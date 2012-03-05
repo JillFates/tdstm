@@ -20,16 +20,7 @@ class AssetDependency {
 	static constraints = {
 		asset( blank:false, nullable:false )
 		dependent(blank:true, nullable:true)
-		type( blank:false, nullable:false ,inList:[
-													"Unknown",
-													"Runs On",
-													"Hosts" ,
-													"DB" ,
-													"Web" ,
-													"Backup" ,
-													"File",
-													"Other"
-												])
+		type( blank:false, nullable:false )
 		dataFlowFreq(blank:true, nullable:true, inList:[
 													"Unknown",
 													"constant",
@@ -44,7 +35,7 @@ class AssetDependency {
 													"incoming",
 													"outgoing"
 												])
-		status(blank:false, nullable:false ,inList:["Unknown", "Validated", "Questioned"])
+		status(blank:false, nullable:false )
 		comment(blank:true, nullable:true)
 		updatedBy( blank:false, nullable:false )
 	}

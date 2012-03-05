@@ -117,8 +117,8 @@ $(document).ready(function() {
 		<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
 		<td><g:select name="entity" from="['Server','Application','Database','Files']" onchange='updateAssetsList(this.name, this.value)'></g:select></td>
 		<td><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></td>
-		<td><g:select name="dtype" from="${assetDependency.constraints.type.inList}"></g:select></td>
-		<td><g:select name="status" from="${assetDependency.constraints.status.inList}"></g:select></td>
+		<td><g:select name="dtype" from="${dependencyType.value}"  optionValue="value""></g:select></td>
+		<td><g:select name="status" from="${dependencyStatus.value}" optionValue="value"></g:select></td>
 	</tr>
 	</table>
 </div>

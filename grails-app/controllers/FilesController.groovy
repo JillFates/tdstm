@@ -11,6 +11,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
+import com.tds.asset.AssetOptions
 import com.tds.asset.AssetTransition
 import com.tds.asset.Database
 import com.tds.asset.Files
@@ -55,6 +56,10 @@ class FilesController {
 		def applications = Application.findAllByAssetTypeAndProject('Application',project)
 		def dbs = Database.findAllByAssetTypeAndProject('Database',project)
 		def files = Files.findAllByAssetTypeAndProject('Files',project)
+		
+		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		
 		try{
 			tableFacade.items = filesList
 			Limit limit = tableFacade.limit
@@ -64,7 +69,7 @@ class FilesController {
 				tableFacade.render()
 			}else
 				return [filesList : filesList , projectId: projectId ,assetDependency: new AssetDependency(),
-					servers : servers, applications : applications, dbs : dbs, files : files]
+					servers : servers, applications : applications, dbs : dbs, files : files,dependencyType:dependencyType,dependencyStatus:dependencyStatus]
 		}catch(Exception e){
 			return [filesList : null,projectId: projectId,
 					servers : servers, applications : applications, dbs : dbs, files : files]
@@ -75,14 +80,13 @@ class FilesController {
 		def fileInstance = new Files(appOwner:'TDS')
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
-		def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
-		def planStatusOptions = EavAttributeOption.findAllByAttribute(planStatusAttribute)
+		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
 		def moveBundleList = MoveBundle.findAllByProject(project)
 
 		[fileInstance:fileInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-					planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project]
+					planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project,planStatusOptions:planStatusOptions.value]
 	}
 	def save = {
 		
@@ -127,8 +131,7 @@ class FilesController {
 	def edit ={
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
-		def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
-		def planStatusOptions = EavAttributeOption.findAllByAttribute(planStatusAttribute)
+		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
 		def moveBundleList = MoveBundle.findAllByProject(project)
@@ -143,10 +146,12 @@ class FilesController {
 			def assetEntity = AssetEntity.get(id)
 			def dependentAssets = AssetDependency.findAllByAsset(assetEntity)
 			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
+			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 
 			[fileInstance:fileInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
 						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, 
-						dependentAssets:dependentAssets, redirectTo : params.redirectTo]
+						dependentAssets:dependentAssets, redirectTo : params.redirectTo, dependencyType:dependencyType, dependencyStatus:dependencyStatus]
 		}
 		
 	}

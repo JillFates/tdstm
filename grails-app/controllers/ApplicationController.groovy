@@ -17,6 +17,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
+import com.tds.asset.AssetOptions
 import com.tds.asset.AssetTransition
 import com.tds.asset.Database
 import com.tds.asset.Files
@@ -69,6 +70,10 @@ class ApplicationController {
 		def applications = Application.findAllByAssetTypeAndProject('Application',project)
 		def dbs = Database.findAllByAssetTypeAndProject('Database',project)
 		def files = Files.findAllByAssetTypeAndProject('Files',project)
+		
+		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		
 		try{
 			tableFacade.items = appBeanList
 			Limit limit = tableFacade.limit
@@ -78,7 +83,7 @@ class ApplicationController {
 				tableFacade.render()
 			} else {
 				return [assetEntityList : appBeanList , projectId: projectId, assetDependency: new AssetDependency(),
-					servers : servers, applications : applications, dbs : dbs, files : files]
+					servers : servers, applications : applications, dbs : dbs, files : files,dependencyType:dependencyType,dependencyStatus:dependencyStatus]
 			}
 		}catch(Exception e){
 			return [assetEntityList : null, projectId: projectId , servers : servers, applications : applications, dbs : dbs, files : files]
@@ -88,11 +93,10 @@ class ApplicationController {
 		def applicationInstance = new Application(appOwner:'TDS')
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
-		def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
-		def planStatusOptions = EavAttributeOption.findAllByAttribute(planStatusAttribute)
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
 		def moveBundleList = MoveBundle.findAllByProject(project)
+		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 
 		[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 					planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project]
@@ -151,8 +155,7 @@ class ApplicationController {
 
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
-		def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
-		def planStatusOptions = EavAttributeOption.findAllByAttribute(planStatusAttribute)
+		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
 		def moveBundleList = MoveBundle.findAllByProject(project)
@@ -167,10 +170,12 @@ class ApplicationController {
 			def assetEntity = AssetEntity.get(id)
 			def dependentAssets = AssetDependency.findAllByAsset(assetEntity)
 			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
-
+			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+	
 			[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
 						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, 
-						dependentAssets:dependentAssets, redirectTo : params.redirectTo]
+						dependentAssets:dependentAssets, redirectTo : params.redirectTo,dependencyType:dependencyType, dependencyStatus:dependencyStatus]
 		}
 
 	}

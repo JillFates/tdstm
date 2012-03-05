@@ -1170,6 +1170,10 @@ class AssetEntityController {
 		def applications = Application.findAllByAssetTypeAndProject('Application',project)
 		def dbs = Database.findAllByAssetTypeAndProject('Database',project)
 		def files = Files.findAllByAssetTypeAndProject('Files',project)
+		
+		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+
 		try{
 			TableFacade tableFacade = new TableFacadeImpl("tag",request)
 			tableFacade.items = assetEntityList
@@ -1180,7 +1184,7 @@ class AssetEntityController {
 				tableFacade.render()
 			}else
 				return [assetEntityList : assetEntityList,projectId: projectId, servers : servers,
-					applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency()]
+					applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency(), dependencyType:dependencyType, dependencyStatus:dependencyStatus ]
 		} catch(Exception ex ){
 			return [assetEntityInstanceList : null,projectId: projectId, servers : servers,
 				applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency()]
@@ -2461,23 +2465,28 @@ class AssetEntityController {
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute , [sort:"value"])
 		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",["Server"])?.manufacturer
 
-		def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
-		def planStatusOptions = EavAttributeOption.findAllByAttribute(planStatusAttribute)
+		/*def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
+		def planStatusOptions = EavAttributeOption.findAllByAttribute(planStatusAttribute)*/
 
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
 
 		def moveBundleList = MoveBundle.findAllByProject(project)
+		
+		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		
+		def priorityOption = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
+		
 
 		def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
 		def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)
 
-		def priorityAttribute = EavAttribute.findByAttributeCode('priority')
-		def priorityOption = EavAttributeOption.findAllByAttribute(priorityAttribute)
+		/*def priorityAttribute = EavAttribute.findByAttributeCode('priority')
+		def priorityOption = EavAttributeOption.findAllByAttribute(priorityAttribute)*/
 
 		[assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 					planStatusOptions:planStatusOptions?.value, projectId:projectId ,railTypeOption:railTypeOption?.value,
-					priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers,redirectTo:params?.redirectTo ]
+					priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers,redirectTo:params?.redirectTo]
 
 
 
@@ -2553,12 +2562,14 @@ class AssetEntityController {
 		def dependentAssets = AssetDependency.findAllByAsset(assetEntityInstance)
 		def supportAssets = AssetDependency.findAllByDependent(assetEntityInstance)
 
-
+		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 
 		[assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 					planStatusOptions:planStatusOptions?.value, projectId:projectId, project: project, railTypeOption:railTypeOption?.value,
 					priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets,
-					manufacturers:manufacturers, models:models,redirectTo:params?.redirectTo]
+					manufacturers:manufacturers, models:models,redirectTo:params?.redirectTo, dependencyType:dependencyType,
+					dependencyStatus:dependencyStatus]
 
 	}
 
@@ -2744,4 +2755,6 @@ class AssetEntityController {
 		}
 		render assetOptionInstance.id
 	}
+	
+
 }
