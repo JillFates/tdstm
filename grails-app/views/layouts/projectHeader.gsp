@@ -219,7 +219,7 @@
 				</li>
             </tds:hasPermission>
 	        <tds:hasPermission permission='AssetMenuView'>
-			<li id="assetMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="assetImport">Assets
+			<li id="assetMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="assetSummary" params="[projectId:currProjObj?.id]">Assets
 				<a id="assetAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#assetMegaMenu')" href="javascript:showMegaMenu('#assetMegaMenu')" style="display: inline"></a></g:link>
 				<div class="megamenu rooms" id="assetMegaMenu" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" style="display: none;">
 					<table class="mmtable room_rack"><tr>
