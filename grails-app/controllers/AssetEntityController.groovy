@@ -2753,6 +2753,54 @@ class AssetEntityController {
 		}
 		render assetOptionInstance.id
 	}
-	
+	/**
+	* Render Summary of assigned and unassgined assets.
+	*/
+	def assetSummary ={
+		def projectId = params.projectId
+		if(projectId == null || projectId == ""){
+			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		}
+		def project = Project.findById( projectId )
+		List moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
+		List assetSummaryList = []
+		int totalAsset = 0;
+		int totalApplication =0;
+		int totalDatabase = 0;
+		int totalFiles = 0;
+		int unassignedAssetCount = 0;
+		int unassignedAppCount = 0;
+		int unassignedDBCount = 0;
+		int unassignedFilesCount = 0;
 
+		moveBundleList.each{ moveBundle->
+			def assetCount = AssetEntity.findAllByMoveBundleAndAssetTypeNotInList( moveBundle,["Application","Database","Files"], params ).size()
+			def applicationCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,"Application").size()
+			def databaseCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,"Database").size()
+			def filesCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,"Files").size()
+			assetSummaryList << ["name":moveBundle, "assetCount":assetCount, "applicationCount":applicationCount, "databaseCount":databaseCount, "filesCount":filesCount]
+		}
+
+		unassignedAssetCount = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId and assetType not in ('Application','Database','Files')").size()
+		unassignedAppCount = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId and assetType='Application'").size()
+		unassignedDBCount = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId and assetType='Database'").size()
+		unassignedFilesCount = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId and assetType='Files'").size()
+
+		assetSummaryList.each{asset->
+			totalAsset=totalAsset + asset.assetCount
+			totalApplication = totalApplication + asset.applicationCount
+			totalDatabase = totalDatabase + asset.databaseCount
+			totalFiles = totalFiles + asset.filesCount
+
+		}
+		totalAsset = totalAsset + unassignedAssetCount ;
+		totalApplication = totalApplication + unassignedAppCount;
+		totalDatabase = totalDatabase + unassignedDBCount;
+		totalFiles =totalFiles + unassignedFilesCount;
+
+		return [assetSummaryList:assetSummaryList, totalAsset:totalAsset, totalApplication:totalApplication, totalDatabase:totalDatabase,
+			totalFiles:totalFiles,unassignedAssetCount:unassignedAssetCount, unassignedAppCount:unassignedAppCount, unassignedDBCount:unassignedDBCount,
+			unassignedFilesCount:unassignedFilesCount]
+
+	}
 }
