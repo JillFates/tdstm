@@ -102,7 +102,7 @@ class MoveBundleService {
 		def moveBundleSteps = MoveBundleStep.findAll('FROM MoveBundleStep mbs WHERE mbs.moveBundle = :mb ORDER BY mbs.transitionId',[mb:moveBundle])
 		def dashboardSteps = []
 		try{
-			def stepsList = stateEngineService.getDashboardSteps( moveBundle.project.workflowCode )
+			def stepsList = stateEngineService.getDashboardSteps( moveBundle.workflowCode )
 			stepsList.each{
 				def moveBundleStep
 				def stepSnapshot = []
