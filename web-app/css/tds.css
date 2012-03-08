@@ -225,6 +225,12 @@
 .megamenu ul li {
 	display:table;
 }
+
+*+html .megamenu ul li {
+	display: block;
+	clear:both;
+	}
+	
 .megamenu ul li a {
 	width:auto;
 	height:16px;
@@ -614,6 +620,7 @@ td .dep-Questioned {
 	display: none;  left:-527px  !important;    position: absolute  !important; top: 20px; 
 }
 .client { display: none;  left:0px  !important;    position: absolute  !important; top:20px;}
+.admin { display: none;  left:0px  !important;    position: absolute  !important; top:50px;}
 .mmtable .mmlink { 
 	border-right:0px !important;
 }

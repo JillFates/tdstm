@@ -104,7 +104,7 @@
 			<tds:hasPermission permission='AdminMenuView'>
 			<li id="adminMenuId"><g:link class="home menuhideright" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" controller="auth" action="home">Admin
 				<a id="adminAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#adminMegaMenu')" href="javascript:showMegaMenu('#adminMegaMenu')" style="display: inline"></a></g:link>
-    		    <div class="megamenu " id="adminMegaMenu" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+    		    <div class="megamenu admin" id="adminMegaMenu" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" style="display: none;">
 					<table class="mmtable room_rack"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Administration</span><br />
 						<ul >
@@ -329,8 +329,8 @@
 				<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#bundleMegaMenu')" href="javascript:showMegaMenu('#bundleMegaMenu')" style="display: inline"></a></g:link>
 			</li>
 
-			<li id="teamMenuId"><g:link class="home" onmouseover="showMegaMenu('')" onmouseout="mclosetime()" controller="clientTeams" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('bundleMegaMenu')">Teams</g:link></li>
-			<li>&nbsp;</li>
+			<li id="teamMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('')" onmouseout="mclosetime()" controller="clientTeams" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('bundleMegaMenu')">Teams</g:link></li>
+            <li>&nbsp;</li>
             </tds:hasPermission>
 	        <tds:hasPermission permission='ConsoleMenuView'>
 			<li id="consoleMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console
@@ -384,7 +384,7 @@
 			   <li id="dashboardMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('')" controller="dashboard" params="[projectId:currProjObj?.id]">Dashboard</g:link></li>
 			</tds:hasPermission>
 			<tds:hasPermission permission='AssetTrackerMenuView'>
-			   <li id="assetTrackerMenuId"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link></li>
+			   <li id="assetTrackerMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('')" controller="clientConsole" params="[projectId:currProjObj?.id]">Asset Tracker</g:link></li>
 			</tds:hasPermission>
 	        <tds:hasPermission permission='ReportMenuView'>
 			<li id="reportsMenuId" style="position:relative; float: left;"><g:link class="home" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" controller="reports" params="[projectId:currProjObj?.id]">Reports
