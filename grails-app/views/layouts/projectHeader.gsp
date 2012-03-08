@@ -330,7 +330,6 @@
 			</li>
 
 			<li id="teamMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('')" onmouseout="mclosetime()" controller="clientTeams" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('bundleMegaMenu')">Teams</g:link></li>
-            <li>&nbsp;</li>
             </tds:hasPermission>
 	        <tds:hasPermission permission='ConsoleMenuView'>
 			<li id="consoleMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="dashboardView" params="[projectId:currProjObj?.id, 'showAll':'show']">Console
