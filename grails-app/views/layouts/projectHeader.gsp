@@ -300,7 +300,9 @@
 						<ul>
 							<li><g:link class="mmlink" controller="moveBundle" action="list" onclick="hideMegaMenu('bundleMegaMenu')" >List Bundles</g:link> </li>
 							<li><g:link class="mmlink" controller="moveBundle" action="create"  params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('bundleMegaMenu')">Create Bundle</g:link></li>
-							<li>&nbsp;</li>
+							<tds:hasPermission permission='MoveBundleShowView'>
+							  <li><g:link class="mmlink" controller="moveBundle" action="planningStats"  params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('bundleMegaMenu')">Planning Stats</g:link></li>
+							</tds:hasPermission>
 							<li>&nbsp;</li>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('bundleMegaMenu')">help</a></li>

@@ -165,6 +165,7 @@ class MoveBundleController {
 			def allDashboardSteps = moveBundleService.getAllDashboardSteps( moveBundleInstance )
 			def remainingSteps = allDashboardSteps.remainingSteps
 			def workflowCodes = stateEngineService.getWorkflowCode()
+			
 		       	
         	return [ moveBundleInstance : moveBundleInstance, projectId: projectId, managers: managers, projectManager: projectManager, 
 					 moveManager: moveManager, dashboardSteps: allDashboardSteps.dashboardSteps, remainingSteps : remainingSteps, workflowCodes:workflowCodes]
@@ -181,6 +182,11 @@ class MoveBundleController {
             moveBundleInstance.name = params.name
             moveBundleInstance.description = params.description
 			moveBundleInstance.workflowCode = params.workflowCode
+			if(params.useOfPlanning){
+				moveBundleInstance.useOfPlanning = true
+		    }else{
+			    moveBundleInstance.useOfPlanning = false
+			}
 			if(params.moveEvent.id){
 				moveBundleInstance.moveEvent = MoveEvent.get(params.moveEvent.id)
 			} else {
@@ -246,7 +252,7 @@ class MoveBundleController {
     }
 
     def create = {
-    		
+    	
         def moveBundleInstance = new MoveBundle()
         def projectId = params.projectId              
 		def projectInstance = Project.get(projectId)   
@@ -258,7 +264,7 @@ class MoveBundleController {
     }
 
     def save = {
-
+    
 		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
         def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
         def startTime = params.startTime
@@ -276,6 +282,11 @@ class MoveBundleController {
     	def moveManager = params.moveManager
     	def managers = partyRelationshipService.getProjectStaff( projectId )
     	def projectInstance = Party.findById( projectId )
+		if(params.useOfPlanning){
+			moveBundleInstance.useOfPlanning = true
+		}else{
+		    moveBundleInstance.useOfPlanning = false
+		}
         if(!moveBundleInstance.hasErrors() && moveBundleInstance.save()) {
         	if( projectManager != null && projectManager != ""){
 	        	def projectManegerInstance = Party.findById( projectManager )
@@ -433,4 +444,74 @@ class MoveBundleController {
 		}
 		redirect(action:show,params:[id:params.id, projectId:params.projectId])
 	}
+	def planningStats = {
+		def projectId = params.projectId
+		if(!projectId){
+			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		}
+		def project = Project.get(projectId)
+		def AppList = [] 
+		def AssetList = []
+		def totalAppCount =0;
+		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+		int percentageAppCount ;
+		int percentageAssetCount ;
+		def applicationCount = AssetEntity.findAllByAssetTypeAndProject('Application',project).size() 
+		def assetCount = AssetEntity.findAllByProjectAndAssetTypeNotInList(project,['Application','Database','Files'],params).size()
+		def assignedAssetCount
+		def assignedApplicationCount
+		
+		moveBundleList.each{ moveBundle->
+			assignedApplicationCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,"Application").size()
+			AppList << ['count':assignedApplicationCount]
+				 def physicalAssetCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,'Physical Storage').size()
+				 def virtualAssetCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,'Virtual Machine').size()
+				 def count = AssetEntity.findAllByMoveBundleAndAssetTypeNotInList(moveBundle,['Application','Database','Files'],params).size()
+			AssetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count]
+		}
+		def unassignedAppCount = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId and assetType='Application'").size()
+		def totalAssignedApp = applicationCount - unassignedAppCount ;
+		if(unassignedAppCount > 0){
+			   percentageAppCount = Math.round((totalAssignedApp/applicationCount)*100)
+		}else{
+			   percentageAppCount = 100;
+		}
+		if(applicationCount==unassignedAppCount){
+			 percentageAppCount = 0;
+		}
+        
+
+		 def unassignedPhysialAssetCount = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId and assetType = 'Physical Storage'").size()
+		 def unassignedVirtualAssetCount = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId and assetType = 'Virtual Machine'").size()
+		 def totalAssignedPhysicalAsset = assetCount - unassignedPhysialAssetCount ;
+		 def totalAssignedVirtualAsset = assetCount - unassignedVirtualAssetCount ;
+		 
+		 if(unassignedPhysialAssetCount > 0){
+			 percentageAssetCount = Math.round((totalAssignedPhysicalAsset/assetCount)*100)
+		 }else{
+			 percentageAssetCount = 100;
+		 }
+		 if(assetCount==unassignedPhysialAssetCount){
+		   percentageAssetCount = 0;
+		 }
+	   def physicalCount=0;
+	   def virtualCount=0;
+	   AssetList.each{asset->
+		   physicalCount = physicalCount + asset.physicalCount
+		   virtualCount = virtualCount + asset.virtualAssetCount
+	   }
+	   def appDependencies = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+	   int appDependenciesCount = 0;
+	   int serverDependenciesCount = 0;
+	   appDependencies.each{ moveBundle->
+		    def appDependencyCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,'Application').size()
+			appDependenciesCount = appDependenciesCount+appDependencyCount
+			def serverDependencyCount = AssetEntity.findAllByMoveBundleAndAssetTypeInList(moveBundle,['Server','VM','Blade']).size()
+			serverDependenciesCount = serverDependenciesCount+serverDependencyCount
+	   }
+	   return [moveBundleList:moveBundleList, applicationCount:applicationCount,AppList:AppList,unassignedAppCount:unassignedAppCount,percentageAppCount:percentageAppCount,
+			   assetCount:assetCount,AssetList:AssetList,unassignedPhysicalAssetCount:unassignedPhysialAssetCount,unassignedVirtualAssetCount:unassignedVirtualAssetCount,percentageAssetCount:percentageAssetCount,physicalCount:physicalCount,
+			   virtualCount:virtualCount,appDependencies:appDependenciesCount,serverDependenciesCount:serverDependenciesCount]
+	}
+
 }

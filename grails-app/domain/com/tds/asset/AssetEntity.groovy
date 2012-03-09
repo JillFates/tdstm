@@ -94,6 +94,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	
 	Integer currentStatus
 	
+	Integer dependencyBundle = 0
+	
 	static hasMany = [
 		assetEntityVarchars : AssetEntityVarchar
 	]
@@ -177,6 +179,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		
 		
 		currentStatus( blank:true, nullable:true )
+		
+		dependencyBundle( blank:true, nullable:true )
 	}
 	
 	static mapping  = {	

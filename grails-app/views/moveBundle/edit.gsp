@@ -199,6 +199,20 @@
 						as="list" field="workflowCode" /></div>
 				</g:hasErrors></td>
               </tr>
+               <tr class="prop">
+                <td valign="top" class="name">
+                  <label for="description">Use For Planning:</label>
+                </td>
+                <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'useOfPlanning','errors')}">
+                <g:if test="${moveBundleInstance.useOfPlanning == true}">
+                    <input type="checkbox" id="useOfPlanning" name="useOfPlanning" checked="checked"/>
+                 </g:if>
+                 <g:else>
+                    <input type="checkbox" id="useOfPlanning" name="useOfPlanning" />
+                 </g:else>
+                  
+                </td>
+              </tr>
 			
             </tbody>
           </table>

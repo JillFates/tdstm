@@ -151,6 +151,20 @@
 
             </tr>
             
+             <tr class="prop">
+              <td valign="top" class="name">Use For Planning:</td>
+
+              <td valign="top" class="value"> 
+              <g:if test="${moveBundleInstance.useOfPlanning == true}">
+                <input type="checkbox" id="useOfPlanning" name="useOfPlanning" checked="checked" disabled="disabled"/>
+              </g:if>
+              <g:else>
+                 <input type="checkbox" id="useOfPlanning" name="useOfPlanning" disabled="disabled" />
+              </g:else></td>
+
+            </tr>
+            
+            
 
           </tbody>
         </table>

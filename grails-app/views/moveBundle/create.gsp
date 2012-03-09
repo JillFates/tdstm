@@ -174,6 +174,11 @@
 						as="list" field="workflowCode" /></div>
 				</g:hasErrors></td>
               </tr>
+              
+               <tr class="prop">
+                <td valign="top" class="name"><label for="useOfPlanning">Use Of Planning:</label></td>
+               <td> <label for="frontView" ><input type="checkbox" name="useOfPlanning" id="useOfPlanning" checked="checked"/>&nbsp;Front</label></td>
+              </tr>
             </tbody>
           </table>
         </div>

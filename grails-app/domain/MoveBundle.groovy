@@ -10,6 +10,7 @@ class MoveBundle extends Party {
     Integer operationalOrder = 1  		// Order that the bundles are performed in (NOT BEING USED)
     MoveEvent moveEvent
 	String workflowCode
+	Boolean useOfPlanning = true
 	
     static constraints = {        
 		name( blank:false, nullable:false )
