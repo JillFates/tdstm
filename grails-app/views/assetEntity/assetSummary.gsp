@@ -10,14 +10,14 @@
   <div>
   <h1>ASSET SUMMARY</h1>
   </div>
-  <table >
+  <table style="width:700px;">
      <thead>
       <tr>
 	     <th>Bundle</th>
-	     <th>Assets </th>
-	     <th>Applications</th>
-	     <th>Database</th>
-	     <th>files</th>
+	     <th style="text-align:center;">Assets </th>
+	     <th style="text-align:center;">Applications</th>
+	     <th style="text-align:center;">Database</th>
+	     <th style="text-align:center;">files</th>
 	   </tr>
     </thead>
    
@@ -25,25 +25,25 @@
    <g:each in="${assetSummaryList}" var="assetSummary" status="i">
          <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 	          <td>${assetSummary.name}</td>
-	          <td>${assetSummary.assetCount}</td>
-	          <td>${assetSummary.applicationCount}</td>
-	          <td>${assetSummary.databaseCount}</td>
-	          <td>${assetSummary.filesCount}</td>
+	          <td  style="text-align:right;">${assetSummary.assetCount}</td>
+	          <td  style="text-align:right;">${assetSummary.applicationCount}</td>
+	          <td  style="text-align:right;">${assetSummary.databaseCount}</td>
+	          <td  style="text-align:right;">${assetSummary.filesCount}</td>
          </tr>    
     </g:each>
          <tr class='odd'>
-	          <td><b>UnAssigned</b></td>
-	          <td><b>${unassignedAssetCount}</b></td>
-	          <td><b>${unassignedAppCount}</b></td>
-	          <td><b>${unassignedDBCount}</b></td>
-	          <td><b>${unassignedFilesCount}</b></td>
+	          <td  style="text-align:right;"><i>UnAssigned</i></td>
+	          <td  style="text-align:right;"><b>${unassignedAssetCount}</b></td>
+	          <td  style="text-align:right;"><b>${unassignedAppCount}</b></td>
+	          <td  style="text-align:right;"><b>${unassignedDBCount}</b></td>
+	          <td  style="text-align:right;"><b>${unassignedFilesCount}</b></td>
          </tr> 
         <tr class='odd'>
-	          <td><b>Total</b></td>
-	          <td><b>${totalAsset}</b></td>
-	          <td><b>${totalApplication}</b></td>
-	          <td><b>${totalDatabase}</b></td>
-	          <td><b>${totalFiles}</b></td>
+	          <td  style="text-align:right;"><b>Total</b></td>
+	          <td  style="text-align:right;"><b>${totalAsset}</b></td>
+	          <td  style="text-align:right;"><b>${totalApplication}</b></td>
+	          <td  style="text-align:right;"><b>${totalDatabase}</b></td>
+	          <td  style="text-align:right;"><b>${totalFiles}</b></td>
          </tr> 
     </tbody>
     
