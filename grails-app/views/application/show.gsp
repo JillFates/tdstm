@@ -230,19 +230,19 @@
 					<tbody>
 						<g:each in="${supportAssets}" var="support" status="i">
 							<tr onclick="getEntityDetails('${redirectTo}','${support?.asset?.assetType}', ${support?.asset?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
-								<td class="dep-${support.status}">
+								<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
 									${support?.dataFlowFreq}
 								</td>
-								<td class="dep-${support.status}">
+								<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
 									${support?.asset?.assetType}
 								</td>
-								<td class="dep-${support.status}">
+								<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
 									${support?.asset?.assetName}
 								</td>
-								<td class="dep-${support.status}">
+								<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
 									${support.type}
 								</td>
-								<td class="dep-${support.status}">
+								<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
 									${support.status}
 								</td>
 							</tr>
@@ -267,19 +267,19 @@
 					<tbody>
 						<g:each in="${dependentAssets}" var="dependent" status="i">
 							<tr onclick="getEntityDetails('${redirectTo}','${dependent.dependent?.assetType}', ${dependent.dependent?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
-								<td class="dep-${dependent.status}">
+								<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
 									${dependent.dataFlowFreq}
 								</td>
-								<td class="dep-${dependent.status}">
+								<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
 									${dependent.dependent?.assetType}
 								</td>
-								<td class="dep-${dependent.status}">
+								<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
 									${dependent.dependent?.assetName}
 								</td>
-								<td class="dep-${dependent.status}">
+								<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
 									${dependent.type}
 								</td>
-								<td class="dep-${dependent.status}">
+								<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
 									${dependent.status}
 								</td>
 							</tr>
