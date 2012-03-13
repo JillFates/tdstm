@@ -121,7 +121,7 @@
 						</tr>
 						<tr>
 							<td style="width: 170px;text-align: right;">Server Dependencies</td>
-							<td><g:if test="${appDependenciesCount > 0 }">
+							<td><g:if test="${serverDependenciesCount > 0 }">
 									${serverDependenciesCount} &nbsp;
 								${100 - Math.round((pendingServerDependenciesCount/serverDependenciesCount)*100)}%&nbsp;
 								(${pendingServerDependenciesCount}&nbsp;connections to resolve)
