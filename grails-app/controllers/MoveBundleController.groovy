@@ -492,11 +492,14 @@ class MoveBundleController {
 		int percentagePhysicalAssetCount = 0;
 		int percentagevirtualAssetCount = 0;
 
-		if(assetCount > 0){
+		if(totalPhysicalAssetCount > 0){
 			percentagePhysicalAssetCount = Math.round((assignedPhysicalAsset/totalPhysicalAssetCount)*100)
-			percentagevirtualAssetCount = Math.round((assignedVirtualAsset/totalVirtualAssetCount)*100)
 		}else{
 			percentagePhysicalAssetCount = 100;
+		}
+		if(totalVirtualAssetCount > 0){
+			percentagevirtualAssetCount = Math.round((assignedVirtualAsset/totalVirtualAssetCount)*100)
+		}else{
 			percentagevirtualAssetCount = 100;
 		}
 		def physicalCount=0;
