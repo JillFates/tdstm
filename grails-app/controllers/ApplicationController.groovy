@@ -66,10 +66,10 @@ class ApplicationController {
 			appBeanList.add(appBeanInstance)
 		}
 		TableFacade tableFacade = new TableFacadeImpl("tag", request)
-		def servers = AssetEntity.findAllByAssetTypeAndProject('Server',project)
-		def applications = Application.findAllByAssetTypeAndProject('Application',project)
-		def dbs = Database.findAllByAssetTypeAndProject('Database',project)
-		def files = Files.findAllByAssetTypeAndProject('Files',project)
+		def servers = AssetEntity.findAll('from AssetEntity where assetType = ? and project =? order by assetName asc',['Server', project])
+		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
+		def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
+		def files = Files.findAll('from Files where assetType = ? and project =? order by assetName asc',['Files', project])
 		
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
