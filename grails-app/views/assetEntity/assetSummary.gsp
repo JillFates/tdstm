@@ -33,10 +33,10 @@
     </g:each>
          <tr class='odd'>
 	          <td  style="text-align:right;"><i>UnAssigned</i></td>
-	          <td  style="text-align:right;"><b>${unassignedAssetCount}</b></td>
-	          <td  style="text-align:right;"><b>${unassignedAppCount}</b></td>
-	          <td  style="text-align:right;"><b>${unassignedDBCount}</b></td>
-	          <td  style="text-align:right;"><b>${unassignedFilesCount}</b></td>
+	          <td  style="text-align:right;"><i>${unassignedAssetCount}</i></td>
+	          <td  style="text-align:right;"><i>${unassignedAppCount}</i></td>
+	          <td  style="text-align:right;"><i>${unassignedDBCount}</i></td>
+	          <td  style="text-align:right;"><i>${unassignedFilesCount}</i></td>
          </tr> 
         <tr class='odd'>
 	          <td  style="text-align:right;"><b>Total</b></td>
