@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 
+import com.tds.asset.AssetComment;
+import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetTransition
 import com.tdssrc.grails.GormUtil
@@ -444,74 +446,83 @@ class MoveBundleController {
 		}
 		redirect(action:show,params:[id:params.id, projectId:params.projectId])
 	}
+	/**
+	 * 
+	 */
 	def planningStats = {
 		def projectId = params.projectId
 		if(!projectId){
 			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		}
 		def project = Project.get(projectId)
-		def AppList = [] 
-		def AssetList = []
-		def totalAppCount =0;
+		def appList = []
+		def assetList = []
 		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
-		int percentageAppCount ;
-		int percentageAssetCount ;
-		def applicationCount = AssetEntity.findAllByAssetTypeAndProject('Application',project).size() 
+		
+		def applicationCount = AssetEntity.findAllByAssetTypeAndProject('Application',project).size()
 		def assetCount = AssetEntity.findAllByProjectAndAssetTypeNotInList(project,['Application','Database','Files'],params).size()
 		def assignedAssetCount
 		def assignedApplicationCount
-		
+
 		moveBundleList.each{ moveBundle->
 			assignedApplicationCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,"Application").size()
-			AppList << ['count':assignedApplicationCount]
-				 def physicalAssetCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,'Physical Storage').size()
-				 def virtualAssetCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,'Virtual Machine').size()
-				 def count = AssetEntity.findAllByMoveBundleAndAssetTypeNotInList(moveBundle,['Application','Database','Files'],params).size()
-			AssetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count]
+			appList << ['count':assignedApplicationCount]
+			def physicalAssetCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,'Server').size()
+			def virtualAssetCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,'VM').size()	
+			def count = AssetEntity.findAllByMoveBundleAndAssetTypeNotInList(moveBundle,['Application','Database','Files'],params).size()
+			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count]
 		}
-		def unassignedAppCount = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId and assetType='Application'").size()
+		def unassignedAppCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType=? and planStatus = ?",['Application','Unassigned']).size()
 		def totalAssignedApp = applicationCount - unassignedAppCount ;
-		if(unassignedAppCount > 0){
-			   percentageAppCount = Math.round((totalAssignedApp/applicationCount)*100)
+		int percentageAppCount = 0 ;
+		if(applicationCount > 0){
+			percentageAppCount = Math.round((totalAssignedApp/applicationCount)*100)
 		}else{
-			   percentageAppCount = 100;
+			percentageAppCount = 100;
 		}
-		if(applicationCount==unassignedAppCount){
-			 percentageAppCount = 0;
-		}
-        
+		def unassignedPhysialAssetCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType = ? and planStatus = ?",['Server','Unassigned']).size()
+		def unassignedVirtualAssetCount = AssetEntity.findAll("from AssetEntity where  project = $projectId and assetType = ? and planStatus = ?",['VM','Unassigned']).size()
+		
+		def assignedPhysicalAsset = moveBundleList ? AssetEntity.countByAssetTypeAndMoveBundleInList('Server',moveBundleList) : 0
+		def assignedVirtualAsset = moveBundleList ? AssetEntity.countByAssetTypeAndMoveBundleInList('VM',moveBundleList) : 0
+		
+		def totalPhysicalAssetCount = assignedPhysicalAsset + unassignedPhysialAssetCount ;
+		def totalVirtualAssetCount = assignedVirtualAsset + unassignedVirtualAssetCount ;
 
-		 def unassignedPhysialAssetCount = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId and assetType = 'Physical Storage'").size()
-		 def unassignedVirtualAssetCount = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId and assetType = 'Virtual Machine'").size()
-		 def totalAssignedPhysicalAsset = assetCount - unassignedPhysialAssetCount ;
-		 def totalAssignedVirtualAsset = assetCount - unassignedVirtualAssetCount ;
-		 
-		 if(unassignedPhysialAssetCount > 0){
-			 percentageAssetCount = Math.round((totalAssignedPhysicalAsset/assetCount)*100)
-		 }else{
-			 percentageAssetCount = 100;
-		 }
-		 if(assetCount==unassignedPhysialAssetCount){
-		   percentageAssetCount = 0;
-		 }
-	   def physicalCount=0;
-	   def virtualCount=0;
-	   AssetList.each{asset->
-		   physicalCount = physicalCount + asset.physicalCount
-		   virtualCount = virtualCount + asset.virtualAssetCount
-	   }
-	   def appDependencies = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
-	   int appDependenciesCount = 0;
-	   int serverDependenciesCount = 0;
-	   appDependencies.each{ moveBundle->
-		    def appDependencyCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,'Application').size()
-			appDependenciesCount = appDependenciesCount+appDependencyCount
-			def serverDependencyCount = AssetEntity.findAllByMoveBundleAndAssetTypeInList(moveBundle,['Server','VM','Blade']).size()
-			serverDependenciesCount = serverDependenciesCount+serverDependencyCount
-	   }
-	   return [moveBundleList:moveBundleList, applicationCount:applicationCount,AppList:AppList,unassignedAppCount:unassignedAppCount,percentageAppCount:percentageAppCount,
-			   assetCount:assetCount,AssetList:AssetList,unassignedPhysicalAssetCount:unassignedPhysialAssetCount,unassignedVirtualAssetCount:unassignedVirtualAssetCount,percentageAssetCount:percentageAssetCount,physicalCount:physicalCount,
-			   virtualCount:virtualCount,appDependencies:appDependenciesCount,serverDependenciesCount:serverDependenciesCount]
+		int percentagePhysicalAssetCount = 0;
+		int percentagevirtualAssetCount = 0;
+
+		if(assetCount > 0){
+			percentagePhysicalAssetCount = Math.round((assignedPhysicalAsset/totalPhysicalAssetCount)*100)
+			percentagevirtualAssetCount = Math.round((assignedVirtualAsset/totalVirtualAssetCount)*100)
+		}else{
+			percentagePhysicalAssetCount = 100;
+			percentagevirtualAssetCount = 100;
+		}
+		def physicalCount=0;
+		def virtualCount=0;
+		assetList.each{asset->
+			physicalCount = physicalCount + asset.physicalCount
+			virtualCount = virtualCount + asset.virtualAssetCount
+		}
+		
+		
+		def applicationsOfPlanningBundle = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Application',moveBundleList)
+		def serversOfPlanningBundle = AssetEntity.findAllByAssetTypeInListAndMoveBundleInList(['Server', 'VM', 'Blade'],moveBundleList)
+		
+		def appDependenciesCount = applicationsOfPlanningBundle ? AssetDependency.countByDependentInList(applicationsOfPlanningBundle) : 0
+		def serverDependenciesCount = serversOfPlanningBundle ? AssetDependency.countByDependentInList(serversOfPlanningBundle) : 0
+		def pendingAppDependenciesCount = applicationsOfPlanningBundle ? AssetDependency.countByDependentInListAndStatusNotEqual(applicationsOfPlanningBundle,"Validated") : 0
+		def pendingServerDependenciesCount = serversOfPlanningBundle ? AssetDependency.countByDependentInListAndStatusNotEqual(serversOfPlanningBundle,"Validated") : 0
+		
+		def issues = AssetComment.findAll("FROM AssetComment a where a.assetEntity.project = ? and a.commentType = ? and a.isResolved = 0",[project,"issue"])
+		
+		return [moveBundleList:moveBundleList, applicationCount:applicationCount,appList:appList,unassignedAppCount:unassignedAppCount,
+			percentageAppCount:percentageAppCount,assetCount:assetCount,assetList:assetList,unassignedPhysicalAssetCount:unassignedPhysialAssetCount,
+			unassignedVirtualAssetCount:unassignedVirtualAssetCount,percentagePhysicalAssetCount:percentagePhysicalAssetCount,
+			percentagevirtualAssetCount:percentagevirtualAssetCount,physicalCount:physicalCount, virtualCount:virtualCount,
+			appDependenciesCount:appDependenciesCount,serverDependenciesCount:serverDependenciesCount, pendingAppDependenciesCount:pendingAppDependenciesCount,
+			pendingServerDependenciesCount:pendingServerDependenciesCount, issuesCount : issues.size()]
 	}
 
 }
