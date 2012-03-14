@@ -374,7 +374,7 @@ function onInvokeAction(id) {
 		if(j == 0){
 			alert('Please select the Asset');
 		}else{
-			${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr ', onComplete:'showChangeStatusDialog(e);' )}
+			${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr +\'&moveBundle=\'+$(\'#moveBundleId\').val() ', onComplete:'showChangeStatusDialog(e);' )}
 		}
 	}	
 	
