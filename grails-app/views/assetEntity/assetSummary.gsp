@@ -54,7 +54,7 @@
          <tr class='odd'>
 	          <td  style="text-align:right;"><i>UnAssigned</i></td>
 	          <g:if test="${unassignedAssetCount>0}">
-	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[tag_s_11_moveBundle:"desc"]' >${assetSummary.assetCount}</g:link></td>
+	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[tag_s_11_moveBundle:"desc"]' >${unassignedAssetCount}</g:link></td>
 	          </g:if>
 	          <g:else>
 	              <td  style="text-align:right;"></td>
