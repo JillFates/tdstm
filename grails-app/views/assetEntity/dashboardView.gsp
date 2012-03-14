@@ -872,7 +872,7 @@ function onInvokeAction(id) {
 								<td><b>Change:</b></td>
 								<td><select id="stateSelectId" name="state"
 									style="width: 100px"
-									onchange="${remoteFunction(action:'getFlag', params:'\'toState=\'+ this.value +\'&fromState=\'+$(\'#currentStateId\').val()', onComplete:'setComment(e)')}">
+									onchange="${remoteFunction(action:'getFlag', params:'\'toState=\'+ this.value +\'&fromState=\'+$(\'#currentStateId\').val()+\'&moveBundle=\'+$(\'#moveBundleId\').val()', onComplete:'setComment(e)')}">
 									<option value="">Status</option>
 								</select></td>
 							</tr>

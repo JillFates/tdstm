@@ -642,6 +642,7 @@ function showAssetDialog( e , action ) {
 	      	 $('#resolutionEditId').val(assetComments[0].assetComment.resolution)
 	      	 $('#commentEditId').val(assetComments[0].assetComment.comment)
 	      	 $('#commentTypeEditId').val(assetComments[0].assetComment.commentType)
+	      	 $('#commentTypeEditIdReadOnly').val(assetComments[0].assetComment.commentType)
 	      	 $('#categoryEditId').html(assetComments[0].assetComment.category)
 	      	 $('#commentCodeEditId').html(assetComments[0].assetComment.commentCode)
 	      	 $('#mustVerifyEditId').val(assetComments[0].assetComment.mustVerify)
