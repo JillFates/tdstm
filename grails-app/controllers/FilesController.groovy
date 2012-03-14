@@ -26,6 +26,8 @@ class FilesController {
 		 	
 	}
 	def list={
+		def filterAttributes = [tag_f_assetName:params.tag_f_assetName,tag_f_fileFormat:params.tag_f_fileFormat,tag_f_fileSize:params.tag_f_fileSize,tag_f_moveBundle:params.tag_f_moveBundle,tag_f_planStatus:params.tag_f_planStatus,tag_f_depUp:params.tag_f_depUp,tag_f_depDown:params.tag_f_depDown]
+		session.setAttribute('filterAttributes', filterAttributes)
 		def projectId = params.projectId ? params.projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
 		def fileInstanceList = Files.findAllByProject(project)
@@ -52,7 +54,7 @@ class FilesController {
 			filesList.add(filesEntity)
 		}
 		TableFacade tableFacade = new TableFacadeImpl("tag", request)
-		def servers = AssetEntity.findAll('from AssetEntity where assetType = ? and project =? order by assetName asc',['Server', project])
+		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
 		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
 		def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
 		def files = Files.findAll('from Files where assetType = ? and project =? order by assetName asc',['Files', project])
@@ -148,14 +150,19 @@ class FilesController {
 			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
 			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+			def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
 
 			[fileInstance:fileInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
 						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, 
-						dependentAssets:dependentAssets, redirectTo : params.redirectTo, dependencyType:dependencyType, dependencyStatus:dependencyStatus]
+						dependentAssets:dependentAssets, redirectTo : params.redirectTo, dependencyType:dependencyType, dependencyStatus:dependencyStatus,servers:servers]
 		}
 		
 	}
 	def update ={
+		def attribute = session.getAttribute('filterAttr')
+		def filterAttr = session.getAttribute('filterAttributes')
+		session.setAttribute("USE_FILTERS","true")
+		
 		def filesInstance = Files.get(params.id)
 		filesInstance.properties = params
 		if(!filesInstance.hasErrors() && filesInstance.save(flush:true)) {
@@ -184,7 +191,7 @@ class FilesController {
 					redirect( controller:'application', action:list)
 					break;
 				default:
-					redirect( action:list)
+					redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_fileFormat:filterAttr.tag_f_fileFormat,tag_f_fileSize:filterAttr.tag_f_fileSize, tag_f_moveBundle:filterAttr.tag_f_moveBundle, tag_f_planStatus:filterAttr.tag_f_planStatus, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown])
 			}
 		}
 		else {

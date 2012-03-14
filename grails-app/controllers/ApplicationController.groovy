@@ -37,6 +37,9 @@ class ApplicationController {
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
 	def  list ={
+		def filterAttributes = [tag_f_assetName:params.tag_f_assetName,tag_f_appOwner:params.tag_f_appOwner,tag_f_appSme:params.tag_f_appSme,tag_f_planStatus:params.tag_f_planStatus,tag_f_depUp:params.tag_f_depUp,tag_f_depDown:params.tag_f_depDown]
+		session.setAttribute('filterAttributes', filterAttributes)
+		
 		def projectId = params.projectId ? params.projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
 		def workFlow = project.workflowCode
@@ -66,7 +69,7 @@ class ApplicationController {
 			appBeanList.add(appBeanInstance)
 		}
 		TableFacade tableFacade = new TableFacadeImpl("tag", request)
-		def servers = AssetEntity.findAll('from AssetEntity where assetType = ? and project =? order by assetName asc',['Server', project])
+		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
 		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
 		def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
 		def files = Files.findAll('from Files where assetType = ? and project =? order by assetName asc',['Files', project])
@@ -158,8 +161,8 @@ class ApplicationController {
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
-		def moveBundleList = MoveBundle.findAllByProject(project)
-
+        def moveBundleList = MoveBundle.findAllByProject(project)
+        
 		def id = params.id
 		def applicationInstance = Application.get( id )
 		if(!applicationInstance) {
@@ -172,15 +175,20 @@ class ApplicationController {
 			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
 			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-	
+	        def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
+	        
 			[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
-						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, 
-						dependentAssets:dependentAssets, redirectTo : params.redirectTo,dependencyType:dependencyType, dependencyStatus:dependencyStatus]
+						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets,
+						dependentAssets:dependentAssets, redirectTo : params.redirectTo,dependencyType:dependencyType, dependencyStatus:dependencyStatus,
+						servers:servers]
 		}
 
 	}
 
 	def update ={
+		def attribute = session.getAttribute('filterAttr')
+		def filterAttr = session.getAttribute('filterAttributes')
+		session.setAttribute("USE_FILTERS","true")
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def maintExpDate = params.maintExpDate
@@ -219,7 +227,7 @@ class ApplicationController {
 					redirect( controller:'files', action:list)
 					break;
 				default:
-					redirect( action:list)
+					redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_appOwner:filterAttr.tag_f_appOwner, tag_f_appSme:filterAttr.tag_f_appSme, tag_f_planStatus:filterAttr.tag_f_planStatus, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown])
 			}
 		}
 		else {

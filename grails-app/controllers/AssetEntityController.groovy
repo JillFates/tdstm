@@ -1166,7 +1166,7 @@ class AssetEntityController {
 
 			assetEntityList.add(assetBeanInstance)
 		}
-		def servers = AssetEntity.findAll('from AssetEntity where assetType = ? and project =? order by assetName asc',['Server', project])
+		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
 		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
 		def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
 		def files = Files.findAll('from Files where assetType = ? and project =? order by assetName asc',['Files', project])
@@ -2562,13 +2562,13 @@ class AssetEntityController {
 
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-		
+		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
 
 		[assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 					planStatusOptions:planStatusOptions?.value, projectId:projectId, project: project, railTypeOption:railTypeOption?.value,
 					priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets,
 					manufacturers:manufacturers, models:models,redirectTo:params?.redirectTo, dependencyType:dependencyType,
-					dependencyStatus:dependencyStatus]
+					dependencyStatus:dependencyStatus,servers:servers]
 
 	}
 
