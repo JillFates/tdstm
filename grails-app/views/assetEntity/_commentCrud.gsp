@@ -173,7 +173,7 @@
 					 onChange="commentChange('#editResolveDiv','editCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
 				</tds:hasPermission>
 				<tds:hasPermission permission='CommentCrudView'>
-					<input type="text" id="commentTypeEditId" name="commentType" readonly style="border: 0;"/>&nbsp;&nbsp;&nbsp;&nbsp;
+					<input type="text" id="commentTypeEditIdReadOnly" readonly style="border: 0;"/>&nbsp;&nbsp;&nbsp;&nbsp;
 				</tds:hasPermission>				
 				<input type="checkbox" id="mustVerifyEditId" name="mustVerify" value="0"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
