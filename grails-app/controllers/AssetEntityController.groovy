@@ -2664,7 +2664,12 @@ class AssetEntityController {
 		}
 		def project = Project.findById( projectId )
 		def assetEntityInstance = AssetEntity.findAllByProject(project)
-		def assetCommentList = AssetComment.findAll("From AssetComment a where a.assetEntity.project = :project",[project:project])
+		def assetCommentList
+		if(params.resolvedBox=="on"){
+		    assetCommentList = AssetComment.findAll("From AssetComment a where a.assetEntity.project = :project  order by dateCreated asc ",[project:project])
+		}else{
+		    assetCommentList = AssetComment.findAll("From AssetComment a where a.assetEntity.project = :project and isResolved = :isResolved order by dateCreated asc",[project:project,isResolved:0])
+		}
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
 		tableFacade.items = assetCommentList
 		Limit limit = tableFacade.limit
@@ -2673,7 +2678,7 @@ class AssetEntityController {
 			tableFacade.setColumnProperties("comment","commentType","assetEntity","mustVerify","isResolved","resolution","resolvedBy","createdBy","commentCode","category","displayOption")
 			tableFacade.render()
 		} else {
-			return [assetCommentList:assetCommentList,rediectTo:'comment']
+			return [assetCommentList:assetCommentList,rediectTo:'comment',checked:params.resolvedBox]
 		}
 	}
 
