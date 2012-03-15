@@ -659,9 +659,10 @@ function showAssetDialog( e , action ) {
 	      	 	$("#showCommentDialog").dialog("open")
 	      	 	$("#editCommentDialog").dialog("close")
 	      	 }
-	      	timedUpdate('never')
+	      	 if($("#selectTimedId").length > 0){
+	      		 timedUpdate('never')
+	      	 }
 		}
-		
 	}
 	function addCommentsToList( e ){
 		var status = $('#statusId').val();
