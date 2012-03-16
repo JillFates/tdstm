@@ -20,8 +20,11 @@ class Application extends AssetEntity{
 	String appFunction
 	String useFrequency
 	String userLocations
-	String userConcurrent
 	String userCount
+	String validation
+	String latency
+	String testProc
+	String startupProc
 	
 	String drRpoDesc
 	String drRtoDesc
@@ -43,8 +46,11 @@ class Application extends AssetEntity{
 		appFunction( blank:true, nullable:true )
 		useFrequency( blank:true, nullable:true )
 		userLocations( blank:true, nullable:true )
-		userConcurrent( blank:true, nullable:true )
 		userCount( blank:true, nullable:true )
+		validation( blank:true, nullable:true )
+		latency( blank:true, nullable:true )
+		testProc( blank:true, nullable:true )
+		startupProc( blank:true, nullable:true )
 		
 		drRpoDesc( blank:true, nullable:true )
 		drRtoDesc( blank:true, nullable:true )
