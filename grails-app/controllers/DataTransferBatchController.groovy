@@ -373,7 +373,6 @@ class DataTransferBatchController {
 		    		
     					if( application && flag == 0 ) {
     						application.project = projectInstance
-    						//application.owner = projectInstance.client
     						dtvList.each {
     							def attribName = it.eavAttribute.attributeCode
 									switch(attribName){
@@ -399,7 +398,14 @@ class DataTransferBatchController {
 										case "owner":
 												application."$attribName" = application.owner
 											break;
-										
+										case "validation":
+												if(!it.importValue){
+														def validation = "Discovery"
+														application."$attribName" = validation
+												}else{
+												        application."$attribName" = it.importValue
+												}
+												break;
 										default:
 										if( it.eavAttribute.backendType == "int"){
 		    								def correctedPos
@@ -444,7 +450,7 @@ class DataTransferBatchController {
 									application.assetType='Application'
         							if ( isNewValidate == "true" ) {
         								if( application.save() ) {
-											
+                                   											
         									insertCount+=1
         								}
         							} else {

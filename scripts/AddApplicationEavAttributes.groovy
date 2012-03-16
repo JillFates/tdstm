@@ -1880,3 +1880,278 @@ if(!downtimeToleranceDataTransferMapWalkThru){
 } else {
    DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'DowntimeTolerance',sheetName='Applications' where eavAttribute = ?",[downtimeToleranceAttribute])
 }
+/**
+*  Create validation
+*/
+def validationAttribute = EavAttribute.findByAttributeCodeAndEntityType('validation',appEntityType)
+if(validationAttribute){
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'validation', frontendLabel='Validation' where id = ?",[validationAttribute.id])
+} else {
+   validationAttribute = new EavAttribute( attributeCode : "validation",
+		   backendType : 'String',
+		   frontendInput : 'text',
+		   frontendLabel : 'Validation',
+		   note : 'this field is used for just import',
+		   sortOrder : 10,
+		   entityType:appEntityType,
+		   isRequired:0,
+		   isUnique:0,
+		   defaultValue:"1",
+		   validation:'No validation'
+		   )
+   if ( !validationAttribute.validate() || validationAttribute.save(flush:true) ) {
+	   println"Unable to create validationAttribute : "
+	   validationAttribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def validationEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(validationAttribute,appAttributeSet)
+if(validationEavEntityAttribute){
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 10, attributeCode = 'validation' where attributeCode = 'validation'")
+} else {
+   validationEavEntityAttribute = new EavEntityAttribute(sortOrder:10,attribute:validationAttribute,eavAttributeSet:appAttributeSet)
+   if ( !validationEavEntityAttribute.validate() || !validationEavEntityAttribute.save(flush:true) ) {
+	   println"Unable to create validationEavEntityAttribute : " +
+			   validationEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def validationDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,validationAttribute)
+if( !validationDataTransferMapMaster ){
+   validationDataTransferMapMaster = new DataTransferAttributeMap(columnName:"Validation",
+		   sheetName:"Applications",
+		   dataTransferSet : masterDataTransferSet,
+		   eavAttribute:validationAttribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !validationDataTransferMapMaster.validate() || !validationDataTransferMapMaster.save(flush:true) ) {
+	   println"Unable to create validationDataTransferMapMaster : " +
+			   validationDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'validation',sheetName='Applications' where eavAttribute = ?",[validationAttribute])
+}
+
+def validationDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,validationAttribute)
+if(!validationDataTransferMapWalkThru){
+   validationDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Validation",
+		   sheetName:"Applications",
+		   dataTransferSet : walkThruDataTransferSet,
+		   eavAttribute:validationAttribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !validationDataTransferMapWalkThru.validate() || !validationDataTransferMapWalkThru.save(flush:true) ) {
+	   println"Unable to create validationDataTransferMapWalkThru : " +
+			   validationDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Validation',sheetName='Applications' where eavAttribute = ?",[validationAttribute])
+}
+/**
+*  Create Latency
+*/
+def latencyAttribute = EavAttribute.findByAttributeCodeAndEntityType('latency',appEntityType)
+if(latencyAttribute){
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'latency', frontendLabel='Latency' where id = ?",[latencyAttribute.id])
+} else {
+   latencyAttribute = new EavAttribute( attributeCode : "latency",
+		   backendType : 'String',
+		   frontendInput : 'text',
+		   frontendLabel : 'Latency',
+		   note : 'this field is used for just import',
+		   sortOrder : 10,
+		   entityType:appEntityType,
+		   isRequired:0,
+		   isUnique:0,
+		   defaultValue:"1",
+		   validation:'No validation'
+		   )
+   if ( !latencyAttribute.validate() || !latencyAttribute.save(flush:true) ) {
+	   println"Unable to create latencyAttribute : "
+	   latencyAttribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def latencyEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(latencyAttribute,appAttributeSet)
+if(latencyEavEntityAttribute){
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 10, attributeCode = 'latency' where attributeCode = 'latency'")
+} else {
+   latencyEavEntityAttribute = new EavEntityAttribute(sortOrder:10,attribute:latencyAttribute,eavAttributeSet:appAttributeSet)
+   if ( !latencyEavEntityAttribute.validate() || !latencyEavEntityAttribute.save(flush:true) ) {
+	   println"Unable to create latencyEavEntityAttribute : " +
+			   latencyEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+def latencyDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,latencyAttribute)
+if( !latencyDataTransferMapMaster ){
+   latencyDataTransferMapMaster = new DataTransferAttributeMap(columnName:"Latency",
+		   sheetName:"Applications",
+		   dataTransferSet : masterDataTransferSet,
+		   eavAttribute:latencyAttribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !latencyDataTransferMapMaster.validate() || !latencyDataTransferMapMaster.save(flush:true) ) {
+	   println"Unable to create latencyDataTransferMapMaster : " +
+			   latencyDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'latency',sheetName='Applications' where eavAttribute = ?",[latencyAttribute])
+}
+
+def latencyDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,latencyAttribute)
+if(!latencyDataTransferMapWalkThru){
+   latencyDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Latency",
+		   sheetName:"Applications",
+		   dataTransferSet : walkThruDataTransferSet,
+		   eavAttribute:latencyAttribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !latencyDataTransferMapWalkThru.validate() || !latencyDataTransferMapWalkThru.save(flush:true) ) {
+	   println"Unable to create latencyDataTransferMapWalkThru : " +
+			   latencyDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Latency',sheetName='Applications' where eavAttribute = ?",[latencyAttribute])
+}
+/**
+*  Create TestProc
+*/
+def testProcAttribute = EavAttribute.findByAttributeCodeAndEntityType('testProc',appEntityType)
+if(testProcAttribute){
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'testProc', frontendLabel='TestProc' where id = ?",[testProcAttribute.id])
+} else {
+   testProcAttribute = new EavAttribute( attributeCode : "testProc",
+		   backendType : 'String',
+		   frontendInput : 'text',
+		   frontendLabel : 'TestProc',
+		   note : 'this field is used for just import',
+		   sortOrder : 10,
+		   entityType:appEntityType,
+		   isRequired:0,
+		   isUnique:0,
+		   defaultValue:"1",
+		   validation:'No validation'
+		   )
+   if ( !testProcAttribute.validate() || !testProcAttribute.save(flush:true) ) {
+	   println"Unable to create testProcAttribute : "
+	   testProcAttribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def testProcEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(testProcAttribute,appAttributeSet)
+if(testProcEavEntityAttribute){
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 10, attributeCode = 'testProc' where attributeCode = 'testProc'")
+} else {
+   testProcEavEntityAttribute = new EavEntityAttribute(sortOrder:10,attribute:testProcAttribute,eavAttributeSet:appAttributeSet)
+   if ( !testProcEavEntityAttribute.validate() || !testProcEavEntityAttribute.save(flush:true) ) {
+	   println"Unable to create testProcEavEntityAttribute : " +
+			   testProcEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def testProcDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,testProcAttribute)
+if( !testProcDataTransferMapMaster ){
+   testProcDataTransferMapMaster = new DataTransferAttributeMap(columnName:"TestProc",
+		   sheetName:"Applications",
+		   dataTransferSet : masterDataTransferSet,
+		   eavAttribute:testProcAttribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !testProcDataTransferMapMaster.validate() || !testProcDataTransferMapMaster.save(flush:true) ) {
+	   println"Unable to create testProcDataTransferMapMaster : " +
+			   testProcDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'testProc',sheetName='Applications' where eavAttribute = ?",[testProcAttribute])
+}
+
+def testProcDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,testProcAttribute)
+if(!testProcDataTransferMapWalkThru){
+   testProcDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"TestProc",
+		   sheetName:"Applications",
+		   dataTransferSet : walkThruDataTransferSet,
+		   eavAttribute:testProcAttribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !testProcDataTransferMapWalkThru.validate() || !testProcDataTransferMapWalkThru.save(flush:true) ) {
+	   println"Unable to create testProcDataTransferMapWalkThru : " +
+			   testProcDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'TestProc',sheetName='Applications' where eavAttribute = ?",[testProcAttribute])
+}
+/**
+*  Create StartupProc
+*/
+def startupProcAttribute = EavAttribute.findByAttributeCodeAndEntityType('startupProc',appEntityType)
+if(startupProcAttribute){
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'startupProc', frontendLabel='StartupProc' where id = ?",[startupProcAttribute.id])
+} else {
+   startupProcAttribute = new EavAttribute( attributeCode : "startupProc",
+		   backendType : 'String',
+		   frontendInput : 'text',
+		   frontendLabel : 'StartupProc',
+		   note : 'this field is used for just import',
+		   sortOrder : 10,
+		   entityType:appEntityType,
+		   isRequired:0,
+		   isUnique:0,
+		   defaultValue:"1",
+		   validation:'No validation'
+		   )
+   if ( !startupProcAttribute.validate() || !startupProcAttribute.save(flush:true) ) {
+	   println"Unable to create startupProcAttribute : "
+	   startupProcAttribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def startupProcEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(startupProcAttribute,appAttributeSet)
+if(startupProcEavEntityAttribute){
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 10, attributeCode = 'startupProc' where attributeCode = 'startupProc'")
+} else {
+   startupProcEavEntityAttribute = new EavEntityAttribute(sortOrder:10,attribute:startupProcAttribute,eavAttributeSet:appAttributeSet)
+   if ( !startupProcEavEntityAttribute.validate() || !startupProcEavEntityAttribute.save(flush:true) ) {
+	   println"Unable to create startupProcEavEntityAttribute : " +
+			   startupProcEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def startupProcDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,startupProcAttribute)
+if( !startupProcDataTransferMapMaster ){
+   startupProcDataTransferMapMaster = new DataTransferAttributeMap(columnName:"StartupProc",
+		   sheetName:"Applications",
+		   dataTransferSet : masterDataTransferSet,
+		   eavAttribute:startupProcAttribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !startupProcDataTransferMapMaster.validate() || !startupProcDataTransferMapMaster.save(flush:true) ) {
+	   println"Unable to create startupProcDataTransferMapMaster : " +
+			   startupProcDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'startupProc',sheetName='Applications' where eavAttribute = ?",[startupProcAttribute])
+}
+
+def startupProcDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,startupProcAttribute)
+if(!startupProcDataTransferMapWalkThru){
+   startupProcDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"StartupProc",
+		   sheetName:"Applications",
+		   dataTransferSet : walkThruDataTransferSet,
+		   eavAttribute:startupProcAttribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !startupProcDataTransferMapWalkThru.validate() || !startupProcDataTransferMapWalkThru.save(flush:true) ) {
+	   println"Unable to create startupProcDataTransferMapWalkThru : " +
+			   startupProcDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'StartupProc',sheetName='Applications' where eavAttribute = ?",[startupProcAttribute])
+}

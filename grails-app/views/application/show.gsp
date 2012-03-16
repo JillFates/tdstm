@@ -70,8 +70,7 @@
 							<td>
 								${applicationInstance.criticality}
 							</td>
-							<td class="label" nowrap="nowrap"><label for="userConcurrent">Concurrent</label>
-							</td>
+							<td class="label" nowrap="nowrap"><label for="useFrequency">Use Frequency</label></td>
 							<td>
 								${applicationInstance.userConcurrent}
 							</td>
@@ -91,9 +90,10 @@
 							<td>
 								${applicationInstance.moveBundle}
 							</td>
-							<td class="label" nowrap="nowrap"><label for="useFrequency">Use Frequency</label></td>
+							</td>
+							<td class="label" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label></td>
 							<td>
-								${applicationInstance.userConcurrent}
+								${applicationInstance.drRpoDesc}
 							</td>
 						</tr>
 						<tr>
@@ -111,11 +111,11 @@
 							<td>
 								${applicationInstance.planStatus}
 							</td>
-							<td class="label" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label></td>
-							<td>
-								${applicationInstance.drRpoDesc}
+							<td class="label" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label></td>
+							<td>${applicationInstance.drRtoDesc}
 							</td>
 						</tr>
+						
 						<tr>
 							<td class="label" nowrap="nowrap"><label for="license">License</label>
 							</td>
@@ -126,13 +126,27 @@
 							<td><tds:convertDate
 									date="${applicationInstance?.retireDate}"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
+							<td class="label" nowrap="nowrap">Validation</td>
+							<td>${applicationInstance.validation}
+							</td>
+							<td class="label" nowrap="nowrap"><label for="testProc">Test Proc</label></td>
+							<td>${applicationInstance.testProc ? applicationInstance.testProc : '?'}
+							</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
 							<td class="label" nowrap="nowrap">Maint Exp.</td>
 							<td><tds:convertDate
 									date="${applicationInstance?.maintExpDate}" formate="12hrs"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
-							<td class="label" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label></td>
-							<td>${applicationInstance.drRtoDesc}
+							<td class="label" nowrap="nowrap"><label for="latency">Latency</label></td>
+							<td>
+								${applicationInstance.latency ? applicationInstance.latency : '?'}
+							</td>
+							<td class="label" nowrap="nowrap"><label for="startupProc">Startup Procs</label></td>
+							<td>${applicationInstance.startupProc ? applicationInstance.startupProc : '?'}
 							</td>
 						</tr>
 						<tr>
@@ -208,6 +222,7 @@
 							<td colspan="7"><a href="${applicationInstance.url}" style="color:#00E">${applicationInstance.url}</a>
 							</td>
 						</tr>
+						
 					</tbody>
 				</table>
 			</div>
