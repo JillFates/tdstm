@@ -25,7 +25,7 @@
 								<td ><input type="text" id="appFunction"
 									name="appFunction" value="${applicationInstance.appFunction}"  tabindex="31" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="userConcurrent">Users</label>
+								<td class="label" nowrap="nowrap"><label for="userCount">Users</label>
 								</td>
 								<td ><input type="text" id="userId" name="userCount" value="${applicationInstance.userCount}"  tabindex="41" />
 								</td>
@@ -65,7 +65,7 @@
 								<td ><g:select id="criticality" name="criticality" from="${applicationInstance.constraints.criticality.inList}" value="${applicationInstance.criticality}"  tabindex="33"></g:select></td>
 								<td class="label" nowrap="nowrap"><label for="useFrequency">Use	Frequency</label>
 								</td>
-								<td ><input type="text" id="useFrequency" name="useFrequency" value="${applicationInstance.userConcurrent}" tabindex="43" />
+								<td ><input type="text" id="useFrequency" name="useFrequency" value="${applicationInstance.useFrequency}" tabindex="43" />
 								</td>
 
 							</tr>

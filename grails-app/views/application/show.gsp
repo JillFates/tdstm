@@ -29,7 +29,7 @@
 							<td>
 								${applicationInstance.appFunction}
 							</td>
-							<td class="label" nowrap="nowrap"><label for="userConcurrent">Users</label>
+							<td class="label" nowrap="nowrap"><label for="userCount">Users</label>
 							</td>
 							<td>${applicationInstance.userCount}</td>
 						</tr>
@@ -72,7 +72,7 @@
 							</td>
 							<td class="label" nowrap="nowrap"><label for="useFrequency">Use Frequency</label></td>
 							<td>
-								${applicationInstance.userConcurrent}
+								${applicationInstance.useFrequency}
 							</td>
 						</tr>
 						<tr>
