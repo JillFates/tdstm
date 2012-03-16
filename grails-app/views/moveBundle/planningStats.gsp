@@ -8,22 +8,20 @@
 <body>
 	<div class="body">
 		<div>
-			<h1>Move Planning DashBoard</h1>
+			<h1>Move Planning Dashboard</h1>
 			<div>
 				<table style="border: 0px; width: 1000px;">
 					<thead>
 						<th style="background-color: white;">&nbsp;</th>
 						<th style="background-color: white;">&nbsp;</th>
-						<th style="background-color: white;"><g:each
-								in="${moveBundleList}" var="bundle">
-								<th
-									style="color: Blue; background-color: white; text-decoration: underline;"><b>
-										${bundle.name}
-								</b></th>
-							</g:each></th>
-						<th
-							style="color: Blue; background-color: white; text-decoration: underline;">To
-							Be Assigned</th>
+						<th style="background-color: white;">
+							<g:each in="${moveBundleList}" var="bundle">
+								<th style="color: Blue; background-color: white;">
+									<b>${bundle.name}</b>
+								</th>
+							</g:each>
+						</th>
+						<th style="color: Blue; background-color: white;">To Be Assigned</th>
 					</thead>
 					<tbody>
 						<tr>
@@ -128,7 +126,9 @@
 								</g:if></td>
 						</tr>
 						<tr>
-							<td style="width: 170px;text-align: right;">Open Issue</td>
+							<td style="width: 170px;text-align: right;">
+							<g:link controller="assetEntity" action="listComment" params="[projectId:currProjObj?.id]">
+								Open Issues</g:link></td>
 							<td>${issuesCount}</td>
 						</tr>
 					</table>

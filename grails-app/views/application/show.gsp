@@ -141,7 +141,7 @@
 									date="${applicationInstance?.maintExpDate}" formate="12hrs"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
-							<td class="label" nowrap="nowrap"><label for="latency">Latency</label></td>
+							<td class="label" nowrap="nowrap"><label for="latency">Latency OK</label></td>
 							<td>
 								${applicationInstance.latency ? applicationInstance.latency : '?'}
 							</td>

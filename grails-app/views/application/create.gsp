@@ -137,7 +137,7 @@
 									<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate" tabindex="27" 
 									value="<tds:convertDate date="${applicationInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />" /> 
 								</td>
-								<td class="label" nowrap="nowrap"><label for="latency">Latency</label>
+								<td class="label" nowrap="nowrap"><label for="latency">Latency OK</label>
 								</td>
 								<td ><g:select  id="latency"	name="latency"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="37" />
