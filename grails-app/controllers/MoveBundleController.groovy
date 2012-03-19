@@ -8,6 +8,7 @@ import org.jmesa.facade.TableFacadeImpl
 import com.tds.asset.AssetComment;
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tds.asset.Application
 import com.tds.asset.AssetTransition
 import com.tdssrc.grails.GormUtil
 
@@ -470,7 +471,12 @@ class MoveBundleController {
 			def physicalAssetCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,'Server').size()
 			def virtualAssetCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,'VM').size()	
 			def count = AssetEntity.findAllByMoveBundleAndAssetTypeNotInList(moveBundle,['Application','Database','Files'],params).size()
-			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count]
+			def likelyLatency = Application.findAllByMoveBundleAndLatency(moveBundle,'Y').size() 
+			def unlikelyLatency = Application.findAllByMoveBundleAndLatency(moveBundle,'N').size() 
+			def unknownLatency = Application.findAllByMoveBundleAndLatency(moveBundle,null).size() 
+			
+			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,'likelyLatency':likelyLatency,
+				          'unlikelyLatency':unlikelyLatency,'unknownLatency':unknownLatency]
 		}
 		def unassignedAppCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType=? and planStatus = ?",['Application','Unassigned']).size()
 		def totalAssignedApp = applicationCount - unassignedAppCount ;
@@ -504,11 +510,16 @@ class MoveBundleController {
 		}
 		def physicalCount=0;
 		def virtualCount=0;
+		def likelyLatencyCount=0;
+		def unlikelyLatencyCount=0;
+		def unknownLatencyCount=0;
 		assetList.each{asset->
 			physicalCount = physicalCount + asset.physicalCount
 			virtualCount = virtualCount + asset.virtualAssetCount
+			likelyLatencyCount = likelyLatencyCount+asset.likelyLatency
+			unlikelyLatencyCount = unlikelyLatencyCount + asset.unlikelyLatency
+			unknownLatencyCount = unknownLatencyCount+asset.unknownLatency
 		}
-		
 		
 		def applicationsOfPlanningBundle = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Application',moveBundleList)
 		def serversOfPlanningBundle = AssetEntity.findAllByAssetTypeInListAndMoveBundleInList(['Server', 'VM', 'Blade'],moveBundleList)
@@ -525,7 +536,8 @@ class MoveBundleController {
 			unassignedVirtualAssetCount:unassignedVirtualAssetCount,percentagePhysicalAssetCount:percentagePhysicalAssetCount,
 			percentagevirtualAssetCount:percentagevirtualAssetCount,physicalCount:physicalCount, virtualCount:virtualCount,
 			appDependenciesCount:appDependenciesCount,serverDependenciesCount:serverDependenciesCount, pendingAppDependenciesCount:pendingAppDependenciesCount,
-			pendingServerDependenciesCount:pendingServerDependenciesCount, issuesCount : issues.size()]
+			pendingServerDependenciesCount:pendingServerDependenciesCount, issuesCount : issues.size(),likelyLatencyCount:likelyLatencyCount,unlikelyLatencyCount:unlikelyLatencyCount,
+			unknownLatencyCount:unknownLatencyCount]
 	}
 
 }

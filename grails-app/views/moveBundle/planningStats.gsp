@@ -139,15 +139,15 @@
 					</h3>
 					<table style="border: 0px; margin-left: 10px;">
 						<tr>
-							<td style="width: 10px;">0</td>
+							<td style="width: 10px;">${likelyLatencyCount}</td>
 							<td>Likely</td>
 						</tr>
 						<tr>
-							<td>${applicationCount}</td>
+							<td>${unknownLatencyCount}</td>
 							<td>UnKnown</td>
 						</tr>
 						<tr>
-							<td>0</td>
+							<td>${unlikelyLatencyCount }</td>
 							<td>UnLikely</td>
 						</tr>
 					</table>
