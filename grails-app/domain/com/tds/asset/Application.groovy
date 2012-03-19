@@ -47,7 +47,7 @@ class Application extends AssetEntity{
 		useFrequency( blank:true, nullable:true )
 		userLocations( blank:true, nullable:true )
 		userCount( blank:true, nullable:true )
-		validation( blank:true, nullable:true )
+		validation( blank:true, nullable:true, inList:['Discovery','DependencyReview','DependencyScan','BundleReady'] )
 		latency( blank:true, nullable:true )
 		testProc( blank:true, nullable:true )
 		startupProc( blank:true, nullable:true )
