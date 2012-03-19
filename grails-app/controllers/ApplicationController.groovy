@@ -100,12 +100,12 @@ class ApplicationController {
 		def project = Project.read(projectId)
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 
 		[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-					planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project]
+					planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project,moveEventList:moveEventList]
 	}
 	def save = {
-
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def maintExpDate = params.maintExpDate
@@ -120,6 +120,19 @@ class ApplicationController {
 		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
 			flash.message = "Application ${applicationInstance.assetName} created"
 			assetEntityService.createOrUpdateApplicationDependencies(params, applicationInstance)
+			def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
+			def project = Project.read(projectId)
+			def moveEventList = MoveEvent.findAllByProject(project).id
+			for(int i : moveEventList){
+				def okToMove = params["okToMove_"+i]
+				def appMoveInstance = new AppMoveEvent()
+				appMoveInstance.application = applicationInstance
+				appMoveInstance.moveEvent = MoveEvent.get(i)
+				appMoveInstance.value = okToMove
+				if(!appMoveInstance.save(flush:true)){
+					appMoveInstance.errors.allErrors.each { println it }
+				}
+			}
 			redirect(action:list)
 		}
 		else {
@@ -148,9 +161,14 @@ class ApplicationController {
 			} else {
 				assetComment = "blank"
 			}
-			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)						
-		
-			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList]
+			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)	
+			def appMoveEvent = AppMoveEvent.findAllByApplication(applicationInstance)
+			def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
+			def project = Project.read(projectId)
+		    def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
+			def appMoveEventlist = AppMoveEvent.findAllByApplication(applicationInstance).value
+			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList,
+			  appMoveEvent:appMoveEvent,moveEventList:moveEventList,appMoveEvent:appMoveEventlist]
 		}
 	}
 
@@ -161,8 +179,8 @@ class ApplicationController {
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
-        def moveBundleList = MoveBundle.findAllByProject(project)
-        
+		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
+
 		def id = params.id
 		def applicationInstance = Application.get( id )
 		if(!applicationInstance) {
@@ -175,12 +193,21 @@ class ApplicationController {
 			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
 			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-	        def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
-	        
+			def moveEvent = MoveEvent.findAllByProject(project,,[sort:'name'])
+			def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
+			moveEvent.each{
+			   def appMoveList = AppMoveEvent.findByApplicationAndMoveEvent(applicationInstance,it)
+			   if(!appMoveList){
+				   def appMoveInstance = new AppMoveEvent()
+				   appMoveInstance.application = applicationInstance
+				   appMoveInstance.moveEvent = it
+				   appMoveInstance.save(flush:true)
+			   }
+			}
 			[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
 						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets,
 						dependentAssets:dependentAssets, redirectTo : params.redirectTo,dependencyType:dependencyType, dependencyStatus:dependencyStatus,
-						servers:servers]
+						moveEvent:moveEvent,servers:servers]
 		}
 
 	}
@@ -204,6 +231,15 @@ class ApplicationController {
 		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
 			flash.message = "Application ${applicationInstance.assetName} Updated"
 			assetEntityService.createOrUpdateApplicationDependencies(params, applicationInstance)
+			def appMoveEventList = AppMoveEvent.findAllByApplication(applicationInstance)?.moveEvent?.id
+			if(appMoveEventList.size()>0){
+				for(int i : appMoveEventList){
+					def okToMove = params["okToMove_"+i]
+					def appMoveInstance = AppMoveEvent.findByMoveEventAndApplication(MoveEvent.get(i),applicationInstance)
+					    appMoveInstance.value = okToMove
+					    appMoveInstance.save(flush:true)
+				}
+			}			  
 			switch(params.redirectTo){
 				case "room":
 					redirect( controller:'room',action:list )
@@ -254,6 +290,10 @@ class ApplicationController {
 			AssetDependency.executeUpdate("delete AssetDependency where asset = ? or dependent = ? ",[applicationInstance, applicationInstance])
 			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
 			Application.executeUpdate("delete from Application a where a.id = ${applicationInstance.id}")
+			def appMoveInstance = AppMoveEvent.findAllByApplication(applicationInstance);
+			appMoveInstance.each{
+			         it.delete(flush:true)
+			}
 			flash.message = "Application ${assetName} deleted"
 		}
 		else {

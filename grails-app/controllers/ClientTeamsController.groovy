@@ -28,10 +28,11 @@ class ClientTeamsController {
 	 * @return : List of teams that are belongs to current project, and if project user preference not exist list all teams
 	 */
 	def list = {
+		println "params:::::::::::"+params
 		def sourceTeams = []
 		def targetTeams = []
 		userPreferenceService.loadPreferences("CURR_PROJ")
-		def projectId = params.projectId
+		String projectId = params.projectId
 		if(!projectId){
 			projectId = session.getAttribute("CURR_PROJ")?.CURR_PROJ;
 		}
@@ -47,6 +48,7 @@ class ClientTeamsController {
 		def now = GormUtil.convertInToGMT( "now","EDT" )
 		def timeNow = now.getTime()
 		def moveBundles = MoveBundle.getActiveBundlesByProject( Integer.parseInt(projectId), now )
+		println "moveBundles:::::::::::::"+moveBundles
 		moveBundles.each{ moveBundle ->
 			def bundleAssetsList = AssetEntity.findAllWhere( moveBundle : moveBundle )
 			partyRelationshipService.getBundleTeamInstanceList( moveBundle ).each {
