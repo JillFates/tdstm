@@ -480,9 +480,12 @@ class MoveBundleController {
 			def likelyLatency = Application.findAllByMoveBundleAndLatency(moveBundle,'Y').size()
 			def unlikelyLatency = Application.findAllByMoveBundleAndLatency(moveBundle,'N').size()
 			def unknownLatency = Application.findAllByMoveBundleAndLatency(moveBundle,null).size()
-
+			def potential = 0
+			def optional = 0
+		         potential = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle = $moveBundle.id and value != 'N' group by application").size()
+				 optional = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle = $moveBundle.id and value = 'N' group by application").size()
 			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,'likelyLatency':likelyLatency,
-						'unlikelyLatency':unlikelyLatency,'unknownLatency':unknownLatency]
+				          'unlikelyLatency':unlikelyLatency,'unknownLatency':unknownLatency,'potential':potential,'optional':optional]
 		}
 		def unassignedAppCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType=? and planStatus = ?",['Application', 'Unassigned']).size()
 		def totalAssignedApp = applicationCount - unassignedAppCount ;

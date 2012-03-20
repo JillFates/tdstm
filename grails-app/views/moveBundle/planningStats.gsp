@@ -44,10 +44,20 @@
 									${applicationCount}
 							</b></td>
 							<td style="color: grey"><b>Optional</b></td>
+							<td><g:each in="${assetList}" var="appCount">
+									<td><b>
+											${appCount.optional}
+									</b></td>
+								</g:each></td>
 						</tr>
 						<tr>
 							<td style="color: blue"><b></b></td>
 							<td style="color: grey"><b>Potential</b></td>
+							<td><g:each in="${assetList}" var="appCount">
+									<td><b>
+											${appCount.potential}
+									</b></td>
+								</g:each></td>
 						</tr>
 						<tr>
 							<td colspan="3" height="20"></td>
