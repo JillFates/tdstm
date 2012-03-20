@@ -9,6 +9,7 @@ import com.tds.asset.AssetComment;
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Application
+import com.tds.asset.AssetOptions
 import com.tds.asset.AssetTransition
 import com.tdssrc.grails.GormUtil
 
@@ -16,121 +17,95 @@ import com.tdssrc.grails.GormUtil
 class MoveBundleController {
 
 	def stepSnapshotService
-    def partyRelationshipService
-    def userPreferenceService
+	def partyRelationshipService
+	def userPreferenceService
 	def stateEngineService
 	def moveBundleService
 	def jdbcTemplate
-	
-    def index = { redirect(action:list,params:params) }
 
-    // the delete, save and update actions only accept POST requests
-    def allowedMethods = [delete:'POST', save:'POST', update:'POST']
+	def index = { redirect(action:list,params:params) }
 
-    def list = {
-        
-    	if(!params.sort) params.sort = 'startTime'
-    	if(!params.order) params.order = 'asc'
-    	def projectId = params.projectId
-    	if(projectId == null || projectId == ""){
-        	projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-        }
-    	def moveBundleList = []
-    	def projectInstance = Project.findById( projectId )
+	// the delete, save and update actions only accept POST requests
+	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
+
+	def list = {
+
+		if(!params.sort) params.sort = 'startTime'
+		if(!params.order) params.order = 'asc'
+		def projectId = params.projectId
+		if(projectId == null || projectId == ""){
+			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		}
+		def moveBundleList = []
+		def projectInstance = Project.findById( projectId )
 		def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance, params )
 		// Statements for JMESA integration
-    	TableFacade tableFacade = new TableFacadeImpl("tag",request)
-        tableFacade.items = moveBundleInstanceList
+		TableFacade tableFacade = new TableFacadeImpl("tag",request)
+		tableFacade.items = moveBundleInstanceList
 		return [moveBundleInstanceList : moveBundleInstanceList, projectId:projectId]
-    	
-    }
 
-    def show = {
+	}
+
+	def show = {
 		userPreferenceService.loadPreferences("MOVE_EVENT")
 		def moveBundleId = params.id
-		
+
 		moveBundleId = moveBundleId ? moveBundleId : session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE;
 		if(moveBundleId){
-			
+
 			def moveBundleInstance = MoveBundle.get( moveBundleId )
-	        //request.getSession(false).setAttribute("MOVEBUNDLE",moveBundleInstance)
-	        def projectId = params.projectId 
-	        
-	        if(!moveBundleInstance) {
-	            flash.message = "MoveBundle not found with id ${moveBundleId}"
-	            redirect(action:list)
-	        } else {
-	        	userPreferenceService.setPreference( "CURR_BUNDLE", "${moveBundleInstance.id}" )
-	            def projectManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "PROJ_MGR" ) 
-	            //PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'PROJ_MGR' ")
-	        	def moveManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "MOVE_MGR" ) 
-	            //PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-	        	
-				
+			//request.getSession(false).setAttribute("MOVEBUNDLE",moveBundleInstance)
+			def projectId = params.projectId
+
+			if(!moveBundleInstance) {
+				flash.message = "MoveBundle not found with id ${moveBundleId}"
+				redirect(action:list)
+			} else {
+				userPreferenceService.setPreference( "CURR_BUNDLE", "${moveBundleInstance.id}" )
+				def projectManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "PROJ_MGR" )
+				//PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'PROJ_MGR' ")
+				def moveManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "MOVE_MGR" )
+				//PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'MOVE_MGR' ")
+
+
 				// get the list of Manual Dashboard Steps that are associated to moveBundle.project
-				def moveBundleSteps = MoveBundleStep.findAll('FROM MoveBundleStep mbs WHERE mbs.moveBundle = :mb ORDER BY mbs.transitionId',[mb:moveBundleInstance]) 
+				def moveBundleSteps = MoveBundleStep.findAll('FROM MoveBundleStep mbs WHERE mbs.moveBundle = :mb ORDER BY mbs.transitionId',[mb:moveBundleInstance])
 				def dashboardSteps = []
 
 				moveBundleSteps .each{
 					def stepSnapshot = StepSnapshot.findAll("FROM StepSnapshot ss WHERE ss.moveBundleStep = :msb ORDER BY ss.dateCreated DESC",[msb:it, max:1])
 					dashboardSteps << [moveBundleStep : it, stepSnapshot : stepSnapshot[0] ]
 				}
-	        	def showHistoryButton = false
+				def showHistoryButton = false
 				def bundleTransition = AssetTransition.findAll("FROM AssetTransition at WHERE at.assetEntity in (SELECT ae.id FROM AssetEntity ae WHERE ae.moveBundle = ${moveBundleInstance.id})" )
-				
+
 				if( bundleTransition.size() > 0 )
 					showHistoryButton = true
-					
-	        	return [ moveBundleInstance : moveBundleInstance, projectId:projectId, projectManager: projectManager, 
-						 moveManager: moveManager, dashboardSteps:dashboardSteps, showHistoryButton : showHistoryButton ] 
-	        }
+
+				return [ moveBundleInstance : moveBundleInstance, projectId:projectId, projectManager: projectManager,
+					moveManager: moveManager, dashboardSteps:dashboardSteps, showHistoryButton : showHistoryButton ]
+			}
 		} else {
 			redirect(action:list)
 		}
-    }
+	}
 
-    def delete = {
-        def moveBundleInstance = MoveBundle.get( params.id )
-        def projectId = params.projectId
-        if(moveBundleInstance) {
-        	AssetEntity.withTransaction { status ->
-	            try{
-	            	// Update asset associations
-	            	AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = null WHERE moveBundle = ?",[moveBundleInstance])
-					// Delete Bundle and associations
-					moveBundleService.deleteMoveBundleAssociates(moveBundleInstance)
-					
-					moveBundleInstance.delete(flush:true)
-					
-					flash.message = "MoveBundle ${moveBundleInstance} deleted"
-	                redirect(action:list, params:[projectId: projectId])
-	            
-	            }catch(Exception ex){
-	            	status.setRollbackOnly()
-	            	flash.message = "Unable to Delete MoveBundle Assosiated with Teams "+ex
-	            	redirect(action:list)
-	            }
-        	}
-        } else {
-            flash.message = "MoveBundle not found with id ${params.id}"
-            redirect(action:list)
-        }
-    }
-	def deleteBundleAndAssets = {
+	def delete = {
 		def moveBundleInstance = MoveBundle.get( params.id )
 		def projectId = params.projectId
 		if(moveBundleInstance) {
 			AssetEntity.withTransaction { status ->
 				try{
 					// Update asset associations
-					moveBundleService.deleteBundleAssetsAndAssociates(moveBundleInstance)
+					AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = null WHERE moveBundle = ?",[moveBundleInstance])
 					// Delete Bundle and associations
 					moveBundleService.deleteMoveBundleAssociates(moveBundleInstance)
-					
+
 					moveBundleInstance.delete(flush:true)
+
 					flash.message = "MoveBundle ${moveBundleInstance} deleted"
 					redirect(action:list, params:[projectId: projectId])
-				
+
 				}catch(Exception ex){
 					status.setRollbackOnly()
 					flash.message = "Unable to Delete MoveBundle Assosiated with Teams "+ex
@@ -142,74 +117,100 @@ class MoveBundleController {
 			redirect(action:list)
 		}
 	}
-    def edit = {
-        def moveBundleInstance = MoveBundle.get( params.id )
+	def deleteBundleAndAssets = {
+		def moveBundleInstance = MoveBundle.get( params.id )
+		def projectId = params.projectId
+		if(moveBundleInstance) {
+			AssetEntity.withTransaction { status ->
+				try{
+					// Update asset associations
+					moveBundleService.deleteBundleAssetsAndAssociates(moveBundleInstance)
+					// Delete Bundle and associations
+					moveBundleService.deleteMoveBundleAssociates(moveBundleInstance)
+
+					moveBundleInstance.delete(flush:true)
+					flash.message = "MoveBundle ${moveBundleInstance} deleted"
+					redirect(action:list, params:[projectId: projectId])
+
+				}catch(Exception ex){
+					status.setRollbackOnly()
+					flash.message = "Unable to Delete MoveBundle Assosiated with Teams "+ex
+					redirect(action:list)
+				}
+			}
+		} else {
+			flash.message = "MoveBundle not found with id ${params.id}"
+			redirect(action:list)
+		}
+	}
+	def edit = {
+		def moveBundleInstance = MoveBundle.get( params.id )
 		stateEngineService.loadWorkflowTransitionsIntoMap(moveBundleInstance.workflowCode, 'project')
-        def projectId = params.projectId
-        projectId = projectId ? projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-        if(!moveBundleInstance) {
-            flash.message = "MoveBundle not found with id ${params.id}"
-            redirect(action:list, params:[projectId: projectId])
-        } else {
-        	def managers = partyRelationshipService.getProjectStaff( projectId )
-        	def projectManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "PROJ_MGR" )
-            //PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'PROJ_MGR' ")
-        	def moveManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "MOVE_MGR" )
-            //PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-        	if( projectManager != null ){
-        		projectManager = projectManager.partyIdTo.id
-        	}
-        	if( moveManager != null ){
-        		moveManager = moveManager.partyIdTo.id
-        	}
-        	
-        	
-        	//get the all Dashboard Steps that are associated to moveBundle.project
+		def projectId = params.projectId
+		projectId = projectId ? projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		if(!moveBundleInstance) {
+			flash.message = "MoveBundle not found with id ${params.id}"
+			redirect(action:list, params:[projectId: projectId])
+		} else {
+			def managers = partyRelationshipService.getProjectStaff( projectId )
+			def projectManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "PROJ_MGR" )
+			//PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'PROJ_MGR' ")
+			def moveManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "MOVE_MGR" )
+			//PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'MOVE_MGR' ")
+			if( projectManager != null ){
+				projectManager = projectManager.partyIdTo.id
+			}
+			if( moveManager != null ){
+				moveManager = moveManager.partyIdTo.id
+			}
+
+
+			//get the all Dashboard Steps that are associated to moveBundle.project
 			def allDashboardSteps = moveBundleService.getAllDashboardSteps( moveBundleInstance )
 			def remainingSteps = allDashboardSteps.remainingSteps
 			def workflowCodes = stateEngineService.getWorkflowCode()
-			
-		       	
-        	return [ moveBundleInstance : moveBundleInstance, projectId: projectId, managers: managers, projectManager: projectManager, 
-					 moveManager: moveManager, dashboardSteps: allDashboardSteps.dashboardSteps, remainingSteps : remainingSteps, workflowCodes:workflowCodes]
-        	
-        }
-    }
 
-    def update = {
-        def moveBundleInstance = MoveBundle.get( params.id )  
-        def projectId = params.projectId
-        def projectManagerId = params.projectManager
-    	def moveManagerId = params.moveManager 
-        if( moveBundleInstance ) {
-            moveBundleInstance.name = params.name
-            moveBundleInstance.description = params.description
+
+			return [ moveBundleInstance : moveBundleInstance, projectId: projectId, managers: managers, projectManager: projectManager,
+				moveManager: moveManager, dashboardSteps: allDashboardSteps.dashboardSteps, remainingSteps : remainingSteps, workflowCodes:workflowCodes]
+
+		}
+	}
+
+	def update = {
+		def moveBundleInstance = MoveBundle.get( params.id )
+		def projectId = params.projectId
+		def projectManagerId = params.projectManager
+		def moveManagerId = params.moveManager
+		if( moveBundleInstance ) {
+			moveBundleInstance.name = params.name
+			moveBundleInstance.description = params.description
 			moveBundleInstance.workflowCode = params.workflowCode
 			if(params.useOfPlanning){
 				moveBundleInstance.useOfPlanning = true
-		    }else{
-			    moveBundleInstance.useOfPlanning = false
+			}else{
+				moveBundleInstance.useOfPlanning = false
 			}
 			if(params.moveEvent.id){
 				moveBundleInstance.moveEvent = MoveEvent.get(params.moveEvent.id)
 			} else {
 				moveBundleInstance.moveEvent = null
 			}
-            moveBundleInstance.operationalOrder = params.operationalOrder ? Integer.parseInt(params.operationalOrder) : 1
-            def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-            def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-            def startTime = params.startTime
-            def completionTime = params.completionTime
-            if( startTime ){
-            	moveBundleInstance.startTime =  GormUtil.convertInToGMT(formatter.parse( startTime ), tzId)
-            }
-            if( completionTime ){
-            	moveBundleInstance.completionTime =  GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId)
-            }
+			moveBundleInstance.operationalOrder = params.operationalOrder ? Integer.parseInt(params.operationalOrder) : 1
+			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def startTime = params.startTime
+			def completionTime = params.completionTime
+			if( startTime ){
+				moveBundleInstance.startTime =  GormUtil.convertInToGMT(formatter.parse( startTime ), tzId)
+			}
+			if( completionTime ){
+				moveBundleInstance.completionTime =  GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId)
+			}
 			moveBundleInstance.tempForUpdate = Math.random().toString()
-            if(moveBundleInstance.validate(true) && moveBundleInstance.save() ) {
+			if(moveBundleInstance.validate(true) && moveBundleInstance.save() ) {
 				stateEngineService.loadWorkflowTransitionsIntoMap(moveBundleInstance.workflowCode, 'project')
-            	def stepsList = stateEngineService.getDashboardSteps( moveBundleInstance.workflowCode )
+				def stepsList = stateEngineService.getDashboardSteps( moveBundleInstance.workflowCode )
 				stepsList.each{
 					def checkbox = params["checkbox_"+it.id]
 					if(checkbox  && checkbox == 'on'){
@@ -217,7 +218,7 @@ class MoveBundleController {
 						def tasksCompleted = params["tasksCompleted_"+it.id] ? Integer.parseInt(params["tasksCompleted_"+it.id]) : 0
 						def calcMethod = params["calcMethod_"+it.id]
 						if(calcMethod == "L"){
-							stepSnapshotService.createLinearSnapshot( moveBundleInstance.id, moveBundleStep.id )	
+							stepSnapshotService.createLinearSnapshot( moveBundleInstance.id, moveBundleStep.id )
 						} else {
 							stepSnapshotService.createManualSnapshot( moveBundleInstance.id, moveBundleStep.id, tasksCompleted )
 						}
@@ -228,85 +229,85 @@ class MoveBundleController {
 						}
 					}
 				}
-            	
-            	//def projectManegerInstance = Party.findById( projectManagerId )
-            	def updateMoveBundlePMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", projectManagerId, "PROJ_MGR" )
-            	def updateMoveBundleMMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", moveManagerId, "MOVE_MGR" )
-                flash.message = "MoveBundle ${moveBundleInstance} updated"
-                //redirect(action:show,params:[id:moveBundleInstance.id, projectId:projectId])
-                redirect(action:show,id:moveBundleInstance.id, params:[projectId: projectId])
-            } else {
-            	//	get the all Dashboard Steps that are associated to moveBundle.project
-    			def allDashboardSteps = moveBundleService.getAllDashboardSteps( moveBundleInstance )
+
+				//def projectManegerInstance = Party.findById( projectManagerId )
+				def updateMoveBundlePMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", projectManagerId, "PROJ_MGR" )
+				def updateMoveBundleMMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", moveManagerId, "MOVE_MGR" )
+				flash.message = "MoveBundle ${moveBundleInstance} updated"
+				//redirect(action:show,params:[id:moveBundleInstance.id, projectId:projectId])
+				redirect(action:show,id:moveBundleInstance.id, params:[projectId: projectId])
+			} else {
+				//	get the all Dashboard Steps that are associated to moveBundle.project
+				def allDashboardSteps = moveBundleService.getAllDashboardSteps( moveBundleInstance )
 				def remainingSteps = allDashboardSteps.remainingSteps
-				
-            	moveBundleInstance.discard()
-            	def managers = partyRelationshipService.getProjectStaff( projectId )
-            	def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'PROJ_MGR' ")
-            	def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-                render(view:'edit',model:[moveBundleInstance:moveBundleInstance, projectId: projectId, managers: managers, projectManager: projectManagerId, 
-										  moveManager: moveManagerId, dashboardSteps:allDashboardSteps.dashboardSteps, remainingSteps : remainingSteps ])
-            }
-        }
-        else {
-            flash.message = "MoveBundle not found with id ${params.id}"
-            redirect(action:edit,id:params.id)
-        }
-    }
 
-    def create = {
-    	
-        def moveBundleInstance = new MoveBundle()
-        def projectId = params.projectId              
-		def projectInstance = Project.get(projectId)   
+				moveBundleInstance.discard()
+				def managers = partyRelationshipService.getProjectStaff( projectId )
+				def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'PROJ_MGR' ")
+				def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'MOVE_MGR' ")
+				render(view:'edit',model:[moveBundleInstance:moveBundleInstance, projectId: projectId, managers: managers, projectManager: projectManagerId,
+							moveManager: moveManagerId, dashboardSteps:allDashboardSteps.dashboardSteps, remainingSteps : remainingSteps ])
+			}
+		}
+		else {
+			flash.message = "MoveBundle not found with id ${params.id}"
+			redirect(action:edit,id:params.id)
+		}
+	}
+
+	def create = {
+
+		def moveBundleInstance = new MoveBundle()
+		def projectId = params.projectId
+		def projectInstance = Project.get(projectId)
 		def workflowCodes = stateEngineService.getWorkflowCode()
-        moveBundleInstance.properties = params        
-        def managers = partyRelationshipService.getProjectStaff( projectId )        
-        return ['moveBundleInstance':moveBundleInstance, managers: managers, projectId: projectId ,projectInstance:projectInstance,workflowCodes:workflowCodes]	     
-	  
-    }
+		moveBundleInstance.properties = params
+		def managers = partyRelationshipService.getProjectStaff( projectId )
+		return ['moveBundleInstance':moveBundleInstance, managers: managers, projectId: projectId ,projectInstance:projectInstance,workflowCodes:workflowCodes]
 
-    def save = {
-    
+	}
+
+	def save = {
+
 		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-        def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-        def startTime = params.startTime
-        def completionTime = params.completionTime
-        if(startTime){
-        	params.startTime =  GormUtil.convertInToGMT(formatter.parse( startTime ), tzId)
-        }
-        if(completionTime){
-        	params.completionTime =  GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId)
-        }
-        
-        def moveBundleInstance = new MoveBundle(params)
-        def projectId = params.projectId        
-        def projectManager = params.projectManager
-    	def moveManager = params.moveManager
-    	def managers = partyRelationshipService.getProjectStaff( projectId )
-    	def projectInstance = Party.findById( projectId )
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def startTime = params.startTime
+		def completionTime = params.completionTime
+		if(startTime){
+			params.startTime =  GormUtil.convertInToGMT(formatter.parse( startTime ), tzId)
+		}
+		if(completionTime){
+			params.completionTime =  GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId)
+		}
+
+		def moveBundleInstance = new MoveBundle(params)
+		def projectId = params.projectId
+		def projectManager = params.projectManager
+		def moveManager = params.moveManager
+		def managers = partyRelationshipService.getProjectStaff( projectId )
+		def projectInstance = Party.findById( projectId )
 		if(params.useOfPlanning){
 			moveBundleInstance.useOfPlanning = true
 		}else{
-		    moveBundleInstance.useOfPlanning = false
+			moveBundleInstance.useOfPlanning = false
 		}
-        if(!moveBundleInstance.hasErrors() && moveBundleInstance.save()) {
-        	if( projectManager != null && projectManager != ""){
-	        	def projectManegerInstance = Party.findById( projectManager )
-	        	def pmPartyRelation = partyRelationshipService.savePartyRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance, "MOVE_BUNDLE", projectManegerInstance, "PROJ_MGR")
-        	}
-        	if( moveManager != null && moveManager != "" ){
-        		def moveManegerInstance = Party.findById( moveManager )
-        		def mmPartyRelation = partyRelationshipService.savePartyRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance, "MOVE_BUNDLE", moveManegerInstance, "MOVE_MGR")
-        	}
-        	
-            flash.message = "MoveBundle ${moveBundleInstance} created"
-            redirect(action:show,params:[id:moveBundleInstance.id, projectId:projectId])
-        }
-        else {
-            render(view:'create',model:[moveBundleInstance:moveBundleInstance, managers: managers, projectId:projectId, projectManager: projectManager, moveManager: moveManager])
-        }
-    }
+		if(!moveBundleInstance.hasErrors() && moveBundleInstance.save()) {
+			if( projectManager != null && projectManager != ""){
+				def projectManegerInstance = Party.findById( projectManager )
+				def pmPartyRelation = partyRelationshipService.savePartyRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance, "MOVE_BUNDLE", projectManegerInstance, "PROJ_MGR")
+			}
+			if( moveManager != null && moveManager != "" ){
+				def moveManegerInstance = Party.findById( moveManager )
+				def mmPartyRelation = partyRelationshipService.savePartyRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance, "MOVE_BUNDLE", moveManegerInstance, "MOVE_MGR")
+			}
+
+			flash.message = "MoveBundle ${moveBundleInstance} created"
+			redirect(action:show,params:[id:moveBundleInstance.id, projectId:projectId])
+		}
+		else {
+			render(view:'create',model:[moveBundleInstance:moveBundleInstance, managers: managers, projectId:projectId, projectManager: projectManager, moveManager: moveManager])
+		}
+	}
 
 	/**
 	 * Used to create StepSnapshot records for specified MoveBundle/MoveBundleStep.  
@@ -316,42 +317,39 @@ class MoveBundleController {
 	 * @return Returns 200 okay or appropriate error message
 	 */
 	def createManualStep = {
-	/*
-		// render( "HELLO WORLD!" )
-		// return
-		MoveBundleStep.withTransaction { status ->
-			try {
-				def moveBundleId = Integer.parseInt(params.moveBundleId)
-				def moveBundleSteps = request.getParameterValues( "moveBundleStepId" )
-			
-				moveBundleSteps.each{ moveStep->
-					def tasksCompleted = Integer.parseInt( request.getParameter("tasksCompleted_"+moveStep) )
-					if (  tasksCompleted < 0 || tasksCompleted > 100 ) {
-						response.sendError( 400, "Bad Request P")
-						// render("400 Bad Request")
-						status.setRollbackOnly()
-						return false
-					}
-					def moveBundleStepId = Integer.parseInt(moveStep)
-					
-					def result = stepSnapshotService.createManualSnapshot( moveBundleId, moveBundleStepId, tasksCompleted )
-				
-					if (result == 200){
-						render ("Record created")
-						flash.result = "Record created"
-					} else {
-						response.sendError( result , "Error ${result}" )
-						flash.result = "Error ${result}"
-						status.setRollbackOnly()
-					}
-				}
-				redirect(action:show,params:[id:moveBundleId, projectId:params.projectId ])
-			} catch(NumberFormatException nfe) {
-				response.sendError( 400, "Bad Request NFE")
-				status.setRollbackOnly()
-			}
-		}
-	*/
+		/*
+		 // render( "HELLO WORLD!" )
+		 // return
+		 MoveBundleStep.withTransaction { status ->
+		 try {
+		 def moveBundleId = Integer.parseInt(params.moveBundleId)
+		 def moveBundleSteps = request.getParameterValues( "moveBundleStepId" )
+		 moveBundleSteps.each{ moveStep->
+		 def tasksCompleted = Integer.parseInt( request.getParameter("tasksCompleted_"+moveStep) )
+		 if (  tasksCompleted < 0 || tasksCompleted > 100 ) {
+		 response.sendError( 400, "Bad Request P")
+		 // render("400 Bad Request")
+		 status.setRollbackOnly()
+		 return false
+		 }
+		 def moveBundleStepId = Integer.parseInt(moveStep)
+		 def result = stepSnapshotService.createManualSnapshot( moveBundleId, moveBundleStepId, tasksCompleted )
+		 if (result == 200){
+		 render ("Record created")
+		 flash.result = "Record created"
+		 } else {
+		 response.sendError( result , "Error ${result}" )
+		 flash.result = "Error ${result}"
+		 status.setRollbackOnly()
+		 }
+		 }
+		 redirect(action:show,params:[id:moveBundleId, projectId:params.projectId ])
+		 } catch(NumberFormatException nfe) {
+		 response.sendError( 400, "Bad Request NFE")
+		 status.setRollbackOnly()
+		 }
+		 }
+		 */
 		try {
 			def moveBundleId = Integer.parseInt(params.moveBundleId)
 			def moveBundleStepId = Integer.parseInt(params.moveBundleStepId)
@@ -361,18 +359,18 @@ class MoveBundleController {
 				// render("400 Bad Request")
 				return false
 			}
-			
+
 			def result = stepSnapshotService.createManualSnapshot( moveBundleId, moveBundleStepId, tasksCompleted)
-			
+
 			if (result == 200)
 				render ("Record created")
-				else
-					response.sendError( result , "Error ${result}" )
+			else
+				response.sendError( result , "Error ${result}" )
 		} catch(NumberFormatException nfe) {
 			nfe.printStackTrace()
 			response.sendError( 400, "Bad Request NFE")
 		}
-	 
+
 	}
 	/* if the checkbox is subsequently checked and the form submitted, a new MoveBundleStep shall be created for that transition.
 	 *  @param moveBundleId
@@ -382,18 +380,18 @@ class MoveBundleController {
 	def createMoveBundleStep = {
 		def moveBundle = MoveBundle.get( params.moveBundleId )
 		def transitionId = Integer.parseInt( params.transitionId )
-		def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle , transitionId) 
-		if( !moveBundleStep ){	
+		def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle , transitionId)
+		if( !moveBundleStep ){
 			moveBundleStep = new MoveBundleStep(moveBundle:moveBundle, transitionId:transitionId, calcMethod:"L")
 			moveBundleStep.label = stateEngineService.getDashboardLabel( moveBundle.project.workflowCode, transitionId )
 			if ( !moveBundleStep.validate() || !moveBundleStep.save(flush:true) ) {
 				def etext = "Unable to create moveBundleStep" +
-				GormUtil.allErrorsString( moveBundleStep )
+						GormUtil.allErrorsString( moveBundleStep )
 				response.sendError( 500, "Validation Error")
-		       	println etext
+				println etext
 			}
 		}
-		render moveBundleStep 
+		render moveBundleStep
 	}
 	/*-----------------------------------------------------
 	 * remote function to verify stepSnapshot records for a list of steps.
@@ -420,15 +418,15 @@ class MoveBundleController {
 				}
 			}
 		}
-		 render message;
+		render message;
 	}
-	
+
 	def projectMoveBundles = {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def moveBundlesList 
+		def moveBundlesList
 		if(projectId){
 			moveBundlesList = MoveBundle.findAllByProject(Project.get(projectId),[sort:'name',order:'asc'])
-	 	}
+		}
 		render moveBundlesList as JSON
 	}
 	/*
@@ -440,9 +438,9 @@ class MoveBundleController {
 		if(bundleId){
 			def moveBundle = MoveBundle.get( bundleId )
 			AssetTransition.executeUpdate("DELETE FROM AssetTransition at WHERE at.assetEntity in (SELECT ae.id FROM AssetEntity ae WHERE ae.moveBundle = ${moveBundle.id})" )
-			AssetEntity.executeUpdate("UPDATE AssetEntity ae SET ae.currentStatus = null WHERE ae.moveBundle = ?", [ moveBundle ] )
+			AssetEntity.executeUpdate("UPDATE AssetEntity ae SET ae.currentStatus = null WHERE ae.moveBundle = ?", [moveBundle ])
 			ProjectAssetMap.executeUpdate("DELETE FROM ProjectAssetMap WHERE asset in (SELECT ae.id FROM AssetEntity ae WHERE ae.moveBundle = ${moveBundle.id})")
-			MoveBundleStep.executeUpdate("UPDATE MoveBundleStep mbs SET mbs.actualStartTime = null , mbs.actualCompletionTime = null WHERE mbs.moveBundle = ?", [ moveBundle ] )
+			MoveBundleStep.executeUpdate("UPDATE MoveBundleStep mbs SET mbs.actualStartTime = null , mbs.actualCompletionTime = null WHERE mbs.moveBundle = ?", [moveBundle ])
 			stepSnapshotService.process( bundleId )
 		}
 		redirect(action:show,params:[id:params.id, projectId:params.projectId])
@@ -459,9 +457,13 @@ class MoveBundleController {
 		def appList = []
 		def assetList = []
 		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
-		
+
 		def applicationCount = AssetEntity.findAllByAssetTypeAndProject('Application',project).size()
-		def assetCount = AssetEntity.findAllByProjectAndAssetTypeNotInList(project,['Application','Database','Files'],params).size()
+		def assetCount = AssetEntity.findAllByProjectAndAssetTypeNotInList(project,[
+			'Application',
+			'Database',
+			'Files'
+		],params).size()
 		def assignedAssetCount
 		def assignedApplicationCount
 
@@ -469,16 +471,20 @@ class MoveBundleController {
 			assignedApplicationCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,"Application").size()
 			appList << ['count':assignedApplicationCount]
 			def physicalAssetCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,'Server').size()
-			def virtualAssetCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,'VM').size()	
-			def count = AssetEntity.findAllByMoveBundleAndAssetTypeNotInList(moveBundle,['Application','Database','Files'],params).size()
-			def likelyLatency = Application.findAllByMoveBundleAndLatency(moveBundle,'Y').size() 
-			def unlikelyLatency = Application.findAllByMoveBundleAndLatency(moveBundle,'N').size() 
-			def unknownLatency = Application.findAllByMoveBundleAndLatency(moveBundle,null).size() 
-			
+			def virtualAssetCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,'VM').size()
+			def count = AssetEntity.findAllByMoveBundleAndAssetTypeNotInList(moveBundle,[
+				'Application',
+				'Database',
+				'Files'
+			],params).size()
+			def likelyLatency = Application.findAllByMoveBundleAndLatency(moveBundle,'Y').size()
+			def unlikelyLatency = Application.findAllByMoveBundleAndLatency(moveBundle,'N').size()
+			def unknownLatency = Application.findAllByMoveBundleAndLatency(moveBundle,null).size()
+
 			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,'likelyLatency':likelyLatency,
-				          'unlikelyLatency':unlikelyLatency,'unknownLatency':unknownLatency]
+						'unlikelyLatency':unlikelyLatency,'unknownLatency':unknownLatency]
 		}
-		def unassignedAppCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType=? and planStatus = ?",['Application','Unassigned']).size()
+		def unassignedAppCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType=? and planStatus = ?",['Application', 'Unassigned']).size()
 		def totalAssignedApp = applicationCount - unassignedAppCount ;
 		int percentageAppCount = 0 ;
 		if(applicationCount > 0){
@@ -486,12 +492,12 @@ class MoveBundleController {
 		}else{
 			percentageAppCount = 100;
 		}
-		def unassignedPhysialAssetCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType = ? and planStatus = ?",['Server','Unassigned']).size()
-		def unassignedVirtualAssetCount = AssetEntity.findAll("from AssetEntity where  project = $projectId and assetType = ? and planStatus = ?",['VM','Unassigned']).size()
-		
+		def unassignedPhysialAssetCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType = ? and planStatus = ?",['Server', 'Unassigned']).size()
+		def unassignedVirtualAssetCount = AssetEntity.findAll("from AssetEntity where  project = $projectId and assetType = ? and planStatus = ?",['VM', 'Unassigned']).size()
+
 		def assignedPhysicalAsset = moveBundleList ? AssetEntity.countByAssetTypeAndMoveBundleInList('Server',moveBundleList) : 0
 		def assignedVirtualAsset = moveBundleList ? AssetEntity.countByAssetTypeAndMoveBundleInList('VM',moveBundleList) : 0
-		
+
 		def totalPhysicalAssetCount = assignedPhysicalAsset + unassignedPhysialAssetCount ;
 		def totalVirtualAssetCount = assignedVirtualAsset + unassignedVirtualAssetCount ;
 
@@ -520,17 +526,17 @@ class MoveBundleController {
 			unlikelyLatencyCount = unlikelyLatencyCount + asset.unlikelyLatency
 			unknownLatencyCount = unknownLatencyCount+asset.unknownLatency
 		}
-		
+
 		def applicationsOfPlanningBundle = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Application',moveBundleList)
 		def serversOfPlanningBundle = AssetEntity.findAllByAssetTypeInListAndMoveBundleInList(['Server', 'VM', 'Blade'],moveBundleList)
-		
+
 		def appDependenciesCount = applicationsOfPlanningBundle ? AssetDependency.countByDependentInList(applicationsOfPlanningBundle) : 0
 		def serverDependenciesCount = serversOfPlanningBundle ? AssetDependency.countByDependentInList(serversOfPlanningBundle) : 0
 		def pendingAppDependenciesCount = applicationsOfPlanningBundle ? AssetDependency.countByDependentInListAndStatusNotEqual(applicationsOfPlanningBundle,"Validated") : 0
 		def pendingServerDependenciesCount = serversOfPlanningBundle ? AssetDependency.countByDependentInListAndStatusNotEqual(serversOfPlanningBundle,"Validated") : 0
-		
-		def issues = AssetComment.findAll("FROM AssetComment a where a.assetEntity.project = ? and a.commentType = ? and a.isResolved = 0",[project,"issue"])
-		
+
+		def issues = AssetComment.findAll("FROM AssetComment a where a.assetEntity.project = ? and a.commentType = ? and a.isResolved = 0",[project, "issue"])
+
 		return [moveBundleList:moveBundleList, applicationCount:applicationCount,appList:appList,unassignedAppCount:unassignedAppCount,
 			percentageAppCount:percentageAppCount,assetCount:assetCount,assetList:assetList,unassignedPhysicalAssetCount:unassignedPhysialAssetCount,
 			unassignedVirtualAssetCount:unassignedVirtualAssetCount,percentagePhysicalAssetCount:percentagePhysicalAssetCount,
@@ -539,5 +545,14 @@ class MoveBundleController {
 			pendingServerDependenciesCount:pendingServerDependenciesCount, issuesCount : issues.size(),likelyLatencyCount:likelyLatencyCount,unlikelyLatencyCount:unlikelyLatencyCount,
 			unknownLatencyCount:unknownLatencyCount]
 	}
-
+	/**
+	 * 
+	 */
+	def planningConsole = {
+		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+		return[dependencyType:dependencyType]
+	}
+	def dependencyBundleDetails = {
+		render(template:"dependencyBundleDetails")
+	}
 }

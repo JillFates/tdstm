@@ -624,3 +624,37 @@ td .dep-Questioned {
 .mmtable .mmlink { 
 	border-right:0px !important;
 }
+
+.tabs {
+	margin-top: 10px;
+	margin-left: 20px;
+}
+.tabs ul {
+    list-style: none;
+}
+
+.tabs ul li {
+    float: left;
+    background: #eee;
+    border: 1px #aaa solid;
+    border-bottom: none;
+    margin-right: 10px;
+    padding: 5px;
+}
+
+.tabs ul li.active {
+	background-color : #fff;
+    margin-bottom: -1px;
+    padding-bottom: 6px;
+}
+
+.tabInner {
+    clear: both;
+    border: 1px solid #aaa;
+    overflow: hidden;
+}
+
+.tabInner div {
+    padding: 5px;
+
+}
