@@ -123,3 +123,15 @@ function showComment(id , action){
 		   new Ajax.Request('../assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog(e, 'show');}})
 	   }
 }
+function validateFileFormat(){
+	var fileFlag = false;
+    var fileSize = $('#fileSize').val();
+    if( fileSize=='' || isNaN(fileSize)){
+   	  alert("Please enter numeric value for File Size");
+    }else if($('#fileFormat').val()==''){
+   	  alert("Please enter value for File Format");
+    }else{
+   	  fileFlag = true;
+    }
+  return fileFlag
+}

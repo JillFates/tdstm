@@ -133,7 +133,7 @@
 					<input  name="supportCount"  id="supportCount" type="hidden" value="0">
 					<input name="attributeSet.id" type="hidden" value="1"> <input
 						name="project.id" type="hidden" value="${projectId}"> <span
-						class="button"><g:actionSubmit class="save" value="Save" />
+						class="button"><g:actionSubmit class="save" value="Save" onclick="return validateFileFormat()"/>
 					</span>
 				</div>
 			</td>
@@ -143,4 +143,5 @@
 <script>
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')
+	
 </script>
