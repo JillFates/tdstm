@@ -477,8 +477,8 @@ class MoveBundleController {
 				'Database',
 				'Files'
 			],params).size()
-			def likelyLatency = Application.findAllByMoveBundleAndLatency(moveBundle,'Y').size()
-			def unlikelyLatency = Application.findAllByMoveBundleAndLatency(moveBundle,'N').size()
+			def likelyLatency = Application.findAllByMoveBundleAndLatency(moveBundle,'N').size()
+			def unlikelyLatency = Application.findAllByMoveBundleAndLatency(moveBundle,'Y').size()
 			def unknownLatency = Application.findAllByMoveBundleAndLatency(moveBundle,null).size()
 			def potential = 0
 			def optional = 0
