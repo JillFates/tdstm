@@ -311,9 +311,5 @@ class ApplicationController {
 			flash.message = "Application not found with id ${params.id}"
 		}
 		redirect( action:list )
-	}
-		public static void main(String[] args) {
-			BundleReady
-		}
-	
+	}	
 }
