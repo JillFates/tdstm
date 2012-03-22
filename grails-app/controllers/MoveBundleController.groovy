@@ -537,8 +537,8 @@ class MoveBundleController {
 		def applicationsOfPlanningBundle = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Application',moveBundleList)
 		def serversOfPlanningBundle = AssetEntity.findAllByAssetTypeInListAndMoveBundleInList(['Server', 'VM', 'Blade'],moveBundleList)
 
-		def appDependenciesCount = applicationsOfPlanningBundle ? AssetDependency.countByDependentInList(applicationsOfPlanningBundle) : 0
-		def serverDependenciesCount = serversOfPlanningBundle ? AssetDependency.countByDependentInList(serversOfPlanningBundle) : 0
+		def appDependenciesCount = applicationsOfPlanningBundle ? AssetDependency.countByAssetInListOrDependentInList(applicationsOfPlanningBundle, applicationsOfPlanningBundle) : 0
+		def serverDependenciesCount = serversOfPlanningBundle ? AssetDependency.countByAssetInListOrDependentInList(serversOfPlanningBundle, serversOfPlanningBundle) : 0
 		def pendingAppDependenciesCount = applicationsOfPlanningBundle ? AssetDependency.countByDependentInListAndStatusNotEqual(applicationsOfPlanningBundle,"Validated") : 0
 		def pendingServerDependenciesCount = serversOfPlanningBundle ? AssetDependency.countByDependentInListAndStatusNotEqual(serversOfPlanningBundle,"Validated") : 0
 

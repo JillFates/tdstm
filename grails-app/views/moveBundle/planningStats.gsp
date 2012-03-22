@@ -170,19 +170,19 @@
 					<table style="border: 0px; margin-left: 10px;">
 						<tr>
 							<td style="width: 10px;">${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? and validation = ? ',['Application', project,'Discovery']).size()}</td>
-							<td>Discovery</td>
+							<td><g:link controller="application" action="list" params="[validation:'Discovery']">Discovery</g:link></td>
 						</tr>
 						<tr>
 							<td>${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? and validation = ?',['Application', project , 'DependencyReview']).size()}</td>
-							<td>DependencyReview</td>
+							<td><g:link controller="application" action="list" params="[validation:'DependencyReview']">DependencyReview</g:link></td>
 						</tr>
 						<tr>
 							<td>${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? and validation = ?',['Application', project , 'DependencyScan']).size()}</td>
-							<td>DependencyScan</td>
+							<td><g:link controller="application" action="list" params="[validation:'DependencyScan']">DependencyScan</g:link></td>
 						</tr>
 						<tr>
 							<td>${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? and validation = ?',['Application', project , 'BundleReady']).size()}</td>
-							<td>BundleReady</td>
+							<td><g:link controller="application" action="list" params="[validation:'BundleReady']">BundleReady</g:link></td>
 						</tr>
 					</table>
 	

@@ -43,7 +43,18 @@ class ApplicationController {
 		def projectId = params.projectId ? params.projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
 		def workFlow = project.workflowCode
-		def appEntityList = Application.findAllByProject(project)
+		def appEntityList
+		if(params.validation=='Discovery'){
+			appEntityList = Application.findAllByValidationAndProject('Discovery',project)
+	    }else if(params.validation=='DependencyReview'){
+		    appEntityList = Application.findAllByValidationAndProject('DependencyReview',project)
+		}else if(params.validation=='DependencyScan'){
+			appEntityList = Application.findAllByValidationAndProject('DependencyScan',project)
+		}else if(params.validation=='BundleReady'){
+			appEntityList = Application.findAllByValidationAndProject('BundleReady',project)
+		}else{
+		    appEntityList = Application.findAllByProject(project)
+		}
 		def appBeanList = new ArrayList()
 		appEntityList.each { appEntity->
 			def assetEntity = AssetEntity.get(appEntity.id)
@@ -301,5 +312,8 @@ class ApplicationController {
 		}
 		redirect( action:list )
 	}
+		public static void main(String[] args) {
+			BundleReady
+		}
 	
 }
