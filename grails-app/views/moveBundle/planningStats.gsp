@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=ISO-8859-1"%>
+<%@page import="com.tds.asset.Application;"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
@@ -71,7 +71,7 @@
 									</b></td>
 								</g:each></td>
 							<td style="color: red;"><b>
-									${unassignedPhysicalAssetCount}
+									${unassignedAssetCount}
 							</b></td>
 							<td>&nbsp;</td>
 						</tr>
@@ -86,7 +86,7 @@
 									</b></td>
 								</g:each></td>
 							<td style="color: red;"><b>
-									${unassignedPhysicalAssetCount}
+									${unassignedPhysialAssetCount}
 							</b></td>
 							<td><b>
 									${percentagePhysicalAssetCount}%&nbsp;&nbsp;&nbsp;assigned
@@ -159,6 +159,30 @@
 						<tr>
 							<td>${unlikelyLatencyCount }</td>
 							<td>UnLikely</td>
+						</tr>
+					</table>
+	
+				</div>
+				<div style="float: left;margin-left: 50px;">
+					<h3>
+						<b>Appl Evals</b>
+					</h3>
+					<table style="border: 0px; margin-left: 10px;">
+						<tr>
+							<td style="width: 10px;">${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? and validation = ? ',['Application', project,'Discovery']).size()}</td>
+							<td>Discovery</td>
+						</tr>
+						<tr>
+							<td>${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? and validation = ?',['Application', project , 'DependencyReview']).size()}</td>
+							<td>DependencyReview</td>
+						</tr>
+						<tr>
+							<td>${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? and validation = ?',['Application', project , 'DependencyScan']).size()}</td>
+							<td>DependencyScan</td>
+						</tr>
+						<tr>
+							<td>${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? and validation = ?',['Application', project , 'BundleReady']).size()}</td>
+							<td>BundleReady</td>
 						</tr>
 					</table>
 	

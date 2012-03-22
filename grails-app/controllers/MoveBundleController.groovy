@@ -472,10 +472,9 @@ class MoveBundleController {
 			appList << ['count':assignedApplicationCount]
 			def physicalAssetCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,'Server').size()
 			def virtualAssetCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,'VM').size()
-			def count = AssetEntity.findAllByMoveBundleAndAssetTypeNotInList(moveBundle,[
-				'Application',
-				'Database',
-				'Files'
+			def count = AssetEntity.findAllByMoveBundleAndAssetTypeInList(moveBundle,[
+				'Server',
+				'VM'
 			],params).size()
 			def likelyLatency = Application.findAllByMoveBundleAndLatency(moveBundle,'N').size()
 			def unlikelyLatency = Application.findAllByMoveBundleAndLatency(moveBundle,'Y').size()
@@ -487,7 +486,7 @@ class MoveBundleController {
 			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,'likelyLatency':likelyLatency,
 				          'unlikelyLatency':unlikelyLatency,'unknownLatency':unknownLatency,'potential':potential,'optional':optional]
 		}
-		def unassignedAppCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType=? and planStatus = ?",['Application', 'Unassigned']).size()
+		def unassignedAppCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType=? and (planStatus is null or planStatus in ('Unassigned',''))",['Application']).size()
 		def totalAssignedApp = applicationCount - unassignedAppCount ;
 		int percentageAppCount = 0 ;
 		if(applicationCount > 0){
@@ -495,27 +494,32 @@ class MoveBundleController {
 		}else{
 			percentageAppCount = 100;
 		}
-		def unassignedPhysialAssetCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType = ? and planStatus = ?",['Server', 'Unassigned']).size()
-		def unassignedVirtualAssetCount = AssetEntity.findAll("from AssetEntity where  project = $projectId and assetType = ? and planStatus = ?",['VM', 'Unassigned']).size()
+		def unassignedAssetCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType='Server' and (planStatus is null or planStatus in ('Unassigned',''))").size()
+		String moveBundles = moveBundleList.id
+		moveBundles = moveBundles.replace("[","('").replace(",","','").replace("]","')")
+		def unassignedPhysialAssetCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType='Server' and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundles ").size()
+		def unassignedVirtualAssetCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType='VM' and (planStatus is null or planStatus in ('Unassigned',''))  and moveBundle in $moveBundles ").size()
 
 		def assignedPhysicalAsset = moveBundleList ? AssetEntity.countByAssetTypeAndMoveBundleInList('Server',moveBundleList) : 0
 		def assignedVirtualAsset = moveBundleList ? AssetEntity.countByAssetTypeAndMoveBundleInList('VM',moveBundleList) : 0
-
 		def totalPhysicalAssetCount = assignedPhysicalAsset + unassignedPhysialAssetCount ;
 		def totalVirtualAssetCount = assignedVirtualAsset + unassignedVirtualAssetCount ;
 
 		int percentagePhysicalAssetCount = 0;
 		int percentagevirtualAssetCount = 0;
-
-		if(totalPhysicalAssetCount > 0){
-			percentagePhysicalAssetCount = Math.round((assignedPhysicalAsset/totalPhysicalAssetCount)*100)
-		}else{
+        if(unassignedPhysialAssetCount==assignedPhysicalAsset){
 			percentagePhysicalAssetCount = 100;
+		}else if(totalPhysicalAssetCount > 0){
+			percentagePhysicalAssetCount = 100-Math.round((unassignedPhysialAssetCount/assignedPhysicalAsset)*100)
+		}else if (unassignedPhysialAssetCount==0){
+			percentagePhysicalAssetCount=0;
 		}
-		if(totalVirtualAssetCount > 0){
-			percentagevirtualAssetCount = Math.round((assignedVirtualAsset/totalVirtualAssetCount)*100)
-		}else{
-			percentagevirtualAssetCount = 100;
+		if(unassignedVirtualAssetCount==assignedVirtualAsset){
+			percentagevirtualAssetCount = 0;
+		}else if(totalVirtualAssetCount > 0){
+			percentagevirtualAssetCount = 100-Math.round((unassignedVirtualAssetCount/assignedVirtualAsset)*100)
+		}else if(unassignedVirtualAssetCount==0){
+		    percentagevirtualAssetCount = 100;
 		}
 		def physicalCount=0;
 		def virtualCount=0;
@@ -541,12 +545,12 @@ class MoveBundleController {
 		def issues = AssetComment.findAll("FROM AssetComment a where a.assetEntity.project = ? and a.commentType = ? and a.isResolved = 0",[project, "issue"])
 
 		return [moveBundleList:moveBundleList, applicationCount:applicationCount,appList:appList,unassignedAppCount:unassignedAppCount,
-			percentageAppCount:percentageAppCount,assetCount:assetCount,assetList:assetList,unassignedPhysicalAssetCount:unassignedPhysialAssetCount,
+			percentageAppCount:percentageAppCount,assetCount:assetCount,assetList:assetList,unassignedPhysialAssetCount:unassignedPhysialAssetCount,
 			unassignedVirtualAssetCount:unassignedVirtualAssetCount,percentagePhysicalAssetCount:percentagePhysicalAssetCount,
 			percentagevirtualAssetCount:percentagevirtualAssetCount,physicalCount:physicalCount, virtualCount:virtualCount,
 			appDependenciesCount:appDependenciesCount,serverDependenciesCount:serverDependenciesCount, pendingAppDependenciesCount:pendingAppDependenciesCount,
 			pendingServerDependenciesCount:pendingServerDependenciesCount, issuesCount : issues.size(),likelyLatencyCount:likelyLatencyCount,unlikelyLatencyCount:unlikelyLatencyCount,
-			unknownLatencyCount:unknownLatencyCount]
+			unknownLatencyCount:unknownLatencyCount,unassignedAssetCount:unassignedAssetCount,project:project]
 	}
 	/**
 	 * 
