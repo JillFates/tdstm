@@ -35,7 +35,7 @@ class ClientConsoleController {
     def list={
 		def moveBundleInstance
 		def moveBundle
-		def workFlowCode
+		def workflowCode
 		def projectId=params.projectId
 		def browserTest = request.getHeader("User-Agent").contains("MSIE")
 		def projectInstance = Project.findById( projectId )
@@ -48,11 +48,11 @@ class ClientConsoleController {
 		}else{
 		    if(params.moveBundle!="all"){
 			  moveBundleInstance = MoveBundle.findByIdAndProject(params.moveBundle,Project.get(params.projectId))
-			  workFlowCode = moveBundleInstance.workflowCode
+			  workflowCode = moveBundleInstance.workflowCode
 		    }else{
-			  workFlowCode = projectInstance.workflowCode
+			  workflowCode = projectInstance.workflowCode
 			}
-			stateEngineService.loadWorkflowTransitionsIntoMap(workFlowCode, 'project')
+			stateEngineService.loadWorkflowTransitionsIntoMap(workflowCode, 'project')
 			def headerCount = getHeaderNames(params.moveBundle)
 	        def bundleId = params.moveBundle
 			def moveEventId = params.moveEvent
@@ -87,7 +87,6 @@ class ClientConsoleController {
 	            	moveEventInstance = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
 	            }
 	        }
-	        
 	    	if( moveEventInstance ){
 	    		def bundles
 	    		def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.moveEvent = ? order by mb.name asc",[moveEventInstance])
@@ -97,7 +96,7 @@ class ClientConsoleController {
 					bundles = "("+bundleId+")"
 		        } else if(moveBundleInstanceList.size() > 0){
 		        	if(bundleId == "all"){
-		        		userPreferenceService.removePreference( "CURR_BUNDLE" )
+						userPreferenceService.removePreference( "CURR_BUNDLE" )
 						bundles = (moveBundleInstanceList.id).toString().replace("[","(").replace("]",")")
 		        	} else if(defalutBundleId){ // check to see if there is any pref bundle exist
 		        		def defalutBundle = MoveBundle.get(defalutBundleId)
@@ -113,7 +112,7 @@ class ClientConsoleController {
 		        	}
 		        	
 		        }
-	    		def resultList
+				def resultList
 	    		def column1List
 				def column2List
 				def column3List
@@ -124,19 +123,19 @@ class ClientConsoleController {
 					
 					def temp1List = AssetEntity.executeQuery("""select distinct ae.${columns?.column1.field} , count(ae.id) from AssetEntity 
 																	ae where  ae.moveBundle.id in ${bundles} group by ae.${columns?.column1.field} order by ae.${columns?.column1.field}""")
-					column1List = splitFilterExpansion( temp1List, columns?.column1.field, moveBundleInstance )
+					column1List = splitFilterExpansion( temp1List, columns?.column1.field, workflowCode )
 					
 					def temp2List = AssetEntity.executeQuery("""select distinct ae.${columns?.column2.field} , count(ae.id) from AssetEntity 
 																	ae where  ae.moveBundle.id in ${bundles} group by ae.${columns?.column2.field} order by ae.${columns?.column2.field}""")
-					column2List = splitFilterExpansion( temp2List, columns?.column2.field, moveBundleInstance  )
+					column2List = splitFilterExpansion( temp2List, columns?.column2.field, workflowCode  )
 					
 					def temp3List = AssetEntity.executeQuery("""select distinct ae.${columns?.column3.field} , count(ae.id) from AssetEntity 
 																	ae where  ae.moveBundle.id in ${bundles} group by ae.${columns?.column3.field} order by ae.${columns?.column3.field}""")
-					column3List = splitFilterExpansion( temp3List, columns?.column3.field, moveBundleInstance  )
+					column3List = splitFilterExpansion( temp3List, columns?.column3.field, workflowCode  )
 					
 					def temp4List = AssetEntity.executeQuery("""select distinct ae.${columns?.column4.field} , count(ae.id) from AssetEntity 
 																	ae where  ae.moveBundle.id in ${bundles} group by ae.${columns?.column4.field} order by ae.${columns?.column4.field}""")
-					column4List = splitFilterExpansion( temp4List, columns?.column4.field, moveBundleInstance  )
+					column4List = splitFilterExpansion( temp4List, columns?.column4.field, workflowCode  )
 	                
 					/*-------------get asset details----------------*/
 					def returnValue = pmoAssetTrackingService.getAssetsForListView( projectId, bundles, columns, params )
@@ -150,19 +149,19 @@ class ClientConsoleController {
 				def processTransitionList=[]
 				def tempTransitions = []
 				
-				def processTransitions= stateEngineService.getTasks(workFlowCode,"TASK_ID")
+				def processTransitions= stateEngineService.getTasks(workflowCode,"TASK_ID")
 				processTransitions.each{
 					tempTransitions <<Integer.parseInt(it)
 				}
 				tempTransitions.sort().each{
-					def processTransition = stateEngineService.getState(workFlowCode,it)
-					def fillColor = stateEngineService.getHeaderColor(workFlowCode, stateEngineService.getState(workFlowCode,it))
-					def transId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,processTransition))
-					processTransitionList<<[header:stateEngineService.getStateLabel(workFlowCode,it),
+					def processTransition = stateEngineService.getState(workflowCode,it)
+					def fillColor = stateEngineService.getHeaderColor(workflowCode, stateEngineService.getState(workflowCode,it))
+					def transId = Integer.parseInt(stateEngineService.getStateId(workflowCode,processTransition))
+					processTransitionList<<[header:stateEngineService.getStateLabel(workflowCode,it),
 											transId:transId,
 											fillColor:fillColor,
-											stateType:stateEngineService.getStateType( workFlowCode, 
-	                                                        stateEngineService.getState(workFlowCode, transId))]
+											stateType:stateEngineService.getStateType( workflowCode, 
+	                                                        stateEngineService.getState(workflowCode, transId))]
 				}
 				/* user role check*/
 				def role = ""
@@ -172,10 +171,10 @@ class ClientConsoleController {
 				} else if(subject.hasRole("MANAGER")){
 					role = "MANAGER"
 				}
-				def holdId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Hold"))
-				def releaseId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Release"))
-				def reRackId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Reracked"))
-				def terminatedId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Terminated"))
+				def holdId = Integer.parseInt(stateEngineService.getStateId(workflowCode,"Hold"))
+				def releaseId = Integer.parseInt(stateEngineService.getStateId(workflowCode,"Release"))
+				def reRackId = Integer.parseInt(stateEngineService.getStateId(workflowCode,"Reracked"))
+				def terminatedId = Integer.parseInt(stateEngineService.getStateId(workflowCode,"Terminated"))
 				resultList.each{
 					def stateId = 0
 					def assetId = it.id
@@ -192,8 +191,8 @@ class ClientConsoleController {
 	                if(stateId == 0){
 	                    check = true
 	                } else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
-	                    stateVal = stateEngineService.getState(workFlowCode,stateId)
-	                    taskVal = stateEngineService.getTasks(workFlowCode, role ,stateVal)
+	                    stateVal = stateEngineService.getState(workflowCode,stateId)
+	                    taskVal = stateEngineService.getTasks(workflowCode, role ,stateVal)
 	                    if(taskVal.size() == 0){
 	                        check = false
 	                    }else{
@@ -249,7 +248,7 @@ class ClientConsoleController {
 	                    htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass tranCell\"  >&nbsp;</td>"
 	                }
 	                assetEntityList << [id: assetId, asset:it, transitions:htmlTd, checkVal:check, 
-										currentStatus : it.currentStatus ? stateEngineService.getState(workFlowCode,it.currentStatus) : ""]
+										currentStatus : it.currentStatus ? stateEngineService.getState(workflowCode,it.currentStatus) : ""]
 				}
 	
 				userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
@@ -766,7 +765,7 @@ class ClientConsoleController {
 	 * @author : Lokanada Reddy
 	 * @return : result as list.
 	 * -------------------------------------------------------*/
-	def splitFilterExpansion( def appsList, def assetAttribute, def projectInstance  ){
+	def splitFilterExpansion( def appsList, def assetAttribute, def workflowCode  ){
 		def applicationMap = new HashMap()
 		def resList = []
 		appsList.each{ apps ->
@@ -788,7 +787,7 @@ class ClientConsoleController {
 			}
 		} else {
 			applicationMap.keySet().each{
-				resList << ["key":it ? stateEngineService.getState(projectInstance.workflowCode,Integer.parseInt(it)) : "", "value":applicationMap.get(it), 'id':it]  
+				resList << ["key":it ? stateEngineService.getState(workflowCode,Integer.parseInt(it)) : "", "value":applicationMap.get(it), 'id':it]  
 			}
 		}
 		resList.sort(){
@@ -978,16 +977,16 @@ class ClientConsoleController {
 		def moveBundlesList = MoveBundle.findAllByMoveEvent( moveEvent )
 		def bundles = moveBundlesList.id.toString().replace("[","(").replace("]",")")
 		def moveBundleInstance
-		def workFlowCode    
+		def workflowCode    
 		if(params.bundle!="all"){
 			moveBundleInstance = MoveBundle.get(params.bundle) 
-			workFlowCode = moveBundleInstance
+			workflowCode = moveBundleInstance.workflowCode
 		}else{
-		    workFlowCode = moveEvent.project
+		    workflowCode = moveEvent.project.workflowCode
 		}
 		def tempList = AssetEntity.executeQuery("""select distinct ae.${columnName} , count(ae.id) from AssetEntity 
 										ae where  ae.moveBundle.id in ${bundles} group by ae.${columnName} order by ae.${columnName}""")
-		def columnList = splitFilterExpansion( tempList, columnName, workFlowCode )
+		def columnList = splitFilterExpansion( tempList, columnName, workflowCode )
 		render columnList as JSON
 	}
 	/*
