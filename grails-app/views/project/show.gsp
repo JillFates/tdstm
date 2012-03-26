@@ -23,6 +23,9 @@
      <tds:hasPermission permission='CreateProject'>
     <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
         <span class="menuButton"><g:link class="create" action="create">New Project</g:link></span>
+        <tds:hasPermission permission='MoveBundleEditView'>
+          <span class="menuButton"><g:link class="create" controller="moveBundle" action="planningConsole">Planning Console</g:link></span>
+        </tds:hasPermission>
     </div>
       </tds:hasPermission>
     <br/>
