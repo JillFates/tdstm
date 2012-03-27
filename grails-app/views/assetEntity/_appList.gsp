@@ -30,34 +30,34 @@
 						<tr id="tag_row1" style="cursor: pointer;"
 							class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td><a
-								href="javascript:editEntity('application','Application', 15651)"><img
+								href="javascript:editEntity('planningConsole','Application', ${app.id})"><img
 									src="/tdstm/images/skin/database_edit.png" border="0px" />
 							</a> <span id="icon_15651"> <a
 									href="javascript:createNewAssetComment(15651);"> <img
 										src="/tdstm/i/db_table_light.png" border="0px" /> </a> </span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('application','Application', 15651 )">${app.assetName}</span>
+								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app.assetName}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('application','Application', 15651 )">${app.owner}</span>
+								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app.owner}</span>
 							</td>
 
 							<td><span
-								onclick="getEntityDetails('application','Application', 15651 )">${app.sme}</span>
+								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app.sme}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('application','Application', 15651 )">${app.moveBundle}</span>
+								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app.moveBundle}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('application','Application', 15651 )">${app.planStatus}</span>
+								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app.planStatus}</span>
 
 							</td>
 							<td><span
-								onclick="getEntityDetails('application','Application', 15651 )">0</span>
+								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">0</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('application','Application', 15651 )">4</span>
+								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">4</span>
 							</td>
 						</tr>
 					</g:each>

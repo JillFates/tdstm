@@ -21,10 +21,12 @@ $(document).ready(function() {
     
 });
 
+
 </script>
+
 </head>
 <body>
-	<input type="hidden" id="planning" value="${temp}" />
+	<input type="hidden" id="redirectTo" name="redirectTo" value="planningConsole" />
 	<div class="body">
 		<div style="float: left;">
 			<h1>Dependency Console</h1>
@@ -137,24 +139,24 @@ $(document).ready(function() {
 	function getList(value){
 		if(value=='Apps'){
 			var app = 'Apps'
-			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + app', onComplete:'listUpdate(e,"server")') }
+			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + app', onComplete:'listUpdate(e)') }
 		}else if(value=='server'){
 			var server = 'server'
-			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + server', onComplete:'listUpdate(e,"server")') }
+			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + server', onComplete:'listUpdate(e)') }
 		}
 		else if(value=='database'){
 			var server = 'database'
-			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + server', onComplete:'listUpdate(e,"server")') }
+			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + server', onComplete:'listUpdate(e)') }
 		}else{
 			var server = 'files'
-			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + server', onComplete:'listUpdate(e,"server")') }
+			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + server', onComplete:'listUpdate(e)') }
 		}
 	}
-	function listUpdate(e , value){
-			   var resp = e.responseText;
-			   $('#items1').html(resp)
-			   $('#items1').css('display','block');
-}
+	function listUpdate(e){
+		   var resp = e.responseText;
+		   $('#items1').html(resp)
+		   $('#items1').css('display','block');
+    }
 </script>
 </body>
 </html>

@@ -190,6 +190,7 @@ class DatabaseController {
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def maintExpDate = params.maintExpDate
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		if(maintExpDate){
 			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
 		}
@@ -224,6 +225,10 @@ class DatabaseController {
 				case "files":
 					redirect( controller:'files', action:list)
 					break;
+				case "planningConsole":
+					def dbList = Database.findAllByProject(Project.findById(projectId),[max:5])
+					render(template:"../assetEntity/dbList",model:[databaseList:dbList])
+					break;
 				default:
 					redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_dbFormat:filterAttr.tag_f_dbFormat, tag_f_moveBundle:filterAttr.tag_f_moveBundle, tag_f_planStatus:filterAttr.tag_f_planStatus, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown])
 			}
@@ -238,6 +243,7 @@ class DatabaseController {
 	def delete = {
 		def databaseInstance = Database.get( params.id )
 		def assetEntityInstance = AssetEntity.get(params.id)
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		if(assetEntityInstance) {
 			def assetName = assetEntityInstance.assetName
 			ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${assetEntityInstance.id}")
@@ -253,10 +259,17 @@ class DatabaseController {
 			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
 			Database.executeUpdate("delete from Database d where d.id = ${databaseInstance.id}")
 			flash.message = "Database ${assetName} deleted"
+			if(params.dstPath =='planningConsole'){
+				def dbList = Database.findAllByProject(Project.findById(projectId),[max:5])
+				render(template:"../assetEntity/dbList",model:[databaseList:dbList])
+			}else{
+				redirect( action:list )
+			}
 		}
 		else {
 			flash.message = "Database not found with id ${params.id}"
+			redirect( action:list )
 		}
-		redirect( action:list )
+		
 	}
 }

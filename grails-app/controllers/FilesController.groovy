@@ -162,7 +162,7 @@ class FilesController {
 		def attribute = session.getAttribute('filterAttr')
 		def filterAttr = session.getAttribute('filterAttributes')
 		session.setAttribute("USE_FILTERS","true")
-		
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def filesInstance = Files.get(params.id)
 		filesInstance.properties = params
 		if(!filesInstance.hasErrors() && filesInstance.save(flush:true)) {
@@ -190,6 +190,10 @@ class FilesController {
 				case "application":
 					redirect( controller:'application', action:list)
 					break;
+			    case "planningConsole":
+					def filesList = Files.findAllByProject(Project.findById(projectId),[max:5])
+					render(template:"../assetEntity/filesList",model:[filesList:filesList])
+					break;
 				default:
 					redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_fileFormat:filterAttr.tag_f_fileFormat,tag_f_fileSize:filterAttr.tag_f_fileSize, tag_f_moveBundle:filterAttr.tag_f_moveBundle, tag_f_planStatus:filterAttr.tag_f_planStatus, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown])
 			}
@@ -204,6 +208,7 @@ class FilesController {
 	def delete = {
 		def filesInstance = Files.get( params.id )
 		def assetEntityInstance = AssetEntity.get(params.id)
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		if(assetEntityInstance) {
 			def assetName = assetEntityInstance.assetName
 			ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${assetEntityInstance.id}")
@@ -219,10 +224,17 @@ class FilesController {
 			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
 			Files.executeUpdate("delete from Database d where d.id = ${filesInstance.id}")
 			flash.message = "Files ${assetName} deleted"
+			if(params.dstPath =='planningConsole'){
+				def filesList = Files.findAllByProject(Project.findById(projectId),[max:5])
+				render(template:"../assetEntity/filesList",model:[filesList:filesList])
+			}else{
+				redirect( action:list )
+			}
 		}
 		else {
 			flash.message = "Files not found with id ${params.id}"
+			redirect( action:list )
 		}
-		redirect( action:list )
+		
 	}
 }

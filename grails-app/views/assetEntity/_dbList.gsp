@@ -28,31 +28,31 @@
 						<tr id="tag_row1" style="cursor: pointer;"
 							class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td><a
-								href="javascript:editEntity('application','Database', ${database.id})"><img
+								href="javascript:editEntity('planningConsole','Database', ${database.id})"><img
 									src="/tdstm/images/skin/database_edit.png" border="0px" />
 							</a> <span id="icon_15651"> <a
 									href="javascript:createNewAssetComment(15651);"> <img
 										src="/tdstm/i/db_table_light.png" border="0px" /> </a> </span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('application','Database', ${database.id} )">${database.assetName}</span>
+								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${database.assetName}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('application','Database', ${database.id} )">${database.dbFormat}</span>
+								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${database.dbFormat}</span>
 							</td>
 
 							<td><span
-								onclick="getEntityDetails('application','Database', ${database.id} )">${database.moveBundle}</span>
+								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${database.moveBundle}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('application','Database', ${database.id} )">${database.planStatus}</span>
+								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${database.planStatus}</span>
 
 							</td>
 							<td><span
-								onclick="getEntityDetails('application','Database', ${database.id} )">0</span>
+								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">0</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('application','Database', ${database.id} )">4</span>
+								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">4</span>
 							</td>
 						</tr>
 					</g:each>

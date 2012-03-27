@@ -135,3 +135,52 @@ function validateFileFormat(){
     }
   return fileFlag
 }
+function submitRemoteForm(){
+		jQuery.ajax({
+			url: $('#editAssetsFormId').attr('action'),
+			data: $('#editAssetsFormId').serialize(),
+			type:'POST',
+			success: function(data) {
+				$('#editEntityView').dialog('close')
+				$('#items1').html(data);
+			}
+		});
+ 		return false;
+}
+function deleteAsset(id,value){
+	var redirectTo = 'planningConsole'
+	if(value=='server'){
+		new Ajax.Request('../assetEntity/delete?id='+id+'&dstPath='+redirectTo,{asynchronous:true,evalScripts:true,
+			onComplete:function(data){
+			$('#editEntityView').dialog('close');
+			$('#showEntityView').dialog('close');
+			$('#items1').html(data.responseText);
+			}
+		})
+	}else if(value=='app'){
+		new Ajax.Request('../application/delete?id='+id+'&dstPath='+redirectTo,{asynchronous:true,evalScripts:true,
+			onComplete:function(data){
+			$('#editEntityView').dialog('close');
+			$('#showEntityView').dialog('close');
+			$('#items1').html(data.responseText);
+			}
+		})
+	}else if(value=='database'){
+		new Ajax.Request('../database/delete?id='+id+'&dstPath='+redirectTo,{asynchronous:true,evalScripts:true,
+			onComplete:function(data){
+			$('#editEntityView').dialog('close');
+			$('#showEntityView').dialog('close');
+			$('#items1').html(data.responseText);
+			}
+		})
+	}else {
+		new Ajax.Request('../files/delete?id='+id+'&dstPath='+redirectTo,{asynchronous:true,evalScripts:true,
+			onComplete:function(data){
+			$('#editEntityView').dialog('close');
+			$('#showEntityView').dialog('close');
+			$('#items1').html(data.responseText);
+			}
+		})
+	}
+	
+}

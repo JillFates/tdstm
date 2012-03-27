@@ -206,10 +206,15 @@
 		<td colspan="2">
 			<div class="buttons">
 				<g:form>
-					<input type="hidden" name="id" value="${databaseInstance?.id}" />
+					<input type="hidden" name="id" id ="databaseId" value="${databaseInstance?.id}" />
 					<tds:hasPermission permission='EditAndDelete'>
-						<span class="button"><input type="button" class="edit" value="Edit" onclick="editEntity('${redirectTo}','Database',${databaseInstance?.id})" /> </span>
-						<span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>
+					<span class="button"><input type="button" class="edit" value="Edit" onclick="editEntity('${redirectTo}','Database',${databaseInstance?.id})" /> </span>
+					<g:if test="${redirectTo!='planningConsole'}">
+					   <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>
+					</g:if>
+					<g:else>
+					   <span class="button"><input id="deleteId"	 name="deleteId"  class="save" value="Delete" onclick=" deleteAsset($('#databaseId').val(),'database')" value="Delete" /> </span>
+					</g:else>
 					</tds:hasPermission>
 					<g:if test="${assetComment == 'issue'}">
 						<g:remoteLink controller="assetEntity" action="listComments" id="${databaseInstance.id}" before="setAssetId('${databaseInstance.id}');" onComplete="listCommentsDialog(e,'never');">

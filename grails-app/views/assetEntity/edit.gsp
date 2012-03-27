@@ -1,4 +1,4 @@
-<g:form method="post">
+<g:form method="post"  name="editAssetsFormId" action="update">
 	<table style="border:0;width:1000px;">
 		<tr>
 			<td colspan="2">
@@ -250,11 +250,18 @@
 					<input  name="supportCount"  id="supportCount" type="hidden" value="${supportAssets.size()}">
 					<input name="attributeSet.id" type="hidden" value="1">
 					<input name="project.id" type="hidden" value="${projectId}">
-					<input name="id" type="hidden" value="${assetEntityInstance.id}">
+					<input name="id" id ="assetId" type="hidden" value="${assetEntityInstance.id}">
 					<input type = "hidden" id = "dstPath" name = "dstPath" value ="${redirectTo}"/>
 					<input name="redirectTo" type="hidden" value="${redirectTo}">
-					<span class="button"><g:actionSubmit class="save" value="Update" /> </span>
-					<span class="button"><g:actionSubmit class="delete"	onclick=" return confirm('Are you sure?');" value="Delete" /> </span>
+					<g:if test="${redirectTo!='planningConsole'}">
+					  <span class="button"><g:actionSubmit class="save" value="Update"  /> </span>
+					  <span class="button"><g:actionSubmit class="delete"	onclick=" return confirm('Are you sure?');" value="Delete" /> </span>
+					</g:if>
+					<g:else>
+					  <span class="button"><input id="updatedId" name="updatedId" type="button" class="save" value="Update" onclick="submitRemoteForm()"> 
+					  <span class="button"><input id="deleteId"	 name="deleteId"  class="save" value="Delete" onclick=" deleteAsset($('#assetId').val(),'server')" value="Delete" /> </span>
+					</g:else>
+					
 				</div></td>
 		</tr>
 	</table>

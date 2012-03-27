@@ -184,7 +184,7 @@ class ApplicationController {
 	}
 
 	def edit ={
-
+ 
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
@@ -229,6 +229,7 @@ class ApplicationController {
 		session.setAttribute("USE_FILTERS","true")
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def maintExpDate = params.maintExpDate
 		if(maintExpDate){
 			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
@@ -273,6 +274,10 @@ class ApplicationController {
 				case "files":
 					redirect( controller:'files', action:list)
 					break;
+				case "planningConsole":
+					def appList = Application.findAllByProject(Project.findById(projectId),[max:5])
+					render(template:"../assetEntity/appList",model:[appList:appList])
+					break;
 				default:
 					redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_appOwner:filterAttr.tag_f_appOwner, tag_f_appSme:filterAttr.tag_f_appSme, tag_f_planStatus:filterAttr.tag_f_planStatus, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown])
 			}
@@ -286,6 +291,7 @@ class ApplicationController {
 	def delete = {
 		def applicationInstance = Application.get( params.id )
 		def assetEntityInstance = AssetEntity.get(params.id)
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		if(assetEntityInstance) {
 			def assetName = assetEntityInstance.assetName
 			ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${assetEntityInstance.id}")
@@ -306,10 +312,15 @@ class ApplicationController {
 			         it.delete(flush:true)
 			}
 			flash.message = "Application ${assetName} deleted"
+			if(params.dstPath =='planningConsole'){
+				def appList = Application.findAllByProject(Project.findById(projectId),[max:5])
+				render(template:"../assetEntity/appList",model:[appList:appList])
+			}else{
+				redirect( action:list )
+			}
 		}
 		else {
-			flash.message = "Application not found with id ${params.id}"
-		}
-		redirect( action:list )
+			flash.message = "Application not found with id ${params.id}"			
+		}		
 	}	
 }

@@ -29,34 +29,34 @@
 						<tr id="tag_row1" style="cursor: pointer;"
 							class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td><a
-								href="javascript:editEntity('application','Files', ${files.id}"><img
+								href="javascript:editEntity('planningConsole','Files', ${files.id})"><img
 									src="/tdstm/images/skin/database_edit.png" border="0px" />
 							</a> <span id="icon_15651"> <a
 									href="javascript:createNewAssetComment(15651);"> <img
 										src="/tdstm/i/db_table_light.png" border="0px" /> </a> </span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('application','Files', ${files.id} )">${files.assetName}</span>
+								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${files.assetName}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('application','Files', ${files.id} )">${files.fileFormat}</span>
+								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${files.fileFormat}</span>
 							</td>
                             <td><span
-								onclick="getEntityDetails('application','Files', ${files.id} )">${files.fileSize}</span>
+								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${files.fileSize}</span>
 							</td>
 
 							<td><span
-								onclick="getEntityDetails('application','Files', ${files.id} )">${files.moveBundle}</span>
+								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${files.moveBundle}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('application','Files', ${files.id} )">${files.planStatus}</span>
+								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${files.planStatus}</span>
 
 							</td>
 							<td><span
-								onclick="getEntityDetails('application','Files', ${files.id} )">0</span>
+								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">0</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('application','Files', ${files.id} )">4</span>
+								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">4</span>
 							</td>
 						</tr>
 					</g:each>

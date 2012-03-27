@@ -1,4 +1,4 @@
-<g:form method="post">
+<g:form method="post" action="update" name="editAssetsFormId">
 	<input type="hidden" name="id" value="${applicationInstance?.id}" />
 	<table style="border: 0">
 		<tr>
@@ -270,8 +270,16 @@
 					<input name="dependentCount" id="dependentCount" type="hidden" value="${dependentAssets.size()}" />
 					<input name="supportCount"  id="supportCount" type="hidden" value="${supportAssets.size()}" />
 					<input name="redirectTo" type="hidden" value="${redirectTo}">
-					<span class="button"><g:actionSubmit class="save" value="Update" /></span>
-                    <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
+					<input type = "hidden" id = "dstPath" name = "dstPath" value ="${redirectTo}"/>
+					<input type = "hidden" id = "appId"  value ="${applicationInstance.id}"/>
+					<g:if test="${redirectTo!='planningConsole'}">
+					  <span class="button"><g:actionSubmit class="save" value="Update"  /> </span>
+					  <span class="button"><g:actionSubmit class="delete"	onclick=" return confirm('Are you sure?');" value="Delete" /> </span>
+					</g:if>
+					<g:else>
+					  <span class="button"><input id="updatedId" name="updatedId" type="button" class="save" value="Update" onclick="submitRemoteForm()"> 
+					  <span class="button"><input id="deleteId"	 name="deleteId"  class="save" value="Delete" onclick=" deleteAsset($('#appId').val(),'app')" value="Delete" /> </span>
+					</g:else>
                 </div></td>
 		</tr>
 	</table>
