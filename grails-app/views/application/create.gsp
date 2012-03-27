@@ -119,7 +119,7 @@
 								</td>
 								<td ><g:select  id="validation"	name="validation" from="${applicationInstance.constraints.validation.inList }"  value="" tabindex="36" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="testProcs">Test Procs</label>
+								<td class="label" nowrap="nowrap"><label for="testProcs">Test Proc OK</label>
 								</td>
 								<td ><g:select  id="testProc"	name="testProc"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="46" />
@@ -142,7 +142,7 @@
 								<td ><g:select  id="latency"	name="latency"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="37" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="startupProc">Startup Procs</label>
+								<td class="label" nowrap="nowrap"><label for="startupProc">Startup Proc OK</label>
 								</td>
 								<td ><g:select  id="testProcs"	name="startupProc" from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="47" />

@@ -129,7 +129,7 @@
 							<td class="label" nowrap="nowrap">Validation</td>
 							<td>${applicationInstance.validation}
 							</td>
-							<td class="label" nowrap="nowrap"><label for="testProc">Test Proc</label></td>
+							<td class="label" nowrap="nowrap"><label for="testProc">Test Proc OK</label></td>
 							<td>${applicationInstance.testProc ? applicationInstance.testProc : '?'}
 							</td>
 						</tr>
@@ -145,7 +145,7 @@
 							<td>
 								${applicationInstance.latency ? applicationInstance.latency : '?'}
 							</td>
-							<td class="label" nowrap="nowrap"><label for="startupProc">Startup Procs</label></td>
+							<td class="label" nowrap="nowrap"><label for="startupProc">Startup Proc OK</label></td>
 							<td>${applicationInstance.startupProc ? applicationInstance.startupProc : '?'}
 							</td>
 						</tr>
