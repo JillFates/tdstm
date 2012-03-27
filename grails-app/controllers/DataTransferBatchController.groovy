@@ -91,7 +91,7 @@ class DataTransferBatchController {
     					def isNewValidate
     					def isFormatError = 0
 		    			def assetEntity
-		    			if( assetEntityId ) {
+		    			if( assetEntityId && AssetEntity.get(assetEntityId).project.id == projectInstance.id) {
 		    				assetEntity = AssetEntity.get(assetEntityId)
 							if(assetEntity?.id != null && assetEntity.project.id == projectInstance.id ){
 								existingAssetsList.add( assetEntity )
@@ -107,11 +107,8 @@ class DataTransferBatchController {
 			    				} else {
 			    					flag = 0;
 			    				}
-							} else {
-								unknowAssetIds += 1
-								unknowAssets += assetEntityId+"," 
-							}
-		    			} else {
+							} 
+		    			} else if(!assetEntityId || AssetEntity.get(assetEntityId).project.id != projectInstance.id) {
 		    				assetEntity = new AssetEntity()
 		    				assetEntity.attributeSet = eavAttributeSet
 		    				isNewValidate = "true"
@@ -232,11 +229,11 @@ class DataTransferBatchController {
     						if ( isFormatError != 1 ) {
     							if( isModified == "true" ) {
         							if ( isNewValidate == "true" ) {
-        								if( assetEntity.save() ) {
+        								if( assetEntity.save(flush:true) ) {
         									insertCount+=1
         								}
         							} else {
-        								if( assetEntity.save() ) {
+        								if( assetEntity.save(flush:true) ) {
         									updateCount+=1
         								}
         							}
@@ -345,7 +342,7 @@ class DataTransferBatchController {
     					def isNewValidate
     					def isFormatError = 0
 		    			def assetEntity
-		    			if( assetEntityId ) {
+		    			if( assetEntityId && AssetEntity.get(assetEntityId).project.id == projectInstance.id ) {
 		    				application = Application.get(assetEntityId)
 							if(application?.id != null && application.project.id == projectInstance.id ){
 								existingAssetsList.add( application )
@@ -365,7 +362,7 @@ class DataTransferBatchController {
 								unknowAssetIds += 1
 								unknowAssets += assetEntityId+"," 
 							}
-		    			} else {
+		    			} else if(!assetEntityId || AssetEntity.get(assetEntityId).project.id != projectInstance.id){
 		    				application = new Application()
 		    				application.attributeSet = eavAttributeSet
 		    				isNewValidate = "true"
@@ -560,7 +557,7 @@ class DataTransferBatchController {
 						def isNewValidate
 						def isFormatError = 0
 						def assetEntity
-						if( assetEntityId ) {
+						if( assetEntityId && AssetEntity.get(assetEntityId).project.id == projectInstance.id ) {
 							files = Files.get(assetEntityId)
 							if(files?.id != null && files.project.id == projectInstance.id ){
 								existingAssetsList.add( files )
@@ -579,7 +576,7 @@ class DataTransferBatchController {
 								unknowAssetIds += 1
 								unknowAssets += assetEntityId+","
 							}
-						} else {
+						} else if(!assetEntityId || AssetEntity.get(assetEntityId).project.id != projectInstance.id){
 							files = new Files()
 							files.attributeSet = eavAttributeSet
 							isNewValidate = "true"
@@ -767,7 +764,7 @@ class DataTransferBatchController {
 						def isNewValidate
 						def isFormatError = 0
 						def assetEntity
-						if( assetEntityId ) {
+						if( assetEntityId && AssetEntity.get(assetEntityId).project.id == projectInstance.id ) {
 							dbInstance = Database.get(assetEntityId)
 							if(dbInstance?.id != null && dbInstance.project.id == projectInstance.id ){
 								existingAssetsList.add( dbInstance )
@@ -786,7 +783,7 @@ class DataTransferBatchController {
 								unknowAssetIds += 1
 								unknowAssets += assetEntityId+","
 							}
-						} else {
+						} else if(!assetEntityId || AssetEntity.get(assetEntityId).project.id != projectInstance.id){
 							dbInstance = new Database()
 							dbInstance.attributeSet = eavAttributeSet
 							isNewValidate = "true"
