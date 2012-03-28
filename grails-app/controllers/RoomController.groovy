@@ -359,6 +359,8 @@ class RoomController {
 	   def thisRackTotalSpace = 42
 	   def rackId = params.rackId
 	   def rack
+	   def totalPowerInRack = 0;
+	   def unassignedPowerInRack = 0;
 	   if(rackId){
 		   rack = Rack.get(rackId)
 		   def assets = AssetEntity.findAllByRackSource( rack )
@@ -372,14 +374,20 @@ class RoomController {
 			   thisRackUsedSpace += assetEntity?.model?.usize ? assetEntity?.model?.usize : 1
 		   }
 		   spaceString = params.capacityType != "Used" ? (thisRackTotalSpace-thisRackUsedSpace)+" remaining of "+thisRackTotalSpace+" RU" : thisRackUsedSpace+" used of "+thisRackTotalSpace+" RU"
-		   assets.findAll{moveBundles?.id?.contains(it.moveBundle?.id)}.each{ asset->
+		   assets.each{ asset->
 			   def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? ",["Power",asset])
 			   def powerConnectors = assetPowerCabling.size()
 			   def powerConnectorsAssigned = assetPowerCabling.findAll{it.toPower != null && it.toPower != '' }.size()
 			   
 			   def powerDesign = asset.model?.powerDesign ? asset.model?.powerDesign : 0
+			   totalPowerInRack = powerDesign + totalPowerInRack
+			   assetPowerCabling.each{
+				   if(it.toPower==null){
+					   unassignedPowerInRack = powerDesign/powerConnectors + unassignedPowerInRack
+					}
+				}
 			   if(powerConnectorsAssigned){
-				   def powerUseForConnector = powerDesign ? powerDesign / powerConnectorsAssigned : 0
+				   def powerUseForConnector = powerDesign ? (powerDesign / powerConnectors) : 0
 				   assetPowerCabling.each{ cables ->
 					   if(cables.toPower){
 						   switch(cables.toPower){
@@ -392,9 +400,9 @@ class RoomController {
 						   }
 					   }
 				   }
-			   } else {
-			   		powerX += powerUsed
-			   }
+			  } 
+			   		powerX = unassignedPowerInRack
+			  
 		   }
 		   powerA = powerType != "Watts" ?  powerA ? (powerA / 110).toFloat().round(1) : 0.0 : powerA ? Math.round(powerA):0
 		   powerB = powerType != "Watts" ?  powerB ? (powerB / 110).toFloat().round(1) : 0.0 : powerB ? Math.round(powerB):0
