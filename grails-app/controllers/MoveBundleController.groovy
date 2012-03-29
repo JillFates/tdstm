@@ -5,10 +5,11 @@ import java.text.SimpleDateFormat
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 
-import com.tds.asset.AssetComment;
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
 import com.tds.asset.Application
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetDependency
+import com.tds.asset.AssetDependencyBundle
+import com.tds.asset.AssetEntity
 import com.tds.asset.AssetOptions
 import com.tds.asset.AssetTransition
 import com.tdssrc.grails.GormUtil
@@ -438,9 +439,9 @@ class MoveBundleController {
 		if(bundleId){
 			def moveBundle = MoveBundle.get( bundleId )
 			AssetTransition.executeUpdate("DELETE FROM AssetTransition at WHERE at.assetEntity in (SELECT ae.id FROM AssetEntity ae WHERE ae.moveBundle = ${moveBundle.id})" )
-			AssetEntity.executeUpdate("UPDATE AssetEntity ae SET ae.currentStatus = null WHERE ae.moveBundle = ?", [moveBundle ])
+			AssetEntity.executeUpdate("UPDATE AssetEntity ae SET ae.currentStatus = null WHERE ae.moveBundle = ?", [moveBundle])
 			ProjectAssetMap.executeUpdate("DELETE FROM ProjectAssetMap WHERE asset in (SELECT ae.id FROM AssetEntity ae WHERE ae.moveBundle = ${moveBundle.id})")
-			MoveBundleStep.executeUpdate("UPDATE MoveBundleStep mbs SET mbs.actualStartTime = null , mbs.actualCompletionTime = null WHERE mbs.moveBundle = ?", [moveBundle ])
+			MoveBundleStep.executeUpdate("UPDATE MoveBundleStep mbs SET mbs.actualStartTime = null , mbs.actualCompletionTime = null WHERE mbs.moveBundle = ?", [moveBundle])
 			stepSnapshotService.process( bundleId )
 		}
 		redirect(action:show,params:[id:params.id, projectId:params.projectId])
@@ -472,19 +473,16 @@ class MoveBundleController {
 			appList << ['count':assignedApplicationCount]
 			def physicalAssetCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,'Server').size()
 			def virtualAssetCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,'VM').size()
-			def count = AssetEntity.findAllByMoveBundleAndAssetTypeInList(moveBundle,[
-				'Server',
-				'VM'
-			],params).size()
+			def count = AssetEntity.findAllByMoveBundleAndAssetTypeInList(moveBundle,['Server', 'VM'],params).size()
 			def likelyLatency = Application.findAllByMoveBundleAndLatency(moveBundle,'N').size()
 			def unlikelyLatency = Application.findAllByMoveBundleAndLatency(moveBundle,'Y').size()
 			def unknownLatency = Application.findAllByMoveBundleAndLatency(moveBundle,null).size()
 			def potential = 0
 			def optional = 0
-		         potential = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle = $moveBundle.id and value != 'N' group by application").size()
-				 optional = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle = $moveBundle.id and value = 'N' group by application").size()
+			potential = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle = $moveBundle.id and value != 'N' group by application").size()
+			optional = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle = $moveBundle.id and value = 'N' group by application").size()
 			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,'likelyLatency':likelyLatency,
-				          'unlikelyLatency':unlikelyLatency,'unknownLatency':unknownLatency,'potential':potential,'optional':optional]
+						'unlikelyLatency':unlikelyLatency,'unknownLatency':unknownLatency,'potential':potential,'optional':optional]
 		}
 		def unassignedAppCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType=? and (planStatus is null or planStatus in ('Unassigned',''))",['Application']).size()
 		def totalAssignedApp = applicationCount - unassignedAppCount ;
@@ -507,7 +505,7 @@ class MoveBundleController {
 
 		int percentagePhysicalAssetCount = 0;
 		int percentagevirtualAssetCount = 0;
-        if(unassignedPhysialAssetCount==assignedPhysicalAsset){
+		if(unassignedPhysialAssetCount==assignedPhysicalAsset){
 			percentagePhysicalAssetCount = 100;
 		}else if(totalPhysicalAssetCount > 0){
 			percentagePhysicalAssetCount = 100-Math.round((unassignedPhysialAssetCount/assignedPhysicalAsset)*100)
@@ -519,7 +517,7 @@ class MoveBundleController {
 		}else if(totalVirtualAssetCount > 0){
 			percentagevirtualAssetCount = 100-Math.round((unassignedVirtualAssetCount/assignedVirtualAsset)*100)
 		}else if(unassignedVirtualAssetCount==0){
-		    percentagevirtualAssetCount = 100;
+			percentagevirtualAssetCount = 100;
 		}
 		def physicalCount=0;
 		def virtualCount=0;
@@ -559,7 +557,70 @@ class MoveBundleController {
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		return[dependencyType:dependencyType]
 	}
-	def dependencyBundleDetails = {
-		render(template:"dependencyBundleDetails")
+	def dependencyBundleDetails = { render(template:"dependencyBundleDetails") }
+	
+	def generateDependency ={
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectInstance = Project.get(projectId)
+		def status = request.getParameterValues( "connection" )
+		String connections = status.toString()
+		connections = connections.replace("[","('").replace("]","')").replace(",","','").replace(" ","")
+		String movebundleList = MoveBundle.findAllByUseOfPlanningAndProject(true,projectInstance).id
+		movebundleList = movebundleList.replace("[","('").replace("]","')").replace(",","','")
+		def queryForAssets = """SELECT COUNT(ad.asset_id) as dependentCount, a.asset_entity_id as assetId FROM asset_entity a
+														LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id
+														WHERE a.asset_type in ('server','vm','blade','applciation','files','database')
+													AND a.move_bundle_id in ${movebundleList} """
+		if(connections!='null'){
+			queryForAssets += " AND ad.type in ${connections} "
+		}
+		queryForAssets += " GROUP BY a.asset_entity_id ORDER BY COUNT(ad.asset_id) DESC "
+		def assetIds = jdbcTemplate.queryForList(queryForAssets )
+
+
+		int currentDependencyBundleNumber = 1;
+		int assetDependencyBundle  = currentDependencyBundleNumber ;
+		String AssetDependencyBundleSource = "Initial"
+		int loopLevel = 1;
+		int assetsAddedTo = 0;
+		int assetsAddedFm = 0;
+		int assetsAddedX = 0;
+		def dependencyList = []
+		jdbcTemplate.execute("""DELETE  FROM asset_dependency_bundle""")
+		assetIds.each{asset1 ->
+			def firstAssetinstance = AssetEntity.get(asset1.assetId)
+			assetIds.each{asset2 ->
+				def assetInstance = AssetEntity.get(asset2.assetId)
+				if(AssetDependency.countByDependent(assetInstance)>0){
+					assetDependencyBundle = AssetDependency.countByDependent(assetInstance);
+					AssetDependencyBundleSource = "Dependency";
+					assetsAddedFm = assetsAddedFm + 1;
+					loopLevel = 1;
+				}else if(AssetDependency.countByAsset(assetInstance)>0){
+					assetDependencyBundle = AssetDependency.countByAsset(assetInstance);
+					AssetDependencyBundleSource = "Dependency";
+					assetsAddedTo = assetsAddedTo + 1;
+					loopLevel = 1;
+				}else{
+					assetDependencyBundle = currentDependencyBundleNumber
+					AssetDependencyBundleSource = "Initial"
+					assetsAddedX = assetsAddedX + 1;
+					loopLevel = 1;
+				}
+				loopLevel++
+				if(loopLevel == 3 ){
+					currentDependencyBundleNumber++
+				}
+			}
+			def aseetDependencyBundle = new AssetDependencyBundle()
+			aseetDependencyBundle.asset =  firstAssetinstance
+			aseetDependencyBundle.dependencySource = AssetDependencyBundleSource
+			aseetDependencyBundle.dependencyBundle = assetDependencyBundle
+			
+			if(!aseetDependencyBundle.save(flush:true)){
+				aseetDependencyBundle.errors.allErrors.each { println it }
+			}
+		}
+		redirect(action:planningConsole)
 	}
 }
