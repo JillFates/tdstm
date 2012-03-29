@@ -23,6 +23,7 @@ import com.tds.asset.ApplicationAssetMap
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
+import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetOptions
@@ -31,7 +32,6 @@ import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.eav.EavEntityType
 
 class AssetEntityController {
 
@@ -2842,8 +2842,11 @@ class AssetEntityController {
 			def applicationList = Application.findAllByProject(project,[max:5])
 			render(template:"appList",model:[appList:applicationList])
 		}else if(params.entity=='server'){
-			def assetEntityList = AssetEntity.findAllByProject(project,[max:5])
-			render(template:"assetList",model:[assetList:assetEntityList])
+			def assetDependentlist = AssetDependencyBundle.findAllByDependencyBundle(params.dependencyBundle)
+			def assetDependentListIds = assetDependentlist.findAll{it.asset.assetType ==  'VM' || it.asset.assetType ==  'Server'}.asset.id
+			def assetEntityList = AssetEntity.findAllByIdInList(assetDependentListIds)
+			def assetEntityListSize = assetEntityList.size()
+			render(template:"assetList",model:[assetList:assetEntityList,assetEntityListSize:assetEntityListSize])
 		
 		}else if(params.entity=='database'){
 			def databaseList = Database.findAllByProject(project,[max:5])

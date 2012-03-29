@@ -1,7 +1,7 @@
 <div class="tabs">
 	<ul>
 		<li id="serverli" class="active"><a
-			href="javascript:getList('server')"><span>Servers(10)</span> </a></li>
+			href="javascript:getList('server')"><span>Servers(${assetEntityListSize})</span> </a></li>
 		<li id="appli" ><a href="javascript:getList('Apps')">Apps(10)</a>
 		</li>
 		<li id="dbli" ><a href="#item3"><a href="javascript:getList('database')">DB(10)</a></li>

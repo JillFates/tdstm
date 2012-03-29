@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=ISO-8859-1"%>
+<%@page import="com.tds.asset.AssetEntity;"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
@@ -64,66 +64,23 @@ $(document).ready(function() {
 					style="margin-left: 20px; width: 500px;">
 					<tr class="odd">
 						<td><b>Dependency Bundles</b></td>
-						<td><span id="serverIds"
-							style="cursor: pointer; color: grey;" onclick="getList('server')"><b>1</b>
-						</span></td>
-						<td><span id="serverId" style="cursor: pointer; color: grey;"
-							onclick="getList('server')"><b>2</b> </span></td>
-						<td><span id="serverId" style="cursor: pointer; color: grey;"
-							onclick="getList('server')"><b>3</b> </span></td>
-						<td><span id="serverId" style="cursor: pointer; color: grey;"
-							onclick="getList('server')"><b>4</b> </span></td>
-						<td><span id="serverId" style="cursor: pointer; color: grey;"
-							onclick="getList('server')"><b>5</b> </span></td>
-						<td><span id="serverId" style="cursor: pointer; color: grey;"
-							onclick="getList('server')"><b>6</b> </span></td>
-						<td><span id="serverId" style="cursor: pointer; color: grey;"
-							onclick="getList('server')"><b>7</b> </span></td>
-						<td><span id="serverId" style="cursor: pointer; color: grey;"
-							onclick="getList('server')"><b>8</b> </span></td>
-						<td><span id="serverId" style="cursor: pointer; color: grey;"
-							onclick="getList('server')"><b>9</b> </span></td>
-						<td><span id="serverId" style="cursor: pointer; color: grey;"
-							onclick="getList('server')"><b>10</b> </span></td>
-					</tr>
+						<g:each in="${planningConsoleList}" var="asset"><td><span id="serverIds" style="cursor: pointer; color: grey;" onclick="getList('server',${asset.dependencyBundle})"><b>${asset.dependencyBundle}</b>
+						</span></td></g:each>
+						</tr>
 					<tr class="even">
 						<td><b>Applications</b></td>
-						<td>10</td>
-						<td>20</td>
-						<td>3</td>
-						<td>14</td>
-						<td>5</td>
-						<td>2</td>
-						<td>6</td>
-						<td>2</td>
-						<td>3</td>
-						<td>1</td>
+						<g:each in="${planningConsoleList}" var="assets"><td>${assets.appCount }</td>
+						</g:each>
 					</tr>
 					<tr class="odd">
 						<td><b>Physical Servers</b></td>
-						<td>41</td>
-						<td>12</td>
-						<td>3</td>
-						<td>14</td>
-						<td>15</td>
-						<td>16</td>
-						<td>7</td>
-						<td>8</td>
-						<td>1</td>
-						<td>0</td>
+						<g:each in="${planningConsoleList}" var="assets"><td>${assets.serverCount }</td>
+					    </g:each>
 					</tr>
 					<tr class="even">
 						<td><b>Virtual Servers</b></td>
-						<td>11</td>
-						<td>52</td>
-						<td>13</td>
-						<td>04</td>
-						<td>15</td>
-						<td>16</td>
-						<td>07</td>
-						<td>18</td>
-						<td>0</td>
-						<td>0</td>
+						<g:each in="${planningConsoleList}" var="assets"><td>${assets.vmCount }</td>
+					    </g:each>
 					</tr>
 				</table>
 			</div>
@@ -138,13 +95,13 @@ $(document).ready(function() {
 	</div>
 
 <script type="text/javascript">
-	function getList(value){
+	function getList(value,dependencyBundle){
 		if(value=='Apps'){
 			var app = 'Apps'
 			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + app', onComplete:'listUpdate(e)') }
 		}else if(value=='server'){
 			var server = 'server'
-			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + server', onComplete:'listUpdate(e)') }
+			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + server +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
 		}
 		else if(value=='database'){
 			var server = 'database'

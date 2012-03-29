@@ -621,6 +621,16 @@ class MoveBundleController {
 				aseetDependencyBundle.errors.allErrors.each { println it }
 			}
 		}
-		redirect(action:planningConsole)
+		def planningConsoleList = []
+		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle group by dependency_bundle order by Count(asset_id) limit 10 ;""")
+		assetDependencyList.each{dependencyBundle->
+			    def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundle(dependencyBundle.dependencyBundle)
+				def appCount = assetDependentlist.findAll{it.asset.assetType == 'Application'}.size()
+				def serverCount = assetDependentlist.findAll{it.asset.assetType == 'Server'}.size()
+				def vmCount = assetDependentlist.findAll{it.asset.assetType == 'VM'}.size()
+				planningConsoleList << ['dependencyBundle':dependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
+		}
+		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+		render(view:'planningConsole',model:[assetDependencyList:assetDependencyList,dependencyType:dependencyType,planningConsoleList:planningConsoleList] )
 	}
 }
