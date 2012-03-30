@@ -555,24 +555,34 @@ class MoveBundleController {
 	 */
 	def planningConsole = {
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-		return[dependencyType:dependencyType]
+		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		return[dependencyType:dependencyType,dependencyStatus:dependencyStatus]
 	}
 	def dependencyBundleDetails = { render(template:"dependencyBundleDetails") }
 	
 	def generateDependency ={
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def date = new Date()
+		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
+		String time = formatter.format(date);
 		def projectInstance = Project.get(projectId)
 		def status = request.getParameterValues( "connection" )
 		String connections = status.toString()
 		connections = connections.replace("[","('").replace("]","')").replace(",","','").replace(" ","")
+		def connectionType = request.getParameterValues( "status" )
+		String statusType = connectionType.toString()
+		statusType = statusType.replace("[","('").replace("]","')").replace(",","','").replace(" ","")
 		String movebundleList = MoveBundle.findAllByUseOfPlanningAndProject(true,projectInstance).id
 		movebundleList = movebundleList.replace("[","('").replace("]","')").replace(",","','")
 		def queryForAssets = """SELECT COUNT(ad.asset_id) as dependentCount, a.asset_entity_id as assetId FROM asset_entity a
 														LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id
-														WHERE a.asset_type in ('server','vm','blade','applciation','files','database')
+														WHERE a.asset_type in ('server','vm','blade','Application','Files','Database')
 													AND a.move_bundle_id in ${movebundleList} """
-		if(connections!='null'){
+		if(connections!='null'  ){
 			queryForAssets += " AND ad.type in ${connections} "
+		}
+		if(statusType!='null'){
+		    queryForAssets += " AND ad.status in ${statusType} "
 		}
 		queryForAssets += " GROUP BY a.asset_entity_id ORDER BY COUNT(ad.asset_id) DESC "
 		def assetIds = jdbcTemplate.queryForList(queryForAssets )
@@ -631,6 +641,7 @@ class MoveBundleController {
 				planningConsoleList << ['dependencyBundle':dependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
 		}
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-		render(view:'planningConsole',model:[assetDependencyList:assetDependencyList,dependencyType:dependencyType,planningConsoleList:planningConsoleList] )
+		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		render(view:'planningConsole',model:[assetDependencyList:assetDependencyList,dependencyType:dependencyType,planningConsoleList:planningConsoleList,date:time,dependencyStatus:dependencyStatus] )
 	}
 }

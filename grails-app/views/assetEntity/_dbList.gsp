@@ -1,11 +1,11 @@
 <div class="tabs">
 	<ul>
 		<li id="serverli" ><a
-			href="javascript:getList('server')"><span>Servers(10)</span> </a></li>
-		<li id="appli" ><a href="javascript:getList('Apps')">Apps(10)</a>
+			href="javascript:getList('server',${dependencyBundle})"><span>Servers(${assetEntityListSize})</span> </a></li>
+		<li id="appli" ><a href="javascript:getList('Apps',${dependencyBundle})">Apps(${appDependentListSize})</a>
 		</li>
-		<li id="dbli" class="active" ><a href="#item3"><a href="javascript:getList('database')">DB(10)</a></li>
-		<li id="fileli" ><a href="javascript:getList('files')">Files(10)</a></li>
+		<li id="dbli" class="active" ><a href="#item3"><a href="javascript:getList('database',${dependencyBundle})">DB(${dbDependentListSize})</a></li>
+		<li id="fileli" ><a href="javascript:getList('files',${dependencyBundle})">Files(${filesDependentListSize})</a></li>
 	</ul>
 	<div class="tabInner">
 		<div id="item1">
@@ -49,10 +49,10 @@
 
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">0</span>
+								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${ com.tds.asset.AssetDependency.countByDependentAndStatusNotEqual(com.tds.asset.AssetEntity.get(database.id),'Validated') }</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">4</span>
+								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${ com.tds.asset.AssetDependency.countByAssetAndStatusNotEqual(com.tds.asset.AssetEntity.get(database.id),'Validated') }</span>
 							</td>
 						</tr>
 					</g:each>

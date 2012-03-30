@@ -226,8 +226,7 @@ class DatabaseController {
 					redirect( controller:'files', action:list)
 					break;
 				case "planningConsole":
-					def dbList = Database.findAllByProject(Project.findById(projectId),[max:5])
-					render(template:"../assetEntity/dbList",model:[databaseList:dbList])
+					redirect( controller:'assetEntity',action:'getLists', params:[entity: 'database',dependencyBundle:session.getAttribute("dependencyBundle")])
 					break;
 				default:
 					redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_dbFormat:filterAttr.tag_f_dbFormat, tag_f_moveBundle:filterAttr.tag_f_moveBundle, tag_f_planStatus:filterAttr.tag_f_planStatus, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown])
@@ -260,8 +259,7 @@ class DatabaseController {
 			Database.executeUpdate("delete from Database d where d.id = ${databaseInstance.id}")
 			flash.message = "Database ${assetName} deleted"
 			if(params.dstPath =='planningConsole'){
-				def dbList = Database.findAllByProject(Project.findById(projectId),[max:5])
-				render(template:"../assetEntity/dbList",model:[databaseList:dbList])
+				redirect( controller:'assetEntity',action:'getLists', params:[entity: 'database',dependencyBundle:session.getAttribute("dependencyBundle")])
 			}else{
 				redirect( action:list )
 			}

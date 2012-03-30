@@ -1170,7 +1170,7 @@ class AssetEntityController {
 			assetBeanInstance.setMoveBundle(assetEntity.moveBundle?.name)
 			assetBeanInstance.setSerialNumber(assetEntity.serialNumber)
 			assetBeanInstance.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
-			assetBeanInstance.setDepDown(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
+			assetBeanInstance.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))
 
 			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
 				assetBeanInstance.setCommentType("issue")
@@ -1263,8 +1263,7 @@ class AssetEntityController {
 					redirect( controller:'files', action:list, params:[projectId: projectId])
 					break;
 				case "planningConsole":
-					def assetEntityList = AssetEntity.findAllByProject(Project.findById(projectId),[max:5])
-					render(template:"assetList",model:[assetList:assetEntityList])
+					redirect( action:getLists, params:[entity: 'server',dependencyBundle:session.getAttribute("dependencyBundle")])
 					break;
 				default:
 					redirect( action:list)
@@ -2595,6 +2594,7 @@ class AssetEntityController {
 	}
 
 	def update={
+		println "params.dependencyBundle"+params.dependencyBundle
 		def attribute = session.getAttribute('filterAttr')
 		def filterAttr = session.getAttribute('filterAttributes')
 		session.setAttribute("USE_FILTERS","true")
@@ -2645,8 +2645,7 @@ class AssetEntityController {
 					redirect( controller:'files', action:list, params:[projectId: projectId])
 					break;
 				case "planningConsole":
-			        def assetEntityList = AssetEntity.findAllByProject(Project.findById(projectId),[max:5])
-			        render(template:"assetList",model:[assetList:assetEntityList])
+			        redirect( action:getLists, params:[entity: 'server',dependencyBundle:session.getAttribute("dependencyBundle")])
 					break;
 				default:
 					redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_model:filterAttr.tag_f_model, tag_f_sourceLocation:filterAttr.tag_f_sourceLocation, tag_f_sourceRack:filterAttr.tag_f_sourceRack, tag_f_targetLocation:filterAttr.tag_f_targetLocation, tag_f_targetRack:filterAttr.tag_f_targetRack, tag_f_assetType:filterAttr.tag_f_assetType, tag_f_serialNumber:filterAttr.tag_f_serialNumber, tag_f_moveBundle:filterAttr.tag_f_moveBundle, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown,tag_s_1_application:filterAttr.tag_s_1_application,tag_s_2_assetName:filterAttr.tag_s_2_assetName,tag_s_3_model:filterAttr.tag_s_3_model,tag_s_4_sourceLocation:filterAttr.tag_s_4_sourceLocation,tag_s_5_sourceRack:filterAttr.tag_s_5_sourceRack,tag_s_6_targetLocation:filterAttr.tag_s_6_targetLocation,tag_s_7_targetRack:filterAttr.tag_s_7_targetRack,tag_s_8_assetType:filterAttr.tag_s_8_assetType,tag_s_9_assetTag:filterAttr.tag_s_9_assetTag,tag_s_10_serialNumber:filterAttr.tag_s_10_serialNumber,tag_s_11_moveBundle:filterAttr.tag_s_11_moveBundle,tag_s_12_depUp:filterAttr.tag_s_12_depUp,tag_s_13_depDown:filterAttr.tag_s_13_depDown])
@@ -2838,23 +2837,46 @@ class AssetEntityController {
 	def getLists ={
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 	    def project = Project.findById( projectId )
+		def assetDependentlist = AssetDependencyBundle.findAllByDependencyBundle(params.dependencyBundle)
+		session.setAttribute('dependencyBundle',params.dependencyBundle)
 		if(params.entity=='Apps'){
-			def applicationList = Application.findAllByProject(project,[max:5])
-			render(template:"appList",model:[appList:applicationList])
+			def appDependentListIds = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.asset.id
+			def filesDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Files' }.size()
+			def assetEntityListSize = assetDependentlist.findAll{it.asset.assetType ==  'VM' || it.asset.assetType ==  'Server' }.size()
+			def dbDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Database'}.size()
+			def applicationList = AssetEntity.findAllByIdInList(appDependentListIds)
+			def applicationListSize = applicationList.size()
+			render(template:"appList",model:[appList:applicationList,assetEntityListSize:assetEntityListSize,applicationListSize:applicationListSize,dependencyBundle:params.dependencyBundle,
+				                               filesDependentListSize:filesDependentListSize,appDependentListSize:applicationListSize,dbDependentListSize:dbDependentListSize])
 		}else if(params.entity=='server'){
-			def assetDependentlist = AssetDependencyBundle.findAllByDependencyBundle(params.dependencyBundle)
 			def assetDependentListIds = assetDependentlist.findAll{it.asset.assetType ==  'VM' || it.asset.assetType ==  'Server'}.asset.id
+			def filesDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Files' }.size()
+			def appDependentListSize = assetDependentlist.findAll{it.asset.assetType=='Application' }.size()
+			def dbDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Database'}.size()
 			def assetEntityList = AssetEntity.findAllByIdInList(assetDependentListIds)
 			def assetEntityListSize = assetEntityList.size()
-			render(template:"assetList",model:[assetList:assetEntityList,assetEntityListSize:assetEntityListSize])
-		
+			render(template:"assetList",model:[assetList:assetEntityList,assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
+				                               filesDependentListSize:filesDependentListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbDependentListSize])
 		}else if(params.entity=='database'){
-			def databaseList = Database.findAllByProject(project,[max:5])
-			render(template:"dbList",model:[databaseList:databaseList])
+			def dbDependentListIds = assetDependentlist.findAll{it.asset.assetType ==  'Database' }.asset.id
+			def filesDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Files' }.size()
+			def appDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.size()
+			def assetEntityListSize = assetDependentlist.findAll{it.asset.assetType ==  'VM' || it.asset.assetType ==  'Server' }.size()
+			def dbDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Database'}.size()
+			def databaseList = AssetEntity.findAllByIdInList(dbDependentListIds)
+			def dbListSize = databaseList.size()
+			render(template:"dbList",model:[databaseList:databaseList,assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
+				                               filesDependentListSize:filesDependentListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbListSize])
 		
 		}else{
-		    def filesList = Files.findAllByProject(project,[max:5])
-		    render(template:"filesList",model:[filesList:filesList])
+			def filesDependentListIds = assetDependentlist.findAll{it.asset.assetType ==  'Files' }.asset.id
+			def dbDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Database' }.size()
+			def appDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.size()
+			def assetEntityListSize = assetDependentlist.findAll{it.asset.assetType ==  'VM' || it.asset.assetType ==  'Server' }.size()
+			def filesList = AssetEntity.findAllByIdInList(filesDependentListIds)
+			def filesListSize = filesList.size()
+			render(template:"filesList",model:[filesList:filesList,assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
+										   filesDependentListSize:filesListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbDependentListSize])
 		}
 	}
 }
