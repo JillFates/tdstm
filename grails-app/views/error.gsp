@@ -1,6 +1,6 @@
 <html>
   <head>
-	  <title>Transition Manager Error</title>
+	  <title>TransitionManager&trade; Error</title>
 <meta name="viewport" content="height=device-height,width=device-width" />
 	  <style type="text/css">
 	  		.message {
@@ -24,7 +24,7 @@
 	  </style>
   </head>
   <body>
-<h2 style="color:#006DBA;">Transition Manager Error</h2>
+<h2 style="color:#006DBA;">TransitionManager&trade; Error</h2>
 <strong>Ok I got an error, now what? </strong><br/>
 This error may be from a bug, a misconfiguration, bad data, or a system problem.  You can <a href="javascript:history.go(-1)">go back</a> then reload that page to try again.<br/><br />
 If this happens again and you'd like help diagnosing the problem, copy the text below and email it to your TDS contact or TranMan@transitionaldata.com.<br/>

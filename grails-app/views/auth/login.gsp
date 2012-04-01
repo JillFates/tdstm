@@ -22,7 +22,7 @@
 		<%--<a href="http://www.transitionaldata.com/" target="new"><img
 			src="${createLinkTo(dir:'images',file:'tds.jpg')}" border="0"
 			alt="tds" /></a>--%>
-			<h1>Transition Manager</h1>
+			<h1>TransitionManager&trade;</h1>
 		</td>
 		
 	</tr>

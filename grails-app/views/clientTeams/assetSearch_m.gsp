@@ -114,7 +114,7 @@
 	<a name="top"></a>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" style="border:0px solid #e7e7e7; width:220px;">
-		<div id="mobtitle">Transition Manager - Mobile</div>
+		<div id="mobtitle">TransitionManager&trade; - Mobile</div>
 	<div class="menu4">
 		<ul>
 			<li><g:link class="mobmenu" action="list" params="[projectId:projectId, viewMode:'mobile']">Teams</g:link></li>

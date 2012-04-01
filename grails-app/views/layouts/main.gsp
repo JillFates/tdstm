@@ -50,7 +50,7 @@
      			<a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds.jpg')}" style="float: left;border: 0px"/></a>      	    	 
     		</g:else>
     	</div>
-      	<div class="title">&nbsp;Transition Manager 
+      	<div class="title">&nbsp;TransitionManager&trade; 
       	<g:if test="${currProjObj}"> - ${currProjObj.name} </g:if>
       	<g:if test="${moveEventId}"> : ${MoveEvent.findById( moveEventId )?.name}</g:if>
       	<g:if test="${moveBundleId}"> : ${MoveBundle.findById( moveBundleId )?.name}</g:if>

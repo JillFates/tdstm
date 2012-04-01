@@ -2,7 +2,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="projectHeader" />
-        <title>Transition Manager Reports Home</title>
+        <title>TransitionManager&trade; Reports Home</title>
     </head>
 <body>
 <div class="body">
