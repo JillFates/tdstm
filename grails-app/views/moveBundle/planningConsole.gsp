@@ -32,7 +32,6 @@ $(document).ready(function() {
 			<h1>Dependency Console</h1>
 		</div>
 		<div style="float: left; margin-left: 50px;">
-			<h1>Dependency Analysis</h1>
 		<g:form name="checkBoxForm" action ="generateDependency"> 
 			<div style="float: left;">
 				<h3>Connection Type</h3>
@@ -40,7 +39,7 @@ $(document).ready(function() {
 					<input type="checkbox" id="${dependency.value}"
 						name="connection" value="${dependency.value} " checked="checked"/>&nbsp;&nbsp;<span
 						id="dependecy_${dependency.id}" > ${dependency.value} </span>
-					<br></br>
+					<br />
 				</g:each>
 			</div>
 			&nbsp;
@@ -50,7 +49,7 @@ $(document).ready(function() {
 					<input type="checkbox" id="${dependencyStatus.value}"
 						name="status" value="${dependencyStatus.value} " checked="checked"/>&nbsp;&nbsp;<span
 						id="dependecy_${dependencyStatus.id}" > ${dependencyStatus.value} </span>
-					<br></br>
+					<br />
 				</g:each>
 			</div>
 			<div style="float: left;margin-left: 10px;" class="buttonR">
@@ -61,7 +60,7 @@ $(document).ready(function() {
 
 		</div>
 		<div style="clear: both;"></div>
-		<div style="margin-top: 40px;">
+		<div style="margin-top: 10px;">
 			<div>
 				<div style="margin-left: 20px; margin-bottom: 10px;">
 					<h3>
