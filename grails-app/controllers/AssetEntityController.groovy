@@ -2594,7 +2594,6 @@ class AssetEntityController {
 	}
 
 	def update={
-		println "params.dependencyBundle"+params.dependencyBundle
 		def attribute = session.getAttribute('filterAttr')
 		def filterAttr = session.getAttribute('filterAttributes')
 		session.setAttribute("USE_FILTERS","true")

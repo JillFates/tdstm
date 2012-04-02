@@ -189,68 +189,7 @@
 				</div>
 			</div>
 			<div style="clear: both;float: left;margin-top: 40px; margin-left: 100px;">
-				<div>
-					<h3>
-						<b>Dependency Bundling</b>
-					</h3>
-					<div style="margin-left: 20px;margin-bottom: 5px;">
-						03/13/2012: There were ${unassignedAppCount} Dependency-bundles discovered 
-					</div>
-					<table border="0" cellpadding="4" cellspacing="0" style="margin-left: 20px;">
-						<tr class="odd">
-							<td>Top-10 counts</td>
-							<td>1</td>
-							<td>2</td>
-							<td>3</td>
-							<td>4</td>
-							<td>5</td>
-							<td>6</td>
-							<td>7</td>
-							<td>8</td>
-							<td>9</td>
-							<td>10</td>
-						</tr>
-						<tr class="even">
-							<td>Applications</td>
-							<td>10</td>
-							<td>20</td>
-							<td>3</td>
-							<td>14</td>
-							<td>5</td>
-							<td>2</td>
-							<td>6</td>
-							<td>2</td>
-							<td>3</td>
-							<td>1</td>
-						</tr>
-						<tr class="odd">
-							<td>Physical Servers</td>
-							<td>41</td>
-							<td>12</td>
-							<td>3</td>
-							<td>14</td>
-							<td>15</td>
-							<td>16</td>
-							<td>7</td>
-							<td>8</td>
-							<td>1</td>
-							<td>0</td>
-						</tr>
-						<tr class="even">
-							<td>Virtual Servers</td>
-							<td>11</td>
-							<td>52</td>
-							<td>13</td>
-							<td>04</td>
-							<td>15</td>
-							<td>16</td>
-							<td>07</td>
-							<td>18</td>
-							<td>0</td>
-							<td>0</td>
-						</tr>
-					</table>
-				</div>
+			   <g:render template="dependencyBundleDetails" />
 			</div>
 		</div>
 </body>
