@@ -547,7 +547,9 @@ class MoveBundleController {
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
 		String time
 		date = AssetDependencyBundle.findAll().lastUpdated[0]
-		time = formatter.format(date)
+		if(date){
+		    time = formatter.format(date)
+		}
 		def planningConsoleList = []
 		assetDependencyList.each{dependencyBundle->
 				def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundle(dependencyBundle.dependencyBundle)
@@ -575,7 +577,9 @@ class MoveBundleController {
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
 		String time
 		date = AssetDependencyBundle.findAll().lastUpdated[0]
-		time = formatter.format(date)
+		if(date){
+		  time = formatter.format(date)
+		}
 		return[dependencyType:dependencyType,dependencyStatus:dependencyStatus,date:time]
 	}
 	def dependencyBundleDetails = { render(template:"dependencyBundleDetails") }
