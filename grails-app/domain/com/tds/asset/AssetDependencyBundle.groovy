@@ -7,8 +7,8 @@ class AssetDependencyBundle {
 	Date lastUpdated
     
     static constraints = {
-		dependencyBundle( blank:false, nullable:false )
-		asset( blank:false, nullable:false )
+		dependencyBundle( blank:false, nullable:false, unique:'asset')
+		asset( blank:false, nullable:false, unique:true)
 		dependencySource( blank:false, nullable:false )
 		lastUpdated( blank:true, nullable:true )
     }
