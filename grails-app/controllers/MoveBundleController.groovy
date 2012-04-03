@@ -573,14 +573,23 @@ class MoveBundleController {
 	def planningConsole = {
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle group by dependency_bundle order by dependency_bundle  limit 10 ;""")
 		Date date 
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
 		String time
 		date = AssetDependencyBundle.findAll().lastUpdated[0]
 		if(date){
-		  time = formatter.format(date)
+		    time = formatter.format(date)
 		}
-		return[dependencyType:dependencyType,dependencyStatus:dependencyStatus,date:time]
+		def planningConsoleList = []
+		assetDependencyList.each{dependencyBundle->
+				def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundle(dependencyBundle.dependencyBundle)
+				def appCount = assetDependentlist.findAll{it.asset.assetType == 'Application'}.size()
+				def serverCount = assetDependentlist.findAll{it.asset.assetType == 'Server'}.size()
+				def vmCount = assetDependentlist.findAll{it.asset.assetType == 'VM'}.size()
+				planningConsoleList << ['dependencyBundle':dependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
+		}
+		return[dependencyType:dependencyType,dependencyStatus:dependencyStatus,date:time,planningConsoleList:planningConsoleList]
 	}
 	def dependencyBundleDetails = { render(template:"dependencyBundleDetails") }
 	
@@ -611,7 +620,6 @@ class MoveBundleController {
 		queryForAssets += " GROUP BY a.asset_entity_id ORDER BY COUNT(ad.asset_id) DESC "
 		def assetIds = jdbcTemplate.queryForList(queryForAssets )
 
-
 		int currentDependencyBundleNumber = 1;
 		int assetDependencyBundle  = currentDependencyBundleNumber ;
 		String AssetDependencyBundleSource = "Initial"
@@ -624,39 +632,45 @@ class MoveBundleController {
 		assetIds.each{asset1 ->
 			def firstAssetinstance = AssetEntity.get(asset1.assetId)
 			assetIds.each{asset2 ->
-				def assetInstance = AssetEntity.get(asset1.assetId)
-				if(AssetDependency.countByDependent(assetInstance)>0){
-					assetDependencyBundle = AssetDependency.countByDependent(assetInstance);
-					AssetDependencyBundleSource = "Dependency";
-					assetsAddedFm = assetsAddedFm + 1;
-					loopLevel = 1;
-				}else if(AssetDependency.countByAsset(assetInstance)>0){
-					assetDependencyBundle = AssetDependency.countByAsset(assetInstance);
-					AssetDependencyBundleSource = "Dependency";
-					assetsAddedTo = assetsAddedTo + 1;
-					loopLevel = 1;
-				}else{
-					assetDependencyBundle = currentDependencyBundleNumber
-					AssetDependencyBundleSource = "Initial"
-					assetsAddedX = assetsAddedX + 1;
-					loopLevel = 1;
+				def assetInstance = AssetEntity.get(asset2.assetId)
+				if(AssetDependencyBundle.findByAsset(assetInstance)){
+					if(AssetDependency.countByDependent(assetInstance) > 0 ){
+						assetDependencyBundle = AssetDependency.countByDependent(assetInstance);
+						AssetDependencyBundleSource = "Dependency";
+						assetsAddedFm = assetsAddedFm + 1;
+						loopLevel = 1;
+					}
+					if(AssetDependency.countByAsset(assetInstance) > 0 ){
+						assetDependencyBundle = AssetDependency.countByAsset(assetInstance);
+						AssetDependencyBundleSource = "Dependency";
+						assetsAddedTo = assetsAddedTo + 1;
+						loopLevel = 1;
+					}
+					if(loopLevel == 3){
+						assetDependencyBundle = currentDependencyBundleNumber
+						AssetDependencyBundleSource = "Initial"
+						assetsAddedX = assetsAddedX + 1;
+						loopLevel = 1;
+					}
 				}
 			}
-				loopLevel++
-				if(loopLevel == 3 ){
-					currentDependencyBundleNumber++
-				}
-				def aseetDependencyBundle = new AssetDependencyBundle()
-				aseetDependencyBundle.asset =  firstAssetinstance
-				aseetDependencyBundle.dependencySource = AssetDependencyBundleSource
-				aseetDependencyBundle.dependencyBundle = assetDependencyBundle
-				aseetDependencyBundle.lastUpdated = date
-				
-				if(!aseetDependencyBundle.save(flush:true)){
-					aseetDependencyBundle.errors.allErrors.each { println it }
-				}
+			loopLevel++
+			if(loopLevel == 3 ){
+				currentDependencyBundleNumber++
+			}
+			def aseetDependencyBundle = new AssetDependencyBundle()
+			aseetDependencyBundle.asset =  firstAssetinstance
+			aseetDependencyBundle.dependencySource = AssetDependencyBundleSource
+			aseetDependencyBundle.dependencyBundle = assetDependencyBundle
+			aseetDependencyBundle.lastUpdated = date
+
+			if(!aseetDependencyBundle.save(flush:true)){
+				aseetDependencyBundle.errors.allErrors.each { println it }
+			}
+
 			
 		}
+		
 		def planningConsoleList = []
 		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle group by dependency_bundle order by dependency_bundle  limit 10 ;""")
 		assetDependencyList.each{dependencyBundle->
