@@ -623,7 +623,7 @@ class MoveBundleController {
 		int currentDependencyBundleNumber = 1;
 		int dependencyBundle  = currentDependencyBundleNumber ;
 		String dependencySource = "Initial"
-		int loopLevel = 1;
+		int loopLevel = 3;
 		int assetsAddedTo = 0;
 		int assetsAddedFm = 0;
 		int assetsAddedX = 0;
