@@ -88,7 +88,7 @@
 							<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label>
 							</td>
 							<td>
-								${applicationInstance.moveBundle}
+								${applicationInstance.moveBundle} / ${dependencyBundleNumber}
 							</td>
 							</td>
 							<td class="label" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label></td>
@@ -134,9 +134,8 @@
 							</td>
 						</tr>
 						<tr>
-							<td class="label" nowrap="nowrap"><label for="dependencyBundleNumber">Dependency Bundle</label></td>
-							<td>${dependencyBundleNumber}
-							</td>
+							<td></td>
+							<td></td>
 							<td class="label" nowrap="nowrap">Maint Exp.</td>
 							<td><tds:convertDate
 									date="${applicationInstance?.maintExpDate}" formate="12hrs"

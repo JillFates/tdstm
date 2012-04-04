@@ -28,7 +28,7 @@
 							<td><tds:convertDate date="${databaseInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
 							<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-							<td>${databaseInstance?.moveBundle}</td>
+							<td>${databaseInstance?.moveBundle} / ${dependencyBundleNumber}</td>
 						</tr>
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="dbSize">Size</label></td>
@@ -106,8 +106,6 @@
 								<g:else>
 									 <label for="custom7">${databaseInstance.project.custom8 ?:'Custom8'}</label>
 								</g:else>
-							<td class="label" nowrap="nowrap"><label for="dependencyBundleNumber">Dependency Bundle</label></td>
-							<td>${dependencyBundleNumber}</td>
 							</td>
 						</tr>
 					</tbody>

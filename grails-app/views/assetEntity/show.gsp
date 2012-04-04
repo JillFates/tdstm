@@ -136,8 +136,8 @@
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="railType">Rail Type</label></td>
 								<td >${assetEntityInstance.railType}</td>
-								<td class="label" nowrap="nowrap"><label for="dependencyBundlenumber">Dependency Bundle</label></td>
-								<td >${dependencyBundlenumber}</td>
+								<td></td>
+								<td></td>
 								<td class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label></td>
 								<td>${assetEntityInstance.virtualHost}</td>
 								<td>&nbsp</td>
@@ -156,7 +156,7 @@
 								<td>&nbsp</td>
 								<td>&nbsp</td>
 								<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-								<td >${assetEntityInstance.moveBundle}</td>
+								<td >${assetEntityInstance.moveBundle} / ${dependencyBundlenumber}</td>
 								<td>&nbsp</td>
 								<td class="label" nowrap="nowrap"><label for="truck">Truck</label></td>
 								<td >${assetEntityInstance.truck}</td>

@@ -72,7 +72,7 @@
 							<td>${filesInstance.fileSize}</td>
 							<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label>
 							</td>
-							<td>${filesInstance.moveBundle}</td>
+							<td>${filesInstance.moveBundle} / ${dependencyBundleNumber}</td>
 						</tr>
 						<tr class="prop">
 							<td colspan="2" class="label" nowrap="nowrap">
@@ -144,16 +144,10 @@
 								 <label for="custom7">${filesInstance.project.custom8 ?:'Custom8'}</label>
 							</g:else>
 							</td>
-							<td class="label" nowrap="nowrap"><label for="planStatus">Plan
-									Status</label>
+							<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label>
 							</td>
 							<td>${filesInstance.planStatus}</td>
 						</tr>
-                         <tr class="prop">
-							<td class="label" nowrap="nowrap"><label for="dependencyBundleNumber">Dependency Bundle</label></td>
-							<td>${dependencyBundleNumber}</td>
-						</tr>
-
 					</tbody>
 				</table>
 			</div></td>
