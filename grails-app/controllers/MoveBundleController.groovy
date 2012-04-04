@@ -12,6 +12,8 @@ import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetOptions
 import com.tds.asset.AssetTransition
+import com.tds.asset.Database
+import com.tds.asset.Files
 import com.tdssrc.grails.GormUtil
 
 
@@ -589,7 +591,7 @@ class MoveBundleController {
 			def vmCount = assetDependentlist.findAll{it.asset.assetType == 'VM'}.size()
 			planningConsoleList << ['dependencyBundle':dependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
 		}
-		return[dependencyType:dependencyType,dependencyStatus:dependencyStatus,date:time,planningConsoleList:planningConsoleList]
+		return[dependencyType:dependencyType,dependencyStatus:dependencyStatus,date:time,planningConsoleList:planningConsoleList,assetDependency: new AssetDependency()]
 	}
 	def dependencyBundleDetails = { render(template:"dependencyBundleDetails") }
 
@@ -607,6 +609,9 @@ class MoveBundleController {
 		statusType = statusType.replace("[","('").replace("]","')").replace(",","','").replace(" ","")
 		String movebundleList = MoveBundle.findAllByUseOfPlanningAndProject(true,projectInstance).id
 		movebundleList = movebundleList.replace("[","('").replace("]","')").replace(",","','")
+		
+		// Query to fetch dependent asset list with dependency type and status and move bundle list with use for planning .
+		
 		def queryForAssets = """SELECT  a.asset_entity_id as assetId FROM asset_entity a
 														LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id Or ad.dependent_id = a.asset_entity_id
 														WHERE a.asset_type in ('server','vm','blade','Application','Files','Database')
@@ -628,32 +633,48 @@ class MoveBundleController {
 		int assetsAddedFm = 0;
 		int assetsAddedX = 0;
 		def dependencyList = []
+		// Deleting previously generated dependency bundle table .
 		jdbcTemplate.execute("""DELETE  FROM asset_dependency_bundle""")
+		 
 		def assetIds = results.assetId
-		assetIds.each{asset0 ->
+		// First loop  with resultant list .
+		assetIds.each{asset0 -> 
 			def initialAsset = AssetEntity.get(asset0)
+			// Skip the loop if asset and it's dependents already bundled
+			// If true assume that there is a new bundle found
 			if(!AssetDependencyBundle.findByAsset(initialAsset)){
-				dependencySource = "Initial"
+				// Setting dependencySource to initial
+				dependencySource = "Initial"  
+				// Add parent asset to dep-bundle group
 				Set dependentAssets = [["asset":initialAsset, "source":dependencySource]]
-				assetIds.each{asset1 ->
+				// Second loop with resultant list, to ensure there is no assets missing
+				assetIds.each{asset1 -> 
 					def firstAssetinstance = AssetEntity.get(asset1)
+					// Skip the loop if asset and it's dependents already bundled
 					if(!AssetDependencyBundle.findByAsset(firstAssetinstance)){
-						assetIds.each{asset2 ->
+						// Third loop with resultant list to find the interdependent records
+						assetIds.each{asset2 ->  
 							def assetInstance = AssetEntity.get(asset2)
-							if(!AssetDependencyBundle.findByAsset(assetInstance)){
+							// Don't process id this bundle group if asset already associated with another
+							if(!AssetDependencyBundle.findByAsset(assetInstance)){ 
+								// Check if asset has any dependency records
 								def hasDependencyRelation = AssetDependency.findByAssetAndDependent(firstAssetinstance, assetInstance)
+								// True : if this asset already not exist in the current dep-bundle list and it has dependencies  
 								if(dependentAssets?.asset?.id?.contains(asset1) && hasDependencyRelation){
-									
+									// determine the dependency status 
 									if(assetInstance.id != initialAsset.id){
-										dependencySource = "Dependency"
+										dependencySource = "Dependency" 
 									}
+									// after all add this asset and status to this dep-bundle list
 									dependentAssets << ["asset":assetInstance, "source":dependencySource]
 								}
 							}
 						}
 					}
 				}
-				currentDependencyBundleNumber++
+				// Increment currentDependencyBundleNumber to 1 if process reach to here
+				currentDependencyBundleNumber++ 
+				// Add all grouped assets to AssetDependencyBundle with currentDependencyBundleNumber.
 				dependentAssets.each{
 					def aseetDependencyBundle = new AssetDependencyBundle()
 					aseetDependencyBundle.asset =  it.asset
@@ -667,7 +688,7 @@ class MoveBundleController {
 				}
 			}
 		}
-
+          // for displaying the results 
 		def planningConsoleList = []
 		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle group by dependency_bundle order by dependency_bundle  limit 10 ;""")
 		assetDependencyList.each{ assetDependencyBundle->
@@ -677,8 +698,15 @@ class MoveBundleController {
 			def vmCount = assetDependentlist.findAll{it.asset.assetType == 'VM'}.size()
 			planningConsoleList << ['dependencyBundle':assetDependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
 		}
+		
+		def servers = AssetEntity.findAllByAssetTypeAndProject('Server',projectInstance)
+		def applications = Application.findAllByAssetTypeAndProject('Application',projectInstance)
+		def dbs = Database.findAllByAssetTypeAndProject('Database',projectInstance)
+		def files = Files.findAllByAssetTypeAndProject('Files',projectInstance)
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-		render(view:'planningConsole',model:[assetDependencyList:assetDependencyList,dependencyType:dependencyType,planningConsoleList:planningConsoleList,date:time,dependencyStatus:dependencyStatus] )
+		
+		render(view:'planningConsole',model:[assetDependencyList:assetDependencyList,dependencyType:dependencyType,planningConsoleList:planningConsoleList,date:time,dependencyStatus:dependencyStatus,assetDependency: new AssetDependency() ,
+			servers:servers , applications:applications ,dbs:dbs,files:files] )
 	}
 }

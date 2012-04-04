@@ -1,4 +1,4 @@
-<%@page import="com.tds.asset.AssetEntity;com.tds.asset.AssetDependency;"%>
+<%@page import="com.tds.asset.AssetEntity;"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
@@ -68,6 +68,23 @@ $(document).ready(function() {
 		<div id="createEntityView" style="display: none;"></div>
 		<div id="showEntityView" style="display: none;"></div>
 		<div id="editEntityView" style="display: none;"></div>
+		<div style="display: none;">
+		<table id="assetDependencyRow">
+			<tr>
+				<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
+				<td><g:select name="entity" from="['Server','Application','Database','Files']" onchange='updateAssetsList(this.name, this.value)'></g:select></td>
+				<td><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></td>
+				<td><g:select name="dtype" from="${dependencyType.value}"></g:select></td>
+				<td><g:select name="status" from="${dependencyStatus.value}"></g:select></td>
+			</tr>
+	   </table>
+       </div>
+       <div style="display: none;">
+			<span id="Server"><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+			<span id="Application"><g:select name="asset" from="${applications}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+			<span id="Database"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+			<span id="Files"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+	   </div>
 	</div>
 
 <script type="text/javascript">
