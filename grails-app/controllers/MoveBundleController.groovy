@@ -656,9 +656,10 @@ class MoveBundleController {
 						assetIds.each{asset2 ->  
 							def assetInstance = AssetEntity.get(asset2)
 							// Don't process id this bundle group if asset already associated with another
-							if(!AssetDependencyBundle.findByAsset(assetInstance)){ 
+							if(!AssetDependencyBundle.findByAsset(assetInstance)){
 								// Check if asset has any dependency records
 								def hasDependencyRelation = AssetDependency.findByAssetAndDependent(firstAssetinstance, assetInstance)
+								def hasAssetRelation = AssetDependency.findByAssetAndDependent(assetInstance, firstAssetinstance)
 								// True : if this asset already not exist in the current dep-bundle list and it has dependencies  
 								if(dependentAssets?.asset?.id?.contains(asset1) && hasDependencyRelation){
 									// determine the dependency status 
@@ -667,13 +668,38 @@ class MoveBundleController {
 									}
 									// after all add this asset and status to this dep-bundle list
 									dependentAssets << ["asset":assetInstance, "source":dependencySource]
+								// True : if asset1 already not exist in the current dep-bundle list and it has dependencies
+								} else if(dependentAssets?.asset?.id?.contains(asset1) && hasAssetRelation){
+									// determine the dependency status
+									if(assetInstance.id != initialAsset.id){
+										dependencySource = "Dependency"
+									}
+									// after all add this asset and status to this dep-bundle list
+									dependentAssets << ["asset":assetInstance, "source":dependencySource]
 								}
 							}
 						}
 					}
 				}
+				//Run the dependentAssets.asset again to ensure nothing missing
+				dependentAssets.asset.each{ parent->
+					def dependencyAssets = AssetDependency.findAllByAsset(parent)
+					dependencyAssets?.dependent?.each{ child ->
+						// True : if this asset already not exist in the current dep-bundle list and it has dependencies
+						if(!dependentAssets?.asset?.id?.contains(child.id)){
+							dependentAssets << ["asset":child, "source":"Dependency"]
+						}
+					}
+					def supportAssets = AssetDependency.findAllByDependent(parent)
+					supportAssets?.asset?.each{ child ->
+						// True : if this asset already not exist in the current dep-bundle list and it has dependencies
+						if(!dependentAssets?.asset?.id?.contains(child.id)){
+							dependentAssets << ["asset":child, "source":"Dependency"]
+						}
+					}
+				}
 				// Increment currentDependencyBundleNumber to 1 if process reach to here
-				currentDependencyBundleNumber++ 
+				currentDependencyBundleNumber++
 				// Add all grouped assets to AssetDependencyBundle with currentDependencyBundleNumber.
 				dependentAssets.each{
 					def aseetDependencyBundle = new AssetDependencyBundle()
@@ -688,7 +714,7 @@ class MoveBundleController {
 				}
 			}
 		}
-          // for displaying the results 
+        // for displaying the results 
 		def planningConsoleList = []
 		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle group by dependency_bundle order by dependency_bundle  limit 10 ;""")
 		assetDependencyList.each{ assetDependencyBundle->
