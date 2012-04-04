@@ -15,6 +15,7 @@ import com.tds.asset.ApplicationAssetMap
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
+import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetOptions
@@ -68,6 +69,7 @@ class ApplicationController {
 			appBeanInstance.setplanStatus(appEntity.planStatus)
 			appBeanInstance.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
 			appBeanInstance.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))
+			appBeanInstance.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(appEntity)?.dependencyBundle)
 			
 			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
 				appBeanInstance.setCommentType("issue")
@@ -179,7 +181,7 @@ class ApplicationController {
 		    def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 			def appMoveEventlist = AppMoveEvent.findAllByApplication(applicationInstance).value
 			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList,
-			  appMoveEvent:appMoveEvent,moveEventList:moveEventList,appMoveEvent:appMoveEventlist]
+			  appMoveEvent:appMoveEvent,moveEventList:moveEventList,appMoveEvent:appMoveEventlist,dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle]
 		}
 	}
 
@@ -306,6 +308,7 @@ class ApplicationController {
 			AssetDependency.executeUpdate("delete AssetDependency where asset = ? or dependent = ? ",[applicationInstance, applicationInstance])
 			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
 			Application.executeUpdate("delete from Application a where a.id = ${applicationInstance.id}")
+			AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = ${applicationInstance.id}")
 			def appMoveInstance = AppMoveEvent.findAllByApplication(applicationInstance);
 			appMoveInstance.each{
 			         it.delete(flush:true)

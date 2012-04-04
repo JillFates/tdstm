@@ -107,6 +107,9 @@ $(document).ready(function() {
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
 						<span onclick="getEntityDetails('files','${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.planStatus}</span>
 					</jmesa:htmlColumn>
+					<jmesa:htmlColumn property="dependencyBundleNumber" title="Dependecy Bundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+						<span onclick="getEntityDetails('files','${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.dependencyBundleNumber}</span>
+					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="depUp" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span onclick="getEntityDetails('files','${fileInstance.assetType}', ${fileInstance.id} )">${fileInstance.depUp}</span>
 		        	</jmesa:htmlColumn>

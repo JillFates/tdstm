@@ -9,6 +9,7 @@ import com.tds.asset.ApplicationAssetMap
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
+import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetOptions
@@ -44,6 +45,7 @@ class FilesController {
 			filesEntity.setplanStatus(fileentity.planStatus)
 			filesEntity.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
 			filesEntity.setDepDown(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
+			filesEntity.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(fileentity)?.dependencyBundle)
 			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
 				filesEntity.setCommentType("issue")
 			} else if(AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id)){
@@ -127,7 +129,8 @@ class FilesController {
 			}
 			
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
-			[ filesInstance : filesInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList]
+			[ filesInstance : filesInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList,
+			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(filesInstance)?.dependencyBundle]
 		}
 	}
 	def edit ={
@@ -222,6 +225,7 @@ class FilesController {
 										   where toAsset = ?""",[assetEntityInstance])
 			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
 			Files.executeUpdate("delete from Database d where d.id = ${filesInstance.id}")
+			AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = ${filesInstance.id}")
 			flash.message = "Files ${assetName} deleted"
 			if(params.dstPath =='planningConsole'){
 				redirect( controller:'assetEntity',action:'getLists', params:[entity: 'files',dependencyBundle:session.getAttribute("dependencyBundle")])

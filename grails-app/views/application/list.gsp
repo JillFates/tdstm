@@ -90,6 +90,9 @@ $(document).ready(function() {
 		        	<jmesa:htmlColumn property="planStatus" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span onclick="getEntityDetails('application','${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.planStatus}</span>
 		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="dependencyBundleNumber"  title="Dependecy Bundle" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span onclick="getEntityDetails('application','${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.dependencyBundleNumber}</span>
+		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="depUp" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span onclick="getEntityDetails('application','${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.depUp}</span>
 		        	</jmesa:htmlColumn>

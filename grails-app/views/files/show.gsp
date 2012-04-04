@@ -149,7 +149,10 @@
 							</td>
 							<td>${filesInstance.planStatus}</td>
 						</tr>
-
+                         <tr class="prop">
+							<td class="label" nowrap="nowrap"><label for="dependencyBundleNumber">Dependency Bundle</label></td>
+							<td>${dependencyBundleNumber}</td>
+						</tr>
 
 					</tbody>
 				</table>

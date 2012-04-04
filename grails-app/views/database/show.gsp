@@ -106,6 +106,8 @@
 								<g:else>
 									 <label for="custom7">${databaseInstance.project.custom8 ?:'Custom8'}</label>
 								</g:else>
+							<td class="label" nowrap="nowrap"><label for="dependencyBundleNumber">Dependency Bundle</label></td>
+							<td>${dependencyBundleNumber}</td>
 							</td>
 						</tr>
 					</tbody>

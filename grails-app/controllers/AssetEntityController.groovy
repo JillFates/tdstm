@@ -1171,6 +1171,7 @@ class AssetEntityController {
 			assetBeanInstance.setSerialNumber(assetEntity.serialNumber)
 			assetBeanInstance.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
 			assetBeanInstance.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))
+			assetBeanInstance.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle)
 
 			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
 				assetBeanInstance.setCommentType("issue")
@@ -1214,6 +1215,7 @@ class AssetEntityController {
 	 * --------------------------------------- */
 	def delete = {
 		def redirectAsset = params.dstPath
+		println "params.id::::::::::::::"+params.id
 		def assetEntityInstance = AssetEntity.get( params.id )
 		def projectId = params.projectId ? params.projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		if(assetEntityInstance) {
@@ -1229,7 +1231,7 @@ class AssetEntityController {
 											where toAsset = ?""",[assetEntityInstance])
 			AssetDependency.executeUpdate("delete AssetDependency where asset = ? or dependent = ? ",[assetEntityInstance, assetEntityInstance])
 			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
-
+            AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = ${assetEntityInstance.id}")
 			flash.message = "AssetEntity ${assetEntityInstance.assetName} deleted"
 			if(redirectAsset?.contains("room_")){
 				def newredirectAsset = redirectAsset.split("_")
@@ -2553,8 +2555,9 @@ class AssetEntityController {
 			assetComment = "blank"
 		}
 		def assetCommentList = AssetComment.findAllByAssetEntity(assetEntityInstance)
+		
 		[label:frontEndLabel, assetEntityInstance:assetEntityInstance,supportAssets: supportAssets,
-					dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList]
+					dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList,dependencyBundlenumber:AssetDependencyBundle.findByAsset(assetEntityInstance)?.dependencyBundle]
 	}
 	def edit ={
 		def assetEntityInstance = AssetEntity.get(params.id)

@@ -11,6 +11,7 @@ import com.tds.asset.ApplicationAssetMap
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
+import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetOptions
@@ -49,6 +50,7 @@ class DatabaseController {
 			dataBeanInstance.setplanStatus(dataBaseentity.planStatus)
 			dataBeanInstance.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
 			dataBeanInstance.setDepDown(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
+			dataBeanInstance.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(dataBaseentity)?.dependencyBundle)
 			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
 				dataBeanInstance.setCommentType("issue")
 			} else if(AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id)){
@@ -109,7 +111,7 @@ class DatabaseController {
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 			
 			[ databaseInstance : databaseInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo, 
-			  assetComment:assetComment, assetCommentList:assetCommentList]
+			  assetComment:assetComment, assetCommentList:assetCommentList,dependencyBundleNumber:AssetDependencyBundle.findByAsset(databaseInstance)?.dependencyBundle]
 		}
 	}
 	
@@ -257,6 +259,7 @@ class DatabaseController {
 										   where toAsset = ?""",[assetEntityInstance])
 			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
 			Database.executeUpdate("delete from Database d where d.id = ${databaseInstance.id}")
+			AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = ${databaseInstance.id}")
 			flash.message = "Database ${assetName} deleted"
 			if(params.dstPath =='planningConsole'){
 				redirect( controller:'assetEntity',action:'getLists', params:[entity: 'database',dependencyBundle:session.getAttribute("dependencyBundle")])

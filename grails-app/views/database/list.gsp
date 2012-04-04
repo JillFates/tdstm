@@ -95,6 +95,9 @@ $(document).ready(function() {
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
 						<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.planStatus}</span>
 					</jmesa:htmlColumn>
+					<jmesa:htmlColumn property="dependencyBundleNumber" title="Dependecy Bundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+						<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.dependencyBundleNumber}</span>
+					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="depUp" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id} )">${dataBaseInstance.depUp}</span>
 		        	</jmesa:htmlColumn>

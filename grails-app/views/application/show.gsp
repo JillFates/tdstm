@@ -134,8 +134,9 @@
 							</td>
 						</tr>
 						<tr>
-							<td></td>
-							<td></td>
+							<td class="label" nowrap="nowrap"><label for="dependencyBundleNumber">Dependency Bundle</label></td>
+							<td>${dependencyBundleNumber}
+							</td>
 							<td class="label" nowrap="nowrap">Maint Exp.</td>
 							<td><tds:convertDate
 									date="${applicationInstance?.maintExpDate}" formate="12hrs"

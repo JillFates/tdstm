@@ -38,6 +38,8 @@ public class AssetEntityBean implements Serializable {
 	private String targetLocation;
 	private String targetRack;
 	private String serialNumber;
+	
+	private Integer  dependencyBundleNumber;
 
 
 	public AssetEntityBean() {
@@ -266,5 +268,12 @@ public class AssetEntityBean implements Serializable {
 
 	public void setSerialNumber(String serialNumber) {
 		this.serialNumber = serialNumber;
+	}
+	public Integer getDependencyBundleNumber() {
+		return dependencyBundleNumber;
+	}
+
+	public void setDependencyBundleNumber(Integer dependencyBundleNumber) {
+		this.dependencyBundleNumber = dependencyBundleNumber;
 	}
 }
