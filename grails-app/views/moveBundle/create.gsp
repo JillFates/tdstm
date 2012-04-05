@@ -176,8 +176,8 @@
               </tr>
               
                <tr class="prop">
-                <td valign="top" class="name"><label for="useOfPlanning">Use Of Planning:</label></td>
-               <td> <label for="frontView" ><input type="checkbox" name="useOfPlanning" id="useOfPlanning" checked="checked"/>&nbsp;Front</label></td>
+                <td valign="top" class="name"><label for="useOfPlanning">Use for Planning:</label></td>
+               <td> <input type="checkbox" name="useOfPlanning" id="useOfPlanning" checked="checked"/></td>
               </tr>
             </tbody>
           </table>
