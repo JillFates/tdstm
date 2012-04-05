@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>TransitionManager&trade; Admin Portal</title>
+<title>TDS TransitionManager&trade; Admin Portal</title>
 <style type="text/css">
 a:hover {
 	text-decoration: underline;
