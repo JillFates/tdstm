@@ -15,9 +15,9 @@
 						<th style="background-color: white;">&nbsp;</th>
 						<th style="background-color: white;">&nbsp;</th>
 						<th style="background-color: white;">
-							<g:each in="${moveBundleList}" var="bundle">
+							<g:each in="${moveBundle}" var="bundle">
 								<th style="color: Blue; background-color: white;">
-									<b>${bundle.name}</b>
+									<b>${bundle}</b>
 								</th>
 							</g:each>
 						</th>
