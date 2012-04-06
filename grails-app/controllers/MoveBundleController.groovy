@@ -602,11 +602,11 @@ class MoveBundleController {
 		String time = formatter.format(date);
 		def projectInstance = Project.get(projectId)
 		def status = request.getParameterValues( "connection" )
-		String connections = status.toString()
-		connections = connections.replace("[","('").replace("]","')").replace(",","','").replace(" ","")
+		String connections = status.collect{id->"'"+id.trim()+"'"}.toString()
+		connections = connections.replace("[","(").replace("]",")")
 		def connectionType = request.getParameterValues( "status" )
-		String statusType = connectionType.toString()
-		statusType = statusType.replace("[","('").replace("]","')").replace(",","','").replace(" ","")
+		String statusType = connectionType.collect{id->"'"+id.trim()+"'"}.toString()
+		statusType = statusType.replace("[","(").replace("]",")")
 		String movebundleList = MoveBundle.findAllByUseOfPlanningAndProject(true,projectInstance).id
 		movebundleList = movebundleList.replace("[","('").replace("]","')").replace(",","','")
 		
@@ -616,7 +616,7 @@ class MoveBundleController {
 														LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id Or ad.dependent_id = a.asset_entity_id
 														WHERE a.asset_type in ('server','vm','blade','Application','Files','Database')
 													AND a.move_bundle_id in ${movebundleList} """
-		if(connections!='null'  ){
+		if(connections!='null'){
 			queryForAssets += " AND ad.type in ${connections} "
 		}
 		if(statusType!='null'){
