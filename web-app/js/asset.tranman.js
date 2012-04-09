@@ -610,6 +610,20 @@ function showAssetDialog( e , action ) {
 	      	 $('#isResolvedId').val(assetComments[0].assetComment.isResolved)
 	      	 $('#categoryTdId').html(assetComments[0].assetComment.category)
 	      	 $('#commentCodeTdId').html(assetComments[0].assetComment.commentCode)
+	      	 if(assetComments[0].assetComment.commentType=='issue'){
+	      		 if(assetComments[0].owners){
+			      	 $('#ownerTdId').html(assetComments[0].owners)
+			      	 $('#ownerEditTdId').val(assetComments[0].assetComment.owner.id)
+	      		 }
+		      	 $('#ownerTdId').css('display','block')
+		      	 $('#ownerEditId').css('display','block')
+	      	 }
+			 if(assetComments[0].assetComment.commentType!='instruction'){
+		      	 $('#assetShowValueId').css('display','block')
+		      	 $('#assetTrShowId').css('display','block')
+		      	 $('#assetShowValueId').html(assetComments[0].assetNames)
+		      	 $('#assetTrShowId').html(assetComments[0].assetNames)
+	      	 }
 	      	 if(assetComments[0].assetComment.mustVerify != 0){
 	      	 $('#mustVerifyShowId').attr('checked', true);
 	      	 $('#mustVerifyEditId').attr('checked', true);
@@ -880,12 +894,12 @@ function resolveValidate(formName, idVal, redirectTo){
 				if($("#selectTimedId").length > 0){
 					timedUpdate($("#selectTimedId").val())
 				}
-				new Ajax.Request('../assetEntity/saveComment?assetEntity.id='+parseInt(assetId)+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value+'&category='+document.forms[formName].category.value,{asynchronous:true,evalScripts:true,onComplete:function(e){addCommentsToList(e);}})
+				new Ajax.Request('../assetEntity/saveComment?assetEntity.id='+parseInt(assetId)+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value+'&category='+document.forms[formName].category.value+'&owners='+document.forms[formName].owner.value,{asynchronous:true,evalScripts:true,onComplete:function(e){addCommentsToList(e);}})
 			} else {
 				if(redirectTo){
-					new Ajax.Request('../assetEntity/updateComment?id='+parseInt(assetId)+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsLists();}})			
+					new Ajax.Request('../assetEntity/updateComment?id='+parseInt(assetId)+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value+'&owners='+document.forms[formName].owner.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsLists();}})			
 				} else {
-					new Ajax.Request('../assetEntity/updateComment?id='+parseInt(assetId)+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsOnList(e);}})
+					new Ajax.Request('../assetEntity/updateComment?id='+parseInt(assetId)+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value+'&owners='+document.forms[formName].owner.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsOnList(e);}})
 				}
 			}
 		}else{
@@ -897,12 +911,12 @@ function resolveValidate(formName, idVal, redirectTo){
 			if($("#selectTimedId").length > 0){
 				timedUpdate($("#selectTimedId").val())
 			}
-			new Ajax.Request('../assetEntity/saveComment?assetEntity.id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value+'&category='+document.forms[formName].category.value,{asynchronous:true,evalScripts:true,onComplete:function(e){addCommentsToList(e);}})
+			new Ajax.Request('../assetEntity/saveComment?assetEntity.id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value+'&category='+document.forms[formName].category.value+'&owners='+document.forms[formName].owner.value,{asynchronous:true,evalScripts:true,onComplete:function(e){addCommentsToList(e);}})
 		}else{
 			if( redirectTo ){
-				new Ajax.Request('../assetEntity/updateComment?id='+parseInt(assetId)+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsLists();}})	
+				new Ajax.Request('../assetEntity/updateComment?id='+parseInt(assetId)+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value+'&owners='+document.forms[formName].owner.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsLists();}})	
 			} else {
-				new Ajax.Request('../assetEntity/updateComment?id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsOnList(e);}})
+				new Ajax.Request('../assetEntity/updateComment?id='+assetId+'&comment='+document.forms[formName].comment.value+'&isResolved='+document.forms[formName].isResolved.value+'&resolution='+document.forms[formName].resolution.value+'&commentType='+document.forms[formName].commentType.value+'&mustVerify='+document.forms[formName].mustVerify.value+'&owners='+document.forms[formName].owner.value,{asynchronous:true,evalScripts:true,onComplete:function(e){updateCommentsOnList(e);}})
 			}
 		}
 	}

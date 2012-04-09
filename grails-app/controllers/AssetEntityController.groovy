@@ -1618,6 +1618,9 @@ class AssetEntityController {
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername(principal)
 		assetCommentInstance.createdBy = loginUser.person
+		def personInstance = Person.get(params.owners)
+		assetCommentInstance.owner = personInstance
+		
 		if(params.isResolved == '1'){
 			assetCommentInstance.resolvedBy = loginUser.person
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
@@ -1642,6 +1645,7 @@ class AssetEntityController {
 		def dtCreated
 		def dtResolved
 		DateFormat formatter ;
+		String owners = "";
 		formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a");
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def assetComment = AssetComment.get(params.id)
@@ -1653,9 +1657,12 @@ class AssetEntityController {
 			personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")
 			dtResolved = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
 		}
+		if(assetComment.owner){
+		    owners = assetComment.owner
+		}
 		commentList<<[ assetComment:assetComment,personCreateObj:personCreateObj,
 					personResolvedObj:personResolvedObj,dtCreated:dtCreated?dtCreated:"",
-					dtResolved:dtResolved?dtResolved:"" ]
+					dtResolved:dtResolved?dtResolved:"",owners:owners?owners:"",assetNames:assetComment.assetEntity.assetName]
 		render commentList as JSON
 	}
 	/* ------------------------------------------------------------
@@ -1679,7 +1686,8 @@ class AssetEntityController {
 			assetCommentInstance.dateResolved = null
 		}
 		assetCommentInstance.properties = params
-
+		def personInstance = Person.get(params.owners)
+		assetCommentInstance.owner = personInstance
 		if(!assetCommentInstance.hasErrors() && assetCommentInstance.save(flush:true) ) {
 			def status = AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetCommentInstance.assetEntity,'issue',0])
 			assetComments << [assetComment : assetCommentInstance, status : status ? true : false]
@@ -2689,11 +2697,19 @@ class AssetEntityController {
 		}
 		def project = Project.findById( projectId )
 		def assetEntityInstance = AssetEntity.findAllByProject(project)
+		def userId = session.getAttribute("LOGIN_PERSON").id
+		def personInstance = Person.get(userId)
 		def assetCommentList
 		if(params.resolvedBox=="on"){
 		    assetCommentList = AssetComment.findAll("From AssetComment a where a.assetEntity.project = :project  order by dateCreated asc ",[project:project])
 		}else{
 		    assetCommentList = AssetComment.findAll("From AssetComment a where a.assetEntity.project = :project and isResolved = :isResolved order by dateCreated asc",[project:project,isResolved:0])
+		}
+		if(params.issueBox=="on" && params.resolvedBox=="on" ){
+			
+			assetCommentList = AssetComment.findAll("From AssetComment a where a.assetEntity.project = :project and isResolved = :isResolved and owner = :owner order by dateCreated asc",[project:project,isResolved:1,owner:personInstance])
+		}else if(params.issueBox=="on" ){
+			assetCommentList = AssetComment.findAll("From AssetComment a where a.assetEntity.project = :project  and owner = :owner order by dateCreated asc",[project:project,owner:personInstance])
 		}
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
 		tableFacade.items = assetCommentList
@@ -2703,7 +2719,7 @@ class AssetEntityController {
 			tableFacade.setColumnProperties("comment","commentType","assetEntity","mustVerify","isResolved","resolution","resolvedBy","createdBy","commentCode","category","displayOption")
 			tableFacade.render()
 		} else {
-			return [assetCommentList:assetCommentList,rediectTo:'comment',checked:params.resolvedBox]
+			return [assetCommentList:assetCommentList,rediectTo:'comment',checked:params.resolvedBox,issueBox:params.issueBox]
 		}
 	}
 

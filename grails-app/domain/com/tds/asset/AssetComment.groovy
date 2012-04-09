@@ -12,9 +12,11 @@ class AssetComment {
 	String resolution
 	Person resolvedBy
 	Person createdBy
+	Person owner
 	String commentCode 
 	String category = "general"
 	String displayOption = "U"	// Used in dashboard to control display of user entered test (comment) or a generic message
+	
 	
 	static constraints = {
 		
@@ -30,6 +32,7 @@ class AssetComment {
 		commentCode( blank:true, nullable:true  )
 		category( blank:false, nullable:false )
 		displayOption( blank:false, inList: ['G','U'] ) // Generic or User
+		owner( blank:true, nullable:true  )
 	}
 
 	static mapping  = {	

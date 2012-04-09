@@ -64,6 +64,13 @@
 				<textarea cols="80" rows="4" id="resolution" name="resolution" ></textarea>
 			</td>
 		</tr> 
+		<tr class="prop">
+		<% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
+			<td valign="top" class="name"><label for="owner">Owner:</label></td>
+			<td valign="top" style="width: 20%;">
+				<g:select id="owner" name="owner" from="${partyList}"  value="" optionKey="id" noSelection="['':'please select']" ></g:select>
+			</td>
+		</tr> 
 		</table>
             </div>
 		
@@ -88,6 +95,10 @@
 			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 			<td valign="top" class="value" id="createdById" ></td>
 		</tr>
+		<tr>
+			<td valign="top" class="name"><label for="owner">Owner:</label></td>
+			<td valign="top" class="value" id="ownerTdId" ></td>
+		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
 			<td valign="top" class="value" id="commentTypeTdId" ></td>
@@ -105,6 +116,10 @@
 			<td valign="top" class="value" id="verifyTdId">
 				<input type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0" disabled="disabled" />
 			</td>
+		</tr>
+		<tr id = "assetShowId" class="prop" >
+			<td valign="top" class="name"><label for="asset">Asset:</label></td>
+			<td valign="top" class="value" id="assetShowValueId" style="display: none;"></td>
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="comment">Comment:</label></td>
@@ -164,6 +179,13 @@
 			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 			<td valign="top" class="value" id="createdByEditId" />
 		</tr>
+		<tr class="prop">
+		<% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
+			<td valign="top" class="name"><label for="owner">Owner:</label></td>
+			<td valign="top" id="ownerEditId" style="width: 20%;display: none;">
+				<g:select id="ownerEditTdId" name="owner" from="${partyList}"  value="" optionKey="id"   noSelection="['':'please select']" ></g:select>
+			</td>
+		</tr> 
 		<tr class="prop" >
 			<td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
 			<td valign="top" style="width: 20%;" >
@@ -187,6 +209,10 @@
 		<tr class="prop">
 			<td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
 			<td valign="top" class="value" id="commentCodeEditId" ></td>
+		</tr>
+		<tr id="assetTrId" class="prop" >
+			<td valign="top" class="name"><label for="asset">Asset:</label></td>
+			<td valign="top" class="value" style ="display: none;" id="assetTrShowId" ></td>
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="comment">Comment:</label></td>
