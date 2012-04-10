@@ -105,7 +105,7 @@ $(document).ready(function() {
 		        	<jmesa:htmlColumn property="serialNumber" title="Serial #" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span id="serialNumber_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.serialNumber}</span>
 		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="moveBundle" title="Move Bundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        	<jmesa:htmlColumn property="moveBundle" title="Bundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span id="moveBundle_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.moveBundle}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="dependencyBundleNumber" title="Dep #" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">

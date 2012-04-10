@@ -84,14 +84,14 @@ $(document).ready(function() {
 		        	<jmesa:htmlColumn property="appSme" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span onclick="getEntityDetails('application','${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.appSme}</span>
 		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="moveBundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        	<jmesa:htmlColumn property="moveBundle" title="Bundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span onclick="getEntityDetails('application','${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.moveBundle}</span>
-		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="dependencyBundleNumber"  title="Dep #" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getEntityDetails('application','${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.dependencyBundleNumber}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="planStatus" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span onclick="getEntityDetails('application','${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.planStatus}</span>
+		        	</jmesa:htmlColumn>
+		        	<jmesa:htmlColumn property="dependencyBundleNumber"  title="Dep #" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+		        		<span onclick="getEntityDetails('application','${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.dependencyBundleNumber}</span>
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="depUp" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span onclick="getEntityDetails('application','${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.depUp}</span>
