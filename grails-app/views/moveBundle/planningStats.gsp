@@ -149,15 +149,15 @@
 					</h3>
 					<table style="border: 0px; margin-left: 10px;">
 						<tr>
-							<td style="width: 10px;">${likelyLatencyCount}</td>
+							<td style="width: 10px;">${likelyLatency}</td>
 							<td>Likely</td>
 						</tr>
 						<tr>
-							<td>${unknownLatencyCount}</td>
+							<td>${unknownLatency}</td>
 							<td>UnKnown</td>
 						</tr>
 						<tr>
-							<td>${unlikelyLatencyCount }</td>
+							<td>${unlikelyLatency }</td>
 							<td>UnLikely</td>
 						</tr>
 					</table>

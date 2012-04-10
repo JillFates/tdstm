@@ -460,9 +460,13 @@ class MoveBundleController {
 		def appList = []
 		def assetList = []
 		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
-	    Set moveEventList = moveBundleList.moveEvent
-		moveEventList.remove(null)
-		def applicationCount = AssetEntity.findAllByAssetTypeAndProject('Application',project).size()
+	    Set uniqueMoveEventList = moveBundleList.moveEvent
+		
+		uniqueMoveEventList.minus(null)
+		List moveEventList = []
+		moveEventList =  uniqueMoveEventList.toList()
+		moveEventList.sort{it.name}
+		def applicationCount = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Application',moveBundleList).size()
 		def assetCount = AssetEntity.findAllByProjectAndAssetTypeNotInList(project,[
 			'Application',
 			'Database',
@@ -471,7 +475,8 @@ class MoveBundleController {
 		def assignedAssetCount
 		def assignedApplicationCount
 		moveEventList.each{ moveEvent->
-			def moveBundle = moveEvent?.moveBundles
+			def moveBundles = moveEvent?.moveBundles
+			def moveBundle = moveBundles.findAll {it.useOfPlanning == true}
 			assignedApplicationCount = AssetEntity.findAllByMoveBundleInListAndAssetType(moveBundle,"Application").size()
 			def appLists = AssetEntity.findAllByMoveBundleInListAndAssetType(moveBundle,"Application").id
 			String applicationList = appLists
@@ -480,28 +485,24 @@ class MoveBundleController {
 			def physicalAssetCount = AssetEntity.findAllByMoveBundleInListAndAssetType(moveBundle,'Server').size()
 			def virtualAssetCount = AssetEntity.findAllByMoveBundleInListAndAssetType(moveBundle,'VM').size()
 			def count = AssetEntity.findAllByMoveBundleInListAndAssetTypeInList(moveBundle,['Server', 'VM'],params).size()
-			def likelyLatency = Application.findAllByMoveBundleInListAndLatency(moveBundle,'N').size()
-			def unlikelyLatency = Application.findAllByMoveBundleInListAndLatency(moveBundle,'Y').size()
-			def unknownLatency = Application.findAllByMoveBundleInListAndLatency(moveBundle,null).size()
 			def potential = 0
 			def optional = 0
 			String moveBundleId =  moveBundle.id
-			
 			moveBundleId = moveBundleId.replace("[","('").replace(",","','").replace("]","')")
 			def moveEventId = moveEventList.id 
-			moveEventId.remove(moveEvent.id)
 			String moveEvents = moveEventId
 			moveEvents = moveEvents.replace("[","('").replace(",","','").replace("]","')")
 			def allMoveBundle = moveEventList.moveBundles.id
 			allMoveBundle.remove(moveBundle.id)
-			String moveBundlesForPlanning = allMoveBundle
-			moveBundlesForPlanning = moveBundlesForPlanning.replace("[[","('").replace(",","','").replace("]]","')")
-			potential = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle  in $moveBundlesForPlanning and moveEvent not in ${moveEvents} and value = '' and application.project=$projectId group by application").size()
-			optional = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle  in $moveBundlesForPlanning and moveEvent not in ${moveEvents} and value = 'Y' and application.project=$projectId group by application").size()
-			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,'likelyLatency':likelyLatency,
-						'unlikelyLatency':unlikelyLatency,'unknownLatency':unknownLatency,'potential':potential,'optional':optional]
+			String eventMoveBundles = allMoveBundle
+			eventMoveBundles = eventMoveBundles.replace("[[","('").replace(",", "','").replace("], [","','").replace("]]","')").replace("]',' [", "','")
+			potential  = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle.useOfPlanning = true and application.moveBundle not in $eventMoveBundles   and  (value is null or value = '') and application.project=$projectId group by application").size()
+			optional = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle.useOfPlanning = true and application.moveBundle not in $eventMoveBundles  and value = 'Y' and application.project=$projectId group by application").size()
+			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,'potential':potential,'optional':optional]
 		}
-		def unassignedAppCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType=? and (planStatus is null or planStatus in ('Unassigned',''))",['Application']).size()
+		String moveBundle = moveBundleList.id
+		moveBundle = moveBundle.replace("[","('").replace(",","','").replace("]","')")
+		def unassignedAppCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType=? and moveBundle in $moveBundle and (planStatus is null or planStatus in ('Unassigned',''))",['Application']).size()
 		def totalAssignedApp = applicationCount - unassignedAppCount ;
 		int percentageAppCount = 0 ;
 		if(applicationCount > 0){
@@ -544,9 +545,6 @@ class MoveBundleController {
 		assetList.each{asset->
 			physicalCount = physicalCount + asset.physicalCount
 			virtualCount = virtualCount + asset.virtualAssetCount
-			likelyLatencyCount = likelyLatencyCount+asset.likelyLatency
-			unlikelyLatencyCount = unlikelyLatencyCount + asset.unlikelyLatency
-			unknownLatencyCount = unknownLatencyCount+asset.unknownLatency
 		}
 
 		def applicationsOfPlanningBundle = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Application',moveBundleList)
@@ -575,14 +573,17 @@ class MoveBundleController {
 			def vmCount = assetDependentlist.findAll{it.asset.assetType == 'VM'}.size()
 			planningConsoleList << ['dependencyBundle':dependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
 		}
-
+			def likelyLatency = Application.findAllByLatencyAndProject('N',project).size()
+			def unlikelyLatency = Application.findAllByLatencyAndProject('Y',project).size()
+			def unknownLatency = Application.findAllByLatencyAndProject(null,project).size()
 		return [moveBundleList:moveBundleList, applicationCount:applicationCount,appList:appList,unassignedAppCount:unassignedAppCount,
 			percentageAppCount:percentageAppCount,assetCount:assetCount,assetList:assetList,unassignedPhysialAssetCount:unassignedPhysialAssetCount,
 			unassignedVirtualAssetCount:unassignedVirtualAssetCount,percentagePhysicalAssetCount:percentagePhysicalAssetCount,
 			percentagevirtualAssetCount:percentagevirtualAssetCount,physicalCount:physicalCount, virtualCount:virtualCount,
 			appDependenciesCount:appDependenciesCount,serverDependenciesCount:serverDependenciesCount, pendingAppDependenciesCount:pendingAppDependenciesCount,
 			pendingServerDependenciesCount:pendingServerDependenciesCount, issuesCount : issues.size(),likelyLatencyCount:likelyLatencyCount,unlikelyLatencyCount:unlikelyLatencyCount,
-			unknownLatencyCount:unknownLatencyCount,unassignedAssetCount:unassignedAssetCount,project:project,planningConsoleList:planningConsoleList,date:time,moveBundle:moveEventList]
+			unknownLatencyCount:unknownLatencyCount,unassignedAssetCount:unassignedAssetCount,project:project,planningConsoleList:planningConsoleList,date:time,moveBundle:moveEventList,likelyLatency:likelyLatency,
+			unlikelyLatency:unlikelyLatency,unknownLatency:unknownLatency]
 	}
 	/**
 	 * 
