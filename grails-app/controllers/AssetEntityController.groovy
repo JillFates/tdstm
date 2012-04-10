@@ -2031,6 +2031,9 @@ class AssetEntityController {
 			def dbs = Database.findAllByAssetTypeAndProject('Database',projectInstance)
 			def files = Files.findAllByAssetTypeAndProject('Files',projectInstance)
 
+			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+			
 			return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams,
 				assetBeansList:assetBeansList, moveBundleInstance:moveBundleInstance, project : projectInstance,
 				supportTeam:supportTeam, totalUnracked:totalUnracked, totalSourceAvail:totalSourceAvail,
@@ -2039,7 +2042,7 @@ class AssetEntityController {
 				applicationList : applicationList, appOwnerList : appOwnerList, appSmeList : appSmeList,
 				transitionStates : transitionStates, params:params, totalAssetsOnHold:totalAssetsOnHold,
 				totalSourcePending: totalSourcePending, totalTargetPending: totalTargetPending, role: role, teamType:teamType, assetDependency: new AssetDependency() ,
-				servers:servers , applications:applications ,dbs:dbs,files:files]
+				servers:servers , applications:applications ,dbs:dbs,files:files, dependencyType:dependencyType, dependencyStatus:dependencyStatus ]
 		} else {
 			flash.message = "Please create bundle to view Console"
 			redirect(controller:'project',action:'show',params:["id":params.projectId])
