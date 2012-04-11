@@ -4,8 +4,7 @@
 					<h3>
 						<b>Dependency Bundling</b>
 					</h3>
-					&nbsp;Bundling Analysis Run&nbsp;${date}: There were ${unassignedAppCount}
-					Dependency-bundles discovered
+					&nbsp;Bundling Analysis Run&nbsp;${date}: There were ${dependencyBundleCount} dependency bundles discovered
 				</div>
 				<table border="0" cellpadding="4" cellspacing="0"
 					style="margin-left: 20px; width: 500px;">

@@ -568,6 +568,7 @@ class MoveBundleController {
 		if(date){
 			time = formatter.format(date)
 		}
+		
 		def planningConsoleList = []
 		assetDependencyList.each{dependencyBundle->
 			def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundleAndProject(dependencyBundle.dependencyBundle,project)
@@ -576,9 +577,11 @@ class MoveBundleController {
 			def vmCount = assetDependentlist.findAll{it.asset.assetType == 'VM'}.size()
 			planningConsoleList << ['dependencyBundle':dependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
 		}
-			def likelyLatency = Application.findAllByLatencyAndProject('N',project).size()
-			def unlikelyLatency = Application.findAllByLatencyAndProject('Y',project).size()
-			def unknownLatency = Application.findAllByLatencyAndProject(null,project).size()
+		
+		def likelyLatency = Application.findAllByLatencyAndProject('N',project).size()
+		def unlikelyLatency = Application.findAllByLatencyAndProject('Y',project).size()
+		def unknownLatency = Application.findAllByLatencyAndProject(null,project).size()
+		
 		return [moveBundleList:moveBundleList, applicationCount:applicationCount,appList:appList,unassignedAppCount:unassignedAppCount,
 			percentageAppCount:percentageAppCount,assetCount:assetCount,assetList:assetList,unassignedPhysialAssetCount:unassignedPhysialAssetCount,
 			unassignedVirtualAssetCount:unassignedVirtualAssetCount,percentagePhysicalAssetCount:percentagePhysicalAssetCount,
@@ -592,6 +595,7 @@ class MoveBundleController {
 	 * 
 	 */
 	def planningConsole = {
+		/*
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.get(projectId)
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
@@ -618,12 +622,24 @@ class MoveBundleController {
 		def files = Files.findAllByAssetTypeAndProject('Files',project,[sort:"assetName"])
 		return[dependencyType:dependencyType,dependencyStatus:dependencyStatus,date:time,planningConsoleList:planningConsoleList,assetDependency: new AssetDependency(),
 			   servers:servers, applications:applications ,dbs:dbs,files:files]
+		*/
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		
+		return getPlanningConsoleMap(projectId)
 	}
+	
+	/*
+	 * Render the Dependency Bundle Details
+	 */
 	def dependencyBundleDetails = { render(template:"dependencyBundleDetails") }
 
+	/*
+	 * Performs an analysis of the interdependencies of assets for a project and creates assetDependencyBundle records appropriately. It will
+	 * find all assets assigned to bundles that which are set to be used for planning, sorting the assets so that those with the most dependency
+	 * relationships are processed first.  
+	 */
 	def generateDependency ={
-		sessionFactory.getCurrentSession().flush();
-		sessionFactory.getCurrentSession().clear();
+
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def date = new Date()
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
@@ -639,90 +655,120 @@ class MoveBundleController {
 		movebundleList = movebundleList.replace("[","('").replace("]","')").replace(",","','")
 		
 		// Query to fetch dependent asset list with dependency type and status and move bundle list with use for planning .
-		
-		def queryForAssets = """SELECT  a.asset_entity_id as assetId FROM asset_entity a
-														LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id Or ad.dependent_id = a.asset_entity_id
-														WHERE a.asset_type in ('server','vm','blade','Application','Files','Database')
-													AND a.move_bundle_id in ${movebundleList} """
-		if(connections!='null'){
-			queryForAssets += " AND ad.type in ${connections} "
-		}
-		if(statusType!='null'){
-			queryForAssets += " AND ad.status in ${statusType} "
-		}
+		// TODO : Swap out 'server','vm','blade','Application','Files','Database' for ENUM reference
+		def queryForAssets = """SELECT a.asset_entity_id as assetId FROM asset_entity a
+			LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id Or ad.dependent_id = a.asset_entity_id
+			WHERE a.asset_type in ('server','vm','blade','Application','Files','Database')
+				AND a.move_bundle_id in ${movebundleList} """
+		queryForAssets += connections=='null' ? "" : " AND ad.type in ${connections} "
+		queryForAssets += statusType=='null' ? "" : " AND ad.status in ${statusType} "
 		queryForAssets += " GROUP BY a.asset_entity_id ORDER BY COUNT(ad.asset_id) DESC "
 
 		def results = jdbcTemplate.queryForList(queryForAssets )
-
-		int currentDependencyBundleNumber = 1;
-		int dependencyBundle  = currentDependencyBundleNumber ;
-		
-		def dependencyList = []
-		// Deleting previously generated dependency bundle table .
-		jdbcTemplate.execute("DELETE  FROM asset_dependency_bundle where project_id = $projectId ")
 		def assetIds = results.assetId
 		def assetIdsSize = assetIds.size()
-		// First loop  with resultant list .
+
+		int bundleNumber = 1;
+		
+		def dependencyList = []
+		def bundledIds = []			// Used to keep track of Assets that were bundled (AssetDependencyBundle created)
+		
+		// Deleting previously generated dependency bundle table .
+		jdbcTemplate.execute("DELETE FROM asset_dependency_bundle where project_id = $projectId ")
+
+		// Reset hibernate session since we just cleared out the data directly and we don't want to be looking up assets in stale cache 
+		sessionFactory.getCurrentSession().flush();
+		sessionFactory.getCurrentSession().clear();
+
+		// Main loop that will iterate over all found assets for the project
 		for (int i = 0; i < assetIdsSize; i++) {
 			
-			def initialAsset = AssetEntity.get(assetIds[i])
 			// Skip the loop if asset and it's dependents already bundled
-			// If true assume that there is a new bundle found
-			if(!AssetDependencyBundle.findByAsset(initialAsset)){
-				log.info "New Bundle group found : $currentDependencyBundleNumber"
-				// Setting dependencySource to initial
-				int loopLevel = 0;
-				// Add parent asset to dep-bundle group
-				Set dependentAssets = [["asset":initialAsset, "source":"Initial"]]
-				// Second loop with resultant list, to ensure there is no assets missing
-				while(loopLevel <=3){
-					for (int j = 1; j < assetIdsSize; j++) {
-						def firstAssetinstance = AssetEntity.get(assetIds[j])
-						if(!AssetDependencyBundle.findByAsset(firstAssetinstance)){
-							// Third loop with resultant list to find the interdependent records
-							for (int k = 1; k < assetIdsSize; k++) {
-								def assetInstance = AssetEntity.get(assetIds[k])
-								if(firstAssetinstance.id != assetInstance.id){
-									// Check if asset has any dependency records
-									def hasDependencyRelation = AssetDependency.findByAssetAndDependent(firstAssetinstance, assetInstance)
-									def hasAssetRelation = AssetDependency.findByAssetAndDependent(assetInstance, firstAssetinstance)
-									// True : if this asset already not exist in the current dep-bundle list and it has dependencies  
-									if(hasDependencyRelation && dependentAssets?.asset?.id?.contains(assetIds[j])){
-										// after all add this asset and status to this dep-bundle list
-										dependentAssets << ["asset":assetInstance, "source":"Dependency"]
-										log.info "${assetInstance?.assetName} added into ${initialAsset.assetName} as Dependency"
-									// True : if asset1 already not exist in the current dep-bundle list and it has dependencies
-									} else if(hasAssetRelation && dependentAssets?.asset?.id?.contains(assetIds[j])){
-										// after all add this asset and status to this dep-bundle list
-										log.info "${assetInstance?.assetName} added into ${initialAsset.assetName} as Dependency"
-										dependentAssets << ["asset":assetInstance, "source":"Dependency"]
-									}
-								}
-							}
-						}
-					}
+			if (bundledIds.contains(assetIds[i])) continue
+
+			// Add parent asset to dependent list as the Initial asset
+			def initialAsset = AssetEntity.get(assetIds[i])
+			Set dependentAssets = [ ["asset":initialAsset, "source":"Initial"] ]
+			def assignedIds = [ assetIds[i] ]
+			
+			log.info "New Bundle group started : id=$bundleNumber"
+			
+			// Loop over all assets until we don't add any new dependencies
+			def addedDep = true
+			def loopLevel = 0
+			while (addedDep) {
 				loopLevel++
-				}
-				// Add all grouped assets to AssetDependencyBundle with currentDependencyBundleNumber.
-				dependentAssets.each{
-					def aseetDependencyBundle = new AssetDependencyBundle()
-					aseetDependencyBundle.asset =  it.asset
-					aseetDependencyBundle.dependencySource = it.source
-					aseetDependencyBundle.dependencyBundle = currentDependencyBundleNumber
-					aseetDependencyBundle.lastUpdated = date
-					aseetDependencyBundle.project = projectInstance
+				addedDep = false
+				
+				for (int j = i; j < assetIdsSize; j++) {
+					// Skip over asset if not already in the group or previously bundled
+					if ( ! assignedIds.contains(assetIds[j]) || bundledIds.contains(assetIds[j]) ) continue
 					
-					if(!aseetDependencyBundle.save(flush:true)){
-						aseetDependencyBundle.errors.allErrors.each { log.info it }
-					}
+					def firstAssetInstance = AssetEntity.get(assetIds[j])
+					
+					// Skip over assets previously bundled
+					if (bundledIds.contains(assetIds[j])) continue
+					
+					// Third loop with resultant list to find the interdependent records
+					for (int k = i; k < assetIdsSize; k++) {
+						// Skip over if we're about to compare same asset
+						if ( j == k ) continue
+												
+						// Skip if we've already added this asset to the group or previously bundled
+						if (assignedIds.contains(assetIds[k]) || bundledIds.contains(assetIds[k]) ) continue
+
+						def assetInstance = AssetEntity.get(assetIds[k])
+						
+						// Check if the two assets has a dependency or support relationship
+						if ( AssetDependency.findByAssetAndDependent(firstAssetInstance, assetInstance) || 
+							 AssetDependency.findByAssetAndDependent(assetInstance, firstAssetInstance) ) 
+						{
+							dependentAssets << ["asset":assetInstance, "source":"Dependency"]
+							assignedIds << assetIds[k]
+							addedDep = true
+							log.info "Added ${assetInstance?.assetName}, associated to ${initialAsset.assetName}, loopLevel=${loopLevel}"
+						}
+					} // for k
+				} // for j
+			} // while (addedDep)
+			
+			// Add all grouped assets to AssetDependencyBundle with bundleNumber.
+			dependentAssets.each{
+				def assetDependencyBundle = new AssetDependencyBundle()
+				assetDependencyBundle.asset = it.asset
+				assetDependencyBundle.dependencySource = it.source
+				assetDependencyBundle.dependencyBundle = bundleNumber
+				assetDependencyBundle.lastUpdated = date
+				assetDependencyBundle.project = projectInstance
+				
+				if (!assetDependencyBundle.save(flush:true)) {
+					assetDependencyBundle.errors.allErrors.each { log.info it }
 				}
-				// Increment currentDependencyBundleNumber to 1 if process reach to here
-				currentDependencyBundleNumber++
+				// Remember each asset that was bundled
+				bundledIds << it.asset.id
 			}
-		}
+			
+			// Increment bundleNumber 
+			bundleNumber++
+		} // for i
+		
         // for displaying the results 
+		
+		render(view:'planningConsole', model:getPlanningConsoleMap(projectId) )
+	}
+	
+	/*
+	 * Used by several controller functions to generate the mapping arguments used by the planningConsole view
+	 */
+	private def getPlanningConsoleMap(projectId) {
+		def projectInstance = Project.get(projectId)
 		def planningConsoleList = []
-		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle where project_id = $projectId  group by dependency_bundle order by dependency_bundle  limit 10 ;""")
+		def depBundleIDCountSQL = "select count(distinct dependency_bundle) from asset_dependency_bundle where project_id = $projectId"
+		def depBundleIdSQL = "select distinct dependency_bundle as dependencyBundle from asset_dependency_bundle where project_id = $projectId order by dependency_bundle limit 24"
+		
+		def dependencyBundleCount = jdbcTemplate.queryForInt(depBundleIDCountSQL)
+		
+		def assetDependencyList = jdbcTemplate.queryForList(depBundleIdSQL)
 		assetDependencyList.each{ assetDependencyBundle->
 			def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundleAndProject(assetDependencyBundle.dependencyBundle,projectInstance)
 			def appCount = assetDependentlist.findAll{it.asset.assetType == 'Application'}.size()
@@ -737,8 +783,19 @@ class MoveBundleController {
 		def files = Files.findAllByAssetTypeAndProject('Files',projectInstance)
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+
+		// Get the time that the bundles were processed
+		String time
+		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
+		def date = AssetDependencyBundle.findAll().lastUpdated[0]
+		if(date){
+			time = formatter.format(date)
+		}
+
+		def map = [assetDependencyList:assetDependencyList, dependencyType:dependencyType, planningConsoleList:planningConsoleList,
+				date:time, dependencyStatus:dependencyStatus, assetDependency:new AssetDependency(), dependencyBundleCount:dependencyBundleCount,
+				servers:servers, applications:applications, dbs:dbs, files:files]
 		
-		render(view:'planningConsole',model:[assetDependencyList:assetDependencyList,dependencyType:dependencyType,planningConsoleList:planningConsoleList,date:time,dependencyStatus:dependencyStatus,assetDependency: new AssetDependency() ,
-			servers:servers , applications:applications ,dbs:dbs,files:files] )
+		return map
 	}
 }
