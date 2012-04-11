@@ -462,10 +462,10 @@ class MoveBundleController {
 		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
 	    Set uniqueMoveEventList = moveBundleList.moveEvent
 		
-		uniqueMoveEventList.minus(null)
+		uniqueMoveEventList.remove(null)
 		List moveEventList = []
 		moveEventList =  uniqueMoveEventList.toList()
-		moveEventList.sort{it.name}
+		moveEventList.sort{it?.name}
 		def applicationCount = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Application',moveBundleList).size()
 		def assetCount = AssetEntity.findAllByProjectAndAssetTypeNotInList(project,[
 			'Application',
@@ -496,8 +496,10 @@ class MoveBundleController {
 			allMoveBundle.remove(moveBundle.id)
 			String eventMoveBundles = allMoveBundle
 			eventMoveBundles = eventMoveBundles.replace("[[","('").replace(",", "','").replace("], [","','").replace("]]","')").replace("]',' [", "','")
-			potential  = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle.useOfPlanning = true and application.moveBundle not in $eventMoveBundles   and  (value is null or value = '') and application.project=$projectId group by application").size()
-			optional = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle.useOfPlanning = true and application.moveBundle not in $eventMoveBundles  and value = 'Y' and application.project=$projectId group by application").size()
+			if(allMoveBundle.size()>0){
+				potential  = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle.useOfPlanning = true and application.moveBundle not in $eventMoveBundles   and  (value is null or value = '') and application.project=$projectId group by application").size()
+				optional = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle.useOfPlanning = true and application.moveBundle not in $eventMoveBundles  and value = 'Y' and application.project=$projectId group by application").size()
+			}
 			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,'potential':potential,'optional':optional]
 		}
 		String moveBundle = moveBundleList.id
@@ -557,7 +559,7 @@ class MoveBundleController {
 
 		def issues = AssetComment.findAll("FROM AssetComment a where a.assetEntity.project = ? and a.commentType = ? and a.isResolved = 0",[project, "issue"])
 
-		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle group by dependency_bundle order by dependency_bundle  limit 10 ;""")
+		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle where project_id = $projectId group by dependency_bundle order by dependency_bundle  limit 10 ;""")
 		Date date
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
 		String time
@@ -567,7 +569,7 @@ class MoveBundleController {
 		}
 		def planningConsoleList = []
 		assetDependencyList.each{dependencyBundle->
-			def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundle(dependencyBundle.dependencyBundle)
+			def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundleAndProject(dependencyBundle.dependencyBundle,project)
 			def appCount = assetDependentlist.findAll{it.asset.assetType == 'Application'}.size()
 			def serverCount = assetDependentlist.findAll{it.asset.assetType == 'Server'}.size()
 			def vmCount = assetDependentlist.findAll{it.asset.assetType == 'VM'}.size()
