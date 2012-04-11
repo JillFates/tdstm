@@ -25,7 +25,8 @@ class MoveBundleController {
 	def stateEngineService
 	def moveBundleService
 	def jdbcTemplate
-
+	def sessionFactory
+	
 	def index = { redirect(action:list,params:params) }
 
 	// the delete, save and update actions only accept POST requests
@@ -621,6 +622,8 @@ class MoveBundleController {
 	def dependencyBundleDetails = { render(template:"dependencyBundleDetails") }
 
 	def generateDependency ={
+		sessionFactory.getCurrentSession().flush();
+		sessionFactory.getCurrentSession().clear();
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def date = new Date()
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
@@ -651,62 +654,55 @@ class MoveBundleController {
 
 		def results = jdbcTemplate.queryForList(queryForAssets )
 
-		int currentDependencyBundleNumber = 0;
+		int currentDependencyBundleNumber = 1;
 		int dependencyBundle  = currentDependencyBundleNumber ;
-		String dependencySource = "Initial"
 		
-		int assetsAddedTo = 0;
-		int assetsAddedFm = 0;
-		int assetsAddedX = 0;
 		def dependencyList = []
 		// Deleting previously generated dependency bundle table .
 		jdbcTemplate.execute("DELETE  FROM asset_dependency_bundle where project_id = $projectId ")
 		def assetIds = results.assetId
+		def assetIdsSize = assetIds.size()
 		// First loop  with resultant list .
-		assetIds.each{asset0 -> 
-			def initialAsset = AssetEntity.get(asset0)
+		for (int i = 0; i < assetIdsSize; i++) {
+			
+			def initialAsset = AssetEntity.get(assetIds[i])
 			// Skip the loop if asset and it's dependents already bundled
 			// If true assume that there is a new bundle found
 			if(!AssetDependencyBundle.findByAsset(initialAsset)){
+				log.info "New Bundle group found : $currentDependencyBundleNumber"
 				// Setting dependencySource to initial
 				int loopLevel = 0;
-				dependencySource = "Initial"  
 				// Add parent asset to dep-bundle group
-				Set dependentAssets = [["asset":initialAsset, "source":dependencySource]]
+				Set dependentAssets = [["asset":initialAsset, "source":"Initial"]]
 				// Second loop with resultant list, to ensure there is no assets missing
 				while(loopLevel <=3){
-					assetIds.each{asset1 -> 
-						def firstAssetinstance = AssetEntity.get(asset1)
-						// Third loop with resultant list to find the interdependent records
-						assetIds.each{asset2 ->  
-							def assetInstance = AssetEntity.get(asset2)
-							// Check if asset has any dependency records
-							def hasDependencyRelation = AssetDependency.findByAssetAndDependent(firstAssetinstance, assetInstance)
-							def hasAssetRelation = AssetDependency.findByAssetAndDependent(assetInstance, firstAssetinstance)
-							// True : if this asset already not exist in the current dep-bundle list and it has dependencies  
-							if(dependentAssets?.asset?.id?.contains(asset1) && hasDependencyRelation){
-								// determine the dependency status 
-								if(assetInstance.id != initialAsset.id){
-									dependencySource = "Dependency" 
+					for (int j = 1; j < assetIdsSize; j++) {
+						def firstAssetinstance = AssetEntity.get(assetIds[j])
+						if(!AssetDependencyBundle.findByAsset(firstAssetinstance)){
+							// Third loop with resultant list to find the interdependent records
+							for (int k = 1; k < assetIdsSize; k++) {
+								def assetInstance = AssetEntity.get(assetIds[k])
+								if(firstAssetinstance.id != assetInstance.id){
+									// Check if asset has any dependency records
+									def hasDependencyRelation = AssetDependency.findByAssetAndDependent(firstAssetinstance, assetInstance)
+									def hasAssetRelation = AssetDependency.findByAssetAndDependent(assetInstance, firstAssetinstance)
+									// True : if this asset already not exist in the current dep-bundle list and it has dependencies  
+									if(hasDependencyRelation && dependentAssets?.asset?.id?.contains(assetIds[j])){
+										// after all add this asset and status to this dep-bundle list
+										dependentAssets << ["asset":assetInstance, "source":"Dependency"]
+										log.info "${assetInstance?.assetName} added into ${initialAsset.assetName} as Dependency"
+									// True : if asset1 already not exist in the current dep-bundle list and it has dependencies
+									} else if(hasAssetRelation && dependentAssets?.asset?.id?.contains(assetIds[j])){
+										// after all add this asset and status to this dep-bundle list
+										log.info "${assetInstance?.assetName} added into ${initialAsset.assetName} as Dependency"
+										dependentAssets << ["asset":assetInstance, "source":"Dependency"]
+									}
 								}
-								// after all add this asset and status to this dep-bundle list
-								dependentAssets << ["asset":assetInstance, "source":dependencySource]
-							// True : if asset1 already not exist in the current dep-bundle list and it has dependencies
-							} else if(dependentAssets?.asset?.id?.contains(asset1) && hasAssetRelation){
-								// determine the dependency status
-								if(assetInstance.id != initialAsset.id){
-									dependencySource = "Dependency"
-								}
-								// after all add this asset and status to this dep-bundle list
-								dependentAssets << ["asset":assetInstance, "source":dependencySource]
 							}
 						}
 					}
 				loopLevel++
 				}
-			
-				// Increment currentDependencyBundleNumber to 1 if process reach to here
-				currentDependencyBundleNumber++
 				// Add all grouped assets to AssetDependencyBundle with currentDependencyBundleNumber.
 				dependentAssets.each{
 					def aseetDependencyBundle = new AssetDependencyBundle()
@@ -720,6 +716,8 @@ class MoveBundleController {
 						aseetDependencyBundle.errors.allErrors.each { log.info it }
 					}
 				}
+				// Increment currentDependencyBundleNumber to 1 if process reach to here
+				currentDependencyBundleNumber++
 			}
 		}
         // for displaying the results 
