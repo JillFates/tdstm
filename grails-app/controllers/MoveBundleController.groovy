@@ -592,37 +592,10 @@ class MoveBundleController {
 			unlikelyLatency:unlikelyLatency,unknownLatency:unknownLatency]
 	}
 	/**
-	 * 
+	 * Control function to render the Planning Console 
 	 */
 	def planningConsole = {
-		/*
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = Project.get(projectId)
-		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle where project_id = $projectId group by dependency_bundle order by dependency_bundle  limit 10 ;""")
-		Date date
-		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
-		String time
-		date = AssetDependencyBundle.findAll().lastUpdated[0]
-		if(date){
-			time = formatter.format(date)
-		}
-		def planningConsoleList = []
-		assetDependencyList.each{dependencyBundle->
-			def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundleAndProject(dependencyBundle.dependencyBundle,project)
-			def appCount = assetDependentlist.findAll{it.asset.assetType == 'Application'}.size()
-			def serverCount = assetDependentlist.findAll{it.asset.assetType == 'Server'}.size()
-			def vmCount = assetDependentlist.findAll{it.asset.assetType == 'VM'}.size()
-			planningConsoleList << ['dependencyBundle':dependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
-		}
-		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
-		def applications = Application.findAllByAssetTypeAndProject('Application',project,[sort:"assetName"])
-		def dbs = Database.findAllByAssetTypeAndProject('Database',project,[sort:"assetName"])
-		def files = Files.findAllByAssetTypeAndProject('Files',project,[sort:"assetName"])
-		return[dependencyType:dependencyType,dependencyStatus:dependencyStatus,date:time,planningConsoleList:planningConsoleList,assetDependency: new AssetDependency(),
-			   servers:servers, applications:applications ,dbs:dbs,files:files]
-		*/
+	
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		
 		return getPlanningConsoleMap(projectId)
@@ -668,6 +641,9 @@ class MoveBundleController {
 		def assetIds = results.assetId
 		def assetIdsSize = assetIds.size()
 
+		log.info "Found ${assetIdsSize} to bundle"
+		log.debug "SQL used to find assets: ${queryForAssets}"
+		
 		int bundleNumber = 1;
 		
 		def dependencyList = []
