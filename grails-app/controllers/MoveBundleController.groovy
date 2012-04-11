@@ -589,6 +589,8 @@ class MoveBundleController {
 	 * 
 	 */
 	def planningConsole = {
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def project = Project.get(projectId)
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle group by dependency_bundle order by dependency_bundle  limit 10 ;""")
@@ -607,7 +609,12 @@ class MoveBundleController {
 			def vmCount = assetDependentlist.findAll{it.asset.assetType == 'VM'}.size()
 			planningConsoleList << ['dependencyBundle':dependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
 		}
-		return[dependencyType:dependencyType,dependencyStatus:dependencyStatus,date:time,planningConsoleList:planningConsoleList,assetDependency: new AssetDependency()]
+		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
+		def applications = Application.findAllByAssetTypeAndProject('Application',project,[sort:"assetName"])
+		def dbs = Database.findAllByAssetTypeAndProject('Database',project,[sort:"assetName"])
+		def files = Files.findAllByAssetTypeAndProject('Files',project,[sort:"assetName"])
+		return[dependencyType:dependencyType,dependencyStatus:dependencyStatus,date:time,planningConsoleList:planningConsoleList,assetDependency: new AssetDependency(),
+			   servers:servers, applications:applications ,dbs:dbs,files:files]
 	}
 	def dependencyBundleDetails = { render(template:"dependencyBundleDetails") }
 
