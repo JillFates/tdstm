@@ -593,7 +593,7 @@ class MoveBundleController {
 		def project = Project.get(projectId)
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle group by dependency_bundle order by dependency_bundle  limit 10 ;""")
+		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle where project_id = $projectId group by dependency_bundle order by dependency_bundle  limit 10 ;""")
 		Date date
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
 		String time
@@ -603,7 +603,7 @@ class MoveBundleController {
 		}
 		def planningConsoleList = []
 		assetDependencyList.each{dependencyBundle->
-			def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundle(dependencyBundle.dependencyBundle)
+			def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundleAndProject(dependencyBundle.dependencyBundle,project)
 			def appCount = assetDependentlist.findAll{it.asset.assetType == 'Application'}.size()
 			def serverCount = assetDependentlist.findAll{it.asset.assetType == 'Server'}.size()
 			def vmCount = assetDependentlist.findAll{it.asset.assetType == 'VM'}.size()
@@ -658,7 +658,7 @@ class MoveBundleController {
 		int assetsAddedX = 0;
 		def dependencyList = []
 		// Deleting previously generated dependency bundle table .
-		jdbcTemplate.execute("DELETE  FROM asset_dependency_bundle")
+		jdbcTemplate.execute("DELETE  FROM asset_dependency_bundle where project_id = $projectId ")
 		def assetIds = results.assetId
 		// First loop  with resultant list .
 		assetIds.each{asset0 -> 
@@ -712,7 +712,8 @@ class MoveBundleController {
 					aseetDependencyBundle.dependencySource = it.source
 					aseetDependencyBundle.dependencyBundle = currentDependencyBundleNumber
 					aseetDependencyBundle.lastUpdated = date
-
+					aseetDependencyBundle.project = projectInstance
+					
 					if(!aseetDependencyBundle.save(flush:true)){
 						aseetDependencyBundle.errors.allErrors.each { log.info it }
 					}
@@ -721,9 +722,9 @@ class MoveBundleController {
 		}
         // for displaying the results 
 		def planningConsoleList = []
-		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle group by dependency_bundle order by dependency_bundle  limit 10 ;""")
+		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle where project_id = $projectId  group by dependency_bundle order by dependency_bundle  limit 10 ;""")
 		assetDependencyList.each{ assetDependencyBundle->
-			def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundle(assetDependencyBundle.dependencyBundle)
+			def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundleAndProject(assetDependencyBundle.dependencyBundle,projectInstance)
 			def appCount = assetDependentlist.findAll{it.asset.assetType == 'Application'}.size()
 			def serverCount = assetDependentlist.findAll{it.asset.assetType == 'Server'}.size()
 			def vmCount = assetDependentlist.findAll{it.asset.assetType == 'VM'}.size()
