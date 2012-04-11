@@ -301,7 +301,7 @@
 							<li><g:link class="mmlink" controller="moveBundle" action="list" onclick="hideMegaMenu('bundleMegaMenu')" >List Bundles</g:link> </li>
 							<li><g:link class="mmlink" controller="moveBundle" action="create"  params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('bundleMegaMenu')">Create Bundle</g:link></li>
 							<tds:hasPermission permission='MoveBundleShowView'>
-							  <li><g:link class="mmlink" controller="moveBundle" action="planningStats"  params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('bundleMegaMenu')">Planning Stats</g:link></li>
+							  <li><g:link class="mmlink" controller="moveBundle" action="planningStats"  params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('bundleMegaMenu')">Planning Dashboard</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='MoveBundleEditView'>
 							  <li><g:link class="mmlink" controller="moveBundle" action="planningConsole"  params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('bundleMegaMenu')">Planning Console</g:link></li>
