@@ -564,7 +564,7 @@ class MoveBundleController {
 		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle where project_id = $projectId group by dependency_bundle order by dependency_bundle  limit 10 ;""")
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
 		String time
-		def date = AssetDependencyBundle.findByProject(projectInstance,[sort:"lastUpdated",order:"desc"])?.lastUpdated
+		def date = AssetDependencyBundle.findByProject(project,[sort:"lastUpdated",order:"desc"])?.lastUpdated
 		if(date){
 			time = formatter.format(date)
 		}
