@@ -564,7 +564,7 @@ class MoveBundleController {
 		Date date
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
 		String time
-		date = AssetDependencyBundle.findAll().lastUpdated[0]
+		date = AssetDependencyBundle.findByProject()?.lastUpdated
 		if(date){
 			time = formatter.format(date)
 		}
@@ -763,7 +763,7 @@ class MoveBundleController {
 		// Get the time that the bundles were processed
 		String time
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
-		def date = AssetDependencyBundle.findAll().lastUpdated[0]
+		def date = AssetDependencyBundle.findByProject(projectInstance)?.lastUpdated
 		if(date){
 			time = formatter.format(date)
 		}

@@ -2858,7 +2858,7 @@ class AssetEntityController {
 	def getLists ={
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 	    def project = Project.findById( projectId )
-		def assetDependentlist = AssetDependencyBundle.findAllByDependencyBundle(params.dependencyBundle)
+		def assetDependentlist = AssetDependencyBundle.findAllByDependencyBundleAndProject(params.dependencyBundle,project)
 		session.setAttribute('dependencyBundle',params.dependencyBundle)
 		if(params.entity=='Apps'){
 			def appDependentListIds = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.asset.id
