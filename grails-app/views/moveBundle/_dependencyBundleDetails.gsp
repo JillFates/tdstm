@@ -6,8 +6,13 @@
 					</h3>
 					&nbsp;Bundling Analysis Run&nbsp;${date}: There were ${dependencyBundleCount} dependency bundles discovered
 				</div>
-				<table border="0" cellpadding="4" cellspacing="0"
+				<div id="processDiv" style="display:none;">
+		          		<img src="../images/processing.gif"/>
+		        </div>
+				<table id="dependencyTableId" border="0" cellpadding="4" cellspacing="0"
 					style="margin-left: 20px; width: 500px;">
+					
+		            
 					<tr class="odd">
 						<td><b>Dependency Bundle</b></td>
 						<g:each in="${planningConsoleList}" var="asset"><td><span id="serverIds" style="cursor: pointer; color: grey;" onclick="getList('server',${asset.dependencyBundle})"><b>${asset.dependencyBundle}</b>

@@ -26,6 +26,7 @@ class MoveBundleController {
 	def moveBundleService
 	def jdbcTemplate
 	def sessionFactory
+	protected static String dependecyBundlingAssetType = "('server','vm','blade','Application','Files','Database')"  
 	
 	def index = { redirect(action:list,params:params) }
 
@@ -561,10 +562,9 @@ class MoveBundleController {
 		def issues = AssetComment.findAll("FROM AssetComment a where a.assetEntity.project = ? and a.commentType = ? and a.isResolved = 0",[project, "issue"])
 
 		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle where project_id = $projectId group by dependency_bundle order by dependency_bundle  limit 10 ;""")
-		Date date
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
 		String time
-		date = AssetDependencyBundle.findByProject()?.lastUpdated
+		def date = AssetDependencyBundle.findByProject(projectInstance,[sort:"lastUpdated",order:"desc"])?.lastUpdated
 		if(date){
 			time = formatter.format(date)
 		}
@@ -612,7 +612,7 @@ class MoveBundleController {
 	 * relationships are processed first.  
 	 */
 	def generateDependency ={
-
+	
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def date = new Date()
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
@@ -626,12 +626,13 @@ class MoveBundleController {
 		statusType = statusType.replace("[","(").replace("]",")")
 		String movebundleList = MoveBundle.findAllByUseOfPlanningAndProject(true,projectInstance).id
 		movebundleList = movebundleList.replace("[","('").replace("]","')").replace(",","','")
+		def assetTypeList =  MoveBundleController.dependecyBundlingAssetType
 		
 		// Query to fetch dependent asset list with dependency type and status and move bundle list with use for planning .
-		// TODO : Swap out 'server','vm','blade','Application','Files','Database' for ENUM reference
+		
 		def queryForAssets = """SELECT a.asset_entity_id as assetId FROM asset_entity a
 			LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id Or ad.dependent_id = a.asset_entity_id
-			WHERE a.asset_type in ('server','vm','blade','Application','Files','Database')
+			WHERE a.asset_type in ${assetTypeList}
 				AND a.move_bundle_id in ${movebundleList} """
 		queryForAssets += connections=='null' ? "" : " AND ad.type in ${connections} "
 		queryForAssets += statusType=='null' ? "" : " AND ad.status in ${statusType} "
@@ -730,7 +731,7 @@ class MoveBundleController {
 		
         // for displaying the results 
 		
-		render(view:'planningConsole', model:getPlanningConsoleMap(projectId) )
+		render(template:'dependencyBundleDetails', model:getPlanningConsoleMap(projectId) )
 	}
 	
 	/*
@@ -763,7 +764,7 @@ class MoveBundleController {
 		// Get the time that the bundles were processed
 		String time
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
-		def date = AssetDependencyBundle.findByProject(projectInstance)?.lastUpdated
+		def date = AssetDependencyBundle.findByProject(projectInstance,[sort:"lastUpdated",order:"desc"])?.lastUpdated
 		if(date){
 			time = formatter.format(date)
 		}

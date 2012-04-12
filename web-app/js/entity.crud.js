@@ -184,3 +184,23 @@ function deleteAsset(id,value){
 	}
 	
 }
+function submitCheckBox(){
+	var data = $('#checkBoxForm').serialize()
+	new Ajax.Request('../moveBundle/generateDependency?'+data,{asynchronous:true,evalScripts:true,
+		    onLoading:function(){
+		    	var processTab = jQuery('#processDiv');
+			    processTab.attr("style", "display:block");
+			    processTab.attr("style", "margin-left: 180px");
+			    var assetTab = jQuery('#dependencyTableId');
+			    assetTab.attr("style", "display:none");
+			    assetTab.attr("style", "display:none");
+			    jQuery('#items1').css("display","none");
+		    }, onComplete:function(data){
+				$('#dependencyBundleDetailsId').html(data.responseText)
+				var processTab = jQuery('#processDiv');
+			    processTab.attr("style", "display:none");
+			    var assetTab = jQuery('#dependencyBundleDetailsId');
+			    assetTab.attr("style", "display:block");
+			}
+		});
+}

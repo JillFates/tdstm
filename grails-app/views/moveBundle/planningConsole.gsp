@@ -32,7 +32,7 @@ $(document).ready(function() {
 			<h1>Dependency Console</h1>
 		</div>
 		<div style="float: left; margin-left: 50px;">
-		<g:form name="checkBoxForm" action ="generateDependency"> 
+		<g:form name="checkBoxForm"> 
 			<div style="float: left;">
 				<h3>Connection Type</h3>
 				<g:each in="${dependencyType}" var="dependency">
@@ -53,14 +53,17 @@ $(document).ready(function() {
 				</g:each>
 			</div>
 			<div style="float: left;margin-left: 10px;" class="buttonR">
-				<g:actionSubmit class="submit"
-					style="float: right; margin-top: 50px" value="Generate" action="generateDependency" />
+				<input type="button" class="submit"
+					style="float: right; margin-top: 50px" value="Generate" onclick="submitCheckBox()" />
 			</div>
 			</g:form>
 
 		</div>
 		<div style="clear: both;"></div>
-		<g:render template="dependencyBundleDetails" />
+		
+		<div id = "dependencyBundleDetailsId" >
+			<g:render template="dependencyBundleDetails" />
+		</div>
 		<div style="clear: both;"></div>
 		<div id="items1" style="display: none"></div>
 		<g:render template="../assetEntity/commentCrud" />
