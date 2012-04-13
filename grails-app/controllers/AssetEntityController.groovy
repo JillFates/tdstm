@@ -967,7 +967,7 @@ class AssetEntityController {
 							//Add assetId for walkthrough template only.
 							if( appSheetColumnNames.containsKey("appId") ) {
 								def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
-								def addAppId = new Number(0, r, (asset[r-1].id))
+								def addAppId = new Number(0, r, (application[r-1].id))
 								appSheet.addCell( addAppId )
 							}
 							for ( int coll = 0; coll < appcolumnNameListSize; coll++ ) {
