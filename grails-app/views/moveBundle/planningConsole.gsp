@@ -17,6 +17,7 @@ $(document).ready(function() {
     $("#editCommentDialog").dialog({ autoOpen: false })
     $("#manufacturerShowDialog").dialog({ autoOpen: false })
     $("#modelShowDialog").dialog({ autoOpen: false })
+    $("#moveBundleSelectId").dialog({ autoOpen: false })
      
     
 });
@@ -65,12 +66,36 @@ $(document).ready(function() {
 			<g:render template="dependencyBundleDetails" />
 		</div>
 		<div style="clear: both;"></div>
+		
+		<div id="moveBundleSelectId" title="Change Move Bundle" style="background-color: #808080; display: none; float: right" >
+		<g:form name="changeBundle" action="saveAssetsToBundle" >
+		        
+		        <input type="hidden" name="assetVal" id="assetVal" />
+		        <table style="border: 0px;">
+		        <tr>
+		           <td style="color:#EFEFEF"> <b> Change MoveBundle for Selected Assets</b></td>
+		        </tr>
+		        <tr>
+		           <td>
+		             <g:select name="moveBundleList" from="${moveBundle}" optionKey="id"></g:select><br></br>
+		           </td>
+		        </tr>
+		        <tr>
+		         <td style="text-align: right"><input type="button" id ="saveBundleId" name="saveBundle"  value= "save" onclick="submitMoveForm()"> </td>
+		        </tr>
+		        </table>
+           		
+           		
+          </g:form>
+		</div>
 		<div id="items1" style="display: none"></div>
+		
 		<g:render template="../assetEntity/commentCrud" />
 		<g:render template="../assetEntity/modelDialog" />
 		<div id="createEntityView" style="display: none;"></div>
 		<div id="showEntityView" style="display: none;"></div>
 		<div id="editEntityView" style="display: none;"></div>
+		
 		<div style="display: none;">
 		<table id="assetDependencyRow">
 			<tr>
@@ -92,6 +117,7 @@ $(document).ready(function() {
 
 <script type="text/javascript">
 	function getList(value,dependencyBundle){
+		
 		if(value=='Apps'){
 			var app = 'Apps'
 			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + app +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }

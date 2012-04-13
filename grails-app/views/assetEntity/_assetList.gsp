@@ -7,6 +7,10 @@
 		<li id="dbli" ><a href="#item3"><a href="javascript:getList('database',${dependencyBundle})">DB(${dbDependentListSize})</a></li>
 		<li id="fileli" ><a href="javascript:getList('files',${dependencyBundle})">Files(${filesDependentListSize})</a></li>
 	</ul>
+    <div id ="selectionId" >
+		<input id="state" type="button"  class="submit" value="Change MoveBundle" onclick="changeMoveBundle()"  />
+		<input id="state" type="button"  class="submit" value="All.." onclick="selectAll()" title="Select All" />
+	</div>
 	<div class="tabInner">
 		<div id="item1">
 			<table id="tag" border="0" cellpadding="0" cellspacing="0"
@@ -34,8 +38,9 @@
 					<g:each in="${assetList}" var="asset" status="i">
 						<tr id="tag_row1" style="cursor: pointer;"
 							class="${(i % 2) == 0 ? 'odd' : 'even'}">
-							<td><a
-								href="javascript:editEntity('planningConsole','Server', ${asset.id})"><img
+							<td>
+							<g:checkBox name="checkBox" id="checkId_${asset.id}" ></g:checkBox>
+							<a href="javascript:editEntity('planningConsole','Server', ${asset.id})"><img
 									src="/tdstm/images/skin/database_edit.png" border="0px" />
 							</a> <span id="icon_15651"> <a
 									href="javascript:createNewAssetComment(15651);"> <img
@@ -87,4 +92,39 @@
 			</table>
 		</div>
 	</div>
+	<script type="text/javascript">
+	function changeMoveBundle(){
+		
+		var assetArr = new Array();
+		var totalAsset = ${assetList?.id};
+		var j=0;
+		for(i=0; i< totalAsset.size() ; i++){
+			if($('#checkId_'+totalAsset[i]) != null){
+				var booCheck = $('#checkId_'+totalAsset[i]).is(':checked');
+				if(booCheck){
+					assetArr[j] = totalAsset[i];
+					j++;
+				}
+			}
+		}if(j == 0){
+			alert('Please select the Asset');
+		}else{
+			$('#assetVal').val(assetArr);
+			$('#moveBundleSelectId').dialog('open')
+		}
+	}	
+	function submitMoveForm(){
+		jQuery.ajax({
+			url: $('#changeBundle').attr('action'),
+			data: $('#changeBundle').serialize(),
+			type:'POST',
+			success: function(data) {
+				$('#moveBundleSelectId').dialog("close")
+				$('#items1').html(data);
+			}
+		});
+	}
+
+	</script>
 </div>
+

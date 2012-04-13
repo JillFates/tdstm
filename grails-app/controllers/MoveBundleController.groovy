@@ -768,11 +768,29 @@ class MoveBundleController {
 		if(date){
 			time = formatter.format(date)
 		}
+		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance,true)
 
 		def map = [assetDependencyList:assetDependencyList, dependencyType:dependencyType, planningConsoleList:planningConsoleList,
 				date:time, dependencyStatus:dependencyStatus, assetDependency:new AssetDependency(), dependencyBundleCount:dependencyBundleCount,
-				servers:servers, applications:applications, dbs:dbs, files:files]
+				servers:servers, applications:applications, dbs:dbs, files:files,moveBundle:moveBundleList]
 		
 		return map
 	}
+	def saveAssetsToBundle={
+		def assetArray = params.assetVal
+		def moveBundleInstance = MoveBundle.findById(Integer.parseInt(params.moveBundleList))
+		def assetList = assetArray.split(",")
+		assetList.each{assetId->
+			def assetInstance = AssetEntity.get(assetId)
+			assetInstance.moveBundle = moveBundleInstance
+			if(!assetInstance.save(flush:true)){
+				assetInstance.errors.allErrors.each{
+			          println it 		
+				}
+			}
+			
+		}
+		redirect(controller:"assetEntity",action:"getLists", params:[entity:"server",dependencyBundle:session.getAttribute('dependencyBundle')])
+   }
 }
+

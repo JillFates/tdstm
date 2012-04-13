@@ -204,3 +204,18 @@ function submitCheckBox(){
 			}
 		});
 }
+var isFirst = true;
+function selectAll(){
+	var totalCheck = document.getElementsByName('checkBox');
+	if(isFirst){
+	for(i=0;i<totalCheck.length;i++){
+	totalCheck[i].checked = true;
+	}
+	isFirst = false;
+	}else{
+	for(i=0;i<totalCheck.length;i++){
+	totalCheck[i].checked = false;
+	}
+	isFirst = true;
+	}
+}
