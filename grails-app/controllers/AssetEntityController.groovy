@@ -768,6 +768,7 @@ class AssetEntityController {
 		def workbook
 		def book
 		try {
+			def assetDepBundleList = AssetDependencyBundle.findAllByProject(project)
 			def filenametoSet = dataTransferSetInstance.templateFilename
 			File file =  ApplicationHolder.application.parentContext.getResource(filenametoSet).getFile()
 			// Going to use temporary file because we were getting out of memory errors constantly on staging server
@@ -819,21 +820,33 @@ class AssetEntityController {
 				serverColumnNameList.add(item.columnName)
 				serverSheetNameMap.put( "sheetName", (item.sheetName).trim() )
 			}
+			serverMap.put("Dep Bundle", null )
+			serverColumnNameList.add("Dep Bundle")
+			
 			appDTAMap.eachWithIndex { item, pos ->
 				appMap.put( item.columnName, null )
 				appColumnNameList.add(item.columnName)
 				appSheetNameMap.put( "sheetName", (item.sheetName).trim() )
 			}
+			appMap.put("Dep Bundle", null )
+			appColumnNameList.add("Dep Bundle")
+			
 			dbDTAMap.eachWithIndex { item, pos ->
 				dbMap.put( item.columnName, null )
 				dbColumnNameList.add(item.columnName)
 				dbSheetNameMap.put( "sheetName", (item.sheetName).trim() )
 			}
+			dbMap.put("Dep Bundle", null )
+			dbColumnNameList.add("Dep Bundle")
+			
 			fileDTAMap.eachWithIndex { item, pos ->
 				fileMap.put( item.columnName, null )
 				fileColumnNameList.add(item.columnName)
 				fileSheetNameMap.put( "sheetName", (item.sheetName).trim() )
 			}
+			fileMap.put("Dep Bundle", null )
+			fileColumnNameList.add("Dep Bundle")
+			
 			def sheetNames = book.getSheetNames()
 			def flag = 0
 			def sheetNamesLength = sheetNames.length
@@ -943,19 +956,24 @@ class AssetEntityController {
 								def addAssetId = new Number(0, r, (asset[r-1].id))
 								serverSheet.addCell( addAssetId )
 							}
+							
 							for ( int coll = 0; coll < serverColumnNameListSize; coll++ ) {
 								def addContentToSheet
 								def attribute = serverDTAMap.eavAttribute.attributeCode[coll]
-								if ( attribute != "usize" && asset[r-1][attribute] == null ) {
-									addContentToSheet = new Label( serverMap[serverColumnNameList.get(coll)], r, "" )
+								def colName = serverColumnNameList.get(coll)
+								if(colName == "Dep Bundle"){
+									def depBundle = assetDepBundleList.find{it.asset.id==asset[r-1].id}?.dependencyBundle?.toString()
+									addContentToSheet = new Label(serverMap[colName], r, depBundle?: "" )
+								} else if ( attribute != "usize" && asset[r-1][attribute] == null ) {
+									addContentToSheet = new Label( serverMap[colName], r, "" )
 								} else if(attribute == "usize"){
-									addContentToSheet = new Label(serverMap[serverColumnNameList.get(coll)], r, asset[r-1]?.model?.usize?.toString() ?:"" )
-								}else {
+									addContentToSheet = new Label(serverMap[colName], r, asset[r-1]?.model?.usize?.toString() ?:"" )
+								} else {
 									//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
 									if( bundleMoveAndClientTeams.contains(serverDTAMap.eavAttribute.attributeCode[coll]) ) {
-										addContentToSheet = new Label( serverMap[serverColumnNameList.get(coll)], r, String.valueOf(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll]).teamCode) )
+										addContentToSheet = new Label( serverMap[colName], r, String.valueOf(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll]).teamCode) )
 									}else {
-										addContentToSheet = new Label( serverMap[serverColumnNameList.get(coll)], r, String.valueOf(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll])) )
+										addContentToSheet = new Label( serverMap[colName], r, String.valueOf(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll])) )
 									}
 								}
 								serverSheet.addCell( addContentToSheet )
@@ -973,19 +991,24 @@ class AssetEntityController {
 							for ( int coll = 0; coll < appcolumnNameListSize; coll++ ) {
 								def addContentToSheet
 								def attribute = appDTAMap.eavAttribute.attributeCode[coll]
-								addContentToSheet = new Label( appMap[appColumnNameList.get(coll)], r, "" )
 								//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
-								if ( application[r-1][attribute] == null ) {
-									addContentToSheet = new Label( appMap[appColumnNameList.get(coll)], r, "" )
+								def colName = appColumnNameList.get(coll)
+								addContentToSheet = new Label( appMap[colName], r, "" )
+								if(colName == "Dep Bundle"){
+									def depBundle = assetDepBundleList.find{it.asset.id==application[r-1].id}?.dependencyBundle?.toString()
+									addContentToSheet = new Label(appMap[colName], r, depBundle?:"" )
+								} else if ( application[r-1][attribute] == null ) {
+									addContentToSheet = new Label( appMap[colName], r, "" )
 								}else {
 									if( bundleMoveAndClientTeams.contains(appDTAMap.eavAttribute.attributeCode[coll]) ) {
-										addContentToSheet = new Label( appMap[appColumnNameList.get(coll)], r, String.valueOf(application[r-1].(appDTAMap.eavAttribute.attributeCode[coll]).teamCode) )
+										addContentToSheet = new Label( appMap[colName], r, String.valueOf(application[r-1].(appDTAMap.eavAttribute.attributeCode[coll]).teamCode) )
 									}else {
-										addContentToSheet = new Label( appMap[appColumnNameList.get(coll)], r, String.valueOf(application[r-1].(appDTAMap.eavAttribute.attributeCode[coll])) )
+										addContentToSheet = new Label( appMap[colName], r, String.valueOf(application[r-1].(appDTAMap.eavAttribute.attributeCode[coll])) )
 									}
 								}
 								appSheet.addCell( addContentToSheet )
 							}
+							
 						}
 					}
 					if(params.database=='database'){
@@ -1000,13 +1023,17 @@ class AssetEntityController {
 								def addContentToSheet
 								def attribute = dbDTAMap.eavAttribute.attributeCode[coll]
 								//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
-								if ( database[r-1][attribute] == null ) {
-									addContentToSheet = new Label(  dbMap[dbColumnNameList.get(coll)], r, "" )
+								def colName = dbColumnNameList.get(coll)
+								if(colName == "Dep Bundle"){
+									def depBundle = assetDepBundleList.find{it.asset.id==database[r-1].id}?.dependencyBundle?.toString()
+									addContentToSheet = new Label(dbMap[colName], r, depBundle ?:"" )
+								} else if ( database[r-1][attribute] == null ) {
+									addContentToSheet = new Label(  dbMap[colName], r, "" )
 								}else {
 									if( bundleMoveAndClientTeams.contains(dbDTAMap.eavAttribute.attributeCode[coll]) ) {
-										addContentToSheet = new Label( dbMap[dbColumnNameList.get(coll)], r, String.valueOf(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]).teamCode) )
+										addContentToSheet = new Label( dbMap[colName], r, String.valueOf(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]).teamCode) )
 									}else {
-										addContentToSheet = new Label( dbMap[dbColumnNameList.get(coll)], r, String.valueOf(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll])) )
+										addContentToSheet = new Label( dbMap[colName], r, String.valueOf(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll])) )
 									}
 								}
 								dbSheet.addCell( addContentToSheet )
@@ -1024,14 +1051,18 @@ class AssetEntityController {
 							for ( int coll = 0; coll < filecolumnNameListSize; coll++ ) {
 								def addContentToSheet
 								def attribute = fileDTAMap.eavAttribute.attributeCode[coll]
-								if ( files[r-1][attribute] == null ) {
-									addContentToSheet = new Label( fileMap[fileColumnNameList.get(coll)], r, "" )
-								}else {
+								def colName = fileColumnNameList.get(coll)
+								if(colName == "Dep Bundle"){
+									def depBundle = assetDepBundleList.find{it.asset.id==files[r-1].id}?.dependencyBundle?.toString()
+									addContentToSheet = new Label(fileMap[colName], r, depBundle ?:"" )
+								} else if ( files[r-1][attribute] == null ) {
+									addContentToSheet = new Label( fileMap[colName], r, "" )
+								} else {
 									//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
 									if( bundleMoveAndClientTeams.contains(fileDTAMap.eavAttribute.attributeCode[coll]) ) {
-										addContentToSheet = new Label( fileMap[fileColumnNameList.get(coll)], r, String.valueOf(files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll]).teamCode) )
+										addContentToSheet = new Label( fileMap[colName], r, String.valueOf(files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll]).teamCode) )
 									}else {
-										addContentToSheet = new Label( fileMap[fileColumnNameList.get(coll)], r, String.valueOf(files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll])) )
+										addContentToSheet = new Label( fileMap[colName], r, String.valueOf(files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll])) )
 									}
 								}
 								fileSheet.addCell( addContentToSheet )
@@ -1127,7 +1158,7 @@ class AssetEntityController {
 	def checkHeader( def list, def serverSheetColumnNames  ) {
 		def listSize = list.size()
 		for ( int coll = 0; coll < listSize; coll++ ) {
-			if( serverSheetColumnNames.containsKey( list[coll] ) ) {
+			if( serverSheetColumnNames.containsKey( list[coll] ) || list[coll] == "Dep Bundle") {
 				//Nonthing to perform.
 			} else {
 				missingHeader = missingHeader + ", " + list[coll]
