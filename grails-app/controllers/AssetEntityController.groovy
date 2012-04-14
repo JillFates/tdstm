@@ -820,32 +820,32 @@ class AssetEntityController {
 				serverColumnNameList.add(item.columnName)
 				serverSheetNameMap.put( "sheetName", (item.sheetName).trim() )
 			}
-			serverMap.put("Dep Bundle", null )
-			serverColumnNameList.add("Dep Bundle")
+			serverMap.put("DepGroup", null )
+			serverColumnNameList.add("DepGroup")
 			
 			appDTAMap.eachWithIndex { item, pos ->
 				appMap.put( item.columnName, null )
 				appColumnNameList.add(item.columnName)
 				appSheetNameMap.put( "sheetName", (item.sheetName).trim() )
 			}
-			appMap.put("Dep Bundle", null )
-			appColumnNameList.add("Dep Bundle")
+			appMap.put("DepGroup", null )
+			appColumnNameList.add("DepGroup")
 			
 			dbDTAMap.eachWithIndex { item, pos ->
 				dbMap.put( item.columnName, null )
 				dbColumnNameList.add(item.columnName)
 				dbSheetNameMap.put( "sheetName", (item.sheetName).trim() )
 			}
-			dbMap.put("Dep Bundle", null )
-			dbColumnNameList.add("Dep Bundle")
+			dbMap.put("DepGroup", null )
+			dbColumnNameList.add("DepGroup")
 			
 			fileDTAMap.eachWithIndex { item, pos ->
 				fileMap.put( item.columnName, null )
 				fileColumnNameList.add(item.columnName)
 				fileSheetNameMap.put( "sheetName", (item.sheetName).trim() )
 			}
-			fileMap.put("Dep Bundle", null )
-			fileColumnNameList.add("Dep Bundle")
+			fileMap.put("DepGroup", null )
+			fileColumnNameList.add("DepGroup")
 			
 			def sheetNames = book.getSheetNames()
 			def flag = 0
@@ -961,9 +961,9 @@ class AssetEntityController {
 								def addContentToSheet
 								def attribute = serverDTAMap.eavAttribute.attributeCode[coll]
 								def colName = serverColumnNameList.get(coll)
-								if(colName == "Dep Bundle"){
-									def depBundle = assetDepBundleList.find{it.asset.id==asset[r-1].id}?.dependencyBundle?.toString()
-									addContentToSheet = new Label(serverMap[colName], r, depBundle?: "" )
+								if(colName == "DepGroup"){
+									def depGroup = assetDepBundleList.find{it.asset.id==asset[r-1].id}?.dependencyBundle?.toString()
+									addContentToSheet = new Label(serverMap[colName], r, depGroup?: "" )
 								} else if ( attribute != "usize" && asset[r-1][attribute] == null ) {
 									addContentToSheet = new Label( serverMap[colName], r, "" )
 								} else if(attribute == "usize"){
@@ -994,9 +994,9 @@ class AssetEntityController {
 								//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
 								def colName = appColumnNameList.get(coll)
 								addContentToSheet = new Label( appMap[colName], r, "" )
-								if(colName == "Dep Bundle"){
-									def depBundle = assetDepBundleList.find{it.asset.id==application[r-1].id}?.dependencyBundle?.toString()
-									addContentToSheet = new Label(appMap[colName], r, depBundle?:"" )
+								if(colName == "DepGroup"){
+									def depGroup = assetDepBundleList.find{it.asset.id==application[r-1].id}?.dependencyBundle?.toString()
+									addContentToSheet = new Label(appMap[colName], r, depGroup?:"" )
 								} else if ( application[r-1][attribute] == null ) {
 									addContentToSheet = new Label( appMap[colName], r, "" )
 								}else {
@@ -1024,9 +1024,9 @@ class AssetEntityController {
 								def attribute = dbDTAMap.eavAttribute.attributeCode[coll]
 								//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
 								def colName = dbColumnNameList.get(coll)
-								if(colName == "Dep Bundle"){
-									def depBundle = assetDepBundleList.find{it.asset.id==database[r-1].id}?.dependencyBundle?.toString()
-									addContentToSheet = new Label(dbMap[colName], r, depBundle ?:"" )
+								if(colName == "DepGroup"){
+									def depGroup = assetDepBundleList.find{it.asset.id==database[r-1].id}?.dependencyBundle?.toString()
+									addContentToSheet = new Label(dbMap[colName], r, depGroup ?:"" )
 								} else if ( database[r-1][attribute] == null ) {
 									addContentToSheet = new Label(  dbMap[colName], r, "" )
 								}else {
@@ -1052,9 +1052,9 @@ class AssetEntityController {
 								def addContentToSheet
 								def attribute = fileDTAMap.eavAttribute.attributeCode[coll]
 								def colName = fileColumnNameList.get(coll)
-								if(colName == "Dep Bundle"){
-									def depBundle = assetDepBundleList.find{it.asset.id==files[r-1].id}?.dependencyBundle?.toString()
-									addContentToSheet = new Label(fileMap[colName], r, depBundle ?:"" )
+								if(colName == "DepGroup"){
+									def depGroup = assetDepBundleList.find{it.asset.id==files[r-1].id}?.dependencyBundle?.toString()
+									addContentToSheet = new Label(fileMap[colName], r, depGroup ?:"" )
 								} else if ( files[r-1][attribute] == null ) {
 									addContentToSheet = new Label( fileMap[colName], r, "" )
 								} else {
@@ -1158,7 +1158,7 @@ class AssetEntityController {
 	def checkHeader( def list, def serverSheetColumnNames  ) {
 		def listSize = list.size()
 		for ( int coll = 0; coll < listSize; coll++ ) {
-			if( serverSheetColumnNames.containsKey( list[coll] ) || list[coll] == "Dep Bundle") {
+			if( serverSheetColumnNames.containsKey( list[coll] ) || list[coll] == "DepGroup") {
 				//Nonthing to perform.
 			} else {
 				missingHeader = missingHeader + ", " + list[coll]
