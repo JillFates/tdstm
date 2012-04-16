@@ -7,6 +7,11 @@
 		<li id="dbli"  ><a href="#item3"><a href="javascript:getList('database',${dependencyBundle})">DB(${dbDependentListSize})</a></li>
 		<li id="fileli" class="active"><a href="javascript:getList('files',${dependencyBundle})">Files(${filesDependentListSize})</a></li>
 	</ul>
+	<div id ="selectionFilesId">
+	    <input type="hidden" id="assetTypeId" name="assetType" value="${asset}" />
+		<input id="state" type="button"  class="submit" value="Change MoveBundle" onclick="changeMoveBundle($('#assetTypeId').val(),${filesList.id})"  />
+		<input id="selectId" type="button"  class="submit" value="All.." onclick="selectAll()" title="Select All" />
+	 </div>
 	<div class="tabInner">
 		<div id="item1">
 			<table id="tagApp" border="0" cellpadding="0" cellspacing="0"
@@ -28,8 +33,9 @@
 					<g:each in="${filesList}" var="files" status="i">
 						<tr id="tag_row1" style="cursor: pointer;"
 							class="${(i % 2) == 0 ? 'odd' : 'even'}">
-							<td><a
-								href="javascript:editEntity('planningConsole','Files', ${files.id})"><img
+							<td>
+							<g:checkBox name="checkBox" id="checkId_${files.id}" ></g:checkBox>
+							<a href="javascript:editEntity('planningConsole','Files', ${files.id})"><img
 									src="/tdstm/images/skin/database_edit.png" border="0px" />
 							</a> <span id="icon_15651"> <a
 									href="javascript:createNewAssetComment(15651);"> <img

@@ -194,7 +194,7 @@ class FilesController {
 					redirect( controller:'application', action:list)
 					break;
 			    case "planningConsole":
-					redirect( controller:'assetEntity',action:'getLists', params:[entity: 'files',dependencyBundle:session.getAttribute("dependencyBundle")])
+					forward( controller:'assetEntity',action:'getLists', params:[entity: 'files',dependencyBundle:session.getAttribute("dependencyBundle")])
 					break;
 				default:
 					redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_fileFormat:filterAttr.tag_f_fileFormat,tag_f_fileSize:filterAttr.tag_f_fileSize, tag_f_moveBundle:filterAttr.tag_f_moveBundle, tag_f_planStatus:filterAttr.tag_f_planStatus, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown])
@@ -228,7 +228,7 @@ class FilesController {
 			AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = ${filesInstance.id}")
 			flash.message = "Files ${assetName} deleted"
 			if(params.dstPath =='planningConsole'){
-				redirect( controller:'assetEntity',action:'getLists', params:[entity: 'files',dependencyBundle:session.getAttribute("dependencyBundle")])
+				forward( controller:'assetEntity',action:'getLists', params:[entity: 'files',dependencyBundle:session.getAttribute("dependencyBundle")])
 			}else{
 				redirect( action:list )
 			}

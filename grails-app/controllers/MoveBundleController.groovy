@@ -790,7 +790,7 @@ class MoveBundleController {
 			}
 			
 		}
-		redirect(controller:"assetEntity",action:"getLists", params:[entity:"server",dependencyBundle:session.getAttribute('dependencyBundle')])
+		forward(controller:"assetEntity",action:"getLists", params:[entity:params.assetType,dependencyBundle:session.getAttribute('dependencyBundle')])
    }
 }
 

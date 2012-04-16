@@ -8,7 +8,8 @@
 		<li id="fileli" ><a href="javascript:getList('files',${dependencyBundle})">Files(${filesDependentListSize})</a></li>
 	</ul>
     <div id ="selectionId" >
-		<input id="state" type="button"  class="submit" value="Change MoveBundle" onclick="changeMoveBundle()"  />
+   		<input type="hidden" id="assetTypeId" name="assetType" value="${asset}" />
+		<input id="state" type="button"  class="submit" value="Change MoveBundle" onclick="changeMoveBundle($('#assetTypeId').val(),${assetList.id})"  />
 		<input id="state" type="button"  class="submit" value="All.." onclick="selectAll()" title="Select All" />
 	</div>
 	<div class="tabInner">
@@ -92,39 +93,5 @@
 			</table>
 		</div>
 	</div>
-	<script type="text/javascript">
-	function changeMoveBundle(){
-		
-		var assetArr = new Array();
-		var totalAsset = ${assetList?.id};
-		var j=0;
-		for(i=0; i< totalAsset.size() ; i++){
-			if($('#checkId_'+totalAsset[i]) != null){
-				var booCheck = $('#checkId_'+totalAsset[i]).is(':checked');
-				if(booCheck){
-					assetArr[j] = totalAsset[i];
-					j++;
-				}
-			}
-		}if(j == 0){
-			alert('Please select the Asset');
-		}else{
-			$('#assetVal').val(assetArr);
-			$('#moveBundleSelectId').dialog('open')
-		}
-	}	
-	function submitMoveForm(){
-		jQuery.ajax({
-			url: $('#changeBundle').attr('action'),
-			data: $('#changeBundle').serialize(),
-			type:'POST',
-			success: function(data) {
-				$('#moveBundleSelectId').dialog("close")
-				$('#items1').html(data);
-			}
-		});
-	}
-
-	</script>
 </div>
 

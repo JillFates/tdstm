@@ -71,6 +71,7 @@ $(document).ready(function() {
 		<g:form name="changeBundle" action="saveAssetsToBundle" >
 		        
 		        <input type="hidden" name="assetVal" id="assetVal" />
+		        <input type="hidden" name="assetType" id="assetsTypeId"  />
 		        <table style="border: 0px;">
 		        <tr>
 		           <td style="color:#EFEFEF"> <b> Change MoveBundle for Selected Assets</b></td>
@@ -117,9 +118,9 @@ $(document).ready(function() {
 
 <script type="text/javascript">
 	function getList(value,dependencyBundle){
-		
+		$('#moveBundleSelectId').dialog("close")
 		if(value=='Apps'){
-			var app = 'Apps'
+			var app = 'Apps'	   
 			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + app +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
 		}else if(value=='server'){
 			var server = 'server'

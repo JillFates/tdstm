@@ -219,3 +219,33 @@ function selectAll(){
 	isFirst = true;
 	}
 }
+function changeMoveBundle(assetType,totalAsset){
+	var assetArr = new Array();
+	var j=0;
+	for(i=0; i< totalAsset.size() ; i++){
+		if($('#checkId_'+totalAsset[i]) != null){
+			var booCheck = $('#checkId_'+totalAsset[i]).is(':checked');
+			if(booCheck){
+				assetArr[j] = totalAsset[i];
+				j++;
+			}
+		}
+	}if(j == 0){
+		alert('Please select the Asset');
+	}else{
+		$('#assetsTypeId').val(assetType)
+		$('#assetVal').val(assetArr);
+		$('#moveBundleSelectId').dialog('open')
+	}
+}	
+function submitMoveForm(){
+	jQuery.ajax({
+		url: $('#changeBundle').attr('action'),
+		data: $('#changeBundle').serialize(),
+		type:'POST',
+		success: function(data) {
+			$('#moveBundleSelectId').dialog("close")
+			$('#items1').html(data);
+		}
+	});
+}
