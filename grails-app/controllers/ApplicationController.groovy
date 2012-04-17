@@ -53,6 +53,12 @@ class ApplicationController {
 			appEntityList = Application.findAllByValidationAndProject('DependencyScan',project)
 		}else if(params.validation=='BundleReady'){
 			appEntityList = Application.findAllByValidationAndProject('BundleReady',project)
+		}else if(params.latency=='likely'){
+			appEntityList= Application.findAllByLatencyAndProject('N',project)
+		}else if(params.latency=='UnKnown'){
+			appEntityList= Application.findAllByLatencyAndProject(null,project)
+		}else if(params.latency=='UnLikely'){
+			appEntityList= Application.findAllByLatencyAndProject('Y',project)
 		}else{
 		    appEntityList = Application.findAllByProject(project)
 		}

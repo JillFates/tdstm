@@ -149,16 +149,16 @@
 					</h3>
 					<table style="border: 0px; margin-left: 10px;">
 						<tr>
-							<td style="width: 10px;">${likelyLatency}</td>
-							<td>Likely</td>
+							<td style="width: 10px;"><g:link controller="application" action="list" params="[latency:'likely']">${likelyLatency}</g:link></td>
+							<td><g:link controller="application" action="list" params="[latency:'likely']">Likely</g:link></td>
 						</tr>
 						<tr>
-							<td>${unknownLatency}</td>
-							<td>UnKnown</td>
+							<td><g:link controller="application" action="list" params="[latency:'UnKnown']">${unknownLatency}</g:link></td>
+							<td><g:link controller="application" action="list" params="[latency:'UnKnown']">UnKnown</g:link></td>
 						</tr>
 						<tr>
-							<td>${unlikelyLatency }</td>
-							<td>UnLikely</td>
+							<td><g:link controller="application" action="list" params="[latency:'UnLikely']">${unlikelyLatency }</g:link></td>
+							<td><g:link controller="application" action="list" params="[latency:'UnLikely']">UnLikely</g:link></td>
 						</tr>
 					</table>
 	
