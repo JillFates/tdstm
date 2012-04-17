@@ -582,6 +582,8 @@ class MoveBundleController {
 		def unlikelyLatency = Application.findAllByLatencyAndProject('Y',project).size()
 		def unknownLatency = Application.findAllByLatencyAndProject(null,project).size()
 		
+		def depBundleIDCountSQL = "select count(distinct dependency_bundle) from asset_dependency_bundle where project_id = $projectId"
+        def dependencyBundleCount = jdbcTemplate.queryForInt(depBundleIDCountSQL)		
 		return [moveBundleList:moveBundleList, applicationCount:applicationCount,appList:appList,unassignedAppCount:unassignedAppCount,
 			percentageAppCount:percentageAppCount,assetCount:assetCount,assetList:assetList,unassignedPhysialAssetCount:unassignedPhysialAssetCount,
 			unassignedVirtualAssetCount:unassignedVirtualAssetCount,percentagePhysicalAssetCount:percentagePhysicalAssetCount,
@@ -589,7 +591,7 @@ class MoveBundleController {
 			appDependenciesCount:appDependenciesCount,serverDependenciesCount:serverDependenciesCount, pendingAppDependenciesCount:pendingAppDependenciesCount,
 			pendingServerDependenciesCount:pendingServerDependenciesCount, issuesCount : issues.size(),likelyLatencyCount:likelyLatencyCount,unlikelyLatencyCount:unlikelyLatencyCount,
 			unknownLatencyCount:unknownLatencyCount,unassignedAssetCount:unassignedAssetCount,project:project,planningConsoleList:planningConsoleList,date:time,moveBundle:moveEventList,likelyLatency:likelyLatency,
-			unlikelyLatency:unlikelyLatency,unknownLatency:unknownLatency]
+			unlikelyLatency:unlikelyLatency,unknownLatency:unknownLatency,dependencyBundleCount:dependencyBundleCount]
 	}
 	/**
 	 * Control function to render the Planning Console 
