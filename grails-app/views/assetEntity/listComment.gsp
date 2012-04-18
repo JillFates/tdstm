@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=ISO-8859-1" %>
+<%@page import="com.tds.asset.AssetComment"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
@@ -68,14 +68,14 @@
 							 <jmesa:htmlColumn property="commentType" title="Type" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.commentType}</span>
 							 </jmesa:htmlColumn>
-							 <jmesa:htmlColumn property="owner" title="Owner" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+							 <jmesa:htmlColumn property="ownerString" title="Owner" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
         	                 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.owner}</span>
         	                 </jmesa:htmlColumn>
 							 <%--
     	                     <jmesa:htmlColumn property="mustVerify" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
     	                     	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show')"><g:if test ="${commentInstance.mustVerify == 1}"></g:if><g:else><g:checkBox name="myVerifyBox" value="${true}" disabled="true"/></g:else></span>
     	                     </jmesa:htmlColumn>
-        	                 --%><jmesa:htmlColumn property="assetEntity" title="Asset" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+        	                 --%><jmesa:htmlColumn property="assetName" title="Asset" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
         	                 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.assetEntity?.assetName}</span>
         	                 </jmesa:htmlColumn>
             	             <jmesa:htmlColumn property="isResolved"  sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">

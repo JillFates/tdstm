@@ -49,6 +49,12 @@ class AssetComment {
 			displayOption sqltype: 'char(1)'
 		}
 	}
+	def getOwnerString(){
+		return owner.toString()
+	}
+	def getAssetName(){
+		return assetEntity.assetName
+	}
 	
 	String toString() {
 		 comment
