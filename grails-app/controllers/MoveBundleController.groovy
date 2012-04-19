@@ -743,7 +743,7 @@ class MoveBundleController {
 		def projectInstance = Project.get(projectId)
 		def planningConsoleList = []
 		def depBundleIDCountSQL = "select count(distinct dependency_bundle) from asset_dependency_bundle where project_id = $projectId"
-		def depBundleIdSQL = "select distinct dependency_bundle as dependencyBundle from asset_dependency_bundle where project_id = $projectId order by dependency_bundle limit 24"
+		def depBundleIdSQL = "select distinct dependency_bundle as dependencyBundle from asset_dependency_bundle where project_id = $projectId order by dependency_bundle limit 48"
 		
 		def dependencyBundleCount = jdbcTemplate.queryForInt(depBundleIDCountSQL)
 		
