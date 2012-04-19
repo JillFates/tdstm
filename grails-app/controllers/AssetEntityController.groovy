@@ -2585,8 +2585,8 @@ class AssetEntityController {
 			redirect(action:list)
 		}
 		else {
-			dependentAssets = AssetDependency.findAllByAsset(assetEntityInstance)
-			supportAssets 	= AssetDependency.findAllByDependent(assetEntityInstance)
+			dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntityInstance])
+			supportAssets 	= AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntityInstance])
 		}
 		if(AssetComment.find("from AssetComment where assetEntity = ${assetEntityInstance?.id} and commentType = ? and isResolved = ?",['issue',0])){
 			assetComment = "issue"
@@ -2619,8 +2619,8 @@ class AssetEntityController {
 
 
 
-		def dependentAssets = AssetDependency.findAllByAsset(assetEntityInstance)
-		def supportAssets = AssetDependency.findAllByDependent(assetEntityInstance)
+		def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntityInstance])
+		def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntityInstance])
 		
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def priorityOption = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)

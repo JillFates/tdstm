@@ -117,8 +117,8 @@ class FilesController {
 		}
 		else {
 			def assetEntity = AssetEntity.get(id)
-			def dependentAssets = AssetDependency.findAllByAsset(assetEntity)
-			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
+			def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
+			def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
 			def assetComment
 			if(AssetComment.find("from AssetComment where assetEntity = ${filesInstance?.id} and commentType = ? and isResolved = ?",['issue',0])){
 				assetComment = "issue"
@@ -149,8 +149,8 @@ class FilesController {
 		}
 		else {
 			def assetEntity = AssetEntity.get(id)
-			def dependentAssets = AssetDependency.findAllByAsset(assetEntity)
-			def supportAssets = AssetDependency.findAllByDependent(assetEntity)
+			def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
+			def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
 			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 			def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
