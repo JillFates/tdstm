@@ -44,7 +44,7 @@ class FilesController {
 			filesEntity.setMoveBundle(fileentity?.moveBundle?.name)
 			filesEntity.setplanStatus(fileentity.planStatus)
 			filesEntity.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
-			filesEntity.setDepDown(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
+			filesEntity.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))
 			filesEntity.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(fileentity)?.dependencyBundle)
 			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
 				filesEntity.setCommentType("issue")

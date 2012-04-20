@@ -49,7 +49,7 @@ class DatabaseController {
 			dataBeanInstance.setMoveBundle(dataBaseentity?.moveBundle?.name)
 			dataBeanInstance.setplanStatus(dataBaseentity.planStatus)
 			dataBeanInstance.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
-			dataBeanInstance.setDepDown(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
+			dataBeanInstance.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))
 			dataBeanInstance.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(dataBaseentity)?.dependencyBundle)
 			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
 				dataBeanInstance.setCommentType("issue")
