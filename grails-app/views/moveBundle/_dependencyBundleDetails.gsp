@@ -2,9 +2,9 @@
 			<div>
 				<div style="margin-left: 20px; margin-bottom: 10px;">
 					<h3>
-						<b>Dependency Bundling</b>
+						<b>Dependency Groups</b>
 					</h3>
-					&nbsp;Bundling Analysis Run&nbsp;${date}: There were ${dependencyBundleCount} dependency bundles discovered
+					&nbsp;Dependency Analysis Run&nbsp;${date}: There were ${dependencyBundleCount} dependency groups discovered
 				</div>
 				<div id="processDiv" style="display:none;">
 		          		<img src="../images/processing.gif"/>
