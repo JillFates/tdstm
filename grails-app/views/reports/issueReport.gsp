@@ -16,6 +16,20 @@
      		$("#"+fromId).val("false");
      	}
     }
+    function populateMultipleSelect(){
+    	 var moveBundleListForm = document.forms.MoveBundleList;
+         var moveBundles = "";
+         var x = 0;
+         for (x=0;x<moveBundleListForm.moveBundles.length;x++)
+         {
+            if (moveBundleListForm.moveBundles[x].selected)
+            {
+             moveBundles = moveBundles + moveBundleListForm.moveBundles[x].value +",";
+            }
+         }
+         moveBundles = "["+moveBundles+ "]"
+         $('#moveBundle').val( moveBundles )
+    }
     </script>
 </head>
 <body>
@@ -35,13 +49,14 @@
 		<tr class="prop" id="bundleRow" >
 			<td valign="top" class="name" style="paddingleft:10px;"><label>&nbsp;&nbsp;&nbsp;&nbsp;<b>Bundles:<span style="color: red;">*</span> </b></label></td>
 			<td valign="top" class="value" align="left">
-				<select id="moveBundleId" name="moveBundles" onchange="return populateSelect('moveBundle', this.value);">
-					<option value="null" selected="selected">Please Select</option>
+			 <form name="MoveBundleList" >
+				<select id="moveBundleId" name="moveBundles" multiple="multiple" onblur="populateMultipleSelect();">
 					<option value="">All Bundles</option>
 					<g:each in="${moveBundleInstanceList}" var="moveBundleList">
 						<option value="${moveBundleList?.id}">${moveBundleList?.name}</option>
 					</g:each>
 				</select>
+			  </form>
 			</td>
 		</tr>
 		<tr>

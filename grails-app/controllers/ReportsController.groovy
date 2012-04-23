@@ -642,12 +642,13 @@ class ReportsController {
     	if( params.reportResolveInfo == "false" ){
     		resolvedInfoInclude = "Resolved issues were not included"
     	}
+		String moveBundles = params.moveBundle
+		moveBundles = moveBundles.replace("[","('").replace(",]","')").replace(",","','")
     	if(params.moveBundle == "null") {    		
     		flash.message = " Please Select Bundles. "
     		redirect( action:'getBundleListForReportDialog', params:[reportId: 'Issue Report'] )
         } else {
-    		def moveBundleInstance = MoveBundle.findById(params.moveBundle)
-    		def bundleName = "All Bundles"
+    		String bundleName = "All Bundles"
     		def targetAssetEntitylist
 			def commentType = "('issue','comment')"
 	    	if(comment == "false"){
@@ -655,10 +656,10 @@ class ReportsController {
 	    	}
     		def commentsQuery = new StringBuffer("from AssetComment ac where ac.commentType in ${commentType} ")
 				
-    		if( moveBundleInstance != null ){
-    			commentsQuery.append(" and ac.assetEntity.id in (select ae.id from AssetEntity ae where ae.moveBundle.id = $moveBundleInstance.id ) order by ac.assetEntity.${sortBy} ")
-    			bundleNames = moveBundleInstance?.name
-    			bundleName = bundleNames
+    		if( moveBundles.size() > 4 ){
+    			commentsQuery.append(" and ac.assetEntity.id in (select ae.id from AssetEntity ae where ae.moveBundle.id in $moveBundles ) order by ac.assetEntity.${sortBy} ")
+    			bundleNames = MoveBundle.findAll("from MoveBundle where id in $moveBundles").name.toString()
+    		    bundleName = bundleNames
     		}else {
     			commentsQuery.append(" and ac.assetEntity.id in (select ae.id from AssetEntity ae where ae.project.id = $projectInstance.id ) order by ac.assetEntity.${sortBy} ")
     			bundleNames = "All"
@@ -679,20 +680,22 @@ class ReportsController {
     								(assetComment?.assetEntity?.targetRack ? assetComment?.assetEntity?.targetRack : "--")+"/"+
     								(assetComment?.assetEntity?.targetRackPosition ? assetComment?.assetEntity?.targetRackPosition : "--")
     			if( params.reportResolveInfo == "true" || assetComment.isResolved != 1 ) {
-    				reportFields <<['assetName':assetComment?.assetEntity?.assetName, 'assetTag':assetComment?.assetEntity?.assetTag, 
+    				reportFields <<['assetName':assetComment?.assetEntity?.assetName, 'assetTag':assetComment?.assetEntity?.assetTag,'moveBundle' :assetComment?.assetEntity?.moveBundle?.name,
     								'sourceTargetRoom':sourceTargetRoom,'commentCode':assetComment.commentCode ? assetComment.commentCode : "",
     								'commentType':assetComment.commentType,
     								'model':(assetComment?.assetEntity?.manufacturer ? assetComment?.assetEntity?.manufacturer?.toString() : "")+" "+(assetComment?.assetEntity?.model ? assetComment?.assetEntity?.model : "" ), 
     								'occuredAt':GormUtil.convertInToUserTZ( assetComment?.dateCreated, tzId ), 'createdBy':assetComment?.createdBy?.firstName+" "+assetComment?.createdBy?.lastName, 
+									'owner':assetComment?.owner ? assetComment?.owner?.firstName+" "+assetComment?.owner?.lastName : '',
     								'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
     								'clientName':projectInstance?.client?.name,"resolvedInfoInclude":resolvedInfoInclude,
     								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
     			}
     			if( params.reportResolveInfo == "true" && assetComment.isResolved == 1 ) {
-    				reportFields <<['assetName':null, 'assetTag':null, 'sourceTargetRoom':null,'model':null, 
+    				reportFields <<['assetName':null, 'assetTag':null, 'moveBundle' :null,'sourceTargetRoom':null,'model':null, 
 									'commentCode':assetComment.commentCode ? assetComment.commentCode : "",'commentType':assetComment.commentType,
 									'occuredAt':GormUtil.convertInToUserTZ( assetComment?.dateResolved, tzId ), 
     								'createdBy':assetComment?.resolvedBy?.firstName+" "+assetComment?.resolvedBy?.lastName, 
+									'owner':assetComment?.owner ? assetComment?.owner?.firstName+" "+assetComment?.owner?.lastName : '',
     								'issue':assetComment?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
     								'clientName':projectInstance?.client?.name,
     								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
@@ -703,10 +706,11 @@ class ReportsController {
 				def moveEventNewsList=MoveEventNews.findAllByMoveEvent(moveEvent)
 				moveEventNewsList.each{ moveEventNews ->
 					moveEventNews?.resolution = moveEventNews?.resolution ? moveEventNews?.resolution : ''
-					reportFields <<['assetName':'', 'assetTag':'', 'sourceTargetRoom':'','model':'',
+					reportFields <<['assetName':'', 'assetTag':'', 'moveBundle' :'','sourceTargetRoom':'','model':'',
 								'commentCode':"",'commentType':"news",
 								'occuredAt':GormUtil.convertInToUserTZ( moveEventNews?.dateCreated, tzId ),
 								'createdBy':moveEventNews?.createdBy.toString(),
+								'owner':'',
 								'issue':moveEventNews.message +"/"+  moveEventNews?.resolution , 'bundleNames':'','projectName':projectInstance?.name,
 								'clientName':projectInstance?.client?.name,
 								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
@@ -741,13 +745,15 @@ class ReportsController {
 						for ( int r = 0; r < reportFields.size(); r++ ) {
 							sheet.addCell( new Label( 0, r+6, String.valueOf(reportFields[r].assetName )) )
 							sheet.addCell( new Label( 1, r+6, String.valueOf(reportFields[r].assetTag )) )
-							sheet.addCell( new Label( 2, r+6, String.valueOf(reportFields[r].sourceTargetRoom )) )
-							sheet.addCell( new Label( 3, r+6, String.valueOf(reportFields[r].model )) )
-							sheet.addCell( new Label( 4, r+6, String.valueOf(reportFields[r].commentCode )) )
-							sheet.addCell( new Label( 5, r+6, String.valueOf(reportFields[r].commentType )) )
-							sheet.addCell( new Label( 6, r+6, String.valueOf(reportFields[r].occuredAt ? formatter.format( reportFields[r].occuredAt ) : "")) )
-							sheet.addCell( new Label( 7, r+6, String.valueOf(reportFields[r].createdBy )) )
-							sheet.addCell( new Label( 8, r+6, String.valueOf(reportFields[r].issue )) )
+							sheet.addCell( new Label( 2, r+6, String.valueOf(reportFields[r].moveBundle )) )
+							sheet.addCell( new Label( 3, r+6, String.valueOf(reportFields[r].sourceTargetRoom )) )
+							sheet.addCell( new Label( 4, r+6, String.valueOf(reportFields[r].model )) )
+							sheet.addCell( new Label( 5, r+6, String.valueOf(reportFields[r].commentCode )) )
+							sheet.addCell( new Label( 6, r+6, String.valueOf(reportFields[r].commentType )) )
+							sheet.addCell( new Label( 7, r+6, String.valueOf(reportFields[r].occuredAt ? formatter.format( reportFields[r].occuredAt ) : "")) )
+							sheet.addCell( new Label( 8, r+6, String.valueOf(reportFields[r].createdBy )) )
+							sheet.addCell( new Label( 9, r+6, String.valueOf(reportFields[r].owner )) )
+							sheet.addCell( new Label( 10, r+6, String.valueOf(reportFields[r].issue )) )
 						}
 						sheet.addCell( new Label( 0, reportFields.size()+7, String.valueOf("Note : All times are in "+reportFields[0].timezone+" time zone") ))
 						
