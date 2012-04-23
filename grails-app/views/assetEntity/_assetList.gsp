@@ -39,7 +39,7 @@
 					<g:each in="${assetList}" var="asset" status="i">
 						<tr id="tag_row1" style="cursor: pointer;"
 							class="${(i % 2) == 0 ? 'odd' : 'even'}">
-							<td>
+							<td nowrap="nowrap">
 							<g:checkBox name="checkBox" id="checkId_${asset.id}" ></g:checkBox>
 							<a href="javascript:editEntity('planningConsole','Server', ${asset.id})"><img
 									src="/tdstm/images/skin/database_edit.png" border="0px" />

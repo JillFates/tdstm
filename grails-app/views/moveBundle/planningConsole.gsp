@@ -8,6 +8,9 @@
 <g:javascript src="entity.crud.js" />
 <script type="text/javascript">
 $(document).ready(function() {
+	
+	${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + "server" +\'&dependencyBundle=\'+ null', onComplete:'listUpdate(e)') }
+	
 	$("#createEntityView").dialog({ autoOpen: false })
 	$("#showEntityView").dialog({ autoOpen: false })
 	$("#editEntityView").dialog({ autoOpen: false })
@@ -18,7 +21,7 @@ $(document).ready(function() {
     $("#manufacturerShowDialog").dialog({ autoOpen: false })
     $("#modelShowDialog").dialog({ autoOpen: false })
     $("#moveBundleSelectId").dialog({ autoOpen: false })
-     
+   
     
 });
 
