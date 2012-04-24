@@ -32,10 +32,10 @@ $(document).ready(function() {
 <body>
 	<input type="hidden" id="redirectTo" name="redirectTo" value="planningConsole" />
 	<div class="body">
-		<div style="float: left;">
+		<div id="dependencyTitle" style="float: left;display: none">
 			<h1>Dependency Console</h1>
 		</div>
-		<div style="float: left; margin-left: 50px;">
+		<div id="checkBoxDiv" style="float: left;;display: none; margin-left: 50px;">
 		<g:form name="checkBoxForm"> 
 			<div style="float: left;">
 				<h3>Connection Type</h3>
@@ -68,6 +68,8 @@ $(document).ready(function() {
 		<div id = "dependencyBundleDetailsId" >
 			<g:render template="dependencyBundleDetails" />
 		</div>
+		
+		
 		<div style="clear: both;"></div>
 		
 		<div id="moveBundleSelectId" title="Change Move Bundle" style="background-color: #808080; display: none; float: right" >
@@ -122,6 +124,11 @@ $(document).ready(function() {
 <script type="text/javascript">
 	function getList(value,dependencyBundle){
 		$('#moveBundleSelectId').dialog("close")
+		$('.highlightSpan').css('background-color','#EEEEEE')
+		$('.highlightSpan').css('font-weight','normal')
+		$('#span_'+dependencyBundle).css('background-color','yellow')
+		$('#span_'+dependencyBundle).css('font-weight','bold')
+		
 		switch(value){
 		case "server" :
 			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
@@ -145,6 +152,18 @@ $(document).ready(function() {
 		   $('#items1').html(resp)
 		   $('#items1').css('display','block');
     }
+    function collapsePage(){
+      $('#checkBoxDiv').hide(300);
+      $('#dependencyTitle').hide(300);
+      $('#upArrow').css('display','none')
+      $('#downArrow').css('display','inline')
+    }
+    function openPage(){
+    	$('#dependencyTitle').show(300);
+        $('#checkBoxDiv').show(300)
+        $('#upArrow').css('display','inline')
+        $('#downArrow').css('display','none')
+      }
 </script>
 </body>
 </html>

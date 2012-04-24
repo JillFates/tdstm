@@ -195,12 +195,15 @@ function submitCheckBox(){
 			    assetTab.attr("style", "display:none");
 			    assetTab.attr("style", "display:none");
 			    jQuery('#items1').css("display","none");
+			    $('#upArrow').css('display','none')
 		    }, onComplete:function(data){
 				$('#dependencyBundleDetailsId').html(data.responseText)
 				var processTab = jQuery('#processDiv');
 			    processTab.attr("style", "display:none");
 			    var assetTab = jQuery('#dependencyBundleDetailsId');
 			    assetTab.attr("style", "display:block");
+			    $('#upArrow').css('display','inline');
+			    $('#downArrow').css('display','none');
 			}
 		});
 }
