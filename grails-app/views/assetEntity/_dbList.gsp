@@ -6,6 +6,7 @@
 		</li>
 		<li id="dbli" class="active" ><a href="#item3"><a href="javascript:getList('database',${dependencyBundle})">DB(${dbDependentListSize})</a></li>
 		<li id="fileli" ><a href="javascript:getList('files',${dependencyBundle})">Files(${filesDependentListSize})</a></li>
+		<li id="graphli"><a href="javascript:getList('graph',${dependencyBundle})">Map</a></li>
 	</ul>
 	 <div id ="selectionDBId">
 	    <input type="hidden" id="assetTypeId" name="assetType" value="${asset}" />

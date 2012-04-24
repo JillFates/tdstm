@@ -2933,6 +2933,14 @@ class AssetEntityController {
 			render(template:"filesList",model:[filesList:filesList,assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
 										   filesDependentListSize:filesListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbDependentListSize,asset:'files'])
 			break;
+		case "graph" :
+			def filesListSize = assetDependentlist.findAll{it.assetType ==  'Files' }.size()
+			def dbDependentListSize = assetDependentlist.findAll{it.assetType ==  'Database' }.size()
+			def appDependentListSize = assetDependentlist.findAll{it.assetType ==  'Application' }.size()
+			def assetEntityListSize = assetDependentlist.findAll{it.assetType ==  'VM' || it.assetType ==  'Server' }.size()
+			render(template:'dependencyGraph',model:[assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
+										   filesDependentListSize:filesListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbDependentListSize,asset:'graph'])
+			break;
 		}
 	}	
 }

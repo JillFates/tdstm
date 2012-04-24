@@ -122,19 +122,22 @@ $(document).ready(function() {
 <script type="text/javascript">
 	function getList(value,dependencyBundle){
 		$('#moveBundleSelectId').dialog("close")
-		if(value=='Apps'){
-			var app = 'Apps'	   
-			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + app +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
-		}else if(value=='server'){
-			var server = 'server'
-			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + server +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
-		}
-		else if(value=='database'){
-			var server = 'database'
-			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + server +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
-		}else{
-			var server = 'files'
-			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + server +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
+		switch(value){
+		case "server" :
+			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
+			break;
+		case "Apps" :
+			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
+			break;
+		case "database" :
+			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
+			break;
+		case "files" :
+			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
+			break;
+		case "graph" :
+			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
+			break;
 		}
 	}
 	function listUpdate(e){
