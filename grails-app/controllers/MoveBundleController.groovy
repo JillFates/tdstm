@@ -468,7 +468,7 @@ class MoveBundleController {
 		List moveEventList = []
 		moveEventList =  uniqueMoveEventList.toList()
 		moveEventList.sort{it?.name}
-		def applicationCount = AssetEntity.findAllByAssetTypeAndProject('Application',project).size()
+		def applicationCount = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Application',moveBundleList).size()
 		def assetCount = AssetEntity.findAllByProjectAndAssetTypeNotInList(project,[
 			'Application',
 			'Database',
@@ -499,8 +499,8 @@ class MoveBundleController {
 			String eventMoveBundles = allMoveBundle
 			eventMoveBundles = eventMoveBundles.replace("[[","('").replace(",", "','").replace("], [","','").replace("]]","')").replace("]',' [", "','")
 			if(allMoveBundle.size()>0){
-				potential  = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle.moveEvent != ${moveEvent.id} and moveEvent = ${moveEvent.id} and  (value is null or value = '') and application.project=$projectId group by application").size()
-				optional = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle.moveEvent != ${moveEvent.id} and moveEvent = ${moveEvent.id} and value = 'Y' and application.project=$projectId group by application").size()
+				potential  = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle.moveEvent != ${moveEvent.id} and moveEvent = ${moveEvent.id} and  value = 'Y' or (value is null or value = '') and (application.planStatus is null or application.planStatus in ('Unassigned','')) and application.project=$projectId  group by application").size()
+				optional = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle.moveEvent != ${moveEvent.id} and moveEvent = ${moveEvent.id} and value = 'Y' and (application.planStatus is null or application.planStatus in ('Unassigned','')) and application.project=$projectId  group by application").size()
 			}
 			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,'potential':potential,'optional':optional]
 		}
@@ -557,7 +557,7 @@ class MoveBundleController {
 
 		def issues = AssetComment.findAll("FROM AssetComment a where a.assetEntity.project = ? and a.commentType = ? and a.isResolved = 0",[project, "issue"])
 
-		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle where project_id = $projectId group by dependency_bundle order by dependency_bundle  limit 10 ;""")
+		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle where project_id = $projectId group by dependency_bundle order by dependency_bundle  limit 48 ;""")
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
 		String time
 		def date = AssetDependencyBundle.findByProject(project,[sort:"lastUpdated",order:"desc"])?.lastUpdated
@@ -580,6 +580,7 @@ class MoveBundleController {
 		
 		def depBundleIDCountSQL = "select count(distinct dependency_bundle) from asset_dependency_bundle where project_id = $projectId"
         def dependencyBundleCount = jdbcTemplate.queryForInt(depBundleIDCountSQL)		
+		
 		return [moveBundleList:moveBundleList, applicationCount:applicationCount,appList:appList,unassignedAppCount:unassignedAppCount,
 			percentageAppCount:percentageAppCount,assetCount:assetCount,assetList:assetList,unassignedPhysialAssetCount:unassignedPhysialAssetCount,
 			unassignedVirtualAssetCount:unassignedVirtualAssetCount,percentagePhysicalAssetCount:percentagePhysicalAssetCount,
@@ -587,7 +588,7 @@ class MoveBundleController {
 			appDependenciesCount:appDependenciesCount,serverDependenciesCount:serverDependenciesCount, pendingAppDependenciesCount:pendingAppDependenciesCount,
 			pendingServerDependenciesCount:pendingServerDependenciesCount, issuesCount : issues.size(),likelyLatencyCount:likelyLatencyCount,unlikelyLatencyCount:unlikelyLatencyCount,
 			unknownLatencyCount:unknownLatencyCount,unassignedAssetCount:unassignedAssetCount,project:project,planningConsoleList:planningConsoleList,date:time,moveBundle:moveEventList,likelyLatency:likelyLatency,
-			unlikelyLatency:unlikelyLatency,unknownLatency:unknownLatency,dependencyBundleCount:dependencyBundleCount,uniqueMoveEventList:uniqueMoveEventList]
+			unlikelyLatency:unlikelyLatency,unknownLatency:unknownLatency,dependencyBundleCount:dependencyBundleCount,uniqueMoveEventList:uniqueMoveEventList,planningDashboard:'planningDashboard']
 	}
 	/**
 	 * Control function to render the Planning Console 

@@ -3,6 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <meta name="layout" content="projectHeader" />
+<g:javascript src="entity.crud.js" />
 <title>Planning Stats</title>
 </head>
 <body>
@@ -165,23 +166,23 @@
 				</div>
 				<div style="float: left;margin-left: 50px;">
 					<h3>
-						<b>Appl Evals</b>
+						<b>App Validations</b>
 					</h3>
 					<table style="border: 0px; margin-left: 10px;">
 						<tr>
-							<td style="width: 10px;">${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? and validation = ? ',['Application', project,'Discovery']).size()}</td>
+							<td style="width: 10px;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ? ',['Application', project,'Discovery',true]).size()}</td>
 							<td><g:link controller="application" action="list" params="[validation:'Discovery']">Discovery</g:link></td>
 						</tr>
 						<tr>
-							<td>${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? and validation = ?',['Application', project , 'DependencyReview']).size()}</td>
+							<td>${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyReview',true]).size()}</td>
 							<td><g:link controller="application" action="list" params="[validation:'DependencyReview']">DependencyReview</g:link></td>
 						</tr>
 						<tr>
-							<td>${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? and validation = ?',['Application', project , 'DependencyScan']).size()}</td>
+							<td>${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyScan',true]).size()}</td>
 							<td><g:link controller="application" action="list" params="[validation:'DependencyScan']">DependencyScan</g:link></td>
 						</tr>
 						<tr>
-							<td>${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? and validation = ?',['Application', project , 'BundleReady']).size()}</td>
+							<td>${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()}</td>
 							<td><g:link controller="application" action="list" params="[validation:'BundleReady']">BundleReady</g:link></td>
 						</tr>
 					</table>
@@ -191,6 +192,5 @@
 			<div style="clear: both;float: left;margin-top: 40px; margin-left: 100px;">
 			   <g:render template="dependencyBundleDetails" />
 			</div>
-		</div>
 </body>
 </html>
