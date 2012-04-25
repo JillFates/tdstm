@@ -2890,54 +2890,73 @@ class AssetEntityController {
 	    def project = Project.findById( projectId )
 		def assetDependentlist
 		if(params.dependencyBundle!= 'null'){
-			 assetDependentlist = AssetDependencyBundle.findAllByDependencyBundleAndProject(params.dependencyBundle,project)?.asset
+			 assetDependentlist = AssetDependencyBundle.findAllByDependencyBundleAndProject(params.dependencyBundle,project)
 		}else{
-			 assetDependentlist = AssetEntity.findAllByProject(project)
+			 assetDependentlist = AssetDependencyBundle.findAllByProject(project)?.sort{it.dependencyBundle}
 		}
 		session.setAttribute('dependencyBundle',params.dependencyBundle)
 		switch(params.entity){
 		case "Apps" :
-			def applicationList = assetDependentlist.findAll{it.assetType ==  'Application' }
-			def filesDependentListSize = assetDependentlist.findAll{it.assetType ==  'Files' }.size()
-			def assetEntityListSize = assetDependentlist.findAll{it.assetType ==  'VM' || it.assetType ==  'Server' }.size()
-			def dbDependentListSize = assetDependentlist.findAll{it.assetType ==  'Database'}.size()
+			def applicationList = assetDependentlist.findAll{it.asset.assetType ==  'Application' }
+			def filesDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Files' }.size()
+			def assetEntityListSize = assetDependentlist.findAll{it.asset.assetType ==  'VM' || it.asset.assetType ==  'Server' }.size()
+			def dbDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Database'}.size()
 			def applicationListSize = applicationList.size()
-			render(template:"appList",model:[appList:applicationList,assetEntityListSize:assetEntityListSize,applicationListSize:applicationListSize,dependencyBundle:params.dependencyBundle,
+			render(template:"appList",model:[appList:applicationList.asset,assetEntityListSize:assetEntityListSize,applicationListSize:applicationListSize,dependencyBundle:params.dependencyBundle,
 				                               filesDependentListSize:filesDependentListSize,appDependentListSize:applicationListSize,dbDependentListSize:dbDependentListSize,asset:'Apps'])
 			break;
 		case "server":
-			def assetEntityList = assetDependentlist.findAll{it.assetType ==  'VM' || it.assetType ==  'Server'}
-			def filesDependentListSize = assetDependentlist.findAll{it.assetType ==  'Files' }.size()
-			def appDependentListSize = assetDependentlist.findAll{it.assetType=='Application' }.size()
-			def dbDependentListSize = assetDependentlist.findAll{it.assetType ==  'Database'}.size()
+			def assetEntityList = assetDependentlist.findAll{it.asset.assetType ==  'VM' || it.asset.assetType ==  'Server'}
+			def filesDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Files' }.size()
+			def appDependentListSize = assetDependentlist.findAll{it.asset.assetType=='Application' }.size()
+			def dbDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Database'}.size()
 			def assetEntityListSize = assetEntityList.size()
-			render(template:"assetList",model:[assetList:assetEntityList,assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
+			render(template:"assetList",model:[assetList:assetEntityList.asset,assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
 				                               filesDependentListSize:filesDependentListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbDependentListSize,asset:'server'])
 			break;
 		case "database" :
-			def databaseList = assetDependentlist.findAll{it.assetType ==  'Database' }
-			def filesDependentListSize = assetDependentlist.findAll{it.assetType ==  'Files' }.size()
-			def appDependentListSize = assetDependentlist.findAll{it.assetType ==  'Application' }.size()
-			def assetEntityListSize = assetDependentlist.findAll{it.assetType == 'VM' || it.assetType ==  'Server' }.size()
-			def dbDependentListSize = assetDependentlist.findAll{it.assetType ==  'Database'}.size()
+			def databaseList = assetDependentlist.findAll{it.asset.assetType ==  'Database' }
+			def filesDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Files' }.size()
+			def appDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.size()
+			def assetEntityListSize = assetDependentlist.findAll{it.asset.assetType == 'VM' || it.asset.assetType ==  'Server' }.size()
+			def dbDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Database'}.size()
 			def dbListSize = databaseList.size()
-			render(template:"dbList",model:[databaseList:databaseList,assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
+			render(template:"dbList",model:[databaseList:databaseList.asset,assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
 				                               filesDependentListSize:filesDependentListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbListSize,asset:'database'])
 			break;
 		case "files" :
-			def filesList = assetDependentlist.findAll{it.assetType ==  'Files' }
-			def dbDependentListSize = assetDependentlist.findAll{it.assetType ==  'Database' }.size()
-			def appDependentListSize = assetDependentlist.findAll{it.assetType ==  'Application' }.size()
-			def assetEntityListSize = assetDependentlist.findAll{it.assetType ==  'VM' || it.assetType ==  'Server' }.size()
+			def filesList = assetDependentlist.findAll{it.asset.assetType ==  'Files' }
+			def dbDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Database' }.size()
+			def appDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.size()
+			def assetEntityListSize = assetDependentlist.findAll{it.asset.assetType ==  'VM' || it.asset.assetType ==  'Server' }.size()
 			def filesListSize = filesList.size()
-			render(template:"filesList",model:[filesList:filesList,assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
+			render(template:"filesList",model:[filesList:filesList.asset,assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
 										   filesDependentListSize:filesListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbDependentListSize,asset:'files'])
 			break;
 		case "graph" :
-			def filesListSize = assetDependentlist.findAll{it.assetType ==  'Files' }.size()
-			def dbDependentListSize = assetDependentlist.findAll{it.assetType ==  'Database' }.size()
-			def appDependentListSize = assetDependentlist.findAll{it.assetType ==  'Application' }.size()
-			def assetEntityListSize = assetDependentlist.findAll{it.assetType ==  'VM' || it.assetType ==  'Server' }.size()
+			def filesListSize = assetDependentlist.findAll{it.asset.assetType ==  'Files' }.size()
+			def dbDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Database' }.size()
+			def appDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.size()
+			def assetEntityListSize = assetDependentlist.findAll{it.asset.assetType ==  'VM' || it.asset.assetType ==  'Server' }.size()
+			def graphData = [:]
+			def graphNodes = []
+			assetDependentlist.each{
+				graphNodes << ["id":it.asset.id,"name":it.asset.assetName,"group":it.dependencyBundle]
+			}
+			graphData << ["nodes":graphNodes]
+			def assetDependencies = AssetDependency.findAll("From AssetDependency where asset.project = :project OR dependent.project = :project",[project:project])
+			def graphLinks = []
+			assetDependencies.each{
+				def sourceIndex = graphNodes.id.indexOf(it.asset.id)
+				def targetIndex = graphNodes.id.indexOf(it.dependent.id)
+				if(sourceIndex != -1 && targetIndex != -1){
+					graphLinks << ["source":sourceIndex,"target":targetIndex,"value":2]
+				}
+			}
+			graphData << ["links":graphLinks]
+			JSON output = graphData as JSON
+			def currentfile = ApplicationHolder.application.parentContext.getResource( "/d3/force/miserables.json" ).getFile()
+			currentfile.write(output.toString());
 			render(template:'dependencyGraph',model:[assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
 										   filesDependentListSize:filesListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbDependentListSize,asset:'graph'])
 			break;
