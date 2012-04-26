@@ -2941,7 +2941,7 @@ class AssetEntityController {
 			def graphData = [:]
 			def graphNodes = []
 			assetDependentlist.each{
-				graphNodes << ["id":it.asset.id,"name":it.asset.assetName,"group":it.dependencyBundle]
+				graphNodes << ["id":it.asset.id,"name":it.asset.assetName,"type":it.asset.assetType,"group":it.dependencyBundle]
 			}
 			graphData << ["nodes":graphNodes]
 			def assetDependencies = AssetDependency.findAll("From AssetDependency where asset.project = :project OR dependent.project = :project",[project:project])

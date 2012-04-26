@@ -33,7 +33,7 @@ d3.json("miserables.json", function(json) {
       .call(force.drag);
 
   node.append("title")
-      .text(function(d) { return d.name; });
+      .text(function(d) { return [d.name + d.type + d.id]; });
 
   force.on("tick", function() {
     link.attr("x1", function(d) { return d.source.x; })

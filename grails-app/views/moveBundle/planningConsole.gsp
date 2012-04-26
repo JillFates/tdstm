@@ -34,8 +34,8 @@ $(document).ready(function() {
 	<div class="body">
 		<div id="dependencyTitle" style="float: left;">
 			<h1>Dependency Console</h1>
-			<img id="upArrow"  style="display:none; margin-left: 179px; margin-top: -22px; float: left; " src="../images/TriangleArrow-Up.svg.png" onclick="collapsePage()"/>
-	        <img id="downArrow" style="float:left;	 margin-left: 179px; margin-top: -22px;" src="../images/TriangleArrow-Down.svg.png" onclick="openPage()"/>
+			<img id="upArrow" style="display:none; margin-left: 179px; margin-top: -22px; float: left; " src="${createLinkTo(dir:'images',file:'triangle_up.png')}" onclick="collapsePage()"/>
+	        <img id="downArrow" style="float:left; margin-left: 179px; margin-top: -22px;" src="${createLinkTo(dir:'images',file:'triangle_down.png')}" onclick="openPage()"/>
 		</div>
 		<div id="checkBoxDiv" style="float: left;margin-top:10px;display: none; margin-left: 50px;">
 		<g:form name="checkBoxForm"> 
