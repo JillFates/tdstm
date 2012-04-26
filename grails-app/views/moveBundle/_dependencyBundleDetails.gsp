@@ -15,28 +15,36 @@
 		            
 					<tr class="odd">
 						<td><b>Dependency Bundle</b></td>
-						<g:each in="${planningConsoleList}" var="asset"><td><span id="serverIds"  style="cursor: pointer; color: grey;" onclick="getList('server',${asset.dependencyBundle})"><span id="span_${asset.dependencyBundle}" class="highlightSpan" >${asset.dependencyBundle}</span>
+						<g:if test="${planningDashboard!='planningDashboard'}">
+							<td><span id="allDependencyBundle" class="highlightSpan"  style="cursor: pointer; background-color: yellow;font-weight:bold;" onclick="getList('Apps',null)" >All</span></td>
+						</g:if> 
+						<g:each in="${planningConsoleList}" var="asset"><td><span id="serverIds"  style="cursor: pointer; color: grey;" onclick="getList('Apps',${asset.dependencyBundle})"><span id="span_${asset.dependencyBundle}" class="highlightSpan" >${asset.dependencyBundle}</span>
 						</span></td></g:each>
 						</tr>
 					<tr class="even">
 						<td><b>Applications</b></td>
+						<g:if test="${planningDashboard!='planningDashboard'}">
+							<td><span id="allAppCount">${applicationListSize }</span></td>
+						</g:if> 
 						<g:each in="${planningConsoleList}" var="assets"><td>${assets.appCount }</td>
 						</g:each>
 					</tr>
 					<tr class="odd">
 						<td><b>Physical Servers</b></td>
+						<g:if test="${planningDashboard!='planningDashboard'}">
+							<td><span id="allServerCount">${physicalListSize }</span></td>
+						</g:if> 
 						<g:each in="${planningConsoleList}" var="assets"><td>${assets.serverCount }</td>
 					    </g:each>
 					</tr>
 					<tr class="even">
 						<td><b>Virtual Servers</b></td>
+						<g:if test="${planningDashboard!='planningDashboard'}">
+							<td><span id="allVirtualCount">${virtualListSize }</span></td>
+						</g:if>
 						<g:each in="${planningConsoleList}" var="assets"><td>${assets.vmCount }</td>
 					    </g:each>
 					</tr>
 				</table>
 			</div>
 </div>
-<g:if test="${planningDashboard!='planningDashboard'}">
-	<img id="upArrow"  style="display:none; margin-top:70px;" src="../images/arrow_blue_up.png" onclick="collapsePage()"/>
-	<img id="downArrow" style="margin-top:70px" src="../images/arrow_blue_down.png" onclick="openPage()"/>
-</g:if>

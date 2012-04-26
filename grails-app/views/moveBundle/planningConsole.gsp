@@ -9,7 +9,7 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	
-	${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + "server" +\'&dependencyBundle=\'+ null', onComplete:'listUpdate(e)') }
+	${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + "Apps" +\'&dependencyBundle=\'+ null', onComplete:'listUpdate(e)') }
 	
 	$("#createEntityView").dialog({ autoOpen: false })
 	$("#showEntityView").dialog({ autoOpen: false })
@@ -32,10 +32,12 @@ $(document).ready(function() {
 <body>
 	<input type="hidden" id="redirectTo" name="redirectTo" value="planningConsole" />
 	<div class="body">
-		<div id="dependencyTitle" style="float: left;display: none">
+		<div id="dependencyTitle" style="float: left;">
 			<h1>Dependency Console</h1>
+			<img id="upArrow"  style="display:none; margin-left: 179px; margin-top: -22px; float: left; " src="../images/TriangleArrow-Up.svg.png" onclick="collapsePage()"/>
+	        <img id="downArrow" style="float:left;	 margin-left: 179px; margin-top: -22px;" src="../images/TriangleArrow-Down.svg.png" onclick="openPage()"/>
 		</div>
-		<div id="checkBoxDiv" style="float: left;;display: none; margin-left: 50px;">
+		<div id="checkBoxDiv" style="float: left;margin-top:10px;display: none; margin-left: 50px;">
 		<g:form name="checkBoxForm"> 
 			<div style="float: left;">
 				<h3>Connection Type</h3>
@@ -128,6 +130,10 @@ $(document).ready(function() {
 		$('.highlightSpan').css('font-weight','normal')
 		$('#span_'+dependencyBundle).css('background-color','yellow')
 		$('#span_'+dependencyBundle).css('font-weight','bold')
+		if(dependencyBundle==null){
+			$('#allDependencyBundle').css('background-color','yellow')
+			$('#allDependencyBundle').css('font-weight','bold')
+		}
 		
 		switch(value){
 		case "server" :
@@ -154,12 +160,10 @@ $(document).ready(function() {
     }
     function collapsePage(){
       $('#checkBoxDiv').hide(300);
-      $('#dependencyTitle').hide(300);
       $('#upArrow').css('display','none')
       $('#downArrow').css('display','inline')
     }
     function openPage(){
-    	$('#dependencyTitle').show(300);
         $('#checkBoxDiv').show(300)
         $('#upArrow').css('display','inline')
         $('#downArrow').css('display','none')

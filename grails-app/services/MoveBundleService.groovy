@@ -447,10 +447,17 @@ class MoveBundleService {
 			 time = formatter.format(date)
 		 }
 		 def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance,true)
+		 
+		def  assetDependentlist = AssetDependencyBundle.findAllByProject(projectInstance)?.sort{it.dependencyBundle}
+		
+		def physicalListSize = assetDependentlist.findAll{ it.asset.assetType ==  'Server' }.size()
+		def virtualListSize = assetDependentlist.findAll{ it.asset.assetType ==  'VM' }.size()
+		def applicationListSize = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.size()
  
 		 def map = [assetDependencyList:assetDependencyList, dependencyType:dependencyType, planningConsoleList:planningConsoleList,
 				 date:time, dependencyStatus:dependencyStatus, assetDependency:new AssetDependency(), dependencyBundleCount:dependencyBundleCount,
-				 servers:servers, applications:applications, dbs:dbs, files:files,moveBundle:moveBundleList]
+				 servers:servers, applications:applications, dbs:dbs, files:files,moveBundle:moveBundleList,applicationListSize:applicationListSize,
+				 physicalListSize:physicalListSize,virtualListSize:virtualListSize]
 		 
 		 return map
 	 }
