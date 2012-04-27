@@ -1,6 +1,6 @@
 var w = 970, 
 h = 575, 
-r = 10, 
+r = 7, 
 fill = d3.scale.category20();
 var vis = d3.select("body")
 			.append("svg:svg")
@@ -29,17 +29,42 @@ d3.json("miserables.json", function(json) {
 				.append("svg:g")
 				.attr("class", "node")
 				.call(force.drag);
+	
+	/*node.each(function(d) {
+		alert("dd-->"+d.type)
+		switch(d.type){
+			case 'Application':
+				jQuery(this).append("svg:circle")
+					.attr("r", r).style("fill", function(d) {return fill(d.group);
+				});
+			break;
+			case 'VM' :
+			case 'Server':
+				jQuery(this).append("svg:rect")
+					.attr("rx", 8).attr("ry", 4)
+					.style("fill", function(d) {return fill(d.group);
+				});
+			break;
+			case 'Files'
+		    case 'Database'
+		    	jQuery(this).append("svg:ellipse")
+					.attr("rx", 8).attr("ry", 4)
+					.style("fill", function(d) {return fill(d.group);
+				});
+			break;
+		}
+	});*/
 
 	node.append("svg:circle")
 		.attr("r", r).style("fill", function(d) {return fill(d.group);
 	});
-
-	node.append("svg:image").attr("class", "circle")
+	
+	/*node.append("svg:image").attr("class", "circle")
 		.attr("xlink:href","https://d3nwyuy0nl342s.cloudfront.net/images/icons/public.png")
 		.attr("x", "-8px")
 		.attr("y", "-8px")
 		.attr("width", "16px")
-		.attr("height", "16px");
+		.attr("height", "16px");*/
 
 	node.append("svg:text").attr("class", "nodetext")
 		.attr("dx", 12)
