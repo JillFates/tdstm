@@ -1,47 +1,61 @@
-var width = 970,
-    height = 575;
-
-var color = d3.scale.category20();
-
-var force = d3.layout.force()
-    .size([width, height]);
-
-var svg = d3.select("#chart").append("svg")
-    .attr("width", width)
-    .attr("height", height);
-
+var w = 970, 
+h = 575, 
+r = 10, 
+fill = d3.scale.category20();
+var vis = d3.select("body")
+			.append("svg:svg")
+			.attr("width", w)
+			.attr("height", h);
 d3.json("miserables.json", function(json) {
-  force
-      .nodes(json.nodes)
-      .links(json.links)
-      .charge(json.force)
-      .linkDistance(json.linkdistance)
-      .start();
+	var force = self.force = d3.layout.force()
+				.nodes(json.nodes).links(json.links)
+				.gravity(.05)
+				.distance(json.linkdistance)
+				.charge(json.force)
+				.size([ w, h ])
+				.start();
+	var link = vis.selectAll("line.link")
+				.data(json.links).enter()
+				.append("svg:line")
+				.attr("class", "link")
+				.attr("x1", function(d) { return d.source.x;})
+				.attr("y1", function(d) { return d.source.y;})
+				.attr("x2", function(d) { return d.target.x;})
+				.attr("y2", function(d) {
+		return d.target.y;
+	});
+	var node = vis.selectAll("g.node")
+				.data(json.nodes).enter()
+				.append("svg:g")
+				.attr("class", "node")
+				.call(force.drag);
 
-  var link = svg.selectAll("line.link")
-      .data(json.links)
-    .enter().append("line")
-      .attr("class", "link")
-      .style("stroke-width", function(d) { return Math.sqrt(d.value); });
+	node.append("svg:circle")
+		.attr("r", r).style("fill", function(d) {return fill(d.group);
+	});
 
-  var node = svg.selectAll("circle.node")
-      .data(json.nodes)
-    .enter().append("circle")
-      .attr("class", "node")
-      .attr("r", 5)
-      .style("fill", function(d) { return color(d.group); })
-      .call(force.drag);
+	node.append("svg:image").attr("class", "circle")
+		.attr("xlink:href","https://d3nwyuy0nl342s.cloudfront.net/images/icons/public.png")
+		.attr("x", "-8px")
+		.attr("y", "-8px")
+		.attr("width", "16px")
+		.attr("height", "16px");
 
-  node.append("title")
-      .text(function(d) { return [d.name + d.type + d.id]; });
+	node.append("svg:text").attr("class", "nodetext")
+		.attr("dx", 12)
+		.attr("dy",".35em")
+		.text(function(d) {return d.name});
 
-  force.on("tick", function() {
-    link.attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
+	force.on("tick", function() {
+		link.attr("x1", function(d) {return d.source.x;})
+		.attr("y1", function(d) {return d.source.y;})
+		.attr("x2", function(d) {return d.target.x;})
+		.attr("y2", function(d) {return d.target.y;});
 
-    node.attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; });
-  });
+	node.attr("cx", function(d) {return d.x = Math.max(r, Math.min(w - r, d.x));})
+		.attr("cy", function(d) {return d.y = Math.max(r, Math.min(h - r, d.y));})
+		.attr("transform", function(d) {
+			return "translate(" + d.x + "," + d.y + ")";
+		});
+	});
 });

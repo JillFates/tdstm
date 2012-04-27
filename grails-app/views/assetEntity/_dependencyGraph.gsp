@@ -43,13 +43,28 @@
 					<td colspan="2" style="padding: 0px 0px 6px 0px ;text-align: left;"><h4>Show Labels</h4></td>
 				</tr>
 				<tr>
-					<td colspan="2" style="padding: 0px;"><input type="checkbox" name="labels" value="apps">&nbsp;Apps</td>
+					<g:if test="${labels.contains('apps')}">
+						<td colspan="2" style="padding: 0px;"><input type="checkbox" name="labels" value="apps" checked="checked">&nbsp;Apps</td>
+					</g:if>
+					<g:else>
+					    <td colspan="2" style="padding: 0px;"><input type="checkbox" name="labels" value="apps" >&nbsp;Apps</td>
+					</g:else>
 				</tr>
 				<tr>
+				<g:if test="${labels.contains('servers')}">
+					<td colspan="2" style="padding: 0px;"><input type="checkbox" name="labels" checked="checked" value="servers">&nbsp;Servers</td>
+				</g:if>
+				<g:else>
 					<td colspan="2" style="padding: 0px;"><input type="checkbox" name="labels" value="servers">&nbsp;Servers</td>
+				</g:else>
 				</tr>
 				<tr>
+				<g:if test="${labels.contains('files')}">
+					<td colspan="2" style="padding: 0px;"><input type="checkbox" name="labels" checked="checked" value="files">&nbsp;DB/Files</td>
+				</g:if>
+				<g:else>
 					<td colspan="2" style="padding: 0px;"><input type="checkbox" name="labels" value="files">&nbsp;DB/Files</td>
+				</g:else>
 				</tr>
 				<tr>
 					<td colspan="2" style="padding: 0px;text-align: center;">

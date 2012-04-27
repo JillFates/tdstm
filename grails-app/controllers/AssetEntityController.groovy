@@ -2941,12 +2941,20 @@ class AssetEntityController {
 			def graphData = [:]
 			def force = params.force && params.force != 'undefined' ? params.force : -120
 			def distance = params.distance && params.distance != 'undefined' ? params.distance : 30
-			def labels = params.labelsList ?  params.labelsList.split(",") : []
+			List labels = params.labelsList ?  params.labelsList.split(",") : []
 			graphData << ["force":force]
 			graphData << ["linkdistance":distance]
 			def graphNodes = []
 			assetDependentlist.each{
-				graphNodes << ["id":it.asset.id,"name":it.asset.assetName,"type":it.asset.assetType,"group":it.dependencyBundle]
+				def name = ""
+				if(labels.contains("apps") && it.asset.assetType == "Application"){
+				  name = it.asset.assetName
+				} else if(labels.contains("servers") && ['VM','Server'].contains(it.asset.assetType)){
+					name = it.asset.assetName
+				} else if(labels.contains("files") && ['Database','Files'].contains(it.asset.assetType)){
+					name = it.asset.assetName
+				}
+				graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle]
 			}
 			graphData << ["nodes":graphNodes]
 			def assetDependencies = AssetDependency.findAll("From AssetDependency where asset.project = :project OR dependent.project = :project",[project:project])
