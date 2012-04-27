@@ -124,7 +124,7 @@ $(document).ready(function() {
 	</div>
 
 <script type="text/javascript">
-	function getList(value,dependencyBundle){
+	function getList(value,dependencyBundle, force, distance, labels){
 		$('#moveBundleSelectId').dialog("close")
 		$('.highlightSpan').css('background-color','#EEEEEE')
 		$('.highlightSpan').css('font-weight','normal')
@@ -149,7 +149,13 @@ $(document).ready(function() {
 			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
 			break;
 		case "graph" :
-			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
+			var labelsList = ""
+			if(labels =="labels"){
+				$('#labelTree input:checked').each(function() {
+					labelsList += $(this).val() + ',';
+				});
+			}
+			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&force=\'+ force+\'&distance=\'+ distance+\'&labelsList=\'+ labelsList', onComplete:'listUpdate(e)') }
 			break;
 		}
 	}

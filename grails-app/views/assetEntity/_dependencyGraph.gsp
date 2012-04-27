@@ -16,47 +16,44 @@
 			href="javascript:getList('graph',${dependencyBundle})">Map</a></li>
 	</ul>
 	<div class="tabInner">
-		<div style="float: left;">
-			<table cellpadding="0" cellspacing="0" border="0" style="width: 123px; z-index: 100000">
+		<div style="float: left;border: 1px solid #ccc;margin-left: 3px;margin-top: 3px;">
+			<table id="labelTree" cellpadding="0" cellspacing="0" style="width: 125px;margin-left: 5px;border: 0" >
 				<tr>
 					<td colspan="2" style="padding: 0px;"><h4>Control Panel</h4></td>
 				</tr>
 				<tr>
 					<td style="padding: 0px;width: 30px;">Force</td>
 					<td style="padding-left :5px;">
-					<strong><a href="javascript:increaseValue('sub','forceId')"><</a></strong> 
-					<input type="text" id="forceId" name="force" value="0" style="width: 30px;border: 0px;background-color: #FFF;text-align: center;">
-					<strong><a href="javascript:increaseValue('add','forceId')">></a></strong> 
+					<img src="${createLinkTo(dir:'images',file:'minus.gif')}" height="18" onclick="increaseValue('sub','forceId')"/>
+					<input type="text" id="forceId" name="force" value="${force}" disabled="disabled" style="width: 30px;border: 0px;background-color: #FFF;text-align: center;vertical-align: top;">
+					<img src="${createLinkTo(dir:'images',file:'plus.gif')}" height="18" onclick="increaseValue('add','forceId')"/> 
 				</tr>
 				<tr>
 					<td style="padding: 0px;width: 30px;">Links</td>
 					<td style="padding-left :5px">
-					<strong><a href="javascript:increaseValue('sub','linksId')"><</a></strong> 
-					<input type="text" id="linksId" name="links" value="0" style="width: 30px;border: 0px;background-color: #FFF;text-align: center;" >
-					<strong><a href="javascript:increaseValue('add','linksId')">></a></strong> 
+					<img src="${createLinkTo(dir:'images',file:'minus.gif')}" height="18" onclick="increaseValue('sub','linksId')"/>
+					<input type="text" id="linksId" name="links" value="${distance}" disabled="disabled" style="width: 30px;border: 0px;background-color: #FFF;text-align: center;" >
+					<img src="${createLinkTo(dir:'images',file:'plus.gif')}" height="18" onclick="increaseValue('add','linksId')"/>
 					</td>
 				</tr>
 				<tr>
 					<td colspan="2" style="padding: 0px;">&nbsp;</td>
 				</tr>
 				<tr>
-					<td colspan="2" style="padding: 0px;"><h4>Show Labels</h4></td>
+					<td colspan="2" style="padding: 0px 0px 6px 0px ;text-align: left;"><h4>Show Labels</h4></td>
 				</tr>
 				<tr>
-					<td colspan="2" style="padding: 0px;"><input type="checkbox">
-						Apps</td>
+					<td colspan="2" style="padding: 0px;"><input type="checkbox" name="labels" value="apps">&nbsp;Apps</td>
 				</tr>
 				<tr>
-					<td colspan="2" style="padding: 0px;"><input type="checkbox">
-						Servers</td>
+					<td colspan="2" style="padding: 0px;"><input type="checkbox" name="labels" value="servers">&nbsp;Servers</td>
 				</tr>
 				<tr>
-					<td colspan="2" style="padding: 0px;"><input type="checkbox">
-						DB/Files</td>
+					<td colspan="2" style="padding: 0px;"><input type="checkbox" name="labels" value="files">&nbsp;DB/Files</td>
 				</tr>
 				<tr>
-					<td colspan="2" style="padding: 0px;"><input type="button"
-						value="Refresh Map"></td>
+					<td colspan="2" style="padding: 0px;text-align: center;">
+					<input type="button" value="Refresh Map" onclick="getList('graph',${dependencyBundle},$('#forceId').val(), $('#linksId').val(),'labels' )"></td>
 				</tr>
 			</table>
 		</div>

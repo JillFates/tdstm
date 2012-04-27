@@ -2939,6 +2939,11 @@ class AssetEntityController {
 			def appDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.size()
 			def assetEntityListSize = assetDependentlist.findAll{it.asset.assetType ==  'VM' || it.asset.assetType ==  'Server' }.size()
 			def graphData = [:]
+			def force = params.force && params.force != 'undefined' ? params.force : -120
+			def distance = params.distance && params.distance != 'undefined' ? params.distance : 30
+			def labels = params.labelsList ?  params.labelsList.split(",") : []
+			graphData << ["force":force]
+			graphData << ["linkdistance":distance]
 			def graphNodes = []
 			assetDependentlist.each{
 				graphNodes << ["id":it.asset.id,"name":it.asset.assetName,"type":it.asset.assetType,"group":it.dependencyBundle]
@@ -2958,7 +2963,8 @@ class AssetEntityController {
 			def currentfile = ApplicationHolder.application.parentContext.getResource( "/d3/force/miserables.json" ).getFile()
 			currentfile.write(output.toString());
 			render(template:'dependencyGraph',model:[assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
-										   filesDependentListSize:filesListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbDependentListSize,asset:'graph'])
+										   filesDependentListSize:filesListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbDependentListSize,
+										   asset:'graph', force:force, distance:distance, labels:labels ])
 			break;
 		}
 	}	

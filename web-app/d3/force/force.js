@@ -4,8 +4,6 @@ var width = 970,
 var color = d3.scale.category20();
 
 var force = d3.layout.force()
-    .charge(-120)
-    .linkDistance(30)
     .size([width, height]);
 
 var svg = d3.select("#chart").append("svg")
@@ -16,6 +14,8 @@ d3.json("miserables.json", function(json) {
   force
       .nodes(json.nodes)
       .links(json.links)
+      .charge(json.force)
+      .linkDistance(json.linkdistance)
       .start();
 
   var link = svg.selectAll("line.link")
