@@ -500,7 +500,7 @@ class MoveBundleController {
 			String eventMoveBundles = allMoveBundle
 			eventMoveBundles = eventMoveBundles.replace("[[","('").replace(",", "','").replace("], [","','").replace("]]","')").replace("]',' [", "','")
 			if(allMoveBundle.size()>0){
-				potential  = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle.moveEvent != ${moveEvent.id} and moveEvent = ${moveEvent.id} and  value = 'Y' or (value is null or value = '') and (application.planStatus is null or application.planStatus in ('Unassigned','')) and application.project=$projectId  group by application").size()
+				potential  = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle.moveEvent != ${moveEvent.id} and moveEvent = ${moveEvent.id} and  (value = 'Y' or value is null or value = '') and (application.planStatus is null or application.planStatus in ('Unassigned','')) and application.project=$projectId  group by application").size()
 				optional = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle.moveEvent != ${moveEvent.id} and moveEvent = ${moveEvent.id} and value = 'Y' and (application.planStatus is null or application.planStatus in ('Unassigned','')) and application.project=$projectId  group by application").size()
 			}
 			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,'potential':potential,'optional':optional]
