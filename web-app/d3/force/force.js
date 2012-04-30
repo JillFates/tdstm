@@ -29,25 +29,24 @@ d3.json("miserables.json", function(json) {
 				.append("svg:g")
 				.attr("class", "node")
 				.call(force.drag);
-
+	
 	/*node.each(function(d) {
-		alert("dd-->"+d.type)
 		switch(d.type){
 			case 'Application':
-				jQuery(this).append("svg:circle")
+				vis.select(this).append("svg:circle")
 					.attr("r", r).style("fill", function(d) {return fill(d.group);
 				});
 			break;
 			case 'VM' :
 			case 'Server':
-				jQuery(this).append("svg:rect")
+				vis.select(this).append("svg:rect")
 					.attr("rx", 8).attr("ry", 4)
 					.style("fill", function(d) {return fill(d.group);
 				});
 			break;
-			case 'Files'
-		    case 'Database'
-		    	jQuery(this).append("svg:ellipse")
+			case 'Files':
+		    case 'Database':
+		    	vis.select(this).append("svg:ellipse")
 					.attr("rx", 8).attr("ry", 4)
 					.style("fill", function(d) {return fill(d.group);
 				});
@@ -58,6 +57,7 @@ d3.json("miserables.json", function(json) {
 	node.append("svg:circle")
 		.attr("r", r).style("fill", function(d) {return fill(d.group);
 	});
+	
 	
 	/*node.append("svg:image").attr("class", "circle")
 		.attr("xlink:href","https://d3nwyuy0nl342s.cloudfront.net/images/icons/public.png")
