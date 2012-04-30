@@ -14,7 +14,7 @@
 					
 		            
 					<tr class="odd">
-						<td><b>Dependency Bundle</b></td>
+						<td><b>Dependency Group</b></td>
 						<g:if test="${planningDashboard!='planningDashboard'}">
 							<td><span id="allDependencyBundle" class="highlightSpan"  style="cursor: pointer; background-color: yellow;font-weight:bold;" onclick="getList('Apps',null)" >All</span></td>
 						</g:if> 

@@ -1,7 +1,7 @@
-var w = 970, 
-h = 575, 
-r = 7, 
-fill = d3.scale.category20();
+var w = 1500,
+	h = 1000,
+	r = 5,
+	fill = d3.scale.category20();
 var vis = d3.select("body")
 			.append("svg:svg")
 			.attr("width", w)
@@ -29,7 +29,7 @@ d3.json("miserables.json", function(json) {
 				.append("svg:g")
 				.attr("class", "node")
 				.call(force.drag);
-	
+
 	/*node.each(function(d) {
 		alert("dd-->"+d.type)
 		switch(d.type){
