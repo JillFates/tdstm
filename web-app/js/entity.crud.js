@@ -118,9 +118,9 @@ function showModelView(e){
 function showComment(id , action){
 	   var id = id
 	   if(action =='edit'){
-	   new Ajax.Request('../assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog(e, 'edit');}})
+	   new Ajax.Request('../assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog(e, 'edit');commentChangeShow();}})
 	   }else{
-		   new Ajax.Request('../assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog(e, 'show');}})
+		   new Ajax.Request('../assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog(e, 'show');commentChangeShow();}})
 	   }
 }
 function validateFileFormat(){
