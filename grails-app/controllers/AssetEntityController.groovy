@@ -2939,8 +2939,8 @@ class AssetEntityController {
 			def appDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.size()
 			def assetEntityListSize = assetDependentlist.findAll{it.asset.assetType ==  'VM' || it.asset.assetType ==  'Server' }.size()
 			def graphData = [:]
-			def force = params.force && params.force != 'undefined' ? params.force : -120
-			def distance = params.distance && params.distance != 'undefined' ? params.distance : 30
+			def force = params.force && params.force != 'undefined' ? params.force : -70
+			def distance = params.distance && params.distance != 'undefined' ? params.distance : 20
 			List labels = params.labelsList ?  params.labelsList.split(",") : []
 			graphData << ["force":force]
 			graphData << ["linkdistance":distance]
