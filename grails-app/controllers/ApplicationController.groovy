@@ -312,13 +312,15 @@ class ApplicationController {
 										   toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
 										   where toAsset = ?""",[assetEntityInstance])
 			AssetDependency.executeUpdate("delete AssetDependency where asset = ? or dependent = ? ",[applicationInstance, applicationInstance])
-			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
-			Application.executeUpdate("delete from Application a where a.id = ${applicationInstance.id}")
+			
 			AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = ${applicationInstance.id}")
 			def appMoveInstance = AppMoveEvent.findAllByApplication(applicationInstance);
 			appMoveInstance.each{
 			         it.delete(flush:true)
 			}
+			applicationInstance.delete();
+			assetEntityInstance.delete();
+			
 			flash.message = "Application ${assetName} deleted"
 			if(params.dstPath =='planningConsole'){
 				forward( controller:'assetEntity',action:'getLists', params:[entity: 'Apps',dependencyBundle:session.getAttribute("dependencyBundle")])

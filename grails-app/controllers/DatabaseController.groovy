@@ -257,9 +257,11 @@ class DatabaseController {
 			AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
 										   toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
 										   where toAsset = ?""",[assetEntityInstance])
-			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
-			Database.executeUpdate("delete from Database d where d.id = ${databaseInstance.id}")
+			AssetDependency.executeUpdate("delete AssetDependency where asset = ? or dependent = ? ",[assetEntityInstance, assetEntityInstance])
 			AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = ${databaseInstance.id}")
+			databaseInstance.delete()
+			assetEntityInstance.delete()
+			
 			flash.message = "Database ${assetName} deleted"
 			if(params.dstPath =='planningConsole'){
 				forward( controller:'assetEntity',action:'getLists', params:[entity: 'database',dependencyBundle:session.getAttribute("dependencyBundle")])

@@ -1260,9 +1260,10 @@ class AssetEntityController {
 											toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
 											where toAsset = ?""",[assetEntityInstance])
 			AssetDependency.executeUpdate("delete AssetDependency where asset = ? or dependent = ? ",[assetEntityInstance, assetEntityInstance])
-			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.id = ${assetEntityInstance.id}")
-            AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = ${assetEntityInstance.id}")
+			AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = ${assetEntityInstance.id}")
+            
 			flash.message = "AssetEntity ${assetEntityInstance.assetName} deleted"
+			assetEntityInstance.delete()
 			if(redirectAsset?.contains("room_")){
 				def newredirectAsset = redirectAsset.split("_")
 				redirectAsset = newredirectAsset[0]
