@@ -92,6 +92,7 @@ class MoveEventController {
 				jdbcTemplate.update("DELETE FROM move_event_news WHERE move_event_id = ${moveEventInstance?.id} " )
 				jdbcTemplate.update("UPDATE move_bundle SET move_event_id = null WHERE move_event_id = ${moveEventInstance?.id} " )
 				jdbcTemplate.update("DELETE FROM user_preference WHERE value = ${moveEventInstance?.id}")
+				AppMoveEvent.executeUpdate("DELETE FROM AppMoveEvent where move_event_id = ${moveEventInstance?.id} ")
         	    moveEventInstance.delete()
             	flash.message = "MoveEvent ${moveEventName} deleted"
         	} else {
