@@ -2948,14 +2948,22 @@ class AssetEntityController {
 			def graphNodes = []
 			assetDependentlist.each{
 				def name = ""
-				if(labels.contains("apps") && it.asset.assetType == "Application"){
-				  name = it.asset.assetName
-				} else if(labels.contains("servers") && ['VM','Server'].contains(it.asset.assetType)){
-					name = it.asset.assetName
-				} else if(labels.contains("files") && ['Database','Files'].contains(it.asset.assetType)){
-					name = it.asset.assetName
+				def shape = "circle"
+				def size = 150
+				if(it.asset.assetType == "Application"){
+					if(labels.contains("apps"))
+						name = it.asset.assetName
+					shape = "circle"
+				} else if(['VM','Server'].contains(it.asset.assetType)){
+					if(labels.contains("servers"))
+						name = it.asset.assetName
+					shape = "square"
+				} else if(['Database','Files'].contains(it.asset.assetType)){
+					if(labels.contains("files"))
+						name = it.asset.assetName
+					shape = "cross"
 				}
-				graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle]
+				graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle, shape:shape, size : size]
 			}
 			graphData << ["nodes":graphNodes]
 			def assetDependencies = AssetDependency.findAll("From AssetDependency where asset.project = :project OR dependent.project = :project",[project:project])

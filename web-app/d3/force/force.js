@@ -24,47 +24,14 @@ d3.json("miserables.json", function(json) {
 				.attr("y2", function(d) {
 		return d.target.y;
 	});
-	var node = vis.selectAll("g.node")
+	var node = vis.selectAll("path")
 				.data(json.nodes).enter()
-				.append("svg:g")
+				.append("svg:path")
 				.attr("class", "node")
-				.call(force.drag);
-	
-	/*node.each(function(d) {
-		switch(d.type){
-			case 'Application':
-				vis.select(this).append("svg:circle")
-					.attr("r", r).style("fill", function(d) {return fill(d.group);
-				});
-			break;
-			case 'VM' :
-			case 'Server':
-				vis.select(this).append("svg:rect")
-					.attr("rx", 8).attr("ry", 4)
-					.style("fill", function(d) {return fill(d.group);
-				});
-			break;
-			case 'Files':
-		    case 'Database':
-		    	vis.select(this).append("svg:ellipse")
-					.attr("rx", 8).attr("ry", 4)
-					.style("fill", function(d) {return fill(d.group);
-				});
-			break;
-		}
-	});*/
-
-	node.append("svg:circle")
-		.attr("r", r).style("fill", function(d) {return fill(d.group);
-	});
-	
-	
-	/*node.append("svg:image").attr("class", "circle")
-		.attr("xlink:href","https://d3nwyuy0nl342s.cloudfront.net/images/icons/public.png")
-		.attr("x", "-8px")
-		.attr("y", "-8px")
-		.attr("width", "16px")
-		.attr("height", "16px");*/
+				.call(force.drag)
+				.attr("d", d3.svg.symbol().size(function(d) { return d.size; }).type(function(d) { return d.shape; }))
+			    .style("fill", function(d) {return fill(d.group);});
+			      
 
 	node.append("svg:text").attr("class", "nodetext")
 		.attr("dx", 12)
