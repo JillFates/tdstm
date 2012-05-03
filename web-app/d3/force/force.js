@@ -31,23 +31,29 @@ d3.json("miserables.json", function(json) {
 				.call(force.drag)
 				.attr("d", d3.svg.symbol().size(function(d) { return d.size; }).type(function(d) { return d.shape; }))
 			    .style("fill", function(d) {return fill(d.group);});
-			      
-
-	node.append("svg:text").attr("class", "nodetext")
-		.attr("dx", 12)
-		.attr("dy",".35em")
-		.text(function(d) {return d.name});
+	node.append("title").text(function(d){ return d.title })
+         
+    var graph = vis.selectAll("g.node")
+				.data(json.nodes).enter()
+				.append("svg:g")
+				.attr("class", "node")
+				.call(force.drag);
+	graph.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
+							.attr("dx", 8)
+							.attr("dy",".35em")
+							.text(function(d) {return d.name});
 
 	force.on("tick", function() {
-		link.attr("x1", function(d) {return d.source.x;})
-		.attr("y1", function(d) {return d.source.y;})
-		.attr("x2", function(d) {return d.target.x;})
-		.attr("y2", function(d) {return d.target.y;});
+			link.attr("x1", function(d) {return d.source.x;})
+				.attr("y1", function(d) {return d.source.y;})
+				.attr("x2", function(d) {return d.target.x;})
+				.attr("y2", function(d) {return d.target.y;});
 
 	node.attr("cx", function(d) {return d.x = Math.max(r, Math.min(w - r, d.x));})
 		.attr("cy", function(d) {return d.y = Math.max(r, Math.min(h - r, d.y));})
-		.attr("transform", function(d) {
-			return "translate(" + d.x + "," + d.y + ")";
-		});
+		.attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";});
+	graph.attr("cx", function(d) {return d.x = Math.max(r, Math.min(w - r, d.x));})
+		.attr("cy", function(d) {return d.y = Math.max(r, Math.min(h - r, d.y));})
+		.attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";});
 	});
 });

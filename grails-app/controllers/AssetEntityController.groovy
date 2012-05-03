@@ -2950,6 +2950,7 @@ class AssetEntityController {
 				def name = ""
 				def shape = "circle"
 				def size = 150
+				def title = it.asset.assetName
 				if(it.asset.assetType == "Application"){
 					if(labels.contains("apps"))
 						name = it.asset.assetName
@@ -2961,9 +2962,10 @@ class AssetEntityController {
 				} else if(['Database','Files'].contains(it.asset.assetType)){
 					if(labels.contains("files"))
 						name = it.asset.assetName
-					shape = "cross"
+					shape = "triangle-up"
 				}
-				graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle, shape:shape, size : size]
+				graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle, 
+								shape:shape, size : size, title: title]
 			}
 			graphData << ["nodes":graphNodes]
 			def assetDependencies = AssetDependency.findAll("From AssetDependency where asset.project = :project OR dependent.project = :project",[project:project])
