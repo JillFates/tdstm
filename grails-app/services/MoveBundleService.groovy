@@ -319,6 +319,9 @@ class MoveBundleService {
 		 String time = formatter.format(date);
 
 		 def projectInstance = Project.get(projectId)
+		 
+		 // Get array of the valid status types to test against
+		 def statusList = [ statusTypes.split(',') ]
 
 		 String movebundleList = MoveBundle.findAllByUseOfPlanningAndProject(true,projectInstance).id
 		 movebundleList = movebundleList.replace("[","('").replace("]","')").replace(",","','")
@@ -374,7 +377,7 @@ class MoveBundleService {
 				log.debug "Processing asset ${asset.id}:${asset.assetName}:${asset.assetType}:i=${i}:loops=${loops++}:stack=${stack.size()}"
 			 	AssetDependency.findAllByDependent(asset).each { ad ->
 					def id = ad.asset.id
-				 	if ( id && ! ( groupIds.contains(id) || bundledIds.contains(id) ) ) {
+				 	if ( id && statusList.contains(ad.status) && ! ( groupIds.contains(id) || bundledIds.contains(id) ) ) {
 					 	stack << ad.asset
 						groupAssets << ad.asset
 						groupIds << id
@@ -382,7 +385,7 @@ class MoveBundleService {
 				}
 				AssetDependency.findAllByAsset(asset)?.each { ad ->
 					def id = ad.dependent.id
-				 	if ( id && ! ( groupIds.contains(id) || bundledIds.contains(id) ) ) {
+				 	if ( id && statusList.contains(ad.status) && ! ( groupIds.contains(id) || bundledIds.contains(id) ) ) {
 					 	stack << ad.dependent
 						groupAssets << ad.dependent
 						groupIds << id
