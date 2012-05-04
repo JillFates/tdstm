@@ -253,6 +253,7 @@
 					<input name="id" id ="assetId" type="hidden" value="${assetEntityInstance.id}">
 					<input type = "hidden" id = "dstPath" name = "dstPath" value ="${redirectTo}"/>
 					<input name="redirectTo" type="hidden" value="${redirectTo}">
+					<input type = "hidden" id = "tabType" name="tabType" value =""/>
 					<g:if test="${redirectTo!='planningConsole'}">
 					  <span class="button"><g:actionSubmit class="save" value="Update"  /> </span>
 					  <span class="button"><g:actionSubmit class="delete"	onclick=" return confirm('Are you sure?');" value="Delete" /> </span>
@@ -269,4 +270,5 @@
 <script>
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')
+	$('#tabType').val($('#assetTypesId').val())
 </script>

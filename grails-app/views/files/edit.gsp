@@ -156,6 +156,7 @@
 					<input  name="supportCount"  id="supportCount" type="hidden" value="${supportAssets.size()}">
 					<input name="redirectTo" type="hidden" value="${redirectTo}">
 					<input type = "hidden" id ="filesId"  value ="${fileInstance.id}"/>
+					<input type = "hidden" id = "tabType" name="tabType" value =""/>
 					<g:if test="${redirectTo!='planningConsole'}">
 					  <span class="button"><g:actionSubmit class="save" value="Update"  /> </span>
 					  <span class="button"><g:actionSubmit class="delete"	onclick=" return confirm('Are you sure?');" value="Delete" /> </span>
@@ -172,4 +173,5 @@
 <script>
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')
+	$('#tabType').val($('#assetTypesId').val())
 </script>

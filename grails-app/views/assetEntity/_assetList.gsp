@@ -11,6 +11,7 @@
 	</ul>
     <div id ="selectionId" >
    		<input type="hidden" id="assetTypeId" name="assetType" value="${asset}" />
+   		<input type="hidden" id="assetTypesId" name="assetType" value="server" />
 		<input id="state" type="button"  class="submit" value="Change MoveBundle" onclick="changeMoveBundle($('#assetTypeId').val(),${assetList.id})"  />
 		<input id="state" type="button"  class="submit" value="All.." onclick="selectAll()" title="Select All" />
 	</div>

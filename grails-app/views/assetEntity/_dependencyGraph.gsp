@@ -17,7 +17,7 @@
 			href="javascript:getList('graph',${dependencyBundle})">Map</a></li>
 	</ul>
 	<div class="tabInner">
-	<input type="hidden" id="assetTypeId" name="assetType" value="graph" />
+	<input type="hidden" id="assetTypesId" name="assetType" value="${asset}" />
 		<div id="item1" style="float: left;z-index: 10000px;">
 			<div style="float: left;border: 1px solid #ccc;margin-left: 3px;margin-top: 3px;width: 331px">
 				<table id="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;width: 331px;" >
