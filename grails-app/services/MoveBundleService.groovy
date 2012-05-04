@@ -321,8 +321,8 @@ class MoveBundleService {
 		 def projectInstance = Project.get(projectId)
 		 
 		 // Get array of the valid status and connection types to check against in the inner loop
-		 ArrayList statusList = statusTypes.replace("'",'').split(',')
-		 ArrayList connectionList = connectionTypes.replace("'",'').split(',')
+		 def statusList = statusTypes.replaceAll(', ',',').replaceAll("'",'').tokenize(',')
+		 def connectionList = connectionTypes.replaceAll(', ',',').replaceAll("'",'').tokenize(',')
 
 		 // Find all move bundles that are flagged for Planning in the project and then get all assets in those bundles
 		 String movebundleList = MoveBundle.findAllByUseOfPlanningAndProject(true,projectInstance).id
