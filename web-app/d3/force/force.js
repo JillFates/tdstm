@@ -1,12 +1,12 @@
-var w = 1500,
+var w = 1200,
 	h = 1000,
 	r = 5,
 	fill = d3.scale.category20();
-var vis = d3.select("body")
+var vis = d3.select("div#item1")
 			.append("svg:svg")
 			.attr("width", w)
 			.attr("height", h);
-d3.json("miserables.json", function(json) {
+d3.json("../d3/force/miserables.json", function(json) {
 	var force = self.force = d3.layout.force()
 				.nodes(json.nodes).links(json.links)
 				.gravity(.05)
@@ -29,9 +29,11 @@ d3.json("miserables.json", function(json) {
 				.append("svg:path")
 				.attr("class", "node")
 				.call(force.drag)
+				.on("dblclick", function(d) { return getEntityDetails('planningConsole', d.type, d.id); })
 				.attr("d", d3.svg.symbol().size(function(d) { return d.size; }).type(function(d) { return d.shape; }))
 			    .style("fill", function(d) {return fill(d.group);});
 	node.append("title").text(function(d){ return d.title })
+	
          
     var graph = vis.selectAll("g.node")
 				.data(json.nodes).enter()

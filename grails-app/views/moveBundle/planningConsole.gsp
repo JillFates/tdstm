@@ -6,7 +6,10 @@
 <title>Planning Console</title>
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
+<script type="text/javascript" src="${createLinkTo(dir:'d3',file:'d3.v2.js')} "></script>
+<link rel="stylesheet" href="${createLinkTo(dir:'d3/force',file:'force.css')}" type="text/css"/>
 <script type="text/javascript">
+
 $(document).ready(function() {
 	
 	${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + "Apps" +\'&dependencyBundle=\'+ null', onComplete:'listUpdate(e)') }
