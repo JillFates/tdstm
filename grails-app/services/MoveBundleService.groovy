@@ -320,15 +320,16 @@ class MoveBundleService {
 
 		 def projectInstance = Project.get(projectId)
 		 
-		 // Get array of the valid status types to test against
-		 def statusList = [ statusTypes.split(',') ]
+		 // Get array of the valid status and connection types to check against in the inner loop
+		 ArrayList statusList = statusTypes.replace("'",'').split(',')
+		 ArrayList connectionList = connectionTypes.replace("'",'').split(',')
 
+		 // Find all move bundles that are flagged for Planning in the project and then get all assets in those bundles
 		 String movebundleList = MoveBundle.findAllByUseOfPlanningAndProject(true,projectInstance).id
 		 movebundleList = movebundleList.replace("[","('").replace("]","')").replace(",","','")
 		 def assetTypeList =  MoveBundleController.dependecyBundlingAssetType
 		 
 		 // Query to fetch dependent asset list with dependency type and status and move bundle list with use for planning .
-		 
 		 def queryForAssets = """SELECT a.asset_entity_id as assetId FROM asset_entity a
 			LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id Or ad.dependent_id = a.asset_entity_id
 			WHERE a.asset_type in ${assetTypeList}
@@ -375,17 +376,19 @@ class MoveBundleService {
 			 while (stack.size() > 0) {
 				asset = stack[0] 
 				log.debug "Processing asset ${asset.id}:${asset.assetName}:${asset.assetType}:i=${i}:loops=${loops++}:stack=${stack.size()}"
+				// cycle through all dependencies that the asset is dependent on
 			 	AssetDependency.findAllByDependent(asset).each { ad ->
 					def id = ad.asset.id
-				 	if ( id && statusList.contains(ad.status) && ! ( groupIds.contains(id) || bundledIds.contains(id) ) ) {
+				 	if ( id && statusList.contains(ad.status) && connectionList.contains(ad.type) && ! ( groupIds.contains(id) || bundledIds.contains(id) ) ) {
 					 	stack << ad.asset
 						groupAssets << ad.asset
 						groupIds << id
 					}
 				}
+				// cycle through all dependencies that the asset supports
 				AssetDependency.findAllByAsset(asset)?.each { ad ->
 					def id = ad.dependent.id
-				 	if ( id && statusList.contains(ad.status) && ! ( groupIds.contains(id) || bundledIds.contains(id) ) ) {
+				 	if ( id && statusList.contains(ad.status) && connectionList.contains(ad.type) && ! ( groupIds.contains(id) || bundledIds.contains(id) ) ) {
 					 	stack << ad.dependent
 						groupAssets << ad.dependent
 						groupIds << id
