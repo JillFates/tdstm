@@ -1,11 +1,13 @@
-var w = 1200,
+var w = 1600,
 	h = 1000,
+	graphstyle = "position:relative;top:-120;z-index:-1;",
 	r = 5,
 	fill = d3.scale.category20();
 var vis = d3.select("div#item1")
 			.append("svg:svg")
 			.attr("width", w)
-			.attr("height", h);
+			.attr("height", h)
+			.attr("style",graphstyle);
 d3.json("../d3/force/miserables.json", function(json) {
 	var force = self.force = d3.layout.force()
 				.nodes(json.nodes).links(json.links)

@@ -1,25 +1,26 @@
 
 <div class="tabs">
 	<ul>
-		<li id="serverli"><a
-			href="javascript:getList('server',${dependencyBundle})"><span>Servers(${assetEntityListSize})
-			</span> </a></li>
-		<li id="appli"><a
-			href="javascript:getList('Apps',${dependencyBundle})">Apps(${appDependentListSize})
-		</a></li>
-		<li id="dbli"><a href="#item3"><a
-				href="javascript:getList('database',${dependencyBundle})">DB(${dbDependentListSize})
-			</a></li>
-		<li id="fileli"><a
-			href="javascript:getList('files',${dependencyBundle})">Files(${filesDependentListSize})
-		</a></li>
-		<li id="graphli" class="active"><a
-			href="javascript:getList('graph',${dependencyBundle})">Map</a></li>
+		<li id="appli">
+			<a href="javascript:getList('Apps',${dependencyBundle})">Apps(${appDependentListSize})</a>
+		</li>
+		<li id="serverli">
+			<a href="javascript:getList('server',${dependencyBundle})"><span>Servers(${assetEntityListSize})</span> </a>
+		</li>
+		<li id="dbli"><a href="#item3">
+			<a href="javascript:getList('database',${dependencyBundle})">DB(${dbDependentListSize})</a>
+		</li>
+		<li id="fileli">
+			<a href="javascript:getList('files',${dependencyBundle})">Files(${filesDependentListSize})</a>
+		</li>
+		<li id="graphli" class="active">
+			<a href="javascript:getList('graph',${dependencyBundle})">Map</a>
+		</li>
 	</ul>
 	<div class="tabInner">
 	<input type="hidden" id="assetTypesId" name="assetType" value="${asset}" />
-		<div id="item1" style="float: left;z-index: 10000px;">
-			<div style="float: left;border: 1px solid #ccc;margin-left: 3px;margin-top: 3px;width: 331px">
+		<div id="item1" style="float: left;z-index: 10000;">
+			<div style="float: left;border: 1px solid #ccc;margin-left: 3px;margin-top: 3px;width: 331px; background-color:white;">
 				<table id="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;width: 331px;" >
 					<tr>
 						<td colspan="2" style="padding: 0px;"><h4>Control Panel</h4></td>
