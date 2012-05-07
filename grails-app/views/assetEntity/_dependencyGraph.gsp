@@ -20,7 +20,7 @@
 	<div class="tabInner">
 	<input type="hidden" id="assetTypesId" name="assetType" value="${asset}" />
 		<div id="item1" style="float: left;z-index: 10000;">
-			<div style="float: left;border: 1px solid #ccc;margin-left: 3px;margin-top: 3px;width: 331px; background-color:white;">
+			<div style="float: left;border: 1px solid #ccc;margin-left: 3px;margin-top: 3px;width: 331px; background-color:white;position: absolute;">
 				<table id="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;width: 331px;" >
 					<tr>
 						<td colspan="2" style="padding: 0px;"><h4>Control Panel</h4></td>
