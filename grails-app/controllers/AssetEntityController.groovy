@@ -2887,6 +2887,7 @@ class AssetEntityController {
 
 	}
 	def getLists ={
+		session.removeAttribute('assetDependentlist')
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 	    def project = Project.findById( projectId )
 		def assetDependentlist
@@ -2896,6 +2897,7 @@ class AssetEntityController {
 			 assetDependentlist = AssetDependencyBundle.findAllByProject(project)?.sort{it.dependencyBundle}
 		}
 		session.setAttribute('dependencyBundle',params.dependencyBundle)
+		session.setAttribute('assetDependentlist',assetDependentlist)
 		switch(params.entity){
 		case "Apps" :
 			def applicationList = assetDependentlist.findAll{it.asset.assetType ==  'Application' }
@@ -2986,5 +2988,57 @@ class AssetEntityController {
 										   asset:'graph', force:force, distance:distance, labels:labels ])
 			break;
 		}
+	}
+	
+	def reloadMap={
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def project = Project.findById( projectId )
+		def graphData = [:]
+		def assetDependentlist = session.getAttribute('assetDependentlist')
+		def labelList = params.labelsList
+		labelList = labelList.replace(" ","")
+		List labels = labelList ?  labelList.split(",") : []
+		def force = params.force && params.force != 'undefined' ? params.force : -70
+		def distance = params.distance && params.distance != 'undefined' ? params.distance : 20
+		graphData << ["force":force]
+		graphData << ["linkdistance":distance]
+		def graphNodes = []
+		assetDependentlist.each{
+			def name = ""
+			def shape = "circle"
+			def size = 150
+			def title = it.asset.assetName
+			if(it.asset.assetType == "Application"){
+				if(labels.contains("apps"))
+					name = it.asset.assetName
+				shape = "circle"
+			} else if(['VM','Server'].contains(it.asset.assetType)){
+				if(labels.contains("servers"))
+					name = it.asset.assetName
+				shape = "square"
+			} else if(['Database','Files'].contains(it.asset.assetType)){
+				if(labels.contains("files"))
+					name = it.asset.assetName
+				shape = "triangle-up"
+			}
+			graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle,
+							shape:shape, size : size, title: title]
+		}
+		graphData << ["nodes":graphNodes]
+		def assetDependencies = AssetDependency.findAll("From AssetDependency where asset.project = :project OR dependent.project = :project",[project:project])
+		def graphLinks = []
+		assetDependencies.each{
+			def sourceIndex = graphNodes.id.indexOf(it.asset.id)
+			def targetIndex = graphNodes.id.indexOf(it.dependent.id)
+			if(sourceIndex != -1 && targetIndex != -1){
+				graphLinks << ["source":sourceIndex,"target":targetIndex,"value":2]
+			}
+		}
+		graphData << ["links":graphLinks]
+		JSON output = graphData as JSON
+		def currentfile = ApplicationHolder.application.parentContext.getResource( "/d3/force/miserables.json" ).getFile()
+		currentfile.write(output.toString());
+		render(template:'map',model:[asset:'graph', force:force, distance:distance, labels:labels])
+		
 	}	
 }

@@ -177,6 +177,17 @@ $(document).ready(function() {
         $('#upArrow').css('display','inline')
         $('#downArrow').css('display','none')
       }
+    function fillView(e){
+    	var data = e.responseText
+    	$('#item1').html(data)
+    }
+    function refreshMap(force,distance){
+    	var labelsList = " "
+    	$('#labelTree input:checked').each(function() {
+    		labelsList += $(this).val()+',';
+    	});
+    	${remoteFunction(controller:'assetEntity',action:'reloadMap', params:'\'&force=\'+ force+\'&distance=\'+ distance+\'&labelsList=\'+ labelsList', onComplete:'fillView(e)' )}
+    }
 </script>
 </body>
 </html>
