@@ -326,14 +326,18 @@ class MoveBundleService {
 
 		 // Find all move bundles that are flagged for Planning in the project and then get all assets in those bundles
 		 String movebundleList = MoveBundle.findAllByUseOfPlanningAndProject(true,projectInstance).id
-		 movebundleList = movebundleList.replace("[","('").replace("]","')").replace(",","','")
+//		 moveBundleList = movebundleList.replace("[","('").replace("]","')").replace(",","','")
+		 moveBundleText = movebundleList.replace("[","('").replace("]","')")
+		 def moveBundleList = moveBundleText.replaceAll(', ',',').tokenize(',')
+		 moveBundleText = moveBundleText.replace(",","','")
+		 
 		 def assetTypeList =  MoveBundleController.dependecyBundlingAssetType
 		 
 		 // Query to fetch dependent asset list with dependency type and status and move bundle list with use for planning .
 		 def queryForAssets = """SELECT a.asset_entity_id as assetId FROM asset_entity a
 			LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id Or ad.dependent_id = a.asset_entity_id
 			WHERE a.asset_type in ${assetTypeList}
-				AND a.move_bundle_id in ${movebundleList} """
+				AND a.move_bundle_id in (${movebundleText}) """
 		 queryForAssets += connectionTypes == 'null' ? "" : " AND ad.type in (${connectionTypes}) "
 		 queryForAssets += statusTypes == 'null' ? "" : " AND ad.status in (${statusTypes}) "
 		 queryForAssets += " GROUP BY a.asset_entity_id ORDER BY COUNT(ad.asset_id) DESC "
@@ -381,7 +385,10 @@ class MoveBundleService {
 				// cycle through all dependencies that the asset is dependent on
 			 	AssetDependency.findAllByDependent(asset).each { ad ->
 					def id = ad.asset.id
-				 	if ( id && statusList.contains(ad.status) && connectionList.contains(ad.type) && ! ( groupIds.contains(id) || bundledIds.contains(id) ) ) {
+				 	if ( id && statusList.contains(ad.status) && connectionList.contains(ad.type) && 
+						 ! ( groupIds.contains(id) || bundledIds.contains(id) ) && 
+						 moveBundleList.contains(ad.asset.moveBundle.id) 
+					   ) {
 					 	stack << ad.asset
 						groupAssets << ad.asset
 						groupIds << id
@@ -390,7 +397,10 @@ class MoveBundleService {
 				// cycle through all dependencies that the asset supports
 				AssetDependency.findAllByAsset(asset)?.each { ad ->
 					def id = ad.dependent.id
-				 	if ( id && statusList.contains(ad.status) && connectionList.contains(ad.type) && ! ( groupIds.contains(id) || bundledIds.contains(id) ) ) {
+				 	if ( id && statusList.contains(ad.status) && connectionList.contains(ad.type) && 
+						 ! ( groupIds.contains(id) || bundledIds.contains(id) ) &&
+						 moveBundleList.contains(ad.asset.moveBundle.id)
+					   ) {
 					 	stack << ad.dependent
 						groupAssets << ad.dependent
 						groupIds << id
