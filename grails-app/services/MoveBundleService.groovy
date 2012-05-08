@@ -353,6 +353,8 @@ class MoveBundleService {
 		 
 		 // Deleting previously generated dependency bundle table .
 		 jdbcTemplate.execute("DELETE FROM asset_dependency_bundle where project_id = $projectId ")
+		 jdbcTemplate.execute("UPDATE asset_entity SET dependency_bundle=NULL WHERE project_id = $projectId ")
+		 
  
 		 // Reset hibernate session since we just cleared out the data directly and we don't want to be looking up assets in stale cache
 		 sessionFactory.getCurrentSession().flush();
