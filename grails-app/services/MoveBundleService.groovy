@@ -325,11 +325,11 @@ class MoveBundleService {
 		 def connectionList = connectionTypes.replaceAll(', ',',').replaceAll("'",'').tokenize(',')
 
 		 // Find all move bundles that are flagged for Planning in the project and then get all assets in those bundles
-		 String movebundleList = MoveBundle.findAllByUseOfPlanningAndProject(true,projectInstance).id
-//		 moveBundleList = movebundleList.replace("[","('").replace("]","')").replace(",","','")
-		 moveBundleText = movebundleList.replace("[","('").replace("]","')")
+		 String moveBundleText = MoveBundle.findAllByUseOfPlanningAndProject(true,projectInstance).id
+		 moveBundleText = moveBundleText.replace("[",'').replace("]",'')
+
+		 // Get array of moveBundle ids
 		 def moveBundleList = moveBundleText.replaceAll(', ',',').tokenize(',')
-		 moveBundleText = moveBundleText.replace(",","','")
 		 
 		 def assetTypeList =  MoveBundleController.dependecyBundlingAssetType
 		 
@@ -337,7 +337,7 @@ class MoveBundleService {
 		 def queryForAssets = """SELECT a.asset_entity_id as assetId FROM asset_entity a
 			LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id Or ad.dependent_id = a.asset_entity_id
 			WHERE a.asset_type in ${assetTypeList}
-				AND a.move_bundle_id in (${movebundleText}) """
+				AND a.move_bundle_id in (${moveBundleText}) """
 		 queryForAssets += connectionTypes == 'null' ? "" : " AND ad.type in (${connectionTypes}) "
 		 queryForAssets += statusTypes == 'null' ? "" : " AND ad.status in (${statusTypes}) "
 		 queryForAssets += " GROUP BY a.asset_entity_id ORDER BY COUNT(ad.asset_id) DESC "
