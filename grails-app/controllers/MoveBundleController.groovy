@@ -500,8 +500,8 @@ class MoveBundleController {
 			String eventMoveBundles = allMoveBundle
 			eventMoveBundles = eventMoveBundles.replace("[[","('").replace(",", "','").replace("], [","','").replace("]]","')").replace("]',' [", "','")
 			if(allMoveBundle.size()>0){
-				potential = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle.useOfPlanning = true and application.moveBundle.moveEvent != ${moveEvent.id} and application.project=$projectId and (value = 'Y' or value is null or value = '') and (application.planStatus is null or application.planStatus in ('Unassigned','')) group by application").size()
-				optional = AppMoveEvent.findAll("from AppMoveEvent where application.moveBundle.useOfPlanning = true and application.moveBundle.moveEvent != ${moveEvent.id} and application.project=$projectId and value = 'Y' and (application.planStatus is null or application.planStatus in ('Unassigned','')) group by application").size()
+				potential = Application.findAll("from AppMoveEvent am right join am.application a where a.moveBundle.useOfPlanning = true and a.project=$projectId and (a.moveBundle.moveEvent != ${moveEvent.id} or a.moveBundle.moveEvent is null) and (am.moveEvent = ${moveEvent.id} or am.moveEvent is null) and (am.value = '?' or am.value is null or am.value = '') and (a.planStatus is null or a.planStatus in ('Unassigned',''))").size()
+				optional = Application.findAll("from AppMoveEvent am right join am.application a where a.moveBundle.useOfPlanning = true  and a.project=$projectId and (a.moveBundle.moveEvent != ${moveEvent.id} or a.moveBundle.moveEvent is null) and (am.moveEvent = ${moveEvent.id} or am.moveEvent is null) and am.value = 'Y' and (a.planStatus is null or a.planStatus in ('Unassigned',''))").size()
 			}
 			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,'potential':potential,'optional':optional]
 		}
