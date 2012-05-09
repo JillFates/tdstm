@@ -286,7 +286,7 @@ class ApplicationController {
 					forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle")])
 					break;
 				default:
-					redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_appOwner:filterAttr.tag_f_appOwner, tag_f_appSme:filterAttr.tag_f_appSme, tag_f_planStatus:filterAttr.tag_f_planStatus, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown])
+					redirect( action:list,params:[tag_f_assetName:filterAttr?.tag_f_assetName, tag_f_appOwner:filterAttr?.tag_f_appOwner, tag_f_appSme:filterAttr?.tag_f_appSme, tag_f_planStatus:filterAttr?.tag_f_planStatus, tag_f_depUp:filterAttr?.tag_f_depUp, tag_f_depDown:filterAttr?.tag_f_depDown])
 			}
 		}
 		else {
