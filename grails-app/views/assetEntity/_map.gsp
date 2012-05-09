@@ -1,5 +1,5 @@
 <div style="float: left;border: 1px solid #ccc;margin-left: 3px;margin-top: 3px;width: 150px; background-color:white;position: absolute;">
-				<table id="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;width: 331px;" >
+				<table id="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;width: 148px;" >
 					<tr>
 						<td colspan="2" style="padding: 0px;"><h4>Control Panel</h4></td>
 					</tr>
@@ -26,13 +26,13 @@
 						<g:if test="${labels?.contains('apps')}">
 							<td colspan="2" style="padding: 0px;">
 								<input type="checkbox" name="labels" value="apps" checked="checked">
-								<span style="vertical-align: text-top;">Apps</span>&nbsp;<img src="${createLinkTo(dir:'images',file:'iconApp.png')}" height="14" />
+								<span style="vertical-align: text-top;">Apps</span>&nbsp;&nbsp;&nbsp;<img src="${createLinkTo(dir:'images',file:'iconApp.png')}" height="14" />
 							</td>
 						</g:if>
 						<g:else>
 						    <td colspan="2" style="padding: 0px;">
 						    	<input type="checkbox" name="labels" value="apps" >
-						    	<span style="vertical-align: text-top;">Apps</span>&nbsp;<img src="${createLinkTo(dir:'images',file:'iconApp.png')}" height="14" />
+						    	<span style="vertical-align: text-top;">Apps</span>&nbsp;&nbsp;&nbsp;<img src="${createLinkTo(dir:'images',file:'iconApp.png')}" height="14" />
 						    </td>
 						</g:else>
 					</tr>
@@ -66,7 +66,8 @@
 					</tr>
 					<tr>
 						<td colspan="2" style="padding: 0px;text-align: center;">
-						<input type="button" value="Refresh Map" onclick="refreshMap($('#forceId').val(), $('#linksId').val() )"></td>
+						<input type="button" value="Refresh Map" onclick="refreshMap($('#forceId').val(), $('#linksId').val() )">
+						</td>
 					</tr>
 				</table>
 			</div>
