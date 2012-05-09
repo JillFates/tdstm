@@ -2948,6 +2948,16 @@ class AssetEntityController {
 			graphData << ["force":force]
 			graphData << ["linkdistance":distance]
 			def graphNodes = []
+			if(assetDependentlist.size()<30){
+				graphData << ["width":800]
+				graphData << ["height":400]
+		    }else if(assetDependentlist.size()>30 && assetDependentlist.size()<200){
+				graphData << ["width":1200]
+				graphData << ["height":800]
+		    }else{
+				graphData << ["width":1600]
+				graphData << ["height":1200]
+		    }
 			assetDependentlist.each{
 				def name = ""
 				def shape = "circle"
@@ -3003,6 +3013,16 @@ class AssetEntityController {
 		graphData << ["force":force]
 		graphData << ["linkdistance":distance]
 		def graphNodes = []
+		if(assetDependentlist.size()<30){
+			graphData << ["width":800]
+			graphData << ["height":400]
+		}else if(assetDependentlist.size()>30 && assetDependentlist.size()<200){
+			graphData << ["width":1200]
+			graphData << ["height":800]
+		}else{
+			graphData << ["width":1600]
+			graphData << ["height":1200]
+		}
 		assetDependentlist.each{
 			def name = ""
 			def shape = "circle"

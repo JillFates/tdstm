@@ -1,21 +1,21 @@
-var w = 1600,
-	h = 1000,
-	graphstyle = "top:-120;z-index:-1;",
+var graphstyle = "top:-120;z-index:-1;",
 	r = 5,
 	fill = d3.scale.category20();
-var vis = d3.select("div#item1")
-			.append("svg:svg")
-			.attr("width", w)
-			.attr("height", h)
-			.attr("style",graphstyle);
+
 			
 d3.json("../d3/force/miserables.json", function(json) {
+	var vis = d3.select("div#item1")
+			  .append("svg:svg")
+			  .attr("width", json.width)
+			  .attr("height", json.height)
+			  .attr("style",graphstyle);
+	
 	var force = self.force = d3.layout.force()
 				.nodes(json.nodes).links(json.links)
 				.gravity(.05)
 				.distance(json.linkdistance)
 				.charge(json.force)
-				.size([ w, h ])
+				.size([ json.width, json.height ])
 				.start();
 	var link = vis.selectAll("line.link")
 				.data(json.links).enter()
@@ -54,11 +54,11 @@ d3.json("../d3/force/miserables.json", function(json) {
 				.attr("x2", function(d) {return d.target.x;})
 				.attr("y2", function(d) {return d.target.y;});
 
-	node.attr("cx", function(d) {return d.x = Math.max(r, Math.min(w - r, d.x));})
-		.attr("cy", function(d) {return d.y = Math.max(r, Math.min(h - r, d.y));})
+	node.attr("cx", function(d) {return d.x = Math.max(r, Math.min(json.width - r, d.x));})
+		.attr("cy", function(d) {return d.y = Math.max(r, Math.min(json.height - r, d.y));})
 		.attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";});
-	graph.attr("cx", function(d) {return d.x = Math.max(r, Math.min(w - r, d.x));})
-		.attr("cy", function(d) {return d.y = Math.max(r, Math.min(h - r, d.y));})
+	graph.attr("cx", function(d) {return d.x = Math.max(r, Math.min(json.width - r, d.x));})
+		.attr("cy", function(d) {return d.y = Math.max(r, Math.min(json.height - r, d.y));})
 		.attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";});
 	});
 });
