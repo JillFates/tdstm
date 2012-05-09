@@ -2955,8 +2955,8 @@ class AssetEntityController {
 				graphData << ["width":1200]
 				graphData << ["height":800]
 		    }else{
-				graphData << ["width":1600]
-				graphData << ["height":1200]
+				graphData << ["width":1800]
+				graphData << ["height":1600]
 		    }
 			assetDependentlist.each{
 				def name = ""
