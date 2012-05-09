@@ -387,7 +387,7 @@ class MoveBundleService {
 					def id = ad.asset.id
 				 	if ( id && statusList.contains(ad.status) && connectionList.contains(ad.type) && 
 						 ! ( groupIds.contains(id) || bundledIds.contains(id) ) && 
-						 moveBundleList.contains(ad.asset.moveBundle.id) 
+						 moveBundleList.contains(ad.asset.moveBundle?.id.toString()) 
 					   ) {
 					 	stack << ad.asset
 						groupAssets << ad.asset
@@ -399,7 +399,7 @@ class MoveBundleService {
 					def id = ad.dependent.id
 				 	if ( id && statusList.contains(ad.status) && connectionList.contains(ad.type) && 
 						 ! ( groupIds.contains(id) || bundledIds.contains(id) ) &&
-						 moveBundleList.contains(ad.asset.moveBundle.id)
+						 moveBundleList.contains(ad.asset.moveBundle?.id.toString())
 					   ) {
 					 	stack << ad.dependent
 						groupAssets << ad.dependent
