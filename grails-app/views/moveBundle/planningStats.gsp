@@ -45,8 +45,8 @@
 									${applicationCount}
 							</b></td>
 							<td style="color: grey"><b>Optional</b></td>
-							<td style="color: grey"><g:each in="${assetList}" var="appCount">
-									<td><b>
+							<td><g:each in="${assetList}" var="appCount">
+									<td style="color: grey"><b>
 											${appCount.optional}
 									</b></td>
 								</g:each></td>
@@ -54,8 +54,8 @@
 						<tr>
 							<td style="color: blue"><b></b></td>
 							<td style="color: grey"><b>Potential</b></td>
-							<td style="color: grey"><g:each in="${assetList}" var="appCount">
-									<td><b>
+							<td><g:each in="${assetList}" var="appCount">
+									<td style="color: grey"><b>
 											${appCount.potential}
 									</b></td>
 								</g:each></td>
