@@ -780,7 +780,7 @@ class AssetEntityController {
 			exportType = exportType.substring(0,exportType.indexOf("_template.xls"))
 			def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString().replace(" ","_")
 			response.setContentType( "application/vnd.ms-excel" )
-			response.setHeader( "Content-Disposition", "attachment; filename= ${exportType}-${filename}.xls" )
+			response.setHeader( "Content-Disposition", "attachment; filename=\""+exportType-filename+".xls\"" )
 			//create workbook and sheet
 			book = Workbook.createWorkbook( response.getOutputStream(), workbook )
 			def serverSheet
