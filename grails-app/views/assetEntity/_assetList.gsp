@@ -96,5 +96,8 @@
 			</table>
 		</div>
 	</div>
+	<script type="text/javascript">
+		$('#tabTypeId').val('server')
+	</script>
 </div>
 

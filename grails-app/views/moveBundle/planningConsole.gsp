@@ -73,8 +73,6 @@ $(document).ready(function() {
 		<div id = "dependencyBundleDetailsId" >
 			<g:render template="dependencyBundleDetails" />
 		</div>
-		
-		
 		<div style="clear: both;"></div>
 		
 		<div id="moveBundleSelectId" title="Change Move Bundle" style="background-color: #808080; display: none; float: right" >
@@ -95,8 +93,6 @@ $(document).ready(function() {
 		         <td style="text-align: right"><input type="button" id ="saveBundleId" name="saveBundle"  value= "save" onclick="submitMoveForm()"> </td>
 		        </tr>
 		        </table>
-           		
-           		
           </g:form>
 		</div>
 		<div id="items1" style="display: none"></div>
@@ -152,12 +148,7 @@ $(document).ready(function() {
 			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
 			break;
 		case "graph" :
-			var labelsList = ""
-			if(labels =="labels"){
-				$('#labelTree input:checked').each(function() {
-					labelsList += $(this).val() + ',';
-				});
-			}
+			var labelsList = "apps"
 			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&force=\'+ force+\'&distance=\'+ distance+\'&labelsList=\'+ labelsList', onComplete:'listUpdate(e)') }
 			break;
 		}
@@ -181,12 +172,12 @@ $(document).ready(function() {
     	var data = e.responseText
     	$('#item1').html(data)
     }
-    function refreshMap(force,distance){
+    function refreshMap(force,distance,friction,height,width){
     	var labelsList = " "
     	$('#labelTree input:checked').each(function() {
     		labelsList += $(this).val()+',';
     	});
-    	${remoteFunction(controller:'assetEntity',action:'reloadMap', params:'\'&force=\'+ force+\'&distance=\'+ distance+\'&labelsList=\'+ labelsList', onComplete:'fillView(e)' )}
+    	${remoteFunction(controller:'assetEntity',action:'reloadMap', params:'\'&force=\'+ force+\'&distance=\'+ distance+\'&friction=\'+ friction+\'&height=\'+ height+\'&width=\'+ width+\'&labelsList=\'+ labelsList', onComplete:'fillView(e)' )}
     }
 </script>
 </body>

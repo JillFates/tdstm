@@ -2944,20 +2944,17 @@ class AssetEntityController {
 			def graphData = [:]
 			def force = params.force && params.force != 'undefined' ? params.force : -70
 			def distance = params.distance && params.distance != 'undefined' ? params.distance : 20
+			def friction = params.friction && params.friction != 'undefined' ? params.friction : 0.9
+			def height = params.height && params.height != 'undefined' ? params.height : 800
+			def width = params.width && params.width!= 'undefined' ? params.width : 1200
+			
 			List labels = params.labelsList ?  params.labelsList.split(",") : []
 			graphData << ["force":force]
 			graphData << ["linkdistance":distance]
+			graphData << ["friction":friction]
+			graphData << ["height":height]
+			graphData << ["width":width]
 			def graphNodes = []
-			if(assetDependentlist.size()<30){
-				graphData << ["width":800]
-				graphData << ["height":400]
-		    }else if(assetDependentlist.size()>30 && assetDependentlist.size()<200){
-				graphData << ["width":1200]
-				graphData << ["height":800]
-		    }else{
-				graphData << ["width":1800]
-				graphData << ["height":2200]
-		    }
 			assetDependentlist.each{
 				def name = ""
 				def shape = "circle"
@@ -2995,7 +2992,7 @@ class AssetEntityController {
 			currentfile.write(output.toString());
 			render(template:'dependencyGraph',model:[assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
 										   filesDependentListSize:filesListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbDependentListSize,
-										   asset:'graph', force:force, distance:distance, labels:labels ])
+										   asset:'graph', force:force, distance:distance,friction:friction,height:height,width:width, labels:labels , appChecked:'checked'])
 			break;
 		}
 	}
@@ -3008,21 +3005,17 @@ class AssetEntityController {
 		def labelList = params.labelsList
 		labelList = labelList.replace(" ","")
 		List labels = labelList ?  labelList.split(",") : []
-		def force = params.force && params.force != 'undefined' ? params.force : -70
-		def distance = params.distance && params.distance != 'undefined' ? params.distance : 20
+		def force = params.force && params.force != 'undefined' ? Integer.parseInt(params.force) : -70
+		def distance = params.distance && params.distance != 'undefined' ? Integer.parseInt(params.distance) : 20
+		def friction = params.friction && params.friction != 'undefined' ? params.friction : 0.9
+		def height = params.height && params.height != 'undefined' ? params.height : 800
+		def width = params.width && params.width!= 'undefined' ? params.width : 1200
 		graphData << ["force":force]
 		graphData << ["linkdistance":distance]
 		def graphNodes = []
-		if(assetDependentlist.size()<30){
-			graphData << ["width":800]
-			graphData << ["height":400]
-		}else if(assetDependentlist.size()>30 && assetDependentlist.size()<200){
-			graphData << ["width":1200]
-			graphData << ["height":800]
-		}else{
-			graphData << ["width":1600]
-			graphData << ["height":1200]
-		}
+		graphData << ["width":width]
+		graphData << ["height":height]
+		graphData << ["friction":friction]
 		assetDependentlist.each{
 			def name = ""
 			def shape = "circle"
@@ -3058,7 +3051,7 @@ class AssetEntityController {
 		JSON output = graphData as JSON
 		def currentfile = ApplicationHolder.application.parentContext.getResource( "/d3/force/miserables.json" ).getFile()
 		currentfile.write(output.toString());
-		render(template:'map',model:[asset:'graph', force:force, distance:distance, labels:labels])
+		render(template:'map',model:[asset:'graph', force:force, distance:distance,friction:friction,height:height,width:width, labels:labels])
 		
 	}	
 }

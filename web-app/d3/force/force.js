@@ -14,6 +14,7 @@ d3.json("../d3/force/miserables.json", function(json) {
 				.nodes(json.nodes).links(json.links)
 				.gravity(.05)
 				.distance(json.linkdistance)
+				.friction(json.friction)
 				.charge(json.force)
 				.size([ json.width, json.height ])
 				.start();

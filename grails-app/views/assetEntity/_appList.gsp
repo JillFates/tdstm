@@ -74,4 +74,7 @@
 			</table>
 		</div>
 	</div>
+	<script type="text/javascript">
+		$('#tabTypeId').val('Apps')
+	</script>
 </div>
