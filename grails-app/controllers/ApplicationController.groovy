@@ -43,6 +43,7 @@ class ApplicationController {
 		
 		def projectId = params.projectId ? params.projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
+		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
 		def workFlow = project.workflowCode
 		def appEntityList
 		if(params.validation=='Discovery'){
@@ -54,11 +55,11 @@ class ApplicationController {
 		}else if(params.validation=='BundleReady'){
 			appEntityList = Application.findAllByValidationAndProject('BundleReady',project)
 		}else if(params.latency=='likely'){
-			appEntityList= Application.findAllByLatencyAndProject('N',project)
+			appEntityList= Application.findAllByLatencyAndMoveBundleInList('N',moveBundleList)
 		}else if(params.latency=='UnKnown'){
-			appEntityList= Application.findAllByLatencyAndProject(null,project)
+			appEntityList= Application.findAllByLatencyAndMoveBundleInList(null,moveBundleList)
 		}else if(params.latency=='UnLikely'){
-			appEntityList= Application.findAllByLatencyAndProject('Y',project)
+			appEntityList= Application.findAllByLatencyAndMoveBundleInList('Y',moveBundleList)
 		}else{
 		    appEntityList = Application.findAllByProject(project)
 		}

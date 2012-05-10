@@ -551,10 +551,10 @@ class MoveBundleController {
 		def applicationsOfPlanningBundle = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Application',moveBundleList)
 		def serversOfPlanningBundle = AssetEntity.findAllByAssetTypeInListAndMoveBundleInList(['Server', 'VM', 'Blade'],moveBundleList)
 
-		def appDependenciesCount = applicationsOfPlanningBundle ? AssetDependency.countByAssetInListOrDependentInList(applicationsOfPlanningBundle, applicationsOfPlanningBundle) : 0
-		def serverDependenciesCount = serversOfPlanningBundle ? AssetDependency.countByAssetInListOrDependentInList(serversOfPlanningBundle, serversOfPlanningBundle) : 0
-		def pendingAppDependenciesCount = applicationsOfPlanningBundle ? AssetDependency.countByDependentInListAndStatusInList(applicationsOfPlanningBundle,['Unknown','Questioned']) : 0
-		def pendingServerDependenciesCount = serversOfPlanningBundle ? AssetDependency.countByDependentInListAndStatusInList(serversOfPlanningBundle,['Unknown','Questioned']) : 0
+		def appDependenciesCount = applicationsOfPlanningBundle ? AssetDependency.countByAssetInList(applicationsOfPlanningBundle) : 0
+		def serverDependenciesCount = serversOfPlanningBundle ? AssetDependency.countByAssetInList(serversOfPlanningBundle) : 0
+		def pendingAppDependenciesCount = applicationsOfPlanningBundle ? AssetDependency.countByAssetInListAndStatusInList(applicationsOfPlanningBundle,['Unknown','Questioned']) : 0
+		def pendingServerDependenciesCount = serversOfPlanningBundle ? AssetDependency.countByAssetInListAndStatusInList(serversOfPlanningBundle,['Unknown','Questioned']) : 0
 
 		def issues = AssetComment.findAll("FROM AssetComment a where a.assetEntity.project = ? and a.commentType = ? and a.isResolved = 0",[project, "issue"])
 
@@ -575,9 +575,9 @@ class MoveBundleController {
 			planningConsoleList << ['dependencyBundle':dependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
 		}
 		
-		def likelyLatency = Application.findAllByLatencyAndProject('N',project).size()
-		def unlikelyLatency = Application.findAllByLatencyAndProject('Y',project).size()
-		def unknownLatency = Application.findAllByLatencyAndProject(null,project).size()
+		def likelyLatency = Application.findAllByLatencyAndMoveBundleInList('N',moveBundleList).size()
+		def unlikelyLatency = Application.findAllByLatencyAndMoveBundleInList('Y',moveBundleList).size()
+		def unknownLatency = Application.findAllByLatencyAndMoveBundleInList(null,moveBundleList).size()
 		
 		def depBundleIDCountSQL = "select count(distinct dependency_bundle) from asset_dependency_bundle where project_id = $projectId"
         def dependencyBundleCount = jdbcTemplate.queryForInt(depBundleIDCountSQL)		
