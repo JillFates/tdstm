@@ -2960,30 +2960,49 @@ class AssetEntityController {
 				def shape = "circle"
 				def size = 150
 				def title = it.asset.assetName
+				def color = ''				
 				if(it.asset.assetType == "Application"){
+					if (it.asset.moveBundle.moveEvent!=null){
+						color='red'
+					}
 					if(labels.contains("apps"))
 						name = it.asset.assetName
-					shape = "circle"
+					shape = "gray"
 				} else if(['VM','Server'].contains(it.asset.assetType)){
+					if (it.asset.moveBundle.moveEvent!=null){
+						color='red'
+					}
 					if(labels.contains("servers"))
 						name = it.asset.assetName
 					shape = "square"
 				} else if(['Database','Files'].contains(it.asset.assetType)){
+					if (it.asset.moveBundle.moveEvent!=null){
+						color='red'
+					}
 					if(labels.contains("files"))
 						name = it.asset.assetName
 					shape = "triangle-up"
 				}
 				graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle, 
-								shape:shape, size : size, title: title]
-			}
+								shape:shape, size : size, title: title,color:color]
+		}
 			graphData << ["nodes":graphNodes]
 			def assetDependencies = AssetDependency.findAll("From AssetDependency where asset.project = :project OR dependent.project = :project",[project:project])
 			def graphLinks = []
 			assetDependencies.each{
+				def opacity
+				def statusColor = ''
+				if(it.status=='Questioned'){
+					statusColor='red'
+					opacity = 1
+				}else {
+					statusColor='gray'
+					opacity = 0.2
+				}
 				def sourceIndex = graphNodes.id.indexOf(it.asset.id)
 				def targetIndex = graphNodes.id.indexOf(it.dependent.id)
 				if(sourceIndex != -1 && targetIndex != -1){
-					graphLinks << ["source":sourceIndex,"target":targetIndex,"value":2]
+					graphLinks << ["source":sourceIndex,"target":targetIndex,"value":2,"statusColor":statusColor,"opacity":opacity,"distance":50]
 				}
 			}
 			graphData << ["links":graphLinks]
@@ -3021,30 +3040,49 @@ class AssetEntityController {
 			def shape = "circle"
 			def size = 150
 			def title = it.asset.assetName
+			def color = ''
 			if(it.asset.assetType == "Application"){
+				if (it.asset.moveBundle.moveEvent!=null){
+					color='red'
+				}
 				if(labels.contains("apps"))
 					name = it.asset.assetName
 				shape = "circle"
 			} else if(['VM','Server'].contains(it.asset.assetType)){
+				if (it.asset.moveBundle.moveEvent!=null){
+					color='red'
+				}
 				if(labels.contains("servers"))
 					name = it.asset.assetName
 				shape = "square"
 			} else if(['Database','Files'].contains(it.asset.assetType)){
+				if (it.asset.moveBundle.moveEvent!=null){
+					color='red'
+				}
 				if(labels.contains("files"))
 					name = it.asset.assetName
 				shape = "triangle-up"
 			}
-			graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle,
-							shape:shape, size : size, title: title]
+			graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle, 
+								shape:shape, size : size, title: title,color:color]
 		}
 		graphData << ["nodes":graphNodes]
 		def assetDependencies = AssetDependency.findAll("From AssetDependency where asset.project = :project OR dependent.project = :project",[project:project])
 		def graphLinks = []
 		assetDependencies.each{
+			def opacity
+			def statusColor = ''
+			if(it.status=='Questioned'){
+				statusColor='red'
+				opacity = 1
+			}else {
+				statusColor='gray'
+				opacity = 0.2
+			}
 			def sourceIndex = graphNodes.id.indexOf(it.asset.id)
 			def targetIndex = graphNodes.id.indexOf(it.dependent.id)
 			if(sourceIndex != -1 && targetIndex != -1){
-				graphLinks << ["source":sourceIndex,"target":targetIndex,"value":2]
+				graphLinks << ["source":sourceIndex,"target":targetIndex,"value":2,"statusColor":statusColor,"opacity":opacity,"distance":50]
 			}
 		}
 		graphData << ["links":graphLinks]
@@ -3054,4 +3092,4 @@ class AssetEntityController {
 		render(template:'map',model:[asset:'graph', force:force, distance:distance,friction:friction,height:height,width:width, labels:labels])
 		
 	}	
-}
+} 

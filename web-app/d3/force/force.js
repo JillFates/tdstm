@@ -21,6 +21,8 @@ d3.json("../d3/force/miserables.json", function(json) {
 	var link = vis.selectAll("line.link")
 				.data(json.links).enter()
 				.append("svg:line")
+				.style("stroke",function(d) {return d.statusColor;})
+				.style("stroke-opacity", function (d) { return d.opacity;})
 				.attr("class", "link")
 				.attr("x1", function(d) { return d.source.x;})
 				.attr("y1", function(d) { return d.source.y;})
@@ -35,7 +37,9 @@ d3.json("../d3/force/miserables.json", function(json) {
 				.call(force.drag)
 				.on("dblclick", function(d) { return getEntityDetails('planningConsole', d.type, d.id); })
 				.attr("d", d3.svg.symbol().size(function(d) { return d.size; }).type(function(d) { return d.shape; }))
-			    .style("fill", function(d) {return fill(d.group);});
+				.style("fill", function(d) {return fill(d.group);})
+				.style("stroke", function(d) {return d.color;})
+				.style("stroke-width", '2px');
 	node.append("title").text(function(d){ return d.title })
 	
          
