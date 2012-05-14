@@ -2944,33 +2944,36 @@ class AssetEntityController {
 			def graphData = [:]
 			def force = params.force && params.force != 'undefined' ? params.force : -70
 			def distance = params.distance && params.distance != 'undefined' ? params.distance : 20
-			def friction = params.friction && params.friction != 'undefined' ? params.friction : 0.9
+			def friction = params.friction && params.friction != 'undefined' ? params.friction : 0.8
 			def height 
 			def width 
 			
 			List labels = params.labelsList ?  params.labelsList.split(",") : []
-			graphData << ["force":force]
+			if(assetDependentlist.size()<30){
+				graphData << ["force":-100]
+				graphData << ["linkdistance":40]
+		    }else if(assetDependentlist.size()<200){
+				graphData << ["force":-80]
+				graphData << ["linkdistance":30]
+		    }else{
+				graphData << ["force":-70]
+				graphData << ["linkdistance":20]
+		    }
 			graphData << ["friction":friction]
 			def graphNodes = []
 			if(assetDependentlist.size()<30){
 				height = 400
 				width = 800
-				graphData << ["force":-100]
-				graphData << ["linkdistance":40]
 				graphData << ["width":800]
 				graphData << ["height":400]
 		    }else if(assetDependentlist.size()<200){
 				height = 800
 				width = 1200
-				graphData << ["force":-80]
-				graphData << ["linkdistance":30]
 				graphData << ["width":1200]
 				graphData << ["height":800]
 		    }else{
 				height = 2200
 				width = 1800
-				graphData << ["force":-70]
-				graphData << ["linkdistance":20]
 				graphData << ["width":1800]
 				graphData << ["height":2200]
 		    }
