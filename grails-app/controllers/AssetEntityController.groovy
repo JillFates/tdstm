@@ -2950,22 +2950,27 @@ class AssetEntityController {
 			
 			List labels = params.labelsList ?  params.labelsList.split(",") : []
 			graphData << ["force":force]
-			graphData << ["linkdistance":distance]
 			graphData << ["friction":friction]
 			def graphNodes = []
 			if(assetDependentlist.size()<30){
 				height = 400
 				width = 800
+				graphData << ["force":-100]
+				graphData << ["linkdistance":40]
 				graphData << ["width":800]
 				graphData << ["height":400]
-		    }else if(assetDependentlist.size()>30 && assetDependentlist.size()<200){
+		    }else if(assetDependentlist.size()<200){
 				height = 800
 				width = 1200
+				graphData << ["force":-80]
+				graphData << ["linkdistance":30]
 				graphData << ["width":1200]
 				graphData << ["height":800]
 		    }else{
 				height = 2200
 				width = 1800
+				graphData << ["force":-70]
+				graphData << ["linkdistance":20]
 				graphData << ["width":1800]
 				graphData << ["height":2200]
 		    }

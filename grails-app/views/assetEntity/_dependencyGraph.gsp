@@ -37,12 +37,12 @@ $('#appLabel').attr('checked',true)
 function increaseValue(action, id ){
 	var value = parseFloat($("#"+id).val())
 	if(id=='frictionId' && action =='add'){
-	 if(value==1){
-        alert("Maximum value for friction should be 1") 
-	 }else{
-		value += 0.1
-		value = value.toPrecision(1)
-	 }
+		if(value==1){
+    	    alert("Maximum value for friction should be 1") 
+		 }else{
+			value += 0.1
+			value = value.toPrecision(1)
+		 }
 	}else if(id=='frictionId' && action =='sub'){
 		if(value==0){
 	        alert("Minimum value for friction should be 0") 
@@ -53,10 +53,17 @@ function increaseValue(action, id ){
 	}else{
 	 var value = parseInt($("#"+id).val())
 		if(action=='add'){
-			value += 10
-			
+			if(id=='heightId' || id=='widthId'){
+				value += 100
+			}else{
+				value += 10
+			}
 		} else {
-			value -= 10
+			if(id=='heightId' || id=='widthId'){
+				value -= 100
+			}else{
+				value -= 10
+			}
 		}
 	}
 	$("#"+id).val( value )
