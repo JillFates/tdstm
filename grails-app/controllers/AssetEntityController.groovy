@@ -2945,16 +2945,30 @@ class AssetEntityController {
 			def force = params.force && params.force != 'undefined' ? params.force : -70
 			def distance = params.distance && params.distance != 'undefined' ? params.distance : 20
 			def friction = params.friction && params.friction != 'undefined' ? params.friction : 0.9
-			def height = params.height && params.height != 'undefined' ? params.height : 800
-			def width = params.width && params.width!= 'undefined' ? params.width : 1200
+			def height 
+			def width 
 			
 			List labels = params.labelsList ?  params.labelsList.split(",") : []
 			graphData << ["force":force]
 			graphData << ["linkdistance":distance]
 			graphData << ["friction":friction]
-			graphData << ["height":height]
-			graphData << ["width":width]
 			def graphNodes = []
+			if(assetDependentlist.size()<30){
+				height = 400
+				width = 800
+				graphData << ["width":800]
+				graphData << ["height":400]
+		    }else if(assetDependentlist.size()>30 && assetDependentlist.size()<200){
+				height = 800
+				width = 1200
+				graphData << ["width":1200]
+				graphData << ["height":800]
+		    }else{
+				height = 2200
+				width = 1800
+				graphData << ["width":1800]
+				graphData << ["height":2200]
+		    }
 			assetDependentlist.each{
 				def name = ""
 				def shape = "circle"
@@ -3016,7 +3030,7 @@ class AssetEntityController {
 		}
 	}
 	
-	def reloadMap={
+	def reloadMap={		
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
 		def graphData = [:]
