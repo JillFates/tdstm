@@ -345,7 +345,9 @@ class MoveBundleService {
 		 def results = jdbcTemplate.queryForList(queryForAssets )
 		 def assetIds = results.assetId
 		 def assetIdsSize = assetIds.size()
- 
+		 
+		 jdbcTemplate.execute("UPDATE asset_entity SET dependency_bundle=0 WHERE project_id = $projectId ")
+		 
 		 log.info "Found ${assetIdsSize} to bundle"
 		 log.debug "SQL used to find assets: ${queryForAssets}"
 		 
@@ -356,8 +358,8 @@ class MoveBundleService {
 		 def bundledIds = []			// Used to keep track of Assets that were bundled (AssetDependencyBundle created)
 		 
 		 // Deleting previously generated dependency bundle table .
-		 jdbcTemplate.execute("DELETE FROM asset_dependency_bundle where project_id = $projectId ")
-		 jdbcTemplate.execute("UPDATE asset_entity SET dependency_bundle=NULL WHERE project_id = $projectId ")
+		 jdbcTemplate.execute("DELETE FROM asset_dependency_bundle where project_id = $projectId")
+		 jdbcTemplate.execute("UPDATE asset_entity SET dependency_bundle=NULL WHERE project_id = $projectId")
 		 
  
 		 // Reset hibernate session since we just cleared out the data directly and we don't want to be looking up assets in stale cache
@@ -377,7 +379,7 @@ class MoveBundleService {
 			 def groupAssets = [ asset ]
 			 def groupIds = [ asset.id ]
 			 def stack = [ asset ]
-
+			 
 			 log.debug "New dependency group started : id=$groupNum"
 			 while (stack.size() > 0) {
 				asset = stack[0] 
@@ -399,7 +401,7 @@ class MoveBundleService {
 					def id = ad.dependent.id
 				 	if ( id && statusList.contains(ad.status) && connectionList.contains(ad.type) && 
 						 ! ( groupIds.contains(id) || bundledIds.contains(id) ) &&
-						 moveBundleList.contains(ad.asset.moveBundle?.id.toString())
+						 moveBundleList.contains(ad.dependent.moveBundle?.id.toString())
 					   ) {
 					 	stack << ad.dependent
 						groupAssets << ad.dependent
@@ -427,6 +429,16 @@ class MoveBundleService {
 				 bundledIds << it.id
 			 } 
 		 } // for i
+		 
+		 // Last step is to put all the straggler assets that were not grouped into group 0
+		 def stragglerSQL = """INSERT INTO asset_dependency_bundle (asset_id, dependency_bundle, dependency_source, last_updated, project_id)
+			 SELECT ae.asset_entity_id, 0, "Straggler", now(), ae.project_id
+			 FROM asset_entity ae
+			 LEFT OUTER JOIN asset_dependency_bundle adb ON ae.asset_entity_id=adb.asset_id
+			 WHERE ae.project_id = ${projectId} # AND ae.dependency_bundle IS NULL
+			 AND adb.asset_id IS NULL
+			 AND move_bundle_id in (${moveBundleText})"""
+		 def x = jdbcTemplate.execute(stragglerSQL)
 		 
 	 }
 	 
