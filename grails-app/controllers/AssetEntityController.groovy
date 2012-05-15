@@ -3032,9 +3032,12 @@ class AssetEntityController {
 				def opacity
 				def statusColor = ''
 				if(it.status=='Questioned'){
-					statusColor='red'
+				statusColor='red'
+				opacity = 1
+				}else if(it.status=='Unknown'|| it.status=='Validated') {
+					statusColor='gray'
 					opacity = 1
-				}else {
+				}else{
 					statusColor='gray'
 					opacity = 0.2
 				}
@@ -3120,7 +3123,10 @@ class AssetEntityController {
 			if(it.status=='Questioned'){
 				statusColor='red'
 				opacity = 1
-			}else {
+			}else if(it.status=='Unknown'|| it.status=='Validated') {
+				statusColor='gray'
+				opacity = 1
+			}else{
 				statusColor='gray'
 				opacity = 0.2
 			}
