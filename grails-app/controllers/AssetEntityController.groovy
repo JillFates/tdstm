@@ -2942,20 +2942,39 @@ class AssetEntityController {
 			def appDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.size()
 			def assetEntityListSize = assetDependentlist.findAll{it.asset.assetType ==  'VM' || it.asset.assetType ==  'Server' }.size()
 			def graphData = [:]
-			def force = params.force && params.force != 'undefined' ? params.force : -70
-			def distance = params.distance && params.distance != 'undefined' ? params.distance : 20
+			def force 
+			def distance 
 			def friction = params.friction && params.friction != 'undefined' ? params.friction : 0.8
 			def height 
 			def width 
-			
+			def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+			Set uniqueMoveEventList = moveBundleList.moveEvent
+		    uniqueMoveEventList.remove(null)
+		    List moveEventList = []
+		    moveEventList =  uniqueMoveEventList.toList()
+		    moveEventList.sort{it?.name}
+			def eventColorCode = [:]
+			int colorDiff = (232/moveEventList.size()).intValue()
 			List labels = params.labelsList ?  params.labelsList.split(",") : []
+			
+			moveEventList.eachWithIndex{ event, i -> 
+				def colorCode = colorDiff * i
+				def colorsCode = "rgb(${colorCode},${colorCode},${colorCode})"
+				eventColorCode << [(event.name):colorsCode]
+			}
 			if(assetDependentlist.size()<30){
+				force = -100
+				distance = 40
 				graphData << ["force":-100]
 				graphData << ["linkdistance":40]
 		    }else if(assetDependentlist.size()<200){
+				force = -80
+				distance = 30
 				graphData << ["force":-80]
 				graphData << ["linkdistance":30]
 		    }else{
+				force = -70
+				distance = 20
 				graphData << ["force":-70]
 				graphData << ["linkdistance":20]
 		    }
@@ -2977,6 +2996,7 @@ class AssetEntityController {
 				graphData << ["width":1800]
 				graphData << ["height":2200]
 		    }
+			
 			assetDependentlist.each{
 				def name = ""
 				def shape = "circle"
@@ -2984,29 +3004,21 @@ class AssetEntityController {
 				def title = it.asset.assetName
 				def color = ''				
 				if(it.asset.assetType == "Application"){
-					if (it.asset.moveBundle.moveEvent!=null){
-						color='red'
-					}
 					if(labels.contains("apps"))
 						name = it.asset.assetName
 					shape = "gray"
 				} else if(['VM','Server'].contains(it.asset.assetType)){
-					if (it.asset.moveBundle.moveEvent!=null){
-						color='red'
-					}
 					if(labels.contains("servers"))
 						name = it.asset.assetName
 					shape = "square"
 				} else if(['Database','Files'].contains(it.asset.assetType)){
-					if (it.asset.moveBundle.moveEvent!=null){
-						color='red'
-					}
 					if(labels.contains("files"))
 						name = it.asset.assetName
 					shape = "triangle-up"
 				}
+				def moveEventName = it.asset.moveBundle.moveEvent?.name
 				graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle, 
-								shape:shape, size : size, title: title,color:color]
+								shape:shape, size : size, title: title,color:eventColorCode[moveEventName]?eventColorCode[moveEventName]:"red"]
 		}
 			graphData << ["nodes":graphNodes]
 			def assetDependencies = AssetDependency.findAll("From AssetDependency where asset.project = :project OR dependent.project = :project",[project:project])
@@ -3051,6 +3063,20 @@ class AssetEntityController {
 		def friction = params.friction && params.friction != 'undefined' ? params.friction : 0.9
 		def height = params.height && params.height != 'undefined' ? params.height : 800
 		def width = params.width && params.width!= 'undefined' ? params.width : 1200
+		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+		Set uniqueMoveEventList = moveBundleList.moveEvent
+		uniqueMoveEventList.remove(null)
+		List moveEventList = []
+		moveEventList =  uniqueMoveEventList.toList()
+		moveEventList.sort{it?.name}
+		def eventColorCode = [:]
+		int colorDiff = (232/moveEventList.size()).intValue()
+		moveEventList.eachWithIndex{ event, i ->
+			def colorCode = colorDiff * i
+			def colorsCode = "rgb(${colorCode},${colorCode},${colorCode})"
+			eventColorCode << [(event.name):colorsCode]
+		}
+		
 		graphData << ["force":force]
 		graphData << ["linkdistance":distance]
 		def graphNodes = []
@@ -3064,29 +3090,21 @@ class AssetEntityController {
 			def title = it.asset.assetName
 			def color = ''
 			if(it.asset.assetType == "Application"){
-				if (it.asset.moveBundle.moveEvent!=null){
-					color='red'
-				}
 				if(labels.contains("apps"))
 					name = it.asset.assetName
 				shape = "circle"
 			} else if(['VM','Server'].contains(it.asset.assetType)){
-				if (it.asset.moveBundle.moveEvent!=null){
-					color='red'
-				}
 				if(labels.contains("servers"))
 					name = it.asset.assetName
 				shape = "square"
 			} else if(['Database','Files'].contains(it.asset.assetType)){
-				if (it.asset.moveBundle.moveEvent!=null){
-					color='red'
-				}
 				if(labels.contains("files"))
 					name = it.asset.assetName
 				shape = "triangle-up"
 			}
-			graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle, 
-								shape:shape, size : size, title: title,color:color]
+			def moveEventName = it.asset.moveBundle.moveEvent?.name
+				graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle, 
+								shape:shape, size : size, title: title,color:eventColorCode[moveEventName]?eventColorCode[moveEventName]:"red"]
 		}
 		graphData << ["nodes":graphNodes]
 		def assetDependencies = AssetDependency.findAll("From AssetDependency where asset.project = :project OR dependent.project = :project",[project:project])
