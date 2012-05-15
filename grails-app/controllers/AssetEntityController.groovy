@@ -754,16 +754,21 @@ class AssetEntityController {
 			return;
 		}
 		def asset
+		def application
+		def database
+		def files
 		def assetEntityInstance
 		if(bundle[0] == "" ) {
 			asset = AssetEntity.findAllByProjectAndAssetTypeNotInList( project,["Application","Database","Files"], params )
+			application =Application.findAllByProject( project )
+			database =Database.findAllByProject( project )
+			files =Files.findAllByProject( project )
 		} else {
 			asset = AssetEntity.findAll( "from AssetEntity m where m.project = project and m.moveBundle in ( $bundleList )" )
+			application = Application.findAll( "from Application m where m.project = project and m.moveBundle in ( $bundleList )" )
+			database = Database.findAll( "from Database m where m.project = project and m.moveBundle in ( $bundleList )")
+			files = Files.findAll( "from Files m where m.project = project and m.moveBundle in ( $bundleList )" )
 		}
-		def application = Application.findAllByProject( project )
-		def database = Database.findAllByProject( project )
-		def files = Files.findAllByProject( project )
-
 		//get template Excel
 		def workbook
 		def book
