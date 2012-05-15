@@ -1,6 +1,6 @@
 <div style="margin-top: 10px; float:left;">
 			<div>
-				<input type="hidden" id="tabTypeId" name="tabType" value="" />
+				<input type="hidden" id="tabTypeId" name="tabType" value="${asset}" />
 				<div style="margin-left: 20px; margin-bottom: 10px;">
 					<h3>
 						<b>Dependency Groups</b>

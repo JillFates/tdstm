@@ -475,7 +475,7 @@ class MoveBundleService {
 		 def map = [assetDependencyList:assetDependencyList, dependencyType:dependencyType, planningConsoleList:planningConsoleList,
 				 date:time, dependencyStatus:dependencyStatus, assetDependency:new AssetDependency(), dependencyBundleCount:dependencyBundleCount,
 				 servers:servers, applications:applications, dbs:dbs, files:files,moveBundle:moveBundleList,applicationListSize:applicationListSize,
-				 physicalListSize:physicalListSize,virtualListSize:virtualListSize]
+				 physicalListSize:physicalListSize,virtualListSize:virtualListSize,asset:'Apps']
 		 
 		 return map
 	 }
