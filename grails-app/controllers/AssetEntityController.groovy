@@ -3055,7 +3055,7 @@ class AssetEntityController {
 			render(template:'dependencyGraph',model:[assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
 										   filesDependentListSize:filesListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbDependentListSize,
 										   asset:'graph', force:force, distance:distance,friction:friction,height:height,width:width, labels:labels , appChecked:labels.contains('apps') ? true : false , serverChecked:labels.contains('servers') ? true : false,
-										   filesChecked:labels.contains('files') ? true : false])
+										   filesChecked:labels.contains('files') ? true : false,eventColorCode:eventColorCode])
 			break;
 		}
 	}
@@ -3142,7 +3142,7 @@ class AssetEntityController {
 		JSON output = graphData as JSON
 		def currentfile = ApplicationHolder.application.parentContext.getResource( "/d3/force/miserables.json" ).getFile()
 		currentfile.write(output.toString());
-		render(template:'map',model:[asset:'graph', force:force, distance:distance,friction:friction,height:height,width:width, labels:labels])
+		render(template:'map',model:[asset:'graph', force:force, distance:distance,friction:friction,height:height,width:width, labels:labels,eventColorCode:eventColorCode])
 		
 	}	
 } 
