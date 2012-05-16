@@ -67,7 +67,7 @@
 						</g:if>
 						<g:else>
 							<td colspan="2" style="padding: 0px;">
-								<input type="checkbox" name="labels" value="servers">
+								<input type="checkbox" id="serverLabel" name="labels" value="servers">
 								<span style="vertical-align: text-top;">Servers</span>&nbsp;<img src="${createLinkTo(dir:'images',file:'iconServer.png')}" height="14" />
 							</td>
 						</g:else>
@@ -81,7 +81,7 @@
 						</g:if>
 						<g:else>
 							<td colspan="2" style="padding: 0px;">
-								<input type="checkbox" name="labels" value="files">
+								<input type="checkbox" id="filesLabel" name="labels" value="files">
 								<span style="vertical-align: text-top;">DB/Files</span>&nbsp;<img src="${createLinkTo(dir:'images',file:'iconDB.png')}" height="14" />
 							</td>
 						</g:else>

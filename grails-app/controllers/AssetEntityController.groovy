@@ -2694,7 +2694,7 @@ class AssetEntityController {
 					redirect( controller:'files', action:list, params:[projectId: projectId])
 					break;
 				case "planningConsole":
-			        forward(action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle")])
+			        forward(action:'getLists', params:[entity: params.tabType,labelsList:params.labels,dependencyBundle:session.getAttribute("dependencyBundle")])
 					break;
 				default:
 					redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_model:filterAttr.tag_f_model, tag_f_sourceLocation:filterAttr.tag_f_sourceLocation, tag_f_sourceRack:filterAttr.tag_f_sourceRack, tag_f_targetLocation:filterAttr.tag_f_targetLocation, tag_f_targetRack:filterAttr.tag_f_targetRack, tag_f_assetType:filterAttr.tag_f_assetType, tag_f_serialNumber:filterAttr.tag_f_serialNumber, tag_f_moveBundle:filterAttr.tag_f_moveBundle, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown,tag_s_1_application:filterAttr.tag_s_1_application,tag_s_2_assetName:filterAttr.tag_s_2_assetName,tag_s_3_model:filterAttr.tag_s_3_model,tag_s_4_sourceLocation:filterAttr.tag_s_4_sourceLocation,tag_s_5_sourceRack:filterAttr.tag_s_5_sourceRack,tag_s_6_targetLocation:filterAttr.tag_s_6_targetLocation,tag_s_7_targetRack:filterAttr.tag_s_7_targetRack,tag_s_8_assetType:filterAttr.tag_s_8_assetType,tag_s_9_assetTag:filterAttr.tag_s_9_assetTag,tag_s_10_serialNumber:filterAttr.tag_s_10_serialNumber,tag_s_11_moveBundle:filterAttr.tag_s_11_moveBundle,tag_s_12_depUp:filterAttr.tag_s_12_depUp,tag_s_13_depDown:filterAttr.tag_s_13_depDown])
@@ -2960,8 +2960,9 @@ class AssetEntityController {
 		    moveEventList.sort{it?.name}
 			def eventColorCode = [:]
 			int colorDiff = (232/moveEventList.size()).intValue()
-			List labels = params.labelsList ?  params.labelsList.split(",") : []
-			
+			def labelList = params.labelsList
+			labelList = labelList.replace(" ","")
+			List labels = labelList ?  labelList.split(",") : []
 			moveEventList.eachWithIndex{ event, i -> 
 				def colorCode = colorDiff * i
 				def colorsCode = "rgb(${colorCode},${colorCode},${colorCode})"
@@ -3053,7 +3054,8 @@ class AssetEntityController {
 			currentfile.write(output.toString());
 			render(template:'dependencyGraph',model:[assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
 										   filesDependentListSize:filesListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbDependentListSize,
-										   asset:'graph', force:force, distance:distance,friction:friction,height:height,width:width, labels:labels , appChecked:'checked'])
+										   asset:'graph', force:force, distance:distance,friction:friction,height:height,width:width, labels:labels , appChecked:labels.contains('apps') ? true : false , serverChecked:labels.contains('servers') ? true : false,
+										   filesChecked:labels.contains('files') ? true : false])
 			break;
 		}
 	}

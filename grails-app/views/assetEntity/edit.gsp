@@ -254,6 +254,7 @@
 					<input type = "hidden" id = "dstPath" name = "dstPath" value ="${redirectTo}"/>
 					<input name="redirectTo" type="hidden" value="${redirectTo}">
 					<input type = "hidden" id = "tabType" name="tabType" value =""/>
+					<input type="hidden" id="labelsListId" name="labels" value =""/>
 					<g:if test="${redirectTo!='planningConsole'}">
 					  <span class="button"><g:actionSubmit class="save" value="Update"  /> </span>
 					  <span class="button"><g:actionSubmit class="delete"	onclick=" return confirm('Are you sure?');" value="Delete" /> </span>
@@ -271,4 +272,14 @@
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')
 	$('#tabType').val($('#assetTypesId').val())
+$(document).ready(function() {
+	var labelsList = " "
+		$('#labelTree input:checked').each(function() {
+			labelsList += $(this).val()+',';
+		});
+	$('#labelsListId').val(labelsList)
+	$('#distanceId').val($('#distance').val())
+	$('#frictionId').val($('#friction').val())
+	$('#forceId').val($('#force').val())
+})
 </script>

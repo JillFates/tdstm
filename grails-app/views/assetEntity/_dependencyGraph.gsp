@@ -25,6 +25,9 @@
 	<input type="hidden" id="height" value="${height}" />
 	<input type="hidden" id="width" value="${width}" />
 	<input type="hidden" id="appChecked" value="${appChecked}" />
+	<input type="hidden" id="serverChecked" value="${serverChecked}" />
+	<input type="hidden" id="filesChecked" value="${filesChecked}" />
+	
 	
 	
 		<div id="item1" style="float: left;z-index: 10000;">
@@ -33,7 +36,27 @@
 	</div>
 </div>
 <script type="text/javascript">
-$('#appLabel').attr('checked',true)
+$(document).ready(function() {
+	$('#appLabel').attr('checked',true)
+	var isAppChecked = $('#appChecked').val()
+	var isServerChecked = $('#serverChecked').val()
+	var isFilesChecked = $('#filesChecked').val()
+	if(isAppChecked=='true'){
+		  $('#appLabel').attr('checked',true)
+	}else{
+	  	  $('#appLabel').attr('checked',false)
+	}
+	if(isServerChecked=='true'){
+	  $('#serverLabel').attr('checked',true)
+	}else{
+	  $('#serverLabel').attr('checked',false)
+	}
+	if(isFilesChecked=='true'){
+      $('#filesLabel').attr('checked',true)
+	}else{
+	  $('#filesLabel').attr('checked',false)
+	}
+})
 function increaseValue(action, id ){
 	var value = parseFloat($("#"+id).val())
 	if(id=='frictionId' && action =='add'){
@@ -79,8 +102,13 @@ function openPanel(){
 	$('#controlPanel').css('display','block')
 	$('#panelLink').attr('onClick','hidePanel()')
 }
-
-
+function listCheck(){
+	var labelsList = " "
+	$('#labelTree input:checked').each(function() {
+		labelsList += $(this).val()+',';
+	});
+	$('#labelsList').val(labelsList)
+}
 
   $('#forceId').val($('#force').val())
   $('#linksId').val($('#distance').val())
