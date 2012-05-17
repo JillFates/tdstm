@@ -1283,4 +1283,97 @@ class ReportsController {
 			return [reportDetails : reportDetails]
 		}
 	}
+	def preMoveCheckList={
+		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+    	def projectInstance = Project.findById( currProj ) 
+		def moveEventList = MoveEvent.findAllByProject(projectInstance)
+		return ['moveEvents':moveEventList]
+	}
+	def generateCheckList={
+		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectInstance = Project.findById( currProj )
+		def date = new Date()
+		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
+		String time = formatter.format(date);
+		def moveEventInstance = MoveEvent.get(params.moveEvent)
+		def errorForEventTime = ""
+		def moveBundles = moveEventInstance.moveBundles
+		def inProgressError
+		def clientAccess
+		def userLoginError = ""
+		moveBundles.each{
+			if(it.startTime > projectInstance.startDate && it.completionTime > projectInstance.completionDate){
+				errorForEventTime += """<span style="color:red" >Move bundle ${it.name} is completing after project completion  </span><br></br>"""
+			}else{
+				errorForEventTime += """<span style="color:green"><b>Event Time Period ${it.name} :OK </b>${it.startTime} - ${it.completionTime}</span><br></br>"""
+			}
+		}
+		if(moveEventInstance.inProgress=='true'){
+			inProgressError = "Event In Progress"
+		}
+		def list = []
+		def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $currProj and p.roleTypeCodeFrom = 'PROJECT' ")
+		projectStaff.each{staff ->
+			def map = new HashMap()
+			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+			map.put("company", company.partyIdFrom[0])
+			map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
+			map.put("role", staff.roleTypeCodeTo)
+			list<<map
+
+			def user = UserLogin.findByPerson(Person.get(staff.partyIdTo.id))
+			if(!user){
+				userLoginError +="""<span style="color:red"><b>${Person.get(staff.partyIdTo.id)} login disabled</b></span><br></br>"""
+			}
+			if(user?.active=='N'){
+				userLoginError +="""<span style="color:red"><b>${user} login inactive</b></span><br></br>"""
+			}
+
+		}
+		def query = "from Person s where s.id in (select p.partyIdTo from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = ${projectInstance.client.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ) order by s.lastName "
+		def personInstanceList = Person.findAll( query )
+		if(personInstanceList.size()==0){
+			clientAccess = "No Client Access"
+		}
+
+		//for Event and Bundles ----------------------------------------------------------------
+		Set workFlowCode = moveBundles.workflowCode
+		def workFlow = moveBundles.workflowCode
+		def workFlowCodeSelected = [:]
+		def steps = [:]
+		def moveBundleStep
+		if(workFlowCode.size()==1){
+			workFlowCodeSelected << [(moveEventInstance.name+'(Event)'):workFlow[0]]
+		}else{
+			moveBundles.each{
+				workFlowCodeSelected << [(it.name+'(Bundle)'):it.workflowCode]
+			}
+		}
+		def label = []
+		moveBundles.each{moveBundle->
+			moveBundleStep = MoveBundleStep.findAllByMoveBundle(moveBundle)
+			if(moveBundleStep.size()==0){
+				steps << [(moveBundle.name):"No steps created"]
+			}else{
+				moveBundleStep.each{step->
+					label << [
+						"${step.label}(${step.planDuration/60})"
+					]
+					steps << [(moveBundle.name):label]
+				}
+			}
+		}
+
+		//for Assets and Bundles ----------------------------------------------------------------
+
+		/*moveBundles.each{moveBundle->
+		 def assetEntity = AssetEntity.findAllByMoveBundle(moveBundle)
+		 assetEntity.each {asset->
+		 }
+		 }*/
+		return['project':projectInstance,'time':time,'moveEvent':moveEventInstance,'errorForEventTime':errorForEventTime,
+			'inProgressError':inProgressError,'userLoginError':userLoginError,'clientAccess':clientAccess,'list':list,
+			'workFlowCodeSelected':workFlowCodeSelected,'steps':steps,'moveBundleSize':moveBundles.size(),'moveBundles':moveBundles]
+	}
 }
+ 
