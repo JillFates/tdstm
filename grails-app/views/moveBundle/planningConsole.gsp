@@ -17,18 +17,15 @@ $(document).ready(function() {
 	$("#createEntityView").dialog({ autoOpen: false })
 	$("#showEntityView").dialog({ autoOpen: false })
 	$("#editEntityView").dialog({ autoOpen: false })
-    $("#commentsListDialog").dialog({ autoOpen: false })
-    $("#createCommentDialog").dialog({ autoOpen: false })
-    $("#showCommentDialog").dialog({ autoOpen: false })
-    $("#editCommentDialog").dialog({ autoOpen: false })
-    $("#manufacturerShowDialog").dialog({ autoOpen: false })
-    $("#modelShowDialog").dialog({ autoOpen: false })
-    $("#moveBundleSelectId").dialog({ autoOpen: false })
-   
-    
+	$("#commentsListDialog").dialog({ autoOpen: false })
+	$("#createCommentDialog").dialog({ autoOpen: false })
+	$("#showCommentDialog").dialog({ autoOpen: false })
+	$("#editCommentDialog").dialog({ autoOpen: false })
+	$("#manufacturerShowDialog").dialog({ autoOpen: false })
+	$("#modelShowDialog").dialog({ autoOpen: false })
+	$("#moveBundleSelectId").dialog({ autoOpen: false })  
+
 });
-
-
 </script>
 
 </head>
@@ -43,23 +40,27 @@ $(document).ready(function() {
 		<div id="checkBoxDiv" style="float: left;margin-top:10px;display: none; margin-left: 50px;">
 		<g:form name="checkBoxForm"> 
 			<div style="float: left;">
-				<h3>Connection Type</h3>
-				<g:each in="${dependencyType}" var="dependency">
-					<input type="checkbox" id="${dependency.value}"
-						name="connection" value="${dependency.value}" ${[ 'Batch' ].contains(dependency.value) ? "" : "checked"}/>&nbsp;&nbsp;
-						<span id="dependecy_${dependency.id}"> ${dependency.value}</span>
-					<br />
-				</g:each>
+			   <fieldset>
+			      <legend>Connection Type:</legend>
+					<g:each in="${dependencyType}" var="dependency">
+						<input type="checkbox" id="${dependency.value}"
+							name="connection" value="${dependency.value}" ${[ 'Batch' ].contains(dependency.value) ? "" : "checked"}/>&nbsp;&nbsp;
+							<span id="dependecy_${dependency.id}"> ${dependency.value}</span>
+						<br />
+					</g:each>
+				</fieldset>
 			</div>
 			&nbsp;
 			<div style="float: left;margin-left: 10px;">
-				<h3>Connection Status</h3>
-				<g:each in="${dependencyStatus}" var="dependencyStatus">
-					<input type="checkbox" id="${dependencyStatus.value}"
-						name="status" value="${dependencyStatus.value}" ${['Archived','Not Applicable'].contains(dependencyStatus.value) ? '' : 'checked'}/>&nbsp;&nbsp;
-						<span id="dependecy_${dependencyStatus.id}"> ${dependencyStatus.value} </span>
-					<br />
-				</g:each>
+            <fieldset>
+               <legend>Connection Status:</legend>
+					<g:each in="${dependencyStatus}" var="dependencyStatus">
+						<input type="checkbox" id="${dependencyStatus.value}"
+							name="status" value="${dependencyStatus.value}" ${['Archived','Not Applicable'].contains(dependencyStatus.value) ? '' : 'checked'}/>&nbsp;&nbsp;
+							<span id="dependecy_${dependencyStatus.id}"> ${dependencyStatus.value} </span>
+						<br />
+					</g:each>
+            </fieldset>
 			</div>
 			<div style="float: left;margin-left: 10px;" class="buttonR">
 				<input type="button" class="submit"
