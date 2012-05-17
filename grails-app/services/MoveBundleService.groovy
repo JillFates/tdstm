@@ -8,6 +8,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetType
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetOptions
 import com.tds.asset.AssetTransition
@@ -448,24 +449,26 @@ class MoveBundleService {
 	 def getPlanningConsoleMap(projectId) {
 		 def projectInstance = Project.get(projectId)
 		 def planningConsoleList = []
-		 def depBundleIDCountSQL = "select count(distinct dependency_bundle) from asset_dependency_bundle where project_id = $projectId"
-		 def depBundleIdSQL = "select distinct dependency_bundle as dependencyBundle from asset_dependency_bundle where project_id = $projectId order by dependency_bundle limit 48"
+		 def depBundleIDCountSQL = "SELECT count(distinct dependency_bundle) FROM asset_dependency_bundle WHERE project_id = $projectId"
+		 def depBundleIdSQL = "SELECT distinct dependency_bundle AS dependencyBundle FROM asset_dependency_bundle WHERE project_id = $projectId ORDER BY dependency_bundle"
 		 
 		 def dependencyBundleCount = jdbcTemplate.queryForInt(depBundleIDCountSQL)
 		 
 		 def assetDependencyList = jdbcTemplate.queryForList(depBundleIdSQL)
+		 
+		 // Iterate over the Asset Dependency list to construct the planningConsoleList of values
 		 assetDependencyList.each{ assetDependencyBundle->
 			 def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundleAndProject(assetDependencyBundle.dependencyBundle,projectInstance)
-			 def appCount = assetDependentlist.findAll{it.asset.assetType == 'Application'}.size()
-			 def serverCount = assetDependentlist.findAll{it.asset.assetType == 'Server'}.size()
-			 def vmCount = assetDependentlist.findAll{it.asset.assetType == 'VM'}.size()
+			 def appCount = assetDependentlist.findAll{ it.asset.assetType == AssetType.APPLICATION.toString() }.size()
+			 def serverCount = assetDependentlist.findAll{ it.asset.assetType == AssetType.SERVER.toString() }.size()
+			 def vmCount = assetDependentlist.findAll{it.asset.assetType == AssetType.VM.toString() }.size()
 			 planningConsoleList << ['dependencyBundle':assetDependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
 		 }
 		 
-		 def servers = AssetEntity.findAllByAssetTypeAndProject('Server',projectInstance)
-		 def applications = Application.findAllByAssetTypeAndProject('Application',projectInstance)
-		 def dbs = Database.findAllByAssetTypeAndProject('Database',projectInstance)
-		 def files = Files.findAllByAssetTypeAndProject('Files',projectInstance)
+		 def servers = AssetEntity.findAllByAssetTypeAndProject(AssetType.SERVER.toString(),projectInstance)
+		 def applications = Application.findAllByAssetTypeAndProject(AssetType.APPLICATION.toString(),projectInstance)
+		 def dbs = Database.findAllByAssetTypeAndProject(AssetType.DATABASE.toString(),projectInstance)
+		 def files = Files.findAllByAssetTypeAndProject(AssetType.FILES.toString(),projectInstance)
 		 def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		 def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
  
@@ -478,11 +481,11 @@ class MoveBundleService {
 		 }
 		 def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance,true)
 		 
-		def  assetDependentlist = AssetDependencyBundle.findAllByProject(projectInstance)?.sort{it.dependencyBundle}
+		 def  assetDependentlist = AssetDependencyBundle.findAllByProject(projectInstance)?.sort{it.dependencyBundle}
 		
-		def physicalListSize = assetDependentlist.findAll{ it.asset.assetType ==  'Server' }.size()
-		def virtualListSize = assetDependentlist.findAll{ it.asset.assetType ==  'VM' }.size()
-		def applicationListSize = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.size()
+		 def physicalListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.SERVER.toString() }.size()
+		 def virtualListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.VM.toString() }.size()
+		 def applicationListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.APPLICATION.toString() }.size()
  
 		 def map = [assetDependencyList:assetDependencyList, dependencyType:dependencyType, planningConsoleList:planningConsoleList,
 				 date:time, dependencyStatus:dependencyStatus, assetDependency:new AssetDependency(), dependencyBundleCount:dependencyBundleCount,

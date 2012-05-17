@@ -46,8 +46,8 @@ $(document).ready(function() {
 				<h3>Connection Type</h3>
 				<g:each in="${dependencyType}" var="dependency">
 					<input type="checkbox" id="${dependency.value}"
-						name="connection" value="${dependency.value} " checked="checked"/>&nbsp;&nbsp;<span
-						id="dependecy_${dependency.id}" > ${dependency.value} </span>
+						name="connection" value="${dependency.value}" ${[ 'Batch' ].contains(dependency.value) ? "" : "checked"}/>&nbsp;&nbsp;
+						<span id="dependecy_${dependency.id}"> ${dependency.value}</span>
 					<br />
 				</g:each>
 			</div>
@@ -56,8 +56,8 @@ $(document).ready(function() {
 				<h3>Connection Status</h3>
 				<g:each in="${dependencyStatus}" var="dependencyStatus">
 					<input type="checkbox" id="${dependencyStatus.value}"
-						name="status" value="${dependencyStatus.value} " checked="checked"/>&nbsp;&nbsp;<span
-						id="dependecy_${dependencyStatus.id}" > ${dependencyStatus.value} </span>
+						name="status" value="${dependencyStatus.value}" ${['Archived','Not Applicable'].contains(dependencyStatus.value) ? '' : 'checked'}/>&nbsp;&nbsp;
+						<span id="dependecy_${dependencyStatus.id}"> ${dependencyStatus.value} </span>
 					<br />
 				</g:each>
 			</div>
