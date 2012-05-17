@@ -626,6 +626,9 @@ class MoveBundleController {
 		render(template:'dependencyBundleDetails', model:moveBundleService.getPlanningConsoleMap(projectId) )
 	}
 	
+	/**
+	 * Assigns one or more assets to a specified move bundle
+	 */
 	def saveAssetsToBundle={
 		def assetArray = params.assetVal
 		def moveBundleInstance = MoveBundle.findById(Integer.parseInt(params.moveBundleList))
@@ -633,6 +636,7 @@ class MoveBundleController {
 		assetList.each{assetId->
 			def assetInstance = AssetEntity.get(assetId)
 			assetInstance.moveBundle = moveBundleInstance
+			assetInstance.planStatus = 'Assigned'
 			if(!assetInstance.save(flush:true)){
 				assetInstance.errors.allErrors.each{
 			          println it 		
