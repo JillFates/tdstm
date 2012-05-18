@@ -37,6 +37,7 @@ $(document).ready(function() {
 			<img id="upArrow" style="display:none; margin-left: 179px; margin-top: -22px; float: left; " src="${createLinkTo(dir:'images',file:'triangle_up.png')}" onclick="collapsePage()"/>
 	        <img id="downArrow" style="float:left; margin-left: 179px; margin-top: -22px;" src="${createLinkTo(dir:'images',file:'triangle_down.png')}" onclick="openPage()"/>
 		</div>
+		 <tds:hasPermission permission='MoveBundleEditView'>
 		<div id="checkBoxDiv" style="float: left;margin-top:10px;display: none; margin-left: 50px;">
 		<g:form name="checkBoxForm"> 
 			<div style="float: left;">
@@ -66,14 +67,17 @@ $(document).ready(function() {
 				<input type="button" class="submit"
 					style="float: right; margin-top: 50px" value="Generate" onclick="submitCheckBox()" />
 			</div>
+			
 			</g:form>
-
+             
 		</div>
+		</tds:hasPermission>
 		<div style="clear: both;"></div>
-		
-		<div id = "dependencyBundleDetailsId" >
-			<g:render template="dependencyBundleDetails" />
-		</div>
+		 <tds:hasPermission permission='MoveBundleEditView'>
+			<div id = "dependencyBundleDetailsId" >
+				<g:render template="dependencyBundleDetails" />
+			</div>
+		</tds:hasPermission>
 		<div style="clear: both;"></div>
 		
 		<div id="moveBundleSelectId" title="Change Move Bundle" style="background-color: #808080; display: none; float: right" >
@@ -96,8 +100,9 @@ $(document).ready(function() {
 		        </table>
           </g:form>
 		</div>
-		<div id="items1" style="display: none"></div>
-		
+		<tds:hasPermission permission='MoveBundleEditView'>
+		  <div id="items1" style="display: none"></div>
+		</tds:hasPermission>
 		<g:render template="../assetEntity/commentCrud" />
 		<g:render template="../assetEntity/modelDialog" />
 		<div id="createEntityView" style="display: none;"></div>

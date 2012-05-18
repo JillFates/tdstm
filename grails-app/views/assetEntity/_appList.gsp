@@ -12,8 +12,10 @@
 	 <div id ="selectionAppId">
 	    <input type="hidden" id="assetTypeId" name="assetType" value="${asset}" />
 	    <input type="hidden" id="assetTypesId" name="assetType" value="Apps" />
+	   <tds:hasPermission permission='MoveBundleEditView'>
 		<input id="state" type="button"  class="submit" value="Change MoveBundle" onclick="changeMoveBundle($('#assetTypeId').val(),${appList.id})"  />
 		<input id="selectId" type="button"  class="submit" value="All.." onclick="selectAll()" title="Select All" />
+	  </tds:hasPermission>
 	</div>
 	<div class="tabInner">
 		<div id="item1">
