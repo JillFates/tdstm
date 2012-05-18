@@ -1343,13 +1343,14 @@ class ReportsController {
 		def steps = [:]
 		def moveBundleStep
 		if(workFlowCode.size()==1){
-			workFlowCodeSelected << [(moveEventInstance.name+'(Event)'):workFlow[0]]
+			workFlowCodeSelected << [(moveEventInstance.name+'(Event)'+'All Bundles have same WorkFlow'):workFlow[0]]
 		}else{
 			moveBundles.each{
 				workFlowCodeSelected << [(it.name+'(Bundle)'):it.workflowCode]
 			}
 		}
 		def label = []
+		String labels
 		moveBundles.each{moveBundle->
 			moveBundleStep = MoveBundleStep.findAllByMoveBundle(moveBundle)
 			if(moveBundleStep.size()==0){
@@ -1357,23 +1358,33 @@ class ReportsController {
 			}else{
 				moveBundleStep.each{step->
 					label << [
-						"${step.label}(${step.planDuration/60})"
+						"${step.label}(${step.planDuration/60+'m'})"
 					]
-					steps << [(moveBundle.name):label]
+					labels = label.toString()
+					labels = labels.replace('[[','').replace('], [',' , ').replace(']]','')
+					steps << [(moveBundle.name):labels]
 				}
 			}
 		}
 
 		//for Assets and Bundles ----------------------------------------------------------------
-
-		/*moveBundles.each{moveBundle->
-		 def assetEntity = AssetEntity.findAllByMoveBundle(moveBundle)
-		 assetEntity.each {asset->
-		 }
-		 }*/
+        def assetEntityList = AssetEntity.findAllByMoveBundleInListAndProject(moveBundles,projectInstance)
+		def summaryOk = [:]
+		Set assetType
+		def typeCount 
+		def types = []
+		moveBundles.each{moveBundle->
+			 def assetEntity = AssetEntity.findAllByMoveBundleAndProject(moveBundle,projectInstance)
+			 typeCount = AssetEntity.executeQuery("select count(*) , assetType  from AssetEntity where moveBundle = ${moveBundle.id} group by assetType ")
+			 String counts = typeCount.toString()
+			 counts = counts.replace('[[', '').replace(']]', '').replace(',', '').replace('] [',',').replace('[]', '0')
+			 summaryOk << [(moveBundle) :  counts ]
+		}
+		def duplicatesAssetNames = jdbcTemplate.queryForList("SELECT asset_name from asset_entity where project_id = $currProj GROUP BY asset_name HAVING COUNT(*) > 1")
 		return['project':projectInstance,'time':time,'moveEvent':moveEventInstance,'errorForEventTime':errorForEventTime,
 			'inProgressError':inProgressError,'userLoginError':userLoginError,'clientAccess':clientAccess,'list':list,
-			'workFlowCodeSelected':workFlowCodeSelected,'steps':steps,'moveBundleSize':moveBundles.size(),'moveBundles':moveBundles]
+			'workFlowCodeSelected':workFlowCodeSelected,'steps':steps,'moveBundleSize':moveBundles.size(),'moveBundles':moveBundles,'summaryOk':summaryOk,
+			'duplicatesAssetNames':duplicatesAssetNames]
 	}
 }
  
