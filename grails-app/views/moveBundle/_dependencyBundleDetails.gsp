@@ -16,33 +16,38 @@
 					<tr class="odd">
 						<td><b>Dependency Group</b></td>
 						<g:if test="${planningDashboard!='planningDashboard'}">
-							<td><span id="allDependencyBundle" class="highlightSpan"  style="cursor: pointer; background-color: yellow;font-weight:bold;" onclick="getList($('#tabTypeId').val(),null)" >All</span></td>
+							<td id="span_all" class="highlightSpan"  >
+								<span style="cursor: pointer;" onclick="getList($('#tabTypeId').val(),'all')" >All</span>
+							</td>
 						</g:if> 
-					<g:each in="${planningConsoleList}" var="asset"><td><span id="serverIds"  style="cursor: pointer; color: grey;" onclick="getList( $('#tabTypeId').val() , ${asset.dependencyBundle})" ><span id="span_${asset.dependencyBundle}" class="highlightSpan" >${asset.dependencyBundle}</span>
-						</span></td></g:each>
+						<g:each in="${planningConsoleList}" var="asset">
+							<td id="span_${asset.dependencyBundle}">
+								<span style="cursor: pointer; color: grey;" onclick="getList( $('#tabTypeId').val() , ${asset.dependencyBundle})" >${asset.dependencyBundle}</span>
+							</td>
+						</g:each>
 						</tr>
 					<tr class="even">
 						<td><b>Applications</b></td>
 						<g:if test="${planningDashboard!='planningDashboard'}">
-							<td><span id="allAppCount">${applicationListSize }</span></td>
+							<td id="app_all"><span id="allAppCount">${applicationListSize }</span></td>
 						</g:if> 
-						<g:each in="${planningConsoleList}" var="assets"><td>${assets.appCount }</td>
+						<g:each in="${planningConsoleList}" var="asset"><td id="app_${asset.dependencyBundle}">${asset.appCount }</td>
 						</g:each>
 					</tr>
 					<tr class="odd">
 						<td><b>Physical Servers</b></td>
 						<g:if test="${planningDashboard!='planningDashboard'}">
-							<td><span id="allServerCount">${physicalListSize }</span></td>
+							<td id="server_all"><span id="allServerCount">${physicalListSize }</span></td>
 						</g:if> 
-						<g:each in="${planningConsoleList}" var="assets"><td>${assets.serverCount }</td>
+						<g:each in="${planningConsoleList}" var="asset"><td id="server_${asset.dependencyBundle}">${asset.serverCount }</td>
 					    </g:each>
 					</tr>
 					<tr class="even">
 						<td><b>Virtual Servers</b></td>
 						<g:if test="${planningDashboard!='planningDashboard'}">
-							<td><span id="allVirtualCount">${virtualListSize }</span></td>
+							<td id="vm_all"><span id="allVirtualCount">${virtualListSize }</span></td>
 						</g:if>
-						<g:each in="${planningConsoleList}" var="assets"><td>${assets.vmCount }</td>
+						<g:each in="${planningConsoleList}" var="asset"><td id="vm_${asset.dependencyBundle}">${asset.vmCount }</td>
 					    </g:each>
 					</tr>
 				</table>
