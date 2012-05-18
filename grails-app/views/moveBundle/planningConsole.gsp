@@ -131,19 +131,21 @@ $(document).ready(function() {
 <script type="text/javascript">
 	function getList(value,dependencyBundle, force, distance, labels){
 		$('#moveBundleSelectId').dialog("close")
+		var id = 'all'
+		if(dependencyBundle != null) id = dependencyBundle
 		
 		$('.highlightSpan').removeClass('highlightSpan')
 		$('.app_count').removeClass('app_count')
 		$('.server_count').removeClass('server_count')
 		$('.vm_count').removeClass('vm_count')
 		
-		$('#span_'+dependencyBundle).addClass('highlightSpan')
-		$('#app_'+dependencyBundle).addClass('app_count')
-		$('#server_'+dependencyBundle).addClass('server_count')
-		$('#vm_'+dependencyBundle).addClass('vm_count')
+		$('#span_'+id).addClass('highlightSpan')
+		$('#app_'+id).addClass('app_count')
+		$('#server_'+id).addClass('server_count')
+		$('#vm_'+id).addClass('vm_count')
 		
 		
-		if(dependencyBundle == 'all') dependencyBundle = null
+		 
 		switch(value){
 		case "server" :
 			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }

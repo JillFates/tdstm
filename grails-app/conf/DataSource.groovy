@@ -15,21 +15,23 @@ environments {
 	development {
 		dataSource {
 			// TDS Transitional Manager
+			pooled = true
 			dbCreate = "update" // one of 'create', 'create-drop','update'
 			//  dbCreate = "create-drop" // one of 'create', 'create-drop','update'
 			// url = "jdbc:mysql://localhost/tdstm_dev"
-			url = "jdbc:mysql://tdstm-dbserver/tdstm"
+			url = "jdbc:mysql://localhost/tdstm"
 			driverClassName = "com.mysql.jdbc.Driver"
-			username = "tdstm"
-			password = "tdstm"
+			username = "root"
+			password = "admin"
 			
-			logSql = true 
+			//logSql = true 
 			
 			/*
 			dbCreate = "create-drop" // one of 'create', 'create-drop','update'
 			url = "jdbc:hsqldb:mem:devDB"
 			*/
 		}
+		
 	}
 	test {
 		dataSource {
