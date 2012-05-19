@@ -15,7 +15,7 @@
 		</div>
 	</div>
 	<div style="border: 1px solid #63A242; margin-left: 20px;">
-		<table cellpadding="0" cellspacing="0" style="border: 0px;">
+		<table id="dependencyTableId" cellpadding="0" cellspacing="0" style="border: 0px;">
 			<tr>
 				<td style="width: 137px; padding: 0px;">
 				<div style="overflow-x:scroll; max-width: 137px;">

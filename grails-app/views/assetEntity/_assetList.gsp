@@ -1,3 +1,4 @@
+<%@page import="com.tds.asset.AssetComment"%>
 <div class="tabs">
 	<ul>
 		
@@ -48,9 +49,24 @@
 							<g:checkBox name="checkBox" id="checkId_${asset.id}" ></g:checkBox>
 							<a href="javascript:editEntity('planningConsole','Server', ${asset.id})"><img
 									src="/tdstm/images/skin/database_edit.png" border="0px" />
-							</a> <span id="icon_15651"> <a
-									href="javascript:createNewAssetComment(15651);"> <img
-										src="/tdstm/i/db_table_light.png" border="0px" /> </a> </span>
+							</a> <span id="icon_15651">
+							 <g:if test="${AssetComment.find('from AssetComment where assetEntity = '+asset.id+' and commentType = ? and isResolved = ?',['issue',0])}">
+							   <g:remoteLink controller="assetEntity" action="listComments" id="${asset.id}" before="setAssetId('${asset.id}');" onComplete="listCommentsDialog(e,'never');">
+							      <img id="comment_${asset.id}" src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="0px" />
+							   </g:remoteLink>
+				             </g:if>
+						     <g:elseif test="${AssetComment.find('from AssetComment where assetEntity = '+asset.id)}">
+						     <g:remoteLink controller="assetEntity" action="listComments" id="${asset.id}" before="setAssetId('${asset.id}');" onComplete="listCommentsDialog(e,'never');">
+							      <img id="comment_${asset.id}" src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px" />
+							 </g:remoteLink>
+						     </g:elseif>
+						     <g:else>
+						     <a href="javascript:createNewAssetComment(${asset.id});">
+							    <img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${asset.id});"/>
+							 </a>
+							    
+						    </g:else>
+			 				</span>
 							</td>
 							<td><span
 								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.application}</span>
