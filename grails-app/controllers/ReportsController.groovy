@@ -15,6 +15,7 @@ import org.jsecurity.SecurityUtils
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetDependency
 import com.tdssrc.grails.GormUtil
 
 class ReportsController {
@@ -1336,7 +1337,8 @@ class ReportsController {
 			clientAccess = "No Client Access"
 		}
 
-		//for Event and Bundles ----------------------------------------------------------------
+		//for Event and Bundles ----------------------------------------------------------------//
+		
 		Set workFlowCode = moveBundles.workflowCode
 		def workFlow = moveBundles.workflowCode
 		def workFlowCodeSelected = [:]
@@ -1367,8 +1369,9 @@ class ReportsController {
 			}
 		}
 
-		//for Assets and Bundles ----------------------------------------------------------------
-        def assetEntityList = AssetEntity.findAllByMoveBundleInListAndProject(moveBundles,projectInstance)
+		//for Assets and Bundles ----------------------------------------------------------------//
+
+        def assetEntityList = AssetEntity.findAllByMoveBundleInListAndProject(moveBundles,projectInstance,[sort:'assetName'])
 		def summaryOk = [:]
 		Set assetType
 		def typeCount 
@@ -1380,11 +1383,52 @@ class ReportsController {
 			 counts = counts.replace('[[', '').replace(']]', '').replace(',', '').replace('] [',',').replace('[]', '0')
 			 summaryOk << [(moveBundle) :  counts ]
 		}
-		def duplicatesAssetNames = jdbcTemplate.queryForList("SELECT asset_name from asset_entity where project_id = $currProj GROUP BY asset_name HAVING COUNT(*) > 1")
+		def duplicatesAssetNames = jdbcTemplate.queryForList("SELECT asset_name as assetName , count(*) as counts from asset_entity where project_id = $currProj GROUP BY asset_name HAVING COUNT(*) > 1")
+		String duplicates = ""
+		if(duplicatesAssetNames.size()>0){
+			duplicates += """<span style="color: red;"><b>Naming Check: <br></br></span>"""
+		}else{
+			duplicates += """<span style="color: green;"><b>Naming Check OK <br></br></span>"""
+		}
+		def duplicatesAssetTagNames = jdbcTemplate.queryForList("SELECT asset_tag as tag , count(*) as counts from asset_entity where project_id = $currProj GROUP BY asset_tag HAVING COUNT(*) > 1")
+		String duplicatesTag = ""
+		if(duplicatesAssetTagNames.size()>0){
+			duplicatesTag += """<span style="color: red;"><b>Asset Tag: <br></br></span>"""
+		}else{
+			duplicatesTag += """<span style="color: green;"><b>Asset Tag  OK <br></br></span>"""
+		}
+		def missingRacks = AssetEntity.findAll("from AssetEntity asset where  asset.project.id=${currProj} and assetType not in('Application','Files','Database','Blades') and asset.moveBundle.moveEvent.id=${moveEventInstance.id} and (sourceRack='' or targetRack='' or sourceRackPosition = '' or targetRackPosition = '')  ").assetName
+		String missedRacks = ""
+		if(missingRacks.size()>0){
+			missedRacks += """<span style="color: red;"><b>Asset Details:${missingRacks.size} Servers With Missing Rack info : </b><br></br></span>"""
+		}else{
+		    missedRacks += """<span style="color: Green;"><b>Asset Details: OK </b><br></br></span>"""
+			missingRacks = ''
+		}
+		def dependencies = []
+		if(assetEntityList.size()>0){
+		   dependencies = AssetDependency.findAllByAssetInListOrDependentInList(assetEntityList,assetEntityList)?.asset?.assetName
+		}
+		String dependenciesOk = ""
+		if(dependencies.size()>0){
+			dependenciesOk +="""<span style="color: red;"><b>Dependency found:${dependencies.size} :${dependencies} </b><br></br></span>"""
+		}else{
+		    dependenciesOk +="""<span style="color: green;"><b>Dependency -No Dependencies : </b><br></br></span>"""
+		}
+		String assetId = assetEntityList.id
+		assetId = assetId.replace("[","('").replace(",","','").replace("]","')")
+		def issues = AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in ${assetId} and commentType ='issue' and  isResolved =0 order by comment.assetEntity.assetName ")
+		def issue = ""
+		if(issues.size()>0){
+			issue +="""<span style="color: red;"><b>Issues: Unresolved Issues  </b><br></br></span>"""
+		}else{
+		    issue +="""<span style="color: green;"><b>Issues OK  </b><br></br></span>"""
+		}
 		return['project':projectInstance,'time':time,'moveEvent':moveEventInstance,'errorForEventTime':errorForEventTime,
 			'inProgressError':inProgressError,'userLoginError':userLoginError,'clientAccess':clientAccess,'list':list,
 			'workFlowCodeSelected':workFlowCodeSelected,'steps':steps,'moveBundleSize':moveBundles.size(),'moveBundles':moveBundles,'summaryOk':summaryOk,
-			'duplicatesAssetNames':duplicatesAssetNames]
+			'duplicatesAssetNames':duplicatesAssetNames,'duplicates':duplicates,'duplicatesTag':duplicatesTag,'duplicatesAssetTagNames':duplicatesAssetTagNames,'missedRacks':missedRacks,'missingRacks':missingRacks,
+			'dependenciesOk':dependenciesOk,'issue':issue,'issueMap':issues]
 	}
 }
  

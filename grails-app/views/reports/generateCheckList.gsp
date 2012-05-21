@@ -83,29 +83,70 @@
 				<td></td>
 				<td><span style="color: green;"> <g:each
 							in="${workFlowCodeSelected}" var="workFlow" status="i">
-						 	${workFlow.key}:${workFlow.value}<br></br>
+							${workFlow.key}:${workFlow.value}<br></br>
 						</g:each></b></span></td>
 
 			</tr>
 			<tr>
 				<td></td>
 
-				<td><span style="color: green;"><b>DashBoard OK</b><br></br></span><span> 
-				        <g:each in="${steps}" var="workFlow">
+				<td><span style="color: green;"><b>DashBoard OK</b><br></br></span><span>
+						<g:each in="${steps}" var="workFlow">
 							${workFlow.key}:${workFlow.value}<br></br>
-						</g:each></b></span></td>
+						</g:each></b>
+				</span></td>
 
 			</tr>
 			<tr>
 				<td><span style="color: red;"><b><h2>Assets</h2></b></span></td>
 			</tr>
 			<tr>
-			     <td></td>
-				 <td><span style="color: green;"><b>Summary : OK <br></br> <g:each in="${summaryOk}" var="summary">${summary.key}:${summary.value}<br></br></g:each>  </b></span></td>
+				<td></td>
+				<td><span style="color: green;"><b>Summary : OK <br></br>
+							<g:each in="${summaryOk}" var="summary">
+								${summary.key}:${summary.value}<br></br>
+							</g:each>
+					</b></span></td>
 			</tr>
 			<tr>
-			     <td></td>
-				 <td><span style="color: green;"><b>Naming Check <br></br> <g:each in="${duplicatesAssetNames}" var="duplicate">${duplicatesAssetNames.size()} duplicates Named ${duplicate.asset_name}<br></br></g:each>  </b></span></td>
+				<td></td>
+				<td>
+					${duplicates} <g:each in="${duplicatesAssetNames}" var="duplicate">
+						${duplicate.counts} duplicates Named "${duplicate.assetName}"<br></br>
+					</g:each>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+					${duplicatesTag} <g:each in="${duplicatesAssetTagNames}"
+						var="duplicate">
+						${duplicate.counts} duplicates Named "${duplicate.tag}"<br></br>
+					</g:each>
+				</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>
+					${missedRacks}<br /> ${missingRacks}
+				</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>
+					${dependenciesOk}
+				</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>
+					${issue}<br /> <g:each in="${issueMap}" var="issue">
+						<b>
+							${issue.assetEntity.assetName}:"${issue.comment}"
+						</b>
+						<br />
+					</g:each>
+				</td>
 			</tr>
 		</table>
 
