@@ -141,13 +141,96 @@
 				<td>&nbsp;</td>
 				<td>
 					${issue}<br /> <g:each in="${issueMap}" var="issue">
-						<b>
-							${issue.assetEntity.assetName}:"${issue.comment}"
+						<b> ${issue.assetEntity.assetName}:"${issue.comment}"
 						</b>
 						<br />
 					</g:each>
 				</td>
 			</tr>
+			<tr>
+				<td><span style="color: red;"><b><h2>Teams</h2></b></span></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><span style="color: green;"><b>Summary OK : <g:each
+								in="${bundleMap}" var="bundle">
+								${bundle.name}:${bundle.size} teams.</g:each></b></span></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><g:each in="${bundleMap}" var="bundle">
+				<g:if test="${bundle.teamList.size()>0}">
+						<h3>
+							<b>
+								${bundle.name}
+							</b>
+						</h3>
+						<br />
+						<table style="width:700px">
+							<thead>
+								<tr>
+									<th width="100px;">Team</th>
+									<th width="100px;">Role</th>
+									<th width="150px;">Team Members</th>
+									<th width="50px;">Assets</th>
+								</tr>
+							</thead>
+							<tbody>
+								<g:each in="${bundle.teamList}" var="teamList">
+									<tr>
+										<td>
+											${teamList.name[0]}
+										</td>
+										<td>
+											${teamList.role[0]}
+										</td>
+										<td>
+											<table style="border: 0px;" >
+												<tr>
+													<td><g:each in="${teamList.teamList[0]}" var="teamListtaff">
+															<tr>
+																<td >
+																	${teamListtaff.company[0]}:${teamListtaff.name}
+																</td>
+															</tr>
+														</g:each></td>
+												</tr>
+											</table>
+										</td>
+										<td>
+											${teamList.assetSize[0]}
+										</td>
+									</tr>
+								</g:each>
+							</tbody>
+						</table>
+						</g:if>
+					</g:each></td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td>
+							${teamAssignment}<br /> <g:each in="${notAssignedToTeam}" var="asset">
+								${asset[0]}, 
+							</g:each><b> Not Assigned .</b>
+						</td>
+				
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td>
+							${userLogin}<br /> <g:each in="${inValidUsers}" var="user">
+								<b>${user[0]}</b>
+							</g:each>
+						</td>
+					</tr>
+					<tr>
+					  <td><span style="color: green;"><b><h2>Transport</h2></b></span></td>
+					</tr>
+					<tr>
+					  <td>&nbsp;</td>
+					  <td>${truckError} <g:each in="${truck}" var="truck">${truck}</g:each> </span></td>
+					</tr>
 		</table>
 
 	</div>
