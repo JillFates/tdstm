@@ -25,15 +25,11 @@
 			</tr>
 			<tr>
 				<td></td>
-				<td><span style="color: red"><b> ${moveEvent.name } :
-							${inProgressError}
-					</b></span></td>
+				<td>${inProgressError}</td>
 			</tr>
 			<tr>
 				<td></td>
-				<td><span style="color: green"><b>Staff</b></span>: <span
-					style="color: red"><b> ${clientAccess}
-					</b></span></td>
+				<td><span style="color: green"><b>Staff</b></span>:${clientAccess} </td>
 			</tr>
 			<tr>
 				<td></td>
@@ -69,11 +65,11 @@
 				</td>
 			</tr>
 			<tr>
-				<td><span style="color: green;"><b><h2>Event/Bundle</h2></b></span></td>
+				<td><span style="color: green;"><h2><b>Event/Bundle</b></h2></span></td>
 			</tr>
 			<tr>
 				<td></td>
-				<td><span style="color: green;"><b>Bundels:OK ${moveBundleSize}:${moveBundles}</b></span></td>
+				<td><span style="color: green;"><b>Bundles:OK &nbsp;&nbsp; ${moveBundleSize}: &nbsp;&nbsp;${moveBundles}</b></span></td>
 			</tr>
 			<tr>
 				<td></td>
@@ -84,7 +80,7 @@
 				<td><span style="color: green;"> <g:each
 							in="${workFlowCodeSelected}" var="workFlow" status="i">
 							${workFlow.key}:${workFlow.value}<br></br>
-						</g:each></b></span></td>
+						</g:each></span></td>
 
 			</tr>
 			<tr>
@@ -92,8 +88,13 @@
 
 				<td><span style="color: green;"><b>DashBoard OK</b><br></br></span><span>
 						<g:each in="${steps}" var="workFlow">
-							${workFlow.key}:${workFlow.value}<br></br>
-						</g:each></b>
+						  <g:if test="${workFlow.value=='No steps created'}"> 
+							 	<span style="color:red">${workFlow.key}:${workFlow.value}</span><br></br>
+						  </g:if>
+						  <g:else>
+						  		<span style="color:green">${workFlow.key}:${workFlow.value}</span><br></br>
+						  </g:else>
+						</g:each>
 				</span></td>
 
 			</tr>
@@ -111,8 +112,19 @@
 			<tr>
 				<td></td>
 				<td>
-					${duplicates} <g:each in="${duplicatesAssetNames}" var="duplicate">
-						${duplicate.counts} duplicates Named "${duplicate.assetName}"<br></br>
+					${duplicates} 
+					<g:each in="${duplicatesAssetNames}" var="duplicate">
+					    <g:if test="${nullAssetname.size() == 1 && (nullAssetname.contains(null) || nullAssetname.contains(''))}">
+					        <span style="color:green;"> Blank names: ${duplicate.counts}-${duplicate.type}</span><br/>
+					    </g:if>
+					    <g:else>
+							<g:if test="${duplicate.assetName=='' || duplicate.assetName==null}">
+							   <span style="color:red;"> Blank names: ${duplicate.counts}-${duplicate.type}</span><br/>
+							</g:if>
+							<g:else>
+								<span style="color:red;" >${duplicate.counts} duplicates Named "${duplicate.assetName} "-(${duplicate.type})</span><br></br>
+							</g:else>
+						</g:else>
 					</g:each>
 				</td>
 			</tr>
@@ -229,7 +241,15 @@
 					</tr>
 					<tr>
 					  <td>&nbsp;</td>
-					  <td>${truckError} <g:each in="${truck}" var="truck">${truck}</g:each> </span></td>
+					  <td>${truckError} <g:each in="${truck}" var="truck">${truck}</g:each> </td>
+					</tr>
+					<tr>
+					  <td>&nbsp;</td>
+					  <td>${cartError} <g:each in="${cart}" var="cart">${cart}</g:each> </td>
+					</tr>
+					<tr>
+					  <td>&nbsp;</td>
+					  <td>${shelfError}  <g:each in="${shelf}" var="shelf">${shelf}</g:each> </td>
 					</tr>
 		</table>
 
