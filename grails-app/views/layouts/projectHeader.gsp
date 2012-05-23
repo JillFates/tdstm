@@ -239,38 +239,9 @@
 					<td style="vertical-align:top"><span class="megamenuSection">Assets</span><br />
 						<ul>
 							<li><g:link class="mmlink" controller="assetEntity" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">List Assets</g:link> </li>
-							<li>&nbsp;</li>
-							<li>&nbsp;</li>
-							<tds:hasPermission permission='HelpMenuView'>
-							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('assetMegaMenu')">help</a></li>
-							</tds:hasPermission>
-						</ul>
-					</td>
-					<td style="vertical-align:top"><span class="megamenuSection">Applications</span><br />
-						<ul>
 							<li><g:link class="mmlink" controller="application" action="list"  params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">List Apps</g:link></li>
-							<li>&nbsp;</li>
-							<li>&nbsp;</li>
-							<tds:hasPermission permission='HelpMenuView'>
-							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('assetMegaMenu')">help</a></li>
-							</tds:hasPermission>
-						</ul>
-					</td>
-					<td style="vertical-align:top"><span class="megamenuSection">Databases</span><br />
-						<ul>
 							<li><g:link class="mmlink" controller="database" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">List DBs</g:link></li>
-							<li>&nbsp;</li>
-							<li>&nbsp;</li>
-							<tds:hasPermission permission='HelpMenuView'>
-							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('assetMegaMenu')">help</a></li>
-							</tds:hasPermission>
-						</ul>
-					</td>
-					<td style="vertical-align:top"><span class="megamenuSection">Files</span><br />
-						<ul>
 							<li><g:link class="mmlink" controller="files" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">List Files</g:link></li>
-							<li>&nbsp;</li>
-							<li>&nbsp;</li>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('assetMegaMenu')">help</a></li>
 							</tds:hasPermission>
