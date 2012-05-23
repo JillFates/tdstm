@@ -227,7 +227,10 @@
 					<td style="vertical-align:top"><span class="megamenuSection">Manage Data</span><br />
 					
 						<ul>
-							<li><g:link class="mmlink" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">Import/Export</g:link></li>
+							<tds:hasPermission permission='AssetMenuView'>
+							<li><g:link class="mmlink" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">Import Assets</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" action="exportAssets" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">Export Assets</g:link></li>
+							</tds:hasPermission>
 							<li><g:link class="mmlink" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">Manage Batches</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" action="listComment" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">List Comments</g:link></li>
 							<tds:hasPermission permission='HelpMenuView'>
@@ -362,7 +365,7 @@
 			</tds:hasPermission>
 	        <tds:hasPermission permission='ReportMenuView'>
 			<li id="reportsMenuId" style="position:relative; float: left;"><g:link class="home" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" controller="reports" params="[projectId:currProjObj?.id]">Reports
-	        	<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#reportsMegaMenu')" href="javascript:showMegaMenu('#reportsMegaMenu')" style="display: inline"></a></g:link>
+	        	<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#reportsMegaMenu')" href="javascript:('#reportsMegaMenu')" style="display: inline"></a></g:link>
 				<div  class="megamenu reports" id="reportsMegaMenu" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" style="display: none;">
 					<table class="mmtable "><tr>
 					<tds:hasPermission permission='ShowDiscovery'>

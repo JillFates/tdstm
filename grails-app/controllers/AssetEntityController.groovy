@@ -150,7 +150,38 @@ class AssetEntityController {
 	def assetExport = {
 		render( view:"assetExport" )
 	}
-
+	def exportAssets = {
+		def projectId = params.projectId
+		def project
+		def projectInstance
+		def assetsByProject
+		def dataTransferSetExport
+		def moveBundleInstanceList
+		if( projectId != null ) {
+			projectInstance = Project.findById( projectId )
+			moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
+		}
+		dataTransferSetExport = DataTransferSet.findAll(" from DataTransferSet dts where dts.transferMode IN ('B','E') ")
+		if( projectId == null ) {
+			//get project id from session
+			def currProj = getSession().getAttribute( "CURR_PROJ" )
+			projectId = currProj.CURR_PROJ
+			projectInstance = Project.findById( projectId )
+			moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
+			if( projectId == null ) {
+				flash.message = " No Projects are Associated, Please select Project. "
+				redirect( controller:"project",action:"list" )
+			}
+		}
+		if ( projectId != null ) {
+			project = Project.findById(projectId)
+		}
+		def	dataTransferBatchs = DataTransferBatch.findAllByProject(project).size()
+		render (view:"exportAssets",model : [projectId: projectId,
+						dataTransferBatchs:dataTransferBatchs,
+					moveBundleInstanceList: moveBundleInstanceList,
+					dataTransferSetExport: dataTransferSetExport])
+	}
 	/* ---------------------------------------------------
 	 * To upload the Data from the ExcelSheet
 	 * @author Mallikarjun
