@@ -46,10 +46,10 @@
 							<span style="vertical-align: text-top;">DB/Files</span>
 						</td>
 					</tr>
-					<tr><td><hr style="width: 30px;color:rgb(56,56,56);"></hr></td><td>Valid Links</td></tr>
-					<tr><td><hr style="width: 30px;color:red;"></hr></td><td>Questioned</td></tr>
-					<tr><td><hr style="width: 30px;color:rgb(224,224,224);"></hr></td><td>N/A</td></tr>
-					<tr><td nowrap="nowrap" ><span style="color: Gray;"><h4>Move Events (border):</h4></span></td></tr>
+					<tr><td><hr style="width: 60px;color:rgb(56,56,56);"></hr></td><td>Valid Links</td></tr>
+					<tr><td><hr style="width: 60px;color:red;"></hr></td><td>Questioned</td></tr>
+					<tr><td><hr style="width: 60px;color:rgb(224,224,224);"></hr></td><td>N/A</td></tr>
+					<tr><td nowrap="nowrap" colspan="2"><span style="color: Gray;"><h4>Move Events (border):</h4></span></td></tr>
 					<g:each in="${eventColorCode}" var="color">
 						<tr>
 						   <td><input type="text" size="1" style="background-color: ${color.value};height:5px;width:5px;border: 0px;" />
@@ -59,7 +59,7 @@
 							</td>
 						</tr>
 					</g:each>
-					<tr><td><input type="text" size="1" style="background-color: red;height:5px;width:5px; border: 0px;" />
+					<tr><td><input type="text" size="1" style="border-color: red;height:5px;width:5px; border-width: 2px;" />
 						</td>
 						<td nowrap="nowrap">No Event</td>
 					</tr>
