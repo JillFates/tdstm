@@ -227,12 +227,14 @@
 					<td style="vertical-align:top"><span class="megamenuSection">Manage Data</span><br />
 					
 						<ul>
-							<tds:hasPermission permission='AssetMenuView'>
+							<tds:hasPermission permission='EditAndDelete'>
 							<li><g:link class="mmlink" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">Import Assets</g:link></li>
-							<li><g:link class="mmlink" controller="assetEntity" action="exportAssets" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">Export Assets</g:link></li>
-							</tds:hasPermission>
 							<li><g:link class="mmlink" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">Manage Batches</g:link></li>
+							</tds:hasPermission>
+							<tds:hasPermission permission='AssetMenuView'>
+							<li><g:link class="mmlink" controller="assetEntity" action="exportAssets" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">Export Assets</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" action="listComment" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">List Comments</g:link></li>
+							</tds:hasPermission>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('assetMegaMenu')">help</a></li>
 							</tds:hasPermission>
