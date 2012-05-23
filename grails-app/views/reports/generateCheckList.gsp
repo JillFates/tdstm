@@ -110,21 +110,20 @@
 					</b></span></td>
 			</tr>
 			<tr>
+			   <td></td>
+				<td>
+				${blankAssets}
+				<g:each in="${nullAssetname}" var="nullName">
+				    <span style="color:red;"> Blank names: ${nullName.counts}-${nullName.type}</span><br/>
+				</g:each>
+				</td>
+			</tr>
+			<tr>
 				<td></td>
 				<td>
 					${duplicates} 
 					<g:each in="${duplicatesAssetNames}" var="duplicate">
-					    <g:if test="${nullAssetname.size() == 1 && (nullAssetname.contains(null) || nullAssetname.contains(''))}">
-					        <span style="color:green;"> Blank names: ${duplicate.counts}-${duplicate.type}</span><br/>
-					    </g:if>
-					    <g:else>
-							<g:if test="${duplicate.assetName=='' || duplicate.assetName==null}">
-							   <span style="color:red;"> Blank names: ${duplicate.counts}-${duplicate.type}</span><br/>
-							</g:if>
-							<g:else>
-								<span style="color:red;" >${duplicate.counts} duplicates Named "${duplicate.assetName} "-(${duplicate.type})</span><br></br>
-							</g:else>
-						</g:else>
+						<span style="color:red;" >${duplicate.counts} duplicates Named "${duplicate.assetName} "-(${duplicate.type})</span><br></br>
 					</g:each>
 				</td>
 			</tr>
@@ -152,8 +151,24 @@
 			<tr>
 				<td>&nbsp;</td>
 				<td>
+					${questioned} - <span style="color: red"> <b>${questionedDependency}</b></span>
+				</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>
 					${issue}<br /> <g:each in="${issueMap}" var="issue">
-						<b> ${issue.assetEntity.assetName}:"${issue.comment}"
+						<b> ${issue.assetEntity.assetName}:${issue.comment}
+						</b>
+						<br />
+					</g:each>
+				</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>
+					${importantInstruction}<br /> <g:each in="${specialInstruction}" var="instruction">
+						<b> ${instruction.assetEntity.assetName}:${instruction.comment}
 						</b>
 						<br />
 					</g:each>

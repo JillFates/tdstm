@@ -47,7 +47,8 @@ class ReportsService {
 			   'dependenciesOk':assetsInfo.dependenciesOk,'issue':assetsInfo.issue,'issueMap':assetsInfo.issues,'bundleMap':moveBundleTeamInfo.bundleMap,
 			   'notAssignedToTeam':moveBundleTeamInfo.notAssignedToTeam,'teamAssignment':moveBundleTeamInfo.teamAssignment,
 			   'inValidUsers':moveBundleTeamInfo.inValidUsers,'userLogin':moveBundleTeamInfo.userLogin,'truckError':transportInfo.truckError,'truck':transportInfo.truck,
-			   'cartError':transportInfo.cartError,'cart':transportInfo.cart,'shelf':transportInfo.shelf,'shelfError':transportInfo.shelfError,'nullAssetname':assetsInfo.nullAssetname]
+			   'cartError':transportInfo.cartError,'cart':transportInfo.cart,'shelf':transportInfo.shelf,'shelfError':transportInfo.shelfError,'nullAssetname':assetsInfo.nullAssetname,
+			   'blankAssets':assetsInfo.blankAssets ,'questioned':assetsInfo.questioned,'questionedDependency':assetsInfo.questionedDependency,'specialInstruction':assetsInfo.specialInstruction,'importantInstruction':assetsInfo.importantInstruction]
 
 	} 
 	
@@ -128,17 +129,23 @@ class ReportsService {
 			summaryOk << [(moveBundle) :  counts ]
 		}
 		
-		def duplicatesAssetNames = jdbcTemplate.queryForList("SELECT asset_name as assetName , count(*) as counts , asset_type as type from asset_entity where project_id = $currProj GROUP BY asset_name ,asset_type HAVING COUNT(*) > 1")
+		def duplicatesAssetNames = jdbcTemplate.queryForList("SELECT asset_name as assetName , count(*) as counts , asset_type as type from asset_entity where project_id = $currProj and asset_name is not null and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_name ,asset_type HAVING COUNT(*) > 1")
 		
 		String duplicates = ""
-		Set nullAssetname = duplicatesAssetNames.assetName
+		Set nullAssetname = jdbcTemplate.queryForList("SELECT asset_name as assetName , count(*) as counts , asset_type as type from asset_entity where project_id = $currProj and asset_name is null and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_name ,asset_type HAVING COUNT(*) > 1")
 		if(duplicatesAssetNames.size()>0){
 			duplicates += """<span style="color: red;"><b>Naming Check: <br></br></span>"""
 		}else{
 			duplicates += """<span style="color: green;"><b>Naming Check OK <br></br></span>"""
 		}
+		def blankAssets = ''
+		if(nullAssetname.size()>0){
+			blankAssets += """<span style="color: red;"><b>Blank Naming Check: <br></br></span>"""
+		}else{
+		    blankAssets += """<span style="color: green;"><b>Blank Naming Check: OK : No error: "Blank names: 0"<br></br></span>"""
+		}
 		
-		def duplicatesAssetTagNames = jdbcTemplate.queryForList("SELECT asset_tag as tag , count(*) as counts from asset_entity where project_id = $currProj GROUP BY asset_tag HAVING COUNT(*) > 1")
+		def duplicatesAssetTagNames = jdbcTemplate.queryForList("SELECT asset_tag as tag , count(*) as counts from asset_entity where project_id = $currProj and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_tag HAVING COUNT(*) > 1")
 		
 		String duplicatesTag = ""
 		if(duplicatesAssetTagNames.size()>0){
@@ -157,14 +164,16 @@ class ReportsService {
 			missingRacks = ''
 		}
 		
-		def dependencies = []
+		def dependencies = [] 
 		if(assetEntityList.size()>0){
 			dependencies = AssetDependency.findAllByAssetInListOrDependentInList(assetEntityList,assetEntityList)?.asset?.assetName
+		}else{
+		    dependencies=[]
 		}
-		
+		dependencies.sort()
 		String dependenciesOk = ""
 		if(dependencies.size()>0){
-			dependenciesOk +="""<span style="color: red;"><b>Dependency found:${dependencies.size} :${dependencies} </b><br></br></span>"""
+			dependenciesOk +="""<span style="color: red;"><b>Dependency found:${dependencies.size} :<br></br>${dependencies} </b></span>"""
 		}else{
 			dependenciesOk +="""<span style="color: green;"><b>Dependency -No Dependencies : </b><br></br></span>"""
 		}
@@ -180,9 +189,30 @@ class ReportsService {
 			issue +="""<span style="color: green;"><b>Issues OK  </b><br></br></span>"""
 		}
 		
-		return[summaryOk:summaryOk,issue:issue,dependenciesOk:dependenciesOk,dependencies:dependencies,missingRacks:missingRacks,
+		def specialInstruction = AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in ${assetId}  and  mustVerify = 1 order by comment.assetEntity.assetName ")
+		def importantInstruction = ""
+		if(specialInstruction.size()>0){
+			importantInstruction +="""<span style="color: red;"><b>Special Instruction: </b><br></br></span>"""
+		}else{
+			importantInstruction +="""<span style="color: green;"><b>Special Instruction: OK  </b><br></br></span>"""
+		}
+		
+		
+		Set questionedDependencies = AssetDependency.findAll("from AssetDependency dependency where (dependency.asset in $assetId or dependency.dependent in $assetId) and dependency.status='Questioned' and dependency.asset.moveBundle.moveEvent.id = ${moveEventInstance.id} order by dependency.asset.assetName ").asset.assetName
+		def questionedDependency = questionedDependencies.toList()
+		questionedDependency.sort()
+		def questioned = ''
+		if(questionedDependency.size()>0){
+			questioned +="""<span style="color: red;"><b>Dependencies questioned for ${questionedDependency.size() } assets</b><br></br></span>"""
+		}else{
+		    questioned +="""<span style="color: green;"><b>Dependencies questioned : OK  </b><br></br></span>"""
+		}
+		
+		
+		return[summaryOk:summaryOk,issue:issue,issues:issues,dependenciesOk:dependenciesOk,dependencies:dependencies,missingRacks:missingRacks,
 			   missedRacks:missedRacks,duplicatesTag:duplicatesTag,duplicatesAssetTagNames:duplicatesAssetTagNames,duplicates:duplicates,
-			   duplicatesAssetNames:duplicatesAssetNames,nullAssetname:nullAssetname]
+			   duplicatesAssetNames:duplicatesAssetNames,nullAssetname:nullAssetname,blankAssets:blankAssets,questioned:questioned,
+			   questionedDependency:questionedDependency,specialInstruction:specialInstruction,importantInstruction:importantInstruction]
 
 	}
 	
