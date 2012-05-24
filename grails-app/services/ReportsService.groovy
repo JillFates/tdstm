@@ -145,7 +145,8 @@ class ReportsService {
 		def duplicatesAssetNames = jdbcTemplate.queryForList("SELECT asset_name as assetName , count(*) as counts , asset_type as type from asset_entity where project_id = $currProj and asset_name is not null and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_name ,asset_type HAVING COUNT(*) > 1")
 		
 		String duplicates = ""
-		def nullAssetname = jdbcTemplate.queryForList("SELECT asset_name as assetName ,asset_tag as tag, count(*) as counts , asset_type as type from asset_entity where project_id = $currProj and asset_name is null and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_name ,asset_tag  HAVING COUNT(*) > 1")
+		def nullAssetname = jdbcTemplate.queryForList("SELECT asset_name as assetName ,asset_tag as tag,  asset_type as type from asset_entity where project_id = $currProj and asset_name is null and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) ")
+		println "nullAssetname---------------"+nullAssetname
 		if(duplicatesAssetNames.size()>0){
 			duplicates += """<span style="color: red;"><b>Naming Check: <br></br></span>"""
 			eventErrorList << 'Assets'

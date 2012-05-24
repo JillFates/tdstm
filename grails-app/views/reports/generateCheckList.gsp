@@ -161,10 +161,11 @@
 			<tr>
 				<td></td>
 				<td>
-					${blankAssets} <g:each in="${nullAssetname}" var="nullName">
-						<span style="color: red;"> Blank names: ${nullName.counts}-${nullName.tag}</span>
-						<br />
-					</g:each>
+					${blankAssets} 
+					 <g:if test="${nullAssetname.size()>0 }">
+						<span style="color: red;margin-left: 50px;"> Blank names: ${nullAssetname.size()} Assets with no name-${nullAssetname.tag.toString().replace('[','').replace(']','')}</span>
+					 </g:if>
+					<br/>
 				</td>
 			</tr>
 			<tr>
