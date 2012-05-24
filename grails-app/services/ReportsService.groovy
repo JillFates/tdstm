@@ -13,7 +13,7 @@ class ReportsService {
 	def generatePreMoveCheckList(def currProj , def moveEventInstance) {
 		
 		def projectInstance = Project.findById( currProj )
-		def moveBundles = moveEventInstance.moveBundles
+		def moveBundles = moveEventInstance.moveBundles.sort{it.name}
 		def eventErrorList =[] 
 	
   //---------------------------------------for Events and Project ---------------------------------------//
@@ -42,7 +42,7 @@ class ReportsService {
 		Set allErrors = eventErrorList
 		def eventErrorString = ''
 		if(allErrors.size()>0){
-			eventErrorString +="""<span style="color:red;text-align: center;"><h3>There were ${allErrors.size()} sections with Issues or Errors.See Details Below.</h3></span><br/>"""
+			eventErrorString +="""<span style="color:red;text-align: center;"><h2>There were ${allErrors.size()} sections with Issues or Errors.See Details Below.</h2></span><br/>"""
 		}else{
 		    eventErrorString +="""<span style="color:green;text-align: center;"><h3>No preparation issues for this event</h3></span>"""
 		}
@@ -56,7 +56,8 @@ class ReportsService {
 			   'inValidUsers':moveBundleTeamInfo.inValidUsers,'userLogin':moveBundleTeamInfo.userLogin,'truckError':transportInfo.truckError,'truck':transportInfo.truck,
 			   'cartError':transportInfo.cartError,'cart':transportInfo.cart,'shelf':transportInfo.shelf,'shelfError':transportInfo.shelfError,'nullAssetname':assetsInfo.nullAssetname,
 			   'blankAssets':assetsInfo.blankAssets ,'questioned':assetsInfo.questioned,'questionedDependency':assetsInfo.questionedDependency,
-			   'specialInstruction':assetsInfo.specialInstruction,'importantInstruction':assetsInfo.importantInstruction,'eventErrorString':eventErrorString]
+			   'specialInstruction':assetsInfo.specialInstruction,'importantInstruction':assetsInfo.importantInstruction,'eventErrorString':eventErrorString,
+			   'dashBoardOk':eventBundleInfo.dashBoardOk,'allErrors':allErrors]
 
 	} 
 	
@@ -92,7 +93,7 @@ class ReportsService {
 		def teamAssignment = ""
 		if(notAssignedToTeam.size()>0){
 			teamAssignment+="""<span style="color: red;"><b>MoveTech Assignment : Asset Not Assigned  </b><br></br></span>"""
-			eventErrorList << ['Teams']
+			eventErrorList << 'Teams'
 		}else{
 			teamAssignment+="""<span style="color: green;"><b>MoveTech Assignment : OK  </b><br></br></span>"""
 		}
@@ -110,7 +111,7 @@ class ReportsService {
 		def userLogin =""
 			if(inValidUsers.size()>0){
 				userLogin+="""<span style="color: red;"><b>Team Details Check : Team Member name Not Valid</b><br></br></span>"""
-				eventErrorList << ['Teams']
+				eventErrorList << 'Teams'
 			}else{
 				userLogin+="""<span style="color: green;"><b>Team Details Check : OK  </b><br></br></span>"""
 			}
@@ -135,7 +136,7 @@ class ReportsService {
 			def assetEntity = AssetEntity.findAllByMoveBundleAndProject(moveBundle,projectInstance)
 			typeCount = AssetEntity.executeQuery("select count(*) , assetType  from AssetEntity where moveBundle = ${moveBundle.id} group by assetType ")
 			String counts = typeCount.toString()
-			counts = counts.replace('[[', '').replace(']]', '').replace(',', '').replace('] [',',').replace('[]', '0')
+			counts = counts.replace('[[', '').replace(']]', '').replace(',', '').replace('] [',' , ').replace('[]', '0')
 			summaryOk << [(moveBundle) :  counts ]
 		}
 		
@@ -145,14 +146,14 @@ class ReportsService {
 		Set nullAssetname = jdbcTemplate.queryForList("SELECT asset_name as assetName , count(*) as counts , asset_type as type from asset_entity where project_id = $currProj and asset_name is null and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_name ,asset_type HAVING COUNT(*) > 1")
 		if(duplicatesAssetNames.size()>0){
 			duplicates += """<span style="color: red;"><b>Naming Check: <br></br></span>"""
-			eventErrorList << ['Assets']
+			eventErrorList << 'Assets'
 		}else{
 			duplicates += """<span style="color: green;"><b>Naming Check OK <br></br></span>"""
 		}
 		def blankAssets = ''
 		if(nullAssetname.size()>0){
 			blankAssets += """<span style="color: red;"><b>Blank Naming Check: <br></br></span>"""
-			eventErrorList << ['Assets']
+			eventErrorList << 'Assets'
 		}else{
 		    blankAssets += """<span style="color: green;"><b>Blank Naming Check: OK : No error: "Blank names: 0"<br></br></span>"""
 		}
@@ -162,7 +163,7 @@ class ReportsService {
 		String duplicatesTag = ""
 		if(duplicatesAssetTagNames.size()>0){
 			duplicatesTag += """<span style="color: red;"><b>Asset Tag: <br></br></span>"""
-			eventErrorList << ['Assets']
+			eventErrorList << 'Assets'
 		}else{
 			duplicatesTag += """<span style="color: green;"><b>Asset Tag  OK <br></br></span>"""
 		}
@@ -172,7 +173,7 @@ class ReportsService {
 		String missedRacks = ""
 		if(missingRacks.size()>0){
 			missedRacks += """<span style="color: red;"><b>Asset Details:${missingRacks.size} Servers With Missing Rack info : </b><br></br></span>"""
-			eventErrorList << ['Assets']
+			eventErrorList << 'Assets'
 		}else{
 			missedRacks += """<span style="color: Green;"><b>Asset Details: OK </b><br></br></span>"""
 			missingRacks = ''
@@ -187,8 +188,8 @@ class ReportsService {
 		dependencies.sort()
 		String dependenciesOk = ""
 		if(dependencies.size()>0){
-			dependenciesOk +="""<span style="color: red;"><b>Dependency found:${dependencies.size} :<br></br>${dependencies} </b></span>"""
-			eventErrorList << ['Assets']
+			dependenciesOk +="""<span style="color: red;"><b>Dependency found:${dependencies.size} :<br></br></b></span> <div style="margin-left:50px;"> ${dependencies.toString().replace('[','').replace(']','')}</div>"""
+			eventErrorList << 'Assets'
 		}else{
 			dependenciesOk +="""<span style="color: green;"><b>Dependency -No Dependencies : </b><br></br></span>"""
 		}
@@ -200,7 +201,7 @@ class ReportsService {
 		def issue = ""
 		if(issues.size()>0){
 			issue +="""<span style="color: red;"><b>Issues: Unresolved Issues  </b><br></br></span>"""
-			eventErrorList << ['Assets']
+			eventErrorList << 'Assets'
 		}else{
 			issue +="""<span style="color: green;"><b>Issues OK  </b><br></br></span>"""
 		}
@@ -209,7 +210,7 @@ class ReportsService {
 		def importantInstruction = ""
 		if(specialInstruction.size()>0){
 			importantInstruction +="""<span style="color: red;"><b>Special Instruction: </b><br></br></span>"""
-			eventErrorList << ['Assets']
+			eventErrorList << 'Assets'
 		}else{
 			importantInstruction +="""<span style="color: green;"><b>Special Instruction: OK  </b><br></br></span>"""
 		}
@@ -220,9 +221,9 @@ class ReportsService {
 		questionedDependency.sort()
 		def questioned = ''
 		if(questionedDependency.size()>0){
-			questioned +="""<span style="color: red;"><b>Dependencies questioned for ${questionedDependency.size() } assets</b><br></br></span>"""
+			questioned +="""<span style="color: red;"><b>Dependencies Questioned for ${questionedDependency.size() } assets:</b><br></br></span>"""
 		}else{
-		    questioned +="""<span style="color: green;"><b>Dependencies questioned : OK  </b><br></br></span>"""
+		    questioned +="""<span style="color: green;"><b>Dependencies Questioned : OK  </b><br></br></span>"""
 		}
 		
 		
@@ -248,22 +249,23 @@ class ReportsService {
 		def moveBundleStep
 		
 		if(workFlowCode.size()==1){
-			workFlowCodeSelected << [(moveEventInstance.name+'(Event)'+'All Bundles have same WorkFlow'):workFlow[0]]
+			workFlowCodeSelected << [(moveEventInstance.name+'  (Event)  '+'  All Bundles have same WorkFlow  '):workFlow[0]]
 		}else{
 			moveBundles.each{
-				workFlowCodeSelected << [(it.name+'(Bundle)'):it.workflowCode]
+				workFlowCodeSelected << [(it.name+'(Bundle)'+'  '+'  Uses WorkFlow ') : it.workflowCode]
 			}
 		}
 		
 		def label = []
 		
 		String labels
-		
+		def dashBoardOk = []
 		moveBundles.each{moveBundle->
 			moveBundleStep = MoveBundleStep.findAllByMoveBundle(moveBundle)
 			if(moveBundleStep.size()==0){
 				steps << [(moveBundle.name):"No steps created"]
-				eventErrorList << ['EventsBundle']
+				eventErrorList << 'EventsBundle'
+				dashBoardOk <<['No steps created']
 			}else{
 				moveBundleStep.each{step->
 					label << [
@@ -273,9 +275,10 @@ class ReportsService {
 					labels = labels.replace('[[','').replace('], [',' , ').replace(']]','')
 					steps << [(moveBundle.name):labels]
 				}
+				dashBoardOk += """<span style="color:green" ><b>DashBoard OK:</b></span>"""
 			}
 		}
-	  return[workFlowCodeSelected:workFlowCodeSelected,steps:steps,eventErrorList:eventErrorList]
+	  return[workFlowCodeSelected:workFlowCodeSelected,steps:steps,eventErrorList:eventErrorList,dashBoardOk:dashBoardOk]
 	}
 	/**
 	* @param moveEventInstance,projectInstance,currProj
@@ -295,7 +298,7 @@ class ReportsService {
 
 		moveBundles.each{
 			if(it.startTime > projectInstance.startDate && it.completionTime > projectInstance.completionDate){
-				eventErrorList << ['Project']
+				eventErrorList << 'Project'
 				errorForEventTime += """<span style="color:red" ><b>Move bundle ${it.name} is completing after project completion</b>  </span><br></br>"""
 			}else{
 				def projectStartTime = 'Not Available'
@@ -315,10 +318,10 @@ class ReportsService {
 		def moveEventCompletiondate = lastMoveBundleDate[lastMoveBundleDateSize-1]
 		def inPastError = ''
 		if(moveEventInstance.inProgress=='true'){
-			eventErrorList << ['Project']
+			eventErrorList << 'Project'
 			inProgressError += """<span style="color:red" ><b>${moveEventInstance.name} : MoveEvent In Progress </b></span>"""
 		}else if(moveEventCompletiondate < projectInstance.startDate) {
-		    eventErrorList << ['Project']
+		    eventErrorList << 'Project'
 		    inProgressError += """<span style="color:red" ><b>${moveEventInstance.name} : MoveEvent In Past </b></span>"""
 		}else{
 		    inProgressError += """<span style="color:green" ><b>${moveEventInstance.name} : OK </b></span>"""
@@ -340,12 +343,12 @@ class ReportsService {
 			def user = UserLogin.findByPerson(Person.get(staff.partyIdTo.id))
 			
 			if(!user){
-				eventErrorList << ['Project']
-				userLoginError +="""<span style="color:red"><b>${Person.get(staff.partyIdTo.id)} login disabled</b></span><br></br>"""
+				eventErrorList << 'Project'
+				userLoginError +="""<span style="color:red;margin-left:50px;"><b>${Person.get(staff.partyIdTo.id)} login disabled</b></span><br></br>"""
 			}
 			if(user?.active=='N'){
-				eventErrorList << ['Project']
-				userLoginError +="""<span style="color:red"><b>${user} login inactive</b></span><br></br>"""
+				eventErrorList << 'Project'
+				userLoginError +="""<span style="color:red;margin-left:50px;"><b>${user} login inactive</b></span><br></br>"""
 			}
 			
 		}
@@ -353,7 +356,7 @@ class ReportsService {
 		def personInstanceList = Person.findAll( query )
 		if(personInstanceList.size()==0){
 			clientAccess += """<span style="color:red"><b>No Client Access</b></span>"""
-			eventErrorList << ['Project']
+			eventErrorList << 'Project'
 		}else{
 			clientAccess += """<span style="color:Green"><b>Client Access :&nbsp;&nbsp; &nbsp;&nbsp;${personInstanceList}</b></span>"""
 		}
@@ -376,7 +379,7 @@ class ReportsService {
 		String truckError = ''
 		
 		if(truck.size()==0){
-			eventErrorList << ['Transport']
+			eventErrorList << 'Transport'
 			truckError += """<span style="color: red;"><b>Trucks :No trucks defined</b><br></br></span>"""
 		}else{
 			truckError+="""<span style="color: green;"><b>Trucks : OK  </b><br></br></span>"""
@@ -388,7 +391,7 @@ class ReportsService {
 		String cartError = ''
 		
 		if(cart.size()==0){
-			eventErrorList << ['Transport']
+			eventErrorList << 'Transport'
 			cartError += """<span style="color: red;"><b>Carts :No carts defined</b><br></br></span>"""
 		}else{
 			cartError+="""<span style="color: green;"><b>Carts : OK  </b><br></br></span>"""
@@ -401,7 +404,7 @@ class ReportsService {
 		def shelfError = ''
 		
 		if(shelf.size()==0){
-			eventErrorList << ['Transport']
+			eventErrorList << 'Transport'
 			shelfError += """<span style="color: red;"><b>Shelves :No Shelves defined</b><br></br></span>"""
 		}else{
 			shelfError+= """<span style="color: green;"><b>Shelves : OK (${shelf.size()}) </b><br></br></span>"""
