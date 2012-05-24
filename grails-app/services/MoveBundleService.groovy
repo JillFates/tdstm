@@ -360,6 +360,7 @@ class MoveBundleService {
 		 
 		 // Deleting previously generated dependency bundle table .
 		 jdbcTemplate.execute("DELETE FROM asset_dependency_bundle where project_id = $projectId")
+		 // TODO: THIS SHOULD NOT BE NECESSARY GOING FORWARD - THIS COLUMN is being dropped.
 		 jdbcTemplate.execute("UPDATE asset_entity SET dependency_bundle=NULL WHERE project_id = $projectId")
 		 
  
@@ -432,13 +433,17 @@ class MoveBundleService {
 		 } // for i
 		 
 		 // Last step is to put all the straggler assets that were not grouped into group 0
+		 def assetTypes = '"' + AssetType.SERVER.toString() + '","' + AssetType.VM.toString() + '","' + 
+		 	AssetType.APPLICATION.toString() + '","' + AssetType.DATABASE.toString() + '","' + AssetType.FILES.toString() + '"'
+			 
 		 def stragglerSQL = """INSERT INTO asset_dependency_bundle (asset_id, dependency_bundle, dependency_source, last_updated, project_id)
 			 SELECT ae.asset_entity_id, 0, "Straggler", now(), ae.project_id
 			 FROM asset_entity ae
 			 LEFT OUTER JOIN asset_dependency_bundle adb ON ae.asset_entity_id=adb.asset_id
 			 WHERE ae.project_id = ${projectId} # AND ae.dependency_bundle IS NULL
 			 AND adb.asset_id IS NULL
-			 AND move_bundle_id in (${moveBundleText})"""
+			 AND move_bundle_id in (${moveBundleText})
+		     AND ae.asset_type in (${assetTypes})"""
 		 def x = jdbcTemplate.execute(stragglerSQL)
 		 
 	 }
