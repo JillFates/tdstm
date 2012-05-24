@@ -57,7 +57,7 @@ class ReportsService {
 			   'cartError':transportInfo.cartError,'cart':transportInfo.cart,'shelf':transportInfo.shelf,'shelfError':transportInfo.shelfError,'nullAssetname':assetsInfo.nullAssetname,
 			   'blankAssets':assetsInfo.blankAssets ,'questioned':assetsInfo.questioned,'questionedDependency':assetsInfo.questionedDependency,
 			   'specialInstruction':assetsInfo.specialInstruction,'importantInstruction':assetsInfo.importantInstruction,'eventErrorString':eventErrorString,
-			   'dashBoardOk':eventBundleInfo.dashBoardOk,'allErrors':allErrors]
+			   'dashBoardOk':eventBundleInfo.dashBoardOk,'allErrors':allErrors,'nullAssetTag':assetsInfo.nullAssetTag,'blankAssetTag':assetsInfo.blankAssetTag]
 
 	} 
 	
@@ -85,7 +85,9 @@ class ReportsService {
 
 		}
 		def notAssignedToTeam = []
-		assetEntityList.each{assetEntity->
+		def assetList = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(moveBundles,['Application','Database','Files'])
+		
+		assetList.each{assetEntity->
 			if(assetEntity['sourceTeamMt']?.teamCode ==null || assetEntity['targetTeamMt']?.teamCode==null){
 				notAssignedToTeam << [assetEntity.assetName]
 			}
@@ -143,7 +145,7 @@ class ReportsService {
 		def duplicatesAssetNames = jdbcTemplate.queryForList("SELECT asset_name as assetName , count(*) as counts , asset_type as type from asset_entity where project_id = $currProj and asset_name is not null and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_name ,asset_type HAVING COUNT(*) > 1")
 		
 		String duplicates = ""
-		Set nullAssetname = jdbcTemplate.queryForList("SELECT asset_name as assetName , count(*) as counts , asset_type as type from asset_entity where project_id = $currProj and asset_name is null and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_name ,asset_type HAVING COUNT(*) > 1")
+		def nullAssetname = jdbcTemplate.queryForList("SELECT asset_name as assetName ,asset_tag as tag, count(*) as counts , asset_type as type from asset_entity where project_id = $currProj and asset_name is null and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_name ,asset_tag  HAVING COUNT(*) > 1")
 		if(duplicatesAssetNames.size()>0){
 			duplicates += """<span style="color: red;"><b>Naming Check: <br></br></span>"""
 			eventErrorList << 'Assets'
@@ -158,17 +160,26 @@ class ReportsService {
 		    blankAssets += """<span style="color: green;"><b>Blank Naming Check: OK : No error: "Blank names: 0"<br></br></span>"""
 		}
 		
-		def duplicatesAssetTagNames = jdbcTemplate.queryForList("SELECT asset_tag as tag , count(*) as counts from asset_entity where project_id = $currProj and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_tag HAVING COUNT(*) > 1")
+		def duplicatesAssetTagNames = jdbcTemplate.queryForList("SELECT asset_tag as tag , count(*) as counts from asset_entity where project_id = $currProj and asset_tag is not null and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_tag HAVING COUNT(*) > 1")
 		
 		String duplicatesTag = ""
+		
 		if(duplicatesAssetTagNames.size()>0){
 			duplicatesTag += """<span style="color: red;"><b>Asset Tag: <br></br></span>"""
 			eventErrorList << 'Assets'
 		}else{
 			duplicatesTag += """<span style="color: green;"><b>Asset Tag  OK <br></br></span>"""
 		}
+		def nullAssetTag = jdbcTemplate.queryForList("SELECT asset_tag as tag , count(*) as counts , asset_name as name from asset_entity where project_id = $currProj and asset_tag is  null and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_tag HAVING COUNT(*) > 1")
+		def blankAssetTag = ''
+		if(nullAssetTag.size()>0){
+			blankAssetTag += """<span style="color: red;"><b>Blank Tag Check: ${nullAssetTag.counts[0]} assets with no asset tags <br></br></span>"""
+			eventErrorList << 'Assets'
+		}else{
+			blankAssetTag += """<span style="color: green;"><b>Blank Tag Check: OK : No error: "Blank tag: 0"<br></br></span>"""
+		}
 		
-		def missingRacks = AssetEntity.findAll("from AssetEntity asset where  asset.project.id=${currProj} and asset.assetType not in('Application','Files','Database') and asset.moveBundle.moveEvent.id=${moveEventInstance.id} and (sourceRack='' or targetRack='' or sourceRackPosition = '' or targetRackPosition = '') group by asset.assetName").assetName
+		def missingRacks = AssetEntity.findAll("from AssetEntity asset where  asset.project.id=${currProj} and asset.assetType not in('Application','Files','Database','VM') and asset.moveBundle.moveEvent.id=${moveEventInstance.id} and (sourceRack='' or targetRack='' or sourceRackPosition = '' or targetRackPosition = '') group by asset.assetName").assetName
 		
 		String missedRacks = ""
 		if(missingRacks.size()>0){
@@ -181,14 +192,14 @@ class ReportsService {
 		
 		def dependencies = [] 
 		if(assetEntityList.size()>0){
-			dependencies = AssetDependency.findAllByAssetInListOrDependentInList(assetEntityList,assetEntityList)?.asset?.assetName
+			dependencies = AssetDependency.findAllByDependentInList(assetEntityList,assetEntityList)?.asset?.assetName
 		}else{
 		    dependencies=[]
 		}
 		dependencies.sort()
 		String dependenciesOk = ""
 		if(dependencies.size()>0){
-			dependenciesOk +="""<span style="color: red;"><b>Dependency found:${dependencies.size} :<br></br></b></span> <div style="margin-left:50px;"> ${dependencies.toString().replace('[','').replace(']','')}</div>"""
+			dependenciesOk +="""<span style="color: red;"><b>Dependency found:${dependencies.size} Dependency Found:<br></br></b></span> <div style="margin-left:50px;"> ${dependencies.toString().replace('[','').replace(']','')}</div>"""
 			eventErrorList << 'Assets'
 		}else{
 			dependenciesOk +="""<span style="color: green;"><b>Dependency -No Dependencies : </b><br></br></span>"""
@@ -231,7 +242,7 @@ class ReportsService {
 			   missedRacks:missedRacks,duplicatesTag:duplicatesTag,duplicatesAssetTagNames:duplicatesAssetTagNames,duplicates:duplicates,
 			   duplicatesAssetNames:duplicatesAssetNames,nullAssetname:nullAssetname,blankAssets:blankAssets,questioned:questioned,
 			   questionedDependency:questionedDependency,specialInstruction:specialInstruction,importantInstruction:importantInstruction,
-			   eventErrorList:eventErrorList]
+			   eventErrorList:eventErrorList,nullAssetTag:nullAssetTag,blankAssetTag:blankAssetTag]
 
 	}
 	

@@ -47,7 +47,9 @@
 					</tr>
 				</thead>
 				<tbody>
+				<tds:hasPermission permission="ShowMovePrep">
 				<tr><td><a href="/tdstm/reports/preMoveCheckList" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Pre-move Checklist</a> </td><td style="width:12px">W</td><td style="width:12px"> </td><td style="width:12px">P</td></tr>
+				</tds:hasPermission>
 				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Login+Badges" class="home">Login Badges</a> </td><td style="width:12px">W</td><td style="width:12px"> </td><td style="width:12px"> </td></tr>
 				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Asset+Tag" class="home">Asset Tags</a> </td><td style="width:12px">W</td><td style="width:12px"> </td><td style="width:12px"> </td></tr>
 				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Team+Worksheets" class="home">Move Team Worksheets</a> </td><td style="width:12px"> </td><td style="width:12px"> </td><td style="width:12px">P</td></tr>

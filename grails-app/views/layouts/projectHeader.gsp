@@ -265,6 +265,9 @@
 						<ul>
 							<li><g:link class="mmlink" controller="moveEvent" action="list" onclick="hideMegaMenu('bundleMegaMenu')" >List Events</g:link> </li>
 							<li><g:link class="mmlink" controller="moveEvent" action="create" onclick="hideMegaMenu('bundleMegaMenu')">Create Event</g:link></li>
+							<tds:hasPermission permission="ShowMovePrep">
+							<li><g:link class="mmlink" controller="reports" action="preMoveCheckList" onclick="hideMegaMenu('bundleMegaMenu')">Pre-move Checklist</g:link></li>
+							</tds:hasPermission>
 							<li>&nbsp;</li>
 							<li>&nbsp;</li>
 							<tds:hasPermission permission='HelpMenuView'>
@@ -387,7 +390,9 @@
 					<tds:hasPermission permission='ShowMovePrep'>
 					<td style="vertical-align:top"><span class="megamenuSection">Move Prep</span><br />
 						<ul >
+						    <tds:hasPermission permission="ShowMovePrep">
 						    <li><a href="/tdstm/reports/preMoveCheckList" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Pre-move Checklist</a> </li>
+						    </tds:hasPermission>
 							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Login+Badges" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Login Badges</a> </li>
 							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Asset+Tag" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Asset Tags</a> </li>
 							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Team+Worksheets" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Move Team Worksheets</a> </li>

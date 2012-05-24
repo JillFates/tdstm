@@ -27,7 +27,9 @@
 						</td>
 					</tr>
 					<tr class="buttonR">
+					<tds:hasPermission permission="ShowMovePrep">
 						<td><input type="submit" class="submit" value="Generate" /></td>
+					</tds:hasPermission>
 					</tr>
 				</tbody>
 			</table>

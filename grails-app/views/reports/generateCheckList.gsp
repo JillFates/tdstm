@@ -40,7 +40,7 @@
 			</tr>
 			<tr>
 				<td></td>
-				<td><span style="color: green"><b>Staff</b></span>:${clientAccess}
+				<td><span style="color: green"><b>Staff</b></span>:${clientAccess.toString().replace('[','').replace(']','')}
 				</td>
 			</tr>
 			<tr>
@@ -162,7 +162,7 @@
 				<td></td>
 				<td>
 					${blankAssets} <g:each in="${nullAssetname}" var="nullName">
-						<span style="color: red;"> Blank names: ${nullName.counts}-${nullName.type}</span>
+						<span style="color: red;"> Blank names: ${nullName.counts}-${nullName.tag}</span>
 						<br />
 					</g:each>
 				</td>
@@ -175,6 +175,15 @@
 							${duplicate.counts} duplicates Named "${duplicate.assetName} "-(${duplicate.type})
 						</span>
 						<br></br>
+					</g:each>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+					${blankAssetTag} <g:each in="${nullAssetTag}" var="nullTag">
+						<span style="color: red;"> ${nullTag.name}</span>
+						<br />
 					</g:each>
 				</td>
 			</tr>
@@ -349,7 +358,7 @@
 						<g:each in="${notAssignedToTeam}" var="asset">
 							${asset[0].toString()+','}
 						</g:each>
-						<b> Assets Not Assigned . 
+						<b><g:if test="${notAssignedToTeam.size()>0}"> Assets Not Assigned . </g:if>
 					</div> </b>
 				</td>
 
@@ -379,9 +388,7 @@
 				<td>
 					${truckError}
 					<div style="margin-left: 50px">
-						<g:each in="${truck}" var="truck">
-							${truck}
-						</g:each>
+						${truck.toString().replace('[','').replace(']','')}
 					</div>
 				</td>
 			</tr>
@@ -390,9 +397,7 @@
 				<td>
 					${cartError}
 					<div style="margin-left: 50px">
-						<g:each in="${cart}" var="cart">
-							${cart}
-						</g:each>
+							${cart.toString().replace('[','').replace(']','')}
 					</div>
 				</td>
 			</tr>
@@ -401,9 +406,7 @@
 				<td>
 					${shelfError}
 					<div style="margin-left: 50px">
-						<g:each in="${shelf}" var="shelf">
-							${shelf}
-						</g:each>
+							${shelf.toString().replace('[','').replace(']','')}
 					</div>
 				</td>
 			</tr>
