@@ -9,9 +9,13 @@
 	<div>
 		<span style="text-align: center; color: black;"><h1>
 				<b>Pre-Move CheckList - ${project.name} : ${moveEvent.name }</b>
-			</h1></span> <span style="text-align: center; color: black;"><h3>
+			</h1></span> <span style="text-align: center; color: black;">
+			<h3>
 				${time}
-			</h3></span>
+			</h3></span>${eventErrorString}
+			
+			
+			
 
 		<table>
 			<tr>

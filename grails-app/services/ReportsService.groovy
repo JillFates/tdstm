@@ -14,41 +14,49 @@ class ReportsService {
 		
 		def projectInstance = Project.findById( currProj )
 		def moveBundles = moveEventInstance.moveBundles
+		def eventErrorList =[] 
 	
   //---------------------------------------for Events and Project ---------------------------------------//
 		
-		def eventsProjectInfo = getEventsProjectInfo(moveEventInstance,projectInstance,currProj,moveBundles)
+		def eventsProjectInfo = getEventsProjectInfo(moveEventInstance,projectInstance,currProj,moveBundles,eventErrorList)
 
   //---------------------------------------for Event and Bundles ---------------------------------------//
         
-		def eventBundleInfo = getEventsBundelsInfo(moveBundles,moveEventInstance)
+		def eventBundleInfo = getEventsBundelsInfo(moveBundles,moveEventInstance,eventErrorList)
 		
 
   //---------------------------------------for Assets and Bundles --------------------------------------//
 		
 		def assetEntityList = AssetEntity.findAllByMoveBundleInListAndProject(moveBundles,projectInstance,[sort:'assetName'])
 		
-		def assetsInfo = getAssetInfo(assetEntityList,moveBundles,projectInstance,currProj,moveEventInstance)
+		def assetsInfo = getAssetInfo(assetEntityList,moveBundles,projectInstance,currProj,moveEventInstance,eventErrorList)
 
   //---------------------------------------For Teams---------------------------------------------------//
 		
-		def moveBundleTeamInfo = getMoveBundleTeamInfo(moveBundles, assetEntityList)
+		def moveBundleTeamInfo = getMoveBundleTeamInfo(moveBundles, assetEntityList,eventErrorList)
 
   //---------------------------------------For Transport------------------------------------------------//
   
-        def transportInfo = getTransportInfo(assetEntityList)
+        def transportInfo = getTransportInfo(assetEntityList,eventErrorList)
 		
-		
+		Set allErrors = eventErrorList
+		def eventErrorString = ''
+		if(allErrors.size()>0){
+			eventErrorString +="""<span style="color:red;text-align: center;"><h3>There were ${allErrors.size()} sections with Issues or Errors.See Details Below.</h3></span><br/>"""
+		}else{
+		    eventErrorString +="""<span style="color:green;text-align: center;"><h3>No preparation issues for this event</h3></span>"""
+		}
 		return['project':projectInstance,'time':eventsProjectInfo.time,'moveEvent':moveEventInstance,'errorForEventTime':eventsProjectInfo.errorForEventTime,
-			   'inProgressError':eventsProjectInfo.inProgressError,'userLoginError':eventsProjectInfo.userLoginError,'clientAccess':eventsProjectInfo.clientAccess,'list':eventsProjectInfo.list,
-			   'workFlowCodeSelected':eventBundleInfo.workFlowCodeSelected,'steps':eventBundleInfo.steps,'moveBundleSize':moveBundles.size(),'moveBundles':moveBundles,'summaryOk':assetsInfo.summaryOk,
-			   'duplicatesAssetNames':assetsInfo.duplicatesAssetNames,'duplicates':assetsInfo.duplicates,'duplicatesTag':assetsInfo.duplicatesTag,
-			   'duplicatesAssetTagNames':assetsInfo.duplicatesAssetTagNames,'missedRacks':assetsInfo.missedRacks,'missingRacks':assetsInfo.missingRacks,
-			   'dependenciesOk':assetsInfo.dependenciesOk,'issue':assetsInfo.issue,'issueMap':assetsInfo.issues,'bundleMap':moveBundleTeamInfo.bundleMap,
-			   'notAssignedToTeam':moveBundleTeamInfo.notAssignedToTeam,'teamAssignment':moveBundleTeamInfo.teamAssignment,
+			   'inProgressError':eventsProjectInfo.inProgressError,'userLoginError':eventsProjectInfo.userLoginError,'clientAccess':eventsProjectInfo.clientAccess,
+			   'list':eventsProjectInfo.list,'workFlowCodeSelected':eventBundleInfo.workFlowCodeSelected,'steps':eventBundleInfo.steps,'moveBundleSize':moveBundles.size(),
+			   'moveBundles':moveBundles,'summaryOk':assetsInfo.summaryOk,'duplicatesAssetNames':assetsInfo.duplicatesAssetNames,'duplicates':assetsInfo.duplicates,
+			   'duplicatesTag':assetsInfo.duplicatesTag,'duplicatesAssetTagNames':assetsInfo.duplicatesAssetTagNames,'missedRacks':assetsInfo.missedRacks,
+			   'missingRacks':assetsInfo.missingRacks,'dependenciesOk':assetsInfo.dependenciesOk,'issue':assetsInfo.issue,'issueMap':assetsInfo.issues,
+			   'bundleMap':moveBundleTeamInfo.bundleMap,'notAssignedToTeam':moveBundleTeamInfo.notAssignedToTeam,'teamAssignment':moveBundleTeamInfo.teamAssignment,
 			   'inValidUsers':moveBundleTeamInfo.inValidUsers,'userLogin':moveBundleTeamInfo.userLogin,'truckError':transportInfo.truckError,'truck':transportInfo.truck,
 			   'cartError':transportInfo.cartError,'cart':transportInfo.cart,'shelf':transportInfo.shelf,'shelfError':transportInfo.shelfError,'nullAssetname':assetsInfo.nullAssetname,
-			   'blankAssets':assetsInfo.blankAssets ,'questioned':assetsInfo.questioned,'questionedDependency':assetsInfo.questionedDependency,'specialInstruction':assetsInfo.specialInstruction,'importantInstruction':assetsInfo.importantInstruction]
+			   'blankAssets':assetsInfo.blankAssets ,'questioned':assetsInfo.questioned,'questionedDependency':assetsInfo.questionedDependency,
+			   'specialInstruction':assetsInfo.specialInstruction,'importantInstruction':assetsInfo.importantInstruction,'eventErrorString':eventErrorString]
 
 	} 
 	
@@ -58,7 +66,7 @@ class ReportsService {
 	 * @return bundleMap, inValidUsers, teamAssignment, notAssignedToTeam
 	 */
 	
-	def getMoveBundleTeamInfo( moveBundles, assetEntityList ){
+	def getMoveBundleTeamInfo( moveBundles, assetEntityList,eventErrorList ){
 		def bundleMap = []
 		moveBundles.each{moveBundle->
 			def teamList = []
@@ -77,13 +85,14 @@ class ReportsService {
 		}
 		def notAssignedToTeam = []
 		assetEntityList.each{assetEntity->
-			if(assetEntity['sourceTeamMt']?.teamCode == null || assetEntity['targetTeamMt']?.teamCode==null){
+			if(assetEntity['sourceTeamMt']?.teamCode ==null || assetEntity['targetTeamMt']?.teamCode==null){
 				notAssignedToTeam << [assetEntity.assetName]
 			}
 		}
 		def teamAssignment = ""
 		if(notAssignedToTeam.size()>0){
 			teamAssignment+="""<span style="color: red;"><b>MoveTech Assignment : Asset Not Assigned  </b><br></br></span>"""
+			eventErrorList << ['Teams']
 		}else{
 			teamAssignment+="""<span style="color: green;"><b>MoveTech Assignment : OK  </b><br></br></span>"""
 		}
@@ -91,7 +100,7 @@ class ReportsService {
 		bundleMap.teamList.teamList.each{lists->
 			lists.id[0].each{personId->
 				personId.each{ids->
-					if(UserLogin.findByPerson(Person.get(ids))?.lastLogin!=null){
+					if(UserLogin.findByPerson(Person.get(ids))?.lastLogin==null||UserLogin.findByPerson(Person.get(ids))?.active=='N'){
 						inValidUsers << [Person.get(ids)]
 					}
 				}
@@ -101,11 +110,12 @@ class ReportsService {
 		def userLogin =""
 			if(inValidUsers.size()>0){
 				userLogin+="""<span style="color: red;"><b>Team Details Check : Team Member name Not Valid</b><br></br></span>"""
+				eventErrorList << ['Teams']
 			}else{
 				userLogin+="""<span style="color: green;"><b>Team Details Check : OK  </b><br></br></span>"""
 			}
 		return [bundleMap:bundleMap,inValidUsers:inValidUsers,
-			teamAssignment:teamAssignment, notAssignedToTeam:notAssignedToTeam,userLogin:userLogin]
+			teamAssignment:teamAssignment, notAssignedToTeam:notAssignedToTeam,userLogin:userLogin,eventErrorList:eventErrorList]
 	}
 	
 	/**
@@ -114,7 +124,7 @@ class ReportsService {
 	* @return summaryOk,issue,dependenciesOk,dependencies,missingRacks,missedRacks,duplicatesTag,duplicatesAssetTagNames,duplicates,duplicatesAssetNames
 	*/
 	
-	def getAssetInfo(assetEntityList,moveBundles,projectInstance,currProj,moveEventInstance){
+	def getAssetInfo(assetEntityList,moveBundles,projectInstance,currProj,moveEventInstance,eventErrorList){
 
 		def summaryOk = [:]
 		Set assetType
@@ -135,12 +145,14 @@ class ReportsService {
 		Set nullAssetname = jdbcTemplate.queryForList("SELECT asset_name as assetName , count(*) as counts , asset_type as type from asset_entity where project_id = $currProj and asset_name is null and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_name ,asset_type HAVING COUNT(*) > 1")
 		if(duplicatesAssetNames.size()>0){
 			duplicates += """<span style="color: red;"><b>Naming Check: <br></br></span>"""
+			eventErrorList << ['Assets']
 		}else{
 			duplicates += """<span style="color: green;"><b>Naming Check OK <br></br></span>"""
 		}
 		def blankAssets = ''
 		if(nullAssetname.size()>0){
 			blankAssets += """<span style="color: red;"><b>Blank Naming Check: <br></br></span>"""
+			eventErrorList << ['Assets']
 		}else{
 		    blankAssets += """<span style="color: green;"><b>Blank Naming Check: OK : No error: "Blank names: 0"<br></br></span>"""
 		}
@@ -150,6 +162,7 @@ class ReportsService {
 		String duplicatesTag = ""
 		if(duplicatesAssetTagNames.size()>0){
 			duplicatesTag += """<span style="color: red;"><b>Asset Tag: <br></br></span>"""
+			eventErrorList << ['Assets']
 		}else{
 			duplicatesTag += """<span style="color: green;"><b>Asset Tag  OK <br></br></span>"""
 		}
@@ -159,6 +172,7 @@ class ReportsService {
 		String missedRacks = ""
 		if(missingRacks.size()>0){
 			missedRacks += """<span style="color: red;"><b>Asset Details:${missingRacks.size} Servers With Missing Rack info : </b><br></br></span>"""
+			eventErrorList << ['Assets']
 		}else{
 			missedRacks += """<span style="color: Green;"><b>Asset Details: OK </b><br></br></span>"""
 			missingRacks = ''
@@ -174,6 +188,7 @@ class ReportsService {
 		String dependenciesOk = ""
 		if(dependencies.size()>0){
 			dependenciesOk +="""<span style="color: red;"><b>Dependency found:${dependencies.size} :<br></br>${dependencies} </b></span>"""
+			eventErrorList << ['Assets']
 		}else{
 			dependenciesOk +="""<span style="color: green;"><b>Dependency -No Dependencies : </b><br></br></span>"""
 		}
@@ -185,6 +200,7 @@ class ReportsService {
 		def issue = ""
 		if(issues.size()>0){
 			issue +="""<span style="color: red;"><b>Issues: Unresolved Issues  </b><br></br></span>"""
+			eventErrorList << ['Assets']
 		}else{
 			issue +="""<span style="color: green;"><b>Issues OK  </b><br></br></span>"""
 		}
@@ -193,6 +209,7 @@ class ReportsService {
 		def importantInstruction = ""
 		if(specialInstruction.size()>0){
 			importantInstruction +="""<span style="color: red;"><b>Special Instruction: </b><br></br></span>"""
+			eventErrorList << ['Assets']
 		}else{
 			importantInstruction +="""<span style="color: green;"><b>Special Instruction: OK  </b><br></br></span>"""
 		}
@@ -212,7 +229,8 @@ class ReportsService {
 		return[summaryOk:summaryOk,issue:issue,issues:issues,dependenciesOk:dependenciesOk,dependencies:dependencies,missingRacks:missingRacks,
 			   missedRacks:missedRacks,duplicatesTag:duplicatesTag,duplicatesAssetTagNames:duplicatesAssetTagNames,duplicates:duplicates,
 			   duplicatesAssetNames:duplicatesAssetNames,nullAssetname:nullAssetname,blankAssets:blankAssets,questioned:questioned,
-			   questionedDependency:questionedDependency,specialInstruction:specialInstruction,importantInstruction:importantInstruction]
+			   questionedDependency:questionedDependency,specialInstruction:specialInstruction,importantInstruction:importantInstruction,
+			   eventErrorList:eventErrorList]
 
 	}
 	
@@ -222,7 +240,7 @@ class ReportsService {
 	* @return workFlowCodeSelected,steps
 	*/
 	
-	def getEventsBundelsInfo(moveBundles,moveEventInstance){
+	def getEventsBundelsInfo(moveBundles,moveEventInstance,eventErrorList){
 		Set workFlowCode = moveBundles.workflowCode
 		def workFlow = moveBundles.workflowCode
 		def workFlowCodeSelected = [:]
@@ -245,6 +263,7 @@ class ReportsService {
 			moveBundleStep = MoveBundleStep.findAllByMoveBundle(moveBundle)
 			if(moveBundleStep.size()==0){
 				steps << [(moveBundle.name):"No steps created"]
+				eventErrorList << ['EventsBundle']
 			}else{
 				moveBundleStep.each{step->
 					label << [
@@ -256,14 +275,14 @@ class ReportsService {
 				}
 			}
 		}
-	  return[workFlowCodeSelected:workFlowCodeSelected,steps:steps]
+	  return[workFlowCodeSelected:workFlowCodeSelected,steps:steps,eventErrorList:eventErrorList]
 	}
 	/**
 	* @param moveEventInstance,projectInstance,currProj
 	* @param Events
 	* @return time,moveEventInstance,errorForEventTime,inProgressError,userLoginError,clientAccess,list
 	*/
-	def getEventsProjectInfo(moveEventInstance,projectInstance,currProj,moveBundles){
+	def getEventsProjectInfo(moveEventInstance,projectInstance,currProj,moveBundles,eventErrorList){
 		
 		def date = new Date()
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
@@ -276,6 +295,7 @@ class ReportsService {
 
 		moveBundles.each{
 			if(it.startTime > projectInstance.startDate && it.completionTime > projectInstance.completionDate){
+				eventErrorList << ['Project']
 				errorForEventTime += """<span style="color:red" ><b>Move bundle ${it.name} is completing after project completion</b>  </span><br></br>"""
 			}else{
 				def projectStartTime = 'Not Available'
@@ -295,8 +315,10 @@ class ReportsService {
 		def moveEventCompletiondate = lastMoveBundleDate[lastMoveBundleDateSize-1]
 		def inPastError = ''
 		if(moveEventInstance.inProgress=='true'){
+			eventErrorList << ['Project']
 			inProgressError += """<span style="color:red" ><b>${moveEventInstance.name} : MoveEvent In Progress </b></span>"""
 		}else if(moveEventCompletiondate < projectInstance.startDate) {
+		    eventErrorList << ['Project']
 		    inProgressError += """<span style="color:red" ><b>${moveEventInstance.name} : MoveEvent In Past </b></span>"""
 		}else{
 		    inProgressError += """<span style="color:green" ><b>${moveEventInstance.name} : OK </b></span>"""
@@ -318,9 +340,11 @@ class ReportsService {
 			def user = UserLogin.findByPerson(Person.get(staff.partyIdTo.id))
 			
 			if(!user){
+				eventErrorList << ['Project']
 				userLoginError +="""<span style="color:red"><b>${Person.get(staff.partyIdTo.id)} login disabled</b></span><br></br>"""
 			}
 			if(user?.active=='N'){
+				eventErrorList << ['Project']
 				userLoginError +="""<span style="color:red"><b>${user} login inactive</b></span><br></br>"""
 			}
 			
@@ -329,11 +353,13 @@ class ReportsService {
 		def personInstanceList = Person.findAll( query )
 		if(personInstanceList.size()==0){
 			clientAccess += """<span style="color:red"><b>No Client Access</b></span>"""
+			eventErrorList << ['Project']
 		}else{
 			clientAccess += """<span style="color:Green"><b>Client Access :&nbsp;&nbsp; &nbsp;&nbsp;${personInstanceList}</b></span>"""
 		}
 		return[time:time,moveEvent:moveEventInstance,errorForEventTime:errorForEventTime,
-			   inProgressError:inProgressError,userLoginError:userLoginError,clientAccess:clientAccess,list:list]
+			   inProgressError:inProgressError,userLoginError:userLoginError,clientAccess:clientAccess,list:list,
+			   eventErrorList:eventErrorList]
 	}
 	
 	/**
@@ -342,7 +368,7 @@ class ReportsService {
 	* @return truckError,truck
 	*/
 	
-	def getTransportInfo(assetEntityList){
+	def getTransportInfo(assetEntityList,eventErrorList){
 		
 		Set truck = assetEntityList.truck
 		truck.remove('')
@@ -350,6 +376,7 @@ class ReportsService {
 		String truckError = ''
 		
 		if(truck.size()==0){
+			eventErrorList << ['Transport']
 			truckError += """<span style="color: red;"><b>Trucks :No trucks defined</b><br></br></span>"""
 		}else{
 			truckError+="""<span style="color: green;"><b>Trucks : OK  </b><br></br></span>"""
@@ -361,6 +388,7 @@ class ReportsService {
 		String cartError = ''
 		
 		if(cart.size()==0){
+			eventErrorList << ['Transport']
 			cartError += """<span style="color: red;"><b>Carts :No carts defined</b><br></br></span>"""
 		}else{
 			cartError+="""<span style="color: green;"><b>Carts : OK  </b><br></br></span>"""
@@ -373,11 +401,13 @@ class ReportsService {
 		def shelfError = ''
 		
 		if(shelf.size()==0){
+			eventErrorList << ['Transport']
 			shelfError += """<span style="color: red;"><b>Shelves :No Shelves defined</b><br></br></span>"""
 		}else{
 			shelfError+= """<span style="color: green;"><b>Shelves : OK (${shelf.size()}) </b><br></br></span>"""
 		}
 		
-		return[truckError:truckError,truck:truck,cartError:cartError,cart:cart,shelf:shelf,shelfError:shelfError]
+		return[truckError:truckError,truck:truck,cartError:cartError,cart:cart,shelf:shelf,shelfError:shelfError,
+			   eventErrorList:eventErrorList]
 	}
 }
