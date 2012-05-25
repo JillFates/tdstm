@@ -28,7 +28,6 @@ class ClientTeamsController {
 	 * @return : List of teams that are belongs to current project, and if project user preference not exist list all teams
 	 */
 	def list = {
-		println "params:::::::::::"+params
 		def sourceTeams = []
 		def targetTeams = []
 		userPreferenceService.loadPreferences("CURR_PROJ")
@@ -48,7 +47,6 @@ class ClientTeamsController {
 		def now = GormUtil.convertInToGMT( "now","EDT" )
 		def timeNow = now.getTime()
 		def moveBundles = MoveBundle.getActiveBundlesByProject( Integer.parseInt(projectId), now )
-		println "moveBundles:::::::::::::"+moveBundles
 		moveBundles.each{ moveBundle ->
 			def bundleAssetsList = AssetEntity.findAllWhere( moveBundle : moveBundle )
 			partyRelationshipService.getBundleTeamInstanceList( moveBundle ).each {
@@ -56,7 +54,7 @@ class ClientTeamsController {
 					def teamId = it.projectTeam.id
 					def headColor = 'done'
 					def role = it.projectTeam?.role ? it.projectTeam?.role : "MOVE_TECH"
-					def swimlane = Swimlane.findByNameAndWorkflow(role ? role : "MOVE_TECH", Workflow.findByProcess(moveBundle.project.workflowCode) )
+					def swimlane = Swimlane.findByNameAndWorkflow(role ? role : "MOVE_TECH", Workflow.findByProcess(moveBundle.workflowCode) )
 					
 					def hasSourceAssets = AssetEntity.find("from AssetEntity WHERE sourceTeamMt = $teamId OR sourceTeamSa = $teamId OR sourceTeamDba = $teamId")
 					if(hasSourceAssets || role =="CLEANER"){
@@ -64,16 +62,16 @@ class ClientTeamsController {
 						def sourceAssets = sourceAssetsList.size()
 						
 						def minSource = swimlane.minSource ? swimlane.minSource : "Release"
-						def minSourceId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, minSource ) )
+						def minSourceId = Integer.parseInt( stateEngineService.getStateId( moveBundle.workflowCode, minSource ) )
 						
 						def maxSource = swimlane.maxSource ? swimlane.maxSource : "Unracked"
-						def maxSourceId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, maxSource ) )
+						def maxSourceId = Integer.parseInt( stateEngineService.getStateId( moveBundle.workflowCode, maxSource ) )
 						
 						def unrackingAssets = sourceAssetsList.findAll{it.currentStatus > minSourceId &&  it.currentStatus < maxSourceId }.size()
 						
 						if(role =="CLEANER"){
-							minSourceId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Unracked" ) )
-							maxSourceId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Cleaned" ) )
+							minSourceId = Integer.parseInt( stateEngineService.getStateId( moveBundle.workflowCode, "Unracked" ) )
+							maxSourceId = Integer.parseInt( stateEngineService.getStateId( moveBundle.workflowCode, "Cleaned" ) )
 							unrackingAssets = sourceAssetsList.findAll{it.currentStatus == minSourceId }.size()
 						}
 						def sourceAvailassets = sourceAssetsList.findAll{it.currentStatus >= minSourceId && it.currentStatus < maxSourceId }.size()
@@ -92,11 +90,11 @@ class ClientTeamsController {
 					def hasTargetAssets = AssetEntity.find("from AssetEntity WHERE targetTeamMt = $teamId OR targetTeamSa = $teamId OR targetTeamDba = $teamId")
 					if(hasTargetAssets && !(role =="CLEANER")){
 						def minTarget = swimlane.minTarget ? swimlane.maxTarget : "Staged"
-						def minTargetId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, minTarget ) )
+						def minTargetId = Integer.parseInt( stateEngineService.getStateId( moveBundle.workflowCode, minTarget ) )
 						
 						def maxTarget = swimlane.maxTarget ? swimlane.maxTarget : "Reracked"
-						def maxTargetId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, maxTarget ) )
-						def rerackingId = Integer.parseInt( stateEngineService.getStateId( moveBundle.project.workflowCode, "Reracking" ) )
+						def maxTargetId = Integer.parseInt( stateEngineService.getStateId( moveBundle.workflowCode, maxTarget ) )
+						def rerackingId = Integer.parseInt( stateEngineService.getStateId( moveBundle.workflowCode, "Reracking" ) )
 						
 						
 						def targetAssetsList = bundleAssetsList.findAll{it[targetTeamType.get(role)]?.id == teamId }

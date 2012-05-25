@@ -470,10 +470,10 @@ class MoveBundleService {
 			 planningConsoleList << ['dependencyBundle':assetDependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
 		 }
 		 
-		 def servers = AssetEntity.findAllByAssetTypeAndProject(AssetType.SERVER.toString(),projectInstance)
-		 def applications = Application.findAllByAssetTypeAndProject(AssetType.APPLICATION.toString(),projectInstance)
-		 def dbs = Database.findAllByAssetTypeAndProject(AssetType.DATABASE.toString(),projectInstance)
-		 def files = Files.findAllByAssetTypeAndProject(AssetType.FILES.toString(),projectInstance)
+		 def servers = AssetEntity.findAll("from AssetEntity where assetType in ('${AssetType.SERVER.toString()}','${AssetType.VM.toString()}','Blade') and project =$projectId order by assetName asc")
+		 def applications = Application.findAllByAssetTypeAndProject(AssetType.APPLICATION.toString(),projectInstance,[sort:'assetName'])
+		 def dbs = Database.findAllByAssetTypeAndProject(AssetType.DATABASE.toString(),projectInstance,[sort:'assetName'])
+		 def files = Files.findAllByAssetTypeAndProject(AssetType.FILES.toString(),projectInstance,[sort:'assetName'])
 		 def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		 def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
  
