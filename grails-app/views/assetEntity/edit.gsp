@@ -198,7 +198,7 @@
 								<tr id='row_s_${i}'>
 									<td><g:select name="dataFlowFreq_support_${i}" value="${support.dataFlowFreq}" from="${support.constraints.dataFlowFreq.inList}" /></td>
 									<td><g:select name="entity_support_${i}" from="['Server','Application','Database','Files']" onchange='updateAssetsList(this.name, this.value)' value="${support?.asset?.assetType}"></g:select></td>
-									<g:if test="${support?.asset?.assetType=='Server'}">
+									<g:if test="${support?.asset?.assetType=='Server'|| support?.asset.assetType=='Blade' || support?.asset.assetType=='VM'}">
 									<td><g:select name="asset_support_${i}" from="${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType in (\'Server\',\'VM\',\'Blade\') and project = ? order by assetName asc ',[project])}" value="${support?.asset?.id}" optionKey="id" optionValue="assetName"  style="width:105px;"></g:select></td>
 									</g:if>
 									<g:else>
@@ -233,10 +233,9 @@
 						<tbody id="createDependentsList">
 						<g:each in="${dependentAssets}" var="dependent" status="i">
 							<tr id='row_d_${i}'>
-							${dependent?.dependent?.assetType}
 								<td><g:select name="dataFlowFreq_dependent_${i}" value="${dependent.dataFlowFreq}" from="${dependent.constraints.dataFlowFreq.inList}" /></td>
 								<td><g:select name="entity_dependent_${i}" from="['Server','Application','Database','Files']" onchange='updateAssetsList(this.name, this.value)' value="${dependent?.dependent?.assetType}"></g:select></td>
-								<g:if test="${dependent?.dependent?.assetType=='Server'}">
+								<g:if test="${dependent?.dependent?.assetType=='Server'|| dependent?.dependent?.assetType=='Blade' || dependent?.dependent?.assetType=='VM'}">
 								  <td><g:select name="asset_dependent_${i}" from="${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType in (\'Server\',\'VM\',\'Blade\') and project = ? order by assetName asc ',[project])}" value="${dependent?.dependent?.id}" optionKey="id" optionValue="assetName"  style="width:105px;"></g:select></td>
 								</g:if>
 								<g:else>

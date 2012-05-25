@@ -353,7 +353,7 @@ class MoveEventController {
     	def moveEvent = MoveEvent.findById(params.id)
 		def statusAndNewsList = []
 		if(moveEvent){
-			def holdId = stateEngineService.getStateId(moveEvent.project.workflowCode,"Hold")
+			def holdId = Integer.parseInt(stateEngineService.getStateId(moveEvent.project.workflowCode,"Hold"))
 			
 	    	def moveEventNewsQuery = """SELECT mn.date_created as created, mn.message as message from move_event_news mn 
 							left join move_event me on ( me.move_event_id = mn.move_event_id ) 
