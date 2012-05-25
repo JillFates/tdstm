@@ -213,7 +213,7 @@ class ApplicationController {
 			def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
 			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-			def moveEvent = MoveEvent.findAllByProject(project,,[sort:'name'])
+			def moveEvent = MoveEvent.findAllByProject(project,[sort:'name'])
 			def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
 			moveEvent.each{
 			   def appMoveList = AppMoveEvent.findByApplicationAndMoveEvent(applicationInstance,it)
