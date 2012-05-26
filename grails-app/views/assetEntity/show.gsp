@@ -17,14 +17,15 @@
 								<td class="label_sm">Source</td>
 								<td class="label_sm">Target</td>
 								<td colspan="2" class="label" nowrap="nowrap">
-								<g:if test="${(assetEntityInstance.custom1)?.length()>= 4 && (assetEntityInstance.custom1)?.substring(0, 4)=='http'}">
+								   <g:if test="${(assetEntityInstance.custom1)?.length()>= 4 && (assetEntityInstance.custom1)?.substring(0, 4)=='http'}">
 										<a href="javascript:window.open('${assetEntityInstance.custom1}','help');" style="color:#00E">${assetEntityInstance.project.custom1!=null ? assetEntityInstance.project.custom1 : 'Custom1'}</a>
-							    </g:if>
-							    <g:else>
-								   ${assetEntityInstance.project.custom1 ?:'Custom1'}
-							    </g:else>
+								    </g:if>
+								    <g:else>
+								         ${assetEntityInstance.project.custom1 ?:'Custom1'}
+							        </g:else>
 							    </td>
-							</td>
+							    <td>${assetEntityInstance.custom1 }</td>
+							    
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
@@ -42,6 +43,7 @@
 								   ${assetEntityInstance.project.custom2 ?:'Custom2'}
 							    </g:else>
 							    </td>
+							    <td>${assetEntityInstance.custom2}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="manufacturer">Manufacturer</label></td>
@@ -59,6 +61,7 @@
 								   ${assetEntityInstance.project.custom3 ?:'Custom3'}
 							    </g:else>
 							    </td>
+							    <td>${assetEntityInstance.custom3}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="model">Model</label></td>
@@ -76,6 +79,7 @@
 								   ${assetEntityInstance.project.custom4 ?:'Custom4'}
 							    </g:else>
 							    </td>
+							    <td>${assetEntityInstance.custom4}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="shortName">Alt Name</label></td>
@@ -93,6 +97,7 @@
 								   ${assetEntityInstance.project.custom5 ?:'Custom5'}
 							    </g:else>
 							    </td>
+							    <td>${assetEntityInstance.custom5}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="serialNumber">S/N</label></td>
@@ -112,6 +117,7 @@
 								   ${assetEntityInstance.project.custom6 ?:'Custom6'}
 							    </g:else>
 							    </td>
+							    <td>${assetEntityInstance.custom6}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="assetTag">Tag</label></td>
@@ -130,8 +136,8 @@
 							    <g:else>
 								   ${assetEntityInstance.project.custom7 ?:'Custom7'}
 							    </g:else>
-									
 								</td>
+								<td>${assetEntityInstance.custom7}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="railType">Rail Type</label></td>
@@ -149,6 +155,7 @@
 								   ${assetEntityInstance.project.custom8 ?:'Custom8'}
 							    </g:else>
 								</td>
+								<td>${assetEntityInstance.custom8}</td>
 							</tr>
 							<tr class="prop">
 								<td>&nbsp</td>
