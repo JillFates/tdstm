@@ -1,6 +1,5 @@
 import grails.converters.JSON
 
-import java.io.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -10,6 +9,7 @@ import jxl.read.biff.*
 import jxl.write.*
 import net.tds.util.jmesa.AssetEntityBean
 
+import java.io.File;
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
@@ -455,7 +455,6 @@ class AssetEntityController {
 									jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
 									serverAdded = r
 								} catch (Exception e) {
-									println"e-->"+e
 									skipped += ( r +1 )
 								}
 							}
@@ -648,7 +647,7 @@ class AssetEntityController {
 										asset.updatedBy = userLogins.person
 										//asset.createdBy = userLogin.person
 										if(!asset.save(flush:true)){
-											asset.errors.allErrors.each { println it }
+											asset.errors.allErrors.each { log.error  it }
 											skipped += ( r +1 )
 											skippedUpdated = skipped.size()
 										}
@@ -678,7 +677,7 @@ class AssetEntityController {
 									assetDpendencyInstance.createdBy = userLogins?.person
 									assetDpendencyInstance.updatedBy = userLogins?.person
 									if(!assetDpendencyInstance.save(flush:true)){
-										assetDpendencyInstance.errors.allErrors.each { println it }
+										assetDpendencyInstance.errors.allErrors.each { log.error it }
 										skipped += ( r +1 )
 										skippedAdded = skipped.size()
 									}
@@ -1416,8 +1415,8 @@ class AssetEntityController {
 			assetEntityInstance.assetTag = "TDS-${lastAssetId}"
 			projectInstance.lastAssetId = lastAssetId + 1
 			if(!projectInstance.save(flush:true)){
-				println"Error while updating project.lastAssetId : ${projectInstance}"
-				projectInstance.errors.each { println it }
+				log.error "Error while updating project.lastAssetId : ${projectInstance}"
+				projectInstance.errors.each { log.error  it }
 			}
 		}
 
@@ -1442,7 +1441,7 @@ class AssetEntityController {
 			flash.message = "AssetEntity ${assetEntityInstance.assetName} not created"
 			def etext = "Unable to Update Asset" +
 					GormUtil.allErrorsString( assetEntityInstance )
-			println etext
+			log.error  etext
 			if(params.redirectTo == "room"){
 				redirect( controller:'room',action:list, params:[projectId: projectId] )
 			} else if(params.redirectTo == "rack"){
@@ -1575,7 +1574,7 @@ class AssetEntityController {
 				} else {
 					def etext = "Unable to Update Asset" +
 							GormUtil.allErrorsString( assetEntityInstance )
-					println etext
+					log.error  etext
 					log.error( etext )
 				}
 			}
@@ -2487,7 +2486,7 @@ class AssetEntityController {
 				}
 			}
 		} catch(Exception ex){
-			println"$ex"
+			log.error "$ex"
 		}
 		redirect(action:'dashboardView',params:[moveBundle:params.moveBundle, showAll:params.showAll,
 					projectId:params.projectId] )
@@ -2813,7 +2812,7 @@ class AssetEntityController {
 			assetOptionInstance.type = AssetOptions.AssetOptionsType.STATUS_OPTION
 			assetOptionInstance.value = params.planStatus
 			if(!assetOptionInstance.save(flush:true)){
-				assetOptionInstance.errors.allErrors.each { println it }
+				assetOptionInstance.errors.allErrors.each { log.error  it }
 			}
 			planStatus = AssetOptions.findByValue(params.planStatus).id
 			
@@ -2821,7 +2820,7 @@ class AssetEntityController {
 			assetOptionInstance.type = AssetOptions.AssetOptionsType.PRIORITY_OPTION
 			assetOptionInstance.value = params.priorityOption
 			if(!assetOptionInstance.save(flush:true)){
-				assetOptionInstance.errors.allErrors.each { println it }
+				assetOptionInstance.errors.allErrors.each { log.error  it }
 			}
 			planStatus = AssetOptions.findByValue(params.priorityOption).id
 			
@@ -2829,7 +2828,7 @@ class AssetEntityController {
 			assetOptionInstance.type = AssetOptions.AssetOptionsType.DEPENDENCY_TYPE
 			assetOptionInstance.value = params.dependencyType
 			if(!assetOptionInstance.save(flush:true)){
-				assetOptionInstance.errors.allErrors.each { println it }
+				assetOptionInstance.errors.allErrors.each { log.error  it }
 			}
 			planStatus = AssetOptions.findByValue(params.dependencyType).id
 			
@@ -2837,7 +2836,7 @@ class AssetEntityController {
 		    assetOptionInstance.type = AssetOptions.AssetOptionsType.DEPENDENCY_STATUS
 			assetOptionInstance.value = params.dependencyStatus
 			if(!assetOptionInstance.save(flush:true)){
-				assetOptionInstance.errors.allErrors.each { println it }
+				assetOptionInstance.errors.allErrors.each { log.error  it }
 			}
 			planStatus = AssetOptions.findByValue(params.dependencyStatus).id
 			
@@ -2852,22 +2851,22 @@ class AssetEntityController {
 		if(params.assetOptionType=="planStatus"){
 			 assetOptionInstance = AssetOptions.get(params.assetStatusId)
 			 if(!assetOptionInstance.delete(flush:true)){
-				assetOptionInstance.errors.allErrors.each { println it }
+				assetOptionInstance.errors.allErrors.each { log.error  it }
 			 }
 		}else if(params.assetOptionType=="Priority"){
 			assetOptionInstance = AssetOptions.get(params.priorityId)
 			if(!assetOptionInstance.delete(flush:true)){
-				assetOptionInstance.errors.allErrors.each { println it }
+				assetOptionInstance.errors.allErrors.each { log.error  it }
 			}
 		}else if(params.assetOptionType=="dependency"){
 		    assetOptionInstance = AssetOptions.get(params.dependecyId)
 			if(!assetOptionInstance.delete(flush:true)){
-				assetOptionInstance.errors.allErrors.each { println it }
+				assetOptionInstance.errors.allErrors.each { log.error  it }
 			}
 		}else{
 			assetOptionInstance = AssetOptions.get(params.dependecyId)
 			if(!assetOptionInstance.delete(flush:true)){
-				assetOptionInstance.errors.allErrors.each { println it }
+				assetOptionInstance.errors.allErrors.each { log.error  it }
 			}
 		}
 		render assetOptionInstance.id
@@ -3081,17 +3080,21 @@ class AssetEntityController {
 			}
 			graphData << ["links":graphLinks]
 			JSON output = graphData as JSON
-			def currentfile = ApplicationHolder.application.parentContext.getResource( "/d3/force/miserables.json" ).getFile()
-			currentfile.write(output.toString());
+			def currentfile = ApplicationHolder.application.parentContext.getResource( "/d3/force/force.js" ).getFile()
+			assetEntityService.deleteTempGraphFiles("/d3/force", "G_")
+			def file_name = "G_${new Date().getTime()}"
+			def file_path = currentfile.absolutePath.replace("force.js",file_name)
+			File file = new File(file_path)
+			file.write(output.toString())
 			render(template:'dependencyGraph',model:[assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
 										   filesDependentListSize:filesListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbDependentListSize,
 										   asset:'graph', force:force, distance:distance,friction:friction,height:height,width:width, labels:labels , appChecked:labels.contains('apps') ? true : false , serverChecked:labels.contains('servers') ? true : false,
-										   filesChecked:labels.contains('files') ? true : false,eventColorCode:eventColorCode])
+										   filesChecked:labels.contains('files') ? true : false,eventColorCode:eventColorCode, file_name:file_name])
 			break;
 		}
 	}
 	
-	def reloadMap={		
+	def reloadMap={
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
 		def graphData = [:]
@@ -3171,9 +3174,13 @@ class AssetEntityController {
 		}
 		graphData << ["links":graphLinks]
 		JSON output = graphData as JSON
-		def currentfile = ApplicationHolder.application.parentContext.getResource( "/d3/force/miserables.json" ).getFile()
-		currentfile.write(output.toString());
-		render(template:'map',model:[asset:'graph', force:force, distance:distance,friction:friction,height:height,width:width, labels:labels,eventColorCode:eventColorCode])
+		def currentfile = ApplicationHolder.application.parentContext.getResource( "/d3/force/force.js" ).getFile()
+		assetEntityService.deleteTempGraphFiles("/d3/force", "G_")
+		def file_name = "G_${new Date().getTime()}"
+		def file_path = currentfile.absolutePath.replace("force.js",file_name)
+		File file = new File(file_path)
+		file.write(output.toString())			
+		render(template:'map',model:[asset:'graph', force:force, distance:distance,friction:friction,height:height,width:width, labels:labels,eventColorCode:eventColorCode,file_name:file_name])
 		
-	}	
+	}
 } 

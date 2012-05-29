@@ -3,7 +3,7 @@ var graphstyle = "top:-120;z-index:-1;",
 	fill = d3.scale.category20();
 
 			
-d3.json("../d3/force/miserables.json", function(json) {
+d3.json("../d3/force/"+file_name, function(json) {
 	var vis = d3.select("div#item1")
 			  .append("svg:svg")
 			  .attr("width", json.width)

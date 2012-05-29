@@ -137,4 +137,4 @@
 			</table>
 			</div>
 			
-<g:render template="../d3/force/force" />
+<g:render template="../d3/force/force" model="[file_name:file_name]"/>

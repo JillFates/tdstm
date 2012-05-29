@@ -1,3 +1,4 @@
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.jsecurity.SecurityUtils
 
 import com.tds.asset.AssetDependency
@@ -298,6 +299,26 @@ class AssetEntityService {
 						GormUtil.allErrorsString( assetDependency )
 						   println etext
 					}
+				}
+			}
+		}
+	}
+	/**
+	 * @patams, files path, file name startsWith
+	 * Delete all files that are match with params criteria
+	 */
+	def deleteTempGraphFiles(path, startsWith){
+		def filePath = ApplicationHolder.application.parentContext.getResource(path).file
+		// Get file path
+		def dir = new File( "${filePath.absolutePath}" )
+		def children = dir.list()
+		if ( children ) {
+			for (int i=0; i<children.length; i++) {
+				// Get filename
+				def filename = children[i]
+				if ( filename.startsWith(startsWith) ) {
+					def jsonFile =  ApplicationHolder.application.parentContext.getResource( "${path}/${filename}" ).getFile()
+					jsonFile?.delete()
 				}
 			}
 		}

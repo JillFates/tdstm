@@ -394,7 +394,7 @@ class MoveBundleController {
 				def etext = "Unable to create moveBundleStep" +
 						GormUtil.allErrorsString( moveBundleStep )
 				response.sendError( 500, "Validation Error")
-				println etext
+				log.error etext
 			}
 		}
 		render moveBundleStep
@@ -639,7 +639,7 @@ class MoveBundleController {
 			assetInstance.planStatus = 'Assigned'
 			if(!assetInstance.save(flush:true)){
 				assetInstance.errors.allErrors.each{
-			          println it 		
+			          log.error it 		
 				}
 			}
 			
