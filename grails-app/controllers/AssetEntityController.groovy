@@ -3053,7 +3053,7 @@ class AssetEntityController {
 						name = it.asset.assetName
 					shape = "triangle-up"
 				}
-				def moveEventName = it.asset.moveBundle.moveEvent?.name
+				def moveEventName = it.asset.moveBundle?.moveEvent?.name
 				graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle, 
 								shape:shape, size : size, title: title,color:eventColorCode[moveEventName]?eventColorCode[moveEventName]:"red"]
 		}
@@ -3143,7 +3143,7 @@ class AssetEntityController {
 					name = it.asset.assetName
 				shape = "triangle-up"
 			}
-			def moveEventName = it.asset.moveBundle.moveEvent?.name
+			def moveEventName = it.asset.moveBundle?.moveEvent?.name
 				graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle, 
 								shape:shape, size : size, title: title,color:eventColorCode[moveEventName]?eventColorCode[moveEventName]:"red"]
 		}
