@@ -623,6 +623,7 @@ td .dep-Questioned {
 .admin { display: none;  left:0px  !important;    position: absolute  !important; top:50px;}
 .mmtable .mmlink { 
 	border-right:0px !important;
+	height:auto;
 }
 
 .tabs {
@@ -679,4 +680,7 @@ td .dep-Questioned {
 #dependency_group {
 	overflow-x:scroll; 
 	max-width: 1350px;
+}
+.pointer {
+	cursor: pointer;
 }
