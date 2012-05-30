@@ -42,7 +42,7 @@ class ReportsService {
 		Set allErrors = eventErrorList
 		def eventErrorString = ''
 		if(allErrors.size()>0){
-			eventErrorString +="""<span style="color:red;text-align: center;"><h2>There were ${allErrors.size()} sections with Issues or Errors.See Details Below.</h2></span><br/>"""
+			eventErrorString +="""<span style="color:red;text-align: center;"><h2>There were ${allErrors.size()} sections with Issues (see details below).</h2></span><br/>"""
 		}else{
 		    eventErrorString +="""<span style="color:green;text-align: center;"><h3>No preparation issues for this event</h3></span>"""
 		}
@@ -94,10 +94,10 @@ class ReportsService {
 		}
 		def teamAssignment = ""
 		if(notAssignedToTeam.size()>0){
-			teamAssignment+="""<span style="color: red;"><b>MoveTech Assignment : Asset Not Assigned  </b><br></br></span>"""
+			teamAssignment+="""<span style="color: red;"><b>MoveTech Assignment: Asset Not Assigned  </b><br></br></span>"""
 			eventErrorList << 'Teams'
 		}else{
-			teamAssignment+="""<span style="color: green;"><b>MoveTech Assignment : OK  </b><br></br></span>"""
+			teamAssignment+="""<span style="color: green;"><b>MoveTech Assignment: OK  </b><br></br></span>"""
 		}
 		Set inValidUsers = []
 		bundleMap.teamList.teamList.each{lists->
@@ -112,10 +112,10 @@ class ReportsService {
 		}
 		def userLogin =""
 			if(inValidUsers.size()>0){
-				userLogin+="""<span style="color: red;"><b>Team Details Check : Team Member name Not Valid</b><br></br></span>"""
+				userLogin+="""<span style="color: red;"><b>Team Details Check: Team Member name Not Valid</b><br></br></span>"""
 				eventErrorList << 'Teams'
 			}else{
-				userLogin+="""<span style="color: green;"><b>Team Details Check : OK  </b><br></br></span>"""
+				userLogin+="""<span style="color: green;"><b>Team Details Check: OK  </b><br></br></span>"""
 			}
 		return [bundleMap:bundleMap,inValidUsers:inValidUsers,
 			teamAssignment:teamAssignment, notAssignedToTeam:notAssignedToTeam,userLogin:userLogin,eventErrorList:eventErrorList]
@@ -146,22 +146,21 @@ class ReportsService {
 		
 		String duplicates = ""
 		def nullAssetname = jdbcTemplate.queryForList("SELECT asset_name as assetName ,asset_tag as tag,  asset_type as type from asset_entity where project_id = $currProj and asset_name is null and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) ")
-		println "nullAssetname---------------"+nullAssetname
 		if(duplicatesAssetNames.size()>0){
 			duplicates += """<span style="color: red;"><b>Naming Check: <br></br></span>"""
 			eventErrorList << 'Assets'
 		}else{
-			duplicates += """<span style="color: green;"><b>Naming Check OK <br></br></span>"""
+			duplicates += """<span style="color: green;"><b>Naming Check: OK <br></br></span>"""
 		}
 		def blankAssets = ''
 		if(nullAssetname.size()>0){
 			blankAssets += """<span style="color: red;"><b>Blank Naming Check: <br></br></span>"""
 			eventErrorList << 'Assets'
 		}else{
-		    blankAssets += """<span style="color: green;"><b>Blank Naming Check: OK : No error: "Blank names: 0"<br></br></span>"""
+		    blankAssets += """<span style="color: green;"><b>Blank Naming Check: OK: No error: "Blank names: 0"<br></br></span>"""
 		}
 		
-		def duplicatesAssetTagNames = jdbcTemplate.queryForList("SELECT asset_tag as tag , count(*) as counts from asset_entity where project_id = $currProj and asset_tag is not null and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_tag HAVING COUNT(*) > 1")
+		def duplicatesAssetTagNames = jdbcTemplate.queryForList("SELECT asset_tag as tag , count(*) as counts from asset_entity where project_id = $currProj and asset_tag is not null and asset_type in ('Server','VM','Blade') and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_tag HAVING COUNT(*) > 1")
 		
 		String duplicatesTag = ""
 		
@@ -169,22 +168,22 @@ class ReportsService {
 			duplicatesTag += """<span style="color: red;"><b>Asset Tag: <br></br></span>"""
 			eventErrorList << 'Assets'
 		}else{
-			duplicatesTag += """<span style="color: green;"><b>Asset Tag  OK <br></br></span>"""
+			duplicatesTag += """<span style="color: green;"><b>Asset Tag: OK <br></br></span>"""
 		}
-		def nullAssetTag = jdbcTemplate.queryForList("SELECT asset_tag as tag , count(*) as counts , asset_name as name from asset_entity where project_id = $currProj and asset_tag is  null and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_tag HAVING COUNT(*) > 1")
+		def nullAssetTag =  jdbcTemplate.queryForList("SELECT asset_name as assetName ,asset_tag as tag,  asset_type as type from asset_entity where project_id = $currProj and asset_tag is null and asset_type in ('Server','VM','Blade') and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) ")
 		def blankAssetTag = ''
 		if(nullAssetTag.size()>0){
-			blankAssetTag += """<span style="color: red;"><b>Blank Tag Check: ${nullAssetTag.counts[0]} assets with no asset tags <br></br></span>"""
+			blankAssetTag += """<span style="color: red;"><b>Blank Tag Check: ${nullAssetTag.size()} assets with no asset tags <br></br></span>"""
 			eventErrorList << 'Assets'
 		}else{
-			blankAssetTag += """<span style="color: green;"><b>Blank Tag Check: OK : No error: "Blank tag: 0"<br></br></span>"""
+			blankAssetTag += """<span style="color: green;"><b>Blank Tag Check: OK: No error: "Blank tag: 0"<br></br></span>"""
 		}
 		
 		def missingRacks = AssetEntity.findAll("from AssetEntity asset where  asset.project.id=${currProj} and asset.assetType not in('Application','Files','Database','VM') and asset.moveBundle.moveEvent.id=${moveEventInstance.id} and (sourceRack='' or targetRack='' or sourceRackPosition = '' or targetRackPosition = '') group by asset.assetName").assetName
 		
 		String missedRacks = ""
 		if(missingRacks.size()>0){
-			missedRacks += """<span style="color: red;"><b>Asset Details:${missingRacks.size} Servers With Missing Rack info : </b><br></br></span>"""
+			missedRacks += """<span style="color: red;"><b>Asset Details: ${missingRacks.size} Servers With Missing Rack info: </b><br></br></span>"""
 			eventErrorList << 'Assets'
 		}else{
 			missedRacks += """<span style="color: Green;"><b>Asset Details: OK </b><br></br></span>"""
@@ -200,10 +199,10 @@ class ReportsService {
 		dependencies.sort()
 		String dependenciesOk = ""
 		if(dependencies.size()>0){
-			dependenciesOk +="""<span style="color: red;"><b>Dependency found:${dependencies.size} Dependency Found:<br></br></b></span> <div style="margin-left:50px;"> ${dependencies.toString().replace('[','').replace(']','')}</div>"""
+			dependenciesOk +="""<span style="color: red;"><b>Dependency found: ${dependencies.size} Dependency Found:<br></br></b></span> <div style="margin-left:50px;"> ${dependencies.toString().replace('[','').replace(']','')}</div>"""
 			eventErrorList << 'Assets'
 		}else{
-			dependenciesOk +="""<span style="color: green;"><b>Dependency -No Dependencies : </b><br></br></span>"""
+			dependenciesOk +="""<span style="color: green;"><b>Dependency: OK-No Dependencies: </b><br></br></span>"""
 		}
 		
 		String assetId = assetEntityList.id
@@ -215,7 +214,7 @@ class ReportsService {
 			issue +="""<span style="color: red;"><b>Issues: Unresolved Issues  </b><br></br></span>"""
 			eventErrorList << 'Assets'
 		}else{
-			issue +="""<span style="color: green;"><b>Issues OK  </b><br></br></span>"""
+			issue +="""<span style="color: green;"><b>Issues: OK  </b><br></br></span>"""
 		}
 		
 		def specialInstruction = AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in ${assetId}  and  mustVerify = 1 order by comment.assetEntity.assetName ")
@@ -235,7 +234,7 @@ class ReportsService {
 		if(questionedDependency.size()>0){
 			questioned +="""<span style="color: red;"><b>Dependencies Questioned for ${questionedDependency.size() } assets:</b><br></br></span>"""
 		}else{
-		    questioned +="""<span style="color: green;"><b>Dependencies Questioned : OK  </b><br></br></span>"""
+		    questioned +="""<span style="color: green;"><b>Dependencies Questioned: OK  </b><br></br></span>"""
 		}
 		
 		
@@ -287,7 +286,7 @@ class ReportsService {
 					labels = labels.replace('[[','').replace('], [',' , ').replace(']]','')
 					steps << [(moveBundle.name):labels]
 				}
-				dashBoardOk += """<span style="color:green" ><b>DashBoard OK:</b></span>"""
+				dashBoardOk += """<span style="color:green" ><b>DashBoard OK: </b></span>"""
 			}
 		}
 	  return[workFlowCodeSelected:workFlowCodeSelected,steps:steps,eventErrorList:eventErrorList,dashBoardOk:dashBoardOk]
@@ -321,7 +320,7 @@ class ReportsService {
 					  projectEndTime  = formatter.format(format.parse(it.completionTime.toString()))
 					}
 					
-					errorForEventTime += """<span style="color:green"><b>Event Time Period ${it.name} :OK </b>${projectStartTime} - ${projectEndTime}</span><br></br>"""
+					errorForEventTime += """<span style="color:green"><b>Event Time Period ${it.name}: OK </b>${projectStartTime} - ${projectEndTime}</span><br></br>"""
 				}
 		}
 		def lastMoveBundleDate = moveEventInstance.moveBundles.completionTime
@@ -331,12 +330,12 @@ class ReportsService {
 		def inPastError = ''
 		if(moveEventInstance.inProgress=='true'){
 			eventErrorList << 'Project'
-			inProgressError += """<span style="color:red" ><b>${moveEventInstance.name} : MoveEvent In Progress </b></span>"""
+			inProgressError += """<span style="color:red" ><b>${moveEventInstance.name}: MoveEvent In Progress </b></span>"""
 		}else if(moveEventCompletiondate < projectInstance.startDate) {
 		    eventErrorList << 'Project'
-		    inProgressError += """<span style="color:red" ><b>${moveEventInstance.name} : MoveEvent In Past </b></span>"""
+		    inProgressError += """<span style="color:red" ><b>${moveEventInstance.name}: MoveEvent In Past </b></span>"""
 		}else{
-		    inProgressError += """<span style="color:green" ><b>${moveEventInstance.name} : OK </b></span>"""
+		    inProgressError += """<span style="color:green" ><b>${moveEventInstance.name}: OK </b></span>"""
 		}
 		
 		
@@ -370,7 +369,7 @@ class ReportsService {
 			clientAccess += """<span style="color:red"><b>No Client Access</b></span>"""
 			eventErrorList << 'Project'
 		}else{
-			clientAccess += """<span style="color:Green"><b>Client Access :&nbsp;&nbsp; &nbsp;&nbsp;${personInstanceList}</b></span>"""
+			clientAccess += """<span style="color:Green"><b> Client Access:&nbsp;${personInstanceList}</b></span>"""
 		}
 		return[time:time,moveEvent:moveEventInstance,errorForEventTime:errorForEventTime,
 			   inProgressError:inProgressError,userLoginError:userLoginError,clientAccess:clientAccess,list:list,
@@ -392,9 +391,9 @@ class ReportsService {
 		
 		if(truck.size()==0){
 			eventErrorList << 'Transport'
-			truckError += """<span style="color: red;"><b>Trucks :No trucks defined</b><br></br></span>"""
+			truckError += """<span style="color: red;"><b>Trucks: No trucks defined</b><br></br></span>"""
 		}else{
-			truckError+="""<span style="color: green;"><b>Trucks : OK  </b><br></br></span>"""
+			truckError+="""<span style="color: green;"><b>Trucks: OK  </b><br></br></span>"""
 		}
 		
 		Set cart = assetEntityList.cart
@@ -404,9 +403,9 @@ class ReportsService {
 		
 		if(cart.size()==0){
 			eventErrorList << 'Transport'
-			cartError += """<span style="color: red;"><b>Carts :No carts defined</b><br></br></span>"""
+			cartError += """<span style="color: red;"><b>Carts: No carts defined</b><br></br></span>"""
 		}else{
-			cartError+="""<span style="color: green;"><b>Carts : OK  </b><br></br></span>"""
+			cartError+="""<span style="color: green;"><b>Carts: OK (${cart.size()}) </b><br></br></span>"""
 		}
 		
 		Set shelf = assetEntityList.shelf
@@ -417,9 +416,9 @@ class ReportsService {
 		
 		if(shelf.size()==0){
 			eventErrorList << 'Transport'
-			shelfError += """<span style="color: red;"><b>Shelves :No Shelves defined</b><br></br></span>"""
+			shelfError += """<span style="color: red;"><b>Shelves: No Shelves defined</b><br></br></span>"""
 		}else{
-			shelfError+= """<span style="color: green;"><b>Shelves : OK (${shelf.size()}) </b><br></br></span>"""
+			shelfError+= """<span style="color: green;"><b>Shelves: OK (${shelf.size()}) </b><br></br></span>"""
 		}
 		
 		return[truckError:truckError,truck:truck,cartError:cartError,cart:cart,shelf:shelf,shelfError:shelfError,

@@ -1026,7 +1026,6 @@ class ReportsController {
 									'timezone':tzId ? tzId : "EDT", "rpt_time":String.valueOf(formatter.format( currDate ) )]
        			}
        		}
-			  println "reportFields--------------------"+reportFields
        		//No Assets were found for selected moveBundle,team and Location
        		if(reportFields.size() <= 0) {    		
        			flash.message = " No Cables were found for  selected values  "

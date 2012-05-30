@@ -7,12 +7,12 @@
 </head>
 <body>
 	<div>
-		<span style="margin-left: 360px; color: black; font-size: 20px;">
+		<div style="color: black; font-size: 20px;text-align: center;" >
 			<b>Pre-Move CheckList - ${project.name} : ${moveEvent.name }</b>
-		</span> <br />
-		<span style="margin-left: 600px; color: black; font-size: 15px">
+		</div> 
+		<div style="margin-left: 600px; color: black; font-size: 15px">
 			${time}
-		</span>
+		</div>
 		${eventErrorString}
 
 
@@ -96,13 +96,13 @@
 			</tr>
 			<tr>
 				<td></td>
-				<td><span style="color: green;"><b>Bundles:OK
+				<td><span style="color: green;"><b>Bundles: OK
 							&nbsp;&nbsp; ${moveBundleSize} Move Bundles;&nbsp;${moveBundles.toString().replace('[','').replace(']','')}
 					</b></span></td>
 			</tr>
 			<tr>
 				<td></td>
-				<td><span style="color: green;"><b>WorkFlow:OK </b></span></td>
+				<td><span style="color: green;"><b>WorkFlow: OK </b></span></td>
 			</tr>
 			<tr>
 				<td></td>
@@ -126,13 +126,13 @@
 					</g:else> <span> <g:each in="${steps}" var="workFlow">
 							<g:if test="${workFlow.value=='No steps created'}">
 								<span style="color: red; margin-left: 50px;">
-									${workFlow.key}:${workFlow.value}
+									${workFlow.key}: ${workFlow.value}
 								</span>
 								<br></br>
 							</g:if>
 							<g:else>
 								<span style="color: green; margin-left: 50px;">
-									${workFlow.key}:${workFlow.value}
+									${workFlow.key}: ${workFlow.value}
 								</span>
 								<br></br>
 							</g:else>
@@ -149,10 +149,10 @@
 			</tr>
 			<tr>
 				<td></td>
-				<td><span style="color: green;"><b>Summary : OK <br></br>
+				<td><span style="color: green;"><b>Summary: OK <br></br>
 							<g:each in="${summaryOk}" var="summary">
 								<span style="color: green; margin-left: 50px;">
-									${summary.key}&nbsp;: &nbsp;${summary.value}
+									${summary.key}:&nbsp;${summary.value}
 								</span>
 								<br></br>
 							</g:each>
@@ -173,7 +173,7 @@
 				<td>
 					${duplicates} <g:each in="${duplicatesAssetNames}" var="duplicate">
 						<span style="margin-left: 50px;">
-							${duplicate.counts} duplicates Named "${duplicate.assetName} "-(${duplicate.type})
+							${duplicate.counts} duplicates Named "${duplicate.assetName} "- (${duplicate.type})
 						</span>
 						<br></br>
 					</g:each>
@@ -182,10 +182,11 @@
 			<tr>
 				<td></td>
 				<td>
-					${blankAssetTag} <g:each in="${nullAssetTag}" var="nullTag">
-						<span style="color: red;"> ${nullTag.name}</span>
+					${blankAssetTag} 
+					<g:if test="${nullAssetTag.size()>0 }">
+						<span style="color: red;margin-left: 50px;"> Blank names: ${nullAssetTag.size()} Assets with no tag- ${nullAssetTag.assetName.toString().replace('[','').replace(']','')}</span>
+					</g:if>
 						<br />
-					</g:each>
 				</td>
 			</tr>
 			<tr>
@@ -296,9 +297,9 @@
 			</tr>
 			<tr>
 				<td></td>
-				<td><span style="color: green;"><b>Summary OK : <g:each
+				<td><span style="color: green;"><b>Summary OK: <g:each
 								in="${bundleMap}" var="bundle">
-								${bundle.name}:${bundle.size} teams.</g:each></b></span></td>
+								${bundle.name}: ${bundle.size} teams.</g:each></b></span></td>
 			</tr>
 			<tr>
 				<td></td>
