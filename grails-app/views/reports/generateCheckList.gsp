@@ -3,14 +3,14 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Pre-Move Check List</title>
+<title>Pre-Move Checklist</title>
 </head>
 <body>
 	<div>
-		<div style="color: black; font-size: 20px;text-align: center;" >
-			<b>Pre-Move CheckList - ${project.name} : ${moveEvent.name }</b>
+		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
+			<b>Pre-Move Checklist - ${project.name} : ${moveEvent.name }</b>
 		</div> 
-		<div style="margin-left: 600px; color: black; font-size: 15px">
+		<div style="color: black; font-size: 15px;text-align: center;">
 			${time}
 		</div>
 		${eventErrorString}
@@ -229,7 +229,7 @@
 				<td>&nbsp;</td>
 				<td>
 					${issue}<br />
-					<table style="width: 200px; margin-left: 100px;">
+					<table style="width: auto; margin-left: 100px;">
 						<tr>
 							<th>AssetName</th>
 							<th>Comment</th>
@@ -261,7 +261,7 @@
 				<td>&nbsp;</td>
 				<td>
 					${importantInstruction}<br />
-					<table style="width: 200px; margin-left: 100px;">
+					<table style="width: auto; margin-left: 100px;">
 						<tr>
 							<th>AssetName</th>
 							<th>Special Comment</th>

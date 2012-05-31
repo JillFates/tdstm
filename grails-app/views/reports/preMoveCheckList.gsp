@@ -2,11 +2,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Pre-Move CheckList</title>
+<title>Pre-Move Checklist</title>
 </head>
 <body>
 	<div class="body">
-		<h1>Pre-Move CheckList</h1>
+		<h1>Pre-Move Checklist</h1>
 		<g:form action="generateCheckList" name="preMoveCheck" method="post">
 			<table>
 				<tbody>
@@ -18,11 +18,9 @@
 
 						<td>
 							<div style="width: 150px; float: left;">
-								<label><strong>Output:</strong></label>&nbsp;<br /> <label
-									for="web"><input type="radio" name="output" id="web"
-									checked="checked" value="web" />&nbsp;Web</label><br /> <label
-									for="pdf"><input type="radio" name="output" id="pdf"
-									value="pdf" />&nbsp;PDF</label><br />
+								<label><strong>Output:</strong></label>&nbsp;<br />
+								<label for="web"><input type="radio" name="output" id="web" checked="checked" value="web" />&nbsp;Web</label><br />
+								<label for="pdf"><input type="radio" name="output" id="pdf" value="pdf" />&nbsp;PDF</label><br />
 							</div>
 						</td>
 					</tr>
