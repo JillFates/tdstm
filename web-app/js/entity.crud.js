@@ -210,7 +210,7 @@ function submitCheckBox(){
 var isFirst = true;
 function selectAll(){
 	var totalCheck = document.getElementsByName('checkBox');
-	if(isFirst){
+	if($('#selectId').attr('checked')==true){
 	for(i=0;i<totalCheck.length;i++){
 	totalCheck[i].checked = true;
 	}
@@ -249,6 +249,9 @@ function submitMoveForm(){
 		success: function(data) {
 			$('#moveBundleSelectId').dialog("close")
 			$('#items1').html(data);
+			$('#allBundles').attr('checked','false')
+			$('#planningBundle').attr('checked','true')
+			$("#plannedMoveBundleList").html($("#moveBundleList_planning").html())
 		}
 	});
 }

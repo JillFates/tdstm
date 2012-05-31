@@ -14,8 +14,7 @@
 	    <input type="hidden" id="assetTypeId" name="assetType" value="${asset}" />
 	    <input type="hidden" id="assetTypesId" name="assetType" value="database" />
 	    <tds:hasPermission permission='MoveBundleEditView'>
-		<input id="state" type="button"  class="submit" value="Change MoveBundle" onclick="changeMoveBundle($('#assetTypeId').val(),${databaseList.id})"  />
-		<input id="selectId" type="button"  class="submit" value="All.." onclick="selectAll()" title="Select All" />
+		<input id="state" type="button"  class="submit" value="Assignment" onclick="changeMoveBundle($('#assetTypeId').val(),${databaseList.id})"  />
 		</tds:hasPermission>
 	 </div>
 	<div class="tabInner">
@@ -24,7 +23,7 @@
 				style="border-collapse: separate" class="table">
 				<thead>
 					<tr class="header">
-						<th>Actions</th>
+						<th nowrap="nowrap"><input id="selectId" type="checkbox"   onclick="selectAll()" title="Select All" />&nbsp;Actions</th>
 						<th>Name</th>
 						<th>DB Format</th>
 						<th>Move Bundle</th>

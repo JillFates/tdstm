@@ -80,22 +80,30 @@ $(document).ready(function() {
 		</tds:hasPermission>
 		<div style="clear: both;"></div>
 		
-		<div id="moveBundleSelectId" title="Change Move Bundle" style="background-color: #808080; display: none; float: right" >
+		<div id="moveBundleSelectId" title="Assignment" style="background-color: #808080; display: none; float: right" >
 		<g:form name="changeBundle" action="saveAssetsToBundle" >
 		        
 		        <input type="hidden" name="assetVal" id="assetVal" />
 		        <input type="hidden" name="assetType" id="assetsTypeId"  />
 		        <table style="border: 0px;">
 		        <tr>
-		           <td style="color:#EFEFEF"> <b> Change MoveBundle for Selected Assets</b></td>
+		           <td style="color:#EFEFEF ; width: 260px"> <b> Assign selected assets to :</b></td>
 		        </tr>
 		        <tr>
 		           <td>
-		             <g:select name="moveBundleList" from="${moveBundle}" optionKey="id"></g:select><br></br>
+		             <span style="color:#EFEFEF "><b>Bundles</b></span> &nbsp;&nbsp;<g:select name="moveBundleList" id="plannedMoveBundleList" from="${moveBundle}" optionKey="id"></g:select><br></br>
 		           </td>
 		        </tr>
 		        <tr>
-		         <td style="text-align: right"><input type="button" id ="saveBundleId" name="saveBundle"  value= "save" onclick="submitMoveForm()"> </td>
+		           <td>
+		            <div>
+						<label for="planningBundle" ><input type="radio" name="bundles" id="planningBundle" value="planningBundle" checked="checked" onChange="changeBundles(this.id)" />&nbsp;<span style="color:#EFEFEF "><b>Planning Bundles</b></span></label>
+						<label for="allBundles" ><input type="radio" name="bundles" id="allBundles" value="allBundles" onChange="changeBundles(this.id)" />&nbsp;<span style="color:#EFEFEF "><b>All Bundles</b></span></label><br />
+					</div>
+			   </td>
+		        </tr>
+		        <tr>
+		         <td style="text-align: left"><input type="button" id ="saveBundleId" name="saveBundle"  value= "Assign" onclick="submitMoveForm()"> </td>
 		        </tr>
 		        </table>
           </g:form>
@@ -108,7 +116,10 @@ $(document).ready(function() {
 		<div id="createEntityView" style="display: none;"></div>
 		<div id="showEntityView" style="display: none;"></div>
 		<div id="editEntityView" style="display: none;"></div>
-		
+		<div style="display: none;">
+		  <g:select name="moveBundleList" id="moveBundleList_all" from="${allMoveBundles}" optionKey="id"></g:select><br></br>
+		  <g:select name="moveBundleList" id="moveBundleList_planning" from="${moveBundle}" optionKey="id"></g:select><br></br>
+		</div>
 		<div style="display: none;">
 		<table id="assetDependencyRow">
 			<tr>
@@ -148,6 +159,7 @@ $(document).ready(function() {
 		 
 		switch(value){
 		case "server" :
+			$('#assetCheck').attr('checked','false')
 			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
 			break;
 		case "Apps" :
@@ -190,6 +202,13 @@ $(document).ready(function() {
     		labelsList += $(this).val()+',';
     	});
     	${remoteFunction(controller:'assetEntity',action:'reloadMap', params:'\'&force=\'+ force+\'&distance=\'+ distance+\'&friction=\'+ friction+\'&height=\'+ height+\'&width=\'+ width+\'&labelsList=\'+ labelsList', onComplete:'fillView(e)' )}
+    }
+    function changeBundles(id){
+        if(id=="allBundles"){
+        	$("#plannedMoveBundleList").html($("#moveBundleList_all").html())
+        }else{
+        	$("#plannedMoveBundleList").html($("#moveBundleList_planning").html())
+        }
     }
 </script>
 </body>

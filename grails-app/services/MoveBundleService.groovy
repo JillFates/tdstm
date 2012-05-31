@@ -491,11 +491,13 @@ class MoveBundleService {
 		 def physicalListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.SERVER.toString() }.size()
 		 def virtualListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.VM.toString() }.size()
 		 def applicationListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.APPLICATION.toString() }.size()
+		 
+		 def moveBundles = MoveBundle.findAllByProject(projectInstance)
  
 		 def map = [assetDependencyList:assetDependencyList, dependencyType:dependencyType, planningConsoleList:planningConsoleList,
 				 date:time, dependencyStatus:dependencyStatus, assetDependency:new AssetDependency(), dependencyBundleCount:dependencyBundleCount,
 				 servers:servers, applications:applications, dbs:dbs, files:files,moveBundle:moveBundleList,applicationListSize:applicationListSize,
-				 physicalListSize:physicalListSize,virtualListSize:virtualListSize,asset:'Apps']
+				 physicalListSize:physicalListSize,virtualListSize:virtualListSize,asset:'Apps',allMoveBundles:moveBundles]
 		 
 		 return map
 	 }
