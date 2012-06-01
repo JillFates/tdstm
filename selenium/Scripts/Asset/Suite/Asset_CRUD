@@ -58,7 +58,7 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>link=Import/Export</td>
+	<td>link=Import Assets</td>
 	<td></td>
 </tr>
 <tr>
@@ -345,7 +345,7 @@
 <tr>
 	<td>select</td>
 	<td>planStatus</td>
-	<td>Old</td>
+	<td>Locked</td>
 </tr>
 <tr>
 	<td>select</td>
@@ -426,7 +426,7 @@
 <tr>
 	<td>verifyTable</td>
 	<td>tag.2.11</td>
-	<td>Move Bundle</td>
+	<td>Bundle</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>

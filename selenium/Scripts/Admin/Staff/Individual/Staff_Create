@@ -42,11 +42,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>clickAndWait</td>
-	<td>link=Staff</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyTitle</td>
 	<td>Staff List</td>
 	<td></td>

@@ -58,37 +58,37 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.0</td>
+	<td>css=div.dialog&gt;table.0.0</td>
 	<td>Party Relationship Type:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.0</td>
+	<td>css=div.dialog&gt;table.1.0</td>
 	<td>Party Id From:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.0</td>
+	<td>css=div.dialog&gt;table.2.0</td>
 	<td>Party Id To:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.3.0</td>
+	<td>css=div.dialog&gt;table.3.0</td>
 	<td>Role Type Code To:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.4.0</td>
+	<td>css=div.dialog&gt;table.4.0</td>
 	<td>Role Type Code From:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.5.0</td>
+	<td>css=div.dialog&gt;table.5.0</td>
 	<td>Status Code:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.6.0</td>
+	<td>css=div.dialog&gt;table.6.0</td>
 	<td>exact:Comment:</td>
 </tr>
 <tr>
@@ -199,37 +199,37 @@
 <!--Reading the PartyRelationship-->
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
+	<td>css=div.dialog&gt;table.0.1</td>
 	<td>${partyRtype}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.1</td>
+	<td>css=div.dialog&gt;table.1.1</td>
 	<td>${partyIDfrom}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.1</td>
+	<td>css=div.dialog&gt;table.2.1</td>
 	<td>${roleTypefrom}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.3.1</td>
+	<td>css=div.dialog&gt;table.3.1</td>
 	<td>${partyIDto}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.4.1</td>
+	<td>css=div.dialog&gt;table.4.1</td>
 	<td>${roleTypeto}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.5.1</td>
+	<td>css=div.dialog&gt;table.5.1</td>
 	<td>ENABLED</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.6.1</td>
+	<td>css=div.dialog&gt;table.6.1</td>
 	<td>Test Comment-${Comment}</td>
 </tr>
 <tr>
@@ -345,7 +345,7 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.6.1</td>
+	<td>css=div.dialog&gt;table.6.1</td>
 	<td>Test Comment Edited</td>
 </tr>
 <tr>

@@ -108,7 +108,7 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.0</td>
+	<td>css=div.dialog &gt; table.1.0</td>
 	<td>exact:Name: *</td>
 </tr>
 <tr>
@@ -118,7 +118,7 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.0</td>
+	<td>css=div.dialog &gt; table.2.0</td>
 	<td>exact:Comment:</td>
 </tr>
 <tr>
@@ -158,7 +158,7 @@
 </tr>
 <tr>
 	<td>verifyTitle</td>
-	<td>Show Company</td>
+	<td>Company</td>
 	<td></td>
 </tr>
 <tr>
@@ -168,37 +168,32 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
+	<td>css=div.dialog &gt; table.0.1</td>
 	<td>${cName}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.1</td>
+	<td>css=div.dialog &gt; table.1.1</td>
 	<td>Test Comment - ${CommenT}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.0</td>
+	<td>css=div.dialog &gt; table.2.0</td>
 	<td>Date Created:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.3.0</td>
+	<td>css=div.dialog &gt; table.3.0</td>
 	<td>Last Updated:</td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>link=Company List</td>
-	<td></td>
-</tr>
-<tr>
 	<td>storeTable</td>
-	<td>//table.2.1</td>
+	<td>css=div.dialog &gt; table.2.1</td>
 	<td>dCreated</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>//table.3.1</td>
+	<td>css=div.dialog &gt; table.3.1</td>
 	<td>lUpdated</td>
 </tr>
 <tr>
@@ -259,17 +254,17 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.0.1</td>
+	<td>css=div.dialog &gt; table.0.1</td>
 	<td>${cName}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.1.1</td>
+	<td>css=div.dialog &gt; table.1.1</td>
 	<td>Test Comment</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>//table.2.1</td>
+	<td>css=div.dialog &gt; table.2.1</td>
 	<td>${dCreated}</td>
 </tr>
 <!--Deleting the Company-->

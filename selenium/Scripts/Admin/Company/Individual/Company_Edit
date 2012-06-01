@@ -33,17 +33,17 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
+	<td>link=Admin</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
 	<td>link=List Companies</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
 	<td>Company List</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>name=_action_create</td>
 	<td></td>
 </tr>
 <tr>
@@ -68,12 +68,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>id=tag.3.1</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Edit Company</td>
+	<td>name=_action_create</td>
 	<td></td>
 </tr>
 <tr>
@@ -82,26 +77,25 @@
 	<td>javascript{var ProjectName =&quot;Test Company - &quot;; var date = new Date();&nbsp;&nbsp;var month =&nbsp;&nbsp;date.getMonth();month = month + 1;var monthday&nbsp;&nbsp;&nbsp;&nbsp;= date.getDate();var year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= date.getFullYear();var hour&nbsp;&nbsp;&nbsp;= date.getHours();var minute = date.getMinutes();var second = date.getSeconds();var ap = &quot;AM&quot;;&nbsp;&nbsp;&nbsp;if (month &lt; 10){month = '0' + month;}&nbsp;&nbsp;&nbsp;&nbsp;if (hour&nbsp;&nbsp;&nbsp;&gt; 11) { ap = &quot;PM&quot;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;&nbsp;&nbsp;if (hour&nbsp;&nbsp;&nbsp;&gt; 12) { hour = hour - 12;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;&nbsp;&nbsp;if (hour&nbsp;&nbsp;&nbsp;== 0) { hour = 12;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;&nbsp;&nbsp;if (hour&nbsp;&nbsp;&nbsp;&lt; 10) { hour&nbsp;&nbsp;&nbsp;= &quot;0&quot; + hour;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;&nbsp;&nbsp;if (minute &lt; 10) { minute = &quot;0&quot; + minute; }&nbsp;&nbsp;&nbsp;&nbsp;if (second &lt; 10) { second = &quot;0&quot; + second; }&nbsp;&nbsp;ProjectName +month+&quot;/&quot;+monthday+&quot;/&quot;+year+&quot; &quot;+hour + ':' + minute + &quot; &quot; +&nbsp;&nbsp;ap;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</td>
 </tr>
 <tr>
-	<td>type</td>
-	<td>name=comment</td>
-	<td>Test Comment</td>
-</tr>
-<tr>
 	<td>clickAndWait</td>
-	<td>name=_action_Update</td>
+	<td>css=input.save</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>PartyGroup Test Company - 02/8/2012 12:25 PM updated</td>
+	<td>created</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTextPresent</td>
-	<td>updated</td>
+	<td>verifyText</td>
+	<td>name=_action_Edit</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>name=_action_Delete</td>
 	<td></td>
 </tr>
 </tbody></table>
 </body>
 </html>
-

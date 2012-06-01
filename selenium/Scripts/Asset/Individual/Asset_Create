@@ -264,7 +264,7 @@
 <tr>
 	<td>select</td>
 	<td>planStatus</td>
-	<td>label=Old</td>
+	<td>label=Locked</td>
 </tr>
 <tr>
 	<td>select</td>

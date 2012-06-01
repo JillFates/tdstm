@@ -44,7 +44,7 @@
 </tr>
 <tr>
 	<td>verifyTitle</td>
-	<td>Asset Import/Export</td>
+	<td>Asset Summary</td>
 	<td></td>
 </tr>
 <tr>
@@ -291,11 +291,6 @@
 	<td>verifySelectedLabel</td>
 	<td>assetType</td>
 	<td>${aType}</td>
-</tr>
-<tr>
-	<td>verifySelectedLabel</td>
-	<td>model</td>
-	<td>${modeL}</td>
 </tr>
 <tr>
 	<td>verifyValue</td>
