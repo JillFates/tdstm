@@ -204,7 +204,7 @@
 </tr>
 <tr>
 	<td>assertTextPresent</td>
-	<td>created</td>
+	<td>MoveBundle ${BundleName} created</td>
 	<td></td>
 </tr>
 <tr>

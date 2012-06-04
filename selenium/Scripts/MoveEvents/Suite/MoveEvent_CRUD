@@ -294,6 +294,51 @@
 	<td>Yes</td>
 </tr>
 <tr>
+	<td>label</td>
+	<td>label20</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Asset Tracker</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeElementPresent</td>
+	<td>css=div.message</td>
+	<td>variable1</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${variable1}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${variable1}==true</td>
+	<td>label10</td>
+</tr>
+<tr>
+	<td>gotoIf</td>
+	<td>${variable1}==false</td>
+	<td>label20</td>
+</tr>
+<tr>
+	<td>label</td>
+	<td>label10</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>tag.3.0</td>
+	<td>variable2</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=${variable2}</td>
+	<td></td>
+</tr>
+<tr>
 	<td>clickAndWait</td>
 	<td>link=Asset Tracker</td>
 	<td></td>

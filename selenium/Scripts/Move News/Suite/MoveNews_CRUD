@@ -44,7 +44,7 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=News</td>
+	<td>link=List News</td>
 	<td></td>
 </tr>
 <tr>
@@ -222,7 +222,7 @@
 <!--Editing the Move News-->
 <tr>
 	<td>clickAndWait</td>
-	<td>link=News</td>
+	<td>link=List News</td>
 	<td></td>
 </tr>
 <tr>
