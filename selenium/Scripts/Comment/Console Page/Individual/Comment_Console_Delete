@@ -70,7 +70,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>xpath=/html/body/div/div[5]/div/div/table/tbody/tr[2]/td/table/tbody/tr/td/div/form/div/table/tbody/tr/td[8]/div/a/img</td>
+	<td>//td//div/a/img</td>
 	<td></td>
 </tr>
 <tr>
@@ -99,11 +99,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>createCommentTable.0.0</td>
-	<td>Comment Type:</td>
-</tr>
-<tr>
 	<td>verifyTextPresent</td>
 	<td>Create Asset Comment</td>
 	<td></td>
@@ -121,7 +116,7 @@
 <tr>
 	<td>randomString</td>
 	<td>numeric|4</td>
-	<td>Test</td>
+	<td>Test1</td>
 </tr>
 <tr>
 	<td>type</td>
@@ -129,8 +124,13 @@
 	<td>${Test}</td>
 </tr>
 <tr>
+	<td>verifyValue</td>
+	<td>css=#createCommentForm &gt; div.buttons &gt; span.button &gt; input.save</td>
+	<td>Create</td>
+</tr>
+<tr>
 	<td>click</td>
-	<td>//input[@ value='Create']</td>
+	<td>//input[@ value='Create' and @onclick=&quot;resolveValidate('createCommentForm','createAssetCommentId');&quot;]</td>
 	<td></td>
 </tr>
 <tr>
@@ -151,18 +151,13 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>xpath=/html/body/div[14]/div[2]/div/table/tbody/tr/td/a/img</td>
+	<td>//td/a/img[@src='../images/skin/database_edit.png']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
 	<td>//input[@value='Update']</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyValue</td>
-	<td>commentEditId</td>
-	<td>${Comnt}</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -176,7 +171,7 @@
 </tr>
 <tr>
 	<td>assertConfirmation</td>
-	<td>Delete Asset, are you sure?</td>
+	<td>Are you sure?</td>
 	<td></td>
 </tr>
 <tr>

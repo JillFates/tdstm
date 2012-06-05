@@ -99,19 +99,9 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>createCommentTable.0.1</td>
-	<td>please select issue instruction comment&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Must Verify</td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
 	<td>mustVerifyEdit</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>createCommentTable.1.0</td>
-	<td>exact:Comment:</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -166,28 +156,18 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.2.0</td>
+	<td>showCommentTable.3.0</td>
 	<td>Comment Type:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.3.0</td>
+	<td>showCommentTable.4.0</td>
 	<td>exact:Category:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.4.0</td>
-	<td>comment Code:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
 	<td>showCommentTable.5.0</td>
-	<td>Must Verify:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.6.0</td>
-	<td>exact:Comment:</td>
+	<td>comment Code:</td>
 </tr>
 <tr>
 	<td>storeTable</td>
@@ -206,7 +186,7 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.3.1</td>
+	<td>showCommentTable.4.1</td>
 	<td>general</td>
 </tr>
 <tr>
@@ -262,12 +242,12 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>updateCommentTable.3.1</td>
+	<td>updateCommentTable.4.1</td>
 	<td>general</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Update' and @type='button' and @onclick=&quot;resolveValidate('editCommentForm','updateCommentId');&quot;]</td>
+	<td>//input[@value='Update']</td>
 	<td></td>
 </tr>
 <tr>
@@ -287,23 +267,18 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Update' and @type='button' and @onclick=&quot;resolveValidate('editCommentForm','updateCommentId');&quot;]</td>
+	<td>css=#editCommentForm &gt; div.buttons &gt; span.button &gt; input.save</td>
 	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>xpath=//html/body/div/div[2]/div[1]/table/tbody/tr/td[2][node()='edited here']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyValue</td>
-	<td>commentTdId</td>
-	<td>edited here</td>
 </tr>
 <!--Deleting comment-->
 <tr>
 	<td>click</td>
-	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;var booConfirm = confirm('Are you sure?');if(booConfirm)new Ajax.Request('/tdstm/assetEntity/deleteComment',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never')},parameters:'id=' + $('#commentId').val() +'&amp;assetEntity='+$('#createAssetCommentId').val() });&quot;]</td>
+	<td>//span/a/img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Delete']</td>
 	<td></td>
 </tr>
 <tr>

@@ -77,23 +77,23 @@
 	<td></td>
 </tr>
 <tr>
-	<td>storeTextPresent</td>
-	<td>teamname-Sources</td>
+	<td>storeTable</td>
+	<td>css=div.list&gt;table.1.0</td>
 	<td>varTeam</td>
 </tr>
 <tr>
-	<td>storeTextPresent</td>
-	<td>Move Tech</td>
+	<td>storeTable</td>
+	<td>css=div.list&gt;table.1.1</td>
 	<td>varRole</td>
 </tr>
 <tr>
-	<td>storeTextPresent</td>
-	<td>exact:TDS:Drowne, Chris <br /> TDS:Beauchemin, Todd - Project Manager</td>
+	<td>storeTable</td>
+	<td>css=div.list&gt;table.1.2</td>
 	<td>varMember</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>xpath=id('loginForm')/x:div/x:div[2]/x:table/x:tbody/x:tr[3]/x:td[1]/x:b</td>
+	<td>xpath=id('loginForm')/x:div/x:div[2]/x:table/x:tbody/x:tr/x:td[1]/x:b</td>
 	<td></td>
 </tr>
 <tr>
@@ -103,7 +103,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>My Tasks</td>
+	<td>Tasks</td>
 	<td></td>
 </tr>
 <tr>
@@ -128,11 +128,6 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>Currently Logged in as:</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
 	<td>exact:Project:</td>
 	<td></td>
 </tr>
@@ -148,17 +143,12 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>exact:Action:</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
 	<td>Mobile Site</td>
 	<td></td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=My Tasks</td>
+	<td>link=Tasks</td>
 	<td></td>
 </tr>
 <tr>
@@ -173,7 +163,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>My Tasks:</td>
+	<td>Tasks:</td>
 	<td></td>
 </tr>
 <tr>
@@ -193,8 +183,8 @@
 </tr>
 <tr>
 	<td>verifyText</td>
-	<td>link=Mobile Site</td>
-	<td>Mobile Site</td>
+	<td>link=Use Mobile Site</td>
+	<td>Use Mobile Site</td>
 </tr>
 <tr>
 	<td>storeTextPresent</td>
@@ -239,11 +229,6 @@
 <tr>
 	<td>click</td>
 	<td>css=tr.asset_hold &gt; td.asset_details_block</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>The asset is on Hold. Please contact manager to resolve issue.</td>
 	<td></td>
 </tr>
 <tr>
@@ -372,9 +357,14 @@
 	<td></td>
 </tr>
 <tr>
+	<td>label</td>
+	<td>label2</td>
+	<td></td>
+</tr>
+<tr>
 	<td>verifyTextPresent</td>
 	<td>Asset</td>
-	<td>label2</td>
+	<td></td>
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
@@ -423,18 +413,8 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>exact:Truck:</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
 	<td>Current State:</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyText</td>
-	<td>link=Mobile site</td>
-	<td>Mobile site</td>
 </tr>
 <tr>
 	<td>storeTextPresent</td>
@@ -482,11 +462,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>xpath=/html/body/div/div[5]/div[2]/div/form/table/tbody/tr[2]/td/input</td>
-	<td></td>
-</tr>
-<tr>
 	<td>label</td>
 	<td>label10</td>
 	<td></td>
@@ -502,8 +477,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>label8</td>
-	<td></td>
+	<td>label</td>
+	<td>lable8</td>
 	<td></td>
 </tr>
 <tr>

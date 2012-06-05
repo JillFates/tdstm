@@ -130,7 +130,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>xpath=id('link_3538')/x:img</td>
+	<td>//td/a/img[@src='../images/skin/database_edit.png']</td>
 	<td></td>
 </tr>
 <tr>

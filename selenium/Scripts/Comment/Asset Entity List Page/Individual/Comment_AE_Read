@@ -131,27 +131,27 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.2.0</td>
+	<td>showCommentTable.3.0</td>
 	<td>Comment Type:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.3.0</td>
+	<td>showCommentTable.4.0</td>
 	<td>exact:Category:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.4.0</td>
+	<td>showCommentTable.5.0</td>
 	<td>comment Code:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.5.0</td>
+	<td>showCommentTable.6.0</td>
 	<td>Must Verify:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.6.0</td>
+	<td>showCommentTable.8.0</td>
 	<td>exact:Comment:</td>
 </tr>
 <tr>
@@ -166,12 +166,12 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>showCommentTable.2.1</td>
+	<td>showCommentTable.3.1</td>
 	<td>cType</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.3.1</td>
+	<td>showCommentTable.4.1</td>
 	<td>general</td>
 </tr>
 <tr>
@@ -181,12 +181,12 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Edit' and @type='button' and @onclick=&quot;commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')&quot;]</td>
+	<td>//input[@value='Edit' ]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;var booConfirm = confirm('Are you sure?');if(booConfirm)new Ajax.Request('/tds-0.1/assetEntity/deleteComment',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never')},parameters:'id=' + $('#commentId').val() +'&amp;assetEntity='+$('#createAssetCommentId').val() });&quot;]</td>
+	<td>//input[@value='Delete']</td>
 	<td></td>
 </tr>
 <tr>
@@ -221,7 +221,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[14]/div/a/span</td>
+	<td>//td/a/img[@src=&quot;../images/skin/database_edit.png&quot;]</td>
 	<td></td>
 </tr>
 <tr>
@@ -237,57 +237,42 @@
 <tr>
 	<td>verifyTable</td>
 	<td>showCommentTable.2.0</td>
-	<td>Comment Type:</td>
+	<td>Owner:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
 	<td>showCommentTable.3.0</td>
-	<td>exact:Category:</td>
+	<td>Comment Type:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
 	<td>showCommentTable.4.0</td>
-	<td>comment Code:</td>
+	<td>exact:Category:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
 	<td>showCommentTable.5.0</td>
-	<td>Must Verify:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.6.0</td>
-	<td>exact:Comment:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.2.1</td>
-	<td>${cmtType}</td>
+	<td>comment Code:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
 	<td>showCommentTable.3.1</td>
-	<td>general</td>
+	<td>${cmtType}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
 	<td>showCommentTable.4.1</td>
+	<td>general</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>showCommentTable.5.1</td>
 	<td>${cCode}</td>
 </tr>
 <tr>
 	<td>verifyValue</td>
 	<td>commentTdId</td>
 	<td>${ftComment}</td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>xpath=/html/body/div[13]/div[2]/form/div[2]/span/input</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>xpath=/html/body/div[13]/div[2]/form/div[2]/span[2]/input</td>
-	<td></td>
 </tr>
 <tr>
 	<td>label</td>
