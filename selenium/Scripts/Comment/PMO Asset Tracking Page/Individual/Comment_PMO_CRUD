@@ -50,7 +50,7 @@
 <!--Comment creation-->
 <tr>
 	<td>click</td>
-	<td>xpath=/html/body/div/div[5]/div/form/div[2]/div[2]/table/tbody/tr/td/span[2]/img</td>
+	<td>//td/span/img</td>
 	<td></td>
 </tr>
 <tr>
@@ -79,24 +79,9 @@
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>//a[contains(text(),'New<br />Comment')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>label</td>
 	<td>label1</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//table[@id='createCommentTable']/tbody/tr[1]/td[1]/label</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>createCommentTable.0.1</td>
-	<td>please select issue instruction comment&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Must Verify</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -106,7 +91,7 @@
 <tr>
 	<td>verifyTable</td>
 	<td>createCommentTable.1.0</td>
-	<td>exact:Comment:</td>
+	<td>Comment Type:</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -114,8 +99,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>//input[@value='Create']</td>
+	<td>click</td>
+	<td>//div/span//a</td>
 	<td></td>
 </tr>
 <tr>
@@ -140,7 +125,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Create']</td>
+	<td>//div/span/input[@value='Create' and @onclick=&quot;resolveValidate('createCommentForm','createAssetCommentId');&quot; ]</td>
 	<td></td>
 </tr>
 <!--Reading comment-->
@@ -161,27 +146,27 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.2.0</td>
+	<td>showCommentTable.3.0</td>
 	<td>Comment Type:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.3.0</td>
+	<td>showCommentTable.4.0</td>
 	<td>exact:Category:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.4.0</td>
+	<td>showCommentTable.5.0</td>
 	<td>comment Code:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.5.0</td>
+	<td>showCommentTable.6.0</td>
 	<td>Must Verify:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.6.0</td>
+	<td>showCommentTable.8.0</td>
 	<td>exact:Comment:</td>
 </tr>
 <tr>
@@ -196,13 +181,8 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>showCommentTable.2.1</td>
-	<td>cType</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
 	<td>showCommentTable.3.1</td>
-	<td>moveday</td>
+	<td>cType</td>
 </tr>
 <tr>
 	<td>verifyValue</td>
@@ -211,18 +191,18 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Edit']</td>
+	<td>//div/span//input[@value='Edit']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Delete']</td>
+	<td>//div/span//input[@value='Delete']</td>
 	<td></td>
 </tr>
 <!--Editing comment-->
 <tr>
 	<td>click</td>
-	<td>xpath=/html/body/div[15]/div[2]/div/div[3]/span/input</td>
+	<td>//div/span//input[@value='Edit']</td>
 	<td></td>
 </tr>
 <tr>
@@ -251,13 +231,8 @@
 	<td>comment</td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>updateCommentTable.3.1</td>
-	<td>moveday</td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Update']</td>
+	<td>//div/span//input[@value='Update']</td>
 	<td></td>
 </tr>
 <tr>
@@ -267,7 +242,7 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Delete']</td>
+	<td>//div/span//input[@value='Delete']</td>
 	<td></td>
 </tr>
 <tr>
@@ -277,7 +252,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Update' and @type='button' and @onclick=&quot;resolveValidate('editCommentForm','updateCommentId');&quot;]</td>
+	<td>//div/span//input[@value='Update' and @type='button' and @onclick=&quot;resolveValidate('editCommentForm','updateCommentId','');&quot;]</td>
 	<td></td>
 </tr>
 <tr>
@@ -293,7 +268,12 @@
 <!--Deleting comment-->
 <tr>
 	<td>click</td>
-	<td>xpath=/html/body/div[15]/div[2]/div/div[3]/span[2]/input</td>
+	<td>//div/span/input[@value='Delete']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertConfirmation</td>
+	<td>Are you sure?</td>
 	<td></td>
 </tr>
 <tr>

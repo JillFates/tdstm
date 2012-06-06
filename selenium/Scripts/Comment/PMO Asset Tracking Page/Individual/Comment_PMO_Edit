@@ -39,13 +39,13 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=PMO Asset Tracking</td>
+	<td>link=Asset Tracker</td>
 	<td></td>
 </tr>
 <!--If there is a comment existing for the first asset, this test edits that comment else it creates a new comment and edits it-->
 <tr>
 	<td>click</td>
-	<td>//span[2]/img</td>
+	<td>//td/span/img</td>
 	<td></td>
 </tr>
 <tr>
@@ -74,29 +74,14 @@
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>//a[contains(text(),'New<br />Comment')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
 	<td>//table[@id='createCommentTable']/tbody/tr[1]/td[1]/label</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTable</td>
-	<td>createCommentTable.0.1</td>
-	<td>please select issue instruction comment&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Must Verify</td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
 	<td>mustVerifyEdit</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>createCommentTable.1.0</td>
-	<td>exact:Comment:</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -105,7 +90,7 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Create']</td>
+	<td>//input[@value='Create' and @onclick=&quot;resolveValidate('createCommentForm','createAssetCommentId');&quot;]</td>
 	<td></td>
 </tr>
 <tr>
@@ -130,12 +115,22 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Create']</td>
+	<td>//input[@value='Create' and @onclick=&quot;resolveValidate('createCommentForm','createAssetCommentId');&quot;]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>xpath=//html/body/div/div[2]/div[1]/table/tbody/tr/td[2][node()='test comment - ${Comment}']</td>
+	<td>//td/span/img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>listCommentsTable.1.1</td>
+	<td>Table1</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>xpath=//html/body/div[16]/div[2]/div/table/tbody/tr/td[2][node()='${Table1}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -150,27 +145,22 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.2.0</td>
+	<td>showCommentTable.3.0</td>
 	<td>Comment Type:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.3.0</td>
+	<td>showCommentTable.5.0</td>
 	<td>exact:Category:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.4.0</td>
+	<td>showCommentTable.6.0</td>
 	<td>comment Code:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.5.0</td>
-	<td>Must Verify:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.6.0</td>
+	<td>showCommentTable.7.0</td>
 	<td>exact:Comment:</td>
 </tr>
 <tr>
@@ -185,12 +175,12 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>showCommentTable.2.1</td>
+	<td>showCommentTable.3.1</td>
 	<td>cType</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.3.1</td>
+	<td>showCommentTable.4.1</td>
 	<td>moveday</td>
 </tr>
 <tr>
@@ -205,7 +195,7 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;new Ajax.Request('/tds-0.1/assetEntity/deleteComment',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action')},parameters:'id=' + $('#commentId').val() +'&amp;assetEntity='+$('#createAssetCommentId').val() });&quot;]</td>
+	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;var booConfirm = confirm('Are you sure?');if(booConfirm)new Ajax.Request('/tdstm/assetEntity/deleteComment',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never')},parameters:'id=' + $('#updateCommentId').val() +'&amp;amp;assetEntity='+$('#createAssetCommentId').val() });&quot;]</td>
 	<td></td>
 </tr>
 <!--Editing comment-->
@@ -241,7 +231,7 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>updateCommentTable.3.1</td>
+	<td>updateCommentTable.4.1</td>
 	<td>moveday</td>
 </tr>
 <tr>
@@ -266,7 +256,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Update' and @type='button' and @onclick=&quot;resolveValidate('editCommentForm','updateCommentId');&quot;]</td>
+	<td>//input[@value='Update' and @type='button' and @onclick=&quot;resolveValidate('editCommentForm','updateCommentId','');&quot;]</td>
 	<td></td>
 </tr>
 <tr>
@@ -280,8 +270,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>storeTable</td>
+	<td>listCommentsTable.1.1</td>
+	<td>table1</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${table1}</td>
+	<td></td>
+</tr>
+<tr>
 	<td>click</td>
-	<td>//div[2]/div[1]/table/tbody/tr/td[2]</td>
+	<td>xpath=//html/body/div[16]/div[2]/div/table/tbody/tr/td[2][node()='${table1}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -296,17 +296,17 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>showCommentTable.2.1</td>
+	<td>showCommentTable.3.1</td>
 	<td>cType</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>showCommentTable.3.1</td>
+	<td>showCommentTable.4.1</td>
 	<td>categorY</td>
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>showCommentTable.4.1</td>
+	<td>showCommentTable.6.1</td>
 	<td>cCode</td>
 </tr>
 <tr>
@@ -316,7 +316,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Edit' and @type='button' and @onclick=&quot;commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 700);$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')&quot;]</td>
+	<td>//input[@value='Edit' and @type='button' and @onclick=&quot;commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 'auto');$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')&quot;]</td>
 	<td></td>
 </tr>
 <tr>
@@ -336,12 +336,12 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>updateCommentTable.3.1</td>
+	<td>updateCommentTable.4.1</td>
 	<td>${categorY}</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Update' and @type='button' and @onclick=&quot;resolveValidate('editCommentForm','updateCommentId');&quot;]</td>
+	<td>//input[@value='Update' and @type='button' and @onclick=&quot;resolveValidate('editCommentForm','updateCommentId','');&quot;]</td>
 	<td></td>
 </tr>
 <tr>
@@ -350,18 +350,13 @@
 	<td>${Comnt}</td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;new Ajax.Request('/tds-0.1/assetEntity/deleteComment',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action')},parameters:'id=' + $('#updateCommentId').val() +'&amp;assetEntity='+$('#createAssetCommentId').val() });&quot;]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>type</td>
 	<td>commentEditId</td>
 	<td>edited here</td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Update' and @type='button' and @onclick=&quot;resolveValidate('editCommentForm','updateCommentId');&quot;]</td>
+	<td>//input[@value='Update' and @type='button' and @onclick=&quot;resolveValidate('editCommentForm','updateCommentId','');&quot;]</td>
 	<td></td>
 </tr>
 <tr>
@@ -369,17 +364,6 @@
 	<td>label3</td>
 	<td></td>
 </tr>
-<tr>
-	<td>click</td>
-	<td>xpath=//html/body/div/div[2]/div[1]/table/tbody/tr/td[2][node()='edited here']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyValue</td>
-	<td>commentTdId</td>
-	<td>edited here</td>
-</tr>
-
 </tbody></table>
 </body>
 </html>

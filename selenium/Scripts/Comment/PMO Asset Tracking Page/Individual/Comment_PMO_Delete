@@ -39,13 +39,13 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=PMO Asset Tracking</td>
+	<td>link=Asset Tracker</td>
 	<td></td>
 </tr>
 <!--If there is a comment existing for the first asset, this test deletes that comment else it creates a new comment and deletes it.-->
 <tr>
 	<td>click</td>
-	<td>//span[2]/img</td>
+	<td>//td/span/img</td>
 	<td></td>
 </tr>
 <tr>
@@ -74,19 +74,9 @@
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>//a[contains(text(),'New<br />Comment')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
-	<td>//table[@id='createCommentTable']/tbody/tr[1]/td[1]/label</td>
+	<td>//input[@type='button' and @onclick=&quot;resolveValidate('createCommentForm','createAssetCommentId');&quot;]</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>createCommentTable.0.1</td>
-	<td>please select issue instruction comment&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Must Verify</td>
 </tr>
 <tr>
 	<td>select</td>
@@ -110,17 +100,17 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Create']</td>
+	<td>//input[@value='Create' and @onclick=&quot;resolveValidate('createCommentForm','createAssetCommentId');&quot;]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>xpath=//html/body/div/div[2]/div[1]/table/tbody/tr/td[2][node()='test comment - ${Comment}']</td>
+	<td>//span/a/img</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;new Ajax.Request('/tds-0.1/assetEntity/deleteComment',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action')},parameters:'id=' + $('#commentId').val() +'&amp;assetEntity='+$('#createAssetCommentId').val() });&quot;]</td>
+	<td>//div/span//input[@value='Delete']</td>
 	<td></td>
 </tr>
 <tr>
@@ -135,12 +125,17 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[2]/div[1]/table/tbody/tr/td[2]</td>
+	<td>//td/a/img[@src='../images/skin/database_edit.png']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Delete' and @type='button' and @onclick=&quot;new Ajax.Request('/tds-0.1/assetEntity/deleteComment',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'action')},parameters:'id=' + $('#commentId').val() +'&amp;assetEntity='+$('#createAssetCommentId').val() });&quot;]</td>
+	<td>//div/span//input[@value='Delete']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertConfirmation</td>
+	<td>Are you sure?</td>
 	<td></td>
 </tr>
 <tr>
@@ -153,7 +148,6 @@
 	<td>commentsListDialog</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

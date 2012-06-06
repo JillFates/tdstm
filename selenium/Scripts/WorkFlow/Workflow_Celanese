@@ -233,6 +233,11 @@
 </tr>
 <!--In the below step, enter the path of the XML file that contains the steps data-->
 <tr>
+	<td>loadTestData</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
 	<td>nextTestData</td>
 	<td></td>
 	<td></td>

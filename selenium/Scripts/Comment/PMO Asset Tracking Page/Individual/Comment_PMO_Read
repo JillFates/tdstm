@@ -45,7 +45,7 @@
 <!--If there is a comment existing for the first asset, this test reads the comments else it creates new comment and reads it-->
 <tr>
 	<td>click</td>
-	<td>xpath=/html/body/div/div[5]/div/form/div[2]/div[2]/table/tbody/tr/td/span[2]/img</td>
+	<td>//td/span/img</td>
 	<td></td>
 </tr>
 <tr>
@@ -74,21 +74,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>//a[contains(text(),'New<br />Comment')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyElementPresent</td>
-	<td>//table[@id='createCommentTable']/tbody/tr[1]/td[1]/label</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>createCommentTable.0.1</td>
-	<td>please select issue instruction comment&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Must Verify</td>
-</tr>
-<tr>
 	<td>verifyElementPresent</td>
 	<td>mustVerifyEdit</td>
 	<td></td>
@@ -96,7 +81,7 @@
 <tr>
 	<td>verifyTable</td>
 	<td>createCommentTable.1.0</td>
-	<td>exact:Comment:</td>
+	<td>Comment Type:</td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
@@ -105,7 +90,7 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Create']</td>
+	<td>//input[@value='Create' and @ onclick=&quot;resolveValidate('createCommentForm','createAssetCommentId');&quot;]</td>
 	<td></td>
 </tr>
 <tr>
@@ -130,7 +115,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//input[@value='Create']</td>
+	<td>//input[@value='Create' and @onclick=&quot;resolveValidate('createCommentForm','createAssetCommentId');&quot;]</td>
 	<td></td>
 </tr>
 <!--Reading comment-->
@@ -151,27 +136,27 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.2.0</td>
+	<td>showCommentTable.3.0</td>
 	<td>Comment Type:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.3.0</td>
+	<td>showCommentTable.4.0</td>
 	<td>exact:Category:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.4.0</td>
+	<td>showCommentTable.5.0</td>
 	<td>comment Code:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.5.0</td>
+	<td>showCommentTable.6.0</td>
 	<td>Must Verify:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.6.0</td>
+	<td>showCommentTable.8.0</td>
 	<td>exact:Comment:</td>
 </tr>
 <tr>
@@ -186,13 +171,8 @@
 </tr>
 <tr>
 	<td>storeTable</td>
-	<td>showCommentTable.2.1</td>
-	<td>cType</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
 	<td>showCommentTable.3.1</td>
-	<td>moveday</td>
+	<td>cType</td>
 </tr>
 <tr>
 	<td>verifyValue</td>
@@ -201,12 +181,12 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Edit']</td>
+	<td>//div/span/input[@value='Edit' ]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Delete']</td>
+	<td>//div/span/input[@value='Delete']</td>
 	<td></td>
 </tr>
 <tr>
@@ -241,7 +221,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>xpath=/html/body/div[15]/div[2]/div/table/tbody/tr/td/a/img</td>
+	<td>xpath=/html/body/div[16]/div[2]/div/table/tbody/tr/td[2][node()='${ftComment}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -256,42 +236,37 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.2.0</td>
+	<td>showCommentTable.3.0</td>
 	<td>Comment Type:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.3.0</td>
+	<td>showCommentTable.4.0</td>
 	<td>exact:Category:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.4.0</td>
+	<td>showCommentTable.5.0</td>
 	<td>comment Code:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.5.0</td>
+	<td>showCommentTable.6.0</td>
 	<td>Must Verify:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.6.0</td>
+	<td>showCommentTable.8.0</td>
 	<td>exact:Comment:</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.2.1</td>
+	<td>showCommentTable.3.1</td>
 	<td>${cmtType}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>showCommentTable.3.1</td>
-	<td>moveday</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>showCommentTable.4.1</td>
+	<td>showCommentTable.5.1</td>
 	<td>${cCode}</td>
 </tr>
 <tr>
@@ -301,12 +276,12 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Edit']</td>
+	<td>//input[@value='Edit' and @ onclick=&quot;commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 'auto');$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')&quot;]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//input[@value='Delete']</td>
+	<td>//div/span/input[@value='Delete' ]</td>
 	<td></td>
 </tr>
 <tr>
