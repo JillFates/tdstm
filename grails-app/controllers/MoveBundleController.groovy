@@ -44,7 +44,7 @@ class MoveBundleController {
 		}
 		def moveBundleList = []
 		def projectInstance = Project.findById( projectId )
-		def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance, params )
+		def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance, [sort:'name'] )
 		// Statements for JMESA integration
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
 		tableFacade.items = moveBundleInstanceList

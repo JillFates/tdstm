@@ -91,7 +91,7 @@ $(document).ready(function() {
 		        </tr>
 		        <tr>
 		           <td>
-		             <span style="color:#EFEFEF "><b>Bundles</b></span> &nbsp;&nbsp;<g:select name="moveBundleList" id="plannedMoveBundleList" from="${moveBundle}" optionKey="id"></g:select><br></br>
+		             <span style="color:#EFEFEF "><b>Bundle</b></span> &nbsp;&nbsp;<g:select name="moveBundleList" id="plannedMoveBundleList" from="${moveBundle}" optionKey="id"></g:select><br></br>
 		           </td>
 		        </tr>
 		        <tr>
