@@ -1,4 +1,4 @@
-<g:form method="post"  name="editAssetsFormId" action="update">
+<g:form method="post"  name="editAssetsFormId"  action="update">
 	<table style="border:0;width:1000px;">
 		<tr>
 			<td colspan="2">
@@ -256,17 +256,19 @@
 		<tr>
 			<td colspan="2">
 				<div class="buttons">
-				    <input name="dependentCount" id="dependentCount" type="hidden" value="${dependentAssets.size()}">
-					<input  name="supportCount"  id="supportCount" type="hidden" value="${supportAssets.size()}">
-					<input name="attributeSet.id" type="hidden" value="1">
-					<input name="project.id" type="hidden" value="${projectId}">
-					<input name="id" id ="assetId" type="hidden" value="${assetEntityInstance.id}">
+				    <input name="dependentCount" id="dependentCount" type="hidden" value="${dependentAssets.size()}"/>
+					<input  name="supportCount"  id="supportCount" type="hidden" value="${supportAssets.size()}"/>
+					<input name="attributeSet.id" type="hidden" value="1"/>
+					<input name="project.id" type="hidden" value="${projectId}"/>
+					<input name="id" id="assetId" type="hidden" value="${assetEntityInstance.id}"/>
 					<input type = "hidden" id = "dstPath" name = "dstPath" value ="${redirectTo}"/>
-					<input name="redirectTo" type="hidden" value="${redirectTo}">
+					<input name="redirectTo" id="redirectTo" type="hidden" value="${redirectTo}">
 					<input type = "hidden" id = "tabType" name="tabType" value =""/>
 					<input type="hidden" id="labelsListId" name="labels" value =""/>
+					<input type="hidden" id="updateViewId" name="updateViewId" value =""/>
 					<g:if test="${redirectTo!='planningConsole'}">
-					  <span class="button"><g:actionSubmit class="save" value="Update"  /> </span>
+					  <span class="button"><g:actionSubmit class="save" value="Update/Close"  /> </span>
+					  <span class="button"><input type="button" class="save" value="Update/View" onclick="updateToShow()" /> </span>
 					  <span class="button"><g:actionSubmit class="delete"	onclick=" return confirm('Are you sure?');" value="Delete" /> </span>
 					</g:if>
 					<g:else>

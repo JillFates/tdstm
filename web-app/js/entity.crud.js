@@ -255,3 +255,20 @@ function submitMoveForm(){
 		}
 	});
 }
+function updateToShow(){
+	$('#redirectTo').val('updateView')
+	
+	jQuery.ajax({
+		url: $('#editAssetsFormId').attr('action'),
+		data: $('#editAssetsFormId').serialize(),
+		type:'POST',
+		success: function(data) {
+			$('#editEntityView').dialog('close')
+			$('#showEntityView').html(data)
+			$("#showEntityView").dialog('option', 'width', 'auto')
+			$("#showEntityView").dialog('option', 'position', ['center','top']);
+			$("#showEntityView").dialog('open');
+		}
+	});
+	
+}
