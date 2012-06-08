@@ -267,7 +267,7 @@
 					<input type="hidden" id="labelsListId" name="labels" value =""/>
 					<input type="hidden" id="updateViewId" name="updateViewId" value =""/>
 					<g:if test="${redirectTo!='planningConsole'}">
-					  <span class="button"><g:actionSubmit class="save" value="Update/Close"  /> </span>
+					  <span class="button"><g:actionSubmit class="save" value="Update/Close" action="Update"  /> </span>
 					  <span class="button"><input type="button" class="save" value="Update/View" onclick="updateToShow()" /> </span>
 					  <span class="button"><g:actionSubmit class="delete"	onclick=" return confirm('Are you sure?');" value="Delete" /> </span>
 					</g:if>
