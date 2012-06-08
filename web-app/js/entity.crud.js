@@ -256,8 +256,7 @@ function submitMoveForm(){
 	});
 }
 function updateToShow(){
-	$('#redirectTo').val('updateView')
-	
+	$('#updateView').val('updateView')
 	jQuery.ajax({
 		url: $('#editAssetsFormId').attr('action'),
 		data: $('#editAssetsFormId').serialize(),

@@ -187,7 +187,7 @@ class ApplicationController {
 			def project = Project.read(projectId)
 		    def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 			def appMoveEventlist = AppMoveEvent.findAllByApplication(applicationInstance).value
-			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList,
+			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo, assetComment:assetComment, assetCommentList:assetCommentList,
 			  appMoveEvent:appMoveEvent,moveEventList:moveEventList,appMoveEvent:appMoveEventlist,dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle]
 		}
 	}
@@ -260,34 +260,40 @@ class ApplicationController {
 					    appMoveInstance.value = okToMove
 					    appMoveInstance.save(flush:true)
 				}
-			}			  
-			switch(params.redirectTo){
-				case "room":
-					redirect( controller:'room',action:list )
-					break;
-				case "rack":
-					redirect( controller:'rackLayouts',action:'create' )
-					break;
-				case "console":
-					redirect( controller:'assetEntity', action:"dashboardView", params:[showAll:'show'])
-					break;
-				case "clientConsole":
-					redirect( controller:'clientConsole', action:list)
-					break;
-				case "assetEntity":
-					redirect( controller:'assetEntity', action:list)
-					break;
-				case "database":
-					redirect( controller:'database', action:list)
-					break;
-				case "files":
-					redirect( controller:'files', action:list)
-					break;
-				case "planningConsole":
-					forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle")])
-					break;
-				default:
-					redirect( action:list,params:[tag_f_assetName:filterAttr?.tag_f_assetName, tag_f_appOwner:filterAttr?.tag_f_appOwner, tag_f_appSme:filterAttr?.tag_f_appSme, tag_f_planStatus:filterAttr?.tag_f_planStatus, tag_f_depUp:filterAttr?.tag_f_depUp, tag_f_depDown:filterAttr?.tag_f_depDown])
+			}
+			if(params.updateView == 'updateView'){
+				forward(action:'show', params:[id: params.id])
+				
+			}else{
+				switch(params.redirectTo){
+					case "room":
+						redirect( controller:'room',action:list )
+						break;
+					case "rack":
+						redirect( controller:'rackLayouts',action:'create' )
+						break;
+					case "console":
+						redirect( controller:'assetEntity', action:"dashboardView", params:[showAll:'show'])
+						break;
+					case "clientConsole":
+						redirect( controller:'clientConsole', action:list)
+						break;
+					case "assetEntity":
+						redirect( controller:'assetEntity', action:list)
+						break;
+					case "database":
+						redirect( controller:'database', action:list)
+						break;
+					case "files":
+						redirect( controller:'files', action:list)
+						break;
+					case "planningConsole":
+						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle")])
+						break;
+					
+					default:
+						redirect( action:list,params:[tag_f_assetName:filterAttr?.tag_f_assetName, tag_f_appOwner:filterAttr?.tag_f_appOwner, tag_f_appSme:filterAttr?.tag_f_appSme, tag_f_planStatus:filterAttr?.tag_f_planStatus, tag_f_depUp:filterAttr?.tag_f_depUp, tag_f_depDown:filterAttr?.tag_f_depDown])
+				}
 			}
 		}
 		else {

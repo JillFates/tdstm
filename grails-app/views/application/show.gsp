@@ -249,6 +249,7 @@
 							<th>Frequency</th>
 							<th>Entity Type</th>
 							<th>Name</th>
+							<th>Move Bundle</th>
 							<th>Type</th>
 							<th>Status</th>
 						</tr>
@@ -265,6 +266,21 @@
 								<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
 									${support?.asset?.assetName}
 								</td>
+								<g:if test="${support?.asset?.moveBundle!=applicationInstance.moveBundle && support.status == 'Validated' }" >
+									<td style="background-color: red">
+										     ${support?.asset?.moveBundle}
+									</td>
+								 </g:if>
+								 <g:elseif test="${support?.asset?.moveBundle!=applicationInstance.moveBundle }" >
+									<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
+										    <b>${support?.asset?.moveBundle}</b>
+									</td>
+								 </g:elseif>
+								 <g:else>
+								    <td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
+									   ${support?.asset?.moveBundle}
+								    </td>
+								 </g:else>
 								<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
 									${support.type}
 								</td>
@@ -286,6 +302,7 @@
 							<th>Frequency</th>
 							<th>Entity Type</th>
 							<th>Name</th>
+							<th>Move Bundle</th>
 							<th>Type</th>
 							<th>Status</th>
 						</tr>
@@ -302,6 +319,21 @@
 								<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
 									${dependent.dependent?.assetName}
 								</td>
+								<g:if test="${dependent.dependent?.moveBundle!=applicationInstance.moveBundle && dependent.status == 'Validated' }" >
+									<td style="background-color: red">
+										     ${dependent.dependent?.moveBundle}
+									</td>
+								</g:if>
+								<g:elseif test="${dependent.dependent?.moveBundle!=applicationInstance.moveBundle }" >
+									<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
+										    <b>${dependent.dependent?.moveBundle}</b>
+									</td>
+								</g:elseif>
+								<g:else>
+								    <td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
+										   ${dependent.dependent?.moveBundle}
+									</td>
+								</g:else>
 								<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
 									${dependent.type}
 								</td>

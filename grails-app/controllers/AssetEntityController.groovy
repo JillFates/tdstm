@@ -2701,37 +2701,39 @@ class AssetEntityController {
 			flash.message = "Asset ${assetEntityInstance.assetName} Updated"
 			assetEntityInstance.updateRacks()
 			assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance)
-			switch(redirectTo){
-				case "room":
-					redirect( controller:'room',action:list, params:[projectId: projectId] )
-					break;
-				case "rack":
-					redirect( controller:'rackLayouts',action:'create', params:[projectId: projectId] )
-					break;
-				case "console":
-					redirect( action:dashboardView, params:[projectId: projectId, showAll:'show',tag_f_assetName:params.tag_f_assetName,tag_f_priority:attribute.tag_f_priority,tag_f_assetTag:attribute.tag_f_assetTag,tag_f_assetName:attribute.tag_f_assetName,tag_f_status:attribute.tag_f_status,tag_f_sourceTeamMt:attribute.tag_f_sourceTeamMt,tag_f_targetTeamMt:attribute.tag_f_targetTeamMt,tag_f_commentType:attribute.tag_f_commentType,tag_s_1_priority:attribute.tag_s_1_priority,tag_s_2_assetTag:attribute.tag_s_2_assetTag,tag_s_3_assetName:attribute.tag_s_3_assetName,tag_s_4_status:attribute.tag_s_4_status,tag_s_5_sourceTeamMt:attribute.tag_s_5_sourceTeamMt,tag_s_6_targetTeamMt:attribute.tag_s_6_targetTeamMt,tag_s_7_commentType:attribute.tag_s_7_commentType])
-					break;
-				case "clientConsole":
-					redirect( controller:'clientConsole', action:list, params:[projectId: projectId])
-					break;
-				case "application":
-					redirect( controller:'application', action:list, params:[projectId: projectId])
-					break;
-				case "database":
-					redirect( controller:'database', action:list, params:[projectId: projectId])
-					break;
-				case "files":
-					redirect( controller:'files', action:list, params:[projectId: projectId])
-					break;
-				case "planningConsole":
-			        forward(action:'getLists', params:[entity: params.tabType,labelsList:params.labels,dependencyBundle:session.getAttribute("dependencyBundle")])
-					break;
-				case "updateView":
-				    forward(action:'show', params:[id: params.id])
-					break;
-				default:
-					redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_model:filterAttr.tag_f_model, tag_f_sourceLocation:filterAttr.tag_f_sourceLocation, tag_f_sourceRack:filterAttr.tag_f_sourceRack, tag_f_targetLocation:filterAttr.tag_f_targetLocation, tag_f_targetRack:filterAttr.tag_f_targetRack, tag_f_assetType:filterAttr.tag_f_assetType, tag_f_serialNumber:filterAttr.tag_f_serialNumber, tag_f_moveBundle:filterAttr.tag_f_moveBundle, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown,tag_s_1_application:filterAttr.tag_s_1_application,tag_s_2_assetName:filterAttr.tag_s_2_assetName,tag_s_3_model:filterAttr.tag_s_3_model,tag_s_4_sourceLocation:filterAttr.tag_s_4_sourceLocation,tag_s_5_sourceRack:filterAttr.tag_s_5_sourceRack,tag_s_6_targetLocation:filterAttr.tag_s_6_targetLocation,tag_s_7_targetRack:filterAttr.tag_s_7_targetRack,tag_s_8_assetType:filterAttr.tag_s_8_assetType,tag_s_9_assetTag:filterAttr.tag_s_9_assetTag,tag_s_10_serialNumber:filterAttr.tag_s_10_serialNumber,tag_s_11_moveBundle:filterAttr.tag_s_11_moveBundle,tag_s_12_depUp:filterAttr.tag_s_12_depUp,tag_s_13_depDown:filterAttr.tag_s_13_depDown])
-
+			if(params.updateView == 'updateView'){
+				forward(action:'show', params:[id: params.id])
+				
+			}else{
+				switch(redirectTo){
+					case "room":
+						redirect( controller:'room',action:list, params:[projectId: projectId] )
+						break;
+					case "rack":
+						redirect( controller:'rackLayouts',action:'create', params:[projectId: projectId] )
+						break;
+					case "console":
+						redirect( action:dashboardView, params:[projectId: projectId, showAll:'show',tag_f_assetName:params.tag_f_assetName,tag_f_priority:attribute.tag_f_priority,tag_f_assetTag:attribute.tag_f_assetTag,tag_f_assetName:attribute.tag_f_assetName,tag_f_status:attribute.tag_f_status,tag_f_sourceTeamMt:attribute.tag_f_sourceTeamMt,tag_f_targetTeamMt:attribute.tag_f_targetTeamMt,tag_f_commentType:attribute.tag_f_commentType,tag_s_1_priority:attribute.tag_s_1_priority,tag_s_2_assetTag:attribute.tag_s_2_assetTag,tag_s_3_assetName:attribute.tag_s_3_assetName,tag_s_4_status:attribute.tag_s_4_status,tag_s_5_sourceTeamMt:attribute.tag_s_5_sourceTeamMt,tag_s_6_targetTeamMt:attribute.tag_s_6_targetTeamMt,tag_s_7_commentType:attribute.tag_s_7_commentType])
+						break;
+					case "clientConsole":
+						redirect( controller:'clientConsole', action:list, params:[projectId: projectId])
+						break;
+					case "application":
+						redirect( controller:'application', action:list, params:[projectId: projectId])
+						break;
+					case "database":
+						redirect( controller:'database', action:list, params:[projectId: projectId])
+						break;
+					case "files":
+						redirect( controller:'files', action:list, params:[projectId: projectId])
+						break;
+					case "planningConsole":
+				        forward(action:'getLists', params:[entity: params.tabType,labelsList:params.labels,dependencyBundle:session.getAttribute("dependencyBundle")])
+						break;
+					default:
+						redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_model:filterAttr.tag_f_model, tag_f_sourceLocation:filterAttr.tag_f_sourceLocation, tag_f_sourceRack:filterAttr.tag_f_sourceRack, tag_f_targetLocation:filterAttr.tag_f_targetLocation, tag_f_targetRack:filterAttr.tag_f_targetRack, tag_f_assetType:filterAttr.tag_f_assetType, tag_f_serialNumber:filterAttr.tag_f_serialNumber, tag_f_moveBundle:filterAttr.tag_f_moveBundle, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown,tag_s_1_application:filterAttr.tag_s_1_application,tag_s_2_assetName:filterAttr.tag_s_2_assetName,tag_s_3_model:filterAttr.tag_s_3_model,tag_s_4_sourceLocation:filterAttr.tag_s_4_sourceLocation,tag_s_5_sourceRack:filterAttr.tag_s_5_sourceRack,tag_s_6_targetLocation:filterAttr.tag_s_6_targetLocation,tag_s_7_targetRack:filterAttr.tag_s_7_targetRack,tag_s_8_assetType:filterAttr.tag_s_8_assetType,tag_s_9_assetTag:filterAttr.tag_s_9_assetTag,tag_s_10_serialNumber:filterAttr.tag_s_10_serialNumber,tag_s_11_moveBundle:filterAttr.tag_s_11_moveBundle,tag_s_12_depUp:filterAttr.tag_s_12_depUp,tag_s_13_depDown:filterAttr.tag_s_13_depDown])
+	
+				}
 			}
 		}
 		else {

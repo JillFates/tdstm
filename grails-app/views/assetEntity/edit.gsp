@@ -263,16 +263,17 @@
 					<input name="id" id="assetId" type="hidden" value="${assetEntityInstance.id}"/>
 					<input type = "hidden" id = "dstPath" name = "dstPath" value ="${redirectTo}"/>
 					<input name="redirectTo" id="redirectTo" type="hidden" value="${redirectTo}">
+					<input name="updateView" id="updateView" type="hidden" value="">
 					<input type = "hidden" id = "tabType" name="tabType" value =""/>
 					<input type="hidden" id="labelsListId" name="labels" value =""/>
 					<input type="hidden" id="updateViewId" name="updateViewId" value =""/>
 					<g:if test="${redirectTo!='planningConsole'}">
-					  <span class="button"><g:actionSubmit class="save" value="Update/Close" action="Update"  /> </span>
+					  <span class="button"><g:actionSubmit class="save" value="Update/Close" action="Update" /> </span>
 					  <span class="button"><input type="button" class="save" value="Update/View" onclick="updateToShow()" /> </span>
 					  <span class="button"><g:actionSubmit class="delete"	onclick=" return confirm('Are you sure?');" value="Delete" /> </span>
 					</g:if>
 					<g:else>
-					  <span class="button"><input id="updatedId" name="updatedId" type="button" class="save" value="Update" onclick="submitRemoteForm()"> 
+					  <span class="button"><input id="updatedId" name="updatedId" type="button" class="save" value="Update" onclick="submitRemoteForm()"> </span>
 					  <span class="button"><input id="deleteId"	 name="deleteId"  class="save" value="Delete" onclick=" deleteAsset($('#assetId').val(),'server')" value="Delete" /> </span>
 					</g:else>
 					

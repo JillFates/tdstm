@@ -171,33 +171,38 @@ class FilesController {
 		if(!filesInstance.hasErrors() && filesInstance.save(flush:true)) {
 			flash.message = "File ${filesInstance.assetName} Updated"
 			assetEntityService.createOrUpdateFilesDependencies(params, filesInstance)
-			switch(params.redirectTo){
-				case "room":
-					redirect( controller:'room',action:list )
-					break;
-				case "rack":
-					redirect( controller:'rackLayouts',action:'create' )
-					break;
-				case "console":
-					redirect( controller:'assetEntity', action:"dashboardView", params:[showAll:'show'])
-					break;
-				case "clientConsole":
-					redirect( controller:'clientConsole', action:list)
-					break;
-				case "assetEntity":
-					redirect( controller:'assetEntity', action:list)
-					break;
-				case "database":
-					redirect( controller:'database', action:list)
-					break;
-				case "application":
-					redirect( controller:'application', action:list)
-					break;
-			    case "planningConsole":
-					forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle")])
-					break;
-				default:
-					redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_fileFormat:filterAttr.tag_f_fileFormat,tag_f_fileSize:filterAttr.tag_f_fileSize, tag_f_moveBundle:filterAttr.tag_f_moveBundle, tag_f_planStatus:filterAttr.tag_f_planStatus, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown])
+			if(params.updateView == 'updateView'){
+				forward(action:'show', params:[id: params.id])
+				
+			}else{
+				switch(params.redirectTo){
+					case "room":
+						redirect( controller:'room',action:list )
+						break;
+					case "rack":
+						redirect( controller:'rackLayouts',action:'create' )
+						break;
+					case "console":
+						redirect( controller:'assetEntity', action:"dashboardView", params:[showAll:'show'])
+						break;
+					case "clientConsole":
+						redirect( controller:'clientConsole', action:list)
+						break;
+					case "assetEntity":
+						redirect( controller:'assetEntity', action:list)
+						break;
+					case "database":
+						redirect( controller:'database', action:list)
+						break;
+					case "application":
+						redirect( controller:'application', action:list)
+						break;
+				    case "planningConsole":
+						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle")])
+						break;
+					default:
+						redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_fileFormat:filterAttr.tag_f_fileFormat,tag_f_fileSize:filterAttr.tag_f_fileSize, tag_f_moveBundle:filterAttr.tag_f_moveBundle, tag_f_planStatus:filterAttr.tag_f_planStatus, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown])
+				}
 			}
 		}
 		else {
