@@ -273,7 +273,9 @@
 					  <span class="button"><g:actionSubmit class="delete"	onclick=" return confirm('Are you sure?');" value="Delete" /> </span>
 					</g:if>
 					<g:else>
-					  <span class="button"><input id="updatedId" name="updatedId" type="button" class="save" value="Update" onclick="submitRemoteForm()"> </span>
+					  
+					  <span class="button"><input id="updatedId" name="updatedId" type="button" class="save" value="Update/Close" onclick="submitRemoteForm()"> </span>
+					  <span class="button"><input type="button" class="save" value="Update/View" onclick="updateToShow()" /> </span>
 					  <span class="button"><input id="deleteId"	 name="deleteId"  class="save" value="Delete" onclick=" deleteAsset($('#assetId').val(),'server')" value="Delete" /> </span>
 					</g:else>
 					
