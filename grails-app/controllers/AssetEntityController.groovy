@@ -2674,6 +2674,7 @@ class AssetEntityController {
 	}
 
 	def update={
+		println "params-------------------"+params
 		def attribute = session.getAttribute('filterAttr')
 		def filterAttr = session.getAttribute('filterAttributes')
 		session.setAttribute("USE_FILTERS","true")
@@ -2726,6 +2727,9 @@ class AssetEntityController {
 						break;
 					case "files":
 						redirect( controller:'files', action:list, params:[projectId: projectId])
+						break;
+					case "listComment":
+						forward(action:'listComment', params:[projectId: projectId])
 						break;
 					case "planningConsole":
 				        forward(action:'getLists', params:[entity: params.tabType,labelsList:params.labels,dependencyBundle:session.getAttribute("dependencyBundle")])

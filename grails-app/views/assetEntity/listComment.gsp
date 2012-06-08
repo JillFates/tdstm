@@ -23,6 +23,9 @@
  	        $("#createCommentDialog").dialog({ autoOpen: false })
  	        $("#showCommentDialog").dialog({ autoOpen: false })
  	        $("#editCommentDialog").dialog({ autoOpen: false })
+ 	        $("#showEntityView").dialog({ autoOpen: false })
+			$("#editEntityView").dialog({ autoOpen: false })
+			$("#createEntityView").dialog({ autoOpen: false })
         });
         </script>
 </head>
@@ -76,7 +79,7 @@
     	                     	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show')"><g:if test ="${commentInstance.mustVerify == 1}"></g:if><g:else><g:checkBox name="myVerifyBox" value="${true}" disabled="true"/></g:else></span>
     	                     </jmesa:htmlColumn>
         	                 --%><jmesa:htmlColumn property="assetName" title="Asset" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-        	                 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.assetEntity?.assetName}</span>
+        	                 	<span onclick="javascript:getEntityDetails('listComment', '${commentInstance.assetEntity.assetType}', '${commentInstance.assetEntity.id}');">${commentInstance.assetEntity?.assetName}</span>
         	                 </jmesa:htmlColumn>
             	             <jmesa:htmlColumn property="isResolved"  sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
             	             	<span style="align:center;" onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><g:if test ="${commentInstance.commentType =='issue' && commentInstance.isResolved == 1}"><g:checkBox name="myCheckbox" value="${true}" disabled="true"/></g:if><g:else>&nbsp</g:else></span>
@@ -92,8 +95,15 @@
                 </jmesa:tableFacade>
             </form>
             </div>
+            <div id="showEntityView" style="display: none;"></div>
+			<div id="editEntityView" style="display: none;"></div>
+			<div id="createEntityView" style="display: none;"></div>
   </div>
+  
  <g:render template="commentCrud"/> 
+ </div>
+ </div>
+ </body>
  <script>
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')	

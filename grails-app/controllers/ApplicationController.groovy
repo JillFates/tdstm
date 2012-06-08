@@ -171,6 +171,7 @@ class ApplicationController {
 		}
 		else {
 			def assetEntity = AssetEntity.get(id)
+			println "----------------------"+assetEntity
 			def assetComment 
 			def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
 			def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
@@ -286,6 +287,9 @@ class ApplicationController {
 						break;
 					case "files":
 						redirect( controller:'files', action:list)
+						break;
+					case "listComment":
+						redirect( controller:'assetEntity', action:'listComment' , params:[projectId: projectId])
 						break;
 					case "planningConsole":
 						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle")])
