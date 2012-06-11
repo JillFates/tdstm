@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://localhost:8080/" />
+<title>Room_Edit</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Room_Edit</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>/tdstm/auth/login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=usernameId</td>
+	<td>john</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=password</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>css=input[type=&quot;submit&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=List Rooms</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//td[@onclick=&quot;new Ajax.Request('/tdstm/room/show',{asynchronous:true,evalScripts:true,onComplete:function(e){openRoomView(e)},parameters:'id=55'});&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Edit']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Rack']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>2|numeric</td>
+	<td>x</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=roomXId_50000</td>
+	<td>${x}</td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>2|numeric</td>
+	<td>y</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=roomYId_50000</td>
+	<td>${y}</td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>4|alphanumeric</td>
+	<td>roomname</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=tag_50000</td>
+	<td>${roomname}</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='UPS']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=tag_50001</td>
+	<td>ups</td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>2|numeric</td>
+	<td>X1</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=roomXId_50001</td>
+	<td>${X1}</td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>2|numeric</td>
+	<td>Y1</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=roomYId_50001</td>
+	<td>${Y1}</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Update']</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
