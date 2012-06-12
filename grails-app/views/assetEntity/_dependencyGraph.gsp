@@ -30,7 +30,7 @@
 	
 	<div id="item1" style="float: left;z-index: 10000;">
 			 <g:render template="map" model="[file_name:file_name]"/>
-			<div id="legendDivIdGraph" style="float: left; border: 1px solid #ccc; margin-left: 3px; margin-top: 3px; width: 170px; background-color: white; position: absolute; display: none;">
+			<div id="legendDivIdGraph" style="float: left; border: 1px solid #ccc; margin-left: 3px; margin-top: 3px; width: 178px; background-color: white; position: absolute; display: none;">
 				<table id="legendId" cellpadding="0" cellspacing="0" style="margin-left: 5px; border: 0; width: 148px;">
 					<tr><td style="padding: 3px 3px;"><h3>Legend</h3></td></tr>
 					<tr>
@@ -49,19 +49,19 @@
 					<tr><td><hr style="width: 60px;color:rgb(56,56,56);"></hr></td><td>Valid Links</td></tr>
 					<tr><td><hr style="width: 60px;color:red;"></hr></td><td>Questioned</td></tr>
 					<tr><td><hr style="width: 60px;color:rgb(224,224,224);"></hr></td><td>N/A</td></tr>
-					<tr><td nowrap="nowrap" colspan="2"><span style="color: Gray;"><h4>Move Events (border):</h4></span></td></tr>
+					<tr><td nowrap="nowrap" ><span style="color: Gray;"><h4>Move Events:</h4></span></td></tr>
 					<g:each in="${eventColorCode}" var="color">
 						<tr>
-						   <td><input type="text" size="1" style="background-color: ${color.value};height:5px;width:5px;border: 0px;" />
+						   <td><input type="text" size="1" style="background-color: ${color.value};height:5px;width:5px;" />
 							</td>
 							<td nowrap="nowrap">
 								${color.key}
 							</td>
 						</tr>
 					</g:each>
-					<tr><td><input type="text" size="1" style="border-color: red;height:5px;width:5px; border-width: 2px;" />
+					<tr><td><input type="text" size="1" style="border: 2px solid red;height:5px;width:5px; " />
 						</td>
-						<td nowrap="nowrap">No Event</td>
+						<td nowrap="nowrap">Event N/A</td>
 					</tr>
 				</table>
 			</div>
