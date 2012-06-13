@@ -706,6 +706,555 @@ if(!planStatusDataTransferMapWalkThru){
    DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'PlanStatus',sheetName='Files' where eavAttribute = ?",[planStatusAttribute])
 }
 
+/**
+*  Create Custom1
+*/
+def custom1Attribute = EavAttribute.findByAttributeCodeAndEntityType('custom1',filesEntityType)
+if(custom1Attribute){
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'custom1', frontendLabel='Custom1' where id = ?",[custom1Attribute.id])
+} else {
+   custom1Attribute = new EavAttribute( attributeCode : "custom1",
+		   backendType : 'String',
+		   frontendInput : 'text',
+		   frontendLabel : 'Custom1',
+		   note : 'this field is used for just import',
+		   sortOrder : 100,
+		   entityType:filesEntityType,
+		   isRequired:0,
+		   isUnique:0,
+		   defaultValue:"1",
+		   validation:'No validation'
+		   )
+   if ( !custom1Attribute.validate() || !custom1Attribute.save(flush:true) ) {
+	   println"Unable to create custom1Attribute : "
+	   custom1Attribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
 
+def custom1EavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(custom1Attribute,filesAttributeSet)
+if(custom1EavEntityAttribute){
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 100, attributeCode = 'custom1' where attributeCode = 'custom1'")
+} else {
+   custom1EavEntityAttribute = new EavEntityAttribute(sortOrder:100,attribute:custom1Attribute,eavAttributeSet:filesAttributeSet)
+   if ( !custom1EavEntityAttribute.validate() || !custom1EavEntityAttribute.save(flush:true) ) {
+	   println"Unable to create custom1EavEntityAttribute : " +
+			   custom1EavEntityAttribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
 
+def custom1DataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,custom1Attribute)
+if( !custom1DataTransferMapMaster ){
+   custom1DataTransferMapMaster = new DataTransferAttributeMap(columnName:"Custom1",
+		   sheetName:"Files",
+		   dataTransferSet : masterDataTransferSet,
+		   eavAttribute:custom1Attribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !custom1DataTransferMapMaster.validate() || !custom1DataTransferMapMaster.save(flush:true) ) {
+	   println"Unable to create custom1DataTransferMapMaster : " +
+			   custom1DataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Custom1',sheetName='Files' where eavAttribute = ?",[custom1Attribute])
+}
 
+def custom1DataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,custom1Attribute)
+if(!custom1DataTransferMapWalkThru){
+   custom1DataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Custom1",
+		   sheetName:"Files",
+		   dataTransferSet : walkThruDataTransferSet,
+		   eavAttribute:custom1Attribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !custom1DataTransferMapWalkThru.validate() || !custom1DataTransferMapWalkThru.save(flush:true) ) {
+	   println"Unable to create custom1DataTransferMapWalkThru : " +
+			   custom1DataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Custom1',sheetName='Files' where eavAttribute = ?",[custom1Attribute])
+}
+/**
+*  Create Custom2
+*/
+def custom2Attribute = EavAttribute.findByAttributeCodeAndEntityType('custom2',filesEntityType)
+if(custom2Attribute){
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'custom2', frontendLabel='Custom2' where id = ?",[custom2Attribute.id])
+} else {
+   custom2Attribute = new EavAttribute( attributeCode : "custom2",
+		   backendType : 'String',
+		   frontendInput : 'text',
+		   frontendLabel : 'Custom2',
+		   note : 'this field is used for just import',
+		   sortOrder : 100,
+		   entityType:filesEntityType,
+		   isRequired:0,
+		   isUnique:0,
+		   defaultValue:"1",
+		   validation:'No validation'
+		   )
+   if ( !custom2Attribute.validate() || !custom2Attribute.save(flush:true) ) {
+	   println"Unable to create custom2Attribute : "
+	   custom2Attribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def custom2EavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(custom2Attribute,filesAttributeSet)
+if(custom2EavEntityAttribute){
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 200, attributeCode = 'custom2' where attributeCode = 'custom2'")
+} else {
+   custom2EavEntityAttribute = new EavEntityAttribute(sortOrder:200,attribute:custom2Attribute,eavAttributeSet:filesAttributeSet)
+   if ( !custom2EavEntityAttribute.validate() || !custom2EavEntityAttribute.save(flush:true) ) {
+	   println"Unable to create custom2EavEntityAttribute : " +
+			   custom2EavEntityAttribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def custom2DataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,custom2Attribute)
+if( !custom2DataTransferMapMaster ){
+   custom2DataTransferMapMaster = new DataTransferAttributeMap(columnName:"Custom2",
+		   sheetName:"Files",
+		   dataTransferSet : masterDataTransferSet,
+		   eavAttribute:custom2Attribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !custom2DataTransferMapMaster.validate() || !custom2DataTransferMapMaster.save(flush:true) ) {
+	   println"Unable to create custom2DataTransferMapMaster : " +
+			   custom2DataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Custom2',sheetName='Files' where eavAttribute = ?",[custom2Attribute])
+}
+
+def custom2DataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,custom2Attribute)
+if(!custom2DataTransferMapWalkThru){
+   custom2DataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Custom2",
+		   sheetName:"Files",
+		   dataTransferSet : walkThruDataTransferSet,
+		   eavAttribute:custom2Attribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !custom2DataTransferMapWalkThru.validate() || !custom2DataTransferMapWalkThru.save(flush:true) ) {
+	   println"Unable to create custom2DataTransferMapWalkThru : " +
+			   custom2DataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Custom2',sheetName='Files' where eavAttribute = ?",[custom2Attribute])
+}
+/**
+*  Create Custom3
+*/
+def custom3Attribute = EavAttribute.findByAttributeCodeAndEntityType('custom3',filesEntityType)
+if(custom3Attribute){
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'custom3', frontendLabel='Custom3' where id = ?",[custom3Attribute.id])
+} else {
+   custom3Attribute = new EavAttribute( attributeCode : "custom3",
+		   backendType : 'String',
+		   frontendInput : 'text',
+		   frontendLabel : 'Custom3',
+		   note : 'this field is used for just import',
+		   sortOrder : 100,
+		   entityType:filesEntityType,
+		   isRequired:0,
+		   isUnique:0,
+		   defaultValue:"1",
+		   validation:'No validation'
+		   )
+   if ( !custom3Attribute.validate() || !custom3Attribute.save(flush:true) ) {
+	   println"Unable to create custom3Attribute : "
+	   custom3Attribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def custom3EavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(custom3Attribute,filesAttributeSet)
+if(custom3EavEntityAttribute){
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 300, attributeCode = 'custom3' where attributeCode = 'custom3'")
+} else {
+   custom3EavEntityAttribute = new EavEntityAttribute(sortOrder:300,attribute:custom3Attribute,eavAttributeSet:filesAttributeSet)
+   if ( !custom3EavEntityAttribute.validate() || !custom3EavEntityAttribute.save(flush:true) ) {
+	   println"Unable to create custom3EavEntityAttribute : " +
+			   custom3EavEntityAttribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def custom3DataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,custom3Attribute)
+if( !custom3DataTransferMapMaster ){
+   custom3DataTransferMapMaster = new DataTransferAttributeMap(columnName:"Custom3",
+		   sheetName:"Files",
+		   dataTransferSet : masterDataTransferSet,
+		   eavAttribute:custom3Attribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !custom3DataTransferMapMaster.validate() || !custom3DataTransferMapMaster.save(flush:true) ) {
+	   println"Unable to create custom3DataTransferMapMaster : " +
+			   custom3DataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Custom3',sheetName='Files' where eavAttribute = ?",[custom3Attribute])
+}
+
+def custom3DataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,custom3Attribute)
+if(!custom3DataTransferMapWalkThru){
+   custom3DataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Custom3",
+		   sheetName:"Files",
+		   dataTransferSet : walkThruDataTransferSet,
+		   eavAttribute:custom3Attribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !custom3DataTransferMapWalkThru.validate() || !custom3DataTransferMapWalkThru.save(flush:true) ) {
+	   println"Unable to create custom3DataTransferMapWalkThru : " +
+			   custom3DataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Custom3',sheetName='Files' where eavAttribute = ?",[custom3Attribute])
+}
+/**
+*  Create Custom4
+*/
+def custom4Attribute = EavAttribute.findByAttributeCodeAndEntityType('custom4',filesEntityType)
+if(custom4Attribute){
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'custom4', frontendLabel='Custom4' where id = ?",[custom4Attribute.id])
+} else {
+   custom4Attribute = new EavAttribute( attributeCode : "custom4",
+		   backendType : 'String',
+		   frontendInput : 'text',
+		   frontendLabel : 'Custom4',
+		   note : 'this field is used for just import',
+		   sortOrder : 100,
+		   entityType:filesEntityType,
+		   isRequired:0,
+		   isUnique:0,
+		   defaultValue:"1",
+		   validation:'No validation'
+		   )
+   if ( !custom4Attribute.validate() || !custom4Attribute.save(flush:true) ) {
+	   println"Unable to create custom4Attribute : "
+	   custom4Attribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def custom4EavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(custom4Attribute,filesAttributeSet)
+if(custom4EavEntityAttribute){
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 400, attributeCode = 'custom4' where attributeCode = 'custom4'")
+} else {
+   custom4EavEntityAttribute = new EavEntityAttribute(sortOrder:400,attribute:custom4Attribute,eavAttributeSet:filesAttributeSet)
+   if ( !custom4EavEntityAttribute.validate() || !custom4EavEntityAttribute.save(flush:true) ) {
+	   println"Unable to create custom4EavEntityAttribute : " +
+			   custom4EavEntityAttribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def custom4DataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,custom4Attribute)
+if( !custom4DataTransferMapMaster ){
+   custom4DataTransferMapMaster = new DataTransferAttributeMap(columnName:"Custom4",
+		   sheetName:"Files",
+		   dataTransferSet : masterDataTransferSet,
+		   eavAttribute:custom4Attribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !custom4DataTransferMapMaster.validate() || !custom4DataTransferMapMaster.save(flush:true) ) {
+	   println"Unable to create custom4DataTransferMapMaster : " +
+			   custom4DataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Custom4',sheetName='Files' where eavAttribute = ?",[custom4Attribute])
+}
+
+def custom4DataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,custom4Attribute)
+if(!custom4DataTransferMapWalkThru){
+   custom4DataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Custom4",
+		   sheetName:"Files",
+		   dataTransferSet : walkThruDataTransferSet,
+		   eavAttribute:custom4Attribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !custom4DataTransferMapWalkThru.validate() || !custom4DataTransferMapWalkThru.save(flush:true) ) {
+	   println"Unable to create custom4DataTransferMapWalkThru : " +
+			   custom4DataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Custom4',sheetName='Files' where eavAttribute = ?",[custom4Attribute])
+}
+/**
+*  Create Custom5
+*/
+def custom5Attribute = EavAttribute.findByAttributeCodeAndEntityType('custom5',filesEntityType)
+if(custom5Attribute){
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'custom5', frontendLabel='Custom5' where id = ?",[custom5Attribute.id])
+} else {
+   custom5Attribute = new EavAttribute( attributeCode : "custom5",
+		   backendType : 'String',
+		   frontendInput : 'text',
+		   frontendLabel : 'Custom5',
+		   note : 'this field is used for just import',
+		   sortOrder : 100,
+		   entityType:filesEntityType,
+		   isRequired:0,
+		   isUnique:0,
+		   defaultValue:"1",
+		   validation:'No validation'
+		   )
+   if ( !custom5Attribute.validate() || !custom5Attribute.save(flush:true) ) {
+	   println"Unable to create custom5Attribute : "
+	   custom5Attribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def custom5EavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(custom5Attribute,filesAttributeSet)
+if(custom5EavEntityAttribute){
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 500, attributeCode = 'custom5' where attributeCode = 'custom5'")
+} else {
+   custom5EavEntityAttribute = new EavEntityAttribute(sortOrder:500,attribute:custom5Attribute,eavAttributeSet:filesAttributeSet)
+   if ( !custom5EavEntityAttribute.validate() || !custom5EavEntityAttribute.save(flush:true) ) {
+	   println"Unable to create custom5EavEntityAttribute : " +
+			   custom5EavEntityAttribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def custom5DataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,custom5Attribute)
+if( !custom5DataTransferMapMaster ){
+   custom5DataTransferMapMaster = new DataTransferAttributeMap(columnName:"Custom5",
+		   sheetName:"Files",
+		   dataTransferSet : masterDataTransferSet,
+		   eavAttribute:custom5Attribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !custom5DataTransferMapMaster.validate() || !custom5DataTransferMapMaster.save(flush:true) ) {
+	   println"Unable to create custom5DataTransferMapMaster : " +
+			   custom5DataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Custom5',sheetName='Files' where eavAttribute = ?",[custom5Attribute])
+}
+
+def custom5DataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,custom5Attribute)
+if(!custom5DataTransferMapWalkThru){
+   custom5DataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Custom5",
+		   sheetName:"Files",
+		   dataTransferSet : walkThruDataTransferSet,
+		   eavAttribute:custom5Attribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !custom5DataTransferMapWalkThru.validate() || !custom5DataTransferMapWalkThru.save(flush:true) ) {
+	   println"Unable to create custom5DataTransferMapWalkThru : " +
+			   custom5DataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Custom5',sheetName='Files' where eavAttribute = ?",[custom5Attribute])
+}
+/**
+*  Create Custom6
+*/
+def custom6Attribute = EavAttribute.findByAttributeCodeAndEntityType('custom6',filesEntityType)
+if(custom6Attribute){
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'custom6', frontendLabel='Custom6' where id = ?",[custom6Attribute.id])
+} else {
+   custom6Attribute = new EavAttribute( attributeCode : "custom6",
+		   backendType : 'String',
+		   frontendInput : 'text',
+		   frontendLabel : 'Custom6',
+		   note : 'this field is used for just import',
+		   sortOrder : 100,
+		   entityType:filesEntityType,
+		   isRequired:0,
+		   isUnique:0,
+		   defaultValue:"1",
+		   validation:'No validation'
+		   )
+   if ( !custom6Attribute.validate() || !custom6Attribute.save(flush:true) ) {
+	   println"Unable to create custom6Attribute : "
+	   custom6Attribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def custom6EavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(custom6Attribute,filesAttributeSet)
+if(custom6EavEntityAttribute){
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 600, attributeCode = 'custom6' where attributeCode = 'custom6'")
+} else {
+   custom6EavEntityAttribute = new EavEntityAttribute(sortOrder:600,attribute:custom6Attribute,eavAttributeSet:filesAttributeSet)
+   if ( !custom6EavEntityAttribute.validate() || !custom6EavEntityAttribute.save(flush:true) ) {
+	   println"Unable to create custom6EavEntityAttribute : " +
+			   custom6EavEntityAttribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def custom6DataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,custom6Attribute)
+if( !custom6DataTransferMapMaster ){
+   custom6DataTransferMapMaster = new DataTransferAttributeMap(columnName:"Custom6",
+		   sheetName:"Files",
+		   dataTransferSet : masterDataTransferSet,
+		   eavAttribute:custom6Attribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !custom6DataTransferMapMaster.validate() || !custom6DataTransferMapMaster.save(flush:true) ) {
+	   println"Unable to create custom6DataTransferMapMaster : " +
+			   custom6DataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Custom6',sheetName='Files' where eavAttribute = ?",[custom6Attribute])
+}
+
+def custom6DataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,custom6Attribute)
+if(!custom6DataTransferMapWalkThru){
+   custom6DataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Custom6",
+		   sheetName:"Files",
+		   dataTransferSet : walkThruDataTransferSet,
+		   eavAttribute:custom6Attribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !custom6DataTransferMapWalkThru.validate() || !custom6DataTransferMapWalkThru.save(flush:true) ) {
+	   println"Unable to create custom6DataTransferMapWalkThru : " +
+			   custom6DataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Custom6',sheetName='Files' where eavAttribute = ?",[custom6Attribute])
+}
+/**
+*  Create Custom7
+*/
+def custom7Attribute = EavAttribute.findByAttributeCodeAndEntityType('custom7',filesEntityType)
+if(custom7Attribute){
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'custom7', frontendLabel='Custom7' where id = ?",[custom7Attribute.id])
+} else {
+   custom7Attribute = new EavAttribute( attributeCode : "custom7",
+		   backendType : 'String',
+		   frontendInput : 'text',
+		   frontendLabel : 'Custom7',
+		   note : 'this field is used for just import',
+		   sortOrder : 100,
+		   entityType:filesEntityType,
+		   isRequired:0,
+		   isUnique:0,
+		   defaultValue:"1",
+		   validation:'No validation'
+		   )
+   if ( !custom7Attribute.validate() || !custom7Attribute.save(flush:true) ) {
+	   println"Unable to create custom7Attribute : "
+	   custom7Attribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def custom7EavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(custom7Attribute,filesAttributeSet)
+if(custom7EavEntityAttribute){
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 700, attributeCode = 'custom7' where attributeCode = 'custom7'")
+} else {
+   custom7EavEntityAttribute = new EavEntityAttribute(sortOrder:700,attribute:custom7Attribute,eavAttributeSet:filesAttributeSet)
+   if ( !custom7EavEntityAttribute.validate() || !custom7EavEntityAttribute.save(flush:true) ) {
+	   println"Unable to create custom7EavEntityAttribute : " +
+			   custom7EavEntityAttribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def custom7DataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,custom7Attribute)
+if( !custom7DataTransferMapMaster ){
+   custom7DataTransferMapMaster = new DataTransferAttributeMap(columnName:"Custom7",
+		   sheetName:"Files",
+		   dataTransferSet : masterDataTransferSet,
+		   eavAttribute:custom7Attribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !custom7DataTransferMapMaster.validate() || !custom7DataTransferMapMaster.save(flush:true) ) {
+	   println"Unable to create custom7DataTransferMapMaster : " +
+			   custom7DataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Custom7',sheetName='Files' where eavAttribute = ?",[custom7Attribute])
+}
+
+def custom7DataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,custom7Attribute)
+if(!custom7DataTransferMapWalkThru){
+   custom7DataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Custom7",
+		   sheetName:"Files",
+		   dataTransferSet : walkThruDataTransferSet,
+		   eavAttribute:custom7Attribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !custom7DataTransferMapWalkThru.validate() || !custom7DataTransferMapWalkThru.save(flush:true) ) {
+	   println"Unable to create custom7DataTransferMapWalkThru : " +
+			   custom7DataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Custom7',sheetName='Files' where eavAttribute = ?",[custom7Attribute])
+}
+/**
+*  Create Custom8
+*/
+def custom8Attribute = EavAttribute.findByAttributeCodeAndEntityType('custom8',filesEntityType)
+if(custom8Attribute){
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'custom8', frontendLabel='Custom8' where id = ?",[custom8Attribute.id])
+} else {
+   custom8Attribute = new EavAttribute( attributeCode : "custom8",
+		   backendType : 'String',
+		   frontendInput : 'text',
+		   frontendLabel : 'Custom8',
+		   note : 'this field is used for just import',
+		   sortOrder : 100,
+		   entityType:filesEntityType,
+		   isRequired:0,
+		   isUnique:0,
+		   defaultValue:"1",
+		   validation:'No validation'
+		   )
+   if ( !custom8Attribute.validate() || !custom8Attribute.save(flush:true) ) {
+	   println"Unable to create custom8Attribute : "
+	   custom8Attribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def custom8EavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(custom8Attribute,filesAttributeSet)
+if(custom8EavEntityAttribute){
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 800, attributeCode = 'custom8' where attributeCode = 'custom8'")
+} else {
+   custom8EavEntityAttribute = new EavEntityAttribute(sortOrder:800,attribute:custom8Attribute,eavAttributeSet:filesAttributeSet)
+   if ( !custom8EavEntityAttribute.validate() || !custom8EavEntityAttribute.save(flush:true) ) {
+	   println"Unable to create custom8EavEntityAttribute : " +
+			   custom8EavEntityAttribute.errors.allErrors.each() {println"\n"+it }
+   }
+}
+
+def custom8DataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,custom8Attribute)
+if( !custom8DataTransferMapMaster ){
+   custom8DataTransferMapMaster = new DataTransferAttributeMap(columnName:"Custom8",
+		   sheetName:"Files",
+		   dataTransferSet : masterDataTransferSet,
+		   eavAttribute:custom8Attribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !custom8DataTransferMapMaster.validate() || !custom8DataTransferMapMaster.save(flush:true) ) {
+	   println"Unable to create custom8DataTransferMapMaster : " +
+			   custom8DataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Custom8',sheetName='Files' where eavAttribute = ?",[custom8Attribute])
+}
+
+def custom8DataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,custom8Attribute)
+if(!custom8DataTransferMapWalkThru){
+   custom8DataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Custom8",
+		   sheetName:"Files",
+		   dataTransferSet : walkThruDataTransferSet,
+		   eavAttribute:custom8Attribute,
+		   validation:"NO Validation",
+		   isRequired:0
+		   )
+   if ( !custom8DataTransferMapWalkThru.validate() || !custom8DataTransferMapWalkThru.save(flush:true) ) {
+	   println"Unable to create custom8DataTransferMapWalkThru : " +
+			   custom8DataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
+   }
+} else {
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Custom8',sheetName='Files' where eavAttribute = ?",[custom8Attribute])
+}

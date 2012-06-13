@@ -75,7 +75,7 @@
 							<td>${filesInstance.moveBundle} / ${dependencyBundleNumber}</td>
 						</tr>
 						<tr class="prop">
-							<td colspan="2" class="label" nowrap="nowrap">
+							<td class="label" nowrap="nowrap">
 							<g:if test="${(filesInstance.custom1)?.length()>= 4 && (filesInstance.custom1)?.substring(0, 4)=='http'}">
 										<a href="javascript:window.open('${filesInstance.custom1}','help');" style="color:#00E">${filesInstance.project.custom1 !=null ? filesInstance.project.custom1 :'Custom1'}</a>
 							</g:if>
@@ -83,7 +83,8 @@
 								<label for="custom1">${filesInstance.project.custom1 ?:'Custom1'}</label>
 							</g:else>
 							</td>
-							<td colspan="2" class="label" nowrap="nowrap">
+							<td>${filesInstance?.custom1 }</td>
+							<td class="label" nowrap="nowrap">
 							<g:if test="${(filesInstance?.custom2)?.length()>= 4 &&(filesInstance.custom2)?.substring(0, 4)=='http'}">
 										<a href="javascript:window.open('${filesInstance.custom2}','help');" style="color:#00E">${filesInstance.project.custom2 !=null ? filesInstance.project.custom2 :'Custom2'}</a>
 							</g:if>
@@ -91,7 +92,8 @@
 								<label for="custom2">${filesInstance.project.custom2 ?:'Custom2'}</label>
 							</g:else>
 							</td>
-							<td colspan="2" class="label" nowrap="nowrap">
+							<td>${filesInstance?.custom2}</td>
+							<td class="label" nowrap="nowrap">
 							<g:if test="${(filesInstance.custom3)?.length()>= 4 &&(filesInstance.custom3)?.substring(0, 4)=='http'}">
 										<a href="javascript:window.open('${filesInstance.custom3}','help');" style="color:#00E">${filesInstance.project.custom3 !=null ? filesInstance.project.custom3 :'Custom3'}</a>
 							</g:if>
@@ -99,10 +101,11 @@
 								<label for="custom3">${filesInstance.project.custom3 ?:'Custom3'}</label>
 							</g:else>
 							</td>
+							<td>${filesInstance?.custom3}</td>
 							
 						</tr>
 						<tr class="prop">
-							<td colspan="2" class="label" nowrap="nowrap">
+							<td class="label" nowrap="nowrap">
 							<g:if test="${(filesInstance.custom4)?.length()>= 4 &&(filesInstance.custom4)?.substring(0, 4)=='http'}">
 										<a href="javascript:window.open('${filesInstance.custom4}','help');" style="color:#00E">${filesInstance.project.custom4 !=null ? filesInstance.project.custom4 :'Custom4'}</a>
 							</g:if>
@@ -110,7 +113,8 @@
 								<label for="custom4">${filesInstance.project.custom4 ?:'Custom4'}</label>
 							</g:else>
 							</td>
-							<td colspan="2" class="label" nowrap="nowrap">
+							<td>${filesInstance?.custom4}</td>
+							<td class="label" nowrap="nowrap">
 							<g:if test="${(filesInstance.custom5)?.length()>= 4 &&(filesInstance.custom5)?.substring(0, 4)=='http'}">
 										<a href="javascript:window.open('${filesInstance.custom5}','help');" style="color:#00E">${filesInstance.project.custom5 !=null ? filesInstance.project.custom5 :'Custom5'}</a>
 							</g:if>
@@ -118,7 +122,8 @@
 								<label for="custom5">${filesInstance.project.custom5 ?:'Custom5'}</label>
 							</g:else>
 							</td>
-							<td colspan="2" class="label" nowrap="nowrap">
+							<td>${filesInstance?.custom5}</td>
+							<td class="label" nowrap="nowrap">
 							<g:if test="${(filesInstance.custom6)?.length()>= 4 &&(filesInstance.custom6)?.substring(0, 4)=='http'}">
 										<a href="javascript:window.open('${filesInstance.custom6}','help');" style="color:#00E">${filesInstance.project.custom6 !=null ? filesInstance.project.custom6 :'Custom6'}</a>
 							</g:if>
@@ -126,9 +131,10 @@
 								 <label for="custom6">${filesInstance.project.custom6 ?:'Custom6'}</label>
 							</g:else>
 							</td>
+							<td>${filesInstance?.custom6}</td>
 						</tr>
 					    <tr class="prop">
-							<td colspan="2" class="label" nowrap="nowrap">
+							<td class="label" nowrap="nowrap">
 							<g:if test="${(filesInstance.custom7)?.length()>= 4 &&(filesInstance.custom7)?.substring(0, 4)=='http'}">
 										<a href="javascript:window.open('${filesInstance.custom7}','help');" style="color:#00E">${filesInstance.project.custom7 !=null ? filesInstance.project.custom7 :'Custom7'}</a>
 							</g:if>
@@ -136,7 +142,8 @@
 								<label for="custom7">${filesInstance.project.custom7 ?:'Custom7'}</label>
 							</g:else>
 							</td>
-							<td colspan="2" class="label" nowrap="nowrap">
+							<td>${filesInstance?.custom7}</td>
+							<td class="label" nowrap="nowrap">
 							<g:if test="${(filesInstance.custom8)?.length()>= 4 &&(filesInstance.custom8)?.substring(0, 4)=='http'}">
 										<a href="javascript:window.open('${filesInstance.custom8}','help');" style="color:#00E">${filesInstance.project.custom8 !=null ? filesInstance.project.custom8 :'Custom8'}</a>
 							</g:if>
@@ -144,6 +151,7 @@
 								 <label for="custom7">${filesInstance.project.custom8 ?:'Custom8'}</label>
 							</g:else>
 							</td>
+							<td>${filesInstance?.custom8}</td>
 							<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label>
 							</td>
 							<td>${filesInstance.planStatus}</td>

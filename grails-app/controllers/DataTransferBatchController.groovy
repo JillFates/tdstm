@@ -26,7 +26,7 @@ class DataTransferBatchController {
     def index = { redirect(action:list,params:params) }
 
     // the delete, save and update actions only accept POST requests
-    def allowedMethods = [delete:'POST', save:'POST', update:'POST']
+    def allowedMethods = [save:'POST', update:'POST']
     /* --------------------------------------------------------------------------
      * Return list of dataTransferBatchs for associated Project and Mode = Import
      * @param projectId
@@ -38,6 +38,9 @@ class DataTransferBatchController {
     		flash.message = params.message
     	}
     	def projectId = params.projectId
+		if(!projectId){
+			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ 
+		}
 		def projectInstance = Project.findById( projectId )
 		if( !params.max ) params.max = 10
 		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( projectInstance, "I", 
@@ -1072,4 +1075,26 @@ class DataTransferBatchController {
 					toAssetUposition=${assetEntity.targetRackPosition} where toAsset = ? """,[assetEntity])
 		}
     }
+	/*
+     *     Delete the Data Transfer Batch Instance
+	 */
+	
+	def delete={
+		try{
+			def dataTransferBatchInstance = DataTransferBatch.get(params.batchId)
+	        if(dataTransferBatchInstance) {
+			    dataTransferBatchInstance.delete(flush:true,failOnError:true)
+				// TODO to check why instance is not deleting ?
+				flash.message = "DataTransferBatch ${params.batchId} deleted"
+				redirect(action:list)
+	        }else {
+	            flash.message = "DataTransferBatch not found with id ${params.batchId}"
+	            redirect(action:list)
+	       }
+		}catch(Exception e){
+		       e.printStackTrace()
+		}
+	}
 }
+
+	

@@ -171,7 +171,6 @@ class ApplicationController {
 		}
 		else {
 			def assetEntity = AssetEntity.get(id)
-			println "----------------------"+assetEntity
 			def assetComment 
 			def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
 			def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])

@@ -794,7 +794,7 @@ class AssetEntityController {
 			database =Database.findAllByProject( project )
 			files =Files.findAllByProject( project )
 		} else {
-			asset = AssetEntity.findAll( "from AssetEntity m where m.project = project and m.moveBundle in ( $bundleList )" )
+			asset = AssetEntity.findAll( "from AssetEntity m where m.project = project and m.assetType not in('Application','Database','Files') and m.moveBundle in ( $bundleList ) " )
 			application = Application.findAll( "from Application m where m.project = project and m.moveBundle in ( $bundleList )" )
 			database = Database.findAll( "from Database m where m.project = project and m.moveBundle in ( $bundleList )")
 			files = Files.findAll( "from Files m where m.project = project and m.moveBundle in ( $bundleList )" )

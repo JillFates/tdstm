@@ -229,7 +229,7 @@
 						<ul>
 							<tds:hasPermission permission='EditAndDelete'>
 							<li><g:link class="mmlink" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">Import Assets</g:link></li>
-							<li><g:link class="mmlink" controller="assetEntity" action="assetImport" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">Manage Batches</g:link></li>
+							<li><g:link class="mmlink" controller="dataTransferBatch" action="index" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">Manage Batches</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='AssetMenuView'>
 							<li><g:link class="mmlink" controller="assetEntity" action="exportAssets" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('assetMegaMenu')">Export Assets</g:link></li>

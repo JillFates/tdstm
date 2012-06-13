@@ -44,7 +44,19 @@
 				alert("Please wait, process is in progress.");
 				return false;
 			}
-		}		
+		}
+
+		function removeDataTrsferBatch(id){
+			var id = id
+	           jQuery.ajax({
+                  url:'../dataTransferBatch/delete',
+                  data:{'id':id},
+                  type:'POST',
+                  success: function(data){
+                            window.location.reload();
+                            }
+			    });
+		}
 		
 	</script>
     </head>
@@ -102,27 +114,26 @@
                             <td></td>
                             
                             <td>${fieldValue(bean:dataTransferBatch, field:'statusCode')}</td>
-                            
                             <td>
 	                            <g:if test="${dataTransferBatch?.statusCode == 'PENDING'}">
 	                                <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'AssetEntity'}">
-	                            	   <g:link action="serverProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<a href="#">Void</a>
+	                            	   <g:link action="serverProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                                </g:if> 
 	                                 <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Application'}">
-	                            	   <g:link action="appProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<a href="#">Void</a>
+	                            	   <g:link action="appProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                                 </g:if> 
 	                                 <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Database'}">
-	                            	   <g:link action="dbProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<a href="#">Void</a>
+	                            	   <g:link action="dbProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                                 </g:if>
 	                                 <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Files'}">
-	                            	   <g:link action="fileProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<a href="#">Void</a>
+	                            	   <g:link action="fileProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                                 </g:if> 
 	                                  <g:if test="${dataTransferBatch?.eavEntityType?.domainName == null}">
-	                            	   <g:link action="serverProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<a href="#">Void</a>
+	                            	   <g:link action="serverProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                                 </g:if>                     
 	                            </g:if>
 	                             <g:else>
-	                            	<a href="#">Remove</a><g:if test="${dataTransferBatch?.hasErrors == 1}">|<a href="errorsListView?id=${dataTransferBatch?.id}">View Errors</a></g:if>
+	                            	<g:if test="${dataTransferBatch?.hasErrors == 1}">|<a href="errorsListView?id=${dataTransferBatch?.id}">View Errors</a></g:if>
 	                            </g:else>
                             </td>
                         
@@ -149,5 +160,6 @@
 			$('#assetMenu').show();
 			$('#reportsMenu').hide();
 		</script>
+		
     </body>
 </html>

@@ -39,7 +39,7 @@
 							<td>${databaseInstance?.planStatus}</td>
 						</tr>
 						<tr>
-							<td colspan="2" class="label" nowrap="nowrap">
+							<td class="label" nowrap="nowrap">
 								<g:if test="${(databaseInstance.custom1)?.length()>= 4 && (databaseInstance.custom1)?.substring(0, 4)=='http'}">
 											<a href="javascript:window.open('${databaseInstance.custom1}','help');" style="color:#00E">${databaseInstance.project.custom1 !=null ? databaseInstance.project.custom1:'Custom1'}</a>
 								</g:if>
@@ -47,7 +47,8 @@
 									<label for="custom1">${databaseInstance.project.custom1 ?:'Custom1'}</label>
 								</g:else>
 							</td>
-							<td colspan="2" class="label" nowrap="nowrap">
+							<td>${databaseInstance.custom1}</td>
+							<td class="label" nowrap="nowrap">
 								<g:if test="${(databaseInstance.custom2)?.length()>= 4 &&(databaseInstance.custom2)?.substring(0, 4)=='http'}">
 											<a href="javascript:window.open('${databaseInstance.custom2}','help');" style="color:#00E">${databaseInstance.project.custom2 !=null ? databaseInstance.project.custom2:'Custom2'}</a>
 								</g:if>
@@ -55,7 +56,8 @@
 									<label for="custom2">${databaseInstance.project.custom2 ?:'Custom2'}</label>
 								</g:else>
 							</td>
-							<td colspan="2" class="label" nowrap="nowrap">
+							<td>${databaseInstance.custom2}</td>
+							<td class="label" nowrap="nowrap">
 								<g:if test="${(databaseInstance.custom3)?.length()>= 4 &&(databaseInstance.custom3)?.substring(0, 4)=='http'}">
 											<a href="javascript:window.open('${databaseInstance.custom3}','help');" style="color:#00E">${databaseInstance.project.custom3 !=null ? databaseInstance.project.custom3:'Custom3'}</a>
 								</g:if>
@@ -63,9 +65,10 @@
 									<label for="custom3">${databaseInstance.project.custom3 ?:'Custom3'}</label>
 								</g:else>
 								</td>
+								<td>${databaseInstance.custom3}</td>
 						</tr>
 						<tr>
-							<td colspan="2" class="label" nowrap="nowrap">
+							<td class="label" nowrap="nowrap">
 								<g:if test="${(databaseInstance.custom4)?.length()>= 4 &&(databaseInstance.custom4)?.substring(0, 4)=='http'}">
 											<a href="javascript:window.open('${databaseInstance.custom4}','help');" style="color:#00E">${databaseInstance.project.custom4 !=null ? databaseInstance.project.custom4:'Custom4'}</a>
 								</g:if>
@@ -73,7 +76,8 @@
 									<label for="custom4">${databaseInstance.project.custom4 ?:'Custom4'}</label>
 								</g:else>
 								</td>
-							<td colspan="2" class="label" nowrap="nowrap">
+								<td>${databaseInstance.custom4}</td>
+							<td class="label" nowrap="nowrap">
 								<g:if test="${(databaseInstance.custom5)?.length()>= 4 &&(databaseInstance.custom5)?.substring(0, 4)=='http'}">
 											<a href="javascript:window.open('${databaseInstance.custom5}','help');" style="color:#00E">${databaseInstance.project.custom5 !=null ? databaseInstance.project.custom5:'Custom5'}</a>
 								</g:if>
@@ -81,7 +85,8 @@
 									<label for="custom5">${databaseInstance.project.custom5 ?:'Custom5'}</label>
 								</g:else>
 							</td>
-							<td colspan="2" class="label" nowrap="nowrap">
+							<td>${databaseInstance.custom5}</td>
+							<td class="label" nowrap="nowrap">
 								<g:if test="${(databaseInstance.custom6)?.length()>= 4 &&(databaseInstance.custom6)?.substring(0, 4)=='http'}">
 											<a href="javascript:window.open('${databaseInstance.custom6}','help');" style="color:#00E">${databaseInstance.project.custom6 !=null ? databaseInstance.project.custom6:'Custom6'}</a>
 								</g:if>
@@ -89,9 +94,10 @@
 									 <label for="custom6">${databaseInstance.project.custom6 ?:'Custom6'}</label>
 								</g:else>
 							</td>
+							<td>${databaseInstance.custom6}</td>
 						</tr>
 					    <tr>
-							<td colspan="2" class="label" nowrap="nowrap">
+							<td class="label" nowrap="nowrap">
 								<g:if test="${(databaseInstance.custom7)?.length()>= 4 &&(databaseInstance.custom7)?.substring(0, 4)=='http'}">
 											<a href="javascript:window.open('${databaseInstance.custom7}','help');" style="color:#00E">${databaseInstance.project.custom7!=null ? databaseInstance.project.custom7:'Custom7'}</a>
 								</g:if>
@@ -99,14 +105,16 @@
 									<label for="custom7">${databaseInstance.project.custom7 ?:'Custom7'}</label>
 								</g:else>
 							</td>
-							<td colspan="2" class="label" nowrap="nowrap">
+							<td>${databaseInstance.custom7}</td>
+							<td class="label" nowrap="nowrap">
 								<g:if test="${(databaseInstance.custom8)?.length()>= 4 &&(databaseInstance.custom8)?.substring(0, 4)=='http'}">
 											<a href="javascript:window.open('${databaseInstance.custom8}','help');" style="color:#00E">${databaseInstance.project.custom8 !=null ? databaseInstance.project.custom8:'Custom8'}</a>
 								</g:if>
 								<g:else>
-									 <label for="custom7">${databaseInstance.project.custom8 ?:'Custom8'}</label>
+									 <label for="custom8">${databaseInstance.project.custom8 ?:'Custom8'}</label>
 								</g:else>
 							</td>
+							<td>${databaseInstance.custom8}</td>
 						</tr>
 					</tbody>
 				</table>
