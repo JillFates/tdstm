@@ -2674,7 +2674,6 @@ class AssetEntityController {
 	}
 
 	def update={
-		println "params-------------------"+params
 		def attribute = session.getAttribute('filterAttr')
 		def filterAttr = session.getAttribute('filterAttributes')
 		session.setAttribute("USE_FILTERS","true")
@@ -2998,7 +2997,10 @@ class AssetEntityController {
 		    moveEventList =  uniqueMoveEventList.toList()
 		    moveEventList.sort{it?.name}
 			def eventColorCode = [:]
-			int colorDiff = (232/moveEventList.size()).intValue()
+			int colorDiff
+			if(moveEventList.size()){
+			   colorDiff = (232/moveEventList.size()).intValue()
+			}
 			def labelList = params.labelsList
 			labelList = labelList.replace(" ","")
 			List labels = labelList ?  labelList.split(",") : []
@@ -3123,7 +3125,10 @@ class AssetEntityController {
 		moveEventList =  uniqueMoveEventList.toList()
 		moveEventList.sort{it?.name}
 		def eventColorCode = [:]
-		int colorDiff = (232/moveEventList.size()).intValue()
+		int colorDiff
+		if(moveEventList.size()){
+		colorDiff = (232/moveEventList.size()).intValue()
+		}
 		moveEventList.eachWithIndex{ event, i ->
 			def colorCode = colorDiff * i
 			def colorsCode = "rgb(${colorCode},${colorCode},${colorCode})"
