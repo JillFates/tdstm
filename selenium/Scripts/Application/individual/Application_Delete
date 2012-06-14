@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://localhost:8080/" />
+<title>Application_Delete</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Application_Delete</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>/tdstm/application/list?tag_f_assetName=&amp;tag_f_appOwner=&amp;tag_f_appSme=&amp;tag_f_planStatus=&amp;tag_f_depUp=&amp;tag_f_depDown=</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Sign out</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=usernameId</td>
+	<td>john</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=password</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>css=input[type=&quot;submit&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=List Apps</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Application list</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Application List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.0</td>
+	<td>Actions</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.1</td>
+	<td>Name</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.2</td>
+	<td>App Owner</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.3</td>
+	<td>App Sme</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.4</td>
+	<td>Bundle</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.5</td>
+	<td>Plan Status</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.6</td>
+	<td>Dep #</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.7</td>
+	<td>Dep Up</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.8</td>
+	<td>Dep Down</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>id=tag.3.1</td>
+	<td>appLn</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=#tag_row1 &gt; td &gt; a &gt; img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>assetName</td>
+	<td>${appLn}</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>name=_action_Update</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>name=_action_Update</td>
+	<td>Update/Close</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>//input[@value='Update/View']</td>
+	<td>Update/View</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>name=_action_Delete</td>
+	<td>Delete</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>name=_action_Delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertConfirmation</td>
+	<td>Are you sure?</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForPageToLoad</td>
+	<td>2000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Application ${appLn} deleted</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://localhost:8080/" />
+<title>Database_delete</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Database_delete</td></tr>
+</thead><tbody>
+<tr>
+	<td>setSpeed</td>
+	<td>1000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>/tdstm/auth/login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=usernameId</td>
+	<td>john</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=password</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>css=input[type=&quot;submit&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=List DBs</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Db list</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>DB List</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.0</td>
+	<td>Actions</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.1</td>
+	<td>Name</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.2</td>
+	<td>DB Format</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.3</td>
+	<td>Bundle</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.4</td>
+	<td>Plan Status</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.5</td>
+	<td>Dep #</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.6</td>
+	<td>Dep Up</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.7</td>
+	<td>Dep Down</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>id=tag.3.1</td>
+	<td>dbName</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>id=tag.3.2</td>
+	<td>dbFormat</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>id=tag.3.3</td>
+	<td>bundle</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>id=tag.3.4</td>
+	<td>planstatus</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=#tag_row1 &gt; td &gt; a &gt; img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=td &gt; div.dialog &gt; table.0.0</td>
+	<td>exact:Name*</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=td &gt; div.dialog &gt; table.1.0</td>
+	<td>Type</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=td &gt; div.dialog &gt; table.2.0</td>
+	<td>exact:Format*</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=td &gt; div.dialog &gt; table.3.0</td>
+	<td>exact:Size*</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=td &gt; div.dialog &gt; table.4.0</td>
+	<td>Custom1</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=td &gt; div.dialog &gt; table.5.0</td>
+	<td>Custom4</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=td &gt; div.dialog &gt; table.6.0</td>
+	<td>Custom7</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=td &gt; div.dialog &gt; table.0.2</td>
+	<td>Description</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=td &gt; div.dialog &gt; table.1.2</td>
+	<td>Support</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=td &gt; div.dialog &gt; table.2.2</td>
+	<td>Retire Date:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=td &gt; div.dialog &gt; table.3.2</td>
+	<td>Maint Exp.</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=td &gt; div.dialog &gt; table.5.2</td>
+	<td>Custom5</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=td &gt; div.dialog &gt; table.6.2</td>
+	<td>Custom8</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=td &gt; div.dialog &gt; table.1.4</td>
+	<td>Environment</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=td &gt; div.dialog &gt; table.3.4</td>
+	<td>Plan Status</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=td &gt; div.dialog &gt; table.4.4</td>
+	<td>Custom3</td>
+</tr>
+<tr>
+	<td>waitForTable</td>
+	<td>css=td &gt; div.dialog &gt; table.5.4</td>
+	<td>Custom6</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>name=_action_Update</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>//input[@value='Update/View']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>name=_action_Delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>id=assetName</td>
+	<td>${dbName}</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>id=dbFormat</td>
+	<td>${dbFormat}</td>
+</tr>
+<tr>
+	<td>verifySelectedLabel</td>
+	<td>id=moveBundle</td>
+	<td>${bundle}</td>
+</tr>
+<tr>
+	<td>verifySelectedLabel</td>
+	<td>id=planStatus</td>
+	<td>${planstatus}</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[14]/div/a/span</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
