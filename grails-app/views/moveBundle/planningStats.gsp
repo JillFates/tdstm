@@ -25,15 +25,15 @@
 					</h4>
 					<table style="float:left; border: 0px; margin-left: 10px; margin-bottom: 10px;">
 						<tr>
-							<td style="width: 10px;">${applicationCount}</td>
+							<td style="width: 10px;text-align: right;">${applicationCount}</td>
 							<td><g:link controller="application" action="list" params="[validation:'Discovery']">Applications</g:link></td>
 						</tr>
 						<tr>
-							<td style="width: 10px;">${physicalCount}</td>
+							<td style="width: 10px;text-align: right;">${physicalCount}</td>
 							<td><g:link controller="assetEntity" action="list" params="[validation:'Discovery']">Physical Servers</g:link></td>
 						</tr>
 						<tr>
-							<td style="width: 10px;">${virtualCount}</td>
+							<td style="width: 10px;text-align: right;">${virtualCount}</td>
 							<td><g:link controller="assetEntity" action="list" params="[validation:'Discovery']">Virtual Servers</g:link></td>
 						</tr>
 					</table>
@@ -43,23 +43,23 @@
 					</h4>
 					<table style="float:left; border: 0px; margin-left: 10px;">
 						<tr>
-							<td style="width: 10px;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ? ',['Application', project,'Discovery',true]).size()}</td>
+							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ? ',['Application', project,'Discovery',true]).size()}</td>
 							<td><g:link controller="application" action="list" params="[validation:'Discovery']">Discovery</g:link></td>
 						</tr>
 						<tr>
-							<td>${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyScan',true]).size()}</td>
+							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyScan',true]).size()}</td>
 							<td><g:link controller="application" action="list" params="[validation:'DependencyScan']">DependencyScan</g:link></td>
 						</tr>
 						<tr>
-							<td>${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Validated',true]).size()}</td>
+							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Validated',true]).size()}</td>
 							<td><g:link controller="application" action="list" params="[validation:'DependencyScan']">Validated</g:link></td>
 						</tr>
 						<tr>
-							<td>${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyReview',true]).size()}</td>
+							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyReview',true]).size()}</td>
 							<td><g:link controller="application" action="list" params="[validation:'DependencyReview']">Dependency Review</g:link></td>
 						</tr>
 						<tr>
-							<td>${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()}</td>
+							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()}</td>
 							<td><g:link controller="application" action="list" params="[validation:'BundleReady']">Bundle Ready</g:link></td>
 						</tr>
 					</table>
@@ -82,7 +82,7 @@
 					</h4>
 					<table style="float:left; border: 0px;">
 						<tr>
-							<td style="width: 10px;">${appDependenciesCount}</td>
+							<td style="width: 10px;text-align: right;">${appDependenciesCount}</td>
 							<td style="width: 150px;">App Dependencies <br />
 								<g:if test="${appDependenciesCount > 0 }">
 								(${100 - Math.round((pendingAppDependenciesCount/appDependenciesCount)*100)}%,&nbsp;
@@ -90,7 +90,7 @@
 								</g:if></td>
 						</tr>
 						<tr>
-							<td style="width: 10px;">${serverDependenciesCount}</td>
+							<td style="width: 10px;text-align: right;">${serverDependenciesCount}</td>
 							<td style="width: 150px;">Server Dependencies <br />
 								<g:if test="${serverDependenciesCount > 0 }">
 								(${100 - Math.round((pendingServerDependenciesCount/serverDependenciesCount)*100)}%,&nbsp;
@@ -98,7 +98,7 @@
 								</g:if></td>
 						</tr>
 						<tr>
-							<td style="width: 10px;">${issuesCount}</td>
+							<td style="width: 10px;text-align: right;">${issuesCount}</td>
 							<td style="width: 150px;">
 							<g:link controller="assetEntity" action="listComment" params="[projectId:currProjObj?.id]">
 								Open Issues</g:link></td>
@@ -109,17 +109,17 @@
 					<h4>
 						<b>App Latency Evaluations</b>
 					</h4>
-					<table style="border: 0px; margin-left: 10px;">
+					<table style="border: 0px;">
 						<tr>
-							<td style="width: 10px;"><g:link controller="application" action="list" params="[latency:'likely']">${likelyLatency}</g:link></td>
+							<td style="width: 10px;text-align: right;"><g:link controller="application" action="list" params="[latency:'likely']">${likelyLatency}</g:link></td>
 							<td><g:link controller="application" action="list" params="[latency:'likely']">Likely</g:link></td>
 						</tr>
 						<tr>
-							<td><g:link controller="application" action="list" params="[latency:'UnKnown']">${unknownLatency}</g:link></td>
+							<td style="width: 10px;text-align: right;"><g:link controller="application" action="list" params="[latency:'UnKnown']">${unknownLatency}</g:link></td>
 							<td><g:link controller="application" action="list" params="[latency:'UnKnown']">Unknown</g:link></td>
 						</tr>
 						<tr>
-							<td><g:link controller="application" action="list" params="[latency:'UnLikely']">${unlikelyLatency }</g:link></td>
+							<td style="width: 10px;text-align: right;"><g:link controller="application" action="list" params="[latency:'UnLikely']">${unlikelyLatency }</g:link></td>
 							<td><g:link controller="application" action="list" params="[latency:'UnLikely']">UnLikely</g:link></td>
 						</tr>
 					</table>
