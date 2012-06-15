@@ -50,49 +50,55 @@ class ProjectController {
      *  return the details of Project
      */
     def show = {
-        def projectInstance = Project.get( params.id )
-        if(!projectInstance) {
-            flash.message = "Project not found with id ${params.id}"
-            redirect( action:list )
-        } else { 
-        	// load transitions details into application memory.
-        	//stateEngineService.loadWorkflowTransitionsIntoMap(projectInstance.workflowCode, 'project')
-        	userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
-        	def currProj = session.getAttribute("CURR_PROJ");
-        	def currProjectInstance = Project.get( currProj.CURR_PROJ )
-        	def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
-    		def userCompany = partyRelationshipService.getSatffCompany( loginUser.person )
-			userPreferenceService.setPreference( "PARTYGROUP", "${userCompany?.partyIdFrom?.id}" )
-			userPreferenceService.loadPreferences("CURR_TZ")
-			userPreferenceService.loadPreferences("CURR_BUNDLE")
-			userPreferenceService.loadPreferences("MOVE_EVENT")
-			def currPowerType = session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE
-			if(!currPowerType){
-				userPreferenceService.setPreference( "CURR_POWER_TYPE", "Watts" )
-			}
-        	def projectLogo
-        	if(currProjectInstance){
-        		projectLogo = ProjectLogo.findByProject(currProjectInstance)
-        	}
-        	def imageId
-        	if(projectLogo){
-        		imageId = projectLogo.id
-        	}
-        	session.setAttribute("setImage",imageId) 
-        	def projectLogoForProject = ProjectLogo.findByProject(projectInstance)
-        	//def projectClient = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_CLIENT' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'CLIENT' ")
-        	def projectPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
-        	def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
-        	def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-
-        	return [ projectInstance : projectInstance, projectPartner:projectPartner, 
-					 projectManager:projectManager, moveManager:moveManager, 
-					 projectLogoForProject:projectLogoForProject ]
-        }
+		def CURR_PROJ = session.CURR_PROJ?.CURR_PROJ
+		if(CURR_PROJ){
+	        def projectInstance = Project.get( CURR_PROJ )
+	        if(!projectInstance) {
+	            flash.message = "Project not found with id ${params.id}"
+	            redirect( action:list )
+	        } else { 
+	        	// load transitions details into application memory.
+	        	//stateEngineService.loadWorkflowTransitionsIntoMap(projectInstance.workflowCode, 'project')
+	        	userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+	        	def currProj = session.getAttribute("CURR_PROJ");
+	        	def currProjectInstance = Project.get( currProj.CURR_PROJ )
+	        	def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
+	    		def userCompany = partyRelationshipService.getSatffCompany( loginUser.person )
+				userPreferenceService.setPreference( "PARTYGROUP", "${userCompany?.partyIdFrom?.id}" )
+				userPreferenceService.loadPreferences("CURR_TZ")
+				userPreferenceService.loadPreferences("CURR_BUNDLE")
+				userPreferenceService.loadPreferences("MOVE_EVENT")
+				def currPowerType = session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE
+				if(!currPowerType){
+					userPreferenceService.setPreference( "CURR_POWER_TYPE", "Watts" )
+				}
+	        	def projectLogo
+	        	if(currProjectInstance){
+	        		projectLogo = ProjectLogo.findByProject(currProjectInstance)
+	        	}
+	        	def imageId
+	        	if(projectLogo){
+	        		imageId = projectLogo.id
+	        	}
+	        	session.setAttribute("setImage",imageId) 
+	        	def projectLogoForProject = ProjectLogo.findByProject(projectInstance)
+	        	//def projectClient = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_CLIENT' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'CLIENT' ")
+	        	def projectPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
+	        	def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
+	        	def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
+	
+	        	return [ projectInstance : projectInstance, projectPartner:projectPartner, 
+						 projectManager:projectManager, moveManager:moveManager, 
+						 projectLogoForProject:projectLogoForProject ]
+	        }
+		} else {
+		flash.message = "Project not found with id ${params.id}"
+		redirect(action:list)
+		}
     }
 
     def delete = {
-    	def projectInstance = Project.get( params.id )
+    	def projectInstance = Project.get( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 	    if(projectInstance) {
 	    	def message = userPreferenceService.removeProjectAssociates(projectInstance)
 			projectInstance.delete(flush:true)
@@ -109,7 +115,7 @@ class ProjectController {
     }
 
     def edit = {
-        def projectInstance = Project.get( params.id )
+        def projectInstance = Project.get( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 
         if(!projectInstance) {
             flash.message = "Project not found with id ${params.id}"
@@ -171,7 +177,7 @@ class ProjectController {
      * Update the Project details
      */
     def update = {
-        def projectInstance = Project.get( params.id )
+        def projectInstance = Project.get( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
         //projectInstance.lastUpdated = new Date()
         
         if( projectInstance ) {
@@ -197,11 +203,11 @@ class ProjectController {
 				if( file.getContentType() && file.getContentType() != "application/octet-stream"){
 					if(params.projectPartner == ""){
 		           		flash.message = " Please select Associated Partner to upload Image. "
-				        redirect(action:'edit',id:projectInstance.id )
+				        redirect(action:'edit')
 				        return;
 		           	} else if (! okcontents.contains(file.getContentType())) {
 		        		flash.message = "Image must be one of: ${okcontents}"
-		        		redirect(action:'edit',id:projectInstance.id )
+		        		redirect(action:'edit' )
 		        		return;
 		        	}
 	        	}
@@ -225,7 +231,7 @@ class ProjectController {
 	            def imageSize = image.getSize()
 	            if( imageSize > 50000 ) {
 	            	flash.message = " Image size is too large. Please select proper Image"
-	            	redirect(action:'edit',id:projectInstance.id )
+	            	redirect(action:'edit')
 	    	    	return;
 	            }
 	            if(file.getContentType() == "application/octet-stream"){
@@ -233,7 +239,7 @@ class ProjectController {
 	            } else if(params.projectPartner){
                		if(!image.save()){
                			flash.message = " Image Upload Error."
-               			redirect(action:'edit',id:projectInstance.id )
+               			redirect(action:'edit' )
                			return;
                		}
 	            }
@@ -346,7 +352,7 @@ class ProjectController {
             	}
             	*/
             	flash.message = "Project ${projectInstance} updated"
-                redirect(action:show,id:projectInstance.id)
+                redirect(action:show)
                 
             }
             else {
@@ -507,7 +513,7 @@ class ProjectController {
         	userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )       	
         	
         	flash.message = "Project ${projectInstance} created"
-            redirect( action:show, id:projectInstance.id, imageId:image.id )
+            redirect( action:show,  imageId:image.id )
         } else {
             def tdsParty = PartyGroup.findByName( 'TDS' ).id
              
@@ -586,7 +592,7 @@ class ProjectController {
     	if(selectProject){
     		def projectInstance = Project.findByProjectCode(params.selectProject)
 	        userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
-	        redirect(controller:'project', action:"show", id: projectInstance.id )
+	        redirect(controller:'project', action:"show" )
     	} else {
     		flash.message = "Please select Project"
     		redirect( action:"list" )
@@ -606,7 +612,7 @@ class ProjectController {
      }
     
     def deleteImage = {    		 
-         	 def projectInstance = Project.get( params.id )
+         	 def projectInstance = Project.get( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
     		 def imageInstance = ProjectLogo.findByProject(projectInstance)
     		 if(imageInstance){
     			 flash.message = "Image deleted"

@@ -22,7 +22,6 @@
             <div class="message">${flash.message}</div>
             </g:if>
             <g:form method="post" action="update" name="editProjectForm" enctype="multipart/form-data">
-                <input type="hidden" name="id" value="${projectInstance?.id}" />
                 <div class="dialog">
                     <table>
                         <tbody>

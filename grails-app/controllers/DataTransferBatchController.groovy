@@ -37,10 +37,8 @@ class DataTransferBatchController {
     	if(params.message){
     		flash.message = params.message
     	}
-    	def projectId = params.projectId
-		if(!projectId){
-			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ 
-		}
+    	def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		
 		def projectInstance = Project.findById( projectId )
 		if( !params.max ) params.max = 10
 		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( projectInstance, "I", 
@@ -62,7 +60,7 @@ class DataTransferBatchController {
     	def projectId
 		def assetsList = new ArrayList()
 		DataTransferBatch.withTransaction { status ->
-			projectId = params.projectId
+			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 			def projectInstance = Project.findById( projectId )
     		def dataTransferBatch
     		def insertCount = 0
@@ -313,7 +311,7 @@ class DataTransferBatchController {
     	def projectId
 		def assetsList = new ArrayList()
 		DataTransferBatch.withTransaction { status ->
-			projectId = params.projectId
+			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 			def projectInstance = Project.findById( projectId )
     		def dataTransferBatch
     		def insertCount = 0
@@ -528,7 +526,7 @@ class DataTransferBatchController {
 		def projectId
 		def assetsList = new ArrayList()
 		DataTransferBatch.withTransaction { status ->
-			projectId = params.projectId
+			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 			def projectInstance = Project.findById( projectId )
 			def dataTransferBatch
 			def insertCount = 0
@@ -735,7 +733,7 @@ class DataTransferBatchController {
 		def projectId
 		def assetsList = new ArrayList()
 		DataTransferBatch.withTransaction { status ->
-			projectId = params.projectId
+			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 			def projectInstance = Project.findById( projectId )
 			def dataTransferBatch
 			def insertCount = 0
@@ -976,77 +974,7 @@ class DataTransferBatchController {
         completeDataTransferErrorList.sort{it.assetTag + it.attribute}
         return [ completeDataTransferErrorList : completeDataTransferErrorList ]
      }
-    /*
-    def show = {
-        def dataTransferBatchInstance = DataTransferBatch.get( params.id )
 
-        if(!dataTransferBatchInstance) {
-            flash.message = "DataTransferBatch not found with id ${params.id}"
-            redirect(action:list)
-        }
-        else { return [ dataTransferBatchInstance : dataTransferBatchInstance ] }
-    }
-
-    def delete = {
-        def dataTransferBatchInstance = DataTransferBatch.get( params.id )
-        if(dataTransferBatchInstance) {
-            dataTransferBatchInstance.delete()
-            flash.message = "DataTransferBatch ${params.id} deleted"
-            redirect(action:list)
-        }
-        else {
-            flash.message = "DataTransferBatch not found with id ${params.id}"
-            redirect(action:list)
-        }
-    }
-
-    def edit = {
-        def dataTransferBatchInstance = DataTransferBatch.get( params.id )
-
-        if(!dataTransferBatchInstance) {
-            flash.message = "DataTransferBatch not found with id ${params.id}"
-            redirect(action:list)
-        }
-        else {
-            return [ dataTransferBatchInstance : dataTransferBatchInstance ]
-        }
-    }
-
-    def update = {
-        def dataTransferBatchInstance = DataTransferBatch.get( params.id )
-        if(dataTransferBatchInstance) {
-            dataTransferBatchInstance.properties = params
-            if(!dataTransferBatchInstance.hasErrors() && dataTransferBatchInstance.save()) {
-                flash.message = "DataTransferBatch ${params.id} updated"
-                redirect(action:show,id:dataTransferBatchInstance.id)
-            }
-            else {
-                render(view:'edit',model:[dataTransferBatchInstance:dataTransferBatchInstance])
-            }
-        }
-        else {
-            flash.message = "DataTransferBatch not found with id ${params.id}"
-            redirect(action:edit,id:params.id)
-        }
-    }
-
-    def create = {
-        def dataTransferBatchInstance = new DataTransferBatch()
-        dataTransferBatchInstance.properties = params
-        return ['dataTransferBatchInstance':dataTransferBatchInstance]
-    }
-
-    def save = {
-        def dataTransferBatchInstance = new DataTransferBatch(params)
-        if(!dataTransferBatchInstance.hasErrors() && dataTransferBatchInstance.save()) {
-            flash.message = "DataTransferBatch ${dataTransferBatchInstance.id} created"
-            redirect(action:show,id:dataTransferBatchInstance.id)
-        }
-        else {
-            render(view:'create',model:[dataTransferBatchInstance:dataTransferBatchInstance])
-        }
-    }
-    */
 	/*=========================================================
 	 * Update Asset Racks once import batch process done.
 	 *========================================================*/
@@ -1075,16 +1003,16 @@ class DataTransferBatchController {
 					toAssetUposition=${assetEntity.targetRackPosition} where toAsset = ? """,[assetEntity])
 		}
     }
-	/*
+    
+	/**
      *     Delete the Data Transfer Batch Instance
 	 */
 	
-	def delete={
+	def delete = {
 		try{
 			def dataTransferBatchInstance = DataTransferBatch.get(params.batchId)
 	        if(dataTransferBatchInstance) {
 			    dataTransferBatchInstance.delete(flush:true,failOnError:true)
-				// TODO to check why instance is not deleting ?
 				flash.message = "DataTransferBatch ${params.batchId} deleted"
 				redirect(action:list)
 	        }else {

@@ -16,11 +16,7 @@ class DashboardController {
 		def moveEvent
 		def moveBundleList
 		
-		if( !projectId ){
-			project = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
-		} else {
-			project = Project.findById( projectId )
-		}
+		project = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		moveEventsList = MoveEvent.findAllByProject(project)
 		projectLogo = ProjectLogo.findByProject(project)
 		def moveEventId = params.moveEvent

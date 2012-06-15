@@ -16,7 +16,7 @@ class ProjectTeamController {
         def bundleId = params.bundleId		
 		def bundleInstance = MoveBundle.findById(bundleId)
         if(!bundleId){
-           def project = Project.findById(params.projectId)
+           def project = Project.findById(getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ)
 		   bundleInstance = MoveBundle.findByProject(project)
         }
         def projectTeamInstanceList = partyRelationshipService.getBundleTeamInstanceList( bundleInstance  )

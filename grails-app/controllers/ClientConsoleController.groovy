@@ -36,7 +36,7 @@ class ClientConsoleController {
 		def moveBundleInstance
 		def moveBundle
 		def workflowCode
-		def projectId=params.projectId
+		def projectId=getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def browserTest = request.getHeader("User-Agent").contains("MSIE")
 		def projectInstance = Project.findById( projectId )
 		if(!params.moveBundle){
@@ -47,7 +47,7 @@ class ClientConsoleController {
 			redirect(controller:"moveBundle",action:"list")
 		}else{
 		    if(params.moveBundle!="all"){
-			  moveBundleInstance = MoveBundle.findByIdAndProject(params.moveBundle,Project.get(params.projectId))
+			  moveBundleInstance = MoveBundle.findByIdAndProject(params.moveBundle,Project.get(projectId))
 			  workflowCode = moveBundleInstance.workflowCode
 		    }else{
 			  workflowCode = projectInstance.workflowCode

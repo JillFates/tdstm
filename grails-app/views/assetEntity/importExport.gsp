@@ -75,7 +75,7 @@
                 </tr>
                 
                 <tr>
-                	<td valign="top" class="buttonR"><g:link controller="dataTransferBatch" params="[projectId:projectId]">Manage Batches: ${dataTransferBatchs}</g:link></td>
+                	<td valign="top" class="buttonR"><g:link controller="dataTransferBatch" >Manage Batches: ${dataTransferBatchs}</g:link></td>
                 	<td valign="top" class="name">&nbsp;</td>
                 	 
                 </tr>

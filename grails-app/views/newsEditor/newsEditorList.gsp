@@ -159,7 +159,6 @@ function validateCreateNewsForm(){
 <div class="body">
 <g:form action="newsEditorList" name="newsEditorForm" method="get">
 <div>
-<input type="hidden" name="projectId" value="${projectId}"/>
 	<table style="border: none;" >
 		<tr>
 			<td nowrap="nowrap">

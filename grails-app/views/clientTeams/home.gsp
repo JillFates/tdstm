@@ -36,9 +36,9 @@ dt {
 	<div class="mainbody">
 	<div class="menu4">
 		<ul>
-			<li><g:link class="mobmenu" controller="clientTeams" params="[projectId:project?.id]">Teams</g:link></li>
-			<li><g:link class="mobmenu mobselect" action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId]'>Home</g:link></li>
-			<li><g:link class="mobmenu" action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":project?.id,"tab":"Todo"]'>Tasks</g:link></li>
+			<li><g:link class="mobmenu" controller="clientTeams" >Teams</g:link></li>
+			<li><g:link class="mobmenu mobselect" action='home' params='["bundleId":bundleId,"teamId":teamId,"location":location]'>Home</g:link></li>
+			<li><g:link class="mobmenu" action="myTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"tab":"Todo"]'>Tasks</g:link></li>
 			<li><a href="#" class="mobmenu">Asset</a></li>
 		</ul>
 	</div>
@@ -47,7 +47,6 @@ dt {
 					      <input name="bundleId" type="hidden" value="${bundleId}" />
 							<input name="teamId" type="hidden" value="${teamId}" />
 							<input name="location" type="hidden" value="${location}" />
-							<input name="projectId" type="hidden" value="${project?.id}" />
 							<input name="tab" type="hidden" value="Todo" />	
 							<input name="home" type="hidden" value="home" />									
 				<div style="float:left; width:100%; margin:5px 0; ">              								

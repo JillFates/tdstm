@@ -11,6 +11,7 @@
 //=============================================================================
 function startprintjob(e)
 {
+	alert(e)
 var job = window.TF.CreateJob();
 var form = window.document.assetTagLabelForm;
 var jobdata = job.NewJobDataRecordSet();

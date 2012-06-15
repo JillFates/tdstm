@@ -99,7 +99,7 @@ class MoveBundleAssetController {
     	def bundleId = params.bundleId
 		def moveBundleInstance = MoveBundle.findById( bundleId )
     	if(!bundleId){
-           def project  = Project.findById(params.projectId)
+           def project  = Project.findById(getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ)
 		   moveBundleInstance = MoveBundle.findByProject(project)
         }
     	def moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $moveBundleInstance.project.id")
@@ -321,7 +321,7 @@ class MoveBundleAssetController {
 		if(bundleId){
 		   bundleInstance =  MoveBundle.findById(bundleId)
 		}else{
-		   def project = Project.findById(params.projectId)
+		   def project = Project.findById(getSession().getAttribute("CURR_PROJ").CURR_PROJ)
 		   bundleInstance = MoveBundle.findByProject(project)
 		}
     	def projectTeamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.role = '${params.role}' " )
@@ -373,7 +373,7 @@ class MoveBundleAssetController {
 											room:assetEntity.sourceRoom,
 											rack:assetEntity.sourceRack,
 											rackPosition:assetEntity.sourceRackPosition,
-											teamCode:assetEntity[sourceTeamType.get(params.role)]?.teamCode,
+											teamCode:assetEntity[sourceTeamType?.get(params.role)]?.teamCode,
 											teamId:assetEntity[sourceTeamType.get(params.role)]?.id
 											]
 			}
@@ -719,7 +719,7 @@ class MoveBundleAssetController {
 				
 				reportFields << assetEntityList
 			}
-			
+			println "==============================="+reportFields
 			render reportFields  as JSON
 	    }
 	}

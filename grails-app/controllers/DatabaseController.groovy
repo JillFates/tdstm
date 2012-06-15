@@ -35,7 +35,7 @@ class DatabaseController {
 		def filterAttributes = [tag_f_assetName:params.tag_f_assetName,tag_f_dbFormat:params.tag_f_dbFormat,tag_f_moveBundle:params.tag_f_moveBundle,tag_f_planStatus:params.tag_f_planStatus,tag_f_depUp:params.tag_f_depUp,tag_f_depDown:params.tag_f_depDown]
 		session.setAttribute('filterAttributes', filterAttributes)
 		
-		def projectId = params.projectId ? params.projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId =  getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
 		def databaseInstanceList = Database.findAllByProject(project)
 		def databaseList = new ArrayList();

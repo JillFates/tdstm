@@ -23,10 +23,7 @@ class CartTrackingController {
 	def cartTracking = {
 		def cartAction = params.cartAction
     	def moveBundleInstance
-    	def projectId = params.projectId
-    	if( !projectId ){
-    		projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-    	}
+    	def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
     	def bundleId = params.moveBundle
     	def projectInstance = Project.findById( projectId )
     	def allCartTrackingDetails = []
@@ -137,7 +134,7 @@ class CartTrackingController {
 	 * @return : return all the assets which are on Cart
 	 *---------------------------------------------------------*/
 	def getAssetsOnCart = {
-		def projectId = params.projectId
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def projectInstance = Project.findById( projectId )
 		def bundleId = params.moveBundle
 		def cart = params.cart
@@ -233,7 +230,7 @@ class CartTrackingController {
 	 *---------------------------------------------------------*/
 	def moveToOnTruck = {
 		def startTime = System.currentTimeMillis()
-		def projectId = params.projectId
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def projectInstance = Project.findById( projectId )
 		def bundleId = params.moveBundle
 		def cart = params.cart

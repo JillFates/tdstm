@@ -183,8 +183,8 @@
           </table>
         </div>
         <div class="buttons">
-          <input type="hidden"  name="project.id" value="${projectId}"/>
-          <input type="hidden"  name="projectId" value="${projectId}"/>
+          <input type="hidden"  name="project.id" value="${session.getAttribute( 'CURR_PROJ' ).CURR_PROJ}"/>
+          <input type="hidden"  name="projectId" value="${session.getAttribute( 'CURR_PROJ' ).CURR_PROJ}"/>
           <span class="button"><input class="save" type="submit" value="Create" onclick="return validateDates()"/></span>
         </div>
       </g:form>

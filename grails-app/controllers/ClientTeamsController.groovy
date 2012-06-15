@@ -31,10 +31,7 @@ class ClientTeamsController {
 		def sourceTeams = []
 		def targetTeams = []
 		userPreferenceService.loadPreferences("CURR_PROJ")
-		String projectId = params.projectId
-		if(!projectId){
-			projectId = session.getAttribute("CURR_PROJ")?.CURR_PROJ;
-		}
+		String projectId = session.getAttribute("CURR_PROJ")?.CURR_PROJ;
 		def viewMode = params.viewMode
 		if(!viewMode){
 			viewMode = session.getAttribute("TEAM_VIEW_MODE") ? session.getAttribute("TEAM_VIEW_MODE") : 'web'
@@ -166,15 +163,13 @@ class ClientTeamsController {
 			projectTeamInstance.currentLocation = "Target"
 			projectTeamInstance.save()
 		}
-		def projectId = params.projectId
-		if(!projectId){
-			projectId = session.getAttribute("CURR_PROJ")?.CURR_PROJ;
-		}
+		def projectId = session.getAttribute("CURR_PROJ")?.CURR_PROJ;
+		
 		if(viewMode != 'web'){
-			   render ( view:'home_m',model:[ projectTeam:teamName, members:teamMembers, project:Project.read(params.projectId), loc:location, 
+			   render ( view:'home_m',model:[ projectTeam:teamName, members:teamMembers, project:Project.read(projectId), loc:location, 
 						bundleId:bundleId, bundleName:bundleInstance.name, teamId: teamId, location: location ])
 		}else{
-			 return [projectTeam:teamName, members:teamMembers, project:Project.read(params.projectId), loc:location, 
+			 return [projectTeam:teamName, members:teamMembers, project:Project.read(projectId), loc:location, 
 						bundleId:bundleId, bundleName:bundleInstance.name, teamId: teamId, location: location]
 		}		
 	}
@@ -305,10 +300,10 @@ class ClientTeamsController {
         }
 		
         if (viewMode !='web'){
-            render (view:'myTasks_m', model:[ bundleId:bundleId, teamId:teamId, projectId:params.projectId, location:params.location, 
+            render (view:'myTasks_m', model:[ bundleId:bundleId, teamId:teamId, projectId:session.getAttribute("CURR_PROJ")?.CURR_PROJ, location:params.location, 
                     assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab])
 		} else{ 
-		      return[bundleId:bundleId, teamId:teamId,moveBundleInstance:moveBundleInstance, projectId:params.projectId, location:params.location, projectTeam:projectTeam,
+		      return[bundleId:bundleId, teamId:teamId,moveBundleInstance:moveBundleInstance, projectId:session.getAttribute("CURR_PROJ")?.CURR_PROJ, location:params.location, projectTeam:projectTeam,
               assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab,workflowCode:workflowCode,workflow:workflow,swimlane:swimlane]
 		}
 	}

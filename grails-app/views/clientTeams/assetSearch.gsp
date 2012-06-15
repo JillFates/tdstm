@@ -128,7 +128,6 @@
 			<input name="bundleId" type="hidden" value="${bundleId}" />
 			<input name="teamId" type="hidden" value="${teamId}" />
 			<input name="location" type="hidden" value="${location}" />
-			<input name="projectId" type="hidden" value="${projectId}" />
 			<input name="label" type="hidden" value="${label}"  />
 			<input name="actionLabel" type="hidden" value="${actionLabel}"  />
 			<input name="similarComment" id="similarComment" type="hidden" value="nosimilar"/>

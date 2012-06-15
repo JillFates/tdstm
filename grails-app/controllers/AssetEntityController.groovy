@@ -103,7 +103,7 @@ class AssetEntityController {
 	 * --------------------------------------------------------*/
 	def assetImport = {
 		//get id of selected project from project view
-		def projectId = params.projectId
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def assetsByProject
 		def projectInstance
 		def moveBundleInstanceList
@@ -151,7 +151,7 @@ class AssetEntityController {
 		render( view:"assetExport" )
 	}
 	def exportAssets = {
-		def projectId = params.projectId
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project
 		def projectInstance
 		def assetsByProject
@@ -204,7 +204,7 @@ class AssetEntityController {
 		def databaseDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Databases" )
 		def filesDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Files" )
 		try {
-			projectId = params["projectIdImport"]
+			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 			if ( projectId == null || projectId == "" ) {
 				flash.message = "Project Name is required"
 				redirect( controller:"asset", action:"assetImport" )
@@ -729,18 +729,18 @@ class AssetEntityController {
 				} else {
 					flash.message = " File uploaded successfully with ${added} records.  Please click the Manage Batches to review and post these changes."
 				}
-				redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+				redirect( action:assetImport, params:[ message:flash.message] )
 				return;
 			}
 		} catch( NumberFormatException ex ) {
 			ex.printStackTrace()
 			flash.message = ex
-			redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+			redirect( action:assetImport, params:[ message:flash.message] )
 			return;
 		} catch( Exception ex ) {
 			ex.printStackTrace()
 			flash.message = grailsApplication.metadata[ 'app.file.format' ]+ex
-			redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+			redirect( action:assetImport, params:[ message:flash.message] )
 			return;
 		}
 	}
@@ -751,7 +751,8 @@ class AssetEntityController {
 	 *------------------------------------------------------------*/
 	def export = {
 		//get project Id
-		def projectId = params[ "projectIdExport" ]
+		println "export------------------------------"+params
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def dataTransferSet = params.dataTransferSet
 		def bundle = request.getParameterValues( "bundle" )
 		def bundleList = new StringBuffer()
@@ -780,7 +781,7 @@ class AssetEntityController {
 		def project = Project.findById( projectId )
 		if ( projectId == null || projectId == "" ) {
 			flash.message = " Project Name is required. "
-			redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+			redirect( action:assetImport, params:[message:flash.message] )
 			return;
 		}
 		def asset
@@ -899,7 +900,7 @@ class AssetEntityController {
 
 			if( flag == 0 ) {
 				flash.message = " Sheet not found, Please check it."
-				redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+				redirect( action:assetImport, params:[message:flash.message] )
 				return;
 			} else {
 				def serverCol = serverSheet.getColumns()
@@ -944,7 +945,7 @@ class AssetEntityController {
 				if ( serverCheckCol == false || appCheckCol == false || dbCheckCol == false || filesCheckCol == false) {
 					missingHeader = missingHeader.replaceFirst(",","")
 					flash.message = " Column Headers : ${missingHeader} not found, Please check it."
-					redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+					redirect( action:assetImport, params:[message:flash.message] )
 					return;
 				} else {
 					//Add Title Information to master SpreadSheet
@@ -1180,7 +1181,7 @@ class AssetEntityController {
 
 			flash.message = "Exception occurred wile exporting Excel. "
 			fileEx.printStackTrace();
-			redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
+			redirect( action:assetImport, params:[ message:flash.message] )
 			return;
 		}
 	}
@@ -1215,10 +1216,7 @@ class AssetEntityController {
 	def list = {
 		def filterAttributes = [tag_f_assetName:params.tag_f_assetName,tag_f_model:params.tag_f_model,tag_f_sourceLocation:params.tag_f_sourceLocation,tag_f_sourceRack:params.tag_f_sourceRack,tag_f_targetLocation:params.tag_f_targetLocation,tag_f_targetRack:params.tag_f_targetRack,tag_f_assetType:params.tag_f_assetType,tag_f_assetType:params.tag_f_assetType,tag_f_serialNumber:params.tag_f_serialNumber,tag_f_moveBundle:params.tag_f_moveBundle,tag_f_depUp:params.tag_f_depUp,tag_f_depDown:params.tag_f_depDown,tag_s_1_application:params.tag_s_1_application,tag_s_2_assetName:params.tag_s_2_assetName,tag_s_3_model:params.tag_s_3_model,tag_s_4_sourceLocation:params.tag_s_4_sourceLocation,tag_s_5_sourceRack:params.tag_s_5_sourceRack,tag_s_6_targetLocation:params.tag_s_6_targetLocation,tag_s_7_targetRack:params.tag_s_7_targetRack,tag_s_8_assetType:params.tag_s_8_assetType,tag_s_9_assetTag:params.tag_s_9_assetTag,tag_s_10_serialNumber:params.tag_s_10_serialNumber,tag_s_11_moveBundle:params.tag_s_11_moveBundle,tag_s_12_depUp:params.tag_s_12_depUp,tag_s_13_depDown:params.tag_s_13_depDown]
 		session.setAttribute('filterAttributes', filterAttributes)
-		def projectId = params.projectId
-		if(projectId == null || projectId == ""){
-			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		}
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
 		def assetEntityInstanceList = AssetEntity.findAllByProjectAndAssetTypeNotInList( project,["Application","Database","Files"], params )
 		def assetEntityList =  new ArrayList()
@@ -1282,7 +1280,7 @@ class AssetEntityController {
 	def delete = {
 		def redirectAsset = params.dstPath
 		def assetEntityInstance = AssetEntity.get( params.id )
-		def projectId = params.projectId ? params.projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		if(assetEntityInstance) {
 			ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${assetEntityInstance.id}")
 			AssetTransition.executeUpdate("delete from AssetTransition ast where ast.assetEntity = ${assetEntityInstance.id}")
@@ -1307,28 +1305,28 @@ class AssetEntityController {
 			}
 			switch(redirectAsset){
 				case "room":
-					redirect( controller:'room',action:list, params:[projectId: projectId] )
+					redirect( controller:'room',action:list )
 					break;
 				case "rack":
-					redirect( controller:'rackLayouts',action:'create', params:[projectId: projectId] )
+					redirect( controller:'rackLayouts',action:'create' )
 					break;
 				case "console":
-					redirect( action:dashboardView, params:[projectId: projectId, showAll:'show'])
+					redirect( action:dashboardView, params:[ showAll:'show'])
 					break;
 				case "dashboardView":
-					redirect( action:dashboardView, params:[projectId: projectId, showAll:'show'])
+					redirect( action:dashboardView, params:[ showAll:'show'])
 					break;
 				case "clientConsole":
-					redirect( controller:'clientConsole', action:list, params:[projectId: projectId])
+					redirect( controller:'clientConsole', action:list)
 					break;
 				case "application":
-					redirect( controller:'application', action:list, params:[projectId: projectId])
+					redirect( controller:'application', action:list)
 					break;
 				case "database":
-					redirect( controller:'database', action:list, params:[projectId: projectId])
+					redirect( controller:'database', action:list)
 					break;
 				case "files":
-					redirect( controller:'files', action:list, params:[projectId: projectId])
+					redirect( controller:'files', action:list)
 					break;
 				case "planningConsole":
 					forward( action:'getLists', params:[entity: 'server',dependencyBundle:session.getAttribute("dependencyBundle")])
@@ -1353,7 +1351,7 @@ class AssetEntityController {
 	 *-------------------------------------------------*/
 	def remove = {
 		def assetEntityInstance = AssetEntity.get( params.id )
-		def projectId = params.projectId
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		if(assetEntityInstance) {
 			ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${params.id}")
 			ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = ${params.id}")
@@ -1365,11 +1363,11 @@ class AssetEntityController {
 			flash.message = "AssetEntity not found with id ${params.id}"
 		}
 		if ( params.clientList ){
-			redirect( controller:"clientConsole", action:"list", params:[projectId:projectId, moveBundle:params.moveBundleId] )
+			redirect( controller:"clientConsole", action:"list", params:[moveBundle:params.moveBundleId] )
 		} else if ( params.moveBundleId ){
-			redirect( action:dashboardView, params:[projectId:projectId, moveBundle : params.moveBundleId, showAll : params.showAll] )
+			redirect( action:dashboardView, params:[ moveBundle : params.moveBundleId, showAll : params.showAll] )
 		}else{
-			redirect( action:list, params:[projectId:projectId] )
+			redirect( action:list )
 		}
 	}
 	/* -------------------------------------------
@@ -1400,7 +1398,7 @@ class AssetEntityController {
 
 		def bundleId = getSession().getAttribute( "CURR_BUNDLE" )?.CURR_BUNDLE
 		def assetEntityInstance = new AssetEntity(params)
-		def projectId = params.projectId ? params.projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId =  getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def projectInstance = Project.findById( projectId )
 		assetEntityInstance.project = projectInstance
 		assetEntityInstance.owner = projectInstance.client
@@ -1429,11 +1427,11 @@ class AssetEntityController {
 			assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance)
 			flash.message = "AssetEntity ${assetEntityInstance.assetName} created"
 			if(redirectTo == "room"){
-				redirect( controller:'room',action:list, params:[projectId: projectId] )
+				redirect( controller:'room',action:list )
 			} else if(redirectTo == "rack"){
-				redirect( controller:'rackLayouts',action:'create', params:[projectId: projectId] )
+				redirect( controller:'rackLayouts',action:'create' )
 			} else {
-				redirect( action:list, params:[projectId: projectId] )
+				redirect( action:list )
 			}
 		}
 		else {
@@ -1443,9 +1441,9 @@ class AssetEntityController {
 					GormUtil.allErrorsString( assetEntityInstance )
 			log.error  etext
 			if(params.redirectTo == "room"){
-				redirect( controller:'room',action:list, params:[projectId: projectId] )
+				redirect( controller:'room',action:list )
 			} else if(params.redirectTo == "rack"){
-				redirect( controller:'rackLayouts',action:'create', params:[projectId: projectId] )
+				redirect( controller:'rackLayouts',action:'create' )
 			} else {
 				redirect( action:list, params:[projectId: projectId] )
 			}
@@ -1788,7 +1786,7 @@ class AssetEntityController {
 		def filterAttr = [tag_f_priority:params.tag_f_priority,tag_f_assetTag:params.tag_f_assetTag,tag_f_assetName:params.tag_f_assetName,tag_f_status:params.tag_f_status,tag_f_sourceTeamMt:params.tag_f_sourceTeamMt,tag_f_targetTeamMt:params.tag_f_targetTeamMt,tag_f_commentType:params.tag_f_commentType,tag_s_1_priority:params.tag_s_1_priority,tag_s_2_assetTag:params.tag_s_2_assetTag,tag_s_3_assetName:params.tag_s_3_assetName,tag_s_4_status:params.tag_s_4_status,tag_s_5_sourceTeamMt:params.tag_s_5_sourceTeamMt,tag_s_6_targetTeamMt:params.tag_s_6_targetTeamMt,tag_s_7_commentType:params.tag_s_7_commentType]
 		session.setAttribute('filterAttr', filterAttr)
 		def showAll = params.showAll
-		def projectId = params.projectId
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def bundleId = params.moveBundle
 		def currentState = params.currentState
 		def assetList
@@ -1797,7 +1795,7 @@ class AssetEntityController {
 		def totalAsset = []
 		def totalAssetsSize = 0
 		def supportTeam = new HashMap()
-		projectId = projectId ? projectId : getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		
 		def teamType = params.teamType
 		teamType = teamType ? teamType : getSession().getAttribute( "CONSOLE_TEAM_TYPE" )?.CONSOLE_TEAM_TYPE
 		if(!teamType){
@@ -2111,7 +2109,7 @@ class AssetEntityController {
 				servers:servers , applications:applications ,dbs:dbs,files:files, dependencyType:dependencyType, dependencyStatus:dependencyStatus ]
 		} else {
 			flash.message = "Please create bundle to view Console"
-			redirect(controller:'project',action:'show',params:["id":params.projectId])
+			redirect(controller:'project',action:'show')
 		}
 	}
 	/*--------------------------------------------
@@ -2488,8 +2486,7 @@ class AssetEntityController {
 		} catch(Exception ex){
 			log.error "$ex"
 		}
-		redirect(action:'dashboardView',params:[moveBundle:params.moveBundle, showAll:params.showAll,
-					projectId:params.projectId] )
+		redirect(action:'dashboardView',params:[moveBundle:params.moveBundle, showAll:params.showAll] )
 	}
 
 	/* --------------------------------------
@@ -2707,28 +2704,28 @@ class AssetEntityController {
 			}else{
 				switch(redirectTo){
 					case "room":
-						redirect( controller:'room',action:list, params:[projectId: projectId] )
+						redirect( controller:'room',action:list )
 						break;
 					case "rack":
-						redirect( controller:'rackLayouts',action:'create', params:[projectId: projectId] )
+						redirect( controller:'rackLayouts',action:'create' )
 						break;
 					case "console":
-						redirect( action:dashboardView, params:[projectId: projectId, showAll:'show',tag_f_assetName:params.tag_f_assetName,tag_f_priority:attribute.tag_f_priority,tag_f_assetTag:attribute.tag_f_assetTag,tag_f_assetName:attribute.tag_f_assetName,tag_f_status:attribute.tag_f_status,tag_f_sourceTeamMt:attribute.tag_f_sourceTeamMt,tag_f_targetTeamMt:attribute.tag_f_targetTeamMt,tag_f_commentType:attribute.tag_f_commentType,tag_s_1_priority:attribute.tag_s_1_priority,tag_s_2_assetTag:attribute.tag_s_2_assetTag,tag_s_3_assetName:attribute.tag_s_3_assetName,tag_s_4_status:attribute.tag_s_4_status,tag_s_5_sourceTeamMt:attribute.tag_s_5_sourceTeamMt,tag_s_6_targetTeamMt:attribute.tag_s_6_targetTeamMt,tag_s_7_commentType:attribute.tag_s_7_commentType])
+						redirect( action:dashboardView, params:[ showAll:'show',tag_f_assetName:params.tag_f_assetName,tag_f_priority:attribute.tag_f_priority,tag_f_assetTag:attribute.tag_f_assetTag,tag_f_assetName:attribute.tag_f_assetName,tag_f_status:attribute.tag_f_status,tag_f_sourceTeamMt:attribute.tag_f_sourceTeamMt,tag_f_targetTeamMt:attribute.tag_f_targetTeamMt,tag_f_commentType:attribute.tag_f_commentType,tag_s_1_priority:attribute.tag_s_1_priority,tag_s_2_assetTag:attribute.tag_s_2_assetTag,tag_s_3_assetName:attribute.tag_s_3_assetName,tag_s_4_status:attribute.tag_s_4_status,tag_s_5_sourceTeamMt:attribute.tag_s_5_sourceTeamMt,tag_s_6_targetTeamMt:attribute.tag_s_6_targetTeamMt,tag_s_7_commentType:attribute.tag_s_7_commentType])
 						break;
 					case "clientConsole":
-						redirect( controller:'clientConsole', action:list, params:[projectId: projectId])
+						redirect( controller:'clientConsole', action:list)
 						break;
 					case "application":
-						redirect( controller:'application', action:list, params:[projectId: projectId])
+						redirect( controller:'application', action:list)
 						break;
 					case "database":
-						redirect( controller:'database', action:list, params:[projectId: projectId])
+						redirect( controller:'database', action:list)
 						break;
 					case "files":
-						redirect( controller:'files', action:list, params:[projectId: projectId])
+						redirect( controller:'files', action:list)
 						break;
 					case "listComment":
-						forward(action:'listComment', params:[projectId: projectId])
+						forward(action:'listComment')
 						break;
 					case "planningConsole":
 				        forward(action:'getLists', params:[entity: params.tabType,labelsList:params.labels,dependencyBundle:session.getAttribute("dependencyBundle")])
@@ -2768,10 +2765,7 @@ class AssetEntityController {
 	 * Render comments list form.
 	 */
 	def listComment = {
-		def projectId = params.projectId
-		if(projectId == null || projectId == ""){
-			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		}
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
 		def assetEntityInstance = AssetEntity.findAllByProject(project)
 		def userId = session.getAttribute("LOGIN_PERSON").id
@@ -2883,10 +2877,7 @@ class AssetEntityController {
 	* Render Summary of assigned and unassgined assets.
 	*/
 	def assetSummary ={
-		def projectId = params.projectId
-		if(projectId == null || projectId == ""){
-			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		}
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
 		List moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		List assetSummaryList = []
@@ -3002,7 +2993,8 @@ class AssetEntityController {
 			   colorDiff = (232/moveEventList.size()).intValue()
 			}
 			def labelList = params.labelsList
-			labelList = labelList.replace(" ","")
+			println "labelList--------------------"+labelList
+			labelList = labelList?.replace(" ","")
 			List labels = labelList ?  labelList.split(",") : []
 			moveEventList.eachWithIndex{ event, i -> 
 				def colorCode = colorDiff * i

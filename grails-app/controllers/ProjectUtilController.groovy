@@ -30,7 +30,7 @@ class ProjectUtilController {
 				projectInstance = Project.findById( userPreference.value[0] )
 			}
 			if(projectInstance){
-				redirect( controller:"project", action:"show",id:projectInstance.id)
+				redirect( controller:"project", action:"show")
 			} else {
 				userPreferenceService.removePreference("CURR_PROJ")
 				if(params.message){

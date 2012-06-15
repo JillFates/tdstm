@@ -28,7 +28,7 @@ class NewsEditorController {
      *--------------------------------------------------------*/
 	def newsEditorList = {
 			
-    	def projectId =  params.projectId
+    	def projectId =  getSession().getAttribute('CURR_PROJ').CURR_PROJ
     	def projectInstance = Project.findById( projectId )
     	def bundleId = params.moveBundle
 		def viewFilter = params.viewFilter
@@ -139,7 +139,7 @@ class NewsEditorController {
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
         tableFacade.items = newsAndCommentsList
 		
-		return [moveBundlesList : moveBundlesList, newsAndCommentsList : newsAndCommentsList, projectId : projectId, moveEventsList : moveEventsList,
+		return [moveBundlesList : moveBundlesList, newsAndCommentsList : newsAndCommentsList,  moveEventsList : moveEventsList,
 				params : params, moveEvent : moveEvent]
     }
 	/*-------------------------------------------------------------------
@@ -225,7 +225,7 @@ class NewsEditorController {
 		
 		}
 	    
-		redirect(action:newsEditorList, params:[projectId:params.projectId, moveBundle : params.moveBundle, viewFilter:params.viewFilter])
+		redirect(action:newsEditorList, params:[moveBundle : params.moveBundle, viewFilter:params.viewFilter])
 	}
 	
 	/*---------------------------------------------------------
@@ -247,7 +247,7 @@ class NewsEditorController {
 			moveEventNewsInstance.dateArchived = GormUtil.convertInToGMT( "now", tzId )
 		}
 		moveEventNewsInstance.save(flush:true)
-		redirect(action:newsEditorList, params:[projectId:params.projectId, moveBundle : params.moveBundle, 
+		redirect(action:newsEditorList, params:[ moveBundle : params.moveBundle, 
 												viewFilter:params.viewFilter, moveEvent:params.moveEvent.id])
 	}
 	def truncate( value ){

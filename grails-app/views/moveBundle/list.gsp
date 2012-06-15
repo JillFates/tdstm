@@ -27,7 +27,7 @@ function onInvokeAction(id) {
              <jmesa:htmlTable style=" border-collapse: separate">
                  <jmesa:htmlRow highlighter="true">
                      <jmesa:htmlColumn property="name" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-						<g:link params="[projectId:projectId]" action="show" id="${moveBundle?.id}">${moveBundle?.name}</g:link>
+						<g:link  action="show" id="${moveBundle?.id}">${moveBundle?.name}</g:link>
 					 </jmesa:htmlColumn>
 					 <jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${moveBundle?.description}</jmesa:htmlColumn>
 					 <jmesa:htmlColumn property="operationalOrder" title="Order" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${moveBundle?.operationalOrder}</jmesa:htmlColumn>

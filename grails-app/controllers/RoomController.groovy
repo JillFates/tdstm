@@ -22,10 +22,7 @@ class RoomController {
     def list = {
 		def rackIds = session.getAttribute("RACK_ID")
         params.max = Math.min(params.max ? params.int('max') : 100, 100)
-		def projectId = params.projectId
-    	if(projectId == null || projectId == ""){
-        	projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-        }
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
 		def roomInstanceList = Room.findAllByProject( project, params )
 		def roomId = getSession().getAttribute( "CURR_ROOM" )?.CURR_ROOM

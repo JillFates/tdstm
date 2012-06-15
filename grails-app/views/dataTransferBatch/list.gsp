@@ -117,19 +117,19 @@
                             <td>
 	                            <g:if test="${dataTransferBatch?.statusCode == 'PENDING'}">
 	                                <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'AssetEntity'}">
-	                            	   <g:link action="serverProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
+	                            	   <g:link action="serverProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                                </g:if> 
 	                                 <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Application'}">
-	                            	   <g:link action="appProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
+	                            	   <g:link action="appProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                                 </g:if> 
 	                                 <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Database'}">
-	                            	   <g:link action="dbProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
+	                            	   <g:link action="dbProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                                 </g:if>
 	                                 <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Files'}">
-	                            	   <g:link action="fileProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
+	                            	   <g:link action="fileProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                                 </g:if> 
 	                                  <g:if test="${dataTransferBatch?.eavEntityType?.domainName == null}">
-	                            	   <g:link action="serverProcess" params="[batchId:dataTransferBatch.id, projectId:projectId]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
+	                            	   <g:link action="serverProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                                 </g:if>                     
 	                            </g:if>
 	                             <g:else>

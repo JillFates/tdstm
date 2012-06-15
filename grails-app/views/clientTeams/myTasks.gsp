@@ -41,7 +41,6 @@
 			<input name="bundleId" type="hidden" value="${bundleId}" />
 			<input name="teamId" type="hidden" value="${teamId}" />
 			<input name="location" type="hidden" value="${location}" />
-			<input name="projectId" type="hidden" value="${projectId}" />
 			<input name="tab" type="hidden" value="${tab}" />								              	
 		<div id="mydiv" onclick="this.style.display = 'none';setFocus();">						            
 			<g:if test="${flash.message}">

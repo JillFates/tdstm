@@ -69,7 +69,7 @@
     <div class="nav" style="border: 1px solid #CCCCCC; height: 11px;width: 250px; margin:9px 14px 0px">
 			<span class="menuButton"><g:link class="list" action="list">Bundle List</g:link></span>
 		    <tds:hasPermission permission='MoveBundleEditView '>
-		    	<span class="menuButton"><g:link class="create" action="create" params="[projectId:projectId]">New Bundle</g:link></span>
+		    	<span class="menuButton"><g:link class="create" action="create" >New Bundle</g:link></span>
 			</tds:hasPermission>
 		</div>
     <div class="body" style="width: 330px;">
