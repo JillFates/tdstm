@@ -83,7 +83,7 @@
 					<table style="float:left; border: 0px;">
 						<tr>
 							<td style="width: 10px;">${appDependenciesCount}</td>
-							<td style="width: 150px;">App Dependencies 
+							<td style="width: 150px;">App Dependencies <br />
 								<g:if test="${appDependenciesCount > 0 }">
 								(${100 - Math.round((pendingAppDependenciesCount/appDependenciesCount)*100)}%,&nbsp;
 								${pendingAppDependenciesCount}&nbsp; to resolve)
@@ -91,7 +91,7 @@
 						</tr>
 						<tr>
 							<td style="width: 10px;">${serverDependenciesCount}</td>
-							<td style="width: 150px;">Server Dependencies 
+							<td style="width: 150px;">Server Dependencies <br />
 								<g:if test="${serverDependenciesCount > 0 }">
 								(${100 - Math.round((pendingServerDependenciesCount/serverDependenciesCount)*100)}%,&nbsp;
 								${pendingServerDependenciesCount}&nbsp; to resolve)
@@ -107,7 +107,7 @@
 				</div>
 				<div style="float:left; margin-left: 0px; margin-top: 10px;">
 					<h4>
-						<b>App Latency Evals</b>
+						<b>App Latency Evaluations</b>
 					</h4>
 					<table style="border: 0px; margin-left: 10px;">
 						<tr>
@@ -222,11 +222,46 @@
 									${percentagevirtualAssetCount}%&nbsp;
 							</b></td>
 						</tr>
-
+						<tr>
+							<td style="color: black"><b>Databases</b></td>
+							<td style="color: red; text-align: right;""><b>
+									&nbsp;
+							</b></td>
+								<g:each in="${assetList}" var="assetCount">
+									<td style="text-align: right;"><b>
+											-
+									</b></td>
+								</g:each>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td style="color: black"><b>Files</b></td>
+							<td style="color: red; text-align: right;""><b>
+									&nbsp;
+							</b></td>
+								<g:each in="${assetList}" var="assetCount">
+									<td style="text-align: right;"><b>
+											-
+									</b></td>
+								</g:each>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td style="color: black"><b>Other</b></td>
+							<td style="color: red; text-align: right;""><b>
+									&nbsp;
+							</b></td>
+								<g:each in="${assetList}" var="assetCount">
+									<td style="text-align: right;"><b>
+											-
+									</b></td>
+								</g:each>
+							<td>&nbsp;</td>
+						</tr>
 					</tbody>
 				</table>
 			</div>
-			<div style="clear: both;float: left;margin-top: 30px; margin-left: 10px;">
+			<div style="clear: both;float: left;margin-top: 30px; margin-left: 10px; width:900px; overflow:scroll;">
 			   <g:render template="dependencyBundleDetails" />
 			</div>
 </body>

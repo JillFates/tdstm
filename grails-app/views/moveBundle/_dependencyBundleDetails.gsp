@@ -32,7 +32,7 @@
 							<td><b>Virtual Servers</b></td>
 						</tr>
 					</table>
-					</div>
+				</div>
 				</td>
 				<td style="padding: 0px;">
 					<div style="overflow-x:scroll; max-width: 1350px;">
