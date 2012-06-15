@@ -751,7 +751,6 @@ class AssetEntityController {
 	 *------------------------------------------------------------*/
 	def export = {
 		//get project Id
-		println "export------------------------------"+params
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def dataTransferSet = params.dataTransferSet
 		def bundle = request.getParameterValues( "bundle" )
@@ -2993,7 +2992,6 @@ class AssetEntityController {
 			   colorDiff = (232/moveEventList.size()).intValue()
 			}
 			def labelList = params.labelsList
-			println "labelList--------------------"+labelList
 			labelList = labelList?.replace(" ","")
 			List labels = labelList ?  labelList.split(",") : []
 			moveEventList.eachWithIndex{ event, i -> 

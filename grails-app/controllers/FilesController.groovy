@@ -201,7 +201,7 @@ class FilesController {
 						redirect( controller:'assetEntity', action:'listComment' , params:[projectId: projectId])
 						break;
 				    case "planningConsole":
-						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle")])
+						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
 						break;
 					default:
 						redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_fileFormat:filterAttr.tag_f_fileFormat,tag_f_fileSize:filterAttr.tag_f_fileSize, tag_f_moveBundle:filterAttr.tag_f_moveBundle, tag_f_planStatus:filterAttr.tag_f_planStatus, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown])
