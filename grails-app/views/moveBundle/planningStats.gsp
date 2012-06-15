@@ -4,16 +4,25 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <meta name="layout" content="projectHeader" />
 <g:javascript src="entity.crud.js" />
-<title>Planning Stats</title>
+<title>Planning Dashboard</title>
 </head>
 <body>
 	<div class="body">
 		<div>
 			<h1>Move Planning Dashboard</h1>
 			<div style="float:left;margin-top: 10px; margin-left: 5px;width:280px;">
-					<h3>
+					<h3 style="color:#63A242">
 						<b>Discovery</b>
 					</h3>
+					<table style="float:left; border: 1px; margin-left: 10px;">
+						<tr>
+							<td>${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%</td>
+							<td><g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Validated</g:link></td>
+						</tr>
+					</table>
+					<h4>
+						<b>Totals</b>
+					</h4>
 					<table style="float:left; border: 0px; margin-left: 10px;">
 						<tr>
 							<td style="width: 10px;">${applicationCount}</td>
@@ -32,7 +41,7 @@
 					<h4>
 						<b>App Validations</b>
 					</h4>
-					<table style="float:left; border: 0px; margin-left: 10px;">
+					<table style="float:left; border: 0px; margin-left: 10px; margin-top: 10px;">
 						<tr>
 							<td style="width: 10px;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ? ',['Application', project,'Discovery',true]).size()}</td>
 							<td><g:link controller="application" action="list" params="[validation:'Discovery']">Discovery</g:link></td>
@@ -53,46 +62,46 @@
 	
 			</div>
 
-			<div style="float:none;margin-top: 10px; margin-left: 5px;width:280px;">
-					<h3>
+			<div style="float:left;margin-top: 10px; margin-left: 5px;width:280px;">
+					<h3 style="color:#63A242">
 						<b>Analysis</b>
 					</h3>
-					<table style="float:left; border: 0px;">
+					<table style="float:left; border: 1px; margin-left: 10px;">
 						<tr>
-							<td>${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size())*100)}%</td>
+							<td>${Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()/applicationCount)*100)}%</td>
 							<td><g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Ready</g:link></td>
 						</tr>
 					</table>
-				<div style="float:left;">
+				<div style="float:left; margin-left: 0px; margin-top: 10px;">
 					<h4>
 						<b>Dependencies</b>
 					</h4>
 					<table style="float:left; border: 0px;">
 						<tr>
+							<td style="width: 10px;">${appDependenciesCount}</td>
 							<td style="width: 150px;text-align: right;">App Dependencies</td>
 							<td><g:if test="${appDependenciesCount > 0 }">
-									${appDependenciesCount} &nbsp;
-								${100 - Math.round((pendingAppDependenciesCount/appDependenciesCount)*100)}%&nbsp;
-								(${pendingAppDependenciesCount}&nbsp; to resolve)
+								(${100 - Math.round((pendingAppDependenciesCount/appDependenciesCount)*100)}%,&nbsp;
+								${pendingAppDependenciesCount}&nbsp; to resolve)
 								</g:if></td>
 						</tr>
 						<tr>
+							<td style="width: 10px;">${serverDependenciesCount}</td>
 							<td style="width: 150px;text-align: right;">Server Dependencies</td>
 							<td><g:if test="${serverDependenciesCount > 0 }">
-									${serverDependenciesCount} &nbsp;
-								${100 - Math.round((pendingServerDependenciesCount/serverDependenciesCount)*100)}%&nbsp;
-								(${pendingServerDependenciesCount}&nbsp; to resolve)
+								(${100 - Math.round((pendingServerDependenciesCount/serverDependenciesCount)*100)}%,&nbsp;
+								${pendingServerDependenciesCount}&nbsp; to resolve)
 								</g:if></td>
 						</tr>
 						<tr>
+							<td style="width: 10px;">${issuesCount}</td>
 							<td style="width: 150px;text-align: right;">
 							<g:link controller="assetEntity" action="listComment" params="[projectId:currProjObj?.id]">
 								Open Issues</g:link></td>
-							<td>${issuesCount}</td>
 						</tr>
 					</table>
 				</div>
-				<div style="float:left; margin-left: 0px;">
+				<div style="float:left; margin-left: 0px; margin-top: 10px;">
 					<h4>
 						<b>Latency Evals</b>
 					</h4>
@@ -103,7 +112,7 @@
 						</tr>
 						<tr>
 							<td><g:link controller="application" action="list" params="[latency:'UnKnown']">${unknownLatency}</g:link></td>
-							<td><g:link controller="application" action="list" params="[latency:'UnKnown']">UnKnown</g:link></td>
+							<td><g:link controller="application" action="list" params="[latency:'UnKnown']">Unknown</g:link></td>
 						</tr>
 						<tr>
 							<td><g:link controller="application" action="list" params="[latency:'UnLikely']">${unlikelyLatency }</g:link></td>
@@ -114,12 +123,12 @@
 				</div>
 			</div>
 			<div style="float:right;margin-top: 10px; margin-left: 5px;width:800px;">
-					<h3>
+					<h3 style="color:#63A242">
 						<b>Assignment</b>
 					</h3>
 				<table style="border: 0px; width: 700px;">
 					<thead>
-						<th style="background-color: white;">&nbsp;</th>
+						<th style="background-color: white;width:80px;">&nbsp;</th>
 						<th style="color: Blue; background-color: white;width:45px;">Unassigned</th>
 							<g:each in="${moveBundle}" var="bundle">
 								<th style="color: Blue; background-color: white;">
@@ -144,7 +153,7 @@
 							</b></td>
 						</tr>
 						<tr>
-							<td style="color: grey"><b>Optional</b></td>
+							<td style="color: grey">Optional</td>
 							<td>&nbsp;</td>
 							<g:each in="${assetList}" var="appCount">
 									<td style="color: grey">
@@ -154,7 +163,7 @@
 							<td>&nbsp;</td>
 						</tr>
 						<tr>
-							<td style="color: grey"><b>UnKnown</b></td>
+							<td style="color: grey">Unknown</td>
 							<td>&nbsp;</td>
 							<g:each in="${assetList}" var="appCount">
 									<td style="color: grey">
@@ -207,7 +216,7 @@
 					</tbody>
 				</table>
 			</div>
-			<div style="clear: both;float: left;margin-top: 40px; margin-left: 100px;">
+			<div style="clear: both;float: left;margin-top: 30px; margin-left: 10px;">
 			   <g:render template="dependencyBundleDetails" />
 			</div>
 </body>
