@@ -1224,7 +1224,12 @@ class AssetEntityController {
 		if(params.moveEvent=='unAssigned' && params.filter=='All'){
 			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','VM','Blade') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundle ")
 		}else if(params.moveEvent && params.moveEvent!='unAssigned' && params.filter=='All'){
-			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','VM','Blade')  and moveBundle in $moveBundle ")
+			def moveEvent = MoveEvent.get(params.moveEvent)
+			def moveBundles = moveEvent.moveBundles
+			def bundles = moveBundles.findAll {it.useOfPlanning == true}.id
+			String filterdBundle = bundles
+			String bundle = filterdBundle.replace("[","('").replace(",","','").replace("]","')")
+			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','VM','Blade')  and moveBundle in $bundle ")
 		}else if(params.moveEvent=='unAssigned' && params.filter=='physical'){
 			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','Blade') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundle ")
 		}else if(params.moveEvent && params.moveEvent!='unAssigned' && params.filter=='physical'){
@@ -1237,6 +1242,7 @@ class AssetEntityController {
 		}else if(params.moveEvent=='unAssigned' && params.filter=='virtual'){
 			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('VM') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundle ")
 		}else if(params.moveEvent && params.moveEvent!='unAssigned' && params.filter=='virtual'){
+		
 			def moveEvent = MoveEvent.get(params.moveEvent)
 			def moveBundles = moveEvent.moveBundles
 			def bundles = moveBundles.findAll {it.useOfPlanning == true}.id
