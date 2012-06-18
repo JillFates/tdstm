@@ -267,12 +267,13 @@ class ReportsService {
 			}
 		}
 		
-		def label = []
+		
 		
 		String labels
 		def dashBoardOk = []
 		moveBundles.each{moveBundle->
-			moveBundleStep = MoveBundleStep.findAllByMoveBundle(moveBundle)
+			def label = []
+			moveBundleStep = MoveBundleStep.findAllByMoveBundle(moveBundle,[sort:'transitionId'])
 			if(moveBundleStep.size()==0){
 				steps << [(moveBundle.name):"No steps created"]
 				eventErrorList << 'EventsBundle'
@@ -286,7 +287,8 @@ class ReportsService {
 					labels = labels.replace('[[','').replace('], [',' , ').replace(']]','')
 					steps << [(moveBundle.name):labels]
 				}
-				dashBoardOk += """<span style="color:green" ><b>DashBoard OK: </b></span>"""
+				
+				dashBoardOk += """<span style="color:green" ><b>Dashboard OK: </b></span>"""
 			}
 		}
 	  return[workFlowCodeSelected:workFlowCodeSelected,steps:steps,eventErrorList:eventErrorList,dashBoardOk:dashBoardOk]
@@ -326,7 +328,10 @@ class ReportsService {
 		def lastMoveBundleDate = moveEventInstance.moveBundles.completionTime
 		lastMoveBundleDate.sort()
 		def lastMoveBundleDateSize = lastMoveBundleDate.size()
-		def moveEventCompletiondate = lastMoveBundleDate[lastMoveBundleDateSize-1]
+		def moveEventCompletiondate
+		if(lastMoveBundleDateSize>0){
+		   moveEventCompletiondate = lastMoveBundleDate[lastMoveBundleDateSize-1]
+		}
 		def inPastError = ''
 		if(moveEventInstance.inProgress=='true'){
 			eventErrorList << 'Project'

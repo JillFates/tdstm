@@ -120,9 +120,9 @@
 
 				<td><g:if
 						test="${dashBoardOk[0]?.contains('No steps created')}">
-						<span style="color: red;"><b>DashBoard </b><br></br></span>
+						<span style="color: red;"><b>Dashboard </b><br></br></span>
 					</g:if> <g:else>
-						<span style="color: green;"><b>DashBoard OK</b><br></br></span>
+						<span style="color: green;"><b>Dashboard OK</b><br></br></span>
 					</g:else> <span> <g:each in="${steps}" var="workFlow">
 							<g:if test="${workFlow.value=='No steps created'}">
 								<span style="color: red; margin-left: 50px;">
