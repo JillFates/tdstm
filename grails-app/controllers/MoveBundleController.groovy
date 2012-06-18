@@ -482,7 +482,10 @@ class MoveBundleController {
 			def startDate = moveBundle.startTime.sort()
 			if(startDate.size()>0){
 				def formatter = new SimpleDateFormat("MMM-yy")
-				bundleStartDate << formatter.format(startDate[0]) 
+				println "startDate[0]:::::::::::::::::"+startDate[0]
+				if(startDate[0]){
+				   bundleStartDate << formatter.format(startDate[0]) 
+				}
 			}
 			def physicalAssetCount = AssetEntity.findAllByMoveBundleInListAndAssetTypeInList(moveBundle,['Server','Blade']).size()
 			def virtualAssetCount = AssetEntity.findAllByMoveBundleInListAndAssetType(moveBundle,'VM').size()

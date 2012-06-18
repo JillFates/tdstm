@@ -16,7 +16,7 @@
 					</h3>
 					<table style="margin-bottom: 10px;">
 						<tr>
-							<td><b>${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%</b></td>
+							<td><b><g:if test="${applicationCount>0}">${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%</g:if></b></td>
 							<td><g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Validated</g:link></td>
 						</tr>
 					</table>
@@ -72,7 +72,7 @@
 					</h3>
 					<table style="margin-bottom: 10px;">
 						<tr>
-							<td><b>${Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()/applicationCount)*100)}%</b></td>
+							<td><b><g:if test="${applicationCount>0}"><${Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()/applicationCount)*100)}%</g:if></b></td>
 							<td><g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Ready</g:link></td>
 						</tr>
 					</table>
