@@ -72,7 +72,7 @@
 					</h3>
 					<table style="margin-bottom: 10px;">
 						<tr>
-							<td><b><g:if test="${applicationCount>0}"><${Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()/applicationCount)*100)}%</g:if></b></td>
+							<td><b><g:if test="${applicationCount>0}">${Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()/applicationCount)*100)}%</g:if></b></td>
 							<td><g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Ready</g:link></td>
 						</tr>
 					</table>
@@ -141,7 +141,7 @@
 						<th style="background-color: white;width:80px;">&nbsp;</th>
 						<th style="color: Blue; background-color: white;width:45px;text-align: right;"><g:link controller="application" action="list" params="[moveEvent:'unAssigned']">Unassigned</g:link></th>
 							<g:each in="${moveBundle}" var="bundle">
-								<th style="color: Blue; background-color: white;text-align: right;">
+								<th style="color: Blue; background-color: white;text-align: center;">
 									<b><g:link controller="application" action="list" params="[moveEvent:bundle.id]">${bundle}</g:link></b>
 								</th>
 							</g:each>
@@ -150,8 +150,8 @@
 					    <td style="background-color: white;width:80px;">&nbsp;</td>
 					    <th style="background-color: white;width:45px;text-align: right;">&nbsp;</td>
 					    <g:each in="${bundleStartDate}" var="startdate">
-									<td style="text-align: right;font-size: 10px"><b>
-									(${startdate})
+									<td style="text-align: center;font-size: 10px"><b>
+									${startdate}
 									</b></td>
 						</g:each>
 						<td style="background-color: white;">&nbsp;</td>
