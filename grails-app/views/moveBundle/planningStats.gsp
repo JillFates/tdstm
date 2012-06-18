@@ -139,23 +139,33 @@
 				<table style="border: 0px;">
 					<thead>
 						<th style="background-color: white;width:80px;">&nbsp;</th>
-						<th style="color: Blue; background-color: white;width:45px;text-align: right;">Unassigned</th>
+						<th style="color: Blue; background-color: white;width:45px;text-align: right;"><g:link controller="application" action="list" params="[moveEvent:'unAssigned']">Unassigned</g:link></th>
 							<g:each in="${moveBundle}" var="bundle">
 								<th style="color: Blue; background-color: white;text-align: right;">
-									<b>${bundle}</b>
+									<b><g:link controller="application" action="list" params="[moveEvent:bundle.id]">${bundle}</g:link></b>
 								</th>
 							</g:each>
 						<th style="background-color: white;">&nbsp;</th>
+						<tr>
+					    <td style="background-color: white;width:80px;">&nbsp;</td>
+					    <th style="background-color: white;width:45px;text-align: right;">&nbsp;</td>
+					    <g:each in="${bundleStartDate}" var="startdate">
+									<td style="text-align: right;font-size: 10px"><b>
+									(${startdate})
+									</b></td>
+						</g:each>
+						<td style="background-color: white;">&nbsp;</td>
+					    </tr>
 					</thead>
 					<tbody>
 						<tr>
 							<td style="color: black"><b>Apps</b></td>
 							<td style="color: red;text-align: right;"><b>
-									${unassignedAppCount}
+									<g:link controller="application" action="list" params="[moveEvent:'unAssigned']">${unassignedAppCount}</g:link>
 							</b></td>
 							<g:each in="${appList}" var="appCount">
 									<td style="text-align: right;"><b>
-											${appCount.count}
+											<g:link controller="application" action="list" params="[moveEvent:appCount.moveEvent]">${appCount.count}</g:link>
 									</b></td>
 								</g:each>
 							<td><b>
@@ -185,11 +195,11 @@
 						<tr>
 							<td style="color: black"><b>Servers</b></td>
 							<td style="color: red; text-align: right;""><b>
-									${unassignedAssetCount}
+									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'All']">${unassignedAssetCount}</g:link>
 							</b></td>
 								<g:each in="${assetList}" var="assetCount">
 									<td style="text-align: right;"><b>
-											${assetCount.count}
+										<g:link controller="assetEntity" action="list" params="[moveEvent:assetCount.moveEvent,filter:'All']">	${assetCount.count}</g:link>
 									</b></td>
 								</g:each>
 							<td>&nbsp;</td>
@@ -197,11 +207,11 @@
 						<tr>
 							<td style="color: black">Physical</td>
 							<td style="color: red;text-align: right;""><b>
-									${unassignedPhysialAssetCount}
+									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'physical']">${unassignedPhysialAssetCount}</g:link>
 							</b></td>
 								<g:each in="${assetList}" var="assetCount">
 									<td style="text-align: right;"><b>
-											${assetCount.physicalCount}
+											<g:link controller="assetEntity" action="list" params="[moveEvent:assetCount.moveEvent,filter:'physical']">${assetCount.physicalCount}</g:link>
 									</b></td>
 								</g:each>
 							<td><b>
@@ -211,11 +221,11 @@
 						<tr>
 							<td style="color: black">Virtual</td>
 							<td style="color: red;text-align: right;""><b>
-									${unassignedVirtualAssetCount}
+									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'virtual']">${unassignedVirtualAssetCount}</g:link>
 							</b></td>
 								<g:each in="${assetList}" var="assetCount">
 									<td style="text-align: right;"><b>
-											${assetCount.virtualAssetCount}
+										<g:link controller="assetEntity" action="list" params="[moveEvent:assetCount.moveEvent,filter:'virtual']">	${assetCount.virtualAssetCount}</g:link>
 									</b></td>
 								</g:each>
 							<td><b>

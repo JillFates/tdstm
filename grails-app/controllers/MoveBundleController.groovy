@@ -455,6 +455,7 @@ class MoveBundleController {
 		def project = Project.get(projectId)
 		def appList = []
 		def assetList = []
+		def bundleStartDate = []
 		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
 	    Set uniqueMoveEventList = moveBundleList.moveEvent
 		
@@ -477,10 +478,15 @@ class MoveBundleController {
 			def appLists = AssetEntity.findAllByMoveBundleInListAndAssetType(moveBundle,"Application").id
 			String applicationList = appLists
 			applicationList = applicationList.replace("[","('").replace(",","','").replace("]","')")
-			appList << ['count':assignedApplicationCount]
-			def physicalAssetCount = AssetEntity.findAllByMoveBundleInListAndAssetType(moveBundle,'Server').size()
+			appList << ['count':assignedApplicationCount , 'moveEvent':moveEvent.id]
+			def startDate = moveBundle.startTime.sort()
+			if(startDate.size()>0){
+				def formatter = new SimpleDateFormat("MMM-yy")
+				bundleStartDate << formatter.format(startDate[0]) 
+			}
+			def physicalAssetCount = AssetEntity.findAllByMoveBundleInListAndAssetTypeInList(moveBundle,['Server','Blade']).size()
 			def virtualAssetCount = AssetEntity.findAllByMoveBundleInListAndAssetType(moveBundle,'VM').size()
-			def count = AssetEntity.findAllByMoveBundleInListAndAssetTypeInList(moveBundle,['Server', 'VM'],params).size()
+			def count = AssetEntity.findAllByMoveBundleInListAndAssetTypeInList(moveBundle,['Server', 'VM', 'Blade'],params).size()
 			def potential = 0
 			def optional = 0
 			String moveBundleId =  moveBundle.id
@@ -496,7 +502,7 @@ class MoveBundleController {
 				potential = Application.findAll("from AppMoveEvent am right join am.application a where a.moveBundle.useOfPlanning = true and a.project=$projectId and (a.moveBundle.moveEvent != ${moveEvent.id} or a.moveBundle.moveEvent is null) and (am.moveEvent = ${moveEvent.id} or am.moveEvent is null) and (am.value = '?' or am.value is null or am.value = '') and (a.planStatus is null or a.planStatus in ('Unassigned',''))").size()
 				optional = Application.findAll("from AppMoveEvent am right join am.application a where a.moveBundle.useOfPlanning = true  and a.project=$projectId and (a.moveBundle.moveEvent != ${moveEvent.id} or a.moveBundle.moveEvent is null) and (am.moveEvent = ${moveEvent.id} or am.moveEvent is null) and am.value = 'Y' and (a.planStatus is null or a.planStatus in ('Unassigned',''))").size()
 			}
-			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,'potential':potential,'optional':optional]
+			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,'potential':potential,'optional':optional,'moveEvent':moveEvent.id]
 		}
 		String moveBundle = moveBundleList.id
 		moveBundle = moveBundle.replace("[","('").replace(",","','").replace("]","')")
@@ -510,11 +516,11 @@ class MoveBundleController {
 		}
 		String moveBundles = moveBundleList.id
 		moveBundles = moveBundles.replace("[","('").replace(",","','").replace("]","')")
-		def unassignedAssetCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','VM') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundles ").size()
-		def unassignedPhysialAssetCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType='Server' and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundles ").size()
+		def unassignedAssetCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','VM','Blade') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundles ").size()
+		def unassignedPhysialAssetCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','Blade') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundles ").size()
 		def unassignedVirtualAssetCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType='VM' and (planStatus is null or planStatus in ('Unassigned',''))  and moveBundle in $moveBundles ").size()
 
-		def assignedPhysicalAsset = moveBundleList ? AssetEntity.countByAssetTypeAndMoveBundleInList('Server',moveBundleList) : 0
+		def assignedPhysicalAsset = moveBundleList ? AssetEntity.countByAssetTypeInListAndMoveBundleInList(['Server','Blade'],moveBundleList) : 0
 		def assignedVirtualAsset = moveBundleList ? AssetEntity.countByAssetTypeAndMoveBundleInList('VM',moveBundleList) : 0
 		def totalPhysicalAssetCount = assignedPhysicalAsset + unassignedPhysialAssetCount ;
 		def totalVirtualAssetCount = assignedVirtualAsset + unassignedVirtualAssetCount ;
@@ -535,7 +541,7 @@ class MoveBundleController {
 		}else if(unassignedVirtualAssetCount==0){
 			percentagevirtualAssetCount = 100;
 		}
-		def physicalCount=AssetEntity.findAllByAssetTypeAndMoveBundleInList('Server',moveBundleList).size()
+		def physicalCount=AssetEntity.findAllByAssetTypeInListAndMoveBundleInList(['Server','Blade'],moveBundleList).size()
 		def	virtualCount=AssetEntity.findAllByAssetTypeAndMoveBundleInList('VM',moveBundleList).size()
 		def likelyLatencyCount=0;
 		def unlikelyLatencyCount=0;
@@ -563,7 +569,7 @@ class MoveBundleController {
 		assetDependencyList.each{dependencyBundle->
 			def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundleAndProject(dependencyBundle.dependencyBundle,project)
 			def appCount = assetDependentlist.findAll{it.asset.assetType == 'Application'}.size()
-			def serverCount = assetDependentlist.findAll{it.asset.assetType == 'Server'}.size()
+			def serverCount = assetDependentlist.findAll{it.asset.assetType == 'Server' || it.asset.assetType == 'Blade' }.size()
 			def vmCount = assetDependentlist.findAll{it.asset.assetType == 'VM'}.size()
 			planningConsoleList << ['dependencyBundle':dependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
 		}
@@ -574,7 +580,6 @@ class MoveBundleController {
 		
 		def depBundleIDCountSQL = "select count(distinct dependency_bundle) from asset_dependency_bundle where project_id = $projectId"
         def dependencyBundleCount = jdbcTemplate.queryForInt(depBundleIDCountSQL)		
-		
 		return [moveBundleList:moveBundleList, applicationCount:applicationCount,appList:appList,unassignedAppCount:unassignedAppCount,
 			percentageAppCount:percentageAppCount,assetCount:assetCount,assetList:assetList,unassignedPhysialAssetCount:unassignedPhysialAssetCount,
 			unassignedVirtualAssetCount:unassignedVirtualAssetCount,percentagePhysicalAssetCount:percentagePhysicalAssetCount,
@@ -582,7 +587,7 @@ class MoveBundleController {
 			appDependenciesCount:appDependenciesCount,serverDependenciesCount:serverDependenciesCount, pendingAppDependenciesCount:pendingAppDependenciesCount,
 			pendingServerDependenciesCount:pendingServerDependenciesCount, issuesCount : issues.size(),likelyLatencyCount:likelyLatencyCount,unlikelyLatencyCount:unlikelyLatencyCount,
 			unknownLatencyCount:unknownLatencyCount,unassignedAssetCount:unassignedAssetCount,project:project,planningConsoleList:planningConsoleList,date:time,moveBundle:moveEventList,likelyLatency:likelyLatency,
-			unlikelyLatency:unlikelyLatency,unknownLatency:unknownLatency,dependencyBundleCount:dependencyBundleCount,uniqueMoveEventList:uniqueMoveEventList,planningDashboard:'planningDashboard']
+			unlikelyLatency:unlikelyLatency,unknownLatency:unknownLatency,dependencyBundleCount:dependencyBundleCount,uniqueMoveEventList:uniqueMoveEventList,planningDashboard:'planningDashboard',bundleStartDate:bundleStartDate]
 	}
 	
 	/**

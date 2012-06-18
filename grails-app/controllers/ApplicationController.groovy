@@ -40,10 +40,11 @@ class ApplicationController {
 	def  list ={
 		def filterAttributes = [tag_f_assetName:params.tag_f_assetName,tag_f_appOwner:params.tag_f_appOwner,tag_f_appSme:params.tag_f_appSme,tag_f_planStatus:params.tag_f_planStatus,tag_f_depUp:params.tag_f_depUp,tag_f_depDown:params.tag_f_depDown]
 		session.setAttribute('filterAttributes', filterAttributes)
-		
 		def projectId =  getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
 		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+		String moveBundle = moveBundleList.id
+		moveBundle = moveBundle.replace("[","('").replace(",","','").replace("]","')")
 		def workFlow = project.workflowCode
 		def appEntityList
 		if(params.validation=='Discovery'){
@@ -60,7 +61,15 @@ class ApplicationController {
 			appEntityList= Application.findAllByLatencyAndMoveBundleInList(null,moveBundleList)
 		}else if(params.latency=='UnLikely'){
 			appEntityList= Application.findAllByLatencyAndMoveBundleInList('Y',moveBundleList)
-		}else{
+		}else if(params.moveEvent=='unAssigned'){
+		    appEntityList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType=? and moveBundle in $moveBundle and (planStatus is null or planStatus in ('Unassigned',''))",['Application'])
+		}else if(params.moveEvent && params.moveEvent!='unAssigned'){
+		    def moveEvent = MoveEvent.get(params.moveEvent)
+			def moveBundles = moveEvent.moveBundles
+			def bundles = moveBundles.findAll {it.useOfPlanning == true}
+		    appEntityList= AssetEntity.findAllByMoveBundleInListAndAssetType(bundles,"Application")
+		}
+		else{
 		    appEntityList = Application.findAllByProject(project)
 		}
 		def appBeanList = new ArrayList()
