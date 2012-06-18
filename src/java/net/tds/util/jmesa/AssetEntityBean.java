@@ -38,9 +38,18 @@ public class AssetEntityBean implements Serializable {
 	private String targetLocation;
 	private String targetRack;
 	private String serialNumber;
+	private String validation;
 	
 	private Integer  dependencyBundleNumber;
 
+
+	public String getValidation() {
+		return validation;
+	}
+
+	public void setValidation(String validation) {
+		this.validation = validation;
+	}
 
 	public AssetEntityBean() {
 

@@ -85,11 +85,11 @@ $(document).ready(function() {
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
 						<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.dbFormat}</a>
 					</jmesa:htmlColumn>
-					<jmesa:htmlColumn property="moveBundle" title="Bundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.moveBundle}</span>
-					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="planStatus" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 						<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.planStatus}</span>
+					</jmesa:htmlColumn>
+					<jmesa:htmlColumn property="moveBundle" title="Bundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+						<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.moveBundle}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="dependencyBundleNumber" title="Dep #" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 						<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.dependencyBundleNumber}</span>

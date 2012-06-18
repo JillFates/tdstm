@@ -1232,6 +1232,7 @@ class AssetEntityController {
 			assetBeanInstance.setTargetRack(assetEntity.rackTarget?.tag)
 			assetBeanInstance.setMoveBundle(assetEntity.moveBundle?.name)
 			assetBeanInstance.setSerialNumber(assetEntity.serialNumber)
+			assetBeanInstance.setplanStatus(assetEntity.planStatus)
 			assetBeanInstance.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
 			assetBeanInstance.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))
 			assetBeanInstance.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle)
