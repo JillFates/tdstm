@@ -1224,7 +1224,7 @@ class AssetEntityController {
 		if(params.moveEvent=='unAssigned' && params.filter=='All'){
 			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','VM','Blade') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundle ")
 		}else if(params.moveEvent && params.moveEvent!='unAssigned' && params.filter=='All'){
-			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','VM','Blade')  and moveBundle in $bundle ")
+			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','VM','Blade')  and moveBundle in $moveBundle ")
 		}else if(params.moveEvent=='unAssigned' && params.filter=='physical'){
 			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','Blade') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundle ")
 		}else if(params.moveEvent && params.moveEvent!='unAssigned' && params.filter=='physical'){
