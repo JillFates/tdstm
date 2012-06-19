@@ -10,14 +10,22 @@
 	<div class="body">
 		<div>
 			<h1>Move Planning Dashboard</h1>
-			<div style="float:left;margin-top: 10px; margin-left: 5px;width:280px;">
+			<div style="float:left;margin-top: 10px; margin-left: 5px;width:250px;">
 					<h3 style="color:#63A242">
 						<b>Discovery</b>
 					</h3>
 					<table style="margin-bottom: 10px;">
 						<tr>
-							<td><b><g:if test="${applicationCount>0}">${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%</g:if></b></td>
-							<td><g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Validated</g:link></td>
+							<td style="padding:0px;">
+							<g:if test="${applicationCount>0}">
+								<div style="background-color:#86DA5A; z-index:-1; width: ${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%"></div>
+								<div style="position:relative; top:-24px;"><b>${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%</b>
+							</g:if><g:else>
+								<div style="position:relative; top:0px;"><b>0%</b>
+							</g:else>
+							<g:link controller="application" action="list" params="[validation:'Discovery']">Applications Validated</g:link>
+								</div>
+							</td>
 						</tr>
 					</table>
 					<h4>
@@ -66,14 +74,22 @@
 	
 			</div>
 
-			<div style="float:left;margin-top: 10px; margin-left: 5px;width:280px;">
+			<div style="float:left;margin-top: 10px; margin-left: 5px;width:250px;">
 					<h3 style="color:#63A242">
 						<b>Analysis</b>
 					</h3>
 					<table style="margin-bottom: 10px;">
 						<tr>
-							<td><b><g:if test="${applicationCount>0}">${Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()/applicationCount)*100)}%</g:if></b></td>
-							<td><g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Ready</g:link></td>
+							<td style="padding:0px;">
+							<g:if test="${applicationCount>0}">
+								<div style="background-color:#86DA5A; z-index:-1; width: ${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%"></div>
+								<div style="position:relative; top:-24px;"><b>${Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()/applicationCount)*100)}%</b>
+							</g:if><g:else>
+								<div style="position:relative; top:0px;"><b>0%</b>
+							</g:else>
+							<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Ready</g:link>
+								</div>
+							</td>
 						</tr>
 					</table>
 				<div style="float:left; margin-left: 0px; margin-top: 10px;">
@@ -132,8 +148,12 @@
 					</h3>
 					<table style="margin-bottom: 10px;">
 						<tr>
-							<td><b>${percentageAppCount}%</b></td>
-							<td><g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Assigned</g:link></td>
+							<td style="padding:0px;">
+								<div style="background-color:#86DA5A; z-index:-1; width: ${percentageAppCount}%"></div>
+								<div style="position:relative; top:-24px;"><b>${percentageAppCount}%</b>
+							<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Assigned</g:link>
+								</div>
+							</td>
 						</tr>
 					</table>
 				<table style="border: 0px;">
