@@ -48,29 +48,52 @@ class ApplicationController {
 		def workFlow = project.workflowCode
 		def appEntityList
 		if(params.validation=='Discovery'){
-			appEntityList = Application.findAllByValidationAndProject('Discovery',project)
+			
+			appEntityList = AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ? ',['Application', project,'Discovery',true])
+			
 	    }else if(params.validation=='DependencyReview'){
-		    appEntityList = Application.findAllByValidationAndProject('DependencyReview',project)
+		
+		    appEntityList = AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyReview',true])
+			
 		}else if(params.validation=='DependencyScan'){
-			appEntityList = Application.findAllByValidationAndProject('DependencyScan',project)
+		
+			appEntityList = AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyScan',true])
+			
 		}else if(params.validation=='BundleReady'){
-			appEntityList = Application.findAllByValidationAndProject('BundleReady',project)
+		
+			appEntityList = AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true])
+			
 		}else if(params.latency=='likely'){
+		
 			appEntityList= Application.findAllByLatencyAndMoveBundleInList('N',moveBundleList)
+			
 		}else if(params.latency=='UnKnown'){
+		
 			appEntityList= Application.findAllByLatencyAndMoveBundleInList(null,moveBundleList)
+			
 		}else if(params.latency=='UnLikely'){
+		
 			appEntityList= Application.findAllByLatencyAndMoveBundleInList('Y',moveBundleList)
+			
 		}else if(params.moveEvent=='unAssigned'){
+		
 		    appEntityList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType=? and moveBundle in $moveBundle and (planStatus is null or planStatus in ('Unassigned',''))",['Application'])
+			
 		}else if(params.moveEvent && params.moveEvent!='unAssigned'){
+		
 		    def moveEvent = MoveEvent.get(params.moveEvent)
 			def moveBundles = moveEvent.moveBundles
 			def bundles = moveBundles.findAll {it.useOfPlanning == true}
 		    appEntityList= AssetEntity.findAllByMoveBundleInListAndAssetType(bundles,"Application")
-		}
-		else{
+			
+		}else if(params.filter=='applicationCount'){
+		
+		    appEntityList = AssetEntity.findAllByMoveBundleInListAndAssetTypeInList(moveBundleList,['Application'])
+			
+		}else{
+		
 		    appEntityList = Application.findAllByProject(project)
+			
 		}
 		def appBeanList = new ArrayList()
 		appEntityList.each { appEntity->

@@ -469,8 +469,14 @@ class MoveBundleController {
 			'Database',
 			'Files'
 		],params).size()
+		def databaseCount=AssetEntity.findAllByAssetTypeAndMoveBundleInList('Database',moveBundleList).size()
+		def fileCount=AssetEntity.findAllByAssetTypeAndMoveBundleInList('Files',moveBundleList).size()
+		def otherAssetCount=AssetEntity.findAllByAssetTypeNotInListAndMoveBundleInList(['Server','VM','Blade','Application','Files','Database'],moveBundleList).size()
 		def assignedAssetCount
 		def assignedApplicationCount
+        def dbList = []
+		def filesList = []
+		def otherTypeList = []
 		moveEventList.each{ moveEvent->
 			def moveBundles = moveEvent?.moveBundles
 			def moveBundle = moveBundles.findAll {it.useOfPlanning == true}
@@ -482,7 +488,6 @@ class MoveBundleController {
 			def startDate = moveBundle.startTime.sort()
 			if(startDate.size()>0){
 				def formatter = new SimpleDateFormat("MMM-yy")
-				println "startDate[0]:::::::::::::::::"+startDate[0]
 				if(startDate[0]){
 				   bundleStartDate << formatter.format(startDate[0]) 
 				}
@@ -506,6 +511,12 @@ class MoveBundleController {
 				optional = Application.findAll("from AppMoveEvent am right join am.application a where a.moveBundle.useOfPlanning = true  and a.project=$projectId and (a.moveBundle.moveEvent != ${moveEvent.id} or a.moveBundle.moveEvent is null) and (am.moveEvent = ${moveEvent.id} or am.moveEvent is null) and am.value = 'Y' and (a.planStatus is null or a.planStatus in ('Unassigned',''))").size()
 			}
 			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,'potential':potential,'optional':optional,'moveEvent':moveEvent.id]
+			def dbCount = AssetEntity.findAllByMoveBundleInListAndAssetType(moveBundle,'Database').size()
+			dbList << ['moveEvent':moveEvent.id , 'count':dbCount]
+			def filesCount = AssetEntity.findAllByMoveBundleInListAndAssetType(moveBundle,'Files').size()
+			filesList << ['moveEvent':moveEvent.id , 'count':filesCount]
+			def otherCount = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(moveBundle,['Server','VM','Blade','Application','Files','Database']).size()
+			otherTypeList << ['moveEvent':moveEvent.id , 'count':otherCount]
 		}
 		String moveBundle = moveBundleList.id
 		moveBundle = moveBundle.replace("[","('").replace(",","','").replace("]","')")
@@ -522,6 +533,9 @@ class MoveBundleController {
 		def unassignedAssetCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','VM','Blade') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundles ").size()
 		def unassignedPhysialAssetCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','Blade') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundles ").size()
 		def unassignedVirtualAssetCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType='VM' and (planStatus is null or planStatus in ('Unassigned',''))  and moveBundle in $moveBundles ").size()
+		def unassignedDbCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType ='Database' and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundles ").size()
+		def unassignedFilesCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType ='Files' and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundles ").size()
+		def unassignedOtherCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType not in ('Server','VM','Blade','Application','Database','Files') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundles ").size()
 
 		def assignedPhysicalAsset = moveBundleList ? AssetEntity.countByAssetTypeInListAndMoveBundleInList(['Server','Blade'],moveBundleList) : 0
 		def assignedVirtualAsset = moveBundleList ? AssetEntity.countByAssetTypeAndMoveBundleInList('VM',moveBundleList) : 0
@@ -544,6 +558,31 @@ class MoveBundleController {
 		}else if(unassignedVirtualAssetCount==0){
 			percentagevirtualAssetCount = 100;
 		}
+		
+		int percentageDBCount = 0 ;
+		def totalAssignedDB = databaseCount - unassignedDbCount ;
+		if(databaseCount > 0){
+			percentageDBCount = Math.round((totalAssignedDB/databaseCount)*100)
+		}else{
+			percentageDBCount = 100;
+		}
+		
+		int percentageFilesCount = 0 ;
+		def totalAssignedFiles = fileCount - unassignedFilesCount ;
+		if(fileCount > 0){
+			percentageFilesCount = Math.round((totalAssignedFiles/fileCount)*100)
+		}else{
+			percentageFilesCount = 100;
+		}
+		
+		int percentageOtherCount = 0 ;
+		def totalAssignedOthers = otherAssetCount - unassignedOtherCount ;
+		if(otherAssetCount > 0){
+			percentageOtherCount = Math.round((totalAssignedOthers/otherAssetCount)*100)
+		}else{
+			percentageOtherCount = 100;
+		}
+		
 		def physicalCount=AssetEntity.findAllByAssetTypeInListAndMoveBundleInList(['Server','Blade'],moveBundleList).size()
 		def	virtualCount=AssetEntity.findAllByAssetTypeAndMoveBundleInList('VM',moveBundleList).size()
 		def likelyLatencyCount=0;
@@ -590,7 +629,9 @@ class MoveBundleController {
 			appDependenciesCount:appDependenciesCount,serverDependenciesCount:serverDependenciesCount, pendingAppDependenciesCount:pendingAppDependenciesCount,
 			pendingServerDependenciesCount:pendingServerDependenciesCount, issuesCount : issues.size(),likelyLatencyCount:likelyLatencyCount,unlikelyLatencyCount:unlikelyLatencyCount,
 			unknownLatencyCount:unknownLatencyCount,unassignedAssetCount:unassignedAssetCount,project:project,planningConsoleList:planningConsoleList,date:time,moveBundle:moveEventList,likelyLatency:likelyLatency,
-			unlikelyLatency:unlikelyLatency,unknownLatency:unknownLatency,dependencyBundleCount:dependencyBundleCount,uniqueMoveEventList:uniqueMoveEventList,planningDashboard:'planningDashboard',bundleStartDate:bundleStartDate]
+			unlikelyLatency:unlikelyLatency,unknownLatency:unknownLatency,dependencyBundleCount:dependencyBundleCount,uniqueMoveEventList:uniqueMoveEventList,planningDashboard:'planningDashboard',bundleStartDate:bundleStartDate,
+			unassignedDbCount:unassignedDbCount,unassignedFilesCount:unassignedFilesCount,unassignedOtherCount:unassignedOtherCount,dbList:dbList,filesList:filesList,otherTypeList:otherTypeList,percentageOtherCount:percentageOtherCount,
+			percentageDBCount:percentageDBCount,percentageFilesCount:percentageFilesCount]
 	}
 	
 	/**

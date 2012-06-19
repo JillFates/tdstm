@@ -31,7 +31,20 @@ class FilesController {
 		session.setAttribute('filterAttributes', filterAttributes)
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
-		def fileInstanceList = Files.findAllByProject(project)
+		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+		String moveBundle = moveBundleList.id
+		moveBundle = moveBundle.replace("[","('").replace(",","','").replace("]","')")
+		def fileInstanceList
+		if(params.moveEvent=='unAssigned'){
+			fileInstanceList = Files.findAll("from Files where project = $projectId and assetType=? and moveBundle in $moveBundle and (planStatus is null or planStatus in ('Unassigned',''))",['Files'])
+		}else if(params.moveEvent && params.moveEvent!='unAssigned' ){
+			def moveEvent = MoveEvent.get(params.moveEvent)
+			def moveBundles = moveEvent.moveBundles
+			def bundles = moveBundles.findAll {it.useOfPlanning == true}
+			fileInstanceList= Files.findAllByMoveBundleInListAndAssetType(bundles,"Files")
+		}else{
+			fileInstanceList = Files.findAllByProject(project)
+		}
 		def filesList = new ArrayList();
 		fileInstanceList.each {fileentity ->
 			def assetEntity = AssetEntity.get(fileentity.id)

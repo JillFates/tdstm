@@ -37,7 +37,20 @@ class DatabaseController {
 		
 		def projectId =  getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
-		def databaseInstanceList = Database.findAllByProject(project)
+		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+		String moveBundle = moveBundleList.id
+		moveBundle = moveBundle.replace("[","('").replace(",","','").replace("]","')")
+		def databaseInstanceList
+		if(params.moveEvent=='unAssigned'){
+		    databaseInstanceList = Database.findAll("from Database where project = $projectId and assetType=? and moveBundle in $moveBundle and (planStatus is null or planStatus in ('Unassigned',''))",['Database'])
+		}else if(params.moveEvent && params.moveEvent!='unAssigned' ){
+			def moveEvent = MoveEvent.get(params.moveEvent)
+			def moveBundles = moveEvent.moveBundles
+			def bundles = moveBundles.findAll {it.useOfPlanning == true}
+			databaseInstanceList= Database.findAllByMoveBundleInListAndAssetType(bundles,"Database")
+		}else{
+			databaseInstanceList = Database.findAllByProject(project)
+		}
 		def databaseList = new ArrayList();
 		databaseInstanceList.each {dataBaseentity ->
 			def assetEntity = AssetEntity.get(dataBaseentity.id)

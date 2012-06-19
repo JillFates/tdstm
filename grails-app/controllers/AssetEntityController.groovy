@@ -1220,36 +1220,60 @@ class AssetEntityController {
 		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
 		String moveBundle = moveBundleList.id
 		moveBundle = moveBundle.replace("[","('").replace(",","','").replace("]","')")
+		String bundle
+		def bundledAsset
+		if(params.moveEvent && params.moveEvent!='unAssigned'){
+			def moveEvent = MoveEvent.get(params.moveEvent)
+			def moveBundles = moveEvent.moveBundles
+		    def  bundles = moveBundles.findAll {it.useOfPlanning == true}.id
+			bundledAsset = moveBundles.findAll {it.useOfPlanning == true}
+			String filterdBundle = bundles
+			bundle = filterdBundle.replace("[","('").replace(",","','").replace("]","')")
+		}
 		def assetEntityInstanceList
+		
 		if(params.moveEvent=='unAssigned' && params.filter=='All'){
+			
 			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','VM','Blade') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundle ")
+			
 		}else if(params.moveEvent && params.moveEvent!='unAssigned' && params.filter=='All'){
-			def moveEvent = MoveEvent.get(params.moveEvent)
-			def moveBundles = moveEvent.moveBundles
-			def bundles = moveBundles.findAll {it.useOfPlanning == true}.id
-			String filterdBundle = bundles
-			String bundle = filterdBundle.replace("[","('").replace(",","','").replace("]","')")
+		
 			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','VM','Blade')  and moveBundle in $bundle ")
+			
 		}else if(params.moveEvent=='unAssigned' && params.filter=='physical'){
+		
 			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','Blade') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundle ")
+			
 		}else if(params.moveEvent && params.moveEvent!='unAssigned' && params.filter=='physical'){
-			def moveEvent = MoveEvent.get(params.moveEvent)
-			def moveBundles = moveEvent.moveBundles
-			def bundles = moveBundles.findAll {it.useOfPlanning == true}.id
-			String filterdBundle = bundles
-			String bundle = filterdBundle.replace("[","('").replace(",","','").replace("]","')")
+		
 			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','Blade')  and moveBundle in $bundle ")
+			
 		}else if(params.moveEvent=='unAssigned' && params.filter=='virtual'){
+		
 			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('VM') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundle ")
+			
 		}else if(params.moveEvent && params.moveEvent!='unAssigned' && params.filter=='virtual'){
 		
-			def moveEvent = MoveEvent.get(params.moveEvent)
-			def moveBundles = moveEvent.moveBundles
-			def bundles = moveBundles.findAll {it.useOfPlanning == true}.id
-			String filterdBundle = bundles
-			String bundle = filterdBundle.replace("[","('").replace(",","','").replace("]","')")
 			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('VM')  and moveBundle in $bundle ")
-		}else{
+			
+		}else if(params.moveEvent=='unAssigned' && params.filter=='other'){
+		
+		    assetEntityInstanceList =AssetEntity.findAll("from AssetEntity where project = $projectId and assetType not in ('Server','VM','Blade','Application','Database','Files') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundle ")
+		
+		}else if(params.moveEvent && params.moveEvent!='unAssigned' && params.filter=='other'){
+		
+		    assetEntityInstanceList =AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(bundledAsset,['Server','VM','Blade','Application','Files','Database'])
+		 
+		}else if(params.filter=='physicalServer'){
+		
+		    assetEntityInstanceList = AssetEntity.findAllByMoveBundleInListAndAssetTypeInList(moveBundleList,['Server','Blade'])
+			
+		}else if(params.filter=='virtual'){
+		
+		    assetEntityInstanceList = AssetEntity.findAllByMoveBundleInListAndAssetTypeInList(moveBundleList,['VM'])
+			
+		} else{
+		
 		    assetEntityInstanceList = AssetEntity.findAllByProjectAndAssetTypeNotInList( project,["Application","Database","Files"], params )
 		}
 		def assetEntityList =  new ArrayList()
