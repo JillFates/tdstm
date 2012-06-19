@@ -486,8 +486,9 @@ class MoveBundleController {
 			applicationList = applicationList.replace("[","('").replace(",","','").replace("]","')")
 			appList << ['count':assignedApplicationCount , 'moveEvent':moveEvent.id]
 			def startDate = moveBundle.startTime.sort()
+			startDate?.removeAll([null])
 			if(startDate.size()>0){
-				def formatter = new SimpleDateFormat("MMM-yy")
+				def formatter = new SimpleDateFormat("dd-MMM")
 				if(startDate[0]){
 				   bundleStartDate << formatter.format(startDate[0]) 
 				}
