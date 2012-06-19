@@ -89,33 +89,39 @@
 	<table id="showCommentTable" style="border: 0px;">
 		<tr>
 			<td valign="top" class="name"><label for="dateCreated">Created At:</label></td>
-			<td valign="top" class="value" id="dateCreatedId" ></td>
+			<td valign="top" class="value" id="dateCreatedId" style="width:20px;" ></td>
 		</tr>
 		<tr>
 			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 			<td valign="top" class="value" id="createdById" ></td>
+			
 		</tr>
 		<tr>
 			<td valign="top" class="name"><label for="owner">Owner:</label></td>
 			<td valign="top" class="value" id="ownerTdId" ></td>
+			
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
 			<td valign="top" class="value" id="commentTypeTdId" ></td>
+			
 		</tr>
 		<tr>
 			<td valign="top" class="name"><label for="category">Category:</label></td>
 			<td valign="top" class="value" id="categoryTdId" ></td>
+			
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="commentCode">comment Code:</label></td>
 			<td valign="top" class="value" id="commentCodeTdId" ></td>
+			
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="mustVerify">Must Verify:</label></td>
 			<td valign="top" class="value" id="verifyTdId">
 				<input type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0" disabled="disabled" />
 			</td>
+			
 		</tr>
 		<tr id = "assetShowId" class="prop" >
 			<td valign="top" class="name"><label for="asset">Asset:</label></td>
@@ -123,7 +129,7 @@
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="comment">Comment:</label></td>
-			<td valign="top" class="value" >
+			<td valign="top" class="value" colspan="2">
 				<textarea cols="80" rows="4" id="commentTdId" readonly="readonly"></textarea>
 			</td>
 		</tr>
@@ -139,18 +145,62 @@
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
-			<td valign="top" class="value" >
+			<td valign="top" class="value" colspan="2">
 				<textarea cols="80" rows="3" id="resolutionId" readonly="readonly"></textarea>
 			</td>
 		</tr>
 		<tr>
 			<td valign="top" class="name"><label for="dateResolved">Resolved At:</label></td>
 			<td valign="top" class="value" id="dateResolvedId" ></td>
+			<td valign="top" class="name"><label for="type">Type:</label></td>
+			<td valign="top" class="value" id="typeId" ></td>
 		</tr>
 		<tr>
-			<td valign="top" class="name"><label for="resolvedBy">Resolved By:</label></td>
+			<td valign="top" class="name" nowrap="nowrap"><label for="resolvedBy">Resolved By:</label></td>
 			<td valign="top" class="value" id="resolvedById" ></td>
+			<td valign="top" class="name"><label for="priority">Priority:</label></td>
+			<td valign="top" class="value" id="priorityId" ></td>
+		</tr>
+		<tr><td valign="top" class="name"><label for="dueDate">dueDate:</label></td>
+			<td valign="top" class="value" id="dueDateId" ></td>
+			<td valign="top" class="name"><label for="startedTime">StartedTime:</label></td>
+			<td valign="top" class="value" id="startedTimeId" ></td>
 		</tr>	
+		<tr><td valign="top" class="name" nowrap="nowrap"><label for="predecessor ">Predecessor :</label></td>
+			<td valign="top" class="value" id="predecessorId" ></td>
+			<td valign="top" class="name"><label for="estStart ">est Start :</label></td>
+			<td valign="top" class="value" id="estStartId" ></td>
+		</tr>
+		<tr><td valign="top" class="name"><label for="duration ">Duration :</label></td>
+			<td valign="top" class="value" id="durationId" ></td>
+			<td valign="top" class="name"><label for="estFinish ">est Finish :</label></td>
+			<td valign="top" class="value" id="estFinishId" ></td>
+	    </tr>
+		<tr><td valign="top" class="name"><label for="priority  ">Priority :</label></td>
+			<td valign="top" class="value" id="priorityId" ></td>
+			<td valign="top" class="name" nowrap="nowrap"><label for="wbsParent ">wbs Parent :</label></td>
+			<td valign="top" class="value" id="wbsParentId" ></td>
+		</tr>
+		<tr><td valign="top" class="name"><label for="status ">Status :</label></td>
+			<td valign="top" class="value" id="statusId" ></td>
+			<td valign="top" class="name" nowrap="nowrap"><label for="wbsSequence ">wbs Sequence:</label></td>
+			<td valign="top" class="value" id="wbsSequenceId" ></td>
+		</tr>
+		<tr><td valign="top" class="name"><label for="duration ">Duration :</label></td>
+			<td valign="top" class="value" id="durationId" ></td>
+			<td valign="top" class="name"><label for="workflow ">Workflow:</label></td>
+			<td valign="top" class="value" id="workflowId" ></td>
+		</tr>
+			<tr><td valign="top" class="name" nowrap="nowrap"><label for="workflowItem ">WorkFlow Item :</label></td>
+			<td valign="top" class="value" id="workflowItemId" ></td>
+			<td valign="top" class="name" nowrap="nowrap"><label for="workflowOverride ">Workflow Override:</label></td>
+			<td valign="top" class="value" id="workflowOverrideId" ></td>
+		</tr>
+		<tr><td valign="top" class="name"><label for="role ">Role :</label></td>
+			<td valign="top" class="value" id="roleId" ></td>
+			<td valign="top" class="name"><label for="attribute">Attribute:</label></td>
+			<td valign="top" class="value" id="attributeId" ></td>
+		</tr>
 	</table>
 	</div>
 	<tds:hasPermission permission='CommentCrudView'>

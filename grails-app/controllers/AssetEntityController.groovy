@@ -2829,7 +2829,9 @@ class AssetEntityController {
 		def userId = session.getAttribute("LOGIN_PERSON").id
 		def personInstance = Person.get(userId)
 		def assetCommentList
-		if(params.resolvedBox=="on"){
+		if(params.filter=='openIssue'){
+			assetCommentList = AssetComment.findAll("FROM AssetComment a where a.assetEntity.project = ? and a.commentType = ? and a.isResolved = 0",[project, "issue"])
+		}else if(params.resolvedBox=="on"){
 		    assetCommentList = AssetComment.findAll("From AssetComment a where a.assetEntity.project = :project  order by dateCreated asc ",[project:project])
 		}else{
 		    assetCommentList = AssetComment.findAll("From AssetComment a where a.assetEntity.project = :project and isResolved = :isResolved order by dateCreated asc",[project:project,isResolved:0])

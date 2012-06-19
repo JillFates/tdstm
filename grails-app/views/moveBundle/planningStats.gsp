@@ -100,7 +100,7 @@
 						<tr>
 							<td style="width: 10px;text-align: right;">${issuesCount}</td>
 							<td style="width: 150px;">
-							<g:link controller="assetEntity" action="listComment" params="[projectId:currProjObj?.id]">
+							<g:link controller="assetEntity" action="listComment" params="[filter:'openIssue']">
 								Open Issues</g:link></td>
 						</tr>
 					</table>
