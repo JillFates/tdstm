@@ -19,9 +19,9 @@
 							<td style="padding:0px;">
 							<g:if test="${applicationCount>0}">
 								<div style="background-color:#86DA5A; z-index:-1; width: ${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%"></div>
-								<div style="position:relative; top:-24px;"><b>${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%</b>
+								<div style="position:relative; top:-20px;height:0px;"><b>${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%</b>
 							</g:if><g:else>
-								<div style="position:relative; top:0px;"><b>0%</b>
+								<div style="position:relative; top:0px;height:0px;"><b>0%</b>
 							</g:else>
 							<g:link controller="application" action="list" params="[validation:'Discovery']">Applications Validated</g:link>
 								</div>
@@ -83,7 +83,7 @@
 							<td style="padding:0px;">
 							<g:if test="${applicationCount>0}">
 								<div style="background-color:#86DA5A; z-index:-1; width: ${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%"></div>
-								<div style="position:relative; top:-24px;"><b>${Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()/applicationCount)*100)}%</b>
+								<div style="position:relative; top:-20px;height:0px;"><b>${Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()/applicationCount)*100)}%</b>
 							</g:if><g:else>
 								<div style="position:relative; top:0px;"><b>0%</b>
 							</g:else>
@@ -150,7 +150,7 @@
 						<tr>
 							<td style="padding:0px;">
 								<div style="background-color:#86DA5A; z-index:-1; width: ${percentageAppCount}%"></div>
-								<div style="position:relative; top:-24px;"><b>${percentageAppCount}%</b>
+								<div style="position:relative; top:-20px;height:0px;"><b>${percentageAppCount}%</b>
 							<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Assigned</g:link>
 								</div>
 							</td>
