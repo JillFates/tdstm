@@ -14,11 +14,11 @@
 					<h3 style="color:#63A242">
 						<b>Discovery</b>
 					</h3>
-					<table style="margin-bottom: 10px;">
+					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
 							<td style="padding:0px;height:24px;">
 							<g:if test="${applicationCount>0}">
-								<div style="background-color:#86DA5A; z-index:-1; height:24px; width: ${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%"></div>
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px; width: ${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%"></div>
 								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%</b>
 							</g:if><g:else>
 								<div style="position:relative; top:0px;height:0px;margin-left:5px;"><b>0%</b>
@@ -78,11 +78,11 @@
 					<h3 style="color:#63A242">
 						<b>Analysis</b>
 					</h3>
-					<table style="margin-bottom: 10px;">
+					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
 							<td style="padding:0px;height:24px;">
 							<g:if test="${applicationCount>0}">
-								<div style="background-color:#86DA5A; z-index:-1; height:24px; width: ${Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()/applicationCount)*100)}%"></div>
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px; width: ${Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()/applicationCount)*100)}%"></div>
 								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()/applicationCount)*100)}%</b>
 							</g:if><g:else>
 								<div style="position:relative; top:0px;margin-left:5px;"><b>0%</b>
@@ -146,10 +146,10 @@
 					<h3 style="color:#63A242">
 						<b>Assignment</b>
 					</h3>
-					<table style="margin-bottom: 10px;">
+					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
 							<td style="padding:0px;height:24px;">
-								<div style="background-color:#86DA5A; z-index:-1; height:24px; width: ${percentageAppCount}%"></div>
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px; width: ${percentageAppCount}%"></div>
 								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${percentageAppCount}%</b>
 							<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Assigned</g:link>
 								</div>
