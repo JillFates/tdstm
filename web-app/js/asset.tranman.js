@@ -615,7 +615,12 @@ function showAssetDialog( e , action ) {
 			      	 $('#ownerTdId').html(assetComments[0].owners)
 			      	 $('#ownerEditTdId').val(assetComments[0].assetComment.owner.id)
 	      		 }
+	      		 var notes = assetComments[0].notes
+	      		 $('#previousNote').html(notes)
+	      		 $('#previousNotesShowId').html(notes)
+	      		 $('#dueDatesId').html(assetComments[0].dueDate)
 		      	 $('#ownerTdId').css('display','block')
+		      	 $('#dueDateId').css('display','block')
 		      	 $('#ownerEditId').css('display','block')
 	      	 }
 			 if(assetComments[0].assetComment.commentType!='instruction'){
@@ -657,7 +662,7 @@ function showAssetDialog( e , action ) {
 	      	 $('#commentEditId').val(assetComments[0].assetComment.comment)
 	      	 $('#commentTypeEditId').val(assetComments[0].assetComment.commentType)
 	      	 $('#commentTypeEditIdReadOnly').val(assetComments[0].assetComment.commentType)
-	      	 $('#categoryEditId').html(assetComments[0].assetComment.category)
+	      	 $('#categoryEditId').val(assetComments[0].assetComment.category)
 	      	 $('#commentCodeEditId').html(assetComments[0].assetComment.commentCode)
 	      	 $('#mustVerifyEditId').val(assetComments[0].assetComment.mustVerify)
 	      	 $('#isResolvedEditId').val(assetComments[0].assetComment.isResolved)
@@ -894,7 +899,7 @@ function resolveValidate(formName, idVal, redirectTo){
 				if($("#selectTimedId").length > 0){
 					timedUpdate($("#selectTimedId").val())
 				}
-				var params = {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'category':document.forms[formName].category.value,'owners':document.forms[formName].owner.value}
+				var params = {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'category':document.forms[formName].category.value,'owners':document.forms[formName].owner.value,'dueDate':document.forms[formName].dueDate.value}
 				jQuery.ajax({
 					url: '../assetEntity/saveComment',
 					data: params,
@@ -907,7 +912,8 @@ function resolveValidate(formName, idVal, redirectTo){
 				if(redirectTo){
 					jQuery.ajax({
 						url: '../assetEntity/updateComment',
-						data: {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value,'owners':document.forms[formName].owner.value},
+						data: {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value,'owners':document.forms[formName].owner.value,'note':document.forms[formName].note.value,'category':document.forms[formName].categoryEditId.value
+							,'dueDate':document.forms[formName].dueDateEdit.value},
 						type:'POST',
 						complete: function(e) {
 							updateCommentsLists();
@@ -916,7 +922,7 @@ function resolveValidate(formName, idVal, redirectTo){
 				} else {
 					jQuery.ajax({
 						url: '../assetEntity/updateComment',
-						data: {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value,'owners':document.forms[formName].owner.value},
+						data: {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value,'owners':document.forms[formName].owner.value,'note':document.forms[formName].note.value,'category':document.forms[formName].categoryEditId.value,'dueDate':document.forms[formName].dueDateEdit.value},
 						type:'POST',
 						complete: function(e) {
 							updateCommentsOnList(e);
@@ -933,7 +939,7 @@ function resolveValidate(formName, idVal, redirectTo){
 			if($("#selectTimedId").length > 0){
 				timedUpdate($("#selectTimedId").val())
 			}
-			var params = {'assetEntity.id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'category':document.forms[formName].category.value,'owners':document.forms[formName].owner.value}
+			var params = {'assetEntity.id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'category':document.forms[formName].category.value,'owners':document.forms[formName].owner.value,'dueDate':document.forms[formName].dueDate.value}
 				jQuery.ajax({
 					url: '../assetEntity/saveComment',
 					data: params,
@@ -946,7 +952,7 @@ function resolveValidate(formName, idVal, redirectTo){
 			if( redirectTo ){
 				jQuery.ajax({
 					url: '../assetEntity/updateComment',
-					data: {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'owners':document.forms[formName].owner.value},
+					data: {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'owners':document.forms[formName].owner.value,'note':document.forms[formName].note.value,'category':document.forms[formName].categoryEditId.value,'dueDate':document.forms[formName].dueDateEdit.value},
 					type:'POST',
 					complete: function(e) {
 						updateCommentsLists();
@@ -955,7 +961,7 @@ function resolveValidate(formName, idVal, redirectTo){
 			} else {
 				jQuery.ajax({
 					url: '../assetEntity/updateComment',
-					data: {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'owners':document.forms[formName].owner.value},
+					data: {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'owners':document.forms[formName].owner.value,'note':document.forms[formName].note.value,'category':document.forms[formName].categoryEditId.value,'dueDate':document.forms[formName].dueDateEdit.value},
 					type:'POST',
 					complete: function(e) {
 						updateCommentsOnList(e);

@@ -26,6 +26,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
+import com.tds.asset.AssetNotes
 import com.tds.asset.AssetOptions
 import com.tds.asset.AssetTransition
 import com.tds.asset.Database
@@ -1735,8 +1736,14 @@ class AssetEntityController {
 	 * @return assetComments
 	 * -----------------------------------------------------------------*/
 	def saveComment = {
+		def formatter = new SimpleDateFormat("MM/dd/yyyy");
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def assetComments = []
+		if(params.dueDate){
+		   params.dueDate = GormUtil.convertInToGMT(formatter.parse(params.dueDate), tzId)
+		}
 		def assetCommentInstance = new AssetComment(params)
+		
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername(principal)
 		assetCommentInstance.createdBy = loginUser.person
@@ -1745,12 +1752,13 @@ class AssetEntityController {
 		
 		if(params.isResolved == '1'){
 			assetCommentInstance.resolvedBy = loginUser.person
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			assetCommentInstance.dateResolved = GormUtil.convertInToGMT( "now", tzId )
 		}
 		if(!assetCommentInstance.hasErrors() && assetCommentInstance.save()) {
 			def status = AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetCommentInstance.assetEntity,'issue',0])
 			assetComments << [assetComment : assetCommentInstance, status : status ? true : false]
+		}else{
+		      assetCommentInstance.errors.allErrors.each{println it}
 		}
 		render assetComments as JSON
 	}
@@ -1768,6 +1776,7 @@ class AssetEntityController {
 		def dtResolved
 		DateFormat formatter ;
 		String owners = "";
+		def dueDate
 		formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a");
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def assetComment = AssetComment.get(params.id)
@@ -1782,9 +1791,14 @@ class AssetEntityController {
 		if(assetComment.owner){
 		    owners = assetComment.owner
 		}
+		if(assetComment.dueDate){
+			dueDate = formatter.format(GormUtil.convertInToUserTZ(assetComment.dueDate, tzId));
+		}
+		def assetNotes = assetComment.notes.note
+		String notes = assetNotes.toString().replace('[','').replace(']','').replace(',','</br>')
 		commentList<<[ assetComment:assetComment,personCreateObj:personCreateObj,
 					personResolvedObj:personResolvedObj,dtCreated:dtCreated?dtCreated:"",
-					dtResolved:dtResolved?dtResolved:"",owners:owners?owners:"",assetNames:assetComment.assetEntity.assetName]
+					dtResolved:dtResolved?dtResolved:"",owners:owners?owners:"",assetNames:assetComment.assetEntity.assetName , dueDate:dueDate?dueDate:'',notes:notes]
 		render commentList as JSON
 	}
 	/* ------------------------------------------------------------
@@ -1798,8 +1812,11 @@ class AssetEntityController {
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername(principal)
 		def assetCommentInstance = AssetComment.get(params.id)
+		def formatter = new SimpleDateFormat("MM/dd/yyyy");
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def date = new Date()
+		
 		if(params.isResolved == '1' && assetCommentInstance.isResolved == 0 ){
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			assetCommentInstance.resolvedBy = loginUser.person
 			assetCommentInstance.dateResolved = GormUtil.convertInToGMT( "now", tzId )
 		}else if(params.isResolved == '1' && assetCommentInstance.isResolved == 1){
@@ -1807,10 +1824,21 @@ class AssetEntityController {
 			assetCommentInstance.resolvedBy = null
 			assetCommentInstance.dateResolved = null
 		}
+		params.dueDate = GormUtil.convertInToGMT(formatter.parse(params.dueDate), tzId)
 		assetCommentInstance.properties = params
 		def personInstance = Person.get(params.owners)
 		assetCommentInstance.owner = personInstance
-		if(!assetCommentInstance.hasErrors() && assetCommentInstance.save(flush:true) ) {
+		if(!assetCommentInstance.hasErrors() && assetCommentInstance.save(flush:true)) {
+		 if(params.note){
+			def assetNoteInstance = new AssetNotes();
+			assetNoteInstance.createdBy = assetCommentInstance.createdBy
+			assetNoteInstance.dateCreated =  new Date()
+			assetNoteInstance.note = params.note
+			assetNoteInstance.assetComment = assetCommentInstance
+			if(!assetNoteInstance.save(flush:true)){
+				assetNoteInstance.errors.allErrors.each{println it}
+			}
+		 }
 			def status = AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetCommentInstance.assetEntity,'issue',0])
 			assetComments << [assetComment : assetCommentInstance, status : status ? true : false]
 		}

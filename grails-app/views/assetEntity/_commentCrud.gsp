@@ -65,6 +65,15 @@
 			</td>
 		</tr> 
 		<tr class="prop">
+			<td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
+			<td valign="top" class="value">
+				<script type="text/javascript" charset="utf-8">
+                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+                  </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDate" id="dueDateId"
+					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+			</td>
+		</tr> 
+		<tr class="prop">
 		<% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
 			<td valign="top" class="name"><label for="owner">Owner:</label></td>
 			<td valign="top" style="width: 20%;">
@@ -138,6 +147,12 @@
 	<div id="showResolveDiv" style="display: none;">
 		<table id="showResolveTable" style="border: 0px">
 		<tr class="prop">
+			<td valign="top" class="name"><label for="previousNotes">Previous Notes:</label></td>
+			<td valign="top" class="value" >
+				<div id="previousNotesShowId" ></div>
+			</td>
+		</tr>
+		<tr class="prop">
 			<td valign="top" class="name"><label for="isResolved">Is Resolved:</label></td>
 			<td valign="top" class="value" id="resolveTdId">
 				<input type="checkbox" id="isResolvedId" name="isResolved" value="0" disabled="disabled" />
@@ -161,8 +176,8 @@
 			<td valign="top" class="name"><label for="priority">Priority:</label></td>
 			<td valign="top" class="value" id="priorityId" ></td>
 		</tr>
-		<tr><td valign="top" class="name"><label for="dueDate">dueDate:</label></td>
-			<td valign="top" class="value" id="dueDateId" ></td>
+			<tr><td valign="top" class="name"><label for="dueDate">dueDate:</label></td>
+			<td valign="top" class="value" id="dueDatesId" ></td>
 			<td valign="top" class="name"><label for="startedTime">StartedTime:</label></td>
 			<td valign="top" class="value" id="startedTimeId" ></td>
 		</tr>	
@@ -254,7 +269,7 @@
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="category">Category:</label></td>
-			<td valign="top" class="value" id="categoryEditId" ></td>
+			<td valign="top" class="value"  ><g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"  ></g:select></td>
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
@@ -266,7 +281,7 @@
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="comment">Comment:</label></td>
-			<td valign="top" class="value">
+			<td valign="top" class="value" colspan="1">
 				<textarea cols="80" rows="4" id="commentEditId" name="comment" ></textarea>
 			</td>
 		</tr>
@@ -274,6 +289,15 @@
 	</div>
 	<div id="editResolveDiv" style="display: none;">
 	<table id="updateResolveTable" style="border: 0px;">
+	   <tr class="prop">
+			<td valign="top" class="name"><label for="notes">Previous Notes:</label></td>
+			<td valign="top" class="value"><div id="previousNote" style="width: 200px"></div></td>
+		</tr>
+	    <tr class="prop">
+			<td valign="top" class="name"><label for="notes">Note:</label></td>
+			<td valign="top" class="value"><input type="text" id="note" name="note" value=""/>
+			</td>
+		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="isResolved">Resolved:</label></td>
 			<td valign="top" class="value">
@@ -282,19 +306,18 @@
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
-			<td valign="top" class="value">
-				<textarea cols="80" rows="3" id="resolutionEditId" name="resolution" ></textarea>
+			<td valign="top" class="value" colspan="4">
+				<textarea cols="80" rows="4" id="resolutionEditId" name="resolution" ></textarea>
 			</td>
 		</tr> 
-		<tr>
-			<td valign="top" class="name"><label for="dateResolved">Resolved At:</label></td>
-			<td valign="top" class="value" id="dateResolvedEditId" ></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name"><label for="resolvedBy">Resolved By:</label></td>
-			<td valign="top" class="value" id="resolvedByEditId" ></td>
-		</tr>
-	</table>
+		<tr><td valign="top" class="name"><label for="dueDate">DueDate:</label></td>
+			<td valign="top" class="value" id="dueDatesEditId" ><script type="text/javascript" charset="utf-8">
+                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+                  </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDateEdit" id="dueDateEdit"
+					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+			
+		</tr>	
+		</table>
 	</div>
 </div>
 <tds:hasPermission permission='CommentCrudView'>

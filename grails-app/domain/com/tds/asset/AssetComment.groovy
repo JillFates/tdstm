@@ -34,7 +34,7 @@ class AssetComment {
 	String workflowOverride
 	String role
 	
-	
+	static hasMany = [notes : AssetNotes]
 	
 	static constraints = {
 		
@@ -48,7 +48,7 @@ class AssetComment {
 		dateCreated( nullable:true  )
 		dateResolved( nullable:true  )
 		commentCode( blank:true, nullable:true  )
-		category( blank:false, nullable:false )
+		category( blank:false, nullable:false ,inList:['general', 'discovery', 'planning','walkthru','premove','shutdown','moveday','startup','postmove'])
 		displayOption( blank:false, inList: ['G','U'] ) // Generic or User
 		owner( blank:true, nullable:true  )
 		attribute( blank:true, nullable:true  )
