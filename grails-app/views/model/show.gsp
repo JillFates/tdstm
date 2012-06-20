@@ -205,7 +205,7 @@
 		</table>
 	</div>
 	<div id="showMergeDialog" title="Select the item to merge to:" style="display: none;" class="list">
-		<table cellpadding="0" cellspacing="0">
+		<table cellpadding="0" cellspacing="0" >
 			<thead>
 				<tr><th>Name</th><th>AKA</th></tr>
 			</thead>
@@ -218,6 +218,7 @@
                       </g:link>
                      </td>
                      <td valign="top" class="value">${model.aka}</td>
+                     <td valign="top" class="value">${model?.assetType}</td>
                  </tr>
             	</g:each>
             </tbody>
@@ -266,7 +267,8 @@ function validateModelDependency( modelId ){
 	return returnValue
 }
 function showMergeDialog(){
-	$("#showMergeDialog").dialog('option', 'height', 530 )
+	$("#showMergeDialog").dialog('option', 'height', 530)
+	$("#showMergeDialog").dialog('option', 'width', 500)
     $("#showMergeDialog").dialog('open')
 }
 
