@@ -207,7 +207,7 @@
 	<div id="showMergeDialog" title="Select the item to merge to:" style="display: none;" class="list">
 		<table cellpadding="0" cellspacing="0" >
 			<thead>
-				<tr><th>Name</th><th>AKA</th></tr>
+				<tr><th>Name</th><th>AKA</th><th>Type</th></tr>
 			</thead>
             <tbody>
             	<g:each in="${Model.findAll('from Model where id != ? and manufacturer = ?', [modelInstance?.id, modelInstance?.manufacturer])?.sort{it.modelName}}" status="i" var="model">
