@@ -619,7 +619,7 @@ class MoveBundleController {
 		
 		def likelyLatency = Application.findAllByLatencyAndMoveBundleInList('N',moveBundleList).size()
 		def unlikelyLatency = Application.findAllByLatencyAndMoveBundleInList('Y',moveBundleList).size()
-		def unknownLatency = Application.findAllByLatencyAndMoveBundleInList(null,moveBundleList).size()
+		def unknownLatency = Application.findAll("from Application where project = $projectId  and (latency is null or latency = '') and moveBundle in $moveBundles").size()
 		
 		def depBundleIDCountSQL = "select count(distinct dependency_bundle) from asset_dependency_bundle where project_id = $projectId"
         def dependencyBundleCount = jdbcTemplate.queryForInt(depBundleIDCountSQL)		

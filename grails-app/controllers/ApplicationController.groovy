@@ -69,7 +69,7 @@ class ApplicationController {
 			
 		}else if(params.latency=='UnKnown'){
 		
-			appEntityList= Application.findAllByLatencyAndMoveBundleInList(null,moveBundleList)
+			appEntityList= Application.findAll("from Application where project = $projectId  and (latency is null or latency = '') and moveBundle in $moveBundle")
 			
 		}else if(params.latency=='UnLikely'){
 		
