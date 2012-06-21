@@ -186,6 +186,14 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	static mapping  = {	
 		version true
 		autoTimestamp false
+		sourceTeamMt ignoreNotFound: true
+	    targetTeamMt ignoreNotFound: true
+	    sourceTeamLog ignoreNotFound: true
+	    targetTeamLog ignoreNotFound: true
+	    sourceTeamSa ignoreNotFound: true
+	    targetTeamSa ignoreNotFound: true
+	    sourceTeamDba ignoreNotFound: true
+	    targetTeamDba ignoreNotFound: true
 		tablePerHierarchy false
 		id column:'asset_entity_id'
 		os column:'hinfo'
