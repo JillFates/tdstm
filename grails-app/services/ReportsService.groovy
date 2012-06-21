@@ -39,6 +39,8 @@ class ReportsService {
   
         def transportInfo = getTransportInfo(assetEntityList,eventErrorList)
 		
+		def modelInfo = getModelInfo(eventErrorList)
+		
 		Set allErrors = eventErrorList
 		def eventErrorString = ''
 		if(allErrors.size()>0){
@@ -57,7 +59,7 @@ class ReportsService {
 			   'cartError':transportInfo.cartError,'cart':transportInfo.cart,'shelf':transportInfo.shelf,'shelfError':transportInfo.shelfError,'nullAssetname':assetsInfo.nullAssetname,
 			   'blankAssets':assetsInfo.blankAssets ,'questioned':assetsInfo.questioned,'questionedDependency':assetsInfo.questionedDependency,
 			   'specialInstruction':assetsInfo.specialInstruction,'importantInstruction':assetsInfo.importantInstruction,'eventErrorString':eventErrorString,
-			   'dashBoardOk':eventBundleInfo.dashBoardOk,'allErrors':allErrors,'nullAssetTag':assetsInfo.nullAssetTag,'blankAssetTag':assetsInfo.blankAssetTag]
+			   'dashBoardOk':eventBundleInfo.dashBoardOk,'allErrors':allErrors,'nullAssetTag':assetsInfo.nullAssetTag,'blankAssetTag':assetsInfo.blankAssetTag,'modelList':modelInfo.modelList,'modelError':modelInfo.modelError]
 
 	} 
 	
@@ -428,5 +430,19 @@ class ReportsService {
 		
 		return[truckError:truckError,truck:truck,cartError:cartError,cart:cart,shelf:shelf,shelfError:shelfError,
 			   eventErrorList:eventErrorList]
+	}
+	
+	def getModelInfo(eventErrorList){
+		def modelList = Model.findAllByModelStatusAndUsize('new',1,[sort:'modelName']).modelName
+		def modelError = ''
+		
+		if(modelList.size()>0){
+			eventErrorList << 'Model'
+			modelError+="""<span style="color: red;"><b>${modelList.size()}: un-validated models used : </b><br></br></span>"""
+		}else{
+	    	modelError+="""<span style="color: green;"><b>Model: OK  </b><br></br></span>"""
+		}
+		return[modelList:modelList,modelError:modelError]
+		
 	}
 }

@@ -65,7 +65,9 @@
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="model">Model</label></td>
-								<td><a href='javascript:showModel(${assetEntityInstance.model?.id})' style='color:#00E'>${assetEntityInstance.model}</a></td>
+								<td><a href='javascript:showModel(${assetEntityInstance.model?.id})' style='color:#00E'>${assetEntityInstance.model}</a>
+								  <g:if test="${assetEntityInstance.model?.modelStatus=='new' && assetEntityInstance.model?.usize==1}"> <span style="color: gray;"><b>?</b></span></g:if>
+								</td>
 								<td class="label" nowrap="nowrap"><label for="os">OS</label></td>
 								<td >${assetEntityInstance.os}</td>
 								<td class="label" nowrap="nowrap"><label for="sourceRack">Rack/Cab</label></td>

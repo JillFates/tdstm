@@ -39,7 +39,8 @@
 								 </jmesa:htmlColumn>
 								 <jmesa:htmlColumn property="aka" title="AKA" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${manufacturer.aka}</jmesa:htmlColumn>
 	                            <jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${manufacturer.description}</jmesa:htmlColumn>
-	                            <jmesa:htmlColumn property="modelsCount" title="Models" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${manufacturer.modelsCount}</jmesa:htmlColumn>
+	                            <jmesa:htmlColumn property="modelsCount" title="Models" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${manufacturer.modelCount}</jmesa:htmlColumn>
+	                            <jmesa:htmlColumn property="count" title="AssetCount" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${manufacturer.count}</jmesa:htmlColumn>
 	                        </jmesa:htmlRow>
 	                    </jmesa:htmlTable>
 	                </jmesa:tableFacade>

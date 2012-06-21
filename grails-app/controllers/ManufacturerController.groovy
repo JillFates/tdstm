@@ -1,7 +1,11 @@
 import grails.converters.JSON
+import net.tds.util.jmesa.AssetEntityBean
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
+
+import com.tds.asset.AssetEntity
+
 
 
 class ManufacturerController {
@@ -31,16 +35,30 @@ class ManufacturerController {
 		} else {
 			session.modelFilters = params
 		}
+		def manufacturerList =  new ArrayList()
         def manufacturersList = Manufacturer.list( params )
+		manufacturersList.each{manufacturer->
+			AssetEntityBean assetBeanInstance = new AssetEntityBean();
+			assetBeanInstance.setId(manufacturer.id)
+			assetBeanInstance.setName(manufacturer.name)
+			assetBeanInstance.setDescription(manufacturer.description)
+			assetBeanInstance.setAka(manufacturer.aka)
+			assetBeanInstance.setModelCount(manufacturer.modelsCount)
+			assetBeanInstance.setCount(AssetEntity.countByManufacturer(manufacturer))
+			
+			manufacturerList.add(assetBeanInstance)
+		}
+		
+		
         TableFacade tableFacade = new TableFacadeImpl("tag",request)
-        tableFacade.items = manufacturersList
+        tableFacade.items = manufacturerList
         Limit limit = tableFacade.limit
 		if(limit.isExported()){
             tableFacade.setExportTypes(response,limit.getExportType())
             tableFacade.setColumnProperties("name","aka","description")
             tableFacade.render()
         }else
-            return [manufacturersList : manufacturersList]
+            return [manufacturersList : manufacturerList]
     }
 
     def show = {

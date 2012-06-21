@@ -1824,7 +1824,9 @@ class AssetEntityController {
 			assetCommentInstance.resolvedBy = null
 			assetCommentInstance.dateResolved = null
 		}
-		params.dueDate = GormUtil.convertInToGMT(formatter.parse(params.dueDate), tzId)
+		if(params.dueDate){
+		    params.dueDate = GormUtil.convertInToGMT(formatter.parse(params.dueDate), tzId)
+		}
 		assetCommentInstance.properties = params
 		def personInstance = Person.get(params.owners)
 		assetCommentInstance.owner = personInstance

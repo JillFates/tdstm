@@ -348,6 +348,10 @@ class ModelController {
             modelInstance.properties = params
             modelInstance.rearImage = rearImage
             modelInstance.frontImage = frontImage
+			
+			def oldModelManufacturer = modelInstance.manufacturer.id
+			def oldModelType = modelInstance.assetType
+			
 			if (!modelInstance.hasErrors() && modelInstance.save(flush: true)) {
             	def connectorCount = Integer.parseInt(params.connectorCount)
 				if(connectorCount > 0){
@@ -466,6 +470,16 @@ class ModelController {
 	    			modelInstance.sourceTDSVersion = 1
 	    		}
 	        	modelInstance.save(flush: true)
+				def newManufacturer = Manufacturer.get(params.manufacturer.id)
+				if( oldModelManufacturer != params.manufacturer.id){
+					def updateModelQuery = "update asset_entity set manufacturer = '${newManufacturer.name}' where model_id='${modelInstance.id}'"
+					jdbcTemplate.update(updateModelQuery)
+				}
+				if(oldModelType!=params.assetType){
+					def updateModelTypeQuery = "update asset_entity set asset_type = '${params.assetType}' where model_id='${modelInstance.id}'"
+					jdbcTemplate.update(updateModelTypeQuery)
+				
+				}
 				
 				flash.message = "${modelInstance.modelName} Updated"
                 redirect(action: "show", id: modelInstance.id)
