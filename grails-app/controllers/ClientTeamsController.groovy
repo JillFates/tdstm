@@ -323,7 +323,7 @@ class ClientTeamsController {
 	   def teamId = params.teamId
 	   def search = params.search
 	   def bundleId = params.bundleId
-	   def projectId = params.projectId
+	   def projectId = session.CURR_PROJ.CURR_PROJ
 	   def viewMode = session.getAttribute("TEAM_VIEW_MODE")
 	   def stateVal
 	   def taskList
@@ -537,7 +537,7 @@ class ClientTeamsController {
                     redirect ( action:'assetSearch', params:params)
             	} else {
             		redirect ( action: 'myTasks', 
-            			params:[ "bundleId":params.bundleId, "teamId":params.teamId, "projectId":params.projectId,
+            			params:[ "bundleId":params.bundleId, "teamId":params.teamId, "projectId":session.CURR_PROJ.CURR_PROJ,
             			         "location":params.location, "tab":"Todo" 
             			         ])
             	}
@@ -591,13 +591,13 @@ class ClientTeamsController {
 				  assetComment.createdBy = loginUser.person
 				  assetComment.save()
 				  redirect ( action: action,
-					  			params:["bundleId":params.bundleId, "teamId":params.teamId, "projectId":params.projectId,
+					  			params:["bundleId":params.bundleId, "teamId":params.teamId, "projectId":session.CURR_PROJ.CURR_PROJ,
 									  	"location":params.location, "tab":"Todo"
 								  		])
 			 } else {
 				 flash.message = message ( code : workflow.message )
 				 redirect ( action : action,
-							 params:["bundleId":params.bundleId, "teamId":params.teamId, "projectId":params.projectId,
+							 params:["bundleId":params.bundleId, "teamId":params.teamId, "projectId":session.CURR_PROJ.CURR_PROJ,
 									 "location":params.location, "tab":"Todo"
 									 ])
 			 }
@@ -652,7 +652,7 @@ class ClientTeamsController {
 	   projectTeamInstance.save()
 	   def teamLocation = projectTeamInstance.currentLocation
 
-	 render ( view:'logisticsHome' , model:[ projectTeam:projectTeamInstance, members:teamMembers, projectId:params.projectId,
+	 render ( view:'logisticsHome' , model:[ projectTeam:projectTeamInstance, members:teamMembers, projectId:session.CURR_PROJ.CURR_PROJ,
 												   loc:teamLocation, bundleId:params.bundleId ,bundleName:bundleInstance.name, teamId:teamId,
 												   location:location, project: bundleInstance.project])
 			 
@@ -727,7 +727,7 @@ class ClientTeamsController {
 		   assetIssueCommentList = AssetComment.findAll("from AssetComment ac where ac.assetEntity = ${assetItem.id} and ac.commentType = 'issue' and ac.isResolved = 0 ")
 		   assetIssueCommentListSize = assetIssueCommentList.size()
 	   }
-	   return[ bundleId:bundleId, teamId:teamId, projectId:params.projectId, location:params.location,
+	   return[ bundleId:bundleId, teamId:teamId, projectId:session.CURR_PROJ.CURR_PROJ, location:params.location,
 		   		assetList:assetList, allSize:allSize, todoSize:todoSize, 'tab':tab, issuecomments: assetIssueCommentList,
 				assetIssueCommentListSize: assetIssueCommentListSize
 	   		]
@@ -772,7 +772,7 @@ class ClientTeamsController {
 		if ( params.menu == "true" ) {
 			render(view:'logisticsAssetSearch',
 					model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundleId:moveBundleId,
-						teamId:params.teamId, projectId:params.projectId, location:params.location, search:search,
+						teamId:params.teamId, projectId:session.CURR_PROJ.CURR_PROJ, location:params.location, search:search,
 						label:label, actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
 					])
 			return;
@@ -784,13 +784,13 @@ class ClientTeamsController {
 				if ( textSearch ) {
 					render ( view:'logisticsAssetSearch',
 							model:[ projMap:projMap, assetComment:assetComment, stateVal:stateVal, bundleId:moveBundleId,
-								teamId:params.teamId, projectId:params.projectId, location:params.location,
+								teamId:params.teamId, projectId:session.CURR_PROJ.CURR_PROJ, location:params.location,
 								search:search, label:label, actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
 							])
 					return;
 				} else {
 					redirect( action:'logisticsTask',
-							params:[ "bundleId":moveBundleId, "teamId":params.teamId, "projectId":params.projectId,
+							params:[ "bundleId":moveBundleId, "teamId":params.teamId, "projectId":session.CURR_PROJ.CURR_PROJ,
 								"location":params.location, "tab":params.tab
 							])
 					return;
@@ -810,13 +810,13 @@ class ClientTeamsController {
 					if ( textSearch ) {
 						render(view:'logisticsAssetSearch',
 								model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal,
-									bundleId:moveBundleId, teamId:params.teamId, projectId:params.projectId, location:params.location,
+									bundleId:moveBundleId, teamId:params.teamId, projectId:session.CURR_PROJ.CURR_PROJ, location:params.location,
 									search:search, label:label, actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList
 								])
 						return;
 					} else {
 						redirect ( action: 'logisticsMyTasks',
-								params:[ "bundleId":moveBundleId, "teamId":params.teamId, "projectId":params.projectId,
+								params:[ "bundleId":moveBundleId, "teamId":params.teamId, "projectId":session.CURR_PROJ.CURR_PROJ,
 									"location":params.location,"tab":params.tab
 								])
 						return;
@@ -830,7 +830,7 @@ class ClientTeamsController {
 						if ( textSearch ) {
 							render ( view:'logisticsAssetSearch',
 									model:[	teamMembers:teamMembers, projMap:projMap,assetComment:assetComment, stateVal:stateVal,
-										bundleId:moveBundleId, teamId:params.teamId, projectId:params.projectId, location:params.location,
+										bundleId:moveBundleId, teamId:params.teamId, projectId:session.CURR_PROJ.CURR_PROJ, location:params.location,
 										search:search, label:label, actionLabel:actionLabel, browserTest:browserTest,
 										issuecomments: assetIssueCommentList, assetIssueCommentListSize: assetIssueCommentListSize,
 										commentsList: commentsList
@@ -838,7 +838,7 @@ class ClientTeamsController {
 							return;
 						} else {
 							redirect ( action: 'logisticsMyTasks',
-									params:[ "bundleId":moveBundleId, "teamId":params.teamId, "projectId":params.projectId,
+									params:[ "bundleId":moveBundleId, "teamId":params.teamId, "projectId":session.CURR_PROJ.CURR_PROJ,
 										"location":params.location,"tab":params.tab, "issueAssetId" : String.valueOf( assetItem.id )
 									])
 							return;
@@ -875,7 +875,7 @@ class ClientTeamsController {
 					}
 					render ( view:'logisticsAssetSearch',
 							model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment ? assetComment :"", stateVal:stateVal, bundleId:moveBundleId,
-								teamId:params.teamId, projectId:params.projectId, location:params.location, search:search, label:label,
+								teamId:params.teamId, projectId:session.CURR_PROJ.CURR_PROJ, location:params.location, search:search, label:label,
 								actionLabel:actionLabel, browserTest:browserTest, commentsList: commentsList, cartQty: cartQty
 							])
 				}
@@ -906,13 +906,13 @@ class ClientTeamsController {
 				actionLabel = null
 				render(view: 'logisticsAssetSearch',
 						model:[ projMap:projMap, stateVal:stateVal, "search":params.search, "bundleId":params.bundleId,
-							"teamId":params.teamId, "projectId":params.projectId, "location":params.location, "tab":"Todo", label:label,
+							"teamId":params.teamId, "projectId":session.CURR_PROJ.CURR_PROJ, "location":params.location, "tab":"Todo", label:label,
 							actionLabel:actionLabel
 						])
 			} else {
 				flash.message = message ( code : workflow.message )
 				redirect ( action:'logisticsAssetSearch',
-						params:[ "bundleId":params.bundleId, "teamId":params.teamId, "projectId":params.projectId, "location":params.location,
+						params:[ "bundleId":params.bundleId, "teamId":params.teamId, "projectId":session.CURR_PROJ.CURR_PROJ, "location":params.location,
 							"search":params.search, "label":params.label, "actionLabel":actionLabel
 						])
 			}
@@ -937,7 +937,7 @@ class ClientTeamsController {
 			def projMap = []
 			render(view: 'logisticsAssetSearch',
 					model:[	projMap:projMap, "search":params.search, "bundleId":params.bundleId, "teamId":params.teamId,
-						"projectId":params.projectId, "location":params.location, "tab":"Todo" ])
+						"projectId":session.CURR_PROJ.CURR_PROJ, "location":params.location, "tab":"Todo" ])
 		} else {
 			flash.message = "Asset not found"
 			redirect ( action:'logisticsAssetSearch', params:params)

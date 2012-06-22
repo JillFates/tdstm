@@ -123,7 +123,7 @@ class CartTrackingController {
 	 * @return : updated truck
 	 *---------------------------------------------------------*/
 	def changeTruck = {
-		def updateQuery = "update asset_entity set truck = '$params.truck' where project_id = $params.projectId "+
+		def updateQuery = "update asset_entity set truck = '$params.truck' where project_id = ${session.CURR_PROJ.CURR_PROJ} "+
 						"and move_bundle_id = $params.bundleId and cart = '$params.cart' "
 		jdbcTemplate.update(updateQuery)
 		render params.truck

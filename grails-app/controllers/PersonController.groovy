@@ -240,7 +240,7 @@ class PersonController {
 	 */
 	def updateStaff = {
     	def personInstance = Person.get( params.id )
-    	def projectId = params.projectId
+    	def projectId = session.CURR_PROJ.CURR_PROJ
     	def roleType = params.roleType
     	def companyId = params.company
     	//personInstance.lastUpdated = new Date()
@@ -285,7 +285,7 @@ class PersonController {
 	 *	Method to add Staff to project through Ajax Overlay 
 	 */
 	def saveProjectStaff = {
-    	def projectId = params.projectId
+    	def projectId = session.CURR_PROJ.CURR_PROJ
     	def personId = params.person
     	def roleType = params.roleType
     	def submit = params.submit
@@ -302,7 +302,7 @@ class PersonController {
 		
 		//personInstance.dateCreated = new Date()
 		def companyId = params.company
-		def projectId = params.projectId
+		def projectId = session.CURR_PROJ.CURR_PROJ
 		def roleType = params.roleType
 		if ( !personInstance.hasErrors() && personInstance.save() ) {
 			

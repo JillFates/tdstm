@@ -9,7 +9,7 @@ class DashboardController {
     
 	def index = { 
 		
-		def projectId = params.projectId
+		def projectId = session.CURR_PROJ.CURR_PROJ
 		def project
 		def moveEventsList
 		def projectLogo

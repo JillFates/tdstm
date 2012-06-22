@@ -1885,6 +1885,7 @@ class AssetEntityController {
 		def supportTeam = new HashMap()
 		
 		def teamType = params.teamType
+		params.projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		teamType = teamType ? teamType : getSession().getAttribute( "CONSOLE_TEAM_TYPE" )?.CONSOLE_TEAM_TYPE
 		if(!teamType){
 			teamType = "MOVE"

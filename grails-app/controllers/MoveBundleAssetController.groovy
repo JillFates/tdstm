@@ -624,7 +624,7 @@ class MoveBundleAssetController {
     //get teams for selected bundles.
     def getTeamsForBundles = {
     	def bundleId = params.bundleId
-    	def projectId = params.projectId
+    	def projectId = session.CURR_PROJ.CURR_PROJ
     	def projectInstance = Project.findById( projectId )
     	def TeamInstance 
         if( bundleId == "") {
@@ -643,7 +643,7 @@ class MoveBundleAssetController {
     //Get the List of Racks corresponding to Selected Bundle
     def getRacksForBundles = {
     	def bundleId = params.bundleId
-        def projectId = params.projectId
+        def projectId = session.CURR_PROJ.CURR_PROJ
         def projectInstance = Project.findById( projectId )
         def movebundleInstance = MoveBundle.findById(bundleId)
        	def assetEntityList = AssetEntity.findAllByMoveBundle(movebundleInstance)

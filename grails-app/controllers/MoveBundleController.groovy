@@ -345,7 +345,7 @@ class MoveBundleController {
 		 status.setRollbackOnly()
 		 }
 		 }
-		 redirect(action:show,params:[id:moveBundleId, projectId:params.projectId ])
+		 redirect(action:show,params:[id:moveBundleId, projectId:session.CURR_PROJ.CURR_PROJ ])
 		 } catch(NumberFormatException nfe) {
 		 response.sendError( 400, "Bad Request NFE")
 		 status.setRollbackOnly()

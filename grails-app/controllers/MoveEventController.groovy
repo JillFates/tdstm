@@ -178,7 +178,7 @@ class MoveEventController {
 	 * @return : return the list of MoveBundles as JSON object
 	 */
     def getMoveBundles = {
-    	def projectId = params.projectId
+    	def projectId = session.CURR_PROJ.CURR_PROJ
 		def moveBundles
 		def project
 		if( projectId ){

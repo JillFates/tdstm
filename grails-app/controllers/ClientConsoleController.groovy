@@ -291,7 +291,7 @@ class ClientConsoleController {
 	    	
 	        } else {
 	    		flash.message = "Please create move event and bundle to view PMO Dashboard"
-	    		redirect(controller:'project',action:'show',params:["id":params.projectId])
+	    		redirect(controller:'project',action:'show',params:["id":session.CURR_PROJ.CURR_PROJ])
 	    	}
 		 }
 	}
@@ -455,7 +455,7 @@ class ClientConsoleController {
 	        }
         }
     
-        redirect(action:'list',params:["projectId":params.projectId,"moveBundle":params.moveBundle])
+        redirect(action:'list',params:["projectId":session.CURR_PROJ.CURR_PROJ,"moveBundle":params.moveBundle])
 			
 	       
     }
