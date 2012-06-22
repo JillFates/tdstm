@@ -52,23 +52,23 @@
 					<table style="float:left; border: 0px; margin-left: 10px;">
 						<tr>
 							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ? ',['Application', project,'Discovery',true]).size()}</td>
-							<td><g:link controller="application" action="list" params="[validation:'Discovery']">Discovery</g:link></td>
+							<td><g:link controller="application" action="list" params="[tag_f_validation:'Discovery']">Discovery</g:link></td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyScan',true]).size()}</td>
-							<td><g:link controller="application" action="list" params="[validation:'DependencyScan']">DependencyScan</g:link></td>
+							<td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyScan']">DependencyScan</g:link></td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Validated',true]).size()}</td>
-							<td><g:link controller="application" action="list" params="[validation:'DependencyScan']">Validated</g:link></td>
+							<td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyScan']">Validated</g:link></td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyReview',true]).size()}</td>
-							<td><g:link controller="application" action="list" params="[validation:'DependencyReview']">Dependency Review</g:link></td>
+							<td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyReview']">Dependency Review</g:link></td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()}</td>
-							<td><g:link controller="application" action="list" params="[validation:'BundleReady']">Bundle Ready</g:link></td>
+							<td><g:link controller="application" action="list" params="[tag_f_validation:'BundleReady']">Bundle Ready</g:link></td>
 						</tr>
 					</table>
 	
