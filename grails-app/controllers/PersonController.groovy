@@ -272,7 +272,7 @@ class PersonController {
 	 *  Return Project Staff 
 	 */
 	def projectStaff = {
-		def projectId = params.projectId
+		def projectId = session.CURR_PROJ.CURR_PROJ
 		def submit = params.submit
 		def role = ""
 		def subject = SecurityUtils.subject
