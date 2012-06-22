@@ -1749,8 +1749,9 @@ class AssetEntityController {
 		assetCommentInstance.createdBy = loginUser.person
 		def personInstance = Person.get(params.owners)
 		assetCommentInstance.owner = personInstance
-		
-		if(params.isResolved == '1'){
+
+		if(params.status=='Completed'){
+			assetCommentInstance.isResolved = 1
 			assetCommentInstance.resolvedBy = loginUser.person
 			assetCommentInstance.dateResolved = GormUtil.convertInToGMT( "now", tzId )
 		}
@@ -1778,6 +1779,7 @@ class AssetEntityController {
 		String owners = "";
 		def dueDate
 		formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a");
+		def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def assetComment = AssetComment.get(params.id)
 		if(assetComment.createdBy){
@@ -1792,13 +1794,19 @@ class AssetEntityController {
 		    owners = assetComment.owner
 		}
 		if(assetComment.dueDate){
-			dueDate = formatter.format(GormUtil.convertInToUserTZ(assetComment.dueDate, tzId));
+			dueDate = dateFormatter.format(assetComment.dueDate);
 		}
-		def assetNotes = assetComment.notes.note
-		String notes = assetNotes.toString().replace('[','').replace(']','').replace(',','</br>')
+		def assetNotes = assetComment.notes.sort{it.dateCreated}
+		println "assetNotes==================="+assetNotes.createdBy
+		def assetNote = []
+		assetNotes.each{
+			def dateCreated = dateFormatter.format(it.dateCreated)
+			assetNote << [ dateCreated , it.createdBy.toString() ,it.note]
+			
+		}
 		commentList<<[ assetComment:assetComment,personCreateObj:personCreateObj,
 					personResolvedObj:personResolvedObj,dtCreated:dtCreated?dtCreated:"",
-					dtResolved:dtResolved?dtResolved:"",owners:owners?owners:"",assetNames:assetComment.assetEntity.assetName , dueDate:dueDate?dueDate:'',notes:notes]
+					dtResolved:dtResolved?dtResolved:"",owners:owners?owners:"",assetNames:assetComment.assetEntity.assetName , dueDate:dueDate?dueDate:'',notes:assetNote]
 		render commentList as JSON
 	}
 	/* ------------------------------------------------------------
@@ -1815,11 +1823,15 @@ class AssetEntityController {
 		def formatter = new SimpleDateFormat("MM/dd/yyyy");
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def date = new Date()
-		
-		if(params.isResolved == '1' && assetCommentInstance.isResolved == 0 ){
+		if(params.status=='Completed'){
+			assetCommentInstance.isResolved = 1
 			assetCommentInstance.resolvedBy = loginUser.person
 			assetCommentInstance.dateResolved = GormUtil.convertInToGMT( "now", tzId )
-		}else if(params.isResolved == '1' && assetCommentInstance.isResolved == 1){
+		}
+		if(params.status=='Completed' && assetCommentInstance.status != 'Completed' ){
+			assetCommentInstance.resolvedBy = loginUser.person
+			assetCommentInstance.dateResolved = GormUtil.convertInToGMT( "now", tzId )
+		}else if(params.status=='Completed' && assetCommentInstance.status != 'Completed'){
 		}else{
 			assetCommentInstance.resolvedBy = null
 			assetCommentInstance.dateResolved = null

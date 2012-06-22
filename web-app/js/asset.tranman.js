@@ -616,12 +616,26 @@ function showAssetDialog( e , action ) {
 			      	 $('#ownerEditTdId').val(assetComments[0].assetComment.owner.id)
 	      		 }
 	      		 var notes = assetComments[0].notes
-	      		 $('#previousNote').html(notes)
-	      		 $('#previousNotesShowId').html(notes)
+	      		  var noteTable = ''
+	      		      noteTable += "<table>"
+	      		     for(i=0; i<assetComments[0].notes.length; i++){
+	      		    	noteTable += "<tr>" 
+	      		    	noteTable += "<td>"+notes[i][0]+"</td>"
+	      		    	noteTable += "<td>"+notes[i][1]+"</td>"
+	      		    	noteTable += "<td>"+notes[i][2]+"</td>"
+	      		    	noteTable += "</tr>"
+	      		     }
+	      		    noteTable +="</table>"
+	      			
+	      		 $('#previousNote').html(noteTable)
+	      		 $('#previousNotesShowId').html(noteTable)
 	      		 $('#dueDatesId').html(assetComments[0].dueDate)
+	      		 $('#dueDateEdit').val(assetComments[0].dueDate)
 		      	 $('#ownerTdId').css('display','block')
 		      	 $('#dueDateId').css('display','block')
 		      	 $('#ownerEditId').css('display','block')
+		      	 $('#note').val('')
+		      	 $('#statusEditId').val(assetComments[0].assetComment.status)
 	      	 }
 			 if(assetComments[0].assetComment.commentType!='instruction'){
 		      	 $('#assetShowValueId').css('display','block')
@@ -636,13 +650,9 @@ function showAssetDialog( e , action ) {
 	      	 $('#mustVerifyShowId').attr('checked', false);
 	      	 $('#mustVerifyEditId').attr('checked', false);
 	      	 }
-	      	 if(assetComments[0].assetComment.isResolved != 0){
-	      	 $('#isResolvedId').attr('checked', true);
+	      	 $('#statusShowId').html(assetComments[0].assetComment.status);
 	      	 $('#isResolvedEditId').attr('checked', true);
-	      	 } else {
-	      	 $('#isResolvedId').attr('checked', false);
-	      	 $('#isResolvedEditId').attr('checked', false);
-	      	 }
+	      	
 	      	 $('#dateResolvedId').html(assetComments[0].dtResolved)
 	      	 $('#dateResolvedEditId').html(assetComments[0].dtResolved)
 	      	 $('#dateCreatedId').html(assetComments[0].dtCreated)
@@ -657,7 +667,7 @@ function showAssetDialog( e , action ) {
 	      	
 	      	 $('#createdById').html(assetComments[0].personCreateObj.firstName+" "+assetComments[0].personCreateObj.lastName)
 	      	 $('#createdByEditId').html(assetComments[0].personCreateObj.firstName+" "+assetComments[0].personCreateObj.lastName)
-	      	 $('#resolutionId').val(assetComments[0].assetComment.resolution)
+	      	 $('#resolutionId').html(assetComments[0].assetComment.resolution)
 	      	 $('#resolutionEditId').val(assetComments[0].assetComment.resolution)
 	      	 $('#commentEditId').val(assetComments[0].assetComment.comment)
 	      	 $('#commentTypeEditId').val(assetComments[0].assetComment.commentType)
@@ -832,6 +842,17 @@ function showAssetDialog( e , action ) {
 function commentChange(resolveDiv,formName) {
 var type = 	document.forms[formName].commentType.value;
 if(type == "issue"){
+	var now = new Date();
+	now.setDate(now.getDate() + 30)
+    formatDate(now);
+	$("#dueDateTrId").css('display', 'table-row');
+	$("#ownerId").css('display', 'table-row');
+	$("#catagoryTrId").css('display', 'table-row');
+	$("#issueItemId").html('<label for="comment">Issue:</label>');
+	$("#mustVerifyTd").css('display', 'none');
+	$("#categoryEditId").css('display', 'table-row');
+	$("#ownerEditedId").css('display', 'table-row');
+	$("#dueDatesEditId").css('display', 'table-row');
 	$(resolveDiv).css('display', 'block');
 	document.forms[formName].mustVerify.checked = false;
 	document.forms[formName].mustVerify.value = 0;
@@ -841,19 +862,45 @@ if(type == "issue"){
 	document.forms[formName].mustVerify.checked = true;
 	document.forms[formName].mustVerify.value = 1;
 	$(resolveDiv).css('display', 'none');
+	$("#catagoryTrId").css('display', 'none');
+	$("#dueDateTrId").css('display', 'none');
+	$("#ownerId").css('display', 'none');
+	$("#mustVerifyTd").css('display', 'block');
+	$("#ownerEditedId").css('display', 'none');
+	$("#dueDatesEditId").css('display', 'none');
+	$("#categoryEditId").css('display', 'none');
+	$("#commentEditId").html('<label for="comment">Comment:</label>');
+	$("#issueItemId").html('<label for="comment">Comment:</label>');
 }else{
 	document.forms[formName].mustVerify.checked = false;
 	document.forms[formName].mustVerify.value = 0;
 	$(resolveDiv).css('display', 'none');
+	$("#dueDateTrId").css('display', 'none');
+	$("#catagoryTrId").css('display', 'none');
+	$("#ownerId").css('display', 'none');
+	$("#mustVerifyTd").css('display', 'none')
+	$("#issueItemId").html('<label for="comment">Comment:</label>');
+	$("#ownerEditedId").css('display', 'none');
+	$("#dueDatesEditId").css('display', 'none');
+	$("#categoryEditId").css('display', 'none');
+	$("#commentEditId").html('<label for="comment">Comment:</label>');
 }
 }
 
 function commentChangeEdit(resolveDiv,formName) {
 var type = 	document.forms[formName].commentType.value;
 if(type == "issue"){
+	$('#note').val('')
+	$("#dueDatesEditId").css('display', 'table-row');
+	$("#commentEditId").html('<label for="comment">Issue:</label>');
+	$("#ownerEditedId").css('display', 'table-row');
 	$("#"+resolveDiv).css('display', 'block');
 }else{
+	$("#categoryEditId").css('display', 'none');
+	$("#ownerEditedId").css('display', 'none');
 	$("#"+resolveDiv).css('display', 'none');
+	$("#dueDatesEditId").css('display', 'none');
+	$("#commentEditId").html('<label for="comment">Comment:</label>');
 }
 }
 
@@ -913,7 +960,7 @@ function resolveValidate(formName, idVal, redirectTo){
 					jQuery.ajax({
 						url: '../assetEntity/updateComment',
 						data: {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value,'owners':document.forms[formName].owner.value,'note':document.forms[formName].note.value,'category':document.forms[formName].categoryEditId.value
-							,'dueDate':document.forms[formName].dueDateEdit.value},
+							,'dueDate':document.forms[formName].dueDateEdit.value,'status':document.forms[formName].statusEditId.value},
 						type:'POST',
 						complete: function(e) {
 							updateCommentsLists();
@@ -922,7 +969,7 @@ function resolveValidate(formName, idVal, redirectTo){
 				} else {
 					jQuery.ajax({
 						url: '../assetEntity/updateComment',
-						data: {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value,'owners':document.forms[formName].owner.value,'note':document.forms[formName].note.value,'category':document.forms[formName].categoryEditId.value,'dueDate':document.forms[formName].dueDateEdit.value},
+						data: {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value,'owners':document.forms[formName].owner.value,'note':document.forms[formName].note.value,'category':document.forms[formName].categoryEditId.value,'dueDate':document.forms[formName].dueDateEdit.value,'status':document.forms[formName].statusEditId.value},
 						type:'POST',
 						complete: function(e) {
 							updateCommentsOnList(e);
@@ -935,11 +982,13 @@ function resolveValidate(formName, idVal, redirectTo){
 			return false;
 		}
 	}else{
+		
 	if(formName == "createCommentForm"){
 			if($("#selectTimedId").length > 0){
 				timedUpdate($("#selectTimedId").val())
 			}
-			var params = {'assetEntity.id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'category':document.forms[formName].category.value,'owners':document.forms[formName].owner.value,'dueDate':document.forms[formName].dueDate.value}
+			var params = {'assetEntity.id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'category':document.forms[formName].createCategory.value,'owners':document.forms[formName].owner.value,'dueDate':document.forms[formName].dueDate.value,
+					       'status':document.forms[formName].statusId.value}
 				jQuery.ajax({
 					url: '../assetEntity/saveComment',
 					data: params,
@@ -952,7 +1001,8 @@ function resolveValidate(formName, idVal, redirectTo){
 			if( redirectTo ){
 				jQuery.ajax({
 					url: '../assetEntity/updateComment',
-					data: {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'owners':document.forms[formName].owner.value,'note':document.forms[formName].note.value,'category':document.forms[formName].categoryEditId.value,'dueDate':document.forms[formName].dueDateEdit.value},
+					data: {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'owners':document.forms[formName].owner.value,'note':document.forms[formName].note.value,'category':document.forms[formName].categoryEditId.value,'dueDate':document.forms[formName].dueDateEdit.value,
+						    'status':document.forms[formName].statusEditId.value},
 					type:'POST',
 					complete: function(e) {
 						updateCommentsLists();
@@ -961,7 +1011,7 @@ function resolveValidate(formName, idVal, redirectTo){
 			} else {
 				jQuery.ajax({
 					url: '../assetEntity/updateComment',
-					data: {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'owners':document.forms[formName].owner.value,'note':document.forms[formName].note.value,'category':document.forms[formName].categoryEditId.value,'dueDate':document.forms[formName].dueDateEdit.value},
+					data: {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'owners':document.forms[formName].owner.value,'note':document.forms[formName].note.value,'category':document.forms[formName].categoryEditId.value,'dueDate':document.forms[formName].dueDateEdit.value,'status':document.forms[formName].statusEditId.value},
 					type:'POST',
 					complete: function(e) {
 						updateCommentsOnList(e);
@@ -1075,7 +1125,21 @@ function createNewAssetComment( asset ){
 function showAssetComment(id ,type){
 	new Ajax.Request('../assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, type );commentChangeShow();}})
 }
+
 function updateCommentsLists(){
 	$('#editCommentDialog').dialog('close');
 	window.location.reload();
+}
+
+function formatDate(dateValue)
+{
+	    var M = "" + (dateValue.getMonth()+1);
+	    var MM = "0" + M;
+	    MM = MM.substring(MM.length-2, MM.length);
+	    var D = "" + (dateValue.getDate());
+	    var DD = "0" + D;
+	    DD = DD.substring(DD.length-2, DD.length);
+	    var YYYY = "" + (dateValue.getFullYear()); 
+        var currentDate = MM + "/" +DD + "/" + YYYY
+        $("#dueDateCreateId").val(currentDate);
 }
