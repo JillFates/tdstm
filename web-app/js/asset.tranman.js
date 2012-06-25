@@ -636,7 +636,7 @@ function showAssetDialog( e , action ) {
       		    	 if (i>0) {
       		    		 noteTable += "<hr/>"
       		    	 }
-      		    	 noteTable += "<b>" + notes[i][0] + "</b>" + "&nbsp;" + notes[i][1] + "<br/><pre>" + notes[i][2] + "</pre>"  
+      		    	 noteTable += "<b>" + notes[i][1] + "</b>" + "&nbsp;" + notes[i][0] + "<br/><pre>" + notes[i][2] + "</pre>"  
       		     }
 	      			
 	      		 $('#previousNote').html(noteTable)

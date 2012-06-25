@@ -1809,7 +1809,7 @@ class AssetEntityController {
 		def assetNotes = assetComment.notes.sort{it.dateCreated}
 		def assetNote = []
 		assetNotes.each{
-			def dateCreated = dateFormatter.format(it.dateCreated)
+			def dateCreated = it.dateCreated.format("E, d MMM 'at ' HH:mma")
 			assetNote << [ dateCreated , it.createdBy.toString() ,it.note]
 			
 		}
