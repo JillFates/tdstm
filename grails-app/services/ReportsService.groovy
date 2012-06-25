@@ -442,7 +442,9 @@ class ReportsService {
 	}
 	
 	def getModelInfo(moveEventInstance,eventErrorList){
-		Set modelList = AssetEntity.findAll('from AssetEntity a where a.model.modelStatus = ? and a.model.usize = ? and a.moveBundle.moveEvent =? order by a.model.modelName asc',['new',1,moveEventInstance]).modelName
+		Set modelLists = AssetEntity.findAll('from AssetEntity a where a.model.modelStatus = ? and a.model.usize = ? and a.moveBundle.moveEvent =? order by a.model.modelName asc',['new',1,moveEventInstance]).modelName
+		def modelList = []
+		modelList = modelLists.toList()
 		//def modelList = Model.findAllByModelStatusAndUsize('new',1,[sort:'modelName']).modelName
 		def modelError = ''
 		

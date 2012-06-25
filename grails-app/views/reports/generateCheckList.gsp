@@ -340,7 +340,7 @@
 					<td>
 						${modelError}
 						<div style="margin-left: 50px">
-							<b>${modelList.model.toString().replace('[','').replace(']','')}</b>
+							<b>${modelList.toString().replace('[','').replace(']','')}</b>
 						</div>
 					</td>
 				</tr>
