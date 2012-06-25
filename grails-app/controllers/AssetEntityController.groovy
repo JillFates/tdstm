@@ -1232,7 +1232,8 @@ class AssetEntityController {
 			bundle = filterdBundle.replace("[","('").replace(",","','").replace("]","')")
 		}
 		def assetEntityInstanceList
-		
+
+		// TODO - Some of the else if test params.moveEvent while others don't which doesn't seem correct. 
 		if(params.moveEvent=='unAssigned' && params.filter=='All'){
 			
 			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','VM','Blade') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundle ")
@@ -1825,8 +1826,10 @@ class AssetEntityController {
 	 * ------------------------------------------------------------ */
 	def updateComment = {
 		def assetComments = []
+		// Getting the loginUser should be abstracted into a service
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername(principal)
+		// TODO - SECURITY - Need to verify that the comment is associated to the project
 		def assetCommentInstance = AssetComment.get(params.id)
 		def formatter = new SimpleDateFormat("MM/dd/yyyy");
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
@@ -1849,6 +1852,7 @@ class AssetEntityController {
 		    params.dueDate = GormUtil.convertInToGMT(formatter.parse(params.dueDate), tzId)
 		}
 		assetCommentInstance.properties = params
+		// TODO - SECURITY - Need to validate that the owner is a member of the project
 		def personInstance = Person.get(params.owners)
 		if(!params.owner){
 		   assetCommentInstance.owner = personInstance
@@ -1856,7 +1860,7 @@ class AssetEntityController {
 		if(!assetCommentInstance.hasErrors() && assetCommentInstance.save(flush:true)) {
 		 if(params.note){
 			def assetNoteInstance = new AssetNotes();
-			assetNoteInstance.createdBy = assetCommentInstance.createdBy
+			assetNoteInstance.createdBy = loginUser.person
 			assetNoteInstance.dateCreated =  new Date()
 			assetNoteInstance.note = params.note
 			assetNoteInstance.assetComment = assetCommentInstance
@@ -1874,16 +1878,19 @@ class AssetEntityController {
 		}
 		render assetComments as JSON
 	}
+	
 	/* delete the comment record
 	 * @param assetComment
 	 * @author Lokanath
 	 * @return assetCommentList 
 	 */
 	def deleteComment = {
+		// TODO - SECURITY - deleteComment - verify that the asset is part of a project that the user has the rights to delete the note
 		def assetCommentInstance = AssetComment.get(params.id)
 		if(assetCommentInstance){
 			assetCommentInstance.delete(flush:true)
 		}
+		// TODO - deleteComment - Need to be fixed to handle non-asset type comments
 		def assetEntityInstance = AssetEntity.get( params.assetEntity )
 		def assetCommentsInstance = AssetComment.findAllByAssetEntityAndIdNotEqual( assetEntityInstance, params.id )
 		def assetCommentsList = []
