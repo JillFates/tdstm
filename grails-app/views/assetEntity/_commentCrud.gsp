@@ -31,6 +31,7 @@
 	<div>
 		<table id="createCommentTable" style="border: 0px;">
 		<tr class="prop" id="ownerId" style="display:none">
+		<% // TODO - the list of users should be in the model and not in the view %>
 		<% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
 			<td valign="top" class="name"><label for="owner">Assigned To:</label></td>
 			<td valign="top" style="width: 20%;">
@@ -38,13 +39,6 @@
 			</td>
 		
 		</tr> 
-		<tr class="prop" id="catagoryTrId" style="display:none">
-			<td valign="top" class="name"><label for="category">Category:</label></td>
-			<td style="margin-right:30px ;" valign="top">
-				<g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
-				noSelection="['':'please select']" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
-			</td>
-		</tr>
 		<tr class="prop" id="moveEventTrId" style="display:none">
 			<td valign="top" class="name"><label for="moveEvent">MoveEvent:</label></td>
 			<td style="margin-right:30px ;" valign="top">
@@ -63,8 +57,14 @@
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
 			<label for="mustVerifyEdit">Must Verify</label>
 			</td>
-					
 		</tr>
+      <tr class="prop" id="catagoryTrId" style="display:none">
+         <td valign="top" class="name"><label for="category">Category:</label></td>
+         <td style="margin-right:30px ;" valign="top">
+            <g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
+            noSelection="['':'please select']" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
+         </td>
+      </tr>
 		
 		<tr class="prop" id="dueDateTrId" style="display: none">
 			<td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
@@ -291,7 +291,8 @@
 		</tr>
 	    <tr class="prop">
 			<td valign="top" class="name"><label for="notes">Note:</label></td>
-			<td valign="top" class="value"><input type="text" id="note" name="note" value=""/>
+			<td valign="top" class="value">
+			   <textarea cols="80" rows="4" id="note" name="note" ></textarea>
 			</td>
 		</tr>
 		<tr class="prop" >
