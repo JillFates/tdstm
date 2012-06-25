@@ -8,6 +8,7 @@
           <g:javascript src="entity.crud.js" />
         <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
         <link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
+        <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
         <script type="text/javascript">
         function onInvokeAction(id) {
             setExportToLimit(id, '');
@@ -65,11 +66,17 @@
                             <jmesa:htmlColumn property="comment" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.comment?.size() > 40 ? commentInstance.comment?.substring(0,40)+'..' : commentInstance.comment}</span>
 							 </jmesa:htmlColumn>
+							 <jmesa:htmlColumn property="dueDate" title="Due Date" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.dueDate}" /></span>
+							 </jmesa:htmlColumn>
 							 <jmesa:htmlColumn property="dateCreated" title="Date Created" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDateTime date="${commentInstance.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span>
+								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.dateCreated}" /></span>
 							 </jmesa:htmlColumn>
 							 <jmesa:htmlColumn property="commentType" title="Type" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.commentType}</span>
+							 </jmesa:htmlColumn>
+							 <jmesa:htmlColumn property="status" title="Status" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.status}</span>
 							 </jmesa:htmlColumn>
 							 <jmesa:htmlColumn property="ownerString" title="Owner" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
         	                 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.owner}</span>
@@ -79,13 +86,13 @@
     	                     	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show')"><g:if test ="${commentInstance.mustVerify == 1}"></g:if><g:else><g:checkBox name="myVerifyBox" value="${true}" disabled="true"/></g:else></span>
     	                     </jmesa:htmlColumn>
         	                 --%><jmesa:htmlColumn property="assetName" title="Asset" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-        	                 	<span onclick="javascript:getEntityDetails('listComment', '${commentInstance.assetEntity.assetType}', '${commentInstance.assetEntity.id}');">${commentInstance.assetEntity?.assetName}</span>
+        	                 	<span onclick="javascript:getEntityDetails('listComment', '${commentInstance.assetEntity?.assetType}', '${commentInstance.assetEntity?.id}');">${commentInstance.assetEntity?.assetName}</span>
         	                 </jmesa:htmlColumn>
             	             <jmesa:htmlColumn property="isResolved"  sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
             	             	<span style="align:center;" onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><g:if test ="${commentInstance.commentType =='issue' && commentInstance.isResolved == 1}"><g:checkBox name="myCheckbox" value="${true}" disabled="true"/></g:if><g:else>&nbsp</g:else></span>
             	             </jmesa:htmlColumn>
                 	         <jmesa:htmlColumn width="50px" property="assetEntity.assetType" sortable="true" filterable="true" title="AssetType">
-                	         	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.assetEntity.assetType}</span>
+                	         	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance?.assetEntity?.assetType}</span>
                 	         </jmesa:htmlColumn>
                              <jmesa:htmlColumn width="50px" property="category" sortable="true" filterable="true" title="category">
                              	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.category}</span>
@@ -94,6 +101,9 @@
                     </jmesa:htmlTable>
                 </jmesa:tableFacade>
             </form>
+            <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
+		      <span class="menuButton"><a class="create" href="#" onclick="$('#statusId').val('');$('#createResolveDiv').css('display','none');$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();$('#catagoryTrId').css('display', 'none');$('#dueDateTrId').css('display', 'none');$('#ownerId').css('display', 'none');$('#mustVerifyTd').css('display', 'block');$('#moveEventTrId').css('display','table-row')" >Create</a></span>
+	       </div>
             </div>
             <div id="showEntityView" style="display: none;"></div>
 			<div id="editEntityView" style="display: none;"></div>

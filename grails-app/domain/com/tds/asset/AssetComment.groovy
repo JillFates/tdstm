@@ -1,4 +1,5 @@
 package com.tds.asset
+
 import com.tdssrc.grails.GormUtil
 class AssetComment {
 	
@@ -6,6 +7,7 @@ class AssetComment {
 	String commentType
 	Integer mustVerify = 0
 	AssetEntity assetEntity
+	MoveEvent moveEvent
 	Date dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
 	Integer isResolved = 0
 	Date dateResolved 
@@ -33,12 +35,19 @@ class AssetComment {
 	String workflowItem
 	String workflowOverride
 	String role
+	Project project
 	
 	static hasMany = [notes : AssetNotes]
 	
 	static constraints = {
 		
 		comment( blank:true, nullable:true  )
+		assetEntity( blank:true, nullable:true )
+		moveEvent(nullable: true, validator: { val, assetComment->
+												if (!val && !assetComment.assetEntity ) {
+												return ['assetComment.moveEvent.notspecified']
+												}
+											  })
 		commentType( blank:true, nullable:true, inList: ['issue','instruction','comment'] )
 		mustVerify( nullable:true )
 		isResolved( nullable:true )
@@ -68,6 +77,7 @@ class AssetComment {
 		workflowOverride( blank:true, nullable:true  )
 		role( blank:true, nullable:true  )
 		dueDate( blank:true, nullable:true  )
+		project( blank:false, nullable:false  )
 	}
 
 	static mapping  = {	

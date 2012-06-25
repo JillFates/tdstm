@@ -7,10 +7,9 @@
 			<th nowrap>Action</th>
 			<th nowrap>Comment</th>
 			<th nowrap>Comment Type</th>
+			<th nowrap>Due Date</th>
 			<th nowrap>Resolved</th>
-			<th nowrap>Must Verify</th>
 			<th nowrap>Category</th>  
-			<th nowrap>Comment Code</th>                     
 		</tr>
 		</thead>
 		<tbody id="listCommentsTbodyId">
@@ -44,6 +43,13 @@
 			<td style="margin-right:30px ;" valign="top">
 				<g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
 				noSelection="['':'please select']" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
+			</td>
+		</tr>
+		<tr class="prop" id="moveEventTrId" style="display:none">
+			<td valign="top" class="name"><label for="moveEvent">MoveEvent:</label></td>
+			<td style="margin-right:30px ;" valign="top">
+				<g:select id="moveEvent" name="moveEvent" from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}" 
+				 optionKey='id' optionValue="name" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
 		</tr>
 		<tr class="prop" >
@@ -141,7 +147,7 @@
 			<td valign="top" class="value" id="categoryTdId" ></td>
 			
 		</tr>
-		<tr class="prop">
+		<tr class="prop" style="display: none">
 			<td valign="top" class="name"><label for="commentCode">comment Code:</label></td>
 			<td valign="top" class="value" id="commentCodeTdId" ></td>
 			
@@ -187,19 +193,13 @@
 		<tr>
 			<td valign="top" class="name"><label for="dateResolved">Resolved At:</label></td>
 			<td valign="top" class="value" id="dateResolvedId" ></td>
-			<td valign="top" class="name"><label for="type">Type:</label></td>
-			<td valign="top" class="value" id="typeId" ></td>
 		</tr>
 		<tr>
 			<td valign="top" class="name" nowrap="nowrap"><label for="resolvedBy">Resolved By:</label></td>
 			<td valign="top" class="value" id="resolvedById" ></td>
-			<td valign="top" class="name"><label for="priority">Priority:</label></td>
-			<td valign="top" class="value" id="priorityId" ></td>
 		</tr>
 			<tr><td valign="top" class="name"><label for="dueDate">dueDate:</label></td>
 			<td valign="top" class="value" id="dueDatesId" ></td>
-			<td valign="top" class="name"><label for="startedTime">StartedTime:</label></td>
-			<td valign="top" class="value" id="startedTimeId" ></td>
 		</tr>	
 		
 	</table>
@@ -267,7 +267,7 @@
 			<td valign="top" class="name"><label for="category">Category:</label></td>
 			<td valign="top" class="value"  ><g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"  ></g:select></td>
 		</tr>
-		<tr class="prop">
+		<tr class="prop" style="display:none">
 			<td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
 			<td valign="top" class="value" id="commentCodeEditId" ></td>
 		</tr>
@@ -276,7 +276,7 @@
 			<td valign="top" class="value" style ="display: none;" id="assetTrShowId" ></td>
 		</tr>
 		<tr class="prop">
-			<td valign="top" class="name" id="commentEditId"><label for="comment">Comment:</label></td>
+			<td valign="top" class="name" id="commentEditTdId"><label for="comment">Comment:</label></td>
 			<td valign="top" class="value" colspan="1">
 				<textarea cols="80" rows="4" id="commentEditId" name="comment" ></textarea>
 			</td>

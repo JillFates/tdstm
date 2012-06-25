@@ -71,6 +71,21 @@
 							<td><g:link controller="application" action="list" params="[tag_f_validation:'BundleReady']">Bundle Ready</g:link></td>
 						</tr>
 					</table>
+					<h4>
+						<b>Open Issue</b>
+					</h4>
+					<table style="float:left; border: 0px; margin-left: 10px;">
+						<tr>
+							<td style="width: 10px;text-align: right;">${openIssue}</td>
+							<td><g:link controller="assetEntity" action="listComment" params="[filter:'Discovery']">Open Issues</g:link></td>
+						</tr>
+						<g:if test="${dueOpenIssue>0}">
+						<tr>
+						    <td style="width: 10px;text-align: left; " nowrap="nowrap">${dueOpenIssue} Overdue</td>
+							<td><g:link controller="assetEntity" action="listComment" params="[filter:'dueOpenIssue']">Open Issues</g:link></td>
+						</tr>
+						</g:if>
+					</table>
 	
 			</div>
 
@@ -119,6 +134,10 @@
 							<g:link controller="assetEntity" action="listComment" params="[filter:'openIssue']">
 								Open Issues</g:link></td>
 						</tr>
+						<g:if test="${generalOverDue>0}">
+						    <td style="width: 10px;text-align: left; " nowrap="nowrap">${generalOverDue} Overdue</td>
+							<td><g:link controller="assetEntity" action="listComment" params="[filter:'generalOverDue']">Open Issues</g:link></td>
+						</g:if>
 					</table>
 				</div>
 				<div style="float:left; margin-left: 0px; margin-top: 10px;">

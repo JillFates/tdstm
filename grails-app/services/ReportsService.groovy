@@ -59,7 +59,8 @@ class ReportsService {
 			   'cartError':transportInfo.cartError,'cart':transportInfo.cart,'shelf':transportInfo.shelf,'shelfError':transportInfo.shelfError,'nullAssetname':assetsInfo.nullAssetname,
 			   'blankAssets':assetsInfo.blankAssets ,'questioned':assetsInfo.questioned,'questionedDependency':assetsInfo.questionedDependency,
 			   'specialInstruction':assetsInfo.specialInstruction,'importantInstruction':assetsInfo.importantInstruction,'eventErrorString':eventErrorString,
-			   'dashBoardOk':eventBundleInfo.dashBoardOk,'allErrors':allErrors,'nullAssetTag':assetsInfo.nullAssetTag,'blankAssetTag':assetsInfo.blankAssetTag,'modelList':modelInfo.modelList,'modelError':modelInfo.modelError]
+			   'dashBoardOk':eventBundleInfo.dashBoardOk,'allErrors':allErrors,'nullAssetTag':assetsInfo.nullAssetTag,'blankAssetTag':assetsInfo.blankAssetTag,'modelList':modelInfo.modelList,'modelError':modelInfo.modelError,
+			   'eventIssues':assetsInfo.eventIssues,'nonAssetIssue':assetsInfo.nonAssetIssue]
 
 	} 
 	
@@ -239,12 +240,20 @@ class ReportsService {
 		    questioned +="""<span style="color: green;"><b>Dependencies Questioned: OK  </b><br></br></span>"""
 		}
 		
+		def nonAssetIssue = AssetComment.findAll("from AssetComment a where a.assetEntity is null and a.moveEvent = ?",[moveEventInstance])
+		def eventIssues = ''
+		if(nonAssetIssue.size()>0){
+			eventIssues +="""<span style="color: red;"><b>Event Issues: </b><br></br></span>"""
+		}else{
+			eventIssues +="""<span style="color: green;"><b>Event Issues: OK  </b><br></br></span>"""
+		}
+		
 		
 		return[summaryOk:summaryOk,issue:issue,issues:issues,dependenciesOk:dependenciesOk,dependencies:dependencies,missingRacks:missingRacks,
 			   missedRacks:missedRacks,duplicatesTag:duplicatesTag,duplicatesAssetTagNames:duplicatesAssetTagNames,duplicates:duplicates,
 			   duplicatesAssetNames:duplicatesAssetNames,nullAssetname:nullAssetname,blankAssets:blankAssets,questioned:questioned,
 			   questionedDependency:questionedDependency,specialInstruction:specialInstruction,importantInstruction:importantInstruction,
-			   eventErrorList:eventErrorList,nullAssetTag:nullAssetTag,blankAssetTag:blankAssetTag]
+			   eventErrorList:eventErrorList,nullAssetTag:nullAssetTag,blankAssetTag:blankAssetTag,eventIssues:eventIssues,nonAssetIssue:nonAssetIssue]
 
 	}
 	
@@ -433,7 +442,7 @@ class ReportsService {
 	}
 	
 	def getModelInfo(moveEventInstance,eventErrorList){
-		def modelList = AssetEntity.findAll('from AssetEntity a where a.model.modelStatus = ? and a.model.usize = ? and a.moveBundle.moveEvent =? order by a.model.modelName asc',['new',1,moveEventInstance])
+		Set modelList = AssetEntity.findAll('from AssetEntity a where a.model.modelStatus = ? and a.model.usize = ? and a.moveBundle.moveEvent =? order by a.model.modelName asc',['new',1,moveEventInstance]).modelName
 		//def modelList = Model.findAllByModelStatusAndUsize('new',1,[sort:'modelName']).modelName
 		def modelError = ''
 		

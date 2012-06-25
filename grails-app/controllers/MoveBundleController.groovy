@@ -598,7 +598,7 @@ class MoveBundleController {
 		def pendingAppDependenciesCount = applicationsOfPlanningBundle ? AssetDependency.countByAssetInListAndStatusInList(applicationsOfPlanningBundle,['Unknown','Questioned']) : 0
 		def pendingServerDependenciesCount = serversOfPlanningBundle ? AssetDependency.countByAssetInListAndStatusInList(serversOfPlanningBundle,['Unknown','Questioned']) : 0
 
-		def issues = AssetComment.findAll("FROM AssetComment a where a.assetEntity.project = ? and a.commentType = ? and a.isResolved = 0",[project, "issue"])
+		def issues = AssetComment.findAll("FROM AssetComment a where a.assetEntity.project = ? and a.commentType = ? and a.isResolved = 0 and category in ('general','planning')",[project, "issue"])
 
 		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle where project_id = $projectId group by dependency_bundle order by dependency_bundle  limit 48 ;""")
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
@@ -607,7 +607,11 @@ class MoveBundleController {
 		if(date){
 			time = formatter.format(date)
 		}
-		
+		def today = new Date()
+		def dueOpenIssue = AssetComment.findAll('from AssetComment a  where a.assetEntity.project = ? and a.category= ? and a.dueDate < ? and a.isResolved = 0',[project,'discovery',today]).size()
+		def openIssue =  AssetComment.findAll('from AssetComment a  where a.assetEntity.project = ? and a.category= ? and a.isResolved = 0',[project,'discovery']).size()
+		def generalOverDue = AssetComment.findAll("from AssetComment a  where a.assetEntity.project = ? and a.category in ('general','planning')  and a.dueDate < ? and a.isResolved = 0",[project,today]).size()
+
 		def planningConsoleList = []
 		assetDependencyList.each{dependencyBundle->
 			def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundleAndProject(dependencyBundle.dependencyBundle,project)
@@ -632,7 +636,7 @@ class MoveBundleController {
 			unknownLatencyCount:unknownLatencyCount,unassignedAssetCount:unassignedAssetCount,project:project,planningConsoleList:planningConsoleList,date:time,moveBundle:moveEventList,likelyLatency:likelyLatency,
 			unlikelyLatency:unlikelyLatency,unknownLatency:unknownLatency,dependencyBundleCount:dependencyBundleCount,uniqueMoveEventList:uniqueMoveEventList,planningDashboard:'planningDashboard',bundleStartDate:bundleStartDate,
 			unassignedDbCount:unassignedDbCount,unassignedFilesCount:unassignedFilesCount,unassignedOtherCount:unassignedOtherCount,dbList:dbList,filesList:filesList,otherTypeList:otherTypeList,percentageOtherCount:percentageOtherCount,
-			percentageDBCount:percentageDBCount,percentageFilesCount:percentageFilesCount]
+			percentageDBCount:percentageDBCount,percentageFilesCount:percentageFilesCount,openIssue:openIssue,dueOpenIssue:dueOpenIssue,generalOverDue:generalOverDue]
 	}
 	
 	/**

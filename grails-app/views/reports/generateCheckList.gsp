@@ -288,6 +288,45 @@
 					</table>
 				</td>
 			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>
+					${eventIssues}<br />
+					<table style="width: auto; margin-left: 100px;">
+						<tr>
+							<th>Due Date</th>
+							<th>Assigned To</th>
+							<th>Status</th>
+							<th>Comment</th>
+						</tr>
+						<tbody>
+							<g:if test="${nonAssetIssue.size()>0}">
+								<g:each in="${nonAssetIssue}" var="issue" status="i">
+									<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+										<td>
+											<tds:convertDate date="${issue.dueDate}"/>
+										</td>
+										<td>
+											${issue.owner}
+										</td>
+										<td>
+											${issue.status}
+										</td>
+										<td>
+											${issue.comment}
+										</td>
+									</tr>
+								</g:each>
+							</g:if>
+							<g:else>
+								<tr>
+									<td colspan="2">No Special Instruction</td>
+								</tr>
+							</g:else>
+						</tbody>
+					</table>
+				</td>
+			</tr>
 			<tr >
 			  <td>&nbsp;</td>
 				<td style="margin-left: 50px;"><g:if test="${allErrors.contains('Model')}">

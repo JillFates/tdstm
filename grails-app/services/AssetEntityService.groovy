@@ -1,3 +1,4 @@
+import java.text.SimpleDateFormat
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.jsecurity.SecurityUtils
 
@@ -10,6 +11,7 @@ import com.tdssrc.grails.GormUtil
 class AssetEntityService {
 
     static transactional = true
+	def mailService
 	
 	def createOrUpdateAssetEntityDependencies(def params, def assetEntityInstance) {
 		
@@ -322,5 +324,41 @@ class AssetEntityService {
 				}
 			}
 		}
+	}
+	
+	def sendMailToUser(assetComment,tzId){
+		def personCreateObj
+		def dtCreated
+		def dtResolved
+		def personResolvedObj
+		def owners
+		def dueDate
+		def formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a");
+		def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
+		
+		if(assetComment.createdBy){
+			personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")
+			dtCreated = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
+		}
+		if(assetComment.resolvedBy){
+			personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")
+			dtResolved = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
+		}
+		if(assetComment.owner){
+			owners = assetComment.owner
+		}
+		if(assetComment.dueDate){
+			dueDate = dateFormatter.format(assetComment.dueDate);
+		}
+		def assetNotes = assetComment.notes?.sort{it.dateCreated}
+		
+			mailService.sendMail {
+				from ''
+				to assetComment.owner.email
+				subject "TDS New ${assetComment.category} issue  due ${dueDate}"
+				body ( view:"/assetEntity/mailFormat",
+				model:[assetComment:assetComment, personCreateObj:personCreateObj, dtCreated:dtCreated, personResolvedObj:personResolvedObj,
+					   owners:owners,dueDate:dueDate,assetNotes:assetNotes])
+				}
 	}
 }

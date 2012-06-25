@@ -1749,13 +1749,22 @@ class AssetEntityController {
 		assetCommentInstance.createdBy = loginUser.person
 		def personInstance = Person.get(params.owners)
 		assetCommentInstance.owner = personInstance
+		assetCommentInstance.project = Project.get(session.CURR_PROJ.CURR_PROJ)
 
+		if(params.moveEvents){
+		  assetCommentInstance.moveEvent = MoveEvent.get(params.moveEvents)
+		}
 		if(params.status=='Completed'){
 			assetCommentInstance.isResolved = 1
 			assetCommentInstance.resolvedBy = loginUser.person
 			assetCommentInstance.dateResolved = GormUtil.convertInToGMT( "now", tzId )
 		}
 		if(!assetCommentInstance.hasErrors() && assetCommentInstance.save()) {
+			if(assetCommentInstance.owner.email){
+				Thread.start {
+					assetEntityService.sendMailToUser(assetCommentInstance,tzId)
+				}
+			}
 			def status = AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetCommentInstance.assetEntity,'issue',0])
 			assetComments << [assetComment : assetCommentInstance, status : status ? true : false]
 		}else{
@@ -1797,7 +1806,6 @@ class AssetEntityController {
 			dueDate = dateFormatter.format(assetComment.dueDate);
 		}
 		def assetNotes = assetComment.notes.sort{it.dateCreated}
-		println "assetNotes==================="+assetNotes.createdBy
 		def assetNote = []
 		assetNotes.each{
 			def dateCreated = dateFormatter.format(it.dateCreated)
@@ -1806,7 +1814,7 @@ class AssetEntityController {
 		}
 		commentList<<[ assetComment:assetComment,personCreateObj:personCreateObj,
 					personResolvedObj:personResolvedObj,dtCreated:dtCreated?dtCreated:"",
-					dtResolved:dtResolved?dtResolved:"",owners:owners?owners:"",assetNames:assetComment.assetEntity.assetName , dueDate:dueDate?dueDate:'',notes:assetNote]
+					dtResolved:dtResolved?dtResolved:"",owners:owners?owners:"",assetNames:assetComment.assetEntity?.assetName , dueDate:dueDate?dueDate:'',notes:assetNote]
 		render commentList as JSON
 	}
 	/* ------------------------------------------------------------
@@ -1824,6 +1832,7 @@ class AssetEntityController {
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def date = new Date()
 		if(params.status=='Completed'){
+			params.isResolved = 1
 			assetCommentInstance.isResolved = 1
 			assetCommentInstance.resolvedBy = loginUser.person
 			assetCommentInstance.dateResolved = GormUtil.convertInToGMT( "now", tzId )
@@ -1841,7 +1850,9 @@ class AssetEntityController {
 		}
 		assetCommentInstance.properties = params
 		def personInstance = Person.get(params.owners)
-		assetCommentInstance.owner = personInstance
+		if(!params.owner){
+		   assetCommentInstance.owner = personInstance
+		}
 		if(!assetCommentInstance.hasErrors() && assetCommentInstance.save(flush:true)) {
 		 if(params.note){
 			def assetNoteInstance = new AssetNotes();
@@ -1852,6 +1863,11 @@ class AssetEntityController {
 			if(!assetNoteInstance.save(flush:true)){
 				assetNoteInstance.errors.allErrors.each{println it}
 			}
+		 }
+		 if(assetCommentInstance.owner.email){
+			 Thread.start{
+		          assetEntityService.sendMailToUser(assetCommentInstance,tzId)
+			 }
 		 }
 			def status = AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetCommentInstance.assetEntity,'issue',0])
 			assetComments << [assetComment : assetCommentInstance, status : status ? true : false]
@@ -2872,18 +2888,24 @@ class AssetEntityController {
 		def userId = session.getAttribute("LOGIN_PERSON").id
 		def personInstance = Person.get(userId)
 		def assetCommentList
+		def today = new Date()
 		if(params.filter=='openIssue'){
-			assetCommentList = AssetComment.findAll("FROM AssetComment a where a.assetEntity.project = ? and a.commentType = ? and a.isResolved = 0",[project, "issue"])
+			assetCommentList = AssetComment.findAll("FROM AssetComment a where a.project = ? and a.commentType = ? and a.isResolved = 0 and category in ('general','planning') order by dueDate desc , dateCreated desc",[project, "issue"])
+		}else if(params.filter=='generalOverDue'){
+		    assetCommentList = AssetComment.findAll("from AssetComment a  where a.project = ? and  category in ('general','planning') and a.dueDate < ? and a.isResolved = 0 order by dueDate desc , dateCreated desc",[project,today])
+		}else if(params.filter=='Discovery'){
+		    assetCommentList = AssetComment.findAll('from AssetComment a  where a.project = ? and a.category= ?  order by dueDate desc , dateCreated desc',[project,'discovery'])
+		}else if(params.filter=='dueOpenIssue'){
+		    assetCommentList = AssetComment.findAll('from AssetComment a  where a.project = ? and a.category= ? and a.dueDate < ? order by dueDate desc , dateCreated desc',[project,'discovery',today])
 		}else if(params.resolvedBox=="on"){
-		    assetCommentList = AssetComment.findAll("From AssetComment a where a.assetEntity.project = :project  order by dateCreated asc ",[project:project])
+		    assetCommentList = AssetComment.findAll("From AssetComment a where a.project = :project  order by dateCreated asc ",[project:project])
 		}else{
-		    assetCommentList = AssetComment.findAll("From AssetComment a where a.assetEntity.project = :project and isResolved = :isResolved order by dateCreated asc",[project:project,isResolved:0])
+		    assetCommentList = AssetComment.findAll("From AssetComment a where a.project = :project  and isResolved = :isResolved order by dueDate desc , dateCreated desc",[project:project,isResolved:0])
 		}
 		if(params.issueBox=="on" && params.resolvedBox=="on" ){
-			
-			assetCommentList = AssetComment.findAll("From AssetComment a where a.assetEntity.project = :project and isResolved = :isResolved and owner = :owner order by dateCreated asc",[project:project,isResolved:1,owner:personInstance])
+			assetCommentList = AssetComment.findAll("From AssetComment a where a.project = :project  and isResolved = :isResolved and owner = :owner order by dueDate desc , dateCreated desc",[project:project,isResolved:1,owner:personInstance])
 		}else if(params.issueBox=="on" ){
-			assetCommentList = AssetComment.findAll("From AssetComment a where a.assetEntity.project = :project  and owner = :owner order by dateCreated asc",[project:project,owner:personInstance])
+			assetCommentList = AssetComment.findAll("From AssetComment a where a.project = :project  and owner = :owner order by dueDate asc , dateCreated desc",[project:project,owner:personInstance])
 		}
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
 		tableFacade.items = assetCommentList

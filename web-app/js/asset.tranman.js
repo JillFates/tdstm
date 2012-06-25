@@ -509,11 +509,18 @@ function showAssetDialog( e , action ) {
 			      typeTd.id = 'type_'+commentObj.commentInstance.id
 			      typeTd.name = commentObj.commentInstance.id
 			      typeTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'show' );commentChangeShow();}})}
+			      
+			      var dueDateTd = document.createElement('td');
+			      dueDateTd.id = 'dueDate_'+commentObj.commentInstance.id
+			      dueDateTd.name = commentObj.commentInstance.id					   	  
+			      dueDateTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
+			      
 			      var resolveTd = document.createElement('td');
 				  resolveTd.id = 'resolve_'+commentObj.commentInstance.id
 				  resolveTd.name = commentObj.commentInstance.id
 			      resolveTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'show' );commentChangeShow();}})}					      
 			      var verifyTd = document.createElement('td');
+			      
 				  verifyTd.id = 'verify_'+commentObj.commentInstance.id
 				  verifyTd.name = commentObj.commentInstance.id
 			      verifyTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'show' );commentChangeShow();}})}
@@ -527,7 +534,9 @@ function showAssetDialog( e , action ) {
 			      commentCodeTd.id = 'commentCode_'+commentObj.commentInstance.id
 			      commentCodeTd.name = commentObj.commentInstance.id					   	  
 			      commentCodeTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
-			      					      
+			      	
+			      
+			      
 			      var image = document.createElement('img');
 			      image.src = "../images/skin/database_edit.png"
 			      image.border = 0
@@ -537,7 +546,10 @@ function showAssetDialog( e , action ) {
 			      link.name = commentObj.commentInstance.id
 			      link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChangeEdit('editResolveDiv','editCommentForm');}})} //;return false
 			      var commentText = document.createTextNode(truncate(commentObj.commentInstance.comment));
-			      var typeText = document.createTextNode(commentObj.commentInstance.commentType);
+			      var typeText = document.createTextNode(commentObj.commentInstance.commentType); 
+			      var formatedDueDate = formatDueDate(commentObj.commentInstance.dueDate);
+			      var duedate = document.createTextNode(formatedDueDate);
+			      
 			      var resolveVal
 			      if(commentObj.commentInstance.commentType != "issue"){
 			      resolveVal = document.createTextNode('');
@@ -550,6 +562,7 @@ function showAssetDialog( e , action ) {
 			      }
 			      var categoryText = document.createTextNode(truncate(commentObj.commentInstance.category));
 			      var commentCodeText = document.createTextNode(truncate(commentObj.commentInstance.commentCode));
+			     
 			      
 			      var verifyText = document.createElement('input')
 			      verifyText.id = 'verifyText_'+commentObj.commentInstance.id
@@ -561,25 +574,27 @@ function showAssetDialog( e , action ) {
 				  editTd.appendChild( link )	
 			      commentTd.appendChild( commentText )
 			      typeTd.appendChild( typeText )
+			     
+			      dueDateTd.appendChild( duedate )
 			      resolveTd.appendChild( resolveVal )
-			      verifyTd.appendChild( verifyText )
+			     
+			      //verifyTd.appendChild( verifyText )
 			      categoryTd.appendChild( categoryText )
-			      commentCodeTd.appendChild( commentCodeText )
+			      //commentCodeTd.appendChild( commentCodeText )
 			      if ( role ) {
 			      	tr.appendChild( editTd )
 			      }
 			      tr.appendChild( commentTd )
-			      tr.appendChild( typeTd )	     					      
+			      tr.appendChild( typeTd )	   
+			      tr.appendChild( dueDateTd )	  
 			      tr.appendChild( resolveTd )	     					      
-			      tr.appendChild( verifyTd )
+			      //tr.appendChild( verifyTd )
 			      tr.appendChild( categoryTd )
-			      tr.appendChild( commentCodeTd )
+			     
+			      //tr.appendChild( commentCodeTd )
 			      listTbody.appendChild( tr )
 			      if(commentObj.commentInstance.isResolved == 1){
 			      	resolveVal.checked = true ;
-			      }
-		       if(commentObj.commentInstance.mustVerify == 1){
-			      	verifyText.checked = true ;
 			      }
 		      	}
 		      listTable.append( listTbody )
@@ -651,7 +666,7 @@ function showAssetDialog( e , action ) {
 	      	 $('#mustVerifyEditId').attr('checked', false);
 	      	 }
 	      	 $('#statusShowId').html(assetComments[0].assetComment.status);
-	      	 $('#isResolvedEditId').attr('checked', true);
+	      	 $('#isResolvedEditId').val(assetComments[0].assetComment.isResolved);
 	      	
 	      	 $('#dateResolvedId').html(assetComments[0].dtResolved)
 	      	 $('#dateResolvedEditId').html(assetComments[0].dtResolved)
@@ -716,6 +731,11 @@ function showAssetDialog( e , action ) {
 				  typeTd.name = assetComments[0].assetComment.id
 				  typeTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
 				  
+				  var dueDateTd = document.createElement('td');
+				  dueDateTd.id = 'type_'+assetComments[0].assetComment.id
+				  dueDateTd.name = assetComments[0].assetComment.id
+				  dueDateTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
+				  
 				  var categoryTd = document.createElement('td');
 				  categoryTd.id = 'category_'+assetComments[0].assetComment.id
 				  categoryTd.name = assetComments[0].assetComment.id
@@ -743,6 +763,8 @@ function showAssetDialog( e , action ) {
 				  link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+assetComments[0].assetComment.id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );}})} //;return false
 			      var commentText = document.createTextNode(truncate(assetComments[0].assetComment.comment));
 			      var typeText = document.createTextNode(assetComments[0].assetComment.commentType);
+			      var formatedDueDate = formatDueDate(assetComments[0].assetComment.dueDate);
+			      var duedate = document.createTextNode(formatedDueDate);
 			      
 			      var categoryText = document.createTextNode(assetComments[0].assetComment.category);
 			      var commentCodeText = document.createTextNode(assetComments[0].assetComment.commentCode);
@@ -767,17 +789,19 @@ function showAssetDialog( e , action ) {
 				  editTd.appendChild( link  )					      
 			      commentTd.appendChild( commentText )
 			      typeTd.appendChild( typeText )
+			      dueDateTd.appendChild( duedate )
 			      resolveTd.appendChild( resolveVal )
-			      verifyTd.appendChild( verifyText )
+			      //verifyTd.appendChild( verifyText )
 			      categoryTd.appendChild( categoryText )
-			      commentCodeTd.appendChild( commentCodeText )
+			      //commentCodeTd.appendChild( commentCodeText )
 			      tr.appendChild( editTd )
 			      tr.appendChild( commentTd )
 			      tr.appendChild( typeTd )
+			      tr.appendChild( dueDateTd )
 			      tr.appendChild( resolveTd )
-			      tr.appendChild( verifyTd )
+			      //tr.appendChild( verifyTd )
 			      tr.appendChild( categoryTd )
-			      tr.appendChild( commentCodeTd )
+			      //tr.appendChild( commentCodeTd )
 			      tbody.append( tr )
 			      if(assetComments[0].assetComment.isResolved == 1){
 			      	resolveVal.checked = true;
@@ -935,18 +959,20 @@ function resolveValidate(formName, idVal, redirectTo){
 	}
 	var resolveBoo = document.forms[formName].isResolved.checked;
 	var resolveVal = document.forms[formName].resolution.value;
-	var assetId = $("#"+idVal).val()
-	
+	var assetId = ''
+		if($("#"+idVal).val()){
+			assetId = $("#"+idVal).val()
+		}
 	if(type == ""){
 		alert('Please select comment type');
 		return false;
-	}else if(resolveBoo){
-		if(resolveVal != ""){
+	}else if($('#statusEditId').val() == "Completed"){
+		if( $('#resolutionEditId').val() !=''){
 			if(formName == "createCommentForm"){
 				if($("#selectTimedId").length > 0){
 					timedUpdate($("#selectTimedId").val())
 				}
-				var params = {'id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'category':document.forms[formName].category.value,'owners':document.forms[formName].owner.value,'dueDate':document.forms[formName].dueDate.value}
+				var params = { 'id':parseInt(assetId),'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'category':document.forms[formName].category.value,'owners':document.forms[formName].owner.value,'dueDate':document.forms[formName].dueDate.value,'moveEvent':document.forms[formName].moveEvent.value}
 				jQuery.ajax({
 					url: '../assetEntity/saveComment',
 					data: params,
@@ -987,8 +1013,14 @@ function resolveValidate(formName, idVal, redirectTo){
 			if($("#selectTimedId").length > 0){
 				timedUpdate($("#selectTimedId").val())
 			}
-			var params = {'assetEntity.id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'category':document.forms[formName].createCategory.value,'owners':document.forms[formName].owner.value,'dueDate':document.forms[formName].dueDate.value,
-					       'status':document.forms[formName].statusId.value}
+			var params
+			if(document.forms[formName].moveEvent.value){
+			   params = { 'comment':document.forms[formName].comment.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'category':document.forms[formName].createCategory.value,'owners':document.forms[formName].owner.value,'dueDate':document.forms[formName].dueDate.value,
+					       'status':document.forms[formName].statusId.value,'moveEvents':document.forms[formName].moveEvent.value}
+			}else{ 
+				params = {'assetEntity.id':parseInt(assetId), 'comment':document.forms[formName].comment.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'category':document.forms[formName].createCategory.value,'owners':document.forms[formName].owner.value,'dueDate':document.forms[formName].dueDate.value,
+					       'status':document.forms[formName].statusId.value,'moveEvent':document.forms[formName].moveEvent.value}
+			}
 				jQuery.ajax({
 					url: '../assetEntity/saveComment',
 					data: params,
@@ -1142,4 +1174,15 @@ function formatDate(dateValue)
 	    var YYYY = "" + (dateValue.getFullYear()); 
         var currentDate = MM + "/" +DD + "/" + YYYY
         $("#dueDateCreateId").val(currentDate);
+}
+function formatDueDate(input)
+{
+	 var currentDate = ""
+	 if(input){
+		  var datePart = input.match(/\d+/g),
+		  year = datePart[0].substring(0), // get only two digits
+		  month = datePart[1], day = datePart[2];
+	      currentDate = month+'/'+day+'/'+year;
+	 }
+    return currentDate
 }
