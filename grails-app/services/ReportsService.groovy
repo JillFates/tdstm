@@ -39,7 +39,7 @@ class ReportsService {
   
         def transportInfo = getTransportInfo(assetEntityList,eventErrorList)
 		
-		def modelInfo = getModelInfo(eventErrorList)
+		def modelInfo = getModelInfo(moveEventInstance,eventErrorList)
 		
 		Set allErrors = eventErrorList
 		def eventErrorString = ''
@@ -213,10 +213,10 @@ class ReportsService {
 		def issues = AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in ${assetId} and commentType ='issue' and  isResolved =0 order by comment.assetEntity.assetName ")
 		def issue = ""
 		if(issues.size()>0){
-			issue +="""<span style="color: red;"><b>Issues: Unresolved Issues  </b><br></br></span>"""
+			issue +="""<span style="color: red;"><b>Asset Issues: Unresolved Issues  </b><br></br></span>"""
 			eventErrorList << 'Assets'
 		}else{
-			issue +="""<span style="color: green;"><b>Issues: OK  </b><br></br></span>"""
+			issue +="""<span style="color: green;"><b>Asset Issues: OK  </b><br></br></span>"""
 		}
 		
 		def specialInstruction = AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in ${assetId}  and  mustVerify = 1 order by comment.assetEntity.assetName ")
@@ -432,15 +432,16 @@ class ReportsService {
 			   eventErrorList:eventErrorList]
 	}
 	
-	def getModelInfo(eventErrorList){
-		def modelList = Model.findAllByModelStatusAndUsize('new',1,[sort:'modelName']).modelName
+	def getModelInfo(moveEventInstance,eventErrorList){
+		def modelList = AssetEntity.findAll('from AssetEntity a where a.model.modelStatus = ? and a.model.usize = ? and a.moveBundle.moveEvent =? order by a.model.modelName asc',['new',1,moveEventInstance])
+		//def modelList = Model.findAllByModelStatusAndUsize('new',1,[sort:'modelName']).modelName
 		def modelError = ''
 		
 		if(modelList.size()>0){
 			eventErrorList << 'Model'
-			modelError+="""<span style="color: red;"><b>${modelList.size()}: un-validated models used : </b><br></br></span>"""
+			modelError+="""<span style="color: red;margin-left:50px;"><b>${modelList.size()}: un-validated models used : </b><br></br></span>"""
 		}else{
-	    	modelError+="""<span style="color: green;"><b>Model: OK  </b><br></br></span>"""
+	    	modelError+="""<span style="color: green;margin-left:50px;"><b>Model: OK  </b><br></br></span>"""
 		}
 		return[modelList:modelList,modelError:modelError]
 		

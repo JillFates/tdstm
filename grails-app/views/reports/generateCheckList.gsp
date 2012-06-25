@@ -288,6 +288,23 @@
 					</table>
 				</td>
 			</tr>
+			<tr >
+			  <td>&nbsp;</td>
+				<td style="margin-left: 50px;"><g:if test="${allErrors.contains('Model')}">
+							<span style="color: red;"><b>Model Check</b></span>
+						</g:if> <g:else>
+							<span style="color: green;"><b>Model Check</b></span>
+						</g:else></td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td>
+						${modelError}
+						<div style="margin-left: 50px">
+							<b>${modelList.model.toString().replace('[','').replace(']','')}</b>
+						</div>
+					</td>
+				</tr>
 			<tr>
 				<td><g:if test="${allErrors.contains('Teams')}">
 						<span style="color: red;"><b><h2>Teams</h2></b></span>
@@ -414,22 +431,7 @@
 			</tr>
 			
 			
-			<tr>
-				<td><g:if test="${allErrors.contains('Model')}">
-						<span style="color: red;"><b><h2>Model Check</h2></b></span>
-					</g:if> <g:else>
-						<span style="color: green;"><b><h2>Model Check</h2></b></span>
-					</g:else></td>
-			</tr>
-			<tr>
-				<td>&nbsp;</td>
-				<td>
-					${modelError}
-					<div style="margin-left: 50px">
-						<b>${modelList.toString().replace('[','').replace(']','')}</b>
-					</div>
-				</td>
-			</tr>
+			
 			
 		</table>
 
