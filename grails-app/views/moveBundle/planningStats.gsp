@@ -34,7 +34,11 @@
 					<table style="float:left; border: 0px; margin-left: 10px; margin-bottom: 10px;">
 						<tr>
 							<td style="width: 10px;text-align: right;">${applicationCount}</td>
-							<td><g:link controller="application" action="list" params="[filter:'applicationCount']">Applications</g:link></td>
+							<td><g:link controller="application" action="list" params="[filter:'applicationCount']">Applications</g:link><br />
+							(<g:link controller="application" action="list" params="[tag_f_validation:'Discovery']">
+							${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ? ',['Application', project,'Discovery',true]).size()} 
+							to validate</g:link>)
+							</td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${physicalCount}</td>
@@ -47,32 +51,7 @@
 					</table>
 					<br />
 					<h4>
-						<b>App Validations</b>
-					</h4>
-					<table style="float:left; border: 0px; margin-left: 10px;">
-						<tr>
-							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ? ',['Application', project,'Discovery',true]).size()}</td>
-							<td><g:link controller="application" action="list" params="[tag_f_validation:'Discovery']">Discovery</g:link></td>
-						</tr>
-						<tr>
-							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyScan',true]).size()}</td>
-							<td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyScan']">DependencyScan</g:link></td>
-						</tr>
-						<tr>
-							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Validated',true]).size()}</td>
-							<td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyScan']">Validated</g:link></td>
-						</tr>
-						<tr>
-							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyReview',true]).size()}</td>
-							<td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyReview']">Dependency Review</g:link></td>
-						</tr>
-						<tr>
-							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()}</td>
-							<td><g:link controller="application" action="list" params="[tag_f_validation:'BundleReady']">Bundle Ready</g:link></td>
-						</tr>
-					</table>
-					<h4>
-						<b>Open Issue</b>
+						<b>Discovery Issues</b>
 					</h4>
 					<table style="float:left; border: 0px; margin-left: 10px;">
 						<tr>
@@ -81,8 +60,8 @@
 						</tr>
 						<g:if test="${dueOpenIssue>0}">
 						<tr>
-						    <td style="width: 10px;text-align: left; " nowrap="nowrap">${dueOpenIssue} Overdue</td>
-							<td><g:link controller="assetEntity" action="listComment" params="[filter:'dueOpenIssue']">Open Issues</g:link></td>
+						    <td style="width: 10px;text-align: right;color: red;">${dueOpenIssue}</td>
+							<td><g:link controller="assetEntity" action="listComment" params="[filter:'dueOpenIssue']">Overdue</g:link></td>
 						</tr>
 						</g:if>
 					</table>
@@ -109,34 +88,53 @@
 					</table>
 				<div style="float:left; margin-left: 0px; margin-top: 10px;">
 					<h4>
+						<b>App Reviews</b>
+					</h4>
+					<table style="float:left; border: 0px; margin-left: 10px;">
+						<tr>
+							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyScan',true]).size()}</td>
+							<td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyScan']">DependencyScan</g:link></td>
+						</tr>
+						<tr>
+							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Validated',true]).size()}</td>
+							<td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyScan']">Validated</g:link></td>
+						</tr>
+						<tr>
+							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyReview',true]).size()}</td>
+							<td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyReview']">Dependency Review</g:link></td>
+						</tr>
+						<tr>
+							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()}</td>
+							<td><g:link controller="application" action="list" params="[tag_f_validation:'BundleReady']">Bundle Ready</g:link></td>
+						</tr>
+					</table>
+					<h4>
 						<b>Dependencies</b>
 					</h4>
 					<table style="float:left; border: 0px;">
 						<tr>
-							<td style="width: 10px;text-align: right;">${appDependenciesCount}</td>
-							<td style="width: 150px;">App Dependencies <br />
+							<td style="width: 10px;text-align: right;">${pendingAppDependenciesCount}</td>
+							<td style="width: 150px;">App Dependencies to validate<br />
 								<g:if test="${appDependenciesCount > 0 }">
-								(${100 - Math.round((pendingAppDependenciesCount/appDependenciesCount)*100)}%,&nbsp;
-								${pendingAppDependenciesCount}&nbsp; to resolve)
-								</g:if></td>
+								(${100 - Math.round((pendingAppDependenciesCount/appDependenciesCount)*100)}% of the
+								${appDependenciesCount} total)
+								</td>
 						</tr>
 						<tr>
-							<td style="width: 10px;text-align: right;">${serverDependenciesCount}</td>
-							<td style="width: 150px;">Server Dependencies <br />
+							<td style="width: 10px;text-align: right;">${pendingServerDependenciesCount}</td>
+							<td style="width: 150px;">Server Dependencies to validate<br />
 								<g:if test="${serverDependenciesCount > 0 }">
-								(${100 - Math.round((pendingServerDependenciesCount/serverDependenciesCount)*100)}%,&nbsp;
-								${pendingServerDependenciesCount}&nbsp; to resolve)
+								(${100 - Math.round((pendingServerDependenciesCount/serverDependenciesCount)*100)}% of the
+								 ${serverDependenciesCount} total)
 								</g:if></td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${issuesCount}</td>
-							<td style="width: 150px;">
-							<g:link controller="assetEntity" action="listComment" params="[filter:'openIssue']">
-								Open Issues</g:link></td>
+							<td style="width: 150px;"><g:link controller="assetEntity" action="listComment" params="[filter:'openIssue']">Open Issues</g:link></td>
 						</tr>
 						<g:if test="${generalOverDue>0}">
-						    <td style="width: 10px;text-align: left; " nowrap="nowrap">${generalOverDue} Overdue</td>
-							<td><g:link controller="assetEntity" action="listComment" params="[filter:'generalOverDue']">Open Issues</g:link></td>
+						    <td style="width: 10px;text-align: right;color: red;">${generalOverDue}</td>
+							<td><g:link controller="assetEntity" action="listComment" params="[filter:'generalOverDue']">Overdue</g:link></td>
 						</g:if>
 					</table>
 				</div>
@@ -158,7 +156,6 @@
 							<td><g:link controller="application" action="list" params="[latency:'UnLikely']">UnLikely</g:link></td>
 						</tr>
 					</table>
-	
 				</div>
 			</div>
 			<div style="float:right;margin-top: 10px; margin-left: 5px;">
@@ -199,7 +196,7 @@
 					<tbody>
 						<tr>
 							<td style="color: black"><b>Apps</b></td>
-							<td style="color: red;text-align: right;"><b>
+							<td style="text-align: right;"><b>
 									<g:link controller="application" action="list" params="[moveEvent:'unAssigned']"><span style="color: red">${unassignedAppCount}</span></g:link>
 							</b></td>
 							<g:each in="${appList}" var="appCount">
@@ -233,7 +230,7 @@
 						</tr>
 						<tr>
 							<td style="color: black"><b>Servers</b></td>
-							<td style="color: red; text-align: right;""><b>
+							<td style=" text-align: right;""><b>
 									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'All']"><span style="color: red">${unassignedAssetCount}</span></g:link>
 							</b></td>
 								<g:each in="${assetList}" var="assetCount">
@@ -245,7 +242,7 @@
 						</tr>
 						<tr>
 							<td style="color: black">Physical</td>
-							<td style="color: red;text-align: right;""><b>
+							<td style="text-align: right;""><b>
 									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'physical']"><span style="color: red">${unassignedPhysialAssetCount}</span></g:link>
 							</b></td>
 								<g:each in="${assetList}" var="assetCount">
@@ -259,7 +256,7 @@
 						</tr>
 						<tr>
 							<td style="color: black">Virtual</td>
-							<td style="color: red;text-align: right;""><b>
+							<td style="text-align: right;""><b>
 									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'virtual']"><span style="color: red">${unassignedVirtualAssetCount}</span></g:link>
 							</b></td>
 								<g:each in="${assetList}" var="assetCount">
@@ -273,7 +270,7 @@
 						</tr>
 						<tr>
 							<td style="color: black"><b>Databases</b></td>
-							<td style="color: red; text-align: right;""><b>
+							<td style=" text-align: right;""><b>
 									<g:link controller="database" action="list" params="[moveEvent:'unAssigned']"><span style="color: red">${unassignedDbCount}</span></g:link>
 							</b></td>
 								<g:each in="${dbList}" var="dbCount">
@@ -285,7 +282,7 @@
 						</tr>
 						<tr>
 							<td style="color: black"><b>Files</b></td>
-							<td style="color: red; text-align: right;""><b>
+							<td style=" text-align: right;""><b>
 									<g:link controller="files" action="list" params="[moveEvent:'unAssigned']"><span style="color: red">${unassignedFilesCount}</span></g:link>
 							</b></td>
 								<g:each in="${filesList}" var="filesCount">
@@ -297,7 +294,7 @@
 						</tr>
 						<tr>
 							<td style="color: black"><b>Other</b></td>
-							<td style="color: red; text-align: right;""><b>
+							<td style=" text-align: right;""><b>
 									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'other']"><span style="color: red">${unassignedOtherCount}</span></g:link>
 							</b></td>
 								<g:each in="${otherTypeList}" var="otherCount">
@@ -309,9 +306,6 @@
 						</tr>
 					</tbody>
 				</table>
-			</div>
-			<div style="clear: both;float: left;margin-top: 30px; margin-left: 10px; width:900px; overflow:scroll;">
-			   <g:render template="dependencyBundleDetails" />
 			</div>
 </body>
 </html>
