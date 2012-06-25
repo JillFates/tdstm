@@ -118,7 +118,7 @@
 								<g:if test="${appDependenciesCount > 0 }">
 								(${100 - Math.round((pendingAppDependenciesCount/appDependenciesCount)*100)}% of the
 								${appDependenciesCount} total)
-								</td>
+								</g:if></td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${pendingServerDependenciesCount}</td>
