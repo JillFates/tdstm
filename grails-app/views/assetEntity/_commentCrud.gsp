@@ -18,7 +18,7 @@
 	</div>
     <tds:hasPermission permission='CommentCrudView'>
 	<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-		<span class="menuButton"><a class="create" href="#" onclick="$('#statusId').val('');$('#createResolveDiv').css('display','none');$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();$('#catagoryTrId').css('display', 'none');$('#dueDateTrId').css('display', 'none');$('#ownerId').css('display', 'none');$('#mustVerifyTd').css('display', 'block');" >New Comment</a></span>
+		<span class="menuButton"><a class="create" href="#" onclick="$('#statusId').val('');$('#createResolveDiv').css('display','none');$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();$('#catagoryTrId').css('display', 'none');$('#dueDateTrId').css('display', 'none');$('#ownerId').css('display', 'none');" >New Comment</a></span>
 	</div>
 	</tds:hasPermission>
 </div>
