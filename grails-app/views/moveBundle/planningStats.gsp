@@ -29,7 +29,7 @@
 						</tr>
 					</table>
 					<h4>
-						<b>Totals</b>
+						<b>Total Discovered</b>
 					</h4>
 					<table style="float:left; border: 0px; margin-left: 10px; margin-bottom: 10px;">
 						<tr>
@@ -47,6 +47,18 @@
 						<tr>
 							<td style="width: 10px;text-align: right;">${virtualCount}</td>
 							<td><g:link controller="assetEntity" action="list" params="[filter:'virtual']">Virtual Servers</g:link></td>
+						</tr>
+						<tr>
+							<td style="width: 10px;text-align: right;">${dbCount}</td>
+							<td><g:link controller="database" action="list" >Databases</g:link></td>
+						</tr>
+						<tr>
+							<td style="width: 10px;text-align: right;">${filesCount}</td>
+							<td><g:link controller="files" action="list" >Files</g:link></td>
+						</tr>
+						<tr>
+							<td style="width: 10px;text-align: right;">${otherCount}</td>
+							<td><g:link controller="assetEntity" action="list" >Other Assets</g:link></td>
 						</tr>
 					</table>
 					<br />
@@ -108,6 +120,8 @@
 							<td><g:link controller="application" action="list" params="[tag_f_validation:'BundleReady']">Bundle Ready</g:link></td>
 						</tr>
 					</table>
+				</div>
+				<div style="float:left; margin-left: 0px; margin-top: 10px;">
 					<h4>
 						<b>Dependencies</b>
 					</h4>
@@ -116,7 +130,7 @@
 							<td style="width: 10px;text-align: right;">${pendingAppDependenciesCount}</td>
 							<td style="width: 150px;">App Dependencies to validate<br />
 								<g:if test="${appDependenciesCount > 0 }">
-								(${100 - Math.round((pendingAppDependenciesCount/appDependenciesCount)*100)}% of the
+								(${Math.round((pendingAppDependenciesCount/appDependenciesCount)*100)}% of the
 								${appDependenciesCount} total)
 								</g:if></td>
 						</tr>
@@ -124,7 +138,7 @@
 							<td style="width: 10px;text-align: right;">${pendingServerDependenciesCount}</td>
 							<td style="width: 150px;">Server Dependencies to validate<br />
 								<g:if test="${serverDependenciesCount > 0 }">
-								(${100 - Math.round((pendingServerDependenciesCount/serverDependenciesCount)*100)}% of the
+								(${Math.round((pendingServerDependenciesCount/serverDependenciesCount)*100)}% of the
 								 ${serverDependenciesCount} total)
 								</g:if></td>
 						</tr>
