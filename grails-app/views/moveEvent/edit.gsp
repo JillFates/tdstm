@@ -73,6 +73,46 @@
                                 </td>
                             </tr>
                             <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="runbookStatus">Runbook Status:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'runbookStatus','errors')}">
+                                    <g:select id="runbookStatus" name="runbookStatus" from="${moveEventInstance.constraints.runbookStatus.inList}" value="${moveEventInstance.runbookStatus}" ></g:select>
+                                </td>
+                            </tr> 
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="description">Runbook version:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'runbookVersion','errors')}">
+                                    <input type="text" id="runbookVersion" name="runbookVersion" value="${fieldValue(bean:moveEventInstance,field:'runbookVersion')}"/>
+                                </td>
+                            </tr> 
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="description">Runbook bridge1 :</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'runbookBridge1','errors')}">
+                                    <input type="text" id="runbookBridge1" name="runbookBridge1" value="${fieldValue(bean:moveEventInstance,field:'runbookBridge1')}"/>
+                                </td>
+                            </tr> 
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="description">Runbook bridge1 :</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'runbookBridge2','errors')}">
+                                    <input type="text" id="runbookBridge2" name="runbookBridge2" value="${fieldValue(bean:moveEventInstance,field:'runbookBridge1')}"/>
+                                </td>
+                            </tr> 
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="description">Video Link:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'videolink','errors')}">
+                                    <input type="text" id="videolink" name="videolink" value="${fieldValue(bean:moveEventInstance,field:'videolink')}"/>
+                                </td>
+                            </tr> 
+                            <tr class="prop">
 				                <td valign="top" class="name">
 				                  <label for="calcMethod"><b>Calculated Type:&nbsp;<span style="color: red">*</span></b></label>
 				                </td>

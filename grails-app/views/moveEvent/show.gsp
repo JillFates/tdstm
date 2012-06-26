@@ -72,7 +72,27 @@
 								<g:else>Linear</g:else>
 							</td>
 						</tr>
-                        
+                        <tr class="prop">
+				            <td valign="top" class="name">Runbook Status:</td>
+				
+				            <td valign="top" class="value">${fieldValue(bean:moveEventInstance, field:'runbookStatus')}</td>
+						</tr><tr class="prop">
+				            <td valign="top" class="name">Runbook Version:</td>
+				
+				            <td valign="top" class="value">${fieldValue(bean:moveEventInstance, field:'runbookVersion')}</td>
+						</tr><tr class="prop">
+				            <td valign="top" class="name">Runbook bridge1 :</td>
+				
+				            <td valign="top" class="value">${fieldValue(bean:moveEventInstance, field:'runbookBridge1')}</td>
+						</tr><tr class="prop">
+				            <td valign="top" class="name">Runbook bridge2 :</td>
+				
+				            <td valign="top" class="value">${fieldValue(bean:moveEventInstance, field:'runbookBridge2')}</td>
+						</tr><tr class="prop">
+				            <td valign="top" class="name">Video Link::</td>
+				
+				            <td valign="top" class="value">${fieldValue(bean:moveEventInstance, field:'videolink')}</td>
+						</tr>
                         <tr class="prop">
 				            <td valign="top" class="name">Status:</td>
 				

@@ -16,6 +16,11 @@ class MoveEvent {
     String description
 	String inProgress = "auto" 
 	String calcMethod = METHOD_LINEAR
+	String runbookStatus
+	Integer runbookVersion = 1
+	String runbookBridge1
+	String runbookBridge2 
+	String videolink
 
 	Date revisedCompletionTime		// Revised Completion Time of the MoveEvent which is only set as an exception
 
@@ -32,6 +37,11 @@ class MoveEvent {
 		revisedCompletionTime ( nullable:true )
 		inProgress( blank:false, nullable:false, inList:["auto", "true", "false"] )
 		calcMethod( blank:false, nullable:false, inList: [METHOD_LINEAR, METHOD_MANUAL] )
+		runbookStatus( blank:true, nullable:true , inList:["Pending", "Draft", "Final", "Done"])
+		runbookVersion ( blank:true, nullable:true )
+		runbookBridge1( blank:true, nullable:true )
+		runbookBridge2( blank:true, nullable:true )
+		videolink( blank:true, nullable:true )
 	}
 
 	static hasMany = [
