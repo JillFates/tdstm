@@ -16,7 +16,7 @@
 					</h3>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
-							<td style="padding:0px;height:24px;">
+							<td style="padding:0px; height:24px; background-color: lightyellow;">
 							<g:if test="${applicationCount>0}">
 								<div style="background-color:#BFF3A5; z-index:-1; height:24px; width: ${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%"></div>
 								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%</b>
@@ -53,11 +53,11 @@
 							<td><g:link controller="database" action="list" >Databases</g:link></td>
 						</tr>
 						<tr>
-							<td style="width: 10px;text-align: right;">${filesCount}</td>
+							<td style="width: 10px;text-align: right;">${fileCount}</td>
 							<td><g:link controller="files" action="list" >Files</g:link></td>
 						</tr>
 						<tr>
-							<td style="width: 10px;text-align: right;">${otherCount}</td>
+							<td style="width: 10px;text-align: right;">${otherAssetCount}</td>
 							<td><g:link controller="assetEntity" action="list" >Other Assets</g:link></td>
 						</tr>
 					</table>
@@ -72,7 +72,7 @@
 						</tr>
 						<g:if test="${dueOpenIssue>0}">
 						<tr>
-						    <td style="width: 10px;text-align: right;color: red;">${dueOpenIssue}</td>
+						    <td style="width: 10px;text-align: right;color: red;"><b>${dueOpenIssue}</b></td>
 							<td><g:link controller="assetEntity" action="listComment" params="[filter:'dueOpenIssue']">Overdue</g:link></td>
 						</tr>
 						</g:if>
@@ -86,7 +86,7 @@
 					</h3>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
-							<td style="padding:0px;height:24px;">
+							<td style="padding:0px;height:24px;background-color: lightyellow;">
 							<g:if test="${applicationCount>0}">
 								<div style="background-color:#BFF3A5; z-index:-1; height:24px; width: ${Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()/applicationCount)*100)}%"></div>
 								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()/applicationCount)*100)}%</b>
@@ -147,8 +147,10 @@
 							<td style="width: 150px;"><g:link controller="assetEntity" action="listComment" params="[filter:'openIssue']">Open Issues</g:link></td>
 						</tr>
 						<g:if test="${generalOverDue>0}">
-						    <td style="width: 10px;text-align: right;color: red;">${generalOverDue}</td>
+						<tr>
+						    <td style="width: 10px;text-align: right;color: red;"><b>${generalOverDue}</b></td>
 							<td><g:link controller="assetEntity" action="listComment" params="[filter:'generalOverDue']">Overdue</g:link></td>
+						</tr>
 						</g:if>
 					</table>
 				</div>
@@ -178,7 +180,7 @@
 					</h3>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
-							<td style="padding:0px;height:24px;">
+							<td style="padding:0px;height:24px;background-color: lightyellow;">
 								<div style="background-color:#BFF3A5; z-index:-1; height:24px; width: ${percentageAppCount}%"></div>
 								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${percentageAppCount}%</b>
 							<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Assigned</g:link>
