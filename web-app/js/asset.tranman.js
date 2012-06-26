@@ -631,14 +631,15 @@ function showAssetDialog( e , action ) {
 			      	 $('#ownerEditTdId').val(assetComments[0].assetComment.owner.id)
 	      		 }
 	      		 var notes = assetComments[0].notes
-	      		 var noteTable = ''
+	      		 var noteTable = '<table border=0>'
       		     for(i=0; i<assetComments[0].notes.length; i++){
       		    	 if (i>0) {
-      		    		 noteTable += "<hr/>"
+      		    		 noteTable += ""
       		    	 }
-      		    	 noteTable += "<b>" + notes[i][1] + "</b>" + "&nbsp;" + notes[i][0] + "<br/><pre>" + notes[i][2] + "</pre>"  
-      		     }
-	      			
+      		    	 noteTable += "<tr><td>" + notes[i][0] + "</td><td>" + notes[i][1] + "</td><td><pre>" + notes[i][2] + "</pre></td></tr>"
+      		    	 }
+      		     noteTable += "</table>"
+
 	      		 $('#previousNote').html(noteTable)
 	      		 $('#previousNotesShowId').html(noteTable)
 	      		 $('#dueDatesId').html(assetComments[0].dueDate)
