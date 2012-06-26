@@ -43,7 +43,7 @@
 			<td valign="top" class="name"><label for="moveEvent">MoveEvent:</label></td>
 			<td style="margin-right:30px ;" valign="top">
 				<g:select id="moveEvent" name="moveEvent" from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}" 
-				 optionKey='id' optionValue="name" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
+				 optionKey='id' optionValue="name" noSelection="['':'please select']"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
 		</tr>
 		<tr class="prop" >
@@ -117,7 +117,7 @@
 		onclick="resolveValidate('createCommentForm','createAssetCommentId');" /></span></div>
 	</tds:hasPermission>
 </g:form></div>
-<div id="showCommentDialog" title="Show Asset Comment"
+<div id="showCommentDialog" title="Comment/Issue detail"
 	style="display: none;">
 <div class="dialog" style="border: 1px solid #5F9FCF"><input name="id" value="" id="commentId"
 	type="hidden"/>
@@ -152,15 +152,15 @@
 			<td valign="top" class="value" id="commentCodeTdId" ></td>
 			
 		</tr>
-		<tr class="prop">
-			<td valign="top" class="name"><label for="mustVerify">Must Verify:</label></td>
+		<tr class="prop" id="mustVerifyId">
+			<td valign="top" class="name" ><label for="mustVerify">Must Verify:</label></td>
 			<td valign="top" class="value" id="verifyTdId">
 				<input type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0" disabled="disabled" />
 			</td>
 			
 		</tr>
 		<tr id = "assetShowId" class="prop" >
-			<td valign="top" class="name"><label for="asset">Asset:</label></td>
+			<td valign="top" class="name" id="assetTdId"><label for="asset">Asset:</label></td>
 			<td valign="top" class="value" id="assetShowValueId" style="display: none;"></td>
 		</tr>
 		<tr class="prop">
@@ -216,7 +216,7 @@
 	</tds:hasPermission>
 </div>
 </div>
-<div id="editCommentDialog" title="Edit Asset Comment" style="display: none;">
+<div id="editCommentDialog" title="Edit Comment/Issue" style="display: none;">
 <g:form action="updateComment" method="post" name="editCommentForm">
 <div class="dialog" style="border: 1px solid #5F9FCF">
 	<input type="hidden" name="id" id="updateCommentId" value=""/>
@@ -272,7 +272,7 @@
 			<td valign="top" class="value" id="commentCodeEditId" ></td>
 		</tr>
 		<tr id="assetTrId" class="prop" >
-			<td valign="top" class="name"><label for="asset">Asset:</label></td>
+			<td valign="top" class="name" id="assetEditTd"><label for="asset">Asset:</label></td>
 			<td valign="top" class="value" style ="display: none;" id="assetTrShowId" ></td>
 		</tr>
 		<tr class="prop">

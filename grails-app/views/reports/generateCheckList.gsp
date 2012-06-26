@@ -297,6 +297,7 @@
 							<th>Due Date</th>
 							<th>Assigned To</th>
 							<th>Status</th>
+							<th>Category</th>
 							<th>Comment</th>
 						</tr>
 						<tbody>
@@ -311,6 +312,9 @@
 										</td>
 										<td>
 											${issue.status}
+										</td>
+										<td>
+											${issue.category}
 										</td>
 										<td>
 											${issue.comment}

@@ -1725,8 +1725,11 @@ class AssetEntityController {
 		def assetEntityInstance = AssetEntity.get( params.id )
 		def assetCommentsInstance = AssetComment.findAllByAssetEntity( assetEntityInstance )
 		def assetCommentsList = []
+		def today = new Date()
+		def css //= 'white'
 		assetCommentsInstance.each {
-			assetCommentsList <<[ commentInstance : it, assetEntityId : it.assetEntity.id ]
+			css = it.dueDate < today ? 'Lightpink' : 'White'
+			assetCommentsList <<[ commentInstance : it, assetEntityId : it.assetEntity.id,cssClass:css ]
 		}
 		render assetCommentsList as JSON
 	}
@@ -1760,14 +1763,17 @@ class AssetEntityController {
 			assetCommentInstance.resolvedBy = loginUser.person
 			assetCommentInstance.dateResolved = GormUtil.convertInToGMT( "now", tzId )
 		}
+		def today =new Date();
 		if(!assetCommentInstance.hasErrors() && assetCommentInstance.save()) {
 			if(assetCommentInstance.owner.email){
 				Thread.start {
 					assetEntityService.sendMailToUser(assetCommentInstance,tzId)
 				}
 			}
+			def css = ''
+			css = assetCommentInstance.dueDate < today ? 'Lightpink' : 'White'
 			def status = AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetCommentInstance.assetEntity,'issue',0])
-			assetComments << [assetComment : assetCommentInstance, status : status ? true : false]
+			assetComments << [assetComment : assetCommentInstance, status : status ? true : false ,cssClass:css]
 		}else{
 		      assetCommentInstance.errors.allErrors.each{println it}
 		}
@@ -1815,7 +1821,8 @@ class AssetEntityController {
 		}
 		commentList<<[ assetComment:assetComment,personCreateObj:personCreateObj,
 					personResolvedObj:personResolvedObj,dtCreated:dtCreated?dtCreated:"",
-					dtResolved:dtResolved?dtResolved:"",owners:owners?owners:"",assetNames:assetComment.assetEntity?.assetName , dueDate:dueDate?dueDate:'',notes:assetNote]
+					dtResolved:dtResolved?dtResolved:"",owners:owners?owners:"",assetNames:assetComment.assetEntity != null  ? assetComment.assetEntity.assetName : assetComment.moveEvent.name
+				    , dueDate:dueDate?dueDate:'',notes:assetNote]
 		render commentList as JSON
 	}
 	/* ------------------------------------------------------------
@@ -1849,7 +1856,7 @@ class AssetEntityController {
 			assetCommentInstance.dateResolved = null
 		}
 		if(params.dueDate){
-		    params.dueDate = GormUtil.convertInToGMT(formatter.parse(params.dueDate), tzId)
+		    params.dueDate = formatter.parse(params.dueDate)
 		}
 		assetCommentInstance.properties = params
 		// TODO - SECURITY - Need to validate that the owner is a member of the project
@@ -1857,6 +1864,7 @@ class AssetEntityController {
 		if(!params.owner){
 		   assetCommentInstance.owner = personInstance
 		}
+		def today = new Date()
 		if(!assetCommentInstance.hasErrors() && assetCommentInstance.save(flush:true)) {
 		 if(params.note){
 			def assetNoteInstance = new AssetNotes();
@@ -1873,8 +1881,10 @@ class AssetEntityController {
 		          assetEntityService.sendMailToUser(assetCommentInstance,tzId)
 			 }
 		 }
+			 def css = ''
+			  css =  assetCommentInstance.dueDate < today ? 'Lightpink' : 'White'
 			def status = AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetCommentInstance.assetEntity,'issue',0])
-			assetComments << [assetComment : assetCommentInstance, status : status ? true : false]
+			assetComments << [assetComment : assetCommentInstance, status : status ? true : false , cssClass:css]
 		}
 		render assetComments as JSON
 	}

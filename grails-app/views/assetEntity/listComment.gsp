@@ -66,11 +66,11 @@
                             <jmesa:htmlColumn property="comment" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.comment?.size() > 40 ? commentInstance.comment?.substring(0,40)+'..' : commentInstance.comment}</span>
 							 </jmesa:htmlColumn>
-							 <jmesa:htmlColumn property="dueDate" title="Due Date" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.dueDate}" /></span>
-							 </jmesa:htmlColumn>
 							 <jmesa:htmlColumn property="dateCreated" title="Date Created" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.dateCreated}" /></span>
+							 </jmesa:htmlColumn>
+							 <jmesa:htmlColumn property="dueDate" title="Due Date" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.dueDate}" /></span>
 							 </jmesa:htmlColumn>
 							 <jmesa:htmlColumn property="commentType" title="Type" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.commentType}</span>

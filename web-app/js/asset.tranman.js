@@ -497,7 +497,10 @@ function showAssetDialog( e , action ) {
 		      	  var commentObj = assetComments[i]
 		      	  var tr = document.createElement('tr');
 		      	  tr.id = "commentTr_"+commentObj.commentInstance.id
+		      	  //tr.setAttribute("class", commentObj.cssClass)
 		      	  tr.setAttribute('onmouseover','this.style.backgroundColor="white";');
+		      	  tr.setAttribute('onmouseout','this.style.backgroundColor="'+commentObj.cssClass+'";');
+		      	  tr.style.backgroundColor=commentObj.cssClass;
 			      var editTd = document.createElement('td');
 			      var commentTd = document.createElement('td');
 			      commentTd.id = 'comment_'+commentObj.commentInstance.id
@@ -649,12 +652,21 @@ function showAssetDialog( e , action ) {
 		      	 $('#ownerEditId').css('display','block')
 		      	 $('#note').val('')
 		      	 $('#statusEditId').val(assetComments[0].assetComment.status)
+		      	 $('#mustVerifyId').css('display','none')
 	      	 }
 			 if(assetComments[0].assetComment.commentType!='instruction'){
-		      	 $('#assetShowValueId').css('display','block')
-		      	 $('#assetTrShowId').css('display','block')
-		      	 $('#assetShowValueId').html(assetComments[0].assetNames)
-		      	 $('#assetTrShowId').html(assetComments[0].assetNames)
+				     $('#mustVerifyId').css('display','none')
+			      	 $('#assetShowValueId').css('display','block')
+			      	 $('#assetTrShowId').css('display','block')
+			      	 $('#assetShowValueId').html(assetComments[0].assetNames)
+			      	 $('#assetTrShowId').html(assetComments[0].assetNames)
+			      if(assetComments[0].assetComment.assetEntity==null){
+			    	  $('#assetTdId').html('<label for="asset">Move Event:</label>')
+			    	  $('#assetEditTd').html('<label for="asset">Move Event:</label>')
+			      }else{
+			    	  $('#assetTdId').html('<label for="asset">Asset:</label>')
+			    	  $('#assetEditTd').html('<label for="asset">Asset:</label>')
+			      }
 	      	 }
 	      	 if(assetComments[0].assetComment.mustVerify != 0){
 	      	 $('#mustVerifyShowId').attr('checked', true);
@@ -717,8 +729,11 @@ function showAssetDialog( e , action ) {
 		      	//generate dynamic rows	
 		      	  var tr = document.createElement('tr');
 		      	  tr.style.background = '#65a342'
+		      	  tr.setAttribute('onmouseover','this.style.backgroundColor="white";');
+		      	  tr.setAttribute('onmouseout','this.style.backgroundColor="'+assetComments[0].cssClass+'";');
+		      	  tr.style.background = assetComments[0].cssClass
 		      	  tr.id = "commentTr_"+assetComments[0].assetComment.id
-			      tr.setAttribute('onmouseover','this.style.backgroundColor="white";');
+			     
 			      var editTd = document.createElement('td');
 				  var commentTd = document.createElement('td');
 				  commentTd.id = 'comment_'+assetComments[0].assetComment.id
@@ -763,7 +778,6 @@ function showAssetDialog( e , action ) {
 			      var typeText = document.createTextNode(assetComments[0].assetComment.commentType);
 			      var formatedDueDate = formatDueDate(assetComments[0].assetComment.dueDate);
 			      var duedate = document.createTextNode(formatedDueDate);
-			      
 			      var categoryText = document.createTextNode(assetComments[0].assetComment.category);
 			      var commentCodeText = document.createTextNode(assetComments[0].assetComment.commentCode);
 			      
@@ -820,6 +834,8 @@ function showAssetDialog( e , action ) {
 	      	//generate dynamic rows	
 	      	  var tr = $('#commentTr_'+assetComments[0].assetComment.id);
 	      	  tr.css( 'background', '#65a342' );
+	      	  tr.setAttribute('onmouseout','this.style.backgroundColor="'+assetComments[0].cssClass+'";');
+	      	  tr.style.background = assetComments[0].cssClass
 	      	  if(assetComments[0].assetComment.mustVerify != 0){
 		      $('#verifyText_'+assetComments[0].assetComment.id).attr('checked', true);
 		      } else {
@@ -844,7 +860,11 @@ function showAssetDialog( e , action ) {
 			      	$('#verifyResolved_'+assetComments[0].assetComment.id).attr('checked', false);
 			      }
 		      }
+		      var formatedDueDate = formatDueDate(assetComments[0].assetComment.dueDate);
+		      var duedate = document.createTextNode(formatedDueDate);
+		      
 		      $('#type_'+assetComments[0].assetComment.id).html(assetComments[0].assetComment.commentType);
+		      $('#dueDate_'+assetComments[0].assetComment.id).html(duedate);
 		      $('#comment_'+assetComments[0].assetComment.id).html(truncate(assetComments[0].assetComment.comment));
 		      updateAssetCommentIcon( assetComments[0] )
 		}
@@ -1161,8 +1181,7 @@ function updateCommentsLists(){
 	window.location.reload();
 }
 
-function formatDate(dateValue)
-{
+function formatDate(dateValue){
 	    var M = "" + (dateValue.getMonth()+1);
 	    var MM = "0" + M;
 	    MM = MM.substring(MM.length-2, MM.length);
@@ -1173,8 +1192,7 @@ function formatDate(dateValue)
         var currentDate = MM + "/" +DD + "/" + YYYY
         $("#dueDateCreateId").val(currentDate);
 }
-function formatDueDate(input)
-{
+function formatDueDate(input){
 	 var currentDate = ""
 	 if(input){
 		  var datePart = input.match(/\d+/g),
@@ -1184,3 +1202,25 @@ function formatDueDate(input)
 	 }
     return currentDate
 }
+/*function compareDueDate(dueDate){
+	var today = new Date();
+	var biggerDate = 'dueDate'
+	if(dueDate.substring(6,10) < today.getFullYear() ){
+		biggerDate = 'today'
+	}else if(dueDate.substring(6,10) > today.getFullYear()){
+		biggerDate = 'dueDate'
+	}else{
+		if(dueDate.substring(0,2) < (today.getMonth()+1)){
+			biggerDate = 'today'
+		}else if(dueDate.substring(0,2) > (today.getMonth()+1)){
+			biggerDate = 'dueDate'
+		}else{
+			if(dueDate.substring(3,5) < today.getDate){
+				biggerDate = 'today'
+			}else if(dueDate.substring(3,5) > today.getDate){
+				biggerDate = 'dueDate'
+			}
+	    }
+	}
+	return biggerDate
+}*/
