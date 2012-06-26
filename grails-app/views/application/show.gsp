@@ -256,9 +256,9 @@
 					<thead>
 						<tr>
 							<th>Frequency</th>
-							<th>Entity Type</th>
+							<th>Type</th>
 							<th>Name</th>
-							<th>Move Bundle</th>
+							<th>Bundle</th>
 							<th>Type</th>
 							<th>Status</th>
 						</tr>
@@ -309,9 +309,9 @@
 					<thead>
 						<tr>
 							<th>Frequency</th>
-							<th>Entity Type</th>
+							<th>Type</th>
 							<th>Name</th>
-							<th>Move Bundle</th>
+							<th>Bundle</th>
 							<th>Type</th>
 							<th>Status</th>
 						</tr>
@@ -367,9 +367,7 @@
 				<th nowrap>Comment</th>
 				<th nowrap>Comment Type</th>
 				<th nowrap>Resolved</th>
-				<th nowrap>Must Verify</th>
 				<th nowrap>Category</th>  
-				<th nowrap>Comment Code</th>                     
 			</tr>
 			</thead>
 			<tbody id="listCommentsTbodyIds">
@@ -379,9 +377,7 @@
 				<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.comment}</td>
 				<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.commentType}</td>
 				<td ><g:if test ="${commentList.commentType =='issue' && commentList.isResolved == 1}"><g:checkBox name="myCheckbox" value="${true}" disabled="true"/></g:if><g:else>&nbsp</g:else></td>
-				<td ><g:if test ="${commentList.mustVerify == 1}"></g:if><g:else><g:checkBox name="myVerifyBox" value="${true}" disabled="true"/></g:else></td>
 				<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.category}</td>
-				<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.commentCode}</td>
 			</tr>
 			</g:each>
 			</tbody>
