@@ -39,26 +39,6 @@
 			</td>
 		
 		</tr>
-		<tr class="prop" >
-			<td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
-			<td style="width: 20%;">
-				<g:select id="commentType" name="commentType" from="${com.tds.asset.AssetComment.constraints.commentType.inList}" value=""
-				noSelection="['':'please select']" onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
-			</td>					
-            <td valign="top" id="mustVerifyTd" style="display: none;">
-			<input type="checkbox" id="mustVerifyEdit" name="mustVerify" value="0" 
-				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
-			<label for="mustVerifyEdit">Must Verify</label>
-			</td>
-		</tr>
-      <tr class="prop" id="catagoryTrId" style="display:none">
-         <td valign="top" class="name"><label for="category">Category:</label></td>
-         <td style="margin-right:30px ;" valign="top">
-            <g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
-            noSelection="['':'please select']" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
-         </td>
-      </tr>
-		
 		<tr class="prop" id="dueDateTrId" style="display: none">
 			<td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
 			
@@ -68,7 +48,27 @@
                   </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDate" id="dueDateCreateId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
-		</tr> 
+		</tr>
+		<tr class="prop" >
+			<td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
+			<td style="width: 20%;">
+				<g:select id="commentType" name="commentType" from="${com.tds.asset.AssetComment.constraints.commentType.inList}" value=""
+				noSelection="['':'please select']" onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
+			</td>
+            <td valign="top" id="mustVerifyTd" style="display: none;">
+			<input type="checkbox" id="mustVerifyEdit" name="mustVerify" value="0" 
+				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
+			<label for="mustVerifyEdit">Must Verify</label>
+			</td>
+		</tr>
+		<tr class="prop" id="catagoryTrId" style="display:none">
+        	<td valign="top" class="name"><label for="category">Category:</label></td>
+        	<td style="margin-right:30px ;" valign="top">
+            	<g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
+            	noSelection="['':'please select']" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
+        	</td>
+		</tr>
+		
 		<tr class="prop" id="moveEventTrId" style="display:none">
 			<td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
 			<td style="margin-right:30px ;" valign="top">
