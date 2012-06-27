@@ -38,13 +38,6 @@
 				<g:select id="owner" name="owner" from="${partyList}"  value="${session.getAttribute('LOGIN_PERSON').id }" optionKey="id" noSelection="['':'please select']" ></g:select>
 			</td>
 		
-		</tr> 
-		<tr class="prop" id="moveEventTrId" style="display:none">
-			<td valign="top" class="name"><label for="moveEvent">MoveEvent:</label></td>
-			<td style="margin-right:30px ;" valign="top">
-				<g:select id="moveEvent" name="moveEvent" from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}" 
-				 optionKey='id' optionValue="name" noSelection="['':'please select']"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
-			</td>
 		</tr>
 		<tr class="prop" >
 			<td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
@@ -76,6 +69,14 @@
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 		</tr> 
+		<tr class="prop" id="moveEventTrId" style="display:none">
+			<td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
+			<td style="margin-right:30px ;" valign="top">
+				<g:select id="moveEvent" name="moveEvent" from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}" 
+				 optionKey='id' optionValue="name" noSelection="['':'please select']"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
+			</td>
+		</tr> 
+		
 		<tr class="prop">
 			<td id="issueItemId" valign="top" class="name"><label for="comment">Comment:</label></td>
 			<td valign="top" class="value" colspan="4">
@@ -124,17 +125,20 @@
 	<div>
 	<table id="showCommentTable" style="border: 0px;">
 		<tr>
+			<td valign="top" class="name"><label for="owner">Owner:</label></td>
+			<td valign="top" class="value" id="ownerTdId" ></td>
+		</tr>
+		<tr>
+			<td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
+			<td valign="top" class="value" id="dueDatesId" ></td>
+		</tr>
+		<tr>
 			<td valign="top" class="name"><label for="dateCreated">Created At:</label></td>
-			<td valign="top" class="value" id="dateCreatedId" style="width:20px;" ></td>
+			<td valign="top" class="value" id="dateCreatedId" ></td>
 		</tr>
 		<tr>
 			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 			<td valign="top" class="value" id="createdById" ></td>
-			
-		</tr>
-		<tr>
-			<td valign="top" class="name"><label for="owner">Owner:</label></td>
-			<td valign="top" class="value" id="ownerTdId" ></td>
 			
 		</tr>
 		<tr class="prop">
@@ -148,7 +152,7 @@
 			
 		</tr>
 		<tr class="prop" style="display: none">
-			<td valign="top" class="name"><label for="commentCode">comment Code:</label></td>
+			<td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
 			<td valign="top" class="value" id="commentCodeTdId" ></td>
 			
 		</tr>
@@ -197,9 +201,6 @@
 		<tr>
 			<td valign="top" class="name" nowrap="nowrap"><label for="resolvedBy">Resolved By:</label></td>
 			<td valign="top" class="value" id="resolvedById" ></td>
-		</tr>
-			<tr><td valign="top" class="name"><label for="dueDate">dueDate:</label></td>
-			<td valign="top" class="value" id="dueDatesId" ></td>
 		</tr>	
 		
 	</table>
