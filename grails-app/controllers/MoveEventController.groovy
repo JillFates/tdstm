@@ -14,6 +14,9 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 
+import com.tds.asset.Application
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
 import com.tds.asset.AssetTransition
 import com.tdssrc.grails.GormUtil
 
@@ -26,6 +29,7 @@ class MoveEventController {
 	def userPreferenceService
 	def stepSnapshotService
 	def stateEngineService
+	def reportsService
 	
     def index = { redirect(action:list,params:params) }
 
@@ -38,7 +42,7 @@ class MoveEventController {
     	def moveEventInstanceList
         if(!params.max) params.max = 10
         def currProj = session.getAttribute("CURR_PROJ").CURR_PROJ;
-    	if(currProj) moveEventInstanceList = MoveEvent.findAllByProject( Project.get( currProj ), params )
+    	if(currProj) moveEventInstanceList = MoveEvent.findAllByProject( Project.get( currProj ) )
 		// Statements for JMESA integration
     	TableFacade tableFacade = new TableFacadeImpl("tag",request)
         tableFacade.items = moveEventInstanceList
@@ -486,6 +490,408 @@ class MoveEventController {
 			redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
 			return;
 		}
+	}
+	
+	def exportRunbook ={
+		def projectId =  session.CURR_PROJ.CURR_PROJ		
+		def project = Project.get(projectId)
+		def moveEventList = MoveEvent.findAllByProject(project)
+		
+		return [moveEventList:moveEventList]
+	}
+	
+	def runBook = {
+		def moveEventId = params.id
+		def projectId =  session.CURR_PROJ.CURR_PROJ
+		def project = Project.get(projectId)
+		def moveEventInstance = MoveEvent.get(moveEventId)
+		def bundles = moveEventInstance.moveBundles
+		def applcationAssigned = 0
+		def assetCount = 0
+		def databaseCount = 0
+		def fileCount = 0
+		def otherAssetCount = 0
+		if(bundles?.size()>0){
+			 applcationAssigned = Application.countByMoveBundleInListAndProject(bundles,project)
+			 assetCount = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(bundles,['Application','Database','Files'],params).size()
+			 databaseCount=AssetEntity.findAllByAssetTypeAndMoveBundleInList('Database',bundles).size()
+			 fileCount=AssetEntity.findAllByAssetTypeAndMoveBundleInList('Files',bundles).size()
+			 otherAssetCount=AssetEntity.findAllByAssetTypeNotInListAndMoveBundleInList(['Server','VM','Blade','Application','Files','Database'],bundles).size()
+		}
+		return [applcationAssigned:applcationAssigned, assetCount:assetCount, databaseCount:databaseCount, fileCount:fileCount, otherAssetCount:otherAssetCount,
+			       reportService: reportsService.generatePreMoveCheckList(projectId,moveEventInstance).allErrors,bundles:bundles]
+	}
+	
+	def generateRunbook={
+			def projectId =  session.CURR_PROJ.CURR_PROJ
+			def project = Project.get(projectId)
+			def moveEventInstance = MoveEvent.get(params.eventId)
+			def bundles = moveEventInstance.moveBundles
+			def today = new Date()
+			def formatter = new SimpleDateFormat("yy/mm/dd");
+			today = formatter.format(today)
+			def moveEventList = MoveEvent.findAllByProject(project)
+			def applcationAssigned = 0
+			def assetCount = 0
+			def databaseCount = 0
+			def fileCount = 0
+			def otherAssetCount = 0
+			def applications = []
+			def assets = []
+			def databases = []
+			def files = []
+			def others = []
+			def unresolvedIssues = []
+			def preMoveIssue = []
+			def postMoveIssue = []
+			if(bundles?.size()>0){
+				 applications = Application.findAllByMoveBundleInListAndProject(bundles,project)
+				 applcationAssigned = Application.countByMoveBundleInListAndProject(bundles,project)
+				 assets = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(bundles,['Application','Database','Files'])
+				 assetCount = assets.size()
+				 databases = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Database',bundles)
+				 databaseCount = databases.size()
+				 files = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Files',bundles)
+				 fileCount=files.size()
+				 others = AssetEntity.findAllByAssetTypeNotInListAndMoveBundleInList(['Server','VM','Blade','Application','Files','Database'],bundles)
+				 otherAssetCount=others.size()
+				 def allAssets = AssetEntity.findAllByMoveBundleInListAndProject(bundles,project).id
+				 String asset = allAssets.toString().replace("[","('").replace(",","','").replace("]","')") 
+				 unresolvedIssues = AssetComment.findAll("from AssetComment a where a.assetEntity in ${asset} and a.isResolved = ? and a.commentType = ? and a.category in ('general', 'discovery', 'planning','walkthru')",[0,'issue'])
+				 preMoveIssue = AssetComment.findAll("from AssetComment a where a.assetEntity in ${asset}  and a.commentType = ? and a.category = ? ",['issue','premove'])
+				 postMoveIssue = AssetComment.findAll("from AssetComment a where a.assetEntity in ${asset}  and a.commentType = ? and a.category = ? ",['issue','postmove'])
+			}
+			
+			//TODO - Move controller code into Service .
+			def preMoveCheckListError = reportsService.generatePreMoveCheckList(projectId,moveEventInstance).allErrors.size()
+			try {
+						File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Runbook.xls" ).getFile()
+						WorkbookSettings wbSetting = new WorkbookSettings()
+						wbSetting.setUseTemporaryFileDuringWrite(true)
+						def workbook = Workbook.getWorkbook( file, wbSetting )
+						//set MIME TYPE as Excel
+						response.setContentType( "application/vnd.ms-excel" )
+						def filename = 	"${project.name} - ${moveEventInstance.name} Runbook v - ${today}"
+						filename = filename.replace(".xls",'')
+						response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
+						response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
+						def book = Workbook.createWorkbook( response.getOutputStream(), workbook )
+						
+						def summarySheet = book.getSheet("Summary")
+						def personelSheet = book.getSheet("Personel")
+						def appSheet = book.getSheet("Applications")
+						def serverSheet = book.getSheet("Servers")
+						def dbSheet = book.getSheet("Database")
+						def filesSheet = book.getSheet("Files")
+						def otherSheet = book.getSheet("Other")
+						def issueSheet = book.getSheet("Issues")
+						def preMoveSheet = book.getSheet("Premove")
+						def postMoveSheet = book.getSheet("Postmove")
+						
+						   // For Summary Export
+							summarySheet.addCell( new Label( 0, 1, String.valueOf(bundles.size() )) )
+							summarySheet.addCell( new Label( 1, 1, String.valueOf(applcationAssigned )) )
+							summarySheet.addCell( new Label( 2, 1, String.valueOf(assetCount )) )
+							summarySheet.addCell( new Label( 3, 1, String.valueOf(databaseCount )) )
+							summarySheet.addCell( new Label( 4, 1, String.valueOf(fileCount)) )
+							summarySheet.addCell( new Label( 5, 1, String.valueOf(otherAssetCount )) )
+							summarySheet.addCell( new Label( 6, 1, String.valueOf(preMoveCheckListError )) )
+							
+							
+					      // For Project Staff Export
+									
+						  def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' ")
+						  for ( int r = 1; r <= projectStaff.size(); r++ ) {
+							  def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${projectStaff[0].partyIdTo.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+							  personelSheet.addCell( new Label( 0, r, String.valueOf( projectStaff[r-1].partyIdTo.firstName+" "+ projectStaff[r-1].partyIdTo.lastName)) )
+							  personelSheet.addCell( new Label( 1, r, String.valueOf(company.partyIdFrom[0])) )
+							  personelSheet.addCell( new Label( 2, r, String.valueOf(projectStaff[r-1].roleTypeCodeTo )) )
+						  }
+						  
+						  // For Application Export
+						  
+						  for ( int r = 1; r <= applications.size(); r++ ) {
+							  appSheet.addCell( new Label( 0, r, String.valueOf(applications[r-1].id)) )
+							  appSheet.addCell( new Label( 1, r, String.valueOf(applications[r-1].assetName )) )
+							  appSheet.addCell( new Label( 2, r, String.valueOf(applications[r-1].appVendor )) )
+							  appSheet.addCell( new Label( 3, r, String.valueOf(applications[r-1].appVersion )) )
+							  appSheet.addCell( new Label( 4, r, String.valueOf(applications[r-1].appTech)) )
+							  appSheet.addCell( new Label( 5, r, String.valueOf(applications[r-1].appAccess )) )
+							  appSheet.addCell( new Label( 6, r, String.valueOf(applications[r-1].appSource )) )
+							  appSheet.addCell( new Label( 7, r, String.valueOf(applications[r-1].license)) )
+							  appSheet.addCell( new Label( 8, r, String.valueOf(applications[r-1].description )) )
+							  appSheet.addCell( new Label( 9, r, String.valueOf(applications[r-1].supportType )) )
+							  appSheet.addCell( new Label(10, r, String.valueOf(applications[r-1].sme )) )
+							  appSheet.addCell( new Label(11, r, String.valueOf(applications[r-1].sme2)) )
+							  appSheet.addCell( new Label(12, r, String.valueOf(applications[r-1].businessUnit )) )
+							  appSheet.addCell( new Label(13, r, String.valueOf(applications[r-1].owner  ? applications[r-1].owner  : '' )) )
+							  appSheet.addCell( new Label(14, r, String.valueOf(applications[r-1].retireDate ? applications[r-1].retireDate : '')) )
+							  appSheet.addCell( new Label(15, r, String.valueOf(applications[r-1].maintExpDate ? applications[r-1].maintExpDate : '')) )
+							  appSheet.addCell( new Label(16, r, String.valueOf(applications[r-1].appFunction )) )
+							  appSheet.addCell( new Label(17, r, String.valueOf(applications[r-1].environment )) )
+							  appSheet.addCell( new Label(18, r, String.valueOf(applications[r-1].criticality)) )
+							  appSheet.addCell( new Label(19, r, String.valueOf(applications[r-1].moveBundle )) )
+							  appSheet.addCell( new Label(20, r, String.valueOf(applications[r-1].planStatus )) )
+							  appSheet.addCell( new Label(21, r, String.valueOf(applications[r-1].userCount )) )
+							  appSheet.addCell( new Label(22, r, String.valueOf(applications[r-1].userLocations )) )
+							  appSheet.addCell( new Label(23, r, String.valueOf(applications[r-1].useFrequency )) )
+							  appSheet.addCell( new Label(24, r, String.valueOf(applications[r-1].drRpoDesc)) )
+							  appSheet.addCell( new Label(25, r, String.valueOf(applications[r-1].drRtoDesc )) )
+							  appSheet.addCell( new Label(26, r, String.valueOf(applications[r-1].moveDowntimeTolerance )) )
+							  appSheet.addCell( new Label(27, r, String.valueOf(applications[r-1].validation)) )
+							  appSheet.addCell( new Label(28, r, String.valueOf(applications[r-1].latency )) )
+							  appSheet.addCell( new Label(29, r, String.valueOf(applications[r-1].testProc )) )
+							  appSheet.addCell( new Label(30, r, String.valueOf(applications[r-1].startupProc )) )
+							  appSheet.addCell( new Label(31, r, String.valueOf(applications[r-1].url)) )
+							  appSheet.addCell( new Label(32, r, String.valueOf(applications[r-1].custom1 )) )
+							  appSheet.addCell( new Label(33, r, String.valueOf(applications[r-1].custom2 )) )
+							  appSheet.addCell( new Label(34, r, String.valueOf(applications[r-1].custom3)) )
+							  appSheet.addCell( new Label(35, r, String.valueOf(applications[r-1].custom4 )) )
+							  appSheet.addCell( new Label(36, r, String.valueOf(applications[r-1].custom5 )) )
+							  appSheet.addCell( new Label(37, r, String.valueOf(applications[r-1].custom6 )) )
+							  appSheet.addCell( new Label(38, r, String.valueOf(applications[r-1].custom7)) )
+							  appSheet.addCell( new Label(39, r, String.valueOf(applications[r-1].custom8 )) )
+							  
+						}
+						  
+						  // For Server Export
+						  
+						  for ( int r = 1; r <= assets.size(); r++ ) {
+							  serverSheet.addCell( new Label( 0, r, String.valueOf(assets[r-1].id)) )
+							  serverSheet.addCell( new Label( 1, r, String.valueOf(assets[r-1].application )) )
+							  serverSheet.addCell( new Label( 2, r, String.valueOf(assets[r-1].assetName )) )
+							  serverSheet.addCell( new Label( 3, r, String.valueOf(assets[r-1].shortName ? assets[r-1].shortName : '' )) )
+							  serverSheet.addCell( new Label( 4, r, String.valueOf(assets[r-1].serialNumber ? assets[r-1].serialNumber : '')) )
+							  serverSheet.addCell( new Label( 5, r, String.valueOf(assets[r-1].assetTag )) )
+							  serverSheet.addCell( new Label( 6, r, String.valueOf(assets[r-1].manufacturer ? assets[r-1].manufacturer : '')) )
+							  serverSheet.addCell( new Label( 7, r, String.valueOf(assets[r-1].model ? assets[r-1].model : '')) )
+							  serverSheet.addCell( new Label( 8, r, String.valueOf(assets[r-1].assetType )) )
+							  serverSheet.addCell( new Label( 9, r, String.valueOf(assets[r-1].ipAddress ? assets[r-1].ipAddress : '' )) )
+							  serverSheet.addCell( new Label(10, r, String.valueOf(assets[r-1].os ? assets[r-1].os : '')) )
+							  serverSheet.addCell( new Label(11, r, String.valueOf(assets[r-1].sourceLocation ? assets[r-1].sourceLocation : '')) )
+							  serverSheet.addCell( new Label(12, r, String.valueOf(assets[r-1].sourceRoom ? assets[r-1].sourceRoom : '')) )
+							  serverSheet.addCell( new Label(13, r, String.valueOf(assets[r-1].sourceRack ? assets[r-1].sourceRack : '')) )
+							  serverSheet.addCell( new Label(14, r, String.valueOf(assets[r-1].sourceRackPosition ? assets[r-1].sourceRackPosition : '')) )
+							  serverSheet.addCell( new Label(15, r, String.valueOf(assets[r-1].sourceBladeChassis ? assets[r-1].sourceBladeChassis : '')) )
+							  serverSheet.addCell( new Label(16, r, String.valueOf(assets[r-1].sourceBladePosition ? assets[r-1].sourceBladePosition : '' )) )
+							  serverSheet.addCell( new Label(17, r, String.valueOf(assets[r-1].targetLocation ? assets[r-1].targetLocation : '')) )
+							  serverSheet.addCell( new Label(18, r, String.valueOf(assets[r-1].targetRoom ? assets[r-1].targetRoom : '')) )
+							  serverSheet.addCell( new Label(19, r, String.valueOf(assets[r-1].targetRack ? assets[r-1].targetRack : '')) )
+							  serverSheet.addCell( new Label(20, r, String.valueOf(assets[r-1].targetRackPosition ? assets[r-1].targetRackPosition : '' )) )
+							  serverSheet.addCell( new Label(21, r, String.valueOf(assets[r-1].targetBladeChassis ? assets[r-1].targetBladeChassis : '')) )
+							  serverSheet.addCell( new Label(22, r, String.valueOf(assets[r-1].targetBladePosition ? assets[r-1].targetBladePosition : '')) )
+							  serverSheet.addCell( new Label(23, r, String.valueOf(assets[r-1].custom1 ? assets[r-1].custom1 :'' )) )
+							  serverSheet.addCell( new Label(24, r, String.valueOf(assets[r-1].custom2 ? assets[r-1].custom2 : '')) )
+							  serverSheet.addCell( new Label(25, r, String.valueOf(assets[r-1].custom3 ? assets[r-1].custom3 : '' )) )
+							  serverSheet.addCell( new Label(26, r, String.valueOf(assets[r-1].custom4 ? assets[r-1].custom4 : '')) )
+							  serverSheet.addCell( new Label(27, r, String.valueOf(assets[r-1].custom5 ? assets[r-1].custom5 : '')) )
+							  serverSheet.addCell( new Label(28, r, String.valueOf(assets[r-1].custom6 ? assets[r-1].custom6 : '')) )
+							  serverSheet.addCell( new Label(29, r, String.valueOf(assets[r-1].custom7 ? assets[r-1].custom7 : '' )) )
+							  serverSheet.addCell( new Label(30, r, String.valueOf(assets[r-1].custom8 ? assets[r-1].custom8 : '')) )
+							  serverSheet.addCell( new Label(31, r, String.valueOf(assets[r-1].moveBundle ? assets[r-1].moveBundle : '')) )
+							  serverSheet.addCell( new Label(32, r, String.valueOf(assets[r-1].sourceTeamMt ? assets[r-1].sourceTeamMt : '' )) )
+							  serverSheet.addCell( new Label(33, r, String.valueOf(assets[r-1].targetTeamMt ? assets[r-1].targetTeamMt : '')) )
+							  serverSheet.addCell( new Label(34, r, String.valueOf(assets[r-1].sourceTeamLog ? assets[r-1].sourceTeamLog : '')) )
+							  serverSheet.addCell( new Label(35, r, String.valueOf(assets[r-1].targetTeamLog ? assets[r-1].targetTeamLog :'')) )
+							  serverSheet.addCell( new Label(36, r, String.valueOf(assets[r-1].sourceTeamSa ? assets[r-1].sourceTeamSa : '')) )
+							  serverSheet.addCell( new Label(37, r, String.valueOf(assets[r-1].targetTeamSa ? assets[r-1].targetTeamSa : '')) )
+							  serverSheet.addCell( new Label(38, r, String.valueOf(assets[r-1].sourceTeamDba ? assets[r-1].sourceTeamDba : '')) )
+							  serverSheet.addCell( new Label(39, r, String.valueOf(assets[r-1].targetTeamDba ? assets[r-1].targetTeamDba : '' )) )
+							  serverSheet.addCell( new Label(40, r, String.valueOf(assets[r-1].truck ? assets[r-1].truck :'')) )
+							  serverSheet.addCell( new Label(41, r, String.valueOf(assets[r-1].cart ? assets[r-1].cart :'' )) )
+							  serverSheet.addCell( new Label(42, r, String.valueOf(assets[r-1].shelf ? assets[r-1].shelf : '' )) )
+							  serverSheet.addCell( new Label(43, r, String.valueOf(assets[r-1].railType ? assets[r-1].railType :'' )) )
+							  serverSheet.addCell( new Label(44, r, String.valueOf(assets[r-1].appOwner ? assets[r-1].appOwner : '')) )
+							  serverSheet.addCell( new Label(45, r, String.valueOf(assets[r-1].appSme ? assets[r-1].appSme : '')) )
+							  serverSheet.addCell( new Label(46, r, String.valueOf(assets[r-1].priority ? assets[r-1].priority : '')) )
+							  serverSheet.addCell( new Label(47, r, String.valueOf(assets[r-1].planStatus ? assets[r-1].planStatus : '')) )
+							  serverSheet.addCell( new Label(48, r, String.valueOf(assets[r-1].usize ? assets[r-1].usize : '')) )
+							  
+						}
+						  // For Database Export
+						  
+						  for ( int r = 1; r <= databases.size(); r++ ) {
+							  dbSheet.addCell( new Label( 0, r, String.valueOf(databases[r-1].id)) )
+							  dbSheet.addCell( new Label( 1, r, String.valueOf(databases[r-1].assetName ? databases[r-1].assetName : '' )) )
+							  dbSheet.addCell( new Label( 2, r, String.valueOf(databases[r-1].dbFormat ? databases[r-1].dbFormat : '')) )
+							  dbSheet.addCell( new Label( 3, r, String.valueOf(databases[r-1].dbSize ? databases[r-1].dbSize : '' )) )
+							  dbSheet.addCell( new Label( 4, r, String.valueOf(databases[r-1].description ? databases[r-1].description : '')) )
+							  dbSheet.addCell( new Label( 5, r, String.valueOf(databases[r-1].supportType ? databases[r-1].supportType  :'' )) )
+							  dbSheet.addCell( new Label( 6, r, String.valueOf(databases[r-1].retireDate ? databases[r-1].retireDate : '')) )
+							  dbSheet.addCell( new Label( 7, r, String.valueOf(databases[r-1].maintExpDate ? databases[r-1].maintExpDate : '')) )
+							  dbSheet.addCell( new Label( 8, r, String.valueOf(databases[r-1].environment ? databases[r-1].environment : '' )) )
+							  dbSheet.addCell( new Label( 9, r, String.valueOf(databases[r-1].ipAddress ? databases[r-1].ipAddress : '' )) )
+							  dbSheet.addCell( new Label(10, r, String.valueOf(databases[r-1].planStatus ? databases[r-1].planStatus : '')) )
+							  dbSheet.addCell( new Label(11, r, String.valueOf(databases[r-1].custom1 ? databases[r-1].custom1 : '')) )
+							  dbSheet.addCell( new Label(12, r, String.valueOf(databases[r-1].custom2 ? databases[r-1].custom2 : '')) )
+							  dbSheet.addCell( new Label(13, r, String.valueOf(databases[r-1].custom3 ? databases[r-1].custom3 : '')) )
+							  dbSheet.addCell( new Label(14, r, String.valueOf(databases[r-1].custom4 ? databases[r-1].custom4 : '')) )
+							  dbSheet.addCell( new Label(15, r, String.valueOf(databases[r-1].custom5 ? databases[r-1].custom5 : '')) )
+							  dbSheet.addCell( new Label(16, r, String.valueOf(databases[r-1].custom6 ? databases[r-1].custom6 : '' )) )
+							  dbSheet.addCell( new Label(17, r, String.valueOf(databases[r-1].custom7 ? databases[r-1].custom7 : '')) )
+							  dbSheet.addCell( new Label(18, r, String.valueOf(databases[r-1].custom8 ? databases[r-1].custom8 : '')) )
+						}
+						  
+						  // For Database Export
+						  
+						  for ( int r = 1; r <= databases.size(); r++ ) {
+							  dbSheet.addCell( new Label( 0, r, String.valueOf(databases[r-1].id)) )
+							  dbSheet.addCell( new Label( 1, r, String.valueOf(databases[r-1].assetName ? databases[r-1].assetName : '' )) )
+							  dbSheet.addCell( new Label( 2, r, String.valueOf(databases[r-1].dbFormat ? databases[r-1].dbFormat : '')) )
+							  dbSheet.addCell( new Label( 3, r, String.valueOf(databases[r-1].dbSize ? databases[r-1].dbSize : '' )) )
+							  dbSheet.addCell( new Label( 4, r, String.valueOf(databases[r-1].description ? databases[r-1].description : '')) )
+							  dbSheet.addCell( new Label( 5, r, String.valueOf(databases[r-1].supportType ? databases[r-1].supportType  :'' )) )
+							  dbSheet.addCell( new Label( 6, r, String.valueOf(databases[r-1].retireDate ? databases[r-1].retireDate : '')) )
+							  dbSheet.addCell( new Label( 7, r, String.valueOf(databases[r-1].maintExpDate ? databases[r-1].maintExpDate : '')) )
+							  dbSheet.addCell( new Label( 8, r, String.valueOf(databases[r-1].environment ? databases[r-1].environment : '' )) )
+							  dbSheet.addCell( new Label( 9, r, String.valueOf(databases[r-1].ipAddress ? databases[r-1].ipAddress : '' )) )
+							  dbSheet.addCell( new Label(10, r, String.valueOf(databases[r-1].planStatus ? databases[r-1].planStatus : '')) )
+							  dbSheet.addCell( new Label(11, r, String.valueOf(databases[r-1].custom1 ? databases[r-1].custom1 : '')) )
+							  dbSheet.addCell( new Label(12, r, String.valueOf(databases[r-1].custom2 ? databases[r-1].custom2 : '')) )
+							  dbSheet.addCell( new Label(13, r, String.valueOf(databases[r-1].custom3 ? databases[r-1].custom3 : '')) )
+							  dbSheet.addCell( new Label(14, r, String.valueOf(databases[r-1].custom4 ? databases[r-1].custom4 : '')) )
+							  dbSheet.addCell( new Label(15, r, String.valueOf(databases[r-1].custom5 ? databases[r-1].custom5 : '')) )
+							  dbSheet.addCell( new Label(16, r, String.valueOf(databases[r-1].custom6 ? databases[r-1].custom6 : '' )) )
+							  dbSheet.addCell( new Label(17, r, String.valueOf(databases[r-1].custom7 ? databases[r-1].custom7 : '')) )
+							  dbSheet.addCell( new Label(18, r, String.valueOf(databases[r-1].custom8 ? databases[r-1].custom8 : '')) )
+						}
+						  
+						  // For Files Export
+						  
+						  for ( int r = 1; r <= files.size(); r++ ) {
+							  filesSheet.addCell( new Label( 0, r, String.valueOf(files[r-1].id)) )
+							  filesSheet.addCell( new Label( 1, r, String.valueOf(files[r-1].assetName ? files[r-1].assetName : '' )) )
+							  filesSheet.addCell( new Label( 2, r, String.valueOf(files[r-1].fileFormat ? files[r-1].fileFormat : '')) )
+							  filesSheet.addCell( new Label( 3, r, String.valueOf(files[r-1].fileSize ? files[r-1].fileSize : '' )) )
+							  filesSheet.addCell( new Label( 4, r, String.valueOf(files[r-1].description ? files[r-1].description : '')) )
+							  filesSheet.addCell( new Label( 5, r, String.valueOf(files[r-1].supportType ? files[r-1].supportType  :'' )) )
+							  filesSheet.addCell( new Label( 6, r, String.valueOf(files[r-1].retireDate ? files[r-1].retireDate : '')) )
+							  filesSheet.addCell( new Label( 7, r, String.valueOf(files[r-1].maintExpDate ? files[r-1].maintExpDate : '')) )
+							  filesSheet.addCell( new Label( 8, r, String.valueOf(files[r-1].environment ? files[r-1].environment : '' )) )
+							  filesSheet.addCell( new Label( 9, r, String.valueOf(files[r-1].ipAddress ? files[r-1].ipAddress : '' )) )
+							  filesSheet.addCell( new Label(10, r, String.valueOf(files[r-1].planStatus ? files[r-1].planStatus : '')) )
+							  filesSheet.addCell( new Label(11, r, String.valueOf(files[r-1].custom1 ? files[r-1].custom1 : '')) )
+							  filesSheet.addCell( new Label(12, r, String.valueOf(files[r-1].custom2 ? files[r-1].custom2 : '')) )
+							  filesSheet.addCell( new Label(13, r, String.valueOf(files[r-1].custom3 ? files[r-1].custom3 : '')) )
+							  filesSheet.addCell( new Label(14, r, String.valueOf(files[r-1].custom4 ? files[r-1].custom4 : '')) )
+							  filesSheet.addCell( new Label(15, r, String.valueOf(files[r-1].custom5 ? files[r-1].custom5 : '')) )
+							  filesSheet.addCell( new Label(16, r, String.valueOf(files[r-1].custom6 ? files[r-1].custom6 : '' )) )
+							  filesSheet.addCell( new Label(17, r, String.valueOf(files[r-1].custom7 ? files[r-1].custom7 : '')) )
+							  filesSheet.addCell( new Label(18, r, String.valueOf(files[r-1].custom8 ? files[r-1].custom8 : '')) )
+						}
+						  
+						  // For Others Export
+						  
+						  for ( int r = 1; r <= others.size(); r++ ) {
+							  otherSheet.addCell( new Label( 0, r, String.valueOf(others[r-1].id)) )
+							  otherSheet.addCell( new Label( 1, r, String.valueOf(others[r-1].application )) )
+							  otherSheet.addCell( new Label( 2, r, String.valueOf(others[r-1].assetName)) )
+							  otherSheet.addCell( new Label( 3, r, String.valueOf(others[r-1].shortName ? others[r-1].shortName : '' )) )
+							  otherSheet.addCell( new Label( 4, r, String.valueOf(others[r-1].serialNumber ? others[r-1].serialNumber : '')) )
+							  otherSheet.addCell( new Label( 5, r, String.valueOf(others[r-1].assetTag )) )
+							  otherSheet.addCell( new Label( 6, r, String.valueOf(others[r-1].manufacturer ? others[r-1].manufacturer : '')) )
+							  otherSheet.addCell( new Label( 7, r, String.valueOf(others[r-1].model ? others[r-1].model : '')) )
+							  otherSheet.addCell( new Label( 8, r, String.valueOf(others[r-1].assetType )) )
+							  otherSheet.addCell( new Label( 9, r, String.valueOf(others[r-1].ipAddress ? others[r-1].ipAddress : '' )) )
+							  otherSheet.addCell( new Label(10, r, String.valueOf(others[r-1].os ? others[r-1].os : '')) )
+							  otherSheet.addCell( new Label(11, r, String.valueOf(others[r-1].sourceLocation ? others[r-1].sourceLocation : '')) )
+							  otherSheet.addCell( new Label(12, r, String.valueOf(others[r-1].sourceRoom ? others[r-1].sourceRoom : '')) )
+							  otherSheet.addCell( new Label(13, r, String.valueOf(others[r-1].sourceRack ? others[r-1].sourceRack : '')) )
+							  otherSheet.addCell( new Label(14, r, String.valueOf(others[r-1].sourceRackPosition ? others[r-1].sourceRackPosition : '')) )
+							  otherSheet.addCell( new Label(15, r, String.valueOf(others[r-1].sourceBladeChassis ? others[r-1].sourceBladeChassis : '')) )
+							  otherSheet.addCell( new Label(16, r, String.valueOf(others[r-1].sourceBladePosition ? others[r-1].sourceBladePosition : '' )) )
+							  otherSheet.addCell( new Label(17, r, String.valueOf(others[r-1].targetLocation ? others[r-1].targetLocation : '')) )
+							  otherSheet.addCell( new Label(18, r, String.valueOf(others[r-1].targetRoom ? others[r-1].targetRoom : '')) )
+							  otherSheet.addCell( new Label(19, r, String.valueOf(others[r-1].targetRack ? others[r-1].targetRack : '')) )
+							  otherSheet.addCell( new Label(20, r, String.valueOf(others[r-1].targetRackPosition ? others[r-1].targetRackPosition : '' )) )
+							  otherSheet.addCell( new Label(21, r, String.valueOf(others[r-1].targetBladeChassis ? others[r-1].targetBladeChassis : '')) )
+							  otherSheet.addCell( new Label(22, r, String.valueOf(others[r-1].targetBladePosition ? others[r-1].targetBladePosition : '')) )
+							  otherSheet.addCell( new Label(23, r, String.valueOf(others[r-1].custom1 ? others[r-1].custom1 :'' )) )
+							  otherSheet.addCell( new Label(24, r, String.valueOf(others[r-1].custom2 ? others[r-1].custom2 : '')) )
+							  otherSheet.addCell( new Label(25, r, String.valueOf(others[r-1].custom3 ? others[r-1].custom3 : '' )) )
+							  otherSheet.addCell( new Label(26, r, String.valueOf(others[r-1].custom4 ? others[r-1].custom4 : '')) )
+							  otherSheet.addCell( new Label(27, r, String.valueOf(others[r-1].custom5 ? others[r-1].custom5 : '')) )
+							  otherSheet.addCell( new Label(28, r, String.valueOf(others[r-1].custom6 ? others[r-1].custom6 : '')) )
+							  otherSheet.addCell( new Label(29, r, String.valueOf(others[r-1].custom7 ? others[r-1].custom7 : '' )) )
+							  otherSheet.addCell( new Label(30, r, String.valueOf(others[r-1].custom8 ? others[r-1].custom8 : '')) )
+							  otherSheet.addCell( new Label(31, r, String.valueOf(others[r-1].moveBundle ? others[r-1].moveBundle : '')) )
+							  otherSheet.addCell( new Label(32, r, String.valueOf(others[r-1].sourceTeamMt ? others[r-1].sourceTeamMt : '' )) )
+							  otherSheet.addCell( new Label(33, r, String.valueOf(others[r-1].targetTeamMt ? others[r-1].targetTeamMt : '')) )
+							  otherSheet.addCell( new Label(34, r, String.valueOf(others[r-1].sourceTeamLog ? others[r-1].sourceTeamLog : '')) )
+							  otherSheet.addCell( new Label(35, r, String.valueOf(others[r-1].targetTeamLog ? others[r-1].targetTeamLog :'')) )
+							  otherSheet.addCell( new Label(36, r, String.valueOf(others[r-1].sourceTeamSa ? others[r-1].sourceTeamSa : '')) )
+							  otherSheet.addCell( new Label(37, r, String.valueOf(others[r-1].targetTeamSa ? others[r-1].targetTeamSa : '')) )
+							  otherSheet.addCell( new Label(38, r, String.valueOf(others[r-1].sourceTeamDba ? others[r-1].sourceTeamDba : '')) )
+							  otherSheet.addCell( new Label(39, r, String.valueOf(others[r-1].targetTeamDba ? others[r-1].targetTeamDba : '' )) )
+							  otherSheet.addCell( new Label(40, r, String.valueOf(others[r-1].truck ? others[r-1].truck :'')) )
+							  otherSheet.addCell( new Label(41, r, String.valueOf(others[r-1].cart ? others[r-1].cart :'' )) )
+							  otherSheet.addCell( new Label(42, r, String.valueOf(others[r-1].shelf ? others[r-1].shelf : '' )) )
+							  otherSheet.addCell( new Label(43, r, String.valueOf(others[r-1].railType ? others[r-1].railType :'' )) )
+							  otherSheet.addCell( new Label(44, r, String.valueOf(others[r-1].appOwner ? others[r-1].appOwner : '')) )
+							  otherSheet.addCell( new Label(45, r, String.valueOf(others[r-1].appSme ? others[r-1].appSme : '')) )
+							  otherSheet.addCell( new Label(46, r, String.valueOf(others[r-1].priority ? others[r-1].priority : '')) )
+							  otherSheet.addCell( new Label(47, r, String.valueOf(others[r-1].planStatus ? others[r-1].planStatus : '')) )
+							  otherSheet.addCell( new Label(48, r, String.valueOf(others[r-1].usize ? others[r-1].usize : '')) )
+							  
+						}
+						  
+						  // For Issues Export
+						  
+						  for ( int r = 1; r <= unresolvedIssues.size(); r++ ) {
+							  issueSheet.addCell( new Label( 0, r, String.valueOf(unresolvedIssues[r-1].id)) )
+							  issueSheet.addCell( new Label( 1, r, String.valueOf(unresolvedIssues[r-1].comment ? unresolvedIssues[r-1].comment : '' )) )
+							  issueSheet.addCell( new Label( 2, r, String.valueOf(unresolvedIssues[r-1].commentType ? unresolvedIssues[r-1].commentType : '')) )
+							  issueSheet.addCell( new Label( 3, r, String.valueOf(unresolvedIssues[r-1].assetEntity?.assetName ? unresolvedIssues[r-1].assetEntity?.assetName : '' )) )
+							  issueSheet.addCell( new Label( 4, r, String.valueOf(unresolvedIssues[r-1].resolution ? unresolvedIssues[r-1].resolution  :'' )) )
+							  issueSheet.addCell( new Label( 5, r, String.valueOf(unresolvedIssues[r-1].resolvedBy ? unresolvedIssues[r-1].resolvedBy : '')) )
+							  issueSheet.addCell( new Label( 6, r, String.valueOf(unresolvedIssues[r-1].createdBy ? unresolvedIssues[r-1].createdBy : '')) )
+							  issueSheet.addCell( new Label( 7, r, String.valueOf(unresolvedIssues[r-1].owner ? unresolvedIssues[r-1].owner : '' )) )
+							  issueSheet.addCell( new Label( 8, r, String.valueOf(unresolvedIssues[r-1].category ? unresolvedIssues[r-1].category : '' )) )
+							  issueSheet.addCell( new Label( 9, r, String.valueOf(unresolvedIssues[r-1].dateCreated ? unresolvedIssues[r-1].dateCreated : '')) )
+							  issueSheet.addCell( new Label( 10, r, String.valueOf(unresolvedIssues[r-1].dateResolved ? unresolvedIssues[r-1].dateResolved : '')) )
+						}
+						  
+						  // For premove Issues Export
+						  
+						  for ( int r = 1; r <= preMoveIssue.size(); r++ ) {
+							  preMoveSheet.addCell( new Label( 0, r, String.valueOf(preMoveIssue[r-1].id)) )
+							  preMoveSheet.addCell( new Label( 1, r, String.valueOf(preMoveIssue[r-1].comment ? preMoveIssue[r-1].comment : '' )) )
+							  preMoveSheet.addCell( new Label( 2, r, String.valueOf(preMoveIssue[r-1].commentType ? preMoveIssue[r-1].commentType : '')) )
+							  preMoveSheet.addCell( new Label( 3, r, String.valueOf(preMoveIssue[r-1].assetEntity?.assetName ? preMoveIssue[r-1].assetEntity?.assetName : '' )) )
+							  preMoveSheet.addCell( new Label( 4, r, String.valueOf(preMoveIssue[r-1].resolution ? preMoveIssue[r-1].resolution  :'' )) )
+							  preMoveSheet.addCell( new Label( 5, r, String.valueOf(preMoveIssue[r-1].resolvedBy ? preMoveIssue[r-1].resolvedBy : '')) )
+							  preMoveSheet.addCell( new Label( 6, r, String.valueOf(preMoveIssue[r-1].createdBy ? preMoveIssue[r-1].createdBy : '')) )
+							  preMoveSheet.addCell( new Label( 7, r, String.valueOf(preMoveIssue[r-1].owner ? preMoveIssue[r-1].owner : '' )) )
+							  preMoveSheet.addCell( new Label( 8, r, String.valueOf(preMoveIssue[r-1].category ? preMoveIssue[r-1].category : '' )) )
+							  preMoveSheet.addCell( new Label( 9, r, String.valueOf(preMoveIssue[r-1].dateCreated ? preMoveIssue[r-1].dateCreated : '')) )
+							  preMoveSheet.addCell( new Label( 10, r, String.valueOf(preMoveIssue[r-1].dateResolved ? preMoveIssue[r-1].dateResolved : '')) )
+						}
+						  
+						  // For postmove Issues Export
+						  
+						  for ( int r = 1; r <= postMoveIssue.size(); r++ ) {
+							  postMoveSheet.addCell( new Label( 0, r, String.valueOf(postMoveIssue[r-1].id)) )
+							  postMoveSheet.addCell( new Label( 1, r, String.valueOf(postMoveIssue[r-1].comment ? postMoveIssue[r-1].comment : '' )) )
+							  postMoveSheet.addCell( new Label( 2, r, String.valueOf(postMoveIssue[r-1].commentType ? postMoveIssue[r-1].commentType : '')) )
+							  postMoveSheet.addCell( new Label( 3, r, String.valueOf(postMoveIssue[r-1].assetEntity?.assetName ? postMoveIssue[r-1].assetEntity?.assetName : '' )) )
+							  postMoveSheet.addCell( new Label( 4, r, String.valueOf(postMoveIssue[r-1].resolution ? postMoveIssue[r-1].resolution  :'' )) )
+							  postMoveSheet.addCell( new Label( 5, r, String.valueOf(postMoveIssue[r-1].resolvedBy ? postMoveIssue[r-1].resolvedBy : '')) )
+							  postMoveSheet.addCell( new Label( 6, r, String.valueOf(postMoveIssue[r-1].createdBy ? postMoveIssue[r-1].createdBy : '')) )
+							  postMoveSheet.addCell( new Label( 7, r, String.valueOf(postMoveIssue[r-1].owner ? postMoveIssue[r-1].owner : '' )) )
+							  postMoveSheet.addCell( new Label( 8, r, String.valueOf(postMoveIssue[r-1].category ? postMoveIssue[r-1].category : '' )) )
+							  postMoveSheet.addCell( new Label( 9, r, String.valueOf(postMoveIssue[r-1].dateCreated ? postMoveIssue[r-1].dateCreated : '')) )
+							  postMoveSheet.addCell( new Label( 10, r, String.valueOf(postMoveIssue[r-1].dateResolved ? postMoveIssue[r-1].dateResolved : '')) )
+						}
+						  
+						book.write()
+						book.close()
+					} catch( Exception ex ) {
+					  println "Exception occurred while exporting data"+ex.printStackTrace()
+					  
+					  return;
+				   }
+				return ;
+		
 	}
     
 }
