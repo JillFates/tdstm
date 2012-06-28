@@ -498,9 +498,11 @@ function showAssetDialog( e , action ) {
 		      	  var tr = document.createElement('tr');
 		      	  tr.id = "commentTr_"+commentObj.commentInstance.id
 		      	  //tr.setAttribute("class", commentObj.cssClass)
-		      	  tr.setAttribute('onmouseover','this.style.backgroundColor="white";');
-		      	  tr.setAttribute('onmouseout','this.style.backgroundColor="'+commentObj.cssClass+'";');
-		      	  tr.style.backgroundColor=commentObj.cssClass;
+		      	  if(commentObj.commentInstance.commentType=='issue'){
+			      	  tr.setAttribute('onmouseover','this.style.backgroundColor="white";');
+			      	  tr.setAttribute('onmouseout','this.style.backgroundColor="'+commentObj.cssClass+'";');
+			      	  tr.style.backgroundColor=commentObj.cssClass;
+		      	  }
 			      var editTd = document.createElement('td');
 			      var commentTd = document.createElement('td');
 			      commentTd.id = 'comment_'+commentObj.commentInstance.id
@@ -730,8 +732,10 @@ function showAssetDialog( e , action ) {
 		      	  var tr = document.createElement('tr');
 		      	  tr.style.background = '#65a342'
 		      	  tr.setAttribute('onmouseover','this.style.backgroundColor="white";');
-		      	  tr.setAttribute('onmouseout','this.style.backgroundColor="'+assetComments[0].cssClass+'";');
-		      	  tr.style.background = assetComments[0].cssClass
+		          if(assetComments[0].assetComment.commentType=='issue'){
+			      	  tr.setAttribute('onmouseout','this.style.backgroundColor="'+assetComments[0].cssClass+'";');
+			      	  tr.style.background = assetComments[0].cssClass
+		          }
 		      	  tr.id = "commentTr_"+assetComments[0].assetComment.id
 			     
 			      var editTd = document.createElement('td');
@@ -828,14 +832,13 @@ function showAssetDialog( e , action ) {
 	}
 	// update comments 
 	function updateCommentsOnList( e ){
+		
 	var assetComments = eval('(' + e.responseText + ')');
 		if (assetComments != "") {
 			$("#editCommentDialog").dialog("close")
 	      	//generate dynamic rows	
 	      	  var tr = $('#commentTr_'+assetComments[0].assetComment.id);
 	      	  tr.css( 'background', '#65a342' );
-	      	  tr.setAttribute('onmouseout','this.style.backgroundColor="'+assetComments[0].cssClass+'";');
-	      	  tr.style.background = assetComments[0].cssClass
 	      	  if(assetComments[0].assetComment.mustVerify != 0){
 		      $('#verifyText_'+assetComments[0].assetComment.id).attr('checked', true);
 		      } else {
@@ -853,7 +856,7 @@ function showAssetDialog( e , action ) {
 			      resolveVal.type = 'checkbox'
 			      resolveVal.disabled = 'disabled'
 			      $('#resolve_'+assetComments[0].assetComment.id).append( resolveVal )
-			     
+			   
 			      if(assetComments[0].assetComment.isResolved != 0){
 			      	$('#verifyResolved_'+assetComments[0].assetComment.id).attr('checked', true);
 			      } else {
@@ -903,6 +906,8 @@ if(type == "issue"){
 }else if(type == "instruction"){
 	document.forms[formName].mustVerify.checked = true;
 	document.forms[formName].mustVerify.value = 1;
+	alert("-----------------------")
+	$("#mustVerifyEditId").css('display', 'block');
 	$(resolveDiv).css('display', 'none');
 	$("#catagoryTrId").css('display', 'none');
 	$("#dueDateTrId").css('display', 'none');
