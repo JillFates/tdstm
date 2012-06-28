@@ -4,6 +4,7 @@
 <body>
  <div class="body">
  <table style="width: 400px">
+ <th colspan="2"> SUMMARY for Move-Event : ${moveEventInstance.name}</th>
  <tr>
 	 <td> Bundles :</td>
 	 <td>${bundles?.size() }</td>
