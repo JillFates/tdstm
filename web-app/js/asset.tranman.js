@@ -906,7 +906,6 @@ if(type == "issue"){
 }else if(type == "instruction"){
 	document.forms[formName].mustVerify.checked = true;
 	document.forms[formName].mustVerify.value = 1;
-	alert("-----------------------")
 	$("#mustVerifyEditId").css('display', 'block');
 	$(resolveDiv).css('display', 'none');
 	$("#catagoryTrId").css('display', 'none');

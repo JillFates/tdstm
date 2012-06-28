@@ -24,8 +24,9 @@ environments {
 			username = "root"
 			password = "admin"
 			
-			//logSql = true 
-			
+	
+				
+				
 			/*
 			dbCreate = "create-drop" // one of 'create', 'create-drop','update'
 			url = "jdbc:hsqldb:mem:devDB"
