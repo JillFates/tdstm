@@ -42,7 +42,7 @@ class MoveEventController {
     	def moveEventInstanceList
         if(!params.max) params.max = 10
         def currProj = session.getAttribute("CURR_PROJ").CURR_PROJ;
-    	if(currProj) moveEventInstanceList = MoveEvent.findAllByProject( Project.get( currProj ) )
+    	if(currProj) moveEventInstanceList = MoveEvent.findAllByProject( Project.get( currProj ))
 		// Statements for JMESA integration
     	TableFacade tableFacade = new TableFacadeImpl("tag",request)
         tableFacade.items = moveEventInstanceList
@@ -528,7 +528,7 @@ class MoveEventController {
 			def moveEventInstance = MoveEvent.get(params.eventId)
 			def bundles = moveEventInstance.moveBundles
 			def today = new Date()
-			def formatter = new SimpleDateFormat("yy/mm/dd");
+			def formatter = new SimpleDateFormat("yy/MM/dd");
 			today = formatter.format(today)
 			def moveEventList = MoveEvent.findAllByProject(project)
 			def applcationAssigned = 0
@@ -577,14 +577,19 @@ class MoveEventController {
 						response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
 						def book = Workbook.createWorkbook( response.getOutputStream(), workbook )
 						
-						def summarySheet = book.getSheet("Summary")
-						def personelSheet = book.getSheet("Personel")
-						def appSheet = book.getSheet("Applications")
 						def serverSheet = book.getSheet("Servers")
+						def personelSheet = book.getSheet("Personnel")
+						def preMoveSheet = book.getSheet("Pre-move")
 						def dbSheet = book.getSheet("Database")
 						def filesSheet = book.getSheet("Files")
 						def otherSheet = book.getSheet("Other")
 						def issueSheet = book.getSheet("Issues")
+						
+						/*def summarySheet = book.getSheet("Summary")
+						def personelSheet = book.getSheet("Personel")
+						def appSheet = book.getSheet("Applications")
+						
+						
 						def preMoveSheet = book.getSheet("Premove")
 						def postMoveSheet = book.getSheet("Postmove")
 						
@@ -598,15 +603,10 @@ class MoveEventController {
 							summarySheet.addCell( new Label( 6, 1, String.valueOf(preMoveCheckListError )) )
 							
 							
+							
 					      // For Project Staff Export
 									
-						  def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' ")
-						  for ( int r = 1; r <= projectStaff.size(); r++ ) {
-							  def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${projectStaff[0].partyIdTo.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-							  personelSheet.addCell( new Label( 0, r, String.valueOf( projectStaff[r-1].partyIdTo.firstName+" "+ projectStaff[r-1].partyIdTo.lastName)) )
-							  personelSheet.addCell( new Label( 1, r, String.valueOf(company.partyIdFrom[0])) )
-							  personelSheet.addCell( new Label( 2, r, String.valueOf(projectStaff[r-1].roleTypeCodeTo )) )
-						  }
+						  
 						  
 						  // For Application Export
 						  
@@ -652,65 +652,39 @@ class MoveEventController {
 							  appSheet.addCell( new Label(38, r, String.valueOf(applications[r-1].custom7 ? applications[r-1].custom7 : '')) )
 							  appSheet.addCell( new Label(39, r, String.valueOf(applications[r-1].custom8 ? applications[r-1].custom8 : '')) )
 							  
-						}
+						}*/
 						  
 						  // For Server Export
+						//WritableCellFormat wrappedText = new WritableCellFormat (WritableWorkbook.ARIAL_10_PT);
+						//CellView cell = new CellView ();
+                        ///wrappedText.setWrap(true);
+						//wrappedText.setAlignment(jxl.format.Alignment.CENTRE);
+						//serverSheet.addCell( new Label(8 , 3, String.valueOf('Server:'+assetCount +'Blade:'+assetCount+'VM:'+assetCount),wrappedText,cell) )
 						  
-						  for ( int r = 1; r <= assets.size(); r++ ) {
+						  for ( int r = 5; r <= assets.size(); r++ ) {
 							  serverSheet.addCell( new Label( 0, r, String.valueOf(assets[r-1].id)) )
 							  serverSheet.addCell( new Label( 1, r, String.valueOf(assets[r-1].application )) )
 							  serverSheet.addCell( new Label( 2, r, String.valueOf(assets[r-1].assetName )) )
-							  serverSheet.addCell( new Label( 3, r, String.valueOf(assets[r-1].shortName ? assets[r-1].shortName : '' )) )
-							  serverSheet.addCell( new Label( 4, r, String.valueOf(assets[r-1].serialNumber ? assets[r-1].serialNumber : '')) )
+							  serverSheet.addCell( new Label( 3, r, String.valueOf('')) )
 							  serverSheet.addCell( new Label( 5, r, String.valueOf(assets[r-1].assetTag )) )
 							  serverSheet.addCell( new Label( 6, r, String.valueOf(assets[r-1].manufacturer ? assets[r-1].manufacturer : '')) )
 							  serverSheet.addCell( new Label( 7, r, String.valueOf(assets[r-1].model ? assets[r-1].model : '')) )
 							  serverSheet.addCell( new Label( 8, r, String.valueOf(assets[r-1].assetType )) )
-							  serverSheet.addCell( new Label( 9, r, String.valueOf(assets[r-1].ipAddress ? assets[r-1].ipAddress : '' )) )
-							  serverSheet.addCell( new Label(10, r, String.valueOf(assets[r-1].os ? assets[r-1].os : '')) )
-							  serverSheet.addCell( new Label(11, r, String.valueOf(assets[r-1].sourceLocation ? assets[r-1].sourceLocation : '')) )
-							  serverSheet.addCell( new Label(12, r, String.valueOf(assets[r-1].sourceRoom ? assets[r-1].sourceRoom : '')) )
-							  serverSheet.addCell( new Label(13, r, String.valueOf(assets[r-1].sourceRack ? assets[r-1].sourceRack : '')) )
-							  serverSheet.addCell( new Label(14, r, String.valueOf(assets[r-1].sourceRackPosition ? assets[r-1].sourceRackPosition : '')) )
-							  serverSheet.addCell( new Label(15, r, String.valueOf(assets[r-1].sourceBladeChassis ? assets[r-1].sourceBladeChassis : '')) )
-							  serverSheet.addCell( new Label(16, r, String.valueOf(assets[r-1].sourceBladePosition ? assets[r-1].sourceBladePosition : '' )) )
-							  serverSheet.addCell( new Label(17, r, String.valueOf(assets[r-1].targetLocation ? assets[r-1].targetLocation : '')) )
-							  serverSheet.addCell( new Label(18, r, String.valueOf(assets[r-1].targetRoom ? assets[r-1].targetRoom : '')) )
-							  serverSheet.addCell( new Label(19, r, String.valueOf(assets[r-1].targetRack ? assets[r-1].targetRack : '')) )
-							  serverSheet.addCell( new Label(20, r, String.valueOf(assets[r-1].targetRackPosition ? assets[r-1].targetRackPosition : '' )) )
-							  serverSheet.addCell( new Label(21, r, String.valueOf(assets[r-1].targetBladeChassis ? assets[r-1].targetBladeChassis : '')) )
-							  serverSheet.addCell( new Label(22, r, String.valueOf(assets[r-1].targetBladePosition ? assets[r-1].targetBladePosition : '')) )
-							  serverSheet.addCell( new Label(23, r, String.valueOf(assets[r-1].custom1 ? assets[r-1].custom1 :'' )) )
-							  serverSheet.addCell( new Label(24, r, String.valueOf(assets[r-1].custom2 ? assets[r-1].custom2 : '')) )
-							  serverSheet.addCell( new Label(25, r, String.valueOf(assets[r-1].custom3 ? assets[r-1].custom3 : '' )) )
-							  serverSheet.addCell( new Label(26, r, String.valueOf(assets[r-1].custom4 ? assets[r-1].custom4 : '')) )
-							  serverSheet.addCell( new Label(27, r, String.valueOf(assets[r-1].custom5 ? assets[r-1].custom5 : '')) )
-							  serverSheet.addCell( new Label(28, r, String.valueOf(assets[r-1].custom6 ? assets[r-1].custom6 : '')) )
-							  serverSheet.addCell( new Label(29, r, String.valueOf(assets[r-1].custom7 ? assets[r-1].custom7 : '' )) )
-							  serverSheet.addCell( new Label(30, r, String.valueOf(assets[r-1].custom8 ? assets[r-1].custom8 : '')) )
-							  serverSheet.addCell( new Label(31, r, String.valueOf(assets[r-1].moveBundle ? assets[r-1].moveBundle : '')) )
-							  serverSheet.addCell( new Label(32, r, String.valueOf(assets[r-1].sourceTeamMt ? assets[r-1].sourceTeamMt : '' )) )
-							  serverSheet.addCell( new Label(33, r, String.valueOf(assets[r-1].targetTeamMt ? assets[r-1].targetTeamMt : '')) )
-							  serverSheet.addCell( new Label(34, r, String.valueOf(assets[r-1].sourceTeamLog ? assets[r-1].sourceTeamLog : '')) )
-							  serverSheet.addCell( new Label(35, r, String.valueOf(assets[r-1].targetTeamLog ? assets[r-1].targetTeamLog :'')) )
-							  serverSheet.addCell( new Label(36, r, String.valueOf(assets[r-1].sourceTeamSa ? assets[r-1].sourceTeamSa : '')) )
-							  serverSheet.addCell( new Label(37, r, String.valueOf(assets[r-1].targetTeamSa ? assets[r-1].targetTeamSa : '')) )
-							  serverSheet.addCell( new Label(38, r, String.valueOf(assets[r-1].sourceTeamDba ? assets[r-1].sourceTeamDba : '')) )
-							  serverSheet.addCell( new Label(39, r, String.valueOf(assets[r-1].targetTeamDba ? assets[r-1].targetTeamDba : '' )) )
-							  serverSheet.addCell( new Label(40, r, String.valueOf(assets[r-1].truck ? assets[r-1].truck :'')) )
-							  serverSheet.addCell( new Label(41, r, String.valueOf(assets[r-1].cart ? assets[r-1].cart :'' )) )
-							  serverSheet.addCell( new Label(42, r, String.valueOf(assets[r-1].shelf ? assets[r-1].shelf : '' )) )
-							  serverSheet.addCell( new Label(43, r, String.valueOf(assets[r-1].railType ? assets[r-1].railType :'' )) )
-							  serverSheet.addCell( new Label(44, r, String.valueOf(assets[r-1].appOwner ? assets[r-1].appOwner : '')) )
-							  serverSheet.addCell( new Label(45, r, String.valueOf(assets[r-1].appSme ? assets[r-1].appSme : '')) )
-							  serverSheet.addCell( new Label(46, r, String.valueOf(assets[r-1].priority ? assets[r-1].priority : '')) )
-							  serverSheet.addCell( new Label(47, r, String.valueOf(assets[r-1].planStatus ? assets[r-1].planStatus : '')) )
-							  serverSheet.addCell( new Label(48, r, String.valueOf(assets[r-1].usize ? assets[r-1].usize : '')) )
+							  serverSheet.addCell( new Label( 9, r, String.valueOf('')) )
+							  serverSheet.addCell( new Label(10, r, String.valueOf('')) )
+							  serverSheet.addCell( new Label(11, r, String.valueOf('')) )
 							  
 						}
-						  // For Database Export
 						  
-						  for ( int r = 1; r <= databases.size(); r++ ) {
+						  def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' ")
+						  for ( int r = 8; r <= projectStaff.size(); r++ ) {
+							  def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${projectStaff[0].partyIdTo.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+							  personelSheet.addCell( new Label( 1, r, String.valueOf( projectStaff[r-1].partyIdTo.firstName+" "+ projectStaff[r-1].partyIdTo.lastName)) )
+							  personelSheet.addCell( new Label( 2, r, String.valueOf(projectStaff[r-1].roleTypeCodeTo )) )
+							  personelSheet.addCell( new Label( 5, r, String.valueOf(projectStaff[r-1].partyIdTo.email)) )
+						  }
+						  
+						  for ( int r = 4; r <= databases.size(); r++ ) {
 							  dbSheet.addCell( new Label( 0, r, String.valueOf(databases[r-1].id)) )
 							  dbSheet.addCell( new Label( 1, r, String.valueOf(databases[r-1].assetName ? databases[r-1].assetName : '' )) )
 							  dbSheet.addCell( new Label( 2, r, String.valueOf(databases[r-1].dbFormat ? databases[r-1].dbFormat : '')) )
@@ -731,32 +705,6 @@ class MoveEventController {
 							  dbSheet.addCell( new Label(17, r, String.valueOf(databases[r-1].custom7 ? databases[r-1].custom7 : '')) )
 							  dbSheet.addCell( new Label(18, r, String.valueOf(databases[r-1].custom8 ? databases[r-1].custom8 : '')) )
 						}
-						  
-						  // For Database Export
-						  
-						  for ( int r = 1; r <= databases.size(); r++ ) {
-							  dbSheet.addCell( new Label( 0, r, String.valueOf(databases[r-1].id)) )
-							  dbSheet.addCell( new Label( 1, r, String.valueOf(databases[r-1].assetName ? databases[r-1].assetName : '' )) )
-							  dbSheet.addCell( new Label( 2, r, String.valueOf(databases[r-1].dbFormat ? databases[r-1].dbFormat : '')) )
-							  dbSheet.addCell( new Label( 3, r, String.valueOf(databases[r-1].dbSize ? databases[r-1].dbSize : '' )) )
-							  dbSheet.addCell( new Label( 4, r, String.valueOf(databases[r-1].description ? databases[r-1].description : '')) )
-							  dbSheet.addCell( new Label( 5, r, String.valueOf(databases[r-1].supportType ? databases[r-1].supportType  :'' )) )
-							  dbSheet.addCell( new Label( 6, r, String.valueOf(databases[r-1].retireDate ? databases[r-1].retireDate : '')) )
-							  dbSheet.addCell( new Label( 7, r, String.valueOf(databases[r-1].maintExpDate ? databases[r-1].maintExpDate : '')) )
-							  dbSheet.addCell( new Label( 8, r, String.valueOf(databases[r-1].environment ? databases[r-1].environment : '' )) )
-							  dbSheet.addCell( new Label( 9, r, String.valueOf(databases[r-1].ipAddress ? databases[r-1].ipAddress : '' )) )
-							  dbSheet.addCell( new Label(10, r, String.valueOf(databases[r-1].planStatus ? databases[r-1].planStatus : '')) )
-							  dbSheet.addCell( new Label(11, r, String.valueOf(databases[r-1].custom1 ? databases[r-1].custom1 : '')) )
-							  dbSheet.addCell( new Label(12, r, String.valueOf(databases[r-1].custom2 ? databases[r-1].custom2 : '')) )
-							  dbSheet.addCell( new Label(13, r, String.valueOf(databases[r-1].custom3 ? databases[r-1].custom3 : '')) )
-							  dbSheet.addCell( new Label(14, r, String.valueOf(databases[r-1].custom4 ? databases[r-1].custom4 : '')) )
-							  dbSheet.addCell( new Label(15, r, String.valueOf(databases[r-1].custom5 ? databases[r-1].custom5 : '')) )
-							  dbSheet.addCell( new Label(16, r, String.valueOf(databases[r-1].custom6 ? databases[r-1].custom6 : '' )) )
-							  dbSheet.addCell( new Label(17, r, String.valueOf(databases[r-1].custom7 ? databases[r-1].custom7 : '')) )
-							  dbSheet.addCell( new Label(18, r, String.valueOf(databases[r-1].custom8 ? databases[r-1].custom8 : '')) )
-						}
-						  
-						  // For Files Export
 						  
 						  for ( int r = 1; r <= files.size(); r++ ) {
 							  filesSheet.addCell( new Label( 0, r, String.valueOf(files[r-1].id)) )
@@ -779,8 +727,6 @@ class MoveEventController {
 							  filesSheet.addCell( new Label(17, r, String.valueOf(files[r-1].custom7 ? files[r-1].custom7 : '')) )
 							  filesSheet.addCell( new Label(18, r, String.valueOf(files[r-1].custom8 ? files[r-1].custom8 : '')) )
 						}
-						  
-						  // For Others Export
 						  
 						  for ( int r = 1; r <= others.size(); r++ ) {
 							  otherSheet.addCell( new Label( 0, r, String.valueOf(others[r-1].id)) )
@@ -835,8 +781,6 @@ class MoveEventController {
 							  
 						}
 						  
-						  // For Issues Export
-						  
 						  for ( int r = 1; r <= unresolvedIssues.size(); r++ ) {
 							  issueSheet.addCell( new Label( 0, r, String.valueOf(unresolvedIssues[r-1].id)) )
 							  issueSheet.addCell( new Label( 1, r, String.valueOf(unresolvedIssues[r-1].comment ? unresolvedIssues[r-1].comment : '' )) )
@@ -851,6 +795,16 @@ class MoveEventController {
 							  issueSheet.addCell( new Label( 10, r, String.valueOf(unresolvedIssues[r-1].dateCreated ? unresolvedIssues[r-1].dateCreated : '')) )
 							  issueSheet.addCell( new Label( 11, r, String.valueOf(unresolvedIssues[r-1].dateResolved ? unresolvedIssues[r-1].dateResolved : '')) )
 						}
+						  // For Database Export
+						  
+						  /*
+						  
+						   
+						  
+						  
+						  // For Issues Export
+						  
+						 
 						  
 						  // For premove Issues Export
 						  
@@ -884,7 +838,7 @@ class MoveEventController {
 							  postMoveSheet.addCell( new Label( 9, r, String.valueOf(postMoveIssue[r-1].category ? postMoveIssue[r-1].category : '' )) )
 							  postMoveSheet.addCell( new Label( 10, r, String.valueOf(postMoveIssue[r-1].dateCreated ? postMoveIssue[r-1].dateCreated : '')) )
 							  postMoveSheet.addCell( new Label( 11, r, String.valueOf(postMoveIssue[r-1].dateResolved ? postMoveIssue[r-1].dateResolved : '')) )
-						}
+						}*/
 						  
 						book.write()
 						book.close()
