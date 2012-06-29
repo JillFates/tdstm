@@ -244,7 +244,7 @@ class ModelController {
         }
         else {
         	def modelConnectors = ModelConnector.findAllByModel( modelInstance,[sort:"id"] )
-			def nextConnector
+			def nextConnector = 0
 			try{
 				nextConnector = modelConnectors.size() > 0 ? Integer.parseInt(modelConnectors[modelConnectors.size()-1]?.connector) : 0
 			} catch( NumberFormatException ex){
@@ -353,7 +353,10 @@ class ModelController {
 			def oldModelType = modelInstance.assetType
 			
 			if (!modelInstance.hasErrors() && modelInstance.save(flush: true)) {
-            	def connectorCount = Integer.parseInt(params.connectorCount)
+				def connectorCount = 0
+				if(params.connectorCount){
+            	    connectorCount = Integer.parseInt(params.connectorCount)
+				}
 				if(connectorCount > 0){
 		        	for(int i=1; i<=connectorCount; i++){
 						def connector = params["connector"+i]
