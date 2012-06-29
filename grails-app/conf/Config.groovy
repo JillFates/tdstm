@@ -1,14 +1,23 @@
 // locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
-
+grails.config.locations = []
+// grails.config.locations = [ "classpath:${appName}-config.groovy" ]
 // grails.config.locations = [ "classpath:${appName}-config.properties",
 //                             "classpath:${appName}-config.groovy",
 //                             "file:${userHome}/.grails/${appName}-config.properties",
 //                             "file:${userHome}/.grails/${appName}-config.groovy"]
+// Load properties file that is passed in as an Java Startup argument
+def appConfigLocation = System.properties["${appName}.config.location"]
+if (appConfigLocation) {
+	File f = new File(appConfigLocation)
+	if ( f.exists() ) {
+		grails.config.locations << "file:${appConfigLocation}"
+	} else {
+		// For whatever reason log.error if bombing here...
+		println "Application properties file System.properties['${appName}.config.location'] defined as [${appConfigLocation}] is missing"
+	}
+}
 
-// if(System.properties["${appName}.config.location"]) {
-//    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
-// }
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
 grails.mime.types = [ html: ['text/html','application/xhtml+xml'],
                       xml: ['text/xml', 'application/xml'],
