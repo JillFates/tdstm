@@ -1846,11 +1846,6 @@ class AssetEntityController {
 			assetCommentInstance.isResolved = 1
 			assetCommentInstance.resolvedBy = loginUser.person
 			assetCommentInstance.dateResolved = GormUtil.convertInToGMT( "now", tzId )
-		}
-		if(params.status=='Completed' && assetCommentInstance.status != 'Completed' ){
-			assetCommentInstance.resolvedBy = loginUser.person
-			assetCommentInstance.dateResolved = GormUtil.convertInToGMT( "now", tzId )
-		}else if(params.status=='Completed' && assetCommentInstance.status != 'Completed'){
 		}else{
 			assetCommentInstance.resolvedBy = null
 			assetCommentInstance.dateResolved = null
