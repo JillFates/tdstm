@@ -142,6 +142,36 @@
 	<td>Move Bundle:</td>
 </tr>
 <tr>
+	<td>verifyTable</td>
+	<td>css=div.dialog&gt;table.5.0</td>
+	<td>Runbook Status:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=div.dialog&gt;table.6.0</td>
+	<td>Runbook version:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=div.dialog&gt;table.7.0</td>
+	<td>Runbook bridge1 :</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=div.dialog&gt;table.8.0</td>
+	<td>Runbook bridge1 :</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=div.dialog&gt;table.9.0</td>
+	<td>Video Link:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=div.dialog&gt;table.10.0</td>
+	<td>Status: *</td>
+</tr>
+<tr>
 	<td>verifyElementPresent</td>
 	<td>projectId</td>
 	<td></td>
@@ -173,12 +203,12 @@
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>css=div.dialog&gt;table.5.0</td>
+	<td>css=div.dialog&gt;table.10.0</td>
 	<td>exact:Status: *</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
-	<td>css=div.dialog&gt;table.5.1</td>
+	<td>css=div.dialog&gt;table.10.1</td>
 	<td>Auto Start Started Stopped</td>
 </tr>
 <!--Below two commands are to test if mandatory fields are validated in this page-->
@@ -211,6 +241,36 @@
 	<td>type</td>
 	<td>description</td>
 	<td>${Desc}</td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>1|numeric</td>
+	<td>runBookVersion</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>runbookVersion</td>
+	<td>${runBookVersion}</td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>6|alpha</td>
+	<td>bridge1</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>runbookBridge1</td>
+	<td>${bridge1}</td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>6|alpha</td>
+	<td>bridge2</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>runbookBridge2</td>
+	<td>${bridge2}</td>
 </tr>
 <tr>
 	<td>storeElementPresent</td>

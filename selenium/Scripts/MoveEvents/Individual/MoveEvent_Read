@@ -157,6 +157,31 @@
 	<td>${MoveBundles}</td>
 </tr>
 <tr>
+	<td>verifyTable</td>
+	<td>css=div.dialog&gt;table.4.0</td>
+	<td>Calculated Type:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=div.dialog&gt;table.5.0</td>
+	<td>Runbook Status:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=div.dialog&gt;table.6.0</td>
+	<td>Runbook Version:</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=div.dialog&gt;table.7.0</td>
+	<td>Runbook bridge1 :</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=div.dialog&gt;table.8.0</td>
+	<td>Runbook bridge2 :</td>
+</tr>
+<tr>
 	<td>verifyElementPresent</td>
 	<td>_action_Edit</td>
 	<td></td>
