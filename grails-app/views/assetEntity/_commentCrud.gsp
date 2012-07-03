@@ -24,7 +24,6 @@
 </div>
 <div id="createCommentDialog" title="Create Asset Comment" style="display: none;">
 	<input type="hidden" name="assetEntity.id" id="createAssetCommentId" value="" />
-	<input type="hidden" name="status" id="statusId" value="" />
 	<g:form action="saveComment" method="post" name="createCommentForm">
 		<input type="hidden" name="category" value="general" />
 	<div class="dialog" style="border: 1px solid #5F9FCF">

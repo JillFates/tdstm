@@ -8,6 +8,7 @@
 <g:javascript src="entity.crud.js" />
 <script type="text/javascript" src="${createLinkTo(dir:'d3',file:'d3.v2.js')} "></script>
 <link rel="stylesheet" href="${createLinkTo(dir:'d3/force',file:'force.css')}" type="text/css"/>
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
 <script type="text/javascript">
 
 $(document).ready(function() {

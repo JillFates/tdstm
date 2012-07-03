@@ -586,9 +586,9 @@ function showAssetDialog( e , action ) {
 			      //verifyTd.appendChild( verifyText )
 			      categoryTd.appendChild( categoryText )
 			      //commentCodeTd.appendChild( commentCodeText )
-			      if ( role ) {
+			     // if ( role ) {
 			      	tr.appendChild( editTd )
-			      }
+			     // }
 			      tr.appendChild( commentTd )
 			      tr.appendChild( typeTd )	   
 			      tr.appendChild( dueDateTd )	  
@@ -598,6 +598,7 @@ function showAssetDialog( e , action ) {
 			     
 			      //tr.appendChild( commentCodeTd )
 			      listTbody.appendChild( tr )
+			      //$('#createAssetCommentId').val(commentObj.commentInstance.assetEntity.id)
 			      if(commentObj.commentInstance.isResolved == 1){
 			      	resolveVal.checked = true ;
 			      }
@@ -988,13 +989,13 @@ function resolveValidate(formName, idVal, redirectTo){
 	if(type == ""){
 		alert('Please select comment type');
 		return false;
-	}else if($('#statusEditId').val() == "Completed"){
-		if( $('#resolutionEditId').val() !=''){
+	}else if($('#statusEditId').val() == "Completed" || $('#statusId').val() == "Completed"){
+		if( $('#resolutionEditId').val() !='' || $('#resolution').val()){
 			if(formName == "createCommentForm"){
 				if($("#selectTimedId").length > 0){
 					timedUpdate($("#selectTimedId").val())
 				}
-				var params = { 'id':parseInt(assetId),'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'category':document.forms[formName].category.value,'owners':document.forms[formName].owner.value,'dueDate':document.forms[formName].dueDate.value,'moveEvent':document.forms[formName].moveEvent.value}
+				var params = { 'id':parseInt(assetId),'assetEntity.id':parseInt(assetId),'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'category':document.forms[formName].category.value,'owners':document.forms[formName].owner.value,'dueDate':document.forms[formName].dueDate.value,'moveEvent':document.forms[formName].moveEvent.value}
 				jQuery.ajax({
 					url: '../assetEntity/saveComment',
 					data: params,
@@ -1030,13 +1031,13 @@ function resolveValidate(formName, idVal, redirectTo){
 			return false;
 		}
 	}else{
-		
 	if(formName == "createCommentForm"){
 			if($("#selectTimedId").length > 0){
 				timedUpdate($("#selectTimedId").val())
 			}
 			var params
 			if(document.forms[formName].moveEvent.value){
+				
 			   params = { 'comment':document.forms[formName].comment.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'category':document.forms[formName].createCategory.value,'owners':document.forms[formName].owner.value,'dueDate':document.forms[formName].dueDate.value,
 					       'status':document.forms[formName].statusId.value,'moveEvents':document.forms[formName].moveEvent.value}
 			}else{ 
@@ -1163,7 +1164,6 @@ function showModel(id){
 }
 function createNewAssetComment( asset ){
 	setAssetId( asset );
-	$('#statusId').val('new');
 	$('#createCommentDialog').dialog('option', 'width', 'auto');
 	$('#createCommentDialog').dialog('open');
 	$('#commentsListDialog').dialog('close');
