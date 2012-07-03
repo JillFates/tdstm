@@ -5,19 +5,18 @@
 
 	<table style="border: 1px solid green;font-family:courier;">
 		<tr style="margin-top: 10px">
-			<td valign="top" class="name" ><label for="dateCreated" style=""><b>Created At:</b></label></td>
-			<td valign="top" class="value" id="dateCreatedId"  >${dtCreated}</td>
-		</tr>
-		<tr style="margin-top: 10px">
-			<td valign="top" class="name" ><label for="createdBy"><b>Created By:</b></label></td>
-			<td valign="top" class="value" id="createdById" >${personCreateObj}</td>
-			
+			<td valign="top" class="name" ><label for="dateCreated" style=""><b>Created Bt:</b></label></td>
+			<td valign="top" class="value" id="dateCreatedId"  >${createdBy} at ${dtCreated}</td>
 		</tr>
 		<tr style="margin-top: 10px">
 			<td valign="top" class="name" ><label for="owner"><b>Owner:</b></label></td>
-			<td valign="top" class="value" id="ownerTdId" >${owners}</td>
+			<td valign="top" class="value" id="ownerTdId" >${owner}</td>
 			
 		</tr>
+      <tr style="margin-top: 10px">
+         <td valign="top" class="name" ><label for="dueDate"><b>dueDate:</b></label></td>
+         <td valign="top" class="value" id="dueDatesId" ><tds:convertDate date="${assetComment.dueDate}" /></td>
+      </tr> 
 		<tr class="prop" style="margin-top: 10px">
 			<td valign="top" class="name" ><label for="commentType"><b>Comment Type:</b></label></td>
 			<td valign="top" class="value" id="commentTypeTdId" >${assetComment.commentType}</td>
@@ -26,13 +25,6 @@
 		<tr style="margin-top: 10px">
 			<td valign="top" class="name" ><label for="category"><b>Category:</b></label></td>
 			<td valign="top" class="value" id="categoryTdId" >${assetComment.category}</td>
-			
-		</tr>
-		<tr class="prop">
-			<td valign="top" class="name" ><label for="mustVerify"><b>Must Verify:</b></label></td>
-			<td valign="top" class="value" id="verifyTdId">
-				<input type="checkbox" id="mustVerifyShowId" name="mustVerify" value="${assetComment.mustVerify}" disabled="disabled" />
-			</td>
 			
 		</tr>
 		<tr id = "assetShowId" class="prop" style="margin-top: 10px" >
@@ -81,11 +73,8 @@
 		</tr>
 		<tr style="margin-top: 10px">
 			<td valign="top" class="name" nowrap="nowrap" ><label for="resolvedBy"><b>Resolved By:</b></label></td>
-			<td valign="top" class="value" id="resolvedById" >${personResolvedObj}</td>
+			<td valign="top" class="value" id="resolvedById" >${resolvedBy}</td>
 		</tr>
-			<tr style="margin-top: 10px"><td valign="top" class="name" ><label for="dueDate"><b>dueDate:</b></label></td>
-			<td valign="top" class="value" id="dueDatesId" ><tds:convertDate date="${assetComment.dueDate}" /></td>
-		</tr>	
 		
 	</table>
 	</div>

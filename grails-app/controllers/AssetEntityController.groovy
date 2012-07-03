@@ -1832,56 +1832,62 @@ class AssetEntityController {
 	 * @return assetComment
 	 * ------------------------------------------------------------ */
 	def updateComment = {
-		def assetComments = []
+		def map = []
 		// Getting the loginUser should be abstracted into a service
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername(principal)
 		// TODO - SECURITY - Need to verify that the comment is associated to the project
-		def assetCommentInstance = AssetComment.get(params.id)
+		def assetComment = AssetComment.get(params.id)
 		def formatter = new SimpleDateFormat("MM/dd/yyyy");
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def date = new Date()
+
+		// Update the resolved properties based on status being Completed
 		if(params.status=='Completed'){
 			params.isResolved = 1
-			assetCommentInstance.isResolved = 1
-			assetCommentInstance.resolvedBy = loginUser.person
-			assetCommentInstance.dateResolved = GormUtil.convertInToGMT( "now", tzId )
+			assetComment.isResolved = 1
+			assetComment.resolvedBy = loginUser.person
+			assetComment.dateResolved = GormUtil.convertInToGMT( "now", tzId )
 		}else{
-			assetCommentInstance.resolvedBy = null
-			assetCommentInstance.dateResolved = null
+			assetComment.resolvedBy = null
+			assetComment.dateResolved = null
 		}
+		
 		if(params.dueDate){
 		    params.dueDate = formatter.parse(params.dueDate)
 		}
-		assetCommentInstance.properties = params
+
+		assetComment.properties = params
 		// TODO - SECURITY - Need to validate that the owner is a member of the project
 		def personInstance = Person.get(params.owners)
 		if(!params.owner){
-		   assetCommentInstance.owner = personInstance
+		   assetComment.owner = personInstance
 		}
 		def today = new Date()
-		if(!assetCommentInstance.hasErrors() && assetCommentInstance.save(flush:true)) {
-		 if(params.note){
-			def assetNoteInstance = new AssetNotes();
-			assetNoteInstance.createdBy = loginUser.person
-			assetNoteInstance.dateCreated =  new Date()
-			assetNoteInstance.note = params.note
-			assetNoteInstance.assetComment = assetCommentInstance
-			if(!assetNoteInstance.save(flush:true)){
-				assetNoteInstance.errors.allErrors.each{println it}
+		if (! assetComment.hasErrors() && assetComment.save(flush:true)) {
+			if (params.note){
+				// TODO The adding of assetNote should be a method on the AssetComment instead of reverse injections plus the save above can handle both. Right now if this fails, everthing keeps on as though it didn't which is wrong.
+				def assetNote = new AssetNotes();
+				assetNote.createdBy = loginUser.person
+				assetNote.dateCreated =  new Date()
+				assetNote.note = params.note
+				assetNote.assetComment = assetComment
+				if (!assetNote.save(flush:true)){
+					// TODO error won't bubble up to the user
+					assetNote.errors.allErrors.each{println it}
+				}
 			}
-		 }
-		 if(assetCommentInstance.owner.email){
-			 Thread.start{
-		          assetEntityService.sendMailToUser(assetCommentInstance,tzId)
-			 }
-		 }
-			 def css = ''
-			  css =  assetCommentInstance.dueDate < today ? 'Lightpink' : 'White'
-			def status = AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetCommentInstance.assetEntity,'issue',0])
-			assetComments << [assetComment : assetCommentInstance, status : status ? true : false , cssClass:css]
+			// TODO : Only send email if the originator of the change is not the owner.
+			if (assetComment.owner.email) {
+				Thread.start {
+					 assetEntityService.sendTaskEMail(assetComment.id, tzId)
+				}
+			}
+			def css =  assetComment.dueDate < today ? 'Lightpink' : 'White'
+			def status = AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetComment.assetEntity,'issue',0])
+			map << [assetComment : assetComment, status : status ? true : false , cssClass:css]
 		}
-		render assetComments as JSON
+		render map as JSON
 	}
 	
 	/* delete the comment record

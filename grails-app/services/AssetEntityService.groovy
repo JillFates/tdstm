@@ -4,14 +4,16 @@ import org.jsecurity.SecurityUtils
 
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetNotes
+
 import com.tdssrc.grails.GormUtil
-
-
 
 class AssetEntityService {
 
     static transactional = true
-	def mailService
+	
+	def mailService					// SendMail MailService class
 	
 	def createOrUpdateAssetEntityDependencies(def params, def assetEntityInstance) {
 		
@@ -326,39 +328,86 @@ class AssetEntityService {
 		}
 	}
 	
-	def sendMailToUser(assetComment,tzId){
-		def personCreateObj
+	/**
+	 * Used to send the Task email to the appropriate user for the comment passed to the method
+	 * @param assetComment
+	 * @param tzId
+	 * @return
+	 */
+	def sendTaskEMail(taskId, tzId){
+		def createdBy
 		def dtCreated
 		def dtResolved
-		def personResolvedObj
-		def owners
+		def resolvedBy
+		def owner
 		def dueDate
 		def formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a");
 		def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
 		
+		def assetComment = AssetComment.get(taskId)
+		if (! assetComment) {
+			log.error "Invalid AssetComment ID [${taskId}] referenced in call"
+			return
+		}
+		if (!assetComment.owner?.email) {
+			log.error "No valid email address for task owner"
+			return
+		}
+		
 		if(assetComment.createdBy){
-			personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")
+			createdBy = assetComment.createdBy
 			dtCreated = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
 		}
 		if(assetComment.resolvedBy){
-			personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")
+			resolvedBy = assetComment.resolvedBy
 			dtResolved = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
 		}
 		if(assetComment.owner){
-			owners = assetComment.owner
+			owner = assetComment.owner
 		}
 		if(assetComment.dueDate){
 			dueDate = dateFormatter.format(assetComment.dueDate);
 		}
 		def assetNotes = assetComment.notes?.sort{it.dateCreated}
 		
-			mailService.sendMail {
-				from ''
-				to assetComment.owner.email
-				subject "TDS New ${assetComment.category} issue  due ${dueDate}"
-				body ( view:"/assetEntity/mailFormat",
-				model:[assetComment:assetComment, personCreateObj:personCreateObj, dtCreated:dtCreated, personResolvedObj:personResolvedObj,
-					   owners:owners,dueDate:dueDate,assetNotes:assetNotes])
-				}
+		def sub = leftString(getLine(assetComment.comment,0), 40)
+		sub = (sub == null || sub.size() == 0) ? "Task ${assetComment.id}" : sub
+
+		mailService.sendMail {
+			to assetComment.owner.email
+			subject "Re: ${sub}"
+			body ( 
+				view:"/assetEntity/_taskEMailTemplate",
+				model:[assetComment:assetComment, createdBy:createdBy, dtCreated:dtCreated, resolvedBy:resolvedBy,
+				   owner:owner,dueDate:dueDate,assetNotes:assetNotes] )
+		}
 	}
+	
+	// TODO : move these methods into a reusable class - perhaps extending string with @Delegate
+	
+	/**
+	 * Returns the left of a string to an optional length limit
+	 * @param str - string to return
+	 * @param len - optional length of string to return
+	 * @return String
+	 */
+	def leftString(str, len=null) {
+		if (str == null) return null
+		def size = str.size()
+		size = (len != null && size > len) ? len : size
+		size = size==0 ? 1 : size
+		return str[0..(size-1)]
+	}
+
+	/**
+	 * Returns a specified line within a string and null if line number does not exist, defaulting to the first if no	
+	 * @param str - string to act upon
+	 * @param lineNum - line number to return starting with zero, default of 0
+	 * @return String
+	 */
+	def getLine(str, lineNum=0) {
+		ArrayList lines = str.readLines()
+		return ( (lineNum+1) > lines.size() ) ? null : lines[lineNum]
+	}
+	
 }
