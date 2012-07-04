@@ -526,6 +526,17 @@ class MoveEventController {
 			def projectId =  session.CURR_PROJ.CURR_PROJ
 			def project = Project.get(projectId)
 			def moveEventInstance = MoveEvent.get(params.eventId)
+			def currentVersion = moveEventInstance.runbookVersion
+			if(params.version=='on'){
+				if(moveEventInstance.runbookVersion){
+					moveEventInstance.runbookVersion = currentVersion + 1
+					currentVersion = currentVersion + 1
+				}else{
+					moveEventInstance.runbookVersion = 1
+					currentVersion = 1
+				}
+				moveEventInstance.save(flush:true)
+			}
 			def bundles = moveEventInstance.moveBundles
 			def today = new Date()
 			def formatter = new SimpleDateFormat("yy/MM/dd");
@@ -571,7 +582,7 @@ class MoveEventController {
 						def workbook = Workbook.getWorkbook( file, wbSetting )
 						//set MIME TYPE as Excel
 						response.setContentType( "application/vnd.ms-excel" )
-						def filename = 	"${project.name} - ${moveEventInstance.name} Runbook v - ${today}"
+						def filename = 	"${project.name} - ${moveEventInstance.name} Runbook v${currentVersion} - ${today}"
 						filename = filename.replace(".xls",'')
 						response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
 						response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
@@ -806,5 +817,4 @@ class MoveEventController {
 				return ;
 		
 	}
-    
 }

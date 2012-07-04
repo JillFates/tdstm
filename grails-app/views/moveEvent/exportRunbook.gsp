@@ -7,26 +7,26 @@
   <script type="text/javascript">
   </script>
   <body>
+   <g:form name="moveEventForm"  action="generateRunbook">
    <div class="body">
     <h1>Export Runbook</h1>
- 
+   
      <div class="dialog">
      <table>
      <tr><td>
-     <g:form name="moveEventForm"  action="generateRunbook">
         <g:select from="${moveEventList}"  name="eventId"  id="eventList"  optionKey="id"  optionValue="name"  noSelection="['':'please select']"  value="${ session.getAttribute('MOVE_EVENT')?.MOVE_EVENT }"/>
-     </g:form>
      </td></tr>
      <tr>
            <td class="buttonR">
-				<input type="submit" class="submit" value="Summary" id="generateId" onclick="generateRunbook();"/>
+				<input type="button" class="submit" value="Summary" id="generateId" onclick="generateRunbook();"/>
 			</td>
      </tr>
      </table>
-
     </div>
+    
      </div>
      <div id="exportResultId" style="float: left ; display: none; margin-top: 39px ; margin-left: 40px"></div>
+  </g:form>
  <script type="text/javascript">
   function generateRunbook(){
 	 var moveEvent = $('#eventList').val();
