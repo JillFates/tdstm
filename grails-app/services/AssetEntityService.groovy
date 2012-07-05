@@ -5,7 +5,7 @@ import org.jsecurity.SecurityUtils
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetComment
-import com.tds.asset.AssetNotes
+import com.tds.asset.CommentNote
 
 import com.tdssrc.grails.GormUtil
 
@@ -366,7 +366,7 @@ class AssetEntityService {
 	def assetCommentModel(assetComment, tzId) {
 		def formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a");
 		def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
-		def assetNotes = assetComment.notes?.sort{it.dateCreated}
+		def notes = assetComment.notes?.sort{it.dateCreated}
 		def assetName = assetComment.assetEntity ? "${assetComment.assetEntity.assetName} (${assetComment.assetEntity.assetType})" : null
 		def createdBy = assetComment.createdBy
 		def resolvedBy = assetComment.resolvedBy
@@ -386,7 +386,7 @@ class AssetEntityService {
 			moveEvent:assetComment.moveEvent,
 			createdBy:createdBy, dtCreated:dtCreated, dtResolved:dtResolved, dueDate:dueDate,
 			resolvedBy:resolvedBy, owners:assetComment.owner,
-			assetNotes:assetNotes ]
+			notes:notes ]
 	}
 	
 	// TODO : move these methods into a reusable class - perhaps extending string with @Delegate

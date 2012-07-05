@@ -37,17 +37,18 @@ class AssetComment {
 	String role
 	Project project
 	
-	static hasMany = [notes : AssetNotes]
+	static hasMany = [notes : CommentNote]
 	
 	static constraints = {
 		
 		comment( blank:true, nullable:true  )
 		assetEntity( blank:true, nullable:true )
-		moveEvent(nullable: true, validator: { val, assetComment->
-												if (!val && !assetComment.assetEntity ) {
-												return ['assetComment.moveEvent.notspecified']
-												}
-											  })
+		moveEvent(nullable: true, validator: { 
+			val, assetComment->
+				if (!val && !assetComment.assetEntity ) {
+					return ['assetComment.moveEvent.notspecified']
+				}
+			})
 		commentType( blank:true, nullable:true, inList: ['issue','instruction','comment'] )
 		mustVerify( nullable:true )
 		isResolved( nullable:true )

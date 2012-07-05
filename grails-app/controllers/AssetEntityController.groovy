@@ -26,7 +26,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
-import com.tds.asset.AssetNotes
+import com.tds.asset.CommentNote
 import com.tds.asset.AssetOptions
 import com.tds.asset.AssetTransition
 import com.tds.asset.Database
@@ -1814,17 +1814,22 @@ class AssetEntityController {
 		if(assetComment.dueDate){
 			dueDate = dateFormatter.format(assetComment.dueDate);
 		}
-		def assetNotes = assetComment.notes.sort{it.dateCreated}
-		def assetNote = []
-		assetNotes.each{
+		def noteList = assetComment.notes.sort{it.dateCreated}
+		def notes = []
+		noteList.each{
 			def dateCreated = it.dateCreated.format("E, d MMM 'at ' HH:mma")
-			assetNote << [ dateCreated , it.createdBy.toString() ,it.note]
+			notes << [ dateCreated , it.createdBy.toString() ,it.note]
 			
 		}
-		commentList<<[ assetComment:assetComment,personCreateObj:personCreateObj,
-					personResolvedObj:personResolvedObj,dtCreated:dtCreated?dtCreated:"",
-					dtResolved:dtResolved?dtResolved:"",owners:owners?owners:"",assetNames:assetComment.assetEntity != null  ? assetComment.assetEntity.assetName : assetComment.moveEvent.name
-				    , dueDate:dueDate?dueDate:'',notes:assetNote]
+		commentList << [ 
+			assetComment:assetComment,
+			personCreateObj:personCreateObj,
+			personResolvedObj:personResolvedObj,
+			dtCreated:dtCreated ? dtCreated : "",
+			dtResolved:dtResolved?dtResolved:"",
+			owners:owners?owners:"",
+			assetNames:assetComment.assetEntity != null  ? assetComment.assetEntity.assetName : assetComment.moveEvent.name,
+		    dueDate:dueDate?dueDate:'',notes:notes]
 		render commentList as JSON
 	}
 	/* ------------------------------------------------------------
@@ -1869,7 +1874,7 @@ class AssetEntityController {
 		if (! assetComment.hasErrors() && assetComment.save(flush:true)) {
 			if (params.note){
 				// TODO The adding of assetNote should be a method on the AssetComment instead of reverse injections plus the save above can handle both. Right now if this fails, everthing keeps on as though it didn't which is wrong.
-				def assetNote = new AssetNotes();
+				def assetNote = new CommentNote();
 				assetNote.createdBy = loginUser.person
 				assetNote.dateCreated =  new Date()
 				assetNote.note = params.note

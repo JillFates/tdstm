@@ -49,13 +49,13 @@
 			<td valign="top" class="value" >
 				<div id="previousNotesShowId" > 
 				<table style="border:1px solid green;margin-right: 40px">
-				<g:each in="${assetNotes}" var="assetNote">
+				<g:each in="${notes}" var="note">
 				<tr>
-				<td><tds:convertDate date="${assetNote.dateCreated}"
+				<td><tds:convertDate date="${note.dateCreated}"
 				     timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 				</td>
-				<td>${assetNote.createdBy }</td>
-				<td>${assetNote.note }</td>
+				<td>${note.createdBy }</td>
+				<td>${note.note }</td>
 				</tr>
 				</g:each>
 				</table>

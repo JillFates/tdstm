@@ -1,6 +1,6 @@
 package com.tds.asset
 
-class AssetNotes {
+class CommentNote {
 	
 	Person createdBy
 	String note
