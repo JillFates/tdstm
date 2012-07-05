@@ -374,7 +374,7 @@ class AssetEntityService {
 		def dueDate
 		def dtResolved
 		
-		if(assetComment.resolvedBy) {
+		if(assetComment.dateResolved) {
 			dtResolved = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
 		}
 		if(assetComment.dueDate){
@@ -384,7 +384,7 @@ class AssetEntityService {
 		[	assetComment:assetComment, 
 			assetName:assetName,
 			moveEvent:assetComment.moveEvent,
-			createdBy:createdBy, dtCreated:dtCreated, dueDate:dueDate,
+			createdBy:createdBy, dtCreated:dtCreated, dtResolved:dtResolved, dueDate:dueDate,
 			resolvedBy:resolvedBy, owners:assetComment.owner,
 			assetNotes:assetNotes ]
 	}
