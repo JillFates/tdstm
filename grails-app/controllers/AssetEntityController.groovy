@@ -1746,36 +1746,38 @@ class AssetEntityController {
 		if(params.dueDate){
 		   params.dueDate = GormUtil.convertInToGMT(formatter.parse(params.dueDate), tzId)
 		}
-		def assetCommentInstance = new AssetComment(params)
+		def assetComment = new AssetComment(params)
 		
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername(principal)
-		assetCommentInstance.createdBy = loginUser.person
-		def personInstance = Person.get(params.owners)
-		assetCommentInstance.owner = personInstance
-		assetCommentInstance.project = Project.get(session.CURR_PROJ.CURR_PROJ)
+		assetComment.createdBy = loginUser.person
+		assetComment.owner = Person.get(params.owners)
+		assetComment.project = Project.get(session.CURR_PROJ.CURR_PROJ)
 
 		if(params.moveEvents){
-		  assetCommentInstance.moveEvent = MoveEvent.get(params.moveEvents)
+		  assetComment.moveEvent = MoveEvent.get(params.moveEvents)
 		}
 		if(params.status=='Completed'){
-			assetCommentInstance.isResolved = 1
-			assetCommentInstance.resolvedBy = loginUser.person
-			assetCommentInstance.dateResolved = GormUtil.convertInToGMT( "now", tzId )
+			assetComment.isResolved = 1
+			assetComment.resolvedBy = loginUser.person
+			assetComment.dateResolved = GormUtil.convertInToGMT( "now", tzId )
 		}
-		def today =new Date();
-		if(!assetCommentInstance.hasErrors() && assetCommentInstance.save()) {
-			if(assetCommentInstance.owner.email){
+		def today = new Date();
+		if(!assetComment.hasErrors() && assetComment.save()) {
+			def css = assetComment.dueDate < today ? 'Lightpink' : 'White'
+			// TODO - why the heck are we doing a lookup to determine the status and not just determining from existing data?
+			def status = AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetComment.assetEntity,'issue',0])
+			assetComments << [assetComment : assetComment, status : status ? true : false ,cssClass:css]
+
+			// If there is an assigned owner with email and it is not the person creating the issue, then email the owner
+			if( assetComment.owner.email && assetComment.owner.email != loginUser.person.email ){
+				// Email in a separate thread to prevent delays to the user
 				Thread.start {
-					assetEntityService.sendMailToUser(assetCommentInstance,tzId)
+					assetEntityService.sendTaskEMail(assetComment.id,tzId)
 				}
 			}
-			def css = ''
-			css = assetCommentInstance.dueDate < today ? 'Lightpink' : 'White'
-			def status = AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetCommentInstance.assetEntity,'issue',0])
-			assetComments << [assetComment : assetCommentInstance, status : status ? true : false ,cssClass:css]
 		}else{
-		      assetCommentInstance.errors.allErrors.each{println it}
+			assetCommentInstance.errors.allErrors.each{println it}
 		}
 		render assetComments as JSON
 	}
@@ -1877,15 +1879,18 @@ class AssetEntityController {
 					assetNote.errors.allErrors.each{println it}
 				}
 			}
-			// TODO : Only send email if the originator of the change is not the owner.
-			if (assetComment.owner.email) {
-				Thread.start {
-					 assetEntityService.sendTaskEMail(assetComment.id, tzId)
-				}
-			}
+
 			def css =  assetComment.dueDate < today ? 'Lightpink' : 'White'
 			def status = AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetComment.assetEntity,'issue',0])
 			map << [assetComment : assetComment, status : status ? true : false , cssClass:css]
+
+			// Only send email if the originator of the change is not the owner as one doesn't need email to one's self.
+			if ( assetComment.owner.email && assetComment.owner.email != loginUser.person.email ) {
+				// Send email in separate thread to prevent delay to user
+				Thread.start {
+					 assetEntityService.sendTaskEMail(assetComment.id, tzId, false)
+				}
+			}
 		}
 		render map as JSON
 	}

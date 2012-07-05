@@ -334,16 +334,7 @@ class AssetEntityService {
 	 * @param tzId
 	 * @return
 	 */
-	def sendTaskEMail(taskId, tzId){
-		def createdBy
-		def dtCreated
-		def dtResolved
-		def resolvedBy
-		def owner
-		def dueDate
-		def formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a");
-		def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
-		
+	def sendTaskEMail(taskId, tzId, isNew=true){
 		def assetComment = AssetComment.get(taskId)
 		if (! assetComment) {
 			log.error "Invalid AssetComment ID [${taskId}] referenced in call"
@@ -354,33 +345,48 @@ class AssetEntityService {
 			return
 		}
 		
-		if(assetComment.createdBy){
-			createdBy = assetComment.createdBy
-			dtCreated = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
+		def sub = leftString(getLine(assetComment.comment,0), 40)
+		sub = (isNew ? '' : 'Re: ') + ( (sub == null || sub.size() == 0) ? "Task ${assetComment.id}" : sub )
+
+		mailService.sendMail {
+			to assetComment.owner.email
+			subject "${sub}"
+			body ( 
+				view:"/assetEntity/_taskEMailTemplate",
+				model: assetCommentModel(assetComment, tzId)
+			)
 		}
-		if(assetComment.resolvedBy){
-			resolvedBy = assetComment.resolvedBy
+	}
+	
+	/**
+	 * Returns a map of variables for the AssetComment and notes
+	 * @param assetComment - the assetComment object to create a model of
+	 * @return map 
+	 */
+	def assetCommentModel(assetComment, tzId) {
+		def formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a");
+		def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
+		def assetNotes = assetComment.notes?.sort{it.dateCreated}
+		def assetName = assetComment.assetEntity ? "${assetComment.assetEntity.assetName} (${assetComment.assetEntity.assetType})" : null
+		def createdBy = assetComment.createdBy
+		def resolvedBy = assetComment.resolvedBy
+		def dtCreated = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
+		def dueDate
+		def dtResolved
+		
+		if(assetComment.resolvedBy) {
 			dtResolved = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
-		}
-		if(assetComment.owner){
-			owner = assetComment.owner
 		}
 		if(assetComment.dueDate){
 			dueDate = dateFormatter.format(assetComment.dueDate);
 		}
-		def assetNotes = assetComment.notes?.sort{it.dateCreated}
 		
-		def sub = leftString(getLine(assetComment.comment,0), 40)
-		sub = (sub == null || sub.size() == 0) ? "Task ${assetComment.id}" : sub
-
-		mailService.sendMail {
-			to assetComment.owner.email
-			subject "Re: ${sub}"
-			body ( 
-				view:"/assetEntity/_taskEMailTemplate",
-				model:[assetComment:assetComment, createdBy:createdBy, dtCreated:dtCreated, resolvedBy:resolvedBy,
-				   owner:owner,dueDate:dueDate,assetNotes:assetNotes] )
-		}
+		[	assetComment:assetComment, 
+			assetName:assetName,
+			moveEvent:assetComment.moveEvent,
+			createdBy:createdBy, dtCreated:dtCreated, dueDate:dueDate,
+			resolvedBy:resolvedBy, owners:assetComment.owner,
+			assetNotes:assetNotes ]
 	}
 	
 	// TODO : move these methods into a reusable class - perhaps extending string with @Delegate

@@ -2,19 +2,17 @@
 <html>
 <body> 
 <div style="font:courier ">
-
 	<table style="border: 1px solid green;font-family:courier;">
 		<tr style="margin-top: 10px">
-			<td valign="top" class="name" ><label for="dateCreated" style=""><b>Created Bt:</b></label></td>
+			<td valign="top" class="name" ><label for="dateCreated" style=""><b>Created By:</b></label></td>
 			<td valign="top" class="value" id="dateCreatedId"  >${createdBy} at ${dtCreated}</td>
 		</tr>
 		<tr style="margin-top: 10px">
-			<td valign="top" class="name" ><label for="owner"><b>Owner:</b></label></td>
-			<td valign="top" class="value" id="ownerTdId" >${owner}</td>
-			
+			<td valign="top" class="name" ><label for="owner"><b>Assigned To:</b></label></td>
+			<td valign="top" class="value" id="ownerTdId" >${owners ? owners : 'Unassigned'}</td>
 		</tr>
       <tr style="margin-top: 10px">
-         <td valign="top" class="name" ><label for="dueDate"><b>dueDate:</b></label></td>
+         <td valign="top" class="name" ><label for="dueDate"><b>Due Date:</b></label></td>
          <td valign="top" class="value" id="dueDatesId" ><tds:convertDate date="${assetComment.dueDate}" /></td>
       </tr> 
 		<tr class="prop" style="margin-top: 10px">
@@ -27,10 +25,18 @@
 			<td valign="top" class="value" id="categoryTdId" >${assetComment.category}</td>
 			
 		</tr>
+		<g:if test="${assetName}">
 		<tr id = "assetShowId" class="prop" style="margin-top: 10px" >
 			<td valign="top" class="name" ><label for="asset"><b>Asset:</b></label></td>
-			<td valign="top" class="value" id="assetShowValueId" style="display: none;">${assetComment.assetEntity?.assetName} </td>
+			<td valign="top" class="value" id="assetShowValueId">${assetName} </td>
 		</tr>
+      </g:if>
+      <g:if test="${moveEvent}">
+      <tr id = "moveEventId" class="prop" style="margin-top: 10px" >
+         <td valign="top" class="name" ><label for="moveEvent"><b>Move Event:</b></label></td>
+         <td valign="top" class="value" id="moveEventShowValueId">${moveEvent} </td>
+      </tr>
+      </g:if>
 		<tr class="prop" style="margin-top: 10px">
 			<td valign="top" class="name" ><label for="comment"><b>Comment:</b></label></td>
 			<td valign="top" class="value" colspan="2">
@@ -68,12 +74,8 @@
 			</td>
 		</tr>
 		<tr style="margin-top: 10px">
-			<td valign="top" class="name" ><label for="dateResolved"><b>Resolved At:</b></label></td>
-			<td valign="top" class="value" id="dateResolvedId" >${dtResolved}</td>
-		</tr>
-		<tr style="margin-top: 10px">
-			<td valign="top" class="name" nowrap="nowrap" ><label for="resolvedBy"><b>Resolved By:</b></label></td>
-			<td valign="top" class="value" id="resolvedById" >${resolvedBy}</td>
+			<td valign="top" class="name" ><label for="dateResolved"><b>Resolved By:</b></label></td>
+			<td valign="top" class="value" id="dateResolvedId" ><g:if test="${resolvedBy}">${resolvedBy} at ${dtResolved}</g:if></td>
 		</tr>
 		
 	</table>
