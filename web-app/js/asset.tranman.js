@@ -995,7 +995,8 @@ function resolveValidate(formName, idVal, redirectTo){
 				if($("#selectTimedId").length > 0){
 					timedUpdate($("#selectTimedId").val())
 				}
-				var params = { 'id':parseInt(assetId),'assetEntity.id':parseInt(assetId),'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'category':document.forms[formName].category.value,'owners':document.forms[formName].owner.value,'dueDate':document.forms[formName].dueDate.value,'moveEvent':document.forms[formName].moveEvent.value}
+				var params = { 'assetEntity.id':parseInt(assetId),'comment':document.forms[formName].comment.value, 'isResolved':document.forms[formName].isResolved.value, 'resolution':document.forms[formName].resolution.value, 'commentType':document.forms[formName].commentType.value, 'mustVerify':document.forms[formName].mustVerify.value, 'category':document.forms[formName].category.value,'owners':document.forms[formName].owner.value,'dueDate':document.forms[formName].dueDate.value,'moveEvent':document.forms[formName].moveEvent.value,
+					           'status':document.forms[formName].statusId.value}
 				jQuery.ajax({
 					url: '../assetEntity/saveComment',
 					data: params,

@@ -1770,14 +1770,14 @@ class AssetEntityController {
 			assetComments << [assetComment : assetComment, status : status ? true : false ,cssClass:css]
 
 			// If there is an assigned owner with email and it is not the person creating the issue, then email the owner
-			if( assetComment.owner.email && assetComment.owner.email != loginUser.person.email ){
+			if( assetComment.owner?.email && assetComment.owner?.email != loginUser.person.email ){
 				// Email in a separate thread to prevent delays to the user
 				Thread.start {
 					assetEntityService.sendTaskEMail(assetComment.id,tzId)
 				}
 			}
 		}else{
-			assetCommentInstance.errors.allErrors.each{println it}
+			assetComment.errors.allErrors.each{println it}
 		}
 		render assetComments as JSON
 	}
@@ -1890,7 +1890,7 @@ class AssetEntityController {
 			map << [assetComment : assetComment, status : status ? true : false , cssClass:css]
 
 			// Only send email if the originator of the change is not the owner as one doesn't need email to one's self.
-			if ( assetComment.owner.email && assetComment.owner.email != loginUser.person.email ) {
+			if ( assetComment.owner?.email && assetComment.owner?.email != loginUser.person.email ) {
 				// Send email in separate thread to prevent delay to user
 				Thread.start {
 					 assetEntityService.sendTaskEMail(assetComment.id, tzId, false)
