@@ -22,7 +22,7 @@
 			<a href="http://www.transitionaldata.com/" target="new">
 			<img src="${createLinkTo(dir:'images',file:'tds2b.png')}" border="0" alt="Visit TDS" /></a>
 			<br />
-			<h1>TDS TransitionManager&trade;</h1>
+			<h1>TransitionManager&trade;</h1>
 		</td>
 		
 	</tr>
