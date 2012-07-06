@@ -9,7 +9,7 @@
 <body>
 	<div class="body">
 		<div>
-			<h1>Move Planning Dashboard</h1>
+			<h1>Planning Dashboard</h1>
 			<div style="float:left;margin-top: 10px; margin-left: 5px;width:250px;">
 					<h3 style="color:#63A242">
 						<b>Discovery</b>
