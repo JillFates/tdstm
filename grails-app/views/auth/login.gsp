@@ -16,20 +16,19 @@
 	src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 </div>
 <div class="logo">
-<table style="border: 0;">
+<table style="border: 0; width: 292px;">
 	<tr>
-		<td>
-		<%--<a href="http://www.transitionaldata.com/" target="new"><img
-			src="${createLinkTo(dir:'images',file:'tds.jpg')}" border="0"
-			alt="tds" /></a>--%>
+		<td style="text-align: center;">
+			<a href="http://www.transitionaldata.com/" target="new">
+			<img src="${createLinkTo(dir:'images',file:'tds2b.png')}" border="0" alt="Visit TDS" /></a>
+			<br />
 			<h1>TDS TransitionManager&trade;</h1>
 		</td>
 		
 	</tr>
 </table>
 <div class="mainbody" >
-<table width="100%" style="border: 0; vertical-align: top;" align="center" cellpadding="0"
-	cellspacing="0">
+<table width="100%" style="border: 0; vertical-align: top;" align="center" cellpadding="0" cellspacing="0">
 	<tr>
 		<td  valign="top" style="width:292px" >
 		<div class="colum_login">
