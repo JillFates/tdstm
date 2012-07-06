@@ -196,13 +196,8 @@
 </tr>
 <!--Cleaning Team Worksheets page-->
 <tr>
-	<td>click</td>
+	<td>clickAndWait</td>
 	<td>link=Logistics Team Worksheets</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTitle</td>
-	<td>Logistics Team Worksheets</td>
 	<td></td>
 </tr>
 <tr>
@@ -306,11 +301,6 @@
 	<td>verifyTable</td>
 	<td>css=div.dialog&gt;table.2.0</td>
 	<td>Sort report by:</td>
-</tr>
-<tr>
-	<td>verifyTable</td>
-	<td>css=div.dialog&gt;table.1.1</td>
-	<td>${bundlesList}</td>
 </tr>
 <tr>
 	<td>verifyTable</td>
@@ -450,8 +440,63 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyElementPresent</td>
-	<td>_action_getMoveEventResultsAsPDF</td>
+	<td>clickAndWait</td>
+	<td>xpath=(//a[contains(text(),'Pre-move Checklist')])[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Pre-Move Checklist</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>exact:Output:</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Web</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>PDF</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>css=input.submit</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Project</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Event/Bundle</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Assets</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=div.main_bottom &gt; div &gt; table.25.0</td>
+	<td>Teams</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>css=div.main_bottom &gt; div &gt; table.30.0</td>
+	<td>Transport</td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Pre-Move Checklist</td>
 	<td></td>
 </tr>
 <tr>
