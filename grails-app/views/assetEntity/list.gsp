@@ -48,12 +48,17 @@ $(document).ready(function() {
 	<div class="message">${flash.message}</div>
 </g:if>
 <input type="hidden" id="role" value="role"/>
+    <div style="margin-left: 5px;">
+		<input id="selectAssetId" type="checkbox" onclick="selectAllAssets()" title="Select All" />&nbsp;&nbsp;&nbsp;&nbsp;
+		<input id="deleteAsset" type="button" value="Delete Selected..."  title="Delete Selected" disabled="disabled"  onclick="deleteAssets(${assetEntityList.id},'server')" />
+	</div>
 <div>
 	<form name="assetEntityForm" action="list">
 		<jmesa:tableFacade id="tag" items="${assetEntityList}" maxRows="25" exportTypes="csv,excel" stateAttr="restore" var="assetEntityInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
 		    <jmesa:htmlTable style=" border-collapse: separate">
 		        <jmesa:htmlRow highlighter="true">
 		        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" >
+		        		<g:checkBox name="assetCheckBox" id="checkId_${assetEntityInstance.id}" onclick="enableButton(${assetEntityList.id})"></g:checkBox>
 		        	<tds:hasPermission permission='EditAndDelete'>
 		        		<a href="javascript:editEntity('assetEntity','${assetEntityInstance?.assetType}',${assetEntityInstance.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 		        	</tds:hasPermission>

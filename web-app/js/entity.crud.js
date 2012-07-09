@@ -271,3 +271,82 @@ function updateToShow(){
 	});
 	
 }
+function selectAllAssets(){
+	$('#deleteAsset').attr('disabled',false)
+	var totalCheck = document.getElementsByName('assetCheckBox');
+	if($('#selectAssetId').attr('checked')==true){
+	for(i=0;i<totalCheck.length;i++){
+	totalCheck[i].checked = true;
+	}
+	isFirst = false;
+	}else{
+	for(i=0;i<totalCheck.length;i++){
+	totalCheck[i].checked = false;
+	$('#deleteAsset').attr('disabled',true)
+	}
+	isFirst = true;
+	}
+}
+function deleteAssets(list,action){
+	var assetArr = new Array();
+	var j=0;
+	for(i=0; i< list.size() ; i++){
+		if($('#checkId_'+list[i]) != null){
+			var booCheck = $('#checkId_'+list[i]).is(':checked');
+			if(booCheck){
+				assetArr[j] = list[i];
+				j++;
+			}
+		}
+	}if(j == 0){
+		alert('Please select the Asset');
+	}else{
+			if(confirm("There is no undo! Are you sure you want to delete these ?")){
+				var url
+				if(action=='server'){
+					url='../assetEntity/deleteBulkAsset'
+				}else if(action=='application'){
+					url='../application/deleteBulkAsset'
+				}else if(action=='files'){
+					url='../files/deleteBulkAsset'
+				}else{
+					url='../database/deleteBulkAsset'
+				}
+				
+				jQuery.ajax({
+				url: url,
+				data: {'assetLists':assetArr},
+				type:'POST',
+				success: function(data) {
+					if(data="success"){
+						window.location.reload()
+						var totalCheck = document.getElementsByName('assetCheckBox');
+						for(i=0;i<totalCheck.length;i++){
+							totalCheck[i].checked = false;
+							$('#deleteAsset').attr('disabled',true)
+						}
+						
+					}
+				}
+			});
+		}
+	}
+	
+}
+function enableButton(list){
+	var assetArr = new Array();
+	var j=0;
+	for(i=0; i< list.size() ; i++){
+		if($('#checkId_'+list[i]) != null){
+			var booCheck = $('#checkId_'+list[i]).is(':checked');
+			if(booCheck){
+				assetArr[j] = list[i];
+				j++;
+			}
+		}
+	}if(j == 0){
+		$('#deleteAsset').attr('disabled',true)
+	}else{
+		$('#deleteAsset').attr('disabled',false)
+	}
+}

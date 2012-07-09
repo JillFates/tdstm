@@ -46,14 +46,22 @@ $(document).ready(function() {
 </g:if>
 <input type="hidden" id="role" value="role"/>
 <div id="jmesaId" class="body">
+	<div style="margin-left: 5px;">
+		<input id="selectAssetId" type="checkbox" onclick="selectAllAssets()" title="Select All" />&nbsp;&nbsp;&nbsp;&nbsp;
+		<input id="deleteAsset" type="button" value="Delete Selected..."  title="Delete Selected" disabled="disabled"  onclick="deleteAssets(${databaseList.id},'database')" />
+	</div>
 	<form name="listDBForm" action="list">
+	
 		<jmesa:tableFacade id="tag" items="${databaseList}" maxRows="50"
 			exportTypes="csv,excel" stateAttr="restore" var="dataBaseInstance"
 			autoFilterAndSort="true" maxRowsIncrements="50,100,200">
+			
 			<jmesa:htmlTable style=" border-collapse: separate" editable="true">
 				<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
+				<input id="state" type="button" value="All.." onclick="selectAllAssets()" title="Select All" />
 					<jmesa:htmlColumn property="id" sortable="false" filterable="false"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions">
+						<g:checkBox name="assetCheckBox" id="checkId_${dataBaseInstance.id}" onclick="enableButton(${databaseList.id})"></g:checkBox>
 						<tds:hasPermission permission='EditAndDelete'>
 						  <a href="javascript:editEntity('database','${dataBaseInstance?.assetType}',${dataBaseInstance?.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 						 </tds:hasPermission>

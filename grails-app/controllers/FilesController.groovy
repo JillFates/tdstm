@@ -262,4 +262,43 @@ class FilesController {
 		}
 		
 	}
+	def deleteBulkAsset={
+		def assetArray = params['assetLists[]']
+		def assetList
+		if(assetArray.class.toString() == "class java.lang.String"){
+		  assetList = assetArray.split(",")
+		}else{
+		  assetList = assetArray
+		}
+		def assetNames = []
+		def assetEntityInstance
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+	
+			for(int i=0 ; i<assetList.size();i++){
+				assetEntityInstance = AssetEntity.get( assetList[i] )
+				def filesInstance = Files.get(assetList[i] )
+				
+				if(assetEntityInstance) {
+					assetNames.add(assetEntityInstance.assetName)
+					ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${assetEntityInstance.id}")
+					AssetTransition.executeUpdate("delete from AssetTransition ast where ast.assetEntity = ${assetEntityInstance.id}")
+					AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity = ${assetEntityInstance.id}")
+					ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = ${assetEntityInstance.id}")
+					AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = ${assetEntityInstance.id}")
+					ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = ${assetEntityInstance.id}")
+					AssetCableMap.executeUpdate("delete AssetCableMap where fromAsset = ? ",[assetEntityInstance])
+					AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
+												   toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+												   where toAsset = ?""",[assetEntityInstance])
+					AssetDependency.executeUpdate("delete AssetDependency where asset = ? or dependent = ? ",[assetEntityInstance, assetEntityInstance])
+					AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = ${filesInstance.id}")
+					
+					filesInstance.delete()
+					assetEntityInstance.delete()
+				}
+			String names = assetNames.toString().replace('[','').replace(']','')
+			flash.message = "File ${names} deleted"
+		}
+	  render "success"
+	}
 }

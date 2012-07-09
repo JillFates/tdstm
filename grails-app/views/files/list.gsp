@@ -53,6 +53,10 @@ $(document).ready(function() {
 		</span>
 	</tds:hasPermission>
 	</div>
+	<div style="margin-left: 5px;">
+		<input id="selectAssetId" type="checkbox" onclick="selectAllAssets()" title="Select All" />&nbsp;&nbsp;&nbsp;&nbsp;
+	    <input id="deleteAsset" type="button" value="Delete Selected..."  title="Delete Selected" disabled="disabled"  onclick="deleteAssets(${filesList.id},'files')" />
+    </div>
 	<form name="listFileForm" action="list">
 		<jmesa:tableFacade id="tag" items="${filesList}" maxRows="50"
 			exportTypes="csv,excel" stateAttr="restore" var="fileInstance"
@@ -61,6 +65,7 @@ $(document).ready(function() {
 				<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
 					<jmesa:htmlColumn property="id" sortable="false" filterable="false"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions">
+					<g:checkBox name="assetCheckBox" id="checkId_${fileInstance.id}" onclick="enableButton(${filesList.id})"></g:checkBox>
 					<tds:hasPermission permission='EditAndDelete'>
 						<a href="javascript:editEntity('files','${fileInstance?.assetType}',${fileInstance?.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 					</tds:hasPermission>	
