@@ -2,7 +2,7 @@
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>
-	<div style="margin-top: 89px; margin-left: 150px; width: auto;">
+	<div style="margin-top: 89px; margin-left: 50px; width: auto;">
 		<table>
 			<thead>
 				<tr>
@@ -25,3 +25,4 @@
 		 <input type="text" id="dependencyType" name="dependencyType" value=""> </span> <input type="button" id="addDependencyButtonId" name="createDependencyType" value="EDIT"
 			onclick="addAssetOptions($('#dependencyHiddenId').val())"/>
 	</div>
+</div>

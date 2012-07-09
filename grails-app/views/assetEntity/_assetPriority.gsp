@@ -2,7 +2,7 @@
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>
-	<div style="margin-top: 89px; margin-left: 150px; width: 150px;">
+	<div style="margin-top: 89px; margin-left: 50px; width: 150px;">
 		<table>
 			<thead>
 				<tr>
@@ -27,3 +27,4 @@
 			id="addPriorityButtonId" name="createPriorityOption" value="EDIT"
 			onclick="addAssetOptions($('#priorityhiddenId').val())"/>
 	</div>
+</div>

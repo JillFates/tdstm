@@ -27,7 +27,7 @@
 			name="createAssetPlan" value="EDIT"
 			onclick="addAssetOptions($('#planStatushiddenId').val())"/>
 	</div>
-
+</div>
 	<script type="text/javascript">
     function addAssetOptions(value){
         var option = value;
@@ -126,6 +126,4 @@
     	   $('#dependencyStatus_'+id).remove();
     	 }
     }
-    
-
 	</script>

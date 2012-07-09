@@ -2,7 +2,7 @@
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>
-	<div style="margin-top: 89px; margin-left: 150px; width: auto;">
+	<div style="margin-top: 89px; margin-left: 50px; width: auto;">
 		<table>
 			<thead>
 				<tr>
@@ -28,3 +28,4 @@
 			name="createDependencyStatusType" value="EDIT"
 			onclick="addAssetOptions($('#dependencyStatusHiddenId').val())"/>
 	</div>
+</div>
