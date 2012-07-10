@@ -8,8 +8,8 @@
 			<td valign="top" class="value" id="dateCreatedId"  >${createdBy} at ${dtCreated}</td>
 		</tr>
 		<tr style="margin-top: 10px">
-			<td valign="top" class="name" ><label for="owner"><b>Assigned To:</b></label></td>
-			<td valign="top" class="value" id="ownerTdId" >${owners ? owners : 'Unassigned'}</td>
+			<td valign="top" class="name" ><label for="assignedTo"><b>Assigned To:</b></label></td>
+			<td valign="top" class="value" id="assignedToTdId" >${assignedTo ? assignedTo : 'Unassigned'}</td>
 		</tr>
       <tr style="margin-top: 10px">
          <td valign="top" class="name" ><label for="dueDate"><b>Due Date:</b></label></td>

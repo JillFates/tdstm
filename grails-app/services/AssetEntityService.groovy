@@ -13,8 +13,6 @@ class AssetEntityService {
 
     static transactional = true
 	
-	def mailService					// SendMail MailService class
-	
 	def createOrUpdateAssetEntityDependencies(def params, def assetEntityInstance) {
 		
 		def principal = SecurityUtils.subject.principal
@@ -328,92 +326,5 @@ class AssetEntityService {
 		}
 	}
 	
-	/**
-	 * Used to send the Task email to the appropriate user for the comment passed to the method
-	 * @param assetComment
-	 * @param tzId
-	 * @return
-	 */
-	def sendTaskEMail(taskId, tzId, isNew=true){
-		def assetComment = AssetComment.get(taskId)
-		if (! assetComment) {
-			log.error "Invalid AssetComment ID [${taskId}] referenced in call"
-			return
-		}
-		if (!assetComment.owner?.email) {
-			log.error "No valid email address for task owner"
-			return
-		}
-		
-		def sub = leftString(getLine(assetComment.comment,0), 40)
-		sub = (isNew ? '' : 'Re: ') + ( (sub == null || sub.size() == 0) ? "Task ${assetComment.id}" : sub )
-
-		mailService.sendMail {
-			to assetComment.owner.email
-			subject "${sub}"
-			body ( 
-				view:"/assetEntity/_taskEMailTemplate",
-				model: assetCommentModel(assetComment, tzId)
-			)
-		}
-	}
-	
-	/**
-	 * Returns a map of variables for the AssetComment and notes
-	 * @param assetComment - the assetComment object to create a model of
-	 * @return map 
-	 */
-	def assetCommentModel(assetComment, tzId) {
-		def formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a");
-		def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
-		def notes = assetComment.notes?.sort{it.dateCreated}
-		def assetName = assetComment.assetEntity ? "${assetComment.assetEntity.assetName} (${assetComment.assetEntity.assetType})" : null
-		def createdBy = assetComment.createdBy
-		def resolvedBy = assetComment.resolvedBy
-		def dtCreated = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
-		def dueDate
-		def dtResolved
-		
-		if(assetComment.dateResolved) {
-			dtResolved = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
-		}
-		if(assetComment.dueDate){
-			dueDate = dateFormatter.format(assetComment.dueDate);
-		}
-		
-		[	assetComment:assetComment, 
-			assetName:assetName,
-			moveEvent:assetComment.moveEvent,
-			createdBy:createdBy, dtCreated:dtCreated, dtResolved:dtResolved, dueDate:dueDate,
-			resolvedBy:resolvedBy, owners:assetComment.owner,
-			notes:notes ]
-	}
-	
-	// TODO : move these methods into a reusable class - perhaps extending string with @Delegate
-	
-	/**
-	 * Returns the left of a string to an optional length limit
-	 * @param str - string to return
-	 * @param len - optional length of string to return
-	 * @return String
-	 */
-	def leftString(str, len=null) {
-		if (str == null) return null
-		def size = str.size()
-		size = (len != null && size > len) ? len : size
-		size = size==0 ? 1 : size
-		return str[0..(size-1)]
-	}
-
-	/**
-	 * Returns a specified line within a string and null if line number does not exist, defaulting to the first if no	
-	 * @param str - string to act upon
-	 * @param lineNum - line number to return starting with zero, default of 0
-	 * @return String
-	 */
-	def getLine(str, lineNum=0) {
-		ArrayList lines = str.readLines()
-		return ( (lineNum+1) > lines.size() ) ? null : lines[lineNum]
-	}
 	
 }

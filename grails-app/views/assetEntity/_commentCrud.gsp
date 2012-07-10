@@ -1,3 +1,10 @@
+<%
+/*
+ **************************
+ * Comment List Dialog
+ **************************
+ */ 
+%>
 <div id="commentsListDialog" title="Show Asset Comments" style="display: none;">
 <br/>
 	<div class="list">
@@ -18,10 +25,127 @@
 	</div>
     <tds:hasPermission permission='CommentCrudView'>
 	<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-		<span class="menuButton"><a class="create" href="#" onclick="$('#statusId').val('');$('#createResolveDiv').css('display','none');$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();$('#catagoryTrId').css('display', 'none');$('#dueDateTrId').css('display', 'none');$('#ownerId').css('display', 'none');" >New Comment</a></span>
+		<span class="menuButton"><a class="create" href="#" onclick="$('#statusId').val('');$('#createResolveDiv').css('display','none');$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();$('#catagoryTrId').css('display', 'none');$('#dueDateTrId').css('display', 'none');$('#assignedToId').css('display', 'none');" >New Comment</a></span>
 	</div>
 	</tds:hasPermission>
 </div>
+<%
+/*
+ **************************
+ * Show Comment Dialog
+ **************************
+ */ 
+%>
+<div id="showCommentDialog" title="Comment/Issue detail"
+   style="display: none;">
+<div class="dialog" style="border: 1px solid #5F9FCF"><input name="id" value="" id="commentId"
+   type="hidden"/>
+   <div>
+   <table id="showCommentTable" style="border: 0px;">
+      <tr>
+         <td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
+         <td valign="top" class="value" id="assignedToTdId"></td>
+      </tr>
+      <tr>
+         <td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
+         <td valign="top" class="value" id="dueDatesId"></td>
+      </tr>
+      <tr>
+         <td valign="top" class="name"><label for="dateCreated">Created At:</label></td>
+         <td valign="top" class="value" id="dateCreatedId"></td>
+      </tr>
+      <tr>
+         <td valign="top" class="name"><label for="createdBy">Created By:</label></td>
+         <td valign="top" class="value" id="createdById"></td>
+         
+      </tr>
+      <tr class="prop">
+         <td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
+         <td valign="top" class="value" id="commentTypeTdId"></td>
+         
+      </tr>
+      <tr>
+         <td valign="top" class="name"><label for="category">Category:</label></td>
+         <td valign="top" class="value" id="categoryTdId"></td>
+         
+      </tr>
+      <tr class="prop" style="display: none">
+         <td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
+         <td valign="top" class="value" id="commentCodeTdId"></td>
+         
+      </tr>
+      <tr class="prop" id="mustVerifyId">
+         <td valign="top" class="name" ><label for="mustVerify">Must Verify:</label></td>
+         <td valign="top" class="value" id="verifyTdId">
+            <input type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0" disabled="disabled" />
+         </td>
+         
+      </tr>
+      <tr id = "assetShowId" class="prop" >
+         <td valign="top" class="name" id="assetTdId"><label for="asset">Asset:</label></td>
+         <td valign="top" class="value" id="assetShowValueId" ></td>
+      </tr>
+      <tr id = "moveShowId" class="prop" style="display: none;" >
+         <td valign="top" class="name" id="eventTdId"><label for="asset">Move Event:</label></td>
+         <td valign="top" class="value" id="eventShowValueId" ></td>
+      </tr>
+      <tr class="prop">
+         <td valign="top" class="name"><label for="comment">Comment:</label></td>
+         <td valign="top" class="value" colspan="2">
+            <textarea cols="80" rows="4" id="commentTdId" readonly="readonly"></textarea>
+         </td>
+      </tr>
+   </table>
+   </div>
+   <div id="showResolveDiv" style="display: none;">
+      <table id="showResolveTable" style="border: 0px">
+      <tr class="prop">
+         <td valign="top" class="name"><label for="previousNotes">Previous Notes:</label></td>
+         <td valign="top" class="value" >
+            <div id="previousNotesShowId" ></div>
+         </td>
+      </tr>
+      <tr class="prop">
+         <td valign="top" class="name"><label for="status">Status:</label></td>
+         <td valign="top" class="value" id="statusShowId" ></td>
+         
+      </tr>
+      <tr class="prop">
+         <td valign="top" class="name"><label for="resolution">Resolution:</label></td>
+         <td valign="top" class="value" colspan="2">
+            <div id="resolutionId" ></div>
+         </td>
+      </tr>
+      <tr>
+         <td valign="top" class="name"><label for="dateResolved">Resolved At:</label></td>
+         <td valign="top" class="value" id="dateResolvedId" ></td>
+      </tr>
+      <tr>
+         <td valign="top" class="name" nowrap="nowrap"><label for="resolvedBy">Resolved By:</label></td>
+         <td valign="top" class="value" id="resolvedById" ></td>
+      </tr> 
+      
+   </table>
+   </div>
+   <tds:hasPermission permission='CommentCrudView'>
+   <div class="buttons"><span class="button">
+   <input class="edit" type="button" value="Edit"
+      onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 'auto');$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
+   </span>
+   <span class="button"> <input class="delete" type="button" value="Delete"
+   onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment',controller:'assetEntity', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'never\')')}" />
+   </span>
+   </div>
+   </tds:hasPermission>
+</div>
+</div>
+<%
+/*
+ **************************
+ * Create Comment Dialog
+ **************************
+ */ 
+%>
 <div id="createCommentDialog" title="Create Asset Comment" style="display: none;">
 	<input type="hidden" name="assetEntity.id" id="createAssetCommentId" value="" />
 	<g:form action="saveComment" method="post" name="createCommentForm">
@@ -29,12 +153,12 @@
 	<div class="dialog" style="border: 1px solid #5F9FCF">
 	<div>
 		<table id="createCommentTable" style="border: 0px;">
-		<tr class="prop" id="ownerId" style="display:none">
+		<tr class="prop" id="assignedToId" style="display:none">
 		<% // TODO - the list of users should be in the model and not in the view %>
 		<% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
-			<td valign="top" class="name"><label for="owner">Assigned To:</label></td>
+			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
 			<td valign="top" style="width: 20%;">
-				<g:select id="owner" name="owner" from="${partyList}"  value="${session.getAttribute('LOGIN_PERSON').id }" optionKey="id" noSelection="['':'please select']" ></g:select>
+				<g:select id="assignedTo" name="assignedTo" from="${partyList}"  value="${session.getAttribute('LOGIN_PERSON').id }" optionKey="id" noSelection="['':'please select']" ></g:select>
 			</td>
 		
 		</tr>
@@ -55,7 +179,7 @@
 				noSelection="['':'please select']" onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
             <td valign="top" id="mustVerifyTd" style="display: none;">
-			<input type="checkbox" id="mustVerifyEdit" name="mustVerify" value="0" 
+			<input type="checkbox" id="mustVerify" name="mustVerify" value="0" 
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
 			<label for="mustVerifyEdit">Must Verify</label>
 			</td>
@@ -117,132 +241,44 @@
 		onclick="resolveValidate('createCommentForm','createAssetCommentId');" /></span></div>
 	</tds:hasPermission>
 </g:form></div>
-<div id="showCommentDialog" title="Comment/Issue detail"
-	style="display: none;">
-<div class="dialog" style="border: 1px solid #5F9FCF"><input name="id" value="" id="commentId"
-	type="hidden"/>
-	<div>
-	<table id="showCommentTable" style="border: 0px;">
-		<tr>
-			<td valign="top" class="name"><label for="owner">Owner:</label></td>
-			<td valign="top" class="value" id="ownerTdId" ></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
-			<td valign="top" class="value" id="dueDatesId" ></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name"><label for="dateCreated">Created At:</label></td>
-			<td valign="top" class="value" id="dateCreatedId" ></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
-			<td valign="top" class="value" id="createdById" ></td>
-			
-		</tr>
-		<tr class="prop">
-			<td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
-			<td valign="top" class="value" id="commentTypeTdId" ></td>
-			
-		</tr>
-		<tr>
-			<td valign="top" class="name"><label for="category">Category:</label></td>
-			<td valign="top" class="value" id="categoryTdId" ></td>
-			
-		</tr>
-		<tr class="prop" style="display: none">
-			<td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
-			<td valign="top" class="value" id="commentCodeTdId" ></td>
-			
-		</tr>
-		<tr class="prop" id="mustVerifyId">
-			<td valign="top" class="name" ><label for="mustVerify">Must Verify:</label></td>
-			<td valign="top" class="value" id="verifyTdId">
-				<input type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0" disabled="disabled" />
-			</td>
-			
-		</tr>
-		<tr id = "assetShowId" class="prop" >
-			<td valign="top" class="name" id="assetTdId"><label for="asset">Asset:</label></td>
-			<td valign="top" class="value" id="assetShowValueId" style="display: none;"></td>
-		</tr>
-		<tr class="prop">
-			<td valign="top" class="name"><label for="comment">Comment:</label></td>
-			<td valign="top" class="value" colspan="2">
-				<textarea cols="80" rows="4" id="commentTdId" readonly="readonly"></textarea>
-			</td>
-		</tr>
-	</table>
-	</div>
-	<div id="showResolveDiv" style="display: none;">
-		<table id="showResolveTable" style="border: 0px">
-		<tr class="prop">
-			<td valign="top" class="name"><label for="previousNotes">Previous Notes:</label></td>
-			<td valign="top" class="value" >
-				<div id="previousNotesShowId" ></div>
-			</td>
-		</tr>
-		<tr class="prop">
-			<td valign="top" class="name"><label for="status">Status:</label></td>
-			<td valign="top" class="value" id="statusShowId" ></td>
-			
-		</tr>
-		<tr class="prop">
-			<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
-			<td valign="top" class="value" colspan="2">
-				<div id="resolutionId" ></div>
-			</td>
-		</tr>
-		<tr>
-			<td valign="top" class="name"><label for="dateResolved">Resolved At:</label></td>
-			<td valign="top" class="value" id="dateResolvedId" ></td>
-		</tr>
-		<tr>
-			<td valign="top" class="name" nowrap="nowrap"><label for="resolvedBy">Resolved By:</label></td>
-			<td valign="top" class="value" id="resolvedById" ></td>
-		</tr>	
-		
-	</table>
-	</div>
-	<tds:hasPermission permission='CommentCrudView'>
-	<div class="buttons"><span class="button">
-	<input class="edit" type="button" value="Edit"
-		onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 'auto');$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
-	</span>
-	<span class="button"> <input class="delete" type="button" value="Delete"
-	onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment',controller:'assetEntity', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'never\')')}" />
-	</span>
-	</div>
-	</tds:hasPermission>
-</div>
-</div>
+
+<%
+/*
+ **************************
+ * Edit Comment Dialog
+ **************************
+ */ 
+%>
 <div id="editCommentDialog" title="Edit Comment/Issue" style="display: none;">
 <g:form action="updateComment" method="post" name="editCommentForm">
 <div class="dialog" style="border: 1px solid #5F9FCF">
 	<input type="hidden" name="id" id="updateCommentId" value=""/>
+	<input type="hidden" name="assetName" id="assetValueId" value=""/>
 	<div>
 	<table id="updateCommentTable" style="border: 0px;">
-	   <tr class="prop" id="ownerEditedId">
-		<% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
-			<td valign="top" class="name"><label for="owner">Owner:</label></td>
-			<td valign="top" id="ownerEditId" style="width: 20%;display: none;">
-				<g:select id="ownerEditTdId" name="owner" from="${partyList}"  value="" optionKey="id"   noSelection="['':'please select']" ></g:select>
+	   <% // TODO : Replace DB lookup in GSP with data from controller %>
+      <% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
+	   <tr class="prop" id="assignedToTrEditId">
+			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
+			<td valign="top" id="assignedToEditTdId" style="width: 20%;display: none;">
+				<g:select id="assignedToEditId" name="assignedTo" from="${partyList}" value="" optionKey="id" noSelection="['':'please select']"></g:select>
 			</td>
 		</tr> 
+
 	    <tr id="dueDatesEditId" style="display: none" ><td valign="top" class="name"><label for="dueDate">DueDate:</label></td>
 			<td valign="top" class="value" id="dueDatesEditId" ><script type="text/javascript" charset="utf-8">
-                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-                  </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDateEdit" id="dueDateEdit"
+             jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+             </script><input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDateEdit" id="dueDateEdit"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 			
 		</tr>
 		<tr>
 			<td valign="top" class="name"><label for="dateCreated">Created At:</label></td>
-			<td valign="top" class="value" id="dateCreatedEditId"  />
+			<td valign="top" class="value" id="dateCreatedEditId"/>
 		</tr>
 		<tr>
 			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
-			<td valign="top" class="value" id="createdByEditId" />
+			<td valign="top" class="value" id="createdByEditId"/>
 		</tr>
 		
 		<tr class="prop" >
@@ -254,22 +290,36 @@
 					 onChange="commentChange('#editResolveDiv','editCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;			
 				</tds:hasPermission>
 				<div style="display: none">
-				<tds:hasPermission permission='CommentCrudView'>
-					<input type="text" id="commentTypeEditIdReadOnly" readonly style="border: 0;"/>&nbsp;&nbsp;&nbsp;&nbsp;
-				</tds:hasPermission>				
+					<tds:hasPermission permission='CommentCrudView'>
+						<input type="text" id="commentTypeEditIdReadOnly" readonly style="border: 0;"/>&nbsp;&nbsp;&nbsp;&nbsp;
+					</tds:hasPermission>				
+				</div>
+				
+			</td>
+		</tr>
+		<tr class="prop" id="mustVerifyEditTd" style="display: none;">
+			<td valign="top" class="name"><label for="mustVerifyEditId">Must Verify:</label></td>
+			<td  valign="top" class="value">
 				<input type="checkbox" id="mustVerifyEditId" name="mustVerify" value="0"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
-				<label for="mustVerify">Must Verify</label>
-				</div>
 			</td>
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="category">Category:</label></td>
-			<td valign="top" class="value"  ><g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"  ></g:select></td>
+			<td valign="top" class="value"><g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"></g:select></td>
 		</tr>
+		<tr class="prop" id="moveEventEditTrId" style="display:none">
+         <td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
+         <td style="margin-right:30px ;" valign="top">
+            <g:select id="moveEventEditId" name="moveEvent" from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}" 
+             optionKey='id' optionValue="name" noSelection="['':'please select']"></g:select>
+             <% // TODO : fix so that it defaults the current value %>
+         </td>
+      </tr> 
+		
 		<tr class="prop" style="display:none">
 			<td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
-			<td valign="top" class="value" id="commentCodeEditId" ></td>
+			<td valign="top" class="value" id="commentCodeEditId"></td>
 		</tr>
 		<tr id="assetTrId" class="prop" >
 			<td valign="top" class="name" id="assetEditTd"><label for="asset">Asset:</label></td>
@@ -292,14 +342,14 @@
 	    <tr class="prop">
 			<td valign="top" class="name"><label for="notes">Note:</label></td>
 			<td valign="top" class="value">
-			   <textarea cols="80" rows="4" id="note" name="note" ></textarea>
+			   <textarea cols="80" rows="4" id="noteEditId" name="note" ></textarea>
 			</td>
 		</tr>
 		<tr class="prop" >
 			<td valign="top" class="name"><label for="status">Status:</label></td>
 			<td style="width: 20%;">
 				<g:select id="statusEditId" name="statusEdit" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Pending"
-				noSelection="['':'please select']" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
+				noSelection="['':'please select']" ></g:select>
 			</td>	
 		</tr>
 		<tr class="prop" style="display: none;">

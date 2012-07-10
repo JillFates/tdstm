@@ -51,6 +51,7 @@ class AssetEntityController {
 	def sessionFactory
 	def assetEntityAttributeLoaderService
 	def assetEntityService
+	def commentService
 
 	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
@@ -1733,56 +1734,8 @@ class AssetEntityController {
 		}
 		render assetCommentsList as JSON
 	}
-	/* ----------------------------------------------------------------
-	 * To save the Comment record
-	 * @param assetComment
-	 * @author Lokanath
-	 * @return assetComments
-	 * -----------------------------------------------------------------*/
-	def saveComment = {
-		def formatter = new SimpleDateFormat("MM/dd/yyyy");
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def assetComments = []
-		if(params.dueDate){
-		   params.dueDate = GormUtil.convertInToGMT(formatter.parse(params.dueDate), tzId)
-		}
-		def assetComment = new AssetComment(params)
-		
-		def principal = SecurityUtils.subject.principal
-		def loginUser = UserLogin.findByUsername(principal)
-		assetComment.createdBy = loginUser.person
-		assetComment.owner = Person.get(params.owners)
-		assetComment.project = Project.get(session.CURR_PROJ.CURR_PROJ)
-
-		if(params.moveEvents){
-		  assetComment.moveEvent = MoveEvent.get(params.moveEvents)
-		}
-		if(params.status=='Completed'){
-			assetComment.isResolved = 1
-			assetComment.resolvedBy = loginUser.person
-			assetComment.dateResolved = GormUtil.convertInToGMT( "now", tzId )
-		}
-		def today = new Date();
-		if(!assetComment.hasErrors() && assetComment.save()) {
-			def css = assetComment.dueDate < today ? 'Lightpink' : 'White'
-			// TODO - why the heck are we doing a lookup to determine the status and not just determining from existing data?
-			def status = AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetComment.assetEntity,'issue',0])
-			assetComments << [assetComment : assetComment, status : status ? true : false ,cssClass:css]
-
-			// If there is an assigned owner with email and it is not the person creating the issue, then email the owner
-			if( assetComment.owner?.email && assetComment.owner?.email != loginUser.person.email ){
-				// Email in a separate thread to prevent delays to the user
-				Thread.start {
-					assetEntityService.sendTaskEMail(assetComment.id,tzId)
-				}
-			}
-		}else{
-			assetComment.errors.allErrors.each{println it}
-		}
-		render assetComments as JSON
-	}
 	/* ------------------------------------------------------------------------
-	 * return the commet record
+	 * return the comment record
 	 * @param assetCommentId
 	 * @author Lokanath
 	 * @return assetCommentList
@@ -1794,7 +1747,6 @@ class AssetEntityController {
 		def dtCreated
 		def dtResolved
 		DateFormat formatter ;
-		String owners = "";
 		def dueDate
 		formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a");
 		def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
@@ -1808,9 +1760,6 @@ class AssetEntityController {
 			personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")
 			dtResolved = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
 		}
-		if(assetComment.owner){
-		    owners = assetComment.owner
-		}
 		if(assetComment.dueDate){
 			dueDate = dateFormatter.format(assetComment.dueDate);
 		}
@@ -1821,16 +1770,27 @@ class AssetEntityController {
 			notes << [ dateCreated , it.createdBy.toString() ,it.note]
 			
 		}
+		
 		commentList << [ 
 			assetComment:assetComment,
 			personCreateObj:personCreateObj,
 			personResolvedObj:personResolvedObj,
 			dtCreated:dtCreated ? dtCreated : "",
 			dtResolved:dtResolved?dtResolved:"",
-			owners:owners?owners:"",
-			assetNames:assetComment.assetEntity != null  ? assetComment.assetEntity.assetName : assetComment.moveEvent.name,
-		    dueDate:dueDate?dueDate:'',notes:notes]
+			assignedTo:assetComment.assignedTo ? assetComment.assignedTo : "",
+			assetNames:assetComment.assetEntity != null  ? assetComment.assetEntity?.assetName : assetComment.moveEvent?.name ?: "",
+		    dueDate:dueDate?dueDate:'',notes:notes ]
 		render commentList as JSON
+	}
+	/* ----------------------------------------------------------------
+	 * To save the Comment record
+	 * @param assetComment
+	 * @author Lokanath
+	 * @return assetComments
+	 * -----------------------------------------------------------------*/
+	def saveComment = {
+		def map = commentService.saveUpdateCommentAndNotes(session, params, true)
+		render map as JSON
 	}
 	/* ------------------------------------------------------------
 	 * update comments
@@ -1839,64 +1799,7 @@ class AssetEntityController {
 	 * @return assetComment
 	 * ------------------------------------------------------------ */
 	def updateComment = {
-		def map = []
-		// Getting the loginUser should be abstracted into a service
-		def principal = SecurityUtils.subject.principal
-		def loginUser = UserLogin.findByUsername(principal)
-		// TODO - SECURITY - Need to verify that the comment is associated to the project
-		def assetComment = AssetComment.get(params.id)
-		def formatter = new SimpleDateFormat("MM/dd/yyyy");
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def date = new Date()
-
-		// Update the resolved properties based on status being Completed
-		if(params.status=='Completed'){
-			params.isResolved = 1
-			assetComment.isResolved = 1
-			assetComment.resolvedBy = loginUser.person
-			assetComment.dateResolved = GormUtil.convertInToGMT( "now", tzId )
-		}else{
-			assetComment.resolvedBy = null
-			assetComment.dateResolved = null
-		}
-		
-		if(params.dueDate){
-		    params.dueDate = formatter.parse(params.dueDate)
-		}
-
-		assetComment.properties = params
-		// TODO - SECURITY - Need to validate that the owner is a member of the project
-		def personInstance = Person.get(params.owners)
-		if(!params.owner){
-		   assetComment.owner = personInstance
-		}
-		def today = new Date()
-		if (! assetComment.hasErrors() && assetComment.save(flush:true)) {
-			if (params.note){
-				// TODO The adding of assetNote should be a method on the AssetComment instead of reverse injections plus the save above can handle both. Right now if this fails, everthing keeps on as though it didn't which is wrong.
-				def assetNote = new CommentNote();
-				assetNote.createdBy = loginUser.person
-				assetNote.dateCreated =  new Date()
-				assetNote.note = params.note
-				assetNote.assetComment = assetComment
-				if (!assetNote.save(flush:true)){
-					// TODO error won't bubble up to the user
-					assetNote.errors.allErrors.each{println it}
-				}
-			}
-
-			def css =  assetComment.dueDate < today ? 'Lightpink' : 'White'
-			def status = AssetComment.find('from AssetComment where assetEntity = ? and commentType = ? and isResolved = ?',[assetComment.assetEntity,'issue',0])
-			map << [assetComment : assetComment, status : status ? true : false , cssClass:css]
-
-			// Only send email if the originator of the change is not the owner as one doesn't need email to one's self.
-			if ( assetComment.owner?.email && assetComment.owner?.email != loginUser.person.email ) {
-				// Send email in separate thread to prevent delay to user
-				Thread.start {
-					 assetEntityService.sendTaskEMail(assetComment.id, tzId, false)
-				}
-			}
-		}
+		def map = commentService.saveUpdateCommentAndNotes(session, params, false)
 		render map as JSON
 	}
 	
@@ -2700,8 +2603,8 @@ class AssetEntityController {
 		}
 		render statusMsg
 	}
-	def create ={
-		def assetEntityInstance = new AssetEntity(appOwner:'TDS')
+	def create = {
+		def assetEntityInstance = new AssetEntity(appOwner:'')
 
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute , [sort:"value"])
@@ -2917,7 +2820,14 @@ class AssetEntityController {
 		def personInstance = Person.get(userId)
 		def assetCommentList
 		def today = new Date()
-		if(params.filter=='openIssue'){
+		
+		if (params.issueBox=="on") {
+			if ( params.resolvedBox=="on" ){
+				assetCommentList = AssetComment.findAll("From AssetComment a where a.project = :project AND isResolved = :isResolved and assignedTo = :assignedTo order by dueDate desc , dateCreated desc",[project:project,isResolved:1,assignedTo:personInstance])
+			} else {
+				assetCommentList = AssetComment.findAll("From AssetComment a where a.project = :project AND assignedTo = :assignedTo order by dueDate asc , dateCreated desc",[project:project,assignedTo:personInstance])
+			}
+		} else if(params.filter=='openIssue'){
 			assetCommentList = AssetComment.findAll("FROM AssetComment a where a.project = ? and a.commentType = ? and a.isResolved = 0 and category in ('general','planning') order by dueDate desc , dateCreated desc",[project, "issue"])
 		}else if(params.filter=='generalOverDue'){
 		    assetCommentList = AssetComment.findAll("from AssetComment a  where a.project = ? and  category in ('general','planning') and a.dueDate < ? and a.isResolved = 0 order by dueDate desc , dateCreated desc",[project,today])
@@ -2930,11 +2840,7 @@ class AssetEntityController {
 		}else{
 		    assetCommentList = AssetComment.findAll("From AssetComment a where a.project = :project  and isResolved = :isResolved order by dueDate desc , dateCreated desc",[project:project,isResolved:0])
 		}
-		if(params.issueBox=="on" && params.resolvedBox=="on" ){
-			assetCommentList = AssetComment.findAll("From AssetComment a where a.project = :project  and isResolved = :isResolved and owner = :owner order by dueDate desc , dateCreated desc",[project:project,isResolved:1,owner:personInstance])
-		}else if(params.issueBox=="on" ){
-			assetCommentList = AssetComment.findAll("From AssetComment a where a.project = :project  and owner = :owner order by dueDate asc , dateCreated desc",[project:project,owner:personInstance])
-		}
+		
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
 		tableFacade.items = assetCommentList
 		Limit limit = tableFacade.limit

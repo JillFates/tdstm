@@ -14,7 +14,7 @@ class AssetComment {
 	String resolution
 	Person resolvedBy
 	Person createdBy
-	Person owner
+	Person assignedTo			// FKA owner
 	String commentCode 
 	String category = "general"
 	String displayOption = "U"	// Used in dashboard to control display of user entered test (comment) or a generic message
@@ -49,18 +49,19 @@ class AssetComment {
 					return ['assetComment.moveEvent.notspecified']
 				}
 			})
-		commentType( blank:true, nullable:true, inList: ['issue','instruction','comment'] )
+		// TODO - Need to verify if commentType can be blank/nullable
+		commentType( blank:false, nullable:false, inList: ['issue','instruction','comment'] )
 		mustVerify( nullable:true )
 		isResolved( nullable:true )
-		resolution( blank:true, nullable:true  )
-		resolvedBy( nullable:true  )
 		createdBy( nullable:true  )
+		assignedTo( blank:true, nullable:true  )
+		resolvedBy( nullable:true  )
+		resolution( blank:true, nullable:true  )
 		dateCreated( nullable:true  )
 		dateResolved( nullable:true  )
 		commentCode( blank:true, nullable:true  )
 		category( blank:false, nullable:false ,inList:['general', 'discovery', 'planning','walkthru','premove','shutdown','moveday','startup','postmove'])
 		displayOption( blank:false, inList: ['G','U'] ) // Generic or User
-		owner( blank:true, nullable:true  )
 		attribute( blank:true, nullable:true  )
 		commentKey( blank:true, nullable:true  )
 		status( blank:true, nullable:true , inList : [	'Pending', 'Started', 'Hold', 'Completed'] )
@@ -95,8 +96,8 @@ class AssetComment {
 			displayOption sqltype: 'char(1)'
 		}
 	}
-	def getOwnerString(){
-		return owner.toString()
+	def getAssignedToString(){
+		return assignedTo.toString()
 	}
 	def getAssetName(){
 		return assetEntity.assetName
