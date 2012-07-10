@@ -371,6 +371,8 @@ class PersonController {
 				userPreferenceService.setPreference( "CURR_TZ", params.timeZone )
 				userPreferenceService.setPreference( "CURR_POWER_TYPE", params.powerType )
 				userPreferenceService.loadPreferences("CURR_TZ")
+				userPreferenceService.loadPreferences("START_PAGE")
+				userPreferenceService.setPreference("START_PAGE", params.startPage )
 			}
 			ret << [name:personInstance.firstName, tz:getSession().getAttribute( "CURR_TZ" )?.CURR_TZ]
 			render  ret as JSON

@@ -592,7 +592,14 @@ class ProjectController {
     	if(selectProject){
     		def projectInstance = Project.findByProjectCode(params.selectProject)
 	        userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
-	        redirect(controller:'project', action:"show" )
+			
+	        if(userPreferenceService.getPreference('START_PAGE')=='Current Dashboard'){
+			    redirect(controller:'dashboard' )
+			}else if(userPreferenceService.getPreference('START_PAGE')=='Admin Portal'){
+				redirect(controller:'auth' , action:'home')
+			}else{
+			    redirect(controller:'project', action:"show", id: projectInstance.id )
+			}
     	} else {
     		flash.message = "Please select Project"
     		redirect( action:"list" )

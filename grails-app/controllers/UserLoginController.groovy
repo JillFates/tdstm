@@ -93,8 +93,10 @@ class UserLoginController {
 		}
 		def partyGroupList = PartyGroup.findAllByPartyType( PartyType.read("COMPANY"))
 		def company
-		if(params.companyName!="All"){
-		    company = PartyGroup.findById(companyId)
+		if(companyId){
+			if(params.companyName!="All"){
+			    company = PartyGroup.findById(companyId)
+			}
 		}
 		// Statements for JMESA integration
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
@@ -247,7 +249,11 @@ class UserLoginController {
         	def assignedRoles = request.getParameterValues("assignedRole");
         	def person = params.person.id
         	userPreferenceService.setUserRoles(assignedRoles, person)
-        	
+			def userPreference = new UserPreference()
+			userPreference.userLogin = userLoginInstance
+			userPreference.preferenceCode = "START_PAGE"
+			userPreference.value = "Current Dashboard"
+			userPreference.save( insert: true)
             flash.message = "UserLogin ${userLoginInstance} created"
             redirect( action:show, id:userLoginInstance.id, params:[ companyId:companyId ] )
         }

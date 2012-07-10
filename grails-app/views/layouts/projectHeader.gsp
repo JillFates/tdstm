@@ -548,6 +548,22 @@
 						value="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>
 					</td>
 				</tr>
+				
+					<tr class="prop">
+						<td valign="top" class="name">
+							<label for="startPage">Start Page:</label>
+						</td>
+						<td valign="top" class="value">
+						<g:if test="${RolePermissions.hasPermission('AdminMenuView')}">
+							<g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard','Admin Portal']}" 
+							value="${session.getAttribute('START_PAGE')?.START_PAGE}"/>
+						</g:if>
+						<g:else>
+						<g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard']}" 
+							value="${session.getAttribute('START_PAGE')?.START_PAGE}"/>
+						</g:else>
+						</td>
+					</tr>
 				<tr class="prop">
 					<td valign="top" class="name">
                        <label for="title">Power In:</label>
@@ -640,7 +656,7 @@
 	        }
 	        if(returnVal){
 				${remoteFunction(controller:'person', action:'updatePerson', 
-						params:'\'id=\' + $(\'#personId\').val() +\'&firstName=\'+$(\'#firstNameId\').val() +\'&lastName=\'+$(\'#lastNameId\').val()+\'&nickName=\'+$(\'#nickNameId\').val()+\'&title=\'+$(\'#titleId\').val()+\'&password=\'+$(\'#passwordId\').val()+\'&timeZone=\'+$(\'#timeZoneId\').val()+\'&powerType=\'+$(\'#powerTypeId\').val()+\'&email=\'+$(\'#emailId\').val()+\'&expiryDate=\'+$(\'#expiryDateId\').val()', 
+						params:'\'id=\' + $(\'#personId\').val() +\'&firstName=\'+$(\'#firstNameId\').val() +\'&lastName=\'+$(\'#lastNameId\').val()+\'&nickName=\'+$(\'#nickNameId\').val()+\'&title=\'+$(\'#titleId\').val()+\'&password=\'+$(\'#passwordId\').val()+\'&timeZone=\'+$(\'#timeZoneId\').val()+\'&powerType=\'+$(\'#powerTypeId\').val()+\'&email=\'+$(\'#emailId\').val()+\'&expiryDate=\'+$(\'#expiryDateId\').val()+\'&startPage=\'+$(\'#startPage\').val()', 
 						onComplete:'updateWelcome(e)')}
 	        }
 		}

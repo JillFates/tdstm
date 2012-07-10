@@ -62,7 +62,19 @@ class AuthController {
 							redirect(controller:'clientTeams', params:[viewMode:'mobile'])
 		            	}
 		            } else {
-		            	redirect(controller:'projectUtil')
+					   if(userPreferenceService.getPreference('CURR_PROJ')){
+							if(userPreferenceService.getPreference('START_PAGE')=='Project Settings'){
+				            	redirect(controller:'projectUtil')
+				            }else if(userPreferenceService.getPreference('START_PAGE')=='Current Dashboard'){
+							   redirect(controller:'dashboard')
+				            }else if(userPreferenceService.getPreference('START_PAGE')=='Admin Portal'){
+							   redirect(action:'home')
+				            }else{
+							   redirect(controller:'projectUtil')
+							}
+					   }else{
+					         redirect(controller:'projectUtil')
+					   }
 		            }
 	            }
 	        }
