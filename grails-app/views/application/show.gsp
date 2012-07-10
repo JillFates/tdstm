@@ -401,6 +401,7 @@
 					   <span class="button"><input id="deleteId"	 name="deleteId"  class="save" value="Delete" onclick=" deleteAsset($('#applicationId').val(),'app')" value="Delete" /> </span>
 					</g:else>
 					</tds:hasPermission>
+					<tds:hasPermission permission="CommentCrudView">
 					<g:if test="${assetComment == 'issue'}">
 						<g:remoteLink controller="assetEntity" action="listComments" id="${applicationInstance.id}" before="setAssetId('${applicationInstance.id}');" onComplete="listCommentsDialog(e,'never');">
 							<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="=0px" style="margin-bottom: -4px;"/>&nbsp&nbspComment
@@ -416,6 +417,7 @@
 							<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/>&nbsp&nbspComment
 						</a>
 				    </g:else>
+				    </tds:hasPermission>
 				</g:form>
 			</div></td>
 	</tr>

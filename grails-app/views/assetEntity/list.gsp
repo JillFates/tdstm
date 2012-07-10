@@ -47,38 +47,40 @@ $(document).ready(function() {
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
-<input type="hidden" id="role" value="role"/>
+<tds:hasPermission permission='EditAndDelete'>
     <div style="margin-left: 5px;">
-		<input id="selectAssetId" type="checkbox" onclick="selectAllAssets()" title="Select All" />&nbsp;&nbsp;&nbsp;&nbsp;
-		<input id="deleteAsset" type="button" value="Delete Selected..."  title="Delete Selected" disabled="disabled"  onclick="deleteAssets(${assetEntityList.id},'server')" />
+		<input id="selectAssetId" type="checkbox" onclick="selectAllAssets()" title="Select All" />&nbsp;&nbsp;<label for="selectAssetId" style="cursor:pointer;"> <b>All</b></label>
 	</div>
+</tds:hasPermission>
 <div>
 	<form name="assetEntityForm" action="list">
 		<jmesa:tableFacade id="tag" items="${assetEntityList}" maxRows="25" exportTypes="csv,excel" stateAttr="restore" var="assetEntityInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
 		    <jmesa:htmlTable style=" border-collapse: separate">
 		        <jmesa:htmlRow highlighter="true">
 		        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" >
-		        		<g:checkBox name="assetCheckBox" id="checkId_${assetEntityInstance.id}" onclick="enableButton(${assetEntityList.id})"></g:checkBox>
 		        	<tds:hasPermission permission='EditAndDelete'>
+		        		<g:checkBox name="assetCheckBox" id="checkId_${assetEntityInstance.id}" onclick="enableButton(${assetEntityList.id})"></g:checkBox>
 		        		<a href="javascript:editEntity('assetEntity','${assetEntityInstance?.assetType}',${assetEntityInstance.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 		        	</tds:hasPermission>
-						<span id="icon_${assetEntityInstance.id}">
-							<g:if test="${assetEntityInstance.commentType == 'issue'}">
+		        		<tds:hasPermission permission="CommentCrudView">
+							<span id="icon_${assetEntityInstance.id}">
+								<g:if test="${assetEntityInstance.commentType == 'issue'}">
+									<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
+										<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="0px"/>
+									</g:remoteLink>
+								</g:if>
+								<g:elseif test="${assetEntityInstance.commentType == 'comment'}">
 								<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-									<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="0px"/>
+									<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px"/>
 								</g:remoteLink>
-							</g:if>
-							<g:elseif test="${assetEntityInstance.commentType == 'comment'}">
-							<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-								<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px"/>
-							</g:remoteLink>
-							</g:elseif>
-							<g:else>
-							<a href="javascript:createNewAssetComment(${assetEntityInstance.id});">
-								<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
-							</a>
-							</g:else>
-						</span>
+								</g:elseif>
+								<g:else>
+								<a href="javascript:createNewAssetComment(${assetEntityInstance.id});">
+									<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
+								</a>
+								</g:else>
+							</span>
+					 </tds:hasPermission> 
 		        	</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="assetName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<a id="assetName_${assetEntityInstance.id}" href="javascript:getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.assetName}</a>
@@ -131,6 +133,7 @@ $(document).ready(function() {
 <div class="buttons"><g:form>
 <tds:hasPermission permission='EditAndDelete'>
 	<span class="button"><input type="button" value="New Asset" class="create" onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Server\')')}"/></span>
+	<span class="button"><input id="deleteAsset" type="button" class="create" value="Delete Selected..."  title="Delete Selected" disabled="disabled"  onclick="deleteAssets(${assetEntityList.id},'server')" /></span>
 </tds:hasPermission>
 </g:form></div>
 </div> <%-- End of Body --%>

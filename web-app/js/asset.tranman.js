@@ -472,7 +472,6 @@ function showAssetDialog( e , action ) {
  /**------------------------------------Asset Comments----------------------------------*/
 //function to list the comments list
 	function listCommentsDialog(e,action) {
-		var role = $("#role").val();
 		$("#editCommentDialog").dialog("close");
 		$("#showCommentDialog").dialog("close");
 		$("#createCommentDialog").dialog("close");
@@ -586,9 +585,7 @@ function showAssetDialog( e , action ) {
 			      //verifyTd.appendChild( verifyText )
 			      categoryTd.appendChild( categoryText )
 			      //commentCodeTd.appendChild( commentCodeText )
-			     // if ( role ) {
-			      	tr.appendChild( editTd )
-			     // }
+			      tr.appendChild( editTd )
 			      tr.appendChild( commentTd )
 			      tr.appendChild( typeTd )	   
 			      tr.appendChild( dueDateTd )	  

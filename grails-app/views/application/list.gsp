@@ -47,21 +47,22 @@ $(document).ready(function() {
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
-<input type="hidden" id="role" value="role"/>
-<div style="margin-left: 5px;">
-<input id="selectAssetId" type="checkbox" onclick="selectAllAssets()" title="Select All" />&nbsp;&nbsp;&nbsp;&nbsp;
-<input id="deleteAsset" type="button" value="Delete Selected..."  title="Delete Selected" disabled="disabled"  onclick="deleteAssets(${assetEntityList.id},'application')" />
-</div>
+<tds:hasPermission permission='EditAndDelete'>
+	<div style="margin-left: 5px;">
+		<input id="selectAssetId" type="checkbox" onclick="selectAllAssets()" title="Select All" />&nbsp;&nbsp;<label for="selectAssetId" style="cursor:pointer;"> <b>All</b></label>
+	</div>
+</tds:hasPermission>
 <div id= "jmesaId">
 	<form name="listAppsForm" action="list">
 		<jmesa:tableFacade id="tag" items="${assetEntityList}" maxRows="50" exportTypes="csv,excel" stateAttr="restore" var="appEntityInstance" autoFilterAndSort="true" maxRowsIncrements="50,100,200">
 		    <jmesa:htmlTable style=" border-collapse: separate" editable="true">
 		        <jmesa:htmlRow highlighter="true" style="cursor: pointer;">
 		        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" nowrap>
-		        	<g:checkBox name="assetCheckBox" id="checkId_${appEntityInstance.id}" onclick="enableButton(${assetEntityList.id})"></g:checkBox>
 		        	<tds:hasPermission permission='EditAndDelete'>
+		        	    <g:checkBox name="assetCheckBox" id="checkId_${appEntityInstance.id}" onclick="enableButton(${assetEntityList.id})"></g:checkBox>
 		        		<a href="javascript:editEntity('application','${appEntityInstance?.assetType}', ${appEntityInstance?.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 		        	</tds:hasPermission>
+		        	<tds:hasPermission permission="CommentCrudView">
 						<span id="icon_${appEntityInstance.id}">
 							<g:if test="${appEntityInstance.commentType == 'issue'}">
 								<g:remoteLink controller="assetEntity" action="listComments" id="${appEntityInstance.id}" before='setAssetId(${appEntityInstance.id});'	onComplete="listCommentsDialog( e ,'never' );">
@@ -79,6 +80,7 @@ $(document).ready(function() {
 							</a>
 							</g:else>
 						</span>
+					</tds:hasPermission>
 					</jmesa:htmlColumn>
 		        	<jmesa:htmlColumn property="assetName" title="Name" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 		        		<span onclick="getEntityDetails('application','${appEntityInstance.assetType}', ${appEntityInstance.id} )">${appEntityInstance.assetName}</span>
@@ -114,6 +116,7 @@ $(document).ready(function() {
 <div class="buttons"> 
 <tds:hasPermission permission='EditAndDelete'>
 		<span class="button"><input type="button" class="save" value="Create App" onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Application\')')}"/></span>
+		<span class="button"><input id="deleteAsset" type="button" value="Delete Selected..." class="save" title="Delete Selected" disabled="disabled"  onclick="deleteAssets(${assetEntityList.id},'application')" /></span>
 </tds:hasPermission>
 </div>
 <div id="createEntityView" style="display: none;" ></div>
