@@ -635,7 +635,7 @@ function showAssetDialog( e , action ) {
 	      	 $('#commentCodeTdId').html(ac.commentCode)
 	      	 if(ac.commentType=='issue'){
 	      		 if(params.assignedTo){
-			      	 $('#assignedToTdId').html(params.assignedTo)
+			      	 $('#assignedToTdId').html(params.assignedTo.firstName + " " + params.assignedTo.lastName)
 			      	 $('#assignedToEditId').val(params.assignedTo.id)
 	      		 }
 	      		 var notes = params.notes
@@ -658,30 +658,26 @@ function showAssetDialog( e , action ) {
 		      	 $('#note').val('')
 		      	 $('#statusEditId').val(ac.status)
 		      	 $('#mustVerifyId').css('display','none')
-		      	 
-	      	 }
-			 if(ac.commentType =='issue'){
-				  $('#mustVerifyId').css('display','none')
-			      $('#assetShowValueId').css('display','block')
-			      $('#assetTrShowId').css('display','block')
-			      $('#assetShowValueId').html(params.assetNames)
-			      $('#assetTrShowId').html(params.assetNames)
-			      $('#eventShowValueId').html(params.assetNames)
-			      $('#commentTypeEditId').attr("disabled","disabled");
-			      if(ac.assetEntity==null){
-			    	  $('#moveShowId').css('display','table-row')
-			    	  $('#assetShowId').css('display','none')
-			    	  $('#assetTrId').css('display','none')
-			    	  $('#moveEventEditId').val(ac.moveEvent.id)
-			    	  $('#moveEventEditTrId').css('display','table-row')
-			    	  
-			      }else{
-			    	  $('#moveShowId').css('display','none')
-			    	  $('#assetShowId').css('display','table-row')
-			    	  $('#moveEventEditTrId').css('display','none')
-			    	  $('#assetTrId').css('display','table-row')
-			    	  $('#assetValueId').val(ac.assetEntity.id)
-			      }
+				  // $('#mustVerifyId').css('display','none')
+			     $('#assetShowValueId').css('display','block')
+			     $('#assetTrShowId').css('display','block')
+			     $('#assetShowValueId').html(params.assetNames)
+			     $('#assetTrShowId').html(params.assetNames)
+			     $('#eventShowValueId').html(params.assetNames)
+		         $('#commentTypeEditId').attr("disabled","disabled");
+			     if(ac.assetEntity==null){
+			    	$('#moveShowId').css('display','table-row')
+			    	$('#assetShowId').css('display','none')
+			    	$('#assetTrId').css('display','none')
+			    	$('#moveEventEditId').val(ac.moveEvent.id)
+			    	$('#moveEventEditTrId').css('display','table-row')
+			     }else{
+			    	$('#moveShowId').css('display','none')
+			    	$('#assetShowId').css('display','table-row')
+			    	$('#moveEventEditTrId').css('display','none')
+			    	$('#assetTrId').css('display','table-row')
+			    	$('#assetValueId').val(ac.assetEntity.id)
+			     }
 	      	 } else {
 	      		$('#commentTypeEditId').removeAttr("disabled");
 	      	 }
