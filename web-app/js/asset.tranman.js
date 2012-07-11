@@ -633,6 +633,9 @@ function showAssetDialog( e , action ) {
 	      	 $('#isResolvedId').val(ac.isResolved)
 	      	 $('#categoryTdId').html(ac.category)
 	      	 $('#commentCodeTdId').html(ac.commentCode)
+	      	 $('#assetShowValueId').html(params.assetNames)
+		     $('#assetTrShowId').html(params.assetNames)
+		     $('#eventShowValueId').html(params.assetNames)
 	      	 if(ac.commentType=='issue'){
 	      		 if(params.assignedTo){
 			      	 $('#assignedToTdId').html(params.assignedTo.firstName + " " + params.assignedTo.lastName)
@@ -661,9 +664,6 @@ function showAssetDialog( e , action ) {
 				  // $('#mustVerifyId').css('display','none')
 			     $('#assetShowValueId').css('display','block')
 			     $('#assetTrShowId').css('display','block')
-			     $('#assetShowValueId').html(params.assetNames)
-			     $('#assetTrShowId').html(params.assetNames)
-			     $('#eventShowValueId').html(params.assetNames)
 		         $('#commentTypeEditId').attr("disabled","disabled");
       		     $('.issue').css('display','table-row')
 			     if(ac.assetEntity==null){
@@ -683,6 +683,11 @@ function showAssetDialog( e , action ) {
 	      		$('.issue').css('display','none')
 	      		$('#commentTypeEditId').removeAttr("disabled");
 	      	 }
+			 if(ac.commentType=='instruction'){
+				 $('#mustVerifyId').css('display','table-row')
+			 }else{
+				 $('#mustVerifyId').css('display','none')
+			 }
 	      	 if(ac.mustVerify != 0){
 		      	 $('#mustVerifyShowId').attr('checked', true);
 		      	 $('#mustVerifyEditId').attr('checked', true);
@@ -915,6 +920,8 @@ function commentChange(resolveDiv,formName) {
 	    formatDate(now);
 		$("#dueDateTrId").css('display', 'table-row');
 		$("#assignedToId").css('display', 'table-row');
+		$("#assignedToTrEditId").css('display', 'table-row');
+		$("#assignedToEditTdId").css('display', 'table-row');
 		$("#catagoryTrId").css('display', 'table-row');
 		$("#issueItemId").html('<label for="comment">Issue:</label>');
 		$("#mustVerifyTd").css('display', 'none');

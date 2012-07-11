@@ -70,7 +70,7 @@
          <td valign="top" class="value" id="commentCodeTdId"></td>
          
       </tr>
-      <tr class="prop" id="mustVerifyId">
+      <tr class="prop" id="mustVerifyId" style="display:none">
          <td valign="top" class="name" ><label for="mustVerify">Must Verify:</label></td>
          <td valign="top" class="value" id="verifyTdId">
             <input type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0" disabled="disabled" />
@@ -315,7 +315,7 @@
 		</tr>
 		<tr id="assetTrId" class="prop" >
 			<td valign="top" class="name" id="assetEditTd"><label for="asset">Asset:</label></td>
-			<td valign="top" class="value" style ="display: none;" id="assetTrShowId" ></td>
+			<td valign="top" class="value"  id="assetTrShowId" ></td>
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name" id="commentEditTdId"><label for="comment">Comment:</label></td>
