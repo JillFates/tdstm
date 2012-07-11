@@ -156,6 +156,11 @@ class CommentService {
 			}
 			
 			return map
+		} else {
+			def etext = "Unable to create Assetcomment" +
+                GormUtil.allErrorsString( assetComment )
+				println etext
+				log.error( etext )
 		}
 	}
 	

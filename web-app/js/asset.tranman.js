@@ -666,14 +666,14 @@ function showAssetDialog( e , action ) {
 			    	$('#moveShowId').css('display','table-row')
 			    	$('#assetShowId').css('display','none')
 			    	$('#assetTrId').css('display','none')
-			    	$('#moveEventEditId').val(ac.moveEvent.id)
+			    	$('#moveEventEditId').val(ac.moveEvent ? ac.moveEvent.id : '')
 			    	$('#moveEventEditTrId').css('display','table-row')
 			     }else{
 			    	$('#moveShowId').css('display','none')
 			    	$('#assetShowId').css('display','table-row')
 			    	$('#moveEventEditTrId').css('display','none')
 			    	$('#assetTrId').css('display','table-row')
-			    	$('#assetValueId').val(ac.assetEntity.id)
+			    	$('#assetValueId').val(ac.assetEntity ? ac.assetEntity.id : '')
 			     }
 	      	 } else {
 	      		$('.issue').css('display','none')
@@ -921,11 +921,9 @@ function commentChange(resolveDiv,formName) {
 		$("#assignedToId").css('display', 'table-row');
 		$("#assignedToTrEditId").css('display', 'table-row');
 		$("#assignedToEditTdId").css('display', 'table-row');
-		$("#catagoryTrId").css('display', 'table-row');
 		$("#issueItemId").html('<label for="comment">Issue:</label>');
 		$("#mustVerifyTd").css('display', 'none');
 		$("#mustVerifyEditTr").css('display', 'none');
-		$("#categoryEditId").css('display', 'table-row');
 		$("#assignedToEditedId").css('display', 'table-row');
 		$("#dueDatesEditId").css('display', 'table-row');
 		$(resolveDiv).css('display', 'block');
@@ -938,14 +936,12 @@ function commentChange(resolveDiv,formName) {
 		document.forms[formName].mustVerify.value = 1;
 		$("#mustVerifyEditId").css('display', 'block');
 		$(resolveDiv).css('display', 'none');
-		$("#catagoryTrId").css('display', 'none');
 		$("#dueDateTrId").css('display', 'none');
 		$("#assignedToId").css('display', 'none');
 		$("#mustVerifyTd").css('display', 'block');
 		$("#mustVerifyEditTr").css('display', 'table-row');
 		$("#assignedToEditedId").css('display', 'none');
 		$("#dueDatesEditId").css('display', 'none');
-		$("#categoryEditId").css('display', 'none');
 		$("#commentEditId").html('<label for="comment">Comment:</label>');
 		$("#issueItemId").html('<label for="comment">Comment:</label>');
 	}else{
@@ -953,14 +949,12 @@ function commentChange(resolveDiv,formName) {
 		document.forms[formName].mustVerify.value = 0;
 		$(resolveDiv).css('display', 'none');
 		$("#dueDateTrId").css('display', 'none');
-		$("#catagoryTrId").css('display', 'none');
 		$("#assignedToId").css('display', 'none');
 		$("#mustVerifyTd").css('display', 'none')
 		$("#mustVerifyEditTr").css('display', 'none');
 		$("#issueItemId").html('<label for="comment">Comment:</label>');
 		$("#assignedToEditedId").css('display', 'none');
 		$("#dueDatesEditId").css('display', 'none');
-		$("#categoryEditId").css('display', 'none');
 		$("#commentEditId").html('<label for="comment">Comment:</label>');
 	}
 }
@@ -974,7 +968,6 @@ if(type == "issue"){
 	$("#assignedToEditedId").css('display', 'table-row');
 	$("#"+resolveDiv).css('display', 'block');
 }else{
-	$("#categoryEditId").css('display', 'none');
 	$("#assignedToEditedId").css('display', 'none');
 	$("#"+resolveDiv).css('display', 'none');
 	$("#dueDatesEditId").css('display', 'none');

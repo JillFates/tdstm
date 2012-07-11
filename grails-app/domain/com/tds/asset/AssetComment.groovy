@@ -43,12 +43,7 @@ class AssetComment {
 		
 		comment( blank:true, nullable:true  )
 		assetEntity( blank:true, nullable:true )
-		moveEvent(nullable: true, validator: { 
-			val, assetComment->
-				if (!val && !assetComment.assetEntity ) {
-					return ['assetComment.moveEvent.notspecified']
-				}
-			})
+		moveEvent(nullable: true)
 		// TODO - Need to verify if commentType can be blank/nullable
 		commentType( blank:false, nullable:false, inList: ['issue','instruction','comment'] )
 		mustVerify( nullable:true )

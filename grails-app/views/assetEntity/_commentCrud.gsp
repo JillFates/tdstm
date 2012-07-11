@@ -25,7 +25,7 @@
 	</div>
     <tds:hasPermission permission='CommentCrudView'>
 	<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-		<span class="menuButton"><a class="create" href="#" onclick="$('#statusId').val('');$('#createResolveDiv').css('display','none');$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();$('#catagoryTrId').css('display', 'none');$('#dueDateTrId').css('display', 'none');$('#assignedToId').css('display', 'none');" >New Comment</a></span>
+		<span class="menuButton"><a class="create" href="#" onclick="$('#statusId').val('');$('#createResolveDiv').css('display','none');$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();$('#dueDateTrId').css('display', 'none');$('#assignedToId').css('display', 'none');" >New Comment</a></span>
 	</div>
 	</tds:hasPermission>
 </div>
@@ -60,7 +60,7 @@
          <td valign="top" class="value" id="commentTypeTdId"></td>
          
       </tr>
-      <tr class = "issue" id="categoryTrId" style="display:none">
+      <tr class = "issue" id="categoryTrId" >
          <td valign="top" class="name"><label for="category">Category:</label></td>
          <td valign="top" class="value" id="categoryTdId"></td>
          
@@ -171,8 +171,8 @@
 		<tr class="prop" >
 			<td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
 			<td style="width: 20%;">
-				<g:select id="commentType" name="commentType" from="${com.tds.asset.AssetComment.constraints.commentType.inList}" value=""
-				noSelection="['':'please select']" onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
+				<g:select id="commentType" name="commentType" from="${com.tds.asset.AssetComment.constraints.commentType.inList}" value="comment"
+				onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
             <td valign="top" id="mustVerifyTd" style="display: none;">
 			<input type="checkbox" id="mustVerify" name="mustVerify" value="0" 
@@ -180,7 +180,7 @@
 			<label for="mustVerifyEdit">Must Verify</label>
 			</td>
 		</tr>
-		<tr class="prop" id="catagoryTrId" style="display:none">
+		<tr class="prop">
         	<td valign="top" class="name"><label for="category">Category:</label></td>
         	<td style="margin-right:30px ;" valign="top">
             	<g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
@@ -296,7 +296,7 @@
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
 			</td>
 		</tr>
-		<tr class="prop issue">
+		<tr class="prop">
 			<td valign="top" class="name"><label for="category">Category:</label></td>
 			<td valign="top" class="value"><g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"></g:select></td>
 		</tr>
