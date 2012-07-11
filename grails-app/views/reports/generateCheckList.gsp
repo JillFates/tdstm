@@ -308,7 +308,7 @@
 											<tds:convertDate date="${issue.dueDate}"/>
 										</td>
 										<td>
-											${issue.owner}
+											${issue.assignedTo}
 										</td>
 										<td>
 											${issue.status}
