@@ -51,10 +51,6 @@
          <td valign="top" class="value" id="dueDatesId"></td>
       </tr>
       <tr>
-         <td valign="top" class="name"><label for="dateCreated">Created At:</label></td>
-         <td valign="top" class="value" id="dateCreatedId"></td>
-      </tr>
-      <tr>
          <td valign="top" class="name"><label for="createdBy">Created By:</label></td>
          <td valign="top" class="value" id="createdById"></td>
          
@@ -271,10 +267,6 @@
              </script><input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDateEdit" id="dueDateEdit"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 			
-		</tr>
-		<tr>
-			<td valign="top" class="name"><label for="dateCreated">Created At:</label></td>
-			<td valign="top" class="value" id="dateCreatedEditId"/>
 		</tr>
 		<tr>
 			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>

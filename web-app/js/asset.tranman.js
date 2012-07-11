@@ -695,8 +695,6 @@ function showAssetDialog( e , action ) {
 	      	
 	      	 $('#dateResolvedId').html(params.dtResolved)
 	      	 $('#dateResolvedEditId').html(params.dtResolved)
-	      	 $('#dateCreatedId').html(params.dtCreated)
-	      	 $('#dateCreatedEditId').html(params.dtCreated)
 	      	 if(params.personResolvedObj != null){
 		      	 $('#resolvedById').html(params.personResolvedObj.firstName+" "+params.personResolvedObj.lastName)
 		      	 $('#resolvedByEditId').html(params.personResolvedObj.firstName+" "+params.personResolvedObj.lastName)
@@ -705,8 +703,8 @@ function showAssetDialog( e , action ) {
 		      	 $('#resolvedByEditId').html("")
 	      	 }
 	      	
-	      	 $('#createdById').html(params.personCreateObj.firstName+" "+params.personCreateObj.lastName)
-	      	 $('#createdByEditId').html(params.personCreateObj.firstName+" "+params.personCreateObj.lastName)
+	      	 $('#createdById').html(params.personCreateObj.firstName+" "+params.personCreateObj.lastName+" at "+params.dtCreated)
+	      	 $('#createdByEditId').html(params.personCreateObj.firstName+" "+params.personCreateObj.lastName+" at "+params.dtCreated)
 	      	 $('#resolutionId').html(ac.resolution)
 	      	 $('#resolutionEditId').val(ac.resolution)
 	      	 $('#commentEditId').val(ac.comment)
