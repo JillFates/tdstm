@@ -24,7 +24,7 @@
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>
-	<span style="font: bold 13px arial; float:left; margin-top: 10px;">Select Team to use:</span>
+	<span style="font: bold 13px arial; float:left; margin-top: 10px;">Select <g:link controller="assetEntity" action="listComment"  params="[issueBox:'on']">your tasks</g:link> or a Team to use:</span>
 
 	<div class='list'>
 	<table>
