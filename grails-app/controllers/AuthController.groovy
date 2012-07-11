@@ -66,7 +66,11 @@ class AuthController {
 							if(userPreferenceService.getPreference('START_PAGE')=='Project Settings'){
 				            	redirect(controller:'projectUtil')
 				            }else if(userPreferenceService.getPreference('START_PAGE')=='Current Dashboard'){
-							   redirect(controller:'dashboard')
+								 if(RolePermissions.hasPermission('MoveBundleShowView')){
+								      redirect(controller:'moveBundle',action:'planningStats')
+								 }else{
+								       redirect(controller:'projectUtil')
+								 }
 				            }else if(userPreferenceService.getPreference('START_PAGE')=='Admin Portal'){
 							   redirect(action:'home')
 				            }else{

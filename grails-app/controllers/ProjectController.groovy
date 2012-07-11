@@ -594,7 +594,11 @@ class ProjectController {
 	        userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
 			
 	        if(userPreferenceService.getPreference('START_PAGE')=='Current Dashboard'){
-			    redirect(controller:'dashboard' )
+			    if(RolePermissions.hasPermission('MoveBundleShowView')){
+					 redirect(controller:'moveBundle',action:'planningStats')
+				}else{
+				     redirect(controller:'projectUtil')
+				}
 			}else if(userPreferenceService.getPreference('START_PAGE')=='Admin Portal'){
 				redirect(controller:'auth' , action:'home')
 			}else{
