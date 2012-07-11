@@ -42,11 +42,11 @@
    type="hidden"/>
    <div>
    <table id="showCommentTable" style="border: 0px;">
-      <tr>
+      <tr class = "issue" id="assignedToTrId" style="display:none">
          <td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
          <td valign="top" class="value" id="assignedToTdId"></td>
       </tr>
-      <tr>
+      <tr class = "issue" id="dueDatesTrId" style="display:none">
          <td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
          <td valign="top" class="value" id="dueDatesId"></td>
       </tr>
@@ -258,14 +258,14 @@
 	<table id="updateCommentTable" style="border: 0px;">
 	   <% // TODO : Replace DB lookup in GSP with data from controller %>
       <% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
-	   <tr class="prop" id="assignedToTrEditId">
+	   <tr class="prop issue" id="assignedToTrEditId" style="display: none">
 			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
 			<td valign="top" id="assignedToEditTdId" style="width: 20%;display: none;">
 				<g:select id="assignedToEditId" name="assignedTo" from="${partyList}" value="" optionKey="id" noSelection="['':'please select']"></g:select>
 			</td>
 		</tr> 
 
-	    <tr id="dueDatesEditId" style="display: none" ><td valign="top" class="name"><label for="dueDate">DueDate:</label></td>
+	    <tr class="prop issue" id="dueDatesEditId" style="display: none" ><td valign="top" class="name"><label for="dueDate">DueDate:</label></td>
 			<td valign="top" class="value" id="dueDatesEditId" ><script type="text/javascript" charset="utf-8">
              jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
              </script><input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDateEdit" id="dueDateEdit"

@@ -665,6 +665,7 @@ function showAssetDialog( e , action ) {
 			     $('#assetTrShowId').html(params.assetNames)
 			     $('#eventShowValueId').html(params.assetNames)
 		         $('#commentTypeEditId').attr("disabled","disabled");
+      		     $('.issue').css('display','table-row')
 			     if(ac.assetEntity==null){
 			    	$('#moveShowId').css('display','table-row')
 			    	$('#assetShowId').css('display','none')
@@ -679,6 +680,7 @@ function showAssetDialog( e , action ) {
 			    	$('#assetValueId').val(ac.assetEntity.id)
 			     }
 	      	 } else {
+	      		$('.issue').css('display','none')
 	      		$('#commentTypeEditId').removeAttr("disabled");
 	      	 }
 	      	 if(ac.mustVerify != 0){
