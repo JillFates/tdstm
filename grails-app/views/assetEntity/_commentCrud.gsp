@@ -234,7 +234,7 @@
 	<tds:hasPermission permission='CommentCrudView'>
 	<div class="buttons"><span class="button"> <input
 		class="save" type="button" value="Create"
-		onclick="resolveValidate('createCommentForm','createAssetCommentId');" /></span></div>
+		onclick="resolveValidate('createCommentForm','createAssetCommentId','${rediectTo}');" /></span></div>
 	</tds:hasPermission>
 </g:form></div>
 
