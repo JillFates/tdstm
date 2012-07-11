@@ -161,7 +161,7 @@
 					<table class="mmtable"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Client/Project</span><br />
 						<ul >
-							<li><g:link class="mmlink" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link></li>
+							<li><g:link class="mmlink" controller="project" action="list" params="[active:'active',tag_s_2_startDate:'desc']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link></li>
 							<tds:hasPermission permission='CreateProject'>
 							<li><g:link class="mmlink" controller="project" action="create"  onclick="hideMegaMenu('projectMegaMenu')">Create Project</g:link></li>
 							</tds:hasPermission>
@@ -312,7 +312,7 @@
 				<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#bundleMegaMenu')" href="javascript:showMegaMenu('#bundleMegaMenu')" style="display: inline"></a></g:link>
 			</li>
 
-			<li id="teamMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('')" onmouseout="mclosetime()" controller="clientTeams"  onclick="hideMegaMenu('bundleMegaMenu')">Teams</g:link></li>
+			<li id="teamMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('')" onmouseout="mclosetime()" controller="clientTeams"  onclick="hideMegaMenu('bundleMegaMenu')">Tasks</g:link></li>
             </tds:hasPermission>
 	        <tds:hasPermission permission='ConsoleMenuView'>
 			<li id="consoleMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="dashboardView" params="['showAll':'show']">Console
