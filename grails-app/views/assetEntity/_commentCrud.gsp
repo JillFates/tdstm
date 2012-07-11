@@ -54,13 +54,13 @@
          <td valign="top" class="name"><label for="createdBy">Created By:</label></td>
          <td valign="top" class="value" id="createdById"></td>
          
-      </tr>
+      </tr >
       <tr class="prop">
          <td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
          <td valign="top" class="value" id="commentTypeTdId"></td>
          
       </tr>
-      <tr>
+      <tr class = "issue" id="categoryTrId" style="display:none">
          <td valign="top" class="name"><label for="category">Category:</label></td>
          <td valign="top" class="value" id="categoryTdId"></td>
          
@@ -93,7 +93,7 @@
       </tr>
    </table>
    </div>
-   <div id="showResolveDiv" style="display: none;">
+   <div id="showResolveDiv" style="display: none;" class="issue">
       <table id="showResolveTable" style="border: 0px">
       <tr class="prop">
          <td valign="top" class="name"><label for="previousNotes">Previous Notes:</label></td>
@@ -256,7 +256,7 @@
       <% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
 	   <tr class="prop issue" id="assignedToTrEditId" style="display: none">
 			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
-			<td valign="top" id="assignedToEditTdId" style="width: 20%;display: none;">
+			<td valign="top" id="assignedToEditTdId" style="width: 20%;display: none;" class="issue" >
 				<g:select id="assignedToEditId" name="assignedTo" from="${partyList}" value="" optionKey="id" noSelection="['':'please select']"></g:select>
 			</td>
 		</tr> 
@@ -289,14 +289,14 @@
 				
 			</td>
 		</tr>
-		<tr class="prop" id="mustVerifyEditTd" style="display: none;">
+		<tr class="prop" id="mustVerifyEditTr" style="display: none;">
 			<td valign="top" class="name"><label for="mustVerifyEditId">Must Verify:</label></td>
 			<td  valign="top" class="value">
 				<input type="checkbox" id="mustVerifyEditId" name="mustVerify" value="0"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
 			</td>
 		</tr>
-		<tr class="prop">
+		<tr class="prop issue">
 			<td valign="top" class="name"><label for="category">Category:</label></td>
 			<td valign="top" class="value"><g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"></g:select></td>
 		</tr>
@@ -325,7 +325,7 @@
 		</tr>
 	</table>		
 	</div>
-	<div id="editResolveDiv" style="display: none;">
+	<div id="editResolveDiv" style="display: none;" class="issue">
 	<table id="updateResolveTable" style="border: 0px;">
 	   <tr class="prop">
 			<td valign="top" class="name"><label for="notes">Previous Notes:</label></td>
