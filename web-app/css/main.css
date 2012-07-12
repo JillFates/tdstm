@@ -340,3 +340,13 @@ th.desc a {
     color: #333;
     padding-left: 25px;
 }
+
+.completed {
+	 background-color:#FFFFFF;
+}
+.pending  {
+	 background-color:#7FFF00;
+}
+.inProgress {
+	 background-color:#0000FF;
+}

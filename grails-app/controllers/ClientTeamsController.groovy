@@ -943,4 +943,37 @@ class ClientTeamsController {
 			redirect ( action:'logisticsAssetSearch', params:params)
 		}
 	}
+	
+	def listComment={
+		def projectId = session.CURR_PROJ.CURR_PROJ
+		def projectInstance = Project.get(projectId)
+		def userId = session.getAttribute("LOGIN_PERSON").id
+		def personInstance = Person.get(userId)
+		def tab
+		def listComment
+		def todo = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND status != :status order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,status:'Completed',type:'issue'])
+		def all = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
+		if(params.tab=='todo'){
+			tab = 'todo'
+			listComment = todo
+		}else{
+		    tab = 'all'
+		    listComment = all
+		}
+		def todoSize = todo.size()
+		def allSize = all.size()
+		def issueList = []
+		
+		listComment.each{issue->
+			def css = 'inProgress'
+			if(issue.status=='Pending'){
+				css='pending'
+			}else if(issue.status=='Completed'){
+			    css='completed'
+			}
+			issueList << ['item':issue,'css':css]
+			
+		}
+		render (view:'myIssues',model:['listComment':issueList, 'tab':tab ,todoSize:todoSize,allSize:allSize])
+	}
 }
