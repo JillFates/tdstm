@@ -249,7 +249,7 @@
 					</g:if>
 					<g:else>
 					<g:if test="${clientConsoleCommentHasPermission}">
-						<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${assetEntity.id});"/>
+						<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${assetEntity.id},'${assetEntity.asset.assetName}');"/>
 					</g:if>
 					</g:else>
 			</g:else>
@@ -807,14 +807,17 @@
 		return data
 	}
 
-	function createNewAssetComment(asset){
+	function createNewAssetComment(asset,assetName){
 		timedUpdate('never')
 		if(asset) {
 			setAssetId( asset );
 		} else {
 			setAssetId( $('#newAssetCommentId').val() );
 		}
+		var name = assetName
 		$('#statusId').val('new');
+		$('#assetEntityTrId').css('display','table-row')
+		$('#assetEntityInputId').html(name)
 		$('#createCommentDialog').dialog('option', 'width', 'auto');
 		$('#createCommentDialog').dialog('open');
 		$('#commentsListDialog').dialog('close');

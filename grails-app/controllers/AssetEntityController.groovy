@@ -1730,7 +1730,7 @@ class AssetEntityController {
 		def css //= 'white'
 		assetCommentsInstance.each {
 			css = it.dueDate < today ? 'Lightpink' : 'White'
-			assetCommentsList <<[ commentInstance : it, assetEntityId : it.assetEntity.id,cssClass:css ]
+			assetCommentsList <<[ commentInstance : it, assetEntityId : it.assetEntity.id,cssClass:css,assetName: it.assetEntity.assetName]
 		}
 		render assetCommentsList as JSON
 	}

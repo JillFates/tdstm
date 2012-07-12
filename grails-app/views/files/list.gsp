@@ -85,7 +85,7 @@ $(document).ready(function() {
 								</g:remoteLink>
 							</g:elseif>
 							<g:else>
-							<a href="javascript:createNewAssetComment(${fileInstance.id});">
+							<a href="javascript:createNewAssetComment(${fileInstance.id},'${fileInstance.assetName}');">
 								<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
 							</a>
 							</g:else>

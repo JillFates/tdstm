@@ -804,7 +804,7 @@ function onInvokeAction(id) {
 											</g:remoteLink>
 										</g:elseif>
 										<g:else>
-										<a onclick="createNewAssetComment(${assetEntityBean.id});">
+										<a onclick="createNewAssetComment(${assetEntityBean.id},'${assetEntityBean.assetName}');">
 											<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
 										</a>
 										</g:else>

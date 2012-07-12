@@ -53,8 +53,8 @@
 							 </g:remoteLink>
 						     </g:elseif>
 						     <g:else>
-						     <a href="javascript:createNewAssetComment(${app.id});">
-							    <img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${app.id});"/>
+						     <a href="javascript:createNewAssetComment(${app.id},'${app.assetName}');">
+							    <img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${app.id},'${app.assetName}');"/>
 							 </a>
 							    
 						    </g:else> </span>

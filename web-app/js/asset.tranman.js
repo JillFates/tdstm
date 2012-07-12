@@ -491,14 +491,16 @@ function showAssetDialog( e , action ) {
 		    var listTbody = document.createElement('tbody');
 		    listTbody.id = 'listCommentsTbodyId'
 			var length = assetComments.length
+		    $('#assetEntityInputId').html(assetComments[0].assetName)
+		      
 		      	for (var i=0; i < length; i++) {
 		      	//generate dynamic rows	
 		      	  var commentObj = assetComments[i]
 		      	  var tr = document.createElement('tr');
 		      	  tr.id = "commentTr_"+commentObj.commentInstance.id
 		      	  //tr.setAttribute("class", commentObj.cssClass)
+		      	  tr.setAttribute('onmouseover','this.style.backgroundColor="white";');
 		      	  if(commentObj.commentInstance.commentType=='issue'){
-			      	  tr.setAttribute('onmouseover','this.style.backgroundColor="white";');
 			      	  tr.setAttribute('onmouseout','this.style.backgroundColor="'+commentObj.cssClass+'";');
 			      	  tr.style.backgroundColor=commentObj.cssClass;
 		      	  }
@@ -538,7 +540,7 @@ function showAssetDialog( e , action ) {
 			      commentCodeTd.id = 'commentCode_'+commentObj.commentInstance.id
 			      commentCodeTd.name = commentObj.commentInstance.id					   	  
 			      commentCodeTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
-			      	
+			      				     
 			      
 			      
 			      var image = document.createElement('img');
@@ -853,7 +855,7 @@ function showAssetDialog( e , action ) {
 			$("#editCommentDialog").dialog("close")
 	      	//generate dynamic rows	
 	      	  var tr = $('#commentTr_'+assetComments.assetComment.id);
-	      	  tr.css( 'background', '#65a342' );
+	      	 tr.css( 'background', '#65a342' );
 	      	  if(assetComments.assetComment.mustVerify != 0){
 		      $('#verifyText_'+assetComments.assetComment.id).attr('checked', true);
 		      } else {
@@ -903,6 +905,7 @@ function createIssue(){
 	document.forms['createCommentForm'].commentType.value = 'issue'
 	document.forms['createCommentForm'].commentType.disabled = 'disabled'
 	commentChange('#createResolveDiv','createCommentForm')
+	$('#assetEntityTrId').css('display','none')
 	$('#createResolveDiv').css('display','block');
 	$('#createCommentDialog').dialog('option', 'width', 'auto');
 	$('#createCommentDialog').dialog('option', 'position', ['center','top']);
@@ -1140,9 +1143,12 @@ function showModel(id){
 		}
 	})
 }
-function createNewAssetComment( asset ){
+function createNewAssetComment(asset, assetName){
 	setAssetId( asset );
+	var name = assetName
 	$('#createCommentDialog').dialog('option', 'width', 'auto');
+	$('#assetEntityTrId').css('display','table-row')
+	$('#assetEntityInputId').html(name)
 	$('#createCommentDialog').dialog('open');
 	$('#commentsListDialog').dialog('close');
 	$('#editCommentDialog').dialog('close');

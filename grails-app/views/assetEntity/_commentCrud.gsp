@@ -187,7 +187,12 @@
             	noSelection="['':'please select']" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
         	</td>
 		</tr>
-		
+		<tr class="prop" id="assetEntityTrId">
+        	<td valign="top" class="name"><label for="category">Asset Name:</label></td>
+        	<td style="margin-right:30px ;" valign="top">
+            	<span id="assetEntityInputId" ></span>
+        	</td>
+		</tr>
 		<tr class="prop" id="moveEventTrId" style="display:none">
 			<td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
 			<td style="margin-right:30px ;" valign="top">
