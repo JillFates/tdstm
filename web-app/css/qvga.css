@@ -226,6 +226,7 @@ a.mobselect {
 	border-top-color: #444; 
 	border-left-color: #444; 
 	border-right-color: #507028;
+	border-bottom-width: 6px;
 	background:#444;
 	padding:auto 0px;
 }
