@@ -1,22 +1,37 @@
 package com.tds.asset
 
 import com.tdssrc.grails.GormUtil
+
 class AssetComment {
+
 	
+
 	String comment
+
 	String commentType
+
 	Integer mustVerify = 0
+
 	AssetEntity assetEntity
 	MoveEvent moveEvent
+
 	Date dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
+
 	Integer isResolved = 0
+
 	Date dateResolved 
+
 	String resolution
+
 	Person resolvedBy
+
 	Person createdBy
 	Person assignedTo			// FKA owner
+
 	String commentCode 
+
 	String category = "general"
+
 	String displayOption = "U"	// Used in dashboard to control display of user entered test (comment) or a generic message
 	String attribute = 'default'
 	String commentKey
@@ -37,29 +52,42 @@ class AssetComment {
 	String role
 	Project project
 	
+
 	static hasMany = [notes : CommentNote]
 	
+
 	static constraints = {
+
 		
+
 		comment( blank:true, nullable:true  )
 		assetEntity( blank:true, nullable:true )
 		moveEvent(nullable: true)
 		// TODO - Need to verify if commentType can be blank/nullable
+
 		commentType( blank:false, nullable:false, inList: ['issue','instruction','comment'] )
+
 		mustVerify( nullable:true )
+
 		isResolved( nullable:true )
+
 		createdBy( nullable:true  )
 		assignedTo( blank:true, nullable:true  )
 		resolvedBy( nullable:true  )
+
 		resolution( blank:true, nullable:true  )
 		dateCreated( nullable:true  )
+
 		dateResolved( nullable:true  )
+
 		commentCode( blank:true, nullable:true  )
+
 		category( blank:false, nullable:false ,inList:['general', 'discovery', 'planning','walkthru','premove','shutdown','moveday','startup','postmove'])
+
 		displayOption( blank:false, inList: ['G','U'] ) // Generic or User
 		attribute( blank:true, nullable:true  )
 		commentKey( blank:true, nullable:true  )
-		status( blank:true, nullable:true , inList : [	'Pending', 'Started', 'Hold', 'Completed'] )
+		status( blank:true, nullable:true , inList : [	'Planned', 'Pending', 'Started', 'Hold', 'Completed'] )
 		predecessor( blank:true, nullable:true  )
 		duration( blank:true, nullable:true  )
 		type( blank:true, nullable:true , inList :['ASAP', 'SS', 'SF']  )
@@ -75,21 +103,37 @@ class AssetComment {
 		role( blank:true, nullable:true  )
 		dueDate( blank:true, nullable:true  )
 		project( blank:false, nullable:false  )
+
 	}
 
+
+
 	static mapping  = {	
+
 		version true
+
 		autoTimestamp false
+
 		id column: 'asset_comment_id'
+
 		resolvedBy column: 'resolved_by'
+
 		createdBy column: 'created_by'
+
 		columns {
+
 			comment sqltype: 'text'
+
 			mustVerify sqltype: 'tinyint'
+
 			isResolved sqltype: 'tinyint'
+
 			resolution sqltype: 'text'
+
 			displayOption sqltype: 'char(1)'
+
 		}
+
 	}
 	def getAssignedToString(){
 		return assignedTo.toString()
@@ -97,9 +141,15 @@ class AssetComment {
 	def getAssetName(){
 		return assetEntity.assetName
 	}
+
 	
+
 	String toString() {
+
 		 comment
+
 	}
+
 	
+
 }
