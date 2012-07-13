@@ -161,7 +161,7 @@ class WorkflowController {
 						}
 					}
 				}
-				message = "Workfolw \"${workflowInstance}\" created"
+				message = "Workflow \"${workflowInstance}\" was created"
 			}
 		}
 		redirect( action:home, params:[ message : message ] )

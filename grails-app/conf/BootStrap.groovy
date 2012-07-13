@@ -8,14 +8,21 @@ import com.tdssrc.grails.GormUtil
 class BootStrap {
 	def assetEntityAttributeLoaderService
 	def workflowService
-    def init = { servletContext ->
+	def stateEngineService
+	def init = { servletContext ->
 
-  	// Don't load bootstrap if production environment
-	// TODO : JPM Disabled BootStrap for testing
-return
-	if ( grails.util.GrailsUtil.environment.equals("production") ) return
-    	
-    	// -------------------------------
+		// Load all of the Workflow definitions into the StateEngine service
+		def workflowList = Workflow.list()
+		workflowList.each { wf ->
+			stateEngineService.loadWorkflowTransitionsIntoMap(wf.process, 'workflow')
+		}
+		
+		// Don't load bootstrap if production environment
+		// TODO : JPM Disabled BootStrap for testing
+		return
+		if ( grails.util.GrailsUtil.environment.equals("production") ) return
+
+		// -------------------------------
 		// Role Types
 		// The description now classifies groups of roles.  Eventually this will be implemented
 		// like ofBiz where there is a parent id.
@@ -28,11 +35,11 @@ return
 		def userRole = new RoleType( description:"System : User" )
 		userRole.id = "USER"
 		userRole.save( insert:true )
-		
+
 		def managerRole = new RoleType( description:"System : Manager" )
 		managerRole.id = "MANAGER"
 		managerRole.save( insert:true )
-		
+
 		def observerRole = new RoleType( description:"System : Observer" )
 		observerRole.id = "OBSERVER"
 		observerRole.save( insert:true )
@@ -124,15 +131,15 @@ return
 		def appSCRole = new RoleType( description:"App : Secondary Contact" )
 		appSCRole.id = "APP_2ND_CONTACT"
 		appSCRole.save( insert:true )
-		
+
 		def bundleRole = new RoleType( description:"Proj: Move Bundle" )
 		bundleRole.id = "MOVE_BUNDLE"
 		bundleRole.save( insert:true )
-		
+
 		def companyAdmin = new RoleType( description:"Staff: Company Administrator" )
 		companyAdmin.id = "COMPANY_ADMIN"
 		companyAdmin.save( insert:true )
-		
+
 		// -------------------------------
 		// Party Types
 		// -------------------------------
@@ -196,15 +203,15 @@ return
 		def vendorType = new PartyRelationshipType( description:"Vendors" )
 		vendorType.id = "VENDORS"
 		vendorType.save( insert:true )
-		
+
 		def projBundleStaffType = new PartyRelationshipType( description:"Bundle Staff" )
 		projBundleStaffType.id = "PROJ_BUNDLE_STAFF"
 		projBundleStaffType.save( insert:true )
 
-        // Don't think we need this (John)
-        //	    def projectRelaType = new PartyRelationshipType( description:"Project" )
-        //        projectRelaType.id = "PROJECT"
-        //        projectRelaType.save( insert:true )
+		// Don't think we need this (John)
+		//	    def projectRelaType = new PartyRelationshipType( description:"Project" )
+		//        projectRelaType.id = "PROJECT"
+		//        projectRelaType.save( insert:true )
 
 		def appRelaType = new PartyRelationshipType( description:"Application" )
 		appRelaType.id = "APPLICATION"
@@ -215,44 +222,44 @@ return
 		// -------------------------------
 		println "PERSONS"
 		def personJohn = new Person( firstName:'John', lastName:'Doherty', title:'Project Manager',
-			partyType:personPartyType ).save()
+					partyType:personPartyType ).save()
 		def personJimL = new Person( firstName:'Jim', lastName:'Laucher', title:'Tech',
-			partyType:personPartyType ).save()
+					partyType:personPartyType ).save()
 		def personLisa = new Person( firstName:'Lisa', lastName:'Carr', title:'Move Manager',
-			partyType:personPartyType ).save()
+					partyType:personPartyType ).save()
 		def personGenePoole = new Person( firstName:'Gene', lastName:'Poole', title:'Move Manager',
-			active:'N', partyType:personPartyType ).save()
+					active:'N', partyType:personPartyType ).save()
 		def personTim = new Person( firstName:'Tim', lastName:'Schutt', title:'Project Manager',
-			partyType:personPartyType ).save()
+					partyType:personPartyType ).save()
 		def personRobin = new Person( firstName:'Robin', lastName:'Banks', title:'Project Manager',
-			partyType:personPartyType ).save()
+					partyType:personPartyType ).save()
 		def personAnna = new Person( firstName:'Anna', lastName:'Graham',title:'Sys Opp',
-			partyType:personPartyType ).save()
+					partyType:personPartyType ).save()
 		def personReddy = new Person( firstName:'Lokanath', lastName:'Reddy',title:'Tech Lead',
-			partyType:personPartyType ).save()
+					partyType:personPartyType ).save()
 		def personBrock = new Person( firstName:'Brock', lastName:'Lee',title:'Tech',
-			partyType:personPartyType ).save()
+					partyType:personPartyType ).save()
 		def personTransport = new Person( firstName:'Tran', lastName:'Sport',title:'Transport',
-			partyType:personPartyType ).save()
+					partyType:personPartyType ).save()
 		def personRita = new Person( firstName:'Rita', lastName:'Booke', title:'MANAGER',
-			partyType:personPartyType ).save()
+					partyType:personPartyType ).save()
 		def personWarren = new Person( firstName:'Warren', lastName:'Peace', title:'OBSERVER ',
-			partyType:personPartyType ).save()	
-		
+					partyType:personPartyType ).save()
+
 
 		// This person account will actual share 3 logins (move tech, clean tech, and mover)
 		def personWorkStation = new Person( firstName:'Work', lastName:'Station', title:'Work Station User',
-			partyType:personPartyType ).save()	
-		
+					partyType:personPartyType ).save()
+
 		// Cedars staff for Raiser's Edge application
 		def personNBonner = new Person( firstName:'Nancy', lastName:'Bonner', title:'',
-			partyType:personPartyType  ).save()
+					partyType:personPartyType  ).save()
 		def personAMaslac = new Person( firstName:'Alan', lastName:'Maslac', title:'',
-			partyType:personPartyType  ).save()
+					partyType:personPartyType  ).save()
 		def personHKim = new Person( firstName:'Hongki', lastName:'Kim', title:'',
-			partyType:personPartyType  ).save()
+					partyType:personPartyType  ).save()
 		def personLCoronado = new Person( firstName:'Leo', lastName:'Coronado', title:'',
-			partyType:personPartyType  ).save()
+					partyType:personPartyType  ).save()
 
 		// -------------------------------
 		// Create User Login.
@@ -292,11 +299,11 @@ return
 		// -------------------------------
 		println "PROJECTS "
 		def cedarsProject = new Project( name:"Cedars-Sinai Move 1", projectCode:'CS1', client:cedars,
-			description:'100 servers', trackChanges:'Y', partyType:groupPartyType,
-			startDate:new Date(), completionDate: new Date()+10, workflowCode: 'STD_PROCESS' ).save();
+					description:'100 servers', trackChanges:'Y', partyType:groupPartyType,
+					startDate:new Date(), completionDate: new Date()+10, workflowCode: 'STD_PROCESS' ).save();
 		def twProject = new Project( name:"Time Warner VA Move", projectCode:'TM-VA-1', client:timeWarner,
-			description:'500 servers', trackChanges:'N', partyType:groupPartyType,
-			startDate:new Date(), completionDate: new Date()+10, workflowCode: 'STD_PROCESS' ).save();
+					description:'500 servers', trackChanges:'N', partyType:groupPartyType,
+					startDate:new Date(), completionDate: new Date()+10, workflowCode: 'STD_PROCESS' ).save();
 
 
 		// -------------------------------
@@ -309,16 +316,16 @@ return
 		// -------------------------------
 		println "MOVE BUNDLE"
 		def cedarsProjectMoveBundle1 = new MoveBundle( project: cedarsProject, name: "Bundle 1", moveEvent : moveEvent,
-            startTime: new Date(), completionTime: new Date()+1, operationalOrder:1 ).save( insert:true )
+					startTime: new Date(), completionTime: new Date()+1, operationalOrder:1 ).save( insert:true )
 		def cedarsProjectMoveBundle2 = new MoveBundle( project: cedarsProject, name: "Bundle 2",
-            startTime: new Date()+1, completionTime: new Date()+2, operationalOrder:1 ).save( insert:true )
+					startTime: new Date()+1, completionTime: new Date()+2, operationalOrder:1 ).save( insert:true )
 		def cedarsProjectMoveBundle3 = new MoveBundle( project: cedarsProject, name: "Bundle 3",
-            startTime: new Date()+2, completionTime: new Date()+3, operationalOrder:1 ).save( insert:true )
+					startTime: new Date()+2, completionTime: new Date()+3, operationalOrder:1 ).save( insert:true )
 		def cedarsProjectMoveBundle4 = new MoveBundle( project: cedarsProject, name: "Bundle 4",
-            startTime: new Date()+3, completionTime: new Date()+4, operationalOrder:1 ).save( insert:true )
+					startTime: new Date()+3, completionTime: new Date()+4, operationalOrder:1 ).save( insert:true )
 		def twProjectMoveBundle = new MoveBundle( project: twProject, name: "TW Bundle",
-            startTime: new Date()+12, completionTime: new Date()+15, operationalOrder:2 ).save( insert:true )
-		
+					startTime: new Date()+12, completionTime: new Date()+15, operationalOrder:2 ).save( insert:true )
+
 		// -------------------------------
 		// Create ProjectTeam
 		// -------------------------------
@@ -338,7 +345,7 @@ return
 		johnPref.userLogin = userJohn
 		johnPref.preferenceCode = "CURR_PROJ"
 		johnPref.save( insert: true)
-		
+
 		// -------------------------------
 		// Create PartyRole Details
 		// -------------------------------
@@ -353,7 +360,7 @@ return
 		new PartyRole( party:personWarren, roleType:observerRole ).save( insert:true )
 
 		// -------------------------------
-        // create Party Relationship
+		// create Party Relationship
 		// -------------------------------
 		println "PARTY RELATIONSHIPS "
 		// Save all the rows in list
@@ -419,12 +426,12 @@ return
 			// println "${it[0].id} : ${it[1].id} : ${it[2].id} : ${it[3].id} : ${it[4].id}"
 
 			new PartyRelationship(
-				partyRelationshipType: it[0],
-				partyIdFrom: it[1],
-				roleTypeCodeFrom: it[2],
-				partyIdTo: it[3],
-				roleTypeCodeTo: it[4]
-            ).save( insert:true )
+						partyRelationshipType: it[0],
+						partyIdFrom: it[1],
+						roleTypeCodeFrom: it[2],
+						partyIdTo: it[3],
+						roleTypeCodeTo: it[4]
+						).save( insert:true )
 		}
 
 		//--------------------------------
@@ -441,91 +448,91 @@ return
 		//---------------------------------
 		println "MODEL"
 		def refCodeList = [
-            [ "railType", "StorageWorks", 0 ],
-            [ "railType", "Ultrium Tape", 0 ]
+			[ "railType", "StorageWorks", 0 ],
+			[ "railType", "Ultrium Tape", 0 ]
 		]
 		refCodeList.each {
 			def refCode = new RefCode(
-				domain: it[0],
-				value: it[1],
-				sortOrder : it[2]
-			)
+						domain: it[0],
+						value: it[1],
+						sortOrder : it[2]
+						)
 			if ( !refCode.validate() || !refCode.save() ) {
 				def etext = "Unable to create refCode" +
-                GormUtil.allErrorsString( refCode )
+							GormUtil.allErrorsString( refCode )
 				println etext
 				log.error( etext )
 			}
 		}
-		
+
 		def dellManu = new Manufacturer(name:"DELL").save()
 		def hclManu = new Manufacturer(name:"HCL").save()
 		def modelList = [
-		    [ "server", dellManu ],
-		    [ "leaptop", dellManu ],
-		   	[ "mouse", dellManu ],
-		    [ "hardisk", dellManu ],
-		    [ "monitor", hclManu ],
-		    [ "keyboard", hclManu ],
-		    [ "cpu", hclManu ],
-		    [ "charger", hclManu ]
-		    ]
+			[ "server", dellManu ],
+			[ "leaptop", dellManu ],
+			[ "mouse", dellManu ],
+			[ "hardisk", dellManu ],
+			[ "monitor", hclManu ],
+			[ "keyboard", hclManu ],
+			[ "cpu", hclManu ],
+			[ "charger", hclManu ]
+		]
 		modelList.each {
 			def model = new Model(
-				modeName: it[0],
-				manufacturer : it[1]
-			)
+						modeName: it[0],
+						manufacturer : it[1]
+						)
 			if ( !model.validate() || !model.save() ) {
 				def etext = "Unable to create model" +
-				GormUtil.allErrorsString( model )
-		       	println etext
-		       	log.error( etext )
+							GormUtil.allErrorsString( model )
+				println etext
+				log.error( etext )
 			}
-   		}
+		}
 		//---------------------------------
 		//  Create Asset Entity
 		//---------------------------------
 		println "ASSET ENTITY"
 		def assetEntityList = [
-            ["105C31D", "Workstation B2600", "XX-232-YAB", "XX-232-YABB", "rackad1", "rackad11", "1", "11", "12", attributeSet, cedarsProject, "Server", "C2A133", "ASD12345", "Mail", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1, "shelf1", 1 ],
-            ["105D74C CSMEDI","7028-6C4", "XX-138-YAB", "XX-138-YABB", "rackad2", "rackad22", "2", "22",  "12", attributeSet, cedarsProject, "Server", "C2A134", "ASD2343455", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 2, "shelf1", 2 ],
-            ["AIX Console HMC3", "KVM", "MM-2232", "MM-22322", "rackad3", "rackad33", "4", "44", "1", attributeSet, cedarsProject, "Server", "C2A135", "ASD1893045", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 6, "shelf1", 3 ],
-            ["105D74C CSMEDI", "AutoView 3100", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad44", "3", "33", "1", attributeSet, cedarsProject, "KVM Switch", "C2A136", "ASD189234", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 5, "shelf1", 1 ],
-            ["CED14P", "Proliant 1600R", "RR-32-YAB", "RR-32-YABB", "rackad5", "rackad55", "6", "66", "5", attributeSet, cedarsProject, "KVM Switch", "C2A137", "SU02325456", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1],
-            ["AIX Console HMC2", "V490", "RR-32-YAB", "RR-32-YABB", "rackad1", "rackad66", "7", "77", "5", attributeSet, cedarsProject, "KVM Switch", "C2A138", "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1],
-            ["AXPNTSA", "Proliant DL380 G3", "RR-32-YAB", "RR-32-YABB", "rackad2", "rackad77", "5", "55", "3", attributeSet, cedarsProject, "KVM Switch", "ASD12345",  "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1],
-            ["CEDCONSOLE1", "StorageWorks", "RR-32-YAB", "RR-32-YABB", "rackad3", "rackad88", "8", "88", "6", attributeSet, cedarsProject, "KVM Switch", "C2A140", "ASD2343455", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1],
-            ["CSEGP2 = CSENSD1 IO Drawer 1", "Ultrium Tape", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad99", "9", "99", "7", attributeSet, cedarsProject, "KVM Switch", "C2A141", "SU0234423", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1]
+			["105C31D", "Workstation B2600", "XX-232-YAB", "XX-232-YABB", "rackad1", "rackad11", "1", "11", "12", attributeSet, cedarsProject, "Server", "C2A133", "ASD12345", "Mail", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1, "shelf1", 1 ],
+			["105D74C CSMEDI","7028-6C4", "XX-138-YAB", "XX-138-YABB", "rackad2", "rackad22", "2", "22",  "12", attributeSet, cedarsProject, "Server", "C2A134", "ASD2343455", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 2, "shelf1", 2 ],
+			["AIX Console HMC3", "KVM", "MM-2232", "MM-22322", "rackad3", "rackad33", "4", "44", "1", attributeSet, cedarsProject, "Server", "C2A135", "ASD1893045", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 6, "shelf1", 3 ],
+			["105D74C CSMEDI", "AutoView 3100", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad44", "3", "33", "1", attributeSet, cedarsProject, "KVM Switch", "C2A136", "ASD189234", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 5, "shelf1", 1 ],
+			["CED14P", "Proliant 1600R", "RR-32-YAB", "RR-32-YABB", "rackad5", "rackad55", "6", "66", "5", attributeSet, cedarsProject, "KVM Switch", "C2A137", "SU02325456", "SAP", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1],
+			["AIX Console HMC2", "V490", "RR-32-YAB", "RR-32-YABB", "rackad1", "rackad66", "7", "77", "5", attributeSet, cedarsProject, "KVM Switch", "C2A138", "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle1, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1],
+			["AXPNTSA", "Proliant DL380 G3", "RR-32-YAB", "RR-32-YABB", "rackad2", "rackad77", "5", "55", "3", attributeSet, cedarsProject, "KVM Switch", "ASD12345",  "ASD1765454", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1],
+			["CEDCONSOLE1", "StorageWorks", "RR-32-YAB", "RR-32-YABB", "rackad3", "rackad88", "8", "88", "6", attributeSet, cedarsProject, "KVM Switch", "C2A140", "ASD2343455", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1],
+			["CSEGP2 = CSENSD1 IO Drawer 1", "Ultrium Tape", "RR-32-YAB", "RR-32-YABB", "rackad4", "rackad99", "9", "99", "7", attributeSet, cedarsProject, "KVM Switch", "C2A141", "SU0234423", "Mail", cedarsProject.client, cedarsProjectMoveBundle2, cedarsGreenProjectTeam, cedarsRedProjectTeam, 1,"shelf1", 1]
 		]
 
 		// Insert the List of assetEntity
 		assetEntityList.each {
 			def assetEntity = new AssetEntity(
-				assetName: it[0],
-				model: it[1],
-				sourceLocation: it[2],
-				targetLocation: it[3],
-				sourceRack: it[4],
-				targetRack: it[5],
-				sourceRackPosition: it[6],
-				targetRackPosition: it[7],
-				attributeSet: it[9],
-				project: it[10],
-				assetType: it[11],
-				assetTag: it[12],
-				serialNumber: it[13],
-				application: it[14],
-				owner: it[15],
-				moveBundle: it[16],
-				sourceTeamMt: it[17],
-				targetTeamMt: it[18],
-				cart:it[19],
-				shelf:it[20],
-				priority:it[21]
-            )
+						assetName: it[0],
+						model: it[1],
+						sourceLocation: it[2],
+						targetLocation: it[3],
+						sourceRack: it[4],
+						targetRack: it[5],
+						sourceRackPosition: it[6],
+						targetRackPosition: it[7],
+						attributeSet: it[9],
+						project: it[10],
+						assetType: it[11],
+						assetTag: it[12],
+						serialNumber: it[13],
+						application: it[14],
+						owner: it[15],
+						moveBundle: it[16],
+						sourceTeamMt: it[17],
+						targetTeamMt: it[18],
+						cart:it[19],
+						shelf:it[20],
+						priority:it[21]
+						)
 			if ( ! assetEntity.validate() || ! assetEntity.save() ) {
 				def etext = "Unable to create asset ${it[0]}" +
-                GormUtil.allErrorsString( assetEntity )
+							GormUtil.allErrorsString( assetEntity )
 				println etext
 				log.error( etext )
 			}
@@ -535,47 +542,47 @@ return
 		//--------------------------------
 		println "PROJECT_ASSET_MAP"
 		def projectAssetMapList = [
-            [ cedarsProject, AssetEntity.get(1), 10 ],
-            [ cedarsProject, AssetEntity.get(2), 60 ],
-            [ cedarsProject, AssetEntity.get(3), 60 ],
-            [ cedarsProject, AssetEntity.get(4), 10 ],
-            [ cedarsProject, AssetEntity.get(5), 150 ],
-            [ cedarsProject, AssetEntity.get(6), 60 ],
-            [ cedarsProject, AssetEntity.get(7), 150 ],
-            [ cedarsProject, AssetEntity.get(8), 60 ],
-            [ cedarsProject, AssetEntity.get(9), 10 ]
+			[ cedarsProject, AssetEntity.get(1), 10 ],
+			[ cedarsProject, AssetEntity.get(2), 60 ],
+			[ cedarsProject, AssetEntity.get(3), 60 ],
+			[ cedarsProject, AssetEntity.get(4), 10 ],
+			[ cedarsProject, AssetEntity.get(5), 150 ],
+			[ cedarsProject, AssetEntity.get(6), 60 ],
+			[ cedarsProject, AssetEntity.get(7), 150 ],
+			[ cedarsProject, AssetEntity.get(8), 60 ],
+			[ cedarsProject, AssetEntity.get(9), 10 ]
 		]
-		
+
 		//	Insert the List of assetEntity
 		projectAssetMapList.each {
 			def projectAssetMap = new ProjectAssetMap(
-				project: it[0],
-				asset: it[1],
-				currentStateId: it[2]
-			)
+						project: it[0],
+						asset: it[1],
+						currentStateId: it[2]
+						)
 			if ( !projectAssetMap.validate() || !projectAssetMap.save() ) {
 				def etext = "Unable to create ProjectAssetMap" +
-                GormUtil.allErrorsString( projectAssetMap )
+							GormUtil.allErrorsString( projectAssetMap )
 				println etext
 				log.error( etext )
 			}
 		}
-		
+
 		//--------------------------------
-		// Create AssetTransition 
+		// Create AssetTransition
 		//--------------------------------
 		println "TRANSITIONS"
 		// Adding ‘Ready’ transition for all assets
 		def readyTarasitionList = [
-            [ "Ready", AssetEntity.get(1),cedarsProjectMoveBundle1],
-            [ "Ready", AssetEntity.get(2),cedarsProjectMoveBundle1],
-            [ "Ready", AssetEntity.get(3),cedarsProjectMoveBundle1],
-            [ "Ready", AssetEntity.get(4),cedarsProjectMoveBundle1],
-            [ "Ready", AssetEntity.get(5),cedarsProjectMoveBundle1],
-            [ "Ready", AssetEntity.get(6),cedarsProjectMoveBundle1],
-            [ "Ready", AssetEntity.get(7),cedarsProjectMoveBundle1],
-            [ "Ready", AssetEntity.get(8),cedarsProjectMoveBundle1],
-            [ "Ready", AssetEntity.get(9),cedarsProjectMoveBundle1]
+			[ "Ready", AssetEntity.get(1),cedarsProjectMoveBundle1],
+			[ "Ready", AssetEntity.get(2),cedarsProjectMoveBundle1],
+			[ "Ready", AssetEntity.get(3),cedarsProjectMoveBundle1],
+			[ "Ready", AssetEntity.get(4),cedarsProjectMoveBundle1],
+			[ "Ready", AssetEntity.get(5),cedarsProjectMoveBundle1],
+			[ "Ready", AssetEntity.get(6),cedarsProjectMoveBundle1],
+			[ "Ready", AssetEntity.get(7),cedarsProjectMoveBundle1],
+			[ "Ready", AssetEntity.get(8),cedarsProjectMoveBundle1],
+			[ "Ready", AssetEntity.get(9),cedarsProjectMoveBundle1]
 		]
 		//Insert the "Ready" list into Transitions
 		readyTarasitionList.each {
@@ -583,14 +590,14 @@ return
 		}
 		// Adding "PoweredDown" and "Release" to 4 of the assets
 		def powerTarasitionList = [
-            [ "PoweredDown", AssetEntity.get(1),cedarsProjectMoveBundle1],
-            [ "PoweredDown", AssetEntity.get(2),cedarsProjectMoveBundle1],
-            [ "PoweredDown", AssetEntity.get(3),cedarsProjectMoveBundle1],
-            [ "PoweredDown", AssetEntity.get(4),cedarsProjectMoveBundle1],
-            [ "Release", AssetEntity.get(1),cedarsProjectMoveBundle1],
-            [ "Release", AssetEntity.get(2),cedarsProjectMoveBundle1],
-            [ "Release", AssetEntity.get(3),cedarsProjectMoveBundle1],
-            [ "Release", AssetEntity.get(4),cedarsProjectMoveBundle1]
+			[ "PoweredDown", AssetEntity.get(1),cedarsProjectMoveBundle1],
+			[ "PoweredDown", AssetEntity.get(2),cedarsProjectMoveBundle1],
+			[ "PoweredDown", AssetEntity.get(3),cedarsProjectMoveBundle1],
+			[ "PoweredDown", AssetEntity.get(4),cedarsProjectMoveBundle1],
+			[ "Release", AssetEntity.get(1),cedarsProjectMoveBundle1],
+			[ "Release", AssetEntity.get(2),cedarsProjectMoveBundle1],
+			[ "Release", AssetEntity.get(3),cedarsProjectMoveBundle1],
+			[ "Release", AssetEntity.get(4),cedarsProjectMoveBundle1]
 		]
 		//	Insert the "PoweredDown" and "Release" list into Transitions
 		powerTarasitionList.each {
@@ -598,59 +605,59 @@ return
 		}
 		//	Adding "Unracking" to 2 of the assets and "Unracked" to 1 of the asset
 		def unrackTarasitionList = [
-            [ "Unracking", AssetEntity.get(1),cedarsProjectMoveBundle1],
-            [ "Unracking", AssetEntity.get(2),cedarsProjectMoveBundle1],
-            [ "Unracked", AssetEntity.get(1),cedarsProjectMoveBundle1]
+			[ "Unracking", AssetEntity.get(1),cedarsProjectMoveBundle1],
+			[ "Unracking", AssetEntity.get(2),cedarsProjectMoveBundle1],
+			[ "Unracked", AssetEntity.get(1),cedarsProjectMoveBundle1]
 		]
-		//	Insert the "Unracking" and "Unracked" list into Transitions		
+		//	Insert the "Unracking" and "Unracked" list into Transitions
 		unrackTarasitionList.each {
 			def unrackTarasition = workflowService.createTransition("STD_PROCESS", "SUPERVISOR", it[0], it[1], it[2], userJohn, null, "" )
 		}
-		
+
 		//--------------------------------
-		// Create DataTransferSet 
+		// Create DataTransferSet
 		//--------------------------------
 		def dataTransferSetList = [
-            // project, type, name, asset tag, s/n, AssetOwner
-		    ["TDS Master Spreadsheet", "B", "/templates/TDSMaster_template.xls", "MASTER" ],
-		    ["TDS Walkthru", "B", "/templates/walkthrough_template.xls", "WALKTHROUGH" ]
-        ]
-		                      
+			// project, type, name, asset tag, s/n, AssetOwner
+			["TDS Master Spreadsheet", "B", "/templates/TDSMaster_template.xls", "MASTER" ],
+			["TDS Walkthru", "B", "/templates/walkthrough_template.xls", "WALKTHROUGH" ]
+		]
+
 		// Insert the List of DataTransferSet
 		dataTransferSetList.each {
-		    def dataTransferSet = new DataTransferSet(
-                title: it[0],
-                transferMode: it[1],
-                templateFilename: it[2],
-                setCode: it[3]
-            ).save()
+			def dataTransferSet = new DataTransferSet(
+						title: it[0],
+						transferMode: it[1],
+						templateFilename: it[2],
+						setCode: it[3]
+						).save()
 		}
-		
+
 		//--------------------------------
-		// Create AssetComment 
+		// Create AssetComment
 		//--------------------------------
 		def assetCommentList = [
-		  			
-            ["Switch powersupply to 220V", "instruction", 1, AssetEntity.get(1), personJohn],
-            ["Tape the SCSI cable to the server", "instruction", 1, AssetEntity.get(1), personJohn],
-            ["After move we should upgrade this", "comment", 0, AssetEntity.get(1), personJohn],
-            ["The server is going to moved right after the move so don't bother dressing the cabling.", "issue", 0, AssetEntity.get(2), personJohn]
+
+			["Switch powersupply to 220V", "instruction", 1, AssetEntity.get(1), personJohn],
+			["Tape the SCSI cable to the server", "instruction", 1, AssetEntity.get(1), personJohn],
+			["After move we should upgrade this", "comment", 0, AssetEntity.get(1), personJohn],
+			["The server is going to moved right after the move so don't bother dressing the cabling.", "issue", 0, AssetEntity.get(2), personJohn]
 		]
 		//Insert the List of AssetComment
 		assetCommentList.each {
 			def assetComment = new AssetComment(
-				comment: it[0],
-				commentType: it[1],
-				mustVerify: it[2],
-				assetEntity: it[3],
-				createdBy: it[4]
-            ).save()
+						comment: it[0],
+						commentType: it[1],
+						mustVerify: it[2],
+						assetEntity: it[3],
+						createdBy: it[4]
+						).save()
 		}
-//		--------------------------------
+		//		--------------------------------
 		// Create MoveEventNews
 		//--------------------------------
 		def eventNewsList = [
-		  			
+
 			[moveEvent,'The truck has just arrived',personJohn],
 			[moveEvent,'Customer backups are delaying more start',personJohn],
 			[moveEvent,'After move we should upgrade this',personJohn],
@@ -659,10 +666,10 @@ return
 		//Insert the List of AssetComment
 		eventNewsList.each {
 			def moveEventNews = new MoveEventNews(
-				moveEvent: it[0],
-				message: it[1],
-				createdBy: it[2]
-            ).save()
+						moveEvent: it[0],
+						message: it[1],
+						createdBy: it[2]
+						).save()
 		}
 		/*
 		 * Getting Stream of object on AssetEntity_Attributes.xls and storing Stream as records in database 
@@ -671,12 +678,12 @@ return
 		InputStream stream
 		try {
 			stream = servletContext.getResourceAsStream("/resource/AssetEntity_Attributes.xls")
-                
-        } catch (Exception ex) {
-            println "exception while reading AssetEntity_Attributes file"
-            
-        }
-        assetEntityAttributeLoaderService.uploadEavAttribute(stream)
+
+		} catch (Exception ex) {
+			println "exception while reading AssetEntity_Attributes file"
+
+		}
+		assetEntityAttributeLoaderService.uploadEavAttribute(stream)
 
 
 	}
