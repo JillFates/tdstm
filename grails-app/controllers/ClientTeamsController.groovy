@@ -965,15 +965,24 @@ class ClientTeamsController {
 		def issueList = []
 		
 		listComment.each{issue->
-			def css = 'inProgress'
+			def css = 'asset_process'
 			if(issue.status=='Pending'){
-				css='pending'
+				css='asset_ready'
 			}else if(issue.status=='Completed'){
-			    css='completed'
+			    css='asset_done'
+			}else if(issue.status=='Hold'){
+			    css='asset_hold'
+			}else if(issue.status=='Planned'){
+			    css='asset_pending'
 			}
 			issueList << ['item':issue,'css':css]
 			
 		}
 		render (view:'myIssues',model:['listComment':issueList, 'tab':tab ,todoSize:todoSize,allSize:allSize])
+	}
+	
+	def showIssue={
+		def assetComment = AssetComment.get(params.issueId)
+		return[assetComment:assetComment]
 	}
 }

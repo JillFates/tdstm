@@ -9,12 +9,16 @@
 </head>
 <body>
 	<div class="mainbody">
-	<div class="timebar" ><div id="timebar" ></div></div>
+	<div class="menu4">
+		<ul>
+			<li><g:link class="mobmenu" controller="clientTeams" >Teams</g:link></li>
+			<li><g:link class="mobmenu mobselect" action="listComment" params='["tab":"Todo"]'>My Tasks</g:link></li>
+			<li><a href="#" class="mobmenu">Details</a></li>
+		</ul>
+	</div>
 	<div class="mobbodyweb">
-      	<g:form method="post" name="bundleTeamAssetForm" action="listComment">
-			<input name="bundleId" type="hidden" value="${bundleId}" />
-			<input name="teamId" type="hidden" value="${teamId}" />
-			<input name="location" type="hidden" value="${location}" />
+      	<g:form method="post" name="issueAssetForm" action="showIssue">
+			<input id="issueId" name="issueId" type="hidden" value="" />
 			<input name="tab" type="hidden" value="${tab}" />								              	
 		<div id="mydiv" onclick="this.style.display = 'none';setFocus();">						            
 			<g:if test="${flash.message}">
@@ -50,9 +54,9 @@
 			<table id="issueTable" style="height:80px;">
 			<thead>
 				<tr>
-					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="comment" title="Comment" params="['tab':tab]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="date_created" title="Created At" params="['tab':tab,]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="due_date" title="Due Date" params="['tab':tab]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:60px;"  action="listComment" property="comment" title="Comment" params="['tab':tab]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="date_created" title="Created At" params="['tab':tab,]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="due_date" title="Due Date" params="['tab':tab]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="comment_type" title="Type" params="['tab':tab]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="asset_entity_id" title="Asset" params="['tab':tab]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="status" title="Status" params="['tab':tab]"></g:sortableColumn>
@@ -60,10 +64,10 @@
 			</thead>
 			<tbody>
 			<g:each status="i" in="${listComment}" var="issue">
-				<tr class="${issue.css}"  onclick="">
+				<tr class="${issue.css}"  onclick="actionSubmit(${issue?.item?.id})">
 					<td class="asset_details_block">${issue?.item?.comment}</td>
-					<td class="asset_details_block col2">${issue?.item?.dateCreated}</td>
-					<td class="asset_details_block">${issue?.item?.dueDate}</td>
+					<td class="asset_details_block col2"><tds:convertDate date="${issue?.item?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+					<td class="asset_details_block"><tds:convertDate date="${issue?.item?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 					<td class="asset_details_block">${issue?.item?.commentType}</td>
 					<td class="asset_details_block">${issue?.item?.assetEntity?.assetName}</td>
 					<td class="asset_details_block">${issue?.item?.status}</td>
@@ -76,5 +80,12 @@
       		</g:form>
       		<br />
 	</div>
+ <script type="text/javascript">
+ function actionSubmit(id){
+   $('#issueId').val(id)
+   document.issueAssetForm.submit();
+ }
+
+ </script>
 </body>
 </html>

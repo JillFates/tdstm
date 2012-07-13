@@ -1800,7 +1800,12 @@ class AssetEntityController {
 	 * ------------------------------------------------------------ */
 	def updateComment = {
 		def map = commentService.saveUpdateCommentAndNotes(session, params, false)
-		render map as JSON
+		 if(params.redirectTo=='myTask'){
+			redirect(controller:'clientTeams' , action:'showIssue',params:[issueId:params.id])
+		 }else{
+		    render map as JSON
+		 }
+		
 	}
 	
 	/* delete the comment record

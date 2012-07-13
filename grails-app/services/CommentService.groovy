@@ -77,7 +77,7 @@ class CommentService {
 		if (params.displayOption) assetComment.displayOption = params.displayOption
 		if (params.attribute) assetComment.attribute = params.attribute
 		if (params.commentType) assetComment.commentType = params.commentType
-		if (params.resolution) assetComment.resolution = params.resolution
+	    assetComment.resolution = params.resolution
 
 		// Issues (aka tasks) have a number of additional properties to be managed 
 		if ( assetComment.commentType == 'issue' ) {
