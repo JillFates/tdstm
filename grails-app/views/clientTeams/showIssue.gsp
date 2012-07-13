@@ -31,7 +31,7 @@
 		<div class="clear" style="margin:5px;"></div>
 
 		<table style="border:0px; width:420px;margin-top: 10px;margin-bottom: 10px;">
-			<tr><td style="padding:0px;"><b>Comment</b>:&nbsp;<span id="search" >&nbsp;${assetComment.comment}</span><a href="#detail">(Details...)</a></td>
+			<tr><td style="padding:0px;"><b>Task :</b><br/>&nbsp;<span id="search" >&nbsp;${assetComment.comment}</span><a href="#detail">(Details...)</a></td>
 			</tr>
 		</table>
 	
@@ -44,24 +44,17 @@
 		<input id="redirectTo" name="redirectTo" type="hidden" value="myTask" />
 		<table style="width:420px;">
 			<tr>
-				<td class="heading" colspan=2><a class="heading" href="#comments">Other Actions</a></td>
+				<td class="heading" colspan=2><a class="heading" href="#comments">Task details:</a></td>
 			</tr>
 			<tr>
 			<td colspan=2>
 			</td>
 			</tr>		
 			<tr>
-			<td valign="top" class="name"><label for="comment">Comment:</label></td>
+			<td valign="top" class="name"><label for="comment">Task:</label></td>
 			<td colspan=2>
-			  <textarea rows="2" cols="100" style="width:188px;padding:0px;" title="Edit Comment..." id="editComment" name="comment" >${assetComment.comment}</textarea>
+			  <textarea rows="4" cols="100" style="width:188px;padding:0px;" title="Edit Comment..." id="editComment" name="comment" >${assetComment.comment}</textarea>
 			</td></tr>	
-			<tr class="prop issue" id="dueDatesEditId"  ><td valign="top" class="name"><label for="dueDate">DueDate:</label></td>
-				<td valign="top" class="value" id="dueDatesEditId" ><script type="text/javascript" charset="utf-8">
-	             jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-	             </script><input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDate" id="dueDateEdit"
-						value="<tds:convertDate date="${assetComment?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" /></td>
-				
-			</tr>
 			<tr class="prop" >
 				<td valign="top" class="name"><label for="status">Status:</label></td>
 				<td style="width: 20%;">
@@ -76,9 +69,28 @@
 					<g:select id="assignedToEditId" name="assignedTo" from="${partyList}" value="${assetComment.assignedTo.id}" optionKey="id" noSelection="['':'please select']"></g:select>
 				</td>
 			</tr> 
+			<tr class="prop issue" id="dueDatesEditId"  ><td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
+				<td valign="top" class="value" id="dueDatesEditId" ><script type="text/javascript" charset="utf-8">
+	             jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+	             </script><input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDate" id="dueDateEdit"
+						value="<tds:convertDate date="${assetComment?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" /></td>
+				
+			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="category">Category:</label></td>
 				<td valign="top" class="value"><g:select id="categoryEditId" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="${assetComment.category}"></g:select></td>
+			</tr>
+			<tr>
+			<g:if test="${assetComment.assetEntity}">
+		   		  <td>Asset Entity:</td><td>&nbsp;${assetComment?.assetEntity.assetName}</td>
+		   		</g:if>
+		   		<g:if test="${assetComment.moveEvent}">
+		   		  <td>Move Event:</td><td>&nbsp;${assetComment?.moveEvent.name}</td>
+		   		</g:if>
+		   	</tr>
+		   	<tr class="prop">
+				<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
+				<td valign="top" class="value"><span id="categoryEditId">${assetComment?.createdBy}</span></td>
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
@@ -88,10 +100,7 @@
 			</tr> 
 			
 			<tr><td class="buttonR" colspan=1 style="text-align:center;">
-				<input type="submit" value="Update Comment" onclick="return validateComment()" />
-			</td>
-			<td class="button_style" colspan=1 style="text-align:center;">
-				<input type="submit" value="HOLD" onclick="return holdComment();" class="action_button_hold" />
+				<input type="submit" value="Update Task" onclick="return validateComment()" />
 			</td>
 			</tr>	
 		</table>
@@ -130,6 +139,62 @@
 		</tr>
 		</table>
 		</div>
+		<div class="clear" style="margin:4px;"></div>
+		<div style="margin:2px;" class="reset" ></div>
+		<a name="detail" ></a>
+	 	<div style="float: left;">
+			<table style="width:420px;">
+			<tr>
+				<td class="heading"><a href="#detail">Details</a></td>
+				<td><span style="float:right;"><a href="#top">Top</a></span></td>
+			</tr>
+			<tr><td colspan=2>
+			<dl>
+               <g:if test="${assetComment?.assetEntity.assetType=='Application'}">
+	                <dt>Application Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+					<dt>Validation:</dt><dd>&nbsp;${assetComment?.assetEntity.validation}</dd>
+					<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
+					<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
+               </g:if>
+                <g:elseif test="${assetComment?.assetEntity.assetType=='Database'}">
+                    <dt>Database Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+					<dt>DB Size:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+					<dt>DB Format:</dt><dd>&nbsp;${assetComment?.assetEntity.dbFormat}</dd>
+					<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
+                </g:elseif>
+                <g:elseif test="${assetComment?.assetEntity.assetType=='Files'}">
+                    <dt>File Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+					<dt>FIle Size:</dt><dd>&nbsp;${assetComment?.assetEntity.fileSize}</dd>
+					<dt>File Format:</dt><dd>&nbsp;${assetComment?.assetEntity.fileFormat}</dd>
+					<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
+                </g:elseif>
+                <g:else>
+					<dt>Asset Tag:</dt><dd>&nbsp;${assetComment?.assetEntity.assetTag}</dd>
+					<dt>Asset Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+					<dt>Model:</dt><dd>&nbsp;${assetComment?.assetEntity.model}</dd>
+					<dt>Serial #:</dt><dd>&nbsp;${assetComment?.assetEntity.serialNumber}</dd>
+					<g:if test="${location == 'source'}">			   	
+				   		<dt>Location:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceLocation}</dd>
+				   		<dt>Room:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRoom}</dd>
+				   		<dt>Rack/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRack}/${assetComment?.assetEntity.sourceRackPosition}</dd>
+				   		<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
+						<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	
+					</g:if>
+					<g:else>				
+				   		<dt>Location:</dt><dd>&nbsp;${assetComment?.assetEntity.targetLocation}</dd>
+				   		<dt>Room:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRoom}</dd>
+				   		<dt>Rack/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRack}/${assetComment?.assetEntity.targetRackPosition}</dd>
+				   		<dt>Truck:</dt><dd>&nbsp;${assetComment?.assetEntity.truck}</dd>
+				   		<dt>Cart/Shelf:</dt><dd>&nbsp;${assetComment?.assetEntity.cart}/${assetComment?.assetEntity.shelf}</dd>
+				   		<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
+						<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	
+					</g:else>
+				</g:else>
+			</dl>
+		</tr>
+		</table>
+		
+		</div>
 </div>
 <script type="text/javascript">
  function validateComment(){
@@ -141,10 +206,6 @@
         
 	 }
 	 return boo
- }
- function holdComment(){
-      $('#statusEditId').val('Hold')
-      return true
  }
 
  </script>

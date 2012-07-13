@@ -951,8 +951,8 @@ class ClientTeamsController {
 		def personInstance = Person.get(userId)
 		def tab
 		def listComment
-		def todo = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND status != :status order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,status:'Completed',type:'issue'])
-		def all = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
+		def todo = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Pending' , 'Started')) order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
+		def all = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo  AND status in ('Hold', 'Planned','Completed') order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
 		if(params.tab=='todo'){
 			tab = 'todo'
 			listComment = todo

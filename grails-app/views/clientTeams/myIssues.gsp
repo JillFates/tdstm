@@ -54,21 +54,19 @@
 			<table id="issueTable" style="height:80px;">
 			<thead>
 				<tr>
-					<g:sortableColumn class="sort_column" style="width:60px;"  action="listComment" property="comment" title="Comment" params="['tab':tab]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="date_created" title="Created At" params="['tab':tab,]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="due_date" title="Due Date" params="['tab':tab]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="comment_type" title="Type" params="['tab':tab]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="asset_entity_id" title="Asset" params="['tab':tab]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:60px;"  action="listComment" property="comment" title="Task" params="['tab':tab]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="date_created" title="Created" params="['tab':tab,]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="due_date" title="Due" params="['tab':tab]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="asset_entity_id" title="Related to" params="['tab':tab]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="status" title="Status" params="['tab':tab]"></g:sortableColumn>
 				</tr>
 			</thead>
 			<tbody>
 			<g:each status="i" in="${listComment}" var="issue">
-				<tr class="${issue.css}"  onclick="actionSubmit(${issue?.item?.id})">
-					<td class="asset_details_block">${issue?.item?.comment}</td>
+				<tr class="${issue.css}" style="cursor: pointer;" onclick="actionSubmit(${issue?.item?.id})">
+					<td class="asset_details_block">${issue?.item?.comment?.size() > 50 ? issue?.item?.comment?.substring(0,40)+'...' : issue?.item?.comment}</td>
 					<td class="asset_details_block col2"><tds:convertDate date="${issue?.item?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 					<td class="asset_details_block"><tds:convertDate date="${issue?.item?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-					<td class="asset_details_block">${issue?.item?.commentType}</td>
 					<td class="asset_details_block">${issue?.item?.assetEntity?.assetName}</td>
 					<td class="asset_details_block">${issue?.item?.status}</td>
 				</tr>
