@@ -51,78 +51,24 @@ environments {
    development {
       // grails.serverURL = "http://localhost/tdstm"
       grails.serverURL = "http://localhost:8080/tdstm"
-      log4j {
-         appender.'errors.File'="/var/log/tomcat/stacktrace.log"
-         appender.logfile = "org.apache.log4j.DailyRollingFileAppender "
-         appender.'logfile.File' = "/var/log/tomcat/tdstm.log"
-         appender.'logfile.layout' = "org.apache.log4j.PatternLayout"
-         appender.'logfile.layout.ConversionPattern' = '%d{[ dd.MM.yy HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n'
-
-         logger {
-            grails="debug,stdout,logfile"
-            org {
-               codehaus.groovy.grails.web.servlet="info,stdout,logfile"
-            }
-         }
-      }
    }
    production {
       grails.serverURL = "http://tm.tdsops.com/tdstm"
       // grails.serverURL = "http://ph1.tdsops.com/tdstm"
       // grails.serverURL = "http://dev01.tdsops.net:8080/tdstm"
-      log4j {
-         appender.'errors.File'="/var/log/tomcat/stacktrace.log"
-         appender.logfile = "org.apache.log4j.DailyRollingFileAppender "
-         appender.'logfile.File' = "/var/log/tomcat/tdstm.log"
-         appender.'logfile.layout' = "org.apache.log4j.PatternLayout"
-         appender.'logfile.layout.ConversionPattern' = '%d{[ dd.MM.yy HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n'
-
-         logger {
-            // grails="error,stdout,logfile"
-            grails="info,stdout,logfile"
-            org {
-               codehaus.groovy.grails.web.servlet="error,stdout,logfile"
-            }
-         }
-      }
    }
 }
 
-// log4j configuration
-log4j {
-    appender.stdout = "org.apache.log4j.ConsoleAppender"
-    appender.'stdout.layout'="org.apache.log4j.PatternLayout"
-    appender.'stdout.layout.ConversionPattern'='[%r] %c{2} %m%n'
-    appender.stacktraceLog = "org.apache.log4j.FileAppender"
-    appender.'stacktraceLog.layout'="org.apache.log4j.PatternLayout"
-    appender.'stacktraceLog.layout.ConversionPattern'='[%r] %c{2} %m%n'
-    appender.'stacktraceLog.File'="stacktrace.log"
-    rootLogger="error,stdout"
-    logger {
-        grails="error"
-        StackTrace="error,stacktraceLog"
-        org {
-            codehaus.groovy.grails.web.servlet="error"  //  controllers
-            codehaus.groovy.grails.web.pages="error" //  GSP
-            codehaus.groovy.grails.web.sitemesh="error" //  layouts
-            codehaus.groovy.grails."web.mapping.filter"="error" // URL mapping
-            codehaus.groovy.grails."web.mapping"="error" // URL mapping
-            codehaus.groovy.grails.commons="info" // core / classloading
-            codehaus.groovy.grails.plugins="error" // plugins
-            codehaus.groovy.grails.orm.hibernate="error" // hibernate integration
-            springframework="off"
-            hibernate="off"
-        }
-
-    }
-    additivity.StackTrace=false
-}
+//
 // For JSecurity
+//
 jsecurity.legacy.filter.enabled = true
 
+//
+// SendMail Configuration
+//
 grails {
 	mail {
-
 		host = "smtp.gmail.com"
 		port = 465
 		username = ""
@@ -130,8 +76,79 @@ grails {
 		props = ["mail.smtp.auth":"true",
 					"mail.smtp.socketFactory.port":"465",
 					"mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
-					"mail.smtp.socketFactory.fallback":"false"] // using port forwarding
-
-
+					"mail.smtp.socketFactory.fallback":"false"
+				]
 	}
 }
+grails.mail.default.from = "TDS Transition Manager <tds.transition.manager@gmail.com>"
+
+//
+// log4J Logging Configuration
+//
+// Any custom logging configuration should be done by copying this whole definition into a local tdstm-config.groovy 
+// configuration file in order to override this closure. When running locally, the logs will reside in the target directory
+// and for Tomcat they will reside in the CATALINA_HOME/logs directory.  
+// 
+log4j = {
+	// Configure classes to log at the various logging levels (defaulting to error)
+	error 'org.codehaus.groovy.grails.web.servlet',  //  controllers
+		  'org.codehaus.groovy.grails.web.pages', //  GSP
+		  'org.codehaus.groovy.grails.web.sitemesh', //  layouts
+		  'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+		  'org.codehaus.groovy.grails.web.mapping', // URL mapping
+		  'org.codehaus.groovy.grails.commons', // core / classloading
+		  'org.codehaus.groovy.grails.plugins', // plugins
+		  'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+		  'org.springframework',
+		  'net.sf.ehcache.hibernate'
+	// trace 'org.hibernate'
+	// debug 'org.hibernate'
+	// info 'org.codehaus.groovy.grails.web.mapping' // URL mapping
+	// off 'org.hibernate'
+ 
+	appenders {
+	   def appName = appName ?: "tdstm"	// If not defined (for local config)
+	   def commonPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n"
+	   def logDirectory = 'target'
+	   if (System.properties.getProperty('catalina.base')) {
+		   logDirectory = "${System.properties.getProperty('catalina.base')}/logs"
+	   }
+ 
+	   // Use this if we want to modify the default appender called 'stdout'.
+	   console name:'stdout', layout:pattern(conversionPattern: '[%t] %-5p %c{2} %x - %m%n')
+ 
+	   // Application log file
+	   rollingFile name:'applicationLog',
+			   file:"${logDirectory}/${appName}.log",
+			   maxFileSize:'500MB',
+			   maxBackupIndex:7
+			   layout:pattern(conversionPattern: commonPattern)
+ 
+	   // Stacktrace log file
+	   // Use the 'null' line only, if we want to prevent creation of a stacktrace.log file.
+	   // 'null' name:'stacktrace'
+	   rollingFile name:'stacktraceLog',
+			   file:"$logDirectory/${appName}-stacktrace.log",
+			   maxFileSize:'500MB',
+			   maxBackupIndex:7
+			   layout:pattern(conversionPattern: commonPattern)
+	}
+	
+	// Set the logging level for the various appenders based on environment
+	environment {
+		development {
+			root {
+				info 'stdout', 'applicationLog'
+				// additivity = false
+			 }
+		}
+		production {
+			root {
+				error 'stdout', 'applicationLog'
+				// additivity = false
+			 }
+		}
+	}
+	additivity.StackTrace=false
+ }
+ 
