@@ -635,9 +635,9 @@ function showAssetDialog( e , action ) {
 	      	 $('#isResolvedId').val(ac.isResolved)
 	      	 $('#categoryTdId').html(ac.category)
 	      	 $('#commentCodeTdId').html(ac.commentCode)
-	      	 $('#assetShowValueId').html(params.assetNames)
-		     $('#assetTrShowId').html(params.assetNames)
-		     $('#eventShowValueId').html(params.assetNames)
+	      	 $('#assetShowValueId').html(params.assetName)
+		     $('#assetTrShowId').html(params.assetName)
+		     $('#eventShowValueId').html(params.eventName)
 	      	 if(ac.commentType=='issue'){
 	      		 if(params.assignedTo){
 			      	 $('#assignedToTdId').html(params.assignedTo.firstName + " " + params.assignedTo.lastName)

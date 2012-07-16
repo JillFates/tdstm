@@ -1775,11 +1775,13 @@ class AssetEntityController {
 			assetComment:assetComment,
 			personCreateObj:personCreateObj,
 			personResolvedObj:personResolvedObj,
-			dtCreated:dtCreated ? dtCreated : "",
-			dtResolved:dtResolved?dtResolved:"",
-			assignedTo:assetComment.assignedTo ? assetComment.assignedTo : "",
-			assetNames:assetComment.assetEntity != null  ? assetComment.assetEntity?.assetName : assetComment.moveEvent?.name ?: "",
-		    dueDate:dueDate?dueDate:'',notes:notes ]
+			dtCreated:dtCreated ?: "",
+			dtResolved:dtResolved ?: "",
+			assignedTo:assetComment.assignedTo ?: "",
+			assetName:assetComment.assetEntity?.assetName ?: "",
+			eventName:assetComment.moveEvent?.name ?: "",
+		    dueDate:dueDate ?: '',
+			notes:notes ]
 		render commentList as JSON
 	}
 	/* ----------------------------------------------------------------
