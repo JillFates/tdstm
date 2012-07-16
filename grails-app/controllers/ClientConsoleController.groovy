@@ -505,19 +505,32 @@ class ClientConsoleController {
 				// TODO : Handle error response from Ajax call
 				return
 			}
-    		def moveBundlesList = MoveBundle.findAll("from MoveBundle mb where mb.moveEvent = ? order by mb.name asc",[moveEvent])
 			def bundles
 	        if( bundleId == 'all' ){
+				def moveBundlesList = MoveBundle.findAll("from MoveBundle mb where mb.moveEvent = ? order by mb.name asc",[moveEvent])
 	        	//userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
-				bundles = "(${bundleId})"
-	        } else if(moveBundlesList.size() > 0){
-	        	bundles = (moveBundlesList.id).toString().replace("[","(").replace("]",")")
-	        } else {
-				log.error "Was unable to load list of bundles for MoveEvent Id [${moveEventId}]"
-				// TODO : handle error return from Ajax call
-				return
+				if(moveBundlesList.size() > 0) {
+					bundles = (moveBundlesList.id).toString().replace("[","(").replace("]",")")
+				} else {
+					log.error "There were no bundles for MoveEvent Id [${moveEventId}]"
+					// TODO : handle error return from Ajax call
+					return
+				}
+	        } else { 
+				// Verify that the bundle Id is from the project and is valid
+				if (bundleId.isNumber()) {
+					def moveBundle = MoveBundle.get(bundleId)
+					if (moveBundle.project == project) {
+						bundles = "(${bundleId})"
+					}
+				}
+				if (! bundles) {
+					log.error "Invalid bundle Id [${bundleId}] for the current project [${project}]"
+					// TODO : handle error return from Ajax call
+					return
+				}
+				
 	        }
-			assert bundles != null
 			
 			def lastPoolTime = params.lastPoolTime
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
