@@ -410,6 +410,7 @@ class PmoAssetTrackingService {
         def order = params.order
 		def limit = params.assetsInView
 		def offset = params.offset
+		// TODO : CLEANUP - remove as custom# from SQL statement as it is unnecessary
 		def query = new StringBuffer("""SELECT * FROM( select ae.asset_entity_id as id, ae.asset_name as assetName,ae.short_name as shortName,ae.asset_tag as assetTag,
 				ae.asset_type as assetType,mf.name as manufacturer, m.name as model, ae.application, ae.app_owner as appOwner, ae.app_sme as appSme,
 				ae.ip_address as ipAddress, ae.hinfo as os, ae.serial_number as serialNumber,m.usize, ae.rail_type as railType,
@@ -440,6 +441,7 @@ class PmoAssetTrackingService {
 				where ae.project_id = $projectId and ae.move_bundle_id  in ${bundles} and ae.asset_type not in ('Application','Files','Database')
 				GROUP BY ae.asset_entity_id ) ae WHERE  1 = 1""")
 				
+		// TODO : SECURITY - the follow code constructs SQL with user input data from params - possible SQL Injection
 		if(column1Value !="" && column1Value!= null){
 			if(column1Value == 'blank'){
 				query.append(" and ae.${columns?.column1.field} = '' OR ae.${columns?.column1.field} is null")
@@ -474,6 +476,8 @@ class PmoAssetTrackingService {
 			}
 		}
 		// get the total assets
+		// TODO - PERFORMANCE - The following code makes two SQL calls. Perhaps we can just call ONCE and handle the limit/offset in another way.  Also, if offset or limit are not specified we doing the 2nd query for nothing.
+		log.debug "SQL to be executed: ${query.toString()}"
 		def resultListSize =jdbcTemplate.queryForList(query.toString())?.size()
 		if(sortby != "" && sortby != null){
 			query.append(" order by $sortby")
@@ -492,9 +496,9 @@ class PmoAssetTrackingService {
 			} else {
 				query.append(" limit ${limit}")
 			}
-				
 		}
-		
+
+		// TODO : SECURITY - Wrap this in a try/catch so user doesn't see the SQL		
 		def resultList=jdbcTemplate.queryForList(query.toString())
 		
 		return [resultList,resultListSize]
@@ -518,6 +522,7 @@ class PmoAssetTrackingService {
 		def offset = params.offset
 		def sortby = params.sort
         def order = params.order
+		// TODO : CLEANUP - there is no need for the nested select statements in this query.  Remove the outer SELECT"
 		def query = new StringBuffer("""SELECT * FROM (SELECT * FROM( select ae.asset_entity_id as id, ae.asset_name as assetName,ae.short_name as shortName,ae.asset_tag as assetTag,
 				ae.asset_type as assetType,mf.name as manufacturer, m.name as model, ae.application, ae.app_owner as appOwner, ae.app_sme as appSme,
 				ae.ip_address as ipAddress, ae.hinfo as os, ae.serial_number as serialNumber,m.usize, ae.rail_type as railType,

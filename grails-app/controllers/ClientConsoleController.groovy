@@ -466,30 +466,59 @@ class ClientConsoleController {
 	 * @return: AssetEntity object with recent transactions
 	 *----------------------------------------------------*/
 	def getTransitions = {
-		def bundleId = params.moveBundle
 		def workFlowCode
-		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
-		if(bundleId!="all"){
-		   def moveBundleInstance = MoveBundle.get(bundleId)
-		   workFlowCode = moveBundleInstance.workflowCode
-		}else{
-		   workFlowCode = projectInstance.workflowCode
+		def project = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
+		
+		def bundleId = params.moveBundle
+		if (bundleId == "all") {
+		   workFlowCode = project.workflowCode
+		} else if (bundleId.isNumber() ) {
+		   def moveBundle = MoveBundle.get(bundleId)
+		   if (moveBundle) {
+			   def moveEvent = moveBundle.moveEvent
+			   if (moveEvent.project.id != project.id) {
+				// TODO : need to handle error return for Ajax call and put username into the error log
+			   	log.error "The project id associated with moveBundle Id [${bundleId}] did not match the user's current project"
+				return
+			   }
+		   } else {
+		   		log.error "Unable to load moveBundle for id [${bundleId}]"
+				// TODO : need to handle error return for Ajax call
+				return 
+		   }
+		   workFlowCode = moveBundle.workflowCode
+		} else {
+			log.error "moveBundle id was not properly passed to method"
+			// TODO : need to handle error return for Ajax call
+			return
 		}
+		
 		def moveEventId = params.moveEvent
 		def assetEntityList = []
 		def assetEntityAndCommentList = []
 		DateFormat formatter = new SimpleDateFormat("hh:mm a");
 		
-		if (moveEventId) {
-			def bundles
+		if ( moveEventId && moveEventId.isNumber() ) {
 			def moveEvent = MoveEvent.findById(moveEventId)
+			if ( moveEvent?.project != project ) {
+				log.error "The moveEvent Id param [${moveEventId}] is not associated with the user's current project"
+				// TODO : Handle error response from Ajax call
+				return
+			}
     		def moveBundlesList = MoveBundle.findAll("from MoveBundle mb where mb.moveEvent = ? order by mb.name asc",[moveEvent])
-	        if( bundleId && bundleId != 'all' ){
+			def bundles
+	        if( bundleId == 'all' ){
 	        	//userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
-				bundles = "("+bundleId+")"
+				bundles = "(${bundleId})"
 	        } else if(moveBundlesList.size() > 0){
 	        	bundles = (moveBundlesList.id).toString().replace("[","(").replace("]",")")
+	        } else {
+				log.error "Was unable to load list of bundles for MoveEvent Id [${moveEventId}]"
+				// TODO : handle error return from Ajax call
+				return
 	        }
+			assert bundles != null
+			
 			def lastPoolTime = params.lastPoolTime
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			def today = GormUtil.convertInToGMT( "now", tzId );
