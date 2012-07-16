@@ -12,7 +12,7 @@
 	<div class="menu4">
 		<ul>
 			<li><g:link class="mobmenu" controller="clientTeams" >Teams</g:link></li>
-			<li><g:link class="mobmenu mobselect" action="listComment" params='["tab":"Todo"]'>My Tasks</g:link></li>
+			<li><g:link class="mobmenu mobselect" action="listComment" params='["tab":"todo"]'>My Tasks</g:link></li>
 			<li><a href="#" class="mobmenu">Details</a></li>
 		</ul>
 	</div>
@@ -40,10 +40,10 @@
 			</td>
 			<td id="allId" class="tab">
 				<g:if test="${tab == 'all'}">
-				  <g:link class="tab_select" action="listComment" params='["tab":"All"]'>All&nbsp;(${allSize})</g:link>
+				  <g:link class="tab_select" action="listComment" params='["tab":"all"]'>All&nbsp;(${allSize})</g:link>
 				</g:if>
 				<g:else>
-				  <g:link class="tab_deselect" action="listComment" params='["tab":"All"]'>All&nbsp;(${allSize})</g:link>
+				  <g:link class="tab_deselect" action="listComment" params='["tab":"all"]'>All&nbsp;(${allSize})</g:link>
 				</g:else>
 			</td>
 			<td class="tab_search"><input  type="text" size="08" value="" id="search" name="search" autocorrect="off" autocapitalize="off" /></td>
@@ -77,6 +77,7 @@
 		</div>
       		</g:form>
       		<br />
+      	<g:link class="mobfooter" action="listComment" params="[viewMode:'mobile']">Use Mobile Site</g:link>
 	</div>
  <script type="text/javascript">
  function actionSubmit(id){

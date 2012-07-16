@@ -951,14 +951,18 @@ class ClientTeamsController {
 		def personInstance = Person.get(userId)
 		def tab
 		def listComment
-		def todo = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Pending' , 'Started')) order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
-		def all = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo  AND status in ('Hold', 'Planned','Completed') order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
-		if(params.tab=='todo'){
+		def viewMode = params.viewMode
+		if(viewMode){
+			session.setAttribute('ISSUE_VIEW_MODE', viewMode)
+		}
+		 	def todo = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Pending' , 'Started')) order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
+		    def all= AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo  AND status in ('Hold', 'Planned','Completed') order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
+		if(params.tab=='all'){
+			tab = 'all'
+			listComment = all
+		}else{
 			tab = 'todo'
 			listComment = todo
-		}else{
-		    tab = 'all'
-		    listComment = all
 		}
 		def todoSize = todo.size()
 		def allSize = all.size()
@@ -966,7 +970,7 @@ class ClientTeamsController {
 		
 		listComment.each{issue->
 			def css = 'asset_process'
-			if(issue.status=='Pending'){
+			if(issue.status=='Pending' || issue.status==''){
 				css='asset_ready'
 			}else if(issue.status=='Completed'){
 			    css='asset_done'
@@ -978,11 +982,20 @@ class ClientTeamsController {
 			issueList << ['item':issue,'css':css]
 			
 		}
-		render (view:'myIssues',model:['listComment':issueList, 'tab':tab ,todoSize:todoSize,allSize:allSize])
+		if(session.getAttribute('ISSUE_VIEW_MODE')=='mobile'){
+			render (view:'myIssues_m',model:['listComment':issueList, 'tab':tab ,todoSize:todoSize,allSize:allSize])
+		}else{
+			render (view:'myIssues',model:['listComment':issueList, 'tab':tab ,todoSize:todoSize,allSize:allSize])
+		}
 	}
 	
 	def showIssue={
 		def assetComment = AssetComment.get(params.issueId)
-		return[assetComment:assetComment]
+		def viewMode = session.getAttribute('ISSUE_VIEW_MODE')
+		if(viewMode=='mobile'){
+			render (view:'showIssue_m',model:['assetComment':assetComment])
+		}else{
+			return[assetComment:assetComment]
+		}
 	}
 }

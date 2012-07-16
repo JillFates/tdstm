@@ -1,19 +1,25 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="projectHeader" />
-	<title>Issue Details</title>
+<title>Asset</title>
+<jq:plugin name="jquery"/>
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
+<meta name="viewport" content="height=device-height,width=220" />
+	
+<script type="text/javascript">
+        window.addEventListener('load', function(){
+                setTimeout(scrollTo, 0, 0, 1);
+        }, false);
+</script>
 </head>
 <body>
 	<a name="top"></a>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
-	<div class="mainbody">
+	<div class="mainbody" style="width: 220px;">
+	<div id="mobtitle">TransitionManager&trade; - Mobile</div>
 	<div class="menu4">
 		<ul>
 			<li><g:link class="mobmenu" controller="clientTeams" >Teams</g:link></li>
@@ -28,9 +34,9 @@
 			</g:if> 
 		</div>
 
-		<div class="clear" style="margin:5px;"></div>
+		<div class="clear" style="margin:5px;width: 220px;"></div>
 
-		<table style="border:0px; width:420px;margin-top: 10px;margin-bottom: 10px;">
+		<table style="border:0px; width:220px;margin-top: 10px;margin-bottom: 10px;">
 			<tr><td style="padding:0px;"><b>Task :</b><br/>&nbsp;<span id="search" >&nbsp;${assetComment.comment}</span><a href="#detail">&nbsp;&nbsp;(related details...)</a></td>
 			</tr>
 		</table>
@@ -42,7 +48,7 @@
 		<a name="comments"></a>
 		<input id="issueId" name="id" type="hidden" value="${assetComment.id}" />
 		<input id="redirectTo" name="redirectTo" type="hidden" value="myTask" />
-		<table style="width:420px;">
+		<table style="width: 220px;">
 			<tr>
 				<td class="heading" colspan=2><a class="heading" href="#comments">Task details:</a></td>
 			</tr>
@@ -53,7 +59,7 @@
 			<tr>
 			<td valign="top" class="name"><label for="comment">Task:</label></td>
 			<td colspan=2>
-			  <textarea rows="4" cols="100" style="width:188px;padding:0px;" title="Edit Comment..." id="editComment" name="comment" >${assetComment.comment}</textarea>
+			  <textarea rows="1" cols="100" style="width:80px;padding:0px;" title="Edit Comment..." id="editComment" name="comment" >${assetComment.comment}</textarea>
 			</td></tr>	
 			<tr class="prop" >
 				<td valign="top" class="name"><label for="status">Status:</label></td>
@@ -66,13 +72,13 @@
 			<tr class="prop issue" id="assignedToTrEditId" >
 				<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
 				<td valign="top" id="assignedToEditTdId" style="width: 20%;" >
-					<g:select id="assignedToEditId" name="assignedTo" from="${partyList}" value="${assetComment.assignedTo.id}" optionKey="id" noSelection="['':'please select']"></g:select>
+					<g:select id="assignedToEditId" name="assignedTo"  from="${partyList}" value="${assetComment.assignedTo.id}" optionKey="id" noSelection="['':'please select']"></g:select>
 				</td>
 			</tr> 
 			<tr class="prop issue" id="dueDatesEditId"  ><td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
 				<td valign="top" class="value" id="dueDatesEditId" ><script type="text/javascript" charset="utf-8">
 	             jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-	             </script><input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDate" id="dueDateEdit"
+	             </script><input type="text" class="dateRange" size="15" style="width: 80px; height: 14px;" name="dueDate" id="dueDateEdit"
 						value="<tds:convertDate date="${assetComment?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" /></td>
 				
 			</tr>
@@ -95,7 +101,7 @@
 			<tr class="prop">
 				<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
 				<td valign="top" class="value" colspan="2">
-					<textarea cols="100" rows="2" style="width:188px;padding:0px;" id="resolutionEditId" name="resolution" >${assetComment.resolution}</textarea>
+					<textarea cols="100" rows="1" style="width:80px;padding:0px;" id="resolutionEditId" name="resolution" >${assetComment.resolution}</textarea>
 				</td>
 			</tr> 
 			<g:if test="${assetComment.dateResolved}">
@@ -159,60 +165,61 @@
 		<div style="margin:2px;" class="reset" ></div>
 		<a name="detail" ></a>
 		<g:if test="${assetComment?.assetEntity}">
-		 	<div style="float: left;">
-				<table style="width:420px;">
-				<tr>
-					<td class="heading"><a href="#detail">Details</a></td>
-					<td><span style="float:right;"><a href="#top">Top</a></span></td>
-				</tr>
-				<tr><td colspan=2>
-				<dl>
-	               <g:if test="${assetComment?.assetEntity?.assetType=='Application'}">
-		                <dt>Application Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
-						<dt>Validation:</dt><dd>&nbsp;${assetComment?.assetEntity.validation}</dd>
-						<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
-						<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
-	               </g:if>
-	                <g:elseif test="${assetComment?.assetEntity?.assetType=='Database'}">
-	                    <dt>Database Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
-						<dt>DB Size:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
-						<dt>DB Format:</dt><dd>&nbsp;${assetComment?.assetEntity.dbFormat}</dd>
-						<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
-	                </g:elseif>
-	                <g:elseif test="${assetComment?.assetEntity?.assetType=='Files'}">
-	                    <dt>File Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
-						<dt>FIle Size:</dt><dd>&nbsp;${assetComment?.assetEntity.fileSize}</dd>
-						<dt>File Format:</dt><dd>&nbsp;${assetComment?.assetEntity.fileFormat}</dd>
-						<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
-	                </g:elseif>
-	                <g:else>
-						<dt>Asset Tag:</dt><dd>&nbsp;${assetComment?.assetEntity?.assetTag}</dd>
-						<dt>Asset Name:</dt><dd>&nbsp;${assetComment?.assetEntity?.assetName}</dd>
-						<dt>Model:</dt><dd>&nbsp;${assetComment?.assetEntity?.model}</dd>
-						<dt>Serial #:</dt><dd>&nbsp;${assetComment?.assetEntity?.serialNumber}</dd>
-						<g:if test="${location == 'source'}">			   	
-					   		<dt>Location:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceLocation}</dd>
-					   		<dt>Room:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRoom}</dd>
-					   		<dt>Rack/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRack}/${assetComment?.assetEntity.sourceRackPosition}</dd>
-					   		<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
-							<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	
-						</g:if>
-						<g:else>				
-					   		<dt>Location:</dt><dd>&nbsp;${assetComment?.assetEntity.targetLocation}</dd>
-					   		<dt>Room:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRoom}</dd>
-					   		<dt>Rack/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRack}/${assetComment?.assetEntity.targetRackPosition}</dd>
-					   		<dt>Truck:</dt><dd>&nbsp;${assetComment?.assetEntity.truck}</dd>
-					   		<dt>Cart/Shelf:</dt><dd>&nbsp;${assetComment?.assetEntity.cart}/${assetComment?.assetEntity.shelf}</dd>
-					   		<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
-							<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	
-						</g:else>
-					</g:else>
-				</dl>
+	 	<div style="float: left;">
+			<table style="width: 220px;">
+			<tr>
+				<td class="heading"><a href="#detail">Details</a></td>
+				<td><span style="float:right;"><a href="#top">Top</a></span></td>
 			</tr>
-			</table>
-			
-			</div>
+			<tr><td colspan=2>
+			<dl>
+               <g:if test="${assetComment?.assetEntity.assetType=='Application'}">
+	                <dt>Application Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+					<dt>Validation:</dt><dd>&nbsp;${assetComment?.assetEntity.validation}</dd>
+					<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
+					<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
+               </g:if>
+                <g:elseif test="${assetComment?.assetEntity.assetType=='Database'}">
+                    <dt>Database Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+					<dt>DB Size:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+					<dt>DB Format:</dt><dd>&nbsp;${assetComment?.assetEntity.dbFormat}</dd>
+					<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
+                </g:elseif>
+                <g:elseif test="${assetComment?.assetEntity.assetType=='Files'}">
+                    <dt>File Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+					<dt>FIle Size:</dt><dd>&nbsp;${assetComment?.assetEntity.fileSize}</dd>
+					<dt>File Format:</dt><dd>&nbsp;${assetComment?.assetEntity.fileFormat}</dd>
+					<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
+                </g:elseif>
+                <g:else>
+					<dt>Asset Tag:</dt><dd>&nbsp;${assetComment?.assetEntity.assetTag}</dd>
+					<dt>Asset Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+					<dt>Model:</dt><dd>&nbsp;${assetComment?.assetEntity.model}</dd>
+					<dt>Serial #:</dt><dd>&nbsp;${assetComment?.assetEntity.serialNumber}</dd>
+					<g:if test="${location == 'source'}">			   	
+				   		<dt>Location:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceLocation}</dd>
+				   		<dt>Room:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRoom}</dd>
+				   		<dt>Rack/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRack}/${assetComment?.assetEntity.sourceRackPosition}</dd>
+				   		<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
+						<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	
+					</g:if>
+					<g:else>				
+				   		<dt>Location:</dt><dd>&nbsp;${assetComment?.assetEntity.targetLocation}</dd>
+				   		<dt>Room:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRoom}</dd>
+				   		<dt>Rack/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRack}/${assetComment?.assetEntity.targetRackPosition}</dd>
+				   		<dt>Truck:</dt><dd>&nbsp;${assetComment?.assetEntity.truck}</dd>
+				   		<dt>Cart/Shelf:</dt><dd>&nbsp;${assetComment?.assetEntity.cart}/${assetComment?.assetEntity.shelf}</dd>
+				   		<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
+						<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	
+					</g:else>
+				</g:else>
+			</dl>
+		</tr>
+		</table>
+		
+		</div>
 		</g:if>
+		
 </div>
 <script type="text/javascript">
  function validateComment(){
@@ -221,10 +228,10 @@
 	 if(status=='Completed' && $('#resolutionEditId').val()==''){
 		 boo= false
          alert("Please Enter Resolution")
+        
 	 }
 	 return boo
  }
-
  </script>
 </body>
 </html>
