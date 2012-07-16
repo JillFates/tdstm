@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Asset</title>
+<title>Task Details</title>
 <jq:plugin name="jquery"/>
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
@@ -57,9 +57,8 @@
 			</td>
 			</tr>		
 			<tr>
-			<td valign="top" class="name"><label for="comment">Task:</label></td>
 			<td colspan=2>
-			  <textarea rows="4" cols="100" style="width:150px;padding:0px;" title="Edit Comment..." id="editComment" name="comment" >${assetComment.comment}</textarea>
+			  <textarea rows="4" cols="130" style="width:150px;padding:0px;" title="Edit Comment..." id="editComment" name="comment" >${assetComment.comment}</textarea>
 			</td></tr>	
 			<tr class="prop" >
 				<td valign="top" class="name"><label for="status">Status:</label></td>
@@ -70,12 +69,13 @@
 			</tr>	
 			 <% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
 			<tr class="prop issue" id="assignedToTrEditId" >
-				<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
-				<td valign="top" id="assignedToEditTdId" style="width: 20%;" >
-					<g:select id="assignedToEditId" name="assignedTo"  from="${partyList}" value="${assetComment.assignedTo.id}" optionKey="id" noSelection="['':'please select']"></g:select>
+				<td valign="top" class="name"><label for="assignedTo">Assigned:</label></td>
+				<td valign="top" id="assignedToEditTdId" style="" >
+					<g:select id="assignedToEditId" name="assignedTo" from="${partyList}" value="${assetComment.assignedTo.id}" optionKey="id" noSelection="['':'please select']"></g:select>
 				</td>
 			</tr> 
-			<tr class="prop issue" id="dueDatesEditId"  ><td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
+			<tr class="prop issue" id="dueDatesEditId"  >
+				<td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
 				<td valign="top" class="value" id="dueDatesEditId" ><script type="text/javascript" charset="utf-8">
 	             jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 	             </script><input type="text" class="dateRange" size="15" style="width: 80px; height: 14px;" name="dueDate" id="dueDateEdit"
@@ -88,7 +88,7 @@
 			</tr>
 			<tr>
 			<g:if test="${assetComment.assetEntity}">
-		   		  <td>Asset Entity:</td><td>&nbsp;${assetComment?.assetEntity.assetName}</td>
+		   		  <td>Asset:</td><td>&nbsp;${assetComment?.assetEntity.assetName}</td>
 		   		</g:if>
 		   		<g:if test="${assetComment.moveEvent}">
 		   		  <td>Move Event:</td><td>&nbsp;${assetComment?.moveEvent.name}</td>
@@ -96,34 +96,30 @@
 		   	</tr>
 		   	<tr class="prop">
 				<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
-				<td valign="top" class="value"><span id="categoryEditId">${assetComment?.createdBy} at <tds:convertDate date="${assetComment?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span></td>
+				<td valign="top" class="value"><span id="categoryEditId">${assetComment?.createdBy} on <tds:convertDate date="${assetComment?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span></td>
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
-				<td valign="top" class="value" colspan="2">
-					<textarea cols="100" rows="4" style="width:150px;padding:0px;" id="resolutionEditId" name="resolution" >${assetComment.resolution}</textarea>
 				</td>
 			</tr> 
-			<g:if test="${assetComment.dateResolved}">
-				<tr class="prop">
-					<td valign="top" class="name"><label for="resolution">Resolved At:</label></td>
-					<td valign="top" class="value" colspan="2">
-						<span id="dateResolvedTd" >${assetComment.dateResolved}</span>
-					</td>
-				</tr> 
-			</g:if>
+			<tr class="prop">
+				<td valign="top" class="value" colspan="2">
+					<textarea cols="130" rows="4" style="width:150px;padding:0px;" id="resolutionEditId" name="resolution" >${assetComment.resolution}</textarea>
+				</td>
+			</tr> 
 			<g:if test="${assetComment.resolvedBy}">
 				<tr class="prop">
 					<td valign="top" class="name"><label for="resolution">Resolved By:</label></td>
-					<td valign="top" class="value" colspan="2">
-						<span id="resolvedByTd" >${assetComment.resolvedBy}</span>
+					<td valign="top" class="value" colspan="1">
+						<span id="resolvedByTd" >${assetComment.resolvedBy} on ${assetComment.dateResolved}</span>
 					</td>
 				</tr> 
 			</g:if>
 			
-			<tr><td class="buttonR" colspan=1 style="text-align:center;">
-				<input type="submit" value="Update Task" onclick="return validateComment()" />
-			</td>
+			<tr>
+				<td class="buttonR" colspan="2" style="text-align:right;">
+					<input type="submit" value="Update Task" onclick="return validateComment()" />
+				</td>
 			</tr>	
 		</table>
 </g:form>
@@ -219,7 +215,6 @@
 		
 		</div>
 		</g:if>
-		
 </div>
 <script type="text/javascript">
  function validateComment(){
