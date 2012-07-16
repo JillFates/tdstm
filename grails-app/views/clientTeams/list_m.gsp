@@ -21,6 +21,7 @@
 			<li><a href="#" class="mobmenu">Asset</a></li>
 		</ul>
 	</div>
+	<span style="font: bold 13px arial; float:left; margin-top: 10px;">Select <g:link controller="clientTeams" action="listComment" params="[viewMode:'mobile']" ><span class="buttonR"><input type="button" value="Your Task" class="buttonR"/></span></g:link> or a Team to use:</span>
 	<div class="mobbody">
 	<g:form action="home" name="loginForm">
         <input type="hidden" name="bundleId" id="bundleId"/>

@@ -306,5 +306,9 @@
 		$("#cablingPanel").css("background-color","#FFF")
 	}
 	</script>
+	<script>
+		currentMenuId = "#teamMenuId";
+		$("#teamMenuId a").css('background-color','#003366')
+	</script>
 </body>
 </html>

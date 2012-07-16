@@ -249,7 +249,7 @@ a.mobselect {
 	font: bold 11px Arial;
 	color: white;
 	background:black;
-	position: absolute;
+	position: fixed;
 	bottom:0px;
 	left:0px;
 	-webkit-border-radius: 0px;

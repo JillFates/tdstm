@@ -107,5 +107,9 @@
 		<g:link class="mobfooter" action="list" params="[projectId:projectId, viewMode:'mobile']">Use Mobile Site</g:link>
 	</div>
 <script type="text/javascript">setFocus();</script>
+<script>
+	currentMenuId = "#teamMenuId";
+	$("#teamMenuId a").css('background-color','#003366')
+</script>
 </body>
 </html>

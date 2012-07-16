@@ -46,7 +46,7 @@
 				  <g:link class="tab_deselect" action="listComment" params='["tab":"all"]'>All&nbsp;(${allSize})</g:link>
 				</g:else>
 			</td>
-			<td class="tab_search"><input  type="text" size="08" value="" id="search" name="search" autocorrect="off" autocapitalize="off" /></td>
+			<td class="tab_search"><input  type="text" size="08" value="" id="search" name="search" autocorrect="off" autocapitalize="off" onfocus="changeAction()" onblur="retainAction()"/></td>
 		</tr>
 		</table>
 		</div>
@@ -77,14 +77,25 @@
 		</div>
       		</g:form>
       		<br />
-      	<g:link class="mobfooter" action="listComment" params="[viewMode:'mobile']">Use Mobile Site</g:link>
+      <div>
+      	<g:link class="mobfooter"  saction="listComment" params="[viewMode:'mobile']">Use Mobile Site</g:link>
+      </div>
 	</div>
  <script type="text/javascript">
  function actionSubmit(id){
    $('#issueId').val(id)
    document.issueAssetForm.submit();
  }
-
+ function changeAction(){
+	 document.issueAssetForm.action = 'listComment'
+ }
+ function retainAction(){
+	 document.issueAssetForm.action = 'showIssue'
+ }
+ </script>
+ <script>
+	currentMenuId = "#teamMenuId";
+	$("#teamMenuId a").css('background-color','#003366')
  </script>
 </body>
 </html>

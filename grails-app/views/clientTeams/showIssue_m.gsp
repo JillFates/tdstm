@@ -59,7 +59,7 @@
 			<tr>
 			<td valign="top" class="name"><label for="comment">Task:</label></td>
 			<td colspan=2>
-			  <textarea rows="1" cols="100" style="width:80px;padding:0px;" title="Edit Comment..." id="editComment" name="comment" >${assetComment.comment}</textarea>
+			  <textarea rows="4" cols="100" style="width:150px;padding:0px;" title="Edit Comment..." id="editComment" name="comment" >${assetComment.comment}</textarea>
 			</td></tr>	
 			<tr class="prop" >
 				<td valign="top" class="name"><label for="status">Status:</label></td>
@@ -101,7 +101,7 @@
 			<tr class="prop">
 				<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
 				<td valign="top" class="value" colspan="2">
-					<textarea cols="100" rows="1" style="width:80px;padding:0px;" id="resolutionEditId" name="resolution" >${assetComment.resolution}</textarea>
+					<textarea cols="100" rows="4" style="width:150px;padding:0px;" id="resolutionEditId" name="resolution" >${assetComment.resolution}</textarea>
 				</td>
 			</tr> 
 			<g:if test="${assetComment.dateResolved}">

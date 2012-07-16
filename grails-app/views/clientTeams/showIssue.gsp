@@ -98,6 +98,26 @@
 					<textarea cols="100" rows="2" style="width:188px;padding:0px;" id="resolutionEditId" name="resolution" >${assetComment.resolution}</textarea>
 				</td>
 			</tr> 
+			 <tr class="prop">
+				<td valign="top" class="name"><label for="notes">Previous Notes:</label></td>
+				<td valign="top" class="value"><div id="previousNote" style="width: 180px">
+				 <table>
+                   <g:each in="${notes}" var="note" status="i" >
+                    <tr>
+	                    <td>${note[0]}</td>
+	                    <td>${note[1]}</td>
+                        <td>${note[2]}</td>
+                     </tr>
+                   </g:each>
+				 </table>
+				</div></td>
+			</tr>
+		    <tr class="prop">
+				<td valign="top" class="name"><label for="notes">Note:</label></td>
+				<td valign="top" class="value">
+				   <textarea cols="80" rows="4" id="noteEditId" name="note" style="width:188px;padding:0px;"></textarea>
+				</td>
+			</tr>
 			<g:if test="${assetComment.dateResolved}">
 				<tr class="prop">
 					<td valign="top" class="name"><label for="resolution">Resolved At:</label></td>
@@ -226,5 +246,9 @@
  }
 
  </script>
+ <script>
+	currentMenuId = "#teamMenuId";
+	$("#teamMenuId a").css('background-color','#003366')
+</script>
 </body>
 </html>

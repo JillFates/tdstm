@@ -955,8 +955,8 @@ class ClientTeamsController {
 		if(viewMode){
 			session.setAttribute('ISSUE_VIEW_MODE', viewMode)
 		}
-		 	def todo = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Pending' , 'Started')) order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
-		    def all= AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo  AND status in ('Hold', 'Planned','Completed') order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
+		def todo = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Pending' , 'Started')) order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
+		def all= AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo   order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
 		if(params.tab=='all'){
 			tab = 'all'
 			listComment = all
@@ -968,9 +968,10 @@ class ClientTeamsController {
 		def allSize = all.size()
 		def issueList = []
 		
+		
 		listComment.each{issue->
 			def css = 'asset_process'
-			if(issue.status=='Pending' || issue.status==''){
+			if(issue.status=='Pending' || issue.status=='' || issue.status==null){
 				css='asset_ready'
 			}else if(issue.status=='Completed'){
 			    css='asset_done'
@@ -991,11 +992,17 @@ class ClientTeamsController {
 	
 	def showIssue={
 		def assetComment = AssetComment.get(params.issueId)
+		def noteList = assetComment.notes.sort{it.dateCreated}
+		def notes = []
+		noteList.each{
+			def dateCreated = it.dateCreated.format("E, d MMM 'at ' HH:mma")
+			notes << [dateCreated , it.createdBy.toString() ,it.note]
+		}
 		def viewMode = session.getAttribute('ISSUE_VIEW_MODE')
 		if(viewMode=='mobile'){
-			render (view:'showIssue_m',model:['assetComment':assetComment])
+			render (view:'showIssue_m',model:['assetComment':assetComment,notes:notes])
 		}else{
-			return[assetComment:assetComment]
+			return[assetComment:assetComment,notes:notes]
 		}
 	}
 }

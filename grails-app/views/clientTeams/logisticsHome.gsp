@@ -75,5 +75,9 @@
 		<script type="text/javascript">
 		initializeTF();
 		</script>
+		<script>
+			currentMenuId = "#teamMenuId";
+			$("#teamMenuId a").css('background-color','#003366')
+		</script>
 </body>
 </html>
