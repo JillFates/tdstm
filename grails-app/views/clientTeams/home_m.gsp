@@ -81,7 +81,7 @@ dt {
 					</dl>
 				</div>
 				</g:form>
-				<g:link class="mobfooter" controller="clientTeams" style="color:white;" params="[projectId:projectId, viewMode:'web']">Use Full Site</g:link>
+				<g:link class="mobfooter" controller="clientTeams" style="color:white;" params="[ viewMode:'web']">Use Full Site</g:link>
 			</div>
 		</div>
 	</div>

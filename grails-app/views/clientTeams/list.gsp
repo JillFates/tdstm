@@ -67,7 +67,7 @@
 	</div>
         </div>
         </g:form>
-	<g:link class="mobfooter" action="list" style="color:white;" params="[projectId:projectId, viewMode:'mobile']">Use Mobile Site</g:link>
+	<g:link class="mobfooter" action="list" style="color:white;" params="[ viewMode:'mobile']">Use Mobile Site</g:link>
 
 <script type="text/javascript">
    function submitLoginForm( bundleId,teamId,role,location){
