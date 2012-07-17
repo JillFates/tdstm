@@ -97,7 +97,7 @@
 	</div>
  <script type="text/javascript">
 $( function() {
-	var timers = ${timers}
+	var timers = '${timers}'
 	if(timers && timers != "never" ){
    	  $("#selectTimedId").val( ${timers} );
    	  timedUpdate(${timers})
