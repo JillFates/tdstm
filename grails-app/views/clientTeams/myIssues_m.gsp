@@ -113,20 +113,21 @@
 			<td style="border-bottom:2px solid #507028;"><b>Tasks:</b></td>
 			<td id="todoId" class="tab">
 				<g:if test="${tab && tab == 'todo'}">
-				  <g:link class="tab_select" action="listComment"  params='["tab":"todo"]'>Todo&nbsp;(${todoSize})</g:link>
+				  <g:link class="tab_select" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(${todoSize})</g:link>
 				</g:if>
 				<g:else>
-				  <g:link class="tab_deselect" action="listComment"  params='["tab":"todo"]'>Todo&nbsp;(${todoSize})</g:link>
+				  <g:link class="tab_deselect" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(${todoSize})</g:link>
 				</g:else>
 			</td>
 			<td id="allId" class="tab">
 				<g:if test="${tab == 'all'}">
-				  <g:link class="tab_select" action="listComment" params='["tab":"all"]'>All&nbsp;(${allSize})</g:link>
+				  <g:link class="tab_select" action="listComment" params='["tab":"all","search":search]'>All&nbsp;(${allSize})</g:link>
 				</g:if>
 				<g:else>
-				  <g:link class="tab_deselect" action="listComment" params='["tab":"all"]'>All&nbsp;(${allSize})</g:link>
+				  <g:link class="tab_deselect" action="listComment" params='["tab":"all","search":search]'>All&nbsp;(${allSize})</g:link>
 				</g:else>
 			</td>
+			<td class="tab_search"><input  type="text" size="08" value="${search}" id="search" name="search" autocorrect="off" autocapitalize="off" onfocus="changeAction()" onblur="retainAction()"/></td>
 		</tr>
 		</table>
 		</div>
@@ -134,11 +135,11 @@
 			<table id="issueTable" style="height:80px;width:220px;">
 			<thead>
 				<tr>
-					<g:sortableColumn class="sort_column" style="width:60px;"  action="listComment" property="comment" title="Task" params="['tab':tab]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:60px;"  action="listComment" property="comment" title="Task" params="['tab':tab]"></g:sortableColumn><%--
 /*-					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="date_created" title="Created" params="['tab':tab,]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="due_date" title="Due" params="['tab':tab]"></g:sortableColumn>
 ---*/
-					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="asset_entity_id" title="Related to" params="['tab':tab]"></g:sortableColumn>
+					--%><g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="asset_entity_id" title="Related to" params="['tab':tab]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="status" title="Status" params="['tab':tab]"></g:sortableColumn>
 				</tr>
 			</thead>
@@ -146,10 +147,10 @@
 			<g:each status="i" in="${listComment}" var="issue">
 				<tr class="${issue.css}" style="cursor: pointer;" onclick="actionSubmit(${issue?.item?.id})">
 					<td class="asset_details_block">${issue?.item?.comment?.size() > 50 ? issue?.item?.comment?.substring(0,40)+'...' : issue?.item?.comment}</td>
-/*-					<td class="asset_details_block col2"><tds:convertDate date="${issue?.item?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+					<%--<td class="asset_details_block col2"><tds:convertDate date="${issue?.item?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 					<td class="asset_details_block"><tds:convertDate date="${issue?.item?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
----*/
-					<td class="asset_details_block">${issue?.item?.assetEntity?.assetName}</td>
+
+					--%><td class="asset_details_block">${issue?.item?.assetEntity?.assetName}</td>
 					<td class="asset_details_block">${issue?.item?.status}</td>
 				</tr>
 			</g:each>
@@ -162,12 +163,18 @@
       		<g:link class="mobfooter" action="listComment" style="color:white;" params="[viewMode:'web']">Use Full Site</g:link>
 	</div>
 <script type="text/javascript" >
-
 	function actionSubmit(id){
 	  $('#issueId').val(id)
 	  document.issueAssetForm.submit();
     }
+	function changeAction(){
+		 document.issueAssetForm.action = 'listComment'
+	}
 
+	function retainAction(){
+		 document.issueAssetForm.action = 'showIssue'
+	}
+	
 	setFocus();
 
 	function Bar(o){

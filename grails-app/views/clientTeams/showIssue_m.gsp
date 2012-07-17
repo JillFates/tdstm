@@ -99,8 +99,31 @@
 				<td valign="top" class="value"><span id="categoryEditId">${assetComment?.createdBy} on <tds:convertDate date="${assetComment?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span></td>
 			</tr>
 			<tr class="prop">
-				<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
+				<td valign="top" class="name"><label for="notes">Previous Notes:</label></td>
+			</tr>
+			<tr class="prop">
+			<td valign="top" class="value" colspan="2"><div id="previousNote" >
+				 <table style="width: 50px;">
+                   <g:each in="${notes}" var="note" status="i" >
+                    <tr>
+	                    <td>${note[0]}</td>
+	                    <td>${note[1]}</td>
+                        <td>${note[2]}</td>
+                     </tr>
+                   </g:each>
+				 </table>
+				</div></td>
+			</tr>
+		    <tr class="prop">
+				<td valign="top" class="name"><label for="notes">Note:</label></td>
+				
+			</tr>
+			<tr class="prop"><td valign="top" class="value" colspan="2">
+				   <textarea cols="130" rows="4" id="noteEditId" name="note" style="width:150px;padding:0px;"></textarea>
 				</td>
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
 			</tr> 
 			<tr class="prop">
 				<td valign="top" class="value" colspan="2">
@@ -111,7 +134,7 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label for="resolution">Resolved By:</label></td>
 					<td valign="top" class="value" colspan="1">
-						<span id="resolvedByTd" >${assetComment.resolvedBy} on ${assetComment.dateResolved}</span>
+						<span id="resolvedByTd" >${assetComment.resolvedBy} on <tds:convertDate date="${assetComment?.dateResolved}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span>
 					</td>
 				</tr> 
 			</g:if>

@@ -1,3 +1,5 @@
+import grails.converters.JSON
+
 import org.jsecurity.SecurityUtils
 
 import com.tds.asset.AssetCableMap
@@ -955,8 +957,15 @@ class ClientTeamsController {
 		if(viewMode){
 			session.setAttribute('ISSUE_VIEW_MODE', viewMode)
 		}
-		def todo = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Pending' , 'Started')) order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
-		def all= AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo   order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
+		def todo
+		def all
+		if(params.search){
+			todo = AssetComment.findAll("From AssetComment a where a.project = :project AND a.assetEntity.assetTag=:tag AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Pending' , 'Started')) order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue',tag:params.search])
+			all= AssetComment.findAll("From AssetComment a where a.project = :project  AND a.assetEntity.assetTag=:tag AND commentType=:type AND assignedTo = :assignedTo   order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue',tag:params.search])
+		}else{
+			todo = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Pending' , 'Started')) order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
+			all= AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo   order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
+		}
 		if(params.tab=='all'){
 			tab = 'all'
 			listComment = all
@@ -984,9 +993,9 @@ class ClientTeamsController {
 			
 		}
 		if(session.getAttribute('ISSUE_VIEW_MODE')=='mobile'){
-			render (view:'myIssues_m',model:['listComment':issueList, 'tab':tab ,todoSize:todoSize,allSize:allSize])
+			render (view:'myIssues_m',model:['listComment':issueList, 'tab':tab ,todoSize:todoSize,allSize:allSize,search:params.search])
 		}else{
-			render (view:'myIssues',model:['listComment':issueList, 'tab':tab ,todoSize:todoSize,allSize:allSize])
+			render (view:'myIssues',model:['listComment':issueList, 'tab':tab ,todoSize:todoSize,allSize:allSize,timers:session.MY_ISSUE_REFRESH.MY_ISSUE_REFRESH,search:params.search])
 		}
 	}
 	
@@ -1004,5 +1013,16 @@ class ClientTeamsController {
 		}else{
 			return[assetComment:assetComment,notes:notes]
 		}
+	}
+	
+	def setTimePreference = {
+		def timer = params.timer
+		def updateTime =[]
+		if(timer){
+			userPreferenceService.setPreference( "MY_ISSUE_REFRESH", "${timer}" )
+		}
+		def timeToUpdate = getSession().getAttribute("MY_ISSUE_REFRESH")
+		updateTime <<[updateTime:timeToUpdate]
+		render updateTime as JSON
 	}
 }

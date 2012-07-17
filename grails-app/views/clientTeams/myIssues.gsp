@@ -32,21 +32,35 @@
 			<td style="border-bottom:2px solid #507028;"><b>Tasks:</b></td>
 			<td id="todoId" class="tab">
 				<g:if test="${tab && tab == 'todo'}">
-				  <g:link class="tab_select" action="listComment"  params='["tab":"todo"]'>Todo&nbsp;(${todoSize})</g:link>
+				  <g:link class="tab_select" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(${todoSize})</g:link>
 				</g:if>
 				<g:else>
-				  <g:link class="tab_deselect" action="listComment"  params='["tab":"todo"]'>Todo&nbsp;(${todoSize})</g:link>
+				  <g:link class="tab_deselect" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(${todoSize})</g:link>
 				</g:else>
 			</td>
 			<td id="allId" class="tab">
 				<g:if test="${tab == 'all'}">
-				  <g:link class="tab_select" action="listComment" params='["tab":"all"]'>All&nbsp;(${allSize})</g:link>
+				  <g:link class="tab_select" action="listComment" params='["tab":"all","search":search]'>All&nbsp;(${allSize})</g:link>
 				</g:if>
 				<g:else>
-				  <g:link class="tab_deselect" action="listComment" params='["tab":"all"]'>All&nbsp;(${allSize})</g:link>
+				  <g:link class="tab_deselect" action="listComment" params='["tab":"all","search":search]'>All&nbsp;(${allSize})</g:link>
 				</g:else>
 			</td>
-			<td class="tab_search"><input  type="text" size="08" value="" id="search" name="search" autocorrect="off" autocapitalize="off" onfocus="changeAction()" onblur="retainAction()"/></td>
+			<td class="tab_search"><input  type="text" size="08" value="${search}" id="search" name="search" autocorrect="off" autocapitalize="off" onfocus="changeAction()" onblur="retainAction()"/></td>
+			<td class="tab_search">
+			    <select id="selectTimedId"
+				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setUpdateTime(e)') }">
+				<option value="never">Never</option>
+				<option value="30000">30s</option>
+				<option value="60000">1m</option>
+				<option value="120000">2m</option>
+				<option value="300000">5m</option>
+				<option value="600000">10m</option>
+			</select>
+		  </td>
+		  <td class="tab_search"><input type="button" id="updateId"
+				value="Update" onclick="pageReload();"/>
+		</td>
 		</tr>
 		</table>
 		</div>
@@ -82,16 +96,50 @@
       </div>
 	</div>
  <script type="text/javascript">
- function actionSubmit(id){
+$( function() {
+	if('${timers}' != "never"){
+   	  $("#selectTimedId").val( ${timers} );
+   	  timedUpdate(${timers})
+   	}
+});
+
+ 
+function actionSubmit(id){
    $('#issueId').val(id)
    document.issueAssetForm.submit();
- }
- function changeAction(){
+}
+
+function changeAction(){
 	 document.issueAssetForm.action = 'listComment'
- }
- function retainAction(){
+}
+
+function retainAction(){
 	 document.issueAssetForm.action = 'showIssue'
- }
+}
+
+function setUpdateTime(e) {
+	var timeUpdate = eval("(" + e.responseText + ")")
+	if(timeUpdate){
+		timedUpdate(timeUpdate[0].updateTime.MY_ISSUE_REFRESH)
+	}
+}
+	
+var timer
+function timedUpdate(timeoutPeriod) {
+	if(timeoutPeriod != 'never'){
+		clearTimeout(timer)
+		timer = setTimeout("pageRefresh()",timeoutPeriod);
+	} else {
+		clearTimeout(timer)
+	}
+}
+function pageRefresh(){
+	document.issueAssetForm.action = 'listComment'
+	document.issueAssetForm.submit()
+}
+function pageReload(){
+	window.location.href = document.URL;
+}
  </script>
  <script>
 	currentMenuId = "#teamMenuId";

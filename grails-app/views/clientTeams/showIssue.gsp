@@ -123,7 +123,7 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label for="resolution">Resolved At:</label></td>
 					<td valign="top" class="value" colspan="2">
-						<span id="dateResolvedTd" >${assetComment.dateResolved}</span>
+						<span id="dateResolvedTd" ><tds:convertDate date="${assetComment?.dateResolved}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span>
 					</td>
 				</tr> 
 			</g:if>
