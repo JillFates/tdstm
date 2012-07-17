@@ -995,7 +995,7 @@ class ClientTeamsController {
 		if(session.getAttribute('ISSUE_VIEW_MODE')=='mobile'){
 			render (view:'myIssues_m',model:['listComment':issueList, 'tab':tab ,todoSize:todoSize,allSize:allSize,search:params.search])
 		}else{
-			render (view:'myIssues',model:['listComment':issueList, 'tab':tab ,todoSize:todoSize,allSize:allSize,timers:session.MY_ISSUE_REFRESH.MY_ISSUE_REFRESH,search:params.search])
+			render (view:'myIssues',model:['listComment':issueList, 'tab':tab ,todoSize:todoSize,allSize:allSize,timers:session.MY_ISSUE_REFRESH?.MY_ISSUE_REFRESH,search:params.search])
 		}
 	}
 	
