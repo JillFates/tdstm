@@ -137,10 +137,15 @@ class ClientTeamsController {
 				headColor = 'pending'
 			}
 		}*/
+		def projectInstance = Project.get(projectId)
+		def userId = session.getAttribute("LOGIN_PERSON").id
+		def personInstance = Person.get(userId)
+		def todo = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Pending' , 'Started')) order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
+		def cssTodo = todo.size() > 0 ? 'buttonTodo' : 'buttonBlank'
 		if( viewMode != 'web'){
-			render( view:'list_m', model:[ sourceTeams:sourceTeams , targetTeams:targetTeams, projectId:projectId] )
+			render( view:'list_m', model:[ sourceTeams:sourceTeams , targetTeams:targetTeams, projectId:projectId,todo:todo.size(),cssTodo:cssTodo] )
 		} else {
-			return [ sourceTeams:sourceTeams , targetTeams:targetTeams , projectId:projectId]
+			return [ sourceTeams:sourceTeams , targetTeams:targetTeams , projectId:projectId,todo:todo.size(),cssTodo:cssTodo]
 		}
 		
 	}

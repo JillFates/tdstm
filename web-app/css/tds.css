@@ -55,6 +55,34 @@
 	text-decoration:none;
 	letter-spacing:1px;
 }
+.buttonTodo {
+	background-color:#7FFF00;
+	border:1px solid #328714;
+	background-image:url(../images/button_highlight.png);
+	background-repeat:repeat-x; 
+	font-family:"bold Arial",Helvetica,sans-serif;
+	font-size:12px;
+	padding: 2px 8px;
+	font-weight:bold;
+	margin:2px;
+	text-align:center;
+	text-decoration:none;
+	letter-spacing:1px;
+}
+.buttonBlank {
+	background-color:#808080;
+	border:1px solid #328714;
+	background-image:url(../images/button_highlight.png);
+	background-repeat:repeat-x; 
+	font-family:"bold Arial",Helvetica,sans-serif;
+	font-size:12px;
+	padding: 2px 8px;
+	font-weight:bold;
+	margin:2px;
+	text-align:center;
+	text-decoration:none;
+	letter-spacing:1px;
+}
 .buttonR input:hover{
 	color: #FFFFFF;
 	background-color:#5F9FCF;
