@@ -886,6 +886,7 @@ function showAssetDialog( e , action ) {
 		      $('#type_'+assetComments.assetComment.id).html(assetComments.assetComment.commentType);
 		      $('#dueDate_'+assetComments.assetComment.id).html(duedate);
 		      $('#comment_'+assetComments.assetComment.id).html(truncate(assetComments.assetComment.comment));
+		      $('#category_'+assetComments.assetComment.id).html(assetComments.assetComment.category);
 		      updateAssetCommentIcon( assetComments )
 		}
 	}
