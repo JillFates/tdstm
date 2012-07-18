@@ -135,7 +135,7 @@
 /*-					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="date_created" title="Created" params="['tab':tab,]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="due_date" title="Due" params="['tab':tab]"></g:sortableColumn>
 ---*/
-					--%><g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="asset_entity_id" title="Related to" params="['tab':tab]"></g:sortableColumn>
+					--%><g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="assetEntity" title="Related to" params="['tab':tab]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="status" title="Status" params="['tab':tab]"></g:sortableColumn>
 				</tr>
 			</thead>
