@@ -21,32 +21,39 @@
       	generateOptions(sourceSelectObj,sourceRacks,'none');
       	generateOptions(targetSelectObj,targetRacks,'all');
       	var hideIcons = "${rackFilters?.hideIcons}"
-        if(hideIcons == "on"){
-            $("#hideIcons").attr("checked",true)
-        }
-      	var backView = "${rackFilters?.backView}"
-        if(backView == "on"){
-                $("#backView").attr("checked",true)
-        }
-      	var frontView = "${rackFilters?.frontView}"
-        if(frontView == "on"){
-                $("#frontView").attr("checked",true)
-        }
-      	var bundleName = "${rackFilters?.bundleName}"
-        if(bundleName == "on"){
-                $("#bundleName").attr("checked",true)
-        }
-      	var otherBundle = "${rackFilters?.otherBundle}"
-        if(otherBundle == "on"){
-                $("#otherBundle").attr("checked",true)
-        }
-      	var showCabling = "${rackFilters?.showCabling}"
-        if(showCabling == "on"){
-                $("#showCabling").attr("checked",true)
-        }
+	        if(hideIcons == "on"){
+	            $("#hideIcons").attr("checked",true)
+	        }
+	        
+	      	var backView = "${rackFilters?.backView}"
+	        if(backView == "on"){
+	                $("#backViewId").attr("checked",true)
+	        }
+	        
+	      	var frontView = "${rackFilters?.frontView}"
+	        if(frontView == "on"){
+	                $("#frontView").attr("checked",true)
+	        }
+	        
+	      	var bundleName = "${rackFilters?.bundleName}"
+	        if(bundleName == "on"){
+	                $("#bundleNameId").attr("checked",true)
+	        }
+	        
+	      	var otherBundle = "${rackFilters?.otherBundle}"
+	        if(otherBundle == "on"){
+	                $("#otherBundleId").attr("checked",true)
+	        }
+	        
+	      	var showCabling = "${rackFilters?.showCabling}"
+	        if(showCabling == "on"){
+	                $("#showCabling").attr("checked",true)
+	        }
       	var targetList = "${targetRackFilter}"
       	var targetArray =	targetList.split(",")
-      	if(targetArray.length>1 || targetList!=""){
+      	if(sourceList=='none'){
+    		$("#sourceRackIdSelect option[value='none']").attr('selected', true);
+        }else if(targetArray.length>1 || targetList!=""){
 	        for(i=0; i<targetArray.length;i++){
 	            var optvalue = targetArray[i].trim();
 	            $("#targetRackIdSelect option[value="+optvalue+"]").attr('selected', 'selected');
@@ -57,15 +64,18 @@
 		}
 		
       	var sourceList = "${sourceRackFilter}"
+          
         	var sourceArray =	sourceList.split(",")
-        	if(sourceArray.length>1 || sourceList!=""){
-  	        for(i=0; i<sourceArray.length;i++){
-  	            var optsourcevalue = sourceArray[i].trim();
-  	            $("#sourceRackIdSelect option[value="+optsourcevalue+"]").attr('selected', 'selected');
-  	            $("#sourceRackIdSelect option[value='']").attr('selected', false);
-  	            $("#sourceRackIdSelect option[value='none']").attr('selected', false);
-  	 	    }
-  	    } else{
+        	if(sourceList=='none'){
+        		$("#sourceRackIdSelect option[value='none']").attr('selected', true);
+            }else if(sourceArray.length>=1 && sourceList!=""){
+	  	        for(i=0; i<sourceArray.length;i++){
+	  	            var optsourcevalue = sourceArray[i].trim();
+	  	            $("#sourceRackIdSelect option[value="+optsourcevalue+"]").attr('selected', 'selected');
+	  	            $("#sourceRackIdSelect option[value='']").attr('selected', false);
+	  	            $("#sourceRackIdSelect option[value='none']").attr('selected', false);
+	  	 	    }
+	  	    } else{
         		$("#sourceRackIdSelect option[value='']").attr('selected', 'selected');
         		$("#sourceRackIdSelect option[value='none']").attr('selected', false);
           }
@@ -100,7 +110,7 @@
      function submitForm(form){
      	if($("#bundleId").val() == 'null') {
      		alert("Please select bundle")
-     	} else if( !$("#frontView").is(":checked") && !$("#backView").is(":checked") ) {
+     	} else if( !$("#frontView").is(":checked") && !$("#backView").is(":checked") && !$("#frontViewId").is(":checked") && !$("#backViewId").is(":checked") ) {
      		alert("Please select print view")
      	} else if($('#commit').val() == 'Generate') {
 			$("#cablingDialogId").dialog("close")
@@ -184,9 +194,17 @@
 			<td>
 				<div style="width:150px">
 					<label for="frontView" ><input type="checkbox" name="frontView" id="frontView" />&nbsp;Front</label>&nbsp
-					<label for="backView" ><input type="checkbox" name="backView" id="backView" checked="checked"/>&nbsp;Back</label><br />
-					<label for="bundleName" ><input type="checkbox" name="bundleName" id="bundleName" checked="checked" />&nbsp;w/ bundle names</label><br />
-					<label for="otherBundle" ><input type="checkbox" name="otherBundle" id="otherBundle" checked="checked" />&nbsp;w/ other bundles</label><br />
+					<g:if test="${useCheck}">
+					   <label for="backView" ><input type="checkbox" name="backView" id="backViewId" />&nbsp;Back</label><br />
+					   <label for="bundleName" ><input type="checkbox" name="bundleName" id="bundleNameId" />&nbsp;w/ bundle names</label><br />
+					   <label for="otherBundle" ><input type="checkbox" name="otherBundle" id="otherBundleId" />&nbsp;w/ other bundles</label><br />
+					 </g:if>
+                    <g:else>
+                        <label for="backView" ><input type="checkbox" name="backView" id="backView" checked="checked"/>&nbsp;Back</label><br />
+						<label for="bundleName" ><input type="checkbox" name="bundleName" id="bundleName" checked="checked" />&nbsp;w/ bundle names</label><br />
+						<label for="otherBundle" ><input type="checkbox" name="otherBundle" id="otherBundle" checked="checked" />&nbsp;w/ other bundles</label><br />
+					</g:else>
+					
 					<label for="showCabling" ><input type="checkbox" name="showCabling" id="showCabling" />&nbsp;w/ diagrams</label><br />
 					<label for="hideIcons" ><input type="checkbox" name="hideIcons" id="hideIcons" />&nbsp;w/ Add Icons</label>
 				</div>
@@ -316,10 +334,11 @@
 		var bundleObj = $("#bundleId");
 		var bundle = "${bundle}"
 	    var bundleArray = bundle.split(",")
-      	if(bundleArray != null && bundleArray.size()>1){
+      	if(bundleArray != null && bundleArray != '' && bundleArray != 'all' && bundleArray.size()>0){
 	        for(i=0; i < bundleArray.size();i++){
 	            var optvalue = bundleArray[i].trim();
 	            $("#bundleId option[value="+optvalue+"]").attr('selected', 'selected');
+	            $("#bundleId option[value=all]").attr('selected', false);
 	 	    }
 	    } else {
 		    var isCurrentBundle = '${isCurrentBundle}'

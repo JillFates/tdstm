@@ -23,8 +23,9 @@ class RackLayoutsController {
 		def sourceRack= ""
 		def bundle= ""
 		def rackFilters
-		
+		def useCheck = false
 		if(session.getAttribute("USE_FILTERS")=="true"){
+		    useCheck = true
 			rackFilters = session.getAttribute( "RACK_FILTERS")
 			if(rackFilters){
 				targetRack = rackFilters?.targetrack ? rackFilters?.targetrack?.toString().replace("[","").replace("]","") : ""
@@ -56,7 +57,7 @@ class RackLayoutsController {
 		return [moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, projectId:projectId,
 				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models ,servers:servers, 
 				applications : applications, dbs : dbs, files : files, rackFilters:rackFilters, targetRackFilter:targetRack,
-				bundle:bundle,sourceRackFilter:sourceRack,rackLayoutsHasPermission:RolePermissions.hasPermission("rackLayouts")]
+				bundle:bundle,sourceRackFilter:sourceRack,rackLayoutsHasPermission:RolePermissions.hasPermission("rackLayouts"),useCheck:useCheck]
 	}
 	
 	def save = {
