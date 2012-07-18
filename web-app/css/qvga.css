@@ -233,6 +233,9 @@ a.mobselect {
 .timebar {
   float:left;width:220px;height:5px;background-Color:grey;
 }
+.issueTimebar {
+  float:left;height:5px;background-Color:grey;
+}
 
 #timebar {
   width:30px;height:5px;background-Color:green;color:white;text-Align:center;

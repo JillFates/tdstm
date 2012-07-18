@@ -964,12 +964,14 @@ class ClientTeamsController {
 		}
 		def todo
 		def all
+		def sortBy = params.sort ? params.sort : 'dueDate'
+		def orderBy = params.order ? params.order : 'asc , dateCreated desc'
 		if(params.search){
-			todo = AssetComment.findAll("From AssetComment a where a.project = :project AND a.assetEntity.assetTag=:tag AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Pending' , 'Started')) order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue',tag:params.search])
-			all= AssetComment.findAll("From AssetComment a where a.project = :project  AND a.assetEntity.assetTag=:tag AND commentType=:type AND assignedTo = :assignedTo   order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue',tag:params.search])
+			todo = AssetComment.findAll("From AssetComment a where a.project = :project AND a.assetEntity.assetTag=:tag AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Pending' , 'Started')) order by ${sortBy} ${orderBy} ",[project:projectInstance,assignedTo:personInstance,type:'issue',tag:params.search])
+			all= AssetComment.findAll("From AssetComment a where a.project = :project  AND a.assetEntity.assetTag=:tag AND commentType=:type AND assignedTo = :assignedTo   order by ${sortBy} ${orderBy} , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue',tag:params.search])
 		}else{
-			todo = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Pending' , 'Started')) order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
-			all= AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo   order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
+			todo = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Pending' , 'Started')) order by ${sortBy} ${orderBy} ",[project:projectInstance,assignedTo:personInstance,type:'issue'])
+			all= AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo   order by ${sortBy} ${orderBy} ",[project:projectInstance,assignedTo:personInstance,type:'issue'])
 		}
 		if(params.tab=='all'){
 			tab = 'all'
@@ -1018,16 +1020,5 @@ class ClientTeamsController {
 		}else{
 			return[assetComment:assetComment,notes:notes]
 		}
-	}
-	
-	def setTimePreference = {
-		def timer = params.timer
-		def updateTime =[]
-		if(timer){
-			userPreferenceService.setPreference( "MY_ISSUE_REFRESH", "${timer}" )
-		}
-		def timeToUpdate = getSession().getAttribute("MY_ISSUE_REFRESH")
-		updateTime <<[updateTime:timeToUpdate]
-		render updateTime as JSON
 	}
 }

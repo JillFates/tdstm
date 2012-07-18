@@ -14,12 +14,7 @@
 	}, false);
 
 	function setFocus(){
-		document.bundleTeamAssetForm.search.focus();
-	}
-	
-	function assetSubmit(searchVal){
-	document.bundleTeamAssetForm.search.value = searchVal; 
-	document.bundleTeamAssetForm.submit();
+		document.issueAssetForm.search.focus();
 	}
 	
 	function updateOrientation(){
@@ -36,7 +31,7 @@
 			for(var i = 0; i < elems.length; i++) elems[i].style.display = "block";
                     break;
                 }
-		document.bundleTeamAssetForm.search.value = displayStr;
+		document.issueAssetForm.search.value = displayStr;
 	}
 
 	function zxcAnimate(mde,obj,srt){
@@ -97,6 +92,7 @@
 			<li><a href="#" class="mobmenu">Details</a></li>
 		</ul>
 	</div>
+	<div class="issueTimebar" id="issueTimebar"><div id="timebar" ></div>
 	<div class="mobbodyweb" style="width: 220px;">
       	<g:form method="post" name="issueAssetForm" action="showIssue">
 			<input id="issueId" name="issueId" type="hidden" value="" />
@@ -164,6 +160,7 @@
 	</div>
 <script type="text/javascript" >
 	function actionSubmit(id){
+	  $('#issueTimebar').width($('#issueTable').width())
 	  $('#issueId').val(id)
 	  document.issueAssetForm.submit();
     }
@@ -173,6 +170,10 @@
 
 	function retainAction(){
 		 document.issueAssetForm.action = 'showIssue'
+	}
+	function pageRefresh(){
+		document.issueAssetForm.action = 'listComment'
+		document.issueAssetForm.submit()
 	}
 	
 	setFocus();
@@ -196,6 +197,8 @@
 //			this.oop.obj.innerHTML=sec+' sec';
 			if (sec>0){
 				this.to=setTimeout(function(){ oop.Time(); },1000);
+			}else{
+				pageRefresh();
 			}
 		}
 	}
@@ -204,7 +207,7 @@
 		ID:'timebar'
 	});
 
-	B1.Start(100);
+	B1.Start(60);
 </script>
 </body>
 </html>
