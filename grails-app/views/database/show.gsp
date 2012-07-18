@@ -261,7 +261,7 @@
 						</g:remoteLink>
 				    </g:elseif>
 					<g:else>
-						<a href="javascript:createNewAssetComment(${databaseInstance.id});">
+						<a href="javascript:createNewAssetComment(${databaseInstance.id},'${databaseInstance.assetName}');">
 							<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/>&nbsp&nbspComment
 						</a>
 				    </g:else>
