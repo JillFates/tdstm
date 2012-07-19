@@ -16,7 +16,7 @@
 			<li><a href="#" class="mobmenu">Details</a></li>
 		</ul>
 	</div>
-	<div class="issueTimebar" id="issueTimebar"><div id="timebar" ></div>
+	<div class="issueTimebar" id="issueTimebar"><div id="issueTimebarId" ></div>
 	<div class="mobbodyweb">
       	<g:form method="post" name="issueAssetForm" action="showIssue">
 			<input id="issueId" name="issueId" type="hidden" value="" />
@@ -55,11 +55,11 @@
 			<table id="issueTable" style="height:80px;">
 			<thead>
 				<tr>
-					<g:sortableColumn class="sort_column" style="width:60px;"  action="listComment" property="comment" title="Task" params="['tab':tab]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="dateCreated" title="Created" params="['tab':tab,]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="dueDate" title="Due" params="['tab':tab]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="assetEntity" title="Related to" params="['tab':tab]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="status" title="Status" params="['tab':tab]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:60px;"  action="listComment" property="comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="dateCreated" title="Created" params="['tab':tab,'search':search]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="dueDate" title="Due" params="['tab':tab,'search':search]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="assetEntity" title="Related to" params="['tab':tab,'search':search]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="status" title="Status" params="['tab':tab,'search':search]"></g:sortableColumn>
 				</tr>
 			</thead>
 			<tbody>
@@ -158,7 +158,7 @@ function zxcOpacity(obj,opc){
 	function Bar(o){
 	var obj=document.getElementById(o.ID);
 		this.oop=new zxcAnimate('width',obj,0);
-		this.max=obj.parentNode.offsetWidth;
+		this.max=$('#issueTable').width();
 		this.to=null;
 	}
 	Bar.prototype={
@@ -181,7 +181,7 @@ function zxcOpacity(obj,opc){
 	}
 
 	var B1=new Bar({
-		ID:'timebar'
+		ID:'issueTimebarId'
 	});
 
 	B1.Start(60);
