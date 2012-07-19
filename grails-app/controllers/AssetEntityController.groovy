@@ -1804,6 +1804,8 @@ class AssetEntityController {
 		def map = commentService.saveUpdateCommentAndNotes(session, params, false)
 		 if(params.redirectTo=='myTask'){
 			redirect(controller:'clientTeams' , action:'showIssue',params:[issueId:params.id])
+		 }else if(params.redirectTo=='taskList'){
+			redirect(controller:'clientTeams' , action:'listComment')
 		 }else{
 		    render map as JSON
 		 }
