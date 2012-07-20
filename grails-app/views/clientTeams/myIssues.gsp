@@ -119,11 +119,11 @@ function openStatus(id,status){
 		$('#started_'+id).css('display','none')
     }
 	$('#showStatusId_'+id).show()
-	$('#issueTrId_'+id).attr('onClick','hideStatus('+id+')');
+	$('#issueTrId_'+id).attr('onClick','hideStatus('+id+',"'+status+'")');
 }
-function hideStatus(id){
+function hideStatus(id,status){
 	$('#showStatusId_'+id).hide()
-	$('#issueTrId_'+id).attr('onClick','openStatus('+id+')');
+	$('#issueTrId_'+id).attr('onClick','openStatus('+id+',"'+status+'")');
 }
  
 function actionSubmit(id){

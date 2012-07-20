@@ -128,7 +128,7 @@
 		</table>
 		</div>
 		<div id="assetIssueDiv" style="float:left;width:220px;">
-			<table id="issueTable" style="height:80px;width:220px;">
+			<table id="issueTable" style="height:80px;width:220px;" cellspacing="0px">
 			<thead>
 				<tr>
 					<g:sortableColumn class="sort_column" style="width:60px;"  action="listComment" property="comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn><%--
@@ -141,7 +141,12 @@
 			</thead>
 			<tbody>
 			<g:each status="i" in="${listComment}" var="issue">
-				<tr class="${issue.css}" style="cursor: pointer;" onclick="actionSubmit(${issue?.item?.id})">
+			  <g:if test="${tab && tab == 'todo'}">
+				 <tr id="issueMTrId_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;"  onclick="openStatus(${issue?.item?.id},'${issue?.item?.status}')">
+			  </g:if>
+			  <g:else>
+			     <tr id="issueMTrId_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="actionSubmit(${issue?.item?.id})">
+			  </g:else>
 					<td class="asset_details_block">${issue?.item?.comment?.size() > 50 ? issue?.item?.comment?.substring(0,40)+'...' : issue?.item?.comment}</td>
 					<%--<td class="asset_details_block col2"><tds:convertDate date="${issue?.item?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 					<td class="asset_details_block"><tds:convertDate date="${issue?.item?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
@@ -149,6 +154,14 @@
 					--%><td class="asset_details_block">${issue?.item?.assetEntity?.assetName}</td>
 					<td class="asset_details_block">${issue?.item?.status}</td>
 				</tr>
+				<g:if test="${tab && tab == 'todo'}">
+					<tr id="showStatusId_${issue?.item?.id}" style="display: none; height: 30px;" class="statusClass" > 
+					   <td nowrap="nowrap" colspan="4"><span class="statusButton" id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','Started',${userId})" style="margin: 12px">&nbsp;&nbsp;Start&nbsp;&nbsp;</span> 
+					              <span class="statusButton" onclick="changeStatus('${issue?.item?.id}','Completed',${userId})" style="margin: 12px">&nbsp;&nbsp;Complete&nbsp;&nbsp;</span>
+					              <span class="statusButton" onclick="actionSubmit(${issue?.item?.id})" style="margin: 12px">&nbsp;&nbsp;Details..&nbsp;&nbsp;</span>
+					   </td>
+					</tr>
+				</g:if>
 			</g:each>
 			</tbody>
 			</table>
@@ -164,6 +177,33 @@
 	  $('#issueId').val(id)
 	  document.issueAssetForm.submit();
     }
+    
+	function changeStatus(id,status,user){
+		jQuery.ajax({
+			url: '../assetEntity/updateComment',
+			data: {'id':id,'status':status,'redirectTo':'taskList','assignedTo':user},
+			type:'POST',
+			success: function(data) {
+				pageRefresh();
+			}
+		});
+	      	
+	}
+	
+	function openStatus(id,status){
+		$('.statusClass').css('display','none')
+		if(status=='Started'){
+			$('#started_'+id).css('display','none')
+	    }
+		$('#showStatusId_'+id).show()
+		$('#issueMTrId_'+id).attr('onClick','hideStatus('+id+',"'+status+'")');
+	}
+	
+	function hideStatus(id,status){
+		$('#showStatusId_'+id).hide()
+		$('#issueMTrId_'+id).attr('onClick','openStatus('+id+',"'+status+'")');
+	}
+	
 	function changeAction(){
 		 document.issueAssetForm.action = 'listComment'
 	}
