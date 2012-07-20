@@ -24,13 +24,13 @@
 			<div id="mydiv" onclick="this.style.display = 'none';setFocus();">						            
 				<g:if test="${flash.message}">
 					<br />
-					<div style="color: red;"><ul>${flash.message}</ul></div>
+					<div class="message"><ul>${flash.message}</ul></div>
 				</g:if> 
 			</div>		
 			<div id="taskId" style="float:left; margin:2px 0; ">              								
 			<table style="border:0px;width:220px;">
 			<tr>
-				<td style="border-bottom:2px solid #507028;"><b>Tasks:</b></td>
+				<td>&nbsp;</td>
 				<td id="todoId" class="tab">
 					<g:if test="${tab && tab == 'todo'}">
 					  <g:link class="tab_select" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(${todoSize})</g:link>
@@ -79,9 +79,12 @@
 					<g:if test="${tab && tab == 'todo'}">
 					<tr id="showStatusId_${issue?.item?.id}" style="display: none; height: 30px;" class="statusClass" > 
 					   <td nowrap="nowrap" colspan="5">
-							<span class="statusButton" id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','Started',${userId})">&nbsp;&nbsp;Start&nbsp;&nbsp;</span> 
-							<span class="statusButton" onclick="changeStatus('${issue?.item?.id}','Completed',${userId})">&nbsp;&nbsp;Complete&nbsp;&nbsp;</span>
-							<span class="statusButton" onclick="actionSubmit(${issue?.item?.id})">&nbsp;&nbsp;Details..&nbsp;&nbsp;</span>
+							
+				             <span class="statusButton" id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','Started',${userId})">&nbsp;&nbsp;Start&nbsp;&nbsp;</span>
+				             <span id="image_${issue?.item?.id}"><img src="${createLinkTo(dir:'images',file:'player_play.jpg')}" /><img src="${createLinkTo(dir:'images',file:'player_pause.png')}" /></span>  
+				              <span class="statusButton" onclick="changeStatus('${issue?.item?.id}','Completed',${userId})" style="margin-left: 30px">&nbsp;&nbsp;Complete&nbsp;&nbsp;</span>
+				              <img src="${createLinkTo(dir:'images',file:'check.png')}" />
+				              <span class="detailButton" onclick="actionSubmit(${issue?.item?.id})" style="margin: 30px">&nbsp;&nbsp;Details..&nbsp;&nbsp;</span>
 					   </td>
 					</tr>
 					</g:if>
@@ -119,6 +122,7 @@ function openStatus(id,status){
 	$('.statusClass').css('display','none')
 	if(status=='Started'){
 		$('#started_'+id).css('display','none')
+		$('#image_'+id).css('display','none')
     }
 	$('#showStatusId_'+id).show()
 	$('#issueTrId_'+id).attr('onClick','hideStatus('+id+',"'+status+'")');

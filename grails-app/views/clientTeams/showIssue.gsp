@@ -24,7 +24,7 @@
 		
 	 	<div id="mydiv" onclick="this.style.display = 'none';">
  			<g:if test="${flash.message}">
-				<div style="color: red;"><ul>${flash.message}</ul></div>
+				<div style="color: red; font-size:15px"><ul>${flash.message}</ul></div>
 			</g:if> 
 		</div>
 
@@ -41,7 +41,7 @@
 	<g:form name="issueUpdateForm" controller="assetEntity" action="updateComment">
 		<a name="comments"></a>
 		<input id="issueId" name="id" type="hidden" value="${assetComment.id}" />
-		<input id="redirectTo" name="redirectTo" type="hidden" value="myTask" />
+		<input id="redirectTo" name="redirectTo" type="hidden" value="taskList" />
 		<table style="width:420px;">
 			<tr>
 				<td class="heading" colspan=2><a class="heading" href="#comments">Task details:</a></td>

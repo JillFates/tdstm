@@ -122,6 +122,19 @@ font-weight: bold;
 }
 .statusButton {
     background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
+    box-shadow: inset 0px 3px 3px #888;
+    border: 1px solid #ccc;
+    color: #666;
+    font-size: 10px;
+    margin-top: 5px;
+    overflow: hidden;
+    padding: 0;
+    cursor: pointer;
+    box-shadow: inset 0px 3px 3px #888;
+    margin-left: 65px;
+}
+.detailButton {
+    background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
     border: 1px solid #ccc;
     color: #666;
     font-size: 10px;
@@ -130,6 +143,8 @@ font-weight: bold;
     padding: 0;
     cursor: pointer;
     margin-left: 65px;
+    
+   
 }
 .statusButton_mobile {
     background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
@@ -141,6 +156,7 @@ font-weight: bold;
     padding: 0;
     cursor: pointer;
     margin-left: 35px;
+    box-shadow: inset 0px 3px 3px #888;
 }
 .action_button {
 	background-color:#aaefb8;
