@@ -97,79 +97,82 @@
       	<g:form method="post" name="issueAssetForm" action="showIssue">
 			<input id="issueId" name="issueId" type="hidden" value="" />
 			<input name="tab" type="hidden" value="${tab}" />								              	
-		<div id="mydiv" onclick="this.style.display = 'none';setFocus();">						            
-			<g:if test="${flash.message}">
-				<br />
-				<div style="color: red;"><ul>${flash.message}</ul></div>
-			</g:if> 
-		</div>		
-		<div style="float:left; width:220px; margin:2px 0; ">              								
-		<table style="border:0px;width:220px;">
-		<tr>
-			<td style="border-bottom:2px solid #507028;"><b>Tasks:</b></td>
-			<td id="todoId" class="tab">
-				<g:if test="${tab && tab == 'todo'}">
-				  <g:link class="tab_select" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(${todoSize})</g:link>
-				</g:if>
-				<g:else>
-				  <g:link class="tab_deselect" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(${todoSize})</g:link>
-				</g:else>
-			</td>
-			<td id="allId" class="tab">
-				<g:if test="${tab == 'all'}">
-				  <g:link class="tab_select" action="listComment" params='["tab":"all","search":search]'>All&nbsp;(${allSize})</g:link>
-				</g:if>
-				<g:else>
-				  <g:link class="tab_deselect" action="listComment" params='["tab":"all","search":search]'>All&nbsp;(${allSize})</g:link>
-				</g:else>
-			</td>
-			<td class="tab_search"><input  type="text" size="08" value="${search}" id="search" name="search" autocorrect="off" autocapitalize="off" onfocus="changeAction()" onblur="retainAction()"/></td>
-		</tr>
-		</table>
-		</div>
-		<div id="assetIssueDiv" style="float:left;width:220px;">
-			<table id="issueTable" style="height:80px;width:220px;" cellspacing="0px">
-			<thead>
-				<tr>
-					<g:sortableColumn class="sort_column" style="width:60px;"  action="listComment" property="comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn><%--
-/*-					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="date_created" title="Created" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="due_date" title="Due" params="['tab':tab,'search':search]"></g:sortableColumn>
----*/
-					--%><g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="assetEntity" title="Related to" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="status" title="Status" params="['tab':tab,'search':search]"></g:sortableColumn>
-				</tr>
-			</thead>
-			<tbody>
-			<g:each status="i" in="${listComment}" var="issue">
-			  <g:if test="${tab && tab == 'todo'}">
-				 <tr id="issueMTrId_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;"  onclick="openStatus(${issue?.item?.id},'${issue?.item?.status}')">
-			  </g:if>
-			  <g:else>
-			     <tr id="issueMTrId_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="actionSubmit(${issue?.item?.id})">
-			  </g:else>
-					<td class="asset_details_block">${issue?.item?.comment?.size() > 50 ? issue?.item?.comment?.substring(0,40)+'...' : issue?.item?.comment}</td>
-					<%--<td class="asset_details_block col2"><tds:convertDate date="${issue?.item?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-					<td class="asset_details_block"><tds:convertDate date="${issue?.item?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-
-					--%><td class="asset_details_block">${issue?.item?.assetEntity?.assetName}</td>
-					<td class="asset_details_block">${issue?.item?.status}</td>
-				</tr>
-				<g:if test="${tab && tab == 'todo'}">
-					<tr id="showStatusId_${issue?.item?.id}" style="display: none; height: 30px;" class="statusClass" > 
-					   <td nowrap="nowrap" colspan="4"><span class="statusButton" id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','Started',${userId})" style="margin: 12px">&nbsp;&nbsp;Start&nbsp;&nbsp;</span> 
-					              <span class="statusButton" onclick="changeStatus('${issue?.item?.id}','Completed',${userId})" style="margin: 12px">&nbsp;&nbsp;Complete&nbsp;&nbsp;</span>
-					              <span class="statusButton" onclick="actionSubmit(${issue?.item?.id})" style="margin: 12px">&nbsp;&nbsp;Details..&nbsp;&nbsp;</span>
-					   </td>
-					</tr>
-				</g:if>
-			</g:each>
-			</tbody>
+			<div id="mydiv" onclick="this.style.display = 'none';setFocus();">						            
+				<g:if test="${flash.message}">
+					<br />
+					<div style="color: red;"><ul>${flash.message}</ul></div>
+				</g:if> 
+			</div>		
+			<div style="float:left; width:220px; margin:2px 0; ">              								
+			<table style="border:0px;width:220px;">
+			<tr>
+				<td style="border-bottom:2px solid #507028;"><b>Tasks:</b></td>
+				<td id="todoId" class="tab">
+					<g:if test="${tab && tab == 'todo'}">
+					  <g:link class="tab_select" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(${todoSize})</g:link>
+					</g:if>
+					<g:else>
+					  <g:link class="tab_deselect" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(${todoSize})</g:link>
+					</g:else>
+				</td>
+				<td id="allId" class="tab">
+					<g:if test="${tab == 'all'}">
+					  <g:link class="tab_select" action="listComment" params='["tab":"all","search":search]'>All&nbsp;(${allSize})</g:link>
+					</g:if>
+					<g:else>
+					  <g:link class="tab_deselect" action="listComment" params='["tab":"all","search":search]'>All&nbsp;(${allSize})</g:link>
+					</g:else>
+				</td>
+				<td class="tab_search"><input  type="text" size="08" value="${search}" id="search" name="search" autocorrect="off" autocapitalize="off" onfocus="changeAction()" onblur="retainAction()"/></td>
+			</tr>
 			</table>
-		</div>
-		</div>
+			</div>
+			<div id="assetIssueDiv" style="float:left;width:220px;">
+				<table id="issueTable" style="width:220px;" cellspacing="0px">
+				<thead>
+					<tr>
+						<g:sortableColumn class="sort_column" style="width:60px;"  action="listComment" property="comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
+						<%--
+						<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="date_created" title="Created" params="['tab':tab,'search':search]"></g:sortableColumn>
+						<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="due_date" title="Due" params="['tab':tab,'search':search]"></g:sortableColumn>
+						--%>
+						<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="assetEntity" title="Related to" params="['tab':tab,'search':search]"></g:sortableColumn>
+						<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="status" title="Status" params="['tab':tab,'search':search]"></g:sortableColumn>
+					</tr>
+				</thead>
+				<tbody>
+				<g:each status="i" in="${listComment}" var="issue">
+				  <g:if test="${tab && tab == 'todo'}">
+					 <tr id="issueMTrId_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;"  onclick="openStatus(${issue?.item?.id},'${issue?.item?.status}')">
+				  </g:if>
+				  <g:else>
+				     <tr id="issueMTrId_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="actionSubmit(${issue?.item?.id})">
+				  </g:else>
+						<td class="asset_details_block">${issue?.item?.comment?.size() > 50 ? issue?.item?.comment?.substring(0,40)+'...' : issue?.item?.comment}</td>
+						<%--<td class="asset_details_block col2"><tds:convertDate date="${issue?.item?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+						<td class="asset_details_block"><tds:convertDate date="${issue?.item?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+	
+						--%><td class="asset_details_block">${issue?.item?.assetEntity?.assetName}</td>
+						<td class="asset_details_block">${issue?.item?.status}</td>
+					</tr>
+					<g:if test="${tab && tab == 'todo'}">
+						<tr id="showStatusId_${issue?.item?.id}" style="display: none; height: 30px;" class="statusClass" > 
+						   <td nowrap="nowrap" colspan="5">
+							  	<span class="statusButton_mobile" id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','Started',${userId})">&nbsp;&nbsp;Start&nbsp;&nbsp;</span> 
+				              	<span class="statusButton_mobile" onclick="changeStatus('${issue?.item?.id}','Completed',${userId})">&nbsp;&nbsp;Complete&nbsp;&nbsp;</span>
+				              	<span class="statusButton_mobile" onclick="actionSubmit(${issue?.item?.id})">&nbsp;&nbsp;Details..&nbsp;&nbsp;</span>
+						   </td>
+						</tr>
+					</g:if>
+				</g:each>
+				</tbody>
+				</table>
+			</div>
       		</g:form>
-      		<br />
-      		<g:link class="mobfooter" action="listComment" style="color:white;" params="[viewMode:'web']">Use Full Site</g:link>
+   		</div>
+   		<br />
+   		<g:link class="mobfooter" action="listComment" params="[viewMode:'web']">Use Full Site</g:link>
+	</div>
 	</div>
 <script type="text/javascript" >
 	function actionSubmit(id){
