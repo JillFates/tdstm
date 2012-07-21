@@ -77,8 +77,8 @@
 						<td class="asset_details_block">${issue?.item?.status}</td>
 					</tr>
 					<g:if test="${tab && tab == 'todo'}">
-					<tr id="showStatusId_${issue?.item?.id}" style="display: none;" class="statusButtonBar" > 
-					   <td nowrap="nowrap" colspan="5">
+					<tr id="showStatusId_${issue?.item?.id}" style="display: none;" > 
+					   <td nowrap="nowrap" colspan="5" class="statusButtonBar" >
 							<span class="statusButton" id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','Started',${userId})">
 							<img src="${createLinkTo(dir:'images',file:'player_play.jpg')}" />&nbsp;&nbsp;Start&nbsp;&nbsp;
 							</span>
