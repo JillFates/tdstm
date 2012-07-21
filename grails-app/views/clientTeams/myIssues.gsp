@@ -65,10 +65,10 @@
 				<tbody>
 				<g:each status="i" in="${listComment}" var="issue" >
 				  <g:if test="${tab && tab == 'todo'}">
-					  <tr id="issueTrId_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="openStatus(${issue?.item?.id},'${issue?.item?.status}')">
+					<tr id="issueTrId_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="openStatus(${issue?.item?.id},'${issue?.item?.status}')">
 				  </g:if>
 				  <g:else>
-				      <tr id="issueTrId_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="actionSubmit(${issue?.item?.id})">
+					<tr id="issueTrId_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="actionSubmit(${issue?.item?.id})">
 				  </g:else>
 						<td class="asset_details_block_task">${issue?.item?.comment?.size() > 50 ? issue?.item?.comment?.substring(0,40)+'...' : issue?.item?.comment}</td>
 						<td class="asset_details_block"><tds:convertDate date="${issue?.item?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
@@ -77,14 +77,16 @@
 						<td class="asset_details_block">${issue?.item?.status}</td>
 					</tr>
 					<g:if test="${tab && tab == 'todo'}">
-					<tr id="showStatusId_${issue?.item?.id}" style="display: none; height: 30px;" class="statusClass" > 
+					<tr id="showStatusId_${issue?.item?.id}" style="display: none;" class="statusButtonBar" > 
 					   <td nowrap="nowrap" colspan="5">
-							
-				             <span class="statusButton" id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','Started',${userId})">&nbsp;&nbsp;Start&nbsp;&nbsp;</span>
-				             <span id="image_${issue?.item?.id}"><img src="${createLinkTo(dir:'images',file:'player_play.jpg')}" /><img src="${createLinkTo(dir:'images',file:'player_pause.png')}" /></span>  
-				              <span class="statusButton" onclick="changeStatus('${issue?.item?.id}','Completed',${userId})" style="margin-left: 30px">&nbsp;&nbsp;Complete&nbsp;&nbsp;</span>
-				              <img src="${createLinkTo(dir:'images',file:'check.png')}" />
-				              <span class="detailButton" onclick="actionSubmit(${issue?.item?.id})" style="margin: 30px">&nbsp;&nbsp;Details..&nbsp;&nbsp;</span>
+							<span class="statusButton" id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','Started',${userId})">
+							<img src="${createLinkTo(dir:'images',file:'player_play.jpg')}" />&nbsp;&nbsp;Start&nbsp;&nbsp;
+							</span>
+							<span id="image_${issue?.item?.id}"></span>  
+							<span class="statusButton" onclick="changeStatus('${issue?.item?.id}','Completed',${userId})" style="margin-left: 30px">
+							<img src="${createLinkTo(dir:'images',file:'check.png')}" />&nbsp;&nbsp;Complete&nbsp;&nbsp;
+							</span>
+							<span class="detailButton" onclick="actionSubmit(${issue?.item?.id})" style="margin: 30px">&nbsp;&nbsp;Details..&nbsp;&nbsp;</span>
 					   </td>
 					</tr>
 					</g:if>
@@ -100,37 +102,39 @@
       </div>
 	</div>
 	</div>
- <script type="text/javascript">
-$( function() {
-	$('#issueTimebar').width($('#issueTable').width())
-});
-function setFocus(){
-	document.issueAssetForm.search.focus();
-}
-function changeStatus(id,status,user){
-	jQuery.ajax({
-		url: '../assetEntity/updateComment',
-		data: {'id':id,'status':status,'redirectTo':'taskList','assignedTo':user},
-		type:'POST',
-		success: function(data) {
-			pageRefresh();
-		}
+<script type="text/javascript">
+	$( function() {
+		$('#issueTimebar').width($('#issueTable').width())
 	});
-      	
-}
-function openStatus(id,status){
-	$('.statusClass').css('display','none')
-	if(status=='Started'){
-		$('#started_'+id).css('display','none')
-		$('#image_'+id).css('display','none')
-    }
-	$('#showStatusId_'+id).show()
-	$('#issueTrId_'+id).attr('onClick','hideStatus('+id+',"'+status+'")');
-}
-function hideStatus(id,status){
-	$('#showStatusId_'+id).hide()
-	$('#issueTrId_'+id).attr('onClick','openStatus('+id+',"'+status+'")');
-}
+
+	function setFocus(){
+		document.issueAssetForm.search.focus();
+	}
+	function changeStatus(id,status,user){
+		jQuery.ajax({
+			url: '../assetEntity/updateComment',
+			data: {'id':id,'status':status,'redirectTo':'taskList','assignedTo':user},
+			type:'POST',
+			success: function(data) {
+				pageRefresh();
+			}
+		});
+	}
+
+	function openStatus(id,status){
+		$('.statusClass').css('display','none')
+		if(status=='Started'){
+			$('#started_'+id).css('display','none')
+			$('#image_'+id).css('display','none')
+	    }
+		$('#showStatusId_'+id).show()
+		$('#issueTrId_'+id).attr('onClick','hideStatus('+id+',"'+status+'")');
+	}
+
+	function hideStatus(id,status){
+		$('#showStatusId_'+id).hide()
+		$('#issueTrId_'+id).attr('onClick','openStatus('+id+',"'+status+'")');
+	}
  
 function actionSubmit(id){
    $('#issueId').val(id)
