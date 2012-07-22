@@ -80,7 +80,7 @@
 					<tr id="showStatusId_${issue?.item?.id}" style="display: none;" > 
 					   <td nowrap="nowrap" colspan="5" class="statusButtonBar" >
 							<span class="statusButton" id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','Started',${userId})">
-							<img src="${createLinkTo(dir:'images',file:'player_play.jpg')}" />&nbsp;&nbsp;Start&nbsp;&nbsp;
+							<a href="changeStatus('${issue?.item?.id}','Started',${userId})" class="ui-icon ui-icon-play" /></a>&nbsp;&nbsp;Start&nbsp;&nbsp;
 							</span>
 							<span id="image_${issue?.item?.id}"></span>  
 							<span class="statusButton" onclick="changeStatus('${issue?.item?.id}','Completed',${userId})" style="margin-left: 30px">
