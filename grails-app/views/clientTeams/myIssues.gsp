@@ -79,10 +79,18 @@
 					<g:if test="${tab && tab == 'todo'}">
 					<tr id="showStatusId_${issue?.item?.id}" style="display: none;" > 
 					   <td nowrap="nowrap" colspan="5" class="statusButtonBar" >
-							<span class="statusButton" id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','Started',${userId})">
-							<a href="changeStatus('${issue?.item?.id}','Started',${userId})" class="ui-icon ui-icon-play" /></a>&nbsp;&nbsp;Start&nbsp;&nbsp;
-							</span>
-							<span id="image_${issue?.item?.id}"></span>  
+							<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary" role="button" aria-disabled="false"
+							 id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','Started',${userId})">
+							<span class="ui-button-icon-primary ui-icon ui-icon-play"style="vertical-align:middle;"></span>
+							<span class="ui-button-text" style="vertical-align:middle;">&nbsp;&nbsp;Start&nbsp;&nbsp;</span>
+							</button>
+
+							<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary" role="button" aria-disabled="false"
+							 id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','Completed',${userId})">
+							<span class="ui-button-icon-primary ui-icon ui-icon-check"style="vertical-align:middle;"></span>
+							<span class="ui-button-text" style="vertical-align:middle;">&nbsp;&nbsp;Complete&nbsp;&nbsp;</span>
+							</button>
+
 							<span class="statusButton" onclick="changeStatus('${issue?.item?.id}','Completed',${userId})" style="margin-left: 30px">
 							<img src="${createLinkTo(dir:'images',file:'check.png')}" />&nbsp;&nbsp;Complete&nbsp;&nbsp;
 							</span>
