@@ -820,12 +820,19 @@
 		
 		//set up mega menus to align with menu2 items
 		//admin and user mega menus are to the edges
-		document.getElementById('#projectMegaMenu').style.left = document.getElementById('#projectMenuId').style.left;
-		document.getElementById('#racksMegaMenu').style.left = document.getElementById('#roomMenuId').style.left;
-		document.getElementById('#assetMegaMenu').style.left = document.getElementById('#assetMenuId').style.left;
-		document.getElementById('#bundleMegaMenu').style.left = document.getElementById('#eventMenuId').style.left;
-		document.getElementById('#consoleMegaMenu').style.left = document.getElementById('#consoleMenuId').style.left;
-		document.getElementById('#reportsMegaMenu').style.left = document.getElementById('#reportsMenuId').style.left;
+		$('#projectMegaMenu').style.left = $('#projectMenuId').style.left;
+		$('#racksMegaMenu').style.left = $('#roomMenuId').style.left;
+		$('#assetMegaMenu').style.left = $('#assetMenuId').style.left;
+		$('#bundleMegaMenu').style.left = $('#eventMenuId').style.left;
+		$('#consoleMegaMenu').style.left = $('#consoleMenuId').style.left;
+		$('#reportsMegaMenu').style.right = $('#reportsMenuId').style.right;
+
+		$('#projectMegaMenu').style.top = $('#projectMenuId').style.bottom +1;
+		$('#racksMegaMenu').style.top = $('#roomMenuId').style.bottom +1;
+		$('#assetMegaMenu').style.top = $('#assetMenuId').style.bottom +1;
+		$('#bundleMegaMenu').style.top = $('#eventMenuId').style.bottom +1;
+		$('#consoleMegaMenu').style.top = $('#consoleMenuId').style.bottom +1;
+		$('#reportsMegaMenu').style.top = $('#reportsMenuId').style.bottom +1;
 
 		var timeout = 500;
 		var closetimer = 0;
