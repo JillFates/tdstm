@@ -5,6 +5,7 @@
         <meta name="layout" content="projectHeader" />
 	<title>Team Home</title>
 	<jq:plugin name="jquery"/>
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 
 <style type="text/css">

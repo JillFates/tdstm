@@ -3,29 +3,6 @@ body {
 	color: black;
 	font: 11px "HelveticaNeue-Light","Helvetica Neue",Helvetica,Arial,Verdana,sans-serif;
 }
-.mainbody {
-	background: white;
-	color: black;
-	font: 11px "HelveticaNeue-Light","Helvetica Neue",Helvetica,Arial,Verdana,sans-serif;
-}
-
-.menu4 {
-	background: #444;
-}
-
-.colum_techlogin{
-	width:220px;
-	height:auto;
-	margin:0px;
-}
-
-.w_techlog{
-	width:220px;
-	height:380px;
-	float:left;
-	border:1px solid #5F9FCF;
-	padding:0px;
-}
 
 .mobbody{
 	width:220px;
@@ -38,50 +15,14 @@ body {
 	margin:0px;
 }
 
-.w_techlog_login{
-	width:237px;
-	height:374px;
-	float:left;
-	border:1px solid #5F9FCF;
-	padding:0px;
-}
-
-dl dt {
-   font-weight: bold;
-   float: left;
-   margin-right: 2px;
-}
-dl dd {
-   margin: 2px;
-}
-
 table {
 	width:100%;
 	float:left;
 	border: 1px solid black;
 }
 
-.asset_details_block{
-	font-size:12px;
-}
-.asset_details_block_task{
-	font-size:12px;
-	width: 500px;
-}
 .asset_hold{
 	background-color:#FFFF33;
-	color:black;
-	font-weight:bold;
-}
-
-.asset_ready{
-	background-color:#33ff00;
-	color:black;
-	font-weight:bold;
-}
-
-.asset_process{
-	background-color:#66ffff;
 	color:black;
 	font-weight:bold;
 }
@@ -91,19 +32,7 @@ table {
 	color:black;
 	font-weight:bold;
 }
-.asset_select{
-	background-color:#65a342;
-	color:black;
-	font-weight:bold;
-}
 
-.asset_done{
-	background-color:#FFFFFF;
-	color:black;
-}
-.task_pending {
-	background-color: #FFFFFF;
-}
 .task_done{
 	background-color: green;
 }
@@ -119,80 +48,6 @@ td {
 
 a:link, a:visited, a:hover {
 font-weight: bold;
-}
-.statusButtonBar {
-    background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
-    box-shadow: inset 0px 3px 3px #888;
-    height: 30px;
-}
-.statusButton {
-    background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
-    border: 1px solid #ccc;
-    border-radius:4px;
-    color: #666;
-    height: 20px;
-    font-size: 12px;
-	font-weight:bold;
-    margin-top: 5px;
-    overflow: hidden;
-    padding: 0;
-    cursor: pointer;
-    margin-left: 65px;
-}
-.detailButton {
-    background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
-    border: 1px solid #ccc;
-    border-radius:4px;
-    color: #666;
-    height: 20px;
-    font-size: 12px;
-	font-weight:bold;
-    margin-top: 5px;
-    overflow: hidden;
-    padding: 0;
-    cursor: pointer;
-    margin-left: 65px;
-}
-.statusButton_mobile {
-    background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
-    border: 1px solid #ccc;
-    border-radius:4px;
-    color: #666;
-    height: 20px;
-    font-size: 12px;
-	font-weight:bold;
-    margin-top: 5px;
-    overflow: hidden;
-    padding: 0;
-    cursor: pointer;
-    margin-left: 35px;
-}
-.action_button {
-	background-color:#aaefb8;
-	width: 200px;
-	font-size: 12px;
-	font-weight:bold;
-}
-.action_button_small {
-	background-color:#aaefb8;
-	width: 80px;
-	font-size: 12px;
-	font-weight:bold;
-}
-.action_button_hold {
-	background-color:yellow;
-	width: 100px;
-	font-size: 12px;
-	font-weight:bold;
-}
-.confirm_checkbox {
-	width: 24px;
-	height: 24px;
-}
-.button_style {
-	padding-bottom: 0px;
-	padding-top:0px;
-	text-align: right;
 }
 #mobtitle {
 	height: 25px; 
@@ -221,53 +76,6 @@ text-align: center;
 	margin:0px;
 padding: 2px 8px;
 }
-.menu4 {
-    width:100%;
-    height:auto;
-    float:left;
-    background:#444;
-    margin-top:0px;
-}
-.menu4 ul {
-    width:auto;
-    padding-top:0px;
-    margin:0px;
-    padding-left:0px;
-}
-.menu4 ul li {
-    display:inline;
-}
-.menu4 ul li a {
-    width:auto;
-    float: left;
-    height:21px;
-    text-decoration: none;
-    text-align:center;
-    font:bold 12px Tahoma, Arial, san-serif;
-    color: white;
-    padding:2px 8px;
-    border-right:1px solid #666;
-}
-.menu4 .title1 {
-    width:auto;
-    float: left;
-    height:21px;
-    text-decoration: none;
-    text-align:center;
-    font: bold 12px Arial;
-    color: white;
-    padding:2px 8px;
-    border-right:1px solid #666;
-}
-.menu4 li a:hover, .menu4 li.current a {
-    color: white;
-}
-.menu4 ul li a:visited  {
-    color: white;
-}
-.menu4 ul li a:hover   {
-    color: yellow;
-}
 a.mobselect {
 	color: yellow; 
 	font-weight: bold;
@@ -278,19 +86,6 @@ a.mobselect {
 	border-bottom-width: 6px;
 	background:#444;
 	padding:auto 0px;
-}
-.timebar {
-  float:left;width:220px;height:8px;background-Color:grey;
-}
-.issueTimebar {
-  float:left;height:8px;background-Color:grey;
-}
-#issueTimebarId {
-  height:8px;background-Color:green;color:white;text-Align:center;
-}
-
-#timebar {
-  width:30px;height:8px;background-Color:green;color:white;text-Align:center;
 }
 
 .mobfooter {
@@ -333,120 +128,6 @@ a.mobselect {
 	float:left;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
-}
-.tab {
-	padding-top:4px;
-	padding-left:0px;
-	padding-right:0px;
-	padding-bottom:0px;
-	width:50px;
-}
-.tab_search {
-	padding-top:0px;
-	padding-left:1px;
-	padding-right:0px;
-	padding-bottom:0px; 
-	height:10px;
-}
-.tab_search input {
-	color: #5b5e5c; 
-	border:1px solid #507028; 
-	margin:0px; 
-	padding:1px;
-}
-a.tab_select {
-	color: black; 
-	border:2px solid #507028;
-	border-bottom-color: white;
-	margin:2px;
-	background: white;
-	padding:2px;
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
-	border-bottom-left-radius: 0px;
-	border-bottom-right-radius: 0px;
-}
-a.tab_deselect {
-	color: grey; 
-	border:2px solid #507028;
-	margin:2px;
-	background: white;
-	padding:2px;
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
-	border-bottom-left-radius: 0px;
-	border-bottom-right-radius: 0px;
-}
-.sort_column {
-	color: #5b5e5c; 
-	border:1px  solid #5b5e5c; 
-	margin:2px;
-	background:#CCC;
-	padding:2px;
-}
-.comment_font {
-	font-size: 12px;
-}
-
-.norecords_display {
-	color:red;
-	font-weight:bold;
-}
-/*
-* Cabling diagram
-*/
-
-#cablingPanel {
-	width: 379px;
-	height: 199px;
-	border: 2px solid black;
-	margin-right: 5px;
-	margin-bottom: 5px;
-	margin-top: 5px;
-	background-color: LightGreen; 
-	color:black;
-	position: relative;
-}
-#cablingPanel div {
-	position: absolute; 
-	left: 0; 
-	top: 0
-	color:black;
-}
-.connector_Bottom{
-	margin-top: 19px;
-}
-.connector_Right{
-	margin-left: 19px;
-}
-.connector_Left{
-	margin-left: -66px;
-}
-.connector_Top{
-	margin-top: -13px;
-}
-#connectorModelBody{
-	color: black;
-}
-.cabling_div {
-	border:1px solid #63A242;
-	float: left;
-	height: auto;
-	width: 220px; 
-	overflow: auto;
-}
-.cabling_div th {
-    background: none repeat scroll 0 0 #CCCCCC;
-    color: #000000;
-    font-size: 11px;
-    font-weight: bold;
-    line-height: 17px;
-    padding: 2px 6px;
-   	white-space :nowrap;
-}
-#issueTable {
-	height:80px;
-	margin-bottom: 30px;
 }
 
 a.task_action{float: left; position: relative; margin: 0 0 0 30px;cursor: pointer;}
