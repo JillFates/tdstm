@@ -24,15 +24,26 @@ class PersonController {
     def list = {
 		//def	projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
         def companyId = params.id
-        def personInstanceList
+        List personInstanceList = new ArrayList()
         def companiesList
+        def query = "from PartyGroup as p where partyType = 'COMPANY' "
+        companiesList = PartyGroup.findAll( query )
+		
+		if(params.companyName ){
+			companyId  = PartyGroup.findByName(params.companyName)?.id
+		}
+		if(params.companyName!="All"){
+			if( !companyId ){
+				companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
+			}
+		}
+		if(companyId == null && params.companyName=="All"){
+			personInstanceList = Person.findAll( "from Person" )
+		}
         if ( companyId!= null && companyId != "" ) {
         	
-        	personInstanceList = partyRelationshipService.getCompanyStaff( companyId )
-        	def query = "from PartyGroup as p where partyType = 'COMPANY' "
-            companiesList = PartyGroup.findAll( query )
-        	//projectCompanies = partyRelationshipService.getProjectCompanies( projectId )        	
-        } else {
+        	personInstanceList = partyRelationshipService.getCompanyStaff( companyId )     	
+        } else if(params.companyName!="All"){
         	flash.message = "Please select Company before navigating to Staff"
             redirect(controller:'partyGroup',action:'list')
         }
@@ -58,7 +69,14 @@ class PersonController {
     	TableFacade tableFacade = new TableFacadeImpl("tag",request)
         tableFacade.items = personsList
 		
-		return [ personsList: personsList, companyId:companyId,totalCompanies:companiesList ]
+		def company
+		if(companyId){
+			if(params.companyName!="All"){
+			    company = PartyGroup.findById(companyId)
+			}
+		}
+		
+		return [ personsList: personsList, companyId:companyId,totalCompanies:companiesList, company:company]
     }
 
     def show = {

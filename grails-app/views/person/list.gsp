@@ -16,6 +16,15 @@
 	    createHiddenInputFieldsForLimitAndSubmit(id);
 	}
 	</script>
+		<script type="text/javascript">
+		 $(document).ready(function() {
+		  $("#filterSelect").change(function(ev) {
+			    ev.preventDefault();
+			    $("#formId").submit();
+			  });
+		 })
+		
+		</script>
     <script type="text/javascript">
 
       $(document).ready(function() {
@@ -121,7 +130,10 @@ document.createDialogForm.company.value = ${companyId}
       </g:if>
 
       <div>
-      <form name="personForm">
+      <form name="personForm" id="formId">
+          <div> 
+          	<g:select id="filterSelect" name="companyName" from="${totalCompanies}" value="${company}"  noSelection="['All':'All']" />
+          </div>
 	      <jmesa:tableFacade id="tag" items="${personsList}" maxRows="25" stateAttr="restore" var="personBean" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
 	          <jmesa:htmlTable style=" border-collapse: separate">
 	              <jmesa:htmlRow highlighter="true">
