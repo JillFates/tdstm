@@ -68,6 +68,7 @@
 	text-align:center;
 	text-decoration:none;
 	letter-spacing:1px;
+	cursor: pointer;
 }
 .buttonBlank {
 	background-color:#808080;
@@ -82,6 +83,7 @@
 	text-align:center;
 	text-decoration:none;
 	letter-spacing:1px;
+	cursor: pointer;
 }
 .buttonR input:hover{
 	color: #FFFFFF;

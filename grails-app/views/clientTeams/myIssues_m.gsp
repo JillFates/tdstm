@@ -89,12 +89,13 @@
 	<div class="menu4">
 		<ul>
 			<li><g:link class="mobmenu" controller="clientTeams" >Teams</g:link></li>
-			<li><g:link class="mobmenu mobselect" action="listComment" params='["tab":"todo"]'>My Tasks</g:link></li>
-			<li><a href="#" class="mobmenu">Details</a></li>
+			<li><g:link elementId="taskLinkId"  class="mobmenu mobselect" action="listComment" params='["tab":"todo"]'>My Tasks</g:link></li>
+			<li><a href="#" id="detailLinkId" class="mobmenu">Details</a></li>
 		</ul>
 	</div>
 	<div class="issueTimebar" id="issueTimebar"><div id="timebar" ></div>
-	<div class="mobbodyweb" style="width: 220px;">
+	<div id="detailId"  style="display: none;margin-top: 45px;position: absolute;width: 420px;" > </div>
+	<div id="myIssueList" class="mobbodyweb" style="width: 220px;">
       	<g:form method="post" name="issueAssetForm" action="showIssue">
 			<input id="issueId" name="issueId" type="hidden" value="" />
 			<input name="tab" type="hidden" value="${tab}" />								              	
@@ -110,7 +111,7 @@
 				<td>&nbsp;</td>
 				<td id="todoId" class="tab">
 					<g:if test="${tab && tab == 'todo'}">
-					  <g:link class="tab_select" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(${todoSize})</g:link>
+					  <g:link class="tab_select" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(<span id="toDoNumberId">${todoSize}</span>)</g:link>
 					</g:if>
 					<g:else>
 					  <g:link class="tab_deselect" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(${todoSize})</g:link>
@@ -121,7 +122,7 @@
 					  <g:link class="tab_select" action="listComment" params='["tab":"all","search":search]'>All&nbsp;(${allSize})</g:link>
 					</g:if>
 					<g:else>
-					  <g:link class="tab_deselect" action="listComment" params='["tab":"all","search":search]'>All&nbsp;(${allSize})</g:link>
+					  <g:link class="tab_deselect" action="listComment" params='["tab":"all","search":search]'>All&nbsp;(<span id="allNumberId">${allSize}</span>)</g:link>
 					</g:else>
 				</td>
 				<td class="tab_search"><input  type="text" size="08" value="${search}" id="search" name="search" autocorrect="off" autocapitalize="off" onfocus="changeAction()" onblur="retainAction()"/></td>
@@ -147,14 +148,14 @@
 					<tr id="issueMTrId_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="openStatus(${issue?.item?.id},'${issue?.item?.status}')">
 				  </g:if>
 				  <g:else>
-					<tr id="issueMTrId_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="actionSubmit(${issue?.item?.id})">
+					<tr id="issueMTrId_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="issueDetails(${issue?.item?.id})">
 				  </g:else>
 						<td class="asset_details_block">${issue?.item?.comment?.size() > 50 ? issue?.item?.comment?.substring(0,40)+'...' : issue?.item?.comment}</td>
 						<%--<td class="asset_details_block col2"><tds:convertDate date="${issue?.item?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 						<td class="asset_details_block"><tds:convertDate date="${issue?.item?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 	
 						--%><td class="asset_details_block">${issue?.item?.assetEntity?.assetName}</td>
-						<td class="asset_details_block">${issue?.item?.status}</td>
+						<td id="statusTd_${issue?.item?.id}" class="asset_details_block">${issue?.item?.status}</td>
 					</tr>
 					<g:if test="${tab && tab == 'todo'}">
 					<tr id="showStatusId_${issue?.item?.id}" style="display: none;" > 
@@ -166,7 +167,7 @@
 							<span class="statusButton" onclick="changeStatus('${issue?.item?.id}','Completed',${userId})" style="margin-left: 30px">
 							<img src="${createLinkTo(dir:'images',file:'check.png')}" />&nbsp;&nbsp;Complete&nbsp;&nbsp;
 							</span>
-							<span class="detailButton" onclick="actionSubmit(${issue?.item?.id})" style="margin: 30px">&nbsp;&nbsp;Details..&nbsp;&nbsp;</span>
+							<span class="detailButton" onclick="issueDetails(${issue?.item?.id})" style="margin: 30px">&nbsp;&nbsp;Details..&nbsp;&nbsp;</span>
 						   </td>
 						</tr>
 					</g:if>
@@ -186,17 +187,47 @@
 	  $('#issueId').val(id)
 	  document.issueAssetForm.submit();
     }
-    
+
+	function issueDetails(id){
+		jQuery.ajax({
+			url: 'showIssue',
+			data: {'issueId':id},
+			type:'POST',
+			success: function(data) {
+				$('#myIssueList').css('display','none')
+				$('#detailId').html(data)
+				$('#detailId').css('display','block')
+				$('#taskLinkId').removeClass('mobselect')
+				$('#detailLinkId').addClass('mobselect')
+			}
+		});
+	}
+	function cancelButton(){
+		$('#myIssueList').css('display','block')
+		$('#detailId').css('display','none')
+		$('#taskLinkId').addClass('mobselect')
+		$('#detailLinkId').removeClass('mobselect')
+
+	}
+	
 	function changeStatus(id,status,user){
 		jQuery.ajax({
 			url: '../assetEntity/updateComment',
-			data: {'id':id,'status':status,'redirectTo':'taskList','assignedTo':user},
+			data: {'id':id,'status':status,'assignedTo':user},
 			type:'POST',
 			success: function(data) {
-				pageRefresh();
+				var myClass = $('#issueMTrId_'+data.assetComment.id).attr("class");
+				if(data.assetComment.status=='Started'){
+					$('#statusTd_'+data.assetComment.id).html(data.assetComment.status)
+					$('#started_'+data.assetComment.id).hide()
+					$('#issueMTrId_'+data.assetComment.id).removeClass(myClass).addClass('asset_process');
+				}else{
+					$('#showStatusId_'+data.assetComment.id).hide()
+					$('#issueMTrId_'+data.assetComment.id).remove()
+					$('#toDoNumberId').html(parseInt($('#toDoNumberId').html())-1)
+				}
 			}
 		});
-	      	
 	}
 
 	function openStatus(id,status){

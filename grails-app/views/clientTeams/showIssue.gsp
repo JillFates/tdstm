@@ -2,7 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="projectHeader" />
 	<title>Task Details</title>
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
@@ -14,35 +13,16 @@
 	<a name="top"></a>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody">
-	<div class="menu4">
-		<ul>
-			<li><g:link class="mobmenu" controller="clientTeams" >Teams</g:link></li>
-			<li><g:link class="mobmenu" action="listComment" params='["tab":"todo"]'>My Tasks</g:link></li>
-			<li><a href="#" class="mobmenu mobselect">Details</a></li>
-		</ul>
-	</div>
-		
 	 	<div id="mydiv" onclick="this.style.display = 'none';">
  			<g:if test="${flash.message}">
 				<div style="color: red; font-size:15px"><ul>${flash.message}</ul></div>
 			</g:if> 
 		</div>
-
-		<div class="clear" style="margin:5px;"></div>
-
-		<table style="border:0px; width:420px;margin-top: 10px;margin-bottom: 10px;">
-			<tr><td style="padding:0px;"><b>Task :</b><br/>&nbsp;<span id="search" >&nbsp;${assetComment.comment}</span><a href="#detail">&nbsp;&nbsp;(related details...)</a></td>
-			</tr>
-		</table>
-	
- 			
-
-	<div class="clear" style="margin:4px;"></div>
 	<g:form name="issueUpdateForm" controller="assetEntity" action="updateComment">
 		<a name="comments"></a>
 		<input id="issueId" name="id" type="hidden" value="${assetComment.id}" />
 		<input id="redirectTo" name="redirectTo" type="hidden" value="taskList" />
-		<table style="width:420px;">
+		<table style="width:420px;margin-bottom:30px">
 			<tr>
 				<td class="heading" colspan=2><a class="heading" href="#comments">Task details:</a></td>
 			</tr>
@@ -137,7 +117,8 @@
 			</g:if>
 			
 			<tr>
-				<td class="buttonR" colspan="2" style="text-align:right;">
+			    <td class="buttonR" ><input type="button" value="Cancel" onclick="cancelButton()" /> </td>
+				<td class="buttonR" colspan="1" style="text-align:right;">
 				<input type="submit" value="Update Task" onclick="return validateComment()" />
 			</td>
 			</tr>	
@@ -182,7 +163,7 @@
 		<a name="detail" ></a>
 		<g:if test="${assetComment?.assetEntity}">
 		 	<div style="float: left;">
-				<table style="width:420px;">
+				<table style="width:420px;margin-bottom:30px">
 				<tr>
 					<td class="heading"><a href="#detail">Details</a></td>
 					<td><span style="float:right;"><a href="#top">Top</a></span></td>
