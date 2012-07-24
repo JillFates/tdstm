@@ -334,7 +334,7 @@
 	<table id="updateResolveTable" style="border: 0px;">
 	   <tr class="prop">
 			<td valign="top" class="name"><label for="notes">Previous Notes:</label></td>
-			<td valign="top" class="value"><div id="previousNote" style="width: 200px"></div></td>
+			<td valign="top" class="value"><div id="previousNote" style="width: 100%;"></div></td>
 		</tr>
 	    <tr class="prop">
 			<td valign="top" class="name"><label for="notes">Note:</label></td>

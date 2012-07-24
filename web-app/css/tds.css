@@ -1033,3 +1033,9 @@ a.tab_deselect {
 	height:80px;
 	margin-bottom: 30px;
 }
+
+#previousNote table tr td span {
+	white-space:pre-wrap;
+	word-wrap:break-word;
+	word-break:break-all;
+}

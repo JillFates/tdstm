@@ -649,7 +649,7 @@ function showAssetDialog( e , action ) {
       		    	 if (i>0) {
       		    		 noteTable += ""
       		    	 }
-      		    	 noteTable += "<tr><td>" + notes[i][0] + "</td><td>" + notes[i][1] + "</td><td><pre>" + notes[i][2] + "</pre></td></tr>"
+      		    	 noteTable += "<tr><td>" + notes[i][0] + "</td><td>" + notes[i][1] + "</td><td><span>" + notes[i][2] + "</span></td></tr>"
       		    	 }
       		     noteTable += "</table>"
 
