@@ -3,6 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
+<title>Files List</title>
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
@@ -35,7 +36,6 @@ $(document).ready(function() {
 })
 </script>
 
-<title>Files List</title>
 </head>
 <body>
 <div class="body">
@@ -44,17 +44,6 @@ $(document).ready(function() {
 <div class="message">${flash.message}</div>
 </g:if>
 <div id="jmesaId" class="body">
-	<div class="buttons">
-	<tds:hasPermission permission='EditAndDelete'>
-		<span class="button"><input type="button" class="save"
-			value="Create Files"
-			onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Files\')')}" />
-		</span>
-		<span class="button"><input id="deleteAsset" type="button" 
-		    value="Delete Selected..." class="save" title="Delete Selected" disabled="disabled"  
-		    onclick="deleteAssets(${filesList.id},'files')" /></span>
-	</tds:hasPermission>
-	</div>
 <tds:hasPermission permission='EditAndDelete'>
 	<div style="margin-left: 5px;">
 		<input id="selectAssetId" type="checkbox" onclick="selectAllAssets()" title="Select All" />&nbsp;&nbsp;<label for="selectAssetId" style="cursor:pointer;"> <b>All</b></label>
@@ -127,6 +116,17 @@ $(document).ready(function() {
 			</jmesa:htmlTable>
 		</jmesa:tableFacade>
 	</form>
+	<div class="buttons">
+	<tds:hasPermission permission='EditAndDelete'>
+		<span class="button"><input type="button" class="save"
+			value="Create Files"
+			onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Files\')')}" />
+		</span>
+		<span class="button"><input id="deleteAsset" type="button" 
+		    value="Delete Selected..." class="save" title="Delete Selected" disabled="disabled"  
+		    onclick="deleteAssets(${filesList.id},'files')" /></span>
+	</tds:hasPermission>
+	</div>
 <div id="createEntityView" style="display: none;" ></div>
 <div id="showEntityView" style="display: none;"></div>
 <div id="editEntityView" style="display: none;"></div>	

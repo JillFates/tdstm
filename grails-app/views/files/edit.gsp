@@ -93,7 +93,7 @@
 						<thead>
 							<tr>
 								<th>Frequency</th>
-								<th>Entity Type</th>
+								<th>Type</th>
 								<th>Name</th>
 								<th>Type</th>
 								<th>Status</th>
@@ -130,7 +130,7 @@
 						<thead>
 							<tr>
 								<th>Frequency</th>
-								<th>Entity Type</th>
+								<th>Type</th>
 								<th>Name</th>
 								<th>Type</th>
 								<th>Status</th>
