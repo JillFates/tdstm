@@ -12,7 +12,7 @@
 <body>
 	<a name="top"></a>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
-	<div class="mainbody">
+	<div class="mainbody" id="mainbody">
 	 	<div id="mydiv" onclick="this.style.display = 'none';">
  			<g:if test="${flash.message}">
 				<div style="color: red; font-size:15px"><ul>${flash.message}</ul></div>
@@ -39,7 +39,7 @@
 				<td valign="top" class="name"><label for="status">Status:</label></td>
 				<td style="width: 20%;">
 					<g:select id="statusEditId" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
-					noSelection="['':'please select']" ></g:select>
+					noSelection="['':'please select']"  onChange="showResolve()"></g:select>
 				</td>	
 			</tr>	
 			 <% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
@@ -73,7 +73,7 @@
 				<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 				<td valign="top" class="value"><span id="categoryEditId">${assetComment?.createdBy} on <tds:convertDate date="${assetComment?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span></td>
 			</tr>
-			<tr class="prop">
+			<tr class="prop" id="resolutionId" style="display: none;">
 				<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
 				<td valign="top" class="value" colspan="2">
 					<textarea cols="100" rows="2" style="width:188px;padding:0px;" id="resolutionEditId" name="resolution" >${assetComment.resolution}</textarea>
@@ -93,7 +93,7 @@
 				 </table>
 				</div></td>
 			</tr>
-		    <tr class="prop">
+		    <tr class="prop" id="noteId">
 				<td valign="top" class="name"><label for="notes">Note:</label></td>
 				<td valign="top" class="value">
 				   <textarea cols="80" rows="4" id="noteEditId" name="note" style="width:188px;padding:0px;"></textarea>
@@ -218,6 +218,27 @@
 		</g:if>
 </div>
 <script type="text/javascript">
+$( function() {
+	 if($('#statusEditId').val()=='Completed'){
+	       $('#noteId').hide()
+	       $('#resolutionId').show()
+	 }
+});
+ window.document.onkeydown = function (e){
+    if (e.keyCode  == 27) {
+    	cancelButton();
+    }
+ };
+ function showResolve(){
+   if($('#statusEditId').val()=='Completed'){
+       $('#noteId').hide()
+       $('#resolutionId').show()
+   }else{
+	   $('#noteId').show()
+       $('#resolutionId').hide()
+   }
+ }
+
  function validateComment(){
 	 var status = $('#statusEditId').val()
 	 var boo = true

@@ -58,7 +58,7 @@
 				<thead>
 					<tr>
 						<g:sortableColumn class="sort_column" style="width:60px;"  action="listComment" property="comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
-						<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="dateCreated" title="Created" params="['tab':tab,'search':search]"></g:sortableColumn>
+						<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="lastUpdated" title="Updated" params="['tab':tab,'search':search]"></g:sortableColumn>
 						<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="dueDate" title="Due" params="['tab':tab,'search':search]"></g:sortableColumn>
 						<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="assetEntity" title="Related to" params="['tab':tab,'search':search]"></g:sortableColumn>
 						<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="status" title="Status" params="['tab':tab,'search':search]"></g:sortableColumn>
@@ -73,7 +73,7 @@
 					<tr id="issueTr_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="issueDetails(${issue?.item?.id})">
 				  </g:else>
 						<td class="asset_details_block_task">${issue?.item?.comment?.size() > 50 ? issue?.item?.comment?.substring(0,40)+'...' : issue?.item?.comment}</td>
-						<td class="asset_details_block"><tds:convertDate date="${issue?.item?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+						<td class="asset_details_block"><tds:convertDate date="${issue?.item?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 						<td class="asset_details_block"><tds:convertDate date="${issue?.item?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 						<td class="asset_details_block">${issue?.item?.assetEntity?.assetName}</td>
 						<td id="statusTd_${issue?.item?.id}" class="asset_details_block">${issue?.item?.status}</td>

@@ -16,6 +16,7 @@ class AssetComment {
 	MoveEvent moveEvent
 
 	Date dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
+	Date lastUpdated 
 
 	Integer isResolved = 0
 
@@ -77,6 +78,7 @@ class AssetComment {
 
 		resolution( blank:true, nullable:true  )
 		dateCreated( nullable:true  )
+		lastUpdated( blank:true, nullable:true  )
 
 		dateResolved( nullable:true  )
 
@@ -142,7 +144,9 @@ class AssetComment {
 		return assetEntity.assetName
 	}
 
-	
+	def beforeUpdate = {
+		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+	}
 
 	String toString() {
 

@@ -974,7 +974,7 @@ class ClientTeamsController {
 		}
 		
 		def sortBy = session.getAttribute("SORT_BY") ? session.getAttribute("SORT_BY") : 'dueDate'
-		def orderBy = session.getAttribute("ORDER_BY") ? session.getAttribute("ORDER_BY") : 'asc , dateCreated desc'
+		def orderBy = session.getAttribute("ORDER_BY") ? session.getAttribute("ORDER_BY") : 'asc , lastUpdated desc'
 		if(params.search){
 			todo = AssetComment.findAll("From AssetComment a where a.project = :project AND a.assetEntity.assetTag=:tag AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Pending' , 'Started')) order by ${sortBy} ${orderBy} ",[project:projectInstance,assignedTo:personInstance,type:'issue',tag:params.search])
 			all= AssetComment.findAll("From AssetComment a where a.project = :project  AND a.assetEntity.assetTag=:tag AND commentType=:type AND assignedTo = :assignedTo   order by ${sortBy} ${orderBy} , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue',tag:params.search])
