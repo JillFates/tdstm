@@ -1802,12 +1802,8 @@ class AssetEntityController {
 	 * ------------------------------------------------------------ */
 	def updateComment = {
 		def map = commentService.saveUpdateCommentAndNotes(session, params, false)
-		if(params.redirectTo=='taskList'){
-		    flash.message = " ${map.assetComment} Comment Updated"
-			redirect(controller:'clientTeams' , action:'listComment')
-		 }else{
-		    render map as JSON
-		 }
+		
+		render map as JSON
 		
 	}
 	

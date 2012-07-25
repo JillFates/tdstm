@@ -72,10 +72,10 @@
 				  <g:else>
 					<tr id="issueTr_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="issueDetails(${issue?.item?.id})">
 				  </g:else>
-						<td class="asset_details_block_task">${issue?.item?.comment?.size() > 50 ? issue?.item?.comment?.substring(0,40)+'...' : issue?.item?.comment}</td>
-						<td class="asset_details_block"><tds:convertDate date="${issue?.item?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-						<td class="asset_details_block"><tds:convertDate date="${issue?.item?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-						<td class="asset_details_block">${issue?.item?.assetEntity?.assetName}</td>
+						<td id="comment_${issue?.item?.id}" class="asset_details_block_task">${issue?.item?.comment?.size() > 50 ? issue?.item?.comment?.substring(0,40)+'...' : issue?.item?.comment}</td>
+						<td id="lastUpdated_${issue?.item?.id}" class="asset_details_block"><tds:convertDate date="${issue?.item?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+						<td id="dueDate_${issue?.item?.id}" class="asset_details_block"><tds:convertDate date="${issue?.item?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+						<td id="asset_${issue?.item?.id}" class="asset_details_block">${issue?.item?.assetEntity?.assetName}</td>
 						<td id="statusTd_${issue?.item?.id}" class="asset_details_block">${issue?.item?.status}</td>
 					</tr>
 					<g:if test="${tab && tab == 'todo'}">
@@ -103,6 +103,11 @@
 					   </td>
 					</tr>
 					</g:if>
+					<tr id="detailTdId_${issue?.item?.id}" style="display: none">
+					<td colspan="5">
+					   <div id="detailId_${issue?.item?.id}"  > </div>
+					</td>
+					</tr>
 				</g:each>
 				</tbody>
 				</table>
@@ -130,20 +135,24 @@
 			type:'POST',
 			success: function(data) {
 				B1.Pause()
-				$('#myIssueList').css('display','none')
-				$('#detailId').html(data)
-				$('#detailId').css('display','block')
+				$('#showStatusId_'+id).css('display','none')
+				$('#issueTr_'+id).attr('onClick','cancelButton('+id+')');
+				$('#detailId_'+id).html(data)
+				$('#detailTdId_'+id).css('display','table-row')
+				//$('#detailId_'+id).css('display','block')
 				$('#taskLinkId').removeClass('mobselect')
 				$('#detailLinkId').addClass('mobselect')
 			}
 		});
 	}
-	function cancelButton(){
+	function cancelButton(id){
 		B1.Start(60);
-		$('#myIssueList').css('display','block')
-		$('#detailId').css('display','none')
+		//$('#myIssueList').css('display','block')
+		$('#detailTdId_'+id).css('display','none')
 		$('#taskLinkId').addClass('mobselect')
 		$('#detailLinkId').removeClass('mobselect')
+		$('#showStatusId_'+id).css('display','table-row')
+		$('#issueTr_'+id).attr('onClick','issueDetails('+id+')');
 
 	}
 	function changeStatus(id,status,user){
@@ -178,7 +187,9 @@
 
 	function hideStatus(id,status){
 		$('#showStatusId_'+id).hide()
+		$('#detailTdId_'+id).css('display','none')
 		$('#issueTrId_'+id).attr('onClick','openStatus('+id+',"'+status+'")');
+		B1.Start(60);
 	}
  
 function actionSubmit(id){

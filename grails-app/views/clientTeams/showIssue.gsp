@@ -22,7 +22,7 @@
 		<a name="comments"></a>
 		<input id="issueId" name="id" type="hidden" value="${assetComment.id}" />
 		<input id="redirectTo" name="redirectTo" type="hidden" value="taskList" />
-		<table style="width:420px;margin-bottom:30px">
+		<table style="width:420px;">
 			<tr>
 				<td class="heading" colspan=2><a class="heading" href="#comments">Task details:</a></td>
 			</tr>
@@ -33,12 +33,12 @@
 			<tr>
 			<td valign="top" class="name"><label for="comment">Task:</label></td>
 			<td colspan=2>
-			  <textarea rows="4" cols="130" style="width:188px;padding:0px;" title="Edit Comment..." id="editComment" name="comment" >${assetComment.comment}</textarea>
+			  <textarea rows="4" cols="130" style="width:188px;padding:0px;" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" >${assetComment.comment}</textarea>
 			</td></tr>	
 			<tr class="prop" >
 				<td valign="top" class="name"><label for="status">Status:</label></td>
 				<td style="width: 20%;">
-					<g:select id="statusEditId" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
+					<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
 					noSelection="['':'please select']"  onChange="showResolve()"></g:select>
 				</td>	
 			</tr>	
@@ -46,12 +46,12 @@
 			<tr class="prop issue" id="assignedToTrEditId" >
 				<td valign="top" class="name"><label for="assignedTo">Assigned:</label></td>
 				<td valign="top" id="assignedToEditTdId" style="width: 20%;" >
-					<g:select id="assignedToEditId" name="assignedTo" from="${partyList}" value="${assetComment.assignedTo.id}" optionKey="id" noSelection="['':'please select']"></g:select>
+					<g:select id="assignedToEditId_${assetComment.id}" name="assignedTo" from="${partyList}" value="${assetComment.assignedTo.id}" optionKey="id" noSelection="['':'please select']"></g:select>
 				</td>
 			</tr> 
 			<tr class="prop issue" id="dueDatesEditId"  >
 				<td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
-				<td valign="top" class="value" id="dueDatesEditId" ><script type="text/javascript" charset="utf-8">
+				<td valign="top" class="value" id="dueDatesEditId_${assetComment.id}" ><script type="text/javascript" charset="utf-8">
 	             jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 	             </script><input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDate" id="dueDateEdit"
 						value="<tds:convertDate date="${assetComment?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" /></td>
@@ -59,7 +59,7 @@
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="category">Category:</label></td>
-				<td valign="top" class="value"><g:select id="categoryEditId" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="${assetComment.category}"></g:select></td>
+				<td valign="top" class="value"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="${assetComment.category}"></g:select></td>
 			</tr>
 			<tr>
 			<g:if test="${assetComment.assetEntity}">
@@ -73,10 +73,10 @@
 				<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 				<td valign="top" class="value"><span id="categoryEditId">${assetComment?.createdBy} on <tds:convertDate date="${assetComment?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span></td>
 			</tr>
-			<tr class="prop" id="resolutionId" style="display: none;">
+			<tr class="prop" id="resolutionId_${assetComment.id}" style="display: none;">
 				<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
 				<td valign="top" class="value" colspan="2">
-					<textarea cols="100" rows="2" style="width:188px;padding:0px;" id="resolutionEditId" name="resolution" >${assetComment.resolution}</textarea>
+					<textarea cols="100" rows="2" style="width:188px;padding:0px;" id="resolutionEditId_${assetComment.id}" name="resolution" >${assetComment.resolution}</textarea>
 				</td>
 			</tr> 
 			 <tr class="prop">
@@ -93,10 +93,10 @@
 				 </table>
 				</div></td>
 			</tr>
-		    <tr class="prop" id="noteId">
+		    <tr class="prop" id="noteId_${assetComment.id}">
 				<td valign="top" class="name"><label for="notes">Note:</label></td>
 				<td valign="top" class="value">
-				   <textarea cols="80" rows="4" id="noteEditId" name="note" style="width:188px;padding:0px;"></textarea>
+				   <textarea cols="80" rows="4" id="noteEditId_${assetComment.id}" name="note" style="width:188px;padding:0px;"></textarea>
 				</td>
 			</tr>
 			<g:if test="${assetComment.dateResolved}">
@@ -117,9 +117,9 @@
 			</g:if>
 			
 			<tr>
-			    <td class="buttonR" ><input type="button" value="Cancel" onclick="cancelButton()" /> </td>
+			    <td class="buttonR" ><input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" /> </td>
 				<td class="buttonR" colspan="1" style="text-align:right;">
-				<input type="submit" value="Update Task" onclick="return validateComment()" />
+				<input type="button" value="Update Task" onclick="validateComment(${assetComment.id})" />
 			</td>
 			</tr>	
 		</table>
@@ -159,11 +159,10 @@
 		</table>
 		</div>
 		--%><div class="clear" style="margin:4px;"></div>
-		<div style="margin:2px;" class="reset" ></div>
 		<a name="detail" ></a>
 		<g:if test="${assetComment?.assetEntity}">
 		 	<div style="float: left;">
-				<table style="width:420px;margin-bottom:30px">
+				<table style="width:420px;float: left;margin-left: -8px;">
 				<tr>
 					<td class="heading"><a href="#detail">Details</a></td>
 					<td><span style="float:right;"><a href="#top">Top</a></span></td>
@@ -219,9 +218,9 @@
 </div>
 <script type="text/javascript">
 $( function() {
-	 if($('#statusEditId').val()=='Completed'){
-	       $('#noteId').hide()
-	       $('#resolutionId').show()
+	 if($('#statusEditId_'+${assetComment.id}).val()=='Completed'){
+	       $('#noteId_'+${assetComment.id}).hide()
+	       $('#resolutionId_'+${assetComment.id}).show()
 	 }
 });
  window.document.onkeydown = function (e){
@@ -230,24 +229,72 @@ $( function() {
     }
  };
  function showResolve(){
-   if($('#statusEditId').val()=='Completed'){
-       $('#noteId').hide()
-       $('#resolutionId').show()
+   if($('#statusEditId_'+${assetComment.id}).val()=='Completed'){
+       $('#noteId_'+${assetComment.id}).hide()
+       $('#resolutionId_'+${assetComment.id}).show()
    }else{
-	   $('#noteId').show()
-       $('#resolutionId').hide()
+	   $('#noteId_'+${assetComment.id}).show()
+       $('#resolutionId_'+${assetComment.id}).hide()
    }
  }
-
- function validateComment(){
-	 var status = $('#statusEditId').val()
-	 var boo = true
-	 if(status=='Completed' && $('#resolutionEditId').val()==''){
-		 boo= false
-         alert("Please Enter Resolution")
+ function formatDueDate(input){
+	 var currentDate = ""
+	 if(input){
+		  var datePart = input.match(/\d+/g),
+		  year = datePart[0].substring(0), // get only two digits
+		  month = datePart[1], day = datePart[2];
+	      currentDate = month+'/'+day+'/'+year;
 	 }
-	 return boo
+    return currentDate
+}
+ function validateComment(objId){
+	 var status = $('#statusEditId_'+${assetComment.id}).val()
+	 if(status=='Completed' && $('#resolutionEditId_'+${assetComment.id}).val()==''){
+         alert("Please Enter Resolution")
+	 }else{
+		var params = {   'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 
+						 'category':$('#categoryEditId_'+objId).val(), 'assignedTo':$('#assignedToEditId_'+objId).val(),
+						 'dueDate':$('#dueDateEdit_'+objId).val(), 'status':$('#statusEditId_'+objId).val(),
+						 'note':$('#noteEditId_'+objId).val(),'id':objId }
+		 jQuery.ajax({
+				url: '../assetEntity/updateComment',
+				data: params,
+				type:'POST',
+				success: function(data) {
+					var myClass = $('#issueTrId_'+data.assetComment.id).attr("class");
+					$('#comment_'+data.assetComment.id).html(truncate(data.assetComment.comment))
+					$('#lastUpdated_'+data.assetComment.id).html(formatDueDate(data.assetComment.lastUpdated))
+					$('#dueDate_'+data.assetComment.id).html(formatDueDate(data.assetComment.dueDate))
+					if(data.assetComment.assetEntity){
+					 	$('#asset_'+data.assetComment.id).html(data.assetComment.assetEntity.assetName)
+					}
+					$('#statusTd_'+data.assetComment.id).html(data.assetComment.status)
+					if(data.assetComment.status!='Completed'){
+						$('#started_'+data.assetComment.id).hide()
+						$('#issueTrId_'+data.assetComment.id).removeClass(myClass).addClass('asset_process');
+						$('#issueTr_'+data.assetComment.id).removeClass(myClass).addClass('asset_process');
+					}else{
+						$('#showStatusId_'+data.assetComment.id).hide()
+						$('#issueTrId_'+data.assetComment.id).remove()
+						$('#toDoNumberId').html(parseInt($('#toDoNumberId').html())-1)
+						$('#detailTdId_'+data.assetComment.id).hide()
+						B1.Start(60);
+					}
+				}
+			});
+	 }
  }
+ function truncate( text ){
+		var trunc = text
+		if(text){
+			if(text.length > 50){
+				trunc = trunc.substring(0, 50);
+				trunc += '...'
+			}
+		}
+		return trunc;
+ }
+	
 
  </script>
  <script>
