@@ -129,6 +129,7 @@
 			data: {'issueId':id},
 			type:'POST',
 			success: function(data) {
+				B1.Pause()
 				$('#myIssueList').css('display','none')
 				$('#detailId').html(data)
 				$('#detailId').css('display','block')
@@ -138,6 +139,7 @@
 		});
 	}
 	function cancelButton(){
+		B1.Start(60);
 		$('#myIssueList').css('display','block')
 		$('#detailId').css('display','none')
 		$('#taskLinkId').addClass('mobselect')
@@ -266,6 +268,9 @@ function zxcOpacity(obj,opc){
 			}else{
 				pageRefresh();
 			}
+		},
+		Pause:function(){
+			clearTimeout(this.to);
 		}
 	}
 
