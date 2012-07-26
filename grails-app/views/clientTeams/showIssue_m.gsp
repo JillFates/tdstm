@@ -3,10 +3,12 @@
 <head>
 <title>Task Details</title>
 <jq:plugin name="jquery"/>
+ 
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
 <meta name="viewport" content="height=device-height,width=220" />
 	
 <script type="text/javascript">
@@ -28,7 +30,7 @@
 		<a name="comments"></a>
 		<input id="issueId" name="id" type="hidden" value="${assetComment.id}" />
 		<input id="redirectTo" name="redirectTo" type="hidden" value="taskList" />
-		<table style="width: 220px;margin-bottom: 30px">
+		<table style="width: 100%;">
 			<tr>
 				<td class="heading" colspan=2><a class="heading" href="#comments">Task details:</a></td>
 			</tr>
@@ -38,33 +40,33 @@
 			</tr>		
 			<tr>
 			<td colspan=2>
-			  <textarea rows="4" cols="130" style="width:150px;padding:0px;" title="Edit Comment..." id="editComment" name="comment" >${assetComment.comment}</textarea>
+			  <textarea rows="4" cols="130" style="width:100%;padding:0px;" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" >${assetComment.comment}</textarea>
 			</td></tr>	
 			<tr class="prop" >
 				<td valign="top" class="name"><label for="status">Status:</label></td>
 				<td style="width: 20%;">
-					<g:select id="statusEditId" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
-					noSelection="['':'please select']" ></g:select>
+					<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
+					noSelection="['':'please select']" onChange="showResolve()" ></g:select>
 				</td>	
 			</tr>	
 			 <% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
 			<tr class="prop issue" id="assignedToTrEditId" >
 				<td valign="top" class="name"><label for="assignedTo">Assigned:</label></td>
 				<td valign="top" id="assignedToEditTdId" style="" >
-					<g:select id="assignedToEditId" name="assignedTo" from="${partyList}" value="${assetComment.assignedTo.id}" optionKey="id" noSelection="['':'please select']"></g:select>
+					<g:select id="assignedToEditId_${assetComment.id}" name="assignedTo" from="${partyList}" value="${assetComment.assignedTo.id}" optionKey="id" noSelection="['':'please select']"></g:select>
 				</td>
 			</tr> 
 			<tr class="prop issue" id="dueDatesEditId"  >
 				<td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
-				<td valign="top" class="value" id="dueDatesEditId" ><script type="text/javascript" charset="utf-8">
+				<td valign="top" class="value" id="dueDatesEditId_${assetComment.id}" ><script type="text/javascript" charset="utf-8">
 	             jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-	             </script><input type="text" class="dateRange" size="15" style="width: 80px; height: 14px;" name="dueDate" id="dueDateEdit"
+	             </script><input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDate" id="dueDateEdit_${assetComment.id}"
 						value="<tds:convertDate date="${assetComment?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" /></td>
 				
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="category">Category:</label></td>
-				<td valign="top" class="value"><g:select id="categoryEditId" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="${assetComment.category}"></g:select></td>
+				<td valign="top" class="value"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="${assetComment.category}"></g:select></td>
 			</tr>
 			<tr>
 			<g:if test="${assetComment.assetEntity}">
@@ -83,31 +85,31 @@
 			</tr>
 			<tr class="prop">
 			<td valign="top" class="value" colspan="2"><div id="previousNote" >
-				 <table style="width: 50px;">
+				 <table style="table-layout: fixed; width: 100%;border: 1px solid green;">
                    <g:each in="${notes}" var="note" status="i" >
                     <tr>
 	                    <td>${note[0]}</td>
 	                    <td>${note[1]}</td>
-                        <td>${note[2]}</td>
+                        <td style="word-wrap: break-word">${note[2]}</td>
                      </tr>
                    </g:each>
 				 </table>
 				</div></td>
 			</tr>
-		    <tr class="prop">
+		    <tr class="prop" id="noteId_${assetComment.id}">
 				<td valign="top" class="name"><label for="notes">Note:</label></td>
 				
 			</tr>
-			<tr class="prop"><td valign="top" class="value" colspan="2">
-				   <textarea cols="130" rows="4" id="noteEditId" name="note" style="width:150px;padding:0px;"></textarea>
+			<tr class="prop" id="noteTrId_${assetComment.id}"><td valign="top" class="value" colspan="2">
+				   <textarea cols="130" rows="4" id="noteEditId_${assetComment.id}" name="note" style="width:100%;padding:0px;"></textarea>
 				</td>
 			</tr>
-			<tr class="prop">
+			<tr class="prop" id="resolutionId_${assetComment.id}" style="display: none">
 				<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
 			</tr> 
-			<tr class="prop">
+			<tr class="prop" id="resolutionTrId_${assetComment.id}" style="display: none">
 				<td valign="top" class="value" colspan="2">
-					<textarea cols="130" rows="4" style="width:150px;padding:0px;" id="resolutionEditId" name="resolution" >${assetComment.resolution}</textarea>
+					<textarea cols="130" rows="4" style="width:100%;padding:0px;" id="resolutionEditId_${assetComment.id}" name="resolution" >${assetComment.resolution}</textarea>
 				</td>
 			</tr> 
 			<g:if test="${assetComment.resolvedBy}">
@@ -120,9 +122,9 @@
 			</g:if>
 			
 			<tr>
-			    <td class="buttonR" ><input type="button" value="Cancel" onclick="cancelButton()" /> </td>
+			    <td class="buttonR" ><input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" /> </td>
 				<td class="buttonR" colspan="1" style="text-align:right;">
-					<input type="submit" value="Update Task" onclick="return validateComment()" />
+					<input type="button" value="Update Task" onclick="validateComment(${assetComment.id})" />
 				</td>
 			</tr>	
 		</table>
@@ -221,15 +223,89 @@
 		</g:if>
 </div>
 <script type="text/javascript">
- function validateComment(){
-	 var status = $('#statusEditId').val()
-	 var boo = true
-	 if(status=='Completed' && $('#resolutionEditId').val()==''){
-		 boo= false
-         alert("Please Enter Resolution")
-        
+ $( function() {
+	 if($('#statusEditId_'+${assetComment.id}).val()=='Completed'){
+	       $('#noteId_'+${assetComment.id}).hide()
+	       $('#noteTrId_'+${assetComment.id}).hide()
+	       $('#resolutionId_'+${assetComment.id}).show()
+	       $('#resolutionTrId_'+${assetComment.id}).show()
 	 }
-	 return boo
+ });
+
+ function showResolve(){
+  if($('#statusEditId_'+${assetComment.id}).val()=='Completed'){
+      $('#noteId_'+${assetComment.id}).hide()
+      $('#resolutionId_'+${assetComment.id}).show()
+       $('#noteTrId_'+${assetComment.id}).hide()
+      $('#resolutionTrId_'+${assetComment.id}).show()
+  }else{
+	   $('#noteId_'+${assetComment.id}).show()
+      $('#resolutionId_'+${assetComment.id}).hide()
+      $('#noteTrId_'+${assetComment.id}).show()
+      $('#resolutionTrId_'+${assetComment.id}).hide()
+  }
+ }
+ function formatDueDate(input){
+	 var currentDate = ""
+	 if(input){
+		  var datePart = input.match(/\d+/g),
+		  year = datePart[0].substring(0), // get only two digits
+		  month = datePart[1], day = datePart[2];
+	      currentDate = month+'/'+day+'/'+year;
+	 }
+   return currentDate
+ }
+ function validateComment(objId){
+	 var status = $('#statusEditId_'+${assetComment.id}).val()
+	 if(status=='Completed' && $('#resolutionEditId_'+${assetComment.id}).val()==''){
+        alert("Please Enter Resolution")
+	 }else{
+		var params = {   'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 
+						 'category':$('#categoryEditId_'+objId).val(), 'assignedTo':$('#assignedToEditId_'+objId).val(),
+						 'dueDate':$('#dueDateEdit_'+objId).val(), 'status':$('#statusEditId_'+objId).val(),
+						 'note':$('#noteEditId_'+objId).val(),'id':objId }
+		 jQuery.ajax({
+				url: '../assetEntity/updateComment',
+				data: params,
+				type:'POST',
+				success: function(data) {
+					var myClass = $('#issueTrId_'+data.assetComment.id).attr("class");
+					$('#comment_'+data.assetComment.id).html(truncate(data.assetComment.comment))
+					$('#lastUpdated_'+data.assetComment.id).html(formatDueDate(data.assetComment.lastUpdated))
+					$('#dueDate_'+data.assetComment.id).html(formatDueDate(data.assetComment.dueDate))
+					if(data.assetComment.assetEntity){
+					 	$('#asset_'+data.assetComment.id).html(data.assetComment.assetEntity.assetName)
+					}
+					$('#statusTd_'+data.assetComment.id).html(data.assetComment.status)
+					$('#detailTdId_'+data.assetComment.id).hide()
+					$('#issueTrId_'+data.assetComment.id).removeClass(myClass).addClass(data.statusCss);
+					$('#issueTr_'+data.assetComment.id).removeClass(myClass).addClass(data.statusCss);
+					if(data.assetComment.status==''|| data.assetComment.status=='Started'|| data.assetComment.status=='Pending' || data.assetComment.status==null){
+						$('#started_'+data.assetComment.id).hide()
+						$('#showStatusId_'+data.assetComment.id).css('display','table-row')
+						if(data.assetComment.status=='Pending'){
+							$('#started_'+data.assetComment.id).show()
+						}
+						$('#toDoAllId').html(parseInt($('#toDoAllId').html())+1)
+					}else{
+						$('#showStatusId_'+data.assetComment.id).hide()
+						$('#issueTrId_'+data.assetComment.id).remove()
+						$('#toDoNumberId').html(parseInt($('#toDoNumberId').html())-1)
+						B1.Start(60);
+					}
+				}
+			});
+	 }
+ }
+ function truncate( text ){
+		var trunc = text
+		if(text){
+			if(text.length > 50){
+				trunc = trunc.substring(0, 50);
+				trunc += '...'
+			}
+		}
+		return trunc;
  }
  </script>
 </body>

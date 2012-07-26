@@ -143,6 +143,10 @@ class AssetComment {
 	def getAssetName(){
 		return assetEntity.assetName
 	}
+	
+	def beforeInsert = {
+		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+	}
 
 	def beforeUpdate = {
 		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )

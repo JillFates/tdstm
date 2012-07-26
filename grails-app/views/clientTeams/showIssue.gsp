@@ -22,7 +22,7 @@
 		<a name="comments"></a>
 		<input id="issueId" name="id" type="hidden" value="${assetComment.id}" />
 		<input id="redirectTo" name="redirectTo" type="hidden" value="taskList" />
-		<table style="width:420px;">
+		<table>
 			<tr>
 				<td class="heading" colspan=2><a class="heading" href="#comments">Task details:</a></td>
 			</tr>
@@ -33,7 +33,7 @@
 			<tr>
 			<td valign="top" class="name"><label for="comment">Task:</label></td>
 			<td colspan=2>
-			  <textarea rows="4" cols="130" style="width:188px;padding:0px;" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" >${assetComment.comment}</textarea>
+			  <textarea rows="4" cols="130" style="width:380px;padding:0px;" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" >${assetComment.comment}</textarea>
 			</td></tr>	
 			<tr class="prop" >
 				<td valign="top" class="name"><label for="status">Status:</label></td>
@@ -53,7 +53,7 @@
 				<td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
 				<td valign="top" class="value" id="dueDatesEditId_${assetComment.id}" ><script type="text/javascript" charset="utf-8">
 	             jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-	             </script><input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDate" id="dueDateEdit"
+	             </script><input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDate" id="dueDateEdit_${assetComment.id}"
 						value="<tds:convertDate date="${assetComment?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" /></td>
 				
 			</tr>
@@ -73,15 +73,10 @@
 				<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 				<td valign="top" class="value"><span id="categoryEditId">${assetComment?.createdBy} on <tds:convertDate date="${assetComment?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span></td>
 			</tr>
-			<tr class="prop" id="resolutionId_${assetComment.id}" style="display: none;">
-				<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
-				<td valign="top" class="value" colspan="2">
-					<textarea cols="100" rows="2" style="width:188px;padding:0px;" id="resolutionEditId_${assetComment.id}" name="resolution" >${assetComment.resolution}</textarea>
-				</td>
-			</tr> 
+			
 			 <tr class="prop">
 				<td valign="top" class="name"><label for="notes">Previous Notes:</label></td>
-				<td valign="top" class="value"><div id="previousNote" style="width: 180px">
+				<td valign="top" class="value"><div id="previousNote" style="width: 380px">
 				 <table>
                    <g:each in="${notes}" var="note" status="i" >
                     <tr>
@@ -96,9 +91,15 @@
 		    <tr class="prop" id="noteId_${assetComment.id}">
 				<td valign="top" class="name"><label for="notes">Note:</label></td>
 				<td valign="top" class="value">
-				   <textarea cols="80" rows="4" id="noteEditId_${assetComment.id}" name="note" style="width:188px;padding:0px;"></textarea>
+				   <textarea cols="80" rows="4" id="noteEditId_${assetComment.id}" name="note" style="width:380px;padding:0px;"></textarea>
 				</td>
 			</tr>
+			<tr class="prop" id="resolutionId_${assetComment.id}" style="display: none;">
+				<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
+				<td valign="top" class="value" colspan="2">
+					<textarea cols="100" rows="4" style="width:380px;padding:0px;" id="resolutionEditId_${assetComment.id}" name="resolution" >${assetComment.resolution}</textarea>
+				</td>
+			</tr> 
 			<g:if test="${assetComment.dateResolved}">
 				<tr class="prop">
 					<td valign="top" class="name"><label for="resolution">Resolved At:</label></td>
@@ -162,7 +163,7 @@
 		<a name="detail" ></a>
 		<g:if test="${assetComment?.assetEntity}">
 		 	<div style="float: left;">
-				<table style="width:420px;float: left;margin-left: -8px;">
+				<table style="float: left;width:500px;">
 				<tr>
 					<td class="heading"><a href="#detail">Details</a></td>
 					<td><span style="float:right;"><a href="#top">Top</a></span></td>
@@ -223,11 +224,7 @@ $( function() {
 	       $('#resolutionId_'+${assetComment.id}).show()
 	 }
 });
- window.document.onkeydown = function (e){
-    if (e.keyCode  == 27) {
-    	cancelButton();
-    }
- };
+
  function showResolve(){
    if($('#statusEditId_'+${assetComment.id}).val()=='Completed'){
        $('#noteId_'+${assetComment.id}).hide()
@@ -269,15 +266,20 @@ $( function() {
 					 	$('#asset_'+data.assetComment.id).html(data.assetComment.assetEntity.assetName)
 					}
 					$('#statusTd_'+data.assetComment.id).html(data.assetComment.status)
-					if(data.assetComment.status!='Completed'){
+					$('#detailTdId_'+data.assetComment.id).hide()
+					$('#issueTrId_'+data.assetComment.id).removeClass(myClass).addClass(data.statusCss);
+					$('#issueTr_'+data.assetComment.id).removeClass(myClass).addClass(data.statusCss);
+					if(data.assetComment.status==''|| data.assetComment.status=='Started'|| data.assetComment.status=='Pending' || data.assetComment.status==null){
 						$('#started_'+data.assetComment.id).hide()
-						$('#issueTrId_'+data.assetComment.id).removeClass(myClass).addClass('asset_process');
-						$('#issueTr_'+data.assetComment.id).removeClass(myClass).addClass('asset_process');
+						$('#showStatusId_'+data.assetComment.id).show()
+						if(data.assetComment.status=='Pending'){
+							$('#started_'+data.assetComment.id).show()
+						}
+						$('#toDoAllId').html(parseInt($('#toDoAllId').html())+1)
 					}else{
 						$('#showStatusId_'+data.assetComment.id).hide()
 						$('#issueTrId_'+data.assetComment.id).remove()
 						$('#toDoNumberId').html(parseInt($('#toDoNumberId').html())-1)
-						$('#detailTdId_'+data.assetComment.id).hide()
 						B1.Start(60);
 					}
 				}

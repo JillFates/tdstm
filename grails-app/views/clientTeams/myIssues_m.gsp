@@ -6,6 +6,8 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
 <link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <meta name="viewport" content="height=device-height,width=220" />
 	
@@ -114,7 +116,7 @@
 					  <g:link class="tab_select" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(<span id="toDoNumberId">${todoSize}</span>)</g:link>
 					</g:if>
 					<g:else>
-					  <g:link class="tab_deselect" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(${todoSize})</g:link>
+					  <g:link class="tab_deselect" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(<span id="toDoAllId">${todoSize}</span>)</g:link>
 					</g:else>
 				</td>
 				<td id="allId" class="tab">
@@ -145,32 +147,40 @@
 				<tbody>
 				<g:each status="i" in="${listComment}" var="issue" >
 				  <g:if test="${tab && tab == 'todo'}">
-					<tr id="issueMTrId_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="openStatus(${issue?.item?.id},'${issue?.item?.status}')">
+					<tr id="issueTrId_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="openStatus(${issue?.item?.id},'${issue?.item?.status}')">
 				  </g:if>
 				  <g:else>
-					<tr id="issueMTrId_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="issueDetails(${issue?.item?.id})">
+					<tr id="issueTr_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="issueDetails(${issue?.item?.id})">
 				  </g:else>
-						<td class="asset_details_block">${issue?.item?.comment?.size() > 50 ? issue?.item?.comment?.substring(0,40)+'...' : issue?.item?.comment}</td>
-						<%--<td class="asset_details_block col2"><tds:convertDate date="${issue?.item?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-						<td class="asset_details_block"><tds:convertDate date="${issue?.item?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-	
-						--%><td class="asset_details_block">${issue?.item?.assetEntity?.assetName}</td>
-						<td id="statusTd_${issue?.item?.id}" class="asset_details_block">${issue?.item?.status}</td>
+						<td id="comment_${issue?.item?.id}" class="asset_details_block">${issue?.item?.comment?.size() > 50 ? issue?.item?.comment?.substring(0,40)+'...' : issue?.item?.comment}</td>
+						<td id="asset_${issue?.item?.id}"class="asset_details_block">${issue?.item?.assetEntity?.assetName}</td>
+						<td id="statusTd_${issue?.item?.id}"id="statusTd_${issue?.item?.id}" class="asset_details_block">${issue?.item?.status}</td>
 					</tr>
 					<g:if test="${tab && tab == 'todo'}">
-					<tr id="showStatusId_${issue?.item?.id}" style="display: none;" > 
-						   <td nowrap="nowrap" colspan="5" class="statusButtonBar" >
-							<span class="statusButton" id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','Started',${userId})">
-							<img src="${createLinkTo(dir:'images',file:'player_play.jpg')}" />&nbsp;&nbsp;Start&nbsp;&nbsp;
-							</span>
-							<span id="image_${issue?.item?.id}"></span>  
-							<span class="statusButton" onclick="changeStatus('${issue?.item?.id}','Completed',${userId})" style="margin-left: 30px">
-							<img src="${createLinkTo(dir:'images',file:'check.png')}" />&nbsp;&nbsp;Complete&nbsp;&nbsp;
-							</span>
-							<span class="detailButton" onclick="issueDetails(${issue?.item?.id})" style="margin: 30px">&nbsp;&nbsp;Details..&nbsp;&nbsp;</span>
+					<tr id="showStatusId_${issue?.item?.id}" style="display: none;" nowrap="nowrap"> 
+						   <td nowrap="nowrap" colspan="3" class="statusButtonBar" >
+							<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action" style="margin-left: 5px"
+							 id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','Started',${userId})">
+								<span class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
+								<span class="ui-button-text task_button">Start</span>
+							</a>
+							<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
+							 onclick="changeStatus('${issue?.item?.id}','Completed',${userId})" style="margin-left: 5px">
+								<span class="ui-button-icon-primary ui-icon ui-icon-check task_icon"></span>
+								<span class="ui-button-text task_button">Complete</span>
+							</a>
+							<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action" style="margin-left: 5px" onclick="issueDetails(${issue?.item?.id})">
+								<span class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
+								<span class="ui-button-text task_button">Details..</span>
+							</a>
 						   </td>
 						</tr>
 					</g:if>
+					<tr id="detailTdId_${issue?.item?.id}" style="display: none">
+					<td colspan="3">
+					   <div id="detailId_${issue?.item?.id}"  > </div>
+					</td>
+					</tr>
 				</g:each>
 				</tbody>
 				</table>
@@ -194,20 +204,24 @@
 			data: {'issueId':id},
 			type:'POST',
 			success: function(data) {
-				$('#myIssueList').css('display','none')
-				$('#detailId').html(data)
-				$('#detailId').css('display','block')
+				B1.Pause()
+				$('#showStatusId_'+id).css('display','none')
+				$('#issueTr_'+id).attr('onClick','cancelButton('+id+')');
+				$('#detailId_'+id).html(data)
+				$('#detailTdId_'+id).css('display','table-row')
 				$('#taskLinkId').removeClass('mobselect')
 				$('#detailLinkId').addClass('mobselect')
 			}
 		});
 	}
-	function cancelButton(){
-		$('#myIssueList').css('display','block')
-		$('#detailId').css('display','none')
+	
+	function cancelButton(id){
+		B1.Start(60);
+		$('#detailTdId_'+id).css('display','none')
 		$('#taskLinkId').addClass('mobselect')
 		$('#detailLinkId').removeClass('mobselect')
-
+		$('#showStatusId_'+id).css('display','table-row')
+		$('#issueTr_'+id).attr('onClick','issueDetails('+id+')');
 	}
 	
 	function changeStatus(id,status,user){
@@ -216,14 +230,14 @@
 			data: {'id':id,'status':status,'assignedTo':user},
 			type:'POST',
 			success: function(data) {
-				var myClass = $('#issueMTrId_'+data.assetComment.id).attr("class");
+				var myClass = $('#issueTrId_'+data.assetComment.id).attr("class");
 				if(data.assetComment.status=='Started'){
 					$('#statusTd_'+data.assetComment.id).html(data.assetComment.status)
 					$('#started_'+data.assetComment.id).hide()
-					$('#issueMTrId_'+data.assetComment.id).removeClass(myClass).addClass('asset_process');
+					$('#issueTrId_'+data.assetComment.id).removeClass(myClass).addClass('asset_process');
 				}else{
 					$('#showStatusId_'+data.assetComment.id).hide()
-					$('#issueMTrId_'+data.assetComment.id).remove()
+					$('#issueTrId_'+data.assetComment.id).remove()
 					$('#toDoNumberId').html(parseInt($('#toDoNumberId').html())-1)
 				}
 			}
@@ -231,18 +245,19 @@
 	}
 
 	function openStatus(id,status){
-		$('.statusClass').css('display','none')
 		if(status=='Started'){
 			$('#started_'+id).css('display','none')
 			$('#image_'+id).css('display','none')
 	    }
 		$('#showStatusId_'+id).show()
-		$('#issueMTrId_'+id).attr('onClick','hideStatus('+id+',"'+status+'")');
+		$('#issueTrId_'+id).attr('onClick','hideStatus('+id+',"'+status+'")');
 	}
 	
 	function hideStatus(id,status){
 		$('#showStatusId_'+id).hide()
-		$('#issueMTrId_'+id).attr('onClick','openStatus('+id+',"'+status+'")');
+		$('#detailTdId_'+id).css('display','none')
+		$('#issueTrId_'+id).attr('onClick','openStatus('+id+',"'+status+'")');
+		B1.Start(60);
 	}
 	
 	function changeAction(){
@@ -281,6 +296,9 @@
 			}else{
 				pageRefresh();
 			}
+		},
+		Pause:function(){
+			clearTimeout(this.to);
 		}
 	}
 

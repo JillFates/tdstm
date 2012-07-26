@@ -38,7 +38,7 @@
 					  <g:link class="tab_select" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(<span id="toDoNumberId">${todoSize}</span>)</g:link>
 					</g:if>
 					<g:else>
-					  <g:link class="tab_deselect" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(${todoSize})</g:link>
+					  <g:link class="tab_deselect" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(<span id="toDoAllId">${todoSize}</span>)</g:link>
 					</g:else>
 				</td>
 				<td id="allId" class="tab">
@@ -176,7 +176,6 @@
 	}
 
 	function openStatus(id,status){
-		$('.statusClass').css('display','none')
 		if(status=='Started'){
 			$('#started_'+id).css('display','none')
 			$('#image_'+id).css('display','none')
@@ -192,11 +191,6 @@
 		B1.Start(60);
 	}
  
-function actionSubmit(id){
-   $('#issueId').val(id)
-   document.issueAssetForm.submit();
-}
-
 function changeAction(){
 	 document.issueAssetForm.action = 'listComment'
 }

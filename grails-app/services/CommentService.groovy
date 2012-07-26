@@ -143,7 +143,19 @@ class CommentService {
 			def css =  assetComment.dueDate < date ? 'Lightpink' : 'White'
 			def status = (assetComment.commentType == "issue" && assetComment.isResolved == 0) ? true : false
 			
-			def map = [ assetComment : assetComment, status : status ? true : false , cssClass:css ]
+			    def statusCss = 'asset_process'
+			
+				if(assetComment.status=='Pending' || assetComment.status=='' || assetComment.status==null){
+					statusCss='asset_ready'
+				}else if(assetComment.status=='Completed'){
+					statusCss='asset_done'
+				}else if(assetComment.status=='Hold'){
+					statusCss='asset_hold'
+				}else if(assetComment.status=='Planned'){
+					statusCss='asset_pending'
+				}
+			
+			def map = [ assetComment : assetComment, status : status ? true : false , cssClass:css,statusCss:statusCss ]
 
 			// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.
 			def loginPerson = loginUser.person	// load so that we don't have a lazyInit issue
