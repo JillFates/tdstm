@@ -976,10 +976,10 @@ class ClientTeamsController {
 		def sortBy = session.getAttribute("SORT_BY") ? session.getAttribute("SORT_BY") : 'dueDate'
 		def orderBy = session.getAttribute("ORDER_BY") ? session.getAttribute("ORDER_BY") : 'asc , lastUpdated desc'
 		if(params.search){
-			todo = AssetComment.findAll("From AssetComment a where a.project = :project AND a.assetEntity.assetTag=:tag AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Pending' , 'Started')) order by ${sortBy} ${orderBy} ",[project:projectInstance,assignedTo:personInstance,type:'issue',tag:params.search])
+			todo = AssetComment.findAll("From AssetComment a where a.project = :project AND a.assetEntity.assetTag=:tag AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Ready' , 'Started')) order by ${sortBy} ${orderBy} ",[project:projectInstance,assignedTo:personInstance,type:'issue',tag:params.search])
 			all= AssetComment.findAll("From AssetComment a where a.project = :project  AND a.assetEntity.assetTag=:tag AND commentType=:type AND assignedTo = :assignedTo   order by ${sortBy} ${orderBy} , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue',tag:params.search])
 		}else{
-			todo = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Pending' , 'Started')) order by ${sortBy} ${orderBy} ",[project:projectInstance,assignedTo:personInstance,type:'issue'])
+			todo = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Ready' , 'Started')) order by ${sortBy} ${orderBy} ",[project:projectInstance,assignedTo:personInstance,type:'issue'])
 			all= AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo   order by ${sortBy} ${orderBy} ",[project:projectInstance,assignedTo:personInstance,type:'issue'])
 		}
 		if(params.tab=='all'){
@@ -996,13 +996,13 @@ class ClientTeamsController {
 		
 		listComment.each{issue->
 			def css = 'asset_process'
-			if(issue.status=='Pending' || issue.status=='' || issue.status==null){
+			if( issue.status=='Ready' || issue.status=='' || issue.status==null){
 				css='asset_ready'
 			}else if(issue.status=='Completed'){
 			    css='asset_done'
 			}else if(issue.status=='Hold'){
 			    css='asset_hold'
-			}else if(issue.status=='Planned'){
+			}else if(issue.status=='Planned'|| issue.status=='Pending'){
 			    css='asset_pending'
 			}
 			issueList << ['item':issue,'css':css]

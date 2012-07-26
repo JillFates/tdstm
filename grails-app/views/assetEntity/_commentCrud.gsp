@@ -214,7 +214,7 @@
 		<tr class="prop" >
 			<td valign="top" class="name"><label for="status">Status:</label></td>
 			<td style="width: 20%;">
-				<g:select id="statusId" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Pending"
+				<g:select id="statusId" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Ready"
 				noSelection="['':'please select']" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>	
 		</tr>

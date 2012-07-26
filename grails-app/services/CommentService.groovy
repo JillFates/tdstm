@@ -145,13 +145,13 @@ class CommentService {
 			
 			    def statusCss = 'asset_process'
 			
-				if(assetComment.status=='Pending' || assetComment.status=='' || assetComment.status==null){
+				if(assetComment.status=='Ready' ||assetComment.status=='' || assetComment.status==null){
 					statusCss='asset_ready'
 				}else if(assetComment.status=='Completed'){
 					statusCss='asset_done'
 				}else if(assetComment.status=='Hold'){
 					statusCss='asset_hold'
-				}else if(assetComment.status=='Planned'){
+				}else if(assetComment.status=='Planned'||assetComment.status=='Pending'){
 					statusCss='asset_pending'
 				}
 			

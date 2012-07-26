@@ -265,11 +265,13 @@ $( function() {
 					if(data.assetComment.assetEntity){
 					 	$('#asset_'+data.assetComment.id).html(data.assetComment.assetEntity.assetName)
 					}
+					$('#issueTr_'+objId).attr('onClick','issueDetails('+objId+')');
 					$('#statusTd_'+data.assetComment.id).html(data.assetComment.status)
 					$('#detailTdId_'+data.assetComment.id).hide()
 					$('#issueTrId_'+data.assetComment.id).removeClass(myClass).addClass(data.statusCss);
 					$('#issueTr_'+data.assetComment.id).removeClass(myClass).addClass(data.statusCss);
-					if(data.assetComment.status==''|| data.assetComment.status=='Started'|| data.assetComment.status=='Pending' || data.assetComment.status==null){
+					$('#messageId').html('Comment' +data.assetComment + ' Updated')
+					if(data.assetComment.status==''|| data.assetComment.status=='Started'|| data.assetComment.status=='Ready' || data.assetComment.status==null){
 						$('#started_'+data.assetComment.id).hide()
 						$('#showStatusId_'+data.assetComment.id).show()
 						if(data.assetComment.status=='Pending'){
