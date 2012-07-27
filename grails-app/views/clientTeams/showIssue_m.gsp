@@ -20,7 +20,7 @@
 <body>
 	<a name="top"></a>
 	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
-	<div class="mainbody" style="width: 220px;">
+	<div class="mainbody" style="width: 100%;">
 	 	<div id="mydiv" onclick="this.style.display = 'none';">
  			<g:if test="${flash.message}">
 				<div class="message"><ul>${flash.message}</ul></div>
@@ -30,7 +30,7 @@
 		<a name="comments"></a>
 		<input id="issueId" name="id" type="hidden" value="${assetComment.id}" />
 		<input id="redirectTo" name="redirectTo" type="hidden" value="taskList" />
-		<table style="width: 100%;">
+		<table >
 			<tr>
 				<td class="heading" colspan=2><a class="heading" href="#comments">Task details:</a></td>
 			</tr>
@@ -46,21 +46,21 @@
 				<td valign="top" class="name"><label for="status">Status:</label></td>
 				<td style="width: 20%;">
 					<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
-					noSelection="['':'please select']" onChange="showResolve()" ></g:select>
+					noSelection="['':'please select']" onChange="showResolve()" style="width: 70%;" ></g:select>
 				</td>	
 			</tr>	
 			 <% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
 			<tr class="prop issue" id="assignedToTrEditId" >
 				<td valign="top" class="name"><label for="assignedTo">Assigned:</label></td>
 				<td valign="top" id="assignedToEditTdId" style="" >
-					<g:select id="assignedToEditId_${assetComment.id}" name="assignedTo" from="${partyList}" value="${assetComment.assignedTo.id}" optionKey="id" noSelection="['':'please select']"></g:select>
+					<g:select id="assignedToEditId_${assetComment.id}" name="assignedTo" from="${partyList}" value="${assetComment.assignedTo.id}" optionKey="id" noSelection="['':'please select']" style="width: 70%;"></g:select>
 				</td>
 			</tr> 
 			<tr class="prop issue" id="dueDatesEditId"  >
 				<td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
 				<td valign="top" class="value" id="dueDatesEditId_${assetComment.id}" ><script type="text/javascript" charset="utf-8">
 	             jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-	             </script><input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDate" id="dueDateEdit_${assetComment.id}"
+	             </script><input type="text" class="dateRange" size="15" style="width: 70%; height: 14px;" name="dueDate" id="dueDateEdit_${assetComment.id}"
 						value="<tds:convertDate date="${assetComment?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" /></td>
 				
 			</tr>
@@ -123,7 +123,7 @@
 			
 			<tr>
 			    <td class="buttonR" ><input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" /> </td>
-				<td class="buttonR" colspan="1" style="text-align:right;">
+				<td class="buttonR" colspan="1" style="text-align:right;padding: 2px 6px;">
 					<input type="button" value="Update Task" onclick="validateComment(${assetComment.id})" />
 				</td>
 			</tr>	
@@ -167,8 +167,8 @@
 		<div style="margin:2px;" class="reset" ></div>
 		<a name="detail" ></a>
 		<g:if test="${assetComment?.assetEntity}">
-	 	<div style="float: left;">
-			<table style="width: 220px; margin-bottom: 30px;">
+	 	<div style="float: left;width:100%">
+			<table style=" margin-bottom: 30px;">
 			<tr>
 				<td class="heading"><a href="#detail">Details</a></td>
 				<td><span style="float:right;"><a href="#top">Top</a></span></td>

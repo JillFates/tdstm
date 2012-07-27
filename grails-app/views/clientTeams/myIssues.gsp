@@ -54,7 +54,7 @@
 			</table>
 			</div>
 			<div id="assetIssueDiv" style="float:left;width:500px; ">
-				<table id="issueTable" cellspacing="0px">
+				<table id="issueTable" cellspacing="0px" style="width:100%;margin-left: -1px;">
 				<thead>
 					<tr>
 						<g:sortableColumn class="sort_column" style="width:60px;"  action="listComment" property="comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
@@ -105,7 +105,7 @@
 					</g:if>
 					<tr id="detailTdId_${issue?.item?.id}" style="display: none">
 					<td colspan="5">
-					   <div id="detailId_${issue?.item?.id}"  > </div>
+					   <div id="detailId_${issue?.item?.id}" style="width: 100%" > </div>
 					</td>
 					</tr>
 				</g:each>

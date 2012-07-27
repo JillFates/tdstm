@@ -22,7 +22,7 @@
 		<a name="comments"></a>
 		<input id="issueId" name="id" type="hidden" value="${assetComment.id}" />
 		<input id="redirectTo" name="redirectTo" type="hidden" value="taskList" />
-		<table>
+		<table style="margin-left: -2px;">
 			<tr>
 				<td class="heading" colspan=2><a class="heading" href="#comments">Task details:</a></td>
 			</tr>
@@ -33,7 +33,7 @@
 			<tr>
 			<td valign="top" class="name"><label for="comment">Task:</label></td>
 			<td colspan=2>
-			  <textarea rows="4" cols="130" style="width:380px;padding:0px;" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" >${assetComment.comment}</textarea>
+			  <textarea rows="4" cols="130" style="width:100%;padding:0px;" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" >${assetComment.comment}</textarea>
 			</td></tr>	
 			<tr class="prop" >
 				<td valign="top" class="name"><label for="status">Status:</label></td>
@@ -91,13 +91,13 @@
 		    <tr class="prop" id="noteId_${assetComment.id}">
 				<td valign="top" class="name"><label for="notes">Note:</label></td>
 				<td valign="top" class="value">
-				   <textarea cols="80" rows="4" id="noteEditId_${assetComment.id}" name="note" style="width:380px;padding:0px;"></textarea>
+				   <textarea cols="80" rows="4" id="noteEditId_${assetComment.id}" name="note" style="width:100%;padding:0px;"></textarea>
 				</td>
 			</tr>
 			<tr class="prop" id="resolutionId_${assetComment.id}" style="display: none;">
 				<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
 				<td valign="top" class="value" colspan="2">
-					<textarea cols="100" rows="4" style="width:380px;padding:0px;" id="resolutionEditId_${assetComment.id}" name="resolution" >${assetComment.resolution}</textarea>
+					<textarea cols="100" rows="4" style="width:100%;padding:0px;" id="resolutionEditId_${assetComment.id}" name="resolution" >${assetComment.resolution}</textarea>
 				</td>
 			</tr> 
 			<g:if test="${assetComment.dateResolved}">
@@ -119,7 +119,7 @@
 			
 			<tr>
 			    <td class="buttonR" ><input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" /> </td>
-				<td class="buttonR" colspan="1" style="text-align:right;">
+				<td class="buttonR" colspan="2" style="text-align:right;padding: 5px 3px;">
 				<input type="button" value="Update Task" onclick="validateComment(${assetComment.id})" />
 			</td>
 			</tr>	
@@ -162,8 +162,8 @@
 		--%><div class="clear" style="margin:4px;"></div>
 		<a name="detail" ></a>
 		<g:if test="${assetComment?.assetEntity}">
-		 	<div style="float: left;">
-				<table style="float: left;width:500px;">
+		 	<div style="float: left;width: 100%">
+				<table style="float: left;margin-left: -2px;">
 				<tr>
 					<td class="heading"><a href="#detail">Details</a></td>
 					<td><span style="float:right;"><a href="#top">Top</a></span></td>
