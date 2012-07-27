@@ -280,7 +280,7 @@
 					$('#detailTdId_'+data.assetComment.id).hide()
 					$('#issueTrId_'+data.assetComment.id).removeClass(myClass).addClass(data.statusCss);
 					$('#issueTr_'+data.assetComment.id).removeClass(myClass).addClass(data.statusCss);
-					if(data.assetComment.status==''|| data.assetComment.status=='Started'|| data.assetComment.status=='Pending' || data.assetComment.status==null){
+					if(data.assetComment.status==''|| data.assetComment.status=='Started'|| data.assetComment.status=='Ready' || data.assetComment.status==null){
 						$('#started_'+data.assetComment.id).hide()
 						$('#showStatusId_'+data.assetComment.id).css('display','table-row')
 						if(data.assetComment.status=='Pending'){

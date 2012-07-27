@@ -89,7 +89,7 @@ class AssetComment {
 		displayOption( blank:false, inList: ['G','U'] ) // Generic or User
 		attribute( blank:true, nullable:true  )
 		commentKey( blank:true, nullable:true  )
-		status( blank:true, nullable:true , inList : ['Ready','Planned', 'Pending', 'Started', 'Hold', 'Completed'] )
+		status( blank:true, nullable:true , inList : ['Planned', 'Pending', 'Ready', 'Started', 'Hold', 'Completed'] )
 		predecessor( blank:true, nullable:true  )
 		duration( blank:true, nullable:true  )
 		type( blank:true, nullable:true , inList :['ASAP', 'SS', 'SF']  )

@@ -77,12 +77,12 @@
 			 <tr class="prop">
 				<td valign="top" class="name"><label for="notes">Previous Notes:</label></td>
 				<td valign="top" class="value"><div id="previousNote" style="width: 380px">
-				 <table>
+				 <table style="table-layout: fixed; width: 100%;border: 1px solid green;" >
                    <g:each in="${notes}" var="note" status="i" >
                     <tr>
 	                    <td>${note[0]}</td>
 	                    <td>${note[1]}</td>
-                        <td>${note[2]}</td>
+                        <td style="word-wrap: break-word">${note[2]}</td>
                      </tr>
                    </g:each>
 				 </table>
