@@ -481,6 +481,7 @@ function showAssetDialog( e , action ) {
 		$('#changeStatusDialog').dialog('close');
 		$('#filterDialog').dialog('close');
 		var assetComments = eval('(' + e.responseText + ')');
+		alert(assetComments);
 		
 		var listTable = $('#listCommentsTable');
 		var tbody = $('#listCommentsTbodyId');
@@ -968,14 +969,14 @@ var type = 	document.forms[formName].commentType.value;
 if(type == "issue"){
 	$('#note').val('')
 	$("#dueDatesEditId").css('display', 'table-row');
-	$("#commentEditId").html('<label for="comment">Issue:</label>');
+	//$("#commentTypeEditId").html('<label for="comment">Issue:</label>');
 	$("#assignedToEditedId").css('display', 'table-row');
 	$("#"+resolveDiv).css('display', 'block');
 }else{
 	$("#assignedToEditedId").css('display', 'none');
 	$("#"+resolveDiv).css('display', 'none');
 	$("#dueDatesEditId").css('display', 'none');
-	$("#commentEditId").html('<label for="comment">Comment:</label>');
+	//$("#commentTypeEditId").html('<label for="comment">Comment:</label>');
 }
 }
 
