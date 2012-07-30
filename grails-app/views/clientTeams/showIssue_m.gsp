@@ -2,7 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Task Details</title>
-<jq:plugin name="jquery"/>
  
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
@@ -58,9 +57,12 @@
 			</tr> 
 			<tr class="prop issue" id="dueDatesEditId"  >
 				<td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
-				<td valign="top" class="value" id="dueDatesEditId_${assetComment.id}" ><script type="text/javascript" charset="utf-8">
-	             jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-	             </script><input type="text" class="dateRange" size="15" style="width: 70%; height: 14px;" name="dueDate" id="dueDateEdit_${assetComment.id}"
+				<td valign="top" class="value" id="dueDateEditId_${assetComment.id}" >
+				<script type="text/javascript" src="${resource(dir:'js' ,file:'ui.datepicker.js') }"/>
+				<script type="text/javascript">
+	               $(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+	            </script>
+	            <input type="text" class="dateRange" size="15" style="width: 70%; height: 14px;" name="dueDate" id="dueDateEdit_${assetComment.id}"
 						value="<tds:convertDate date="${assetComment?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" /></td>
 				
 			</tr>
