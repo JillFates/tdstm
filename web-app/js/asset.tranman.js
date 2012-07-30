@@ -654,7 +654,8 @@ function showAssetDialog( e , action ) {
       		    	 }
       		     noteTable += "</table>"
 
-	      		 $('#previousNote').html(noteTable)
+    	      	 $('#previousNotesShowId').html(noteTable)
+    	      	 $('#previousNote').html(noteTable)
 	      		 $('#dueDatesId').html(params.dueDate)
 	      		 $('#dueDateEdit').val(params.dueDate)
 		      	 $('#note').val('')
