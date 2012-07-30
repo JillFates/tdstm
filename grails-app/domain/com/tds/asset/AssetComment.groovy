@@ -115,14 +115,6 @@ class AssetComment {
 
 	// TODO : need method to handle inserting new assetComment or updating so that the category+taskNumber is unique 
 	
-	def beforeInsert = {
-		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
-	}
-	def beforeUpdate = {
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
-	}
-
 	def getAssignedToString(){
 		return assignedTo.toString()
 	}
