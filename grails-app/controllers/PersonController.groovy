@@ -362,6 +362,26 @@ class PersonController {
 		render personDetails as JSON
     }
 	/*-----------------------------------------------------------
+	 * Check if the user inputed password is correct, and if so update call the update method
+	 * @author : Ross Macfarlane 
+	 * @param  : person id and input password
+	 * @return : pass:"no" or the return of the update method
+	 *----------------------------------------------------------*/
+	def checkPassword = {
+		if(params.oldPassword == null)
+			return updatePerson(params)
+		
+		def userLogin = UserLogin.findByPerson(Person.findById(params.id))
+		def password = userLogin.password
+		def passwordInput = new Sha1Hash(params.oldPassword).toHex()
+		
+		if(password.equals(passwordInput))
+			return updatePerson(params)
+		def ret = []
+		ret << [pass:"no"]
+		render  ret as JSON
+	}
+	/*-----------------------------------------------------------
 	 * Update the person details and user password, Return person first name
 	 * @author : Lokanada Reddy 
 	 * @param  : person details and user password
@@ -376,12 +396,13 @@ class PersonController {
 				def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
 				getSession().setAttribute( "LOGIN_PERSON", ['name':personInstance.firstName, "id":personInstance.id ])
 				def userLogin = UserLogin.findByPerson( personInstance )
-				def password = params.password
-				if( password ){
-					userLogin.password = new Sha1Hash( password ).toHex()
-				}
-				def expiryDate = params.expiryDate
-				if(expiryDate){
+				def password = params.newPassword
+				
+				if(password != null)
+					userLogin.password = new Sha1Hash(params.newPassword).toHex()
+					
+				if(params.expiryDate != "null"){
+					def expiryDate = params.expiryDate
 					userLogin.expiryDate =  GormUtil.convertInToGMT(formatter.parse( expiryDate ), tzId)
 				}
 				userLogin.save();

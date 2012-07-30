@@ -469,15 +469,6 @@
 				<tr>
 					<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 				</tr>
-              	<tr class="prop">
-                	<td valign="top" class="name">
-                    	<label for="password">Password:&nbsp;</label>
-					</td>
-                    <td valign="top" class="value">
-                    	<input type="hidden" id="personId" name="personId" value=""/>
-						<input type="password" maxlength="25" name="password" id="passwordId" value=""/>
-					</td>
-				</tr>
 
                 <tr class="prop">
 					<td valign="top" class="name">
@@ -521,24 +512,24 @@
                     <input type="text" maxlength="64" id="emailId" name="email"/>
                   </td>
                 </tr>
-                <tr class="prop">
-					<td valign="top" class="name">
-						<label for="nickName"><b>Expiry Date:<span style="color: red">*</span></label>
-					</td>
-					<td valign="top" class="value">
-					<tds:hasPermission permission='PersonExpiryDate'>
+                
+                <tds:hasPermission permission='PersonExpiryDate'>
+	                <tr class="prop">
+						<td valign="top" class="name">
+							<label for="nickName"><b>Expiry Date:<span style="color: red">*</span></label>
+						</td>
+						<td valign="top" class="value">
 						<script type="text/javascript">
-						$(document).ready(function(){
-				        	$("#expiryDateId").datetimepicker();
-				        });
-					    </script>
-        	            <input type="text" maxlength="64" id="expiryDateId" name="expiryDate"/>
-                    </tds:hasPermission>
-                    <tds:hasPermission permission='PersonExpiryDate'>
+							$(document).ready(function(){
+					        	$("#expiryDateId").datetimepicker();
+					        });
+						</script>
+	        	        <input type="text" maxlength="64" id="expiryDateId" name="expiryDate"/>
 						<input type="text" maxlength="64" id="expiryDateId" name="expiryDate" readonly="readonly" style="background: none;border: 0"/>
-                    </tds:hasPermission>
-					</td>
-				</tr>
+						</td>
+					</tr>
+                </tds:hasPermission>
+                
                 <tr class="prop">
 					<td valign="top" class="name">
 						<label for="title">Time Zone:</label>
@@ -579,6 +570,33 @@
 					</td>
 					<td valign="top" class="value">
                        <input type="text" name ="modelScore" id ="modelScoreId" readonly="readonly" value="${person?.modelScore}"/>
+					</td>
+				</tr>
+              	<tr class="prop">
+                	<td valign="top" class="name">
+                    	<label for="password">Old Password:&nbsp;</label>
+					</td>
+                    <td valign="top" class="value">
+                    	<input type="hidden" id="personId" name="personId" value=""/>
+						<input type="password" maxlength="25" name="oldPassword" id="oldPasswordId" value=""/>
+					</td>
+				</tr>
+
+              	<tr class="prop">
+                	<td valign="top" class="name">
+                    	<label for="password">New Password:&nbsp;</label>
+					</td>
+                    <td valign="top" class="value">
+						<input type="password" maxlength="25" name="newPassword" id="newPasswordId" value=""/>
+					</td>
+				</tr>
+
+              	<tr class="prop">
+                	<td valign="top" class="name">
+                    	<label for="password">New Password (confirm):&nbsp;</label>
+					</td>
+                    <td valign="top" class="value">
+						<input type="password" maxlength="25" name="newPasswordConfirm" id="newPasswordConfirmId" value=""/>
 					</td>
 				</tr>
               </tbody>
@@ -639,33 +657,61 @@
 		function changePersonDetails(){
 			var returnVal = true 
 	    	var firstName = $("#firstNameId").val()
+	    	var oldPassword = $("#oldPasswordId").val()
+	    	var newPassword = $("#newPasswordId").val()
+	    	var newPasswordConfirm = $("#newPasswordConfirmId").val()
 	        var email = $("#emailId").val()
 	        var expiryDate = $("#expiryDateId").val()
-	        if(!firstName) {
+	        
+	        if(expiryDate + "" == "undefined"){
+	        	expiryDate = "null"
+			}
+			if(!firstName) {
 	            alert("First Name should not be blank ")
 	            returnVal = false
 	        } else if( email && !emailRegExp.test(email)){
-	        	 alert(email +" is not a valid e-mail address ")
+	        	 alert(email + " is not a valid e-mail address ")
 	             returnVal = false
-	        } else if(!expiryDate){
+	        } else if(expiryDate != "null" && !expiryDate){
 	        	alert("Expiry Date should not be blank ")
 	            returnVal = false
-	        } else  if(!dateRegExpForExp.test(expiryDate)){
+	        } else if(expiryDate != "null" && !dateRegExpForExp.test(expiryDate)){
 		        alert("Expiry Date should be in 'mm/dd/yyyy HH:MM AM/PM' format")
 		        returnVal = false
+	        } else if(oldPassword != "" || newPassword != "" || newPasswordConfirm != ""){
+	            if(!oldPassword){
+		        	alert("Old Password should not be blank ")
+		            returnVal = false
+		        } else if(!newPassword){
+		        	alert("New Password should not be blank ")
+		            returnVal = false
+		        } else if(!newPasswordConfirm){
+			       	alert("New Password (Confirm) should not be blank")
+		            returnVal = false
+			    } else if(oldPassword.length < 6 && newPassword.length < 6 && newPasswordConfirm.length < 6){
+					alert("A password must be at least 6 characters long ")
+		            returnVal = false
+				} else if(newPassword != newPasswordConfirm){
+					alert("New Password and New Password (Confirm) must be the same ")
+		            returnVal = false
+				}
 	        }
 	        if(returnVal){
-				${remoteFunction(controller:'person', action:'updatePerson', 
-						params:'\'id=\' + $(\'#personId\').val() +\'&firstName=\'+$(\'#firstNameId\').val() +\'&lastName=\'+$(\'#lastNameId\').val()+\'&nickName=\'+$(\'#nickNameId\').val()+\'&title=\'+$(\'#titleId\').val()+\'&password=\'+$(\'#passwordId\').val()+\'&timeZone=\'+$(\'#timeZoneId\').val()+\'&powerType=\'+$(\'#powerTypeId\').val()+\'&email=\'+$(\'#emailId\').val()+\'&expiryDate=\'+$(\'#expiryDateId\').val()+\'&startPage=\'+$(\'#startPage\').val()', 
+				${remoteFunction(controller:'person', action:'checkPassword', 
+						params:'\'id=\' + $(\'#personId\').val() +\'&firstName=\'+$(\'#firstNameId\').val() +\'&lastName=\'+$(\'#lastNameId\').val()+\'&nickName=\'+$(\'#nickNameId\').val()+\'&title=\'+$(\'#titleId\').val()+\'&oldPassword=\'+$(\'#oldPasswordId\').val()+\'&newPassword=\'+$(\'#newPasswordId\').val()+\'&newPasswordConfirm=\'+$(\'#newPasswordConfirmId\').val()+\'&timeZone=\'+$(\'#timeZoneId\').val()+\'&email=\'+$(\'#emailId\').val()+\'&expiryDate=\'+expiryDate', 
 						onComplete:'updateWelcome(e)')}
 	        }
 		}
 	  	function updateWelcome( e ){
 		  	var ret = eval("(" + e.responseText + ")");
-		  	$("#loginUserId").html(ret[0].name)
-		  	$("#tzId").html(ret[0].tz)
-		  	$("#personDialog").dialog('close')
-		  	window.location.reload()
+			if(ret[0].pass == "no")
+				alert("Old Password is incorrect")
+			else{
+			  	$("#loginUserId").html(ret[0].name)
+			  	$("#tzId").html(ret[0].tz)
+			  	$("#personDialog").dialog('close')
+			  	window.location.reload()
+			}
 	  	}
 	  	function setUserTimeZone( tz ){
 	  		${remoteFunction(controller:'project', action:'setUserTimeZone', 
