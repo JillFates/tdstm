@@ -97,7 +97,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	Integer dependencyBundle = 0
 	
 	static hasMany = [
-		assetEntityVarchars : AssetEntityVarchar
+		assetEntityVarchars : AssetEntityVarchar,
+		comments : AssetComment
 	]
 	
 	static constraints = {
