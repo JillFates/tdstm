@@ -13,14 +13,24 @@
 	<div class="menu4">
 		<ul>
 			<li><g:link class="mobmenu" controller="clientTeams" >Teams</g:link></li>
-			<li><g:link elementId="taskLinkId"  class="mobmenu mobselect" action="listComment" params='["tab":"todo"]'>My Tasks</g:link></li>
+			<g:if test="${tab && tab == 'todo'}">
+				<li><g:link elementId="taskLinkId"  class="mobmenu mobselect" action="listComment" params='["tab":"todo","search":search]'>My Tasks ${todoSize}</g:link></li>
+				<li><g:link elementId="taskLinkAllId"  class="mobmenu" action="listComment" params='["tab":"all","search":search]'>All Tasks ${allSize}</g:link></li>
+			</g:if>
+			<g:if test="${tab && tab == 'all'}">
+				<li><g:link elementId="taskLinkId"  class="mobmenu" action="listComment" params='["tab":"todo","search":search]'>My Tasks ${todoSize}</g:link></li>
+				<li><g:link elementId="taskLinkAllId"  class="mobmenu mobselect" action="listComment" params='["tab":"all","search":search]'>All Tasks ${allSize}</g:link></li>
+			</g:if>
 			<li><a href="#" id="detailLinkId" class="mobmenu">Details</a></li>
 		</ul>
+		<div class="tab_search">
+	      	<g:form method="post" name="issueAssetForm" action="showIssue">
+			<input  type="text" size="08" value="${search}" id="search" name="search" autocorrect="off" autocapitalize="off" onfocus="changeAction()" onblur="retainAction()" />
+		</div>
 	</div>
 	<div class="issueTimebar" id="issueTimebar"> <div id="issueTimebarId" ></div> </div>
 	<div id="detailId"  style="display: none;position: absolute;width: 420px;margin-top: 40px" > </div>
 	<div id="myIssueList" class="mobbodyweb">
-      	<g:form method="post" name="issueAssetForm" action="showIssue">
 			<input id="issueId" name="issueId" type="hidden" value="" />
 			<input name="tab" type="hidden" value="${tab}" />								              	
 			<div id="mydiv" onclick="this.style.display = 'none';setFocus();">						            
@@ -30,28 +40,6 @@
 				</g:if> 
 			</div>		
 			<div id="taskId" style="float:left; margin:2px 0; ">              								
-			<table style="border:0px;width:220px;">
-			<tr>
-				<td>&nbsp;</td>
-				<td id="todoId" class="tab">
-					<g:if test="${tab && tab == 'todo'}">
-					  <g:link class="tab_select" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(<span id="toDoNumberId">${todoSize}</span>)</g:link>
-					</g:if>
-					<g:else>
-					  <g:link class="tab_deselect" action="listComment"  params='["tab":"todo","search":search]'>Todo&nbsp;(<span id="toDoAllId">${todoSize}</span>)</g:link>
-					</g:else>
-				</td>
-				<td id="allId" class="tab">
-					<g:if test="${tab == 'all'}">
-					  <g:link class="tab_select" action="listComment" params='["tab":"all","search":search]'>All&nbsp;(${allSize})</g:link>
-					</g:if>
-					<g:else>
-					  <g:link class="tab_deselect" action="listComment" params='["tab":"all","search":search]'>All&nbsp;(<span id="allNumberId">${allSize}</span>)</g:link>
-					</g:else>
-				</td>
-				<td class="tab_search"><input  type="text" size="08" value="${search}" id="search" name="search" autocorrect="off" autocapitalize="off" onfocus="changeAction()" onblur="retainAction()"/></td>
-			</tr>
-			</table>
 			</div>
 			<div id="assetIssueDiv" style="float:left;width:500px; ">
 				<table id="issueTable" cellspacing="0px" style="width:100%;margin-left: -1px;">

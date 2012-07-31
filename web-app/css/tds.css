@@ -416,27 +416,45 @@
       }
         
 /* class for dashboards */
-.asset_done{
-	background-color:#FFFFFF;
-	color:black;
+
+.task_planned {
+	background-color: #FFFFFF;
+	color: black;
+	font-weight: bold;
 }
 .task_pending {
 	background-color: #FFFFFF;
+	color: black;
+	font-weight: bold;
 }
-.task_done{
-	background-color: #336600;
+.task_hold{
+	background-color:#FFFF33;
+	color:black;
+	font-weight: bold;
+}
+.task_started {
+	background-color: darkturquoise;
+	color: white;
+	font-weight: bold;
 }
 .task_done2{
-	background-color: #66cc66;
+	background-color: #5478BA;
 }
 .task_done5{
-	background-color: olive ;
+	background-color: #4468AA ;
+}
+.task_done{
+	background-color: #24488A;
+	color: white;
+	font-weight: bold;
 }
 .task_term {
 	background-color: black;
 }
+
+/* older movetech workflow styles */
 .asset_pending{
-	background-color:#ccc;
+	background-color:#FFFFFF;
 	color:black;
 }
 .asset_hold{
@@ -446,6 +464,11 @@
 .asset_hold_overtime{
 	background-color:#FF0000;
 	color:black;
+}
+.asset_done{
+	background-color: #24488A;
+	color: white;
+	font-weight: bold;
 }
 
 /* dashboards label display for IE only */
@@ -767,15 +790,15 @@ dl dd {
 }
 
 .asset_ready{
-	background-color:#33ff00;
-	color:black;
-	font-weight:bold;
+	background-color: green;
+	color: white;
+	font-weight: bold;
 }
 
 .asset_process{
-	background-color:#66ffff;
-	color:black;
-	font-weight:bold;
+	background-color: darkturquoise;
+	color: white;
+	font-weight: bold;
 }
 .asset_select{
 	background-color:#65a342;
