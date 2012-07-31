@@ -2829,7 +2829,7 @@ class AssetEntityController {
 			if ( params.resolvedBox=="on" ){
 				assetCommentList = AssetComment.findAll("From AssetComment a where a.project = :project AND isResolved = :isResolved and assignedTo = :assignedTo order by dueDate desc , dateCreated desc",[project:project,isResolved:1,assignedTo:personInstance])
 			} else {
-				assetCommentList = AssetComment.findAll("From AssetComment a where a.project = :project AND assignedTo = :assignedTo order by dueDate asc , dateCreated desc",[project:project,assignedTo:personInstance])
+				assetCommentList = AssetComment.findAll("From AssetComment a where a.project = :project AND assignedTo = :assignedTo and isResolved = :isResolved order by dueDate asc , dateCreated desc",[project:project,assignedTo:personInstance,isResolved:0])
 			}
 		} else if(params.filter=='openIssue'){
 			assetCommentList = AssetComment.findAll("FROM AssetComment a where a.project = ? and a.commentType = ? and a.isResolved = 0 and category in ('general','planning') order by dueDate desc , dateCreated desc",[project, "issue"])
