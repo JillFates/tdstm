@@ -476,9 +476,9 @@ class ClientConsoleController {
 		   def moveBundle = MoveBundle.get(bundleId)
 		   if (moveBundle) {
 			   def moveEvent = moveBundle.moveEvent
-			   if (moveEvent.project.id != project.id) {
+			   if (moveEvent.project != project) {
 				// TODO : need to handle error return for Ajax call and put username into the error log
-			   	log.error "The project id associated with moveBundle Id [${bundleId}] did not match the user's current project"
+			   	log.error "The project associated with moveBundle Id [${bundleId}] did not match the user's current project"
 				return
 			   }
 		   } else {
@@ -517,19 +517,7 @@ class ClientConsoleController {
 					return
 				}
 	        } else { 
-				// Verify that the bundle Id is from the project and is valid
-				if (bundleId.isNumber()) {
-					def moveBundle = MoveBundle.get(bundleId)
-					if (moveBundle.project == project) {
-						bundles = "(${bundleId})"
-					}
-				}
-				if (! bundles) {
-					log.error "Invalid bundle Id [${bundleId}] for the current project [${project}]"
-					// TODO : handle error return from Ajax call
-					return
-				}
-				
+				bundles = "(${bundleId})"
 	        }
 			
 			def lastPoolTime = params.lastPoolTime
