@@ -38,7 +38,14 @@ class CommentService {
 		def date = new Date()
 		def project = Project.get(session.CURR_PROJ.CURR_PROJ)
 		def assetComment
+		def commentProject
 
+		if (! project) {
+			log.error "User has no current project"
+			// TODO : Handle failure
+			return []
+		}
+		
 		// Create or load the assetComment object appropriately
 		if (isNew) {
 			assetComment = new AssetComment()
@@ -47,27 +54,39 @@ class CommentService {
 			def lastTask = jdbcTemplate.queryForInt("select max(task_number) FROM asset_comment WHERE project_id = ${project.id}")
 			assetComment.taskNumber = lastTask + 1
 			if ( params.commentType != 'issue' && (! params.assetEntity || ! params.assetEntity.isNumber() ) ) {
+				log.error "Asset id was not properly supplied to add or update a comment"
 				// TODO : handle failure where an asset id is necessary but not supplied
-				return
+				return []
 			}
 			if ( params.assetEntity && params.assetEntity.isNumber() ) {
 				def assetEntity = AssetEntity.get(params.assetEntity)
 				if (assetEntity) {
-					if (assetEntity.project.id != project.id) {
-						// TODO : handle the failure where asset id supplied is not from the current project
-						return
-					}
 					assetComment.assetEntity = assetEntity
+					commentProject = assetEntity.project
+				} else {
+					// TODO : handle failure for missing Asset
+					log.error "Specified asset [id:${params.assetEntity}] was not found while creating comment"
+					return []
 				}
 			}
 		} else {
+			// Load existing comment
 			assetComment = AssetComment.get(params.id)
-			if (! assetComment || assetComment.project.id != project.id ) {
-				// TODO: handle failure of bad assetComment id passed for the user's current project (could be a hack)
-				return
+			if (! assetComment ) {
+				// TODO : handle failure for invalid comment id
+				log.error "Specified comment [id:${params.id}] was not found while updating comment"
+				return []
 			}
+			commentProject = assetComment.assetEntity ? assetComment.assetEntity.project : assetComment.project
 		}
 		
+		// Make sure that the comment about to be updated/created is associated to the user's current project
+		if ( commentProject.id != project.id ) {
+			log.error "The project [${commentProject.id}] for comment [${assetComment.id}] was not associated with user's current project [${project.id}]"
+			// TODO: handle failure of bad assetComment id passed for the user's current project (could be a hack)
+			return []
+		}
+
 //		def bindArgs = [assetComment, params, [ exclude:['assignedTo', 'assetEntity', 'moveEvent', 'project', 'dueDate', 'status'] ] ]
 //		def bindArgs = [assetComment, params, [ include:['comment', 'category', 'displayOption', 'attribute'] ] ]
 //		bindData.invoke( assetComment, 'bind', (Object[])bindArgs )
@@ -99,7 +118,7 @@ class CommentService {
 					// Validate that this is a legit moveEvent for this project
 					if (moveEvent.project.id != project.id) {
 						// TODO: handle failure of moveEvent not being in project
-						return
+						return []
 					}
 					assetComment.moveEvent = moveEvent
 				} else {
@@ -183,8 +202,8 @@ class CommentService {
 		} else {
 			def etext = "Unable to create Assetcomment" +
                 GormUtil.allErrorsString( assetComment )
-				println etext
-				log.error( etext )
+			log.error( etext )
+			return []
 		}
 	}
 	
@@ -204,11 +223,19 @@ class CommentService {
 				log.error "Invalid AssetComment ID [${taskId}] referenced in call"
 				return
 			}
+			
+			// Only send emails out for issues in the categories up to premove
+			if ( assetComment.commentType != 'issue' || ! ['general', 'discovery', 'planning','walkthru','premove'].contains(assetComment.category) ) {
+				return
+			}
+
+			// Must have an email address
 			if ( ! assetComment.assignedTo?.email) {
 				log.error "No valid email address for assigned individual"
 				return
 			}
 			
+			// Truncate long comments to make manageable subject line
 			def sub = leftString(getLine(assetComment.comment,0), 40)
 			sub = (isNew ? '' : 'Re: ') + ( (sub == null || sub.size() == 0) ? "Task ${assetComment.id}" : sub )
 	
