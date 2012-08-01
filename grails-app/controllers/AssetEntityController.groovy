@@ -1345,7 +1345,6 @@ class AssetEntityController {
 		if(assetEntityInstance) {
 			ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${assetEntityInstance.id}")
 			AssetTransition.executeUpdate("delete from AssetTransition ast where ast.assetEntity = ${assetEntityInstance.id}")
-			AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity = ${assetEntityInstance.id}")
 			ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = ${assetEntityInstance.id}")
 			AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = ${assetEntityInstance.id}")
 			ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = ${assetEntityInstance.id}")
@@ -1400,12 +1399,10 @@ class AssetEntityController {
 		else {
 			flash.message = "AssetEntity not found with id ${params.id}"
 		}
-
-
 	}
 
 	/*--------------------------------------------------
-	 * To remove the asseet from project
+	 * To remove the asset from project
 	 * @param assetEntityId
 	 * @author Mallikarjun
 	 * @return assetList page
