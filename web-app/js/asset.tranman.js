@@ -309,19 +309,19 @@ function showAssetDialog( e , action ) {
     
  function setAssetId(assetId){
 	$("#createAssetCommentId").val(assetId)
-	var inputField = ''
-		new Ajax.Request('../assetEntity/getWorkflowTransition?assetId='+assetId,{asynchronous:true,evalScripts:true,
-			onComplete:function(e){
-	        var resp = eval('(' + e.responseText + ')');
-	        inputField = '<select id="workFlowId" name="workFlow">'
-			for(i=0; i<resp.length; i++){
-				var bundle = resp[i]
-					inputField += '<option value=\''+bundle.id+'\' >'+bundle.name+'</option>'
-			}
-	         inputField +='</select>'
-	        	   $('#workFlowTransitionId').html(inputField)
-			}
-		})
+ }
+ 
+ function updateWorkflowTransitions(assetId, category, transitionID, predecessorID){
+	new Ajax.Request('../assetEntity/getWorkflowTransition?assetId='+assetId+'&category='+category,{asynchronous:true,evalScripts:true,
+		onComplete:function(e){
+			$('#'+transitionID).html(e.responseText);
+		}
+	})
+	new Ajax.Request('../assetEntity/getPredecessor?category='+category,{asynchronous:true,evalScripts:true,
+		onComplete:function(e){
+			$('#'+predecessorID).html(e.responseText);
+		}
+	})
  }
  
  function getLength( length ){
@@ -917,6 +917,7 @@ function showAssetDialog( e , action ) {
 	}
 
 function createIssue(){
+	updateWorkflowTransitions( '', "general", "workFlowTransitionId", "predecessorId" );
 	document.forms['createCommentForm'].commentType.value = 'issue'
 	document.forms['createCommentForm'].commentType.disabled = 'disabled'
 	commentChange('#createResolveDiv','createCommentForm')
@@ -928,7 +929,8 @@ function createIssue(){
 	$('#showCommentDialog').dialog('close');
 	$('#editCommentDialog').dialog('close');
 	$('#moveEventTrId').css('display','table-row')
-	$('#workFlowTransitionTrId').css('display','none')
+	$('#workFlowTransitionTrId').css('display','table-row')
+	$('#predecessorTrId').css('display','table-row')
 }	
 function commentChange(resolveDiv,formName) {
 	var type = 	document.forms[formName].commentType.value;
@@ -950,6 +952,7 @@ function commentChange(resolveDiv,formName) {
 		$('#actStartTrId').css('display', 'table-row');
 		$(resolveDiv).css('display', 'table-row');
 		$('#workFlowTransitionTrId').css('display','table-row')
+		$('#predecessorTrId').css('display','table-row')
 		$('#priorityId').css('display', 'table-row');
 		$('#durationId').css('display', 'table-row');
 		document.forms[formName].mustVerify.checked = false;
@@ -969,6 +972,7 @@ function commentChange(resolveDiv,formName) {
 		$("#assignedToEditedId").css('display', 'none');
 		$("#dueDatesEditId").css('display', 'none');
 		$('#workFlowTransitionTrId').css('display','none')
+		$('#predecessorTrId').css('display','none')
 		$("#commentEditId").html('<label for="comment">Comment:</label>');
 		$("#issueItemId").html('<label for="comment">Comment:</label>');
 		$('#estStartTrId').css('display', 'none');
@@ -989,6 +993,7 @@ function commentChange(resolveDiv,formName) {
 		$("#dueDatesEditId").css('display', 'none');
 		$("#commentEditId").html('<label for="comment">Comment:</label>');
 		$('#workFlowTransitionTrId').css('display','none')
+		$('#predecessorTrId').css('display','none')
 		$('#estStartTrId').css('display', 'none');
 		$('#estFinishTrId').css('display', 'none');
 		$('#actStartTrId').css('display', 'none');
@@ -1061,6 +1066,7 @@ function resolveValidate(formName, idVal, redirectTo) {
 
 	// Get params from create or update forms approppriately
 	if (formName == "createCommentForm") {
+		alert($("#taskDependencyId").val())
 		var url = '../assetEntity/saveComment'
 		var params = { 'comment':$('#comment').val(), 'commentType':$('#commentType').val(),
 			'isResolved':$('#isResolved').val(), 'resolution':$('#resolution').val(),
@@ -1071,7 +1077,8 @@ function resolveValidate(formName, idVal, redirectTo) {
 			'actStart':$('#actStartCreateId').val(), 'workflowTransition':$('#workFlowId').val(),
 			'hardAssigned':$('#hardAssigned').val(),'priority':$('#priority').val(),
 			'duration':$('#duration').val(),'durationScale':$('#durationScale').val(),
-			'assetEntity':objId ,'overRide':$('#overRide').val()};
+			'assetEntity':objId ,'overRide':$('#overRide').val(),
+			'taskDependency' : $("#taskDependencyId").val()};
 		var completeFunc = function(e) { addCommentsToList(e); }
 	} else {
 		var url = '../assetEntity/updateComment'
@@ -1182,7 +1189,8 @@ function showModel(id){
 	})
 }
 function createNewAssetComment(asset, assetName){
-	setAssetId( asset );
+	setAssetId( asset )
+	updateWorkflowTransitions( asset, "general", "workFlowTransitionId", "predecessorId" );
 	var name = assetName
 	$('#createCommentDialog').dialog('option', 'width', 'auto');
 	$('#assetEntityTrId').css('display','table-row')
@@ -1201,7 +1209,8 @@ function createNewAssetComment(asset, assetName){
 	
 }
 function createComments(asset, assetName){
-	setAssetId( asset );
+	setAssetId( asset )
+	updateWorkflowTransitions( asset, "general", "workFlowTransitionId", "predecessorId" );
 	var name = assetName
 	$('#createCommentDialog').dialog('option', 'width', 'auto');
 	$('#assetEntityTrId').css('display','table-row')

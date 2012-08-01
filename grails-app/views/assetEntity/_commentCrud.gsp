@@ -135,13 +135,13 @@
    </tds:hasPermission>
 </div>
 </div>
-<%
+<%--
 /*
  **************************
  * Create Comment Dialog
  **************************
  */ 
-%>
+--%>
 <div id="createCommentDialog" title="Create Asset Comment" style="display: none;">
 	<input type="hidden" name="assetEntity.id" id="createAssetCommentId" value="" />
 	<g:form action="saveComment" method="post" name="createCommentForm">
@@ -204,16 +204,6 @@
 		<tr class="prop" id="actStartTrId" style="display: none">
 			
 		</tr>
-		<tr class="prop" id="workFlowTransitionTrId" style="display: none">
-			<td valign="top" class="name"><label for="actStartTrId">WorkFlowTransition:</label></td>
-			<td valign="top" class="value" id="workFlowTransitionId">
-			</td>
-			<td>
-			<input type="checkbox" id="overRide" name="overRide" value="0" 
-				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
-			 <label for="overRide" >Overridden</label>
-			</td>
-		</tr>
 		<tr class="prop" >
 			<td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
 			<td style="width: 20%;">
@@ -226,26 +216,39 @@
 			<label for="mustVerifyEdit">Must Verify</label>
 			</td>
 		</tr>
+		<tr class="prop">
+        	<td valign="top" class="name"><label for="category">Category:</label></td>
+        	<td style="margin-right:30px ;" valign="top">
+            	<g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
+            	noSelection="['':'please select']" onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionId', 'predecessorId')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
+        	</td>
+		</tr>
+		<tr class="prop" id="workFlowTransitionTrId" style="display: none">
+			<td valign="top" class="name"><label for="actStartTrId">WorkFlowTransition:</label></td>
+			<td valign="top" class="value" id="workFlowTransitionId"></td>
+			<td>
+			<input type="checkbox" id="overRide" name="overRide" value="0" 
+				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
+			 <label for="overRide" >Overridden</label>
+			</td>
+		</tr>
 		<tr id="priorityId" class="prop" style="display: none">
         	<td valign="top" class="name" ><label for="priority">Priority:</label></td>
         	<td style="margin-right:30px ;" valign="top">
             	<g:select id="priority" name="priority" from="${1..5}" value="4"
             	noSelection="['':'please select']" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
         	</td>
+        </tr>
+        <tr class="prop" id="predecessorTrId" style="display: none">
+			<td valign="top" class="name"><label for="predecessorId">Predecessor:</label></td>
+			<td valign="top" class="value" id="predecessorId"></td>
 		</tr>
 		<tr id="durationId" class="prop" style="display: none">
-        	<td valign="top" class="name"><label for="duration ">Duration :</label></td>
+        	<td valign="top" class="name"><label for="duration ">Duration:</label></td>
         	<td style="margin-right:30px ;" valign="top">
         	  <input type="text" id="duration" name="duration" value="" style="width: 12%" >
             	<g:select id="durationScale" name="durationScale " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"
             	 ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
-        	</td>
-		</tr>
-		<tr class="prop">
-        	<td valign="top" class="name"><label for="category">Category:</label></td>
-        	<td style="margin-right:30px ;" valign="top">
-            	<g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
-            	noSelection="['':'please select']" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
         	</td>
 		</tr>
 		<tr class="prop" id="assetEntityTrId">
@@ -273,7 +276,7 @@
 	<div id="createResolveDiv" style="display: none;">
 		<table id="createResolveTable" style="border: 0px" >
 		<tr class="prop" >
-			<td valign="top" class="name" style="width: 20%;"><label for="status">Status:</label></td>
+			<td valign="top" class="name"  style="width: 20%;"><label for="status">Status:</label></td>
 			<td style="width: 20%;">
 				<g:select id="statusId" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Ready"
 				noSelection="['':'please select']" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -304,13 +307,13 @@
 	</tds:hasPermission>
 </g:form></div>
 
-<%
+<%--
 /*
  **************************
  * Edit Comment Dialog
  **************************
  */ 
-%>
+--%>
 <div id="editCommentDialog" title="Edit Comment/Issue" style="display: none;">
 <g:form action="updateComment" method="post" name="editCommentForm">
 <div class="dialog" style="border: 1px solid #5F9FCF">

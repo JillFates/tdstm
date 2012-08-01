@@ -3294,17 +3294,40 @@ class AssetEntityController {
 		}
 	  render "success"
 	}
+	
 	def getWorkflowTransition={
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def project = Project.findById( projectId )
+		
 		def assetEntity = AssetEntity.get(params.assetId)
-		def workFlowInstance = Workflow.findByProcess(assetEntity.moveBundle?.workflowCode)
-		def workFlowTransition = WorkflowTransition.findAllByWorkflow(workFlowInstance)
-		def workFlowList = AssetComment.findAllByAssetEntity(assetEntity).workflowTransition 
-		workFlowTransition.removeAll(workFlowList)
-		def transitionList =[]
-		workFlowTransition.each{
-			transitionList << ['id':it.id,'name':it.name]
+		def workFlowInstance = Workflow.findByProcess(project.workflowCode)
+		def workFlowTransition = WorkflowTransition.findAllByWorkflowAndCategory(workFlowInstance, params.category)
+		//def workFlowTransition = WorkflowTransition.findAllByWorkflow(workFlowInstance) TODO : should be removed after completion of this new feature
+		if(assetEntity){
+			def existingWorkflows = AssetComment.findAllByAssetEntity(assetEntity).workflowTransition
+			workFlowTransition.removeAll(existingWorkflows)
 		}
-		render transitionList as JSON
+		def selectControl = new StringBuffer("""<select id="workFlowId" name="workFlow">""")
+		workFlowTransition.each{
+			selectControl.append("<option value='${it.id}'>${it.name}</option>")
+		}
+		selectControl.append("</select>")
+		render selectControl
+	}
+	
+	def getPredecessor = {
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def project = Project.findById( projectId )
+		
+		def workFlowInstance = Workflow.findByProcess(project.workflowCode)
+		def workFlowTransition = WorkflowTransition.findAllByWorkflowAndCategory(workFlowInstance, params.category)
+		//def workFlowTransition = WorkflowTransition.findAllByWorkflow(workFlowInstance) TODO : should be removed after completion of this new feature
+		def selectControl = new StringBuffer("""<select id="taskDependencyId" name="taskDependency" multiple="multiple">""")
+		workFlowTransition.each{
+			selectControl.append("<option value='${it.id}'>${it.name}</option>")
+		}
+		selectControl.append("</select>")
+		render selectControl
 	}
 } 
  
