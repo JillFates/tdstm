@@ -231,11 +231,7 @@
 			<td>
 			<g:if test="${clientConsoleCheckBoxHasPermission}">
 			<span id="action_${assetEntity.id}">
-				<g:if test="${assetEntity.checkVal == true}">
-					<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedUpdate('never')"></g:checkBox>
-						<img id="task_${assetEntity.id}"src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" />
-				</g:if>
-				<g:else>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</g:else>
+				<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedUpdate('never')"></g:checkBox>
 			</span>
 			</g:if>
 			<img id="asset_${assetEntity.id}" src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px" />
