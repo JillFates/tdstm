@@ -21,6 +21,7 @@ class CommentService {
 	BindDynamicMethod bindData = new BindDynamicMethod()
 
 	def mailService					// SendMail MailService class
+	def jdbcTemplate
 	
 	/**
 	 * Used to persist changes to the AssetComment and CommentNote
@@ -43,6 +44,8 @@ class CommentService {
 			assetComment = new AssetComment()
 			assetComment.createdBy = loginUser.person
 			assetComment.project = project
+			def lastTask = jdbcTemplate.queryForInt("select max(task_number) FROM asset_comment WHERE project_id = ${project.id}")
+			assetComment.taskNumber = lastTask + 1
 			if ( params.commentType != 'issue' && (! params.assetEntity || ! params.assetEntity.isNumber() ) ) {
 				// TODO : handle failure where an asset id is necessary but not supplied
 				return
@@ -78,7 +81,16 @@ class CommentService {
 		if (params.attribute) assetComment.attribute = params.attribute
 		if (params.commentType) assetComment.commentType = params.commentType
 	    assetComment.resolution = params.resolution
-
+		if(params.estStart) assetComment.estStart = formatter.parse(params.estStart)
+		if(params.estFinish) assetComment.estFinish = formatter.parse(params.estFinish)
+		if(params.actStart) assetComment.actStart = formatter.parse(params.actStart)
+		assetComment.workflowTransition = WorkflowTransition.get(params.workflowTransition)
+		if(params.hardAssigned) assetComment.hardAssigned = Integer.parseInt(params.hardAssigned)
+		if(params.priority) assetComment.priority = Integer.parseInt(params.priority)
+		if(params.duration) assetComment.duration = Integer.parseInt(params.duration)
+		if(params.durationScale) assetComment.durationScale = params.durationScale
+		if(params.overRide) assetComment.workflowOverride = Integer.parseInt(params.overRide)
+        
 		// Issues (aka tasks) have a number of additional properties to be managed 
 		if ( assetComment.commentType == 'issue' ) {
 			if ( params.moveEvent && params.moveEvent.isNumber() ){

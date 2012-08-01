@@ -1,10 +1,10 @@
-<%
+<%--
 /*
  **************************
  * Comment List Dialog
  **************************
  */ 
-%>
+--%>
 <div id="commentsListDialog" title="Show Asset Comments" style="display: none;">
 <br/>
 	<div class="list">
@@ -25,17 +25,17 @@
 	</div>
     <tds:hasPermission permission='CommentCrudView'>
 	<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-		<span class="menuButton"><a class="create" href="#" onclick="$('#statusId').val('');$('#createResolveDiv').css('display','none');$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();$('#dueDateTrId').css('display', 'none');$('#assignedToId').css('display', 'none');" >New Comment</a></span>
+		<span class="menuButton"><a id="newCommentId" class="create" href="#" onclick="$('#statusId').val('');$('#createResolveDiv').css('display','none');$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();$('#dueDateTrId').css('display', 'none');$('#assignedToId').css('display', 'none');" >New Comment</a></span>
 	</div>
 	</tds:hasPermission>
 </div>
-<%
+<%--
 /*
  **************************
  * Show Comment Dialog
  **************************
  */ 
-%>
+--%>
 <div id="showCommentDialog" title="Comment/Issue detail"
    style="display: none;">
 <div class="dialog" style="border: 1px solid #5F9FCF"><input name="id" value="" id="commentId"
@@ -151,10 +151,17 @@
 		<table id="createCommentTable" style="border: 0px;">
 		<tr class="prop" id="assignedToId" style="display:none">
 		<% // TODO - the list of users should be in the model and not in the view %>
-		<% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
+		<% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;
+		   def roleList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).roleTypeCodeTo;%>
 			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
-			<td valign="top" style="width: 20%;">
+			<td valign="top" style="width: 20%;" nowrap="nowrap" colspan="4">
 				<g:select id="assignedTo" name="assignedTo" from="${partyList}"  value="${session.getAttribute('LOGIN_PERSON').id }" optionKey="id" noSelection="['':'please select']" ></g:select>
+				
+				<g:select id="roleType" name="roleType" from="${roleList}"  value="" optionKey="id" ></g:select>
+			
+				<input type="checkbox" id="hardAssigned" name="hardAssigned" value="0" 
+					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
+				<label for="hardAssigned" >Fixed Assignment</label>
 			</td>
 		
 		</tr>
@@ -166,6 +173,45 @@
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDate" id="dueDateCreateId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+			</td>
+			<td valign="top" class="name"><label for="estStartTrId">Estimated start:</label></td>
+			
+			<td valign="top" class="value">
+				<script type="text/javascript" charset="utf-8">
+                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+                  </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="estStart" id="estStartCreateId"
+					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+			</td>
+		</tr>
+		<tr class="prop" id="estFinishTrId" style="display: none">
+			<td valign="top" class="name"><label for="estFinishTrId">Estimated finish:</label></td>
+			
+			<td valign="top" class="value">
+				<script type="text/javascript" charset="utf-8">
+                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+                  </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="estFinish" id="estFinishCreateId"
+					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+			</td>
+			<td valign="top" class="name"><label for="actStartTrId">Actual Start:</label></td>
+			
+			<td valign="top" class="value">
+				<script type="text/javascript" charset="utf-8">
+                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+                  </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="actStart" id="actStartCreateId"
+					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+			</td>
+		</tr>
+		<tr class="prop" id="actStartTrId" style="display: none">
+			
+		</tr>
+		<tr class="prop" id="workFlowTransitionTrId" style="display: none">
+			<td valign="top" class="name"><label for="actStartTrId">WorkFlowTransition:</label></td>
+			<td valign="top" class="value" id="workFlowTransitionId">
+			</td>
+			<td>
+			<input type="checkbox" id="overRide" name="overRide" value="0" 
+				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
+			 <label for="overRide" >Overridden</label>
 			</td>
 		</tr>
 		<tr class="prop" >
@@ -179,6 +225,21 @@
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
 			<label for="mustVerifyEdit">Must Verify</label>
 			</td>
+		</tr>
+		<tr id="priorityId" class="prop" style="display: none">
+        	<td valign="top" class="name" ><label for="priority">Priority:</label></td>
+        	<td style="margin-right:30px ;" valign="top">
+            	<g:select id="priority" name="priority" from="${1..5}" value="4"
+            	noSelection="['':'please select']" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
+        	</td>
+		</tr>
+		<tr id="durationId" class="prop" style="display: none">
+        	<td valign="top" class="name"><label for="duration ">Duration :</label></td>
+        	<td style="margin-right:30px ;" valign="top">
+        	  <input type="text" id="duration" name="duration" value="" style="width: 12%" >
+            	<g:select id="durationScale" name="durationScale " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"
+            	 ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
+        	</td>
 		</tr>
 		<tr class="prop">
         	<td valign="top" class="name"><label for="category">Category:</label></td>
@@ -212,7 +273,7 @@
 	<div id="createResolveDiv" style="display: none;">
 		<table id="createResolveTable" style="border: 0px" >
 		<tr class="prop" >
-			<td valign="top" class="name"><label for="status">Status:</label></td>
+			<td valign="top" class="name" style="width: 20%;"><label for="status">Status:</label></td>
 			<td style="width: 20%;">
 				<g:select id="statusId" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Ready"
 				noSelection="['':'please select']" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -225,8 +286,8 @@
 			</td>
 		</tr>
 		<tr class="prop">
-			<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
-			<td valign="top" class="value">
+			<td valign="top" class="name" ><label for="resolution" >Resolution:</label></td>
+			<td valign="top" class="value" colspan="2">
 				<textarea cols="80" rows="4" id="resolution" name="resolution" ></textarea>
 			</td>
 		</tr> 

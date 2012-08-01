@@ -3294,5 +3294,19 @@ class AssetEntityController {
 		}
 	  render "success"
 	}
+	def getWorkflowTransition={
+		def assetEntity = AssetEntity.get(params.assetId)
+		def workFlowInstance = Workflow.findByProcess(assetEntity.moveBundle?.workflowCode)
+		def workFlowTransition = WorkflowTransition.findAllByWorkflow(workFlowInstance)
+		def workFlowList = AssetComment.findAllByAssetEntity(assetEntity).workflowTransition 
+		workFlowTransition.removeAll(workFlowList)
+		def transitionList =[]
+		workFlowTransition.each{
+			transitionList << ['id':it.id,'name':it.name]
+		}
+		render transitionList as JSON
+	}
 } 
+ 
+
    
