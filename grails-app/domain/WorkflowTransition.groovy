@@ -30,7 +30,7 @@ class WorkflowTransition {
 		predecessor( blank:true, nullable:true)
 		category( blank:false, nullable:false ,inList:['general', 'discovery', 'planning','walkthru','premove','shutdown','moveday','startup','postmove'])
 		header( blank:true, nullable:true)
-		effort( blank:true, nullable:true)
+		//effort( blank:true, nullable:true)
 		duration( blank:true, nullable:true)
 		durationScale(nullable:true, blank:true, inList:['m','h','d','w'])
 }	

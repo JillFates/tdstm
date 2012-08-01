@@ -195,7 +195,7 @@ class WorkflowController {
 				workflowTransition.dashboardLabel = params["dashboardLabel_"+workflowTransition.id]
 				workflowTransition.predecessor = params["predecessor_"+workflowTransition.id] ? Integer.parseInt( params["predecessor_"+workflowTransition.id] ) : null
 				workflowTransition.header = params["header_"+workflowTransition.id]
-				workflowTransition.effort = params["effort_"+workflowTransition.id] ? Integer.parseInt( params["effort_"+workflowTransition.id] ) : null
+				//workflowTransition.effort = params["effort_"+workflowTransition.id] ? Integer.parseInt( params["effort_"+workflowTransition.id] ) : null
 				workflowTransition.duration = params["duration_"+workflowTransition.id] ? Integer.parseInt( params["duration_"+workflowTransition.id] ) : null
 				if (  ! workflowTransition.validate() || ! workflowTransition.save( flush:true) ) {
 					//workflowTransition.errors.allErrors.each() { flash.message += it }
@@ -215,7 +215,7 @@ class WorkflowController {
 					dashboardLabel : params["dashboardLabel_$i"],
 					predecessor : params["predecessor_$i"] ? Integer.parseInt( params["predecessor_$i"] ) : null,
 					header : params["header_$i"],		
-					effort : params["effort_$i"] ? Integer.parseInt( params["effort_$i"] ) : null,
+					//effort : params["effort_$i"] ? Integer.parseInt( params["effort_$i"] ) : null,
 					duration : params["duration_$i"] ? Integer.parseInt( params["duration_$i"] ) : null
 					)
 				
