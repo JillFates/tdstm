@@ -44,17 +44,37 @@
    <table id="showCommentTable" style="border: 0px;">
       <tr class = "issue" id="assignedToTrId" style="display:none">
          <td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
-         <td valign="top" class="value" id="assignedToTdId"></td>
+         <td valign="top" class="value" id="" style="width: 20%"> <span id="assignedToTdId"></span>
+          <input type="checkbox" id="hardAssignedShow" name="hardAssignedShow" value="0" 
+				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
+			<label for="hardAssignedShow"  >Fixed Assignment</label>
+         </td>
+        
       </tr>
       <tr class = "issue" id="dueDatesTrId" style="display:none">
          <td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
          <td valign="top" class="value" id="dueDatesId"></td>
+        
+      </tr>
+      <tr class = "issue" id="estStartShow" style="display:none">
+         <td valign="top" class="name"><label for="estStartShowId">Estimated Start:</label></td>
+         <td valign="top" class="value" id="estStartShowId"></td>
+         <td valign="top" class="name" nowrap="nowrap"><label for="estFinishShowId">Estimated Finish:</label></td>
+         <td valign="top" class="value" id="estFinishShowId" nowrap="nowrap" colspan="4"></td>
+         
+      </tr>
+      <tr class = "issue" id="actStartShow" style="display:none">
+         <td valign="top" class="name"><label for="actStartShowId">Estimated Start:</label></td>
+         <td valign="top" class="value" id="actStartShowId"></td>
+         <td valign="top" class="name" nowrap="nowrap"><label for="actFinishShowId">Estimated Finish:</label></td>
+         <td valign="top" class="value" id="actFinishShowId" nowrap="nowrap"></td>
       </tr>
       <tr>
          <td valign="top" class="name"><label for="createdBy">Created By:</label></td>
          <td valign="top" class="value" id="createdById"></td>
          
       </tr >
+      
       <tr class="prop">
          <td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
          <td valign="top" class="value" id="commentTypeTdId"></td>
@@ -65,6 +85,21 @@
          <td valign="top" class="value" id="categoryTdId"></td>
          
       </tr>
+      <tr class = "issue" id="workFlowShow" style="display:none">
+         <td valign="top" class="name" nowrap="nowrap"><label for="workFlowShowId">WorkFlow Transition:</label></td>
+         <td valign="top" class="value" id="workFlowShowId"></td>
+         <td valign="top" class="name"><input type="checkbox" id="overRideShow" name="overRideShow" value="0" 
+				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
+			 <label for="overRide" >Overridden</label></td>
+      </tr>
+      <tr class = "issue" id="workFlowShow" style="display:none">
+         <td valign="top" class="name"><label for="priorityShowId">Priority:</label></td>
+         <td valign="top" class="value" id="priorityShowId"></td>
+         <td valign="top" class="name"><label for="durationShowId">Duration:</label></td>
+         <td valign="top" class="value" id="durationShowId"></td>
+      </tr>
+      
+      
       <tr class="prop" style="display: none">
          <td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
          <td valign="top" class="value" id="commentCodeTdId"></td>
@@ -87,7 +122,7 @@
       </tr>
       <tr class="prop">
          <td valign="top" class="name"><label for="comment">Comment:</label></td>
-         <td valign="top" class="value" colspan="2">
+         <td valign="top" class="value" colspan="6">
             <textarea cols="80" rows="4" id="commentTdId" readonly="readonly"></textarea>
          </td>
       </tr>
@@ -108,7 +143,7 @@
       </tr>
       <tr class="prop">
          <td valign="top" class="name"><label for="resolution">Resolution:</label></td>
-         <td valign="top" class="value" colspan="2">
+         <td valign="top" class="value" colspan="6">
             <div id="resolutionId" ></div>
          </td>
       </tr>

@@ -672,6 +672,26 @@ function showAssetDialog( e , action ) {
 	      		 $('#dueDateEdit').val(params.dueDate)
 		      	 $('#note').val('')
 		      	 $('#statusEditId').val(ac.status)
+		      	 $('#hardAssignedShow').attr('disabled', 'disabled');
+      		     $('#overRideShow').attr('disabled', 'disabled');
+		      	 if(ac.hardAssigned==1){
+		      		 $('#hardAssignedShow').attr('checked', true);
+		      	 }
+      		     if(ac.workflowOverride==1){
+		      		 $('#overRideShow').attr('checked', true);
+		      	 }
+      		     $('#estStartShowId').html(params.etStart)
+      		     $('#estFinishShowId').html(params.etFinish)
+      		     $('#actStartShowId').html(params.atStart)
+      		     $('#actFinishShowId').html(params.dtResolved)
+      		     $('#workFlowShowId').html(params.workflow)
+      		     $('#priorityShowId').html(ac.priority)
+      		     $('#durationShowId').html(ac.duration +" "+ ac.durationScale  )
+      		     $('#workFlowShow').css('display','table-row')
+      		     $('#priorityShow').css('display','table-row')
+      		     $('#estStartShowId').css('display','table-row')
+      		     $('#estFinishShowId').css('display','table-row')
+      		     $('#actStartShowId').css('display','table-row')
 		      	 $('#mustVerifyId').css('display','none')
 		      	 $('#mustVerifyEditTr').css('display','none')
 			     $('#assetShowValueId').css('display','block')
@@ -1054,7 +1074,7 @@ function resolveValidate(formName, idVal, redirectTo) {
 		alert('Please select a comment type');
 		return false;
 	}
-	if ( ($('#statusEditId').val() == "Completed" && $('#resolutionEditId').val() == '') ||
+	if ( ($('#statusEditId').val() == "Completed" && $('#resolutionEditId').val() == '') &&
 		 ($('#statusId').val() == "Completed" && $('#resolution').val() == '') ) {
 		alert('Please enter a resolution');
 		return false;

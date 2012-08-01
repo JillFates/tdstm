@@ -1746,6 +1746,9 @@ class AssetEntityController {
 		def personCreateObj
 		def dtCreated
 		def dtResolved
+		def etStart
+		def etFinish
+		def atStart
 		DateFormat formatter ;
 		def dueDate
 		formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a");
@@ -1760,17 +1763,26 @@ class AssetEntityController {
 			personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")
 			dtResolved = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
 		}
+		if(assetComment.estStart){
+			etStart = dateFormatter.format(assetComment.estStart);
+		}
+		if(assetComment.estFinish){
+			etFinish = dateFormatter.format(assetComment.estFinish);
+		}
+		if(assetComment.actStart){
+			atStart = dateFormatter.format(assetComment.actStart);
+		}
 		if(assetComment.dueDate){
 			dueDate = dateFormatter.format(assetComment.dueDate);
 		}
 		def noteList = assetComment.notes.sort{it.dateCreated}
 		def notes = []
+		def workflow = assetComment?.workflowTransition?.name
 		noteList.each{
 			def dateCreated = it.dateCreated.format("E, d MMM 'at ' HH:mma")
 			notes << [ dateCreated , it.createdBy.toString() ,it.note]
 			
 		}
-		
 		commentList << [ 
 			assetComment:assetComment,
 			personCreateObj:personCreateObj,
@@ -1780,8 +1792,8 @@ class AssetEntityController {
 			assignedTo:assetComment.assignedTo ?: "",
 			assetName:assetComment.assetEntity?.assetName ?: "",
 			eventName:assetComment.moveEvent?.name ?: "",
-		    dueDate:dueDate ?: '',
-			notes:notes ]
+		    dueDate:dueDate ?: '',etStart:etStart,
+			etFinish:etFinish,atStart:atStart,notes:notes,workflow:workflow]
 		render commentList as JSON
 	}
 	/* ----------------------------------------------------------------
