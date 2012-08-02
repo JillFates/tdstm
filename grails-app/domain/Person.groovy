@@ -28,8 +28,8 @@ class Person extends Party {
 		 location( blank:true, nullable:true )
 		 workPhone(blank:true, nullable:true, phoneNumber:true)
 		 mobilePhone(blank:true, nullable:true, phoneNumber:true)
-		 modelScore( blank:true, nullable:true )
-		 modelScoreBonus( blank:true, nullable:true )
+		 modelScore( nullable:true )
+		 modelScoreBonus( nullable:true )
 		 
 	 }
 

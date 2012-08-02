@@ -8,7 +8,7 @@ class Files extends AssetEntity{
 	
     static constraints = {
 		fileFormat( blank:false, nullable:false )
-		fileSize( blank:false, nullable:false )
+		fileSize( nullable:false )
     }
 	static mapping  = {
 		version true

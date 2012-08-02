@@ -10,9 +10,9 @@ class Workflow {
 	
 	static constraints = {
 		process( blank:false, nullable:false, unique:true)
-		dateCreated( blank:false, nullable:false  )
-		lastUpdated( blank:true, nullable:true  )
-		updateBy( blank:true, nullable:true  )
+		dateCreated( nullable:false  )
+		lastUpdated( nullable:true  )
+		updateBy( nullable:true  )
     }
 	
 	static mapping  = {

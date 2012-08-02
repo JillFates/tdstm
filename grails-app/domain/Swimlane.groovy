@@ -13,7 +13,7 @@ class Swimlane {
 	static constraints = {
 		actorId( blank:false, nullable:false )
 		name( blank:false, nullable:false )
-		workflow( blank:false, nullable:false )
+		workflow( nullable:false )
 		maxSource( blank:true, nullable:true )
 		maxTarget( blank:true, nullable:true )
 		minSource( blank:true, nullable:true )

@@ -8,11 +8,11 @@ class AssetDependencyBundle {
 	Project project
     
     static constraints = {
-		dependencyBundle( blank:false, nullable:false, unique:'asset')
-		asset( blank:false, nullable:false, unique:true)
+		dependencyBundle( nullable:false, unique:'asset')
+		asset( nullable:false, unique:true)
 		dependencySource( blank:false, nullable:false )
-		lastUpdated( blank:true, nullable:true )
-		project( blank:false, nullable:false )
+		lastUpdated( nullable:true )
+		project( nullable:false )
     }
 	static mapping  = {
 		version false

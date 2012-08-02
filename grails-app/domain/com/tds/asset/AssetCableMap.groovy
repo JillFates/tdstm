@@ -13,12 +13,12 @@ class AssetCableMap {
 	
 	static constraints = {
 		cable( nullable:false, blank:false )
-		fromAsset( nullable:false, blank:false )
-		toAsset( nullable:true, blank:true )
-		fromConnectorNumber( nullable:false, blank:false )
-		toConnectorNumber( nullable:true, blank:true )
+		fromAsset( nullable:false )
+		toAsset( nullable:true )
+		fromConnectorNumber( nullable:false )
+		toConnectorNumber( nullable:true )
 		toAssetRack( nullable:true, blank:true )
-		toAssetUposition( nullable:true, blank:true )
+		toAssetUposition( nullable:true )
 		status( nullable:false, blank:false, inList: ['missing','empty','cabled','cabledDetails'] )
 		color( nullable:true, blank:true, inList: ['White', 'Grey', 'Green', 'Yellow', 'Orange', 'Red', 'Blue', 'Purple', 'Black'] )
 		toPower( nullable:true, blank:true)

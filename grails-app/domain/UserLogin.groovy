@@ -24,7 +24,7 @@ class UserLogin {
 		lastLogin( nullable: true )
 		active( nullable:false, inList:['Y', 'N'] )
 		lastPage( nullable: true )
-		expiryDate( blank: false, nullable: false )
+		expiryDate( nullable: false )
 	}
 
 	static mapping  = {

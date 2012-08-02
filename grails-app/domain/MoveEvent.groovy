@@ -38,7 +38,7 @@ class MoveEvent {
 		inProgress( blank:false, nullable:false, inList:["auto", "true", "false"] )
 		calcMethod( blank:false, nullable:false, inList: [METHOD_LINEAR, METHOD_MANUAL] )
 		runbookStatus( blank:true, nullable:true , inList:["Pending", "Draft", "Final", "Done"])
-		runbookVersion ( blank:true, nullable:true )
+		runbookVersion ( nullable:true )
 		runbookBridge1( blank:true, nullable:true )
 		runbookBridge2( blank:true, nullable:true )
 		videolink( blank:true, nullable:true )

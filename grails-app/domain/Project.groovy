@@ -31,7 +31,7 @@ class Project extends PartyGroup {
 		description( blank:true, nullable:true )
 		trackChanges( blank:false, nullable:false, inList:['Y', 'N'] )
 		startDate( nullable:true )
-		completionDate(blank:false, nullable:false )
+		completionDate( nullable:false )
 		dateCreated( ) // related to party
 		lastUpdated( ) // related to party
 		workflowCode( blank:false, nullable:false )
@@ -45,7 +45,7 @@ class Project extends PartyGroup {
 		custom6( blank:true, nullable:true )
 		custom7( blank:true, nullable:true )
 		custom8( blank:true, nullable:true )
-		lastAssetId( blank:true, nullable:true )
+		lastAssetId( nullable:true )
 	}
 
 	static mapping  = {

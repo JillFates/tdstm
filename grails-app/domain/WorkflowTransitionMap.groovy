@@ -7,11 +7,11 @@ class WorkflowTransitionMap {
 	static belongsTo = [ workflow : Workflow, workflowTransition : WorkflowTransition, swimlane : Swimlane  ]
 	
 	static constraints = {
-		transId( blank:false, nullable:false )
+		transId( nullable:false )
 		flag( blank:true, nullable:true )
-		workflow( blank:false, nullable:false )
-		workflowTransition( blank:false, nullable:false )
-		swimlane( blank:false, nullable:false )
+		workflow( nullable:false )
+		workflowTransition( nullable:false )
+		swimlane( nullable:false )
 	}
 	
 	static mapping = {

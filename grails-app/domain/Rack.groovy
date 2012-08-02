@@ -21,19 +21,19 @@ class Rack {
 	
 	static constraints = {
 		project( nullable:false )
-		source( blank:true, nullable:true )
+		source( nullable:true )
 		location( blank:true, nullable:true )
-		room( blank:true, nullable:true )
+		room( nullable:true )
 		tag( blank:true, nullable:true )
-		roomX( blank:true, nullable:true )
-		roomY( blank:true, nullable:true )
-		powerA( blank:true, nullable:true )
-		powerB( blank:true, nullable:true )
-		powerC( blank:true, nullable:true )
+		roomX( nullable:true )
+		roomY( nullable:true )
+		powerA( nullable:true )
+		powerB( nullable:true )
+		powerC( nullable:true )
 		rackType( blank:true, nullable:true, inList: ["Rack","CRAC","DoorL","DoorR","UPS","Object"] )
 		front( blank:true, nullable:true, inList: ["L","R","T","B"] )
-		manufacturer( blank:true, nullable:true )
-		model( blank:true, nullable:true )
+		manufacturer( nullable:true )
+		model( nullable:true )
 	}
 
 	static mapping  = {	

@@ -11,8 +11,8 @@ class CommentNote {
 	static belongsTo = [ assetComment : AssetComment ]
 	
     static constraints = {
-		dateCreated( blank:true, nullable:true  )
-		createdBy( blank:true, nullable:true  )
+		dateCreated( nullable:true  )
+		createdBy( nullable:true  )
 		note( blank:true, nullable:true  )
     }
 	

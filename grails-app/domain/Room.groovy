@@ -18,12 +18,12 @@ class Room {
 	static mappedBy = [sourceAssets:"roomSource", targetAssets:"roomTarget"]
 	
 	static constraints = {
-		project( blank:false, nullable:false )
+		project( nullable:false )
 		roomName( blank:false, nullable:false )
 		location( blank:false, nullable:false )
-		roomWidth( blank:true, nullable:true )
-		roomDepth( blank:true, nullable:true )
-		source( blank:true, nullable:true )
+		roomWidth( nullable:true )
+		roomDepth( nullable:true )
+		source( nullable:true )
 	}
 
 	static mapping  = {	

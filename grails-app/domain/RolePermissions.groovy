@@ -10,7 +10,7 @@ class RolePermissions {
 	
     static constraints = {
 		role( blank:false, nullable:false )
-		permission( blank:false, nullable:false )
+		permission( nullable:false )
     }
 	
 	// Helper methods

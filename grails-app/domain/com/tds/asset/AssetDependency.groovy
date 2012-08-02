@@ -18,8 +18,8 @@ class AssetDependency {
 	Date lastUpdated
 
 	static constraints = {
-		asset( blank:false, nullable:false )
-		dependent(blank:true, nullable:true)
+		asset( nullable:false )
+		dependent( nullable:true)
 		type( blank:false, nullable:false )
 		dataFlowFreq(blank:true, nullable:true, inList:[
 													"Unknown",
@@ -37,7 +37,7 @@ class AssetDependency {
 												])
 		status(blank:false, nullable:false )
 		comment(blank:true, nullable:true)
-		updatedBy( blank:false, nullable:false )
+		updatedBy( nullable:false )
 	}
 
 	static mapping={	

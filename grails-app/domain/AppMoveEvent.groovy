@@ -8,8 +8,8 @@ class AppMoveEvent {
 	String value
 	
     static constraints = {
-		application(blank:true, nullable:true)
-		moveEvent (blank:false, nullable:true)
+		application( nullable:true)
+		moveEvent ( nullable:true)
 		value (blank:true,nullable:true)
     }
 }

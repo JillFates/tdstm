@@ -8,7 +8,7 @@ class Database extends AssetEntity{
 	
     static constraints = {
 		dbFormat( blank:false, nullable:false )
-		dbSize( blank:false, nullable:false )
+		dbSize( nullable:false )
     }
 	static mapping  = {
 		table "data_base"

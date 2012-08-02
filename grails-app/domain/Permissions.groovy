@@ -11,7 +11,7 @@ class Permissions {
 	}
 	static constraints = {
 		permissionItem( blank:false, nullable:false,unique:true )
-		permissionGroup( blank:false, nullable:false )
+		permissionGroup( nullable:false )
 		description( blank:true , nullable:true)
 	}
 }
