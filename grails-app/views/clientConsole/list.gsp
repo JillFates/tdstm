@@ -825,6 +825,8 @@
 		$('#changeStatusDialog').dialog('close');
 		document.createCommentForm.mustVerify.value=0;
 		document.createCommentForm.reset();
+		document.forms['createCommentForm'].commentType.value = 'comment'
+		commentChange('#createResolveDiv','createCommentForm')
 	}
 	//To catch the event and call the specific remotefunction 
 	function catchevent(event) {
