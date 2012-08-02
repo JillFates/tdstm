@@ -38,6 +38,8 @@
 		</g:form>
 	</div>
 	<script type="text/javascript">
+	currentMenuId = "#reportsMenu";
+	$("#reportsMenuId a").css('background-color','#003366')
 	 function submitForm(form){
 			if($("form input:radio:checked").val() == "web"){
 		    	$('#checkListId').html('Loading...');

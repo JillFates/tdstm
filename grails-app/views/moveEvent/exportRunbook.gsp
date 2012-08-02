@@ -28,11 +28,13 @@
      <div id="exportResultId" style="float: left ; display: none; margin-top: 39px ; margin-left: 40px"></div>
   </g:form>
  <script type="text/javascript">
-  function generateRunbook(){
-	 var moveEvent = $('#eventList').val();
-	 var boo = false;
-	  if(moveEvent){
-		  boo = true;
+	currentMenuId = "#eventMenu";
+	$("#eventMenuId a").css('background-color','#003366')
+	function generateRunbook(){
+		var moveEvent = $('#eventList').val();
+		var boo = false;
+		if(moveEvent){
+			boo = true;
 			jQuery.ajax({
 				url: '../moveEvent/runBook',
 			 	data: {'id':moveEvent},
@@ -43,11 +45,11 @@
 					$('#exportResultId').css('display','block')
 				}
 			});
-	  }else{
-		 alert("Please Select Event")
-	 }
-      return boo;
-  }
+		}else{
+			alert("Please Select Event")
+	 	}
+		return boo;
+	}
  </script>
  </body>
  

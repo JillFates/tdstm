@@ -6,6 +6,10 @@
 <title>Logistics Team Worksheets </title>
 
 <script type="text/javascript">
+		$(document).ready(function() {
+		    currentMenuId = "#reportsMenu";
+		    $("#reportsMenuId a").css('background-color','#003366')
+		});
     
     	function populateBundle( moveBundleVal ) {  	
 	     	jQuery('#moveBundle').val( moveBundleVal );

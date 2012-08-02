@@ -25,6 +25,8 @@ $(document).ready(function() {
 	$("#manufacturerShowDialog").dialog({ autoOpen: false })
 	$("#modelShowDialog").dialog({ autoOpen: false })
 	$("#moveBundleSelectId").dialog({ autoOpen: false })  
+	currentMenuId = "#bundleMenu";
+	$("#bundleMenuId a").css('background-color','#003366')
 
 });
 </script>

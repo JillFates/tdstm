@@ -28,6 +28,8 @@
  	        $("#showEntityView").dialog({ autoOpen: false })
 			$("#editEntityView").dialog({ autoOpen: false })
 			$("#createEntityView").dialog({ autoOpen: false })
+	    	currentMenuId = "#assetMenu";
+	    	$("#assetMenuId a").css('background-color','#003366')
         });
         </script>
 </head>
@@ -115,9 +117,5 @@
  </div>
  </div>
  </body>
- <script>
-	currentMenuId = "#assetMenu";
-	$("#assetMenuId a").css('background-color','#003366')	
- </script>
  
 </html>

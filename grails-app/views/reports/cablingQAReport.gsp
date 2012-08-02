@@ -6,6 +6,10 @@
 <title>Cabling ${ type == 'QA' ? 'QA' : 'Conflict' } Report</title>
 
 <script type="text/javascript">
+		$(document).ready(function() {
+		    currentMenuId = "#reportsMenu";
+		    $("#reportsMenuId a").css('background-color','#003366')
+		});
     
     	function populateBundle( moveBundleVal ) {  	
 	     	jQuery('#moveBundle').val( moveBundleVal );

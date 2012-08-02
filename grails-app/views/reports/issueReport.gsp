@@ -5,6 +5,10 @@
 <meta name="layout" content="projectHeader" />
 <title>Issue Report</title>
 <script type="text/javascript">
+	$(document).ready(function() {
+	    currentMenuId = "#reportsMenu";
+	    $("#reportsMenuId a").css('background-color','#003366')
+	});
     
     function populateSelect( id, value ) {    	
 		$('#'+id).val( value )

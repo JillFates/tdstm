@@ -209,6 +209,8 @@ function mySelect(x)
 </div>
 </div>
 <script type="text/javascript">
+currentMenuId = "#reportsMenu";
+$("#reportsMenuId a").css('background-color','#003366')
 InitData()
 </script>
 </body>

@@ -17,6 +17,8 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 	    $("#editDialog").dialog({ autoOpen: false })
+	    currentMenuId = "#reportsMenu";
+	    $("#reportsMenuId a").css('background-color','#003366')
 	})
 	function openAssetEditDialig( id ){
 		$("#editFormId").val(id)

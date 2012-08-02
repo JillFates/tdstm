@@ -157,6 +157,8 @@
         	</script>
         </div>
         <script type="text/javascript">
+    		currentMenuId = "#assetMenu";
+    		$("#assetMenuId a").css('background-color','#003366')
 			$('#assetMenu').show();
 			$('#reportsMenu').hide();
 		</script>

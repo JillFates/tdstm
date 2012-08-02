@@ -8,6 +8,10 @@
 <g:javascript src="asset.tranman.js" />
 <title>Power Report</title>
 <script type="text/javascript">
+	$(document).ready(function() {
+	    currentMenuId = "#reportsMenu";
+	    $("#reportsMenuId a").css('background-color','#003366')
+	});
 	function updateRackDetails(e) {
      	var rackDetails = eval('(' + e.responseText + ')')   	
       	var sourceSelectObj = $('#sourceRackId');

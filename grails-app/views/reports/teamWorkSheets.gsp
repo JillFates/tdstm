@@ -5,6 +5,10 @@
 <meta name="layout" content="projectHeader" />
 <title>Move Team Worksheets </title>
 <script type="text/javascript">
+		$(document).ready(function() {
+		    currentMenuId = "#reportsMenu";
+		    $("#reportsMenuId a").css('background-color','#003366')
+		});
     	
     	function populateTeams(val) {    	
     			

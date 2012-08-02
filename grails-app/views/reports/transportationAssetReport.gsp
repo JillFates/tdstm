@@ -5,6 +5,10 @@
 <meta name="layout" content="projectHeader" />
 <title>Transport Worksheets </title>
 <script type="text/javascript">
+		$(document).ready(function() {
+		    currentMenuId = "#reportsMenu";
+		    $("#reportsMenuId a").css('background-color','#003366')
+		});
     
     	function populateBundle(val) {    	
     			

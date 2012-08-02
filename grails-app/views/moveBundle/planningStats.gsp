@@ -5,6 +5,12 @@
 <meta name="layout" content="projectHeader" />
 <g:javascript src="entity.crud.js" />
 <title>Planning Dashboard</title>
+<script type="text/javascript">
+$(document).ready(function() { 
+	currentMenuId = "#bundleMenu";
+	$("#bundleMenuId a").css('background-color','#003366')
+});
+</script>
 </head>
 <body>
 	<div class="body">

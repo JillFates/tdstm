@@ -4,6 +4,12 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <title>Pre-Move Checklist</title>
+<script>
+	$(document).ready(function() {
+	    currentMenuId = "#reportsMenu";
+	    $("#reportsMenuId a").css('background-color','#003366')
+	});
+</script>
 </head>
 <body>
 	<div>

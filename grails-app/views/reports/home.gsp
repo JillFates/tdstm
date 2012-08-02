@@ -131,8 +131,10 @@
 </div>
 </div>
 <script>
-	currentMenuId = "";
-	$("#reportMenuId a").css('background-color','#003366')
+	$(document).ready(function() {
+	    currentMenuId = "#reportsMenu";
+	    $("#reportsMenuId a").css('background-color','#003366')
+	});
 </script>
 </body>
 </html>

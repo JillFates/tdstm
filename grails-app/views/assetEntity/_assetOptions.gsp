@@ -29,6 +29,8 @@
 	</div>
 </div>
 	<script type="text/javascript">
+	currentMenuId = "#adminMenu";
+	$("#adminMenuId a").css('background-color','#003366')
     function addAssetOptions(value){
         var option = value;
         if(option=='planStatus'){

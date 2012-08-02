@@ -232,6 +232,10 @@ var sHint = "C:\\temp\\output";
 	 var location = document.getElementById( 'location' ).value
 	${remoteFunction(action:'getLabelBadges', params:'\'moveBundle=\' + moveBundle +\'&project=\'+projectId +\'&teamFilter=\'+team+\'&location=\'+location', onComplete:'startprintjob(e)')}
 	 }
+		$(document).ready(function() {
+		    currentMenuId = "#reportsMenu";
+		    $("#reportsMenuId a").css('background-color','#003366')
+		});
      
     </script>
 </head>
