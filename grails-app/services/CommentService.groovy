@@ -34,6 +34,7 @@ class CommentService {
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername(principal)
 		def formatter = new SimpleDateFormat("MM/dd/yyyy");
+		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def date = new Date()
 		def project = Project.get(session.CURR_PROJ.CURR_PROJ)
@@ -100,15 +101,16 @@ class CommentService {
 		if (params.attribute) assetComment.attribute = params.attribute
 		if (params.commentType) assetComment.commentType = params.commentType
 	    assetComment.resolution = params.resolution
-		if(params.estStart) assetComment.estStart = formatter.parse(params.estStart)
-		if(params.estFinish) assetComment.estFinish = formatter.parse(params.estFinish)
-		if(params.actStart) assetComment.actStart = formatter.parse(params.actStart)
+		if(params.estStart) assetComment.estStart = estformatter.parse(params.estStart)
+		if(params.estFinish) assetComment.estFinish = estformatter.parse(params.estFinish)
+		if(params.actStart) assetComment.actStart = estformatter.parse(params.actStart)
 		assetComment.workflowTransition = WorkflowTransition.get(params.workflowTransition)
 		if(params.hardAssigned) assetComment.hardAssigned = Integer.parseInt(params.hardAssigned)
 		if(params.priority) assetComment.priority = Integer.parseInt(params.priority)
 		if(params.duration) assetComment.duration = Integer.parseInt(params.duration)
 		if(params.durationScale) assetComment.durationScale = params.durationScale
 		if(params.overRide) assetComment.workflowOverride = Integer.parseInt(params.overRide)
+		 assetComment.role = params.role
         
 		// Issues (aka tasks) have a number of additional properties to be managed 
 		if ( assetComment.commentType == 'issue' ) {

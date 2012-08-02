@@ -1746,28 +1746,27 @@ class AssetEntityController {
 		def etStart
 		def etFinish
 		def atStart
-		DateFormat formatter ;
 		def dueDate
-		formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a");
+		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 		def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def assetComment = AssetComment.get(params.id)
 		if(assetComment.createdBy){
 			personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")
-			dtCreated = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
+			dtCreated = estformatter.format(GormUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
 		}
 		if(assetComment.resolvedBy){
 			personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")
-			dtResolved = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
+			dtResolved = estformatter.format(GormUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
 		}
 		if(assetComment.estStart){
-			etStart = dateFormatter.format(assetComment.estStart);
+			etStart = estformatter.format(assetComment.estStart);
 		}
 		if(assetComment.estFinish){
-			etFinish = dateFormatter.format(assetComment.estFinish);
+			etFinish = estformatter.format(assetComment.estFinish);
 		}
 		if(assetComment.actStart){
-			atStart = dateFormatter.format(assetComment.actStart);
+			atStart = estformatter.format(assetComment.actStart);
 		}
 		if(assetComment.dueDate){
 			dueDate = dateFormatter.format(assetComment.dueDate);
@@ -1780,6 +1779,11 @@ class AssetEntityController {
 			notes << [ dateCreated , it.createdBy.toString() ,it.note]
 			
 		}
+		def roles = ''
+		if(assetComment.role){
+		def roletype =  RoleType.findById(assetComment.role).description 
+		roles = roletype.substring(roletype.lastIndexOf(':')+1)
+		}
 		commentList << [ 
 			assetComment:assetComment,
 			personCreateObj:personCreateObj,
@@ -1790,7 +1794,7 @@ class AssetEntityController {
 			assetName:assetComment.assetEntity?.assetName ?: "",
 			eventName:assetComment.moveEvent?.name ?: "",
 		    dueDate:dueDate ?: '',etStart:etStart,
-			etFinish:etFinish,atStart:atStart,notes:notes,workflow:workflow]
+			etFinish:etFinish,atStart:atStart,notes:notes,workflow:workflow,roles:roles]
 		render commentList as JSON
 	}
 	/* ----------------------------------------------------------------
@@ -3307,20 +3311,23 @@ class AssetEntityController {
 	def getWorkflowTransition={
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
-		
+		def assetCommentId = params.assetCommentId
 		def assetEntity = AssetEntity.get(params.assetId)
 		def workFlowInstance = Workflow.findByProcess(project.workflowCode)
 		def workFlowTransition = WorkflowTransition.findAllByWorkflowAndCategory(workFlowInstance, params.category)
 		//def workFlowTransition = WorkflowTransition.findAllByWorkflow(workFlowInstance) TODO : should be removed after completion of this new feature
 		if(assetEntity){
-			def existingWorkflows = AssetComment.findAllByAssetEntity(assetEntity).workflowTransition
+			def existingWorkflows = assetCommentId ? AssetComment.findAllByAssetEntityAndIdNotEqual(assetEntity, assetCommentId ).workflowTransition : AssetComment.findAllByAssetEntity(assetEntity ).workflowTransition
 			workFlowTransition.removeAll(existingWorkflows)
 		}
-		def selectControl = new StringBuffer("""<select id="workFlowId" name="workFlow">""")
-		workFlowTransition.each{
-			selectControl.append("<option value='${it.id}'>${it.name}</option>")
+		def selectControl = ''
+		if(workFlowTransition.size()){
+			selectControl = new StringBuffer("""<select id="workFlowId" name="workFlow">""")
+			workFlowTransition.each{
+				selectControl.append("<option value='${it.id}'>${it.name}</option>")
+			}
+			selectControl.append("</select>")
 		}
-		selectControl.append("</select>")
 		render selectControl
 	}
 	
@@ -3332,9 +3339,11 @@ class AssetEntityController {
 		def workFlowTransition = WorkflowTransition.findAllByWorkflowAndCategory(workFlowInstance, params.category)
 		//def workFlowTransition = WorkflowTransition.findAllByWorkflow(workFlowInstance) TODO : should be removed after completion of this new feature
 		def selectControl = new StringBuffer("""<select id="taskDependencyId" name="taskDependency" multiple="multiple">""")
+		
 		workFlowTransition.each{
 			selectControl.append("<option value='${it.id}'>${it.name}</option>")
 		}
+		
 		selectControl.append("</select>")
 		render selectControl
 	}

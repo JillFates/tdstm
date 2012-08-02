@@ -33,7 +33,7 @@ class AssetComment {
 	
 	Integer duration				// # of minutes to perform task
 	String durationScale = 'm'		// Scale that duration represents m)inute, h)our, d)ay, w)eek
-	Integer priority=4				// An additional option to score the order that like tasks should be processed where 1=highest and 5=lowest
+	Integer priority=3				// An additional option to score the order that like tasks should be processed where 1=highest and 5=lowest
 	
 	Date estStart
 	Date estFinish	
