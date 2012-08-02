@@ -204,9 +204,8 @@
 	border-right:0px;
 }
 .megamenu {
-	z-index:10;
-	position:absolute;
-	top:50px;
+	z-index:100;
+	top:49px;
 	left:auto;
 	width:600px;
 	height:auto;
