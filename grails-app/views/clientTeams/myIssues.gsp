@@ -2,9 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="projectHeader" />
+	<meta name="layout" content="projectHeader" />
 	<title>My Issues</title>
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 </head>
@@ -14,14 +13,13 @@
 		<ul>
 			<li><g:link class="mobmenu" controller="clientTeams" >Teams</g:link></li>
 			<g:if test="${tab && tab == 'todo'}">
-				<li><g:link elementId="taskLinkId"  class="mobmenu mobselect" action="listComment" params='["tab":"todo","search":search]'>My Tasks ${todoSize}</g:link></li>
-				<li><g:link elementId="taskLinkAllId"  class="mobmenu" action="listComment" params='["tab":"all","search":search]'>All Tasks ${allSize}</g:link></li>
+				<li><g:link elementId="taskLinkId"  class="mobmenu mobselect" action="listComment" params='["tab":"todo","search":search]'>My Tasks: ${todoSize}</g:link></li>
+				<li><g:link elementId="taskLinkAllId"  class="mobmenu" action="listComment" params='["tab":"all","search":search]'>All Tasks: ${allSize}</g:link></li>
 			</g:if>
 			<g:if test="${tab && tab == 'all'}">
-				<li><g:link elementId="taskLinkId"  class="mobmenu" action="listComment" params='["tab":"todo","search":search]'>My Tasks ${todoSize}</g:link></li>
-				<li><g:link elementId="taskLinkAllId"  class="mobmenu mobselect" action="listComment" params='["tab":"all","search":search]'>All Tasks ${allSize}</g:link></li>
+				<li><g:link elementId="taskLinkId"  class="mobmenu" action="listComment" params='["tab":"todo","search":search]'>My Tasks: ${todoSize}</g:link></li>
+				<li><g:link elementId="taskLinkAllId"  class="mobmenu mobselect" action="listComment" params='["tab":"all","search":search]'>All Tasks: ${allSize}</g:link></li>
 			</g:if>
-			<li><a href="#" id="detailLinkId" class="mobmenu">Details</a></li>
 		</ul>
 		<div class="tab_search">
 	      	<g:form method="post" name="issueAssetForm" action="showIssue">
@@ -48,7 +46,7 @@
 						<g:sortableColumn class="sort_column" style="width:60px;"  action="listComment" property="comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
 						<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="lastUpdated" title="Updated" params="['tab':tab,'search':search]"></g:sortableColumn>
 						<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="dueDate" title="Due" params="['tab':tab,'search':search]"></g:sortableColumn>
-						<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="assetEntity" title="Related to" params="['tab':tab,'search':search]"></g:sortableColumn>
+						<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="assetEntity" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
 						<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="status" title="Status" params="['tab':tab,'search':search]"></g:sortableColumn>
 					</tr>
 				</thead>
@@ -129,7 +127,6 @@
 				$('#detailTdId_'+id).css('display','table-row')
 				//$('#detailId_'+id).css('display','block')
 				$('#taskLinkId').removeClass('mobselect')
-				$('#detailLinkId').addClass('mobselect')
 			}
 		});
 	}
@@ -138,7 +135,6 @@
 		//$('#myIssueList').css('display','block')
 		$('#detailTdId_'+id).css('display','none')
 		$('#taskLinkId').addClass('mobselect')
-		$('#detailLinkId').removeClass('mobselect')
 		$('#showStatusId_'+id).css('display','table-row')
 		$('#issueTr_'+id).attr('onClick','issueDetails('+id+')');
 

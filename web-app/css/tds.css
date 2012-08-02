@@ -782,10 +782,12 @@ dl dd {
 }
 
 .asset_details_block{
-	font-size:12px;
+	font-size:15px;
+	font-weight: bold;
 }
 .asset_details_block_task{
-	font-size:12px;
+	font-size:15px;
+	font-weight: bold;
 	width: 500px;
 }
 
