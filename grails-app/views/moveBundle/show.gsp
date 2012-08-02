@@ -133,7 +133,11 @@
             <tr class="prop">
               <td valign="top" class="name">Move Event:</td>
 
-              <td valign="top" class="value"> ${fieldValue(bean:moveBundleInstance, field:'moveEvent')}</td>
+              <td valign="top" class="value">
+              	<g:each var="e" in="${moveBundleInstance.moveEvent}">
+                	<li><g:link controller="moveEvent" action="show" id="${e.id}">${e?.encodeAsHTML()}</g:link></li>
+                </g:each>
+              </td>
 
             </tr>
 
