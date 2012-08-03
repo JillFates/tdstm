@@ -26,7 +26,16 @@
 	</div>
     <tds:hasPermission permission='CommentCrudView'>
 	<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-		<span class="menuButton"><a id="newCommentId" class="create" href="#" onclick="$('#statusId').val('');$('#createResolveDiv').css('display','none');$('#createCommentDialog').dialog('option', 'width', 'auto');$('#createCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close');document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();$('#dueDateTrId').css('display', 'none');$('#assignedToId').css('display', 'none');" >New Comment</a></span>
+		<span class="menuButton"><a id="newCommentId" class="create" href="#" 
+		onclick="$('#statusId').val('');
+		$('#createResolveDiv').css('display','none');
+		$('#createCommentDialog').dialog('option', 'width', 'auto');
+		$('#createCommentDialog').dialog('option', 'position', ['center','top']);
+		$('#createCommentDialog').dialog('open');$('#showCommentDialog').dialog('close');
+		$('#editCommentDialog').dialog('close');$('#showDialog').dialog('close');
+		$('#editDialog').dialog('close');$('#createDialog').dialog('close');
+		document.createCommentForm.mustVerify.value=0;document.createCommentForm.reset();
+		$('#dueDateTrId').css('display', 'none');$('#assignedToId').css('display', 'none');" >New...</a></span>
 	</div>
 	</tds:hasPermission>
 </div>
@@ -37,94 +46,71 @@
  **************************
  */ 
 --%>
-<div id="showCommentDialog" title="Comment/Issue detail"
-   style="display: none;">
-<div class="dialog" style="border: 1px solid #5F9FCF"><input name="id" value="" id="commentId"
-   type="hidden"/>
-   <div>
-   <table id="showCommentTable" style="border: 0px;">
+<div id="showCommentDialog" title="Comment/Issue detail" style="display: none;">
+	<div class="dialog" style="border: 1px solid #5F9FCF"><input name="id" value="" id="commentId" type="hidden" />
+	<div>
+	<table id="showCommentTable" style="border: 0px;">
       <tr class = "issue" id="assignedToTrId" style="display:none">
          <td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
-         <td valign="top" class="value" id="" style="width: 20%"> <span id="assignedToTdId"></span>&nbsp;&nbsp;
+         <td valign="top" class="value" id="" style=""> <span id="assignedToTdId"></span>&nbsp;&nbsp;
          <span id="roleTdId"></span>&nbsp;&nbsp;
           <input type="checkbox" id="hardAssignedShow" name="hardAssignedShow" value="0" 
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
 			<label for="hardAssignedShow"  >Fixed Assignment</label>
          </td>
-        
-      </tr>
-      <tr class = "issue" id="dueDatesTrId" style="display:none">
          <td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
          <td valign="top" class="value" id="dueDatesId"></td>
-        
       </tr>
-      <tr class = "issue" id="estStartShow" style="display:none">
-         <td valign="top" class="name"><label for="estStartShowId">Estimated Start:</label></td>
-         <td valign="top" class="value" id="estStartShowId"></td>
-         <td valign="top" class="name" nowrap="nowrap"><label for="estFinishShowId">Estimated Finish:</label></td>
-         <td valign="top" class="value" id="estFinishShowId" nowrap="nowrap" colspan="4"></td>
-         
-      </tr>
-      <tr class = "issue" id="actStartShow" style="display:none">
-         <td valign="top" class="name"><label for="actStartShowId">Actual Start:</label></td>
-         <td valign="top" class="value" id="actStartShowId"></td>
-         <td valign="top" class="name" nowrap="nowrap"><label for="actFinishShowId">Actual Finish:</label></td>
-         <td valign="top" class="value" id="actFinishShowId" nowrap="nowrap"></td>
+      <tr class = "issue" id="dueDatesTrId" style="display:none">
       </tr>
       <tr>
          <td valign="top" class="name"><label for="createdBy">Created By:</label></td>
-         <td valign="top" class="value" id="createdById"></td>
-         
+         <td valign="top" class="value" id="createdById" colspan="3"></td>
       </tr >
       
       <tr class="prop">
          <td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
-         <td valign="top" class="value" id="commentTypeTdId"></td>
-         
+         <td valign="top" class="value" id="commentTypeTdId" colspan="3"></td>
       </tr>
       <tr class = "issue" id="categoryTrId" >
          <td valign="top" class="name"><label for="category">Category:</label></td>
          <td valign="top" class="value" id="categoryTdId"></td>
-         
+         <td valign="top" class="name"><label for="priorityShowId">Priority:</label></td>
+         <td valign="top" class="value" id="priorityShowId"></td>
       </tr>
       <tr class = "issue" id="workFlowShow" style="display:none">
          <td valign="top" class="name" nowrap="nowrap"><label for="workFlowShowId">WorkFlow Transition:</label></td>
          <td valign="top" class="value" id="workFlowShowId"></td>
-         <td valign="top" class="name"><input type="checkbox" id="overRideShow" name="overRideShow" value="0" 
+         <td valign="top" class="name" colspan="2"><input type="checkbox" id="overRideShow" name="overRideShow" value="0" 
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
 			 <label for="overRide" >Overridden</label></td>
       </tr>
       <tr class = "issue" id="workFlowShow" style="display:none">
-         <td valign="top" class="name"><label for="priorityShowId">Priority:</label></td>
-         <td valign="top" class="value" id="priorityShowId"></td>
          <td valign="top" class="name"><label for="durationShowId">Duration:</label></td>
-         <td valign="top" class="value" id="durationShowId"></td>
+         <td valign="top" class="value" id="durationShowId" colspan="3"></td>
       </tr>
-      
-      
       <tr class="prop" style="display: none">
          <td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
-         <td valign="top" class="value" id="commentCodeTdId"></td>
-         
+         <td valign="top" class="value" id="commentCodeTdId" colspan="3"></td>
       </tr>
       <tr class="prop" id="mustVerifyId" style="display:none">
          <td valign="top" class="name" ><label for="mustVerify">Must Verify:</label></td>
-         <td valign="top" class="value" id="verifyTdId">
+         <td valign="top" class="value" id="verifyTdId" colspan="3">
             <input type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0" disabled="disabled" />
          </td>
          
       </tr>
       <tr id = "assetShowId" class="prop" >
          <td valign="top" class="name" id="assetTdId"><label for="asset">Asset:</label></td>
-         <td valign="top" class="value" id="assetShowValueId" ></td>
+         <td valign="top" class="value" id="assetShowValueId" colspan="3"></td>
       </tr>
       <tr id = "moveShowId" class="prop" style="display: none;" >
          <td valign="top" class="name" id="eventTdId"><label for="asset">Move Event:</label></td>
-         <td valign="top" class="value" id="eventShowValueId" ></td>
+         <td valign="top" class="value" id="eventShowValueId" colspan="3"></td>
       </tr>
       <tr class="prop">
-         <td valign="top" class="name"><label for="comment">Comment:</label></td>
-         <td valign="top" class="value" colspan="6">
+         <td valign="top" class="name"><label for="comment">Description:</label></td>
+         <td valign="top" class="value" colspan="3">
             <textarea cols="80" rows="4" id="commentTdId" readonly="readonly"></textarea>
          </td>
       </tr>
@@ -134,9 +120,21 @@
       <table id="showResolveTable" style="border: 0px">
       <tr class="prop">
          <td valign="top" class="name"><label for="previousNotes">Previous Notes:</label></td>
-         <td valign="top" class="value" >
+         <td valign="top" class="value" colspan="3">
             <div id="previousNotesShowId" ></div>
          </td>
+      </tr>
+      <tr class = "issue" id="estStartShow" style="display:none">
+         <td valign="top" class="name"><label for="estStartShowId">Estimated Start:</label></td>
+         <td valign="top" class="value" id="estStartShowId"></td>
+         <td valign="top" class="name" nowrap="nowrap"><label for="estFinishShowId">Estimated Finish:</label></td>
+         <td valign="top" class="value" id="estFinishShowId" nowrap="nowrap" colspan="4"></td>         
+      </tr>
+      <tr class = "issue" id="actStartShow" style="display:none">
+         <td valign="top" class="name"><label for="actStartShowId">Actual Start:</label></td>
+         <td valign="top" class="value" id="actStartShowId"></td>
+         <td valign="top" class="name" nowrap="nowrap"><label for="actFinishShowId">Actual Finish:</label></td>
+         <td valign="top" class="value" id="actFinishShowId" nowrap="nowrap"></td>
       </tr>
       <tr class="prop">
          <td valign="top" class="name"><label for="status">Status:</label></td>
