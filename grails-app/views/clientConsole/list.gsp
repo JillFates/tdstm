@@ -151,7 +151,7 @@
 				<span>Actions</span><br />
 				<g:if test="${clientConsoleCheckBoxHasPermission}"> 
 					<input type="button" value="State..." onclick="changeState()" title="Change State" style="width: 80px;"/><br />
-					<a href="#" onclick="selectAll()" ><u style="color:blue;">All</u></a>
+					<a href="#" onclick="selectAll()" style="color:blue;text-decoration: underline;">All</a>
 				</g:if>
 			</th>
 			

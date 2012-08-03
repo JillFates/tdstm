@@ -58,9 +58,6 @@ class ClientConsoleController {
 			def moveEventId = params.moveEvent
 			def moveEventInstance
 			//def projectMap
-	        def stateVal
-	        def taskVal
-	        def check 
 			def moveEventsList = MoveEvent.findAll("from MoveEvent me where me.project = ? order by me.name asc",[projectInstance])
 			def columns = userPreferenceService.setAssetTrackingPreference(params.column1Attribute, params.column2Attribute, params.column3Attribute, params.column4Attribute)
 			
@@ -188,19 +185,6 @@ class ClientConsoleController {
 	                if(transitionStates.size()){
 	                    stateId = transitionStates[0].stateTo
 	                }
-	                if(stateId == 0){
-	                    check = true
-	                } else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
-	                    stateVal = stateEngineService.getState(workflowCode,stateId)
-	                    taskVal = stateEngineService.getTasks(workflowCode, role ,stateVal)
-	                    if(taskVal.size() == 0){
-	                        check = false
-	                    }else{
-	                        check = true
-	                    }
-	                }else{
-	                    check = false
-	                }
 	                
 	                def transQuery = "from AssetTransition where assetEntity = $assetId and voided = 0"
 	                
@@ -247,8 +231,7 @@ class ClientConsoleController {
 	                    }
 	                    htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass tranCell\"  >&nbsp;</td>"
 	                }
-	                assetEntityList << [id: assetId, asset:it, transitions:htmlTd, checkVal:check, 
-										currentStatus : it.currentStatus ? stateEngineService.getState(workflowCode,it.currentStatus) : ""]
+	                assetEntityList << [id: assetId, asset:it, transitions:htmlTd, currentStatus : it.currentStatus ? stateEngineService.getState(workflowCode,it.currentStatus) : ""]
 				}
 	
 				userPreferenceService.loadPreferences("CLIENT_CONSOLE_REFRESH")
@@ -547,7 +530,6 @@ class ClientConsoleController {
 				def stateId = 0
 				def assetId = it.id
 				def tdId = []
-				def check
 				def maxstate = it.maxstate
 				def assetEntity = AssetEntity.get(assetId)
 				/*def projectMap = ProjectAssetMap.findByAsset(assetEntity)
@@ -559,19 +541,6 @@ class ClientConsoleController {
 																"order by date_created desc, stateTo desc limit 1 ")
 				if(transitionStates.size()){
 					stateId = transitionStates[0].stateTo
-				}
-				if(stateId == 0){
-					check = true
-				} else if((stateId > holdId && stateId < releaseId) || (stateId > reRackId)){
-					def stateVal = stateEngineService.getState(workFlowCode,stateId)
-					def taskVal = stateEngineService.getTasks(workFlowCode,role,stateVal)
-					if(taskVal.size() == 0){
-						check = false
-					}else{
-						check = true
-					}
-				}else{
-					check = false
 				}
                 
                 def transQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 "
@@ -624,7 +593,7 @@ class ClientConsoleController {
 											column2value:it."${columns.column2.field}" ? columns.column2.field != "currentStatus" ? it."${columns.column2.field}" : stateEngineService.getState(workFlowCode,it."${columns.column2.field}") : "&nbsp;",
 											column3value:it."${columns.column3.field}" ? columns.column3.field != "currentStatus" ? it."${columns.column3.field}" : stateEngineService.getState(workFlowCode,it."${columns.column3.field}") : "&nbsp;",
 											column4value:it."${columns.column4.field}" ? columns.column4.field != "currentStatus" ? it."${columns.column4.field}" : stateEngineService.getState(workFlowCode,it."${columns.column4.field}") : "&nbsp;",
-											tdId:tdId,	check:check ,lastUpdated:formatter.format( GormUtil.convertInToUserTZ(it.updated ,tzId) )]
+											tdId:tdId,	check:RolePermissions.hasPermission("ClientConsoleCheckBox") ,lastUpdated:formatter.format( GormUtil.convertInToUserTZ(it.updated ,tzId) )]
 			}
 			
 			def assetCommentsList = []
