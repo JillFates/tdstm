@@ -412,7 +412,7 @@
 
 .task_planned {
 	background-color: #FFFFFF;
-	color: black;
+	color: gray;
 	font-weight: bold;
 }
 .task_pending {

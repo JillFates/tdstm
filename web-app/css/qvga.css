@@ -19,6 +19,7 @@ table {
 	width:100%;
 	float:left;
 	border: 1px solid black;
+	border-spacing: 0px;
 }
 
 .asset_hold{
