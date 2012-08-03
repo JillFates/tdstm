@@ -183,6 +183,7 @@
 	<input type="hidden" name="assetEntity.id" id="createAssetCommentId" value="" />
 	<g:form action="saveComment" method="post" name="createCommentForm">
 		<input type="hidden" name="category" value="general" />
+		<input type="hidden" id="predCount"  value="1" />
 	<div class="dialog" style="border: 1px solid #5F9FCF">
 	<div>
 		<table id="createCommentTable" style="border: 0px;">
@@ -259,10 +260,20 @@
 		<tr class="prop" id="workFlowTransitionTrId" style="display: none">
 			<td valign="top" class="name"><label for="actStartTrId">WorkFlowTransition:</label></td>
 			<td valign="top" class="value" id="workFlowTransitionId"></td>
-			<td>
+			<td nowrap="nowrap">
 			<input type="checkbox" id="overRide" name="overRide" value="0" 
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
-			 <label for="overRide" >Overridden</label>
+			 <label for="overRide" >Overridden</label>&nbsp;&nbsp;&nbsp;
+			 <a class="button" href="javascript:" onclick="addPredecessor('predecessorCategory','','predecessorTr','relatedIssueId');"> Add </a>
+			</td>
+		</tr>
+		<tr class="prop" id="predecessorTr" style="display: none">
+			<td valign="top" class="name"><label for="actStartTrId">Predecessor:</label>
+			</td>
+			<td valign="top" class="value" id="workFlowTransitionId">
+			   <table>
+			    <tbody id="predecessorTableId"></tbody>
+			   </table>
 			</td>
 		</tr>
 		<tr id="priorityId" class="prop" style="display: none">
@@ -304,6 +315,14 @@
 				<textarea cols="80" rows="4" id="comment" name="comment" ></textarea>
 			</td>
 		</tr>
+	</table>
+	</div>
+	<div style="display: none;">
+	<table id="taskDependencyRow">
+	<tr>
+		<td><g:select id="predecessorCategoryId" class="predecessor" name="predecessorCategoryCreate" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general" noSelection="['':'please select']" onChange="fillPredecessor(this.id)"/></td>
+		<td id="taskDependencyTdId"></td>
+	 </tr>
 	</table>
 	</div>
 	<div id="createResolveDiv" style="display: none;">
@@ -440,7 +459,16 @@
 			<td>
 			<input type="checkbox" id="overRideEdit" name="overRide" value="0" 
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
-			 <label for="overRideEdit" >Overridden</label>
+			 <label for="overRideEdit" >Overridden</label>&nbsp;&nbsp;
+			  <a class="button" href="javascript:" onclick="addPredecessor('predecessorCategoryEdit','updateCommentId','predecessorEditTr','relatedIssueEditId');"> Add </a>
+			</td>
+		</tr>
+		<tr class="prop" id="predecessorEditTr" style="display: none">
+			<td valign="top" class="name"><label for="actStartTrId">Predecessor:</label></td>
+			<td valign="top" class="value" id="predecessorEditTd">
+			  <g:select id="predecessorCategoryEdit"  from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general" noSelection="['':'please select']" onChange="addPredecessor('predecessorCategoryEdit','updateCommentId','predecessorEditTr','relatedIssueEditId')"/>
+			</td>
+			<td id="relatedIssueEditId">
 			</td>
 		</tr>
 		<tr id="priorityEditId" class="prop" style="display: none">

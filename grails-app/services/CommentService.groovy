@@ -87,7 +87,6 @@ class CommentService {
 			// TODO: handle failure of bad assetComment id passed for the user's current project (could be a hack)
 			return []
 		}
-
 //		def bindArgs = [assetComment, params, [ exclude:['assignedTo', 'assetEntity', 'moveEvent', 'project', 'dueDate', 'status'] ] ]
 //		def bindArgs = [assetComment, params, [ include:['comment', 'category', 'displayOption', 'attribute'] ] ]
 //		bindData.invoke( assetComment, 'bind', (Object[])bindArgs )
@@ -111,6 +110,8 @@ class CommentService {
 		if(params.durationScale) assetComment.durationScale = params.durationScale
 		if(params.overRide) assetComment.workflowOverride = Integer.parseInt(params.overRide)
 		 assetComment.role = params.role
+		 
+		 
         
 		// Issues (aka tasks) have a number of additional properties to be managed 
 		if ( assetComment.commentType == 'issue' ) {
@@ -170,8 +171,16 @@ class CommentService {
 					// TODO error won't bubble up to the user
 					assetNote.errors.allErrors.each{println it}
 				}
+				
 			}
-
+			def taskDependency = params["taskDependency[]"]
+			taskDependency.each {
+			   def commentInstance = AssetComment.get(it)
+			   def taskDepenencyInstance = new TaskDependency()
+			   taskDepenencyInstance.predecessor = commentInstance
+			   taskDepenencyInstance.assetComment = assetComment
+			   if(!taskDepenencyInstance.save(flush:true)){taskDepenencyInstance.errors.allErrors.each{println it}}
+			}
 			// TODO - comparison of the assetComment.dueDate may not work if the dueDate is stored in GMT
 			def css =  assetComment.dueDate < date ? 'Lightpink' : 'White'
 			def status = (assetComment.commentType == "issue" && assetComment.isResolved == 0) ? true : false

@@ -319,18 +319,17 @@ function showAssetDialog( e , action ) {
 				$('#workFlowTransitionEditTrId').css('display','none')
 			}else{
 				$('#'+transitionID).html(e.responseText);
-			    if(document.forms['createCommentForm'].commentType.value =='issue' || document.forms['editCommentForm'].commentType.value =='issue'){
-			      $('#workFlowTransitionTrId').css('display','table-row')
+			    if(document.forms['editCommentForm'].commentType.value =='issue'){
 			      $('#workFlowTransitionEditTrId').css('display','table-row')
 			    }
 			}
 		}
 	})
-	new Ajax.Request('../assetEntity/getPredecessor?category='+category,{asynchronous:true,evalScripts:true,
-		onComplete:function(e){
-			$('#'+predecessorID).html(e.responseText);
-		}
-	})
+	//new Ajax.Request('../assetEntity/getPredecessor?category='+category,{asynchronous:true,evalScripts:true,
+		//onComplete:function(e){
+			//$('#'+predecessorID).html(e.responseText);
+		//}
+	//})
  }
  
  function getLength( length ){
@@ -1063,11 +1062,22 @@ if(type == "issue"){
 	//$("#commentTypeEditId").html('<label for="comment">Issue:</label>');
 	$("#assignedToEditedId").css('display', 'table-row');
 	$("#"+resolveDiv).css('display', 'block');
+	//$('#estFinishTrEditId').css('display', 'block')
+	//$('#workFlowTransitionEditTrId').css('display', 'block')
+	//$('#priorityEditId').css('display', 'block')
+	//$('#predecessorTrEditId').css('display', 'block')
+	//$('#durationEditId').css('display', 'block')
+	
 }else{
 	$("#assignedToEditedId").css('display', 'none');
 	$("#"+resolveDiv).css('display', 'none');
 	$("#dueDatesEditId").css('display', 'none');
 	//$("#commentTypeEditId").html('<label for="comment">Comment:</label>');
+	$('#estFinishTrEditId').css('display', 'none')
+	$('#workFlowTransitionEditTrId').css('display', 'none')
+	$('#priorityEditId').css('display', 'none')
+	$('#predecessorTrEditId').css('display', 'none')
+	$('#durationEditId').css('display', 'none')
 }
 }
 
@@ -1120,6 +1130,12 @@ function resolveValidate(formName, idVal, redirectTo) {
 	// Get params from create or update forms approppriately
 	if (formName == "createCommentForm") {
 		var url = '../assetEntity/saveComment'
+			var predArr = new Array();
+			$('select[name="taskDependency"]').each(function(){
+				predArr.push($(this).val())
+		    });
+			predArr = removeDuplicateElement(predArr)
+
 		var params = { 'comment':$('#comment').val(), 'commentType':$('#commentType').val(),
 			'isResolved':$('#isResolved').val(), 'resolution':$('#resolution').val(),
 			'mustVerify':$('#mustVerify').val(), 'category':$('#createCategory').val(),
@@ -1130,7 +1146,7 @@ function resolveValidate(formName, idVal, redirectTo) {
 			'hardAssigned':$('#hardAssigned').val(),'priority':$('#priority').val(),
 			'duration':$('#duration').val(),'durationScale':$('#durationScale').val(),
 			'assetEntity':objId ,'overRide':$('#overRide').val(),'role':$('#roleType').val(),
-			'taskDependency' : $("#taskDependencyId").val()};
+			'taskDependency' : predArr};
 		var completeFunc = function(e) { addCommentsToList(e); }
 	} else {
 		var url = '../assetEntity/updateComment'
@@ -1145,7 +1161,7 @@ function resolveValidate(formName, idVal, redirectTo) {
 			'hardAssigned':$('#hardAssigned').val(),'priority':$('#priorityEdit').val(),
 			'duration':$('#durationEdit').val(),'durationScale':$('#durationScaleEdit').val(),
 			'overRide':$('#overRideEdit').val(),'role':$('#roleTypeEdit').val(),
-			'note':$('#noteEditId').val(),
+			'note':$('#noteEditId').val(),'taskDependency' : $("#taskDependencyEditId").val(),
 			'id':objId };
 		var completeFunc = function(e) { updateCommentsOnList(e); }
 	}
@@ -1269,6 +1285,8 @@ function createComments(asset, assetName){
 	setAssetId( asset )
 	updateWorkflowTransitions( asset, "general", "workFlowTransitionId", "predecessorId", '');
 	var name = assetName
+	$('#workFlowTransitionTrId').css('display','none')
+	$('#predecessorTr').css('display','none')
 	$('#createCommentDialog').dialog('option', 'width', 'auto');
 	$('#assetEntityTrId').css('display','table-row')
 	$('#assetEntityInputId').html(name)
@@ -1323,3 +1341,46 @@ function showResolve(value){
 	}
 	
 }
+function addPredecessor(predecessorCategory,comment,row,span){
+	var category = $('#'+predecessorCategory).val() ? $('#'+predecessorCategory).val() : 'general'
+	var commentId = comment ? $('#'+comment).val() : ''
+	new Ajax.Request('../assetEntity/getPredecessor?category='+category+'&assetCommentId='+commentId,{asynchronous:true,evalScripts:true,
+		 onComplete:function(e){
+		     $('#'+span).html(e.responseText)
+		     $('#taskDependencyTdId').html(e.responseText)
+	         var rowNo = $("#predCount").val()
+	         var taskRow =  $('#taskDependencyRow tr').html().replace("predecessorCategoryId","predecessorCategoryId_"+rowNo).replace("taskDependencyId","taskDependencyId_"+rowNo).replace("taskDependencyTdId","taskDependencyTdId_"+rowNo)
+	         $('#predecessorTableId').append("<tr id='row_d_"+rowNo+"'>"+taskRow+"<td>")
+	         $('#predecessorTr').show()
+	         $("#predCount").val(parseInt(rowNo)+1)
+		 }
+	         
+	})
+	
+}
+function fillPredecessor(id){
+	var row = id.split('_')[1]
+	var category = $("#"+id).val()
+	new Ajax.Request('../assetEntity/getPredecessor?category='+category,{asynchronous:true,evalScripts:true,
+		 onComplete:function(e){
+			 var resp =  e.responseText.replace('taskDependencyId','taskDependencyId_'+row)
+		     $('#taskDependencyTdId_'+row).html(e.responseText)
+		 }
+	})
+	
+}
+ function removeDuplicateElement(arrayName)
+{
+	  var newArray=new Array();
+	  label:for(var i=0; i<arrayName.length;i++ )
+	  {  
+	  for(var j=0; j<newArray.length;j++ )
+	  {
+	  if(newArray[j]==arrayName[i]) 
+	  continue label;
+	  }
+	  newArray[newArray.length] = arrayName[i];
+	  }
+	  return newArray;
+	  }
+

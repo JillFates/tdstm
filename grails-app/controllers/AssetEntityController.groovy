@@ -3334,14 +3334,17 @@ class AssetEntityController {
 	def getPredecessor = {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
+		String queryForPredecessor = "from AssetComment a where a.project=${projectId} and a.category= '${params.category}' and a.commentType='issue' "
+		if(params.assetCommentId){ 
+			queryForPredecessor += "and a.id != ${params.assetCommentId}"
+		}
+		def prdecessors = AssetComment.findAll(queryForPredecessor)
+		def taskId = params.assetCommentId ? 'taskDependencyEditId' : 'taskDependencyId'
+	
+		def selectControl = new StringBuffer("""<select id="${taskId}" name="taskDependency" >""")
 		
-		def workFlowInstance = Workflow.findByProcess(project.workflowCode)
-		def workFlowTransition = WorkflowTransition.findAllByWorkflowAndCategory(workFlowInstance, params.category)
-		//def workFlowTransition = WorkflowTransition.findAllByWorkflow(workFlowInstance) TODO : should be removed after completion of this new feature
-		def selectControl = new StringBuffer("""<select id="taskDependencyId" name="taskDependency" multiple="multiple">""")
-		
-		workFlowTransition.each{
-			selectControl.append("<option value='${it.id}'>${it.name}</option>")
+		prdecessors.each{
+			selectControl.append("<option value='${it.id}'>${it.getPredecessor()}</option>")
 		}
 		
 		selectControl.append("</select>")
