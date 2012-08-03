@@ -78,9 +78,8 @@ class CommentService {
 				log.error "Specified comment [id:${params.id}] was not found while updating comment"
 				return []
 			}
-			commentProject = assetComment.assetEntity ? assetComment.assetEntity.project : assetComment.project
 		}
-		
+		commentProject = assetComment.assetEntity ? assetComment.assetEntity.project : assetComment.project
 		// Make sure that the comment about to be updated/created is associated to the user's current project
 		if ( commentProject.id != project.id ) {
 			log.error "The project [${commentProject.id}] for comment [${assetComment.id}] was not associated with user's current project [${project.id}]"
