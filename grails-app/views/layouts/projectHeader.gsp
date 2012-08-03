@@ -823,7 +823,7 @@
 			$("#consoleMenuId a").css('border-right-color','#0366b0');
 			$("#consoleMenuId a").css('color','#9ACAEE');
 			$("#reportsMenuId a").css('background-color','#0366b0');
-			$("#reportMenuId a").css('border-right-color','#0366b0');
+			$("#reportsMenuId a").css('border-right-color','#0366b0');
 			$("#reportsMenuId a").css('color','#9ACAEE');
 			$("#userMenuId").css('background-color','');
 			$("#adminAnchor").css('color','#9ACAEE')

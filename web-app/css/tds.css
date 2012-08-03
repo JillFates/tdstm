@@ -216,27 +216,21 @@
 	box-shadow: 3px 3px 3px #888;
 }
 #projectMegaMenu {
-	left:65px;
 	width:300px;
 }
 #racksMegaMenu {
-	left:176px;
 	width:250px;
 }
 #assetMegaMenu {
-	left:290px;
 	width:250px;
 }
 #bundleMegaMenu {
-	left:354px;
 	width:450px;
 }
 #consoleMegaMenu {
-	left:533px;
 	width:450px;
 }
 #reportsMegaMenu {
-	left:249px;
 	width:600px;
 }
 #userMegaMenu {
@@ -436,6 +430,17 @@
 	color: white;
 	font-weight: bold;
 }
+.task_completed2{
+	background-color: #5478BA;
+}
+.task_completed5{
+	background-color: #4468AA ;
+}
+.task_completed{
+	background-color: #24488A;
+	color: white;
+	font-weight: bold;
+}
 .task_done2{
 	background-color: #5478BA;
 }
@@ -446,6 +451,9 @@
 	background-color: #24488A;
 	color: white;
 	font-weight: bold;
+}
+.task_na {
+	background-color: gray;
 }
 .task_term {
 	background-color: black;
