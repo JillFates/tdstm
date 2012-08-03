@@ -31,7 +31,9 @@ the Entity Attribute data model.
 		return claz.theClass.name
 	}
 
+/*	
 	def doWithDynamicMethods = { ctx ->
+
     	println "EavModel Injecting methods on Entity domain classes"
 
     	def classLoader = application.classLoader
@@ -53,7 +55,7 @@ the Entity Attribute data model.
 			if (isEavModel) {
 				println "We found a class that implements EavEntity"
 			}
-/*
+
 			metaClass.'static'.insert = {Boolean validate ->
 				println "CAS Severn, insert validate arg called with ${delegate}"
 				insertMethod.invoke(delegate, "insert", [validate] as Object[])
@@ -69,10 +71,9 @@ the Entity Attribute data model.
 				}
 				insertMethod.invoke(delegate, "insert", [] as Object[])
 			}
-*/
 		}
-
 	}
+*/
 	
 	def onChange = { event ->
 		// TODO Implement code that is executed when any artefact that this plugin is
