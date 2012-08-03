@@ -192,7 +192,7 @@
 		<% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;
 		   def roleList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).roleTypeCodeTo;%>
 			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
-			<td valign="top" style="width: 20%;" nowrap="nowrap" colspan="4">
+			<td valign="top" style="width: 20%;" nowrap="nowrap" colspan="2">
 				<g:select id="assignedTo" name="assignedTo" from="${partyList}"  value="${session.getAttribute('LOGIN_PERSON').id }" optionKey="id" noSelection="['':'please select']" ></g:select>
 				
 				<g:select id="roleType" name="roleType" from="${RoleType.list()}" noSelection="['':'UnAssigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)" ></g:select>
@@ -201,45 +201,15 @@
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
 				<label for="hardAssigned" >Fixed Assignment</label>
 			</td>
-		
-		</tr>
-		<tr class="prop" id="dueDateTrId" style="display: none">
-			<td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
-			
-			<td valign="top" class="value">
+			<td valign="top" class="name"><label for="dueDate">Due:</label>
 				<script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDate" id="dueDateCreateId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
-			<td valign="top" class="name"><label for="estStartTrId">Estimated start:</label></td>
-			
-			<td valign="top" class="value">
-				<script type="text/javascript" charset="utf-8">
-				 jQuery(function($){$('.datetimeRange').datetimepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-                  </script> <input type="text" class="datetimeRange" size="15" style="width: 112px; height: 14px;" name="estStart" id="estStartCreateId"
-					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-			</td>
-		</tr>
-		<tr class="prop" id="estFinishTrId" style="display: none">
-			<td valign="top" class="name"><label for="estFinishTrId">Estimated finish:</label></td>
-			
-			<td valign="top" class="value">
-				 <input type="text" class="datetimeRange" size="15" style="width: 112px; height: 14px;" name="estFinish" id="estFinishCreateId"
-					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-			</td>
-			<td valign="top" class="name"><label for="actStartTrId">Actual Start:</label></td>
-			
-			<td valign="top" class="value">
-				<input type="text" class="datetimeRange" size="15" style="width: 112px; height: 14px;" name="actStart" id="actStartCreateId"
-					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-			</td>
-		</tr>
-		<tr class="prop" id="actStartTrId" style="display: none">
-			
 		</tr>
 		<tr class="prop" >
-			<td valign="top" class="name"><label for="commentType">Comment Type:</label></td>
+			<td valign="top" class="name"><label for="commentType">Type:</label></td>
 			<td style="width: 20%;">
 				<g:select id="commentType" name="commentType" from="${com.tds.asset.AssetComment.constraints.commentType.inList}" value="comment"
 				onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -256,6 +226,11 @@
             	<g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
             	noSelection="['':'please select']" onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionId', 'predecessorId','')"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
         	</td>
+        	<td valign="top" class="name" ><label for="priority">Priority:</label></td>
+        	<td style="margin-right:30px ;" valign="top">
+            	<g:select id="priority" name="priority" from="${1..5}" value="3"
+            	noSelection="['':'please select']" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
+        	</td>
 		</tr>
 		<tr class="prop" id="workFlowTransitionTrId" style="display: none">
 			<td valign="top" class="name"><label for="actStartTrId">WorkFlowTransition:</label></td>
@@ -264,11 +239,15 @@
 			<input type="checkbox" id="overRide" name="overRide" value="0" 
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
 			 <label for="overRide" >Overridden</label>&nbsp;&nbsp;&nbsp;
+			</td>
+		</tr>
+		<tr class="prop" style="display: none">
+			<td valign="top" class="name"><label for="actStartTrId">Predecessors</label>
 			 <a class="button" href="javascript:" onclick="addPredecessor('predecessorCategory','','predecessorTr','relatedIssueId');"> Add </a>
 			</td>
 		</tr>
 		<tr class="prop" id="predecessorTr" style="display: none">
-			<td valign="top" class="name"><label for="actStartTrId">Predecessor:</label>
+			<td valign="top" class="name"><label for="actStartTrId">Pred:</label>
 			</td>
 			<td valign="top" class="value" id="workFlowTransitionId">
 			   <table>
@@ -276,16 +255,38 @@
 			   </table>
 			</td>
 		</tr>
-		<tr id="priorityId" class="prop" style="display: none">
-        	<td valign="top" class="name" ><label for="priority">Priority:</label></td>
-        	<td style="margin-right:30px ;" valign="top">
-            	<g:select id="priority" name="priority" from="${1..5}" value="3"
-            	noSelection="['':'please select']" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
-        	</td>
-        </tr>
         <tr class="prop" id="predecessorTrId" style="display: none">
 			<td valign="top" class="name"><label for="predecessorId">Predecessor:</label></td>
 			<td valign="top" class="value" id="predecessorId"></td>
+		</tr>
+		<tr class="prop" >
+			<td valign="top" class="name"  ><label for="status">Status:</label></td>
+			<td style="width: 20%;">
+			<script type="text/javascript" charset="utf-8">
+             </script>
+				<g:select id="statusId" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Ready" style="margin-left:61px"
+				noSelection="['':'please select']" onChange="showResolve(this.value)"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			</td>	
+		</tr>
+		<tr class="prop" id="assetEntityTrId">
+        	<td valign="top" class="name"><label for="category">Asset Name:</label></td>
+        	<td style="margin-right:30px ;" valign="top" colspan="3">
+            	<span id="assetEntityInputId" ></span>
+        	</td>
+		</tr>
+		<tr class="prop" id="moveEventTrId" style="display:none">
+			<td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
+			<td style="margin-right:30px ;" valign="top" colspan="3">
+				<g:select id="moveEvent" name="moveEvent" from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}" 
+				 optionKey='id' optionValue="name" noSelection="['':'please select']"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
+			</td>
+		</tr> 
+		
+		<tr class="prop">
+			<td id="issueItemId" valign="top" class="name"><label for="comment">Description:</label></td>
+			<td valign="top" class="value" colspan="3">
+				<textarea cols="80" rows="4" id="comment" name="comment" ></textarea>
+			</td>
 		</tr>
 		<tr id="durationId" class="prop" style="display: none">
         	<td valign="top" class="name"><label for="duration ">Duration:</label></td>
@@ -294,26 +295,6 @@
             	<g:select id="durationScale" name="durationScale " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"
             	 ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
         	</td>
-		</tr>
-		<tr class="prop" id="assetEntityTrId">
-        	<td valign="top" class="name"><label for="category">Asset Name:</label></td>
-        	<td style="margin-right:30px ;" valign="top">
-            	<span id="assetEntityInputId" ></span>
-        	</td>
-		</tr>
-		<tr class="prop" id="moveEventTrId" style="display:none">
-			<td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
-			<td style="margin-right:30px ;" valign="top">
-				<g:select id="moveEvent" name="moveEvent" from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}" 
-				 optionKey='id' optionValue="name" noSelection="['':'please select']"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
-			</td>
-		</tr> 
-		
-		<tr class="prop">
-			<td id="issueItemId" valign="top" class="name"><label for="comment">Comment:</label></td>
-			<td valign="top" class="value" colspan="4">
-				<textarea cols="80" rows="4" id="comment" name="comment" ></textarea>
-			</td>
 		</tr>
 	</table>
 	</div>
@@ -327,14 +308,26 @@
 	</div>
 	<div id="createResolveDiv" style="display: none;">
 		<table id="createResolveTable" style="border: 0px" >
-		<tr class="prop" >
-			<td valign="top" class="name"  ><label for="status">Status:</label></td>
-			<td style="width: 20%;">
-			<script type="text/javascript" charset="utf-8">
-             </script>
-				<g:select id="statusId" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Ready" style="margin-left:61px"
-				noSelection="['':'please select']" onChange="showResolve(this.value)"></g:select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			</td>	
+		<tr class="prop" id="estStartTrId" style="display: none">
+			<td valign="top" class="name"><label for="estStartTrId">Estimated start:</label></td>			
+			<td valign="top" class="value">
+				<script type="text/javascript" charset="utf-8">
+				 jQuery(function($){$('.datetimeRange').datetimepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+                  </script> <input type="text" class="datetimeRange" size="15" style="width: 112px; height: 14px;" name="estStart" id="estStartCreateId"
+					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+			</td>
+			<td valign="top" class="name"><label for="estFinishTrId">Estimated finish:</label></td>
+			<td valign="top" class="value">
+				 <input type="text" class="datetimeRange" size="15" style="width: 112px; height: 14px;" name="estFinish" id="estFinishCreateId"
+					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+			</td>
+		</tr>
+		<tr class="prop" id="actStartTrId" style="display: none">
+			<td valign="top" class="name"><label for="actStartTrId">Actual Start:</label></td>			
+			<td valign="top" class="value">
+				<input type="text" class="datetimeRange" size="15" style="width: 112px; height: 14px;" name="actStart" id="actStartCreateId"
+					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+			</td>
 		</tr>
 		<tr class="prop" style="display: none;">
 			<td valign="top" class="name"><label for="isResolved">Resolved:</label></td>
@@ -347,11 +340,9 @@
 			<td valign="top" class="value" colspan="2" >
 				<textarea cols="80" rows="4" id="resolution" name="resolution" style="margin-left:49px"></textarea>
 			</td>
-		</tr> 
-		
-		
-		</table>
-            </div>
+		</tr>
+	</table>
+    </div>
 		
 	</div>
 	<tds:hasPermission permission='CommentCrudView'>
