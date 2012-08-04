@@ -239,7 +239,7 @@
 			 <label for="overRide" >Overridden</label>&nbsp;&nbsp;&nbsp;
 			</td>
 		</tr>
-		<tr class="prop" style="">
+		<tr class="prop" id="predecessorHeadTrId" style="display: none">
 			<td valign="top" class="name"><label for="actStartTrId">Predecessors</label>
 			 <a class="button" href="javascript:" onclick="addPredecessor('predecessorCategory','','predecessorTr','relatedIssueId');"> Add </a>
 			</td>
@@ -286,7 +286,7 @@
 				<textarea cols="80" rows="4" id="comment" name="comment" ></textarea>
 			</td>
 		</tr>
-		<tr id="durationId" class="prop" style="display: none">
+		<tr id="durationTrId" class="prop" style="display: none">
         	<td valign="top" class="name"><label for="duration ">Duration:</label></td>
         	<td style="" valign="top" colspan="3">
         	  <input type="text" id="duration" name="duration" value="" style="width: 12%" >
@@ -340,12 +340,10 @@
 			</td>
 		</tr>
 	</table>
-    </div>
-		
+    </div>	
 	</div>
 	<tds:hasPermission permission='CommentCrudView'>
-	<div class="buttons"><span class="button"> <input
-		class="save" type="button" value="Create"
+	<div class="buttons"><span class="button"> <input class="save" type="button" value="Create"
 		onclick="resolveValidate('createCommentForm','createAssetCommentId','${rediectTo}');" /></span></div>
 	</tds:hasPermission>
 </g:form></div>
@@ -368,27 +366,25 @@
       <% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
 	   <tr class="prop issue" id="assignedToTrEditId" style="display: none">
 			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
-			<td valign="top" id="assignedToEditTdId" style="width: 20%;display: none;" class="issue"  colspan="6" nowrap="nowrap">
+			<td valign="top" id="assignedToEditTdId" style="display: none;" class="issue"  colspan="2" nowrap="nowrap">
 				<g:select id="assignedToEditId" name="assignedTo" from="${partyList}" value="" optionKey="id" noSelection="['':'please select']"></g:select>
-				
+
 				<g:select id="roleTypeEdit" name="roleTypeEdit" from="${RoleType.list()}" noSelection="['':'UnAssigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)" ></g:select>
-			
+
 				<input type="checkbox" id="hardAssignedEdit" name="hardAssignedEdit" value="1"  checked="checked"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
 				<label for="hardAssignedEdit" >Fixed Assignment</label>
 			</td>
-	    	<td valign="top" class="name"><label for="dueDate">DueDate:</label></td>
-			<td valign="top" class="value" id="dueDatesEditId" ><script type="text/javascript" charset="utf-8">
+	    	<td valign="top" class="name" id="dueDatesEditId" ><label for="dueDate">DueDate:</label>
+	    		<script type="text/javascript" charset="utf-8">
              jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
              </script><input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDateEdit" id="dueDateEdit"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-		</tr> 
-
+		</tr>
 		<tr>
 			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 			<td valign="top" class="value" id="createdByEditId" colspan="3" />
 		</tr>
-		
 		<tr class="prop" >
 			<td valign="top" class="name"><label for="commentType">Type:</label></td>
 			<td valign="top" style="" colspan="3" >
@@ -414,7 +410,7 @@
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="category">Category:</label></td>
-			<td valign="top" class="value" colspan="3" ><g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
+			<td valign="top" class="value" colspan="1" ><g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
 			onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionId', 'predecessorId',jQuery('#createAssetCommentId').html())"></g:select></td>
         	<td valign="top" class="name" ><label for="priority">Priority:</label></td>
         	<td style="" valign="top">
@@ -422,9 +418,8 @@
             	noSelection="['':'please select']" ></g:select>&nbsp;&nbsp;&nbsp;&nbsp;
         	</td>
         </tr>
-		</tr>
 		<tr class="prop" id="workFlowTransitionEditTrId" style="display: none">
-			<td valign="top" class="name"><label for="workFlowTransitionEditId">WorkFlowTransition:</label></td>
+			<td valign="top" class="name"><label for="workFlowTransitionEditId">WorkFlow Step:</label></td>
 			<td valign="top" class="value" id="workFlowTransitionEditId"></td>
 			<td colspan="2" >
 			<input type="checkbox" id="overRideEdit" name="overRide" value="0" 
@@ -435,7 +430,7 @@
 		</tr>
 		<tr class="prop" id="predecessorEditTr" style="display: none">
 			<td valign="top" class="name"><label for="actStartTrId">Predecessor:</label></td>
-			<td valign="top" class="value" id="predecessorEditTd" colspan="3" >
+			<td valign="top" class="value" id="predecessorEditTd" colspan="2" >
 			  <g:select id="predecessorCategoryEdit"  from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general" noSelection="['':'please select']" onChange="addPredecessor('predecessorCategoryEdit','updateCommentId','predecessorEditTr','relatedIssueEditId')"/>
 			</td>
 			<td id="relatedIssueEditId">
@@ -443,17 +438,16 @@
 		</tr>
         <tr class="prop" id="predecessorTrEditId" style="display: none">
 			<td valign="top" class="name"><label for="predecessorEditId">Predecessor:</label></td>
-			<td valign="top" class="value" id="predecessorEditId"></td>
+			<td valign="top" class="value" id="predecessorEditId" colspan="3"></td>
 		</tr>
 		<tr class="prop" id="moveEventEditTrId" style="display:none">
-         <td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
-         <td style="margin-right:30px ;" valign="top" colspan="3">
+			<td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
+			<td style="margin-right:30px ;" valign="top" colspan="3">
             <g:select id="moveEventEditId" name="moveEvent" from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}" 
              optionKey='id' optionValue="name" noSelection="['':'please select']"></g:select>
              <% // TODO : fix so that it defaults the current value %>
-         </td>
-      </tr> 
-		
+			</td>
+		</tr> 
 		<tr class="prop" style="display:none">
 			<td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
 			<td valign="top" class="value" id="commentCodeEditId" colspan="3"></td>
@@ -482,17 +476,17 @@
 	<table id="updateResolveTable" style="border: 0px;">
 	   <tr class="prop">
 			<td valign="top" class="name"><label for="notes">Previous Notes:</label></td>
-			<td valign="top" class="value"><div id="previousNote" style="width: 100%;"></div></td>
+			<td valign="top" class="value" colspan="3"><div id="previousNote" style="width: 100%;"></div></td>
 		</tr>
 	    <tr class="prop">
 			<td valign="top" class="name"><label for="notes">Note:</label></td>
-			<td valign="top" class="value" colspan="4">
+			<td valign="top" class="value" colspan="3">
 			   <textarea cols="80" rows="4" id="noteEditId" name="note" ></textarea>
 			</td>
 		</tr>
 		<tr class="prop" >
 			<td valign="top" class="name"><label for="status">Status:</label></td>
-			<td style="width: 20%;">
+			<td style="" colspan="3">
 			<script type="text/javascript" charset="utf-8">
              </script>
 				<g:select id="statusEditId" name="statusEdit" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Pending"
@@ -508,7 +502,6 @@
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 			<td valign="top" class="name"><label for="estFinishTrId">Estimated finish:</label></td>
-			
 			<td valign="top" class="value" nowrap="nowrap">
                    <input type="text" class="datetimeEditRange" size="15" style="width: 112px; height: 14px;" name="estFinishEditId" id="estFinishEditId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
@@ -516,25 +509,23 @@
 		</tr>
 		<tr class="prop" id="actStartTrEditId" style="display: none">
 			<td valign="top" class="name"><label for="actStartEditTrId">Actual Start:</label></td>
-			<td valign="top" class="value">
+			<td valign="top" class="value" colspan="3">
 				 <input type="text" class="datetimeEditRange" size="15" style="width: 112px; height: 14px;" name="actStartEditId" id="actStartEditId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 		</tr>
 		<tr class="prop" style="display: none;">
 			<td valign="top" class="name"><label for="isResolved">Resolved:</label></td>
-			<td valign="top" class="value">
+			<td valign="top" class="value" colspan="3">
 				<input type="checkbox" id="isResolvedEditId" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
 			</td>
 		</tr>
 		<tr class="prop" id="resolutionEditTrId" style="display: none;">
 			<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
-			<td valign="top" class="value" colspan="4">
-			
+			<td valign="top" class="value" colspan="3">
 				<textarea cols="80" rows="4" id="resolutionEditId" name="resolution" ></textarea>
 			</td>
 		</tr> 
-			
 		</table>
 	</div>
 </div>

@@ -982,6 +982,7 @@ function createIssue(){
 	$('#editCommentDialog').dialog('close');
 	$('#moveEventTrId').css('display','table-row')
 	$('#workFlowTransitionTrId').css('display','table-row')
+	$('#predecessorHeadTrId').css('display','table-row')
 	$('#predecessorTrId').css('display','table-row')
 }	
 function commentChange(resolveDiv,formName) {
@@ -990,7 +991,7 @@ function commentChange(resolveDiv,formName) {
 		var now = new Date();
 		now.setDate(now.getDate() + 30)
 	    formatDate(now);
-		$("#dueDateTrId").css('display', 'table-row');
+//		$("#dueDateTrId").css('display', 'table-row');
 		$("#assignedToId").css('display', 'table-row');
 		$("#assignedToTrEditId").css('display', 'table-row');
 		$("#assignedToEditTdId").css('display', 'table-row');
@@ -1000,13 +1001,14 @@ function commentChange(resolveDiv,formName) {
 		$("#assignedToEditedId").css('display', 'table-row');
 		$("#dueDatesEditId").css('display', 'table-row');
 		$('#estStartTrId').css('display', 'table-row');
-		$('#estFinishTrId').css('display', 'table-row');
+//		$('#estFinishTrId').css('display', 'table-row');
 		$('#actStartTrId').css('display', 'table-row');
 		$(resolveDiv).css('display', 'table-row');
 		$('#workFlowTransitionTrId').css('display','table-row')
+		$('#predecessorHeadTrId').css('display','table-row')
 		$('#predecessorTrId').css('display','table-row')
-		$('#priorityId').css('display', 'table-row');
-		$('#durationId').css('display', 'table-row');
+		$('#priorityTrId').css('display', 'table-row');
+		$('#durationTrId').css('display', 'table-row');
 		document.forms[formName].mustVerify.checked = false;
 		document.forms[formName].mustVerify.value = 0;
 		document.forms[formName].isResolved.checked = false;
@@ -1017,26 +1019,27 @@ function commentChange(resolveDiv,formName) {
 		document.forms[formName].mustVerify.value = 1;
 		$("#mustVerifyEditId").css('display', 'block');
 		$(resolveDiv).css('display', 'none');
-		$("#dueDateTrId").css('display', 'none');
+//		$("#dueDateTrId").css('display', 'none');
 		$("#assignedToId").css('display', 'none');
 		$("#mustVerifyTd").css('display', 'block');
 		$("#mustVerifyEditTr").css('display', 'table-row');
 		$("#assignedToEditedId").css('display', 'none');
 		$("#dueDatesEditId").css('display', 'none');
 		$('#workFlowTransitionTrId').css('display','none')
+		$('#predecessorHeadTrId').css('display','none')
 		$('#predecessorTrId').css('display','none')
 		$("#commentEditId").html('<label for="comment">Comment:</label>');
 		$("#issueItemId").html('<label for="comment">Comment:</label>');
 		$('#estStartTrId').css('display', 'none');
-		$('#estFinishTrId').css('display', 'none');
+//		$('#estFinishTrId').css('display', 'none');
 		$('#actStartTrId').css('display', 'none');
-		$('#priorityId').css('display', 'none');
-		$('#durationId').css('display', 'none');
+		$('#priorityTrId').css('display', 'none');
+		$('#durationTrId').css('display', 'none');
 	}else{
 		document.forms[formName].mustVerify.checked = false;
 		document.forms[formName].mustVerify.value = 0;
 		$(resolveDiv).css('display', 'none');
-		$("#dueDateTrId").css('display', 'none');
+//		$("#dueDateTrId").css('display', 'none');
 		$("#assignedToId").css('display', 'none');
 		$("#mustVerifyTd").css('display', 'none')
 		$("#mustVerifyEditTr").css('display', 'none');
@@ -1045,12 +1048,13 @@ function commentChange(resolveDiv,formName) {
 		$("#dueDatesEditId").css('display', 'none');
 		$("#commentEditId").html('<label for="comment">Comment:</label>');
 		$('#workFlowTransitionTrId').css('display','none')
+		$('#predecessorHeadTrId').css('display','none')
 		$('#predecessorTrId').css('display','none')
 		$('#estStartTrId').css('display', 'none');
-		$('#estFinishTrId').css('display', 'none');
+//		$('#estFinishTrId').css('display', 'none');
 		$('#actStartTrId').css('display', 'none');
-		$('#priorityId').css('display', 'none');
-		$('#durationId').css('display', 'none');
+		$('#priorityTrId').css('display', 'none');
+		$('#durationTrId').css('display', 'none');
 	}
 }
 
@@ -1076,6 +1080,7 @@ if(type == "issue"){
 	$('#estFinishTrEditId').css('display', 'none')
 	$('#workFlowTransitionEditTrId').css('display', 'none')
 	$('#priorityEditId').css('display', 'none')
+	$('#predecessorHeadTrId').css('display','none')
 	$('#predecessorTrEditId').css('display', 'none')
 	$('#durationEditId').css('display', 'none')
 }
