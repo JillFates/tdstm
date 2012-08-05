@@ -681,7 +681,7 @@ function showAssetDialog( e , action ) {
 
     	      	 $('#previousNotesShowId').html(noteTable)
     	      	 $('#previousNote').html(noteTable)
-	      		 $('#dueDatesId').html(params.dueDate)
+	      		 $('#dueDateId').html(params.dueDate)
 	      		 $('#dueDateEdit').val(params.dueDate)
 		      	 $('#noteEditId').val('')
 		      	 $('#statusEditId').val(ac.status)
@@ -999,7 +999,7 @@ function commentChange(resolveDiv,formName) {
 		$("#mustVerifyTd").css('display', 'none');
 		$("#mustVerifyEditTr").css('display', 'none');
 		$("#assignedToEditedId").css('display', 'table-row');
-		$("#dueDatesEditId").css('display', 'table-row');
+		$("#dueDateEditId").css('display', 'table-row');
 		$('#estStartTrId').css('display', 'table-row');
 //		$('#estFinishTrId').css('display', 'table-row');
 		$('#actStartTrId').css('display', 'table-row');
@@ -1024,7 +1024,7 @@ function commentChange(resolveDiv,formName) {
 		$("#mustVerifyTd").css('display', 'block');
 		$("#mustVerifyEditTr").css('display', 'table-row');
 		$("#assignedToEditedId").css('display', 'none');
-		$("#dueDatesEditId").css('display', 'none');
+		$("#dueDateEditId").css('display', 'none');
 		$('#workFlowTransitionTrId').css('display','none')
 		$('#predecessorHeadTrId').css('display','none')
 		$('#predecessorTrId').css('display','none')
@@ -1045,7 +1045,7 @@ function commentChange(resolveDiv,formName) {
 		$("#mustVerifyEditTr").css('display', 'none');
 		$("#issueItemId").html('<label for="comment">Comment:</label>');
 		$("#assignedToEditedId").css('display', 'none');
-		$("#dueDatesEditId").css('display', 'none');
+		$("#dueDateEditId").css('display', 'none');
 		$("#commentEditId").html('<label for="comment">Comment:</label>');
 		$('#workFlowTransitionTrId').css('display','none')
 		$('#predecessorHeadTrId').css('display','none')
@@ -1062,7 +1062,7 @@ function commentChangeEdit(resolveDiv,formName) {
 var type = 	document.forms[formName].commentType.value;
 if(type == "issue"){
 	$('#noteEditId').val('')
-	$("#dueDatesEditId").css('display', 'table-row');
+	$("#dueDateEditId").css('display', 'table-row');
 	//$("#commentTypeEditId").html('<label for="comment">Issue:</label>');
 	$("#assignedToEditedId").css('display', 'table-row');
 	$("#"+resolveDiv).css('display', 'block');
@@ -1075,7 +1075,7 @@ if(type == "issue"){
 }else{
 	$("#assignedToEditedId").css('display', 'none');
 	$("#"+resolveDiv).css('display', 'none');
-	$("#dueDatesEditId").css('display', 'none');
+	$("#dueDateEditId").css('display', 'none');
 	//$("#commentTypeEditId").html('<label for="comment">Comment:</label>');
 	$('#estFinishTrEditId').css('display', 'none')
 	$('#workFlowTransitionEditTrId').css('display', 'none')
