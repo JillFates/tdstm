@@ -709,7 +709,7 @@
 	        } else if(expiryDate != "null" && !dateRegExpForExp.test(expiryDate)){
 		        alert("Expiry Date should be in 'mm/dd/yyyy HH:MM AM/PM' format")
 		        returnVal = false
-	        } else if(oldPassword != "" || newPassword != "" || newPasswordConfirm != ""){
+	        } else if(oldPassword+newPassword+newPasswordConfirm != ""){
 	            if(!oldPassword){
 		        	alert("Old Password should not be blank ")
 		            returnVal = false

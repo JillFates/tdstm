@@ -362,13 +362,13 @@ class PersonController {
 		render personDetails as JSON
     }
 	/*-----------------------------------------------------------
-	 * Check if the user inputed password is correct, and if so update call the update method
+	 * Check if the user inputed password is correct, and if so call the update method
 	 * @author : Ross Macfarlane 
 	 * @param  : person id and input password
 	 * @return : pass:"no" or the return of the update method
 	 *----------------------------------------------------------*/
 	def checkPassword = {
-		if(params.oldPassword == null)
+		if(params.oldPassword == "")
 			return updatePerson(params)
 		
 		def userLogin = UserLogin.findByPerson(Person.findById(params.id))
