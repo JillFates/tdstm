@@ -77,6 +77,8 @@ class CommentService {
 				// TODO : handle failure for invalid comment id
 				log.error "Specified comment [id:${params.id}] was not found while updating comment"
 				return []
+			}else{
+			     def taskDependencyInstance =  TaskDependency.executeUpdate("delete TaskDependency where assetComment = ? ",[assetComment])
 			}
 		}
 		commentProject = assetComment.assetEntity ? assetComment.assetEntity.project : assetComment.project
@@ -156,7 +158,7 @@ class CommentService {
 			
 			assetComment.status = params.status
 		}
-
+        
 		if (! assetComment.hasErrors() && assetComment.save(flush:true)) {
 		
 			if (assetComment.commentType == 'issue' && params.note){

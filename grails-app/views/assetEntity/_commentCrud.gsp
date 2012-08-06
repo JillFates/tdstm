@@ -89,8 +89,10 @@
 				<label for="overRide" >Overridden</label></td>
 		</tr>
 		<tr class="prop" id="predecessorShowTr" style="display: none">
-			<td valign="top" class="name"><label for="precessorShowId">Predecessor:</label></td>
-			<td valign="top" class="value" id="predecessorShowTd" colspan="2"></td>
+			<td><label for="precessorShowId">Predecessor:</label></td>
+			<td id="predecessorShowTd"></td>
+			<td><label for="precessorShowId">Successor:</label></td>
+			<td id="successorShowTd"></td>
 		</tr>
         <tr class="prop" id="predecessorTrShowId" style="display: none">
 			<td valign="top" class="name"><label for="predecessorShowId">Predecessor:</label></td>
@@ -290,8 +292,7 @@
         	<td valign="top" class="name"><label for="duration ">Duration:</label></td>
         	<td valign="top" class="value" colspan="3">
         	  <input type="text" id="duration" name="duration" value="" style="width: 12%">
-            	<g:select id="durationScale" name="durationScale " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m">
-            	</g:select>
+            	<g:select id="durationScale" name="durationScale " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>
         	</td>
 		</tr>
 	</table>
@@ -299,7 +300,7 @@
 	<div style="display: none;">
 	<table id="taskDependencyRow">
 	<tr>
-		<td><g:select id="predecessorCategoryId" class="predecessor" name="predecessorCategoryCreate" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general" noSelection="['':'please select']" onChange="fillPredecessor(this.id)"/></td>
+		<td><g:select id="predecessorCategoryId" class="predecessor" name="predecessorCategoryCreate" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general" noSelection="['':'please select']" onChange="fillPredecessor(this.id, this.value)"/></td>
 		<td id="taskDependencyTdId"></td>
 	 </tr>
 	</table>

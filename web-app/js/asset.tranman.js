@@ -649,6 +649,7 @@ function showAssetDialog( e , action ) {
 				ac.resolution = "";
 			}
 			 $('#commentId').val(ac.id)
+			 $('#predCount').val(params.maxVal)
 			 $('#updateCommentId').val(ac.id)
 	      	 $('#commentTdId').val(ac.comment)
 	      	 $('#commentTypeTdId').html(ac.commentType)
@@ -678,8 +679,11 @@ function showAssetDialog( e , action ) {
       		    	 noteTable += "<tr><td>" + notes[i][0] + "</td><td>" + notes[i][1] + "</td><td><span>" + notes[i][2] + "</span></td></tr>"
       		    	 }
       		     noteTable += "</table>"
-                 $('#predecessorShowTd').html(params.table)
+                 $('#predecessorShowTd').html(params.predecessorTable)
+                 $('#successorShowTd').html(params.successorTable)
                  $('#predecessorShowTr').css('display','table-row')
+                 $('#predecessorEditId').html(params.predEditTable)
+                 $('#predecessorTrEditId').css('display','table-row')
     	      	 $('#previousNotesShowId').html(noteTable)
     	      	 $('#previousNote').html(noteTable)
 	      		 $('#dueDateId').html(params.dueDate)
@@ -1137,14 +1141,13 @@ function resolveValidate(formName, idVal, redirectTo) {
 	if ($("#"+idVal).val()) { objId = $("#"+idVal).val() }
 
 	// Get params from create or update forms approppriately
+	var predArr = new Array();
+		$('select[name="taskDependencySave"]').each(function(){
+			predArr.push($(this).val())
+	    });
+		predArr = removeDuplicateElement(predArr)
 	if (formName == "createCommentForm") {
 		var url = '../assetEntity/saveComment'
-			var predArr = new Array();
-			$('select[name="taskDependency"]').each(function(){
-				predArr.push($(this).val())
-		    });
-			predArr = removeDuplicateElement(predArr)
-
 		var params = { 'comment':$('#comment').val(), 'commentType':$('#commentType').val(),
 			'isResolved':$('#isResolved').val(), 'resolution':$('#resolution').val(),
 			'mustVerify':$('#mustVerify').val(), 'category':$('#createCategory').val(),
@@ -1171,7 +1174,7 @@ function resolveValidate(formName, idVal, redirectTo) {
 			'duration':$('#durationEdit').val(),'durationScale':$('#durationScaleEdit').val(),
 			'overRide':$('#overRideEdit').val(),'role':$('#roleTypeEdit').val(),
 			'note':$('#noteEditId').val(),'taskDependency' : $("#taskDependencyEditId").val(),
-			'id':objId };
+			'id':objId,'taskDependency' : predArr };
 		var completeFunc = function(e) { updateCommentsOnList(e); }
 	}
 	if (redirectTo) { completeFunc = function(e) { updateCommentsLists(e); } }
@@ -1358,8 +1361,14 @@ function addPredecessor(predecessorCategory,comment,row,span){
 		     $('#'+span).html(e.responseText)
 		     $('#taskDependencyTdId').html(e.responseText)
 	         var rowNo = $("#predCount").val()
-	         var taskRow =  $('#taskDependencyRow tr').html().replace("predecessorCategoryId","predecessorCategoryId_"+rowNo).replace("taskDependencyId","taskDependencyId_"+rowNo).replace("taskDependencyTdId","taskDependencyTdId_"+rowNo)
-	         $('#predecessorTableId').append("<tr id='row_d_"+rowNo+"'>"+taskRow+"<td>")
+	          var taskRow
+	         if(comment){
+	           taskRow =  $('#taskDependencyRow tr').html().replace("predecessorCategoryId","predecessorCategoryId_"+rowNo).replace("taskDependencyId","taskDependencyEditId_"+rowNo).replace("taskDependencyTdId","taskDependencyEditTdId_"+rowNo).replace("taskDependencyEditId","taskDependencyEditId_"+rowNo)
+	         }else{
+	           taskRow =  $('#taskDependencyRow tr').html().replace("predecessorCategoryId","predecessorCategoryId_"+rowNo).replace("taskDependencyId","taskDependencyId_"+rowNo).replace("taskDependencyTdId","taskDependencySaveTdId_"+rowNo).replace("taskDependencyEditId","taskDependencyEditId_"+rowNo)
+	         }
+	         $('#predecessorTableId').append("<tr id='row_d_"+rowNo+"'>"+taskRow+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+	         $('#predecessorEditTableId').append("<tr id='row_Edit_"+rowNo+"'>"+taskRow+"<td><a href=\"javascript:deleteRow(\'row_Edit_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td><tr>")
 	         $('#predecessorTr').show()
 	         $("#predCount").val(parseInt(rowNo)+1)
 		 }
@@ -1367,13 +1376,14 @@ function addPredecessor(predecessorCategory,comment,row,span){
 	})
 	
 }
-function fillPredecessor(id){
+function fillPredecessor(id, category){
 	var row = id.split('_')[1]
-	var category = $("#"+id).val()
 	new Ajax.Request('../assetEntity/getPredecessor?category='+category,{asynchronous:true,evalScripts:true,
 		 onComplete:function(e){
 			 var resp =  e.responseText.replace('taskDependencyId','taskDependencyId_'+row)
-		     $('#taskDependencyTdId_'+row).html(e.responseText)
+			 var data = e.responseText
+		     $('#taskDependencySaveTdId_'+row).html(data)
+		     $('#taskDependencyEditTdId_'+row).html(data)
 		 }
 	})
 	
