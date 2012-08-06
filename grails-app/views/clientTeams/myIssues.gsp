@@ -39,15 +39,15 @@
 			</div>		
 			<div id="taskId" style="float:left; margin:2px 0; ">              								
 			</div>
-			<div id="assetIssueDiv" style="float:left;width:500px; ">
+			<div id="assetIssueDiv" style="float:left;width:800px; ">
 				<table id="issueTable" cellspacing="0px" style="width:100%;margin-left: -1px;">
 				<thead>
 					<tr>
-						<g:sortableColumn class="sort_column" style="width:60px;"  action="listComment" property="comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
-						<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="lastUpdated" title="Updated" params="['tab':tab,'search':search]"></g:sortableColumn>
-						<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="dueDate" title="Due" params="['tab':tab,'search':search]"></g:sortableColumn>
-						<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="assetEntity" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
-						<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="status" title="Status" params="['tab':tab,'search':search]"></g:sortableColumn>
+						<g:sortableColumn class="sort_column" style=""  action="listComment" property="comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
+						<g:sortableColumn class="sort_column" style="" action="listComment" property="lastUpdated" title="Updated" params="['tab':tab,'search':search]"></g:sortableColumn>
+						<g:sortableColumn class="sort_column" style="" action="listComment" property="dueDate" title="Due" params="['tab':tab,'search':search]"></g:sortableColumn>
+						<g:sortableColumn class="sort_column" style="" action="listComment" property="assetEntity" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
+						<g:sortableColumn class="sort_column" style="" action="listComment" property="status" title="Status" params="['tab':tab,'search':search]"></g:sortableColumn>
 					</tr>
 				</thead>
 				<tbody>
