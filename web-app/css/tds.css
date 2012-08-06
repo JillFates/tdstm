@@ -414,6 +414,11 @@
         
 /* class for dashboards */
 
+.task_hold{
+   background-color:#FFFF33;
+   color:black;
+   font-weight: bold;
+}
 .task_planned {
 	background-color: #FFFFFF;
 	color: gray;
@@ -424,10 +429,10 @@
 	color: black;
 	font-weight: bold;
 }
-.task_hold{
-	background-color:#FFFF33;
-	color:black;
-	font-weight: bold;
+.task_ready {
+   background-color: green;
+   color: white;
+   font-weight: bold;
 }
 .task_started {
 	background-color: darkturquoise;
@@ -1074,34 +1079,4 @@ a.tab_deselect {
 	white-space:pre-wrap;
 	word-wrap:break-word;
 	word-break:break-all;
-}
-.general{
-	background-color: #EEF3E2;
-}
-.discovery{
-	background-color: darkturquoise;
-}
-.planning{
-	background-color: #FFFFFF;
-}
-.walkthru{
-	background-color: #FFEECA;
-}
-.moveday{
-	background-color:#FFFF33;
-}
-.planning{
-	background-color: #F0F0F0;
-}
-.shutdown{
-	background-color: #FF0000;
-}
-.physical{
-	background-color: #24488A;
-}
-.startup{
-	background-color: #E0FFFF;
-}
-.postmove{
-	background-color: #EEDC82;
 }
