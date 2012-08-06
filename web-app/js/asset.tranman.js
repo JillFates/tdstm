@@ -678,7 +678,8 @@ function showAssetDialog( e , action ) {
       		    	 noteTable += "<tr><td>" + notes[i][0] + "</td><td>" + notes[i][1] + "</td><td><span>" + notes[i][2] + "</span></td></tr>"
       		    	 }
       		     noteTable += "</table>"
-
+                 $('#predecessorShowTd').html(params.table)
+                 $('#predecessorShowTr').css('display','table-row')
     	      	 $('#previousNotesShowId').html(noteTable)
     	      	 $('#previousNote').html(noteTable)
 	      		 $('#dueDateId').html(params.dueDate)
@@ -706,7 +707,11 @@ function showAssetDialog( e , action ) {
       		     $('#actFinishShowId').html(params.dtResolved)
       		     $('#actFinishEditId').val(params.dtResolved)
       		     $('#workFlowShowId').html(params.workflow)
-      		     updateWorkflowTransitions(ac.assetEntity.id, ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
+      		     if(ac.assetEntity){
+      		       updateWorkflowTransitions(ac.assetEntity.id, ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
+      		     }else{
+      		       updateWorkflowTransitions('', ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
+      		     }
       		     $('#workFlowEditId').html(params.workflow)
       		     $('#priorityShowId').html(ac.priority)
       		     $('#durationShowId').html(ac.duration ? ac.duration :'' +" "+ ac.durationScale ?ac.durationScale:'' )
@@ -729,7 +734,6 @@ function showAssetDialog( e , action ) {
 			     $('#assetTrShowId').css('display','block')
 		         $('#commentTypeEditId').attr("disabled","disabled");
       		     $('.issue').css('display','table-row')
-      		     
 			     if(ac.assetEntity==null){
 			    	$('#moveShowId').css('display','table-row')
 			    	$('#assetShowId').css('display','none')

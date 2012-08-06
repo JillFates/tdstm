@@ -1784,6 +1784,12 @@ class AssetEntityController {
 		def roletype =  RoleType.findById(assetComment.role).description 
 		roles = roletype.substring(roletype.lastIndexOf(':')+1)
 		}
+		def taskDependent = assetComment.taskDependency
+		def table = """<table cellspacing="0" style="border:0px;"><tbody>"""
+			taskDependent.each{task->
+				table+="""<tr class="${task.predecessor.category}" onClick="showAssetComment(${task.predecessor.id}, 'show')"> <td>${task.predecessor.category}</td> <td>${task.predecessor}</td>"""
+		    }
+		table+="""</tbody></table>"""
 		commentList << [ 
 			assetComment:assetComment,
 			personCreateObj:personCreateObj,
@@ -1794,7 +1800,7 @@ class AssetEntityController {
 			assetName:assetComment.assetEntity?.assetName ?: "",
 			eventName:assetComment.moveEvent?.name ?: "",
 		    dueDate:dueDate ?: '',etStart:etStart,
-			etFinish:etFinish,atStart:atStart,notes:notes,workflow:workflow,roles:roles]
+			etFinish:etFinish,atStart:atStart,notes:notes,workflow:workflow,roles:roles,table:table]
 		render commentList as JSON
 	}
 	/* ----------------------------------------------------------------

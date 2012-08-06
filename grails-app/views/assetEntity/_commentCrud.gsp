@@ -91,8 +91,6 @@
 		<tr class="prop" id="predecessorShowTr" style="display: none">
 			<td valign="top" class="name"><label for="precessorShowId">Predecessor:</label></td>
 			<td valign="top" class="value" id="predecessorShowTd" colspan="2"></td>
-			<td id="relatedIssueShowId">
-			</td>
 		</tr>
         <tr class="prop" id="predecessorTrShowId" style="display: none">
 			<td valign="top" class="name"><label for="predecessorShowId">Predecessor:</label></td>
