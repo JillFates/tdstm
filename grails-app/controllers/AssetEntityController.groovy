@@ -3363,7 +3363,7 @@ class AssetEntityController {
 			}
 			selectControl.append("</select>")
 		}
-		srender selectControl
+		render selectControl
 	}
 	
 	def getPredecessorForTask(task){
