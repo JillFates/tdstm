@@ -7,11 +7,17 @@ import org.jsecurity.SecurityUtils
 import org.springframework.web.context.request.RequestContextHolder
 
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetComment
 import com.tds.asset.AssetTransition
 import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enum.domain.AssetCommentStatus
 
+/**
+ * Service class used by the Asset Tracking / PMO dashboard that has a number of methods used to gather data for the dashboard
+ *
+ */
 class PmoAssetTrackingService {
-
+		
 	// define services
 	def workflowService
 	def stateEngineService
@@ -30,7 +36,7 @@ class PmoAssetTrackingService {
 	def createBulkTransition(def type, def assetEntity, def stateTo, def role, def loginUser, def comment, def bundle ){
 		
 		def transitionStatus
-		def message = "Transaction created successfully"
+		def message = ""
 		def workFlowCode
 		def assetTransitionQuery = "from AssetTransition t where t.assetEntity = ${assetEntity.id} and t.voided = 0"
 		if(bundle!="all"){
@@ -48,32 +54,34 @@ class PmoAssetTrackingService {
 		
 		switch (type) {
 			case "done" :
-				def menuOption = constructManuOptions( stateTo, assetEntity, "done", stateType )
-				def validOptions = "doneMenu doMenu"
-				if( validOptions.contains( menuOption ) || ( menuOption == "readyMenu" && stateTo == "Ready") ){
-					def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
-					if(assetTeansition){
-						assetTeansition.voided = 1
-						assetTeansition.save(flush:true)
+				def menuOption = constructMenuOptions( stateTo, assetEntity, "done", stateType )
+				// def validOptions = "doneMenu doMenu"
+				if( ['doneMenu', 'doMenu'].contains( menuOption ) || ( menuOption == "readyMenu" && stateTo == "Ready") ){
+					def assetTransition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
+					if(assetTransition){
+						assetTransition.voided = 1
+						assetTransition.save(flush:true)
 					}
 					transitionStatus = workflowService.createTransition( workFlowCode, role,stateTo, assetEntity, 
 																		assetEntity.moveBundle, loginUser, null, comment )
 					message = transitionStatus.message
 				}
 				if(stateType == "boolean" && stateTo=="VMCompleted"){
-					transitionStatus = workflowService.createTransition( workFlowCode, role,"Completed", assetEntity, 
+					transitionStatus = workflowService.createTransition( workFlowCode, role, "Completed", assetEntity, 
 																		assetEntity.moveBundle, loginUser, null, comment )
+					message = transitionStatus.message
 				}
 				break;
 			
 			case "void" : 
-				def assetTeansitions = AssetTransition.findAll(assetTransitionQuery + " and t.stateTo >= $stateToId")
-				assetTeansitions.each{
+				def transitions = AssetTransition.findAll(assetTransitionQuery + " and t.stateTo >= $stateToId")
+				transitions.each{
 					if(it.type != "boolean"){
 						it.voided = 1
 						it.save(flush:true)
 					}
 				}
+				// TODO: Runbook - undo completed task when a transition is voided
 				changeCurrentStatus(currStateQuery,assetEntity)
 				break;
 					
@@ -84,26 +92,26 @@ class PmoAssetTrackingService {
 				break;
 			case "NA" :
 				if(stateType == "boolean"){
-					def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
-					if(assetTeansition){
-						assetTeansition.voided = 1
-						assetTeansition.save(flush:true)
+					def assetTransition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
+					if(assetTransition){
+						assetTransition.voided = 1
+						assetTransition.save(flush:true)
 					}
 					transitionStatus = workflowService.createTransition( workFlowCode, role,stateTo, assetEntity, 
-																					assetEntity.moveBundle, loginUser, null, comment )
+						assetEntity.moveBundle, loginUser, null, comment )
 					message = transitionStatus.message
-					def currentTransition = AssetTransition.find("from AssetTransition t where t.assetEntity = ${assetEntity.id} "+
-																	"and voided = 0 order by dateCreated desc")
+					def currentTransition = AssetTransition.find("FROM AssetTransition t where t.assetEntity = ? "+
+						"AND voided = 0 order by dateCreated desc", [assetEntity.id])
 					currentTransition.isNonApplicable = 1
 					currentTransition.save(flush:true)
 				}
 				break;
 			case "pending" :
-				if(stateType == "boolean"){
-					def assetTeansition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
-					if(assetTeansition){
-						assetTeansition.voided = 1
-						assetTeansition.save(flush:true)
+				if(stateType == "boolean") {
+					def assetTransition = AssetTransition.find(assetTransitionQuery + " and t.stateTo=?", [stateToId])
+					if(assetTransition){
+						assetTransition.voided = 1
+						assetTransition.save(flush:true)
 					}
 					changeCurrentStatus(currStateQuery,assetEntity)
 				}
@@ -132,12 +140,48 @@ class PmoAssetTrackingService {
 		assetEntity.currentStatus = currState 
 		assetEntity.save()
 	}
+
+	/**
+	 * Called by the PMO AssetTracker to get the attributes for the various workflow steps of the specified asset (in Runbook Mode)
+	 */
+	def getTransitionRowRb(def assetEntity, def state, def bundle) {	
+
+		// Need to use the Project Workflow if user has selected "All" bundles otherwise use the moveBundle's workflow
+		// thereby only showing the appropriate workflow steps in the row.
+		def moveBundle = assetEntity.moveBundle
+		def project = assetEntity.project
+		def workflowCode = bundle=="all" && project.workflowCode ? project.workflowCode : moveBundle.workflowCode
+		
+		// Get all of the Workflow Transition Ids that we want to report for the asset
+		def sql = "SELECT task.asset_entity_id AS assetId, wft.trans_id AS step, task.status FROM workflow w " +  
+			"JOIN workflow_transition wft ON wft.workflow_id=w.workflow_id " +
+			"LEFT OUTER JOIN asset_comment task ON task.workflow_transition_id=wft.workflow_transition_id AND task.asset_entity_id=${assetEntity.id} " +
+			"WHERE w.process='${workflowCode}' ORDER BY step"
+		def assetSteps = jdbcTemplate.queryForList(sql)
+		def map=[]
+		// TODO : need to handle hold overtime and completed 2/5
+		assetSteps.each() { step ->
+			def id = "${assetEntity.id}_${step.step}"
+			def css = step.status ? "task_${step.status.toLowerCase()}" : 'task_na'
+			map << [id:id, cssClass:css]
+		}
+		
+		return map
+	}
+	
 	/* -----------------------------------------------------
+	 * Called by the PMO AssetTracker to get the attributes for the various workflow steps of the specified asset
 	 * @author : Lokanath Reddy
 	 * @param  : Asset Entity and  state
 	 * @return : Transition row details  
 	 *----------------------------------------------------*/
 	def getTransitionRow(def assetEntity, def state, def bundle){
+		def project = assetEntity.project
+
+		if (project.runbookOn) {
+			return getTransitionRowRb( assetEntity, state, bundle)	
+		}
+		
 		def workFlowCode 
 		if(bundle!="all"){
 			workFlowCode = assetEntity.moveBundle.workflowCode
@@ -215,7 +259,11 @@ class PmoAssetTrackingService {
 	 * @param  : Asset, State and statetype  
 	 * @return : return the list for menu
 	 *----------------------------------------------------*/
-	def constructManuOptions( def state, def assetEntity, def situation, def stateType ){
+	def constructMenuOptions( def state, def assetEntity, def situation, def stateType ) {
+		def project = assetEntity.project
+		if (project.runbookOn) {
+			return constructMenuOptionsRb( state, assetEntity, situation, stateType)
+		}
 		 def menuOptions = ""
 		 def holdId = Integer.parseInt(stateEngineService.getStateId(assetEntity.moveBundle.workflowCode,"Hold"))
 		 if(stateType != "process" && state != "Hold"){
@@ -267,12 +315,66 @@ class PmoAssetTrackingService {
 		 }
 		 return menuOptions.toString()
 	}
+	
+	/**
+	 * Used by the PMO asset tracker screen to determine what menu should be presented when the user right-clicks on a particular
+	 * state.
+	 * @param state	- Workflow state that the user clicked on
+	 * @param assetEntity - the assetEntity that user clicked on
+	 * @param situation - contains 'done', 'NA' or ? (TBD)
+	 * @param stateType - contains 'process', 'Hold' or ? 'bool' (TBD) 
+	 * @return String menu name to use
+	 */
+	def constructMenuOptionsRb( def state, def assetEntity, def situation, def stateType ) {
+		// TODO: Runbook : add security around the constructMenuOptionsRb method
+		
+		/*
+		 * Menus:
+		 *    o doMenu - Start/Done
+		 *    o doneMenu - Done/Hold/Undo (TBD)
+		 *    o voidMenu - Undo
+		 *    o noOption - No option
+		 * Cases (task status):
+		 *    o Ready - doMenu
+		 *    o pre Ready (verify that there are no incomplete predecessors) - doMenu
+		 *    o Started - doneMenu
+		 *    o Completed - voidMenu (aka undo)
+		 *    o Cancelled - noOption
+		 *    o Hold - doMenu
+		 */
+		def task = workflowService.getTaskFromAssetAndWorkflow(assetEntity, state) 
+		def menu = 'noOption'
+		
+		if (task) {
+			switch (task.status) {
+				case [ AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING ]:
+					def predecessors = workflowService.getIncompletePredecessors(task)
+					if (predecessors?.size() == 0) menu = 'doMenu'
+					break
+					
+				case [ AssetCommentStatus.READY, AssetCommentStatus.HOLD ]:
+					menu = 'doMenu'
+					break
+				
+				case AssetCommentStatus.STARTED: 
+					menu = 'doneMenu'
+					break
+
+				case AssetCommentStatus.COMPLETED: 
+					menu = 'voidMenu'
+					break
+			}
+		}
+		return menu
+	}
+		
+	
 	/*-----------------------------------------------------
 	 * @author : Lokanada Reddy
 	 * @param  : event, bundle, four coulmn filters
 	 * @return : return the AssetEntity object for the selected filterd
 	 *----------------------------------------------------*/
-	def getAssetEntityListForBulkEdit(def params ){
+	def getAssetEntityListForBulkEdit(def params ) {
 
 		def moveBundleId = params.bundleId
 		def moveEventId = params.eventId
@@ -355,6 +457,7 @@ class PmoAssetTrackingService {
 	 *--------------------------------------------------------*/
 	
 	def getRecentChangeStyle( def assetId, def cssClass, def transId ){
+		// TODO: Runbook - need to interweave with Runbook tasks for getRecentChangeStyle()
 		def changedClass = cssClass
 		if(cssClass == "task_done"){
 			def createdTime = AssetTransition.find("from AssetTransition a where a.assetEntity = $assetId and a.voided = 0 and a.stateTo=${transId}")?.dateCreated?.getTime()
@@ -376,6 +479,7 @@ class PmoAssetTrackingService {
 	}
 
 	def getRecentChangeStyle( def cssClass, def trans ){
+		// TODO : Runbook - getRecentChangeStyle(2 args) what is this used for
 		def changedClass = cssClass
 		if(cssClass == "task_done"){
 			def createdTime = trans.dateCreated?.getTime()
@@ -400,8 +504,9 @@ class PmoAssetTrackingService {
 	 * @param  : Project, bundles, params
 	 * @return : List of assets for PMO 
 	 *--------------------------------------------------------*/
-	def getAssetsForListView( def projectId, def bundles, def columns, def params ){
-		
+	def getAssetsForListView( def projectId, def bundles, def columns, def params ) {
+
+		def project = Project.get(projectId)		
 		def column1Value = params.column1
         def column2Value = params.column2
         def column3Value = params.column3
@@ -410,79 +515,92 @@ class PmoAssetTrackingService {
         def order = params.order
 		def limit = params.assetsInView
 		def offset = params.offset
-		// TODO : CLEANUP - remove as custom# from SQL statement as it is unnecessary
-		def query = new StringBuffer("""SELECT * FROM( select ae.asset_entity_id as id, ae.asset_name as assetName,ae.short_name as shortName,ae.asset_tag as assetTag,
-				ae.asset_type as assetType,mf.name as manufacturer, m.name as model, ae.application, ae.app_owner as appOwner, ae.app_sme as appSme,
-				ae.ip_address as ipAddress, ae.hinfo as os, ae.serial_number as serialNumber,m.usize, ae.rail_type as railType,
-				ae.source_location as sourceLocation, ae.source_room as sourceRoom, ae.source_rack as sourceRack, ae.source_rack_position as sourceRackPosition,
-			    ae.target_location as targetLocation, ae.target_room as targetRoom, ae.target_rack as targetRack, ae.target_rack_position as targetRackPosition,
-				mb.name as moveBundle, ae.truck,
-				ae.new_or_old as planStatus, ae.priority, ae.cart, ae.shelf, 
-				sptMt.team_code as sourceTeamMt, tptMt.team_code as targetTeamMt,
-				sptLog.team_code as sourceTeamLog, tptLog.team_code as targetTeamLog,
-				sptSa.team_code as sourceTeamSa, tptSa.team_code as targetTeamSa,
-				sptDba.team_code as sourceTeamDba, tptDba.team_code as targetTeamDba,
-				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate, ae.custom1 as custom1, ae.custom2 as custom2,ae.custom3 as custom3,
-				ae.custom3 as custom4,ae.custom5 as custom5,ae.custom6 as custom6,ae.custom7 as custom7,ae.custom8 as custom8,ae.current_status as currentStatus,
-				max(at.date_created) as updated
-				FROM asset_entity ae
-				LEFT JOIN move_bundle mb ON (ae.move_bundle_id = mb.move_bundle_id )
-				LEFT JOIN project_team sptMt ON (ae.source_team_id = sptMt.project_team_id )
-                LEFT JOIN project_team tptMt ON (ae.target_team_id = tptMt.project_team_id )
-                LEFT JOIN project_team sptLog ON (ae.source_team_id = sptLog.project_team_id )
-                LEFT JOIN project_team tptLog ON (ae.target_team_id = tptLog.project_team_id )
-                LEFT JOIN project_team sptSa ON (ae.source_team_id = sptSa.project_team_id )
-                LEFT JOIN project_team tptSa ON (ae.target_team_id = tptSa.project_team_id )
-                LEFT JOIN project_team sptDba ON (ae.source_team_id = sptDba.project_team_id )
-                LEFT JOIN project_team tptDba ON (ae.target_team_id = tptDba.project_team_id )
-				LEFT JOIN model m ON (ae.model_id = m.model_id )
-				LEFT JOIN manufacturer mf ON (ae.manufacturer_id = mf.manufacturer_id )
-                LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 and at.type='process')
-				where ae.project_id = $projectId and ae.move_bundle_id  in ${bundles} and ae.asset_type not in ('Application','Files','Database')
-				GROUP BY ae.asset_entity_id ) ae WHERE  1 = 1""")
+		def query = new StringBuffer(
+			"""SELECT * FROM( SELECT ae.asset_entity_id AS id, ae.asset_name AS assetName,ae.short_name AS shortName,ae.asset_tag AS assetTag,
+			ae.asset_type AS assetType,mf.name AS manufacturer, m.name AS model, ae.application, ae.app_owner AS appOwner, ae.app_sme AS appSme,
+			ae.ip_address AS ipAddress, ae.hinfo AS os, ae.serial_number AS serialNumber,m.usize, ae.rail_type AS railType,
+			ae.source_location AS sourceLocation, ae.source_room AS sourceRoom, ae.source_rack AS sourceRack, ae.source_rack_position AS sourceRackPosition,
+		    ae.target_location AS targetLocation, ae.target_room AS targetRoom, ae.target_rack AS targetRack, ae.target_rack_position AS targetRackPosition,
+			mb.name AS moveBundle, ae.truck,
+			ae.new_or_old AS planStatus, ae.priority, ae.cart, ae.shelf, 
+			sptMt.team_code AS sourceTeamMt, tptMt.team_code AS targetTeamMt,
+			sptLog.team_code AS sourceTeamLog, tptLog.team_code AS targetTeamLog,
+			sptSa.team_code AS sourceTeamSa, tptSa.team_code AS targetTeamSa,
+			sptDba.team_code AS sourceTeamDba, tptDba.team_code AS targetTeamDba,
+			MAX(CAST(at.state_to AS UNSIGNED INTEGER)) AS maxstate,  
+			ae.custom1, ae.custom2, ae.custom3,	ae.custom4, ae.custom5, ae.custom6, ae.custom7, ae.custom8,
+			ae.current_status AS currentStatus, """)
+		
+		if (project.runbookOn) {
+			query.append( 'MAX(IFNULL(task.last_updated,eav.last_updated)) AS updated')	
+		} else {
+			query.append( 'MAX(at.date_created) AS updated')
+		}
+		
+		query.append(""" FROM asset_entity ae
+			JOIN eav_entity eav ON eav.entity_id=ae.asset_entity_id
+			LEFT JOIN move_bundle mb ON ae.move_bundle_id = mb.move_bundle_id
+			LEFT JOIN project_team sptMt ON ae.source_team_id = sptMt.project_team_id
+            LEFT JOIN project_team tptMt ON ae.target_team_id = tptMt.project_team_id
+            LEFT JOIN project_team sptLog ON ae.source_team_id = sptLog.project_team_id
+            LEFT JOIN project_team tptLog ON ae.target_team_id = tptLog.project_team_id
+            LEFT JOIN project_team sptSa ON ae.source_team_id = sptSa.project_team_id
+            LEFT JOIN project_team tptSa ON ae.target_team_id = tptSa.project_team_id
+            LEFT JOIN project_team sptDba ON ae.source_team_id = sptDba.project_team_id
+            LEFT JOIN project_team tptDba ON ae.target_team_id = tptDba.project_team_id
+			LEFT JOIN model m ON ae.model_id = m.model_id
+			LEFT JOIN manufacturer mf ON ae.manufacturer_id = mf.manufacturer_id
+            LEFT JOIN asset_transition at ON at.asset_entity_id = ae.asset_entity_id and at.voided = 0 and at.type='process'
+			""")
+		if (project.runbookOn) {
+			query.append( 'LEFT JOIN asset_comment task ON task.asset_entity_id = ae.asset_entity_id')
+		}
+		query.append("""
+			WHERE ae.project_id = $projectId AND ae.move_bundle_id IN ${bundles} AND ae.asset_type NOT IN ('Files','Database')
+			GROUP BY ae.asset_entity_id ) ae WHERE  1=1
+			""")
 				
 		// TODO : SECURITY - the follow code constructs SQL with user input data from params - possible SQL Injection
 		if(column1Value !="" && column1Value!= null){
 			if(column1Value == 'blank'){
-				query.append(" and ae.${columns?.column1.field} = '' OR ae.${columns?.column1.field} is null")
+				query.append(" AND ae.${columns?.column1.field} = '' OR ae.${columns?.column1.field} IS NULL")
 			} else {
 				def app = column1Value.replace("'","\\'")
-				query.append(" and ae.${columns?.column1.field} like '%$app%'")
+				query.append(" AND ae.${columns?.column1.field} LIKE '%$app%'")
 			}
 		}
 		if(column2Value!="" && column2Value!= null){
 			if(column2Value == 'blank'){
-				query.append(" and ae.${columns?.column2.field} = '' OR ae.${columns?.column2.field} is null")
+				query.append(" AND ae.${columns?.column2.field} = '' OR ae.${columns?.column2.field} IS NULL")
 			} else {
 				def owner = column2Value.replace("'","\\'")
-				query.append(" and ae.${columns?.column2.field} like '%$owner%'")
+				query.append(" AND ae.${columns?.column2.field} LIKE '%$owner%'")
 			}
 
 		}	
 		if(column3Value!="" && column3Value!= null){
 			if(column3Value == 'blank'){
-				query.append(" and ae.${columns?.column3.field} = '' OR ae.${columns?.column3.field} is null")
+				query.append(" AND ae.${columns?.column3.field} = '' OR ae.${columns?.column3.field} IS NULL")
 			} else {
 				def sme = column3Value.toString().replace("'","\\'")
-				query.append(" and ae.${columns?.column3.field} like '%$sme%'")
+				query.append(" AND ae.${columns?.column3.field} LIKE '%$sme%'")
 			}
 		}
 		if(column4Value!="" && column4Value!= null){
 			if(column4Value == 'blank'){
-				query.append(" and ae.${columns?.column4.field} = '' OR ae.${columns?.column4.field} is null")
+				query.append(" AND ae.${columns?.column4.field} = '' OR ae.${columns?.column4.field} IS NULL")
 			} else {
 				def name = column4Value.toString().replace("'","\\'")
-				query.append(" and ae.${columns?.column4.field} like '%$name%'")
+				query.append(" AND ae.${columns?.column4.field} LIKE '%$name%'")
 			}
 		}
 		// get the total assets
 		// TODO - PERFORMANCE - The following code makes two SQL calls. Perhaps we can just call ONCE and handle the limit/offset in another way.  Also, if offset or limit are not specified we doing the 2nd query for nothing.
-		log.debug "SQL to be executed: ${query.toString()}"
 		def resultListSize =jdbcTemplate.queryForList(query.toString())?.size()
 		if(sortby != "" && sortby != null){
-			query.append(" order by $sortby")
+			query.append(" ORDER BY $sortby")
 		}else {
-			query.append(" order by updated ")
+			query.append(" ORDER BY updated ")
 		}
 		if(order != "" && order != null){
 			query.append(" $order ")
@@ -492,16 +610,20 @@ class PmoAssetTrackingService {
 		
 		if(limit && limit != "all"){
 			if(offset){
-				query.append(" limit ${offset},${limit}")
+				query.append(" LIMIT ${offset},${limit}")
 			} else {
-				query.append(" limit ${limit}")
+				query.append(" LIMIT ${limit}")
 			}
 		}
 
-		// TODO : SECURITY - Wrap this in a try/catch so user doesn't see the SQL		
-		def resultList=jdbcTemplate.queryForList(query.toString())
-		
-		return [resultList,resultListSize]
+		try {
+			def resultList=jdbcTemplate.queryForList(query.toString())
+			return [resultList, resultListSize]
+		} catch (e) {
+			log.error "SQL Error: ${e.toString()}"
+			return null
+		}
+
 	}
 	/*----------------------------------------------------------
 	 * @author : Lokanada Reddy
@@ -522,7 +644,7 @@ class PmoAssetTrackingService {
 		def offset = params.offset
 		def sortby = params.sort
         def order = params.order
-		// TODO : CLEANUP - there is no need for the nested select statements in this query.  Remove the outer SELECT"
+		// The SQL has a nested SELECT in order to provide ability to tack on LIMIT and ORDER criteria after the fact
 		def query = new StringBuffer("""SELECT * FROM (SELECT * FROM( select ae.asset_entity_id as id, ae.asset_name as assetName,ae.short_name as shortName,ae.asset_tag as assetTag,
 				ae.asset_type as assetType,mf.name as manufacturer, m.name as model, ae.application, ae.app_owner as appOwner, ae.app_sme as appSme,
 				ae.ip_address as ipAddress, ae.hinfo as os, ae.serial_number as serialNumber,m.usize, ae.rail_type as railType,
@@ -549,66 +671,70 @@ class PmoAssetTrackingService {
                 LEFT JOIN project_team tptDba ON (ae.target_team_id = tptDba.project_team_id )
 				LEFT JOIN model m ON (ae.model_id = m.model_id )
 				LEFT JOIN manufacturer mf ON (ae.manufacturer_id = mf.manufacturer_id )
-                LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id and at.voided = 0 and at.type='process')
-				where ae.project_id = $projectId and ae.move_bundle_id in ${bundles} GROUP BY ae.asset_entity_id ) ae WHERE  1 = 1""")
-				
+                LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id AND at.voided = 0 AND at.type='process')
+				WHERE ae.project_id = $projectId and ae.move_bundle_id in ${bundles} GROUP BY ae.asset_entity_id ) ae WHERE  1 = 1""")
+
 		if(column1Value !="" && column1Value!= null){
 			if(column1Value == 'blank'){
-				query.append(" and ae.${column1Field} = '' OR ae.${column1Field} is null")
+				query.append(" AND ae.${column1Field} = '' OR ae.${column1Field} is null")
 			} else {
 				def app = column1Value.replace("'","\\'")
-				query.append(" and ae.${column1Field} like '%$app%'")
+				query.append(" AND ae.${column1Field} like '%$app%'")
 			}
 		}
 		if(column2Value!="" && column2Value!= null){
 			if(column2Value == 'blank'){
-				query.append(" and ae.${column2Field} = '' OR ae.${column2Field} is null")
+				query.append(" AND ae.${column2Field} = '' OR ae.${column2Field} is null")
 			} else {
 				def owner = column2Value.replace("'","\\'")
-				query.append(" and ae.${column2Field} like '%$owner%'")
+				query.append(" AND ae.${column2Field} like '%$owner%'")
 			}
 
 		}	
 		if(column3Value!="" && column3Value!= null){
 			if(column3Value == 'blank'){
-				query.append(" and ae.${column3Field} = '' OR ae.${column3Field} is null")
+				query.append(" AND ae.${column3Field} = '' OR ae.${column3Field} is null")
 			} else {
 				def sme = column3Value.toString().replace("'","\\'")
-				query.append(" and ae.${column3Field} like '%$sme%'")
+				query.append(" AND ae.${column3Field} like '%$sme%'")
 			}
 		}
 		if(column4Value!="" && column4Value!= null){
 			if(column4Value == 'blank'){
-				query.append(" and ae.${column4Field} = '' OR ae.${column4Field} is null")
+				query.append(" AND ae.${column4Field} = '' OR ae.${column4Field} is null")
 			} else {
 				def name = column4Value.toString().replace("'","\\'")
-				query.append(" and ae.${column4Field} like '%$name%'")
+				query.append(" AND ae.${column4Field} like '%$name%'")
 			}
 		}
 		if(sortby != "" && sortby != null){
-			query.append(" order by $sortby")
+			query.append(" ORDER BY $sortby")
 		}else {
-			query.append(" order by updated")
+			query.append(" ORDER BY updated")
 		}
 		if(order != "" && order != null){
 			query.append(" $order ")
 		}else {
-			query.append(" desc ")
+			query.append(" DESC ")
 		}
 		if(limit && limit != "all"){
 			if(offset){
-				query.append(" limit ${offset},${limit} ) a")
+				query.append(" LIMIT ${offset},${limit}")
 			} else {
-				query.append(" limit ${limit} ) a")
+				query.append(" LIMIT ${limit}")
 			}
-		} else {
-			query.append(" ) a")
 		}
-		query.append(""" WHERE a.id in	( select t.asset_entity_id from asset_transition t where 
-					(t.date_created between SUBTIME('$lastPoolTime','00:15:30') and '$currentPoolTime' OR t.last_updated between SUBTIME('$lastPoolTime','00:15:30') and '$currentPoolTime') )""")
 		
-		def resultList=jdbcTemplate.queryForList(query.toString())
+		query.append(""") a WHERE a.id IN ( SELECT t.asset_entity_id FROM asset_transition t WHERE
+					(t.date_created BETWEEN SUBTIME('$lastPoolTime','00:15:30') AND '$currentPoolTime' 
+					OR t.last_updated between SUBTIME('$lastPoolTime','00:15:30') AND '$currentPoolTime') )""")
 		
-		return resultList
+		try {
+			def resultList=jdbcTemplate.queryForList(query.toString())
+			return resultList
+		} catch (e) {
+			log.error "SQL Error: ${e.toString()}"
+			return null
+		}
 	}
 }

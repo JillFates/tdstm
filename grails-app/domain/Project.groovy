@@ -11,6 +11,7 @@ class Project extends PartyGroup {
     String workflowCode
     String projectType = "Standard"
 	Integer lastAssetId
+	Integer runbookOn=0		// Flag that indicates that the project should use the runbook mode for various screens
     
 	// Custom field labels
     	String custom1
@@ -46,6 +47,7 @@ class Project extends PartyGroup {
 		custom7( blank:true, nullable:true )
 		custom8( blank:true, nullable:true )
 		lastAssetId( nullable:true )
+		runbookOn(nullable:true)
 	}
 
 	static mapping  = {
@@ -55,6 +57,7 @@ class Project extends PartyGroup {
 		columns {
 			trackChanges sqlType: 'char(1)'
 			projectCode sqlType: 'varchar(20)', index: 'project_projectcode_idx', unique: true
+			runbookOn sqlType: 'tinyint'
 		}
 	}
 	

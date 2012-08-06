@@ -1,6 +1,7 @@
 package com.tds.asset
 
 import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enum.domain.AssetCommentStatus
 
 class AssetComment {
 	String comment					// This is also the title of an issue or task
@@ -47,7 +48,7 @@ class AssetComment {
 	
 	static hasMany = [ 
 		notes : CommentNote,
-		taskDependency : TaskDependency 
+		taskDependencies : TaskDependency 
 	]
 	
 	static belongsTo = [ assetEntity : AssetEntity ]
@@ -75,7 +76,8 @@ class AssetComment {
 		attribute( blank:true, nullable:true  )
 		commentKey( blank:true, nullable:true  )
 		// TODO: remove the blank/nullable constraint for status after testing
-		status( blank:true, nullable:true , inList : ['Planned', 'Pending', 'Ready', 'Started', 'Hold', 'Completed'] )
+		// status( blank:true, nullable:true , inList : ['Planned', 'Pending', 'Ready', 'Started', 'Hold', 'Completed'] )
+		status( blank:true, nullable:true , inList : AssetCommentStatus.getList() )
 		// TODO: change duration to default to zero and min:1, need to coordinate with db update for existing data
 		duration(nullable:true)
 		durationScale(nullable:true, blank:true, inList:['m','h','d','w'])
@@ -113,6 +115,8 @@ class AssetComment {
 		}
 	}
 
+	static transients = ['actFinish']
+	
 	// TODO : need method to handle inserting new assetComment or updating so that the category+taskNumber is unique 
 	
 	def getAssignedToString(){
@@ -127,6 +131,9 @@ class AssetComment {
 	def setActFinish(def date) {
 		dateResolved = date
 	}
+	// Setter to allow assignment by ENUM
+	def setStatus( AssetCommentStatus acs ) { status = acs.toString() }
+	
 	// Get the duration in minutes
 	def durationInMinutes() {
 		def d = duration
@@ -154,9 +161,11 @@ class AssetComment {
 	def beforeInsert = {
 		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
 		lastUpdated = dateCreated
+		if (dateResolved != null) isResolved = 1
 	}
 	def beforeUpdate = {
 		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+		if (dateResolved != null) isResolved = 1
 	}
 
 	String toString() {

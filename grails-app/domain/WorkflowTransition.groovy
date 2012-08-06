@@ -20,18 +20,18 @@ class WorkflowTransition {
 	static hasMany  = [ WorkflowTransitionMap ]
 	
 	static constraints = {
-		workflow( blank:false, nullable:false )
+		workflow( nullable:false )
 		code( blank:false, nullable:false, unique:'workflow' )
 		name( blank:false, nullable:false )
-		transId( blank:false, nullable:false )
+		transId( nullable:false )
 		type( blank:false, nullable:false, inList: ['process', 'boolean'] )
 		color( blank:true, nullable:true)
 		dashboardLabel( blank:true, nullable:true)
-		predecessor( blank:true, nullable:true)
+		predecessor( nullable:true)
 		category( blank:false, nullable:false ,inList:['general', 'discovery', 'planning','walkthru','premove','shutdown','moveday','startup','postmove'])
 		header( blank:true, nullable:true)
 		//effort( blank:true, nullable:true)
-		duration( blank:true, nullable:true)
+		duration( nullable:true)
 		durationScale(nullable:true, blank:true, inList:['m','h','d','w'])
 }	
 	

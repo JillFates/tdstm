@@ -2339,6 +2339,8 @@ class AssetEntityController {
 		def statusName
 		def check
 		def assetComment
+		def message = ''
+		
 		if(assetEntity){
 			def status = params.state
 			def assignTo = params.assignTo
@@ -2375,6 +2377,7 @@ class AssetEntityController {
 					stateIdList.sort().each{
 						statesList<<[id:stateEngineService.getState(assetEntity.moveBundle.workflowCode,it),label:stateEngineService.getStateLabel(assetEntity.moveBundle.workflowCode,it)]
 					}
+					message = transactionStatus.message
 				}
 			} else {
 				statusLabel = stateEngineService.getStateLabel(assetEntity.moveBundle.workflowCode,currentStateId)
@@ -2462,7 +2465,8 @@ class AssetEntityController {
 			assetList <<['assetEntity':assetEntity, 'sourceTeamMt':sourceTeamMt, 'targetTeamMt':targetTeamMt,
 						'sourceTeamMts':sourceTeamMts,'targetTeamMts':targetTeamMts, 'statesList':statesList,
 						'status':statusLabel,'cssClass':cssClass,'checkVal':check,
-						'statusName':statusName, assetComment:assetComment]
+						'statusName':statusName, assetComment:assetComment,
+						'message':message]
 		}
 		render assetList as JSON
 	}

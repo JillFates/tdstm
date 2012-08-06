@@ -72,7 +72,6 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String shelf
 	String railType
 	
-	
 	PartyGroup owner
 	Rack rackSource
 	Room roomSource
@@ -90,7 +89,6 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	ProjectTeam targetTeamSa
 	ProjectTeam sourceTeamDba
 	ProjectTeam targetTeamDba
-	
 	
 	Integer currentStatus
 	

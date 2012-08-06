@@ -522,10 +522,13 @@
 				$("#"+transition.id).attr("class",transition.cssClass );
 				$("#"+transition.id).addClass('tranCell');
 			}
+			if (assetTransitions[0].message) {
+				alert("Error: " + assetTransitions[0].message)
+			}
 		}
 	}
 	/*
-	*	Update the current Status options when transition done through the Buld edit 
+	*	Update the current Status options when transition done through the Bulk edit 
 	*/
 	function updateCurrentStatusOptions( e ){
 		var options = eval('(' + e.responseText + ')');
