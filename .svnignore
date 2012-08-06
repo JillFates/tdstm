@@ -4,3 +4,4 @@ target-eclipse
 .project
 .settings
 headerSvg_*
+.DS_Store
