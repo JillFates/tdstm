@@ -15,7 +15,7 @@ class RefCode {
         value(blank:false, nullable:false, maxSize:240, unique:'domain')
         abbreviation(blank:true, nullable:true, maxSize:240)
         meaning(blank:true, nullable:true, maxSize:240)
-        sortOrder(blank:false, nullable:false, range:0..99)
+        sortOrder(nullable:false, range:0..99)
     }
     
     def getAbbreviationOrValue() { abbreviation ? abbreviation : value }
