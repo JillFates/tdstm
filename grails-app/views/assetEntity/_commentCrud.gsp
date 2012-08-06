@@ -7,7 +7,7 @@
 --%>
 
 <div id="commentsListDialog" title="Show Asset Comments" style="display: none;">
-<br/>
+	<br/>
 	<div class="list">
 		<table id="listCommentsTable">
 		<thead>
@@ -58,10 +58,8 @@
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
 				<label for="hardAssignedShow" >Fixed Assignment</label>
 			</td>
-			<td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
+			<td valign="top" class="name" id="dueDateTrId"><label for="dueDate">Due Date:</label></td>
 			<td valign="top" class="value" id="dueDateId"></td>
-		</tr>
-		<tr class = "issue" id="dueDateTrId" style="display: none">
 		</tr>
 		<tr>
 			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
@@ -123,8 +121,8 @@
 			<td valign="top" class="value" id="durationShowId" colspan="3"></td>
 		</tr>
 	</table>
-   </div>
-   <div id="showResolveDiv" style="display: none;" class="issue">
+	</div>
+	<div id="showResolveDiv" style="display: none;" class="issue">
 	<table id="showResolveTable" style="border: 0px">
 		<tr class="prop">
 			<td valign="top" class="name"><label for="previousNotes">Previous Notes:</label></td>
@@ -163,16 +161,17 @@
 			<td valign="top" class="value" id="resolvedById" colspan="3"></td>
 		</tr>
    </table>
-   </div>
+	</div>
    <tds:hasPermission permission='CommentCrudView'>
-   <div class="buttons"><span class="button">
-   <input class="edit" type="button" value="Edit"
+	<div class="buttons">
+	<span class="button">
+	<input class="edit" type="button" value="Edit"
       onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 'auto');$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
-   </span>
-   <span class="button"> <input class="delete" type="button" value="Delete"
-   onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment',controller:'assetEntity', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'never\')')}" />
-   </span>
-   </div>
+	</span>
+	<span class="button"> <input class="delete" type="button" value="Delete"
+	onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment',controller:'assetEntity', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'never\')')}" />
+	</span>
+	</div>
    </tds:hasPermission>
 </div>
 </div>
@@ -188,7 +187,7 @@
 	<g:form action="saveComment" method="post" name="createCommentForm">
 		<input type="hidden" name="category" value="general" />
 		<input type="hidden" id="predCount"  value="1" />
-	<div class="dialog" style="border: 1px solid #5F9FCF">
+  <div class="dialog" style="border: 1px solid #5F9FCF">
 	<div>
 		<table id="createCommentTable" style="border: 0px;">
 		<tr class="prop" id="assignedToId" style="display: none">
@@ -200,12 +199,12 @@
 				<g:select id="assignedTo" name="assignedTo" from="${partyList}"  value="${session.getAttribute('LOGIN_PERSON').id }" optionKey="id" noSelection="['':'please select']"></g:select>
 
 				<g:select id="roleType" name="roleType" from="${RoleType.list()}" noSelection="['':'UnAssigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)"></g:select>
-
+			</td>
+			<td valign="top" class="name">
 				<input type="checkbox" id="hardAssigned" name="hardAssigned" value="1"  checked="checked"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
-				<label for="hardAssigned" >Fixed Assignment</label>
-			</td>
-			<td valign="top" class="name"><label for="dueDate">Due:</label>
+				<label for="hardAssigned" >Fixed Assignment</label>&nbsp;&nbsp;
+				<label for="dueDate">Due:</label>
 				<script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDate" id="dueDateCreateId"
@@ -266,7 +265,7 @@
 			<td valign="top" class="value" colspan="3">
 			<script type="text/javascript" charset="utf-8">
              </script>
-				<g:select id="statusId" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Ready" style="margin-left:61px"
+				<g:select id="statusId" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Ready"
 				noSelection="['':'please select']" onChange="showResolve(this.value)"></g:select>
 			</td>
 		</tr>
@@ -349,7 +348,8 @@
 	<div class="buttons"><span class="button"> <input class="save" type="button" value="Create"
 		onclick="resolveValidate('createCommentForm','createAssetCommentId','${rediectTo}');" /></span></div>
 	</tds:hasPermission>
-</g:form></div>
+</g:form>
+</div>
 
 <%--
 /*
@@ -360,10 +360,10 @@
 --%>
 <div id="editCommentDialog" title="Edit Comment/Issue" style="display: none;">
 <g:form action="updateComment" method="post" name="editCommentForm">
-<div class="dialog" style="border: 1px solid #5F9FCF">
-	<input type="hidden" name="id" id="updateCommentId" value=""/>
-	<input type="hidden" name="assetName" id="assetValueId" value=""/>
-	<div>
+ <div class="dialog" style="border: 1px solid #5F9FCF">
+	<input type="hidden" name="id" id="updateCommentId" value="" />
+	<input type="hidden" name="assetName" id="assetValueId" value="" />
+  <div>
 	<table id="updateCommentTable" style="border: 0px;">
 	   <% // TODO : Replace DB lookup in GSP with data from controller %>
       <% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
@@ -463,15 +463,15 @@
 		</tr>
 		<tr id="durationEditId" class="prop" style="display: none">
         	<td valign="top" class="name"><label for="durationEdit ">Duration:</label></td>
-        	<td style="margin-right:30px ;" valign="top" colspan="3">
+        	<td valign="top" class="value" colspan="3">
         	  <input type="text" id="durationEdit" name="durationEdit" value="" style="width: 12%">
             	<g:select id="durationScaleEdit" name="durationScaleEdit " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m">
             	</g:select>
         	</td>
 		</tr>
 	</table>
-	</div>
-	<div id="editResolveDiv" style="display: none;" class="issue">
+  </div>
+  <div id="editResolveDiv" style="display: none;" class="issue">
 	<table id="updateResolveTable" style="border: 0px;">
 		<tr class="prop">
 			<td valign="top" class="name"><label for="notes">Previous Notes:</label></td>
@@ -526,7 +526,7 @@
 			</td>
 		</tr>
 		</table>
-	</div>
+  </div>
 </div>
 <tds:hasPermission permission='CommentCrudView'>
 <div class="buttons"><span class="button">

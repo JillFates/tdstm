@@ -999,7 +999,7 @@ function commentChange(resolveDiv,formName) {
 		$("#mustVerifyTd").css('display', 'none');
 		$("#mustVerifyEditTr").css('display', 'none');
 		$("#assignedToEditedId").css('display', 'table-row');
-		$("#dueDateEditId").css('display', 'table-row');
+		$("#dueDateEditId").css('display', 'block');
 		$('#estStartTrId').css('display', 'table-row');
 //		$('#estFinishTrId').css('display', 'table-row');
 		$('#actStartTrId').css('display', 'table-row');
@@ -1062,7 +1062,7 @@ function commentChangeEdit(resolveDiv,formName) {
 var type = 	document.forms[formName].commentType.value;
 if(type == "issue"){
 	$('#noteEditId').val('')
-	$("#dueDateEditId").css('display', 'table-row');
+	$("#dueDateEditId").css('display', 'block');
 	//$("#commentTypeEditId").html('<label for="comment">Issue:</label>');
 	$("#assignedToEditedId").css('display', 'table-row');
 	$("#"+resolveDiv).css('display', 'block');
