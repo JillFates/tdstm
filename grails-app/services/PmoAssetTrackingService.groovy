@@ -10,7 +10,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetTransition
 import com.tdssrc.grails.GormUtil
-import com.tdsops.tm.enum.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCommentStatus
 
 /**
  * Service class used by the Asset Tracking / PMO dashboard that has a number of methods used to gather data for the dashboard

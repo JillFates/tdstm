@@ -1,4 +1,4 @@
-package com.tdsops.tm.enum.domain
+package com.tdsops.tm.enums.domain
 
 /**
  * AssetCommentCategory - represents the valid options for the AssetComment domain property category.

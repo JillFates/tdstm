@@ -1,7 +1,7 @@
 package com.tds.asset
 
 import com.tdssrc.grails.GormUtil
-import com.tdsops.tm.enum.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCommentStatus
 
 class AssetComment {
 	String comment					// This is also the title of an issue or task

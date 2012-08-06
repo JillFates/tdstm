@@ -2,7 +2,7 @@ import com.tds.asset.AssetTransition
 import com.tds.asset.AssetComment
 
 
-import com.tdsops.tm.enum.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tds.asset.TaskDependency
 import com.tdssrc.grails.GormUtil
 /*
