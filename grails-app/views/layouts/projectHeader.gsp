@@ -313,7 +313,26 @@
 				<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#bundleMegaMenu')" href="javascript:showMegaMenu('#bundleMegaMenu')" style="display: inline"></a></g:link>
 			</li>
 
-			<li id="teamMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#teamMegaMenu')" controller="clientTeams"  >Tasks</g:link></li>
+			<li id="teamMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#teamMegaMenu')" controller="clientTeams"  >Tasks
+				<a id="teamMenuAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#teamMegaMenu')" href="javascript:showMegaMenu('#teamMegaMenu')" style="display: inline"></a></g:link>
+				<div class="megamenu rooms" id="teamMegaMenu" onmouseover="showMegaMenu('#teamMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+					<table class="mmtable"><tr>
+					<td style="vertical-align:top"><span class="megamenuSection">Tasks</span><br />
+						<ul>
+							<tds:hasPermission permission='ShowMoveTechsAndAdmins'>
+							<li><a class="mmlink" id="MyTasksMenuId" href="/tdstm/clientTeams/listComment" onclick="hideMegaMenu('teamMegaMenu')">My Tasks: 0</a></li>
+							<li><a class="mmlink" href="/tdstm/clientTeams/list" onclick="hideMegaMenu('teamMegaMenu')">Team Tasks</a></li>
+							<li>&nbsp;</li>
+							</tds:hasPermission>
+							<tds:hasPermission permission='HelpMenuView'>
+							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('consoleMegaMenu')">help</a></li>
+							</tds:hasPermission>
+						</ul>
+						
+					</td>
+					</tr></table>
+				</div>
+			</li>
             </tds:hasPermission>
 	        <tds:hasPermission permission='ConsoleMenuView'>
 			<li id="consoleMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="mclosetime()" controller="assetEntity" action="dashboardView" params="['showAll':'show']">Console
@@ -628,8 +647,18 @@
 	    }
 	       $(document).keydown(function(){ resetTimer(); });
 	       $(document).mousedown(function(){ resetTimer(); });
-       
-   
+
+		//Replace the number on the "My Tasks" menu with the number of tasks assigned to the user
+		$("#MyTasksMenuId").ready(getTaskCount());
+		function getTaskCount(){
+			${remoteFunction(controller:'clientTeams',action:'getToDoCount',onComplete:'setTaskCount(e)')};
+		}
+		function setTaskCount( e ){
+			var count = eval("(" + e.responseText + ")")[0].count;
+		  	if(typeof count != 'undefined')
+				$("#MyTasksMenuId").html("My Tasks: " + count);
+		}
+		
 	    /*---------------------------------------------------
 		* Script to load the marquee to scroll the live news
 		*--------------------------------------------------*/
@@ -728,6 +757,7 @@
 	  		$('#racksMegaMenu').hide();
 	  		$('#assetMegaMenu').hide();
 	  		$('#bundleMegaMenu').hide();
+	  		$('#teamMegaMenu').hide();
 	  		$('#consoleMegaMenu').hide();
 	  		$('#reportsMegaMenu').hide();
 	  		$('#userMegaMenu').hide();
@@ -772,6 +802,12 @@
 					$("#bundleMenuId a").css('border-right-color','lightblue');
 					$("#bundleMenuId a").css('color','#0366b0');
 					$("#bundleAnchor").css("display","inline")
+				}
+				if(e == "#teamMegaMenu"){
+					$("#teamMenuId a").css('background-color','lightblue');
+					$("#teamMenuId a").css('border-right-color','lightblue');
+					$("#teamMenuId a").css('color','#0366b0');
+					$("#teamAnchor").css("display","inline")
 				}
 				if(e == "#consoleMegaMenu"){
 					$("#consoleMenuId a").css('background-color','lightblue');
@@ -819,6 +855,9 @@
 			$("#bundleMenuId a").css('background-color','#0366b0');
 			$("#bundleMenuId a").css('border-right-color','#0366b0');
 			$("#bundleMenuId a").css('color','#9ACAEE');
+			$("#teamMenuId a").css('background-color','#0366b0');
+			$("#teamMenuId a").css('border-right-color','#0366b0');
+			$("#teamMenuId a").css('color','#9ACAEE');
 			$("#consoleMenuId a").css('background-color','#0366b0');
 			$("#consoleMenuId a").css('border-right-color','#0366b0');
 			$("#consoleMenuId a").css('color','#9ACAEE');
@@ -889,6 +928,7 @@
 		$('#racksMegaMenu').css("left", $('#roomMenuId').offset().left+"px");
 		$('#assetMegaMenu').css("left", $('#assetMenuId').offset().left+"px");
 		$('#bundleMegaMenu').css("left", $('#eventMenuId').offset().left+"px");
+		$('#teamMegaMenu').css("left", $('#teamMenuId').offset().left+"px");
 		$('#consoleMegaMenu').css("left", $('#consoleMenuId').offset().left+"px");
 		$('#reportsMegaMenu').css("right", $('#reportsMenuId').offset().right+"px");
 
@@ -896,6 +936,7 @@
 		$('#racksMegaMenu').css("top", $('#roomMenuId').offset().bottom +1+"px");
 		$('#assetMegaMenu').css("top", $('#assetMenuId').offset().bottom +1+"px");
 		$('#bundleMegaMenu').css("top", $('#eventMenuId').offset().bottom +1+"px");
+		$('#teamMegaMenu').css("top", $('#teamMenuId').offset().bottom +1+"px");
 		$('#consoleMegaMenu').css("top", $('#consoleMenuId').offset().bottom +1+"px");
 		$('#reportsMegaMenu').css("top", $('#reportsMenuId').offset().bottom +1+"px");
 

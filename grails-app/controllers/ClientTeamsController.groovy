@@ -1014,7 +1014,20 @@ class ClientTeamsController {
 			render (view:'myIssues',model:['listComment':issueList, 'tab':tab ,todoSize:todoSize,allSize:allSize,timers:session.MY_ISSUE_REFRESH?.MY_ISSUE_REFRESH,search:params.search,userId:userId])
 		}
 	}
-	
+	/**
+	 * @author : Ross Macfarlane
+	 * @return : The number of tasks assigned to the current user
+	 */
+	def getToDoCount={
+		def projectId = session.CURR_PROJ.CURR_PROJ
+		def projectInstance = Project.get(projectId)
+		def userId = session.getAttribute("LOGIN_PERSON").id
+		def personInstance = Person.get(userId)
+		def todoSize = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Ready' , 'Started')) ",[project:projectInstance,assignedTo:personInstance,type:'issue']).size()
+		def map = []
+		map << [count:todoSize]
+		render map as JSON
+	}
 	def showIssue={
 		def assetComment = AssetComment.get(params.issueId)
 		def noteList = assetComment.notes.sort{it.dateCreated}
