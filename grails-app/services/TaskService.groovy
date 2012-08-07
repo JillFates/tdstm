@@ -10,6 +10,7 @@ import com.tdsops.tm.enums.domain.RoleTypeGroup
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 
+import com.tds.asset.AssetEntity
 import com.tds.asset.AssetComment
   
 class TaskService {
@@ -21,7 +22,7 @@ class TaskService {
 	/**
 	 * This method returns a list of tasks (aka AssetComment objects) based on the parameters that form the criteria
 	 */
-    def getUserTasks(person, project, search=null, sortOn='a.dueDate', sortOrder='ASC, a.lastUpdated DESC' ) {
+    def getUserTasks(person, project, search=null, sortOn='c.dueDate', sortOrder='ASC, c.lastUpdated DESC' ) {
 		
 		// Get the user's roles for the current project
 		// TODO : This should (perhaps) pass the project to getPersonRoles
@@ -29,20 +30,36 @@ class TaskService {
 		def type=AssetCommentType.TASK
 		def statuses = [AssetCommentStatus.PLANNED.toString(), AssetCommentStatus.PENDING.toString(), AssetCommentStatus.READY.toString() ]
 		def sqlParams = [project:project, assignedTo:person, type:type, roles:roles, statuses:statuses]
-
+//		def sqlParams = [project:project, assignedTo:person, type:type]
+		
+		log.error "person:${person.id}"
 		// Find all Tasks assigned to the person OR assigned to a role that is not hard assigned (to someone else)
-		StringBuffer sql = new StringBuffer("""FROM AssetComment a WHERE a.project=:project AND a.commentType=:type
-			AND ( a.assignedTo=:assignedTo OR ( a.role IN (:roles) AND a.status IN (:statuses) AND a.hardAssigned!=1 ) )""")
+//		StringBuffer sql = new StringBuffer('FROM AssetComment AS c WHERE a.project=:project AND a.commentType=:type')
+//	    sql.append(' AND ( c.assignedTo=:assignedTo OR ( c.role IN (:roles) AND c.status IN (:statuses) AND c.hardAssigned != 1 ) ) ')
+//
+//		// Add the search to the query if specified		
+//		if (search) {
+//			sqlParams << [ search:search ]
+//			sql.append(' AND a.assetTag=:search (from AssetEntity AS a where a.assetEntity=c.assetEntity)' )
+//		}
+		
+		search = org.apache.commons.lang.StringUtils.trimToNull(search)
 
-		// Add the search to the query if specified		
+		StringBuffer sql = new StringBuffer('FROM AssetComment AS c')
 		if (search) {
+			// Join on the AssetEntity and embed the search criteria
+			sql.append(', AssetEntity AS a WHERE c.assetEntity.id=a.id AND a.assetTag=:search AND ')
+			// Add the search param to the sql params
 			sqlParams << [ search:search ]
-			sql.append(' AND a.assetTag=:search')
+		} else {
+			sql.append(' WHERE ')
 		}
+		sql.append('c.project=:project AND c.commentType=:type ')
+		sql.append('AND ( c.assignedTo=:assignedTo OR ( c.role IN (:roles) AND c.status IN (:statuses) AND c.hardAssigned != 1 ) ) ')
 
-		// TODO : Security : getUserTasks - sortOn/sortOrder should be defined instead of allowing user to INJECT		
+		// TODO : Security : getUserTasks - sortOn/sortOrder should be defined instead of allowing user to INJECT, also shouldn't the column name have the 'a.' prefix?	
 		// Add the ORDER to the SQL
-		sql.append(" ORDER BY ${sortOn} ${sortOrder}")
+//		 sql.append("ORDER BY ${sortOn} ${sortOrder}")
 		
 		// log.error "SQL for userTasks: " + sql.toString()
 		
