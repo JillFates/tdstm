@@ -1080,3 +1080,7 @@ a.tab_deselect {
 	word-wrap:break-word;
 	word-break:break-all;
 }
+#commentTdId {
+	font-size: 12px;
+	font-weight: bold;
+}

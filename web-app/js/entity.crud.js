@@ -83,7 +83,6 @@ function addAssetDependency( type ){
 	$("#"+type+"Count").val(parseInt(rowNo)+1)
 }
 function deleteRow( rowId ){
-	alert(rowId)
 	$("#"+rowId).remove()
 }
 function updateAssetsList( name, value ){

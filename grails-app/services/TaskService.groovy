@@ -62,6 +62,7 @@ class TaskService {
 //		 sql.append("ORDER BY ${sortOn} ${sortOrder}")
 		
 		// log.error "SQL for userTasks: " + sql.toString()
+		println "-------------params---------$sql----------$sqlParams"
 		
 		def allTasks = AssetComment.findAll( sql.toString(), sqlParams )
 		def todoTasks = allTasks.findAll { [AssetCommentStatus.READY, AssetCommentStatus.STARTED].contains(it.status) }
@@ -87,7 +88,7 @@ class TaskService {
 	 * @param task
 	 * @return
 	 */
-	def genSelectForTaskDependency(taskDependency, project=null, idPrefix='taskDependencyEditId', name='taskDependencySave') {
+	def genSelectForTaskDependency(taskDependency, project=null, idPrefix='taskDependencyEditId', name='taskDependencyEdit') {
 		def predecessor = taskDependency.predecessor
 		def category = predecessor.category
 		

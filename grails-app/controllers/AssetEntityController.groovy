@@ -3389,7 +3389,7 @@ class AssetEntityController {
 		def prdecessors = AssetComment.findAll(queryForPredecessor)
 		def taskId = params.assetCommentId ? 'taskDependencyEditId' : 'taskDependencyId'
 	
-		def selectControl = new StringBuffer("""<select id="${taskId}" name="taskDependencySave" >""")
+		def selectControl = new StringBuffer("""<select id="${taskId}" name="taskDependencyEdit" >""")
 		
 		prdecessors.each{
 			selectControl.append("<option value='${it.id}'>${it.toString()}</option>")

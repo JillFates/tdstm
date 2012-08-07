@@ -159,12 +159,10 @@
 			</td>
 		</tr>
 		<tr>
-			<td valign="top" class="name"><label for="dateResolved">Resolved At:</label></td>
-			<td valign="top" class="value" id="dateResolvedId" colspan="3"></td>
-		</tr>
-		<tr>
 			<td valign="top" class="name" nowrap="nowrap"><label for="resolvedBy">Resolved By:</label></td>
-			<td valign="top" class="value" id="resolvedById" colspan="3"></td>
+			<td valign="top" class="value" id="resolvedById" ></td>
+			<td valign="top" class="name"><label for="dateResolved">Resolved At:</label></td>
+			<td valign="top" class="value" id="dateResolvedId" ></td>
 		</tr>
    </table>
 	</div>
@@ -247,7 +245,7 @@
 		<tr class="prop" id="predecessorHeadTrId" style="display: none">
 			<td valign="top" class="name" colspan="4">
 				<label for="actStartTrId">Predecessors</label>
-				<a class="button" href="javascript:" onclick="addPredecessor('predecessorCategory','','predecessorTr','relatedIssueId');"> Add </a>
+				<a class="button" href="javascript:" onclick="addPredecessor('createCategory','','','predecessorTr','relatedIssueId');"> Add </a>
 			</td>
 		</tr>
 		<tr class="prop" id="predecessorTr" style="display: none">
@@ -258,10 +256,6 @@
 			    <tbody id="predecessorTableId"></tbody>
 			   </table>
 			</td>
-		</tr>
-        <tr class="prop" id="predecessorTrId" style="display: none">
-			<td valign="top" class="name"><label for="predecessorId">Predecessor:</label></td>
-			<td valign="top" class="value" id="predecessorId" colspan="3"></td>
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"  ><label for="status">Status:</label></td>
@@ -346,7 +340,7 @@
     </div>
 	</div>
 	<tds:hasPermission permission='CommentCrudView'>
-	<div class="buttons"><span class="button"> <input class="save" type="button" value="Create"
+	<div class="buttons"><span class="button"> <input class="save" type="button" value="Save"
 		onclick="resolveValidate('createCommentForm','createAssetCommentId','${rediectTo}');" /></span></div>
 	</tds:hasPermission>
 </g:form>
@@ -359,7 +353,7 @@
  **************************
  */
 --%>
-<div id="editCommentDialog" title="Edit Comment/Issue" style="display: none;">
+<div id="editCommentDialog" title="Edit Comment/Issue" style="display: none;width: 800px">
 <g:form action="updateComment" method="post" name="editCommentForm">
  <div class="dialog" style="border: 1px solid #5F9FCF">
 	<input type="hidden" name="id" id="updateCommentId" value="" />
@@ -429,13 +423,13 @@
 		</tr>
 		<tr class="prop" id="predecessorAddTr" style="display: none">
 			<td valign="top" class="name"><label for="predecessorEditTd">Predecessors:</label>
-			 <a class="button" href="javascript:" onclick="addPredecessor('predecessorCategoryEdit','updateCommentId','predecessorEditTr','relatedIssueEditId');"> Add </a>
+			 <a class="button" href="javascript:" onclick="addPredecessor('categoryEditId','','updateCommentId','predecessorEditTr','relatedIssueEditId');"> Add </a>
 			</td>
 		</tr>
 		<tr class="prop" id="predecessorEditTr" style="display: none">
 			<td valign="top" class="name"><label for="predecessorEditTd">Pred:</label></td>
 			<td valign="top" class="value" id="predecessorEditTd" colspan="2">
-			  <g:select id="predecessorCategoryEdit"  from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general" noSelection="['':'please select']" onChange="addPredecessor('predecessorCategoryEdit','updateCommentId','predecessorEditTr','relatedIssueEditId')"/>
+			  <g:select id="predecessorCategoryEdit"  from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general" noSelection="['':'please select']" onChange="addPredecessor('','predecessorCategoryEdit','updateCommentId','predecessorEditTr','relatedIssueEditId')"/>
 			</td>
 			<td id="relatedIssueEditId">
 			</td>
@@ -535,7 +529,7 @@
 </div>
 <tds:hasPermission permission='CommentCrudView'>
 <div class="buttons"><span class="button">
-	<input class="save" type="button" value="Update" onclick="resolveValidate('editCommentForm','updateCommentId','${rediectTo}');" />
+	<input class="save" type="button" value="Save" onclick="resolveValidate('editCommentForm','updateCommentId','${rediectTo}');" />
 	</span>
 	<span class="button">
 	<g:if test="${rediectTo}">
