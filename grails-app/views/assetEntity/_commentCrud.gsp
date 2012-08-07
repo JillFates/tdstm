@@ -52,14 +52,17 @@
 	<table id="showCommentTable" style="border: 0px;">
 		<tr class = "issue" id="assignedToTrId" style="display: none">
 			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
-			<td valign="top" class="value" id="" style=""> <span id="assignedToTdId"></span>
+			<td valign="top" class="value" id="" colspan="3">
+				<span id="assignedToTdId"></span>&nbsp;-&nbsp;
 				<span id="roleTdId"></span>&nbsp;
 				<input type="checkbox" id="hardAssignedShow" name="hardAssignedShow" value="0"
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
-				<label for="hardAssignedShow" >Fixed Assignment</label>
+				<label for="hardAssignedShow" >Fixed Assignment</label>&nbsp;&nbsp;
+				<span id="dueDateTrId">
+					<label for="dueDate">Due Date:</label>
+					<span id="dueDateId"></span>
+				</span>
 			</td>
-			<td valign="top" class="name" id="dueDateTrId"><label for="dueDate">Due Date:</label></td>
-			<td valign="top" class="value" id="dueDateId"></td>
 		</tr>
 		<tr>
 			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
@@ -118,7 +121,10 @@
 		</tr>
 		<tr class="issue" id="workFlowShow" style="display: none">
 			<td valign="top" class="name"><label for="durationShowId">Duration:</label></td>
-			<td valign="top" class="value" id="durationShowId" colspan="3"></td>
+			<td valign="top" class="value"colspan="3">
+				<span id="durationShowId" />
+				<span id="durationScale" />
+			</td>
 		</tr>
 	</table>
 	</div>
@@ -207,7 +213,7 @@
 				<label for="dueDate">Due:</label>
 				<script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-                  </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDate" id="dueDateCreateId"
+                  </script> <input type="text" class="dateRange" size="15" style="" name="dueDate" id="dueDateCreateId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 		</tr>
@@ -291,7 +297,7 @@
 		<tr id="durationTrId" class="prop" style="display: none">
         	<td valign="top" class="name"><label for="duration ">Duration:</label></td>
         	<td valign="top" class="value" colspan="3">
-        	  <input type="text" id="duration" name="duration" value="" style="width: 12%">
+        	  <input type="text" id="duration" name="duration" value="">
             	<g:select id="durationScale" name="durationScale " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>
         	</td>
 		</tr>
@@ -312,19 +318,19 @@
 			<td valign="top" class="value">
 				<script type="text/javascript" charset="utf-8">
 				 jQuery(function($){$('.datetimeRange').datetimepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-                  </script> <input type="text" class="datetimeRange" size="15" style="width: 112px; height: 14px;" name="estStart" id="estStartCreateId"
+                  </script> <input type="text" class="datetimeRange" size="15" style="" name="estStart" id="estStartCreateId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 			<td valign="top" class="name"><label for="estFinishTrId">Estimated finish:</label></td>
 			<td valign="top" class="value">
-				 <input type="text" class="datetimeRange" size="15" style="width: 112px; height: 14px;" name="estFinish" id="estFinishCreateId"
+				 <input type="text" class="datetimeRange" size="15" style="" name="estFinish" id="estFinishCreateId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 		</tr>
 		<tr class="prop" id="actStartTrId" style="display: none">
 			<td valign="top" class="name"><label for="actStartTrId">Actual Start:</label></td>
 			<td valign="top" class="value" colspan="3">
-				<input type="text" class="datetimeRange" size="15" style="width: 112px; height: 14px;" name="actStart" id="actStartCreateId"
+				<input type="text" class="datetimeRange" size="15" style="" name="actStart" id="actStartCreateId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 		</tr>
@@ -380,7 +386,7 @@
 			<td valign="top" class="name" id="dueDateEditId" ><label for="dueDate">DueDate:</label>
 				<script type="text/javascript" charset="utf-8">
 				jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-				</script><input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDateEdit" id="dueDateEdit"
+				</script><input type="text" class="dateRange" size="15" style="" name="dueDateEdit" id="dueDateEdit"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 		</tr>
 		<tr>
@@ -463,7 +469,7 @@
 		<tr id="durationEditId" class="prop" style="display: none">
         	<td valign="top" class="name"><label for="durationEdit ">Duration:</label></td>
         	<td valign="top" class="value" colspan="3">
-        	  <input type="text" id="durationEdit" name="durationEdit" value="" style="width: 12%">
+        	  <input type="text" id="durationEdit" name="durationEdit" value="">
             	<g:select id="durationScaleEdit" name="durationScaleEdit " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m">
             	</g:select>
         	</td>
@@ -496,19 +502,19 @@
 			<td valign="top" class="value" nowrap="nowrap">
 				<script type="text/javascript" charset="utf-8">
 				  jQuery(function($){$('.datetimeEditRange').datetimepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-                  </script> <input type="text" class="datetimeRange" size="15" style="width: 112px; height: 14px;" name="estStart" id="estStartEditId"
+                  </script> <input type="text" class="datetimeRange" size="15" style="" name="estStart" id="estStartEditId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 			<td valign="top" class="name"><label for="estFinishTrId">Estimated finish:</label></td>
 			<td valign="top" class="value" nowrap="nowrap">
-                   <input type="text" class="datetimeEditRange" size="15" style="width: 112px; height: 14px;" name="estFinishEditId" id="estFinishEditId"
+                   <input type="text" class="datetimeEditRange" size="15" style="" name="estFinishEditId" id="estFinishEditId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 		</tr>
 		<tr class="prop" id="actStartTrEditId" style="display: none">
 			<td valign="top" class="name"><label for="actStartEditTrId">Actual Start:</label></td>
 			<td valign="top" class="value" colspan="3">
-				 <input type="text" class="datetimeEditRange" size="15" style="width: 112px; height: 14px;" name="actStartEditId" id="actStartEditId"
+				 <input type="text" class="datetimeEditRange" size="15" style="" name="actStartEditId" id="actStartEditId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 		</tr>
