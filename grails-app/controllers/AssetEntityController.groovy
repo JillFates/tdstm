@@ -34,6 +34,7 @@ import com.tds.asset.Files
 import com.tds.asset.TaskDependency
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enums.domain.AssetCommentType
 
 class AssetEntityController {
 
@@ -53,6 +54,8 @@ class AssetEntityController {
 	def assetEntityAttributeLoaderService
 	def assetEntityService
 	def commentService
+	def securityService
+	def taskService
 
 	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
@@ -1772,61 +1775,67 @@ class AssetEntityController {
 		if(assetComment.dueDate){
 			dueDate = dateFormatter.format(assetComment.dueDate);
 		}
+
+		def workflowTransition = assetComment?.workflowTransition
+		def workflow = workflowTransition?.name
+		
 		def noteList = assetComment.notes.sort{it.dateCreated}
 		def notes = []
-		def workflow = assetComment?.workflowTransition?.name
-		noteList.each{
+		noteList.each {
 			def dateCreated = it.dateCreated.format("E, d MMM 'at ' HH:mma")
 			notes << [ dateCreated , it.createdBy.toString() ,it.note]
-			
 		}
-		def roles = ''
-		if(assetComment.role){
-		def roletype =  RoleType.findById(assetComment.role).description 
-		roles = roletype.substring(roletype.lastIndexOf(':')+1)
-		}
-		def taskDependent = assetComment.taskDependencies
+		
+		// Get the name of the User Role by Name to display
+		def roles = securityService.getRoleName(assetComment.role)
+		
 		def maxVal = TaskDependency.list([sort:'id',order:'desc',max:1])?.id[0]
 		def predecessorTable = ""
-		if(taskDependent.size()>0){
-			predecessorTable = new StringBuffer("""<table  cellspacing="0" style="border:0px;" ><tbody>""")
-			taskDependent.each{task->
-				predecessorTable.append("""<tr class="${task.predecessor.category}" onClick="showAssetComment(${task.predecessor.id}, 'show')"> <td>${task.predecessor.category}</td> <td>${task.predecessor}</td>""")
+		def taskDependencies = assetComment.taskDependencies
+		if (taskDependencies.size() > 0) {
+			predecessorTable = new StringBuffer('<table cellspacing="0" style="border:0px;"><tbody>')
+			taskDependencies.each() { taskDep ->
+				def task = taskDep.predecessor
+				def css = taskService.getCssClassForStatus(task.status)
+				predecessorTable.append("""<tr class="${css}" onClick="showAssetComment(${task.id}, 'show')"><td>${task.category}</td><td>${task}</td>""")
 		    }
-			predecessorTable.append("""</tbody></table>""")
+			predecessorTable.append('</tbody></table>')
 		}
-		def taskSuccessor = TaskDependency.findAllByPredecessor( assetComment )
+		def taskSuccessors = TaskDependency.findAllByPredecessor( assetComment )
 		def successorTable = ""
-		if(taskSuccessor.size() > 0){
-			successorTable = new StringBuffer("""<table  cellspacing="0" style="border:0px;" ><tbody>""")
-			taskSuccessor.each{task->
-				successorTable.append("""<tr class="${task.assetComment.category}" onClick="showAssetComment(${task.assetComment.id}, 'show')"> <td>${task.assetComment.category}</td> <td>${task.assetComment}</td>""")
+		if (taskSuccessors.size() > 0) {
+			successorTable = new StringBuffer('<table  cellspacing="0" style="border:0px;" ><tbody>')
+			taskSuccessors.each() { successor ->
+				def task = successor.assetComment
+				def css = taskService.getCssClassForStatus(task.status)
+				successorTable.append("""<tr class="${css}" onClick="showAssetComment(${task.id}, 'show')"><td>${task.category}</td><td>${task}</td>""")
 			}
 			successorTable.append("""</tbody></table>""")
 		
 		}
 		def predEditTable = new StringBuffer("""<table id="predecessorEditTableId" cellspacing="0" style="border:0px;"><tbody>""")
-		taskDependent.each{ task->
-			def selectCategory = new StringBuffer("<select id='predecessorCategoryEditId_${task.id}' name='category' onChange='fillPredecessor(this.id,this.value)'>")
-			AssetComment.constraints.category.inList.each{
-				if(it!= task.predecessor.category)
-					selectCategory.append( "<option value='${it}'>${it}</option>")
-				else 
-					selectCategory.append("<option value='${it}' selected='selected'>${it}</option>")
+		taskDependencies.each{ taskDep ->
+			def predecessor = taskDep.predecessor
+			log.error "predecessor=${predecessor}"
+			def selectCategory = new StringBuffer("<select id=\"predecessorCategoryEditId_${taskDep.id}\" name=\"category\" onChange='fillPredecessor(this.id,this.value)'>")
+			AssetComment.constraints.category.inList.each() {
+				def selected = it == predecessor.category ? 'selected="selected"' : ''
+				selectCategory.append("<option value=\"${it}\" ${selected}>${it}</option>")
 			}
-			selectCategory.append("</select>")
+			selectCategory.append('</select>')
 			
-			def predFortask = commentService.genSelectForTaskDependency(session, task.predecessor.category, task.predecessor.id, null)
+			def predFortask = taskService.genSelectForTaskDependency(taskDep)
 			
-			predEditTable.append("""<tr id="row_Edit_${task.id}"  > <td>${selectCategory}</td> <td id="taskDependencyEditTdId_${task.id}">${predFortask}</td><td><a href="javascript:deleteRow('row_Edit_${task.id}')"><span class='clear_filter'><u>X</u></span></a></td>""")
+			predEditTable.append("""<tr id="row_Edit_${taskDep.id}"  > <td>${selectCategory}</td><td id="taskDependencyEditTdId_${taskDep.id}">${predFortask}</td><td><a href="javascript:deleteRow('row_Edit_${taskDep.id}')"><span class="clear_filter"><u>X</u></span></a></td>""")
 			selectCategory = ""
 		}
 		 
+		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
 		commentList << [ 
 			assetComment:assetComment, personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
 			dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo ?: "", assetName:assetComment.assetEntity?.assetName ?: "",
 			eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate ?: '',etStart:etStart, etFinish:etFinish,atStart:atStart,notes:notes,
-			workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,predEditTable:predEditTable,maxVal:maxVal+1]
+			workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,predEditTable:predEditTable,maxVal:maxVal+1 ]
 		render commentList as JSON
 	}
 	/* ----------------------------------------------------------------
@@ -3366,13 +3375,27 @@ class AssetEntityController {
 		}
 		render selectControl
 	}
+
+
+	def getPredecessor = {
+		def project = securityService.getUserCurrentProject()
+		def projectId = project.id
+		
+		String queryForPredecessor = "FROM AssetComment a WHERE a.project=${projectId} AND a.category='${params.category}' AND a.commentType='${AssetCommentType.TASK}' "
+		if(params.assetCommentId){ 
+			queryForPredecessor += "AND a.id != ${params.assetCommentId}"
+		}
+		def prdecessors = AssetComment.findAll(queryForPredecessor)
+		def taskId = params.assetCommentId ? 'taskDependencyEditId' : 'taskDependencyId'
 	
-	/**
-	 * @params : category(required), assetCommentId(optional)
-	 * @return : HTML Select with all TaskDependencies
-	 */
-	def getPredecessorSelectForCategory = {
-		render commentService.genSelectForTaskDependency(session, params.category, null, params.assetCommentId)
+		def selectControl = new StringBuffer("""<select id="${taskId}" name="taskDependencySave" >""")
+		
+		prdecessors.each{
+			selectControl.append("<option value='${it.id}'>${it.toString()}</option>")
+		}
+		
+		selectControl.append("</select>")
+		render selectControl
 	}
 } 
  

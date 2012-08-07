@@ -8,11 +8,11 @@ package com.tdsops.tm.enums.domain
  *
  */ 
 class AssetCommentStatus {
+	static final String HOLD='Hold'
+	static final String PLANNED='Planned'
 	static final String READY='Ready'
 	static final String PENDING='Pending'
-	static final String PLANNED='Planned'
 	static final String STARTED='Started'
-	static final String HOLD='Hold'
 	static final String COMPLETED='Completed'
 	static final getList() {
 		return [PLANNED, PENDING, READY, STARTED, HOLD, COMPLETED]

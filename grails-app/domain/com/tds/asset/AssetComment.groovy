@@ -158,7 +158,6 @@ class AssetComment {
 	}
 
 	String toString() {
-		 comment
+		 (taskNumber ? "${taskNumber}:" : '') + org.apache.commons.lang.StringUtils.left(comment,25)
 	}
-
 }

@@ -13,6 +13,8 @@ class ClientTeamsController {
 	def userPreferenceService
 	def partyRelationshipService
 	def stateEngineService 
+	def securityService 
+	def taskService
 	def jdbcTemplate
 	def clientTeamsService
 	def workflowService
@@ -180,6 +182,7 @@ class ClientTeamsController {
 						bundleId:bundleId, bundleName:bundleInstance.name, teamId: teamId, location: location]
 		}		
 	}
+	
 	/**
 	 * @author : lokanada
 	 * @param  : bundleId,teamId,location,project,tab
@@ -951,68 +954,81 @@ class ClientTeamsController {
 		}
 	}
 	
+	/**
+	 * Generates the user's list of tasks for the current project
+	 * params:
+	 *		tab - all or todo 
+	 */
 	def listComment={
-		def projectId = session.CURR_PROJ.CURR_PROJ
-		def projectInstance = Project.get(projectId)
-		def userId = session.getAttribute("LOGIN_PERSON").id
-		def personInstance = Person.get(userId)
+
+		def project = securityService.getUserCurrentProject()
+		log.error "PROJECT: ${project}"
+		def person = securityService.getUserLoginPerson()
+		log.error "PERSON=${person}"
+		def allTasks = false
+
+		// Parameters 		
 		def tab
 		def listComment
-		def viewMode = params.viewMode
-		if(viewMode){
-			session.setAttribute('ISSUE_VIEW_MODE', viewMode)
-		}
 		def todo
 		def all
-		if(params.search==null){
-			session.removeAttribute("SORT_BY")
-			session.removeAttribute("ORDER_BY")
-		}
-		if(params.sort){
-			session.setAttribute("SORT_BY", params.sort)
-			session.setAttribute("ORDER_BY", params.order)
-		}
 		
-		def sortBy = session.getAttribute("SORT_BY") ? session.getAttribute("SORT_BY") : 'dueDate'
-		def orderBy = session.getAttribute("ORDER_BY") ? session.getAttribute("ORDER_BY") : 'asc , lastUpdated desc'
-		if(params.search){
-			todo = AssetComment.findAll("From AssetComment a where a.project = :project AND a.assetEntity.assetTag=:tag AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Ready' , 'Started')) order by ${sortBy} ${orderBy} ",[project:projectInstance,assignedTo:personInstance,type:'issue',tag:params.search])
-			all= AssetComment.findAll("From AssetComment a where a.project = :project  AND a.assetEntity.assetTag=:tag AND commentType=:type AND assignedTo = :assignedTo   order by ${sortBy} ${orderBy} , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue',tag:params.search])
-		}else{
-			todo = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Ready' , 'Started')) order by ${sortBy} ${orderBy} ",[project:projectInstance,assignedTo:personInstance,type:'issue'])
-			all= AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo   order by ${sortBy} ${orderBy} ",[project:projectInstance,assignedTo:personInstance,type:'issue'])
+		// Deal with the user preferences
+		def viewMode = params.viewMode
+		def search = params.search
+		def sort = params.sort
+		
+		if (viewMode) { 
+			session.setAttribute('TASK_VIEW_MODE', viewMode)
 		}
-		if(params.tab=='all'){
+		if (search == null) {
+			session.removeAttribute("TASK_VIEW_SORT_ON")
+			session.removeAttribute("TASK_VIEW_SORT_ORDER")
+		}
+		if (sort) {
+			session.setAttribute("TASK_VIEW_SORT_ON", params.sort)
+			session.setAttribute("TASK_VIEW_SORT_ORDER", params.order)
+		}
+
+		def sortOn = session.getAttribute("TASK_VIEW_SORT_ON") ? session.getAttribute("TASK_VIEW_SORT_ON") : 'dueDate'
+		def sortOrder = session.getAttribute("TASK_VIEW_SORT_ORDER") ? session.getAttribute("TASK_VIEW_SORT_ORDER") : 'ASC , lastUpdated DESC'
+
+		// Use the taskService.getUserTasks service to get all of the tasks [all,todo]
+		def tasks = taskService.getUserTasks(person, project, search, sortOn, sortOrder )
+		
+		// Get the size of the lists
+		def todoSize = tasks['todo'].size()
+		def allSize = tasks['all'].size()
+
+		// Based on which tab the user is viewing we'll set listComment to the appropriate list to be returned to the user
+		if (params.tab=='all') {
 			tab = 'all'
-			listComment = all
-		}else{
+			listComment = tasks['all']
+			allTasks = true
+		} else {
 			tab = 'todo'
-			listComment = todo
+			listComment = tasks['todo']
 		}
-		def todoSize = todo.size()
-		def allSize = all.size()
+		
+		// Build the list and associate the proper CSS style
 		def issueList = []
-		
-		
-		listComment.each{issue->
-			def css = 'asset_process'
-			if( issue.status=='Ready' || issue.status=='' || issue.status==null){
-				css='asset_ready'
-			}else if(issue.status=='Completed'){
-			    css='asset_done'
-			}else if(issue.status=='Hold'){
-			    css='asset_hold'
-			}else if(issue.status=='Planned'|| issue.status=='Pending'){
-			    css='asset_pending'
-			}
-			issueList << ['item':issue,'css':css]
-			
+		listComment.each{ task ->
+			def css = taskService.getCssClassForStatus( task.status )
+			issueList << ['item':task,'css':css]
 		}
-		if(session.getAttribute('ISSUE_VIEW_MODE')=='mobile'){
-			render (view:'myIssues_m',model:['listComment':issueList, 'tab':tab ,todoSize:todoSize,allSize:allSize,search:params.search,userId:userId])
-		}else{
-			render (view:'myIssues',model:['listComment':issueList, 'tab':tab ,todoSize:todoSize,allSize:allSize,timers:session.MY_ISSUE_REFRESH?.MY_ISSUE_REFRESH,search:params.search,userId:userId])
+
+		// Determine the model and view
+		// TODO: runbook : WHY ARE WE PASSING THE userId back to the browser?
+		def model = [listComment:issueList, tab:tab, todoSize:todoSize, allSize:allSize, search:search, userId:5]
+		def view = 'myIssues'
+		if ( session.getAttribute('ISSUE_VIEW_MODE') == 'mobile') {
+			view = view+'_m'
+		} else {
+			model << [timers:session.MY_ISSUE_REFRESH?.MY_ISSUE_REFRESH]
 		}
+		// Send the user on his merry way
+		render (view:view, model:model)
+		
 	}
 	/**
 	 * @author : Ross Macfarlane
