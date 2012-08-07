@@ -705,7 +705,9 @@ function showAssetDialog( e , action ) {
       		     $('#actStartEditId').val(params.atStart)
       		     $('#actFinishShowId').html(params.dtResolved)
       		     $('#actFinishEditId').val(params.dtResolved)
-      		     $('#workFlowShowId').html(params.workflow)
+      		     if(params.workflow)
+      		      $('#workFlowShowId').html(params.workflow)
+      		      $('#workFlowShow').css('display','none')
       		     if(ac.assetEntity){
       		       updateWorkflowTransitions(ac.assetEntity.id, ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
       		     }else{
@@ -713,11 +715,14 @@ function showAssetDialog( e , action ) {
       		     }
       		     $('#workFlowEditId').html(params.workflow)
       		     $('#priorityShowId').html(ac.priority)
-      		     $('#durationShowId').html(ac.duration ? ac.duration :'' +" "+ ac.durationScale ?ac.durationScale:'' )
+      		     var duration = ac.duration ? ac.duration :''
+      		     var durationScale = ac.durationScale ?ac.durationScale:''
+      		     $('#durationShowId').html(duration +" "+ durationScale )
       		     $('#durationEdit').val(ac.duration )
       		     ac.durationScale ? $('#durationScaleEdit').val(ac.durationScale) : $('#durationScaleEdit').val('m') 
       		     ac.priority ? $('#priorityEdit').val(ac.priority) : $('#priorityEdit').val('')
       		     
+      		     $('#predecessorAddTr').css('display','table-row')
       		     $('#workFlowShow').css('display','table-row')
 	      		 $('#estFinishTrEditId').css('display','table-row')
 	      		 $('#priorityEditId').css('display','table-row')
@@ -1137,11 +1142,11 @@ function resolveValidate(formName, idVal, redirectTo) {
 
 	// Get params from create or update forms approppriately
 	var predArr = new Array();
+	if (formName == "createCommentForm") {
 		$('select[name="taskDependencySave"]').each(function(){
 			predArr.push($(this).val())
 	    });
-		predArr = removeDuplicateElement(predArr)
-	if (formName == "createCommentForm") {
+	    predArr = removeDuplicateElement(predArr)
 		var url = '../assetEntity/saveComment'
 		var params = { 'comment':$('#comment').val(), 'commentType':$('#commentType').val(),
 			'isResolved':$('#isResolved').val(), 'resolution':$('#resolution').val(),
@@ -1156,7 +1161,13 @@ function resolveValidate(formName, idVal, redirectTo) {
 			'taskDependency' : predArr};
 		var completeFunc = function(e) { addCommentsToList(e); }
 	} else {
+		$('#taskDependencyTdId').html("")
+		$('#relatedIssueEditId').html("")
 		var url = '../assetEntity/updateComment'
+		$('select[name="taskDependencyEdit"]').each(function(){
+			predArr.push($(this).val())
+	    });
+	    predArr = removeDuplicateElement(predArr)
 		var params = { 'comment':$('#commentEditId').val(), 'commentType':$('#commentTypeEditId').val(),
 			'isResolved':$('#isResolvedEditId').val(), 'resolution':$('#resolutionEditId').val(), 
 			'mustVerify':$('#mustVerifyEditId').val(), 'category':$('#categoryEditId').val(), 
@@ -1356,20 +1367,20 @@ function addPredecessor(predecessorCategory,comment,row,span){
 		     $('#'+span).html(e.responseText)
 		     $('#taskDependencyTdId').html(e.responseText)
 	         var rowNo = $("#predCount").val()
-	          var taskRow
+	         var taskRow
+	         
 	         if(comment){
 	           taskRow =  $('#taskDependencyRow tr').html().replace("predecessorCategoryId","predecessorCategoryId_"+rowNo).replace("taskDependencyId","taskDependencyEditId_"+rowNo).replace("taskDependencyTdId","taskDependencyEditTdId_"+rowNo).replace("taskDependencyEditId","taskDependencyEditId_"+rowNo)
+	            $('#predecessorEditTableId').append("<tr id='row_Edit_"+rowNo+"'>"+taskRow+"<td><a href=\"javascript:deleteRow(\'row_Edit_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td><tr>")
 	         }else{
-	           taskRow =  $('#taskDependencyRow tr').html().replace("predecessorCategoryId","predecessorCategoryId_"+rowNo).replace("taskDependencyId","taskDependencyId_"+rowNo).replace("taskDependencyTdId","taskDependencySaveTdId_"+rowNo).replace("taskDependencyEditId","taskDependencyEditId_"+rowNo)
+	        	 
+	           taskRow =  $('#taskDependencyRow tr').html().replace("predecessorCategoryId","predecessorCategoryId_"+rowNo).replace("taskDependencyId","taskDependencyId_"+rowNo).replace("taskDependencyTdId","taskDependencySaveTdId_"+rowNo).replace("taskDependencyEditId","taskDependencyEditId_"+rowNo).replace(' name="taskDependencyEdit"','name="taskDependencySave"')
+	            $('#predecessorTableId').append("<tr id='row_d_"+rowNo+"'>"+taskRow+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
 	         }
-	         $('#predecessorTableId').append("<tr id='row_d_"+rowNo+"'>"+taskRow+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
-	         $('#predecessorEditTableId').append("<tr id='row_Edit_"+rowNo+"'>"+taskRow+"<td><a href=\"javascript:deleteRow(\'row_Edit_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td><tr>")
 	         $('#predecessorTr').show()
 	         $("#predCount").val(parseInt(rowNo)+1)
 		 }
-	         
 	})
-	
 }
 function fillPredecessor(id, category){
 	var row = id.split('_')[1]
@@ -1396,5 +1407,5 @@ function fillPredecessor(id, category){
 	  newArray[newArray.length] = arrayName[i];
 	  }
 	  return newArray;
-	  }
+}
 
