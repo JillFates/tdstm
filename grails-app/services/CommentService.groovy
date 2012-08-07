@@ -319,5 +319,36 @@ class CommentService {
 		ArrayList lines = str.readLines()
 		return ( (lineNum+1) > lines.size() ) ? null : lines[lineNum]
 	}
+	
+	/**
+	 * Generate select control for Predecessor 
+	 * @param session
+	 * @param category - list the TaskDepenendy for selected category
+	 * @param selected - provide default selected
+	 * @param commentId - should not include in the list
+	 */
+	def genSelectForTaskDependency(session, category, selected, commentId){
+		
+		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def project = Project.findById( projectId )
+		def taskDependencyId = 'taskDependencyId'
+		String queryForPredecessor = "SELECT asset_comment_id as id,concat(if(task_number,concat(task_number,':'),''),left(comment,50)) as comment FROM asset_comment a where a.project_id=${projectId} and a.comment_type='issue' and a.category= '${category}' "
+		if(commentId){
+			queryForPredecessor += " and a.asset_comment_id != ${commentId}"
+			taskDependencyId = 'taskDependencyEditId'
+		}
+		
+		def predecessors = jdbcTemplate.queryForList(queryForPredecessor)
+	
+		def selectControl = new StringBuffer("""<select id="${taskDependencyId}" name="taskDependency">""")
+		
+		predecessors.each{
+			selectControl.append( it.id != selected ? "<option value='${it.id}'>${it.comment}</option>" : "<option value='${it.id}' selected='selected'>${it.comment}</option>")
+		}
+		
+		selectControl.append("</select>")
+		
+		return selectControl
+	}
 
 }

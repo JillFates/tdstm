@@ -325,11 +325,6 @@ function showAssetDialog( e , action ) {
 			}
 		}
 	})
-	//new Ajax.Request('../assetEntity/getPredecessor?category='+category,{asynchronous:true,evalScripts:true,
-		//onComplete:function(e){
-			//$('#'+predecessorID).html(e.responseText);
-		//}
-	//})
  }
  
  function getLength( length ){
@@ -1356,7 +1351,7 @@ function showResolve(value){
 function addPredecessor(predecessorCategory,comment,row,span){
 	var category = $('#'+predecessorCategory).val() ? $('#'+predecessorCategory).val() : 'general'
 	var commentId = comment ? $('#'+comment).val() : ''
-	new Ajax.Request('../assetEntity/getPredecessor?category='+category+'&assetCommentId='+commentId,{asynchronous:true,evalScripts:true,
+	new Ajax.Request('../assetEntity/getPredecessorSelectForCategory?category='+category+'&assetCommentId='+commentId,{asynchronous:true,evalScripts:true,
 		 onComplete:function(e){
 		     $('#'+span).html(e.responseText)
 		     $('#taskDependencyTdId').html(e.responseText)
@@ -1378,7 +1373,7 @@ function addPredecessor(predecessorCategory,comment,row,span){
 }
 function fillPredecessor(id, category){
 	var row = id.split('_')[1]
-	new Ajax.Request('../assetEntity/getPredecessor?category='+category,{asynchronous:true,evalScripts:true,
+	new Ajax.Request('../assetEntity/getPredecessorSelectForCategory?category='+category,{asynchronous:true,evalScripts:true,
 		 onComplete:function(e){
 			 var resp =  e.responseText.replace('taskDependencyId','taskDependencyId_'+row)
 			 var data = e.responseText

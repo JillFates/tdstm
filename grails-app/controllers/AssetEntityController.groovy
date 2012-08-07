@@ -1785,7 +1785,7 @@ class AssetEntityController {
 		def roletype =  RoleType.findById(assetComment.role).description 
 		roles = roletype.substring(roletype.lastIndexOf(':')+1)
 		}
-		def taskDependent = assetComment.taskDependency
+		def taskDependent = assetComment.taskDependencies
 		def maxVal = TaskDependency.list([sort:'id',order:'desc',max:1])?.id[0]
 		def predecessorTable = ""
 		if(taskDependent.size()>0){
@@ -1816,10 +1816,7 @@ class AssetEntityController {
 			}
 			selectCategory.append("</select>")
 			
-			//selectPredecessor.append("<select id='taskDependencyId_${task.id}' name='category' >")
-			def predFortask = getPredecessorForTask(task)
-			//selectPredecessor.append("<option value='${task.predecessor.category}'>${task.predecessor.category}</option>")
-			//selectPredecessor.append("</select>")
+			def predFortask = commentService.genSelectForTaskDependency(session, task.predecessor.category, task.predecessor.id, null)
 			
 			predEditTable.append("""<tr id="row_Edit_${task.id}"  > <td>${selectCategory}</td> <td id="taskDependencyEditTdId_${task.id}">${predFortask}</td><td><a href="javascript:deleteRow('row_Edit_${task.id}')"><span class='clear_filter'><u>X</u></span></a></td>""")
 			selectCategory = ""
@@ -3370,42 +3367,12 @@ class AssetEntityController {
 		render selectControl
 	}
 	
-	def getPredecessorForTask(task){
-		def category = task.predecessor.category
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = Project.findById( projectId )
-		String queryForPredecessor = "from AssetComment a where a.project=${projectId} and a.category= '${category}' and a.commentType='issue' "
-		def prdecessors = AssetComment.findAll(queryForPredecessor)
-		def selectControl = new StringBuffer("""<select id="taskDependencyEditId_${task.id}" name="taskDependencySave" >""")
-		prdecessors.each{
-			if(it.id!= task.predecessor.id){
-				selectControl.append("<option value='${it.id}'>${it.getPredecessor()}</option>")
-		    }else{
-			    selectControl.append("<option value='${it.id}' selected='selected'>${it.getPredecessor()}</option>")
-			}
-		}
-		selectControl.append("</select>")
-		return selectControl
-	}
-	
-	def getPredecessor = {
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = Project.findById( projectId )
-		String queryForPredecessor = "from AssetComment a where a.project=${projectId} and a.category= '${params.category}' and a.commentType='issue' "
-		if(params.assetCommentId){ 
-			queryForPredecessor += "and a.id != ${params.assetCommentId}"
-		}
-		def prdecessors = AssetComment.findAll(queryForPredecessor)
-		def taskId = params.assetCommentId ? 'taskDependencyEditId' : 'taskDependencyId'
-	
-		def selectControl = new StringBuffer("""<select id="${taskId}" name="taskDependencySave" >""")
-		
-		prdecessors.each{
-			selectControl.append("<option value='${it.id}'>${it.getPredecessor()}</option>")
-		}
-		
-		selectControl.append("</select>")
-		render selectControl
+	/**
+	 * @params : category(required), assetCommentId(optional)
+	 * @return : HTML Select with all TaskDependencies
+	 */
+	def getPredecessorSelectForCategory = {
+		render commentService.genSelectForTaskDependency(session, params.category, null, params.assetCommentId)
 	}
 } 
  

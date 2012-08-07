@@ -146,17 +146,6 @@ class AssetComment {
 		return d
 	}
 	
-	def getPredecessor(){
-		def comments = this.comment?.length()>20 ? this.comment.substring(0,20) : this.comment
-		def prdecessorString = ''
-		if(this.taskNumber){
-			prdecessorString = "${this.taskNumber}:${comments}"
-		}else{
-		    prdecessorString = "${comments}"
-		}
-		return prdecessorString
-	}
-	
 	// Force the created and updated dates to be GMT
 	def beforeInsert = {
 		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
