@@ -26,8 +26,8 @@
 			<input  type="text" size="08" value="${search}" id="search" name="search" autocorrect="off" autocapitalize="off" onfocus="changeAction()" onblur="retainAction()" />
 		</div>
 	</div>
-	<div class="issueTimebar" id="issueTimebar"> <div id="issueTimebarId" ></div> </div>
-	<div id="detailId"  style="display: none;position: absolute;width: 420px;margin-top: 40px" > </div>
+	<div class="issueTimebar" id="issueTimebar"><div id="issueTimebarId" ></div></div>
+	<div id="detailId"  style="display: none;position: absolute;width: 420px;margin-top: 40px;" > </div>
 	<div id="myIssueList" class="mobbodyweb">
 			<input id="issueId" name="issueId" type="hidden" value="" />
 			<input name="tab" type="hidden" value="${tab}" />								              	
@@ -37,7 +37,7 @@
 					<div class="message"><ul>${flash.message}</ul></div>
 				</g:if> 
 			</div>		
-			<div id="taskId" style="float:left; margin:2px 0; ">              								
+			<div id="taskId" style="float:left; margin:2px 0; ">
 			</div>
 			<div id="assetIssueDiv" style="float:left;width:800px; ">
 				<table id="issueTable" cellspacing="0px" style="width:100%;margin-left: -1px;">
@@ -66,7 +66,7 @@
 					</tr>
 					<g:if test="${tab && tab == 'todo'}">
 					<tr id="showStatusId_${issue?.item?.id}" style="display: none;" > 
-					   <td nowrap="nowrap" colspan="5" class="statusButtonBar" >
+						<td nowrap="nowrap" colspan="5" class="statusButtonBar" >
 							<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
 							 id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','Started',${userId})">
 								<span class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
@@ -98,12 +98,11 @@
 				</tbody>
 				</table>
 			</div>
-			
       		</g:form>
    		</div>
    		<br />
       <div>
-      	<g:link class="mobfooter" action="listComment" params="[viewMode:'mobile']">Use Mobile Site</g:link>
+		<g:link class="mobfooter" action="listComment" params="[viewMode:'mobile']">Use Mobile Site</g:link>
       </div>
 	</div>
 <script type="text/javascript">
@@ -137,7 +136,6 @@
 		$('#taskLinkId').addClass('mobselect')
 		$('#showStatusId_'+id).css('display','table-row')
 		$('#issueTr_'+id).attr('onClick','issueDetails('+id+')');
-
 	}
 	function changeStatus(id,status,user){
 		jQuery.ajax({
@@ -182,7 +180,6 @@ function changeAction(){
 function retainAction(){
 	 document.issueAssetForm.action = 'showIssue'
 }
-
 function pageRefresh(){
 	document.issueAssetForm.action = 'listComment'
 	document.issueAssetForm.submit()
