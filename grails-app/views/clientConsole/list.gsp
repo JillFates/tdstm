@@ -303,7 +303,8 @@
 <div class="contextMenu" id="myMenu"></div>
 <div class="contextMenu" id="transitionMenu" style="visibility: hidden;">
 	<ul>
-        <li id="done">Done</li>
+        <li id="start">Start</li>
+		<li id="done">Done</li>
         <li id="NA">N/A</li>
         <li id="pending">Pending</li>
         <li id="void">Undo</li>
@@ -419,7 +420,10 @@
 					return menu;
 				},
 				bindings: {
-	        		'done': function(t) {
+	        		'start': function(t) {
+			       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=start\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
+			        },
+			        'done': function(t) {
 			       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=done\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
 			        },
 			        'ready': function(t) {
@@ -478,20 +482,41 @@
 	 *------------------------------------------------------------*/
 	function updateMenu(e,menu){
 		var actionType = e.responseText
-		if( actionType == "noTransMenu"){
-			$('#pending, #void, #ready, #noOptions', menu ).remove()
-		} else if( actionType == "naMenu") {
-			$('#NA, #void, #ready, #noOptions', menu ).remove()
-		} else if( actionType == "doneMenu") {
-			$('#done, #void, #ready, #noOptions', menu ).remove()
-		} else if( actionType == "readyMenu") {
-			$('#NA, #done, #void, #pending, #noOptions', menu ).remove()
-		} else if( actionType == "voidMenu") {
-			$('#NA, #done, #ready, #pending, #noOptions', menu ).remove()
-		} else if( actionType == "doMenu") {
-			$('#NA, #ready, #pending, #void, #noOptions', menu ).remove()
-		} else {
-			$('#NA, #done, #ready, #pending, #void', menu ).remove()
+		switch(actionType){
+			case "noTransMenu": 
+				$('#pending, #void, #ready, #noOptions', menu ).remove()
+				break;
+			case "naMenu": 
+				$('#NA, #void, #ready, #noOptions', menu ).remove()
+				break;
+			case "doneMenu": 
+				$('#start, #done, #void, #ready, #noOptions', menu ).remove()
+				break;
+			case "readyMenu": 
+				$('#start, #NA, #done, #void, #pending, #noOptions', menu ).remove()
+				break;
+			case "voidMenu": 
+				$('#start, #NA, #done, #ready, #pending, #noOptions', menu ).remove()
+				break;
+			case "doMenu": 
+				$('#NA, #ready, #pending, #void, #noOptions', menu ).remove()
+				break;
+			case "noOption":
+			case "rb_noOption":
+				$('#start, #NA, #done, #ready, #pending, #void', menu ).remove()
+				break;
+			case "rb_doMenu": 
+				$('#NA, #ready, #pending, #void, #noOptions', menu ).remove()
+				break;
+			case "rb_doneMenu": 
+				$('#start, #NA, #ready, #pending, #noOptions', menu ).remove()
+				break;
+			case "rb_voidMenu": 
+				$('#start, #NA, #done, #ready, #pending, #noOptions', menu ).remove()
+				break;
+			default :
+				$('#start, #NA, #done, #ready, #pending, #void', menu ).remove()
+				break;
 		}
 		menu.show()
 	}

@@ -330,10 +330,10 @@ class PmoAssetTrackingService {
 		
 		/*
 		 * Menus:
-		 *    o doMenu - Start/Done
-		 *    o doneMenu - Done/Hold/Undo (TBD)
-		 *    o voidMenu - Undo
-		 *    o noOption - No option
+		 *    o rb_doMenu - Start/Done
+		 *    o rb_doneMenu - Done/Hold/Undo (TBD)
+		 *    o rb_voidMenu - Undo
+		 *    o rb_noOption - No option
 		 * Cases (task status):
 		 *    o Ready - doMenu
 		 *    o pre Ready (verify that there are no incomplete predecessors) - doMenu
@@ -343,25 +343,25 @@ class PmoAssetTrackingService {
 		 *    o Hold - doMenu
 		 */
 		def task = workflowService.getTaskFromAssetAndWorkflow(assetEntity, state) 
-		def menu = 'noOption'
+		def menu = 'rb_noOption'
 		
 		if (task) {
 			switch (task.status) {
 				case [ AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING ]:
 					def predecessors = workflowService.getIncompletePredecessors(task)
-					if (predecessors?.size() == 0) menu = 'doMenu'
+					if (predecessors?.size() == 0) menu = 'rb_doMenu'
 					break
 					
 				case [ AssetCommentStatus.READY, AssetCommentStatus.HOLD ]:
-					menu = 'doMenu'
+					menu = 'rb_doMenu'
 					break
 				
 				case AssetCommentStatus.STARTED: 
-					menu = 'doneMenu'
+					menu = 'rb_doneMenu'
 					break
 
 				case AssetCommentStatus.COMPLETED: 
-					menu = 'voidMenu'
+					menu = 'rb_voidMenu'
 					break
 			}
 		}
