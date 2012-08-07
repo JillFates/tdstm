@@ -2465,7 +2465,7 @@ class AssetEntityController {
 			assetList <<['assetEntity':assetEntity, 'sourceTeamMt':sourceTeamMt, 'targetTeamMt':targetTeamMt,
 						'sourceTeamMts':sourceTeamMts,'targetTeamMts':targetTeamMts, 'statesList':statesList,
 						'status':statusLabel,'cssClass':cssClass,'checkVal':check,
-						'statusName':statusName, assetComment:assetComment,
+						'statusName':statusName, 'assetComment':assetComment,
 						'message':message]
 		}
 		render assetList as JSON
