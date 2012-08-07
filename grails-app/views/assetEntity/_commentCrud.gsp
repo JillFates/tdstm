@@ -219,13 +219,12 @@
 			<td valign="top" class="name"><label for="commentType">Type:</label></td>
 			<td style="">
 				<g:select id="commentType" name="commentType" from="${com.tds.asset.AssetComment.constraints.commentType.inList}" value="comment"
-				onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>
-			</td>
-        	<td valign="top" class="name"><label for="category">Category:</label>
+				onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;
+				<label for="category">Category:</label>
             	<g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
             	noSelection="['':'please select']" onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionId', 'predecessorId','')"></g:select>
-        	</td>
-        	<td valign="top" class="name"><label for="priority">Priority:</label>
+        		&nbsp;&nbsp;
+        		<label for="priority">Priority:</label>
             	<g:select id="priority" name="priority" from="${1..5}" value="3"
             	noSelection="['':'please select']"></g:select>
         	</td>
@@ -239,16 +238,16 @@
 		</tr>
 		<tr class="prop" id="workFlowTransitionTrId" style="display: none">
 			<td valign="top" class="name"><label for="actStartTrId">WorkFlowTransition:</label></td>
-			<td valign="top" class="value" id="workFlowTransitionId"></td>
-			<td nowrap="nowrap" colspan="2">
+			<td valign="top" class="value" id="workFlowTransitionId" colspan="3">
 			<input type="checkbox" id="overRide" name="overRide" value="0"
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
 			 <label for="overRide" >Overridden</label>
 			</td>
 		</tr>
 		<tr class="prop" id="predecessorHeadTrId" style="display: none">
-			<td valign="top" class="name" colspan="4"><label for="actStartTrId">Predecessors</label>
-			 <a class="button" href="javascript:" onclick="addPredecessor('predecessorCategory','','predecessorTr','relatedIssueId');"> Add </a>
+			<td valign="top" class="name" colspan="4">
+				<label for="actStartTrId">Predecessors</label>
+				<a class="button" href="javascript:" onclick="addPredecessor('predecessorCategory','','predecessorTr','relatedIssueId');"> Add </a>
 			</td>
 		</tr>
 		<tr class="prop" id="predecessorTr" style="display: none">
@@ -313,15 +312,14 @@
 		<table id="createResolveTable" style="border: 0px">
 		<tr class="prop" id="estStartTrId" style="display: none">
 			<td valign="top" class="name"><label for="estStartTrId">Estimated start:</label></td>
-			<td valign="top" class="value">
+			<td valign="top" class="value" colspan="3">
 				<script type="text/javascript" charset="utf-8">
 				 jQuery(function($){$('.datetimeRange').datetimepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script> <input type="text" class="datetimeRange" size="15" style="" name="estStart" id="estStartCreateId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-			</td>
-			<td valign="top" class="name"><label for="estFinishTrId">Estimated finish:</label></td>
-			<td valign="top" class="value">
-				 <input type="text" class="datetimeRange" size="15" style="" name="estFinish" id="estFinishCreateId"
+				&nbsp;&nbsp;
+				<label for="estFinishTrId">Estimated finish:</label>
+				<input type="text" class="datetimeRange" size="15" style="" name="estFinish" id="estFinishCreateId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 		</tr>
