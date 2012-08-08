@@ -75,6 +75,7 @@
 		<tr class="issue" id="categoryTrId">
 			<td valign="top" class="name"><label for="category">Category:</label></td>
 			<td valign="top" class="value" id="categoryTdId"></td>
+			<td valign="top" class="name" id="taskNumberId"></td>
 			<td valign="top" class="name"><label for="priorityShowId">Priority:</label></td>
 			<td valign="top" class="value" id="priorityShowId"></td>
 		</tr>
@@ -196,11 +197,11 @@
 		<table id="createCommentTable" style="border: 0px;">
 		<tr class="prop" id="assignedToId" style="display: none">
 		<% // TODO - the list of users should be in the model and not in the view %>
-		<% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;
+		<% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ?  " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;
 		   def roleList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).roleTypeCodeTo;%>
 			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
 			<td valign="top" nowrap="nowrap" colspan="3">
-				<g:select id="assignedTo" name="assignedTo" from="${partyList}"  value="${session.getAttribute('LOGIN_PERSON').id }" optionKey="id" noSelection="['':'please select']"></g:select>
+				<span id="assignedCreateSpan"></span>
 				&nbsp;-&nbsp;
 				<g:select id="roleType" name="roleType" from="${RoleType.list()}" noSelection="['':'UnAssigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)"></g:select> &nbsp;
 				<input type="checkbox" id="hardAssigned" name="hardAssigned" value="1"  checked="checked"
@@ -307,8 +308,8 @@
 		<tr class="prop" id="estStartTrId" style="display: none">
 			<td valign="top" class="name"><label for="estStartTrId">Estimated start:</label></td>
 			<td valign="top" class="value" colspan="3">
-				<script type="text/javascript" charset="utf-8">
-				 jQuery(function($){$('.datetimeRange').datetimepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+			      <script type="text/javascript">
+				   jQuery(function($){$('.datetimeRange').datetimepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script> <input type="text" class="datetimeRange" size="15" style="" name="estStart" id="estStartCreateId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 				&nbsp;&nbsp;
@@ -341,7 +342,7 @@
 	</div>
 	<tds:hasPermission permission='CommentCrudView'>
 	<div class="buttons"><span class="button"> <input class="save" type="button" value="Save"
-		onclick="resolveValidate('createCommentForm','createAssetCommentId','${rediectTo}');" /></span></div>
+		onclick="resolveValidate('createCommentForm','createAssetCommentId','${rediectTo}','');" /></span></div>
 	</tds:hasPermission>
 </g:form>
 </div>
@@ -365,8 +366,9 @@
 	   <tr class="prop issue" id="assignedToTrEditId" style="display: none">
 			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
 			<td valign="top" id="assignedToEditTdId" style="display: none;" class="issue"  colspan="2" nowrap="nowrap">
-				<g:select id="assignedToEditId" name="assignedTo" from="${partyList}" value="" optionKey="id" noSelection="['':'please select']"></g:select>
-
+               
+                <span id="assignedEditSpan"> </span>
+              
 				<g:select id="roleTypeEdit" name="roleTypeEdit" from="${RoleType.list()}" noSelection="['':'UnAssigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)"></g:select>
 
 				<input type="checkbox" id="hardAssignedEdit" name="hardAssignedEdit" value="1"  checked="checked"
@@ -384,8 +386,8 @@
 			<td valign="top" class="value" id="createdByEditId" colspan="3"></td>
 		</tr>
 		<tr class="prop">
-			<td valign="top" class="name"><label for="commentType">Type:</label></td>
-			<td valign="top" style="">
+			<td valign="top" class="name" id="commentTypeEditTdId"><label for="commentType">Type:</label></td>
+			<td valign="top" style="" id="typeListTdId">
 				<tds:hasPermission permission='CommentCrudView'>
 					<g:select id="commentTypeEditId" name="commentType"
 					from="${com.tds.asset.AssetComment.constraints.commentType.inList}" value=""
@@ -398,8 +400,10 @@
 				</div>
 			</td>
 			<td valign="top" class="name"><label for="category">Category:</label>
+			<td>
 				<g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
 				onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionId', 'predecessorId',jQuery('#createAssetCommentId').html())"></g:select></td>
+			</td>
         	<td valign="top" class="name" ><label for="priority">Priority:</label>
             	<g:select id="priorityEdit" name="priorityEdit" from="${1..5}" value=""
             	noSelection="['':'please select']"></g:select>
@@ -491,12 +495,12 @@
 				noSelection="['':'please select']" onChange="showResolve(this.value)"></g:select>
 			</td>
 		</tr>
-	    <tr class="prop issue" id="estStartEditId" style="display: none">
+	    <tr class="prop issue" id="estStartEditTrId" style="display: none">
 			<td valign="top" class="name"><label for="estStartTrId">Estimated start:</label></td>
 			<td valign="top" class="value" nowrap="nowrap">
 				<script type="text/javascript" charset="utf-8">
 				  jQuery(function($){$('.datetimeEditRange').datetimepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-                  </script> <input type="text" class="datetimeRange" size="15" style="" name="estStart" id="estStartEditId"
+                  </script> <input type="text" class="datetimeEditRange" size="15" style="" name="estStart" id="estStartEditId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 			<td valign="top" class="name"><label for="estFinishTrId">Estimated finish:</label></td>
@@ -529,7 +533,9 @@
 </div>
 <tds:hasPermission permission='CommentCrudView'>
 <div class="buttons"><span class="button">
-	<input class="save" type="button" value="Save" onclick="resolveValidate('editCommentForm','updateCommentId','${rediectTo}');" />
+	<input class="save" type="button" value="Save and close" onclick="resolveValidate('editCommentForm','updateCommentId','${rediectTo}','');" />
+	
+	<input class="save" type="button" value="Save and view" onclick="resolveValidate('editCommentForm','updateCommentId','','view');" />
 	</span>
 	<span class="button">
 	<g:if test="${rediectTo}">

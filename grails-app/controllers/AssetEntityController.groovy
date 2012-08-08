@@ -1857,8 +1857,11 @@ class AssetEntityController {
 	 * ------------------------------------------------------------ */
 	def updateComment = {
 		def map = commentService.saveUpdateCommentAndNotes(session, params, false)
-		
-		render map as JSON
+		if(params.open=='view'){
+			forward(action:'showComment',params:[id:params.id] )
+		}else{
+		   render map as JSON
+		}
 		
 	}
 	
@@ -3397,6 +3400,13 @@ class AssetEntityController {
 		
 		selectControl.append("</select>")
 		render selectControl
+	}
+	def updateAssignedToSelect = {
+		def project = securityService.getUserCurrentProject()
+		def projectId = project.id
+		def viewId = params.forView
+		def assignedToSelect = partyRelationshipService.getProjectCompaniesStaff( projectId ,'genSelectForOwner',viewId)
+		render assignedToSelect
 	}
 } 
  

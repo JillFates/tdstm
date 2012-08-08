@@ -656,6 +656,7 @@ function showAssetDialog( e , action ) {
 		     $('#assetTrShowId').html(params.assetName)
 		     $('#eventShowValueId').html(params.eventName)
 	      	 if(ac.commentType=='issue'){
+	      		 updateAssignedToList('assignedToEdit','assignedEditSpan');
 	      		 if(ac.resolution || ac.status=='Completed'){
 	      		   $('#resolutionEditTrId').css('display','table-row')
 	      		 }else{
@@ -663,7 +664,7 @@ function showAssetDialog( e , action ) {
 	      		}
 	      		 if(params.assignedTo){
 			      	 $('#assignedToTdId').html(params.assignedTo.firstName + " " + params.assignedTo.lastName)
-			      	 $('#assignedToEditId').val(params.assignedTo.id)
+			      	 $('#assignedToEdit').val(params.assignedTo.id)
 	      		 }
 	      		 var notes = params.notes
 	      		 var noteTable = '<table border=0>'
@@ -680,6 +681,7 @@ function showAssetDialog( e , action ) {
       		    	$('#predecessorShowTr').css('display','table-row')
       		     }
                  $('#predecessorShowTd').html(params.predecessorTable)
+                 $('#taskNumberId').html('# : '+'<b>'+ac.taskNumber+'</b>')
                  $('#successorShowTd').html(params.successorTable)
                  $('#predecessorEditId').html(params.predEditTable)
                  $('#predecessorTrEditId').css('display','table-row')
@@ -694,6 +696,9 @@ function showAssetDialog( e , action ) {
 		      	 if(ac.hardAssigned==1){
 		      		 $('#hardAssignedShow').attr('checked', true);
 		      		 $('#hardAssignedEdit').attr('checked', true);
+		      	 }else{
+		      		$('#hardAssignedShow').attr('checked', false);
+		      		$('#hardAssignedEdit').attr('checked', false);
 		      	 }
       		     if(ac.workflowOverride==1){
 		      		 $('#overRideShow').attr('checked', true);
@@ -703,6 +708,7 @@ function showAssetDialog( e , action ) {
       		     ac.role ? $('#roleTypeEdit').val(ac.role) :$('#roleTypeEdit').val('')
       		     $('#estStartShowId').html(params.etStart)
       		     $('#estStartEditId').val(params.etStart)
+      		     $('#estStartEditTrId').css('display','table-row')
       		     $('#estFinishShowId').html(params.etFinish)
       		     $('#estFinishEditId').val(params.etFinish)
       		     $('#actStartShowId').html(params.atStart)
@@ -726,6 +732,8 @@ function showAssetDialog( e , action ) {
       		     ac.durationScale ? $('#durationScaleEdit').val(ac.durationScale) : $('#durationScaleEdit').val('m') 
       		     ac.priority ? $('#priorityEdit').val(ac.priority) : $('#priorityEdit').val('')
       		     
+      		     $('#commentTypeEditTdId').css('display','none')
+      	      	 $('#typeListTdId').css('display','none')
       		     $('#predecessorAddTr').css('display','table-row')
       		     $('#workFlowShow').css('display','table-row')
 	      		 $('#estFinishTrEditId').css('display','table-row')
@@ -758,6 +766,8 @@ function showAssetDialog( e , action ) {
 	      	 } else {
 	      		$('.issue').css('display','none')
 	      		$('#commentTypeEditId').removeAttr("disabled");
+	      		$('#commentTypeEditTdId').css('display','block')
+     	      	$('#typeListTdId').css('display','block')
 	      	 }
 			 if(ac.commentType=='instruction'){
 				 $('#mustVerifyId').css('display','table-row')
@@ -982,6 +992,7 @@ function showAssetDialog( e , action ) {
 
 function createIssue(){
 	updateWorkflowTransitions( '', "general", "workFlowTransitionId", "predecessorId",'' );
+	updateAssignedToList('assignedToSave','assignedCreateSpan');
 	document.forms['createCommentForm'].commentType.value = 'issue'
 	document.forms['createCommentForm'].commentType.disabled = 'disabled'
 	commentChange('#createResolveDiv','createCommentForm')
@@ -1000,6 +1011,7 @@ function createIssue(){
 function commentChange(resolveDiv,formName) {
 	var type = 	document.forms[formName].commentType.value;
 	if(type == "issue"){
+		updateAssignedToList('assignedToEdit','assignedEditSpan');
 		var now = new Date();
 		now.setDate(now.getDate() + 30)
 	    formatDate(now);
@@ -1036,6 +1048,7 @@ function commentChange(resolveDiv,formName) {
 		$("#mustVerifyTd").css('display', 'block');
 		$("#mustVerifyEditTr").css('display', 'table-row');
 		$("#assignedToEditedId").css('display', 'none');
+		$("#assignedToTrEditId").css('display', 'none');
 		$("#dueDateEditId").css('display', 'none');
 		$('#workFlowTransitionTrId').css('display','none')
 		$('#predecessorHeadTrId').css('display','none')
@@ -1057,6 +1070,7 @@ function commentChange(resolveDiv,formName) {
 		$("#mustVerifyEditTr").css('display', 'none');
 		$("#issueItemId").html('<label for="comment">Comment:</label>');
 		$("#assignedToEditedId").css('display', 'none');
+		$("#assignedToTrEditId").css('display', 'none');
 		$("#dueDateEditId").css('display', 'none');
 		$("#commentEditId").html('<label for="comment">Comment:</label>');
 		$('#workFlowTransitionTrId').css('display','none')
@@ -1125,7 +1139,7 @@ function updateAssetCommentIcon( assetComments ){
 //
 // Invoked by createCommentForm and editCommentDialog to make Ajax call to persist changes of new and existing assetComment classes
 //
-function resolveValidate(formName, idVal, redirectTo) {
+function resolveValidate(formName, idVal, redirectTo,open) {
 	// Bump the list timer if it exists
 	if ($("#selectTimedId").length > 0){ timedUpdate($("#selectTimedId").val()) }
 
@@ -1155,7 +1169,7 @@ function resolveValidate(formName, idVal, redirectTo) {
 		var params = { 'comment':$('#comment').val(), 'commentType':$('#commentType').val(),
 			'isResolved':$('#isResolved').val(), 'resolution':$('#resolution').val(),
 			'mustVerify':$('#mustVerify').val(), 'category':$('#createCategory').val(),
-			'assignedTo':$('#assignedTo').val(), 'dueDate':$('#dueDateCreateId').val(),
+			'assignedTo':$('#assignedToSave').val(), 'dueDate':$('#dueDateCreateId').val(),
 			'moveEvent':$('#moveEvent').val(), 'status':$('#statusId').val(),
 			'estStart':$('#estStartCreateId').val(), 'estFinish':$('#estFinishCreateId').val(),
 			'actStart':$('#actStartCreateId').val(), 'workflowTransition':$('#workFlowId').val(),
@@ -1175,19 +1189,20 @@ function resolveValidate(formName, idVal, redirectTo) {
 		var params = { 'comment':$('#commentEditId').val(), 'commentType':$('#commentTypeEditId').val(),
 			'isResolved':$('#isResolvedEditId').val(), 'resolution':$('#resolutionEditId').val(), 
 			'mustVerify':$('#mustVerifyEditId').val(), 'category':$('#categoryEditId').val(), 
-			'assignedTo':$('#assignedToEditId').val(), 'dueDate':$('#dueDateEdit').val(), 
+			'assignedTo':$('#assignedToEdit').val(), 'dueDate':$('#dueDateEdit').val(), 
 			'moveEvent':$('#moveEventEditId').val(), 'status':$('#statusEditId').val(),
 //			'note':$('#noteEditId').val(),'assetEntity.id':$('#assetValueId').val(),
 			'estStart':$('#estStartEditId').val(), 'estFinish':$('#estFinishEditId').val(),
 			'actStart':$('#actStartEditId').val(), 'workflowTransition':$('#workFlowId').val(),
-			'hardAssigned':$('#hardAssigned').val(),'priority':$('#priorityEdit').val(),
+			'hardAssigned':$('#hardAssignedEdit').val(),'priority':$('#priorityEdit').val(),
 			'duration':$('#durationEdit').val(),'durationScale':$('#durationScaleEdit').val(),
 			'overRide':$('#overRideEdit').val(),'role':$('#roleTypeEdit').val(),
 			'note':$('#noteEditId').val(),'taskDependency' : $("#taskDependencyEditId").val(),
-			'id':objId,'taskDependency' : predArr };
+			'id':objId,'taskDependency' : predArr,'open':open};
 		var completeFunc = function(e) { updateCommentsOnList(e); }
 	}
 	if (redirectTo) { completeFunc = function(e) { updateCommentsLists(e); } }
+	else if(open=='view'){ completeFunc = function(e) { showAssetCommentDialog( e , 'show'); } }
 	
 	jQuery.ajax({
 		url: url,
@@ -1286,6 +1301,7 @@ function showModel(id){
 function createNewAssetComment(asset, assetName){
 	setAssetId( asset )
 	updateWorkflowTransitions( asset, "general", "workFlowTransitionId", "predecessorId",'' );
+	updateAssignedToList('assignedToSave','assignedCreateSpan');
 	var name = assetName
 	$('#createCommentDialog').dialog('option', 'width', 'auto');
 	$('#assetEntityTrId').css('display','table-row')
@@ -1306,6 +1322,7 @@ function createNewAssetComment(asset, assetName){
 function createComments(asset, assetName){
 	setAssetId( asset )
 	updateWorkflowTransitions( asset, "general", "workFlowTransitionId", "predecessorId", '');
+	updateAssignedToList('assignedToSave','assignedCreateSpan');
 	var name = assetName
 	$('#workFlowTransitionTrId').css('display','none')
 	$('#predecessorTr').css('display','none')
@@ -1418,5 +1435,12 @@ function fillPredecessor(id, category){
 	  newArray[newArray.length] = arrayName[i];
 	  }
 	  return newArray;
+}
+function updateAssignedToList(forView,span){
+	new Ajax.Request('../assetEntity/updateAssignedToSelect?forView='+forView,{asynchronous:true,evalScripts:true,
+		 onComplete:function(e){
+			 $('#'+span).html(e.responseText)
+		 }
+	})
 }
 
