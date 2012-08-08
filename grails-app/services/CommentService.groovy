@@ -29,7 +29,7 @@ class CommentService {
 	 * @isNew - boolean flag that indicates if it is new or an update
 	 * @return map of the AssetComment data used to refresh the view
 	 */
-	def saveUpdateCommentAndNotes(session, params, isNew = true) {
+	def saveUpdateCommentAndNotes(session, params, isNew = true,flash) {
 		// Getting the loginUser should be abstracted into a service
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername(principal)
@@ -197,7 +197,8 @@ class CommentService {
 				}else if(assetComment.status=='Planned'||assetComment.status=='Pending'){
 					statusCss='asset_pending'
 				}
-			
+				
+		      flash.message = isNew ? "${assetComment} were Saved" : "${assetComment} were Updated"
 			def map = [ assetComment : assetComment, status : status ? true : false , cssClass:css,statusCss:statusCss ]
 
 			// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.

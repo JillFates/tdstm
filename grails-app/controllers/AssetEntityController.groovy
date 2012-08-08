@@ -1797,7 +1797,7 @@ class AssetEntityController {
 			taskDependencies.each() { taskDep ->
 				def task = taskDep.predecessor
 				def css = taskService.getCssClassForStatus(task.status)
-				def taskDesc = task.comment.length()>50 ? task.comment.substring(0,50): task.comment
+				def taskDesc = task.comment?.length()>50 ? task.comment.substring(0,50): task.comment
 				predecessorTable.append("""<tr class="${css}" onClick="showAssetComment(${task.id}, 'show')"><td>${task.category}</td><td>${task.taskNumber ? task.taskNumber+':' :''}<b>${taskDesc}</b></td>""")
 		    }
 			predecessorTable.append('</tbody></table>')
@@ -1830,13 +1830,15 @@ class AssetEntityController {
 			predEditTable.append("""<tr id="row_Edit_${taskDep.id}"  > <td>${selectCategory}</td><td id="taskDependencyEditTdId_${taskDep.id}">${predFortask}</td><td><a href="javascript:deleteRow('row_Edit_${taskDep.id}')"><span class="clear_filter"><u>X</u></span></a></td>""")
 			selectCategory = ""
 		}
+		def cssForCommentStatus = taskService.getCssClassForStatus(assetComment.status)
 		 
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
 		commentList << [ 
 			assetComment:assetComment, personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
 			dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo ?: "", assetName:assetComment.assetEntity?.assetName ?: "",
 			eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate ?: '',etStart:etStart, etFinish:etFinish,atStart:atStart,notes:notes,
-			workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,predEditTable:predEditTable,maxVal:maxVal+1 ]
+			workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,predEditTable:predEditTable,maxVal:maxVal+1,
+			cssForCommentStatus:cssForCommentStatus ]
 		render commentList as JSON
 	}
 	/* ----------------------------------------------------------------
@@ -1846,7 +1848,7 @@ class AssetEntityController {
 	 * @return assetComments
 	 * -----------------------------------------------------------------*/
 	def saveComment = {
-		def map = commentService.saveUpdateCommentAndNotes(session, params, true)
+		def map = commentService.saveUpdateCommentAndNotes(session, params, true,flash)
 		render map as JSON
 	}
 	/* ------------------------------------------------------------
@@ -1856,7 +1858,7 @@ class AssetEntityController {
 	 * @return assetComment
 	 * ------------------------------------------------------------ */
 	def updateComment = {
-		def map = commentService.saveUpdateCommentAndNotes(session, params, false)
+		def map = commentService.saveUpdateCommentAndNotes(session, params, false,flash)
 		if(params.open=='view'){
 			forward(action:'showComment',params:[id:params.id] )
 		}else{

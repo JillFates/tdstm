@@ -59,7 +59,7 @@
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
 				<label for="hardAssignedShow" >Fixed Assignment</label>&nbsp;&nbsp;
 				<span id="dueDateTrId">
-					<label for="dueDate">Due Date:</label>
+					<label for="dueDate">Due :</label>
 					<span id="dueDateId"></span>
 				</span>
 			</td>
@@ -68,7 +68,7 @@
 			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 			<td valign="top" class="value" id="createdById" colspan="3"></td>
 		</tr>
-		<tr class="prop">
+		<tr class="prop" id="commentShowTrId">
 			<td valign="top" class="name"><label for="commentType">Type:</label></td>
 			<td valign="top" class="value" id="commentTypeTdId" colspan="3"></td>
 		</tr>
@@ -139,11 +139,11 @@
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="status">Status:</label></td>
-			<td valign="top" class="value" id="statusShowId" colspan="3"></td>
+			<td valign="top" class="value" id="statusShowId" colspan="1" style="width: 20%"></td>
 		</tr>
 		<tr class = "issue" id="estStartShow" style="display: none">
-			<td valign="top" class="name"><label for="estStartShowId">Estimated Start:</label></td>
-			<td valign="top" class="value" id="estStartShowId"></td>
+			<td valign="top" class="name" nowrap="nowrap"><label for="estStartShowId">Estimated Start:</label></td>
+			<td valign="top" class="value" id="estStartShowId" nowrap="nowrap"></td>
 			<td valign="top" class="name" nowrap="nowrap"><label for="estFinishShowId">Estimated Finish:</label></td>
 			<td valign="top" class="value" id="estFinishShowId" nowrap="nowrap"></td>
 		</tr>

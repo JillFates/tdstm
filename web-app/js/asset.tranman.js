@@ -724,7 +724,11 @@ function showAssetDialog( e , action ) {
       		       updateWorkflowTransitions('', ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
       		     }
       		     $('#workFlowEditId').html(params.workflow)
-      		     $('#priorityShowId').html(ac.priority)
+      		     if(ac.priority==1||ac.priority==2){
+      		       $('#priorityShowId').html('<b>'+ac.priority+'</b>')
+      		     }else{
+      		    	 $('#priorityShowId').html(ac.priority)
+      		     }
       		     var duration = ac.duration ? ac.duration :''
       		     var durationScale = ac.durationScale ?ac.durationScale:''
       		     $('#durationShowId').html(duration +" "+ durationScale )
@@ -734,6 +738,7 @@ function showAssetDialog( e , action ) {
       		     
       		     $('#commentTypeEditTdId').css('display','none')
       	      	 $('#typeListTdId').css('display','none')
+      		     $('#commentShowTrId').css('display','none')
       		     $('#predecessorAddTr').css('display','table-row')
       		     $('#workFlowShow').css('display','table-row')
 	      		 $('#estFinishTrEditId').css('display','table-row')
@@ -768,6 +773,7 @@ function showAssetDialog( e , action ) {
 	      		$('#commentTypeEditId').removeAttr("disabled");
 	      		$('#commentTypeEditTdId').css('display','block')
      	      	$('#typeListTdId').css('display','block')
+     	      	$('#commentShowTrId').css('display','table-row')
 	      	 }
 			 if(ac.commentType=='instruction'){
 				 $('#mustVerifyId').css('display','table-row')
@@ -785,6 +791,8 @@ function showAssetDialog( e , action ) {
 		      	 $('#mustVerifyEditId').attr('checked', false);
 	      	 }
 	      	 $('#statusShowId').html(ac.status);
+	         $("#statusShowId").className = "";
+	      	 $('#statusShowId').addClass(params.cssForCommentStatus);
 	      	 $('#isResolvedEditId').val(ac.isResolved);
 	      	
 	      	 $('#dateResolvedId').html(params.dtResolved)
