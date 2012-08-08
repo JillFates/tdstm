@@ -28,7 +28,7 @@
 	</div>
 	<div class="issueTimebar" id="issueTimebar"><div id="issueTimebarId" ></div></div>
 	<div id="detailId"  style="display: none;position: absolute;width: 420px;margin-top: 40px;" > </div>
-	<div id="myIssueList" class="mobbodyweb">
+	<div id="myIssueList" class="mobbodyweb" style="width:100%">
 			<input id="issueId" name="issueId" type="hidden" value="" />
 			<input name="tab" type="hidden" value="${tab}" />								              	
 			<div id="mydiv" onclick="this.style.display = 'none';setFocus();">						            
@@ -39,7 +39,7 @@
 			</div>		
 			<div id="taskId" style="float:left; margin:2px 0; ">
 			</div>
-			<div id="assetIssueDiv" style="float:left;width:800px; ">
+			<div id="assetIssueDiv" style="float:left;width:100%; ">
 				<table id="issueTable" cellspacing="0px" style="width:100%;margin-left: -1px;">
 				<thead>
 					<tr>
