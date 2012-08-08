@@ -3,18 +3,21 @@ import java.text.SimpleDateFormat
 import com.tdssrc.grails.GormUtil
 class CustomTagLib {
 	static namespace = 'tds'
-	/*
-	 * 
+	
+	/**
+	 * Used to adjust a date to a specified timezone and format to the default (yyyy-MM-dd  kk:mm:ss) or one specified
 	 */
 	def convertDate = { attrs ->
 		Date dt = attrs['date'];
 		def tzId = attrs['timeZone']
+		def format = attrs['format'] ? attrs['format'] : 'yyyy-MM-dd  kk:mm:ss'
+		
 		String dtStr = dt.getClass().getName().toString();
 		String dtParam = dt.toString();	
 		
 		if(dtStr.equals("java.util.Date")){	
 			DateFormat formatter ; 
-			formatter = new SimpleDateFormat("yyyy-MM-dd  kk:mm:ss");
+			formatter = new SimpleDateFormat(format);
 			dt = GormUtil.convertInToUserTZ( dt, tzId )
 			dtParam = formatter.format(dt);		
 		}  
@@ -27,10 +30,11 @@ class CustomTagLib {
 		}
 	}
 	/*
-	 * 
+	 * Converts a date to User's Timezone and applies formating
 	 */
 	def convertDateTime = { attrs ->
 		Date dt = attrs['date'];
+		// TODO : convertDateTime - param formate is misspelled.  Also this should just use the date formatter instead of the multiple if/else conditions
 		def formate = attrs['formate'];
 		def tzId = attrs['timeZone']
 		String dtStr = dt.getClass().getName().toString();
