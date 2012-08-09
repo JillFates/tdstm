@@ -1818,7 +1818,7 @@ class AssetEntityController {
 		taskDependencies.each{ taskDep ->
 			def predecessor = taskDep.predecessor
 			log.error "predecessor=${predecessor}"
-			def selectCategory = new StringBuffer("<select id=\"predecessorCategoryEditId_${taskDep.id}\" name=\"category\" onChange='fillPredecessor(this.id,this.value)'>")
+			def selectCategory = new StringBuffer("<select id=\"predecessorCategoryEditId_${taskDep.id}\" name=\"category\" onChange='fillPredecessor(this.id,this.value,${assetComment.id})'>")
 			AssetComment.constraints.category.inList.each() {
 				def selected = it == predecessor.category ? 'selected="selected"' : ''
 				selectCategory.append("<option value=\"${it}\" ${selected}>${it}</option>")
@@ -3381,8 +3381,11 @@ class AssetEntityController {
 		}
 		render selectControl
 	}
-
-
+    
+	/**
+	 * @params: commentId
+	 * @return : HTML Select of prdecessor list
+	 */
 	def getPredecessor = {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
@@ -3404,6 +3407,11 @@ class AssetEntityController {
 		selectControl.append("</select>")
 		render selectControl
 	}
+	/**
+	 * @parmas: forView
+	 * @return: HTML select of staff belongs to company and TDS
+	 * 
+	 */
 	def updateAssignedToSelect = {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id

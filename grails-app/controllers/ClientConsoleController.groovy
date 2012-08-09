@@ -294,7 +294,6 @@ class ClientConsoleController {
 				
 				Set workflowCodeListForMoveBundle = MoveBundle.findAllByMoveEvent(moveEventInstance).workflowCode
 			    def workflowCodeListForMoveBundleLength = workflowCodeListForMoveBundle.size()
-				
 	            return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
 					column1List:column1List, column2List:column2List,column3List:column3List, column4List:column4List,projectId:projectId, lastPoolTime : lastPoolTime,
 	                processTransitionList:processTransitionList,projectId:projectId,column2Value:params.column2,column1Value:params.column1,

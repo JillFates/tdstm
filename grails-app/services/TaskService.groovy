@@ -97,7 +97,7 @@ class TaskService {
 		def projectId = project.id
 		
 		def selectControl = new StringBuffer("""<select id="${idPrefix}_${taskDependency.id}" name="${name}">""")
-		String queryForPredecessor = "FROM AssetComment a WHERE a.project=${projectId} AND a.category='${category}' AND a.commentType='${AssetCommentType.TASK}' "
+		String queryForPredecessor = "FROM AssetComment a WHERE a.project=${projectId} AND a.category='${category}' AND a.commentType='${AssetCommentType.TASK}' ORDER BY a.taskNumber"
 		def predecessors = AssetComment.findAll(queryForPredecessor)
 		predecessors.each{
 			def selected = it.id == predecessor.id ?  'selected="selected"' : ''

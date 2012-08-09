@@ -99,7 +99,7 @@
 			<td valign="top" class="value" id="assetShowValueId" colspan="3"></td>
 		</tr>
 		<tr class="prop">
-			<td valign="top" class="name"><label for="comment">Description:</label></td>
+			<td valign="top" class="name"><label for="comment"><b>Description:</b></label></td>
 			<td valign="top" class="value" colspan="3">
 				<textarea cols="80" rows="2" id="commentTdId" readonly="readonly"></textarea>
 			</td>
@@ -174,7 +174,7 @@
       onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 'auto');$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
 	</span>
 	<span class="button"> <input class="delete" type="button" value="Delete"
-	onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment',controller:'assetEntity', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'never\')')}" />
+	 onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment',controller:'assetEntity', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'never\')')}" />
 	</span>
 	</div>
    </tds:hasPermission>
@@ -300,7 +300,7 @@
 	<div style="display: none;">
 	<table id="taskDependencyRow">
 	<tr>
-		<td><g:select id="predecessorCategoryId" class="predecessor" name="predecessorCategoryCreate" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general" noSelection="['':'please select']" onChange="fillPredecessor(this.id, this.value)"/></td>
+		<td><g:select id="predecessorCategoryId" class="predecessor" name="predecessorCategoryCreate" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general" noSelection="['':'please select']" onChange="fillPredecessor(this.id, this.value,'')"/></td>
 		<td id="taskDependencyTdId"></td>
 	 </tr>
 	</table>
@@ -540,7 +540,7 @@
 	
 	<input class="save" type="button" value="Save and view" onclick="resolveValidate('editCommentForm','updateCommentId','','view');" />
 	</span>
-	<span class="button">
+	<span id="deleteCommentId" class="button">
 	<g:if test="${rediectTo}">
 	<input class="delete" type="button" value="Delete"
 		onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment',controller:'assetEntity', params:'\'id=\' + $(\'#updateCommentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'updateCommentsLists()')}" />

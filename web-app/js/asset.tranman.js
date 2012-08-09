@@ -667,7 +667,7 @@ function showAssetDialog( e , action ) {
 			      	 $('#assignedToEdit').val(params.assignedTo.id)
 	      		 }
 	      		 var notes = params.notes
-	      		 var noteTable = '<table border=0>'
+	      		 var noteTable = '<table style="border:0px">'
       		     for(i=0; i<params.notes.length; i++){
       		    	 if (i>0) {
       		    		 noteTable += ""
@@ -681,8 +681,9 @@ function showAssetDialog( e , action ) {
       		    	$('#predecessorShowTr').css('display','table-row')
       		     }
                  $('#predecessorShowTd').html(params.predecessorTable)
-                 $('#taskNumberId').html('# : '+'<b>'+ac.taskNumber+'</b>')
-                 $('#taskNumberSpanEditId').html('# : '+'<b>'+ac.taskNumber+'</b>')
+                 var taskNumber = ac.taskNumber ? ac.taskNumber : '&nbsp;&nbsp;'
+                 $('#taskNumberId').html('Task # : '+'<b>'+taskNumber +'</b>')
+                 $('#taskNumberSpanEditId').html('Task # : '+'<b>'+ac.taskNumber+'</b>')
                  $('#successorShowTd').html(params.successorTable)
                  $('#predecessorEditId').html(params.predEditTable)
                  $('#predecessorTrEditId').css('display','table-row')
@@ -716,9 +717,11 @@ function showAssetDialog( e , action ) {
       		     $('#actStartEditId').val(params.atStart)
       		     $('#actFinishShowId').html(params.dtResolved)
       		     $('#actFinishEditId').val(params.dtResolved)
-      		     if(params.workflow)
+      		     if(params.workflow){
       		      $('#workFlowShowId').html(params.workflow)
+      		     }else{
       		      $('#workFlowShow').css('display','none')
+      		     }
       		     if(ac.assetEntity){
       		       updateWorkflowTransitions(ac.assetEntity.id, ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
       		     }else{
@@ -756,6 +759,7 @@ function showAssetDialog( e , action ) {
 			     $('#assetTrShowId').css('display','block')
 		         $('#commentTypeEditId').attr("disabled","disabled");
       		     $('.issue').css('display','table-row')
+      		     $('#deleteCommentId').css('display','none')
 			     if(ac.assetEntity==null){
 			    	$('#moveShowId').css('display','table-row')
 			    	$('#assetShowId').css('display','none')
@@ -771,6 +775,7 @@ function showAssetDialog( e , action ) {
 			     }
 	      	 } else {
 	      		$('.issue').css('display','none')
+	      		$('#deleteCommentId').css('display','block')
 	      		$('#commentTypeEditId').removeAttr("disabled");
 	      		$('#commentTypeEditTdId').css('display','block')
      	      	$('#typeListTdId').css('display','block')
@@ -1180,10 +1185,14 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 	// Get params from create or update forms approppriately
 	var predArr = new Array();
 	if (formName == "createCommentForm") {
+		$('#taskDependencyTdId').html("")
+		$('#relatedIssueEditId').html("")
+		
 		$('select[name="taskDependencySave"]').each(function(){
 			predArr.push($(this).val())
 	    });
 	    predArr = removeDuplicateElement(predArr)
+	    $('#predecessorTableId').html("")
 		var url = '../assetEntity/saveComment'
 		var params = { 'comment':$('#comment').val(), 'commentType':$('#commentType').val(),
 			'isResolved':$('#isResolved').val(), 'resolution':$('#resolution').val(),
@@ -1418,10 +1427,10 @@ function addPredecessor(issueCategory,predecessorCategory,comment,row,span){
 		     $('#taskDependencyTdId').html(e.responseText)
 	         var taskRow
 	         if(comment){
-	           taskRow =  $('#taskDependencyRow tr').html().replace("predecessorCategoryId","predecessorCategoryId_"+rowNo).replace("taskDependencyId","taskDependencyEditId_"+rowNo).replace("taskDependencyTdId","taskDependencyEditTdId_"+rowNo).replace("taskDependencyEditId","taskDependencyEditId_"+rowNo)
+	           taskRow =  $('#taskDependencyRow tr').html().replace("predecessorCategoryId","predecessorCategoryId_"+rowNo).replace("taskDependencyId","taskDependencyEditId_"+rowNo).replace("taskDependencyTdId","taskDependencyEditTdId_"+rowNo).replace("taskDependencyEditId","taskDependencyEditId_"+rowNo).replace("fillPredecessor(this.id, this.value,'')","fillPredecessor(this.id, this.value,"+commentId+")")
 	            $('#predecessorEditTableId').append("<tr id='row_Edit_"+rowNo+"'>"+taskRow+"<td><a href=\"javascript:deleteRow(\'row_Edit_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td><tr>")
 	         }else{
-	           taskRow =  $('#taskDependencyRow tr').html().replace("predecessorCategoryId","predecessorCategoryId_"+rowNo).replace("taskDependencyId","taskDependencyId_"+rowNo).replace("taskDependencyTdId","taskDependencySaveTdId_"+rowNo).replace("taskDependencyEditId","taskDependencyEditId_"+rowNo).replace(' name="taskDependencyEdit"','name="taskDependencySave"')
+	           taskRow =  $('#taskDependencyRow tr').html().replace("predecessorCategoryId","predecessorCategoryId_"+rowNo).replace("taskDependencyId","taskDependencyId_"+rowNo).replace("taskDependencyTdId","taskDependencySaveTdId_"+rowNo).replace("taskDependencyEditId","taskDependencyEditId_"+rowNo).replace(' name="taskDependencyEdit"','name="taskDependencySave"').replace("fillPredecessor(this.id, this.value,'')","fillPredecessor(this.id, this.value,'')")
 	            $('#predecessorTableId').append("<tr id='row_d_"+rowNo+"'>"+taskRow+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
 	         }
 		     
@@ -1433,9 +1442,9 @@ function addPredecessor(issueCategory,predecessorCategory,comment,row,span){
 		 }
 	})
 }
-function fillPredecessor(id, category){
+function fillPredecessor(id, category,commentId){
 	var row = id.split('_')[1]
-	new Ajax.Request('../assetEntity/getPredecessor?category='+category,{asynchronous:true,evalScripts:true,
+	new Ajax.Request('../assetEntity/getPredecessor?category='+category+'&assetCommentId='+commentId,{asynchronous:true,evalScripts:true,
 		 onComplete:function(e){
 			 var resp =  e.responseText.replace('taskDependencyId','taskDependencyId_'+row)
 			 var data = e.responseText

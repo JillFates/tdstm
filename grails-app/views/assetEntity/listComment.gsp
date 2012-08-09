@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
 <meta name="layout" content="projectHeader" />
-        <title>Comment List</title>
+        <title>Task List</title>
          <g:javascript src="asset.tranman.js" />
           <g:javascript src="entity.crud.js" />
         <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
@@ -36,7 +36,7 @@
 <body>
   <div class="body">
    <div class="body">
-            <h1>Comment List</h1>
+            <h1>Task List</h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
@@ -66,7 +66,7 @@
 				        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" nowrap>
 				        		<a href="javascript:showAssetComment(${commentInstance?.id}, 'edit')"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="taskNumber" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+							<jmesa:htmlColumn property="taskNumber" title="Task" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.taskNumber ? commentInstance.taskNumber :''}</span>
 							 </jmesa:htmlColumn>
                             <jmesa:htmlColumn property="comment" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Description" nowrap>
@@ -82,7 +82,7 @@
 							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.commentType}</span>
 							 </jmesa:htmlColumn>
 							 <jmesa:htmlColumn property="status" title="Status" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.status}</span>
+							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');" class="task_${commentInstance.status?.toLowerCase()}">${commentInstance.status}</span>
 							 </jmesa:htmlColumn>
 							 <jmesa:htmlColumn property="assignedToString" title="Assigned To" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
         	                 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.assignedTo}</span>
@@ -94,9 +94,6 @@
         	                 --%><jmesa:htmlColumn property="assetName" title="Asset" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
         	                 	<span onclick="javascript:getEntityDetails('listComment', '${commentInstance.assetEntity?.assetType}', '${commentInstance.assetEntity?.id}');">${commentInstance.assetEntity?.assetName}</span>
         	                 </jmesa:htmlColumn>
-            	             <jmesa:htmlColumn property="isResolved"  sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-            	             	<span style="align:center;" onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><g:if test ="${commentInstance.commentType =='issue' && commentInstance.isResolved == 1}"><g:checkBox name="myCheckbox" value="${true}" disabled="true"/></g:if><g:else>&nbsp</g:else></span>
-            	             </jmesa:htmlColumn>
                 	         <jmesa:htmlColumn width="50px" property="assetEntity.assetType" sortable="true" filterable="true" title="AssetType">
                 	         	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance?.assetEntity?.assetType}</span>
                 	         </jmesa:htmlColumn>
