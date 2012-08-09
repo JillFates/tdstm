@@ -254,6 +254,11 @@ class UserLoginController {
 			userPreference.preferenceCode = "START_PAGE"
 			userPreference.value = "Current Dashboard"
 			userPreference.save( insert: true)
+			def tZPreference = new UserPreference()
+			tZPreference.userLogin = userLoginInstance
+			tZPreference.preferenceCode = "CURR_TZ"
+			tZPreference.value = "EDT"
+			tZPreference.save( insert: true)
             flash.message = "UserLogin ${userLoginInstance} created"
             redirect( action:show, id:userLoginInstance.id, params:[ companyId:companyId ] )
         }
