@@ -27,14 +27,11 @@
             </div>
             <div>
 	            <form name="companyForm">
-			         <jmesa:tableFacade id="tag" items="${partyGroupList}" maxRows="25" stateAttr="restore" var="partyGroupInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
+			         <jmesa:tableFacade id="tag" items="${partyGroupList}" maxRows="100" stateAttr="restore" var="partyGroupInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
 			             <jmesa:htmlTable style=" border-collapse: separate">
 			                 <jmesa:htmlRow highlighter="true">
-			                 	 <jmesa:htmlColumn property="id" title ="Action" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-		                         		<g:link action="show" id="${partyGroupInstance.id}"><input type="button" value="Select"  /></g:link>
-								 </jmesa:htmlColumn>
 			                     <jmesa:htmlColumn property="name" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-									<g:link action="edit" id="${partyGroupInstance.id}" title="Edit  '${partyGroupInstance.name}'">${partyGroupInstance.name}</g:link>
+									<g:link action="show" id="${partyGroupInstance.id}" title="Show  '${partyGroupInstance.name}'">${partyGroupInstance.name}</g:link>
 								 </jmesa:htmlColumn>
 			                     <jmesa:htmlColumn property="dateCreated" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor"><tds:convertDateTime date="${partyGroupInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
 			                     <jmesa:htmlColumn property="lastUpdated" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor"><tds:convertDateTime date="${partyGroupInstance?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>

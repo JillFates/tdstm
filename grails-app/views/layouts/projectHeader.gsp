@@ -122,7 +122,7 @@
 					</td>
 					<td style="vertical-align:top"><span class="megamenuSection">Manage Clients</span><br />
 						<ul >
-							<li><g:link class="mmlink" controller="partyGroup" id="${partyGroup}" onclick="hideMegaMenu('adminMegaMenu')">List Companies</g:link></li>
+							<li><g:link class="mmlink" controller="partyGroup" action="list" params="[active:'active',tag_s_2_name:'asc']" id="${partyGroup}" onclick="hideMegaMenu('adminMegaMenu')">List Companies</g:link></li>
 							<li><g:link class="mmlink" controller="person" id="${partyGroup}" onclick="hideMegaMenu('adminMegaMenu')">List Staff</g:link></li>
 							<li><g:link class="mmlink" controller="userLogin" id="${partyGroup}" onclick="hideMegaMenu('adminMegaMenu')">List Users</g:link></li>
 							<tds:hasPermission permission='HelpMenuView'>
