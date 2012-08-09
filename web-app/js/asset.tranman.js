@@ -682,6 +682,7 @@ function showAssetDialog( e , action ) {
       		     }
                  $('#predecessorShowTd').html(params.predecessorTable)
                  $('#taskNumberId').html('# : '+'<b>'+ac.taskNumber+'</b>')
+                 $('#taskNumberSpanEditId').html('# : '+'<b>'+ac.taskNumber+'</b>')
                  $('#successorShowTd').html(params.successorTable)
                  $('#predecessorEditId').html(params.predEditTable)
                  $('#predecessorTrEditId').css('display','table-row')

@@ -196,9 +196,6 @@
 	<div>
 		<table id="createCommentTable" style="border: 0px;">
 		<tr class="prop" id="assignedToId" style="display: none">
-		<% // TODO - the list of users should be in the model and not in the view %>
-		<% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ?  " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;
-		   def roleList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).roleTypeCodeTo;%>
 			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
 			<td valign="top" nowrap="nowrap" colspan="3">
 				<span id="assignedCreateSpan"></span>
@@ -307,7 +304,7 @@
 		<table id="createResolveTable" style="border: 0px">
 		<tr class="prop" id="estStartTrId" style="display: none">
 			<td valign="top" class="name"><label for="estStartTrId">Estimated start:</label></td>
-			<td valign="top" class="value" colspan="3">
+			<td valign="top" class="value" colspan="3" >
 			      <script type="text/javascript">
 				   jQuery(function($){$('.datetimeRange').datetimepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script> <input type="text" class="datetimeRange" size="15" style="" name="estStart" id="estStartCreateId"
@@ -362,10 +359,9 @@
   <div>
 	<table id="updateCommentTable" style="border: 0px;">
 	   <% // TODO : Replace DB lookup in GSP with data from controller %>
-      <% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
 	   <tr class="prop issue" id="assignedToTrEditId" style="display: none">
 			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
-			<td valign="top" id="assignedToEditTdId" style="display: none;" class="issue"  colspan="2" nowrap="nowrap">
+			<td valign="top" id="assignedToEditTdId" style="display: none;" class="issue"  colspan="3" nowrap="nowrap">
                
                 <span id="assignedEditSpan"> </span>
               
@@ -374,12 +370,12 @@
 				<input type="checkbox" id="hardAssignedEdit" name="hardAssignedEdit" value="1"  checked="checked"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
 				<label for="hardAssignedEdit" >Fixed Assignment</label>
-			</td>
-			<td valign="top" class="name" id="dueDateEditId" ><label for="dueDate">DueDate:</label>
+			    <label for="dueDate">Due:</label>
 				<script type="text/javascript" charset="utf-8">
 				jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 				</script><input type="text" class="dateRange" size="15" style="" name="dueDateEdit" id="dueDateEdit"
-					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+			</td>
 		</tr>
 		<tr>
 			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
@@ -400,13 +396,15 @@
 				</div>
 			</td>
 			<td valign="top" class="name"><label for="category">Category:</label>
-			<td>
+			<td width="10px">
 				<g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
-				onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionId', 'predecessorId',jQuery('#createAssetCommentId').html())"></g:select></td>
+				onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionId', 'predecessorId',jQuery('#createAssetCommentId').html())"></g:select>
+				<span id="taskNumberSpanEditId"></span>
+        	    <label for="priority">Priority:</label>
+            	<g:select id="priorityEdit" name="priorityEdit" from="${1..5}" value="" noSelection="['':'please select']"></g:select>
 			</td>
-        	<td valign="top" class="name" ><label for="priority">Priority:</label>
-            	<g:select id="priorityEdit" name="priorityEdit" from="${1..5}" value=""
-            	noSelection="['':'please select']"></g:select>
+        	<td valign="top" class="name" >
+        	
         	</td>
         </tr>
 		<tr class="prop" id="mustVerifyEditTr" style="display: none;">
@@ -418,11 +416,21 @@
 		</tr>
 		<tr class="prop" id="workFlowTransitionEditTrId" style="display: none">
 			<td valign="top" class="name"><label for="workFlowTransitionEditId">WorkFlow Step:</label></td>
-			<td valign="top" class="value" id="workFlowTransitionEditId"></td>
-			<td colspan="2">
+			<td valign="top" class="value" >
+			 <span id="workFlowTransitionEditId"></span>
 			<input type="checkbox" id="overRideEdit" name="overRide" value="0"
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
 			 <label for="overRideEdit" >Overridden</label>
+			</td>
+		</tr>
+		<tr id="assetTrId" class="prop">
+			<td valign="top" class="name" id="assetEditTd"><label for="asset">Asset:</label></td>
+			<td valign="top" class="value"  id="assetTrShowId" colspan="3"></td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name" id="commentEditTdId"><label for="comment">Description:</label></td>
+			<td valign="top" class="value" colspan="3">
+				<textarea cols="80" rows="2" id="commentEditId" name="comment"></textarea>
 			</td>
 		</tr>
 		<tr class="prop" id="predecessorAddTr" style="display: none">
@@ -439,7 +447,7 @@
 			</td>
 		</tr>
         <tr class="prop" id="predecessorTrEditId" style="display: none">
-			<td valign="top" class="name"><label for="predecessorEditId">Pred:</label></td>
+			<td valign="top" class="name"></td>
 			<td valign="top" class="value" id="predecessorEditId" colspan="3"></td>
 		</tr>
 		<tr class="prop" id="moveEventEditTrId" style="display: none">
@@ -454,28 +462,27 @@
 			<td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
 			<td valign="top" class="value" id="commentCodeEditId" colspan="3"></td>
 		</tr>
-		<tr id="assetTrId" class="prop">
-			<td valign="top" class="name" id="assetEditTd"><label for="asset">Asset:</label></td>
-			<td valign="top" class="value"  id="assetTrShowId" colspan="3"></td>
-		</tr>
-		<tr class="prop">
-			<td valign="top" class="name" id="commentEditTdId"><label for="comment">Description:</label></td>
-			<td valign="top" class="value" colspan="3">
-				<textarea cols="80" rows="4" id="commentEditId" name="comment"></textarea>
-			</td>
-		</tr>
+		
 		<tr id="durationEditId" class="prop" style="display: none">
         	<td valign="top" class="name"><label for="durationEdit ">Duration:</label></td>
         	<td valign="top" class="value" colspan="3">
-        	  <input type="text" id="durationEdit" name="durationEdit" value="">
-            	<g:select id="durationScaleEdit" name="durationScaleEdit " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m">
-            	</g:select>
+        	  <input type="text" id="durationEdit" name="durationEdit" value="" size="5"/>
+            	<g:select id="durationScaleEdit" name="durationScaleEdit " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>
         	</td>
 		</tr>
 	</table>
   </div>
   <div id="editResolveDiv" style="display: none;" class="issue">
 	<table id="updateResolveTable" style="border: 0px;">
+	    <tr class="prop">
+			<td valign="top" class="name"><label for="status">Status:</label></td>
+			<td colspan="3">
+			<script type="text/javascript" charset="utf-8">
+             </script>
+				<g:select id="statusEditId" name="statusEdit" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Pending"
+				noSelection="['':'please select']" onChange="showResolve(this.value)"></g:select>
+			</td>
+		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="notes">Previous Notes:</label></td>
 			<td valign="top" class="value" colspan="3"><div id="previousNote" style="width: 100%;"></div></td>
@@ -484,15 +491,6 @@
 			<td valign="top" class="name"><label for="notes">Note:</label></td>
 			<td valign="top" class="value" colspan="3">
 			   <textarea cols="80" rows="4" id="noteEditId" name="note"></textarea>
-			</td>
-		</tr>
-		<tr class="prop">
-			<td valign="top" class="name"><label for="status">Status:</label></td>
-			<td colspan="3">
-			<script type="text/javascript" charset="utf-8">
-             </script>
-				<g:select id="statusEditId" name="statusEdit" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Pending"
-				noSelection="['':'please select']" onChange="showResolve(this.value)"></g:select>
 			</td>
 		</tr>
 	    <tr class="prop issue" id="estStartEditTrId" style="display: none">
