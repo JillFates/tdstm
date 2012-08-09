@@ -792,7 +792,7 @@ function showAssetDialog( e , action ) {
 		      	 $('#mustVerifyEditId').attr('checked', false);
 	      	 }
 	      	 $('#statusShowId').html(ac.status);
-	         $("#statusShowId").removeAttr("class");
+	         $("#statusShowId").removeAttr('class')
 	      	 $('#statusShowId').addClass(params.cssForCommentStatus);
 	      	 $('#isResolvedEditId').val(ac.isResolved);
 	      	
@@ -1019,15 +1019,21 @@ function createIssue(){
 }	
 function commentChange(resolveDiv,formName) {
 	var type = 	document.forms[formName].commentType.value;
+	$("#commentTypeCreateTdId").css('display', 'compact');
 	if(type == "issue"){
 		updateAssignedToList('assignedToEdit','assignedEditSpan');
-		var now = new Date();
-		now.setDate(now.getDate() + 30)
-	    formatDate(now);
+		//var now = new Date();
+		//now.setDate(now.getDate() + 30)
+	    //formatDate(now);
 //		$("#dueDateTrId").css('display', 'table-row');
 		$("#assignedToId").css('display', 'table-row');
 		$("#assignedToTrEditId").css('display', 'table-row');
 		$("#assignedToEditTdId").css('display', 'table-row');
+		
+		$("#typeCommentCreateId").css('display', 'none');
+		$("#commentTypeCreateTdId").css('display', 'none');
+		
+		
 		$("#issueItemId").html('<label for="comment">Issue:</label>');
 		$("#mustVerifyTd").css('display', 'none');
 		$("#mustVerifyEditTr").css('display', 'none');
@@ -1053,6 +1059,8 @@ function commentChange(resolveDiv,formName) {
 		$("#mustVerifyEditId").css('display', 'block');
 		$(resolveDiv).css('display', 'none');
 //		$("#dueDateTrId").css('display', 'none');
+		//$("#typeCommentCreateId").css('display', 'table-row');
+		//$("#commentType").css('display', 'table-row');
 		$("#assignedToId").css('display', 'none');
 		$("#mustVerifyTd").css('display', 'block');
 		$("#mustVerifyEditTr").css('display', 'table-row');
@@ -1074,6 +1082,8 @@ function commentChange(resolveDiv,formName) {
 		document.forms[formName].mustVerify.value = 0;
 		$(resolveDiv).css('display', 'none');
 //		$("#dueDateTrId").css('display', 'none');
+		//$("#typeCommentCreateId").css('display', 'table-row');
+		//$("#commentType").css('display', 'table-row');
 		$("#assignedToId").css('display', 'none');
 		$("#mustVerifyTd").css('display', 'none')
 		$("#mustVerifyEditTr").css('display', 'none');
@@ -1339,6 +1349,10 @@ function createComments(asset, assetName){
 	$('#assetEntityTrId').css('display','table-row')
 	$('#assetEntityInputId').html(name)
 	$('#createCommentDialog').dialog('open');
+	$('#typeCommentCreateId').removeAttr('style')
+	$('#commentTypeCreateTdId').removeAttr('style')
+	//$("#typeCommentCreateId").css('display', 'table-row');
+	//$("#commentTypeCreateTdId").css('display', 'table-row');
 	document.createCommentForm.mustVerify.value=0;
 	document.createCommentForm.reset();
 	commentChange('#createResolveDiv','createCommentForm');
@@ -1353,7 +1367,7 @@ function updateCommentsLists(){
 	window.location.reload();
 }
 
-function formatDate(dateValue){
+/*function formatDate(dateValue){
 	    var M = "" + (dateValue.getMonth()+1);
 	    var MM = "0" + M;
 	    MM = MM.substring(MM.length-2, MM.length);
@@ -1363,7 +1377,7 @@ function formatDate(dateValue){
 	    var YYYY = "" + (dateValue.getFullYear()); 
         var currentDate = MM + "/" +DD + "/" + YYYY
         $("#dueDateCreateId").val(currentDate);
-}
+}*/
 function formatDueDate(input){
 	 var currentDate = ""
 	 if(input){

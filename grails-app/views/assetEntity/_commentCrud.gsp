@@ -207,16 +207,20 @@
 				<label for="dueDate">Due:</label>
 				<script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-                  </script> <input type="text" class="dateRange" size="15" style="" name="dueDate" id="dueDateCreateId"
+                  </script> <input type="text" class="dateRange" size="10" style="" name="dueDate" id="dueDateCreateId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 		</tr>
-		<tr class="prop">
-			<td valign="top" class="name"><label for="commentType">Type:</label></td>
-			<td style="">
+		<tr class="prop" >
+			<td valign="top" class="name" id="typeCommentCreateId" ><label for="commentType">Type:</label></td>
+			<td  id="commentTypeCreateTdId" class="name" nowrap="nowrap">
 				<g:select id="commentType" name="commentType" from="${com.tds.asset.AssetComment.constraints.commentType.inList}" value="comment"
 				onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;
-				<label for="category">Category:</label>
+			</td>
+			<td>
+				<label id="categoryLabelId" for="category" >Category:</label>
+			</td>
+			<td>
             	<g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
             	noSelection="['':'please select']" onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionId', 'predecessorId','')"></g:select>
         		&nbsp;&nbsp;
@@ -240,6 +244,18 @@
 			 <label for="overRide" >Overridden</label>
 			</td>
 		</tr>
+		<tr class="prop" id="assetEntityTrId">
+        	<td valign="top" class="name"><label for="category">Asset Name:</label></td>
+        	<td valign="top" class="value" colspan="3">
+            	<span id="assetEntityInputId"></span>
+        	</td>
+		</tr>
+		<tr class="prop">
+			<td id="issueItemId" valign="top" class="name"><label for="comment">Description:</label></td>
+			<td valign="top" class="value" colspan="4">
+				<textarea cols="80" rows="2" id="comment" name="comment"></textarea>
+			</td>
+		</tr>
 		<tr class="prop" id="predecessorHeadTrId" style="display: none">
 			<td valign="top" class="name" colspan="4">
 				<label for="actStartTrId">Predecessors</label>
@@ -247,10 +263,10 @@
 			</td>
 		</tr>
 		<tr class="prop" id="predecessorTr" style="display: none">
-			<td valign="top" class="name"><label for="actStartTrId">Pred:</label>
+			<td valign="top" class="name">
 			</td>
 			<td valign="top" class="value" id="workFlowTransitionId" colspan="3">
-			   <table>
+			   <table style="border: 0px">
 			    <tbody id="predecessorTableId"></tbody>
 			   </table>
 			</td>
@@ -264,12 +280,7 @@
 				noSelection="['':'please select']" onChange="showResolve(this.value)"></g:select>
 			</td>
 		</tr>
-		<tr class="prop" id="assetEntityTrId">
-        	<td valign="top" class="name"><label for="category">Asset Name:</label></td>
-        	<td valign="top" class="value" colspan="3">
-            	<span id="assetEntityInputId"></span>
-        	</td>
-		</tr>
+		
 		<tr class="prop" id="moveEventTrId" style="display: none">
 			<td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
 			<td valign="top" class="value" colspan="3">
@@ -277,16 +288,10 @@
 				 optionKey='id' optionValue="name" noSelection="['':'please select']"></g:select>
 			</td>
 		</tr>
-		<tr class="prop">
-			<td id="issueItemId" valign="top" class="name"><label for="comment">Description:</label></td>
-			<td valign="top" class="value" colspan="3">
-				<textarea cols="80" rows="4" id="comment" name="comment"></textarea>
-			</td>
-		</tr>
 		<tr id="durationTrId" class="prop" style="display: none">
         	<td valign="top" class="name"><label for="duration ">Duration:</label></td>
         	<td valign="top" class="value" colspan="3">
-        	  <input type="text" id="duration" name="duration" value="">
+        	  <input type="text" id="duration" name="duration" value="" size="5">
             	<g:select id="durationScale" name="durationScale " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>
         	</td>
 		</tr>
