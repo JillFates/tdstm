@@ -68,14 +68,14 @@
 					<tr id="showStatusId_${issue?.item?.id}" style="display: none;" > 
 						<td nowrap="nowrap" colspan="5" class="statusButtonBar" >
 							<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
-							 id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','Started',${userId})">
+							 id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','${com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED}')">
 								<span class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
 								<span class="ui-button-text task_button">Start</span>
 							</a>
 							<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
-							 onclick="changeStatus('${issue?.item?.id}','Completed',${userId})">
+							 onclick="changeStatus('${issue?.item?.id}','${com.tdsops.tm.enums.domain.AssetCommentStatus.DONE}')">
 								<span class="ui-button-icon-primary ui-icon ui-icon-check task_icon"></span>
-								<span class="ui-button-text task_button">Complete</span>
+								<span class="ui-button-text task_button">Done</span>
 							</a>
 
 							<%--<span class="statusButton" onclick="changeStatus('${issue?.item?.id}','Completed',${userId})" style="margin-left: 30px">
@@ -140,7 +140,7 @@
 	function changeStatus(id,status,user){
 		jQuery.ajax({
 			url: '../assetEntity/updateComment',
-			data: {'id':id,'status':status,'assignedTo':user},
+			data: {'id':id,'status':status},
 			type:'POST',
 			success: function(data) {
 				var myClass = $('#issueTrId_'+data.assetComment.id).attr("class");
