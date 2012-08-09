@@ -24,6 +24,7 @@ class CommentService {
 	def mailService					// SendMail MailService class
 	def jdbcTemplate
 	def taskService
+	def securityService
 	
 	/**
 	 * Used to persist changes to the AssetComment and CommentNote from 
@@ -32,14 +33,14 @@ class CommentService {
 	 * @return map of the AssetComment data used to refresh the view
 	 */
 	def saveUpdateCommentAndNotes(session, params, isNew = true,flash) {
-		// Getting the loginUser should be abstracted into a service
-		def principal = SecurityUtils.subject.principal
-		def loginUser = UserLogin.findByUsername(principal)
+		def loginUser = securityService.getUserLogin()
+		def project = securityService.getUserCurrentProject()
+		
 		def formatter = new SimpleDateFormat("MM/dd/yyyy");
 		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
+		
 		def date = new Date()
-		def project = Project.get(session.CURR_PROJ.CURR_PROJ)
 		def assetComment
 		def commentProject
 
@@ -80,7 +81,8 @@ class CommentService {
 				log.error "Specified comment [id:${params.id}] was not found while updating comment"
 				return []
 			}else{
-			     def taskDependencyInstance =  TaskDependency.executeUpdate("delete TaskDependency where assetComment = ? ",[assetComment])
+				// TODO : Lok - why the heck were you DELETING the TaskDependencies?????
+			   //  def taskDependencyInstance =  TaskDependency.executeUpdate("delete TaskDependency where assetComment = ? ",[assetComment])
 			}
 		}
 		commentProject = assetComment.assetEntity ? assetComment.assetEntity.project : assetComment.project
@@ -107,11 +109,11 @@ class CommentService {
 		if(params.estFinish) assetComment.estFinish = estformatter.parse(params.estFinish)
 		if(params.actStart) assetComment.actStart = estformatter.parse(params.actStart)
 		assetComment.workflowTransition = WorkflowTransition.get(params.workflowTransition)
-		if(params.hardAssigned) assetComment.hardAssigned = Integer.parseInt(params.hardAssigned)
+		if(params.hardAssigned?.isNumber()) assetComment.hardAssigned = Integer.parseInt(params.hardAssigned)
 		if(params.priority) assetComment.priority = Integer.parseInt(params.priority)
 		if(params.duration) assetComment.duration = Integer.parseInt(params.duration)
 		if(params.durationScale) assetComment.durationScale = params.durationScale
-		if(params.overRide) assetComment.workflowOverride = Integer.parseInt(params.overRide)
+		if(params.overRide?.isNumber()) assetComment.workflowOverride = Integer.parseInt(params.overRide)
 		 assetComment.role = params.role
 		 
 		// Issues (aka tasks) have a number of additional properties to be managed 
@@ -139,20 +141,9 @@ class CommentService {
 			} else {
 				assetComment.assignedTo = null
 			}
-			
+	
+			// Use the service to update the Status because it does a number of things that we don't need to duplicate		
 			taskService.setTaskStatus( assetComment, params.status )
-			/*
-			// Update the resolved properties based on status being Completed
-			if(params.status==AssetCommentStatus.COMPLETED){
-				assetComment.isResolved = 1
-				assetComment.resolvedBy = loginUser.person
-				assetComment.dateResolved = GormUtil.convertInToGMT( "now", tzId )
-			}else{
-				assetComment.isResolved = 0
-				assetComment.resolvedBy = null
-				assetComment.dateResolved = null
-			}
-			*/
 			
 			if(params.dueDate){
 				assetComment.dueDate = formatter.parse(params.dueDate)

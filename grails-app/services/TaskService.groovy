@@ -58,7 +58,7 @@ class TaskService {
 //		 sql.append("ORDER BY ${sortOn} ${sortOrder}")
 		
 		// log.error "SQL for userTasks: " + sql.toString()
-		println "-------------params---------$sql----------$sqlParams"
+		// println "-------------params---------$sql----------$sqlParams"
 		
 		def allTasks = AssetComment.findAll( sql.toString(), sqlParams )
 		def todoTasks = allTasks.findAll { [AssetCommentStatus.READY, AssetCommentStatus.STARTED].contains(it.status) }
