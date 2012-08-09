@@ -550,6 +550,7 @@
 			if (assetTransitions[0].message) {
 				alert("Error: " + assetTransitions[0].message)
 			}
+			doAjaxCall();
 		}
 	}
 	/*

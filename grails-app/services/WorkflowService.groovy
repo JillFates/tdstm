@@ -11,6 +11,8 @@ import com.tdssrc.grails.GormUtil
 class WorkflowService {
     boolean transactional = true
     def stateEngineService
+	def taskService
+	
     def jdbcTemplate
     /*
      *  Used to create the Asset Transaction 
@@ -40,6 +42,7 @@ class WorkflowService {
 		def project = assetEntity.project
 		
     	if ( projectAssetMap ) {
+			log.info "createTransition: in projectAssetMap logic"
     		def transitionStates = jdbcTemplate.queryForList("SELECT CAST(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
     														"WHERE t.asset_entity_id = ${assetEntity.id} and voided = 0 order by date_created desc, stateTo desc limit 1 ")
 			if(transitionStates.size()){
@@ -51,7 +54,12 @@ class WorkflowService {
 	    	def fromState = stateEngineService.getState( process, currentState )
 	    	def roleCheck = stateEngineService.canDoTask( process, role, fromState, toState )
 	    	// Check whether role has permission to change the State
-	    	if ( roleCheck ) {
+			
+	    	if ( ! roleCheck ) {
+				log.warn "createTransition: role check failed - role:${role}, currentState:${currentState}, fromState:${currentState}, roleCheck:${roleCheck}"
+				message = "$role does not have permission to change the State"
+			} else {
+
 	    		flag = stateEngineService.getFlags(process, role, fromState, toState)
 	    		if ( ! comment && flag && ( flag.contains("comment") || flag.contains("issue") ) ) {
         			verifyFlag = false
@@ -121,11 +129,11 @@ class WorkflowService {
 						}
 	        		}
 	        	}
-	    	} else {
-	    		message = "$role does not have permission to change the State"
 	    	}
     	} else { // if ( projectAssetMap )
 			// TODO : Runbook - What is the difference with/without projectAssetMap?
+			log.info "createTransition: in ! projectAssetMap logic"
+		
     		def state = stateEngineService.getStateId( process, toState )
     		if ( toState == "Hold" ) {
 	        	if ( ! comment ) {
@@ -264,12 +272,13 @@ class WorkflowService {
 	  */
 	 def completeWorkflowTask( assetEntity, userLogin, process, state) {
 		 def task = getTaskFromAssetAndWorkflow(assetEntity, state)
-		 def message
-		 
+		 def message = ''
+		 log.info "completeWorkflowTask: asset:${assetEntity.id}, user:${userLogin}, process:${process}, state:${state}, task:${task.id}"
 		 if (task) {
 			 // TODO : calling completeTask with false doesn't allow for updating multiple states at once
 			 message = completeTask(task.id, userLogin.id, false)
 		 } else {
+		 	message = "Sorry but was unable to locate the task associated with the workflow."
 		 	log.info "No task associated with workflow ${process}:${state} for asset id ${assetEntity.id}"
 		 }
 		 return message
@@ -289,25 +298,26 @@ class WorkflowService {
 			 if (wfTransition) {
 				 task = AssetComment.findByAssetEntityAndWorkflowTransition(assetEntity, wfTransition)
 				 if (! task) {
-					 log.info "Unable to find asset (${assetEntity.id}) task for workflow (${workflowCode}:${state})"
+					 log.info "Unable to find asset (${assetEntity.id}) task for (wf:${workflowCode}/state:${state}/wftId:${wfId})"
 				 }
 			 } else {
-				 error.info "Missing to find workflow Transition for workflow (${workflowCode}:${state})"
+				 error.info "Missing to find workflow Transition for workflow (wf:${workflowCode}/state:${state}/wftId:${wfId})"
 			 }
 		 } else {
 			 error.info "Missing workflowTransition ID from state engine for workflow (${workflowCode}:${state})"
 		 }
 		 return task
 	 }
-	 
+
 	 /**
 	  * Used to set the state of a task (aka AssetComment) to completed and update any dependencies to the ready state appropriately. This will 
 	  * complete predecessor tasks if completePredecessors=true.
 	  * @param task
 	  * @return
 	  */
+	 // TODO: runbook : completeTask() : move into the TaskService and change so that we pass in the Task instead of the id
 	 def completeTask( taskId, userId, completePredecessors=false ) {
-		 
+		 log.info "completeTask: taskId:${taskId}, userId:${userId}"
 		 def task = AssetComment.get(taskId)
 		 def userLogin = UserLogin.get(userId)
 		 def tasksToComplete = [task]
@@ -322,6 +332,7 @@ class WorkflowService {
 
 		 // If automatically completing predecessors, check first to see if there are any on hold and stop 		 
 		 if (completePredecessors) {
+			 // TODO : Runbook - if/when we want to complete all predecessors, perhaps we should do it recursive since this logic only goes one level I believe.
 			 if ( predecessors.size() > 0 ) {
 				 // Scan the list to see if any of the predecessor tasks are on hold because we don't want to do anything if that is the case
 				 def hasHold=false
@@ -341,14 +352,14 @@ class WorkflowService {
 
 	 	// Complete the task(s)
 		tasksToComplete.each() { activeTask ->
-			activeTask.dateResolved = GormUtil.convertInToGMT( "now", "EDT" )
-			activeTask.resolvedBy = userLogin.person
-			activeTask.status = 'Completed'
+			// activeTask.dateResolved = GormUtil.convertInToGMT( "now", "EDT" )
+			// activeTask.resolvedBy = userLogin.person
+			taskService.setTaskStatus(activeTask, AssetCommentStatus.DONE)
 			if ( ! (activeTask.validate() && activeTask.save(flush:true)) ) {
 				throw new TaskCompletionException("Unable to complete task # ${activeTask.taskNumber} due to " +
 					GormUtil.allErrorsString(activeTask) )
 				log.error "Failed Completing task [${activeTask.id} " + GormUtil.allErrorsString(successorTask)
-				
+				return "Unable to complete due to " + GormUtil.allErrorsString(successorTask)
 			}
 		} 
 		
@@ -381,34 +392,12 @@ class WorkflowService {
 	 }
 	 
 	 /**
-	  * Used to update any successors of a task to the Ready state if they have any additional predecessors that are all beyond the pending
-	  * status.
-	  */
-	 def releaseSuccessorTasks( task ) {
-		 
-		 def dependencies = TaskDependency.findAllByPredecessor(task)
-		 dependencies.each {
-			 def successorTask = it.predecessor
-			 if ( ['Planned','Pending'].contains(successorTask) ) {
-				 def incompleteTasks = getIncompletePredecessors(successorTask)
-				 if (incompleteTasks.size() == 0) {
-					 successorTask.status = 'Ready'
-					 if ( ! (successorTask.validate() && successorTask.save(flush:true)) ) {
-					 	throw new TaskCompletionException("Unable to release task # ${successorTask.taskNumber} due to " +
-							 GormUtil.allErrorsString(successorTask) )
-					 }
-				 }
-			 }
-		 }
-		 
-	 }
-	 
-	 /**
 	  * Provides a list of upstream task predecessors that have not been completed for a given task. Implemented by recursion
 	  * @param task
 	  * @param taskList list of predecessors collected during the recursive lookup
 	  * @return list of predecessor tasks
 	  */
+	 // TODO: runbook : Refactor getIncompletePredecessors() into the TaskService,
 	 def getIncompletePredecessors(task, taskList=[]) {
 		 task.taskDependencies?.each() { dependency ->
 			 def predecessor = dependency.predecessor
@@ -432,6 +421,7 @@ class WorkflowService {
 	 }
 }
 
+// TODO : refactor this into the src/grails/com/tdsops/tm/exceptions source tree
 class TaskCompletionException extends Exception {
 	public TaskCompletionException(String message) {
 		super(message);

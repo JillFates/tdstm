@@ -663,27 +663,27 @@ class AssetEntityController {
 									}
 								}
 							}else{
-								AssetDependency assetDpendencyInstance = new AssetDependency()
+								AssetDependency dependency = new AssetDependency()
 								def assetId = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
 								def dependentId = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
 								def assetInstance = AssetEntity.get(Integer.parseInt(assetId))
 								def dependentInstance = AssetEntity.get(Integer.parseInt(dependentId))
 								if(assetInstance.project.id==projectInstance.id && dependentInstance.project.id == projectInstance.id){
 									if(assetId){
-										assetDpendencyInstance.asset = assetInstance
+										dependency.asset = assetInstance
 									}
 									if(dependentId){
-										assetDpendencyInstance.dependent = dependentInstance
+										dependency.dependent = dependentInstance
 									}
-									assetDpendencyInstance.type = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-									assetDpendencyInstance.dataFlowFreq = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-									assetDpendencyInstance.dataFlowDirection = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-									assetDpendencyInstance.status = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-									assetDpendencyInstance.comment = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-									assetDpendencyInstance.createdBy = userLogins?.person
-									assetDpendencyInstance.updatedBy = userLogins?.person
-									if(!assetDpendencyInstance.save(flush:true)){
-										assetDpendencyInstance.errors.allErrors.each { log.error it }
+									dependency.type = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+									dependency.dataFlowFreq = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+									dependency.dataFlowDirection = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+									dependency.status = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+									dependency.comment = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+									dependency.createdBy = userLogins?.person
+									dependency.updatedBy = userLogins?.person
+									if(!dependency.save(flush:true)){
+										dependency.errors.allErrors.each { log.error it }
 										skipped += ( r +1 )
 										skippedAdded = skipped.size()
 									}
@@ -1789,6 +1789,9 @@ class AssetEntityController {
 		// Get the name of the User Role by Name to display
 		def roles = securityService.getRoleName(assetComment.role)
 		
+		// TODO : Runbook : the use of maxVal is incorrect.  I believe that this is for the max assetComment.taskNumber but is getting taskDependency.id. This fails
+		// when there are no taskDependencies as Null gets incremented down in the map return.  Plus the property should be completely calculated here instead of incrementing
+		// while assigning in the map.  Logic should test for null.
 		def maxVal = TaskDependency.list([sort:'id',order:'desc',max:1])?.id[0]
 		def predecessorTable = ""
 		def taskDependencies = assetComment.taskDependencies

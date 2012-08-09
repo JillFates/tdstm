@@ -9,6 +9,7 @@ import com.tdssrc.grails.GormUtil
 
 import com.tds.asset.*
 import com.tds.asset.AssetComment
+import com.tdsops.tm.enums.domain.AssetCommentType
 
 /**
  * CommentService class contains methods used to manage comments/tasks
@@ -22,9 +23,10 @@ class CommentService {
 
 	def mailService					// SendMail MailService class
 	def jdbcTemplate
+	def taskService
 	
 	/**
-	 * Used to persist changes to the AssetComment and CommentNote
+	 * Used to persist changes to the AssetComment and CommentNote from 
 	 * @param params 
 	 * @isNew - boolean flag that indicates if it is new or an update
 	 * @return map of the AssetComment data used to refresh the view
@@ -88,9 +90,9 @@ class CommentService {
 			// TODO: handle failure of bad assetComment id passed for the user's current project (could be a hack)
 			return []
 		}
-//		def bindArgs = [assetComment, params, [ exclude:['assignedTo', 'assetEntity', 'moveEvent', 'project', 'dueDate', 'status'] ] ]
-//		def bindArgs = [assetComment, params, [ include:['comment', 'category', 'displayOption', 'attribute'] ] ]
-//		bindData.invoke( assetComment, 'bind', (Object[])bindArgs )
+		//	def bindArgs = [assetComment, params, [ exclude:['assignedTo', 'assetEntity', 'moveEvent', 'project', 'dueDate', 'status'] ] ]
+		//	def bindArgs = [assetComment, params, [ include:['comment', 'category', 'displayOption', 'attribute'] ] ]
+		//	bindData.invoke( assetComment, 'bind', (Object[])bindArgs )
 		// TODO - assignedTo is getting set even though it is in exclude list (seen in debugger with issue type)
 		
 		// Assign the general params for all types.  Was having an issue with the above binding, which was 
@@ -112,10 +114,8 @@ class CommentService {
 		if(params.overRide) assetComment.workflowOverride = Integer.parseInt(params.overRide)
 		 assetComment.role = params.role
 		 
-		 
-        
 		// Issues (aka tasks) have a number of additional properties to be managed 
-		if ( assetComment.commentType == 'issue' ) {
+		if ( assetComment.commentType == AssetCommentType.ISSUE ) {
 			if ( params.moveEvent && params.moveEvent.isNumber() ){
 				def moveEvent = MoveEvent.get(params.moveEvent)
 				if (moveEvent) {
@@ -140,9 +140,10 @@ class CommentService {
 				assetComment.assignedTo = null
 			}
 			
-			
+			taskService.setTaskStatus( assetComment, params.status )
+			/*
 			// Update the resolved properties based on status being Completed
-			if(params.status=='Completed'){
+			if(params.status==AssetCommentStatus.COMPLETED){
 				assetComment.isResolved = 1
 				assetComment.resolvedBy = loginUser.person
 				assetComment.dateResolved = GormUtil.convertInToGMT( "now", tzId )
@@ -151,12 +152,12 @@ class CommentService {
 				assetComment.resolvedBy = null
 				assetComment.dateResolved = null
 			}
+			*/
 			
 			if(params.dueDate){
 				assetComment.dueDate = formatter.parse(params.dueDate)
 			}
 			
-			assetComment.status = params.status
 		}
         
 		if (! assetComment.hasErrors() && assetComment.save(flush:true)) {

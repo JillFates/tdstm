@@ -6,6 +6,8 @@ import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCommentType
 
 
 class ClientTeamsController {
@@ -142,7 +144,10 @@ class ClientTeamsController {
 		def projectInstance = Project.get(projectId)
 		def userId = session.getAttribute("LOGIN_PERSON").id
 		def personInstance = Person.get(userId)
-		def todo = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Ready' , 'Started')) order by dueDate asc , dateCreated desc",[project:projectInstance,assignedTo:personInstance,type:'issue'])
+		def todo = AssetComment.findAll("From AssetComment a where a.project=:project AND commentType=:type AND assignedTo=:assignedTo AND " +
+			"(status is null OR status in('','${AssetCommentStatus.READY}', '${AssetCommentStatus.STARTED}')) " +
+			"ORDER BY dueDate asc , dateCreated desc", 
+			[ project:projectInstance, assignedTo:personInstance, type:AssetCommentType.TASK ])
 		def cssTodo = todo.size() > 0 ? 'buttonTodo' : 'buttonBlank'
 		if( viewMode != 'web'){
 			render( view:'list_m', model:[ sourceTeams:sourceTeams , targetTeams:targetTeams, projectId:projectId,todo:todo.size(),cssTodo:cssTodo] )
@@ -962,9 +967,9 @@ class ClientTeamsController {
 	def listComment={
 
 		def project = securityService.getUserCurrentProject()
-		log.error "PROJECT: ${project}"
+		//log.error "PROJECT: ${project}"
 		def person = securityService.getUserLoginPerson()
-		log.error "PERSON=${person}"
+		//log.error "PERSON=${person}"
 		def allTasks = false
 
 		// Parameters 		
@@ -1039,6 +1044,7 @@ class ClientTeamsController {
 		def projectInstance = Project.get(projectId)
 		def userId = session.getAttribute("LOGIN_PERSON").id
 		def personInstance = Person.get(userId)
+		// TODO : runbook : getToDoCount - this is repeating existing code and does not handle tasks associated by role. Should be able to refactor or better to SELECT COUNT, which is much more efficient
 		def todoSize = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Ready' , 'Started')) ",[project:projectInstance,assignedTo:personInstance,type:'issue']).size()
 		def map = []
 		map << [count:todoSize]
@@ -1051,7 +1057,7 @@ class ClientTeamsController {
 		noteList.each{
 			def dateCreated = it.dateCreated.format("E, d MMM 'at ' HH:mma")
 			notes << [dateCreated , it.createdBy.toString() ,it.note]
-		}
+3		}
 		def viewMode = session.getAttribute('ISSUE_VIEW_MODE')
 		if(viewMode=='mobile'){
 			render (view:'showIssue_m',model:['assetComment':assetComment,notes:notes])

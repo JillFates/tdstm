@@ -11,6 +11,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetTransition
 import com.tdssrc.grails.GormUtil
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCommentType
 
 /**
  * Service class used by the Asset Tracking / PMO dashboard that has a number of methods used to gather data for the dashboard
@@ -20,6 +21,7 @@ class PmoAssetTrackingService {
 		
 	// define services
 	def workflowService
+	def taskService
 	def stateEngineService
 	def jdbcTemplate
 	
@@ -30,10 +32,11 @@ class PmoAssetTrackingService {
     def HttpSession getSession() {
         return RequestContextHolder.currentRequestAttributes().getSession()
     }
+	
 	/*
 	 *  Will create bulk transition based on user input.
 	 */
-	def createBulkTransition(def type, def assetEntity, def stateTo, def role, def loginUser, def comment, def bundle ){
+	def createBulkTransition(def type, def assetEntity, def stateTo, def role, def loginUser, def comment, def bundle ) {
 		
 		def transitionStatus
 		def message = ""
@@ -48,27 +51,50 @@ class PmoAssetTrackingService {
 		def stateToId = stateEngineService.getStateId( workFlowCode,stateTo)
 		def holdId = stateEngineService.getStateId( workFlowCode,"Hold")
 		
-		
 		def currStateQuery = "select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
 				"where t.asset_entity_id = ${assetEntity.id} and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId )  order by date_created desc, stateTo desc limit 1 "
+
+		// The the menuOption which provides us the validation logic of what the user can do here.
+		def menuOption = constructMenuOptions( stateTo, assetEntity, type, stateType )
 		
+		log.info "createBulkTransition: stateTo:${stateTo}, stateType:${stateType}, stateToId:${stateToId}, menuOption:${menuOption}, type:${type}"
+				
 		switch (type) {
+			case "start" :
+				// The concept of a Start action is only applicable for the Task logic and therefore there is no Transition interaction
+				log.info "createBulkTransition: menuOption=${menuOption}"
+				if ( menuOption == 'rb_doMenu' ) {
+					def task = workflowService.getTaskFromAssetAndWorkflow(assetEntity, stateTo)
+					if (task) {
+						taskService.setTaskStatus(task, AssetCommentStatus.STARTED)
+						if (! (task.validate() && task.save(flush:true)) ) {
+							log.error "createBulkTransition: Failed to START task [${task.id} : " + GormUtil.allErrorsString(task)
+							message = "Unable to Start task due to " + GormUtil.allErrorsString(task)
+						 }
+					} else {
+						log.error "createBulkTransition: unable to find task for asset ${assetEntity.id} and state ${stateTo}"
+						message = "Unexpectedly was unable to locate the task in order to start it"
+					}
+				}
 			case "done" :
-				def menuOption = constructMenuOptions( stateTo, assetEntity, "done", stateType )
+//				log.info "createBulkTransition: processing 'done'"
 				// def validOptions = "doneMenu doMenu"
-				if( ['doneMenu', 'doMenu'].contains( menuOption ) || ( menuOption == "readyMenu" && stateTo == "Ready") ){
+				if( ['rb_doneMenu', 'doneMenu', 'doMenu'].contains( menuOption ) || 
+					( menuOption == "readyMenu" && stateTo == AssetCommentStatus.READY ) ) 
+				{
+					
 					def assetTransition = AssetTransition.find(assetTransitionQuery + " and t.stateTo = $stateToId")
 					if(assetTransition){
 						assetTransition.voided = 1
 						assetTransition.save(flush:true)
 					}
 					transitionStatus = workflowService.createTransition( workFlowCode, role,stateTo, assetEntity, 
-																		assetEntity.moveBundle, loginUser, null, comment )
+						assetEntity.moveBundle, loginUser, null, comment )
 					message = transitionStatus.message
 				}
-				if(stateType == "boolean" && stateTo=="VMCompleted"){
-					transitionStatus = workflowService.createTransition( workFlowCode, role, "Completed", assetEntity, 
-																		assetEntity.moveBundle, loginUser, null, comment )
+				if(stateType == "boolean" && stateTo=="VMCompleted") {
+					transitionStatus = workflowService.createTransition( workFlowCode, role, AssetCommentStatus.DONE, assetEntity, 
+						assetEntity.moveBundle, loginUser, null, comment )
 					message = transitionStatus.message
 				}
 				break;
@@ -86,7 +112,7 @@ class PmoAssetTrackingService {
 				break;
 					
 			case "ready" :
-				transitionStatus = workflowService.createTransition( workFlowCode, role,"Ready", assetEntity, 
+				transitionStatus = workflowService.createTransition( workFlowCode, role, AssetCommentStatus.READY, assetEntity, 
 						assetEntity.moveBundle, loginUser, null, comment )
 				message = transitionStatus.message
 				break;
@@ -143,14 +169,39 @@ class PmoAssetTrackingService {
 
 	/**
 	 * Called by the PMO AssetTracker to get the attributes for the various workflow steps of the specified asset (in Runbook Mode)
+	 * 
+	 * @param assetEntity - the asset to lookup the state of the taskflow steps for
+	 * @param bundleCode - the bundle code or 'all', which is used to determine which workflow to use (either the moveBundle's or the project's)
+	 * @return  Map[id, cssClass] list of all steps and the associated CSS class names to use in the display
 	 */
-	def getTransitionRowRb(def assetEntity, def state, def bundle) {	
+	def getTransitionRowRb(def assetEntity, def bundleId ) {	
 
 		// Need to use the Project Workflow if user has selected "All" bundles otherwise use the moveBundle's workflow
 		// thereby only showing the appropriate workflow steps in the row.
-		def moveBundle = assetEntity.moveBundle
-		def project = assetEntity.project
-		def workflowCode = bundle=="all" && project.workflowCode ? project.workflowCode : moveBundle.workflowCode
+		def moveBundle
+		def project
+		def workflowCode
+		
+		// Note that sometimes AssetEntity is an array and other times is the AssetEntity domain class
+		if ( assetEntity.projectId ) {
+			project = Project.read(assetEntity.projectId)
+			if (bundleId == 'all') {
+				workflowCode = project.workflowCode
+			} else {
+				moveBundle = MoveBundle.read(bundleId)
+				workflowCode = moveBundle.workflowCode
+			} 	
+		} else {
+			project = assetEntity.project
+			if (bundleId == 'all') {
+				workflowCode = project.workflowCode
+			} else {
+				moveBundle = assetEntity.moveBundle 
+				workflowCode = moveBundle.workflowCode
+			}
+		}
+		
+		log.info "getTransitionRowRb: bundleCode:${bundleId}, moveBundle:${moveBundle}, project:${project}, asset:${assetEntity.toString()}"
 		
 		// Get all of the Workflow Transition Ids that we want to report for the asset
 		def sql = "SELECT task.asset_entity_id AS assetId, wft.trans_id AS step, task.status FROM workflow w " +  
@@ -162,7 +213,7 @@ class PmoAssetTrackingService {
 		// TODO : need to handle hold overtime and completed 2/5
 		assetSteps.each() { step ->
 			def id = "${assetEntity.id}_${step.step}"
-			def css = step.status ? "task_${step.status.toLowerCase()}" : 'task_na'
+			def css = taskService.getCssClassForStatus(step.status)
 			map << [id:id, cssClass:css]
 		}
 		
@@ -179,7 +230,7 @@ class PmoAssetTrackingService {
 		def project = assetEntity.project
 
 		if (project.runbookOn) {
-			return getTransitionRowRb( assetEntity, state, bundle)	
+			return getTransitionRowRb( assetEntity, bundle)	
 		}
 		
 		def workFlowCode 
@@ -344,7 +395,6 @@ class PmoAssetTrackingService {
 		 */
 		def task = workflowService.getTaskFromAssetAndWorkflow(assetEntity, state) 
 		def menu = 'rb_noOption'
-		
 		if (task) {
 			switch (task.status) {
 				case [ AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING ]:
@@ -365,6 +415,7 @@ class PmoAssetTrackingService {
 					break
 			}
 		}
+		log.info "constructMenuOptionsRb: asset:${assetEntity}, state:${state}, task.status: ${task ? task.status : 'null'}, menu:${menu}"
 		return menu
 	}
 		
@@ -518,7 +569,7 @@ class PmoAssetTrackingService {
 		def query = new StringBuffer(
 			"""SELECT * FROM( SELECT ae.asset_entity_id AS id, ae.asset_name AS assetName,ae.short_name AS shortName,ae.asset_tag AS assetTag,
 			ae.asset_type AS assetType,mf.name AS manufacturer, m.name AS model, ae.application, ae.app_owner AS appOwner, ae.app_sme AS appSme,
-			ae.ip_address AS ipAddress, ae.hinfo AS os, ae.serial_number AS serialNumber,m.usize, ae.rail_type AS railType,
+			ae.ip_address AS ipAddress, ae.hinfo AS os, ae.serial_number AS serialNumber,m.usize, ae.rail_type AS railType, ae.project_id AS projectId,
 			ae.source_location AS sourceLocation, ae.source_room AS sourceRoom, ae.source_rack AS sourceRack, ae.source_rack_position AS sourceRackPosition,
 		    ae.target_location AS targetLocation, ae.target_room AS targetRoom, ae.target_rack AS targetRack, ae.target_rack_position AS targetRackPosition,
 			mb.name AS moveBundle, ae.truck,
@@ -552,7 +603,7 @@ class PmoAssetTrackingService {
 			LEFT JOIN manufacturer mf ON ae.manufacturer_id = mf.manufacturer_id
             LEFT JOIN asset_transition at ON at.asset_entity_id = ae.asset_entity_id and at.voided = 0 and at.type='process'
 			""")
-		if (project.runbookOn) {
+		if (project.runbookOn==1) {
 			query.append( 'LEFT JOIN asset_comment task ON task.asset_entity_id = ae.asset_entity_id')
 		}
 		query.append("""
@@ -631,7 +682,7 @@ class PmoAssetTrackingService {
 	 * @return : List of assets for PMO to update thru ajax
 	 *--------------------------------------------------------*/
 	def getAssetsForPmoUpdate( def projectId, def bundles, def params, def lastPoolTime, def currentPoolTime ){
-
+		def project = Project.read(projectId)
 		def column1Value = params.c1v
 		def column2Value = params.c2v
 		def column3Value = params.c3v
@@ -647,7 +698,7 @@ class PmoAssetTrackingService {
 		// The SQL has a nested SELECT in order to provide ability to tack on LIMIT and ORDER criteria after the fact
 		def query = new StringBuffer("""SELECT * FROM (SELECT * FROM( select ae.asset_entity_id as id, ae.asset_name as assetName,ae.short_name as shortName,ae.asset_tag as assetTag,
 				ae.asset_type as assetType,mf.name as manufacturer, m.name as model, ae.application, ae.app_owner as appOwner, ae.app_sme as appSme,
-				ae.ip_address as ipAddress, ae.hinfo as os, ae.serial_number as serialNumber,m.usize, ae.rail_type as railType,
+				ae.ip_address as ipAddress, ae.hinfo as os, ae.serial_number as serialNumber,m.usize, ae.rail_type as railType, ae.project_id AS projectId,
 				ae.source_location as sourceLocation, ae.source_room as sourceRoom, ae.source_rack as sourceRack, ae.source_rack_position as sourceRackPosition,
 				ae.target_location as targetLocation, ae.target_room as targetRoom, ae.target_rack as targetRack, ae.target_rack_position as targetRackPosition,
 			    mb.name as moveBundle, ae.truck,
@@ -658,11 +709,19 @@ class PmoAssetTrackingService {
 				sptDba.team_code as sourceTeamDba, tptDba.team_code as targetTeamDba,
 				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate, ae.custom1 as custom1, ae.custom2 as custom2,ae.custom3 as custom3,
 				ae.custom3 as custom4,ae.custom5 as custom5,ae.custom6 as custom6,ae.custom7 as custom7,ae.custom8 as custom8, ae.current_status as currentStatus,
-				max(at.date_created) as updated
-				FROM asset_entity ae
+			""")
+			
+		if (project.runbookOn) {
+			query.append( 'MAX(IFNULL(task.last_updated,eav.last_updated)) AS updated')
+		} else {
+			query.append( 'MAX(at.date_created) AS updated')
+		}
+		
+		query.append(""" FROM asset_entity ae
+				JOIN eav_entity eav ON eav.entity_id=ae.asset_entity_id
 				LEFT JOIN move_bundle mb ON (ae.move_bundle_id = mb.move_bundle_id )
 				LEFT JOIN project_team sptMt ON (ae.source_team_id = sptMt.project_team_id )
-                LEFT JOIN project_team tptMt ON (ae.target_team_id = tptMt.project_team_id )
+				LEFT JOIN project_team tptMt ON ae.target_team_id = tptMt.project_team_id
                 LEFT JOIN project_team sptLog ON (ae.source_team_id = sptLog.project_team_id )
                 LEFT JOIN project_team tptLog ON (ae.target_team_id = tptLog.project_team_id )
                 LEFT JOIN project_team sptSa ON (ae.source_team_id = sptSa.project_team_id )
@@ -671,8 +730,13 @@ class PmoAssetTrackingService {
                 LEFT JOIN project_team tptDba ON (ae.target_team_id = tptDba.project_team_id )
 				LEFT JOIN model m ON (ae.model_id = m.model_id )
 				LEFT JOIN manufacturer mf ON (ae.manufacturer_id = mf.manufacturer_id )
-                LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id AND at.voided = 0 AND at.type='process')
-				WHERE ae.project_id = $projectId and ae.move_bundle_id in ${bundles} GROUP BY ae.asset_entity_id ) ae WHERE  1 = 1""")
+                LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id AND at.voided = 0 AND at.type='process')""")
+
+		if (project.runbookOn==1) {
+			query.append( 'LEFT JOIN asset_comment task ON task.asset_entity_id = ae.asset_entity_id ')
+		}
+		
+		query.append("""WHERE ae.project_id = $projectId and ae.move_bundle_id in ${bundles} GROUP BY ae.asset_entity_id ) ae WHERE  1 = 1""")
 
 		if(column1Value !="" && column1Value!= null){
 			if(column1Value == 'blank'){
@@ -725,10 +789,19 @@ class PmoAssetTrackingService {
 			}
 		}
 		
-		query.append(""") a WHERE a.id IN ( SELECT t.asset_entity_id FROM asset_transition t WHERE
-					(t.date_created BETWEEN SUBTIME('$lastPoolTime','00:15:30') AND '$currentPoolTime' 
-					OR t.last_updated between SUBTIME('$lastPoolTime','00:15:30') AND '$currentPoolTime') )""")
+		// Add the filter that will restrict what transitions displayed. It will use the tasks if runbook is enabled otherwise look at 
+		// the transitions
+		if ( project.runbookOn == 1) {
+			query.append(""") a WHERE a.id IN ( SELECT asset_entity_id FROM asset_comment WHERE 
+				project_id=${projectId} AND comment_type='${AssetCommentType.TASK}' AND 
+				last_updated BETWEEN SUBTIME('$lastPoolTime','00:15:30') AND '$currentPoolTime') """)	
+		} else {
+			query.append(""") a WHERE a.id IN ( SELECT t.asset_entity_id FROM asset_transition t WHERE
+				(t.date_created BETWEEN SUBTIME('$lastPoolTime','00:15:30') AND '$currentPoolTime' 
+				OR t.last_updated between SUBTIME('$lastPoolTime','00:15:30') AND '$currentPoolTime') )""")
+		}
 		
+		 log.info "getAssetsForPmoUpdate: Query:${query.toString()}"
 		try {
 			def resultList=jdbcTemplate.queryForList(query.toString())
 			return resultList
@@ -737,4 +810,43 @@ class PmoAssetTrackingService {
 			return null
 		}
 	}
+	
+	/**
+	 * Will split the Application, App Owner, and AppSME of entries by a comma inside a given record.
+	 * For example, there are three assets with "Adam", "Bob", and "Adam, Bob,Charlie" in the app owner fields.In the filter dropdown,
+	 * we currently show "Adam (1), Bob (1), and Adam,Bob,Charlie(1)" and will split like "Adam(2), Bob(2),Charlie(1)".
+	 * @author : Lokanada Reddy
+	 * @return : result as list.
+	 */
+	def splitFilterExpansion( def appsList, def assetAttribute, def workflowCode  ){
+		def applicationMap = new HashMap()
+		def resList = []
+		appsList.each{ apps ->
+			apps[0] = apps[0] ? apps[0] : ""
+			def applications = String.valueOf(apps[0]).split(",")
+			applications.each{ app ->
+				if( ! applicationMap.containsKey( app.trim() ) ){
+					applicationMap.put(app.trim(),apps[1])
+				} else {
+					def appCount = applicationMap.get(app.trim()) + apps[1]
+					applicationMap.put( app.trim(), appCount )
+				}
+			}
+			
+		}
+		if(assetAttribute != "currentStatus"){
+			applicationMap.keySet().each{
+				resList << ["key":it, "value":applicationMap.get(it), 'id':it ]
+			}
+		} else {
+			applicationMap.keySet().each{
+				resList << ["key":it ? stateEngineService.getState(workflowCode,Integer.parseInt(it)) : "", "value":applicationMap.get(it), 'id':it]
+			}
+		}
+		resList.sort(){
+			it.id
+		}
+		return resList
+	}
+
 }

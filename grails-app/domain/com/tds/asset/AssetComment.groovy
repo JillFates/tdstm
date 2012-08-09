@@ -4,6 +4,11 @@ import com.tdssrc.grails.GormUtil
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 
 class AssetComment {
+
+	// Inject a few services that will be used by some of the custom setter methods
+	def taskService
+	def securityService
+	
 	String comment					// This is also the title of an issue or task
 	String commentType
 	Integer mustVerify = 0			// Flag used in MoveTech to have the user verify an instruction
@@ -115,7 +120,8 @@ class AssetComment {
 		}
 	}
 
-	static transients = ['actFinish']
+	// List of properties that should NOT be persisted
+	static transients = ['actFinish', 'taskService', 'assignedToString', 'assetName']
 	
 	// TODO : need method to handle inserting new assetComment or updating so that the category+taskNumber is unique 
 	
@@ -125,16 +131,22 @@ class AssetComment {
 	def getAssetName(){
 		return assetEntity.assetName
 	}
+
+	// The actFinish value is stored in the dateResolved column	
 	def getActFinish() {
 		return dateResolved
 	}
-	def setActFinish(def date) {
-		dateResolved = date
+	public void setActFinish(Date date) {
+		setDateResolved( date )
 	}
-	// Setter to allow assignment by ENUM
-	def setStatus( AssetCommentStatus acs ) { status = acs.toString() }
-	
-	// Get the duration in minutes
+
+	// Extend the dateResolved setter to also set the isResolved appropriately
+	public void setDateResolved( Date date ) {
+		this.dateResolved = date
+		this.isResolved = date ? 1 : 0
+	}
+			
+	// Returns the duration of the task in minutes
 	def durationInMinutes() {
 		def d = duration
 		switch (durationScale) {
@@ -146,15 +158,22 @@ class AssetComment {
 		return d
 	}
 	
-	// Force the created and updated dates to be GMT
 	def beforeInsert = {
 		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
 		lastUpdated = dateCreated
-		if (dateResolved != null) isResolved = 1
+		
+		// Trigger the Status Change event to properly handle an necessary changes to this task or any dependencies
+		taskService.taskStatusChangeEvent( this )
 	}
+	
 	def beforeUpdate = {
 		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
 		if (dateResolved != null) isResolved = 1
+		
+		// Trigger the taskStatusChangeEvent if the status was changed so we can update dependencies
+		if ( this.isDirty('status')) {
+			taskService.taskStatusChangeEvent( this )
+		}
 	}
 
 	String toString() {

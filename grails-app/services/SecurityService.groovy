@@ -33,7 +33,7 @@
 		if (project) {
 			// Need to lookup the User's Party role to the Project
 			def client=project.client
-			
+			// TODO: runbook : getPersonRoles not fully implemented when the project is passed.  Need to test...
 			def sql = """SELECT role_type_code_to_id
 				FROM party_relationship
 				WHERE party_relationship_type_id='PROJ_STAFF' AND party_id_from_id=${client.id} AND party_id_to_id=${person.id} AND status_code='ENABLED'"""

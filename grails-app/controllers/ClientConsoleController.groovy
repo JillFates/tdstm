@@ -15,11 +15,14 @@ import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enums.domain.AssetCommentStatus
+
 class ClientConsoleController {
 	
 	 protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
 	 def stateEngineService
 	 def userPreferenceService
+	 def securityService
 	 def workflowService
 	 def jdbcTemplate
 	 def pmoAssetTrackingService
@@ -119,19 +122,19 @@ class ClientConsoleController {
 					/*-------------get filter details----------------*/
 					def temp1List = AssetEntity.executeQuery("""SELECT DISTINCT ae.${columns?.column1.field}, COUNT(ae.id) FROM AssetEntity ae 
 																	WHERE  ae.moveBundle.id in ${bundles} GROUP BY ae.${columns?.column1.field} ORDER BY ae.${columns?.column1.field}""")
-					column1List = splitFilterExpansion( temp1List, columns?.column1.field, workflowCode )
+					column1List = pmoAssetTrackingService.splitFilterExpansion( temp1List, columns?.column1.field, workflowCode )
 					
 					def temp2List = AssetEntity.executeQuery("""SELECT DISTINCT ae.${columns?.column2.field}, COUNT(ae.id) FROM AssetEntity ae 
 																	WHERE  ae.moveBundle.id in ${bundles} GROUP BY ae.${columns?.column2.field} ORDER BY ae.${columns?.column2.field}""")
-					column2List = splitFilterExpansion( temp2List, columns?.column2.field, workflowCode  )
+					column2List = pmoAssetTrackingService.splitFilterExpansion( temp2List, columns?.column2.field, workflowCode  )
 					
 					def temp3List = AssetEntity.executeQuery("""SELECT DISTINCT ae.${columns?.column3.field}, COUNT(ae.id) FROM AssetEntity ae 
 																	WHERE  ae.moveBundle.id in ${bundles} GROUP BY ae.${columns?.column3.field} ORDER BY ae.${columns?.column3.field}""")
-					column3List = splitFilterExpansion( temp3List, columns?.column3.field, workflowCode  )
+					column3List = pmoAssetTrackingService.splitFilterExpansion( temp3List, columns?.column3.field, workflowCode  )
 					
 					def temp4List = AssetEntity.executeQuery("""SELECT DISTINCT ae.${columns?.column4.field}, COUNT(ae.id) FROM AssetEntity ae 
 																	WHERE  ae.moveBundle.id in ${bundles} GROUP BY ae.${columns?.column4.field} ORDER BY ae.${columns?.column4.field}""")
-					column4List = splitFilterExpansion( temp4List, columns?.column4.field, workflowCode  )
+					column4List = pmoAssetTrackingService.splitFilterExpansion( temp4List, columns?.column4.field, workflowCode  )
 	                
 					/*-------------get asset details----------------*/
 					def returnValue = pmoAssetTrackingService.getAssetsForListView( projectId, bundles, columns, params )
@@ -478,14 +481,15 @@ class ClientConsoleController {
 	       
     }
 	
-	/* -----------------------------------------------------
+	/**
+	 * Returns JSON data for all assets displayed in the Asset Tracker including recent transactions
 	 * @author: Lokanada Reddy
 	 * @param : MoveBundle, application,appSme,appOwner
 	 * @return: AssetEntity object with recent transactions
-	 *----------------------------------------------------*/
+	 **/
 	def getTransitions = {
 		def workFlowCode
-		def project = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
+		def project = securityService.getUserCurrentProject()
 		
 		def bundleId = params.moveBundle
 		if (bundleId == "all") {
@@ -542,10 +546,8 @@ class ClientConsoleController {
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			def today = GormUtil.convertInToGMT( "now", tzId );
 			def currentPoolTime = new java.sql.Timestamp(today.getTime())
+			// TODO : LOK - Why are we persisting the LAST_POOL_TIME since it is passed as an argument in the view
 			getSession().setAttribute("LAST_POOL_TIME",currentPoolTime)
-			
-			// get the assets list
-			def resultList= pmoAssetTrackingService.getAssetsForPmoUpdate( moveEvent.project.id, bundles, params, lastPoolTime, currentPoolTime)//jdbcTemplate.queryForList(query.toString())
 			
 			def processTransitions= stateEngineService.getTasks(workFlowCode, "TASK_ID")
 			/* user role check*/
@@ -561,74 +563,86 @@ class ClientConsoleController {
 			def reRackId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Reracked"))
 			def terminatedId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Terminated"))
 			def columns = userPreferenceService.setAssetTrackingPreference(null, null, null, null)
-			resultList.each{
+
+			// get the asset list
+			def assetList= pmoAssetTrackingService.getAssetsForPmoUpdate( moveEvent.project.id, bundles, params, lastPoolTime, currentPoolTime)
+			assetList.each{
 				def stateId = 0
 				def assetId = it.id
 				def tdId = []
-				def maxstate = it.maxstate
-				def assetEntity = AssetEntity.get(assetId)
-				/*def projectMap = ProjectAssetMap.findByAsset(assetEntity)
-				if(projectMap){
-					stateId = projectMap.currentStateId
-				}*/
-				def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-																"where t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
-																"order by date_created desc, stateTo desc limit 1 ")
-				if(transitionStates.size()){
-					stateId = transitionStates[0].stateTo
-				}
-                
-                def transQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 "
-                
-                def assetTransitions = AssetTransition.findAll(transQuery)
-                def isHoldNa = assetTransitions.find { it.type == 'boolean' && it.stateTo == holdId.toString() }
 				
-				processTransitions.each() { trans ->
-					def cssClass='task_pending'
-                	def transitionId = Integer.parseInt(trans)
-					def stateType = stateEngineService.getStateType( workFlowCode, 
-									stateEngineService.getState(workFlowCode, transitionId))
-                    if(stateId != terminatedId){
-                        def assetTrans = assetTransitions.find { it.stateTo == transitionId.toString() }
-                        
-                        if(assetTrans?.type == 'boolean' && assetTrans?.isNonApplicable) {
-							cssClass='asset_pending'
-                        } else if(assetTrans?.type == 'boolean' && stateType == 'boolean') {
-							if(stateId != holdId || isHoldNa?.isNonApplicable){
-								cssClass='task_done'
-							} else {
-								cssClass = (isHoldNa?.holdTimer && isHoldNa?.holdTimer?.getTime() < today.getTime()) ? 'asset_hold_overtime' : 'asset_hold' 
-							}
-						}
-						if(stateType != 'boolean' || transitionId == holdId){
-							if(stateId == holdId && !isHoldNa?.isNonApplicable){ /* check the current state, if current state = hold , show all steps in yellow */
-								cssClass = (isHoldNa?.holdTimer && isHoldNa?.holdTimer?.getTime() < today.getTime()) ? 'asset_hold_overtime' : 'asset_hold'
-							} else if( transitionId <= maxstate  ){
-                                if(transitionId != holdId && assetTrans?.type != 'boolean'){ 
-        							cssClass = "task_done"
-        						} else if( transitionId == holdId ){
-									if(isHoldNa){
-										cssClass='asset_pending'
-									} else {
-										cssClass='task_pending'
-									}
-                                } else if(assetTrans?.type == 'boolean' && assetTrans.isNonApplicable){
-									cssClass='asset_pending'
+				// TODO : LOK - what does this maxstate property do?
+				def maxstate = it.maxstate
+				
+				// This code was refetching the AssetEntity instead of using what being returned from getAssetsForPmoUpdate 
+				// def assetEntity = AssetEntity.get(assetId)
+				def assetEntity = it
+				
+				if (project.runbookOn==1) {
+					// Build TD data by Task
+					tdId = pmoAssetTrackingService.getTransitionRowRb(assetEntity, bundleId)
+				} else {
+					// Build TD data by Workflow 
+					def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+																	"where t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
+																	"order by date_created desc, stateTo desc limit 1 ")
+					if (transitionStates.size()){
+						stateId = transitionStates[0].stateTo
+					}
+	                
+	                def transQuery = "from AssetTransition where assetEntity = $assetId and voided = 0 "
+	                
+	                def assetTransitions = AssetTransition.findAll(transQuery)
+	                def isHoldNa = assetTransitions.find { it.type == 'boolean' && it.stateTo == holdId.toString() }
+					
+					processTransitions.each() { trans ->
+						def cssClass='task_pending'
+	                	def transitionId = Integer.parseInt(trans)
+						def stateType = stateEngineService.getStateType( workFlowCode, 
+										stateEngineService.getState(workFlowCode, transitionId))
+	                    if(stateId != terminatedId){
+	                        def assetTrans = assetTransitions.find { it.stateTo == transitionId.toString() }
+	                        
+	                        if(assetTrans?.type == 'boolean' && assetTrans?.isNonApplicable) {
+								cssClass='asset_pending'
+	                        } else if(assetTrans?.type == 'boolean' && stateType == 'boolean') {
+								if(stateId != holdId || isHoldNa?.isNonApplicable){
+									cssClass='task_done'
+								} else {
+									cssClass = (isHoldNa?.holdTimer && isHoldNa?.holdTimer?.getTime() < today.getTime()) ? 'asset_hold_overtime' : 'asset_hold' 
 								}
 							}
-						}
-						if( assetTrans )
-	                           cssClass = getRecentChangeStyle( assetTrans, cssClass )
-                    } else {
-                    	cssClass='task_term'
-                    }
-					tdId << [id:"${assetId+"_"+trans}", cssClass:cssClass]
-				}
+							if(stateType != 'boolean' || transitionId == holdId){
+								if(stateId == holdId && !isHoldNa?.isNonApplicable){ /* check the current state, if current state = hold , show all steps in yellow */
+									cssClass = (isHoldNa?.holdTimer && isHoldNa?.holdTimer?.getTime() < today.getTime()) ? 'asset_hold_overtime' : 'asset_hold'
+								} else if( transitionId <= maxstate  ){
+	                                if(transitionId != holdId && assetTrans?.type != 'boolean'){ 
+	        							cssClass = "task_done"
+	        						} else if( transitionId == holdId ){
+										if(isHoldNa){
+											cssClass='asset_pending'
+										} else {
+											cssClass='task_pending'
+										}
+	                                } else if(assetTrans?.type == 'boolean' && assetTrans.isNonApplicable){
+										cssClass='asset_pending'
+									}
+								}
+							}
+							if( assetTrans )
+		                           cssClass = getRecentChangeStyle( assetTrans, cssClass )
+	                    } else {
+	                    	cssClass='task_term'
+	                    }
+						tdId << [id:"${assetId+"_"+trans}", cssClass:cssClass]
+					}
+				} // if (project.runbookOn) 
+				
 				assetEntityList << [id: assetId, column1value:it."${columns.column1.field}" ? columns.column1.field != "currentStatus" ? it."${columns.column1.field}" : stateEngineService.getState(workFlowCode,it."${columns.column1.field}") : "&nbsp;",
 					column2value:it."${columns.column2.field}" ? columns.column2.field != "currentStatus" ? it."${columns.column2.field}" : stateEngineService.getState(workFlowCode,it."${columns.column2.field}") : "&nbsp;",
 					column3value:it."${columns.column3.field}" ? columns.column3.field != "currentStatus" ? it."${columns.column3.field}" : stateEngineService.getState(workFlowCode,it."${columns.column3.field}") : "&nbsp;",
 					column4value:it."${columns.column4.field}" ? columns.column4.field != "currentStatus" ? it."${columns.column4.field}" : stateEngineService.getState(workFlowCode,it."${columns.column4.field}") : "&nbsp;",
-					tdId:tdId, lastUpdated:formatter.format( GormUtil.convertInToUserTZ(it.updated ,tzId) )]
+					tdId:tdId, lastUpdated:formatter.format( GormUtil.convertInToUserTZ(it.updated, tzId) )]
 			}
 			
 			def assetCommentsList = []
@@ -756,36 +770,47 @@ class ClientConsoleController {
 	 * @return : Create a transition as selected by User and will return the tannsition asset row details
 	 *----------------------------------------------------*/
 	def createTransitionForNA = {
-		def actionId = params.actionId
+		def loginUser = securityService.getUserLogin()
+		def project = securityService.getUserCurrentProject()
+
 		def type = params.type
-		def principal = SecurityUtils.subject.principal
-        def loginUser = UserLogin.findByUsername(principal)
+		
+		// The asset id and stateToId are embedded in the actionId param as assetId_stateToId so we need to parse it appart 
+		def actionId = params.actionId
 		def actions = actionId.split("_")
 		def assetEntity = AssetEntity.findById(actions[0])
 		def stateToId = Integer.parseInt(actions[1])
-		def workFlowCode
-		if(params.bundle !="all"){
-		   workFlowCode = assetEntity.moveBundle.workflowCode
-		}else{
-		   workFlowCode = assetEntity.project.workflowCode
-		}
+
+		if (assetEntity.project.id != project.id ) {
+			log.error "createTransitionForNA: User($loginUser) attempted to access asset(${assetEntity.id}) that was not associated with current project ${project}"
+			// TODO : handle faild call
+			return 
+		}		
+		
+		// Now we'll use the movebundle workflow unless the user has selected 'all' bundles then we'll use the project level workflow
+		def workFlowCode = (params.bundle=="all") ? assetEntity.project.workflowCode : assetEntity.moveBundle.workflowCode
+
 		def stateTo = stateEngineService.getState( workFlowCode, stateToId )
+		
+		log.info "createTransitionForNA: starting to create transition for asset(${assetEntity} for state(${stateTo}/${stateToId}"
 		
 		def role = ""
 		def subject = SecurityUtils.subject
+		
 		if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
 			role = "SUPERVISOR"
 		} else if(subject.hasRole("MANAGER")){
 			role = "MANAGER"
 		}
+		
 		def assetTransitionQuery = "from AssetTransition t where t.assetEntity = ${assetEntity.id} and t.voided = 0"
 		def comment = ""
-		if(stateTo == "Terminated"){
-				comment = "Asset has been Terminated"
+		if (stateTo == AssetCommentStatus.TERMINATED ){
+			comment = "Asset has been Terminated"
 		}
 		def message = ""
-		if(role){
-			message = pmoAssetTrackingService.createBulkTransition(type, assetEntity, stateTo, role, loginUser, comment,params.bundle)
+		if (role){
+			message = pmoAssetTrackingService.createBulkTransition(type, assetEntity, stateTo, role, loginUser, comment, params.bundle)
 		} else {
 			message = " You don't have permission to create transition"
 		}
@@ -793,43 +818,7 @@ class ClientConsoleController {
 		tdId.add(message:message)
 		render tdId as JSON
 	}
-	/*--------------------------------------------------------
-	 * Will split the Application, App Owner, and AppSME of entries by a comma inside a given record.  
-	 * For example, there are three assets with "Adam", "Bob", and "Adam, Bob,Charlie" in the app owner fields.In the filter dropdown,
-	  	we currently show "Adam (1), Bob (1), and Adam,Bob,Charlie(1)" and will split like "Adam(2), Bob(2),Charlie(1)".
-	 * @author : Lokanada Reddy
-	 * @return : result as list.
-	 * -------------------------------------------------------*/
-	def splitFilterExpansion( def appsList, def assetAttribute, def workflowCode  ){
-		def applicationMap = new HashMap()
-		def resList = []
-		appsList.each{ apps ->
-			apps[0] = apps[0] ? apps[0] : ""
-			def applications = String.valueOf(apps[0]).split(",")
-			applications.each{ app ->
-				if( ! applicationMap.containsKey( app.trim() ) ){
-					applicationMap.put(app.trim(),apps[1])
-				} else {
-					def appCount = applicationMap.get(app.trim()) + apps[1]
-					applicationMap.put( app.trim(), appCount ) 
-				}
-			}
-			
-		}
-		if(assetAttribute != "currentStatus"){
-			applicationMap.keySet().each{
-				resList << ["key":it, "value":applicationMap.get(it), 'id':it ]  
-			}
-		} else {
-			applicationMap.keySet().each{
-				resList << ["key":it ? stateEngineService.getState(workflowCode,Integer.parseInt(it)) : "", "value":applicationMap.get(it), 'id':it]  
-			}
-		}
-		resList.sort(){
-			it.id
-		}
-		return resList
-	}
+
 	/*
 	 * Validate and return the message to the user. 
 	 */
@@ -982,6 +971,14 @@ class ClientConsoleController {
 		render ""
 	}
 	
+	/**
+	 * Returns the appropriate CSS class for a task if done that shows the progressive darkening over time
+	 * @param Entity that the style is for (assuming this is the transition object TBD )
+	 * @param cssClass that is being evaluated
+	 * @return String cssClass to use in display
+	 */
+	// TODO - getRecentChangeStyle: move to TaskService
+	// TODO - getRecentChangeStyle: Runbook - will need to revamp this to work without transitions
 	private getRecentChangeStyle(def entity, def cssClass) {
         def changedClass = cssClass
         if(cssClass == "task_done") {
@@ -1013,16 +1010,18 @@ class ClientConsoleController {
 		def bundles = moveBundlesList.id.toString().replace("[","(").replace("]",")")
 		def moveBundleInstance
 		def workflowCode    
-		if(params.bundle!="all"){
+		
+		if (params.bundle == "all"){
+		    workflowCode = moveEvent.project.workflowCode
+		} else {
 			moveBundleInstance = MoveBundle.get(params.bundle) 
 			workflowCode = moveBundleInstance.workflowCode
-		}else{
-		    workflowCode = moveEvent.project.workflowCode
 		}
-		// TODO : Runbook : Fix getCurrentStatusOptions to return task updates VS workflow
-		def tempList = AssetEntity.executeQuery("""SELECT DISTINCT ae.${columnName} , count(ae.id) from AssetEntity 
-										ae where  ae.moveBundle.id in ${bundles} group by ae.${columnName} order by ae.${columnName}""")
-		def columnList = splitFilterExpansion( tempList, columnName, workflowCode )
+		
+		def tempList = AssetEntity.executeQuery("""SELECT DISTINCT ae.${columnName} , count(ae.id) FROM AssetEntity ae
+			WHERE  ae.moveBundle.id IN ${bundles} GROUP BY ae.${columnName} ORDER BY ae.${columnName}""")
+		
+		def columnList = pmoAssetTrackingService.splitFilterExpansion( tempList, columnName, workflowCode )
 		render columnList as JSON
 	}
 	/*

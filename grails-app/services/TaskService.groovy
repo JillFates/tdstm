@@ -12,7 +12,9 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetComment
-  
+import com.tds.asset.TaskDependency
+import com.tdssrc.grails.GormUtil
+
 class TaskService {
 
     static transactional = true
@@ -28,20 +30,14 @@ class TaskService {
 		// TODO : This should (perhaps) pass the project to getPersonRoles
 		def roles = securityService.getPersonRoles(person, RoleTypeGroup.STAFF)
 		def type=AssetCommentType.TASK
-		def statuses = [AssetCommentStatus.PLANNED.toString(), AssetCommentStatus.PENDING.toString(), AssetCommentStatus.READY.toString() ]
-		def sqlParams = [project:project, assignedTo:person, type:type, roles:roles, statuses:statuses]
-//		def sqlParams = [project:project, assignedTo:person, type:type]
 		
-		log.error "person:${person.id}"
+		// List of statuses that user should be able to see in when soft assigned to others and user has proper role
+		def statuses = [AssetCommentStatus.PLANNED.toString(), AssetCommentStatus.PENDING.toString(), AssetCommentStatus.READY.toString() ]
+		
+		def sqlParams = [project:project, assignedTo:person, type:type, roles:roles, statuses:statuses]
+		
+		//log.error "person:${person.id}"
 		// Find all Tasks assigned to the person OR assigned to a role that is not hard assigned (to someone else)
-//		StringBuffer sql = new StringBuffer('FROM AssetComment AS c WHERE a.project=:project AND a.commentType=:type')
-//	    sql.append(' AND ( c.assignedTo=:assignedTo OR ( c.role IN (:roles) AND c.status IN (:statuses) AND c.hardAssigned != 1 ) ) ')
-//
-//		// Add the search to the query if specified		
-//		if (search) {
-//			sqlParams << [ search:search ]
-//			sql.append(' AND a.assetTag=:search (from AssetEntity AS a where a.assetEntity=c.assetEntity)' )
-//		}
 		
 		search = org.apache.commons.lang.StringUtils.trimToNull(search)
 
@@ -69,6 +65,126 @@ class TaskService {
 
 		return ['all':allTasks, 'todo':todoTasks]
     }
+	
+	/**
+	 * Used to set the status of a task, which will perform additional updated based on the state
+	 * @param task
+	 * @param status
+	 * @return
+	 */
+	def setTaskStatus( task, status) {
+		
+		// If the current task.status or the persisted value equals the new status, then there's nutt'n to do.
+		if (task.status == status || task.getPersistentValue('status') == status) {
+			return
+		}
+		
+		task.status = status
+
+		// Now for certain statuses we'll update some other properties to boot
+		
+		if ([AssetCommentStatus.STARTED, AssetCommentStatus.DONE, AssetCommentStatus.TERMINATED].contains(status)) {
+	 		// Get the current user's person so we can assign it appropriately
+			def userPerson = securityService.getUserLoginPerson()
+	
+			def now =  GormUtil.convertInToGMT( "now", "EDT" )
+					
+			switch (status) {
+				case AssetCommentStatus.STARTED:
+					task.assignedTo = userPerson
+					task.actStart = now
+					break
+					
+				case AssetCommentStatus.DONE:
+				case AssetCommentStatus.TERMINATED:
+					task.resolvedBy = userPerson
+					task.actFinish = now
+					break
+			}
+		}
+	}
+ 	
+	/**
+	 * This is invoked by the AssetComment.beforeUpdate method in order to handle any status changes
+	 * that may result in the updating of other tasks successor tasks.
+	 */
+	def taskStatusChangeEvent( task ) {
+		log.info "taskStatusChangeEvent: processing task(${task.id}): ${task}"
+		def status = task.status
+		
+		// Let's bail out if the status isn't dirty or the status isn't STARTED or DONE
+		if ( ! task.isDirty('status') ||
+			task.getPersistentValue('status') == status || 
+			! [AssetCommentStatus.STARTED, AssetCommentStatus.DONE].contains(status) ) {
+			return
+		}
+		
+		// Okay so we want to handle the STARTED and DONE states and update accordingly.  We are going
+		// to assume that the validation logic prevented the user from changing the status if there were
+		// any incomplete predecessors.
+			
+		// TODO: taskStatusChangeEvent : Add logic to handle READY for the SS predecessor type and correct the current code to not assume SF type
+	
+		//
+		// Now mark any successors as Ready if all of the successors' predecessors are DONE
+		//
+		if ( status ==  AssetCommentStatus.DONE ) {
+			def successorDependents = TaskDependency.findByPredecessor(task)
+			successorDependents?.each() { succDepend ->
+				def dependentTask = succDepend.assetComment
+				log.debug "taskStatusChangeEvent: Processing dependentTask(${dependentTask.id}): ${dependentTask}"
+				
+				// If the Task is in the Planned or Pending state, we can check to see if it makes sense to set to READY
+				if ([AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING].contains(dependentTask.status)) {
+					
+					// Find all predecessor/ tasks for the successor, other than the current task, and make sure they are completed
+					def predDependencies = TaskDependency.findByAssetCommentAndPredecessorNot(dependentTask, task)
+					def makeReady=true
+					log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) predecessors> ${predDependencies}"
+					predDependencies?.each() { predDependency
+						def predTask = predDependency.assetEntity
+						// TODO : runbook : taskStatusChangeEvent - add the dependency type (SS,FS) logic here
+						if (predTask.status != AssetCommentStatus.COMPLETED) { 
+							makeReady = false
+						}
+					}
+					if (makeReady) {
+						log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) Making READY "
+						setTaskStatus(dependentTask, AssetCommentStatus.READY)
+						// log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) Making READY - Successful"
+						if ( ! dependentTask.validate() ) {
+							log.error "taskStatusChangeEvent: Failed Readying successor task [${dependentTask.id} " + GormUtil.allErrorsString(dependentTask)
+						}
+						// log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) Made it by validate() "
+						
+						/*
+						 * OK - For anybody looking at this logic and questioning it, let me first say I'm confused too.  For some 
+						 * reason we do not need to invoke the save method here on the successor tasks that are being updated.  Some how
+						 * GORM is handling it auto-magically. The code originally was doing the save but would get a strange error:
+						 * 		[http-8080-1] ERROR errors.GrailsExceptionResolver  - Index: 1, Size: 0
+						 * 		java.lang.IndexOutOfBoundsException: Index: 1, Size: 0
+						 * 		at java.util.ArrayList.RangeCheck(ArrayList.java:547)
+						 * I therefore have commented it out.
+						 * John 8/2012
+						if (false && dependentTask.save(flush:true) ) {
+							log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) Saved"
+							return
+						} else {
+						//if (! (  dependentTask.validate() && dependentTask.save(flush:true) ) ) {
+							log.error "Failed Readying successor task [${dependentTask.id} " + GormUtil.allErrorsString(dependentTask)
+							
+							 throw new TaskCompletionException("Unable to READY task ${dependentTask} due to " +
+								 GormUtil.allErrorsString(dependentTask) )
+						}
+						*/
+					}
+				} else {
+					log.warn "taskStatusChangeEvent: Found dependentTask(${dependentTask.id}): ${dependentTask} at unexpected status (${dependentTask.status}"
+				} 
+			} // succDependencies?.each()
+		}
+	}
+
 
 	/**
 	 * Used to determine the CSS class name that should be used when presenting a task, which is based on the task's status	
@@ -76,11 +192,12 @@ class TaskService {
 	 * @return String The appropriate CSS style or task_na if the status is invalid
 	 */
 	def getCssClassForStatus( status ) {
+		def css = 'task_na'
 		if (AssetCommentStatus.getList().contains(status)) {
-			return "task_${status.toLowerCase()}"
-		} else {	
-			return 'task_na'
+			css = "task_${status.toLowerCase()}"
 		}
+		// log.error "getCssClassForStatus('${status})=${css}"
+		return css 
 	}
 
 	/**

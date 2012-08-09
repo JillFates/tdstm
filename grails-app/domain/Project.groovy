@@ -1,5 +1,6 @@
 import com.tdssrc.grails.GormUtil
 import org.jsecurity.SecurityUtils
+
 class Project extends PartyGroup {
 
 	String projectCode

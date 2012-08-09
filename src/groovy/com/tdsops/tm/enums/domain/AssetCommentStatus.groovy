@@ -14,6 +14,8 @@ class AssetCommentStatus {
 	static final String PENDING='Pending'
 	static final String STARTED='Started'
 	static final String COMPLETED='Completed'
+	static final String DONE='Completed'
+	static final String TERMINATED='Terminated'
 	static final getList() {
 		return [PLANNED, PENDING, READY, STARTED, HOLD, COMPLETED]
 	}
