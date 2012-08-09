@@ -1437,8 +1437,9 @@ function addPredecessor(issueCategory,predecessorCategory,comment,row,span){
 		     if(issueCategory){
 		    	 $('#predecessorCategoryId_'+rowNo).val($('#'+issueCategory).val())
 		     }
+		     $("#predCount").val(parseInt(rowNo)+1)
 	         $('#predecessorTr').show()
-	         $("#predCount").val(parseInt(rowNo)+1)
+	         
 		 }
 	})
 }
