@@ -1421,7 +1421,7 @@ function addPredecessor(issueCategory,predecessorCategory,comment,row,span){
 			category =$('#'+issueCategory).val()
 		}
 	var commentId = comment ? $('#'+comment).val() : ''
-	new Ajax.Request('../assetEntity/getPredecessor?category='+category+'&assetCommentId='+commentId,{asynchronous:true,evalScripts:true,
+	new Ajax.Request('../assetEntity/getPredecessor?category='+category+'&assetCommentId='+commentId,{asynchronous:false,evalScripts:true,
 		 onComplete:function(e){
 		     $('#'+span).html(e.responseText)
 		     $('#taskDependencyTdId').html(e.responseText)
