@@ -3393,8 +3393,9 @@ class AssetEntityController {
 		}
 		def prdecessors = AssetComment.findAll(queryForPredecessor)
 		def taskId = params.assetCommentId ? 'taskDependencyEditId' : 'taskDependencyId'
-	
-		def selectControl = new StringBuffer("""<select id="${taskId}" name="taskDependencyEdit" >""")
+	    def selectName = params.assetCommentId ? 'taskDependencyEdit' : 'taskDependencySave'
+		
+		def selectControl = new StringBuffer("""<select id="${taskId}" name="${selectName}" >""")
 		
 		prdecessors.each{
 			selectControl.append("<option value='${it.id}'>${it.toString()}</option>")
@@ -3407,7 +3408,13 @@ class AssetEntityController {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
 		def viewId = params.forView
-		def assignedToSelect = partyRelationshipService.getProjectCompaniesStaff( projectId ,'genSelectForOwner',viewId)
+		def projectCompaniesStaff = partyRelationshipService.getProjectCompaniesStaff( projectId ,'all' )
+		def assignedToSelect = new StringBuffer("""<select id="${viewId}" name="${viewId}" >""")
+		projectCompaniesStaff.each{
+			assignedToSelect.append("<option value='${it.partyIdTo.id}'>${it.partyIdTo.firstName+" "+ it.partyIdTo.lastName}</option>")
+		}
+		assignedToSelect.append("</select>")
+		
 		render assignedToSelect
 	}
 } 

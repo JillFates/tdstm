@@ -217,36 +217,33 @@ class PartyRelationshipService {
     	}
     	return list
     }
-    /*
-     * 	Return the Companies Staff list, which are not associated with Project 
+    /**
+     * Return the Companies Staff list, which are not associated with Project Or all based on generate value
+     * @param : prjectId
+     * @param : generate( either 'all' or for ignore project staff
+     * 
      */
-    def getProjectCompaniesStaff( def projectId ,generate , viewId) {
+    def getProjectCompaniesStaff( def projectId , def generate) {
     	def list = []
     	def project = Project.get( projectId )
     	def projectCompanyQuery = "select pr.partyIdTo from PartyRelationship pr where pr.partyRelationshipType in ('PROJ_CLIENT','PROJ_COMPANY','PROJ_PARTNER','PROJ_VENDOR ') and pr.partyIdFrom = $projectId and pr.roleTypeCodeFrom = 'PROJECT'  "
-    	def projectStaffQuery = "select ps.partyIdTo from PartyRelationship ps where ps.partyRelationshipType = 'PROJ_STAFF' and ps.partyIdFrom = $projectId and ps.roleTypeCodeFrom = 'PROJECT'"
     	def query = " from PartyRelationship p where p.partyRelationshipType = 'STAFF' and ( p.partyIdFrom in ( $projectCompanyQuery ) or p.partyIdFrom = ${project.client.id} ) and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' "
-		    query += generate ? '' :" and  p.partyIdTo not in ( $projectStaffQuery )"
-    	def projectCompaniesStaff = PartyRelationship.findAll(query)
-		if(generate){
-			def selectControlForAssignedTo = new StringBuffer("""<select id="${viewId}" name="${viewId}" >""")
-			projectCompaniesStaff.each{
-				selectControlForAssignedTo.append("<option value='${it.partyIdTo.id}'>${it.partyIdTo.firstName+" "+ it.partyIdTo.lastName}</option>")
+		if( !generate ){
+			def projectStaffQuery = "select ps.partyIdTo from PartyRelationship ps where ps.partyRelationshipType = 'PROJ_STAFF' and ps.partyIdFrom = $projectId and ps.roleTypeCodeFrom = 'PROJECT'"
+			query +=" and  p.partyIdTo not in ( $projectStaffQuery )"
+			def projectCompaniesStaff = PartyRelationship.findAll(query)
+			projectCompaniesStaff.each{staff ->
+				def map = new HashMap()
+				def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+				map.put("company", company.partyIdFrom)
+				map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
+				map.put("staff", staff.partyIdTo)
+				list<<map
 			}
-			selectControlForAssignedTo.append("</select>")
-			
-			return selectControlForAssignedTo
-		}else{
-	        projectCompaniesStaff.each{staff ->
-	            def map = new HashMap()
-	            def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-	            map.put("company", company.partyIdFrom)
-	            map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
-	            map.put("staff", staff.partyIdTo)
-	            list<<map
-	        }
-	    	return list
+		} else {
+			list = PartyRelationship.findAll(query)
 		}
+    	return list
     }
     /*
      *  Will return the Companies list associated with the Project

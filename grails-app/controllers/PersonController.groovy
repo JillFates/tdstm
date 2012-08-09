@@ -295,7 +295,7 @@ class PersonController {
 		def role = ""
 		def subject = SecurityUtils.subject
 		def projectStaff = partyRelationshipService.getProjectStaff( projectId )	
-		def companiesStaff = partyRelationshipService.getProjectCompaniesStaff( projectId,'','' )
+		def companiesStaff = partyRelationshipService.getProjectCompaniesStaff( projectId,'' )
 		def projectCompanies = partyRelationshipService.getProjectCompanies( projectId )
 		return [ projectStaff:projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies, projectId:projectId, submit:submit, personHasPermission:RolePermissions.hasPermission("AddPerson") ]
 	}

@@ -792,7 +792,7 @@ function showAssetDialog( e , action ) {
 		      	 $('#mustVerifyEditId').attr('checked', false);
 	      	 }
 	      	 $('#statusShowId').html(ac.status);
-	         $("#statusShowId").className = "";
+	         $("#statusShowId").removeAttr("class");
 	      	 $('#statusShowId').addClass(params.cssForCommentStatus);
 	      	 $('#isResolvedEditId').val(ac.isResolved);
 	      	
