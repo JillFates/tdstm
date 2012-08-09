@@ -74,10 +74,12 @@
 		</tr>
 		<tr class="issue" id="categoryTrId">
 			<td valign="top" class="name"><label for="category">Category:</label></td>
-			<td valign="top" class="value" id="categoryTdId"></td>
-			<td valign="top" class="name" id="taskNumberId"></td>
-			<td valign="top" class="name"><label for="priorityShowId">Priority:</label></td>
-			<td valign="top" class="value" id="priorityShowId"></td>
+			<td valign="top" class="value" id="categoryTdId" style="width:15%"></td>
+			<td>
+				<span id="taskNumberId"></span>
+				<span ><label for="priorityShowId">Priority:</label></span>
+				<span id="priorityShowId"></span>
+			</td>
 		</tr>
 		<tr class="prop" id="mustVerifyId" style="display: none">
 			<td valign="top" class="name" ><label for="mustVerify">Must Verify:</label></td>
@@ -92,11 +94,21 @@
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
 				<label for="overRide" >Overridden</label></td>
 		</tr>
+		<tr id="assetShowId" class="prop">
+			<td valign="top" class="name" id="assetTdId"><label for="asset">Asset:</label></td>
+			<td valign="top" class="value" id="assetShowValueId" colspan="3"></td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name"><label for="comment">Description:</label></td>
+			<td valign="top" class="value" colspan="3">
+				<textarea cols="80" rows="2" id="commentTdId" readonly="readonly"></textarea>
+			</td>
+		</tr>
 		<tr class="prop" id="predecessorShowTr" style="display: none">
-			<td><label for="precessorShowId">Predecessor:</label></td>
-			<td id="predecessorShowTd"></td>
-			<td><label for="precessorShowId">Successor:</label></td>
-			<td id="successorShowTd"></td>
+			<td valign="top"><label for="precessorShowId">Predecessor:</label></td>
+			<td valign="top" id="predecessorShowTd" colspan="2" width="34%"></td>
+			<td valign="top"  style="float: left;"><label for="precessorShowId" >Successor:</label></td>
+			<td valign="top" id="successorShowTd" colspan="2" width="76%" style="margin-left: 0px;float: left;"></td>
 		</tr>
         <tr class="prop" id="predecessorTrShowId" style="display: none">
 			<td valign="top" class="name"><label for="predecessorShowId">Predecessor:</label></td>
@@ -110,16 +122,6 @@
 			<td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
 			<td valign="top" class="value" id="commentCodeTdId" colspan="3"></td>
 		</tr>
-		<tr id="assetShowId" class="prop">
-			<td valign="top" class="name" id="assetTdId"><label for="asset">Asset:</label></td>
-			<td valign="top" class="value" id="assetShowValueId" colspan="3"></td>
-		</tr>
-		<tr class="prop">
-			<td valign="top" class="name"><label for="comment">Description:</label></td>
-			<td valign="top" class="value" colspan="3">
-				<textarea cols="80" rows="4" id="commentTdId" readonly="readonly"></textarea>
-			</td>
-		</tr>
 		<tr class="issue" id="workFlowShow" style="display: none">
 			<td valign="top" class="name"><label for="durationShowId">Duration:</label></td>
 			<td valign="top" class="value"colspan="3">
@@ -131,15 +133,15 @@
 	</div>
 	<div id="showResolveDiv" style="display: none;" class="issue">
 	<table id="showResolveTable" style="border: 0px">
+    	<tr class="prop">
+			<td valign="top" class="name"><label for="status">Status:</label></td>
+			<td valign="top" class="value" id="statusShowId" colspan="1" style="width: 20%"></td>
+		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="previousNotes">Previous Notes:</label></td>
 			<td valign="top" class="value" colspan="3">
 				<div id="previousNotesShowId"></div>
 			</td>
-		</tr>
-		<tr class="prop">
-			<td valign="top" class="name"><label for="status">Status:</label></td>
-			<td valign="top" class="value" id="statusShowId" colspan="1" style="width: 20%"></td>
 		</tr>
 		<tr class = "issue" id="estStartShow" style="display: none">
 			<td valign="top" class="name" nowrap="nowrap"><label for="estStartShowId">Estimated Start:</label></td>
@@ -150,20 +152,18 @@
 		<tr class = "issue" id="actStartShow" style="display: none">
 			<td valign="top" class="name"><label for="actStartShowId">Actual Start:</label></td>
 			<td valign="top" class="value" id="actStartShowId"></td>
-			<td valign="top" class="name" nowrap="nowrap"><label for="actFinishShowId">Actual Finish:</label></td>
+			<td valign="top" class="name" nowrap="nowrap" width="10%"><label for="actFinishShowId">Actual Finish:</label></td>
 			<td valign="top" class="value" id="actFinishShowId" nowrap="nowrap"></td>
 		</tr >
 		<tr class="prop">
 			<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
-			<td valign="top" class="value" colspan="3">
+			<td valign="top" class="value" colspan="6">
             	<div id="resolutionId"></div>
 			</td>
 		</tr>
 		<tr>
 			<td valign="top" class="name" nowrap="nowrap"><label for="resolvedBy">Resolved By:</label></td>
-			<td valign="top" class="value" id="resolvedById" ></td>
-			<td valign="top" class="name"><label for="dateResolved">Resolved At:</label></td>
-			<td valign="top" class="value" id="dateResolvedId" ></td>
+			<td valign="top" class="value" id="resolvedById" nowrap="nowrap"></td>
 		</tr>
    </table>
 	</div>
