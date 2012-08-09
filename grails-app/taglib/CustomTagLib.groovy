@@ -25,7 +25,13 @@ class CustomTagLib {
 		if (dtParam != "null") {
 		
 			dtParam = dtParam.trim();
-			out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]
+			if(format=="MM/dd"){
+			 out << dtParam[5..6]+"/"+dtParam[8..9]
+			}else{
+			 out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]
+			}
+			
+			
 		
 		}
 	}
