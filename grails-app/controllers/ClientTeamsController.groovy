@@ -1057,12 +1057,12 @@ class ClientTeamsController {
 		noteList.each{
 			def dateCreated = it.dateCreated.format("E, d MMM 'at ' HH:mma")
 			notes << [dateCreated , it.createdBy.toString() ,it.note]
-3		}
+		}
 		def viewMode = session.getAttribute('ISSUE_VIEW_MODE')
 		if(viewMode=='mobile'){
-			render (view:'showIssue_m',model:['assetComment':assetComment,notes:notes])
+			render (view:'showIssue_m',model:['assetComment':assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1])
 		}else{
-			return[assetComment:assetComment,notes:notes]
+			return[assetComment:assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1]
 		}
 	}
 }

@@ -62,8 +62,14 @@
 			<tr class="prop" >
 				<td valign="top" class="name"><label for="status">Status:</label></td>
 				<td style="width: 20%;">
-					<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
-					noSelection="['':'please select']"  onChange="showResolve()" disabled="true"></g:select>
+					<g:if test="${statusWarn==1}">
+						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
+						noSelection="['':'please select']"  onChange="showResolve()" disabled="true"></g:select>
+					</g:if>
+					<g:else>
+						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
+						noSelection="['':'please select']"  onChange="showResolve()"></g:select>
+					</g:else>
 				</td>	
 			</tr>	
 			 <% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
