@@ -64,6 +64,22 @@
 	}
 	
 	/**
+	 * 
+	 * Used to get user's current bundleId
+	 */
+	def getUserCurrentMoveBundleId() {
+		def bundleId = RequestContextHolder.currentRequestAttributes().getSession().getAttribute( "CURR_BUNDLE" )?.CURR_BUNDLE
+		return bundleId
+	}
+	/**
+	 *
+	 * Used to get user's current MoveEventId
+	 */
+	def getUserCurrentMoveEventId() {
+		def bundleId = RequestContextHolder.currentRequestAttributes().getSession().getAttribute( "MOVE_EVENT" )?.MOVE_EVENT
+		return bundleId
+	}
+	/**
 	 * Used to get the UserLogin object of the currently logged in user
 	 * @return UserLogin object or null if user is not logged in
 	 */
