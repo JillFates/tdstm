@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<%@page import="com.tds.asset.TaskDependency;"%>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -31,15 +31,39 @@
 			</td>
 			</tr>		
 			<tr>
-			<td valign="top" class="name"><label for="comment">Task:</label></td>
-			<td colspan=2>
-			  <textarea rows="4" cols="130" style="width:100%;padding:0px;" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" >${assetComment.comment}</textarea>
-			</td></tr>	
+				<td valign="top" class="name"><label for="comment">Task:</label></td>
+				<td colspan=2>
+				  <textarea rows="4" cols="130" style="width:100%;padding:0px;" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" >${assetComment.comment}</textarea>
+				</td>
+			</tr>	
+			<tr>
+				<td valign="top" class="name"><label>Predecessors:</label></td>
+				<td><span style="width: 50%">
+							<g:each in="${assetComment.taskDependencies}" var="task">
+							<span class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}">
+								${task.predecessor.category}&nbsp;&nbsp;&nbsp;&nbsp;${task.predecessor}
+							</span>
+							</g:each>
+					</span>
+				</td>
+			</tr>
+			<tr>
+				<td valign="top" class="name"><label>Successors:</label></td>
+				<td>	
+					<span  style="width: 50%">
+							<g:each in="${TaskDependency.findAllByPredecessor( assetComment )}" var="task">
+							<span class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}">
+								${task.assetComment.category}&nbsp;&nbsp;&nbsp;&nbsp;${task.assetComment}
+							</span>
+							</g:each>
+					</span>
+				</td>
+			</tr>
 			<tr class="prop" >
 				<td valign="top" class="name"><label for="status">Status:</label></td>
 				<td style="width: 20%;">
 					<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
-					noSelection="['':'please select']"  onChange="showResolve()"></g:select>
+					noSelection="['':'please select']"  onChange="showResolve()" disabled="true"></g:select>
 				</td>	
 			</tr>	
 			 <% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>

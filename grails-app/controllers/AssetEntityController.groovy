@@ -1807,7 +1807,7 @@ class AssetEntityController {
 				def task = taskDep.predecessor
 				def css = taskService.getCssClassForStatus(task.status)
 				def taskDesc = task.comment?.length()>50 ? task.comment.substring(0,50): task.comment
-				predecessorTable.append("""<tr class="${css}" style="cursor:pointer;" onClick="showAssetComment(${task.id}, 'show')"><td>${task.category}</td><td>${task.taskNumber ? task.taskNumber+':' :''}${taskDesc}</td>""")
+				predecessorTable.append("""<tr class="${css}" style="cursor:pointer;" onClick="showAssetComment(${task.id}, 'show')"><td>${task.category}</td><td>${task.taskNumber ? task.taskNumber+':' :''}${taskDesc}</td></tr>""")
 		    }
 			predecessorTable.append('</tbody></table>')
 		}
