@@ -1823,7 +1823,7 @@ class AssetEntityController {
 			successorTable.append("""</tbody></table>""")
 		
 		}
-		def predEditTable = new StringBuffer("""<table id="predecessorEditTableId" cellspacing="0" style="border:0px;"><tbody>""")
+		def predEditTable = new StringBuffer("""<table id="predecessorEditTableId" cellspacing="0" style="border:0px;width:0px"><tbody>""")
 		taskDependencies.each{ taskDep ->
 			def predecessor = taskDep.predecessor
 			// log.info "showComment: predecessor=${predecessor}"
@@ -3427,10 +3427,10 @@ class AssetEntityController {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
 		def viewId = params.forView
-		def projectCompaniesStaff = partyRelationshipService.getProjectCompaniesStaff( projectId ,'all' )
 		def assignedToSelect = new StringBuffer("""<select id="${viewId}" name="${viewId}" >""")
-		projectCompaniesStaff.each{
-			assignedToSelect.append("<option value='${it.partyIdTo.id}'>${it.partyIdTo.firstName+" "+ it.partyIdTo.lastName}</option>")
+		def projectStaff = partyRelationshipService.getProjectStaff( projectId )?.staff
+		projectStaff.each{
+			assignedToSelect.append("<option value='${it.id}'>${it.firstName+" "+ it.lastName}</option>")
 		}
 		assignedToSelect.append("</select>")
 		

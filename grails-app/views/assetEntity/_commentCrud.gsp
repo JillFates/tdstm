@@ -398,9 +398,9 @@
 				</div>
 			</td>
 			<td valign="top" class="name"><label for="category">Category:</label>
-			<td width="10px">
+			<td width="10px" colspan="4">
 				<g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
-				onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionId', 'predecessorId',jQuery('#createAssetCommentId').html())"></g:select>
+				onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionEditId', 'predecessorId',jQuery('#createAssetCommentId').html())"></g:select>
 				<span id="taskNumberSpanEditId"></span>
         	    <label for="priority">Priority:</label>
             	<g:select id="priorityEdit" name="priorityEdit" from="${1..5}" value="" noSelection="['':'please select']"></g:select>
@@ -417,7 +417,7 @@
 		</tr>
 		<tr class="prop" id="workFlowTransitionEditTrId" style="display: none">
 			<td valign="top" class="name"><label for="workFlowTransitionEditId">WorkFlow Step:</label></td>
-			<td valign="top" class="value" >
+			<td valign="top" class="value" colspan="3">
 			 <span id="workFlowTransitionEditId"></span>
 			<input type="checkbox" id="overrideEdit" name="override" value="0"
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
@@ -438,6 +438,7 @@
 			<td valign="top" class="name"><label for="predecessorEditTd">Predecessors:</label>
 			 <a class="button" href="javascript:" onclick="addPredecessor('categoryEditId','','updateCommentId','predecessorEditTr','relatedIssueEditId');"> Add </a>
 			</td>
+			<td><span style="margin-left: 380px;">Successors:</span></td>
 		</tr>
 		<tr class="prop" id="predecessorEditTr" style="display: none">
 			<td valign="top" class="name"><label for="predecessorEditTd">Pred:</label></td>
@@ -449,7 +450,9 @@
 		</tr>
         <tr class="prop" id="predecessorTrEditId" style="display: none">
 			<td valign="top" class="name"></td>
-			<td valign="top" class="value" id="predecessorEditId" colspan="3"></td>
+			<td nowrap="nowrap" width="auto;"> <span id="predecessorEditId" style="width: 50%;float: left"></span> <span id="successorEditId" style="width: 40%;float:right;"></span>
+			</td>
+			
 		</tr>
 		<tr class="prop" id="moveEventEditTrId" style="display: none">
 			<td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>

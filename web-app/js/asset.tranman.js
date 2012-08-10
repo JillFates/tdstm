@@ -675,7 +675,7 @@ function showAssetDialog( e , action ) {
       		    	 noteTable += "<tr><td>" + notes[i][0] + "</td><td>" + notes[i][1] + "</td><td><span>" + notes[i][2] + "</span></td></tr>"
       		    	 }
       		     noteTable += "</table>"
-      		     if(params.predecessorTable.length==0){ 
+      		     if(params.predecessorTable.length==0 && params.successorTable.length==0){ 
       		    	 $('#predecessorShowTr').css('display','none')
       		     }else{
       		    	$('#predecessorShowTr').css('display','table-row')
@@ -685,6 +685,7 @@ function showAssetDialog( e , action ) {
                  $('#taskNumberId').html('Task # : '+'<b>'+taskNumber +'</b>')
                  $('#taskNumberSpanEditId').html('Task # : '+'<b>'+ac.taskNumber+'</b>')
                  $('#successorShowTd').html(params.successorTable)
+                 $('#successorEditId').html(params.successorTable)
                  $('#predecessorEditId').html(params.predEditTable)
                  $('#predecessorTrEditId').css('display','table-row')
     	      	 $('#previousNotesShowId').html(noteTable)
