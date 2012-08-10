@@ -1,17 +1,16 @@
+/**
+ * TaskDependency represents the association of tasks with various types of dependencies amongst them 
+ */
+
 package com.tds.asset
 
-/**
- * 
- * 
- * @author pbwebguy
- *
- */
+import com.tdsops.tm.enums.domain.TaskDependencyType
+
 class TaskDependency {
-	// enum DependencyType { FS,FF,SF,SS }
 	
 	AssetComment predecessor
 	// AssetComment successor
-	String dependencyType = 'FS'
+	String type = TaskDependencyType.FS
 	// Integer delayTime		// # of minutes to delay either lead or lag 
 	// Integer delayType		// 1=Lead, 2=Lag
 	
@@ -19,15 +18,15 @@ class TaskDependency {
 	
 	static constraints = {
 		predecessor(nullable:false)
-		dependencyType( inList:['FS','FF','SF','SS'] )
+		type( inList:TaskDependencyType.getList() )
 	}
 	
 	static mapping = {
-		dependencyType sqltype: 'char', length:2
+		type sqltype: 'char', length:2
 		id column:'task_dependency_id'
 	}
 
 	String toString() {
-		"${assetComment.id}(${dependencyType})~${id}"
+		"${assetComment.id}(${type})~${id}"
 	}
 }

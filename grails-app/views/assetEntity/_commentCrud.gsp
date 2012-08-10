@@ -90,9 +90,9 @@
 		<tr class="issue" id="workFlowShow" style="display: none">
 			<td valign="top" class="name" nowrap="nowrap"><label for="workFlowShowId">WorkFlow Transition:</label></td>
 			<td valign="top" class="value" id="workFlowShowId"></td>
-			<td valign="top" class="name" colspan="2"><input type="checkbox" id="overRideShow" name="overRideShow" value="0"
+			<td valign="top" class="name" colspan="2"><input type="checkbox" id="overrideShow" name="overrideShow" value="0"
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
-				<label for="overRide" >Overridden</label></td>
+				<label for="override" >Overridden</label></td>
 		</tr>
 		<tr id="assetShowId" class="prop">
 			<td valign="top" class="name" id="assetTdId"><label for="asset">Asset:</label></td>
@@ -239,9 +239,9 @@
 		<tr class="prop" id="workFlowTransitionTrId" style="display: none">
 			<td valign="top" class="name"><label for="actStartTrId">WorkFlowTransition:</label></td>
 			<td valign="top" class="value" id="workFlowTransitionId" colspan="3">
-			<input type="checkbox" id="overRide" name="overRide" value="0"
+			<input type="checkbox" id="override" name="override" value="0"
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
-			 <label for="overRide" >Overridden</label>
+			 <label for="override" >Overridden</label>
 			</td>
 		</tr>
 		<tr class="prop" id="assetEntityTrId">
@@ -419,9 +419,9 @@
 			<td valign="top" class="name"><label for="workFlowTransitionEditId">WorkFlow Step:</label></td>
 			<td valign="top" class="value" >
 			 <span id="workFlowTransitionEditId"></span>
-			<input type="checkbox" id="overRideEdit" name="overRide" value="0"
+			<input type="checkbox" id="overrideEdit" name="override" value="0"
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
-			 <label for="overRide">Overridden</label>
+			 <label for="override">Overridden</label>
 			</td>
 		</tr>
 		<tr id="assetTrId" class="prop">

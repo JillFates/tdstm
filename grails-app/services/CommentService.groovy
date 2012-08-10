@@ -10,6 +10,7 @@ import com.tdssrc.grails.GormUtil
 import com.tds.asset.*
 import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.AssetCommentCategory
 
 /**
  * CommentService class contains methods used to manage comments/tasks
@@ -27,13 +28,13 @@ class CommentService {
 	def securityService
 	
 	/**
-	 * Used to persist changes to the AssetComment and CommentNote from 
+	 * Used to persist changes to the AssetComment and CommentNote from various forms
 	 * @param params 
 	 * @isNew - boolean flag that indicates if it is new or an update
 	 * @return map of the AssetComment data used to refresh the view
 	 */
 	def saveUpdateCommentAndNotes(session, params, isNew = true,flash) {
-		def loginUser = securityService.getUserLogin()
+		def userLogin = securityService.getUserLogin()
 		def project = securityService.getUserCurrentProject()
 		
 		def formatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -41,57 +42,75 @@ class CommentService {
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		
 		def date = new Date()
+		def assetEntity
 		def assetComment
 		def commentProject
 
 		if (! project) {
-			log.error "User has no current project"
+			log.error "saveUpdateCommentAndNotes: User has no currently selected project"
 			// TODO : Handle failure
 			return []
 		}
-		
+
+		// if assetEntity is passed, then validate that it valid and that the user has access to it (belongs to the current project)
+		if ( params.assetEntity ) {
+			if (! params.assetEntity.isNumber() ) {
+				log.error "saveUpdateCommentAndNotes: Invalid asset id (${params.assetEntity}"
+				return []
+			}
+			// Now see if it exists and belongs to the project
+			assetEntity = AssetEntity.get(params.assetEntity)
+			if (assetEntity) {
+				def assetProject = assetEntity.project
+				if (assetProject.id != project.id) {
+					log.error "saveUpdateCommentAndNotes: Asset(${assetEntity.id}/${assetProject}) not associated with user(${userLogin}) project (${project})"
+					return []
+				}
+			} else {
+				// TODO : handle failure for missing Asset
+				log.error "saveUpdateCommentAndNotes: Specified asset [id:${params.assetEntity}] was not found while creating comment"
+				return []
+			}
+		}
+
 		// Create or load the assetComment object appropriately
 		if (isNew) {
-			assetComment = new AssetComment()
-			assetComment.createdBy = loginUser.person
-			assetComment.project = project
-			def lastTask = jdbcTemplate.queryForInt("select max(task_number) FROM asset_comment WHERE project_id = ${project.id}")
-			assetComment.taskNumber = lastTask + 1
-			if ( params.commentType != 'issue' && (! params.assetEntity || ! params.assetEntity.isNumber() ) ) {
-				log.error "Asset id was not properly supplied to add or update a comment"
+			// Only tasks can be created that are not associated with an Asset
+			if ( ! assetEntity && params.commentType != AssetCommentType.TASK ) {
+				log.error "saveUpdateCommentAndNotes: Asset id was not properly supplied to add or update a comment"
 				// TODO : handle failure where an asset id is necessary but not supplied
 				return []
 			}
-			if ( params.assetEntity && params.assetEntity.isNumber() ) {
-				def assetEntity = AssetEntity.get(params.assetEntity)
-				if (assetEntity) {
-					assetComment.assetEntity = assetEntity
-					commentProject = assetEntity.project
-				} else {
-					// TODO : handle failure for missing Asset
-					log.error "Specified asset [id:${params.assetEntity}] was not found while creating comment"
-					return []
-				}
+			
+			// Let's create a new Comment/Task
+			assetComment = new AssetComment()
+			assetComment.createdBy = userLogin.person
+			assetComment.project = project
+			def lastTask = jdbcTemplate.queryForInt("SELECT MAX(task_number) FROM asset_comment WHERE project_id = ${project.id}")
+			assetComment.taskNumber = lastTask + 1
+			if (assetEntity) {
+				assetComment.assetEntity = assetEntity
+				commentProject = assetEntity.project
 			}
 		} else {
 			// Load existing comment
 			assetComment = AssetComment.get(params.id)
 			if (! assetComment ) {
 				// TODO : handle failure for invalid comment id
-				log.error "Specified comment [id:${params.id}] was not found while updating comment"
+				log.error "saveUpdateCommentAndNotes: Specified comment [id:${params.id}] was not found"
 				return []
-			}else{
-				// TODO : Lok - why the heck were you DELETING the TaskDependencies?????
-			   //  def taskDependencyInstance =  TaskDependency.executeUpdate("delete TaskDependency where assetComment = ? ",[assetComment])
+			}
+			
+			commentProject = assetComment.project
+			
+			// Make sure that the comment about to be updated is associated to the user's current project
+			if ( commentProject.id != project.id ) {
+				log.error "saveUpdateCommentAndNotes: The comment (${params.id}/${commentProject.id}) is not associated with user's current project [${project.id}]"
+				// TODO: handle failure of bad assetComment id passed for the user's current project (could be a hack)
+				return []
 			}
 		}
-		commentProject = assetComment.assetEntity ? assetComment.assetEntity.project : assetComment.project
-		// Make sure that the comment about to be updated/created is associated to the user's current project
-		if ( commentProject.id != project.id ) {
-			log.error "The project [${commentProject.id}] for comment [${assetComment.id}] was not associated with user's current project [${project.id}]"
-			// TODO: handle failure of bad assetComment id passed for the user's current project (could be a hack)
-			return []
-		}
+		
 		//	def bindArgs = [assetComment, params, [ exclude:['assignedTo', 'assetEntity', 'moveEvent', 'project', 'dueDate', 'status'] ] ]
 		//	def bindArgs = [assetComment, params, [ include:['comment', 'category', 'displayOption', 'attribute'] ] ]
 		//	bindData.invoke( assetComment, 'bind', (Object[])bindArgs )
@@ -99,22 +118,34 @@ class CommentService {
 		
 		// Assign the general params for all types.  Was having an issue with the above binding, which was 
 		// setting the assignedTo automatically with a blank Person object even though it was excluded.
+		// TODO : should only set properties base on the commentType
+		if (params.commentType) assetComment.commentType = params.commentType
 		if (params.comment) assetComment.comment = params.comment
 		if (params.category) assetComment.category = params.category
 		if (params.displayOption) assetComment.displayOption = params.displayOption
 		if (params.attribute) assetComment.attribute = params.attribute
-		if (params.commentType) assetComment.commentType = params.commentType
 	    assetComment.resolution = params.resolution
 		if(params.estStart) assetComment.estStart = estformatter.parse(params.estStart)
 		if(params.estFinish) assetComment.estFinish = estformatter.parse(params.estFinish)
-		if(params.actStart) assetComment.actStart = estformatter.parse(params.actStart)
-		assetComment.workflowTransition = WorkflowTransition.get(params.workflowTransition)
+		// Actual Start/Finish are handled by the statusUpdate function
+		// if(params.actStart) assetComment.actStart = estformatter.parse(params.actStart)
+		if(params.workflowTransition?.isNumber()) {
+			// TODO : should validate that this workflow is associated with that of the workflow for the move bundle
+			def wft = WorkflowTransition.get(params.workflowTransition)
+			if (wft) {
+				assetComment.workflowTransition = wft
+			} else {
+				log.warn "saveUpdateCommentAndNotes: Invalid workflowTransition id (${params.workflowTransition})"
+			}  
+		}
 		if(params.hardAssigned?.isNumber()) assetComment.hardAssigned = Integer.parseInt(params.hardAssigned)
-		if(params.priority) assetComment.priority = Integer.parseInt(params.priority)
-		if(params.duration) assetComment.duration = Integer.parseInt(params.duration)
+		if(params.priority?.isNumber()) assetComment.priority = Integer.parseInt(params.priority)
+		if(params.override?.isNumber()) assetComment.workflowOverride = Integer.parseInt(params.override)
+		if(params.duration?.isNumber()) assetComment.duration = Integer.parseInt(params.duration)
 		if(params.durationScale) assetComment.durationScale = params.durationScale
-		if(params.overRide?.isNumber()) assetComment.workflowOverride = Integer.parseInt(params.overRide)
-		 assetComment.role = params.role
+		
+		// TODO : runbook - need to validate that the role is legit for "Staff : *" of RoleType
+		assetComment.role = params.role
 		 
 		// Issues (aka tasks) have a number of additional properties to be managed 
 		if ( assetComment.commentType == AssetCommentType.ISSUE ) {
@@ -148,54 +179,65 @@ class CommentService {
 			if(params.dueDate){
 				assetComment.dueDate = formatter.parse(params.dueDate)
 			}
-			
 		}
         
 		if (! assetComment.hasErrors() && assetComment.save(flush:true)) {
-		
-			if (assetComment.commentType == 'issue' && params.note){
+			
+			// Deal with Notes if there are any
+			if (assetComment.commentType == AssetCommentType.TASK && params.note){
 				// TODO The adding of assetNote should be a method on the AssetComment instead of reverse injections plus the save above can handle both. Right now if this fails, everything keeps on as though it didn't which is wrong.
 				def assetNote = new CommentNote();
-				assetNote.createdBy = loginUser.person
+				assetNote.createdBy = userLogin.person
 				assetNote.dateCreated = date
 				assetNote.note = params.note
 				assetNote.assetComment = assetComment
-				if (!assetNote.save(flush:true)){
+				if ( assetNote.hasErrors() || ! assetNote.save(flush:true)){
 					// TODO error won't bubble up to the user
-					assetNote.errors.allErrors.each{println it}
+					log.error "saveUpdateCommentAndNotes: Saving comment notes faild - " + GormUtil.allErrorsString(assetNote)
 				}
+			}
+			
+			// Now handle creating / updating task dependencies if the "manageDependency flag was passed
+			if (params.manageDependency) {
+				def taskDependencies = params.list('taskDependency[]')
 				
+				// If we're updating, we'll delete the existing dependencies and then readd them following
+				if (! isNew ) {
+					TaskDependency.executeUpdate("DELETE TaskDependency WHERE assetComment = ? ",[assetComment])
+				}
+				// Iterate over the predecessor ids and validate that the exist and are associated with the project
+				taskDependencies.each {
+					def predecessor = AssetComment.get(it)
+					if (! predecessor) {
+						log.error "saveUpdateCommentAndNotes: invalid predecessor id (${it})"
+					} else {
+						def predProject = predecessor.project
+						if ( predProject?.id != project.id ) {
+							log.error "saveUpdateCommentAndNotes: predecessor project id (${predProject?.id}) different from current project (${project.id})"
+						} else {
+							def taskDependency = new TaskDependency()
+							taskDependency.predecessor = predecessor
+							taskDependency.assetComment = assetComment
+							if( taskDependency.hasErrors() || ! taskDependency.save(flush:true) ) {
+								log.error "saveUpdateCommentAndNotes: Saving comment predecessors faild - " + GormUtil.allErrorsString(taskDependency)
+							}
+						}
+					}
+				}
 			}
-			def taskDependency = params["taskDependency[]"]
-			taskDependency.each {
-			   def commentInstance = AssetComment.get(it)
-			   def taskDepenencyInstance = new TaskDependency()
-			   taskDepenencyInstance.predecessor = commentInstance
-			   taskDepenencyInstance.assetComment = assetComment
-			   if(!taskDepenencyInstance.save(flush:true)){taskDepenencyInstance.errors.allErrors.each{println it}}
-			}
+			
 			// TODO - comparison of the assetComment.dueDate may not work if the dueDate is stored in GMT
 			def css =  assetComment.dueDate < date ? 'Lightpink' : 'White'
-			def status = (assetComment.commentType == "issue" && assetComment.isResolved == 0) ? true : false
 			
-			    def statusCss = 'asset_process'
+			def status = (assetComment.commentType == AssetCommentType.TASK && assetComment.isResolved == 0) ? true : false
 			
-				if(assetComment.status=='Ready' ||assetComment.status=='' || assetComment.status==null){
-					statusCss='asset_ready'
-				}else if(assetComment.status=='Completed'){
-					statusCss='asset_done'
-				}else if(assetComment.status=='Hold'){
-					statusCss='asset_hold'
-				}else if(assetComment.status=='Planned'||assetComment.status=='Pending'){
-					statusCss='asset_pending'
-				}
+			def statusCss = taskService.getCssClassForStatus(assetComment.status )
 				
-		      flash.message = isNew ? "${assetComment} were Saved" : "${assetComment} were Updated"
-			def map = [ assetComment : assetComment, status : status ? true : false , cssClass:css,statusCss:statusCss ]
+			def map = [ assetComment : assetComment, status : status ? true : false , cssClass:css, statusCss:statusCss ]
 
 			// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.
-			def loginPerson = loginUser.person	// load so that we don't have a lazyInit issue
-			if ( assetComment.commentType == 'issue' && assetComment.assignedTo && assetComment.assignedTo.id != loginPerson.id ) {
+			def loginPerson = userLogin.person	// load so that we don't have a lazyInit issue
+			if ( assetComment.commentType == AssetCommentType.TASK && assetComment.assignedTo && assetComment.assignedTo.id != loginPerson.id ) {
 				// Send email in separate thread to prevent delay to user
 				// TODO renable Thread.start once we upgrade to 2.x (see sendTaskEMail below for additional code re-enablement).
 				//Thread.start {
@@ -223,36 +265,51 @@ class CommentService {
 		// TODO re-enable the withNewSession after upgrade to 2.x as there is a bug in 1.3 that we ran into
 		// https://github.com/grails/grails-core/commit/9a8e765e4a139f67bb150b6dd9f7e67b16ecb21e
 		// AssetComment.withNewSession { session ->
-			def assetComment = AssetComment.get(taskId)
-			if (! assetComment) {
-				log.error "Invalid AssetComment ID [${taskId}] referenced in call"
-				return
-			}
-			
-			// Only send emails out for issues in the categories up to premove
-			if ( assetComment.commentType != 'issue' || ! ['general', 'discovery', 'planning','walkthru','premove'].contains(assetComment.category) ) {
-				return
-			}
+		def assetComment = AssetComment.read(taskId)
+		if (! assetComment) {
+			log.error "sendTaskEMail: Invalid AssetComment ID [${taskId}] referenced in call"
+			return
+		}
+		
+		// TODO: Need to refactor these AssetComment.category parameters into an ENUM
+		def statusToSendEmailFor = [
+			AssetCommentCategory.GENERAL,
+			AssetCommentCategory.DISCOVERY,
+			AssetCommentCategory.PLANNING,
+			AssetCommentCategory.WALKTHRU,
+			AssetCommentCategory.PREMOVE,
+			AssetCommentCategory.POSTMOVE ]
 
-			// Must have an email address
-			if ( ! assetComment.assignedTo?.email) {
-				log.error "No valid email address for assigned individual"
-				return
-			}
+		// log.info "sendTaskEMail: commentType: ${assetComment.commentType}, category: ${assetComment.category}"
 			
-			// Truncate long comments to make manageable subject line
-			def sub = leftString(getLine(assetComment.comment,0), 40)
-			sub = (isNew ? '' : 'Re: ') + ( (sub == null || sub.size() == 0) ? "Task ${assetComment.id}" : sub )
-	
-			mailService.sendMail {
-				to assetComment.assignedTo.email
-				subject "${sub}"
-				body (
-					view:"/assetEntity/_taskEMailTemplate",
-					model: assetCommentModel(assetComment, tzId)
-				)
-			}
-//		}
+		// Only send emails out for issues in the categories up to premove
+		if ( assetComment.commentType != AssetCommentType.TASK || ! statusToSendEmailFor.contains(assetComment.category) ) {
+			return
+		}
+
+		def assignedTo = assetComment.assignedTo
+		
+		// Must have an email address
+		if ( ! assignedTo?.email) {
+			log.warn "sendTaskEMail: No valid email address for assigned individual"
+			return
+		}
+		
+		// Truncate long comments to make manageable subject line
+		// TODO : Use Apache commons StringUtil and get rid of this function
+		def sub = leftString(getLine(assetComment.comment,0), 40)
+		sub = (isNew ? '' : 'Re: ') + ( (sub == null || sub.size() == 0) ? "Task ${assetComment.id}" : sub )
+		
+		log.info "sendTaskEMail: sending email to ${assignedTo.email} for task id ${taskId}"
+		
+		mailService.sendMail {
+			to assignedTo.email
+			subject "${sub}"
+			body (
+				view:"/assetEntity/_taskEMailTemplate",
+				model: assetCommentModel(assetComment, tzId)
+			)
+		}
 	}
 	
 	/**

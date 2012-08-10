@@ -1793,6 +1793,12 @@ class AssetEntityController {
 		// when there are no taskDependencies as Null gets incremented down in the map return.  Plus the property should be completely calculated here instead of incrementing
 		// while assigning in the map.  Logic should test for null.
 		def maxVal = TaskDependency.list([sort:'id',order:'desc',max:1])?.id[0]
+		if (maxVal) {
+			maxVal++
+		} else {
+			maxVal = 1
+		}
+		
 		def predecessorTable = ""
 		def taskDependencies = assetComment.taskDependencies
 		if (taskDependencies.size() > 0) {
@@ -1820,7 +1826,7 @@ class AssetEntityController {
 		def predEditTable = new StringBuffer("""<table id="predecessorEditTableId" cellspacing="0" style="border:0px;"><tbody>""")
 		taskDependencies.each{ taskDep ->
 			def predecessor = taskDep.predecessor
-			log.error "predecessor=${predecessor}"
+			// log.info "showComment: predecessor=${predecessor}"
 			def selectCategory = new StringBuffer("<select id=\"predecessorCategoryEditId_${taskDep.id}\" name=\"category\" onChange='fillPredecessor(this.id,this.value,${assetComment.id})'>")
 			AssetComment.constraints.category.inList.each() {
 				def selected = it == predecessor.category ? 'selected="selected"' : ''
@@ -1830,7 +1836,7 @@ class AssetEntityController {
 			
 			def predFortask = taskService.genSelectForTaskDependency(taskDep)
 			
-			predEditTable.append("""<tr id="row_Edit_${taskDep.id}"  > <td>${selectCategory}</td><td id="taskDependencyEditTdId_${taskDep.id}">${predFortask}</td><td><a href="javascript:deleteRow('row_Edit_${taskDep.id}')"><span class="clear_filter"><u>X</u></span></a></td>""")
+			predEditTable.append("""<tr id="row_Edit_${taskDep.id}"><td>${selectCategory}</td><td id="taskDependencyEditTdId_${taskDep.id}">${predFortask}</td><td><a href="javascript:deleteRow('row_Edit_${taskDep.id}')"><span class="clear_filter"><u>X</u></span></a></td>""")
 			selectCategory = ""
 		}
 		def cssForCommentStatus = taskService.getCssClassForStatus(assetComment.status)
@@ -1840,7 +1846,7 @@ class AssetEntityController {
 			assetComment:assetComment, personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
 			dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo ?: "", assetName:assetComment.assetEntity?.assetName ?: "",
 			eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate ?: '',etStart:etStart, etFinish:etFinish,atStart:atStart,notes:notes,
-			workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,predEditTable:predEditTable,maxVal:maxVal+1,
+			workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,predEditTable:predEditTable,maxVal:maxVal,
 			cssForCommentStatus:cssForCommentStatus ]
 		render commentList as JSON
 	}
@@ -1850,8 +1856,9 @@ class AssetEntityController {
 	 * @author Lokanath
 	 * @return assetComments
 	 * -----------------------------------------------------------------*/
+	// def saveComment = { com.tdsops.tm.command.AssetCommentCommand cmd ->
 	def saveComment = {
-		def map = commentService.saveUpdateCommentAndNotes(session, params, true,flash)
+		def map = commentService.saveUpdateCommentAndNotes(session, params, true, flash)
 		render map as JSON
 	}
 	/* ------------------------------------------------------------
@@ -1861,10 +1868,10 @@ class AssetEntityController {
 	 * @return assetComment
 	 * ------------------------------------------------------------ */
 	def updateComment = {
-		def map = commentService.saveUpdateCommentAndNotes(session, params, false,flash)
-		if(params.open=='view'){
+		def map = commentService.saveUpdateCommentAndNotes(session, params, false, flash)
+		if (params.open=='view'){
 			forward(action:'showComment',params:[id:params.id] )
-		}else{
+		} else {
 		   render map as JSON
 		}
 		

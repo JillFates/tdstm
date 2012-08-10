@@ -694,7 +694,7 @@ function showAssetDialog( e , action ) {
 		      	 $('#noteEditId').val('')
 		      	 $('#statusEditId').val(ac.status)
 		      	 $('#hardAssignedShow').attr('disabled', 'disabled');
-      		     $('#overRideShow').attr('disabled', 'disabled');
+      		     $('#overrideShow').attr('disabled', 'disabled');
 		      	 if(ac.hardAssigned==1){
 		      		 $('#hardAssignedShow').attr('checked', true);
 		      		 $('#hardAssignedEdit').attr('checked', true);
@@ -703,8 +703,8 @@ function showAssetDialog( e , action ) {
 		      		$('#hardAssignedEdit').attr('checked', false);
 		      	 }
       		     if(ac.workflowOverride==1){
-		      		 $('#overRideShow').attr('checked', true);
-		      		 $('#overRideEdit').attr('checked', true);
+		      		 $('#overrideShow').attr('checked', true);
+		      		 $('#overrideEdit').attr('checked', true);
 		      	 }
       		     $('#roleTdId').html(params.roles)
       		     ac.role ? $('#roleTypeEdit').val(ac.role) :$('#roleTypeEdit').val('')
@@ -1203,8 +1203,9 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 			'actStart':$('#actStartCreateId').val(), 'workflowTransition':$('#workFlowId').val(),
 			'hardAssigned':$('#hardAssigned').val(),'priority':$('#priority').val(),
 			'duration':$('#duration').val(),'durationScale':$('#durationScale').val(),
-			'assetEntity':objId ,'overRide':$('#overRide').val(),'role':$('#roleType').val(),
-			'taskDependency' : predArr};
+			'assetEntity':objId ,'override':$('#override').val(),'role':$('#roleType').val(),
+			'taskDependency' : predArr,
+			'manageDependency':1 };
 		var completeFunc = function(e) { addCommentsToList(e); }
 	} else {
 		$('#taskDependencyTdId').html("")
@@ -1224,9 +1225,9 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 			'actStart':$('#actStartEditId').val(), 'workflowTransition':$('#workFlowId').val(),
 			'hardAssigned':$('#hardAssignedEdit').val(),'priority':$('#priorityEdit').val(),
 			'duration':$('#durationEdit').val(),'durationScale':$('#durationScaleEdit').val(),
-			'overRide':$('#overRideEdit').val(),'role':$('#roleTypeEdit').val(),
+			'override':$('#overrideEdit').val(),'role':$('#roleTypeEdit').val(),
 			'note':$('#noteEditId').val(),'taskDependency' : $("#taskDependencyEditId").val(),
-			'id':objId,'taskDependency' : predArr,'open':open};
+			'id':objId, 'taskDependency':predArr,'manageDependency':1, 'open':open};
 		var completeFunc = function(e) { updateCommentsOnList(e); }
 	}
 	if (redirectTo) { completeFunc = function(e) { updateCommentsLists(e); } }
