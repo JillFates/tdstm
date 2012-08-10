@@ -280,7 +280,6 @@
 				noSelection="['':'please select']" onChange="showResolve(this.value)"></g:select>
 			</td>
 		</tr>
-		
 		<tr class="prop" id="moveEventTrId" style="display: none">
 			<td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
 			<td valign="top" class="value" colspan="3">
@@ -291,7 +290,7 @@
 		<tr id="durationTrId" class="prop" style="display: none">
         	<td valign="top" class="name"><label for="duration ">Duration:</label></td>
         	<td valign="top" class="value" colspan="3">
-        	  <input type="text" id="duration" name="duration" value="" size="5">
+        	  <input type="text" id="duration" name="duration" value="" size="3">
             	<g:select id="durationScale" name="durationScale " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>
         	</td>
 		</tr>
@@ -367,14 +366,12 @@
 	   <tr class="prop issue" id="assignedToTrEditId" style="display: none">
 			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
 			<td valign="top" id="assignedToEditTdId" style="display: none;" class="issue"  colspan="3" nowrap="nowrap">
-               
                 <span id="assignedEditSpan"> </span>
-              
 				<g:select id="roleTypeEdit" name="roleTypeEdit" from="${RoleType.list()}" noSelection="['':'UnAssigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)"></g:select>
 
 				<input type="checkbox" id="hardAssignedEdit" name="hardAssignedEdit" value="1"  checked="checked"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
-				<label for="hardAssignedEdit" >Fixed Assignment</label>
+				<label for="hardAssignedEdit" >Fixed Assignment</label>&nbsp;&nbsp;
 			    <label for="dueDate">Due:</label>
 				<script type="text/javascript" charset="utf-8">
 				jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
@@ -409,7 +406,6 @@
             	<g:select id="priorityEdit" name="priorityEdit" from="${1..5}" value="" noSelection="['':'please select']"></g:select>
 			</td>
         	<td valign="top" class="name" >
-        	
         	</td>
         </tr>
 		<tr class="prop" id="mustVerifyEditTr" style="display: none;">
@@ -425,7 +421,7 @@
 			 <span id="workFlowTransitionEditId"></span>
 			<input type="checkbox" id="overRideEdit" name="overRide" value="0"
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
-			 <label for="overRideEdit" >Overridden</label>
+			 <label for="overRide">Overridden</label>
 			</td>
 		</tr>
 		<tr id="assetTrId" class="prop">
@@ -471,7 +467,7 @@
 		<tr id="durationEditId" class="prop" style="display: none">
         	<td valign="top" class="name"><label for="durationEdit ">Duration:</label></td>
         	<td valign="top" class="value" colspan="3">
-        	  <input type="text" id="durationEdit" name="durationEdit" value="" size="5"/>
+        	  <input type="text" id="durationEdit" name="durationEdit" value="" size="3"/>
             	<g:select id="durationScaleEdit" name="durationScaleEdit " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>
         	</td>
 		</tr>
