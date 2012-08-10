@@ -1847,7 +1847,7 @@ class AssetEntityController {
 			dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo ?: "", assetName:assetComment.assetEntity?.assetName ?: "",
 			eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate ?: '',etStart:etStart, etFinish:etFinish,atStart:atStart,notes:notes,
 			workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,predEditTable:predEditTable,maxVal:maxVal,
-			cssForCommentStatus:cssForCommentStatus ]
+			cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 1 : 0]
 		render commentList as JSON
 	}
 	/* ----------------------------------------------------------------

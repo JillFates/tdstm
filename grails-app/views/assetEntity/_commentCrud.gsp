@@ -360,6 +360,7 @@
  <div class="dialog" style="border: 1px solid #5F9FCF">
 	<input type="hidden" name="id" id="updateCommentId" value="" />
 	<input type="hidden" name="assetName" id="assetValueId" value="" />
+	<input type="hidden" id="statuWarnId" value="" />
   <div>
 	<table id="updateCommentTable" style="border: 0px;">
 	   <% // TODO : Replace DB lookup in GSP with data from controller %>

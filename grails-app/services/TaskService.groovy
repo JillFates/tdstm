@@ -9,6 +9,7 @@
 import com.tdsops.tm.enums.domain.RoleTypeGroup
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCommentCategory
 
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetComment
@@ -241,6 +242,20 @@ class TaskService {
 		}
 		selectControl.append("</select>")
 		return selectControl
+	}
+	
+	/**
+	 * Returns Boolean value to warn status is overriding or not
+	 * @param AssetComment as task
+	 * @return statusWarn as can
+	 */
+	def canChangeStatus ( task ){
+		def can = true
+		if ([AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP].contains( task.category ) && 
+			! [ AssetCommentStatus.READY, AssetCommentStatus.STARTED ].contains( task.status )) {
+			  can = false 
+		}
+		return can
 	}
 	
 }

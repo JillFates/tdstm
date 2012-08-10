@@ -680,6 +680,7 @@ function showAssetDialog( e , action ) {
       		     }else{
       		    	$('#predecessorShowTr').css('display','table-row')
       		     }
+      		     $('#statuWarnId').val(params.statusWarn)
                  $('#predecessorShowTd').html(params.predecessorTable)
                  var taskNumber = ac.taskNumber ? ac.taskNumber : '&nbsp;&nbsp;'
                  $('#taskNumberId').html('Task # : '+'<b>'+taskNumber +'</b>')
@@ -1405,6 +1406,10 @@ function roleChange(value){
 	}
 }
 function showResolve(value){
+	var statusWarn = $('#statuWarnId').val()
+  	if(statusWarn==1){
+  		alert("Warning: you are overriding the predefined ordering of tasks by changing the task status prematurely.")
+  	}
 	if(value=='Completed'){
 		$('#resolutionTrId').css('display','table-row')
 		$('#resolutionEditTrId').css('display','table-row')
