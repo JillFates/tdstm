@@ -111,7 +111,7 @@ class WorkflowService {
 				    				projectAssetMap.save(flush:true)
 									
 									assetEntity.currentStatus = Integer.parseInt(stateEngineService.getStateId( process, toState ))
-									assetEntity.save()
+									assetEntity.save(flush:true)
 			    				}
 								success = true
 			    			}

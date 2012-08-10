@@ -96,6 +96,7 @@ class TaskService {
 					break
 					
 				case AssetCommentStatus.DONE:
+					taskStatusChangeEvent(task)
 				case AssetCommentStatus.TERMINATED:
 					task.resolvedBy = userPerson
 					task.actFinish = now
@@ -129,10 +130,11 @@ class TaskService {
 		// Now mark any successors as Ready if all of the successors' predecessors are DONE
 		//
 		if ( status ==  AssetCommentStatus.DONE ) {
-			def successorDependents = TaskDependency.findByPredecessor(task)
+			def successorDependents = TaskDependency.findAllByPredecessor(task)
+			log.info "taskStatusChangeEvent: Found ${successorDependents ? successorDependents.size() : '0'} successors for task ${task.id}"
 			successorDependents?.each() { succDepend ->
 				def dependentTask = succDepend.assetComment
-				log.debug "taskStatusChangeEvent: Processing dependentTask(${dependentTask.id}): ${dependentTask}"
+				log.info "taskStatusChangeEvent: Processing dependentTask(${dependentTask.id}): ${dependentTask}"
 				
 				// If the Task is in the Planned or Pending state, we can check to see if it makes sense to set to READY
 				if ([AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING].contains(dependentTask.status)) {
@@ -141,20 +143,38 @@ class TaskService {
 					def predDependencies = TaskDependency.findByAssetCommentAndPredecessorNot(dependentTask, task)
 					def makeReady=true
 					log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) predecessors> ${predDependencies}"
-					predDependencies?.each() { predDependency
-						def predTask = predDependency.assetEntity
+					predDependencies?.each() { predDependency ->
+						def predTask = predDependency.assetComment
 						// TODO : runbook : taskStatusChangeEvent - add the dependency type (SS,FS) logic here
 						if (predTask.status != AssetCommentStatus.COMPLETED) { 
 							makeReady = false
 						}
 					}
 					if (makeReady) {
+						/*
+						def taskToReady = AssetComment.get(dependentTask.id)
+						setTaskStatus(taskToReady, AssetCommentStatus.READY)
+						if ( ! taskToReady.validate() ) {
+							log.error "taskStatusChangeEvent: Failed Readying successor task [${taskToReady.id} " + GormUtil.allErrorsString(taskToReady)
+						}
+//							if ( taskToReady.save(flush:true) ) {
+						if ( taskToReady.save() ) {
+							log.info "taskStatusChangeEvent: dependentTask(${taskToReady.id}) Saved"
+							return
+						}
+						if (! (  dependentTask.validate() && dependentTask.save(flush:true) ) ) {
+							log.error "Failed Readying successor task [${taskToReady.id} " + GormUtil.allErrorsString(taskToReady)
+						}
+						*/
+							
+							
 						log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) Making READY "
 						setTaskStatus(dependentTask, AssetCommentStatus.READY)
 						// log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) Making READY - Successful"
 						if ( ! dependentTask.validate() ) {
 							log.error "taskStatusChangeEvent: Failed Readying successor task [${dependentTask.id} " + GormUtil.allErrorsString(dependentTask)
 						}
+						
 						// log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) Made it by validate() "
 						
 						/*
@@ -166,7 +186,8 @@ class TaskService {
 						 * 		at java.util.ArrayList.RangeCheck(ArrayList.java:547)
 						 * I therefore have commented it out.
 						 * John 8/2012
-						if (false && dependentTask.save(flush:true) ) {
+						 */
+						if ( dependentTask.save(flush:true) ) {
 							log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) Saved"
 							return
 						} else {
@@ -176,7 +197,6 @@ class TaskService {
 							 throw new TaskCompletionException("Unable to READY task ${dependentTask} due to " +
 								 GormUtil.allErrorsString(dependentTask) )
 						}
-						*/
 					}
 				} else {
 					log.warn "taskStatusChangeEvent: Found dependentTask(${dependentTask.id}): ${dependentTask} at unexpected status (${dependentTask.status}"

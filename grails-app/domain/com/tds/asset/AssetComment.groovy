@@ -163,7 +163,7 @@ class AssetComment {
 		lastUpdated = dateCreated
 		
 		// Trigger the Status Change event to properly handle an necessary changes to this task or any dependencies
-		taskService.taskStatusChangeEvent( this )
+//		taskService.taskStatusChangeEvent( this )
 	}
 	
 	def beforeUpdate = {
@@ -171,9 +171,9 @@ class AssetComment {
 		if (dateResolved != null) isResolved = 1
 		
 		// Trigger the taskStatusChangeEvent if the status was changed so we can update dependencies
-		if ( this.isDirty('status')) {
-			taskService.taskStatusChangeEvent( this )
-		}
+//		if ( this.isDirty('status')) {
+//			taskService.taskStatusChangeEvent( this )
+//		}
 	}
 
 	String toString() {
