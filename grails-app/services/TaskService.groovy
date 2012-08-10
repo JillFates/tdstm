@@ -58,7 +58,6 @@ class TaskService {
 //		 sql.append("ORDER BY ${sortOn} ${sortOrder}")
 		
 		// log.error "SQL for userTasks: " + sql.toString()
-		// println "-------------params---------$sql----------$sqlParams"
 		
 		def allTasks = AssetComment.findAll( sql.toString(), sqlParams )
 		def todoTasks = allTasks.findAll { [AssetCommentStatus.READY, AssetCommentStatus.STARTED].contains(it.status) }
@@ -234,7 +233,7 @@ class TaskService {
 		def projectId = project.id
 		
 		def selectControl = new StringBuffer("""<select id="${idPrefix}_${taskDependency.id}" name="${name}">""")
-		String queryForPredecessor = "FROM AssetComment a WHERE a.project=${projectId} AND a.category='${category}' AND a.commentType='${AssetCommentType.TASK}' ORDER BY a.taskNumber"
+		String queryForPredecessor = "FROM AssetComment a WHERE a.project=${projectId} AND a.category='${category}' AND a.commentType='${AssetCommentType.TASK}' ORDER BY a.taskNumber DESC"
 		def predecessors = AssetComment.findAll(queryForPredecessor)
 		predecessors.each{
 			def selected = it.id == predecessor.id ?  'selected="selected"' : ''

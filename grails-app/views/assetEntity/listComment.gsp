@@ -30,6 +30,13 @@
 			$("#createEntityView").dialog({ autoOpen: false })
 	    	currentMenuId = "#assetMenu";
 	    	$("#assetMenuId a").css('background-color','#003366')
+	    	$(".span_ready").parent().addClass("task_ready")
+	    	$(".span_hold").parent().addClass("task_hold")
+	    	$(".span_started").parent().addClass("task_started")
+	    	$(".span_pending").parent().addClass("task_pending")
+	    	$(".span_planned").parent().addClass("task_planned")
+	    	$(".span_completed").parent().addClass("task_completed")
+	    	$(".span_na").parent().addClass("task_na")
         });
         </script>
 </head>
@@ -81,8 +88,8 @@
 							 <jmesa:htmlColumn property="commentType" title="Type" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.commentType}</span>
 							 </jmesa:htmlColumn>
-							 <jmesa:htmlColumn property="status" title="Status" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');" class="task_${commentInstance.status?.toLowerCase()}">${commentInstance.status}</span>
+							 <jmesa:htmlColumn property="status" title="Status" sortable="true" filterable="true" width="100px" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');" class="span_${commentInstance.status ? commentInstance.status.toLowerCase() : 'na'}">${commentInstance.status}</span>
 							 </jmesa:htmlColumn>
 							 <jmesa:htmlColumn property="assignedToString" title="Assigned To" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
         	                 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.assignedTo}</span>
@@ -105,7 +112,7 @@
                 </jmesa:tableFacade>
             </form>
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-		      <span class="menuButton"><a class="create" href="#" onclick="createIssue()" >Create</a></span>
+		      <span class="menuButton"><a class="create" href="javascript:createIssue()">Create</a></span>
 	       </div>
             </div>
             <div id="showEntityView" style="display: none;"></div>

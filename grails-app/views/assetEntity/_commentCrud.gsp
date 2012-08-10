@@ -421,7 +421,7 @@
 			 <span id="workFlowTransitionEditId"></span>
 			<input type="checkbox" id="overrideEdit" name="override" value="0"
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
-			 <label for="override">Overridden</label>
+			 <label for="overrideEdit">Overridden</label>
 			</td>
 		</tr>
 		<tr id="assetTrId" class="prop">

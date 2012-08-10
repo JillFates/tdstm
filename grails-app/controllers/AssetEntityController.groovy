@@ -3404,6 +3404,7 @@ class AssetEntityController {
 		if(params.assetCommentId){ 
 			queryForPredecessor += "AND a.id != ${params.assetCommentId}"
 		}
+		queryForPredecessor += "ORDER BY a.taskNumber DESC"
 		def prdecessors = AssetComment.findAll(queryForPredecessor)
 		def taskId = params.assetCommentId ? 'taskDependencyEditId' : 'taskDependencyId'
 	    def selectName = params.assetCommentId ? 'taskDependencyEdit' : 'taskDependencySave'

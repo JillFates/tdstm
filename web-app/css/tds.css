@@ -1080,6 +1080,12 @@ a.tab_deselect {
 	word-wrap:break-word;
 	word-break:break-all;
 }
+#taskNumberSpanEditId {
+	margin:15px;
+}
+#overrideEdit {
+	margin-left:15px;
+}
 #commentTdId {
 	font-size: 12px;
 	font-weight: bold;
