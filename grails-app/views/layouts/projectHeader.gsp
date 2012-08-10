@@ -234,7 +234,7 @@
 							</tds:hasPermission>
 							<tds:hasPermission permission='AssetMenuView'>
 							<li><g:link class="mmlink" controller="assetEntity" action="exportAssets"  onclick="hideMegaMenu('assetMegaMenu')">Export Assets</g:link></li>
-							<li><g:link class="mmlink" controller="assetEntity" action="listComment"  onclick="hideMegaMenu('assetMegaMenu')">List Comments</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" action="listComment"  onclick="hideMegaMenu('assetMegaMenu')">List Tasks/Comments</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('assetMegaMenu')">help</a></li>
@@ -313,14 +313,14 @@
 				<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#bundleMegaMenu')" href="javascript:showMegaMenu('#bundleMegaMenu')" style="display: inline"></a></g:link>
 			</li>
 
-			<li id="teamMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#teamMegaMenu')" controller="clientTeams"  >Tasks
+			<li id="teamMenuId" style="position:relative; float:left;"><a class="home" onmouseover="showMegaMenu('#teamMegaMenu')" href="/tdstm/clientTeams/listComment" >Tasks
 				<a id="teamMenuAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#teamMegaMenu')" href="javascript:showMegaMenu('#teamMegaMenu')" style="display: inline"></a></g:link>
 				<div class="megamenu rooms" id="teamMegaMenu" onmouseover="showMegaMenu('#teamMegaMenu')" onmouseout="mclosetime()" style="display: none;">
 					<table class="mmtable"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Tasks</span><br />
 						<ul>
-							<tds:hasPermission permission='ShowMoveTechsAndAdmins'>
 							<li><a class="mmlink" id="MyTasksMenuId" href="/tdstm/clientTeams/listComment" onclick="hideMegaMenu('teamMegaMenu')">My Tasks: 0</a></li>
+							<tds:hasPermission permission='ShowMoveTechsAndAdmins'>
 							<li><a class="mmlink" href="/tdstm/clientTeams/list" onclick="hideMegaMenu('teamMegaMenu')">Team Tasks</a></li>
 							<li><g:link class="mmlink" controller="assetEntity" action="listComment"  onclick="hideMegaMenu('assetMegaMenu')">All Tasks</g:link></li>
 							<li>&nbsp;</li>
