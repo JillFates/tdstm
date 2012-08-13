@@ -136,6 +136,7 @@ class UserPreferenceService  {
     /*
      *	Set Roles to Persons in PartyRole  
      */
+	// TODO : setUserRoles - Move to SecurityService
     def setUserRoles( def roleType, def person ){
     	def personInstance = Party.findById(person)
     	roleType.each{role ->
@@ -152,6 +153,7 @@ class UserPreferenceService  {
      * @param  : person and rols
      * @return : Remove Roles to Persons in PartyRole  
      *----------------------------------------------------------*/
+	// TODO : setUserRoles - Move to SecurityService
     def removeUserRoles( def roleType, def person ){
     	roleType.each{role ->
     		PartyRole.executeUpdate("delete from PartyRole where party = '$person' and roleType = '$role' ")
@@ -161,6 +163,7 @@ class UserPreferenceService  {
     /*
      *  Method to return List of Roles Available for User
      */
+	// TODO : getAvailableRoles - Move to SecurityService
     def getAvailableRoles( def person ){
         def availableRoles = RoleType.findAll("from RoleType r where r.id not in (select roleType.id from PartyRole where party = $person.id group by roleType.id )")
     	 
@@ -169,6 +172,7 @@ class UserPreferenceService  {
     /*
      *  Method to return List of Roles Assigned to User
      */
+	// TODO : getAssignedRoles - Move to SecurityService
     def getAssignedRoles( def person ){
 
         def assignedRoles = RoleType.findAll("from RoleType r where r.id in (select roleType.id from PartyRole where party = $person.id group by roleType.id )")
@@ -178,6 +182,7 @@ class UserPreferenceService  {
     /*
      *  Check the User Authentication and return the boolean value 
      */
+	// TODO : checkActiveStatus - Move to SecurityService
     def checkActiveStatus(){
     	def activeStatus = true
     	def principal = SecurityUtils.subject.principal
@@ -193,6 +198,7 @@ class UserPreferenceService  {
      * Update the lastlogin once user has logged in.
      * @param  : login username.
      */
+	// TODO : updateLastLogin - Move to SecurityService
 	def updateLastLogin( username ){
     	if( username ){
     		def userLogin = UserLogin.findByUsername( username )
