@@ -54,6 +54,7 @@
 	/** 
 	 * Used to get user's current project
 	 */
+	// TODO : getUserCurrentProject - move to userPreferenceService
 	def getUserCurrentProject() {
 		def project
 		def projectId = RequestContextHolder.currentRequestAttributes().getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
@@ -67,6 +68,7 @@
 	 * 
 	 * Used to get user's current bundleId
 	 */
+	// TODO : getUserCurrentMoveBundleId - move to userPreferenceService
 	def getUserCurrentMoveBundleId() {
 		def bundleId = RequestContextHolder.currentRequestAttributes().getSession().getAttribute( "CURR_BUNDLE" )?.CURR_BUNDLE
 		return bundleId
@@ -75,10 +77,12 @@
 	 *
 	 * Used to get user's current MoveEventId
 	 */
+	// TODO : getUserCurrentMoveEventId - move to userPreferenceService
 	def getUserCurrentMoveEventId() {
 		def bundleId = RequestContextHolder.currentRequestAttributes().getSession().getAttribute( "MOVE_EVENT" )?.MOVE_EVENT
 		return bundleId
 	}
+	
 	/**
 	 * Used to get the UserLogin object of the currently logged in user
 	 * @return UserLogin object or null if user is not logged in
@@ -100,8 +104,7 @@
 	 */
 	def getUserLoginPerson() {
 		def userLogin = getUserLogin()
-		def party = userLogin?.person
-		return party
+		return userLogin?.person
 	}
 	
 	/**
