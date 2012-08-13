@@ -6,14 +6,14 @@
  *
  */
 
-import com.tdsops.tm.enums.domain.RoleTypeGroup
-import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdsops.tm.enums.domain.AssetCommentStatus
-import com.tdsops.tm.enums.domain.AssetCommentCategory
+import org.jsecurity.SecurityUtils
 
-import com.tds.asset.AssetEntity
 import com.tds.asset.AssetComment
 import com.tds.asset.TaskDependency
+import com.tdsops.tm.enums.domain.AssetCommentCategory
+import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.RoleTypeGroup
 import com.tdssrc.grails.GormUtil
 
 class TaskService {
@@ -88,15 +88,18 @@ class TaskService {
 			def userPerson = securityService.getUserLoginPerson()
 	
 			def now =  GormUtil.convertInToGMT( "now", "EDT" )
-					
+			def subject = SecurityUtils.subject
 			switch (status) {
 				case AssetCommentStatus.STARTED:
-					task.assignedTo = userPerson
+					if (!subject.hasRole("PROJ_MGR")) task.assignedTo = userPerson
 					task.actStart = now
 					break
 					
 				case AssetCommentStatus.DONE:
 					taskStatusChangeEvent(task)
+					if (!subject.hasRole("PROJ_MGR")) task.assignedTo = userPerson
+					task.resolvedBy = userPerson
+					task.actFinish = now
 				case AssetCommentStatus.TERMINATED:
 					task.resolvedBy = userPerson
 					task.actFinish = now

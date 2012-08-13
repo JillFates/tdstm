@@ -167,9 +167,9 @@ class CommentService {
 			
 			if (params.assignedTo && params.assignedTo.isNumber()){
 				// TODO - SECURITY - Need to validate that the assignedTo is a member of the project
+				def subject = SecurityUtils.subject
 				def person = Person.get(params.assignedTo)
-				def partyRelationRole = PartyRelationship.findByPartyIdTo(userLogin.person)?.roleTypeCodeTo
-				if(!isNew && partyRelationRole?.id != 'PROJ_MGR'){
+				if (!isNew && subject.hasRole("PROJ_MGR")){
 					assetComment.assignedTo = person
 				}else if(isNew){
 					assetComment.assignedTo = person
