@@ -484,10 +484,10 @@
 		var actionType = e.responseText
 		switch(actionType){
 			case "noTransMenu": 
-				$('#pending, #void, #ready, #noOptions', menu ).remove()
+				$('#start, #pending, #void, #ready, #noOptions', menu ).remove()
 				break;
 			case "naMenu": 
-				$('#NA, #void, #ready, #noOptions', menu ).remove()
+				$('#start, #NA, #void, #ready, #noOptions', menu ).remove()
 				break;
 			case "doneMenu": 
 				$('#start, #done, #void, #ready, #noOptions', menu ).remove()
@@ -499,7 +499,7 @@
 				$('#start, #NA, #done, #ready, #pending, #noOptions', menu ).remove()
 				break;
 			case "doMenu": 
-				$('#NA, #ready, #pending, #void, #noOptions', menu ).remove()
+				$('#start, #NA, #ready, #pending, #void, #noOptions', menu ).remove()
 				break;
 			case "noOption":
 			case "rb_noOption":
