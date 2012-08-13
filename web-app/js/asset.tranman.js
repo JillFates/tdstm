@@ -1479,7 +1479,7 @@ function fillPredecessor(id, category,commentId){
 	  return newArray;
 }
 function updateAssignedToList(forView,span){
-	new Ajax.Request('../assetEntity/updateAssignedToSelect?forView='+forView,{asynchronous:true,evalScripts:true,
+	new Ajax.Request('../assetEntity/updateAssignedToSelect?forView='+forView,{asynchronous:false,evalScripts:true,
 		 onComplete:function(e){
 			 $('#'+span).html(e.responseText)
 		 }
