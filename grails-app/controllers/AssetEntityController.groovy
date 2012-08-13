@@ -1898,17 +1898,58 @@ class AssetEntityController {
 		render assetCommentsList as JSON
 	}
 	/*---------------------------------------------------------------------------------------
-	 *	User to get the deatails for Supervisor Console
+	 *	User to get the details for Supervisor Console
 	 * 	@author:	Lokanath Reddy
 	 * 	@param :	CURR_PROJ and movebundle
 	 * 	@return:	AssetEntity details and Transition details for all MoveBundle Teams
 	 *--------------------------------------------------------------------------------------*/
 	def dashboardView = {
+		
+		def userLogin = securityService.getUserLogin()
+		def projectInstance = securityService.getUserCurrentProject()
+		def projectId = projectInstance.id
+		params.projectId = projectId
+
+		//
+		// Deal with which moveBundle that the user should be viewing
+		//
+		def bundleId = params.moveBundle
+		def moveBundleInstance
+		if (bundleId) {
+			// Okay, so the user selected one from the view.  Let's make sure that they aren't hacking around and trying to 
+			// get to a bundle outside their current project
+			moveBundleInstance = MoveBundle.findByIdAndProject(bundleId, projectInstance)
+			if (moveBundleInstance) {
+				userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
+			} else {
+				log.error "dashboardView: Bundle(${bundleId}) not associated with user's(${loginUser}) current project(${project.id})"
+				flash.message = "The bundle specified was unrelated to your current project"
+				bundleId = null
+			}
+		}
+		if ( ! bundleId ) {
+			// No bundle was specified so let's see if they have a preference or get one from the user's project
+			userPreferenceService.loadPreferences("CURR_BUNDLE")
+			def defaultBundle = getSession().getAttribute("CURR_BUNDLE")
+			if(defaultBundle?.CURR_BUNDLE){
+				moveBundleInstance = MoveBundle.findById(defaultBundle.CURR_BUNDLE)
+				def mbProject = moveBundleInstance?.project
+				// log.info "dashboardView: mbProject=${mbProject?.id}, projectId=${projectId}"
+				if( mbProject?.id != projectId ){
+//				if( mbProject?.id != Integer.parseInt(projectId) ){
+					moveBundleInstance = MoveBundle.find("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
+				}
+			} else {
+				moveBundleInstance = MoveBundle.find("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
+			}
+		}
+		
+		// Get list of all moveBundles
+		def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
+		
 		def filterAttr = [tag_f_priority:params.tag_f_priority,tag_f_assetTag:params.tag_f_assetTag,tag_f_assetName:params.tag_f_assetName,tag_f_status:params.tag_f_status,tag_f_sourceTeamMt:params.tag_f_sourceTeamMt,tag_f_targetTeamMt:params.tag_f_targetTeamMt,tag_f_commentType:params.tag_f_commentType,tag_s_1_priority:params.tag_s_1_priority,tag_s_2_assetTag:params.tag_s_2_assetTag,tag_s_3_assetName:params.tag_s_3_assetName,tag_s_4_status:params.tag_s_4_status,tag_s_5_sourceTeamMt:params.tag_s_5_sourceTeamMt,tag_s_6_targetTeamMt:params.tag_s_6_targetTeamMt,tag_s_7_commentType:params.tag_s_7_commentType]
 		session.setAttribute('filterAttr', filterAttr)
 		def showAll = params.showAll
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def bundleId = params.moveBundle
 		def currentState = params.currentState
 		def assetList
 		def bundleTeams = []
@@ -1917,16 +1958,10 @@ class AssetEntityController {
 		def totalAssetsSize = 0
 		def supportTeam = new HashMap()
 		
-		def teamType = params.teamType
-		params.projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		teamType = teamType ? teamType : getSession().getAttribute( "CONSOLE_TEAM_TYPE" )?.CONSOLE_TEAM_TYPE
-		if(!teamType){
-			teamType = "MOVE"
-		}
+		// Set the teamType to params or user's preferences or default to 'MOVE'
+		def teamType = params.teamType ?: ( getSession().getAttribute( "CONSOLE_TEAM_TYPE" )?.CONSOLE_TEAM_TYPE ?: "MOVE")
+
 		userPreferenceService.setPreference( "CONSOLE_TEAM_TYPE", "${teamType}" )
-		def projectInstance = Project.findById( projectId )
-		def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
-		def moveBundleInstance
 		def stateVal
 		def taskVal
 		/* user role check*/
@@ -1937,21 +1972,7 @@ class AssetEntityController {
 		} else if(subject.hasRole("MANAGER")){
 			role = "MANAGER"
 		}
-		if(bundleId){
-			userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
-			moveBundleInstance = MoveBundle.findById(bundleId)
-		} else {
-			userPreferenceService.loadPreferences("CURR_BUNDLE")
-			def defaultBundle = getSession().getAttribute("CURR_BUNDLE")
-			if(defaultBundle?.CURR_BUNDLE){
-				moveBundleInstance = MoveBundle.findById(defaultBundle.CURR_BUNDLE)
-				if( moveBundleInstance?.project?.id != Integer.parseInt(projectId) ){
-					moveBundleInstance = MoveBundle.find("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
-				}
-			} else {
-				moveBundleInstance = MoveBundle.find("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
-			}
-		}
+		
 		// get the list of assets order by Hold and recent asset Transition
 		if( moveBundleInstance != null ){
 			//  Get Id for respective States
@@ -2125,11 +2146,12 @@ class AssetEntityController {
 			supportTeam.put("transport", transportTeam )
 			supportTeam.put("transportMembers", transportMembers ? transportMembers?.delete((transportMembers?.length()-1), transportMembers?.length()) : "" )
 			totalAsset.each{
+				// log.info "dashboardView: it=${it}"
 				def check = true
 				def curId = it.currentState
 
-				stateVal = stateEngineService.getState( moveBundleInstance.workflowCode, curId )
-				if(stateVal){
+				stateVal = curId ? stateEngineService.getState( moveBundleInstance.workflowCode, curId ) : null
+				if (stateVal){
 					taskVal = stateEngineService.getTasks( moveBundleInstance.workflowCode, "SUPERVISOR", stateVal )
 					if(taskVal.size() == 0){
 						check = false
@@ -2148,7 +2170,8 @@ class AssetEntityController {
 				} else if(curId > rerackedId){
 					cssClass = 'asset_done'
 				}
-				assetsList<<[asset: it, status: stateEngineService.getStateLabel( moveBundleInstance.workflowCode, curId ), cssClass : cssClass, checkVal:check]
+				def status = curId ? stateEngineService.getStateLabel( moveBundleInstance.workflowCode, curId ) : ''
+				assetsList<<[asset: it, status:status, cssClass : cssClass, checkVal:check]
 			}
 			def totalSourcePending = bundleAssetsList.findAll{ it.currentStatus < releasedId || !it.currentStatus }.size()
 
@@ -2281,7 +2304,7 @@ class AssetEntityController {
 			 currentState = projectAssetMap.currentStateId
 			 }*/
 
-			def state = stateEngineService.getState( assetDetail.moveBundle.workflowCode, currentState )
+			def state = currentState ? stateEngineService.getState( assetDetail.moveBundle.workflowCode, currentState ) : null
 			def validStates
 			if(state){
 				validStates= stateEngineService.getTasks( assetDetail.moveBundle.workflowCode, "SUPERVISOR", state )
@@ -2610,7 +2633,7 @@ class AssetEntityController {
 				}
 			}
 		} catch(Exception ex){
-			log.error "$ex"
+			log.error "changeStatus: unexpected Exception occurred - ${ex.toString()}"
 		}
 		redirect(action:'dashboardView',params:[moveBundle:params.moveBundle, showAll:params.showAll] )
 	}

@@ -4,11 +4,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <title>Supervisor Console</title>
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
 
@@ -18,8 +18,8 @@ td .odd {
 	nowrap
 }
 </style>
-<link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
-<script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
+<link rel="stylesheet" type="text/css" href="${resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
+<script language="javascript" src="${resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
 <script type="text/javascript">
 function onInvokeAction(id) {
     setExportToLimit(id, '');
@@ -762,10 +762,10 @@ function onInvokeAction(id) {
 										</g:if>
 									</tds:hasPermission>
 									<a id="${assetEntityBean.id}" href="javascript:getEntityDetails('console','Server', ${assetEntityBean.id} )">
-										<img src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px" />
+										<img src="${resource(dir:'images',file:'asset_view.png')}" border="0px" />
 									</a>
 									<span style="display: none;" id="image_${assetEntityBean.id}" class="selected" >
-										<img src="${createLinkTo(dir:'images',file:'row_arrow.gif')}" border="0px"/>
+										<img src="${resource(dir:'images',file:'row_arrow.gif')}" border="0px"/>
 									</span>
 		                         </jmesa:htmlColumn>
 								</tds:hasPermission>
@@ -795,17 +795,17 @@ function onInvokeAction(id) {
 									<div id="icon_${assetEntityBean.id}">
 										<g:if test="${assetEntityBean.commentType == 'issue'}">
 											<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityBean.id}" before='setAssetId(${assetEntityBean.id});'	onComplete="listCommentsDialog( e ,'never' );">
-												<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}"	border="0px"/>
+												<img src="${resource(dir:'i',file:'db_table_red.png')}"	border="0px"/>
 											</g:remoteLink>
 										</g:if>
 										<g:elseif test="${assetEntityBean.commentType == 'comment'}">
 											<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityBean.id}" before="setAssetId(${assetEntityBean.id});" onComplete="listCommentsDialog( e ,'never' ); ">
-												<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px"/>
+												<img src="${resource(dir:'i',file:'db_table_bold.png')}" border="0px"/>
 											</g:remoteLink>
 										</g:elseif>
 										<g:else>
 										<a onclick="createNewAssetComment(${assetEntityBean.id},'${assetEntityBean.assetName}');">
-											<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
+											<img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px"/>
 										</a>
 										</g:else>
 									</div>
