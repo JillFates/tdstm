@@ -26,7 +26,7 @@
 	</div>
     <tds:hasPermission permission='CommentCrudView'>
 	<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-		<span class="menuButton"><a id="newCommentId" class="create" href="#"
+		<span class="menuButton"><a id="newCommentId" class="create" href="javascript:"
 		onclick="$('#statusId').val('');
 		$('#createResolveDiv').css('display','none');
 		$('#createCommentDialog').dialog('option', 'width', 'auto');

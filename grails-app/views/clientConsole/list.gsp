@@ -832,31 +832,6 @@
 		return data
 	}
 
-	function createNewAssetComment(asset,assetName){
-		timedUpdate('never')
-		if(asset) {
-			setAssetId( asset );
-		} else {
-			setAssetId( $('#newAssetCommentId').val() );
-		}
-		var name = assetName
-		$('#statusId').val('new');
-		$('#assetEntityTrId').css('display','table-row')
-		$('#assetEntityInputId').html(name)
-		$('#createCommentDialog').dialog('option', 'width', 'auto');
-		$('#createCommentDialog').dialog('open');
-		$('#commentsListDialog').dialog('close');
-		$('#editCommentDialog').dialog('close');
-		$('#showCommentDialog').dialog('close');
-		$('#showDialog').dialog('close');
-		$('#editDialog').dialog('close');
-		$('#createDialog').dialog('close');
-		$('#changeStatusDialog').dialog('close');
-		document.createCommentForm.mustVerify.value=0;
-		document.createCommentForm.reset();
-		document.forms['createCommentForm'].commentType.value = 'comment'
-		commentChange('#createResolveDiv','createCommentForm')
-	}
 	//To catch the event and call the specific remotefunction 
 	function catchevent(event) {
 		var oSource = event.target

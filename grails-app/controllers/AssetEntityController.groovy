@@ -1764,13 +1764,13 @@ class AssetEntityController {
 			dtResolved = estformatter.format(GormUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
 		}
 		if(assetComment.estStart){
-			etStart = estformatter.format(assetComment.estStart);
+			etStart = estformatter.format(GormUtil.convertInToUserTZ(assetComment.estStart, tzId));
 		}
 		if(assetComment.estFinish){
-			etFinish = estformatter.format(assetComment.estFinish);
+			etFinish = estformatter.format(GormUtil.convertInToUserTZ(assetComment.estFinish, tzId));
 		}
 		if(assetComment.actStart){
-			atStart = estformatter.format(assetComment.actStart);
+			atStart = estformatter.format(GormUtil.convertInToUserTZ(assetComment.actStart, tzId));
 		}
 		if(assetComment.dueDate){
 			dueDate = dateFormatter.format(assetComment.dueDate);
@@ -3429,6 +3429,7 @@ class AssetEntityController {
 		def viewId = params.forView
 		def assignedToSelect = new StringBuffer("""<select id="${viewId}" name="${viewId}" >""")
 		def projectStaff = partyRelationshipService.getProjectStaff( projectId )?.staff
+		projectStaff.sort{it.firstName}
 		projectStaff.each{
 			assignedToSelect.append("<option value='${it.id}'>${it.firstName+" "+ it.lastName}</option>")
 		}

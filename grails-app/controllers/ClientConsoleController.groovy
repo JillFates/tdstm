@@ -133,7 +133,7 @@ class ClientConsoleController {
                 
 				/*-------------get asset details----------------*/
 				def returnValue = pmoAssetTrackingService.getAssetsForListView( project.id, bundles, columns, params )
-				log.error "pmoAssetTrackingService.getAssetsForListView:" + returnValue
+				//log.error "pmoAssetTrackingService.getAssetsForListView:" + returnValue
 				resultList = returnValue[0]
 				totalAssets = returnValue[1]
 			}
@@ -668,7 +668,7 @@ class ClientConsoleController {
 		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		def workFlowCode
 		def moveBundleInstance
-		if(moveBundle!=null && moveBundle!="all"){
+		if(moveBundle  &&  moveBundle!="all"){
 		    moveBundleInstance = MoveBundle.findByIdAndProject(moveBundle,projectInstance)
 		    workFlowCode = moveBundleInstance.workflowCode
 		}else{

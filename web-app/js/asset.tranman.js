@@ -1337,6 +1337,8 @@ function createNewAssetComment(asset, assetName){
 	$('#createCommentDialog').dialog('option', 'width', 'auto');
 	$('#assetEntityTrId').css('display','table-row')
 	$('#assetEntityInputId').html(name)
+	$('#typeCommentCreateId').removeAttr('style')
+	$('#commentTypeCreateTdId').removeAttr('style')
 	$('#createCommentDialog').dialog('open');
 	$('#commentsListDialog').dialog('close');
 	$('#editCommentDialog').dialog('close');
