@@ -191,6 +191,7 @@ class WorkflowController {
 				workflowTransition.name = params["name_"+workflowTransition.id]
 				workflowTransition.transId = params["transId_"+workflowTransition.id] ? Integer.parseInt( params["transId_"+workflowTransition.id] ) : null
 				workflowTransition.type = params["type_"+workflowTransition.id]
+				workflowTransition.category = params["category_"+workflowTransition.id]
 				workflowTransition.color = params["color_"+workflowTransition.id]
 				workflowTransition.dashboardLabel = params["dashboardLabel_"+workflowTransition.id]
 				workflowTransition.predecessor = params["predecessor_"+workflowTransition.id] ? Integer.parseInt( params["predecessor_"+workflowTransition.id] ) : null
@@ -211,6 +212,7 @@ class WorkflowController {
 					name : params["name_$i"],
 					transId : params["transId_$i"] ? Integer.parseInt( params["transId_$i"] ) : null,
 					type : params["type_$i"],	
+					category : params["category_$i"],
 					color : params["color_$i"],
 					dashboardLabel : params["dashboardLabel_$i"],
 					predecessor : params["predecessor_$i"] ? Integer.parseInt( params["predecessor_$i"] ) : null,

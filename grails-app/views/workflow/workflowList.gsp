@@ -105,6 +105,8 @@
 			
 			<th class="sortable">Type<span style="color: red">*</span></th>
 			
+			<th class="sortable">Category</th>
+			
 			<th class="sortable">Start</th>
 			
 			<th class="sortable">Color</th>
@@ -132,6 +134,8 @@
 				
 				<td class="name"><g:message code="workflow.type.${transitions.transition?.type}" /></td>
 
+				<td class="name">${transitions.transition?.category}</td>
+				
 				<td class="name">${transitions.transition?.predecessor}</td>
 
 				<td class="name">${transitions.transition?.color}</td>
@@ -180,6 +184,8 @@
 			
 			<th class="sortable">Type<span style="color: red">*</span></th>
 			
+			<th class="sortable">Category</th>
+			
 			<th class="sortable">Start</th>
 			
 			<th class="sortable">Color</th>
@@ -217,6 +223,10 @@
 				
 				<td nowrap="nowrap">
 					<g:select id="typeId_${transitions.transition.id}" name="type_${transitions.transition.id}" from="${transitions.transition.constraints.type.inList}" value="${transitions.transition.type}" valueMessagePrefix="workflow.type"></g:select>
+				</td>
+				
+				<td nowrap="nowrap">
+					<g:select id="category_${transitions.transition.id}" name="category_${transitions.transition.id}" from="${WorkflowTransition.constraints.category.inList}" value="${transitions.transition.category}"  noSelection="['':'please select']" ></g:select>
 				</td>
 
 				<td nowrap="nowrap">
@@ -290,6 +300,10 @@
             <span class="button"><input type="button" class="delete" value="Cancel" onclick="$('#copyWorkflowDialog').dialog('close');"/></span>
           </div>
     </g:form>
+    <div style="display: none;" >
+    		 <g:select id="createCategory" name="createCategory" from="${WorkflowTransition.constraints.category.inList}" 
+                noSelection="['':'please select']"/>
+    </div>
 </div>
 </div>
 <script type="text/javascript">
@@ -374,6 +388,9 @@ function addStep( type ){
 						"<td><select id='typeId_"+additionalSteps+"' name='type_"+additionalSteps+"'>"+
 								"<option value='process'>Process</option>"+
 								"<option value='boolean'>Boolean</option>"+
+							"</select></td>"+
+						"<td><select id='category_"+additionalSteps+"' name='category_"+additionalSteps+"'>"+
+								$('#createCategory').html()+
 							"</select></td>"+
 						"<td><input type='text' name='predecessor_"+additionalSteps+"' id='predecessorId_"+additionalSteps+"'  style='width: 60px;' maxlength='3'  onchange=\"validateField(this.value, this.id, 'predecessor')\"/></td>"+
 						"<td><input type='text' name='color_"+additionalSteps+"' id='colorId_"+additionalSteps+"' /></td>"+
