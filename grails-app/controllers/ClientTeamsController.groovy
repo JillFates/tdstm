@@ -1059,10 +1059,23 @@ class ClientTeamsController {
 			notes << [dateCreated , it.createdBy.toString() ,it.note]
 		}
 		def viewMode = session.getAttribute('ISSUE_VIEW_MODE')
+		def subject = SecurityUtils.subject
+		def permissionForUpdate = false
+		def userLogin = securityService.getUserLogin()
+		if( subject.hasRole("PROJ_MGR")){
+			permissionForUpdate = true
+		} else if(assetComment.assignedTo==userLogin.person || (assetComment.hardAssigned==0 && assetComment.role)){
+		          def predList = assetComment.taskDependencies
+				  def predComments = predList.predecessor
+				  Set predStatus = predComments.status
+				  if(predpredStatus.size()==1 && predStatus.contains("Completed")){
+					  permissionForUpdate = true
+				  }
+		}
 		if(viewMode=='mobile'){
-			render (view:'showIssue_m',model:['assetComment':assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1])
+			render (view:'showIssue_m',model:['assetComment':assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1,permissionForUpdate:permissionForUpdate])
 		}else{
-			return[assetComment:assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1]
+			return[assetComment:assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, permissionForUpdate : permissionForUpdate]
 		}
 	}
 }

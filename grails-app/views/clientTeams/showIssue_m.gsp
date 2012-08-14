@@ -157,7 +157,12 @@
 			<tr>
 			    <td class="buttonR" ><input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" /> </td>
 				<td class="buttonR" colspan="1" style="text-align:right;padding: 2px 6px;">
+				 <g:if test="${permissionForUpdate==true}">
 					<input type="button" value="Update Task" onclick="validateComment(${assetComment.id})" />
+				</g:if>
+				<g:else>
+				   <input type="button" value="Update Task" disabled="disabled"/>
+				</g:else>
 				</td>
 			</tr>	
 		</table>

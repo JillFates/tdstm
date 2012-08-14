@@ -61,7 +61,7 @@
 			</tr>
 			<tr class="prop" >
 				<td valign="top" class="name"><label for="status">Status:</label></td>
-				<td style="width: 20%;">
+				<td style="width: 20%;" id="statusEditTrId_${assetComment.id}">
 					<g:if test="${statusWarn==1}">
 						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
 						noSelection="['':'please select']"  onChange="showResolve()" disabled="true"></g:select>
@@ -150,7 +150,12 @@
 			<tr>
 			    <td class="buttonR" ><input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" /> </td>
 				<td class="buttonR" colspan="2" style="text-align:right;padding: 5px 3px;">
-				<input type="button" value="Update Task" onclick="validateComment(${assetComment.id})" />
+				 <g:if test="${permissionForUpdate==true}">
+				   <input type="button" value="Update Task" onclick="validateComment(${assetComment.id})" />
+				 </g:if>
+				 <g:else>
+				   <input type="button" value="Update Task" disabled="disabled" />
+				 </g:else>
 			</td>
 			</tr>	
 		</table>
@@ -295,7 +300,7 @@ $( function() {
 					if(data.assetComment.assetEntity){
 					 	$('#asset_'+data.assetComment.id).html(data.assetComment.assetEntity.assetName)
 					}
-					$('#issueTr_'+objId).attr('onClick','issueDetails('+objId+')');
+					$('#issueTr_'+objId).attr('onClick','issueDetails('+objId+',"'+data.assetComment.status+'")');
 					$('#statusTd_'+data.assetComment.id).html(data.assetComment.status)
 					$('#detailTdId_'+data.assetComment.id).hide()
 					$('#issueTrId_'+data.assetComment.id).removeClass(myClass).addClass(data.statusCss);

@@ -62,6 +62,16 @@ class AssetEntityController {
 	protected static targetTeamType = ['MOVE_TECH':'targetTeamMt', 'CLEANER':'targetTeamLog','SYS_ADMIN':'targetTeamSa',"DB_ADMIN":'targetTeamDba']
 	protected static sourceTeamType = ['MOVE_TECH':'sourceTeamMt', 'CLEANER':'sourceTeamLog','SYS_ADMIN':'sourceTeamSa',"DB_ADMIN":'sourceTeamDba']
 	protected static teamsByType = ["MOVE":"'MOVE_TECH','CLEANER'","ADMIN":"'SYS_ADMIN','DB_ADMIN'"]
+	
+	static statusOptionForRole = ["PROJ_MGR":
+		                                    ["Planned":["Planned","Pending","Ready","Started", "Hold", "Completed"],"Pending":["Pending","Ready","Started", "Hold", "Completed"],
+											 "Ready":["Pending","Ready","Started", "Hold", "Completed"],"Started":["Pending","Ready","Started", "Hold", "Completed"],
+											 "Hold":["Pending","Ready","Started", "Hold", "Completed"],"Completed":["Pending","Ready","Started", "Hold", "Completed"]
+											 ],
+									 "USER":["Planned":["Planned"],"Pending":["Pending"],"Ready":["Ready","Started", "Hold", "Completed"],
+											  "Started":["Ready","Started", "Hold", "Completed"],"Hold":["Hold"],"Completed":["Hold"]
+											]
+								 ]
 	def index = {
 		redirect( action:list, params:params )
 	}
@@ -3460,6 +3470,25 @@ class AssetEntityController {
 		
 		render assignedToSelect
 	}
+	/**
+	 * @parmas: task status 
+	 * @return: HTML select of status according to user role
+	 *
+	 */
+	def updateStatusSelect = {
+		def subject = SecurityUtils.subject
+		def mapKey = subject.hasRole("PROJ_MGR") ? "PROJ_MGR" : "USER" 
+		def optionForRole = statusOptionForRole.get(mapKey)
+		def optionList = optionForRole.get(params.status)
+		def statusSelect = new StringBuffer("""<select id="statusEditId" name="statusEdit" onChange="showResolve(this.value)" >""")
+		statusSelect.append("""<option value="">please select</option>""")
+		optionList.each{
+			statusSelect.append("<option value='${it}'>${it}</option>")
+		}
+		statusSelect.append("</select>")
+		
+		render statusSelect
+	  }
 } 
  
 

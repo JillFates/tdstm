@@ -481,7 +481,7 @@
 	<table id="updateResolveTable" style="border: 0px;">
 	    <tr class="prop">
 			<td valign="top" class="name"><label for="status">Status:</label></td>
-			<td colspan="3">
+			<td colspan="3" id="statusEditTrId">
 			<script type="text/javascript" charset="utf-8">
              </script>
 				<g:select id="statusEditId" name="statusEdit" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Pending"

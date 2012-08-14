@@ -657,6 +657,7 @@ function showAssetDialog( e , action ) {
 		     $('#eventShowValueId').html(params.eventName)
 	      	 if(ac.commentType=='issue'){
 	      		 updateAssignedToList('assignedToEdit','assignedEditSpan');
+	      		 updateStatusSelect(ac.status);
 	      		 if(ac.resolution || ac.status=='Completed'){
 	      		   $('#resolutionEditTrId').css('display','table-row')
 	      		 }else{
@@ -1482,6 +1483,13 @@ function updateAssignedToList(forView,span){
 	new Ajax.Request('../assetEntity/updateAssignedToSelect?forView='+forView,{asynchronous:false,evalScripts:true,
 		 onComplete:function(e){
 			 $('#'+span).html(e.responseText)
+		 }
+	})
+}
+function updateStatusSelect(status){
+	new Ajax.Request('../assetEntity/updateStatusSelect?status='+status,{asynchronous:false,evalScripts:true,
+		 onComplete:function(e){
+			 $('#statusEditTrId').html(e.responseText)
 		 }
 	})
 }

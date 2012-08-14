@@ -56,7 +56,7 @@
 					<tr id="issueTrId_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="openStatus(${issue?.item?.id},'${issue?.item?.status}')">
 				  </g:if>
 				  <g:else>
-					<tr id="issueTr_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="issueDetails(${issue?.item?.id})">
+					<tr id="issueTr_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="issueDetails(${issue?.item?.id},'${issue?.item?.status}')">
 				  </g:else>
 						<td id="comment_${issue?.item?.id}" class="asset_details_block_task">${issue?.item?.comment?.size() > 50 ? issue?.item?.comment?.substring(0,40)+'...' : issue?.item?.comment}</td>
 						<td id="lastUpdated_${issue?.item?.id}" class="asset_details_block"><tds:convertDate date="${issue?.item?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" format="MMM/dd" /></td>
@@ -82,7 +82,7 @@
 							<img src="${createLinkTo(dir:'images',file:'check.png')}" />&nbsp;&nbsp;Complete&nbsp;&nbsp;
 							</span>
 							--%>
-							<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action" onclick="issueDetails(${issue?.item?.id})">
+							<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action" onclick="issueDetails(${issue?.item?.id},'${issue?.item?.status}')">
 								<span class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
 								<span class="ui-button-text task_button">Details..</span>
 							</a>
@@ -113,7 +113,7 @@
 	function setFocus(){
 		document.issueAssetForm.search.focus();
 	}
-	function issueDetails(id){
+	function issueDetails(id,status){
 		jQuery.ajax({
 			url: 'showIssue',
 			data: {'issueId':id},
@@ -121,21 +121,31 @@
 			success: function(data) {
 				B1.Pause()
 				$('#showStatusId_'+id).css('display','none')
-				$('#issueTr_'+id).attr('onClick','cancelButton('+id+')');
+				$('#issueTr_'+id).attr('onClick','cancelButton('+id+',"'+status+'")');
 				$('#detailId_'+id).html(data)
 				$('#detailTdId_'+id).css('display','table-row')
 				//$('#detailId_'+id).css('display','block')
 				$('#taskLinkId').removeClass('mobselect')
+				new Ajax.Request('../assetEntity/updateStatusSelect?status='+status,{asynchronous:false,evalScripts:true,
+			          onComplete:function(e){
+							 var resp = e.responseText;
+							 resp = resp.replace("statusEditId","statusEditId_"+id).replace("showResolve(this.value)","showResolve()")
+							 $('#statusEditTrId_'+id).html(resp)
+							 $('#statusEditId_'+id).val(status)
+			 			}
+				})
 			}
 		});
+		
+		
 	}
-	function cancelButton(id){
+	function cancelButton(id,status){
 		B1.Start(60);
 		//$('#myIssueList').css('display','block')
 		$('#detailTdId_'+id).css('display','none')
 		$('#taskLinkId').addClass('mobselect')
 		$('#showStatusId_'+id).css('display','table-row')
-		$('#issueTr_'+id).attr('onClick','issueDetails('+id+')');
+		$('#issueTr_'+id).attr('onClick','issueDetails('+id+',"'+status+'")');
 	}
 	function changeStatus(id,status,user){
 		jQuery.ajax({
