@@ -274,8 +274,6 @@
 		<tr class="prop">
 			<td valign="top" class="name"  ><label for="status">Status:</label></td>
 			<td valign="top" class="value" colspan="3">
-			<script type="text/javascript" charset="utf-8">
-             </script>
 				<g:select id="statusId" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Ready"
 				noSelection="['':'please select']" onChange="showResolve(this.value)"></g:select>
 			</td>
@@ -482,8 +480,6 @@
 	    <tr class="prop">
 			<td valign="top" class="name"><label for="status">Status:</label></td>
 			<td colspan="3" id="statusEditTrId">
-			<script type="text/javascript" charset="utf-8">
-             </script>
 				<g:select id="statusEditId" name="statusEdit" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Pending"
 				noSelection="['':'please select']" onChange="showResolve(this.value)"></g:select>
 			</td>
