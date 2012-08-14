@@ -48,6 +48,8 @@ class AuthController {
 		             *  call loadPreferences() to load CURR_PROJ MAP into session
 		             */
 		            userPreferenceService.loadPreferences("CURR_PROJ")
+		            userPreferenceService.loadPreferences("CURR_BUNDLE")
+		            userPreferenceService.loadPreferences("MOVE_EVENT")
 					/*
 					 *  call userPreferenceService.updateLastLogin( params.username ) to update the last login time
 					 */
