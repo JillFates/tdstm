@@ -28,7 +28,8 @@ class WorkflowTransition {
 		color( blank:true, nullable:true)
 		dashboardLabel( blank:true, nullable:true)
 		predecessor( nullable:true)
-		category( blank:false, nullable:false ,inList:['general', 'discovery', 'planning','walkthru','premove','shutdown','moveday','startup','postmove'])
+		// TODO : set to blank:false and nullable:false once we update category for existing data.
+		category( blank:true, nullable:true ,inList:['general', 'discovery', 'planning','walkthru','premove','shutdown','moveday','startup','postmove'])
 		header( blank:true, nullable:true)
 		//effort( blank:true, nullable:true)
 		duration( nullable:true)
