@@ -1068,7 +1068,7 @@ class ClientTeamsController {
 		          def predList = assetComment.taskDependencies
 				  def predComments = predList.predecessor
 				  Set predStatus = predComments.status
-				  if(predpredStatus.size()==1 && predStatus.contains("Completed")){
+				  if(predStatus.size()==1 && predStatus.contains("Completed")){
 					  permissionForUpdate = true
 				  }
 		}
