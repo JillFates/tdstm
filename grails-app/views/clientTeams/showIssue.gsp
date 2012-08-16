@@ -316,7 +316,6 @@ $( function() {
 					}else{
 						$('#showStatusId_'+data.assetComment.id).hide()
 						$('#issueTrId_'+data.assetComment.id).remove()
-						$('#toDoNumberId').html(parseInt($('#toDoNumberId').html())-1)
 						B1.Start(60);
 					}
 				}

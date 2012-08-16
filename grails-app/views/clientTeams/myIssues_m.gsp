@@ -9,6 +9,7 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
 <link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+<script type="text/javascript" src="${resource(dir:'js' ,file:'ui.datepicker.js') }" />
 <meta name="viewport" content="height=device-height,width=220" />
 	
 <script type="text/javascript">    	
@@ -178,7 +179,6 @@
 				}else{
 					$('#showStatusId_'+data.assetComment.id).hide()
 					$('#issueTrId_'+data.assetComment.id).remove()
-					$('#toDoNumberId').html(parseInt($('#toDoNumberId').html())-1)
 				}
 			}
 		});
@@ -262,7 +262,7 @@ function zxcOpacity(obj,opc){
 	function Bar(o){
 	var obj=document.getElementById(o.ID);
 		this.oop=new zxcAnimate('width',obj,0);
-		this.max=$('#issueTable').width();
+		this.max=obj.parentNode.offsetWidth;
 		this.to=null;
 	}
 	Bar.prototype={
@@ -288,7 +288,7 @@ function zxcOpacity(obj,opc){
 	}
 
 	var B1=new Bar({
-		ID:'issueTimebarId'
+		ID:'issueTimebar'
 	});
 
 	B1.Start(60);

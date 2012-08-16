@@ -1026,7 +1026,7 @@ class ClientTeamsController {
 		// TODO: runbook : WHY ARE WE PASSING THE userId back to the browser?
 		def model = [listComment:issueList, tab:tab, todoSize:todoSize, allSize:allSize, search:search, userId:5]
 		def view = 'myIssues'
-		if ( session.getAttribute('ISSUE_VIEW_MODE') == 'mobile') {
+		if ( session.getAttribute('TASK_VIEW_MODE') == 'mobile') {
 			view = view+'_m'
 		} else {
 			model << [timers:session.MY_ISSUE_REFRESH?.MY_ISSUE_REFRESH]

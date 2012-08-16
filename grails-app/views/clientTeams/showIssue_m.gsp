@@ -88,8 +88,7 @@
 			</tr> 
 			<tr class="prop issue" id="dueDatesEditId"  >
 				<td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
-				<td valign="top" class="value" id="dueDateEditId_${assetComment.id}" >
-				<script type="text/javascript" src="${resource(dir:'js' ,file:'ui.datepicker.js') }"/>
+				<td valign="top" class="value" id="dueDateEditId_${assetComment.id}">
 				<script type="text/javascript">
 	               $(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 	            </script>
@@ -328,7 +327,6 @@
 					}else{
 						$('#showStatusId_'+data.assetComment.id).hide()
 						$('#issueTrId_'+data.assetComment.id).remove()
-						$('#toDoNumberId').html(parseInt($('#toDoNumberId').html())-1)
 						B1.Start(60);
 					}
 				}
