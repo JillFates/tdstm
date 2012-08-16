@@ -170,7 +170,9 @@ class ProjectController {
         	}
         	clientStaff.each{staff->
         	}
-        	return [ projectInstance : projectInstance, projectPartner:projectPartner, projectManager:projectManager, moveManager:moveManager, companyStaff:companyStaff, clientStaff:clientStaff, partnerStaff:partnerStaff, companyPartners:companyPartners,projectLogoForProject:projectLogoForProject ]
+			def workflowCodes = stateEngineService.getWorkflowCode()
+        	return [ projectInstance : projectInstance, projectPartner:projectPartner, projectManager:projectManager, moveManager:moveManager, companyStaff:companyStaff, clientStaff:clientStaff, partnerStaff:partnerStaff, companyPartners:companyPartners,projectLogoForProject:projectLogoForProject,
+				     workflowCodes:workflowCodes ]
         }
     }
     /*

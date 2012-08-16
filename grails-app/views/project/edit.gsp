@@ -240,9 +240,18 @@
                            </tr>
 						   <tr class="prop">
 			
-					            <td valign="top" class="name">Workflow Code:</td>
+					            <td valign="top" class="name">Workflow Code:&nbsp;<span style="color: red">*</span></td>
 					
-					            <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'workflowCode')}</td>
+					          <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
+			              	    <g:select id="workflowCode" name="workflowCode"
+								      from="${workflowCodes}"
+								      value="${projectInstance?.workflowCode}" noSelection="['':'Please Select']" onChange="warnForWorkflow()"></g:select>
+								<g:hasErrors bean="${projectInstance}" field="workflowCode">
+				                    <div class="errors">
+				                      <g:renderErrors bean="${projectInstance}" as="list" field="workflowCode"/>
+				                    </div>
+				                  </g:hasErrors>
+								</td>
 								<td valign="top" class="name">
 				                  <label for="inProgress"><b>Display Transitions in Status bar:&nbsp;<span style="color: red">*</span></b></label>
 				                </td>
@@ -400,7 +409,11 @@
 			} 
             return returnval;
 		}
-        </script>
+        function warnForWorkflow(){
+            alert("Warning: Changing the workflow for a project underway can create problems!")
+         return true
+       }
+       </script>
 <script>
 	currentMenuId = "#projectMenu";
 	$("#projectMenuId a").css('background-color','#003366')
