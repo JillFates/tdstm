@@ -5,6 +5,7 @@ import org.jsecurity.SecurityUtils
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tds.asset.TaskDependency
 import com.tdssrc.grails.GormUtil
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
@@ -1072,10 +1073,11 @@ class ClientTeamsController {
 					  permissionForUpdate = true
 				  }
 		}
+		def successor = TaskDependency.findAllByPredecessor( assetComment )
 		if(viewMode=='mobile'){
-			render (view:'showIssue_m',model:['assetComment':assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1,permissionForUpdate:permissionForUpdate])
+			render (view:'showIssue_m',model:['assetComment':assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1,permissionForUpdate:permissionForUpdate, successor:successor])
 		}else{
-			return[assetComment:assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, permissionForUpdate : permissionForUpdate]
+			return[assetComment:assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, permissionForUpdate : permissionForUpdate, successor:successor]
 		}
 	}
 }

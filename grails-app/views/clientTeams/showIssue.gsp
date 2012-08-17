@@ -51,7 +51,7 @@
 				<td valign="top" class="name"><label>Successors:</label></td>
 				<td>	
 					<span  style="width: 50%">
-							<g:each in="${TaskDependency.findAllByPredecessor( assetComment )}" var="task">
+							<g:each in="${successor}" var="task">
 							<span class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}">
 								${task.assetComment.category}&nbsp;&nbsp;&nbsp;&nbsp;${task.assetComment}
 							</span>
