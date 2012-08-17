@@ -41,76 +41,79 @@
         </script>
 </head>
 <body>
-  <div class="body">
-   <div class="body">
-            <h1>Task List</h1>
-            <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
-            </g:if>
-            <div>
-            <div>
-            <form name="commentForm" id="commentForm" action="listComment">
-               <span > <b>Show Resolved : </b>
-               <g:if test="${checked=='on'}">
-                   <input type="checkBox" name="resolvedBox" id="myResolvedBox"  checked="checked"  onclick="$('#commentForm').submit();"  />
-               </g:if>
-               <g:else>
-                    <input type="checkBox" name="resolvedBox" id="myResolvedBox" onclick="$('#commentForm').submit();"  />
-               </g:else>
-               </span>
-               <span><b>Show My Issues :</b>
-                <g:if test="${issueBox=='on'}">
-                    <input type="checkBox" name="issueBox" id="issueBox" checked="checked" onclick="$('#commentForm').submit();"  />
-                </g:if>
-                <g:else>
-                    <input type="checkBox" name="issueBox" id="issueBox"  onclick="$('#commentForm').submit();"  />
-                </g:else>
-               </span>
-               <br></br>
-                <jmesa:tableFacade id="tag" items="${assetCommentList}" maxRows="25" stateAttr="restore" var="commentInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100" >
-                    <jmesa:htmlTable style=" border-collapse: separate" editable="true">
-		       	 		<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
-				        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" nowrap>
+	<div class="body">
+		<div class="body">
+			<h1>Task List</h1>
+			<g:if test="${flash.message}">
+				<div class="message">${flash.message}</div>
+			</g:if>
+			<div>
+			<div>
+			<form name="commentForm" id="commentForm" action="listComment">
+			<span > <b>Show Resolved : </b>
+				<g:if test="${checked=='on'}">
+					<input type="checkBox" name="resolvedBox" id="myResolvedBox"  checked="checked"  onclick="$('#commentForm').submit();"  />
+				</g:if>
+				<g:else>
+					<input type="checkBox" name="resolvedBox" id="myResolvedBox" onclick="$('#commentForm').submit();"  />
+				</g:else>
+				</span>
+				<span><b>Show My Issues :</b>
+				<g:if test="${issueBox=='on'}">
+					<input type="checkBox" name="issueBox" id="issueBox" checked="checked" onclick="$('#commentForm').submit();"  />
+				</g:if>
+				<g:else>
+					<input type="checkBox" name="issueBox" id="issueBox"  onclick="$('#commentForm').submit();"  />
+				</g:else>
+				</span>
+				<br></br>
+				<jmesa:tableFacade id="tag" items="${assetCommentList}" maxRows="25" stateAttr="restore" var="commentInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100" >
+					<jmesa:htmlTable style=" border-collapse: separate" editable="true">
+						<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
+							<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" nowrap>
 				        		<a href="javascript:showAssetComment(${commentInstance?.id}, 'edit')"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="taskNumber" title="Task" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.taskNumber ? commentInstance.taskNumber :''}</span>
-							 </jmesa:htmlColumn>
-                            <jmesa:htmlColumn property="comment" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Description" nowrap>
+							</jmesa:htmlColumn>
+							<jmesa:htmlColumn property="comment" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Description" nowrap>
 								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.comment?.size() > 40 ? commentInstance.comment?.substring(0,40)+'..' : commentInstance.comment}</span>
-							 </jmesa:htmlColumn>
-							 <jmesa:htmlColumn property="dateCreated" title="Updated" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+							</jmesa:htmlColumn>
+							<jmesa:htmlColumn property="dateCreated" title="Updated" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.dateCreated}" format="MM/dd"  /></span>
-							 </jmesa:htmlColumn>
-							 <jmesa:htmlColumn property="dueDate" title="Due" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+							</jmesa:htmlColumn>
+							<jmesa:htmlColumn property="dueDate" title="Due" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.dueDate}" format="MM/dd"/></span>
-							 </jmesa:htmlColumn>
-							 <jmesa:htmlColumn property="commentType" title="Type" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+							</jmesa:htmlColumn>
+							<jmesa:htmlColumn property="commentType" title="Type" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.commentType}</span>
-							 </jmesa:htmlColumn>
-							 <jmesa:htmlColumn property="status" title="Status" sortable="true" filterable="true" width="100px" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+							</jmesa:htmlColumn>
+							<jmesa:htmlColumn property="status" title="Status" sortable="true" filterable="true" width="100px" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');" class="span_${commentInstance.status ? commentInstance.status.toLowerCase() : 'na'}">${commentInstance.status}</span>
-							 </jmesa:htmlColumn>
-							 <jmesa:htmlColumn property="assignedToString" title="Assigned To" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+							</jmesa:htmlColumn>
+							<jmesa:htmlColumn property="assignedToString" title="Assigned To" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
         	                 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.assignedTo}</span>
-        	             </jmesa:htmlColumn>
+							</jmesa:htmlColumn>
+							<jmesa:htmlColumn property="role" title="Role" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+        	                 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.role}</span>
+							</jmesa:htmlColumn>
 							 <%--
     	                     <jmesa:htmlColumn property="mustVerify" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
     	                     	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show')"><g:if test ="${commentInstance.mustVerify == 1}"></g:if><g:else><g:checkBox name="myVerifyBox" value="${true}" disabled="true"/></g:else></span>
     	                     </jmesa:htmlColumn>
         	                 --%><jmesa:htmlColumn property="assetName" title="Asset" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
         	                 	<span onclick="javascript:getEntityDetails('listComment', '${commentInstance.assetEntity?.assetType}', '${commentInstance.assetEntity?.id}');">${commentInstance.assetEntity?.assetName}</span>
-        	                 </jmesa:htmlColumn>
-                	         <jmesa:htmlColumn width="50px" property="assetEntity.assetType" sortable="true" filterable="true" title="AssetType">
+							</jmesa:htmlColumn>
+							<jmesa:htmlColumn width="50px" property="assetEntity.assetType" sortable="true" filterable="true" title="AssetType">
                 	         	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance?.assetEntity?.assetType}</span>
-                	         </jmesa:htmlColumn>
-                             <jmesa:htmlColumn width="50px" property="category" sortable="true" filterable="true" title="category">
+							</jmesa:htmlColumn>
+							<jmesa:htmlColumn width="50px" property="category" sortable="true" filterable="true" title="category">
                              	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.category}</span>
-                             </jmesa:htmlColumn>
-                            </jmesa:htmlRow>
-                    </jmesa:htmlTable>
-                </jmesa:tableFacade>
-            </form>
+							</jmesa:htmlColumn>
+						</jmesa:htmlRow>
+					</jmesa:htmlTable>
+				</jmesa:tableFacade>
+			</form>
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 		      <span class="menuButton"><a class="create" href="javascript:createIssue()">Create</a></span>
 	       </div>
