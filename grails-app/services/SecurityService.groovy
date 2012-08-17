@@ -4,15 +4,24 @@
  *
  */
 
- import javax.servlet.http.HttpSession
- import org.springframework.web.context.request.RequestContextHolder
- import org.jsecurity.SecurityUtils
- 
- import com.tdsops.tm.enums.domain.RoleTypeGroup
+import javax.servlet.http.HttpSession
+import org.springframework.web.context.request.RequestContextHolder
+import org.jsecurity.SecurityUtils
+import com.tdsops.tm.enums.domain.RoleTypeGroup
  
  class SecurityService {
 	
 	static transactional = true
+
+	/**
+	 * Used to determine if the current user has a specified role
+	 * @param	role	a String representing a role
+	 * @return 	bool	true or false indicating if the user has the role
+	 * @Usage  if ( securityService.hasRole( 'PROJ_MGR' ) ...
+	 */
+	def hasRole( role ) {
+		return SecurityUtils.subject.hasRole( role )
+	}
 	
 	/**
 	 * Used to get a list of roles that have been assigned to a user. The roleTypeGroup provides a filtering for the type of Roles that 
@@ -119,4 +128,5 @@
 		if (roleType) name = roleType.substring(roleType.lastIndexOf(':')+1)
 		return name
 	}
+	
 }

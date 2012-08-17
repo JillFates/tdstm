@@ -94,6 +94,7 @@ class CommentService {
 			}
 		} else {
 			// Load existing comment
+			// TODO : Test that the id is a number and by user's project
 			assetComment = AssetComment.get(params.id)
 			if (! assetComment ) {
 				// TODO : handle failure for invalid comment id
@@ -125,8 +126,8 @@ class CommentService {
 		if (params.displayOption) assetComment.displayOption = params.displayOption
 		if (params.attribute) assetComment.attribute = params.attribute
 	    assetComment.resolution = params.resolution
-		if(params.estStart) assetComment.estStart = GormUtil.convertInToGMT(estformatter.parse(params.estStart),tzId)
-		if(params.estFinish) assetComment.estFinish = GormUtil.convertInToGMT(estformatter.parse(params.estFinish),tzId)
+		if(params.estStart) assetComment.estStart = estformatter.parse(params.estStart)
+		if(params.estFinish) assetComment.estFinish = estformatter.parse(params.estFinish)
 		// Actual Start/Finish are handled by the statusUpdate function
 		// if(params.actStart) assetComment.actStart = estformatter.parse(params.actStart)
 		if(params.workflowTransition?.isNumber()) {
@@ -144,8 +145,10 @@ class CommentService {
 		if(params.duration?.isNumber()) assetComment.duration = Integer.parseInt(params.duration)
 		if(params.durationScale) assetComment.durationScale = params.durationScale
 		
-		// TODO : runbook - need to validate that the role is legit for "Staff : *" of RoleType
-		assetComment.role = params.role
+		if (params.role) {
+			// TODO : runbook - need to validate that the role is legit for "Staff : *" of RoleType
+			assetComment.role = params.role
+		}
 		 
 		// Issues (aka tasks) have a number of additional properties to be managed 
 		if ( assetComment.commentType == AssetCommentType.ISSUE ) {
@@ -174,8 +177,6 @@ class CommentService {
 				}else if(isNew){
 					assetComment.assignedTo = person
 				}
-			} else {
-				assetComment.assignedTo = null
 			}
 	
 			// Use the service to update the Status because it does a number of things that we don't need to duplicate		
@@ -195,7 +196,8 @@ class CommentService {
 				assetNote.createdBy = userLogin.person
 				assetNote.dateCreated = date
 				assetNote.note = params.note
-				assetNote.assetComment = assetComment
+				task.addToNotes(this)
+				assetNote.assetComment = task	// Yeah - this is screwy as far as the naming convention (eventually assetComment will become a Task)
 				if ( assetNote.hasErrors() || ! assetNote.save(flush:true)){
 					// TODO error won't bubble up to the user
 					log.error "saveUpdateCommentAndNotes: Saving comment notes faild - " + GormUtil.allErrorsString(assetNote)

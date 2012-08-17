@@ -41,11 +41,13 @@ class JsecDbRealm {
     def hasRole(principal, roleName) {
     	// retuen boolen true if principal has role
         def roles = []
+log.info "hasRole(): principal=${principal}, roleName=${roleName}"
     	def userLogin = UserLogin.findByUsername(principal)
     	if( userLogin ){
 	    	def person = userLogin.person
-	        def roleType = RoleType.findById(roleName)
+	        def roleType = RoleType.read(roleName)
 	        roles = PartyRole.findAllByPartyAndRoleType(person,roleType)
+			// log.debug "hasRole: person:${person}, role:${roleName}, found:{$roles.size()}"
     	}
         return roles.size() > 0
     }

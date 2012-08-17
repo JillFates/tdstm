@@ -35,6 +35,7 @@ import com.tds.asset.TaskDependency
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.AssetCommentStatus
 
 class AssetEntityController {
 
@@ -63,15 +64,25 @@ class AssetEntityController {
 	protected static sourceTeamType = ['MOVE_TECH':'sourceTeamMt', 'CLEANER':'sourceTeamLog','SYS_ADMIN':'sourceTeamSa',"DB_ADMIN":'sourceTeamDba']
 	protected static teamsByType = ["MOVE":"'MOVE_TECH','CLEANER'","ADMIN":"'SYS_ADMIN','DB_ADMIN'"]
 	
-	static statusOptionForRole = ["PROJ_MGR":
-		                                    ["Planned":["Planned","Pending","Ready","Started", "Hold", "Completed"],"Pending":["Pending","Ready","Started", "Hold", "Completed"],
-											 "Ready":["Pending","Ready","Started", "Hold", "Completed"],"Started":["Pending","Ready","Started", "Hold", "Completed"],
-											 "Hold":["Pending","Ready","Started", "Hold", "Completed"],"Completed":["Pending","Ready","Started", "Hold", "Completed"]
-											 ],
-									 "USER":["Planned":["Planned"],"Pending":["Pending"],"Ready":["Ready","Started", "Hold", "Completed"],
-											  "Started":["Ready","Started", "Hold", "Completed"],"Hold":["Hold"],"Completed":["Hold"]
-											]
-								 ]
+	protected static statusOptionForRole = [
+		"PROJ_MGR": [
+			(AssetCommentStatus.PLANNED): AssetCommentStatus.getList(),
+			(AssetCommentStatus.PENDING): AssetCommentStatus.getList(),
+			(AssetCommentStatus.READY): AssetCommentStatus.getList(),
+			(AssetCommentStatus.STARTED): AssetCommentStatus.getList(),
+			(AssetCommentStatus.HOLD): AssetCommentStatus.getList(),
+			(AssetCommentStatus.DONE): AssetCommentStatus.getList()
+		],
+		"USER":[
+			(AssetCommentStatus.PLANNED): [AssetCommentStatus.PLANNED],
+			(AssetCommentStatus.PENDING): [AssetCommentStatus.PENDING],
+			(AssetCommentStatus.READY):   [AssetCommentStatus.READY,AssetCommentStatus.STARTED, AssetCommentStatus.DONE, AssetCommentStatus.HOLD],
+			(AssetCommentStatus.STARTED): [AssetCommentStatus.READY, AssetCommentStatus.STARTED, AssetCommentStatus.DONE, AssetCommentStatus.HOLD],
+			(AssetCommentStatus.DONE): [AssetCommentStatus.DONE, AssetCommentStatus.HOLD],
+			(AssetCommentStatus.HOLD): [AssetCommentStatus.HOLD]
+		]
+	]
+	
 	def index = {
 		redirect( action:list, params:params )
 	}
@@ -3403,8 +3414,8 @@ class AssetEntityController {
 	}
 	
 	def getWorkflowTransition={
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = Project.findById( projectId )
+		def project = securityService.getUserCurrentProject()
+		def projectId = project.id
 		def assetCommentId = params.assetCommentId
 		def assetEntity = AssetEntity.get(params.assetId)
 		def workFlowInstance = Workflow.findByProcess(project.workflowCode)
@@ -3426,7 +3437,7 @@ class AssetEntityController {
 	}
     
 	/**
-	 * @params: commentId
+	 * @param: commentId
 	 * @return : HTML Select of prdecessor list
 	 */
 	def getPredecessor = {
@@ -3452,7 +3463,7 @@ class AssetEntityController {
 		render selectControl
 	}
 	/**
-	 * @parmas: forView
+	 * @param: forView
 	 * @return: HTML select of staff belongs to company and TDS
 	 * 
 	 */
@@ -3460,36 +3471,34 @@ class AssetEntityController {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
 		def viewId = params.forView
-		def assignedToSelect = new StringBuffer("""<select id="${viewId}" name="${viewId}" >""")
+		def assignedToSelect = new StringBuffer("""<SELECT ID="${viewId}" NAME="${viewId}" >""")
 		def projectStaff = partyRelationshipService.getProjectStaff( projectId )?.staff
 		projectStaff.sort{it.firstName}
 		projectStaff.each{
-			assignedToSelect.append("<option value='${it.id}'>${it.firstName+" "+ it.lastName}</option>")
+			assignedToSelect.append("<OPTION VALUE='${it.id}'>${it.firstName+" "+ it.lastName}</OPTION>")
 		}
-		assignedToSelect.append("</select>")
+		assignedToSelect.append("</SELECT>")
 		
 		render assignedToSelect
 	}
 	/**
-	 * @parmas: task status 
-	 * @return: HTML select of status according to user role
-	 *
+	 * Generates an HTML SELECT control for the AssetComment.status property according to user role and params.status
+	 * @param	params.status	current status value
+	 * @return render HTML
 	 */
 	def updateStatusSelect = {
-		def subject = SecurityUtils.subject
-		def mapKey = subject.hasRole("PROJ_MGR") ? "PROJ_MGR" : "USER" 
+		
+		def mapKey = securityService.hasRole("PROJ_MGR") ? "PROJ_MGR" : "USER" 
 		def optionForRole = statusOptionForRole.get(mapKey)
 		def optionList = optionForRole.get(params.status)
-		def statusSelect = new StringBuffer("""<select id="statusEditId" name="statusEdit" onChange="showResolve(this.value)" >""")
-		statusSelect.append("""<option value="">please select</option>""")
+		// TODO : NO MORE BUILDING SELECT CONTROLLERS - Refactor this into HtmlUtil utility class.
+		def statusSelect = new StringBuffer("""<SELECT ID="statusEditId" NAME="statusEdit" onChange="showResolve(this.value)" >""")
+		statusSelect.append("""<OPTION VALUE="">Please select</OPTION>""")
 		optionList.each{
-			statusSelect.append("<option value='${it}'>${it}</option>")
+			statusSelect.append("<OPTION VALUE='${it}'>${it}</OPTION>")
 		}
-		statusSelect.append("</select>")
+		statusSelect.append("</SELECT>")
 		
 		render statusSelect
 	  }
-} 
- 
-
-   
+}

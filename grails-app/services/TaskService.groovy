@@ -9,6 +9,7 @@
 import org.jsecurity.SecurityUtils
 
 import com.tds.asset.AssetComment
+import com.tds.asset.CommentNote
 import com.tds.asset.TaskDependency
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
@@ -21,19 +22,22 @@ class TaskService {
     static transactional = true
 
 	def securityService
-	
+
+	static final List statusList = AssetCommentStatus.getList()
+
 	/**
 	 * This method returns a list of tasks (aka AssetComment objects) based on the parameters that form the criteria
 	 */
     def getUserTasks(person, project, search=null, sortOn='c.dueDate', sortOrder='ASC, c.lastUpdated DESC' ) {
 		
 		// Get the user's roles for the current project
-		// TODO : This should (perhaps) pass the project to getPersonRoles
+		// TODO : Runbook: getUserTasks - should get the user's project roles instead of global roles
 		def roles = securityService.getPersonRoles(person, RoleTypeGroup.STAFF)
 		def type=AssetCommentType.TASK
 		
 		// List of statuses that user should be able to see in when soft assigned to others and user has proper role
-		def statuses = [AssetCommentStatus.PLANNED.toString(), AssetCommentStatus.PENDING.toString(), AssetCommentStatus.READY.toString() ]
+		def statuses = [AssetCommentStatus.PLANNED.toString(), AssetCommentStatus.PENDING.toString(), 
+			AssetCommentStatus.READY.toString(), AssetCommentStatus.STARTED.toString() ]
 		
 		def sqlParams = [project:project, assignedTo:person, type:type, roles:roles, statuses:statuses]
 		
@@ -52,11 +56,12 @@ class TaskService {
 			sql.append(' WHERE ')
 		}
 		sql.append('c.project=:project AND c.commentType=:type ')
+		// TODO : runbook : my tasks should only show mine.  All should show mine and anything that my teams has started or complete
 		sql.append('AND ( c.assignedTo=:assignedTo OR ( c.role IN (:roles) AND c.status IN (:statuses) AND c.hardAssigned != 1 ) ) ')
 
 		// TODO : Security : getUserTasks - sortOn/sortOrder should be defined instead of allowing user to INJECT, also shouldn't the column name have the 'a.' prefix?	
 		// Add the ORDER to the SQL
-//		 sql.append("ORDER BY ${sortOn} ${sortOrder}")
+		// sql.append("ORDER BY ${sortOn} ${sortOrder}")
 		
 		// log.error "SQL for userTasks: " + sql.toString()
 		
@@ -67,45 +72,106 @@ class TaskService {
     }
 	
 	/**
-	 * Used to set the status of a task, which will perform additional updated based on the state
+	 * Overloaded version of the setTaskStatus that has passes the logged in user's person object to the main method
 	 * @param task
 	 * @param status
-	 * @return
+	 * @return AssetComement	task that was updated by method
 	 */
+	// Refactor to accept the Person
 	def setTaskStatus( task, status) {
-		
+		def whom = securityService.getUserLoginPerson()
+		return setTaskStatus( task, status, whom )
+	}
+
+	/**
+	 * Used to set the status of a task, which will perform additional updated based on the state
+	 * @param whom		A Person object that represents the person updating the task
+	 * @param task		A AssetComment (aka Task) to change the status on
+	 * @param status	A String representing the status code (AssetCommentStatus)
+	 * @return AssetComment the task object that was updated
+	 */
+	// TODO : We should probably refactor this into the AssetComment domain class as setStatus
+	def setTaskStatus(task, status, whom) {
 		// If the current task.status or the persisted value equals the new status, then there's nutt'n to do.
 		if (task.status == status || task.getPersistentValue('status') == status) {
 			return
 		}
-		
-		task.status = status
 
-		// Now for certain statuses we'll update some other properties to boot
+		// First thing to do, set the status
+		task.status = status
 		
+		def previousStatus = task.getPersistentValue('status')
+		// Determine if the status is being reverted (e.g. going from DONE to READY)
+		def revertStatus = compareStatus(previousStatus, status) > 0
+
+		log.debug "setTaskStatus() status=${status}, previousStatus=${previousStatus}, revertStatus=${revertStatus}"
+
+		// Setting of AssignedTO:
+		//
+		// We are going to update the AssignedTo when the task is marked Started or Done unless the current user has the 
+		// PROJ_MGR role because we want to allow for the PM to mark a task as being started or done on behalf of someone else. The only
+		// time we'll set the PM to the AssignedTo property is if it is presently unassigned.
+		// 
+		// Setting Status Backwards (e.g. DONE back to READY):
+		//
+		// In the rare case that we need to set the status back from a progressive state, we may need to undue some stuff (e.g. mark unresolved, clear 
+		// resolvedBy, etc).  We will log a note on the task whenever this occurs.
+		//
+		if (revertStatus) {
+			if (previousStatus == AssetCommentStatus.DONE) {
+				task.resolvedBy = null
+				task.actFinish = null
+				// isResolved = 0 -- should be set in the domain class automatically
+			}
+			// Clear the actual Start if we're moving back before STARTED
+			if ( compareStatus(AssetCommentStatus.STARTED, status) > 0) {
+				task.actStart = null				
+			}
+			
+			addNote( task, whom, "Reverted task status from '${previousStatus}' to '${status}'")
+			
+			// TODO : Runbook Look at the successors and do something about them
+			// Change READY successors to PENDING
+			// Put STARTED task on HOLD and add note that predecessor task was reverted
+			
+		}
+		
+		// Now update the task properties according to the new status
 		if ([AssetCommentStatus.STARTED, AssetCommentStatus.DONE, AssetCommentStatus.TERMINATED].contains(status)) {
-	 		// Get the current user's person so we can assign it appropriately
-			def userPerson = securityService.getUserLoginPerson()
 	
 			def now =  GormUtil.convertInToGMT( "now", "EDT" )
-			def subject = SecurityUtils.subject
+			def isPM = securityService.hasRole("PROJ_MGR")
+
+			// Properly handle assignment if the user is the PM
+			def assignee = whom
+			if (task.assignedTo && isPM) {
+				assignee = task.assignedTo
+			}
+			
 			switch (status) {
 				case AssetCommentStatus.STARTED:
-					if (!subject.hasRole("PROJ_MGR")) task.assignedTo = userPerson
-					task.actStart = now
+					task.assignedTo = assignee
+					// We don't want to loose the original started time if we are reverting from DONE to STARTED
+					if (! revertStatus ) {
+						task.actStart = now
+					}
 					break
 					
 				case AssetCommentStatus.DONE:
 					taskStatusChangeEvent(task)
-					if (!subject.hasRole("PROJ_MGR")) task.assignedTo = userPerson
-					task.resolvedBy = userPerson
+					task.assignedTo = assignee
+					task.resolvedBy = assignee
 					task.actFinish = now
+					break
+					
 				case AssetCommentStatus.TERMINATED:
-					task.resolvedBy = userPerson
+					task.resolvedBy = assignee
 					task.actFinish = now
 					break
 			}
 		}
+		
+		return task
 	}
  	
 	/**
@@ -113,7 +179,7 @@ class TaskService {
 	 * that may result in the updating of other tasks successor tasks.
 	 */
 	def taskStatusChangeEvent( task ) {
-		log.info "taskStatusChangeEvent: processing task(${task.id}): ${task}"
+		log.debug "taskStatusChangeEvent: processing task(${task.id}): ${task}"
 		def status = task.status
 		
 		// Let's bail out if the status isn't dirty or the status isn't STARTED or DONE
@@ -134,10 +200,10 @@ class TaskService {
 		//
 		if ( status ==  AssetCommentStatus.DONE ) {
 			def successorDependents = TaskDependency.findAllByPredecessor(task)
-			log.info "taskStatusChangeEvent: Found ${successorDependents ? successorDependents.size() : '0'} successors for task ${task.id}"
+			log.debug "taskStatusChangeEvent: Found ${successorDependents ? successorDependents.size() : '0'} successors for task ${task.id}"
 			successorDependents?.each() { succDepend ->
 				def dependentTask = succDepend.assetComment
-				log.info "taskStatusChangeEvent: Processing dependentTask(${dependentTask.id}): ${dependentTask}"
+				log.debug "taskStatusChangeEvent: Processing dependentTask(${dependentTask.id}): ${dependentTask}"
 				
 				// If the Task is in the Planned or Pending state, we can check to see if it makes sense to set to READY
 				if ([AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING].contains(dependentTask.status)) {
@@ -169,7 +235,6 @@ class TaskService {
 							log.error "Failed Readying successor task [${taskToReady.id} " + GormUtil.allErrorsString(taskToReady)
 						}
 						*/
-							
 							
 						log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) Making READY "
 						setTaskStatus(dependentTask, AssetCommentStatus.READY)
@@ -254,6 +319,7 @@ class TaskService {
 	 */
 	def canChangeStatus ( task ){
 		def can = true
+		// TODO : runbook - add logic to allow PM to change status anytime.
 		if ([AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP].contains( task.category ) && 
 			! [ AssetCommentStatus.READY, AssetCommentStatus.STARTED ].contains( task.status )) {
 			  can = false 
@@ -261,4 +327,40 @@ class TaskService {
 		return can
 	}
 	
+	/**
+	 * Comparies two statuses and returns -1 if 1st is before 2nd, 0 if equal, or 1 if 1st is after the 2nd
+	 * @param from	status moving from
+	 * @param to 	status moving to
+	 * @return int 
+	 */
+	def compareStatus( from, to ) {
+		if (! from && to ) return 1
+		if ( from && !to ) return -1
+		
+		def fidx = statusList.findIndexOf { it == from }
+		def tidx = statusList.findIndexOf { it == to }
+		
+		// TODO - need to solve issue when the status from or to is unknown.
+		
+		return fidx < tidx ? -1 : fidx == tidx ? 0 : 1
+	}
+	
+	/**
+	 * Used to add a note to a task
+	 * @param task	The task (aka AssetComment) to add a note to
+	 * @param person	The Person object that is creating the note
+	 * @param note	A String that represents the note
+	 */
+	def addNote( def task, def person, def note ) {
+		def taskNote = new CommentNote();
+		taskNote.createdBy = person
+		taskNote.note = note
+		if ( taskNote.hasErrors() ) {
+			log.error "addNote: failed to save note : ${GormUtil.allErrorsString(taskNote)}"
+			return false
+		} else {
+			task.addToNotes(taskNote)
+			return true
+		}
+	}
 }
