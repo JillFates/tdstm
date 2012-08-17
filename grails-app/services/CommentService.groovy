@@ -125,8 +125,8 @@ class CommentService {
 		if (params.displayOption) assetComment.displayOption = params.displayOption
 		if (params.attribute) assetComment.attribute = params.attribute
 	    assetComment.resolution = params.resolution
-		if(params.estStart) assetComment.estStart = estformatter.parse(params.estStart)
-		if(params.estFinish) assetComment.estFinish = estformatter.parse(params.estFinish)
+		if(params.estStart) assetComment.estStart = GormUtil.convertInToGMT(estformatter.parse(params.estStart),tzId)
+		if(params.estFinish) assetComment.estFinish = GormUtil.convertInToGMT(estformatter.parse(params.estFinish),tzId)
 		// Actual Start/Finish are handled by the statusUpdate function
 		// if(params.actStart) assetComment.actStart = estformatter.parse(params.actStart)
 		if(params.workflowTransition?.isNumber()) {
