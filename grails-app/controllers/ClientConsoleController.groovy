@@ -72,18 +72,26 @@ class ClientConsoleController {
 				def defaultBundleId = securityService.getUserCurrentMoveBundleId()
 				if(bundleId == "all"){
 					userPreferenceService.removePreference( "CURR_BUNDLE" )
+					def moveBundleIds = moveBundleInstanceList.id
 					bundles = (moveBundleInstanceList.id).toString().replace("[","(").replace("]",")")
+					bundleId = moveBundleIds[0]
+
 				} else if(defaultBundleId){ // check to see if there is any pref bundle exist
 					def defalutBundle = MoveBundle.get(defaultBundleId)
 					if(defalutBundle?.moveEvent?.id != moveEventInstance.id){ // check to see if preff bundle belongs to current event , if not remove the pref bundle
 						userPreferenceService.removePreference( "CURR_BUNDLE" )
-						bundles = (moveBundleInstanceList.id).toString().replace("[","(").replace("]",")")
+						def moveBundleIds =  moveBundleInstanceList.id
+						bundles = (moveBundleIds).toString().replace("[","(").replace("]",")")
+						bundleId = moveBundleIds[0]
 					} else {
 						moveBundleInstance = defalutBundle
 						bundles = "("+defaultBundleId+")"
+						bundleId = moveBundleInstance.id
 					}
 				} else  { // use all the bundles if pref bundle not exist
-					bundles = (moveBundleInstanceList.id).toString().replace("[","(").replace("]",")")
+				    def moveBundleIds =  moveBundleInstanceList.id
+					bundles = (moveBundleIds).toString().replace("[","(").replace("]",")")
+					bundleId = moveBundleIds[0]
 				}
 			}
 			
@@ -91,10 +99,13 @@ class ClientConsoleController {
 			if(moveBundleInstance){
 				workflowCode = moveBundleInstance.workflowCode
 			}else{
-				workflowCode = project.workflowCode
+				workflowCode = bundleId ? MoveBundle.read(bundleId).workflowCode : project.workflowCode
 			}
+			Set uniqueWorkflowCodes = moveBundleInstanceList.workflowCode
+			def showAllOption = uniqueWorkflowCodes.size() == 1 && moveBundleInstanceList.size() > 1
+			
 			stateEngineService.loadWorkflowTransitionsIntoMap(workflowCode, 'project')
-			def headerCount = getHeaderNames(bundleId)
+			def headerCount = getHeaderNames(bundleId, workflowCode)
 			
 			//def projectMap
 			def moveEventsList = MoveEvent.findAll("from MoveEvent me where me.project = ? order by me.name asc",[project])
@@ -290,8 +301,6 @@ class ClientConsoleController {
 			def dbs = Database.findAllByAssetTypeAndProject('Database',project)
 			def files = Files.findAllByAssetTypeAndProject('Files',project)
 			
-			Set workflowCodeListForMoveBundle = MoveBundle.findAllByMoveEvent(moveEventInstance).workflowCode
-		    def workflowCodeListForMoveBundleLength = workflowCodeListForMoveBundle.size()
             return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
 				column1List:column1List, column2List:column2List,column3List:column3List, column4List:column4List,projectId:project.id, lastPoolTime : lastPoolTime,
                 processTransitionList:processTransitionList,column2Value:params.column2,column1Value:params.column1,
@@ -303,7 +312,7 @@ class ClientConsoleController {
 				clientConsoleCheckBoxHasPermission:RolePermissions.hasPermission("ClientConsoleCheckBox"),
 				columns:columns, assetsInView:assetsInView, totalAssets:totalAssets, attributesList:attributesList, servers : servers, 
 				applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency(), project:project,
-				workflowCodeListForMoveBundleLength:workflowCodeListForMoveBundleLength ]
+				showAllOption:showAllOption, bundleId:bundleId ]
 	    	
 		 }
 	}
@@ -663,17 +672,8 @@ class ClientConsoleController {
 	 * @author: Mallikarjun
 	 * @return: count of tasks
 	 *----------------------------------------------------*/
-	def getHeaderNames(moveBundle){
+	def getHeaderNames(moveBundleId, workFlowCode){
 		def tempTransitions = []
-		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
-		def workFlowCode
-		def moveBundleInstance
-		if(moveBundle  &&  moveBundle!="all"){
-		    moveBundleInstance = MoveBundle.findByIdAndProject(moveBundle,projectInstance)
-		    workFlowCode = moveBundleInstance.workflowCode
-		}else{
-		    workFlowCode = projectInstance.workflowCode
-		}
 		def processTransitions= stateEngineService.getTasks(workFlowCode, "TASK_ID")
 		processTransitions.each{
 			tempTransitions <<Integer.parseInt(it)
@@ -716,7 +716,7 @@ class ClientConsoleController {
 		}
 		svgHeaderFile.append("' stroke = '#FFFFFF' stroke-width = '1'/>")
 		svgHeaderFile.append("</svg>")
-		def f = ApplicationHolder.application.parentContext.getResource("templates/headerSvg_${projectInstance?.id}.svg").getFile()
+		def f = ApplicationHolder.application.parentContext.getResource("templates/headerSvg_${moveBundleId}.svg").getFile()
 		def fop=new FileOutputStream(f)
 		if(f.exists()){
 			fop.write(svgHeaderFile.toString().getBytes())
@@ -1039,15 +1039,16 @@ class ClientConsoleController {
 	def moveBundleList ={
 		def moveEventId = params.moveEvent
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def MoveEventInstance = MoveEvent.findByIdAndProject(moveEventId ,(Project.get(projectId)))
-		def moveBundlesList = MoveEventInstance.moveBundles
-		def BundleList = []
-		Set workflowCodeListForMoveBundle = MoveBundle.findAllByMoveEvent(MoveEventInstance).workflowCode
-		def workflowCodeListForMoveBundleLength = workflowCodeListForMoveBundle.size()
-		MoveEventInstance.moveBundles.each{moveEvent->
-			BundleList << [id:moveEvent.id, name:moveEvent.name,workflowCodeListForMoveBundleLength:workflowCodeListForMoveBundleLength]
+		def moveEventInstance = MoveEvent.findByIdAndProject(moveEventId ,(Project.get(projectId)))
+		def moveBundlesList = moveEventInstance.moveBundles
+		def bundleList = []
+		def moveBundles = MoveBundle.findAllByMoveEvent(moveEventInstance)
+		Set uniqueWorkflowCodes = moveBundles?.workflowCode
+		def showAllOption = uniqueWorkflowCodes.size() == 1 && moveBundles.size() > 1
+		moveBundles.each{moveEvent->
+			bundleList << [id:moveEvent.id, name:moveEvent.name,showAllOption:showAllOption]
 		}
-		BundleList.sort { it.name }
-		render BundleList as JSON
+		bundleList.sort { it.name }
+		render bundleList as JSON
 	}
 }

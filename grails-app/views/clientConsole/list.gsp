@@ -74,7 +74,7 @@
 					<label for="moveBundle"><b>Bundle:</b></label>&nbsp;
 					<span id="jsonReplace">
 					<select id="moveBundleId" name="moveBundle" onchange="document.listForm.submit()" >
-					    <g:if test="${workflowCodeListForMoveBundleLength < 2}">
+					    <g:if test="${showAllOption}">
 						  <option value="all">All</option>
 						</g:if>
 						<g:each status="i" in="${moveBundleInstanceList}" var="moveBundleInstance">
@@ -219,7 +219,7 @@
 			</g:each>
 			</g:if>
 			<g:else>
-			<th style="padding-left: 0px; height: 102px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg_'+projectId+'.svg')}" type="image/svg+xml" width="${headerCount*21.80}" height="102px"/></th>
+			<th style="padding-left: 0px; height: 102px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg_'+bundleId+'.svg')}" type="image/svg+xml" width="${headerCount*21.80}" height="102px"/></th>
 			</g:else>
 		</tr>
 	</g:form>
@@ -1037,11 +1037,8 @@
 		var data = eval('(' + e.responseText + ')');
 		var selectContent = "<select id='moveBundleId' name='moveBundle'>"
 
-		if(data.size()==0){
-			selectContent += "<option selected='selected' value='all' >"+'All'+"</option>"
-		}
 		for (var i = 0; i < data.size(); i++){
-			if( data[i].workflowCodeListForMoveBundleLength < 2 ){
+			if( data[i].showAllOption ){
 			   selectContent += "<option selected='selected' value='all' >"+'All'+"</option>"
 			 } 
 			 selectContent += "<option value ="+data[i].id+">"+data[i].name+"</option>"
