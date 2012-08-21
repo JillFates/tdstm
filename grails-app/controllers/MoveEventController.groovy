@@ -30,6 +30,7 @@ class MoveEventController {
 	def stepSnapshotService
 	def stateEngineService
 	def reportsService
+	def taskService
 	
     def index = { redirect(action:list,params:params) }
 
@@ -347,6 +348,24 @@ class MoveEventController {
 		}
 		render "success"
     }
+	
+	/**
+	 * Used to clear or reset any Task data for selected move event.
+     * @param  : moveEventId 
+     * @param : type (delete/clear)
+	 */
+	def clearTaskData = {
+		def moveEventId = params.moveEventId
+		if(moveEventId ){
+			if(params.type == 'clear'){
+				taskService.cleanTaskData(moveEventId)
+			} else if(params.type == 'delete'){
+				taskService.deleteTaskData(moveEventId)
+			}
+		}
+		render "success"
+	}
+	
     /*------------------------------------------------
      * Return the list of active news for a selected moveEvent and status of that evnt.
      * @author : Lokanada Reddy

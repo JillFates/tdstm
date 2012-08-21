@@ -3,17 +3,6 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="projectHeader" />
         <title>Show Move Event</title>
-        <script type="text/javascript">
-        function clearHistoricData( moveEventId ){
-            $("#messageDiv").hide();
-            $("#messageDiv").html("");
-            var confirmStatus = confirm("Are you sure you want to permanently clear the dashboard data for this move event?")
-            if(confirmStatus){
-            	${remoteFunction(action:'clearHistoricData', params:'\'moveEventId=\' + moveEventId ', 
-                    	onSuccess:"jQuery('#messageDiv').html('Dashboard History has been cleaned successfully');jQuery('#messageDiv').show()")}
-            }
-        }
-        </script>
     </head>
     <body>
         <div class="body">
@@ -110,6 +99,8 @@
                     <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this Event will remove any move news and any related step data?');" value="Delete" /></span>
                     <span class="button"><input type="button" class="delete" value="Clear Dashboard History" onclick="clearHistoricData( $('#moveEventId').val() )"/></span>
+                 	<span class="button"><input type="button" class="delete" value="Delete Tasks" onclick="clearTaskData( $('#moveEventId').val(), 'delete' )"/></span>
+                    <span class="button"><input type="button" class="delete" value="Clear Task History" onclick="clearTaskData( $('#moveEventId').val(), 'clear' )"/></span>
                  </tds:hasPermission>
                 </g:form>
             </div>
@@ -117,6 +108,25 @@
 <script>
 	currentMenuId = "#eventMenu";
 	$("#eventMenuId a").css('background-color','#003366')
+	function clearHistoricData( moveEventId ){
+        $("#messageDiv").hide();
+        $("#messageDiv").html("");
+        var confirmStatus = confirm("Are you sure you want to permanently clear the dashboard data for this move event?")
+        if(confirmStatus){
+        	${remoteFunction(action:'clearHistoricData', params:'\'moveEventId=\' + moveEventId ', 
+                	onSuccess:"jQuery('#messageDiv').html('Dashboard History has been cleaned successfully');jQuery('#messageDiv').show()")}
+        }
+	}
+
+   	function clearTaskData(moveEventId, type){
+	   	$("#messageDiv").hide();
+      	$("#messageDiv").html("");
+       	var confirmStatus = confirm("Are you sure you want to permanently "+type+" the task data for this move event?")
+       	if(confirmStatus){
+       		${remoteFunction(action:'clearTaskData ', params:'\'moveEventId=\' + moveEventId +\'&type=\' + type ', 
+               	onSuccess:"jQuery('#messageDiv').html('Task data has been '+(type=='clear' ? 'cleaned' : 'deleted')+' successfully');jQuery('#messageDiv').show()")}
+       	}
+   	}
 </script>
     </body>
 </html>

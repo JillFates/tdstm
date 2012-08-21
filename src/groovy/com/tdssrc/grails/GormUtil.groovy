@@ -76,5 +76,12 @@ public class GormUtil {
 		}
 		return ret;
 	}
-
+	/*
+	 * Convert List as comma delimited of type String to use inside sql statement.
+	 * @param List
+	 * @return converted List in to String as comma delimited
+	 */
+	 public static String getCommaDelimitedString( def idList ){
+		return idList.toString().replace("[","").replace("]","")
+	}
 }
