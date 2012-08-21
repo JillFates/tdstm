@@ -10,31 +10,28 @@ class CustomTagLib {
 	def convertDate = { attrs ->
 		Date dt = attrs['date'];
 		def tzId = attrs['timeZone']
-		def format = attrs['format'] ?: 'yyyy-MM-dd kk:mm:ss'
+		def format = attrs['format']
 		
 		String dtStr = dt.getClass().getName().toString();
 		String dtParam = dt.toString();	
 		
 		if (dtStr.equals("java.util.Date")) {	
 			DateFormat formatter ; 
-			formatter = new SimpleDateFormat(format);
+			formatter = new SimpleDateFormat('yyyy-MM-dd kk:mm:ss');
 			dt = GormUtil.convertInToUserTZ( dt, tzId )
 			dtParam = formatter.format(dt);		
 		}  
 		/* if null or any plain string */
+		out << ""
 		if (dtParam != "null") {
-		
 			dtParam = dtParam.trim();
 			if(format=="MM/dd"){
 			 out << dtParam[5..6]+"/"+dtParam[8..9]
-			} else if (format=="MM/dd hh:mm:ss") {
+			} else if (format=="MM/dd kk:mm:ss") {
 				out << dtParam[5..6]+'/'+dtParam[8..9]+' '+dtParam[11..18]
 			} else {
 			 out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]
 			}
-			
-			
-		
 		}
 	}
 	/*
