@@ -70,20 +70,15 @@
 					<tr id="showStatusId_${issue?.item?.id}" style="display: none;" > 
 						<td nowrap="nowrap" colspan="5" class="statusButtonBar" >
 							<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
-							 id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','${com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED}')">
+							 id="started_${issue?.item?.id}" onclick="changeStatus('${issue?.item?.id}','${com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED}','${issue.item.status}')">
 								<span class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
 								<span class="ui-button-text task_button">Start</span>
 							</a>
 							<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
-							 onclick="changeStatus('${issue?.item?.id}','${com.tdsops.tm.enums.domain.AssetCommentStatus.DONE}')">
+							 onclick="changeStatus('${issue?.item?.id}','${com.tdsops.tm.enums.domain.AssetCommentStatus.DONE}', '${issue.item.status}')">
 								<span class="ui-button-icon-primary ui-icon ui-icon-check task_icon"></span>
 								<span class="ui-button-text task_button">Done</span>
 							</a>
-
-							<%--<span class="statusButton" onclick="changeStatus('${issue?.item?.id}', '${com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED}')" style="margin-left: 30px">
-							<img src="${createLinkTo(dir:'images',file:'check.png')}" />&nbsp;&nbsp;Complete&nbsp;&nbsp;
-							</span>
-							--%>
 							<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action" onclick="issueDetails(${issue?.item?.id},'${issue?.item?.status}')">
 								<span class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
 								<span class="ui-button-text task_button">Details..</span>
@@ -128,18 +123,16 @@
 				$('#detailTdId_'+id).css('display','table-row')
 				//$('#detailId_'+id).css('display','block')
 				$('#taskLinkId').removeClass('mobselect')
-				new Ajax.Request('../assetEntity/updateStatusSelect?status='+status,{asynchronous:false,evalScripts:true,
+				new Ajax.Request('../assetEntity/updateStatusSelect?id='+id,{asynchronous:false,evalScripts:true,
 			          onComplete:function(e){
 							 var resp = e.responseText;
 							 resp = resp.replace("statusEditId","statusEditId_"+id).replace("showResolve(this.value)","showResolve()")
 							 $('#statusEditTrId_'+id).html(resp)
-							 $('#statusEditId_'+id).val(status)
+							 // $('#statusEditId_'+id).val(status)
 			 			}
 				})
 			}
 		});
-		
-		
 	}
 	function cancelButton(id,status){
 		B1.Start(60);
@@ -149,21 +142,28 @@
 		$('#showStatusId_'+id).css('display','table-row')
 		$('#issueTr_'+id).attr('onClick','issueDetails('+id+',"'+status+'")');
 	}
-	function changeStatus(id,status){
+	function changeStatus(id,status, currentStatus){
 		jQuery.ajax({
 			url: '../assetEntity/updateComment',
-			data: {'id':id,'status':status},
+			data: {'id':id,'status':status,'currentStatus':currentStatus},
 			type:'POST',
 			success: function(data) {
-				var myClass = $('#issueTrId_'+data.assetComment.id).attr("class");
-				if(data.assetComment.status=='Started'){
-					$('#statusTd_'+data.assetComment.id).html(data.assetComment.status)
-					$('#started_'+data.assetComment.id).hide()
-					$('#issueTrId_'+data.assetComment.id).removeClass(myClass).addClass('asset_process');
-				}else{
-					$('#showStatusId_'+data.assetComment.id).hide()
-					$('#issueTrId_'+data.assetComment.id).remove()
+				if (typeof data.error !== 'undefined') {
+					alert(data.error);
+				} else {
+					var myClass = $('#issueTrId_'+data.assetComment.id).attr("class");
+					if(data.assetComment.status=='Started'){
+						$('#statusTd_'+data.assetComment.id).html(data.assetComment.status)
+						$('#started_'+data.assetComment.id).hide()
+						$('#issueTrId_'+data.assetComment.id).removeClass(myClass).addClass('asset_process');
+					}else{
+						$('#showStatusId_'+data.assetComment.id).hide()
+						$('#issueTrId_'+data.assetComment.id).remove()
+					}
 				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert("An unexpected error occurred while attempting to update task/comment")
 			}
 		});
 	}

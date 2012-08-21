@@ -60,7 +60,9 @@
 				</td>
 			</tr>
 			<tr class="prop" >
-				<td valign="top" class="name"><label for="status">Status:</label></td>
+				<td valign="top" class="name"><label for="status">Status:</label>
+				<input id="currentStatus_${assetComment.id}" name="currentStatus" type="hidden" value="${assetComment.status}" />
+				</td>
 				<td style="width: 20%;" id="statusEditTrId_${assetComment.id}">
 					<g:if test="${statusWarn==1}">
 						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
@@ -282,42 +284,50 @@ $( function() {
  function validateComment(objId){
 	 var status = $('#statusEditId_'+${assetComment.id}).val()
 	 if(status=='Completed' && $('#resolutionEditId_'+${assetComment.id}).val()==''){
-         alert("Please Enter Resolution")
+         alert("Please enter a resolution")
 	 }else{
 		var params = {   'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 
 						 'category':$('#categoryEditId_'+objId).val(), 'assignedTo':$('#assignedToEditId_'+objId).val(),
 						 'dueDate':$('#dueDateEdit_'+objId).val(), 'status':$('#statusEditId_'+objId).val(),
-						 'note':$('#noteEditId_'+objId).val(),'id':objId }
+						 'currentStatus':$('#currentStatus_'+objId).val(), 'note':$('#noteEditId_'+objId).val(),'id':objId }
 		 jQuery.ajax({
 				url: '../assetEntity/updateComment',
 				data: params,
 				type:'POST',
 				success: function(data) {
-					var myClass = $('#issueTrId_'+data.assetComment.id).attr("class");
-					$('#comment_'+data.assetComment.id).html(truncate(data.assetComment.comment))
-					$('#lastUpdated_'+data.assetComment.id).html(formatDueDate(data.assetComment.lastUpdated))
-					$('#dueDate_'+data.assetComment.id).html(formatDueDate(data.assetComment.dueDate))
-					if(data.assetComment.assetEntity){
-					 	$('#asset_'+data.assetComment.id).html(data.assetComment.assetEntity.assetName)
-					}
-					$('#issueTr_'+objId).attr('onClick','issueDetails('+objId+',"'+data.assetComment.status+'")');
-					$('#statusTd_'+data.assetComment.id).html(data.assetComment.status)
-					$('#detailTdId_'+data.assetComment.id).hide()
-					$('#issueTrId_'+data.assetComment.id).removeClass(myClass).addClass(data.statusCss);
-					$('#issueTr_'+data.assetComment.id).removeClass(myClass).addClass(data.statusCss);
-					$('#messageId').html('Comment' +data.assetComment + ' Updated')
-					if(data.assetComment.status==''|| data.assetComment.status=='Started'|| data.assetComment.status=='Ready' || data.assetComment.status==null){
-						$('#started_'+data.assetComment.id).hide()
-						$('#showStatusId_'+data.assetComment.id).show()
-						if(data.assetComment.status=='Pending'){
-							$('#started_'+data.assetComment.id).show()
+					if (typeof data.error !== 'undefined') {
+						alert(data.error);
+					} else {
+						var myClass = $('#issueTrId_'+data.assetComment.id).attr("class");
+						$('#comment_'+data.assetComment.id).html(truncate(data.assetComment.comment))
+						$('#lastUpdated_'+data.assetComment.id).html(formatDueDate(data.assetComment.lastUpdated))
+						$('#dueDate_'+data.assetComment.id).html(formatDueDate(data.assetComment.dueDate))
+						if(data.assetComment.assetEntity){
+						 	$('#asset_'+data.assetComment.id).html(data.assetComment.assetEntity.assetName)
 						}
-						$('#toDoAllId').html(parseInt($('#toDoAllId').html())+1)
-					}else{
-						$('#showStatusId_'+data.assetComment.id).hide()
-						$('#issueTrId_'+data.assetComment.id).remove()
-						B1.Start(60);
+						$('#issueTr_'+objId).attr('onClick','issueDetails('+objId+',"'+data.assetComment.status+'")');
+						$('#statusTd_'+data.assetComment.id).html(data.assetComment.status)
+						$('#currentStatus_'+data.assetComment.id).value=data.assetComment.status					
+						$('#detailTdId_'+data.assetComment.id).hide()
+						$('#issueTrId_'+data.assetComment.id).removeClass(myClass).addClass(data.statusCss);
+						$('#issueTr_'+data.assetComment.id).removeClass(myClass).addClass(data.statusCss);
+						$('#messageId').html('Comment' +data.assetComment + ' Updated')
+						if(data.assetComment.status==''|| data.assetComment.status=='Started'|| data.assetComment.status=='Ready' || data.assetComment.status==null){
+							$('#started_'+data.assetComment.id).hide()
+							$('#showStatusId_'+data.assetComment.id).show()
+							if(data.assetComment.status=='Pending'){
+								$('#started_'+data.assetComment.id).show()
+							}
+							$('#toDoAllId').html(parseInt($('#toDoAllId').html())+1)
+						}else{
+							$('#showStatusId_'+data.assetComment.id).hide()
+							$('#issueTrId_'+data.assetComment.id).remove()
+							B1.Start(60);
+						}
 					}
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					alert("An unexpected error occurred while attempting to update task/comment")
 				}
 			});
 	 }

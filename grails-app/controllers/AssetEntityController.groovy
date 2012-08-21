@@ -1890,10 +1890,13 @@ class AssetEntityController {
 	 * ------------------------------------------------------------ */
 	def updateComment = {
 		def map = commentService.saveUpdateCommentAndNotes(session, params, false, flash)
-		if (params.open=='view'){
+		if (params.open=='view') {
+			if (map.error) {
+				flash.message = map.error
+			}
 			forward(action:'showComment',params:[id:params.id] )
 		} else {
-		   render map as JSON
+			render map as JSON
 		}
 		
 	}
@@ -3482,20 +3485,23 @@ class AssetEntityController {
 		render assignedToSelect
 	}
 	/**
-	 * Generates an HTML SELECT control for the AssetComment.status property according to user role and params.status
-	 * @param	params.status	current status value
+	 * Generates an HTML SELECT control for the AssetComment.status property according to user role and current status of AssetComment(id)
+	 * @param	params.id	The ID of the AssetComment to generate the SELECT for
 	 * @return render HTML
 	 */
 	def updateStatusSelect = {
 		
 		def mapKey = securityService.hasRole("PROJ_MGR") ? "PROJ_MGR" : "USER" 
 		def optionForRole = statusOptionForRole.get(mapKey)
-		def optionList = optionForRole.get(params.status)
+		def status = AssetComment.read(params.id)?.status ?: ''
+		def optionList = optionForRole.get(status)
+		def selected
 		// TODO : NO MORE BUILDING SELECT CONTROLLERS - Refactor this into HtmlUtil utility class.
 		def statusSelect = new StringBuffer("""<SELECT ID="statusEditId" NAME="statusEdit" onChange="showResolve(this.value)" >""")
 		statusSelect.append("""<OPTION VALUE="">Please select</OPTION>""")
 		optionList.each{
-			statusSelect.append("<OPTION VALUE='${it}'>${it}</OPTION>")
+			selected = it == status ? 'SELECTED' : ''
+			statusSelect.append("<OPTION VALUE=\"${it}\" ${selected}>${it}</OPTION>")
 		}
 		statusSelect.append("</SELECT>")
 		
