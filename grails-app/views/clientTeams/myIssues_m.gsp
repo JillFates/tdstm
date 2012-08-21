@@ -56,7 +56,9 @@
 		</ul>
 		<div class="tab_search">
 	      	<g:form method="post" name="issueAssetForm" action="showIssue">
-			<input  type="text" size="08" value="${search}" id="search" name="search" autocorrect="off" autocapitalize="off" onfocus="changeAction()" onblur="retainAction()" />
+			<input type="hidden" name="sort" value="${sort}">
+			<input type="hidden" name="order" value="${order}">
+			<input type="text" size="08" value="${search}" id="search" name="search" autocorrect="off" autocapitalize="off" onfocus="changeAction()" onblur="retainAction()" />
 		</div>
 	</div>
 	<div class="issueTimebar" id="issueTimebar"><div id="issueTimebarId" ></div></div>
@@ -94,7 +96,7 @@
 					<tr id="issueTr_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="issueDetails(${issue?.item?.id})">
 				  </g:else>
 						<td id="comment_${issue?.item?.id}" class="asset_details_block">${issue?.item?.comment?.size() > 50 ? issue?.item?.comment?.substring(0,40)+'...' : issue?.item?.comment}</td>
-						<td id="asset_${issue?.item?.id}"class="asset_details_block">${issue?.item?.assetEntity?.assetName}</td>
+						<td id="asset_${issue?.item?.id}"class="asset_details_block">${issue?.item?.assetName}</td>
 						<td id="statusTd_${issue?.item?.id}"id="statusTd_${issue?.item?.id}" class="asset_details_block">${issue?.item?.status}</td>
 					</tr>
 					<g:if test="${tab && tab == 'todo'}">
