@@ -54,6 +54,8 @@ class AssetComment {
 	
 	static belongsTo = [ assetEntity : AssetEntity ]
 	
+	// TODO : Add custom validator for role that checks that the role is legit for "Staff : *" of RoleType
+	
 	static constraints = {	
 		// comment(size:255)	// TODO: add constraint for comment size
 		assetEntity(nullable:true )

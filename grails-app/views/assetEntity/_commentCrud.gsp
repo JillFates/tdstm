@@ -50,11 +50,14 @@
 	<div class="dialog" style="border: 1px solid #5F9FCF"><input name="id" value="" id="commentId" type="hidden" />
 	<div>
 	<table id="showCommentTable" style="border: 0px;">
+		<tr>
+			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
+			<td valign="top" class="value" id="createdById" colspan="3"></td>
+		</tr>
 		<tr class = "issue" id="assignedToTrId" style="display: none">
 			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
 			<td valign="top" class="value" id="" colspan="3">
-				<span id="assignedToTdId"></span>&nbsp;-&nbsp;
-				<span id="roleTdId"></span>&nbsp;
+				<span id="assignedToTdId"></span>&nbsp;/&nbsp;<span id="roleTdId"></span>&nbsp;
 				<input type="checkbox" id="hardAssignedShow" name="hardAssignedShow" value="0"
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
 				<label for="hardAssignedShow" >Fixed Assignment</label>&nbsp;&nbsp;
@@ -63,10 +66,6 @@
 					<span id="dueDateId"></span>
 				</span>
 			</td>
-		</tr>
-		<tr>
-			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
-			<td valign="top" class="value" id="createdById" colspan="3"></td>
 		</tr>
 		<tr class="prop" id="commentShowTrId">
 			<td valign="top" class="name"><label for="commentType">Type:</label></td>
@@ -199,7 +198,7 @@
 			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
 			<td valign="top" nowrap="nowrap" colspan="3">
 				<span id="assignedCreateSpan"></span>
-				&nbsp;-&nbsp;
+				&nbsp;/&nbsp;
 				<g:select id="roleType" name="roleType" from="${RoleType.list()}" noSelection="['':'UnAssigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)"></g:select> &nbsp;
 				<input type="checkbox" id="hardAssigned" name="hardAssigned" value="1"  checked="checked"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
@@ -225,8 +224,7 @@
             	noSelection="['':'please select']" onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionId', 'predecessorId','')"></g:select>
         		&nbsp;&nbsp;
         		<label for="priority">Priority:</label>
-            	<g:select id="priority" name="priority" from="${1..5}" value="3"
-            	noSelection="['':'please select']"></g:select>
+            	<g:select id="priority" name="priority" from="${1..5}" value="3"></g:select>
         	</td>
 		</tr>
 		<tr class="prop" id="mustVerifyTr" style="display: none;">
@@ -362,25 +360,26 @@
   <div>
 	<table id="updateCommentTable" style="border: 0px;">
 	   <% // TODO : Replace DB lookup in GSP with data from controller %>
+		<tr>
+			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
+			<td valign="top" class="value" id="createdByEditId" colspan="3"></td>
+		</tr>
 	   <tr class="prop issue" id="assignedToTrEditId" style="display: none">
 			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
 			<td valign="top" id="assignedToEditTdId" style="display: none;" class="issue"  colspan="3" nowrap="nowrap">
-                <span id="assignedEditSpan"> </span>
+                <span id="assignedEditSpan"> </span>&nbsp;
 				<g:select id="roleTypeEdit" name="roleTypeEdit" from="${RoleType.list()}" noSelection="['':'UnAssigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)"></g:select>
-
+				&nbsp;
 				<input type="checkbox" id="hardAssignedEdit" name="hardAssignedEdit" value="1"  checked="checked"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
-				<label for="hardAssignedEdit" >Fixed Assignment</label>&nbsp;&nbsp;
-			    <label for="dueDate">Due:</label>
+				<label for="hardAssignedEdit" >Fixed Assignment</label>
+				&nbsp;&nbsp;&nbsp;
+			    <label for="dueDate">Due Date:</label>
 				<script type="text/javascript" charset="utf-8">
 				jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 				</script><input type="text" class="dateRange" size="15" style="" name="dueDateEdit" id="dueDateEdit"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
-		</tr>
-		<tr>
-			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
-			<td valign="top" class="value" id="createdByEditId" colspan="3"></td>
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name" id="commentTypeEditTdId"><label for="commentType">Type:</label></td>
@@ -397,12 +396,12 @@
 				</div>
 			</td>
 			<td valign="top" class="name"><label for="category">Category:</label>
-			<td width="10px" colspan="4">
+			<td colspan="4">
 				<g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
 				onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionEditId', 'predecessorId',jQuery('#createAssetCommentId').html())"></g:select>
 				<span id="taskNumberSpanEditId"></span>
         	    <label for="priority">Priority:</label>
-            	<g:select id="priorityEdit" name="priorityEdit" from="${1..5}" value="" noSelection="['':'please select']"></g:select>
+            	<g:select id="priorityEdit" name="priorityEdit" from="${1..5}" value=""></g:select>
 			</td>
         	<td valign="top" class="name" >
         	</td>
@@ -481,7 +480,7 @@
 			<td valign="top" class="name"><label for="status">Status:</label></td>
 			<td colspan="3" id="statusEditTrId">
 				<g:select id="statusEditId" name="statusEdit" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Pending"
-				noSelection="['':'please select']" onChange="showResolve(this.value)"></g:select>
+				noSelection="['':'Please select']" onChange="showResolve(this.value)"></g:select>
 			</td>
 		</tr>
 		<tr class="prop">
@@ -495,16 +494,16 @@
 			</td>
 		</tr>
 	    <tr class="prop issue" id="estStartEditTrId" style="display: none">
-			<td valign="top" class="name"><label for="estStartTrId">Estimated start:</label></td>
+			<td valign="top" class="name"><label for="estStartTrId">Estimated Start:</label></td>
 			<td valign="top" class="value" nowrap="nowrap">
 				<script type="text/javascript" charset="utf-8">
 				  jQuery(function($){$('.datetimeEditRange').datetimepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script> <input type="text" class="datetimeEditRange" size="15" style="" name="estStart" id="estStartEditId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
-			<td valign="top" class="name"><label for="estFinishTrId">Estimated finish:</label></td>
+			<td valign="middle" class="name"><label for="estFinishTrId">Estimated Finish:</label></td>
 			<td valign="top" class="value" nowrap="nowrap">
-                   <input type="text" class="datetimeEditRange" size="15" style="" name="estFinishEditId" id="estFinishEditId"
+				<input type="text" class="datetimeEditRange" size="15" style="" name="estFinishEditId" id="estFinishEditId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 		</tr>

@@ -657,7 +657,7 @@ function showAssetDialog( e , action ) {
 		     $('#eventShowValueId').html(params.eventName)
 	      	 if(ac.commentType=='issue'){
 	      		 updateAssignedToList('assignedToEdit','assignedEditSpan');
-	      		 updateStatusSelect(ac.status);
+	      		 updateStatusSelect(ac.id);
 	      		 if(ac.resolution || ac.status=='Completed'){
 	      		   $('#resolutionEditTrId').css('display','table-row')
 	      		 }else{
@@ -1486,8 +1486,8 @@ function updateAssignedToList(forView,span){
 		 }
 	})
 }
-function updateStatusSelect(status){
-	new Ajax.Request('../assetEntity/updateStatusSelect?status='+status,{asynchronous:false,evalScripts:true,
+function updateStatusSelect(taskId){
+	new Ajax.Request('../assetEntity/updateStatusSelect?id='+taskId,{asynchronous:false,evalScripts:true,
 		 onComplete:function(e){
 			 $('#statusEditTrId').html(e.responseText)
 		 }

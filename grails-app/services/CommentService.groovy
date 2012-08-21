@@ -153,32 +153,40 @@ class CommentService {
 			if (params.displayOption) assetComment.displayOption = params.displayOption
 			if (params.attribute) assetComment.attribute = params.attribute
 		    assetComment.resolution = params.resolution
-			if(params.estStart) assetComment.estStart = estformatter.parse(params.estStart)
-			if(params.estFinish) assetComment.estFinish = estformatter.parse(params.estFinish)
+			if (params.containsKey('estStart')) {
+				log.info "saveUpdateCommentAndNotes: estStart=[${params.estStart}]"
+				assetComment.estStart = params.estStart ? estformatter.parse(params.estStart) : null
+			}
+			if (params.containsKey('estStart')) {
+				assetComment.estFinish = params.estFinish ? estformatter.parse(params.estFinish) : null
+			}
+			if (params.containsKey('role')) {
+				assetComment.role = params.role ?: null
+			}
+			
 			// Actual Start/Finish are handled by the statusUpdate function
 			// if(params.actStart) assetComment.actStart = estformatter.parse(params.actStart)
-			if(params.workflowTransition?.isNumber()) {
-				// TODO : should validate that this workflow is associated with that of the workflow for the move bundle
-				def wft = WorkflowTransition.get(params.workflowTransition)
-				if (wft) {
-					assetComment.workflowTransition = wft
+			if (params.containsKey('workflowTransition')) {
+				if (params.workflowTransition?.isNumber()) {
+					// TODO : should validate that this workflow is associated with that of the workflow for the move bundle
+					def wft = WorkflowTransition.get(params.workflowTransition)
+					if (wft) {
+						assetComment.workflowTransition = wft
+					} else {
+						log.warn "saveUpdateCommentAndNotes: Invalid workflowTransition id (${params.workflowTransition})"
+					}  
 				} else {
-					log.warn "saveUpdateCommentAndNotes: Invalid workflowTransition id (${params.workflowTransition})"
-				}  
+					assetComment.workflowTransition = null
+				}
 			}
-			if(params.hardAssigned?.isNumber()) assetComment.hardAssigned = Integer.parseInt(params.hardAssigned)
-			if(params.priority?.isNumber()) assetComment.priority = Integer.parseInt(params.priority)
-			if(params.override?.isNumber()) assetComment.workflowOverride = Integer.parseInt(params.override)
-			if(params.duration?.isNumber()) assetComment.duration = Integer.parseInt(params.duration)
-			if(params.durationScale) assetComment.durationScale = params.durationScale
-		
-			if (params.role) {
-				// TODO : runbook - need to validate that the role is legit for "Staff : *" of RoleType
-				assetComment.role = params.role
-			}
+			if (params.hardAssigned?.isNumber()) assetComment.hardAssigned = Integer.parseInt(params.hardAssigned)
+			if (params.priority?.isNumber()) assetComment.priority = Integer.parseInt(params.priority)
+			if (params.override?.isNumber()) assetComment.workflowOverride = Integer.parseInt(params.override)
+			if (params.duration?.isNumber()) assetComment.duration = Integer.parseInt(params.duration)
+			if (params.durationScale) assetComment.durationScale = params.durationScale		
 		 
 			// Issues (aka tasks) have a number of additional properties to be managed 
-			if ( assetComment.commentType == AssetCommentType.ISSUE ) {
+			if ( assetComment.commentType == AssetCommentType.TASK ) {
 				if ( params.moveEvent && params.moveEvent.isNumber() ){
 					def moveEvent = MoveEvent.get(params.moveEvent)
 					if (moveEvent) {
@@ -186,7 +194,7 @@ class CommentService {
 						if (moveEvent.project.id != project.id) {
 							// TODO: handle failure of moveEvent not being in project
 							log.error "saveUpdateCommentAndNotes: moveEvent.project (${moveEvent.id}) does not match user's current project (${project.id})"
-							errorMsg = "An unexpected condition occurred that is preventing an update"
+							errorMsg = "An unexpected condition with the move event occurred that is preventing an update"
 							break
 						}
 						assetComment.moveEvent = moveEvent
@@ -197,24 +205,31 @@ class CommentService {
 					assetComment.moveEvent = null
 				}
 			
-				if (params.assignedTo && params.assignedTo.isNumber()){
-					// TODO - SECURITY - Need to validate that the assignedTo is a member of the project
-					def subject = SecurityUtils.subject
-					def person = Person.get(params.assignedTo)
-					if (!isNew && subject.hasRole("PROJ_MGR")){
-						assetComment.assignedTo = person
-					}else if(isNew){
-						assetComment.assignedTo = person
+				if (params.containsKey('assignedTo')) {
+					if (params.assignedTo && params.assignedTo.isNumber()){
+						// TODO - SECURITY - Need to validate that the assignedTo is a member of the project
+						def subject = SecurityUtils.subject
+						def person = Person.get(params.assignedTo)
+						if (!isNew && subject.hasRole("PROJ_MGR")){
+							assetComment.assignedTo = person
+						}else if(isNew){
+							assetComment.assignedTo = person
+						}
+					} else {
+						assetComment.assignedTo = null
 					}
 				}
-	
-				// Use the service to update the Status because it does a number of things that we don't need to duplicate		
-				taskService.setTaskStatus( assetComment, params.status )
-			
-				if(params.dueDate){
-					assetComment.dueDate = formatter.parse(params.dueDate)
+
+				if (params.containsKey('dueDate') ) { 
+					log.info "saveUpdateCommentAndNotes: dueDate=[${params.dueDate}]"
+					assetComment.dueDate = params.dueDate ? formatter.parse(params.dueDate) : null
 				}
+	
 			}
+
+			// Use the service to update the Status because it does a number of things that we don't need to duplicate. This 
+			// should be the last update to Task properties before saving.	
+			taskService.setTaskStatus( assetComment, params.status )		
         
 			if (! assetComment.hasErrors() && assetComment.save(flush:true)) {
 			

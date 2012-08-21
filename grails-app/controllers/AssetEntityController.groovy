@@ -1865,8 +1865,8 @@ class AssetEntityController {
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
 		commentList << [ 
 			assetComment:assetComment, personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
-			dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo ?: "", assetName:assetComment.assetEntity?.assetName ?: "",
-			eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate ?: '',etStart:etStart, etFinish:etFinish,atStart:atStart,notes:notes,
+			dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo?:'', assetName:assetComment.assetEntity?.assetName ?: "",
+			eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate?:'', etStart:etStart?:'', etFinish:etFinish?:'',atStart:atStart,notes:notes,
 			workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,predEditTable:predEditTable,maxVal:maxVal,
 			cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1]
 		render commentList as JSON

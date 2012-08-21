@@ -62,6 +62,7 @@ public class GormUtil {
 			def timeZoneId = timeZones[ tzId ]
 			TimeZone tz = TimeZone.getTimeZone( timeZoneId );
 			ret = new Date(date.getTime() + tz.getRawOffset());
+			println "convertInToUserTZ() date=${date}, tzId=${tzId}, newDate=${ret}"
 			// if we are now in DST, back off by the delta. Note that we are
 			// checking the GMT date, this is the KEY.
 			/*if (tz.inDaylightTime(ret)) {
