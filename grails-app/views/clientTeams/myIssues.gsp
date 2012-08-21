@@ -24,6 +24,8 @@
 		<div class="tab_search">
 	      	<g:form method="post" name="issueAssetForm" action="showIssue">
 			<input  type="text" size="08" value="${search}" id="search" name="search" autocorrect="off" autocapitalize="off" onfocus="changeAction()" onblur="retainAction()" />
+			<input type="hidden" name="sort" value="${sort}">
+			<input type="hidden" name="order" value="${order}">
 		</div>
 	</div>
 	<div class="issueTimebar" id="issueTimebar"><div id="issueTimebarId" ></div></div>
@@ -59,9 +61,9 @@
 					<tr id="issueTr_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="issueDetails(${issue?.item?.id},'${issue?.item?.status}')">
 				  </g:else>
 						<td id="comment_${issue?.item?.id}" class="asset_details_block_task">${issue?.item?.comment?.size() > 50 ? issue?.item?.comment?.substring(0,40)+'...' : issue?.item?.comment}</td>
-						<td id="lastUpdated_${issue?.item?.id}" class="asset_details_block"><tds:convertDate date="${issue?.item?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" format="MMM/dd" /></td>
+						<td id="lastUpdated_${issue?.item?.id}" class="asset_details_block"><tds:convertDate date="${issue?.item?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" format="MM/dd hh:mm:ss" /></td>
 						<td id="dueDate_${issue?.item?.id}" class="asset_details_block"><tds:convertDate date="${issue?.item?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" format="MMM/dd" /></td>
-						<td id="asset_${issue?.item?.id}" class="asset_details_block">${issue?.item?.assetEntity?.assetName}</td>
+						<td id="asset_${issue?.item?.id}" class="asset_details_block">${issue?.item?.assetName}</td>
 						<td id="statusTd_${issue?.item?.id}" class="asset_details_block">${issue?.item?.status}</td>
 					</tr>
 					<g:if test="${tab && tab == 'todo'}">
@@ -78,7 +80,7 @@
 								<span class="ui-button-text task_button">Done</span>
 							</a>
 
-							<%--<span class="statusButton" onclick="changeStatus('${issue?.item?.id}','Completed',${userId})" style="margin-left: 30px">
+							<%--<span class="statusButton" onclick="changeStatus('${issue?.item?.id}', '${com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED}')" style="margin-left: 30px">
 							<img src="${createLinkTo(dir:'images',file:'check.png')}" />&nbsp;&nbsp;Complete&nbsp;&nbsp;
 							</span>
 							--%>
@@ -147,7 +149,7 @@
 		$('#showStatusId_'+id).css('display','table-row')
 		$('#issueTr_'+id).attr('onClick','issueDetails('+id+',"'+status+'")');
 	}
-	function changeStatus(id,status,user){
+	function changeStatus(id,status){
 		jQuery.ajax({
 			url: '../assetEntity/updateComment',
 			data: {'id':id,'status':status},

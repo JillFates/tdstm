@@ -17,18 +17,133 @@ import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.RoleTypeGroup
 import com.tdssrc.grails.GormUtil
 
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
+import org.springframework.jdbc.core.namedparam.SqlParameterSource
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+
 class TaskService {
 
     static transactional = true
 
 	def securityService
+	def jdbcTemplate
+	def dataSource
 
 	static final List statusList = AssetCommentStatus.getList()
 
 	/**
-	 * This method returns a list of tasks (aka AssetComment objects) based on the parameters that form the criteria
+	 * The getUserTasks method is used to retreive the user's TODO and ALL tasks lists or the count results of the lists. The list results are based 
+	 * on the Person and Project.
+	 * @param person	A Person object representing the individual to get tasks for
+	 * @param project	A Project object representing the project to get tasks for
+	 * @param countOnly	Flag that when true will only return the counts of the tasks otherwise method returns list of tasks
+	 * @param limitHistory	A numeric value when set will limit the done tasks completed in the N previous days specificed by param 
+	 * @param search	A String value when provided will provided will limit the results to just the AssetEntity.AssetTag  
+	 * @param sortOn	A String value when provided will sort the task lists by the specified column (limited to present list of columns), default sort on score
+	 * @param sortOrder	A String value with valid options [asc|desc], default [desc]
+	 * @return Map	A map containing keys all and todo. Values will contain the task lists or counts based on countOnly flag
 	 */
-    def getUserTasks(person, project, search=null, sortOn='c.dueDate', sortOrder='ASC, c.lastUpdated DESC' ) {
+    def getUserTasks(person, project, countOnly=false, limitHistory=7, sortOn=null, sortOrder=null, search=null ) {
+
+		log.info "getUserTasks: limitHistory=${limitHistory}, sortOn=${sortOn}, sortOrder=${sortOrder}, search=${search}"
+		// Need to initialize the NamedParameterJdbcTemplate to pass named params to a SQL statement
+		def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
+		
+		// Get the user's roles for the current project
+		// TODO : Runbook: getUserTasks - should get the user's project roles instead of global roles
+		def roles = securityService.getPersonRoles(person, RoleTypeGroup.STAFF)
+		def type=AssetCommentType.TASK
+
+		// List of statuses that user should be able to see in when soft assigned to others and user has proper role
+		def statuses = [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]
+		
+		def sqlParams = [projectId:project.id, assignedToId:person.id, type:type, roles:roles, statuses:statuses]
+		
+		//log.error "person:${person.id}"
+		// Find all Tasks assigned to the person OR assigned to a role that is not hard assigned (to someone else)
+		
+		StringBuffer sql = new StringBuffer("""SELECT t.asset_comment_id AS id, t.comment, t.due_date AS dueDate, t.last_updated AS lastUpdated,
+		 	t.asset_entity_id AS assetEntity, t.status, t.assigned_to_id AS assignedTo, IFNULL(a.asset_name,'') AS assetName, t.role """)
+
+		// Add in the Sort Scoring Algorithm into the SQL if we're going to return a list
+		if ( ! countOnly) {
+			/*
+				The sorting scoring will compute a weighted value based on several criteria that includes: 
+				- Assigned to me +30
+				- Status of Started +30
+				- Status of Ready +20
+				- Status of Hold +15
+				- Status of Pending +10
+				- Category of Startup, Physical, Moveday, or Shutdown +10
+				- If duedate exists and is older than today +5
+				- Priority - Six (6) - <priority value> (so a priority of 5 will add 1 to the score and 1 adds 5)
+			*/
+			sql.append(""", ( IF(t.assigned_to_id=:assignedToId, 30, 0) + (CASE t.status 
+				WHEN '${AssetCommentStatus.STARTED}' THEN 30
+				WHEN '${AssetCommentStatus.READY}' THEN 20
+				WHEN '${AssetCommentStatus.HOLD}' THEN 15
+				WHEN '${AssetCommentStatus.PENDING}' THEN 10
+				END) +  
+				IF(t.category IN ('${AssetCommentCategory.SHUTDOWN}', '${AssetCommentCategory.PHYSICAL}', '${AssetCommentCategory.STARTUP}'), 10,0) +
+				6 - t.priority) AS score """)
+		}
+		
+		sql.append("""FROM asset_comment t 
+			LEFT OUTER JOIN asset_entity a ON a.asset_entity_id = t.asset_entity_id
+			WHERE t.project_id=:projectId AND t.comment_type=:type AND 
+			( t.assigned_to_id=:assignedToId OR (t.role IN (:roles) AND t.status IN (:statuses) AND t.hard_assigned=0) ) """)
+		
+		search = org.apache.commons.lang.StringUtils.trimToNull(search)
+		if (search) {
+			// Join on the AssetEntity and embed the search criteria
+			sql.append('AND a.asset_tag=:search ')
+			// Add the search param to the sql params
+			sqlParams << [ search:search ]
+		}
+
+		// Add filter for limitHistory
+		if (limitHistory) {
+			if (limitHistory instanceof Integer && limitHistory >= 0) {
+				sql.append("AND (t.date_resolved IS NULL OR t.date_resolved >= SUBDATE(NOW(), ${limitHistory})) ")
+			} else {
+				log.warn "getUserTasks: invalid parameter value for limitHistory (${limitHistory})"
+			}
+		}		
+		
+		if ( ! countOnly ) {
+			// If we are returning the lists, then let's deal with the sorting
+			sql.append('ORDER BY ')
+			def sortableProps = ['comment', 'dueDate', 'lastUpdated', 'status', 'assetEntity']
+			if (sortOn) {
+				if ( sortableProps.contains(sortOn) ) {
+					sortOrder = ['asc','desc'].contains(sortOrder) ? sortOrder : 'asc'
+					sql.append("${sortOn} ${sortOrder.toUpperCase()}")
+				} else {
+					log.warn "getUserTasks: called with invalid sort property [${sortOn}]"
+					sortOn=null
+				}
+			}
+			// add the score sort either as addition or as only ORDER BY parameteters
+			sql.append( (sortOn ? ', ' : '') + 'score DESC' )
+		}
+		
+		// log.info "getUserTasks: SQL for userTasks: " + sql.toString()
+		
+		// Get all tasks from the database and then filter out the TODOs based on a filtering
+		def allTasks = namedParameterJdbcTemplate.queryForList( sql.toString(), sqlParams )
+		// def allTasks = jdbcTemplate.queryForList( sql.toString(), sqlParams )
+		def todoTasks = allTasks.findAll { task ->
+			task.status == AssetCommentStatus.READY || ( task.status == AssetCommentStatus.STARTED && task.assignedTo == person.id )
+		}
+
+		if (countOnly) {
+			return ['all':allTasks.size(), 'todo':todoTasks.size()]
+		} else {
+			return ['all':allTasks, 'todo':todoTasks]
+		}
+    }
+
+    def getUserTasksOriginal(person, project, search=null, sortOn='c.dueDate', sortOrder='ASC, c.lastUpdated DESC' ) {
 		
 		// Get the user's roles for the current project
 		// TODO : Runbook: getUserTasks - should get the user's project roles instead of global roles

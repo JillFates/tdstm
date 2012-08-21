@@ -987,20 +987,11 @@ class ClientTeamsController {
 		if (viewMode) { 
 			session.setAttribute('TASK_VIEW_MODE', viewMode)
 		}
-		if (search == null) {
-			session.removeAttribute("TASK_VIEW_SORT_ON")
-			session.removeAttribute("TASK_VIEW_SORT_ORDER")
-		}
-		if (sort) {
-			session.setAttribute("TASK_VIEW_SORT_ON", params.sort)
-			session.setAttribute("TASK_VIEW_SORT_ORDER", params.order)
-		}
 
-		def sortOn = session.getAttribute("TASK_VIEW_SORT_ON") ? session.getAttribute("TASK_VIEW_SORT_ON") : 'dueDate'
-		def sortOrder = session.getAttribute("TASK_VIEW_SORT_ORDER") ? session.getAttribute("TASK_VIEW_SORT_ORDER") : 'ASC , lastUpdated DESC'
+		// log.info "listComment() sort=${params.sort}, order=${params.order}"
 
 		// Use the taskService.getUserTasks service to get all of the tasks [all,todo]
-		def tasks = taskService.getUserTasks(person, project, search, sortOn, sortOrder )
+		def tasks = taskService.getUserTasks(person, project, false, 7, params.sort, params.order, search )
 		
 		// Get the size of the lists
 		def todoSize = tasks['todo'].size()
@@ -1024,8 +1015,7 @@ class ClientTeamsController {
 		}
 
 		// Determine the model and view
-		// TODO: runbook : WHY ARE WE PASSING THE userId back to the browser?
-		def model = [listComment:issueList, tab:tab, todoSize:todoSize, allSize:allSize, search:search, userId:5]
+		def model = [listComment:issueList, tab:tab, todoSize:todoSize, allSize:allSize, search:search, sort:params.sort, order:params.order]
 		def view = 'myIssues'
 		if ( session.getAttribute('TASK_VIEW_MODE') == 'mobile') {
 			view = view+'_m'
@@ -1036,21 +1026,20 @@ class ClientTeamsController {
 		render (view:view, model:model)
 		
 	}
+	
 	/**
-	 * @author : Ross Macfarlane
-	 * @return : The number of tasks assigned to the current user
+	 * @author Ross Macfarlane
+	 * @return JSON response containing the number of tasks assigned to the current user {count:#}
 	 */
 	def getToDoCount={
-		def projectId = session.CURR_PROJ.CURR_PROJ
-		def projectInstance = Project.get(projectId)
-		def userId = session.getAttribute("LOGIN_PERSON").id
-		def personInstance = Person.get(userId)
-		// TODO : runbook : getToDoCount - this is repeating existing code and does not handle tasks associated by role. Should be able to refactor or better to SELECT COUNT, which is much more efficient
-		def todoSize = AssetComment.findAll("From AssetComment a where a.project = :project AND commentType=:type AND assignedTo = :assignedTo AND (status is null OR status in('','Ready' , 'Started')) ",[project:projectInstance,assignedTo:personInstance,type:'issue']).size()
-		def map = []
-		map << [count:todoSize]
+		def project = securityService.getUserCurrentProject()
+		def person = securityService.getUserLoginPerson()
+		def tasksStats = taskService.getUserTasks(person, project, true)
+		// log.info "getToDoCount: tasksStats=${tasksStats}"
+		def map = [ count:tasksStats['todo'] ]
 		render map as JSON
 	}
+	
 	def showIssue={
 		def assetComment = AssetComment.get(params.issueId)
 		def noteList = assetComment.notes.sort{it.dateCreated}
