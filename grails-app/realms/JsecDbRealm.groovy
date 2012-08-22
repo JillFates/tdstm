@@ -38,17 +38,21 @@ class JsecDbRealm {
         return account
     }
 
+	/**
+	 * Used to determine if a principal (aka user) has a specified role name
+	 * @param String principal	- username
+	 * @param String roleName - role name (e.g. ADMIN)
+	 * @return Boolean	true if user has the role
+	*/
     def hasRole(principal, roleName) {
-    	// retuen boolen true if principal has role
         def roles = []
-log.info "hasRole(): principal=${principal}, roleName=${roleName}"
     	def userLogin = UserLogin.findByUsername(principal)
     	if( userLogin ){
 	    	def person = userLogin.person
 	        def roleType = RoleType.read(roleName)
 	        roles = PartyRole.findAllByPartyAndRoleType(person,roleType)
-			// log.debug "hasRole: person:${person}, role:${roleName}, found:{$roles.size()}"
     	}
+		log.debug "hasRole: userLogin:${userLogin ?: principal}, role:${roleName}, found:{$roles.size()}"
         return roles.size() > 0
     }
 
