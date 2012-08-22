@@ -29,6 +29,7 @@ class TaskService {
 	def securityService
 	def jdbcTemplate
 	def dataSource
+	def namedParameterJdbcTemplate
 
 	static final List statusList = AssetCommentStatus.getList()
 
@@ -45,10 +46,10 @@ class TaskService {
 	 * @return Map	A map containing keys all and todo. Values will contain the task lists or counts based on countOnly flag
 	 */
     def getUserTasks(person, project, countOnly=false, limitHistory=7, sortOn=null, sortOrder=null, search=null ) {
+		// Need to initialize the NamedParameterJdbcTemplate to pass named params to a SQL statement
+		namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
 
 		log.info "getUserTasks: limitHistory=${limitHistory}, sortOn=${sortOn}, sortOrder=${sortOrder}, search=${search}"
-		// Need to initialize the NamedParameterJdbcTemplate to pass named params to a SQL statement
-		def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
 		
 		// Get the user's roles for the current project
 		// TODO : Runbook: getUserTasks - should get the user's project roles instead of global roles
@@ -481,69 +482,78 @@ class TaskService {
 	}
 	
 	/**
-	 * 	Used to clear all Task data that are associated to move event and move bundle of event 
+	 * 	Used to clear all Task data that are associated to a specified move event  
 	 * @param moveEventId
-	 * @return : nothing
+	 * @return void
 	 */
-	def cleanTaskData(def moveEventId){
-		def queryForTaskIds = "SELECT ac.id FROM AssetComment ac WHERE ac.moveEvent.id = $moveEventId"
-		def assetIds = AssetEntity.executeQuery("""SELECT a.id FROM AssetEntity a WHERE a.moveBundle.id IN 
-													(SELECT mb.id FROM MoveBundle mb WHERE mb.moveEvent.id = $moveEventId) """)
-		if(assetIds.size() > 0){
-			def ids = GormUtil.getCommaDelimitedString( assetIds )
-			queryForTaskIds += " OR ac.assetEntity.id IN ($ids)"
-		}
-		def taskIds = AssetComment.executeQuery(queryForTaskIds)
-		def taskIdsAsStr = GormUtil.getCommaDelimitedString(taskIds)
-		def taskIdsHavePred = AssetComment.executeQuery("SELECT td.assetComment.id FROM TaskDependency td WHERE td.assetComment.id IN ($taskIdsAsStr)")
-		taskIds.removeAll(taskIdsHavePred)
+	def cleanTaskData(def moveEventId) {
+		// We want to find all AssetComment records that have the MoveEvent or are associate with assets that are 
+		// with move bundles that are part of the move event. With that list, we will reset the
+		// AssetComment status to PENDING by default or READY if there are no predecessors and clear several other properties.
+		// We will also delete Task notes that are auto generated during the runbook execution.
+		log.info("cleanTaskData() was called for moveEvent(${moveEventId})")
+		def tasksMap = getMoveEventTaskLists(moveEventId)
 		
-		// Convert the list to String for SQL
-		def taskIdsHavePredAsStr = GormUtil.getCommaDelimitedString(taskIdsHavePred)
-		def taskIdsNoPredAsStr = GormUtil.getCommaDelimitedString(taskIds)
-		
-		/*
-		 * Reset the status to AssetCommentStatus.PENDING if there is a predecessor tasks associated or READY if there are no predecessors
-		 * Set the following properties to NULL: actStart, actFinish, resolvedBy
-		 * Set isResolved=0
-		 */
-		AssetComment.executeUpdate("""UPDATE AssetComment ac SET ac.status = '${AssetCommentStatus.PENDING}', ac.actStart = null, 
-										ac.actStart = null, ac.dateResolved = null, ac.resolvedBy = null, ac.isResolved=0 
-										WHERE ac.id in (${taskIdsHavePredAsStr})""" )
-		
-		AssetComment.executeUpdate("""UPDATE AssetComment ac SET ac.status = '${AssetCommentStatus.READY}', ac.actStart = null,
-										ac.actStart = null, ac.dateResolved = null, ac.resolvedBy = null, ac.isResolved=0 
-										WHERE ac.id in (${taskIdsNoPredAsStr})""" )
-		
-		// Delete task notes (CommentNote) associated with the task where the note is like 'Reverted task status from%'
-		CommentNote.executeUpdate("""DELETE FROM CommentNote cn WHERE cn.assetComment.id IN ($taskIdsAsStr) 
-										AND cn.note LIKE 'Reverted task status from%'""" )
+		def updateSql = "UPDATE AssetComment ac \
+			SET ac.status = :status, ac.actStart = null, ac.actStart = null, ac.dateResolved = null, ac.resolvedBy = null, ac.isResolved=0 \
+			WHERE ac.id in (:ids)"
+			
+		AssetComment.executeUpdate(updateSql, ['status':AssetCommentStatus.PENDING, 'ids':tasksMap.tasksWithPred ] )
+		AssetComment.executeUpdate(updateSql, ['status':AssetCommentStatus.READY, 'ids':tasksMap.tasksNoPred ] )
+		CommentNote.executeUpdate("DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids) AND cn.note LIKE 'Reverted task status from%'", 
+			[ 'ids':tasksMap.tasksWithNotes ] )
 	}
 	
 	/**
-	 * 	Used to delete all Task data that are associated to move event and move bundle of event
+	 * 	Used to delete all Task data that are associated to a specified move event
 	 * @param moveEventId
-	 * @return : nothing
+	 * @return void
 	 * 
 	 */
 	def deleteTaskData(def moveEventId){
-		def queryForTaskIds = "SELECT ac.id FROM AssetComment ac WHERE ac.moveEvent.id = $moveEventId"
-		def assetIds = AssetEntity.executeQuery("""SELECT a.id FROM AssetEntity a WHERE a.moveBundle.id IN 
-                                                          (SELECT mb.id FROM MoveBundle mb WHERE mb.moveEvent.id = $moveEventId) """)
-		if(assetIds.size() > 0){
-			def ids = GormUtil.getCommaDelimitedString(assetIds)
-			queryForTaskIds += " OR ac.assetEntity.id IN ($ids)"
+		log.info("deleteTaskData() was called for moveEvent(${moveEventId})")
+		def tasksMap = getMoveEventTaskLists(moveEventId)
+		
+		CommentNote.executeUpdate('DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids)', ['ids':tasksMap.tasksWithNotes] )
+		TaskDependency.executeUpdate('DELETE FROM TaskDependency td WHERE td.assetComment.id IN (:ids) OR td.predecessor.id IN (:ids)', ['ids':tasksMap.tasksAll] )
+		AssetComment.executeUpdate('DELETE FROM AssetComment ac WHERE ac.id IN (:ids)', ['ids':tasksMap.tasksAll] )
+	}
+	
+	/** 
+	 * Returns a map containing several lists of AssetComment ids for a specified moveEvent that include keys
+	 * tasksWithPred, tasksNoPred, TasksAll and TasksWithNotes
+	 * @param moveEventID
+	 * @return map of tasksWithPred, tasksNoPred, TasksAll and TasksWithNotes
+	 */
+	def getMoveEventTaskLists(def moveEventId) {
+		
+		def query = """SELECT c.asset_comment_id AS id, 
+				( SELECT count(*) FROM task_dependency t WHERE t.asset_comment_id = c.asset_comment_id ) AS predCount,
+				( SELECT count(*) FROM task_dependency t WHERE t.asset_comment_id = c.asset_comment_id ) AS noteCount
+			FROM asset_comment c 
+			LEFT OUTER JOIN asset_entity a ON a.asset_entity_id=c.asset_entity_id
+			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id = a.move_bundle_id
+			WHERE 
+				c.move_event_id = ${moveEventId}
+		   		OR mb.move_event_id = ${moveEventId}"""
+		def tasksList = jdbcTemplate.queryForList(query)
+
+		def tasksWithPred=[]
+		def tasksNoPred=[]
+		def tasksWithNotes=[]
+		def tasksAll=[]
+		
+		// Iterate over the results and add the ids to the appropriate arrays
+		tasksList.each {
+			tasksAll << it.id 
+			if (it.predCount == 0) {
+				tasksNoPred << it.id
+			} else {
+				tasksWithPred << it.id
+			}
+			if (it.noteCount > 0) tasksWithNotes << it.id
 		}
-		def taskIds = AssetComment.executeQuery(queryForTaskIds)
-		def taskIdsAsStr = GormUtil.getCommaDelimitedString(taskIds)
-		// Delete CommentNote, TaskDependency associated with the task
 		
-		CommentNote.executeUpdate("DELETE FROM CommentNote cn WHERE cn.assetComment.id IN ($taskIdsAsStr)" )
-		TaskDependency.executeUpdate("""DELETE FROM TaskDependency td WHERE td.assetComment.id IN ($taskIdsAsStr) 
-											OR td.predecessor.id IN ($taskIdsAsStr) """ )
-		
-		// Delete Tasks
-		AssetComment.executeUpdate("DELETE FROM AssetComment ac WHERE ac.id IN ($taskIdsAsStr)" )
-		
+		return [tasksAll:tasksAll, tasksWithPred:tasksWithPred, tasksNoPred:tasksNoPred, tasksWithNotes:tasksWithNotes]
 	}
 }

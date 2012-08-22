@@ -114,17 +114,20 @@
         var confirmStatus = confirm("Are you sure you want to permanently clear the dashboard data for this move event?")
         if(confirmStatus){
         	${remoteFunction(action:'clearHistoricData', params:'\'moveEventId=\' + moveEventId ', 
-                	onSuccess:"jQuery('#messageDiv').html('Dashboard History has been cleaned successfully');jQuery('#messageDiv').show()")}
+				onSuccess:"jQuery('#messageDiv').html('Dashboard History has been cleaned successfully');jQuery('#messageDiv').show()")}
         }
 	}
 
    	function clearTaskData(moveEventId, type){
-	   	$("#messageDiv").hide();
-      	$("#messageDiv").html("");
+        $("#messageDiv").hide();
+        $("#messageDiv").html("");
        	var confirmStatus = confirm("Are you sure you want to permanently "+type+" the task data for this move event?")
        	if(confirmStatus){
+	      	$("#messageDiv").html((type=='clear'?'Clearing':'Deleting')+' task history');
+		   	$("#messageDiv").show();
        		${remoteFunction(action:'clearTaskData ', params:'\'moveEventId=\' + moveEventId +\'&type=\' + type ', 
-               	onSuccess:"jQuery('#messageDiv').html('Task data has been '+(type=='clear' ? 'cleaned' : 'deleted')+' successfully');jQuery('#messageDiv').show()")}
+               	onSuccess:"jQuery('#messageDiv').html('Tasks have been '+(type=='clear' ? 'cleared' : 'deleted')+' successfully.')",
+               	onFailure:"jQuery('#messageDiv').html('An unexpected error has occurred and update was unsuccessful.')") }
        	}
    	}
 </script>

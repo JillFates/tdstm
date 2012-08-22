@@ -82,7 +82,7 @@ public class GormUtil {
 	 * @param List
 	 * @return converted List in to String as comma delimited
 	 */
-	 public static String getCommaDelimitedString( def idList ){
+	 public static String asCommaDelimitedString( def idList ){
 		return idList.toString().replace("[","").replace("]","")
 	}
 }
