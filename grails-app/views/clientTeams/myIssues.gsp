@@ -9,38 +9,37 @@
 </head>
 <body>
 	<div class="mainbody">
-	<div class="menu4">
-		<ul>
-			<li><g:link class="mobmenu" controller="clientTeams" >Teams</g:link></li>
-			<g:if test="${tab && tab == 'todo'}">
-				<li><g:link elementId="taskLinkId"  class="mobmenu mobselect" action="listComment" params='["tab":"todo","search":search]'>My Tasks: ${todoSize}</g:link></li>
-				<li><g:link elementId="taskLinkAllId"  class="mobmenu" action="listComment" params='["tab":"all","search":search]'>All Tasks: ${allSize}</g:link></li>
-			</g:if>
-			<g:if test="${tab && tab == 'all'}">
-				<li><g:link elementId="taskLinkId"  class="mobmenu" action="listComment" params='["tab":"todo","search":search]'>My Tasks: ${todoSize}</g:link></li>
-				<li><g:link elementId="taskLinkAllId"  class="mobmenu mobselect" action="listComment" params='["tab":"all","search":search]'>All Tasks: ${allSize}</g:link></li>
-			</g:if>
-		</ul>
-		<div class="tab_search">
-	      	<g:form method="post" name="issueAssetForm" action="showIssue">
-			<input  type="text" size="08" value="${search}" id="search" name="search" autocorrect="off" autocapitalize="off" onfocus="changeAction()" onblur="retainAction()" />
-			<input type="hidden" name="sort" value="${sort}">
-			<input type="hidden" name="order" value="${order}">
+		<div class="menu4">
+			<ul>
+				<li><g:link class="mobmenu" controller="clientTeams" >Teams</g:link></li>
+				<g:if test="${tab && tab == 'todo'}">
+					<li><g:link elementId="taskLinkId"  class="mobmenu mobselect" action="listComment" params='["tab":"todo","search":search]'>My Tasks: ${todoSize}</g:link></li>
+					<li><g:link elementId="taskLinkAllId"  class="mobmenu" action="listComment" params='["tab":"all","search":search]'>All Tasks: ${allSize}</g:link></li>
+				</g:if>
+				<g:if test="${tab && tab == 'all'}">
+					<li><g:link elementId="taskLinkId"  class="mobmenu" action="listComment" params='["tab":"todo","search":search]'>My Tasks: ${todoSize}</g:link></li>
+					<li><g:link elementId="taskLinkAllId"  class="mobmenu mobselect" action="listComment" params='["tab":"all","search":search]'>All Tasks: ${allSize}</g:link></li>
+				</g:if>
+			</ul>
+			<div class="tab_search">
+			  	<g:form method="post" name="issueAssetForm" action="showIssue">
+				<input  type="text" size="08" value="${search}" id="search" name="search" autocorrect="off" autocapitalize="off" onfocus="changeAction()" onblur="retainAction()" />
+				<input type="hidden" name="sort" value="${sort}">
+				<input type="hidden" name="order" value="${order}">
+			</div>
 		</div>
-	</div>
-	<div class="issueTimebar" id="issueTimebar"><div id="issueTimebarId" ></div></div>
-	<div id="detailId"  style="display: none;position: absolute;width: 420px;margin-top: 40px;" > </div>
-	<div id="myIssueList" class="mobbodyweb" style="width:100%">
+		<div class="issueTimebar" id="issueTimebar"><div id="issueTimebarId" ></div></div>
+		<div id="detailId"  style="display: none;position: absolute;width: 420px;margin-top: 40px;" > </div>
+		<div id="myIssueList" class="mobbodyweb" style="width:100%">
 			<input id="issueId" name="issueId" type="hidden" value="" />
-			<input name="tab" type="hidden" value="${tab}" />								              	
-			<div id="mydiv" onclick="this.style.display = 'none';setFocus();">						            
+			<input name="tab" type="hidden" value="${tab}" />											  	
+			<div id="mydiv" onclick="this.style.display = 'none';setFocus();">									
 				<g:if test="${flash.message}">
 					<br />
 					<div class="message"><ul>${flash.message}</ul></div>
 				</g:if> 
 			</div>		
-			<div id="taskId" style="float:left; margin:2px 0; ">
-			</div>
+			<div id="taskId" style="float:left; margin:2px 0; "></div>
 			<div id="assetIssueDiv" style="float:left;width:100%; ">
 				<table id="issueTable" cellspacing="0px" style="width:100%;margin-left: -1px;">
 				<thead>
@@ -88,19 +87,78 @@
 					</g:if>
 					<tr id="detailTdId_${issue?.item?.id}" style="display: none">
 					<td colspan="5">
-					   <div id="detailId_${issue?.item?.id}" style="width: 100%" > </div>
+					 	<div id="detailId_${issue?.item?.id}" style="width: 100%" > </div>
 					</td>
 					</tr>
 				</g:each>
 				</tbody>
 				</table>
-			</div>
-      		</g:form>
-   		</div>
-   		<br />
-      <div>
-		<g:link class="mobfooter" action="listComment" params="[viewMode:'mobile']">Use Mobile Site</g:link>
-      </div>
+				</div>
+			</g:form>
+	 	</div>
+		<br />
+		<div>
+			<g:link class="mobfooter" action="listComment" params="[viewMode:'mobile']">Use Mobile Site</g:link>
+		</div>
+	</div>
+	<div id="dependencyBox" style="display: none;" align="right">
+		<span class="ui-icon ui-icon-closethick" unselectable="on" onclick="closeBox()"></span>
+		<table id="showCommentTable" style="border: 0px;">
+			<tr class="prop">
+				<td valign="top" class="name"><label for="comment"><b>Description:</b></label></td>
+				<td valign="top" class="value" colspan="3">
+					<textarea cols="80" rows="2" id="commentTdId" readonly="readonly"></textarea>
+				</td>
+			</tr>
+			<tr class="prop" id="predecessorShowTr">
+				<td valign="top"><label for="precessorShowId">Predecessor:</label></td>
+				<td valign="top" id="predecessorShowTd" colspan="2" width="34%"></td>
+				<td valign="top"  style="float: left;"><label for="precessorShowId" >Successor:</label></td>
+				<td valign="top" id="successorShowTd" colspan="2" width="76%" style="margin-left: 0px;float: left;"></td>
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="status">Status:</label></td>
+				<td valign="top" class="value" id="statusShowId" colspan="1" style="width: 20%"></td>
+			</tr>
+			<tr class="issue" id="assignedToTrId">
+				<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
+				<td valign="top" class="value" id="" colspan="3">
+					<span id="assignedToTdId"></span>&nbsp;-&nbsp;
+					<span id="roleTdId"></span>&nbsp;
+					<input type="checkbox" id="hardAssignedShow" name="hardAssignedShow" value="0" readonly="readonly"/>
+					<label for="hardAssignedShow" >Fixed Assignment</label>&nbsp;&nbsp;
+					<span id="dueDateTrId">
+						<label for="dueDate">Due :</label>
+						<span id="dueDateId"></span>
+					</span>
+				</td>
+			</tr>
+			<tr class="issue" id="workFlowShow">
+				<td valign="top" class="name"><label for="durationShowId">Duration:</label></td>
+				<td valign="top" class="value" colspan="3">
+					<span id="durationShowId"></span>
+					<span id="durationScale"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<span ><label for="priorityShowId">Priority:</label></span>
+					<span id="priorityShowId"></span>
+				</td>
+			</tr>
+			<tr id="assetShowId" class="prop">
+				<td valign="top" class="name" id="assetTdId"><label for="asset">Asset:</label></td>
+				<td valign="top" class="value" id="assetShowValueId" colspan="3"></td>
+			</tr>
+			<tr class = "issue" id="estStartShow">
+				<td valign="top" class="name" nowrap="nowrap"><label for="estStartShowId">Estimated Start:</label></td>
+				<td valign="top" class="value" id="estStartShowId" nowrap="nowrap"></td>
+				<td valign="top" class="name" nowrap="nowrap"><label for="estFinishShowId">Estimated Finish:</label></td>
+				<td valign="top" class="value" id="estFinishShowId" nowrap="nowrap"></td>
+			</tr>
+			<tr class = "issue" id="actStartShow">
+				<td valign="top" class="name"><label for="actStartShowId">Actual Start:</label></td>
+				<td valign="top" class="value" id="actStartShowId"></td>
+				<td valign="top" class="name" nowrap="nowrap" width="10%"><label for="actFinishShowId">Actual Finish:</label></td>
+				<td valign="top" class="value" id="actFinishShowId" nowrap="nowrap"></td>
+			</tr>
+		</table>
 	</div>
 <script type="text/javascript">
 	$( function() {
@@ -124,15 +182,47 @@
 				//$('#detailId_'+id).css('display','block')
 				$('#taskLinkId').removeClass('mobselect')
 				new Ajax.Request('../assetEntity/updateStatusSelect?id='+id,{asynchronous:false,evalScripts:true,
-			          onComplete:function(e){
-							 var resp = e.responseText;
-							 resp = resp.replace("statusEditId","statusEditId_"+id).replace("showResolve(this.value)","showResolve()")
-							 $('#statusEditTrId_'+id).html(resp)
-							 // $('#statusEditId_'+id).val(status)
+					onComplete:function(e){
+						var resp = e.responseText;
+							resp = resp.replace("statusEditId","statusEditId_"+id).replace("showResolve(this.value)","showResolve()")
+							$('#statusEditTrId_'+id).html(resp)
+							// $('#statusEditId_'+id).val(status)
 			 			}
 				})
 			}
 		});
+	}
+	function showAssetComment(id){
+		$('#dependencyBox').css('display','table');
+		jQuery.ajax({
+			url: '../assetEntity/showComment',
+			data: {'id':id},
+			type:'POST',
+			success: function(data) {
+				B1.Pause()
+				var ac = data[0];
+				$('#predecessorShowTd').html(ac.predecessorTable)
+				$('#successorShowTd').html(ac.successorTable)
+				$('#assignedToTdId').html(ac.assignedTo)
+				ac = ac.assetComment;
+				$('#commentTdId').html(ac.comment)
+				$('#statusShowId').html(ac.status)
+				$('#roleTdId').html(ac.role)
+				$('#hardAssignedShow').html(ac.hardAssigned)
+				$('#dueDateId').html(ac.dueDate)
+				$('#durationShowId').html(ac.duration)
+				$('#durationScale').html(ac.durationScale)
+				$('#priorityShowId').html(ac.priority)
+				$('#assetShowValueId').html(ac.assetEntity)
+				$('#estStartShowId').html(ac.estStart)
+				$('#estFinishShowId').html(ac.estFinish)
+				$('#actStartShowId').html(ac.actStart)
+				$('#actFinishShowId').html(ac.dateResolved)
+			}
+		});
+	}
+	function closeBox(){
+		$('#dependencyBox').css("display","none");
 	}
 	function cancelButton(id,status){
 		B1.Start(60);
@@ -168,12 +258,11 @@
 			}
 		});
 	}
-
 	function openStatus(id,status){
 		if(status=='Started'){
 			$('#started_'+id).css('display','none')
 			$('#image_'+id).css('display','none')
-	    }
+		}
 		$('#showStatusId_'+id).show()
 		$('#issueTrId_'+id).attr('onClick','hideStatus('+id+',"'+status+'")');
 	}
@@ -278,7 +367,7 @@ function zxcOpacity(obj,opc){
 
 	B1.Start(60);
 </script>
- <script>
+<script>
 	currentMenuId = "#teamMenuId";
 	$("#teamMenuId a").css('background-color','#003366')
  </script>

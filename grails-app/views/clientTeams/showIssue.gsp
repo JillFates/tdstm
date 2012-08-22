@@ -40,7 +40,7 @@
 				<td valign="top" class="name"><label>Predecessors:</label></td>
 				<td><span style="width: 50%">
 							<g:each in="${assetComment.taskDependencies}" var="task">
-							<span class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}">
+							<span class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}" onclick="showAssetComment(${task.predecessor.id})">
 								${task.predecessor.category}&nbsp;&nbsp;&nbsp;&nbsp;${task.predecessor}
 							</span>
 							</g:each>
@@ -52,7 +52,7 @@
 				<td>	
 					<span  style="width: 50%">
 							<g:each in="${successor}" var="task">
-							<span class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}">
+							<span class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}" onclick="showAssetComment(${task.assetComment.id})">
 								${task.assetComment.category}&nbsp;&nbsp;&nbsp;&nbsp;${task.assetComment}
 							</span>
 							</g:each>

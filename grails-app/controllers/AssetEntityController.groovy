@@ -1898,7 +1898,6 @@ class AssetEntityController {
 		} else {
 			render map as JSON
 		}
-		
 	}
 	
 	/* delete the comment record

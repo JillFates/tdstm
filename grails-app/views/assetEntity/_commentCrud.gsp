@@ -382,6 +382,9 @@
 			</td>
 		</tr>
 		<tr class="prop">
+			<td valign="top" class="name">
+				<label for="category">Category:</label>
+			</td>
 			<td valign="top" class="name" id="commentTypeEditTdId"><label for="commentType">Type:</label></td>
 			<td valign="top" style="" id="typeListTdId">
 				<tds:hasPermission permission='CommentCrudView'>
@@ -395,7 +398,6 @@
 					</tds:hasPermission>
 				</div>
 			</td>
-			<td valign="top" class="name"><label for="category">Category:</label>
 			<td colspan="4">
 				<g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
 				onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionEditId', 'predecessorId',jQuery('#createAssetCommentId').html())"></g:select>
@@ -403,8 +405,6 @@
         	    <label for="priority">Priority:</label>
             	<g:select id="priorityEdit" name="priorityEdit" from="${1..5}" value=""></g:select>
 			</td>
-        	<td valign="top" class="name" >
-        	</td>
         </tr>
 		<tr class="prop" id="mustVerifyEditTr" style="display: none;">
 			<td valign="top" class="name"><label for="mustVerifyEditId">Must Verify:</label></td>
@@ -422,7 +422,7 @@
 			 <label for="overrideEdit">Overridden</label>
 			</td>
 		</tr>
-		<tr id="assetTrId" class="prop">
+		<tr class="prop" id="assetTrId">
 			<td valign="top" class="name" id="assetEditTd"><label for="asset">Asset:</label></td>
 			<td valign="top" class="value"  id="assetTrShowId" colspan="3"></td>
 		</tr>
@@ -464,12 +464,11 @@
 			<td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
 			<td valign="top" class="value" id="commentCodeEditId" colspan="3"></td>
 		</tr>
-		
-		<tr id="durationEditId" class="prop" style="display: none">
+		<tr class="prop" id="durationEditId" style="display: none">
         	<td valign="top" class="name"><label for="durationEdit ">Duration:</label></td>
         	<td valign="top" class="value" colspan="3">
-        	  <input type="text" id="durationEdit" name="durationEdit" value="" size="3"/>
-            	<g:select id="durationScaleEdit" name="durationScaleEdit " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>
+				<input type="text" id="durationEdit" name="durationEdit" value="" size="3"/>
+				<g:select id="durationScaleEdit" name="durationScaleEdit " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>
         	</td>
 		</tr>
 	</table>
