@@ -15,7 +15,7 @@ class CustomTagLib {
 		String dtStr = dt.getClass().getName().toString();
 		String dtParam = dt.toString();	
 		
-		if (dtStr.equals("java.util.Date")) {	
+		if (dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp")) {	
 			DateFormat formatter ; 
 			formatter = new SimpleDateFormat('yyyy-MM-dd kk:mm:ss');
 			dt = GormUtil.convertInToUserTZ( dt, tzId )

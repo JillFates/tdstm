@@ -156,6 +156,7 @@
 						$('#statusTd_'+data.assetComment.id).html(data.assetComment.status)
 						$('#started_'+data.assetComment.id).hide()
 						$('#issueTrId_'+data.assetComment.id).removeClass(myClass).addClass('asset_process');
+						$('#lastUpdated_'+data.assetComment.id).html(data.lastUpdatedDate)
 					}else{
 						$('#showStatusId_'+data.assetComment.id).hide()
 						$('#issueTrId_'+data.assetComment.id).remove()

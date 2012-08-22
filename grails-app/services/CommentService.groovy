@@ -286,8 +286,9 @@ class CommentService {
 				def status = (assetComment.commentType == AssetCommentType.TASK && assetComment.isResolved == 0) ? true : false
 			
 				def statusCss = taskService.getCssClassForStatus(assetComment.status )
-				
-				map = [ assetComment : assetComment, status : status ? true : false , cssClass:css, statusCss:statusCss ]
+				def lastUpadatedFormatter  = new SimpleDateFormat("MM/dd kk:mm:ss");
+				map = [ assetComment : assetComment, status : status ? true : false , cssClass:css, statusCss:statusCss, 
+						lastUpdatedDate:lastUpadatedFormatter.format(GormUtil.convertInToUserTZ(assetComment.lastUpdated,tzId)) ]
 
 				// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.
 				def loginPerson = userLogin.person	// load so that we don't have a lazyInit issue

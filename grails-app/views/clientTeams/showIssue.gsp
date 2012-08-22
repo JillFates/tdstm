@@ -300,7 +300,7 @@ $( function() {
 					} else {
 						var myClass = $('#issueTrId_'+data.assetComment.id).attr("class");
 						$('#comment_'+data.assetComment.id).html(truncate(data.assetComment.comment))
-						$('#lastUpdated_'+data.assetComment.id).html(formatDueDate(data.assetComment.lastUpdated))
+						$('#lastUpdated_'+data.assetComment.id).html(data.lastUpdatedDate)
 						$('#dueDate_'+data.assetComment.id).html(formatDueDate(data.assetComment.dueDate))
 						if(data.assetComment.assetEntity){
 						 	$('#asset_'+data.assetComment.id).html(data.assetComment.assetEntity.assetName)
