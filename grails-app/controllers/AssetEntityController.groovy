@@ -3473,11 +3473,29 @@ class AssetEntityController {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
 		def viewId = params.forView
+		def selectedId = 0
+		def person
+
+		// Find the person assigned to existing comment or default to the current user
+		if (params.containsKey('id')) {
+			if (params.id && params.id != '0') {
+				def comment = AssetComment.findByIdAndProject(params.id, project);
+				person = comment?.assignedTo
+			} else {
+				person = securityService.getUserLoginPerson()
+			}
+		}
+		if (person) selectedId = person.id
+		log.debug "updateAssignedToSelect(): id=${params.id}, person=${person}, selectedId=${selectedId}" 
+
 		def assignedToSelect = new StringBuffer("""<SELECT ID="${viewId}" NAME="${viewId}" >""")
 		def projectStaff = partyRelationshipService.getProjectStaff( projectId )?.staff
 		projectStaff.sort{it.firstName}
+		def selected
 		projectStaff.each{
-			assignedToSelect.append("<OPTION VALUE='${it.id}'>${it.firstName+" "+ it.lastName}</OPTION>")
+			log.info "updateAssignedToSelect: id=${it.id}, name=${it.toString()}"
+			selected = it.id == selectedId ? selected = 'SELECTED' : ''
+			assignedToSelect.append("<OPTION VALUE='${it.id}' ${selected}>${it.toString()}</OPTION>")
 		}
 		assignedToSelect.append("</SELECT>")
 		

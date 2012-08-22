@@ -9,6 +9,8 @@ Array.prototype.contains = function (element) {
 	return false;
 }
 
+var stdErrorMsg = 'An unexpected error occurred. Please close and reload form to see if the problem persists'
+
 // function to generate createForm
  function generateCreateForm( e ){
 		var browser=navigator.appName;		
@@ -656,7 +658,7 @@ function showAssetDialog( e , action ) {
 		     $('#assetTrShowId').html(params.assetName)
 		     $('#eventShowValueId').html(params.eventName)
 	      	 if(ac.commentType=='issue'){
-	      		 updateAssignedToList('assignedToEdit','assignedEditSpan');
+	      		 updateAssignedToList('assignedToEdit','assignedEditSpan',ac.id);
 	      		 updateStatusSelect(ac.id);
 	      		 if(ac.resolution || ac.status=='Completed'){
 	      		   $('#resolutionEditTrId').css('display','table-row')
@@ -683,9 +685,9 @@ function showAssetDialog( e , action ) {
       		     }
       		     $('#statuWarnId').val(params.statusWarn)
                  $('#predecessorShowTd').html(params.predecessorTable)
-                 var taskNumber = ac.taskNumber ? ac.taskNumber : '&nbsp;&nbsp;'
-                 $('#taskNumberId').html('Task # : '+'<b>'+taskNumber +'</b>')
-                 $('#taskNumberSpanEditId').html('Task # : '+'<b>'+ac.taskNumber+'</b>')
+                 var taskNumber = ac.taskNumber == null ? '&nbsp;' : ac.taskNumber
+                 $('#taskNumberId').html('Task #: '+'<b>'+taskNumber+'</b>')
+                 $('#taskNumberSpanEditId').html('Task #: '+'<b>'+taskNumber+'</b>')
                  $('#successorShowTd').html(params.successorTable)
                  $('#successorEditId').html(params.successorTable)
                  $('#predecessorEditId').html(params.predEditTable)
@@ -1009,7 +1011,7 @@ function showAssetDialog( e , action ) {
 
 function createIssue(){
 	updateWorkflowTransitions( '', "general", "workFlowTransitionId", "predecessorId",'' );
-	updateAssignedToList('assignedToSave','assignedCreateSpan');
+	updateAssignedToList('assignedToSave','assignedCreateSpan',0);
 	document.forms['createCommentForm'].commentType.value = 'issue'
 	document.forms['createCommentForm'].commentType.disabled = 'disabled'
 	commentChange('#createResolveDiv','createCommentForm')
@@ -1029,7 +1031,8 @@ function commentChange(resolveDiv,formName) {
 	var type = 	document.forms[formName].commentType.value;
 	$("#commentTypeCreateTdId").css('display', 'table-row');
 	if(type == "issue"){
-		updateAssignedToList('assignedToEdit','assignedEditSpan');
+		var commentId=$('#commentId').val()
+		updateAssignedToList('assignedToEdit','assignedEditSpan', commentId);
 		//var now = new Date();
 		//now.setDate(now.getDate() + 30)
 	    //formatDate(now);
@@ -1333,7 +1336,7 @@ function showModel(id){
 function createNewAssetComment(asset, assetName){
 	setAssetId( asset )
 	updateWorkflowTransitions( asset, "general", "workFlowTransitionId", "predecessorId",'' );
-	updateAssignedToList('assignedToSave','assignedCreateSpan');
+	updateAssignedToList('assignedToSave','assignedCreateSpan',0);
 	var name = assetName
 	$('#createCommentDialog').dialog('option', 'width', 'auto');
 	$('#assetEntityTrId').css('display','table-row')
@@ -1356,7 +1359,7 @@ function createNewAssetComment(asset, assetName){
 function createComments(asset, assetName){
 	setAssetId( asset )
 	updateWorkflowTransitions( asset, "general", "workFlowTransitionId", "predecessorId", '');
-	updateAssignedToList('assignedToSave','assignedCreateSpan');
+	updateAssignedToList('assignedToSave','assignedCreateSpan',0);
 	var name = assetName
 	$('#workFlowTransitionTrId').css('display','none')
 	$('#predecessorTr').css('display','none')
@@ -1479,11 +1482,15 @@ function fillPredecessor(id, category,commentId){
 	  }
 	  return newArray;
 }
-function updateAssignedToList(forView,span){
-	new Ajax.Request('../assetEntity/updateAssignedToSelect?forView='+forView,{asynchronous:false,evalScripts:true,
-		 onComplete:function(e){
-			 $('#'+span).html(e.responseText)
-		 }
+function updateAssignedToList(forView,span,id){
+	new Ajax.Request('../assetEntity/updateAssignedToSelect?forView='+forView+'&id='+id,{
+		asynchronous:false, evalScripts:true,
+		onSuccess:function(e){
+			$('#'+span).html(e.responseText)
+		},
+		onFailure:function(jqXHR, textStatus, errorThrown){
+			alert(stdErrorMsg)
+		},
 	})
 }
 function updateStatusSelect(taskId){

@@ -195,11 +195,11 @@
 	<div>
 		<table id="createCommentTable" style="border: 0px;">
 		<tr class="prop" id="assignedToId" style="display: none">
-			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
-			<td valign="top" nowrap="nowrap" colspan="3">
+			<td valign="middle" class="name"><label for="assignedTo">Assigned To:</label></td>
+			<td valign="middle" nowrap="nowrap" colspan="3">
 				<span id="assignedCreateSpan"></span>
 				&nbsp;/&nbsp;
-				<g:select id="roleType" name="roleType" from="${RoleType.list()}" noSelection="['':'UnAssigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)"></g:select> &nbsp;
+				<g:select id="roleType" name="roleType" from="${RoleType.list()}" noSelection="['':'Unassigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)"></g:select> &nbsp;
 				<input type="checkbox" id="hardAssigned" name="hardAssigned" value="1"  checked="checked"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
 				<label for="hardAssigned" >Fixed Assignment</label>&nbsp;&nbsp;
@@ -365,14 +365,15 @@
 			<td valign="top" class="value" id="createdByEditId" colspan="3"></td>
 		</tr>
 	   <tr class="prop issue" id="assignedToTrEditId" style="display: none">
-			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
-			<td valign="top" id="assignedToEditTdId" style="display: none;" class="issue"  colspan="3" nowrap="nowrap">
-                <span id="assignedEditSpan"> </span>&nbsp;
+			<td valign="middle" class="name"><label for="assignedTo">Assigned To:</label></td>
+			<td valign="middle" id="assignedToEditTdId" style="display: none;" class="issue"  colspan="3" nowrap="nowrap">
+                <span id="assignedEditSpan"> </span>
+				&nbsp;/&nbsp;
 				<g:select id="roleTypeEdit" name="roleTypeEdit" from="${RoleType.list()}" noSelection="['':'UnAssigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)"></g:select>
 				&nbsp;
 				<input type="checkbox" id="hardAssignedEdit" name="hardAssignedEdit" value="1"  checked="checked"
-					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
-				<label for="hardAssignedEdit" >Fixed Assignment</label>
+					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;
+				<label for="hardAssignedEdit">Fixed Assignment</label>
 				&nbsp;&nbsp;&nbsp;
 			    <label for="dueDate">Due Date:</label>
 				<script type="text/javascript" charset="utf-8">
