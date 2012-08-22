@@ -1027,7 +1027,7 @@ function createIssue(){
 }	
 function commentChange(resolveDiv,formName) {
 	var type = 	document.forms[formName].commentType.value;
-	$("#commentTypeCreateTdId").css('display', 'compact');
+	$("#commentTypeCreateTdId").css('display', 'table-row');
 	if(type == "issue"){
 		updateAssignedToList('assignedToEdit','assignedEditSpan');
 		//var now = new Date();
