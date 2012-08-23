@@ -191,22 +191,26 @@ class CommentService {
 		 
 			// Issues (aka tasks) have a number of additional properties to be managed 
 			if ( assetComment.commentType == AssetCommentType.TASK ) {
-				if ( params.moveEvent && params.moveEvent.isNumber() ){
-					def moveEvent = MoveEvent.get(params.moveEvent)
-					if (moveEvent) {
-						// Validate that this is a legit moveEvent for this project
-						if (moveEvent.project.id != project.id) {
-							// TODO: handle failure of moveEvent not being in project
-							log.error "saveUpdateCommentAndNotes: moveEvent.project (${moveEvent.id}) does not match user's current project (${project.id})"
+				if ( params.containsKey('moveEvent') ) {
+					if ( params.moveEvent.isNumber() ) {
+						def moveEvent = MoveEvent.get(params.moveEvent)
+						if (moveEvent) {
+							// Validate that this is a legit moveEvent for this project
+							if (moveEvent.project.id != project.id) {
+								// TODO: handle failure of moveEvent not being in project
+								log.error "saveUpdateCommentAndNotes: moveEvent.project (${moveEvent.id}) does not match user's current project (${project.id})"
+								errorMsg = "An unexpected condition with the move event occurred that is preventing an update"
+								break
+							}
+							assetComment.moveEvent = moveEvent
+						} else {
+							log.error "saveUpdateCommentAndNotes: Specified moveEvent (${moveEvent.id}) was not found})"
 							errorMsg = "An unexpected condition with the move event occurred that is preventing an update"
 							break
 						}
-						assetComment.moveEvent = moveEvent
-					} else {
-						// TODO : Handle error if moveEvent not found
+					} else if (params.moveEvent == '') {
+						assetComment.moveEvent = null
 					}
-				} else {
-					assetComment.moveEvent = null
 				}
 			
 				if (params.containsKey('assignedTo')) {
