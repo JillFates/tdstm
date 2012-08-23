@@ -540,7 +540,7 @@ class TaskService {
 		
 		def query = """SELECT c.asset_comment_id AS id, 
 				( SELECT count(*) FROM task_dependency t WHERE t.asset_comment_id = c.asset_comment_id ) AS predCount,
-				( SELECT count(*) FROM task_dependency t WHERE t.asset_comment_id = c.asset_comment_id ) AS noteCount
+				( SELECT count(*) FROM comment_note n WHERE n.asset_comment_id = c.asset_comment_id ) AS noteCount
 			FROM asset_comment c 
 			LEFT OUTER JOIN asset_entity a ON a.asset_entity_id=c.asset_entity_id
 			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id = a.move_bundle_id

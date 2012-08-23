@@ -4,26 +4,64 @@ import groovy.sql.Sql
 // USER DEFINED PER RUN OF APP
 //
 //def dbHost = 'dev02.tdsops.net'
-def dbHost = 'dev01.tdsops.net'
-//def dbHost = 'localhost'
-def projectId = 1125
-def now = '2012-08-22 18:30:15'
+//def dbHost = 'dev01.tdsops.net'
+def dbHostList = ['localhost':'localhost', 'dev01':'dev01.tdsops.net', 'dev02':'dev02.tdsops.net']
+def dbHost
 
-println "RUNBOOK DATA IMPORT\n\ndbHost ${dbHost}\nproject ${projectId}\n\n"
+if (this.args.size() < 3) {
+	println "\nUsage: grails import_runbook.groovy DbHost ProjectID ImportFile\n"
+	return
+}
+
+if (dbHostList.containsKey(this.args[0]) ) {
+	dbHost = dbHostList.get(this.args[0])
+} else {
+	def dblist 
+	println "\nInvalid DbHost specified - options are: ${dbHostList.keySet()}\n"
+	return
+}
+def sql = Sql.newInstance("jdbc:mysql://${dbHost}/tdstm", 'tdstm', 'tdstm', 'com.mysql.jdbc.Driver')
+
+def projectId = this.args[1]
+if (! projectId.isNumber()) {
+	println "ProjectID must be numeric"
+	return
+}
+
+def projectName = sql.firstRow("SELECT project_code FROM project WHERE project_id=${projectId}")
+if (! projectName) {
+	println "Unable to find project with id $projectId"
+	return
+}
+
+def importFile = new File(this.args[2])
+if ( ! importFile.exists() || ! importFile.canRead() ) {
+	println "Unable to open file ${this.args[2]} for reading"
+	return
+}
+
+// Prompt that the user wants to proceed
+def input
+System.in.withReader {
+    print "Import runbook into $dbHost for project $projectName, are you sure (Y/N)? "
+    input = it.readLine()
+}
+if (input != 'Y') return
+
+def now = new Date().format('yyyy-MM-dd H:m:s')
+
+// println "\nRUNBOOK DATA IMPORT\n\ndbHost ${dbHost}\nproject ${projectId}\n\n"
 
 def runbook = []
 def lastMoveBundleId
 def moveEvents = [:]
 def workflowId 
-def isHeader=true
 def taskList = [:]
 def dependencies = []
 def lastTaskNum
 def taskCount=0
 def predecessorCount=0
 def status
-
-def sql = Sql.newInstance("jdbc:mysql://${dbHost}/tdstm", 'tdstm', 'tdstm', 'com.mysql.jdbc.Driver')
 
 def task = sql.dataSet('asset_comment')
 def taskDependency = sql.dataSet('task_dependency')
@@ -32,8 +70,9 @@ def taskDependency = sql.dataSet('task_dependency')
 int taskId = sql.firstRow("SELECT MAX(asset_comment_id) AS id FROM asset_comment").id + 1
 
 // Import the runbook int an array of associative records
-new File('runbook_export.txt').splitEachLine("\t") {fields ->
-
+def isHeader=true
+importFile.splitEachLine("\t") { fields ->
+	
 	if (isHeader) {
 		isHeader=false
 	} else {
@@ -87,10 +126,11 @@ new File('runbook_export.txt').splitEachLine("\t") {fields ->
 		} else {
 			assetId = null
 			// Look up the moveEventId and projectId
-			if (! moveEvents[moveEventCode]) {
-				moveEvents[moveEventCode] = sql.firstRow("SELECT move_event_id AS id FROM move_event WHERE project_id=${projectId} AND name=${moveEventCode}").id			
+			if (! moveEvents.containsKey(moveEventCode) ) {
+				moveEventId = sql.firstRow("SELECT move_event_id AS id FROM move_event WHERE project_id=${projectId} AND name=${moveEventCode}").id			
+				moveEvents << [ "${moveEventCode}":moveEventId ]
 			}
-			moveEventId = moveEvents[moveEventCode]
+			moveEventId = moveEvents.get("${moveEventCode}")
 		}
 	
 		// Lookup the workflow transition id from the workflow id and step code
@@ -139,7 +179,6 @@ new File('runbook_export.txt').splitEachLine("\t") {fields ->
 		taskId++
 
 	}
-
 }	// read file
 
 // Generate the TaskDependency relationships
