@@ -2,6 +2,7 @@ package com.tds.asset
 
 import com.tdssrc.grails.GormUtil
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCommentCategory
 
 class AssetComment {
 
@@ -46,6 +47,7 @@ class AssetComment {
 	Integer workflowOverride = 0			// Flag that the Transition values (duration) has been overridden
 	String role	// TODO : Determine proper name.
 	Integer taskNumber	// TODO : constraint type short int min 1, max ?, nullable 
+	Integer score		// Derived property that calculates the weighted score for sorting on priority
 	
 	static hasMany = [ 
 		notes : CommentNote,
@@ -102,8 +104,13 @@ class AssetComment {
 		version true
 		autoTimestamp false
 		id column: 'asset_comment_id'
-		resolvedBy column: 'resolved_by'
-		createdBy column: 'created_by'
+		score formula:  "( (CASE status \
+			WHEN '${AssetCommentStatus.STARTED}' THEN 30 \
+			WHEN '${AssetCommentStatus.READY}' THEN 15 \
+			WHEN '${AssetCommentStatus.PENDING}' THEN 10 \
+			ELSE 0 END) + \
+			IF(category IN ('${AssetCommentCategory.SHUTDOWN}', '${AssetCommentCategory.PHYSICAL}', '${AssetCommentCategory.STARTUP}'), 10,0) + \
+			6 - priority)"
 		columns {
 			comment sqltype: 'text'
 			mustVerify sqltype: 'tinyint'

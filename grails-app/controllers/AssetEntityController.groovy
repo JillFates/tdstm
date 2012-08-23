@@ -2979,7 +2979,7 @@ class AssetEntityController {
 			break;
 		}
 		
-		assetCommentQuery += " order by taskNumber asc, dueDate asc, dateCreated desc"
+		assetCommentQuery += " ORDER BY score DESC, taskNumber ASC, dueDate ASC, dateCreated DESC"
 		
 		def assetCommentList = AssetComment.findAll(assetCommentQuery,args)
 		
