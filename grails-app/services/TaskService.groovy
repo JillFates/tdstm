@@ -547,10 +547,8 @@ class TaskService {
 				( SELECT count(*) FROM task_dependency t WHERE t.asset_comment_id = c.asset_comment_id ) AS predCount,
 				( SELECT count(*) FROM comment_note n WHERE n.asset_comment_id = c.asset_comment_id ) AS noteCount
 			FROM asset_comment c 
-			LEFT OUTER JOIN asset_entity a ON a.asset_entity_id=c.asset_entity_id
-			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id = a.move_bundle_id
 			WHERE 
-				( c.move_event_id = ${moveEventId} OR mb.move_event_id = ${moveEventId} ) AND
+				c.move_event_id = ${moveEventId} AND
 				c.category IN (${GormUtil.asQuoteCommaDelimitedString(runbookCategories)})"""
 		log.info "getMoveEventTaskLists: query = ${query}"
 		def tasksList = jdbcTemplate.queryForList(query)
