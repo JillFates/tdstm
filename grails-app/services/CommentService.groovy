@@ -139,6 +139,10 @@ class CommentService {
 				}
 			}
 		
+			/*
+			 * Now do the general binding of params to the new or updated object
+			 */
+			
 			//	def bindArgs = [assetComment, params, [ exclude:['assignedTo', 'assetEntity', 'moveEvent', 'project', 'dueDate', 'status'] ] ]
 			//	def bindArgs = [assetComment, params, [ include:['comment', 'category', 'displayOption', 'attribute'] ] ]
 			//	bindData.invoke( assetComment, 'bind', (Object[])bindArgs )
