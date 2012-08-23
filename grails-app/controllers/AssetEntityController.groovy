@@ -1895,7 +1895,10 @@ class AssetEntityController {
 				flash.message = map.error
 			}
 			forward(action:"showComment", params:[id:params.id] )
-		} else if( params.view == "myTask" ){
+		} else if( params.view == "myTask" ) {
+			if (map.error) {
+				flash.message = map.error
+			}
 			forward(controller:"clientTeams", action:"listComment", params:[view:params.view, tab:params.tab])
 		} else {
 			render map as JSON
