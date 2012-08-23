@@ -30,6 +30,8 @@ class TaskService {
 	def jdbcTemplate
 	def dataSource
 	def namedParameterJdbcTemplate
+	
+	static final List runbookCategories = [AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP]
 
 	static final List statusList = AssetCommentStatus.getList()
 
@@ -545,8 +547,8 @@ class TaskService {
 			LEFT OUTER JOIN asset_entity a ON a.asset_entity_id=c.asset_entity_id
 			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id = a.move_bundle_id
 			WHERE 
-				c.move_event_id = ${moveEventId}
-		   		OR mb.move_event_id = ${moveEventId}"""
+				( c.move_event_id = ${moveEventId} OR mb.move_event_id = ${moveEventId} ) AND
+				c.category IN (${GormUtil.asQuoteCommaDelimitedString(runbookCategories)})"""
 		log.info "getMoveEventTaskLists: query = ${query}"
 		def tasksList = jdbcTemplate.queryForList(query)
 
@@ -568,4 +570,5 @@ class TaskService {
 		
 		return [tasksAll:tasksAll, tasksWithPred:tasksWithPred, tasksNoPred:tasksNoPred, tasksWithNotes:tasksWithNotes]
 	}
+	
 }

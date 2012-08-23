@@ -5,7 +5,7 @@ import groovy.sql.Sql
 //
 //def dbHost = 'dev02.tdsops.net'
 //def dbHost = 'dev01.tdsops.net'
-def dbHostList = ['localhost':'localhost', 'dev01':'dev01.tdsops.net', 'dev02':'dev02.tdsops.net']
+def dbHostList = ['localhost':'localhost', 'dev':'dev01.tdsops.net', 'prod':'dev02.tdsops.net']
 def dbHost
 
 if (this.args.size() < 3) {

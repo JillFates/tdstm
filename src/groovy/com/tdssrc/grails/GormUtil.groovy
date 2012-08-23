@@ -77,12 +77,29 @@ public class GormUtil {
 		}
 		return ret;
 	}
+	
 	/*
-	 * Convert List as comma delimited of type String to use inside sql statement.
+	 * Convert a list into a comma delimited of type String to use inside sql statement.
 	 * @param List
 	 * @return converted List in to String as comma delimited
 	 */
-	 public static String asCommaDelimitedString( def idList ){
-		return idList.toString().replace("[","").replace("]","")
+	 public static String asCommaDelimitedString( def list ){
+		return list.toString().replace("[","").replace("]","")
 	}
+	
+	/*
+	 * Convert a list into a quoted comma delimited of type String to use inside sql statement.
+	 * @param List
+	 * @return converted List in to String as comma delimited
+	 */
+	 public static String asQuoteCommaDelimitedString( def list ) {
+		StringBuffer sb = new StringBuffer()
+		def first = true
+		list.each { 
+			sb.append( (first?'':',') + "'${it}'")
+			first = false
+		}
+		return sb.toString()
+	}
+	
 }
