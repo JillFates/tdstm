@@ -88,6 +88,7 @@ class TaskService {
 				WHEN '${AssetCommentStatus.READY}' THEN 20
 				WHEN '${AssetCommentStatus.HOLD}' THEN 15
 				WHEN '${AssetCommentStatus.PENDING}' THEN 10
+				ELSE 0
 				END) +  
 				IF(t.category IN ('${AssetCommentCategory.SHUTDOWN}', '${AssetCommentCategory.PHYSICAL}', '${AssetCommentCategory.STARTUP}'), 10,0) +
 				6 - t.priority) AS score """)
