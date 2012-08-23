@@ -120,11 +120,12 @@ class TaskService {
 		if ( ! countOnly ) {
 			// If we are returning the lists, then let's deal with the sorting
 			sql.append('ORDER BY ')
-			def sortableProps = ['comment', 'dueDate', 'lastUpdated', 'status', 'assetEntity']
+			def sortableProps = ['number_comment', 'comment', 'dueDate', 'lastUpdated', 'status', 'assetEntity']
 			if (sortOn) {
 				if ( sortableProps.contains(sortOn) ) {
 					sortOrder = ['asc','desc'].contains(sortOrder) ? sortOrder : 'asc'
-					sql.append("${sortOn} ${sortOrder.toUpperCase()}")
+					sortOrder = sortOrder.toUpperCase()
+					sql.append(sortOn == "number_comment" ? "taskNumber ${sortOrder}, comment ${sortOrder}" : "${sortOn} ${sortOrder}")
 				} else {
 					log.warn "getUserTasks: called with invalid sort property [${sortOn}]"
 					sortOn=null

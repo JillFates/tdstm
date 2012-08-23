@@ -33,7 +33,7 @@
 		<table id="issueTable" style="width:220px;" cellspacing="0px">
 			<thead>
 				<tr>
-					<g:sortableColumn class="sort_column" style="width:60px;"  action="listComment" property="comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:60px;"  action="listComment" property="number_comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="assetEntity" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="width:60px;" action="listComment" property="status" title="Status" params="['tab':tab,'search':search]"></g:sortableColumn>
 				</tr>
