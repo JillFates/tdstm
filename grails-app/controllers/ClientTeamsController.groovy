@@ -1016,9 +1016,9 @@ class ClientTeamsController {
 
 		// Determine the model and view
 		def model = [listComment:issueList, tab:tab, todoSize:todoSize, allSize:allSize, search:search, sort:params.sort, order:params.order]
-		def view = 'myIssues'
+		def view = params.view == "myTask" ? "_tasks" : "myIssues"
 		if ( session.getAttribute('TASK_VIEW_MODE') == 'mobile') {
-			view = view+'_m'
+			view = params.view == "myTask" ? "_tasks_m" : view+"_m"
 		} else {
 			model << [timers:session.MY_ISSUE_REFRESH?.MY_ISSUE_REFRESH]
 		}
@@ -1048,7 +1048,7 @@ class ClientTeamsController {
 			def dateCreated = it.dateCreated.format("E, d MMM 'at ' HH:mma")
 			notes << [dateCreated , it.createdBy.toString() ,it.note]
 		}
-		def viewMode = session.getAttribute('ISSUE_VIEW_MODE')
+		def viewMode = session.getAttribute("TASK_VIEW_MODE")
 		def subject = SecurityUtils.subject
 		def permissionForUpdate = false
 		def userLogin = securityService.getUserLogin()

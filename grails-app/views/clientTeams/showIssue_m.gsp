@@ -157,7 +157,7 @@
 			    <td class="buttonR" ><input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" /> </td>
 				<td class="buttonR" colspan="1" style="text-align:right;padding: 2px 6px;">
 				 <g:if test="${permissionForUpdate==true}">
-					<input type="button" value="Update Task" onclick="validateComment(${assetComment.id})" />
+					<input type="button" value="Update Task" onclick="validateCommentMobile(${assetComment.id})" />
 				</g:if>
 				<g:else>
 				   <input type="button" value="Update Task" disabled="disabled"/>
@@ -292,7 +292,8 @@
 	 }
    return currentDate
  }
- function validateComment(objId){
+ function validateCommentMobile(objId){
+     var tab = $('#tab_m').val() 
 	 var status = $('#statusEditId_'+${assetComment.id}).val()
 	 if(status=='Completed' && $('#resolutionEditId_'+${assetComment.id}).val()==''){
         alert("Please Enter Resolution")
@@ -300,35 +301,19 @@
 		var params = {   'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 
 						 'category':$('#categoryEditId_'+objId).val(), 'assignedTo':$('#assignedToEditId_'+objId).val(),
 						 'dueDate':$('#dueDateEdit_'+objId).val(), 'status':$('#statusEditId_'+objId).val(),
-						 'note':$('#noteEditId_'+objId).val(),'id':objId }
+						 'note':$('#noteEditId_'+objId).val(),'id':objId,'view':'myTask', 'tab': tab }
 		 jQuery.ajax({
 				url: '../assetEntity/updateComment',
 				data: params,
 				type:'POST',
 				success: function(data) {
-					var myClass = $('#issueTrId_'+data.assetComment.id).attr("class");
-					$('#comment_'+data.assetComment.id).html(truncate(data.assetComment.comment))
-					$('#lastUpdated_'+data.assetComment.id).html(formatDueDate(data.assetComment.lastUpdated))
-					$('#dueDate_'+data.assetComment.id).html(formatDueDate(data.assetComment.dueDate))
-					if(data.assetComment.assetEntity){
-					 	$('#asset_'+data.assetComment.id).html(data.assetComment.assetEntity.assetName)
-					}
-					$('#statusTd_'+data.assetComment.id).html(data.assetComment.status)
-					$('#detailTdId_'+data.assetComment.id).hide()
-					$('#issueTrId_'+data.assetComment.id).removeClass(myClass).addClass(data.statusCss);
-					$('#issueTr_'+data.assetComment.id).removeClass(myClass).addClass(data.statusCss);
-					if(data.assetComment.status==''|| data.assetComment.status=='Started'|| data.assetComment.status=='Ready' || data.assetComment.status==null){
-						$('#started_'+data.assetComment.id).hide()
-						$('#showStatusId_'+data.assetComment.id).css('display','table-row')
-						if(data.assetComment.status=='Pending'){
-							$('#started_'+data.assetComment.id).show()
-						}
-						$('#toDoAllId').html(parseInt($('#toDoAllId').html())+1)
-					}else{
-						$('#showStatusId_'+data.assetComment.id).hide()
-						$('#issueTrId_'+data.assetComment.id).remove()
-						B1.Start(60);
-					}
+					     $('#myTaskListMobile').html(data)
+					     $('#showStatusId_'+objId).show()
+						 $('#issueTrId_'+objId).attr('onClick','hideStatus('+objId+',"'+status+'")')
+						 if(status=='Started'){
+						 	$('#started_'+objId).hide()
+						 }
+						 B1.Start(60);
 				}
 			});
 	 }

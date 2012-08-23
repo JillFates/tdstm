@@ -1890,11 +1890,13 @@ class AssetEntityController {
 	 * ------------------------------------------------------------ */
 	def updateComment = {
 		def map = commentService.saveUpdateCommentAndNotes(session, params, false, flash)
-		if (params.open=='view') {
+		if ( params.open == "view" ) {
 			if (map.error) {
 				flash.message = map.error
 			}
-			forward(action:'showComment',params:[id:params.id] )
+			forward(action:"showComment", params:[id:params.id] )
+		} else if( params.view == "myTask" ){
+			forward(controller:"clientTeams", action:"listComment", params:[view:params.view, tab:params.tab])
 		} else {
 			render map as JSON
 		}
