@@ -499,10 +499,16 @@ class TaskService {
 			SET ac.status = :status, ac.actStart = null, ac.actStart = null, ac.dateResolved = null, ac.resolvedBy = null, ac.isResolved=0 \
 			WHERE ac.id in (:ids)"
 			
-		AssetComment.executeUpdate(updateSql, ['status':AssetCommentStatus.PENDING, 'ids':tasksMap.tasksWithPred ] )
-		AssetComment.executeUpdate(updateSql, ['status':AssetCommentStatus.READY, 'ids':tasksMap.tasksNoPred ] )
-		CommentNote.executeUpdate("DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids) AND cn.note LIKE 'Reverted task status from%'", 
-			[ 'ids':tasksMap.tasksWithNotes ] )
+		if (tasksMap.tasksWithPred.size() > 0) {
+			AssetComment.executeUpdate(updateSql, ['status':AssetCommentStatus.PENDING, 'ids':tasksMap.tasksWithPred ] )
+		}
+		if (tasksMap.tasksNoPred.size() > 0) {
+			AssetComment.executeUpdate(updateSql, ['status':AssetCommentStatus.READY, 'ids':tasksMap.tasksNoPred ] )
+		}
+		if (tasksMap.tasksWithNotes.size() > 0) {
+			CommentNote.executeUpdate("DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids) AND cn.note LIKE 'Reverted task status from%'", 
+				[ 'ids':tasksMap.tasksWithNotes ] )
+		}
 	}
 	
 	/**
@@ -515,9 +521,13 @@ class TaskService {
 		log.info("deleteTaskData() was called for moveEvent(${moveEventId})")
 		def tasksMap = getMoveEventTaskLists(moveEventId)
 		
-		CommentNote.executeUpdate('DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids)', ['ids':tasksMap.tasksWithNotes] )
-		TaskDependency.executeUpdate('DELETE FROM TaskDependency td WHERE td.assetComment.id IN (:ids) OR td.predecessor.id IN (:ids)', ['ids':tasksMap.tasksAll] )
-		AssetComment.executeUpdate('DELETE FROM AssetComment ac WHERE ac.id IN (:ids)', ['ids':tasksMap.tasksAll] )
+		if (tasksMap.tasksWithNotes.size() > 0) {
+			CommentNote.executeUpdate('DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids)', ['ids':tasksMap.tasksWithNotes] )
+		}
+		if (tasksMap.tasksAll.size() > 0) {
+			TaskDependency.executeUpdate('DELETE FROM TaskDependency td WHERE td.assetComment.id IN (:ids) OR td.predecessor.id IN (:ids)', ['ids':tasksMap.tasksAll] )
+			AssetComment.executeUpdate('DELETE FROM AssetComment ac WHERE ac.id IN (:ids)', ['ids':tasksMap.tasksAll] )
+		}
 	}
 	
 	/** 
@@ -537,6 +547,7 @@ class TaskService {
 			WHERE 
 				c.move_event_id = ${moveEventId}
 		   		OR mb.move_event_id = ${moveEventId}"""
+		log.info "getMoveEventTaskLists: query = ${query}"
 		def tasksList = jdbcTemplate.queryForList(query)
 
 		def tasksWithPred=[]
