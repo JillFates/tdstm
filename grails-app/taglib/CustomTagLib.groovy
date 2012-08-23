@@ -17,7 +17,7 @@ class CustomTagLib {
 		
 		if (dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp")) {	
 			DateFormat formatter ; 
-			formatter = new SimpleDateFormat('yyyy-MM-dd kk:mm:ss');
+			formatter = new SimpleDateFormat('yyyy-MM-dd HH:mm:ss');
 			dt = GormUtil.convertInToUserTZ( dt, tzId )
 			dtParam = formatter.format(dt);		
 		}  
