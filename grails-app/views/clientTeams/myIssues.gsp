@@ -9,6 +9,13 @@
 </head>
 <body>
 	<div class="mainbody">
+<%--
+/*
+ **************************
+ * Menu
+ **************************
+ */
+--%>
 		<div class="menu4">
 			<ul>
 				<li><g:link class="mobmenu" controller="clientTeams" >Teams</g:link></li>
@@ -30,6 +37,13 @@
 		</div>
 		<div class="issueTimebar" id="issueTimebar"><div id="issueTimebarId" ></div></div>
 		<div id="detailId"  style="display: none;position: absolute;width: 420px;margin-top: 40px;" > </div>
+<%--
+/*
+ **************************
+ * My Issues List 
+ **************************
+ */
+--%>
 		<div id="myIssueList" class="mobbodyweb" style="width:100%">
 			<input id="issueId" name="issueId" type="hidden" value="" />
 			<input name="tab" type="hidden" value="${tab}" />											  	
@@ -59,7 +73,9 @@
 				  <g:else>
 					<tr id="issueTr_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="issueDetails(${issue?.item?.id},'${issue?.item?.status}')">
 				  </g:else>
-						<td id="comment_${issue?.item?.id}" class="asset_details_block_task">${issue?.item?.comment?.size() > 50 ? issue?.item?.comment?.substring(0,40)+'...' : issue?.item?.comment}</td>
+						<td id="comment_${issue?.item?.id}" class="asset_details_block_task">
+							${issue?.item?.taskNumber?issue?.item?.taskNumber+' - ' : ''}${com.tdssrc.grails.StringUtil.ellipsis(issue?.item?.comment,50)}
+						</td>
 						<td id="lastUpdated_${issue?.item?.id}" class="asset_details_block"><tds:convertDate date="${issue?.item?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" format="MM/dd kk:mm:ss" /></td>
 						<td id="dueDate_${issue?.item?.id}" class="asset_details_block"><tds:convertDate date="${issue?.item?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" format="MMM/dd" /></td>
 						<td id="asset_${issue?.item?.id}" class="asset_details_block">${issue?.item?.assetName}</td>
@@ -101,6 +117,13 @@
 			<g:link class="mobfooter" action="listComment" params="[viewMode:'mobile']">Use Mobile Site</g:link>
 		</div>
 	</div>
+<%--
+/*
+ **************************
+ * Dependency Dialog
+ **************************
+ */
+--%>
 	<div id="dependencyBox" style="display: none;" align="right">
 		<span class="ui-icon ui-icon-closethick" unselectable="on" onclick="closeBox()"></span>
 		<table id="showCommentTable" style="border: 0px;">

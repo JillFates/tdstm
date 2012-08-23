@@ -95,7 +95,9 @@
 				  <g:else>
 					<tr id="issueTr_${issue?.item?.id}" class="${issue.css}" style="cursor: pointer;" onclick="issueDetails(${issue?.item?.id})">
 				  </g:else>
-						<td id="comment_${issue?.item?.id}" class="asset_details_block">${issue?.item?.comment?.size() > 50 ? issue?.item?.comment?.substring(0,40)+'...' : issue?.item?.comment}</td>
+						<td id="comment_${issue?.item?.id}" class="asset_details_block">
+							${issue?.item?.taskNumber ? issue?.item?.taskNumber+' - ' : ''}${com.tdssrc.grails.StringUtil.ellipsis(issue?.item?.comment,25)}
+						</td>
 						<td id="asset_${issue?.item?.id}"class="asset_details_block">${issue?.item?.assetName}</td>
 						<td id="statusTd_${issue?.item?.id}"id="statusTd_${issue?.item?.id}" class="asset_details_block">${issue?.item?.status}</td>
 					</tr>
