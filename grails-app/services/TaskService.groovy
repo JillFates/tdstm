@@ -129,10 +129,10 @@ class TaskService {
 				}
 			}
 			// add the score sort either as addition or as only ORDER BY parameteters
-			sql.append( (sortOn ? ', ' : '') + 'score DESC' )
+			sql.append( (sortOn ? ', ' : '') + 'score DESC, task_number ASC' )
 		}
 		
-		// log.info "getUserTasks: SQL for userTasks: " + sql.toString()
+		log.info "getUserTasks: SQL for userTasks: " + sql.toString()
 		
 		// Get all tasks from the database and then filter out the TODOs based on a filtering
 		def allTasks = namedParameterJdbcTemplate.queryForList( sql.toString(), sqlParams )
