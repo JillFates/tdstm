@@ -83,11 +83,12 @@ class TaskService {
 				- If duedate exists and is older than today +5
 				- Priority - Six (6) - <priority value> (so a priority of 5 will add 1 to the score and 1 adds 5)
 			*/
-			sql.append(""", ( IF(t.assigned_to_id=:assignedToId, 30, 0) + (CASE t.status 
+			sql.append(""", ( IF(t.assigned_to_id=:assignedToId, 10, 0) + (CASE t.status 
 				WHEN '${AssetCommentStatus.STARTED}' THEN 30
 				WHEN '${AssetCommentStatus.READY}' THEN 20
 				WHEN '${AssetCommentStatus.HOLD}' THEN 15
 				WHEN '${AssetCommentStatus.PENDING}' THEN 10
+				WHEN '${AssetCommentStatus.DONE}' THEN -10
 				ELSE 0
 				END) +  
 				IF(t.category IN ('${AssetCommentCategory.SHUTDOWN}', '${AssetCommentCategory.PHYSICAL}', '${AssetCommentCategory.STARTUP}'), 10,0) +
