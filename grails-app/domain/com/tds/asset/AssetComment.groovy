@@ -104,6 +104,8 @@ class AssetComment {
 		version true
 		autoTimestamp false
 		id column: 'asset_comment_id'
+		resolvedBy column: 'resolved_by'
+		createdBy column: 'created_by'
 		score formula:  "( (CASE status \
 			WHEN '${AssetCommentStatus.STARTED}' THEN 30 \
 			WHEN '${AssetCommentStatus.READY}' THEN 15 \
