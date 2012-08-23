@@ -2942,28 +2942,46 @@ class AssetEntityController {
 		def assetEntityInstance = AssetEntity.findAllByProject(project)
 		def userId = session.getAttribute("LOGIN_PERSON").id
 		def personInstance = Person.get(userId)
-		def assetCommentList
+		def assetCommentQuery = "from AssetComment a where a.project = :project"
+		def args = [project:project]
 		def today = new Date()
+		def action = params.issueBox == "on" ? "issue" : params.resolvedBox == "on" ? "resolved" : params.filter
 		
-		if (params.issueBox=="on") {
-			if ( params.resolvedBox=="on" ){
-				assetCommentList = AssetComment.findAll("From AssetComment a where a.project = :project AND isResolved = :isResolved and assignedTo = :assignedTo order by dueDate desc , dateCreated desc",[project:project,isResolved:1,assignedTo:personInstance])
-			} else {
-				assetCommentList = AssetComment.findAll("From AssetComment a where a.project = :project AND assignedTo = :assignedTo and isResolved = :isResolved order by dueDate asc , dateCreated desc",[project:project,assignedTo:personInstance,isResolved:0])
-			}
-		} else if(params.filter=='openIssue'){
-			assetCommentList = AssetComment.findAll("FROM AssetComment a where a.project = ? and a.commentType = ? and a.isResolved = 0 and category in ('general','planning') order by dueDate desc , dateCreated desc",[project, "issue"])
-		}else if(params.filter=='generalOverDue'){
-		    assetCommentList = AssetComment.findAll("from AssetComment a  where a.project = ? and  category in ('general','planning') and a.dueDate < ? and a.isResolved = 0 order by dueDate desc , dateCreated desc",[project,today])
-		}else if(params.filter=='Discovery'){
-		    assetCommentList = AssetComment.findAll('from AssetComment a  where a.project = ? and a.category= ?  order by dueDate desc , dateCreated desc',[project,'discovery'])
-		}else if(params.filter=='dueOpenIssue'){
-		    assetCommentList = AssetComment.findAll('from AssetComment a  where a.project = ? and a.category= ? and a.dueDate < ? order by dueDate desc , dateCreated desc',[project,'discovery',today])
-		}else if(params.resolvedBox=="on"){
-		    assetCommentList = AssetComment.findAll("From AssetComment a where a.project = :project  order by dateCreated asc ",[project:project])
-		}else{
-		    assetCommentList = AssetComment.findAll("From AssetComment a where a.project = :project  and isResolved = :isResolved order by dueDate desc , dateCreated desc",[project:project,isResolved:0])
+		switch(action){
+			case "issue":
+				def isResolved = params.resolvedBox != "on" ? 0 : 1
+				assetCommentQuery += " and a.assignedTo = :assignedTo and isResolved = :isResolved"
+				args << [ assignedTo:personInstance, isResolved:isResolved ]
+			break;
+			case "openIssue" :
+				assetCommentQuery += " and a.isResolved = :isResolved and category = :category"
+				args << [ isResolved:0, category:"discovery" ]
+			break;
+			case "generalOverDue" :
+				assetCommentQuery += " and category in ('general','planning') and a.dueDate < :dueDate and a.isResolved = :isResolved"
+				args << [ dueDate:today, isResolved:0 ]
+			break;
+			case "Discovery" :
+				assetCommentQuery += " and a.category= :category "
+				args << [ category:"discovery"]
+			break;
+			case "dueOpenIssue" :
+				assetCommentQuery += " and a.category= :category and a.dueDate < :dueDate"
+				args << [ category:"discovery", dueDate:today]
+			break;
+			case "resolved" :
+				assetCommentQuery += " and isResolved = :isResolved "
+				args << [ isResolved:1 ]
+			break
+			default :
+				assetCommentQuery += " and isResolved = :isResolved "
+				args << [ isResolved:0 ]
+			break;
 		}
+		
+		assetCommentQuery += " order by taskNumber asc, dueDate asc, dateCreated desc"
+		
+		def assetCommentList = AssetComment.findAll(assetCommentQuery,args)
 		
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
 		tableFacade.items = assetCommentList

@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
 <meta name="layout" content="projectHeader" />
-        <title>Task List</title>
+        <title>Manage Tasks</title>
          <g:javascript src="asset.tranman.js" />
           <g:javascript src="entity.crud.js" />
         <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
@@ -43,7 +43,7 @@
 <body>
 	<div class="body">
 		<div class="body">
-			<h1>Task List</h1>
+			<h1>Manage Tasks</h1>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>

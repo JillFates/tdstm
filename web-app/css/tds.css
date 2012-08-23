@@ -223,7 +223,7 @@
 	width:250px;
 }
 #assetMegaMenu {
-	width:250px;
+	width:285px;
 }
 #bundleMegaMenu {
 	width:450px;
@@ -728,6 +728,7 @@ td .dep-Questioned {
 .mmtable .mmlink { 
 	border-right:0px !important;
 	height:auto;
+	white-space:nowrap;
 }
 
 .tabs {
