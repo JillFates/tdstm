@@ -319,7 +319,7 @@
 					<table class="mmtable"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Tasks</span><br />
 						<ul>
-							<li><a class="mmlink" id="MyTasksMenuId" href="/tdstm/clientTeams/listComment" onclick="hideMegaMenu('teamMegaMenu')">My Tasks: 0</a></li>
+							<li><a class="mmlink" id="MyTasksMenuId" href="/tdstm/clientTeams/listComment" onclick="hideMegaMenu('teamMegaMenu')">My Tasks</a></li>
 							<tds:hasPermission permission='ShowMoveTechsAndAdmins'>
 							<li><a class="mmlink" href="/tdstm/clientTeams/list" onclick="hideMegaMenu('teamMegaMenu')">Team Tasks</a></li>
 							<li><g:link class="mmlink" controller="assetEntity" action="listComment"  onclick="hideMegaMenu('assetMegaMenu')">Manage Tasks</g:link></li>
@@ -650,6 +650,7 @@
 	       $(document).mousedown(function(){ resetTimer(); });
 
 		//Replace the number on the "My Tasks" menu with the number of tasks assigned to the user
+		/*
 		$("#MyTasksMenuId").ready(getTaskCount());
 		function getTaskCount(){
 			${remoteFunction(controller:'clientTeams',action:'getToDoCount',onComplete:'setTaskCount(e)')};
@@ -659,7 +660,7 @@
 		  	if(typeof count != 'undefined')
 				$("#MyTasksMenuId").html("My Tasks: " + count);
 		}
-		
+		*/
 	    /*---------------------------------------------------
 		* Script to load the marquee to scroll the live news
 		*--------------------------------------------------*/
