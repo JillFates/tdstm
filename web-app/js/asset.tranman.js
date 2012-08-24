@@ -781,7 +781,7 @@ function showAssetDialog( e , action ) {
 			     }
 	      	 } else {
 	      		$('.issue').css('display','none')
-	      		$('#deleteCommentId').css('display','block')
+	      		$('#deleteCommentId').removeAttr('style')
 	      		$('#commentTypeEditId').removeAttr("disabled");
 	      		$('#commentTypeEditTdId').removeAttr("style");
      	      	$('#typeListTdId').css('display','block')
@@ -1049,7 +1049,7 @@ function commentChange(resolveDiv,formName) {
 		$("#commentTypeCreateTdId").css('display', 'none');
 		$("#commentTypeEditTdId").css('display', 'none');
 		$("#typeListTdId").css('display', 'none');
-		
+		$('#deleteCommentId').css('display','none')
 		
 		$("#issueItemId").html('<label for="comment">Issue:</label>');
 		$("#mustVerifyTd").css('display', 'none');
