@@ -788,6 +788,7 @@ function showAssetDialog( e , action ) {
      	      	$('#commentShowTrId').css('display','table-row')
      	      	$('#predecessorAddTr').css('display','none')
      	      	$('#previousNote').html('')
+     	      	$('#predecessorShowTr').css('display','none')
 	      	 }
 			 if(ac.commentType=='instruction'){
 				 $('#mustVerifyId').css('display','table-row')
