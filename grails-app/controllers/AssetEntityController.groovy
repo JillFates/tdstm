@@ -3509,14 +3509,14 @@ class AssetEntityController {
 			}
 		}
 		if (person) selectedId = person.id
-		log.debug "updateAssignedToSelect(): id=${params.id}, person=${person}, selectedId=${selectedId}" 
+		//log.debug "updateAssignedToSelect(): id=${params.id}, person=${person}, selectedId=${selectedId}" 
 
 		def assignedToSelect = new StringBuffer("""<SELECT ID="${viewId}" NAME="${viewId}" >""")
 		def projectStaff = partyRelationshipService.getProjectStaff( projectId )?.staff
 		projectStaff.sort{it.firstName}
 		def selected
 		projectStaff.each{
-			log.info "updateAssignedToSelect: id=${it.id}, name=${it.toString()}"
+			// log.info "updateAssignedToSelect: id=${it.id}, name=${it.toString()}"
 			selected = it.id == selectedId ? selected = 'SELECTED' : ''
 			assignedToSelect.append("<OPTION VALUE='${it.id}' ${selected}>${it.toString()}</OPTION>")
 		}

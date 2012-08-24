@@ -201,7 +201,7 @@ class PmoAssetTrackingService {
 			}
 		}
 		
-		log.info "getTransitionRowRb: bundleCode:${bundleId}, moveBundle:${moveBundle}, project:${project}, asset:${assetEntity.toString()}"
+		// log.info "getTransitionRowRb: bundleCode:${bundleId}, moveBundle:${moveBundle}, project:${project}, asset:${assetEntity.toString()}"
 		
 		// Get all of the Workflow Transition Ids that we want to report for the asset
 		def sql = "SELECT task.asset_entity_id AS assetId, wft.trans_id AS step, task.status FROM workflow w " +  
@@ -801,7 +801,7 @@ class PmoAssetTrackingService {
 				OR t.last_updated between SUBTIME('$lastPoolTime','00:15:30') AND '$currentPoolTime') )""")
 		}
 		
-		 log.info "getAssetsForPmoUpdate: Query:${query.toString()}"
+		// log.info "getAssetsForPmoUpdate: Query:${query.toString()}"
 		try {
 			def resultList=jdbcTemplate.queryForList(query.toString())
 			return resultList

@@ -1,4 +1,5 @@
 import groovy.sql.Sql
+import java.lang.RuntimeException
 
 //
 // USER DEFINED PER RUN OF APP
@@ -8,8 +9,8 @@ import groovy.sql.Sql
 def dbHostList = ['localhost':'localhost', 'dev':'dev01.tdsops.net', 'prod':'dev02.tdsops.net']
 def dbHost
 
-if (this.args.size() < 3) {
-	println "\nUsage: grails import_runbook.groovy DbHost ProjectID ImportFile\n"
+if (this.args.size() != 4) {
+	println "\nUsage: grails import_runbook.groovy DbHost ProjectID moveBundle ImportFile\n"
 	return
 }
 
@@ -34,7 +35,18 @@ if (! projectName) {
 	return
 }
 
-def importFile = new File(this.args[2])
+def moveBundleCode = this.args[2]
+def moveBundle = sql.firstRow("""SELECT workflow_id AS id, move_event_id AS meId
+	FROM move_bundle m
+ 	JOIN workflow w ON w.process=m.workflow_code
+	WHERE project_id=${projectId} AND name=${moveBundleCode}""")
+if (! moveBundle) {
+	println "Unable to find move bundle ${moveBundleCode}"
+}
+def workflowId=moveBundle.id
+def moveEventId=moveBundle.meId
+
+def importFile = new File(this.args[3])
 if ( ! importFile.exists() || ! importFile.canRead() ) {
 	println "Unable to open file ${this.args[2]} for reading"
 	return
@@ -55,7 +67,6 @@ def now = new Date().format('yyyy-MM-dd H:m:s')
 def runbook = []
 def lastMoveBundleId
 def moveEvents = [:]
-def workflowId 
 def taskList = [:]
 def dependencies = []
 def lastTaskNum
@@ -98,8 +109,22 @@ importFile.splitEachLine("\t") { fields ->
 		}
 
 		// Relational integrity checks
-		def person = sql.firstRow("SELECT concat(last_name,',',first_name) FROM person where person_id=${assignedTo}")
-		def asset = sql.firstRow("SELECT asset_tag FROM asset_entity WHERE asset_entity_id = ${assetId}")
+		if (assignedTo) {
+			def person = sql.firstRow("SELECT concat(last_name,',',first_name) FROM person where person_id=${assignedTo}")
+			if (! person) {
+				throw new RuntimeException("Unable to find person id (${assignedTo}) for task ${taskNum}") 
+			}
+		}
+		if (assetId) {
+			def asset = sql.firstRow("SELECT asset_tag FROM asset_entity WHERE asset_entity_id = ${assetId}")
+			if (! asset) {
+				throw new RuntimeException("Unable to find asset id (${assetId}) for task ${taskNum}") 				
+			}
+		}
+		def existingTask = sql.firstRow("SELECT task_number FROM asset_comment WHERE project_id=${projectId} AND task_number=${taskNum}")
+		if (existingTask) {
+			throw new RuntimeException( "Task number ${taskNum} already exists for this project") 							
+		}
 		
 		// Keep track of all of the taskNum and what Id they map to, then track their predecessors so we can generate them afterward
 		taskList[taskNum] = taskId
@@ -113,8 +138,9 @@ importFile.splitEachLine("\t") { fields ->
 		lastTaskNum = taskNum
 		
 		// println "assetId:${assetId} taskNum:${taskNum} stepCode:${stepCode} role:${role}"
-		
-		if (assetId) {
+
+		/*
+		if (assetId && ! workflowId) {			
 			// Find the moveBundle and subsequently the Workflow id associated with the step code and the workflow 
 			def moveBundleId = sql.firstRow("SELECT move_bundle_id FROM asset_entity WHERE asset_entity_id = ${assetId}").move_bundle_id
 			if (moveBundleId != lastMoveBundleId) {
@@ -125,20 +151,30 @@ importFile.splitEachLine("\t") { fields ->
 			moveEventId = null
 		} else {
 			assetId = null
-			// Look up the moveEventId and projectId
-			if (! moveEvents.containsKey(moveEventCode) ) {
-				moveEventId = sql.firstRow("SELECT move_event_id AS id FROM move_event WHERE project_id=${projectId} AND name=${moveEventCode}").id			
-				moveEvents << [ "${moveEventCode}":moveEventId ]
-			}
-			moveEventId = moveEvents.get("${moveEventCode}")
 		}
+		
+		
+		// Look up the moveEventId and projectId
+		if (! moveEvents.containsKey(moveEventCode) ) {
+			moveEventId = sql.firstRow("SELECT move_event_id AS id FROM move_event WHERE project_id=${projectId} AND name=${moveEventCode}").id			
+			moveEvents << [ "${moveEventCode}":moveEventId ]
+		}
+		moveEventId = moveEvents.get("${moveEventCode}")
+		*/
+
+		// Set the assetId to null if it doesn't have a value
+		assetId = assetId ?: null
 	
 		// Lookup the workflow transition id from the workflow id and step code
 		def workflowTransitionId=null
 		if (stepCode) {
 			def s = "SELECT workflow_transition_id AS id FROM workflow_transition WHERE workflow_id=${workflowId} AND trans_id=${stepCode}"
-			println "workflow SQL: ${s}"
-			workflowTransitionId = sql.firstRow(s).id
+			def wfResult = sql.firstRow(s)
+			if (wfResult) {
+				workflowTransitionId = wfResult.id				
+			} else {
+				throw new RuntimeException("Unable to find StepCode (${stepCode}) using workflowId (${workflowId}) for Task number ${taskNum}") 											
+			}
 		}
 	
 		task.add(
@@ -173,10 +209,11 @@ importFile.splitEachLine("\t") { fields ->
 			priority: priority
 		)
 	
-		println "assignedTo:${assignedTo} asset_comment_id:${taskId} assetId:${assetId} workflowId:${workflowId}, workflowTransitionId:${workflowTransitionId}" +
-		   "taskNum:${taskNum} stepCode:${stepCode} role:${role} title:${fields[3]} est_start:${fields[6]}"
+		//println "assignedTo:${assignedTo} asset_comment_id:${taskId} assetId:${assetId} workflowId:${workflowId}, workflowTransitionId:${workflowTransitionId}" +
+		//   "taskNum:${taskNum} stepCode:${stepCode} role:${role} title:${fields[3]} est_start:${fields[6]}"
 		taskCount++   
 		taskId++
+		println "$taskCount - task: $taskNum role:$role asset:$assetId stepCode:$stepCode"
 
 	}
 }	// read file

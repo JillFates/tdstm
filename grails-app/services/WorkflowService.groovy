@@ -11,13 +11,26 @@ import com.tdssrc.grails.GormUtil
 class WorkflowService {
     boolean transactional = true
     def stateEngineService
-	def taskService
-	
+	def grailsApplication
     def jdbcTemplate
+	// protected TaskService taskService
+	/**
+	 * This initializer method is invoked in bootstrap in order to inject the taskService into this service. Since 
+	 * both services need access each another, we have to do a late IOC otherwise we'd have a circular reference
+	 * error since Grails doesn't support lazy IOC.
+	def initialize( ) {
+		this.taskService = grailsApplication.mainContext.taskService
+		log.info "initialize: taskService is ${taskService==null ? 'null' : this.taskService.class.name }"
+	}
+	 */
+	
     /*
      *  Used to create the Asset Transaction 
+	 * @param process		String containing the workflow code
+	 * @param role			String the indicating the role that the user is playing (e.g. SUPERVISOR)
+	 * @param updateTask	boolean indicating if this method should attempt to call TaskService to update the associate task
      */
-    def createTransition( def process, def role, def toState, def assetEntity, def moveBundle, def userLogin, def projectTeam, def comment ) {
+    def createTransition( def process, def role, def toState, def assetEntity, def moveBundle, def userLogin, def projectTeam, def comment, def updateTask=true ) {
     	/*
     	The method should verify that:
 		1. get the current state of the assetEntity from projectAssetMap
@@ -40,6 +53,7 @@ class WorkflowService {
     	def projectAssetMap = ProjectAssetMap.findByAsset( assetEntity )
     	def stateType = stateEngineService.getStateType( process, toState )
 		def project = assetEntity.project
+		log.info "createTransition: process=$process, role=$role, toState=$toState"
 		
     	if ( projectAssetMap ) {
 			log.info "createTransition: in projectAssetMap logic"
@@ -77,8 +91,12 @@ class WorkflowService {
 							// Get the state Id for the state we're bumping the asset to
 							def state = stateEngineService.getStateId( process, toState )
 							
+							// The legacy application will call this function without passing the updateTask flag that defaults 
+							// to true.  In the event that someone completes a task, we need to mimic creating the workflow transition as well
+							// so in the new Task logic we will call this function and don't want it update the task since it has already been
+							// taken care of.
 							// If the project uses runbooks, then update the tasks
-							if (project.runbookOn) {
+							if ( updateTask && project.runbookOn) {
 								completeWorkflowTask(assetEntity, userLogin, process, state)
 							}
 							
@@ -143,9 +161,13 @@ class WorkflowService {
 	        }
     		if ( verifyFlag ) {
 				try {
-					
+							
+					// The legacy application will call this function without passing the updateTask flag that defaults 
+					// to true.  In the event that someone completes a task, we need to mimic creating the workflow transition as well
+					// so in the new Task logic we will call this function and don't want it update the task since it has already been
+					// taken care of.
 					// If the project uses runbooks, then update the tasks
-					if (project.runbookOn) {
+					if ( updateTask && project.runbookOn) {
 						message = completeWorkflowTask(assetEntity, userLogin, process, state)
 					}
 
@@ -217,17 +239,17 @@ class WorkflowService {
 			// TODO : runbook - rollback tasks? 
     	}
     }
-    /*-------------------------------------------------------------------------------
-     * 
+
+    /**
      * When moving a given asset from one workflow status to another will do pre existing transitions if there are steps in between. 
-	 	If selected transition failed then this transitions will be rolled back at called place. 
-	 	For example, if current status is at 30 and the user wants to go to 33, fill in 31 and 32 with the same time as the 33 time. 
-		This assumes 30-33 are all in the workflow.
+	 *	If selected transition failed then this transitions will be rolled back at called place. 
+	 *	For example, if current status is at 30 and the user wants to go to 33, fill in 31 and 32 with the same time as the 33 time. 
+	 *	This assumes 30-33 are all in the workflow.
      * 
      * @author : Lokanath Reddy
      * @param  : process, stateFrom, stateTo,  assetEntity, moveBundle, projectTeam, userLogin
      * @return : last transition stateTo id.
-     *-----------------------------------------------------------------------------*/
+     */
      def doPreExistingTransitions( def process, def stateFrom, def stateTo,  def assetEntity, def moveBundle, def projectTeam, def userLogin ){
 	 	
 	 	// Skip the steps when setting asset to Completed once user set "VM Completed".
@@ -276,7 +298,8 @@ class WorkflowService {
 		 log.info "completeWorkflowTask: asset:${assetEntity.id}, user:${userLogin}, process:${process}, state:${state}, task:${task.id}"
 		 if (task) {
 			 // TODO : calling completeTask with false doesn't allow for updating multiple states at once
-			 message = completeTask(task.id, userLogin.id, false)
+			 // message = taskService.completeTask(task.id, userLogin.id, false)
+			 message = grailsApplication.mainContext.taskService.completeTask(task.id, userLogin.id, false)
 		 } else {
 		 	message = "Sorry but was unable to locate the task associated with the workflow."
 		 	log.info "No task associated with workflow ${process}:${state} for asset id ${assetEntity.id}"
@@ -308,117 +331,7 @@ class WorkflowService {
 		 }
 		 return task
 	 }
-
-	 /**
-	  * Used to set the state of a task (aka AssetComment) to completed and update any dependencies to the ready state appropriately. This will 
-	  * complete predecessor tasks if completePredecessors=true.
-	  * @param task
-	  * @return
-	  */
-	 // TODO: runbook : completeTask() : move into the TaskService and change so that we pass in the Task instead of the id
-	 def completeTask( taskId, userId, completePredecessors=false ) {
-		 log.info "completeTask: taskId:${taskId}, userId:${userId}"
-		 def task = AssetComment.get(taskId)
-		 def userLogin = UserLogin.get(userId)
-		 def tasksToComplete = [task]
-		 
-		 def predecessors = getIncompletePredecessors(task)
-		 
-		 // If we're not going to automatically complete predecessors (Supervisor role only), the we can't do anything 
-		 // if there are any incomplete predecessors.
-		 if (! completePredecessors && predecessors.size() > 0) {
-			throw new TaskCompletionException("Unable to complete task [${task.taskNumber}] due to incomplete predecessor task # (${predecessors[0].taskNumber})")
-		 }
-
-		 // If automatically completing predecessors, check first to see if there are any on hold and stop 		 
-		 if (completePredecessors) {
-			 // TODO : Runbook - if/when we want to complete all predecessors, perhaps we should do it recursive since this logic only goes one level I believe.
-			 if ( predecessors.size() > 0 ) {
-				 // Scan the list to see if any of the predecessor tasks are on hold because we don't want to do anything if that is the case
-				 def hasHold=false
-				 for (int i=0; i < predecessors.size(); i++) {
-					 if (predecessors[i].status == "Hold") {
-						hasHold = true
-						break
-					 }
-				 }
-				 if (hasHold) {
-					 throw new TaskCompletionException("Unable to complete task [${task.taskNumber}] due to predecessor task # (${predecessors[0].taskNumber}) being on Hold")
-				 }
-			 }
-		 
-			 tasksToComplete += predecessors
-		 }
-
-	 	// Complete the task(s)
-		tasksToComplete.each() { activeTask ->
-			// activeTask.dateResolved = GormUtil.convertInToGMT( "now", "EDT" )
-			// activeTask.resolvedBy = userLogin.person
-			taskService.setTaskStatus(activeTask, AssetCommentStatus.DONE)
-			if ( ! (activeTask.validate() && activeTask.save(flush:true)) ) {
-				throw new TaskCompletionException("Unable to complete task # ${activeTask.taskNumber} due to " +
-					GormUtil.allErrorsString(activeTask) )
-				log.error "Failed Completing task [${activeTask.id} " + GormUtil.allErrorsString(successorTask)
-				return "Unable to complete due to " + GormUtil.allErrorsString(successorTask)
-			}
-		} 
-		
-		//
-		// Now Mark any successors as Ready if all predecessors are Completed
-		//
-		def succDependencies = TaskDependency.findByPredecessor(task)
-		succDependencies?.each() { succDepend ->
-			def successorTask = succDepend.assetComment
-			
-			// If the Task is in the Planned or Pending state, we can check to see if it makes sense to set to READY
-			if ([AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING].contains(successorTask.status)) {
-				// Find all predecessors for the successor, other than the current task, and make sure they are completed
-				def predDependencies = TaskDependency.findByAssetCommentAndPredecessorNot(successorTask, task)
-				def makeReady=true
-				predDependencies?.each() { predDependency
-					def predTask = predDependency.assetEntity
-					if (predTask.status != AssetCommentStatus.COMPLETED) makeReady = false
-				}
-				if (makeReady) {
-					successorTask.status = AssetCommentStatus.READY
-					if (! (successorTask.validate() && successorTask.save(flush:true)) ) {
-					 	throw new TaskCompletionException("Unable to release task # ${successorTask.taskNumber} due to " +
-							 GormUtil.allErrorsString(successorTask) )
-						log.error "Failed Readying successor task [${successorTask.id} " + GormUtil.allErrorsString(successorTask)
-					 }
-				}
-			}
-		}
-	 }
 	 
-	 /**
-	  * Provides a list of upstream task predecessors that have not been completed for a given task. Implemented by recursion
-	  * @param task
-	  * @param taskList list of predecessors collected during the recursive lookup
-	  * @return list of predecessor tasks
-	  */
-	 // TODO: runbook : Refactor getIncompletePredecessors() into the TaskService,
-	 def getIncompletePredecessors(task, taskList=[]) {
-		 task.taskDependencies?.each() { dependency ->
-			 def predecessor = dependency.predecessor
-
-			 // Check to see if we already have the predecessor in the list where there were multiple predecessors that referenced one another
-			 def skip=false
-			 for (int i=0; i < taskList.size(); i++) {
-				 if (taskList[i].id == predecessor.id ) {
-				 	skip = true
-					break
-			 	}
-			 }
-			 
-			 // If it is not Completed, add it to the list and recursively look for more predecessors
-			 if (! skip && predecessor.status != 'Completed') {
-				 taskList << predecessor
-				 getIncompletePredecessors(predecessor, taskList)
-			 }
-		 }
-		 return taskList
-	 }
 }
 
 // TODO : refactor this into the src/grails/com/tdsops/tm/exceptions source tree

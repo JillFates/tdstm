@@ -147,6 +147,13 @@ class AssetComment {
 		setDateResolved( date )
 	}
 
+	/* 
+	 * @return Boolean indicating if the tast is done
+	 */
+	def isDone() {
+		return this.status == AssetCommentStatus.DONE
+	}
+	
 	// Extend the dateResolved setter to also set the isResolved appropriately
 	public void setDateResolved( Date date ) {
 		this.dateResolved = date
