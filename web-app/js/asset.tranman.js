@@ -657,6 +657,14 @@ function showAssetDialog( e , action ) {
 	      	 $('#assetShowValueId').html(params.assetName)
 		     $('#assetTrShowId').html(params.assetName)
 		     $('#eventShowValueId').html(params.eventName)
+		     
+		     if(ac.assetEntity){
+    		       updateWorkflowTransitions(ac.assetEntity.id, ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
+    		 }else{
+    		       updateWorkflowTransitions('', ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
+    		 }
+			 $('#successorEditId').html(params.successorTable)
+             $('#predecessorEditId').html(params.predEditTable)
 	      	 if(ac.commentType=='issue'){
 	      		 updateAssignedToList('assignedToEdit','assignedEditSpan',ac.id);
 	      		 updateStatusSelect(ac.id);
@@ -689,8 +697,6 @@ function showAssetDialog( e , action ) {
                  $('#taskNumberId').html('Task #: '+'<b>'+taskNumber+'</b>')
                  $('#taskNumberSpanEditId').html('Task #: '+'<b>'+taskNumber+'</b>')
                  $('#successorShowTd').html(params.successorTable)
-                 $('#successorEditId').html(params.successorTable)
-                 $('#predecessorEditId').html(params.predEditTable)
                  $('#predecessorTrEditId').css('display','table-row')
     	      	 $('#previousNotesShowId').html(noteTable)
     	      	 $('#previousNote').html(noteTable)
@@ -714,10 +720,10 @@ function showAssetDialog( e , action ) {
       		     $('#roleTdId').html(params.roles)
       		     ac.role ? $('#roleTypeEdit').val(ac.role) :$('#roleTypeEdit').val('')
       		     $('#estStartShowId').html(params.etStart)
-      		     $('#estStartEditId').val(params.etStart)
+      		     params.etStart ? $('#estStartEditId').val(params.etStart) : $('#estStartEditId').val('')
       		     $('#estStartEditTrId').css('display','table-row')
       		     $('#estFinishShowId').html(params.etFinish)
-      		     $('#estFinishEditId').val(params.etFinish)
+      		     params.etFinish ? $('#estFinishEditId').val(params.etFinish) : $('#estFinishEditId').val('')
       		     $('#actStartShowId').html(params.atStart)
       		     $('#actStartEditId').val(params.atStart)
       		     $('#actFinishShowId').html(params.dtResolved)
@@ -726,11 +732,6 @@ function showAssetDialog( e , action ) {
       		      $('#workFlowShowId').html(params.workflow)
       		     }else{
       		      $('#workFlowShow').css('display','none')
-      		     }
-      		     if(ac.assetEntity){
-      		       updateWorkflowTransitions(ac.assetEntity.id, ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
-      		     }else{
-      		       updateWorkflowTransitions('', ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
       		     }
       		     $('#workFlowEditId').html(params.workflow)
       		     if(ac.priority==1||ac.priority==2){
@@ -741,7 +742,7 @@ function showAssetDialog( e , action ) {
       		     var duration = ac.duration ? ac.duration :''
       		     var durationScale = ac.durationScale ?ac.durationScale:''
       		     $('#durationShowId').html(duration +" "+ durationScale )
-      		     $('#durationEdit').val(ac.duration )
+      		     $('#durationEdit').val(duration )
       		     ac.durationScale ? $('#durationScaleEdit').val(ac.durationScale) : $('#durationScaleEdit').val('m') 
       		     ac.priority ? $('#priorityEdit').val(ac.priority) : $('#priorityEdit').val('')
       		     
@@ -782,9 +783,11 @@ function showAssetDialog( e , action ) {
 	      		$('.issue').css('display','none')
 	      		$('#deleteCommentId').css('display','block')
 	      		$('#commentTypeEditId').removeAttr("disabled");
-	      		$('#commentTypeEditTdId').css('display','block')
+	      		$('#commentTypeEditTdId').removeAttr("style");
      	      	$('#typeListTdId').css('display','block')
      	      	$('#commentShowTrId').css('display','table-row')
+     	      	$('#predecessorAddTr').css('display','none')
+     	      	$('#previousNote').html('')
 	      	 }
 			 if(ac.commentType=='instruction'){
 				 $('#mustVerifyId').css('display','table-row')
@@ -1043,6 +1046,8 @@ function commentChange(resolveDiv,formName) {
 		
 		$("#typeCommentCreateId").css('display', 'none');
 		$("#commentTypeCreateTdId").css('display', 'none');
+		$("#commentTypeEditTdId").css('display', 'none');
+		$("#typeListTdId").css('display', 'none');
 		
 		
 		$("#issueItemId").html('<label for="comment">Issue:</label>');
@@ -1051,14 +1056,20 @@ function commentChange(resolveDiv,formName) {
 		$("#assignedToEditedId").css('display', 'table-row');
 		$("#dueDateEditId").css('display', 'block');
 		$('#estStartTrId').css('display', 'table-row');
+		$('#estStartEditTrId').css('display', 'table-row');
 //		$('#estFinishTrId').css('display', 'table-row');
 		$('#actStartTrId').css('display', 'table-row');
 		$(resolveDiv).css('display', 'table-row');
 		$('#workFlowTransitionTrId').css('display','table-row')
+		$('#workFlowTransitionEditTrId').css('display', 'table-row');
+		$('relatedIssueEditId').css('display', 'table-row');
 		$('#predecessorHeadTrId').css('display','table-row')
 		$('#predecessorTrId').css('display','table-row')
+		$("#predecessorAddTr").css('display', 'table-row');
+		$("#predecessorTrEditId").css('display', 'table-row');
 		$('#priorityTrId').css('display', 'table-row');
 		$('#durationTrId').css('display', 'table-row');
+		$("#durationEditId").css('display', 'table-row');
 		document.forms[formName].mustVerify.checked = false;
 		document.forms[formName].mustVerify.value = 0;
 		document.forms[formName].isResolved.checked = false;

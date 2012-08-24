@@ -57,9 +57,9 @@
 		<tr class = "issue" id="assignedToTrId" style="display: none">
 			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
 			<td valign="top" class="value" id="" colspan="3">
-				<span id="assignedToTdId"></span>&nbsp;/&nbsp;<span id="roleTdId"></span>&nbsp;
+				<span id="assignedToTdId"></span>&nbsp;/&nbsp;<span id="roleTdId"></span>&nbsp;&nbsp;
 				<input type="checkbox" id="hardAssignedShow" name="hardAssignedShow" value="0"
-				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
+				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
 				<label for="hardAssignedShow" >Fixed Assignment</label>&nbsp;&nbsp;
 				<span id="dueDateTrId">
 					<label for="dueDate">Due :</label>
@@ -201,7 +201,7 @@
 				&nbsp;/&nbsp;
 				<g:select id="roleType" name="roleType" from="${RoleType.list()}" noSelection="['':'Unassigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)"></g:select> &nbsp;
 				<input type="checkbox" id="hardAssigned" name="hardAssigned" value="1"  checked="checked"
-					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
+					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;
 				<label for="hardAssigned" >Fixed Assignment</label>&nbsp;&nbsp;
 				<label for="dueDate">Due:</label>
 				<script type="text/javascript" charset="utf-8">
@@ -386,8 +386,19 @@
 			<td valign="top" class="name">
 				<label for="category">Category:</label>
 			</td>
-			<td valign="top" class="name" id="commentTypeEditTdId"><label for="commentType">Type:</label></td>
-			<td valign="top" style="" id="typeListTdId">
+			<td colspan="4">
+				<g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
+				onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionEditId', 'predecessorId',jQuery('#createAssetCommentId').html())"></g:select>
+				<span id="taskNumberSpanEditId"></span>
+        	    <label for="priority">Priority:</label>
+            	<g:select id="priorityEdit" name="priorityEdit" from="${1..5}" value=""></g:select>
+			</td>
+        </tr>
+        <tr>
+            <td valign="top" class="name" id="commentTypeEditTdId"> 
+               <label for="commentType">Type:</label>
+            </td>
+			<td valign="top" id="typeListTdId">
 				<tds:hasPermission permission='CommentCrudView'>
 					<g:select id="commentTypeEditId" name="commentType"
 					from="${com.tds.asset.AssetComment.constraints.commentType.inList}" value=""
@@ -398,13 +409,6 @@
 						<input type="text" id="commentTypeEditIdReadOnly" readonly style="border: 0;"/>
 					</tds:hasPermission>
 				</div>
-			</td>
-			<td colspan="4">
-				<g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
-				onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionEditId', 'predecessorId',jQuery('#createAssetCommentId').html())"></g:select>
-				<span id="taskNumberSpanEditId"></span>
-        	    <label for="priority">Priority:</label>
-            	<g:select id="priorityEdit" name="priorityEdit" from="${1..5}" value=""></g:select>
 			</td>
         </tr>
 		<tr class="prop" id="mustVerifyEditTr" style="display: none;">
