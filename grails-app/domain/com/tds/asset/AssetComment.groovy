@@ -82,7 +82,8 @@ class AssetComment {
 		commentKey( blank:true, nullable:true  )
 		// TODO: remove the blank/nullable constraint for status after testing
 		// status( blank:true, nullable:true , inList : ['Planned', 'Pending', 'Ready', 'Started', 'Hold', 'Completed'] )
-		status( blank:true, nullable:true , inList : AssetCommentStatus.getList() )
+		status( blank:true, nullable:true, inList : AssetCommentStatus.getList(),
+			validator:{ if (commentType=='issue' && ! status) return ['issue.blank'] } )
 		// TODO: change duration to default to zero and min:1, need to coordinate with db update for existing data
 		duration(nullable:true)
 		durationScale(nullable:true, blank:true, inList:['m','h','d','w'])

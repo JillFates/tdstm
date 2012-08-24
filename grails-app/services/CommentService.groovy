@@ -158,10 +158,10 @@ class CommentService {
 			if (params.attribute) assetComment.attribute = params.attribute
 		    assetComment.resolution = params.resolution
 			if (params.containsKey('estStart')) {
-				log.info "saveUpdateCommentAndNotes: estStart=[${params.estStart}]"
+				// log.info "saveUpdateCommentAndNotes: estStart=[${params.estStart}]"
 				assetComment.estStart = params.estStart ? estformatter.parse(params.estStart) : null
 			}
-			if (params.containsKey('estStart')) {
+			if (params.containsKey('estFinish')) {
 				assetComment.estFinish = params.estFinish ? estformatter.parse(params.estFinish) : null
 			}
 			if (params.containsKey('role')) {
@@ -229,7 +229,7 @@ class CommentService {
 				}
 
 				if (params.containsKey('dueDate') ) { 
-					log.info "saveUpdateCommentAndNotes: dueDate=[${params.dueDate}]"
+					// log.info "saveUpdateCommentAndNotes: dueDate=[${params.dueDate}]"
 					assetComment.dueDate = params.dueDate ? formatter.parse(params.dueDate) : null
 				}
 	

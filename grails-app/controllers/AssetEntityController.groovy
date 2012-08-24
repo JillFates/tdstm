@@ -66,6 +66,7 @@ class AssetEntityController {
 	
 	protected static statusOptionForRole = [
 		"PROJ_MGR": [
+			'*EMPTY*': AssetCommentStatus.getList(),
 			(AssetCommentStatus.PLANNED): AssetCommentStatus.getList(),
 			(AssetCommentStatus.PENDING): AssetCommentStatus.getList(),
 			(AssetCommentStatus.READY): AssetCommentStatus.getList(),
@@ -74,6 +75,7 @@ class AssetEntityController {
 			(AssetCommentStatus.DONE): AssetCommentStatus.getList()
 		],
 		"USER":[
+			'*EMPTY*': [AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING, AssetCommentStatus.HOLD],
 			(AssetCommentStatus.PLANNED): [AssetCommentStatus.PLANNED],
 			(AssetCommentStatus.PENDING): [AssetCommentStatus.PENDING],
 			(AssetCommentStatus.READY):   [AssetCommentStatus.READY,AssetCommentStatus.STARTED, AssetCommentStatus.DONE, AssetCommentStatus.HOLD],
@@ -3533,7 +3535,7 @@ class AssetEntityController {
 		
 		def mapKey = securityService.hasRole("PROJ_MGR") ? "PROJ_MGR" : "USER" 
 		def optionForRole = statusOptionForRole.get(mapKey)
-		def status = AssetComment.read(params.id)?.status ?: ''
+		def status = AssetComment.read(params.id)?.status ?: '*EMPTY*'
 		def optionList = optionForRole.get(status)
 		def selected
 		// TODO : NO MORE BUILDING SELECT CONTROLLERS - Refactor this into HtmlUtil utility class.
