@@ -287,6 +287,11 @@ class CommentService {
 						}
 					}
 				}
+				
+				// Create workflow transition if runbook is enabled
+				if (project.runbookOn == 1) {
+					taskService.createTransition( assetComment, userLogin, params.status )
+				}
 			
 				// TODO - comparison of the assetComment.dueDate may not work if the dueDate is stored in GMT
 				def css =  assetComment.dueDate < date ? 'Lightpink' : 'White'
@@ -324,6 +329,7 @@ class CommentService {
 			return map
 		}
 	}
+	
 	
 	/**
 	 * Used to send the Task email to the appropriate user for the comment passed to the method

@@ -30,6 +30,7 @@ class TaskService {
 	def jdbcTemplate
 	def dataSource
 	def namedParameterJdbcTemplate
+	def workflowService
 	
 	static final List runbookCategories = [AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP]
 
@@ -51,7 +52,7 @@ class TaskService {
 		// Need to initialize the NamedParameterJdbcTemplate to pass named params to a SQL statement
 		namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
 
-		log.info "getUserTasks: limitHistory=${limitHistory}, sortOn=${sortOn}, sortOrder=${sortOrder}, search=${search}"
+		// log.info "getUserTasks: limitHistory=${limitHistory}, sortOn=${sortOn}, sortOrder=${sortOrder}, search=${search}"
 		
 		// Get the user's roles for the current project
 		// TODO : Runbook: getUserTasks - should get the user's project roles instead of global roles
@@ -135,7 +136,7 @@ class TaskService {
 			sql.append( (sortOn ? ', ' : '') + 'score DESC, task_number ASC' )
 		}
 		
-		log.info "getUserTasks: SQL for userTasks: " + sql.toString()
+		// log.info "getUserTasks: SQL for userTasks: " + sql.toString()
 		
 		// Get all tasks from the database and then filter out the TODOs based on a filtering
 		def allTasks = namedParameterJdbcTemplate.queryForList( sql.toString(), sqlParams )
@@ -572,4 +573,141 @@ class TaskService {
 		return [tasksAll:tasksAll, tasksWithPred:tasksWithPred, tasksNoPred:tasksNoPred, tasksWithNotes:tasksWithNotes]
 	}
 	
+	 /**
+	  * Provides a list of upstream task predecessors that have not been completed for a given task. Implemented by recursion
+	  * @param task
+	  * @param taskList list of predecessors collected during the recursive lookup
+	  * @return list of predecessor tasks
+	  */
+	 // TODO: runbook : Refactor getIncompletePredecessors() into the TaskService,
+	 def getIncompletePredecessors(task, taskList=[]) {
+		 task.taskDependencies?.each { dependency ->
+			 def predecessor = dependency.predecessor
+
+			 // Check to see if we already have the predecessor in the list where there were multiple predecessors that referenced one another
+			 def skip=false
+			 for (int i=0; i < taskList.size(); i++) {
+				 if (taskList[i].id == predecessor.id ) {
+				 	skip = true
+					break
+			 	}
+			 }
+			 
+			 // If it is not Completed, add it to the list and recursively look for more predecessors
+			 if (! skip && ! predecessor.isDone()) {
+				 taskList << predecessor
+				 getIncompletePredecessors(predecessor, taskList)
+			 }
+		 }
+		 return taskList
+	 }
+	
+	 /**
+	  * Used to set the state of a task (aka AssetComment) to completed and update any dependencies to the ready state appropriately. This will 
+	  * complete predecessor tasks if completePredecessors=true.
+	  * @param task
+	  * @return
+	  */
+	 def completeTask( taskId, userId, completePredecessors=false ) {
+		 log.info "completeTask: taskId:${taskId}, userId:${userId}"
+		 def task = AssetComment.get(taskId)
+		 def userLogin = UserLogin.get(userId)
+		 def tasksToComplete = [task]
+		 
+		 def predecessors = getIncompletePredecessors(task)
+		 
+		 // If we're not going to automatically complete predecessors (Supervisor role only), the we can't do anything 
+		 // if there are any incomplete predecessors.
+		 if (! completePredecessors && predecessors.size() > 0) {
+			throw new TaskCompletionException("Unable to complete task [${task.taskNumber}] due to incomplete predecessor task # (${predecessors[0].taskNumber})")
+		 }
+
+		 // If automatically completing predecessors, check first to see if there are any on hold and stop 		 
+		 if (completePredecessors) {
+			 // TODO : Runbook - if/when we want to complete all predecessors, perhaps we should do it recursive since this logic only goes one level I believe.
+			 if ( predecessors.size() > 0 ) {
+				 // Scan the list to see if any of the predecessor tasks are on hold because we don't want to do anything if that is the case
+				 def hasHold=false
+				 for (int i=0; i < predecessors.size(); i++) {
+					 if (predecessors[i].status == AssetCommentStatus.HOLD) {
+						hasHold = true
+						break
+					 }
+				 }
+				 if (hasHold) {
+					 throw new TaskCompletionException("Unable to complete task [${task.taskNumber}] due to predecessor task # (${predecessors[0].taskNumber}) being on Hold")
+				 }
+			 }
+		 
+			 tasksToComplete += predecessors
+		 }
+
+	 	// Complete the task(s)
+		tasksToComplete.each() { activeTask ->
+			// activeTask.dateResolved = GormUtil.convertInToGMT( "now", "EDT" )
+			// activeTask.resolvedBy = userLogin.person
+			setTaskStatus(activeTask, AssetCommentStatus.DONE)
+			if ( ! (activeTask.validate() && activeTask.save(flush:true)) ) {
+				throw new TaskCompletionException("Unable to complete task # ${activeTask.taskNumber} due to " +
+					GormUtil.allErrorsString(activeTask) )
+				log.error "Failed Completing task [${activeTask.id} " + GormUtil.allErrorsString(successorTask)
+				return "Unable to complete due to " + GormUtil.allErrorsString(successorTask)
+			}
+		} 
+		
+		//
+		// Now Mark any successors as Ready if all predecessors are Completed
+		//
+		def succDependencies = TaskDependency.findByPredecessor(task)
+		succDependencies?.each() { succDepend ->
+			def successorTask = succDepend.assetComment
+			
+			// If the Task is in the Planned or Pending state, we can check to see if it makes sense to set to READY
+			if ([AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING].contains(successorTask.status)) {
+				// Find all predecessors for the successor, other than the current task, and make sure they are completed
+				def predDependencies = TaskDependency.findByAssetCommentAndPredecessorNot(successorTask, task)
+				def makeReady=true
+				predDependencies?.each() { predDependency
+					def predTask = predDependency.assetEntity
+					if (predTask.status != AssetCommentStatus.COMPLETED) makeReady = false
+				}
+				if (makeReady) {
+					successorTask.status = AssetCommentStatus.READY
+					if (! (successorTask.validate() && successorTask.save(flush:true)) ) {
+					 	throw new TaskCompletionException("Unable to release task # ${successorTask.taskNumber} due to " +
+							 GormUtil.allErrorsString(successorTask) )
+						log.error "Failed Readying successor task [${successorTask.id} " + GormUtil.allErrorsString(successorTask)
+					 }
+				}
+			}
+		}
+	 } // def completeTask()
+	
+	/**
+	 * This method is used by the saveUpdateCommentAndNotes to create workflow transitions in order to support 
+	 * backwards compatiblity with legacy code while using runbook mode.
+	 * @param assetComment
+	 * @param tzId
+	 * @return void
+	 */
+	def createTransition(assetComment, userLogin, status ) {
+		def asset = assetComment.assetEntity
+
+		// Only need to do something if task is completed and the task is associated with a workflow
+		if (status == AssetCommentStatus.DONE && asset && assetComment.workflowTransition) {
+
+			def moveBundle = asset.moveBundle
+			def process = moveBundle.workflowCode
+			def role = 'SUPERVISOR'
+			def projectTeam = null
+			def comment = ''
+			def wft = assetComment.workflowTransition
+			def toState = wft.code
+			def updateTask=false		// we don't want createTransition to call back to TaskService
+
+			log.info "createTransition: task id($assetComment.id) by ${userLogin}, toState=$toState"
+
+			workflowService.createTransition( process, role, toState, asset, moveBundle, userLogin, projectTeam, comment, updateTask )
+		}
+	}
 }
