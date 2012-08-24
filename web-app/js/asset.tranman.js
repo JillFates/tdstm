@@ -1502,7 +1502,7 @@ function updateAssignedToList(forView,span,id){
 		},
 		onFailure:function(jqXHR, textStatus, errorThrown){
 			alert(stdErrorMsg)
-		},
+		}
 	})
 }
 function updateStatusSelect(taskId){
