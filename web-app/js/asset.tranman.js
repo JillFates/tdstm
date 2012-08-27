@@ -709,6 +709,7 @@ function showAssetDialog( e , action ) {
 		      		 $('#overrideShow').attr('checked', true);
 		      		 $('#overrideEdit').attr('checked', true);
 		      	 }
+      		     $('#hardAssignedEdit').val(ac.hardAssigned)
       		     $('#roleTdId').html(params.roles)
       		     ac.role ? $('#roleTypeEdit').val(ac.role) :$('#roleTypeEdit').val('')
       		     $('#estStartShowId').html(params.etStart)
