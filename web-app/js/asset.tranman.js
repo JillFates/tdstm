@@ -658,16 +658,8 @@ function showAssetDialog( e , action ) {
 		     $('#assetTrShowId').html(params.assetName)
 		     $('#eventShowValueId').html(params.eventName)
 		     
-		     if(ac.assetEntity){
-    		       updateWorkflowTransitions(ac.assetEntity.id, ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
-    		 }else{
-    		       updateWorkflowTransitions('', ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
-    		 }
-			 $('#successorEditId').html(params.successorTable)
-             $('#predecessorEditId').html(params.predEditTable)
+		     
 	      	 if(ac.commentType=='issue'){
-	      		 updateAssignedToList('assignedToEdit','assignedEditSpan',ac.id);
-	      		 updateStatusSelect(ac.id);
 	      		 if(ac.resolution || ac.status=='Completed'){
 	      		   $('#resolutionEditTrId').css('display','table-row')
 	      		 }else{
@@ -746,6 +738,7 @@ function showAssetDialog( e , action ) {
       		     ac.durationScale ? $('#durationScaleEdit').val(ac.durationScale) : $('#durationScaleEdit').val('m') 
       		     ac.priority ? $('#priorityEdit').val(ac.priority) : $('#priorityEdit').val('')
       		     
+      		     $('#commentButtonEditId').attr('onClick','showAssetComment('+ac.id+', "edit")')
       		     $('#commentTypeEditTdId').css('display','none')
       	      	 $('#typeListTdId').css('display','none')
       		     $('#commentShowTrId').css('display','none')
@@ -832,11 +825,21 @@ function showAssetDialog( e , action ) {
 	      	 $('#mustVerifyEditId').val(ac.mustVerify)
 	      	 $('#isResolvedEditId').val(ac.isResolved)
 	      	 if(action == 'edit'){
-	      		commentChangeEdit('editResolveDiv','editCommentForm');
+	      		updateStatusSelect(ac.id);
+	      	    if(ac.assetEntity){
+	    		       updateWorkflowTransitions(ac.assetEntity.id, ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
+	    		}else{
+	    		       updateWorkflowTransitions('', ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
+	    		}
+				$('#successorEditId').html(params.successorTable)
+	            updateAssignedToList('assignedToEdit','assignedEditSpan',ac.id);
+				
+				commentChangeEdit('editResolveDiv','editCommentForm');
 		      	$("#editCommentDialog").dialog('option', 'width', 'auto')
 		      	$("#editCommentDialog").dialog('option', 'position', ['center','top']);
 		      	$("#editCommentDialog").dialog("open")
 		      	$("#showCommentDialog").dialog("close")
+		      	loadEditPredecessor(ac.id);
 	      	 } else if(action == 'show'){
 	      	 	$("#showCommentDialog").dialog('option', 'width', 'auto')
 	      	 	$("#showCommentDialog").dialog('option', 'position', ['center','top']);
@@ -1510,6 +1513,23 @@ function updateStatusSelect(taskId){
 		 onComplete:function(e){
 			 $('#statusEditTrId').html(e.responseText)
 		 }
+	})
+}
+function loadEditPredecessor(id){
+	new Ajax.Request('../assetEntity/loadPredecessor?id='+id,{asynchronous:true,evalScripts:true,
+		onLoading:function(){
+			$('#predecessorEditId').html('');
+			var processTab = jQuery('#processDiv');
+		    processTab.css("display", "table-row");
+		    $('#processingId').show();
+	    },
+	    onSuccess:function(e){
+	    	 var resp = e.responseText;
+	    	 if(resp.length > 0){
+		    	 $('#predecessorEditId').html(resp);
+		    	 $('#processingId').hide();
+	    	 }
+		}
 	})
 }
 

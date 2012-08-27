@@ -17,6 +17,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.RoleTypeGroup
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
 
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.SqlParameterSource
@@ -417,22 +418,27 @@ class TaskService {
 	 * @param task
 	 * @return
 	 */
-	def genSelectForTaskDependency(taskDependency, project=null, idPrefix='taskDependencyEditId', name='taskDependencyEdit') {
+	def genSelectForTaskDependency(taskDependency, assetComment, project=null, idPrefix='taskDependencyEditId', name='taskDependencyEdit') {
 		def predecessor = taskDependency.predecessor
 		def category = predecessor.category
 		
 		if (project==null) 
 			project = securityService.getUserCurrentProject()
 		def projectId = project.id
-		
-		def selectControl = new StringBuffer("""<select id="${idPrefix}_${taskDependency.id}" name="${name}">""")
-		String queryForPredecessor = "FROM AssetComment a WHERE a.project=${projectId} AND a.category='${category}' AND a.commentType='${AssetCommentType.TASK}' ORDER BY a.taskNumber DESC"
-		def predecessors = AssetComment.findAll(queryForPredecessor)
-		predecessors.each{
-			def selected = it.id == predecessor.id ?  'selected="selected"' : ''
-			selectControl.append("<option value='${it.id}' ${selected}>${it.toString()}</option>")
+		def assetForComment = assetComment.assetEntity
+		def moveEventForComment =  assetForComment ? assetForComment.moveBundle?.moveEvent : assetComment.moveEvent
+		def queryForPredecessor = new StringBuffer("""FROM AssetComment a WHERE a.project=${projectId} \
+															AND a.category='${category}'\
+														    AND a.commentType='${AssetCommentType.TASK}'\
+															AND a.id != ${assetComment.id} """)
+		if(moveEventForComment){
+			queryForPredecessor.append("AND (a.assetEntity.moveBundle.moveEvent.id = ${moveEventForComment?.id} OR a.moveEvent.id = ${moveEventForComment?.id})")
 		}
-		selectControl.append("</select>")
+		queryForPredecessor.append(""" ORDER BY a.taskNumber ASC""")
+		
+		def predecessors = AssetComment.findAll(queryForPredecessor.toString())
+		
+		def selectControl = HtmlUtil.genHtmlSelect("${idPrefix}_${taskDependency.id}", "${name}", "", predecessors, "id", "", predecessor.id)
 		return selectControl
 	}
 	

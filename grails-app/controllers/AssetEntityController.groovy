@@ -34,6 +34,7 @@ import com.tds.asset.Files
 import com.tds.asset.TaskDependency
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 
@@ -1846,22 +1847,6 @@ class AssetEntityController {
 			successorTable.append("""</tbody></table>""")
 		
 		}
-		def predEditTable = new StringBuffer("""<table id="predecessorEditTableId" cellspacing="0" style="border:0px;width:0px"><tbody>""")
-		taskDependencies.each{ taskDep ->
-			def predecessor = taskDep.predecessor
-			// log.info "showComment: predecessor=${predecessor}"
-			def selectCategory = new StringBuffer("<select id=\"predecessorCategoryEditId_${taskDep.id}\" name=\"category\" onChange='fillPredecessor(this.id,this.value,${assetComment.id})'>")
-			AssetComment.constraints.category.inList.each() {
-				def selected = it == predecessor.category ? 'selected="selected"' : ''
-				selectCategory.append("<option value=\"${it}\" ${selected}>${it}</option>")
-			}
-			selectCategory.append('</select>')
-			
-			def predFortask = taskService.genSelectForTaskDependency(taskDep)
-			
-			predEditTable.append("""<tr id="row_Edit_${taskDep.id}"><td>${selectCategory}</td><td id="taskDependencyEditTdId_${taskDep.id}">${predFortask}</td><td><a href="javascript:deleteRow('row_Edit_${taskDep.id}')"><span class="clear_filter"><u>X</u></span></a></td>""")
-			selectCategory = ""
-		}
 		def cssForCommentStatus = taskService.getCssClassForStatus(assetComment.status)
 		 
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
@@ -1869,7 +1854,7 @@ class AssetEntityController {
 			assetComment:assetComment, personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
 			dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo?:'', assetName:assetComment.assetEntity?.assetName ?: "",
 			eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate?:'', etStart:etStart?:'', etFinish:etFinish?:'',atStart:atStart,notes:notes,
-			workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,predEditTable:predEditTable,maxVal:maxVal,
+			workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,maxVal:maxVal,
 			cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1]
 		render commentList as JSON
 	}
@@ -3474,19 +3459,20 @@ class AssetEntityController {
 		String queryForPredecessor = "FROM AssetComment a WHERE a.project=${projectId} AND a.category='${params.category}' AND a.commentType='${AssetCommentType.TASK}' "
 		if(params.assetCommentId){ 
 			queryForPredecessor += "AND a.id != ${params.assetCommentId}"
+			def assetComment = AssetComment.get(params.assetCommentId)
+			def assetForComment = assetComment.assetEntity
+			def moveEventForComment =  assetForComment ? assetForComment.moveBundle?.moveEvent : assetComment.moveEvent
+			if(moveEventForComment){
+				queryForPredecessor += "AND (a.assetEntity.moveBundle.moveEvent.id = ${moveEventForComment?.id} OR a.moveEvent.id = ${moveEventForComment?.id})"
+			}
 		}
-		queryForPredecessor += "ORDER BY a.taskNumber DESC"
+		queryForPredecessor += "ORDER BY a.taskNumber ASC"
 		def prdecessors = AssetComment.findAll(queryForPredecessor)
 		def taskId = params.assetCommentId ? 'taskDependencyEditId' : 'taskDependencyId'
 	    def selectName = params.assetCommentId ? 'taskDependencyEdit' : 'taskDependencySave'
 		
-		def selectControl = new StringBuffer("""<select id="${taskId}" name="${selectName}" >""")
-		
-		prdecessors.each{
-			selectControl.append("<option value='${it.id}'>${it.toString()}</option>")
-		}
-		
-		selectControl.append("</select>")
+		def selectControl = HtmlUtil.genHtmlSelect("${taskId}", "${selectName}", "", prdecessors, "id", "", "")
+
 		render selectControl
 	}
 	/**
@@ -3549,4 +3535,27 @@ class AssetEntityController {
 		
 		render statusSelect
 	  }
+	
+	/**
+	 * Loads List of predecessors HTML SELECT control for the AssetComment at editing time
+	 * @param	params.id	The ID of the AssetComment to load  predecessor SELECT for
+	 * @return render HTML
+	 */
+	def loadPredecessor = {
+		def assetComment = AssetComment.get(params.id)
+		def taskDependencies = assetComment.taskDependencies
+		def predEditTable = new StringBuffer("""<table id="predecessorEditTableId" cellspacing="0" style="border:0px;width:0px"><tbody>""")
+		taskDependencies.each{ taskDep ->
+			def predecessor = taskDep.predecessor
+			def optionList = AssetComment.constraints.category.inList.toList()
+			
+			// To get html select from HtmlUtil class
+			def selectCategory = HtmlUtil.genHtmlSelect("predecessorCategoryEditId_${taskDep.id}", "category", "onChange='fillPredecessor(this.id,this.value,${assetComment.id})'", optionList, "", "", predecessor.category)
+			
+			def predFortask = taskService.genSelectForTaskDependency(taskDep, assetComment)
+			predEditTable.append("""<tr id="row_Edit_${taskDep.id}"><td>${selectCategory}</td><td id="taskDependencyEditTdId_${taskDep.id}">${predFortask}</td><td><a href="javascript:deleteRow('row_Edit_${taskDep.id}')"><span class="clear_filter"><u>X</u></span></a></td>""")
+			selectCategory = ""
+		}
+		render predEditTable
+	}
 }

@@ -169,8 +169,7 @@
    <tds:hasPermission permission='CommentCrudView'>
 	<div class="buttons">
 	<span class="button">
-	<input class="edit" type="button" value="Edit"
-      onclick="commentChangeEdit('editResolveDiv','editCommentForm');$('#editCommentDialog').dialog('option', 'width', 'auto');$('#editCommentDialog').dialog('option', 'position', ['center','top']);$('#createCommentDialog').dialog('close');$('#showCommentDialog').dialog('close');$('#editCommentDialog').dialog('open');$('#showDialog').dialog('close');$('#editDialog').dialog('close');$('#createDialog').dialog('close')" />
+	<input class="edit" type="button" value="Edit" id="commentButtonEditId" />
 	</span>
 	<span class="button"> <input class="delete" type="button" value="Delete"
 	 onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment',controller:'assetEntity', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'never\')')}" />
@@ -450,6 +449,13 @@
 			</td>
 			<td id="relatedIssueEditId">
 			</td>
+		</tr>
+		
+		<tr id="processDiv" style="display: none;" >
+		<td></td>
+		 <td colspan="4" >
+			<img id="processingId" src="../images/processing.gif" />
+		 </td>
 		</tr>
         <tr class="prop" id="predecessorTrEditId" style="display: none">
 			<td valign="top" class="name"></td>
