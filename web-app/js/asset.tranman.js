@@ -1500,7 +1500,7 @@ function fillPredecessor(id, category,commentId){
 }
 function updateAssignedToList(forView,span,id){
 	new Ajax.Request('../assetEntity/updateAssignedToSelect?forView='+forView+'&id='+id,{
-		asynchronous:false, evalScripts:true,
+		asynchronous:true, evalScripts:true,
 		onSuccess:function(e){
 			$('#'+span).html(e.responseText)
 		},
@@ -1510,16 +1510,16 @@ function updateAssignedToList(forView,span,id){
 	})
 }
 function updateStatusSelect(taskId){
-	new Ajax.Request('../assetEntity/updateStatusSelect?id='+taskId,{asynchronous:false,evalScripts:true,
+	new Ajax.Request('../assetEntity/updateStatusSelect?id='+taskId,{asynchronous:true,evalScripts:true,
 		 onComplete:function(e){
 			 $('#statusEditTrId').html(e.responseText)
 		 }
 	})
 }
 function loadEditPredecessor(id){
+	$('#predecessorEditId').html('');
 	new Ajax.Request('../assetEntity/loadPredecessor?id='+id,{asynchronous:true,evalScripts:true,
 		onLoading:function(){
-			$('#predecessorEditId').html('');
 			var processTab = jQuery('#processDiv');
 		    processTab.css("display", "table-row");
 		    $('#processingId').show();
