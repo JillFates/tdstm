@@ -438,7 +438,7 @@ class TaskService {
 		
 		def predecessors = AssetComment.findAll(queryForPredecessor.toString())
 		
-		def selectControl = HtmlUtil.genHtmlSelect("${idPrefix}_${taskDependency.id}", "${name}", "", predecessors, "id", "", predecessor.id)
+		def selectControl = HtmlUtil.genHtmlSelect("${idPrefix}_${taskDependency.id}", "${name}", "", predecessors, "id", "", predecessor.id, "")
 		return selectControl
 	}
 	

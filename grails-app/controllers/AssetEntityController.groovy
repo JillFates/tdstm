@@ -3439,11 +3439,7 @@ class AssetEntityController {
 		}
 		def selectControl = ''
 		if(workFlowTransition.size()){
-			selectControl = new StringBuffer("""<select id="workFlowId" name="workFlow">""")
-			workFlowTransition.each{
-				selectControl.append("<option value='${it.id}'>${it.name}</option>")
-			}
-			selectControl.append("</select>")
+			selectControl = HtmlUtil.genHtmlSelect("workFlowId", "workFlow", "", workFlowTransition, "id", "name", "","")
 		}
 		render selectControl
 	}
@@ -3471,7 +3467,7 @@ class AssetEntityController {
 		def taskId = params.assetCommentId ? 'taskDependencyEditId' : 'taskDependencyId'
 	    def selectName = params.assetCommentId ? 'taskDependencyEdit' : 'taskDependencySave'
 		
-		def selectControl = HtmlUtil.genHtmlSelect("${taskId}", "${selectName}", "", prdecessors, "id", "", "")
+		def selectControl = HtmlUtil.genHtmlSelect("${taskId}", "${selectName}", "", prdecessors, "id", "", "", "")
 
 		render selectControl
 	}
@@ -3499,17 +3495,9 @@ class AssetEntityController {
 		if (person) selectedId = person.id
 		//log.debug "updateAssignedToSelect(): id=${params.id}, person=${person}, selectedId=${selectedId}" 
 
-		def assignedToSelect = new StringBuffer("""<SELECT ID="${viewId}" NAME="${viewId}" >""")
 		def projectStaff = partyRelationshipService.getProjectStaff( projectId )?.staff
 		projectStaff.sort{it.firstName}
-		def selected
-		projectStaff.each{
-			// log.info "updateAssignedToSelect: id=${it.id}, name=${it.toString()}"
-			selected = it.id == selectedId ? selected = 'SELECTED' : ''
-			assignedToSelect.append("<OPTION VALUE='${it.id}' ${selected}>${it.toString()}</OPTION>")
-		}
-		assignedToSelect.append("</SELECT>")
-		
+		def assignedToSelect = HtmlUtil.genHtmlSelect("${viewId}", "${viewId}", "", projectStaff, "id", "", selectedId, "")
 		render assignedToSelect
 	}
 	/**
@@ -3524,14 +3512,7 @@ class AssetEntityController {
 		def status = AssetComment.read(params.id)?.status ?: '*EMPTY*'
 		def optionList = optionForRole.get(status)
 		def selected
-		// TODO : NO MORE BUILDING SELECT CONTROLLERS - Refactor this into HtmlUtil utility class.
-		def statusSelect = new StringBuffer("""<SELECT ID="statusEditId" NAME="statusEdit" onChange="showResolve(this.value)" >""")
-		statusSelect.append("""<OPTION VALUE="">Please select</OPTION>""")
-		optionList.each{
-			selected = it == status ? 'SELECTED' : ''
-			statusSelect.append("<OPTION VALUE=\"${it}\" ${selected}>${it}</OPTION>")
-		}
-		statusSelect.append("</SELECT>")
+		def statusSelect = HtmlUtil.genHtmlSelect("statusEditId", "statusEditId", "onChange='showResolve(this.value)'", optionList, "", "", status, "Please select")
 		
 		render statusSelect
 	  }
@@ -3550,7 +3531,7 @@ class AssetEntityController {
 			def optionList = AssetComment.constraints.category.inList.toList()
 			
 			// To get html select from HtmlUtil class
-			def selectCategory = HtmlUtil.genHtmlSelect("predecessorCategoryEditId_${taskDep.id}", "category", "onChange='fillPredecessor(this.id,this.value,${assetComment.id})'", optionList, "", "", predecessor.category)
+			def selectCategory = HtmlUtil.genHtmlSelect("predecessorCategoryEditId_${taskDep.id}", "category", "onChange='fillPredecessor(this.id,this.value,${assetComment.id})'", optionList, "", "", predecessor.category, "")
 			
 			def predFortask = taskService.genSelectForTaskDependency(taskDep, assetComment)
 			predEditTable.append("""<tr id="row_Edit_${taskDep.id}"><td>${selectCategory}</td><td id="taskDependencyEditTdId_${taskDep.id}">${predFortask}</td><td><a href="javascript:deleteRow('row_Edit_${taskDep.id}')"><span class="clear_filter"><u>X</u></span></a></td>""")
