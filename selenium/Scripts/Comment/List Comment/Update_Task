@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://localhost:8080/" />
+<title>UpdateTask</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">UpdateTask</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>/tdstm/auth/login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=usernameId</td>
+	<td>john</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>password</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>css=input[type=&quot;submit&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Manage Tasks</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Manage Tasks</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Manage Tasks</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Show Resolved :</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Show My Issues :</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.0</td>
+	<td>Actions</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.1</td>
+	<td>Task</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.2</td>
+	<td>Description</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.3</td>
+	<td>Updated</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.4</td>
+	<td>Due</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.6</td>
+	<td>Status</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.7</td>
+	<td>Assigned To</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.9</td>
+	<td>Asset</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.10</td>
+	<td>AssetType</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.11</td>
+	<td>category</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>id=tag.3.2</td>
+	<td>desc</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>id=tag.3.1</td>
+	<td>taskNumber</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>id=tag.3.4</td>
+	<td>duedate</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>id=tag.3.6</td>
+	<td>status</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>id=tag.3.7</td>
+	<td>assignedTo</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=assetShowId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>id=tag.3.9</td>
+	<td>assetName</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=#tag_row1 &gt; td &gt; a &gt; img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=assignedToEditTdId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>id=commentEditId</td>
+	<td>${desc}</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>css=#taskNumberSpanEditId &gt; b</td>
+	<td>${taskNumber}</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//tr[@id='processDiv']/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Save and view']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=showCommentTable.6.1</td>
+	<td>${assetName}</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>id=assignedToTdId</td>
+	<td>${assignedTo}</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[12]/div/a/span</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
