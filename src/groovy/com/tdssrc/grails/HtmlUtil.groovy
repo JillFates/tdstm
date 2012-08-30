@@ -13,15 +13,16 @@ class HtmlUtil {
 	 * @return String	HTML selectBox
 	 */
 	
-	def public static genHtmlSelect(def selectId, def selectName, def jsEvent, List from, def optionKey, def optionValue, def selection, def noSelectionString){
-		def select = new StringBuffer("<select id=\"${selectId}\" name=\"${selectName}\"  ${jsEvent}>")
-		if(noSelectionString){
-			select.append("<option value=\"\">${noSelectionString}</option>")
+	def public static genHtmlSelect(def paramMap){
+		def jsEvent = paramMap.jsEvent ? paramMap.jsEvent : ""
+		def select = new StringBuffer("<select id=\"${paramMap.selectId}\" name=\"${paramMap.selectName}\"  ${jsEvent}>")
+		if(paramMap.noSelectionString){
+			select.append("<option value=\"${paramMap.noSelectionString.key}\">${paramMap.noSelectionString.value}</option>")
 		}
-		from.each(){
-			def key = optionKey ? it."${optionKey}" : it
-			def value = optionValue ? it."${optionValue}" : it
-			def selected = key == selection ? 'selected="selected"' : ''
+		paramMap.from.each(){
+			def key = paramMap.optionKey ? it."${paramMap.optionKey}" : it
+			def value = paramMap.optionValue ? it."${paramMap.optionValue}" : it
+			def selected = key == paramMap.selection ? 'selected="selected"' : ''
 			select.append("<option value=\"${key}\" ${selected} >${value}</option>")
 		}
 		select.append('</select>')

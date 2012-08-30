@@ -437,8 +437,9 @@ class TaskService {
 		queryForPredecessor.append(""" ORDER BY a.taskNumber ASC""")
 		
 		def predecessors = AssetComment.findAll(queryForPredecessor.toString())
-		
-		def selectControl = HtmlUtil.genHtmlSelect("${idPrefix}_${taskDependency.id}", "${name}", "", predecessors, "id", "", predecessor.id, "")
+		def paramsMap = ["selectId":"${idPrefix}_${taskDependency.id}", "selectName":"${name}", "from":predecessors,
+							 "optionKey":"id", "selection":predecessor.id]
+		def selectControl = HtmlUtil.genHtmlSelect( paramsMap )
 		return selectControl
 	}
 	

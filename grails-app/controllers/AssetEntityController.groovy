@@ -3439,7 +3439,8 @@ class AssetEntityController {
 		}
 		def selectControl = ''
 		if(workFlowTransition.size()){
-			selectControl = HtmlUtil.genHtmlSelect("workFlowId", "workFlow", "", workFlowTransition, "id", "name", "","")
+			def paramsMap = ["selectId":"workFlowId", "selectName":"workFlow", "from":workFlowTransition, "optionKey":"id", "optionValue":"name"]
+			selectControl = HtmlUtil.genHtmlSelect( paramsMap )
 		}
 		render selectControl
 	}
@@ -3466,8 +3467,8 @@ class AssetEntityController {
 		def prdecessors = AssetComment.findAll(queryForPredecessor)
 		def taskId = params.assetCommentId ? 'taskDependencyEditId' : 'taskDependencyId'
 	    def selectName = params.assetCommentId ? 'taskDependencyEdit' : 'taskDependencySave'
-		
-		def selectControl = HtmlUtil.genHtmlSelect("${taskId}", "${selectName}", "", prdecessors, "id", "", "", "")
+		def paramsMap = ["selectId":"${taskId}", "selectName":"${selectName}", "from":prdecessors,  "optionKey":"id"]
+		def selectControl = HtmlUtil.genHtmlSelect( paramsMap )
 
 		render selectControl
 	}
@@ -3497,7 +3498,8 @@ class AssetEntityController {
 
 		def projectStaff = partyRelationshipService.getProjectStaff( projectId )?.staff
 		projectStaff.sort{it.firstName}
-		def assignedToSelect = HtmlUtil.genHtmlSelect("${viewId}", "${viewId}", "", projectStaff, "id", "", selectedId, "")
+		def paramsMap = ["selectId":"${viewId}", "selectName":"${viewId}", "from":projectStaff, "optionKey":"id", "selection":selectedId ]
+		def assignedToSelect = HtmlUtil.genHtmlSelect( paramsMap )
 		render assignedToSelect
 	}
 	/**
@@ -3512,7 +3514,9 @@ class AssetEntityController {
 		def status = AssetComment.read(params.id)?.status ?: '*EMPTY*'
 		def optionList = optionForRole.get(status)
 		def selected
-		def statusSelect = HtmlUtil.genHtmlSelect("statusEditId", "statusEditId", "onChange='showResolve(this.value)'", optionList, "", "", status, "Please select")
+		def paramsMap = ["selectId":"statusEditId", "selectName":"statusEditId", "jsEvent":"onChange='showResolve(this.value)'", 
+							"from":optionList, "selection":status, "noSelectionString":["key":"", 'value':"Please Select"]]
+		def statusSelect = HtmlUtil.genHtmlSelect( paramsMap )
 		
 		render statusSelect
 	  }
@@ -3529,12 +3533,15 @@ class AssetEntityController {
 		taskDependencies.each{ taskDep ->
 			def predecessor = taskDep.predecessor
 			def optionList = AssetComment.constraints.category.inList.toList()
-			
+			def paramsMap = ["selectId":"predecessorCategoryEditId_${taskDep.id}", "selectName":"category", "from":optionList, 
+                             	"jsEvent":"onChange='fillPredecessor(this.id,this.value,${assetComment.id})'", "selection":predecessor.category]
 			// To get html select from HtmlUtil class
-			def selectCategory = HtmlUtil.genHtmlSelect("predecessorCategoryEditId_${taskDep.id}", "category", "onChange='fillPredecessor(this.id,this.value,${assetComment.id})'", optionList, "", "", predecessor.category, "")
+			def selectCategory = HtmlUtil.genHtmlSelect(paramsMap)
 			
 			def predFortask = taskService.genSelectForTaskDependency(taskDep, assetComment)
-			predEditTable.append("""<tr id="row_Edit_${taskDep.id}"><td>${selectCategory}</td><td id="taskDependencyEditTdId_${taskDep.id}">${predFortask}</td><td><a href="javascript:deleteRow('row_Edit_${taskDep.id}')"><span class="clear_filter"><u>X</u></span></a></td>""")
+			predEditTable.append("""<tr id="row_Edit_${taskDep.id}"><td>${selectCategory}</td>
+										<td id="taskDependencyEditTdId_${taskDep.id}">${predFortask}</td>
+										<td><a href="javascript:deleteRow('row_Edit_${taskDep.id}')"><span class="clear_filter"><u>X</u></span></a></td>""")
 			selectCategory = ""
 		}
 		render predEditTable
