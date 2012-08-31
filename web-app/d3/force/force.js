@@ -6,8 +6,6 @@ var file_name = "schedule.json";
 d3.json("../d3/force/"+file_name, function(json) {
 	var vis = d3.select("div#item1")
 			  .append("svg:svg")
-			  .attr("width", json.width)
-			  .attr("height", json.height)
 			  .attr("style",graphstyle);
 	
 	var force = self.force = d3.layout.force()
