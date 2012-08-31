@@ -1,7 +1,7 @@
 var graphstyle = "top:-120;z-index:-1;",
 	r = 5,
 	fill = d3.scale.category20();
-
+var file_name = "schedule.json";
 			
 d3.json("../d3/force/"+file_name, function(json) {
 	var vis = d3.select("div#item1")
