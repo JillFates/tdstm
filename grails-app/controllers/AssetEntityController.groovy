@@ -1825,7 +1825,7 @@ class AssetEntityController {
 			}
 			
 			def predecessorTable = ""
-			def taskDependencies = assetComment.taskDependencies
+					def taskDependencies = assetComment.taskDependencies.sort{ it.predecessor.taskNumber }
 			//taskDependencies.sort{ it.predecessor.taskNumber }
 			if (taskDependencies.size() > 0) {
 				predecessorTable = new StringBuffer('<table cellspacing="0" style="border:0px;"><tbody>')
@@ -1837,7 +1837,7 @@ class AssetEntityController {
 			    }
 				predecessorTable.append('</tbody></table>')
 			}
-			def taskSuccessors = TaskDependency.findAllByPredecessor( assetComment )
+			def taskSuccessors = TaskDependency.findAllByPredecessor( assetComment ).sort{ it.assetComment.taskNumber }
 			def successorTable = ""
 			if (taskSuccessors.size() > 0) {
 				successorTable = new StringBuffer('<table  cellspacing="0" style="border:0px;" ><tbody>')

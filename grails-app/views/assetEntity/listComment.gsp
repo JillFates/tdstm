@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
 <meta name="layout" content="projectHeader" />
-        <title>Manage Tasks</title>
+        <title>Task Manager</title>
          <g:javascript src="asset.tranman.js" />
           <g:javascript src="entity.crud.js" />
         <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
@@ -43,7 +43,7 @@
 <body>
 	<div class="body">
 		<div class="body">
-			<h1>Manage Tasks</h1>
+			<h1>Task Manager</h1>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
@@ -68,7 +68,7 @@
 				</g:else>
 				</span>
 				<br></br>
-				<jmesa:tableFacade id="tag" items="${assetCommentList}" maxRows="25" stateAttr="restore" var="commentInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100" >
+				<jmesa:tableFacade id="tag" items="${assetCommentList}" maxRows="50" stateAttr="restore" var="commentInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100" >
 					<jmesa:htmlTable style=" border-collapse: separate" editable="true">
 						<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
 							<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" nowrap>

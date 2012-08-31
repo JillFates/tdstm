@@ -1,6 +1,5 @@
 <div class="menu4">
 	<ul>
-		<li><g:link class="mobmenu" controller="clientTeams" >Teams</g:link></li>
 		<g:if test="${tab && tab == 'todo'}">
 			<li><g:link elementId="taskLinkId"  class="mobmenu mobselect" action="listComment" params='["tab":"todo","search":search]'>My Tasks: ${todoSize}</g:link></li>
 			<li><g:link elementId="taskLinkAllId"  class="mobmenu" action="listComment" params='["tab":"all","search":search]'>All Tasks: ${allSize}</g:link></li>
