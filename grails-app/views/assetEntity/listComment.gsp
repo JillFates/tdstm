@@ -51,7 +51,7 @@
 			<div>
 			<input type="hidden" id="manageTaskId" value="manageTask"/>
 			<form name="commentForm" id="commentForm" action="listComment">
-			<span > <b>Show Resolved : </b>
+			<span > <b>Include Completed : </b>
 				<g:if test="${checked=='on'}">
 					<input type="checkBox" name="resolvedBox" id="myResolvedBox"  checked="checked"  onclick="$('#commentForm').submit();"  />
 				</g:if>

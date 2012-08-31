@@ -2952,34 +2952,37 @@ class AssetEntityController {
 		
 		switch(action){
 			case "issue":
-				def isResolved = params.resolvedBox != "on" ? 0 : 1
-				assetCommentQuery += " and a.assignedTo = :assignedTo and isResolved = :isResolved"
-				args << [ assignedTo:personInstance, isResolved:isResolved ]
-			break;
+				if(params.resolvedBox == "on" ) {
+					assetCommentQuery += " and a.assignedTo = :assignedTo "
+					args << [ assignedTo:personInstance]
+				} else {
+					assetCommentQuery += " and a.assignedTo = :assignedTo and status != :status"
+					args << [ assignedTo:personInstance, status:AssetCommentStatus.COMPLETED]
+				}
+				break
 			case "openIssue" :
-				assetCommentQuery += " and a.isResolved = :isResolved and category = :category"
-				args << [ isResolved:0, category:"discovery" ]
-			break;
+				assetCommentQuery += " and a.status != :status and category = :category"
+				args << [ status:AssetCommentStatus.COMPLETED, category:"discovery" ]
+				break
 			case "generalOverDue" :
-				assetCommentQuery += " and category in ('general','planning') and a.dueDate < :dueDate and a.isResolved = :isResolved"
-				args << [ dueDate:today, isResolved:0 ]
-			break;
+				assetCommentQuery += " and category in ('general','planning') and a.dueDate < :dueDate and a.status != :status"
+				args << [ dueDate:today, status:AssetCommentStatus.COMPLETED ]
+				break
 			case "Discovery" :
 				assetCommentQuery += " and a.category= :category "
 				args << [ category:"discovery"]
-			break;
+				break
 			case "dueOpenIssue" :
 				assetCommentQuery += " and a.category= :category and a.dueDate < :dueDate"
 				args << [ category:"discovery", dueDate:today]
-			break;
+				break
 			case "resolved" :
-				assetCommentQuery += " and isResolved = :isResolved "
-				args << [ isResolved:1 ]
-			break
+				// DO Nothing
+				break
 			default :
-				assetCommentQuery += " and isResolved = :isResolved "
-				args << [ isResolved:0 ]
-			break;
+				assetCommentQuery += " and status != :status "
+				args << [ status:AssetCommentStatus.COMPLETED ]
+				break
 		}
 		
 		assetCommentQuery += " ORDER BY score DESC, taskNumber ASC, dueDate ASC, dateCreated DESC"
