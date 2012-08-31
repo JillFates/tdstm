@@ -1779,83 +1779,90 @@ class AssetEntityController {
 		def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def assetComment = AssetComment.get(params.id)
-		if(assetComment.createdBy){
-			personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")
-			dtCreated = estformatter.format(GormUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
-		}
-		if(assetComment.resolvedBy){
-			personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")
-			dtResolved = estformatter.format(GormUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
-		}
-		if(assetComment.estStart){
-			etStart = estformatter.format(GormUtil.convertInToUserTZ(assetComment.estStart, tzId));
-		}
-		if(assetComment.estFinish){
-			etFinish = estformatter.format(GormUtil.convertInToUserTZ(assetComment.estFinish, tzId));
-		}
-		if(assetComment.actStart){
-			atStart = estformatter.format(GormUtil.convertInToUserTZ(assetComment.actStart, tzId));
-		}
-		if(assetComment.dueDate){
-			dueDate = dateFormatter.format(assetComment.dueDate);
-		}
-
-		def workflowTransition = assetComment?.workflowTransition
-		def workflow = workflowTransition?.name
-		
-		def noteList = assetComment.notes.sort{it.dateCreated}
-		def notes = []
-		noteList.each {
-			def dateCreated = it.dateCreated.format("E, d MMM 'at ' HH:mma")
-			notes << [ dateCreated , it.createdBy.toString() ,it.note]
-		}
-		
-		// Get the name of the User Role by Name to display
-		def roles = securityService.getRoleName(assetComment.role)
-		
-		// TODO : Runbook : the use of maxVal is incorrect.  I believe that this is for the max assetComment.taskNumber but is getting taskDependency.id. This fails
-		// when there are no taskDependencies as Null gets incremented down in the map return.  Plus the property should be completely calculated here instead of incrementing
-		// while assigning in the map.  Logic should test for null.
-		def maxVal = TaskDependency.list([sort:'id',order:'desc',max:1])?.id[0]
-		if (maxVal) {
-			maxVal++
-		} else {
-			maxVal = 1
-		}
-		
-		def predecessorTable = ""
-		def taskDependencies = assetComment.taskDependencies
-		if (taskDependencies.size() > 0) {
-			predecessorTable = new StringBuffer('<table cellspacing="0" style="border:0px;"><tbody>')
-			taskDependencies.each() { taskDep ->
-				def task = taskDep.predecessor
-				def css = taskService.getCssClassForStatus(task.status)
-				def taskDesc = task.comment?.length()>50 ? task.comment.substring(0,50): task.comment
-				predecessorTable.append("""<tr class="${css}" style="cursor:pointer;" onClick="showAssetComment(${task.id}, 'show')"><td>${task.category}</td><td>${task.taskNumber ? task.taskNumber+':' :''}${taskDesc}</td></tr>""")
-		    }
-			predecessorTable.append('</tbody></table>')
-		}
-		def taskSuccessors = TaskDependency.findAllByPredecessor( assetComment )
-		def successorTable = ""
-		if (taskSuccessors.size() > 0) {
-			successorTable = new StringBuffer('<table  cellspacing="0" style="border:0px;" ><tbody>')
-			taskSuccessors.each() { successor ->
-				def task = successor.assetComment
-				def css = taskService.getCssClassForStatus(task.status)
-				successorTable.append("""<tr class="${css}" style="cursor:pointer;" onClick="showAssetComment(${task.id}, 'show')"><td>${task.category}</td><td>${task}</td>""")
+		if(assetComment){
+			if(assetComment.createdBy){
+				personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")
+				dtCreated = estformatter.format(GormUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
 			}
-			successorTable.append("""</tbody></table>""")
-		
-		}
-		def cssForCommentStatus = taskService.getCssClassForStatus(assetComment.status)
+			if(assetComment.resolvedBy){
+				personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")
+				dtResolved = estformatter.format(GormUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
+			}
+			if(assetComment.estStart){
+				etStart = estformatter.format(GormUtil.convertInToUserTZ(assetComment.estStart, tzId));
+			}
+			if(assetComment.estFinish){
+				etFinish = estformatter.format(GormUtil.convertInToUserTZ(assetComment.estFinish, tzId));
+			}
+			if(assetComment.actStart){
+				atStart = estformatter.format(GormUtil.convertInToUserTZ(assetComment.actStart, tzId));
+			}
+			if(assetComment.dueDate){
+				dueDate = dateFormatter.format(assetComment.dueDate);
+			}
+	
+			def workflowTransition = assetComment?.workflowTransition
+			def workflow = workflowTransition?.name
+			
+			def noteList = assetComment.notes.sort{it.dateCreated}
+			def notes = []
+			noteList.each {
+				def dateCreated = it.dateCreated.format("E, d MMM 'at ' HH:mma")
+				notes << [ dateCreated , it.createdBy.toString() ,it.note]
+			}
+			
+			// Get the name of the User Role by Name to display
+			def roles = securityService.getRoleName(assetComment.role)
+			
+			// TODO : Runbook : the use of maxVal is incorrect.  I believe that this is for the max assetComment.taskNumber but is getting taskDependency.id. This fails
+			// when there are no taskDependencies as Null gets incremented down in the map return.  Plus the property should be completely calculated here instead of incrementing
+			// while assigning in the map.  Logic should test for null.
+			def maxVal = TaskDependency.list([sort:'id',order:'desc',max:1])?.id[0]
+			if (maxVal) {
+				maxVal++
+			} else {
+				maxVal = 1
+			}
+			
+			def predecessorTable = ""
+			def taskDependencies = assetComment.taskDependencies
+			//taskDependencies.sort{ it.predecessor.taskNumber }
+			if (taskDependencies.size() > 0) {
+				predecessorTable = new StringBuffer('<table cellspacing="0" style="border:0px;"><tbody>')
+				taskDependencies.each() { taskDep ->
+					def task = taskDep.predecessor
+					def css = taskService.getCssClassForStatus(task.status)
+					def taskDesc = task.comment?.length()>50 ? task.comment.substring(0,50): task.comment
+					predecessorTable.append("""<tr class="${css}" style="cursor:pointer;" onClick="showAssetComment(${task.id}, 'show')"><td>${task.category}</td><td>${task.taskNumber ? task.taskNumber+':' :''}${taskDesc}</td></tr>""")
+			    }
+				predecessorTable.append('</tbody></table>')
+			}
+			def taskSuccessors = TaskDependency.findAllByPredecessor( assetComment )
+			def successorTable = ""
+			if (taskSuccessors.size() > 0) {
+				successorTable = new StringBuffer('<table  cellspacing="0" style="border:0px;" ><tbody>')
+				taskSuccessors.each() { successor ->
+					def task = successor.assetComment
+					def css = taskService.getCssClassForStatus(task.status)
+					successorTable.append("""<tr class="${css}" style="cursor:pointer;" onClick="showAssetComment(${task.id}, 'show')"><td>${task.category}</td><td>${task}</td>""")
+				}
+				successorTable.append("""</tbody></table>""")
+			
+			}
+			def cssForCommentStatus = taskService.getCssClassForStatus(assetComment.status)
 		 
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
-		commentList << [ 
-			assetComment:assetComment, personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
-			dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo?:'', assetName:assetComment.assetEntity?.assetName ?: "",
-			eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate?:'', etStart:etStart?:'', etFinish:etFinish?:'',atStart:atStart,notes:notes,
-			workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,maxVal:maxVal,
-			cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1]
+			commentList << [ 
+				assetComment:assetComment, personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
+				dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo?:'', assetName:assetComment.assetEntity?.assetName ?: "",
+				eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate?:'', etStart:etStart?:'', etFinish:etFinish?:'',atStart:atStart,notes:notes,
+				workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,maxVal:maxVal,
+				cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1]
+		}else{
+		 def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - ${params.id} "
+		 log.error "showComment: show comment view - "+errorMsg
+		 commentList << [error:errorMsg]
+		}
 		render commentList as JSON
 	}
 	/* ----------------------------------------------------------------
@@ -1900,15 +1907,19 @@ class AssetEntityController {
 	def deleteComment = {
 		// TODO - SECURITY - deleteComment - verify that the asset is part of a project that the user has the rights to delete the note
 		def assetCommentInstance = AssetComment.get(params.id)
+		
 		if(assetCommentInstance){
-			assetCommentInstance.delete(flush:true)
+			def taskDependency = TaskDependency.executeUpdate("delete from TaskDependency td where td.assetComment = ${assetCommentInstance.id} OR td.predecessor = ${assetCommentInstance.id}")
+			assetCommentInstance.delete()
 		}
 		// TODO - deleteComment - Need to be fixed to handle non-asset type comments
-		def assetEntityInstance = AssetEntity.get( params.assetEntity )
-		def assetCommentsInstance = AssetComment.findAllByAssetEntityAndIdNotEqual( assetEntityInstance, params.id )
 		def assetCommentsList = []
-		assetCommentsInstance.each {
-			assetCommentsList <<[ commentInstance : it, assetEntityId : it.assetEntity.id ]
+		if(params.assetEntity){
+			def assetEntityInstance = AssetEntity.get( params.assetEntity )
+			def assetCommentsInstance = AssetComment.findAllByAssetEntityAndIdNotEqual( assetEntityInstance, params.id )
+			assetCommentsInstance.each {
+				assetCommentsList <<[ commentInstance : it, assetEntityId : it.assetEntity.id ]
+			}
 		}
 		render assetCommentsList as JSON
 	}

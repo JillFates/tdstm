@@ -47,6 +47,7 @@
  */
 --%>
 <div id="showCommentDialog" title="Comment/Issue detail" style="display: none;">
+    <input id="assetEntityIdShow" type="hidden" value=""/>
 	<div class="dialog" style="border: 1px solid #5F9FCF"><input name="id" value="" id="commentId" type="hidden" />
 	<div>
 	<table id="showCommentTable" style="border: 0px;">
@@ -171,8 +172,14 @@
 	<span class="button">
 	<input class="edit" type="button" value="Edit" id="commentButtonEditId" />
 	</span>
-	<span class="button"> <input class="delete" type="button" value="Delete"
-	 onclick="var booConfirm = confirm('Are you sure?');if(booConfirm)${remoteFunction(action:'deleteComment',controller:'assetEntity', params:'\'id=\' + $(\'#commentId\').val() +\'&assetEntity=\'+$(\'#createAssetCommentId\').val() ', onComplete:'listCommentsDialog(e,\'never\')')}" />
+	<span class="button"> 
+	<span id="fromAssetId"> <input class="delete" type="button" value="Delete"
+		 onclick="deleteComment('#commentId','#assetEntityIdShow','update')"/>
+	</span>
+	<span id="fromMoveEventId" style="display: none">
+	 <input class="delete" type="button" value="Delete"
+		 onclick="deleteComment('#commentId','#assetEntityIdShow','refresh')" />
+	</span>
 	</span>
 	</div>
    </tds:hasPermission>

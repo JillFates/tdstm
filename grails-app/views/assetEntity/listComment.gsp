@@ -49,6 +49,7 @@
 			</g:if>
 			<div>
 			<div>
+			<input type="hidden" id="manageTaskId" value="manageTask"/>
 			<form name="commentForm" id="commentForm" action="listComment">
 			<span > <b>Show Resolved : </b>
 				<g:if test="${checked=='on'}">

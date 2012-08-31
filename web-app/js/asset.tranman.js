@@ -635,221 +635,233 @@ function showAssetDialog( e , action ) {
 		$("#createCommentDialog").dialog("close")
 		var assetComments = eval('(' + e.responseText + ')');
 		if (assetComments) {
-			
 			var params = assetComments[0]
-			var ac = params.assetComment
-			
-			if(ac.comment == null) {
-				ac.comment = "";
-			}
-			if(ac.resolution == null){
-				ac.resolution = "";
-			}
-			 $('#commentId').val(ac.id)
-			 $('#predCount').val(params.maxVal)
-			 $('#updateCommentId').val(ac.id)
-	      	 $('#commentTdId').val(ac.comment) 
-	      	 $('#commentTypeTdId').html(ac.commentType)
-	      	 $('#mustVerifyShowId').val(ac.mustVerify)
-	      	 $('#isResolvedId').val(ac.isResolved)
-	      	 $('#categoryTdId').html(ac.category)
-	      	 $('#commentCodeTdId').html(ac.commentCode)
-	      	 $('#assetShowValueId').html(params.assetName)
-		     $('#assetTrShowId').html(params.assetName)
-		     $('#eventShowValueId').html(params.eventName)
-		     
-		     
-	      	 if(ac.commentType=='issue'){
-	      		 if(ac.resolution || ac.status=='Completed'){
-	      		   $('#resolutionEditTrId').css('display','table-row')
-	      		 }else{
-	      			 $('#resolutionEditTrId').css('display','none')
-	      		}
-	      		 if(params.assignedTo){
-			      	 $('#assignedToTdId').html(params.assignedTo.firstName + " " + params.assignedTo.lastName)
-			      	 $('#assignedToEdit').val(params.assignedTo.id)
-	      		 }
-	      		 var notes = params.notes
-	      		 var noteTable = '<table style="border:0px">'
-      		     for(i=0; i<params.notes.length; i++){
-      		    	 if (i>0) {
-      		    		 noteTable += ""
-      		    	 }
-      		    	 noteTable += "<tr><td>" + notes[i][0] + "</td><td>" + notes[i][1] + "</td><td><span>" + notes[i][2] + "</span></td></tr>"
-      		    	 }
-      		     noteTable += "</table>"
-      		     if(params.predecessorTable.length==0 && params.successorTable.length==0){ 
-      		    	 $('#predecessorShowTr').css('display','none')
-      		     }else{
-      		    	$('#predecessorShowTr').css('display','table-row')
-      		     }
-      		     $('#statuWarnId').val(params.statusWarn)
-                 $('#predecessorShowTd').html(params.predecessorTable)
-                 var taskNumber = ac.taskNumber == null ? '&nbsp;' : ac.taskNumber
-                 $('#taskNumberId').html('Task #: '+'<b>'+taskNumber+'</b>')
-                 $('#taskNumberSpanEditId').html('Task #: '+'<b>'+taskNumber+'</b>')
-                 $('#successorShowTd').html(params.successorTable)
-                 $('#predecessorTrEditId').css('display','table-row')
-    	      	 $('#previousNotesShowId').html(noteTable)
-    	      	 $('#previousNote').html(noteTable)
-	      		 $('#dueDateId').html(params.dueDate)
-	      		 $('#dueDateEdit').val(params.dueDate)
-		      	 $('#noteEditId').val('')
-		      	 $('#statusEditId').val(ac.status)
-		      	 $('#hardAssignedShow').attr('disabled', 'disabled');
-      		     $('#overrideShow').attr('disabled', 'disabled');
-		      	 if(ac.hardAssigned==1){
-		      		 $('#hardAssignedShow').attr('checked', true);
-		      		 $('#hardAssignedEdit').attr('checked', true);
-		      	 }else{
-		      		$('#hardAssignedShow').attr('checked', false);
-		      		$('#hardAssignedEdit').attr('checked', false);
-		      	 }
-      		     if(ac.workflowOverride==1){
-		      		 $('#overrideShow').attr('checked', true);
-		      		 $('#overrideEdit').attr('checked', true);
-		      	 }
-      		     $('#hardAssignedEdit').val(ac.hardAssigned)
-      		     $('#roleTdId').html(params.roles)
-      		     ac.role ? $('#roleTypeEdit').val(ac.role) :$('#roleTypeEdit').val('')
-      		     $('#estStartShowId').html(params.etStart)
-      		     params.etStart ? $('#estStartEditId').val(params.etStart) : $('#estStartEditId').val('')
-      		     $('#estStartEditTrId').css('display','table-row')
-      		     $('#estFinishShowId').html(params.etFinish)
-      		     params.etFinish ? $('#estFinishEditId').val(params.etFinish) : $('#estFinishEditId').val('')
-      		     $('#actStartShowId').html(params.atStart)
-      		     $('#actStartEditId').val(params.atStart)
-      		     $('#actFinishShowId').html(params.dtResolved)
-      		     $('#actFinishEditId').val(params.dtResolved)
-      		     if(params.workflow){
-      		      $('#workFlowShowId').html(params.workflow)
-      		     }else{
-      		      $('#workFlowShow').css('display','none')
-      		     }
-      		     $('#workFlowEditId').html(params.workflow)
-      		     if(ac.priority==1||ac.priority==2){
-      		       $('#priorityShowId').html('<b>'+ac.priority+'</b>')
-      		     }else{
-      		    	 $('#priorityShowId').html(ac.priority)
-      		     }
-      		     var duration = ac.duration ? ac.duration :''
-      		     var durationScale = ac.durationScale ?ac.durationScale:''
-      		     $('#durationShowId').html(duration +" "+ durationScale )
-      		     $('#durationEdit').val(duration )
-      		     ac.durationScale ? $('#durationScaleEdit').val(ac.durationScale) : $('#durationScaleEdit').val('m') 
-      		     ac.priority ? $('#priorityEdit').val(ac.priority) : $('#priorityEdit').val('')
-      		     
-      		     $('#commentButtonEditId').attr('onClick','showAssetComment('+ac.id+', "edit")')
-      		     $('#commentTypeEditTdId').css('display','none')
-      	      	 $('#typeListTdId').css('display','none')
-      		     $('#commentShowTrId').css('display','none')
-      		     $('#predecessorAddTr').css('display','table-row')
-      		     $('#workFlowShow').css('display','table-row')
-	      		 $('#estFinishTrEditId').css('display','table-row')
-	      		 $('#priorityEditId').css('display','table-row')
-      		     $('#predecessorTrEditId').css('display','table-row')
-      		     $('#durationEditId').css('display','table-row')
-      		     $('#priorityShow').css('display','table-row')
-      		     $('#estStartShowId').css('display','table-row')
-      		     $('#estFinishShowId').css('display','table-row')
-      		     $('#actStartShowId').css('display','table-row')
-		      	 $('#mustVerifyId').css('display','none')
-		      	 $('#mustVerifyEditTr').css('display','none')
-			     $('#assetShowValueId').css('display','block')
-			     $('#assetTrShowId').css('display','block')
-		         $('#commentTypeEditId').attr("disabled","disabled");
-      		     $('.issue').css('display','table-row')
-      		     $('#deleteCommentId').css('display','none')
-			     if(ac.assetEntity==null){
-			    	$('#moveShowId').css('display','table-row')
-			    	$('#assetShowId').css('display','none')
-			    	$('#assetTrId').css('display','none')
-			    	$('#moveEventEditId').val(ac.moveEvent ? ac.moveEvent.id : '')
-			    	$('#moveEventEditTrId').css('display','table-row')
-			     }else{
-			    	$('#moveShowId').css('display','none')
-			    	$('#assetShowId').css('display','table-row')
-			    	$('#moveEventEditTrId').css('display','none')
-			    	$('#assetTrId').css('display','table-row')
-			    	$('#assetValueId').val(ac.assetEntity ? ac.assetEntity.id : '')
-			     }
-	      	 } else {
-	      		$('.issue').css('display','none')
-	      		$('#deleteCommentId').removeAttr('style')
-	      		$('#commentTypeEditId').removeAttr("disabled");
-	      		$('#commentTypeEditTdId').removeAttr("style");
-     	      	$('#typeListTdId').css('display','block')
-     	      	$('#commentShowTrId').css('display','table-row')
-     	      	$('#predecessorAddTr').css('display','none')
-     	      	$('#previousNote').html('')
-     	      	$('#predecessorShowTr').css('display','none')
-	      	 }
-			 if(ac.commentType=='instruction'){
-				 $('#mustVerifyId').css('display','table-row')
-				 $('#mustVerifyEditTr').css('display','table-row')
-				 
-			 }else{
-				 $('#mustVerifyId').css('display','none')
-				 $('#mustVerifyEditTr').css('display','none')
-			 }
-	      	 if(ac.mustVerify != 0){
-		      	 $('#mustVerifyShowId').attr('checked', true);
-		      	 $('#mustVerifyEditId').attr('checked', true);
-	      	 } else {
-		      	 $('#mustVerifyShowId').attr('checked', false);
-		      	 $('#mustVerifyEditId').attr('checked', false);
-	      	 }
-	      	 $('#statusShowId').html(ac.status);
-	         $("#statusShowId").removeAttr('class')
-	      	 $('#statusShowId').addClass(params.cssForCommentStatus);
-	      	 $('#isResolvedEditId').val(ac.isResolved);
-	      	
-	      	 $('#dateResolvedId').html(params.dtResolved)
-	      	 $('#dateResolvedEditId').html(params.dtResolved)
-	      	 if(params.personResolvedObj != null){
-		      	 $('#resolvedById').html(params.personResolvedObj.firstName+" "+params.personResolvedObj.lastName)
-		      	 $('#resolvedByEditId').html(params.personResolvedObj.firstName+" "+params.personResolvedObj.lastName)
-	      	 }else{
-		      	 $('#resolvedById').html("")
-		      	 $('#resolvedByEditId').html("")
-	      	 }
-	      	
-	      	 $('#createdById').html(params.personCreateObj.firstName+" "+params.personCreateObj.lastName+" at "+params.dtCreated)
-	      	 $('#createdByEditId').html(params.personCreateObj.firstName+" "+params.personCreateObj.lastName+" at "+params.dtCreated)
-	      	 $('#resolutionId').html(ac.resolution)
-	      	 $('#resolutionEditId').val(ac.resolution)
-	      	 $('#commentEditId').val(ac.comment)
-	      	 $('#commentTypeEditId').val(ac.commentType)
-	      	 $('#commentTypeEditIdReadOnly').val(ac.commentType)
-	      	 $('#categoryEditId').val(ac.category)
-	      	 $('#commentCodeEditId').html(ac.commentCode)
-	      	 $('#mustVerifyEditId').val(ac.mustVerify)
-	      	 $('#isResolvedEditId').val(ac.isResolved)
-	      	 if(action == 'edit'){
-	      		updateStatusSelect(ac.id);
-	      	    if(ac.assetEntity){
-	    		       updateWorkflowTransitions(ac.assetEntity.id, ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
-	    		}else{
-	    		       updateWorkflowTransitions('', ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
-	    		}
-				$('#successorEditId').html(params.successorTable)
-	            updateAssignedToList('assignedToEdit','assignedEditSpan',ac.id);
+			if(params.error){
+				alert(params.error)
+			}else {
+				var ac = params.assetComment
 				
-				commentChangeEdit('editResolveDiv','editCommentForm');
-		      	$("#editCommentDialog").dialog('option', 'width', 'auto')
-		      	$("#editCommentDialog").dialog('option', 'position', ['center','top']);
-		      	$("#editCommentDialog").dialog("open")
-		      	$("#showCommentDialog").dialog("close")
-		      	loadEditPredecessor(ac.id);
-	      	 } else if(action == 'show'){
-	      	 	$("#showCommentDialog").dialog('option', 'width', 'auto')
-	      	 	$("#showCommentDialog").dialog('option', 'position', ['center','top']);
-	      	 	$("#showCommentDialog").dialog("open")
-	      	 	$("#editCommentDialog").dialog("close")
-	      	 }
-	      	 if($("#selectTimedId").length > 0){
-	      		 timedUpdate('never')
-	      	 }
+				if(ac.comment == null) {
+					ac.comment = "";
+				}
+				if(ac.resolution == null){
+					ac.resolution = "";
+				}
+				 $('#commentId').val(ac.id)
+				 $('#predCount').val(params.maxVal)
+				 $('#updateCommentId').val(ac.id)
+		      	 $('#commentTdId').val(ac.comment) 
+		      	 $('#commentTypeTdId').html(ac.commentType)
+		      	 $('#mustVerifyShowId').val(ac.mustVerify)
+		      	 $('#isResolvedId').val(ac.isResolved)
+		      	 $('#categoryTdId').html(ac.category)
+		      	 $('#commentCodeTdId').html(ac.commentCode)
+		      	 $('#assetShowValueId').html(params.assetName)
+			     $('#assetTrShowId').html(params.assetName)
+			     $('#eventShowValueId').html(params.eventName)
+			     
+			     
+		      	 if(ac.commentType=='issue'){
+		      		 if(ac.resolution || ac.status=='Completed'){
+		      		   $('#resolutionEditTrId').css('display','table-row')
+		      		 }else{
+		      			 $('#resolutionEditTrId').css('display','none')
+		      		}
+		      		 if(params.assignedTo){
+				      	 $('#assignedToTdId').html(params.assignedTo.firstName + " " + params.assignedTo.lastName)
+				      	 $('#assignedToEdit').val(params.assignedTo.id)
+		      		 }
+		      		 var notes = params.notes
+		      		 var noteTable = '<table style="border:0px">'
+	      		     for(i=0; i<params.notes.length; i++){
+	      		    	 if (i>0) {
+	      		    		 noteTable += ""
+	      		    	 }
+	      		    	 noteTable += "<tr><td>" + notes[i][0] + "</td><td>" + notes[i][1] + "</td><td><span>" + notes[i][2] + "</span></td></tr>"
+	      		    	 }
+	      		     noteTable += "</table>"
+	      		     if(params.predecessorTable.length==0 && params.successorTable.length==0){ 
+	      		    	 $('#predecessorShowTr').css('display','none')
+	      		     }else{
+	      		    	$('#predecessorShowTr').css('display','table-row')
+	      		     }
+	      		     
+	      		     if($('#manageTaskId').val()){
+	      		    	$('#fromMoveEventId').css('display','table-row')
+	      		    	$('#fromAssetId').css('display','none')
+	      		     }else{
+	      		    	$('#fromMoveEventId').css('display','none');
+	      		    	$('#fromAssetId').css('display','table-row');
+	      		     }
+	      		     $('#statuWarnId').val(params.statusWarn)
+	                 $('#predecessorShowTd').html(params.predecessorTable)
+	                 var taskNumber = ac.taskNumber == null ? '&nbsp;' : ac.taskNumber
+	                 $('#taskNumberId').html('Task #: '+'<b>'+taskNumber+'</b>')
+	                 $('#taskNumberSpanEditId').html('Task #: '+'<b>'+taskNumber+'</b>')
+	                 $('#successorShowTd').html(params.successorTable)
+	                 $('#predecessorTrEditId').css('display','table-row')
+	    	      	 $('#previousNotesShowId').html(noteTable)
+	    	      	 $('#previousNote').html(noteTable)
+		      		 $('#dueDateId').html(params.dueDate)
+		      		 $('#dueDateEdit').val(params.dueDate)
+			      	 $('#noteEditId').val('')
+			      	 $('#statusEditId').val(ac.status)
+			      	 $('#hardAssignedShow').attr('disabled', 'disabled');
+	      		     $('#overrideShow').attr('disabled', 'disabled');
+			      	 if(ac.hardAssigned==1){
+			      		 $('#hardAssignedShow').attr('checked', true);
+			      		 $('#hardAssignedEdit').attr('checked', true);
+			      	 }else{
+			      		$('#hardAssignedShow').attr('checked', false);
+			      		$('#hardAssignedEdit').attr('checked', false);
+			      	 }
+	      		     if(ac.workflowOverride==1){
+			      		 $('#overrideShow').attr('checked', true);
+			      		 $('#overrideEdit').attr('checked', true);
+			      	 }
+	      		     $('#hardAssignedEdit').val(ac.hardAssigned)
+	      		     $('#roleTdId').html(params.roles)
+	      		     ac.role ? $('#roleTypeEdit').val(ac.role) :$('#roleTypeEdit').val('')
+	      		     $('#estStartShowId').html(params.etStart)
+	      		     params.etStart ? $('#estStartEditId').val(params.etStart) : $('#estStartEditId').val('')
+	      		     $('#estStartEditTrId').css('display','table-row')
+	      		     $('#estFinishShowId').html(params.etFinish)
+	      		     params.etFinish ? $('#estFinishEditId').val(params.etFinish) : $('#estFinishEditId').val('')
+	      		     $('#actStartShowId').html(params.atStart)
+	      		     $('#actStartEditId').val(params.atStart)
+	      		     $('#actFinishShowId').html(params.dtResolved)
+	      		     $('#actFinishEditId').val(params.dtResolved)
+	      		     if(params.workflow){
+	      		      $('#workFlowShowId').html(params.workflow)
+	      		     }else{
+	      		      $('#workFlowShow').css('display','none')
+	      		     }
+	      		     $('#workFlowEditId').html(params.workflow)
+	      		     if(ac.priority==1||ac.priority==2){
+	      		       $('#priorityShowId').html('<b>'+ac.priority+'</b>')
+	      		     }else{
+	      		    	 $('#priorityShowId').html(ac.priority)
+	      		     }
+	      		     var duration = ac.duration ? ac.duration :''
+	      		     var durationScale = ac.durationScale ?ac.durationScale:''
+	      		     $('#durationShowId').html(duration +" "+ durationScale )
+	      		     $('#durationEdit').val(duration )
+	      		     ac.durationScale ? $('#durationScaleEdit').val(ac.durationScale) : $('#durationScaleEdit').val('m') 
+	      		     ac.priority ? $('#priorityEdit').val(ac.priority) : $('#priorityEdit').val('')
+	      		     
+	      		     $('#commentButtonEditId').attr('onClick','showAssetComment('+ac.id+', "edit")')
+	      		     $('#commentTypeEditTdId').css('display','none')
+	      	      	 $('#typeListTdId').css('display','none')
+	      		     $('#commentShowTrId').css('display','none')
+	      		     $('#predecessorAddTr').css('display','table-row')
+	      		     $('#workFlowShow').css('display','table-row')
+		      		 $('#estFinishTrEditId').css('display','table-row')
+		      		 $('#priorityEditId').css('display','table-row')
+	      		     $('#predecessorTrEditId').css('display','table-row')
+	      		     $('#durationEditId').css('display','table-row')
+	      		     $('#priorityShow').css('display','table-row')
+	      		     $('#estStartShowId').css('display','table-row')
+	      		     $('#estFinishShowId').css('display','table-row')
+	      		     $('#actStartShowId').css('display','table-row')
+			      	 $('#mustVerifyId').css('display','none')
+			      	 $('#mustVerifyEditTr').css('display','none')
+				     $('#assetShowValueId').css('display','block')
+				     $('#assetTrShowId').css('display','block')
+			         $('#commentTypeEditId').attr("disabled","disabled");
+	      		     $('.issue').css('display','table-row')
+	      		     $('#deleteCommentId').css('display','none')
+				     if(ac.assetEntity==null){
+				    	$('#moveShowId').css('display','table-row')
+				    	$('#assetShowId').css('display','none')
+				    	$('#assetTrId').css('display','none')
+				    	$('#moveEventEditId').val(ac.moveEvent ? ac.moveEvent.id : '')
+				    	$('#moveEventEditTrId').css('display','table-row')
+				     }else{
+				    	$('#moveShowId').css('display','none')
+				    	$('#assetShowId').css('display','table-row')
+				    	$('#moveEventEditTrId').css('display','none')
+				    	$('#assetTrId').css('display','table-row')
+				    	$('#assetValueId').val(ac.assetEntity ? ac.assetEntity.id : '')
+				    	$('#assetEntityIdShow').val(ac.assetEntity ? ac.assetEntity.id : '')
+				     }
+		      	 } else {
+		      		$('.issue').css('display','none')
+		      		$('#deleteCommentId').removeAttr('style')
+		      		$('#commentTypeEditId').removeAttr("disabled");
+		      		$('#commentTypeEditTdId').removeAttr("style");
+	     	      	$('#typeListTdId').css('display','block')
+	     	      	$('#commentShowTrId').css('display','table-row')
+	     	      	$('#predecessorAddTr').css('display','none')
+	     	      	$('#previousNote').html('')
+	     	      	$('#predecessorShowTr').css('display','none')
+		      	 }
+				 if(ac.commentType=='instruction'){
+					 $('#mustVerifyId').css('display','table-row')
+					 $('#mustVerifyEditTr').css('display','table-row')
+					 
+				 }else{
+					 $('#mustVerifyId').css('display','none')
+					 $('#mustVerifyEditTr').css('display','none')
+				 }
+		      	 if(ac.mustVerify != 0){
+			      	 $('#mustVerifyShowId').attr('checked', true);
+			      	 $('#mustVerifyEditId').attr('checked', true);
+		      	 } else {
+			      	 $('#mustVerifyShowId').attr('checked', false);
+			      	 $('#mustVerifyEditId').attr('checked', false);
+		      	 }
+		      	 $('#statusShowId').html(ac.status);
+		         $("#statusShowId").removeAttr('class')
+		      	 $('#statusShowId').addClass(params.cssForCommentStatus);
+		      	 $('#isResolvedEditId').val(ac.isResolved);
+		      	
+		      	 $('#dateResolvedId').html(params.dtResolved)
+		      	 $('#dateResolvedEditId').html(params.dtResolved)
+		      	 if(params.personResolvedObj != null){
+			      	 $('#resolvedById').html(params.personResolvedObj.firstName+" "+params.personResolvedObj.lastName)
+			      	 $('#resolvedByEditId').html(params.personResolvedObj.firstName+" "+params.personResolvedObj.lastName)
+		      	 }else{
+			      	 $('#resolvedById').html("")
+			      	 $('#resolvedByEditId').html("")
+		      	 }
+		      	
+		      	 $('#createdById').html(params.personCreateObj.firstName+" "+params.personCreateObj.lastName+" at "+params.dtCreated)
+		      	 $('#createdByEditId').html(params.personCreateObj.firstName+" "+params.personCreateObj.lastName+" at "+params.dtCreated)
+		      	 $('#resolutionId').html(ac.resolution)
+		      	 $('#resolutionEditId').val(ac.resolution)
+		      	 $('#commentEditId').val(ac.comment)
+		      	 $('#commentTypeEditId').val(ac.commentType)
+		      	 $('#commentTypeEditIdReadOnly').val(ac.commentType)
+		      	 $('#categoryEditId').val(ac.category)
+		      	 $('#commentCodeEditId').html(ac.commentCode)
+		      	 $('#mustVerifyEditId').val(ac.mustVerify)
+		      	 $('#isResolvedEditId').val(ac.isResolved)
+		      	 if(action == 'edit'){
+		      		updateStatusSelect(ac.id);
+		      	    if(ac.assetEntity){
+		    		       updateWorkflowTransitions(ac.assetEntity.id, ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
+		    		}else{
+		    		       updateWorkflowTransitions('', ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
+		    		}
+					$('#successorEditId').html(params.successorTable)
+		            updateAssignedToList('assignedToEdit','assignedEditSpan',ac.id);
+					
+					commentChangeEdit('editResolveDiv','editCommentForm');
+			      	$("#editCommentDialog").dialog('option', 'width', 'auto')
+			      	$("#editCommentDialog").dialog('option', 'position', ['center','top']);
+			      	$("#editCommentDialog").dialog("open")
+			      	$("#showCommentDialog").dialog("close")
+			      	loadEditPredecessor(ac.id);
+		      	 } else if(action == 'show'){
+		      	 	$("#showCommentDialog").dialog('option', 'width', 'auto')
+		      	 	$("#showCommentDialog").dialog('option', 'position', ['center','top']);
+		      	 	$("#showCommentDialog").dialog("open")
+		      	 	$("#editCommentDialog").dialog("close")
+		      	 }
+		      	 if($("#selectTimedId").length > 0){
+		      		 timedUpdate('never')
+		      	 }
+			}
 		}
 	}
 	function addCommentsToList( e ){
@@ -1533,4 +1545,16 @@ function loadEditPredecessor(id){
 		}
 	})
 }
+function deleteComment(commentId, assetEntityIdShow, complete){
+	var completeFunc =  complete == "update" ? function(e){ listCommentsDialog(e,'never'); } : function(e) { updateCommentsLists(); }
+	if(confirm('Are you sure?')){
+		jQuery.ajax({
+			url: '../assetEntity/deleteComment',
+			data: {'id':$('#commentId').val(),'assetEntity':$('#assetEntityIdShow').val()},
+			complete: completeFunc
+		});
+    }
+}	
+	
+
 
