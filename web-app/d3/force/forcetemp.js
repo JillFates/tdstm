@@ -12,7 +12,7 @@ d3.json("/tdstm/d3/force/schedule.json", function(json) {
 	
 	var force = self.force = d3.layout.force()
 				.nodes(json.nodes).links(json.links)
-				.gravity(.05)
+				.gravity(.00)
 				.distance(json.linkdistance)
 				.friction(json.friction)
 				.charge(json.force)
@@ -27,9 +27,7 @@ d3.json("/tdstm/d3/force/schedule.json", function(json) {
 				.attr("x1", function(d) { return d.source.x;})
 				.attr("y1", function(d) { return d.source.y;})
 				.attr("x2", function(d) { return d.target.x;})
-				.attr("y2", function(d) {
-		return d.target.y;
-	});
+				.attr("y2", function(d) { return d.target.y;});
 	var node = vis.selectAll("path")
 				.data(json.nodes).enter()
 				.append("svg:path")
