@@ -2943,7 +2943,7 @@ class AssetEntityController {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def view = params.commentType == 'issue' ? 'listTasks' : 'listComment'
 		if(params.commentType){
-			session.setAttribute("currentView", params.commentType)
+			session.setAttribute("currentView", view)
 		}
 		def project = Project.findById( projectId )
 		def assetEntityInstance = AssetEntity.findAllByProject(project)
@@ -2954,7 +2954,7 @@ class AssetEntityController {
 		def today = new Date()
 		def action = params.issueBox == "on" ? "issue" : params.resolvedBox == "on" ? "resolved" : params.filter
 		
-		if(session.getAttribute("currentView")=='comment'){
+		if(session.getAttribute("currentView")=='listComment'){
 			assetCommentQuery += " and commentType != :commentType "
 			args << [ commentType:"issue"]
 		}else{
@@ -2997,8 +2997,27 @@ class AssetEntityController {
 				assetCommentQuery += " ORDER BY score DESC, taskNumber ASC, dueDate ASC, dateCreated DESC"
 		   }
 		}
-		def assetCommentList = AssetComment.findAll(assetCommentQuery,args)
-		
+		def assetCommentList = []
+		def commentList = AssetComment.findAll(assetCommentQuery,args)
+		// Initialize all comment property in to bean for jmesa.
+		commentList.each{comment->
+			AssetEntityBean assetBeanInstance = new AssetEntityBean();
+			assetBeanInstance.setId(comment.id)
+			assetBeanInstance.setTaskNumber(comment.taskNumber)
+			assetBeanInstance.setDescription(comment.comment)
+			assetBeanInstance.setAssetName(comment.assetEntity?.assetName)
+			assetBeanInstance.setAssetType(comment.assetEntity?.assetType)
+			assetBeanInstance.setStatus(comment.status)
+			assetBeanInstance.setLastUpdated(comment.dateCreated)
+			assetBeanInstance.setDueDate(comment.dueDate ? comment.dueDate : comment.estFinish)
+			assetBeanInstance.setAssignedTo(comment.assignedTo ? (comment.assignedTo?.firstName +" "+ comment.assignedTo?.lastName) : '' )
+			assetBeanInstance.setRole(comment.role)
+			assetBeanInstance.setCategory(comment.category)
+			assetBeanInstance.setSuccCount( TaskDependency.findAllByPredecessor( comment ).size())
+			assetBeanInstance.setAssetEntityId(comment.assetEntity?.id)
+			assetBeanInstance.setCommentType(comment.commentType)
+			assetCommentList.add(assetBeanInstance)
+		}
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
 		tableFacade.items = assetCommentList
 		Limit limit = tableFacade.limit
@@ -3007,7 +3026,7 @@ class AssetEntityController {
 			tableFacade.setColumnProperties("comment","commentType","assetEntity","mustVerify","isResolved","resolution","resolvedBy","createdBy","commentCode","category","displayOption")
 			tableFacade.render()
 		} else {
-	      	render (view :view , model:[assetCommentList:assetCommentList,rediectTo:'comment',checked:params.resolvedBox,issueBox:params.issueBox])
+	      	render (view :session.getAttribute("currentView") , model:[assetCommentList:assetCommentList,rediectTo:'comment',checked:params.resolvedBox,issueBox:params.issueBox])
 		}
 	}
 

@@ -7638,6 +7638,9 @@ $.widget("ui.dialog", {
 				})
 				.click(function(event) {
 					self.close(event);
+					if(B2 != ''){
+						 B2.Restart(60);
+					}
 					if($("#selectTimedId").length > 0){
 						timedUpdate($("#selectTimedId").val())
 					} else if($("#updateTimeId").length > 0){

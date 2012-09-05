@@ -172,13 +172,12 @@
 	<span class="button">
 	<input class="edit" type="button" value="Edit" id="commentButtonEditId" />
 	</span>
-	<span class="button"> 
-	<span id="fromAssetId"> <input class="delete" type="button" value="Delete"
-		 onclick="deleteComment('#commentId','#assetEntityIdShow','update')"/>
+	<span class="button" style="white-space: nowrap;"> 
+	<span id="fromAssetId"> 
+	    <input class="delete" type="button" value="Delete" onclick="deleteComment('#commentId','#assetEntityIdShow','update')"/>
 	</span>
 	<span id="fromMoveEventId" style="display: none">
-	 <input class="delete" type="button" value="Delete"
-		 onclick="deleteComment('#commentId','#assetEntityIdShow','refresh')" />
+	 		<input class="delete" type="button" value="Delete" onclick="deleteComment('#commentId','#assetEntityIdShow','refresh')" />
 	</span>
 	</span>
 	</div>

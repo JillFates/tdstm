@@ -9,7 +9,6 @@
         <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
         <link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
         <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
-        <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
         <script type="text/javascript">
         function onInvokeAction(id) {
             setExportToLimit(id, '');
@@ -20,6 +19,8 @@
             location.href = '../list?' + parameterString;
         }
         $(document).ready(function() {
+        	$('#issueTimebar').width($(window).width()+'px')
+            
         	$('#assetMenu').show();
         	$("#commentsListDialog").dialog({ autoOpen: false })
  	        $("#createCommentDialog").dialog({ autoOpen: false })
@@ -39,9 +40,14 @@
 	    	$(".span_na").parent().addClass("task_na")
         });
         </script>
+        
 </head>
 <body>
+ <input type="hidden" id="timeBarValueId" value="0"/>
 	<div class="body">
+		<div class="taskTimebar" id="issueTimebar" >
+			<div id="issueTimebarId"></div>
+		</div>
 		<div class="body">
 			<h1>Task Manager</h1>
 			<g:if test="${flash.message}">
@@ -77,22 +83,26 @@
 							<jmesa:htmlColumn property="taskNumber" title="Task" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.taskNumber ? commentInstance.taskNumber :''}</span>
 							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="comment" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Description" nowrap>
-								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.comment?.size() > 40 ? commentInstance.comment?.substring(0,40)+'..' : commentInstance.comment}</span>
+							<jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Description" nowrap>
+								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.description?.size() > 40 ? commentInstance.description?.substring(0,40)+'..' : commentInstance.description}</span>
 							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="dateCreated" title="Updated" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.dateCreated}" format="MM/dd"  /></span>
+							<jmesa:htmlColumn property="assetName" title="Asset" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+        	                 	<span onclick="javascript:getEntityDetails('listComment', '${commentInstance.assetType}', '${commentInstance.assetEntityId}');">${commentInstance.assetName}</span>
+							</jmesa:htmlColumn>
+							<jmesa:htmlColumn width="50px" property="assetType" sortable="true" filterable="true" title="AssetType">
+                	         	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance?.assetType}</span>
+							</jmesa:htmlColumn>
+							<jmesa:htmlColumn property="lastUpdated" title="Updated" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.lastUpdated}" format="MM/dd"  /></span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="dueDate" title="Due" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.dueDate}" format="MM/dd"/></span>
 							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="commentType" title="Type" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.commentType}</span>
-							</jmesa:htmlColumn>
+							
 							<jmesa:htmlColumn property="status" title="Status" sortable="true" filterable="true" width="100px" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');" class="span_${commentInstance.status ? commentInstance.status.toLowerCase() : 'na'}">${commentInstance.status}</span>
 							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="assignedToString" title="Assigned To" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+							<jmesa:htmlColumn property="assignedTo" title="Assigned To" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
         	                 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.assignedTo}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="role" title="Role" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
@@ -102,14 +112,12 @@
     	                     <jmesa:htmlColumn property="mustVerify" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
     	                     	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show')"><g:if test ="${commentInstance.mustVerify == 1}"></g:if><g:else><g:checkBox name="myVerifyBox" value="${true}" disabled="true"/></g:else></span>
     	                     </jmesa:htmlColumn>
-        	                 --%><jmesa:htmlColumn property="assetName" title="Asset" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-        	                 	<span onclick="javascript:getEntityDetails('listComment', '${commentInstance.assetEntity?.assetType}', '${commentInstance.assetEntity?.id}');">${commentInstance.assetEntity?.assetName}</span>
-							</jmesa:htmlColumn>
-							<jmesa:htmlColumn width="50px" property="assetEntity.assetType" sortable="true" filterable="true" title="AssetType">
-                	         	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance?.assetEntity?.assetType}</span>
-							</jmesa:htmlColumn>
+        	                 --%>
 							<jmesa:htmlColumn width="50px" property="category" sortable="true" filterable="true" title="category">
                              	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.category}</span>
+							</jmesa:htmlColumn>
+							<jmesa:htmlColumn property="succCount" title="Count" sortable="true" filterable="true"  cellEditor="org.jmesa.view.editor.BasicCellEditor">
+							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${ commentInstance.succCount}</span>
 							</jmesa:htmlColumn>
 						</jmesa:htmlRow>
 					</jmesa:htmlTable>
@@ -127,6 +135,102 @@
  <g:render template="commentCrud"/> 
  </div>
  </div>
+ <script type="text/javascript">
+            function pageRefresh(){
+               window.location.reload()
+            }
+	        function zxcAnimate(mde,obj,srt){
+	    		this.to=null;
+	    		this.obj=typeof(obj)=='object'?obj:document.getElementById(obj);
+	    		this.mde=mde.replace(/\W/g,'');
+	    		this.data=[srt||0];
+	    		return this;
+	    	}
+	
+	    	zxcAnimate.prototype.animate=function(srt,fin,ms,scale,c){
+	    		clearTimeout(this.to);
+	    		this.time=ms||this.time||0;
+	    		this.neg=srt<0||fin<0;
+	    		this.data=[srt,srt,fin];
+	    		this.mS=this.time*(!scale?1:Math.abs((fin-srt)/(scale[1]-scale[0])));
+	    		this.c=typeof(c)=='string'?c.charAt(0).toLowerCase():this.c?this.c:'';
+	    		this.inc=Math.PI/(2*this.mS);
+	    		this.srttime=new Date().getTime();
+	    		this.cng();
+	    	}
+	
+	    	zxcAnimate.prototype.cng=function(){
+	    		var oop=this,ms=new Date().getTime()-this.srttime;
+	    		this.data[0]=(this.c=='s')?(this.data[2]-this.data[1])*Math.sin(this.inc*ms)+this.data[1]:(this.c=='c')?this.data[2]-(this.data[2]-this.data[1])*Math.cos(this.inc*ms):(this.data[2]-this.data[1])/this.mS*ms+this.data[1];
+	    		this.apply();
+	    		if (ms<this.mS) this.to=setTimeout(function(){oop.cng()},10);
+	    		else {
+	    			this.data[0]=this.data[2];
+	    			this.apply();
+	    		 if (this.Complete) this.Complete(this);
+	    		}
+	    	}
+	
+	    	zxcAnimate.prototype.apply=function(){
+	    		if (isFinite(this.data[0])){
+	    			if (this.data[0]<0&&!this.neg) this.data[0]=0;
+	    			if (this.mde!='opacity') this.obj.style[this.mde]=Math.floor(this.data[0])+'px';
+	    			else zxcOpacity(this.obj,this.data[0]);
+	    		}
+	    	}
+	
+	    	function zxcOpacity(obj,opc){
+	    		if (opc<0||opc>100) return;
+	    		obj.style.filter='alpha(opacity='+opc+')';
+	    		obj.style.opacity=obj.style.MozOpacity=obj.style.WebkitOpacity=obj.style.KhtmlOpacity=opc/100-.001;
+	    	}
+	
+	    		function Bar(o){
+	    		var obj=document.getElementById(o.ID);
+	    			this.oop=new zxcAnimate('width',obj,0);
+	    			this.max=$('#issueTimebar').width();
+	    			this.to=null;
+	    		}
+	    		Bar.prototype={
+	    			Start:function(sec){
+	    				clearTimeout(this.to);
+	    				this.oop.animate(0,this.max,sec*1000);
+	    				this.srt=new Date();
+	    				this.sec=sec;
+	    				this.Time();
+	    			},
+	    			Time:function(sec){
+		    			//alert(sec)
+	    				var oop=this,sec=this.sec-Math.floor((new Date()-this.srt)/1000);
+	    				//this.oop.obj.innerHTML=sec+' sec';
+	    				//alert(sec)
+	    				$('#timeBarValueId').val(sec)
+	    				if (sec>0){
+	    					this.to=setTimeout(function(){ oop.Time(); },1000);
+	    				}else{
+	    					pageRefresh();
+	    				}
+	    			},
+	    			Pause:function(sec){
+	    				clearTimeout(this.to);
+	    				this.oop.animate(sec,'',sec*1000);
+	    			},
+	    			Restart:function(sec){
+	    				clearTimeout(this.to);
+	    				var second = $('#timeBarValueId').val()
+	    				this.oop.animate($('#issueTimebarId').width(),this.max,second*1000);
+	    				this.srt=new Date();
+	    				this.sec=second;
+	    				this.Time();
+	    			}
+	    		}
+	
+	    		B2=new Bar({
+	    			ID:'issueTimebarId'
+	    		});
+	
+	    		B2.Start(60);
+        </script>
  </body>
  
 </html>

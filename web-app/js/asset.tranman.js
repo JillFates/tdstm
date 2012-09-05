@@ -1,5 +1,6 @@
  /**------------------------------------Asset CRUD----------------------------------*/
 var requiredFields = ["assetName"];
+var B2 = []
 Array.prototype.contains = function (element) {
 	for (var i = 0; i < this.length; i++) {
 		if (this[i] == element) {
@@ -632,6 +633,9 @@ function showAssetDialog( e , action ) {
 	}
 	// Invoked by Ajax call to populate the Create & Edit Asset Comment Dialog
 	function showAssetCommentDialog( e , action){
+		if(B2 != ''){
+			B2.Pause()
+		}
 		$("#createCommentDialog").dialog("close")
 		var assetComments = eval('(' + e.responseText + ')');
 		if (assetComments) {
@@ -1039,6 +1043,9 @@ function createIssue(asset, type){
 		$('#createCommentDialog').dialog('option', 'position', ['center','top']);
 		$('#createCommentDialog').dialog('open');
 	}else{
+		if(B2 != ''){
+			B2.Pause()
+		}
 		updateWorkflowTransitions( '', "general", "workFlowTransitionId", "predecessorId",'' );
 		updateAssignedToList('assignedToSave','assignedCreateSpan',0);
 		document.forms['createCommentForm'].commentType.value = 'issue'
