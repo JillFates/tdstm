@@ -659,7 +659,7 @@ function showAssetDialog( e , action ) {
 		      	 $('#assetShowValueId').html(params.assetName)
 			     $('#assetTrShowId').html(params.assetName)
 			     $('#eventShowValueId').html(params.eventName)
-			     
+			     $('#commentButtonEditId').attr('onClick','showAssetComment('+ac.id+', "edit")')
 			     
 		      	 if(ac.commentType=='issue'){
 		      		 if(ac.resolution || ac.status=='Completed'){
@@ -749,7 +749,6 @@ function showAssetDialog( e , action ) {
 	      		     ac.durationScale ? $('#durationScaleEdit').val(ac.durationScale) : $('#durationScaleEdit').val('m') 
 	      		     ac.priority ? $('#priorityEdit').val(ac.priority) : $('#priorityEdit').val('')
 	      		     
-	      		     $('#commentButtonEditId').attr('onClick','showAssetComment('+ac.id+', "edit")')
 	      		     $('#commentTypeEditTdId').css('display','none')
 	      	      	 $('#typeListTdId').css('display','none')
 	      		     $('#commentShowTrId').css('display','none')
@@ -1029,23 +1028,40 @@ function showAssetDialog( e , action ) {
 		return trunc;
 	}
 
-function createIssue(){
-	updateWorkflowTransitions( '', "general", "workFlowTransitionId", "predecessorId",'' );
-	updateAssignedToList('assignedToSave','assignedCreateSpan',0);
-	document.forms['createCommentForm'].commentType.value = 'issue'
-	document.forms['createCommentForm'].commentType.disabled = 'disabled'
-	commentChange('#createResolveDiv','createCommentForm')
-	$('#assetEntityTrId').css('display','none')
-	$('#createResolveDiv').css('display','table-row');
-	$('#createCommentDialog').dialog('option', 'width', 'auto');
-	$('#createCommentDialog').dialog('option', 'position', ['center','top']);
-	$('#createCommentDialog').dialog('open');
-	$('#showCommentDialog').dialog('close');
-	$('#editCommentDialog').dialog('close');
-	$('#moveEventTrId').css('display','table-row')
-	$('#workFlowTransitionTrId').css('display','table-row')
-	$('#predecessorHeadTrId').css('display','table-row')
-	$('#predecessorTrId').css('display','table-row')
+function createIssue(asset, type){
+	if(type=="comment"){
+		$('#typeCommentCreateId').css('display','none')
+		$('#commentTypeCreateTdId').css('display','none')
+		$("#createCommentDialog").dialog( "option", "title", 'Create Comment ' );
+		$('#assetEntityTrId').css('display','table-row')
+		$('#assetEntityInputId').html(asset)
+		$('#createCommentDialog').dialog('option', 'width', 'auto');
+		$('#createCommentDialog').dialog('option', 'position', ['center','top']);
+		$('#createCommentDialog').dialog('open');
+	}else{
+		updateWorkflowTransitions( '', "general", "workFlowTransitionId", "predecessorId",'' );
+		updateAssignedToList('assignedToSave','assignedCreateSpan',0);
+		document.forms['createCommentForm'].commentType.value = 'issue'
+		document.forms['createCommentForm'].commentType.disabled = 'disabled'
+		commentChange('#createResolveDiv','createCommentForm')
+		if(asset){
+			$('#assetEntityTrId').css('display','table-row')
+			$('#assetEntityInputId').html(asset)
+		}else{
+			$('#assetEntityTrId').css('display','none')
+			$('#moveEventTrId').css('display','table-row')
+		}
+		$('#createResolveDiv').css('display','table-row');
+		$('#createCommentDialog').dialog('option', 'width', 'auto');
+		$('#createCommentDialog').dialog('option', 'position', ['center','top']);
+		$("#createCommentDialog").dialog( "option", "title", 'Create Issue/Task ' );
+		$('#createCommentDialog').dialog('open');
+		$('#showCommentDialog').dialog('close');
+		$('#editCommentDialog').dialog('close');
+		$('#workFlowTransitionTrId').css('display','table-row')
+		$('#predecessorHeadTrId').css('display','table-row')
+		$('#predecessorTrId').css('display','table-row')
+	}
 }	
 function commentChange(resolveDiv,formName) {
 	var type = 	document.forms[formName].commentType.value;

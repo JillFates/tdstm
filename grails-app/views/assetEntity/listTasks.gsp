@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
 <meta name="layout" content="projectHeader" />
-        <title>Asset Comment</title>
+        <title>Task Manager</title>
          <g:javascript src="asset.tranman.js" />
           <g:javascript src="entity.crud.js" />
         <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
@@ -43,7 +43,7 @@
 <body>
 	<div class="body">
 		<div class="body">
-			<h1>Asset Comment</h1>
+			<h1>Task Manager</h1>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
@@ -51,6 +51,23 @@
 			<div>
 			<input type="hidden" id="manageTaskId" value="manageTask"/>
 			<form name="commentForm" id="commentForm" action="listComment">
+			<span > <b>Include Completed : </b>
+				<g:if test="${checked=='on'}">
+					<input type="checkBox" name="resolvedBox" id="myResolvedBox"  checked="checked"  onclick="$('#commentForm').submit();"  />
+				</g:if>
+				<g:else>
+					<input type="checkBox" name="resolvedBox" id="myResolvedBox" onclick="$('#commentForm').submit();"  />
+				</g:else>
+				</span>
+				<span><b>Show My Issues :</b>
+				<g:if test="${issueBox=='on'}">
+					<input type="checkBox" name="issueBox" id="issueBox" checked="checked" onclick="$('#commentForm').submit();"  />
+				</g:if>
+				<g:else>
+					<input type="checkBox" name="issueBox" id="issueBox"  onclick="$('#commentForm').submit();"  />
+				</g:else>
+				</span>
+				<br></br>
 				<jmesa:tableFacade id="tag" items="${assetCommentList}" maxRows="50" stateAttr="restore" var="commentInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100" >
 					<jmesa:htmlTable style=" border-collapse: separate" editable="true">
 						<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
@@ -98,6 +115,9 @@
 					</jmesa:htmlTable>
 				</jmesa:tableFacade>
 			</form>
+            <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
+		      <span class="menuButton"><a class="create" href="javascript:createIssue('','')">Create Issue/Task</a></span>
+	       </div>
             </div>
             <div id="showEntityView" style="display: none;"></div>
 			<div id="editEntityView" style="display: none;"></div>

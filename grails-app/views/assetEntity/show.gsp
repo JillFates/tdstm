@@ -341,21 +341,12 @@
 					   <span class="button"><input id="deleteId"	 name="deleteId"  class="save" value="Delete" onclick=" deleteAsset($('#assetsId').val(),'server')" value="Delete" /> </span>
 					</g:else>
 			<tds:hasPermission permission="CommentCrudView">	
-				<g:if test="${assetComment == 'issue'}">
-						<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-							<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="=0px" style="margin-bottom: -4px;"/>&nbsp&nbspComment
-						</g:remoteLink>
-				</g:if>
-				<g:elseif test="${assetComment == 'comment'}">
-					<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-						<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px" style="margin-bottom: -4px;"/>&nbsp&nbspComment
-					</g:remoteLink>
-				</g:elseif>
-			    <g:else>
-					<a href="javascript:createNewAssetComment(${assetEntityInstance.id},'${assetEntityInstance.assetName}');">
-						<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/>&nbsp&nbspComment
-					</a>
-				</g:else>
+				<a href="javascript:createIssue('${assetEntityInstance.assetName}','comment');">
+					<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Comment
+				</a>
+				<a href="javascript:createIssue('${assetEntityInstance.assetName}','');">
+					<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Task
+				</a>
 			</tds:hasPermission>
 				</div>
 			</tds:hasPermission>

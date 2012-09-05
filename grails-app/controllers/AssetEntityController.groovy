@@ -2941,6 +2941,10 @@ class AssetEntityController {
 	 */
 	def listComment = {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def view = params.commentType == 'issue' ? 'listTasks' : 'listComment'
+		if(params.commentType){
+			session.setAttribute("currentView", params.commentType)
+		}
 		def project = Project.findById( projectId )
 		def assetEntityInstance = AssetEntity.findAllByProject(project)
 		def userId = session.getAttribute("LOGIN_PERSON").id
@@ -2950,43 +2954,49 @@ class AssetEntityController {
 		def today = new Date()
 		def action = params.issueBox == "on" ? "issue" : params.resolvedBox == "on" ? "resolved" : params.filter
 		
-		switch(action){
-			case "issue":
-				if(params.resolvedBox == "on" ) {
-					assetCommentQuery += " and a.assignedTo = :assignedTo "
-					args << [ assignedTo:personInstance]
-				} else {
-					assetCommentQuery += " and a.assignedTo = :assignedTo and status != :status"
-					args << [ assignedTo:personInstance, status:AssetCommentStatus.COMPLETED]
-				}
-				break
-			case "openIssue" :
-				assetCommentQuery += " and a.status != :status and category = :category"
-				args << [ status:AssetCommentStatus.COMPLETED, category:"discovery" ]
-				break
-			case "generalOverDue" :
-				assetCommentQuery += " and category in ('general','planning') and a.dueDate < :dueDate and a.status != :status"
-				args << [ dueDate:today, status:AssetCommentStatus.COMPLETED ]
-				break
-			case "Discovery" :
-				assetCommentQuery += " and a.category= :category "
-				args << [ category:"discovery"]
-				break
-			case "dueOpenIssue" :
-				assetCommentQuery += " and a.category= :category and a.dueDate < :dueDate"
-				args << [ category:"discovery", dueDate:today]
-				break
-			case "resolved" :
-				// DO Nothing
-				break
-			default :
-				assetCommentQuery += " and status != :status "
-				args << [ status:AssetCommentStatus.COMPLETED ]
-				break
+		if(session.getAttribute("currentView")=='comment'){
+			assetCommentQuery += " and commentType != :commentType "
+			args << [ commentType:"issue"]
+		}else{
+			assetCommentQuery += " and commentType = :commentType "
+			args << [ commentType:"issue"]
+			switch(action){
+				case "issue":
+					if(params.resolvedBox == "on" ) {
+						assetCommentQuery += " and  a.assignedTo = :assignedTo "
+						args << [ assignedTo:personInstance]
+					} else {
+						assetCommentQuery += " and a.assignedTo = :assignedTo and status != :status"
+						args << [ assignedTo:personInstance, status:AssetCommentStatus.COMPLETED]
+					}
+					break
+				case "openIssue" :
+					assetCommentQuery += " and a.status != :status and category = :category"
+					args << [ status:AssetCommentStatus.COMPLETED, category:"discovery" ]
+					break
+				case "generalOverDue" :
+					assetCommentQuery += " and category in ('general','planning') and a.dueDate < :dueDate and a.status != :status"
+					args << [ dueDate:today, status:AssetCommentStatus.COMPLETED ]
+					break
+				case "Discovery" :
+					assetCommentQuery += " and a.category= :category "
+					args << [ category:"discovery"]
+					break
+				case "dueOpenIssue" :
+					assetCommentQuery += " and a.category= :category and a.dueDate < :dueDate"
+					args << [ category:"discovery", dueDate:today]
+					break
+				case "resolved" :
+					// DO Nothing
+					break
+				default :
+					assetCommentQuery += " and status != :status "
+					args << [ status:AssetCommentStatus.COMPLETED ]
+					break
+					
+				assetCommentQuery += " ORDER BY score DESC, taskNumber ASC, dueDate ASC, dateCreated DESC"
+		   }
 		}
-		
-		assetCommentQuery += " ORDER BY score DESC, taskNumber ASC, dueDate ASC, dateCreated DESC"
-		
 		def assetCommentList = AssetComment.findAll(assetCommentQuery,args)
 		
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
@@ -2997,7 +3007,7 @@ class AssetEntityController {
 			tableFacade.setColumnProperties("comment","commentType","assetEntity","mustVerify","isResolved","resolution","resolvedBy","createdBy","commentCode","category","displayOption")
 			tableFacade.render()
 		} else {
-			return [assetCommentList:assetCommentList,rediectTo:'comment',checked:params.resolvedBox,issueBox:params.issueBox]
+	      	render (view :view , model:[assetCommentList:assetCommentList,rediectTo:'comment',checked:params.resolvedBox,issueBox:params.issueBox])
 		}
 	}
 
