@@ -19,6 +19,7 @@ public class AssetEntityBean implements Serializable {
 	private String updatedClass;
 	private String dueClass;
 	private String statusClass;
+	private String elapsedAgo;
 
 	private String cssClass;
 	private boolean checkVal;
@@ -195,6 +196,14 @@ public class AssetEntityBean implements Serializable {
 	}
 	public void setScore(Integer score) {
 		this.score = score;
+	}
+
+	// score
+	public String getElapsedAgo() {
+		return elapsedAgo;
+	}
+	public void setElapsedAgo(String ago) {
+		this.elapsedAgo = ago;
 	}
 
 	// validation

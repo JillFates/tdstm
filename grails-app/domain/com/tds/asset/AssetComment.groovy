@@ -17,6 +17,7 @@ class AssetComment {
 
 	Date dateCreated
 	Date lastUpdated
+	Date statusUpdated				// Updated when the status changes so we can compute the elapsed time that a task is in a status
 
 	Integer isResolved = 0
 	Date dateResolved 
@@ -43,6 +44,7 @@ class AssetComment {
 	Date actStart
 	// Date actFinish		// Alias of dateResolved
 	
+	Integer slack					// Indicated the original or recalculated slack time that this task has based on other predecessors of successors of this task
 	WorkflowTransition workflowTransition	// The transition that this task was cloned from
 	Integer workflowOverride = 0			// Flag that the Transition values (duration) has been overridden
 	String role	// TODO : Determine proper name.
@@ -93,6 +95,7 @@ class AssetComment {
 		estStart( nullable:true  )
 		actStart( nullable:true  )
 		estFinish( nullable:true  )
+		slack( nullable:true )
 		workflowTransition( nullable:true  )
 		// TODO : add range to workflowOverride constraint
 		workflowOverride( nullable:true)
@@ -129,7 +132,7 @@ class AssetComment {
 	}
 
 	// List of properties that should NOT be persisted
-	static transients = ['actFinish', 'assignedToString', 'assetName']
+	static transients = ['actFinish', 'assignedToString', 'assetName', 'statusDuration']
 	
 	// TODO : need method to handle inserting new assetComment or updating so that the category+taskNumber is unique 
 	
@@ -140,7 +143,7 @@ class AssetComment {
 		return assetEntity.assetName
 	}
 
-	// The actFinish value is stored in the dateResolved column	
+	// The actFinish value is stored in the dateResolved column	so need setter/getter
 	def getActFinish() {
 		return dateResolved
 	}
@@ -155,12 +158,31 @@ class AssetComment {
 		return this.status == AssetCommentStatus.DONE
 	}
 	
+	/*
+	 * Used to determine if an object is a runbook task
+	 * @return Boolean true if is runbook task
+	 */
+	def isRunbookTask() {
+		return [AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP].contains(this.category)
+	}
+	
 	// Extend the dateResolved setter to also set the isResolved appropriately
 	public void setDateResolved( Date date ) {
 		this.dateResolved = date
 		this.isResolved = date ? 1 : 0
 	}
 			
+	/*
+	 * Returns the duration in seconds that a task has been in at particular status
+	 * @return Integer
+	 */
+	def statusDuration() {
+		if (statusDate) {
+			return groovy.time.TimeCategory.minus(new Date(), statusDate)			
+		} else {
+			return null
+		}
+	}
 	// Returns the duration of the task in minutes
 	def durationInMinutes() {
 		def d = duration

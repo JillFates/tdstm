@@ -97,6 +97,9 @@ class TaskService {
 				6 - t.priority) AS score """)
 		}
 		
+		// Add Successor Count
+		sql.append(', (SELECT count(*) FROM task_dependency td WHERE predecessor_id=t.asset_comment_id) AS successors ')
+		
 		sql.append("""FROM asset_comment t 
 			LEFT OUTER JOIN asset_entity a ON a.asset_entity_id = t.asset_entity_id
 			WHERE t.project_id=:projectId AND t.comment_type=:type AND 
@@ -222,8 +225,13 @@ class TaskService {
 			return
 		}
 
+		def now =  GormUtil.convertInToGMT( "now", "EDT" )
+
 		// First thing to do, set the status
 		task.status = status
+		
+		// Update the time that the status has changed which is used to indentify tasks that have not been acted on appropriately
+		task.statusUpdated = now
 		
 		def previousStatus = task.getPersistentValue('status')
 		// Determine if the status is being reverted (e.g. going from DONE to READY)
@@ -253,7 +261,9 @@ class TaskService {
 				task.actStart = null				
 			}
 			
-			addNote( task, whom, "Reverted task status from '${previousStatus}' to '${status}'")
+			if ( task.isRunbookTask() ) {
+				addNote( task, whom, "Reverted task status from '${previousStatus}' to '${status}'")
+			}
 			
 			// TODO : Runbook Look at the successors and do something about them
 			// Change READY successors to PENDING
@@ -264,7 +274,6 @@ class TaskService {
 		// Now update the task properties according to the new status
 		if ([AssetCommentStatus.STARTED, AssetCommentStatus.DONE, AssetCommentStatus.TERMINATED].contains(status)) {
 	
-			def now =  GormUtil.convertInToGMT( "now", "EDT" )
 			def isPM = securityService.hasRole("PROJ_MGR")
 
 			// Properly handle assignment if the user is the PM

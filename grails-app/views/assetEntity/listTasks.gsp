@@ -1,5 +1,5 @@
 <%@page import="com.tds.asset.AssetComment"%>
-<%@page import="com.tdssrc.grails.HtmlUtil"%>
+<%@page import="com.tdssrc.grails.GormUtil"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
@@ -94,7 +94,7 @@
                 	         	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance?.assetType}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="lastUpdated" title="Updated" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.lastUpdated}" format="MM/dd kk:mm:ss"/></span>
+								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:elapsedAgo start="${commentInstance.lastUpdated}" end="${GormUtil.convertInToGMT(new Date(), null)}"/></span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="dueDate" title="Due" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.dueDate}" format="MM/dd"/></span>

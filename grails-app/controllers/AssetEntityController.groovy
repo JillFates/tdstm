@@ -2963,7 +2963,9 @@ class AssetEntityController {
 		
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		
-		def view = params.commentType == AssetCommentType.TASK ? 'listTasks' : 'listComment'
+		def isTask = params.commentType == AssetCommentType.TASK
+		
+		def view = isTask ? 'listTasks' : 'listComment'
 		if(params.commentType){
 			session.setAttribute("currentView", view)
 		}
@@ -3042,8 +3044,8 @@ class AssetEntityController {
 				setAssetName(comment.assetEntity?.assetName ?:'')
 				setAssetType(comment.assetEntity?.assetType ?:'')
 				setStatus(comment.status)
-				setLastUpdated(comment.dateCreated)
-				setDueDate(comment.dueDate ? comment.dueDate : comment.estFinish)
+				setLastUpdated(isTask && comment.isRunbookTask() ? comment.statusUpdated : comment.lastUpdated)
+				setDueDate(isTask && comment.isRunbookTask() ? comment.estFinish : comment.dueDate)
 				setAssignedTo(comment.assignedTo ? (comment.assignedTo?.firstName +" "+ comment.assignedTo?.lastName) : '' )
 				setRole(comment.role)
 				setCategory(org.apache.commons.lang.StringUtils.capitalize(comment.category))

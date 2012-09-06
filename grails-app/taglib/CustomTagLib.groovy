@@ -1,6 +1,8 @@
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
+
 class CustomTagLib {
 	static namespace = 'tds'
 	
@@ -118,51 +120,68 @@ class CustomTagLib {
 	}
 	
     def sortableLink = { attrs ->
-    		def writer = out
-    		if(!attrs.property)
-    			throwTagError("Tag [sortableColumn] is missing required attribute [property]")
-    		if(!attrs.title && !attrs.titleKey)
-    			throwTagError("Tag [sortableColumn] is missing required attribute [title] or [titleKey]")
+   		def writer = out
+   		if(!attrs.property)
+   			throwTagError("Tag [sortableColumn] is missing required attribute [property]")
+   		if(!attrs.title && !attrs.titleKey)
+   			throwTagError("Tag [sortableColumn] is missing required attribute [title] or [titleKey]")
 
-    		def property = attrs.remove("property")
-    		def action = attrs.action ? attrs.remove("action") : (params.action ? params.action : "list")
+   		def property = attrs.remove("property")
+   		def action = attrs.action ? attrs.remove("action") : (params.action ? params.action : "list")
 
-    		def defaultOrder = attrs.remove("defaultOrder")
-    		if(defaultOrder != "desc") defaultOrder = "asc"
+   		def defaultOrder = attrs.remove("defaultOrder")
+   		if(defaultOrder != "desc") defaultOrder = "asc"
 
-    		// current sorting property and order
-    		def sort = params.sort
-    		def order = params.order
+   		// current sorting property and order
+   		def sort = params.sort
+   		def order = params.order
 
-    		// add sorting property and params to link params
-    		def linkParams = [sort:property]
-    		if(params.id) linkParams.put("id",params.id)
-    		if(attrs.params) linkParams.putAll(attrs.remove("params"))
+   		// add sorting property and params to link params
+   		def linkParams = [sort:property]
+   		if(params.id) linkParams.put("id",params.id)
+   		if(attrs.params) linkParams.putAll(attrs.remove("params"))
 
-    		// determine and add sorting order for this column to link params
-    		attrs.class = (attrs.class ? "${attrs.class} sortable" : "sortable")
-    		if(property == sort) {
-    			attrs.class = attrs.class + " sorted " + order
-    			if(order == "asc") {
-    				linkParams.order = "desc"
-    			}
-    			else {
-    				linkParams.order = "asc"
-    			}
-    		}
-    		else {
-    			linkParams.order = defaultOrder
-    		}
+   		// determine and add sorting order for this column to link params
+   		attrs.class = (attrs.class ? "${attrs.class} sortable" : "sortable")
+   		if(property == sort) {
+   			attrs.class = attrs.class + " sorted " + order
+   			if(order == "asc") {
+   				linkParams.order = "desc"
+   			}
+   			else {
+   				linkParams.order = "asc"
+   			}
+   		}
+   		else {
+   			linkParams.order = defaultOrder
+   		}
 
-    		// determine column title
-    		def title = attrs.remove("title")
-    		def titleKey = attrs.remove("titleKey")
-    		if(titleKey) {
-    			if(!title) title = titleKey
-    			def messageSource = grailsAttributes.getApplicationContext().getBean("messageSource")
-    			def locale = RCU.getLocale(request)
-    			title = messageSource.getMessage(titleKey, null, title, locale)
-    		}
+   		// determine column title
+   		def title = attrs.remove("title")
+   		def titleKey = attrs.remove("titleKey")
+   		if(titleKey) {
+   			if(!title) title = titleKey
+   			def messageSource = grailsAttributes.getApplicationContext().getBean("messageSource")
+   			def locale = RCU.getLocale(request)
+   			title = messageSource.getMessage(titleKey, null, title, locale)
+   		}
 
-    		writer << "${link(action:action, params:linkParams) { title }}"
-    	}}
+   		writer << "${link(action:action, params:linkParams) { title }}"
+   	}
+
+	/**
+	 * Used to output the elapsed duration between two times in an Ago shorthand
+	 * @param Date	a start datetime
+	 * @param Date	an ending datetime
+	 */
+	def elapsedAgo = { attrs ->
+		def start = attrs.start
+		def end = attrs.end
+		
+		if ( ! start || ! end ) {
+			out << ''
+		} else {
+			out << TimeUtil.ago(start, end)
+		}
+	}
+}
