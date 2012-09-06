@@ -75,6 +75,7 @@ class AssetComment {
 		resolution( blank:true, nullable:true  )
 		dateCreated( nullable:true  )
 		lastUpdated( nullable:true  )
+		statusUpdated( nullable:true )
 		dateResolved( nullable:true  )
 		dueDate( nullable:true)
 		commentCode( blank:true, nullable:true  )
