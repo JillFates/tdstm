@@ -37,6 +37,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import groovy.time.TimeCategory
 
 class AssetEntityController {
 
@@ -1309,32 +1310,32 @@ class AssetEntityController {
 		}
 		def assetEntityList =  new ArrayList()
 		assetEntityInstanceList.each { assetEntity->
-			AssetEntityBean assetBeanInstance = new AssetEntityBean();
-			assetBeanInstance.setId(assetEntity.id)
-			assetBeanInstance.setAssetName(assetEntity.assetName)
-			assetBeanInstance.setAssetType(assetEntity.assetType)
-			assetBeanInstance.setAssetTag(assetEntity.assetTag)
-			assetBeanInstance.setModel(assetEntity.model?.modelName)
-			assetBeanInstance.setSourceLocation(assetEntity.sourceLocation)
-			assetBeanInstance.setSourceRack(assetEntity.rackSource?.tag)
-			assetBeanInstance.setTargetLocation(assetEntity.targetLocation)
-			assetBeanInstance.setTargetRack(assetEntity.rackTarget?.tag)
-			assetBeanInstance.setMoveBundle(assetEntity.moveBundle?.name)
-			assetBeanInstance.setSerialNumber(assetEntity.serialNumber)
-			assetBeanInstance.setplanStatus(assetEntity.planStatus)
-			assetBeanInstance.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
-			assetBeanInstance.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))
-			assetBeanInstance.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle)
+			AssetEntityBean assetBean = new AssetEntityBean();
+			assetBean.setId(assetEntity.id)
+			assetBean.setAssetName(assetEntity.assetName)
+			assetBean.setAssetType(assetEntity.assetType)
+			assetBean.setAssetTag(assetEntity.assetTag)
+			assetBean.setModel(assetEntity.model?.modelName)
+			assetBean.setSourceLocation(assetEntity.sourceLocation)
+			assetBean.setSourceRack(assetEntity.rackSource?.tag)
+			assetBean.setTargetLocation(assetEntity.targetLocation)
+			assetBean.setTargetRack(assetEntity.rackTarget?.tag)
+			assetBean.setMoveBundle(assetEntity.moveBundle?.name)
+			assetBean.setSerialNumber(assetEntity.serialNumber)
+			assetBean.setplanStatus(assetEntity.planStatus)
+			assetBean.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
+			assetBean.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))
+			assetBean.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle)
 
 			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
-				assetBeanInstance.setCommentType("issue")
+				assetBean.setCommentType("issue")
 			} else if(AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id)){
-				assetBeanInstance.setCommentType("comment")
+				assetBean.setCommentType("comment")
 			} else {
-				assetBeanInstance.setCommentType("blank")
+				assetBean.setCommentType("blank")
 			}
 
-			assetEntityList.add(assetBeanInstance)
+			assetEntityList.add(assetBean)
 		}
 		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
 		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
@@ -2936,12 +2937,33 @@ class AssetEntityController {
 		}
 		render (view :'ModelView' , model:[models : models])
 	}
+	
 	/**
-	 * Render comments list form.
+	 * Used to generate the List for Task Manager, which leverages a shared closure with listComment
+	 */
+	def listTasks = {
+		params.commentType=AssetCommentType.TASK
+		listCommentsOrTasks{}
+	}
+
+	/**
+	 * Used to generate the List of Comments, which leverages a shared closeure with the above listTasks controller
 	 */
 	def listComment = {
+		params.commentType=AssetCommentType.COMMENT
+		listCommentsOrTasks{}
+	}
+	
+	/**
+	 * Shared closure used by listTasks and listComment controller methods
+	 */
+	def listCommentsOrTasks = {
+		log.info "_listCommentsOrTasks: started"
+		def start = new Date()
+		
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def view = params.commentType == 'issue' ? 'listTasks' : 'listComment'
+		
+		def view = params.commentType == AssetCommentType.TASK ? 'listTasks' : 'listComment'
 		if(params.commentType){
 			session.setAttribute("currentView", view)
 		}
@@ -2997,35 +3019,58 @@ class AssetEntityController {
 				assetCommentQuery += " ORDER BY score DESC, taskNumber ASC, dueDate ASC, dateCreated DESC"
 		   }
 		}
-		def assetCommentList = []
+		
+		def stop = new Date()
+		def td = TimeCategory.minus( stop, start )
+
+		log.info "_listCommentsOrTasks:before SQL : ${TimeCategory.minus(new Date(), start)}"
+		start = new Date()
+
 		def commentList = AssetComment.findAll(assetCommentQuery,args)
+		log.info "_listCommentsOrTasks:after SQL : ${TimeCategory.minus(new Date(), start)}"
+		start = new Date()
 		// Initialize all comment property in to bean for jmesa.
+		def assetCommentList = new ArrayList(commentList.size())	// preallocate the size of the array to improve performance
+		def i=0
+		
 		commentList.each{comment->
-			AssetEntityBean assetBeanInstance = new AssetEntityBean();
-			assetBeanInstance.setId(comment.id)
-			assetBeanInstance.setTaskNumber(comment.taskNumber)
-			assetBeanInstance.setDescription(comment.comment)
-			assetBeanInstance.setAssetName(comment.assetEntity?.assetName)
-			assetBeanInstance.setAssetType(comment.assetEntity?.assetType)
-			assetBeanInstance.setStatus(comment.status)
-			assetBeanInstance.setLastUpdated(comment.dateCreated)
-			assetBeanInstance.setDueDate(comment.dueDate ? comment.dueDate : comment.estFinish)
-			assetBeanInstance.setAssignedTo(comment.assignedTo ? (comment.assignedTo?.firstName +" "+ comment.assignedTo?.lastName) : '' )
-			assetBeanInstance.setRole(comment.role)
-			assetBeanInstance.setCategory(comment.category)
-			assetBeanInstance.setSuccCount( TaskDependency.findAllByPredecessor( comment ).size())
-			assetBeanInstance.setAssetEntityId(comment.assetEntity?.id)
-			assetBeanInstance.setCommentType(comment.commentType)
-			assetCommentList.add(assetBeanInstance)
+			AssetEntityBean assetBean = new AssetEntityBean();
+			assetBean.with {
+				setId(comment.id)
+				setTaskNumber(comment.taskNumber)
+				setDescription(comment.comment)
+				setAssetName(comment.assetEntity?.assetName ?:'')
+				setAssetType(comment.assetEntity?.assetType ?:'')
+				setStatus(comment.status)
+				setLastUpdated(comment.dateCreated)
+				setDueDate(comment.dueDate ? comment.dueDate : comment.estFinish)
+				setAssignedTo(comment.assignedTo ? (comment.assignedTo?.firstName +" "+ comment.assignedTo?.lastName) : '' )
+				setRole(comment.role)
+				setCategory(org.apache.commons.lang.StringUtils.capitalize(comment.category))
+				setSuccCount( TaskDependency.findAllByPredecessor( comment ).size())
+				setAssetEntityId(comment.assetEntity?.id)
+				setCommentType(comment.commentType)
+				setScore(comment.score ?: 0)
+				setStatusClass( taskService.getCssClassForStatus(comment.status) )
+			}
+			// assetCommentList.add(assetBean)
+			assetCommentList[i++] = assetBean
 		}
+		log.info "_listCommentsOrTasks: creating list took: ${TimeCategory.minus(new Date(), start)}"
+		start = new Date()
+		
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
 		tableFacade.items = assetCommentList
 		Limit limit = tableFacade.limit
 		if(limit.isExported()){
+			log.info "listComment: limit.isExported()"
 			tableFacade.setExportTypes(response,limit.getExportType())
-			tableFacade.setColumnProperties("comment","commentType","assetEntity","mustVerify","isResolved","resolution","resolvedBy","createdBy","commentCode","category","displayOption")
+			tableFacade.setColumnProperties("comment","commentType","assetEntity","mustVerify","isResolved","resolution","resolvedBy","createdBy","commentCode","category",'score',"displayOption")
 			tableFacade.render()
 		} else {
+			log.info "listComment: ! limit.isExported()"
+			log.info "_listCommentsOrTasks:about to render : ${TimeCategory.minus(new Date(), start)}"
+			
 	      	render (view :session.getAttribute("currentView") , model:[assetCommentList:assetCommentList,rediectTo:'comment',checked:params.resolvedBox,issueBox:params.issueBox])
 		}
 	}

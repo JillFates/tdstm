@@ -1,4 +1,5 @@
 <%@page import="com.tds.asset.AssetComment"%>
+<%@page import="com.tdssrc.grails.HtmlUtil"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
@@ -6,9 +7,9 @@
         <title>Task Manager</title>
          <g:javascript src="asset.tranman.js" />
           <g:javascript src="entity.crud.js" />
-        <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
-        <link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
-        <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
+        <script language="javascript" src="${g.resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
+        <link rel="stylesheet" type="text/css" href="${g.resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
+        <link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
         <script type="text/javascript">
         function onInvokeAction(id) {
             setExportToLimit(id, '');
@@ -31,13 +32,13 @@
 			$("#createEntityView").dialog({ autoOpen: false })
 	    	currentMenuId = "#assetMenu";
 	    	$("#assetMenuId a").css('background-color','#003366')
-	    	$(".span_ready").parent().addClass("task_ready")
-	    	$(".span_hold").parent().addClass("task_hold")
-	    	$(".span_started").parent().addClass("task_started")
-	    	$(".span_pending").parent().addClass("task_pending")
-	    	$(".span_planned").parent().addClass("task_planned")
-	    	$(".span_completed").parent().addClass("task_completed")
-	    	$(".span_na").parent().addClass("task_na")
+	    	$(".span_task_ready").parent().addClass("task_ready")
+	    	$(".span_task_hold").parent().addClass("task_hold")
+	    	$(".span_task_started").parent().addClass("task_started")
+	    	$(".span_task_pending").parent().addClass("task_pending")
+	    	$(".span_task_planned").parent().addClass("task_planned")
+	    	$(".span_task_completed").parent().addClass("task_completed")
+	    	$(".span_task_na").parent().addClass("task_na")
         });
         </script>
         
@@ -78,7 +79,7 @@
 					<jmesa:htmlTable style=" border-collapse: separate" editable="true">
 						<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
 							<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" nowrap>
-				        		<a href="javascript:showAssetComment(${commentInstance?.id}, 'edit')"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
+				        		<a href="javascript:showAssetComment(${commentInstance?.id}, 'edit')"><img src="${g.resource(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="taskNumber" title="Task" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.taskNumber ? commentInstance.taskNumber :''}</span>
@@ -93,14 +94,14 @@
                 	         	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance?.assetType}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="lastUpdated" title="Updated" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.lastUpdated}" format="MM/dd"  /></span>
+								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.lastUpdated}" format="MM/dd kk:mm:ss"/></span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="dueDate" title="Due" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.dueDate}" format="MM/dd"/></span>
 							</jmesa:htmlColumn>
 							
-							<jmesa:htmlColumn property="status" title="Status" sortable="true" filterable="true" width="100px" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');" class="span_${commentInstance.status ? commentInstance.status.toLowerCase() : 'na'}">${commentInstance.status}</span>
+							<jmesa:htmlColumn property="status" title="Status" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
+							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');" class="span_${commentInstance.statusClass}">${commentInstance.status}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="assignedTo" title="Assigned To" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
         	                 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.assignedTo}</span>
@@ -113,11 +114,14 @@
     	                     	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show')"><g:if test ="${commentInstance.mustVerify == 1}"></g:if><g:else><g:checkBox name="myVerifyBox" value="${true}" disabled="true"/></g:else></span>
     	                     </jmesa:htmlColumn>
         	                 --%>
-							<jmesa:htmlColumn width="50px" property="category" sortable="true" filterable="true" title="category">
+							<jmesa:htmlColumn width="50px" property="category" sortable="true" filterable="true" title="Category">
                              	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.category}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="succCount" title="Count" sortable="true" filterable="true"  cellEditor="org.jmesa.view.editor.BasicCellEditor">
 							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${ commentInstance.succCount}</span>
+							</jmesa:htmlColumn>
+							<jmesa:htmlColumn property="score" title="Score" sortable="true" filterable="false">
+							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.score}</span>
 							</jmesa:htmlColumn>
 						</jmesa:htmlRow>
 					</jmesa:htmlTable>

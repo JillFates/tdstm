@@ -15,6 +15,11 @@ public class AssetEntityBean implements Serializable {
 	private String sourceTeamMt;
 	private String targetTeamMt;
 	private String status;
+	// CSS class names used for the Updated, Due and Status columns
+	private String updatedClass;
+	private String dueClass;
+	private String statusClass;
+
 	private String cssClass;
 	private boolean checkVal;
 
@@ -30,9 +35,10 @@ public class AssetEntityBean implements Serializable {
 	private String fileFormat;
 	private Integer fileSize;
 
-	private Integer depUp; // dependencies support count
-	private Integer depDown; // dependencies down count
-	
+	private Integer depUp; 		// dependencies support count
+	private Integer depDown; 	// dependencies down count
+	private Integer dependencyBundleNumber;
+
 	private String model;
 	private String sourceLocation;
 	private String sourceRack;
@@ -56,12 +62,17 @@ public class AssetEntityBean implements Serializable {
 	private String role;
 	private String category;
 	private Integer succCount;
+	private Integer score;
 	private Long assetEntityId;
 	
+	
+	// Default constructor
+	public AssetEntityBean() {}
+
+	// AssetEntityId
 	public Long getAssetEntityId() {
 		return assetEntityId;
 	}
-
 	public void setAssetEntityId(Long assetEntityId) {
 		this.assetEntityId = assetEntityId;
 	}
@@ -146,8 +157,6 @@ public class AssetEntityBean implements Serializable {
 		this.modelCount = modelCount;
 	}
 
-	
-	
 	public String getName() {
 		return name;
 	}
@@ -172,27 +181,28 @@ public class AssetEntityBean implements Serializable {
 		this.aka = aka;
 	}
 
+	// count
 	public Integer getCount() {
 		return count;
 	}
-
 	public void setCount(Integer count) {
 		this.count = count;
 	}
 
-	private Integer  dependencyBundleNumber;
+	// score
+	public Integer getScore() {
+		return score;
+	}
+	public void setScore(Integer score) {
+		this.score = score;
+	}
 
-
+	// validation
 	public String getValidation() {
 		return validation;
 	}
-
 	public void setValidation(String validation) {
 		this.validation = validation;
-	}
-
-	public AssetEntityBean() {
-
 	}
 
 	public long getId() {
@@ -259,20 +269,44 @@ public class AssetEntityBean implements Serializable {
 		this.targetTeamMt = targetTeamMt;
 	}
 
+	// Status
 	public String getStatus() {
 		return status;
 	}
-
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	
+	// StatusClass
+	public String getStatusClass() {
+		return statusClass;
+	}
+	public void setStatusClass(String clazz) {
+		this.statusClass = clazz;
+	}
+	
+	// DueClass
+	public String getDueClass() {
+		return dueClass;
+	}
+	public void setDueClass(String clazz) {
+		this.dueClass = clazz;
+	}
+	
+	// UpdatedClass
+	public String getUpdatedClass() {
+		return updatedClass;
+	}
+	public void setUpdatedClass(String clazz) {
+		this.updatedClass = clazz;
 	}
 
 	public String getCssClass() {
 		return cssClass;
 	}
 
-	public void setCssClass(String cssClass) {
-		this.cssClass = cssClass;
+	public void setCssClass(String clazz) {
+		this.cssClass = clazz;
 	}
 
 	public boolean getCheckVal() {
