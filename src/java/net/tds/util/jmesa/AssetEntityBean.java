@@ -1,7 +1,6 @@
 package net.tds.util.jmesa;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class AssetEntityBean implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -15,12 +14,6 @@ public class AssetEntityBean implements Serializable {
 	private String sourceTeamMt;
 	private String targetTeamMt;
 	private String status;
-	// CSS class names used for the Updated, Due and Status columns
-	private String updatedClass;
-	private String dueClass;
-	private String statusClass;
-	private String elapsedAgo;
-
 	private String cssClass;
 	private boolean checkVal;
 
@@ -55,101 +48,9 @@ public class AssetEntityBean implements Serializable {
 	private Integer modelCount;
 	private Integer count;
 	
-	private Integer taskNumber;
-	private String comment;
-	private Date lastUpdated;
-	private Date dueDate;
-	private String assignedTo;
-	private String role;
-	private String category;
-	private Integer succCount;
-	private Integer score;
-	private Long assetEntityId;
-	
-	
 	// Default constructor
 	public AssetEntityBean() {}
-
-	// AssetEntityId
-	public Long getAssetEntityId() {
-		return assetEntityId;
-	}
-	public void setAssetEntityId(Long assetEntityId) {
-		this.assetEntityId = assetEntityId;
-	}
-
-	public String getPlanStatus() {
-		return planStatus;
-	}
-
-	public void setPlanStatus(String planStatus) {
-		this.planStatus = planStatus;
-	}
-
-	public Integer getTaskNumber() {
-		return taskNumber;
-	}
-
-	public void setTaskNumber(Integer taskNumber) {
-		this.taskNumber = taskNumber;
-	}
-
-	public String getComment() {
-		return comment;
-	}
-
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
-
-	public Date getLastUpdated() {
-		return lastUpdated;
-	}
-
-	public void setLastUpdated(Date lastUpdated) {
-		this.lastUpdated = lastUpdated;
-	}
-
-	public Date getDueDate() {
-		return dueDate;
-	}
-
-	public void setDueDate(Date dueDate) {
-		this.dueDate = dueDate;
-	}
-
-	public String getAssignedTo() {
-		return assignedTo;
-	}
-
-	public void setAssignedTo(String assignedTo) {
-		this.assignedTo = assignedTo;
-	}
-
-	public String getRole() {
-		return role;
-	}
-
-	public void setRole(String role) {
-		this.role = role;
-	}
-
-	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
-	}
-
-	public Integer getSuccCount() {
-		return succCount;
-	}
-
-	public void setSuccCount(Integer succCount) {
-		this.succCount = succCount;
-	}
-
+	
 	public Integer getModelCount() {
 		return modelCount;
 	}
@@ -188,22 +89,6 @@ public class AssetEntityBean implements Serializable {
 	}
 	public void setCount(Integer count) {
 		this.count = count;
-	}
-
-	// score
-	public Integer getScore() {
-		return score;
-	}
-	public void setScore(Integer score) {
-		this.score = score;
-	}
-
-	// score
-	public String getElapsedAgo() {
-		return elapsedAgo;
-	}
-	public void setElapsedAgo(String ago) {
-		this.elapsedAgo = ago;
 	}
 
 	// validation
@@ -286,30 +171,6 @@ public class AssetEntityBean implements Serializable {
 		this.status = status;
 	}
 	
-	// StatusClass
-	public String getStatusClass() {
-		return statusClass;
-	}
-	public void setStatusClass(String clazz) {
-		this.statusClass = clazz;
-	}
-	
-	// DueClass
-	public String getDueClass() {
-		return dueClass;
-	}
-	public void setDueClass(String clazz) {
-		this.dueClass = clazz;
-	}
-	
-	// UpdatedClass
-	public String getUpdatedClass() {
-		return updatedClass;
-	}
-	public void setUpdatedClass(String clazz) {
-		this.updatedClass = clazz;
-	}
-
 	public String getCssClass() {
 		return cssClass;
 	}
@@ -358,11 +219,11 @@ public class AssetEntityBean implements Serializable {
 		this.moveBundle = moveBundle;
 	}
 
-	public String getplanStatus() {
+	public String getPlanStatus() {
 		return planStatus;
 	}
 
-	public void setplanStatus(String planStatus) {
+	public void setPlanStatus(String planStatus) {
 		this.planStatus = planStatus;
 	}
 

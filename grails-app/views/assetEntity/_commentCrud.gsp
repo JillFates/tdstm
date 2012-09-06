@@ -62,10 +62,6 @@
 				<input type="checkbox" id="hardAssignedShow" name="hardAssignedShow" value="0"
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;&nbsp;
 				<label for="hardAssignedShow" >Fixed Assignment</label>&nbsp;&nbsp;
-				<span id="dueDateTrId">
-					<label for="dueDate">Due :</label>
-					<span id="dueDateId"></span>
-				</span>
 			</td>
 		</tr>
 		<tr class="prop" id="commentShowTrId">
@@ -208,11 +204,6 @@
 				<input type="checkbox" id="hardAssigned" name="hardAssigned" value="1"  checked="checked"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;
 				<label for="hardAssigned" >Fixed Assignment</label>&nbsp;&nbsp;
-				<label for="dueDate">Due:</label>
-				<script type="text/javascript" charset="utf-8">
-                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-                  </script> <input type="text" class="dateRange" size="10" style="" name="dueDate" id="dueDateCreateId"
-					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 		</tr>
 		<tr class="prop" >
@@ -380,11 +371,6 @@
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;
 				<label for="hardAssignedEdit">Fixed Assignment</label>
 				&nbsp;&nbsp;&nbsp;
-			    <label for="dueDate">Due Date:</label>
-				<script type="text/javascript" charset="utf-8">
-				jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-				</script><input type="text" class="dateRange" size="15" style="" name="dueDateEdit" id="dueDateEdit"
-					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 		</tr>
 		<tr class="prop">
@@ -523,13 +509,12 @@
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 		</tr>
-		<tr class="prop" id="actStartTrEditId" style="display: none">
-			<td valign="top" class="name"><label for="actStartEditTrId">Actual Start:</label></td>
-			<td valign="top" class="value" colspan="3">
-				 <input type="text" class="datetimeEditRange" size="15" style="" name="actStartEditId" id="actStartEditId"
-					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-			</td>
-		</tr>
+		<tr class = "issue" id="actStartShow" style="display: none">
+			<td valign="top" class="name"><label for="actStartEditId">Actual Start:</label></td>
+			<td valign="top" class="value" id="actStartShowId"></td>
+			<td valign="top" class="name" nowrap="nowrap" width="10%"><label for="actFinishShowId">Actual Finish:</label></td>
+			<td valign="top" class="value" id="actFinishEditId" nowrap="nowrap"></td>
+		</tr >
 		<tr class="prop" style="display: none;">
 			<td valign="top" class="name"><label for="isResolved">Resolved:</label></td>
 			<td valign="top" class="value" colspan="3">

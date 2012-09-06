@@ -39,6 +39,13 @@
 	    	$(".span_task_planned").parent().addClass("task_planned")
 	    	$(".span_task_completed").parent().addClass("task_completed")
 	    	$(".span_task_na").parent().addClass("task_na")
+	    	if($("#revertedValId").val()=="" || $("#revertedValId").val()=='on'){
+	    		$("#myResolvedBox").attr('checked',true)
+	    		$("#resolvedBoxId").val('on')
+			 }else{
+				 $("#resolvedBoxId").val('off')
+				 $("#myResolvedBox").attr('checked',false)
+			 }
         });
         </script>
         
@@ -57,23 +64,24 @@
 			<div>
 			<div>
 			<input type="hidden" id="manageTaskId" value="manageTask"/>
-			<form name="commentForm" id="commentForm" action="listComment">
-			<span > <b>Include Completed : </b>
-				<g:if test="${checked=='on'}">
-					<input type="checkBox" name="resolvedBox" id="myResolvedBox"  checked="checked"  onclick="$('#commentForm').submit();"  />
-				</g:if>
-				<g:else>
-					<input type="checkBox" name="resolvedBox" id="myResolvedBox" onclick="$('#commentForm').submit();"  />
-				</g:else>
-				</span>
-				<span><b>Show My Issues :</b>
+			<form name="commentForm" id="commentForm" action="listTasks">
+			<input type="hidden" id="resolvedBoxId" name="resolvedBox" value="on"/>
+			<input type="hidden" id="revertedValId"  value="${checked}"/>
+			  <span >
+					<input type="checkBox" id="myResolvedBox" value="1" onclick="if(this.checked){this.value = 1} else {this.value = 0 };changeCheck(this.value)"  />
+				 <b> : Just Remaining </b></span>
+				<span>&nbsp;&nbsp;
 				<g:if test="${issueBox=='on'}">
 					<input type="checkBox" name="issueBox" id="issueBox" checked="checked" onclick="$('#commentForm').submit();"  />
 				</g:if>
 				<g:else>
-					<input type="checkBox" name="issueBox" id="issueBox"  onclick="$('#commentForm').submit();"  />
+					<input type="checkBox" name="issueBox" id="issueBox"  onclick="$('#commentForm').submit();" />
 				</g:else>
+				<b>: Just My Tasks </b></span>
+				<span>&nbsp;&nbsp;
+				 	<g:select from="${moveEvents}" name="moveEvent" optionKey="id" optionValue="name" noSelection="${['':' All']}" value="${filterEvent}" onchange="submitForm()" />
 				</span>
+				<span><b>: Move Events </b></span>
 				<br></br>
 				<jmesa:tableFacade id="tag" items="${assetCommentList}" maxRows="50" stateAttr="restore" var="commentInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100" >
 					<jmesa:htmlTable style=" border-collapse: separate" editable="true">
@@ -117,7 +125,7 @@
 							<jmesa:htmlColumn width="50px" property="category" sortable="true" filterable="true" title="Category">
                              	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.category}</span>
 							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="succCount" title="Count" sortable="true" filterable="true"  cellEditor="org.jmesa.view.editor.BasicCellEditor">
+							<jmesa:htmlColumn property="succCount" title="Succ" sortable="true" filterable="true"  cellEditor="org.jmesa.view.editor.BasicCellEditor">
 							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${ commentInstance.succCount}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="score" title="Score" sortable="true" filterable="false">
@@ -140,101 +148,106 @@
  </div>
  </div>
  <script type="text/javascript">
-            function pageRefresh(){
-               window.location.reload()
-            }
-	        function zxcAnimate(mde,obj,srt){
-	    		this.to=null;
-	    		this.obj=typeof(obj)=='object'?obj:document.getElementById(obj);
-	    		this.mde=mde.replace(/\W/g,'');
-	    		this.data=[srt||0];
-	    		return this;
-	    	}
-	
-	    	zxcAnimate.prototype.animate=function(srt,fin,ms,scale,c){
-	    		clearTimeout(this.to);
-	    		this.time=ms||this.time||0;
-	    		this.neg=srt<0||fin<0;
-	    		this.data=[srt,srt,fin];
-	    		this.mS=this.time*(!scale?1:Math.abs((fin-srt)/(scale[1]-scale[0])));
-	    		this.c=typeof(c)=='string'?c.charAt(0).toLowerCase():this.c?this.c:'';
-	    		this.inc=Math.PI/(2*this.mS);
-	    		this.srttime=new Date().getTime();
-	    		this.cng();
-	    	}
-	
-	    	zxcAnimate.prototype.cng=function(){
-	    		var oop=this,ms=new Date().getTime()-this.srttime;
-	    		this.data[0]=(this.c=='s')?(this.data[2]-this.data[1])*Math.sin(this.inc*ms)+this.data[1]:(this.c=='c')?this.data[2]-(this.data[2]-this.data[1])*Math.cos(this.inc*ms):(this.data[2]-this.data[1])/this.mS*ms+this.data[1];
-	    		this.apply();
-	    		if (ms<this.mS) this.to=setTimeout(function(){oop.cng()},10);
-	    		else {
-	    			this.data[0]=this.data[2];
-	    			this.apply();
-	    		 if (this.Complete) this.Complete(this);
-	    		}
-	    	}
-	
-	    	zxcAnimate.prototype.apply=function(){
-	    		if (isFinite(this.data[0])){
-	    			if (this.data[0]<0&&!this.neg) this.data[0]=0;
-	    			if (this.mde!='opacity') this.obj.style[this.mde]=Math.floor(this.data[0])+'px';
-	    			else zxcOpacity(this.obj,this.data[0]);
-	    		}
-	    	}
-	
-	    	function zxcOpacity(obj,opc){
-	    		if (opc<0||opc>100) return;
-	    		obj.style.filter='alpha(opacity='+opc+')';
-	    		obj.style.opacity=obj.style.MozOpacity=obj.style.WebkitOpacity=obj.style.KhtmlOpacity=opc/100-.001;
-	    	}
-	
-	    		function Bar(o){
-	    		var obj=document.getElementById(o.ID);
-	    			this.oop=new zxcAnimate('width',obj,0);
-	    			this.max=$('#issueTimebar').width();
-	    			this.to=null;
-	    		}
-	    		Bar.prototype={
-	    			Start:function(sec){
-	    				clearTimeout(this.to);
-	    				this.oop.animate(0,this.max,sec*1000);
-	    				this.srt=new Date();
-	    				this.sec=sec;
-	    				this.Time();
-	    			},
-	    			Time:function(sec){
-		    			//alert(sec)
-	    				var oop=this,sec=this.sec-Math.floor((new Date()-this.srt)/1000);
-	    				//this.oop.obj.innerHTML=sec+' sec';
-	    				//alert(sec)
-	    				$('#timeBarValueId').val(sec)
-	    				if (sec>0){
-	    					this.to=setTimeout(function(){ oop.Time(); },1000);
-	    				}else{
-	    					pageRefresh();
-	    				}
-	    			},
-	    			Pause:function(sec){
-	    				clearTimeout(this.to);
-	    				this.oop.animate(sec,'',sec*1000);
-	    			},
-	    			Restart:function(sec){
-	    				clearTimeout(this.to);
-	    				var second = $('#timeBarValueId').val()
-	    				this.oop.animate($('#issueTimebarId').width(),this.max,second*1000);
-	    				this.srt=new Date();
-	    				this.sec=second;
-	    				this.Time();
-	    			}
-	    		}
-	
-	    		B2=new Bar({
-	    			ID:'issueTimebarId'
-	    		});
-	
-	    		B2.Start(60);
-        </script>
- </body>
+ function changeCheck(value){
+	 value == 0 ? $('#resolvedBoxId').val('off') : $('#resolvedBoxId').val('on')
+     submitForm();
+ }
+ function submitForm(){
+     $('#commentForm').submit()
+ }
+ function pageRefresh(){
+   window.location.reload()
+ }
+ function zxcAnimate(mde,obj,srt){
+	this.to=null;
+	this.obj=typeof(obj)=='object'?obj:document.getElementById(obj);
+	this.mde=mde.replace(/\W/g,'');
+	this.data=[srt||0];
+	return this;
+ }
+ 
+ zxcAnimate.prototype.animate=function(srt,fin,ms,scale,c){
+	clearTimeout(this.to);
+	this.time=ms||this.time||0;
+	this.neg=srt<0||fin<0;
+	this.data=[srt,srt,fin];
+	this.mS=this.time*(!scale?1:Math.abs((fin-srt)/(scale[1]-scale[0])));
+	this.c=typeof(c)=='string'?c.charAt(0).toLowerCase():this.c?this.c:'';
+	this.inc=Math.PI/(2*this.mS);
+	this.srttime=new Date().getTime();
+	this.cng();
+ }
+
+ zxcAnimate.prototype.cng=function(){
+	var oop=this,ms=new Date().getTime()-this.srttime;
+	this.data[0]=(this.c=='s')?(this.data[2]-this.data[1])*Math.sin(this.inc*ms)+this.data[1]:(this.c=='c')?this.data[2]-(this.data[2]-this.data[1])*Math.cos(this.inc*ms):(this.data[2]-this.data[1])/this.mS*ms+this.data[1];
+	this.apply();
+	if (ms<this.mS) this.to=setTimeout(function(){oop.cng()},10);
+	else {
+		this.data[0]=this.data[2];
+		this.apply();
+	 if (this.Complete) this.Complete(this);
+	}
+ }
+
+ zxcAnimate.prototype.apply=function(){
+	if (isFinite(this.data[0])){
+		if (this.data[0]<0&&!this.neg) this.data[0]=0;
+		if (this.mde!='opacity') this.obj.style[this.mde]=Math.floor(this.data[0])+'px';
+		else zxcOpacity(this.obj,this.data[0]);
+	}
+ }
+
+ function zxcOpacity(obj,opc){
+	if (opc<0||opc>100) return;
+	obj.style.filter='alpha(opacity='+opc+')';
+ 	obj.style.opacity=obj.style.MozOpacity=obj.style.WebkitOpacity=obj.style.KhtmlOpacity=opc/100-.001;
+ }
+
+ function Bar(o){
+	var obj=document.getElementById(o.ID);
+		this.oop=new zxcAnimate('width',obj,0);
+		this.max=$('#issueTimebar').width();
+		this.to=null;
+	}
+	Bar.prototype={
+		Start:function(sec){
+			clearTimeout(this.to);
+			this.oop.animate(0,this.max,sec*1000);
+			this.srt=new Date();
+			this.sec=sec;
+			this.Time();
+		},
+		Time:function(sec){
+			var oop=this,sec=this.sec-Math.floor((new Date()-this.srt)/1000);
+			//this.oop.obj.innerHTML=sec+' sec';
+			$('#timeBarValueId').val(sec)
+			if (sec>0){
+				this.to=setTimeout(function(){ oop.Time(); },1000);
+			}else{
+				pageRefresh();
+			}
+		},
+		Pause:function(sec){
+			clearTimeout(this.to);
+			this.oop.animate(sec,'',sec*1000);
+		},
+		Restart:function(sec){
+			clearTimeout(this.to);
+			var second = $('#timeBarValueId').val()
+			this.oop.animate($('#issueTimebarId').width(),this.max,second*1000);
+			this.srt=new Date();
+			this.sec=second;
+			this.Time();
+		}
+	}
+
+	B2=new Bar({
+		ID:'issueTimebarId'
+	});
+
+  B2.Start(60);
+</script>
+</body>
  
 </html>

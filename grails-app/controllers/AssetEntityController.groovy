@@ -7,6 +7,7 @@ import java.util.Date
 import jxl.*
 import jxl.read.biff.*
 import jxl.write.*
+import net.tds.util.jmesa.AssetCommentBean;
 import net.tds.util.jmesa.AssetEntityBean
 
 import java.io.File;
@@ -2976,22 +2977,29 @@ class AssetEntityController {
 		def assetCommentQuery = "from AssetComment a where a.project = :project"
 		def args = [project:project]
 		def today = new Date()
-		def action = params.issueBox == "on" ? "issue" : params.resolvedBox == "on" ? "resolved" : params.filter
+		def action = params.issueBox == "on" ? "issue" : params.resolvedBox  ? "resolved" : params.filter
+		def moveEvents = []
+		def filterEvent
 		
 		if(session.getAttribute("currentView")=='listComment'){
 			assetCommentQuery += " and commentType != :commentType "
 			args << [ commentType:"issue"]
 		}else{
+		    if(params.moveEvent){
+				filterEvent = MoveEvent.get(params.moveEvent)
+				assetCommentQuery += " and a.moveEvent = :moveEvent "
+				args << [ moveEvent:filterEvent]
+			}
 			assetCommentQuery += " and commentType = :commentType "
 			args << [ commentType:"issue"]
 			switch(action){
 				case "issue":
 					if(params.resolvedBox == "on" ) {
-						assetCommentQuery += " and  a.assignedTo = :assignedTo "
-						args << [ assignedTo:personInstance]
-					} else {
 						assetCommentQuery += " and a.assignedTo = :assignedTo and status != :status"
 						args << [ assignedTo:personInstance, status:AssetCommentStatus.COMPLETED]
+					} else {
+						assetCommentQuery += " and  a.assignedTo = :assignedTo "
+						args << [ assignedTo:personInstance]
 					}
 					break
 				case "openIssue" :
@@ -3011,7 +3019,10 @@ class AssetEntityController {
 					args << [ category:"discovery", dueDate:today]
 					break
 				case "resolved" :
-					// DO Nothing
+					if(params.resolvedBox == "on" ) {
+						assetCommentQuery += "and status != :status"
+						args << [ status:AssetCommentStatus.COMPLETED]
+					}
 					break
 				default :
 					assetCommentQuery += " and status != :status "
@@ -3029,6 +3040,7 @@ class AssetEntityController {
 		start = new Date()
 
 		def commentList = AssetComment.findAll(assetCommentQuery,args)
+	    moveEvents = MoveEvent.findAllByProject(project)
 		log.info "_listCommentsOrTasks:after SQL : ${TimeCategory.minus(new Date(), start)}"
 		start = new Date()
 		// Initialize all comment property in to bean for jmesa.
@@ -3036,25 +3048,25 @@ class AssetEntityController {
 		def i=0
 		
 		commentList.each{comment->
-			AssetEntityBean assetBean = new AssetEntityBean();
-			assetBean.with {
-				setId(comment.id)
-				setTaskNumber(comment.taskNumber)
-				setDescription(comment.comment)
-				setAssetName(comment.assetEntity?.assetName ?:'')
-				setAssetType(comment.assetEntity?.assetType ?:'')
-				setStatus(comment.status)
-				setLastUpdated(isTask && comment.isRunbookTask() ? comment.statusUpdated : comment.lastUpdated)
-				setDueDate(isTask && comment.isRunbookTask() ? comment.estFinish : comment.dueDate)
-				setAssignedTo(comment.assignedTo ? (comment.assignedTo?.firstName +" "+ comment.assignedTo?.lastName) : '' )
-				setRole(comment.role)
-				setCategory(org.apache.commons.lang.StringUtils.capitalize(comment.category))
-				setSuccCount( TaskDependency.findAllByPredecessor( comment ).size())
-				setAssetEntityId(comment.assetEntity?.id)
-				setCommentType(comment.commentType)
-				setScore(comment.score ?: 0)
-				setStatusClass( taskService.getCssClassForStatus(comment.status) )
-			}
+		AssetCommentBean assetBean = new AssetCommentBean();
+		assetBean.with {
+			setId(comment.id)
+			setTaskNumber(comment.taskNumber)
+			setDescription(comment.comment)
+			setAssetName(comment.assetEntity?.assetName ?:'')
+			setAssetType(comment.assetEntity?.assetType ?:'')
+			setStatus(comment.status)
+			setLastUpdated(isTask && comment.isRunbookTask() ? comment.statusUpdated : comment.lastUpdated)
+			setDueDate(isTask && comment.isRunbookTask() ? comment.estFinish : comment.dueDate)
+			setAssignedTo(comment.assignedTo ? (comment.assignedTo?.firstName +" "+ comment.assignedTo?.lastName) : '' )
+			setRole(comment.role)
+			setCategory(org.apache.commons.lang.StringUtils.capitalize(comment.category))
+			setSuccCount( TaskDependency.findAllByPredecessor( comment ).size())
+			setAssetEntityId(comment.assetEntity?.id)
+			setCommentType(comment.commentType)
+			setScore(comment.score ?: 0)
+			setStatusClass( taskService.getCssClassForStatus(comment.status) )
+		}
 			// assetCommentList.add(assetBean)
 			assetCommentList[i++] = assetBean
 		}
@@ -3070,10 +3082,11 @@ class AssetEntityController {
 			tableFacade.setColumnProperties("comment","commentType","assetEntity","mustVerify","isResolved","resolution","resolvedBy","createdBy","commentCode","category",'score',"displayOption")
 			tableFacade.render()
 		} else {
+	      	
 			log.info "listComment: ! limit.isExported()"
 			log.info "_listCommentsOrTasks:about to render : ${TimeCategory.minus(new Date(), start)}"
-			
-	      	render (view :session.getAttribute("currentView") , model:[assetCommentList:assetCommentList,rediectTo:'comment',checked:params.resolvedBox,issueBox:params.issueBox])
+	      	render (view :session.getAttribute("currentView") , model:[assetCommentList:assetCommentList,rediectTo:'comment',s:params.resolvedBox,issueBox:params.issueBox,
+				                                                       moveEvents:moveEvents, filterEvent:filterEvent?.id])
 		}
 	}
 
