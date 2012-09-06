@@ -71,17 +71,12 @@
 			<input type="hidden" id="revertedValId"  value="${checked}"/>
 			<span >
 				<b>Move Event </b>
-			 	<g:select from="${moveEvents}" name="moveEvent" optionKey="id" optionValue="name" noSelection="${['':' All']}" value="${filterEvent}" onchange="submitForm()" />
+			 	<g:select from="${moveEvents}" name="moveEvent" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
 				&nbsp;&nbsp;
-				<input type="checkBox" id="myResolvedBox" value="1" onclick="if(this.checked){this.value = 1} else {this.value = 0 };changeCheck(this.value)"  />
+				<input type="checkBox" id="myResolvedBox" ${resolvedBox=='on' ? 'checked="checked"':''} onclick="if(this.checked){this.value = 1} else {this.value = 0 };changeCheck(this.value)"  />
 				<b> Just Remaining Tasks</b>
 				&nbsp;&nbsp;
-				<g:if test="${issueBox=='on'}">
-					<input type="checkBox" name="issueBox" id="issueBox" checked="checked" onclick="$('#commentForm').submit();"/>
-				</g:if>
-				<g:else>
-					<input type="checkBox" name="issueBox" id="issueBox"  onclick="$('#commentForm').submit();"/>
-				</g:else>
+				<input type="checkBox" name="issueBox" id="issueBox" ${issueBox=='on' ? 'checked="checked"':''} onclick="$('#commentForm').submit();"/>
 				<b> Just My Tasks</b>
 			</span>
 			<br/></br>

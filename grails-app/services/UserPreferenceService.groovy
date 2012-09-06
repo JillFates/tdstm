@@ -58,6 +58,7 @@ class UserPreferenceService  {
     	if ( currProj != null ) {
     		prefValue = currProj[preferenceCode]
     	}
+		// log.info "getPreference: preferenceCode=$preferenceCode, currProj=$currProj, prefValue=$prefValue"
     	return prefValue
     }
     /*
@@ -68,7 +69,7 @@ class UserPreferenceService  {
     	def principal = SecurityUtils.subject.principal
 	    def userLogin = UserLogin.findByUsername( principal )
     	def userPreference = UserPreference.findByUserLoginAndPreferenceCode( userLogin, preferenceCode)
-		if( userPreference ){
+		if ( userPreference ) {
 			userPreference.delete(flush:true)
 			loadPreferences( preferenceCode )
 		}
@@ -82,8 +83,8 @@ class UserPreferenceService  {
     def setPreference( String preferenceCode, String value ) {
     	
     	def principal = SecurityUtils.subject.principal
-		
-    	if(value && value != "null" && principal){
+		// log.info "setPreferences: Attempting to save user preference ${preferenceCode}='${value}'"
+    	if (value && value != "null" && principal){
 	    	def prefValue = getPreference(preferenceCode)
 	    	def userLogin = UserLogin.findByUsername( principal )
 	
@@ -97,12 +98,16 @@ class UserPreferenceService  {
 	    		def userPreference = new UserPreference( value: value )
 	    		userPreference.userLogin = userLogin
 	    		userPreference.preferenceCode = preferenceCode
-	    		userPreference.save( insert: true)
+	    		if (! userPreference.save( insert: true, flush:true)) {
+					log.error "setPreference: failed insert : ${GormUtil.allErrorsString(userPreference)}"
+				}
 	    	} else {
 	    		//	Statements to Update UserPreference to login user
 	    		def userPreference = UserPreference.get( new  UserPreference( userLogin:userLogin, preferenceCode: preferenceCode ) )
 	    		userPreference.value = value;
-	    		userPreference.save(flush:true);
+	    		if (! userPreference.save(flush:true) ) {
+					log.error "setPreference: failed update : ${GormUtil.allErrorsString(userPreference)}"
+				}
 	    	}
 	    	// call loadPreferences() to load CURR_PROJ MAP into session
 	    	loadPreferences(preferenceCode)

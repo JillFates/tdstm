@@ -2961,85 +2961,120 @@ class AssetEntityController {
 	 */
 	def listCommentsOrTasks = {
 		def project = securityService.getUserCurrentProject()
-		
+		def moveEvents = MoveEvent.findAllByProject(project)
+		def person = securityService.getUserLoginPerson()
+
+		// Deal with the parameters
 		def isTask = params.commentType == AssetCommentType.TASK
-		
 		def view = isTask ? 'listTasks' : 'listComment'
-		if (params.commentType){
-			session.setAttribute("currentView", view)
-		}
-		def assetEntityInstance = AssetEntity.findAllByProject(project)
-		def userId = session.getAttribute("LOGIN_PERSON").id
-		def personInstance = Person.get(userId)
-		def assetCommentQuery = "from AssetComment a where a.project = :project"
-		def args = [project:project]
+		// def action = params.issueBox == "on" ? "issue" : params.resolvedBox  ? "resolved" : params.filter
 		def today = new Date()
-		def action = params.issueBox == "on" ? "issue" : params.resolvedBox  ? "resolved" : params.filter
-		def moveEvents = []
-		def filterEvent
+		def moveEvent
+		def filterEvent = 0	    
+
+		def assetCommentQuery = "FROM AssetComment a WHERE a.project = :project"
+		def sqlArgs = [project:project]
 		
-		if(session.getAttribute("currentView")=='listComment'){
-			assetCommentQuery += " and commentType != :commentType "
-			args << [ commentType:"issue"]
-		}else{
-		    if(params.moveEvent){
-				filterEvent = MoveEvent.get(params.moveEvent)
-				assetCommentQuery += " and a.moveEvent = :moveEvent "
-				args << [ moveEvent:filterEvent]
+		if ( ! isTask ) {
+			// For comments we will filter just on the commentType
+			assetCommentQuery += " AND commentType != :commentType "
+			sqlArgs << [ commentType:AssetCommentType.COMMENT]
+		} else {
+			// For tasks, we have a number of different filters that we need to manage
+			
+		    if ( params.moveEvent?.size() > 0) {
+				// zero (0) = All events
+				log.info "listCommentsOrTasks: Handling MoveEvent based on params ${params.moveEvent}"
+				if (params.moveEvent != '0') {
+					moveEvent = MoveEvent.findByIdAndProject(params.moveEvent,project)
+					if (! moveEvent) {
+						log.warn "listCommentsOrTasks: ${person} tried to access moveEvent ${params.moveEvent} that was not found in project ${project.id}"
+					}
+				}
+			} else {
+				// Try getting the move Event from the user's session
+				def moveEventId = userPreferenceService.getPreference('MOVE_EVENT')
+				// log.info "listCommentsOrTasks: getting MOVE_EVENT preference ${moveEventId} for ${person}"
+				if (moveEventId) {
+					moveEvent = MoveEvent.findByIdAndProject(moveEventId,project)
+				}
 			}
-			assetCommentQuery += " and commentType = :commentType "
-			args << [ commentType:"issue"]
-			switch(action){
+			if (moveEvent) {
+				// Add filter to SQL statement and update the user's preferences
+				assetCommentQuery += " AND a.moveEvent = :moveEvent "
+				sqlArgs << [ moveEvent:moveEvent]
+				userPreferenceService.setPreference( 'MOVE_EVENT', "${moveEvent.id}" )
+				filterEvent = moveEvent.id
+				// log.info "listCommentsOrTasks: setting MOVE_EVENT preference to ${moveEvent.id} for ${person}"
+			}
+
+			def action = params.filter
+			def justMyTasks = params.issueBox == 'on'
+			def justRemainingTasks = params.resolvedBox == 'on'
+			
+			assetCommentQuery += " AND commentType = :commentType "
+			sqlArgs << [ commentType: AssetCommentType.TASK ]
+			
+			if (justMyTasks) {
+				assetCommentQuery += ' AND a.assignedTo = :assignedTo'
+				sqlArgs << [ assignedTo:person]
+			}
+			if (! justRemainingTasks) {
+				assetCommentQuery += ' AND status != :status'
+				sqlArgs << [ status:AssetCommentStatus.COMPLETED ]
+			}
+			
+			switch (action){
+				// Believe that most of these actions come from the Planning Dashboard
 				case "issue":
 					if(params.resolvedBox == "on" ) {
-						assetCommentQuery += " and a.assignedTo = :assignedTo and status != :status"
-						args << [ assignedTo:personInstance, status:AssetCommentStatus.COMPLETED]
+						assetCommentQuery += " AND a.assignedTo = :assignedTo AND status != :status"
+						sqlArgs << [ assignedTo:person, status:AssetCommentStatus.COMPLETED]
 					} else {
-						assetCommentQuery += " and  a.assignedTo = :assignedTo "
-						args << [ assignedTo:personInstance]
+						assetCommentQuery += " AND  a.assignedTo = :assignedTo "
+						sqlArgs << [ assignedTo:person]
 					}
 					break
 				case "openIssue" :
-					assetCommentQuery += " and a.status != :status and category = :category"
-					args << [ status:AssetCommentStatus.COMPLETED, category:"discovery" ]
+					assetCommentQuery += " AND a.status != :status AND category = :category"
+					sqlArgs << [ status:AssetCommentStatus.COMPLETED, category:"discovery" ]
 					break
 				case "generalOverDue" :
-					assetCommentQuery += " and category in ('general','planning') and a.dueDate < :dueDate and a.status != :status"
-					args << [ dueDate:today, status:AssetCommentStatus.COMPLETED ]
+					assetCommentQuery += " AND category in ('general','planning') AND a.dueDate < :dueDate AND a.status != :status"
+					sqlArgs << [ dueDate:today, status:AssetCommentStatus.COMPLETED ]
 					break
 				case "Discovery" :
-					assetCommentQuery += " and a.category= :category "
-					args << [ category:"discovery"]
+					assetCommentQuery += " AND a.category= :category "
+					sqlArgs << [ category:"discovery"]
 					break
 				case "dueOpenIssue" :
-					assetCommentQuery += " and a.category= :category and a.dueDate < :dueDate"
-					args << [ category:"discovery", dueDate:today]
+					assetCommentQuery += " AND a.category= :category AND a.dueDate < :dueDate"
+					sqlArgs << [ category:"discovery", dueDate:today]
 					break
 				case "resolved" :
 					if(params.resolvedBox == "on" ) {
-						assetCommentQuery += "and status != :status"
-						args << [ status:AssetCommentStatus.COMPLETED]
+						assetCommentQuery += "AND status != :status"
+						sqlArgs << [ status:AssetCommentStatus.COMPLETED]
 					}
 					break
-				default :
-					assetCommentQuery += " and status != :status "
-					args << [ status:AssetCommentStatus.COMPLETED ]
-					break
+				// this should not be the default any more...	
+				//default :
+				//	assetCommentQuery += " AND status != :status "
+				//	sqlArgs << [ status:AssetCommentStatus.COMPLETED ]
+				//	break
 					
 				assetCommentQuery += " ORDER BY score DESC, taskNumber ASC, dueDate ASC, dateCreated DESC"
 		   }
 		}
-		
-		def commentList = AssetComment.findAll(assetCommentQuery,args)
+		//log.info "listCommentsOrTasks: SQL filter=${assetCommentQuery}"
+		def commentList = AssetComment.findAll(assetCommentQuery,sqlArgs)
 		// def start = new Date()
-	    moveEvents = MoveEvent.findAllByProject(project)
 		// log.info "_listCommentsOrTasks:after SQL : ${TimeCategory.minus(new Date(), start)}"
 		// start = new Date()
 		
 		// Initialize all comment property in to bean for jmesa.
 		def assetCommentList = new ArrayList(commentList.size())	// preallocate the size of the array to improve performance
 		def i=0
-		
 		commentList.each{comment->
 			AssetCommentBean assetBean = new AssetCommentBean();
 			assetBean.with {
@@ -3102,8 +3137,10 @@ class AssetEntityController {
 			tableFacade.render()
 		} else {
 			// log.info "_listCommentsOrTasks:about to render : ${TimeCategory.minus(new Date(), start)}"
-	      	render (view :session.getAttribute("currentView") , model:[assetCommentList:assetCommentList,rediectTo:'comment',s:params.resolvedBox,issueBox:params.issueBox,
-				                                                       moveEvents:moveEvents, filterEvent:filterEvent?.id])
+			def model = [ assetCommentList:assetCommentList, rediectTo:'comment', 
+				s:params.resolvedBox, issueBox:params.issueBox,
+				moveEvents:moveEvents, filterEvent:filterEvent]
+	      	render (view:view ,model:model )
 		}
 	}
 

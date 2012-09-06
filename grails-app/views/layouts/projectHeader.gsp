@@ -4,20 +4,20 @@
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
     <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
     <title><g:layoutTitle default="Grails" /></title>
-    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css"/>
-    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" type="text/css"/>
-    <link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
-    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
-    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
-    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
+    <link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css"/>
+    <link rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" type="text/css"/>
+    <link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.core.css')}" />
+    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.dialog.css')}" />
+    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
+    <link rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
 
     <g:javascript library="prototype" />
     <jq:plugin name="jquery.combined" />
     <g:javascript src="crawler.js" />
     <g:layoutHead />
    
-    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dropDown.css')}" />    
+    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dropDown.css')}" />    
 
    <script type="text/javascript">
    		$(document).ready(function() {
@@ -57,7 +57,7 @@
     	  		<img src="${createLink(controller:'project', action:'showImage', id:setImage)}" style="height: 30px;"/>
     	  	</g:if>
 	      	<g:else>      	
-     			<a href="http://www.transitionaldata.com/" target="new"><img src="${createLinkTo(dir:'images',file:'tds2.png')}" style="float: left;border: 0px;height: 30px;"/></a>      	    	 
+     			<a href="http://www.transitionaldata.com/" target="new"><img src="${resource(dir:'images',file:'tds2.png')}" style="float: left;border: 0px;height: 30px;"/></a>      	    	 
     		</g:else>
     	</div>
       <div class="title">&nbsp;TransitionManager&trade; 
@@ -71,7 +71,7 @@
 			<strong>
 			<div style="float: left;">
 			<g:if test="${isIE6}">
-				<span><img title="Note: MS IE6 has limited capability so functions have been reduced." src="${createLinkTo(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
+				<span><img title="Note: MS IE6 has limited capability so functions have been reduced." src="${resource(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
 			</g:if>
 			<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onmouseover="showMegaMenu('#userMegaMenu')" onmouseout="mclosetime()" onComplete="updatePersonDetails(e)" style="float:left;display:inline">
 			&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name }
