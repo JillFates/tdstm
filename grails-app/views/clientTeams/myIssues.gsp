@@ -28,9 +28,9 @@
 		<span class="ui-icon ui-icon-closethick" unselectable="on" onclick="closeBox()"></span>
 		<table id="showCommentTable" style="border: 0px;">
 			<tr class="prop">
-				<td valign="top" class="name"><label for="comment"><b>Description:</b></label></td>
+			   <td valign="top" class="name"><label for="comment"><b>Task:</b></label></td>
 				<td valign="top" class="value" colspan="3">
-					<textarea cols="80" rows="2" id="commentTdId" readonly="readonly"></textarea>
+				<span id="commentTdId"></span>
 				</td>
 			</tr>
 			<tr class="prop" id="predecessorShowTr">
@@ -70,15 +70,15 @@
 				<td valign="top" class="value" id="assetShowValueId" colspan="3"></td>
 			</tr>
 			<tr class = "issue" id="estStartShow">
-				<td valign="top" class="name" nowrap="nowrap"><label for="estStartShowId">Estimated Start:</label></td>
+				<td valign="top" class="name" nowrap="nowrap"><label for="estStartShowId">Est.Start:</label></td>
 				<td valign="top" class="value" id="estStartShowId" nowrap="nowrap"></td>
-				<td valign="top" class="name" nowrap="nowrap"><label for="estFinishShowId">Estimated Finish:</label></td>
+				<td valign="top" class="name" nowrap="nowrap"><label for="estFinishShowId">Est.Finish:</label></td>
 				<td valign="top" class="value" id="estFinishShowId" nowrap="nowrap"></td>
 			</tr>
 			<tr class = "issue" id="actStartShow">
-				<td valign="top" class="name"><label for="actStartShowId">Actual Start:</label></td>
+				<td valign="top" class="name"><label for="actStartShowId">Act.Start:</label></td>
 				<td valign="top" class="value" id="actStartShowId"></td>
-				<td valign="top" class="name" nowrap="nowrap" width="10%"><label for="actFinishShowId">Actual Finish:</label></td>
+				<td valign="top" class="name" nowrap="nowrap" width="10%"><label for="actFinishShowId">Act.Finish:</label></td>
 				<td valign="top" class="value" id="actFinishShowId" nowrap="nowrap"></td>
 			</tr>
 		</table>
@@ -127,20 +127,22 @@
 				$('#predecessorShowTd').html(ac.predecessorTable)
 				$('#successorShowTd').html(ac.successorTable)
 				$('#assignedToTdId').html(ac.assignedTo)
+				$('#estStartShowId').html(ac.etStart)
+				$('#estFinishShowId').html(ac.etFinish)
+				$('#actStartShowId').html(ac.atStart)
+				$('#actFinishShowId').html(ac.dtResolved)
+				$('#dueDateId').html(ac.dueDate)
 				ac = ac.assetComment;
-				$('#commentTdId').html(ac.comment)
+				$('#statusShowId').attr("class","task_"+ac.status.toLowerCase())
+				$('#commentTdId').html(ac.taskNumber+":"+ac.comment)
+				$('#commentTdId1').html(ac.comment)
 				$('#statusShowId').html(ac.status)
 				$('#roleTdId').html(ac.role)
 				$('#hardAssignedShow').html(ac.hardAssigned)
-				$('#dueDateId').html(ac.dueDate)
 				$('#durationShowId').html(ac.duration)
 				$('#durationScale').html(ac.durationScale)
 				$('#priorityShowId').html(ac.priority)
 				$('#assetShowValueId').html(ac.assetEntity)
-				$('#estStartShowId').html(ac.estStart)
-				$('#estFinishShowId').html(ac.estFinish)
-				$('#actStartShowId').html(ac.actStart)
-				$('#actFinishShowId').html(ac.dateResolved)
 			}
 		});
 	}
