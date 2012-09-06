@@ -66,9 +66,9 @@
 			<thead>
 				<tr>
 					<g:sortableColumn class="sort_column" style="" action="listComment" property="number_comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="" action="listComment" property="assetEntity" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="" action="listComment" property="lastUpdated" title="Updated" params="['tab':tab,'search':search]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="" action="listComment" property="dueDate" title="Due" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="" action="listComment" property="assetEntity" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="" action="listComment" property="status" title="Status" params="['tab':tab,'search':search]"></g:sortableColumn>
 				</tr>
 			</thead>
@@ -89,17 +89,18 @@
 						${issue?.item?.taskNumber?issue?.item?.taskNumber+' - ' : ''}
 						${com.tdssrc.grails.StringUtil.ellipsis(issue?.item?.comment,50)}
 					</td>
+					<td id="asset_${issue?.item?.id}" class="asset_details_block">
+						${issue?.item?.assetName}
+					</td>
 					<td id="lastUpdated_${issue?.item?.id}" class="asset_details_block"><tds:convertDate
 							date="${issue?.item?.lastUpdated}"
 							timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
 							format="MM/dd kk:mm:ss" /></td>
-					<td id="dueDate_${issue?.item?.id}" class="asset_details_block"><tds:convertDate
-							date="${issue?.item?.dueDate}"
-							timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
-							format="MMM/dd" /></td>
-					<td id="asset_${issue?.item?.id}" class="asset_details_block">
-						${issue?.item?.assetName}
+					<td id="dueDate_${issue?.item?.id}" class="asset_details_block">
+							<tds:convertDate date="${issue?.item?.dueDate ? issue?.item?.dueDate : issue?.item?.estFinish}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
+								format="MMM/dd" />
 					</td>
+					
 					<td id="statusTd_${issue?.item?.id}" class="asset_details_block">
 						${issue?.item?.status}
 					</td>
