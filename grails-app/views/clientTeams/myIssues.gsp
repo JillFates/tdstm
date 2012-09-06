@@ -14,6 +14,7 @@
 		     </div>
 		</div>
 	    <br />
+	    <input type="hidden" id="timeBarValueId" value="0"/>
 		<div>
 			<g:link class="mobfooter" action="listComment" params="[viewMode:'mobile']">Use Mobile Site</g:link>
 		</div>
@@ -150,7 +151,7 @@
 		$('#dependencyBox').css("display","none");
 	}
 	function cancelButton(id,status){
-		B1.Start(60);
+		B1.Restart(60);
 		//$('#myIssueList').css('display','block')
 		$('#detailTdId_'+id).css('display','none')
 		$('#taskLinkId').addClass('mobselect')
@@ -173,7 +174,7 @@
 					 if(status=='Started'){
 					 	$('#started_'+id).hide()
 					 }
-					 B1.Start(60);
+					 B1.Restart(60);
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
@@ -194,7 +195,7 @@
 		$('#showStatusId_'+id).hide()
 		$('#detailTdId_'+id).css('display','none')
 		$('#issueTrId_'+id).attr('onClick','openStatus('+id+',"'+status+'")');
-		B1.Start(60);
+		B1.Restart(60);
 	}
  
 function changeAction(){
@@ -273,14 +274,24 @@ function zxcOpacity(obj,opc){
 		Time:function(sec){
 			var oop=this,sec=this.sec-Math.floor((new Date()-this.srt)/1000);
 		//	this.oop.obj.innerHTML=sec+' sec';
+	    	$('#timeBarValueId').val(sec)
 			if (sec>0){
 				this.to=setTimeout(function(){ oop.Time(); },1000);
 			}else{
 				pageRefresh();
 			}
 		},
-		Pause:function(){
+		Pause:function(sec){
 			clearTimeout(this.to);
+			this.oop.animate(sec,'',sec*1000);
+		},
+		Restart:function(sec){
+			clearTimeout(this.to);
+			var second = $('#timeBarValueId').val()
+			this.oop.animate($('#issueTimebarId').width(),this.max,second*1000);
+			this.srt=new Date();
+			this.sec=second;
+			this.Time();
 		}
 	}
 

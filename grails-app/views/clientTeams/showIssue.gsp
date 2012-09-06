@@ -302,7 +302,7 @@ $( function() {
 						 if(status=='Started'){
 						 	$('#started_'+objId).hide()
 						 }
-						 B1.Start(60);
+						 B1.Restart(60);
 					}
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
