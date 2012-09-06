@@ -55,7 +55,7 @@ class FilesController {
 			filesEntity.setFileFormat(fileentity.fileFormat)
 			filesEntity.setFileSize(fileentity.fileSize)
 			filesEntity.setMoveBundle(fileentity?.moveBundle?.name)
-			filesEntity.setplanStatus(fileentity.planStatus)
+			filesEntity.setPlanStatus(fileentity.planStatus)
 			filesEntity.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
 			filesEntity.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))
 			filesEntity.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(fileentity)?.dependencyBundle)

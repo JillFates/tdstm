@@ -472,6 +472,15 @@
 .task_term {
 	background-color: black;
 }
+.task_tardy {
+	background-color: #FFC266;
+}
+.task_late {
+	background-color: #FF9900;
+}
+.task_overdue {
+	color: red;
+}
 
 /* older movetech workflow styles */
 .asset_pending{

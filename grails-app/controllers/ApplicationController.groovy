@@ -105,7 +105,7 @@ class ApplicationController {
 			appBeanInstance.setAppOwner(appEntity.appOwner)
 			appBeanInstance.setAppSme(appEntity.sme)
 			appBeanInstance.setMoveBundle(appEntity.moveBundle?.name)
-			appBeanInstance.setplanStatus(appEntity.planStatus)
+			appBeanInstance.setPlanStatus(appEntity.planStatus)
 			appBeanInstance.setValidation(appEntity.validation)
 			appBeanInstance.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
 			appBeanInstance.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))

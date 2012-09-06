@@ -36,6 +36,7 @@ import com.tds.asset.TaskDependency
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.TimeUtil
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import groovy.time.TimeCategory
@@ -1323,7 +1324,7 @@ class AssetEntityController {
 			assetBean.setTargetRack(assetEntity.rackTarget?.tag)
 			assetBean.setMoveBundle(assetEntity.moveBundle?.name)
 			assetBean.setSerialNumber(assetEntity.serialNumber)
-			assetBean.setplanStatus(assetEntity.planStatus)
+			assetBean.setPlanStatus(assetEntity.planStatus)
 			assetBean.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
 			assetBean.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))
 			assetBean.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle)
@@ -2959,18 +2960,14 @@ class AssetEntityController {
 	 * Shared closure used by listTasks and listComment controller methods
 	 */
 	def listCommentsOrTasks = {
-		log.info "_listCommentsOrTasks: started"
-		def start = new Date()
-		
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def project = securityService.getUserCurrentProject()
 		
 		def isTask = params.commentType == AssetCommentType.TASK
 		
 		def view = isTask ? 'listTasks' : 'listComment'
-		if(params.commentType){
+		if (params.commentType){
 			session.setAttribute("currentView", view)
 		}
-		def project = Project.findById( projectId )
 		def assetEntityInstance = AssetEntity.findAllByProject(project)
 		def userId = session.getAttribute("LOGIN_PERSON").id
 		def personInstance = Person.get(userId)
@@ -3033,58 +3030,78 @@ class AssetEntityController {
 		   }
 		}
 		
-		def stop = new Date()
-		def td = TimeCategory.minus( stop, start )
-
-		log.info "_listCommentsOrTasks:before SQL : ${TimeCategory.minus(new Date(), start)}"
-		start = new Date()
-
 		def commentList = AssetComment.findAll(assetCommentQuery,args)
+		// def start = new Date()
 	    moveEvents = MoveEvent.findAllByProject(project)
-		log.info "_listCommentsOrTasks:after SQL : ${TimeCategory.minus(new Date(), start)}"
-		start = new Date()
+		// log.info "_listCommentsOrTasks:after SQL : ${TimeCategory.minus(new Date(), start)}"
+		// start = new Date()
+		
 		// Initialize all comment property in to bean for jmesa.
 		def assetCommentList = new ArrayList(commentList.size())	// preallocate the size of the array to improve performance
 		def i=0
 		
 		commentList.each{comment->
-		AssetCommentBean assetBean = new AssetCommentBean();
-		assetBean.with {
-			setId(comment.id)
-			setTaskNumber(comment.taskNumber)
-			setDescription(comment.comment)
-			setAssetName(comment.assetEntity?.assetName ?:'')
-			setAssetType(comment.assetEntity?.assetType ?:'')
-			setStatus(comment.status)
-			setLastUpdated(isTask && comment.isRunbookTask() ? comment.statusUpdated : comment.lastUpdated)
-			setDueDate(isTask && comment.isRunbookTask() ? comment.estFinish : comment.dueDate)
-			setAssignedTo(comment.assignedTo ? (comment.assignedTo?.firstName +" "+ comment.assignedTo?.lastName) : '' )
-			setRole(comment.role)
-			setCategory(org.apache.commons.lang.StringUtils.capitalize(comment.category))
-			setSuccCount( TaskDependency.findAllByPredecessor( comment ).size())
-			setAssetEntityId(comment.assetEntity?.id)
-			setCommentType(comment.commentType)
-			setScore(comment.score ?: 0)
-			setStatusClass( taskService.getCssClassForStatus(comment.status) )
-		}
-			// assetCommentList.add(assetBean)
+			AssetCommentBean assetBean = new AssetCommentBean();
+			assetBean.with {
+				setId(comment.id)
+				setTaskNumber(comment.taskNumber)
+				setDescription(comment.comment)
+				setCommentType(comment.commentType)
+				setAssetName(comment.assetEntity?.assetName ?:'')
+				setAssetType(comment.assetEntity?.assetType ?:'')
+				setStatus(comment.status)
+				setLastUpdated(isTask && comment.isRunbookTask() ? comment.statusUpdated : comment.lastUpdated)
+				setDueDate(isTask && comment.isRunbookTask() ? comment.estFinish : comment.dueDate)
+				setAssignedTo(comment.assignedTo ? (comment.assignedTo?.firstName +" "+ comment.assignedTo?.lastName) : '' )
+				setRole(comment.role)
+				setCategory(org.apache.commons.lang.StringUtils.capitalize(comment.category))
+				setScore(comment.score ?: 0)
+				setAssetEntityId( comment.assetEntity?.id )
+				assetBean.setRunbookTask( comment.isRunbookTask() )
+				setSuccCount( TaskDependency.findAllByPredecessor( comment ).size())
+				// TODO - Performance Issue - some reason calling the method on the Service class here is causing a 1+ min delay so the status style is hard coded
+				// assetBean.setStatusClass( taskService.getCssClassForStatus(comment.status) )
+				setStatusClass( comment.status ? "task_${comment.status.toLowerCase()}" : 'task_na' )
+
+				// Set the Last Updated duration appropriately
+				def elapsed = TimeUtil.elapsed(comment.statusUpdated, GormUtil.convertInToGMT( "now", "EDT" ))
+				def elapsedSec = elapsed.toMilliseconds() / 1000
+				if (comment.status == AssetCommentStatus.READY) {
+					if (elapsedSec >= 600) {
+						setUpdatedClass('task_late')
+					} else if (elapsedSec >= 300) {
+						setUpdatedClass('task_tardy')
+					}
+				} else if (comment.status == AssetCommentStatus.STARTED) {
+					def dueInSecs = elapsedSec - (comment.duration ?: 0) * 60
+					if (dueInSecs >= 600) {
+						setUpdatedClass('task_late')
+					} else if (dueInSecs >= 300) {
+						setUpdatedClass('task_tardy')
+					}
+				}
+				if (comment.estFinish) {
+					elapsed = TimeUtil.elapsed(comment.estFinish, GormUtil.convertInToGMT( "now", "EDT" ))
+					elapsedSec = elapsed.toMilliseconds() / 1000
+					if (elapsedSec > 300) {
+						setDueClass('task_overdue')
+					}
+				}
+			}
 			assetCommentList[i++] = assetBean
 		}
-		log.info "_listCommentsOrTasks: creating list took: ${TimeCategory.minus(new Date(), start)}"
-		start = new Date()
+		//log.info "listCommentsOrTasks: creating list took: ${TimeCategory.minus(new Date(), start)}"
+		//start = new Date()
 		
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
 		tableFacade.items = assetCommentList
 		Limit limit = tableFacade.limit
 		if(limit.isExported()){
-			log.info "listComment: limit.isExported()"
 			tableFacade.setExportTypes(response,limit.getExportType())
 			tableFacade.setColumnProperties("comment","commentType","assetEntity","mustVerify","isResolved","resolution","resolvedBy","createdBy","commentCode","category",'score',"displayOption")
 			tableFacade.render()
 		} else {
-	      	
-			log.info "listComment: ! limit.isExported()"
-			log.info "_listCommentsOrTasks:about to render : ${TimeCategory.minus(new Date(), start)}"
+			// log.info "_listCommentsOrTasks:about to render : ${TimeCategory.minus(new Date(), start)}"
 	      	render (view :session.getAttribute("currentView") , model:[assetCommentList:assetCommentList,rediectTo:'comment',s:params.resolvedBox,issueBox:params.issueBox,
 				                                                       moveEvents:moveEvents, filterEvent:filterEvent?.id])
 		}

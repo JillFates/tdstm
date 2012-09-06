@@ -60,7 +60,7 @@ class DatabaseController {
 			dataBeanInstance.setDbFormat(dataBaseentity.dbFormat)
 			dataBeanInstance.setAssetName(dataBaseentity.assetName)
 			dataBeanInstance.setMoveBundle(dataBaseentity?.moveBundle?.name)
-			dataBeanInstance.setplanStatus(dataBaseentity.planStatus)
+			dataBeanInstance.setPlanStatus(dataBaseentity.planStatus)
 			dataBeanInstance.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
 			dataBeanInstance.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))
 			dataBeanInstance.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(dataBaseentity)?.dependencyBundle)

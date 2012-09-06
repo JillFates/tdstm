@@ -24,12 +24,12 @@ public class AssetCommentBean implements Serializable {
 	private Long assetEntityId;
 	
 	// CSS class names used for the Updated, Due and Status columns
-	private String updatedClass;
-	private String dueClass;
-	private String statusClass;
-	private String elapsedAgo;
+	private String updatedClass="";
+	private String dueClass="";
+	private String statusClass="";
+	private String elapsedAgo="";
 	private Integer score;
-	
+	private Boolean isRunbookTask=false;
 	
 	public AssetCommentBean() {}
 	
@@ -157,24 +157,31 @@ public class AssetCommentBean implements Serializable {
 	public String getStatusClass() {
 		return this.statusClass;
 	}
-	public void setStatusClass(String clazz) {
-		this.statusClass = clazz;
+	public void setStatusClass(String val) {
+		this.statusClass = val;
 	}
 	
 	// DueClass
 	public String getDueClass() {
 		return this.dueClass;
 	}
-	public void setDueClass(String clazz) {
-		this.dueClass = clazz;
+	public void setDueClass(String val) {
+		this.dueClass = val;
 	}
 	
 	// UpdatedClass
 	public String getUpdatedClass() {
 		return this.updatedClass;
 	}
-	public void setUpdatedClass(String clazz) {
-		this.updatedClass = clazz;
+	public void setUpdatedClass(String val) {
+		this.updatedClass = val;
 	}
-
+	
+	// isRunbookTask
+	public Boolean isRunbookTask() {
+		return isRunbookTask;
+	}
+	public void setRunbookTask( Boolean isRb ) {
+		this.isRunbookTask = isRb;
+	}
 }

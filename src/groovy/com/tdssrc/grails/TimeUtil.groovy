@@ -16,6 +16,9 @@ class TimeUtil {
 	 * @return TimeDuration
 	 */
 	public static TimeDuration elapsed(def start, def end) {
+		if (! start || ! end ) {
+			return new TimeDuration(0,0,0,0)
+		}
 		use (TimeCategory) {
 			TimeDuration duration = end - start
 			return duration
@@ -36,7 +39,7 @@ class TimeUtil {
 		int minutes=duration.getMinutes()
 		int seconds=duration.getSeconds()
 		String ago = ""
-        if (hours > 24) {
+        if (days > 0) {
                 ago = "${days}d ${hours}h ${minutes}m"
         } else if (hours > 0) {
                 ago = "${hours}h ${minutes}m ${seconds}s"

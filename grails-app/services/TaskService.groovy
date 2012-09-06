@@ -237,7 +237,7 @@ class TaskService {
 		// Determine if the status is being reverted (e.g. going from DONE to READY)
 		def revertStatus = compareStatus(previousStatus, status) > 0
 
-		log.debug "setTaskStatus() status=${status}, previousStatus=${previousStatus}, revertStatus=${revertStatus}"
+		log.info "setTaskStatus() task=${task.id} status=${status}, previousStatus=${previousStatus}, revertStatus=${revertStatus}"
 
 		// Setting of AssignedTO:
 		//
@@ -370,14 +370,14 @@ class TaskService {
 						}
 						*/
 							
-						log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) Making READY "
+						log.info "taskStatusChangeEvent: task=${task.id} dependentTask(${dependentTask.id}) setting to READY "
 						setTaskStatus(dependentTask, AssetCommentStatus.READY)
 						// log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) Making READY - Successful"
 						if ( ! dependentTask.validate() ) {
 							log.error "taskStatusChangeEvent: Failed Readying successor task [${dependentTask.id} " + GormUtil.allErrorsString(dependentTask)
 						}
 						
-						// log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) Made it by validate() "
+						// log.info "taskStatusChangeEvent: task=${task.id} dependentTask(${dependentTask.id}) Made it by validate() "
 						
 						/*
 						 * OK - For anybody looking at this logic and questioning it, let me first say I'm confused too.  For some 
@@ -390,18 +390,18 @@ class TaskService {
 						 * John 8/2012
 						 */
 						if ( dependentTask.save(flush:true) ) {
-							log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) Saved"
+							log.info "taskStatusChangeEvent: task=${task.id} dependentTask(${dependentTask.id}) Saved"
 							return
 						} else {
 						//if (! (  dependentTask.validate() && dependentTask.save(flush:true) ) ) {
-							log.error "Failed Readying successor task [${dependentTask.id} " + GormUtil.allErrorsString(dependentTask)
+							log.error "Failed setting successor task READY [${dependentTask.id}], task=${task.id}, " + GormUtil.allErrorsString(dependentTask)
 							
 							 throw new TaskCompletionException("Unable to READY task ${dependentTask} due to " +
 								 GormUtil.allErrorsString(dependentTask) )
 						}
 					}
 				} else {
-					log.warn "taskStatusChangeEvent: Found dependentTask(${dependentTask.id}): ${dependentTask} at unexpected status (${dependentTask.status}"
+					log.warn "taskStatusChangeEvent: task=${task.id}, Found dependentTask(${dependentTask.id}): ${dependentTask} at unexpected status (${dependentTask.status}"
 				} 
 			} // succDependencies?.each()
 		}
@@ -415,7 +415,8 @@ class TaskService {
 	 */
 	def getCssClassForStatus( status ) {
 		def css = 'task_na'
-		if (AssetCommentStatus.getList().contains(status)) {
+		
+		if (AssetCommentStatus.list.contains(status)) {
 			css = "task_${status.toLowerCase()}"
 		}
 		// log.error "getCssClassForStatus('${status})=${css}"
@@ -437,10 +438,10 @@ class TaskService {
 		def assetForComment = assetComment.assetEntity
 		def moveEventForComment =  assetForComment ? assetForComment.moveBundle?.moveEvent : assetComment.moveEvent
 		def queryForPredecessor = new StringBuffer("""FROM AssetComment a WHERE a.project=${projectId} \
-															AND a.category='${category}'\
-														    AND a.commentType='${AssetCommentType.TASK}'\
-															AND a.id != ${assetComment.id} """)
-		if(moveEventForComment){
+			AND a.category='${category}'\
+			AND a.commentType='${AssetCommentType.TASK}'\
+			AND a.id != ${assetComment.id} """)
+		if (moveEventForComment) {
 			queryForPredecessor.append("AND (a.assetEntity.moveBundle.moveEvent.id = ${moveEventForComment?.id} OR a.moveEvent.id = ${moveEventForComment?.id})")
 		}
 		queryForPredecessor.append(""" ORDER BY a.taskNumber ASC""")
@@ -449,6 +450,7 @@ class TaskService {
 		def paramsMap = ["selectId":"${idPrefix}_${taskDependency.id}", "selectName":"${name}", "from":predecessors,
 							 "optionKey":"id", "selection":predecessor.id]
 		def selectControl = HtmlUtil.genHtmlSelect( paramsMap )
+		
 		return selectControl
 	}
 	

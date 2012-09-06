@@ -32,6 +32,8 @@
 			$("#createEntityView").dialog({ autoOpen: false })
 	    	currentMenuId = "#assetMenu";
 	    	$("#assetMenuId a").css('background-color','#003366')
+	    	$(".span_task_tardy").parent().addClass("task_tardy")
+	    	$(".span_task_late").parent().addClass("task_late")
 	    	$(".span_task_ready").parent().addClass("task_ready")
 	    	$(".span_task_hold").parent().addClass("task_hold")
 	    	$(".span_task_started").parent().addClass("task_started")
@@ -67,22 +69,22 @@
 			<form name="commentForm" id="commentForm" action="listTasks">
 			<input type="hidden" id="resolvedBoxId" name="resolvedBox" value="on"/>
 			<input type="hidden" id="revertedValId"  value="${checked}"/>
-			  <span >
-					<input type="checkBox" id="myResolvedBox" value="1" onclick="if(this.checked){this.value = 1} else {this.value = 0 };changeCheck(this.value)"  />
-				 <b> : Just Remaining </b></span>
-				<span>&nbsp;&nbsp;
+			<span >
+				<b>Move Event </b>
+			 	<g:select from="${moveEvents}" name="moveEvent" optionKey="id" optionValue="name" noSelection="${['':' All']}" value="${filterEvent}" onchange="submitForm()" />
+				&nbsp;&nbsp;
+				<input type="checkBox" id="myResolvedBox" value="1" onclick="if(this.checked){this.value = 1} else {this.value = 0 };changeCheck(this.value)"  />
+				<b> Just Remaining Tasks</b>
+				&nbsp;&nbsp;
 				<g:if test="${issueBox=='on'}">
-					<input type="checkBox" name="issueBox" id="issueBox" checked="checked" onclick="$('#commentForm').submit();"  />
+					<input type="checkBox" name="issueBox" id="issueBox" checked="checked" onclick="$('#commentForm').submit();"/>
 				</g:if>
 				<g:else>
-					<input type="checkBox" name="issueBox" id="issueBox"  onclick="$('#commentForm').submit();" />
+					<input type="checkBox" name="issueBox" id="issueBox"  onclick="$('#commentForm').submit();"/>
 				</g:else>
-				<b>: Just My Tasks </b></span>
-				<span>&nbsp;&nbsp;
-				 	<g:select from="${moveEvents}" name="moveEvent" optionKey="id" optionValue="name" noSelection="${['':' All']}" value="${filterEvent}" onchange="submitForm()" />
-				</span>
-				<span><b>: Move Events </b></span>
-				<br></br>
+				<b> Just My Tasks</b>
+			</span>
+			<br/></br>
 				<jmesa:tableFacade id="tag" items="${assetCommentList}" maxRows="50" stateAttr="restore" var="commentInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100" >
 					<jmesa:htmlTable style=" border-collapse: separate" editable="true">
 						<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
@@ -102,10 +104,11 @@
                 	         	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance?.assetType}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="lastUpdated" title="Updated" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:elapsedAgo start="${commentInstance.lastUpdated}" end="${GormUtil.convertInToGMT(new Date(), null)}"/></span>
+								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');" class="span_${commentInstance.updatedClass}"><tds:elapsedAgo start="${commentInstance.lastUpdated}" end="${GormUtil.convertInToGMT(new Date(), null)}"/></span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="dueDate" title="Due" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.dueDate}" format="MM/dd"/></span>
+							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');" class="${commentInstance.dueClass}">
+								<tds:convertDate date="${commentInstance.dueDate}" format="${commentInstance.isRunbookTask() ? 'MM/dd kk:mm:ss' : 'MM/dd'}"/></span>
 							</jmesa:htmlColumn>
 							
 							<jmesa:htmlColumn property="status" title="Status" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
