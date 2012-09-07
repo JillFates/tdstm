@@ -164,11 +164,11 @@
    </table>
 	</div>
    <tds:hasPermission permission='CommentCrudView'>
-	<div class="buttons">
+	<div class="buttons" style="white-space: nowrap;">
 	<span class="button">
 	<input class="edit" type="button" value="Edit" id="commentButtonEditId" />
 	</span>
-	<span class="button" style="white-space: nowrap;"> 
+	<span class="button" > 
 	<span id="fromAssetId"> 
 	    <input class="delete" type="button" value="Delete" onclick="deleteComment('#commentId','#assetEntityIdShow','update')"/>
 	</span>

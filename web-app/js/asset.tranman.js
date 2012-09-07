@@ -771,20 +771,20 @@ function showAssetDialog( e , action ) {
 			         $('#commentTypeEditId').attr("disabled","disabled");
 	      		     $('.issue').css('display','table-row')
 	      		     $('#deleteCommentId').css('display','none')
+	      		     $('#moveEventEditId').val(ac.moveEvent ? ac.moveEvent.id : '')
+	      		     $('#moveShowId').css('display','table-row')
+	      		     $('#moveEventEditTrId').css('display','table-row')
 				     if(ac.assetEntity==null){
-				    	$('#moveShowId').css('display','table-row')
 				    	$('#assetShowId').css('display','none')
 				    	$('#assetTrId').css('display','none')
-				    	$('#moveEventEditId').val(ac.moveEvent ? ac.moveEvent.id : '')
-				    	$('#moveEventEditTrId').css('display','table-row')
 				     }else{
-				    	$('#moveShowId').css('display','table-row')
 				    	$('#assetShowId').css('display','table-row')
-				    	$('#moveEventEditTrId').css('display','table-row')
 				    	$('#assetTrId').css('display','table-row')
 				    	$('#assetValueId').val(ac.assetEntity ? ac.assetEntity.id : '')
 				    	$('#assetEntityIdShow').val(ac.assetEntity ? ac.assetEntity.id : '')
 				     }
+	      		   $("#showCommentDialog").dialog("option", "title", "Task Detail");
+	      		   $("#editCommentDialog").dialog("option", "title", "Task Detail");
 		      	 } else {
 		      		$('.issue').css('display','none')
 		      		$('#deleteCommentId').removeAttr('style')
@@ -795,6 +795,8 @@ function showAssetDialog( e , action ) {
 	     	      	$('#predecessorAddTr').css('display','none')
 	     	      	$('#previousNote').html('')
 	     	      	$('#predecessorShowTr').css('display','none')
+	     	      	$("#showCommentDialog").dialog("option", "title", "Comment Detail");
+		      		$("#editCommentDialog").dialog("option", "title", "Comment Detail");
 		      	 }
 				 if(ac.commentType=='instruction'){
 					 $('#mustVerifyId').css('display','table-row')
