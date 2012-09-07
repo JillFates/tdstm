@@ -26,6 +26,7 @@ class ReportsController {
 	def jdbcTemplate
 	def supervisorConsoleService 
 	def reportsService
+	def securityService
 	
 	def index = { 
 		render(view:'home')
@@ -1289,13 +1290,30 @@ class ReportsController {
 		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
     	def projectInstance = Project.findById( currProj ) 
 		def moveEventList = MoveEvent.findAllByProject(projectInstance)
-		return ['moveEvents':moveEventList]
+		def moveEventId = securityService.getUserCurrentMoveEventId()
+		return ['moveEvents':moveEventList,moveEventId:moveEventId]
 	}
 	def generateCheckList={
-		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def moveEventInstance = MoveEvent.get(params.moveEvent)
+		def project = securityService.getUserCurrentProject()
+		def moveEventId = params.moveEvent
+		def moveEventInstance
+		def errorMsg = "Please select a MoveEvent"
 		
-		return reportsService.generatePreMoveCheckList(currProj,moveEventInstance)
+		if( moveEventId && moveEventId.isNumber() ){
+			def isProjMoveEvent  = MoveEvent.findByIdAndProject( moveEventId, project )
+			if ( !isProjMoveEvent ) {
+				errorMsg = " User tried to access moveEvent ${moveEventId} that was not found in project : ${project} "
+				log.warn "generateCheckList: User tried to access moveEvent ${moveEventId} that was not found in project : ${project}"
+			} else {
+			    errorMsg = ""
+				userPreferenceService.setPreference( "MOVE_EVENT", "${moveEventId}" )
+				moveEventInstance = MoveEvent.get(moveEventId)
+				return reportsService.generatePreMoveCheckList(project.id, moveEventInstance)
+			}
+		}
+		flash.message = errorMsg
+		redirect( action:"preMoveCheckList")
+		
 	}
 }
  

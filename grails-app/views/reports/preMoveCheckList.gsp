@@ -10,13 +10,15 @@
 	<div class="body">
 		<h1>Pre-Move Checklist</h1>
 		<div class="message" id="preMoveErrorId" style="display: none">Please select the event to start the report.</div>
-		
+		<g:if test="${flash.message}">
+			<div class="message">${flash.message}</div>
+		</g:if>
 		<g:form action="generateCheckList" name="preMoveCheck" method="post">
 			<table>
 				<tbody>
 					<tr>
 						<td><g:select from="${moveEvents}" id="moveEventId" name="moveEvent"
-								optionKey="id" optionValue="name" /></td>
+								optionKey="id" optionValue="name" value="${moveEventId}"/></td>
 					</tr>
 					<tr>
 
