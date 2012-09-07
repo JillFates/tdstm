@@ -22,6 +22,7 @@ class FilesController {
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 	def assetEntityService
+	def taskService
 	def index ={
 	     redirect(action : list)
 		 	
@@ -86,7 +87,8 @@ class FilesController {
 				tableFacade.render()
 			}else
 				return [filesList : filesList , projectId: projectId ,assetDependency: new AssetDependency(),
-					servers : servers, applications : applications, dbs : dbs, files : files,dependencyType:dependencyType,dependencyStatus:dependencyStatus]
+					servers : servers, applications : applications, dbs : dbs, files : files,dependencyType:dependencyType,dependencyStatus:dependencyStatus,
+					staffRoles:taskService.getRolesForStaff()]
 		}catch(Exception e){
 			return [filesList : null,projectId: projectId,
 					servers : servers, applications : applications, dbs : dbs, files : files]

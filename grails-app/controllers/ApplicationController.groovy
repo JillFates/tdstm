@@ -29,6 +29,7 @@ import com.tdssrc.grails.GormUtil
 class ApplicationController {
 	def partyRelationshipService
 	def assetEntityService
+	def taskService
 	
 	def index = {
 		redirect(action:list,params:params)
@@ -139,7 +140,8 @@ class ApplicationController {
 				tableFacade.render()
 			} else {
 				return [assetEntityList : appBeanList , projectId: projectId, assetDependency: new AssetDependency(),
-					servers : servers, applications : applications, dbs : dbs, files : files,dependencyType:dependencyType,dependencyStatus:dependencyStatus]
+					servers : servers, applications : applications, dbs : dbs, files : files,dependencyType:dependencyType,dependencyStatus:dependencyStatus,
+				    staffRoles:taskService.getRolesForStaff()]
 			}
 		}catch(Exception e){
 			return [assetEntityList : null, projectId: projectId , servers : servers, applications : applications, dbs : dbs, files : files]

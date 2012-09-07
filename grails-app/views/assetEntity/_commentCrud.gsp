@@ -200,7 +200,7 @@
 			<td valign="middle" nowrap="nowrap" colspan="3">
 				<span id="assignedCreateSpan"></span>
 				&nbsp;/&nbsp;
-				<g:select id="roleType" name="roleType" from="${RoleType.findAllByDescriptionIlike('staff%')}" noSelection="['':'Unassigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)"></g:select> &nbsp;
+				<g:select id="roleType" name="roleType" from="${staffRoles}" noSelection="['':'Unassigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)"></g:select> &nbsp;
 				<input type="checkbox" id="hardAssigned" name="hardAssigned" value="1"  checked="checked"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;
 				<label for="hardAssigned" >Fixed Assignment</label>&nbsp;&nbsp;
@@ -365,7 +365,7 @@
 			<td valign="middle" id="assignedToEditTdId" style="display: none;" class="issue"  colspan="3" nowrap="nowrap">
                 <span id="assignedEditSpan"> </span>
 				&nbsp;/&nbsp;
-				<g:select id="roleTypeEdit" name="roleTypeEdit" from="${RoleType.findAllByDescriptionIlike('staff%')}" noSelection="['':'UnAssigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)"></g:select>
+				<g:select id="roleTypeEdit" name="roleTypeEdit" from="${staffRoles}" noSelection="['':'UnAssigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)"></g:select>
 				&nbsp;
 				<input type="checkbox" id="hardAssignedEdit" name="hardAssignedEdit" value="1"  checked="checked"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;

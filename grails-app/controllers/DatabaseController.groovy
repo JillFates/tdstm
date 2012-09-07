@@ -27,6 +27,7 @@ class DatabaseController {
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     def assetEntityService  
+	def taskService 
     def index = {
 		redirect(action: "list", params: params)
     }
@@ -92,7 +93,7 @@ class DatabaseController {
 			}else
 				return [databaseList : databaseList , projectId: projectId ,assetDependency: new AssetDependency(),
 					servers : servers, applications : applications, dbs : dbs, files : files, dependencyType:dependencyType,
-					dependencyStatus:dependencyStatus]
+					dependencyStatus:dependencyStatus,staffRoles:taskService.getRolesForStaff()]
 		}catch(Exception e){
 			return [databaseList : null,projectId: projectId,
 					servers : servers, applications : applications, dbs : dbs, files : files]

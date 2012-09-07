@@ -728,4 +728,13 @@ class TaskService {
 			workflowService.createTransition( process, role, toState, asset, moveBundle, userLogin, projectTeam, comment, updateTask )
 		}
 	}
+	/**
+	 * This method is used by the several actions to get the roles that is starts with of 'staff'
+	 * @param blank
+	 * @return list of roles that is only starts with 'staff'
+	 */
+	def getRolesForStaff( ) {
+		def rolesForStaff = RoleType.findAllByDescriptionIlike('staff%',[sort:'description'])
+		return rolesForStaff
+	}
 }

@@ -1357,7 +1357,8 @@ class AssetEntityController {
 				tableFacade.render()
 			}else
 				return [assetEntityList : assetEntityList,projectId: projectId, servers : servers,
-					applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency(), dependencyType:dependencyType, dependencyStatus:dependencyStatus ]
+					applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency(), dependencyType:dependencyType, dependencyStatus:dependencyStatus,
+					staffRoles:taskService.getRolesForStaff() ]
 		} catch(Exception ex ){
 			return [assetEntityInstanceList : null,projectId: projectId, servers : servers,
 				applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency()]
@@ -2280,7 +2281,8 @@ class AssetEntityController {
 				applicationList : applicationList, appOwnerList : appOwnerList, appSmeList : appSmeList,
 				transitionStates : transitionStates, params:params, totalAssetsOnHold:totalAssetsOnHold,
 				totalSourcePending: totalSourcePending, totalTargetPending: totalTargetPending, role: role, teamType:teamType, assetDependency: new AssetDependency() ,
-				servers:servers , applications:applications ,dbs:dbs,files:files, dependencyType:dependencyType, dependencyStatus:dependencyStatus ]
+				servers:servers , applications:applications ,dbs:dbs,files:files, dependencyType:dependencyType, dependencyStatus:dependencyStatus,
+				staffRoles:taskService.getRolesForStaff() ]
 		} else {
 			flash.message = "Please create bundle to view Console"
 			redirect(controller:'project',action:'show')
@@ -3139,7 +3141,7 @@ class AssetEntityController {
 			// log.info "_listCommentsOrTasks:about to render : ${TimeCategory.minus(new Date(), start)}"
 			def model = [ assetCommentList:assetCommentList, rediectTo:'comment', 
 				s:params.resolvedBox, issueBox:params.issueBox,
-				moveEvents:moveEvents, filterEvent:filterEvent]
+				moveEvents:moveEvents, filterEvent:filterEvent,staffRoles:taskService.getRolesForStaff()]
 	      	render (view:view ,model:model )
 		}
 	}

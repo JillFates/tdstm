@@ -26,6 +26,7 @@ class ClientConsoleController {
 	 def workflowService
 	 def jdbcTemplate
 	 def pmoAssetTrackingService
+	 def taskService
 	 def index = { 
 		 redirect(action:list,params:params)
 	 }
@@ -312,7 +313,7 @@ class ClientConsoleController {
 				clientConsoleCheckBoxHasPermission:RolePermissions.hasPermission("ClientConsoleCheckBox"),
 				columns:columns, assetsInView:assetsInView, totalAssets:totalAssets, attributesList:attributesList, servers : servers, 
 				applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency(), project:project,
-				showAllOption:showAllOption, bundleId:bundleId ]
+				showAllOption:showAllOption, bundleId:bundleId, staffRoles:taskService.getRolesForStaff() ]
 	    	
 		 }
 	}

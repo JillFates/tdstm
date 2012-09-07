@@ -12,6 +12,7 @@ import org.hibernate.SessionFactory
 class RoomController {
 
 	def userPreferenceService
+	def taskService
 	SessionFactory sessionFactory
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -33,7 +34,7 @@ class RoomController {
 		def files = Files.findAllByAssetTypeAndProject('Files',project)
 		[roomInstanceList: roomInstanceList, roomInstanceTotal: roomInstanceList.size(), 
 		 projectId:projectId, roomId:roomId, viewType:params.viewType, roomInstance:roomInstance, servers : servers, 
-				applications : applications, dbs : dbs, files : files ,filterRackId:rackIds]
+				applications : applications, dbs : dbs, files : files ,filterRackId:rackIds, staffRoles:taskService.getRolesForStaff()]
     }
 
     def create = {

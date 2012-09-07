@@ -15,6 +15,7 @@ class RackLayoutsController {
 	def jdbcTemplate
 	def supervisorConsoleService
 	def sessionFactory
+	def taskService
 	
 	def static final statusDetails = ["missing":"Unknown", "cabledDetails":"Assigned","empty":"Empty","cabled":"Cabled"]
 	
@@ -57,7 +58,8 @@ class RackLayoutsController {
 		return [moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, projectId:projectId,
 				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models ,servers:servers, 
 				applications : applications, dbs : dbs, files : files, rackFilters:rackFilters, targetRackFilter:targetRack,
-				bundle:bundle,sourceRackFilter:sourceRack,rackLayoutsHasPermission:RolePermissions.hasPermission("rackLayouts"),useCheck:useCheck]
+				bundle:bundle,sourceRackFilter:sourceRack,rackLayoutsHasPermission:RolePermissions.hasPermission("rackLayouts"),useCheck:useCheck,
+				staffRoles:taskService.getRolesForStaff()]
 	}
 	
 	def save = {
