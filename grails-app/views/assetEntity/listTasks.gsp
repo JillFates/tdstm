@@ -31,7 +31,7 @@
 			$("#editEntityView").dialog({ autoOpen: false })
 			$("#createEntityView").dialog({ autoOpen: false })
 	    	currentMenuId = "#assetMenu";
-	    	$("#assetMenuId a").css('background-color','#003366')
+	    	$("#teamMenuId a").css('background-color','#003366')
 	    	$(".span_task_tardy").parent().addClass("task_tardy")
 	    	$(".span_task_late").parent().addClass("task_late")
 	    	$(".span_task_ready").parent().addClass("task_ready")
