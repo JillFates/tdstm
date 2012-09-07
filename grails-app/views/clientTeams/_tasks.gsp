@@ -92,17 +92,21 @@
 					<td id="asset_${issue?.item?.id}" class="asset_details_block">
 						${issue?.item?.assetName}
 					</td>
-					<td id="lastUpdated_${issue?.item?.id}" class="asset_details_block"><tds:convertDate
+					<td id="lastUpdated_${issue?.item?.id}" class="asset_details_block">
+						<tds:convertDate
 							date="${issue?.item?.lastUpdated}"
 							timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
-							format="MM/dd kk:mm:ss" /></td>
+							format="MM/dd kk:mm:ss" />
+					</td>
 					<td id="dueDate_${issue?.item?.id}" class="asset_details_block">
-							<tds:convertDate date="${issue?.item?.dueDate ? issue?.item?.dueDate : issue?.item?.estFinish}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
-								format="MMM/dd" />
+						<tds:convertDate 
+							date="${issue?.item?.estFinish ?: issue?.item?.dueDate}" 
+							timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
+							format="MM/dd kk:mm:ss" />	
 					</td>
 					
 					<td id="statusTd_${issue?.item?.id}" class="asset_details_block">
-						${issue?.item?.status}
+						${issue?.item?.status}/${issue?.item?.score}
 					</td>
 					</tr>
 					<g:if test="${tab && tab == 'todo'}">

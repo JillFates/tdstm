@@ -18,6 +18,7 @@ import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.RoleTypeGroup
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.TimeUtil
 
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.SqlParameterSource
@@ -59,6 +60,9 @@ class TaskService {
 		// TODO : Runbook: getUserTasks - should get the user's project roles instead of global roles
 		def roles = securityService.getPersonRoles(person, RoleTypeGroup.STAFF)
 		def type=AssetCommentType.TASK
+		
+		def now = TimeUtil.nowGMT()
+		def minAgo = TimeUtil.adjustSeconds(now, -60)
 
 		// List of statuses that user should be able to see in when soft assigned to others and user has proper role
 		def statuses = [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]
@@ -70,31 +74,53 @@ class TaskService {
 		
 		StringBuffer sql = new StringBuffer("""SELECT t.asset_comment_id AS id, t.comment, t.due_date AS dueDate, t.last_updated AS lastUpdated,
 		 	t.asset_entity_id AS assetEntity, t.status, t.assigned_to_id AS assignedTo, IFNULL(a.asset_name,'') AS assetName, t.role,
-		 	t.task_number AS taskNumber """)
+		 	t.task_number AS taskNumber, t.est_finish AS estFinish, t.due_date AS dueDate """)
 
 		// Add in the Sort Scoring Algorithm into the SQL if we're going to return a list
 		if ( ! countOnly) {
+			sqlParams << [now:now, minAgo:minAgo]
+			
 			/*
-				The sorting scoring will compute a weighted value based on several criteria that includes: 
-				- Assigned to me +30
-				- Status of Started +30
-				- Status of Ready +20
-				- Status of Hold +15
-				- Status of Pending +10
-				- Category of Startup, Physical, Moveday, or Shutdown +10
+				The objectives are sort the list descending in this order:
+					- HOLD 900
+						+ last updated factor ASC
+					- DONE recently (60 seconds), to allow undo 800
+						+ actual finish factor DESC	
+					- STARTED tasks     700
+						- Hard assigned to user	+55
+						- by the user	+50
+						- + Est Start Factor to sort ASC
+					- READY tasks		600
+						- Hard assigned to user	+55
+						- Assigned to user		+50
+						- + Est Start factor to sort ASC
+					- PENDING tasks		500
+						- + Est Start factor to sort ASC
+					- DONE tasks		200
+						- Assigned to User	+50 
+						- + actual finish factor DESC
+						- DONE by others	+0 + actual finish factor DESC
+					- All other statuses ?
+					- Task # DESC (handled outside the score)
+				
+				The inverse of Priority will be added to any score * 5 so that Priority tasks bubble up above hard assigned to user
+				
+				DON'T THINK THIS APPLIES ANY MORE - Category of Startup, Physical, Moveday, or Shutdown +10
 				- If duedate exists and is older than today +5
 				- Priority - Six (6) - <priority value> (so a priority of 5 will add 1 to the score and 1 adds 5)
 			*/
-			sql.append(""", ( IF(t.assigned_to_id=:assignedToId, 10, 0) + (CASE t.status 
-				WHEN '${AssetCommentStatus.STARTED}' THEN 30
-				WHEN '${AssetCommentStatus.READY}' THEN 20
-				WHEN '${AssetCommentStatus.HOLD}' THEN 15
-				WHEN '${AssetCommentStatus.PENDING}' THEN 10
-				WHEN '${AssetCommentStatus.DONE}' THEN -10
+			sql.append(""", 
+				( ( CASE t.status 
+				WHEN '${AssetCommentStatus.HOLD}' THEN 900
+				WHEN '${AssetCommentStatus.DONE}' THEN IF(t.status_updated <= :minAgo, 800, 200) + t.status_updated / :now
+				WHEN '${AssetCommentStatus.STARTED}' THEN 700 + 1 - IFNULL(t.est_start,:now) / :now
+				WHEN '${AssetCommentStatus.READY}' THEN 600 + 1 - IFNULL(t.est_start,:now) / :now
+				WHEN '${AssetCommentStatus.PENDING}' THEN 500 + 1 - IFNULL(t.est_start,:now) / :now
 				ELSE 0
 				END) +  
-				IF(t.category IN ('${AssetCommentCategory.SHUTDOWN}', '${AssetCommentCategory.PHYSICAL}', '${AssetCommentCategory.STARTUP}'), 10,0) +
-				6 - t.priority) AS score """)
+				IF(t.assigned_to_id=:assignedToId AND t.category IN('${AssetCommentStatus.STARTED}','${AssetCommentStatus.READY}'), IF(t.hard_assigned=1, 55, 50), 0) +
+				IF(t.assigned_to_id=:assignedToId AND t.category='${AssetCommentStatus.DONE}',50, 0) +
+				(6 - t.priority) * 5) AS score """)			
 		}
 		
 		// Add Successor Count
