@@ -72,7 +72,7 @@ class TaskService {
 		//log.error "person:${person.id}"
 		// Find all Tasks assigned to the person OR assigned to a role that is not hard assigned (to someone else)
 		
-		StringBuffer sql = new StringBuffer("""SELECT t.asset_comment_id AS id, t.comment, t.due_date AS dueDate, t.last_updated AS lastUpdated,
+		StringBuffer sql = new StringBuffer("""SELECT t.asset_comment_id AS id, t.comment, t.est_finish AS estFinish, t.last_updated AS lastUpdated,
 		 	t.asset_entity_id AS assetEntity, t.status, t.assigned_to_id AS assignedTo, IFNULL(a.asset_name,'') AS assetName, t.role,
 		 	t.task_number AS taskNumber, t.est_finish AS estFinish, t.due_date AS dueDate """)
 
@@ -151,7 +151,7 @@ class TaskService {
 		if ( ! countOnly ) {
 			// If we are returning the lists, then let's deal with the sorting
 			sql.append('ORDER BY ')
-			def sortableProps = ['number_comment', 'comment', 'dueDate', 'lastUpdated', 'status', 'assetEntity']
+			def sortableProps = ['number_comment', 'comment', 'estFinish', 'lastUpdated', 'status', 'assetName']
 			if (sortOn) {
 				if ( sortableProps.contains(sortOn) ) {
 					sortOrder = ['asc','desc'].contains(sortOrder) ? sortOrder : 'asc'

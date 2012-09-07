@@ -39,7 +39,7 @@
 			</tr>		
 			<tr>
 				<td colspan=2>
-				  <textarea rows="4" cols="130" style="width:100%;padding:0px;" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" >${assetComment.comment}</textarea>
+				   <input type="text" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" value="${assetComment.comment}"/>
 				</td>
 			</tr>	
 			<tr>
@@ -86,16 +86,9 @@
 					<g:select id="assignedToEditId_${assetComment.id}" name="assignedTo" from="${partyList}" value="${assetComment.assignedTo.id}" optionKey="id" noSelection="['':'please select']" style="width: 70%;"></g:select>
 				</td>
 			</tr> 
-			<tr class="prop issue" id="dueDatesEditId"  >
-				<td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
-				<td valign="top" class="value" id="dueDateEditId_${assetComment.id}">
-				<script type="text/javascript">
-	               $(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-	            </script>
-	            <input type="text" class="dateRange" size="15" style="width: 70%; height: 14px;" name="dueDate" id="dueDateEdit_${assetComment.id}"
-						value="<tds:convertDate date="${assetComment?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" /></td>
-				
-			</tr>
+			<tr class="prop issue" id="estFinishShowId"  >
+				<td valign="top" class="name"><label for="estFinish">Est. Finish:</label></td>
+				<td valign="top" class="value" id="estFinishShowId_${assetComment.id}"  nowrap="nowrap" >${etFinish}</td>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="category">Category:</label></td>
 				<td valign="top" class="value"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="${assetComment.category}"></g:select></td>

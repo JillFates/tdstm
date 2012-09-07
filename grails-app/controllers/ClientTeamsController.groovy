@@ -1,4 +1,5 @@
 import grails.converters.JSON
+import java.text.SimpleDateFormat
 
 import org.jsecurity.SecurityUtils
 
@@ -1042,6 +1043,9 @@ class ClientTeamsController {
 	
 	def showIssue={
 		def assetComment = AssetComment.get(params.issueId)
+		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def etFinish
 		def noteList = assetComment.notes.sort{it.dateCreated}
 		def notes = []
 		noteList.each{
@@ -1062,11 +1066,14 @@ class ClientTeamsController {
 					  permissionForUpdate = true
 				  }
 		}
+		if(assetComment?.estFinish){
+			etFinish = estformatter.format(GormUtil.convertInToUserTZ(assetComment.estFinish, tzId));
+		}
 		def successor = TaskDependency.findAllByPredecessor( assetComment )
 		if(viewMode=='mobile'){
-			render (view:'showIssue_m',model:['assetComment':assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1,permissionForUpdate:permissionForUpdate, successor:successor])
+			render (view:'showIssue_m',model:['assetComment':assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1,permissionForUpdate:permissionForUpdate, successor:successor, etFinish:etFinish])
 		}else{
-			return[assetComment:assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, permissionForUpdate : permissionForUpdate, successor:successor]
+			return[assetComment:assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, permissionForUpdate : permissionForUpdate, successor:successor, etFinish:etFinish]
 		}
 	}
 }

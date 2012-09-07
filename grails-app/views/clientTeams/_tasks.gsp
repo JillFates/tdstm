@@ -66,9 +66,9 @@
 			<thead>
 				<tr>
 					<g:sortableColumn class="sort_column" style="" action="listComment" property="number_comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="" action="listComment" property="assetEntity" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="" action="listComment" property="assetName" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="" action="listComment" property="lastUpdated" title="Updated" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="" action="listComment" property="dueDate" title="Due" params="['tab':tab,'search':search]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="" action="listComment" property="estFinish" title="EstFinish" params="['tab':tab,'search':search]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="" action="listComment" property="status" title="Status" params="['tab':tab,'search':search]"></g:sortableColumn>
 				</tr>
 			</thead>
@@ -98,11 +98,9 @@
 							timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
 							format="MM/dd kk:mm:ss" />
 					</td>
-					<td id="dueDate_${issue?.item?.id}" class="asset_details_block">
-						<tds:convertDate 
-							date="${issue?.item?.estFinish ?: issue?.item?.dueDate}" 
-							timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
-							format="MM/dd kk:mm:ss" />	
+					<td id="estFinish_${issue?.item?.id}" class="asset_details_block">
+							<tds:convertDate date="${issue?.item?.estFinish}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
+								format="MM/dd kk:mm:ss" />
 					</td>
 					
 					<td id="statusTd_${issue?.item?.id}" class="asset_details_block">

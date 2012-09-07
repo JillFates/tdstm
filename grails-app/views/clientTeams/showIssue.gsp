@@ -78,13 +78,9 @@
 					<g:select id="assignedToEditId_${assetComment.id}" name="assignedTo" from="${partyList}" value="${assetComment.assignedTo.id}" optionKey="id" noSelection="['':'please select']"></g:select>
 				</td>
 			</tr> 
-			<tr class="prop issue" id="dueDatesEditId"  >
-				<td valign="top" class="name"><label for="dueDate">Due Date:</label></td>
-				<td valign="top" class="value" id="dueDatesEditId_${assetComment.id}" colspan="3"><script type="text/javascript" charset="utf-8">
-	             jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-	             </script><input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="dueDate" id="dueDateEdit_${assetComment.id}"
-						value="<tds:convertDate date="${assetComment?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" /></td>
-				
+			<tr class="prop issue" id="estFinishShowId"  >
+				<td valign="top" class="name"><label for="estFinish">Est.Finish:</label></td>
+				<td valign="top" class="value" id="estFinishShowId_${assetComment.id}" colspan="3" nowrap="nowrap">${etFinish}</td>
 			</tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="category">Category:</label></td>
@@ -92,10 +88,10 @@
 			</tr>
 			<tr>
 			<g:if test="${assetComment.assetEntity}">
-		   		  <td>Asset:</td><td style="width: 10%">&nbsp;${assetComment?.assetEntity.assetName}</td>
+		   		  <td>Asset:</td><td style="width: 1%">&nbsp;${assetComment?.assetEntity.assetName}</td>
 		   		</g:if>
 		   		<g:if test="${assetComment.moveEvent}">
-		   		  <td style="width: 5%">Move Event:</td> <td > ${assetComment?.moveEvent.name}</td>
+		   		  <td style="width: 6%">Move Event:</td><td>${assetComment?.moveEvent.name}</td>
 		   		</g:if>
 		   	</tr>
 		   	<tr class="prop">
@@ -268,16 +264,6 @@ $( function() {
        $('#resolutionId_'+${assetComment.id}).hide()
    }
  }
- function formatDueDate(input){
-	 var currentDate = ""
-	 if(input){
-		  var datePart = input.match(/\d+/g),
-		  year = datePart[0].substring(0), // get only two digits
-		  month = datePart[1], day = datePart[2];
-	      currentDate = month+'/'+day+'/'+year;
-	 }
-    return currentDate
-}
  function validateComment(objId){
 	 var status = $('#statusEditId_'+${assetComment.id}).val()
 	 if(status=='Completed' && $('#resolutionEditId_'+${assetComment.id}).val()==''){
@@ -285,9 +271,9 @@ $( function() {
 	 }else{
 		var params = {   'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 
 						 'category':$('#categoryEditId_'+objId).val(), 'assignedTo':$('#assignedToEditId_'+objId).val(),
-						 'dueDate':$('#dueDateEdit_'+objId).val(), 'status':$('#statusEditId_'+objId).val(),
-						 'currentStatus':$('#currentStatus_'+objId).val(), 'note':$('#noteEditId_'+objId).val(),'id':objId,
-						 'view':'myTask', 'tab': $('#tabId').val() }
+						 'status':$('#statusEditId_'+objId).val(),'currentStatus':$('#currentStatus_'+objId).val(), 
+						 'note':$('#noteEditId_'+objId).val(),'id':objId,'view':'myTask', 'tab': $('#tabId').val()
+						}
 		 jQuery.ajax({
 				url: '../assetEntity/updateComment',
 				data: params,
