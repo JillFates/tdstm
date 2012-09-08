@@ -111,13 +111,6 @@ class AssetComment {
 		id column: 'asset_comment_id'
 		resolvedBy column: 'resolved_by'
 		createdBy column: 'created_by'
-		score formula:  "( (CASE status \
-			WHEN '${AssetCommentStatus.STARTED}' THEN 30 \
-			WHEN '${AssetCommentStatus.READY}' THEN 15 \
-			WHEN '${AssetCommentStatus.PENDING}' THEN 10 \
-			ELSE 0 END) + \
-			IF(category IN ('${AssetCommentCategory.SHUTDOWN}', '${AssetCommentCategory.PHYSICAL}', '${AssetCommentCategory.STARTUP}'), 10,0) + \
-			6 - priority)"
 		columns {
 			comment sqltype: 'text'
 			mustVerify sqltype: 'tinyint'
@@ -130,6 +123,43 @@ class AssetComment {
 			duration sqltype: 'mediumint'
 			durationScale sqltype: 'char', length:1
 		}
+		/*
+			The objectives are sort the list descending in this order:
+				- HOLD 900
+					+ last updated factor ASC
+				- DONE recently (60 seconds), to allow undo 800
+					+ actual finish factor DESC	
+				- STARTED tasks     700
+					- Hard assigned to user	+55
+					- by the user	+50
+					- + Est Start Factor to sort ASC
+				- READY tasks		600
+					- Hard assigned to user	+55
+					- Assigned to user		+50
+					- + Est Start factor to sort ASC
+				- PENDING tasks		500
+					- + Est Start factor to sort ASC
+				- DONE tasks		200
+					- Assigned to User	+50 
+					- + actual finish factor DESC
+					- DONE by others	+0 + actual finish factor DESC
+				- All other statuses ?
+				- Task # DESC (handled outside the score)
+			
+			The inverse of Priority will be added to any score * 5 so that Priority tasks bubble up above hard assigned to user
+			
+			DON'T THINK THIS APPLIES ANY MORE - Category of Startup, Physical, Moveday, or Shutdown +10
+			- If duedate exists and is older than today +5
+			- Priority - Six (6) - <priority value> (so a priority of 5 will add 1 to the score and 1 adds 5)
+		*/
+		score formula:	"CASE status \
+			WHEN '${AssetCommentStatus.HOLD}' THEN 900 \
+			WHEN '${AssetCommentStatus.DONE}' THEN IF(status_updated <= CONVERT_TZ(SUBTIME(NOW(),'00:01:00.0'),'-04:00','+00:00'), 800, 200) + status_updated/NOW() \
+			WHEN '${AssetCommentStatus.STARTED}' THEN 700 + 1 - IFNULL(est_start,NOW())/NOW() \
+			WHEN '${AssetCommentStatus.READY}' THEN 600 + 1 - IFNULL(est_start,NOW())/NOW() \
+			WHEN '${AssetCommentStatus.PENDING}' THEN 500 + 1 - IFNULL(est_start,NOW())/NOW() \
+			ELSE 0 END + \
+			(6 - priority) * 5"			
 	}
 
 	// List of properties that should NOT be persisted
