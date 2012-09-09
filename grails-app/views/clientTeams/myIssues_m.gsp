@@ -10,7 +10,7 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
 <link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <script type="text/javascript" src="${resource(dir:'js' ,file:'ui.datepicker.js') }" />
-<meta name="viewport" content="height=device-height,width=220" />
+<meta name="viewport" content="height=device-height,width=320" />
 	
 <script type="text/javascript">    	
 	window.addEventListener('load', function(){
@@ -40,7 +40,7 @@
 </script>      
 </head>
 <body onorientationchange="updateOrientation();">
-	<div class="mainbody" style="width: 220px;">
+	<div class="mainbody" style="width: 320px;">
 	   <div id="mobtitle">TransitionManager&trade; - Mobile</div>
 	     <div id="myTaskListMobile">
 		 	<g:render template="tasks_m"/>
