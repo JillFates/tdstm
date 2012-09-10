@@ -6,6 +6,7 @@ import org.jsecurity.SecurityUtils
 import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
 
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 
 import com.tds.asset.*
 import com.tds.asset.AssetComment
@@ -48,6 +49,8 @@ class CommentService {
 		def commentProject
 		def map=[:]
 		def errorMsg
+		
+		log.info "saveUpdateCommentAndNotes: tzId -- ${session.getAttribute( "CURR_TZ" )} / ${session.getAttribute( "CURR_TZ" )?.CURR_TZ}"
 		
 		// Wrap the whole routine so that we can break out when we hit fatal situations
 		while (true) {
@@ -159,10 +162,10 @@ class CommentService {
 		    assetComment.resolution = params.resolution
 			if (params.containsKey('estStart')) {
 				// log.info "saveUpdateCommentAndNotes: estStart=[${params.estStart}]"
-				assetComment.estStart = params.estStart ? estformatter.parse(params.estStart) : null
+				assetComment.estStart = params.estStart ? TimeUtil.convertInToGMT(estformatter.parse(params.estStart), tzId) : null
 			}
 			if (params.containsKey('estFinish')) {
-				assetComment.estFinish = params.estFinish ? estformatter.parse(params.estFinish) : null
+				assetComment.estFinish = params.estFinish ? TimeUtil.convertInToGMT(estformatter.parse(params.estFinish), tzId)  : null
 			}
 			if (params.containsKey('role')) {
 				assetComment.role = params.role ?: null
