@@ -1032,7 +1032,9 @@ function showAssetDialog( e , action ) {
 		return trunc;
 	}
 
-function createIssue(asset, type){
+function createIssue(asset, type, id){
+	$("#createAssetCommentId").val(id)
+	$("#comment").val('')
 	if(type=="comment"){
 		$('#typeCommentCreateId').css('display','none')
 		$('#commentTypeCreateTdId').css('display','none')
@@ -1042,6 +1044,11 @@ function createIssue(asset, type){
 		$('#createCommentDialog').dialog('option', 'width', 'auto');
 		$('#createCommentDialog').dialog('option', 'position', ['center','top']);
 		$('#createCommentDialog').dialog('open');
+		$('#priorityCreateSpanId').css('display','none')
+		$('#statusCreateTrId').css('display','none')
+		document.forms['createCommentForm'].commentType.value = 'comment'
+		commentChange('#createResolveDiv','createCommentForm');
+		$('#commentTypeCreateTdId').css('display','none')
 	}else{
 		if(B2 != ''){
 			B2.Pause()
@@ -1051,6 +1058,8 @@ function createIssue(asset, type){
 		document.forms['createCommentForm'].commentType.value = 'issue'
 		document.forms['createCommentForm'].commentType.disabled = 'disabled'
 		commentChange('#createResolveDiv','createCommentForm')
+		$('#priorityCreateSpanId').css('display','inline-table')
+		$('#statusCreateTrId').css('display','table-row')
 		if(asset){
 			$('#assetEntityTrId').css('display','table-row')
 			$('#assetEntityInputId').html(asset)
@@ -1068,6 +1077,7 @@ function createIssue(asset, type){
 		$('#predecessorHeadTrId').css('display','table-row')
 		$('#predecessorTrId').css('display','table-row')
 	}
+	$('#createCommentDialog').parent().css('z-index',10000);
 }	
 function commentChange(resolveDiv,formName) {
 	var type = 	document.forms[formName].commentType.value;
@@ -1079,6 +1089,8 @@ function commentChange(resolveDiv,formName) {
 		//now.setDate(now.getDate() + 30)
 	    //formatDate(now);
 //		$("#dueDateTrId").css('display', 'table-row');
+		$('#priorityCreateSpanId').css('display','inline-table')
+		$('#statusCreateTrId').css('display','table-row')
 		$("#assignedToId").css('display', 'table-row');
 		$("#assignedToTrEditId").css('display', 'table-row');
 		$("#assignedToEditTdId").css('display', 'table-row');
@@ -1109,6 +1121,7 @@ function commentChange(resolveDiv,formName) {
 		$('#priorityTrId').css('display', 'table-row');
 		$('#durationTrId').css('display', 'table-row');
 		$("#durationEditId").css('display', 'table-row');
+		$('#moveEventTrId').css('display', 'none');
 		document.forms[formName].mustVerify.checked = false;
 		document.forms[formName].mustVerify.value = 0;
 		document.forms[formName].isResolved.checked = false;
@@ -1118,6 +1131,8 @@ function commentChange(resolveDiv,formName) {
 		document.forms[formName].mustVerify.checked = true;
 		document.forms[formName].mustVerify.value = 1;
 		$("#mustVerifyEditId").css('display', 'block');
+		$('#priorityCreateSpanId').css('display','none')
+		$('#statusCreateTrId').css('display','table-row')
 		$(resolveDiv).css('display', 'none');
 //		$("#dueDateTrId").css('display', 'none');
 		//$("#typeCommentCreateId").css('display', 'table-row');
@@ -1141,6 +1156,8 @@ function commentChange(resolveDiv,formName) {
 		document.forms[formName].mustVerify.checked = false;
 		document.forms[formName].mustVerify.value = 0;
 		$(resolveDiv).css('display', 'none');
+		$('#priorityCreateSpanId').css('display','none')
+		$('#statusCreateTrId').css('display','none')
 //		$("#dueDateTrId").css('display', 'none');
 		//$("#typeCommentCreateId").css('display', 'table-row');
 		//$("#commentType").css('display', 'table-row');
@@ -1159,6 +1176,7 @@ function commentChange(resolveDiv,formName) {
 		$('#actStartTrId').css('display', 'none');
 		$('#priorityTrId').css('display', 'none');
 		$('#durationTrId').css('display', 'none');
+		$('#moveEventTrId').css('display', 'none');
 	}
 }
 

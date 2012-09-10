@@ -340,14 +340,14 @@
 					<g:else>
 					   <span class="button"><input id="deleteId"	 name="deleteId"  class="save" value="Delete" onclick=" deleteAsset($('#assetsId').val(),'server')" value="Delete" /> </span>
 					</g:else>
-			<tds:hasPermission permission="CommentCrudView">	
-				<a href="javascript:createIssue('${assetEntityInstance.assetName}','comment');">
-					<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Comment
-				</a>
-				<a href="javascript:createIssue('${assetEntityInstance.assetName}','');">
-					<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Task
-				</a>
-			</tds:hasPermission>
+					<tds:hasPermission permission="CommentCrudView">	
+						<a href="javascript:createIssue('${assetEntityInstance.assetName}','comment', ${assetEntityInstance.id});">
+							<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Comment
+						</a>
+						<a href="javascript:createIssue('${assetEntityInstance.assetName}','',${assetEntityInstance.id});">
+							<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Task
+						</a>
+					</tds:hasPermission>
 				</div>
 			</tds:hasPermission>
 			</td>

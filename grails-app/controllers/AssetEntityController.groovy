@@ -2979,7 +2979,7 @@ class AssetEntityController {
 		
 		if ( ! isTask ) {
 			// For comments we will filter just on the commentType
-			assetCommentQuery += " AND commentType != :commentType "
+			assetCommentQuery += " AND commentType = :commentType "
 			sqlArgs << [ commentType:AssetCommentType.COMMENT]
 		} else {
 			// For tasks, we have a number of different filters that we need to manage

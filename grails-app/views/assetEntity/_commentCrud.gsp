@@ -187,7 +187,7 @@
  **************************
  */
 --%>
-<div id="createCommentDialog" title="Create Asset Comment" style="display: none;">
+<div id="createCommentDialog" title="Create Asset Comment" style="display: none;z-index: 10000;">
 	<input type="hidden" name="assetEntity.id" id="createAssetCommentId" value="" />
 	<g:form action="saveComment" method="post" name="createCommentForm">
 		<input type="hidden" name="category" value="general" />
@@ -215,12 +215,14 @@
 			<td>
 				<label id="categoryLabelId" for="category" >Category:</label>
 			</td>
-			<td>
+			<td nowrap="nowrap">
             	<g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
             	noSelection="['':'please select']" onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionId', 'predecessorId','')"></g:select>
         		&nbsp;&nbsp;
-        		<label for="priority">Priority:</label>
-            	<g:select id="priority" name="priority" from="${1..5}" value="3"></g:select>
+        		<span id="priorityCreateSpanId" style="display: none">
+	        		<label for="priority">Priority:</label>
+	            	<g:select id="priority" name="priority" from="${1..5}" value="3"></g:select>
+            	</span>
         	</td>
 		</tr>
 		<tr class="prop" id="mustVerifyTr" style="display: none;">
@@ -265,7 +267,7 @@
 			   </table>
 			</td>
 		</tr>
-		<tr class="prop">
+		<tr id="statusCreateTrId"  class="prop" style="display: none">
 			<td valign="top" class="name"  ><label for="status">Status:</label></td>
 			<td valign="top" class="value" colspan="3">
 				<g:select id="statusId" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Ready"
