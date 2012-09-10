@@ -49,6 +49,11 @@
 				 $("#myResolvedBox").attr('checked',false)
 			 }
         });
+        $(document).keyup(function(e) {
+        	// esc to stop timer
+       	    if (e.keyCode == 27) { if(B2 != ''){ B2.Restart(60); }}   
+       	});
+        	        
         </script>
         
 </head>
