@@ -25,6 +25,9 @@ function getEntityDetails(redirectTo, type, value){
 	 }
 }
 function showEntityView(e, type){
+	 if(B2 != ''){
+		B2.Pause()
+	 }
 	 var resp = e.responseText;
 	 $("#showEntityView").html(resp);
 	 $("#showEntityView").dialog('option', 'width', 'auto')

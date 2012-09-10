@@ -134,7 +134,7 @@
 				</jmesa:tableFacade>
 			</form>
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-		      <span class="menuButton"><a class="create" href="javascript:createIssue('','')">Create Issue/Task</a></span>
+		      <span class="menuButton"><a class="create" href="javascript:createIssue('','','')">Create Issue/Task</a></span>
 	       </div>
             </div>
             <div id="showEntityView" style="display: none;"></div>
