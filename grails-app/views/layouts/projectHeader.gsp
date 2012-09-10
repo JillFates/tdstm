@@ -882,6 +882,7 @@
 			if(currentMenuId == "#assetMenu"){$("#assetMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#eventMenu"){$("#eventMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#bundleMenu"){$("#bundleMenuId a").css('background-color','#003366')}
+			if(currentMenuId == "#teamMenuId"){$("#teamMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#consoleMenu"){$("#consoleMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#reportsMenu"){$("#reportsMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#userMenu"){$("#userMenuId").css('background-color','')}

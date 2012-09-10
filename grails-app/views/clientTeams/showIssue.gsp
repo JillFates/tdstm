@@ -266,10 +266,7 @@ $( function() {
  }
  function validateComment(objId){
 	 var status = $('#statusEditId_'+${assetComment.id}).val()
-	 if(status=='Completed' && $('#resolutionEditId_'+${assetComment.id}).val()==''){
-         alert("Please enter a resolution")
-	 }else{
-		var params = {   'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 
+	 var params = {   'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 
 						 'category':$('#categoryEditId_'+objId).val(), 'assignedTo':$('#assignedToEditId_'+objId).val(),
 						 'status':$('#statusEditId_'+objId).val(),'currentStatus':$('#currentStatus_'+objId).val(), 
 						 'note':$('#noteEditId_'+objId).val(),'id':objId,'view':'myTask', 'tab': $('#tabId').val()
@@ -295,7 +292,6 @@ $( function() {
 					alert("An unexpected error occurred while attempting to update task/comment")
 				}
 			});
-	 }
  }
  function truncate( text ){
 		var trunc = text

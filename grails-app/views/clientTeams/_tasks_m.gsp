@@ -62,7 +62,7 @@
 				<tr>
 					<g:sortableColumn class="sort_column" style="width:140px;"  action="listComment" property="number_comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="assetName" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:80px;" action="listComment" property="status" title="Status" params="['tab':tab,'search':search]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:80px;" action="listComment" property="status" title="Status" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
 				</tr>
 			</thead>
 			<tbody>
