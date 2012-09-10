@@ -10,12 +10,12 @@ class AuthController {
     def index = { redirect(action: 'login', params: params) }
 
     def login = {
-        /*def browserTest = request.getHeader("User-Agent").contains("IEMobile")
-        if(browserTest) {
-            redirect(controller:'moveTech', action:'moveTechLogin')
-        } else {*/
-            return [ username: params.username, rememberMe: (params.rememberMe != null), targetUri: params.targetUri ]
-        /*}*/
+		def redirectURL = session.REDIRECT_URL
+		if(!redirectURL){
+			return [ username: params.username, rememberMe: (params.rememberMe != null), targetUri: params.targetUri ]
+		} else {
+			redirect( url:redirectURL)
+		}
     }
 
     def signIn = {

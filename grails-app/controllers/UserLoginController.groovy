@@ -281,6 +281,7 @@ class UserLoginController {
 			def userLogin = UserLogin.findByUsername( principal )
 			userLogin.lastPage = GormUtil.convertInToGMT( "now", "EDT" )
 			userLogin.save(flush:true)
+			session.REDIRECT_URL = params.url
 		}
 		render "SUCCESS"
 	 }
