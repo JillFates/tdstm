@@ -119,8 +119,8 @@ class TaskService {
 				WHEN '${AssetCommentStatus.PENDING}' THEN 500 + 1 - IFNULL(t.est_start,:now) / :now
 				ELSE 0
 				END) +  
-				IF(t.assigned_to_id=:assignedToId AND t.category IN('${AssetCommentStatus.STARTED}','${AssetCommentStatus.READY}'), IF(t.hard_assigned=1, 55, 50), 0) +
-				IF(t.assigned_to_id=:assignedToId AND t.category='${AssetCommentStatus.DONE}',50, 0) +
+				IF(t.assigned_to_id=:assignedToId AND t.status IN('${AssetCommentStatus.STARTED}','${AssetCommentStatus.READY}'), IF(t.hard_assigned=1, 55, 50), 0) +
+				IF(t.assigned_to_id=:assignedToId AND t.status='${AssetCommentStatus.DONE}',50, 0) +
 				(6 - t.priority) * 5) AS score """)			
 		}
 		
@@ -159,8 +159,14 @@ class TaskService {
 				if ( sortableProps.contains(sortOn) ) {
 					sortOrder = ['asc','desc'].contains(sortOrder) ? sortOrder : 'asc'
 					sortOrder = sortOrder.toUpperCase()
-					sortAndOrder = sortOn == "number_comment" ? "taskNumber ${sortOrder}, comment ${sortOrder}" : "${sortOn} ${sortOrder} "
-					sortAndOrder = sortOn == "assignedTo" ? "p.first_name ${sortOrder}, p.last_name ${sortOrder}" : sortAndOrder
+					switch ($sortOn) {
+						case 'assignedTo':
+							sortAndOrder = "p.first_name ${sortOrder}, p.last_name ${sortOrder}"; break
+						case  'number_comment':
+							sortAndOrder = "taskNumber ${sortOrder}, comment ${sortOrder}"; break
+						default:
+							sortAndOrder = "${sortOn} ${sortOrder}"
+					}
 					sql.append(sortAndOrder)
 				} else {
 					log.warn "getUserTasks: called with invalid sort property [${sortOn}]"
@@ -171,7 +177,8 @@ class TaskService {
 			sql.append( (sortAndOrder ? ', ' : '') + 'score DESC, task_number ASC' )
 		}
 		
-		// log.info "getUserTasks: SQL for userTasks: " + sql.toString()
+		log.info "getUserTasks: SQL: " + sql.toString()
+		log.info "getUserTasks: SQL params: " + sqlParams
 		// Get all tasks from the database and then filter out the TODOs based on a filtering
 		def allTasks = namedParameterJdbcTemplate.queryForList( sql.toString(), sqlParams )
 		// def allTasks = jdbcTemplate.queryForList( sql.toString(), sqlParams )

@@ -68,9 +68,9 @@
 					<g:sortableColumn class="sort_column" style="" action="listComment" property="number_comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="" action="listComment" property="assetName" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="" action="listComment" property="lastUpdated" title="Updated" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="" action="listComment" property="estFinish" title="EstFinish" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="" action="listComment" property="estFinish" title="Due/Est Finish" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="" action="listComment" property="status" title="Status" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="" action="listComment" property="assignedTo" title="AssignedToName " params="['tab':tab,'search':search]" ></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="" action="listComment" property="assignedTo" title="Assigned To" params="['tab':tab,'search':search]" ></g:sortableColumn>
 				</tr>
 			</thead>
 			<tbody>
@@ -108,16 +108,7 @@
 						${issue?.item?.status}/${issue?.item?.score}
 					</td>
 					<td id="assignedToName_${issue?.item?.id}" class="asset_details_block">
-						
-						<g:if test="${ issue?.item?.hardAssigned == 1}">
-							<img src="${resource(dir:'images',file:'star_yellow.gif')}" style="border: 0px;"/>
-							${issue?.item?.firstName} ${issue?.item?.lastName}
-						</g:if>
-						<g:else>
-							<span style="padding-left: 20px;">${issue?.item?.firstName} ${issue?.item?.lastName}</span>
-						</g:else>
-						
-						
+						${ (issue?.item?.hardAssigned?'* ':'') + issue?.item?.firstName + ' ' + issue?.item?.lastName }
 					</td>
 					</tr>
 					<g:if test="${tab && tab == 'todo'}">
