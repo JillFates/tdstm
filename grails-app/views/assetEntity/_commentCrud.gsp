@@ -383,11 +383,13 @@
 				<g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
 				onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionEditId', 'predecessorId',jQuery('#createAssetCommentId').html())"></g:select>
 				<span id="taskNumberSpanEditId"></span>
-        	    <label for="priority">Priority:</label>
-            	<g:select id="priorityEdit" name="priorityEdit" from="${1..5}" value=""></g:select>
+				<span id="priorityEditSpanId">
+	        	    <label for="priority">Priority:</label>
+	            	<g:select id="priorityEdit" name="priorityEdit" from="${1..5}" value=""></g:select>
+            	</span>
 			</td>
         </tr>
-        <tr>
+        <tr id="commentTypeEditTrId">
             <td valign="top" class="name" id="commentTypeEditTdId"> 
                <label for="commentType">Type:</label>
             </td>

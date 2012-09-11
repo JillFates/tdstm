@@ -1786,20 +1786,20 @@ class AssetEntityController {
 		if(assetComment){
 			if(assetComment.createdBy){
 				personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")
-				dtCreated = estformatter.format(GormUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
+				dtCreated = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
 			}
 			if(assetComment.resolvedBy){
 				personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")
-				dtResolved = estformatter.format(GormUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
+				dtResolved = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
 			}
 			if(assetComment.estStart){
-				etStart = estformatter.format(GormUtil.convertInToUserTZ(assetComment.estStart, tzId));
+				etStart = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.estStart, tzId));
 			}
 			if(assetComment.estFinish){
-				etFinish = estformatter.format(GormUtil.convertInToUserTZ(assetComment.estFinish, tzId));
+				etFinish = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.estFinish, tzId));
 			}
 			if(assetComment.actStart){
-				atStart = estformatter.format(GormUtil.convertInToUserTZ(assetComment.actStart, tzId));
+				atStart = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.actStart, tzId));
 			}
 			if(assetComment.dueDate){
 				dueDate = dateFormatter.format(assetComment.dueDate);
@@ -3065,8 +3065,8 @@ class AssetEntityController {
 				//	sqlArgs << [ status:AssetCommentStatus.COMPLETED ]
 				//	break
 					
-				assetCommentQuery += " ORDER BY score DESC, taskNumber ASC, dueDate ASC, dateCreated DESC"
 		   }
+			assetCommentQuery += " ORDER BY score DESC, taskNumber ASC, dueDate ASC, dateCreated DESC "
 		}
 		//log.info "listCommentsOrTasks: SQL filter=${assetCommentQuery}"
 		def commentList = AssetComment.findAll(assetCommentQuery,sqlArgs)

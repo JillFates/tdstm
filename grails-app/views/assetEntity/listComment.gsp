@@ -57,9 +57,6 @@
 							<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" nowrap>
 				        		<a href="javascript:showAssetComment(${commentInstance?.id}, 'edit')"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="taskNumber" title="Task" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.taskNumber ? commentInstance.taskNumber :''}</span>
-							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Description" nowrap>
 								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.description?.size() > 40 ? commentInstance.description?.substring(0,40)+'..' : commentInstance.description}</span>
 							</jmesa:htmlColumn>
@@ -72,9 +69,6 @@
 							--%>
 							<jmesa:htmlColumn property="commentType" title="Type" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.commentType}</span>
-							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="status" title="Status" sortable="true" filterable="true" width="100px" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');" class="span_${commentInstance.status ? commentInstance.status.toLowerCase() : 'na'}">${commentInstance.status}</span>
 							</jmesa:htmlColumn>
 							<%--<jmesa:htmlColumn property="assignedToString" title="Assigned To" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
         	                 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.assignedTo}</span>

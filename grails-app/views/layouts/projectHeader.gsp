@@ -235,7 +235,7 @@
 							</tds:hasPermission>
 							<tds:hasPermission permission='AssetMenuView'>
 							<li><g:link class="mmlink" controller="assetEntity" action="exportAssets"  onclick="hideMegaMenu('assetMegaMenu')">Export Assets</g:link></li>
-							<li><g:link class="mmlink" controller="assetEntity" action="listComment" onclick="hideMegaMenu('assetMegaMenu')">Asset Comments</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" action="listComment"  params="[tag_s_2_lastUpdated:'desc']" onclick="hideMegaMenu('assetMegaMenu')">Asset Comments</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('assetMegaMenu')">help</a></li>
@@ -323,7 +323,7 @@
 							<li><a class="mmlink" id="MyTasksMenuId" href="/tdstm/clientTeams/listComment" onclick="hideMegaMenu('teamMegaMenu')">My Tasks</a></li>
 							<tds:hasPermission permission='ShowMoveTechsAndAdmins'>
 							<li><a class="mmlink" href="/tdstm/clientTeams/list" onclick="hideMegaMenu('teamMegaMenu')">Team Tasks</a></li>
-							<li><g:link class="mmlink" controller="assetEntity" action="listTasks"  params="[tag_s_12_score:'desc']" onclick="hideMegaMenu('assetMegaMenu')">Task Manager</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" action="listTasks"  params="[tag_s_12_score:'desc',tag_s_5_lastUpdated:'desc']" onclick="hideMegaMenu('assetMegaMenu')">Task Manager</g:link></li>
 							<li>&nbsp;</li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='HelpMenuView'>

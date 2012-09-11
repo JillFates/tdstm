@@ -795,6 +795,8 @@ function showAssetDialog( e , action ) {
 	     	      	$('#predecessorAddTr').css('display','none')
 	     	      	$('#previousNote').html('')
 	     	      	$('#predecessorShowTr').css('display','none')
+	     	      	$('#commentTypeEditTrId').css('display','none')
+	     	      	$('#priorityEditSpanId').css('display','none')
 	     	      	$("#showCommentDialog").dialog("option", "title", "Comment Detail");
 		      		$("#editCommentDialog").dialog("option", "title", "Comment Detail");
 		      	 }
@@ -840,21 +842,23 @@ function showAssetDialog( e , action ) {
 		      	 $('#mustVerifyEditId').val(ac.mustVerify)
 		      	 $('#isResolvedEditId').val(ac.isResolved)
 		      	 if(action == 'edit'){
-		      		updateStatusSelect(ac.id);
-		      	    if(ac.assetEntity){
-		    		       updateWorkflowTransitions(ac.assetEntity.id, ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
-		    		}else{
-		    		       updateWorkflowTransitions('', ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
-		    		}
 					$('#successorEditId').html(params.successorTable)
-		            updateAssignedToList('assignedToEdit','assignedEditSpan',ac.id);
 					
 					commentChangeEdit('editResolveDiv','editCommentForm');
 			      	$("#editCommentDialog").dialog('option', 'width', 'auto')
 			      	$("#editCommentDialog").dialog('option', 'position', ['center','top']);
 			      	$("#editCommentDialog").dialog("open")
 			      	$("#showCommentDialog").dialog("close")
-			      	loadEditPredecessor(ac.id);
+			      	if(ac.commentType=='issue'){
+			      		updateStatusSelect(ac.id);
+			      	    if(ac.assetEntity){
+			    		       updateWorkflowTransitions(ac.assetEntity.id, ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
+			    		}else{
+			    		       updateWorkflowTransitions('', ac.category, 'workFlowTransitionEditId', 'predecessorEditId',ac.id)
+			    		}
+			      		updateAssignedToList('assignedToEdit','assignedEditSpan',ac.id);
+			      		loadEditPredecessor(ac.id);
+			      	}
 		      	 } else if(action == 'show'){
 		      	 	$("#showCommentDialog").dialog('option', 'width', 'auto')
 		      	 	$("#showCommentDialog").dialog('option', 'position', ['center','top']);
