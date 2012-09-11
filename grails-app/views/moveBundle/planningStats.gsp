@@ -74,7 +74,7 @@ $(document).ready(function() {
 					<table style="float:left; border: 0px; margin-left: 10px;">
 						<tr>
 							<td style="width: 10px;text-align: right;">${openIssue}</td>
-							<td><g:link controller="assetEntity" action="listComment" params="[filter:'Discovery']">Open Issues</g:link></td>
+							<td><g:link controller="assetEntity" action="listComment" params="[filter:'Discovery']">Open Tasks</g:link></td>
 						</tr>
 						<g:if test="${dueOpenIssue>0}">
 						<tr>
@@ -150,7 +150,7 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${issuesCount}</td>
-							<td style="width: 150px;"><g:link controller="assetEntity" action="listComment" params="[filter:'openIssue']">Open Issues</g:link></td>
+							<td style="width: 150px;"><g:link controller="assetEntity" action="listComment" params="[filter:'openIssue']">Open Tasks</g:link></td>
 						</tr>
 						<g:if test="${generalOverDue>0}">
 						<tr>
@@ -197,7 +197,7 @@ $(document).ready(function() {
 				<table style="border: 0px;">
 					<thead>
 						<th style="background-color: white;width:80px;">&nbsp;</th>
-						<th style="color: Blue; background-color: white;width:45px;text-align: right;"><g:link controller="application" action="list" params="[moveEvent:'unAssigned']">Unassigned</g:link></th>
+						<th style="color: Blue; background-color: white;width:45px;text-align: right;"><g:link controller="application" action="list" params="[moveEvent:'unAssigned']">TBD</g:link></th>
 							<g:each in="${moveBundle}" var="bundle">
 								<th style="color: Blue; background-color: white;text-align: center;">
 									<b><g:link controller="application" action="list" params="[moveEvent:bundle.id]">${bundle}</g:link></b>
