@@ -1,3 +1,4 @@
+<%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus" %>
 <%--
 /*
  **************************
@@ -108,7 +109,7 @@
 						${issue?.item?.status}/${issue?.item?.score}
 					</td>
 					<td id="assignedToName_${issue?.item?.id}" class="asset_details_block">
-						${ (issue?.item?.hardAssigned?'* ':'') + issue?.item?.firstName + ' ' + issue?.item?.lastName }
+						${ (issue?.item?.hardAssigned?'* ':'') } <span id="assignedToNameSpan_${issue?.item?.id}"> ${ issue?.item?.firstName + ' ' + issue?.item?.lastName } </span>
 					</td>
 					</tr>
 					<g:if test="${tab && tab == 'todo'}">
@@ -116,17 +117,26 @@
 							<td nowrap="nowrap" colspan="6" class="statusButtonBar"><a
 								class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
 								id="started_${issue?.item?.id}"
-								onclick="changeStatus('${issue?.item?.id}','${com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED}','${issue.item.status}')">
+								onclick="changeStatus('${issue?.item?.id}','${AssetCommentStatus.STARTED}','${issue.item.status}')">
 									<span
 									class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
 									<span class="ui-button-text task_button">Start</span>
 							</a> <a
 								class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
-								onclick="changeStatus('${issue?.item?.id}','${com.tdsops.tm.enums.domain.AssetCommentStatus.DONE}', '${issue.item.status}')">
+								onclick="changeStatus('${issue?.item?.id}','${AssetCommentStatus.DONE}', '${issue.item.status}')">
 									<span
 									class="ui-button-icon-primary ui-icon ui-icon-check task_icon"></span>
 									<span class="ui-button-text task_button">Done</span>
-							</a> <a
+							</a>
+							<g:if test="${ personId != issue.item.assignedTo && issue.item.status in [AssetCommentStatus.STARTED, AssetCommentStatus.PENDING, AssetCommentStatus.READY]}">
+								<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
+									onclick="assignTask('${issue?.item?.id}','${issue.item.assignedTo}', '${issue.item.status}')">
+										<span
+										class="ui-button-icon-primary ui-icon ui-icon-check task_icon"></span>
+										<span class="ui-button-text task_button">Assign To Me</span>
+								</a> 
+							</g:if>
+							<a
 								class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
 								onclick="issueDetails(${issue?.item?.id},'${issue?.item?.status}')">
 									<span

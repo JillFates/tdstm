@@ -197,6 +197,27 @@
 		$('#issueTrId_'+id).attr('onClick','openStatus('+id+',"'+status+'")');
 		B1.Restart(60);
 	}
+
+	function assignTask(id, user, status){
+		B1.Pause();
+		jQuery.ajax({
+			url: '../task/assignToMe',
+			data: {'id':id, 'user':user, 'status':status},
+			type:'POST',
+			success: function(data) {
+				if (data.errorMsg) {
+					alert(data.errorMsg);
+				} else {
+					 $('#assignedToNameSpan_'+id).html(data.assignedTo)
+					 $('#showStatusId_'+id).hide()
+					 B1.Restart(60);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert("An unexpected error occurred. Please close and reload form to see if the problem persists")
+			}
+		});
+	}
  
 function changeAction(){
 	 document.issueAssetForm.action = 'listComment'
