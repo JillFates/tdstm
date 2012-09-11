@@ -70,6 +70,7 @@
 					<g:sortableColumn class="sort_column" style="" action="listComment" property="lastUpdated" title="Updated" params="['tab':tab,'search':search]"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="" action="listComment" property="estFinish" title="EstFinish" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
 					<g:sortableColumn class="sort_column" style="" action="listComment" property="status" title="Status" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="" action="listComment" property="assignedTo" title="AssignedToName " params="['tab':tab,'search':search]" ></g:sortableColumn>
 				</tr>
 			</thead>
 			<tbody>
@@ -106,10 +107,22 @@
 					<td id="statusTd_${issue?.item?.id}" class="asset_details_block">
 						${issue?.item?.status}/${issue?.item?.score}
 					</td>
+					<td id="assignedToName_${issue?.item?.id}" class="asset_details_block">
+						
+						<g:if test="${ issue?.item?.hardAssigned == 1}">
+							<img src="${resource(dir:'images',file:'star_yellow.gif')}" style="border: 0px;"/>
+							${issue?.item?.firstName} ${issue?.item?.lastName}
+						</g:if>
+						<g:else>
+							<span style="padding-left: 20px;">${issue?.item?.firstName} ${issue?.item?.lastName}</span>
+						</g:else>
+						
+						
+					</td>
 					</tr>
 					<g:if test="${tab && tab == 'todo'}">
 						<tr id="showStatusId_${issue?.item?.id}" style="display: none;">
-							<td nowrap="nowrap" colspan="5" class="statusButtonBar"><a
+							<td nowrap="nowrap" colspan="6" class="statusButtonBar"><a
 								class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
 								id="started_${issue?.item?.id}"
 								onclick="changeStatus('${issue?.item?.id}','${com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED}','${issue.item.status}')">
@@ -132,7 +145,7 @@
 						</tr>
 					</g:if>
 					<tr id="detailTdId_${issue?.item?.id}" style="display: none">
-						<td colspan="5">
+						<td colspan="6">
 							<div id="detailId_${issue?.item?.id}" style="width: 100%">
 							</div>
 						</td>

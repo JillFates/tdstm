@@ -74,7 +74,8 @@ class TaskService {
 		
 		StringBuffer sql = new StringBuffer("""SELECT t.asset_comment_id AS id, t.comment, t.est_finish AS estFinish, t.last_updated AS lastUpdated,
 		 	t.asset_entity_id AS assetEntity, t.status, t.assigned_to_id AS assignedTo, IFNULL(a.asset_name,'') AS assetName, t.role,
-		 	t.task_number AS taskNumber, t.est_finish AS estFinish, t.due_date AS dueDate """)
+		 	t.task_number AS taskNumber, t.est_finish AS estFinish, t.due_date AS dueDate, p.first_name AS firstName, p.last_name AS lastName,
+			t.hard_assigned AS hardAssigned""")
 
 		// Add in the Sort Scoring Algorithm into the SQL if we're going to return a list
 		if ( ! countOnly) {
@@ -127,7 +128,8 @@ class TaskService {
 		sql.append(', (SELECT count(*) FROM task_dependency td WHERE predecessor_id=t.asset_comment_id) AS successors ')
 		
 		sql.append("""FROM asset_comment t 
-			LEFT OUTER JOIN asset_entity a ON a.asset_entity_id = t.asset_entity_id
+			LEFT OUTER JOIN asset_entity a ON a.asset_entity_id = t.asset_entity_id 
+            LEFT OUTER JOIN person p ON p.person_id = t.assigned_to_id 
 			WHERE t.project_id=:projectId AND t.comment_type=:type AND 
 			( t.assigned_to_id=:assignedToId OR (t.role IN (:roles) AND t.status IN (:statuses) AND t.hard_assigned=0) ) """)
 		
@@ -151,23 +153,25 @@ class TaskService {
 		if ( ! countOnly ) {
 			// If we are returning the lists, then let's deal with the sorting
 			sql.append('ORDER BY ')
-			def sortableProps = ['number_comment', 'comment', 'estFinish', 'lastUpdated', 'status', 'assetName']
+			def sortableProps = ['number_comment', 'comment', 'estFinish', 'lastUpdated', 'status', 'assetName', 'assignedTo']
+			def sortAndOrder = null
 			if (sortOn) {
 				if ( sortableProps.contains(sortOn) ) {
 					sortOrder = ['asc','desc'].contains(sortOrder) ? sortOrder : 'asc'
 					sortOrder = sortOrder.toUpperCase()
-					sql.append(sortOn == "number_comment" ? "taskNumber ${sortOrder}, comment ${sortOrder}" : "${sortOn} ${sortOrder}")
+					sortAndOrder = sortOn == "number_comment" ? "taskNumber ${sortOrder}, comment ${sortOrder}" : "${sortOn} ${sortOrder} "
+					sortAndOrder = sortOn == "assignedTo" ? "p.first_name ${sortOrder}, p.last_name ${sortOrder}" : sortAndOrder
+					sql.append(sortAndOrder)
 				} else {
 					log.warn "getUserTasks: called with invalid sort property [${sortOn}]"
-					sortOn=null
+					sortAndOrder=null
 				}
 			}
 			// add the score sort either as addition or as only ORDER BY parameteters
-			sql.append( (sortOn ? ', ' : '') + 'score DESC, task_number ASC' )
+			sql.append( (sortAndOrder ? ', ' : '') + 'score DESC, task_number ASC' )
 		}
 		
 		// log.info "getUserTasks: SQL for userTasks: " + sql.toString()
-		
 		// Get all tasks from the database and then filter out the TODOs based on a filtering
 		def allTasks = namedParameterJdbcTemplate.queryForList( sql.toString(), sqlParams )
 		// def allTasks = jdbcTemplate.queryForList( sql.toString(), sqlParams )
