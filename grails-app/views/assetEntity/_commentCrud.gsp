@@ -164,20 +164,18 @@
    </table>
 	</div>
    <tds:hasPermission permission='CommentCrudView'>
-	<div class="buttons" style="white-space: nowrap;">
-	<span class="button">
-	<input class="edit" type="button" value="Edit" id="commentButtonEditId" />
-	</span>
-	<span class="button" > 
-	<span id="fromAssetId"> 
-	    <input class="delete" type="button" value="Delete" onclick="deleteComment('#commentId','#assetEntityIdShow','update')"/>
-	</span>
-	<span id="fromMoveEventId" style="display: none">
-	 		<input class="delete" type="button" value="Delete" onclick="deleteComment('#commentId','#assetEntityIdShow','refresh')" />
-	</span>
-	</span>
-	</div>
-   </tds:hasPermission>
+		<div class="buttons" style="white-space: nowrap;">
+			<span class="button"> 
+				<input class="edit" type="button" value="Edit" id="commentButtonEditId" />
+				<span id="fromAssetId">
+					<input class="delete" type="button" value="Delete" onclick="deleteComment('#commentId','#assetEntityIdShow','update')" />
+				</span> 
+				<span id="fromMoveEventId" style="display: none"> 
+					<input class="delete" type="button" value="Delete" onclick="deleteComment('#commentId','#assetEntityIdShow','refresh')" />
+				</span>
+			</span>
+		</div>
+	</tds:hasPermission>
 </div>
 </div>
 <%--

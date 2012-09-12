@@ -3021,7 +3021,7 @@ class AssetEntityController {
 				assetCommentQuery += ' AND a.assignedTo = :assignedTo'
 				sqlArgs << [ assignedTo:person]
 			}
-			if (! justRemainingTasks) {
+			if (justRemainingTasks) {
 				assetCommentQuery += ' AND status != :status'
 				sqlArgs << [ status:AssetCommentStatus.COMPLETED ]
 			}
@@ -3140,8 +3140,8 @@ class AssetEntityController {
 		} else {
 			// log.info "_listCommentsOrTasks:about to render : ${TimeCategory.minus(new Date(), start)}"
 			def model = [ assetCommentList:assetCommentList, rediectTo:'comment', 
-				s:params.resolvedBox, issueBox:params.issueBox,
-				moveEvents:moveEvents, filterEvent:filterEvent,staffRoles:taskService.getRolesForStaff()]
+				resolvedBox:params.resolvedBox, issueBox:params.issueBox,
+				moveEvents:moveEvents, filterEvent:filterEvent,staffRoles:taskService.getRolesForStaff() ]
 	      	render (view:view ,model:model )
 		}
 	}

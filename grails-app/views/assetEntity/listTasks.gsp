@@ -41,13 +41,6 @@
 	    	$(".span_task_planned").parent().addClass("task_planned")
 	    	$(".span_task_completed").parent().addClass("task_completed")
 	    	$(".span_task_na").parent().addClass("task_na")
-	    	if($("#revertedValId").val()=="" || $("#revertedValId").val()=='on'){
-	    		$("#myResolvedBox").attr('checked',true)
-	    		$("#resolvedBoxId").val('on')
-			 }else{
-				 $("#resolvedBoxId").val('off')
-				 $("#myResolvedBox").attr('checked',false)
-			 }
         });
         $(document).keyup(function(e) {
         	// esc to stop timer
@@ -72,16 +65,14 @@
 			<div>
 			<input type="hidden" id="manageTaskId" value="manageTask"/>
 			<form name="commentForm" id="commentForm" action="listTasks">
-			<input type="hidden" id="resolvedBoxId" name="resolvedBox" value="on"/>
-			<input type="hidden" id="revertedValId"  value="${checked}"/>
 			<span >
 				<b>Move Event </b>
 			 	<g:select from="${moveEvents}" name="moveEvent" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
 				&nbsp;&nbsp;
-				<input type="checkBox" id="myResolvedBox" ${resolvedBox=='on' ? 'checked="checked"':''} onclick="if(this.checked){this.value = 1} else {this.value = 0 };changeCheck(this.value)"  />
+				<input type="checkBox" id="myResolvedBox" name="resolvedBox" ${resolvedBox=='on' ? 'checked="checked"':''} onclick="submitForm()"  />
 				<b> Just Remaining Tasks</b>
 				&nbsp;&nbsp;
-				<input type="checkBox" name="issueBox" id="issueBox" ${issueBox=='on' ? 'checked="checked"':''} onclick="$('#commentForm').submit();"/>
+				<input type="checkBox" name="issueBox" id="issueBox" ${issueBox=='on' ? 'checked="checked"':''} onclick="submitForm();"/>
 				<b> Just My Tasks</b>
 			</span>
 			<br/></br>
@@ -128,7 +119,7 @@
 							<jmesa:htmlColumn width="50px" property="category" sortable="true" filterable="true" title="Category">
                              	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.category}</span>
 							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="succCount" title="Succ" sortable="true" filterable="true"  cellEditor="org.jmesa.view.editor.BasicCellEditor">
+							<jmesa:htmlColumn property="succCount" title="Suc." sortable="true" filterable="true"  cellEditor="org.jmesa.view.editor.BasicCellEditor">
 							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${ commentInstance.succCount}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="score" title="Score" sortable="true" filterable="false">
@@ -151,10 +142,6 @@
  </div>
  </div>
  <script type="text/javascript">
- function changeCheck(value){
-	 value == 0 ? $('#resolvedBoxId').val('off') : $('#resolvedBoxId').val('on')
-     submitForm();
- }
  function submitForm(){
      $('#commentForm').submit()
  }
