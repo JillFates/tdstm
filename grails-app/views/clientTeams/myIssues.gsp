@@ -6,6 +6,7 @@
 	<title>My Tasks</title>
 	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
 	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	<g:javascript src="asset.comment.js" />
 </head>
 <body>
 		<div class="mainbody">
@@ -159,31 +160,7 @@
 		$('#showStatusId_'+id).css('display','table-row')
 		$('#issueTr_'+id).attr('onClick','issueDetails('+id+',"'+status+'")');
 	}
-	function changeStatus(id,status, currentStatus){
-		var tab = $('#tabId').val()
-		jQuery.ajax({
-			url: '../assetEntity/updateComment',
-			data: {'id':id,'status':status,'currentStatus':currentStatus,'view':'myTask','tab':tab},
-			type:'POST',
-			success: function(data) {
-				if (typeof data.error !== 'undefined') {
-					alert(data.error);
-				} else {
-					 $('#myTaskList').html(data)
-					 // $('#showStatusId_'+id).hide()
-					hideStatus(id, status)
-					 $('#issueTrId_'+id).attr('onClick','hideStatus('+id+',"'+status+'")')
-					 if(status=='Started'){
-					 	$('#started_'+id).hide()
-					 }
-					 B1.Restart(60);
-				}
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				alert("An unexpected error occurred while attempting to update task/comment")
-			}
-		});
-	}
+
 	function openStatus(id,status){
 		if(status=='Started'){
 			$('#started_'+id).css('display','none')
@@ -200,26 +177,6 @@
 		B1.Restart(60);
 	}
 
-	function assignTask(id, user, status){
-		B1.Pause();
-		jQuery.ajax({
-			url: '../task/assignToMe',
-			data: {'id':id, 'user':user, 'status':status},
-			type:'POST',
-			success: function(data) {
-				if (data.errorMsg) {
-					alert(data.errorMsg);
-				} else {
-					 $('#assignedToNameSpan_'+id).html(data.assignedTo)
-					 $('#showStatusId_'+id).hide()
-					 B1.Restart(60);
-				}
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				alert("An unexpected error occurred. Please close and reload form to see if the problem persists")
-			}
-		});
-	}
  
 function changeAction(){
 	 document.issueAssetForm.action = 'listComment'

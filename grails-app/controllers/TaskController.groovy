@@ -2,6 +2,7 @@ import grails.converters.JSON
 
 import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdssrc.grails.HtmlUtil
 
 class TaskController {
 	
@@ -55,5 +56,28 @@ class TaskController {
 		
 		def map = [assignedTo:assignedTo, errorMsg:errorMsg]
 		render map as JSON
+	}
+	
+	/**
+	 *  Generate action bar for a selected comment in Task Manager
+	 *  @params : task id
+	 *  @return : actions bar as HTML (Start, Done, Details, Assign To Me)
+	 */
+	def genActionBarHTML = {
+		def commentInstance = AssetComment.get(params.id)
+		def userLogin = securityService.getUserLogin()
+		StringBuffer actionBar = new StringBuffer("""<table style="border:0px"><tr>""")
+		if(commentInstance.status ==  AssetCommentStatus.READY){
+			actionBar.append(HtmlUtil.genActionButton(commentInstance,"Start","changeStatus('${commentInstance.id}','${AssetCommentStatus.STARTED}','${commentInstance.status}', 'taskManager')"))
+		}
+		if(commentInstance.status in[ AssetCommentStatus.READY,AssetCommentStatus.STARTED]){
+			actionBar.append(HtmlUtil.genActionButton(commentInstance,"Done","changeStatus('${commentInstance.id}','${AssetCommentStatus.DONE}', '${commentInstance.status}', 'taskManager')"))
+		}
+		actionBar.append(HtmlUtil.genActionButton(commentInstance,"Details..","showAssetComment(${commentInstance.id},'show')"))
+		if(userLogin.person.id != commentInstance.assignedTo?.id && commentInstance.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
+			actionBar.append(HtmlUtil.genActionButton(commentInstance,"Assign To Me","assignTask('${commentInstance.id}','${commentInstance.assignedTo}', '${commentInstance.status}','taskManager')"))
+		}
+		actionBar.append(""" </tr></table>""")
+		render actionBar.toString()
 	}
 }

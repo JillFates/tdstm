@@ -112,7 +112,7 @@
 							<a
 							class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
 							id="started_${issue?.item?.id}"
-							onclick="changeStatus('${issue?.item?.id}','${AssetCommentStatus.STARTED}','${issue.item.status}')">
+							onclick="changeStatus('${issue?.item?.id}','${AssetCommentStatus.STARTED}','${issue.item.status}', 'myTask')">
 								<span class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
 								<span class="ui-button-text task_button">Start</span>
 							</a> 
@@ -120,7 +120,7 @@
 							<g:if test="${ [AssetCommentStatus.READY, AssetCommentStatus.STARTED].contains(issue.item.status) }"> 
 							<a
 							class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
-							onclick="changeStatus('${issue?.item?.id}','${com.tdsops.tm.enums.domain.AssetCommentStatus.DONE}', '${issue.item.status}')">
+							onclick="changeStatus('${issue?.item?.id}','${com.tdsops.tm.enums.domain.AssetCommentStatus.DONE}', '${issue.item.status}', 'myTask')">
 								<span class="ui-button-icon-primary ui-icon ui-icon-check task_icon"></span>
 								<span class="ui-button-text task_button">Done</span>
 							</a>
@@ -133,7 +133,7 @@
 							</a>
 							<g:if test="${ personId != issue.item.assignedTo && issue.item.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]}">
 								<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
-									onclick="assignTask('${issue?.item?.id}','${issue.item.assignedTo}', '${issue.item.status}')">
+									onclick="assignTask('${issue?.item?.id}','${issue.item.assignedTo}', '${issue.item.status}','myTask')">
 									<span class="ui-button-icon-primary ui-icon ui-icon-check task_icon"></span>
 									<span class="ui-button-text task_button">Assign To Me</span>
 								</a> 
