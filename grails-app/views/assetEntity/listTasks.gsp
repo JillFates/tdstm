@@ -1,16 +1,17 @@
 <%@page import="com.tds.asset.AssetComment"%>
 <%@page import="com.tdssrc.grails.GormUtil"%>
+<%@page import="com.tdssrc.grails.StringUtil"%>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
-<meta name="layout" content="projectHeader" />
-        <title>Task Manager</title>
-         <g:javascript src="asset.tranman.js" />
-          <g:javascript src="entity.crud.js" />
-        <script language="javascript" src="${g.resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
-        <link rel="stylesheet" type="text/css" href="${g.resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
-        <link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
-        <script type="text/javascript">
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+	<meta name="layout" content="projectHeader" />
+	<title>Task Manager</title>
+	<g:javascript src="asset.tranman.js" />
+	<g:javascript src="entity.crud.js" />
+	<script language="javascript" src="${g.resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
+	<link rel="stylesheet" type="text/css" href="${g.resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
+	<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
+	<script type="text/javascript">
         function onInvokeAction(id) {
             setExportToLimit(id, '');
             createHiddenInputFieldsForLimitAndSubmit(id);
@@ -32,6 +33,7 @@
 			$("#createEntityView").dialog({ autoOpen: false })
 	    	currentMenuId = "#assetMenu";
 	    	$("#teamMenuId a").css('background-color','#003366')
+			<% // The .span_task_* are used to highlight the whole TD cell instead of just the text %>
 	    	$(".span_task_tardy").parent().addClass("task_tardy")
 	    	$(".span_task_late").parent().addClass("task_late")
 	    	$(".span_task_ready").parent().addClass("task_ready")
@@ -40,18 +42,17 @@
 	    	$(".span_task_pending").parent().addClass("task_pending")
 	    	$(".span_task_planned").parent().addClass("task_planned")
 	    	$(".span_task_completed").parent().addClass("task_completed")
-	    	$(".span_task_na").parent().addClass("task_na")
+	    	$(".span_task_na").parent().addClass("task_na")	
         });
         $(document).keyup(function(e) {
         	// esc to stop timer
        	    if (e.keyCode == 27) { if(B2 != ''){ B2.Restart(60); }}   
        	});
         	        
-        </script>
-        
+	</script>
 </head>
 <body>
- <input type="hidden" id="timeBarValueId" value="0"/>
+	<input type="hidden" id="timeBarValueId" value="0"/>
 	<div class="body">
 		<div class="taskTimebar" id="issueTimebar" >
 			<div id="issueTimebarId"></div>
@@ -65,14 +66,16 @@
 			<div>
 			<input type="hidden" id="manageTaskId" value="manageTask"/>
 			<form name="commentForm" id="commentForm" action="listTasks">
+			<input type="hidden" name="justRemaining" id="justRemaining" value="${justRemaining}"/>
+			<input type="hidden" name="justMyTasks"   id="justMyTasks"   value="${justMyTasks}"/>
 			<span >
 				<b>Move Event </b>
 			 	<g:select from="${moveEvents}" name="moveEvent" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
 				&nbsp;&nbsp;
-				<input type="checkBox" id="myResolvedBox" name="resolvedBox" ${resolvedBox=='on' ? 'checked="checked"':''} onclick="submitForm()"  />
+				<input type="checkbox" id="justRemainingCB" ${ (justRemaining=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'justRemaining');"  />
 				<b> Just Remaining Tasks</b>
 				&nbsp;&nbsp;
-				<input type="checkBox" name="issueBox" id="issueBox" ${issueBox=='on' ? 'checked="checked"':''} onclick="submitForm();"/>
+				<input type="checkbox" id="justMyTasksCB" ${ (justMyTasks=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'justMyTasks');"/>
 				<b> Just My Tasks</b>
 			</span>
 			<br/></br>
@@ -86,7 +89,7 @@
 								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.taskNumber ? commentInstance.taskNumber :''}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Description" nowrap>
-								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.description?.size() > 40 ? commentInstance.description?.substring(0,40)+'..' : commentInstance.description}</span>
+								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${StringUtil.ellipsis(commentInstance.description, 45)}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="assetName" title="Asset" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
         	                 	<span onclick="javascript:getEntityDetails('listComment', '${commentInstance.assetType}', '${commentInstance.assetEntityId}');">${commentInstance.assetName}</span>
@@ -131,17 +134,21 @@
 			</form>
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 		      <span class="menuButton"><a class="create" href="javascript:createIssue('','','')">Create Issue/Task</a></span>
-	       </div>
-            </div>
-            <div id="showEntityView" style="display: none;"></div>
-			<div id="editEntityView" style="display: none;"></div>
-			<div id="createEntityView" style="display: none;"></div>
+	       	</div>
+		</div>
+		<div id="showEntityView" style="display: none;"></div>
+		<div id="editEntityView" style="display: none;"></div>
+		<div id="createEntityView" style="display: none;"></div>
   </div>
   
  <g:render template="commentCrud"/> 
  </div>
  </div>
  <script type="text/javascript">
+function toggleCheckbox(chkbox, field) {
+	$('input[name='+field+']').val(chkbox.checked ? '1' : '0')
+	submitForm()
+}
  function submitForm(){
      $('#commentForm').submit()
  }

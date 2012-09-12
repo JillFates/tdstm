@@ -2968,12 +2968,19 @@ class AssetEntityController {
 
 		// Deal with the parameters
 		def isTask = params.commentType == AssetCommentType.TASK
+
 		def view = isTask ? 'listTasks' : 'listComment'
 		// def action = params.issueBox == "on" ? "issue" : params.resolvedBox  ? "resolved" : params.filter
 		def today = new Date()
 		def moveEvent
 		def filterEvent = 0	    
 
+		// Set the Checkbox values to that which were submitted or default if we're coming into the list for the first time
+		def justRemaining = params.containsKey('justRemaining') ? params.justRemaining : "1"
+		def justMyTasks = params.containsKey('justMyTasks') ? params.justMyTasks : "0"
+		
+		// log.info "listCommentsOrTasks: justRemaining=$justRemaining, justMyTasks=$justMyTasks"
+		
 		def assetCommentQuery = "FROM AssetComment a WHERE a.project = :project"
 		def sqlArgs = [project:project]
 		
@@ -2986,7 +2993,7 @@ class AssetEntityController {
 			
 		    if ( params.moveEvent?.size() > 0) {
 				// zero (0) = All events
-				log.info "listCommentsOrTasks: Handling MoveEvent based on params ${params.moveEvent}"
+				// log.info "listCommentsOrTasks: Handling MoveEvent based on params ${params.moveEvent}"
 				if (params.moveEvent != '0') {
 					moveEvent = MoveEvent.findByIdAndProject(params.moveEvent,project)
 					if (! moveEvent) {
@@ -3011,17 +3018,15 @@ class AssetEntityController {
 			}
 
 			def action = params.filter
-			def justMyTasks = params.issueBox == 'on'
-			def justRemainingTasks = params.resolvedBox == 'on'
 			
 			assetCommentQuery += " AND commentType = :commentType "
 			sqlArgs << [ commentType: AssetCommentType.TASK ]
 			
-			if (justMyTasks) {
+			if (justMyTasks == "1") {
 				assetCommentQuery += ' AND a.assignedTo = :assignedTo'
 				sqlArgs << [ assignedTo:person]
 			}
-			if (justRemainingTasks) {
+			if (justRemaining == "1") {
 				assetCommentQuery += ' AND status != :status'
 				sqlArgs << [ status:AssetCommentStatus.COMPLETED ]
 			}
@@ -3100,8 +3105,12 @@ class AssetEntityController {
 				// assetBean.setStatusClass( taskService.getCssClassForStatus(comment.status) )
 				setStatusClass( comment.status ? "task_${comment.status.toLowerCase()}" : 'task_na' )
 
-				// Set the Last Updated duration appropriately
-				def elapsed = TimeUtil.elapsed(comment.statusUpdated, GormUtil.convertInToGMT( "now", "EDT" ))
+				// Set the Last Updated elapsed time and CSS style appropriately
+				// For READY tasks, show tardy or late if they go over 5/10 minutes respectively with no activity
+				// For STARTED, show tardy or late if they go beyond the STARTED time + duration for 5/10 minutes respectively
+				// If the task is not completed within 5 min of the original planned finish indicate that the task was overdue
+				def nowGMT = TimeUtil.nowGMT()
+				def elapsed = TimeUtil.elapsed(comment.statusUpdated, nowGMT)
 				def elapsedSec = elapsed.toMilliseconds() / 1000
 				if (comment.status == AssetCommentStatus.READY) {
 					if (elapsedSec >= 600) {
@@ -3118,7 +3127,7 @@ class AssetEntityController {
 					}
 				}
 				if (comment.estFinish) {
-					elapsed = TimeUtil.elapsed(comment.estFinish, GormUtil.convertInToGMT( "now", "EDT" ))
+					elapsed = TimeUtil.elapsed(comment.estFinish, nowGMT)
 					elapsedSec = elapsed.toMilliseconds() / 1000
 					if (elapsedSec > 300) {
 						setDueClass('task_overdue')
@@ -3135,12 +3144,14 @@ class AssetEntityController {
 		Limit limit = tableFacade.limit
 		if(limit.isExported()){
 			tableFacade.setExportTypes(response,limit.getExportType())
+			// TODO : the column properties will be different for the Comments vs Tasks...
 			tableFacade.setColumnProperties("comment","commentType","assetEntity","mustVerify","isResolved","resolution","resolvedBy","createdBy","commentCode","category",'score',"displayOption")
 			tableFacade.render()
 		} else {
 			// log.info "_listCommentsOrTasks:about to render : ${TimeCategory.minus(new Date(), start)}"
+			// TODO : clean-up : the rediectTo param is spelled wrong and should be redirectTo
 			def model = [ assetCommentList:assetCommentList, rediectTo:'comment', 
-				resolvedBox:params.resolvedBox, issueBox:params.issueBox,
+				justRemaining:justRemaining, justMyTasks:justMyTasks, 
 				moveEvents:moveEvents, filterEvent:filterEvent,staffRoles:taskService.getRolesForStaff() ]
 	      	render (view:view ,model:model )
 		}

@@ -154,7 +154,7 @@ class AssetComment {
 		*/
 		score formula:	"CASE status \
 			WHEN '${AssetCommentStatus.HOLD}' THEN 900 \
-			WHEN '${AssetCommentStatus.DONE}' THEN IF(status_updated <= CONVERT_TZ(SUBTIME(NOW(),'00:01:00.0'),'-04:00','+00:00'), 800, 200) + status_updated/NOW() \
+			WHEN '${AssetCommentStatus.DONE}' THEN IF(status_updated >= CONVERT_TZ(SUBTIME(NOW(),'00:01:00.0'),'-04:00','+00:00'), 800, 200) + status_updated/NOW() \
 			WHEN '${AssetCommentStatus.STARTED}' THEN 700 + 1 - IFNULL(est_start,NOW())/NOW() \
 			WHEN '${AssetCommentStatus.READY}' THEN 600 + 1 - IFNULL(est_start,NOW())/NOW() \
 			WHEN '${AssetCommentStatus.PENDING}' THEN 500 + 1 - IFNULL(est_start,NOW())/NOW() \
