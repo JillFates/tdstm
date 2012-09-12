@@ -71,6 +71,7 @@ function assignTask(id, user, status, from){
 					if(B2 != ''){ B2.Restart(60);}
 				}else{
 					 $('#assignedToNameSpan_'+id).html(data.assignedTo)
+					 $('#assignToMeId_'+id).hide()
 					 if(B1 != ''){ B1.Restart(60); }
 				}
 			}

@@ -132,7 +132,7 @@
 								<span class="ui-button-text task_button">Details..</span>
 							</a>
 							<g:if test="${ personId != issue.item.assignedTo && issue.item.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]}">
-								<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
+								<a id="assignToMeId_${issue?.item?.id}" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
 									onclick="assignTask('${issue?.item?.id}','${issue.item.assignedTo}', '${issue.item.status}','myTask')">
 									<span class="ui-button-icon-primary ui-icon ui-icon-check task_icon"></span>
 									<span class="ui-button-text task_button">Assign To Me</span>
