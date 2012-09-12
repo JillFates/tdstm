@@ -63,9 +63,11 @@ class TaskService {
 		
 		def now = TimeUtil.nowGMT()
 		def minAgo = TimeUtil.adjustSeconds(now, -60)
+		
+		log.info "getUserTasks: now=${now}, minAgo=${minAgo}"
 
 		// List of statuses that user should be able to see in when soft assigned to others and user has proper role
-		def statuses = [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]
+		def statuses = [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED, AssetCommentStatus.COMPLETED, AssetCommentStatus.HOLD]
 		
 		def sqlParams = [projectId:project.id, assignedToId:person.id, type:type, roles:roles, statuses:statuses]
 		
@@ -75,7 +77,7 @@ class TaskService {
 		StringBuffer sql = new StringBuffer("""SELECT t.asset_comment_id AS id, t.comment, t.est_finish AS estFinish, t.last_updated AS lastUpdated,
 		 	t.asset_entity_id AS assetEntity, t.status, t.assigned_to_id AS assignedTo, IFNULL(a.asset_name,'') AS assetName, t.role,
 		 	t.task_number AS taskNumber, t.est_finish AS estFinish, t.due_date AS dueDate, p.first_name AS firstName, p.last_name AS lastName,
-			t.hard_assigned AS hardAssigned""")
+			t.status_updated AS statusUpdated, t.hard_assigned AS hardAssigned""")
 
 		// Add in the Sort Scoring Algorithm into the SQL if we're going to return a list
 		if ( ! countOnly) {
@@ -113,10 +115,10 @@ class TaskService {
 			sql.append(""", 
 				( ( CASE t.status 
 				WHEN '${AssetCommentStatus.HOLD}' THEN 900
-				WHEN '${AssetCommentStatus.DONE}' THEN IF(t.status_updated <= :minAgo, 800, 200) + t.status_updated / :now
-				WHEN '${AssetCommentStatus.STARTED}' THEN 700 + 1 - IFNULL(t.est_start,:now) / :now
-				WHEN '${AssetCommentStatus.READY}' THEN 600 + 1 - IFNULL(t.est_start,:now) / :now
-				WHEN '${AssetCommentStatus.PENDING}' THEN 500 + 1 - IFNULL(t.est_start,:now) / :now
+				WHEN '${AssetCommentStatus.DONE}' THEN IF(t.status_updated >= :minAgo, 800, 200) + UNIX_TIMESTAMP(t.status_updated) / UNIX_TIMESTAMP(:now)
+				WHEN '${AssetCommentStatus.STARTED}' THEN 700 + 1 - UNIX_TIMESTAMP(IFNULL(t.est_start,:now)) / UNIX_TIMESTAMP(:now)
+				WHEN '${AssetCommentStatus.READY}' THEN 600 + 1 - UNIX_TIMESTAMP(IFNULL(t.est_start,:now)) / UNIX_TIMESTAMP(:now)
+				WHEN '${AssetCommentStatus.PENDING}' THEN 500 + 1 - UNIX_TIMESTAMP(IFNULL(t.est_start,:now)) / UNIX_TIMESTAMP(:now)
 				ELSE 0
 				END) +  
 				IF(t.assigned_to_id=:assignedToId AND t.status IN('${AssetCommentStatus.STARTED}','${AssetCommentStatus.READY}'), IF(t.hard_assigned=1, 55, 50), 0) +
@@ -131,7 +133,7 @@ class TaskService {
 			LEFT OUTER JOIN asset_entity a ON a.asset_entity_id = t.asset_entity_id 
             LEFT OUTER JOIN person p ON p.person_id = t.assigned_to_id 
 			WHERE t.project_id=:projectId AND t.comment_type=:type AND 
-			( t.assigned_to_id=:assignedToId OR (t.role IN (:roles) AND t.status IN (:statuses) AND t.hard_assigned=0) ) """)
+			( t.assigned_to_id=:assignedToId OR (t.role IN (:roles) AND t.status IN (:statuses) ) ) """)
 		
 		search = org.apache.commons.lang.StringUtils.trimToNull(search)
 		if (search) {
@@ -182,8 +184,12 @@ class TaskService {
 		// Get all tasks from the database and then filter out the TODOs based on a filtering
 		def allTasks = namedParameterJdbcTemplate.queryForList( sql.toString(), sqlParams )
 		// def allTasks = jdbcTemplate.queryForList( sql.toString(), sqlParams )
+		def format = "yyyy/MM/dd hh:mm:ss"
+		def minAgoFormat = minAgo.format(format)
 		def todoTasks = allTasks.findAll { task ->
-			task.status == AssetCommentStatus.READY || ( task.status == AssetCommentStatus.STARTED && task.assignedTo == person.id )
+			if (task.taskNumber==374) { log.info "getUserTasks: minAgoFormat:${minAgoFormat} [${task.statusUpdated?.format(format)}]"}
+			task.status == AssetCommentStatus.READY || ( task.status == AssetCommentStatus.STARTED && task.assignedTo == person.id ) ||
+			(task.status == AssetCommentStatus.DONE && task.assignedTo == person.id && task.statusUpdated?.format(format) >= minAgoFormat )
 		}
 
 		if (countOnly) {

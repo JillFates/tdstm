@@ -56,22 +56,7 @@
 				</span>
 				</td>
 			</tr>
-			<tr class="prop" >
-				<td valign="top" class="name"><label for="status">Status:</label>
-				<input id="currentStatus_${assetComment.id}" name="currentStatus" type="hidden" value="${assetComment.status}" />
-				</td>
-				<td style="width: 20%;" id="statusEditTrId_${assetComment.id}" colspan="3">
-					<g:if test="${statusWarn==1}">
-						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
-						noSelection="['':'please select']"  onChange="showResolve()" disabled="true"></g:select>
-					</g:if>
-					<g:else>
-						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
-						noSelection="['':'please select']"  onChange="showResolve()"></g:select>
-					</g:else>
-				</td>	
-			</tr>	
-			 <% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
+		 	<% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
 			<tr class="prop issue" id="assignedToTrEditId" >
 				<td valign="top" class="name"><label for="assignedTo">Assigned:</label></td>
 				<td valign="top" id="assignedToEditTdId" style="width: 20%;" colspan="3" >
@@ -98,7 +83,16 @@
 				<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 				<td valign="top" class="value" colspan="3"><span id="categoryEditId">${assetComment?.createdBy} on <tds:convertDate date="${assetComment?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span></td>
 			</tr>
-			
+			<tr class="prop" >
+				<td valign="top" class="name">
+					<label for="status">Status:</label>
+					<input id="currentStatus_${assetComment.id}" name="currentStatus" type="hidden" value="${assetComment.status}" />
+				</td>
+				<td style="width: 20%;" id="statusEditTrId_${assetComment.id}" colspan="3">
+					<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
+					noSelection="['':'please select']"  onChange="showResolve()" ${statusWarn==1 ? 'disabled="true"' : ''}></g:select>
+				</td>	
+			</tr>				
 			 <tr class="prop">
 				<td valign="top" class="name"><label for="notes">Previous Notes:</label></td>
 				<td valign="top" class="value" colspan="3"><div id="previousNote" style="width: 380px;">
@@ -143,26 +137,28 @@
 			</g:if>
 			
 			<tr>
-			    <td class="buttonR" ><input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" /> </td>
+			    <td class="buttonR" >
+					<g:if test="${permissionForUpdate==true}">
+						<input type="button" value="Update Task" onclick="validateComment(${assetComment.id})" />
+					</g:if>
+					<g:else>
+						<input type="button" value="Update Task" disabled="disabled" />
+					</g:else>
+				</td>
 				<td class="buttonR" colspan="3" style="text-align:right;padding: 5px 3px;">
-				 <g:if test="${permissionForUpdate==true}">
-				   <input type="button" value="Update Task" onclick="validateComment(${assetComment.id})" />
-				 </g:if>
-				 <g:else>
-				   <input type="button" value="Update Task" disabled="disabled" />
-				 </g:else>
-			</td>
+					<input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" />
+				</td>
 			</tr>	
 		</table>
 </g:form>
 
 		<%--<div class="clear" style="margin:4px;"></div>
-		<a name="detail" ></a>
+		<a name="detail"></a>
 	 	<div>
 
 			<table style="width:420px;">
 			<tr>
-				<td class="heading"><a href="#detail">Details</a></td>
+				<td class="heading"><a href="#detail">Asset Details</a></td>
 				<td><span style="float:right;"><a href="#top">Top</a></span></td>
 			</tr>
 			<tr><td colspan=2>
@@ -195,7 +191,7 @@
 		 	<div style="float: left;width: 100%">
 				<table style="float: left;margin-left: -2px;">
 				<tr>
-					<td class="heading"><a href="#detail">Details</a></td>
+					<td class="heading"><a href="#detail">${assetComment?.assetEntity?.assetType} Details</a></td>
 					<td><span style="float:right;"><a href="#top">Top</a></span></td>
 				</tr>
 				<tr><td colspan=2>

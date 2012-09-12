@@ -92,7 +92,8 @@
 	function setFocus(){
 		document.issueAssetForm.search.focus();
 	}
-	function issueDetails(id,status){
+	function issueDetails(id,status) {
+		// hideStatus(id,status)
 		jQuery.ajax({
 			url: 'showIssue',
 			data: {'issueId':id},
@@ -169,7 +170,8 @@
 					alert(data.error);
 				} else {
 					 $('#myTaskList').html(data)
-					 $('#showStatusId_'+id).show()
+					 // $('#showStatusId_'+id).hide()
+					hideStatus(id, status)
 					 $('#issueTrId_'+id).attr('onClick','hideStatus('+id+',"'+status+'")')
 					 if(status=='Started'){
 					 	$('#started_'+id).hide()

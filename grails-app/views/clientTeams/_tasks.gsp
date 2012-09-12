@@ -47,6 +47,8 @@
  **************************
  */
 --%>
+<% java.text.DecimalFormat formatter = new java.text.DecimalFormat("0.0000") %>
+
 <div id="myIssueList" class="mobbodyweb" style="width: 100%">
 	<input id="issueId" name="issueId" type="hidden" value="" /> 
 	<input name="tab" id="tabId" type="hidden" value="${tab}" />
@@ -76,75 +78,65 @@
 			</thead>
 			<tbody>
 				<g:each status="i" in="${listComment}" var="issue">
-					<g:if test="${tab && tab == 'todo'}">
-						<tr id="issueTrId_${issue?.item?.id}" class="${issue.css}"
-							style="cursor: pointer;"
-							onclick="openStatus(${issue?.item?.id},'${issue?.item?.status}')">
-					</g:if>
-					<g:else>
-						<tr id="issueTr_${issue?.item?.id}" class="${issue.css}"
-							style="cursor: pointer;"
-							onclick="issueDetails(${issue?.item?.id},'${issue?.item?.status}')">
-					</g:else>
-					<td id="comment_${issue?.item?.id}"
-						class="asset_details_block_task">
-						${issue?.item?.taskNumber?issue?.item?.taskNumber+' - ' : ''}
-						${com.tdssrc.grails.StringUtil.ellipsis(issue?.item?.comment,50)}
-					</td>
-					<td id="asset_${issue?.item?.id}" class="asset_details_block">
-						${issue?.item?.assetName}
-					</td>
-					<td id="lastUpdated_${issue?.item?.id}" class="asset_details_block">
-						<tds:convertDate
-							date="${issue?.item?.lastUpdated}"
-							timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
-							format="MM/dd kk:mm:ss" />
-					</td>
-					<td id="estFinish_${issue?.item?.id}" class="asset_details_block">
-							<tds:convertDate date="${issue?.item?.estFinish}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
+					<tr id="issueTrId_${issue?.item?.id}" class="${issue.css}"
+						style="cursor: pointer;"
+						onclick="openStatus(${issue?.item?.id},'${issue?.item?.status}')">
+						<td id="comment_${issue?.item?.id}"
+							class="asset_details_block_task">
+							${issue?.item?.taskNumber?issue?.item?.taskNumber+' - ' : ''}
+							${com.tdssrc.grails.StringUtil.ellipsis(issue?.item?.comment,50)}
+						</td>
+						<td id="asset_${issue?.item?.id}" class="asset_details_block">
+							${issue?.item?.assetName}
+						</td>
+						<td id="lastUpdated_${issue?.item?.id}" class="asset_details_block">
+							<tds:convertDate
+								date="${issue?.item?.lastUpdated}"
+								timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
 								format="MM/dd kk:mm:ss" />
-					</td>
-					
-					<td id="statusTd_${issue?.item?.id}" class="asset_details_block">
-						${issue?.item?.status}/${issue?.item?.score}
-					</td>
-					<td id="assignedToName_${issue?.item?.id}" class="asset_details_block">
-						${ (issue?.item?.hardAssigned?'* ':'') } <span id="assignedToNameSpan_${issue?.item?.id}"> ${ issue?.item?.firstName + ' ' + issue?.item?.lastName } </span>
-					</td>
+						</td>
+						<td id="estFinish_${issue?.item?.id}" class="asset_details_block">
+								<tds:convertDate date="${issue?.item?.estFinish}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
+									format="MM/dd kk:mm:ss" />
+						</td>
+						<td id="statusTd_${issue?.item?.id}" class="asset_details_block">
+							${issue?.item?.status} (${formatter.format(issue?.item?.score)})
+						</td>
+						<td id="assignedToName_${issue?.item?.id}" class="asset_details_block">
+							${ (issue?.item?.hardAssigned?'* ':'') + issue?.item?.firstName + ' ' + issue?.item?.lastName }
+						</td>
 					</tr>
-					<g:if test="${tab && tab == 'todo'}">
-						<tr id="showStatusId_${issue?.item?.id}" style="display: none;">
-							<td nowrap="nowrap" colspan="6" class="statusButtonBar"><a
-								class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
-								id="started_${issue?.item?.id}"
-								onclick="changeStatus('${issue?.item?.id}','${AssetCommentStatus.STARTED}','${issue.item.status}')">
-									<span
-									class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
-									<span class="ui-button-text task_button">Start</span>
-							</a> <a
-								class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
-								onclick="changeStatus('${issue?.item?.id}','${AssetCommentStatus.DONE}', '${issue.item.status}')">
-									<span
-									class="ui-button-icon-primary ui-icon ui-icon-check task_icon"></span>
-									<span class="ui-button-text task_button">Done</span>
+					<tr id="showStatusId_${issue?.item?.id}" style="display: none;">
+						<td nowrap="nowrap" colspan="6" class="statusButtonBar">
+							<g:if test="${issue.item.status == AssetCommentStatus.READY}"> 
+							<a
+							class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
+							id="started_${issue?.item?.id}"
+							onclick="changeStatus('${issue?.item?.id}','${AssetCommentStatus.STARTED}','${issue.item.status}')">
+								<span
+								class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
+								<span class="ui-button-text task_button">Start</span>
+							</a> 
+							</g:if>
+							<g:if test="${ [AssetCommentStatus.READY, AssetCommentStatus.STARTED].contains(issue.item.status) }"> 
+							<a
+							class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
+							onclick="changeStatus('${issue?.item?.id}','${com.tdsops.tm.enums.domain.AssetCommentStatus.DONE}', '${issue.item.status}')">
+								<span
+								class="ui-button-icon-primary ui-icon ui-icon-check task_icon"></span>
+								<span class="ui-button-text task_button">Done</span>
 							</a>
-							<g:if test="${ personId != issue.item.assignedTo && issue.item.status in [AssetCommentStatus.STARTED, AssetCommentStatus.PENDING, AssetCommentStatus.READY]}">
-								<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
-									onclick="assignTask('${issue?.item?.id}','${issue.item.assignedTo}', '${issue.item.status}')">
-										<span
-										class="ui-button-icon-primary ui-icon ui-icon-check task_icon"></span>
-										<span class="ui-button-text task_button">Assign To Me</span>
-								</a> 
 							</g:if>
 							<a
-								class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
-								onclick="issueDetails(${issue?.item?.id},'${issue?.item?.status}')">
-									<span
-									class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
-									<span class="ui-button-text task_button">Details..</span>
-							</a></td>
-						</tr>
-					</g:if>
+							class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
+							onclick="issueDetails(${issue?.item?.id},'${issue?.item?.status}')">
+								<span
+								class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
+								<span class="ui-button-text task_button">Details..</span>
+							</a>
+						</td>
+					</tr>
+
 					<tr id="detailTdId_${issue?.item?.id}" style="display: none">
 						<td colspan="6">
 							<div id="detailId_${issue?.item?.id}" style="width: 100%">
