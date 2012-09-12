@@ -30,6 +30,8 @@ public class AssetCommentBean implements Serializable {
 	private String elapsedAgo="";
 	private Integer score;
 	private Boolean isRunbookTask=false;
+	private Integer hardAssigned=0;
+	
 	
 	public AssetCommentBean() {}
 	
@@ -179,9 +181,18 @@ public class AssetCommentBean implements Serializable {
 	
 	// isRunbookTask
 	public Boolean isRunbookTask() {
-		return isRunbookTask;
+		return this.isRunbookTask;
 	}
 	public void setRunbookTask( Boolean isRb ) {
 		this.isRunbookTask = isRb;
+	}
+
+	// hardAssigned
+	public Integer getHardAssigned() {
+		return this.hardAssigned;
+	}
+
+	public void setHardAssigned(Integer hardAssigned) {
+		this.hardAssigned = hardAssigned;
 	}
 }

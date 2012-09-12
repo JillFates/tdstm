@@ -109,7 +109,7 @@
 							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');" class="span_${commentInstance.statusClass}">${commentInstance.status}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="assignedTo" title="Assigned To" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-        	                 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.assignedTo}</span>
+        	                 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${(commentInstance?.hardAssigned?'* ':'')}${commentInstance.assignedTo}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="role" title="Role" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
         	                 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.role}</span>

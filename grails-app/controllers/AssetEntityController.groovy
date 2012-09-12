@@ -3101,6 +3101,7 @@ class AssetEntityController {
 				setAssetEntityId( comment.assetEntity?.id )
 				assetBean.setRunbookTask( comment.isRunbookTask() )
 				setSuccCount( TaskDependency.findAllByPredecessor( comment ).size())
+				setHardAssigned(comment.hardAssigned)
 				// TODO - Performance Issue - some reason calling the method on the Service class here is causing a 1+ min delay so the status style is hard coded
 				// assetBean.setStatusClass( taskService.getCssClassForStatus(comment.status) )
 				setStatusClass( comment.status ? "task_${comment.status.toLowerCase()}" : 'task_na' )
