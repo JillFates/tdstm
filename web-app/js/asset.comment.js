@@ -105,8 +105,15 @@ function getActionBar(spanId){
 		data: {'id':id},
 		type:'POST',
 		success: function(data) {
-			 $('#'+trId).after("<tr id='row_d_"+id+"'> <td nowrap='nowrap' colspan='13' class='statusButtonBar'>"+data+"</td></tr>")
-			 $('#'+spanId).parent().parent().find('span').attr('onClick','hideActionBar("row_d_'+id+'","'+spanId+'")')
+				$('#'+spanId).parent().parent().find('span').each(function(){
+					if($(this).attr("id")){
+						$(this).removeAttr('onclick')
+						$(this).unbind("click").bind("click", function(){
+							hideActionBar("row_d_"+id,spanId)
+					    });
+					}
+				})
+				$('#'+trId).after("<tr id='row_d_"+id+"'> <td nowrap='nowrap' colspan='13' class='statusButtonBar'>"+data+"</td></tr>")
 			}
 		});
    }
@@ -118,7 +125,14 @@ function getActionBar(spanId){
  */
 function hideActionBar(rowId,spanId){
 	$('#'+rowId).remove()
-	$('#'+spanId).parent().parent().find('span').attr('onClick','getActionBar("'+spanId+'")')
+	$('#'+spanId).parent().parent().find('span').each(function(){
+		if($(this).attr("id")){
+			$(this).removeAttr('onclick')
+			$(this).unbind("click").bind("click", function(){
+				getActionBar(spanId)
+		    });
+		}
+	})
 	if(B2 != '' && taskManagerTimePref != 0){ B2.Restart(taskManagerTimePref) }
 }
 /**
