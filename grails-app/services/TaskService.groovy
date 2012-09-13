@@ -563,7 +563,8 @@ class TaskService {
 		def tasksMap = getMoveEventTaskLists(moveEventId)
 		
 		def updateSql = "UPDATE AssetComment ac \
-			SET ac.status = :status, ac.actStart = null, ac.actStart = null, ac.dateResolved = null, ac.resolvedBy = null, ac.isResolved=0 \
+			SET ac.status = :status, ac.actStart = null, ac.actStart = null, ac.dateResolved = null, ac.resolvedBy = null, \
+				ac.isResolved=0, ac.statusUpdated = null \
 			WHERE ac.id in (:ids)"
 			
 		if (tasksMap.tasksWithPred.size() > 0) {
