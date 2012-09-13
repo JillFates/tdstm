@@ -100,7 +100,7 @@
 									format="MM/dd kk:mm:ss" />
 						</td>
 						<td id="statusTd_${issue?.item?.id}" class="asset_details_block">
-							${issue?.item?.status} (${formatter.format(issue?.item?.score?: 0)})
+							${issue?.item?.status}<% // (${formatter.format(issue?.item?.score?: 0)}) %>
 						</td>
 						<td id="assignedToName_${issue?.item?.id}" class="asset_details_block">
 							${(issue?.item?.hardAssigned?'* ':'')} <span id="assignedToNameSpan_${issue?.item?.id}">${issue?.item?.firstName+' '+issue?.item?.lastName}</span>
