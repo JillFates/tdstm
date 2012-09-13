@@ -161,7 +161,7 @@ class TaskService {
 				if ( sortableProps.contains(sortOn) ) {
 					sortOrder = ['asc','desc'].contains(sortOrder) ? sortOrder : 'asc'
 					sortOrder = sortOrder.toUpperCase()
-					switch ($sortOn) {
+					switch (sortOn) {
 						case 'assignedTo':
 							sortAndOrder = "p.first_name ${sortOrder}, p.last_name ${sortOrder}"; break
 						case  'number_comment':
