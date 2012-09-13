@@ -68,15 +68,16 @@ class TaskController {
 		def userLogin = securityService.getUserLogin()
 		StringBuffer actionBar = new StringBuffer("""<table style="border:0px"><tr>""")
 		if(commentInstance.status ==  AssetCommentStatus.READY){
-			actionBar.append(HtmlUtil.genActionButton(commentInstance,"Start","changeStatus('${commentInstance.id}','${AssetCommentStatus.STARTED}','${commentInstance.status}', 'taskManager')"))
+			actionBar.append(HtmlUtil.genActionButton(commentInstance,"Start","changeStatus('${commentInstance.id}','${AssetCommentStatus.STARTED}','${commentInstance.status}', 'taskManager')", "startTdId_${commentInstance.id}"))
 		}
 		if(commentInstance.status in[ AssetCommentStatus.READY,AssetCommentStatus.STARTED]){
-			actionBar.append(HtmlUtil.genActionButton(commentInstance,"Done","changeStatus('${commentInstance.id}','${AssetCommentStatus.DONE}', '${commentInstance.status}', 'taskManager')"))
+			actionBar.append(HtmlUtil.genActionButton(commentInstance,"Done","changeStatus('${commentInstance.id}','${AssetCommentStatus.DONE}', '${commentInstance.status}', 'taskManager')", "doneTdId_${commentInstance.id}"))
 		}
-		actionBar.append(HtmlUtil.genActionButton(commentInstance,"Details..","showAssetComment(${commentInstance.id},'show')"))
+		actionBar.append(HtmlUtil.genActionButton(commentInstance,"Details..","showAssetComment(${commentInstance.id},'show')","detailsTdId_${commentInstance.id}"))
 		if(userLogin.person.id != commentInstance.assignedTo?.id && commentInstance.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
-			actionBar.append(HtmlUtil.genActionButton(commentInstance,"Assign To Me","assignTask('${commentInstance.id}','${commentInstance.assignedTo}', '${commentInstance.status}','taskManager')"))
+			actionBar.append(HtmlUtil.genActionButton(commentInstance,"Assign To Me","assignTask('${commentInstance.id}','${commentInstance.assignedTo}', '${commentInstance.status}','taskManager')", "assignMeId_${commentInstance.id}"))
 		}
+		actionBar.append(""" <td colspan='9'>&nbsp;</td>""")
 		actionBar.append(""" </tr></table>""")
 		render actionBar.toString()
 	}

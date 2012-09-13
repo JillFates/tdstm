@@ -35,8 +35,8 @@ class HtmlUtil {
 	 * @param : obj as object , label as td's label, function as jsEvent
 	 * @return String	HTML td
 	 */
-	def public static genActionButton(obj, label, function){
-		return """<td id="doneTdId_${obj.id}" nowrap="nowrap"><a class=" task_action ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
+	def public static genActionButton(obj, label, function, tdId){
+		return """<td id="${tdId}" width="8%" nowrap="nowrap"><a class=" task_action ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
 					onclick="${function}">
 					<span class="ui-button-icon-primary ui-icon ui-icon-check task_icon"></span>
 					<span class="ui-button-text task_button">${label}</span>
