@@ -1,4 +1,5 @@
 <%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus" %>
+<%@page import="com.tdssrc.grails.GormUtil"%>
 <%--
 /*
  **************************
@@ -6,6 +7,18 @@
  **************************
  */
 --%>
+<script type="text/javascript">
+$( function() {
+	$('#selectTimedBarId').val(${timeToUpdate})
+	taskManagerTimePref = ${timeToUpdate}
+	if(taskManagerTimePref != 0){
+		B1.Start(taskManagerTimePref);
+	}else{
+		B1.Pause(0);
+	}
+	
+});
+</script>
 <div class="menu4">
 	<ul>
 		<g:if test="${tab && tab == 'todo'}">
@@ -24,6 +37,19 @@
 					action="listComment" params='["tab":"all","search":search]'>All Tasks: ${allSize}
 				</g:link></li>
 		</g:if>
+		<li><span style="float: right;">
+			<input type="button" value="Refresh" onclick="pageRefresh()" style="cursor: pointer;">&nbsp;
+			<select id="selectTimedBarId"
+			    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', params:'\'timer=\'+ this.value +\'&prefFor=myTask\' ', onComplete:'changeTimebarPref(e)') }">
+				<option value="0">Manual</option>
+				<option value="60">1 Min</option>
+				<option value="120">2 Min</option>
+				<option value="180">3 Min</option>
+				<option value="240">4 Min</option>
+				<option value="300">5 Min</option>
+			</select>
+			</span>
+		</li>
 	</ul>
 	<div class="tab_search">
 		<g:form method="post" name="issueAssetForm" action="showIssue">
@@ -90,14 +116,11 @@
 							${issue?.item?.assetName}
 						</td>
 						<td id="lastUpdated_${issue?.item?.id}" class="asset_details_block">
-							<tds:convertDate
-								date="${issue?.item?.lastUpdated}"
-								timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
-								format="MM/dd kk:mm:ss" />
+							<tds:elapsedAgo start="${issue?.item?.lastUpdated}" end="${GormUtil.convertInToGMT(new Date(), null)}"/>
 						</td>
 						<td id="estFinish_${issue?.item?.id}" class="asset_details_block">
 								<tds:convertDate date="${issue?.item?.estFinish}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
-									format="MM/dd kk:mm:ss" />
+									format="MM/dd kk:mm" />
 						</td>
 						<td id="statusTd_${issue?.item?.id}" class="asset_details_block">
 							${issue?.item?.status}<% // (${formatter.format(issue?.item?.score?: 0)}) %>

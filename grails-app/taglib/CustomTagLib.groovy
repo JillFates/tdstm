@@ -27,12 +27,19 @@ class CustomTagLib {
 		out << ""
 		if (dtParam != "null") {
 			dtParam = dtParam.trim();
-			if(format=="MM/dd"){
-			 out << dtParam[5..6]+"/"+dtParam[8..9]
-			} else if (format=="MM/dd kk:mm:ss") {
-				out << dtParam[5..6]+'/'+dtParam[8..9]+' '+dtParam[11..18]
-			} else {
-			 out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]
+			switch(format){
+				case "MM/dd" :
+					out << dtParam[5..6]+"/"+dtParam[8..9]
+					break
+				case "MM/dd kk:mm:ss" :
+					out << dtParam[5..6]+'/'+dtParam[8..9]+' '+dtParam[11..18]
+					break
+				case "MM/dd kk:mm" :
+					out << dtParam[5..6]+'/'+dtParam[8..9]+' '+dtParam[11..15]
+					break
+				default:
+					out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]
+					break
 			}
 		}
 	}

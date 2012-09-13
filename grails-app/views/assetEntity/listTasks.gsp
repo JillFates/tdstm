@@ -50,7 +50,7 @@
 	    	if(taskManagerTimePref != 0){
 	    	  B2.Start(taskManagerTimePref);
 	    	}else{
-	   		  B2.Pause();
+	   		  B2.Pause(0);
 	   	    }
         });
         $(document).keyup(function(e) {
@@ -86,17 +86,18 @@
 				&nbsp;&nbsp;
 				<input type="checkbox" id="justMyTasksCB" ${ (justMyTasks=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'justMyTasks');"/>
 				<b> Just My Tasks</b>&nbsp;&nbsp;
-				<b> Refresh </b>&nbsp;&nbsp;
-				<select id="selectTimedBarId"
-				    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', params:'\'timer=\'+ this.value +\'&prefFor=myTask\' ', onComplete:'changeTimebarPref(e)') }">
-					<option value="0">Never</option>
-					<option value="60" selected="selected">1 Min</option>
-					<option value="120">2 Min</option>
-					<option value="180">3 Min</option>
-					<option value="240">4 Min</option>
-					<option value="300">5 Min</option>
-				</select>
-				
+				<span style="float:right;">
+					<input type="button" value="Refresh" onclick="submitForm()" style="cursor: pointer;">&nbsp;
+					<select id="selectTimedBarId"
+					    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', params:'\'timer=\'+ this.value +\'&prefFor=myTask\' ', onComplete:'changeTimebarPref(e)') }">
+						<option value="0">Manual</option>
+						<option value="60" selected="selected">1 Min</option>
+						<option value="120">2 Min</option>
+						<option value="180">3 Min</option>
+						<option value="240">4 Min</option>
+						<option value="300">5 Min</option>
+					</select>
+				</span>
 			</span>
 			<br/></br>
 				<jmesa:tableFacade id="tag" items="${assetCommentList}" maxRows="50" stateAttr="restore" var="commentInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100" >

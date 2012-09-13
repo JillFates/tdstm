@@ -37,7 +37,11 @@ function changeStatus(id, status, currentStatus, from){
 					 if(status=='Started'){
 					 	$('#started_'+id).hide()
 					 }
-					 B1.Restart(60);
+					 if(B1 != '' && taskManagerTimePref != 0) {
+					 	B1.Restart(taskManagerTimePref);
+					 } else { 
+					 	B1.Pause(0);
+					 }
 				}
 			}
 		},
@@ -73,7 +77,11 @@ function assignTask(id, user, status, from){
 				}else{
 					 $('#assignedToNameSpan_'+id).html(data.assignedTo)
 					 $('#assignToMeId_'+id).hide()
-					 if(B1 != ''){ B1.Restart(60); }
+					 if(B1 != '' && taskManagerTimePref != 0){ 
+					 	B1.Restart(taskManagerTimePref); 
+					 }else { 
+					  	B1.Pause(0);
+					 }
 				}
 			}
 			
@@ -129,9 +137,17 @@ function changeTimebarPref(data){
  */
 function timedUpdate(timeoutPeriod) {
 	 taskManagerTimePref = timeoutPeriod
-	 if(taskManagerTimePref != 0){
-		 B2.Start(timeoutPeriod);
-	 }else{
-		 B2.Pause();
+	 if(B1 != ''){
+		 if(taskManagerTimePref != 0){
+			 B1.Start(timeoutPeriod);
+		 } else {
+			 B1.Pause(0);
+		 }
+	 } else {
+		 if(taskManagerTimePref != 0){
+			 B2.Start(timeoutPeriod);
+		 } else {
+			 B2.Pause(0);
+		 }
 	 }
 }

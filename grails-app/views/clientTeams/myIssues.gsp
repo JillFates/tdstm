@@ -153,7 +153,11 @@
 		$('#dependencyBox').css("display","none");
 	}
 	function cancelButton(id,status){
-		B1.Restart(60);
+		if(taskManagerTimePref != 0){ 
+			B1.Restart( taskManagerTimePref ); 
+		} else {  
+			B1.Pause(0); 
+		}
 		//$('#myIssueList').css('display','block')
 		$('#detailTdId_'+id).css('display','none')
 		$('#taskLinkId').addClass('mobselect')
@@ -174,7 +178,11 @@
 		$('#showStatusId_'+id).hide()
 		$('#detailTdId_'+id).css('display','none')
 		$('#issueTrId_'+id).attr('onClick','openStatus('+id+',"'+status+'")');
-		B1.Restart(60);
+		if(taskManagerTimePref !=0){
+			B1.Restart(taskManagerTimePref);
+		}else {
+			B1.Pause(0);
+		}
 	}
 
  
@@ -279,7 +287,6 @@ function zxcOpacity(obj,opc){
 		ID:'issueTimebarId'
 	});
 
-	B1.Start(60);
 </script>
 <script>
 	currentMenuId = "#teamMenuId";

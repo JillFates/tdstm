@@ -1014,10 +1014,10 @@ class ClientTeamsController {
 			def css = taskService.getCssClassForStatus( task.status )
 			issueList << ['item':task,'css':css]
 		}
-
+		def timeToRefresh = getSession()?.getAttribute("MY_TASK")?.MY_TASK
 		// Determine the model and view
 		def model = [listComment:issueList, tab:tab, todoSize:todoSize, allSize:allSize, search:search, sort:params.sort, order:params.order,
-			      	 personId : person.id]
+			      	 personId : person.id, timeToUpdate:timeToRefresh ?: 60]
 		def view = params.view == "myTask" ? "_tasks" : "myIssues"
 		if ( session.getAttribute('TASK_VIEW_MODE') == 'mobile') {
 			view = params.view == "myTask" ? "_tasks_m" : view+"_m"
