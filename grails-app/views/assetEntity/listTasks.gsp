@@ -45,10 +45,17 @@
 	    	$(".span_task_planned").parent().addClass("task_planned")
 	    	$(".span_task_completed").parent().addClass("task_completed")
 	    	$(".span_task_na").parent().addClass("task_na")	
+	    	$("#selectTimedBarId").val(${timeToUpdate})
+	    	taskManagerTimePref = ${timeToUpdate}
+	    	if(taskManagerTimePref != 0){
+	    	  B2.Start(taskManagerTimePref);
+	    	}else{
+	   		  B2.Pause();
+	   	    }
         });
         $(document).keyup(function(e) {
         	// esc to stop timer
-       	    if (e.keyCode == 27) { if(B2 != ''){ B2.Restart(60); }}   
+       	    if (e.keyCode == 27) { if(B2 != '' && taskManagerTimePref != 0){ B2.Restart( taskManagerTimePref ); }}   
        	});
         	        
 	</script>
@@ -78,7 +85,18 @@
 				<b> Just Remaining Tasks</b>
 				&nbsp;&nbsp;
 				<input type="checkbox" id="justMyTasksCB" ${ (justMyTasks=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'justMyTasks');"/>
-				<b> Just My Tasks</b>
+				<b> Just My Tasks</b>&nbsp;&nbsp;
+				<b> Refresh </b>&nbsp;&nbsp;
+				<select id="selectTimedBarId"
+				    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', params:'\'timer=\'+ this.value +\'&prefFor=myTask\' ', onComplete:'changeTimebarPref(e)') }">
+					<option value="0">Never</option>
+					<option value="60" selected="selected">1 Min</option>
+					<option value="120">2 Min</option>
+					<option value="180">3 Min</option>
+					<option value="240">4 Min</option>
+					<option value="300">5 Min</option>
+				</select>
+				
 			</span>
 			<br/></br>
 				<jmesa:tableFacade id="tag" items="${assetCommentList}" maxRows="50" stateAttr="restore" var="commentInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100" >
@@ -244,8 +262,6 @@ function toggleCheckbox(chkbox, field) {
 	B2=new Bar({
 		ID:'issueTimebarId'
 	});
-
-  B2.Start(60);
 </script>
 </body>
  

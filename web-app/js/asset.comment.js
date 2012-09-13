@@ -1,5 +1,6 @@
 var B1 = []
 var B2 = []
+var taskManagerTimePref = "60"
 
 /**
  * Action to invoke Change status ajax call from TaskManager and MyTasks
@@ -68,7 +69,7 @@ function assignTask(id, user, status, from){
 					 $('#assignedToName_'+id).html(data.assignedTo)
 					 $('#assignMeId_'+id).hide()
 					 $('#row_d_'+id).hide()
-					if(B2 != ''){ B2.Restart(60);}
+					if(B2 != '' && taskManagerTimePref != 0){ B2.Restart(taskManagerTimePref);}
 				}else{
 					 $('#assignedToNameSpan_'+id).html(data.assignedTo)
 					 $('#assignToMeId_'+id).hide()
@@ -110,5 +111,27 @@ function getActionBar(spanId){
 function hideActionBar(rowId,spanId){
 	$('#'+rowId).remove()
 	$('#'+spanId).parent().parent().find('span').attr('onClick','getActionBar("'+spanId+'")')
-	if(B2 != ''){ B2.Restart(60) }
+	if(B2 != '' && taskManagerTimePref != 0){ B2.Restart(taskManagerTimePref) }
+}
+/**
+ * Updated timer preferences
+ * @param data
+ */
+function changeTimebarPref(data){
+	 var timeUpdate = eval("(" + data.responseText + ")")
+		if(timeUpdate){
+			timedUpdate(timeUpdate[0].updateTime.MY_TASK)
+		}
+}
+/**
+ * updated bar preferences
+ * @param timeoutPeriod
+ */
+function timedUpdate(timeoutPeriod) {
+	 taskManagerTimePref = timeoutPeriod
+	 if(taskManagerTimePref != 0){
+		 B2.Start(timeoutPeriod);
+	 }else{
+		 B2.Pause();
+	 }
 }

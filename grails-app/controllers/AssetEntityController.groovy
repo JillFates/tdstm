@@ -2973,7 +2973,7 @@ class AssetEntityController {
 		// def action = params.issueBox == "on" ? "issue" : params.resolvedBox  ? "resolved" : params.filter
 		def today = new Date()
 		def moveEvent
-		def filterEvent = 0	    
+		def filterEvent = 0     
 
 		// Set the Checkbox values to that which were submitted or default if we're coming into the list for the first time
 		def justRemaining = params.containsKey('justRemaining') ? params.justRemaining : "1"
@@ -3151,9 +3151,11 @@ class AssetEntityController {
 		} else {
 			// log.info "_listCommentsOrTasks:about to render : ${TimeCategory.minus(new Date(), start)}"
 			// TODO : clean-up : the rediectTo param is spelled wrong and should be redirectTo
+			def timeToRefresh = getSession()?.getAttribute("MY_TASK")?.MY_TASK
 			def model = [ assetCommentList:assetCommentList, rediectTo:'comment', 
 				justRemaining:justRemaining, justMyTasks:justMyTasks, 
-				moveEvents:moveEvents, filterEvent:filterEvent,staffRoles:taskService.getRolesForStaff() ]
+				moveEvents:moveEvents, filterEvent:filterEvent,staffRoles:taskService.getRolesForStaff(),
+			    timeToUpdate : timeToRefresh ?: 60 ]
 	      	render (view:view ,model:model )
 		}
 	}
