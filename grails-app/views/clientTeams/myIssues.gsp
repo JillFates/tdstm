@@ -171,13 +171,23 @@
 			$('#image_'+id).css('display','none')
 		}
 		$('#showStatusId_'+id).show()
-		$('#issueTrId_'+id).attr('onClick','hideStatus('+id+',"'+status+'")');
+		$('#issueTrId_'+id).each(function(){
+			$(this).removeAttr('onclick')
+			$(this).unbind("click").bind("click", function(){
+				hideStatus(id,status)
+		    });
+		})
 	}
 
 	function hideStatus(id,status){
 		$('#showStatusId_'+id).hide()
 		$('#detailTdId_'+id).css('display','none')
-		$('#issueTrId_'+id).attr('onClick','openStatus('+id+',"'+status+'")');
+		$('#issueTrId_'+id).each(function(){
+			$(this).removeAttr('onclick')
+			$(this).unbind("click").bind("click", function(){
+				openStatus(id,status)
+		    });
+		})
 		if(taskManagerTimePref !=0){
 			B1.Restart(taskManagerTimePref);
 		}else {
