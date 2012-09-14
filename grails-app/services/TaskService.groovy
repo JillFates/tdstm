@@ -129,11 +129,14 @@ class TaskService {
 		// Add Successor Count
 		sql.append(', (SELECT count(*) FROM task_dependency td WHERE predecessor_id=t.asset_comment_id) AS successors ')
 		
+		// The WHERE clause is going to find tasks that are assigned to the user (hard or soft) OR tasks that are assigned to the role(s) that
+		// the user has unless the task is hard assigned to someone else in one of the groups.
 		sql.append("""FROM asset_comment t 
 			LEFT OUTER JOIN asset_entity a ON a.asset_entity_id = t.asset_entity_id 
             LEFT OUTER JOIN person p ON p.person_id = t.assigned_to_id 
 			WHERE t.project_id=:projectId AND t.comment_type=:type AND 
-			( t.assigned_to_id=:assignedToId OR (t.role IN (:roles) AND t.status IN (:statuses) ) ) """)
+			( t.assigned_to_id=:assignedToId OR 
+				(t.role IN (:roles) AND t.status IN (:statuses) AND t.hard_assigned=0 OR (t.hard_assigned=1 AND t.assigned_to_id=:assignedToId) ) ) """)
 		
 		search = org.apache.commons.lang.StringUtils.trimToNull(search)
 		if (search) {
