@@ -100,7 +100,7 @@
 				</span>
 			</span>
 			<br/></br>
-				<jmesa:tableFacade id="tag" items="${assetCommentList}" maxRows="50" stateAttr="restore" var="commentInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100" >
+				<jmesa:tableFacade id="tag" items="${assetCommentList}" maxRows="50" stateAttr="restore" var="commentInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100,250,500,1000" >
 					<jmesa:htmlTable style=" border-collapse: separate" editable="true">
 						<jmesa:htmlRow highlighter="true" style="cursor: pointer;" >
 							<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" nowrap>
