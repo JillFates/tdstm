@@ -465,7 +465,7 @@
 			</td>
 			</tr></table>
 		</div>
-				<g:if test="${moveEvent && moveEvent?.inProgress == 'true'}">
+				<g:if test="${false && moveEvent && moveEvent?.inProgress == 'true'}">
 			<div class="menu3" id="head_crawler" >
 				<div id="crawlerHead">${moveEvent.name} Move Event Status <span id="moveEventStatus"></span>. News: </div>
 				<div id="head_mycrawler"><div id="head_mycrawlerId" style="width: 1200px; height:25px; vertical-align:bottom" > </div></div>
