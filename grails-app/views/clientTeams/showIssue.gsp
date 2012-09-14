@@ -277,7 +277,12 @@ $( function() {
 					} else {
 					     $('#myTaskList').html(data)
 					     $('#showStatusId_'+objId).show()
-						 $('#issueTrId_'+objId).attr('onClick','hideStatus('+objId+',"'+status+'")')
+						 $('#issueTrId_'+id).each(function(){
+							$(this).removeAttr('onclick')
+							$(this).unbind("click").bind("click", function(){
+								hideStatus(objId,status)
+						    });
+						})
 						 if(status=='Started'){
 						 	$('#started_'+objId).hide()
 						 }

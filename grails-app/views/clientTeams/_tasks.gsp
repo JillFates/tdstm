@@ -10,6 +10,7 @@
 <script type="text/javascript">
 $( function() {
 	$('#selectTimedBarId').val(${timeToUpdate})
+	$('#issueTimebar').width($('#issueTable').width())
 	taskManagerTimePref = ${timeToUpdate}
 	if(taskManagerTimePref != 0){
 		B1.Start(taskManagerTimePref);
