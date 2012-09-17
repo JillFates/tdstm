@@ -165,12 +165,14 @@
 	</div>
    <tds:hasPermission permission='CommentCrudView'>
 		<div class="buttons" style="white-space: nowrap;">
-			<span class="button"> 
+			<span class="button" class="slide"> 
+			<span class="slide">
 				<input class="edit" type="button" value="Edit" id="commentButtonEditId" />
-				<span id="fromAssetId">
+			</span>
+				<span id="fromAssetId" class="slide">
 					<input class="delete" type="button" value="Delete" onclick="deleteComment('#commentId','#assetEntityIdShow','update')" />
 				</span> 
-				<span id="fromMoveEventId" style="display: none"> 
+				<span id="fromMoveEventId" style="display: none" class="slide"> 
 					<input class="delete" type="button" value="Delete" onclick="deleteComment('#commentId','#assetEntityIdShow','refresh')" />
 				</span>
 			</span>
