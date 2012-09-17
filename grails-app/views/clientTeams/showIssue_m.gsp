@@ -79,11 +79,10 @@
 					
 				</td>	
 			</tr>	
-			 <% def partyList = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT' " ,[Party.get(Integer.parseInt(session.getAttribute( 'CURR_PROJ' ).CURR_PROJ))]).partyIdTo;%>
 			<tr class="prop issue" id="assignedToTrEditId" >
 				<td valign="top" class="name"><label for="assignedTo">Assigned:</label></td>
 				<td valign="top" id="assignedToEditTdId" style="" >
-					<g:select id="assignedToEditId_${assetComment.id}" name="assignedTo" from="${partyList}" value="${assetComment.assignedTo.id}" optionKey="id" noSelection="['':'please select']" style="width: 70%;"></g:select>
+					<g:select id="assignedToEditId_${assetComment.id}" name="assignedTo" from="${projectStaff}" value="${assetComment.assignedTo.id}" optionKey="id" noSelection="['':'please select']" style="width: 70%;"></g:select>
 				</td>
 			</tr> 
 			<tr class="prop issue" id="estFinishShowId"  >

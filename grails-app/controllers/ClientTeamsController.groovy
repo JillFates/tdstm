@@ -1043,6 +1043,7 @@ class ClientTeamsController {
 	}
 	
 	def showIssue={
+		def project = securityService.getUserCurrentProject()
 		def assetComment = AssetComment.get(params.issueId)
 		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
@@ -1071,10 +1072,14 @@ class ClientTeamsController {
 			etFinish = estformatter.format(GormUtil.convertInToUserTZ(assetComment.estFinish, tzId));
 		}
 		def successor = TaskDependency.findAllByPredecessor( assetComment )
+		def projectStaff = partyRelationshipService.getProjectStaff( project.id )?.staff
+		projectStaff.sort{it.firstName}
 		if(viewMode=='mobile'){
-			render (view:'showIssue_m',model:['assetComment':assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1,permissionForUpdate:permissionForUpdate, successor:successor, etFinish:etFinish])
+			render (view:'showIssue_m',model:['assetComment':assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1,
+											permissionForUpdate:permissionForUpdate, successor:successor, etFinish:etFinish, projectStaff:projectStaff])
 		}else{
-			return[assetComment:assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, permissionForUpdate : permissionForUpdate, successor:successor, etFinish:etFinish]
+			return[assetComment:assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, 
+					permissionForUpdate : permissionForUpdate, successor:successor, etFinish:etFinish, projectStaff:projectStaff]
 		}
 	}
 }
