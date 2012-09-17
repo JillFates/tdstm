@@ -182,7 +182,7 @@ $(document).ready(function() {
 			</div>
 			<div style="float:right;margin-top: 10px; margin-left: 5px;">
 					<h3 style="color:#63A242">
-						<b>Assignment</b>
+						<b>Assignment and Execution</b>
 					</h3>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
@@ -213,6 +213,13 @@ $(document).ready(function() {
 									</b></td>
 						</g:each>
 						<td style="background-color: white;">&nbsp;</td>
+					    </tr>
+					    <tr>
+					    <td style="background-color: white;width:80px;">&nbsp;</td>
+					    <td style="background-color: white;width:80px;">&nbsp;</td>
+					    <g:each in="${moveBundle}" var="bundle">
+							<td style="text-align: center;font-size: 10px"><b> ${bundle.runbookStatus ?: ''} </b></td>
+						</g:each>
 					    </tr>
 					</thead>
 					<tbody>
