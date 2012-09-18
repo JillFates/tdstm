@@ -3,73 +3,6 @@
 <%--
 /*
  **************************
- * Menu
- **************************
- */
---%>
-<script type="text/javascript">
-$( function() {
-	$('#selectTimedBarId').val(${timeToUpdate})
-	$('#issueTimebar').width($('#issueTable').width())
-	taskManagerTimePref = ${timeToUpdate}
-	if(taskManagerTimePref != 0){
-		B1.Start(taskManagerTimePref);
-	}else{
-		B1.Pause(0);
-	}
-	
-});
-</script>
-<div class="menu4">
-	<ul>
-		<g:if test="${tab && tab == 'todo'}">
-			<li><g:link elementId="taskLinkId" class="mobmenu mobselect"
-					action="listComment" params='["tab":"todo","search":search]'>My Tasks: ${todoSize}
-				</g:link></li>
-			<li><g:link elementId="taskLinkAllId" class="mobmenu"
-					action="listComment" params='["tab":"all","search":search]'>All Tasks: ${allSize}
-				</g:link></li>
-		</g:if>
-		<g:if test="${tab && tab == 'all'}">
-			<li><g:link elementId="taskLinkId" class="mobmenu"
-					action="listComment" params='["tab":"todo","search":search]'>My Tasks: ${todoSize}
-				</g:link></li>
-			<li><g:link elementId="taskLinkAllId" class="mobmenu mobselect"
-					action="listComment" params='["tab":"all","search":search]'>All Tasks: ${allSize}
-				</g:link></li>
-		</g:if>
-		<li><span style="float: right;">
-			<input type="button" value="Refresh" onclick="pageRefresh()" style="cursor: pointer;">&nbsp;
-			<select id="selectTimedBarId"
-			    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', params:'\'timer=\'+ this.value +\'&prefFor=myTask\' ', onComplete:'changeTimebarPref(e)') }">
-				<option value="0">Manual</option>
-				<option value="60">1 Min</option>
-				<option value="120">2 Min</option>
-				<option value="180">3 Min</option>
-				<option value="240">4 Min</option>
-				<option value="300">5 Min</option>
-			</select>
-			</span>
-		</li>
-	</ul>
-	<div class="tab_search">
-		<g:form method="post" name="issueAssetForm" action="showIssue">
-			<input type="text" size="08" value="${search}" id="search"
-				name="search" autocorrect="off" autocapitalize="off"
-				onfocus="changeAction()" onblur="retainAction()" />
-			<input type="hidden" name="sort" value="${sort}">
-			<input type="hidden" name="order" value="${order}">
-	</div>
-</div>
-<div class="issueTimebar" id="issueTimebar">
-	<div id="issueTimebarId"></div>
-</div>
-<div id="detailId"
-	style="display: none; position: absolute; width: 420px; margin-top: 40px;">
-</div>
-<%--
-/*
- **************************
  * My Issues List 
  **************************
  */
@@ -174,5 +107,14 @@ $( function() {
 				</g:each>
 			</tbody>
 		</table>
-	 </g:form>
 	</div>
+</div>
+<script type="text/javascript">
+	if('${tab}'=="todo"){
+		$("#toDOSpanId").html(${todoSize})
+		$("#toDOAllSpanId").html(${allSize})
+	}else{
+		$("#allToDoSpanId").html(${todoSize})
+		$("#allSpanId").html(${allSize})
+	}
+</script>

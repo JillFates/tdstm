@@ -203,7 +203,11 @@ function toggleCheckbox(chkbox, field) {
 		},
 		Pause:function(sec){
 			clearTimeout(this.to);
-			this.oop.animate(sec,'',sec*1000);
+			if(sec==0){
+				this.oop.animate(sec,'',sec*1000);
+			}else{
+				this.oop.animate($('#issueTimebarId').width(),$('#issueTimebarId').width(),sec*1000);
+			}
 		},
 		Restart:function(sec){
 			clearTimeout(this.to);

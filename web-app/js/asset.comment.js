@@ -37,11 +37,6 @@ function changeStatus(id, status, currentStatus, from){
 					 if(status=='Started'){
 					 	$('#started_'+id).hide()
 					 }
-					 if(B1 != '' && taskManagerTimePref != 0) {
-					 	B1.Restart(taskManagerTimePref);
-					 } else { 
-					 	B1.Pause(0);
-					 }
 				}
 			}
 		},
