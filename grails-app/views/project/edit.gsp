@@ -240,12 +240,18 @@
                            </tr>
 						   <tr class="prop">
 			
-					            <td valign="top" class="name">Workflow Code:&nbsp;<span style="color: red">*</span></td>
+					            <td valign="top" class="name">Workflow Code:</td>
 					
 					          <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
 			              	    <g:select id="workflowCode" name="workflowCode"
 								      from="${workflowCodes}"
-								      value="${projectInstance?.workflowCode}" noSelection="['':'Please Select']" onChange="warnForWorkflow()"></g:select>
+								      value="${projectInstance?.workflowCode}" noSelection="['':'Please Select']" onChange="warnForWorkflow()"></g:select> &nbsp;&nbsp;
+							    <span class="name">
+                                <label for="runbookOn">Runbook Driven:</label>
+                                </span>&nbsp;
+                                <span class="value ${hasErrors(bean: projectInstance, field: 'runbookOn', 'errors')}">
+                                   <input type="checkbox" name="runbookOn" id="runbookOn" ${ (projectInstance.runbookOn == 1 ? 'checked="checked"':'') }  />
+                               	</span>
 								<g:hasErrors bean="${projectInstance}" field="workflowCode">
 				                    <div class="errors">
 				                      <g:renderErrors bean="${projectInstance}" as="list" field="workflowCode"/>
@@ -253,7 +259,7 @@
 				                  </g:hasErrors>
 								</td>
 								<td valign="top" class="name">
-				                  <label for="inProgress"><b>Display Transitions in Status bar:&nbsp;<span style="color: red">*</span></b></label>
+				                  <label for="inProgress">Display Transitions in Status bar:</label>
 				                </td>
 				                <td valign="top">
 									<g:select id="trackChanges" name="trackChanges"	from="${projectInstance.constraints.trackChanges.inList}" 

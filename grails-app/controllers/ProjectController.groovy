@@ -194,6 +194,7 @@ class ProjectController {
             if(completionDate){
             	params.completionDate =  GormUtil.convertInToGMT(formatter.parse(completionDate), tzId)
             }
+			params.runbookOn =  params.runbookOn ? 1 : 0
             projectInstance.properties = params
 			projectInstance.tempForUpdate = Math.random().toString()
            //Get the Partner Image file from the multi-part request
@@ -422,6 +423,7 @@ class ProjectController {
         if(completionDate){
         	params.completionDate =  GormUtil.convertInToGMT(formatter.parse(completionDate), tzId)
         }
+		params.runbookOn =  params.runbookOn ? 1 : 0
         def projectInstance = new Project(params)
         //Get the Partner Image file from the multi-part request
         def file = request.getFile('partnerImage')

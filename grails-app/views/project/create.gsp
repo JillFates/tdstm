@@ -451,16 +451,24 @@
                 </td>
 			</tr>
 			<tr class="prop">
-				<td valign="top" class="name"><label for="workflowCode"><b>Workflow	Code:&nbsp;<span style="color: red">*</span></b></label></td>
+				<td valign="top" class="name"><label for="workflowCode">Workflow Code:</label></td>
 				<td valign="top"
 					class="value ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
 				<g:select id="workflowCode" name="workflowCode"
 					from="${workflowCodes}"
-					value="${projectInstance?.workflowCode}" noSelection="['':'Please Select']"></g:select>
+					value="${projectInstance?.workflowCode}" noSelection="['':'Please Select']"></g:select> &nbsp;&nbsp;
+					<span class="name"><label for="runbookOn">Runbook Driven:&nbsp;</label></span>
+					<span class="value ${hasErrors(bean:projectInstance,field:'runbookOn','errors')}">&nbsp;
+					<input type="checkbox" name="runbookOn" id="runbookOn" >
+						<g:hasErrors bean="${projectInstance}" field="runbookOn">
+						<div class="errors"><g:renderErrors bean="${projectInstance}"
+							as="list" field="runbookOn" /></div>
+					</g:hasErrors></span>
 					<g:hasErrors bean="${projectInstance}" field="workflowCode">
 					<div class="errors"><g:renderErrors bean="${projectInstance}"
 						as="list" field="workflowCode" /></div>
-				</g:hasErrors></td>
+				</g:hasErrors> 
+				</td>
 				<td valign="top" class="name">
 					<label for="trackChanges">Display Transitions in Status bar:</label>
 				</td>

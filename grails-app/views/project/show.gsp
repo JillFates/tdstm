@@ -164,7 +164,13 @@
 
             <td valign="top" class="name">Workflow Code:</td>
 
-            <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'workflowCode')}</td>
+            <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'workflowCode')} &nbsp;&nbsp;
+            
+	            <span class="name">Runbook Driven: </span>&nbsp;
+	
+	            <span class="value"><input type="checkbox" name="runbookOn" id="runbookOn" ${ (projectInstance.runbookOn==1 ? 'checked="checked"':'') } disabled="disabled" /></span>
+            
+            </td>
             
 			<td valign="top" class="name">Display Transitions in Status bar:</td>
 
