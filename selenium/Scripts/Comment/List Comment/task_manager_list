@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://localhost:8080/" />
+<title>task_manager_list</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">task_manager_list</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>/tdstm/auth/login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=usernameId</td>
+	<td>john</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>id=justRemainingCB</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=password</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>css=input[type=&quot;submit&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Task Manager</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>css=h1</td>
+	<td>Task Manager</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=h1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=selectTimedBarId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>id=selectTimedBarId</td>
+	<td>label=Manual</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=#selectTimedBarId &gt; option[value=&quot;0&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Move Event</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Just Remaining Tasks</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Just My Tasks</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>id=justRemainingCB</td>
+	<td>on</td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>id=justMyTasksCB</td>
+	<td>off</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=selectTimedBarId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>css=input[type=&quot;button&quot;]</td>
+	<td>Refresh</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>css=tr.header &gt; td &gt; div</td>
+	<td>Actions</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//div[@onclick=&quot;addSortToLimit('tag','1','taskNumber','asc');onInvokeAction('tag', 'sort')&quot;]</td>
+	<td>Task</td>
+</tr>
+<tr>
+	<td>storeTable</td>
+	<td>id=tag.2.4</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.4</td>
+	<td>AssetType</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.5</td>
+	<td>Updated</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.6</td>
+	<td>Due</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.7</td>
+	<td>Status</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.8</td>
+	<td>Assigned To</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.9</td>
+	<td>Role</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.10</td>
+	<td>Category</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.12</td>
+	<td>Score</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=moveEvent</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>id=moveEvent</td>
+	<td>label=Move Grp11</td>
+</tr>
+<tr>
+	<td>verifyText</td>
+	<td>//div[@onclick=&quot;addSortToLimit('tag','2','description','asc');onInvokeAction('tag', 'sort')&quot;]</td>
+	<td>Description</td>
+</tr>
+<tr>
+	<td>verifyTable</td>
+	<td>id=tag.2.3</td>
+	<td>Asset</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>css=option[value=&quot;43&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=moveEvent</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>id=moveEvent</td>
+	<td>label=All</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>css=input[type=&quot;button&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=selectTimedBarId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>id=selectTimedBarId</td>
+	<td>label=1 Min</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=option[value=&quot;60&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>css=option[value=&quot;0&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=option[value=&quot;0&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>id=justMyTasksCB</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=option[value=&quot;0&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>id=justMyTasksCB</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=option[value=&quot;0&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=option[value=&quot;0&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=tr.toolbar &gt; td</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=option[value=&quot;0&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>id=justMyTasksCB</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>

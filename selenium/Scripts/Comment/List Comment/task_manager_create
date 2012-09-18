@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://localhost:8080/" />
+<title>task_manager_create</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">task_manager_create</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>/tdstm/auth/login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=usernameId</td>
+	<td>john</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=password</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>css=input[type=&quot;submit&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Task Manager</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=h1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=selectTimedBarId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=option[value=&quot;0&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>id=selectTimedBarId</td>
+	<td>label=Manual</td>
+</tr>
+<tr>
+	<td>verifyTitle</td>
+	<td>Task Manager</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=commentForm</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Create Issue/Task</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=assignedToSave</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>id=roleType</td>
+	<td>index=1</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=createCategory</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=priority</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>id=priority</td>
+	<td>label=4</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=#priority &gt; option[value=&quot;4&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>16|alpha</td>
+	<td>task</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=comment</td>
+	<td>${task}</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=#predecessorHeadTrId &gt; td.name &gt; a.button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=taskDependencyId_1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=h1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=statusId</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=#statusId &gt; option[value=&quot;Ready&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=duration</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=duration</td>
+	<td>100</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=assignedToSave</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>css=#createCommentForm &gt; div.buttons &gt; span.button &gt; input.save</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyE</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=#selectTimedBarId &gt; option[value=&quot;0&quot;]</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>

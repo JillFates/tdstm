@@ -109,8 +109,28 @@
 	<td>test comment - ${Comment}</td>
 </tr>
 <tr>
+	<td>verifyElementPresent</td>
+	<td>//table[@id='createCommentTable']/tbody/tr[1]/td[1]/label</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>commentType</td>
+	<td>label=comment</td>
+</tr>
+<tr>
+	<td>randomString</td>
+	<td>numeric|4</td>
+	<td>Comment</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>comment</td>
+	<td>test comment - ${Comment}</td>
+</tr>
+<tr>
 	<td>click</td>
-	<td>//input[@value='Create' and @type='button']</td>
+	<td>//input[@value='Save' and @type='button']</td>
 	<td></td>
 </tr>
 <tr>
