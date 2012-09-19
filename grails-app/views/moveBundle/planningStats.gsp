@@ -74,12 +74,12 @@ $(document).ready(function() {
 					<table style="float:left; border: 0px; margin-left: 10px;">
 						<tr>
 							<td style="width: 10px;text-align: right;">${openIssue}</td>
-							<td><g:link controller="assetEntity" action="listComment" params="[filter:'Discovery']">Open Tasks</g:link></td>
+							<td><g:link controller="assetEntity" action="listTasks" params="[filter:'Discovery']">Open Tasks</g:link></td>
 						</tr>
 						<g:if test="${dueOpenIssue>0}">
 						<tr>
 						    <td style="width: 10px;text-align: right;color: red;"><b>${dueOpenIssue}</b></td>
-							<td><g:link controller="assetEntity" action="listComment" params="[filter:'dueOpenIssue']">Overdue</g:link></td>
+							<td><g:link controller="assetEntity" action="listTasks" params="[filter:'dueOpenIssue']">Overdue</g:link></td>
 						</tr>
 						</g:if>
 					</table>
@@ -150,12 +150,12 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${issuesCount}</td>
-							<td style="width: 150px;"><g:link controller="assetEntity" action="listComment" params="[filter:'openIssue']">Open Tasks</g:link></td>
+							<td style="width: 150px;"><g:link controller="assetEntity" action="listTasks" params="[filter:'openIssue']">Open Tasks</g:link></td>
 						</tr>
 						<g:if test="${generalOverDue>0}">
 						<tr>
 						    <td style="width: 10px;text-align: right;color: red;"><b>${generalOverDue}</b></td>
-							<td><g:link controller="assetEntity" action="listComment" params="[filter:'generalOverDue']">Overdue</g:link></td>
+							<td><g:link controller="assetEntity" action="listTasks" params="[filter:'generalOverDue']">Overdue</g:link></td>
 						</tr>
 						</g:if>
 					</table>
