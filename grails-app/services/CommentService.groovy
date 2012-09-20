@@ -14,6 +14,9 @@ import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 
+import org.quartz.SimpleTrigger
+import org.quartz.Trigger
+
 /**
  * CommentService class contains methods used to manage comments/tasks
  * @author jmartin
@@ -28,7 +31,8 @@ class CommentService {
 	def jdbcTemplate
 	def taskService
 	def securityService
-	
+	def quartzScheduler
+    
 	/**
 	 * Used to persist changes to the AssetComment and CommentNote from various forms
 	 * @param params 
@@ -316,6 +320,7 @@ class CommentService {
 					// Send email in separate thread to prevent delay to user
 					// TODO renable Thread.start once we upgrade to 2.x (see sendTaskEMail below for additional code re-enablement).
 					//Thread.start {
+						 //dispatchTaskEmail([taskId:assetComment.id, tzId:tzId, isNew:isNew])
 						 sendTaskEMail(assetComment.id, tzId, isNew)
 					//}
 				}
@@ -452,6 +457,18 @@ class CommentService {
 	def getLine(str, lineNum=0) {
 		ArrayList lines = str.readLines()
 		return ( (lineNum+1) > lines.size() ) ? null : lines[lineNum]
-	}
+	} 
+    /**
+     *  This method is responsible for creating the Quartz job
+     *  @param : paramsMap ["taskId":taskId, "tzId":tzId, "isNew":isNew]
+     *  @return : create Trigger
+     */
+    def dispatchTaskEmail(Map paramsMap){
+        Trigger trigger = new SimpleTrigger("tm-sendEmail-${paramsMap.taskId}" + System.currentTimeMillis(), GormUtil.convertInToGMT( "now", paramsMap.tzId ))
+        trigger.jobDataMap.putAll(["taskId":paramsMap.taskId, "tzId":paramsMap.tzId, "isNew":paramsMap.isNew])
+  
+        SendTaskEmailJob.schedule( trigger )
+        
+    }
 	
 }
