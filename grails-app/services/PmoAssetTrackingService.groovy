@@ -126,10 +126,29 @@ class PmoAssetTrackingService {
 					transitionStatus = workflowService.createTransition( workFlowCode, role,stateTo, assetEntity, 
 						assetEntity.moveBundle, loginUser, null, comment )
 					message = transitionStatus.message
-					def currentTransition = AssetTransition.find("FROM AssetTransition t where t.assetEntity = ${assetEntity.id} "+
-						"AND voided = 0 ORDER BY dateCreated DESC")
-					currentTransition.isNonApplicable = 1
-					currentTransition.save(flush:true)
+					
+					// Find the latest created transition and mark it as NA
+					def sql = "SELECT asset_transition_id FROM asset_transition WHERE asset_entity_id=${assetEntity.id} " + 
+						"AND voided=0 ORDER BY date_created DESC LIMIT 1"
+					def atId = jdbcTemplate.queryForInt(sql)
+					if (atId) {
+						def currentTransition = AssetTransition.get(atId)
+						currentTransition.isNonApplicable = 1
+						currentTransition.save(flush:true)						
+					}
+					/*
+					log.info "createBulkTransition: sql=${sql} results=${results}"
+					def query = AssetTransition.where { id == assetEntity.id && voided == 0	}
+					def currentTransition = query.list(sort:'dateCreated', order:'desc', max:1)
+					//def currentTransition = AssetTransition.findAllByIdAndVoided(assetEntity.id, 0,
+						//"from AssetTransition t where t.assetEntity = ${assetEntity.id} AND t.voided = 0",
+					//	sort:'dateCreated', order:'desc', max:1) 
+					// " ORDER BY dateCreated DESC")
+					if (currentTransition && currentTranstion.size() == 1) {
+						currentTransition[0].isNonApplicable = 1
+						currentTransition[0].save(flush:true)						
+					}
+					*/
 				}
 				break;
 			case "pending" :
@@ -582,7 +601,7 @@ class PmoAssetTrackingService {
 			ae.custom1, ae.custom2, ae.custom3,	ae.custom4, ae.custom5, ae.custom6, ae.custom7, ae.custom8,
 			ae.current_status AS currentStatus, """)
 		
-		if (project.runbookOn) {
+		if (project.runbookOn==1) {
 			query.append( 'MAX(IFNULL(task.last_updated,eav.last_updated)) AS updated')	
 		} else {
 			query.append( 'MAX(at.date_created) AS updated')

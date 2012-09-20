@@ -244,7 +244,7 @@ class ClientConsoleController {
 	                        def assetTrans = assetTransitions.find { it.stateTo == transitionId.toString() }
 	
 	                        if(assetTrans?.type == 'boolean' && assetTrans?.isNonApplicable) {
-	                            cssClass='asset_pending'
+	                            cssClass='asset_na'
 	                        } else if(assetTrans?.type == 'boolean' && stateType == 'boolean') {
 	                            if(stateId != holdId || isHoldNa?.isNonApplicable){
 	                                cssClass='task_done'
@@ -497,7 +497,7 @@ class ClientConsoleController {
 		def bundleId = params.moveBundle
 		if (bundleId == "all") {
 		   workFlowCode = project.workflowCode
-		} else if (bundleId.isNumber() ) {
+		} else if (bundleId != null && bundleId.isNumber() ) {
 		   def moveBundle = MoveBundle.get(bundleId)
 		   if (moveBundle) {
 			   def moveEvent = moveBundle.moveEvent
@@ -566,7 +566,8 @@ class ClientConsoleController {
 			def reRackId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Reracked"))
 			def terminatedId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Terminated"))
 			def columns = userPreferenceService.setAssetTrackingPreference(null, null, null, null)
-
+			def lastUpdated
+			
 			// get the asset list
 			def assetList= pmoAssetTrackingService.getAssetsForPmoUpdate( moveEvent.project.id, bundles, params, lastPoolTime, currentPoolTime)
 			assetList.each{
@@ -607,7 +608,7 @@ class ClientConsoleController {
 	                        def assetTrans = assetTransitions.find { it.stateTo == transitionId.toString() }
 	                        
 	                        if(assetTrans?.type == 'boolean' && assetTrans?.isNonApplicable) {
-								cssClass='asset_pending'
+								cssClass='asset_na'
 	                        } else if(assetTrans?.type == 'boolean' && stateType == 'boolean') {
 								if(stateId != holdId || isHoldNa?.isNonApplicable){
 									cssClass='task_done'
@@ -641,11 +642,19 @@ class ClientConsoleController {
 					}
 				} // if (project.runbookOn) 
 				// log.info "getTransitions: updated=[${it.updated}]}" 
+				
+				try {
+					lastUpdated = formatter.format( TimeUtil.convertInToUserTZ(it.updated, tzId) )
+				} catch (e) {
+					//log.error "getTransitions: formatting updated (${it.updated}) failed, assetId=$assetId"
+					lastUpdated = ''
+				}
+				
 				assetEntityList << [id: assetId, column1value:it."${columns.column1.field}" ? columns.column1.field != "currentStatus" ? it."${columns.column1.field}" : stateEngineService.getState(workFlowCode,it."${columns.column1.field}") : "&nbsp;",
 					column2value:it."${columns.column2.field}" ? columns.column2.field != "currentStatus" ? it."${columns.column2.field}" : stateEngineService.getState(workFlowCode,it."${columns.column2.field}") : "&nbsp;",
 					column3value:it."${columns.column3.field}" ? columns.column3.field != "currentStatus" ? it."${columns.column3.field}" : stateEngineService.getState(workFlowCode,it."${columns.column3.field}") : "&nbsp;",
 					column4value:it."${columns.column4.field}" ? columns.column4.field != "currentStatus" ? it."${columns.column4.field}" : stateEngineService.getState(workFlowCode,it."${columns.column4.field}") : "&nbsp;",
-					tdId:tdId, lastUpdated:formatter.format( TimeUtil.convertInToUserTZ(it.updated, tzId) )]
+					tdId:tdId, lastUpdated:lastUpdated]
 			}
 			
 			def assetCommentsList = []
@@ -747,13 +756,14 @@ class ClientConsoleController {
 		def assetTransition
 		def menuOptions = ""
 		assetTransition = AssetTransition.find("from AssetTransition t where t.assetEntity = $assetEntity.id and t.stateTo = $transId and t.type ='boolean' and t.voided = 0 ")
-		if(assetTransition){
+		if (assetTransition){
 			if(assetTransition.isNonApplicable != 0){
 				situation = "NA"
 			} else {
 				situation = "done"
 			}
 		}
+		log.info "getMenuList: assetTransition=${assetTransition?'yes':'no'}, situation=${situation}, state=${state}, stateType=$stateType} "
 		menuOptions = pmoAssetTrackingService.constructMenuOptions( state, assetEntity, situation, stateType )
 		
 		render menuOptions
