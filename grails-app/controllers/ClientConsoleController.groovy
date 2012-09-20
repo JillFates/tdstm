@@ -15,6 +15,7 @@ import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 
 class ClientConsoleController {
@@ -585,9 +586,9 @@ class ClientConsoleController {
 					tdId = pmoAssetTrackingService.getTransitionRowRb(assetEntity, bundleId)
 				} else {
 					// Build TD data by Workflow 
-					def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-																	"where t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
-																	"order by date_created desc, stateTo desc limit 1 ")
+					def transitionStates = jdbcTemplate.queryForList("SELECT cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
+						"WHERE t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
+						"ORDER BY date_created desc, stateTo desc limit 1 ")
 					if (transitionStates.size()){
 						stateId = transitionStates[0].stateTo
 					}
@@ -639,12 +640,12 @@ class ClientConsoleController {
 						tdId << [id:"${assetId+"_"+trans}", cssClass:cssClass]
 					}
 				} // if (project.runbookOn) 
-				
+				// log.info "getTransitions: updated=[${it.updated}]}" 
 				assetEntityList << [id: assetId, column1value:it."${columns.column1.field}" ? columns.column1.field != "currentStatus" ? it."${columns.column1.field}" : stateEngineService.getState(workFlowCode,it."${columns.column1.field}") : "&nbsp;",
 					column2value:it."${columns.column2.field}" ? columns.column2.field != "currentStatus" ? it."${columns.column2.field}" : stateEngineService.getState(workFlowCode,it."${columns.column2.field}") : "&nbsp;",
 					column3value:it."${columns.column3.field}" ? columns.column3.field != "currentStatus" ? it."${columns.column3.field}" : stateEngineService.getState(workFlowCode,it."${columns.column3.field}") : "&nbsp;",
 					column4value:it."${columns.column4.field}" ? columns.column4.field != "currentStatus" ? it."${columns.column4.field}" : stateEngineService.getState(workFlowCode,it."${columns.column4.field}") : "&nbsp;",
-					tdId:tdId, lastUpdated:formatter.format( GormUtil.convertInToUserTZ(it.updated, tzId) )]
+					tdId:tdId, lastUpdated:formatter.format( TimeUtil.convertInToUserTZ(it.updated, tzId) )]
 			}
 			
 			def assetCommentsList = []
@@ -796,6 +797,7 @@ class ClientConsoleController {
 			role = "MANAGER"
 		}
 		
+		// TODO : cleanup : It doesn't look like assetTransitionQuery is used in this code
 		def assetTransitionQuery = "from AssetTransition t where t.assetEntity = ${assetEntity.id} and t.voided = 0"
 		def comment = ""
 		if (stateTo == AssetCommentStatus.TERMINATED ){

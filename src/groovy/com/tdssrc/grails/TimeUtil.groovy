@@ -145,11 +145,17 @@ class TimeUtil {
 	 */
 	def public static convertInToUserTZ = { date, tzId ->
 		Date ret
-		if(date){
+		if (date) {
 			tzId = tzId ? tzId : "EDT"
 			def timeZoneId = timeZones[ tzId ]
 			TimeZone tz = TimeZone.getTimeZone( timeZoneId );
-			ret = new Date(date.getTime() + tz.getRawOffset());
+			//java.sql.Timestamp
+			try {
+				ret = new Date(date.getTime() + tz.getRawOffset());				
+			} catch (e) { 
+				log.error "convertInToUserTZ(${date}, ${tzId}) had exception: e.toString()" 
+			}
+			
 			// println "convertInToUserTZ() date=${date}, tzId=${tzId}, newDate=${ret}"
 			// if we are now in DST, back off by the delta. Note that we are
 			// checking the GMT date, this is the KEY.
