@@ -126,8 +126,8 @@ class PmoAssetTrackingService {
 					transitionStatus = workflowService.createTransition( workFlowCode, role,stateTo, assetEntity, 
 						assetEntity.moveBundle, loginUser, null, comment )
 					message = transitionStatus.message
-					def currentTransition = AssetTransition.find("FROM AssetTransition t where t.assetEntity = ? "+
-						"AND voided = 0 order by dateCreated desc", [assetEntity.id])
+					def currentTransition = AssetTransition.find("FROM AssetTransition t where t.assetEntity = ${assetEntity.id} "+
+						"AND voided = 0 ORDER BY dateCreated DESC")
 					currentTransition.isNonApplicable = 1
 					currentTransition.save(flush:true)
 				}
