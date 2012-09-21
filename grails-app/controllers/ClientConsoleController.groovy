@@ -673,7 +673,7 @@ class ClientConsoleController {
 					}*/
 				}
 			}
-			assetEntityAndCommentList << [ assetEntityList: assetEntityList, assetCommentsList: assetCommentsList, lastPoolTime : currentPoolTime.toString() ]
+			assetEntityAndCommentList << [ assetEntityList: assetEntityList, assetCommentsList: assetCommentsList, lastPoolTime : currentPoolTime.toString(), check: RolePermissions.hasPermission("ClientConsoleCheckBox") ]
 		}
     	render assetEntityAndCommentList as JSON
     }

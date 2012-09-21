@@ -728,7 +728,7 @@
 						var assetTransition = assetTransitions[i]
 						var action = $("#action_"+assetTransition.id)
 						if(action){
-							if(!assetTransition.check){
+							if(!assetEntityCommentList[0].check){
 								action.html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
 							}
 						}
