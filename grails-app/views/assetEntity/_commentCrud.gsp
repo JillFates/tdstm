@@ -191,7 +191,8 @@
 	<input type="hidden" name="assetEntity.id" id="createAssetCommentId" value="" />
 	<g:form action="saveComment" method="post" name="createCommentForm">
 		<input type="hidden" name="category" value="general" />
-		<input type="hidden" id="predCount"  value="1" />
+		<input type="hidden" id="predCount"  value="-1" />
+		<input type="hidden" id="deletePredId" name="deletePredId" />
   <div class="dialog" style="border: 1px solid #5F9FCF">
 	<div>
 		<table id="createCommentTable" style="border: 0px;">
@@ -536,9 +537,9 @@
 </div>
 <tds:hasPermission permission='CommentCrudView'>
 <div class="buttons"><span class="button">
-	<input class="save" type="button" value="Save and close" onclick="resolveValidate('editCommentForm','updateCommentId','${rediectTo}','');" />
+	<input class="save" type="button" id="saveAndCloseBId" value="Save and close" onclick="resolveValidate('editCommentForm','updateCommentId','${rediectTo}','');" disabled="disabled"/>
 	
-	<input class="save" type="button" value="Save and view" onclick="resolveValidate('editCommentForm','updateCommentId','','view');" />
+	<input class="save" type="button" id="saveAndViewBId" value="Save and view" onclick="resolveValidate('editCommentForm','updateCommentId','','view');" disabled="disabled"/>
 	</span>
 	<span id="deleteCommentId" class="button">
 	<g:if test="${rediectTo}">

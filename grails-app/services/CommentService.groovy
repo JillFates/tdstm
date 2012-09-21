@@ -272,24 +272,32 @@ class CommentService {
 				// Now handle creating / updating task dependencies if the "manageDependency flag was passed
 				if (params.manageDependency) {
 					def taskDependencies = params.list('taskDependency[]')
-				
+					def deletedPreds = params.deletedPreds
+					
 					// If we're updating, we'll delete the existing dependencies and then readd them following
-					if (! isNew ) {
-						TaskDependency.executeUpdate("DELETE TaskDependency WHERE assetComment = ? ",[assetComment])
+					if (! isNew && deletedPreds) {
+						TaskDependency.executeUpdate("DELETE TaskDependency t WHERE t.id in ( ${deletedPreds} ) ")
 					}
 					// Iterate over the predecessor ids and validate that the exist and are associated with the project
-					taskDependencies.each {
-						def predecessor = AssetComment.get(it)
+					taskDependencies.each { preds ->
+						def taskDepId = preds.split("_")[0]
+						def predecessorId = preds.split("_")[1]
+						def predecessor = AssetComment.get( predecessorId )
 						if (! predecessor) {
-							log.error "saveUpdateCommentAndNotes: invalid predecessor id (${it})"
+							log.error "saveUpdateCommentAndNotes: invalid predecessor id (${predecessorId})"
 						} else {
 							def predProject = predecessor.project
 							if ( predProject?.id != project.id ) {
 								log.warn "saveUpdateCommentAndNotes: predecessor project id (${predProject?.id}) different from current project (${project.id})"
 							} else {
-								def taskDependency = new TaskDependency()
-								taskDependency.predecessor = predecessor
-								taskDependency.assetComment = assetComment
+								def taskDependency = TaskDependency.get(taskDepId)
+								if( taskDependency && taskDependency.predecessor.id != Long.parseLong( predecessorId ) ) {
+									taskDependency.predecessor = predecessor
+								} else if( !taskDependency ) {
+									taskDependency = new TaskDependency()
+									taskDependency.predecessor = predecessor
+									taskDependency.assetComment = assetComment
+								}
 								if ( taskDependency.hasErrors() || ! taskDependency.save(flush:true) ) {
 									log.error "saveUpdateCommentAndNotes: Saving comment predecessors failed - " + GormUtil.allErrorsString(taskDependency)
 									errorMsg = 'An unexpected error occurred while saving your change'

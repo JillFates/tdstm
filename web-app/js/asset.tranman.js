@@ -652,7 +652,7 @@ function showAssetDialog( e , action ) {
 					ac.resolution = "";
 				}
 				 $('#commentId').val(ac.id)
-				 $('#predCount').val(params.maxVal)
+				 // $('#predCount').val(params.maxVal)
 				 $('#updateCommentId').val(ac.id)
 		      	 $('#commentTdId').val(ac.comment) 
 		      	 $('#commentTypeTdId').html(ac.commentType)
@@ -799,6 +799,8 @@ function showAssetDialog( e , action ) {
 	     	      	$('#priorityEditSpanId').css('display','none')
 	     	      	$("#showCommentDialog").dialog("option", "title", "Comment Detail");
 		      		$("#editCommentDialog").dialog("option", "title", "Comment Detail");
+		      		$('#saveAndCloseBId').removeAttr('disabled')
+			    	$('#saveAndViewBId').removeAttr('disabled')
 		      	 }
 				 if(ac.commentType=='instruction'){
 					 $('#mustVerifyId').css('display','table-row')
@@ -1263,9 +1265,10 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 		$('#relatedIssueEditId').html("")
 		
 		$('select[name="taskDependencySave"]').each(function(){
-			predArr.push($(this).val())
+			var savePredId = $(this).attr('id').split('_')[1]
+			predArr.push(savePredId+"_"+$(this).val())
 	    });
-	    predArr = removeDuplicateElement(predArr)
+	    //predArr = removeDuplicateElement(predArr)
 	    $('#predecessorTableId').html("")
 		var url = '../assetEntity/saveComment'
 		var params = { 'comment':$('#comment').val(), 'commentType':$('#commentType').val(),
@@ -1286,9 +1289,10 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 		$('#relatedIssueEditId').html("")
 		var url = '../assetEntity/updateComment'
 		$('select[name="taskDependencyEdit"]').each(function(){
-			predArr.push($(this).val())
+			var predId = $(this).attr('id').split('_')[1]
+			predArr.push(predId+"_"+$(this).val())
 	    });
-	    predArr = removeDuplicateElement(predArr)
+	    //predArr = removeDuplicateElement(predArr)
 		var params = { 'comment':$('#commentEditId').val(), 'commentType':$('#commentTypeEditId').val(),
 			'isResolved':$('#isResolvedEditId').val(), 'resolution':$('#resolutionEditId').val(), 
 			'mustVerify':$('#mustVerifyEditId').val(), 'category':$('#categoryEditId').val(), 
@@ -1301,12 +1305,11 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 			'duration':$('#durationEdit').val(),'durationScale':$('#durationScaleEdit').val(),
 			'override':$('#overrideEdit').val(),'role':$('#roleTypeEdit').val(),
 			'note':$('#noteEditId').val(),'taskDependency' : $("#taskDependencyEditId").val(),
-			'id':objId, 'taskDependency':predArr,'manageDependency':1, 'open':open};
+			'id':objId, 'taskDependency':predArr,'manageDependency':1, 'open':open, 'deletedPreds':$('#deletePredId').val()};
 		var completeFunc = function(e) { updateCommentsOnList(e); }
 	}
 	if (redirectTo) { completeFunc = function(e) { updateCommentsLists(e); } }
 	else if(open=='view'){ completeFunc = function(e) { showAssetCommentDialog( e , 'show'); } }
-	
 	jQuery.ajax({
 		url: url,
 		data: params,
@@ -1518,7 +1521,7 @@ function addPredecessor(issueCategory,predecessorCategory,comment,row,span){
 		     if(issueCategory){
 		    	 $('#predecessorCategoryId_'+rowNo).val($('#'+issueCategory).val())
 		     }
-		     $("#predCount").val(parseInt(rowNo)+1)
+		     $("#predCount").val(parseInt(rowNo)-1)
 	         $('#predecessorTr').show()
 	         
 		 }
@@ -1528,10 +1531,9 @@ function fillPredecessor(id, category,commentId){
 	var row = id.split('_')[1]
 	new Ajax.Request('../assetEntity/getPredecessor?category='+category+'&assetCommentId='+commentId,{asynchronous:true,evalScripts:true,
 		 onComplete:function(e){
-			 var resp =  e.responseText.replace('taskDependencyId','taskDependencyId_'+row)
-			 var data = e.responseText
-		     $('#taskDependencySaveTdId_'+row).html(data)
-		     $('#taskDependencyEditTdId_'+row).html(data)
+			 var resp =  e.responseText.replace('taskDependencyId','taskDependencyId_'+row).replace('taskDependencyEditId','taskDependencyEditId_'+row)
+			 $('#taskDependencySaveTdId_'+row).html(resp)
+		     $('#taskDependencyEditTdId_'+row).html(resp)
 		 }
 	})
 	
@@ -1582,6 +1584,13 @@ function loadEditPredecessor(id){
 		    	 $('#predecessorEditId').html(resp);
 		    	 $('#processingId').hide();
 	    	 }
+		},onComplete:function(e){
+	    	 $('#saveAndCloseBId').removeAttr('disabled')
+	    	 $('#saveAndViewBId').removeAttr('disabled')
+		},
+		onFailure:function(jqXHR, textStatus, errorThrown){
+			$('#editCommentDialog').dialog('close');
+			alert( stdErrorMsg )
 		}
 	})
 }
@@ -1594,7 +1603,16 @@ function deleteComment(commentId, assetEntityIdShow, complete){
 			complete: completeFunc
 		});
     }
-}	
+}
+/**
+ * 
+ */
+function deletePredRow( rowId ){
+	$("#"+rowId).remove()
+	var id = rowId.split('_')[2]
+	$("#deletePredId").val(( $("#deletePredId").val() ? $("#deletePredId").val()+"," : "") + id)
+}
+
 	
 
 

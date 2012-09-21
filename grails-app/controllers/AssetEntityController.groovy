@@ -3714,7 +3714,7 @@ class AssetEntityController {
 			def predFortask = taskService.genSelectForTaskDependency(taskDep, assetComment)
 			predEditTable.append("""<tr id="row_Edit_${taskDep.id}"><td>${selectCategory}</td>
 										<td id="taskDependencyEditTdId_${taskDep.id}">${predFortask}</td>
-										<td><a href="javascript:deleteRow('row_Edit_${taskDep.id}')"><span class="clear_filter"><u>X</u></span></a></td>""")
+										<td><a href="javascript:deletePredRow('row_Edit_${taskDep.id}')"><span class="clear_filter"><u>X</u></span></a></td>""")
 			selectCategory = ""
 		}
 		render predEditTable
