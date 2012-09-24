@@ -1,5 +1,7 @@
 import groovy.sql.Sql
 import java.lang.RuntimeException
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
 
 //
 // USER DEFINED PER RUN OF APP
@@ -73,7 +75,8 @@ def lastTaskNum
 def taskCount=0
 def predecessorCount=0
 def status
-
+def estStart
+def estFinish
 def task = sql.dataSet('asset_comment')
 def taskDependency = sql.dataSet('task_dependency')
 
@@ -99,6 +102,11 @@ importFile.splitEachLine("\t") { fields ->
 		def priority = fields[13]
 		
 		priority = priority == '' ? 3 : priority
+
+		use (TimeCategory) {		
+			estStart = new Date().parse("yyyy-M-d H:m:s", fields[6]) + 4.hours
+			estFinish = new Date().parse("yyyy-M-d H:m:s", fields[7]) + 4.hours
+		}
 
 		// Tasks that have predecessor 0 will default to Ready
 		if (predecessors == '0' || predecessors == '' ) {
@@ -176,7 +184,7 @@ importFile.splitEachLine("\t") { fields ->
 				throw new RuntimeException("Unable to find StepCode (${stepCode}) using workflowId (${workflowId}) for Task number ${taskNum}") 											
 			}
 		}
-	
+
 		task.add(
 			asset_comment_id: taskId,
 			version:1,
@@ -201,8 +209,8 @@ importFile.splitEachLine("\t") { fields ->
 			COMMENT: fields[3],
 			asset_entity_id: assetId,
 			move_event_id: moveEventId, 
-			est_start: fields[6], 
-			est_finish: fields[7], 
+			est_start: estStart,
+			est_finish: estFinish, 
 			duration: fields[8], 
 			task_number: taskNum, 
 			workflow_transition_id: workflowTransitionId,
