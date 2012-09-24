@@ -16,10 +16,9 @@ class SendTaskEmailJob {
      * @throws JobExecutionException
      */
     def execute( JobExecutionContext context )  throws JobExecutionException {
-        def taskId = context.getMergedJobDataMap().getLongValue("taskId") as Object;
-        def tzId = context.getMergedJobDataMap().get("tzId")  as Object;
-        def isNew = context.getMergedJobDataMap().getBooleanValue("isNew") as Object
-        
-        commentService.sendTaskEmail(taskId, tzId, isNew)
+        def taskId = context.getMergedJobDataMap().getLongValue("taskId");
+        def tzId = context.getMergedJobDataMap().get("tzId").toString();
+        def isNew = context.getMergedJobDataMap().getBooleanValue("isNew")
+        commentService.sendTaskEMail(taskId, tzId, isNew)
     }
 }

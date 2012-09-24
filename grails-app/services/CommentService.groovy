@@ -328,8 +328,7 @@ class CommentService {
 					// Send email in separate thread to prevent delay to user
 					// TODO renable Thread.start once we upgrade to 2.x (see sendTaskEMail below for additional code re-enablement).
 					//Thread.start {
-						 //dispatchTaskEmail([taskId:assetComment.id, tzId:tzId, isNew:isNew])
-						 sendTaskEMail(assetComment.id, tzId, isNew)
+						 dispatchTaskEmail([taskId:assetComment.id, tzId:tzId, isNew:isNew])
 					//}
 				}
 			
