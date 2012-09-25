@@ -3,22 +3,30 @@ import org.quartz.JobExecutionException;
 
 /**
  * 
- * Invoke the current commentService.sendTaskEmail(params) with the params set to context
+ * A Quartz Job that is used to send email messages by invoking thecommentService.sendTaskEmail(params) with the context parameters. This 
+ * uses the TDSTM-Email Quartz group that will allow several emails to be sent concurrently. 
  */
+// class SendTaskEmailJob implements Job {
 class SendTaskEmailJob {
     
+    def group = 'tdstm'
+	def concurrent = false
     def commentService 
-    def group = "TDSTM"
+	
     static triggers = { }
+
     /**
      * @param context
      * @return call commentService.sendTaskEmail based on the params set to context
      * @throws JobExecutionException
      */
-    def execute( JobExecutionContext context )  throws JobExecutionException {
-        def taskId = context.getMergedJobDataMap().getLongValue("taskId");
-        def tzId = context.getMergedJobDataMap().get("tzId").toString();
-        def isNew = context.getMergedJobDataMap().getBooleanValue("isNew")
+	// TODO - change job so that it will retry if email fails to send
+ 	def execute(context) {
+		def dataMap = context.mergedJobDataMap
+        def taskId = dataMap.getLongValue('taskId');
+        def tzId = dataMap.get('tzId').toString();
+        def isNew = dataMap.getBooleanValue('isNew')
+		// log.info "execute: taskId=$taskId, tzId=$tzId, isNew=$isNew"
         commentService.sendTaskEMail(taskId, tzId, isNew)
     }
 }

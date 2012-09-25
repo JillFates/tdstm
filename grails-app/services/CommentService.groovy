@@ -16,6 +16,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 
 import org.quartz.SimpleTrigger
 import org.quartz.Trigger
+import org.quartz.JobDetail
 
 /**
  * CommentService class contains methods used to manage comments/tasks
@@ -32,6 +33,15 @@ class CommentService {
 	def taskService
 	def securityService
 	def quartzScheduler
+
+	private final List<String> statusToSendEmailFor = [
+		AssetCommentCategory.GENERAL,
+		AssetCommentCategory.DISCOVERY,
+		AssetCommentCategory.PLANNING,
+		AssetCommentCategory.WALKTHRU,
+		AssetCommentCategory.PREMOVE,
+		AssetCommentCategory.POSTMOVE
+	]
     
 	/**
 	 * Used to persist changes to the AssetComment and CommentNote from various forms
@@ -54,7 +64,7 @@ class CommentService {
 		def map=[:]
 		def errorMsg
 		
-		log.info "saveUpdateCommentAndNotes: tzId -- ${session.getAttribute( "CURR_TZ" )} / ${session.getAttribute( "CURR_TZ" )?.CURR_TZ}"
+		// log.info "saveUpdateCommentAndNotes: tzId -- ${session.getAttribute( "CURR_TZ" )} / ${session.getAttribute( "CURR_TZ" )?.CURR_TZ}"
 		
 		// Wrap the whole routine so that we can break out when we hit fatal situations
 		while (true) {
@@ -324,12 +334,12 @@ class CommentService {
 
 				// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.
 				def loginPerson = userLogin.person	// load so that we don't have a lazyInit issue
-				if ( assetComment.commentType == AssetCommentType.TASK && assetComment.assignedTo && assetComment.assignedTo.id != loginPerson.id ) {
-					// Send email in separate thread to prevent delay to user
-					// TODO renable Thread.start once we upgrade to 2.x (see sendTaskEMail below for additional code re-enablement).
-					//Thread.start {
-						 dispatchTaskEmail([taskId:assetComment.id, tzId:tzId, isNew:isNew])
-					//}
+				if ( assetComment.commentType == AssetCommentType.TASK && 
+					assetComment.assignedTo	&& 
+					assetComment.assignedTo.id != loginPerson.id && 
+					statusToSendEmailFor.contains(assetComment.category) ) 
+				{
+					 dispatchTaskEmail([taskId:assetComment.id, tzId:tzId, isNew:isNew])
 				}
 			
 				break
@@ -349,9 +359,30 @@ class CommentService {
 		}
 	}
 	
+    /**
+     *  This method is responsible for creating the Quartz job for sending Emails for comments
+     *  @param : paramsMap ["taskId":taskId, "tzId":tzId, "isNew":isNew]
+     *  @return : create Trigger
+     */
+    def dispatchTaskEmail(Map params) {
+		// Trigger trigger = new SimpleTrigger("tm-sendEmail-${paramsMap.taskId}" + System.currentTimeMillis(), GormUtil.convertInToGMT( "now", paramsMap.tzId ))
+		Trigger trigger = new SimpleTrigger("tm-sendEmail-${params.taskId}" + System.currentTimeMillis(), null, new Date() )
+		// trigger.setStartTime(new Date() )
+        trigger.jobDataMap.putAll( [ 'taskId':params.taskId, 'tzId':params.tzId, 'isNew':params.isNew])
+		trigger.setJobName('SendTaskEmailJob')
+		trigger.setJobGroup('tdstm')
+  
+		// def jobDetail = new JobDetail("TDS-SendEmail", null, SendTaskEmailJob.class)
+		quartzScheduler.scheduleJob(trigger)
+		// SendTaskEmailJob.schedule( trigger )
+		log.info "dispatchTaskEmail ${params}"
+        
+    }
 	
 	/**
-	 * Used to send the Task email to the appropriate user for the comment passed to the method
+	 * Used to send the Task email to the appropriate user for the comment passed to the method. This is typically called from
+	 * a Quartz Job so that it happens outside of the User controller request handler for performance reasons.
+	 * 
 	 * @param assetComment
 	 * @param tzId
 	 * @return
@@ -367,15 +398,6 @@ class CommentService {
 			return
 		}
 		
-		// TODO: Need to refactor these AssetComment.category parameters into an ENUM
-		def statusToSendEmailFor = [
-			AssetCommentCategory.GENERAL,
-			AssetCommentCategory.DISCOVERY,
-			AssetCommentCategory.PLANNING,
-			AssetCommentCategory.WALKTHRU,
-			AssetCommentCategory.PREMOVE,
-			AssetCommentCategory.POSTMOVE ]
-
 		// log.info "sendTaskEMail: commentType: ${assetComment.commentType}, category: ${assetComment.category}"
 			
 		// Only send emails out for issues in the categories up to premove
@@ -396,7 +418,7 @@ class CommentService {
 		def sub = leftString(getLine(assetComment.comment,0), 40)
 		sub = (isNew ? '' : 'Re: ') + ( (sub == null || sub.size() == 0) ? "Task ${assetComment.id}" : sub )
 		
-		log.info "sendTaskEMail: sending email to ${assignedTo.email} for task id ${taskId}"
+		log.info "sendTaskEMail: taskId=${taskId} to=${assignedTo.id}/${assignedTo.email}"
 		
 		mailService.sendMail {
 			to assignedTo.email
@@ -420,9 +442,15 @@ class CommentService {
 		def assetName = assetComment.assetEntity ? "${assetComment.assetEntity.assetName} (${assetComment.assetEntity.assetType})" : null
 		def createdBy = assetComment.createdBy
 		def resolvedBy = assetComment.resolvedBy
-		def dtCreated = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
+		def dtCreated 
 		def dueDate
 		def dtResolved
+		
+		try {
+			dtCreated = formatter.format(TimeUtil.convertInToUserTZ(assetComment.dateCreated, tzId))
+		} catch (e) {
+			dtCreated = formatter.format(assetComment.dateCreated)
+		}
 		
 		if(assetComment.dateResolved) {
 			dtResolved = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
@@ -465,17 +493,5 @@ class CommentService {
 		ArrayList lines = str.readLines()
 		return ( (lineNum+1) > lines.size() ) ? null : lines[lineNum]
 	} 
-    /**
-     *  This method is responsible for creating the Quartz job
-     *  @param : paramsMap ["taskId":taskId, "tzId":tzId, "isNew":isNew]
-     *  @return : create Trigger
-     */
-    def dispatchTaskEmail(Map paramsMap){
-        Trigger trigger = new SimpleTrigger("tm-sendEmail-${paramsMap.taskId}" + System.currentTimeMillis(), GormUtil.convertInToGMT( "now", paramsMap.tzId ))
-        trigger.jobDataMap.putAll(["taskId":paramsMap.taskId, "tzId":paramsMap.tzId, "isNew":paramsMap.isNew])
-  
-        SendTaskEmailJob.schedule( trigger )
-        
-    }
 	
 }
