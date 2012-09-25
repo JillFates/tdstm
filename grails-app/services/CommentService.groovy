@@ -365,16 +365,12 @@ class CommentService {
      *  @return : create Trigger
      */
     def dispatchTaskEmail(Map params) {
-		// Trigger trigger = new SimpleTrigger("tm-sendEmail-${paramsMap.taskId}" + System.currentTimeMillis(), GormUtil.convertInToGMT( "now", paramsMap.tzId ))
 		Trigger trigger = new SimpleTrigger("tm-sendEmail-${params.taskId}" + System.currentTimeMillis(), null, new Date() )
-		// trigger.setStartTime(new Date() )
         trigger.jobDataMap.putAll( [ 'taskId':params.taskId, 'tzId':params.tzId, 'isNew':params.isNew])
 		trigger.setJobName('SendTaskEmailJob')
 		trigger.setJobGroup('tdstm')
   
-		// def jobDetail = new JobDetail("TDS-SendEmail", null, SendTaskEmailJob.class)
 		quartzScheduler.scheduleJob(trigger)
-		// SendTaskEmailJob.schedule( trigger )
 		log.info "dispatchTaskEmail ${params}"
         
     }

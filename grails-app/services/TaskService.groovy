@@ -20,6 +20,9 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 
+import org.quartz.SimpleTrigger
+import org.quartz.Trigger
+
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.SqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -33,6 +36,7 @@ class TaskService {
 	def dataSource
 	def namedParameterJdbcTemplate
 	def workflowService
+	def quartzScheduler
 	
 	static final List runbookCategories = [AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP]
 
@@ -63,8 +67,7 @@ class TaskService {
 		
 		def now = TimeUtil.nowGMT()
 		def minAgo = TimeUtil.adjustSeconds(now, -60)
-		
-		log.info "getUserTasks: now=${now}, minAgo=${minAgo}"
+		// log.info "getUserTasks: now=${now}, minAgo=${minAgo}"
 
 		// List of statuses that user should be able to see in when soft assigned to others and user has proper role
 		def statuses = [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED, AssetCommentStatus.COMPLETED, AssetCommentStatus.HOLD]
@@ -182,8 +185,8 @@ class TaskService {
 			sql.append( (sortAndOrder ? ', ' : '') + 'score DESC, task_number ASC' )
 		}
 		
-		log.info "getUserTasks: SQL: " + sql.toString()
-		log.info "getUserTasks: SQL params: " + sqlParams
+		//log.info "getUserTasks: SQL: " + sql.toString()
+		//log.info "getUserTasks: SQL params: " + sqlParams
 		// Get all tasks from the database and then filter out the TODOs based on a filtering
 		def allTasks = namedParameterJdbcTemplate.queryForList( sql.toString(), sqlParams )
 		// def allTasks = jdbcTemplate.queryForList( sql.toString(), sqlParams )
@@ -338,7 +341,9 @@ class TaskService {
 					break
 					
 				case AssetCommentStatus.DONE:
-					taskStatusChangeEvent(task)
+					if ( task.isDirty('status') && task.getPersistentValue('status') != status) {						
+						triggerUpdateTaskSuccessors(task.id)
+					}
 					task.assignedTo = assignee
 					task.resolvedBy = assignee
 					task.actFinish = now
@@ -355,23 +360,42 @@ class TaskService {
 	}
  	
 	/**
+	* Triggers the invocation of the UpdateTaskSuccessorsJob Quartz job for the specified task id
+	* @param taskId
+	* @return void
+	*/
+	def triggerUpdateTaskSuccessors(taskId) {
+		def whom = securityService.getUserLoginPerson()
+		long startTime = System.currentTimeMillis() + (1200L)
+		Trigger trigger = new SimpleTrigger("tm-updateTaskSuccessors-${taskId}" + System.currentTimeMillis(), null, new Date(startTime) )
+        trigger.jobDataMap.putAll( [ 'taskId':taskId, 'whomId':whom.id ] )
+		trigger.setJobName('UpdateTaskSuccessorsJob')
+		trigger.setJobGroup('tdstm')
+  
+		def result = quartzScheduler.scheduleJob(trigger)
+		log.info "triggerUpdateTaskSuccessors taskId=${taskId}, result=$result"		
+	}
+	
+	/**
 	 * This is invoked by the AssetComment.beforeUpdate method in order to handle any status changes
 	 * that may result in the updating of other tasks successor tasks.
 	 */
-	def taskStatusChangeEvent( task ) {
-		log.debug "taskStatusChangeEvent: processing task(${task.id}): ${task}"
-		def status = task.status
+	def updateTaskSuccessors( taskId, whomId ) {
 		
-		// Let's bail out if the status isn't dirty or the status isn't STARTED or DONE
-		if ( ! task.isDirty('status') ||
-			task.getPersistentValue('status') == status || 
-			! [AssetCommentStatus.STARTED, AssetCommentStatus.DONE].contains(status) ) {
+		def task = AssetComment.get(taskId)
+		if (! task) {
+			log.error "updateTaskSuccessors - unable to find taskId ${taskId}"
 			return
 		}
 		
-		// Okay so we want to handle the STARTED and DONE states and update accordingly.  We are going
-		// to assume that the validation logic prevented the user from changing the status if there were
-		// any incomplete predecessors.
+		def whom = Person.read(whomId)
+		if (! whom) {
+			log.error "updateTaskSuccessors - unable to find person ${whomId}"
+			return			
+		}
+		
+		log.info "updateTaskSuccessors: processing task(${task.id}): ${task}"
+		def status = task.status
 			
 		// TODO: taskStatusChangeEvent : Add logic to handle READY for the SS predecessor type and correct the current code to not assume SF type
 	
@@ -380,10 +404,10 @@ class TaskService {
 		//
 		if ( status ==  AssetCommentStatus.DONE ) {
 			def successorDependents = TaskDependency.findAllByPredecessor(task)
-			log.debug "taskStatusChangeEvent: Found ${successorDependents ? successorDependents.size() : '0'} successors for task ${task.id}"
+			log.debug "updateTaskSuccessors: Found ${successorDependents ? successorDependents.size() : '0'} successors for task ${task.id}"
 			successorDependents?.each() { succDepend ->
 				def dependentTask = succDepend.assetComment
-				log.debug "taskStatusChangeEvent: Processing dependentTask(${dependentTask.id}): ${dependentTask}"
+				log.debug "updateTaskSuccessors: Processing dependentTask(${dependentTask.id}): ${dependentTask}"
 				
 				// If the Task is in the Planned or Pending state, we can check to see if it makes sense to set to READY
 				if ([AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING].contains(dependentTask.status)) {
@@ -391,7 +415,7 @@ class TaskService {
 					// Find all predecessor/ tasks for the successor, other than the current task, and make sure they are completed
 					def predDependencies = TaskDependency.findByAssetCommentAndPredecessorNot(dependentTask, task)
 					def makeReady=true
-					log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) predecessors> ${predDependencies}"
+					log.info "updateTaskSuccessors: dependentTask(${dependentTask.id}) predecessors> ${predDependencies}"
 					predDependencies?.each() { predDependency ->
 						def predTask = predDependency.assetComment
 						// TODO : runbook : taskStatusChangeEvent - add the dependency type (SS,FS) logic here
@@ -416,11 +440,11 @@ class TaskService {
 						}
 						*/
 							
-						log.info "taskStatusChangeEvent: task=${task.id} dependentTask(${dependentTask.id}) setting to READY "
-						setTaskStatus(dependentTask, AssetCommentStatus.READY)
+						log.info "updateTaskSuccessors: task=${task.id} dependentTask(${dependentTask.id}) setting to READY "
+						setTaskStatus(dependentTask, AssetCommentStatus.READY, whom)
 						// log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) Making READY - Successful"
 						if ( ! dependentTask.validate() ) {
-							log.error "taskStatusChangeEvent: Failed Readying successor task [${dependentTask.id} " + GormUtil.allErrorsString(dependentTask)
+							log.error "updateTaskSuccessors: Failed Readying successor task [${dependentTask.id} " + GormUtil.allErrorsString(dependentTask)
 						}
 						
 						// log.info "taskStatusChangeEvent: task=${task.id} dependentTask(${dependentTask.id}) Made it by validate() "
@@ -436,7 +460,7 @@ class TaskService {
 						 * John 8/2012
 						 */
 						if ( dependentTask.save(flush:true) ) {
-							log.info "taskStatusChangeEvent: task=${task.id} dependentTask(${dependentTask.id}) Saved"
+							log.info "updateTaskSuccessors: task=${task.id} dependentTask(${dependentTask.id}) Saved"
 							return
 						} else {
 						//if (! (  dependentTask.validate() && dependentTask.save(flush:true) ) ) {
@@ -447,7 +471,7 @@ class TaskService {
 						}
 					}
 				} else {
-					log.warn "taskStatusChangeEvent: task=${task.id}, Found dependentTask(${dependentTask.id}): ${dependentTask} at unexpected status (${dependentTask.status}"
+					log.warn "updateTaskSuccessors: taskId=${task.id}, Found dependentTask(${dependentTask.id}): ${dependentTask} at unexpected status (${dependentTask.status}"
 				} 
 			} // succDependencies?.each()
 		}
