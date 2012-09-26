@@ -12,6 +12,7 @@ import com.tdssrc.grails.GormUtil
 class AssetEntityService {
 
     static transactional = true
+	def jdbcTemplate
 	
 	def createOrUpdateAssetEntityDependencies(def params, def assetEntityInstance) {
 		
@@ -325,6 +326,92 @@ class AssetEntityService {
 			}
 		}
 	}
-	
-	
+	/**
+	 * @param project
+	 * @return list of entities 
+	 */
+	def getSpecialExportData( project ){
+		String queryForSpecialExport = """ ( SELECT
+											   server.asset_entity_id AS server_id,
+											   IFNULL(app.asset_entity_id,'') AS app_id,
+											   server.asset_name AS server_name,
+											   server.asset_type AS server_type,
+											   IFNULL(app.asset_name,'') AS app_name,
+											   IFNULL(sme,'') AS tru, IFNULL(sme2,'') AS tru2,
+											   IFNULL(mb.name,'') AS move_bundle,
+											   IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
+											   IFNULL(adb.dependency_bundle,'') AS group_id,
+											   IFNULL(server.custom4,'') AS storage_inventory,
+											   IFNULL(application.business_unit,'') AS dr_tier,
+											   IFNULL(server.new_or_old,'') AS status
+											FROM asset_entity server
+											JOIN asset_dependency srvappdep ON server.asset_entity_id = srvappdep.dependent_id
+											JOIN asset_entity app ON app.asset_entity_id = srvappdep.asset_id AND app.asset_type = 'Application'
+											LEFT OUTER JOIN application ON application.app_id = app.asset_entity_id
+											LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=server.move_bundle_id
+											LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id = server.asset_entity_id
+											WHERE
+											   server.project_id=${project.id}
+											   AND server.asset_type IN ('Server','VM', 'Load Balancer','Network', 'Storage')
+											   ORDER BY app_name, server_name
+											)
+											UNION DISTINCT
+											
+											 ( SELECT
+											   dbsrv.asset_entity_id AS server_id,
+											   IFNULL(app.asset_entity_id,'') AS app_id,
+											   dbsrv.asset_name AS server_name,
+											   dbsrv.asset_type server_type,
+											   IFNULL(app.asset_name,'') AS app_name,
+											   IFNULL(sme,'') AS tru, IFNULL(sme2,'') AS tru2,
+											   IFNULL(mb.name,'') AS move_bundle,
+											   IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
+											   IFNULL(adb.dependency_bundle,'') AS group_id,
+											   IFNULL(dbsrv.custom4,'') AS storage_inventory,
+											   IFNULL(applic.business_unit,'') AS dr_tier,
+											   IFNULL(dbsrv.new_or_old,'') AS status
+											FROM asset_entity app
+											JOIN application applic ON applic.app_id=app.asset_entity_id
+											JOIN asset_dependency appdbdep ON appdbdep.asset_id = app.asset_entity_id #AND appdbdep.type='DB'
+											JOIN asset_entity db ON db.asset_entity_id = appdbdep.dependent_id AND db.asset_type = 'Database'
+											JOIN asset_dependency dbsrvdep ON dbsrvdep.asset_id = db.asset_entity_id
+											JOIN asset_entity dbsrv ON dbsrv.asset_entity_id = dbsrvdep.dependent_id AND dbsrv.asset_type IN ('Server','VM')
+											LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=dbsrv.move_bundle_id
+											LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id = dbsrv.asset_entity_id
+											WHERE
+											   app.project_id=${project.id}
+											   AND app.asset_type = 'Application'
+											)
+											UNION DISTINCT
+											( SELECT
+											   clustersrv.asset_entity_id AS server_id,
+											   IFNULL(app.asset_entity_id,'') AS app_id,
+											   clustersrv.asset_name AS server_name,
+											   clustersrv.asset_type server_type,
+											   IFNULL(app.asset_name,'') AS app_name,
+											   IFNULL(sme,'') AS tru, IFNULL(sme2,'') AS tru2,
+											   IFNULL(mb.name,'') AS move_bundle,
+											   IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
+											   IFNULL(adb.dependency_bundle,'') AS group_id,
+											   IFNULL(clustersrv.custom4,'') AS storage_inventory,
+											   IFNULL(applic.business_unit,'') AS dr_tier,
+											   IFNULL(clustersrv.new_or_old,'') AS status
+											 FROM asset_entity app
+											JOIN application applic ON applic.app_id=app.asset_entity_id
+											JOIN asset_dependency appdbdep ON appdbdep.asset_id = app.asset_entity_id # AND appdbdep.type='DB'
+											JOIN asset_entity db ON db.asset_entity_id = appdbdep.dependent_id AND db.asset_type = 'Database'
+											JOIN asset_dependency dbclusterdep ON dbclusterdep.asset_id = db.asset_entity_id
+											JOIN asset_entity dbcluster ON dbcluster.asset_entity_id = dbclusterdep.dependent_id AND dbcluster.asset_type = 'Database'
+											JOIN asset_dependency clustersrvdep ON clustersrvdep.asset_id = dbcluster.asset_entity_id
+											JOIN asset_entity clustersrv ON clustersrv.asset_entity_id = clustersrvdep.dependent_id AND clustersrv.asset_type in ('Server','VM')
+											LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=clustersrv.move_bundle_id
+											LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id = clustersrv.asset_entity_id
+											WHERE
+											   app.project_id=${project.id}
+											   AND app.asset_type = 'Application' )"""
+		 
+	  def splList =   jdbcTemplate.queryForList( queryForSpecialExport )
+											
+      return splList
+	}
 }

@@ -40,6 +40,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import groovy.time.TimeCategory
+import com.tdssrc.grails.ExportUtil
 
 class AssetEntityController {
 
@@ -3152,10 +3153,19 @@ class AssetEntityController {
 			// log.info "_listCommentsOrTasks:about to render : ${TimeCategory.minus(new Date(), start)}"
 			// TODO : clean-up : the rediectTo param is spelled wrong and should be redirectTo
 			def timeToRefresh = getSession()?.getAttribute("MY_TASK")?.MY_TASK
+			def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =${project.id} order by assetName asc")
+			def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
+			def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
+			def files = Files.findAll('from Files where assetType = ? and project =? order by assetName asc',['Files', project])
+			
+			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+			
 			def model = [ assetCommentList:assetCommentList, rediectTo:'comment', 
 				justRemaining:justRemaining, justMyTasks:justMyTasks, 
 				moveEvents:moveEvents, filterEvent:filterEvent,staffRoles:taskService.getRolesForStaff(),
-			    timeToUpdate : timeToRefresh ?: 60 ]
+			    timeToUpdate : timeToRefresh ?: 60,servers:servers, applications:applications, dbs:dbs,
+				files:files, dependencyType:dependencyType, dependencyStatus:dependencyStatus, assetDependency: new AssetDependency()]
 	      	render (view:view ,model:model )
 		}
 	}
@@ -3718,5 +3728,38 @@ class AssetEntityController {
 			selectCategory = ""
 		}
 		render predEditTable
+	}
+	/**
+	 * Export Special Report 
+	 * @param NA
+	 * @return : Export data in WH project format
+	 * 
+	 */
+	def exportSpecialReport = {
+		def project = securityService.getUserCurrentProject()
+		def projectId = project.id
+		def formatter = new SimpleDateFormat("yyyy/MM/dd")
+		def today = formatter.format(new Date())
+		try{
+			def filePath = "/templates/TDS-StorageInventory.xls"
+			def filename = "${project.name}-StorageInventory-${today}"
+			def book = ExportUtil.workBookInstance(filename, filePath, response) 
+			def spcExpSheet = book.getSheet("StorageInventory")
+			def storageInventoryList = assetEntityService.getSpecialExportData( project )
+			def spcColumnList = ["server_name", "server_type", "app_name", "tru", "tru2", "move_bundle", "move_date",
+									"group_id", "storage_inventory", "dr_tier", "status" ]
+			
+			for ( int r = 0; r < storageInventoryList.size(); r++ ) {
+				 for( int c = 0; c < spcColumnList.size(); c++){
+					spcExpSheet.addCell( new Label( c, r+1, String.valueOf( storageInventoryList[r][spcColumnList[c]] )) )
+				 }
+			}
+			book.write()
+			book.close()
+		}catch( Exception ex ){
+			log.error "Exception occurred while exporting data"+ex.printStackTrace()
+			return
+		}
+	 return
 	}
 }

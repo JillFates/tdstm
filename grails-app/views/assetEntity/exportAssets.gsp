@@ -37,7 +37,12 @@
               </tr>                           
               <tr>
               <tds:hasPermission permission="EditAndDelete ">
-                <td class="buttonR" colspan="5"><input class="button" type="submit" value="Generate"/></td>
+                <td class="buttonR">
+                	<input class="button" type="submit" value="Generate"/> 
+                	<g:link controller="assetEntity" action="exportSpecialReport">
+                		<input class="button" type="button" value="Export Special Report"/>
+                	</g:link>
+                </td>
               </tds:hasPermission>
               </tr>
               <tr><td colspan="2">
