@@ -695,6 +695,7 @@
 	    	var newPasswordConfirm = $("#newPasswordConfirmId").val()
 	        var email = $("#emailId").val()
 	        var expiryDate = $("#expiryDateId").val()
+	        var powerType = $("#powerTypeId").val()
 	        
 	        if(expiryDate + "" == "undefined"){
 	        	expiryDate = "null"
@@ -731,7 +732,7 @@
 	        }
 	        if(returnVal){
 				${remoteFunction(controller:'person', action:'checkPassword', 
-						params:'\'id=\' + $(\'#personId\').val() +\'&firstName=\'+$(\'#firstNameId\').val() +\'&lastName=\'+$(\'#lastNameId\').val()+\'&nickName=\'+$(\'#nickNameId\').val()+\'&title=\'+$(\'#titleId\').val()+\'&oldPassword=\'+$(\'#oldPasswordId\').val()+\'&newPassword=\'+$(\'#newPasswordId\').val()+\'&newPasswordConfirm=\'+$(\'#newPasswordConfirmId\').val()+\'&timeZone=\'+$(\'#timeZoneId\').val()+\'&email=\'+$(\'#emailId\').val()+\'&expiryDate=\'+expiryDate', 
+						params:'\'id=\' + $(\'#personId\').val() +\'&firstName=\'+$(\'#firstNameId\').val() +\'&lastName=\'+$(\'#lastNameId\').val()+\'&nickName=\'+$(\'#nickNameId\').val()+\'&title=\'+$(\'#titleId\').val()+\'&oldPassword=\'+$(\'#oldPasswordId\').val()+\'&newPassword=\'+$(\'#newPasswordId\').val()+\'&newPasswordConfirm=\'+$(\'#newPasswordConfirmId\').val()+\'&timeZone=\'+$(\'#timeZoneId\').val()+\'&email=\'+$(\'#emailId\').val()+\'&expiryDate=\'+expiryDate+\'&powerType=\'+powerType', 
 						onComplete:'updateWelcome(e)')}
 	        }
 		}

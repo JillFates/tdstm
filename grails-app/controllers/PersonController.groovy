@@ -426,6 +426,6 @@ class PersonController {
 			 preferenceInstance.delete(flush:true)
 		}
 		userPreferenceService.setPreference("START_PAGE", "Current Dashboard" )
-		return person
+		render person
 	}
 }
