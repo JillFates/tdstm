@@ -342,7 +342,7 @@ class TaskService {
 					
 				case AssetCommentStatus.DONE:
 					if ( task.isDirty('status') && task.getPersistentValue('status') != status) {						
-						triggerUpdateTaskSuccessors(task.id)
+						triggerUpdateTaskSuccessors(task.id, status)
 					}
 					task.assignedTo = assignee
 					task.resolvedBy = assignee
@@ -364,11 +364,11 @@ class TaskService {
 	* @param taskId
 	* @return void
 	*/
-	def triggerUpdateTaskSuccessors(taskId) {
+	def triggerUpdateTaskSuccessors(taskId, status) {
 		def whom = securityService.getUserLoginPerson()
 		long startTime = System.currentTimeMillis() + (1200L)
 		Trigger trigger = new SimpleTrigger("tm-updateTaskSuccessors-${taskId}" + System.currentTimeMillis(), null, new Date(startTime) )
-        trigger.jobDataMap.putAll( [ 'taskId':taskId, 'whomId':whom.id ] )
+        trigger.jobDataMap.putAll( [ 'taskId':taskId, 'whomId':whom.id, 'status':status ] )
 		trigger.setJobName('UpdateTaskSuccessorsJob')
 		trigger.setJobGroup('tdstm')
   
@@ -380,11 +380,27 @@ class TaskService {
 	 * This is invoked by the AssetComment.beforeUpdate method in order to handle any status changes
 	 * that may result in the updating of other tasks successor tasks.
 	 */
-	def updateTaskSuccessors( taskId, whomId ) {
+	def updateTaskSuccessors( taskId, whomId, status ) {
 		
-		def task = AssetComment.get(taskId)
-		if (! task) {
-			log.error "updateTaskSuccessors - unable to find taskId ${taskId}"
+		def task 
+		
+		// This tasks will run parallel with the thread updating the current task to the state passed to this method. Therefore
+		// we need to make sure that the task has been updated.  We'll try for 60 seconds before giving up.
+		def cnt = 6
+		while (cnt-- > 0) {
+			task = AssetComment.get(taskId)
+			if (! task) {
+				log.error "updateTaskSuccessors - unable to find taskId ${taskId}"
+				return
+			}
+			if (task.status == status) {
+				break
+			} else {
+				this.sleep(1000)
+			}			
+		}
+		if (task.status != status) {
+			log.error "updateTaskSuccessors - task status (${task.status}) not as expected '${status}'"
 			return
 		}
 		
@@ -395,7 +411,7 @@ class TaskService {
 		}
 		
 		log.info "updateTaskSuccessors: processing task(${task.id}): ${task}"
-		def status = task.status
+	//	def currStatus = task.status
 			
 		// TODO: taskStatusChangeEvent : Add logic to handle READY for the SS predecessor type and correct the current code to not assume SF type
 	

@@ -314,13 +314,13 @@
 				<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#bundleMegaMenu')" href="javascript:showMegaMenu('#bundleMegaMenu')" style="display: inline"></a></g:link>
 			</li>
 
-			<li id="teamMenuId" style="position:relative; float:left;"><a class="home" onmouseover="showMegaMenu('#teamMegaMenu')" href="/tdstm/clientTeams/listComment" >Tasks</a>
+			<li id="teamMenuId" style="position:relative; float:left;"><a class="home" onmouseover="showMegaMenu('#teamMegaMenu')" href="/tdstm/clientTeams/listTasks" >Tasks</a>
 				<a id="teamMenuAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#teamMegaMenu')" href="javascript:showMegaMenu('#teamMegaMenu')" style="display: inline"></a>
 				<div class="megamenu rooms" id="teamMegaMenu" onmouseover="showMegaMenu('#teamMegaMenu')" onmouseout="mclosetime()" style="display: none;">
 					<table class="mmtable"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Tasks</span><br />
 						<ul>
-							<li><a class="mmlink" id="MyTasksMenuId" href="/tdstm/clientTeams/listComment" onclick="hideMegaMenu('teamMegaMenu')">My Tasks</a></li>
+							<li><a class="mmlink" id="MyTasksMenuId" href="/tdstm/clientTeams/listTasks" onclick="hideMegaMenu('teamMegaMenu')">My Tasks</a></li>
 							<tds:hasPermission permission='ShowMoveTechsAndAdmins'>
 							<li><a class="mmlink" href="/tdstm/clientTeams/list" onclick="hideMegaMenu('teamMegaMenu')">Team Tasks</a></li>
 							<li><g:link class="mmlink" controller="assetEntity" action="listTasks"  params="[tag_s_12_score:'desc']" onclick="hideMegaMenu('assetMegaMenu')">Task Manager</g:link></li>

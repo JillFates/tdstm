@@ -136,9 +136,9 @@ class CommentService {
 						def whoDidIt = (assetComment.status == AssetCommentStatus.DONE) ? assetComment.resolvedBy : assetComment.assignedTo
 						switch (assetComment.status) {
 							case AssetCommentStatus.STARTED:
-								errorMsg = "The task was STARTED by ${whoDidIt}"; break
+								errorMsg = "The task was previously STARTED by ${whoDidIt}"; break
 							case AssetCommentStatus.DONE:
-								errorMsg = "The task was COMPLETED by ${whoDidIt}"; break
+								errorMsg = "The task was previously COMPLETED by ${whoDidIt}"; break
 							default:
 								errorMsg = "The task status was changed to '${assetComment.status}'"
 						}

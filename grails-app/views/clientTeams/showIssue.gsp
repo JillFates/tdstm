@@ -3,11 +3,11 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>Task Details</title>
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
+	<link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 </head>
 <body>
 	<a name="top"></a>
@@ -18,7 +18,7 @@
 				<div style="color: red; font-size:15px"><ul>${flash.message}</ul></div>
 			</g:if> 
 		</div>
-	<g:form name="issueUpdateForm" controller="assetEntity" action="updateComment">
+	<g:form name="issueUpdateForm" controller="task" action="update">
 		<a name="comments"></a>
 		<input id="issueId" name="id" type="hidden" value="${assetComment.id}" />
 		<input id="redirectTo" name="redirectTo" type="hidden" value="taskList" />
@@ -268,7 +268,7 @@ $( function() {
 						 'note':$('#noteEditId_'+objId).val(),'id':objId,'view':'myTask', 'tab': $('#tabId').val()
 						}
 		 jQuery.ajax({
-				url: '../assetEntity/updateComment',
+				url: '../task/update',
 				data: params,
 				type:'POST',
 				success: function(data) {

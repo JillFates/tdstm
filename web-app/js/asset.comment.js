@@ -11,9 +11,14 @@ var taskManagerTimePref = "60"
  */
 function changeStatus(id, status, currentStatus, from){
 	var params = {'id':id,'status':status,'currentStatus':currentStatus,redirectTo:'taskManager'}
+
+	// Disable status change buttons to prevent double-clicking
+	$('#started_button_'+id).removeAttr('onclick')
+	$('#done_button_'+id).removeAttr('onclick')
+
 	if(from == "myTask"){ params = {'id':id,'status':status,'currentStatus':currentStatus,redirectTo:'taskManager','view':'myTask','tab':$('#tabId').val() }}
 	jQuery.ajax({
-		url: '../assetEntity/updateComment',
+		url: '../task/update',
 		data: params,
 		type:'POST',
 		success: function(data) {

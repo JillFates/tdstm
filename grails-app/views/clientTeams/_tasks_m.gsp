@@ -9,18 +9,18 @@
 	<ul>
 		<g:if test="${tab && tab == 'todo'}">
 			<li><g:link elementId="taskLinkId" class="mobmenu mobselect"
-					action="listComment" params='["tab":"todo","search":search]'>My Tasks: ${todoSize}
+					action="listTasks" params='["tab":"todo","search":search]'>My Tasks: ${todoSize}
 				</g:link></li>
 			<li><g:link elementId="taskLinkAllId" class="mobmenu" 
-					action="listComment" params='["tab":"all","search":search]'>All Tasks: ${allSize}
+					action="listTasks" params='["tab":"all","search":search]'>All Tasks: ${allSize}
 				</g:link></li>
 		</g:if>
 		<g:if test="${tab && tab == 'all'}">
 			<li><g:link elementId="taskLinkId" class="mobmenu"
-					action="listComment" params='["tab":"todo","search":search]'>My Tasks: ${todoSize}
+					action="listTasks" params='["tab":"todo","search":search]'>My Tasks: ${todoSize}
 				</g:link></li>
 			<li><g:link elementId="taskLinkAllId" class="mobmenu mobselect"
-					action="listComment" params='["tab":"all","search":search]'>All Tasks: ${allSize}
+					action="listTasks" params='["tab":"all","search":search]'>All Tasks: ${allSize}
 				</g:link></li>
 		</g:if>
 		<li>
@@ -60,13 +60,13 @@
 		<table id="issueTable" cellspacing="0px" style="width: 320px;">
 			<thead>
 				<tr>
-					<g:sortableColumn class="sort_column" style="width:140px;"  action="listComment" property="number_comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:100px;" action="listComment" property="assetName" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:80px;" action="listComment" property="status" title="Status" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:140px;"  action="listTasks" property="number_comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:100px;" action="listTasks" property="assetName" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:80px;" action="listTasks" property="status" title="Status" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
 				</tr>
 			</thead>
 			<tbody>
-				<g:each status="i" in="${listComment}" var="issue">
+				<g:each status="i" in="${taskList}" var="issue">
 					<g:if test="${tab && tab == 'todo'}">
 						<tr id="issueTrId_${issue?.item?.id}" class="${issue.css}"
 							style="cursor: pointer;"
@@ -93,18 +93,20 @@
 					<g:if test="${tab && tab == 'todo'}">
 					<tr id="showStatusId_${issue?.item?.id}" style="display: none;">
 						<td nowrap="nowrap" colspan="3" class="statusButtonBar">
-							<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action" style="margin-left: 5px"
-								id="started_${issue?.item?.id}" 
+							<a id="started_button_${issue?.item?.id}" 
+								class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action" style="margin-left: 5px"
 								onclick="changeStatus('${issue?.item?.id}','${com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED}','${issue.item.status}')">
 								<span class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
 								<span class="ui-button-text task_button">Start</span>
 							</a>
-							<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
+							<a id="done_button_${issue?.item?.id}"
+								class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
 								onclick="changeStatus('${issue?.item?.id}','Completed','${userId}')" style="margin-left: 5px">
 								<span class="ui-button-icon-primary ui-icon ui-icon-check task_icon"></span>
 								<span class="ui-button-text task_button">Done</span>
 							</a>
-							<a class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action" style="margin-left: 5px" 
+							<a id="detail_button_${issue?.item?.id}"
+								class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action" style="margin-left: 5px" 
 								onclick="issueDetails(${issue?.item?.id},'${issue?.item?.status}')">
 								<span class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
 								<span class="ui-button-text task_button">Details..</span>

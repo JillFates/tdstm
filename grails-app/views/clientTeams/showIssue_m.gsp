@@ -25,7 +25,7 @@
 				<div class="message"><ul>${flash.message}</ul></div>
 			</g:if> 
 		</div>
-	<g:form name="issueUpdateForm" controller="assetEntity" action="updateComment">
+	<g:form name="issueUpdateForm" controller="task" action="update">
 		<a name="comments"></a>
 		<input id="issueId" name="id" type="hidden" value="${assetComment.id}" />
 		<input id="redirectTo" name="redirectTo" type="hidden" value="taskList" />
@@ -295,7 +295,7 @@
 						 'dueDate':$('#dueDateEdit_'+objId).val(), 'status':$('#statusEditId_'+objId).val(),
 						 'note':$('#noteEditId_'+objId).val(),'id':objId,'view':'myTask', 'tab': tab }
 		 jQuery.ajax({
-				url: '../assetEntity/updateComment',
+				url: '../task/update',
 				data: params,
 				type:'POST',
 				success: function(data) {

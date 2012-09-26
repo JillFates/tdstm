@@ -3,12 +3,12 @@
 <head>
 	<title>My Tasks</title>
 	<jq:plugin name="jquery"/>
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
-<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.core.css')}" />
+<link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <script type="text/javascript" src="${resource(dir:'js' ,file:'ui.datepicker.js') }" />
 <meta name="viewport" content="height=device-height,width=320" />
 	
@@ -45,7 +45,7 @@
 	     <div id="myTaskListMobile">
 		 	<g:render template="tasks_m"/>
 		 </div>
-		<g:link class="mobfooter" action="listComment" params="[viewMode:'web']">Use Full Site</g:link>
+		<g:link class="mobfooter" action="listTasks" params="[viewMode:'web', tab:tab]">Use Full Site</g:link>
 	</div>
   </div>
 <script type="text/javascript">
@@ -81,8 +81,12 @@
 		$('#issueTr_'+id).attr('onClick','issueDetails('+id+')');
 	}
 	function changeStatus(id,status,user){
+		// Disable status change buttons to prevent double-clicking
+		$('#started_button_'+id).removeAttr('onclick');
+		$('#done_button_'+id).removeAttr('onclick');
+		
 		jQuery.ajax({
-			url: '../assetEntity/updateComment',
+			url: '../task/update',
 			data: {'id':id,'status':status,'assignedTo':user,'view':'myTask','tab':$('#tab_m').val()},
 			type:'POST',
 			success: function(data) {
@@ -95,6 +99,7 @@
 				 B1.Start(60);
 			}
 		});
+		
 	}
 
 	function openStatus(id,status){
@@ -114,14 +119,14 @@
 	}
 	
 	function changeAction(){
-		 document.issueAssetForm.action = 'listComment'
+		 document.issueAssetForm.action = 'listTasks'
 	}
 
 	function retainAction(){
 		 document.issueAssetForm.action = 'showIssue'
 	}
 	function pageRefresh(){
-		document.issueAssetForm.action = 'listComment'
+		document.issueAssetForm.action = 'listTasks'
 		document.issueAssetForm.submit()
 	}
 	

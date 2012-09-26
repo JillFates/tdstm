@@ -4,8 +4,8 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="projectHeader" />
 	<title>My Tasks</title>
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
+	<link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	<g:javascript src="asset.comment.js" />
 </head>
 <body>
@@ -13,21 +13,21 @@
 			<ul>
 					<g:if test="${tab && tab == 'todo'}">
 						<li><g:link elementId="taskLinkId" class="mobmenu mobselect"
-								action="listComment" params='["tab":"todo","search":search]'>My Tasks: <span id="toDOSpanId">${todoSize}</span>
+								action="listTasks" params='["tab":"todo","search":search]'>My Tasks: <span id="toDOSpanId">${todoSize}</span>
 							</g:link>
 						</li>
 						<li><g:link elementId="taskLinkAllId" class="mobmenu"
-								action="listComment" params='["tab":"all","search":search]'>All Tasks: <span id="toDOAllSpanId">${allSize}</span>
+								action="listTasks" params='["tab":"all","search":search]'>All Tasks: <span id="toDOAllSpanId">${allSize}</span>
 							</g:link>
 						</li>
 					</g:if>
 					<g:if test="${tab && tab == 'all'}">
 						<li><g:link elementId="taskLinkId" class="mobmenu"
-								action="listComment" params='["tab":"todo","search":search]'>My Tasks: <span id="allToDoSpanId">${todoSize}</span>
+								action="listTasks" params='["tab":"todo","search":search]'>My Tasks: <span id="allToDoSpanId">${todoSize}</span>
 							</g:link>
 						</li>
 						<li><g:link elementId="taskLinkAllId" class="mobmenu mobselect"
-								action="listComment" params='["tab":"all","search":search]'>All Tasks: <span id="allSpanId">${allSize}</span>
+								action="listTasks" params='["tab":"all","search":search]'>All Tasks: <span id="allSpanId">${allSize}</span>
 							</g:link>
 						</li>
 					</g:if>
@@ -70,7 +70,7 @@
 	    <br />
 	    <input type="hidden" id="timeBarValueId" value="0"/>
 		<div>
-			<g:link class="mobfooter" action="listComment" params="[viewMode:'mobile']">Use Mobile Site</g:link>
+			<g:link class="mobfooter" action="listTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link>
 		</div>
 <%--
 /*
@@ -257,14 +257,14 @@
 
  
 function changeAction(){
-	 document.issueAssetForm.action = 'listComment'
+	 document.issueAssetForm.action = 'listTasks'
 }
 
 function retainAction(){
 	 document.issueAssetForm.action = 'showIssue'
 }
 function pageRefresh(){
-	document.issueAssetForm.action = 'listComment'
+	document.issueAssetForm.action = 'listTasks'
 	document.issueAssetForm.submit()
 }
 

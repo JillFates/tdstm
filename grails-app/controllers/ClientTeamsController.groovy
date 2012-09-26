@@ -966,8 +966,15 @@ class ClientTeamsController {
 	 * params:
 	 *		tab - all or todo 
 	 */
-	def listComment={
-
+	def listTasks = {
+		// If the request is being made as a redirect for a previous task update that was being completed, we need to sleep a moment
+		// to allow the Quartz job that updates successors to finish so that when the user sees the new results that it may have successors
+		// there were updated by the previous update.
+		if (params.containsKey('sync')) {
+			log.info "update - sync'd for 1k ms"
+			this.sleep(1500)
+		}
+		
 		def project = securityService.getUserCurrentProject()
 		//log.error "PROJECT: ${project}"
 		def person = securityService.getUserLoginPerson()
@@ -976,7 +983,7 @@ class ClientTeamsController {
 
 		// Parameters 		
 		def tab
-		def listComment
+		def taskList
 		def todo
 		def all
 		
@@ -998,25 +1005,25 @@ class ClientTeamsController {
 		def todoSize = tasks['todo'].size()
 		def allSize = tasks['all'].size()
 
-		// Based on which tab the user is viewing we'll set listComment to the appropriate list to be returned to the user
+		// Based on which tab the user is viewing we'll set taskList to the appropriate list to be returned to the user
 		if (params.tab=='all') {
 			tab = 'all'
-			listComment = tasks['all']
+			taskList = tasks['all']
 			allTasks = true
 		} else {
 			tab = 'todo'
-			listComment = tasks['todo']
+			taskList = tasks['todo']
 		}
 		
 		// Build the list and associate the proper CSS style
 		def issueList = []
-		listComment.each{ task ->
+		taskList.each{ task ->
 			def css = taskService.getCssClassForStatus( task.status )
 			issueList << ['item':task,'css':css]
 		}
 		def timeToRefresh = getSession()?.getAttribute("MY_TASK")?.MY_TASK
 		// Determine the model and view
-		def model = [listComment:issueList, tab:tab, todoSize:todoSize, allSize:allSize, search:search, sort:params.sort, order:params.order,
+		def model = [taskList:issueList, tab:tab, todoSize:todoSize, allSize:allSize, search:search, sort:params.sort, order:params.order,
 			      	 personId : person.id, timeToUpdate:timeToRefresh ?: 60]
 		def view = params.view == "myTask" ? "_tasks" : "myIssues"
 		if ( session.getAttribute('TASK_VIEW_MODE') == 'mobile') {

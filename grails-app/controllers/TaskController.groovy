@@ -7,8 +7,48 @@ import com.tdssrc.grails.HtmlUtil
 class TaskController {
 	
 	def securityService
+	def commentService
 
     def index = { }
+	
+	/**
+	* Used by the myTasks and Task Manager to update tasks appropriately.
+	*/
+	def update = {
+		def map = commentService.saveUpdateCommentAndNotes(session, params, false, flash)
+
+		if (params.view == 'myTask') {		
+			if (map.error) {
+				flash.message = map.error
+			}
+		
+			def redirParams = [view:params.view]
+			if (params.containsKey('tab') && params.tab) {
+				redirParams << [tab:params.tab]
+			}
+			if (params.containsKey('sort') && params.sort) {
+				redirParams << [sort:params.sort]
+			}
+			if (params.status == AssetCommentStatus.DONE) {
+				redirParams << [sync:1]
+			}
+				redirect(controller:'clientTeams', action:'listTasks', params:redirParams)			
+		} else {
+			// Coming from the Task Manager
+			render map as JSON
+		}
+	}
+	
+	/*
+	id:8667
+	status:Completed
+	currentStatus:Ready
+	redirectTo:taskManager
+	view:myTask
+	tab:all
+	*/
+
+	
 	
 	/**
 	 * Used to assign assignTo through ajax call from MyTasks

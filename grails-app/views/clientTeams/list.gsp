@@ -25,7 +25,7 @@
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>
-	<span style="font: bold 13px arial; float:left; margin-top: 10px;">Select <button type="button"   class="${cssTodo}" onclick="window.location.href='/tdstm/clientTeams/listComment?viewMode=web'">Your Task(${todo})</button> or a Team to use:</span>
+	<span style="font: bold 13px arial; float:left; margin-top: 10px;">Select <button type="button"   class="${cssTodo}" onclick="window.location.href='/tdstm/clientTeams/listTasks?viewMode=web'">Your Task(${todo})</button> or a Team to use:</span>
 
 	<div class='list'>
 	<table>

@@ -28,16 +28,16 @@
 			style="width: 100%; margin-left: -1px;">
 			<thead>
 				<tr>
-					<g:sortableColumn class="sort_column" style="" action="listComment" property="number_comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="" action="listComment" property="assetName" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="" action="listComment" property="lastUpdated" title="Updated" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="" action="listComment" property="estFinish" title="Due/Est Finish" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="" action="listComment" property="status" title="Status" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="" action="listComment" property="assignedTo" title="Assigned To" params="['tab':tab,'search':search]" ></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="" action="listTasks" property="number_comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="" action="listTasks" property="assetName" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="" action="listTasks" property="lastUpdated" title="Updated" params="['tab':tab,'search':search]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="" action="listTasks" property="estFinish" title="Due/Est Finish" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="" action="listTasks" property="status" title="Status" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="" action="listTasks" property="assignedTo" title="Assigned To" params="['tab':tab,'search':search]" ></g:sortableColumn>
 				</tr>
 			</thead>
 			<tbody>
-				<g:each status="i" in="${listComment}" var="issue">
+				<g:each status="i" in="${taskList}" var="issue">
 					<tr id="issueTrId_${issue?.item?.id}" class="${issue.css}"
 						style="cursor: pointer;"
 						onclick="openStatus(${issue?.item?.id},'${issue?.item?.status}')">
@@ -66,30 +66,30 @@
 					<tr id="showStatusId_${issue?.item?.id}" style="display: none;">
 						<td nowrap="nowrap" colspan="6" class="statusButtonBar">
 							<g:if test="${issue.item.status == AssetCommentStatus.READY}"> 
-							<a
+							<a id="started_button_${issue?.item?.id}"
 							class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
-							id="started_${issue?.item?.id}"
 							onclick="changeStatus('${issue?.item?.id}','${AssetCommentStatus.STARTED}','${issue.item.status}', 'myTask')">
 								<span class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
 								<span class="ui-button-text task_button">Start</span>
 							</a> 
 							</g:if>
 							<g:if test="${ [AssetCommentStatus.READY, AssetCommentStatus.STARTED].contains(issue.item.status) }"> 
-							<a
-							class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
-							onclick="changeStatus('${issue?.item?.id}','${com.tdsops.tm.enums.domain.AssetCommentStatus.DONE}', '${issue.item.status}', 'myTask')">
+							<a id="done_button_${issue?.item?.id}"
+								class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
+								onclick="changeStatus('${issue?.item?.id}','${AssetCommentStatus.DONE}', '${issue.item.status}', 'myTask')">
 								<span class="ui-button-icon-primary ui-icon ui-icon-check task_icon"></span>
 								<span class="ui-button-text task_button">Done</span>
 							</a>
 							</g:if>
-							<a
-							class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
-							onclick="issueDetails(${issue?.item?.id},'${issue?.item?.status}')">
+							<a id="details_button_${issue?.item?.id}"
+								class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
+								onclick="issueDetails(${issue?.item?.id},'${issue?.item?.status}')">
 								<span class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
 								<span class="ui-button-text task_button">Details..</span>
 							</a>
 							<g:if test="${ personId != issue.item.assignedTo && issue.item.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]}">
-								<a id="assignToMeId_${issue?.item?.id}" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
+								<a id="assignToMeId_button_${issue?.item?.id}" 
+									class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
 									onclick="assignTask('${issue?.item?.id}','${issue.item.assignedTo}', '${issue.item.status}','myTask')">
 									<span class="ui-button-icon-primary ui-icon ui-icon-check task_icon"></span>
 									<span class="ui-button-text task_button">Assign To Me</span>
