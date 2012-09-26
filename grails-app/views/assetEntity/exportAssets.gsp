@@ -8,7 +8,9 @@
   <body>
  <div class="body">
    <h1>Asset Export</h1>
-
+	  <g:if test="${flash.message}">
+        <div class="message">${flash.message}</div>
+      </g:if>
       <g:form action="export" method="post" name="exportForm">
         <input type="hidden" value="${projectId}" name="projectIdExport" />
         <div class="dialog">
@@ -35,16 +37,6 @@
                     </g:each>
                 </select></td>
               </tr>                           
-              <tr>
-              <tds:hasPermission permission="EditAndDelete ">
-                <td class="buttonR">
-                	<input class="button" type="submit" value="Generate"/> 
-                	<g:link controller="assetEntity" action="exportSpecialReport">
-                		<input class="button" type="button" value="Export Special Report"/>
-                	</g:link>
-                </td>
-              </tds:hasPermission>
-              </tr>
               <tr><td colspan="2">
 	                <span><input type="checkbox" id="assetId" name="asset" value="asset" checked="checked"/>&nbsp;<label for="assetId">Asset</label></span>&nbsp;
 	                <span><input type="checkbox" id="applicationId" name="application" value="application"/>&nbsp;<label for="applicationId">Application</label></span>&nbsp;
@@ -53,6 +45,16 @@
 	                <span><input type="checkbox" id="dependencyId" name="dependency" value="dependency" />&nbsp;<label for="dependencyId">dependency</label></span>&nbsp;
 	                </td>
                </tr>
+               <tr>
+              <tds:hasPermission permission="EditAndDelete ">
+                <td class="buttonR">
+                	<input class="button" type="submit" value="Generate Standard"/> 
+                	<g:link controller="assetEntity" action="exportSpecialReport">
+                		<input class="button" type="button" value="Generate Special"/>
+                	</g:link>
+                </td>
+              </tds:hasPermission>
+              </tr>
             </tbody>
           </table>
         </div>

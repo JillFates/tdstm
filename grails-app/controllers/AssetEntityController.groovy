@@ -1214,7 +1214,7 @@ class AssetEntityController {
 
 			flash.message = "Exception occurred wile exporting Excel. "
 			fileEx.printStackTrace();
-			redirect( action:assetImport, params:[ message:flash.message] )
+			redirect( action:exportAssets, params:[ message:flash.message] )
 			return;
 		}
 	}
@@ -3742,16 +3742,16 @@ class AssetEntityController {
 		def today = formatter.format(new Date())
 		try{
 			def filePath = "/templates/TDS-StorageInventory.xls"
-			def filename = "${project.name}-StorageInventory-${today}"
+			def filename = "${project.name}SpecialExport-${today}"
 			def book = ExportUtil.workBookInstance(filename, filePath, response) 
-			def spcExpSheet = book.getSheet("StorageInventory")
+			def spcExpSheet = book.getSheet("SpecialExport")
 			def storageInventoryList = assetEntityService.getSpecialExportData( project )
-			def spcColumnList = ["server_name", "server_type", "app_name", "tru", "tru2", "move_bundle", "move_date",
+			def spcColumnList = ["server_id", "app_id", "server_name", "server_type", "app_name", "tru", "tru2", "move_bundle", "move_date",
 									"group_id", "storage_inventory", "dr_tier", "status" ]
 			
 			for ( int r = 0; r < storageInventoryList.size(); r++ ) {
 				 for( int c = 0; c < spcColumnList.size(); c++){
-					spcExpSheet.addCell( new Label( c, r+1, String.valueOf( storageInventoryList[r][spcColumnList[c]] )) )
+					spcExpSheet.addCell( new Label( c, r+1, storageInventoryList[r][spcColumnList[c]].toString() ) )
 				 }
 			}
 			book.write()
