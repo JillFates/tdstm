@@ -11,6 +11,7 @@ class MoveBundleAssetController {
 	def userPreferenceService
 	def jdbcTemplate
 	def supervisorConsoleService
+	def securityService
 	protected static targetTeamType = ['MOVE_TECH':'targetTeamMt', 'CLEANER':'targetTeamLog','SYS_ADMIN':'targetTeamSa',"DB_ADMIN":'targetTeamDba']
 	protected static sourceTeamType = ['MOVE_TECH':'sourceTeamMt', 'CLEANER':'sourceTeamLog','SYS_ADMIN':'sourceTeamSa',"DB_ADMIN":'sourceTeamDba']
 	
@@ -96,13 +97,19 @@ class MoveBundleAssetController {
 	 *  Return asset details to assignAssets page
 	 */
     def assignAssetsToBundle = {
-    	def bundleId = params.bundleId
-		def moveBundleInstance = MoveBundle.findById( bundleId )
-    	if(!bundleId){
-           def project  = Project.findById(getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ)
-		   moveBundleInstance = MoveBundle.findByProject(project)
+		def moveBundleInstance
+		if(params.containsKey('bundleId') ){
+			if( !params.bundleId.isNumber() ){
+				log.error "assignAssetsToBundle: Invalid bundle id (${params.bundleId}"
+			}else{
+				def bundleId = params.bundleId
+				moveBundleInstance = MoveBundle.findById( bundleId)
+			}
+		} else {
+		   def project = securityService.getUserCurrentProject()
+		   moveBundleInstance = MoveBundle.findByProject(project,[sort:'name',order:'asc']  )
         }
-    	def moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $moveBundleInstance.project.id")
+    	def moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $moveBundleInstance.project.id order by name")
     	def currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $moveBundleInstance.id")
     	def moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $moveBundleInstance.project.id ")
     	render( view:'assignAssets', model:[moveBundles:moveBundles, currentBundleAssets: currentBundleAssets, 
@@ -122,7 +129,7 @@ class MoveBundleAssetController {
         def moveBundleAssets
         def moveBundleInstanceRight = MoveBundle.findById( bundleRight )
         def moveBundleInstanceLeft = MoveBundle.findById( bundleLeft )
-        def moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $moveBundleInstanceRight.project.id")
+        def moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $moveBundleInstanceRight.project.id order by name")
 	    def sessionSort = request.getSession(true).getAttribute("sessionSort")
         def sessionSide = request.getSession(true).getAttribute("sessionSide")
         def sessionOrder = request.getSession(true).getAttribute("sessionOrder")
