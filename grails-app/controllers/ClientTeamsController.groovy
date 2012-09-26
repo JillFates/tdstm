@@ -967,18 +967,20 @@ class ClientTeamsController {
 	 *		tab - all or todo 
 	 */
 	def listTasks = {
-		// If the request is being made as a redirect for a previous task update that was being completed, we need to sleep a moment
-		// to allow the Quartz job that updates successors to finish so that when the user sees the new results that it may have successors
-		// there were updated by the previous update.
-		if (params.containsKey('sync')) {
-			log.info "update - sync'd for 1k ms"
-			this.sleep(1500)
-		}
-		
 		def project = securityService.getUserCurrentProject()
 		//log.error "PROJECT: ${project}"
 		def person = securityService.getUserLoginPerson()
 		//log.error "PERSON=${person}"
+
+		// If the request is being made as a redirect for a previous task update that was being completed, we need to sleep a moment
+		// to allow the Quartz job that updates successors to finish so that when the user sees the new results that it may have successors
+		// there were updated by the previous update.
+		if (params.containsKey('sync')) {
+			log.info "listTasks - sync'n 1,000 ms for ${person} on project ${project.id}"
+			this.sleep(1000)
+		}
+		log.info "listTasks - sunk"
+		
 		def allTasks = false
 
 		// Parameters 		

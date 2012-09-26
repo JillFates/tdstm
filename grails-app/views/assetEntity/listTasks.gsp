@@ -1,5 +1,5 @@
 <%@page import="com.tds.asset.AssetComment"%>
-<%@page import="com.tdssrc.grails.GormUtil"%>
+<%@page import="com.tdssrc.grails.TimeUtil"%>
 <%@page import="com.tdssrc.grails.StringUtil"%>
 <%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus"%>
 <html>
@@ -119,7 +119,7 @@
                 	         	<span id="assetType_${commentInstance?.id}" onclick="getActionBar(this.id)">${commentInstance?.assetType}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="lastUpdated" title="Updated" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-								<span id="lastUpdated_${commentInstance?.id}" onclick="getActionBar(this.id)" class="span_${commentInstance.updatedClass}"><tds:elapsedAgo start="${commentInstance.lastUpdated}" end="${GormUtil.convertInToGMT(new Date(), null)}"/></span>
+								<span id="lastUpdated_${commentInstance?.id}" onclick="getActionBar(this.id)" class="span_${commentInstance.updatedClass}"><tds:elapsedAgo start="${commentInstance.lastUpdated}" end="${TimeUtil.nowGMT()}"/></span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="dueDate" title="Due" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 							 	<span id="dueDate_${commentInstance?.id}" onclick="getActionBar(this.id)" class="${commentInstance.dueClass}">

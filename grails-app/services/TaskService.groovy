@@ -286,7 +286,7 @@ class TaskService {
 		// Determine if the status is being reverted (e.g. going from DONE to READY)
 		def revertStatus = compareStatus(previousStatus, status) > 0
 
-		log.info "setTaskStatus() task=${task.id} status=${status}, previousStatus=${previousStatus}, revertStatus=${revertStatus}"
+		log.info "setTaskStatus - task(#:${task.taskNumber} Id:${task.id}) status=${status}, previousStatus=${previousStatus}, revertStatus=${revertStatus}"
 
 		// Setting of AssignedTO:
 		//
@@ -310,7 +310,7 @@ class TaskService {
 				task.actStart = null				
 			}
 			
-			if ( task.isRunbookTask() ) {
+			if ( task.isRunbookTask() && previousStatus ) {
 				addNote( task, whom, "Reverted task status from '${previousStatus}' to '${status}'")
 			}
 			
@@ -365,15 +365,21 @@ class TaskService {
 	* @return void
 	*/
 	def triggerUpdateTaskSuccessors(taskId, status) {
-		def whom = securityService.getUserLoginPerson()
-		long startTime = System.currentTimeMillis() + (1200L)
-		Trigger trigger = new SimpleTrigger("tm-updateTaskSuccessors-${taskId}" + System.currentTimeMillis(), null, new Date(startTime) )
-        trigger.jobDataMap.putAll( [ 'taskId':taskId, 'whomId':whom.id, 'status':status ] )
-		trigger.setJobName('UpdateTaskSuccessorsJob')
-		trigger.setJobGroup('tdstm')
+		def task = AssetComment.read(taskId)
+		if (! task) {
+			log.error "triggerUpdateTaskSuccessors - unable to find task id $taskId"
+		} else {
+			def whom = securityService.getUserLoginPerson()
+			long startTime = System.currentTimeMillis() + (250L)
+			Trigger trigger = new SimpleTrigger("tm-updateTaskSuccessors-${taskId}" + System.currentTimeMillis(), null, new Date(startTime) )
+	        trigger.jobDataMap.putAll( [ 'taskId':taskId, 'whomId':whom.id, 'status':status ] )
+			trigger.setJobName('UpdateTaskSuccessorsJob')
+			trigger.setJobGroup('tdstm')
   
-		def result = quartzScheduler.scheduleJob(trigger)
-		log.info "triggerUpdateTaskSuccessors taskId=${taskId}, result=$result"		
+			def result = quartzScheduler.scheduleJob(trigger)
+			log.info "triggerUpdateTaskSuccessors for task(#:${task.taskNumber} Id:${taskId}), status=$status, scheduled=$result"
+		}
+		
 	}
 	
 	/**
@@ -385,8 +391,8 @@ class TaskService {
 		def task 
 		
 		// This tasks will run parallel with the thread updating the current task to the state passed to this method. Therefore
-		// we need to make sure that the task has been updated.  We'll try for 60 seconds before giving up.
-		def cnt = 6
+		// we need to make sure that the task has been updated.  We'll try for 3 seconds before giving up.
+		def cnt = 10
 		while (cnt-- > 0) {
 			task = AssetComment.get(taskId)
 			if (! task) {
@@ -396,22 +402,22 @@ class TaskService {
 			if (task.status == status) {
 				break
 			} else {
-				this.sleep(1000)
+				this.sleep(300)
 			}			
 		}
 		if (task.status != status) {
-			log.error "updateTaskSuccessors - task status (${task.status}) not as expected '${status}'"
+			log.error "updateTaskSuccessors - for task(#:${task.taskNumber} Id:${task.id}) status (${task.status}) not as expected '${status}'"
 			return
 		}
 		
 		def whom = Person.read(whomId)
 		if (! whom) {
-			log.error "updateTaskSuccessors - unable to find person ${whomId}"
+			log.error "updateTaskSuccessors - for task(#:${task.taskNumber} Id:${task.id}) unable to find person ${whomId}"
 			return			
 		}
 		
-		log.info "updateTaskSuccessors: processing task(${task.id}): ${task}"
-	//	def currStatus = task.status
+		log.info "updateTaskSuccessors: processing task(#:${task.taskNumber} Id:${task.id}) ${task}"
+		//	def currStatus = task.status
 			
 		// TODO: taskStatusChangeEvent : Add logic to handle READY for the SS predecessor type and correct the current code to not assume SF type
 	
@@ -420,10 +426,10 @@ class TaskService {
 		//
 		if ( status ==  AssetCommentStatus.DONE ) {
 			def successorDependents = TaskDependency.findAllByPredecessor(task)
-			log.debug "updateTaskSuccessors: Found ${successorDependents ? successorDependents.size() : '0'} successors for task ${task.id}"
+			log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) found ${successorDependents ? successorDependents.size() : '0'} successors"
 			successorDependents?.each() { succDepend ->
 				def dependentTask = succDepend.assetComment
-				log.debug "updateTaskSuccessors: Processing dependentTask(${dependentTask.id}): ${dependentTask}"
+				log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) processing dependentTask(#:${dependentTask.taskNumber} Id:${dependentTask.id}) ${dependentTask}"
 				
 				// If the Task is in the Planned or Pending state, we can check to see if it makes sense to set to READY
 				if ([AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING].contains(dependentTask.status)) {
@@ -431,7 +437,7 @@ class TaskService {
 					// Find all predecessor/ tasks for the successor, other than the current task, and make sure they are completed
 					def predDependencies = TaskDependency.findByAssetCommentAndPredecessorNot(dependentTask, task)
 					def makeReady=true
-					log.info "updateTaskSuccessors: dependentTask(${dependentTask.id}) predecessors> ${predDependencies}"
+					log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) dependentTask(#:${dependentTask.taskNumber} Id:${dependentTask.id}) has other predecessors> ${predDependencies}"
 					predDependencies?.each() { predDependency ->
 						def predTask = predDependency.assetComment
 						// TODO : runbook : taskStatusChangeEvent - add the dependency type (SS,FS) logic here
@@ -456,11 +462,11 @@ class TaskService {
 						}
 						*/
 							
-						log.info "updateTaskSuccessors: task=${task.id} dependentTask(${dependentTask.id}) setting to READY "
+						log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) setting dependentTask(#:${dependentTask.taskNumber} Id:${dependentTask.id}) to READY "
 						setTaskStatus(dependentTask, AssetCommentStatus.READY, whom)
 						// log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) Making READY - Successful"
 						if ( ! dependentTask.validate() ) {
-							log.error "updateTaskSuccessors: Failed Readying successor task [${dependentTask.id} " + GormUtil.allErrorsString(dependentTask)
+							log.error "updateTaskSuccessors: task(#:${dependentTask.taskNumber} Id:${dependentTask.id}) failed READY of successor task(#:${dependentTask.taskNumber} Id:${dependentTask.id}), " + GormUtil.allErrorsString(dependentTask)
 						}
 						
 						// log.info "taskStatusChangeEvent: task=${task.id} dependentTask(${dependentTask.id}) Made it by validate() "
@@ -476,18 +482,19 @@ class TaskService {
 						 * John 8/2012
 						 */
 						if ( dependentTask.save(flush:true) ) {
-							log.info "updateTaskSuccessors: task=${task.id} dependentTask(${dependentTask.id}) Saved"
+							log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) successor task(#:${dependentTask.taskNumber} Id:${dependentTask.id})Saved"
 							return
 						} else {
 						//if (! (  dependentTask.validate() && dependentTask.save(flush:true) ) ) {
-							log.error "Failed setting successor task READY [${dependentTask.id}], task=${task.id}, " + GormUtil.allErrorsString(dependentTask)
+							log.error "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) failed setting successor task(#:${dependentTask.taskNumber} Id:${dependentTask.id}) to READY, " + 
+								GormUtil.allErrorsString(dependentTask)
 							
 							 throw new TaskCompletionException("Unable to READY task ${dependentTask} due to " +
 								 GormUtil.allErrorsString(dependentTask) )
 						}
 					}
 				} else {
-					log.warn "updateTaskSuccessors: taskId=${task.id}, Found dependentTask(${dependentTask.id}): ${dependentTask} at unexpected status (${dependentTask.status}"
+					log.warn "updateTaskSuccessors - taskId(#:${task.taskNumber} Id:${task.id}) found successor task(#:${dependentTask.taskNumber} Id:${dependentTask.id}): ${dependentTask} in unexpected status (${dependentTask.status}"
 				} 
 			} // succDependencies?.each()
 		}
