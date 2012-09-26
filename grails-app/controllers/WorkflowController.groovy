@@ -139,7 +139,6 @@ class WorkflowController {
 							dashboardLabel : stdWorkflowTransition.dashboardLabel,
 							predecessor : stdWorkflowTransition.predecessor,
 							header : stdWorkflowTransition.header,
-							effort : stdWorkflowTransition.effort,
 							duration : stdWorkflowTransition.duration
 							)
 						if (  workflowTransition.validate() && workflowTransition.save( flush:true) ) {

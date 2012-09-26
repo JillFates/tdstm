@@ -192,8 +192,6 @@
 			
 			<th class="sortable">Header</th>
 			
-			<th class="sortable">Effort</th>
-			
 			<th class="sortable">Duration</th>
 			
 			<th class="sortable">Action</th>
