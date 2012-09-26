@@ -77,7 +77,7 @@ function isValidDate( date ){
 }
 function addAssetDependency( type ){
 	var rowNo = $("#"+type+"Count").val()
-	var rowData = $("#assetDependencyRow tr").html().replace("dataFlowFreq","dataFlowFreq_"+type+"_"+rowNo).replace("asset","asset_"+type+"_"+rowNo).replace("dtype","dtype_"+type+"_"+rowNo).replace("status","status_"+type+"_"+rowNo).replace("entity","entity_"+type+"_"+rowNo)
+	var rowData = $("#assetDependencyRow tr").html().replace(/dataFlowFreq/g,"dataFlowFreq_"+type+"_"+rowNo).replace(/asset/g,"asset_"+type+"_"+rowNo).replace(/dtype/g,"dtype_"+type+"_"+rowNo).replace(/status/g,"status_"+type+"_"+rowNo).replace(/entity/g,"entity_"+type+"_"+rowNo)
 	if(type!="support"){
 		$("#createDependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
 	} else {
