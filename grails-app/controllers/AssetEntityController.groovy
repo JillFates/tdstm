@@ -3751,7 +3751,7 @@ class AssetEntityController {
 			
 			for ( int r = 0; r < storageInventoryList.size(); r++ ) {
 				 for( int c = 0; c < spcColumnList.size(); c++){
-					spcExpSheet.addCell( new Label( c, r+1, storageInventoryList[r][spcColumnList[c]].toString() ) )
+					spcExpSheet.addCell( new Label( c, r+1, String.valueOf( storageInventoryList[r][spcColumnList[c]] )) )
 				 }
 			}
 			book.write()
