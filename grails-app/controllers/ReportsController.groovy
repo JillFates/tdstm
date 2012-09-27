@@ -688,7 +688,7 @@ class ReportsController {
     								'commentType':assetComment.commentType,
     								'model':(assetComment?.assetEntity?.manufacturer ? assetComment?.assetEntity?.manufacturer?.toString() : "")+" "+(assetComment?.assetEntity?.model ? assetComment?.assetEntity?.model : "" ), 
     								'occuredAt':GormUtil.convertInToUserTZ( assetComment?.dateCreated, tzId ), 'createdBy':assetComment?.createdBy?.firstName+" "+assetComment?.createdBy?.lastName, 
-									'owner':assetComment?.owner ? assetComment?.owner?.firstName+" "+assetComment?.owner?.lastName : '',
+									'owner':assetComment?.assignedTo ? assetComment?.assignedTo?.firstName+" "+assetComment?.assignedTo?.lastName : '',
     								'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
     								'clientName':projectInstance?.client?.name,"resolvedInfoInclude":resolvedInfoInclude,
     								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
@@ -698,7 +698,7 @@ class ReportsController {
 									'commentCode':assetComment.commentCode ? assetComment.commentCode : "",'commentType':assetComment.commentType,
 									'occuredAt':GormUtil.convertInToUserTZ( assetComment?.dateResolved, tzId ), 
     								'createdBy':assetComment?.resolvedBy?.firstName+" "+assetComment?.resolvedBy?.lastName, 
-									'owner':assetComment?.owner ? assetComment?.owner?.firstName+" "+assetComment?.owner?.lastName : '',
+									'owner':assetComment?.assignedTo ? assetComment?.assignedTo?.firstName+" "+assetComment?.assignedTo?.lastName : '',
     								'issue':assetComment?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
     								'clientName':projectInstance?.client?.name,
     								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
