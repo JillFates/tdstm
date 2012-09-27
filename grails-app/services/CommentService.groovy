@@ -69,7 +69,7 @@ class CommentService {
 		// Wrap the whole routine so that we can break out when we hit fatal situations
 		while (true) {
 			if (! project) {
-				log.error "saveUpdateCommentAndNotes: User has no currently selected project"
+				log.warn "saveUpdateCommentAndNotes: User has no currently selected project"
 				errorMsg = "You have no currently selected project"
 				break
 			}
@@ -77,7 +77,7 @@ class CommentService {
 			// if assetEntity is passed, then validate that it valid and that the user has access to it (belongs to the current project)
 			if ( params.assetEntity ) {
 				if (! params.assetEntity.isNumber() ) {
-					log.error "saveUpdateCommentAndNotes: Invalid asset id (${params.assetEntity}"
+					log.warn "saveUpdateCommentAndNotes: Invalid asset id (${params.assetEntity}"
 					errorMsg = "An unexpected asset id was received"
 					break
 				}

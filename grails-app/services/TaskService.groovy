@@ -31,17 +31,17 @@ class TaskService {
 
     static transactional = true
 
-	def securityService
-	def jdbcTemplate
 	def dataSource
+	def jdbcTemplate
 	def namedParameterJdbcTemplate
-	def workflowService
+	def securityService
 	def quartzScheduler
+	def workflowService
 	
 	static final List runbookCategories = [AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP]
 	static final List categoryList = AssetCommentCategory.getList()
 	static final List statusList = AssetCommentStatus.getList()
-
+	
 	/**
 	 * The getUserTasks method is used to retreive the user's TODO and ALL tasks lists or the count results of the lists. The list results are based 
 	 * on the Person and Project.
@@ -257,7 +257,8 @@ class TaskService {
 	// Refactor to accept the Person
 	def setTaskStatus( task, status) {
 		def whom = securityService.getUserLoginPerson()
-		return setTaskStatus( task, status, whom )
+		def isPM = securityService.hasRole("PROJ_MGR")
+		return setTaskStatus( task, status, whom, isPM )
 	}
 
 	/**
@@ -268,14 +269,15 @@ class TaskService {
 	 * @return AssetComment the task object that was updated
 	 */
 	// TODO : We should probably refactor this into the AssetComment domain class as setStatus
-	def setTaskStatus(task, status, whom) {
+	def setTaskStatus(task, status, whom, isPM) {
+		
 		// If the current task.status or the persisted value equals the new status, then there's nutt'n to do.
 		if (task.status == status || task.getPersistentValue('status') == status) {
 			return
 		}
 
-		def now =  GormUtil.convertInToGMT( "now", "EDT" )
-
+		def now = TimeUtil.nowGMT()
+		
 		// First thing to do, set the status
 		task.status = status
 		
@@ -319,10 +321,10 @@ class TaskService {
 			// Put STARTED task on HOLD and add note that predecessor task was reverted
 			
 		}
-		
-		// Now update the task properties according to the new status
 
-		def isPM = securityService.hasRole("PROJ_MGR")
+		// --------
+		// Now update the task properties according to the new status
+		// --------
 
 		// Properly handle assignment if the user is the PM
 		def assignee = whom
@@ -374,9 +376,10 @@ class TaskService {
 			log.error "triggerUpdateTaskSuccessors - unable to find task id $taskId"
 		} else {
 			def whom = securityService.getUserLoginPerson()
+			def isPM = securityService.hasRole("PROJ_MGR")
 			long startTime = System.currentTimeMillis() + (250L)
 			Trigger trigger = new SimpleTrigger("tm-updateTaskSuccessors-${taskId}" + System.currentTimeMillis(), null, new Date(startTime) )
-	        trigger.jobDataMap.putAll( [ 'taskId':taskId, 'whomId':whom.id, 'status':status ] )
+	        trigger.jobDataMap.putAll( [ taskId:taskId, whomId:whom.id, status:status, isPM:isPM] )
 			trigger.setJobName('UpdateTaskSuccessorsJob')
 			trigger.setJobGroup('tdstm')
   
@@ -390,8 +393,8 @@ class TaskService {
 	 * This is invoked by the AssetComment.beforeUpdate method in order to handle any status changes
 	 * that may result in the updating of other tasks successor tasks.
 	 */
-	def updateTaskSuccessors( taskId, whomId, status ) {
-		
+	def updateTaskSuccessors( taskId, status, whomId, isPM ) {
+		log.info "updateTaskSuccessors - securityService=${securityService ? securityService.getClass() : 'Undefined'}"
 		def whom = Person.read(whomId)
 		if (! whom) {
 			log.error "updateTaskSuccessors - for task(#:${task.taskNumber} Id:${task.id}) unable to find person ${whomId}"
@@ -403,6 +406,7 @@ class TaskService {
 		// This tasks will run parallel with the thread updating the current task to the state passed to this method. Therefore
 		// we need to make sure that the task has been updated.  We'll try for 3 seconds before giving up.
 		def cnt = 10
+		log.info "updateTaskSuccessors - securityService=${securityService ? securityService.getClass() : 'Undefined'}"
 		
 		while (cnt-- > 0) {
 			task = AssetComment.get(taskId)
@@ -420,6 +424,7 @@ class TaskService {
 			log.error "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) status (${task.status}) not as expected '${status}' - $whom"
 			return
 		}
+		log.info "updateTaskSuccessors - securityService=${securityService ? securityService.getClass() : 'Undefined'}"
 		
 		log.info "updateTaskSuccessors: Processing task(#:${task.taskNumber} Id:${task.id}) ${task} - $whom"
 		//	def currStatus = task.status
@@ -477,7 +482,7 @@ class TaskService {
 						*/
 							
 						log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) setting successorTask(#:${successorTask.taskNumber} Id:${successorTask.id}) to READY  - $whom"
-						setTaskStatus(successorTask, AssetCommentStatus.READY, whom)
+						setTaskStatus(successorTask, AssetCommentStatus.READY, whom, isPM)
 						// log.info "taskStatusChangeEvent: successorTask(${successorTask.id}) Making READY - Successful"
 						if ( ! successorTask.validate() ) {
 							log.error "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) failed READY of successor task(#:${successorTask.taskNumber} Id:${successorTask.id}) - $whom : " + GormUtil.allErrorsString(successorTask)

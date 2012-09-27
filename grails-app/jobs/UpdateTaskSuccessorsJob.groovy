@@ -15,17 +15,19 @@ class UpdateTaskSuccessorsJob {
 
 	// IOC services
     def taskService 
+	def securityService
 
     /**
 	 * executes the TaskService.updateTaskSuccessors
      * @param context
      * @return void
      */
- 	def execute(context) {
+ 	def execute(context) {	
 		def dataMap = context.mergedJobDataMap
 		def taskId = dataMap.getLongValue('taskId')
 		def whomId = dataMap.getLongValue('whomId')
 		def status = dataMap.getString('status')
-		taskService.updateTaskSuccessors(taskId, whomId, status)
+		def isPM = dataMap.getBoolean('isPM')
+		taskService.updateTaskSuccessors(taskId, status, whomId, isPM)
 	}
 }
