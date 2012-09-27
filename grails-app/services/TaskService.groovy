@@ -311,7 +311,7 @@ class TaskService {
 			}
 			
 			if ( task.isRunbookTask() && previousStatus ) {
-				addNote( task, whom, "Reverted task status from '${previousStatus}' to '${status}'")
+				addNote( task, whom, "Reverted status from '${previousStatus}' to '${status}'")
 			}
 			
 			// TODO : Runbook Look at the successors and do something about them
@@ -321,41 +321,43 @@ class TaskService {
 		}
 		
 		// Now update the task properties according to the new status
-		if ([AssetCommentStatus.STARTED, AssetCommentStatus.DONE, AssetCommentStatus.TERMINATED].contains(status)) {
-	
-			def isPM = securityService.hasRole("PROJ_MGR")
 
-			// Properly handle assignment if the user is the PM
-			def assignee = whom
-			if (task.assignedTo && isPM) {
-				assignee = task.assignedTo
-			}
-			
-			switch (status) {
-				case AssetCommentStatus.STARTED:
-					task.assignedTo = assignee
-					// We don't want to loose the original started time if we are reverting from DONE to STARTED
-					if (! revertStatus ) {
-						task.actStart = now
-						addNote( task, whom, "Task Started")
-					}
-					break
-					
-				case AssetCommentStatus.DONE:
-					if ( task.isDirty('status') && task.getPersistentValue('status') != status) {						
-						triggerUpdateTaskSuccessors(task.id, status)
-					}
-					task.assignedTo = assignee
-					task.resolvedBy = assignee
-					task.actFinish = now
-					addNote( task, whom, "Task Completed")
-					break
-					
-				case AssetCommentStatus.TERMINATED:
-					task.resolvedBy = assignee
-					task.actFinish = now
-					break
-			}
+		def isPM = securityService.hasRole("PROJ_MGR")
+
+		// Properly handle assignment if the user is the PM
+		def assignee = whom
+		if (task.assignedTo && isPM) {
+			assignee = task.assignedTo
+		}
+		
+		switch (status) {
+			case AssetCommentStatus.HOLD:
+				addNote( task, whom, "Placed task on HOLD, previously was '$previousStatus'")
+				break
+				
+			case AssetCommentStatus.STARTED:
+				task.assignedTo = assignee
+				// We don't want to loose the original started time if we are reverting from DONE to STARTED
+				if (! revertStatus ) {
+					task.actStart = now
+					if (task.isRunbookTask()) addNote( task, whom, "Task Started")
+				}
+				break
+				
+			case AssetCommentStatus.DONE:
+				if ( task.isDirty('status') && task.getPersistentValue('status') != status) {						
+					triggerUpdateTaskSuccessors(task.id, status)
+				}
+				task.assignedTo = assignee
+				task.resolvedBy = assignee
+				task.actFinish = now
+				if (task.isRunbookTask()) addNote( task, whom, "Task Completed")
+				break
+				
+			case AssetCommentStatus.TERMINATED:
+				task.resolvedBy = assignee
+				task.actFinish = now
+				break
 		}
 		
 		return task

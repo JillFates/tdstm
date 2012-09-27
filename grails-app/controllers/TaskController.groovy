@@ -8,6 +8,7 @@ class TaskController {
 	
 	def securityService
 	def commentService
+	def taskService
 
     def index = { }
 	
@@ -38,57 +39,54 @@ class TaskController {
 			render map as JSON
 		}
 	}
-	
-	/*
-	id:8667
-	status:Completed
-	currentStatus:Ready
-	redirectTo:taskManager
-	view:myTask
-	tab:all
-	*/
-
-	
-	
+		
 	/**
 	 * Used to assign assignTo through ajax call from MyTasks
 	 * @params : id, status
 	 * @return : user full name and errorMessage if status changed by accident.
 	 */
 	def assignToMe = {
-		def comment = AssetComment.get(params.id)
+		def task = AssetComment.get(params.id)
 		def userLogin = securityService.getUserLogin()
 		def project = securityService.getUserCurrentProject()
-		def hasPermission = true
-		def commentProject = comment.project
-		def errorMsg = ""
-		def assignedTo
-		if(comment) {
+		def commentProject = task.project
+		def errorMsg = ''
+		def assignedTo=''
+		
+		if (task) {
 			if (commentProject.id != project.id) {
-				hasPermission = false
-				log.error "assignToMe: Asset(${comment.id}/${commentProject}) not associated with user(${userLogin}) project (${project})"
+				log.error "assignToMe - Task(#${task.taskNumber} id:${task.id}/${commentProject}) not associated with user(${userLogin}) project (${project})"
 				errorMsg = "It appears that you do not have permission to change the specified task"
-			}
-			if(hasPermission){
-				comment.assignedTo = userLogin.person
-				if(comment.save(flush:true)){
-					assignedTo = userLogin.person.firstName +" " + userLogin.person.lastName
-				}
-				if (params.status) {
-					if (comment.status != params.status) {
-						log.warn "assignToMe(), Task (${comment.id}) status changed accidentally while assigning to ${userLogin}"
-						def whoDidIt = (comment.status == AssetCommentStatus.DONE) ? comment.resolvedBy : comment.assignedTo
-						switch (comment.status) {
+			} else {
+				
+				// Double check to see if the status changed while the user was reassigning so that they 
+				if (! errorMsg && params.status) {
+					if (task.status != params.status) {
+						log.warn "assignToMe - Task(#:${task.taskNumber} id:${task.id}) status changed around when ${userLogin} was assigning to self"
+						def whoDidIt = (task.status == AssetCommentStatus.DONE) ? task.resolvedBy : task.assignedTo
+						switch (task.status) {
 							case AssetCommentStatus.STARTED:
 								errorMsg = "The task was STARTED by ${whoDidIt}"; break
 							case AssetCommentStatus.DONE:
 								errorMsg = "The task was COMPLETED by ${whoDidIt}"; break
 							default:
-								errorMsg = "The task status was changed to '${comment.status}'"
+								errorMsg = "The task status was changed to '${task.status}'"
 						}
 					}
-				}
+				}				
 				
+				if (! errorMsg ) {
+					// If there were no errors then try reassign the Task
+					def belongedTo = task.assignedTo ? task.assignedTo.toString() : 'Unassigned'
+					task.assignedTo = userLogin.person
+					if (task.save(flush:true)){
+						assignedTo = userLogin.person.toString()
+						if (task.isRunbookTask()) taskService.addNote( task, userLogin.person, "Assigned task to self, previously assigned to $belongedTo")					
+					} else {
+						log.error "assignToMe - Task(#:${task.taskNumber} id:${task.id}) failed while trying to reassign : " + GormUtil.allErrorsString(task)
+						errorMsg = "An unexpected error occured while assigning the task to you."
+					}
+				}
 			}
 		} else {
 			errorMsg = "Task Not Found : Was unable to find the Task for the specified id - ${params.id}"
