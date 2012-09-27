@@ -39,7 +39,7 @@ class TaskService {
 	def quartzScheduler
 	
 	static final List runbookCategories = [AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP]
-
+	static final List categoryList = AssetCommentCategory.getList()
 	static final List statusList = AssetCommentStatus.getList()
 
 	/**
@@ -517,32 +517,89 @@ class TaskService {
 	}
 
 	/**
-	 * Returns the HTML for a SELECT control that contains list of tasks based on a TaskDependency
-	 * @param task
-	 * @return
+	 * Returns the HTML for a SELECT control that contains list of tasks based on a TaskDependency. This logic assumes that the TaskDependency(ies)
+	 * pre-exist.
+	 * @param taskDependency - reference to the dependency relationship of a task (aka assetComment)
+	 * @param task - the task (aka assetComment) that we're building a Predecessor SELECT for
+	 * @param project - a project object (optional default to user's current project)
+	 * @param idPrefix - prefix to use for the control's ID (default: taskDependencyEditId)
+	 * @param name - the name of the control (default taskDependencyEdit)
+	 * @return String - HTML of a SELECT control
 	 */
-	def genSelectForTaskDependency(taskDependency, assetComment, project=null, idPrefix='taskDependencyEditId', name='taskDependencyEdit') {
+	def genSelectForTaskDependency(taskDependency, task, project=null, idPrefix='taskDependencyEditId', name='taskDependencyEdit') {
+		//def sw = new org.springframework.util.StopWatch("genSelectForTaskDependency Stopwatch") 
+		//sw.start("Get predecessor")
 		def predecessor = taskDependency.predecessor
 		def category = predecessor.category
 		
-		if (project==null) 
+		if (! project) {
 			project = securityService.getUserCurrentProject()
+		}
 		def projectId = project.id
-		def assetForComment = assetComment.assetEntity
-		def moveEventForComment =  assetForComment ? assetForComment.moveBundle?.moveEvent : assetComment.moveEvent
+		def moveEvent = task.moveEvent
 		def queryForPredecessor = new StringBuffer("""FROM AssetComment a WHERE a.project=${projectId} \
 			AND a.category='${category}'\
 			AND a.commentType='${AssetCommentType.TASK}'\
-			AND a.id != ${assetComment.id} """)
-		if (moveEventForComment) {
-			queryForPredecessor.append("AND (a.assetEntity.moveBundle.moveEvent.id = ${moveEventForComment?.id} OR a.moveEvent.id = ${moveEventForComment?.id})")
+			AND a.id != ${task.id} """)
+		if (moveEvent) {
+			queryForPredecessor.append("AND a.moveEvent.id=${moveEvent.id}")
 		}
 		queryForPredecessor.append(""" ORDER BY a.taskNumber ASC""")
-		
+		// log.info "genSelectForTaskDependency - SQL ${queryForPredecessor.toString()}"
 		def predecessors = AssetComment.findAll(queryForPredecessor.toString())
-		def paramsMap = ["selectId":"${idPrefix}_${taskDependency.id}", "selectName":"${name}", "from":predecessors,
-							 "optionKey":"id", "selection":predecessor.id]
-		def selectControl = HtmlUtil.genHtmlSelect( paramsMap )
+		def paramsMap = [selectId:"${idPrefix}_${taskDependency.id}", selectName:name, 
+			options:predecessors, optionKey:'id', optionSelected:predecessor.id ]
+		def selectControl = HtmlUtil.generateSelect( paramsMap )
+		//sw.stop()
+		//log.info "genSelectForTaskDependency - Stopwatch: ${sw.prettyPrint()}"
+		return selectControl
+	}
+	
+	/**
+	* Used to generate a SELECT control for a project and category with an optional task. When a task is presented the list will
+	* also be filtered on tasks from the moveEvent.
+	* If a taskId is included, the SELECT will have CSS ID taskDependencyEditId otherwise taskDependencyId and the SELECT name of 
+	* taskDependencyEdit or taskDependencySave accordingly since having an Id means that we're in edit mode vs create mode.
+	*
+	* @param project - the project object to filter tasks to include
+	* @param category - a task category to filter on (optional) 
+	* @param taskId - an optional task Id that the filtering will use to eliminate as an option and also filter on it's moveEvent
+	* @return String the SELECT control
+	*/
+	def genSelectForPredecessors(project, category, task) {	
+		
+		StringBuffer query = new StringBuffer("FROM AssetComment a WHERE a.project=${project.id} AND a.commentType='${AssetCommentType.TASK}' ")
+		if (category) {
+			if ( categoryList.contains(category) ) {
+				query.append("AND a.category='${category}' ")
+			} else {
+				log.warn "genSelectForPredecessors - unexpected category filter '$category'"
+				category=''
+			}
+		}
+
+		// If there is a task we can add some additional filtering like not including self in the list of predecessors and filtering on moveEvent
+		if (task) { 
+			if (! category && task.category) {
+				query.append("AND a.category='${task.category}' ")
+			}				
+			query.append("AND a.id != ${task.id} ")
+		
+			if (task.moveEvent) {
+				query.append("AND a.moveEvent.id=${task.moveEvent.id} ")
+			}
+		}
+		
+		// Add the sort and generate the list
+		query.append('ORDER BY a.taskNumber ASC')
+		def taskList = AssetComment.findAll( query.toString() )
+		
+		// Build the SELECT HTML
+		def cssId = task ? 'taskDependencyEditId' : 'taskDependencyId'
+	    def selectName = task ? 'taskDependencyEdit' : 'taskDependencySave'
+		def firstOption = [value:'', display:'Please Select']
+		def paramsMap = [ selectId:cssId, selectName:selectName, options:taskList, optionKey:'id', firstOption:firstOption]
+		def selectControl = HtmlUtil.generateSelect( paramsMap )
 		
 		return selectControl
 	}

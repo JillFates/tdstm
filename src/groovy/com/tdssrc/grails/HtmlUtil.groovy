@@ -6,28 +6,40 @@ package com.tdssrc.grails
 class HtmlUtil {
 	
 	/**
-	 * Generate HTML selectBox for passed list
-	 * @param String	selectBoxId as selectId, selectBoxName as selectName , javascript Event for select as jsEvent,
-	 *   				optionKey as optionKey optionValue as optionValue , default selected value as selection, NoSelectionString as noSelectionString
-	 * @param List	    list as from
-	 * @return String	HTML selectBox
+	 * Generate the HTML for a SELECT control based on a map of parameters
+	 * @param String selectId - the CSS ID to use for the <SELECT> element
+	 * @param String selectName - the name to use for the <SELECT> element
+	 * @param List options - a list of Strings or Maps of data to populate the <OPTION> elements
+	 * @param String optionKey - indicates the map key used in the <Map>options for the OPTION identifier (required for <Map>options)
+	 * @param String optionValue - indicates the map key used in the <Map>options for the OPTION display value (required for <Map>options)
+	 * @param String optionSelected - the key value of the OPTION that is the default selected value (optional)
+	 * @param Map firstOption - a map containing [value,display] to display first (optional)
+	 * @param String javascript - used to inject any javascript code into the <SELECT> element (optional)
+	 * @param String selectClass - CSS class name to use (optional)
+	 * @return String HTML selectBox
 	 */
 	
-	def public static genHtmlSelect(def paramMap){
-		def jsEvent = paramMap.jsEvent ? paramMap.jsEvent : ""
-		def select = new StringBuffer("<select id=\"${paramMap.selectId}\" name=\"${paramMap.selectName}\"  ${jsEvent}>")
-		if(paramMap.noSelectionString){
-			select.append("<option value=\"${paramMap.noSelectionString.key}\">${paramMap.noSelectionString.value}</option>")
+	def public static generateSelect(def params) {
+		def optionKey = params.optionKey
+		def optionValue = params.optionValue
+		def optionSelected = params.optionSelected
+		def selectClass = params.selectClass ? """class="${params.selectClass}" """ : ''
+		def html = new StringBuffer("""<select id="${params.selectId}" name="${params.selectName}" ${selectClass} ${params.javascript ?:''}>""")
+		def selected 
+		if (params.firstOption){
+			selected = optionSelected == params.firstOption ? 'selected="selected"' : ''			
+			html.append("""<option value="${params.firstOption.value}" ${selected}>${params.firstOption.display}</option>""")
 		}
-		paramMap.from.each(){
-			def key = paramMap.optionKey ? it."${paramMap.optionKey}" : it
-			def value = paramMap.optionValue ? it."${paramMap.optionValue}" : it
-			def selected = key == paramMap.selection ? 'selected="selected"' : ''
-			select.append("<option value=\"${key}\" ${selected} >${value}</option>")
+		
+		params.options.each() {
+			def key = optionKey ? it."${optionKey}" : it
+			def value = optionValue ? it."${optionValue}" : it
+			selected = key == optionSelected ? 'selected="selected"' : ''
+			html.append("""<option value="${key}" ${selected} >${value}</option>""")
 		}
-		select.append('</select>')
+		html.append('</select>')
 	 
-		return  select
+		return html.toString()
 	}
 	
 	/**

@@ -1505,7 +1505,7 @@ function addPredecessor(issueCategory,predecessorCategory,comment,row,span){
 			category =$('#'+issueCategory).val()
 		}
 	var commentId = comment ? $('#'+comment).val() : ''
-	new Ajax.Request('../assetEntity/getPredecessor?category='+category+'&assetCommentId='+commentId,{asynchronous:false,evalScripts:true,
+	new Ajax.Request('../assetEntity/predecessorSelectHtml?category='+category+'&commentId='+commentId, {asynchronous:false,evalScripts:true,
 		 onComplete:function(e){
 		     $('#'+span).html(e.responseText)
 		     $('#taskDependencyTdId').html(e.responseText)
@@ -1529,7 +1529,7 @@ function addPredecessor(issueCategory,predecessorCategory,comment,row,span){
 }
 function fillPredecessor(id, category,commentId){
 	var row = id.split('_')[1]
-	new Ajax.Request('../assetEntity/getPredecessor?category='+category+'&assetCommentId='+commentId,{asynchronous:true,evalScripts:true,
+	new Ajax.Request('../assetEntity/predecessorSelectHtml?category='+category+'&commentId='+commentId, {asynchronous:true,evalScripts:true,
 		 onComplete:function(e){
 			 var resp =  e.responseText.replace('taskDependencyId','taskDependencyId_'+row).replace('taskDependencyEditId','taskDependencyEditId_'+row)
 			 $('#taskDependencySaveTdId_'+row).html(resp)
@@ -1572,7 +1572,7 @@ function updateStatusSelect(taskId){
 }
 function loadEditPredecessor(id){
 	$('#predecessorEditId').html('');
-	new Ajax.Request('../assetEntity/loadPredecessor?id='+id,{asynchronous:true,evalScripts:true,
+	new Ajax.Request('../assetEntity/predecessorTableHtml?commentId='+id,{asynchronous:true,evalScripts:true,
 		onLoading:function(){
 			var processTab = jQuery('#processDiv');
 		    processTab.css("display", "table-row");

@@ -3622,39 +3622,12 @@ class AssetEntityController {
 		}
 		def selectControl = ''
 		if(workFlowTransition.size()){
-			def paramsMap = ["selectId":"workFlowId", "selectName":"workFlow", "from":workFlowTransition, "optionKey":"id", "optionValue":"name"]
-			selectControl = HtmlUtil.genHtmlSelect( paramsMap )
+			def paramsMap = [selectId:'workFlowId', selectName:'workFlow', options:workFlowTransition, optionKey:'id', optionValue:'name']
+			selectControl = HtmlUtil.generateSelect( paramsMap )
 		}
 		render selectControl
 	}
     
-	/**
-	 * @param: commentId
-	 * @return : HTML Select of prdecessor list
-	 */
-	def getPredecessor = {
-		def project = securityService.getUserCurrentProject()
-		def projectId = project.id
-		
-		String queryForPredecessor = "FROM AssetComment a WHERE a.project=${projectId} AND a.category='${params.category}' AND a.commentType='${AssetCommentType.TASK}' "
-		if(params.assetCommentId){ 
-			queryForPredecessor += "AND a.id != ${params.assetCommentId}"
-			def assetComment = AssetComment.get(params.assetCommentId)
-			def assetForComment = assetComment.assetEntity
-			def moveEventForComment =  assetForComment ? assetForComment.moveBundle?.moveEvent : assetComment.moveEvent
-			if(moveEventForComment){
-				queryForPredecessor += "AND (a.assetEntity.moveBundle.moveEvent.id = ${moveEventForComment?.id} OR a.moveEvent.id = ${moveEventForComment?.id})"
-			}
-		}
-		queryForPredecessor += "ORDER BY a.taskNumber ASC"
-		def prdecessors = AssetComment.findAll(queryForPredecessor)
-		def taskId = params.assetCommentId ? 'taskDependencyEditId' : 'taskDependencyId'
-	    def selectName = params.assetCommentId ? 'taskDependencyEdit' : 'taskDependencySave'
-		def paramsMap = ["selectId":"${taskId}", "selectName":"${selectName}", "from":prdecessors,  "optionKey":"id"]
-		def selectControl = HtmlUtil.genHtmlSelect( paramsMap )
-
-		render selectControl
-	}
 	/**
 	 * @param: forView
 	 * @return: HTML select of staff belongs to company and TDS
@@ -3681,8 +3654,9 @@ class AssetEntityController {
 
 		def projectStaff = partyRelationshipService.getProjectStaff( projectId )?.staff
 		projectStaff.sort{it.firstName}
-		def paramsMap = ["selectId":"${viewId}", "selectName":"${viewId}", "from":projectStaff, "optionKey":"id", "selection":selectedId ]
-		def assignedToSelect = HtmlUtil.genHtmlSelect( paramsMap )
+		def firstOption = [value:'', display:'Unassigned']
+		def paramsMap = [selectId:viewId, selectName:viewId, options:projectStaff, optionKey:'id', optionSelected:selectedId, firstOption:firstOption ]
+		def assignedToSelect = HtmlUtil.generateSelect( paramsMap )
 		render assignedToSelect
 	}
 	/**
@@ -3696,39 +3670,75 @@ class AssetEntityController {
 		def optionForRole = statusOptionForRole.get(mapKey)
 		def status = AssetComment.read(params.id)?.status ?: '*EMPTY*'
 		def optionList = optionForRole.get(status)
+		def firstOption = [value:'', display:'Please Select']
 		def selected
-		def paramsMap = ["selectId":"statusEditId", "selectName":"statusEditId", "jsEvent":"onChange='showResolve(this.value)'", 
-							"from":optionList, "selection":status, "noSelectionString":["key":"", 'value':"Please Select"]]
-		def statusSelect = HtmlUtil.genHtmlSelect( paramsMap )
+		def paramsMap = [selectId:'statusEditId', selectName:'statusEditId', 
+			javascript:"onChange='showResolve(this.value)'", 
+			options:optionList, optionSelected:status, firstOption:firstOption]
+		def statusSelect = HtmlUtil.generateSelect( paramsMap )
 		
 		render statusSelect
 	  }
 	
 	/**
-	 * Loads List of predecessors HTML SELECT control for the AssetComment at editing time
+	 * Generates an HTML table containing all the predecessor for a task with corresponding Category and Tasks SELECT controls for
+	 * a speciied assetList of predecessors HTML SELECT control for the AssetComment at editing time
 	 * @param	params.id	The ID of the AssetComment to load  predecessor SELECT for
 	 * @return render HTML
 	 */
-	def loadPredecessor = {
-		def assetComment = AssetComment.get(params.id)
-		def taskDependencies = assetComment.taskDependencies
-		def predEditTable = new StringBuffer("""<table id="predecessorEditTableId" cellspacing="0" style="border:0px;width:0px"><tbody>""")
-		taskDependencies.each{ taskDep ->
-			def predecessor = taskDep.predecessor
+	def predecessorTableHtml = {
+		def sw = new org.springframework.util.StopWatch("predecessorTableHtml Stopwatch") 
+		sw.start("Get current project")
+		def project = securityService.getUserCurrentProject()
+		def task = AssetComment.findByIdAndProject(params.commentId, project)
+		if ( ! task ) {
+			log.error "predecessorTableHtml - unable to find task $params.commentId for project $project.id"
+			render "An unexpected error occured"
+		} else {
+			def taskDependencies = task.taskDependencies
+			def html = new StringBuffer("""<table id="predecessorEditTableId" cellspacing="0" style="border:0px;width:0px"><tbody>""")
 			def optionList = AssetComment.constraints.category.inList.toList()
-			def paramsMap = ["selectId":"predecessorCategoryEditId_${taskDep.id}", "selectName":"category", "from":optionList, 
-                             	"jsEvent":"onChange='fillPredecessor(this.id,this.value,${assetComment.id})'", "selection":predecessor.category]
-			// To get html select from HtmlUtil class
-			def selectCategory = HtmlUtil.genHtmlSelect(paramsMap)
-			
-			def predFortask = taskService.genSelectForTaskDependency(taskDep, assetComment)
-			predEditTable.append("""<tr id="row_Edit_${taskDep.id}"><td>${selectCategory}</td>
-										<td id="taskDependencyEditTdId_${taskDep.id}">${predFortask}</td>
-										<td><a href="javascript:deletePredRow('row_Edit_${taskDep.id}')"><span class="clear_filter"><u>X</u></span></a></td>""")
-			selectCategory = ""
+			def i=1
+			taskDependencies.each{ taskDep ->
+				def predecessor = taskDep.predecessor
+				def paramsMap = [selectId:"predecessorCategoryEditId_${taskDep.id}", selectName:'category', 
+					options:optionList, optionSelected:predecessor.category,
+					javascript:"onChange='fillPredecessor(this.id,this.value,${task.id})'" ]
+				def selectCategory = HtmlUtil.generateSelect(paramsMap)
+				def selectPred = taskService.genSelectForTaskDependency(taskDep, task)
+				html.append("""<tr id="row_Edit_${taskDep.id}"><td>""")
+				html.append(selectCategory)
+				html.append("""</td><td id="taskDependencyEditTdId_${taskDep.id}">""")
+				html.append(selectPred)
+				html.append("""</td><td><a href="javascript:deletePredRow('row_Edit_${taskDep.id}')"><span class="clear_filter"><u>X</u></span></a></td>""")
+			}
+			render html
 		}
-		render predEditTable
 	}
+	
+	/**
+	 * Generates the HTML SELECT for a single Predecessor
+	 * @param commentId - the comment (aka task) that the predecessor will use
+	 * @param category - comment category to filter the list of tasks by
+	 * @return String - HTML Select of prdecessor list
+	 */
+	def predecessorSelectHtml = {
+		def project = securityService.getUserCurrentProject()
+		def projectId = project.id
+		def task
+		
+		if (params.commentId) { 
+			task = AssetComment.findByIdAndProject(params.commentId, project)
+			if ( ! task ) {
+				log.warn "predecessorSelectHtml - Unable to find task id ${params.commentId} in project $project.id"
+			}
+		}
+
+		def selectControl = taskService.genSelectForPredecessors(project, params.category, task)
+		
+		render selectControl
+	}
+	
 	/**
 	 * Export Special Report 
 	 * @param NA
