@@ -24,6 +24,8 @@ class TaskDependency {
 	static mapping = {
 		type sqltype: 'char', length:2
 		id column:'task_dependency_id'
+		assetComment fetch:'join'
+		predecessor fetch:'join'
 	}
 
 	String toString() {

@@ -3687,8 +3687,8 @@ class AssetEntityController {
 	 * @return render HTML
 	 */
 	def predecessorTableHtml = {
-		def sw = new org.springframework.util.StopWatch("predecessorTableHtml Stopwatch") 
-		sw.start("Get current project")
+		//def sw = new org.springframework.util.StopWatch("predecessorTableHtml Stopwatch") 
+		//sw.start("Get current project")
 		def project = securityService.getUserCurrentProject()
 		def task = AssetComment.findByIdAndProject(params.commentId, project)
 		if ( ! task ) {

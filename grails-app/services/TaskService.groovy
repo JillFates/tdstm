@@ -286,7 +286,7 @@ class TaskService {
 		// Determine if the status is being reverted (e.g. going from DONE to READY)
 		def revertStatus = compareStatus(previousStatus, status) > 0
 
-		log.info "setTaskStatus - task(#:${task.taskNumber} Id:${task.id}) status=${status}, previousStatus=${previousStatus}, revertStatus=${revertStatus}"
+		log.info "setTaskStatus - task(#:${task.taskNumber} Id:${task.id}) status=${status}, previousStatus=${previousStatus}, revertStatus=${revertStatus} - $whom"
 
 		// Setting of AssignedTO:
 		//
@@ -337,6 +337,7 @@ class TaskService {
 					// We don't want to loose the original started time if we are reverting from DONE to STARTED
 					if (! revertStatus ) {
 						task.actStart = now
+						addNote( task, whom, "Task Started")
 					}
 					break
 					
@@ -347,6 +348,7 @@ class TaskService {
 					task.assignedTo = assignee
 					task.resolvedBy = assignee
 					task.actFinish = now
+					addNote( task, whom, "Task Completed")
 					break
 					
 				case AssetCommentStatus.TERMINATED:
@@ -377,7 +379,7 @@ class TaskService {
 			trigger.setJobGroup('tdstm')
   
 			def result = quartzScheduler.scheduleJob(trigger)
-			log.info "triggerUpdateTaskSuccessors for task(#:${task.taskNumber} Id:${taskId}), status=$status, scheduled=$result"
+			log.info "triggerUpdateTaskSuccessors for task(#:${task.taskNumber} Id:${taskId}), status=$status, scheduled=$result - $whom"
 		}
 		
 	}
@@ -388,11 +390,18 @@ class TaskService {
 	 */
 	def updateTaskSuccessors( taskId, whomId, status ) {
 		
+		def whom = Person.read(whomId)
+		if (! whom) {
+			log.error "updateTaskSuccessors - for task(#:${task.taskNumber} Id:${task.id}) unable to find person ${whomId}"
+			return			
+		}
+		
 		def task 
 		
 		// This tasks will run parallel with the thread updating the current task to the state passed to this method. Therefore
 		// we need to make sure that the task has been updated.  We'll try for 3 seconds before giving up.
 		def cnt = 10
+		
 		while (cnt-- > 0) {
 			task = AssetComment.get(taskId)
 			if (! task) {
@@ -406,17 +415,11 @@ class TaskService {
 			}			
 		}
 		if (task.status != status) {
-			log.error "updateTaskSuccessors - for task(#:${task.taskNumber} Id:${task.id}) status (${task.status}) not as expected '${status}'"
+			log.error "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) status (${task.status}) not as expected '${status}' - $whom"
 			return
 		}
 		
-		def whom = Person.read(whomId)
-		if (! whom) {
-			log.error "updateTaskSuccessors - for task(#:${task.taskNumber} Id:${task.id}) unable to find person ${whomId}"
-			return			
-		}
-		
-		log.info "updateTaskSuccessors: processing task(#:${task.taskNumber} Id:${task.id}) ${task}"
+		log.info "updateTaskSuccessors: Processing task(#:${task.taskNumber} Id:${task.id}) ${task} - $whom"
 		//	def currStatus = task.status
 			
 		// TODO: taskStatusChangeEvent : Add logic to handle READY for the SS predecessor type and correct the current code to not assume SF type
@@ -425,51 +428,60 @@ class TaskService {
 		// Now mark any successors as Ready if all of the successors' predecessors are DONE
 		//
 		if ( status ==  AssetCommentStatus.DONE ) {
-			def successorDependents = TaskDependency.findAllByPredecessor(task)
-			log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) found ${successorDependents ? successorDependents.size() : '0'} successors"
-			successorDependents?.each() { succDepend ->
-				def dependentTask = succDepend.assetComment
-				log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) processing dependentTask(#:${dependentTask.taskNumber} Id:${dependentTask.id}) ${dependentTask}"
+			def successorDeps = TaskDependency.findAllByPredecessor(task)
+			log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) found ${successorDeps ? successorDeps.size() : '0'} successors - $whom"
+			def i = 1
+			successorDeps?.each() { succDepend ->
+				def successorTask = succDepend.assetComment
+				log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) Processing (#${i++}) successorTask(#:${successorTask.taskNumber} Id:${successorTask.id}) - $whom"
 				
-				// If the Task is in the Planned or Pending state, we can check to see if it makes sense to set to READY
-				if ([AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING].contains(dependentTask.status)) {
+				// If the Successor Task is in the Planned or Pending state, we can check to see if it makes sense to set to READY
+				if ([AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING].contains(successorTask.status)) {
 					
-					// Find all predecessor/ tasks for the successor, other than the current task, and make sure they are completed
-					def predDependencies = TaskDependency.findByAssetCommentAndPredecessorNot(dependentTask, task)
+					// Find all predecessor/tasks dependencies for the successor, other than the current task, and make sure they are completed
+					def dependencies = TaskDependency.findAllByAssetComment(successorTask)
 					def makeReady=true
-					log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) dependentTask(#:${dependentTask.taskNumber} Id:${dependentTask.id}) has other predecessors> ${predDependencies}"
-					predDependencies?.each() { predDependency ->
-						def predTask = predDependency.assetComment
+					def predTaskNumbers=''
+					if (dependencies) {
+						dependencies.each() { predTaskNumbers += "#${it.predecessor.taskNumber}," }
+					} else {
+						predTaskNumbers = 'NONE'
+					}
+					log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) successorTask(#:${successorTask.taskNumber} Id:${successorTask.id}) " + 
+						"has other predecessors> $predTaskNumbers - $whom"
+					dependencies?.each() { dependency ->
 						// TODO : runbook : taskStatusChangeEvent - add the dependency type (SS,FS) logic here
-						if (predTask.status != AssetCommentStatus.COMPLETED) { 
+						if (makeReady && dependency.predecessor.status != AssetCommentStatus.COMPLETED) { 
+							log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) successorTask(#:${successorTask.taskNumber} Id:${successorTask.id}) " +
+								" predecessor(#:${dependency.predecessor.taskNumber} Id:${dependency.predecessor.id}) status '${dependency.predecessor.status}' kicked it out"
 							makeReady = false
 						}
 					}
 					if (makeReady) {
 						/*
-						def taskToReady = AssetComment.get(dependentTask.id)
+						def taskToReady = AssetComment.get(successorTask.id)
 						setTaskStatus(taskToReady, AssetCommentStatus.READY)
 						if ( ! taskToReady.validate() ) {
 							log.error "taskStatusChangeEvent: Failed Readying successor task [${taskToReady.id} " + GormUtil.allErrorsString(taskToReady)
 						}
 //							if ( taskToReady.save(flush:true) ) {
 						if ( taskToReady.save() ) {
-							log.info "taskStatusChangeEvent: dependentTask(${taskToReady.id}) Saved"
+							log.info "taskStatusChangeEvent: successorTask(${taskToReady.id}) Saved"
 							return
 						}
-						if (! (  dependentTask.validate() && dependentTask.save(flush:true) ) ) {
+						if (! (  successorTask.validate() && successorTask.save(flush:true) ) ) {
 							log.error "Failed Readying successor task [${taskToReady.id} " + GormUtil.allErrorsString(taskToReady)
 						}
 						*/
 							
-						log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) setting dependentTask(#:${dependentTask.taskNumber} Id:${dependentTask.id}) to READY "
-						setTaskStatus(dependentTask, AssetCommentStatus.READY, whom)
-						// log.info "taskStatusChangeEvent: dependentTask(${dependentTask.id}) Making READY - Successful"
-						if ( ! dependentTask.validate() ) {
-							log.error "updateTaskSuccessors: task(#:${dependentTask.taskNumber} Id:${dependentTask.id}) failed READY of successor task(#:${dependentTask.taskNumber} Id:${dependentTask.id}), " + GormUtil.allErrorsString(dependentTask)
+						log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) setting successorTask(#:${successorTask.taskNumber} Id:${successorTask.id}) to READY  - $whom"
+						setTaskStatus(successorTask, AssetCommentStatus.READY, whom)
+						// log.info "taskStatusChangeEvent: successorTask(${successorTask.id}) Making READY - Successful"
+						if ( ! successorTask.validate() ) {
+							log.error "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) failed READY of successor task(#:${successorTask.taskNumber} Id:${successorTask.id}) - $whom : " + GormUtil.allErrorsString(successorTask)
 						}
 						
-						// log.info "taskStatusChangeEvent: task=${task.id} dependentTask(${dependentTask.id}) Made it by validate() "
+						// log.info "taskStatusChangeEvent: task=${task.id} successorTask(${successorTask.id}) Made it by validate() "
 						
 						/*
 						 * OK - For anybody looking at this logic and questioning it, let me first say I'm confused too.  For some 
@@ -481,20 +493,21 @@ class TaskService {
 						 * I therefore have commented it out.
 						 * John 8/2012
 						 */
-						if ( dependentTask.save(flush:true) ) {
-							log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) successor task(#:${dependentTask.taskNumber} Id:${dependentTask.id})Saved"
+						if ( successorTask.save(flush:true) ) {
+							log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) successor task(#:${successorTask.taskNumber} Id:${successorTask.id}) Saved - $whom"
 							return
 						} else {
-						//if (! (  dependentTask.validate() && dependentTask.save(flush:true) ) ) {
-							log.error "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) failed setting successor task(#:${dependentTask.taskNumber} Id:${dependentTask.id}) to READY, " + 
-								GormUtil.allErrorsString(dependentTask)
+						//if (! (  successorTask.validate() && successorTask.save(flush:true) ) ) {
+							log.error "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) failed setting successor task(#:${successorTask.taskNumber} Id:${successorTask.id}) to READY - $whom : " + 
+								GormUtil.allErrorsString(successorTask)
 							
-							 throw new TaskCompletionException("Unable to READY task ${dependentTask} due to " +
-								 GormUtil.allErrorsString(dependentTask) )
+							 throw new TaskCompletionException("Unable to READY task ${successorTask} due to " +
+								 GormUtil.allErrorsString(successorTask) )
 						}
 					}
 				} else {
-					log.warn "updateTaskSuccessors - taskId(#:${task.taskNumber} Id:${task.id}) found successor task(#:${dependentTask.taskNumber} Id:${dependentTask.id}): ${dependentTask} in unexpected status (${dependentTask.status}"
+					log.warn "updateTaskSuccessors - taskId(#:${task.taskNumber} Id:${task.id}) found successor task(#:${successorTask.taskNumber} Id:${successorTask.id}) " + 
+						"in unexpected status (${successorTask.status}  - $whom"
 				} 
 			} // succDependencies?.each()
 		}

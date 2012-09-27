@@ -976,10 +976,10 @@ class ClientTeamsController {
 		// to allow the Quartz job that updates successors to finish so that when the user sees the new results that it may have successors
 		// there were updated by the previous update.
 		if (params.containsKey('sync')) {
-			log.info "listTasks - sync'n 1,000 ms for ${person} on project ${project.id}"
-			this.sleep(1000)
+			log.info "listTasks - sync'n 500 ms for ${person} on project ${project.id}"
+			this.sleep(500)
+			log.info "listTasks - sunk for ${person} on project ${project.id}"
 		}
-		log.info "listTasks - sunk"
 		
 		def allTasks = false
 
