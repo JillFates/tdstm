@@ -663,7 +663,10 @@ function showAssetDialog( e , action ) {
 		      	 $('#assetShowValueId').html(params.assetName)
 			     $('#assetTrShowId').html(params.assetName)
 			     $('#eventShowValueId').html(params.eventName)
-			     $('#commentButtonEditId').attr('onClick','showAssetComment('+ac.id+', "edit")')
+			     $('#commentButtonEditId').removeAttr('onclick')
+				 $('#commentButtonEditId').unbind("click").bind("click", function(){
+					 showAssetComment(ac.id, "edit")
+				 });
 			     
 		      	 if(ac.commentType=='issue'){
 		      		 if(ac.resolution || ac.status=='Completed'){
