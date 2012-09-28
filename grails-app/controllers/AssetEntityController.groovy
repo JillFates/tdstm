@@ -3751,7 +3751,7 @@ class AssetEntityController {
 		def formatter = new SimpleDateFormat("yyyy/MM/dd")
 		def today = formatter.format(new Date())
 		try{
-			def filePath = "/templates/TDS-StorageInventory.xls"
+			def filePath = "/templates/TDS-Storage-Inventory.xls"
 			def filename = "${project.name}SpecialExport-${today}"
 			def book = ExportUtil.workBookInstance(filename, filePath, response) 
 			def spcExpSheet = book.getSheet("SpecialExport")
