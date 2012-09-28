@@ -93,24 +93,20 @@
 					<g:if test="${tab && tab == 'todo'}">
 					<tr id="showStatusId_${issue?.item?.id}" style="display: none;">
 						<td nowrap="nowrap" colspan="3" class="statusButtonBar">
-							<a id="started_button_${issue?.item?.id}" 
-								class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action" style="margin-left: 5px"
-								onclick="changeStatus('${issue?.item?.id}','${com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED}','${issue.item.status}')">
-								<span class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
-								<span class="ui-button-text task_button">Start</span>
-							</a>
-							<a id="done_button_${issue?.item?.id}"
-								class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
-								onclick="changeStatus('${issue?.item?.id}','Completed','${userId}')" style="margin-left: 5px">
-								<span class="ui-button-icon-primary ui-icon ui-icon-check task_icon"></span>
-								<span class="ui-button-text task_button">Done</span>
-							</a>
-							<a id="detail_button_${issue?.item?.id}"
-								class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action" style="margin-left: 5px" 
-								onclick="issueDetails(${issue?.item?.id},'${issue?.item?.status}')">
-								<span class="ui-button-icon-primary ui-icon ui-icon-play task_icon"></span>
-								<span class="ui-button-text task_button">Details..</span>
-							</a>
+							<g:if test="${issue.item.status == AssetCommentStatus.READY}"> 
+							<tds:actionButton label="Start" icon="ui-icon-play" id="${issue?.item?.id}"  
+								onclick="changeStatus('${issue?.item?.id}','${AssetCommentStatus.STARTED}', '${issue?.item?.status}', 'taskManager')"/>
+							</g:if>
+							<g:if test="${ [AssetCommentStatus.READY, AssetCommentStatus.STARTED].contains(issue.item.status) }"> 
+							<tds:actionButton label="Done" icon="ui-icon-check" id="${issue?.item?.id}"  
+								onclick="changeStatus('${issue?.item?.id}','${AssetCommentStatus.DONE}', '${issue?.item?.status}', 'taskManager')"/>
+							</g:if>
+							<tds:actionButton label="Details..." icon="ui-icon-zoomin" id="${issue?.item?.id}"  
+								onclick="issueDetails(${issue?.item?.id},'${issue?.item?.status}')"/>
+							<g:if test="${ personId != issue.item.assignedTo && issue.item.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]}">
+							<tds:actionButton label="Assign To Me" icon="ui-icon-play" id="${issue?.item?.id}"  
+								onclick="assignTask('${issue?.item?.id}','${issue.item.assignedTo}', '${issue.item.status}','myTask')"/>
+							</g:if>
 						</td>
 					</tr>
 				</g:if>

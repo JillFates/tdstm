@@ -2,6 +2,7 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.HtmlUtil
 
 class CustomTagLib {
 	static namespace = 'tds'
@@ -190,5 +191,16 @@ class CustomTagLib {
 		} else {
 			out << TimeUtil.ago(start, end)
 		}
+	}
+	
+	/**
+	* Used to generate an HTML Action Button 
+	* @param label - text to display in Button
+	* @param icon - CSS icon to display in button
+	* @param id - CSS id to embed into IDs
+	* @param onclick - Javascript to add to button
+	*/
+	def actionButton = { attrs ->
+		out << HtmlUtil.actionButton( attrs['label'], attrs['icon'], attrs['id'], attrs['onclick'] )
 	}
 }

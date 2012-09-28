@@ -98,25 +98,55 @@ class TaskController {
 	
 	/**
 	 *  Generate action bar for a selected comment in Task Manager
-	 *  @params : task id
+	 *  @params id - the task (aka AssetComment) id number for the task bark
 	 *  @return : actions bar as HTML (Start, Done, Details, Assign To Me)
 	 */
 	def genActionBarHTML = {
-		def commentInstance = AssetComment.get(params.id)
+		def comment = AssetComment.get(params.id)
 		def userLogin = securityService.getUserLogin()
+		
+		// There are a total of 13 columns so we'll subtract for each conditional button
+		def cols=12 
+		
 		StringBuffer actionBar = new StringBuffer("""<table style="border:0px"><tr>""")
-		if(commentInstance.status ==  AssetCommentStatus.READY){
-			actionBar.append(HtmlUtil.genActionButton(commentInstance,"Start","changeStatus('${commentInstance.id}','${AssetCommentStatus.STARTED}','${commentInstance.status}', 'taskManager')", "startTdId_${commentInstance.id}"))
+		if (comment) {
+			if(comment.status ==  AssetCommentStatus.READY){
+				cols--
+				actionBar.append( _actionButtonTd(	"startTdId_${comment.id}",
+					HtmlUtil.actionButton('Start', 'ui-icon-play', comment.id, 
+						"changeStatus('${comment.id}','${AssetCommentStatus.STARTED}','${comment.status}', 'taskManager')")))
+			}
+		
+			if (comment.status in[ AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
+				cols--
+				actionBar.append( _actionButtonTd("doneTdId_${comment.id}",
+					HtmlUtil.actionButton('Done', 'ui-icon-check', comment.id, 
+						"changeStatus('${comment.id}','${AssetCommentStatus.DONE}', '${comment.status}', 'taskManager')")))
+			}
+		
+			actionBar.append( 
+				_actionButtonTd("assignToMeId_${comment.id}", 
+					HtmlUtil.actionButton('Details...', 'ui-icon-zoomin', comment.id, "showAssetComment(${comment.id},'show')")))
+		
+			if (userLogin.person.id != comment.assignedTo?.id && comment.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
+				cols--
+				actionBar.append( _actionButtonTd("assignToMeId_${comment.id}", 
+					HtmlUtil.actionButton('Assign To Me', 'ui-icon-zoomin', comment.id,
+						"assignTask('${comment.id}','${comment.assignedTo}', '${comment.status}', 'taskManager')")))
+			}
+		} else {
+			log.warn "genActionBarHTML - invalid comment id (${params.id}) from user ${userLogin}"
+			actionBar.append('<td>An unexpected error occurred</td>')
 		}
-		if(commentInstance.status in[ AssetCommentStatus.READY,AssetCommentStatus.STARTED]){
-			actionBar.append(HtmlUtil.genActionButton(commentInstance,"Done","changeStatus('${commentInstance.id}','${AssetCommentStatus.DONE}', '${commentInstance.status}', 'taskManager')", "doneTdId_${commentInstance.id}"))
-		}
-		actionBar.append(HtmlUtil.genActionButton(commentInstance,"Details..","showAssetComment(${commentInstance.id},'show')","detailsTdId_${commentInstance.id}"))
-		if(userLogin.person.id != commentInstance.assignedTo?.id && commentInstance.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
-			actionBar.append(HtmlUtil.genActionButton(commentInstance,"Assign To Me","assignTask('${commentInstance.id}','${commentInstance.assignedTo}', '${commentInstance.status}','taskManager')", "assignMeId_${commentInstance.id}"))
-		}
-		actionBar.append(""" <td colspan='9'>&nbsp;</td>""")
-		actionBar.append(""" </tr></table>""")
+
+		actionBar.append(""" <td colspan='${cols}'>&nbsp;</td>
+			</tr></table>""")
 		render actionBar.toString()
+	}
+	/**
+	* Used by the getActionBarHTML to wrap the button HTML into <td>...</td>
+	*/
+	def _actionButtonTd(tdId, button) {
+		return """<td id="${tdId}" width="8%" nowrap="nowrap">${button}</td>"""	
 	}
 }
