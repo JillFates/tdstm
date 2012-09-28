@@ -3761,7 +3761,8 @@ class AssetEntityController {
 			
 			for ( int r = 0; r < storageInventoryList.size(); r++ ) {
 				 for( int c = 0; c < spcColumnList.size(); c++){
-					spcExpSheet.addCell( new Label( c, r+1, String.valueOf( storageInventoryList[r][spcColumnList[c]] )) )
+					def valueForSheet = storageInventoryList[r][spcColumnList[c]] instanceof String ? storageInventoryList[r][spcColumnList[c]] : storageInventoryList[r][spcColumnList[c]].toString()
+					spcExpSheet.addCell( new Label( c, r+1, valueForSheet ) )
 				 }
 			}
 			book.write()
