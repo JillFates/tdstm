@@ -13,8 +13,10 @@ function changeStatus(id, status, currentStatus, from){
 	var params = {'id':id,'status':status,'currentStatus':currentStatus,redirectTo:'taskManager'}
 
 	// Disable status change buttons to prevent double-clicking
-	$('#started_button_'+id).removeAttr('onclick')
+	$('#start_button_'+id).removeAttr('onclick')
 	$('#done_button_'+id).removeAttr('onclick')
+ 	$('#start_text_'+id).attr('class', 'task_button_disabled')
+	$('#done_text_'+id).attr('class', 'task_button_disabled')
 
 	if(from == "myTask"){ params = {'id':id,'status':status,'currentStatus':currentStatus,redirectTo:'taskManager','view':'myTask','tab':$('#tabId').val() }}
 	jQuery.ajax({
@@ -30,10 +32,10 @@ function changeStatus(id, status, currentStatus, from){
 					$('#status_'+id).html(data.assetComment.status)
 					$('#status_'+id).parent().removeAttr('class').addClass(data.statusCss)
 				    if(status=="Started"){ 
-					    $('#startTdId_'+id).hide() 
+					    // $('#startTdId_'+id).hide() 
 					}else if(status=="Completed"){
-						$('#startTdId_'+id).hide()
-						$('#doneTdId_'+id).hide()
+						//$('#startTdId_'+id).hide()
+						//$('#doneTdId_'+id).hide()
 					}
 				}else{
 					 $('#myTaskList').html(data)
@@ -61,6 +63,9 @@ function changeStatus(id, status, currentStatus, from){
 function assignTask(id, user, status, from){
 	if(B2 != ''){  B2.Pause(); }
 	if(B1 != ''){ B1.Pause(); }
+	$('#assigntome_button_'+id).removeAttr('onclick')
+	$('#assigntome_text_'+id).attr('class', 'task_button_disabled')
+ 	
 	jQuery.ajax({
 		url: '../task/assignToMe',
 		data: {'id':id, 'user':user, 'status':status},
@@ -71,12 +76,10 @@ function assignTask(id, user, status, from){
 			} else {
 				if(from=="taskManager"){
 					 $('#assignedToName_'+id).html(data.assignedTo)
-					 $('#assignMeId_'+id).hide()
-					 $('#row_d_'+id).hide()
+					 // $('#row_d_'+id).hide()
 					if(B2 != '' && taskManagerTimePref != 0){ B2.Restart(taskManagerTimePref);}
 				}else{
 					 $('#assignedToNameSpan_'+id).html(data.assignedTo)
-					 $('#assignToMeId_'+id).hide()
 					 if(B1 != '' && taskManagerTimePref != 0){ 
 					 	B1.Restart(taskManagerTimePref); 
 					 }else { 

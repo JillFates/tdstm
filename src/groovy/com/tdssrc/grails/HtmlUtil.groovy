@@ -48,16 +48,21 @@ class HtmlUtil {
 	
 	/**
 	 * Generate action button in action.
-	 * @param : obj as object , label as td's label, function as jsEvent
-	 * @return String	HTML td
+	 * @param label - text that appears in button
+	 * @param icon - CSS icon name to use
+	 * @param id - the task/asset Id number used to embed into the IDs
+	 * @param onClick - javascript to embed into the onclick event
+	 * @return String - HTML for the button
 	 */
-	def public static genActionButton(obj, label, function, tdId){
-		return """<td id="${tdId}" width="8%" nowrap="nowrap"><a class=" task_action ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
-					onclick="${function}">
-					<span class="ui-button-icon-primary ui-icon ui-icon-check task_icon"></span>
-					<span class="ui-button-text task_button">${label}</span>
-					</a></td> 
-				"""
+	def public static actionButton(label, icon, id, onclick) {
+		def name = label.toLowerCase().replace(' ', '').replace('.','')
+		def buttonId = name + "_button_" + id
+		def labelId = name + "_text_" + id
+		return """<a id="${buttonId}" class="task_action ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
+			onclick="${onclick}">
+			<span class="ui-button-icon-primary ui-icon ${icon} task_icon"></span>
+			<span id="${labelId}" class="ui-button-text task_button">${label}</span>
+			</a>"""
 	}
 	
 	 
