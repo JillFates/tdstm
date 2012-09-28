@@ -567,8 +567,9 @@ class TaskService {
 		queryForPredecessor.append(""" ORDER BY a.taskNumber ASC""")
 		// log.info "genSelectForTaskDependency - SQL ${queryForPredecessor.toString()}"
 		def predecessors = AssetComment.findAll(queryForPredecessor.toString())
-		def paramsMap = [selectId:"${idPrefix}_${taskDependency.id}", selectName:name, 
-			options:predecessors, optionKey:'id', optionSelected:predecessor.id ]
+		def paramsMap = [selectId:"${idPrefix}_${taskDependency.id}", selectName:"${name}", options:predecessors, optionKey:"id",
+			     			 optionSelected:predecessor.id, javascript:"onChange='this.className=this.options[this.selectedIndex].className'",
+							 optionClass:"", selectClass:HtmlUtil.getCssClassForStatus(predecessor.status)]
 		def selectControl = HtmlUtil.generateSelect( paramsMap )
 		//sw.stop()
 		//log.info "genSelectForTaskDependency - Stopwatch: ${sw.prettyPrint()}"
@@ -618,7 +619,9 @@ class TaskService {
 		def cssId = task ? 'taskDependencyEditId' : 'taskDependencyId'
 	    def selectName = task ? 'taskDependencyEdit' : 'taskDependencySave'
 		def firstOption = [value:'', display:'Please Select']
-		def paramsMap = [ selectId:cssId, selectName:selectName, options:taskList, optionKey:'id', firstOption:firstOption]
+		def paramsMap = [ selectId:cssId, selectName:selectName, options:taskList, optionKey:'id', firstOption:firstOption,
+						  javascript:"onChange='this.className=this.options[this.selectedIndex].className'",
+						  optionClass:""]
 		def selectControl = HtmlUtil.generateSelect( paramsMap )
 		
 		return selectControl

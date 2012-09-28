@@ -1,5 +1,7 @@
 package com.tdssrc.grails
 
+import com.tdsops.tm.enums.domain.AssetCommentStatus
+
 /**
  * The HtmlUtil class contains method to generate HTML from server side e.g. Select Box
  */
@@ -30,12 +32,14 @@ class HtmlUtil {
 			selected = optionSelected == params.firstOption ? 'selected="selected"' : ''			
 			html.append("""<option value="${params.firstOption.value}" ${selected}>${params.firstOption.display}</option>""")
 		}
+
 		
 		params.options.each() {
 			def key = optionKey ? it."${optionKey}" : it
 			def value = optionValue ? it."${optionValue}" : it
 			selected = key == optionSelected ? 'selected="selected"' : ''
-			html.append("""<option value="${key}" ${selected} >${value}</option>""")
+			def optionClass = params.containsKey('optionClass') ? "class ='${getCssClassForStatus(it.status)}' ": ''
+			html.append("""<option value="${key}" ${selected} ${optionClass}>${value}</option>""")
 		}
 		html.append('</select>')
 	 
@@ -54,5 +58,22 @@ class HtmlUtil {
 					<span class="ui-button-text task_button">${label}</span>
 					</a></td> 
 				"""
+	}
+	
+	 
+	/**
+	 * Used to determine the CSS class name that should be used when presenting a task, which is based on the task's status
+	 * @param status
+	 * @return String The appropriate CSS style or task_na if the status is invalid
+	 */
+	//TODO : Overriding the service method here since facing some issue to inject service class here,  need to clean up ASAP” in HtmlUilt
+	def public static getCssClassForStatus( status ) {
+		def css = 'task_na'
+		
+		if (AssetCommentStatus.list.contains(status)) {
+			css = "task_${status.toLowerCase()}"
+		}
+		// log.error "getCssClassForStatus('${status})=${css}"
+		return css
 	}
 }
