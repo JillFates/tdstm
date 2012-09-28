@@ -104,7 +104,7 @@
 							<tds:actionButton label="Details..." icon="ui-icon-zoomin" id="${issue?.item?.id}"  
 								onclick="issueDetails(${issue?.item?.id},'${issue?.item?.status}')"/>
 							<g:if test="${ personId != issue.item.assignedTo && issue.item.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]}">
-							<tds:actionButton label="Assign To Me" icon="ui-icon-play" id="${issue?.item?.id}"  
+							<tds:actionButton label="Assign To Me" icon="ui-icon-person" id="${issue?.item?.id}"  
 								onclick="assignTask('${issue?.item?.id}','${issue.item.assignedTo}', '${issue.item.status}','myTask')"/>
 							</g:if>
 						</td>

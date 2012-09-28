@@ -131,7 +131,7 @@ class TaskController {
 			if (userLogin.person.id != comment.assignedTo?.id && comment.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
 				cols--
 				actionBar.append( _actionButtonTd("assignToMeId_${comment.id}", 
-					HtmlUtil.actionButton('Assign To Me', 'ui-icon-zoomin', comment.id,
+					HtmlUtil.actionButton('Assign To Me', 'ui-icon-person', comment.id,
 						"assignTask('${comment.id}','${comment.assignedTo}', '${comment.status}', 'taskManager')")))
 			}
 		} else {

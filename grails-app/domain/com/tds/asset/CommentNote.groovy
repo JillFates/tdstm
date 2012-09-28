@@ -9,6 +9,7 @@ class CommentNote {
 	
 	Person createdBy
 	String note
+	Integer isAudit=0	// Flag if the note is created as an audit note created by the system
 	
 	Date dateCreated
 	Date lastUpdated
@@ -25,6 +26,7 @@ class CommentNote {
 		version false
 		autoTimestamp false
 		note sqlType:'text'
+		isAudit sqlType:'tinyint'
 	}
 	
 	def beforeInsert = {

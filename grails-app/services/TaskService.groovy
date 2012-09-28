@@ -666,10 +666,11 @@ class TaskService {
 	 * @param person	The Person object that is creating the note
 	 * @param note	A String that represents the note
 	 */
-	def addNote( def task, def person, def note ) {
+	def addNote( def task, def person, def note, def isAudit=1 ) {
 		def taskNote = new CommentNote();
 		taskNote.createdBy = person
 		taskNote.note = note
+		taskNote.isAudit = isAudit
 		if ( taskNote.hasErrors() ) {
 			log.error "addNote: failed to save note : ${GormUtil.allErrorsString(taskNote)}"
 			return false
@@ -704,7 +705,7 @@ class TaskService {
 			AssetComment.executeUpdate(updateSql, ['status':AssetCommentStatus.READY, 'ids':tasksMap.tasksNoPred ] )
 		}
 		if (tasksMap.tasksWithNotes.size() > 0) {
-			CommentNote.executeUpdate("DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids) AND cn.note LIKE 'Reverted task status from%'", 
+			CommentNote.executeUpdate("DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids) AND cn.isAudit=1", 
 				[ 'ids':tasksMap.tasksWithNotes ] )
 		}
 	}
