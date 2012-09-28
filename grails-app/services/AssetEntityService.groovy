@@ -333,14 +333,14 @@ class AssetEntityService {
 	def getSpecialExportData( project ){
 		String queryForSpecialExport = """ ( SELECT
 											   server.asset_entity_id AS server_id,
-											   IFNULL(app.asset_entity_id,'') AS app_id,
+											   app.asset_entity_id AS app_id,
 											   server.asset_name AS server_name,
 											   server.asset_type AS server_type,
 											   IFNULL(app.asset_name,'') AS app_name,
 											   IFNULL(sme,'') AS tru, IFNULL(sme2,'') AS tru2,
 											   IFNULL(mb.name,'') AS move_bundle,
 											   IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
-											   IFNULL(adb.dependency_bundle,'') AS group_id,
+											   adb.dependency_bundle AS group_id,
 											   IFNULL(server.custom4,'') AS storage_inventory,
 											   IFNULL(application.business_unit,'') AS dr_tier,
 											   IFNULL(server.new_or_old,'') AS status
@@ -359,14 +359,14 @@ class AssetEntityService {
 											
 											 ( SELECT
 											   dbsrv.asset_entity_id AS server_id,
-											   IFNULL(app.asset_entity_id,'') AS app_id,
+											   app.asset_entity_id AS app_id,
 											   dbsrv.asset_name AS server_name,
 											   dbsrv.asset_type server_type,
 											   IFNULL(app.asset_name,'') AS app_name,
 											   IFNULL(sme,'') AS tru, IFNULL(sme2,'') AS tru2,
 											   IFNULL(mb.name,'') AS move_bundle,
 											   IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
-											   IFNULL(adb.dependency_bundle,'') AS group_id,
+											   adb.dependency_bundle AS group_id,
 											   IFNULL(dbsrv.custom4,'') AS storage_inventory,
 											   IFNULL(applic.business_unit,'') AS dr_tier,
 											   IFNULL(dbsrv.new_or_old,'') AS status
@@ -385,14 +385,14 @@ class AssetEntityService {
 											UNION DISTINCT
 											( SELECT
 											   clustersrv.asset_entity_id AS server_id,
-											   IFNULL(app.asset_entity_id,'') AS app_id,
+											   app.asset_entity_id AS app_id,
 											   clustersrv.asset_name AS server_name,
 											   clustersrv.asset_type server_type,
 											   IFNULL(app.asset_name,'') AS app_name,
 											   IFNULL(sme,'') AS tru, IFNULL(sme2,'') AS tru2,
 											   IFNULL(mb.name,'') AS move_bundle,
 											   IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
-											   IFNULL(adb.dependency_bundle,'') AS group_id,
+											   adb.dependency_bundle AS group_id,
 											   IFNULL(clustersrv.custom4,'') AS storage_inventory,
 											   IFNULL(applic.business_unit,'') AS dr_tier,
 											   IFNULL(clustersrv.new_or_old,'') AS status
