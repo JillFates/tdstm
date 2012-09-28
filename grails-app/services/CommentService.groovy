@@ -269,6 +269,7 @@ class CommentService {
 					commentNote.createdBy = userLogin.person
 					commentNote.dateCreated = date
 					commentNote.note = params.note
+					commentNote.isAudit=0
 					// assetComment.addToNotes(this)
 					commentNote.assetComment = assetComment
 					if ( commentNote.hasErrors() || ! commentNote.save(flush:true)){
