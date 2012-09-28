@@ -71,7 +71,6 @@ def lastMoveBundleId
 def moveEvents = [:]
 def taskList = [:]
 def dependencies = []
-def lastTaskNum
 def taskCount=0
 def predecessorCount=0
 def status
@@ -138,12 +137,7 @@ importFile.splitEachLine("\t") { fields ->
 		taskList[taskNum] = taskId
 		if (predecessors) {
 			dependencies << [ taskId:taskId, predecessors:predecessors ]
-		} else {
-			if (lastTaskNum) {
-				dependencies << [ taskId:taskId, predecessors:lastTaskNum ]
-			}
-		}
-		lastTaskNum = taskNum
+		} 
 		
 		// println "assetId:${assetId} taskNum:${taskNum} stepCode:${stepCode} role:${role}"
 
