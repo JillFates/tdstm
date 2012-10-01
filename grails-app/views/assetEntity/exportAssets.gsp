@@ -50,7 +50,7 @@
                 <td class="buttonR">
                 	<input class="button" type="submit" value="Generate Standard"/> 
                 	<g:link controller="assetEntity" action="exportSpecialReport">
-                		<input class="button" type="button" value="Generate Special"/>
+                		<input class="button" type="button" value="Generate Special" onclick="window.location=this.parentNode.href;"/>
                 	</g:link>
                 </td>
               </tds:hasPermission>
