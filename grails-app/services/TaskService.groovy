@@ -406,7 +406,6 @@ class TaskService {
 		// This tasks will run parallel with the thread updating the current task to the state passed to this method. Therefore
 		// we need to make sure that the task has been updated.  We'll try for 3 seconds before giving up.
 		def cnt = 10
-		log.info "updateTaskSuccessors - securityService=${securityService ? securityService.getClass() : 'Undefined'}"
 		
 		while (cnt-- > 0) {
 			task = AssetComment.get(taskId)

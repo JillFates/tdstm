@@ -2769,51 +2769,68 @@ class AssetEntityController {
 
 
 	}
+	
+	/**
+	* Renders the detail of an AssetEntity 
+	*/
 	def show ={
-		def items = []
-		def assetEntityInstance = AssetEntity.get( params.id )
-		def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
-		def projectId = getSession().getAttribute( "CURR_PROJ" )?.CURR_PROJ
-		def project = Project.findById( projectId )
-		def attributeOptions
-		def options
-		def frontEndLabel
-		def dependentAssets
-		def supportAssets
-		def assetComment
-		entityAttributeInstance.each{
-			attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute,[sort:'value',order:'asc'] )
-			options = []
-			attributeOptions.each{option ->
-				options<<[option:option.value]
+		def project = securityService.getUserCurrentProject()
+		def projectId = project.id
+		def userLogin = securityService.getUserLogin()
+		def assetEntity
+		
+		if (params.containsKey('id')) {
+			assetEntity = AssetEntity.findByIdAndProject( params.id, project )
+			if (! assetEntity) {
+				flash.message = "Unable to find asset within current project"
+				log.warn "show - asset id (${params.id}) not found for project (${project.id}) by user ${userLogin}"				
 			}
-			if( !bundleMoveAndClientTeams.contains(it.attribute.attributeCode) && it.attribute.attributeCode != "currentStatus" && it.attribute.attributeCode != "usize" ){
-				frontEndLabel = it.attribute.frontendLabel
-				if( customLabels.contains( frontEndLabel ) ){
-					frontEndLabel = project[it.attribute.attributeCode] ? project[it.attribute.attributeCode] : frontEndLabel
+		} else {
+			flash.message = "Asset reference id was missing from request"
+			log.error "show - missing params.id in request by user ${userLogin}"
+		}
+		
+		if (flash.message) {
+			redirect(action:list)
+		} else {
+		
+			def items = []
+			def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntity.attributeSet.id order by eav.sortOrder ")
+			def attributeOptions
+			def options
+			def frontEndLabel
+			def dependentAssets
+			def supportAssets
+			// def assetComment
+				
+			entityAttributeInstance.each{
+				attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute,[sort:'value',order:'asc'] )
+				options = []
+				attributeOptions.each{option ->
+					options<<[option:option.value]
+				}
+				if( !bundleMoveAndClientTeams.contains(it.attribute.attributeCode) && it.attribute.attributeCode != "currentStatus" && it.attribute.attributeCode != "usize" ){
+					frontEndLabel = it.attribute.frontendLabel
+					if( customLabels.contains( frontEndLabel ) ){
+						frontEndLabel = project[it.attribute.attributeCode] ? project[it.attribute.attributeCode] : frontEndLabel
+					}
 				}
 			}
-		}
-		if(!assetEntityInstance) {
-			flash.message = "Asset not found with id ${params.id}"
-			redirect(action:list)
-		}
-		else {
-			dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntityInstance])
-			supportAssets 	= AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntityInstance])
-		}
-		if(AssetComment.find("from AssetComment where assetEntity = ${assetEntityInstance?.id} and commentType = ? and isResolved = ?",['issue',0])){
-			assetComment = "issue"
-		} else if(AssetComment.find('from AssetComment where assetEntity = '+ assetEntityInstance?.id)){
-			assetComment = "comment"
-		} else {
-			assetComment = "blank"
-		}
-		def assetCommentList = AssetComment.findAllByAssetEntity(assetEntityInstance)
+			
+			dependentAssets = AssetDependency.findAll("from AssetDependency as a where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
+			supportAssets 	= AssetDependency.findAll("from AssetDependency as a where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
 		
-		[label:frontEndLabel, assetEntityInstance:assetEntityInstance,supportAssets: supportAssets,
-					dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList,dependencyBundlenumber:AssetDependencyBundle.findByAsset(assetEntityInstance)?.dependencyBundle]
+			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
+			
+			[	label:frontEndLabel, assetEntity:assetEntity, 
+				supportAssets:supportAssets, dependentAssets:dependentAssets, 
+				redirectTo:params.redirectTo,
+				assetCommentList:assetCommentList,
+				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle
+			]
+		}
 	}
+	
 	def edit ={
 		def assetEntityInstance = AssetEntity.get(params.id)
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
