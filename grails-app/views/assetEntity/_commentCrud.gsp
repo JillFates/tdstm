@@ -52,7 +52,7 @@
 	<div>
 	<table id="showCommentTable" style="border: 0px;">
 		<tr class="prop">
-			<td valign="top" class="name"><label for="comment"><b>Task <span id="taskNumberId"></span>:</b></label></td>
+			<td valign="top" class="name"><label for="comment"><b><span id="taskNumberId"></span>:</b></label></td>
 			<td valign="top" class="value" colspan="3">
 				<textarea cols="80" rows="2" id="commentTdId" readonly="readonly"></textarea>
 			</td>
@@ -184,7 +184,7 @@
 <%--
 /*
  **************************
- * Create Comment Dialog
+ * Create Comment/TASK Dialog
  **************************
  */
 --%>
@@ -198,40 +198,20 @@
 	<div>
 		<table id="createCommentTable" style="border: 0px;">
 		<tr class="prop">
-			<td id="issueItemId" valign="top" class="name"><label for="comment">Description:</label></td>
-			<td valign="top" class="value" colspan="4">
+			<td id="issueItemId" valign="top" class="name"><label for="comment">Task Desc:</label></td>
+			<td valign="top" class="value" colspan="3">
 				<textarea cols="80" rows="2" id="comment" name="comment"></textarea>
 			</td>
 		</tr>
 		<tr class="prop" id="assignedToId" style="display: none">
 			<td valign="middle" class="name"><label for="assignedTo">Assigned:</label></td>
 			<td valign="middle" nowrap="nowrap" colspan="3">
-				<span id="assignedCreateSpan"></span>
-				&nbsp;/&nbsp;
+				<span id="assignedCreateSpan"></span>&nbsp;/&nbsp;
 				<g:select id="roleType" name="roleType" from="${staffRoles}" noSelection="['':'Unassigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)"></g:select> &nbsp;
 				<input type="checkbox" id="hardAssigned" name="hardAssigned" value="1"  checked="checked"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;
 				<label for="hardAssigned" >Fixed Assignment</label>&nbsp;&nbsp;
 			</td>
-		</tr>
-		<tr class="prop" >
-			<td valign="top" class="name" id="typeCommentCreateId" ><label for="commentType">Type:</label></td>
-			<td  id="commentTypeCreateTdId" class="name" nowrap="nowrap">
-				<g:select id="commentType" name="commentType" from="${com.tds.asset.AssetComment.constraints.commentType.inList}" value="comment"
-				onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;
-			</td>
-			<td>
-				<label id="categoryLabelId" for="category" >Category:</label>
-			</td>
-			<td nowrap="nowrap">
-            	<g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
-            	noSelection="['':'please select']" onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionId', 'predecessorId','')"></g:select>
-        		&nbsp;&nbsp;
-        		<span id="priorityCreateSpanId" style="display: none">
-	        		<label for="priority">Priority:</label>
-	            	<g:select id="priority" name="priority" from="${1..5}" value="3"></g:select>
-            	</span>
-        	</td>
 		</tr>
 		<tr class="prop" id="moveEventTrId" style="display: none">
 			<td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
@@ -240,15 +220,23 @@
 				 optionKey='id' optionValue="name" noSelection="['':'please select']"></g:select>
 			</td>
 		</tr>
-		<tr class="prop" id="mustVerifyTr" style="display: none;">
-            <td valign="top" id="mustVerifyTd" style="display: none;" colspan="4">
-			<input type="checkbox" id="mustVerify" name="mustVerify" value="0"
-				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
-			<label for="mustVerifyEdit">Must Verify</label>
+		<tr class="prop" >
+			<td>
+				<label id="categoryLabelId" for="category" >Category:</label>
 			</td>
+			<td nowrap="nowrap">
+            	<g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
+            	noSelection="['':'please select']" onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionId', 'predecessorId','')"></g:select>
+			</td>
+			<td nowrap="nowrap" colspan="2">
+        		<span id="priorityCreateSpanId" style="display: none">
+	        		<label for="priority">Priority:</label>
+	            	<g:select id="priority" name="priority" from="${1..5}" value="3"></g:select>
+            	</span>
+        	</td>
 		</tr>
 		<tr class="prop" id="workFlowTransitionTrId" style="display: none">
-			<td valign="top" class="name"><label for="actStartTrId">WorkFlow Step:</label></td>
+			<td valign="top" class="name"><label>WorkFlow Step:</label></td>
 			<td valign="top" class="value" id="workFlowTransitionId" colspan="3">
 			<input type="checkbox" id="override" name="override" value="0"
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
@@ -261,10 +249,27 @@
             	<span id="assetEntityInputId"></span>
         	</td>
 		</tr>
+		<tr id="durationTrId" class="prop" style="display: none">
+        	<td valign="top" class="name"><label for="duration ">Duration:</label></td>
+        	<td valign="top" class="value" colspan="3">
+        	  <input type="text" id="duration" name="duration" value="" size="3">
+            	<g:select id="durationScale" name="durationScale " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>
+        	</td>
+		</tr>
+		<tr id="statusCreateTrId"  class="prop" style="display: none">
+			<td valign="top" class="name"  ><label for="status">Status:</label></td>
+			<td valign="top" class="value" colspan="3">
+				<g:select id="statusId" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Ready"
+				noSelection="['':'please select']" onChange="showResolve(this.value)"></g:select>
+			</td>
+		</tr>
 		<tr class="prop" id="predecessorHeadTrId" style="display: none">
-			<td valign="top" class="name" colspan="4">
-				<label for="actStartTrId">Predecessors</label>
+			<td valign="top" class="name" colspan="2">
+				<label>Predecessors</label>
 				<a class="button" href="javascript:" onclick="addPredecessor('createCategory','','','predecessorTr','relatedIssueId');"> Add </a>
+			</td>
+			<td valign="top" class="name" colspan="2">
+				<label>Successors</label>
 			</td>
 		</tr>
 		<tr class="prop" id="predecessorTr" style="display: none">
@@ -276,19 +281,33 @@
 			   </table>
 			</td>
 		</tr>
-		<tr id="statusCreateTrId"  class="prop" style="display: none">
-			<td valign="top" class="name"  ><label for="status">Status:</label></td>
-			<td valign="top" class="value" colspan="3">
-				<g:select id="statusId" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Ready"
-				noSelection="['':'please select']" onChange="showResolve(this.value)"></g:select>
+		<tr class="prop" id="estStartTrId" style="display: none">
+			<td valign="top" class="name"><label for="estStartTrId">Estimated start:</label></td>
+			<td valign="top" class="value">
+			      <script type="text/javascript">
+				   jQuery(function($){$('.datetimeRange').datetimepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+                  </script> <input type="text" class="datetimeRange" size="15" style="" name="estStart" id="estStartCreateId"
+					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+				&nbsp;&nbsp;
+			<td valign="top" class="name"><label for="estFinishTrId">Estimated finish:</label></td>
+			<td valign="top" class="value">
+				<input type="text" class="datetimeRange" size="15" style="" name="estFinish" id="estFinishCreateId"
+					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 		</tr>
-		<tr id="durationTrId" class="prop" style="display: none">
-        	<td valign="top" class="name"><label for="duration ">Duration:</label></td>
-        	<td valign="top" class="value" colspan="3">
-        	  <input type="text" id="duration" name="duration" value="" size="3">
-            	<g:select id="durationScale" name="durationScale " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>
-        	</td>
+		<tr class="prop" >
+			<td valign="top" class="name" id="typeCommentCreateId" ><label for="commentType">Type:</label></td>
+			<td  id="commentTypeCreateTdId" class="name" nowrap="nowrap" colspan="3">
+				<g:select id="commentType" name="commentType" from="${com.tds.asset.AssetComment.constraints.commentType.inList}" value="comment"
+				onChange="commentChange('#createResolveDiv','createCommentForm')"></g:select>&nbsp;&nbsp;
+			</td>
+		</tr>
+		<tr class="prop" id="mustVerifyTr" style="display: none;">
+            <td valign="top" id="mustVerifyTd" style="display: none;" colspan="4">
+			<input type="checkbox" id="mustVerify" name="mustVerify" value="0"
+				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
+			<label for="mustVerifyEdit">Must Verify</label>
+			</td>
 		</tr>
 	</table>
 	</div>
@@ -302,19 +321,6 @@
 	</div>
 	<div id="createResolveDiv" style="display: none;">
 		<table id="createResolveTable" style="border: 0px">
-		<tr class="prop" id="estStartTrId" style="display: none">
-			<td valign="top" class="name"><label for="estStartTrId">Estimated start:</label></td>
-			<td valign="top" class="value" colspan="3" >
-			      <script type="text/javascript">
-				   jQuery(function($){$('.datetimeRange').datetimepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-                  </script> <input type="text" class="datetimeRange" size="15" style="" name="estStart" id="estStartCreateId"
-					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-				&nbsp;&nbsp;
-				<label for="estFinishTrId">Estimated finish:</label>
-				<input type="text" class="datetimeRange" size="15" style="" name="estFinish" id="estFinishCreateId"
-					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-			</td>
-		</tr>
 		<tr class="prop" id="actStartTrId" style="display: none">
 			<td valign="top" class="name"><label for="actStartTrId">Actual Start:</label></td>
 			<td valign="top" class="value" colspan="3">
