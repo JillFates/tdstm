@@ -51,12 +51,14 @@
 	<div class="dialog" style="border: 1px solid #5F9FCF"><input name="id" value="" id="commentId" type="hidden" />
 	<div>
 	<table id="showCommentTable" style="border: 0px;">
-		<tr>
-			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
-			<td valign="top" class="value" id="createdById" colspan="3"></td>
+		<tr class="prop">
+			<td valign="top" class="name"><label for="comment"><b>Description:</b></label></td>
+			<td valign="top" class="value" colspan="3">
+				<textarea cols="80" rows="2" id="commentTdId" readonly="readonly"></textarea>
+			</td>
 		</tr>
 		<tr class = "issue" id="assignedToTrId" style="display: none">
-			<td valign="top" class="name"><label for="assignedTo">Assigned To:</label></td>
+			<td valign="top" class="name"><label for="assignedTo">Assigned:</label></td>
 			<td valign="top" class="value" id="" colspan="3">
 				<span id="assignedToTdId"></span>&nbsp;/&nbsp;<span id="roleTdId"></span>&nbsp;&nbsp;
 				<input type="checkbox" id="hardAssignedShow" name="hardAssignedShow" value="0"
@@ -67,6 +69,10 @@
 		<tr class="prop" id="commentShowTrId">
 			<td valign="top" class="name"><label for="commentType">Type:</label></td>
 			<td valign="top" class="value" id="commentTypeTdId" colspan="3"></td>
+		</tr>
+		<tr id="moveShowId" class="prop" style="display: none;">
+			<td valign="top" class="name" id="eventTdId"><label for="moveEvent">Move Event:</label></td>
+			<td valign="top" class="value" id="eventShowValueId" colspan="3"></td>
 		</tr>
 		<tr class="issue" id="categoryTrId">
 			<td valign="top" class="name"><label for="category">Category:</label></td>
@@ -84,7 +90,7 @@
 			</td>
 		</tr>
 		<tr class="issue" id="workFlowShow" style="display: none">
-			<td valign="top" class="name" nowrap="nowrap"><label for="workFlowShowId">WorkFlow Transition:</label></td>
+			<td valign="top" class="name" nowrap="nowrap"><label for="workFlowShowId">WorkFlow Step:</label></td>
 			<td valign="top" class="value" id="workFlowShowId"></td>
 			<td valign="top" class="name" colspan="2"><input type="checkbox" id="overrideShow" name="overrideShow" value="0"
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
@@ -94,10 +100,11 @@
 			<td valign="top" class="name" id="assetTdId"><label for="asset">Asset:</label></td>
 			<td valign="top" class="value" id="assetShowValueId" colspan="3"></td>
 		</tr>
-		<tr class="prop">
-			<td valign="top" class="name"><label for="comment"><b>Description:</b></label></td>
-			<td valign="top" class="value" colspan="3">
-				<textarea cols="80" rows="2" id="commentTdId" readonly="readonly"></textarea>
+		<tr class="issue" id="workFlowShow" style="display: none">
+			<td valign="top" class="name"><label for="durationShowId">Duration:</label></td>
+			<td valign="top" class="value"colspan="3">
+				<span id="durationShowId" />
+				<span id="durationScale" />
 			</td>
 		</tr>
 		<tr class="prop" id="predecessorShowTr" style="display: none">
@@ -110,20 +117,13 @@
 			<td valign="top" class="name"><label for="predecessorShowId">Predecessor:</label></td>
 			<td valign="top" class="value" id="predecessorShowId" colspan="3"></td>
 		</tr>
-		<tr id="moveShowId" class="prop" style="display: none;">
-			<td valign="top" class="name" id="eventTdId"><label for="moveEvent">Move Event:</label></td>
-			<td valign="top" class="value" id="eventShowValueId" colspan="3"></td>
-		</tr>
 		<tr class="prop" style="display: none">
 			<td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
 			<td valign="top" class="value" id="commentCodeTdId" colspan="3"></td>
 		</tr>
-		<tr class="issue" id="workFlowShow" style="display: none">
-			<td valign="top" class="name"><label for="durationShowId">Duration:</label></td>
-			<td valign="top" class="value"colspan="3">
-				<span id="durationShowId" />
-				<span id="durationScale" />
-			</td>
+		<tr>
+			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
+			<td valign="top" class="value" id="createdById" colspan="3"></td>
 		</tr>
 	</table>
 	</div>
@@ -196,8 +196,14 @@
   <div class="dialog" style="border: 1px solid #5F9FCF">
 	<div>
 		<table id="createCommentTable" style="border: 0px;">
+		<tr class="prop">
+			<td id="issueItemId" valign="top" class="name"><label for="comment">Description:</label></td>
+			<td valign="top" class="value" colspan="4">
+				<textarea cols="80" rows="2" id="comment" name="comment"></textarea>
+			</td>
+		</tr>
 		<tr class="prop" id="assignedToId" style="display: none">
-			<td valign="middle" class="name"><label for="assignedTo">Assigned To:</label></td>
+			<td valign="middle" class="name"><label for="assignedTo">Assigned:</label></td>
 			<td valign="middle" nowrap="nowrap" colspan="3">
 				<span id="assignedCreateSpan"></span>
 				&nbsp;/&nbsp;
@@ -226,6 +232,13 @@
             	</span>
         	</td>
 		</tr>
+		<tr class="prop" id="moveEventTrId" style="display: none">
+			<td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
+			<td valign="top" class="value" colspan="3">
+				<g:select id="moveEvent" name="moveEvent" from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}"
+				 optionKey='id' optionValue="name" noSelection="['':'please select']"></g:select>
+			</td>
+		</tr>
 		<tr class="prop" id="mustVerifyTr" style="display: none;">
             <td valign="top" id="mustVerifyTd" style="display: none;" colspan="4">
 			<input type="checkbox" id="mustVerify" name="mustVerify" value="0"
@@ -234,7 +247,7 @@
 			</td>
 		</tr>
 		<tr class="prop" id="workFlowTransitionTrId" style="display: none">
-			<td valign="top" class="name"><label for="actStartTrId">WorkFlowTransition:</label></td>
+			<td valign="top" class="name"><label for="actStartTrId">WorkFlow Step:</label></td>
 			<td valign="top" class="value" id="workFlowTransitionId" colspan="3">
 			<input type="checkbox" id="override" name="override" value="0"
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
@@ -246,12 +259,6 @@
         	<td valign="top" class="value" colspan="3">
             	<span id="assetEntityInputId"></span>
         	</td>
-		</tr>
-		<tr class="prop">
-			<td id="issueItemId" valign="top" class="name"><label for="comment">Description:</label></td>
-			<td valign="top" class="value" colspan="4">
-				<textarea cols="80" rows="2" id="comment" name="comment"></textarea>
-			</td>
 		</tr>
 		<tr class="prop" id="predecessorHeadTrId" style="display: none">
 			<td valign="top" class="name" colspan="4">
@@ -273,13 +280,6 @@
 			<td valign="top" class="value" colspan="3">
 				<g:select id="statusId" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Ready"
 				noSelection="['':'please select']" onChange="showResolve(this.value)"></g:select>
-			</td>
-		</tr>
-		<tr class="prop" id="moveEventTrId" style="display: none">
-			<td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
-			<td valign="top" class="value" colspan="3">
-				<g:select id="moveEvent" name="moveEvent" from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}"
-				 optionKey='id' optionValue="name" noSelection="['':'please select']"></g:select>
 			</td>
 		</tr>
 		<tr id="durationTrId" class="prop" style="display: none">
