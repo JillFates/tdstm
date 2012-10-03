@@ -42,7 +42,7 @@
 <%--
 /*
  **************************
- * Show Comment Dialog
+ * Show Comment/TASK Dialog
  **************************
  */
 --%>
@@ -52,7 +52,7 @@
 	<div>
 	<table id="showCommentTable" style="border: 0px;">
 		<tr class="prop">
-			<td valign="top" class="name"><label for="comment"><b>Description:</b></label></td>
+			<td valign="top" class="name"><label for="comment"><b>Task <span id="taskNumberId"></span>:</b></label></td>
 			<td valign="top" class="value" colspan="3">
 				<textarea cols="80" rows="2" id="commentTdId" readonly="readonly"></textarea>
 			</td>
@@ -66,10 +66,6 @@
 				<label for="hardAssignedShow" >Fixed Assignment</label>&nbsp;&nbsp;
 			</td>
 		</tr>
-		<tr class="prop" id="commentShowTrId">
-			<td valign="top" class="name"><label for="commentType">Type:</label></td>
-			<td valign="top" class="value" id="commentTypeTdId" colspan="3"></td>
-		</tr>
 		<tr id="moveShowId" class="prop" style="display: none;">
 			<td valign="top" class="name" id="eventTdId"><label for="moveEvent">Move Event:</label></td>
 			<td valign="top" class="value" id="eventShowValueId" colspan="3"></td>
@@ -78,15 +74,6 @@
 			<td valign="top" class="name"><label for="category">Category:</label></td>
 			<td valign="top" class="value" id="categoryTdId" style="width:15%"></td>
 			<td>
-				<span id="taskNumberId"></span>
-				<span ><label for="priorityShowId">Priority:</label></span>
-				<span id="priorityShowId"></span>
-			</td>
-		</tr>
-		<tr class="prop" id="mustVerifyId" style="display: none">
-			<td valign="top" class="name" ><label for="mustVerify">Must Verify:</label></td>
-			<td valign="top" class="value" id="verifyTdId" colspan="3">
-				<input type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0" disabled="disabled" />
 			</td>
 		</tr>
 		<tr class="issue" id="workFlowShow" style="display: none">
@@ -102,10 +89,18 @@
 		</tr>
 		<tr class="issue" id="workFlowShow" style="display: none">
 			<td valign="top" class="name"><label for="durationShowId">Duration:</label></td>
-			<td valign="top" class="value"colspan="3">
+			<td valign="top" class="value"colspan="2">
 				<span id="durationShowId" />
 				<span id="durationScale" />
 			</td>
+			<td>
+				<span ><label for="priorityShowId">Priority:</label></span>
+				<span id="priorityShowId"></span>
+			</td>
+		</tr>
+    	<tr class="prop">
+			<td valign="top" class="name"><label for="status">Status:</label></td>
+			<td valign="top" class="value" id="statusShowId" colspan="1" style="width: 20%"></td>
 		</tr>
 		<tr class="prop" id="predecessorShowTr" style="display: none">
 			<td valign="top"><label for="precessorShowId">Predecessor:</label></td>
@@ -113,28 +108,12 @@
 			<td valign="top"  style="float: left;"><label for="precessorShowId" >Successor:</label></td>
 			<td valign="top" id="successorShowTd" colspan="2" width="76%" style="margin-left: 0px;float: left;"></td>
 		</tr>
-        <tr class="prop" id="predecessorTrShowId" style="display: none">
-			<td valign="top" class="name"><label for="predecessorShowId">Predecessor:</label></td>
-			<td valign="top" class="value" id="predecessorShowId" colspan="3"></td>
-		</tr>
-		<tr class="prop" style="display: none">
-			<td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
-			<td valign="top" class="value" id="commentCodeTdId" colspan="3"></td>
-		</tr>
 		<tr>
 			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 			<td valign="top" class="value" id="createdById" colspan="3"></td>
 		</tr>
-	</table>
-	</div>
-	<div id="showResolveDiv" style="display: none;" class="issue">
-	<table id="showResolveTable" style="border: 0px">
-    	<tr class="prop">
-			<td valign="top" class="name"><label for="status">Status:</label></td>
-			<td valign="top" class="value" id="statusShowId" colspan="1" style="width: 20%"></td>
-		</tr>
 		<tr class="prop">
-			<td valign="top" class="name"><label for="previousNotes">Previous Notes:</label></td>
+			<td valign="top" class="name"><label for="previousNotes">Prev. Notes:</label></td>
 			<td valign="top" class="value" colspan="3">
 				<div id="previousNotesShowId"></div>
 			</td>
@@ -151,6 +130,28 @@
 			<td valign="top" class="name" nowrap="nowrap" width="10%"><label for="actFinishShowId">Actual Finish:</label></td>
 			<td valign="top" class="value" id="actFinishShowId" nowrap="nowrap"></td>
 		</tr >
+        <tr class="prop" id="predecessorTrShowId" style="display: none">
+			<td valign="top" class="name"><label for="predecessorShowId">Predecessor:</label></td>
+			<td valign="top" class="value" id="predecessorShowId" colspan="3"></td>
+		</tr>
+		<tr class="prop" style="display: none">
+			<td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
+			<td valign="top" class="value" id="commentCodeTdId" colspan="3"></td>
+		</tr>
+		<tr class="prop" id="commentShowTrId">
+			<td valign="top" class="name"><label for="commentType">Type:</label></td>
+			<td valign="top" class="value" id="commentTypeTdId" colspan="3"></td>
+		</tr>
+		<tr class="prop" id="mustVerifyId" style="display: none">
+			<td valign="top" class="name" ><label for="mustVerify">Must Verify:</label></td>
+			<td valign="top" class="value" id="verifyTdId" colspan="3">
+				<input type="checkbox" id="mustVerifyShowId" name="mustVerify" value="0" disabled="disabled" />
+			</td>
+		</tr>
+	</table>
+	<div id="showResolveDiv" style="display: none;" class="issue">
+	</div>
+	<table id="showResolveTable" style="border: 0px">
 		<tr class="prop">
 			<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
 			<td valign="top" class="value" colspan="6">
