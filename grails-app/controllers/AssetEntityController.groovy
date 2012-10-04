@@ -2778,6 +2778,7 @@ class AssetEntityController {
 		def projectId = project.id
 		def userLogin = securityService.getUserLogin()
 		def assetEntity
+		flash.message = null
 		
 		if (params.containsKey('id')) {
 			assetEntity = AssetEntity.findByIdAndProject( params.id, project )
@@ -2789,9 +2790,9 @@ class AssetEntityController {
 			flash.message = "Asset reference id was missing from request"
 			log.error "show - missing params.id in request by user ${userLogin}"
 		}
-		
 		if (flash.message) {
-			redirect(action:list)
+		   def errorMap = [errMsg : flash.message]
+		   render errorMap as JSON
 		} else {
 		
 			def items = []

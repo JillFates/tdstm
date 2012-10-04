@@ -265,11 +265,15 @@ function updateToShow(){
 		data: $('#editAssetsFormId').serialize(),
 		type:'POST',
 		success: function(data) {
-			$('#editEntityView').dialog('close')
-			$('#showEntityView').html(data)
-			$("#showEntityView").dialog('option', 'width', 'auto')
-			$("#showEntityView").dialog('option', 'position', ['center','top']);
-			$("#showEntityView").dialog('open');
+			if(data.errMsg){
+				alert(data.errMsg)
+			}else{
+				$('#editEntityView').dialog('close')
+				$('#showEntityView').html(data)
+				$("#showEntityView").dialog('option', 'width', 'auto')
+				$("#showEntityView").dialog('option', 'position', ['center','top']);
+				$("#showEntityView").dialog('open');
+			}
 		}
 	});
 	
