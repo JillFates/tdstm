@@ -1064,6 +1064,7 @@ function createIssue(asset, type, id){
 		}
 		updateWorkflowTransitions( '', "general", "workFlowTransitionId", "predecessorId",'' );
 		updateAssignedToList('assignedToSave','assignedCreateSpan',0);
+		updateStatusSelect('');
 		document.forms['createCommentForm'].commentType.value = 'issue'
 		document.forms['createCommentForm'].commentType.disabled = 'disabled'
 		commentChange('#createResolveDiv','createCommentForm')
@@ -1094,6 +1095,7 @@ function commentChange(resolveDiv,formName) {
 	if(type == "issue"){
 		var commentId=$('#commentId').val()
 		updateAssignedToList('assignedToEdit','assignedEditSpan', commentId);
+		updateStatusSelect('');
 		//var now = new Date();
 		//now.setDate(now.getDate() + 30)
 	    //formatDate(now);
@@ -1411,6 +1413,7 @@ function createNewAssetComment(asset, assetName){
 	setAssetId( asset )
 	updateWorkflowTransitions( asset, "general", "workFlowTransitionId", "predecessorId",'' );
 	updateAssignedToList('assignedToSave','assignedCreateSpan',0);
+	updateStatusSelect('');
 	var name = assetName
 	$('#createCommentDialog').dialog('option', 'width', 'auto');
 	$('#assetEntityTrId').css('display','table-row')
@@ -1434,6 +1437,7 @@ function createComments(asset, assetName){
 	setAssetId( asset )
 	updateWorkflowTransitions( asset, "general", "workFlowTransitionId", "predecessorId", '');
 	updateAssignedToList('assignedToSave','assignedCreateSpan',0);
+	updateStatusSelect('');
 	var name = assetName
 	$('#workFlowTransitionTrId').css('display','none')
 	$('#predecessorTr').css('display','none')
@@ -1569,7 +1573,11 @@ function updateAssignedToList(forView,span,id){
 function updateStatusSelect(taskId){
 	new Ajax.Request('../assetEntity/updateStatusSelect?id='+taskId,{asynchronous:true,evalScripts:true,
 		 onComplete:function(e){
-			 $('#statusEditTrId').html(e.responseText)
+			 if(taskId) {
+				 $('#statusEditTrId').html(e.responseText)
+			 } else {
+				 $('#statusCreateTdId').html(e.responseText)
+			 }
 		 }
 	})
 }

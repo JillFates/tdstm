@@ -3689,10 +3689,12 @@ class AssetEntityController {
 		def status = AssetComment.read(params.id)?.status ?: '*EMPTY*'
 		def optionList = optionForRole.get(status)
 		def firstOption = [value:'', display:'Please Select']
-		def selected
-		def paramsMap = [selectId:'statusEditId', selectName:'statusEditId', 
-			javascript:"onChange='showResolve(this.value)'", 
-			options:optionList, optionSelected:status, firstOption:firstOption]
+		def selectId = params.id ? "statusEditId" : "statusCreateId"
+		def optionSelected = params.id ? (status != '*EMPTY*' ? status : 'na' ): AssetCommentStatus.READY
+		def paramsMap = [selectId:selectId, selectName:'statusEditId', selectClass:"task_${optionSelected.toLowerCase()}",
+			javascript:"onChange='this.className=this.options[this.selectedIndex].className'", 
+			options:optionList, optionSelected:optionSelected, firstOption:firstOption,
+			optionClass:""]
 		def statusSelect = HtmlUtil.generateSelect( paramsMap )
 		
 		render statusSelect

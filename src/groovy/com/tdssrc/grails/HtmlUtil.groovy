@@ -38,7 +38,7 @@ class HtmlUtil {
 			def key = optionKey ? it."${optionKey}" : it
 			def value = optionValue ? it."${optionValue}" : it
 			selected = key == optionSelected ? 'selected="selected"' : ''
-			def optionClass = params.containsKey('optionClass') ? "class ='${getCssClassForStatus(it.status)}' ": ''
+			def optionClass = params.containsKey('optionClass') ? "class ='${getCssClassForStatus(it)}' ": ''
 			html.append("""<option value="${key}" ${selected} ${optionClass}>${value}</option>""")
 		}
 		html.append('</select>')

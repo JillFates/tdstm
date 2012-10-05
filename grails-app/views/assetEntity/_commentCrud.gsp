@@ -258,9 +258,7 @@
 		</tr>
 		<tr id="statusCreateTrId"  class="prop" style="display: none">
 			<td valign="top" class="name"  ><label for="status">Status:</label></td>
-			<td valign="top" class="value" colspan="3">
-				<g:select id="statusId" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Ready"
-				noSelection="['':'please select']" onChange="showResolve(this.value)"></g:select>
+			<td valign="top" class="value" colspan="3" id="statusCreateTdId">
 			</td>
 		</tr>
 		<tr class="prop" id="predecessorHeadTrId" style="display: none">
@@ -493,8 +491,6 @@
 	    <tr class="prop">
 			<td valign="top" class="name"><label for="status">Status:</label></td>
 			<td colspan="3" id="statusEditTrId">
-				<g:select id="statusEditId" name="statusEdit" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="Pending"
-				noSelection="['':'Please select']" onChange="showResolve(this.value)"></g:select>
 			</td>
 		</tr>
 		<tr class="prop">
