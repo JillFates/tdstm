@@ -283,6 +283,7 @@ class CommentService {
 				// Now handle creating / updating task dependencies if the "manageDependency flag was passed
 				if (params.manageDependency) {
 					def taskDependencies = params.list('taskDependency[]')
+				    def taskSuccessors = params.list('taskSuccessor[]')
 					def deletedPreds = params.deletedPreds
 					
 					// If we're updating, we'll delete the existing dependencies and then readd them following
@@ -301,20 +302,24 @@ class CommentService {
 							if ( predProject?.id != project.id ) {
 								log.warn "saveUpdateCommentAndNotes: predecessor project id (${predProject?.id}) different from current project (${project.id})"
 							} else {
-								def taskDependency = TaskDependency.get(taskDepId)
-								if( taskDependency && taskDependency.predecessor.id != Long.parseLong( predecessorId ) ) {
-									taskDependency.predecessor = predecessor
-								} else if( !taskDependency ) {
-									taskDependency = new TaskDependency()
-									taskDependency.predecessor = predecessor
-									taskDependency.assetComment = assetComment
-								}
-								if ( taskDependency.hasErrors() || ! taskDependency.save(flush:true) ) {
-									log.error "saveUpdateCommentAndNotes: Saving comment predecessors failed - " + GormUtil.allErrorsString(taskDependency)
-									errorMsg = 'An unexpected error occurred while saving your change'
-								}
+                                errorMsg = saveAndUpdateTaskDependency( assetComment, predecessor, taskDepId, predecessorId )
 							}
 						}
+					}
+					taskSuccessors.each { succ ->
+                        def taskSuccId = succ.split("_")[0]
+                        def successorId = succ.split("_")[1]
+                        def successor = AssetComment.get( successorId )
+                        if (! successor) {
+                            log.error "saveUpdateCommentAndNotes: invalid successor id (${successorId})"
+                        } else {
+                            def predProject = successor.project
+                            if ( predProject?.id != project.id ) {
+                                log.warn "saveUpdateCommentAndNotes: successor project id (${predProject?.id}) different from current project (${project.id})"
+                            } else {
+                                errorMsg = saveAndUpdateTaskDependency( successor, assetComment, taskSuccId, successorId )
+                            }
+                        }
 					}
 				}
 				
@@ -489,6 +494,31 @@ class CommentService {
 	def getLine(str, lineNum=0) {
 		ArrayList lines = str.readLines()
 		return ( (lineNum+1) > lines.size() ) ? null : lines[lineNum]
-	} 
+	}
+    /**
+     * 
+     * @param task, assetComment
+     * @param dependent, predecessor 
+     * @param taskDepId, existing dependency Id
+     * @param depId, successor/predecessor
+     * @return, validate message
+     */
+    def saveAndUpdateTaskDependency( def task, def dependent, def taskDepId, def depId ){
+        def errorMsg = ""
+        def taskDependency = TaskDependency.get(taskDepId)
+        if( taskDependency && taskDependency.predecessor.id != Long.parseLong( depId )  ) {
+            taskDependency.predecessor = dependent
+            taskDependency.assetComment = task
+        } else if( !taskDependency ) {
+            taskDependency = new TaskDependency()
+            taskDependency.predecessor = dependent
+            taskDependency.assetComment = task
+        }
+        if ( taskDependency.hasErrors() || ! taskDependency.save(flush:true) ) {
+            log.error "saveUpdateCommentAndNotes: Saving comment successor failed - " + GormUtil.allErrorsString(taskDependency)
+            errorMsg = 'An unexpected error occurred while saving your change'
+        }
+        return errorMsg
+    }
 	
 }

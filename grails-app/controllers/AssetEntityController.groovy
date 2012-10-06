@@ -3716,27 +3716,28 @@ class AssetEntityController {
 			render "An unexpected error occured"
 		} else {
 			def taskDependencies = task.taskDependencies
-			def html = new StringBuffer("""<table id="predecessorEditTableId" cellspacing="0" style="border:0px;width:0px"><tbody>""")
-			def optionList = AssetComment.constraints.category.inList.toList()
-			def i=1
-			taskDependencies.each{ taskDep ->
-				def predecessor = taskDep.predecessor
-				def paramsMap = [selectId:"predecessorCategoryEditId_${taskDep.id}", selectName:'category', 
-					options:optionList, optionSelected:predecessor.category,
-					javascript:"onChange='fillPredecessor(this.id,this.value,${task.id})'" ]
-				def selectCategory = HtmlUtil.generateSelect(paramsMap)
-				def selectPred = taskService.genSelectForTaskDependency(taskDep, task)
-				html.append("""<tr id="row_Edit_${taskDep.id}"><td>""")
-				html.append(selectCategory)
-				html.append("""</td><td id="taskDependencyEditTdId_${taskDep.id}">""")
-				html.append(selectPred)
-				html.append("""</td><td><a href="javascript:deletePredRow('row_Edit_${taskDep.id}')"><span class="clear_filter"><u>X</u></span></a></td>""")
-			}
-			render html
+			render taskService.genTableHtmlForDependencies(taskDependencies, task, "predecessor")
 		}
 	}
-	
 	/**
+     * Generates an HTML table containing all the successor for a task with corresponding Category and Tasks SELECT controls for
+     * a speciied assetList of successors HTML SELECT control for the AssetComment at editing time
+     * @param   params.id   The ID of the AssetComment to load  successor SELECT for
+     * @return render HTML
+     */
+    def successorTableHtml = {
+        def project = securityService.getUserCurrentProject()
+        def task = AssetComment.findByIdAndProject(params.commentId, project)
+        if ( ! task ) {
+            log.error "successorTableHtml - unable to find task $params.commentId for project $project.id"
+            render "An unexpected error occured"
+        } else {
+            def taskSuccessors = TaskDependency.findAllByPredecessor( task ).sort{ it.assetComment.taskNumber }
+            render taskService.genTableHtmlForDependencies(taskSuccessors, task, "successor")
+        }
+    }
+    
+    /**
 	 * Generates the HTML SELECT for a single Predecessor
 	 * @param commentId - the comment (aka task) that the predecessor will use
 	 * @param category - comment category to filter the list of tasks by
@@ -3754,8 +3755,8 @@ class AssetEntityController {
 			}
 		}
 
-		def selectControl = taskService.genSelectForPredecessors(project, params.category, task)
-		
+		def selectControl = taskService.genSelectForPredecessors(project, params.category, task, params.forWhom)
+	    
 		render selectControl
 	}
 	
@@ -3793,4 +3794,5 @@ class AssetEntityController {
 		}
 	 return
 	}
+    
 }

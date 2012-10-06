@@ -705,6 +705,7 @@ function showAssetDialog( e , action ) {
 	                 var taskNumber = ac.taskNumber == null ? '&nbsp;' : ac.taskNumber
 	                 $('#taskNumberId').html('Task #: '+'<b>'+taskNumber+'</b>')
 	                 $('#taskNumberSpanEditId').html('Task #: '+'<b>'+taskNumber+'</b>')
+	                 $('#taskNumberEditId').html('#: '+'<b>'+taskNumber+'</b>')
 	                 $('#successorShowTd').html(params.successorTable)
 	                 $('#predecessorTrEditId').css('display','table-row')
 	    	      	 $('#previousNotesShowId').html(noteTable)
@@ -863,6 +864,7 @@ function showAssetDialog( e , action ) {
 			    		}
 			      		updateAssignedToList('assignedToEdit','assignedEditSpan',ac.id);
 			      		loadEditPredecessor(ac.id);
+			      		loadEditSucccessor(ac.id);
 			      	}
 		      	 } else if(action == 'show'){
 		      	 	$("#showCommentDialog").dialog('option', 'width', 'auto')
@@ -1120,7 +1122,7 @@ function commentChange(resolveDiv,formName) {
 		$('#estStartTrId').css('display', 'table-row');
 		$('#estStartEditTrId').css('display', 'table-row');
 //		$('#estFinishTrId').css('display', 'table-row');
-		$('#actStartTrId').css('display', 'table-row');
+		//$('#actStartTrId').css('display', 'table-row');
 		$(resolveDiv).css('display', 'table-row');
 		$('#workFlowTransitionTrId').css('display','table-row')
 		$('#workFlowTransitionEditTrId').css('display', 'table-row');
@@ -1135,8 +1137,6 @@ function commentChange(resolveDiv,formName) {
 		$('#moveEventTrId').css('display', 'none');
 		document.forms[formName].mustVerify.checked = false;
 		document.forms[formName].mustVerify.value = 0;
-		document.forms[formName].isResolved.checked = false;
-		document.forms[formName].isResolved.value = 0;
 		
 	}else if(type == "instruction"){
 		document.forms[formName].mustVerify.checked = true;
@@ -1265,37 +1265,47 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 
 	// Get params from create or update forms approppriately
 	var predArr = new Array();
+	var succArr = new Array();
 	if (formName == "createCommentForm") {
 		$('#taskDependencyTdId').html("")
 		$('#relatedIssueEditId').html("")
 		
-		$('select[name="taskDependencySave"]').each(function(){
+		$('select[name="predecessorSave"]').each(function(){
 			var savePredId = $(this).attr('id').split('_')[1]
 			predArr.push(savePredId+"_"+$(this).val())
 	    });
+		$('select[name="successorSave"]').each(function(){
+			var saveSuccId = $(this).attr('id').split('_')[1]
+			succArr.push(saveSuccId+"_"+$(this).val())
+	    });
 	    //predArr = removeDuplicateElement(predArr)
-	    $('#predecessorTableId').html("")
+		$('#predecessorTableId').html("")
+		$('#successorTableId').html("")
 		var url = '../assetEntity/saveComment'
 		var params = { 'comment':$('#comment').val(), 'commentType':$('#commentType').val(),
 			'isResolved':$('#isResolved').val(), 'resolution':$('#resolution').val(),
 			'mustVerify':$('#mustVerify').val(), 'category':$('#createCategory').val(),
 			'assignedTo':$('#assignedToSave').val(), 'dueDate':$('#dueDateCreateId').val(),
-			'moveEvent':$('#moveEvent').val(), 'status':$('#statusId').val(),
+			'moveEvent':$('#moveEvent').val(), 'status':$('#statusCreateId').val(),
 			'estStart':$('#estStartCreateId').val(), 'estFinish':$('#estFinishCreateId').val(),
 			'actStart':$('#actStartCreateId').val(), 'workflowTransition':$('#workFlowId').val(),
 			'hardAssigned':$('#hardAssigned').val(),'priority':$('#priority').val(),
 			'duration':$('#duration').val(),'durationScale':$('#durationScale').val(),
 			'assetEntity':objId ,'override':$('#override').val(),'role':$('#roleType').val(),
-			'taskDependency' : predArr,
+			'taskDependency' : predArr,'taskSuccessor' : succArr,
 			'manageDependency':1 };
 		var completeFunc = function(e) { addCommentsToList(e); }
 	} else {
 		$('#taskDependencyTdId').html("")
 		$('#relatedIssueEditId').html("")
 		var url = '../assetEntity/updateComment'
-		$('select[name="taskDependencyEdit"]').each(function(){
+		$('select[name="predecessorEdit"]').each(function(){
 			var predId = $(this).attr('id').split('_')[1]
 			predArr.push(predId+"_"+$(this).val())
+	    });
+		$('select[name="successorEdit"]').each(function(){
+			var succId = $(this).attr('id').split('_')[1]
+			succArr.push(succId+"_"+$(this).val())
 	    });
 	    //predArr = removeDuplicateElement(predArr)
 		var params = { 'comment':$('#commentEditId').val(), 'commentType':$('#commentTypeEditId').val(),
@@ -1310,7 +1320,7 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 			'duration':$('#durationEdit').val(),'durationScale':$('#durationScaleEdit').val(),
 			'override':$('#overrideEdit').val(),'role':$('#roleTypeEdit').val(),
 			'note':$('#noteEditId').val(),'taskDependency' : $("#taskDependencyEditId").val(),
-			'id':objId, 'taskDependency':predArr,'manageDependency':1, 'open':open, 'deletedPreds':$('#deletePredId').val()};
+			'id':objId, 'taskDependency':predArr,'taskSuccessor' : succArr,'manageDependency':1, 'open':open, 'deletedPreds':$('#deletePredId').val()};
 		var completeFunc = function(e) { updateCommentsOnList(e); }
 	}
 	if (redirectTo) { completeFunc = function(e) { updateCommentsLists(e); } }
@@ -1321,6 +1331,7 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 		type:'POST',
 		complete: completeFunc
 	});
+	$('#deletePredId').val("")
 }	
 
 
@@ -1503,7 +1514,7 @@ function showResolve(value){
 	}
 	
 }
-function addPredecessor(issueCategory,predecessorCategory,comment,row,span){
+function addPredecessor(issueCategory,predecessorCategory,comment,row,span, tableId,forWhom){
 	var rowNo = $("#predCount").val()
 	var category 
 		if(predecessorCategory){
@@ -1512,17 +1523,28 @@ function addPredecessor(issueCategory,predecessorCategory,comment,row,span){
 			category =$('#'+issueCategory).val()
 		}
 	var commentId = comment ? $('#'+comment).val() : ''
-	new Ajax.Request('../assetEntity/predecessorSelectHtml?category='+category+'&commentId='+commentId, {asynchronous:false,evalScripts:true,
+	new Ajax.Request('../assetEntity/predecessorSelectHtml?category='+category+'&commentId='+commentId+'&forWhom='+forWhom, {asynchronous:false,evalScripts:true,
 		 onComplete:function(e){
 		     $('#'+span).html(e.responseText)
 		     $('#taskDependencyTdId').html(e.responseText)
 	         var taskRow
 	         if(comment){
-	           taskRow =  $('#taskDependencyRow tr').html().replace("predecessorCategoryId","predecessorCategoryId_"+rowNo).replace("taskDependencyId","taskDependencyEditId_"+rowNo).replace("taskDependencyTdId","taskDependencyEditTdId_"+rowNo).replace("taskDependencyEditId","taskDependencyEditId_"+rowNo).replace("fillPredecessor(this.id, this.value,'')","fillPredecessor(this.id, this.value,"+commentId+")")
-	            $('#predecessorEditTableId').append("<tr id='row_Edit_"+rowNo+"'>"+taskRow+"<td><a href=\"javascript:deleteRow(\'row_Edit_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td><tr>")
+	           taskRow =  $('#taskDependencyRow tr').html().replace("predecessorCategoryId","predecessorCategoryId_"+rowNo)
+	           											   .replace("taskDependencyId","taskDependencyEditId_"+rowNo)
+	           											   .replace("taskDependencyTdId","taskDependencyEditTdId_"+rowNo)
+	           											   .replace("taskDependencyEditId","taskDependencyEditId_"+rowNo)
+	           											   .replace(' name="predecessorSave"',' name="'+forWhom+'"')
+	           											   .replace("fillPredecessor(this.id, this.value,'')","fillPredecessor(this.id, this.value,"+commentId+",'"+forWhom+"')")
+	            $('#'+tableId).append("<tr id='row_Edit_"+rowNo+"'>"+taskRow+"<td><a href=\"javascript:deleteRow(\'row_Edit_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td><tr>")
 	         }else{
-	           taskRow =  $('#taskDependencyRow tr').html().replace("predecessorCategoryId","predecessorCategoryId_"+rowNo).replace("taskDependencyId","taskDependencyId_"+rowNo).replace("taskDependencyTdId","taskDependencySaveTdId_"+rowNo).replace("taskDependencyEditId","taskDependencyEditId_"+rowNo).replace(' name="taskDependencyEdit"','name="taskDependencySave"').replace("fillPredecessor(this.id, this.value,'')","fillPredecessor(this.id, this.value,'')")
-	            $('#predecessorTableId').append("<tr id='row_d_"+rowNo+"'>"+taskRow+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+	         	taskRow =  $('#taskDependencyRow tr').html().replace("predecessorCategoryId","predecessorCategoryId_"+rowNo)
+	           											   .replace("taskDependencyId","taskDependencyId_"+rowNo)
+	           											   .replace("taskDependencyTdId","taskDependencySaveTdId_"+rowNo)
+	           											   .replace("taskDependencyEditId","taskDependencyEditId_"+rowNo)
+	           											   .replace(' name="predecessorEdit"',' name="'+forWhom+'"')
+	           											   .replace(' name="predecessorSave"',' name="'+forWhom+'"')
+	           											   .replace("fillPredecessor(this.id, this.value,'')","fillPredecessor(this.id, this.value,'','"+forWhom+"')")
+	            $('#'+tableId).append("<tr id='row_d_"+rowNo+"'>"+taskRow+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
 	         }
 		     
 		     if(issueCategory){
@@ -1534,9 +1556,9 @@ function addPredecessor(issueCategory,predecessorCategory,comment,row,span){
 		 }
 	})
 }
-function fillPredecessor(id, category,commentId){
+function fillPredecessor(id, category,commentId, forWhom){
 	var row = id.split('_')[1]
-	new Ajax.Request('../assetEntity/predecessorSelectHtml?category='+category+'&commentId='+commentId, {asynchronous:true,evalScripts:true,
+	new Ajax.Request('../assetEntity/predecessorSelectHtml?category='+category+'&commentId='+commentId+'&forWhom='+forWhom, {asynchronous:true,evalScripts:true,
 		 onComplete:function(e){
 			 var resp =  e.responseText.replace('taskDependencyId','taskDependencyId_'+row).replace('taskDependencyEditId','taskDependencyEditId_'+row)
 			 $('#taskDependencySaveTdId_'+row).html(resp)
@@ -1594,6 +1616,24 @@ function loadEditPredecessor(id){
 	    	 if(resp.length > 0){
 		    	 $('#predecessorEditId').html(resp);
 		    	 $('#processingId').hide();
+	    	 }
+		},onComplete:function(e){
+	    	 $('#saveAndCloseBId').removeAttr('disabled')
+	    	 $('#saveAndViewBId').removeAttr('disabled')
+		},
+		onFailure:function(jqXHR, textStatus, errorThrown){
+			$('#editCommentDialog').dialog('close');
+			alert( stdErrorMsg )
+		}
+	})
+}
+function loadEditSucccessor(id){
+	$('#successorEditId').html('');
+	new Ajax.Request('../assetEntity/successorTableHtml?commentId='+id,{asynchronous:true,evalScripts:true,
+	    onSuccess:function(e){
+	    	 var resp = e.responseText;
+	    	 if(resp.length > 0){
+		    	 $('#successorEditId').html(resp);
 	    	 }
 		},onComplete:function(e){
 	    	 $('#saveAndCloseBId').removeAttr('disabled')

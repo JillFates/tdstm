@@ -134,10 +134,6 @@
 			<td valign="top" class="name"><label for="predecessorShowId">Predecessor:</label></td>
 			<td valign="top" class="value" id="predecessorShowId" colspan="3"></td>
 		</tr>
-		<tr class="prop" style="display: none">
-			<td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
-			<td valign="top" class="value" id="commentCodeTdId" colspan="3"></td>
-		</tr>
 		<tr class="prop" id="commentShowTrId">
 			<td valign="top" class="name"><label for="commentType">Type:</label></td>
 			<td valign="top" class="value" id="commentTypeTdId" colspan="3"></td>
@@ -237,7 +233,7 @@
 		</tr>
 		<tr class="prop" id="workFlowTransitionTrId" style="display: none">
 			<td valign="top" class="name"><label>WorkFlow Step:</label></td>
-			<td valign="top" class="value" id="workFlowTransitionId" colspan="3">
+			<td valign="top" class="value" id="workFlowTransitionId" >
 			<input type="checkbox" id="override" name="override" value="0"
 				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
 			 <label for="override" >Overridden</label>
@@ -264,18 +260,25 @@
 		<tr class="prop" id="predecessorHeadTrId" style="display: none">
 			<td valign="top" class="name" colspan="2">
 				<label>Predecessors</label>
-				<a class="button" href="javascript:" onclick="addPredecessor('createCategory','','','predecessorTr','relatedIssueId');"> Add </a>
+				<a class="button" href="javascript:" onclick="addPredecessor('createCategory','','','predecessorTr','relatedIssueId','predecessorTableId','predecessorSave');"> Add </a>
 			</td>
-			<td valign="top" class="name" colspan="2">
+			<td valign="top" class="name" >
 				<label>Successors</label>
+				<a class="button" href="javascript:" onclick="addPredecessor('createCategory','','','successorTr','relatedIssueId','successorTableId', 'successorSave');"> Add </a>
 			</td>
 		</tr>
 		<tr class="prop" id="predecessorTr" style="display: none">
 			<td valign="top" class="name">
 			</td>
-			<td valign="top" class="value" id="workFlowTransitionId" colspan="3">
+			<td valign="top" class="value">
 			   <table style="border: 0px">
 			    <tbody id="predecessorTableId"></tbody>
+			   </table>
+			</td>
+			<td valign="top" class="name">&nbsp;</td>
+			<td valign="top" class="value">
+			   <table style="border: 0px">
+			    <tbody id="successorTableId"></tbody>
 			   </table>
 			</td>
 		</tr>
@@ -326,18 +329,6 @@
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>
 		</tr>
-		<tr class="prop" style="display: none;">
-			<td valign="top" class="name"><label for="isResolved">Resolved:</label></td>
-			<td valign="top" class="value" colspan="3">
-				<input type="checkbox" id="isResolved" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
-			</td>
-		</tr>
-		<tr class="prop" id="resolutionTrId" style="display: none;">
-			<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
-			<td valign="top" class="value" colspan="3">
-				<textarea cols="80" rows="4" id="resolution" name="resolution" style=""></textarea>
-			</td>
-		</tr>
 	</table>
     </div>
 	</div>
@@ -364,9 +355,11 @@
   <div>
 	<table id="updateCommentTable" style="border: 0px;">
 	   <% // TODO : Replace DB lookup in GSP with data from controller %>
-		<tr>
-			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
-			<td valign="top" class="value" id="createdByEditId" colspan="3"></td>
+		<tr class="prop">
+			<td valign="top" class="name" id="commentEditTdId"><label><b>Task <span id="taskNumberEditId"></span>:</b></label></label></td>
+			<td valign="top" class="value" colspan="3">
+				<textarea cols="80" rows="2" id="commentEditId" name="comment"></textarea>
+			</td>
 		</tr>
 	   <tr class="prop issue" id="assignedToTrEditId" style="display: none">
 			<td valign="middle" class="name"><label for="assignedTo">Assigned To:</label></td>
@@ -381,6 +374,14 @@
 				&nbsp;&nbsp;&nbsp;
 			</td>
 		</tr>
+		<tr class="prop" id="moveEventEditTrId" style="display: none">
+			<td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
+			<td valign="top" colspan="3">
+            <g:select id="moveEventEditId" name="moveEvent" from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}"
+             optionKey='id' optionValue="name" noSelection="['':'please select']"></g:select>
+             <% // TODO : fix so that it defaults the current value %>
+			</td>
+		</tr>
 		<tr class="prop">
 			<td valign="top" class="name">
 				<label for="category">Category:</label>
@@ -388,11 +389,6 @@
 			<td colspan="4">
 				<g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
 				onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionEditId', 'predecessorId',jQuery('#createAssetCommentId').html())"></g:select>
-				<span id="taskNumberSpanEditId"></span>
-				<span id="priorityEditSpanId">
-	        	    <label for="priority">Priority:</label>
-	            	<g:select id="priorityEdit" name="priorityEdit" from="${1..5}" value=""></g:select>
-            	</span>
 			</td>
         </tr>
         <tr id="commentTypeEditTrId">
@@ -432,17 +428,30 @@
 			<td valign="top" class="name" id="assetEditTd"><label for="asset">Asset:</label></td>
 			<td valign="top" class="value"  id="assetTrShowId" colspan="3"></td>
 		</tr>
+		<tr class="prop" id="durationEditId" style="display: none">
+        	<td valign="top" class="name"><label for="durationEdit ">Duration:</label></td>
+        	<td valign="top" class="value" colspan="3">
+				<input type="text" id="durationEdit" name="durationEdit" value="" size="3"/>
+				<g:select id="durationScaleEdit" name="durationScaleEdit " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>&nbsp;&nbsp;
+				<span id="priorityEditSpanId">
+		        	    <label for="priority">Priority:</label>
+		            	<g:select id="priorityEdit" name="priorityEdit" from="${1..5}" value=""></g:select>
+	            </span>
+        	</td>
+	        	
+		</tr>
 		<tr class="prop">
-			<td valign="top" class="name" id="commentEditTdId"><label for="comment">Description:</label></td>
-			<td valign="top" class="value" colspan="3">
-				<textarea cols="80" rows="2" id="commentEditId" name="comment"></textarea>
+			<td valign="top" class="name"><label for="status">Status:</label></td>
+			<td colspan="3" id="statusEditTrId">
 			</td>
 		</tr>
 		<tr class="prop" id="predecessorAddTr" style="display: none">
 			<td valign="top" class="name"><label for="predecessorEditTd">Predecessors:</label>
-			 <a class="button" href="javascript:" onclick="addPredecessor('categoryEditId','','updateCommentId','predecessorEditTr','relatedIssueEditId');"> Add </a>
+			  <a class="button" href="javascript:" onclick="addPredecessor('categoryEditId','','updateCommentId','predecessorEditTr','relatedIssueEditId','predecessorEditTableId','predecessorEdit');"> Add </a>
 			</td>
-			<td><span style="margin-left: 380px;">Successors:</span></td>
+			<td><span style="margin-left: 380px;">Successors:</span>
+			  <a class="button" href="javascript:" onclick="addPredecessor('categoryEditId','','updateCommentId','predecessorEditTr','relatedIssueEditId','successorEditTableId','successorEdit');"> Add </a>
+			</td>
 		</tr>
 		<tr class="prop" id="predecessorEditTr" style="display: none">
 			<td valign="top" class="name"><label for="predecessorEditTd">Pred:</label></td>
@@ -461,38 +470,18 @@
 		</tr>
         <tr class="prop" id="predecessorTrEditId" style="display: none">
 			<td valign="top" class="name"></td>
-			<td nowrap="nowrap" width="auto;"> <span id="predecessorEditId" style="width: 50%;float: left"></span> <span id="successorEditId" style="width: 40%;float:right;"></span>
+			<td nowrap="nowrap" width="auto;"> <span id="predecessorEditId" style="width: 50%;float: left"></span> <span id="successorEditId" style="width: 40%;float:left;"></span>
 			</td>
 			
 		</tr>
-		<tr class="prop" id="moveEventEditTrId" style="display: none">
-			<td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
-			<td valign="top" colspan="3">
-            <g:select id="moveEventEditId" name="moveEvent" from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}"
-             optionKey='id' optionValue="name" noSelection="['':'please select']"></g:select>
-             <% // TODO : fix so that it defaults the current value %>
-			</td>
-		</tr>
-		<tr class="prop" style="display: none">
-			<td valign="top" class="name"><label for="commentCode">Comment Code:</label></td>
-			<td valign="top" class="value" id="commentCodeEditId" colspan="3"></td>
-		</tr>
-		<tr class="prop" id="durationEditId" style="display: none">
-        	<td valign="top" class="name"><label for="durationEdit ">Duration:</label></td>
-        	<td valign="top" class="value" colspan="3">
-				<input type="text" id="durationEdit" name="durationEdit" value="" size="3"/>
-				<g:select id="durationScaleEdit" name="durationScaleEdit " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>
-        	</td>
+		<tr>
+			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
+			<td valign="top" class="value" id="createdByEditId" colspan="3"></td>
 		</tr>
 	</table>
   </div>
   <div id="editResolveDiv" style="display: none;" class="issue">
 	<table id="updateResolveTable" style="border: 0px;">
-	    <tr class="prop">
-			<td valign="top" class="name"><label for="status">Status:</label></td>
-			<td colspan="3" id="statusEditTrId">
-			</td>
-		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><label for="notes">Previous Notes:</label></td>
 			<td valign="top" class="value" colspan="3"><div id="previousNote" style="width: 100%;"></div></td>
@@ -523,18 +512,6 @@
 			<td valign="top" class="name" nowrap="nowrap" width="10%"><label for="actFinishShowId">Actual Finish:</label></td>
 			<td valign="top" class="value" id="actFinishEditId" nowrap="nowrap"></td>
 		</tr >
-		<tr class="prop" style="display: none;">
-			<td valign="top" class="name"><label for="isResolved">Resolved:</label></td>
-			<td valign="top" class="value" colspan="3">
-				<input type="checkbox" id="isResolvedEditId" name="isResolved" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
-			</td>
-		</tr>
-		<tr class="prop" id="resolutionEditTrId" style="display: none;">
-			<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
-			<td valign="top" class="value" colspan="3">
-				<textarea cols="80" rows="4" id="resolutionEditId" name="resolution"></textarea>
-			</td>
-		</tr>
 		</table>
   </div>
 </div>

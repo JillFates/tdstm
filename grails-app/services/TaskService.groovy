@@ -545,12 +545,11 @@ class TaskService {
 	 * @param name - the name of the control (default taskDependencyEdit)
 	 * @return String - HTML of a SELECT control
 	 */
-	def genSelectForTaskDependency(taskDependency, task, project=null, idPrefix='taskDependencyEditId', name='taskDependencyEdit') {
+	def genSelectForTaskDependency(taskDependency, task, idPrefix='taskDependencyEditId', name='predecessorEdit', project=null) {
 		//def sw = new org.springframework.util.StopWatch("genSelectForTaskDependency Stopwatch") 
 		//sw.start("Get predecessor")
-		def predecessor = taskDependency.predecessor
-		def category = predecessor.category
-		
+	    def predecessor = name=="predecessorEdit" ? taskDependency.predecessor : taskDependency.assetComment
+	    def category = predecessor.category
 		if (! project) {
 			project = securityService.getUserCurrentProject()
 		}
@@ -585,7 +584,7 @@ class TaskService {
 	* @param taskId - an optional task Id that the filtering will use to eliminate as an option and also filter on it's moveEvent
 	* @return String the SELECT control
 	*/
-	def genSelectForPredecessors(project, category, task) {	
+	def genSelectForPredecessors(project, category, task, forWhom) {	
 		
 		StringBuffer query = new StringBuffer("FROM AssetComment a WHERE a.project=${project.id} AND a.commentType='${AssetCommentType.TASK}' ")
 		if (category) {
@@ -615,7 +614,7 @@ class TaskService {
 		
 		// Build the SELECT HTML
 		def cssId = task ? 'taskDependencyEditId' : 'taskDependencyId'
-	    def selectName = task ? 'taskDependencyEdit' : 'taskDependencySave'
+	    def selectName = forWhom
 		def firstOption = [value:'', display:'Please Select']
 		def paramsMap = [ selectId:cssId, selectName:selectName, options:taskList, optionKey:'id', firstOption:firstOption]
 		def selectControl = HtmlUtil.generateSelect( paramsMap )
@@ -908,4 +907,31 @@ class TaskService {
 		def rolesForStaff = RoleType.findAllByDescriptionIlike('staff%',[sort:'description'])
 		return rolesForStaff
 	}
+    
+    /**
+     * This method is used to generat HTML for a given type with list of dependencies
+     * @param depTasks, list of successors or dependencies 
+     * @param task, task for which dependencies table generating 
+     * @param dependency, for which table generating for
+     * @return
+     */
+    def genTableHtmlForDependencies(def depTasks, def task, def dependency){
+        def html = new StringBuffer("""<table id="${dependency}EditTableId" cellspacing="0" style="border:0px;width:0px"><tbody>""")
+        def optionList = AssetComment.constraints.category.inList.toList()
+        def i=1
+        depTasks.each{ depTask ->
+            def succecessor = depTask.assetComment
+            def paramsMap = [selectId:"predecessorCategoryEditId_${depTask.id}", selectName:'category', 
+                options:optionList, optionSelected:succecessor.category,
+                javascript:"onChange=\'fillPredecessor(this.id,this.value,${task.id},\"${dependency}Edit\")\'" ]
+            def selectCategory = HtmlUtil.generateSelect(paramsMap)
+            def selectPred = genSelectForTaskDependency(depTask, task , "${dependency}EditId" , "${dependency}Edit")
+            html.append("""<tr id="row_Edit_${depTask.id}"><td>""")
+            html.append(selectCategory)
+            html.append("""</td><td id="taskDependencyEditTdId_${depTask.id}">""")
+            html.append(selectPred)
+            html.append("""</td><td><a href="javascript:deletePredRow('row_Edit_${depTask.id}')"><span class="clear_filter"><u>X</u></span></a></td>""")
+        }
+        return html
+    }
 }
