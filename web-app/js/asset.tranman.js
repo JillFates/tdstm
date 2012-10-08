@@ -1253,11 +1253,6 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 		alert('Please select a comment type');
 		return false;
 	}
-	if ( ($('#statusEditId').val() == "Completed" && $('#resolutionEditId').val() == '') &&
-		 ($('#statusId').val() == "Completed" && $('#resolution').val() == '') ) {
-		alert('Please enter a resolution');
-		return false;
-	}
 	
 	// idVal has the name of the element that holds the assetEntity.id (create) or assetComment.id  (update)
 	var objId = ''
@@ -1278,7 +1273,12 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 			var saveSuccId = $(this).attr('id').split('_')[1]
 			succArr.push(saveSuccId+"_"+$(this).val())
 	    });
-	    //predArr = removeDuplicateElement(predArr)
+	    predArr = removeDuplicateElement(predArr)
+	    succArr = removeDuplicateElement(succArr)
+	    if(chkDuplicates(predArr,succArr)){
+			alert("Sorry, loops not allowed.") 
+			return false
+		}
 		$('#predecessorTableId').html("")
 		$('#successorTableId').html("")
 		var url = '../assetEntity/saveComment'
@@ -1307,7 +1307,14 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 			var succId = $(this).attr('id').split('_')[1]
 			succArr.push(succId+"_"+$(this).val())
 	    });
-	    //predArr = removeDuplicateElement(predArr)
+		 predArr = removeDuplicateElement( predArr )
+		 succArr = removeDuplicateElement( succArr )
+		 predArr = removeByElement( predArr, objId )
+		 succArr = removeByElement( succArr, objId )
+		 if(chkDuplicates(predArr, succArr)){
+			alert("Sorry, loops not allowed.") 
+			return false
+		 }
 		var params = { 'comment':$('#commentEditId').val(), 'commentType':$('#commentTypeEditId').val(),
 			'isResolved':$('#isResolvedEditId').val(), 'resolution':$('#resolutionEditId').val(), 
 			'mustVerify':$('#mustVerifyEditId').val(), 'category':$('#categoryEditId').val(), 
@@ -1332,7 +1339,33 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 		complete: completeFunc
 	});
 	$('#deletePredId').val("")
-}	
+}
+/*
+ * remove a single element from an Array 
+ * Used to Remove Current Task from from succ or Pred select list.
+ */
+function removeByElement(arrayName,arrayElement)
+{
+	 for(var i=0; i<arrayName.length;i++ ){ 
+		 if(arrayName[i].split("_")[1]==arrayElement)
+		 arrayName.splice(i,1); 
+	 } 
+ return arrayName
+}
+/*
+ * Check duplicate Elements From an Array and returns true if duplicate exist and return false if not
+*/
+function chkDuplicates(list1,list2){         // finds any duplicate array elements using the fewest possible comparison
+	var i, j, n;
+	var concArray = list1.concat( list2 );
+	n=concArray.length;
+                                             // to ensure the fewest possible comparisons
+	for (i=0; i<n; i++) {                    // outer loop uses each item i at 0 through n
+		for (j=i+1; j<n; j++) {              // inner loop only compares items j at i+1 to n
+			if (concArray[i].split("_")[1] == concArray[j].split("_")[1]) return true;
+	}	}
+	return false;
+}
 
 
 /*
@@ -1567,18 +1600,19 @@ function fillPredecessor(id, category,commentId, forWhom){
 	})
 	
 }
+/*
+ * to remove duplicate elemment in a array .
+ */
  function removeDuplicateElement(arrayName)
 {
 	  var newArray=new Array();
-	  label:for(var i=0; i<arrayName.length;i++ )
-	  {  
-	  for(var j=0; j<newArray.length;j++ )
-	  {
-	  if(newArray[j]==arrayName[i]) 
-	  continue label;
-	  }
-	  newArray[newArray.length] = arrayName[i];
-	  }
+	  label:for(var i=0; i<arrayName.length;i++ ){  
+				for(var j=0; j<newArray.length;j++ ){
+					if(newArray[j].split("_")[1]==arrayName[i].split("_")[1] ) 
+					  continue label;
+				}
+			     newArray[newArray.length] = arrayName[i];
+			}
 	  return newArray;
 }
 function updateAssignedToList(forView,span,id){
