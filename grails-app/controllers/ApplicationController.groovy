@@ -50,19 +50,19 @@ class ApplicationController {
 		def appEntityList
 		if(params.validation=='Discovery'){
 			
-			appEntityList = AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ? ',['Application', project,'Discovery',true])
+			appEntityList = Application.findAll('from Application as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ? ',['Application', project,'Discovery',true])
 			
 	    }else if(params.validation=='DependencyReview'){
 		
-		    appEntityList = AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyReview',true])
+		    appEntityList = Application.findAll('from Application as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyReview',true])
 			
 		}else if(params.validation=='DependencyScan'){
 		
-			appEntityList = AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyScan',true])
+			appEntityList = Application.findAll('from Application as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyScan',true])
 			
 		}else if(params.validation=='BundleReady'){
 		
-			appEntityList = AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true])
+			appEntityList = Application.findAll('from Application as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true])
 			
 		}else if(params.latency=='likely'){
 		
@@ -78,18 +78,18 @@ class ApplicationController {
 			
 		}else if(params.moveEvent=='unAssigned'){
 		
-		    appEntityList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType=? and moveBundle in $moveBundle and (planStatus is null or planStatus in ('Unassigned',''))",['Application'])
+		    appEntityList= Application.findAll("from Application where project = $projectId and assetType=? and moveBundle in $moveBundle and (planStatus is null or planStatus in ('Unassigned',''))",['Application'])
 			
 		}else if(params.moveEvent && params.moveEvent!='unAssigned'){
 		
 		    def moveEvent = MoveEvent.get(params.moveEvent)
 			def moveBundles = moveEvent.moveBundles
 			def bundles = moveBundles.findAll {it.useOfPlanning == true}
-		    appEntityList= AssetEntity.findAllByMoveBundleInListAndAssetType(bundles,"Application")
+		    appEntityList= Application.findAllByMoveBundleInListAndAssetType(bundles,"Application")
 			
 		}else if(params.filter=='applicationCount'){
 		
-		    appEntityList = AssetEntity.findAllByMoveBundleInListAndAssetTypeInList(moveBundleList,['Application'])
+		    appEntityList = Application.findAllByMoveBundleInListAndAssetTypeInList(moveBundleList,['Application'])
 			
 		}else{
 		
@@ -98,7 +98,7 @@ class ApplicationController {
 		}
 		def appBeanList = new ArrayList()
 		appEntityList.each { appEntity->
-			def assetEntity = AssetEntity.get(appEntity.id)
+			def application = Application.get(appEntity.id)
 			AssetEntityBean appBeanInstance = new AssetEntityBean();
 			appBeanInstance.setId(appEntity.id)
 			appBeanInstance.setAssetName(appEntity.assetName)
@@ -108,6 +108,7 @@ class ApplicationController {
 			appBeanInstance.setMoveBundle(appEntity.moveBundle?.name)
 			appBeanInstance.setPlanStatus(appEntity.planStatus)
 			appBeanInstance.setValidation(appEntity.validation)
+            AssetEntity assetEntity = application
 			appBeanInstance.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
 			appBeanInstance.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))
 			appBeanInstance.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(appEntity)?.dependencyBundle)
