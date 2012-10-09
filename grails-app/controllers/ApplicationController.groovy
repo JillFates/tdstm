@@ -48,23 +48,7 @@ class ApplicationController {
 		moveBundle = moveBundle.replace("[","('").replace(",","','").replace("]","')")
 		def workFlow = project.workflowCode
 		def appEntityList
-		if(params.validation=='Discovery'){
-			
-			appEntityList = Application.findAll('from Application as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ? ',['Application', project,'Discovery',true])
-			
-	    }else if(params.validation=='DependencyReview'){
-		
-		    appEntityList = Application.findAll('from Application as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyReview',true])
-			
-		}else if(params.validation=='DependencyScan'){
-		
-			appEntityList = Application.findAll('from Application as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyScan',true])
-			
-		}else if(params.validation=='BundleReady'){
-		
-			appEntityList = Application.findAll('from Application as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true])
-			
-		}else if(params.latency=='likely'){
+		if(params.latency=='likely'){
 		
 			appEntityList= Application.findAllByLatencyAndMoveBundleInList('N',moveBundleList)
 			
@@ -87,9 +71,13 @@ class ApplicationController {
 			def bundles = moveBundles.findAll {it.useOfPlanning == true}
 		    appEntityList= Application.findAllByMoveBundleInListAndAssetType(bundles,"Application")
 			
+		}else if(params.filter=='appToValidate'){
+		
+		    appEntityList= Application.findAll("from Application  ap where ap.assetType ='Application' and ap.validation = 'Discovery' and ap.project.id = ${projectId}  and (ap.moveBundle.id in ${moveBundle} or ap.moveBundle.id is null)")
+			
 		}else if(params.filter=='applicationCount'){
 		
-		    appEntityList = Application.findAllByMoveBundleInListAndAssetTypeInList(moveBundleList,['Application'])
+		    appEntityList = Application.findAll("from Application where  project.id = $projectId and assetType = 'Application' and (moveBundle in ${moveBundle} or moveBundle is null)")
 			
 		}else{
 		
@@ -98,7 +86,6 @@ class ApplicationController {
 		}
 		def appBeanList = new ArrayList()
 		appEntityList.each { appEntity->
-			def application = Application.get(appEntity.id)
 			AssetEntityBean appBeanInstance = new AssetEntityBean();
 			appBeanInstance.setId(appEntity.id)
 			appBeanInstance.setAssetName(appEntity.assetName)
@@ -108,14 +95,13 @@ class ApplicationController {
 			appBeanInstance.setMoveBundle(appEntity.moveBundle?.name)
 			appBeanInstance.setPlanStatus(appEntity.planStatus)
 			appBeanInstance.setValidation(appEntity.validation)
-            AssetEntity assetEntity = application
-			appBeanInstance.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
-			appBeanInstance.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))
+			appBeanInstance.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(appEntity, "Validated"))
+			appBeanInstance.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(appEntity, "Validated"))
 			appBeanInstance.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(appEntity)?.dependencyBundle)
 			
-			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
+			if(AssetComment.find("from AssetComment where assetEntity = ${appEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
 				appBeanInstance.setCommentType("issue")
-			} else if(AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id)){
+			} else if(AssetComment.find('from AssetComment where assetEntity = '+ appEntity?.id)){
 				appBeanInstance.setCommentType("comment")
 			} else {
 				appBeanInstance.setCommentType("blank")

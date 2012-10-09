@@ -98,6 +98,7 @@ class MoveBundleAssetController {
 	 */
     def assignAssetsToBundle = {
 		def moveBundleInstance
+		def project = securityService.getUserCurrentProject()
 		if(params.containsKey('bundleId') ){
 			if( !params.bundleId.isNumber() ){
 				log.error "assignAssetsToBundle: Invalid bundle id (${params.bundleId}"
@@ -106,7 +107,6 @@ class MoveBundleAssetController {
 				moveBundleInstance = MoveBundle.findById( bundleId)
 			}
 		} else {
-		   def project = securityService.getUserCurrentProject()
 		   moveBundleInstance = MoveBundle.findByProject(project,[sort:'name',order:'asc']  )
         }
     	def moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $moveBundleInstance.project.id order by name")

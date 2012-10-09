@@ -1299,13 +1299,17 @@ class AssetEntityController {
 		
 		    assetEntityInstanceList =AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(bundledAsset,['Server','VM','Blade','Application','Files','Database'])
 		 
+		}else if(params.filter=='otherAsset'){
+		
+		    assetEntityInstanceList =AssetEntity.findAll("from AssetEntity ae where project = $projectId and ae.assetType not in ('Server','VM','Blade','Application','Database','Files','Appliances') and ( ae.moveBundle in $moveBundle or ae.moveBundle is null) ")
+		 
 		}else if(params.filter=='physicalServer'){
 		
-		    assetEntityInstanceList = AssetEntity.findAllByMoveBundleInListAndAssetTypeInList(moveBundleList,['Server','Blade'])
+		    assetEntityInstanceList = AssetEntity.findAll("from AssetEntity ae where project = $projectId and ae.assetType in ('Server','Blade') and ( ae.moveBundle in $moveBundle or ae.moveBundle is null) ")
 			
 		}else if(params.filter=='virtual'){
 		
-		    assetEntityInstanceList = AssetEntity.findAllByMoveBundleInListAndAssetTypeInList(moveBundleList,['VM'])
+		    assetEntityInstanceList = AssetEntity.findAll("from AssetEntity ae where project = $projectId and ae.assetType = 'VM' and ( ae.moveBundle in $moveBundle or ae.moveBundle is null) ")
 			
 		} else{
 		

@@ -24,8 +24,8 @@ $(document).ready(function() {
 						<tr>
 							<td style="padding:0px; height:24px; background-color: lightyellow;">
 							<g:if test="${applicationCount>0}">
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; width: ${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%"></div>
-								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${100 - Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Discovery',true]).size()/applicationCount)*100)}%</b>
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px; width: ${100 - Math.round((appToValidate/applicationCount)*100)}%"></div>
+								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${100 - Math.round((appToValidate/applicationCount)*100)}%</b>
 							</g:if><g:else>
 								<div style="position:relative; top:0px;height:0px;margin-left:5px;"><b>0%</b>
 							</g:else>
@@ -41,9 +41,8 @@ $(document).ready(function() {
 						<tr>
 							<td style="width: 10px;text-align: right;">${applicationCount}</td>
 							<td><g:link controller="application" action="list" params="[filter:'applicationCount']">Applications</g:link><br />
-							(<g:link controller="application" action="list" params="[tag_f_validation:'Discovery']">
-							${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ? ',['Application', project,'Discovery',true]).size()} 
-							to validate</g:link>)
+							(<g:link controller="application" action="list" params="[filter:'appToValidate']">
+							${appToValidate} to validate</g:link>)
 							</td>
 						</tr>
 						<tr>
@@ -64,7 +63,7 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${otherAssetCount}</td>
-							<td><g:link controller="assetEntity" action="list" >Other Assets</g:link></td>
+							<td><g:link controller="assetEntity" action="list" params="[filter:'otherAsset']">Other Assets</g:link></td>
 						</tr>
 					</table>
 					<br />
@@ -94,8 +93,8 @@ $(document).ready(function() {
 						<tr>
 							<td style="padding:0px;height:24px;background-color: lightyellow;">
 							<g:if test="${applicationCount>0}">
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; width: ${Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()/applicationCount)*100)}%"></div>
-								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${Math.round((com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()/applicationCount)*100)}%</b>
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px; width: ${Math.round((bundleReady/applicationCount)*100)}%"></div>
+								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${Math.round((bundleReady/applicationCount)*100)}%</b>
 							</g:if><g:else>
 								<div style="position:relative; top:0px;margin-left:5px;"><b>0%</b>
 							</g:else>
@@ -110,19 +109,19 @@ $(document).ready(function() {
 					</h4>
 					<table style="float:left; border: 0px; margin-left: 10px;">
 						<tr>
-							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyScan',true]).size()}</td>
+							<td style="width: 10px;text-align: right;">${dependencyScan}</td>
 							<td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyScan']">DependencyScan</g:link></td>
 						</tr>
 						<tr>
-							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'Validated',true]).size()}</td>
-							<td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyScan']">Validated</g:link></td>
+							<td style="width: 10px;text-align: right;">${validated}</td>
+							<td><g:link controller="application" action="list" params="[tag_f_validation:'Validated']">Validated</g:link></td>
 						</tr>
 						<tr>
-							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'DependencyReview',true]).size()}</td>
+							<td style="width: 10px;text-align: right;">${dependencyReview}</td>
 							<td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyReview']">Dependency Review</g:link></td>
 						</tr>
 						<tr>
-							<td style="width: 10px;text-align: right;">${com.tds.asset.AssetEntity.findAll('from AssetEntity as ae where assetType = ? and project = ? and validation = ? and ae.moveBundle.useOfPlanning = ?',['Application', project , 'BundleReady',true]).size()}</td>
+							<td style="width: 10px;text-align: right;">${bundleReady}</td>
 							<td><g:link controller="application" action="list" params="[tag_f_validation:'BundleReady']">Bundle Ready</g:link></td>
 						</tr>
 					</table>
@@ -197,7 +196,7 @@ $(document).ready(function() {
 				<table style="border: 0px;">
 					<thead>
 						<th style="background-color: white;width:80px;">&nbsp;</th>
-						<th style="color: Blue; background-color: white;width:45px;text-align: right;"><g:link controller="application" action="list" params="[moveEvent:'unAssigned']">TBD</g:link></th>
+						<th style="color: Blue; background-color: white;width:45px;text-align: left;"><g:link controller="application" action="list" params="[moveEvent:'unAssigned']">TBD</g:link></th>
 							<g:each in="${moveBundle}" var="bundle">
 								<th style="color: Blue; background-color: white;text-align: center;">
 									<b><g:link controller="application" action="list" params="[moveEvent:bundle.id]">${bundle}</g:link></b>
@@ -225,8 +224,8 @@ $(document).ready(function() {
 					<tbody>
 						<tr>
 							<td style="color: black"><b>Apps</b></td>
-							<td style="text-align: right;"><b>
-									<g:link controller="application" action="list" params="[moveEvent:'unAssigned']">${unassignedAppCount}</g:link>
+							<td style="text-align: left;"><b>
+									<g:link controller="application" action="list" params="[moveEvent:'unAssigned']">${unassignedAppCount}(${100-percentageAppCount}%)</g:link>
 							</b></td>
 							<g:each in="${appList}" var="appCount">
 									<td style="text-align: right;"><b>
@@ -259,7 +258,7 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="color: black"><b>Servers</b></td>
-							<td style=" text-align: right;""><b>
+							<td style=" text-align: left;""><b>
 									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'All']">${unassignedAssetCount}</g:link>
 							</b></td>
 								<g:each in="${assetList}" var="assetCount">
@@ -271,8 +270,8 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="color: black">Physical</td>
-							<td style="text-align: right;""><b>
-									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'physical']">${unassignedPhysialAssetCount}</g:link>
+							<td style="text-align: left;""><b>
+									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'physical']">${unassignedPhysialAssetCount}(${100-percentagePhysicalAssetCount}%)</g:link>
 							</b></td>
 								<g:each in="${assetList}" var="assetCount">
 									<td style="text-align: right;"><b>
@@ -285,8 +284,8 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="color: black">Virtual</td>
-							<td style="text-align: right;""><b>
-									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'virtual']">${unassignedVirtualAssetCount}</g:link>
+							<td style="text-align: left;""><b>
+									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'virtual']">${unassignedVirtualAssetCount}(${100-percentagevirtualAssetCount}%)</g:link>
 							</b></td>
 								<g:each in="${assetList}" var="assetCount">
 									<td style="text-align: right;"><b>
@@ -299,8 +298,8 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="color: black"><b>Databases</b></td>
-							<td style=" text-align: right;""><b>
-									<g:link controller="database" action="list" params="[moveEvent:'unAssigned']">${unassignedDbCount}</g:link>
+							<td style=" text-align: left;""><b>
+									<g:link controller="database" action="list" params="[moveEvent:'unAssigned']">${unassignedDbCount}(${100-percentageDBCount}%)</g:link>
 							</b></td>
 								<g:each in="${dbList}" var="dbCount">
 									<td style="text-align: right;"><b>
@@ -311,8 +310,8 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="color: black"><b>Files</b></td>
-							<td style=" text-align: right;""><b>
-									<g:link controller="files" action="list" params="[moveEvent:'unAssigned']">${unassignedFilesCount}</g:link>
+							<td style=" text-align: left;""><b>
+									<g:link controller="files" action="list" params="[moveEvent:'unAssigned']">${unassignedFilesCount}(${100-percentageFilesCount}%)</g:link>
 							</b></td>
 								<g:each in="${filesList}" var="filesCount">
 									<td style="text-align: right;"><b>
@@ -323,8 +322,8 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="color: black"><b>Other</b></td>
-							<td style=" text-align: right;""><b>
-									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'other']">${unassignedOtherCount}</g:link>
+							<td style=" text-align: left;""><b>
+									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'other']">${unassignedOtherCount}(${100-percentageOtherCount}%)</g:link>
 							</b></td>
 								<g:each in="${otherTypeList}" var="otherCount">
 									<td style="text-align: right;"><b>
