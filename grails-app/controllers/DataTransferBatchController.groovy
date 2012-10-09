@@ -72,12 +72,12 @@ class DataTransferBatchController {
 			def unknowAssets = ""
 			def modelAssetsList = new ArrayList()
     		def existingAssetsList = new ArrayList()
-    		try{
+    		try {
     			dataTransferBatch = DataTransferBatch.get(params.batchId)
-				if(dataTransferBatch.eavEntityType?.domainName == "AssetEntity"){
+				if (dataTransferBatch.eavEntityType?.domainName == "AssetEntity") {
     				batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = $dataTransferBatch.id ")[0]
     				def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = "+
-    															"$dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
+    					"$dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
     				def assetsSize = dataTransferValueRowList.size()
     				session.setAttribute("TOTAL_BATCH_ASSETS",assetsSize)
 					def dataTransferValues = DataTransferValue.findAllByDataTransferBatch( dataTransferBatch )
@@ -85,7 +85,7 @@ class DataTransferBatchController {
 					
     				for( int dataTransferValueRow =0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
     					def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
-    					def dtvList = dataTransferValues.findAll{ it.rowId== rowId }//DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
+    					def dtvList = dataTransferValues.findAll{ it.rowId== rowId } //DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
     					def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
     					def flag = 0
     					def isModified = "false"
@@ -99,7 +99,7 @@ class DataTransferBatchController {
 			    				if ( dataTransferBatch.dataTransferSet.id == 1 ) {
 			    					def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, assetEntity, dtvList, projectInstance )
 			    					flag = validateResultList[0]?.flag
-			    					errorConflictCount = errorConflictCount+validateResultList[0]?.errorConflictCount 
+			    					errorConflictCount += validateResultList[0]?.errorConflictCount 
 			    					if( flag == 0 ) {
 			    						isNewValidate = "false"
 			    					}else {
@@ -113,6 +113,7 @@ class DataTransferBatchController {
 		    				assetEntity = new AssetEntity()
 		    				assetEntity.attributeSet = eavAttributeSet
 		    				isNewValidate = "true"
+							log.info "serverProcess - creating new asset for rowId $rowId"
 		    			}
 		    		
     					if( assetEntity && flag == 0 ) {
@@ -184,8 +185,8 @@ class DataTransferBatchController {
 													assetEntity."$attribName" = correctedPos 
 		    	        						}
 		    								} catch ( Exception ex ) {
-												ex.printStackTrace()
-		    									errorConflictCount+=1
+												log.error "serverProcess - unexpected exception 1 - " + ex.toString()
+		    									errorConflictCount++
 		    									it.hasError = 1
 		    									it.errorText = "format error"
 		    									it.save()
@@ -205,18 +206,18 @@ class DataTransferBatchController {
 																lastAssetId = jdbcTemplate.queryForInt("select max(asset_entity_id) FROM asset_entity WHERE project_id = ${projectInstance.id}")
 															}
 															while(AssetEntity.findByAssetTagAndProject("TDS-${lastAssetId}",projectInstance)){
-																lastAssetId = lastAssetId+1
+																lastAssetId++
 															}
 															assetEntity."$attribName" = "TDS-${lastAssetId}"
 															projectInstance.lastAssetId = lastAssetId + 1
 														}
 													} else {
-														assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
+														assetEntity."$attribName" = it.correctedValue ?: it.importValue
 													}
 			    								}
 		    								} catch ( Exception ex ) {
-											ex.printStackTrace()
-		    									errorConflictCount+=1
+												log.error "serverProcess - unexpected exception 2 - " + ex.toString()
+		    									errorConflictCount++
 		    									it.hasError = 1
 		    									it.errorText = "Asset Tag should not be blank"
 		    									it.save()
@@ -231,18 +232,19 @@ class DataTransferBatchController {
     							if( isModified == "true" ) {
         							if ( isNewValidate == "true" ) {
         								if( assetEntity.save(flush:true) ) {
-        									insertCount+=1
+        									insertCount++
         								}
         							} else {
         								if( assetEntity.save(flush:true) ) {
-        									updateCount+=1
+        									updateCount++
         								}
         							}
 									if(assetEntity?.id)
 										assetsList.add(assetEntity?.id)
     							}
     						} else {
-    							errorCount+=1
+    							errorCount++
+								log.warn "serverProcess - performing discard for rowId $rowId"
     							assetEntity.discard()
     						}
     						if(dataTransferValueRow % 50 == 0) {
@@ -251,10 +253,11 @@ class DataTransferBatchController {
     						}
     						session.setAttribute("TOTAL_PROCESSES_ASSETS",dataTransferValueRow)
     					}
-    				}  
+    				} // for loop
+  
     				def dataTransferCommentRowList = DataTransferComment.findAll(" From DataTransferComment dtc where dtc.dataTransferBatch = "+
     																	"$dataTransferBatch.id and dtc.dataTransferBatch.statusCode = 'PENDING'")
-    				if(dataTransferCommentRowList){
+    				if (dataTransferCommentRowList){
     					dataTransferCommentRowList.each{
     						def assetComment
     						def assetEntity = AssetEntity.get(it.assetId)
@@ -276,6 +279,7 @@ class DataTransferBatchController {
     						}
     					}
     				}
+
     				dataTransferBatch.statusCode = 'COMPLETED'
 					dataTransferBatch.save(flush:true)
 					
@@ -286,14 +290,17 @@ class DataTransferBatchController {
 					/* update assets racks, cabling data once process done */
 					updateAssetsCabling( modelAssetsList, existingAssetsList )
     			}
-				}catch (Exception e) {
+			} catch (Exception e) {
+				log.warn "serverProcess - Unexpected error, rolling back - " + $e.toString()
     			status.setRollbackOnly()
 				flash.message = "Import Batch process failed"
     		}
-    		def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
+ 			// END OF TRY
+
+   			def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
     		flash.message = " Process Results:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
-    							"<li>Records Updated: ${updateCount}</li><li>Asset Errors: ${errorCount} </li> "+
-    							"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> " 
+				"<li>Records Updated: ${updateCount}</li><li>Asset Errors: ${errorCount} </li> "+
+				"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> " 
     	}
 		session.setAttribute("IMPORT_ASSETS", assetsList)
 		redirect ( action:list, params:[projectId:projectId, message:flash.message ] )
