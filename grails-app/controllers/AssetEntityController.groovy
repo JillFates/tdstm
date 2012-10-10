@@ -1816,7 +1816,7 @@ class AssetEntityController {
 			def noteList = assetComment.notes.sort{it.dateCreated}
 			def notes = []
 			noteList.each {
-				def dateCreated = it.dateCreated.format("E, d MMM 'at ' HH:mma")
+				def dateCreated = TimeUtil.convertInToUserTZ(it.dateCreated, tzId).format("E, d MMM 'at ' HH:mma")
 				notes << [ dateCreated , it.createdBy.toString() ,it.note]
 			}
 			

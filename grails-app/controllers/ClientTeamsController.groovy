@@ -10,6 +10,7 @@ import com.tds.asset.TaskDependency
 import com.tdssrc.grails.GormUtil
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdssrc.grails.TimeUtil
 
 
 class ClientTeamsController {
@@ -1060,7 +1061,7 @@ class ClientTeamsController {
 		def noteList = assetComment.notes.sort{it.dateCreated}
 		def notes = []
 		noteList.each{
-			def dateCreated = it.dateCreated.format("E, d MMM 'at ' HH:mma")
+			def dateCreated = TimeUtil.convertInToUserTZ(it.dateCreated, tzId).format("E, d MMM 'at ' HH:mma")
 			notes << [dateCreated , it.createdBy.toString() ,it.note]
 		}
 		def viewMode = session.getAttribute("TASK_VIEW_MODE")
