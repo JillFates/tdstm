@@ -514,7 +514,7 @@ class MoveBundleController {
 				optional = Application.findAll("from AppMoveEvent am right join am.application a where a.moveBundle.useOfPlanning = true  and a.project=$projectId and (a.moveBundle.moveEvent != ${moveEvent.id} or a.moveBundle.moveEvent is null) and (am.moveEvent = ${moveEvent.id} or am.moveEvent is null) and am.value = 'Y' and (a.planStatus is null or a.planStatus in ('Unassigned',''))").size()
 			}
 			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,'potential':potential,'optional':optional,'moveEvent':moveEvent.id]
-			def dbCount = moveBundleIds ? AssetEntity.executeQuery("select count(ae)from AssetEntity ae where ae.assetType = 'Database' and (ae.moveBundle.id in ${moveBundleIds} or ae.moveBundle.id is null) and ae.project.id = ${projectId}")[0] : ""
+			def dbCount = moveBundleIds ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.assetType = 'Database' and (ae.moveBundle.id in ${moveBundleIds} or ae.moveBundle.id is null) and ae.project.id = ${projectId}")[0] : ""
 			dbList << ['moveEvent':moveEvent.id , 'count':dbCount]
 			def filesCount = moveBundleIds ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.assetType = 'Files' and (ae.moveBundle.id in ${moveBundleIds} or ae.moveBundle.id is null) and ae.project.id = ${projectId}")[0] : ""
 			filesList << ['moveEvent':moveEvent.id , 'count':filesCount]
@@ -523,7 +523,7 @@ class MoveBundleController {
 		}
 		String moveBundle = moveBundleList.id
 		moveBundle = moveBundle.replace("[","('").replace(",","','").replace("]","')")
-		def unassignedAppCount = AssetEntity.findAll("from AssetEntity where project = $projectId and assetType=? and moveBundle in $moveBundle and (planStatus is null or planStatus in ('Unassigned',''))",['Application']).size()
+		def unassignedAppCount = Application.executeQuery("select count(ap) from Application ap where ap.project = $projectId and ap.assetType='Application' and ap.moveBundle in $moveBundle and (ap.planStatus is null or ap.planStatus in ('Unassigned',''))")[0]
 		def totalAssignedApp = applicationCount - unassignedAppCount ;
 		int percentageAppCount = 0 ;
 		if(applicationCount > 0){
