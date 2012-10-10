@@ -40,12 +40,13 @@ class DataTransferBatchController {
     	}
     	def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		
-		def projectInstance = Project.findById( projectId )
+		def project = Project.findById( projectId )
 		if( !params.max ) params.max = 10
-		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( projectInstance, "I", 
+		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( project, "I", 
 				[sort:"dateCreated", order:"desc",max:params.max,offset:params.offset ? params.offset : 0] )
 		return [ dataTransferBatchList:dataTransferBatchList, projectId:projectId ]
     }
+
     /* -----------------------------------------------------------------------
      * Process DataTransfervalues Corresponding to DataTransferBatch
      * @param dataTransferBach
@@ -58,10 +59,11 @@ class DataTransferBatchController {
     	session.setAttribute("TOTAL_BATCH_ASSETS",0)
     	session.setAttribute("TOTAL_PROCESSES_ASSETS",0)
 		def assetEntityErrorList = []
-    	def projectId
 		def assetsList = new ArrayList()
+		def project
+
 		DataTransferBatch.withTransaction { status ->
-			def projectInstance = securityService.getUserCurrentProject()
+			project = securityService.getUserCurrentProject()
     		def dataTransferBatch
     		def insertCount = 0
     		def errorConflictCount = 0
@@ -92,24 +94,24 @@ class DataTransferBatchController {
     					def isNewValidate
     					def isFormatError = 0
 		    			def assetEntity
-		    			if( assetEntityId && AssetEntity.get(assetEntityId).project.id == projectInstance.id) {
+		    			if( assetEntityId && AssetEntity.get(assetEntityId).project.id == project.id) {
 		    				assetEntity = AssetEntity.get(assetEntityId)
-							if(assetEntity?.id != null && assetEntity.project.id == projectInstance.id ){
+							if(assetEntity?.id != null && assetEntity.project.id == project.id ){
 								existingAssetsList.add( assetEntity )
 			    				if ( dataTransferBatch.dataTransferSet.id == 1 ) {
-			    					def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, assetEntity, dtvList, projectInstance )
+			    					def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, assetEntity, dtvList, project )
 			    					flag = validateResultList[0]?.flag
 			    					errorConflictCount += validateResultList[0]?.errorConflictCount 
 			    					if( flag == 0 ) {
 			    						isNewValidate = "false"
 			    					}else {
-			    						errorCount+=1
+			    						errorCount++
 			    					}
 			    				} else {
 			    					flag = 0;
 			    				}
 							} 
-		    			} else if(!assetEntityId || AssetEntity.get(assetEntityId).project.id != projectInstance.id) {
+		    			} else if(!assetEntityId || AssetEntity.get(assetEntityId).project.id != project.id) {
 		    				assetEntity = new AssetEntity()
 		    				assetEntity.attributeSet = eavAttributeSet
 		    				isNewValidate = "true"
@@ -117,8 +119,8 @@ class DataTransferBatchController {
 		    			}
 		    		
     					if( assetEntity && flag == 0 ) {
-    						assetEntity.project = projectInstance
-    						assetEntity.owner = projectInstance.client
+    						assetEntity.project = project
+    						assetEntity.owner = project.client
     						dtvList.each {
     							def attribName = it.eavAttribute.attributeCode
 								switch(attribName){
@@ -138,7 +140,7 @@ class DataTransferBatchController {
 	    								}
 										break;
 									case "moveBundle":
-	    								def moveBundleInstance = assetEntityAttributeLoaderService.getdtvMoveBundle(it, projectInstance ) 
+	    								def moveBundleInstance = assetEntityAttributeLoaderService.getdtvMoveBundle(it, project ) 
 					    				if( assetEntity."$attribName" != moveBundleInstance || isNewValidate == "true" ) {
 	    									isModified = "true"
 	    									assetEntity."$attribName" = moveBundleInstance 
@@ -201,15 +203,15 @@ class DataTransferBatchController {
 														if(assetEntity?.id){
 															assetEntity."$attribName" = "TDS-${assetEntity?.id}"
 														} else {
-															def lastAssetId = projectInstance.lastAssetId
+															def lastAssetId = project.lastAssetId
 															if(!lastAssetId){
-																lastAssetId = jdbcTemplate.queryForInt("select max(asset_entity_id) FROM asset_entity WHERE project_id = ${projectInstance.id}")
+																lastAssetId = jdbcTemplate.queryForInt("select max(asset_entity_id) FROM asset_entity WHERE project_id = ${project.id}")
 															}
-															while(AssetEntity.findByAssetTagAndProject("TDS-${lastAssetId}",projectInstance)){
+															while(AssetEntity.findByAssetTagAndProject("TDS-${lastAssetId}",project)){
 																lastAssetId++
 															}
 															assetEntity."$attribName" = "TDS-${lastAssetId}"
-															projectInstance.lastAssetId = lastAssetId + 1
+															project.lastAssetId = lastAssetId + 1
 														}
 													} else {
 														assetEntity."$attribName" = it.correctedValue ?: it.importValue
@@ -282,11 +284,11 @@ class DataTransferBatchController {
 					
 					sessionFactory.getCurrentSession().flush();
 					sessionFactory.getCurrentSession().clear();
-					projectInstance = projectInstance.merge()
+					project = project.merge()
 					
-					if(!projectInstance.save(flush:true)){
-						println"Error while updating project.lastAssetId : ${projectInstance}"
-						projectInstance.errors.each { println it }
+					if(!project.save(flush:true)){
+						println"Error while updating project.lastAssetId : ${project}"
+						project.errors.each { println it }
 					}
 					
     				dataTransferBatch.statusCode = 'COMPLETED'
@@ -312,7 +314,7 @@ class DataTransferBatchController {
 				"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> " 
     	}
 		session.setAttribute("IMPORT_ASSETS", assetsList)
-		redirect ( action:list, params:[projectId:projectInstance.id, message:flash.message ] )
+		redirect ( action:list, params:[projectId:project.id, message:flash.message ] )
      }
 	
 	def appProcess ={
@@ -324,11 +326,11 @@ class DataTransferBatchController {
 		def formatter = new SimpleDateFormat("yyyy-dd-MM hh:mm:ss")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
     	def assetEntityErrorList = []
-    	def projectId
 		def assetsList = new ArrayList()
+		def project
+		
 		DataTransferBatch.withTransaction { status ->
-			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-			def projectInstance = Project.findById( projectId )
+			project = securityService.getUserCurrentProject()			
     		def dataTransferBatch
     		def insertCount = 0
     		def errorConflictCount = 0
@@ -359,12 +361,12 @@ class DataTransferBatchController {
     					def isNewValidate
     					def isFormatError = 0
 		    			def assetEntity
-		    			if( assetEntityId && AssetEntity.get(assetEntityId).project.id == projectInstance.id ) {
+		    			if( assetEntityId && AssetEntity.get(assetEntityId).project.id == project.id ) {
 		    				application = Application.get(assetEntityId)
-							if(application?.id != null && application.project.id == projectInstance.id ){
+							if(application?.id != null && application.project.id == project.id ){
 								existingAssetsList.add( application )
 			    				if ( dataTransferBatch?.dataTransferSet.id == 1 ) {
-			    					def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, application, dtvList, projectInstance )
+			    					def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, application, dtvList, project )
 			    					flag = validateResultList[0]?.flag
 			    					errorConflictCount = errorConflictCount+validateResultList[0]?.errorConflictCount 
 			    					if( flag == 0 ) {
@@ -379,19 +381,19 @@ class DataTransferBatchController {
 								unknowAssetIds += 1
 								unknowAssets += assetEntityId+"," 
 							}
-		    			} else if(!assetEntityId || AssetEntity.get(assetEntityId).project.id != projectInstance.id){
+		    			} else if(!assetEntityId || AssetEntity.get(assetEntityId).project.id != project.id){
 		    				application = new Application()
 		    				application.attributeSet = eavAttributeSet
 		    				isNewValidate = "true"
 		    			}
 		    		
     					if( application && flag == 0 ) {
-    						application.project = projectInstance
+    						application.project = project
     						dtvList.each {
     							def attribName = it.eavAttribute.attributeCode
 									switch(attribName){
 										case "moveBundle":
-											def moveBundleInstance = assetEntityAttributeLoaderService.getdtvMoveBundle(it, projectInstance )
+											def moveBundleInstance = assetEntityAttributeLoaderService.getdtvMoveBundle(it, project )
 												isModified = "true"
 												application."$attribName" = moveBundleInstance
 											break;
@@ -435,9 +437,8 @@ class DataTransferBatchController {
 													application."$attribName" = correctedPos 
 		    	        						}
 		    								} catch ( Exception ex ) {
-												println"=================================="
-												ex.printStackTrace()
-		    									errorConflictCount+=1
+												log.error "appProcess - unexpected exception 1 - " + ex.toString()
+		    									errorConflictCount++
 		    									it.hasError = 1
 		    									it.errorText = "format error"
 		    									it.save()
@@ -448,8 +449,8 @@ class DataTransferBatchController {
 		    								try{
 												application."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
 		    								} catch ( Exception ex ) {
-										    	ex.printStackTrace()
-		    									errorConflictCount+=1
+												log.error "appProcess - unexpected exception 2 - " + ex.toString()
+		    									errorConflictCount++
 		    									it.hasError = 1
 		    									it.save()
 		    									dataTransferBatch.hasErrors = 1
@@ -515,7 +516,8 @@ class DataTransferBatchController {
     				dataTransferBatch.save(flush:true)
 					
     		}catch (Exception e) {
-    			status.setRollbackOnly()
+				log.error "appProcess - Unexpected error, rolling back - " + e.printStackTrace()
+				status.setRollbackOnly()
 				e.printStackTrace()
 				flash.message = "Import Batch process failed"
     		}
@@ -525,11 +527,10 @@ class DataTransferBatchController {
     							"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> " 
     	}
 		session.setAttribute("IMPORT_ASSETS", assetsList)
-		redirect ( action:list, params:[projectId:projectId, message:flash.message ] )
-     
+		redirect ( action:list, params:[projectId:project.id, message:flash.message ] )
 		
-		
-		}
+	}
+	
 	def fileProcess ={
 		sessionFactory.getCurrentSession().flush();
 		sessionFactory.getCurrentSession().clear();
@@ -539,11 +540,11 @@ class DataTransferBatchController {
 		def formatter = new SimpleDateFormat("yyyy-dd-MM hh:mm:ss")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def assetEntityErrorList = []
-		def projectId
 		def assetsList = new ArrayList()
+		def project
+		
 		DataTransferBatch.withTransaction { status ->
-			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-			def projectInstance = Project.findById( projectId )
+			project = securityService.getUserCurrentProject()			
 			def dataTransferBatch
 			def insertCount = 0
 			def errorConflictCount = 0
@@ -555,7 +556,7 @@ class DataTransferBatchController {
 			def modelAssetsList = new ArrayList()
 			def existingAssetsList = new ArrayList()
 			def files
-			try{
+			try {
 				dataTransferBatch = DataTransferBatch.get(params.batchId)
 					batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = $dataTransferBatch.id ")[0]
 					def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = "+
@@ -574,12 +575,12 @@ class DataTransferBatchController {
 						def isNewValidate
 						def isFormatError = 0
 						def assetEntity
-						if( assetEntityId && AssetEntity.get(assetEntityId).project.id == projectInstance.id ) {
+						if( assetEntityId && AssetEntity.get(assetEntityId).project.id == project.id ) {
 							files = Files.get(assetEntityId)
-							if(files?.id != null && files.project.id == projectInstance.id ){
+							if(files?.id != null && files.project.id == project.id ){
 								existingAssetsList.add( files )
 								if ( dataTransferBatch?.dataTransferSet.id == 1 ) {
-									def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, files, dtvList, projectInstance )
+									def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, files, dtvList, project )
 									flag = validateResultList[0]?.flag
 									errorConflictCount = errorConflictCount+validateResultList[0]?.errorConflictCount
 									if( flag == 0 ) {
@@ -593,19 +594,19 @@ class DataTransferBatchController {
 								unknowAssetIds += 1
 								unknowAssets += assetEntityId+","
 							}
-						} else if(!assetEntityId || AssetEntity.get(assetEntityId).project.id != projectInstance.id){
+						} else if(!assetEntityId || AssetEntity.get(assetEntityId).project.id != project.id){
 							files = new Files()
 							files.attributeSet = eavAttributeSet
 							isNewValidate = "true"
 						}
 					
 						if( files && flag == 0 ) {
-							files.project = projectInstance
+							files.project = project
 							dtvList.each {
 								def attribName = it.eavAttribute.attributeCode
 									switch(attribName){
 										case "moveBundle":
-											def moveBundleInstance = assetEntityAttributeLoaderService.getdtvMoveBundle(it, projectInstance )
+											def moveBundleInstance = assetEntityAttributeLoaderService.getdtvMoveBundle(it, project )
 												isModified = "true"
 												files."$attribName" = moveBundleInstance
 											break;
@@ -643,8 +644,8 @@ class DataTransferBatchController {
 													files."$attribName" = correctedPos
 												}
 											} catch ( Exception ex ) {
-												ex.printStackTrace()
-												errorConflictCount+=1
+												log.error "fileProcess - unexpected exception 1 - " + ex.toString()
+												errorConflictCount++
 												it.hasError = 1
 												it.errorText = "format error"
 												it.save()
@@ -655,8 +656,8 @@ class DataTransferBatchController {
 											try{
 												files."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
 											} catch ( Exception ex ) {
-												ex.printStackTrace()
-												errorConflictCount+=1
+												log.error "fileProcess - unexpected exception 2 - " + ex.toString()
+												errorConflictCount++
 												it.hasError = 1
 												it.save()
 												dataTransferBatch.hasErrors = 1
@@ -721,6 +722,7 @@ class DataTransferBatchController {
 					dataTransferBatch.statusCode = 'COMPLETED'
 					dataTransferBatch.save(flush:true)
 			}catch (Exception e) {
+				log.error "fileProcess - Unexpected error, rolling back - " + e.printStackTrace()
 				status.setRollbackOnly()
 				e.printStackTrace()
 				flash.message = "Import Batch process failed"
@@ -731,12 +733,10 @@ class DataTransferBatchController {
 								"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> "
 		}
 		session.setAttribute("IMPORT_ASSETS", assetsList)
-		redirect ( action:list, params:[projectId:projectId, message:flash.message ] )
-	 
-		
-		
+		redirect ( action:list, params:[ projectId:project.id, message:flash.message ] )
 		
 	}
+	
 	def dbProcess={
 		sessionFactory.getCurrentSession().flush();
 		sessionFactory.getCurrentSession().clear();
@@ -746,11 +746,11 @@ class DataTransferBatchController {
 		def formatter = new SimpleDateFormat("yyyy-dd-MM hh:mm:ss")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def assetEntityErrorList = []
-		def projectId
 		def assetsList = new ArrayList()
+		def project
+
 		DataTransferBatch.withTransaction { status ->
-			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-			def projectInstance = Project.findById( projectId )
+			project = securityService.getUserCurrentProject()			
 			def dataTransferBatch
 			def insertCount = 0
 			def errorConflictCount = 0
@@ -781,12 +781,12 @@ class DataTransferBatchController {
 						def isNewValidate
 						def isFormatError = 0
 						def assetEntity
-						if( assetEntityId && AssetEntity.get(assetEntityId).project.id == projectInstance.id ) {
+						if( assetEntityId && AssetEntity.get(assetEntityId).project.id == project.id ) {
 							dbInstance = Database.get(assetEntityId)
-							if(dbInstance?.id != null && dbInstance.project.id == projectInstance.id ){
+							if(dbInstance?.id != null && dbInstance.project.id == project.id ){
 								existingAssetsList.add( dbInstance )
 								if ( dataTransferBatch?.dataTransferSet.id == 1 ) {
-									def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, dbInstance, dtvList, projectInstance )
+									def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, dbInstance, dtvList, project )
 									flag = validateResultList[0]?.flag
 									errorConflictCount = errorConflictCount+validateResultList[0]?.errorConflictCount
 									if( flag == 0 ) {
@@ -800,21 +800,21 @@ class DataTransferBatchController {
 								unknowAssetIds += 1
 								unknowAssets += assetEntityId+","
 							}
-						} else if(!assetEntityId || AssetEntity.get(assetEntityId).project.id != projectInstance.id){
+						} else if(!assetEntityId || AssetEntity.get(assetEntityId).project.id != project.id){
 							dbInstance = new Database()
 							dbInstance.attributeSet = eavAttributeSet
 							isNewValidate = "true"
 						}
 					
 						if( dbInstance && flag == 0 ) {
-							dbInstance.project = projectInstance
-							//application.owner = projectInstance.client
+							dbInstance.project = project
+							//application.owner = project.client
 							dtvList.each {
 								def attribName = it.eavAttribute.attributeCode
 									switch(attribName){
 										case "moveBundle":
 										if(it.importValue){
-											def moveBundleInstance = assetEntityAttributeLoaderService.getdtvMoveBundle(it, projectInstance )
+											def moveBundleInstance = assetEntityAttributeLoaderService.getdtvMoveBundle(it, 	 )
 											isModified = "true"
 											dbInstance."$attribName" = moveBundleInstance
 										}
@@ -851,9 +851,8 @@ class DataTransferBatchController {
 													dbInstance."$attribName" = correctedPos
 												}
 											} catch ( Exception ex ) {
-												println"=================================="
-												ex.printStackTrace()
-												errorConflictCount+=1
+												log.error "dbProcess - unexpected exception 1 - " + ex.toString()
+												errorConflictCount++
 												it.hasError = 1
 												it.errorText = "format error"
 												it.save()
@@ -864,8 +863,8 @@ class DataTransferBatchController {
 											try{
 												dbInstance."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
 											} catch ( Exception ex ) {
-												ex.printStackTrace()
-												errorConflictCount+=1
+												log.error "dbProcess - unexpected exception 2 - " + ex.toString()
+												errorConflictCount++
 												it.hasError = 1
 												it.save()
 												dataTransferBatch.hasErrors = 1
@@ -928,7 +927,8 @@ class DataTransferBatchController {
 					
 					dataTransferBatch.statusCode = 'COMPLETED'
 					dataTransferBatch.save(flush:true)
-			}catch (Exception e) {
+			} catch (Exception e) {
+				log.error "dbProcess - Unexpected error, rolling back - " + e.printStackTrace()
 				status.setRollbackOnly()
 				e.printStackTrace()
 				flash.message = "Import Batch process failed"
@@ -940,11 +940,9 @@ class DataTransferBatchController {
 		}
 		session.setAttribute("IMPORT_ASSETS", assetsList)
 		redirect ( action:list, params:[projectId:projectId, message:flash.message ] )
-	 
-		
-		
 		
 	}
+	
     /* --------------------------------------
      * 	@author : Lokanada Reddy
      * 	@param  : processed and total assts from session 
@@ -954,7 +952,7 @@ class DataTransferBatchController {
     	def progressData = []
         def total = session.getAttribute("TOTAL_BATCH_ASSETS") 
         def processed = session.getAttribute("TOTAL_PROCESSES_ASSETS")
-    	progressData<<[processed:processed,total:total]
+    	progressData << [processed:processed,total:total]
         render progressData as JSON
      }
     
