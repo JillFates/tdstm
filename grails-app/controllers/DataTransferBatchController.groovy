@@ -291,7 +291,7 @@ class DataTransferBatchController {
 					updateAssetsCabling( modelAssetsList, existingAssetsList )
     			}
 			} catch (Exception e) {
-				log.warn "serverProcess - Unexpected error, rolling back - " + $e.toString()
+				log.warn "serverProcess - Unexpected error, rolling back - " + e.toString()
     			status.setRollbackOnly()
 				flash.message = "Import Batch process failed"
     		}
