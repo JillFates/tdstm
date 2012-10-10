@@ -418,7 +418,7 @@ class CommentService {
 		// Truncate long comments to make manageable subject line
 		// TODO : Use Apache commons StringUtil and get rid of this function
 		def sub = leftString(getLine(assetComment.comment,0), 40)
-		sub = (isNew ? '' : 'Re: ') + ( (sub == null || sub.size() == 0) ? "Task ${assetComment.id}" : sub )
+		sub = (isNew ? '' : 'Re: ') + ( (sub == null || sub.size() == 0) ? "Task ${assetComment.id}" : (assetComment.taskNumber ? assetComment.taskNumber+":"+sub : sub) )
 		
 		log.info "sendTaskEMail: taskId=${taskId} to=${assignedTo.id}/${assignedTo.email}"
 		
