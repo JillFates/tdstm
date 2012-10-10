@@ -17,6 +17,7 @@ class DataTransferBatchController {
     def sessionFactory
     def assetEntityAttributeLoaderService
     def jdbcTemplate
+	def securityService
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
 	protected static bundleTeamRoles = ['sourceTeamMt':'MOVE_TECH','targetTeamMt':'MOVE_TECH',
 										'sourceTeamLog':'CLEANER','targetTeamLog':'CLEANER',
@@ -60,8 +61,7 @@ class DataTransferBatchController {
     	def projectId
 		def assetsList = new ArrayList()
 		DataTransferBatch.withTransaction { status ->
-			projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-			def projectInstance = Project.findById( projectId )
+			def projectInstance = securityService.getUserCurrentProject()
     		def dataTransferBatch
     		def insertCount = 0
     		def errorConflictCount = 0
@@ -279,19 +279,28 @@ class DataTransferBatchController {
     						}
     					}
     				}
-
-    				dataTransferBatch.statusCode = 'COMPLETED'
-					dataTransferBatch.save(flush:true)
+					
+					sessionFactory.getCurrentSession().flush();
+					sessionFactory.getCurrentSession().clear();
+					projectInstance = projectInstance.merge()
 					
 					if(!projectInstance.save(flush:true)){
 						println"Error while updating project.lastAssetId : ${projectInstance}"
 						projectInstance.errors.each { println it }
 					}
+					
+    				dataTransferBatch.statusCode = 'COMPLETED'
+					if(!dataTransferBatch.save(flush:true)){
+						dataTransferBatch.errors.allErrors.each { println it}
+					}
+					
 					/* update assets racks, cabling data once process done */
 					updateAssetsCabling( modelAssetsList, existingAssetsList )
     			}
 			} catch (Exception e) {
-				log.warn "serverProcess - Unexpected error, rolling back - " + e.toString()
+				log.error "serverProcess - Unexpected error, rolling back - " + e.printStackTrace()
+				insertCount = 0
+				updateCount = 0
     			status.setRollbackOnly()
 				flash.message = "Import Batch process failed"
     		}
@@ -303,7 +312,7 @@ class DataTransferBatchController {
 				"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> " 
     	}
 		session.setAttribute("IMPORT_ASSETS", assetsList)
-		redirect ( action:list, params:[projectId:projectId, message:flash.message ] )
+		redirect ( action:list, params:[projectId:projectInstance.id, message:flash.message ] )
      }
 	
 	def appProcess ={
