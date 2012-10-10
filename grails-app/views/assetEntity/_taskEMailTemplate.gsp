@@ -23,20 +23,13 @@
         </tr> 
         <tr style="margin-top: 10px">
 			<td valign="top" class="name" ><label for="category"><b> Event/Phase</b></label></td>
-			<td valign="top" class="value" id="categoryTdId" >${assetComment.moveEvent ?: ''}</td>
-			
+			<td valign="top" class="value" id="categoryTdId" >${assetComment.moveEvent ?: ''} / ${assetComment.category}</td>
 		</tr>
 		<g:if test="${assetName}">
 		<tr id = "assetShowId" class="prop" style="margin-top: 10px" >
-			<td valign="top" class="name" ><label for="asset"><b>Asset:</b></label></td>
+			<td valign="top" class="name" ><label for="asset"><b>Related Asset:</b></label></td>
 			<td valign="top" class="value" id="assetShowValueId">${assetName} </td>
 		</tr>
-       </g:if>
-       <g:if test="${moveEvent}">
-       <tr id = "moveEventId" class="prop" style="margin-top: 10px" >
-         <td valign="top" class="name" ><label for="moveEvent"><b>Move Event:</b></label></td>
-         <td valign="top" class="value" id="moveEventShowValueId">${moveEvent} </td>
-       </tr>
        </g:if>
 	   <tr class="prop" style="margin-top: 10px">
 			<td valign="top" class="name" ><label for="status"><b>Status:</b></label></td>
@@ -52,18 +45,21 @@
 				<div id="previousNotesShowId" > 
 				<table style="border:1px solid green;margin-right: 40px">
 				<g:each in="${notes}" var="note">
-				<tr>
-				<td><tds:convertDate date="${note.dateCreated}"
-				     timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
-				</td>
-				<td>${note.createdBy }</td>
-				<td>${note.note }</td>
-				</tr>
+					<tr>
+						<td>
+							<tds:convertDate date="${note.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+						</td>
+						<td>${note.createdBy }</td>
+						<td>${note.note }</td>
+					</tr>
 				</g:each>
 				</table>
 				</div>
 			</td>
-		 </tr>
+		</tr>
+		<tr style="margin-top: 10px">
+			<td valign="top" class="name" colspan="2"><a href="https://tm.tdsops.com/tdstm/clientTeams/listTasks">See my tasks</a></td>
+	   </tr>
 	</table>
 	</div>
 	</body>
