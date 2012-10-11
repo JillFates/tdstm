@@ -407,12 +407,12 @@ class AssetEntityAttributeLoaderService {
 		 if( dtv.correctedValue ) {
 				moveBundleInstance = MoveBundle.findByNameAndProject( dtv.correctedValue, projectInstance )
 				if( !moveBundleInstance ) {
-					moveBundleInstance = new MoveBundle( name:dtv.correctedValue, project:projectInstance, operationalOrder:1 ).save()
+					moveBundleInstance = new MoveBundle( name:dtv.correctedValue, project:projectInstance, operationalOrder:1, workflowCode: projectInstance.workflowCode ).save()
 				}
 			} else if( dtv.importValue ) {
 				moveBundleInstance = MoveBundle.findByNameAndProject( dtv.importValue, projectInstance )
 				if( !moveBundleInstance ) {
-					moveBundleInstance = new MoveBundle( name:dtv.importValue, project:projectInstance, operationalOrder:1 ).save()
+					moveBundleInstance = new MoveBundle( name:dtv.importValue, project:projectInstance, operationalOrder:1, workflowCode: projectInstance.workflowCode ).save()
 				}
 			}
 		return moveBundleInstance
