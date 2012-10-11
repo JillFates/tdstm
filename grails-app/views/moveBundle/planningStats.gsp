@@ -202,7 +202,7 @@ $(document).ready(function() {
 									<b><g:link controller="application" action="list" params="[moveEvent:bundle.id]">${bundle}</g:link></b>
 								</th>
 							</g:each>
-						<th style="background-color: white;">&nbsp;</th>
+						<th style="background-color: white;">Done</th>
 						<tr>
 					    <td style="background-color: white;width:80px;">&nbsp;</td>
 					    <th style="background-color: white;width:45px;text-align: right;">&nbsp;</td>
@@ -225,7 +225,9 @@ $(document).ready(function() {
 						<tr>
 							<td style="color: black"><b>Apps</b></td>
 							<td style="text-align: left;"><b>
-									<g:link controller="application" action="list" params="[moveEvent:'unAssigned']">${unassignedAppCount}(${100-percentageAppCount}%)</g:link>
+									<g:link controller="application" action="list" params="[moveEvent:'unAssigned']">
+										${unassignedAppCount} (${(unassignedAppCount/applicationCount)*100 > 0 ? ((unassignedAppCount/applicationCount)*100 < 1 ? 1 : Math.round((unassignedAppCount/applicationCount)*100)) : 0}%)
+									</g:link>
 							</b></td>
 							<g:each in="${appList}" var="appCount">
 									<td style="text-align: right;"><b>
@@ -271,7 +273,9 @@ $(document).ready(function() {
 						<tr>
 							<td style="color: black">Physical</td>
 							<td style="text-align: left;""><b>
-									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'physical']">${unassignedPhysialAssetCount}(${100-percentagePhysicalAssetCount}%)</g:link>
+									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'physical']">${unassignedPhysialAssetCount}
+									(${ physicalCount ? ((unassignedPhysialAssetCount/physicalCount)*100 > 0 ? ((unassignedPhysialAssetCount/physicalCount)*100 < 1 ? 1 : Math.round((unassignedPhysialAssetCount/physicalCount)*100)) : 0) : 0}%)
+									</g:link>
 							</b></td>
 								<g:each in="${assetList}" var="assetCount">
 									<td style="text-align: right;"><b>
@@ -285,7 +289,9 @@ $(document).ready(function() {
 						<tr>
 							<td style="color: black">Virtual</td>
 							<td style="text-align: left;""><b>
-									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'virtual']">${unassignedVirtualAssetCount}(${100-percentagevirtualAssetCount}%)</g:link>
+									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'virtual']">${unassignedVirtualAssetCount}
+										(${virtualCount ? ((unassignedVirtualAssetCount/virtualCount)*100 > 0 ? ((unassignedVirtualAssetCount/virtualCount)*100 < 1 ? 1 : Math.round((unassignedVirtualAssetCount/virtualCount)*100)) : 0) : 0}%)
+									</g:link>
 							</b></td>
 								<g:each in="${assetList}" var="assetCount">
 									<td style="text-align: right;"><b>
@@ -299,7 +305,9 @@ $(document).ready(function() {
 						<tr>
 							<td style="color: black"><b>Databases</b></td>
 							<td style=" text-align: left;""><b>
-									<g:link controller="database" action="list" params="[moveEvent:'unAssigned']">${unassignedDbCount}(${100-percentageDBCount}%)</g:link>
+									<g:link controller="database" action="list" params="[moveEvent:'unAssigned']">${unassignedDbCount}
+										(${dbCount ? ((unassignedDbCount/dbCount)*100 > 0 ? ((unassignedDbCount/dbCount)*100 < 1 ? 1 : Math.round((unassignedDbCount/dbCount)*100)) : 0) : 0}%)
+									</g:link>
 							</b></td>
 								<g:each in="${dbList}" var="dbCount">
 									<td style="text-align: right;"><b>
@@ -311,7 +319,9 @@ $(document).ready(function() {
 						<tr>
 							<td style="color: black"><b>Files</b></td>
 							<td style=" text-align: left;""><b>
-									<g:link controller="files" action="list" params="[moveEvent:'unAssigned']">${unassignedFilesCount}(${100-percentageFilesCount}%)</g:link>
+									<g:link controller="files" action="list" params="[moveEvent:'unAssigned']">${unassignedFilesCount}
+									(${fileCount ? ((unassignedFilesCount/fileCount)*100 > 0 ? ((unassignedFilesCount/fileCount)*100 < 1 ? 1 : Math.round((unassignedFilesCount/fileCount)*100)) : 0) : 0}%)
+									</g:link>
 							</b></td>
 								<g:each in="${filesList}" var="filesCount">
 									<td style="text-align: right;"><b>
@@ -323,7 +333,9 @@ $(document).ready(function() {
 						<tr>
 							<td style="color: black"><b>Other</b></td>
 							<td style=" text-align: left;""><b>
-									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'other']">${unassignedOtherCount}(${100-percentageOtherCount}%)</g:link>
+									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'other']">${unassignedOtherCount}
+									(${otherAssetCount ? ((unassignedVirtualAssetCount/otherAssetCount)*100 > 0 ? ((unassignedVirtualAssetCount/otherAssetCount)*100 < 1 ? 1 : Math.round((unassignedVirtualAssetCount/otherAssetCount)*100)) : 0) : 0}%)
+									</g:link>
 							</b></td>
 								<g:each in="${otherTypeList}" var="otherCount">
 									<td style="text-align: right;"><b>
