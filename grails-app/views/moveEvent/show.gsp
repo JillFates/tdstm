@@ -101,6 +101,7 @@
                     <span class="button"><input type="button" class="delete" value="Clear Dashboard History" onclick="clearHistoricData( $('#moveEventId').val() )"/></span>
                  	<span class="button"><input type="button" class="delete" value="Delete Tasks" onclick="clearTaskData( $('#moveEventId').val(), 'delete' )"/></span>
                     <span class="button"><input type="button" class="delete" value="Clear Task History" onclick="clearTaskData( $('#moveEventId').val(), 'clear' )"/></span>
+                    <span class="button"><input type="button" class="delete" value="Mark Assets Moved" onclick="markAssetsMoved( $('#moveEventId').val())"/></span>
                  </tds:hasPermission>
                 </g:form>
             </div>
@@ -129,6 +130,27 @@
                	onSuccess:"jQuery('#messageDiv').html('Tasks have been '+(type=='clear' ? 'cleared' : 'deleted')+' successfully.')",
                	onFailure:"jQuery('#messageDiv').html('An unexpected error has occurred and update was unsuccessful.')") }
        	}
+   	}
+
+   	function markAssetsMoved( moveEventId ){
+   		 $("#messageDiv").hide();
+     	 $("#messageDiv").html("");
+     	 var confirmStatus = confirm("Marking all event assets as Moved can't be undone. Are you sure?")
+     	 if(confirmStatus){
+     		jQuery.ajax({
+    			url: '../markEventAssetAsMoved',
+    			data: {'moveEventId':moveEventId},
+    			success: function(data) {
+    				$("#messageDiv").show();
+    				var text = isNaN(data) ? '' : 'assets marked as moved.'
+    				$('#messageDiv').html(''+data+' '+text+'')
+    			},
+    			error: function(jqXHR, textStatus, errorThrown) {
+    				$("#messageDiv").show();
+    				$('#messageDiv').html("An unexpected error occurred and update was unsuccessful. ")
+    			}
+    		});
+         }
    	}
 </script>
     </body>

@@ -31,6 +31,7 @@ class MoveEventController {
 	def stateEngineService
 	def reportsService
 	def taskService
+	def securityService
 	
     def index = { redirect(action:list,params:params) }
 
@@ -835,5 +836,36 @@ class MoveEventController {
 				   }
 				return ;
 		
+	}
+	/*
+	 * markEventAssetAsMoved : Used to set asset's plan-status to 'Moved' for move event .
+	 * @param moveEventId
+	 * @return  Count of record affected with this update or Error Message if any
+	 * 
+	 */
+	
+	def markEventAssetAsMoved = {
+		def assetAffected
+		def errorMsg
+		def project = securityService.getUserCurrentProject()
+		if(params.containsKey("moveEventId")){
+			if(params.moveEventId.isNumber()){
+				def moveEvent = MoveEvent.get(params.moveEventId)
+				if(moveEvent){
+					if (moveEvent.project.id != project.id) {
+						log.error "markEventAssetAsMoved: moveEvent.project (${moveEvent.id}) does not match user's current project (${project.id})"
+						errorMsg = "An unexpected condition with the move event occurred that is preventing an update"
+					}else{
+						def bundleForEvent = moveEvent.moveBundles
+						assetAffected = bundleForEvent ? AssetEntity.executeUpdate("update AssetEntity ae set ae.planStatus='Moved' where ae.moveBundle in (:bundles)\
+																	and  ae.planStatus !='Moved' ",[bundles:bundleForEvent]) : 0
+					}
+				} else {
+					log.error "markEventAssetAsMoved: Specified moveEvent (${params.moveEventId}) was not found})"
+					errorMsg = "An unexpected condition with the move event occurred that is preventing an update."
+			    }
+			}
+		}
+		render errorMsg ? errorMsg : assetAffected
 	}
 }
