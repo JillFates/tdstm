@@ -29,13 +29,18 @@ function showEntityView(e, type){
 		B2.Pause()
 	 }
 	 var resp = e.responseText;
-	 $("#showEntityView").html(resp);
-	 $("#showEntityView").dialog('option', 'width', 'auto')
-	 $("#showEntityView").dialog('option', 'position', ['center','top']);
-	 $("#showEntityView").dialog('open');
-	 $("#editEntityView").dialog('close');
-	 $("#createEntityView").dialog('close');
-	 updateTitle(type)
+	 if(resp.substr(0,1) == '{'){
+    	var resp = eval('(' + e.responseText + ')');
+   	 	alert(resp.errMsg)
+     }else{
+		 $("#showEntityView").html(resp);
+		 $("#showEntityView").dialog('option', 'width', 'auto')
+		 $("#showEntityView").dialog('option', 'position', ['center','top']);
+		 $("#showEntityView").dialog('open');
+		 $("#editEntityView").dialog('close');
+		 $("#createEntityView").dialog('close');
+		 updateTitle(type)
+     }
 }
 function editEntity(redirectTo,type, value, source,rack,roomName,location,position){
 	if(redirectTo == "rack"){

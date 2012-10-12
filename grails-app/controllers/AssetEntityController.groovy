@@ -2741,37 +2741,52 @@ class AssetEntityController {
 		render statusMsg
 	}
 	def create = {
-		def assetEntityInstance = new AssetEntity(appOwner:'')
-
-		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
-		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute , [sort:"value"])
-		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",["Server"])?.manufacturer
-
-		/*def planStatusAttribute = EavAttribute.findByAttributeCode('planStatus')
-		def planStatusOptions = EavAttributeOption.findAllByAttribute(planStatusAttribute)*/
-
-		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = Project.read(projectId)
-
-		def moveBundleList = MoveBundle.findAllByProject(project)
-		
-		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
-		
-		def priorityOption = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
-		
-
-		def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
-		def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)
-
-		/*def priorityAttribute = EavAttribute.findByAttributeCode('priority')
-		def priorityOption = EavAttributeOption.findAllByAttribute(priorityAttribute)*/
-
-		[assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-					planStatusOptions:planStatusOptions?.value, projectId:projectId ,railTypeOption:railTypeOption?.value,
-					priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers,redirectTo:params?.redirectTo]
-
-
-
+		def project = securityService.getUserCurrentProject()
+		def errorMsg
+		def map = [:]
+		if(params.containsKey("assetEntityId")){
+			 if(params.assetEntityId.isNumber()){
+				 def assetEntity = AssetEntity.read(params.assetEntityId)
+				 if(assetEntity){
+					 if(assetEntity.project.id !=  project.id){
+						 log.error "create : assetEntity.project (${assetEntity.id}) does not match user's current project (${project.id})"
+						 errorMsg = "An unexpected condition with the move event occurred that is preventing an update"
+					 }
+				 }else{
+					 log.error "create: Specified moveEvent (${params.assetEntityId}) was not found})"
+					 errorMsg = "An unexpected condition with the move event occurred that is preventing an update."
+				 }
+			  }
+		}
+		if( errorMsg ) {
+		   def errorMap = [errMsg : errorMsg]
+		   render errorMap as JSON
+		} else {
+			def assetEntityInstance = new AssetEntity(appOwner:'')
+	
+			def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
+			def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute , [sort:"value"])
+			def assetType = params.assetType ? params.assetType : "Server"
+			def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
+			def manufacuterer = params.manufacturer ? Manufacturer.read(params.manufacturer) : manufacturers[0]
+			
+			def models =  Model.findAllByManufacturer( manufacuterer,[sort:'modelName',order:'asc'] )?.findAll{it.assetType == assetType }
+	
+			def moveBundleList = MoveBundle.findAllByProject(project)
+			
+			def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+			
+			def priorityOption = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
+			
+	
+			def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
+			def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)
+	
+			 [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
+				planStatusOptions:planStatusOptions?.value, projectId:project.id ,railTypeOption:railTypeOption?.value,
+				priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers,redirectTo:params?.redirectTo,
+				models:models]
+		}
 	}
 	
 	/**
@@ -2786,7 +2801,7 @@ class AssetEntityController {
 		
 		if (params.containsKey('id')) {
 			assetEntity = AssetEntity.findByIdAndProject( params.id, project )
-			if (! assetEntity) {
+			if (!assetEntity) {
 				flash.message = "Unable to find asset within current project"
 				log.warn "show - asset id (${params.id}) not found for project (${project.id}) by user ${userLogin}"				
 			}

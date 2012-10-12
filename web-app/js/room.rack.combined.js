@@ -79,15 +79,13 @@ function openSelectedRackLayout(){
     $("#listDialog").dialog("close")
     $("#cablingDialogId").dialog("close")
 }
-function createBladeDialog(source,blade,position){
-	var redirectTo = $('#redirectTo').val() == 'room' ? 'room' : 'rack'
-    new Ajax.Request('../assetEntity/create?redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e);updateAssetBladeInfo(source,blade,position);}})
-}
-function updateAssetBladeInfo(source,blade,position){
+function updateAssetBladeInfo(source,blade,position,manufacturer,moveBundle){
 	var target = source != '1' ? 'target' : 'source'
 	$("#assetTypeId").val("Blade")	
 	$("#"+target+"BladeChassisId").val(blade)
 	$("#"+target+"BladePositionId").val(position)
+	$("#manufacturer").val(manufacturer)
+	$("#moveBundle").val(moveBundle)
 }
 function listBladeDialog(source,blade,position, assign){
 	jQuery.ajax({

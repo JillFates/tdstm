@@ -295,6 +295,23 @@ function createAssetPage(type,source,rack,roomName,location,position){
 	var room = $("#redirectTo").val();
 	   ${remoteFunction(action:'create',controller:'assetEntity',params:'\'redirectTo=\'+room', onComplete:'createEntityView(e,type,source,rack,roomName,location,position)')}
 }
+function createBladeDialog(source,blade,position,manufacturer,assetType,assetEntityId, moveBundleId){
+	var redirectTo =$("#redirectTo").val();
+    new Ajax.Request('../assetEntity/create?redirectTo='+redirectTo+'&assetType='+assetType+'&manufacturer='+manufacturer+'&assetEntityId='+assetEntityId,{
+              asynchronous:true,evalScripts:true,
+              		onSuccess:function(e){
+              		    if(e.responseText.substr(0,1) == '{'){
+				        	var resp = eval('(' + e.responseText + ')');
+				       	 	alert(resp.errMsg)
+				        }else{
+			           	 	createEntityView(e,'Server');updateAssetBladeInfo(source,blade,position,manufacturer,moveBundleId);
+			            }
+			        },
+					onFailure:function(jqXHR, textStatus, errorThrown){
+						alert( "An unexpected error occurred. Please close and reload form to see if the problem persists" )
+					}
+    		  })
+}
 </script>
 </body>
 </html>

@@ -357,6 +357,22 @@
 	function createAssetPage(type,source,rack,roomName,location,position){
 		${remoteFunction(action:'create',controller:'assetEntity',params:['redirectTo':'rack'], onComplete:'createEntityView(e,type,source,rack,roomName,location,position)')}
 	}
+	function createBladeDialog(source,blade,position,manufacturer,assetType,assetEntityId, moveBundleId){
+		var redirectTo = 'rack'
+		new Ajax.Request('../assetEntity/create?redirectTo='+redirectTo+'&assetType='+assetType+'&manufacturer='+manufacturer,{asynchronous:true,evalScripts:true,
+				onSuccess:function(e){
+	      		    if(e.responseText.substr(0,1) == '{'){
+			        	var resp = eval('(' + e.responseText + ')');
+			       	 	alert(resp.errMsg)
+			        }else{
+		           	 	createEntityView(e,Server);updateAssetBladeInfo(source,blade,position,manufacturer,moveBundleId);
+		            }
+		        },
+				onFailure:function(jqXHR, textStatus, errorThrown){
+					alert( "An unexpected error occurred. Please close and reload form to see if the problem persists" )
+				}
+	    })
+	}
 </script>
 <script>
 	currentMenuId = "#racksMenu";

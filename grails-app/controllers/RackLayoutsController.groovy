@@ -559,7 +559,7 @@ class RackLayoutsController {
 						bladeTable += """<td class='emptyBlade' style='height:${tdHeight}px'>
 									<div class="rack_menu"><img src="../i/rack_add2.png"/>
 										<ul>
-											<li><a href="javascript:createBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}')">Create asset  </a></li>
+											<li><a href="javascript:createBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}','${assetEntity.manufacturer.id}','Blade','${assetEntity.id}','${assetEntity.moveBundle.id}')">Create asset  </a></li>
 											<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}','assign')">Assign asset </a></li>
 											<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}','reassign')">Reassign asset </a></li>
 										</ul>
