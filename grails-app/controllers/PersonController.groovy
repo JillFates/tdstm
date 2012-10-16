@@ -15,6 +15,7 @@ class PersonController {
     
 	def partyRelationshipService
 	def userPreferenceService
+	def securityService
 	
     def index = { redirect(action:list,params:params) }
 
@@ -427,5 +428,82 @@ class PersonController {
 		}
 		userPreferenceService.setPreference("START_PAGE", "Current Dashboard" )
 		render person
+	}
+	def manageProjectStaff ={
+		def project = securityService.getUserCurrentProject()
+		def projects = Project.findAll()
+		def roleTypes = RoleType.findAllByDescriptionIlike("Staff%")
+		def role = params.role ? params.role : "MOVE_TECH"
+		def moveEventList = []
+		def bundleTimeformatter = new SimpleDateFormat("dd-MMM")
+		if(project){
+			def moveMap = new HashMap()
+			def moveEvents = MoveEvent.findAllByProject(project)
+			def bundleStartDate = ""
+			moveEvents.each{ moveEvent->
+				def moveBundle = moveEvent?.moveBundles
+				def startDate = moveBundle.startTime.sort()
+				startDate?.removeAll([null])
+				if(startDate.size()>0){
+					if(startDate[0]){
+					   bundleStartDate = bundleTimeformatter.format(startDate[0])
+					}
+				}
+				moveMap.put("project", moveEvent.project.name)
+				moveMap.put("name", moveEvent.name)
+				moveMap.put("startTime", bundleStartDate)
+				
+				moveEventList << moveMap
+			}
+			
+		}
+		def staffList = getStaffList(project.id)
+		[projects:projects, projectId : project.id,roleTypes:roleTypes,staffList:staffList,moveEventList:moveEventList,
+		 currRole:userPreferenceService.getPreference("StaffingRole")?:"MOVE_TECH",
+		 currLoc:userPreferenceService.getPreference("StaffingLocation")?:"All",
+		 currPhase:userPreferenceService.getPreference("StaffingPhases")?:"All",
+		 currScale:userPreferenceService.getPreference("StaffingScale")?:"1"
+		 ]
+		
+	}
+	
+	def loadFilteredStaff={
+		def role = params.role
+		def project = params.project
+		def scale = params.scale
+		def location = params.location
+		def phase = params.list("phaseArr[]")
+		
+		userPreferenceService.setPreference("StaffingRole",role)
+		userPreferenceService.setPreference("StaffingLocation",location)
+		userPreferenceService.setPreference("StaffingPhases",phase.toString().replace("[", "").replace("]", ""))
+		userPreferenceService.setPreference("StaffingScale",scale)
+		
+		def getStaffList = getStaffList(project,role,scale,location);
+		
+		render(template:"projectStaffTable" ,model:[staffList:getStaffList])
+		
+	}
+	
+	def getStaffList(def projectId, def role="MOVE_TECH", def scale=1, def location= "All"){
+		def queryForStaff = "from PartyRelationship p where p.roleTypeCodeTo ='${role}'"
+		def project = Project.get( projectId )
+		if(project && projectId!=0){
+			queryForStaff+=" and p.partyIdFrom = ${projectId} "
+		}
+		queryForStaff+=" group by p.partyIdTo"
+		def list = []
+		def staffList = PartyRelationship.findAll(queryForStaff)
+		staffList.each{staff ->
+			def map = new HashMap()
+			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+			map.put("company", company.partyIdFrom)
+			map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
+			map.put("role", staff.roleTypeCodeTo)
+			map.put("staff", staff.partyIdTo)
+			list<<map
+		}
+		return list
+		
 	}
 }
