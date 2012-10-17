@@ -1917,7 +1917,6 @@ class AssetEntityController {
 		// TODO - SECURITY - deleteComment - verify that the asset is part of a project that the user has the rights to delete the note
 		def assetCommentInstance = AssetComment.get(params.id)
 		if(assetCommentInstance){
-			CommentNote.executeUpdate("DELETE FROM CommentNote cn WHERE cn.assetComment =:comment",['comment':assetCommentInstance] )
 			def taskDependency = TaskDependency.executeUpdate("delete from TaskDependency td where td.assetComment = ${assetCommentInstance.id} OR td.predecessor = ${assetCommentInstance.id}")
 			assetCommentInstance.delete()
 		}
