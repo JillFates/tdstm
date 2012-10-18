@@ -2,8 +2,13 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="projectHeader" />
-        <g:javascript src="project.staff.js" />
-        <title>Project Staff</title>         
+        <g:javascript src="projectStaff.js" />
+        <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
+	    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+        <title>Project Staff</title>   
+        <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'calendarview.css')}" />
+		
+		 
     </head>
     <body>
         <div class="body">
@@ -79,11 +84,15 @@
             	<g:render template="projectStaffTable"></g:render>
             </div>
             </div>
+            <div id="personGeneralViewId" style="display: none;" title="Manage Staff "></div>
         </div>
         <script type="text/javascript">
 	        $(document).ready(function() {
 		        $("#scale").val(${currScale})
+		        $("#personGeneralViewId").dialog({ autoOpen: false })
 			})
+			
+			
      	</script>
      </body>
  </html>

@@ -8,10 +8,13 @@ class Person extends Party {
 	String email
 	String department
 	String location
+	String stateProv
+	String country
 	String workPhone
 	String mobilePhone
 	Integer modelScore = 0
 	Integer modelScoreBonus = 0
+	String personImageURL 
 
 
 	/*
@@ -26,10 +29,13 @@ class Person extends Party {
 		 email(email:true, blank:true, nullable:true)
 		 department( blank:true, nullable:true )
 		 location( blank:true, nullable:true )
+		 stateProv( blank:true, nullable:true )
+		 country( blank:true, nullable:true )
 		 workPhone(blank:true, nullable:true, phoneNumber:true)
 		 mobilePhone(blank:true, nullable:true, phoneNumber:true)
 		 modelScore( nullable:true )
 		 modelScoreBonus( nullable:true )
+		 personImageURL( nullable:true )
 		 
 	 }
 

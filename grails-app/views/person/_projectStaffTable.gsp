@@ -16,27 +16,18 @@
 	<tbody>
 		<g:each in="${staffList}" status="i" var="projectStaff">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-				<g:if test="${personHasPermission }">
-					<td><g:remoteLink controller="person" action="editStaff"
-							id="${projectStaff?.staff.id}"
-							params="[role:projectStaff?.role.id]"
-							onComplete="editPersonDialog( e );">
+				<td><span style="cursor: pointer;" id="${projectStaff?.staff.id}" onClick="loadPersonDiv(this.id)">
 							${projectStaff?.name}
-						</g:remoteLink></td>
-				</g:if>
-				<g:else>
-					<td><g:remoteLink controller="person" action="editStaff"
-							id="${projectStaff?.staff.id}"
-							params="[role:projectStaff?.role.id]"
-							onComplete="showPersonDialog( e );">
-							${projectStaff?.name}
-						</g:remoteLink></td>
-				</g:else>
+					</span></td>
 				<td>
-					${projectStaff?.company[0]}
+					<span style="cursor: pointer;" id="${projectStaff?.staff.id}" onClick="loadPersonDiv(this.id)">
+						${projectStaff?.company[0]}
+					</span>
 				</td>
 				<td>
-					${projectStaff?.role}
+					<span style="cursor: pointer;" id="${projectStaff?.staff.id}" onClick="loadPersonDiv(this.id)">
+						${projectStaff?.role}
+					</span>
 				</td>
 			</tr>
 		</g:each>

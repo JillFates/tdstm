@@ -397,17 +397,28 @@ class PersonController {
 				def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
 				getSession().setAttribute( "LOGIN_PERSON", ['name':personInstance.firstName, "id":personInstance.id ])
 				def userLogin = UserLogin.findByPerson( personInstance )
-				def password = params.newPassword
-				
-				if(password != null)
-					userLogin.password = new Sha1Hash(params.newPassword).toHex()
+				if(userLogin){
+					def password = params.newPassword
 					
-				if(params.expiryDate != "null"){
-					def expiryDate = params.expiryDate
-					userLogin.expiryDate =  GormUtil.convertInToGMT(formatter.parse( expiryDate ), tzId)
+					if(password != null)
+						userLogin.password = new Sha1Hash(params.newPassword).toHex()
+						
+					if(params.expiryDate && params.expiryDate != "null"){
+						def expiryDate = params.expiryDate
+						userLogin.expiryDate =  GormUtil.convertInToGMT(formatter.parse( expiryDate ), tzId)
+					}
+					if(!userLogin.save()){
+						userLogin.errors.allErrors.each{println it}
+					}
 				}
-				userLogin.save();
-				
+				if(params.manageRoles != '0'){
+					PartyRole.executeUpdate("delete from PartyRole where party = '$personInstance.id'  ")
+					if(params.role){
+						Set newRoles = []
+						newRoles.addAll(params.role)
+						userPreferenceService.setUserRoles(newRoles, personInstance.id)
+					}
+				}
 				userPreferenceService.setPreference( "CURR_TZ", params.timeZone )
 				userPreferenceService.setPreference( "CURR_POWER_TYPE", params.powerType )
 				userPreferenceService.loadPreferences("CURR_TZ")
@@ -429,6 +440,11 @@ class PersonController {
 		userPreferenceService.setPreference("START_PAGE", "Current Dashboard" )
 		render person
 	}
+	/*
+	 * Redirect to project staff page with relevant data
+	 * @ returns - staff list.
+	 * 
+	 */
 	def manageProjectStaff ={
 		def project = securityService.getUserCurrentProject()
 		def projects = Project.findAll()
@@ -458,14 +474,24 @@ class PersonController {
 			
 		}
 		def staffList = getStaffList(project.id)
-		[projects:projects, projectId : project.id,roleTypes:roleTypes,staffList:staffList,moveEventList:moveEventList,
-		 currRole:userPreferenceService.getPreference("StaffingRole")?:"MOVE_TECH",
-		 currLoc:userPreferenceService.getPreference("StaffingLocation")?:"All",
-		 currPhase:userPreferenceService.getPreference("StaffingPhases")?:"All",
-		 currScale:userPreferenceService.getPreference("StaffingScale")?:"1"
-		 ]
+		
+	    [projects:projects, projectId:project.id, roleTypes:roleTypes, staffList:staffList,
+			 moveEventList:moveEventList,
+			 currRole:userPreferenceService.getPreference("StaffingRole")?:"MOVE_TECH",
+			 currLoc:userPreferenceService.getPreference("StaffingLocation")?:"All",
+			 currPhase:userPreferenceService.getPreference("StaffingPhases")?:"All",
+			 currScale:userPreferenceService.getPreference("StaffingScale")?:"1"]
 		
 	}
+	
+	/*
+	 * 
+	 *@param projectId id of project from select
+	 *@param role - type of role to filter staff list
+	 *@param scale - duration in month  to filter staff list
+	 *@param location - location to filter staff list
+	 *Redirect to template for staffing list.
+	 */
 	
 	def loadFilteredStaff={
 		def role = params.role
@@ -484,6 +510,13 @@ class PersonController {
 		render(template:"projectStaffTable" ,model:[staffList:getStaffList])
 		
 	}
+	
+	/*
+	 *@param projectId - id of project from select
+	 *@param role - type of role to filter staff list
+	 *@param scale - duration in month  to filter staff list
+	 *@param location - location to filter staff list
+	 */
 	
 	def getStaffList(def projectId, def role="MOVE_TECH", def scale=1, def location= "All"){
 		def queryForStaff = "from PartyRelationship p where p.roleTypeCodeTo ='${role}'"
@@ -505,5 +538,22 @@ class PersonController {
 		}
 		return list
 		
+	}
+	
+	/*
+	 *@param tab is name of template where it need to be redirect
+	 *@param person Id is id of person
+	 *@return NA
+	 */
+	
+	def loadGeneral = {
+		def tab = params.tab ?: 'generalInfo'
+		def person = Person.get(params.personId)
+		def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $person.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ").partyIdFrom[0]
+		
+		def rolesForPerson = PartyRole.findAll("from PartyRole where party = :person and roleType.description like 'staff%' group by roleType",[person:person])?.roleType
+		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")//RoleType.findAll("from RoleType r where r.id in description like 'staff%' (select roleType.id from PartyRole where  description like 'staff%' group by roleType.id )")
+		
+		render(template:tab ,model:[person:person, company:company, rolesForPerson:rolesForPerson, availabaleRoles:availabaleRoles, sizeOfassigned:(rolesForPerson.size()+1)])
 	}
 }
