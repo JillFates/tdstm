@@ -15,9 +15,9 @@ $(document).ready(function() {
 <body>
 	<div class="body">
 		<div>
-		    <g:set var="appToValid" value="${applicationCount ? Math.round((appToValidate/applicationCount)*100) : 0}"/>
-		    <g:set var="bundleRdy" value="${applicationCount ? Math.round((bundleReady/applicationCount)*100) : 0}"/>
-		    
+		    <g:set var="percentageAppToValidate" value="${applicationCount ? Math.round((appToValidate/applicationCount)*100) : 0}"/>
+		    <g:set var="percentageBundleReady" value="${applicationCount ? Math.round((bundleReady/applicationCount)*100) : 0}"/>
+			<g:set var="percentageUnassignedAppCount" value="${applicationCount ? (unassignedAppCount/applicationCount)*100 : 0}"/>
 			<h1>Planning Dashboard</h1>
 			<div style="float:left;margin-top: 10px; margin-left: 5px;width:250px;">
 					<h3 style="color:#63A242">
@@ -26,18 +26,18 @@ $(document).ready(function() {
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
 							<td style="padding:0px; height:24px; background-color: lightyellow;box-shadow: 2px 3px 3px lightgray inset;">
-							<g:if test="${applicationCount=0}">
+							<g:if test="${percentageAppToValidate=100}">
 								<div style="position:relative; top:0px;height:0px;margin-left:5px;"><b>0% Applications Validated</b></div>
 
-							</g:if><g:elseif test="${applicationCount=100}">
+							</g:if><g:elseif test="${percentageAppToValidate=0}">
 
 								<div class="task_completed" style="z-index:-1; height:24px; width: 100%"></div>
 								<div class="task_completed" style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>100% Applications Validated</b></div>
 
 							</g:elseif><g:else>
 
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${100 - appToValid}%"></div>
-								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${100 - appToValid}%</b>
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${100 - percentageAppToValidate}%"></div>
+								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${100 - percentageAppToValidate}%</b>
 									<g:link controller="application" action="list" params="[validation:'Discovery']">Applications Validated</g:link>
 								</div>
 							</g:else>
@@ -92,7 +92,6 @@ $(document).ready(function() {
 						</tr>
 						</g:if>
 					</table>
-	
 			</div>
 
 			<div style="float:left;margin-top: 10px; margin-left: 5px;width:250px;">
@@ -102,18 +101,18 @@ $(document).ready(function() {
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
 							<td style="padding:0px; height:24px; background-color: lightyellow;box-shadow: 2px 3px 3px lightgray inset;">
-							<g:if test="${bundleRdy=0}">
+							<g:if test="${percentageBundleReady=0}">
 								<div style="position:relative; top:0px;height:0px;margin-left:5px;"><b>0% Applications Ready</b></div>
 
-							</g:if><g:elseif test="${bundleRdy=100}">
+							</g:if><g:elseif test="${percentageBundleReady=100}">
 
 								<div class="task_completed" style="z-index:-1; height:24px; width: 100%"></div>
 								<div class="task_completed" style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>100% Applications Ready</b></div>
 
 							</g:elseif><g:else>
 
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${bundleRdy}%"></div>
-								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${bundleRdy}%</b>
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${percentageBundleReady}%"></div>
+								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${percentageBundleReady}%</b>
 									<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Ready</g:link>
 								</div>
 							</g:else>
@@ -203,18 +202,18 @@ $(document).ready(function() {
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
 							<td style="padding:0px; height:24px; background-color: lightyellow;box-shadow: 2px 3px 3px lightgray inset;">
-							<g:if test="${percentageAppCount=0}">
+							<g:if test="${percentageUnassignedAppCount=100}">
 								<div style="position:relative; top:0px;height:0px;margin-left:5px;"><b>0% Applications Assigned</b></div>
 
-							</g:if><g:elseif test="${percentageAppCount=100}">
+							</g:if><g:elseif test="${percentageUnassignedAppCount=0}">
 
 								<div class="task_completed" style="z-index:-1; height:24px; width: 100%"></div>
 								<div class="task_completed" style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>100% Applications Assigned</b></div>
 
 							</g:elseif><g:else>
 
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${percentageAppCount}%"></div>
-								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${percentageAppCount}%</b>
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${100-percentageUnassignedAppCount}%"></div>
+								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${100-percentageUnassignedAppCount}%</b>
 									<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Assigned</g:link>
 								</div>
 							</g:else>
@@ -253,7 +252,6 @@ $(document).ready(function() {
 						<tr>
 							<td style="color: black"><b>Apps</b></td>
 							<td style="text-align: left;">
-							<g:set var="unassinAppCount" value="${applicationCount ? (unassignedAppCount/applicationCount)*100 : 0}"/>
 							<g:if test="${unassignedAppCount = 0 }">
 								0
 							</g:if>
@@ -261,7 +259,7 @@ $(document).ready(function() {
 							<b>
 
 								<g:link controller="application" action="list" params="[tag_f_planStatus:'unassigned']">
-									${unassignedAppCount} (${(unassinAppCount > 0 && unassinAppCount < 1) ? 1 : Math.round(unassinAppCount)}%)
+									${unassignedAppCount} (${(percentageUnassignedAppCount > 0 && percentageUnassignedAppCount < 1) ? 1 : Math.round(percentageUnassignedAppCount)}%)
 								</g:link>
 							</b>
 							</g:else>
@@ -310,14 +308,14 @@ $(document).ready(function() {
 						<tr>
 							<td style="color: black">Physical</td>
 							<td style="text-align: left;">
-							<g:set var="unassinPhyCount" value="${physicalCount ? (unassignedPhysialAssetCount/physicalCount)*100 : 0}"/>
+							<g:set var="percentageUnassignedPhysicalAssetCount" value="${physicalCount ? (unassignedPhysialAssetCount/physicalCount)*100 : 0}"/>
 							<g:if test="${unassignedPhysialAssetCount = 0 }">
 								0
 							</g:if>
 							<g:else>
 							<b>
 								<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'physical']">
-								   ${unassignedPhysialAssetCount} (${(unassinPhyCount > 0 && unassinPhyCount < 1) ? 1 : Math.round(unassinPhyCount)}%)
+								   ${unassignedPhysialAssetCount} (${(percentageUnassignedPhysicalAssetCount > 0 && percentageUnassignedPhysicalAssetCount < 1) ? 1 : Math.round(percentageUnassignedPhysicalAssetCount)}%)
 								</g:link>
 							</b>
 							</g:else>
@@ -334,14 +332,14 @@ $(document).ready(function() {
 						<tr>
 							<td style="color: black">Virtual</td>
 							<td style="text-align: left;">
-							<g:set var="unassinVirtualCount" value="${virtualCount ? (unassignedVirtualAssetCount/virtualCount)*100 : 0}"/>
+							<g:set var="percentageUnassignedVirtualCount" value="${virtualCount ? (unassignedVirtualAssetCount/virtualCount)*100 : 0}"/>
 							<g:if test="${unassignedVirtualAssetCount = 0 }">
 								0
 							</g:if>
 							<g:else>
 							<b>
 								<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'virtual']">
-								   ${unassignedVirtualAssetCount} (${(unassinVirtualCount > 0 && unassinVirtualCount < 1) ? 1 : Math.round(unassinVirtualCount)}%)
+								   ${unassignedVirtualAssetCount} (${(percentageUnassignedVirtualCount > 0 && percentageUnassignedVirtualCount < 1) ? 1 : Math.round(percentageUnassignedVirtualCount)}%)
 								</g:link>
 							</b>
 							</g:else>
@@ -358,14 +356,14 @@ $(document).ready(function() {
 						<tr>
 							<td style="color: black"><b>Databases</b></td>
 							<td style=" text-align: left;">
-							<g:set var="unassinDbCount" value="${dbCount ? (unassignedDbCount/dbCount)*100 : 0}"/>
+							<g:set var="percentageUnassignedDbCount" value="${dbCount ? (unassignedDbCount/dbCount)*100 : 0}"/>
 							<g:if test="${unassignedDbCount = 0 }">
 								0
 							</g:if>
 							<g:else>
 							<b>
 								<g:link controller="database" action="list" params="[moveEvent:'unAssigned']">
-									${unassignedDbCount} (${(unassinDbCount > 0 && unassinDbCount < 1) ? 1 : Math.round(unassinDbCount)}%)
+									${unassignedDbCount} (${(percentageUnassignedDbCount > 0 && percentageUnassignedDbCount < 1) ? 1 : Math.round(percentageUnassignedDbCount)}%)
 								</g:link>
 							</b>
 							</g:else>
@@ -382,14 +380,14 @@ $(document).ready(function() {
 						<tr>
 							<td style="color: black"><b>Files</b></td>
 							<td style=" text-align: left;">
-							<g:set var="unassinFilesCount" value="${fileCount ? (unassignedFilesCount/fileCount)*100 : 0}"/>
+							<g:set var="percentageUnassignedFilesCount" value="${fileCount ? (unassignedFilesCount/fileCount)*100 : 0}"/>
 							<g:if test="${unassignedFilesCount = 0 }">
 								0
 							</g:if>
 							<g:else>
                             <b>
 								<g:link controller="files" action="list" params="[moveEvent:'unAssigned']">
-								${unassignedFilesCount} (${(unassinFilesCount > 0 && unassinFilesCount < 1) ? 1 : Math.round(unassinFilesCount)}%)
+								${unassignedFilesCount} (${(percentageUnassignedFilesCount > 0 && percentageUnassignedFilesCount < 1) ? 1 : Math.round(percentageUnassignedFilesCount)}%)
 								</g:link>
 							</b>
 							</g:else>
@@ -406,14 +404,14 @@ $(document).ready(function() {
                         <tr>
                             <td style="color: black"><b>Other</b></td>
                             <td style=" text-align: left;">
-                            <g:set var="unassinOtherCount" value="${otherAssetCount ? (unassignedOtherCount/otherAssetCount)*100 : 0}"/>
+                            <g:set var="percentageUnassignedOtherCount" value="${otherAssetCount ? (unassignedOtherCount/otherAssetCount)*100 : 0}"/>
 							<g:if test="${unassignedOtherCount = 0 }">
 								0
 							</g:if>
 							<g:else>
                             <b>
 								<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'other']">
-								   ${unassignedOtherCount}	(${(unassinOtherCount > 0 && unassinOtherCount < 1) ? 1 : Math.round(unassinOtherCount)}%)
+								   ${unassignedOtherCount}	(${(percentageUnassignedOtherCount > 0 && percentageUnassignedOtherCount < 1) ? 1 : Math.round(percentageUnassignedOtherCount)}%)
 								</g:link>
 							</b>
 							</g:else>
