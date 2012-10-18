@@ -18,10 +18,22 @@
 						<input type="text" name="roomName" id="roomNameId" value="${roomInstance.roomName}">
 					</td>
 					<td>Width (ft)<br/>
-						<input type="text" name="roomWidth" id="roomWidthId" value="${roomInstance.roomWidth}">
+						<input type="text" name="roomWidth" id="roomWidthId" value="${roomInstance.roomWidth}" size="4" onblur="roundValue(this.value,'roomWidthId')">
 					</td>
 					<td>Depth (ft)<br/>
-						<input type="text" name="roomDepth" id="roomDepthId" value="${roomInstance.roomDepth}">
+						<input type="text" name="roomDepth" id="roomDepthId" value="${roomInstance.roomDepth}" size="4" onblur="roundValue(this.value,'roomDepthId')">
+					</td>
+					<td style="width: 30px">Address<br/>
+						<input type="text" name="address" id="addressId" value="${roomInstance?.address}" size="20">
+					</td>
+					<td style="width: 30px">City <br/>
+						<input type="text" name="city" id="cityId" value="${roomInstance?.city}" size="10">
+					</td>
+					<td style="width: 30px">stateProv <br/>
+						<input type="text" name="stateProv" id="stateProvId" value="${roomInstance?.stateProv}" size="4">
+					</td>
+					<td style="width: 30px">Country<br/>
+						<input type="text" name="country" id="countryId" value="${roomInstance?.country}" size="5">
 					</td>
 				</tr>
 				<tr>
@@ -29,7 +41,7 @@
 						<input type="button" class="submit" value="Cancel" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
 						<input type="submit" class="submit" value="Update" />
 					</td>
-					<td class="buttonR" style="padding-left: 200px;vertical-align:top;">
+					<td class="buttonR" style="padding-left: 200px;vertical-align:top;" colspan="4" nowrap="nowrap">
 						<b>Add to Room:</b>&nbsp;<input type="button" class="submit" value="Rack" onclick="createRack(this.value)" />
 						<input type="button" class="submit" value="UPS" onclick="createRack(this.value)" />
 						<input type="button" class="submit" value="CRAC" onclick="createRack(this.value)" />
@@ -96,7 +108,7 @@
 			<tr id="rackEditRow_${rack.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}" >
 				<td>
 					<input type="hidden" name="rackId" value="${rack.id}"/>
-					<input type="text" name="tag_${rack.id}" value="${rack.tag}" size="5" onchange="changeLabel(${rack.id},this.value)"/>
+					<input type="text" name="tag_${rack.id}" value="${rack.tag}" size="10" onchange="changeLabel(${rack.id},this.value)"/>
 				</td>
 				<td><input type="text" id="roomXId_${rack.id}" name="roomX_${rack.id}" value="${rack.roomX}" size="3"  onkeyup="changeRackPosition(${rack.id},this.value, 'left')" /></td>
 				<td><input type="text" id="roomYId_${rack.id}" name="roomY_${rack.id}" value="${rack.roomY}" size="3"  onkeyup="changeRackPosition(${rack.id},this.value, 'top')" /></td>
@@ -116,7 +128,7 @@
 			<tr id="rackEditRow_${rack}" class="${(i % 2) == 0 ? 'odd' : 'even'}" style="display: none;">
 				<td>
 					<input type="hidden" name="rackId" value="${rack}"/>
-					<input type="text" name="tag_${rack}" value="" size="5" onchange="changeLabel(${rack},this.value)"/>
+					<input type="text" name="tag_${rack}" value="" size="10" onchange="changeLabel(${rack},this.value)"/>
 				</td>
 				<td><input type="text" id="roomXId_${rack}" name="roomX_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'left')" /></td>
 				<td><input type="text" id="roomYId_${rack}" name="roomY_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'top')" /></td>
@@ -247,6 +259,10 @@ function changeRackPosition(rackId, value, position){
 	} else {
 		alert("Please enter Numerics")
 	}
+}
+function roundValue(value,id){
+	var chndValue = Math.round(value)
+	$("#"+id).val( chndValue )
 }
 </script>
 </body>

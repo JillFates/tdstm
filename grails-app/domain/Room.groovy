@@ -6,6 +6,10 @@ class Room {
 	Integer roomWidth = 24
 	Integer roomDepth = 24
 	Project project
+	String address 
+	String city 
+	String stateProv 
+	String country 	
 	
 	// Groovy time stime stamps
 	Date dateCreated
@@ -24,6 +28,10 @@ class Room {
 		roomWidth( nullable:true )
 		roomDepth( nullable:true )
 		source( nullable:true )
+		address( blank:true, nullable:true )
+		city( blank:true, nullable:true )
+		stateProv( blank:true, nullable:true )
+		country( blank:true, nullable:true )
 	}
 
 	static mapping  = {	

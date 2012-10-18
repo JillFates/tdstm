@@ -121,6 +121,11 @@ class RoomController {
 			roomInstance.location = params.location
 			roomInstance.roomWidth = params.roomWidth ? Integer.parseInt(params.roomWidth) : null
 			roomInstance.roomDepth = params.roomDepth ? Integer.parseInt(params.roomDepth) : null
+			roomInstance.address = params.address
+			roomInstance.city = params.city
+			roomInstance.stateProv = params.stateProv
+			roomInstance.country = params.country
+			
             if (!roomInstance.hasErrors() && roomInstance.save(flush: true)) {
 				
                 def racks = Rack.findAllByRoom( roomInstance )

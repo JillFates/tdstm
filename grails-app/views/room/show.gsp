@@ -19,7 +19,9 @@
 				<input type="submit" class="submit" value="List" />
 				 <tds:hasPermission permission='RoomEditView'>
 					<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
-				</tds:hasPermission>
+				</tds:hasPermission> <br/><br/>
+				
+				<a href="http://maps.google.com/maps?q=${roomInstance.address+','+roomInstance.city+','+roomInstance.stateProv +','+roomInstance.country}" target="_blank"> Maps...</a>
 
 				</g:form>
 				</div>
