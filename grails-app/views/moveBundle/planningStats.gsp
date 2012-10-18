@@ -25,10 +25,10 @@ $(document).ready(function() {
 					</h3>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
-							<td style="padding:0px; height:24px; background-color: lightyellow;box-shadow: 2px 3px 0px 0px lightgray inset;">
+							<td style="padding:0px; height:24px; background-color: lightyellow;box-shadow: 2px 3px 3px lightgray inset;">
 							<g:if test="${applicationCount>0}">
 
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 3px;border-color: lightgray;border-right-style: inset; width: ${100 - appToValid}%"></div>
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${100 - appToValid}%"></div>
 								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${100 - appToValid}%</b>
 
 							</g:if><g:else>
@@ -96,10 +96,10 @@ $(document).ready(function() {
 					</h3>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
-							<td style="padding:0px;height:24px;background-color: lightyellow;box-shadow: 2px 3px 0px 0px lightgray inset;">
+							<td style="padding:0px;height:24px;background-color: lightyellow;box-shadow: 2px 3px 3px lightgray inset;">
 							<g:if test="${applicationCount>0}">
 
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 3px;border-color: lightgray;border-right-style: inset; width: ${bundleRdy}%"></div>
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${bundleRdy}%"></div>
 								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${bundleRdy}%</b>
 
 							</g:if><g:else>
@@ -192,8 +192,8 @@ $(document).ready(function() {
 					</h3>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
-							<td style="padding:0px;height:24px;background-color: lightyellow;box-shadow: 2px 3px 0px 0px lightgray inset;">
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px;border-right-width: 3px;border-color: lightgray;border-right-style: inset; width: ${percentageAppCount}%"></div>
+							<td style="padding:0px;height:24px;background-color: lightyellow;box-shadow: 2px 3px 3px lightgray inset;">
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px;border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${percentageAppCount}%"></div>
 								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${percentageAppCount}%</b>
 							<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Assigned</g:link>
 								</div>
@@ -356,7 +356,7 @@ $(document).ready(function() {
                         <tr>
                             <td style="color: black"><b>Other</b></td>
                             <td style=" text-align: left;">
-                            <g:set var="unassinOtherCount" value="${otherAssetCount ? (unassignedVirtualAssetCount/otherAssetCount)*100 : 0}"/>
+                            <g:set var="unassinOtherCount" value="${otherAssetCount ? (unassignedOtherCount/otherAssetCount)*100 : 0}"/>
                             <b>
 								<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'other']">
 								   ${unassignedOtherCount}	(${(unassinOtherCount > 0 && unassinOtherCount < 1) ? 1 : Math.round(unassinOtherCount)}%)
