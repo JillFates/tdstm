@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <meta name="layout" content="projectHeader" />
 <g:javascript src="entity.crud.js" />
-<title>Planning Dashboard</title>
+<title>Transition Planning Dashboard</title>
 <script type="text/javascript">
 $(document).ready(function() { 
 	currentMenuId = "#bundleMenu";
@@ -26,10 +26,10 @@ $(document).ready(function() {
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
 							<td style="padding:0px; height:24px; background-color: lightyellow;box-shadow: 2px 3px 3px lightgray inset;">
-							<g:if test="${percentageAppToValidate=100}">
-								<div style="position:relative; top:0px;height:0px;margin-left:5px;"><b>0% Applications Validated</b></div>
+							<g:if test="${percentageAppToValidate == 100}">
+								<div style="position:relative; top:-5px;height:0px;margin-left:5px;"><b>0% Applications Validated</b></div>
 
-							</g:if><g:elseif test="${percentageAppToValidate=0}">
+							</g:if><g:elseif test="${percentageAppToValidate == 0}">
 
 								<div class="task_completed" style="z-index:-1; height:24px; width: 100%"></div>
 								<div class="task_completed" style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>100% Applications Validated</b></div>
@@ -101,10 +101,10 @@ $(document).ready(function() {
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
 							<td style="padding:0px; height:24px; background-color: lightyellow;box-shadow: 2px 3px 3px lightgray inset;">
-							<g:if test="${percentageBundleReady=0}">
-								<div style="position:relative; top:0px;height:0px;margin-left:5px;"><b>0% Applications Ready</b></div>
+							<g:if test="${percentageBundleReady == 0}">
+								<div style="position:relative; top:-5px;height:0px;margin-left:5px;"><b>0% Applications Ready</b></div>
 
-							</g:if><g:elseif test="${percentageBundleReady=100}">
+							</g:if><g:elseif test="${percentageBundleReady == 100}">
 
 								<div class="task_completed" style="z-index:-1; height:24px; width: 100%"></div>
 								<div class="task_completed" style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>100% Applications Ready</b></div>
@@ -202,10 +202,10 @@ $(document).ready(function() {
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
 							<td style="padding:0px; height:24px; background-color: lightyellow;box-shadow: 2px 3px 3px lightgray inset;">
-							<g:if test="${percentageUnassignedAppCount=100}">
-								<div style="position:relative; top:0px;height:0px;margin-left:5px;"><b>0% Applications Assigned</b></div>
+							<g:if test="${percentageUnassignedAppCount == 100}">
+								<div style="position:relative; top:-5px;height:0px;margin-left:5px;"><b>0% Applications Assigned</b></div>
 
-							</g:if><g:elseif test="${percentageUnassignedAppCount=0}">
+							</g:if><g:elseif test="${percentageUnassignedAppCount == 0}">
 
 								<div class="task_completed" style="z-index:-1; height:24px; width: 100%"></div>
 								<div class="task_completed" style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>100% Applications Assigned</b></div>
@@ -252,7 +252,7 @@ $(document).ready(function() {
 						<tr>
 							<td style="color: black"><b>Apps</b></td>
 							<td style="text-align: left;">
-							<g:if test="${unassignedAppCount = 0 }">
+							<g:if test="${unassignedAppCount == 0 }">
 								0
 							</g:if>
 							<g:else>
@@ -309,7 +309,7 @@ $(document).ready(function() {
 							<td style="color: black">Physical</td>
 							<td style="text-align: left;">
 							<g:set var="percentageUnassignedPhysicalAssetCount" value="${physicalCount ? (unassignedPhysialAssetCount/physicalCount)*100 : 0}"/>
-							<g:if test="${unassignedPhysialAssetCount = 0 }">
+							<g:if test="${unassignedPhysialAssetCount == 0 }">
 								0
 							</g:if>
 							<g:else>
@@ -333,7 +333,7 @@ $(document).ready(function() {
 							<td style="color: black">Virtual</td>
 							<td style="text-align: left;">
 							<g:set var="percentageUnassignedVirtualCount" value="${virtualCount ? (unassignedVirtualAssetCount/virtualCount)*100 : 0}"/>
-							<g:if test="${unassignedVirtualAssetCount = 0 }">
+							<g:if test="${unassignedVirtualAssetCount == 0 }">
 								0
 							</g:if>
 							<g:else>
@@ -357,7 +357,7 @@ $(document).ready(function() {
 							<td style="color: black"><b>Databases</b></td>
 							<td style=" text-align: left;">
 							<g:set var="percentageUnassignedDbCount" value="${dbCount ? (unassignedDbCount/dbCount)*100 : 0}"/>
-							<g:if test="${unassignedDbCount = 0 }">
+							<g:if test="${unassignedDbCount == 0 }">
 								0
 							</g:if>
 							<g:else>
@@ -381,7 +381,7 @@ $(document).ready(function() {
 							<td style="color: black"><b>Files</b></td>
 							<td style=" text-align: left;">
 							<g:set var="percentageUnassignedFilesCount" value="${fileCount ? (unassignedFilesCount/fileCount)*100 : 0}"/>
-							<g:if test="${unassignedFilesCount = 0 }">
+							<g:if test="${unassignedFilesCount == 0 }">
 								0
 							</g:if>
 							<g:else>
@@ -405,7 +405,7 @@ $(document).ready(function() {
                             <td style="color: black"><b>Other</b></td>
                             <td style=" text-align: left;">
                             <g:set var="percentageUnassignedOtherCount" value="${otherAssetCount ? (unassignedOtherCount/otherAssetCount)*100 : 0}"/>
-							<g:if test="${unassignedOtherCount = 0 }">
+							<g:if test="${unassignedOtherCount == 0 }">
 								0
 							</g:if>
 							<g:else>
