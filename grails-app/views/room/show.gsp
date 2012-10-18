@@ -9,7 +9,7 @@
 			<tr>
 				<td class="buttonR" style="vertical-align:top;width:240px;">
 				<div>
-				<h1 style="margin: 0px;">Room View</h1><br />
+				<h1 style="margin: 0px;">Data Center Room View</h1><br />
 				<g:select id="roomId" name="id" from="${roomInstanceList}" value="${roomInstance.id}" optionKey="id" optionValue="${{it.location +' / '+it.roomName}}" onchange="getRackDetails()"/>
 				<input type="hidden" id="selectedRackId" value="">
 				<br />
@@ -20,7 +20,7 @@
 				 <tds:hasPermission permission='RoomEditView'>
 					<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
 				</tds:hasPermission> <br/><br/>
-				
+				<span>${roomInstance.address+','+roomInstance.city+','+roomInstance.stateProv+','+roomInstance.country}</span>&nbsp;
 				<a href="http://maps.google.com/maps?q=${roomInstance.address+','+roomInstance.city+','+roomInstance.stateProv +','+roomInstance.country}" target="_blank"> Maps...</a>
 
 				</g:form>

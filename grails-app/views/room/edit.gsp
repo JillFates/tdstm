@@ -3,7 +3,7 @@
 <div class="body">
 <div id="roomListView">
 <span class="span">
-<b> Room Edit View </b>
+<b>Data Center Room Edit View </b>
 </span>
 <g:form action="update" onsubmit="return submitForm(this)">
 	<div class="dialog"  style="border: 1px solid black;">
@@ -23,25 +23,25 @@
 					<td>Depth (ft)<br/>
 						<input type="text" name="roomDepth" id="roomDepthId" value="${roomInstance.roomDepth}" size="4" onblur="roundValue(this.value,'roomDepthId')">
 					</td>
-					<td style="width: 30px">Address<br/>
+					<td>Address<br/>
 						<input type="text" name="address" id="addressId" value="${roomInstance?.address}" size="20">
 					</td>
-					<td style="width: 30px">City <br/>
+					<td>City <br/>
 						<input type="text" name="city" id="cityId" value="${roomInstance?.city}" size="10">
 					</td>
-					<td style="width: 30px">stateProv <br/>
+					<td>stateProv <br/>
 						<input type="text" name="stateProv" id="stateProvId" value="${roomInstance?.stateProv}" size="4">
 					</td>
-					<td style="width: 30px">Country<br/>
+					<td">Country<br/>
 						<input type="text" name="country" id="countryId" value="${roomInstance?.country}" size="5">
 					</td>
 				</tr>
 				<tr>
-					<td class="buttonR" colspan="4">
+					<td class="buttonR" colspan="3">
 						<input type="button" class="submit" value="Cancel" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
 						<input type="submit" class="submit" value="Update" />
 					</td>
-					<td class="buttonR" style="padding-left: 200px;vertical-align:top;" colspan="4" nowrap="nowrap">
+					<td class="buttonR" style="padding-left: 200px;vertical-align:top;" colspan="5" nowrap="nowrap">
 						<b>Add to Room:</b>&nbsp;<input type="button" class="submit" value="Rack" onclick="createRack(this.value)" />
 						<input type="button" class="submit" value="UPS" onclick="createRack(this.value)" />
 						<input type="button" class="submit" value="CRAC" onclick="createRack(this.value)" />

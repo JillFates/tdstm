@@ -8,7 +8,7 @@
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
 
-<title>Room List</title>
+<title>Data Center Room List</title>
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="drag_drop.js" />
 <g:javascript src="room.rack.combined.js"/>
@@ -73,7 +73,7 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 			
 			<th><a href="#">City</a></th>
 
-			<th><a href="#">stateProv</a></th>
+			<th><a href="#">state Prov</a></th>
 
 			<th><a href="#">Rack count</a></th>
 
