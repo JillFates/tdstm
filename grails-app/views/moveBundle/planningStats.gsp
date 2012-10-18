@@ -25,10 +25,12 @@ $(document).ready(function() {
 					</h3>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
-							<td style="padding:0px; height:24px; background-color: lightyellow;">
+							<td style="padding:0px; height:24px; background-color: lightyellow;box-shadow: 2px 3px 0px 0px lightgray inset;">
 							<g:if test="${applicationCount>0}">
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; width: ${100 - appToValid}%"></div>
+
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 3px;border-color: lightgray;border-right-style: inset; width: ${100 - appToValid}%"></div>
 								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${100 - appToValid}%</b>
+
 							</g:if><g:else>
 								<div style="position:relative; top:0px;height:0px;margin-left:5px;"><b>0%</b>
 							</g:else>
@@ -94,10 +96,12 @@ $(document).ready(function() {
 					</h3>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
-							<td style="padding:0px;height:24px;background-color: lightyellow;">
+							<td style="padding:0px;height:24px;background-color: lightyellow;box-shadow: 2px 3px 0px 0px lightgray inset;">
 							<g:if test="${applicationCount>0}">
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; width: ${bundleRdy}%"></div>
+
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 3px;border-color: lightgray;border-right-style: inset; width: ${bundleRdy}%"></div>
 								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${bundleRdy}%</b>
+
 							</g:if><g:else>
 								<div style="position:relative; top:0px;margin-left:5px;"><b>0%</b>
 							</g:else>
@@ -188,8 +192,8 @@ $(document).ready(function() {
 					</h3>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
-							<td style="padding:0px;height:24px;background-color: lightyellow;">
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; width: ${percentageAppCount}%"></div>
+							<td style="padding:0px;height:24px;background-color: lightyellow;box-shadow: 2px 3px 0px 0px lightgray inset;">
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px;border-right-width: 3px;border-color: lightgray;border-right-style: inset; width: ${percentageAppCount}%"></div>
 								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${percentageAppCount}%</b>
 							<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Assigned</g:link>
 								</div>
@@ -198,31 +202,31 @@ $(document).ready(function() {
 					</table>
 				<table style="border: 0px;">
 					<thead>
-						<th style="background-color: white;width:80px;">&nbsp;</th>
-						<th style="color: Blue; background-color: white;width:45px;text-align: left;"><g:link controller="application" action="list" params="[moveEvent:'unAssigned']">TBD</g:link></th>
+						<tr>
+							<th style="background-color: white;width:80px;">&nbsp;</th>
+							<th style="background-color: white;width:80px;">&nbsp;</th>
 							<g:each in="${moveBundle}" var="bundle">
 								<th style="color: Blue; background-color: white;text-align: center;">
 									<b><g:link controller="application" action="list" params="[moveEvent:bundle.id]">${bundle}</g:link></b>
 								</th>
 							</g:each>
-						<th style="background-color: white;">Done</th>
+							<th style="background-color: white;">Done</th>
+						</tr>
 						<tr>
-					    <td style="background-color: white;width:80px;">&nbsp;</td>
-					    <th style="background-color: white;width:45px;text-align: right;">&nbsp;</td>
-					    <g:each in="${bundleStartDate}" var="startdate">
-									<td style="text-align: center;font-size: 10px"><b>
-									${startdate}
-									</b></td>
-						</g:each>
-						<td style="background-color: white;">&nbsp;</td>
-					    </tr>
-					    <tr>
-					    <td style="background-color: white;width:80px;">&nbsp;</td>
-					    <td style="background-color: white;width:80px;">&nbsp;</td>
-					    <g:each in="${moveBundle}" var="bundle">
-							<td style="text-align: center;font-size: 10px"><b> ${bundle.runbookStatus ?: ''} </b></td>
-						</g:each>
-					    </tr>
+							<td style="background-color: white;width:80px;">&nbsp;</td>
+							<td style="color: Blue; background-color: white;width:45px;text-align: left;"><g:link controller="application" action="list" params="[moveEvent:'unAssigned']">To be</g:link></td>
+							<g:each in="${bundleStartDate}" var="startdate">
+								<td style="text-align: right;font-size: 10px"><b>${startdate}</b></td>
+							</g:each>
+							<td style="background-color: white;">&nbsp;</td>
+						</tr>
+						<tr>
+							<td style="background-color: white;width:80px;">&nbsp;</td>
+							<td style="color: Blue; background-color: white;width:45px;text-align: left;"><g:link controller="application" action="list" params="[moveEvent:'unAssigned']">Assigned</g:link></td>
+							<g:each in="${moveBundle}" var="bundle">
+								<td style="text-align: center;font-size: 10px"><b> ${bundle.runbookStatus ?: ''}</b></td>
+							</g:each>
+						</tr>
 					</thead>
 					<tbody>
 						<tr>
@@ -230,17 +234,19 @@ $(document).ready(function() {
 							<td style="text-align: left;">
 							<g:set var="unassinAppCount" value="${applicationCount ? (unassignedAppCount/applicationCount)*100 : 0}"/>
 							<b>
-									<g:link controller="application" action="list" params="[moveEvent:'unAssigned']">
-										${unassignedAppCount} (${(unassinAppCount > 0 && unassinAppCount < 1) ? 1 : Math.round(unassinAppCount)}%)
-									</g:link>
+
+								<g:link controller="application" action="list" params="[tag_f_planStatus:'unassigned']">
+									${unassignedAppCount} (${(unassinAppCount > 0 && unassinAppCount < 1) ? 1 : Math.round(unassinAppCount)}%)
+								</g:link>
+
 							</b></td>
 							<g:each in="${appList}" var="appCount">
-									<td style="text-align: right;"><b>
-											<g:link controller="application" action="list" params="[moveEvent:appCount.moveEvent]">${appCount.count}</g:link>
-									</b></td>
-								</g:each>
-							<td><b>
-									${percentageAppCount}%
+								<td style="text-align: right;"><b>
+									<g:link controller="application" action="list" params="[moveEvent:appCount.moveEvent]">${appCount.count}</g:link>
+								</b></td>
+							</g:each>
+							<td style="text-align: right;"><b>
+								<g:link controller="application" action="list" params="[tag_f_planStatus:'moved']">${percentageAppCount}%</g:link>
 							</b></td>
 						</tr>
 						<tr>
@@ -289,8 +295,8 @@ $(document).ready(function() {
 											<g:link controller="assetEntity" action="list" params="[moveEvent:assetCount.moveEvent,filter:'physical']">${assetCount.physicalCount}</g:link>
 									</b></td>
 								</g:each>
-							<td><b>
-									${percentagePhysicalAssetCount}%&nbsp;
+							<td style="text-align: right;"><b>
+								<g:link controller="assetEntity" action="list" params="[tag_f_planStatus:'moved']">${percentagePhysicalAssetCount}%</g:link>
 							</b></td>
 						</tr>
 						<tr>
@@ -307,8 +313,8 @@ $(document).ready(function() {
 										<g:link controller="assetEntity" action="list" params="[moveEvent:assetCount.moveEvent,filter:'virtual']">	${assetCount.virtualAssetCount}</g:link>
 									</b></td>
 								</g:each>
-							<td><b>
-									${percentagevirtualAssetCount}%&nbsp;
+							<td style="text-align: right;"><b>
+								<g:link controller="assetEntity" action="list" params="[tag_f_planStatus:'moved',tag_f_assetType:'vm']">${percentagevirtualAssetCount}%</g:link>
 							</b></td>
 						</tr>
 						<tr>
@@ -325,7 +331,9 @@ $(document).ready(function() {
 										<g:link controller="database" action="list" params="[moveEvent:dbCount.moveEvent,filter:'virtual']">${dbCount.count}</g:link>
 									</b></td>
 								</g:each>
-							<td><b>${percentageDBCount}%</b></td>
+							<td style="text-align: right;"><b>
+								<g:link controller="database" action="list" params="[tag_f_planStatus:'moved']">${percentageDBCount}%</g:link>
+							</b></td>
 						</tr>
 						<tr>
 							<td style="color: black"><b>Files</b></td>
@@ -341,7 +349,9 @@ $(document).ready(function() {
 										<g:link controller="files" action="list" params="[moveEvent:filesCount.moveEvent]">	${filesCount.count}</g:link>
 									</b></td>
 								</g:each>
-							<td><b>${percentageFilesCount}%</b></td>
+							<td style="text-align: right;"><b>
+								<g:link controller="files" action="list" params="[tag_f_planStatus:'moved']">${percentageFilesCount}%</g:link>
+							</b></td>
                         </tr>
                         <tr>
                             <td style="color: black"><b>Other</b></td>
