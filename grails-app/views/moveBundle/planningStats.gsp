@@ -17,7 +17,7 @@ $(document).ready(function() {
 		<div>
 		    <g:set var="percentageAppToValidate" value="${applicationCount ? Math.round((appToValidate/applicationCount)*100) : 0}"/>
 		    <g:set var="percentageBundleReady" value="${applicationCount ? Math.round((bundleReady/applicationCount)*100) : 0}"/>
-			<g:set var="percentageUnassignedAppCount" value="${applicationCount ? (unassignedAppCount/applicationCount)*100 : 0}"/>
+			<g:set var="percentageUnassignedAppCount" value="${applicationCount ? Math.round((unassignedAppCount/applicationCount)*100) : 0}"/>
 			<h1>Planning Dashboard</h1>
 			<div style="float:left;margin-top: 10px; margin-left: 5px;width:250px;">
 					<h3 style="color:#63A242">
@@ -213,7 +213,7 @@ $(document).ready(function() {
 							</g:elseif><g:else>
 
 								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${100-percentageUnassignedAppCount}%"></div>
-								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${100-percentageUnassignedAppCount}%</b>
+								<div style="position:relative; top:-10px;height:0px;margin-left:5px;"><b>${100-percentageUnassignedAppCount}%</b>
 									<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Assigned</g:link>
 								</div>
 							</g:else>
