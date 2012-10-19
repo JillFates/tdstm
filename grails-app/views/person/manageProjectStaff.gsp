@@ -7,7 +7,7 @@
 	    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
         <title>Project Staff</title>   
         <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'calendarview.css')}" />
-		
+		<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
 		 
     </head>
     <body>

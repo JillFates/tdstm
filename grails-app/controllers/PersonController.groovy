@@ -392,7 +392,9 @@ class PersonController {
 			def personInstance = Person.get(params.id)
 			def ret = []
 			personInstance.properties = params
-			if ( !personInstance.hasErrors() && personInstance.save() ) {
+			def personId
+			if ( !personInstance.hasErrors() && personInstance.save(flush:true) ) {
+				personId = personInstance.id
 				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 				def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
 				//getSession().setAttribute( "LOGIN_PERSON", ['name':personInstance.firstName, "id":personInstance.id ])
@@ -436,9 +438,11 @@ class PersonController {
 				userPreferenceService.loadPreferences("CURR_TZ")
 				userPreferenceService.loadPreferences("START_PAGE")
 				userPreferenceService.setPreference("START_PAGE", params.startPage )
+			}else{
+				personInstance.errors.allErrors.each{println it}
 			}
 			if(params.tab){
-				forward( action:'loadGeneral', params:[tab: params.tab, personId:personInstance.id])
+				forward( action:'loadGeneral', params:[tab: params.tab, personId:personId])
 			}else{
 				ret << [name:personInstance.firstName, tz:getSession().getAttribute( "CURR_TZ" )?.CURR_TZ]
 				render  ret as JSON
@@ -569,10 +573,10 @@ class PersonController {
 		def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $person.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ").partyIdFrom[0]
 		
 		def rolesForPerson = PartyRole.findAll("from PartyRole where party = :person and roleType.description like 'staff%' group by roleType",[person:person])?.roleType
-		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")//RoleType.findAll("from RoleType r where r.id in description like 'staff%' (select roleType.id from PartyRole where  description like 'staff%' group by roleType.id )")
-		
+		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
 		
 		render(template:tab ,model:[person:person, company:company, rolesForPerson:rolesForPerson, availabaleRoles:availabaleRoles, sizeOfassigned:(rolesForPerson.size()+1),
-									blackOutdays:blackOutdays])
+			blackOutdays:blackOutdays])
+			
 	}
 }

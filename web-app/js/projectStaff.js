@@ -66,13 +66,20 @@ function loadPersonDiv(id,tab){
 		success : function(data) {
 			
 			$("#personGeneralViewId").html(data)
-			$("#personGeneralViewId").dialog('option', 'width', 'auto')
-			$("#personGeneralViewId").dialog('option', 'height', 'auto')
+			$("#personGeneralViewId").dialog('option', 'width', '375px')
 			$("#personGeneralViewId").dialog('option', 'position', ['center','top']);
+			$(".person").hide()
+			$("#"+tab+"Id").show()
 			$("#personGeneralViewId").dialog('open');
 		}
 	});
 	
+}
+function switchTab(id,tab,header){
+	$(".mobmenu").removeClass("mobselect")
+	$("#"+header).addClass("mobselect")
+	$(".person").hide()
+	$("#"+tab).show()
 }
 
 /*
@@ -87,6 +94,9 @@ function updatePerson(tab,form){
 		type:'POST',
 		success: function(data) {
 			$('#personGeneralViewId').html(data)
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			alert("An unexpected error occurred while attempting to update Person ")
 		}
 	});
 }

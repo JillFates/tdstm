@@ -16,16 +16,16 @@
 	<tbody>
 		<g:each in="${staffList}" status="i" var="projectStaff">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-				<td><span style="cursor: pointer;" id="${projectStaff?.staff.id}" onClick="loadPersonDiv(this.id)">
+				<td><span style="cursor: pointer;" id="${projectStaff?.staff.id}" onClick="loadPersonDiv(this.id,'generalInfoShow')">
 							${projectStaff?.name}
 					</span></td>
 				<td>
-					<span style="cursor: pointer;" id="${projectStaff?.staff.id}" onClick="loadPersonDiv(this.id)">
+					<span style="cursor: pointer;" id="${projectStaff?.staff.id}" onClick="loadPersonDiv(this.id,'generalInfoShow')">
 						${projectStaff?.company[0]}
 					</span>
 				</td>
 				<td>
-					<span style="cursor: pointer;" id="${projectStaff?.staff.id}" onClick="loadPersonDiv(this.id)">
+					<span style="cursor: pointer;" id="${projectStaff?.staff.id}" onClick="loadPersonDiv(this.id,'generalInfoShow')">
 						${projectStaff?.role}
 					</span>
 				</td>
