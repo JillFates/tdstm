@@ -179,6 +179,7 @@ class UserPreferenceService  {
      */
 	// TODO : getAssignedRoles - Move to SecurityService
     def getAssignedRoles( def person ){
+
         def assignedRoles = RoleType.findAll("from RoleType r where r.id in (select roleType.id from PartyRole where party = $person.id group by roleType.id )")
     	 
         return assignedRoles

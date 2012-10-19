@@ -18,8 +18,6 @@ import org.quartz.SimpleTrigger
 import org.quartz.Trigger
 import org.quartz.JobDetail
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
-
 /**
  * CommentService class contains methods used to manage comments/tasks
  * @author jmartin
@@ -468,8 +466,7 @@ class CommentService {
 			moveEvent:assetComment.moveEvent,
 			createdBy:createdBy, dtCreated:dtCreated, dtResolved:dtResolved, dueDate:dueDate,
 			resolvedBy:resolvedBy, assignedTo:assetComment.assignedTo,
-			notes:notes,
-			hosts:CH.config.grails.serverURL ]
+			notes:notes ]
 	}
 	
 	// TODO : move the leftString and getLine methods into a reusable class - perhaps extending string with @Delegate
