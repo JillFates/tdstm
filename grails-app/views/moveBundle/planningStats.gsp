@@ -21,7 +21,7 @@ $(document).ready(function() {
 			<h1>Planning Dashboard</h1>
 			<div style="float:left;margin-top: 10px; margin-left: 5px;width:250px;">
 					<h3 style="color:#63A242">
-						<b>Discovery</b>
+						<b>Discovery Phase</b>
 					</h3>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
@@ -37,7 +37,7 @@ $(document).ready(function() {
 							</g:elseif><g:else>
 
 								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${100 - percentageAppToValidate}%"></div>
-								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${100 - percentageAppToValidate}%</b>
+								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${100 - percentageAppToValidate}%</b>
 									<g:link controller="application" action="list" params="[validation:'Discovery']">Applications Validated</g:link>
 								</div>
 							</g:else>
@@ -96,7 +96,7 @@ $(document).ready(function() {
 
 			<div style="float:left;margin-top: 10px; margin-left: 5px;width:250px;">
 					<h3 style="color:#63A242">
-						<b>Analysis</b>
+						<b>Analysis Phase</b>
 					</h3>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
@@ -112,7 +112,7 @@ $(document).ready(function() {
 							</g:elseif><g:else>
 
 								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${percentageBundleReady}%"></div>
-								<div style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>${percentageBundleReady}%</b>
+								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${percentageBundleReady}%</b>
 									<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Ready</g:link>
 								</div>
 							</g:else>
@@ -197,7 +197,7 @@ $(document).ready(function() {
 			</div>
 			<div style="float:right;margin-top: 10px; margin-left: 5px;">
 					<h3 style="color:#63A242">
-						<b>Assignment and Execution</b>
+						<b>Assignment and Execution Phases</b>
 					</h3>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
@@ -213,8 +213,27 @@ $(document).ready(function() {
 							</g:elseif><g:else>
 
 								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${100-percentageUnassignedAppCount}%"></div>
-								<div style="position:relative; top:-10px;height:0px;margin-left:5px;"><b>${100-percentageUnassignedAppCount}%</b>
+								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${100-percentageUnassignedAppCount}%</b>
 									<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Assigned</g:link>
+								</div>
+							</g:else>
+							</td>
+						</tr>
+						<tr>
+							<td style="padding:0px; height:24px; background-color: lightyellow;box-shadow: 2px 3px 3px lightgray inset;">
+							<g:if test="${percentageAppCount == 0}">
+								<div style="position:relative; top:-5px;height:0px;margin-left:5px;"><b>0% Applications Moved</b></div>
+
+							</g:if><g:elseif test="${percentageAppCount == 100}">
+
+								<div class="task_completed" style="z-index:-1; height:24px; width: 100%"></div>
+								<div class="task_completed" style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>100% Applications Moved</b></div>
+
+							</g:elseif><g:else>
+
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${percentageAppCount}%"></div>
+								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${percentageAppCount}%</b>
+									<g:link controller="application" action="list" params="[tag_f_planStatus:'moved']">Applications Moved</g:link>
 								</div>
 							</g:else>
 							</td>
