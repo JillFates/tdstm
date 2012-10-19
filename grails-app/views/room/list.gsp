@@ -161,6 +161,31 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 					</td>
 				</tr>
 				<tr>
+					<td>Address<td/>
+					<td>
+						<input type="text" name="address" id="addressId" value="">
+					</td>
+				</tr>
+				<tr>
+					<td>City<td/>
+					<td>
+						<input type="text" name="city" id="cityId" value="">
+					</td>
+				</tr>	
+				<tr>
+					<td>stateProv<td/>
+					<td>
+						<input type="text" name="stateProv" id="stateProvId" value="">
+					</td>
+				</tr>
+				<tr>
+					<td>Depth<td/>
+					<td>
+						<input type="text" name="country" id="countryId" value="USA">
+					</td>
+				</tr>
+				
+				<tr>
 					<td class="buttons" colspan="4">
 						<input type="submit" class="save" value="Save" />
 						<input type="button" class="show" value="Cancel" onclick="$('#createRoomDialog').dialog('close');" />
