@@ -78,14 +78,15 @@ function loadPersonDiv(id,tab){
 /*
  * to make a Ajax call to update person info.
  */
-function updatePerson(){
+function updatePerson(tab,form){
+	var params = $('#'+form).serialize()
+	params+= "&tab=" + tab;
 	jQuery.ajax({
-		url:$('#personDialogForm').attr('action'),
-		data: $('#personDialogForm').serialize(),
+		url:$('#'+form).attr('action'),
+		data: params,
 		type:'POST',
 		success: function(data) {
-				$('#personGeneralViewId').dialog('close')
-				loadFilteredStaff()
+			$('#personGeneralViewId').html(data)
 		}
 	});
 }
@@ -112,4 +113,14 @@ function deleteRolesRow( rowId ){
 
 function changeManageRole(){
 	$("#manageRolesId").val(1)
+}
+
+function addBlackOutDay(){
+	var id = $("#availableId").val()
+	var inputHtml = $("#dateDivId").html().replace("availId","availId_"+id).replace("available","availability")
+	$("#blackOutDay").append("<tr id='roleTrId_"+id+"'><td>"+inputHtml +"<a href=\"javascript:deleteRolesRow(\'dateTrId_"+id+"')\">&nbsp;&nbsp;"+"<span class=\'clear_filter\'>X</span></a> </td></tr><br/>")
+	showCalender("#availId_"+id)//$("#availabilityId_"+id).datepicker();
+	$("#availableId").val(parseInt($("#availableId").val())+1)
+
+	
 }

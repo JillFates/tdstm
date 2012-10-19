@@ -395,7 +395,7 @@ class PersonController {
 			if ( !personInstance.hasErrors() && personInstance.save() ) {
 				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 				def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-				getSession().setAttribute( "LOGIN_PERSON", ['name':personInstance.firstName, "id":personInstance.id ])
+				//getSession().setAttribute( "LOGIN_PERSON", ['name':personInstance.firstName, "id":personInstance.id ])
 				def userLogin = UserLogin.findByPerson( personInstance )
 				if(userLogin){
 					def password = params.newPassword
@@ -411,12 +411,24 @@ class PersonController {
 						userLogin.errors.allErrors.each{println it}
 					}
 				}
-				if(params.manageRoles != '0'){
+				if(params.manageRoles != '0' && params.role){
 					PartyRole.executeUpdate("delete from PartyRole where party = '$personInstance.id'  ")
 					if(params.role){
 						Set newRoles = []
 						newRoles.addAll(params.role)
 						userPreferenceService.setUserRoles(newRoles, personInstance.id)
+					}
+				}
+				def personExpDates =params.list("availability")
+				if(personExpDates){
+					def expFormatter = new SimpleDateFormat("MM/dd/yyyy")
+					ExceptionDates.executeUpdate("delete from ExceptionDates where person = '$personInstance.id' ")
+					personExpDates.each{
+						def expDates = new ExceptionDates()
+						expDates.exceptionDay = GormUtil.convertInToGMT(expFormatter.parse(it), tzId)
+						expDates.person = personInstance
+						
+						expDates.save(flush:true)
 					}
 				}
 				userPreferenceService.setPreference( "CURR_TZ", params.timeZone )
@@ -425,8 +437,12 @@ class PersonController {
 				userPreferenceService.loadPreferences("START_PAGE")
 				userPreferenceService.setPreference("START_PAGE", params.startPage )
 			}
-			ret << [name:personInstance.firstName, tz:getSession().getAttribute( "CURR_TZ" )?.CURR_TZ]
-			render  ret as JSON
+			if(params.tab){
+				forward( action:'loadGeneral', params:[tab: params.tab, personId:personInstance.id])
+			}else{
+				ret << [name:personInstance.firstName, tz:getSession().getAttribute( "CURR_TZ" )?.CURR_TZ]
+				render  ret as JSON
+			}
     }
 	
 	def resetPreferences ={
@@ -547,13 +563,16 @@ class PersonController {
 	 */
 	
 	def loadGeneral = {
-		def tab = params.tab ?: 'generalInfo'
+		def tab = params.tab ?: 'generalInfoShow'
 		def person = Person.get(params.personId)
+		def blackOutdays = person.blackOutDates
 		def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $person.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ").partyIdFrom[0]
 		
 		def rolesForPerson = PartyRole.findAll("from PartyRole where party = :person and roleType.description like 'staff%' group by roleType",[person:person])?.roleType
 		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")//RoleType.findAll("from RoleType r where r.id in description like 'staff%' (select roleType.id from PartyRole where  description like 'staff%' group by roleType.id )")
 		
-		render(template:tab ,model:[person:person, company:company, rolesForPerson:rolesForPerson, availabaleRoles:availabaleRoles, sizeOfassigned:(rolesForPerson.size()+1)])
+		
+		render(template:tab ,model:[person:person, company:company, rolesForPerson:rolesForPerson, availabaleRoles:availabaleRoles, sizeOfassigned:(rolesForPerson.size()+1),
+									blackOutdays:blackOutdays])
 	}
 }

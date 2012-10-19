@@ -17,6 +17,9 @@ class Person extends Party {
 	String personImageURL 
 
 
+	static hasMany =[
+		blackOutDates : ExceptionDates
+	]
 	/*
 	 * Fields Validations
 	 */

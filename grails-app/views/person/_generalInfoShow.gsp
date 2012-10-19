@@ -2,15 +2,15 @@
 
 <div class="menu4">
 		<ul>
-			<li><a href="#" class="mobmenu mobselect" onclick="loadPersonDiv(${person.id},'generalInfo')">General</a></li>
-			<li><a href="#" class="mobmenu" onclick="loadPersonDiv(${person.id},'availability')">Availability</a></li>
-			<li><a href="#" class="mobmenu" onclick="loadPersonDiv(${person.id},'tdsUtility')">TDS</a></li>
+			<li><a href="#" class="mobmenu mobselect" onclick="loadPersonDiv(${person.id},'generalInfoShow')">General</a></li>
+			<li><a href="#" class="mobmenu" onclick="loadPersonDiv(${person.id},'availabilityShow')">Availability</a></li>
+			<li><a href="#" class="mobmenu" onclick="loadPersonDiv(${person.id},'tdsUtilityShow')">TDS</a></li>
 		</ul>
 </div>
 <g:form  name="personDialogForm"  action="updatePerson">
       <div class="dialog">
       <input type="hidden" name="id" value="${person.id}">
-          <div class="dialog">
+          <div >
             <table>
               <tbody>
                 <tr class="prop">
@@ -18,7 +18,7 @@
 						<label for="firstName"><b>First Name:&nbsp;<span style="color: red">*</span></b></label>
 					</td>
 					<td valign="top" class="value" style="width: 40px" >
-						<input type="text" maxlength="64" id="firstNameId" name="firstName" value="${person.firstName}" size="10"/>
+						<span class="personShow" id="firstNameId" class="asset_details_block_task">${person.firstName}</span>
 					</td>
 					<td rowspan="2"> 
 					 <g:if test="${person.personImageURL==null}">
@@ -36,7 +36,7 @@
                     <label for="lastName">Last Name:</label>
                   </td>
                   <td valign="top" class="value" colspan="2"  width="50%">
-                    <input type="text" maxlength="64" id="lastNameId" name="lastName" value="${person.lastName}" size="10"/>
+                    <span class="personShow" id="lastNameId" > ${person.lastName} </span>
                   </td>
                 </tr>
                 
@@ -45,7 +45,7 @@
                     <label for="lastName">Company:</label>
                   </td>
                   <td valign="top" class="value" colspan="2">
-                    <input type="text" maxlength="64" id="companyId" name="Company" value="${company}"/>
+                    <span class="personShow" id="companyId" >${company}</span>
                   </td>
                 </tr>
 
@@ -54,7 +54,7 @@
                     <label for="title">Title:</label>
                   </td>
                   <td valign="top" class="value" colspan="2">
-                    <input type="text" maxlength="34" id="titleId" name="title" value="${person.title}"/>
+                    <span class="personShow" id="titleId" >${person.title}</span>
                   </td>
                 </tr>
                 <tr class="prop">
@@ -62,7 +62,7 @@
                     <label for="nickName">Email:</label>
                   </td>
                   <td valign="top" class="value" colspan="2">
-                    <input type="text" maxlength="64" id="emailId" name="email" value="${person.email}"/>
+                    <span class="personShow" id="emailId" >${person.email}</span>
                   </td>
                 </tr>
                 <tr class="prop">
@@ -70,7 +70,7 @@
                     <label for="nickName">Image URL:</label>
                   </td>
                   <td valign="top" class="value" colspan="2">
-                    <input type="text"  id="personImageId" name="personImageURL" value="${person.personImageURL}"/>
+                    <span class="personShow"  id="personImageId" >${person.personImageURL}</span>
                   </td>
                 </tr>
                 
@@ -79,7 +79,7 @@
                     <label for="nickName">Work Phone:</label>
                   </td>
                   <td valign="top" class="value" colspan="2">
-                    <input type="text" maxlength="64" id="workPhoneId" name="workPhone" value="${person.workPhone}"/>
+                    <span class="personShow" id="workPhoneId" >${person.workPhone}</span>
                   </td>
                 </tr>
                 
@@ -88,7 +88,7 @@
                     <label for="nickName">Mobile Phone:</label>
                   </td>
                   <td valign="top" class="value" colspan="2">
-                    <input type="text" maxlength="64" id="mobilePhoneId" name="mobilePhone" value="${person.mobilePhone}"/>
+                    <span class="personShow" id="mobilePhoneId" >${person.mobilePhone}</span>
                   </td>
                 </tr>
                 
@@ -97,9 +97,9 @@
                     <label for="nickName">Location :</label>
                   </td>
                   <td valign="top" class="value" colspan="2">
-                    <input type="text" maxlength="64" id="locationId" name="location" value="${person.location}" size="10"/>
-                    <input type="text" maxlength="64" id="stateProvId" name="stateProv" value="${person.stateProv}" size="4"/>
-                    <input type="text" maxlength="64" id="countryId" name="country" value="${person.country}" size="4"/>
+                    <span class="personShow" id="locationId" >${person.location}</span>
+                    <span class="personShow" id="stateProvId" >${person.stateProv}</span>
+                    <span class="personShow" id="countryId" >${person.country}</span>
                   </td>
                 </tr>
                 
@@ -108,7 +108,7 @@
                     <label for="nickName">Active :</label>
                   </td>
                   <td valign="top" class="value" colspan="2">
-                     <g:select from="${Person.constraints.active.inList}" id="activeId" name="active" value="${person.active}"/>
+                     <span class="personShow" id="activeId"  >${person.active}</span>
                   </td>
                 </tr>
                 
@@ -122,32 +122,22 @@
 	                    <g:each in="${rolesForPerson}" status="i" var="role">
 		                    <tr id="roleTrId_${i}" >
 		                      <td>
-			                       <g:select from="${availabaleRoles}" id="roleId" name="role" value="${role.id}" optionKey="id" onChange="changeManageRole()"/> &nbsp;&nbsp;
-			                       <a href="javascript:deleteRolesRow('roleTrId_${i}')"><span class="clear_filter">X</span></a><br/>
+			                       <span class="personShow" >${role}</span><br/>
 		                       </td>
 		                    </tr>
 	                    </g:each>
                     </tbody>
                    </table>
-                    <span style="cursor: pointer;" onclick="addRoles()" ><b>Add Roles </b></span>
                   </td>
                 </tr>
               </tbody>
               
             </table>
-            <input type="hidden" id="maxSize" value="${sizeOfassigned }">
-            
-            <input type="hidden" id="manageRolesId" name="manageRoles" value="0">
-            
-            
-             <div id="availableRolesId" style="display: none">  
-              	<g:select from="${availabaleRoles}" id="roleId" name="roleToAdd" value="" optionKey="id" />
-             </div>
           </div>
           </div>
           </g:form>
             <div class="buttons">
-				<input class="save" type="button" id="updateBId" value="Update" onClick="updatePerson('generalInfoShow','personDialogForm')" />
+				<input class="save" type="button" id="updateBId" value="Edit" onClick="loadPersonDiv(${person.id},'generalInfo')" />
 				
 				<input class="save" type="button" id="cancelBId" value="Cancel" onClick="$('#personGeneralViewId').dialog('close')" />
 			</div>
