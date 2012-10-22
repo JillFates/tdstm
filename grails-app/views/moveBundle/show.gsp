@@ -94,6 +94,20 @@
               <td valign="top" class="value">${fieldValue(bean:moveBundleInstance, field:'description')}</td>
 
             </tr>
+            
+            <tr class="prop">
+              <td valign="top" class="name">From:</td>
+
+              <td valign="top" class="value">${moveBundleInstance.sourceRoom?.roomName}</td>
+
+            </tr>
+            
+            <tr class="prop">
+              <td valign="top" class="name">To:</td>
+
+              <td valign="top" class="value">${moveBundleInstance.targetRoom?.roomName}</td>
+
+            </tr>
 
             <tr class="prop">
               <td valign="top" class="name">Start Time:</td>

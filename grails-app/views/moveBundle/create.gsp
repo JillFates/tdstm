@@ -80,6 +80,32 @@
                   </g:hasErrors>
                 </td>
               </tr>
+              <tr class="prop">
+                <td valign="top" class="name">
+                  <label for="sourceRoom">From:</label>
+                </td>
+                <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'sourceRoom','errors')}">
+                 <g:select from="${rooms}" id="sourceRoomId" name="sourceRoom" optionKey="id"  optionValue="roomName" noSelection="['':'Please Select']" />
+                  <g:hasErrors bean="${moveBundleInstance}" field="sourceRoom">
+                    <div class="errors">
+                      <g:renderErrors bean="${moveBundleInstance}" as="list" field="sourceRoom"/>
+                    </div>
+                  </g:hasErrors>
+                </td>
+              </tr>
+              <tr class="prop">
+                <td valign="top" class="name">
+                  <label for="targetRoom">To:</label>
+                </td>
+                <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'targetRoom','errors')}">
+                 <g:select id="targetRoomId" name="targetRoom" from="${rooms}" optionKey="id"  optionValue="roomName" noSelection="['':'Please Select']" />
+                  <g:hasErrors bean="${moveBundleInstance}" field="targetRoom">
+                    <div class="errors">
+                      <g:renderErrors bean="${moveBundleInstance}" as="list" field="targetRoom"/>
+                    </div>
+                  </g:hasErrors>
+                </td>
+              </tr>
 
               <tr class="prop">
                 <td valign="top" class="name">

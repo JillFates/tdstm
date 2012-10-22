@@ -26,6 +26,7 @@ class MoveBundleController {
 	def stateEngineService
 	def moveBundleService
 	def jdbcTemplate
+	def securityService
 
 	protected static String dependecyBundlingAssetType = "('server','vm','blade','Application','Files','Database')"  
 	
@@ -149,12 +150,12 @@ class MoveBundleController {
 	def edit = {
 		def moveBundleInstance = MoveBundle.get( params.id )
 		stateEngineService.loadWorkflowTransitionsIntoMap(moveBundleInstance.workflowCode, 'project')
-		def projectId =  getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def project = securityService.getUserCurrentProject()
 		if(!moveBundleInstance) {
 			flash.message = "MoveBundle not found with id ${params.id}"
 			redirect(action:list)
 		} else {
-			def managers = partyRelationshipService.getProjectStaff( projectId )
+			def managers = partyRelationshipService.getProjectStaff( project.id )
 			def projectManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "PROJ_MGR" )
 			//PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'PROJ_MGR' ")
 			def moveManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "MOVE_MGR" )
@@ -171,10 +172,12 @@ class MoveBundleController {
 			def allDashboardSteps = moveBundleService.getAllDashboardSteps( moveBundleInstance )
 			def remainingSteps = allDashboardSteps.remainingSteps
 			def workflowCodes = stateEngineService.getWorkflowCode()
+			def rooms = Room.findAllByProject( project )
 
 
-			return [ moveBundleInstance : moveBundleInstance, projectId: projectId, managers: managers, projectManager: projectManager,
-				moveManager: moveManager, dashboardSteps: allDashboardSteps.dashboardSteps?.sort{it["step"].id}, remainingSteps : remainingSteps, workflowCodes:workflowCodes]
+			return [ moveBundleInstance : moveBundleInstance, projectId: project.id, managers: managers, projectManager: projectManager,
+				moveManager: moveManager, dashboardSteps: allDashboardSteps.dashboardSteps?.sort{it["step"].id}, remainingSteps : remainingSteps, workflowCodes:workflowCodes,
+				rooms:rooms]
 
 		}
 	}
@@ -210,6 +213,11 @@ class MoveBundleController {
 				moveBundleInstance.completionTime =  GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId)
 			}
 			moveBundleInstance.tempForUpdate = Math.random().toString()
+			
+			moveBundleInstance.sourceRoom = params.sourceRoom ? Room.read( params.sourceRoom ) : null
+			
+			moveBundleInstance.targetRoom = params.targetRoom ? Room.read( params.targetRoom ) : null
+			
 			if(moveBundleInstance.validate(true) && moveBundleInstance.save() ) {
 				stateEngineService.loadWorkflowTransitionsIntoMap(moveBundleInstance.workflowCode, 'project')
 				def stepsList = stateEngineService.getDashboardSteps( moveBundleInstance.workflowCode )
@@ -259,12 +267,12 @@ class MoveBundleController {
 
 	def create = {
 		def moveBundleInstance = new MoveBundle()
-		def projectId =  getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def projectInstance = Project.get(projectId)
+		def project = securityService.getUserCurrentProject()
 		def workflowCodes = stateEngineService.getWorkflowCode()
 		moveBundleInstance.properties = params
-		def managers = partyRelationshipService.getProjectStaff( projectId )
-		return ['moveBundleInstance':moveBundleInstance, managers: managers ,projectInstance:projectInstance,workflowCodes:workflowCodes]
+		def managers = partyRelationshipService.getProjectStaff( project.id )
+		def rooms = Room.findAllByProject( project )
+		return ['moveBundleInstance':moveBundleInstance, managers: managers ,projectInstance:project,workflowCodes:workflowCodes, rooms:rooms]
 
 	}
 
@@ -280,6 +288,10 @@ class MoveBundleController {
 		if(completionTime){
 			params.completionTime =  GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId)
 		}
+		
+		params.sourceRoom = params.sourceRoom ? Room.read( params.sourceRoom ) : null 
+		
+		params.targetRoom = params.targetRoom ? Room.read( params.targetRoom ) : null
 
 		def moveBundleInstance = new MoveBundle(params)
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ

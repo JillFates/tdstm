@@ -11,6 +11,8 @@ class MoveBundle extends Party {
     MoveEvent moveEvent
 	String workflowCode
 	Boolean useOfPlanning = true
+	Room sourceRoom
+	Room targetRoom
 	
     static constraints = {        
 		name( blank:false, nullable:false )
@@ -21,6 +23,8 @@ class MoveBundle extends Party {
 		completionTime( nullable:true )
 		operationalOrder( nullable:false, range:1..25 )
 		workflowCode( blank:false, nullable:false )
+		sourceRoom( nullable:true )
+		targetRoom( nullable:true )
 	}
 
 	static hasMany = [
