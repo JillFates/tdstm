@@ -9,6 +9,7 @@ class Room {
 	String address 
 	String city 
 	String stateProv 
+	String postalCode 
 	String country 	
 	
 	// Groovy time stime stamps
@@ -31,12 +32,14 @@ class Room {
 		address( blank:true, nullable:true )
 		city( blank:true, nullable:true )
 		stateProv( blank:true, nullable:true )
+		postalCode ( blank:true, nullable:true )
 		country( blank:true, nullable:true )
 	}
 
 	static mapping  = {	
 		version true
 		id column:'room_id'
+		postalCode  column: "postal_code", sqlType: "varchar(12)"
 		autoTimestamp false
 		columns {
 			source sqltype: 'tinyint(1)'
@@ -88,5 +91,11 @@ class Room {
 	}
 	def getAssetCount(){
 		return AssetEntity.findAll("FROM AssetEntity where roomSource=? or roomTarget = ?",[this, this]).size()
+	}
+	
+	def transient getRoomAddress(forWhom){
+		def roomAddress = (this.address ? (forWhom == "link" ? this.address : this.address+"<br/>") : "") + (this.city ? this.city+"," : "" )+ (this.stateProv  ? this.stateProv +"," : "" )+
+						   (this.postalCode ? this.postalCode+"," : "" )+(this.country  ? this.country: "" )
+		return 	roomAddress			   
 	}
 }

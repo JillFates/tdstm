@@ -179,6 +179,12 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 					</td>
 				</tr>
 				<tr>
+					<td>Postal Code<td/>
+					<td>
+						<input type="text" name="postalCode" id="postalCodeId" value="">
+					</td>
+				</tr>
+				<tr>
 					<td>Depth<td/>
 					<td>
 						<input type="text" name="country" id="countryId" value="USA">

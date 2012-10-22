@@ -32,7 +32,10 @@
 					<td>stateProv <br/>
 						<input type="text" name="stateProv" id="stateProvId" value="${roomInstance?.stateProv}" size="4">
 					</td>
-					<td">Country<br/>
+					<td>Postal Code <br/>
+						<input type="text" name="postalCode" id="postalCodeId" value="${roomInstance?.postalCode}" size="4">
+					</td>
+					<td>Country<br/>
 						<input type="text" name="country" id="countryId" value="${roomInstance?.country}" size="5">
 					</td>
 				</tr>

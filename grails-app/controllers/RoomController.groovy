@@ -124,6 +124,7 @@ class RoomController {
 			roomInstance.address = params.address
 			roomInstance.city = params.city
 			roomInstance.stateProv = params.stateProv
+			roomInstance.postalCode = params.postalCode
 			roomInstance.country = params.country
 			
             if (!roomInstance.hasErrors() && roomInstance.save(flush: true)) {

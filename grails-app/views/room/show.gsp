@@ -20,8 +20,8 @@
 				 <tds:hasPermission permission='RoomEditView'>
 					<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
 				</tds:hasPermission> <br/><br/>
-				<span>${roomInstance.address+','+roomInstance.city+','+roomInstance.stateProv+','+roomInstance.country}</span>&nbsp;
-				<a href="http://maps.google.com/maps?q=${roomInstance.address+','+roomInstance.city+','+roomInstance.stateProv +','+roomInstance.country}" target="_blank"> Maps...</a>
+				<span>${roomInstance.getRoomAddress('span')}</span>&nbsp;<br/>
+				<a href="http://maps.google.com/maps?q=${roomInstance.getRoomAddress('link')}" target="_blank"> Maps...</a>
 
 				</g:form>
 				</div>
