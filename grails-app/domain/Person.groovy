@@ -15,6 +15,11 @@ class Person extends Party {
 	Integer modelScore = 0
 	Integer modelScoreBonus = 0
 	String personImageURL 
+	String keyWords
+	String tdsNote
+	String tdsLink
+	String staffType
+	Integer travelOK = 1
 
 
 	static hasMany =[
@@ -39,6 +44,11 @@ class Person extends Party {
 		 modelScore( nullable:true )
 		 modelScoreBonus( nullable:true )
 		 personImageURL( nullable:true )
+		 keyWords( blank:true, nullable:true )
+		 tdsNote( blank:true, nullable:true )
+		 tdsLink( blank:true, nullable:true )
+		 staffType( blank:false, nullable:false, inList:['Contractor', 'Hourly', 'Salary'])
+		 travelOK( blank:true, nullable:true )
 		 
 	 }
 

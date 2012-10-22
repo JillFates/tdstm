@@ -1,14 +1,17 @@
 
 
 <div class="menu4">
-		<ul>
-			<li><a href="#" id="generalHeadId" class="mobmenu mobselect" onclick="switchTab(${person.id},'generalInfoId','generalHeadId')">General</a></li>
-			<li><a href="#" id="availHeadId" class="mobmenu" onclick="switchTab(${person.id},'availabilityId','availHeadId')">Availability</a></li>
-			<li><a href="#" id="tdsHeadId" class="mobmenu" onclick="switchTab(${person.id},'tdsUtilityId','tdsHeadId')">TDS</a></li>
-		</ul>
+	<ul>
+		<li><a href="#" id="generalHeadId" class="mobmenu mobselect"
+			onclick="switchTab(${person.id},'generalInfoId','generalHeadId')">General</a></li>
+		<li><a href="#" id="availHeadId" class="mobmenu"
+			onclick="switchTab(${person.id},'availabilityId','availHeadId')">Availability</a></li>
+		<li><a href="#" id="tdsHeadId" class="mobmenu"
+			onclick="switchTab(${person.id},'tdsUtilityId','tdsHeadId')">TDS</a></li>
+	</ul>
 </div>
 <g:form name="personDialogForm" action="updatePerson">
-<div id="generalInfoId" class="person" >
+	<div id="generalInfoId" class="person">
 		<input type="hidden" name="id" value="${person.id}">
 		<div class="dialog">
 			<table>
@@ -132,15 +135,16 @@
 
 			<div id="availableRolesId" style="display: none">
 				<g:select from="${availabaleRoles}" id="roleId" name="roleToAdd"
+					optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"
 					value="" optionKey="id" />
 			</div>
 		</div>
-		
-</div>
 
-<div id="availabilityId" class="person" style="display: none;">
-	<div>
-<script type="text/javascript" charset="utf-8">
+	</div>
+
+	<div id="availabilityId" class="person" style="display: none;">
+		<div>
+			<script type="text/javascript" charset="utf-8">
 	jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 	
 	function showCalender(id){
@@ -158,76 +162,84 @@
 							<td align="center"><input type="text" class="dateRange"
 								size="15" style="width: 112px; height: 14px;"
 								name="availability" id="availabilityId_${i}"
-								value="<tds:convertDate date='${blackOutDay.exceptionDay}' timeZone='${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}'/>"
-								 /> <a
-								href="javascript:deleteRolesRow('dateTrId_${i}')">&nbsp;&nbsp;<span
+								value="<tds:convertDate date='${blackOutDay.exceptionDay}' timeZone='${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}'/>" />
+								<a href="javascript:deleteRolesRow('dateTrId_${i}')">&nbsp;&nbsp;<span
 									class='clear_filter'>X</span></a></td>
 						</tr>
 					</g:each>
 				</tbody>
 			</table>
-			<br />
-			<span id="" onclick="addBlackOutDay()" style="cursor: pointer;"><b> Add Date </b></span>
-			<input type="hidden" id="availableId" value="1">
+			<br /> <span id="" onclick="addBlackOutDay()"
+				style="cursor: pointer;"><b> Add Date </b></span> <input
+				type="hidden" id="availableId" value="1">
 
 			<div id="dateDivId" style="display: none">
-				<input type="text" size="15" style="width: 112px; height: 14px;" name="available" id="availId" />
+				<input type="text" size="15" style="width: 112px; height: 14px;"
+					name="available" id="availId" />
 			</div>
+		</div>
 	</div>
-</div>
 
-<div id="tdsUtilityId" style="display: none;" class="person">
-      <div class="dialog">
-          <div class="dialog">
-            <table>
-              <tbody>
-                <tr class="prop">
-					<td valign="top" class="name">
-						<label for="keyWords">KeyWords : </label>
-					</td>
-					<td valign="top" class="value" style="width: 40px" >
-						<input type="text" maxlength="64" id="keyWordsId" name="keyWords" value="" />
-					</td>
-				</tr>
+	<div id="tdsUtilityId" style="display: none;" class="person">
+		<div class="dialog">
+			<div class="dialog">
+				<table>
+					<tbody>
+						<tr class="prop">
+							<td valign="top" class="name"><label for="keyWords">KeyWords
+									: </label></td>
+							<td valign="top" class="value" style="width: 40px"><input
+								type="text" maxlength="64" id="keyWordsId" name="keyWords"
+								value="${person.keyWords}" /></td>
+						</tr>
 
-                <tr class="prop">
-                  <td valign="top" class="name">
-                    <label for="tdsNote">TDS Note:</label>
-                  </td>
-                  <td valign="top" class="value" colspan="2"  width="50%">
-                    <input type="text" maxlength="64" id="tdsNoteId" name="tdsNote" value="" size="10"/>
-                  </td>
-                </tr>
-                
-                <tr class="prop">
-                  <td valign="top" class="name">
-                    <label for="tdsLink">TDS Link</label>
-                  </td>
-                  <td valign="top" class="value" colspan="2">
-                    <input type="text" id="tdsLinkId" name="tdsLink" value=""/>
-                  </td>
-                </tr>
+						<tr class="prop">
+							<td valign="top" class="name"><label for="tdsNote">TDS
+									Note:</label></td>
+							<td valign="top" class="value" colspan="2" width="50%"><input
+								type="text" maxlength="64" id="tdsNoteId" name="tdsNote"
+								value="${person.tdsNote}" size="10" /></td>
+						</tr>
 
-                <tr class="prop">
-                  <td valign="top" class="name">
-                    <label for="staffType ">StaffType :</label>
-                  </td>
-                  <td valign="top" class="value" colspan="2">
-                    <g:select id="staffTypeId" name="staffType"  from="${['Contractor', 'Hourly', 'Salary']}" value ="Salary" />
-                  </td>
-                </tr>
-                
-                
-              </tbody>
-              
-            </table>
-             
-          </div>
-          </div>
-         </div>
+						<tr class="prop">
+							<td valign="top" class="name"><label for="tdsLink">TDS
+									Link</label></td>
+							<td valign="top" class="value" colspan="2"><input
+								type="text" id="tdsLinkId" name="tdsLink"
+								value="${person.tdsLink}" /></td>
+						</tr>
+
+						<tr class="prop">
+							<td valign="top" class="name"><label for="staffType ">StaffType
+									:</label></td>
+							<td valign="top" class="value" colspan="2"><g:select
+									id="staffTypeId" name="staffType"
+									from="${Person.constraints.staffType.inList}" value="Salary" />
+							</td>
+						</tr>
+
+						<tr class="prop">
+							<td valign="top" class="name"><label for="travleOK ">TravleOK
+									:</label></td>
+							<td valign="top" class="value" colspan="2"><input
+								type="checkbox" id="travleOKId" name="travelOK"
+								onclick="if(this.checked){this.value = 1} else {this.value = 0 }" ${person.travelOK == 1 ? 'checked="checked"' : 1 }
+								value="${person.travelOK}" /></td>
+						</tr>
+
+
+					</tbody>
+
+				</table>
+
+			</div>
+		</div>
+	</div>
 </g:form>
 <div class="buttons buttonsToUpdate">
-	<input class="save" type="button" id="updateBId" value="Update" onClick="updatePerson('generalInfoShow','personDialogForm')" /> 
-	<input class="save" type="button" id="cancelBId" value="Cancel" onClick="$('#personGeneralViewId').dialog('close')" />
+	<input class="save" type="button" id="updateBId" value="Update"
+		onClick="updatePerson('generalInfoShow','personDialogForm')" /> <input
+		class="save" type="button" id="cancelBId" value="Cancel"
+		onClick="$('#personGeneralViewId').dialog('close')" />
 </div>
 

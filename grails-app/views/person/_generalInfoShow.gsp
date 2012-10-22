@@ -154,42 +154,50 @@
 
 <div id="tdsUtilityShowId" class="person" style="display: none;">
 	<div class="dialog">
-          <div class="dialog">
-            <table>
-              <tbody>
+          <div class="dialog" >
+            <table >
+              <tbody class="personShow">
                 <tr class="prop">
-					<td valign="top" class="name">
-						<label for="keyWords">KeyWords : </label>
+					<td valign="top" class="name personShow">
+						<label for="keyWords">KeyWords :</label>
 					</td>
-					<td valign="top" class="value" style="width: 40px" >
-						<span id="keyWordsId" >Cabling</span >
+					<td valign="top" class="value personShow" style="width: 40px" >
+						<span id="keyWordsId" >${person.keyWords }</span >
 					</td>
 				</tr>
 
                 <tr class="prop">
-                  <td valign="top" class="name">
-                    <label for="tdsNote">TDS Note:</label>
+                  <td valign="top" class="name personShow">
+                    <label for="tdsNote">TDS Note :</label>
                   </td>
-                  <td valign="top" class="value" colspan="2"  width="50%">
-                    <span id="tdsNoteId" >Has a lot data center Exp.</span>
+                  <td valign="top" class="value personShow" colspan="2"  width="50%">
+                    <span id="tdsNoteId" >${person.tdsNote}</span>
                   </td>
                 </tr>
                 
                 <tr class="prop">
-                  <td valign="top" class="name">
-                    <label for="tdsLink">TDS Link</label>
+                  <td valign="top personShow" class="name">
+                    <label for="tdsLink">TDS Link :</label>
                   </td>
-                  <td valign="top" class="value" colspan="2">
-                    <span id="tdsLinkId" >link</span>
+                  <td valign="top" class="value personShow" colspan="2">
+                    <span id="tdsLinkId" >${person.tdsLink}</span>
                   </td>
                 </tr>
 
                 <tr class="prop">
-                  <td valign="top" class="name">
+                  <td valign="top" class="name personShow">
                     <label for="staffType ">StaffType :</label>
                   </td>
-                  <td valign="top" class="value" colspan="2">
-                    <span id="staffTypeId" >Contractor</span>
+                  <td valign="top" class="value personShow" colspan="2">
+                    <span id="staffTypeId" >${person.staffType}</span>
+                  </td>
+                </tr>
+                 <tr class="prop">
+                  <td valign="top" class="name personShow" >
+                    <label for="travelOK ">TravelOK :</label>
+                  </td>
+                  <td valign="top" class="value personShow" colspan="2">
+                    <span id="travelOK" ><input type="checkbox" ${person.travelOK == 1 ? 'checked="checked"':''} disabled="disabled"/> </span>
                   </td>
                 </tr>
                 

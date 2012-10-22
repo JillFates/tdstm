@@ -391,6 +391,7 @@ class PersonController {
 	def updatePerson = {
 			def personInstance = Person.get(params.id)
 			def ret = []
+			params.travelOK == "1" ? params : (params.travelOK = 0)
 			personInstance.properties = params
 			def personId
 			if ( !personInstance.hasErrors() && personInstance.save(flush:true) ) {
