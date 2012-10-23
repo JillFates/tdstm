@@ -26,7 +26,7 @@
 				</td>
 				<td>
 					<span style="cursor: pointer;" id="${projectStaff?.staff.id}" onClick="loadPersonDiv(this.id,'generalInfoShow')">
-						${projectStaff?.role}
+						${projectStaff?.role.description.substring(projectStaff?.role.description.lastIndexOf(':') +1).trim()}
 					</span>
 				</td>
 			</tr>

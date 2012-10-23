@@ -530,9 +530,9 @@ class MoveBundleController {
 			def otherCount = moveBundleIds ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.assetType not in ('Server','VM','Blade','Application','Files','Database') and (ae.moveBundle.id in ${moveBundleIds} or ae.moveBundle is null) and ae.project.id = ${projectId}")[0] : ""
 			otherTypeList << ['moveEvent':moveEvent.id , 'count':otherCount]
 		}
-		def unassignedAppCount = Application.executeQuery("select count(ap) from Application ap where ap.project = $projectId and ap.assetType='Application' and ap.moveBundle in $mbList and (ap.planStatus is null or ap.planStatus in ('Unassigned',''))")[0]
+		def unassignedAppCount =  moveBundleList ? Application.executeQuery("select count(ap) from Application ap where ap.project = $projectId and ap.assetType='Application' and ap.moveBundle in $mbList and (ap.planStatus is null or ap.planStatus in ('Unassigned',''))")[0] : 0
 		def totalAssignedApp = applicationCount - unassignedAppCount ;
-		int percentageAppCount = Application.executeQuery("select count(ap) from Application ap where ap.project = $projectId and ap.assetType='Application' and (ap.moveBundle in $mbList or ap.moveBundle is null ) and ap.moveBundle.moveEvent.runbookStatus = 'Done' ")[0]
+		int percentageAppCount = moveBundleList ? Application.executeQuery("select count(ap) from Application ap where ap.project = $projectId and ap.assetType='Application' and (ap.moveBundle in $mbList or ap.moveBundle is null ) and ap.moveBundle.moveEvent.runbookStatus = 'Done' ")[0] : 0
 		if(applicationCount > 0){
 			percentageAppCount = Math.round((percentageAppCount/applicationCount)*100)
 		}else{

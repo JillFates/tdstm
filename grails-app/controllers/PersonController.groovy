@@ -16,6 +16,7 @@ class PersonController {
 	def partyRelationshipService
 	def userPreferenceService
 	def securityService
+	def projectService
 	
     def index = { redirect(action:list,params:params) }
 
@@ -468,16 +469,18 @@ class PersonController {
 	 */
 	def manageProjectStaff ={
 		def project = securityService.getUserCurrentProject()
-		def projects = Project.findAll()
+		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
+		def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
+		def projects = projectService.getActiveProject( now, projectHasPermission, 'name', 'asc' )
 		def roleTypes = RoleType.findAllByDescriptionIlike("Staff%")
 		def role = params.role ? params.role : "MOVE_TECH"
 		def moveEventList = []
 		def bundleTimeformatter = new SimpleDateFormat("dd-MMM")
 		if(project){
-			def moveMap = new HashMap()
 			def moveEvents = MoveEvent.findAllByProject(project)
 			def bundleStartDate = ""
 			moveEvents.each{ moveEvent->
+				def moveMap = new HashMap()
 				def moveBundle = moveEvent?.moveBundles
 				def startDate = moveBundle.startTime.sort()
 				startDate?.removeAll([null])
@@ -494,14 +497,16 @@ class PersonController {
 			}
 			
 		}
-		def staffList = getStaffList(project.id)
+		def currRole = userPreferenceService.getPreference("StaffingRole")?:"MOVE_TECH"
+		def currLoc = userPreferenceService.getPreference("StaffingLocation")?:"All"
+		def currPhase = userPreferenceService.getPreference("StaffingPhases")?:"All"
+		def currScale = userPreferenceService.getPreference("StaffingScale")?:"1"
+		
+		def staffList = getStaffList(project.id, currRole, currScale, currLoc  )
 		
 	    [projects:projects, projectId:project.id, roleTypes:roleTypes, staffList:staffList,
-			 moveEventList:moveEventList,
-			 currRole:userPreferenceService.getPreference("StaffingRole")?:"MOVE_TECH",
-			 currLoc:userPreferenceService.getPreference("StaffingLocation")?:"All",
-			 currPhase:userPreferenceService.getPreference("StaffingPhases")?:"All",
-			 currScale:userPreferenceService.getPreference("StaffingScale")?:"1"]
+			 moveEventList:moveEventList, currRole:currRole, currLoc:currLoc,
+			 currPhase:currPhase, currScale:currScale]
 		
 	}
 	
@@ -539,15 +544,37 @@ class PersonController {
 	 *@param location - location to filter staff list
 	 */
 	
-	def getStaffList(def projectId, def role="MOVE_TECH", def scale=1, def location= "All"){
-		def queryForStaff = "from PartyRelationship p where p.roleTypeCodeTo ='${role}'"
-		def project = Project.get( projectId )
-		if(project && projectId!=0){
-			queryForStaff+=" and p.partyIdFrom = ${projectId} "
+	def getStaffList(def projectId, def role, def scale, def location){
+		StringBuffer queryForStaff = new StringBuffer("FROM PartyRelationship  p")
+		def sqlArgs = [:]
+		
+		if( role!="0" ){
+			def roleType =RoleType.findById(role)
+		    sqlArgs << [roleArgs : [roleType]]
+		} else {
+		    def roleTypes = RoleType.findAllByDescriptionIlike("Staff%")
+		    sqlArgs << [roleArgs : roleTypes]
 		}
-		queryForStaff+=" group by p.partyIdTo"
+		
+		queryForStaff.append(" WHERE p.roleTypeCodeTo IN (:roleArgs) ")
+		
+		def project = Project.get( projectId )
+		if(project && projectId !=0 ){
+			sqlArgs << [project : [project]]
+			queryForStaff.append(" AND p.partyIdFrom IN (:project) ")
+		}else{
+			def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
+			def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
+			def projects = projectService.getActiveProject( now, projectHasPermission, 'name', 'asc' )
+			sqlArgs << [project : projects]
+			queryForStaff.append(" AND p.partyIdFrom IN (:project) ")
+		}
+		
+		queryForStaff.append(" GROUP BY p.partyIdTo ")
+		
 		def list = []
-		def staffList = PartyRelationship.findAll(queryForStaff)
+		def staffList = PartyRelationship.findAll(queryForStaff,sqlArgs).sort{it.partyIdTo.firstName}
+		
 		staffList.each{staff ->
 			def map = new HashMap()
 			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
