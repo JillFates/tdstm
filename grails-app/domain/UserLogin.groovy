@@ -35,6 +35,7 @@ class UserLogin {
 		password sqlType: 'varchar(100)'  // size must me more than 20 because it will store as encrypted code
 		// TODO - active column should not be varchar(20) as it is only 1 char
 		active sqlType:'varchar(20)'
+		person ignoreNotFound: true
 	}
 
 	String toString(){

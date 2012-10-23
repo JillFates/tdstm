@@ -23,6 +23,8 @@ class PartyRelationship implements Serializable {
 	static mapping  = {	
 		version false
 		id composite:['partyRelationshipType', 'partyIdFrom', 'partyIdTo', 'roleTypeCodeFrom', 'roleTypeCodeTo'], generator:'assigned', unique:true
+		partyIdFrom ignoreNotFound: true
+		partyIdTo ignoreNotFound: true
 		columns {
 			roleTypeCodeFrom sqlType:'varchar(20)'
 			roleTypeCodeTo sqlType:'varchar(20)'

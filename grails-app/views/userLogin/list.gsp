@@ -32,11 +32,11 @@
             
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
             <span class="menuButton"><g:link class="create" action="create" params="[companyId:companyId]">New UserLogin</g:link></span>
-            <g:if test="${session.getAttribute('InActive') == 'InActive'}">
-              <span class="menuButton"><g:link class="create" action="list" params="[activeUsers:'showActive',companyName:company]">Show Active Users</g:link></span>
+            <g:if test="${session.getAttribute('InActive') == 'N'}">
+              <span class="menuButton"><g:link class="create" action="list" params="[activeUsers:'Y',companyName:companyId]">Show Active Users</g:link></span>
             </g:if>
             <g:else>
-              <span class="menuButton"><g:link class="create" action="list" params="[inactiveUsers:'showInactive',companyName:company]">Show Inactive Users</g:link></span>
+              <span class="menuButton"><g:link class="create" action="list" params="[activeUsers:'N',companyName:companyId]">Show Inactive Users</g:link></span>
             </g:else>
         </div>
         
@@ -46,23 +46,25 @@
             </g:if>
             <form name="userForm" id="formId">
             <div> 
-            <g:select id="filterSelect" name="companyName" from="${partyGroupList}" value="${company}"  noSelection="['All':'All']" />
+            <g:select id="filterSelect" name="companyName" from="${partyGroupList}" value="${companyId}"  optionKey="id" optionValue="name" noSelection="['All':'All']" />
             </div>
-            <div>
 			         <jmesa:tableFacade id="tag" items="${userLoginInstanceList}" maxRows="25" stateAttr="restore" var="userLoginInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
 			             <jmesa:htmlTable style=" border-collapse: separate">
 			                 <jmesa:htmlRow highlighter="true">
-			                 	 <jmesa:htmlColumn property="username" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-		                         		<g:link action="show" id="${userLoginInstance.id}" params="[companyId:companyId]">${userLoginInstance.username}</g:link>
+			                 	 <jmesa:htmlColumn property="userName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+		                         		<g:link action="show" id="${userLoginInstance.id}" params="[companyId:companyId]">${userLoginInstance.userName}</g:link>
 								 </jmesa:htmlColumn>
-			                     <jmesa:htmlColumn property="personDetails" title="Person" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+			                     <jmesa:htmlColumn property="person" title="Person" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 									${fieldValue(bean:userLoginInstance, field:'person')}
+								 </jmesa:htmlColumn>
+								  <jmesa:htmlColumn property="company" title="Company" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+									${userLoginInstance.company != 'null' ? userLoginInstance.company : '' }
 								 </jmesa:htmlColumn>
 								 <jmesa:htmlColumn property="lastLogin" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor">
 									<tds:convertDateTime date="${userLoginInstance?.lastLogin}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
   								 </jmesa:htmlColumn>
-			                     <jmesa:htmlColumn property="createdDate" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor">
-			                     	<tds:convertDateTime date="${userLoginInstance?.createdDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+			                     <jmesa:htmlColumn property="dateCreated" title="Created Date" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor">
+			                     	<tds:convertDateTime date="${userLoginInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 								 </jmesa:htmlColumn>
 			                     <jmesa:htmlColumn property="expiryDate" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor">
 			                     	<tds:convertDateTime date="${userLoginInstance?.expiryDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
@@ -72,6 +74,5 @@
 			         </jmesa:tableFacade>
 			     </form>
             </div>
-        </div>
     </body>
 </html>

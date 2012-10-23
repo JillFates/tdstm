@@ -1,14 +1,17 @@
+import net.tds.util.jmesa.AssetEntityBean
 import org.jsecurity.crypto.hash.Sha1Hash;
 import org.jsecurity.SecurityUtils;
 import com.tdssrc.grails.GormUtil
 import java.text.SimpleDateFormat
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
+import java.text.SimpleDateFormat
 
 class UserLoginController {
     
 	def partyRelationshipService
 	def userPreferenceService
+	def securityService
 
 	def index = { redirect(action:list,params:params) }
 
@@ -16,12 +19,15 @@ class UserLoginController {
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
 	def list = {
- 		if(params.inactiveUsers){
-		     session.setAttribute("InActive", "InActive")	
-	    }else if(params.activeUsers ){
-		     session.removeAttribute("InActive")
+ 		if(params.activeUsers){
+		     session.setAttribute("InActive", params.activeUsers)	
+	    }
+		def project = securityService.getUserCurrentProject()
+		def companyId 
+		def active = params.activeUsers ? params.activeUsers : session.getAttribute("InActive")
+		if(!active){
+			active = 'Y'
 		}
-		def companyId = params.id
 		boolean filter = params.filter
 		if(filter){
 			session.userFilters.each{
@@ -32,21 +38,22 @@ class UserLoginController {
 		} else {
 			session.userFilters = params
 		}
-		if(!params.max) params.max = '20'
-		def max = Integer.parseInt( params.max )
-		def offset = params.offset ? Integer.parseInt( params.offset ) : 0
+		def userLogin = securityService.getUserLogin()
 
 		def userLoginInstanceList
 		def userLoginSize
 
 		def userLoginHasPermission = RolePermissions.hasPermission("ShowAllUsers")
 		if( userLoginHasPermission ){
-			if(params.companyName ){
-				companyId  = PartyGroup.findByName(params.companyName)?.id
-			}
-			if(params.companyName!="All"){
-				if( !companyId ){
-					companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
+			if(params.companyName && params.companyName != "All" ){
+				def company  = PartyGroup.get(params.companyName)
+				companyId = company ? company.id : null
+			} 
+			if( !companyId && params.companyName != "All" ){
+				companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
+				if(!companyId){
+					def person = userLogin.person
+					companyId = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${person.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ").partyIdFrom[0]?.id//project.client.id
 				}
 			}
 			if(companyId || params.companyName=="All"){
@@ -57,54 +64,45 @@ class UserLoginController {
 				}
 				if(personIds){
 				    personIds = personIds.substring(0,personIds.lastIndexOf(','))
-				
-					def sort = params.sort ? params.sort : 'person.firstName'
+					def sort = params.sort ? params.sort : 'username'
 					def order = params.order ? params.order : 'asc'
-					if(params.activeUsers=="showActive" && params.companyName!="All"){
-						  userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds) and active = 'Y' order by u.${sort} ${order}",[max:max, offset:offset])
-					}else if(params.inactiveUsers){
-					      userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds) and active = 'N' order by u.${sort} ${order}",[max:max, offset:offset])
-					}else if(session.getAttribute("InActive")=="InActive"){
-					      userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds) and active = 'N' order by u.${sort} ${order}",[max:max, offset:offset])
-					}else{ 
-	            		  userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds) and active = 'Y' order by u.${sort} ${order}",[max:max, offset:offset])
-				    }
-					 userLoginSize =  UserLogin.findAll("from UserLogin u where u.person in ($personIds)").size()
-				}else if(params.companyName=="All" && params.inactiveUsers=="showInactive"){
-					      userLoginInstanceList = UserLogin.findAllByActive("N")
-				}else if(params.companyName=="All" && params.activeUsers=="showActive" ){
-					      userLoginInstanceList = UserLogin.findAllByActive("Y")
-				}else if(params.companyName=="All" && session.getAttribute("InActive")=="InActive"){
-					      userLoginInstanceList = UserLogin.findAllByActive("N")
-				}else if(params.inactiveUsers=="showInactive" && params.companyName=="All"){
-				       	  userLoginInstanceList = UserLogin.findAllByActive("N")
-				}else if(params.companyName=="All"){
-				       	  userLoginInstanceList = UserLogin.findAllByActive("Y")
-				}else{
-						userLoginInstanceList = []
+					
+					userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds) and active = '${active}' order by u.${sort} ${order}")
+					 
+				} else if(params.companyName=="All" ){
+					userLoginInstanceList = UserLogin.findAllByActive(active)
 				}
-			} else {
-				flash.message = "Please select Company before navigating to Users"
-				redirect(controller:'partyGroup',action:'list')
-			}
+			}	
 		} else {
-			userLoginInstanceList = UserLogin.list( [max:max, offset:offset] )
-			userLoginSize = UserLogin.count()
+			userLoginInstanceList = []
 		}
-		def partyGroupList = PartyGroup.findAllByPartyType( PartyType.read("COMPANY"))
+		def partyGroupList = PartyGroup.findAllByPartyType( PartyType.read("COMPANY")).sort{it.name}
 		def company
 		if(companyId){
 			if(params.companyName!="All"){
 			    company = PartyGroup.findById(companyId)
 			}
 		}
+		def userLoginList = []
+		userLoginInstanceList.each{
+			AssetEntityBean personLogin = new AssetEntityBean();
+			def userCompany = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${it.person?.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")?.partyIdFrom
+			personLogin.setId(it.id)
+			personLogin.setUserName(it.username)
+			personLogin.setPerson(it.person.toString())
+			personLogin.setCompany(userCompany[0].toString())
+			personLogin.setLastLogin(it.lastLogin)
+			personLogin.setDateCreated(it.createdDate)
+			personLogin.setExpiryDate(it.expiryDate)
+			userLoginList.add(personLogin)
+		}
 		// Statements for JMESA integration
 		TableFacade tableFacade = new TableFacadeImpl("tag",request)
-		tableFacade.items = userLoginInstanceList
+		tableFacade.items = userLoginList
         if(params.companyName=="All"){
 			 company = "All"
 		}
-		return [ userLoginInstanceList : userLoginInstanceList, companyId:companyId ,userLoginSize:userLoginSize,partyGroupList:partyGroupList,company:company]
+		return [ userLoginInstanceList : userLoginList, companyId:companyId ,partyGroupList:partyGroupList,company:company]
 	}
 
     def show = {

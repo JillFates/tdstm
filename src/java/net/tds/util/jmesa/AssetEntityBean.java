@@ -1,6 +1,7 @@
 package net.tds.util.jmesa;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class AssetEntityBean implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -48,6 +49,61 @@ public class AssetEntityBean implements Serializable {
 	private Integer modelCount;
 	private Integer count;
 	
+	private String userName;
+	private String person;
+	private Date lastLogin;
+	private String company;
+	private Date dateCreated;
+	private Date expiryDate;
+	
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getPerson() {
+		return person;
+	}
+
+	public void setPerson(String person) {
+		this.person = person;
+	}
+
+	public Date getLastLogin() {
+		return lastLogin;
+	}
+
+	public void setLastLogin(Date lastLogin) {
+		this.lastLogin = lastLogin;
+	}
+
+	public String getCompany() {
+		return company;
+	}
+
+	public void setCompany(String company) {
+		this.company = company;
+	}
+
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
+	public Date getExpiryDate() {
+		return expiryDate;
+	}
+
+	public void setExpiryDate(Date expiryDate) {
+		this.expiryDate = expiryDate;
+	}
+
 	// Default constructor
 	public AssetEntityBean() {}
 	
