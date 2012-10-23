@@ -6,8 +6,10 @@
 			onclick="switchTab(${person.id},'generalInfoId','generalHeadId')">General</a></li>
 		<li><a href="#" id="availHeadId" class="mobmenu"
 			onclick="switchTab(${person.id},'availabilityId','availHeadId')">Availability</a></li>
-		<li><a href="#" id="tdsHeadId" class="mobmenu"
-			onclick="switchTab(${person.id},'tdsUtilityId','tdsHeadId')">TDS</a></li>
+		<g:if test="${isProjMgr==true}">
+			<li><a href="#" id="tdsHeadId" class="mobmenu"
+				onclick="switchTab(${person.id},'tdsUtilityId','tdsHeadId')">TDS</a></li>
+		</g:if>
 	</ul>
 </div>
 <g:form name="personDialogForm" action="updatePerson">

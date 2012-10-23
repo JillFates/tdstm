@@ -598,13 +598,18 @@ class PersonController {
 		def tab = params.tab ?: 'generalInfoShow'
 		def person = Person.get(params.personId)
 		def blackOutdays = person.blackOutDates
+		def subject = SecurityUtils.subject
 		def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $person.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ").partyIdFrom[0]
 		
 		def rolesForPerson = PartyRole.findAll("from PartyRole where party = :person and roleType.description like 'staff%' group by roleType",[person:person])?.roleType
 		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
+		def isProjMgr = false
+		if( subject.hasRole("PROJ_MGR")){
+			isProjMgr = true
+		}
 		
 		render(template:tab ,model:[person:person, company:company, rolesForPerson:rolesForPerson, availabaleRoles:availabaleRoles, sizeOfassigned:(rolesForPerson.size()+1),
-			blackOutdays:blackOutdays])
+			blackOutdays:blackOutdays, isProjMgr:isProjMgr])
 			
 	}
 }
