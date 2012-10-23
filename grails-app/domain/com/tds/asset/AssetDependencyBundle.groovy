@@ -2,11 +2,12 @@ package com.tds.asset
 
 class AssetDependencyBundle {
 	Integer dependencyBundle = 0
-	AssetEntity asset
 	String dependencySource
 	Date lastUpdated
 	Project project
     
+	static belongsTo = [asset: AssetEntity]
+	
     static constraints = {
 		dependencyBundle( nullable:false, unique:'asset')
 		asset( nullable:false, unique:true)
