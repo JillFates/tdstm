@@ -191,7 +191,7 @@
 
 		                                <select name="availableRole" id="availableRoleId" multiple="multiple" size="10" style="width: 250px">
 
-			                                <g:each in="${RoleType.list()}" var="availableRoles">
+			                                <g:each in="${roleList}" var="availableRoles">
 
 			                                	<option value="${availableRoles.id}">${availableRoles}</option>
 

@@ -170,7 +170,8 @@ class UserPreferenceService  {
      */
 	// TODO : getAvailableRoles - Move to SecurityService
     def getAvailableRoles( def person ){
-        def availableRoles = RoleType.findAll("from RoleType r where r.id not in (select roleType.id from PartyRole where party = $person.id group by roleType.id )")
+        def availableRoles = RoleType.findAll("from RoleType r where r.id not in (select roleType.id from PartyRole where party = $person.id  group by roleType.id )\
+												and r.description like 'staff%' OR r.description like 'system%' order by r.description ")
     	 
         return availableRoles
     }

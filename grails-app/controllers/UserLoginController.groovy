@@ -224,7 +224,8 @@ class UserLoginController {
         userLoginInstance.properties = params
 		def expiryDate = new Date(GormUtil.convertInToGMT( "now", "EDT" ).getTime() + 7776000000)
         userLoginInstance.expiryDate = expiryDate
-        return ['userLoginInstance':userLoginInstance, personInstance:personInstance, companyId:companyId ]
+		def roleList = RoleType.findAll("from RoleType r where r.description like 'staff%' OR r.description like 'system%' order by r.description ")
+		return ['userLoginInstance':userLoginInstance, personInstance:personInstance, companyId:companyId, roleList:roleList ]
     }
 	/*
 	 *  Save the User details and set the user roles for Person
