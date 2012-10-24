@@ -61,7 +61,7 @@ class Application extends AssetEntity{
 		autoTimestamp false
 		tablePerHierarchy false
 		id column:'app_id'
-		appOwner ignoreNotFound: true
+		owner ignoreNotFound: true
 	}
 	/*
 	 * Date to insert in GMT

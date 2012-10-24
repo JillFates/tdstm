@@ -200,6 +200,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		sourceTeamMt column:'source_team_id'
 		targetTeamMt column:'target_team_id'
 		moveBundle ignoreNotFound:true
+		owner ignoreNotFound: true
 		columns {
 			hasRemoteMgmt sqltype: 'tinyint(1)'
 		}

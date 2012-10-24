@@ -63,7 +63,7 @@
 								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app.assetName}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app.owner}</span>
+								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app?.owner}</span>
 							</td>
 
 							<td><span
