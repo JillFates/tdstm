@@ -53,7 +53,7 @@ class UserLoginController {
 				companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
 				if(!companyId){
 					def person = userLogin.person
-					companyId = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${person.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ").partyIdFrom[0]?.id//project.client.id
+					companyId = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${person.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ").partyIdFrom[0]?.id
 				}
 			}
 			if(companyId || params.companyName=="All"){
@@ -70,7 +70,7 @@ class UserLoginController {
 					userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds) and active = '${active}' order by u.${sort} ${order}")
 					 
 				} else if(params.companyName=="All" ){
-					userLoginInstanceList = UserLogin.findAllByActive(active)
+					userLoginInstanceList = UserLogin.findAllByActive(active).sort{it.username}
 				}
 			}	
 		} else {
