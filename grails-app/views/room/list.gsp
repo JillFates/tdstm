@@ -86,7 +86,7 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
 				 <tds:hasPermission permission='RoomListActionColumn'>
-					<td><input type="checkbox" name="checkbox_${roomInstance.id}" id="checkboxId_${roomInstance.id}" onclick="enableActions()"></td>
+					<td><input type="checkbox" class="listCheck" name="checkbox_${roomInstance.id}" id="roomCheckBoxId" onclick="enableActions()"></td>
 				</tds:hasPermission>
 				<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "location")}</td>
 				
@@ -331,15 +331,15 @@ function openRoomView(e){
 function enableActions(){
 	var inputCheckBox = $("input:checkbox")
 	var enableButtons = 0
-	inputCheckBox.each(function() {
-		if($(this).is(":checked")){
-			enableButtons ++
-		}
+	$('.listCheck:checked').each(function(index, val) {
+	    if ($(this).attr('id') == "roomCheckBoxId") {
+	   	  enableButtons++;
+	    }
 	});
 	if(enableButtons == 1){
 		$("#mergeId").show()
-		var checkBoxId = $("input:checked").attr('id')
-		var roomId = checkBoxId.substring(11,checkBoxId.length)
+		var checkBoxId = $("input:checked").attr('name')
+		var roomId = checkBoxId.substring(9,checkBoxId.length)
 		jQuery.ajax({
 			url: "verifyRoomAssociatedRecords",
 			data: "roomId="+roomId,

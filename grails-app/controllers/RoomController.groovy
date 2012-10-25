@@ -213,6 +213,8 @@ class RoomController {
 					if(AssetEntity.findByRoomSource(roomInstance) || AssetEntity.findByRoomTarget(roomInstance) || Rack.findByRoom(roomInstance)){
 						skippingRooms << roomInstance.roomName
 					} else {
+					    MoveBundle.executeUpdate("Update MoveBundle set sourceRoom = null where sourceRoom = ${roomInstance.id}")
+						MoveBundle.executeUpdate("Update MoveBundle set targetRoom = null where targetRoom = ${roomInstance.id}")
 						roomInstance.delete(flush: true)
 					}
 					/**
@@ -256,7 +258,7 @@ class RoomController {
 	*  Verify if Room has associated with any assets before deleting it.
 	*/
    def verifyRoomAssociatedRecords = {
-	   def id = params.roomId
+       def id = params.roomId
 	   def room = Room.get(id)
 	   def associatedRecords
 	   
