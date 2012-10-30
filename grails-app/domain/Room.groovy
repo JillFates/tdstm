@@ -47,7 +47,7 @@ class Room {
 	}
 	
 	String toString(){
-		"$roomName / $location"
+		"$location / $roomName"
 	}
 	
 	static Room findOrCreateWhere(params) {

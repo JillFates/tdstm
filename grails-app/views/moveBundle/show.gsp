@@ -98,14 +98,14 @@
             <tr class="prop">
               <td valign="top" class="name">From:</td>
 
-              <td valign="top" class="value">${moveBundleInstance.sourceRoom?.roomName}</td>
+              <td valign="top" class="value">${moveBundleInstance.sourceRoom}</td>
 
             </tr>
             
             <tr class="prop">
               <td valign="top" class="name">To:</td>
 
-              <td valign="top" class="value">${moveBundleInstance.targetRoom?.roomName}</td>
+              <td valign="top" class="value">${moveBundleInstance.targetRoom}</td>
 
             </tr>
 
