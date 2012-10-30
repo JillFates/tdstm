@@ -125,6 +125,10 @@ function changeManageRole(){
 	$("#manageRolesId").val(1)
 }
 
+/*
+ * to add date for which a user won't be available
+ */
+
 function addBlackOutDay(){
 	var id = $("#availableId").val()
 	var inputHtml = $("#dateDivId").html().replace("availId","availId_"+id).replace("available","availability")
@@ -133,4 +137,24 @@ function addBlackOutDay(){
 	$("#availableId").val(parseInt($("#availableId").val())+1)
 
 	
+}
+/*
+ * Make a ajax call when user checks on checkbox for moveEvent
+ */
+function saveEventStaff(id){
+	var val = $("[id='"+id+"']").val()
+	var params = {'id':id, 'val':val }
+	jQuery.ajax({
+		url:'../person/saveEventStaff',
+		data: params,
+		type:'POST',
+		success: function(data) {
+			if(data=="false"){
+			   alert("An unexpected error occurred while attempting to update Person's MoveEvent  ")
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			alert("An unexpected error occurred while attempting to update Person's MoveEvent ")
+		}
+	});
 }

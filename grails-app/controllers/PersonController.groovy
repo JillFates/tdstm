@@ -11,6 +11,7 @@ import org.jsecurity.SecurityUtils
 import org.jsecurity.crypto.hash.Sha1Hash
 
 import com.tdssrc.grails.GormUtil
+import com.tds.asset.AssetComment
 class PersonController {
     
 	def partyRelationshipService
@@ -475,38 +476,18 @@ class PersonController {
 		def roleTypes = RoleType.findAllByDescriptionIlike("Staff%")
 		def role = params.role ? params.role : "MOVE_TECH"
 		def moveEventList = []
-		def bundleTimeformatter = new SimpleDateFormat("dd-MMM")
-		if(project){
-			def moveEvents = MoveEvent.findAllByProject(project)
-			def bundleStartDate = ""
-			moveEvents.each{ moveEvent->
-				def moveMap = new HashMap()
-				def moveBundle = moveEvent?.moveBundles
-				def startDate = moveBundle.startTime.sort()
-				startDate?.removeAll([null])
-				if(startDate.size()>0){
-					if(startDate[0]){
-					   bundleStartDate = bundleTimeformatter.format(startDate[0])
-					}
-				}
-				moveMap.put("project", moveEvent.project.name)
-				moveMap.put("name", moveEvent.name)
-				moveMap.put("startTime", bundleStartDate)
-				
-				moveEventList << moveMap
-			}
-			
-		}
+		
 		def currRole = userPreferenceService.getPreference("StaffingRole")?:"MOVE_TECH"
 		def currLoc = userPreferenceService.getPreference("StaffingLocation")?:"All"
 		def currPhase = userPreferenceService.getPreference("StaffingPhases")?:"All"
 		def currScale = userPreferenceService.getPreference("StaffingScale")?:"1"
+		def moveEvents = MoveEvent.findAll("from MoveEvent m where project =:project order by m.project.name , m.name asc",[project:project])
+		def staffList = getStaffList(project.id, currRole, currScale, currLoc)
 		
-		def staffList = getStaffList(project.id, currRole, currScale, currLoc  )
-		
+		def eventCheckStatus = eventCheckStatus(staffList, moveEvents)
 	    [projects:projects, projectId:project.id, roleTypes:roleTypes, staffList:staffList,
-			 moveEventList:moveEventList, currRole:currRole, currLoc:currLoc,
-			 currPhase:currPhase, currScale:currScale]
+			 moveEventList:getBundleHeader( moveEvents ), currRole:currRole, currLoc:currLoc,
+			 currPhase:currPhase, currScale:currScale, project:project, eventCheckStatus:eventCheckStatus]
 		
 	}
 	
@@ -518,22 +499,34 @@ class PersonController {
 	 *@param location - location to filter staff list
 	 *Redirect to template for staffing list.
 	 */
-	
 	def loadFilteredStaff={
 		def role = params.role
-		def project = params.project
+		def projectId = params.project
 		def scale = params.scale
 		def location = params.location
 		def phase = params.list("phaseArr[]")
-		
 		userPreferenceService.setPreference("StaffingRole",role)
 		userPreferenceService.setPreference("StaffingLocation",location)
 		userPreferenceService.setPreference("StaffingPhases",phase.toString().replace("[", "").replace("]", ""))
 		userPreferenceService.setPreference("StaffingScale",scale)
 		
-		def getStaffList = getStaffList(project,role,scale,location);
+		def moveEvents 
+		def projects
+		def project
+		if(projectId=="0"){
+			def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
+			def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
+			projects = projectService.getActiveProject( now, projectHasPermission, 'name', 'asc' )
+			moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",[project:projects])
+		} else {
+			project = Project.get(projectId)
+			moveEvents = MoveEvent.findAll("from MoveEvent m where project =:project order by m.project.name , m.name asc",[project:project])
+		}
+		def staffList = getStaffList(projectId,role,scale,location);
+		def eventCheckStatus = eventCheckStatus(staffList, moveEvents)
 		
-		render(template:"projectStaffTable" ,model:[staffList:getStaffList])
+		render(template:"projectStaffTable" ,model:[staffList:staffList, moveEventList:getBundleHeader(moveEvents),project:projectId,
+					eventCheckStatus:eventCheckStatus])
 		
 	}
 	
@@ -543,48 +536,50 @@ class PersonController {
 	 *@param scale - duration in month  to filter staff list
 	 *@param location - location to filter staff list
 	 */
-	
 	def getStaffList(def projectId, def role, def scale, def location){
-		StringBuffer queryForStaff = new StringBuffer("FROM PartyRelationship  p")
+		def project = Project.get( projectId )
+		def staffList = []
+
+		StringBuffer queryForStaff = new StringBuffer("FROM PartyRole  p")
 		def sqlArgs = [:]
 		
 		if( role!="0" ){
 			def roleType =RoleType.findById(role)
-		    sqlArgs << [roleArgs : [roleType]]
+			sqlArgs << [roleArgs : [roleType]]
 		} else {
-		    def roleTypes = RoleType.findAllByDescriptionIlike("Staff%")
-		    sqlArgs << [roleArgs : roleTypes]
+			def roleTypes = RoleType.findAllByDescriptionIlike("Staff%")
+			sqlArgs << [roleArgs : roleTypes]
 		}
+		queryForStaff.append(" WHERE p.roleType IN (:roleArgs) ")
 		
-		queryForStaff.append(" WHERE p.roleTypeCodeTo IN (:roleArgs) ")
 		
-		def project = Project.get( projectId )
 		if(project && projectId !=0 ){
-			sqlArgs << [project : [project]]
-			queryForStaff.append(" AND p.partyIdFrom IN (:project) ")
-		}else{
-			def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
-			def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
-			def projects = projectService.getActiveProject( now, projectHasPermission, 'name', 'asc' )
-			sqlArgs << [project : projects]
-			queryForStaff.append(" AND p.partyIdFrom IN (:project) ")
+			def partyIds = partyRelationshipService.getProjectCompaniesStaff(projectId,'',true)
+			queryForStaff.append(" AND p.party IN (:partyIds) ")
+			sqlArgs << [partyIds : partyIds['staff']]
+			
 		}
 		
-		queryForStaff.append(" GROUP BY p.partyIdTo ")
+		queryForStaff.append("group by p.party, p.roleType order by p.party,p.roleType ")
 		
-		def list = []
-		def staffList = PartyRelationship.findAll(queryForStaff,sqlArgs).sort{it.partyIdTo.firstName}
-		
-		staffList.each{staff ->
+		def partyRoles = PartyRole.findAll(queryForStaff,sqlArgs)
+
+		partyRoles.each { relation->
 			def map = new HashMap()
-			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+			def persomME = []
+			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $relation.party.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+			
 			map.put("company", company.partyIdFrom)
-			map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
-			map.put("role", staff.roleTypeCodeTo)
-			map.put("staff", staff.partyIdTo)
-			list<<map
+			map.put("name", relation.party.firstName+" "+ relation.party.lastName)
+			map.put("role", relation.roleType)
+			map.put("staff", relation.party)
+			map.put("project",projectId)
+		  
+			staffList << map
 		}
-		return list
+		
+		
+		return staffList
 		
 	}
 	
@@ -593,7 +588,6 @@ class PersonController {
 	 *@param person Id is id of person
 	 *@return NA
 	 */
-	
 	def loadGeneral = {
 		def tab = params.tab ?: 'generalInfoShow'
 		def person = Person.get(params.personId)
@@ -612,4 +606,106 @@ class PersonController {
 			blackOutdays:blackOutdays, isProjMgr:isProjMgr])
 			
 	}
-}
+	
+	/*
+	 *To get headers of event at project staff table 
+	 *@param moveEvents list of moveEvent for selected project
+	 *@return MAP of bundle header containing projectName ,event name, start time and event id
+	 */
+	def getBundleHeader(moveEvents){
+		def project = securityService.getUserCurrentProject()
+		def moveEventList = []
+		def bundleTimeformatter = new SimpleDateFormat("dd-MMM")
+		if(project){
+			def bundleStartDate = ""
+			def personAssignedToME = []
+			moveEvents.each{ moveEvent->
+				def moveMap = new HashMap()
+				def moveBundle = moveEvent?.moveBundles
+				def startDate = moveBundle.startTime.sort()
+				startDate?.removeAll([null])
+				if(startDate.size()>0){
+					if(startDate[0]){
+					   bundleStartDate = bundleTimeformatter.format(startDate[0])
+					}
+				}
+				moveMap.put("project", moveEvent.project.name)
+				moveMap.put("name", moveEvent.name)
+				moveMap.put("startTime", bundleStartDate)
+				moveMap.put("id", moveEvent.id)
+				
+				moveEventList << moveMap
+				
+			}
+		}
+		return moveEventList
+	}
+	
+	/*
+	 * Used to save event for staff in moveEvent staff 
+	 * @param id as composite id contains personId , MoveEventId and roleType id with separated of '-'
+	 * @return if updated successful return true else return false
+	 */
+	def saveEventStaff = {
+	   def compositeId = params.id
+	   def flag = true
+	   if(compositeId){
+		   def project = securityService.getUserCurrentProject()
+		   def ids = compositeId.split("-")
+		   def personId = ids[1]
+		   def eventId = ids[2]
+		   def roleType = ids[3]
+		   def roleTypeInstance  = RoleType.findById( roleType )
+		   def moveEvent = MoveEvent.get( eventId )
+		   def person = Person.get( personId )
+		   def moveEventStaff = MoveEventStaff.findAllByStaffAndEventAndRole(person, moveEvent, roleTypeInstance)
+		   if(moveEventStaff && params.val == "0"){
+			  if(! moveEventStaff.delete()){
+				  moveEventStaff.errors.allErrors.each{ println it}
+				  flag = false
+			  }
+		   } else  if( !moveEventStaff ){
+		      def projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, roleType )
+			  moveEventStaff = new MoveEventStaff()
+			  moveEventStaff.person = person
+			  moveEventStaff.moveEvent = moveEvent
+			  moveEventStaff.role = RoleType.findById( roleType )
+			  if(!moveEventStaff.save(flush:true)){
+				  moveEventStaff.errors.allErrors.each{ println it}
+				  flag = false
+			  }
+		   }
+	   }
+	   render flag
+	}
+	
+	/*
+	 * generates event check box status and id
+	 * @param staffList : list of staff 
+	 * @param events : list of Events  
+	 * @return : id and status of event related check box
+	 */
+	def eventCheckStatus(staffList, events){
+		def checkList = []
+		def moveEventStaffList = MoveEventStaff.findAllByPersonInListAndMoveEventInList(staffList.staff, events)
+		staffList.each { staffObj ->
+			def roleId = staffObj.role.id
+			def staffId = staffObj.staff.id
+			def eventList = []
+			def staffMap = [:]
+			events.each { event->
+				def eventId = event.id
+				def hasAssociation = moveEventStaffList.find{it.person.id == staffId && it.moveEvent.id == eventId && it.role.id == roleId}
+				
+				def checkMap = [:]
+				def checkId = "e-${staffObj.staff?.id}-${event.id}-${staffObj?.role?.id}"
+				checkMap.put('id', checkId)
+				checkMap.put("status", hasAssociation ? 'checked="checked"' : '' )
+				eventList << checkMap
+			}
+			staffMap.put((staffObj.staff.id+"_"+staffObj.role+'_'+staffObj.project), eventList)
+			checkList << staffMap
+		}
+	 return checkList
+	}
+}	
