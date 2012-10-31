@@ -306,14 +306,25 @@ class PersonController {
 	 *	Method to add Staff to project through Ajax Overlay 
 	 */
 	def saveProjectStaff = {
-    	def projectId = session.CURR_PROJ.CURR_PROJ
-    	def personId = params.person
-    	def roleType = params.roleType
-    	def submit = params.submit
-    	def projectParty = Project.findById( projectId )
-    	def personParty = Person.findById( personId )
-    	def projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
-    	redirect(action:'projectStaff', params:[projectId:projectId, submit:submit] )
+		def id = params.id
+		def compositeId = id.split("-")
+		def flag = false
+		if(compositeId){
+	    	def personId = compositeId[1]
+	    	def roleType = compositeId[2]
+			def projectId = compositeId[3]
+	    	def projectParty = Project.findById( projectId )
+	    	def personParty = Person.findById( personId )
+			if(params.val == "0"){
+				def projectStaff = partyRelationshipService.deletePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
+			}else{
+	    		def projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
+			}
+			
+			flag = projectStaff ? true : false
+		}
+		
+		render flag
     }
 	/*
 	 * Method to save person detais and create party relation with Project as well 
@@ -484,10 +495,11 @@ class PersonController {
 		def moveEvents = MoveEvent.findAll("from MoveEvent m where project =:project order by m.project.name , m.name asc",[project:project])
 		def staffList = getStaffList(project.id, currRole, currScale, currLoc)
 		
-		def eventCheckStatus = eventCheckStatus(staffList, moveEvents)
+		def eventCheckStatuses = eventCheckStatus(staffList, moveEvents)
+		def staffCheckStatus = staffCheckStatus(staffList,project)
 	    [projects:projects, projectId:project.id, roleTypes:roleTypes, staffList:staffList,
 			 moveEventList:getBundleHeader( moveEvents ), currRole:currRole, currLoc:currLoc,
-			 currPhase:currPhase, currScale:currScale, project:project, eventCheckStatus:eventCheckStatus]
+			 currPhase:currPhase, currScale:currScale, project:project, eventCheckStatus:eventCheckStatuses,staffCheckStatus:staffCheckStatus]
 		
 	}
 	
@@ -523,10 +535,14 @@ class PersonController {
 			moveEvents = MoveEvent.findAll("from MoveEvent m where project =:project order by m.project.name , m.name asc",[project:project])
 		}
 		def staffList = getStaffList(projectId,role,scale,location);
-		def eventCheckStatus = eventCheckStatus(staffList, moveEvents)
+		def eventCheckStatuses = eventCheckStatus(staffList, moveEvents)
+		def staffCheckStatuses = []
+		if(projectId!="0"){
+			 staffCheckStatuses = staffCheckStatus(staffList ,project)
+		}
 		
-		render(template:"projectStaffTable" ,model:[staffList:staffList, moveEventList:getBundleHeader(moveEvents),project:projectId,
-					eventCheckStatus:eventCheckStatus])
+		render(template:"projectStaffTable" ,model:[staffList:staffList, moveEventList:getBundleHeader(moveEvents),projectId:projectId,
+					eventCheckStatus:eventCheckStatuses, project:project,staffCheckStatus:staffCheckStatuses])
 		
 	}
 	
@@ -568,12 +584,14 @@ class PersonController {
 			def map = new HashMap()
 			def persomME = []
 			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $relation.party.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-			
+			def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdTo = $relation.party.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = '${relation.roleType.id}' ").partyIdFrom
 			map.put("company", company.partyIdFrom)
 			map.put("name", relation.party.firstName+" "+ relation.party.lastName)
 			map.put("role", relation.roleType)
 			map.put("staff", relation.party)
 			map.put("project",projectId)
+			map.put("roleId", relation.roleType.id)
+			map.put("staffProject", projectStaff?.name)
 		  
 			staffList << map
 		}
@@ -705,6 +723,28 @@ class PersonController {
 			}
 			staffMap.put((staffObj.staff.id+"_"+staffObj.role+'_'+staffObj.project), eventList)
 			checkList << staffMap
+		}
+	 return checkList
+	}
+	
+	/*
+	 * generates Project staff check box status and id
+	 * @param staffList : list of staff
+	 * @param project : instance of project for which generating result
+	 * @return : id and status of project related check box
+	 */
+	def staffCheckStatus(staffList, project){
+		def checkList = []
+		staffList.each { staffObj ->
+			def roleId = staffObj.role.id
+			def staffId = staffObj.staff.id
+			def projectStaff =PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $project.id and p.roleTypeCodeFrom = 'PROJECT' ")
+			def hasAssociation = projectStaff.find{it.partyIdTo.id == staffId && it.roleTypeCodeTo.id == roleId && it.partyIdFrom.id == it.partyIdFrom.id}
+			def checkMap = [:]
+			def checkId = "p-${staffObj.staff?.id}-${staffObj?.role?.id}-${project.id}" 
+			checkMap.put('id', checkId)
+			checkMap.put("status", hasAssociation ? 'checked="checked"' : '' )
+			checkList << [(staffObj.staff.id+"_"+staffObj.role+'_'+staffObj.project): [checkMap]]
 		}
 	 return checkList
 	}

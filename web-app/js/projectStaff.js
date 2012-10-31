@@ -158,3 +158,23 @@ function saveEventStaff(id){
 		}
 	});
 }
+/*
+ * Make a ajax call when user checks on checkbox for Project to save project staff
+ */
+function saveProjectStaff(id){
+	var val = $("[id='"+id+"']").val()
+	var params = {'id':id, 'val':val }
+	jQuery.ajax({
+		url:'../person/saveProjectStaff',
+		data: params,
+		type:'POST',
+		success: function(data) {
+			if(data=="false"){
+			   alert("An unexpected error occurred while attempting to update Person's MoveEvent  ")
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			alert("An unexpected error occurred while attempting to update Person's MoveEvent ")
+		}
+	});
+}

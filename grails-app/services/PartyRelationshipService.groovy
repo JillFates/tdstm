@@ -22,6 +22,21 @@ class PartyRelationshipService {
 			println"Exception-------------->"+e
 		}
     }
+	
+	/*
+	 * method to delete party Relationship
+	 */
+	def deletePartyRelationship( def relationshipType, def partyIdFrom, def roleTypeIdFrom, def partyIdTo, def roleTypeIdTo ) {
+		def partyRelationshipType = PartyRelationshipType.findById( relationshipType )
+		def roleTypeFrom = RoleType.findById( roleTypeIdFrom )
+		def roleTypeTo = RoleType.findById( roleTypeIdTo )
+		
+		def partyRelationInstance = PartyRelationship.findByStaffAndProjectAndRoleAndPartyRelationshipType(partyIdTo,partyIdFrom,roleTypeTo,partyRelationshipType)
+		partyRelationInstance.delete(flush:true)
+		return true
+	}
+	
+	
     /*
      *  Method to return Staff Company
      */

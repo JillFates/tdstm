@@ -33,4 +33,25 @@ class PartyRelationship implements Serializable {
 		
 	}
 	
+	/*
+	 * to get moveEventStaff object
+	 * @partyIdTo : instance of person for which need to get instance
+	 * @partyIdFrom : instance of  Project for which need to get instance
+	 * @roleTypeCodeTo : instance of Role for which need to get instance
+	 * @partyRelationshipType : instance of partyRelationshipType for which need to get instance
+	 * @return : PartyRelationship  instance
+	 */
+	
+	static def findByStaffAndProjectAndRoleAndPartyRelationshipType(partyIdTo, partyIdFrom, roleTypeCodeTo,partyRelationshipType){
+		def result = PartyRelationship.createCriteria().get {
+			and {
+				 eq('partyIdTo', partyIdTo )
+				 eq('partyIdFrom', partyIdFrom )
+				 eq('roleTypeCodeTo', roleTypeCodeTo )
+				 eq('partyRelationshipType', partyRelationshipType )
+			}
+		}
+		return result
+	}
+	
 }
