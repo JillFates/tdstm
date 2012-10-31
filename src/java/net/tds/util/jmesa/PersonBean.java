@@ -17,7 +17,16 @@ public class PersonBean implements Serializable {
 	private Date dateCreated;
 	private Date lastUpdated;
 	private Integer modelScore;
+	private String userCompany;
 	
+	public String getUserCompany() {
+		return userCompany;
+	}
+
+	public void setUserCompany(String userCompany) {
+		this.userCompany = userCompany;
+	}
+
 	public Integer getModelScore() {
 		return modelScore;
 	}

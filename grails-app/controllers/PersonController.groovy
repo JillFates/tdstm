@@ -25,31 +25,31 @@ class PersonController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 	// return Persons which are related to company
     def list = {
-		//def	projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
         def companyId = params.id
         List personInstanceList = new ArrayList()
         def companiesList
-        def query = "from PartyGroup as p where partyType = 'COMPANY' "
+        def query = "from PartyGroup as p where partyType = 'COMPANY' order by p.name "
         companiesList = PartyGroup.findAll( query )
+		def user = securityService.getUserLogin()
 		
-		if(params.companyName ){
-			companyId  = PartyGroup.findByName(params.companyName)?.id
-		}
-		if(params.companyName!="All"){
-			if( !companyId ){
+		if(params.containsKey("companyName") && params.companyName=="All"){
+			personInstanceList = Person.findAll( "from Person p order by p.lastName" )
+		} else {
+		    if(params.containsKey("companyName")){
+				if(params.companyName.isNumber()){
+					companyId  = PartyGroup.findByName(params.companyName)?.id
+				}
+			}else{
 				companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
+				if(!companyId){
+					def person = user.person
+					companyId = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${person.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ").partyIdFrom[0]?.id
+				}
 			}
+	        if ( companyId!= null && companyId != "" ) {
+	        	personInstanceList = partyRelationshipService.getCompanyStaff( companyId )     	
+	        } 
 		}
-		if(companyId == null && params.companyName=="All"){
-			personInstanceList = Person.findAll( "from Person" )
-		}
-        if ( companyId!= null && companyId != "" ) {
-        	
-        	personInstanceList = partyRelationshipService.getCompanyStaff( companyId )     	
-        } else if(params.companyName!="All"){
-        	flash.message = "Please select Company before navigating to Staff"
-            redirect(controller:'partyGroup',action:'list')
-        }
 		List personsList = new ArrayList()
 		personInstanceList.each{
 			PersonBean personBean = new PersonBean()
@@ -64,8 +64,10 @@ class PersonController {
 			} else {
 				personBean.setUserLogin("CREATE")
 			}
+			def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${it?.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")?.partyIdFrom
 			personBean.setDateCreated(it.dateCreated)
 			personBean.setLastUpdated(it.lastUpdated)
+			personBean.setUserCompany(userCompany.toString())
 			personsList.add(personBean)
 		}
 		// Statements for JMESA integration
@@ -678,10 +680,7 @@ class PersonController {
 		   def person = Person.get( personId )
 		   def moveEventStaff = MoveEventStaff.findAllByStaffAndEventAndRole(person, moveEvent, roleTypeInstance)
 		   if(moveEventStaff && params.val == "0"){
-			  if(! moveEventStaff.delete()){
-				  moveEventStaff.errors.allErrors.each{ println it}
-				  flag = false
-			  }
+			  moveEventStaff.delete()
 		   } else  if( !moveEventStaff ){
 		      def projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, roleType )
 			  moveEventStaff = new MoveEventStaff()

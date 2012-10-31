@@ -16,7 +16,7 @@
 	<div id="generalInfoId" class="person">
 		<input type="hidden" name="id" value="${person.id}">
 		<div class="dialog">
-			<table>
+			<table style="float: left;">
 				<tbody>
 					<tr class="prop">
 						<td valign="top" class="name"><label for="firstName"><b>First

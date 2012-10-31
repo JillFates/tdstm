@@ -128,7 +128,8 @@ td.errors input {
 
 table {
     border: 1px solid #63a242;
-    width: 100%
+    width: 100%;
+    float:left
 }
 tr {
     border: 0;
