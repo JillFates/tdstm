@@ -152,6 +152,7 @@ function saveEventStaff(id){
 			if(data=="false"){
 			   alert("An unexpected error occurred while attempting to update Person's MoveEvent  ")
 			}
+			loadFilteredStaff();
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while attempting to update Person's MoveEvent ")
@@ -172,6 +173,7 @@ function saveProjectStaff(id){
 			if(data=="false"){
 			   alert("An unexpected error occurred while attempting to update Person's MoveEvent  ")
 			}
+			loadFilteredStaff();
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while attempting to update Person's MoveEvent ")

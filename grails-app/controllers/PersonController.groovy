@@ -317,19 +317,22 @@ class PersonController {
 			def projectId = compositeId[3]
 	    	def projectParty = Project.findById( projectId )
 	    	def personParty = Person.findById( personId )
+            def projectStaff
 			if(params.val == "0"){
-				def projectStaff = partyRelationshipService.deletePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
+				projectStaff = partyRelationshipService.deletePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
+                def moveEvents = MoveEvent.findAllByProject(projectParty)
+                def results = MoveEventStaff.executeUpdate("delete from MoveEventStaff where moveEvent in (:moveEvents) and person = :person and role = :role",[moveEvents:moveEvents, person:personParty,role:RoleType.read(roleType)])
 			}else{
-	    		def projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
+	    		projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
 			}
-			
+
 			flag = projectStaff ? true : false
 		}
 		
 		render flag
     }
 	/*
-	 * Method to save person detais and create party relation with Project as well 
+	 * Method to save person details and create party relation with Project as well 
 	 */
 	def savePerson = {
 		def personInstance = new Person( params )
@@ -495,6 +498,8 @@ class PersonController {
 		def currPhase = userPreferenceService.getPreference("StaffingPhases")?:"All"
 		def currScale = userPreferenceService.getPreference("StaffingScale")?:"1"
 		def moveEvents = MoveEvent.findAll("from MoveEvent m where project =:project order by m.project.name , m.name asc",[project:project])
+        // Limit the events to today-30 days and newer (ie. don't show events over a month ago) 
+        moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > new Date().minus(30)}
 		def staffList = getStaffList(project.id, currRole, currScale, currLoc)
 		
 		def eventCheckStatuses = eventCheckStatus(staffList, moveEvents)
@@ -536,6 +541,8 @@ class PersonController {
 			project = Project.get(projectId)
 			moveEvents = MoveEvent.findAll("from MoveEvent m where project =:project order by m.project.name , m.name asc",[project:project])
 		}
+        // Limit the events to today-30 days and newer (ie. don't show events over a month ago) 
+        moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > new Date().minus(30)}
 		def staffList = getStaffList(projectId,role,scale,location);
 		def eventCheckStatuses = eventCheckStatus(staffList, moveEvents)
 		def staffCheckStatuses = []
@@ -583,22 +590,26 @@ class PersonController {
 		def partyRoles = PartyRole.findAll(queryForStaff,sqlArgs)
 
 		partyRoles.each { relation->
-			def map = new HashMap()
-			def persomME = []
-			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $relation.party.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-			def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdTo = $relation.party.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = '${relation.roleType.id}' ").partyIdFrom
-			map.put("company", company.partyIdFrom)
-			map.put("name", relation.party.firstName+" "+ relation.party.lastName)
-			map.put("role", relation.roleType)
-			map.put("staff", relation.party)
-			map.put("project",projectId)
-			map.put("roleId", relation.roleType.id)
-			map.put("staffProject", projectStaff?.name)
-		  
-			staffList << map
+            def person = Person.read(relation.party.id)
+            if(person.active == "Y"){
+                
+    			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $relation.party.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+    			def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdTo = $relation.party.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = '${relation.roleType.id}' ").partyIdFrom
+                
+                def map = new HashMap()
+                map.put("company", company.partyIdFrom)
+    			map.put("name", relation.party.firstName+" "+ relation.party.lastName)
+    			map.put("role", relation.roleType)
+    			map.put("staff", relation.party)
+    			map.put("project",projectId)
+    			map.put("roleId", relation.roleType.id)
+    			map.put("staffProject", projectStaff?.name)
+                
+    			staffList << map
+            }
 		}
 		
-		
+		staffList.sort{it?.staff?.lastName}
 		return staffList
 		
 	}
@@ -680,8 +691,8 @@ class PersonController {
 		   def person = Person.get( personId )
 		   def moveEventStaff = MoveEventStaff.findAllByStaffAndEventAndRole(person, moveEvent, roleTypeInstance)
 		   if(moveEventStaff && params.val == "0"){
-			  moveEventStaff.delete()
-		   } else  if( !moveEventStaff ){
+			  moveEventStaff.delete(flush:true)
+		   } else if( !moveEventStaff ){
 		      def projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, roleType )
 			  moveEventStaff = new MoveEventStaff()
 			  moveEventStaff.person = person

@@ -23,19 +23,19 @@
 	          						noSelection="${['0':'All']}"></g:select>
 	            	   </label>
 				   </td>
-				    <td>
+				    <%--<td>
 				       <span><b>Location</b></span><br/>
 					   <label for="location">
 	          				<g:select id="location" name="location"  from="${['All', 'Local']}"  value="${currLoc }" onChange="loadFilteredStaff()"></g:select>
 	            	   </label>
 				   </td>
-				   <td>
+				   --%><td>
 				      <span><b>Project</b></span><br/>
 					   <label for="project">
 	          				<g:select id="project" name="project"  from="${projects}"  noSelection="${['0':'All']}" value="${projectId}" optionKey="id" optionValue="name" onChange="loadFilteredStaff()"></g:select>
 	            	   </label>
 				   </td>
-					<td>
+					<%--<td>
 						<table style="border: 0px">
 							<tr>
 								<td><b>Phases</b></td>
@@ -67,7 +67,7 @@
 							</tr>
 						</table>
 					</td>
-					<td>
+					--%><td>
 				      <span><b>Scale</b></span><br/>
 					   <label for="scale">
 	          				<select id="scale" name="scale" onChange="loadFilteredStaff()">
