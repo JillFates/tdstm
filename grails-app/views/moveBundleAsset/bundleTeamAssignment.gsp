@@ -527,7 +527,7 @@
 		          	<div  id="processDiv" style="overflow:scroll; width:100%; display:none;">
 		          		<img src="../images/processing.gif"/>
 		          	</div>
-		           	<div  id="assetDiv" style="overflow:scroll; width:100%;">
+		           	<div  id="assetDiv" style="width:100%;">
 		            	<table id="assetTable">
 		              		<thead>
 		                		<tr>
