@@ -1161,6 +1161,13 @@ a.tab_deselect {
     padding: 5px 6px;
     text-align: left;
 }
+.person{
+	height : 550px;
+}
+.personTable{
+	float: left;
+	border: 0px;
+}
 
 a.task_action{float: left; position: relative; margin: 0 0 0 30px;cursor: pointer;}
 a.task_action span.task_icon{position: absolute; top: 0; left: 0;}

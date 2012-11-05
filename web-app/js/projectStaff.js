@@ -1,7 +1,8 @@
 /*
  * for making and Ajax call to load staff list using filters.  
  */
-
+var currentTabShow = "generalInfoShowId"
+var currentHeaderShow = "generalShowHeadId"
 function loadFilteredStaff() {
 	var role = $("#role").val()
 	var location = $("#location").val()
@@ -56,30 +57,37 @@ function unCheckAll() {
 /*
  * To open person's general info , Availabilty and TDS utility dialog
  */
-function loadPersonDiv(id,tab){
+function loadPersonDiv(personId,renderPage,redirectTo){
 	jQuery.ajax({
 		url : '../person/loadGeneral',
 		data : {
-			'personId' : id,'tab':tab
+			'personId' : personId,'tab':renderPage
 		},
 		type : 'POST',
 		success : function(data) {
-			
+			if(redirectTo == 'edit'){
+				currentTabShow = currentTabShow.replace('Show','Edit')
+				currentHeaderShow = currentHeaderShow.replace('Show','Edit')
+			}
 			$("#personGeneralViewId").html(data)
-			$("#personGeneralViewId").dialog('option', 'width', '375px')
+			$("#personGeneralViewId").dialog('option', 'width', '420px')
 			$("#personGeneralViewId").dialog('option', 'position', ['center','top']);
 			$(".person").hide()
-			$("#"+tab+"Id").show()
+			$("#"+currentTabShow).show()
+			$(".mobmenu").removeClass("mobselect")
+			$("#"+currentHeaderShow).addClass("mobselect")
 			$("#personGeneralViewId").dialog('open');
 		}
 	});
 	
 }
-function switchTab(id,tab,header){
-	$(".mobmenu").removeClass("mobselect")
-	$("#"+header).addClass("mobselect")
+function switchTab(id,divId,header){
 	$(".person").hide()
-	$("#"+tab).show()
+	currentTabShow = divId
+	currentHeaderShow = header
+	$(".mobmenu").removeClass("mobselect")
+	$("#"+currentHeaderShow).addClass("mobselect")
+	$("#"+currentTabShow).show()
 }
 
 /*
@@ -94,6 +102,12 @@ function updatePerson(tab,form){
 		type:'POST',
 		success: function(data) {
 			$('#personGeneralViewId').html(data)
+			currentTabShow = currentTabShow.replace('Edit','Show')
+			currentHeaderShow = currentHeaderShow.replace('Edit','Show')
+			$(".person").hide()
+			$("#"+currentTabShow).show()
+			$(".mobmenu").removeClass("mobselect")
+			$("#"+currentHeaderShow).addClass("mobselect")
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while attempting to update Person ")

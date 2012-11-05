@@ -12,12 +12,12 @@
 		</g:if>
 	</ul>
 </div>
-<div id="generalInfoShowId" class="person">
+<div id="generalInfoShowId" class="person" >
 	<g:form name="personDialogForm" action="updatePerson">
 		<div class="dialog">
 			<input type="hidden" name="id" value="${person.id}">
 			<div>
-				<table>
+				<table class="personTable">
 					<tbody>
 						<tr class="prop">
 							<td valign="top" class="name"><label for="firstName"><b>First
@@ -136,7 +136,7 @@
 
 <div id="availabilityShowId" class="person" style="display: none;">
 	<div>
-		<table style="border: 0px">
+		<table class="personTable">
 			<tbody id="blackOutDay" >
 				<tr>
 					<td><span><b>Available , except for the following dates</b></span></td>
@@ -156,8 +156,8 @@
 
 <div id="tdsUtilityShowId" class="person" style="display: none;">
 	<div class="dialog">
-          <div class="dialog" >
-            <table >
+          <div class="dialog">
+            <table class="personTable">
               <tbody class="personShow">
                 <tr class="prop">
 					<td valign="top" class="name personShow">
@@ -211,7 +211,7 @@
 </div>
 <div class="buttons">
 	<input class="save" type="button" id="edtBId" value="Edit"
-		onClick="loadPersonDiv(${person.id},'generalInfo')" /> <input
+		onClick="loadPersonDiv(${person.id},'generalInfo','edit')" /> <input
 		class="save" type="button" id="cancelBId" value="Cancel"
 		onClick="$('#personGeneralViewId').dialog('close')" />
 </div>

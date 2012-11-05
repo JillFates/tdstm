@@ -2,21 +2,21 @@
 
 <div class="menu4">
 	<ul>
-		<li><a href="#" id="generalHeadId" class="mobmenu mobselect"
-			onclick="switchTab(${person.id},'generalInfoId','generalHeadId')">General</a></li>
-		<li><a href="#" id="availHeadId" class="mobmenu"
-			onclick="switchTab(${person.id},'availabilityId','availHeadId')">Availability</a></li>
+		<li><a href="#" id="generalEditHeadId" class="mobmenu mobselect"
+			onclick="switchTab(${person.id},'generalInfoEditId','generalEditHeadId')">General</a></li>
+		<li><a href="#" id="availEditHeadId" class="mobmenu"
+			onclick="switchTab(${person.id},'availabilityEditId','availEditHeadId')">Availability</a></li>
 		<g:if test="${isProjMgr==true}">
-			<li><a href="#" id="tdsHeadId" class="mobmenu"
-				onclick="switchTab(${person.id},'tdsUtilityId','tdsHeadId')">TDS</a></li>
+			<li><a href="#" id="tdsEditHeadId" class="mobmenu"
+				onclick="switchTab(${person.id},'tdsUtilityEditId','tdsEditHeadId')">TDS</a></li>
 		</g:if>
 	</ul>
 </div>
 <g:form name="personDialogForm" action="updatePerson">
-	<div id="generalInfoId" class="person">
+	<div id="generalInfoEditId" class="person">
 		<input type="hidden" name="id" value="${person.id}">
 		<div class="dialog">
-			<table style="float: left;">
+			<table class="personTable">
 				<tbody>
 					<tr class="prop">
 						<td valign="top" class="name"><label for="firstName"><b>First
@@ -144,7 +144,7 @@
 
 	</div>
 
-	<div id="availabilityId" class="person" style="display: none;">
+	<div id="availabilityEditId" class="person" style="display: none;">
 		<div>
 			<script type="text/javascript" charset="utf-8">
 	jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
@@ -153,7 +153,7 @@
 		jQuery(function($){$(id).datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 }
 </script>
-			<table style="border: 0px">
+			<table class="personTable" >
 				<tbody id="blackOutDay">
 					<tr>
 						<td><span><b>Available , except for the following
@@ -182,32 +182,32 @@
 		</div>
 	</div>
 
-	<div id="tdsUtilityId" style="display: none;" class="person">
+	<div id="tdsUtilityEditId" style="display: none;" class="person">
 		<div class="dialog">
 			<div class="dialog">
-				<table>
+				<table class="personTable" >
 					<tbody>
 						<tr class="prop">
 							<td valign="top" class="name"><label for="keyWords">KeyWords
 									: </label></td>
-							<td valign="top" class="value" style="width: 40px"><input
-								type="text" maxlength="64" id="keyWordsId" name="keyWords"
+							<td valign="top" class="value" ><input
+								type="text" maxlength="64" id="keyWordsId" name="keyWords" size="40"
 								value="${person.keyWords}" /></td>
 						</tr>
 
 						<tr class="prop">
 							<td valign="top" class="name"><label for="tdsNote">TDS
 									Note:</label></td>
-							<td valign="top" class="value" colspan="2" width="50%"><input
+							<td valign="top" class="value" colspan="2" ><input
 								type="text" maxlength="64" id="tdsNoteId" name="tdsNote"
-								value="${person.tdsNote}" size="10" /></td>
+								value="${person.tdsNote}" size="40" /></td>
 						</tr>
 
 						<tr class="prop">
 							<td valign="top" class="name"><label for="tdsLink">TDS
 									Link</label></td>
 							<td valign="top" class="value" colspan="2"><input
-								type="text" id="tdsLinkId" name="tdsLink"
+								type="text" id="tdsLinkId" name="tdsLink" size="40"
 								value="${person.tdsLink}" /></td>
 						</tr>
 

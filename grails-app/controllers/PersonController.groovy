@@ -622,7 +622,7 @@ class PersonController {
 	def loadGeneral = {
 		def tab = params.tab ?: 'generalInfoShow'
 		def person = Person.get(params.personId)
-		def blackOutdays = person.blackOutDates
+		def blackOutdays = person.blackOutDates.sort{it.exceptionDay}
 		def subject = SecurityUtils.subject
 		def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $person.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ").partyIdFrom[0]
 		
