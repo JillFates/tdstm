@@ -23,6 +23,10 @@
 	          						noSelection="${['0':'All']}"></g:select>
 	            	   </label>
 				   </td>
+				   <td>
+				       <span><b>Only Assigned</b></span><br/>
+	          				<input type="checkbox" name="assigned" id="assignedId"  onChange="if(this.checked){this.value = 1} else {this.value = 0 };loadFilteredStaff()"/>
+				   </td>
 				    <%--<td>
 				       <span><b>Location</b></span><br/>
 					   <label for="location">
