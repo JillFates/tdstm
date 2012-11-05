@@ -589,29 +589,29 @@ class PersonController {
 		def partyRoles = PartyRole.findAll(queryForStaff,sqlArgs)
         def allProjRelations = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.roleTypeCodeFrom = 'PROJECT' ")
 		partyRoles.each { relation->
-            def person = Person.read(relation.party.id)
+            Party party = relation.party
+            def person = Person.read(party.id)
             if(person.active == "Y"){
                 def doAdd = true
                 if(assigned == "1"){
                     def hasProjReal
                     if(projectId != "0"){
-                        hasProjReal = allProjRelations.find{it.partyIdFrom?.id == project.id && it.partyIdTo?.id == relation.party?.id && it.roleTypeCodeTo.id == relation.roleType?.id}
+                        hasProjReal = allProjRelations.find{it.partyIdFrom?.id == project.id && it.partyIdTo?.id == party?.id && it.roleTypeCodeTo.id == relation.roleType?.id}
                     } else {
-                        hasProjReal = allProjRelations.find{it.partyIdTo.id == relation.party.id && it.roleTypeCodeTo.id == relation.roleType.id}
+                        hasProjReal = allProjRelations.find{it.partyIdTo.id == party.id && it.roleTypeCodeTo.id == relation.roleType.id}
                     }
                     if(!hasProjReal){
                         doAdd = false
                     }
                 }
                 if(doAdd){
-        			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $relation.party.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-					def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdTo = ${relation.party?.id} and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = '${relation.roleType?.id}' ")?.partyIdFrom
-
+        			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = '${party?.id}' and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+        			def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdTo = '${party?.id}' and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = '${relation.roleType?.id}' ")?.partyIdFrom
                     def map = new HashMap()
                     map.put("company", company.partyIdFrom)
-        			map.put("name", relation.party.firstName+" "+ relation.party.lastName)
+        			map.put("name", party.firstName+" "+ party.lastName)
         			map.put("role", relation.roleType)
-        			map.put("staff", relation.party)
+        			map.put("staff", party)
         			map.put("project",projectId)
         			map.put("roleId", relation.roleType.id)
         			map.put("staffProject", projectStaff?.name)
