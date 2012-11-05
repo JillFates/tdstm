@@ -36,9 +36,7 @@ class PersonController {
 			personInstanceList = Person.findAll( "from Person p order by p.lastName" )
 		} else {
 		    if(params.containsKey("companyName")){
-				if(params.companyName.isNumber()){
-					companyId  = PartyGroup.findByName(params.companyName)?.id
-				}
+				companyId  = PartyGroup.findByName(params.companyName)?.id
 			}else{
 				companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
 				if(!companyId){
