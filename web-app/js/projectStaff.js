@@ -8,6 +8,7 @@ function loadFilteredStaff() {
 	var location = $("#location").val()
 	var project = $("#project").val()
 	var scale = $("#scale").val()
+	var assigned = $("#assignedId").val()
 	var phaseArr = new Array();
 	if ($("#allPhase").val() == '1') {
 		phaseArr.push("all")
@@ -25,7 +26,8 @@ function loadFilteredStaff() {
 			'location' : location,
 			'project' : project,
 			'scale' : scale,
-			'phaseArr' : phaseArr
+			'phaseArr' : phaseArr,
+			'assigned' : assigned
 		},
 		type : 'POST',
 		success : function(data) {

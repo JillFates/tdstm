@@ -500,7 +500,7 @@ class PersonController {
 		def moveEvents = MoveEvent.findAll("from MoveEvent m where project =:project order by m.project.name , m.name asc",[project:project])
         // Limit the events to today-30 days and newer (ie. don't show events over a month ago) 
         moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > new Date().minus(30)}
-		def staffList = getStaffList(project.id, currRole, currScale, currLoc)
+		def staffList = getStaffList(project.id, currRole, currScale, currLoc, 0)
 		
 		def eventCheckStatuses = eventCheckStatus(staffList, moveEvents)
 		def staffCheckStatus = staffCheckStatus(staffList,project)
@@ -524,6 +524,7 @@ class PersonController {
 		def scale = params.scale
 		def location = params.location
 		def phase = params.list("phaseArr[]")
+		def assigned = params.assigned
 		userPreferenceService.setPreference("StaffingRole",role)
 		userPreferenceService.setPreference("StaffingLocation",location)
 		userPreferenceService.setPreference("StaffingPhases",phase.toString().replace("[", "").replace("]", ""))
@@ -543,7 +544,7 @@ class PersonController {
 		}
         // Limit the events to today-30 days and newer (ie. don't show events over a month ago) 
         moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > new Date().minus(30)}
-		def staffList = getStaffList(projectId,role,scale,location);
+		def staffList = getStaffList(projectId,role,scale,location,assigned);
 		def eventCheckStatuses = eventCheckStatus(staffList, moveEvents)
 		def staffCheckStatuses = []
 		if(projectId!="0"){
@@ -561,7 +562,7 @@ class PersonController {
 	 *@param scale - duration in month  to filter staff list
 	 *@param location - location to filter staff list
 	 */
-	def getStaffList(def projectId, def role, def scale, def location){
+	def getStaffList(def projectId, def role, def scale, def location,def assigned){
 		def project = Project.get( projectId )
 		def staffList = []
 
@@ -588,27 +589,38 @@ class PersonController {
 		queryForStaff.append("group by p.party, p.roleType order by p.party,p.roleType ")
 		
 		def partyRoles = PartyRole.findAll(queryForStaff,sqlArgs)
-
+        def allProjRelations = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.roleTypeCodeFrom = 'PROJECT' ")
 		partyRoles.each { relation->
             def person = Person.read(relation.party.id)
             if(person.active == "Y"){
-                
-    			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $relation.party.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-    			def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdTo = $relation.party.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = '${relation.roleType.id}' ").partyIdFrom
-                
-                def map = new HashMap()
-                map.put("company", company.partyIdFrom)
-    			map.put("name", relation.party.firstName+" "+ relation.party.lastName)
-    			map.put("role", relation.roleType)
-    			map.put("staff", relation.party)
-    			map.put("project",projectId)
-    			map.put("roleId", relation.roleType.id)
-    			map.put("staffProject", projectStaff?.name)
-                
-    			staffList << map
+                def doAdd = true
+                if(assigned == "1"){
+                    def hasProjReal
+                    if(projectId != "0"){
+                        hasProjReal = allProjRelations.find{it.partyIdFrom?.id == project.id && it.partyIdTo?.id == relation.party?.id && it.roleTypeCodeTo.id == relation.roleType?.id}
+                    } else {
+                        hasProjReal = allProjRelations.find{it.partyIdTo.id == relation.party.id && it.roleTypeCodeTo.id == relation.roleType.id}
+                    }
+                    if(!hasProjReal){
+                        doAdd = false
+                    }
+                }
+                if(doAdd){
+        			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $relation.party.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+        			def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdTo = $relation.party.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = '${relation.roleType.id}' ").partyIdFrom
+                    def map = new HashMap()
+                    map.put("company", company.partyIdFrom)
+        			map.put("name", relation.party.firstName+" "+ relation.party.lastName)
+        			map.put("role", relation.roleType)
+        			map.put("staff", relation.party)
+        			map.put("project",projectId)
+        			map.put("roleId", relation.roleType.id)
+        			map.put("staffProject", projectStaff?.name)
+                    
+    				staffList << map
+                }
             }
 		}
-		
 		staffList.sort{it?.staff?.lastName}
 		return staffList
 		
