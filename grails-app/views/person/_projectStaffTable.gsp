@@ -23,7 +23,7 @@
 					</span></td>
 				<td>
 					<span style="cursor: pointer;" id="${projectStaff?.staff.id}" onClick="loadPersonDiv(this.id,'generalInfoShow')">
-						${projectStaff?.company[0]}
+						${projectStaff?.company}
 					</span>
 				</td>
 				<td nowrap="nowrap">

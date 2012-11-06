@@ -566,6 +566,18 @@ class PersonController {
 	 *@param location - location to filter staff list
 	 */
 	def getStaffList(def projectId, def role, def scale, def location,def assigned){
+		def user = securityService.getUserLogin()
+		def loggedInPerson = user.person
+		def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' \
+												and p.partyIdTo = :partyIdTo and p.roleTypeCodeFrom = 'COMPANY' \
+												and p.roleTypeCodeTo = 'STAFF' ",[partyIdTo:loggedInPerson]).partyIdFrom
+		
+        def subject = SecurityUtils.subject
+        def isProjMgr
+        if( subject.hasRole("PROJ_MGR") && userCompany.name == "TDS"){
+            isProjMgr = true
+        }
+        
 		def project = Project.get( projectId )
 		def staffList = []
 
@@ -596,6 +608,7 @@ class PersonController {
 		partyRoles.each { relation->
             Party party = relation.party
             def person = Person.read(party.id)
+            def addComUsers = isProjMgr ?: false
             if(person.active == "Y"){
                 def doAdd = true
                 if(assigned == "1"){
@@ -611,19 +624,33 @@ class PersonController {
                     }
                 }
                 if(doAdd){
-        			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = :party "+
-                                                            "and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'",[party:party])
-        			def projectStaff = allProjRelations.findAll{it.partyIdTo.id == party.id && it.roleTypeCodeTo.id == relation.roleType.id}?.partyIdFrom
-                    def map = new HashMap()
-                    map.put("company", company.partyIdFrom)
-        			map.put("name", party.firstName+" "+ party.lastName)
-        			map.put("role", relation.roleType)
-        			map.put("staff", party)
-        			map.put("project",projectId)
-        			map.put("roleId", relation.roleType.id)
-        			map.put("staffProject", projectStaff?.name)
-                    
-    				staffList << map
+					
+        			def company = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = :party "+
+                                                            "and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'",[party:party]).partyIdFrom
+					if(!isProjMgr){
+    					if(company.id == userCompany.id){
+    						addComUsers = true
+    					} else if(projectId != "0" ){
+    						def hasProjReal = allProjRelations.find{it.partyIdFrom?.id == project.id && it.partyIdTo?.id == party?.id && 
+                                                                it.roleTypeCodeTo.id == relation.roleType?.id}
+                            if(hasProjReal){
+                                addComUsers = true
+                            }
+    					}
+					}
+					if( addComUsers ){
+	        			def projectStaff = allProjRelations.findAll{it.partyIdTo.id == party.id && it.roleTypeCodeTo.id == relation.roleType.id}?.partyIdFrom
+	                    def map = new HashMap()
+	                    map.put("company", company)
+	        			map.put("name", party.firstName+" "+ party.lastName)
+	        			map.put("role", relation.roleType)
+	        			map.put("staff", party)
+	        			map.put("project",projectId)
+	        			map.put("roleId", relation.roleType.id)
+	        			map.put("staffProject", projectStaff?.name)
+					
+	    				staffList << map
+					}
                 }
             }
 		}
