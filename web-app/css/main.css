@@ -281,6 +281,7 @@ th.desc a {
     margin-top: 5px;
     overflow: hidden;
     padding: 0;
+    float: left;
 }
 
 .buttons input {
