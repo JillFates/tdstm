@@ -48,7 +48,7 @@ class Person extends Party {
 		 tdsNote( blank:true, nullable:true )
 		 tdsLink( blank:true, nullable:true )
 		 staffType( blank:false, nullable:false, inList:['Contractor', 'Hourly', 'Salary'])
-		 travelOK( blank:true, nullable:true )
+		 travelOK( nullable:true )
 		 
 	 }
 
@@ -66,6 +66,7 @@ class Person extends Party {
 			nickName sqlType:'varchar(34)'
 			title sqlType:'varchar(34)'
 			active sqlType:'char(1)'
+            travelOK sqlType: 'tinyint'
 		}
 	}
 
