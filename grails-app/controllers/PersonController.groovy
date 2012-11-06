@@ -41,7 +41,9 @@ class PersonController {
 				companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
 				if(!companyId){
 					def person = user.person
-					companyId = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${person.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ").partyIdFrom[0]?.id
+					companyId = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+
+                                                            "and p.partyIdTo = :partyIdTo and p.roleTypeCodeFrom = 'COMPANY' "+
+                                                            "and p.roleTypeCodeTo = 'STAFF' ",[partyIdTo:person]).partyIdFrom[0]?.id
 				}
 			}
 	        if ( companyId!= null && companyId != "" ) {
@@ -62,7 +64,8 @@ class PersonController {
 			} else {
 				personBean.setUserLogin("CREATE")
 			}
-			def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${it?.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")?.partyIdFrom
+			def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = :partyTo"+
+                                            " and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'",[partyTo:it])?.partyIdFrom
 			personBean.setDateCreated(it.dateCreated)
 			personBean.setLastUpdated(it.lastUpdated)
 			personBean.setUserCompany(userCompany.toString())
@@ -239,7 +242,8 @@ class PersonController {
         def map = new HashMap()
         def personInstance = Person.get( params.id )
         def role = params.role
-        def company = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $personInstance.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'")
+        def company = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = :person "+
+                                            "and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'", [person:personInstance])
         if(company == null){
         	map.put("companyId","")
         }else{
@@ -300,7 +304,8 @@ class PersonController {
 		def projectStaff = partyRelationshipService.getProjectStaff( projectId )	
 		def companiesStaff = partyRelationshipService.getProjectCompaniesStaff( projectId,'' )
 		def projectCompanies = partyRelationshipService.getProjectCompanies( projectId )
-		return [ projectStaff:projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies, projectId:projectId, submit:submit, personHasPermission:RolePermissions.hasPermission("AddPerson") ]
+		return [ projectStaff:projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies, 
+                projectId:projectId, submit:submit, personHasPermission:RolePermissions.hasPermission("AddPerson") ]
 	}
 	/*
 	 *	Method to add Staff to project through Ajax Overlay 
@@ -596,7 +601,8 @@ class PersonController {
                 if(assigned == "1"){
                     def hasProjReal
                     if(projectId != "0"){
-                        hasProjReal = allProjRelations.find{it.partyIdFrom.id == project.id && it.partyIdTo.id == party?.id && it.roleTypeCodeTo.id == relation.roleType.id}
+                        hasProjReal = allProjRelations.find{it.partyIdFrom?.id == project.id && it.partyIdTo?.id == party?.id && 
+                                                            it.roleTypeCodeTo.id == relation.roleType?.id}
                     } else {
                         hasProjReal = allProjRelations.find{it.partyIdTo.id == party.id && it.roleTypeCodeTo.id == relation.roleType.id}
                     }
@@ -761,7 +767,8 @@ class PersonController {
 		staffList.each { staffObj ->
 			def roleId = staffObj.role.id
 			def staffId = staffObj.staff.id
-			def projectStaff =PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $project.id and p.roleTypeCodeFrom = 'PROJECT' ")
+			def projectStaff =PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' "+
+                                                        "and p.partyIdFrom = $project.id and p.roleTypeCodeFrom = 'PROJECT' ")
 			def hasAssociation = projectStaff.find{it.partyIdTo.id == staffId && it.roleTypeCodeTo.id == roleId && it.partyIdFrom.id == it.partyIdFrom.id}
 			def checkMap = [:]
 			def checkId = "p-${staffObj.staff?.id}-${staffObj?.role?.id}-${project.id}" 
