@@ -613,7 +613,7 @@ class PersonController {
                 if(doAdd){
         			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = :party "+
                                                             "and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'",[party:party])
-        			def projectStaff = allProjRelations.find{it.partyIdTo.id == party.id && it.roleTypeCodeTo.id == relation.roleType.id}?.partyIdFrom
+        			def projectStaff = allProjRelations.findAll{it.partyIdTo.id == party.id && it.roleTypeCodeTo.id == relation.roleType.id}?.partyIdFrom
                     def map = new HashMap()
                     map.put("company", company.partyIdFrom)
         			map.put("name", party.firstName+" "+ party.lastName)

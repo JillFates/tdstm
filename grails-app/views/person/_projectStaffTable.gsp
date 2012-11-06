@@ -34,7 +34,7 @@
 				<g:if test="${projectId=='0'}">
 				 <td style="cursor: pointer;" nowrap="nowrap">
 				    <span  id="projectList_${projectStaff?.staff.id}_${projectStaff?.role}"  onClick="loadPersonDiv(this.id,'generalInfoShow')" title="${projectStaff?.staffProject.toString().replace('[','').replace(']','')}" >
-						${projectStaff?.staffProject?.size() > 1 ? 'mutiple' : projectStaff?.staffProject[0]}
+						${projectStaff?.staffProject.size() > 1 ? 'mutiple' : projectStaff?.staffProject[0]}
 					</span>
 				 </td>
 				</g:if>
