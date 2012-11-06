@@ -596,7 +596,7 @@ class PersonController {
                 if(assigned == "1"){
                     def hasProjReal
                     if(projectId != "0"){
-                        hasProjReal = allProjRelations.find{it.partyIdFrom?.id == project.id && it.partyIdTo?.id == party?.id && it.roleTypeCodeTo.id == relation.roleType?.id}
+                        hasProjReal = allProjRelations.find{it.partyIdFrom.id == project.id && it.partyIdTo.id == party?.id && it.roleTypeCodeTo.id == relation.roleType.id}
                     } else {
                         hasProjReal = allProjRelations.find{it.partyIdTo.id == party.id && it.roleTypeCodeTo.id == relation.roleType.id}
                     }
@@ -605,7 +605,8 @@ class PersonController {
                     }
                 }
                 if(doAdd){
-        			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = '${party?.id}' and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+        			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = :party "+
+                                                            "and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'",[party:party])
         			def projectStaff = allProjRelations.find{it.partyIdTo.id == party.id && it.roleTypeCodeTo.id == relation.roleType.id}?.partyIdFrom
                     def map = new HashMap()
                     map.put("company", company.partyIdFrom)
@@ -635,7 +636,8 @@ class PersonController {
 		def person = Person.get(params.personId)
 		def blackOutdays = person.blackOutDates.sort{it.exceptionDay}
 		def subject = SecurityUtils.subject
-		def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $person.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ").partyIdFrom[0]
+		def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = :person"+
+                                                " and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ",[person:person]).partyIdFrom[0]
 		
 		def rolesForPerson = PartyRole.findAll("from PartyRole where party = :person and roleType.description like 'staff%' group by roleType",[person:person])?.roleType
 		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
@@ -644,8 +646,8 @@ class PersonController {
 			isProjMgr = true
 		}
 		
-		render(template:tab ,model:[person:person, company:company, rolesForPerson:rolesForPerson, availabaleRoles:availabaleRoles, sizeOfassigned:(rolesForPerson.size()+1),
-			blackOutdays:blackOutdays, isProjMgr:isProjMgr])
+		render(template:tab ,model:[person:person, company:company, rolesForPerson:rolesForPerson, availabaleRoles:availabaleRoles, 
+            sizeOfassigned:(rolesForPerson.size()+1), blackOutdays:blackOutdays, isProjMgr:isProjMgr])
 			
 	}
 	
