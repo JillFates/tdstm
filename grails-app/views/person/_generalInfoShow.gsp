@@ -213,5 +213,5 @@
 	<input class="save" type="button" id="edtBId" value="Edit"
 		onClick="loadPersonDiv(${person.id},'generalInfo','edit')" /> <input
 		class="save" type="button" id="cancelBId" value="Cancel"
-		onClick="$('#personGeneralViewId').dialog('close')" />
+		onClick="closePersonDiv('personGeneralViewId')"/>
 </div>

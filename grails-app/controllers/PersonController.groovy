@@ -496,6 +496,14 @@ class PersonController {
 		def role = params.role ? params.role : "MOVE_TECH"
 		def moveEventList = []
 		
+		def user = securityService.getUserLogin()
+		def loggedInPerson = user.person
+		def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' \
+                                        			and p.partyIdTo = :partyIdTo and p.roleTypeCodeFrom = 'COMPANY' \
+                                        			and p.roleTypeCodeTo = 'STAFF' ",[partyIdTo:loggedInPerson]).partyIdFrom
+		
+		def isTdsEmp = userCompany.name == "TDS" ? true :false
+		
 		def currRole = userPreferenceService.getPreference("StaffingRole")?:"MOVE_TECH"
 		def currLoc = userPreferenceService.getPreference("StaffingLocation")?:"All"
 		def currPhase = userPreferenceService.getPreference("StaffingPhases")?:"All"
@@ -509,7 +517,8 @@ class PersonController {
 		def staffCheckStatus = staffCheckStatus(staffList,project)
 	    [projects:projects, projectId:project.id, roleTypes:roleTypes, staffList:staffList,
 			 moveEventList:getBundleHeader( moveEvents ), currRole:currRole, currLoc:currLoc,
-			 currPhase:currPhase, currScale:currScale, project:project, eventCheckStatus:eventCheckStatuses,staffCheckStatus:staffCheckStatus]
+			 currPhase:currPhase, currScale:currScale, project:project, eventCheckStatus:eventCheckStatuses,staffCheckStatus:staffCheckStatus,
+			 isTdsEmp:isTdsEmp]
 		
 	}
 	

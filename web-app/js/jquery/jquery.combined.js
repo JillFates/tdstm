@@ -7638,7 +7638,10 @@ $.widget("ui.dialog", {
 				})
 				.click(function(event) {
 					self.close(event);
-					if(B2 != '' && taskManagerTimePref != 0){
+					if($('#manageStaff').val()){
+						closePersonDiv('personGeneralViewId');
+					}
+					if( taskManagerTimePref != 0 && B2 != ''){
 						 B2.Restart(taskManagerTimePref);
 					}
 					if($("#selectTimedId").length > 0){

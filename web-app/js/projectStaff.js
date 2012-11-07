@@ -196,3 +196,11 @@ function saveProjectStaff(id){
 		}
 	});
 }
+/*
+ * To Close dialog and set global variable again on default.
+ */
+function closePersonDiv(divId){
+	currentTabShow = "generalInfoShowId"
+	currentHeaderShow = "generalShowHeadId"
+	$('#'+divId).dialog('close')
+}

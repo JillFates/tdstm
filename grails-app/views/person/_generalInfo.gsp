@@ -242,6 +242,6 @@
 	<input class="save" type="button" id="updateBId" value="Update"
 		onClick="updatePerson('generalInfoShow','personDialogForm')" /> <input
 		class="save" type="button" id="cancelBId" value="Cancel"
-		onClick="$('#personGeneralViewId').dialog('close')" />
+		onClick="closePersonDiv('personGeneralViewId')" />
 </div>
 

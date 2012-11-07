@@ -33,11 +33,21 @@
 	          				<g:select id="location" name="location"  from="${['All', 'Local']}"  value="${currLoc }" onChange="loadFilteredStaff()"></g:select>
 	            	   </label>
 				   </td>
-				   --%><td>
-				      <span><b>Project</b></span><br/>
-					   <label for="project">
-	          				<g:select id="project" name="project"  from="${projects}"  noSelection="${['0':'All']}" value="${projectId}" optionKey="id" optionValue="name" onChange="loadFilteredStaff()"></g:select>
-	            	   </label>
+				   --%>
+				   <td>
+					    <span><b>Project</b></span><br/>
+						<label for="project">
+							<select id="project" name="project" onChange="loadFilteredStaff()">
+								<g:if test="${isTdsEmp}">
+								    <option value="0">All</option>
+								</g:if>
+								<g:each in="${projects}" var="project">
+									<option value="${project.id}" ${project.id == projectId ? 'selected="selected"' : ''}>
+										${project.name}
+									</option>
+								</g:each>
+							</select>
+						</label>
 				   </td>
 					<%--<td>
 						<table style="border: 0px">
@@ -85,6 +95,7 @@
 				</tr>            
             </table>
             <br/>
+            <input type="hidden" id="manageStaff" value="manageStaff">
             <div id="projectStaffTableId">
             	<g:render template="projectStaffTable"></g:render>
             </div>
