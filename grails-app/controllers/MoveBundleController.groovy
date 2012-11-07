@@ -184,7 +184,6 @@ class MoveBundleController {
 
 	def update = {
 		def moveBundleInstance = MoveBundle.get( params.id )
-		def projectId =  getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def projectManagerId = params.projectManager
 		def moveManagerId = params.moveManager
 		if( moveBundleInstance ) {
@@ -250,13 +249,16 @@ class MoveBundleController {
 				//	get the all Dashboard Steps that are associated to moveBundle.project
 				def allDashboardSteps = moveBundleService.getAllDashboardSteps( moveBundleInstance )
 				def remainingSteps = allDashboardSteps.remainingSteps
-
+				
 				moveBundleInstance.discard()
-				def managers = partyRelationshipService.getProjectStaff( projectId )
+				def project = securityService.getUserCurrentProject()
+				def managers = partyRelationshipService.getProjectStaff( project.id )
 				def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'PROJ_MGR' ")
 				def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-				render(view:'edit',model:[moveBundleInstance:moveBundleInstance, projectId: projectId, managers: managers, projectManager: projectManagerId,
-							moveManager: moveManagerId, dashboardSteps:allDashboardSteps.dashboardSteps, remainingSteps : remainingSteps ])
+				def workflowCodes = stateEngineService.getWorkflowCode()
+				def rooms = Room.findAllByProject( project )
+				render(view:'edit',model:[moveBundleInstance:moveBundleInstance, projectId: project.id, managers: managers, projectManager: projectManagerId,
+							moveManager: moveManagerId, dashboardSteps:allDashboardSteps.dashboardSteps, remainingSteps : remainingSteps,rooms:rooms,workflowCodes:workflowCodes ])
 			}
 		}
 		else {
@@ -294,11 +296,10 @@ class MoveBundleController {
 		params.targetRoom = params.targetRoom ? Room.read( params.targetRoom ) : null
 
 		def moveBundleInstance = new MoveBundle(params)
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def project = securityService.getUserCurrentProject()
 		def projectManager = params.projectManager
 		def moveManager = params.moveManager
-		def managers = partyRelationshipService.getProjectStaff( projectId )
-		def projectInstance = Party.findById( projectId )
+		def managers = partyRelationshipService.getProjectStaff( project.id )
 		if(params.useOfPlanning){
 			moveBundleInstance.useOfPlanning = true
 		}else{
@@ -319,7 +320,8 @@ class MoveBundleController {
 		}
 		else {
 			def workflowCodes = stateEngineService.getWorkflowCode()
-			render(view:'create',model:[moveBundleInstance:moveBundleInstance, managers: managers, projectManager: projectManager, moveManager: moveManager,workflowCodes:workflowCodes])
+			def rooms = Room.findAllByProject( project )
+			render(view:'create',model:[moveBundleInstance:moveBundleInstance, managers: managers, projectManager: projectManager, moveManager: moveManager,workflowCodes:workflowCodes,rooms:rooms])
 		}
 	}
 

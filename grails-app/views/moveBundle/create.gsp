@@ -191,12 +191,12 @@
               <tr>
               <td valign="top" class="name"><label for="workflowCode"><b>WorkFlow	Code:&nbsp;<span style="color: red">*</span></b></label></td>
 				<td valign="top"
-					class="value ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
+					class="value ${hasErrors(bean:moveBundleInstance,field:'workflowCode','errors')}">
 				<g:select id="workflowCode" name="workflowCode"
 					from="${workflowCodes}"
 					value="${projectInstance?.workflowCode}" noSelection="['':'Please Select']"></g:select>
-					<g:hasErrors bean="${projectInstance}" field="workflowCode">
-					<div class="errors"><g:renderErrors bean="${projectInstance}"
+					<g:hasErrors bean="${moveBundleInstance}" field="workflowCode">
+					<div class="errors"><g:renderErrors bean="${moveBundleInstance}"
 						as="list" field="workflowCode" /></div>
 				</g:hasErrors></td>
               </tr>
