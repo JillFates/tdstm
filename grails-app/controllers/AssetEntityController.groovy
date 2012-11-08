@@ -3457,14 +3457,18 @@ class AssetEntityController {
 					if(labels.contains("apps"))
 						name = it.asset.assetName
 					shape = "gray"
-				} else if(['VM','Server'].contains(it.asset.assetType)){
+				} else if(['VM','Server','Blade'].contains(it.asset.assetType)){
 					if(labels.contains("servers"))
 						name = it.asset.assetName
 					shape = "square"
-				} else if(['Database','Files'].contains(it.asset.assetType)){
-					if(labels.contains("files"))
+				} else if(it.asset.assetType == 'Database'){
+					if(labels.contains("databases"))
 						name = it.asset.assetName
 					shape = "triangle-up"
+				} else if(it.asset.assetType == 'Files'){
+					if(labels.contains("files"))
+						name = it.asset.assetName
+					shape = "diamond"
 				}
 				def moveEventName = it.asset.moveBundle?.moveEvent?.name
 				graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle, 
@@ -3554,14 +3558,18 @@ class AssetEntityController {
 				if(labels.contains("apps"))
 					name = it.asset.assetName
 				shape = "circle"
-			} else if(['VM','Server'].contains(it.asset.assetType)){
+			} else if(['VM','Server','Blade'].contains(it.asset.assetType)){
 				if(labels.contains("servers"))
 					name = it.asset.assetName
 				shape = "square"
-			} else if(['Database','Files'].contains(it.asset.assetType)){
-				if(labels.contains("files"))
+			} else if(it.asset.assetType == 'Database'){
+				if(labels.contains("databases"))
 					name = it.asset.assetName
 				shape = "triangle-up"
+			} else if(it.asset.assetType == 'Files'){
+				if(labels.contains("files"))
+					name = it.asset.assetName
+				shape = "diamond"
 			}
 			def moveEventName = it.asset.moveBundle?.moveEvent?.name
 				graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle, 

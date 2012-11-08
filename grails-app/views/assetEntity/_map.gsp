@@ -46,49 +46,73 @@
 					</tr>
 					<tr>
 						<g:if test="${labels?.contains('apps')}">
+						   <td><img src="${createLinkTo(dir:'images',file:'iconApp.png')}" height="14" /></td>
 							<td colspan="2" style="padding: 0px;">
 								<input type="checkbox" id="apps" name="labels" value="apps" checked="checked" class="pointer">
 								<label for="apps" style="vertical-align: text-top;">Apps &nbsp;&nbsp;&nbsp;
-								<img src="${createLinkTo(dir:'images',file:'iconApp.png')}" height="14" /></label>
+								</label>
 							</td>
 						</g:if>
 						<g:else>
+						  	<td><img src="${createLinkTo(dir:'images',file:'iconApp.png')}" height="14" /></td>
 						    <td colspan="2" style="padding: 0px;">
 						    	<input type="checkbox" id="appLabel" name="labels" value="apps" class="pointer"/>
 						    	<label for="appLabel" style="vertical-align: text-top;">Apps &nbsp;&nbsp;&nbsp;
-								<img src="${createLinkTo(dir:'images',file:'iconApp.png')}" height="14" /></label>
+								</label>
 						    </td>
 						</g:else>
 					</tr>
 					<tr>
 						<g:if test="${labels?.contains('servers')}">
+						 	<td><img src="${createLinkTo(dir:'images',file:'iconServer.png')}" height="14" /></td>
 							<td colspan="2" style="padding: 0px;">
 								<input type="checkbox" name="labels" id="servers" checked="checked" value="servers" class="pointer"/>
 								<label for="servers" style="vertical-align: text-top;">Servers
-								<img src="${createLinkTo(dir:'images',file:'iconServer.png')}" height="14" /></label>
+								</label>
 							</td>
 						</g:if>
 						<g:else>
+							<td><img src="${createLinkTo(dir:'images',file:'iconServer.png')}" height="14" /></td>
 							<td colspan="2" style="padding: 0px;">
 								<input type="checkbox" id="serverLabel" name="labels" value="servers" title= "Servers" class="pointer"/>
 								<label for="serverLabel" style="vertical-align: text-top;">Servers
-								<img src="${createLinkTo(dir:'images',file:'iconServer.png')}" height="14" /></label>
+								</label>
+							</td>
+						</g:else>
+					</tr>
+					<tr>
+						<g:if test="${labels?.contains('databases')}">
+							<td><img src="${createLinkTo(dir:'images',file:'iconDB.png')}" height="14" /></td>
+							<td colspan="2" style="padding: 0px;">
+								<input type="checkbox" name="labels" id="dbs" checked="checked" value="databases" class="pointer"/>
+								<label for="dbs" style="vertical-align: text-top;">DB
+								</label>
+							</td>
+						</g:if>
+						<g:else>
+							<td><img src="${createLinkTo(dir:'images',file:'iconDB.png')}" height="14" /></td>
+							<td colspan="2" style="padding: 0px;">
+								<input type="checkbox" id="dbsLabel" name="labels" value="databases" class="pointer"/>
+								<label for="dbsLabel" style="vertical-align: text-top;">DB
+								</label>
 							</td>
 						</g:else>
 					</tr>
 					<tr>
 						<g:if test="${labels?.contains('files')}">
+							<td><img src="${createLinkTo(dir:'images',file:'iconDB.png')}" height="14" /></td>
 							<td colspan="2" style="padding: 0px;">
-								<input type="checkbox" name="labels" id="dbs" checked="checked" value="files" class="pointer"/>
-								<label for="dbs" style="vertical-align: text-top;">DB/Storage
-								<img src="${createLinkTo(dir:'images',file:'iconDB.png')}" height="14" /></label>
+								<input type="checkbox" name="labels" id="filesLabel" checked="checked" value="files" class="pointer"/>
+								<label for="filesLabel" style="vertical-align: text-top;">Storage
+								</label>
 							</td>
 						</g:if>
 						<g:else>
+							<td><img src="${createLinkTo(dir:'images',file:'iconStorage.png')}" height="21" /></td>
 							<td colspan="2" style="padding: 0px;">
 								<input type="checkbox" id="filesLabel" name="labels" value="files" class="pointer"/>
-								<label for="filesLabel" style="vertical-align: text-top;">DB/Storage
-								<img src="${createLinkTo(dir:'images',file:'iconDB.png')}" height="14" /></label>
+								<label for="filesLabel" style="vertical-align: text-top;">Storage
+								</label>
 							</td>
 						</g:else>
 					</tr>
@@ -100,27 +124,31 @@
 				</table>
 			</div>
 			<div id="legendDivId" style="float: left;border: 1px solid #ccc;margin-left: 3px;margin-top: 3px;width: 178px; background-color:white;position: absolute;display: none;">
-			<table id="legendId" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;width: 148px;" >
-				<tr><td style="padding: 3px 3px;"><h3>Legend</h3></td></tr>
-					<tr><td ><span style="color: blue;"><h4>Nodes:</h4></span></td></tr>
+			<table id="legendId" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;width: 140px;" >
+				<tr><td style="padding: 3px 3px;" colspan="2"><h3>Legend</h3></td></tr>
+					<tr><td colspan="2"><span style="color: blue;"><h4>Nodes:</h4></span></td></tr>
 					<tr>
-						<td nowrap="nowrap"><img src="${createLinkTo(dir:'images',file:'iconApp.png')}"
-							height="14" />&nbsp;&nbsp;<span style="vertical-align: text-top;">Apps</span></td>
+						<td nowrap="nowrap" ><img src="${createLinkTo(dir:'images',file:'iconApp.png')}"
+							height="14" /></td><td><span style="vertical-align: text-top;">Apps</span></td>
 					</tr>
 					<tr>
-						<td nowrap="nowrap"><img src="${createLinkTo(dir:'images',file:'iconServer.png')}"
-							height="14" />&nbsp;&nbsp;<span style="vertical-align: text-top;">Servers</span></td>
+						<td nowrap="nowrap" ><img src="${createLinkTo(dir:'images',file:'iconServer.png')}"
+							height="14" /></td><td><span style="vertical-align: text-top;">Servers</span></td>
+					</tr>
+					<tr>
+						<td nowrap="nowrap" ><img
+							src="${createLinkTo(dir:'images',file:'iconDB.png')}" height="14" /></td>
+							<td><span style="vertical-align: text-top;">DB</span></td>
 					</tr>
 					<tr>
 						<td nowrap="nowrap"><img
-							src="${createLinkTo(dir:'images',file:'iconDB.png')}" height="14" />&nbsp;
-							<span style="vertical-align: text-top;">DB/Storage</span>
-						</td>
+							src="${createLinkTo(dir:'images',file:'iconStorage.png')}" height="21" /></td>
+							<td><span style="vertical-align: text-top;">Storage</span></td>
 					</tr>
-					<tr><td><hr style="width: 60px;color:rgb(56,56,56);"></hr></td><td>Valid Links</td></tr>
-					<tr><td><hr style="width: 60px;color:red;"></hr></td><td>Questioned</td></tr>
-					<tr><td><hr style="width: 60px;color:rgb(224,224,224);"></hr></td><td>N/A</td></tr>
-					<tr><td nowrap="nowrap" ><span style="color: Gray;"><h4>Move Events:</h4></span></td></tr>
+					<tr><td width="5px"><hr style="width: 30px;color:rgb(56,56,56);"></hr></td><td>Valid Links</td></tr>
+					<tr><td><hr style="width: 30px;color:red;"></hr></td><td>Questioned</td></tr>
+					<tr><td><hr style="width: 30px;color:rgb(224,224,224);"></hr></td><td>N/A</td></tr>
+					<tr><td nowrap="nowrap" colspan="2"><span style="color: Gray;"><h4>Move Events:</h4></span></td></tr>
 					<g:each in="${eventColorCode}" var="color">
 						<tr>
 						   <td><input type="text" size="1"
@@ -136,7 +164,7 @@
 								style="border: 2px solid red;height:5px;width:5px;" />
 						</td>
 						<td nowrap="nowrap">
-								Event N/A
+								No Event
 						</td>
 					</tr>
 			</table>
