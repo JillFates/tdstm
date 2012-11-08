@@ -83,7 +83,7 @@
         	                 	<span onclick="javascript:getEntityDetails('listComment', '${commentInstance.assetType}', '${commentInstance.assetEntityId}');">${commentInstance.assetName}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn width="50px" property="assetType" sortable="true" filterable="true" title="AssetType">
-                	         	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance?.assetType}</span>
+                	         	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance?.assetType == 'Files' ? 'Storage' : commentInstance?.assetType}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn width="50px" property="category" sortable="true" filterable="true" title="category">
                              	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.category}</span>

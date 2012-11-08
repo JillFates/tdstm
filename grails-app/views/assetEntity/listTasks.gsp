@@ -116,7 +116,7 @@
         	                 	<span onclick="javascript:getEntityDetails('listComment', '${commentInstance.assetType}', '${commentInstance.assetEntityId}');">${commentInstance.assetName}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn width="50px" property="assetType" sortable="true" filterable="true" title="AssetType">
-                	         	<span id="assetType_${commentInstance?.id}" onclick="getActionBar(this.id)">${commentInstance?.assetType}</span>
+                	         	<span id="assetType_${commentInstance?.id}" onclick="getActionBar(this.id)">${commentInstance?.assetType == 'Files' ? 'Storage' : commentInstance?.assetType}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="lastUpdated" title="Updated" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 								<span id="lastUpdated_${commentInstance?.id}" onclick="getActionBar(this.id)" class="span_${commentInstance.updatedClass}"><tds:elapsedAgo start="${commentInstance.lastUpdated}" end="${TimeUtil.nowGMT()}"/></span>
