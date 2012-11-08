@@ -42,7 +42,7 @@
 			</tr>
 			${rackLayout?.frontViewRows}
 		</table>
-		<br class="page-break-after"/>
+		<hr style="page-break-after:always"/>
 		<g:if test="${params.commit == 'Generate'}">
 		</td>
 		</g:if>
