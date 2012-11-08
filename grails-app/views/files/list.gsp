@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Files List</title>
+<title>Storage List</title>
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
@@ -39,7 +39,7 @@ $(document).ready(function() {
 </head>
 <body>
 <div class="body">
-<h1>Files List</h1>
+<h1>Storage List</h1>
 <g:if test="${flash.message}">
 <div class="message">${flash.message}</div>
 </g:if>
@@ -87,11 +87,11 @@ $(document).ready(function() {
 						<span onclick="getEntityDetails('files','${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.assetName}</span>
 					</jmesa:htmlColumn>
 					<jmesa:htmlColumn property="fileFormat" sortable="true"
-						title="File Format" filterable="true"
+						title="Storage Format" filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
 						<span onclick="getEntityDetails('files','${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.fileFormat}</span>
 					</jmesa:htmlColumn>
-					<jmesa:htmlColumn property="fileSize" title="File Size"
+					<jmesa:htmlColumn property="fileSize" title="Storage Size"
 						sortable="true" filterable="true"
 						cellEditor="org.jmesa.view.editor.BasicCellEditor">
 						<span onclick="getEntityDetails('files','${fileInstance.assetType}', ${fileInstance.id})">${fileInstance.fileSize}</span>
@@ -119,8 +119,8 @@ $(document).ready(function() {
 	<div class="buttons">
 	<tds:hasPermission permission='EditAndDelete'>
 		<span class="button"><input type="button" class="save"
-			value="Create Files"
-			onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Files\')')}" />
+			value="Create Storage"
+			onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Storage\')')}" />
 		</span>
 		<span class="button"><input id="deleteAsset" type="button" 
 		    value="Delete Selected..." class="save" title="Delete Selected" disabled="disabled"  
@@ -134,7 +134,7 @@ $(document).ready(function() {
      <table id="assetDependencyRow">
 	  <tr>
 		<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
-		<td><g:select name="entity" from="['Server','Application','Database','Files']" onchange='updateAssetsList(this.name, this.value)'></g:select></td>
+		<td><g:select name="entity" from="['Server','Application','Database','Storage']" onchange='updateAssetsList(this.name, this.value)'></g:select></td>
 		<td><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></td>
 		<td><g:select name="dtype" from="${dependencyType.value}"  optionValue="value"></g:select></td>
 		<td><g:select name="status" from="${dependencyStatus.value}" optionValue="value"></g:select></td>
@@ -145,7 +145,7 @@ $(document).ready(function() {
 		<span id="Server"><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 		<span id="Application"><g:select name="asset" from="${applications}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 		<span id="Database"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
-		<span id="Files"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+		<span id="Storage"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 	</div>
 </div>
 </div>

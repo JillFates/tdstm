@@ -22,7 +22,7 @@
 	 <td>${databaseCount}</td>
  </tr>
   <tr>
-	 <td> Files :	</td>
+	 <td> Storage :	</td>
 	 <td>${fileCount }</td>
  </tr>
   <tr>

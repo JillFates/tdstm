@@ -1,6 +1,6 @@
 <table style="border: 0">
 	<tr>
-		<td colspan="2"><div class="dialog" <tds:hasPermission permission='EditAndDelete'> ondblclick="editEntity('${redirectTo}','Files', ${filesInstance?.id})"</tds:hasPermission>>
+		<td colspan="2"><div class="dialog" <tds:hasPermission permission='EditAndDelete'> ondblclick="editEntity('${redirectTo}','Storage', ${filesInstance?.id})"</tds:hasPermission>>
 				<table>
 					<tbody>
 						<tr class="prop">
@@ -15,32 +15,34 @@
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="assetType">App
 									Type</label></td>
-							<td>${filesInstance.assetType}</td>
+							<td>${filesInstance.assetType == 'Files' ? 'Storage' : filesInstance.assetType}</td>
+							
+							<td class="label" nowrap="nowrap"><label for="lun">LUN
+							</label></td>
+							<td>${filesInstance.LUN}</td>
+							
 
 							<td class="label" nowrap="nowrap"><label for="supportType">Support
 							</label></td>
 							<td>${filesInstance.supportType}</td>
-
-							<td class="label" nowrap="nowrap"><label for="fileFormat">
-									Format </label></td>
-							<td>${filesInstance.fileFormat}</td>
-
 						</tr>
 
 						<tr class="prop">
-
+							<td class="label" nowrap="nowrap"><label for="fileFormat">
+									Format </label></td>
+							<td>${filesInstance.fileFormat}</td>
 							<td class="label" nowrap="nowrap"><label for="environment">Environment
 							</label></td>
 							<td>${filesInstance.environment}</td>
 
 							<td class="label" nowrap="nowrap"><label for="fileSize">Size
 							</label></td>
-							<td>${filesInstance.fileSize}</td>
+							<td>${filesInstance.fileSize}&nbsp;${filesInstance.sizeUnit}</td>
+						</tr>
+						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label>
 							</td>
 							<td>${filesInstance.moveBundle} / ${dependencyBundleNumber}</td>
-						</tr>
-						<tr class="prop">
 							<td class="label" nowrap="nowrap">
 							<g:if test="${(filesInstance.custom1)?.length()>= 4 && (filesInstance.custom1)?.substring(0, 4)=='http'}">
 										<a href="javascript:window.open('${filesInstance.custom1}','help');" style="color:#00E">${filesInstance.project.custom1 !=null ? filesInstance.project.custom1 :'Custom1'}</a>
@@ -59,6 +61,8 @@
 							</g:else>
 							</td>
 							<td>${filesInstance?.custom2}</td>
+						</tr>
+						<tr class="prop">
 							<td class="label" nowrap="nowrap">
 							<g:if test="${(filesInstance.custom3)?.length()>= 4 &&(filesInstance.custom3)?.substring(0, 4)=='http'}">
 										<a href="javascript:window.open('${filesInstance.custom3}','help');" style="color:#00E">${filesInstance.project.custom3 !=null ? filesInstance.project.custom3 :'Custom3'}</a>
@@ -69,8 +73,6 @@
 							</td>
 							<td>${filesInstance?.custom3}</td>
 							
-						</tr>
-						<tr class="prop">
 							<td class="label" nowrap="nowrap">
 							<g:if test="${(filesInstance.custom4)?.length()>= 4 &&(filesInstance.custom4)?.substring(0, 4)=='http'}">
 										<a href="javascript:window.open('${filesInstance.custom4}','help');" style="color:#00E">${filesInstance.project.custom4 !=null ? filesInstance.project.custom4 :'Custom4'}</a>
@@ -89,6 +91,8 @@
 							</g:else>
 							</td>
 							<td>${filesInstance?.custom5}</td>
+						</tr>
+					    <tr class="prop">
 							<td class="label" nowrap="nowrap">
 							<g:if test="${(filesInstance.custom6)?.length()>= 4 &&(filesInstance.custom6)?.substring(0, 4)=='http'}">
 										<a href="javascript:window.open('${filesInstance.custom6}','help');" style="color:#00E">${filesInstance.project.custom6 !=null ? filesInstance.project.custom6 :'Custom6'}</a>
@@ -98,8 +102,6 @@
 							</g:else>
 							</td>
 							<td>${filesInstance?.custom6}</td>
-						</tr>
-					    <tr class="prop">
 							<td class="label" nowrap="nowrap">
 							<g:if test="${(filesInstance.custom7)?.length()>= 4 &&(filesInstance.custom7)?.substring(0, 4)=='http'}">
 										<a href="javascript:window.open('${filesInstance.custom7}','help');" style="color:#00E">${filesInstance.project.custom7 !=null ? filesInstance.project.custom7 :'Custom7'}</a>
@@ -118,6 +120,8 @@
 							</g:else>
 							</td>
 							<td>${filesInstance?.custom8}</td>
+						</tr>
+						<tr>
 							<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label>
 							</td>
 							<td>${filesInstance.planStatus}</td>
@@ -145,7 +149,8 @@
 					<g:each in="${supportAssets}" var="support" status="i">
 						<tr onclick="getEntityDetails('${redirectTo}','${support?.asset?.assetType}', ${support?.asset?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
 							<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">${support?.dataFlowFreq}</td>
-							<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">${support?.asset?.assetType}</td>
+							<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
+								${support?.asset?.assetType == 'Files' ? 'Storage' : support?.asset?.assetType}</td>
 							<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">${support?.asset?.assetName}</td>
 							<g:if test="${support?.asset?.moveBundle!=filesInstance.moveBundle && support.status == 'Validated' }" >
 							<td style="background-color: red"> ${support?.asset?.moveBundle}</td></g:if>
@@ -175,6 +180,7 @@
 						<th>Frequency</th>
 						<th>Type</th>
 						<th>Name</th>
+						<th>Bundle</th>
 						<th>Type</th>
 						<th>Status</th>
 					</tr>
@@ -183,7 +189,8 @@
 					<g:each in="${dependentAssets}" var="dependent" status="i">
 						<tr onclick="getEntityDetails('${redirectTo}','${dependent.dependent?.assetType}', ${dependent.dependent?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
 							<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">${dependent.dataFlowFreq}</td>
-							<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">${dependent.dependent?.assetType}</td>
+							<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
+								${dependent.dependent?.assetType  == 'Files' ? 'Storage' : dependent.dependent?.assetType}</td>
 							<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">${dependent.dependent?.assetName}</td>
 							<g:if test="${dependent.dependent?.moveBundle!=filesInstance.moveBundle && dependent.status == 'Validated' }" >
 									<td style="background-color: red">

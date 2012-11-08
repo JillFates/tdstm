@@ -365,7 +365,7 @@ class AssetEntityController {
 					return;
 				} else if ( !checkHeader( filesColumnslist, filesColumnNames ) ) {
 					def missingHeader = missingHeader.replaceFirst(",","")
-					flash.message = " Files Column Headers : ${missingHeader} not found, Please check it."
+					flash.message = " Storage Column Headers : ${missingHeader} not found, Please check it."
 					redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
 					return;
 				} else {
@@ -627,7 +627,7 @@ class AssetEntityController {
 											try{
 												assetId = Integer.parseInt(filesSheet.getCell( 0, r ).contents)
 											} catch( NumberFormatException ex ) {
-												flash.message = "filesId should be Integer"
+												flash.message = "StorageId should be Integer"
 												redirect( action:assetImport, params:[projectId:projectId, message:flash.message] )
 												return;
 											}
@@ -759,9 +759,9 @@ class AssetEntityController {
 				workbook.close()
 				added = serverAdded + appAdded   + dbAdded + filesAdded + dependencyAdded
 				if (skipped.size() > 0) {
-					flash.message = " File Uploaded Successfully with ${added} records. and  ${skipped} Records skipped Please click the Manage Batches to review and post these changes."
+					flash.message = " Storage Uploaded Successfully with ${added} records. and  ${skipped} Records skipped Please click the Manage Batches to review and post these changes."
 				} else {
-					flash.message = " File uploaded successfully with ${added} records.  Please click the Manage Batches to review and post these changes."
+					flash.message = " Storage uploaded successfully with ${added} records.  Please click the Manage Batches to review and post these changes."
 				}
 				redirect( action:assetImport, params:[ message:flash.message] )
 				return;

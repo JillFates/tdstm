@@ -23,61 +23,66 @@
 										Type</label>
 								</td>
 								<td><input type="text" id="assetType" name="assetType"
-									value="${fileInstance.assetType}"  readonly="readonly"/></td>
-								<td class="label" nowrap="nowrap"><label for="supportType">Support</label>
+									value="Storage"  readonly="readonly"/></td>
+								<td class="label" nowrap="nowrap"><label for="lun">LUN</label>
 								</td>
+								<td><input type="text" id="lun" name="LUN"
+									value="${fileInstance.LUN}" />
+								</td>
+								<td class="label" nowrap="nowrap"><label for="supportType">Support</label></td>
 								<td><input type="text" id="supportType" name="supportType"
 									value="${fileInstance.supportType}" /></td>
+							</tr>
+
+							<tr>
 								<td class="label" nowrap="nowrap"><label for="fileFormat">
 										Format<span style="color: red;">*</span></label>
 								</td>
 								<td><input type="text" id="fileFormat" name="fileFormat"
 									value="${fileInstance.fileFormat}" /></td>
-							</tr>
-
-							<tr>
-
 								<td class="label" nowrap="nowrap"><label for="environment">Environment</label>
 								</td>
 								<td><g:select id="environment" name="environment" from="${com.tds.asset.AssetEntity.constraints.environment.inList}" value="${fileInstance.environment}" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="fileSize">Size<span style="color: red;">*</span></label>
 								</td>
-								<td><input type="text" id="fileSize" name="fileSize"
-									value="${fileInstance.fileSize}" /></td>
-									<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label>
+								<td><input type="text" id="fileSize" name="fileSize" value="${fileInstance.fileSize}" size="10"/>&nbsp;
+								<g:select from="${com.tds.asset.Files.constraints.sizeUnit.inList}" name="sizeUnit" id="sizeUnit" value="${fileInstance.sizeUnit}"/>	
+								</td>
+							</tr>
+							<tr>
+							   <td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label>
 								</td>
 								<td><g:select from="${moveBundleList}" id="moveBundle"
 										name="moveBundle.id" value="${fileInstance.moveBundle?.id}"
 										optionKey="id" optionValue="name" />
 								</td>
-							</tr>
-							<tr>
 								<td class="label" nowrap="nowrap"><label for="custom1">${fileInstance.project.custom1 ?: 'Custom1'}</label></td>
 								<td><input type="text" id="custom1" name="custom1"  value="${fileInstance?.custom1}"  /></td>
 								<td class="label" nowrap="nowrap"><label for="custom1">${fileInstance.project.custom2 ?: 'Custom2'}</label></td>
 								<td><input type="text" id="custom2" name="custom2"  value="${fileInstance?.custom2}"  /></td>
-								<td class="label" nowrap="nowrap"><label for="custom3">${fileInstance.project.custom3 ?: 'Custom3'}</label></td>
-								<td><input type="text" id="custom3" name="custom3"  value="${fileInstance?.custom3}"  /></td>
 							</tr>
 							<tr>
+								<td class="label" nowrap="nowrap"><label for="custom3">${fileInstance.project.custom3 ?: 'Custom3'}</label></td>
+								<td><input type="text" id="custom3" name="custom3"  value="${fileInstance?.custom3}"  /></td>
 								<td class="label" nowrap="nowrap"><label for="custom4">${fileInstance.project.custom4 ?: 'Custom4'}</label></td>
 								<td><input type="text" id="custom4" name="custom4"  value="${fileInstance?.custom4}"  /></td>
 								<td class="label" nowrap="nowrap"><label for="custom5">${fileInstance.project.custom5 ?: 'Custom5'}</label></td>
 								<td><input type="text" id="custom5" name="custom5"  value="${fileInstance?.custom5}"  /></td>
-								<td class="label" nowrap="nowrap"><label for="custom6">${fileInstance.project.custom6 ?: 'Custom6'}</label></td>
-								<td><input type="text" id="custom6" name="custom6"  value="${fileInstance?.custom6}"  /></td>
 							</tr>
 							<tr>
+								<td class="label" nowrap="nowrap"><label for="custom6">${fileInstance.project.custom6 ?: 'Custom6'}</label></td>
+								<td><input type="text" id="custom6" name="custom6"  value="${fileInstance?.custom6}"  /></td>
 								<td class="label" nowrap="nowrap"><label for="custom7">${fileInstance.project.custom7 ?: 'Custom7'}</label></td>
 								<td><input type="text" id="custom7" name="custom7"  value="${fileInstance?.custom7}"  /></td>
 								<td class="label" nowrap="nowrap"><label for="custom8">${fileInstance.project.custom8 ?: 'Custom8'}</label></td>
 								<td><input type="text" id="custom8" name="custom8"  value="${fileInstance?.custom8}"  /></td>
-								<td class="label" nowrap="nowrap"><label for="planStatus">PlanStatus</label></td>
-								<td><g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${fileInstance.planStatus}" />
-									</td>
 							</tr>
-
+							<tr>
+							<td class="label" nowrap="nowrap"><label for="planStatus">PlanStatus</label></td>
+							<td><g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${fileInstance.planStatus}" />
+							</td>
+							</tr>
 						</tbody>
 					</table>
 				</div>
@@ -104,7 +109,7 @@
 							<g:each in="${supportAssets}" var="support" status="i">
 								<tr id='row_s_${i}'>
 									<td><g:select name="dataFlowFreq_support_${i}" value="${support.dataFlowFreq}" from="${support.constraints.dataFlowFreq.inList}" /></td>
-									<td><g:select name="entity_support_${i}" from="['Server','Application','Database','Files']" onchange='updateAssetsList(this.name, this.value)' value="${support?.asset?.assetType}"></g:select></td>
+									<td><g:select name="entity_support_${i}" from="['Server','Application','Database','Storage']" onchange='updateAssetsList(this.name, this.value)' value="${support?.asset?.assetType == 'Files' ? 'Storage' : support?.asset?.assetType}"></g:select></td>
 									<g:if test="${support?.asset.assetType=='Server'|| support?.asset.assetType=='Blade' || support?.asset.assetType=='VM'}">
 								        <td class="dep-${support.status}"><g:select name="asset_support_${i}" from="${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType in (\'Server\',\'VM\',\'Blade\') and project = ? order by assetName asc ',[project])}" value="${support?.asset?.id}" optionKey="id" optionValue="assetName"  style="width:105px;"></g:select></td>
 									</g:if>
@@ -141,7 +146,7 @@
 						<g:each in="${dependentAssets}" var="dependent" status="i">
 							<tr id='row_d_${i}'>
 								<td><g:select name="dataFlowFreq_dependent_${i}" value="${dependent.dataFlowFreq}" from="${dependent.constraints.dataFlowFreq.inList}" /></td>
-								<td><g:select name="entity_dependent_${i}" from="['Server','Application','Database','Files']" onchange='updateAssetsList(this.name, this.value)' value="${dependent?.dependent?.assetType}"></g:select></td>
+								<td><g:select name="entity_dependent_${i}" from="['Server','Application','Database','Storage']" onchange='updateAssetsList(this.name, this.value)' value="${dependent?.dependent?.assetType == 'Files' ? 'Storage' : dependent?.dependent?.assetType}"></g:select></td>
 								<g:if test="${dependent?.dependent?.assetType=='Server'|| dependent?.dependent?.assetType=='Blade' || dependent?.dependent?.assetType=='VM'}">
 								  <td><g:select name="asset_dependent_${i}" from="${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType in (\'Server\',\'VM\',\'Blade\') and project = ? order by assetName asc ',[project])}" value="${dependent?.dependent?.id}" optionKey="id" optionValue="assetName"  style="width:105px;"></g:select></td>
 								</g:if>

@@ -9,6 +9,7 @@ import com.tdssrc.grails.GormUtil
 import com.tds.asset.Application
 import com.tds.asset.Database
 import com.tds.asset.Files
+import com.tds.asset.AssetOptions
 
 class RackLayoutsController {
 	def userPreferenceService
@@ -49,6 +50,8 @@ class RackLayoutsController {
 		def applications = Application.findAllByAssetTypeAndProject('Application',projectInstance)
 		def dbs = Database.findAllByAssetTypeAndProject('Database',projectInstance)
 		def files = Files.findAllByAssetTypeAndProject('Files',projectInstance)
+		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		if(!currentBundle){
 			currentBundle = moveBundleInstanceList[0]?.id?.toString()
 			isCurrentBundle = false
@@ -59,7 +62,7 @@ class RackLayoutsController {
 				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models ,servers:servers, 
 				applications : applications, dbs : dbs, files : files, rackFilters:rackFilters, targetRackFilter:targetRack,
 				bundle:bundle,sourceRackFilter:sourceRack,rackLayoutsHasPermission:RolePermissions.hasPermission("rackLayouts"),useCheck:useCheck,
-				staffRoles:taskService.getRolesForStaff()]
+				staffRoles:taskService.getRolesForStaff(), dependencyType:dependencyType, dependencyStatus:dependencyStatus]
 	}
 	
 	def save = {

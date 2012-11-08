@@ -17,7 +17,7 @@
 	     <th style="text-align:center;"><g:link controller="assetEntity" action="list">Assets</g:link> </th>
 	     <th style="text-align:center;"><g:link controller="application" action="list">Applications</g:link></th>
 	     <th style="text-align:center;"><g:link controller="database" action="list">Database</g:link></th>
-	     <th style="text-align:center;"><g:link controller="files" action="list">Files</g:link></th>
+	     <th style="text-align:center;"><g:link controller="files" action="list">Storage</g:link></th>
 	   </tr>
     </thead>
    

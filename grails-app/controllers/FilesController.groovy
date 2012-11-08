@@ -108,15 +108,15 @@ class FilesController {
 					planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project,planStatusOptions:planStatusOptions.value]
 	}
 	def save = {
-		
+				params.assetType = "Files"
 				def filesInstance = new Files(params)
 				if(!filesInstance.hasErrors() && filesInstance.save()) {
-					flash.message = "File ${filesInstance.assetName} created"
+					flash.message = "Storage ${filesInstance.assetName} created"
 					assetEntityService.createOrUpdateFilesDependencies(params, filesInstance)
 			        redirect(action:list)
 				}
 				else {
-					flash.message = "File not created"
+					flash.message = "Storage not created"
 					filesInstance.errors.allErrors.each{ flash.message += it}
 					redirect(action:list)
 				}
@@ -127,7 +127,7 @@ class FilesController {
 		def id = params.id
 		def filesInstance = Files.get( id )
 		if(!filesInstance) {
-			flash.message = "File not found with id ${params.id}"
+			flash.message = "Storage not found with id ${params.id}"
 			redirect(action:list)
 		}
 		else {
@@ -159,7 +159,7 @@ class FilesController {
 		def id = params.id
 		def fileInstance = Files.get( id )
 		if(!fileInstance) {
-			flash.message = "File not found with id ${params.id}"
+			flash.message = "Storage not found with id ${params.id}"
 			redirect(action:list)
 		}
 		else {
@@ -182,9 +182,10 @@ class FilesController {
 		session.setAttribute("USE_FILTERS","true")
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def filesInstance = Files.get(params.id)
+		params.assetType = "Files"
 		filesInstance.properties = params
 		if(!filesInstance.hasErrors() && filesInstance.save(flush:true)) {
-			flash.message = "File ${filesInstance.assetName} Updated"
+			flash.message = "Storage ${filesInstance.assetName} Updated"
 			assetEntityService.createOrUpdateFilesDependencies(params, filesInstance)
 			if(params.updateView == 'updateView'){
 				forward(action:'show', params:[id: params.id])
@@ -224,7 +225,7 @@ class FilesController {
 			}
 		}
 		else {
-			flash.message = "File not created"
+			flash.message = "Storage not created"
 			filesInstance.errors.allErrors.each{ flash.message += it }
 			redirect(action:list)
 		}
@@ -251,7 +252,7 @@ class FilesController {
 			
 			filesInstance.delete()
 			assetEntityInstance.delete()
-			flash.message = "Files ${assetName} deleted"
+			flash.message = "Storage ${assetName} deleted"
 			if(params.dstPath =='planningConsole'){
 				forward( controller:'assetEntity',action:'getLists', params:[entity: 'files',dependencyBundle:session.getAttribute("dependencyBundle")])
 			}else{
@@ -259,7 +260,7 @@ class FilesController {
 			}
 		}
 		else {
-			flash.message = "Files not found with id ${params.id}"
+			flash.message = "Storage not found with id ${params.id}"
 			redirect( action:list )
 		}
 		
@@ -299,7 +300,7 @@ class FilesController {
 					assetEntityInstance.delete()
 				}
 			String names = assetNames.toString().replace('[','').replace(']','')
-			flash.message = "File ${names} deleted"
+			flash.message = "Storage ${names} deleted"
 		}
 	  render "success"
 	}

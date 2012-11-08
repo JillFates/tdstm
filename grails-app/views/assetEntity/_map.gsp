@@ -80,14 +80,14 @@
 						<g:if test="${labels?.contains('files')}">
 							<td colspan="2" style="padding: 0px;">
 								<input type="checkbox" name="labels" id="dbs" checked="checked" value="files" class="pointer"/>
-								<label for="dbs" style="vertical-align: text-top;">DB/Files
+								<label for="dbs" style="vertical-align: text-top;">DB/Storage
 								<img src="${createLinkTo(dir:'images',file:'iconDB.png')}" height="14" /></label>
 							</td>
 						</g:if>
 						<g:else>
 							<td colspan="2" style="padding: 0px;">
 								<input type="checkbox" id="filesLabel" name="labels" value="files" class="pointer"/>
-								<label for="filesLabel" style="vertical-align: text-top;">DB/Files
+								<label for="filesLabel" style="vertical-align: text-top;">DB/Storage
 								<img src="${createLinkTo(dir:'images',file:'iconDB.png')}" height="14" /></label>
 							</td>
 						</g:else>
@@ -114,7 +114,7 @@
 					<tr>
 						<td nowrap="nowrap"><img
 							src="${createLinkTo(dir:'images',file:'iconDB.png')}" height="14" />&nbsp;
-							<span style="vertical-align: text-top;">DB/Files</span>
+							<span style="vertical-align: text-top;">DB/Storage</span>
 						</td>
 					</tr>
 					<tr><td><hr style="width: 60px;color:rgb(56,56,56);"></hr></td><td>Valid Links</td></tr>

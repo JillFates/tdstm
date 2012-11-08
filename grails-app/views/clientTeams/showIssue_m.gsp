@@ -217,9 +217,9 @@
 					<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
                 </g:elseif>
                 <g:elseif test="${assetComment?.assetEntity.assetType=='Files'}">
-                    <dt>File Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
-					<dt>FIle Size:</dt><dd>&nbsp;${assetComment?.assetEntity.fileSize}</dd>
-					<dt>File Format:</dt><dd>&nbsp;${assetComment?.assetEntity.fileFormat}</dd>
+                    <dt>Storage Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+					<dt>Storage Size:</dt><dd>&nbsp;${assetComment?.assetEntity.fileSize}</dd>
+					<dt>Storage Format:</dt><dd>&nbsp;${assetComment?.assetEntity.fileFormat}</dd>
 					<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
                 </g:elseif>
                 <g:else>

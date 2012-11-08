@@ -18,7 +18,7 @@ function getEntityDetails(redirectTo, type, value){
 		new Ajax.Request('../database/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Database');}})
 		break;
 	 case "Files":
-		new Ajax.Request('../files/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Files');}})
+		new Ajax.Request('../files/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Storage');}})
 		break;
 	 default :
 		new Ajax.Request('../assetEntity/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Server');}})
@@ -54,7 +54,7 @@ function editEntity(redirectTo,type, value, source,rack,roomName,location,positi
 			new Ajax.Request('../database/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Database',source,rack,roomName,location,position);}})
 			break;
 		 case "Files":
-			new Ajax.Request('../files/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Files',source,rack,roomName,location,position);}})
+			new Ajax.Request('../files/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Storage',source,rack,roomName,location,position);}})
 			break;
 		 default :
 			 new Ajax.Request('../assetEntity/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Server',source,rack,roomName,location,position);}})
@@ -135,9 +135,9 @@ function validateFileFormat(){
 	var fileFlag = false;
     var fileSize = $('#fileSize').val();
     if( fileSize=='' || isNaN(fileSize)){
-   	  alert("Please enter numeric value for File Size");
+   	  alert("Please enter numeric value for Storage Size");
     }else if($('#fileFormat').val()==''){
-   	  alert("Please enter value for File Format");
+   	  alert("Please enter value for Storage Format");
     }else{
    	  fileFlag = true;
     }

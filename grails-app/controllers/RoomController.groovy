@@ -8,6 +8,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
 import org.hibernate.SessionFactory
+import com.tds.asset.AssetOptions
 
 class RoomController {
 
@@ -32,9 +33,12 @@ class RoomController {
 		def applications = Application.findAllByAssetTypeAndProject('Application',project)
 		def dbs = Database.findAllByAssetTypeAndProject('Database',project)
 		def files = Files.findAllByAssetTypeAndProject('Files',project)
+		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		[roomInstanceList: roomInstanceList, roomInstanceTotal: roomInstanceList.size(), 
 		 projectId:projectId, roomId:roomId, viewType:params.viewType, roomInstance:roomInstance, servers : servers, 
-				applications : applications, dbs : dbs, files : files ,filterRackId:rackIds, staffRoles:taskService.getRolesForStaff()]
+				applications : applications, dbs : dbs, files : files ,filterRackId:rackIds, staffRoles:taskService.getRolesForStaff(),
+				dependencyType:dependencyType, dependencyStatus:dependencyStatus]
     }
 
     def create = {

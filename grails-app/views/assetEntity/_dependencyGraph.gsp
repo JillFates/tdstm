@@ -11,7 +11,7 @@
 			<a href="javascript:getList('database',${dependencyBundle})">DB(${dbDependentListSize})</a>
 		</li>
 		<li id="fileli">
-			<a href="javascript:getList('files',${dependencyBundle})">Files(${filesDependentListSize})</a>
+			<a href="javascript:getList('files',${dependencyBundle})">Storage(${filesDependentListSize})</a>
 		</li>
 		<li id="graphli" class="active">
 			<a href="javascript:getList('graph',${dependencyBundle})">Map</a>
@@ -43,7 +43,7 @@
 					</tr>
 					<tr>
 						<td nowrap="nowrap"><img src="${createLinkTo(dir:'images',file:'iconDB.png')}" height="14" />&nbsp;
-							<span style="vertical-align: text-top;">DB/Files</span>
+							<span style="vertical-align: text-top;">DB/Storage</span>
 						</td>
 					</tr>
 					<tr><td><hr style="width: 60px;color:rgb(56,56,56);"></hr></td><td>Valid Links</td></tr>

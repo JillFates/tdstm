@@ -69,7 +69,7 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${fileCount}</td>
-							<td><g:link controller="files" action="list" >Files</g:link></td>
+							<td><g:link controller="files" action="list" >Storage</g:link></td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${otherAssetCount}</td>
@@ -397,7 +397,7 @@ $(document).ready(function() {
 							</b></td>
 						</tr>
 						<tr>
-							<td style="color: black"><b>Files</b></td>
+							<td style="color: black"><b>Storage</b></td>
 							<td style=" text-align: left;">
 							<g:set var="percentageUnassignedFilesCount" value="${fileCount ? (unassignedFilesCount/fileCount)*100 : 0}"/>
 							<g:if test="${unassignedFilesCount == 0 }">

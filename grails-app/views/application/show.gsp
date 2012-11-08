@@ -270,7 +270,7 @@
 									${support?.dataFlowFreq}
 								</td>
 								<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
-									${support?.asset?.assetType}
+									${support?.asset?.assetType == 'Files' ? 'Storage' : support?.asset?.assetType}
 								</td>
 								<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
 									${support?.asset?.assetName}
@@ -323,7 +323,7 @@
 									${dependent.dataFlowFreq}
 								</td>
 								<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
-									${dependent.dependent?.assetType}
+									${dependent.dependent?.assetType == 'Files' ? 'Storage' : dependent.dependent?.assetType}
 								</td>
 								<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
 									${dependent.dependent?.assetName}
