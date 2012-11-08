@@ -99,7 +99,7 @@ class MoveBundleAssetController {
     def assignAssetsToBundle = {
 		def moveBundleInstance
 		def project = securityService.getUserCurrentProject()
-		if(params.containsKey('bundleId') ){
+		if(params.containsKey('bundleId') && params.bundleId){
 			if( !params.bundleId.isNumber() ){
 				log.error "assignAssetsToBundle: Invalid bundle id (${params.bundleId}"
 			}else{

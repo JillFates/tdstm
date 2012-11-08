@@ -107,7 +107,7 @@
                         
                             <td>${dataTransferBatch?.dataTransferSet?.title}</td>
                             
-                            <td>${dataTransferBatch?.eavEntityType?.domainName}</td>
+                            <td>${dataTransferBatch?.eavEntityType?.domainName == 'Files' ? 'Storage' : dataTransferBatch?.eavEntityType?.domainName}</td>
                         
                             <td>${DataTransferValue.executeQuery('select count(d.id) from DataTransferValue d where d.dataTransferBatch = '+ dataTransferBatch?.id +' group by rowId' ).size()}</td>
                             

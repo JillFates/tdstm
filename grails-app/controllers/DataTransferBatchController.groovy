@@ -939,7 +939,7 @@ class DataTransferBatchController {
 								"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> "
 		}
 		session.setAttribute("IMPORT_ASSETS", assetsList)
-		redirect ( action:list, params:[projectId:projectId, message:flash.message ] )
+		redirect ( action:list, params:[projectId:project.id, message:flash.message ] )
 		
 	}
 	

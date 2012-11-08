@@ -612,7 +612,7 @@ class MoveEventController {
 						def personelSheet = book.getSheet("Personnel")
 						def preMoveSheet = book.getSheet("Pre-move")
 						def dbSheet = book.getSheet("Database")
-						def filesSheet = book.getSheet("Files")
+						def filesSheet = book.getSheet("Storage")
 						def otherSheet = book.getSheet("Other")
 						def issueSheet = book.getSheet("Issues")
 						def appSheet = book.getSheet("Impacted Applications")

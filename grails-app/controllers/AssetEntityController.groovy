@@ -260,7 +260,7 @@ class AssetEntityController {
 		// create workbook
 		def workbook
 		def titleSheet
-		def sheetNameMap = ['Title','Servers','Applications','Databases','Files','Dependencies']
+		def sheetNameMap = ['Title','Servers','Applications','Databases','Storage','Dependencies']
 		def appNameMap = [:]
 		def databaseNameMap = [:]
 		def filesNameMap = [:]
@@ -320,7 +320,7 @@ class AssetEntityController {
 				def serverSheet = workbook.getSheet( "Servers" )
 				def appSheet = workbook.getSheet( "Applications" )
 				def databaseSheet = workbook.getSheet( "Databases" )
-				def filesSheet = workbook.getSheet( "Files" )
+				def filesSheet = workbook.getSheet( "Storage" )
 				def dependencySheet = workbook.getSheet( "Dependencies" )
 				def serverColumnNames = [:]
 				def appColumnNames = [:]

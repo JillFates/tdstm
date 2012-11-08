@@ -25,8 +25,8 @@
 					<tr class="header">
 						<th nowrap="nowrap"><input id="selectId" type="checkbox"   onclick="selectAll()" title="Select All" />&nbsp;Actions</th>
 						<th>Name</th>
-						<th>File Format</th>
-						<th>File Size</th>
+						<th>Storage Format</th>
+						<th>Storage Size</th>
 						<th>Move Bundle</th>
 						<th>Plan Status</th>
 						<th>Dep Up</th>
