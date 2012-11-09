@@ -63,7 +63,8 @@ class WorkflowController {
 				
 			workflowTransitionsList << [transition : workflowTransition, isExist : isExist, donotDelete : donotDelete ]
 		}
-		return [workflowTransitionsList : workflowTransitionsList, workflow : workflow ]
+		def roles = RoleType.findAllByDescriptionIlike("Staff%",[sort:'description'])
+		return [workflowTransitionsList : workflowTransitionsList, workflow : workflow, roles:roles ]
 	}
 	/*-----------------------------------------------
 	 * @param : workfow stepId
@@ -175,6 +176,7 @@ class WorkflowController {
 		def workflowTransitionsList = []
 		def workflow
 		def principal = SecurityUtils.subject.principal
+		def roles
 		if(workflowId && principal){
 			 flash.message = ""
 			workflow = Workflow.get( workflowId )
@@ -197,6 +199,7 @@ class WorkflowController {
 				workflowTransition.header = params["header_"+workflowTransition.id]
 				//workflowTransition.effort = params["effort_"+workflowTransition.id] ? Integer.parseInt( params["effort_"+workflowTransition.id] ) : null
 				workflowTransition.duration = params["duration_"+workflowTransition.id] ? Integer.parseInt( params["duration_"+workflowTransition.id] ) : null
+				workflowTransition.role = RoleType.get(params["role_"+workflowTransition.id])
 				if (  ! workflowTransition.validate() || ! workflowTransition.save( flush:true) ) {
 					//workflowTransition.errors.allErrors.each() { flash.message += it }
 				} else {
@@ -216,6 +219,7 @@ class WorkflowController {
 					dashboardLabel : params["dashboardLabel_$i"],
 					predecessor : params["predecessor_$i"] ? Integer.parseInt( params["predecessor_$i"] ) : null,
 					header : params["header_$i"],		
+					role : RoleType.get(params["role_$i"]),
 					//effort : params["effort_$i"] ? Integer.parseInt( params["effort_$i"] ) : null,
 					duration : params["duration_$i"] ? Integer.parseInt( params["duration_$i"] ) : null
 					)
@@ -242,10 +246,11 @@ class WorkflowController {
 			}
 			//load transitions details into application memory.
 			stateEngineService.loadWorkflowTransitionsIntoMap(workflow.process, 'workflow')
+			roles = RoleType.findAllByDescriptionIlike("Staff%",[sort:'description'])
 		} else {
 			redirect(action:home)
 		}
-		render( view : 'workflowList', model : [ workflowTransitionsList : workflowTransitionsList, workflow : workflow ] )
+		render( view : 'workflowList', model : [ workflowTransitionsList : workflowTransitionsList, workflow : workflow, roles:roles ] )
 	}
 	/*====================================================
 	 *  Update the workflow roles

@@ -113,6 +113,8 @@
 			
 			<th class="sortable">Header</th>
 			
+			<th class="sortable">Role</th>
+			
 			<th class="sortable">Duration</th>
 			
 			<th class="sortable">Action</th>
@@ -142,6 +144,8 @@
 				
 				<td class="name">${transitions.transition?.header}</td>
 				
+				<td class="name">${transitions.transition?.role.description.substring(transitions.transition?.role.description.lastIndexOf(':') +1).trim()}</td>
+
 				<td class="name">${transitions.transition?.duration}</td>
 				
 				<td class="name">
@@ -192,6 +196,8 @@
 			
 			<th class="sortable">Header</th>
 			
+			<th class="sortable">Role</th>
+			
 			<th class="sortable">Duration</th>
 			
 			<th class="sortable">Action</th>
@@ -237,6 +243,11 @@
 				
 				<td nowrap="nowrap">
 					<input type="text" name="header_${transitions.transition.id}" id="headerId_${transitions.transition.id}" value="${transitions.transition?.header}"  style="width: 50px;" maxlength="7"/>
+				</td>
+				<td nowrap="nowrap">
+				<g:select from="${roles}" id="role_${transitions.transition.id}" name="role_${transitions.transition.id}"
+					optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"
+					value="${transitions.transition?.role.id ? transitions.transition?.role.id : 'PROJ_MGR'  }" optionKey="id" />
 				</td>
 				<td nowrap="nowrap">
 					<input type="text" name="duration_${transitions.transition.id}" id="durationId_${transitions.transition.id}" value="${transitions.transition?.duration}"  style="width: 50px;" maxlength="4"/>
@@ -301,6 +312,10 @@
     <div style="display: none;" >
     		 <g:select id="createCategory" name="createCategory" from="${WorkflowTransition.constraints.category.inList}" 
                 noSelection="['':'please select']"/>
+    </div>
+    <div style="display: none;" >
+    		 <g:select id="addRole" name="addRole" from="${roles}"  optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"
+					value="PROJ_MGR" optionKey="id" />
     </div>
 </div>
 </div>
@@ -393,6 +408,9 @@ function addStep( type ){
 						"<td><input type='text' name='predecessor_"+additionalSteps+"' id='predecessorId_"+additionalSteps+"'  style='width: 60px;' maxlength='3'  onchange=\"validateField(this.value, this.id, 'predecessor')\"/></td>"+
 						"<td><input type='text' name='color_"+additionalSteps+"' id='colorId_"+additionalSteps+"' /></td>"+
 						"<td><input type='text' name='header_"+additionalSteps+"' id='headerId_"+additionalSteps+"'   style='width: 50px;' maxlength='7'/></td>"+
+						"<td><select id='role_"+additionalSteps+"' name='role_"+additionalSteps+"'>"+
+								$('#addRole').html()+
+							"</select></td>"+
 						"<td><input type='text' name='duration_"+additionalSteps+"' id='durationId_"+additionalSteps+"'   style='width: 50px;' maxlength='7'/></td>"+
 					"<tr>"
 	$("#additionalStepsId").val(additionalSteps)

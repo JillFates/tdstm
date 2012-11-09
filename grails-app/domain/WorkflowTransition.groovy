@@ -15,6 +15,7 @@ class WorkflowTransition {
 	Integer duration	// The duration to assign to tasks when building runbooks
 	String durationScale = 'm'		// Scale that duration represents m)inute, h)our, d)ay, w)eek
 	String category		// Identifies which task category that a transition will assigned to when building a runbook
+	RoleType role 
 
 	static belongsTo = [ workflow : Workflow ]
 	static hasMany  = [ WorkflowTransitionMap ]
@@ -34,6 +35,7 @@ class WorkflowTransition {
 		//effort( blank:true, nullable:true)
 		duration( nullable:true)
 		durationScale(nullable:true, blank:true, inList:['m','h','d','w'])
+		role( nullable:false)
 }	
 	
 	static mapping  = {
@@ -41,6 +43,9 @@ class WorkflowTransition {
 		id column:'workflow_transition_id'
 		duration sqltype: 'mediumint'
 		durationScale sqltype: 'char', length:1
+	}
+	def beforeInsert = {
+		role = this.role ? this.role : RoleType.get('PROJ_MGR')
 	}
 	
 	String toString() {
