@@ -613,7 +613,12 @@ class PersonController {
 		queryForStaff.append("group by p.party, p.roleType order by p.party,p.roleType ")
 		
 		def partyRoles = PartyRole.findAll(queryForStaff,sqlArgs)
-        def allProjRelations = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.roleTypeCodeFrom = 'PROJECT' ")
+        def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
+        def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
+        def activeProjects = projectService.getActiveProject( now, projectHasPermission, 'name', 'asc' )
+        def allProjRelations = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' \
+                                                        and p.roleTypeCodeFrom = 'PROJECT' and p.partyIdFrom in (:partyIdFrom)",
+                                                        [partyIdFrom:activeProjects])
 		partyRoles.each { relation->
             Party party = relation.party
             def person = Person.read(party.id)
