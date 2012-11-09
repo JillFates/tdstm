@@ -144,7 +144,7 @@
 				
 				<td class="name">${transitions.transition?.header}</td>
 				
-				<td class="name">${transitions.transition?.role?.description?.substring(transitions.transition?.role?.description?.lastIndexOf(':') +1)?.trim()}</td>
+				<td class="name">${transitions.transition?.role?.description ? transitions.transition?.role?.description?.substring(transitions.transition?.role?.description.lastIndexOf(':') +1).trim() : ''}</td>
 
 				<td class="name">${transitions.transition?.duration}</td>
 				
