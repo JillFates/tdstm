@@ -1,5 +1,5 @@
 <span id="panelLink" colspan="2" style="padding: 0px;cursor: pointer;"  onclick="hidePanel()"><h4>Control Panel</h4></span>
-<div id="controlPanel" style="float: left;border: 1px solid #ccc;margin-left: 3px;margin-top: 3px;width: 150px; background-color:white;position: absolute;">
+<div id="controlPanel" style="float: left;border: 1px solid #ccc;margin-left: 3px;margin-top: 3px;width: 150px; background-color:white;position: absolute;display: none;">
 				<table id="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;width: 148px;" >
 					<tr>
 						<td style="padding: 0px;width: 30px;">Force</td>
@@ -123,7 +123,7 @@
 					</tr>
 				</table>
 			</div>
-			<div id="legendDivId" style="float: left;border: 1px solid #ccc;margin-left: 3px;margin-top: 3px;width: 178px; background-color:white;position: absolute;display: none;">
+			<div id="legendDivId" style="float: left;border: 1px solid #ccc;margin-left: 3px;margin-top: 3px;width: 178px; background-color:white;position: absolute;">
 			<table id="legendId" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;width: 140px;" >
 				<tr><td style="padding: 3px 3px;" colspan="2"><h3>Legend</h3></td></tr>
 					<tr><td colspan="2"><span style="color: blue;"><h4>Nodes:</h4></span></td></tr>
