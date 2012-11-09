@@ -144,7 +144,7 @@
 				
 				<td class="name">${transitions.transition?.header}</td>
 				
-				<td class="name">${transitions.transition?.role.description.substring(transitions.transition?.role.description.lastIndexOf(':') +1).trim()}</td>
+				<td class="name">${transitions.transition?.role?.description?.substring(transitions.transition?.role?.description?.lastIndexOf(':') +1)?.trim()}</td>
 
 				<td class="name">${transitions.transition?.duration}</td>
 				
@@ -247,7 +247,7 @@
 				<td nowrap="nowrap">
 				<g:select from="${roles}" id="role_${transitions.transition.id}" name="role_${transitions.transition.id}"
 					optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"
-					value="${transitions.transition?.role.id ? transitions.transition?.role.id : 'PROJ_MGR'  }" optionKey="id" />
+					value="${transitions.transition?.role?.id ? transitions.transition?.role?.id : 'PROJ_MGR'  }" optionKey="id" />
 				</td>
 				<td nowrap="nowrap">
 					<input type="text" name="duration_${transitions.transition.id}" id="durationId_${transitions.transition.id}" value="${transitions.transition?.duration}"  style="width: 50px;" maxlength="4"/>
