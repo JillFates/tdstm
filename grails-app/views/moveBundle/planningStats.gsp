@@ -15,9 +15,9 @@ $(document).ready(function() {
 <body>
 	<div class="body">
 		<div>
-		    <g:set var="percentageAppToValidate" value="${applicationCount ? Math.round((appToValidate/applicationCount)*100) : 0}"/>
+		    <g:set var="percentageAppToValidate" value="${applicationCount ? Math.round((appToValidate/applicationCount)*100) :100}"/>
 		    <g:set var="percentageBundleReady" value="${applicationCount ? Math.round((bundleReady/applicationCount)*100) : 0}"/>
-			<g:set var="percentageUnassignedAppCount" value="${applicationCount ? Math.round((unassignedAppCount/applicationCount)*100) : 0}"/>
+			<g:set var="percentageUnassignedAppCount" value="${applicationCount ? Math.round((unassignedAppCount/applicationCount)*100) :100}"/>
 			<h1>Planning Dashboard</h1>
 			<div style="float:left;margin-top: 10px; margin-left: 5px;width:250px;">
 					<h3 style="color:#63A242">
@@ -36,7 +36,7 @@ $(document).ready(function() {
 
 							</g:elseif><g:else>
 
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${100 - percentageAppToValidate}%"></div>
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 3px;border-color: lightgray;border-right-style: inset; width: ${100 - percentageAppToValidate}%"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${100 - percentageAppToValidate}%</b>
 									<g:link controller="application" action="list" params="[validation:'Discovery']">Applications Validated</g:link>
 								</div>
@@ -50,30 +50,30 @@ $(document).ready(function() {
 					<table style="float:left; border: 0px; margin-left: 10px; margin-bottom: 10px;">
 						<tr>
 							<td style="width: 10px;text-align: right;">${applicationCount}</td>
-							<td><g:link controller="application" action="list" params="[filter:'applicationCount']">Applications</g:link><br />
-							(<g:link controller="application" action="list" params="[filter:'appToValidate']">
+							<td><g:link controller="application" action="list" params="[filter:'applicationCount']" class="links">Applications</g:link><br />
+							(<g:link controller="application" action="list" params="[filter:'appToValidate']" class="links">
 							${appToValidate} to validate</g:link>)
 							</td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${physicalCount}</td>
-							<td><g:link controller="assetEntity" action="list" params="[filter:'physicalServer']">Physical Servers</g:link></td>
+							<td><g:link controller="assetEntity" action="list" params="[filter:'physicalServer']" class="links">Physical Servers</g:link></td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${virtualCount}</td>
-							<td><g:link controller="assetEntity" action="list" params="[filter:'virtual']">Virtual Servers</g:link></td>
+							<td><g:link controller="assetEntity" action="list" params="[filter:'virtual']" class="links">Virtual Servers</g:link></td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${dbCount}</td>
-							<td><g:link controller="database" action="list" >Databases</g:link></td>
+							<td><g:link controller="database" action="list" class="links">Databases</g:link></td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${fileCount}</td>
-							<td><g:link controller="files" action="list" >Storage</g:link></td>
+							<td><g:link controller="files" action="list" class="links">Storage</g:link></td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${otherAssetCount}</td>
-							<td><g:link controller="assetEntity" action="list" params="[filter:'otherAsset']">Other Assets</g:link></td>
+							<td><g:link controller="assetEntity" action="list" params="[filter:'otherAsset']" class="links">Other Assets</g:link></td>
 						</tr>
 					</table>
 					<br />
@@ -83,12 +83,12 @@ $(document).ready(function() {
 					<table style="float:left; border: 0px; margin-left: 10px;">
 						<tr>
 							<td style="width: 10px;text-align: right;">${openIssue}</td>
-							<td><g:link controller="assetEntity" action="listTasks" params="[filter:'Discovery']">Open Tasks</g:link></td>
+							<td><g:link controller="assetEntity" action="listTasks" params="[filter:'Discovery']" class="links">Open Tasks</g:link></td>
 						</tr>
 						<g:if test="${dueOpenIssue>0}">
 						<tr>
 						    <td style="width: 10px;text-align: right;color: red;"><b>${dueOpenIssue}</b></td>
-							<td><g:link controller="assetEntity" action="listTasks" params="[filter:'dueOpenIssue']">Overdue</g:link></td>
+							<td><g:link controller="assetEntity" action="listTasks" params="[filter:'dueOpenIssue']" class="links">Overdue</g:link></td>
 						</tr>
 						</g:if>
 					</table>
@@ -111,7 +111,7 @@ $(document).ready(function() {
 
 							</g:elseif><g:else>
 
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${percentageBundleReady}%"></div>
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 3px;border-color: lightgray;border-right-style: inset; width: ${percentageBundleReady}%"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${percentageBundleReady}%</b>
 									<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Ready</g:link>
 								</div>
@@ -126,19 +126,19 @@ $(document).ready(function() {
 					<table style="float:left; border: 0px; margin-left: 10px;">
 						<tr>
 							<td style="width: 10px;text-align: right;">${dependencyScan}</td>
-							<td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyScan']">DependencyScan</g:link></td>
+							<td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyScan']" class="links">DependencyScan</g:link></td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${validated}</td>
-							<td><g:link controller="application" action="list" params="[tag_f_validation:'Validated']">Validated</g:link></td>
+							<td><g:link controller="application" action="list" params="[tag_f_validation:'Validated']" class="links">Validated</g:link></td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${dependencyReview}</td>
-							<td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyReview']">Dependency Review</g:link></td>
+							<td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyReview']" class="links">Dependency Review</g:link></td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${bundleReady}</td>
-							<td><g:link controller="application" action="list" params="[tag_f_validation:'BundleReady']">Bundle Ready</g:link></td>
+							<td><g:link controller="application" action="list" params="[tag_f_validation:'BundleReady']" class="links">Bundle Ready</g:link></td>
 						</tr>
 					</table>
 				</div>
@@ -165,12 +165,12 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${issuesCount}</td>
-							<td style="width: 150px;"><g:link controller="assetEntity" action="listTasks" params="[filter:'openIssue']">Open Tasks</g:link></td>
+							<td style="width: 150px;"><g:link controller="assetEntity" action="listTasks" params="[filter:'openIssue']" class="links">Open Tasks</g:link></td>
 						</tr>
 						<g:if test="${generalOverDue>0}">
 						<tr>
 						    <td style="width: 10px;text-align: right;color: red;"><b>${generalOverDue}</b></td>
-							<td><g:link controller="assetEntity" action="listTasks" params="[filter:'generalOverDue']">Overdue</g:link></td>
+							<td><g:link controller="assetEntity" action="listTasks" params="[filter:'generalOverDue']" class="links">Overdue</g:link></td>
 						</tr>
 						</g:if>
 					</table>
@@ -181,16 +181,16 @@ $(document).ready(function() {
 					</h4>
 					<table style="border: 0px;">
 						<tr>
-							<td style="width: 10px;text-align: right;"><g:link controller="application" action="list" params="[latency:'likely']">${likelyLatency}</g:link></td>
-							<td><g:link controller="application" action="list" params="[latency:'likely']">Likely</g:link></td>
+							<td style="width: 10px;text-align: right;"><g:link controller="application" action="list" params="[latency:'likely']" class="links">${likelyLatency}</g:link></td>
+							<td><g:link controller="application" action="list" params="[latency:'likely']" class="links">Likely</g:link></td>
 						</tr>
 						<tr>
-							<td style="width: 10px;text-align: right;"><g:link controller="application" action="list" params="[latency:'UnKnown']">${unknownLatency}</g:link></td>
-							<td><g:link controller="application" action="list" params="[latency:'UnKnown']">Unknown</g:link></td>
+							<td style="width: 10px;text-align: right;"><g:link controller="application" action="list" params="[latency:'UnKnown']" class="links">${unknownLatency}</g:link></td>
+							<td><g:link controller="application" action="list" params="[latency:'UnKnown']" class="links">Unknown</g:link></td>
 						</tr>
 						<tr>
-							<td style="width: 10px;text-align: right;"><g:link controller="application" action="list" params="[latency:'UnLikely']">${unlikelyLatency }</g:link></td>
-							<td><g:link controller="application" action="list" params="[latency:'UnLikely']">UnLikely</g:link></td>
+							<td style="width: 10px;text-align: right;"><g:link controller="application" action="list" params="[latency:'UnLikely']" class="links">${unlikelyLatency }</g:link></td>
+							<td><g:link controller="application" action="list" params="[latency:'UnLikely']" class="links">UnLikely</g:link></td>
 						</tr>
 					</table>
 				</div>
@@ -212,7 +212,7 @@ $(document).ready(function() {
 
 							</g:elseif><g:else>
 
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${100-percentageUnassignedAppCount}%"></div>
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 3px;border-color: lightgray;border-right-style: inset; width: ${100-percentageUnassignedAppCount}%"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${100-percentageUnassignedAppCount}%</b>
 									<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Assigned</g:link>
 								</div>
@@ -231,7 +231,7 @@ $(document).ready(function() {
 
 							</g:elseif><g:else>
 
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 1px;border-color: lightgray;border-right-style: inset; width: ${percentageAppCount}%"></div>
+								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 3px;border-color: lightgray;border-right-style: inset; width: ${percentageAppCount}%"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${percentageAppCount}%</b>
 									<g:link controller="application" action="list" params="[tag_f_planStatus:'moved']">Applications Moved</g:link>
 								</div>
@@ -277,7 +277,7 @@ $(document).ready(function() {
 							<g:else>
 							<b>
 
-								<g:link controller="application" action="list" params="[tag_f_planStatus:'unassigned']">
+								<g:link controller="application" action="list" params="[tag_f_planStatus:'unassigned']" class="links">
 									${unassignedAppCount} (${(percentageUnassignedAppCount > 0 && percentageUnassignedAppCount < 1) ? 1 : Math.round(percentageUnassignedAppCount)}%)
 								</g:link>
 							</b>
@@ -285,11 +285,11 @@ $(document).ready(function() {
 							</td>
 							<g:each in="${appList}" var="appCount">
 								<td style="text-align: right;"><b>
-									<g:link controller="application" action="list" params="[moveEvent:appCount.moveEvent]">${appCount.count}</g:link>
+									<g:link controller="application" action="list" params="[moveEvent:appCount.moveEvent]" class="links">${appCount.count}</g:link>
 								</b></td>
 							</g:each>
 							<td style="text-align: right;"><b>
-								<g:link controller="application" action="list" params="[tag_f_planStatus:'moved']">${percentageAppCount}%</g:link>
+								<g:link controller="application" action="list" params="[tag_f_planStatus:'moved']" class="links">${percentageAppCount}%</g:link>
 							</b></td>
 						</tr>
 						<tr>
@@ -315,11 +315,11 @@ $(document).ready(function() {
 						<tr>
 							<td style="color: black"><b>Servers</b></td>
 							<td style="text-align: left;"><b>
-									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'All']">${unassignedAssetCount}</g:link>
+									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'All']" class="links">${unassignedAssetCount}</g:link>
 							</b></td>
 								<g:each in="${assetList}" var="assetCount">
 									<td style="text-align: right;"><b>
-										<g:link controller="assetEntity" action="list" params="[moveEvent:assetCount.moveEvent,filter:'All']">	${assetCount.count}</g:link>
+										<g:link controller="assetEntity" action="list" params="[moveEvent:assetCount.moveEvent,filter:'All']" class="links" >${assetCount.count}</g:link>
 									</b></td>
 								</g:each>
 							<td>&nbsp;</td>
@@ -333,7 +333,7 @@ $(document).ready(function() {
 							</g:if>
 							<g:else>
 							<b>
-								<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'physical']">
+								<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'physical']" class="links">
 								   ${unassignedPhysialAssetCount} (${(percentageUnassignedPhysicalAssetCount > 0 && percentageUnassignedPhysicalAssetCount < 1) ? 1 : Math.round(percentageUnassignedPhysicalAssetCount)}%)
 								</g:link>
 							</b>
@@ -341,11 +341,11 @@ $(document).ready(function() {
 							</td>
 								<g:each in="${assetList}" var="assetCount">
 									<td style="text-align: right;"><b>
-											<g:link controller="assetEntity" action="list" params="[moveEvent:assetCount.moveEvent,filter:'physical']">${assetCount.physicalCount}</g:link>
+											<g:link controller="assetEntity" action="list" params="[moveEvent:assetCount.moveEvent,filter:'physical']" class="links">${assetCount.physicalCount}</g:link>
 									</b></td>
 								</g:each>
 							<td style="text-align: right;"><b>
-								<g:link controller="assetEntity" action="list" params="[tag_f_planStatus:'moved']">${percentagePhysicalAssetCount}%</g:link>
+								<g:link controller="assetEntity" action="list" params="[tag_f_planStatus:'moved']" class="links">${percentagePhysicalAssetCount}%</g:link>
 							</b></td>
 						</tr>
 						<tr>
@@ -357,7 +357,7 @@ $(document).ready(function() {
 							</g:if>
 							<g:else>
 							<b>
-								<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'virtual']">
+								<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'virtual']" class="links">
 								   ${unassignedVirtualAssetCount} (${(percentageUnassignedVirtualCount > 0 && percentageUnassignedVirtualCount < 1) ? 1 : Math.round(percentageUnassignedVirtualCount)}%)
 								</g:link>
 							</b>
@@ -365,11 +365,11 @@ $(document).ready(function() {
 							</td>
 								<g:each in="${assetList}" var="assetCount">
 									<td style="text-align: right;"><b>
-										<g:link controller="assetEntity" action="list" params="[moveEvent:assetCount.moveEvent,filter:'virtual']">	${assetCount.virtualAssetCount}</g:link>
+										<g:link controller="assetEntity" action="list" params="[moveEvent:assetCount.moveEvent,filter:'virtual']" class="links">${assetCount.virtualAssetCount}</g:link>
 									</b></td>
 								</g:each>
 							<td style="text-align: right;"><b>
-								<g:link controller="assetEntity" action="list" params="[tag_f_planStatus:'moved',tag_f_assetType:'vm']">${percentagevirtualAssetCount}%</g:link>
+								<g:link controller="assetEntity" action="list" params="[tag_f_planStatus:'moved',tag_f_assetType:'vm']" class="links">${percentagevirtualAssetCount}%</g:link>
 							</b></td>
 						</tr>
 						<tr>
@@ -381,7 +381,7 @@ $(document).ready(function() {
 							</g:if>
 							<g:else>
 							<b>
-								<g:link controller="database" action="list" params="[moveEvent:'unAssigned']">
+								<g:link controller="database" action="list" params="[moveEvent:'unAssigned']" class="links">
 									${unassignedDbCount} (${(percentageUnassignedDbCount > 0 && percentageUnassignedDbCount < 1) ? 1 : Math.round(percentageUnassignedDbCount)}%)
 								</g:link>
 							</b>
@@ -389,11 +389,11 @@ $(document).ready(function() {
 							</td>
 								<g:each in="${dbList}" var="dbCount">
 									<td style="text-align: right;"><b>
-										<g:link controller="database" action="list" params="[moveEvent:dbCount.moveEvent,filter:'virtual']">${dbCount.count}</g:link>
+										<g:link controller="database" action="list" params="[moveEvent:dbCount.moveEvent,filter:'virtual']" class="links">${dbCount.count}</g:link>
 									</b></td>
 								</g:each>
 							<td style="text-align: right;"><b>
-								<g:link controller="database" action="list" params="[tag_f_planStatus:'moved']">${percentageDBCount}%</g:link>
+								<g:link controller="database" action="list" params="[tag_f_planStatus:'moved']" class="links">${percentageDBCount}%</g:link>
 							</b></td>
 						</tr>
 						<tr>
@@ -405,7 +405,7 @@ $(document).ready(function() {
 							</g:if>
 							<g:else>
                             <b>
-								<g:link controller="files" action="list" params="[moveEvent:'unAssigned']">
+								<g:link controller="files" action="list" params="[moveEvent:'unAssigned']" class="links">
 								${unassignedFilesCount} (${(percentageUnassignedFilesCount > 0 && percentageUnassignedFilesCount < 1) ? 1 : Math.round(percentageUnassignedFilesCount)}%)
 								</g:link>
 							</b>
@@ -413,11 +413,11 @@ $(document).ready(function() {
 							</td>
 								<g:each in="${filesList}" var="filesCount">
 									<td style="text-align: right;"><b>
-										<g:link controller="files" action="list" params="[moveEvent:filesCount.moveEvent]">	${filesCount.count}</g:link>
+										<g:link controller="files" action="list" params="[moveEvent:filesCount.moveEvent]" class="links">${filesCount.count}</g:link>
 									</b></td>
 								</g:each>
 							<td style="text-align: right;"><b>
-								<g:link controller="files" action="list" params="[tag_f_planStatus:'moved']">${percentageFilesCount}%</g:link>
+								<g:link controller="files" action="list" params="[tag_f_planStatus:'moved']" class="links">${percentageFilesCount}%</g:link>
 							</b></td>
                         </tr>
                         <tr>
@@ -429,7 +429,7 @@ $(document).ready(function() {
 							</g:if>
 							<g:else>
                             <b>
-								<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'other']">
+								<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'other']" class="links">
 								   ${unassignedOtherCount}	(${(percentageUnassignedOtherCount > 0 && percentageUnassignedOtherCount < 1) ? 1 : Math.round(percentageUnassignedOtherCount)}%)
 								</g:link>
 							</b>
@@ -437,11 +437,11 @@ $(document).ready(function() {
 							</td>
 							<g:each in="${otherTypeList}" var="otherCount">
 								<td style="text-align: right;"><b>
-									<g:link controller="assetEntity" action="list" params="[moveEvent:otherCount.moveEvent,filter:'other']">${otherCount.count}</g:link>
+									<g:link controller="assetEntity" action="list" params="[moveEvent:otherCount.moveEvent,filter:'other']" class="links">${otherCount.count}</g:link>
 								</b></td>
 							</g:each>
 							<td style="text-align: right;"><b>
-								<g:link controller="assetEntity" action="list" params="[tag_f_planStatus:'moved']">${percentageOtherCount}%</g:link>
+								<g:link controller="assetEntity" action="list" params="[tag_f_planStatus:'moved']" class="links">${percentageOtherCount}%</g:link>
 							</b></td>
 						</tr>
 					</tbody>

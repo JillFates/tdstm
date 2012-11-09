@@ -538,7 +538,7 @@ class MoveBundleController {
 		if(applicationCount > 0){
 			percentageAppCount = Math.round((percentageAppCount/applicationCount)*100)
 		}else{
-			percentageAppCount = 100;
+			percentageAppCount = 0;
 		}
 		String moveBundles = moveBundleList.id
 		moveBundles = moveBundles.replace("[","('").replace(",","','").replace("]","')")
