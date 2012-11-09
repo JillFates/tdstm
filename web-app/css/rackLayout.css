@@ -36,28 +36,14 @@ br.page-break-after {
 	border:1px solid grey;
 	padding:0px
 }
-.room_CRAC_L {
+.room_CRAC_L, .room_CRAC_R {
 	width:60px;
 	height:100px;
 	border: 1px solid black;
 	background-color:white;
 	position:absolute;
 }
-.room_CRAC_R {
-	width:60px;
-	height:100px;
-	border: 1px solid black;
-	background-color:white;
-	position:absolute;
-}
-.room_CRAC_T {
-	width:100px;
-	height:60px;
-	border: 1px solid black;
-	background-color:white;
-	position:absolute;
-}
-.room_CRAC_B {
+.room_CRAC_T, .room_CRAC_B {
 	width:100px;
 	height:60px;
 	border: 1px solid black;
@@ -146,28 +132,14 @@ br.page-break-after {
 	background-position: right top;
 	position:absolute;
 }
-.room_UPS_R {
+.room_UPS_R, .room_UPS_L {
 	width:60px;
 	height:100px;
 	border: 1px solid black;
 	background-color:white;
 	position:absolute;
 }
-.room_UPS_L {
-	width:60px;
-	height:100px;
-	border: 1px solid black;
-	background-color:white;
-	position:absolute;
-}
-.room_UPS_T {
-	width:100px;
-	height:60px;
-	border: 1px solid black;
-	background-color:white;
-	position:absolute;
-}
-.room_UPS_B {
+.room_UPS_T, .room_UPS_B {
 	width:100px;
 	height:60px;
 	border: 1px solid black;
@@ -203,6 +175,217 @@ br.page-break-after {
 	position:absolute;
 }
 
+.room_block1x1_L, .room_block1x1_R {
+	width:20px;
+	height:20px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block1x2_L, .room_block1x2_R {
+	width:20px;
+	height:40px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block1x3_L, .room_block1x3_R {
+	width:20px;
+	height:60px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block1x4_L, .room_block1x4_R {
+	width:20px;
+	height:80px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block1x5_L, .room_block1x5_R {
+	width:20px;
+	height:100px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block2x2_L, .room_block2x2_R {
+	width:40px;
+	height:40px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block2x3_L, .room_block2x3_R {
+	width:40px;
+	height:60px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block2x4_L, .room_block2x4_R {
+	width:40px;
+	height:80px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block2x5_L, .room_block2x5_R {
+	width:40px;
+	height:100px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block3x3_L, .room_block3x3_R {
+	width:60px;
+	height:60px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block3x4_L, .room_block3x4_R {
+	width:60px;
+	height:80px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block3x5_L, .room_block3x5_R {
+	width:60px;
+	height:100px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block4x4_L, .room_block4x4_R {
+	width:80px;
+	height:80px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block4x5_L, .room_block4x5_R {
+	width:80px;
+	height:100px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block5x5_L, .room_block5x5_R {
+	width:100px;
+	height:100px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+
+.room_block1x1_T, .room_block1x1_B {
+	width:20px;
+	height:20px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block1x2_T, .room_block1x2_B {
+	width:40px;
+	height:20px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block1x3_T, .room_block1x3_B {
+	width:60px;
+	height:20px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block1x4_T, .room_block1x4_B {
+	width:80px;
+	height:20px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block1x5_T, .room_block1x5_B {
+	width:100px;
+	height:20px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block2x2_T, .room_block2x2_B {
+	width:40px;
+	height:40px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block2x3_T, .room_block2x3_B {
+	width:60px;
+	height:40px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block2x4_T, .room_block2x4_B {
+	width:80px;
+	height:40px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block2x5_T, .room_block2x5_B {
+	width:100px;
+	height:40px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block3x3_T, .room_block3x3_B {
+	width:60px;
+	height:60px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block3x4_T, .room_block3x4_B {
+	width:80px;
+	height:60px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block3x5_T, .room_block3x5_B {
+	width:100px;
+	height:60px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block4x4_T, .room_block4x4_B {
+	width:80px;
+	height:80px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block4x5_T, .room_block4x5_B {
+	width:100px;
+	height:80px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
+.room_block5x5_T, .room_block5x5_B {
+	width:100px;
+	height:100px;
+	border: 1px solid gray;
+	background-color:white;
+	position:absolute;
+}
 
 .room_mt {
 }

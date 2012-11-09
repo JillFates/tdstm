@@ -30,7 +30,7 @@ class Rack {
 		powerA( nullable:true )
 		powerB( nullable:true )
 		powerC( nullable:true )
-		rackType( blank:true, nullable:true, inList: ["Rack","CRAC","DoorL","DoorR","UPS","Object"] )
+		rackType( blank:true, nullable:true, inList: ["Rack","CRAC","DoorL","DoorR","UPS","Object","block1x1","block1x2","block1x3","block1x4","block1x5","block2x2","block2x3","block2x4","block2x5","block3x3","block3x4","block3x5","block4x4","block4x5","block5x5"] )
 		front( blank:true, nullable:true, inList: ["L","R","T","B"] )
 		manufacturer( nullable:true )
 		model( nullable:true )
