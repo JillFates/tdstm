@@ -511,7 +511,7 @@ class MoveBundleService {
      def createMoveBundleWorkflowTask(Map args){
          def errMsg = ""
          def stepTask = new AssetComment()
-             stepTask.comment = "${workflow.code}-${args.assetEntity.assetName}"
+             stepTask.comment = "${args.workflow.code}-${args.assetEntity.assetName}"
              stepTask.role = args.workflow.role
              stepTask.moveEvent = args.bundleMoveEvent
              stepTask.category = args.workflow.category

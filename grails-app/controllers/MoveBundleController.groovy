@@ -746,22 +746,20 @@ class MoveBundleController {
                     def bundleworkFlow = bundle.workflowCode
                     def workFlow = Workflow.findByProcess(bundleworkFlow)
                     def workFlowSteps = WorkflowTransition.findAllByWorkflow(workFlow)
-                    workFlowSteps.each{workflow->
-                        def i = 1
+					def i = 1
+                    workFlowSteps.each{ workflow->
                         if(![10, 20, 280, 900].contains(workflow.transId)){
                             bundledAssets.each{asset->
                                 def results = moveBundleService.createMoveBundleWorkflowTask([workflow:workflow, bundleMoveEvent:bundleMoveEvent, assetEntity:asset,
                                                                                                 project:project, person:person, bundle:bundle])
                                 def stepTask = results.stepTask
                                 errMsg = results.errMsg
-                                
                                 if(i==1){
                                     commentService.saveAndUpdateTaskDependency(stepTask, commentToBegin, null, null)
                                 }
                                 if(i==workFlowSteps.size()){
                                     commentService.saveAndUpdateTaskDependency(commentToComplete, stepTask, null, null)
                                 }
-                                i++
                             }
                         } else if(workflow.transId == 110 ){
                             def results = moveBundleService.createMoveBundleWorkflowTask([workflow:workflow, bundleMoveEvent:bundleMoveEvent,
@@ -769,6 +767,7 @@ class MoveBundleController {
                             def stepTask = results.stepTask
                             errMsg = results.errMsg
                         }
+						i++
                     }
                 }
 			}

@@ -63,6 +63,10 @@
 		}
 		return check
 	}
+
+	function createTask(id){
+		 new Ajax.Request('../createTask?bundleId='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){alert(e.responseText)}})
+	}
     </script>
   </head>
   <body>   
@@ -198,6 +202,7 @@
           <g:if test="${showHistoryButton}">
           		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Are you sure you want to permanently clear transitions for assets in this bundle?');" value="Clear Asset History" action="clearBundleAssetHistory"/></span>
           </g:if>
+              <span class="button"><input type="button"  class="edit" value="Create Tasks" onclick="createTask(${moveBundleInstance?.id})">  </span>
           </tds:hasPermission>
         </g:form>
       </div>
@@ -264,6 +269,10 @@
 	 <script>
 	    currentMenuId = "#bundleMenu";
 	    $("#bundleMenuId a").css('background-color','#003366')
+	    $(document).ready(function() {
+			$("#bForBundle").dialog({ autoOpen: false })
+	        
+		})
    </script>
   </body>
 </html>

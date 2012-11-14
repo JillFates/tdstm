@@ -135,7 +135,7 @@ td.errors input {
 table {
     border: 1px solid #63a242;
     width: 100%;
-    float:left
+    //float:left
 }
 tr {
     border: 0;
@@ -287,7 +287,7 @@ th.desc a {
     margin-top: 5px;
     overflow: hidden;
     padding: 0;
-    float: left;
+    //float: left;
 }
 
 .buttons input {
