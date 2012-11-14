@@ -362,3 +362,13 @@ function enableButton(list){
 		$('#deleteAsset').attr('disabled',false)
 	}
 }
+
+function updateModel(rackId,value){
+	var val = value;
+	new Ajax.Request('../assetEntity/getModelsList?manufacturer='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){populateModelSelect(e,rackId);}})
+}
+function populateModelSelect(e,rackId){
+    var resp = e.responseText;
+    resp = resp.replace("model.id","model_"+rackId+"").replace("Unassigned","Select Model")
+    $("#modelSpan_"+rackId).html(resp);
+}
