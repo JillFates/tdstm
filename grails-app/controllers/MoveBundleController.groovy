@@ -14,6 +14,7 @@ import com.tds.asset.AssetOptions
 import com.tds.asset.AssetTransition
 import com.tds.asset.Database
 import com.tds.asset.Files
+import com.tds.asset.TaskDependency;
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
 
@@ -27,6 +28,7 @@ class MoveBundleController {
 	def moveBundleService
 	def jdbcTemplate
 	def securityService
+	def commentService
 
 	protected static String dependecyBundlingAssetType = "('server','vm','blade','Application','Files','Database')"  
 	
@@ -709,5 +711,71 @@ class MoveBundleController {
 		}
 		forward(controller:"assetEntity",action:"getLists", params:[entity:params.assetType,dependencyBundle:session.getAttribute('dependencyBundle')])
    }
+	
+	/**
+	 * To generate Tasks for Bundle
+	 * @param - bundleId - Id of the Bundle to generate the tasks for that bundle
+	 * @return - error Message - if any else success Message
+	 */
+	def createTask ={
+		def bundleId = params.bundleId
+		def bundle = MoveBundle.get(bundleId)
+        def errMsg = ""
+		if(bundle.getAssetQty() > 0 ){
+            def bundleMoveEvent = bundle.moveEvent
+            def userLogin = securityService.getUserLogin()
+            def project = securityService.getUserCurrentProject()
+            def person = userLogin.person
+            
+			def commentToBegin = new AssetComment(comment:'Begin Move Event',moveEvent:bundleMoveEvent, assignedTo:person, role:'PROJ_MGR', category:'shutdown',
+												Status :'Pending', duration:0, commentType:'issue', project:project)
+			if(!commentToBegin.save(flush:true)){
+				commentToBegin.errors.allErrors.each{println it}
+				errMsg = "Failed to create Begin Move Event Task. Process Failed"
+			}
+			if(!errMsg){
+				def commentToComplete = new AssetComment(comment:'Move Event Complete',moveEvent:bundleMoveEvent, assignedTo:person, role:'PROJ_MGR',
+					 										category:'startup',Status :'Pending', duration:0, commentType:'issue', project:project)
+				if(!commentToComplete.save(flush:true)){
+					commentToComplete.errors.allErrors.each{println it}
+					errMsg = "Failed to create Move Event Complete Task. Process Failed"
+				}
+                if(!errMsg){
+                    def bundledAssets = AssetEntity.findAll("from AssetEntity a where a.moveBundle = :bundle and a.project =:project\
+															and a.assetType not  in('application', 'database', 'files',' VM')",[bundle:bundle,project:project])
+                    def bundleworkFlow = bundle.workflowCode
+                    def workFlow = Workflow.findByProcess(bundleworkFlow)
+                    def workFlowSteps = WorkflowTransition.findAllByWorkflow(workFlow)
+                    workFlowSteps.each{workflow->
+                        def i = 1
+                        if(![10, 20, 280, 900].contains(workflow.transId)){
+                            bundledAssets.each{asset->
+                                def results = moveBundleService.createMoveBundleWorkflowTask([workflow:workflow, bundleMoveEvent:bundleMoveEvent, assetEntity:asset,
+                                                                                                project:project, person:person, bundle:bundle])
+                                def stepTask = results.stepTask
+                                errMsg = results.errMsg
+                                
+                                if(i==1){
+                                    commentService.saveAndUpdateTaskDependency(stepTask, commentToBegin, null, null)
+                                }
+                                if(i==workFlowSteps.size()){
+                                    commentService.saveAndUpdateTaskDependency(commentToComplete, stepTask, null, null)
+                                }
+                                i++
+                            }
+                        } else if(workflow.transId == 110 ){
+                            def results = moveBundleService.createMoveBundleWorkflowTask([workflow:workflow, bundleMoveEvent:bundleMoveEvent,
+                                                                            project:project, person:person, bundle:bundle])
+                            def stepTask = results.stepTask
+                            errMsg = results.errMsg
+                        }
+                    }
+                }
+			}
+		}else{
+			errMsg = "No Asset Assigned to current Bundle - ${bundle.name}. So Process Terminated."
+		}
+	   render errMsg ? errMsg : "Generated Tasks for Bundle - ${bundle.name} successfully."
+	}
 }
 

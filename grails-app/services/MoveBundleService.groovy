@@ -501,5 +501,36 @@ class MoveBundleService {
 		 
 		 return map
 	 }
- 
+     
+     /**
+      * 
+      * @param workflow
+      * @param assetEntity (optional)
+      * @return Map [errMsg, stepTask]
+      */
+     def createMoveBundleWorkflowTask(Map args){
+         def errMsg = ""
+         def stepTask = new AssetComment()
+             stepTask.comment = "${workflow.code}-${args.assetEntity.assetName}"
+             stepTask.role = args.workflow.role
+             stepTask.moveEvent = args.bundleMoveEvent
+             stepTask.category = args.workflow.category
+             stepTask.assetEntity = args.assetEntity
+             stepTask.duration = args.workflow.duration ? args.workflow.duration : 0
+             stepTask.priority = args.assetEntity.priority ? args.assetEntity.priority : 3
+             stepTask.status  = "Pending"
+             stepTask.workflowTransition = args.workflow
+             stepTask.project = args.project
+             stepTask.commentType = "issue"
+             stepTask.createdBy = args.person
+             stepTask.estStart = MoveBundleStep.findByMoveBundleAndTransitionId(args.bundle, args.workflow.transId)?.planStartTime
+             stepTask.estFinish = MoveBundleStep.findByMoveBundleAndTransitionId(args.bundle, args.workflow.transId)?.planCompletionTime
+
+         if(!stepTask.save(flush:true)){
+             stepTask.errors.allErrors.each{println it}
+             errMsg = "Failed to create WorkFlow Task. Process Failed"
+         }
+         
+         return [errMsg:errMsg, stepTask:stepTask]
+     }
 }
