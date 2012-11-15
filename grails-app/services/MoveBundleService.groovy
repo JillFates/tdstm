@@ -514,7 +514,7 @@ class MoveBundleService {
              stepTask.comment = "${args.workflow.code}${args.assetEntity ? '-'+args.assetEntity?.assetName:''}"
              stepTask.role = args.workflow.role
              stepTask.moveEvent = args.bundleMoveEvent
-             stepTask.category = args.workflow.category
+             stepTask.category = args.workflow.category ? args.workflow.category : 'general'
              stepTask.assetEntity = args.assetEntity
              stepTask.duration = args.workflow.duration ? args.workflow.duration : 0
              stepTask.priority = args.assetEntity?.priority ? args.assetEntity?.priority : 3
@@ -523,6 +523,7 @@ class MoveBundleService {
              stepTask.project = args.project
              stepTask.commentType = "issue"
              stepTask.createdBy = args.person
+			 stepTask.taskNumber = args.taskNumber
              stepTask.estStart = MoveBundleStep.findByMoveBundleAndTransitionId(args.bundle, args.workflow.transId)?.planStartTime
              stepTask.estFinish = MoveBundleStep.findByMoveBundleAndTransitionId(args.bundle, args.workflow.transId)?.planCompletionTime
 

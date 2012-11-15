@@ -726,46 +726,62 @@ class MoveBundleController {
             def userLogin = securityService.getUserLogin()
             def project = securityService.getUserCurrentProject()
             def person = userLogin.person
-            
+			def lastTask = jdbcTemplate.queryForInt("SELECT MAX(task_number) FROM asset_comment WHERE project_id = ${project.id}")+1
+			
 			def commentToBegin = new AssetComment(comment:'Begin Move Event',moveEvent:bundleMoveEvent, assignedTo:person, role:'PROJ_MGR', category:'shutdown',
-												Status :'Pending', duration:0, commentType:'issue', project:project)
+												Status :'Pending', duration:0, commentType:'issue', project:project, estStart:bundle.startTime, 
+												estFinish:bundle.completionTime, createdBy:person, taskNumber:lastTask)
 			if(!commentToBegin.save(flush:true)){
 				commentToBegin.errors.allErrors.each{println it}
 				errMsg = "Failed to create Begin Move Event Task. Process Failed"
 			}
 			if(!errMsg){
 				def commentToComplete = new AssetComment(comment:'Move Event Complete',moveEvent:bundleMoveEvent, assignedTo:person, role:'PROJ_MGR',
-					 										category:'startup',Status :'Pending', duration:0, commentType:'issue', project:project)
+					 										category:'startup',Status :'Pending', duration:0, commentType:'issue', project:project,
+															createdBy:person, taskNumber:++lastTask)
 				if(!commentToComplete.save(flush:true)){
 					commentToComplete.errors.allErrors.each{println it}
 					errMsg = "Failed to create Move Event Complete Task. Process Failed"
 				}
+				lastTask = lastTask + 1
                 if(!errMsg){
                     def bundledAssets = AssetEntity.findAll("from AssetEntity a where a.moveBundle = :bundle and a.project =:project\
-															and a.assetType not  in('application', 'database', 'files',' VM')",[bundle:bundle,project:project])
+															and a.assetType not  in('application', 'database', 'files', 'VM')",[bundle:bundle,project:project])
                     def bundleworkFlow = bundle.workflowCode
                     def workFlow = Workflow.findByProcess(bundleworkFlow)
                     def workFlowSteps = WorkflowTransition.findAllByWorkflow(workFlow)
 					def i = 1
+					def previousTask
                     workFlowSteps.each{ workflow->
-                        if(![10, 20, 280, 900].contains(workflow.transId)){
+                        if(![10, 20, 110, 280, 900].contains(workflow.transId)){
                             bundledAssets.each{asset->
                                 def results = moveBundleService.createMoveBundleWorkflowTask([workflow:workflow, bundleMoveEvent:bundleMoveEvent, assetEntity:asset,
-                                                                                                project:project, person:person, bundle:bundle])
+                                                                                                project:project, person:person, bundle:bundle, taskNumber:lastTask])
                                 def stepTask = results.stepTask
                                 errMsg = results.errMsg
+								
                                 if(i==1){
                                     commentService.saveAndUpdateTaskDependency(stepTask, commentToBegin, null, null)
-                                }
-                                if(i==workFlowSteps.size()){
+                                }else if(i==workFlowSteps.size()){
                                     commentService.saveAndUpdateTaskDependency(commentToComplete, stepTask, null, null)
-                                }
+									commentService.saveAndUpdateTaskDependency(stepTask, previousTask, null, null)
+                                }else {
+									if(previousTask){
+										 commentService.saveAndUpdateTaskDependency(stepTask, previousTask, null, null) 
+									}
+								}
+								previousTask = stepTask
+								lastTask++
                             }
                         } else if(workflow.transId == 110 ){
+						
                             def results = moveBundleService.createMoveBundleWorkflowTask([workflow:workflow, bundleMoveEvent:bundleMoveEvent,
-                                                                            project:project, person:person, bundle:bundle])
+                                                                            project:project, person:person, bundle:bundle, taskNumber:lastTask])
                             def stepTask = results.stepTask
+							commentService.saveAndUpdateTaskDependency(stepTask, previousTask, null, null)
+							previousTask = stepTask
                             errMsg = results.errMsg
+							lastTask++
                         }
 						i++
                     }
