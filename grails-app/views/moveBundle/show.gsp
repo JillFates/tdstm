@@ -67,6 +67,12 @@
 	function createTask(id){
 		 new Ajax.Request('../createTask?bundleId='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){alert(e.responseText)}})
 	}
+
+	function deleteTask(id){
+		if(confirm("are you sure you want to delete the generated tasks?")){
+			new Ajax.Request('../deleteWorkflowTasks?bundleId='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){alert(e.responseText)}})
+		}
+	}
     </script>
   </head>
   <body>   
@@ -203,6 +209,7 @@
           		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Are you sure you want to permanently clear transitions for assets in this bundle?');" value="Clear Asset History" action="clearBundleAssetHistory"/></span>
           </g:if>
               <span class="button"><input type="button"  class="edit" value="Create Tasks" onclick="createTask(${moveBundleInstance?.id})">  </span>
+              <span class="button"><input type="button"  class="edit" value="Delete Tasks" onclick="deleteTask(${moveBundleInstance?.id})">  </span>
           </tds:hasPermission>
         </g:form>
       </div>

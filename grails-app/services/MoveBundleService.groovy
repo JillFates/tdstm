@@ -511,13 +511,13 @@ class MoveBundleService {
      def createMoveBundleWorkflowTask(Map args){
          def errMsg = ""
          def stepTask = new AssetComment()
-             stepTask.comment = "${args.workflow.code}-${args.assetEntity.assetName}"
+             stepTask.comment = "${args.workflow.code}${args.assetEntity ? '-'+args.assetEntity?.assetName:''}"
              stepTask.role = args.workflow.role
              stepTask.moveEvent = args.bundleMoveEvent
              stepTask.category = args.workflow.category
              stepTask.assetEntity = args.assetEntity
              stepTask.duration = args.workflow.duration ? args.workflow.duration : 0
-             stepTask.priority = args.assetEntity.priority ? args.assetEntity.priority : 3
+             stepTask.priority = args.assetEntity?.priority ? args.assetEntity?.priority : 3
              stepTask.status  = "Pending"
              stepTask.workflowTransition = args.workflow
              stepTask.project = args.project

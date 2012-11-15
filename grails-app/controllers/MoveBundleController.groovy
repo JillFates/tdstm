@@ -776,5 +776,38 @@ class MoveBundleController {
 		}
 	   render errMsg ? errMsg : "Generated Tasks for Bundle - ${bundle.name} successfully."
 	}
+    
+    /**
+     * To delete all generated task for bundle
+     * @Param : bundleId - Id of bundle for which generated task needs to be deleted
+     * @return : void
+     */
+    def deleteWorkflowTasks = {
+        def bundleId = params.bundleId
+        def bundle = MoveBundle.get(bundleId)
+        def errMsg
+        if(bundle.getAssetQty() > 0 ){
+            def event = bundle.moveEvent
+            def project = securityService.getUserCurrentProject()
+            def bundledAssets = AssetEntity.findAll("from AssetEntity a where a.moveBundle = :bundle and a.project =:project\
+                                                    and a.assetType not in ('application','database',' ','VM')",[bundle:bundle,project:project])
+            
+            def assetComments = AssetComment.findAll("from AssetComment ac where commentType = 'issue' and \
+                                                        ((ac.assetEntity in (:assets) and ac.workflowTransition is not null) \
+                                                         or ( ac.moveEvent = :moveEvent and ac.comment in (:comments)) \
+                                                         or ( ac.moveEvent = :moveEvent and ac.workflowTransition is not null )) ",
+                                                         [assets:bundledAssets, moveEvent:event, comments:["Begin Move Event", "Move Event Complete"]])
+            if(assetComments.size() > 0){
+                def taskDependency = TaskDependency.executeUpdate("delete from TaskDependency td where (td.predecessor in (:tasks) or td.assetComment in (:tasks))",
+                                                                    [tasks:assetComments])
+                
+                def assetComment  = AssetComment.executeUpdate("delete from AssetComment ac where ac.id in (:ids)",[ids:assetComments.id])
+            }
+            errMsg = "Tasks Deleted Successfully."
+        } else {
+            errMsg = "No Asset Assigned to current Bundle - ${bundle.name}. So Process Terminated."
+        }
+        render errMsg
+    }
 }
 
