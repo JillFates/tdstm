@@ -1,3 +1,5 @@
+<%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus" %>
+<%@page import="com.tdssrc.grails.GormUtil"%>
 <%--
 /*
  **************************
