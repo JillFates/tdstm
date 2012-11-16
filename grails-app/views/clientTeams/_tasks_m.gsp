@@ -93,7 +93,7 @@
 					</td>
 					</tr>
 					<g:if test="${tab && tab == 'todo'}">
-					<tr id="showStatusId_${issue?.item?.id}" style="display: none;">
+					 <tr id="showStatusId_${issue?.item?.id}" ${(todoSize!=1||search==''||search==null) ? 'style="display: none"' :''}>
 						<td nowrap="nowrap" colspan="3" class="statusButtonBar">
 							<g:if test="${issue.item.status == AssetCommentStatus.READY}"> 
 							<tds:actionButton label="Start" icon="ui-icon-play" id="${issue?.item?.id}"  
