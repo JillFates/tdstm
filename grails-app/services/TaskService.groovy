@@ -137,9 +137,14 @@ class TaskService {
 		sql.append("""FROM asset_comment t 
 			LEFT OUTER JOIN asset_entity a ON a.asset_entity_id = t.asset_entity_id 
             LEFT OUTER JOIN person p ON p.person_id = t.assigned_to_id 
-			WHERE t.project_id=:projectId AND t.comment_type=:type AND 
-			( t.assigned_to_id=:assignedToId OR 
-				(t.role IN (:roles) AND t.status IN (:statuses) AND t.hard_assigned=0 OR (t.hard_assigned=1 AND t.assigned_to_id=:assignedToId) ) ) """)
+			WHERE t.project_id=:projectId AND t.comment_type=:type """)
+		
+		if(roles.contains('CLEANER')){
+			sql.append("""AND t.role = 'CLEANER' """)
+		}else{
+			sql.append("""AND( t.assigned_to_id=:assignedToId OR
+						(t.role IN (:roles) AND t.status IN (:statuses) AND t.hard_assigned=0 OR (t.hard_assigned=1 AND t.assigned_to_id=:assignedToId) ) ) """)
+		}
 		
 		search = org.apache.commons.lang.StringUtils.trimToNull(search)
 		if (search) {
@@ -188,6 +193,7 @@ class TaskService {
 		//log.info "getUserTasks: SQL: " + sql.toString()
 		//log.info "getUserTasks: SQL params: " + sqlParams
 		// Get all tasks from the database and then filter out the TODOs based on a filtering
+		
 		def allTasks = namedParameterJdbcTemplate.queryForList( sql.toString(), sqlParams )
 		// def allTasks = jdbcTemplate.queryForList( sql.toString(), sqlParams )
 		def format = "yyyy/MM/dd hh:mm:ss"

@@ -10,6 +10,11 @@
 </head>
 <body>
 		<div class="menu4">
+		<g:if test="${isOnIE}">
+		<OBJECT id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C"
+				CODEBASE="${createLinkTo(dir:'resource',file:'TFORMer60.cab')}"
+				style="height: 1px;"></OBJECT>
+		</g:if>
 			<ul>
 					<g:if test="${tab && tab == 'todo'}">
 						<li><g:link elementId="taskLinkId" class="mobmenu mobselect"
@@ -139,6 +144,21 @@
 		</table>
 	</div>
 <script type="text/javascript">
+/*----------------------------------------------------------
+	* To load the installed printers into session by initializing TFORMer
+	*---------------------------------------------------------*/
+	if(${isOnIE}){
+		function initializeTF(){
+			window.TF.RefreshOSPrinters();
+			var def = "";
+			var dropdown = new Array();
+			for (i = 0; i < window.TF.GetOSPrintersCount(); i++){
+				dropdown.push(window.TF.GetOSPrinter(i))
+			}
+			${remoteFunction(controller:'moveTech', action:'setPrintersIntoSession', params:'\'dropdown=\' + dropdown')}
+		}
+		initializeTF()
+	}
 	$( function() {
 		$('#issueTimebar').width($('#issueTable').width())
 		$('#selectTimedBarId').val(${timeToUpdate})
@@ -316,7 +336,6 @@ function pageRefresh(){
 	var B1=new Bar({
 		ID:'issueTimebarId'
 	});
-
 </script>
 <script>
 	currentMenuId = "#teamMenuId";

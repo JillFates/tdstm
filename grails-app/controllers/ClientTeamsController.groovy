@@ -1027,13 +1027,18 @@ class ClientTeamsController {
 		def timeToRefresh = getSession()?.getAttribute("MY_TASK")?.MY_TASK
 		// Determine the model and view
 		def model = [taskList:issueList, tab:tab, todoSize:todoSize, allSize:allSize, search:search, sort:params.sort, order:params.order,
-			      	 personId : person.id, timeToUpdate:timeToRefresh ?: 60]
+			      	 personId : person.id, timeToUpdate:timeToRefresh ?: 60, isOnIE : false]
 		def view = params.view == "myTask" ? "_tasks" : "myIssues"
 		if ( session.getAttribute('TASK_VIEW_MODE') == 'mobile') {
 			view = params.view == "myTask" ? "_tasks_m" : view+"_m"
 		} else {
 			model << [timers:session.MY_ISSUE_REFRESH?.MY_ISSUE_REFRESH]
 		}
+		if ( request.getHeader ( "User-Agent" ).contains ( "MSIE" ) ) {
+			model << [isOnIE : true]
+		}
+		println"model->"+model
+		println"view--->"+view
 		// Send the user on his merry way
 		render (view:view, model:model)
 		
@@ -1060,6 +1065,10 @@ class ClientTeamsController {
 		def etFinish
 		def noteList = assetComment.notes.sort{it.dateCreated}
 		def notes = []
+		def browserTest = false
+		if ( !request.getHeader ( "User-Agent" ).contains ( "MSIE" ) ) {
+			browserTest = true
+		}
 		noteList.each{
 			def dateCreated = TimeUtil.convertInToUserTZ(it.dateCreated, tzId).format("E, d MMM 'at ' HH:mma")
 			notes << [dateCreated , it.createdBy.toString() ,it.note]
@@ -1084,12 +1093,19 @@ class ClientTeamsController {
 		def successor = TaskDependency.findAllByPredecessor( assetComment )
 		def projectStaff = partyRelationshipService.getProjectStaff( project.id )?.staff
 		projectStaff.sort{it.firstName}
+	    
+		def model = [assetComment:assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1,
+											permissionForUpdate:permissionForUpdate, successor:successor, etFinish:etFinish, projectStaff:projectStaff,
+											browserTest:browserTest]
+		
+		
 		if(viewMode=='mobile'){
-			render (view:'showIssue_m',model:['assetComment':assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1,
-											permissionForUpdate:permissionForUpdate, successor:successor, etFinish:etFinish, projectStaff:projectStaff])
+			render (view:'showIssue_m',model:model)
 		}else{
-			return[assetComment:assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, 
-					permissionForUpdate : permissionForUpdate, successor:successor, etFinish:etFinish, projectStaff:projectStaff]
+			def isCleaner = assetComment.role == 'CLEANER' ? true : false
+			def view = isCleaner ? '_showCleaningTask' : 'showIssue'
+			
+			render (view:view,model:model)
 		}
 	}
 }
