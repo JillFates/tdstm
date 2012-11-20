@@ -511,7 +511,8 @@ class PersonController {
 		def moveEvents = MoveEvent.findAll("from MoveEvent m where project =:project order by m.project.name , m.name asc",[project:project])
         // Limit the events to today-30 days and newer (ie. don't show events over a month ago) 
         moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > new Date().minus(30)}
-		def staffList = getStaffList(project.id, currRole, currScale, currLoc, 0)
+		def paramsMap = [sortOn : 'lastName', firstProp : 'staff', orderBy : 'asc']
+		def staffList = getStaffList(project.id, currRole, currScale, currLoc, 0,paramsMap)
 		
 		def eventCheckStatuses = eventCheckStatus(staffList, moveEvents)
 		def staffCheckStatus = staffCheckStatus(staffList,project)
@@ -578,7 +579,7 @@ class PersonController {
 	def getStaffList(def projectId, def role, def scale, def location,def assigned,def paramsMap){
 		def sortOn = paramsMap.sortOn ?:"lastName"
 		def orderBy = paramsMap.orderBy?:'asc'
-		def firstProp = paramsMap.firstProp?:'staff'
+		def firstProp = paramsMap.firstProp ? (paramsMap.firstProp && paramsMap.firstProp == 'company' ? '' :paramsMap.firstProp) : 'staff'
 		def user = securityService.getUserLogin()
 		def loggedInPerson = user.person
 		def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' \
