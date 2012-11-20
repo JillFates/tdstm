@@ -1,10 +1,11 @@
 <table>
 	<thead>
-		<th>Name <br/> (job title)
+	  <tr>
+		<th style="cursor: pointer;" onclick="loadFilteredStaff('lastName','staff')">Name <br/> (job title)
 		</th>
-		<th>Company <br/>
+		<th style="cursor: pointer;" onclick="loadFilteredStaff('company','')">Company <br/>
 		</th>
-		<th>Role</th>
+		<th style="cursor: pointer;" onclick="loadFilteredStaff('description','role')">Role</th>
 		<g:if test="${projectId=='0'}"> <th>Project</th></g:if>
 		<g:else><th>${project?.name}</th></g:else>
 		<g:each in ="${moveEventList}" var="moveEvent" >
@@ -14,6 +15,7 @@
 		  ${moveEvent.startTime}<br/>
 		</th>
 		</g:each>
+	  </tr>
 	</thead>
 	<tbody>
 		<g:each in="${staffList}" status="i" var="projectStaff">
@@ -62,4 +64,4 @@
 		</g:each>
 	</tbody>
 </table>
-
+<input type="hidden" id="order" value="asc">

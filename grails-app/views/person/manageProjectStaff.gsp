@@ -19,25 +19,25 @@
 				   <td>
 				       <span><b>Role</b></span><br/>
 					   <label for="role">
-	          				<g:select id="role" name="role" from="${roleTypes}" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"  value="${currRole}" onChange="loadFilteredStaff()"
+	          				<g:select id="role" name="role" from="${roleTypes}" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"  value="${currRole}" onChange="loadFilteredStaff('lastName','staff')"
 	          						noSelection="${['0':'All']}"></g:select>
 	            	   </label>
 				   </td>
 				   <td>
 				       <span><b>Only Assigned</b></span><br/>
-	          				<input type="checkbox" name="assigned" id="assignedId"  onChange="if(this.checked){this.value = 1} else {this.value = 0 };loadFilteredStaff()"/>
+	          				<input type="checkbox" name="assigned" id="assignedId"  onChange="if(this.checked){this.value = 1} else {this.value = 0 };loadFilteredStaff('lastName','staff')"/>
 				   </td>
 				    <%--<td>
 				       <span><b>Location</b></span><br/>
 					   <label for="location">
-	          				<g:select id="location" name="location"  from="${['All', 'Local']}"  value="${currLoc }" onChange="loadFilteredStaff()"></g:select>
+	          				<g:select id="location" name="location"  from="${['All', 'Local']}"  value="${currLoc }" onChange="loadFilteredStaff('lastName','staff')"></g:select>
 	            	   </label>
 				   </td>
 				   --%>
 				   <td>
 					    <span><b>Project</b></span><br/>
 						<label for="project">
-							<select id="project" name="project" onChange="loadFilteredStaff()">
+							<select id="project" name="project" onChange="loadFilteredStaff('lastName','staff')">
 								<g:if test="${isTdsEmp}">
 								    <option value="0">All</option>
 								</g:if>
@@ -84,7 +84,7 @@
 					--%><td>
 				      <span><b>Scale</b></span><br/>
 					   <label for="scale">
-	          				<select id="scale" name="scale" onChange="loadFilteredStaff()">
+	          				<select id="scale" name="scale" onChange="loadFilteredStaff('lastName','staff')">
 	          				 <option value="1"> 1 Month </option>
 	          				 <option value="2"> 2 Month </option>
 	          				 <option value="3"> 3 Month </option>

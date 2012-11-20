@@ -3,12 +3,13 @@
  */
 var currentTabShow = "generalInfoShowId"
 var currentHeaderShow = "generalShowHeadId"
-function loadFilteredStaff() {
+function loadFilteredStaff(sortOn , firstProp) {
 	var role = $("#role").val()
 	var location = $("#location").val()
 	var project = $("#project").val()
 	var scale = $("#scale").val()
 	var assigned = $("#assignedId").val()
+	var orderBy = $("#order").val()
 	var phaseArr = new Array();
 	if ($("#allPhase").val() == '1') {
 		phaseArr.push("all")
@@ -27,11 +28,20 @@ function loadFilteredStaff() {
 			'project' : project,
 			'scale' : scale,
 			'phaseArr' : phaseArr,
-			'assigned' : assigned
+			'assigned' : assigned,
+			'sortOn':sortOn,
+			'firstProp':firstProp,
+			'orderBy':orderBy
+			
 		},
 		type : 'POST',
 		success : function(data) {
 			$("#projectStaffTableId").html(data)
+			if(orderBy=='asc'){
+				$("#order").val('desc')
+			} else {
+				$("#order").val('asc')
+			}
 		}
 	});
 
@@ -47,14 +57,14 @@ function checkAllPhase() {
 			$("#" + phaseId).attr('checked', true);
 		})
 	}
-	loadFilteredStaff();
+	loadFilteredStaff('lastName','staff');
 }
 /*
  * when uncheck any other check box uncheck phase's all check box
  */
 function unCheckAll() {
 	$("#allPhase").attr('checked', false);
-	loadFilteredStaff();
+	loadFilteredStaff('lastName','staff');
 }
 /*
  * To open person's general info , Availabilty and TDS utility dialog
@@ -168,7 +178,7 @@ function saveEventStaff(id){
 			if(data=="false"){
 			   alert("An unexpected error occurred while attempting to update Person's MoveEvent  ")
 			}
-			loadFilteredStaff();
+			loadFilteredStaff('lastName','staff');
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while attempting to update Person's MoveEvent ")
@@ -189,7 +199,7 @@ function saveProjectStaff(id){
 			if(data=="false"){
 			   alert("An unexpected error occurred while attempting to update Person's MoveEvent  ")
 			}
-			loadFilteredStaff();
+			loadFilteredStaff('lastName','staff');
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while attempting to update Person's MoveEvent ")

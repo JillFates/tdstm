@@ -556,7 +556,8 @@ class PersonController {
 		}
         // Limit the events to today-30 days and newer (ie. don't show events over a month ago) 
         moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > new Date().minus(30)}
-		def staffList = getStaffList(projectId,role,scale,location,assigned);
+        def paramsMap = [sortOn : params.sortOn, firstProp : params.firstProp, orderBy : params.orderBy]
+		def staffList = getStaffList(projectId,role,scale,location,assigned,paramsMap);
 		def eventCheckStatuses = eventCheckStatus(staffList, moveEvents)
 		def staffCheckStatuses = []
 		if(projectId!="0"){
@@ -574,7 +575,10 @@ class PersonController {
 	 *@param scale - duration in month  to filter staff list
 	 *@param location - location to filter staff list
 	 */
-	def getStaffList(def projectId, def role, def scale, def location,def assigned){
+	def getStaffList(def projectId, def role, def scale, def location,def assigned,def paramsMap){
+		def sortOn = paramsMap.sortOn ?:"lastName"
+		def orderBy = paramsMap.orderBy?:'asc'
+		def firstProp = paramsMap.firstProp?:'staff'
 		def user = securityService.getUserLogin()
 		def loggedInPerson = user.person
 		def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' \
@@ -668,7 +672,14 @@ class PersonController {
                 }
             }
 		}
-		staffList.sort{it?.staff?.lastName}
+		
+		staffList.sort{ a,b->
+			if(orderBy == 'asc'){
+				firstProp ? (a."${firstProp}"?."${sortOn}" <=> b."${firstProp}"."${sortOn}") : ((a."${sortOn}").toString() <=> b."${sortOn}".toString())
+			} else {
+				firstProp ? (b."${firstProp}"."${sortOn}" <=> a."${firstProp}"?."${sortOn}") : (b."${sortOn}".toString() <=> a."${sortOn}".toString())
+			}
+		}
 		return staffList
 		
 	}
@@ -706,7 +717,7 @@ class PersonController {
 	def getBundleHeader(moveEvents){
 		def project = securityService.getUserCurrentProject()
 		def moveEventList = []
-		def bundleTimeformatter = new SimpleDateFormat("dd-MMM")
+		def bundleTimeformatter = new SimpleDateFormat("MMM dd")
 		if(project){
 			def bundleStartDate = ""
 			def personAssignedToME = []

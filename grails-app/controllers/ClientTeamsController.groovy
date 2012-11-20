@@ -1103,7 +1103,7 @@ class ClientTeamsController {
 			render (view:'showIssue_m',model:model)
 		}else{
 			def isCleaner = assetComment.role == 'CLEANER' ? true : false
-			def view = isCleaner ? '_showCleaningTask' : 'showIssue'
+			def view = isCleaner ? '_showCleanerTask' : 'showIssue'
 			
 			render (view:view,model:model)
 		}
