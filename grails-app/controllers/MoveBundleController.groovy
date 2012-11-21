@@ -749,20 +749,23 @@ class MoveBundleController {
 															and a.assetType not  in('application', 'database', 'files', 'VM')",[bundle:bundle,project:project])
                     def bundleworkFlow = bundle.workflowCode
                     def workFlow = Workflow.findByProcess(bundleworkFlow)
-                    def workFlowSteps = WorkflowTransition.findAllByWorkflow(workFlow)
-					def i = 1
+                    def workFlowSteps = WorkflowTransition.findAllByWorkflow(workFlow,[sort:'transId'])
+                    workFlowSteps = workFlowSteps.findAll{![10, 20, 280, 900].contains(it.transId)}
+                    def results = moveBundleService.createMoveBundleWorkflowTask([workflow:workFlowSteps.find{it.transId == 110}, bundleMoveEvent:bundleMoveEvent,
+                                                project:project, person:person, bundle:bundle, taskNumber:lastTask])
+                    def transportTask = results.stepTask
+                    lastTask++
 					def previousTask
-                    workFlowSteps.each{ workflow->
-                        if(![10, 20, 110, 280, 900].contains(workflow.transId)){
-                            bundledAssets.each{asset->
-                                def results = moveBundleService.createMoveBundleWorkflowTask([workflow:workflow, bundleMoveEvent:bundleMoveEvent, assetEntity:asset,
+                    bundledAssets.each{asset->
+                        workFlowSteps.eachWithIndex{ workflow, index->
+                            if(workflow.transId != 110){
+                                results = moveBundleService.createMoveBundleWorkflowTask([workflow:workflow, bundleMoveEvent:bundleMoveEvent, assetEntity:asset,
                                                                                                 project:project, person:person, bundle:bundle, taskNumber:lastTask])
                                 def stepTask = results.stepTask
                                 errMsg = results.errMsg
-								
-                                if(i==1){
+                                if(index==0){
                                     commentService.saveAndUpdateTaskDependency(stepTask, commentToBegin, null, null)
-                                }else if(i==workFlowSteps.size()){
+                                }else if(index==workFlowSteps.size()-1){
                                     commentService.saveAndUpdateTaskDependency(commentToComplete, stepTask, null, null)
 									commentService.saveAndUpdateTaskDependency(stepTask, previousTask, null, null)
                                 }else {
@@ -772,18 +775,11 @@ class MoveBundleController {
 								}
 								previousTask = stepTask
 								lastTask++
+                            } else {
+                                commentService.saveAndUpdateTaskDependency(transportTask, previousTask, null, null)
+                                previousTask = transportTask
                             }
-                        } else if(workflow.transId == 110 ){
-						
-                            def results = moveBundleService.createMoveBundleWorkflowTask([workflow:workflow, bundleMoveEvent:bundleMoveEvent,
-                                                                            project:project, person:person, bundle:bundle, taskNumber:lastTask])
-                            def stepTask = results.stepTask
-							commentService.saveAndUpdateTaskDependency(stepTask, previousTask, null, null)
-							previousTask = stepTask
-                            errMsg = results.errMsg
-							lastTask++
                         }
-						i++
                     }
                 }
 			}

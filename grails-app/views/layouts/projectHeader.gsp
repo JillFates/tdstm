@@ -310,7 +310,7 @@
 			</li>
 			</tds:hasPermission>
 			<tds:hasPermission permission='BundleMenuView'>
-			<li id="bundleMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]">Bundles
+			<li id="bundleMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]" id="${moveBundleId}">Bundles
 				<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#bundleMegaMenu')" href="javascript:showMegaMenu('#bundleMegaMenu')" style="display: inline"></a></g:link>
 			</li>
 
