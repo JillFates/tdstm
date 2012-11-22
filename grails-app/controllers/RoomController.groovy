@@ -114,7 +114,9 @@ class RoomController {
             redirect(action: "list")
         }
         else {
-            [roomInstance: roomInstance, rackInstanceList:rackInstanceList, newRacks : newRacks, manufacturerList:manufacturerList, modelList:modelList]
+			def draggableRack = session.getAttribute( "DraggableRack" )?.DraggableRack
+			[roomInstance: roomInstance, rackInstanceList:rackInstanceList, newRacks : newRacks, manufacturerList:manufacturerList, 
+				modelList:modelList, draggableRack:draggableRack]
         }
     }
 
@@ -720,5 +722,11 @@ class RoomController {
 		} else {
 			render "None"
 		}
+	}
+	
+	def setDraggableRackPref = {
+		def prefVal = params.prefVal
+		userPreferenceService.setPreference("DraggableRack",prefVal)
+		render 'success'
 	}
 }

@@ -1,5 +1,6 @@
 <html>
 <body>
+
 <div class="body">
 <div id="roomListView">
 <span class="span">
@@ -44,7 +45,8 @@
 						<input type="button" class="submit" value="Cancel" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
 						<input type="submit" class="submit" value="Update" />
 					</td>
-					<td class="buttonR" style="padding-left: 200px;vertical-align:top;" colspan="5" nowrap="nowrap">
+					<td class="buttonR" style="padding-left: 190px;vertical-align:top;" colspan="5" nowrap="nowrap"><b>Enable Rack:</b>
+						<input type="checkbox" id="showRackLayout" name="showRackLayout" ${draggableRack == 'on'? 'checked' :'' } onclick="enableDraggableRack()"/>
 						<b>Add to Room:</b>&nbsp;<input type="button" class="submit" value="Rack" onclick="createRack(this.value)" />
 						<input type="button" class="submit" value="UPS" onclick="createRack(this.value)" />
 						<input type="button" class="submit" value="CRAC" onclick="createRack(this.value)" />
@@ -54,7 +56,7 @@
 			</tbody>
 		</table>
 	</div>
-<div id="roomLayout" style="width: 600px; overflow-x: auto; border: 2px solid black">
+<div id="roomLayout" style="width: 600px; overflow-x: auto; border: 2px solid black;position:relative">
 	<g:set var="numrows" value="${1}" />
 	<g:set var="tilerows" value="${roomInstance.roomDepth / 2}" />
 	<g:set var="numcols" value="${1}" />
@@ -94,7 +96,8 @@
 			</div>
 		</g:each>
 	</div>
-	<div style="float: left;margin-left: 10px;" id="rackLayout">
+	<div style="background-color: #E5E5E5;position:absolute;top:0px;left:580px;" id="rackLayout">
+	
 	<table border="0">
 		<tr>
 			<th>Rack<input type="hidden" id="rackCount" name="rackCount" value="50000"></th>
@@ -155,6 +158,27 @@
 </div>
 </div>
 <script type="text/javascript">
+
+function enableDraggableRack(){
+	  var showDrag = $("#showRackLayout").is(':checked')
+	  var drag = 'off'
+	  if(showDrag){
+		$("#rackLayout").draggable({
+			start: function() {
+				$("#rackLayout").css('margin-left','0px' )
+		    }
+	  	});
+		drag = 'on'
+	  } else {
+		$("#rackLayout").css({ 'top':'0','left':'580px' });
+		$("#rackLayout").draggable('destroy')
+	  }
+	  jQuery.ajax({
+		  url:"../room/setDraggableRackPref",
+		  data:"prefVal="+drag
+	  });
+}
+enableDraggableRack()
 initializeRacksInRoom( ${rackInstanceList.id} )
 function submitForm(form){
 	
