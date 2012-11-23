@@ -64,4 +64,6 @@
 		</g:each>
 	</tbody>
 </table>
-<input type="hidden" id="order" value="asc">
+<input type="hidden" id="orderBy" value="${orderBy?:'desc'}">
+<input type="hidden" id="sortOn" value="${sortOn?:'lastName'}">
+<input type="hidden" id="firstProp" value="${firstProp?:'staff'}">

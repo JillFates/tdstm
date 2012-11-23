@@ -1037,8 +1037,6 @@ class ClientTeamsController {
 		if ( request.getHeader ( "User-Agent" ).contains ( "MSIE" ) ) {
 			model << [isOnIE : true]
 		}
-		println"model->"+model
-		println"view--->"+view
 		// Send the user on his merry way
 		render (view:view, model:model)
 		

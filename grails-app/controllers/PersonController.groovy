@@ -566,7 +566,8 @@ class PersonController {
 		}
 		
 		render(template:"projectStaffTable" ,model:[staffList:staffList, moveEventList:getBundleHeader(moveEvents),projectId:projectId,
-					eventCheckStatus:eventCheckStatuses, project:project,staffCheckStatus:staffCheckStatuses])
+					eventCheckStatus:eventCheckStatuses, project:project,staffCheckStatus:staffCheckStatuses,
+					sortOn : params.sortOn, firstProp : params.firstProp, orderBy : params.orderBy != 'asc' ? 'asc' :'desc'])
 		
 	}
 	
