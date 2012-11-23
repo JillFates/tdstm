@@ -29,7 +29,8 @@ class MoveBundleController {
 	def jdbcTemplate
 	def securityService
 	def commentService
-
+    def taskService
+    
 	protected static String dependecyBundlingAssetType = "('server','vm','blade','Application','Files','Database')"  
 	
 	def index = { redirect(action:list,params:params) }
@@ -782,6 +783,13 @@ class MoveBundleController {
                         }
                     }
                 }
+                if(!errMsg){
+                    bundle.tasksCreated = true
+                    if ( !bundle.save() ) {
+                        log.info "Exception while updating bundle.tasksCreated = true \n"+GormUtil.allErrorsString(bundle)
+                        return
+                    }
+                }
 			}
 		}else{
 			errMsg = "No Asset Assigned to current Bundle - ${bundle.name}. So Process Terminated."
@@ -797,24 +805,11 @@ class MoveBundleController {
     def deleteWorkflowTasks = {
         def bundleId = params.bundleId
         def bundle = MoveBundle.get(bundleId)
-        def errMsg
+        def errMsg = ""
         if(bundle.getAssetQty() > 0 ){
             def event = bundle.moveEvent
             def project = securityService.getUserCurrentProject()
-            def bundledAssets = AssetEntity.findAll("from AssetEntity a where a.moveBundle = :bundle and a.project =:project\
-                                                    and a.assetType not in ('application','database',' ','VM')",[bundle:bundle,project:project])
-            
-            def assetComments = AssetComment.findAll("from AssetComment ac where commentType = 'issue' and \
-                                                        ((ac.assetEntity in (:assets) and ac.workflowTransition is not null) \
-                                                         or ( ac.moveEvent = :moveEvent and ac.comment in (:comments)) \
-                                                         or ( ac.moveEvent = :moveEvent and ac.workflowTransition is not null )) ",
-                                                         [assets:bundledAssets, moveEvent:event, comments:["Begin Move Event", "Move Event Complete"]])
-            if(assetComments.size() > 0){
-                def taskDependency = TaskDependency.executeUpdate("delete from TaskDependency td where (td.predecessor in (:tasks) or td.assetComment in (:tasks))",
-                                                                    [tasks:assetComments])
-                
-                def assetComment  = AssetComment.executeUpdate("delete from AssetComment ac where ac.id in (:ids)",[ids:assetComments.id])
-            }
+            taskService.deleteBundleWorkflowTasks(bundle)
             errMsg = "Tasks Deleted Successfully."
         } else {
             errMsg = "No Asset Assigned to current Bundle - ${bundle.name}. So Process Terminated."

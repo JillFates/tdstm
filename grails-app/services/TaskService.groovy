@@ -728,6 +728,11 @@ class TaskService {
 			TaskDependency.executeUpdate('DELETE FROM TaskDependency td WHERE td.assetComment.id IN (:ids) OR td.predecessor.id IN (:ids)', ['ids':tasksMap.tasksAll] )
 			AssetComment.executeUpdate('DELETE FROM AssetComment ac WHERE ac.id IN (:ids)', ['ids':tasksMap.tasksAll] )
 		}
+        def event = MoveEvent.read(moveEventId)
+        def bundles = MoveBundle.findAllByMoveEvent( event )
+        bundles.each{ bundle->
+            deleteBundleWorkflowTasks(bundle)
+        }
 	}
 	
 	/** 
@@ -940,4 +945,33 @@ class TaskService {
         }
         return html
     }
+    
+    /**
+     * Delete all Bundle associated assets workflow tasks
+     * @param bundle, MoveBundle Instance
+     * @return success message
+     */
+    def deleteBundleWorkflowTasks(def bundle){
+       def bundledAssets = AssetEntity.findAll("from AssetEntity a where a.moveBundle = :bundle and a.project =:project\
+                                                and a.assetType not in ('application','database',' ','VM')",[bundle:bundle,project:bundle.project])
+
+       def assetComments = AssetComment.findAll("from AssetComment ac where commentType = 'issue' and \
+                                                ((ac.assetEntity in (:assets) and ac.workflowTransition is not null) \
+                                                 or ( ac.moveEvent = :moveEvent and ac.comment in (:comments)) \
+                                                 or ( ac.moveEvent = :moveEvent and ac.workflowTransition is not null )) ",
+                                                   [assets:bundledAssets, moveEvent:bundle.moveEvent, comments:["Begin Move Event", "Move Event Complete"]])
+       if(assetComments.size() > 0){
+           def taskDependency = TaskDependency.executeUpdate("delete from TaskDependency td where (td.predecessor in (:tasks) or td.assetComment in (:tasks))",
+               [tasks:assetComments])
+
+           def assetComment  = AssetComment.executeUpdate("delete from AssetComment ac where ac.id in (:ids)",[ids:assetComments.id])
+       }
+       
+       // Set tasksCreated to false to enable user to create them again
+       bundle.tasksCreated = false
+       if ( !bundle.save() ) {
+           log.info "Exception while updating bundle.tasksCreated = false\n"+GormUtil.allErrorsString(bundle)
+           return
+       }
+   }
 }
