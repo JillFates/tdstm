@@ -104,12 +104,13 @@
 			<th>X</th>
 			<th>Y</th>
 			<th>Front</th>
-			<th>A(${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE})</th>
-			<th>B(${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE})</th>
-			<th>C(${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE})</th>
+			<th>A(${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE!="Watts"?"Amps":"W"})</th>
+			<th>B(${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE!="Watts"?"Amps":"W"})</th>
+			<th>C(${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE!="Watts"?"Amps":"W"})</th>
 			<th>Type</th>
 			<th>Manufacturer</th>
 			<th>Model</th>
+			<th>Assets</th>
 		</tr>
 		<g:each in="${rackInstanceList}" var="rack" status="i">
 			<tr id="rackEditRow_${rack.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}" >
@@ -125,7 +126,10 @@
 				<td><input type="text" name="powerC_${rack.id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerC ? (rack.powerC / 110).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC):0}" size="3" /></td>
 				<td><g:select id="rackTypeId_${rack.id}" name="rackType_${rack.id}" from="${Rack.constraints.rackType.inList}" value="${rack.rackType}" onchange="updateRackStyle(${rack.id}, jQuery('#frontId_'+${rack.id}).val(), this.value)"></g:select></td>
 				<td><g:select id="man_${rack.id}" name="man_${rack.id}" from="${manufacturerList}" noSelection="[null:'Select Man...']" value="${rack.manufacturer?.id}" onchange="updateModel(${rack.id}, this.value)" optionKey="id"></g:select></td>
-				<td><span id="modelSpan_${rack.id}"><g:select id="model_${rack.id}" name="model_${rack.id}" from="${modelList}" noSelection="[null:'Select Model']" value="${rack.model?.id}" optionKey="id"></g:select></span></td>
+				<td>
+				<g:set var="mModelList" value="${modelList.findAll{it.manufacturer?.id == rack.manufacturer?.id} }"/>
+				<span id="modelSpan_${rack.id}"><g:select id="model_${rack.id}" name="model_${rack.id}" from="${mModelList}" noSelection="[null:'Select Model']" value="${rack.model?.id}" optionKey="id"></g:select></span>
+				</td>
 				<td>${rack.assets.size()}&nbsp;&nbsp;&nbsp;
 				<g:if test="${rack.assets.size() == 0}">
 					<a href="javascript:verifyAndDeleteRacks(${rack.id})"><span class="clear_filter"><u>X</u></span></a>
@@ -203,27 +207,20 @@ function submitForm(form){
  }
 function updateXYPositions(id){
 	var rackId = id.split("_")[1]
-
+	
 	var width = $("#"+id).css("width")
-	var height = $("#"+id).css("height")
 	
 	var x = $("#"+id).css("left")
 	var y = $("#"+id).css("top")
 	x = x.substring(0,x.indexOf('px'))
 	y = y.substring(0,y.indexOf('px'))
 	
-	var top = $("#room_layout_table").css("height")
 	var left = $("#room_layout_table").css("width")
-	top = top.substring(0,top.indexOf('px')) - parseInt(height)
 	left = left.substring(0,left.indexOf('px'))	- parseInt(width)
 	
 	if(parseInt(left) <= parseInt(x)){
 		x = left-3
 		$("#"+id).css("left",x+"px")
-	}
-	if(parseInt(top) <= parseInt(y)){
-		y = top-2;
-		$("#"+id).css("top",y+"px")
 	}
 	
 	$("#roomXId_"+rackId).val(x)

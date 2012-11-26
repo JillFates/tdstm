@@ -508,6 +508,7 @@ table.rack_elevation input, select, textarea {
     font: 11px verdana, arial, helvetica, sans-serif;
     margin: 2px 0;
     padding: 2px 4px;
+    width: 150px;
 }
 table.rack_elevation .close-icon {
 	float: left;
