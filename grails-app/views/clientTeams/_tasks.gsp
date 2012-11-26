@@ -63,7 +63,7 @@
 							${(issue?.item?.hardAssigned?'* ':'')} <span id="assignedToNameSpan_${issue?.item?.id}">${issue?.item?.firstName+' '+issue?.item?.lastName}</span>
 						</td>
 					</tr>
-					<tr id="showStatusId_${issue?.item?.id}" style="display: none;">
+					<tr id="showStatusId_${issue?.item?.id}" ${(todoSize!=1||search==''||search==null) ? 'style="display: none"' :''}>
 						<td nowrap="nowrap" colspan="6" class="statusButtonBar">
 							<g:if test="${issue.item.status == AssetCommentStatus.READY}"> 
 							<tds:actionButton label="Start" icon="ui-icon-play" id="${issue?.item?.id}"  
