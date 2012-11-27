@@ -46,7 +46,7 @@
 						<input type="submit" class="submit" value="Update" />
 					</td>
 					<td class="buttonR" style="padding-left: 190px;vertical-align:top;" colspan="5" nowrap="nowrap"><b>Enable Rack:</b>
-						<input type="checkbox" id="showRackLayout" name="showRackLayout" ${draggableRack == 'on'? 'checked' :'' } onclick="enableDraggableRack()"/>
+						<input type="checkbox" id="showRoomObjects" name="showRoomObjects" ${draggableRack == 'on'? 'checked' :'' } onclick="enableDraggableRack()"/>
 						<b>Add to Room:</b>&nbsp;<input type="button" class="submit" value="Rack" onclick="createRack(this.value)" />
 						<input type="button" class="submit" value="UPS" onclick="createRack(this.value)" />
 						<input type="button" class="submit" value="CRAC" onclick="createRack(this.value)" />
@@ -96,7 +96,7 @@
 			</div>
 		</g:each>
 	</div>
-	<div style="background-color: #E5E5E5;position:absolute;top:0px;left:580px;" id="rackLayout">
+	<div style="background-color: #E5E5E5;position:absolute;top:0px;left:580px;" id="roomObjects">
 	
 	<table border="0">
 		<tr>
@@ -160,18 +160,18 @@
 <script type="text/javascript">
 
 function enableDraggableRack(){
-	  var showDrag = $("#showRackLayout").is(':checked')
+	  var showDrag = $("#showRoomObjects").is(':checked')
 	  var drag = 'off'
 	  if(showDrag){
-		$("#rackLayout").draggable({
+		$("#roomObjects").draggable({
 			start: function() {
-				$("#rackLayout").css('margin-left','0px' )
+				$("#roomObjects").css('margin-left','0px' )
 		    }
 	  	});
 		drag = 'on'
 	  } else {
-		$("#rackLayout").css({ 'top':'0','left':'580px' });
-		$("#rackLayout").draggable('destroy')
+		$("#roomObjects").css({ 'top':'0','left':'580px' });
+		$("#roomObjects").draggable('destroy')
 	  }
 	  jQuery.ajax({
 		  url:"../room/setDraggableRackPref",
