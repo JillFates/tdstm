@@ -10,6 +10,16 @@ br.page-break-after {
 .empty {
 	background: #ffffff;
 }
+#roomObjects {
+  position: absolute;
+  height: auto; width: 900px !important;
+  top: 170px; right: 5px; bottom: 25px;
+  margin: 0;
+  padding-right: 18px;
+  float: none !important;
+  overflow-y: auto !important;
+  background-color: #E5E5E5;
+}
 #rackLayout {
   position: fixed;
   height: auto; width: auto !important;
