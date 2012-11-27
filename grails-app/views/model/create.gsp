@@ -173,12 +173,10 @@
 	        </td>
         </tr>
 		<tr>
-			<td></td>
-			<td></td>
-			<td valign="top" class="name" nowrap="nowrap">Source URL : </td>
-			<td>
-				<input type="text" name="sourceURL " id="sourceURL " value=""/>
-			</td>
+			<td valign="top" class="name"><label for="useOfPlanning">Room Object:</label></td>
+            <td><input type="checkbox" name="roomObject" id="roomObject" ${modelInstance.roomObject ? 'checked="checked"' : ''}/></td>
+			<td valign="top" class="name" nowrap="nowrap">Source URL :</td>
+			<td><input type="text" name="sourceURL " id="sourceURL " value=""/></td>
 		</tr>
         <tr>
 			<td valign="top" class="name" nowrap="nowrap">Validated By:</td>

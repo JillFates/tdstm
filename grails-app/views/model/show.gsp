@@ -114,14 +114,15 @@
 			<td>${modelInstance?.bladeHeight}</td>
 		</tr>
 		<tr>
-		   <td>Use Image:</td>
+		    <td valign="top" class="name">
+                <label for="description">Room Object:</label>
+            </td>
+            <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'roomObject','errors')}">
+                <input type="checkbox" id="roomObject" name="roomObject" ${modelInstance.roomObject ? 'checked="checked"' : ''} disabled="disabled" />
+            </td>
+	        <td>Use Image:</td>
 	        <td>
-		        <g:if test="${modelInstance.useImage}">
-		        	<input type="checkbox" name="useImage" id="useImageId" checked="checked" disabled="disabled"/>
-		        </g:if>
-		        <g:else>
-		       	 <input type="checkbox" name="useImage" id="useImageId" disabled="disabled"/>
-		        </g:else>
+		        <input type="checkbox" name="useImage" id="useImageId" ${modelInstance.useImage ? 'checked="checked"' : ''} disabled="disabled"/>
 	        </td>
         </tr>
 		<tr>

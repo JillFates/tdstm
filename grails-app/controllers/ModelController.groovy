@@ -524,7 +524,7 @@ class ModelController {
 				if(user){
 					int bonusScore = person?.modelScoreBonus ? person?.modelScoreBonus:0
 				    person.modelScoreBonus = bonusScore+1
-					int score =  person.modelScore
+					int score =  person.modelScore ?: 0
 					person.modelScore = score+bonusScore;
 				}
 				if(!person.save(flush:true)){

@@ -108,7 +108,6 @@
 			<th>B(${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE!="Watts"?"Amps":"W"})</th>
 			<th>C(${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE!="Watts"?"Amps":"W"})</th>
 			<th>Type</th>
-			<th>Manufacturer</th>
 			<th>Model</th>
 			<th>Assets</th>
 		</tr>
@@ -125,10 +124,8 @@
 				<td><input type="text" name="powerB_${rack.id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerB ? (rack.powerB / 110).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB):0}" size="3" /></td>
 				<td><input type="text" name="powerC_${rack.id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerC ? (rack.powerC / 110).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC):0}" size="3" /></td>
 				<td><g:select id="rackTypeId_${rack.id}" name="rackType_${rack.id}" from="${Rack.constraints.rackType.inList}" value="${rack.rackType}" onchange="updateRackStyle(${rack.id}, jQuery('#frontId_'+${rack.id}).val(), this.value)"></g:select></td>
-				<td><g:select id="man_${rack.id}" name="man_${rack.id}" from="${manufacturerList}" noSelection="[null:'Select Man...']" value="${rack.manufacturer?.id}" onchange="updateModel(${rack.id}, this.value)" optionKey="id"></g:select></td>
 				<td>
-				<g:set var="mModelList" value="${modelList.findAll{it.manufacturer?.id == rack.manufacturer?.id} }"/>
-				<span id="modelSpan_${rack.id}"><g:select id="model_${rack.id}" name="model_${rack.id}" from="${mModelList}" noSelection="[null:'Select Model']" value="${rack.model?.id}" optionKey="id"></g:select></span>
+					<span id="modelSpan_${rack.id}"><g:select class="rackModel" id="model_${rack.id}" name="model_${rack.id}" from="${modelList}" noSelection="[null:'Select Model']" value="${rack.model?.id}" optionKey="id"></g:select></span>
 				</td>
 				<td>${rack.assets.size()}&nbsp;&nbsp;&nbsp;
 				<g:if test="${rack.assets.size() == 0}">
@@ -150,8 +147,7 @@
 				<td><input type="text" id = "newPowerB_${rack}" name="powerB_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerB/ 110 ).toFloat().round(1) : new Rack().powerB}" size="3" /></td>
 				<td><input type="text" id = "newPowerC_${rack}" name="powerC_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerC/ 110 ).toFloat().round(1) : new Rack().powerC}" size="3" /></td>
 				<td><g:select id="rackTypeId_${rack}" name="rackType_${rack}" from="${Rack.constraints.rackType.inList}" value="Rack" onchange="updateRackStyle(${rack}, jQuery('#frontId_'+${rack}).val(), this.value)"></g:select></td>
-				<td><g:select id="man_${rack}" name="man_${rack}" from="${manufacturerList}" noSelection="[null:'Select Man...']" value="${rack}" onchange="updateModel(${rack}, this.value)" optionKey="id"></g:select></td>
-				<td><span id="modelSpan_${rack}"><g:select id="model_${rack}" name="model_${rack}" from="" noSelection="[null:'Select Model']"></g:select></span></td>
+				<td><span id="modelSpan_${rack}"><g:select class="rackModel" id="model_${rack}" name="model_${rack}" from="" noSelection="[null:'Select Model']"></g:select></span></td>
 				<td>0&nbsp;&nbsp;&nbsp;<a href="javascript:verifyAndDeleteRacks(${rack})"><span class="clear_filter"><u>X</u></span></a></td>
 			</tr>
 		</g:each>

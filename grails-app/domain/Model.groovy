@@ -35,9 +35,9 @@ class Model {
 	Integer powerNameplate
 	Integer powerDesign 
 	
-	
+	// Room Associated properties
+    Boolean roomObject
 
-	
 	// files to sync data for multiple Transition Manager instances
 	Integer sourceTDS = 1
 	Integer sourceTDSVersion = 1
@@ -96,6 +96,7 @@ class Model {
 		modelScope( nullable:true )
 		powerNameplate( nullable:true )
 		powerDesign( nullable:true )
+        roomObject( nullable:true )
 	}
 	
 	static mapping  = {	

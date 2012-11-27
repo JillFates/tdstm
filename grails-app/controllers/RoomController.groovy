@@ -102,9 +102,7 @@ class RoomController {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
 		def rackInstanceList = Rack.findAllByRoom(roomInstance , [sort:"tag"])
-		def moveBundleList = MoveBundle.findAllByProject( project )
-		def manufacturerList = Manufacturer.list()
-		def modelList = Model.list();
+		def modelList = Model.findAllByRoomObject(true);
 		def newRacks = []
 		for(int i = 50000 ; i<50051; i++ ){
 			newRacks << i
@@ -115,7 +113,7 @@ class RoomController {
         }
         else {
 			def draggableRack = session.getAttribute( "DraggableRack" )?.DraggableRack
-			[roomInstance: roomInstance, rackInstanceList:rackInstanceList, newRacks : newRacks, manufacturerList:manufacturerList, 
+			[roomInstance: roomInstance, rackInstanceList:rackInstanceList, newRacks : newRacks, 
 				modelList:modelList, draggableRack:draggableRack]
         }
     }
@@ -153,8 +151,9 @@ class RoomController {
 						}
 						rack.rackType = params["rackType_"+rack.id]
 						rack.front = params["front_"+rack.id]
-						rack.manufacturer = params["man_"+rack.id] != "null" ?  Manufacturer.get(params["man_"+rack.id]) : null
-						rack.model = params["model_"+rack.id] != "null" ?  Model.get(params["model_"+rack.id]) : null
+                        def model = params["model_"+rack.id] != "null" ?  Model.get(params["model_"+rack.id]) : null
+						rack.manufacturer = model?.manufacturer
+						rack.model = model
 	                	rack.save(flush:true)
                 	} else {
 						AssetEntity.executeUpdate("Update AssetEntity set rackSource = null where rackSource = ${rack.id}")
@@ -173,8 +172,9 @@ class RoomController {
 								newRack.powerA = params["powerA_"+id] ? Float.parseFloat(params["powerA_"+id]) : 0
 								newRack.powerB = (params["powerB_"+id]) ? Float.parseFloat(params["powerB_"+id]) : 0
 								newRack.powerC = (params["powerC_"+id]) ? Float.parseFloat(params["powerC_"+id]) : 0
-								newRack.manufacturer = params["man_"+id] != "null" ?  Manufacturer.get(params["man_"+id]) : null
-								newRack.model = params["model_"+id] != "null"?  Model.get(params["model_"+id]) : null
+                                def model = params["model_"+id] != "null" ?  Model.get(params["model_"+id]) : null
+                                newRack.manufacturer = model?.manufacturer
+                                newRack.model = model
 								if(powerType != "Watts"){
 									newRack.powerA = Math.round(newRack.powerA * 110)
 									newRack.powerB = Math.round(newRack.powerB * 110)

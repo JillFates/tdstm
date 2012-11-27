@@ -130,6 +130,12 @@
 			</td>
 		</tr>
         <tr>
+            <td valign="top" class="name">
+                <label for="description">Room Object:</label>
+            </td>
+            <td valign="top" class="value ${hasErrors(bean:modelInstance,field:'roomObject','errors')}">
+                <input type="checkbox" id="roomObject" name="roomObject" ${modelInstance.roomObject ? 'checked="checked"' : ''}/>
+            </td>
         	<td>Use Image:</td>
 	        <td>
 				<g:if test="${modelInstance.useImage}">
