@@ -3,32 +3,32 @@
 <div class="body" style="width:98%;">
 <div id="roomListView"></div>
 <input type="hidden" id="redirectTo" value="room"/>
-<div class="dialog" style="border: 1px solid black;width: 1203px;overflow-x: auto;">
+<div class="dialog" style="border: 1px solid black;width: 1051px;overflow-x: auto;">
 	<table style="width: 100%; border: none;border-spacing:0px;">
 		<tbody>
 			<tr>
 				<td class="buttonR" style="vertical-align:top;width:220px;">
-				<div>
-				<h1 style="margin: 0px;">Data Center Room View</h1><br />
-				<g:select id="roomId" name="id" from="${roomInstanceList}" value="${roomInstance.id}" optionKey="id" optionValue="${{it.location +' / '+it.roomName}}" onchange="getRackDetails()"/>
-				<input type="hidden" id="selectedRackId" value="">
-				<br />
-				<g:form action="list">
-				<span>${roomInstance.getRoomAddress('span')}</span>&nbsp;
-				<a href="http://maps.google.com/maps?q=${roomInstance.getRoomAddress('link')}" target="_blank"> Map...</a>
-				<input type="hidden" name="viewType" value="list" />
-				<input type="submit" class="submit" value="List" />
-				 <tds:hasPermission permission='RoomEditView'>
-					<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
-				</tds:hasPermission> <br/>
-				</g:form>
-				</div>
+					<div>
+					<h1 style="margin: 0px;">Data Center Room View</h1><br />
+					<g:select id="roomId" name="id" from="${roomInstanceList}" value="${roomInstance.id}" optionKey="id" optionValue="${{it.location +' / '+it.roomName}}" onchange="getRackDetails()"/>
+					<input type="hidden" id="selectedRackId" value="">
+					<br />
+					<g:form action="list">
+					<span>${roomInstance.getRoomAddress('span')}</span>&nbsp;
+					<a href="http://maps.google.com/maps?q=${roomInstance.getRoomAddress('link')}" target="_blank"> Map...</a><br />
+					<input type="hidden" name="viewType" value="list" />
+					<input type="submit" class="submit" value="List" />
+					<tds:hasPermission permission='RoomEditView'>
+						<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
+					</tds:hasPermission> <br/>
+					</g:form>
+					</div>
 				</td>
-				<td style="vertical-align:top;width:140px;">
-				<div style="width: 150px"><label><b>Highlight Bundles:</b></label><br /><br />
-					<g:select id="bundleId" name="moveBundleId" from="${MoveBundle.findAllByProject(project)}" value="${moveBundleList.id}" optionKey="id" optionValue="name" noSelection="${['all':'All']}" multiple="multiple" size="3"
-					  onChange="getRackDetails()"/>
-				</div>
+				<td style="vertical-align:top;width:150px;">
+					<div style="width: 150px"><label><b>Highlight Bundles:</b></label><br /><br />
+						<g:select id="bundleId" name="moveBundleId" from="${MoveBundle.findAllByProject(project)}" value="${moveBundleList.id}" optionKey="id" optionValue="name" noSelection="${['all':'All']}" multiple="multiple" size="3"
+						  onChange="getRackDetails()"/>
+					</div>
 				</td>
 				<td class="cap_tab" style="vertical-align:top;width:250px;">
 					<div style="float: left;">
@@ -66,31 +66,17 @@
 					</div>
 					<div  id="scale_div" style="float: left;display: none;" >
 						<table class="scale_tab" style="width: auto; padding: 0px; border: none;border-collapse: collapse;">
-							<tr>
-								<td class="cap_tab rack_cap20" id="cap20">&nbsp;</td>
-							</tr>
-							<tr>
-								<td class="cap_tab rack_cap32" id="cap32">&nbsp;</td>
-							</tr>
-							<tr>
-								<td class="cap_tab rack_cap44" id="cap44">&nbsp;</td>
-							</tr>
-							<tr>
-								<td class="cap_tab rack_cap56" id="cap56">&nbsp;</td>
-							</tr>
-							<tr>
-								<td class="cap_tab rack_cap68" id="cap68">&nbsp;</td>
-							</tr>
-							<tr>
-								<td class="cap_tab rack_cap80" id="cap80">&nbsp;</td>
-							</tr>
-							<tr>
-								<td class="cap_tab rack_cap100" id="cap100">&nbsp;</td>
-							</tr>
+							<tr><td class="cap_tab rack_cap20" id="cap20">&nbsp;</td></tr>
+							<tr><td class="cap_tab rack_cap32" id="cap32">&nbsp;</td></tr>
+							<tr><td class="cap_tab rack_cap44" id="cap44">&nbsp;</td></tr>
+							<tr><td class="cap_tab rack_cap56" id="cap56">&nbsp;</td></tr>
+							<tr><td class="cap_tab rack_cap68" id="cap68">&nbsp;</td></tr>
+							<tr><td class="cap_tab rack_cap80" id="cap80">&nbsp;</td></tr>
+							<tr><td class="cap_tab rack_cap100" id="cap100">&nbsp;</td></tr>
 						</table>
 					</div>
 				</td>
-				<td style="vertical-align:top;width:450px;padding:0px;" id="rackPowerTd">
+				<td style="vertical-align:top;width:397px;padding:0px;" id="rackPowerTd">
 				</td>
 			</tr>
 		</tbody>
