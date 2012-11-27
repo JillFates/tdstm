@@ -81,7 +81,7 @@ class PersonController {
 			    company = PartyGroup.findById(companyId)
 			}
 		}
-		
+		userPreferenceService.setPreference( "PARTYGROUP", companyId.toString() )
 		return [ personsList: personsList, companyId:companyId,totalCompanies:companiesList, company:company]
     }
 
@@ -189,7 +189,6 @@ class PersonController {
     def save = {
 		
         def personInstance = new Person( params )
-        
         //personInstance.dateCreated = new Date()
         if ( !personInstance.hasErrors() && personInstance.save() ) {
         	def fullName 
@@ -205,12 +204,12 @@ class PersonController {
             }
             flash.message = "Person ${fullName} created"
             //redirect( action:list, id:personInstance.id , params:[companyId:companyId] )
-            redirect( action:list, params:[ id:companyId ] )
+            redirect( action:list )
         }
         else {
             def companyId = params.company
-            flash.message = " Person FirstName cannot be blank. "
-            redirect( action:list, params:[ id:companyId ] )
+            flash.message = "Person FirstName cannot be blank. "
+            redirect( action:list )
         }
     }
     //	Ajax Overlay for show

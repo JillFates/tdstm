@@ -212,6 +212,6 @@
 <div class="buttons">
 	<input class="save" type="button" id="edtBId" value="Edit"
 		onClick="loadPersonDiv(${person.id},'generalInfo','edit')" /> <input
-		class="save" type="button" id="cancelBId" value="Cancel"
+		class="delete" type="button" id="cancelBId" value="Cancel"
 		onClick="closePersonDiv('personGeneralViewId')"/>
 </div>

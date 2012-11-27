@@ -209,3 +209,62 @@ function closePersonDiv(divId){
 	currentHeaderShow = "generalShowHeadId"
 	$('#'+divId).dialog('close')
 }
+
+/**
+ * open staff create dialog
+ */
+function createDialog() {
+	$("#createStaffDialog").show()
+	$("#createStaffDialog").dialog('option', 'width', 500)
+	$("#createStaffDialog").dialog("open")
+
+}
+
+/**
+ * Validate person form
+ */
+function validatePersonForm(form) {
+	var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/
+	var returnVal = true
+	var firstName = $(
+			"form[name = 'createDialogForm'] input[name = 'firstName']")
+			.val()
+	var email = $(
+			"form[name = 'createDialogForm'] input[name = 'email']")
+			.val()
+	var workPhone = $(
+			"form[name = 'createDialogForm'] input[name = 'workPhone']")
+			.val().replace(/[\(\)\.\-\ ]/g, '')
+	var mobilePhone = $(
+			"form[name = 'createDialogForm'] input[name = 'mobilePhone']")
+			.val().replace(/[\(\)\.\-\ ]/g, '')
+	if (!firstName) {
+		alert("First Name should not be blank ")
+		returnVal = false
+	}
+	if (email && !emailExp.test(email)) {
+		alert(email + " is not a valid e-mail address ")
+		returnVal = false
+	}
+	if (workPhone) {
+		if (isNaN(workPhone)) {
+			alert("The Work phone number contains illegal characters.");
+			returnVal = false
+		}
+		if (!(workPhone.length == 10)) {
+			alert("The Work phone number is the wrong length. Make sure you included an area code.");
+			returnVal = false
+		}
+	}
+	if (mobilePhone) {
+		if (isNaN(mobilePhone)) {
+			alert("The Mobile phone number contains illegal characters.");
+			returnVal = false
+		}
+		if (!(mobilePhone.length == 10)) {
+			alert("The Mobile phone number is the wrong length. Make sure you included an area code.");
+			returnVal = false
+		}
+	}
+	return returnVal
+}
