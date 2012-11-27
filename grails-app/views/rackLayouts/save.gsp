@@ -56,7 +56,7 @@
 			<tr>
 				<td colspan="4" style="border:0px;text-align:center">
 					<div class="close-icon" onclick="$(this).parents('td.rack_elevation_td').remove(); $(this).parents('table.rack_elevation').remove();"></div>
-					<h2>Rack ${rackLayout?.rack} in ${rackLayout?.room} (Back view)</h2>
+					<h2>Rack ${rackLayout?.rack} in ${rackLayout?.room} (Back)</h2>
 				</td>
 			</tr>
 			<tr>

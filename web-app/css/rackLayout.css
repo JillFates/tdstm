@@ -10,7 +10,27 @@ br.page-break-after {
 .empty {
 	background: #ffffff;
 }
-
+#rackLayout {
+  position: fixed;
+  height: auto; width: auto !important;
+  top: 90px; right: 5px; bottom: 25px;
+  margin: 0;
+  padding-right: 18px;
+  float: none !important;
+  overflow-y: auto !important;
+  background-color: white;
+}
+#rackLayout .body {
+  height: 100%;
+}
+#room_layout {
+  padding-right: 320px !important;
+}
+#roomLayout_body {
+ width: auto !important;
+  overflow-x: visible !important;
+  padding-right: 300px !important;
+}
 .racktop_label {
 	postition: relative;
 	top: 30%;

@@ -7,50 +7,27 @@
 	<table style="width: 100%; border: none;border-spacing:0px;">
 		<tbody>
 			<tr>
-				<td class="buttonR" style="vertical-align:top;width:240px;">
+				<td class="buttonR" style="vertical-align:top;width:220px;">
 				<div>
 				<h1 style="margin: 0px;">Data Center Room View</h1><br />
 				<g:select id="roomId" name="id" from="${roomInstanceList}" value="${roomInstance.id}" optionKey="id" optionValue="${{it.location +' / '+it.roomName}}" onchange="getRackDetails()"/>
 				<input type="hidden" id="selectedRackId" value="">
 				<br />
-
 				<g:form action="list">
+				<span>${roomInstance.getRoomAddress('span')}</span>&nbsp;
+				<a href="http://maps.google.com/maps?q=${roomInstance.getRoomAddress('link')}" target="_blank"> Map...</a>
 				<input type="hidden" name="viewType" value="list" />
 				<input type="submit" class="submit" value="List" />
 				 <tds:hasPermission permission='RoomEditView'>
 					<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
-				</tds:hasPermission> <br/><br/>
-				<span>${roomInstance.getRoomAddress('span')}</span>&nbsp;<br/>
-				<a href="http://maps.google.com/maps?q=${roomInstance.getRoomAddress('link')}" target="_blank"> Maps...</a>
-
+				</tds:hasPermission> <br/>
 				</g:form>
 				</div>
 				</td>
-				<td style="vertical-align:top;width:180px;">
-				<div style="width: 150px"><label><b>Highlight:</b></label><br /><br />
-				<label><b>Bundle</b></label><br />
+				<td style="vertical-align:top;width:140px;">
+				<div style="width: 150px"><label><b>Highlight Bundles:</b></label><br /><br />
 					<g:select id="bundleId" name="moveBundleId" from="${MoveBundle.findAllByProject(project)}" value="${moveBundleList.id}" optionKey="id" optionValue="name" noSelection="${['all':'All']}" multiple="multiple" size="3"
 					  onChange="getRackDetails()"/>
-				</div>
-				</td>
-				<td style="vertical-align:top;width:50px;">
-				<div style="width: 50px">
-				<label for="sourceView" style="display:none">
-					<g:if test="${source == 'true'}">
-					<input type="hidden" name="sourceView" id="sourceView" value="" checked="checked" onclick="getRackDetails()" />&nbsp;Source
-					</g:if>
-					<g:else>
-					<input type="hidden" name="sourceView" id="sourceView" value="" onclick="getRackDetails()" />&nbsp;Source
-					</g:else>
-					</label><br />
-				<label for="targetView" style="display:none">
-					<g:if test="${target == 'true'}">
-					<input type="hidden" name="targetView" id="targetView" value="" checked="checked" onclick="getRackDetails()" />&nbsp;Target
-					</g:if>
-					<g:else>
-					<input type="hidden" name="targetView" id="targetView" value="" onclick="getRackDetails()" />&nbsp;Target
-					</g:else>
-					</label><br />
 				</div>
 				</td>
 				<td class="cap_tab" style="vertical-align:top;width:250px;">
@@ -74,7 +51,7 @@
 							</tr>
 							<tr>
 								<td>
-									<label for="Used" ><input type="radio" name="capacityType" id="Used" value="Used" onclick="capacityView()"/>&nbsp;Used&nbsp;<br /></label>
+									<label for="Used" ><input type="radio" name="capacityType" id="Used" value="Used" onclick="capacityView()"/>&nbsp;Used&nbsp;</label>
 									<label for="Remaining" ><input type="radio" name="capacityType" id="Remaining" checked="checked" value="Remaining" onclick="capacityView()"/>&nbsp;Remaining<br/></label>
 									<label for="otherBundle" >
 										<g:if test="${moveBundleList.id?.contains('all')}">
@@ -113,7 +90,7 @@
 						</table>
 					</div>
 				</td>
-				<td style="vertical-align:top;width:310px;padding:0px;" id="rackPowerTd">
+				<td style="vertical-align:top;width:450px;padding:0px;" id="rackPowerTd">
 				</td>
 			</tr>
 		</tbody>
