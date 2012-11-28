@@ -6,16 +6,16 @@
 <title>Asset List</title>
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datetimepicker.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
 
-<link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
-<script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
+<link rel="stylesheet" type="text/css" href="${resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
+<script language="javascript" src="${resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
 
 <script type="text/javascript">
 function onInvokeAction(id) {
@@ -60,24 +60,24 @@ $(document).ready(function() {
 		        <jmesa:htmlRow highlighter="true">
 		        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" >
 		        	<tds:hasPermission permission='EditAndDelete'>
-		        		<g:checkBox name="assetCheckBox" id="checkId_${assetEntityInstance.id}" onclick="enableButton(${assetEntityList.id})"></g:checkBox>
-		        		<a href="javascript:editEntity('assetEntity','${assetEntityInstance?.assetType}',${assetEntityInstance.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
+		        		<g:checkBox name="assetCheckBox" id="checkId_${assetEntityInstance.id}" onclick="enableButton(assetEntityList)"></g:checkBox>
+		        		<a href="javascript:editEntity('assetEntity','${assetEntityInstance?.assetType}',${assetEntityInstance.id})"><img src="${resource(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 		        	</tds:hasPermission>
 		        		<tds:hasPermission permission="CommentCrudView">
 							<span id="icon_${assetEntityInstance.id}">
 								<g:if test="${assetEntityInstance.commentType == 'issue'}">
 									<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-										<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="0px"/>
+										<img src="${resource(dir:'i',file:'db_table_red.png')}" border="0px"/>
 									</g:remoteLink>
 								</g:if>
 								<g:elseif test="${assetEntityInstance.commentType == 'comment'}">
 								<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-									<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px"/>
+									<img src="${resource(dir:'i',file:'db_table_bold.png')}" border="0px"/>
 								</g:remoteLink>
 								</g:elseif>
 								<g:else>
 								<a href="javascript:createNewAssetComment(${assetEntityInstance.id},'${assetEntityInstance.assetName}');">
-									<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
+									<img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px"/>
 								</a>
 								</g:else>
 							</span>
@@ -148,19 +148,23 @@ $(document).ready(function() {
 	<tr>
 		<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
 		<td><g:select name="entity" from="['Server','Application','Database','Storage']" onchange='updateAssetsList(this.name, this.value)'></g:select></td>
-		<td><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></td>
+		<td><span id="Server"><g:select name="asset" from="${servers}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span></td>
 		<td><g:select name="dtype" from="${dependencyType.value}"  optionValue="value"></g:select></td>
 		<td><g:select name="status" from="${dependencyStatus.value}" optionValue="value"></g:select></td>
 	</tr>
 	</table>
 </div>
+<%-- This DIV is used by the Asset Dependency DIVs to populate the form --%>
 <div style="display: none;">
-	<span id="Server"><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+<%-- The "Server" SELECT was duplicated above so we are leveraging it above by adding the SPAN tag there. --%>
 	<span id="Application"><g:select name="asset" from="${applications}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 	<span id="Database"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 	<span id="Storage"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 </div>
+
 <script>
+    var assetEntityList=${assetEntityList.id}
+
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')
 </script>

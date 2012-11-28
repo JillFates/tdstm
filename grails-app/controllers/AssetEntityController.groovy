@@ -1315,6 +1315,7 @@ class AssetEntityController {
 		
 		    assetEntityInstanceList = AssetEntity.findAllByProjectAndAssetTypeNotInList( project,["Application","Database","Files"], params )
 		}
+		def commentSQL
 		def assetEntityList =  new ArrayList()
 		assetEntityInstanceList.each { assetEntity->
 			AssetEntityBean assetBean = new AssetEntityBean();
@@ -1334,17 +1335,23 @@ class AssetEntityController {
 			assetBean.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))
 			assetBean.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle)
 
-			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
+			commentSQL = "SELECT count(*) from asset_comment WHERE asset_entity_id=${assetEntity.id} AND comment_type='issue' AND is_resolved=0"
+			if (jdbcTemplate.queryForInt(commentSQL) > 0 ) {
 				assetBean.setCommentType("issue")
-			} else if(AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id)){
-				assetBean.setCommentType("comment")
 			} else {
-				assetBean.setCommentType("blank")
+				commentSQL = "SELECT count(*) from asset_comment WHERE asset_entity_id=${assetEntity.id}"
+				if (jdbcTemplate.queryForInt(commentSQL) > 0 ) {
+					assetBean.setCommentType("comment")
+				} else {
+					assetBean.setCommentType("blank")
+				}
 			}
 
 			assetEntityList.add(assetBean)
 		}
-		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
+		
+		def servers = AssetEntity.executeQuery("SELECT a.id, a.assetName FROM AssetEntity a WHERE assetType in ('Server','VM','Blade') AND project=$projectId ORDER BY assetName")
+		// TODO : change the following queries to use straight JDBC to only get the id and assetName since only used for SELECT 
 		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
 		def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
 		def files = Files.findAll('from Files where assetType = ? and project =? order by assetName asc',['Files', project])
@@ -1366,7 +1373,8 @@ class AssetEntityController {
 					staffRoles:taskService.getRolesForStaff() ]
 		} catch(Exception ex ){
 			return [assetEntityInstanceList : null,projectId: projectId, servers : servers,
-				applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency()]
+				applications : applications, dbs : dbs, files : files, 
+				assetDependency: new AssetDependency() ]
 		}
 
 	}
