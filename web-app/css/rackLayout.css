@@ -15,10 +15,12 @@ br.page-break-after {
   height: auto; width: 900px !important;
   top: 170px; right: 5px; bottom: 25px;
   margin: 0;
-  padding-right: 18px;
   float: none !important;
   overflow-y: auto !important;
   background-color: #E5E5E5;
+}
+#roomObjects td {
+	padding: 0px;
 }
 #rackLayout {
   position: fixed;
@@ -32,6 +34,9 @@ br.page-break-after {
 }
 #rackLayout .body {
   height: 100%;
+}
+#rackLayout td {
+	padding: 1px;
 }
 #room_layout {
   padding-right: 320px !important;
