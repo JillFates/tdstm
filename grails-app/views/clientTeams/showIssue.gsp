@@ -60,7 +60,7 @@
 			<tr class="prop issue" id="assignedToTrEditId" >
 				<td valign="top" class="name"><label for="assignedTo">Assigned:</label></td>
 				<td valign="top" id="assignedToEditTdId" style="width: 20%;" colspan="3" >
-					<g:select id="assignedToEditId_${assetComment.id}" name="assignedTo" from="${projectStaff}" value="${assetComment.assignedTo.id}" optionKey="id" noSelection="['':'please select']"></g:select>
+					<g:select id="assignedToEditId_${assetComment.id}" name="assignedTo" from="${projectStaff}" value="${assetComment.assignedTo?.id}" optionKey="id" noSelection="['':'please select']"></g:select>
 				</td>
 			</tr> 
 			<tr class="prop issue" id="estFinishShowId"  >

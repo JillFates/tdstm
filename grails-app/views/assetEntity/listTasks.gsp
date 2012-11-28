@@ -130,7 +130,7 @@
 							 	<span id="status_${commentInstance?.id}" onclick="getActionBar(this.id);" class="span_${commentInstance.statusClass}">${commentInstance.status}</span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="assignedTo" title="Assigned To" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-        	                 	<span id="assignedTo_${commentInstance?.id}" onclick="getActionBar(this.id);">${(commentInstance?.hardAssigned?'* ':'')}<span id="assignedToName_${commentInstance?.id}">${commentInstance.assignedTo}</span></span>
+        	                 	<span id="assignedTo_${commentInstance?.id}" onclick="getActionBar(this.id);">${(commentInstance?.hardAssigned?'* ':'')}<span id="assignedToName_${commentInstance?.id}">${commentInstance.assignedTo?:''}</span></span>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="role" title="Role" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
         	                 	<span id="role_${commentInstance?.id}" onclick="getActionBar(this.id);">${commentInstance.role}</span>

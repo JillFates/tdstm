@@ -38,53 +38,54 @@
 			</thead>
 			<tbody>
 				<g:each status="i" in="${taskList}" var="issue">
-					<tr id="issueTrId_${issue?.item?.id}" class="${issue.css}"
+					<g:set var="item" value="${issue?.item}"/>
+					<tr id="issueTrId_${item?.id}" class="${issue.css}"
 						style="cursor: pointer;"
-						onclick="openStatus(${issue?.item?.id},'${issue?.item?.status}')">
-						<td id="comment_${issue?.item?.id}"
+						onclick="openStatus(${item?.id},'${item?.status}')">
+						<td id="comment_${item?.id}"
 							class="asset_details_block_task">
-							${issue?.item?.taskNumber?issue?.item?.taskNumber+' - ' : ''}
-							${com.tdssrc.grails.StringUtil.ellipsis(issue?.item?.comment,50)}
+							${item?.taskNumber?item?.taskNumber+' - ' : ''}
+							${com.tdssrc.grails.StringUtil.ellipsis(item?.comment,50)}
 						</td>
-						<td id="asset_${issue?.item?.id}" class="asset_details_block">
-							${issue?.item?.assetName}
+						<td id="asset_${item?.id}" class="asset_details_block">
+							${item?.assetName}
 						</td>
-						<td id="lastUpdated_${issue?.item?.id}" class="asset_details_block">
-							<tds:elapsedAgo start="${issue?.item?.lastUpdated}" end="${GormUtil.convertInToGMT(new Date(), null)}"/>
+						<td id="lastUpdated_${item?.id}" class="asset_details_block">
+							<tds:elapsedAgo start="${item?.lastUpdated}" end="${GormUtil.convertInToGMT(new Date(), null)}"/>
 						</td>
-						<td id="estFinish_${issue?.item?.id}" class="asset_details_block">
-								<tds:convertDate date="${issue?.item?.estFinish}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
+						<td id="estFinish_${item?.id}" class="asset_details_block">
+								<tds:convertDate date="${item?.estFinish}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
 									format="MM/dd kk:mm" />
 						</td>
-						<td id="statusTd_${issue?.item?.id}" class="asset_details_block">
-							${issue?.item?.status}<% // (${formatter.format(issue?.item?.score?: 0)}) %>
+						<td id="statusTd_${item?.id}" class="asset_details_block">
+							${item?.status}<% // (${formatter.format(item?.score?: 0)}) %>
 						</td>
-						<td id="assignedToName_${issue?.item?.id}" class="asset_details_block">
-							${(issue?.item?.hardAssigned?'* ':'')} <span id="assignedToNameSpan_${issue?.item?.id}">${issue?.item?.firstName+' '+issue?.item?.lastName}</span>
+						<td id="assignedToName_${item?.id}" class="asset_details_block">
+							${(item?.hardAssigned?'* ':'')} <span id="assignedToNameSpan_${item?.id}">${(item?.firstName?:'')+' '+((item?.lastName != null)? item?.lastName :'')}</span>
 						</td>
 					</tr>
-					<tr id="showStatusId_${issue?.item?.id}" ${(todoSize!=1||search==''||search==null) ? 'style="display: none"' :''}>
+					<tr id="showStatusId_${item?.id}" ${(todoSize!=1||search==''||search==null) ? 'style="display: none"' :''}>
 						<td nowrap="nowrap" colspan="6" class="statusButtonBar">
 							<g:if test="${issue.item.status == AssetCommentStatus.READY}"> 
-							<tds:actionButton label="Start" icon="ui-icon-play" id="${issue?.item?.id}"  
-								onclick="changeStatus('${issue?.item?.id}','${AssetCommentStatus.STARTED}', '${issue?.item?.status}', 'taskManager')"/>
+							<tds:actionButton label="Start" icon="ui-icon-play" id="${item?.id}"  
+								onclick="changeStatus('${item?.id}','${AssetCommentStatus.STARTED}', '${item?.status}', 'taskManager')"/>
 							</g:if>
 							<g:if test="${ [AssetCommentStatus.READY, AssetCommentStatus.STARTED].contains(issue.item.status) }"> 
-							<tds:actionButton label="Done" icon="ui-icon-check" id="${issue?.item?.id}"  
-								onclick="changeStatus('${issue?.item?.id}','${AssetCommentStatus.DONE}', '${issue?.item?.status}', 'taskManager')"/>
+							<tds:actionButton label="Done" icon="ui-icon-check" id="${item?.id}"  
+								onclick="changeStatus('${item?.id}','${AssetCommentStatus.DONE}', '${item?.status}', 'taskManager')"/>
 							</g:if>
-							<tds:actionButton label="Details..." icon="ui-icon-zoomin" id="${issue?.item?.id}"  
-								onclick="issueDetails(${issue?.item?.id},'${issue?.item?.status}')"/>
+							<tds:actionButton label="Details..." icon="ui-icon-zoomin" id="${item?.id}"  
+								onclick="issueDetails(${item?.id},'${item?.status}')"/>
 							<g:if test="${ personId != issue.item.assignedTo && issue.item.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]}">
-							<tds:actionButton label="Assign To Me" icon="ui-icon-person" id="${issue?.item?.id}"  
-								onclick="assignTask('${issue?.item?.id}','${issue.item.assignedTo}', '${issue.item.status}','myTask')"/>
+							<tds:actionButton label="Assign To Me" icon="ui-icon-person" id="${item?.id}"  
+								onclick="assignTask('${item?.id}','${issue.item.assignedTo}', '${issue.item.status}','myTask')"/>
 							</g:if>
 						</td>
 					</tr>
 
-					<tr id="detailTdId_${issue?.item?.id}" style="display: none">
+					<tr id="detailTdId_${item?.id}" style="display: none">
 						<td colspan="6">
-							<div id="detailId_${issue?.item?.id}" style="width: 100%">
+							<div id="detailId_${item?.id}" style="width: 100%">
 							</div>
 						</td>
 					</tr>
