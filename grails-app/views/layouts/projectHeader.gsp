@@ -383,7 +383,7 @@
 			</li>
 	        </tds:hasPermission>
 			<tds:hasPermission permission='DashBoardMenuView'> 
-			<li id="dashboardMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#dashboardMegaMenu')" controller="dashboard" >Dashboards</g:link>
+			<li id="dashboardMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#dashboardMegaMenu')" controller="moveBundle" action="planningStats"  >Dashboards</g:link>
 				<a id="dashboardAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#dashboardMegaMenu')" href="javascript:showMegaMenu('#dashboardMegaMenu')" style="display: inline"></a>
 				<div class="megamenu rooms" id="dashboardMegaMenu" onmouseover="showMegaMenu('#dashboardMegaMenu')" onmouseout="mclosetime()" style="display: none;">
 					<table class="mmtable"><tr>
