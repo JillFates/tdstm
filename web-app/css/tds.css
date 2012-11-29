@@ -234,6 +234,9 @@
 #consoleMegaMenu {
 	width:450px;
 }
+#dashboardMegaMenu {
+	width:200px;
+}
 #reportsMegaMenu {
 	width:600px;
 }
