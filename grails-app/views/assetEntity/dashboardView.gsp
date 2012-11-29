@@ -1009,7 +1009,7 @@ for(i=1;i<=inputs.length;i++){
 </div>
 <script>
 	currentMenuId = "#consoleMenu";
-	$("#consoleMenuId a").css('background-color','#003366')
+	$("#dashboardMenuId a").css('background-color','#003366')
 </script>
 </body>
 </html>

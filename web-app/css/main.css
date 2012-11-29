@@ -22,12 +22,14 @@ a:link, a:visited, a:hover {
     font-weight: bold;
     text-decoration: none;
 }
-.links{
+.links {
     color: #000 !important;
     font-weight: bold;
     text-decoration: none;
 }
-
+.links a:hover {
+	text-decoration: underline:
+}
 
 h1 {
     color: #214aa0;

@@ -19,15 +19,13 @@ $(document).ready(function() {
 		    <g:set var="percentageBundleReady" value="${applicationCount ? Math.round((bundleReady/applicationCount)*100) : 0}"/>
 			<g:set var="percentageUnassignedAppCount" value="${applicationCount ? Math.round((unassignedAppCount/applicationCount)*100) :100}"/>
 			<h1>Planning Dashboard</h1>
-			<div style="float:left;margin-top: 10px; margin-left: 5px;width:250px;">
-					<h3 style="color:#63A242">
-						<b>Discovery Phase</b>
-					</h3>
+			<div class="dashboard_div" style="float:left; width:250px;">
+					<span class="dashboard_head">Discovery Phase</span>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
-							<td style="padding:0px; height:24px; background-color: lightyellow;box-shadow: 2px 3px 3px lightgray inset;">
+							<td class="dashboard_bar_base" >
 							<g:if test="${percentageAppToValidate == 100}">
-								<div style="position:relative; top:-5px;height:0px;margin-left:5px;"><b>0% Applications Validated</b></div>
+								<div class="dashboard_bar_graph0" ><b>0% Applications Validated</b></div>
 
 							</g:if><g:elseif test="${percentageAppToValidate == 0}">
 
@@ -36,7 +34,7 @@ $(document).ready(function() {
 
 							</g:elseif><g:else>
 
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 3px;border-color: lightgray;border-right-style: inset; width: ${100 - percentageAppToValidate}%"></div>
+								<div class="dashboard_bar_graph" style="width: ${100 - percentageAppToValidate}%"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${100 - percentageAppToValidate}%</b>
 									<g:link controller="application" action="list" params="[validation:'Discovery']">Applications Validated</g:link>
 								</div>
@@ -94,15 +92,13 @@ $(document).ready(function() {
 					</table>
 			</div>
 
-			<div style="float:left;margin-top: 10px; margin-left: 5px;width:250px;">
-					<h3 style="color:#63A242">
-						<b>Analysis Phase</b>
-					</h3>
+			<div class="dashboard_div" style="float:left; width:250px;">
+					<span class="dashboard_head">Analysis Phase</span>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
-							<td style="padding:0px; height:24px; background-color: lightyellow;box-shadow: 2px 3px 3px lightgray inset;">
+							<td class="dashboard_bar_base" >
 							<g:if test="${percentageBundleReady == 0}">
-								<div style="position:relative; top:-5px;height:0px;margin-left:5px;"><b>0% Applications Ready</b></div>
+								<div class="dashboard_bar_graph0" ><b>0% Applications Ready</b></div>
 
 							</g:if><g:elseif test="${percentageBundleReady == 100}">
 
@@ -111,7 +107,7 @@ $(document).ready(function() {
 
 							</g:elseif><g:else>
 
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 3px;border-color: lightgray;border-right-style: inset; width: ${percentageBundleReady}%"></div>
+								<div class="dashboard_bar_graph" style="width: ${percentageBundleReady}%"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${percentageBundleReady}%</b>
 									<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Ready</g:link>
 								</div>
@@ -195,15 +191,13 @@ $(document).ready(function() {
 					</table>
 				</div>
 			</div>
-			<div style="float:right;margin-top: 10px; margin-left: 5px;">
-					<h3 style="color:#63A242">
-						<b>Assignment and Execution Phases</b>
-					</h3>
+			<div class="dashboard_div" style="float:right;">
+					<span class="dashboard_head">Assignment and Execution Phases</span>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
-							<td style="padding:0px; height:24px; background-color: lightyellow;box-shadow: 2px 3px 3px lightgray inset;">
+							<td class="dashboard_bar_base" >
 							<g:if test="${percentageUnassignedAppCount == 100}">
-								<div style="position:relative; top:-5px;height:0px;margin-left:5px;"><b>0% Applications Assigned</b></div>
+								<div class="dashboard_bar_graph0" ><b>0% Applications Assigned</b></div>
 
 							</g:if><g:elseif test="${percentageUnassignedAppCount == 0}">
 
@@ -212,7 +206,7 @@ $(document).ready(function() {
 
 							</g:elseif><g:else>
 
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 3px;border-color: lightgray;border-right-style: inset; width: ${100-percentageUnassignedAppCount}%"></div>
+								<div class="dashboard_bar_graph" style="width: ${100-percentageUnassignedAppCount}%"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${100-percentageUnassignedAppCount}%</b>
 									<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Assigned</g:link>
 								</div>
@@ -220,9 +214,9 @@ $(document).ready(function() {
 							</td>
 						</tr>
 						<tr>
-							<td style="padding:0px; height:24px; background-color: lightyellow;box-shadow: 2px 3px 3px lightgray inset;">
+							<td class="dashboard_bar_base" >
 							<g:if test="${percentageAppCount == 0}">
-								<div style="position:relative; top:-5px;height:0px;margin-left:5px;"><b>0% Applications Moved</b></div>
+								<div class="dashboard_bar_graph0" ><b>0% Applications Moved</b></div>
 
 							</g:if><g:elseif test="${percentageAppCount == 100}">
 
@@ -231,7 +225,7 @@ $(document).ready(function() {
 
 							</g:elseif><g:else>
 
-								<div style="background-color:#BFF3A5; z-index:-1; height:24px; border-right-width: 3px;border-color: lightgray;border-right-style: inset; width: ${percentageAppCount}%"></div>
+								<div class="dashboard_bar_graph" style="width: ${percentageAppCount}%"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${percentageAppCount}%</b>
 									<g:link controller="application" action="list" params="[tag_f_planStatus:'moved']">Applications Moved</g:link>
 								</div>

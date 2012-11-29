@@ -297,6 +297,38 @@
 	float:left;
 	background:#CCCCCC;
 }
+.dashboard_head{
+	color:#63A242;
+	font-size: 16px;
+	font-weight: bold;
+	line-height: 31px;
+}
+.dashboard_div {
+	margin-top: 10px;
+	margin-left: 5px;
+	background-image: url(../images/news_bg.png);
+	background-size: contain;
+}
+.dashboard_bar_base{
+	padding: 0px; 
+	height: 24px; 
+	background-color: lightyellow;
+	box-shadow: 2px 3px 3px lightgray inset;
+}
+.dashboard_bar_graph0{
+	position: relative;
+	top: -5px;
+	height: 0px;
+	margin-left: 5px;
+}
+.dashboard_bar_graph{
+	background-color:#BFF3A5; 
+	z-index:-1;
+	height:24px;
+	border-right-width: 3px;
+	border-color: lightgray;
+	border-right-style: inset;
+}
 .tds_header {
 	width:100%;
 	height:30px;
