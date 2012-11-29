@@ -46,7 +46,7 @@
 						<input type="submit" class="submit" value="Update" />
 					</td>
 					<td class="buttonR" style="padding-left: 190px;vertical-align:top;" colspan="5" nowrap="nowrap"><b>Draggable:</b>
-						<input type="checkbox" id="showRoomObjects" name="showRoomObjects" ${draggableRack == 'on'? 'checked' :'' } onclick="enableDraggableRack()"/>&nbsp;
+						<input type="checkbox" id="showRoomObjects" name="showRoomObjects" ${draggableRack == 'on'? 'checked' :'checked' } onclick="enableDraggableRack()"/>&nbsp;
 						<b>Add to Room:</b>&nbsp;<input type="button" class="submit" value="Rack" onclick="createRack(this.value)" />
 						<input type="button" class="submit" value="UPS" onclick="createRack(this.value)" />
 						<input type="button" class="submit" value="CRAC" onclick="createRack(this.value)" />
@@ -170,7 +170,7 @@ function enableDraggableRack(){
 	  	});
 		drag = 'on'
 	  } else {
-		$("#roomObjects").css({ 'top':'0','left':'580px' });
+		$("#roomObjects").css({ 'top':'170','left':'580px' });
 		$("#roomObjects").draggable('destroy')
 	  }
 	  jQuery.ajax({
