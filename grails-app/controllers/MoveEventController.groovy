@@ -167,11 +167,13 @@ class MoveEventController {
     def save = {
         def moveEventInstance = new MoveEvent(params)
         def moveBundles = request.getParameterValues("moveBundle")
-
+        if(moveEventInstance.project.runbookOn ==1){
+            moveEventInstance.calcMethod = MoveEvent.METHOD_MANUAL
+        }
 		if(!moveEventInstance.hasErrors() && moveEventInstance.save()) {
 			
 			moveBundleService.assignMoveEvent( moveEventInstance, moveBundles )
-            
+            moveBundleService.createManualMoveEventSnapshot( moveEventInstance )
 			flash.message = "MoveEvent ${moveEventInstance.name} created"
             redirect(action:show,id:moveEventInstance.id)
         } else {

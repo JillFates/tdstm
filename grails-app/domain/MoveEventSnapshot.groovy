@@ -4,6 +4,7 @@
  */
 import com.tdssrc.grails.GormUtil
 import org.jsecurity.SecurityUtils
+
 class MoveEventSnapshot {
 	static final String TYPE_PLANNED="P"
 	static final String TYPE_REVISED="R"

@@ -3668,9 +3668,11 @@ class AssetEntityController {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
 		def assetCommentId = params.assetCommentId
+        def assetComment = AssetComment.read(assetCommentId)
 		def assetEntity = AssetEntity.get(params.assetId)
 		def workFlowInstance = Workflow.findByProcess(project.workflowCode)
 		def workFlowTransition = WorkflowTransition.findAllByWorkflowAndCategory(workFlowInstance, params.category)
+        
 		//def workFlowTransition = WorkflowTransition.findAllByWorkflow(workFlowInstance) TODO : should be removed after completion of this new feature
 		if(assetEntity){
 			def existingWorkflows = assetCommentId ? AssetComment.findAllByAssetEntityAndIdNotEqual(assetEntity, assetCommentId ).workflowTransition : AssetComment.findAllByAssetEntity(assetEntity ).workflowTransition
@@ -3678,7 +3680,8 @@ class AssetEntityController {
 		}
 		def selectControl = ''
 		if(workFlowTransition.size()){
-			def paramsMap = [selectId:'workFlowId', selectName:'workFlow', options:workFlowTransition, optionKey:'id', optionValue:'name']
+			def paramsMap = [selectId:'workFlowId', selectName:'workFlow', options:workFlowTransition, 
+                            optionKey:'id', optionValue:'name', optionSelected:assetComment.workflowTransition.id]
 			selectControl = HtmlUtil.generateSelect( paramsMap )
 		}
 		render selectControl

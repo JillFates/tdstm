@@ -534,4 +534,19 @@ class MoveBundleService {
          
          return [errMsg:errMsg, stepTask:stepTask]
      }
+     
+     /**
+      * Create Manual MoveEventSnapshot, when project is task driven. So dashboard dial default to manual 50
+      * @param moveEvent
+      * @param dialIndicator
+      * @return
+      */
+     def createManualMoveEventSnapshot( def moveEvent, def dialIndicator=50 ){
+         if(moveEvent.project.runbookOn ==1){
+             def moveEventSnapshot = new MoveEventSnapshot(moveEvent : moveEvent , dialIndicator:dialIndicator )
+             if ( ! moveEventSnapshot.save( flush : true ) ){
+                 log.errlor("Unable to save changes to MoveEventSnapshot: ${moveEventSnapshot}")
+             }
+         }
+     }
 }

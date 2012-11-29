@@ -11,60 +11,8 @@
 	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <%--<g:javascript src="FusionCharts.js" /> --%>
 <g:javascript src="yahoo.ui.dashboard.js" />
-<%--
-		<script type="text/javascript">
-		/* render the individual step dial data*/
-		function stepDialData( dialInd ){
-		var xmlData = "<chart bgAlpha='0' bgColor='eeeded' lowerLimit='0' upperLimit='100' numberSuffix='' animation='0'"+
-			" showValues='0' rotateValues='1' placeValuesInside='1' "+
-			" showBorder='0' basefontColor='000000' chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5'"+
-			" chartRightMargin='5' toolTipBgColor='80A905' gaugeFillMix='{dark-10},FFFFFF,{dark-10}' gaugeFillRatio='3' showTickMarks='0'>"+
-	  		" <colorRange> <color minValue='0' maxValue='25' code='FF654F'/> <color minValue='25' maxValue='50' code='F6BD0F'/>"+
-	  		" <color minValue='50' maxValue='100' code='8BBA00'/> </colorRange>"+
-	  		" <dials> <dial value='"+dialInd+"' rearExtension='10'/> </dials>"+
-	  		" <trendpoints> <point value='' displayValue='' fontcolor='FF4400' useMarker='1' dashed='1' dashLen='2' dashGap='2' valueInside='1' /> </trendpoints>"+
-	  		" <annotations> <annotationGroup id='Grp1' showBelow='1' > "+
-	  		" <annotation type='rectangle' x='5' y='5' toX='345' toY='195' radius='10' color='ffffff,ffffff' showBorder='0' /> "+
-	  		" </annotationGroup> </annotations>"+
-	  		" <styles><definition><style name='RectShadow' type='shadow' strength='0'/> </definition> <application>"+
-	  		" <apply toObject='Grp1' styles='RectShadow' /> </application> </styles> </chart>";
-  		return xmlData;
-	}
-	/* render the summary dial data*/
-	function summaryDialData( dialInd ){
-		var xmlData = "<chart bgAlpha='0' bgColor='FFFFFF' lowerLimit='0' upperLimit='100' numberSuffix='' showBorder='0' basefontColor='000000' "+
-			"animation='0' showValues='0' rotateValues='1' placeValuesInside='1' "+ 
-			"chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5' chartRightMargin='5' toolTipBgColor='80A905' "+
-			"gaugeFillMix='{dark-10},FFFFFF,{dark-10}' gaugeFillRatio='3' showTickMarks='0'>"+
-			" <colorRange><color minValue='0' maxValue='25' code='FF654F'/><color minValue='25' maxValue='50' code='F6BD0F'/>"+
-			" <color minValue='50' maxValue='100' code='8BBA00'/></colorRange>"+
-			"<dials> <dial value='"+dialInd+"' rearExtension='10'/></dials>"+
-			"<trendpoints><point value='' displayValue='' fontcolor='FF4400' useMarker='' dashed='1' dashLen='2' dashGap='2' valueInside='1' />"+
-			"</trendpoints> <annotations> <annotationGroup id='Grp1' showBelow='1' >"+
-			"<annotation type='rectangle' x='5' y='5' toX='345' toY='195' radius='10' color='ffffff,ffffff' showBorder='0' />"+
-			"</annotationGroup></annotations>"+
-			"<styles>  <definition> <style name='RectShadow' type='shadow' strength='0'/> </definition> <application>"+
-			"<apply toObject='Grp1' styles='RectShadow' /></application></styles></chart>";
-		return xmlData;
-	}
-	/* render the revised dial data*/
-    function revisedDialData( dialInd ){
-    	var xmlData = "<chart bgAlpha='0' bgColor='FFFFFF' lowerLimit='0' upperLimit='100' numberSuffix='' showBorder='0' basefontColor='000000' "+
-	    	" animation='0' showValues='0' rotateValues='1' placeValuesInside='1' "+
-	    	" chartTopMargin='15' chartBottomMargin='15' chartLeftMargin='5' chartRightMargin='5' toolTipBgColor='80A905' "+
-	    	" gaugeFillMix='{dark-10},FFFFFF,{dark-10}' gaugeFillRatio='3' showTickMarks='0'>"+
-	    	" <colorRange><color minValue='0' maxValue='25' code='FF654F'/><color minValue='25' maxValue='50' code='F6BD0F'/>"+
-	    	" <color minValue='50' maxValue='100' code='8BBA00'/></colorRange>"+
-	    	" <dials><dial value='"+dialInd+"' rearExtension='10'/></dials>"+
-			" <trendpoints><point value='' displayValue='' fontcolor='FF4400' useMarker='1' dashed='1' dashLen='2' dashGap='2' valueInside='1' />"+
-			" </trendpoints> <annotations> <annotationGroup id='Grp1' showBelow='1' >"+
-			" <annotation type='rectangle' x='5' y='5' toX='345' toY='195' radius='10' color='FFFFFF,FFFFFF' showBorder='0' /> "+
-			"</annotationGroup></annotations> "+
-			" <styles><definition><style name='RectShadow' type='shadow' strength='0'/></definition>"+
-			" <application><apply toObject='Grp1' styles='RectShadow' /></application></styles></chart>"
-    }
-	</script> --%>
 </head>
+<body>
 <div class="body_bg">
 	<a name="page_up"></a>
 	<div id="doc">
@@ -117,10 +65,10 @@
 					</div>
 					<%-- <div style="float: right;padding: 3px 0px;"> <a href="#page_down" class="nav_button">Page Down</a></div> --%>
 				</div>
-				<input type="hidden" id="typeId" value="${params.type}"> <input
-					type="hidden" id="stateId" value="${params.state}"> <input
-					type="hidden" id="maxLenId" value="${params.maxLen}"> <input
-					type="hidden" id="sortId" value="${params.sort}">
+				<input type="hidden" id="typeId" value="${params.type}"> 
+				<input type="hidden" id="stateId" value="${params.state}"> 
+				<input type="hidden" id="maxLenId" value="${params.maxLen}"> 
+				<input type="hidden" id="sortId" value="${params.sort}">
 			</div>
 			<!-- Header Ends here-->
 			<div id="bodytop">
@@ -128,11 +76,10 @@
 					<div id="topindleft">
 						<div id="summary_gauge_div" align="center">
 							<g:if test="${manualOverrideViewPermission}">
-								<a href="#manualSummary"
-									onclick="javascript:$('#manualSumStatusSpan').show();"> <img
-									id="summary_gauge" alt="Move Event Summary"
-									src="${createLinkTo(dir:'i/dials',file:'dial-50.png')}"
-									style="border: 0px;"> </a>
+								<a href="#manualSummary" onclick="javascript:$('#manualSumStatusSpan').show();"> 
+									<img id="summary_gauge" alt="Move Event Summary"
+									src="${createLinkTo(dir:'i/dials',file:'dial-50.png')}"	style="border: 0px;"> 
+								</a>
 							</g:if>
 							<g:else>
 								<img id="summary_gauge" alt="Move Event Summary"
@@ -140,21 +87,13 @@
 									style="border: 0px;">
 							</g:else>
 						</div>
-						<%--
-					<script language="JavaScript">
-						var summarychart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "summary_gauge", "280", "136", "0", "0");
-	        			//summarychart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'summary_gauge.xml')}");
-	        			 summarychart.setDataXML( summaryDialData( "50" ) )
-						summarychart.render("summary_gauge_div");
-					</script>  --%>
-						Move Status vs. Plan <br /> <span id="manualSumStatusSpan"
-							style="display: none; width: 10px;"> <span
-							style="font-weight: normal; font-size: 12px;">Manual :</span> <input
-							type="checkbox" name="manual" value="" id="checkBoxId" /> <input
-							type="text" value="" name="manualSummaryStatus"
-							id="manualSummaryStatusId" size="3" maxlength="3"
-							onblur="validateManulaSummary(this.value)" />&nbsp; <input
-							type="button" value="Save" onclick="changeEventSummary()" /> </span>
+						Move Status vs. Plan <br /> 
+						<span id="manualSumStatusSpan" style="display: none; width: 10px;"> 
+						<span style="font-weight: normal; font-size: 12px;">Manual :</span> 
+						<input type="checkbox" name="manual" value="" id="checkBoxId" /> 
+						<input type="text" value="" name="manualSummaryStatus" id="manualSummaryStatusId" size="3" maxlength="3"
+						onblur="validateManulaSummary(this.value)" />&nbsp; 
+						<input type="button" value="Save" onclick="changeEventSummary()" /> </span>
 					</div>
 					<div class="topleftcontent">
 						Planned Completion<br>
@@ -168,12 +107,6 @@
 							<img id="revised_gauge" alt="Move Event Revised Summary"
 								src="${createLinkTo(dir:'i/dials',file:'dial-50.png')}">
 						</div>
-						<%--<script language="JavaScript">
-						var revisedChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "revised_gauge", "280", "136", "0", "0");
-						//summarychart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'revised_gauge.xml')}");
-						revisedChart.setDataXML( revisedDialData( "50" ) )
-						revisedChart.render("revised_gauge_div");
-					</script>  --%>
 						Status vs. Revised Plan
 					</div>
 					<div class="toprightcontent" id="revised_gauge_content"
@@ -251,9 +184,11 @@
 				<div id="leftcol">
 					<ul id="btitle">
 						<li>Step</li>
-						<li><span class="percentage">In Percentage</span>
-						</li>
-						<!-- <li><span class="percentage">Completion</span></li> -->
+						<li>&nbsp;</li>
+						<g:if test="${project?.runbookOn == 1 }">
+                             <li><span class="percentage">Tasks</span></li>
+                        </g:if>
+						
 						<li>Planned Start</li>
 						<li>Planned&nbsp;Completion</li>
 						<li>Actual Start</li>
@@ -268,9 +203,7 @@
 				</div>
 				<div class="mod">
 					<div id="themes">
-						<input type="hidden"
-							value="${moveBundleList ? moveBundleList[0]?.id : ''}"
-							id="defaultBundleId">
+						<input type="hidden" value="${moveBundleList ? moveBundleList[0]?.id : ''}"	id="defaultBundleId">
 						<g:each in="${moveBundleList}" status="i" var="moveBundle">
 							<div id="bundlediv${moveBundle.id}"
 								class="${i == 0 ? 'show_bundle_step' : 'hide_bundle_step'}">
@@ -285,23 +218,20 @@
 										</g:if> <g:else>
 													${moveBundleStep.label}
 												</g:else></li>
-											<li
-												id="percentage_${moveBundle.id}_${moveBundleStep.transitionId}">
+											<li id="percentage_${moveBundle.id}_${moveBundleStep.transitionId}"></li>
+											<g:if test="${project?.runbookOn == 1 }">
+											     <li class="tasks" id="tasks_${moveBundle.id}_${moveBundleStep.transitionId}">&nbsp</li>
+											 </g:if>
+											<li class="schstart"><span id="plan_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
+											<li class="schfinish"><span id="plan_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
+											<li class="actstart" id="li_start_${moveBundle.id}_${moveBundleStep.transitionId}">
+											     <span id="act_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;
 											</li>
-											<!-- <li class="actfinish1"><span id="completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li> -->
-											<li class="schstart"><span
-												id="plan_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
-											<li class="schfinish"><span
-												id="plan_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
-											<li class="actstart"
-												id="li_start_${moveBundle.id}_${moveBundleStep.transitionId}"><span
-												id="act_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
-											<li class="actfinish"
-												id="li_finish_${moveBundle.id}_${moveBundleStep.transitionId}"><span
-												id="act_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
+											<li class="actfinish" id="li_finish_${moveBundle.id}_${moveBundleStep.transitionId}">
+											     <span id="act_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;
+											</li>
 										</ul>
-										<div
-											id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}"
+										<div id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}"
 											align="center" style="display: none;">
 											<tds:hasPermission permission='ViewPacingMeters'>
 												<img
@@ -309,14 +239,6 @@
 													src="${createLinkTo(dir:'i/dials',file:'dial-50sm.png')}">
 											</tds:hasPermission>
 										</div>
-										<%-- <jsec:hasAnyRole in="['ADMIN']">
-								<script language="JavaScript">
-							         var stepchart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "chart_${moveBundle.id}_${moveBundleStep.transitionId}", "100", "75", "0", "0");
-							         //stepchart.setDataURL("${createLinkTo(dir:'resource/dashboard',file:'step_gauge.xml')}");
-							         stepchart.setDataXML( stepDialData( "50" ) )
-							         stepchart.render("chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}");
-								</script>  
-								</jsec:hasAnyRole> --%>
 									</div>
 								</g:each>
 							</div>
@@ -500,6 +422,7 @@
 				</span>
 			</div>
 		</div>
+	</div>
 	</div>
 	<script type="text/javascript">
 	var eventType = "load"
@@ -924,7 +847,7 @@
 			for( i = 0; i < steps.length; i++ ) {
 				$("#percentage_"+moveBundleId+"_"+steps[i].tid).html(isNaN(steps[i].tskComp / steps[i].tskTot) ? 0+ "%" : parseInt( (steps[i].tskComp / steps[i].tskTot ) * 100 ) +"%");
 				$("#percentage_"+moveBundleId+"_"+steps[i].tid).attr("class",steps[i].percentageStyle)
-				//$("#completion_"+moveBundleId+"_"+steps[i].tid).html(steps[i].projComp);
+				$("#tasks_"+moveBundleId+"_"+steps[i].tid).html(isNaN(steps[i].tskComp / steps[i].tskTot) ? "0(of 0)" : steps[i].tskComp+"(of "+steps[i].tskTot+")");
 				$("#plan_start_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].planStart));
 				$("#plan_completion_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].planComp));
 				var startDelta = 0
@@ -1270,5 +1193,5 @@
 	currentMenuId = "";
 	$("#dashboardMenuId a").css('background-color','#003366')
 </script>
-</div>
+</body>
 </html>
