@@ -313,7 +313,6 @@
 			<li id="bundleMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]" id="${moveBundleId}">Bundles
 				<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#bundleMegaMenu')" href="javascript:showMegaMenu('#bundleMegaMenu')" style="display: inline"></a></g:link>
 			</li>
-			</tds:hasPermission>
 
 			<li id="teamMenuId" style="position:relative; float:left;"><a class="home" onmouseover="showMegaMenu('#teamMegaMenu')" href="/tdstm/clientTeams/listTasks" >Tasks</a>
 				<a id="teamMenuAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#teamMegaMenu')" href="javascript:showMegaMenu('#teamMegaMenu')" style="display: inline"></a>
