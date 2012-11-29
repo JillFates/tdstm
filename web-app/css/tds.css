@@ -1162,7 +1162,7 @@ a.tab_deselect {
     text-align: left;
 }
 .person{
-	height : 550px;
+	min-height : 200px;
 }
 .personTable{
 	float: left;

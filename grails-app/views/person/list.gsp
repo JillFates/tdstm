@@ -102,7 +102,7 @@
                        <label>Company:</label>
                    </td>
                    <td valign="top" class="value ">
-                   <g:select name="company" id="companyId" optionKey="id" optionValue="name" from="${totalCompanies}" value="${company.id}"/>
+                   <g:select name="company" id="companyId" optionKey="id" optionValue="name" from="${totalCompanies}" value="${company?.id}"/>
                    </td>
 				</tr> 
                 <tr class="prop">
@@ -220,6 +220,14 @@
                     </td>
                     <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'mobilePhone', 'errors')}">
                     	<g:textField name="mobilePhone" value="${personInstance?.mobilePhone}" size="34"/>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td valign="top" class="name"><label for="roles">Roles :</label></td>
+					<td valign="top" class="value" colspan="2">
+						<g:select from="${availabaleRoles}" id="roleId" name="role"
+							optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"
+							value="" optionKey="id" />
 					</td>
 				</tr>
               </tbody>

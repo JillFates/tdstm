@@ -82,7 +82,8 @@ class PersonController {
 			}
 		}
 		userPreferenceService.setPreference( "PARTYGROUP", companyId.toString() )
-		return [ personsList: personsList, companyId:companyId,totalCompanies:companiesList, company:company]
+		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
+		return [ personsList: personsList, companyId:companyId,totalCompanies:companiesList, company:company, availabaleRoles:availabaleRoles]
     }
 
     def show = {
@@ -202,6 +203,7 @@ class PersonController {
                 def companyParty = Party.findById( companyId )
                 def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", personInstance, "STAFF" )
             }
+			userPreferenceService.setUserRoles([params.role], personInstance.id)
             flash.message = "Person ${fullName} created"
             //redirect( action:list, id:personInstance.id , params:[companyId:companyId] )
             redirect( action:list )

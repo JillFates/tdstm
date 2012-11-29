@@ -101,25 +101,28 @@ function switchTab(id,divId,header){
  * to make a Ajax call to update person info.
  */
 function updatePerson(tab,form){
-	var params = $('#'+form).serialize()
-	params+= "&tab=" + tab;
-	jQuery.ajax({
-		url:$('#'+form).attr('action'),
-		data: params,
-		type:'POST',
-		success: function(data) {
-			$('#personGeneralViewId').html(data)
-			currentTabShow = currentTabShow.replace('Edit','Show')
-			currentHeaderShow = currentHeaderShow.replace('Edit','Show')
-			$(".person").hide()
-			$("#"+currentTabShow).show()
-			$(".mobmenu").removeClass("mobselect")
-			$("#"+currentHeaderShow).addClass("mobselect")
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			alert("An unexpected error occurred while attempting to update Person ")
-		}
-	});
+	var validate = validatePersonForm(form)
+	if(validate) {
+		var params = $('#'+form).serialize()
+		params+= "&tab=" + tab;
+		jQuery.ajax({
+			url:$('#'+form).attr('action'),
+			data: params,
+			type:'POST',
+			success: function(data) {
+				$('#personGeneralViewId').html(data)
+				currentTabShow = currentTabShow.replace('Edit','Show')
+				currentHeaderShow = currentHeaderShow.replace('Edit','Show')
+				$(".person").hide()
+				$("#"+currentTabShow).show()
+				$(".mobmenu").removeClass("mobselect")
+				$("#"+currentHeaderShow).addClass("mobselect")
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert("An unexpected error occurred while attempting to update Person ")
+			}
+		});
+	}
 }
 
 /*
@@ -225,18 +228,25 @@ function createDialog() {
  */
 function validatePersonForm(form) {
 	var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/
+	var mobileExp=/^([0-9 +-])+$/
 	var returnVal = true
+	var allFields = $("form[name = "+form+"] input[type = 'text']");
+	
+	jQuery.each(allFields , function(i, field) {
+		field.value=field.value.trim()
+	});
+	
 	var firstName = $(
-			"form[name = 'createDialogForm'] input[name = 'firstName']")
+			"form[name = "+form+"] input[name = 'firstName']")
 			.val()
 	var email = $(
-			"form[name = 'createDialogForm'] input[name = 'email']")
+			"form[name = "+form+"] input[name = 'email']")
 			.val()
 	var workPhone = $(
-			"form[name = 'createDialogForm'] input[name = 'workPhone']")
+			"form[name = "+form+"] input[name = 'workPhone']")
 			.val().replace(/[\(\)\.\-\ ]/g, '')
 	var mobilePhone = $(
-			"form[name = 'createDialogForm'] input[name = 'mobilePhone']")
+			"form[name = "+form+"] input[name = 'mobilePhone']")
 			.val().replace(/[\(\)\.\-\ ]/g, '')
 	if (!firstName) {
 		alert("First Name should not be blank ")
@@ -246,25 +256,14 @@ function validatePersonForm(form) {
 		alert(email + " is not a valid e-mail address ")
 		returnVal = false
 	}
-	if (workPhone) {
-		if (isNaN(workPhone)) {
-			alert("The Work phone number contains illegal characters.");
-			returnVal = false
-		}
-		if (!(workPhone.length == 10)) {
-			alert("The Work phone number is the wrong length. Make sure you included an area code.");
-			returnVal = false
-		}
+	if (workPhone && !(mobileExp.test(workPhone))) {
+		alert("The Work phone number contains illegal characters.");
+		returnVal = false
 	}
-	if (mobilePhone) {
-		if (isNaN(mobilePhone)) {
-			alert("The Mobile phone number contains illegal characters.");
-			returnVal = false
-		}
-		if (!(mobilePhone.length == 10)) {
-			alert("The Mobile phone number is the wrong length. Make sure you included an area code.");
-			returnVal = false
-		}
+	if (mobilePhone && !(mobileExp.test(mobilePhone))) {
+		alert("The Mobile phone number contains illegal characters.");
+		returnVal = false
 	}
 	return returnVal
 }
+
