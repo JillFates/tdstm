@@ -309,6 +309,7 @@
 .dashboard_div {
 	margin-top: 10px;
 	margin-left: 5px;
+	height: 420px;
 	background-image: url(../images/news_bg.png);
 	background-size: contain;
 }

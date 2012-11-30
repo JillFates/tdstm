@@ -118,11 +118,11 @@
 						<div class="racktop_label" >${rack.tag}</div>
 					</div>
 				</g:else>
-		</g:each>
+			</g:each>
 		<span>Floor ${roomInstance.roomWidth}ft x ${roomInstance.roomDepth}ft = ${roomInstance.roomWidth * roomInstance.roomDepth} sqft</span>
-</div>
+	</div>
 	<div style="float: right; margin-left: 20px;width: 350px;" id="rackLayout">
-<table cellpadding=2 class="rack_elevation back">
+	<table cellpadding=2 class="rack_elevation back">
 	<tr><th>U</th><th>Device</th><th>Bundle</th></tr>
 	<tr><td class='rack_upos'>42</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
 	<tr><td class='rack_upos'>41</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
@@ -166,8 +166,8 @@
 	<tr><td class='rack_upos'>3</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
 	<tr><td class='rack_upos'>2</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
 	<tr><td class='rack_upos'>1</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-</table>
-</div>
+	</table>
+	</div>
 </div>
 </div>
 </div>

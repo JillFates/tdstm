@@ -116,10 +116,10 @@
 			<tr id="rackEditRow_${rack.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}" >
 				<td>
 					<input type="hidden" name="rackId" value="${rack.id}"/>${rack.source == 1 ? 'S' : 'T' }
-					<input type="text" name="tag_${rack.id}" value="${rack.tag}" size="10" onchange="changeLabel(${rack.id},this.value)"/>
+					<input type="text" name="tag_${rack.id}" value="${rack.tag}" size="10" onchange="changeLabel(${rack.id},this.value)" onFocus="objectSelectedOn(${rack.id})" onblur="objectSelectedOn(${rack.id})" />
 				</td>
-				<td><input type="text" id="roomXId_${rack.id}" name="roomX_${rack.id}" value="${rack.roomX}" size="3"  onkeyup="changeRackPosition(${rack.id},this.value, 'left')" /></td>
-				<td><input type="text" id="roomYId_${rack.id}" name="roomY_${rack.id}" value="${rack.roomY}" size="3"  onkeyup="changeRackPosition(${rack.id},this.value, 'top')" /></td>
+				<td><input type="text" id="roomXId_${rack.id}" name="roomX_${rack.id}" value="${rack.roomX}" size="3"  onkeyup="changeRackPosition(${rack.id},this.value, 'left')"  onFocus="objectSelectedOn(${rack.id})" onblur="objectSelectedOn(${rack.id})" /></td>
+				<td><input type="text" id="roomYId_${rack.id}" name="roomY_${rack.id}" value="${rack.roomY}" size="3"  onkeyup="changeRackPosition(${rack.id},this.value, 'top')"  onFocus="objectSelectedOn(${rack.id})" onblur="objectSelectedOn(${rack.id})" /></td>
 				<td><g:select id="frontId_${rack.id}" name="front_${rack.id}" from="${Rack.constraints.front.inList}" value="${rack.front}" onchange="updateRackStyle(${rack.id}, this.value, jQuery('#rackTypeId_'+${rack.id}).val())" style="width:40px;"></g:select></td>
 				<td><input type="text" name="powerA_${rack.id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerA ? (rack.powerA / 110).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA):0}" size="3" /></td>
 				<td><input type="text" name="powerB_${rack.id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerB ? (rack.powerB / 110).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB):0}" size="3" /></td>
@@ -139,10 +139,10 @@
 			<tr id="rackEditRow_${rack}" class="${(i % 2) == 0 ? 'odd' : 'even'}" style="display: none;">
 				<td>
 					<input type="hidden" name="rackId" value="${rack}"/>
-					<input type="text" name="tag_${rack}" value="" size="10" onchange="changeLabel(${rack},this.value)"/>
+					<input type="text" name="tag_${rack}" value="" size="10" onchange="changeLabel(${rack},this.value)" onFocus="objectSelectedOn(${rack.id})" onblur="objectSelectedOn(${rack.id})" />
 				</td>
-				<td><input type="text" id="roomXId_${rack}" name="roomX_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'left')" /></td>
-				<td><input type="text" id="roomYId_${rack}" name="roomY_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'top')" /></td>
+				<td><input type="text" id="roomXId_${rack}" name="roomX_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'left')" onFocus="objectSelectedOn(${rack.id})" onblur="objectSelectedOn(${rack.id})" /></td>
+				<td><input type="text" id="roomYId_${rack}" name="roomY_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'top')" onFocus="objectSelectedOn(${rack.id})" onblur="objectSelectedOn(${rack.id})" /></td>
 				<td><g:select id="frontId_${rack}" name="front_${rack}" from="${Rack.constraints.front.inList}" onchange="updateRackStyle(${rack}, this.value, jQuery('#rackTypeId_'+${rack}).val())" style="width:40px;"></g:select></td>
 				<td><input type="text" id = "newPowerA_${rack}" name="powerA_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerA/ 110 ).toFloat().round(1) : new Rack().powerA}"  size="3" /></td>
 				<td><input type="text" id = "newPowerB_${rack}" name="powerB_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerB/ 110 ).toFloat().round(1) : new Rack().powerB}" size="3" /></td>
@@ -261,13 +261,18 @@ function createRack(value){
 		$("#newPowerA_"+newRackId).val('0')
 		$("#newPowerB_"+newRackId).val('0')
 	}
-	$("#roomLayout").css("width","auto")
 }
 function changeLabel(id,value){
 	$("#rackLabel_"+id).html(value)
 }
 function changeRackType(id,value){
 	$("#rack_"+id).html(value)
+}
+function objectSelectedOn(id){
+	$("#rack_"+id).addClass("objectSelected")
+}
+function objectSelectedOff(id){
+	$("#rack_"+id).removeClass("objectSelected")
 }
 function updateRackStyle(id, frontValue, rackTypeValue){
 	$("#rack_"+id).removeAttr("class")

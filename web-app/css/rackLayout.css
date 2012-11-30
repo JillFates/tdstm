@@ -22,7 +22,7 @@ br.page-break-after {
 #roomObjects td {
 	padding: 0px;
 }
-#objectSelected {
+.objectSelected {
 	box-shadow: #888 5px 5px 10px;
 }
 #rackLayout {
