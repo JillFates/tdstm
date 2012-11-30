@@ -69,6 +69,7 @@
 				<input type="hidden" id="stateId" value="${params.state}"> 
 				<input type="hidden" id="maxLenId" value="${params.maxLen}"> 
 				<input type="hidden" id="sortId" value="${params.sort}">
+				<g:set value="${project?.runbookOn}" var="runbookOn"></g:set>
 			</div>
 			<!-- Header Ends here-->
 			<div id="bodytop">
@@ -185,7 +186,7 @@
 					<ul id="btitle">
 						<li>Step</li>
 						<li>&nbsp;</li>
-						<g:if test="${project?.runbookOn == 1 }">
+						<g:if test="${runbookOn == 1 }">
                              <li><span class="percentage">Tasks</span></li>
                         </g:if>
 						
@@ -219,7 +220,7 @@
 													${moveBundleStep.label}
 												</g:else></li>
 											<li id="percentage_${moveBundle.id}_${moveBundleStep.transitionId}"></li>
-											<g:if test="${project?.runbookOn == 1 }">
+											<g:if test="${runbookOn == 1 }">
 											     <li class="tasks" id="tasks_${moveBundle.id}_${moveBundleStep.transitionId}">&nbsp</li>
 											 </g:if>
 											<li class="schstart"><span id="plan_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;</li>
@@ -860,7 +861,7 @@
 					}
 				}
 				$("#act_start_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].actStart+": ("+ startDelta +"m)"));
-				if( steps[i].actStart && !steps[i].actComp && steps[i].calcMethod != "M") {
+				if( steps[i].actStart && !steps[i].actComp && steps[i].calcMethod != "M" && ${runbookOn} != 1) {
 					$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html("<span id='databox'>Total Devices "+steps[i].tskTot+" Completed "+steps[i].tskComp+"</span>")
 				} else {
 					actDelta = parseInt((new Date(steps[i].actComp).getTime() - new Date(steps[i].planComp).getTime())/60000);
