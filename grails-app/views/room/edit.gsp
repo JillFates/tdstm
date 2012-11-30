@@ -139,10 +139,10 @@
 			<tr id="rackEditRow_${rack}" class="${(i % 2) == 0 ? 'odd' : 'even'}" style="display: none;">
 				<td>
 					<input type="hidden" name="rackId" value="${rack}"/>
-					<input type="text" name="tag_${rack}" value="" size="10" onchange="changeLabel(${rack},this.value)" onFocus="objectSelectedOn(${rack.id})" onblur="objectSelectedOn(${rack.id})" />
+					<input type="text" name="tag_${rack}" value="" size="10" onchange="changeLabel(${rack},this.value)" onFocus="objectSelectedOn(${rack})" onblur="objectSelectedOn(${rack})" />
 				</td>
-				<td><input type="text" id="roomXId_${rack}" name="roomX_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'left')" onFocus="objectSelectedOn(${rack.id})" onblur="objectSelectedOn(${rack.id})" /></td>
-				<td><input type="text" id="roomYId_${rack}" name="roomY_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'top')" onFocus="objectSelectedOn(${rack.id})" onblur="objectSelectedOn(${rack.id})" /></td>
+				<td><input type="text" id="roomXId_${rack}" name="roomX_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'left')" onFocus="objectSelectedOn(${rack})" onblur="objectSelectedOn(${rack})" /></td>
+				<td><input type="text" id="roomYId_${rack}" name="roomY_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'top')" onFocus="objectSelectedOn(${rack})" onblur="objectSelectedOn(${rack})" /></td>
 				<td><g:select id="frontId_${rack}" name="front_${rack}" from="${Rack.constraints.front.inList}" onchange="updateRackStyle(${rack}, this.value, jQuery('#rackTypeId_'+${rack}).val())" style="width:40px;"></g:select></td>
 				<td><input type="text" id = "newPowerA_${rack}" name="powerA_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerA/ 110 ).toFloat().round(1) : new Rack().powerA}"  size="3" /></td>
 				<td><input type="text" id = "newPowerB_${rack}" name="powerB_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerB/ 110 ).toFloat().round(1) : new Rack().powerB}" size="3" /></td>
