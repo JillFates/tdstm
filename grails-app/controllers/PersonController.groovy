@@ -512,12 +512,19 @@ class PersonController {
 		def currRole = userPreferenceService.getPreference("StaffingRole")?:"MOVE_TECH"
 		def currLoc = userPreferenceService.getPreference("StaffingLocation")?:"All"
 		def currPhase = userPreferenceService.getPreference("StaffingPhases")?:"All"
-		def currScale = userPreferenceService.getPreference("StaffingScale")?:"1"
-		def moveEvents = MoveEvent.findAll("from MoveEvent m where project =:project order by m.project.name , m.name asc",[project:project])
+		def currScale = userPreferenceService.getPreference("StaffingScale")?:"6"
+        def moveEvents
+        def projectId = projects.find{it.id == project.id} ? project.id : 0
+        if(projectId == 0){
+            moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",[project:projects])
+        } else {
+            project = Project.get(projectId)
+            moveEvents = MoveEvent.findAll("from MoveEvent m where project =:project order by m.project.name , m.name asc",[project:project])
+        }
         // Limit the events to today-30 days and newer (ie. don't show events over a month ago) 
         moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > new Date().minus(30)}
 		def paramsMap = [sortOn : 'lastName', firstProp : 'staff', orderBy : 'asc']
-		def staffList = getStaffList(project.id, currRole, currScale, currLoc, 0,paramsMap)
+		def staffList = getStaffList(projectId, currRole, currScale, currLoc, 0,paramsMap)
 		
 		def eventCheckStatuses = eventCheckStatus(staffList, moveEvents)
 		def staffCheckStatus = staffCheckStatus(staffList,project)
