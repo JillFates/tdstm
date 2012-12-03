@@ -1,3 +1,10 @@
+<%--
+   /*
+    *
+    * I believe that this file is NO longer used and should be deleted if found to be true.
+    *
+    */
+--%>
 <%@page import="com.tds.asset.AssetComment"%>
 <div class="tabs">
 	<ul>
