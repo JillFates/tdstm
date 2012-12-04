@@ -76,22 +76,22 @@
 		<g:each in="${rackInstanceList}" var="rack">
 			<g:if test="${rack.rackType == 'Rack'}">
 			 <g:if test="${rack.model?.layoutStyle == null}">	
-				<div align="center"  id="rack_${rack.id}" style="top:${rack.roomY}px; left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="${ rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_L' }">
+				<div align="center"  id="rack_${rack.id}" style="top:${rack.roomY}px; left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" onmouseover="addShadowCss(this.id)"  class="${ rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_L' }">
 				</g:if>
 				<g:else>
-				<div align="center"  id="rack_${rack.id}" style="top:${rack.roomY}px; left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="${rack.model?.layoutStyle}">
+				<div align="center"  id="rack_${rack.id}" style="top:${rack.roomY}px; left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" onmouseover="addShadowCss(this.id)" class="${rack.model?.layoutStyle}">
 				</g:else>
 					<span id="rackLabel_${rack.id}"><br>${rack.tag}</br></span>
 				</div>
 			</g:if>
 			<g:else>
-				<div align="center" id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" class="room_${rack.rackType}_${rack.front}">
+				<div align="center" id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" onmouseover="addShadowCss(this.id)" class="room_${rack.rackType}_${rack.front}">
 					<span id="rackLabel_${rack.id}" style="background-color:white; z-index:1;" ><br>${rack.tag}</br></span>
 				</div>
 			</g:else>
 		</g:each>
 		<g:each in="${newRacks}" var="rack">
-			<div align="center"id="rack_${rack}" style="top:0px;left:0px;display: none;" onmouseout="updateXYPositions(this.id)" class="rack_highlight_no_L" >
+			<div align="center"id="rack_${rack}" style="top:0px;left:0px;display: none;" onmouseout="updateXYPositions(this.id)" onmouseover="addShadowCss(this.id)" class="rack_highlight_no_L" >
 				<span id="rackLabel_${rack}" style="background-color:white;z-index:1; "><br>&nbsp;</br></span>
 			</div>
 		</g:each>
@@ -116,14 +116,14 @@
 			<tr id="rackEditRow_${rack.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}" >
 				<td>
 					<input type="hidden" name="rackId" value="${rack.id}"/>${rack.source == 1 ? 'S' : 'T' }
-					<input type="text" name="tag_${rack.id}" value="${rack.tag}" size="10" onchange="changeLabel(${rack.id},this.value)" onFocus="objectSelectedOn(${rack.id})" onblur="objectSelectedOn(${rack.id})" />
+					<input type="text" class="focusShadow" id="tag_${rack.id}"  name="tag_${rack.id}" value="${rack.tag}" size="10" onchange="changeLabel(${rack.id},this.value)" />
 				</td>
-				<td><input type="text" id="roomXId_${rack.id}" name="roomX_${rack.id}" value="${rack.roomX}" size="3"  onkeyup="changeRackPosition(${rack.id},this.value, 'left')"  onFocus="objectSelectedOn(${rack.id})" onblur="objectSelectedOn(${rack.id})" /></td>
-				<td><input type="text" id="roomYId_${rack.id}" name="roomY_${rack.id}" value="${rack.roomY}" size="3"  onkeyup="changeRackPosition(${rack.id},this.value, 'top')"  onFocus="objectSelectedOn(${rack.id})" onblur="objectSelectedOn(${rack.id})" /></td>
+				<td><input type="text" class="focusShadow" id="roomXId_${rack.id}" name="roomX_${rack.id}" value="${rack.roomX}" size="3"  onkeyup="changeRackPosition(${rack.id},this.value, 'left')" /></td>
+				<td><input type="text" class="focusShadow" id="roomYId_${rack.id}" name="roomY_${rack.id}" value="${rack.roomY}" size="3"  onkeyup="changeRackPosition(${rack.id},this.value, 'top')" /></td>
 				<td><g:select id="frontId_${rack.id}" name="front_${rack.id}" from="${Rack.constraints.front.inList}" value="${rack.front}" onchange="updateRackStyle(${rack.id}, this.value, jQuery('#rackTypeId_'+${rack.id}).val())" style="width:40px;"></g:select></td>
-				<td><input type="text" name="powerA_${rack.id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerA ? (rack.powerA / 110).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA):0}" size="3" /></td>
-				<td><input type="text" name="powerB_${rack.id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerB ? (rack.powerB / 110).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB):0}" size="3" /></td>
-				<td><input type="text" name="powerC_${rack.id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerC ? (rack.powerC / 110).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC):0}" size="3" /></td>
+				<td><input type="text" class="focusShadow" id="powerA_${rack.id}" name="powerA_${rack.id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerA ? (rack.powerA / 110).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA):0}" size="3" /></td>
+				<td><input type="text" class="focusShadow" id="powerB_${rack.id}" name="powerB_${rack.id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerB ? (rack.powerB / 110).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB):0}" size="3" /></td>
+				<td><input type="text" class="focusShadow" id="powerC_${rack.id}" name="powerC_${rack.id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerC ? (rack.powerC / 110).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC):0}" size="3" /></td>
 				<td><g:select id="rackTypeId_${rack.id}" name="rackType_${rack.id}" from="${Rack.constraints.rackType.inList}" value="${rack.rackType}" onchange="updateRackStyle(${rack.id}, jQuery('#frontId_'+${rack.id}).val(), this.value)" style="width:100px;"></g:select></td>
 				<td>
 					<span id="modelSpan_${rack.id}"><g:select class="rackModel" id="model_${rack.id}" name="model_${rack.id}" from="${modelList}" noSelection="[null:'Select Model']" value="${rack.model?.id}" optionKey="id" optionValue="${{it.manufacturer.name+' / '+it.modelName} }"></g:select></span>
@@ -139,14 +139,14 @@
 			<tr id="rackEditRow_${rack}" class="${(i % 2) == 0 ? 'odd' : 'even'}" style="display: none;">
 				<td>
 					<input type="hidden" name="rackId" value="${rack}"/>
-					<input type="text" name="tag_${rack}" value="" size="10" onchange="changeLabel(${rack},this.value)" onFocus="objectSelectedOn(${rack})" onblur="objectSelectedOn(${rack})" />
+					<input type="text" class="focusShadow" id="tag_${rack}"  name="tag_${rack}" value="" size="10" onchange="changeLabel(${rack},this.value)" />
 				</td>
-				<td><input type="text" id="roomXId_${rack}" name="roomX_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'left')" onFocus="objectSelectedOn(${rack})" onblur="objectSelectedOn(${rack})" /></td>
-				<td><input type="text" id="roomYId_${rack}" name="roomY_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'top')" onFocus="objectSelectedOn(${rack})" onblur="objectSelectedOn(${rack})" /></td>
+				<td><input type="text" class="focusShadow" id="roomXId_${rack}" name="roomX_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'left')" /></td>
+				<td><input type="text" class="focusShadow" id="roomYId_${rack}" name="roomY_${rack}" value="" size="3" onkeyup="changeRackPosition(${rack},this.value, 'top')" /></td>
 				<td><g:select id="frontId_${rack}" name="front_${rack}" from="${Rack.constraints.front.inList}" onchange="updateRackStyle(${rack}, this.value, jQuery('#rackTypeId_'+${rack}).val())" style="width:40px;"></g:select></td>
-				<td><input type="text" id = "newPowerA_${rack}" name="powerA_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerA/ 110 ).toFloat().round(1) : new Rack().powerA}"  size="3" /></td>
-				<td><input type="text" id = "newPowerB_${rack}" name="powerB_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerB/ 110 ).toFloat().round(1) : new Rack().powerB}" size="3" /></td>
-				<td><input type="text" id = "newPowerC_${rack}" name="powerC_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerC/ 110 ).toFloat().round(1) : new Rack().powerC}" size="3" /></td>
+				<td><input type="text" class="focusShadow" id = "newPowerA_${rack}" name="powerA_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerA/ 110 ).toFloat().round(1) : new Rack().powerA}"  size="3" /></td>
+				<td><input type="text" class="focusShadow" id = "newPowerB_${rack}" name="powerB_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerB/ 110 ).toFloat().round(1) : new Rack().powerB}" size="3" /></td>
+				<td><input type="text" class="focusShadow" id = "newPowerC_${rack}" name="powerC_${rack}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerC/ 110 ).toFloat().round(1) : new Rack().powerC}" size="3" /></td>
 				<td><g:select id="rackTypeId_${rack}" name="rackType_${rack}" from="${Rack.constraints.rackType.inList}" value="Rack" onchange="updateRackStyle(${rack}, jQuery('#frontId_'+${rack}).val(), this.value)" style="width:100px;"></g:select></td>
 				<td><span id="modelSpan_${rack}"><g:select class="rackModel" id="model_${rack}" name="model_${rack}" from="" noSelection="[null:'Select Model']"></g:select></span></td>
 				<td>0&nbsp;&nbsp;&nbsp;<a href="javascript:verifyAndDeleteRacks(${rack})"><span class="clear_filter"><u>X</u></span></a></td>
@@ -159,6 +159,14 @@
 </div>
 <script type="text/javascript">
 
+$(document).ready(function() {
+	$(".focusShadow").bind("focus", function(e) {
+		addShadowCss(this.id);
+    }); 
+	$(".focusShadow").bind("blur", function(e) {
+		delShadowCss(this.id)
+    });    
+})
 function enableDraggableRack(){
 	  var showDrag = $("#showRoomObjects").is(':checked')
 	  var drag = 'off'
@@ -221,6 +229,18 @@ function updateXYPositions(id){
 	
 	$("#roomXId_"+rackId).val(x)
 	$("#roomYId_"+rackId).val(y)
+
+	$("#"+id).removeClass("objectSelected")
+}
+
+function addShadowCss(id){
+	var rackId = id.split("_")[1]
+	$("#rack_"+rackId).addClass("objectSelected")
+}
+
+function delShadowCss(id){
+	var rackId = id.split("_")[1]
+	$("#rack_"+rackId).removeClass("objectSelected")
 }
 function verifyAndDeleteRacks(id){
 	jQuery.ajax({
