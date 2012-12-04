@@ -396,6 +396,10 @@ function getRackLayout( rackId ){
 		$("#bundleId option:selected").each(function () {
 			moveBundleId +="moveBundleId="+$(this).val()+"&"
 	   	});
+	   	
+		$(".objectSelected").removeClass("objectSelected")
+		$("#rack_"+rackId).addClass("objectSelected")
+
 		new Ajax.Request('../rackLayouts/save',{asynchronous:true,evalScripts:true,onSuccess:function(e){updateRackPower( rackId )},onComplete:function(e){jQuery('#rackLayout').html(e.responseText);},parameters:moveBundleId+'rackId='+rackId+'&backView=off&showCabling=off&otherBundle='+otherBundle+'&bundleName=on&hideIcons=on'});return false;
 	}
 }
