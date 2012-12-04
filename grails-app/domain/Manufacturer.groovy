@@ -1,13 +1,20 @@
 class Manufacturer {
 	String name
 	String description
-	String aka
+	String aka		// TODO - DELETE aka
+	Date dateCreated
+	Date lastModified
+	UserLogin userlogin
 
-	static hasMany = [ models : Model, racks:Rack ]
+	static hasMany = [ 
+		models:Model, 
+		racks:Rack
+	]
 	
 	static constraints = {
 		name( blank:false, nullable:false, unique:true )
 		description( blank:true, nullable:true )
+		// TODO - DELETE aka
 		aka( blank:true, nullable:true, validator: { val, obj ->
 			if(val){
 				def isDuplicated = false
@@ -37,10 +44,24 @@ class Manufacturer {
 	String toString(){
 		name
 	}
+	
+	def beforeInsert = {
+		dateCreated = TimeUtil.convertInToGMT( "now", "EDT" )
+		lastModified = TimeUtil.convertInToGMT( "now", "EDT" )
+	}
+	def beforeUpdate = {
+		lastModified = TimeUtil.convertInToGMT( "now", "EDT" )
+	}
+	
 	/*
 	 * @return: Number of Models associated with this Manufacturer 
 	 */
 	def getModelsCount(){
 		return Model.countByManufacturer(this)
+	}
+	
+	// Get list of alias records for the manufacturer
+	def getAliases() {
+		ManufacturerAlias.findAllByManufacturer(this, [sort:'name'])
 	}
 }

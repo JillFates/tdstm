@@ -9,6 +9,9 @@ class ModelConnector {
 	Integer connectorPosY
 	String status
 	String option
+	Date dateCreated
+	Date lastModified
+	
 	
 	static belongsTo = [ model : Model ]
 	
@@ -30,6 +33,14 @@ class ModelConnector {
 			option column:'connector_option'
 			type sqltype: 'varchar(20)'
 		}
+	}
+
+	def beforeInsert = {
+		dateCreated = TimeUtil.convertInToGMT( "now", "EDT" )
+		lastModified = TimeUtil.convertInToGMT( "now", "EDT" )
+	}
+	def beforeUpdate = {
+		lastModified = TimeUtil.convertInToGMT( "now", "EDT" )
 	}
 	
 	String toString(){

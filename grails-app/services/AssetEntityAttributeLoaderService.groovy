@@ -417,40 +417,41 @@ class AssetEntityAttributeLoaderService {
 			}
 		return moveBundleInstance
 	}
+	
 	/* To get DataTransferValue Asset Manufacturer
 	 * @param dataTransferValue
 	 * @author Lokanada Reddy
 	 */
 	def getdtvManufacturer( def dtv ) {
-		def manufacturerInstance
+		def manufacturer
 		def manufacturerValue = dtv.correctedValue ? dtv.correctedValue : dtv.importValue
 		if(manufacturerValue){
-			manufacturerInstance = Manufacturer.findByName( manufacturerValue )
-			if( !manufacturerInstance ){
+			manufacturer = Manufacturer.findByName( manufacturerValue )
+			if( !manufacturer ){
 				def manufacuturers = Manufacturer.findAllByAkaIsNotNull()
-				manufacuturers.each{manufacuturer->
+				manufacuturers.each{ manufacuturer->
 					if(manufacuturer.aka.toLowerCase().contains( manufacturerValue.toLowerCase() )){
-						manufacturerInstance = manufacuturer
+						manufacturer = manufacuturer
 					}
 				}
-				if(!manufacturerInstance){
-					manufacturerInstance = new Manufacturer( name : manufacturerValue )
-					if ( !manufacturerInstance.validate() || !manufacturerInstance.save() ) {
-						def etext = "Unable to create manufacturerInstance" +
-		                GormUtil.allErrorsString( manufacturerInstance )
-						println etext
+				if( !manufacturer ) {
+					manufacturer = new Manufacturer( name : manufacturerValue )
+					if ( !manufacturer.validate() || !manufacturer.save() ) {
+						def etext = "Unable to create manufacturer" + GormUtil.allErrorsString( manufacturer )
+						log.error(etext)
 					}
 				}
 			}
 		}
-		return manufacturerInstance
+		return manufacturer
 	}
+	
 	/* To get DataTransferValue Asset Model
 	 * @param dataTransferValue, dataTransferValueList
 	 * @author Lokanada Reddy
 	 */
 	def getdtvModel(def dtv, def dtvList, def assetEntity ) {
-		def modelInstance
+		def model
 		def modelValue = dtv.correctedValue ? dtv.correctedValue : dtv.importValue
 		try{
 		//assetEntity.assetType = assetEntity.assetType ? assetEntity.assetType : "Server"
@@ -458,49 +459,47 @@ class AssetEntityAttributeLoaderService {
 		def dtvUsize = dtvList.find{it.eavAttribute.attributeCode == "usize"}?.importValue
 		if(modelValue && dtvManufacturer){
 			def manufacturerName = dtvManufacturer?.correctedValue ? dtvManufacturer?.correctedValue : dtvManufacturer?.importValue
-			def manufacturerInstance = manufacturerName ? Manufacturer.findByName(manufacturerName) : null
-			if( !manufacturerInstance ){
+			def manufacturer = manufacturerName ? Manufacturer.findByName(manufacturerName) : null
+			if( !manufacturer ){
 				def manufacuturers = Manufacturer.findAllByAkaIsNotNull()
 				manufacuturers.each{manufacuturer->
 					if(manufacuturer.aka.toLowerCase().contains( manufacturerName.toLowerCase() )){
-						manufacturerInstance = manufacuturer
+						manufacturer = manufacuturer
 					}
 				}
 			}
-			if(manufacturerInstance){
-				modelInstance = Model.findByModelNameAndManufacturer( modelValue, manufacturerInstance )
-				//modelInstance = modelInstance?.find{it.assetType == assetEntity?.assetType}
-				if( !modelInstance ){
-					def models = Model.findAllByManufacturerAndAkaIsNotNull( manufacturerInstance )//.findAll{it.assetType == assetEntity?.assetType}
+			if(manufacturer){
+				model = Model.findByModelNameAndManufacturer( modelValue, manufacturer )
+				//model = model?.find{it.assetType == assetEntity?.assetType}
+				if( !model ){
+					def models = Model.findAllByManufacturerAndAkaIsNotNull( manufacturer )//.findAll{it.assetType == assetEntity?.assetType}
 					models.each{ model->
 						if(model.aka.toLowerCase().contains( modelValue.toLowerCase() )){
-							modelInstance = model
+							model = model
 						}
 					}
-					if(!modelInstance){
+					if(!model){
 						def dtvAssetType = dtvList.find{it.eavAttribute.attributeCode == "assetType"}
 						def assetType = dtvAssetType?.correctedValue ? dtvAssetType?.correctedValue : dtvAssetType?.importValue
 						assetType = assetType ? assetType : "Server"
-						modelInstance = new Model( modelName:modelValue, manufacturer:manufacturerInstance, assetType:assetType, sourceTDS : 0, usize : dtvUsize ?: 1 )
-						if ( !modelInstance.validate() || !modelInstance.save(flush:true) ) {
-							def etext = "Unable to create modelInstance" +
-			                GormUtil.allErrorsString( modelInstance )
-							println etext
+						model = new Model( modelName:modelValue, manufacturer:manufacturer, assetType:assetType, sourceTDS : 0, usize : dtvUsize ?: 1 )
+						if ( !model.validate() || !model.save(flush:true) ) {
+							def etext = "Unable to create model" + GormUtil.allErrorsString( model )
+							log.error(etext)
 						} else {
-							def powerConnector = new ModelConnector(model : modelInstance,
-																	connector : 1,
-																	label : "Pwr1",
-																	type : "Power",
-																	labelPosition : "Right",
-																	connectorPosX : 0,
-																	connectorPosY : 0,
-																	status: "missing"
-																	)
+							def powerConnector = new ModelConnector(model : model,
+								connector : 1,
+								label : "Pwr1",
+								type : "Power",
+								labelPosition : "Right",
+								connectorPosX : 0,
+								connectorPosY : 0,
+								status: "missing"
+							)
 								
 							if (!powerConnector.save(flush: true)){
-							 def etext = "Unable to create Power Connectors for ${modelInstance}" +
-									 GormUtil.allErrorsString( powerConnector )
-									 println etext
+								def etext = "Unable to create Power Connectors for ${model}" + GormUtil.allErrorsString( powerConnector )
+								log.error(etext)
 							}
 						}
 					}
@@ -509,8 +508,9 @@ class AssetEntityAttributeLoaderService {
 		}
 		} catch(Exception ex){
 			ex.printStackTrace()
+			log.error("Unexpected exception:" + ex.toString() )
 		}
-		return modelInstance
+		return model
 	}
 	/* To get DataTransferValue source/target Team
 	 * @param dataTransferValue,moveBundle

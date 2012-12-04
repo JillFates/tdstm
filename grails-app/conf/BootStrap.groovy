@@ -1,9 +1,12 @@
 import org.jsecurity.crypto.hash.Sha1Hash
-
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
+
+
+import groovy.sql.Sql
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 class BootStrap {
 	def assetEntityAttributeLoaderService
@@ -11,17 +14,42 @@ class BootStrap {
 	def stateEngineService
 	def init = { servletContext ->
 
+		// Create any necessary indexes
+		createIndexes()
+		
 		// Load all of the Workflow definitions into the StateEngine service
 		def workflowList = Workflow.list()
 		workflowList.each { wf ->
 			stateEngineService.loadWorkflowTransitionsIntoMap(wf.process, 'workflow')
 		}
 		
-		// Don't load bootstrap if production environment
-		// TODO : JPM Disabled BootStrap for testing
-		return
 		if ( grails.util.GrailsUtil.environment.equals("production") ) return
 
+		// createInitialData()
+		
+	}
+		
+	def destroy = {
+	}
+	
+	/**
+	 * Called by bootstrap to create index that can't be done by GORM - believe me, I tried...
+	 */
+	private void createIndexes() {
+		def sql = Sql.newInstance(ConfigurationHolder.config.dataSource.url, ConfigurationHolder.config.dataSource.username, ConfigurationHolder.config.dataSource.password, ConfigurationHolder.config.dataSource.driverClassName)
+
+		// Model
+		try { sql.execute("CREATE INDEX Model_Name_idx ON model(name)") } catch(e) {}
+			
+		// ModelAlias
+		try { sql.execute("CREATE INDEX ModelAlias_Name_idx ON model_alias(name)") } catch(e) { }
+	}
+	
+	/**
+	 * Create Initial Datasets
+	 */
+	private void createInitialData() {
+		
 		// -------------------------------
 		// Role Types
 		// The description now classifies groups of roles.  Eventually this will be implemented
@@ -684,10 +712,7 @@ class BootStrap {
 
 		}
 		assetEntityAttributeLoaderService.uploadEavAttribute(stream)
-
-
 	}
+	
 
-	def destroy = {
-	}
 }

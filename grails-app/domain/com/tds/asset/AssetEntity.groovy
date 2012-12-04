@@ -157,7 +157,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		shelf( blank:true, nullable:true )
 		railType( blank:true, nullable:true )
 		
-		
+		// TODO : owner should not be nullable - remove and test
 		owner( nullable:true )
 		rackSource( nullable:true )
 		roomSource( nullable:true )
