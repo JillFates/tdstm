@@ -473,9 +473,9 @@ class AssetEntityAttributeLoaderService {
 				//model = model?.find{it.assetType == assetEntity?.assetType}
 				if( !model ){
 					def models = Model.findAllByManufacturerAndAkaIsNotNull( manufacturer )//.findAll{it.assetType == assetEntity?.assetType}
-					models.each{ model->
-						if(model.aka.toLowerCase().contains( modelValue.toLowerCase() )){
-							model = model
+					models.each{ m->
+						if(m.aka.toLowerCase().contains( modelValue.toLowerCase() )){
+							model = m
 						}
 					}
 					if(!model){
