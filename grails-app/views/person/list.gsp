@@ -61,7 +61,7 @@
 					 </jmesa:htmlColumn>
 					 <jmesa:htmlColumn property="userLogin" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 						<g:if test="${personBean.userLoginId}">
-							<span id="${personBean.id}" style="cursor: pointer;" onClick="loadPersonDiv(this.id,'generalInfoShow')"><b>${personBean.userLogin}</b></span>
+							 <g:link controller="userLogin" action="edit" id="${personBean.userLoginId}" params="[companyId:companyId]"><b>${personBean.userLogin}</b></g:link>
 						</g:if>
 						<g:else>
 							 <g:link controller="userLogin" action="create" id="${personBean.id}" params="[companyId:companyId]">CREATE</g:link>
