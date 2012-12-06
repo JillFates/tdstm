@@ -38,10 +38,13 @@
                         	<tr>
 							<td valign="top" class="name">AKA:</td>
 								<td>
-									<input type="text" name="aka" id="akaId" value="${manufacturerInstance?.aka}">
-									<g:hasErrors bean="${manufacturerInstance}" field="aka">
-										<div class="errors"><g:renderErrors bean="${manufacturerInstance}" as="list" field="aka" /></div>
-									</g:hasErrors> 
+								   <table style="border:0px ;margin-left:-8px">
+								    <tbody id="addAkaTableId">
+								      <tr><td nowrap="nowrap">
+									  	<input type="text" name="aka" id="akaId" value="${manufacturerInstance?.aka}"> <span style="cursor: pointer;" onclick="addAka()"><b>Add AKA</b></span>
+									  </td></tr>
+									</tbody>
+									</table>
 								</td>
 							</tr>
                             <tr class="prop">
@@ -56,10 +59,29 @@
                         </tbody>
                     </table>
                 </div>
+               
+                
+               
                 <div class="buttons">
                     <span class="button"><input class="save" type="submit" value="Create" /></span>
                 </div>
             </g:form>
+             <div id="akaDiv" style="display:none;"> 
+             	<input type="text" name="aka" id="akaId" value="">
+             </div>
+             <input type="hidden" id="manageAkaId" value="-1" >
         </div>
+        <script type="text/javascript">
+		function addAka(){
+			var trId = $("#manageAkaId").val() 
+			$("#addAkaTableId").append("<tr id='akaId_"+trId+"'><td>"+$("#akaDiv").html()+
+			"<a href=\"javascript:deleteAkaRow(\'akaId_"+trId+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+			$("#manageAkaId").val(parseInt(trId)-1)
+		}
+
+		function deleteAkaRow(id){
+			$("#"+id).remove()
+		}
+	    </script>
     </body>
 </html>

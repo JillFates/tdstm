@@ -5,6 +5,7 @@ import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
 
 import com.tds.asset.AssetEntity
+import com.tdssrc.grails.WebUtil
 
 
 
@@ -13,6 +14,7 @@ class ManufacturerController {
 	// Initialize services
     def jdbcTemplate
 	def sessionFactory
+	def securityService
 	
     def index = { redirect(action:list,params:params) }
 
@@ -42,7 +44,7 @@ class ManufacturerController {
 			assetBeanInstance.setId(manufacturer.id)
 			assetBeanInstance.setName(manufacturer.name)
 			assetBeanInstance.setDescription(manufacturer.description)
-			assetBeanInstance.setAka(manufacturer.aka)
+			assetBeanInstance.setAka(WebUtil.listAsMultiValueString(ManufacturerAlias.findAllByManufacturer( manufacturer )?.name))
 			assetBeanInstance.setModelCount(manufacturer.modelsCount)
 			assetBeanInstance.setCount(AssetEntity.countByManufacturer(manufacturer))
 			
@@ -68,12 +70,15 @@ class ManufacturerController {
             flash.message = "Manufacturer not found with id ${params.id}"
             redirect(action:list)
         }
-        else { return [ manufacturerInstance : manufacturerInstance ] }
+		else {
+			 def manuAlias = WebUtil.listAsMultiValueString(ManufacturerAlias.findAllByManufacturer( manufacturerInstance )?.name)
+			 return [ manufacturerInstance : manufacturerInstance, manuAlias:manuAlias ] }
     }
 
     def delete = {
         def manufacturerInstance = Manufacturer.get( params.id )
         if(manufacturerInstance) {
+			ManufacturerAlias.executeUpdate("delete from ManufacturerAlias ma where ma.manufacturer = ${manufacturerInstance.id}")
             manufacturerInstance.delete(flush:true)
             flash.message = "Manufacturer ${params.id} deleted"
             redirect(action:list)
@@ -92,14 +97,32 @@ class ManufacturerController {
             redirect(action:list)
         }
         else {
-            return [ manufacturerInstance : manufacturerInstance ]
+			def manuAlias = ManufacturerAlias.findAllByManufacturer( manufacturerInstance )
+            return [ manufacturerInstance : manufacturerInstance, manuAlias:manuAlias ]
         }
     }
 
     def update = {
+		def deletedAka = params.deletedAka
+		def akaToSave = params.list('aka')
         def manufacturerInstance = Manufacturer.get( params.id )
         if(manufacturerInstance) {
             manufacturerInstance.properties = params
+			if(deletedAka){
+				ManufacturerAlias.executeUpdate("delete from ManufacturerAlias ma where ma.id in (${deletedAka})")
+			}
+			def akas = ManufacturerAlias.findAllByManufacturer( manufacturerInstance )
+			akas.each{aka->
+				aka.name = params["aka_"+aka.id]
+				aka.save(flush:true)
+			}
+			akaToSave.each{aka->
+				def manuAlias = new ManufacturerAlias()
+				manuAlias.name = aka
+				manuAlias.manufacturer = manufacturerInstance
+				manuAlias.save(flush:true)
+			}
+			
             if(!manufacturerInstance.hasErrors() && manufacturerInstance.save()) {
                 flash.message = "Manufacturer ${params.id} updated"
                 redirect(action:show,id:manufacturerInstance.id)
@@ -121,8 +144,16 @@ class ManufacturerController {
     }
 
     def save = {
+		def loggedUser = securityService.getUserLogin()
         def manufacturerInstance = new Manufacturer(params)
+		manufacturerInstance.userlogin = loggedUser
         if(!manufacturerInstance.hasErrors() && manufacturerInstance.save()) {
+			def akaNames = params.list('aka')
+			if(akaNames.size() > 0){
+				akaNames.each{aka->
+					new ManufacturerAlias(name:aka, manufacturer:manufacturerInstance).save(flush:true)
+				}
+			}
             flash.message = "Manufacturer ${manufacturerInstance.id} created"
             redirect(action:show,id:manufacturerInstance.id)
         }
@@ -161,28 +192,21 @@ class ManufacturerController {
 		
 		def updateModelsQuery = "update model set manufacturer_id = ${toManufacturer.id} where manufacturer_id='${fromManufacturer.id}'"
 		jdbcTemplate.update(updateModelsQuery)
+		def toManufacturerAlias = ManufacturerAlias.findAllByManufacturer(toManufacturer).name
 		
 		// Add to the AKA field list in the target record
-		if(!toManufacturer.aka?.contains(fromManufacturer.name)){
-			def aka = new StringBuffer(toManufacturer.aka ? toManufacturer.aka+"," : "")
-			aka.append(fromManufacturer.name)
-			aka.append(fromManufacturer.aka ? ","+fromManufacturer.aka : "")
+		if(!toManufacturerAlias?.contains(fromManufacturer.name)){
+			def fromManufacturerAlias = ManufacturerAlias.findAllByManufacturer(fromManufacturer)
+			ManufacturerAlias.executeUpdate("delete from ManufacturerAlias ma where ma.manufacturer = ${fromManufacturer.id}")
+			fromManufacturerAlias.each{
+				def toManuAlias = new ManufacturerAlias(name:it.name, manufacturer:toManufacturer ).save(insert:true)
+			}
 			
 			// Delete manufacturer record.
 			fromManufacturer.delete()
-			
-			sessionFactory.getCurrentSession().flush();
-						
-			toManufacturer.aka = aka.toString() 
-			if(toManufacturer.validate(true))
-				toManufacturer.save(flush:true)
-			else 
-				toManufacturer.errors.allErrors.each() {println it }
-			
 		} else {
 			//	Delete manufacturer record.
 			fromManufacturer.delete()
-			
 			sessionFactory.getCurrentSession().flush();
 		}
 		

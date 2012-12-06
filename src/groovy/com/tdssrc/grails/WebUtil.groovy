@@ -12,5 +12,16 @@ class WebUtil {
 		
 		return list
 	}
+	
+	/**
+	 * Returns multi-value String of a List
+	 */
+	def public static listAsMultiValueString = { param ->
+		
+		String list = param.toString()
+		list = list.replace("[","").replace("]","")
+		
+		return list
+	}
 
 }

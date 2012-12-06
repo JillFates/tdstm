@@ -1,3 +1,4 @@
+<%@page import="com.tdssrc.grails.WebUtil";%>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -31,7 +32,7 @@
                         </tr>
                     	<tr>
 							 <td valign="top" class="name">AKA:</td>
-							<td valign="top" class="value">${fieldValue(bean:manufacturerInstance, field:'aka')}</td>
+							<td valign="top" class="value">${manuAlias}</td>
 						</tr>
                         <tr class="prop">
                             <td valign="top" class="name">Description:</td>
@@ -64,7 +65,7 @@
 		                            	${manufacturer.name}
 		                            </g:link>
 	                            </td>
-	                            <td valign="top" class="value">${manufacturer.aka}</td>
+	                            <td valign="top" class="value">${WebUtil.listAsMultiValueString(ManufacturerAlias.findAllByManufacturer(manufacturer).name)}</td>
 	                        </tr>
                     	</g:each>
                     </tbody>

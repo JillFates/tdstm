@@ -1,3 +1,5 @@
+import com.tdssrc.grails.TimeUtil
+
 class Manufacturer {
 	String name
 	String description
@@ -34,6 +36,8 @@ class Manufacturer {
 				return true
 			}
         })
+		userlogin( blank:false)
+		lastModified( blank:true, nullable:true )
 	}
 	
 	static mapping  = {	

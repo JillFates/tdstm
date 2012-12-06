@@ -42,7 +42,18 @@
                                     <label for="aka">AKA:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:manufacturerInstance,field:'aka','errors')}">
-                                    <input type="text" id="aka" name="aka" value="${fieldValue(bean:manufacturerInstance,field:'aka')}"/>
+                                 
+                                 <table style="border: 0px;margin-left: -8px;">
+                                  <tbody id="addAkaTableId">
+                                  <g:each in="${manuAlias}" var="alias">
+                                   <tr id="aka_${alias.id}"><td nowrap="nowrap">
+                                  	 <input type="text" id="aka" name="aka_${alias.id}" value="${alias.name}" onchange="changedAka(this.value,${alias.id})"/>
+                                  	 <a href="javascript:deleteAkaRow('aka_${alias.id}',true)"><span class='clear_filter'><u>X</u></span></a>
+                                   </td></tr>
+                                  </g:each>
+                                  </tbody>
+                                 </table>
+                                 <span style="cursor: pointer;" onclick="addAka()"><b>Add AKA</b></span>
                                 </td>
                             </tr> 
                         
@@ -58,15 +69,36 @@
                         </tbody>
                     </table>
                 </div>
+                <input type="hidden" name="deletedAka" id="deletedAka" />
                 <div class="buttons">
                     <span class="button"><g:actionSubmit class="save" value="Update" /></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
                 </div>
             </g:form>
+             <div id="akaDiv" style="display:none;"> 
+             	<input type="text" name="aka" id="akaId" value="">
+             </div>
+             <input type="hidden" id="manageAkaId" value="-1" >
         </div>
-<script>
-	currentMenuId = "#adminMenu";
-	$("#adminMenuId a").css('background-color','#003366')
-</script>
+		<script>
+			currentMenuId = "#adminMenu";
+			$("#adminMenuId a").css('background-color','#003366')
+			
+			function deleteAkaRow(id, save){
+				$("#"+id).remove()
+				if(save){
+					var deletedId = id.split("_")[1]
+					$("#deletedAka").val() ? $("#deletedAka").val($("#deletedAka").val()+","+deletedId) : $("#deletedAka").val(deletedId)
+				}
+			}
+		
+			function addAka(){
+				var trId = $("#manageAkaId").val() 
+				$("#addAkaTableId").append("<tr id='akaId_"+trId+"'><td nowrap='nowrap'>"+$("#akaDiv").html()+
+				"<a href=\"javascript:deleteAkaRow(\'akaId_"+trId+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+				$("#manageAkaId").val(parseInt(trId)-1)
+			}
+		
+		</script>
     </body>
 </html>

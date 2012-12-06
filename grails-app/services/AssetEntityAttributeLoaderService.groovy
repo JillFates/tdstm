@@ -428,12 +428,7 @@ class AssetEntityAttributeLoaderService {
 		if(manufacturerValue){
 			manufacturer = Manufacturer.findByName( manufacturerValue )
 			if( !manufacturer ){
-				def manufacuturers = Manufacturer.findAllByAkaIsNotNull()
-				manufacuturers.each{ manufacuturer->
-					if(manufacuturer.aka.toLowerCase().contains( manufacturerValue.toLowerCase() )){
-						manufacturer = manufacuturer
-					}
-				}
+				manufacturer = ManufacturerAlias.findByName(manufacturerValue).manufacturer
 				if( !manufacturer ) {
 					manufacturer = new Manufacturer( name : manufacturerValue )
 					if ( !manufacturer.validate() || !manufacturer.save() ) {
@@ -461,11 +456,9 @@ class AssetEntityAttributeLoaderService {
 			def manufacturerName = dtvManufacturer?.correctedValue ? dtvManufacturer?.correctedValue : dtvManufacturer?.importValue
 			def manufacturer = manufacturerName ? Manufacturer.findByName(manufacturerName) : null
 			if( !manufacturer ){
-				def manufacuturers = Manufacturer.findAllByAkaIsNotNull()
-				manufacuturers.each{manufacuturer->
-					if(manufacuturer.aka.toLowerCase().contains( manufacturerName.toLowerCase() )){
-						manufacturer = manufacuturer
-					}
+				def manufacuturersAlias = ManufacturerAlias.list()
+				if(manufacuturersAlias.name?.contains( manufacturerName.toLowerCase() )){
+					manufacturer = manufacturerName
 				}
 			}
 			if(manufacturer){

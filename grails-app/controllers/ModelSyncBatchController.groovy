@@ -2,7 +2,7 @@ import com.tdssrc.grails.GormUtil
 class ModelSyncBatchController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-
+	def securityService
     def index = {
         redirect(action: "list", params: params)
     }
@@ -15,6 +15,7 @@ class ModelSyncBatchController {
     def process = {
     	def modelBatch = params.batchId
 		def modelSyncBatch = ModelSyncBatch.get(modelBatch)
+		def loggedUser = securityService.getUserLogin()
 		try{
 			if(modelSyncBatch){
 				def manufacturersSync = ManufacturerSync.findAllByBatch( modelSyncBatch )
@@ -29,37 +30,42 @@ class ModelSyncBatchController {
 						manufacturerInstance = Manufacturer.findByName( manufacturerSync.name )
 						if(!manufacturerInstance){
 							manufacturerInstance = new Manufacturer( name : manufacturerSync.name,  
-																	 aka:manufacturerSync.aka,
-																	 description : manufacturerSync.description 
+																	 //aka:manufacturerSync.aka,
+																	 description : manufacturerSync.description,
+																	 userLogin:loggedUser
 																	)
 							if ( !manufacturerInstance.validate() || !manufacturerInstance.save() ) {
 								def etext = "Unable to create manufacturerInstance" +
 								GormUtil.allErrorsString( manufacturerInstance )
 								println etext
 							} else {
+								def manufacturerAlias = new ManufacturerAlias(name:manufacturerSync.aka, manufacturer:manufacturerInstance).save(flush:true)
 								manuAdded ++
 							}
 						} else {
 	
-							manufacturerInstance.aka = manufacturerSync.aka
+							//manufacturerInstance.aka = manufacturerSync.aka
 							manufacturerInstance.description = manufacturerSync.description 
+							manufacturerInstance.userLogin = loggedUser
 							if ( !manufacturerInstance.validate() || !manufacturerInstance.save() ) {
 								def etext = "Unable to create manufacturerInstance" +
 								GormUtil.allErrorsString( manufacturerInstance )
 								println etext
 							} else {
+								syncManufacturerAlias(manufacturerSync.aka, manufacturerInstance)
 								manuUpdated ++
 							}
 						
 						}
 					} else {
-						manufacturerInstance.aka = manufacturerSync.aka
+						//manufacturerInstance.aka = manufacturerSync.aka
 						manufacturerInstance.description = manufacturerSync.description 
 						if ( !manufacturerInstance.validate() || !manufacturerInstance.save() ) {
 							def etext = "Unable to create manufacturerInstance" +
 							GormUtil.allErrorsString( manufacturerInstance )
 							println etext
 						} else {
+							syncManufacturerAlias(manufacturerSync.aka, manufacturerInstance)
 							manuUpdated ++
 						}
 					}
@@ -257,4 +263,23 @@ class ModelSyncBatchController {
 		}
     	redirect(action: "list", params: params)
     }
+	/*
+	 * Used to save imported value manufacturer aka in manufacturer_alias table .
+	 * @param : aka -> imported value of AKA (might be comma separated value)
+	 * @param : manufacturer -> instance of manufacturer 
+	 * @return : void
+	 * 
+	 */
+	
+	def syncManufacturerAlias(aka, manufacturer){
+		def importedAlias = aka?.split(",")
+		def manuAlias = ManufacturerAlias.findAllByManufacturer(manufacturer)?.name
+		if(importedAlias.size() > 0){
+			importedAlias.each {alias->
+				if(!manuAlias.contains(alias)){
+					new ManufacturerAlias(name:alias, manufacturer:manufacturer).save(flush:true)
+				}
+			}
+		}
+	}
 }
