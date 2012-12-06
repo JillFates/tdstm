@@ -39,7 +39,7 @@ class Room {
 	static mapping  = {	
 		version true
 		id column:'room_id'
-		postalCode  column: "postal_code", sqlType: "varchar(12)"
+		postalCode sqlType:"varchar(12)"
 		autoTimestamp false
 		columns {
 			source sqltype: 'tinyint(1)'
