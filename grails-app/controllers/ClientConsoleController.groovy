@@ -178,8 +178,8 @@ class ClientConsoleController {
 			def subject = SecurityUtils.subject
 			if (subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
 				role = "SUPERVISOR"
-			} else if(subject.hasRole("MANAGER")){
-				role = "MANAGER"
+			} else if(subject.hasRole("EDITOR")){
+				role = "EDITOR"
 			}
 			def holdId = Integer.parseInt(stateEngineService.getStateId(workflowCode,"Hold"))
 			def releaseId = Integer.parseInt(stateEngineService.getStateId(workflowCode,"Release"))
@@ -343,8 +343,8 @@ class ClientConsoleController {
 		def subject = SecurityUtils.subject
 		if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
 			role = "SUPERVISOR"
-		} else if(subject.hasRole("MANAGER")){
-			role = "MANAGER"
+		} else if(subject.hasRole("EDITOR")){
+			role = "EDITOR"
 		}
         /*def projectMap = ProjectAssetMap.find("from ProjectAssetMap pam where pam.asset = ${params.assetEntity}")
         if(projectMap != null){
@@ -412,8 +412,8 @@ class ClientConsoleController {
 			def subject = SecurityUtils.subject
 			if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
 				role = "SUPERVISOR"
-			} else if(subject.hasRole("MANAGER")){
-				role = "MANAGER"
+			} else if(subject.hasRole("EDITOR")){
+				role = "EDITOR"
 			}
 			def holdId = Integer.parseInt(stateEngineService.getStateId(projectInstance.workflowCode,"Hold"))
         	def assetList = assetArray.split(",") 
@@ -460,8 +460,8 @@ class ClientConsoleController {
 		def subject = SecurityUtils.subject
 		if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
 			role = "SUPERVISOR"
-		} else if(subject.hasRole("MANAGER")){
-			role = "MANAGER"
+		} else if(subject.hasRole("EDITOR")){
+			role = "EDITOR"
 		}
         assetEnt.each{
 	        def bundle = it.moveBundle
@@ -563,8 +563,8 @@ class ClientConsoleController {
 			def subject = SecurityUtils.subject 
 			if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
 				 role = "SUPERVISOR"
-			} else if(subject.hasRole("MANAGER")){
-				 role = "MANAGER"
+			} else if(subject.hasRole("EDITOR")){
+				 role = "EDITOR"
 			}
 			def holdId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Hold"))
 			def releaseId = Integer.parseInt(stateEngineService.getStateId(workFlowCode,"Release"))
@@ -808,8 +808,8 @@ class ClientConsoleController {
 		
 		if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
 			role = "SUPERVISOR"
-		} else if(subject.hasRole("MANAGER")){
-			role = "MANAGER"
+		} else if(subject.hasRole("EDITOR")){
+			role = "EDITOR"
 		}
 		
 		// TODO : cleanup : It doesn't look like assetTransitionQuery is used in this code
@@ -884,8 +884,8 @@ class ClientConsoleController {
 		def role = ""
 		if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
 			role = "SUPERVISOR"
-		} else if(subject.hasRole("MANAGER")){
-			role = "MANAGER"
+		} else if(subject.hasRole("EDITOR")){
+			role = "EDITOR"
 		}
 		def assetIds = assetEntityList.id.toString().replace("[","(").replace("]",")")
 		
@@ -953,8 +953,8 @@ class ClientConsoleController {
 		def role = ""
 		if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
 			role = "SUPERVISOR"
-		} else if(subject.hasRole("MANAGER")){
-			role = "MANAGER"
+		} else if(subject.hasRole("EDITOR")){
+			role = "EDITOR"
 		}
 		def loginUser = UserLogin.findByUsername(subject.principal)
 		def assetIds = assetEntityList.id.toString().replace("[","(").replace("]",")")

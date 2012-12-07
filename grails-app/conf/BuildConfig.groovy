@@ -24,6 +24,6 @@ grails.project.dependency.resolution = {
 	}
   
 	plugins {
-		// runtime ':database-migration:1.1'
+		runtime ':database-migration:1.0'
 	}
 }

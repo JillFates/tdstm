@@ -24,6 +24,21 @@ import com.tdsops.tm.enums.domain.RoleTypeGroup
 	}
 	
 	/**
+	 * Used to determine if the current user has a role within an array of roles
+	 * @param	roles	a array of String representing a role
+	 * @return 	bool	true or false indicating if the user has the role
+	 * @Usage  if ( securityService.hasRole( ['ADMIN','SUPERVISOR']) ...
+	 */
+	boolean hasRole( java.util.ArrayList roles ) {
+		boolean found = false
+		roles.each() {
+			if (SecurityUtils.subject.hasRole( it ) ) {
+				found = true
+			}
+		}
+	}
+	
+	/**
 	 * Used to get a list of roles that have been assigned to a user. The roleTypeGroup provides a filtering for the type of Roles that 
 	 * should be returned (e.g. Staff or System). When a project is presented the method will return roles associate to the project otherwise
 	 * it return the user's global role.

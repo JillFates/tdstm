@@ -113,7 +113,7 @@
     <li><g:link class="home" controller="projectUtil">Main</g:link></li>
     <li><g:link class="home" controller="projectUtil"
         action="searchList">Search</g:link></li>
-    <jsec:hasRole name="PROJECT_ADMIN">
+    <jsec:hasRole name="CLIENT_ADMIN">
         <li><g:link class="home" controller="project" action="create">Add</g:link>
         </li>
     </jsec:hasRole>

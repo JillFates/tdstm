@@ -69,8 +69,9 @@ class AssetEntityController {
 	protected static sourceTeamType = ['MOVE_TECH':'sourceTeamMt', 'CLEANER':'sourceTeamLog','SYS_ADMIN':'sourceTeamSa',"DB_ADMIN":'sourceTeamDba']
 	protected static teamsByType = ["MOVE":"'MOVE_TECH','CLEANER'","ADMIN":"'SYS_ADMIN','DB_ADMIN'"]
 	
+	// This is a has table that sets what status from/to are available
 	protected static statusOptionForRole = [
-		"PROJ_MGR": [
+		"ALL": [
 			'*EMPTY*': AssetCommentStatus.getList(),
 			(AssetCommentStatus.PLANNED): AssetCommentStatus.getList(),
 			(AssetCommentStatus.PENDING): AssetCommentStatus.getList(),
@@ -79,7 +80,7 @@ class AssetEntityController {
 			(AssetCommentStatus.HOLD): AssetCommentStatus.getList(),
 			(AssetCommentStatus.DONE): AssetCommentStatus.getList()
 		],
-		"USER":[
+		"LIMITED":[
 			'*EMPTY*': [AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING, AssetCommentStatus.HOLD],
 			(AssetCommentStatus.PLANNED): [AssetCommentStatus.PLANNED],
 			(AssetCommentStatus.PENDING): [AssetCommentStatus.PENDING],
@@ -2011,9 +2012,10 @@ class AssetEntityController {
 		def subject = SecurityUtils.subject
 		if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
 			role = "SUPERVISOR"
-		} else if(subject.hasRole("MANAGER")){
-			role = "MANAGER"
+		} else if(subject.hasRole("EDITOR")){
+			role = "EDITOR"
 		}
+		// NOTE - I don't see role referenced in the remainder of this code so it might not be used JM 12/7/2012
 		
 		// get the list of assets order by Hold and recent asset Transition
 		if( moveBundleInstance != null ){
@@ -3725,7 +3727,7 @@ class AssetEntityController {
 	 */
 	def updateStatusSelect = {
 		
-		def mapKey = securityService.hasRole("PROJ_MGR") ? "PROJ_MGR" : "USER" 
+		def mapKey = securityService.hasRole( ['ADMIN','SUPERVISOR','CLIENT_ADMIN','CLIENT_MGR'] ) ? 'ALL' : 'LIMITED'
 		def optionForRole = statusOptionForRole.get(mapKey)
 		def status = AssetComment.read(params.id)?.status ?: '*EMPTY*'
 		def optionList = optionForRole.get(status)

@@ -1,3 +1,4 @@
+
 // locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
 grails.config.locations = []
@@ -45,19 +46,13 @@ grails.pagination.default="20"
 grails.pagination.max="20"
 
 //
-// set per-environment serverURL stem for creating absolute links
-//
-environments {
-   development {
-      // grails.serverURL = "http://localhost/tdstm"
-      grails.serverURL = "http://localhost:8080/tdstm"
-   }
-   production {
-      grails.serverURL = "http://tm.tdsops.com/tdstm"
-      // grails.serverURL = "http://ph1.tdsops.com/tdstm"
-      // grails.serverURL = "http://dev01.tdsops.net:8080/tdstm"
-   }
-}
+// Database Migrations Plugin Settings
+// 
+grails.plugin.databasemigration.changelogLocation = 'grails-app/migrations'
+grails.plugin.databasemigration.changelogFileName='changelog.groovy'
+grails.plugin.databasemigration.updateOnStart = true
+grails.plugin.databasemigration.updateOnStartFileNames = ['changelog.groovy']
+grails.plugin.databasemigration.dbDocController.enabled = true
 
 //
 // For JSecurity
@@ -134,21 +129,9 @@ log4j = {
 			   layout:pattern(conversionPattern: commonPattern)
 	}
 	
-	// Set the logging level for the various appenders based on environment
-	environment {
-		development {
-			root {
-				info 'stdout', 'applicationLog'
-				// additivity = false
-			 }
-		}
-		production {
-			root {
-				error 'stdout', 'applicationLog'
-				// additivity = false
-			 }
-		}
-	}
+	// Set the logging level for the various log files:
+	info 'stdout', 'applicationLog'
+	
 	additivity.StackTrace=false
  }
  
