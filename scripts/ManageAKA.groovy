@@ -11,15 +11,21 @@ manufactureres.each { manufacturer->
 	def akaList = akas?.split(",")
 	if(akas){
 		akaList.each{ aka->
-			def manuExist = ManufacturerAlias.findByNameAndManufacturer(aka, manufacturer)
-			if(!manuExist){
-				def manufacturerAlias = new ManufacturerAlias(
-															manufacturer:manufacturer, 
-															name:aka.trim()
-															)
-				if(!manufacturerAlias.save(insert:true)){
-					manufacturerAlias.errors.allErrors.each {
-						println "manufacturerAlias:::::::::::::"+it
+			def existingManu = Manufacturer.findByName(aka)
+			if(!existingManu){
+				def manuExist = ManufacturerAlias.findByNameAndManufacturer(aka, manufacturer)
+				if(!manuExist){
+					def isAkaManufacturer = Manufacturer.findByName(aka.trim())
+					if(!isAkaManufacturer){
+						def manufacturerAlias = new ManufacturerAlias(
+																	manufacturer:manufacturer, 
+																	name:aka.trim()
+																	)
+						if(!manufacturerAlias.save(insert:true)){
+							manufacturerAlias.errors.allErrors.each {
+								println "manufacturerAlias:::::::::::::"+it
+							}
+						}
 					}
 				}
 			}
@@ -39,16 +45,22 @@ models.each { model->
 	def akaList = akas?.split(",")
 	if(akas){
 		akaList.each{ aka->
-			def manuExist = ModelAlias.findByNameAndModel(aka, model)
-			if(!manuExist){
-				def modelAlias = new ModelAlias(
-												model:model, 
-												manufacturer:model.manufacturer,
-												name:aka.trim()
-												)
-				if(!modelAlias.save(insert:true)){
-					modelAlias.errors.allErrors.each {
-						println "modelAlias:::::::::::::"+it
+			def existingModel = Model.findByModelName(aka)
+			if(!existingModel){
+				def manuExist = ModelAlias.findByNameAndModel(aka, model)
+				if(!manuExist){
+					def isAkaModel = Model.findByName(aka.trim())
+					if(!isAkaModel){
+						def modelAlias = new ModelAlias(
+														model:model, 
+														manufacturer:model.manufacturer,
+														name:aka.trim()
+														)
+						if(!modelAlias.save(insert:true)){
+							modelAlias.errors.allErrors.each {
+								println "modelAlias:::::::::::::"+it
+							}
+						}
 					}
 				}
 			}

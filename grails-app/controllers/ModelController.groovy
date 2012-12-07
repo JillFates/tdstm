@@ -19,6 +19,7 @@ import org.springframework.web.multipart.commons.*
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.WebUtil
 
 class ModelController {
 	
@@ -207,11 +208,15 @@ class ModelController {
 			
         	modelInstance.sourceTDSVersion = 1
         	modelInstance.save(flush: true)
+			def akaNames = params.list('aka')
+			akaNames.each{ aka->
+				modelInstance.findOrCreateByName(aka.trim(), true)
+			}
             flash.message = "${modelInstance.modelName} created"
             redirect(action: "show", id: modelInstance.id)
         }
         else {
-        	//flash.message = modelInstance.errors.allErrors.each() {  it }
+        	flash.message = modelInstance.errors.allErrors.each{  log.error it }
 			def	modelConnectors = modelTemplate ? ModelConnector.findAllByModel( modelTemplate ) : null
 	    	def otherConnectors = []
 			def existingConnectors = modelConnectors ? modelConnectors.size()+1 : 1
@@ -232,7 +237,9 @@ class ModelController {
         }
         else {
         	def modelConnectors = ModelConnector.findAllByModel( modelInstance,[sort:"id"] )
-            return [ modelInstance : modelInstance, modelConnectors : modelConnectors,modelHasPermission:RolePermissions.hasPermission("ValidateModel") ]
+			def modelAkas = WebUtil.listAsMultiValueString(ModelAlias.findAllByModelAndManufacturer(modelInstance, modelInstance.manufacturer).name)
+            return [ modelInstance : modelInstance, modelConnectors : modelConnectors, modelAkas:modelAkas,
+                    modelHasPermission:RolePermissions.hasPermission("ValidateModel") ]
         }
     }
 
@@ -254,11 +261,14 @@ class ModelController {
 			for(int i = nextConnector+1 ; i<51; i++ ){
 				otherConnectors << i
 			}
-            return [ modelInstance: modelInstance, modelConnectors : modelConnectors, otherConnectors : otherConnectors, nextConnector:nextConnector ]
+			def modelAliases = ModelAlias.findAllByModel(modelInstance)
+            return [ modelInstance: modelInstance, modelConnectors : modelConnectors, otherConnectors : otherConnectors, 
+                nextConnector:nextConnector, modelAliases:modelAliases ]
         }
     }
 
     def update = {
+		
         def modelInstance = Model.get(params.id)
 		def modelStatus = modelInstance?.modelStatus 
 		def endOfLifeDate = params.endOfLifeDate
@@ -351,6 +361,19 @@ class ModelController {
 			
 			def oldModelManufacturer = modelInstance.manufacturer.id
 			def oldModelType = modelInstance.assetType
+            def deletedAka = params.deletedAka
+            def akaToSave = params.list('aka')
+			if(deletedAka){
+				ModelAlias.executeUpdate("delete from ModelAlias mo where mo.id in (${deletedAka})")
+			}
+			def modelAliasList = ModelAlias.findAllByModel( modelInstance )
+			modelAliasList.each{ modelAlias->
+				modelAlias.name = params["aka_"+modelAlias.id]
+				modelAlias.save(flush:true)
+			}
+			akaToSave.each{aka->
+				modelInstance.findOrCreateByName(aka, true)
+			}
 			
 			if (!modelInstance.hasErrors() && modelInstance.save(flush: true)) {
 				def connectorCount = 0
@@ -649,32 +672,30 @@ class ModelController {
 												toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
 												where toConnectorNumber in (from ModelConnector where model = ${fromModel.id})""")
     	ModelConnector.executeUpdate("delete ModelConnector where model = ?",[fromModel])
+		def toModelAlias = ModelAlias.findAllByModel(toModel).name
 		
 		// Add to the AKA field list in the target record
-		if(!toModel.aka?.contains(fromModel.modelName)){
-			def aka = new StringBuffer(toModel.aka ? toModel.aka+"," : "")
-			aka.append(fromModel.modelName)
-			aka.append(fromModel.aka ? ","+fromModel.aka : "")
+		if(!toModelAlias.contains(fromModel.modelName)){
+			def fromModelAlias = ModelAlias.findAllByModel(fromModel)
+			ModelAlias.executeUpdate("delete from ModelAlias mo where mo.model = ${fromModel.id}")
+			fromModelAlias.each{
+				def modelAlias = new ModelAlias(name:it.name,model:toModel, manufacturer:toModel.manufacturer ).save(insert:true)
+			}
 						
 			// Delete model record
 			fromModel.delete()
-			sessionFactory.getCurrentSession().flush();
 			
-			toModel.aka = aka
-			
-			if(!toModel.hasErrors())
-				toModel.save(flush:true)
-				def principal = SecurityUtils.subject?.principal
-				def user
-				if( principal ){
-					user = UserLogin.findByUsername( principal )
-					def person = user.person
-					def bonusScore = person.modelScoreBonus ? person.modelScoreBonus:0
-					if(user){
-						person.modelScoreBonus = bonusScore+10
-						person.modelScore = person.modelScoreBonus + person.modelScore
-					    person.save(flush:true)
-					}
+			def principal = SecurityUtils.subject?.principal
+			def user
+			if( principal ){
+				user = UserLogin.findByUsername( principal )
+				def person = user.person
+				def bonusScore = person.modelScoreBonus ? person.modelScoreBonus:0
+				if(user){
+					person.modelScoreBonus = bonusScore+10
+					person.modelScore = person.modelScoreBonus + person.modelScore
+				    person.save(flush:true)
+				}
 		}
 		} else {
 			//	Delete model record
@@ -703,7 +724,7 @@ class ModelController {
     def export = {
         //get template Excel
         try {
-			File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Sync_model_template.xls" ).getFile()
+        	File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Sync_model_template.xls" ).getFile()
 			WorkbookSettings wbSetting = new WorkbookSettings()
 			wbSetting.setUseTemporaryFileDuringWrite(true)
 			def workbook = Workbook.getWorkbook( file, wbSetting )
@@ -718,14 +739,12 @@ class ModelController {
 			
 			def manuSheet = book.getSheet("manufacturer")
 			def manufacturers = Model.findAll("FROM Model where sourceTDS = 1 GROUP BY manufacturer").manufacturer
-			
 			for ( int r = 0; r < manufacturers.size(); r++ ) {
 				manuSheet.addCell( new Label( 0, r+1, String.valueOf(manufacturers[r].id )) )
 				manuSheet.addCell( new Label( 1, r+1, String.valueOf(manufacturers[r].name )) )
-				manuSheet.addCell( new Label( 2, r+1, String.valueOf(manufacturers[r].aka ? manufacturers[r].aka : "" )) )
+				manuSheet.addCell( new Label( 2, r+1, String.valueOf(WebUtil.listAsMultiValueString(ManufacturerAlias.findAllByManufacturer(manufacturers[r]).name) )) )
 				manuSheet.addCell( new Label( 3, r+1, String.valueOf(manufacturers[r].description ? manufacturers[r].description : "" )) )
 			}
-			
 			def modelSheet = book.getSheet("model")
 			def models = Model.findAllBySourceTDS(1)
 			if(params.exportCheckbox){
@@ -737,7 +756,7 @@ class ModelController {
 			for ( int r = 0; r < models.size(); r++ ) {
 				modelSheet.addCell( new Label( 0, r+1, String.valueOf(models[r].id )) )
 				modelSheet.addCell( new Label( 1, r+1, String.valueOf(models[r].modelName )) )
-				modelSheet.addCell( new Label( 2, r+1, String.valueOf(models[r].aka ? models[r].aka : "" )) )
+				modelSheet.addCell( new Label( 2, r+1, String.valueOf(WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(models[r]).name))) )
 				modelSheet.addCell( new Label( 3, r+1, String.valueOf(models[r].description ? models[r].description : "" )) )
 				modelSheet.addCell( new Label( 4, r+1, String.valueOf(models[r].manufacturer.id )) )
 				modelSheet.addCell( new Label( 5, r+1, String.valueOf(models[r].manufacturer.name )) )
@@ -788,7 +807,7 @@ class ModelController {
 			book.write()
 			book.close()
 		} catch( Exception ex ) {
-			flash.message = "Exception occurred while exporting data"+ex
+			flash.message = "Exception occurred while exporting data"+ex.printStackTrace()
 			redirect( controller:'model', action:"importExport")
 			return;
 		}
@@ -809,7 +828,8 @@ class ModelController {
 	        // get File
 	        MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
 	        CommonsMultipartFile file = ( CommonsMultipartFile ) mpr.getFile("file")
-	        def modelSyncBatch = new ModelSyncBatch(userLogin:userLogin).save()
+			def date = new Date();
+	        def modelSyncBatch = new ModelSyncBatch(userlogin:userLogin, changesSince:date,createdBy:userLogin,source:"TDS").save()
 	        // create workbook
 	        def workbook
 	        def sheetNameMap = new HashMap()
@@ -817,7 +837,6 @@ class ModelController {
 			sheetNameMap.put( "manufacturer", ["manufacturer_id", "name", "aka", "description"] )
 			sheetNameMap.put( "model", ["model_id", "name","aka","description","manufacturer_id","manufacturer_name","asset_type","blade_count","blade_label_count","blade_rows","sourcetds","power_nameplate","power_design","power_use","sourcetdsversion","use_image","usize","height","weight","depth","width", "layout_style","product_line","model_family","end_of_life_date","end_of_life_status","created_by","updated_by","validated_by","sourceurl","model_status","model_scope"] )
 			sheetNameMap.put( "connector", ["model_connector_id", "connector", "connector_posx", "connector_posy", "label", "label_position", "model_id", "model_name", "connector_option", "status", "type"] )
-			
 	        try {
 	            workbook = Workbook.getWorkbook( file.inputStream )
 	            List sheetNames = workbook.getSheetNames()
@@ -1001,17 +1020,19 @@ class ModelController {
 											jdbcTemplate.update("insert into model_sync( model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,sourcetds,power_nameplate,power_design,power_use,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id ) values "+valueList.toString()+"${modelSyncBatch.id}, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId)")
 											modelAdded = r                                                                                                                                                                                                                    
 										 } else {
-										 	modelSkipped += ( r +1 )
+										 // TODO : getting ArrayIndexOutOfbound exception, need to fix
+										 	//modelSkipped += ( r +1 )
 										 }	
 									 } else {
 									 	jdbcTemplate.update("insert into model_sync( model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,sourcetds,power_nameplate,power_design,power_use,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id ) values "+valueList.toString()+"${modelSyncBatch.id}, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId) ")
 										 modelAdded = r
 									 }	  
 		             			} else {
-		             				modelSkipped += ( r +1 )
+		             				//modelSkipped += ( r +1 )
 		             			}
 		             		} catch (Exception e) {
-		             			modelSkipped += ( r +1 )
+								 e.printStackTrace()
+		             			//modelSkipped += ( r +1 )
 								 e.printStackTrace()
 		             		}
 		                }
@@ -1071,7 +1092,7 @@ class ModelController {
 		             			connectorSkipped += ( r +1 )
 		             		}
 		                }
-					}                
+					} 
 	                workbook.close()
 	                if (manuSkipped.size() > 0 || modelSkipped.size() > 0 || connectorSkipped.size() > 0) {
 	                    flash.message = " File Uploaded Successfully with Manufactures:${manuAdded},Model:${modelAdded},Connectors:${connectorAdded} records. and  Manufactures:${manuSkipped},Model:${modelSkipped},Connectors:${connectorSkipped} Records skipped Please click the Manage Batches to review and post these changes."
@@ -1130,7 +1151,7 @@ class ModelController {
 						description:model.description,
 						assetType:model.assetType,
 						powerUse:powerUsed,
-						aka:model.aka,
+						aka: WebUtil.listAsMultiValueString(ModelAlias.findAllByModelAndManufacturer(model, model.manufacturer).name),
 						usize:model.usize,
 						frontImage:model.frontImage ? model.frontImage : '',
 						rearImage:model.rearImage ? model.rearImage : '',
@@ -1163,5 +1184,5 @@ class ModelController {
 		}
 		flash.message = "${modelInstance.modelName} Validated"
 		render (view: "show",model:[id: modelInstance.id,modelInstance:modelInstance])
-		}
+	}
 }

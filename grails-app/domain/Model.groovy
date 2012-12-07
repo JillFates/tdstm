@@ -1,7 +1,9 @@
-import com.tds.asset.AssetEntity;
-import com.tdssrc.eav.EavAttributeOption
+import org.jsecurity.SecurityUtils
+
+import com.tds.asset.AssetEntity
 import com.tdssrc.eav.EavAttribute
-import org.jsecurity.SecurityUtils;
+import com.tdssrc.eav.EavAttributeOption
+import com.tdssrc.grails.TimeUtil
 
 class Model {
 	String modelName
@@ -108,6 +110,8 @@ class Model {
         })
 		sourceTDS( nullable:true )
 		sourceTDSVersion( nullable:true )
+		lastModified( nullable:true )
+		dateCreated( nullable:true )
 	}
 	
 	static mapping  = {	
@@ -190,8 +194,25 @@ class Model {
 
 	// Get list of alias records for the manufacturer
 	def getAliases() {
-		ModelAliases.findAllByModel(this, [sort:'name'])
+		ModelAlias.findAllByModel(this, [sort:'name'])
 	}
+    
+	/**
+	 * @param : aka -> value of name
+	 * @param : createIfNotFound -> flag to determine whether need to create ManufacturerAlias or not
+	 * @return : void
+	 *
+	 */
 	
+	def findOrCreateByName(name, def createIfNotFound = false){
+		def modelAlias = ModelAlias.findByNameAndModel(name,this)
+		if(!modelAlias && createIfNotFound){
+			modelAlias = new ModelAlias(name:name.trim(), model:this, manufacturer:this.manufacturer)
+			if(modelAlias.save(flush:true)){
+				modelAlias.errors.allErrors.each { log.error it}
+			}
+		}
+        return modelAlias
+	}
 	
 }

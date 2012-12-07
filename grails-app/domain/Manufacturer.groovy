@@ -68,4 +68,22 @@ class Manufacturer {
 	def getAliases() {
 		ManufacturerAlias.findAllByManufacturer(this, [sort:'name'])
 	}
+	
+	/**
+	 * Used to find or create manufacturer_alias based on flag .
+	 * @param : name -> aka value
+	 * @param : createIfNotFound -> flag to determine whether need to create ModelAlias or not
+	 * @return : ManufacturerAlias instance 
+	 *
+	 */
+	def findOrCreateByName(name, def createIfNotFound = false){
+		def manuAlias = ManufacturerAlias.findByNameAndManufacturer(name,this)
+		if(!manuAlias && createIfNotFound){
+			manuAlias = new ManufacturerAlias(name:name.trim(), manufacturer:this)
+			if(manuAlias.save(flush:true)){
+				manuAlias.errors.allErrors.each { log.error it}
+			}
+		}
+        return manuAlias
+	}
 }

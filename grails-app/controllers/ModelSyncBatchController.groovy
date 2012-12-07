@@ -32,18 +32,25 @@ class ModelSyncBatchController {
 							manufacturerInstance = new Manufacturer( name : manufacturerSync.name,  
 																	 //aka:manufacturerSync.aka,
 																	 description : manufacturerSync.description,
-																	 userLogin:loggedUser
+																	 userlogin:loggedUser
 																	)
 							if ( !manufacturerInstance.validate() || !manufacturerInstance.save() ) {
 								def etext = "Unable to create manufacturerInstance" +
 								GormUtil.allErrorsString( manufacturerInstance )
 								println etext
 							} else {
-								def manufacturerAlias = new ManufacturerAlias(name:manufacturerSync.aka, manufacturer:manufacturerInstance).save(flush:true)
+							    if(manufacturerSync.aka){
+									def akas = manufacturerSync.aka?.split(",")
+									akas.each{
+										def manuExist = Manufacturer.findByName(it.trim())
+										if(!manuExist){
+											manufacturerInstance.findOrCreateByName(it.trim(), true)
+										}
+									}
+							    }
 								manuAdded ++
 							}
 						} else {
-	
 							//manufacturerInstance.aka = manufacturerSync.aka
 							manufacturerInstance.description = manufacturerSync.description 
 							manufacturerInstance.userLogin = loggedUser
@@ -52,7 +59,15 @@ class ModelSyncBatchController {
 								GormUtil.allErrorsString( manufacturerInstance )
 								println etext
 							} else {
-								syncManufacturerAlias(manufacturerSync.aka, manufacturerInstance)
+								if(manufacturerSync.aka){
+									def akas = manufacturerSync.aka?.split(",")
+									akas.each{
+										def manuExist = Manufacturer.findByName(it.trim())
+										if(!manuExist){
+											manufacturerInstance.findOrCreateByName(it.trim(), true)
+										}
+									}
+							    }
 								manuUpdated ++
 							}
 						
@@ -65,7 +80,16 @@ class ModelSyncBatchController {
 							GormUtil.allErrorsString( manufacturerInstance )
 							println etext
 						} else {
-							syncManufacturerAlias(manufacturerSync.aka, manufacturerInstance)
+							if(manufacturerSync.aka){
+								def akas = manufacturerSync.aka?.split(",")
+								akas.each{
+									def manuExist = Manufacturer.findByName(it.trim())
+									if(!manuExist){
+										manufacturerInstance.findOrCreateByName(it.trim(), true)
+									}
+									
+								}
+						    }
 							manuUpdated ++
 						}
 					}
@@ -80,7 +104,6 @@ class ModelSyncBatchController {
 						modelInstance = Model.findByModelNameAndAssetType( modelSync.modelName,modelSync.assetType )
 						if(!modelInstance){
 							modelInstance = new Model( modelName : modelSync.modelName, 
-													   aka : modelSync.aka,
 													   description : modelSync.description,
 													   assetType : modelSync.assetType,
 													   powerNameplate : modelSync.powerNameplate,
@@ -112,7 +135,15 @@ class ModelSyncBatchController {
 								println etext
 								modelInstance.errors.allErrors.each { println it }
 							} else {
-							 
+							    if(modelSync.aka){
+									def akas = modelSync.aka?.split(",")
+									akas.each{
+										def akaExist = Model.findByName(it.trim())
+										if( !akaExist ){
+											modelInstance.findOrCreateByName(it.trim(), true)
+										}
+									}
+							    }
 								modelAdded ++
 							}
 						} else{
@@ -148,6 +179,15 @@ class ModelSyncBatchController {
 									GormUtil.allErrorsString( modelInstance )
 									println etext
 								} else {
+									if(modelSync.aka){
+										def akas = modelSync.aka?.split(",")
+										akas.each{
+											def akaExist = Model.findByName(it.trim())
+											if( !akaExist ){
+												modelInstance.findOrCreateByName(it.trim(), true)
+											}
+										}
+									}
 									modelUpdated ++
 								}
 							}
@@ -187,6 +227,15 @@ class ModelSyncBatchController {
 								GormUtil.allErrorsString( modelInstance )
 								println etext
 							} else {
+								if(modelSync.aka){
+									def akas = modelSync.aka?.split(",")
+									akas.each{
+										def akaExist = Model.findByName(it.trim())
+										if( !akaExist ){
+											modelInstance.findOrCreateByName(it.trim(), true)
+										}
+									}
+								}
 								modelUpdated ++
 							}
 						}
@@ -214,7 +263,7 @@ class ModelSyncBatchController {
 							if ( !connectorInstance.validate() || !connectorInstance.save() ) {
 								def etext = "Unable to create connectorInstance" +
 								GormUtil.allErrorsString( connectorInstance )
-								println etext
+								//println etext
 							} else {
 								connectorsAdded ++
 							}
@@ -231,7 +280,7 @@ class ModelSyncBatchController {
 								if ( !connectorInstance.validate() || !connectorInstance.save() ) {
 									def etext = "Unable to create connectorInstance" +
 									GormUtil.allErrorsString( connectorInstance )
-									println etext
+									//println etext
 								} else {
 									connectorsUpdated ++
 								}
@@ -263,23 +312,4 @@ class ModelSyncBatchController {
 		}
     	redirect(action: "list", params: params)
     }
-	/*
-	 * Used to save imported value manufacturer aka in manufacturer_alias table .
-	 * @param : aka -> imported value of AKA (might be comma separated value)
-	 * @param : manufacturer -> instance of manufacturer 
-	 * @return : void
-	 * 
-	 */
-	
-	def syncManufacturerAlias(aka, manufacturer){
-		def importedAlias = aka?.split(",")
-		def manuAlias = ManufacturerAlias.findAllByManufacturer(manufacturer)?.name
-		if(importedAlias.size() > 0){
-			importedAlias.each {alias->
-				if(!manuAlias.contains(alias)){
-					new ManufacturerAlias(name:alias, manufacturer:manufacturer).save(flush:true)
-				}
-			}
-		}
-	}
 }

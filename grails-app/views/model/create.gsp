@@ -43,10 +43,13 @@
 		<tr>
 			<td valign="top" class="name">AKA:</td>
 			<td>
-				<input type="text" name="aka" id="akaId" value="${modelInstance?.aka}">
-				<g:hasErrors bean="${modelInstance}" field="aka">
-					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="aka" /></div>
-				</g:hasErrors>
+				<table style="border:0px ;margin-left:-8px">
+				    <tbody id="addAkaTableId">
+				      <tr><td nowrap="nowrap">
+					  	<input type="text" name="aka" id="akaId" value="${modelInstance?.aka}"> <span style="cursor: pointer;" onclick="addAka()"><b>Add AKA</b></span>
+					  </td></tr>
+					</tbody>
+				</table>
 			 </td>
 			 <td valign="top" class="name" nowrap="nowrap">Asset Type:</td>
 			 <td><g:select id="assetTypeId" name="assetType" from="${modelInstance.assetTypeList}" value="${modelInstance.assetType}" onchange="showBladeFields(this.value)"></g:select></td> 
@@ -271,7 +274,10 @@
 
 </g:form>
 </fieldset>
-
+			<div id="akaDiv" style="display:none;"> 
+             	<input type="text" name="aka" id="akaId" value="">
+             </div>
+             <input type="hidden" id="manageAkaId" value="-1" >
 </div>
 
 <script type="text/javascript">
@@ -402,6 +408,16 @@
 		$("#powerDesignId").val((parseInt(namePlatePower)*0.5).toFixed(0))  
 	    $("#powerUseId").val((parseInt(namePlatePower)*0.33).toFixed(0))
     }
+    function addAka(){
+			var trId = $("#manageAkaId").val() 
+			$("#addAkaTableId").append("<tr id='akaId_"+trId+"'><td>"+$("#akaDiv").html()+
+			"<a href=\"javascript:deleteAkaRow(\'akaId_"+trId+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+			$("#manageAkaId").val(parseInt(trId)-1)
+	}
+
+	function deleteAkaRow(id){
+		$("#"+id).remove()
+	}
 </script>
 <script>
 	currentMenuId = "#adminMenu";

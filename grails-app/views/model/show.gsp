@@ -1,3 +1,4 @@
+<%@page import="com.tdssrc.grails.WebUtil";%>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -36,7 +37,7 @@
 		</tr>
 		<tr>
 			<td>AKA:</td>
-			<td>${modelInstance?.aka}</td>
+			<td>${modelAkas}</td>
 			<td>Asset Type:</td>
 			<td>${modelInstance?.assetType}</td>
 		</tr>

@@ -103,24 +103,22 @@ class ManufacturerController {
     }
 
     def update = {
-		def deletedAka = params.deletedAka
-		def akaToSave = params.list('aka')
+		
         def manufacturerInstance = Manufacturer.get( params.id )
         if(manufacturerInstance) {
             manufacturerInstance.properties = params
+            def deletedAka = params.deletedAka
+            def akaToSave = params.list('aka')
 			if(deletedAka){
 				ManufacturerAlias.executeUpdate("delete from ManufacturerAlias ma where ma.id in (${deletedAka})")
 			}
-			def akas = ManufacturerAlias.findAllByManufacturer( manufacturerInstance )
-			akas.each{aka->
-				aka.name = params["aka_"+aka.id]
-				aka.save(flush:true)
+			def manufacturerAliasList = ManufacturerAlias.findAllByManufacturer( manufacturerInstance )
+			manufacturerAliasList.each{ manufacturerAlias->
+				manufacturerAlias.name = params["aka_"+manufacturerAlias.id]
+				manufacturerAlias.save(flush:true)
 			}
 			akaToSave.each{aka->
-				def manuAlias = new ManufacturerAlias()
-				manuAlias.name = aka
-				manuAlias.manufacturer = manufacturerInstance
-				manuAlias.save(flush:true)
+				manufacturerInstance.findOrCreateByName(aka, true)
 			}
 			
             if(!manufacturerInstance.hasErrors() && manufacturerInstance.save()) {
@@ -151,7 +149,7 @@ class ManufacturerController {
 			def akaNames = params.list('aka')
 			if(akaNames.size() > 0){
 				akaNames.each{aka->
-					new ManufacturerAlias(name:aka, manufacturer:manufacturerInstance).save(flush:true)
+					manufacturerInstance.findOrCreateByName(aka, true)
 				}
 			}
             flash.message = "Manufacturer ${manufacturerInstance.id} created"
@@ -199,7 +197,7 @@ class ManufacturerController {
 			def fromManufacturerAlias = ManufacturerAlias.findAllByManufacturer(fromManufacturer)
 			ManufacturerAlias.executeUpdate("delete from ManufacturerAlias ma where ma.manufacturer = ${fromManufacturer.id}")
 			fromManufacturerAlias.each{
-				def toManuAlias = new ManufacturerAlias(name:it.name, manufacturer:toManufacturer ).save(insert:true)
+				toManufacturer.findOrCreateByName(it.name, true)
 			}
 			
 			// Delete manufacturer record.
