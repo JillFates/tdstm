@@ -55,18 +55,16 @@ environments {
 	}
 	production {
 		dataSource {
-			/*
 			// TDS Transitional Manager
+			driverClassName = "com.mysql.jdbc.Driver"
 			dbCreate = "update" // one of 'create', 'create-drop','update'
 			// url = "jdbc:mysql://localhost/tdstm"
-			url = "jdbc:mysql://tdstm-dbserver/tdstm"
-			driverClassName = "com.mysql.jdbc.Driver"
+			// url = "jdbc:mysql://tdstm-dbserver/tdstm"
 			username = "tdstm"
 			password = "tdstm"
 
 			// loggingSql = true
 			// logSql = true 
-			*/
 		}
 	}
 }
