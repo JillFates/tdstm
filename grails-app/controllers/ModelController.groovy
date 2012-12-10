@@ -1185,4 +1185,30 @@ class ModelController {
 		flash.message = "${modelInstance.modelName} Validated"
 		render (view: "show",model:[id: modelInstance.id,modelInstance:modelInstance])
 	}
+
+	/**
+	 *  Validate whether requested AKA already exist in DB or not
+	 *  @param: aka, name of aka
+	 *  @param: id, id of model
+	 *  @return : return aka if exists
+	 */
+	def validateAKA = {
+		def duplicateAka = ""
+		def aka = params.name
+		def modelId = params.id
+		def akaExist = Model.findByModelName(aka)
+        
+        if(akaExist) {
+            duplicateAka = aka
+        } else if( modelId ){
+			def model = Model.read(modelId)
+			def akaInAlias = ModelAlias.findByNameAndManufacturer(aka, model.manufacturer)
+			if( akaInAlias ){
+				duplicateAka = aka
+			}
+		} 
+        
+	
+		render duplicateAka
+	}
 }

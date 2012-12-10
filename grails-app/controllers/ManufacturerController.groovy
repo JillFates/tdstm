@@ -220,4 +220,28 @@ class ManufacturerController {
     	def manufacturer = Manufacturer.get(params.id)
     	render manufacturer as JSON
     }
+    
+	/**
+	 *  Validate whether requested AKA already exist in DB or not
+	 *  @param: aka, name of aka
+     *  @param: id, id of model
+     *  @return : return aka if exists
+	 */
+	def validateAKA = {
+		def duplicateAka = ""
+		def aka = params.name
+		def manuId = params.id
+		def akaExist = Manufacturer.findByName(aka)
+        
+		if( akaExist ){
+            duplicateAka = aka
+		} else if(manuId) {
+			def manufacturer = Manufacturer.get(manuId)
+			def akaInAlias = ManufacturerAlias.findByNameAndManufacturer(aka, manufacturer)
+			if( akaInAlias ){
+				duplicateAka = aka
+			}
+		}
+		render duplicateAka
+	}
 }

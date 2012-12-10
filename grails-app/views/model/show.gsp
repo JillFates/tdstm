@@ -219,7 +219,7 @@
                       	${model.modelName}
                       </g:link>
                      </td>
-                     <td valign="top" class="value">${model.aka}</td>
+                     <td valign="top" class="value">${WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(model).name)}</td>
                      <td valign="top" class="value">${model?.assetType}</td>
                  </tr>
             	</g:each>

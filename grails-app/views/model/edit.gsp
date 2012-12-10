@@ -4,6 +4,7 @@
     <meta name="layout" content="projectHeader" />
     <title>Model - Edit</title>
     <g:javascript src="drag_drop.js" />
+    <g:javascript src="model.manufacturer.js" />   
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
   </head>
@@ -38,8 +39,9 @@
                  <tbody id="addAkaTableId">
                  <g:each in="${modelAliases}" var="alias">
                   <tr id="aka_${alias.id}"><td nowrap="nowrap">
-                 	 <input type="text" id="aka" name="aka_${alias.id}" value="${alias.name}" onchange="changedAka(this.value,${alias.id})"/>
+                 	 <input type="text" id="aka" name="aka_${alias.id}" value="${alias.name}" onchange="validateAKA(this.value,${alias.id},'errSpan_${alias.id}', 'model')"/>
                  	 <a href="javascript:deleteAkaRow('aka_${alias.id}',true)"><span class='clear_filter'><u>X</u></span></a>
+                 	 <br><div class="errors" style="display: none" id="errSpan_${alias.id}"></div>
                   </td></tr>
                  </g:each>
                  </tbody>
@@ -308,7 +310,8 @@
 </g:form>
 </fieldset>
 <div id="akaDiv" style="display:none;"> 
-	<input type="text" name="aka" id="akaId" value="">
+	<input type="text" name="aka" id="akaId" value="" 
+	onchange="validateAKA(this.value,'${modelInstance.id}', 'errSpan', 'model' )"/>
 </div>
 <input type="hidden" id="manageAkaId" value="-1" >
 </div>
@@ -495,20 +498,6 @@
 		$("#powerDesignId").val((parseInt(namePlatePower)*0.5).toFixed(0))  
 	    $("#powerUseId").val((parseInt(namePlatePower)*0.33).toFixed(0))
     }
-	function deleteAkaRow(id, save){
-		$("#"+id).remove()
-		if(save){
-			var deletedId = id.split("_")[1]
-			$("#deletedAka").val() ? $("#deletedAka").val($("#deletedAka").val()+","+deletedId) : $("#deletedAka").val(deletedId)
-		}
-	}
-
-	function addAka(){
-		var trId = $("#manageAkaId").val() 
-		$("#addAkaTableId").append("<tr id='akaId_"+trId+"'><td nowrap='nowrap'>"+$("#akaDiv").html()+
-		"<a href=\"javascript:deleteAkaRow(\'akaId_"+trId+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
-		$("#manageAkaId").val(parseInt(trId)-1)
-	}
 </script>
 <script>
 	currentMenuId = "#adminMenu";

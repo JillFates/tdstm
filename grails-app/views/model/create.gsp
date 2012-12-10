@@ -4,8 +4,10 @@
     <meta name="layout" content="projectHeader" />
     <title>Model - New</title>
     <g:javascript src="drag_drop.js" />
+    <g:javascript src="model.manufacturer.js" />   
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
     <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
+    
   </head>
   <body>
 <div class="body">
@@ -46,7 +48,8 @@
 				<table style="border:0px ;margin-left:-8px">
 				    <tbody id="addAkaTableId">
 				      <tr><td nowrap="nowrap">
-					  	<input type="text" name="aka" id="akaId" value="${modelInstance?.aka}"> <span style="cursor: pointer;" onclick="addAka()"><b>Add AKA</b></span>
+					  	<input type="text" name="aka" id="akaId" value="${modelInstance?.aka}" onchange="validateAKA(this.value,'','errSpan','model')"> <span style="cursor: pointer;" onclick="addAka()"><b>Add AKA</b></span>
+					  	<br><div class="errors" style="display: none" id="errSpan"></div>
 					  </td></tr>
 					</tbody>
 				</table>
@@ -275,7 +278,7 @@
 </g:form>
 </fieldset>
 			<div id="akaDiv" style="display:none;"> 
-             	<input type="text" name="aka" id="akaId" value="">
+             	<input type="text" name="aka" id="akaId" value="" onchange="validateAKA(this.value,'', 'errSpan', 'model' )">
              </div>
              <input type="hidden" id="manageAkaId" value="-1" >
 </div>
@@ -408,16 +411,6 @@
 		$("#powerDesignId").val((parseInt(namePlatePower)*0.5).toFixed(0))  
 	    $("#powerUseId").val((parseInt(namePlatePower)*0.33).toFixed(0))
     }
-    function addAka(){
-			var trId = $("#manageAkaId").val() 
-			$("#addAkaTableId").append("<tr id='akaId_"+trId+"'><td>"+$("#akaDiv").html()+
-			"<a href=\"javascript:deleteAkaRow(\'akaId_"+trId+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
-			$("#manageAkaId").val(parseInt(trId)-1)
-	}
-
-	function deleteAkaRow(id){
-		$("#"+id).remove()
-	}
 </script>
 <script>
 	currentMenuId = "#adminMenu";
