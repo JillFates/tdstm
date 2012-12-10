@@ -422,11 +422,13 @@ class PersonController {
 				def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
 				//getSession().setAttribute( "LOGIN_PERSON", ['name':personInstance.firstName, "id":personInstance.id ])
 				def userLogin = UserLogin.findByPerson( personInstance )
-				if(userLogin){
-					def password = params.newPassword
-					
-					if(password != null)
-						userLogin.password = new Sha1Hash(params.newPassword).toHex()
+					if(userLogin){
+					if(params.newPassword){
+						def password = params.newPassword
+						
+						if(password != null)
+							userLogin.password = new Sha1Hash(params.newPassword).toHex()
+					}
 						
 					if(params.expiryDate && params.expiryDate != "null"){
 						def expiryDate = params.expiryDate
@@ -460,11 +462,13 @@ class PersonController {
 						expDates.save(flush:true)
 					}
 				}
+				
 				userPreferenceService.setPreference( "CURR_TZ", params.timeZone )
 				userPreferenceService.setPreference( "CURR_POWER_TYPE", params.powerType )
 				userPreferenceService.loadPreferences("CURR_TZ")
-				userPreferenceService.loadPreferences("START_PAGE")
 				userPreferenceService.setPreference("START_PAGE", params.startPage )
+				userPreferenceService.loadPreferences("START_PAGE")
+				
 			}else{
 				personInstance.errors.allErrors.each{println it}
 			}

@@ -64,6 +64,7 @@
 	        var email = $("#emailId").val()
 	        var expiryDate = $("#expiryDateId").val()
 	        var powerType = $("#powerTypeId").val()
+	        var startPage = $("#startPage").val()
 	        
 	        if(expiryDate + "" == "undefined"){
 	        	expiryDate = "null"
@@ -99,7 +100,12 @@
 				}
 	        }
 	        if(returnVal){
-				new Ajax.Request('/tdstm/person/checkPassword',{asynchronous:true,evalScripts:true,onComplete:function(e){updateWelcome(e)},parameters:'id=' + $('#personId').val() +'&firstName='+$('#firstNameId').val() +'&lastName='+$('#lastNameId').val()+'&nickName='+$('#nickNameId').val()+'&title='+$('#titleId').val()+'&oldPassword='+$('#oldPasswordId').val()+'&newPassword='+$('#newPasswordId').val()+'&newPasswordConfirm='+$('#newPasswordConfirmId').val()+'&timeZone='+$('#timeZoneId').val()+'&email='+$('#emailId').val()+'&expiryDate='+expiryDate+'&powerType='+powerType});
+				new Ajax.Request('/tdstm/person/checkPassword',{asynchronous:true,evalScripts:true,onComplete:function(e){updateWelcome(e)},parameters:'id=' + $('#personId').val() 
+											+'&firstName='+$('#firstNameId').val() +'&lastName='+$('#lastNameId').val()
+											+'&nickName='+$('#nickNameId').val()+'&title='+$('#titleId').val()+'&oldPassword='+$('#oldPasswordId').val()
+											+'&newPassword='+$('#newPasswordId').val()+'&newPasswordConfirm='+$('#newPasswordConfirmId').val()
+											+'&timeZone='+$('#timeZoneId').val()+'&email='+$('#emailId').val()+'&expiryDate='+expiryDate
+											+'&powerType='+powerType+'&startPage='+startPage});
 	        }
 		}
 		function updateWelcome( e ){
