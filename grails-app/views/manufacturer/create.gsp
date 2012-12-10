@@ -42,8 +42,9 @@
 								   <table style="border:0px ;margin-left:-8px">
 								    <tbody id="addAkaTableId">
 								      <tr><td nowrap="nowrap">
-									  	<input type="text" name="aka" id="akaId" value="${manufacturerInstance?.aka}" onchange="validateAKA(this.value,'','errSpan', 'manufacturer')"> <span style="cursor: pointer;" onclick="addAka()"><b>Add AKA</b></span>
+									  	<input type="text" class="akaValidate" name="aka" id="akaId" value="${manufacturerInstance?.aka}" onchange="validateAKA(this.value,'','errSpan', 'manufacturer')"> <span style="cursor: pointer;" onclick="addAka()"><b>Add AKA</b></span>
 									  	<br><div class="errors" style="display: none" id="errSpan"></div>
+
 									  </td></tr>
 									</tbody>
 									</table>
@@ -69,7 +70,7 @@
                 </div>
             </g:form>
              <div id="akaDiv" style="display:none;"> 
-             	<input type="text" name="aka" id="akaId" value="" onchange="validateAKA(this.value,'', 'errSpan', 'manufacturer' )">
+             	<input type="text" class="akaValidate" name="aka" id="akaId" value="" onchange="validateAKA(this.value,'', 'errSpan', 'manufacturer' )">
              </div>
              <input type="hidden" id="manageAkaId" value="-1" >
         </div>

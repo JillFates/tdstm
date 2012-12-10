@@ -39,7 +39,7 @@
                  <tbody id="addAkaTableId">
                  <g:each in="${modelAliases}" var="alias">
                   <tr id="aka_${alias.id}"><td nowrap="nowrap">
-                 	 <input type="text" id="aka" name="aka_${alias.id}" value="${alias.name}" onchange="validateAKA(this.value,${alias.id},'errSpan_${alias.id}', 'model')"/>
+                 	 <input type="text" class="akaValidate" id="aka" name="aka_${alias.id}" value="${alias.name}" onchange="validateAKA(this.value,${alias.id},'errSpan_${alias.id}', 'model')"/>
                  	 <a href="javascript:deleteAkaRow('aka_${alias.id}',true)"><span class='clear_filter'><u>X</u></span></a>
                  	 <br><div class="errors" style="display: none" id="errSpan_${alias.id}"></div>
                   </td></tr>

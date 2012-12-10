@@ -32,19 +32,45 @@ function deleteAkaRow(id, save){
  * @param forWhom : to determine which controller we need to send the requst.
  */
 function validateAKA(value,itemId,spanId,forWhom){
-	var params = {'name':value,'id':itemId}
-	jQuery.ajax({
-		url: '../'+forWhom+'/validateAKA',
-		data: params,
-		complete: function(e) { 
-			if(e.responseText){
-				$("#"+spanId).html("Duplicate AKA "+e.responseText+" already exist.")
-				$("#"+spanId).css('display','block')
-			}else{
-				$("#"+spanId).html("")
-				$("#"+spanId).css('display','none')
+	var makeAjaxCall = avoidDuplicate(spanId)
+	if(makeAjaxCall){
+		var params = {'name':value,'id':itemId}
+		jQuery.ajax({
+			url: '../'+forWhom+'/validateAKA',
+			data: params,
+			complete: function(e) { 
+				if(e.responseText){
+					$("#"+spanId).html("Duplicate AKA "+e.responseText+" already exist.")
+					$("#"+spanId).css('display','block')
+				}else{
+					$("#"+spanId).html("")
+					$("#"+spanId).css('display','none')
+				}
+				
 			}
-			
-		}
-	});
+		});
+	}
+}
+/**
+ * 
+ * @param spanId : where to show error message
+ * @returns {Boolean} 
+ */
+function avoidDuplicate(spanId){
+	var textValues = new Array();
+	var flag = true
+    $("input.akaValidate").each(function() {
+        doesExisit = ($.inArray($(this).val(), textValues) == -1) ? false : true;
+        if (!doesExisit) {
+            textValues.push($(this).val())
+            $("#"+spanId).html("")
+			$("#"+spanId).css('display','none')
+        } else {
+        	$("#"+spanId).html("Duplicate AKA "+$(this).val()+" already Entered.")
+			$("#"+spanId).css('display','block')
+			flag = false
+            return false;
+        }
+    });
+	return flag
 }
