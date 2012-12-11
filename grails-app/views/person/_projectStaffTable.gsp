@@ -44,7 +44,7 @@
 				<g:each in="${staffCheckStatus}" var="projectStaffs">
 				  <g:each in="${projectStaffs[projectStaff?.staff.id+'_'+projectStaff?.role+'_'+projectStaff?.project]}" var ="staffStatus"> 
 					 <td nowrap="nowrap">
-					 	<input id="${staffStatus['id']}" type="checkbox" name="staffCheck" 
+					 	<input id="${staffStatus['id']}" type="checkbox" name="staffCheck" ${editPermission ?: 'disabled = "disabled"'}
 						  onClick="if(this.checked){this.value = 1} else {this.value = 0 };saveProjectStaff(this.id);" value="0"
 						  ${staffStatus['status']} />
 					 </td>
@@ -54,7 +54,7 @@
 				<g:each in="${eventCheckStatus}" var="moveEvent">
 				  <g:each in="${moveEvent[projectStaff?.staff.id+'_'+projectStaff?.role+'_'+projectStaff?.project]}" var ="eventStatus"> 
 					 <td nowrap="nowrap">
-					 	<input id="${eventStatus['id']}" type="checkbox" name="staffCheck" 
+					 	<input id="${eventStatus['id']}" type="checkbox" name="staffCheck" ${editPermission ?: 'disabled = "disabled"' }
 						  onClick="if(this.checked){this.value = 1} else {this.value = 0 };saveEventStaff(this.id);" value="0"
 						  ${eventStatus['status']} />
 					 </td>

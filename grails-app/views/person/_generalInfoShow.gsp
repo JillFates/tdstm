@@ -209,9 +209,11 @@
              </div>
              </div>
 </div>
+<tds:hasPermission permission='PersonEditView'>
 <div class="buttons">
 	<input class="save" type="button" id="edtBId" value="Edit"
 		onClick="loadPersonDiv(${person.id},'generalInfo','edit')" /> <input
 		class="delete" type="button" id="cancelBId" value="Cancel"
 		onClick="closePersonDiv('personGeneralViewId')"/>
 </div>
+ </tds:hasPermission>

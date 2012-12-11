@@ -532,10 +532,11 @@ class PersonController {
 		
 		def eventCheckStatuses = eventCheckStatus(staffList, moveEvents)
 		def staffCheckStatus = staffCheckStatus(staffList,project)
+		def editPermission  = RolePermissions.hasPermission('EditProjectStaff')
 	    [projects:projects, projectId:project.id, roleTypes:roleTypes, staffList:staffList,
 			 moveEventList:getBundleHeader( moveEvents ), currRole:currRole, currLoc:currLoc,
 			 currPhase:currPhase, currScale:currScale, project:project, eventCheckStatus:eventCheckStatuses,staffCheckStatus:staffCheckStatus,
-			 isTdsEmp:isTdsEmp]
+			 isTdsEmp:isTdsEmp, editPermission:editPermission]
 		
 	}
 	
@@ -580,9 +581,9 @@ class PersonController {
 		if(projectId!="0"){
 			 staffCheckStatuses = staffCheckStatus(staffList ,project)
 		}
-		
+		def editPermission  = RolePermissions.hasPermission('EditProjectStaff')
 		render(template:"projectStaffTable" ,model:[staffList:staffList, moveEventList:getBundleHeader(moveEvents),projectId:projectId,
-					eventCheckStatus:eventCheckStatuses, project:project,staffCheckStatus:staffCheckStatuses,
+					eventCheckStatus:eventCheckStatuses, project:project,staffCheckStatus:staffCheckStatuses, editPermission:editPermission,
 					sortOn : params.sortOn, firstProp : params.firstProp, orderBy : params.orderBy != 'asc' ? 'asc' :'desc'])
 		
 	}

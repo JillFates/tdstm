@@ -238,10 +238,12 @@
 		</div>
 	</div>
 </g:form>
+<tds:hasPermission permission='PersonEditView'>
 <div class="buttons buttonsToUpdate">
 	<input class="save" type="button" id="updateBId" value="Update"
 		onClick="updatePerson('generalInfoShow','personDialogForm')" /> <input
 		class="save" type="button" id="cancelBId" value="Cancel"
 		onClick="closePersonDiv('personGeneralViewId')" />
 </div>
+</tds:hasPermission>
 

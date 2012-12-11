@@ -62,6 +62,7 @@ def permissionsList = [
 	[ PermissionGroup.PROJECT, "ProjectEditView"],
 	[ PermissionGroup.PROJECT, "ProjectDelete"],
 	[ PermissionGroup.PROJECT, "ShowAllProjects"],
+	[ PermissionGroup.PROJECT, "EditProjectStaff"],
 	
 	[ PermissionGroup.ROLETYPE, "RoleTypeCreate"],
 	[ PermissionGroup.ROLETYPE, "RoleTypeEditView"],

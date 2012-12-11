@@ -378,16 +378,9 @@ class RackLayoutsController {
 								hasBlades = true
 								bladeTable = generateBladeLayout(it, overlapAsset, rackLayoutsHasPermission, hideIcons, redirectTo)
 							}
-							if(rackLayoutsHasPermission){
-								assetTag += """<a href="javascript:getEntityDetails('${redirectTo}','${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>" 
-								if(hasBlades){
-									assetTag += "<br/>"+bladeTable
-								}
-							} else {
-								assetTag += trimString(assetTagValue.replace('~-','-'))
-								if(hasBlades){
-									assetTag += " <br/>"+bladeTable
-								}
+							assetTag += """<a href="javascript:getEntityDetails('${redirectTo}','${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>" 
+							if(hasBlades){
+								assetTag += "<br/>"+bladeTable
 							}
 						}
 					} else if(overlappedAssets.size() > 0){
