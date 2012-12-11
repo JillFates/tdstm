@@ -3682,8 +3682,8 @@ class AssetEntityController {
 		}
 		def selectControl = ''
 		if(workFlowTransition.size()){
-			def paramsMap = [selectId:'workFlowId', selectName:'workFlow', options:workFlowTransition, 
-                            optionKey:'id', optionValue:'name', optionSelected:assetComment.workflowTransition.id]
+			def paramsMap = [selectId:'workFlowId', selectName:'workFlow', options:workFlowTransition, firstOption : [value:'', display:''],
+                            optionKey:'id', optionValue:'name', optionSelected:assetComment.workflowTransition?.id]
 			selectControl = HtmlUtil.generateSelect( paramsMap )
 		}
 		render selectControl
