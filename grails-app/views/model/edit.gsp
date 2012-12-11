@@ -121,10 +121,14 @@
 		<tr>
 			<td>Power (Max/Design/Avg):</td>
 			<td>
-				<input type="text" size="4" name="powerNameplate" id="powerNameplateId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? ( modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 110 ).toFloat().round(1) : '' ): modelInstance?.powerNameplate}" onblur="changePowerValue()" ><a id ="namePlateId"  title="Make standard values from nameplate" style="cursor: pointer;" onclick="setStanderdPower()"> >> </a>
-				<input type="text" size="4" name="powerDesign" id="powerDesignId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? ( modelInstance?.powerDesign ?  (modelInstance?.powerDesign / 110 ).toFloat().round(1) : '' ) : modelInstance?.powerDesign}" >&nbsp;
-				<input type="text" size="4" name="powerUse" id="powerUseId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ?  ( modelInstance?.powerUse ? (modelInstance?.powerUse / 110 ).toFloat().round(1) : '') : modelInstance?.powerUse}" >&nbsp;
-				<g:select id="ptype" name='powerType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" onchange="updatePowerType(this.value, this.name)"> </g:select>
+			    <g:set var="powerType" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE ?: 'Watts'}"/>
+				<input type="text" size="4" name="powerNameplate" id="powerNameplateId" value="${powerType != 'Watts' ? ( modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 110 ).toFloat().round(1) : '' ): modelInstance?.powerNameplate}" onblur="changePowerValue()" ><a id ="namePlateId"  title="Make standard values from nameplate" style="cursor: pointer;" onclick="setStanderdPower()"> >> </a>
+				<input type="hidden" id="powerNameplateIdH" value="${modelInstance?.powerNameplate}">
+				<input type="text" size="4" name="powerDesign" id="powerDesignId" value="${powerType != 'Watts' ? ( modelInstance?.powerDesign ?  (modelInstance?.powerDesign / 110 ).toFloat().round(1) : '' ) : modelInstance?.powerDesign}" >&nbsp;
+				<input type="hidden" id="powerDesignIdH" value="${modelInstance?.powerDesign}" >
+                <input type="text" size="4" name="powerUse" id="powerUseId" value="${powerType != 'Watts' ?  ( modelInstance?.powerUse ? (modelInstance?.powerUse / 110 ).toFloat().round(1) : '') : modelInstance?.powerUse}" >&nbsp;
+                <input type="hidden" id="powerUseIdH" value="${modelInstance?.powerUse}" >
+				<g:select id="ptype" name='powerType' value="${powerType}" from="${['Watts','Amps']}" onchange="updatePowerType(this.value, this.name)"> </g:select>
 			</td>
 			<td>Notes:</td>
 			<td>
@@ -445,35 +449,7 @@
 		});
 	}
 	function updatePowerType( value , name){
-		var preference
-		var designPrefernce
-		var namePlatePrefernce
-		if(value=="Watts" ){
-			preference=$('#powerUseId').val()*110;
-			preference= preference.toFixed(0)
-			$('#powerUseId').val(preference);
-			
-			designPrefernce=$('#powerDesignId').val()*110;
-			designPrefernce= designPrefernce.toFixed(0)
-			$('#powerDesignId').val(designPrefernce);
-			
-			namePlatePrefernce=$('#powerNameplateId').val()*110;
-			namePlatePrefernce= namePlatePrefernce.toFixed(0)
-			$('#powerNameplateId').val(namePlatePrefernce);
-		}else {
-			preference= $('#powerUseId').val()/110;
-			preference= preference.toFixed(1)
-			$('#powerUseId').val(preference);
-			
-			designPrefernce=$('#powerDesignId').val()/110;
-			designPrefernce= designPrefernce.toFixed(1)
-			$('#powerDesignId').val(designPrefernce);
-			
-			namePlatePrefernce=$('#powerNameplateId').val()/110;
-			namePlatePrefernce= namePlatePrefernce.toFixed(1)
-			$('#powerNameplateId').val(namePlatePrefernce);
-		}
-		
+		convertPowerType(value,name)
 		${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + value ')}
 	}	
 
@@ -484,10 +460,12 @@
 		var powerDesign = $("#powerDesignId").val()	
 		var powerUse= $("#powerUseId").val()
 		if(powerDesign == 0 || powerDesign == 0.0  ){
-		  $("#powerDesignId").val(parseInt(namePlatePower)*0.5)  
+		  $("#powerDesignId").val(parseInt(namePlatePower)*0.5)
+		  $("#powerDesignIdH").val(parseInt(namePlatePower)*0.5)  
 		}
 	    if(powerUse == 0 || powerUse == 0.0 ){
 	      $("#powerUseId").val(parseInt(namePlatePower)*0.33)
+	      $("#powerUseIdH").val(parseInt(namePlatePower)*0.33)
 		}
 	  }
 
@@ -495,8 +473,10 @@
 		var namePlatePower = $("#powerNameplateId").val()
 		var powerDesign = $("#powerDesignId").val()	
 		var powerUse= $("#powerUseId").val()
-		$("#powerDesignId").val((parseInt(namePlatePower)*0.5).toFixed(0))  
+		$("#powerDesignId").val((parseInt(namePlatePower)*0.5).toFixed(0))
+		$("#powerDesignIdH").val((parseInt(namePlatePower)*0.5).toFixed(0))
 	    $("#powerUseId").val((parseInt(namePlatePower)*0.33).toFixed(0))
+	    $("#powerUseIdH").val((parseInt(namePlatePower)*0.33).toFixed(0))
     }
 </script>
 <script>

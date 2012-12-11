@@ -71,15 +71,16 @@
 		<tr>
 			<td>Power (max/design/avg) :</td>
 			<td>
-				<span id="namePlatePowerSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerNameplate}</span>
-				<input type="hidden" name="powerNameplate" id="powerNameplateId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 110 )?.toFloat()?.round(1) : 0.0 : modelInstance?.powerNameplate}" >&nbsp;
+			    <g:set var="powerType" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE ?: 'Watts'}"/>
+				<span id="namePlatePowerSpanId">${powerType !='Watts' ? modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerNameplate}</span>
+				<input type="hidden" id="powerNameplateId" value="${modelInstance?.powerNameplate}" >&nbsp;
 
-				<span id="PowerDesignSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerDesign ? (modelInstance?.powerDesign / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerDesign}</span>
-				<input type="hidden" name="powerDesign" id="powerDesignId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? modelInstance?.powerDesign ? (modelInstance?.powerDesign / 110 )?.toFloat()?.round(1) : 0.0 : modelInstance?.powerDesign}" >&nbsp;
+				<span id="PowerDesignSpanId">${powerType !='Watts' ? modelInstance?.powerDesign ? (modelInstance?.powerDesign / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerDesign}</span>
+				<input type="hidden" id="powerDesignId" value="${modelInstance?.powerDesign}" >&nbsp;
 
-				<span id="powerSpanId">${session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}</span>
-				<input type="hidden" name="powerUse" id="powerUseId" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110 )?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}" >&nbsp;
-				<g:select id="powertype" name='powerType' value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE }" from="${['Watts','Amps']}" onchange="updatePowerType( this.value , this.name)"> </g:select>
+				<span id="powerSpanId">${powerType !='Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}</span>
+				<input type="hidden" id="powerUseId" value="${modelInstance?.powerUse}" >&nbsp;
+				<g:select id="powertype" name='powerType' value="${powerType}" from="${['Watts','Amps']}" onchange="updatePowerType( this.value , this.name)"> </g:select>
             </td>
         	<td>Notes:</td>
 			<td>${modelInstance?.description}</td>
@@ -275,38 +276,20 @@ function showMergeDialog(){
 }
 
 function updatePowerType(value,name){
-	var preference
 	if(value=="Watts" && name =="powerType"){
-		preference=$('#powerUseId').val()*110;
-		preference= preference.toFixed(0)
-		$('#powerUseId').val(preference);
-		$("#powerSpanId").html(preference);
-
-		preference=$('#powerNameplateId').val()*110;
-		preference= preference.toFixed(0)
-		$('#powerNameplateId').val(preference);
-		$("#namePlatePowerSpanId").html(preference);
-
-		preference=$('#powerDesignId').val()*110;
-		preference= preference.toFixed(0)
-		$('#powerDesignId').val(preference);
-		$("#PowerDesignSpanId").html(preference);
+		$("#powerSpanId").html($('#powerUseId').val());
+		$("#namePlatePowerSpanId").html($('#powerNameplateId').val());
+		$("#PowerDesignSpanId").html($('#powerDesignId').val());
 	}
 	else if(value=="Amps" && name == "powerType"){
-		preference= $('#powerUseId').val()/110;
-		preference= preference.toFixed(1)
-		$('#powerUseId').val(preference);
-		$("#powerSpanId").html(preference);
+		var preference= $('#powerUseId').val()/110;
+		$("#powerSpanId").html(preference.toFixed(1));
 
 		preference= $('#powerNameplateId').val()/110;
-		preference= preference.toFixed(1)
-		$('#powerNameplateId').val(preference);
-		$("#namePlatePowerSpanId").html(preference);
+		$("#namePlatePowerSpanId").html(preference.toFixed(1));
 
 		preference= $('#powerDesignId').val()/110;
-		preference= preference.toFixed(1)
-		$('#powerDesignId').val(preference);
-		$("#PowerDesignSpanId").html(preference);
+		$("#PowerDesignSpanId").html(preference.toFixed(1));
 	}
 	${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + value ')}
 }

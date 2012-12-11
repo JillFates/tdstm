@@ -74,3 +74,26 @@ function avoidDuplicate(spanId){
     });
 	return flag
 }
+
+/**
+ * convert values from Amps to Watts OR Watts to Amps
+ * @param value
+ * @param name
+ */
+function convertPowerType(value,name){
+	
+	if(value=="Watts" && name =="powerType"){
+		$('#powerUseId').val( $('#powerUseIdH').val() );
+		$('#powerNameplateId').val( $('#powerNameplateIdH').val() );
+		$('#powerDesignId').val( $('#powerDesignIdH').val() );
+	} else if(value=="Amps" && name == "powerType"){
+		var preference = $('#powerUseIdH').val()/110;
+		$('#powerUseId').val(preference.toFixed(1));
+
+		preference = $('#powerNameplateIdH').val()/110;
+		$('#powerNameplateId').val(preference.toFixed(1));
+
+		preference = $('#powerDesignIdH').val()/110;
+		$('#powerDesignId').val(preference.toFixed(1));
+	}
+}
