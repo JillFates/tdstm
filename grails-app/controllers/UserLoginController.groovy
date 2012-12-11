@@ -112,7 +112,9 @@ class UserLoginController {
             flash.message = "UserLogin not found with id ${params.id}"
             redirect( action:list, params:[ id:companyId ] )
         } else { 
-        	return [ userLoginInstance : userLoginInstance, companyId:companyId ] 
+			def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
+			def assignedRoles = userPreferenceService.getAssignedRoles( userLoginInstance.person )
+        	return [ userLoginInstance : userLoginInstance, companyId:companyId, roleList:roleList, assignedRoles:assignedRoles ] 
         }
     }
 
@@ -143,7 +145,8 @@ class UserLoginController {
         	def person = userLoginInstance.person
         	def availableRoles = userPreferenceService.getAvailableRoles( person )
             def assignedRoles = userPreferenceService.getAssignedRoles( person )
-            return [ userLoginInstance : userLoginInstance, availableRoles:availableRoles, assignedRoles:assignedRoles, companyId:companyId  ]
+            def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
+            return [ userLoginInstance : userLoginInstance, availableRoles:availableRoles, assignedRoles:assignedRoles, companyId:companyId, roleList:roleList  ]
         }
     }
 	/*
@@ -174,9 +177,11 @@ class UserLoginController {
 	        		userLoginInstance.password = oldPassword
 	        	}
 	            if( !userLoginInstance.hasErrors() && userLoginInstance.save(flush:true) ) {
-	            	/*def assignedRoles = request.getParameterValues("assignedRole");
+	            	def assignedRoles = request.getParameterValues("assignedRole");
 	            	def person = params.person.id
-	            	userPreferenceService.setUserRoles(assignedRoles, person)*/
+					def personInstance = Person.get(person)
+					partyRelationshipService.updatePartyRoleByType('system', personInstance, assignedRoles)
+	            	userPreferenceService.setUserRoles(assignedRoles, person)
 	                flash.message = "UserLogin ${userLoginInstance} updated"
 	                redirect( action:show, id:userLoginInstance.id, params:[ companyId:companyId ] )
 	            } else {
@@ -204,6 +209,7 @@ class UserLoginController {
         	} else {
         		userPreferenceService.removeUserRoles(assignedRoles, person)
         	}
+		render true
 	}
 	
 	// return userlogin details to create form
@@ -222,7 +228,7 @@ class UserLoginController {
         userLoginInstance.properties = params
 		def expiryDate = new Date(GormUtil.convertInToGMT( "now", "EDT" ).getTime() + 7776000000)
         userLoginInstance.expiryDate = expiryDate
-		def roleList = RoleType.findAll("from RoleType r where r.description like 'staff%' OR r.description like 'system%' order by r.description ")
+		def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
 		return ['userLoginInstance':userLoginInstance, personInstance:personInstance, companyId:companyId, roleList:roleList ]
     }
 	/*

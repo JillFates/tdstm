@@ -117,8 +117,18 @@
 					            </g:hasErrors>
                                 </td>
                             </tr> 
-                        
-                            <tr class="prop">
+                           
+	                        <g:each in="${roleList}" var="role">
+                            	<tr class="prop">
+                            	 <td valign="top" class="value" >
+                            	     ${role}:
+                            	 </td>
+                            	 <td valign="top" class="value" >
+                            	     <input type="checkbox" id="${role.id}" name="assignedRole"  value="${role.id}" ${assignedRoles.id.contains(role.id) ? 'checked="checked"' : ''} />
+                            	 </td>
+                            	</tr>
+                            </g:each>
+                           <%-- <tr class="prop">
                                 <td valign="top" class="value" colspan="2">
                                 <table style="border: none;">
                                 <tr>
@@ -158,7 +168,7 @@
                                 </table>
                                 </td>
                             </tr>
-                        </tbody>
+                        --%></tbody>
                     </table>
                 </div>
                 <div class="buttons">
@@ -170,6 +180,15 @@
 <script>
 	currentMenuId = "#adminMenu";
 	$("#adminMenuId a").css('background-color','#003366')
+	
+	function deleteRole(id){
+		var values = $("#"+id).val()
+		var personId =  $('#person').val();
+		var action = 'remove'
+		if(!$("#"+id).is(':checked')){
+			${remoteFunction(controller:'userLogin', action:'addRoles', params:'\'assignedRoleId=\' + values +\'&person=\'+personId +\'&actionType=\'+action')}
+		}
+	}
 </script>
     </body>
 </html>

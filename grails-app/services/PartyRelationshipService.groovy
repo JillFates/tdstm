@@ -443,5 +443,18 @@ class PartyRelationshipService {
     		 column+=1
     	 }
      }
+	 /**
+	  * To update party role by type 
+	  * @param type : type of role
+	  * @param person : instance of person
+	  * @param assignedRoles : assigned roles to the person
+	  * @return void
+	  */
+	 def updatePartyRoleByType( type, person, assignedRoles ){
+		def existingRoles = PartyRole.findAll("from PartyRole where party = :person and roleType.description like '${type}%' and roleType.id not in (:roles) group by roleType",[roles:assignedRoles, person:person])?.roleType
+		if(existingRoles){
+			PartyRole.executeUpdate("delete from PartyRole where party = '$person.id' and roleType in (:roles)",[roles:existingRoles])
+		}
+	 }
 }
 

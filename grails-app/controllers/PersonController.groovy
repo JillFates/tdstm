@@ -440,11 +440,7 @@ class PersonController {
 				}
 				if(params.manageRoles != '0' && params.role){
 					if(params.role){
-                        def existingRoles = PartyRole.findAll("from PartyRole where party = :person and roleType.description like 'staff%' \
-                                                                and roleType.id not in (:roles) group by roleType",[roles:params.role, person:personInstance])?.roleType
-                        if(existingRoles){
-                            PartyRole.executeUpdate("delete from PartyRole where party = '$personInstance.id' and roleType in (:roles)",[roles:existingRoles])
-                        }
+						partyRelationshipService.updatePartyRoleByType('staff', personInstance, params.role)
 						Set newRoles = []
 						newRoles.addAll(params.role)
 						userPreferenceService.setUserRoles(newRoles, personInstance.id)

@@ -44,13 +44,13 @@
                         <tr class="prop">
                             <td valign="top" class="name">Person:</td>
                             
-                            <td valign="top" class="value"><g:link controller="person" action="show" id="${userLoginInstance?.person?.id}">${userLoginInstance?.person?.encodeAsHTML()}</g:link></td>
+                            <td nowrap="nowrap" valign="top" class="value"><g:link controller="person" action="show" id="${userLoginInstance?.person?.id}">${userLoginInstance?.person?.encodeAsHTML()}</g:link></td>
                             
                         </tr>
                     	<tr class="prop">
                             <td valign="top" class="name"><g:message code="userLogin.expiryDate.label" default="Expiry Date" />:</td>
                             
-                            <td valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.expiryDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+                            <td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.expiryDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
                             
                         </tr>
                     	<tr class="prop">
@@ -59,7 +59,7 @@
 
                             	
 
-                            <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'active')}</td>
+                            <td nowrap="nowrap" valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'active')}</td>
 
                             
 
@@ -69,18 +69,27 @@
                         <tr class="prop">
                             <td valign="top" class="name">Created Date:</td>
                             
-                            <td valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.createdDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+                            <td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.createdDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
                             
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name">Last Login:</td>
                             
-                            <td valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.lastLogin}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+                            <td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.lastLogin}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
                             
                         </tr>
 
-                        
+                        <g:each in="${roleList}" var="role">
+                            	<tr class="prop">
+                            	 <td valign="top" class="value" >
+                            	     ${role}:
+                            	 </td>
+                            	 <td valign="top" class="value" >
+                            	     <input type="checkbox" id="${role.id}" name="assignedRole"  value="${role.id}" disabled="disabled" ${assignedRoles.id.contains(role.id) ? 'checked="checked"' : ''} />
+                            	 </td>
+                            	</tr>
+                         </g:each>
                     
                     </tbody>
                 </table>

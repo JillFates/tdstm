@@ -158,7 +158,25 @@
                                 </td>
 
                             </tr> 
-                            <tr class="prop">
+                            <g:each in="${roleList}" var="role">
+                            	<tr class="prop">
+                            	 <td valign="top" class="value" >
+                            	     ${role}:
+                            	 </td>
+                            	 <td valign="top" class="value" >
+                            	     <input type="checkbox" name="assignedRole"  value="${role.id}" />
+                            	 </td>
+                            	</tr>
+                            </g:each>
+                            <%--<tr class="prop">
+                              <td valign="top" class="value" >
+                              	<table style="border: none;">
+                              		   
+                              		
+                              	</table>
+                              </td>
+                            </tr>
+                            --%><%--<tr class="prop">
                                 <td valign="top" class="value" colspan="2">
 
                                 <table style="border: none;">
@@ -248,7 +266,7 @@
                                 </td>
 
                                 
-                            </tr> 
+                            </tr> --%>
 
                                                    
                         </tbody>
