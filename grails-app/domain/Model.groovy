@@ -115,7 +115,7 @@ class Model {
 	}
 	
 	static mapping  = {	
-		version false
+		autoTimestamp false
 		columns {
 			id column:'model_id'
 			modelName column: 'name'

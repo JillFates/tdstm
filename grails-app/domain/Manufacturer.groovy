@@ -6,7 +6,6 @@ class Manufacturer {
 	String aka		// TODO - DELETE aka
 	Date dateCreated
 	Date lastModified
-	UserLogin userlogin
 
 	static hasMany = [ 
 		models:Model, 
@@ -42,6 +41,7 @@ class Manufacturer {
 	
 	static mapping  = {	
 		version false
+		autoTimestamp false
 		id column:'manufacturer_id'
 	}
 	
