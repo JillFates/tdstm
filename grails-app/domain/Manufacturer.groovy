@@ -35,7 +35,6 @@ class Manufacturer {
 				return true
 			}
         })
-		userlogin( blank:false)
 		lastModified( blank:true, nullable:true )
 	}
 	

@@ -30,9 +30,7 @@ class ModelSyncBatchController {
 						manufacturerInstance = Manufacturer.findByName( manufacturerSync.name )
 						if(!manufacturerInstance){
 							manufacturerInstance = new Manufacturer( name : manufacturerSync.name,  
-																	 //aka:manufacturerSync.aka,
-																	 description : manufacturerSync.description,
-																	 userlogin:loggedUser
+																	 description : manufacturerSync.description
 																	)
 							if ( !manufacturerInstance.validate() || !manufacturerInstance.save() ) {
 								def etext = "Unable to create manufacturerInstance" +

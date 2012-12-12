@@ -144,7 +144,6 @@ class ManufacturerController {
     def save = {
 		def loggedUser = securityService.getUserLogin()
         def manufacturerInstance = new Manufacturer(params)
-		manufacturerInstance.userlogin = loggedUser
         if(!manufacturerInstance.hasErrors() && manufacturerInstance.save()) {
 			def akaNames = params.list('aka')
 			if(akaNames.size() > 0){
