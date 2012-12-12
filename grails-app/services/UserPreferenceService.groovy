@@ -334,4 +334,38 @@ class UserPreferenceService  {
 		}	
 		return message
     }
+	
+	/**
+	 * Set the preference for the given user and code.
+	 * @param userLogin
+	 * @param preference
+	 * @param value
+	 * @return
+	 */
+	def addOrUpdatePreferenceToUser(def userLogin, def preference, def value){
+		def userPreference = UserPreference.findByUserLoginAndPreferenceCode(userLogin, preference)
+		if(userPreference){
+			userPreference.value = value
+		} else {
+			userPreference = new UserPreference(
+												userLogin:userLogin, 
+												preferenceCode:preference, 
+												value:value 
+												)
+		}
+		if (! userPreference.save( insert: true, flush:true)) {
+			log.error "addPreference: failed insert : ${GormUtil.allErrorsString(userPreference)}"
+		}
+	}
+	
+	/**
+	 * get the preference for the given user and preferenceCode
+	 * @param userLogin
+	 * @param preference
+	 * @return
+	 */
+	def getPreferenceByUserAndCode(def userLogin, def preference){
+		def userPreference = UserPreference.findByUserLoginAndPreferenceCode(userLogin, preference)
+		return userPreference.value
+	}
 }

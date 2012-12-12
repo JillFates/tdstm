@@ -158,6 +158,16 @@
                                 </td>
 
                             </tr> 
+                           	<tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="active">Project:</label>
+                                </td>
+                                <td valign="top" class="value">
+                                    <g:select id="project" name="project" from="${projectList}" 
+                                    	noSelection="${['':'Select a project...']}"
+                                    	optionKey="id" optionValue="name"/>
+                                </td>
+                            </tr>
                             <g:each in="${roleList}" var="role">
                             	<tr class="prop">
                             	 <td valign="top" class="value" >

@@ -146,7 +146,10 @@ class UserLoginController {
         	def availableRoles = userPreferenceService.getAvailableRoles( person )
             def assignedRoles = userPreferenceService.getAssignedRoles( person )
             def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
-            return [ userLoginInstance : userLoginInstance, availableRoles:availableRoles, assignedRoles:assignedRoles, companyId:companyId, roleList:roleList  ]
+			def projectList = Project.list(sort:'name', order:'asc')
+			def projectId = userPreferenceService.getPreferenceByUserAndCode(userLoginInstance, "CURR_PROJ")
+            return [ userLoginInstance : userLoginInstance, availableRoles:availableRoles, assignedRoles:assignedRoles, companyId:companyId, roleList:roleList,
+					projectList:projectList,  projectId:projectId  ]
         }
     }
 	/*
@@ -182,6 +185,7 @@ class UserLoginController {
 					def personInstance = Person.get(person)
 					partyRelationshipService.updatePartyRoleByType('system', personInstance, assignedRoles)
 	            	userPreferenceService.setUserRoles(assignedRoles, person)
+					userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "CURR_PROJ", params.project)
 	                flash.message = "UserLogin ${userLoginInstance} updated"
 	                redirect( action:show, id:userLoginInstance.id, params:[ companyId:companyId ] )
 	            } else {
@@ -229,7 +233,10 @@ class UserLoginController {
 		def expiryDate = new Date(GormUtil.convertInToGMT( "now", "EDT" ).getTime() + 7776000000)
         userLoginInstance.expiryDate = expiryDate
 		def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
-		return ['userLoginInstance':userLoginInstance, personInstance:personInstance, companyId:companyId, roleList:roleList ]
+		def project = securityService.getUserCurrentProject()
+		def projectList = Project.list(sort:'name', order:'asc')
+		return ['userLoginInstance':userLoginInstance, personInstance:personInstance, companyId:companyId, roleList:roleList, projectList:projectList,
+			 	project:project]
     }
 	/*
 	 *  Save the User details and set the user roles for Person
@@ -254,11 +261,8 @@ class UserLoginController {
         	def assignedRoles = request.getParameterValues("assignedRole");
         	def person = params.person.id
         	userPreferenceService.setUserRoles(assignedRoles, person)
-			def userPreference = new UserPreference()
-			userPreference.userLogin = userLoginInstance
-			userPreference.preferenceCode = "START_PAGE"
-			userPreference.value = "Current Dashboard"
-			userPreference.save( insert: true)
+			userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "START_PAGE", "Current Dashboard")
+			userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "CURR_PROJ", params.project)
 			def tZPreference = new UserPreference()
 			tZPreference.userLogin = userLoginInstance
 			tZPreference.preferenceCode = "CURR_TZ"
