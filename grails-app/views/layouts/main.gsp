@@ -126,31 +126,19 @@
     <div id="personDialog" title="Edit Person" style="display:none;">
       <div class="dialog">
           <div class="dialog">
-          
-          
             <table>
               <tbody>
-              <tr>
-				<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
-				</tr>
-
-              	<tr class="prop">
-                	<td valign="top" class="name">
-                    	<label for="password">Password:&nbsp;</label>
-					</td>
-                    <td valign="top" class="value">
-                    	<input type="hidden" id="personId" name="personId" value=""/>
-						<input type="password" maxlength="25" name="password" id="passwordId" value=""/>
-					</td>
-				</tr>
+                <tr>
+                    <td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+                </tr>
 
                 <tr class="prop">
-                  <td valign="top" class="name">
-                    <label for="firstName"><b>First Name:&nbsp;<span style="color: red">*</span></b></label>
-                  </td>
-                  <td valign="top" class="value">
-                    <input type="text" maxlength="64" id="firstNameId" name="firstName"/>
-                  </td>
+                    <td valign="top" class="name">
+                        <label for="firstName"><b>First Name:&nbsp;<span style="color: red">*</span></b></label>
+                    </td>
+                    <td valign="top" class="value">
+                        <input type="text" maxlength="64" id="firstNameId" name="firstName"/>
+                    </td>
                 </tr>
 
                 <tr class="prop">
@@ -186,33 +174,92 @@
                     <input type="text" maxlength="64" id="emailId" name="email"/>
                   </td>
                 </tr>
+                
+                <tds:hasPermission permission='PersonExpiryDate'>
+                    <tr class="prop">
+                        <td valign="top" class="name">
+                            <label for="nickName"><b>Expiry Date:<span style="color: red">*</span></label>
+                        </td>
+                        <td valign="top" class="value">
+                        <script type="text/javascript">
+                            $(document).ready(function(){
+                                $("#expiryDateId").datetimepicker();
+                            });
+                        </script>
+                        <input type="text" maxlength="64" id="expiryDateId" name="expiryDate"/>
+                        <input type="text" maxlength="64" id="expiryDateId" name="expiryDate" readonly="readonly" style="background: none;border: 0"/>
+                        </td>
+                    </tr>
+                </tds:hasPermission>
+                
                 <tr class="prop">
-                  <td valign="top" class="name">
-                    <label for="nickName"><b>Expiry Date:<span style="color: red">*</span></label>
-                  </td>
-                  <td valign="top" class="value">
-                   <tds:hasPermission permission='PersonExpiryDate '>
-                   <script type="text/javascript">
-						$(document).ready(function(){
-				        	$("#expiryDateId").datetimepicker();
-				        });
-				    </script>
-				    
-                    <input type="text" maxlength="64" id="expiryDateId" name="expiryDate"/>
-                    </tds:hasPermission>
-                    <tds:hasPermission permission='PersonExpiryDate '>
-                    <input type="text" maxlength="64" id="expiryDateId" name="expiryDate" readonly="readonly" style="background: none;border: 0"/>
-                    </tds:hasPermission>
-                  </td>
+                    <td valign="top" class="name">
+                        <label for="title">Time Zone:</label>
+                    </td>
+                    <td valign="top" class="value">
+                        <g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
+                        value="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>
+                    </td>
                 </tr>
-                 <tr class="prop">
-                  <td valign="top" class="name">
-                    <label for="title">Time Zone:</label>
-                  </td>
-                  <td valign="top" class="value">
-                    <g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
-                    value="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>
-                  </td>
+                
+                    <tr class="prop">
+                        <td valign="top" class="name">
+                            <label for="startPage">Start Page:</label>
+                        </td>
+                        <td valign="top" class="value">
+                        <g:if test="${RolePermissions.hasPermission('AdminMenuView')}">
+                            <g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard','Admin Portal']}" 
+                            value="${session.getAttribute('START_PAGE')?.START_PAGE}"/>
+                        </g:if>
+                        <g:else>
+                        <g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard']}" 
+                            value="${session.getAttribute('START_PAGE')?.START_PAGE}"/>
+                        </g:else>
+                        </td>
+                    </tr>
+                <tr class="prop">
+                    <td valign="top" class="name">
+                       <label for="title">Power In:</label>
+                    </td>
+                    <td valign="top" class="value">
+                        <g:select name="powerType" id="powerTypeId" from="${['Watts','Amps']}" 
+                        value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE}"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td valign="top" class="name">
+                       <label for="title">Model Score:</label>
+                    </td>
+                    <td valign="top" class="value">
+                       <input type="text" name ="modelScore" id ="modelScoreId" readonly="readonly" value="${person?.modelScore}"/>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td valign="top" class="name">
+                        <label for="password">Old Password:&nbsp;</label>
+                    </td>
+                    <td valign="top" class="value">
+                        <input type="hidden" id="personId" name="personId" value=""/>
+                        <input type="password" maxlength="25" name="oldPassword" id="oldPasswordId" value=""/>
+                    </td>
+                </tr>
+
+                <tr class="prop">
+                    <td valign="top" class="name">
+                        <label for="password">New Password:&nbsp;</label>
+                    </td>
+                    <td valign="top" class="value">
+                        <input type="password" maxlength="25" name="newPassword" id="newPasswordId" value=""/>
+                    </td>
+                </tr>
+
+                <tr class="prop">
+                    <td valign="top" class="name">
+                        <label for="password">New Password (confirm):&nbsp;</label>
+                    </td>
+                    <td valign="top" class="value">
+                        <input type="password" maxlength="25" name="newPasswordConfirm" id="newPasswordConfirmId" value=""/>
+                    </td>
                 </tr>
               </tbody>
             </table>
@@ -221,80 +268,8 @@
             <span class="button"><input type="button" class="edit" value="Update" onclick="changePersonDetails()"/></span>
             <span class="button"><input type="button" class="delete" onclick="jQuery('#personDialog').dialog('close')" value="Cancel" /></span>
           </div>
-          
       </div>
     </div>
-    <script type="text/javascript">
-   // making timout for idle pages 
-    var timerId;
-	    timerId = window.setTimeout("timeOut()",(60000 * 120));
-	    
-	    function resetTimer() {
-	        window.clearTimeout(timerId);
-	        timerId = window.setTimeout("timeOut()",(60000 * 120));
-	    }
-	    function timeOut()
-	    {
-	        ${remoteFunction(controller:'auth',action:'signOut',onComplete:'sessionExpireOverlay()')};
-	    }
-	    function sessionExpireOverlay()
-	    {
-	    	window.parent.location = self.location;
-	    }
-	       $(document).keydown(function(){ resetTimer(); });
-	       $(document).mousedown(function(){ resetTimer(); });
-
-    // Update person details 
-	function updatePersonDetails( e ){
-		var personDetails = eval("(" + e.responseText + ")");
-		$("#personId").val(personDetails.person.id)
-		$("#firstNameId").val(personDetails.person.firstName);
-		$("#lastNameId").val(personDetails.person.lastName);
-		$("#nickNameId").val(personDetails.person.nickName);
-		$("#emailId").val(personDetails.person.email);
-		$("#titleId").val(personDetails.person.title);
-		$("#expiryDateId").val(personDetails.expiryDate);
-		$("#personDialog").dialog('option', 'width', 500)
-	    $("#personDialog").dialog("open")
-  	}
-	function changePersonDetails(){
-		var returnVal = true 
-    	var firstName = $("#firstNameId").val()
-        var email = $("#emailId").val()
-        var expiryDate = $("#expiryDateId").val()
-        if(!firstName) {
-            alert("First Name should not be blank ")
-            returnVal = false
-        } else if( email && !emailRegExp.test(email)){
-        	 alert(email +" is not a valid e-mail address ")
-             returnVal = false
-        } else if(!expiryDate){
-        	alert("Expiry Date should not be blank ")
-            returnVal = false
-        } else  if(!dateRegExpForExp.test(expiryDate)){
-	        alert("Expiry Date should be in 'mm/dd/yyyy HH:MM AM/PM' format")
-	        returnVal = false
-        }
-        if(returnVal){
-			${remoteFunction(controller:'person', action:'updatePerson', 
-					params:'\'id=\' + $(\'#personId\').val() +\'&firstName=\'+$(\'#firstNameId\').val() +\'&lastName=\'+$(\'#lastNameId\').val()+\'&nickName=\'+$(\'#nickNameId\').val()+\'&title=\'+$(\'#titleId\').val()+\'&password=\'+$(\'#passwordId\').val()+\'&timeZone=\'+$(\'#timeZoneId\').val()+\'&email=\'+$(\'#emailId\').val()+\'&expiryDate=\'+$(\'#expiryDateId\').val()', 
-					onComplete:'updateWelcome(e)')}
-        }
-	}
-	  	function updateWelcome( e ){
-		  	var ret = eval("(" + e.responseText + ")");
-		  	$("#loginUserId").html(ret[0].name)
-		  	$("#tzId").html(ret[0].tz)
-		  	$("#personDialog").dialog('close')
-	  	}
-	  	function setUserTimeZone( tz ){
-	  		${remoteFunction(controller:'project', action:'setUserTimeZone', 
-					params:'\'tz=\' + tz ',	onComplete:'updateTimeZone(e)')}
-	  	}
-	  	function updateTimeZone( e ){
-		  	var sURL = unescape(window.location);
-		  	window.location.href = sURL;
-	  	}
-	</script>
+    <g:javascript src="tdsmenu.js" />
   </body>
 </html>

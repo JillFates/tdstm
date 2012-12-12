@@ -414,7 +414,12 @@ class PersonController {
 			def personInstance = Person.get(params.id)
 			def ret = []
 			params.travelOK == "1" ? params : (params.travelOK = 0)
+            
+            if(!personInstance.staffType && !params.staffType)
+                params.staffType = 'Hourly'
+            
 			personInstance.properties = params
+            
 			def personId
 			if ( !personInstance.hasErrors() && personInstance.save(flush:true) ) {
 				personId = personInstance.id
