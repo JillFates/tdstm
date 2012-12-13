@@ -31,7 +31,15 @@
  </tr>
   <tr>
 	 <td> Pre-move tasks :</td>
-	 <td>${reportService.size()}</td>
+	 <td>${preMoveSize}</td>
+ </tr>
+ <tr>
+	 <td> Schedule tasks :</td>
+	 <td>${sheduleSize}</td>
+ </tr>
+ <tr>
+	 <td>Post-move tasks:</td>
+	 <td>${postMoveSize}</td>
  </tr>
  <tr><td>
      <input type="checkbox" id="version" name="version" checked="checked" /> <label for="version"> <span id="runBook" style="vertical-align: text-bottom;"><b>Update version number</b></span></label>

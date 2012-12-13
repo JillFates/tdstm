@@ -1,4 +1,7 @@
 import java.text.SimpleDateFormat
+
+import jxl.write.Label
+
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 
 import com.tds.asset.Application
@@ -8,13 +11,14 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
-import com.tds.asset.AssetType
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetOptions
 import com.tds.asset.AssetTransition
+import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.WebUtil
 
 class MoveBundleService {
 	
@@ -549,4 +553,41 @@ class MoveBundleService {
              }
          }
      }
+	 /**
+	  * Method help to write data in excel sheet's appropriate column and remove redundant code.
+	  * @param exportList : list of data which is being export
+	  * @param columnList : list of column of sheet
+	  * @param sheet : sheet-name
+	  * @return void
+	  */
+	 def reportExport(def exportList, def columnList, def sheet, def startRow = 0){
+		 
+		 for ( int r=startRow; r < (exportList.size()+startRow); r++ ) {
+			 for (int c =0; c < columnList.size(); c++){
+				 def cellValue
+				 def attribName = columnList[c]
+				 switch(attribName){
+					 case "taskDependencies":
+					 	cellValue = WebUtil.listAsMultiValueString(exportList[r-startRow]."${columnList[c]}"?.predecessor)
+						break;
+					 case "assetEntity":
+					 	cellValue = exportList[r-startRow]."${columnList[c]}"?.assetType == "Application" ?  String.valueOf(exportList[r-startRow]."${columnList[c]}"?.assetName) : ''
+						break;
+					 case "duration":
+						 cellValue = exportList[r-startRow]."${columnList[c]}" ?  String.valueOf(exportList[r-startRow]."${columnList[c]}"+exportList[r-startRow].durationScale) : ''
+						 break;
+					 case "commentAssetEntity":
+						 cellValue = exportList[r-startRow].assetEntity ?  String.valueOf(exportList[r-startRow].assetEntity?.assetName) : ''
+						 break;
+				     case "":
+						 cellValue = ""
+						 break;
+					 default:
+						 cellValue = String.valueOf(exportList[r-startRow]?."${columnList[c]}" ?:'')
+						 break;
+				 }
+				 sheet.addCell( new Label( c, r, cellValue) )
+			 }
+		 }
+	 }
 }

@@ -1802,7 +1802,7 @@ class AssetEntityController {
 				personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")
 				dtCreated = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
 			}
-			if(assetComment.resolvedBy){
+			if(assetComment.dateResolved){
 				personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")
 				dtResolved = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
 			}
@@ -3683,7 +3683,7 @@ class AssetEntityController {
 		def selectControl = ''
 		if(workFlowTransition.size()){
 			def paramsMap = [selectId:'workFlowId', selectName:'workFlow', options:workFlowTransition, firstOption : [value:'', display:''],
-                            optionKey:'id', optionValue:'name', optionSelected:assetComment.workflowTransition?.id]
+                            optionKey:'id', optionValue:'name', optionSelected:assetComment?.workflowTransition?.id]
 			selectControl = HtmlUtil.generateSelect( paramsMap )
 		}
 		render selectControl
