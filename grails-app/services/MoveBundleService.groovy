@@ -560,7 +560,7 @@ class MoveBundleService {
 	  * @param sheet : sheet-name
 	  * @return void
 	  */
-	 def reportExport(def exportList, def columnList, def sheet, def startRow = 0){
+	 def issueExport(def exportList, def columnList, def sheet, def startRow = 0){
 		 
 		 for ( int r=startRow; r < (exportList.size()+startRow); r++ ) {
 			 for (int c =0; c < columnList.size(); c++){

@@ -669,7 +669,7 @@ class MoveEventController {
 						summarySheet.addCell( new Label( 2, 4, String.valueOf(moveEventInstance.name )) )
 						summarySheet.addCell( new Label( 2, 10, String.valueOf(moveEventInstance.name )) )
 						
-						moveBundleService.reportExport(assets, serverColumnList, serverSheet, 5)
+						moveBundleService.issueExport(assets, serverColumnList, serverSheet, 5)
 						
 						//moveBundleService.issueExport(applications, appColumnList, appSheet, 5)
 						
