@@ -78,8 +78,7 @@ class ManufacturerController {
     def delete = {
         def manufacturerInstance = Manufacturer.get( params.id )
         if(manufacturerInstance) {
-			ManufacturerAlias.executeUpdate("delete from ManufacturerAlias ma where ma.manufacturer = ${manufacturerInstance.id}")
-            manufacturerInstance.delete(flush:true)
+			manufacturerInstance.delete(flush:true)
             flash.message = "Manufacturer ${params.id} deleted"
             redirect(action:list)
         }

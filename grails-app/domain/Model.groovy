@@ -172,6 +172,11 @@ class Model {
 			bladeLabelCount = null
 		}
 	}
+	
+	def beforeDelete = {
+        Model.withNewSession { aliases*.delete() }
+	}
+	
 	def getAssetTypeList(){
 		return EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode("assetType"),[sort:'value',order:'asc'])?.value
 	}

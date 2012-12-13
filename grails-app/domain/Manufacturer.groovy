@@ -56,6 +56,10 @@ class Manufacturer {
 		lastModified = TimeUtil.convertInToGMT( "now", "EDT" )
 	}
 	
+	def beforeDelete = {
+        Manufacturer.withNewSession { aliases*.delete() }
+	}
+	
 	/*
 	 * @return: Number of Models associated with this Manufacturer 
 	 */
