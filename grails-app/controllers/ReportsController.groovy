@@ -17,6 +17,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetDependency
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.WebUtil
 
 class ReportsController {
 	
@@ -684,24 +685,26 @@ class ReportsController {
     								(assetComment?.assetEntity?.targetRackPosition ? assetComment?.assetEntity?.targetRackPosition : "--")
     			if( params.reportResolveInfo == "true" || assetComment.isResolved != 1 ) {
     				reportFields <<['assetName':assetComment?.assetEntity?.assetName, 'assetTag':assetComment?.assetEntity?.assetTag,'moveBundle' :assetComment?.assetEntity?.moveBundle?.name,
-    								'sourceTargetRoom':sourceTargetRoom,'commentCode':assetComment.commentCode ? assetComment.commentCode : "",
-    								'commentType':assetComment.commentType,
+    								'sourceTargetRoom':sourceTargetRoom,
+    								'commentType':assetComment.commentType == 'issue' ? 'Task' : assetComment.commentType,
     								'model':(assetComment?.assetEntity?.manufacturer ? assetComment?.assetEntity?.manufacturer?.toString() : "")+" "+(assetComment?.assetEntity?.model ? assetComment?.assetEntity?.model : "" ), 
     								'occuredAt':GormUtil.convertInToUserTZ( assetComment?.dateCreated, tzId ), 'createdBy':assetComment?.createdBy?.firstName+" "+assetComment?.createdBy?.lastName, 
 									'owner':assetComment?.assignedTo ? assetComment?.assignedTo?.firstName+" "+assetComment?.assignedTo?.lastName : '',
     								'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
     								'clientName':projectInstance?.client?.name,"resolvedInfoInclude":resolvedInfoInclude,
-    								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
+    								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate )),
+									'previousNote':WebUtil.listAsMultiValueString(assetComment.notes) ]
     			}
     			if( params.reportResolveInfo == "true" && assetComment.isResolved == 1 ) {
     				reportFields <<['assetName':null, 'assetTag':null, 'moveBundle' :null,'sourceTargetRoom':null,'model':null, 
-									'commentCode':assetComment.commentCode ? assetComment.commentCode : "",'commentType':assetComment.commentType,
+									'commentType':assetComment.commentType == 'issue' ? 'Task' : assetComment.commentType,
 									'occuredAt':GormUtil.convertInToUserTZ( assetComment?.dateResolved, tzId ), 
     								'createdBy':assetComment?.resolvedBy?.firstName+" "+assetComment?.resolvedBy?.lastName, 
 									'owner':assetComment?.assignedTo ? assetComment?.assignedTo?.firstName+" "+assetComment?.assignedTo?.lastName : '',
     								'issue':assetComment?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
     								'clientName':projectInstance?.client?.name,
-    								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
+    								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate )),
+									'previousNote':WebUtil.listAsMultiValueString(assetComment.notes) ]
     			}
     		}
 			if( params.newsInfo == "true" ) {
@@ -710,13 +713,14 @@ class ReportsController {
 				moveEventNewsList.each{ moveEventNews ->
 					moveEventNews?.resolution = moveEventNews?.resolution ? moveEventNews?.resolution : ''
 					reportFields <<['assetName':'', 'assetTag':'', 'moveBundle' :'','sourceTargetRoom':'','model':'',
-								'commentCode':"",'commentType':"news",
+								'commentType':"news",
 								'occuredAt':GormUtil.convertInToUserTZ( moveEventNews?.dateCreated, tzId ),
 								'createdBy':moveEventNews?.createdBy.toString(),
 								'owner':'',
 								'issue':moveEventNews.message +"/"+  moveEventNews?.resolution , 'bundleNames':'','projectName':projectInstance?.name,
 								'clientName':projectInstance?.client?.name,
-								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
+								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) ),
+								'previousNote':'']
 				}
 
 			}

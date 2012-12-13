@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="issueReport" pageWidth="1200" pageHeight="842" orientation="Landscape" columnWidth="1060" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
 	<property name="ireport.zoom" value="1.0"/>
-	<property name="ireport.x" value="16"/>
+	<property name="ireport.x" value="403"/>
 	<property name="ireport.y" value="0"/>
 	<style name="border">
 		<pen lineWidth="0.0"/>
@@ -21,7 +21,7 @@
 	</queryString>
 	<field name="assetName" class="java.lang.String"/>
 	<field name="assetTag" class="java.lang.String"/>
-    <field name="moveBundle" class="java.lang.String"/>
+	<field name="moveBundle" class="java.lang.String"/>
 	<field name="sourceTargetRoom" class="java.lang.String"/>
 	<field name="model" class="java.lang.String"/>
 	<field name="occuredAt" class="java.util.Date"/>
@@ -36,6 +36,7 @@
 	<field name="commentCode" class="java.lang.String"/>
 	<field name="commentType" class="java.lang.String"/>
 	<field name="owner" class="java.lang.String"/>
+	<field name="previousNote" class="java.lang.String"/>
 	<background>
 		<band/>
 	</background>
@@ -74,14 +75,14 @@
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{clientName}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{clientName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement x="105" y="64" width="250" height="20"/>
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{bundleNames}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{bundleNames}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="105" y="44" width="250" height="20"/>
@@ -116,7 +117,7 @@
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[MoveBundle]]></text>
+				<text><![CDATA[Bundle]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="264" y="0" width="149" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
@@ -133,53 +134,46 @@
 				<text><![CDATA[Model]]></text>
 			</staticText>
 			<staticText>
-				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="767" y="0" width="85" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="679" y="0" width="85" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Created/Resolved By ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="675" y="0" width="92" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="587" y="0" width="92" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Created/Resolved At ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="940" y="0" width="177" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="495" y="0" width="92" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[Issue/Resolution ]]></text>
-			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement x="5" y="-20" width="500" height="20"/>
-				<textElement verticalAlignment="Bottom">
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{resolvedInfoInclude}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="495" y="0" width="88" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
-				<textElement textAlignment="Center">
-					<font size="12"/>
-				</textElement>
-				<text><![CDATA[Comment Code]]></text>
+				<text><![CDATA[Issue Type]]></text>
 			</staticText>
 			<staticText>
-				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="583" y="0" width="92" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
-				<textElement textAlignment="Center">
-					<font size="12"/>
-				</textElement>
-				<text><![CDATA[Comment Type]]></text>
-			</staticText>
-			<staticText>
-				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="852" y="0" width="88" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="764" y="0" width="88" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Owner]]></text>
+			</staticText>
+			<staticText>
+				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="852" y="0" width="131" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Previous Notes]]></text>
+			</staticText>
+			<staticText>
+				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="983" y="0" width="177" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Issue/Resolution ]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -190,77 +184,77 @@
 				<textElement>
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{assetName}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{assetName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="border" stretchType="RelativeToTallestObject" x="89" y="0" width="88" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{assetTag}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{assetTag}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="border" stretchType="RelativeToTallestObject" x="264" y="0" width="149" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{sourceTargetRoom}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{sourceTargetRoom}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="border" stretchType="RelativeToTallestObject" x="413" y="0" width="82" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{model}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{model}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="border" stretchType="RelativeToTallestObject" x="675" y="0" width="92" height="20"/>
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="587" y="0" width="92" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{occuredAt}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="border" stretchType="RelativeToTallestObject" x="767" y="0" width="85" height="20"/>
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="679" y="0" width="85" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{createdBy}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{createdBy}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="border" stretchType="RelativeToTallestObject" x="940" y="0" width="177" height="20"/>
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="495" y="0" width="92" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{issue}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="border" stretchType="RelativeToTallestObject" x="495" y="0" width="88" height="20"/>
-				<textElement>
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{commentCode}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="border" stretchType="RelativeToTallestObject" x="583" y="0" width="92" height="20"/>
-				<textElement>
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{commentType}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{commentType}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="border" stretchType="RelativeToTallestObject" x="176" y="0" width="88" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression  class="java.lang.String"><![CDATA[$F{moveBundle}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{moveBundle}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="border" stretchType="RelativeToTallestObject" x="852" y="0" width="88" height="20"/>
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="764" y="0" width="88" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{owner}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{owner}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="border" stretchType="RelativeToTallestObject"  x="852" y="0" width="131" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{previousNote}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="border" stretchType="RelativeToTallestObject" x="983" y="0" width="177" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{issue}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
@@ -280,7 +274,7 @@
 				<textElement>
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["" + $V{PAGE_NUMBER}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["" + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="false">
 				<reportElement key="textField" x="782" y="6" width="170" height="19" forecolor="#000000" backcolor="#FFFFFF"/>
@@ -293,7 +287,7 @@
 				<textElement textAlignment="Right">
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["Page " + $V{PAGE_NUMBER} + " of "]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER} + " of "]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="424" y="5" width="101" height="20"/>
@@ -308,7 +302,7 @@
 			<textField>
 				<reportElement x="525" y="5" width="22" height="20"/>
 				<textElement/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{timezone}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{timezone}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="false">
 				<reportElement key="textField" x="23" y="6" width="141" height="19" forecolor="#000000" backcolor="#FFFFFF"/>
@@ -321,7 +315,7 @@
 				<textElement textAlignment="Center">
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{rptTime}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{rptTime}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>
