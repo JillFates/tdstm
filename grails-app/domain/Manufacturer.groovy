@@ -18,7 +18,7 @@ class Manufacturer {
 	}
 	
 	static mapping  = {	
-		version false
+		version true
 		autoTimestamp false
 		id column:'manufacturer_id'
 	}
@@ -59,7 +59,7 @@ class Manufacturer {
 	 *
 	 */
 	def findOrCreateByName(name, def createIfNotFound = false){
-		def manuAlias = ManufacturerAlias.findByNameAndManufacturer(name,this)
+		def manuAlias = ManufacturerAlias.findByNameAndManufacturer(name, this)
 		if(!manuAlias && createIfNotFound){
 			manuAlias = new ManufacturerAlias(name:name.trim(), manufacturer:this)
 			if(manuAlias.save(flush:true)){
