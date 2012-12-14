@@ -1388,9 +1388,10 @@ function showManufacturer(id){
 		asynchronous:false,
 		evalScripts:true,
 		onComplete:function(e){
-			var manufacturer = eval('(' + e.responseText + ')')
+			var data = eval('(' + e.responseText + ')')
+			var manufacturer = data.manufacturer
 			$("#showManuName").html( manufacturer.name )
-			$("#showManuAka").html( manufacturer.aka )
+			$("#showManuAka").html( data.aliases )
 			$("#showManuDescription").html( manufacturer.description )
 			$("#show_manufacturerId").val( manufacturer.id )
 			$("#manufacturerShowDialog").dialog("open")

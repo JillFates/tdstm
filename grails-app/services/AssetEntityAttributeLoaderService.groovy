@@ -465,12 +465,7 @@ class AssetEntityAttributeLoaderService {
 				model = Model.findByModelNameAndManufacturer( modelValue, manufacturer )
 				//model = model?.find{it.assetType == assetEntity?.assetType}
 				if( !model ){
-					def models = Model.findAllByManufacturerAndAkaIsNotNull( manufacturer )//.findAll{it.assetType == assetEntity?.assetType}
-					models.each{ m->
-						if(m.aka.toLowerCase().contains( modelValue.toLowerCase() )){
-							model = m
-						}
-					}
+					model = ModelAlias.findByNameAndManufacturer(modelValue,manufacturer).model
 					if(!model){
 						def dtvAssetType = dtvList.find{it.eavAttribute.attributeCode == "assetType"}
 						def assetType = dtvAssetType?.correctedValue ? dtvAssetType?.correctedValue : dtvAssetType?.importValue

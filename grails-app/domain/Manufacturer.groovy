@@ -3,7 +3,6 @@ import com.tdssrc.grails.TimeUtil
 class Manufacturer {
 	String name
 	String description
-	String aka		// TODO - DELETE aka
 	Date dateCreated
 	Date lastModified
 
@@ -15,26 +14,6 @@ class Manufacturer {
 	static constraints = {
 		name( blank:false, nullable:false, unique:true )
 		description( blank:true, nullable:true )
-		// TODO - DELETE aka
-		aka( blank:true, nullable:true, validator: { val, obj ->
-			if(val){
-				def isDuplicated = false
-				def akaArray = val.split(",")
-				def manufacturers = Manufacturer.findAllByAkaIsNotNull()
-				manufacturers = obj.id ? manufacturers.findAll{it.id != obj.id } : manufacturers
-				manufacturers?.aka?.each{ akaString->
-					akaArray.each{
-						if(akaString.toLowerCase().contains( it.toLowerCase() )){
-							isDuplicated = true
-						}
-					}
-				}
-				if(isDuplicated)
-	            return ['invalid.string']
-			} else {
-				return true
-			}
-        })
 		lastModified( blank:true, nullable:true )
 	}
 	

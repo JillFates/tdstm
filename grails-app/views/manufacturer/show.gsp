@@ -61,7 +61,7 @@
                     	<g:each in="${Manufacturer.findAllByIdNotEqual(manufacturerInstance?.id)?.sort{it.name}}" status="i" var="manufacturer">
                     		<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 	                            <td valign="top" class="name">
-	                            	<g:link action="merge" id="${manufacturer.id}" params="[fromId:manufacturerInstance?.id]" style="font-weight: ${manufacturer.aka ? 'bold' : 'normal'}">
+	                            	<g:link action="merge" id="${manufacturer.id}" params="[fromId:manufacturerInstance?.id]" style="font-weight: ${manuAlias ? 'bold' : 'normal'}">
 		                            	${manufacturer.name}
 		                            </g:link>
 	                            </td>

@@ -216,7 +216,7 @@
             	<g:each in="${Model.findAll('from Model where id != ? and manufacturer = ?', [modelInstance?.id, modelInstance?.manufacturer])?.sort{it.modelName}}" status="i" var="model">
             		<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                      <td valign="top" class="name">
-                     	<g:link action="merge" id="${model.id}" params="[fromId:modelInstance?.id]" style="font-weight: ${model.aka ? 'bold' : 'normal'}">
+                     	<g:link action="merge" id="${model.id}" params="[fromId:modelInstance?.id]" style="font-weight: ${modelAkas ? 'bold' : 'normal'}">
                       	${model.modelName}
                       </g:link>
                      </td>

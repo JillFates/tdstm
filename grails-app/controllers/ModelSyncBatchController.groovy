@@ -146,7 +146,6 @@ class ModelSyncBatchController {
 							}
 						} else{
 							if(modelInstance.sourceTDSVersion < modelSync.sourceTDSVersion){
-								modelInstance.aka = modelSync.aka
 								modelInstance.description = modelSync.description 
 								modelInstance.powerNameplate = modelSync.powerNameplate
 								modelInstance.powerDesign = modelSync.powerDesign
@@ -180,7 +179,7 @@ class ModelSyncBatchController {
 									if(modelSync.aka){
 										def akas = modelSync.aka?.split(",")
 										akas.each{
-											def akaExist = Model.findByName(it.trim())
+											def akaExist = Model.findByModelName(it.trim())
 											if( !akaExist ){
 												modelInstance.findOrCreateByName(it.trim(), true)
 											}
@@ -189,11 +188,9 @@ class ModelSyncBatchController {
 									modelUpdated ++
 								}
 							}
-						}
 					} else {
 						if(modelInstance.sourceTDSVersion < modelSync.sourceTDSVersion){
 						    
-						    modelInstance.aka = modelSync.aka
 							modelInstance.description = modelSync.description 
 							modelInstance.powerNameplate = modelSync.powerNameplate
 							modelInstance.powerDesign = modelSync.powerDesign
@@ -228,7 +225,7 @@ class ModelSyncBatchController {
 								if(modelSync.aka){
 									def akas = modelSync.aka?.split(",")
 									akas.each{
-										def akaExist = Model.findByName(it.trim())
+										def akaExist = Model.findByModelName(it.trim())
 										if( !akaExist ){
 											modelInstance.findOrCreateByName(it.trim(), true)
 										}

@@ -360,22 +360,26 @@ class ModelController {
             modelInstance.frontImage = frontImage
 			
 			def oldModelManufacturer = modelInstance.manufacturer.id
-			def oldModelType = modelInstance.assetType
-            def deletedAka = params.deletedAka
-            def akaToSave = params.list('aka')
-			if(deletedAka){
-				ModelAlias.executeUpdate("delete from ModelAlias mo where mo.id in (${deletedAka})")
-			}
-			def modelAliasList = ModelAlias.findAllByModel( modelInstance )
-			modelAliasList.each{ modelAlias->
-				modelAlias.name = params["aka_"+modelAlias.id]
-				modelAlias.save(flush:true)
-			}
-			akaToSave.each{aka->
-				modelInstance.findOrCreateByName(aka, true)
-			}
+			def oldModelType = modelInstance.assetType          
 			
-			if (!modelInstance.hasErrors() && modelInstance.save(flush: true)) {
+			if (!modelInstance.hasErrors() && modelInstance.save()) {
+				
+				def deletedAka = params.deletedAka
+				def akaToSave = params.list('aka')
+				if(deletedAka){
+					ModelAlias.executeUpdate("delete from ModelAlias mo where mo.id in (${deletedAka})")
+				}
+				def modelAliasList = ModelAlias.findAllByModel( modelInstance )
+				modelAliasList.each{ modelAlias->
+					modelAlias.name = params["aka_"+modelAlias.id]
+					if(!modelAlias.save()){
+						modelAlias.errors.allErrors.each {println it}
+					}
+				}
+				akaToSave.each{aka->
+					modelInstance.findOrCreateByName(aka, true)
+				}
+				
 				def connectorCount = 0
 				if(params.connectorCount){
             	    connectorCount = Integer.parseInt(params.connectorCount)
@@ -511,6 +515,7 @@ class ModelController {
                 redirect(action: "show", id: modelInstance.id)
             }
             else {
+				modelInstance.errors.allErrors.each {log.error it}
             	def modelConnectors = ModelConnector.findAllByModel( modelInstance )
 				def otherConnectors = []
 				for(int i = modelConnectors.size()+1 ; i<51; i++ ){
@@ -1139,14 +1144,15 @@ class ModelController {
 		def powerDesign = model.powerDesign
 		def powerUsed = model.powerUse
 		if( session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts'){
-			powerNameplate = powerNameplate / 110
-			powerNameplate = powerNameplate.toDouble().round(1)
-			powerDesign = powerDesign / 110
-			powerDesign = powerDesign.toDouble().round(1)
-			powerUsed = powerUsed / 110
-			powerUsed = powerUsed.toDouble().round(1)
+			powerNameplate = powerNameplate ? powerNameplate / 110 : ''
+			powerNameplate = powerNameplate ? powerNameplate.toDouble().round(1) : ''
+			powerDesign = powerDesign ? powerDesign / 110 : ''
+			powerDesign = powerDesign ? powerDesign.toDouble().round(1) : ''
+			powerUsed = powerUsed ? powerUsed / 110 : ''
+			powerUsed = powerUsed ? powerUsed.toDouble().round(1) : ''
 		}
 		def modelMap = [id:model.id,
+						manufacturer:model.manufacturer?.name,
 						modelName:model.modelName,
 						description:model.description,
 						assetType:model.assetType,

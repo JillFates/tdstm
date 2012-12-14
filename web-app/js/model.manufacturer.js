@@ -6,7 +6,7 @@ function addAka(){
 	var trId = $("#manageAkaId").val() 
 	var spanId = "errSpan_"+trId
 	var textHtml = $("#akaDiv").html().replace(/errSpan/g,"errSpan_"+trId)
-	$("#addAkaTableId").append("<tr id='akaId_"+trId+"'><td>"+textHtml+
+	$("#addAkaTableId").append("<tr id='akaId_"+trId+"'><td nowrap='nowrap'>"+textHtml+
 		"<a href=\"javascript:deleteAkaRow(\'akaId_"+trId+"')\"><span class='clear_filter'><u>X</u></span></a>"+
 		"<br><div style='display:none' class='errors' id='errSpan_"+trId+"'></div>"+
 		"</td></tr>")

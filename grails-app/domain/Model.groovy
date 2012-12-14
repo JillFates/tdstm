@@ -47,7 +47,6 @@ class Model {
 	byte[] frontImage
 	byte[] rearImage
 	Project modelScope
-	String aka
 	Integer sourceTDS = 1
 	Integer sourceTDSVersion = 1
 	
@@ -89,25 +88,6 @@ class Model {
 		modelScope( nullable:true )
 		frontImage( nullable:true )
 		rearImage( nullable:true )
-		aka( blank:true, nullable:true, validator: { val, obj ->
-			if(val){
-				def isDuplicated = false
-				def akaArray = val.split(",")
-				def models = Model.findAllByManufacturerAndAkaIsNotNull( obj.manufacturer )
-				models = obj.id ? models.findAll{it.id != obj.id } : models
-				models?.aka?.each{ akaString->
-					akaArray.each{
-						if(akaString.toLowerCase().contains( it.toLowerCase() )){
-							isDuplicated = true
-						}
-					}
-				}
-				if(isDuplicated)
-	            return ['invalid.string']
-			} else {
-				return true
-			}
-        })
 		sourceTDS( nullable:true )
 		sourceTDSVersion( nullable:true )
 		lastModified( nullable:true )
@@ -213,7 +193,7 @@ class Model {
 		def modelAlias = ModelAlias.findByNameAndModel(name,this)
 		if(!modelAlias && createIfNotFound){
 			modelAlias = new ModelAlias(name:name.trim(), model:this, manufacturer:this.manufacturer)
-			if(modelAlias.save(flush:true)){
+			if(modelAlias.save()){
 				modelAlias.errors.allErrors.each { log.error it}
 			}
 		}

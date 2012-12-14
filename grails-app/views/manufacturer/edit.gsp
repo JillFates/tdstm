@@ -42,7 +42,7 @@
                                 <td valign="top" class="name">
                                     <label for="aka">AKA:</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:manufacturerInstance,field:'aka','errors')}">
+                                <td valign="top">
                                  
                                  <table style="border: 0px;margin-left: -8px;">
                                   <tbody id="addAkaTableId">

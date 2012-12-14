@@ -71,7 +71,7 @@ class ManufacturerController {
             redirect(action:list)
         }
 		else {
-			 def manuAlias = WebUtil.listAsMultiValueString(ManufacturerAlias.findAllByManufacturer( manufacturerInstance )?.name)
+			 def manuAlias = WebUtil.listAsMultiValueString(manufacturerInstance.getAliases()?.name)
 			 return [ manufacturerInstance : manufacturerInstance, manuAlias:manuAlias ] }
     }
 
@@ -216,7 +216,11 @@ class ManufacturerController {
 	def getManufacturerAsJSON = {
     	def id = params.id
     	def manufacturer = Manufacturer.get(params.id)
-    	render manufacturer as JSON
+		def jsonMap = [:]
+		jsonMap.put("manufacturer", manufacturer)
+		jsonMap.put("aliases", WebUtil.listAsMultiValueString(manufacturer.getAliases()?.name))
+		
+    	render jsonMap as JSON
     }
     
 	/**
