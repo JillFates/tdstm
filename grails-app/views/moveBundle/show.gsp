@@ -32,7 +32,7 @@
     function createSnapshot( stepId, value, e ) {
         var moveBundle = $("#moveBundleId").val()
     	var keyID = e.keyCode
-    	if(keyID == 13 && validateManulaValue( value )){
+    	if(keyID == 13 && validateManualVal( value )){
     		${remoteFunction(controller:'moveBundle', action:'createManualStep', params:'\'moveBundleId=\'+ moveBundle +\'&moveBundleStepId=\'+ stepId +\'&tasksCompleted=\'+value', onComplete:'updateStepValue(e , stepId, value)')}
     	}
     }
@@ -50,27 +50,56 @@
         }
     }
  	// validate the dial manual input valueinput value
-	function validateManulaValue(value){
+	function validateManualVal(value){
 		var check = true
 		if( !isNaN(value) ){
 			if(value > 100){
-				alert("Manula step value should not be greater than 100")
+				alert("Manual step value should not be greater than 100")
 				check = false
 			}
 		} else {
-			alert("Manula step value should be Alpha Numeric ")
+			alert("Manual step value should be Alpha Numeric")
 			check = false
 		}
 		return check
 	}
 
 	function createTask(id){
-		 new Ajax.Request('../createTask?bundleId='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){$("#createTasksId").hide();alert(e.responseText)}})
+		$("#messageDiv").hide();
+        $("#messageDiv").html('');
+       	var confirmStatus = confirm('Are you sure you want to create all tasks for this move event?')
+       	if(confirmStatus){
+		   $("#createTasksInput").attr("disabled",true);		   
+		   $("#deleteTasksInput").attr("disabled",true);		   
+	       $("#messageDiv").html('Creating all tasks for the bundle. Please note that this may take a few minutes to complete.');
+		   $("#messageDiv").show();
+		   new Ajax.Request('../createTask?bundleId='+id,
+			{asynchronous:true,evalScripts:true,
+				onComplete:function(e){
+					$("#messageDiv").html(e.responseText);
+					$("#deleteTasksInput").attr("disabled",false);
+				}
+			})
+		}
 	}
 
 	function deleteTask(id){
-		if(confirm("are you sure you want to delete the generated tasks?")){
-			new Ajax.Request('../deleteWorkflowTasks?bundleId='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){$("#createTasksId").show();alert(e.responseText)}})
+		$("#messageDiv").hide();
+        $("#messageDiv").html('');
+		if(confirm("Are you sure you want to delete the generated tasks?")){
+	       $("#messageDiv").html('Deleting all tasks for the bundle.');
+		   $("#messageDiv").show();
+		   $("#createTaskInput").attr("disabled",true);		   
+		   $("#deleteTaskInput").attr("disabled",true);		   
+		   new Ajax.Request('../deleteWorkflowTasks?bundleId='+id, 
+			{asynchronous:true,evalScripts:true,
+				onComplete:function(e){
+					$("#messageDiv").html(e.responseText);
+					$("#createTasksInput").attr('disabled',false);
+					$("#createTasksInput").show();
+					$("#deleteTasksInput").attr("disabled",false);
+				}
+			})
 		}
 	}
     </script>
@@ -208,10 +237,10 @@
           <g:if test="${showHistoryButton}">
           		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Are you sure you want to permanently clear transitions for assets in this bundle?');" value="Clear Asset History" action="clearBundleAssetHistory"/></span>
           </g:if>
-              <span class="button" style="display:${!moveBundleInstance.tasksCreated ? 'block':'none'}" id="createTasksId">
-                <input type="button"  class="edit" value="Create Tasks" onclick="createTask(${moveBundleInstance?.id})">  
+              <span class="button" style="display:${!moveBundleInstance.tasksCreated ? 'block':'none'}">
+                <input type="button" id="createTasksInput" class="edit" value="Create Tasks" onclick="createTask(${moveBundleInstance?.id})">  
               </span>
-              <span class="button"><input type="button"  class="edit" value="Delete Tasks" onclick="deleteTask(${moveBundleInstance?.id})">  </span>
+              <span class="button"><input type="button" id="deleteTaskInput" class="edit" value="Delete Tasks" onclick="deleteTask(${moveBundleInstance?.id})">  </span>
           </tds:hasPermission>
         </g:form>
       </div>

@@ -497,7 +497,8 @@
 			</script>
 		</g:if>
     </g:if>
-      <div class="main_bottom"><g:layoutBody /></div>
+      <div class="main_bottom"><div id="messageDiv" class="message" style="display:none"></div><g:layoutBody /></div>
+	  
     </div>
     <div id="personDialog" title="Edit Person" style="display:none;">
       <div class="dialog">
