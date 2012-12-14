@@ -101,32 +101,33 @@ class ModelSyncBatchController {
 					if( !modelInstance ){
 						modelInstance = Model.findByModelNameAndAssetType( modelSync.modelName,modelSync.assetType )
 						if(!modelInstance){
-							modelInstance = new Model( modelName : modelSync.modelName, 
-													   description : modelSync.description,
-													   assetType : modelSync.assetType,
-													   powerNameplate : modelSync.powerNameplate,
-													   powerDesign : modelSync.powerDesign,
-													   powerUse : modelSync.powerUse,
-													   usize : modelSync.usize,
-													   bladeRows : modelSync.bladeRows,
-													   bladeCount : modelSync.bladeCount,
-													   bladeLabelCount : modelSync.bladeLabelCount,
-													   sourceTDSVersion : 1,
-													   manufacturer : manufacturer,
-													   height : modelSync?.height,
-													   weight : modelSync?.weight,
-													   depth : modelSync?.depth,
-													   width : modelSync?.width,
-													   layoutStyle : modelSync.layoutStyle,
-													   productLine : modelSync.productLine,
-													   modelFamily : modelSync.modelFamily,
-													   endOfLifeDate : modelSync.endOfLifeDate,
-													   endOfLifeStatus : modelSync.endOfLifeStatus,
-													   createdBy : modelSync.createdBy,
-													   sourceURL : modelSync.sourceURL,
-													   modelStatus : modelSync.modelStatus,
-													   modelScope : modelSync.modelScope
-													  )
+							modelInstance = new Model( 
+							   modelName : modelSync.modelName, 
+							   description : modelSync.description,
+							   assetType : modelSync.assetType,
+							   powerNameplate : modelSync.powerNameplate,
+							   powerDesign : modelSync.powerDesign,
+							   powerUse : modelSync.powerUse,
+							   usize : modelSync.usize,
+							   bladeRows : modelSync.bladeRows,
+							   bladeCount : modelSync.bladeCount,
+							   bladeLabelCount : modelSync.bladeLabelCount,
+							   sourceTDSVersion : 1,
+							   manufacturer : manufacturer,
+							   height : modelSync?.height,
+							   weight : modelSync?.weight,
+							   depth : modelSync?.depth,
+							   width : modelSync?.width,
+							   layoutStyle : modelSync.layoutStyle,
+							   productLine : modelSync.productLine,
+							   modelFamily : modelSync.modelFamily,
+							   endOfLifeDate : modelSync.endOfLifeDate,
+							   endOfLifeStatus : modelSync.endOfLifeStatus,
+							   createdBy : modelSync.createdBy,
+							   sourceURL : modelSync.sourceURL,
+							   modelStatus : modelSync.modelStatus,
+							   modelScope : modelSync.modelScope
+							)
 							if ( !modelInstance.validate() || !modelInstance.save() ) {
 								def etext = "Unable to create modelInstance" +
 								GormUtil.allErrorsString( modelInstance )
@@ -144,8 +145,9 @@ class ModelSyncBatchController {
 							    }
 								modelAdded ++
 							}
-						} else{
-							if(modelInstance.sourceTDSVersion < modelSync.sourceTDSVersion){
+						} else {
+							if (modelInstance.sourceTDSVersion < modelSync.sourceTDSVersion) {
+								
 								modelInstance.description = modelSync.description 
 								modelInstance.powerNameplate = modelSync.powerNameplate
 								modelInstance.powerDesign = modelSync.powerDesign
@@ -188,6 +190,7 @@ class ModelSyncBatchController {
 									modelUpdated ++
 								}
 							}
+						}
 					} else {
 						if(modelInstance.sourceTDSVersion < modelSync.sourceTDSVersion){
 						    
@@ -245,16 +248,17 @@ class ModelSyncBatchController {
 					if(model){
 						def connectorInstance = ModelConnector.findByConnectorAndModel( connectorSync.connector ,model)
 						if( !connectorInstance ){
-							connectorInstance = new ModelConnector( connector : connectorSync.connector,
-																	label : connectorSync.label,
-																	type : connectorSync.type,
-																	labelPosition : connectorSync.labelPosition,
-																	connectorPosX : connectorSync.connectorPosX,
-																	connectorPosY : connectorSync.connectorPosY,
-																	status : connectorSync.status,
-																	option : connectorSync.option,
-																	model : model
-																	)
+							connectorInstance = new ModelConnector( 
+								connector : connectorSync.connector,
+								label : connectorSync.label,
+								type : connectorSync.type,
+								labelPosition : connectorSync.labelPosition,
+								connectorPosX : connectorSync.connectorPosX,
+								connectorPosY : connectorSync.connectorPosY,
+								status : connectorSync.status,
+								option : connectorSync.option,
+								model : model
+							)
 							if ( !connectorInstance.validate() || !connectorInstance.save() ) {
 								def etext = "Unable to create connectorInstance" +
 								GormUtil.allErrorsString( connectorInstance )
@@ -301,7 +305,7 @@ class ModelSyncBatchController {
 			}
 			modelSyncBatch.statusCode = "COMPLETED"
 			modelSyncBatch.save()
-		}catch (Exception e) {
+		} catch (Exception e) {
 			flash.message = "Import Batch process failed"
 			e.printStackTrace();
 		}
