@@ -742,6 +742,7 @@ class ReportsController {
 						//set MIME TYPE as Excel
 						response.setContentType( "application/vnd.ms-excel" )
 						response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
+						response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
 						
 						def book = Workbook.createWorkbook( response.getOutputStream(), workbook )
 						
@@ -750,17 +751,19 @@ class ReportsController {
 						sheet.addCell( new Label( 1, 2, String.valueOf( partyGroupInstance?.name )) )
 						sheet.addCell( new Label( 1, 3, String.valueOf( bundleNames )) )
 						for ( int r = 0; r < reportFields.size(); r++ ) {
-							sheet.addCell( new Label( 0, r+6, String.valueOf(reportFields[r].assetName )) )
-							sheet.addCell( new Label( 1, r+6, String.valueOf(reportFields[r].assetTag )) )
-							sheet.addCell( new Label( 2, r+6, String.valueOf(reportFields[r].moveBundle )) )
-							sheet.addCell( new Label( 3, r+6, String.valueOf(reportFields[r].sourceTargetRoom )) )
-							sheet.addCell( new Label( 4, r+6, String.valueOf(reportFields[r].model )) )
-							sheet.addCell( new Label( 5, r+6, String.valueOf(reportFields[r].commentCode )) )
-							sheet.addCell( new Label( 6, r+6, String.valueOf(reportFields[r].commentType )) )
+							sheet.addCell( new Label( 0, r+6, String.valueOf(reportFields[r].assetName ?:'')) )
+							sheet.addCell( new Label( 1, r+6, String.valueOf(reportFields[r].assetTag ?:'')) )
+							sheet.addCell( new Label( 2, r+6, String.valueOf(reportFields[r].moveBundle ?:'')) )
+							sheet.addCell( new Label( 3, r+6, String.valueOf(reportFields[r].sourceTargetRoom ?:'')) )
+							sheet.addCell( new Label( 4, r+6, String.valueOf(reportFields[r].model ?:'')) )
+							sheet.addCell( new Label( 5, r+6, String.valueOf(reportFields[r].commentCode ?:'')) )
+							sheet.addCell( new Label( 6, r+6, String.valueOf(reportFields[r].commentType ?:'')) )
 							sheet.addCell( new Label( 7, r+6, String.valueOf(reportFields[r].occuredAt ? formatter.format( reportFields[r].occuredAt ) : "")) )
-							sheet.addCell( new Label( 8, r+6, String.valueOf(reportFields[r].createdBy )) )
-							sheet.addCell( new Label( 9, r+6, String.valueOf(reportFields[r].owner )) )
-							sheet.addCell( new Label( 10, r+6, String.valueOf(reportFields[r].issue )) )
+							sheet.addCell( new Label( 8, r+6, String.valueOf(reportFields[r].createdBy ?:'')) )
+							sheet.addCell( new Label( 9, r+6, String.valueOf(reportFields[r].owner ?:'')) )
+							sheet.addCell( new Label( 10, r+6, String.valueOf(WebUtil.listAsMultiValueString(reportFields[r].previousNote)?:'')) )
+							sheet.addCell( new Label( 11, r+6, String.valueOf(reportFields[r].issue ?:'')) )
+							
 						}
 						sheet.addCell( new Label( 0, reportFields.size()+7, String.valueOf("Note : All times are in "+reportFields[0].timezone+" time zone") ))
 						
