@@ -391,16 +391,9 @@ class RackLayoutsController {
 							bladeTable = generateBladeLayout(it, overlappedAsset,rackLayoutsHasPermission, hideIcons, redirectTo)
 						}
 						cabling = !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : ""
-						if(rackLayoutsHasPermission){
-							assetTag += """<a href="javascript:getEntityDetails('${redirectTo}','${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>&nbsp;"
-							if(hasBlades){
-								assetTag += "<br/>"+bladeTable
-							}
-						} else {
-							assetTag += trimString(assetTagValue.replace('~-','-'))
-							if(hasBlades){
-								assetTag += "<br/>"+bladeTable
-							}
+						assetTag += """<a href="javascript:getEntityDetails('${redirectTo}','${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>&nbsp;"
+						if(hasBlades){
+							assetTag += "<br/>"+bladeTable
 						}
 					}
 				}
@@ -473,7 +466,7 @@ class RackLayoutsController {
 				rowspan = 1
 				rackStyle = it.rackStyle
 				row.append("<td class='empty' nowrap>${it.rack}</td><td rowspan=1 class=${it.cssClass}>")
-				if(rackLayoutsHasPermission && hideIcons == "on"){
+				if(hideIcons == "on"){
 				row.append("""<div class="rack_menu"><img src="../i/rack_add2.png">
 							<ul>
 								<li><a href="javascript:createAssetPage('Server','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
@@ -546,12 +539,10 @@ class RackLayoutsController {
 					def hasError = assetDetails.asset.source == 1 ? blades.findAll { it.sourceBladePosition == i + bladeLabelCount }.size() > 0 : blades.findAll { it.targetBladePosition == i + bladeLabelCount }.size() > 0
 					if((bladeSpan == 2) &&  hasError )
 						bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>&nbsp;</td>"
-					else if(rackLayoutsHasPermission)
-						bladeTable += """<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href="javascript:getEntityDetails('${redirectTo}','Blade',${blade.id})" title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"""
 					else
-						bladeTable += "<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px' title='${tag.replace('<br/>','')}'>${taglabel}</td>"
+						bladeTable += """<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href="javascript:getEntityDetails('${redirectTo}','Blade',${blade.id})" title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"""
 				} else {
-					if(rackLayoutsHasPermission && hideIcons == 'on'){
+					if(hideIcons == 'on'){
 						bladeTable += """<td class='emptyBlade' style='height:${tdHeight}px'>
 									<div class="rack_menu"><img src="../i/rack_add2.png"/>
 										<ul>
