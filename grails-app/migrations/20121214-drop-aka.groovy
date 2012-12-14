@@ -2,11 +2,14 @@
  * This set of Database change to drop aka field from manufacturer and model table as we no more using it.
  */
 
-databaseChangeLog = {
-	
+databaseChangeLog = {	
 	changeSet(author: "lokanada", id: "20121214 TM-1132.1") {
-		comment('Alter "aka" field from manufacturer and model table')
-		sql("ALTER TABLE manufacturer DROP COLUMN aka")
-		sql("ALTER TABLE model DROP COLUMN aka")
+		comment('Delete the "aka" column from manufacturer and model tables')
+		preConditions(onFail:'MARK_RAN') {
+	        columnExists(schemaName:'tdstm', tableName:'manufacturer', columnName:'aka')
+	        columnExists(schemaName:'tdstm', tableName:'model', columnName:'aka')
+	    }
+	    dropColumn(tableName:'manufacturer', columnName:'aka')
+	    dropColumn(tableName:'model', columnName:'aka')
 	}
 }
