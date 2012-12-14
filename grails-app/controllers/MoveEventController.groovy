@@ -637,7 +637,7 @@ class MoveEventController {
 						
 						def postMoveColumnList = ['taskNumber', 'assetEntity', 'comment','assignedTo', 'status', 'estFinish', 'dateResolved' , 'notes']
 						
-						def serverColumnList = ['id', 'application', 'assetName', '', 'assetTag', 'manufacturer', 'model', 'assetType', '', '', '']
+						def serverColumnList = ['id', 'application', 'assetName', '','serialNumber', 'assetTag', 'manufacturer', 'model', 'assetType', '', '', '']
 						
 						def appColumnList = ['assetName', 'appVendor', 'appVersion', 'appTech', 'appAccess', 'appSource','license','description',
 											 'supportType', 'sme', 'sme2', 'businessUnit','','retireDate','maintExpDate','appFunction',
