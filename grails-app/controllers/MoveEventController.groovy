@@ -626,10 +626,16 @@ class MoveEventController {
 						def postMoveSheet = book.getSheet("Post-move")
 						def summarySheet = book.getSheet("Index")
 						
-						def scheduleSheet = book.getSheet("Schedule")
+						def scheduleSheet = book.getSheet("Shutdown")
 						
 						
-						def taskcolumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role', 'assignedTo', 'duration']
+						def preMoveColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment','assignedTo', 'status','estStart','', 'notes']
+						
+						def sheduleColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role', 'assignedTo', 
+												 'duration', 'actStart','estFinish'
+												]
+						
+						def postMoveColumnList = ['taskNumber', 'assetEntity', 'comment','assignedTo', 'status', 'estFinish', 'dateResolved' , 'notes']
 						
 						def serverColumnList = ['id', 'application', 'assetName', '', 'assetTag', 'manufacturer', 'model', 'assetType', '', '', '']
 						
@@ -647,7 +653,7 @@ class MoveEventController {
 						
 						def filesColumnList = ['id', 'assetName', 'fileFormat', 'fileSize', 'description', 'supportType','retireDate', 'maintExpDate',
 											   'environment','ipAddress', 'planStatus','custom1','custom2','custom3','custom4','custom5',
-											    'custom6','custom7','custom8'
+											   'custom6','custom7','custom8'
 											  ]
 						
 						def othersColumnList = ['id','application','assetName', 'shortName', 'serialNumber', 'assetTag', 'manufacturer',
@@ -659,9 +665,9 @@ class MoveEventController {
 												'truck','cart','shelf','railType','appOwner','appSme','priority','planStatus','usize'
 						   						]
 						
-						
 						def unresolvedIssueColumnList = ['id', 'comment', 'commentType','commentAssetEntity','resolution','resolvedBy','createdBy',
-														'dueDate','assignedTo','category','dateCreated','dateResolved']
+														 'dueDate','assignedTo','category','dateCreated','dateResolved'
+														]
 						
 						
 						summarySheet.addCell( new Label( 1, 1, String.valueOf(project.name )) )
@@ -681,11 +687,11 @@ class MoveEventController {
 						
 						moveBundleService.issueExport(unresolvedIssues, unresolvedIssueColumnList, issueSheet, 1)
 						
-						moveBundleService.issueExport(sheduleIssue, taskcolumnList, scheduleSheet, 2)
+						moveBundleService.issueExport(sheduleIssue, sheduleColumnList, scheduleSheet, 7)
 						
-						moveBundleService.issueExport(preMoveIssue, taskcolumnList, preMoveSheet, 2)
+						moveBundleService.issueExport(preMoveIssue, preMoveColumnList, preMoveSheet, 7)
 						
-						moveBundleService.issueExport(postMoveIssue, taskcolumnList,  postMoveSheet, 2)
+						moveBundleService.issueExport(postMoveIssue, postMoveColumnList,  postMoveSheet, 7)
 						  
 							  
 						def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' ")

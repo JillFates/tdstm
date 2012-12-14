@@ -579,6 +579,9 @@ class MoveBundleService {
 					 case "commentAssetEntity":
 						 cellValue = exportList[r-startRow].assetEntity ?  String.valueOf(exportList[r-startRow].assetEntity?.assetName) : ''
 						 break;
+					 case "notes":
+						 cellValue = exportList[r-startRow].notes ?  String.valueOf(WebUtil.listAsMultiValueString(exportList[r-startRow].notes)) : ''
+						 break;
 				     case "":
 						 cellValue = ""
 						 break;
