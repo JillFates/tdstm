@@ -1072,12 +1072,12 @@ function createIssue(asset, type, id){
 		commentChange('#createResolveDiv','createCommentForm')
 		$('#priorityCreateSpanId').css('display','inline-table')
 		$('#statusCreateTrId').css('display','table-row')
+		$('#assetEntityTrId').css('display','none')
 		if(asset){
 			$('#assetEntityTrId').css('display','table-row')
 			$('#assetEntityInputId').html(asset)
-			$('#assetEntityTrId').css('display','none')
-			$('#moveEventTrId').css('display','table-row')
 		}
+		$('#moveEventTrId').css('display','table-row')
 		$('#createResolveDiv').css('display','table-row');
 		$('#createCommentDialog').dialog('option', 'width', 'auto');
 		$('#createCommentDialog').dialog('option', 'position', ['center','top']);
