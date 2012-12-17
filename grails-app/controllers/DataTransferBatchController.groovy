@@ -817,7 +817,7 @@ class DataTransferBatchController {
 								switch(attribName){
 									case "moveBundle":
 									if(it.importValue){
-										def moveBundleInstance = assetEntityAttributeLoaderService.getdtvMoveBundle(it, 	 )
+										def moveBundleInstance = assetEntityAttributeLoaderService.getdtvMoveBundle(it, project)
 										isModified = "true"
 										dbInstance."$attribName" = moveBundleInstance
 									}
