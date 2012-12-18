@@ -229,28 +229,28 @@ class ModelController {
     }
 
     def show = {
-        def modelInstance = Model.get(params.id)
+        def model = Model.get(params.id)
 		def subject = SecurityUtils.subject
-        if (!modelInstance) {
+        if (!model) {
         	flash.message = "Model not found with Id ${params.id}"
             redirect(action: "list")
         }
         else {
-        	def modelConnectors = ModelConnector.findAllByModel( modelInstance,[sort:"id"] )
-			def modelAkas = WebUtil.listAsMultiValueString(ModelAlias.findAllByModelAndManufacturer(modelInstance, modelInstance.manufacturer).name)
-            return [ modelInstance : modelInstance, modelConnectors : modelConnectors, modelAkas:modelAkas,
+        	def modelConnectors = ModelConnector.findAllByModel( model,[sort:"id"] )
+			def modelAkas = WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(model, [sort:'name']).name)
+            return [ modelInstance : model, modelConnectors : modelConnectors, modelAkas:modelAkas,
                     modelHasPermission:RolePermissions.hasPermission("ValidateModel") ]
         }
     }
 
     def edit = {
-        def modelInstance = Model.get(params.id)
-        if (!modelInstance) {
+        def model = Model.get(params.id)
+        if (!model) {
             flash.message = "Model not found with Id ${params.id}"
             redirect(action: "list")
         }
         else {
-        	def modelConnectors = ModelConnector.findAllByModel( modelInstance,[sort:"id"] )
+        	def modelConnectors = ModelConnector.findAllByModel( model,[sort:"id"] )
 			def nextConnector = 0
 			try{
 				nextConnector = modelConnectors.size() > 0 ? Integer.parseInt(modelConnectors[modelConnectors.size()-1]?.connector) : 0
@@ -261,8 +261,8 @@ class ModelController {
 			for(int i = nextConnector+1 ; i<51; i++ ){
 				otherConnectors << i
 			}
-			def modelAliases = ModelAlias.findAllByModel(modelInstance)
-            return [ modelInstance: modelInstance, modelConnectors : modelConnectors, otherConnectors : otherConnectors, 
+			def modelAliases = ModelAlias.findAllByModel(model, [sort:'name'])
+            return [ modelInstance: model, modelConnectors : modelConnectors, otherConnectors : otherConnectors, 
                 nextConnector:nextConnector, modelAliases:modelAliases ]
         }
     }
