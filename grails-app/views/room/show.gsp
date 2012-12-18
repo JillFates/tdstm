@@ -121,8 +121,8 @@
 			</g:each>
 		<span>Floor ${roomInstance.roomWidth}ft x ${roomInstance.roomDepth}ft = ${roomInstance.roomWidth * roomInstance.roomDepth} sqft</span>
 	</div>
-	<div style="float: right; margin-left: 20px;width: 350px;" id="rackLayout">
-	<table cellpadding=2 class="rack_elevation back">
+	<div style="float: right; margin-left: 20px;" id="rackLayout">
+	<table style="display:none" cellpadding=2 class="rack_elevation back">
 	<tr><th>U</th><th>Device</th><th>Bundle</th></tr>
 	<tr><td class='rack_upos'>42</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
 	<tr><td class='rack_upos'>41</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>

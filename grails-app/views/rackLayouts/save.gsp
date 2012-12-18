@@ -2,7 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
 <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
@@ -56,7 +55,18 @@
 			<tr>
 				<td colspan="4" style="border:0px;text-align:center">
 					<div class="close-icon" onclick="$(this).parents('td.rack_elevation_td').remove(); $(this).parents('table.rack_elevation').remove();"></div>
-					<h2>Rack ${rackLayout?.rack} in ${rackLayout?.room} (Back)</h2>
+					<h2>Rack ${rackLayout?.rack} in ${rackLayout?.room} (Back)
+					 <tds:hasPermission permission="EditAndDelete">
+							<g:if test="${showIconPref =='true'}">
+									<span id="span_${rackLayout?.rackId}" onclick="disableCreateIcon(${rackLayout?.rackId})"> 
+									  <img src='../i/db_delete.png' /></span>
+							</g:if>
+							<g:else>
+									<span id="span_${rackLayout?.rackId}" onclick="enableCreateIcon(${rackLayout?.rackId})"> 
+									   <img src="../i/rack_add2.png" /></span>
+							</g:else>
+					</tds:hasPermission>
+					 </h2>
 				</td>
 			</tr>
 			<tr>

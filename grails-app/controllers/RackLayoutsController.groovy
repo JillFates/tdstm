@@ -296,16 +296,22 @@ class RackLayoutsController {
 				}
 				def backViewRows
 				def frontViewRows
+				def paramsMap = [:]
+				paramsMap = [ "rackLayoutsHasPermission" : rackLayoutsHasPermission, "assetDetails":assetDetails, "includeBundleName": includeBundleName,
+								"backView":backView, "showCabling":params.showCabling, "hideIcons":hideIcons, "redirectTo":redirectTo, "rackId":rack.id]
+				
 				if(backView) {
-					backViewRows = getRackLayout(rackLayoutsHasPermission, assetDetails, includeBundleName, backView, params.showCabling, hideIcons, redirectTo)
+					backViewRows = getRackLayout(paramsMap)
 				}
 				if(frontView) {
-					frontViewRows = getRackLayout(rackLayoutsHasPermission, assetDetails, includeBundleName, null, params.showCabling, hideIcons, redirectTo)
+					paramsMap["backView"] = null
+					frontViewRows = getRackLayout(paramsMap)
 				}
 				rackLayout << [ assetDetails : assetDetails, rack : rack.tag , room : rack.room,
-								frontViewRows : frontViewRows, backViewRows : backViewRows ]
+								frontViewRows : frontViewRows, backViewRows : backViewRows , rackId :rack.id]
 			}
-			return [rackLayout : rackLayout, frontView : frontView, backView : backView]
+			def showIconPref = userPreferenceService.getPreference("ShowAddIcons")
+			return [rackLayout : rackLayout, frontView : frontView, backView : backView, showIconPref:showIconPref]
 		}
 	}
 	
@@ -337,11 +343,21 @@ class RackLayoutsController {
 		render rackDetails as JSON
 	}
 
-	private getRackLayout( def rackLayoutsHasPermission, def asset, def includeBundleName, def backView, def showCabling, def hideIcons, def redirectTo ){
+	private getRackLayout( paramsMap ){
 		def rows = new StringBuffer()
 		def rowspan = 1
 		def cssClass = "empty"
 		def rackStyle = ""
+		def showIconPref = userPreferenceService.getPreference("ShowAddIcons")
+		
+		def rackLayoutsHasPermission = paramsMap.rackLayoutsHasPermission
+		def asset = paramsMap.assetDetails
+		def includeBundleName = paramsMap.includeBundleName
+		def backView = paramsMap.backView
+		def showCabling = paramsMap.showCabling
+		def hideIcons =  paramsMap.hideIcons
+		def redirectTo = paramsMap.redirectTo
+		def rackId = paramsMap.rackId
 		asset.each {
 			def row = new StringBuffer("<tr>")
 			if(it.asset) {
@@ -376,7 +392,7 @@ class RackLayoutsController {
 							moveBundle += (overlapAsset?.moveBundle ? overlapAsset?.moveBundle.name : "") + "<br/>"
 							if(overlapAsset.model && overlapAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on')){
 								hasBlades = true
-								bladeTable = generateBladeLayout(it, overlapAsset, rackLayoutsHasPermission, hideIcons, redirectTo)
+								bladeTable = generateBladeLayout(it, overlapAsset, rackLayoutsHasPermission, hideIcons, redirectTo, rackId)
 							}
 							assetTag += """<a href="javascript:getEntityDetails('${redirectTo}','${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>" 
 							if(hasBlades){
@@ -388,7 +404,7 @@ class RackLayoutsController {
 						moveBundle += (overlappedAsset?.moveBundle ? overlappedAsset?.moveBundle.name : "") + "<br/>"
 						if(overlappedAsset.model && overlappedAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on') ){
 							hasBlades = true
-							bladeTable = generateBladeLayout(it, overlappedAsset,rackLayoutsHasPermission, hideIcons, redirectTo)
+							bladeTable = generateBladeLayout(it, overlappedAsset,rackLayoutsHasPermission, hideIcons, redirectTo, rackId)
 						}
 						cabling = !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : ""
 						assetTag += """<a href="javascript:getEntityDetails('${redirectTo}','${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>&nbsp;"
@@ -466,16 +482,12 @@ class RackLayoutsController {
 				rowspan = 1
 				rackStyle = it.rackStyle
 				row.append("<td class='empty' nowrap>${it.rack}</td><td rowspan=1 class=${it.cssClass}>")
-				if(hideIcons == "on"){
-				row.append("""<div class="rack_menu"><img src="../i/rack_add2.png">
+				row.append("""<div ${showIconPref ? '' : 'style="display:none"'}  class="rack_menu create_${rackId}"><img src="../i/rack_add2.png">
 							<ul>
 								<li><a href="javascript:createAssetPage('Server','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
 								<li><a href="javascript:listDialog('','','asc','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Assign asset </a></li>
 								<li><a href="javascript:listDialog('all','','asc','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Reassign asset </a></li>
 							</ul></img></div>&nbsp;</td><td>&nbsp;</td>""")
-				} else { 
-					row.append("&nbsp;</td><td>&nbsp;</td>")
-				}
 				if(backView)
 					row.append("<td>&nbsp;</td>")
 				
@@ -487,14 +499,15 @@ class RackLayoutsController {
 			//row.append("<td class='${it.rackStyleUpos}'>${it.rack}</td>")
 			row.append("</tr>")
 			rows.append(row.toString())
+			
 		}
 		return rows
 	}
 	/*************************************************
 	 * Construct Balde layout for RackLayouts report
 	 **************************************************/
-	def generateBladeLayout(def assetDetails, def assetEntity, def rackLayoutsHasPermission, def hideIcons, def redirectTo){
-		
+	def generateBladeLayout(def assetDetails, def assetEntity, def rackLayoutsHasPermission, def hideIcons, def redirectTo, def rackId){
+		def showIconPref = userPreferenceService.getPreference("ShowAddIcons")
 		def bladeTable = '<table class="bladeTable"><tr>'
 		def rowspan = assetDetails.asset?.rowspan != 0 ? assetDetails.asset?.rowspan : 1
 		def tdHeight = rowspan * 6
@@ -542,18 +555,14 @@ class RackLayoutsController {
 					else
 						bladeTable += """<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href="javascript:getEntityDetails('${redirectTo}','Blade',${blade.id})" title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"""
 				} else {
-					if(hideIcons == 'on'){
-						bladeTable += """<td class='emptyBlade' style='height:${tdHeight}px'>
-									<div class="rack_menu"><img src="../i/rack_add2.png"/>
-										<ul>
-											<li><a href="javascript:createBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}','${assetEntity.manufacturer.id}','Blade','${assetEntity.id}','${assetEntity.moveBundle.id}')">Create asset  </a></li>
-											<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}','assign')">Assign asset </a></li>
-											<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}','reassign')">Reassign asset </a></li>
-										</ul>
-									</div></td>"""
-					} else {
-						bladeTable += "<td class='emptyBlade' style='height:${tdHeight}px'>&nbsp;</td>"
-					}
+					bladeTable += """<td class='emptyBlade' style='height:${tdHeight}px'>
+								<div ${showIconPref ? '' : 'style="display:none"'} class="rack_menu create_${rackId}"><img src="../i/rack_add2.png"/>
+									<ul>
+										<li><a href="javascript:createBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}','${assetEntity.manufacturer?.id}','Blade','${assetEntity?.id}','${assetEntity.moveBundle?.id}')">Create asset  </a></li>
+										<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}','assign')">Assign asset </a></li>
+										<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}','reassign')">Reassign asset </a></li>
+									</ul>
+								</div></td>"""
 				}
 			}
 			bladeTable += k == chassisRows ? "</tr>" : "</tr><tr>"
@@ -763,7 +772,7 @@ class RackLayoutsController {
 												</div>
 												<div class="connector_${assetCable.fromConnectorNumber.labelPosition}">
 													<span>${assetCable.fromConnectorNumber.label}</span>
-												</div>
+										 		</div>
 											</div>
 										""")
 				}
@@ -778,5 +787,19 @@ class RackLayoutsController {
 			}
 		}
 		return cableDiagram
+	}
+	/**
+	 * This action is used for saving 'ShowAddIcons' Preference 
+	 */
+	def savePreference = {
+		def preference = params.preference
+		if(params.add == "true"){
+			println "inside if"
+			userPreferenceService.setPreference(preference, "true")
+		} else {
+			userPreferenceService.removePreference(preference)
+		}
+		
+	 render true
 	}
 }

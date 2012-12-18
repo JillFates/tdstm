@@ -25,6 +25,10 @@ br.page-break-after {
 .objectSelected {
 	box-shadow: #888 5px 5px 10px;
 }
+
+.objectRowSelected {
+	box-shadow: #888 5px 5px 10px;
+}
 #rackLayout {
   position: inherit;
   height: auto; width: auto !important;
@@ -519,7 +523,7 @@ table.rack_elevation td {
 	text-align: left;
 	font: 8px arial, helvetica, sans-serif;
 	border: 1px solid #999999;
-	padding:0px 2px 0px 2px;
+	padding:0px 0px 0px 0px;
   vertical-align: top;
   font-weight: bold;
 }

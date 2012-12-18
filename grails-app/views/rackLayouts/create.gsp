@@ -206,7 +206,6 @@
 					</g:else>
 					
 					<label for="showCabling" ><input type="checkbox" name="showCabling" id="showCabling" />&nbsp;w/ diagrams</label><br />
-					<label for="hideIcons" ><input type="checkbox" name="hideIcons" id="hideIcons" />&nbsp;w/ Add Icons</label>
 				</div>
 			</td>
 			

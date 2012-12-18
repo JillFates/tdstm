@@ -68,7 +68,7 @@
 				<tr>
 					<g:set var="numcols" value="${1}" />
 					<g:while test="${numcols <= tilecols }">
-						<td class="room_tile" numcols="${numcols++}">&nbsp;</td>
+						<td onclick="deselectAll()" class="room_tile" numcols="${numcols++}">&nbsp;</td>
 					</g:while>
 				</tr ><!-- ${numrows++} -->
 			</g:while>
@@ -76,10 +76,14 @@
 		<g:each in="${rackInstanceList}" var="rack">
 			<g:if test="${rack.rackType == 'Rack'}">
 			 <g:if test="${rack.model?.layoutStyle == null}">	
-				<div align="center"  id="rack_${rack.id}" style="top:${rack.roomY}px; left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" onmouseover="addShadowCss(this.id)"  class="${ rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_L' }">
+				<div align="center"  id="rack_${rack.id}" style="top:${rack.roomY}px; left:${rack.roomX}px;" 
+				onmouseout="updateXYPositions(this.id)" onclick="addShadowCss(this.id,event)"  
+				class="${ rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_L' } ">
 				</g:if>
 				<g:else>
-				<div align="center"  id="rack_${rack.id}" style="top:${rack.roomY}px; left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" onmouseover="addShadowCss(this.id)" class="${rack.model?.layoutStyle}">
+				<div align="center"  id="rack_${rack.id}" style="top:${rack.roomY}px; left:${rack.roomX}px;"
+				 onmouseout="updateXYPositions(this.id)" onclick="addShadowCss(this.id,event)" 
+				 class="${rack.model?.layoutStyle}">
 				</g:else>
 					<span id="rackLabel_${rack.id}"><br>${rack.tag}</br></span>
 				</div>
@@ -167,6 +171,7 @@ $(document).ready(function() {
 		delShadowCss(this.id)
     });    
 })
+
 function enableDraggableRack(){
 	  var showDrag = $("#showRoomObjects").is(':checked')
 	  var drag = 'off'
@@ -230,17 +235,26 @@ function updateXYPositions(id){
 	$("#roomXId_"+rackId).val(x)
 	$("#roomYId_"+rackId).val(y)
 
-	$("#"+id).removeClass("objectSelected")
+	//$("#"+id).removeClass("objectSelected")
+	//var rowId = id.split("_")[1]
+	//$("#rackEditRow_"+rowId).removeClass("objectRowSelected")
 }
 
-function addShadowCss(id){
+function addShadowCss(id, event){
 	var rackId = id.split("_")[1]
+	
+	$("#rackEditRow_"+rackId).addClass("objectRowSelected")
 	$("#rack_"+rackId).addClass("objectSelected")
+	
 }
-
+function deselectAll(){
+	  $(".objectRowSelected").removeClass("objectRowSelected")
+	  $(".objectSelected").removeClass("objectSelected")
+}
 function delShadowCss(id){
 	var rackId = id.split("_")[1]
 	$("#rack_"+rackId).removeClass("objectSelected")
+	$("#rackEditRow_"+rackId).removeClass("objectRowSelected")
 }
 function verifyAndDeleteRacks(id){
 	jQuery.ajax({
@@ -314,6 +328,7 @@ function roundValue(value,id){
 	var chndValue = Math.round(value)
 	$("#"+id).val( chndValue )
 }
+
 </script>
 </body>
 </html>
