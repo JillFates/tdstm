@@ -13,10 +13,7 @@ class BootStrap {
 	def workflowService
 	def stateEngineService
 	def init = { servletContext ->
-
-		// Create any necessary indexes
-		createIndexes()
-		
+	
 		// Load all of the Workflow definitions into the StateEngine service
 		def workflowList = Workflow.list()
 		workflowList.each { wf ->
@@ -31,20 +28,7 @@ class BootStrap {
 		
 	def destroy = {
 	}
-	
-	/**
-	 * Called by bootstrap to create index that can't be done by GORM - believe me, I tried...
-	 */
-	private void createIndexes() {
-		def sql = Sql.newInstance(ConfigurationHolder.config.dataSource.url, ConfigurationHolder.config.dataSource.username, ConfigurationHolder.config.dataSource.password, ConfigurationHolder.config.dataSource.driverClassName)
-
-		// Model
-		try { sql.execute("CREATE INDEX Model_Name_idx ON model(name)") } catch(e) {}
-			
-		// ModelAlias
-		try { sql.execute("CREATE INDEX ModelAlias_Name_idx ON model_alias(name)") } catch(e) { }
-	}
-	
+		
 	/**
 	 * Create Initial Datasets
 	 */
