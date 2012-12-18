@@ -30,11 +30,11 @@
 			<tr>
 				<td colspan="4" style="border:0px;text-align:center">
 					<div class="close-icon" onclick="$(this).parents('td.rack_elevation_td').remove(); $(this).parents('table.rack_elevation').remove();"></div>
-					<h2>Rack ${rackLayout?.rack} in ${rackLayout?.room}</h2>
+					<h2>${rackLayout?.rack} in ${rackLayout?.room}</h2>
 				</td>
 			</tr>
 			<tr>
-				<th>U</th>
+				<th></th>
 				<th>Device</th>
 				<th>Bundle</th>
 				<%--<th>U</th>--%>
@@ -55,22 +55,22 @@
 			<tr>
 				<td colspan="4" style="border:0px;text-align:center">
 					<div class="close-icon" onclick="$(this).parents('td.rack_elevation_td').remove(); $(this).parents('table.rack_elevation').remove();"></div>
-					<h2>Rack ${rackLayout?.rack} in ${rackLayout?.room} (Back)
+					<h2>${rackLayout?.rack} in ${rackLayout?.room} (Back)
 					 <tds:hasPermission permission="EditAndDelete">
-							<g:if test="${showIconPref =='true'}">
-									<span id="span_${rackLayout?.rackId}" onclick="disableCreateIcon(${rackLayout?.rackId})"> 
-									  <img src='../i/db_delete.png' /></span>
-							</g:if>
-							<g:else>
-									<span id="span_${rackLayout?.rackId}" onclick="enableCreateIcon(${rackLayout?.rackId})"> 
-									   <img src="../i/rack_add2.png" /></span>
-							</g:else>
+						<g:if test="${showIconPref =='true'}">
+							<span id="span_${rackLayout?.rackId}" onclick="disableCreateIcon(${rackLayout?.rackId})"> 
+								<img src='../i/db_delete.png' /></span>
+						</g:if>
+						<g:else>
+							<span id="span_${rackLayout?.rackId}" onclick="enableCreateIcon(${rackLayout?.rackId})"> 
+								<img src="../i/rack_add2.png" /></span>
+						</g:else>
 					</tds:hasPermission>
 					 </h2>
 				</td>
 			</tr>
 			<tr>
-				<th>U</th>
+				<th></th>
 				<th>Device</th>
 				<th>Bundle</th>
 				<th>Cabling</th>
