@@ -25,7 +25,6 @@ br.page-break-after {
 .objectSelected {
 	box-shadow: #888 5px 5px 10px;
 }
-
 .objectRowSelected {
 	box-shadow: #888 5px 5px 10px;
 }
@@ -51,7 +50,6 @@ br.page-break-after {
 #roomLayout_body {
  width: auto !important;
   overflow-x: visible !important;
-  padding-right: 300px !important;
 }
 .racktop_label {
 	postition: relative;
@@ -503,6 +501,9 @@ table.rack_elevation h2 {
 table.rack_elevation {
 	border: 8px solid #000000;
 	empty-cells: show;
+	-webkit-border-vertical-spacing: 0px;
+	font-family: arial, helivetica, san-serif !important;
+	font-size: 10px !important;
 }
 
 table.rack_elevation a {
@@ -523,7 +524,7 @@ table.rack_elevation td {
 	text-align: left;
 	font: 8px arial, helvetica, sans-serif;
 	border: 1px solid #999999;
-	padding:0px 0px 0px 0px;
+	padding:0px 2px 0px 2px;
   vertical-align: top;
   font-weight: bold;
 }
@@ -540,10 +541,6 @@ table.rack_elevation th {
   text-align: center;
 }
 
-table.rack_elevation {
-	font-family: arial, helivetica, san-serif !important;
-	font-size: 10px !important;
-}
 table.rack_elevation input, select, textarea {
     background-color: #fcfcfc;
     border: 1px solid #ccc;
