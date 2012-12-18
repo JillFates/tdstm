@@ -367,7 +367,7 @@ class ModelController {
 				def deletedAka = params.deletedAka
 				def akaToSave = params.list('aka')
 				if(deletedAka){
-					ModelAlias.executeUpdate("delete from ModelAlias mo where mo.id in (${deletedAka})")
+					ModelAlias.executeUpdate("delete from ModelAlias mo where mo.id in (:ids)",[ids:deletedAka.split(",").collect{return Long.parseLong(it)}])
 				}
 				def modelAliasList = ModelAlias.findAllByModel( modelInstance )
 				modelAliasList.each{ modelAlias->
@@ -387,22 +387,8 @@ class ModelController {
 				if(connectorCount > 0){
 		        	for(int i=1; i<=connectorCount; i++){
 						def connector = params["connector"+i]
-		        		def modelConnector = connector ? ModelConnector.findByModelAndConnector(modelInstance,connector) : null
+		        		def modelConnector = connector ? ModelConnector.findByModelAndConnector(modelInstance,connector) : ModelConnector.findByModelAndConnector(modelInstance,i)
 						if( !connector && modelConnector ){
-							AssetCableMap.executeUpdate("Delete from AssetCableMap where fromConnectorNumber = ? ", [modelConnector])
-							def assetCables = AssetCableMap.findAll("from AssetCableMap where toConnectorNumber = ? ",[modelConnector])
-							assetCables.each{ assetCableMap->
-								assetCableMap.status = 'missing' 
-								assetCableMap.toAsset = null
-								assetCableMap.toConnectorNumber = null
-								assetCableMap.toAssetRack = null
-								assetCableMap.toAssetUposition = null
-								if ( !assetCableMap.validate() || !assetCableMap.save(flush:true) ) {
-		    						def etext = "Unable to Update assetCableMap : " +
-		    		                GormUtil.allErrorsString( assetCableMap )
-		    						println etext
-		    					}
-							}
 							
 							modelConnector.delete(flush:true)
 							
@@ -541,13 +527,6 @@ class ModelController {
 		}
         if(modelInstance) {
             try {
-            	AssetEntity.executeUpdate("update AssetEntity set model = null where model = ?",[modelInstance])
-				
-            	AssetCableMap.executeUpdate("delete AssetCableMap where fromConnectorNumber in (from ModelConnector where model = ${modelInstance.id})")
-				AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-														toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-														where toConnectorNumber in (from ModelConnector where model = ${modelInstance.id})""")
-            	ModelConnector.executeUpdate("delete ModelConnector where model = ?",[modelInstance])
                 modelInstance.delete(flush: true)
 				if(user){
 					int bonusScore = person?.modelScoreBonus ? person?.modelScoreBonus:0

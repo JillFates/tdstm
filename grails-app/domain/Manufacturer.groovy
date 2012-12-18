@@ -1,3 +1,4 @@
+import com.tds.asset.AssetEntity
 import com.tdssrc.grails.TimeUtil
 
 class Manufacturer {
@@ -36,7 +37,11 @@ class Manufacturer {
 	}
 	
 	def beforeDelete = {
-        Manufacturer.withNewSession { aliases*.delete() }
+        AssetEntity.withNewSession{ 
+            AssetEntity.executeUpdate("Update AssetEntity set manufacturer=null where manufacturer = :manufacturer",[manufacturer:this])
+        }
+        ManufacturerAlias.withNewSession { aliases*.delete() }
+        
 	}
 	
 	/*

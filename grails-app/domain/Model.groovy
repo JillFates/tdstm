@@ -1,5 +1,6 @@
 import org.jsecurity.SecurityUtils
 
+import com.tds.asset.AssetCableMap;
 import com.tds.asset.AssetEntity
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
@@ -154,7 +155,10 @@ class Model {
 	}
 	
 	def beforeDelete = {
-        Model.withNewSession { aliases*.delete() }
+        AssetEntity.withNewSession{
+            AssetEntity.executeUpdate("Update AssetEntity set model=null where model = :model",[model:this])
+        }
+        ModelAlias.withNewSession { aliases*.delete() }
 	}
 	
 	def getAssetTypeList(){

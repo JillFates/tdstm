@@ -1,3 +1,6 @@
+import com.tds.asset.AssetCableMap
+import com.tdssrc.grails.TimeUtil
+
 
 class ModelConnector {
 	// Declare propertied
@@ -24,10 +27,13 @@ class ModelConnector {
 		connectorPosY( nullable:true )
 		status( blank:false, nullable:false, inList: ['missing','empty','cabled','cabledDetails'] )
 		option( blank:true, nullable:true )
+        lastModified( nullable:true )
+        dateCreated( nullable:true )
     }
 	
 	static mapping  = {	
 		version false
+        autoTimestamp false
 		columns {
 			id column:'model_connectors_id'
 			option column:'connector_option'
@@ -42,6 +48,19 @@ class ModelConnector {
 	def beforeUpdate = {
 		lastModified = TimeUtil.convertInToGMT( "now", "EDT" )
 	}
+    
+    def beforeDelete = {
+        AssetCableMap.withNewSession { fromConnectorCableMaps*.delete() }
+        AssetCableMap.withNewSession{
+            AssetCableMap.executeUpdate("Update AssetCableMap set status='missing', toAsset=null, \
+                                                        toConnectorNumber=null,toAssetRack=null,toAssetUposition = null \
+                                                        where toConnectorNumber = :connector",[connector:this])
+        }
+    }
+    
+    def getFromConnectorCableMaps(){
+        AssetCableMap.findAllByFromConnectorNumber(this)
+    }
 	
 	String toString(){
 		"${model?.modelName} : ${connector}"
