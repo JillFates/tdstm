@@ -1,7 +1,7 @@
 import com.tdssrc.grails.TimeUtil
 
 /**
- * ManufacturerAlias --- Represents individual alias names used to reference the same manufacturer
+ * ManufacturerAlias - Represents individual alias names used to reference the same manufacturer
  * 
  */
 class ManufacturerAlias {
@@ -14,7 +14,11 @@ class ManufacturerAlias {
 		name nullable:false, blank:false, unique:true
 		manufacturer nullable:false
     }
-		
+
+	static mapping = {
+		version false		
+	}
+	
 	def beforeInsert = {
 		dateCreated = TimeUtil.convertInToGMT( "now", "EDT" )
 	}	
