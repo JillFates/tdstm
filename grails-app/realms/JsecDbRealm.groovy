@@ -3,18 +3,20 @@ import org.jsecurity.authc.IncorrectCredentialsException
 import org.jsecurity.authc.UnknownAccountException
 import org.jsecurity.authc.SimpleAccount
 
+import com.tdssrc.grails.HtmlUtil
+
 class JsecDbRealm {
     static authTokenClass = org.jsecurity.authc.UsernamePasswordToken
 
     def credentialMatcher
 
     def authenticate(authToken) {
-        log.info "Attempting to authenticate ${authToken.username} in DB realm..."
+        log.debug "Attempting to authenticate ${authToken.username} in DB realm..."
         def username = authToken.username
 
         // Null username is invalid
         if (username == null) {
-            throw new AccountException('Null usernames are not allowed by this realm.')
+            throw new AccountException('Blank usernames are not allowed by this realm.')
         }
 
         // Get the user with the given username. If the user is not
@@ -25,13 +27,14 @@ class JsecDbRealm {
             throw new UnknownAccountException("No account found for user [${username}]")
         }
 
-        log.info "Found user '${user.username}' in DB"
+        log.debug "Found user '${user.username}' in DB"
 
         // Now check the user's password against the hashed value stored
         // in the database.
         def account = new SimpleAccount(username, user.password, "JsecDbRealm")
         if (!credentialMatcher.doCredentialsMatch(authToken, account)) {
-            log.info 'Invalid password (DB realm)'
+			def remoteIp = HtmlUtil.getRemoteIp()
+            log.warn 'Invalid password (DB realm) - IP ${remoteIp}'
             throw new IncorrectCredentialsException("Invalid password for user '${username}'")
         }
 

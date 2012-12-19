@@ -2,7 +2,9 @@ import org.jsecurity.authc.AuthenticationException
 import org.jsecurity.authc.UsernamePasswordToken
 import org.jsecurity.SecurityUtils
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
 import java.text.SimpleDateFormat
+
 class AuthController {
     def jsecSecurityManager
     def userPreferenceService
@@ -42,7 +44,8 @@ class AuthController {
 		            // to it. Otherwise redirect to the root URI.
 		            def targetUri = params.targetUri ?: "/"
 		            
-		            log.info "Redirecting to '${targetUri}'."
+		            // log.info "Redirecting to '${targetUri}'."
+		
 		            //redirect(uri: targetUri)
 		            /*
 		             *  call loadPreferences() to load CURR_PROJ MAP into session
@@ -87,7 +90,8 @@ class AuthController {
 	        catch (AuthenticationException ex){
 	            // Authentication failed, so display the appropriate message
 	            // on the login page.
-	            log.info "Authentication failure for user '${params.username}'."
+				def remoteIp = HtmlUtil.getRemoteIp()
+	            log.warn "Authentication failure user '${params.username}', IP ${remoteIp}"
 	            flash.message = message(code: "login.failed")
 	
 	            // Keep the username and "remember me" setting so that the
@@ -105,7 +109,9 @@ class AuthController {
 	            // Now redirect back to the login page.
 	            redirect(action: 'login', params: m)
 	        }
-    	} catch(Exception e){
+     	} catch(Exception e) {
+			def remoteIp = HtmlUtil.getRemoteIp()
+			log.warn "Authentication failure for user '${params.username}' : IP ${remoteIp}"
 			flash.message = "Authentication failure for user '${params.username}'."
 			redirect(action: 'login', params: params)
     	}

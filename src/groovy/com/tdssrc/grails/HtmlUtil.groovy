@@ -1,6 +1,7 @@
 package com.tdssrc.grails
 
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import org.codehaus.groovy.grails.web.util.WebUtils
 
 /**
  * The HtmlUtil class contains method to generate HTML from server side e.g. Select Box
@@ -80,5 +81,26 @@ class HtmlUtil {
 		}
 		// log.error "getCssClassForStatus('${status})=${css}"
 		return css
+	}
+	
+	/**
+	 * Access the remote IP address from the web request or the X-Forwarded-For header content
+	 * @return String The remote IP address that made the web request
+	 */
+ 	public static String getRemoteIp() {
+		def webUtils = WebUtils.retrieveGrailsWebRequest()
+
+		//Getting the Request object
+		def request = webUtils.getCurrentRequest()
+		
+		// Now try and figure out the IP 
+		def remoteIp = request.getHeader("X-Forwarded-For")
+		if (remoteIp) {
+			remoteIp = "X-Forwarded-For: ${remoteIp}"
+		} else {
+			remoteIp = request.getRemoteAddr()
+		}
+		
+		return remoteIp.toString()
 	}
 }
