@@ -7,6 +7,7 @@ import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.TimeUtil
 
 class Model {
+	// TODO - modelName should be renamed to name (as it is in the db - confusing)
 	String modelName
 	String description
 	String assetType = 'Server'
@@ -104,6 +105,7 @@ class Model {
 			createdBy column: 'created_by'
 			updatedBy column: 'updated_by'
 			validatedBy column: 'validated_by'
+			// TODO : these are going to be deleted
 			frontImage sqlType:'LONGBLOB'
 			rearImage sqlType:'LONGBLOB'
 			useImage sqltype: 'tinyint'
@@ -118,8 +120,7 @@ class Model {
 		modelName
 	}
 	def beforeInsert = {
-		dateCreated = TimeUtil.convertInToGMT( "now", "EDT" )
-		lastModified = TimeUtil.convertInToGMT( "now", "EDT" )
+		dateCreated = lastModified = TimeUtil.nowGMT()
 		if(assetType == "Blade Chassis"){
 			if(!bladeRows)
 				bladeRows = 2
@@ -138,7 +139,7 @@ class Model {
 		}
 	}
 	def beforeUpdate = {
-		lastModified = TimeUtil.convertInToGMT( "now", "EDT" )
+		lastModified = TimeUtil.nowGMT()
 		
 		if(assetType == "Blade Chassis"){
 			if(!bladeRows)
@@ -187,21 +188,22 @@ class Model {
 	}
     
 	/**
-	 * @param : aka -> value of name
-	 * @param : createIfNotFound -> flag to determine whether need to create ManufacturerAlias or not
-	 * @return : void
-	 *
+	 * Used to get a ModelAlias object by name and create one (optionally) if it doesn't exist 
+	 * @param String name - name of the model alias
+	 * @param Boolean createIfNotFound - optional flag to indicating if record should be created (default false)
+	 * @return ModelAlias - a ModelAlias object if found or was successfully created , or null if not found or not created 
 	 */
-	
-	def findOrCreateByName(name, def createIfNotFound = false){
-		def modelAlias = ModelAlias.findByNameAndModel(name,this)
-		if(!modelAlias && createIfNotFound){
-			modelAlias = new ModelAlias(name:name.trim(), model:this, manufacturer:this.manufacturer)
-			if(modelAlias.save()){
-				modelAlias.errors.allErrors.each { log.error it}
+	def findOrCreateAliasByName(name, def createIfNotFound = false) {
+		name = name.trim()
+		def alias = ModelAlias.findByNameAndModel(name,this)
+		if( !alias && createIfNotFound){
+			alias = new ModelAlias(name:name, model:this, manufacturer:this.manufacturer)
+			if (! alias.save()) {
+				alias.errors.allErrors.each { log.error it}
+				alias = null
 			}
 		}
-        return modelAlias
+        return alias
 	}
 	
 }

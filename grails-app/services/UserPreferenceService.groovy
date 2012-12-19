@@ -11,6 +11,8 @@ import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetTransition
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
+
 class UserPreferenceService  {
 
 	static transactional = true
@@ -209,7 +211,7 @@ class UserPreferenceService  {
     	if( username ){
     		def userLogin = UserLogin.findByUsername( username )
 			getSession().setAttribute( "LOGIN_PERSON", ['name':userLogin.person.firstName, "id":userLogin.person.id ])
-			userLogin.lastLogin = GormUtil.convertInToGMT( "now", "EDT" )
+			userLogin.lastLogin = TimeUtil.nowGMT()
     		userLogin.save(flush:true)
     	}
     }

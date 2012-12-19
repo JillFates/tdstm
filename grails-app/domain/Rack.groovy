@@ -17,7 +17,7 @@ class Rack {
 	static hasMany = [sourceAssets:AssetEntity, targetAssets:AssetEntity]
 	static mappedBy = [sourceAssets:"rackSource", targetAssets:"rackTarget"]
 	
-	static belongsTo = [ manufacturer : Manufacturer, model:Model]
+	static belongsTo = [ manufacturer:Manufacturer, model:Model]
 	
 	static constraints = {
 		project( nullable:false )

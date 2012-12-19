@@ -9,17 +9,16 @@ class ManufacturerAlias {
 	Manufacturer manufacturer
 	Date dateCreated
 	
-		
 	static constraints = {
-		name nullable:false, blank:false, unique:true
-		manufacturer nullable:false
+		name unique:true
     }
 
 	static mapping = {
-		version false		
+		version false	
+		autoTimestamp false	
 	}
 	
 	def beforeInsert = {
-		dateCreated = TimeUtil.convertInToGMT( "now", "EDT" )
+		dateCreated = TimeUtil.nowGMT()
 	}	
 }

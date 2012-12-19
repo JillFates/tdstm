@@ -42,7 +42,7 @@ class ModelSyncBatchController {
 									akas.each{
 										def manuExist = Manufacturer.findByName(it.trim())
 										if(!manuExist){
-											manufacturerInstance.findOrCreateByName(it.trim(), true)
+											manufacturerInstance.findOrCreateAliasByName(it.trim(), true)
 										}
 									}
 							    }
@@ -62,7 +62,7 @@ class ModelSyncBatchController {
 									akas.each{
 										def manuExist = Manufacturer.findByName(it.trim())
 										if(!manuExist){
-											manufacturerInstance.findOrCreateByName(it.trim(), true)
+											manufacturerInstance.findOrCreateAliasByName(it.trim(), true)
 										}
 									}
 							    }
@@ -83,7 +83,7 @@ class ModelSyncBatchController {
 								akas.each{
 									def manuExist = Manufacturer.findByName(it.trim())
 									if(!manuExist){
-										manufacturerInstance.findOrCreateByName(it.trim(), true)
+										manufacturerInstance.findOrCreateAliasByName(it.trim(), true)
 									}
 									
 								}
@@ -139,7 +139,7 @@ class ModelSyncBatchController {
 									akas.each{
 										def akaExist = Model.findByName(it.trim())
 										if( !akaExist ){
-											modelInstance.findOrCreateByName(it.trim(), true)
+											modelInstance.findOrCreateAliasByName(it.trim(), true)
 										}
 									}
 							    }
@@ -183,7 +183,7 @@ class ModelSyncBatchController {
 										akas.each{
 											def akaExist = Model.findByModelName(it.trim())
 											if( !akaExist ){
-												modelInstance.findOrCreateByName(it.trim(), true)
+												modelInstance.findOrCreateAliasByName(it.trim(), true)
 											}
 										}
 									}
@@ -228,9 +228,10 @@ class ModelSyncBatchController {
 								if(modelSync.aka){
 									def akas = modelSync.aka?.split(",")
 									akas.each{
-										def akaExist = Model.findByModelName(it.trim())
-										if( !akaExist ){
-											modelInstance.findOrCreateByName(it.trim(), true)
+										// TODO - THIS should be checking if model exists by model name AND manufacturer. The model name is NOT unique
+										def modelExist = Model.findByModelName(it.trim())
+										if( !modelExist ){
+											modelInstance.findOrCreateAliasByName(it.trim(), true)
 										}
 									}
 								}

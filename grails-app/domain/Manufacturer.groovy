@@ -19,29 +19,33 @@ class Manufacturer {
 	}
 	
 	static mapping  = {	
-		version true
 		autoTimestamp false
 		id column:'manufacturer_id'
 	}
 	
-	String toString(){
+	String toString() {
 		name
 	}
 	
 	def beforeInsert = {
-		dateCreated = TimeUtil.convertInToGMT( "now", "EDT" )
-		lastModified = TimeUtil.convertInToGMT( "now", "EDT" )
+		dateCreated = lastModified = TimeUtil.nowGMT()
 	}
 	def beforeUpdate = {
-		lastModified = TimeUtil.convertInToGMT( "now", "EDT" )
+		lastModified = TimeUtil.nowGMT()
 	}
 	
+	/*
+	 * Handle cascading delete logic that is not implemented through constraints
+	 *   1. Set all AssetEntity.manufacturer to null
+	 *   2. Delete all manufacturer Aliases
+	 *   3. TODO - handle Room?
+	 *   4. TODO - What about the sync tables?
+	 */
 	def beforeDelete = {
         AssetEntity.withNewSession{ 
             AssetEntity.executeUpdate("Update AssetEntity set manufacturer=null where manufacturer = :manufacturer",[manufacturer:this])
         }
-        ManufacturerAlias.withNewSession { aliases*.delete() }
-        
+        ManufacturerAlias.withNewSession { aliases*.delete() }        
 	}
 	
 	/*
@@ -50,27 +54,30 @@ class Manufacturer {
 	def getModelsCount(){
 		return Model.countByManufacturer(this)
 	}
-	
-	// Get list of alias records for the manufacturer
+
+	/** 
+	 * Get list of alias records for the manufacturer
+	 * @Return Set of ManufacturerAlias records for the current manufacturer
+	 */
 	def getAliases() {
 		ManufacturerAlias.findAllByManufacturer(this, [sort:'name'])
 	}
 	
 	/**
-	 * Used to find or create manufacturer_alias based on flag .
-	 * @param : name -> aka value
-	 * @param : createIfNotFound -> flag to determine whether need to create ModelAlias or not
-	 * @return : ManufacturerAlias instance 
-	 *
+	 * Used to get a ManufacturerAlias object by name and create one (optionally) if it doesn't exist 
+	 * @param String name - name of the manufacturer alias
+	 * @param Boolean createIfNotFound - optional flag to indicating if record should be created (default false)
+	 * @return ManufacturerAlias - a ManufacturerAlias object if found or was successfully created , or null if not found or not created 
 	 */
-	def findOrCreateByName(name, def createIfNotFound = false){
-		def manuAlias = ManufacturerAlias.findByNameAndManufacturer(name, this)
-		if(!manuAlias && createIfNotFound){
-			manuAlias = new ManufacturerAlias(name:name.trim(), manufacturer:this)
-			if(manuAlias.save(flush:true)){
-				manuAlias.errors.allErrors.each { log.error it}
+	def findOrCreateAliasByName(name, def createIfNotFound = false){
+		def alias = ManufacturerAlias.findByNameAndManufacturer(name, this)
+		if ( !alias && createIfNotFound) {
+			alias = new ManufacturerAlias(name:name.trim(), manufacturer:this)
+			if (! alias.save(flush:true)) {
+				alias.errors.allErrors.each { log.error it}
+				alias = null
 			}
 		}
-        return manuAlias
+        return alias
 	}
 }

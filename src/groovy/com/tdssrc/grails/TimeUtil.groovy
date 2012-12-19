@@ -2,6 +2,7 @@ package com.tdssrc.grails
 
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
+import java.text.SimpleDateFormat
 
 /**
  * The TimeUtil class contains a collection of useful Time manipulation methods 
@@ -103,6 +104,18 @@ class TimeUtil {
 		return ago( elapsed(start, end) )
 	}
 
+	/**
+	 * Get the current datetime in GMT
+	 * @return Date The current date set in GMT
+	 */
+	def public static nowGMT() {
+		SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss")
+		dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"))
+		SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss")
+		
+		return dateFormatLocal.parse( dateFormatGmt.format(new Date()) )
+	}
+	
 	/**
 	 * Converts date into GMT
 	 * @param date
