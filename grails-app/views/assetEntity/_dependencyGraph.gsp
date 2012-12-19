@@ -34,19 +34,19 @@
 				<table id="legendId" cellpadding="0" cellspacing="0" style="margin-left: 5px; border: 0; width: 140px;">
 					<tr><td style="padding: 3px 3px;"><h3>Legend</h3></td></tr>
 					<tr>
-						<td nowrap="nowrap" ><img src="${createLinkTo(dir:'images',file:'iconApp.png')}" height="14" /></td>
+						<td nowrap="nowrap" ><img src="${resource(dir:'images',file:'iconApp.png')}" height="14" /></td>
 						<td><span style="vertical-align: text-top;">Apps</span></td>
 					</tr>
 					<tr>
-						<td nowrap="nowrap" ><img src="${createLinkTo(dir:'images',file:'iconServer.png')}" height="14" /></td>
+						<td nowrap="nowrap" ><img src="${resource(dir:'images',file:'iconServer.png')}" height="14" /></td>
 						<td><span style="vertical-align: text-top;">Servers</span></td>
 					</tr>
 					<tr>
-						<td nowrap="nowrap" ><img src="${createLinkTo(dir:'images',file:'iconDB.png')}" height="14" /></td>
+						<td nowrap="nowrap" ><img src="${resource(dir:'images',file:'iconDB.png')}" height="14" /></td>
 						<td><span style="vertical-align: text-top;">DB</span></td>
 					</tr>
 					<tr>
-						<td nowrap="nowrap" ><img src="${createLinkTo(dir:'images',file:'iconStorage.png')}" height="21" /></td>
+						<td nowrap="nowrap" ><img src="${resource(dir:'images',file:'iconStorage.png')}" height="21" /></td>
 						<td><span style="vertical-align: text-top;">Storage</span></td>
 					</tr>
 					<tr><td width="5px" ><hr style="width: 30px;color:rgb(56,56,56);"></hr></td><td>Valid Links</td></tr>

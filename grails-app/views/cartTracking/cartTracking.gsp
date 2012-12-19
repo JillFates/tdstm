@@ -4,9 +4,9 @@
 <meta name="layout" content="projectHeader" />
 <title>Cart Tracking</title>
 
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
 
 <script type="text/javascript">
 	$(document).ready(function() {

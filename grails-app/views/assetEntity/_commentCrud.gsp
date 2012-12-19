@@ -286,7 +286,7 @@
 			<td valign="top" class="name"><label for="estStartTrId">Estimated start:</label></td>
 			<td valign="top" class="value">
 			      <script type="text/javascript">
-				   jQuery(function($){$('.datetimeRange').datetimepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+				   jQuery(function($){$('.datetimeRange').datetimepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script> <input type="text" class="datetimeRange" size="15" style="" name="estStart" id="estStartCreateId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 				&nbsp;&nbsp;
@@ -496,7 +496,7 @@
 			<td valign="top" class="name"><label for="estStartTrId">Estimated Start:</label></td>
 			<td valign="top" class="value" nowrap="nowrap">
 				<script type="text/javascript" charset="utf-8">
-				  jQuery(function($){$('.datetimeEditRange').datetimepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+				  jQuery(function($){$('.datetimeEditRange').datetimepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script> <input type="text" class="datetimeEditRange" size="15" style="" name="estStart" id="estStartEditId"
 					value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			</td>

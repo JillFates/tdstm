@@ -6,9 +6,9 @@
 <title>Planning Console</title>
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
-<script type="text/javascript" src="${createLinkTo(dir:'d3',file:'d3.v2.js')} "></script>
-<link rel="stylesheet" href="${createLinkTo(dir:'d3/force',file:'force.css')}" type="text/css"/>
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
+<script type="text/javascript" src="${resource(dir:'d3',file:'d3.v2.js')} "></script>
+<link rel="stylesheet" href="${resource(dir:'d3/force',file:'force.css')}" type="text/css"/>
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 <script type="text/javascript">
 
 $(document).ready(function() {
@@ -37,8 +37,8 @@ $(document).ready(function() {
 	<div class="body">
 		<div id="dependencyTitle" style="float: left;">
 			<h1>Dependency Console</h1>
-			<img id="upArrow" style="display:none; margin-left: 179px; margin-top: -22px; float: left; " src="${createLinkTo(dir:'images',file:'triangle_up.png')}" onclick="collapsePage()"/>
-	        <img id="downArrow" style="float:left; margin-left: 179px; margin-top: -22px;" src="${createLinkTo(dir:'images',file:'triangle_down.png')}" onclick="openPage()"/>
+			<img id="upArrow" style="display:none; margin-left: 179px; margin-top: -22px; float: left; " src="${resource(dir:'images',file:'triangle_up.png')}" onclick="collapsePage()"/>
+	        <img id="downArrow" style="float:left; margin-left: 179px; margin-top: -22px;" src="${resource(dir:'images',file:'triangle_down.png')}" onclick="openPage()"/>
 		</div>
 		 <tds:hasPermission permission='MoveBundleEditView'>
 		<div id="checkBoxDiv" style="float: left;margin-top:10px;display: none; margin-left: 50px;">

@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="main" />
     <title>Edit MoveBundle</title>
-    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
+    <link rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 
     <g:javascript>
       function callBundleChange(val){
@@ -90,7 +90,7 @@
               <td valign="top"
                   class="bundle ${hasErrors(bean:moveBundleInstance,field:'startTime','errors')}">
                 <script type="text/javascript" charset="utf-8">
-                  jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+                  jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                 </script> <input type="text" class="dateRange" size="15"
                                  style="width: 112px; height: 14px;" name="startTime"
                                  value="<tds:convertDate date="${moveBundleInstance?.startTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>">
@@ -121,7 +121,7 @@
                 <td valign="top"
                     class="bundle ${hasErrors(bean:moveBundleInstance,field:'finishTime','errors')}">
                 <script type="text/javascript" charset="utf-8">
-                  jQuery(function($){$('.datetRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+                  jQuery(function($){$('.datetRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                 </script> <input type="text" class="dateRange" size="15"
                                  style="width: 112px; height: 14px;" name="startTime"
                                  value="<tds:convertDate date="${moveBundleInstance?.finishTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>">

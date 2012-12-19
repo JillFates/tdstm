@@ -5,8 +5,8 @@
     <title>Model - Edit</title>
     <g:javascript src="drag_drop.js" />
     <g:javascript src="model.manufacturer.js" />   
-    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
-    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
+    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
+    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
   </head>
   <body>
 <div class="body">
@@ -104,7 +104,7 @@
 			<td valign="top" class="name"><label for="endOfLifeDate">End of Life Date:</label></td>
 			<td valign="top" class="value ${hasErrors(bean:modelInstance,field:'endOfLifeDate','errors')}">
 				<script type="text/javascript" charset="utf-8">
-                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 				</script>
 				<input type="text" class="dateRange" size="15" style="width:112px;height:14px;" name="endOfLifeDate" id="endOfLifeDateId"
                    value="<tds:convertDate date="${modelInstance?.endOfLifeDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" />

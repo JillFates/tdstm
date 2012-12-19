@@ -5,15 +5,15 @@
 <g:javascript library="prototype" />
 <jq:plugin name="jquery.combined" />
 <g:javascript src="asset.tranman.js" />
-    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css"/>
-    <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" type="text/css"/>
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'rackLayout.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.core.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.dialog.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.theme.css')}" />
+    <link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css"/>
+    <link rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" type="text/css"/>
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.core.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.dialog.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
 <script type="text/javascript">
 	$(document).ready(function() {
 	    $("#editDialog").dialog({ autoOpen: false })

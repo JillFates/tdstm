@@ -3,9 +3,9 @@
 <head>
 	<meta name="layout" content="projectHeader" />
 	<title>Asset</title>
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'cleaning.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
 
 <script language="JavaScript" type="text/javascript">
 	/*--------------------------------------------------------
@@ -459,7 +459,7 @@ function mySelect(x)
 <body>
 	<div id="serverInfoDialog" title="Server Info" onclick="$('#serverInfoDialog').dialog('close')"></div>
 	<OBJECT id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C"
-		CODEBASE="${createLinkTo(dir:'resource',file:'TFORMer60.cab')}"
+		CODEBASE="${resource(dir:'resource',file:'TFORMer60.cab')}"
 		style="height: 1px;"></OBJECT>
 	<div class="mainbody" style="width: 100%;">
 	<div class="menu4">
@@ -475,7 +475,7 @@ function mySelect(x)
 		<g:form name="assetSearchForm" action="logisticsAssetSearch">
 			<input name="bundleId" type="hidden" value="${bundleId}" />
 			<input type="hidden" name="printCheck" id="printCheck" value="notprinted" />
-			<input type="hidden" name="urlPath" id="urlPath" value="<g:createLinkTo dir="resource" file="racking_label.tff" absolute="true"/>" />
+			<input type="hidden" name="urlPath" id="urlPath" value="<g:resource dir="resource" file="racking_label.tff" absolute="true"/>" />
 			<input name="teamId" type="hidden" value="${teamId}" />
 			<input name="location" type="hidden" value="${location}" />
 			<input name="projectId" type="hidden" value="${projectId}" />
@@ -495,7 +495,7 @@ function mySelect(x)
 			<input name="cartQty" type="hidden" value="${cartQty}" />
 			<input name="similarComment" id="similarComment" type="hidden" value="nosimilar" />
 		<div style="float: right; margin-right: 10px; margin-top: -20px;">
-			<input type="text" name="textSearch" id="textSearchId" size="10" />&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}" />
+			<input type="text" name="textSearch" id="textSearchId" size="10" />&nbsp;<img src="${resource(dir:'images',file:'search.png')}" />
 		</div>
 		<div id="mydiv" onclick="$('#mydiv').hide();setFocus();">						            
 			<g:if test="${flash.message}">

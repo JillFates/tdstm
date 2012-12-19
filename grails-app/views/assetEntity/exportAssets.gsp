@@ -3,7 +3,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="projectHeader" />
     <title>Asset Export</title>
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'progressbar.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
   </head>
   <body>
  <div class="body">

@@ -6,15 +6,15 @@
 <title>Application list</title>
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 
-<link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
-<script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
+<link rel="stylesheet" type="text/css" href="${resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
+<script language="javascript" src="${resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
 
 <script type="text/javascript">
 function onInvokeAction(id) {
@@ -60,23 +60,23 @@ $(document).ready(function() {
 		        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" nowrap>
 		        	<tds:hasPermission permission='EditAndDelete'>
 		        	    <g:checkBox name="assetCheckBox" id="checkId_${appEntityInstance.id}" onclick="enableButton(${assetEntityList.id})"></g:checkBox>
-		        		<a href="javascript:editEntity('application','${appEntityInstance?.assetType}', ${appEntityInstance?.id})"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
+		        		<a href="javascript:editEntity('application','${appEntityInstance?.assetType}', ${appEntityInstance?.id})"><img src="${resource(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 		        	</tds:hasPermission>
 		        	<tds:hasPermission permission="CommentCrudView">
 						<span id="icon_${appEntityInstance.id}">
 							<g:if test="${appEntityInstance.commentType == 'issue'}">
 								<g:remoteLink controller="assetEntity" action="listComments" id="${appEntityInstance.id}" before='setAssetId(${appEntityInstance.id});'	onComplete="listCommentsDialog( e ,'never' );">
-									<img src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="0px"/>
+									<img src="${resource(dir:'i',file:'db_table_red.png')}" border="0px"/>
 								</g:remoteLink>
 							</g:if>
 							<g:elseif test="${appEntityInstance.commentType == 'comment'}">
 								<g:remoteLink controller="assetEntity" action="listComments" id="${appEntityInstance.id}" before="setAssetId(${appEntityInstance.id});" onComplete="listCommentsDialog( e ,'never' ); ">
-									<img src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px"/>
+									<img src="${resource(dir:'i',file:'db_table_bold.png')}" border="0px"/>
 								</g:remoteLink>
 							</g:elseif>
 							<g:else>
 							<a href="javascript:createNewAssetComment(${appEntityInstance.id},'${appEntityInstance.assetName}');">
-								<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px"/>
+								<img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px"/>
 							</a>
 							</g:else>
 						</span>

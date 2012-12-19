@@ -302,11 +302,11 @@
 						<td valign="middle" style="vertical-align: middle"><span
 							style="white-space: nowrap; height: 100px;"> 
 							<a href="#" id="add">
-							<img  src="${createLinkTo(dir:'images',file:'right-arrow.png')}" style="float: left; border: none;"/>
+							<img  src="${resource(dir:'images',file:'right-arrow.png')}" style="float: left; border: none;"/>
 							</a></span><br/><br/><br/>
 						<br/>
 						<span style="white-space: nowrap;"> <a href="#" id="remove" >
-						<img  src="${createLinkTo(dir:'images',file:'left-arrow.png')}" style="float: left; border: none;"/>
+						<img  src="${resource(dir:'images',file:'left-arrow.png')}" style="float: left; border: none;"/>
 						</a></span></td>
 						<td valign="top" >
 						<g:form name="assignRightAssetsForm">

@@ -4,7 +4,7 @@
 <meta name="layout" content="projectHeader" />
 <title>Create Project</title>
 
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 
 <script type="text/javascript">
 
@@ -327,7 +327,7 @@
 				<td valign="top"
 					class="value ${hasErrors(bean:projectInstance,field:'startDate','errors')}">
 				<script type="text/javascript" charset="utf-8">
-                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="startDate" id="startDateId"
 					value="<tds:convertDate date="${projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="setCompletionDate(this.value);isValidDate(this.value);"/> 
        			<g:hasErrors bean="${projectInstance}" field="startDate">
@@ -341,7 +341,7 @@
 				<td valign="top"
 					class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}">
 				<script type="text/javascript" charset="utf-8">
-                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" id="completionDateId"	name="completionDate"
 					value="<tds:convertDate date="${projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="isValidDate(this.value);"/>
 				<g:hasErrors bean="${projectInstance}" field="completionDate">

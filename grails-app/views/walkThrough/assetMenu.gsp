@@ -2,9 +2,9 @@
 <html>
 <head>
 <title>Walkthru&gt; Asset Menu</title>
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'contextmenu.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'walkThrough.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'contextmenu.css')}" />
 <g:javascript src="contextmenu.js" />
 <g:javascript src="betterinnerhtml.js" />
 
@@ -453,8 +453,8 @@ function checkComments(type) {
 				<td class="field" nowrap>
 				<g:select name="sourceRackPosition" from="${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,'Undef']}" 
 							id="sourceRackPositionId" value="${assetEntity?.sourceRackPosition}" onchange="setMustSave(this.value,'${assetEntity?.sourceRackPosition}','front2', this.name)"/>
-				<img src="${createLinkTo(dir:'images',file:'plus.gif')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','up')"/>
-				<img src="${createLinkTo(dir:'images',file:'minus.gif')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','down')"/>
+				<img src="${resource(dir:'images',file:'plus.gif')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','up')"/>
+				<img src="${resource(dir:'images',file:'minus.gif')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','down')"/>
 				</td>
 			</tr>
 			
@@ -558,12 +558,12 @@ function checkComments(type) {
 		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
 		<div style="float:right;"><a class="button" href="#asset_menu">Asset Menu</a></div>
 		<br class="clear"/>
-		<object id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" codebase="${createLinkTo(dir:'resource',file:'TFORMer60.cab')}"></object>
+		<object id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" codebase="${resource(dir:'resource',file:'TFORMer60.cab')}"></object>
 		
 		<g:form name="assetTagLabelForm">
 		<table>
 		<tr>
-			<input type="hidden" name="urlPath" id="urlPath" value="<g:createLinkTo dir="resource" file="assetTag_label.tff" absolute="true"/>"/>
+			<input type="hidden" name="urlPath" id="urlPath" value="<g:resource dir="resource" file="assetTag_label.tff" absolute="true"/>"/>
 			<input type= "hidden" id="RepPath" name="RepPath">
 	      	<input type= "hidden" name="PrjName" id="PrjName">
 	        <input type= "hidden" name="FormName" id="FormName">

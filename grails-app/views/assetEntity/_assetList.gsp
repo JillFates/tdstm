@@ -58,17 +58,17 @@
 							</a> <span id="icon_15651">
 							 <g:if test="${AssetComment.find('from AssetComment where assetEntity = '+asset.id+' and commentType = ? and isResolved = ?',['issue',0])}">
 							   <g:remoteLink controller="assetEntity" action="listComments" id="${asset.id}" before="setAssetId('${asset.id}');" onComplete="listCommentsDialog(e,'never');">
-							      <img id="comment_${asset.id}" src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="0px" />
+							      <img id="comment_${asset.id}" src="${resource(dir:'i',file:'db_table_red.png')}" border="0px" />
 							   </g:remoteLink>
 				             </g:if>
 						     <g:elseif test="${AssetComment.find('from AssetComment where assetEntity = '+asset.id)}">
 						     <g:remoteLink controller="assetEntity" action="listComments" id="${asset.id}" before="setAssetId('${asset.id}');" onComplete="listCommentsDialog(e,'never');">
-							      <img id="comment_${asset.id}" src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px" />
+							      <img id="comment_${asset.id}" src="${resource(dir:'i',file:'db_table_bold.png')}" border="0px" />
 							 </g:remoteLink>
 						     </g:elseif>
 						     <g:else>
 						     <a href="javascript:createNewAssetComment(${asset.id},'${asset.assetName}');">
-							    <img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${asset.id},'${asset.assetName}');"/>
+							    <img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${asset.id},'${asset.assetName}');"/>
 							 </a>
 							    
 						    </g:else>

@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>Main Menu</title>
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'walkThrough.css')}" />
 </head>
 <body>
 <div class="qvga_border">

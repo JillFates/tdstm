@@ -471,8 +471,8 @@
 		              			<td valign="middle">
 			              			<div style="width:140px;">
 			              				<span><b>Filter By Racks</b></span>
-			              				<div style="float:left; width:30px;"><a href="#" onclick="moveRackUp()" id="add"><img src="${createLinkTo(dir:'images',file:'up-arrow.png')}" style="float: left; border: none;" /></a><br/>
-							              	<a href="#" onclick="moveRackDown()" id="add"><img src="${createLinkTo(dir:'images',file:'down-arrow.png')}" style="float: left; border: none;" /></a><br/>
+			              				<div style="float:left; width:30px;"><a href="#" onclick="moveRackUp()" id="add"><img src="${resource(dir:'images',file:'up-arrow.png')}" style="float: left; border: none;" /></a><br/>
+							              	<a href="#" onclick="moveRackDown()" id="add"><img src="${resource(dir:'images',file:'down-arrow.png')}" style="float: left; border: none;" /></a><br/>
 						              	</div>
 						              	
 				              			<div style="float:left;">

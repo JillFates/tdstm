@@ -3,9 +3,9 @@
 <head>
 	<meta name="layout" content="projectHeader" />
 	<title>Home</title>
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'cleaning.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
 	<script type="text/javascript">
 	/*----------------------------------------------------------
 	* To load the installed printers into session by initializing TFORMer
@@ -26,8 +26,8 @@
 	</script>
 </head>
 <body>
-<OBJECT id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" CODEBASE="${createLinkTo(dir:'resource',file:'TFORMer60.cab')}" style="height:1px;"></OBJECT>
-	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
+<OBJECT id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" CODEBASE="${resource(dir:'resource',file:'TFORMer60.cab')}" style="height:1px;"></OBJECT>
+	<div id="spinner" class="spinner" style="display: none;"><img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 		<div class="mainbody" style="width: 100%;" >
 			<div class="colum_techlogin" style="float:left;">
 				<div class="menu4">

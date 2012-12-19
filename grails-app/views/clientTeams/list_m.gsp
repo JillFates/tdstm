@@ -2,15 +2,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>Teams List</title>
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
-	<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
+	<link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	<g:javascript library="application" />
 	<meta name="viewport" content="height=device-height,width=320" />
 </head>
 <body>
-	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
+	<div id="spinner" class="spinner" style="display: none;"><img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody">
 		<div id="mobtitle">TransitionManager&trade; - Mobile</div>
 	<div class="menu4">

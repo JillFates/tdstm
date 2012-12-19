@@ -2,7 +2,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="projectHeader" />
-        <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
+        <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
         <title>Edit Project</title>
          <% def currProj = session.getAttribute("CURR_PROJ");
 		    def projectId = currProj.CURR_PROJ ;
@@ -86,7 +86,7 @@
 			                <td valign="top" class="name"><label for="startDate">Start Date:</label></td>
 			                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'startDate','errors')}">
 			                  <script type="text/javascript" charset="utf-8">
-			                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+			                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 			                  </script>
 			                  <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" name="startDate" id="startDateId"
 			                   value="<tds:convertDate date="${projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="setCompletionDate(this.value);isValidDate(this.value);"/>
@@ -97,7 +97,7 @@
 			                <td valign="top" class="name"><label for="completionDate"><b>Completion Date:&nbsp;<span style="color: red">*</span></b></label></td>
 			                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}">
 			                  <script type="text/javascript" charset="utf-8">
-			                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${createLinkTo(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+			                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 			                  </script>
 			                  <input type="text" class="dateRange" size="15" style="width:112px;height:14px;" id="completionDateId" 
 			                  name="completionDate" value="<tds:convertDate date="${projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="isValidDate(this.value)"/>
@@ -121,7 +121,7 @@
 							<td valign="top" class="name"><label for="client">Partner Image:</label>
 							</td>
 							<g:if test="${projectLogoForProject}">
-							<td valign="top" class="value"><g:link  action="deleteImage" params='["id":projectInstance?.id]'><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;border:0px;"/><img src="${createLinkTo(dir:'images',file:'delete.png' )}" style="border:0px;padding:6px;"/></g:link></td>
+							<td valign="top" class="value"><g:link  action="deleteImage" params='["id":projectInstance?.id]'><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;border:0px;"/><img src="${resource(dir:'images',file:'delete.png' )}" style="border:0px;padding:6px;"/></g:link></td>
 							</g:if>
 							<g:else>				
 							<td valign="top" class="value">

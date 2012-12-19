@@ -3,10 +3,10 @@
 <head>
 <meta http-equiv="refresh" content="0; url=/tdstm/">
 <title>Login</title>
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
-<link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
+<link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <g:javascript library="application" />
 <meta name="viewport" content="height=device-height,width=220" />
 <script type="text/javascript">
@@ -50,7 +50,7 @@
 </head>
 <body onload="getCookie('username');">
 <div id="spinner" class="spinner" style="display: none;">
-<img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
+<img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 </div>
 <div class="mainbody" style="width: auto;">
 <div class="colum_techlogin_login" style="float:left;">
@@ -61,7 +61,7 @@
         <div style="width: 200px;" class="message">${flash.message}</div>
         </g:if>
         <div style="float: left; padding-left: 2px; width: 98%; margin-top: 2px;">
-		<img src="${createLinkTo(dir:'images',file:'tds_movetech.jpg')}" border="0" alt="tds" />
+		<img src="${resource(dir:'images',file:'tds_movetech.jpg')}" border="0" alt="tds" />
         </div>
 
         <div style="float: left; width: 100%; margin: 4px 0; text-align: center;">

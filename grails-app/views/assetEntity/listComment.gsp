@@ -6,10 +6,10 @@
         <title>Asset Comment</title>
          <g:javascript src="asset.tranman.js" />
           <g:javascript src="entity.crud.js" />
-        <script language="javascript" src="${createLinkTo(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
-        <link rel="stylesheet" type="text/css" href="${createLinkTo(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
-        <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
-        <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
+        <script language="javascript" src="${resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
+        <link rel="stylesheet" type="text/css" href="${resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
+        <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+        <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
         <script type="text/javascript">
         function onInvokeAction(id) {
             setExportToLimit(id, '');
@@ -55,7 +55,7 @@
 					<jmesa:htmlTable style=" border-collapse: separate" editable="true">
 						<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
 							<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" nowrap>
-				        		<a href="javascript:showAssetComment(${commentInstance?.id}, 'edit')"><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
+				        		<a href="javascript:showAssetComment(${commentInstance?.id}, 'edit')"><img src="${resource(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
 							</jmesa:htmlColumn>
 							<jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Description" nowrap>
 								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.description?.size() > 40 ? commentInstance.description?.substring(0,40)+'..' : commentInstance.description}</span>

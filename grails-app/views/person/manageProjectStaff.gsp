@@ -3,11 +3,11 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="projectHeader" />
         <g:javascript src="projectStaff.js" />
-        <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
-	    <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+        <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
+	    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
         <title>Project Staff</title>   
-        <link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'calendarview.css')}" />
-		<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
+        <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'calendarview.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 		 
     </head>
     <body>

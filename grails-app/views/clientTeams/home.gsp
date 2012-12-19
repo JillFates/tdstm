@@ -5,8 +5,8 @@
         <meta name="layout" content="projectHeader" />
 	<title>Team Home</title>
 	<jq:plugin name="jquery"/>
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
 
 <style type="text/css">
 dt {
@@ -33,7 +33,7 @@ dt {
 </script>  
 </head>
 <body>
-	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
+	<div id="spinner" class="spinner" style="display: none;"><img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody">
 	<div class="menu4">
 		<ul>

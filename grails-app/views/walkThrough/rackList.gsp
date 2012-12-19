@@ -2,8 +2,8 @@
 <head>
 <title>Walkthru&gt; Select Rack</title>
 <g:javascript library="prototype" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'walkThrough.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'walkThrough.css')}" />
 <g:javascript src="betterinnerhtml.js" />
 <script type="text/javascript">
 /*-----------------------------------------------------------------

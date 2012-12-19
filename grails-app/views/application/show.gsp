@@ -373,7 +373,7 @@
 			<tbody id="listCommentsTbodyIds">
 			<g:each status="i" in="${assetCommentList}"  var="commentList">
 			<tr style="cursor: pointer;">
-				<td ><a href ="javascript:showComment(${commentList.id},'edit')" ><img src="${createLinkTo(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a></td>
+				<td ><a href ="javascript:showComment(${commentList.id},'edit')" ><img src="${resource(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a></td>
 				<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.comment}</td>
 				<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.commentType}</td>
 				<td ><g:if test ="${commentList.commentType =='issue' && commentList.isResolved == 1}"><g:checkBox name="myCheckbox" value="${true}" disabled="true"/></g:if><g:else>&nbsp</g:else></td>
@@ -403,10 +403,10 @@
 					</tds:hasPermission>
 					<tds:hasPermission permission="CommentCrudView">	
 						<a href="javascript:createIssue('${applicationInstance.assetName}','comment', ${applicationInstance.id});">
-							<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Comment
+							<img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Comment
 						</a>
 						<a href="javascript:createIssue('${applicationInstance.assetName}','', ${applicationInstance.id});">
-							<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Task
+							<img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Task
 						</a>
 					</tds:hasPermission>
 				</g:form>

@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dashboard.css')}" />
 <title>Workflow Roles</title>
 </head>
 <body>

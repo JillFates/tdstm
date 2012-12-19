@@ -5,14 +5,14 @@
 <meta name="layout" content="projectHeader" />
 <title>Asset Tracker</title>
 
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'jquery.autocomplete.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.accordion.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.resizable.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.slider.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.tabs.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tableTheme.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'ui.datepicker.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dashboard.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tableTheme.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
@@ -158,7 +158,7 @@
 			<th style="padding-top:35px;" >
 				<tds:sortableLink id="column1Label" style="border:0px;" property="${columns?.column1.field}"  title="${columns?.column1.label}" params="['projectId':projectId, moveEvent:moveEventInstance?.id, 'moveBundle':moveBundleInstance?.id,'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
 				<span id="column1Select" style="display: none;"><g:select from="${attributesList}" optionKey="attributeCode" optionValue="frontendLabel" name="column1Attribute"  value="${columns?.column1.field}"></g:select></span>
-				<span id="column1Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
+				<span id="column1Edit"><img src="${resource(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
 				<span id="column1Save" style="display: none;"><input type="submit" value="Save"/>&nbsp;<input type="button" value="X" onclick="changeToLabel('1')"/></span> 
 				<br />
 					
@@ -172,7 +172,7 @@
 			<th style="padding-top:35px;">
 				<tds:sortableLink id="column2Label" style="border:0px;" property="${columns?.column2.field}"  title="${columns?.column2.label}" params="['projectId':projectId,moveEvent:moveEventInstance?.id, 'moveBundle':moveBundleInstance?.id, 'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]" />
 				<span id="column2Select" style="display: none;"><g:select from="${attributesList}" optionKey="attributeCode" optionValue="frontendLabel" name="column2Attribute" value="${columns?.column2.field}"></g:select></span>
-				<span id="column2Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
+				<span id="column2Edit"><img src="${resource(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
 				<span id="column2Save" style="display: none;"><input type="submit" value="Save"/>&nbsp;<input type="button" value="X" onclick="changeToLabel('2')"/></span> 
 				<br />
 
@@ -186,7 +186,7 @@
 			<th style="padding-top:35px;">
 				<tds:sortableLink id="column3Label" style="border:0px;" property="${columns?.column3.field}"  title="${columns?.column3.label}" params="['projectId':projectId, moveEvent:moveEventInstance?.id, 'moveBundle':moveBundleInstance?.id, 'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
 				<span id="column3Select" style="display: none;"><g:select from="${attributesList}" optionKey="attributeCode" optionValue="frontendLabel" name="column3Attribute" value="${columns?.column3.field}" ></g:select></span>
-				<span id="column3Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
+				<span id="column3Edit"><img src="${resource(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
 				<span id="column3Save" style="display: none;"><input type="submit" value="Save"/>&nbsp;<input type="button" value="X" onclick="changeToLabel('3')"/></span> 
 				<br />
 
@@ -200,7 +200,7 @@
 			<th style="padding-top:35px;">
 				<tds:sortableLink id="column4Label" style="border:0px;" property="${columns?.column4.field}"  title="${columns?.column4.label}" params="['projectId':projectId, moveEvent:moveEventInstance?.id, 'moveBundle':moveBundleInstance?.id, 'column1':column1Value,'column2':column2Value,'column3':column3Value,'column4':column4Value, 'assetsInView':assetsInView, 'offset':params.offset]"/>
 				<span id="column4Select" style="display: none;"><g:select from="${attributesList}" optionKey="attributeCode" optionValue="frontendLabel" name="column4Attribute" value="${columns?.column4.field}" ></g:select></span>
-				<span id="column4Edit"><img src="${createLinkTo(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
+				<span id="column4Edit"><img src="${resource(dir:'i',file:'db_edit.png')}" border="0px" onclick="changeLabelToSelect()"/></span>
 				<span id="column4Save" style="display: none;"><input type="submit" value="Save"/>&nbsp;<input type="button" value="X" onclick="changeToLabel('4')"/></span> 
 				<br />
 
@@ -219,7 +219,7 @@
 			</g:each>
 			</g:if>
 			<g:else>
-			<th style="padding-left: 0px; height: 102px" colspan="${headerCount}"><embed src="${createLinkTo(dir:'templates',file:'headerSvg_'+bundleId+'.svg')}" type="image/svg+xml" width="${headerCount*21.80}" height="102px"/></th>
+			<th style="padding-left: 0px; height: 102px" colspan="${headerCount}"><embed src="${resource(dir:'templates',file:'headerSvg_'+bundleId+'.svg')}" type="image/svg+xml" width="${headerCount*21.80}" height="102px"/></th>
 			</g:else>
 		</tr>
 	</g:form>
@@ -234,18 +234,18 @@
 				<g:checkBox name="checkChange" id="checkId_${assetEntity.id}" onclick="timedUpdate('never')"></g:checkBox>
 			</span>
 			</g:if>
-			<img id="asset_${assetEntity.id}" src="${createLinkTo(dir:'images',file:'asset_view.png')}" border="0px" />
+			<img id="asset_${assetEntity.id}" src="${resource(dir:'images',file:'asset_view.png')}" border="0px" />
 			<span id="icon_${assetEntity.id}">
 				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id+' and commentType = ? and isResolved = ?',['issue',0])}">
-						<img id="comment_${assetEntity.id}" src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="0px" />
+						<img id="comment_${assetEntity.id}" src="${resource(dir:'i',file:'db_table_red.png')}" border="0px" />
 				</g:if>
 				<g:else>
 					<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id)}">
-						<img id="comment_${assetEntity.id}" src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px" />
+						<img id="comment_${assetEntity.id}" src="${resource(dir:'i',file:'db_table_bold.png')}" border="0px" />
 					</g:if>
 					<g:else>
 					<g:if test="${clientConsoleCommentHasPermission}">
-						<img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${assetEntity.id},'${assetEntity.asset.assetName}');"/>
+						<img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${assetEntity.id},'${assetEntity.asset.assetName}');"/>
 					</g:if>
 					</g:else>
 			</g:else>

@@ -3,24 +3,24 @@
 <html>
 <head>
 <title>Login</title>
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" type="text/css"/>
-<link rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" type="text/css"/>
+<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css"/>
+<link rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" type="text/css"/>
 <link rel="shortcut icon"
-	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <meta name="viewport" content="height=device-height,width=device-width" />
 	
 <g:javascript library="application" />
 </head>
 <body onload="document.loginForm.username.focus()">
 <div id="spinner" class="spinner" style="display: none;"><img
-	src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
+	src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 </div>
 <div class="logo">
 <table style="border: 0; width: 292px;">
 	<tr>
 		<td style="text-align: center;">
 			<a href="http://www.transitionaldata.com/" target="new">
-			<img src="${createLinkTo(dir:'images',file:'tds2b.png')}" border="0" alt="Visit TDS" /></a>
+			<img src="${resource(dir:'images',file:'tds2b.png')}" border="0" alt="Visit TDS" /></a>
 			<br />
 			<h1>TransitionManager&trade;</h1>
 		</td>

@@ -11,7 +11,7 @@
 </head>
 <body>
 	<a name="top"></a>
-	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
+	<div id="spinner" class="spinner" style="display: none;"><img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" id="mainbody">
 	 	<div id="mydiv" onclick="this.style.display = 'none';">
  			<g:if test="${flash.message}">

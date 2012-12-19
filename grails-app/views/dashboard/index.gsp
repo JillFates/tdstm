@@ -4,11 +4,11 @@
 <meta name="layout" content="projectHeader" />
 <title>Client Dashboard</title>
 <link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'dashboard.css')}" />
+	href="${resource(dir:'css',file:'dashboard.css')}" />
 <link type="text/css" rel="stylesheet"
-	href="${createLinkTo(dir:'css',file:'tabcontent.css')}" />
+	href="${resource(dir:'css',file:'tabcontent.css')}" />
 <link rel="shortcut icon"
-	href="${createLinkTo(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <%--<g:javascript src="FusionCharts.js" /> --%>
 <g:javascript src="yahoo.ui.dashboard.js" />
 </head>
@@ -79,12 +79,12 @@
 							<g:if test="${manualOverrideViewPermission}">
 								<a href="#manualSummary" onclick="javascript:$('#manualSumStatusSpan').show();"> 
 									<img id="summary_gauge" alt="Move Event Summary"
-									src="${createLinkTo(dir:'i/dials',file:'dial-50.png')}"	style="border: 0px;"> 
+									src="${resource(dir:'i/dials',file:'dial-50.png')}"	style="border: 0px;"> 
 								</a>
 							</g:if>
 							<g:else>
 								<img id="summary_gauge" alt="Move Event Summary"
-									src="${createLinkTo(dir:'i/dials',file:'dial-50.png')}"
+									src="${resource(dir:'i/dials',file:'dial-50.png')}"
 									style="border: 0px;">
 							</g:else>
 						</div>
@@ -106,7 +106,7 @@
 					<div id="topindright" style="display: none;">
 						<div id="revised_gauge_div" align="center">
 							<img id="revised_gauge" alt="Move Event Revised Summary"
-								src="${createLinkTo(dir:'i/dials',file:'dial-50.png')}">
+								src="${resource(dir:'i/dials',file:'dial-50.png')}">
 						</div>
 						Status vs. Revised Plan
 					</div>
@@ -157,13 +157,13 @@
 					<div id="newsarrows">
 						<div id="toparrow">
 							<a href="javascript:moveup()"><img
-								src="${createLinkTo(dir:'images',file:'up_arrow.png')}"
+								src="${resource(dir:'images',file:'up_arrow.png')}"
 								alt="scroll up" width="10" height="6" border="0" />
 							</a>
 						</div>
 						<div id="bottomarrow">
 							<a href="javascript:movedown()"><img
-								src="${createLinkTo(dir:'images',file:'down_arrow.png')}"
+								src="${resource(dir:'images',file:'down_arrow.png')}"
 								alt="scroll down" width="10" height="6" border="0" />
 							</a>
 						</div>
@@ -198,7 +198,7 @@
 				</div>
 				<div id="leftarrow">
 					<a href="javascript:void(0);" id="move-left"><img
-						src="${createLinkTo(dir:'images',file:'left_arrow.png')}"
+						src="${resource(dir:'images',file:'left_arrow.png')}"
 						alt="back" border="0" width="16" height="23" align="right">
 					</a>
 				</div>
@@ -237,7 +237,7 @@
 											<tds:hasPermission permission='ViewPacingMeters'>
 												<img
 													id="chart_${moveBundle.id}_${moveBundleStep.transitionId}"
-													src="${createLinkTo(dir:'i/dials',file:'dial-50sm.png')}">
+													src="${resource(dir:'i/dials',file:'dial-50sm.png')}">
 											</tds:hasPermission>
 										</div>
 									</div>
@@ -248,7 +248,7 @@
 				</div>
 				<div id="rightarrow">
 					<a href="javascript:void(0);" id="move-right"><img
-						src="${createLinkTo(dir:'images',file:'right_arrow.png')}"
+						src="${resource(dir:'images',file:'right_arrow.png')}"
 						alt="back" border="0" width="16" height="23" align="right">
 					</a>
 				</div>
@@ -963,7 +963,7 @@
         $("#"+divId).attr("title", dialInd);
 		
 		<%--try{
-			//var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId2b", "100", "75", "0", "0");
+			//var myChart = new FusionCharts("${resource(dir:'swf',file:'AngularGauge.swf')}", "myChartId2b", "100", "75", "0", "0");
 			updateChartXML( divId, stepDialData( dialInd ) ); 
 			//myChart.setDataXML( xmlData );
 			//myChart.render(divId);
@@ -980,13 +980,13 @@
 		var src = "../i/dials/dial-"+dInd+".png";
 		$("#"+divId).attr("src", src);
 		$("#"+divId).attr("title", dialInd);
-		<%--//var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
+		<%--//var myChart = new FusionCharts("${resource(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
 		updateChartXML(divId, summaryDialData( dialInd ) );
 		//myChart.setDataXML( xmlData );
 	   	//myChart.render(divId); --%>
 	}
 	<%--function updateRevisedGauge( divId, dialInd ){
-		   //var myChart = new FusionCharts("${createLinkTo(dir:'swf',file:'AngularGauge.swf')}", "myChartId1", "180", "136", "0", "0");
+		   //var myChart = new FusionCharts("${resource(dir:'swf',file:'AngularGauge.swf')}", "myChartId1", "180", "136", "0", "0");
 		updateChartXML( divId, revisedDialData( dialInd ) ); 
 	    //myChart.setDataXML( xmlData );
 	   	//myChart.render(divId); 

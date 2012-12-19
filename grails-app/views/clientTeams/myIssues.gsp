@@ -12,7 +12,7 @@
 		<div class="menu4">
 		<g:if test="${isOnIE}">
 		<OBJECT id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C"
-				CODEBASE="${createLinkTo(dir:'resource',file:'TFORMer60.cab')}"
+				CODEBASE="${resource(dir:'resource',file:'TFORMer60.cab')}"
 				style="height: 1px;"></OBJECT>
 		</g:if>
 			<ul>

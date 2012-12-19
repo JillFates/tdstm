@@ -3,9 +3,9 @@
 <head>
 <title>MoveTech Home</title>
 <jq:plugin name="jquery"/>
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
-<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
 <meta name="viewport" content="height=device-height,width=220" />
 
 <style type="text/css">
@@ -34,7 +34,7 @@ dt {
 </head>
 <body>
 	<div id="spinner" class="spinner" style="display: none;"><img
-		src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" />
+		src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 	</div>
 	<div class="mainbody" style="width: 220px; border:0;" >
 	<div class="border_bundle_team" style="border:0px;">

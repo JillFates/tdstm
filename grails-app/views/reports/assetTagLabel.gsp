@@ -157,7 +157,7 @@ function mySelect(x)
 			</div>
 			</g:if>
 <div class="dialog">
-<object id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" codebase="${createLinkTo(dir:'resource',file:'TFORMer60.cab')}"></object>
+<object id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" codebase="${resource(dir:'resource',file:'TFORMer60.cab')}"></object>
 <g:form	name="assetTagLabelForm" >
 <div id="teamNotFound" class="message" style="display:none">
 					<ul>
@@ -172,7 +172,7 @@ function mySelect(x)
 		<tr class="prop" id="bundleRow">
 
 			<td valign="top" class="name"><label><b>Bundles:<span style="color: red;">*</span></b> </label>
-			<input type="hidden" name="urlPath" id="urlPath" value="<g:createLinkTo dir="resource" file="assetTag_label.tff" absolute="true"/>" />
+			<input type="hidden" name="urlPath" id="urlPath" value="<g:resource dir="resource" file="assetTag_label.tff" absolute="true"/>" />
 			<td valign="top" class="value">
 				<select id="moveBundleId" name="moveBundles">
 					<option value="null" selected="selected">Please Select</option>

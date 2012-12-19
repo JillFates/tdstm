@@ -3,9 +3,9 @@
 <head>
 	<meta name="layout" content="projectHeader" />
 	<title>My Tasks</title>
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'tds.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'cleaning.css')}" />
-	<link type="text/css" rel="stylesheet" href="${createLinkTo(dir:'css',file:'qvga.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'cleaning.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
 
 	
 <script type="text/javascript">
@@ -78,7 +78,7 @@
 				  <g:link class="tab_deselect" action="logisticsMyTasks" params='["bundleId":bundleId,"teamId":teamId,"location":location,"projectId":projectId,"tab":"All"]'>All&nbsp;(${allSize})</g:link>
 				</g:else>
 			</td>
-			<td class="tab_search"><input  type="text" size="10" value="" id="search" name="search" autocorrect="off" autocapitalize="off" />&nbsp;<img src="${createLinkTo(dir:'images',file:'search.png')}"/></td>
+			<td class="tab_search"><input  type="text" size="10" value="" id="search" name="search" autocorrect="off" autocapitalize="off" />&nbsp;<img src="${resource(dir:'images',file:'search.png')}"/></td>
 		</tr>
 		</table>
 		</div>

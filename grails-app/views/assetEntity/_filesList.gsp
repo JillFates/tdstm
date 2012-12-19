@@ -44,17 +44,17 @@
 									src="/tdstm/images/skin/database_edit.png" border="0px" />
 							</a> <span id="icon_15651"> <g:if test="${AssetComment.find('from AssetComment where assetEntity = '+files.id+' and commentType = ? and isResolved = ?',['issue',0])}">
 							   <g:remoteLink controller="assetEntity" action="listComments" id="${files.id}" before="setAssetId('${files.id}');" onComplete="listCommentsDialog(e,'never');">
-							      <img id="comment_${files.id}" src="${createLinkTo(dir:'i',file:'db_table_red.png')}" border="0px" />
+							      <img id="comment_${files.id}" src="${resource(dir:'i',file:'db_table_red.png')}" border="0px" />
 							   </g:remoteLink>
 				             </g:if>
 						     <g:elseif test="${AssetComment.find('from AssetComment where assetEntity = '+files.id)}">
 						     <g:remoteLink controller="assetEntity" action="listComments" id="${files.id}" before="setAssetId('${files.id}');" onComplete="listCommentsDialog(e,'never');">
-							      <img id="comment_${files.id}" src="${createLinkTo(dir:'i',file:'db_table_bold.png')}" border="0px" />
+							      <img id="comment_${files.id}" src="${resource(dir:'i',file:'db_table_bold.png')}" border="0px" />
 							 </g:remoteLink>
 						     </g:elseif>
 						     <g:else>
 						     <a href="javascript:createNewAssetComment(${files.id},'${files.assetName}');">
-							    <img src="${createLinkTo(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${files.id},'${files.assetName}');"/>
+							    <img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${files.id},'${files.assetName}');"/>
 							 </a>
 							    
 						    </g:else> </a> </span>

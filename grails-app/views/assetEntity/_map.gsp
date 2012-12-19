@@ -4,41 +4,41 @@
 					<tr>
 						<td style="padding: 0px;width: 30px;">Force</td>
 						<td style="padding-left :5px;">
-							<img src="${createLinkTo(dir:'images',file:'minus.gif')}" height="18" class="pointer" onclick="increaseValue('sub','forceId')"/>
+							<img src="${resource(dir:'images',file:'minus.gif')}" height="18" class="pointer" onclick="increaseValue('sub','forceId')"/>
 							<input type="text" id="forceId" name="force" value="${force}" disabled="disabled" style="width: 30px;border: 0px;background-color: #FFF;text-align: center;vertical-align: top;">
-							<img src="${createLinkTo(dir:'images',file:'plus.gif')}" height="18" class="pointer" onclick="increaseValue('add','forceId')"/>
+							<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer" onclick="increaseValue('add','forceId')"/>
 						</td>
 					</tr>
 					<tr>
 						<td style="padding: 0px;width: 30px;">Links</td>
 						<td style="padding-left :5px">
-							<img src="${createLinkTo(dir:'images',file:'minus.gif')}" height="18"  class="pointer" onclick="increaseValue('sub','linksId')"/>
+							<img src="${resource(dir:'images',file:'minus.gif')}" height="18"  class="pointer" onclick="increaseValue('sub','linksId')"/>
 							<input type="text" id="linksId" name="links" value="${distance}" disabled="disabled" style="width: 30px;border: 0px;background-color: #FFF;text-align: center;" >
-							<img src="${createLinkTo(dir:'images',file:'plus.gif')}" height="18"  class="pointer" onclick="increaseValue('add','linksId')"/>
+							<img src="${resource(dir:'images',file:'plus.gif')}" height="18"  class="pointer" onclick="increaseValue('add','linksId')"/>
 						</td>
 					</tr>
 					<tr>
 						<td style="padding: 0px;width: 30px;">Friction</td>
 						<td style="padding-left :5px">
-							<img src="${createLinkTo(dir:'images',file:'minus.gif')}" height="18"  class="pointer" onclick="increaseValue('sub','frictionId')"/>
+							<img src="${resource(dir:'images',file:'minus.gif')}" height="18"  class="pointer" onclick="increaseValue('sub','frictionId')"/>
 							<input type="text" id="frictionId" name="friction" value="${friction}" disabled="disabled" style="width: 30px;border: 0px;background-color: #FFF;text-align: center;" >
-							<img src="${createLinkTo(dir:'images',file:'plus.gif')}" height="18" class="pointer"  onclick="increaseValue('add','frictionId')"/>
+							<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer"  onclick="increaseValue('add','frictionId')"/>
 						</td>
 					</tr>
 					<tr>
 						<td style="padding: 0px;width: 30px;">Height</td>
 						<td style="padding-left :5px">
-							<img src="${createLinkTo(dir:'images',file:'minus.gif')}" height="18"  class="pointer" onclick="increaseValue('sub','heightId')"/>
+							<img src="${resource(dir:'images',file:'minus.gif')}" height="18"  class="pointer" onclick="increaseValue('sub','heightId')"/>
 							<input type="text" id="heightId" name="height" value="${height}" disabled="disabled" style="width: 30px;border: 0px;background-color: #FFF;text-align: center;" >
-							<img src="${createLinkTo(dir:'images',file:'plus.gif')}" height="18"  class="pointer" onclick="increaseValue('add','heightId')"/>
+							<img src="${resource(dir:'images',file:'plus.gif')}" height="18"  class="pointer" onclick="increaseValue('add','heightId')"/>
 						</td>
 					</tr>
 					<tr>
 						<td style="padding: 0px;width: 30px;">Width</td>
 						<td style="padding-left :5px">
-							<img src="${createLinkTo(dir:'images',file:'minus.gif')}" height="18"  class="pointer" onclick="increaseValue('sub','widthId')"/>
+							<img src="${resource(dir:'images',file:'minus.gif')}" height="18"  class="pointer" onclick="increaseValue('sub','widthId')"/>
 							<input type="text" id="widthId" name="width" value="${width}" disabled="disabled" style="width: 30px;border: 0px;background-color: #FFF;text-align: center;" >
-							<img src="${createLinkTo(dir:'images',file:'plus.gif')}" height="18" class="pointer"  onclick="increaseValue('add','widthId')"/>
+							<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer"  onclick="increaseValue('add','widthId')"/>
 						</td>
 					</tr>
 					<tr>
@@ -46,7 +46,7 @@
 					</tr>
 					<tr>
 						<g:if test="${labels?.contains('apps')}">
-						   <td><img src="${createLinkTo(dir:'images',file:'iconApp.png')}" height="14" /></td>
+						   <td><img src="${resource(dir:'images',file:'iconApp.png')}" height="14" /></td>
 							<td colspan="2" style="padding: 0px;">
 								<input type="checkbox" id="apps" name="labels" value="apps" checked="checked" class="pointer">
 								<label for="apps" style="vertical-align: text-top;">Apps &nbsp;&nbsp;&nbsp;
@@ -54,7 +54,7 @@
 							</td>
 						</g:if>
 						<g:else>
-						  	<td><img src="${createLinkTo(dir:'images',file:'iconApp.png')}" height="14" /></td>
+						  	<td><img src="${resource(dir:'images',file:'iconApp.png')}" height="14" /></td>
 						    <td colspan="2" style="padding: 0px;">
 						    	<input type="checkbox" id="appLabel" name="labels" value="apps" class="pointer"/>
 						    	<label for="appLabel" style="vertical-align: text-top;">Apps &nbsp;&nbsp;&nbsp;
@@ -64,7 +64,7 @@
 					</tr>
 					<tr>
 						<g:if test="${labels?.contains('servers')}">
-						 	<td><img src="${createLinkTo(dir:'images',file:'iconServer.png')}" height="14" /></td>
+						 	<td><img src="${resource(dir:'images',file:'iconServer.png')}" height="14" /></td>
 							<td colspan="2" style="padding: 0px;">
 								<input type="checkbox" name="labels" id="servers" checked="checked" value="servers" class="pointer"/>
 								<label for="servers" style="vertical-align: text-top;">Servers
@@ -72,7 +72,7 @@
 							</td>
 						</g:if>
 						<g:else>
-							<td><img src="${createLinkTo(dir:'images',file:'iconServer.png')}" height="14" /></td>
+							<td><img src="${resource(dir:'images',file:'iconServer.png')}" height="14" /></td>
 							<td colspan="2" style="padding: 0px;">
 								<input type="checkbox" id="serverLabel" name="labels" value="servers" title= "Servers" class="pointer"/>
 								<label for="serverLabel" style="vertical-align: text-top;">Servers
@@ -82,7 +82,7 @@
 					</tr>
 					<tr>
 						<g:if test="${labels?.contains('databases')}">
-							<td><img src="${createLinkTo(dir:'images',file:'iconDB.png')}" height="14" /></td>
+							<td><img src="${resource(dir:'images',file:'iconDB.png')}" height="14" /></td>
 							<td colspan="2" style="padding: 0px;">
 								<input type="checkbox" name="labels" id="dbs" checked="checked" value="databases" class="pointer"/>
 								<label for="dbs" style="vertical-align: text-top;">DB
@@ -90,7 +90,7 @@
 							</td>
 						</g:if>
 						<g:else>
-							<td><img src="${createLinkTo(dir:'images',file:'iconDB.png')}" height="14" /></td>
+							<td><img src="${resource(dir:'images',file:'iconDB.png')}" height="14" /></td>
 							<td colspan="2" style="padding: 0px;">
 								<input type="checkbox" id="dbsLabel" name="labels" value="databases" class="pointer"/>
 								<label for="dbsLabel" style="vertical-align: text-top;">DB
@@ -100,7 +100,7 @@
 					</tr>
 					<tr>
 						<g:if test="${labels?.contains('files')}">
-							<td><img src="${createLinkTo(dir:'images',file:'iconDB.png')}" height="14" /></td>
+							<td><img src="${resource(dir:'images',file:'iconDB.png')}" height="14" /></td>
 							<td colspan="2" style="padding: 0px;">
 								<input type="checkbox" name="labels" id="filesLabel" checked="checked" value="files" class="pointer"/>
 								<label for="filesLabel" style="vertical-align: text-top;">Storage
@@ -108,7 +108,7 @@
 							</td>
 						</g:if>
 						<g:else>
-							<td><img src="${createLinkTo(dir:'images',file:'iconStorage.png')}" height="21" /></td>
+							<td><img src="${resource(dir:'images',file:'iconStorage.png')}" height="21" /></td>
 							<td colspan="2" style="padding: 0px;">
 								<input type="checkbox" id="filesLabel" name="labels" value="files" class="pointer"/>
 								<label for="filesLabel" style="vertical-align: text-top;">Storage
@@ -128,21 +128,21 @@
 				<tr><td style="padding: 3px 3px;" colspan="2"><h3>Legend</h3></td></tr>
 					<tr><td colspan="2"><span style="color: blue;"><h4>Nodes:</h4></span></td></tr>
 					<tr>
-						<td nowrap="nowrap" ><img src="${createLinkTo(dir:'images',file:'iconApp.png')}"
+						<td nowrap="nowrap" ><img src="${resource(dir:'images',file:'iconApp.png')}"
 							height="14" /></td><td><span style="vertical-align: text-top;">Apps</span></td>
 					</tr>
 					<tr>
-						<td nowrap="nowrap" ><img src="${createLinkTo(dir:'images',file:'iconServer.png')}"
+						<td nowrap="nowrap" ><img src="${resource(dir:'images',file:'iconServer.png')}"
 							height="14" /></td><td><span style="vertical-align: text-top;">Servers</span></td>
 					</tr>
 					<tr>
 						<td nowrap="nowrap" ><img
-							src="${createLinkTo(dir:'images',file:'iconDB.png')}" height="14" /></td>
+							src="${resource(dir:'images',file:'iconDB.png')}" height="14" /></td>
 							<td><span style="vertical-align: text-top;">DB</span></td>
 					</tr>
 					<tr>
 						<td nowrap="nowrap"><img
-							src="${createLinkTo(dir:'images',file:'iconStorage.png')}" height="21" /></td>
+							src="${resource(dir:'images',file:'iconStorage.png')}" height="21" /></td>
 							<td><span style="vertical-align: text-top;">Storage</span></td>
 					</tr>
 					<tr><td width="5px"><hr style="width: 30px;color:rgb(56,56,56);"></hr></td><td>Valid Links</td></tr>

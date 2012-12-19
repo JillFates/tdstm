@@ -253,7 +253,7 @@ var sHint = "C:\\temp\\output";
 			</div>
 			</g:if>
 <div class="dialog">
-<object id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" codebase="${createLinkTo(dir:'resource',file:'TFORMer60.cab')}"></object>
+<object id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C" codebase="${resource(dir:'resource',file:'TFORMer60.cab')}"></object>
 <g:form	name="loginLabelForm" >
 <div id="teamNotFound" class="message" style="display:none">
 					<ul>
@@ -267,7 +267,7 @@ var sHint = "C:\\temp\\output";
 		</tr>
 		<tr class="prop" id="bundleRow">
 
-			<td valign="top" class="name"><label><b>Bundles:<span style="color: red;">*</span></b> </label><input type="hidden" name="urlPath" id="urlPath" value="<g:createLinkTo dir="resource" file="login_badge.tff" absolute="true"/>" />
+			<td valign="top" class="name"><label><b>Bundles:<span style="color: red;">*</span></b> </label><input type="hidden" name="urlPath" id="urlPath" value="<g:resource dir="resource" file="login_badge.tff" absolute="true"/>" />
 
 			<td valign="top" class="value"><select id="moveBundleId"
 				name="moveBundles" onchange="return populateTeams(this.value);">

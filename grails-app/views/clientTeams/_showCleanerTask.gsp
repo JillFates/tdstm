@@ -114,7 +114,7 @@ function mySelect(x)
 </head>
 <body>
 	<a name="top"></a>
-	<div id="spinner" class="spinner" style="display: none;"><img src="${createLinkTo(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
+	<div id="spinner" class="spinner" style="display: none;"><img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
 	<div class="mainbody" id="mainbody">
 	 	<div id="mydiv" onclick="this.style.display = 'none';">
  			<g:if test="${flash.message}">
@@ -136,7 +136,7 @@ function mySelect(x)
 		<input type="hidden" name="FormName" id="FormName" />
 		<input type="hidden" name="PrinterName" id="PrinterName" />
 		<input type="hidden" id="RepPath" name="RepPath" />
-		<input type="hidden" name="urlPath" id="urlPath" value="<g:createLinkTo dir="resource" file="racking_label.tff" absolute="true"/>" />
+		<input type="hidden" name="urlPath" id="urlPath" value="<g:resource dir="resource" file="racking_label.tff" absolute="true"/>" />
 		<table style="margin-left: -2px;">
 			<tr>
 				<td class="heading" colspan=2><a class="heading" href="#comments">Task details:</a></td>
