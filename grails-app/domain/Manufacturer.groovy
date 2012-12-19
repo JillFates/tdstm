@@ -15,7 +15,7 @@ class Manufacturer {
 	static constraints = {
 		name( blank:false, nullable:false, unique:true )
 		description( blank:true, nullable:true )
-		lastModified( blank:true, nullable:true )
+		lastModified( nullable:true )
 	}
 	
 	static mapping  = {	

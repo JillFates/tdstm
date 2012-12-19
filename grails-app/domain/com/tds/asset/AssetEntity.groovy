@@ -115,7 +115,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		retireDate( nullable:true )
 		description( blank:true, nullable:true )
 		supportType( blank:true, nullable:true )
-		environment( blank:true, nullable:true, inList:['Production','Development','Staging'] )
+		environment( blank:true, nullable:true, inList:['Production','DR','Development','QA','Staging'] )
 		
 		custom1( blank:true, nullable:true )
 		custom2( blank:true, nullable:true )
