@@ -428,7 +428,7 @@ class AssetEntityAttributeLoaderService {
 		if(manufacturerValue){
 			manufacturer = Manufacturer.findByName( manufacturerValue )
 			if( !manufacturer ){
-				manufacturer = ManufacturerAlias.findByName(manufacturerValue).manufacturer
+				manufacturer = ManufacturerAlias.findByName(manufacturerValue)?.manufacturer
 				if( !manufacturer ) {
 					manufacturer = new Manufacturer( name : manufacturerValue )
 					if ( !manufacturer.validate() || !manufacturer.save() ) {
@@ -454,18 +454,18 @@ class AssetEntityAttributeLoaderService {
 		def dtvUsize = dtvList.find{it.eavAttribute.attributeCode == "usize"}?.importValue
 		if(modelValue && dtvManufacturer){
 			def manufacturerName = dtvManufacturer?.correctedValue ? dtvManufacturer?.correctedValue : dtvManufacturer?.importValue
+			// first checking imported value in manufacturer table .
 			def manufacturer = manufacturerName ? Manufacturer.findByName(manufacturerName) : null
-			if( !manufacturer ){
-				def manufacuturersAlias = ManufacturerAlias.list()
-				if(manufacuturersAlias.name?.contains( manufacturerName.toLowerCase() )){
-					manufacturer = manufacturerName
-				}
+			if( !manufacturer && manufacturerName){
+				// if not found in manufacturer table then searching in  manufacturer_alias table if found assign to manufacturerAlias.manufacturer .
+				manufacturer = ManufacturerAlias.findByName( manufacturerName )?.manufacturer
 			}
 			if(manufacturer){
+				// if manufacturer searching in model table if found assigning .
 				model = Model.findByModelNameAndManufacturer( modelValue, manufacturer )
-				//model = model?.find{it.assetType == assetEntity?.assetType}
 				if( !model ){
-					model = ModelAlias.findByNameAndManufacturer(modelValue,manufacturer).model
+					// if imported value is not in model table then search in model alias table .
+					model = ModelAlias.findByNameAndManufacturer(modelValue,manufacturer)?.model
 					if(!model){
 						def dtvAssetType = dtvList.find{it.eavAttribute.attributeCode == "assetType"}
 						def assetType = dtvAssetType?.correctedValue ? dtvAssetType?.correctedValue : dtvAssetType?.importValue
@@ -482,7 +482,8 @@ class AssetEntityAttributeLoaderService {
 								labelPosition : "Right",
 								connectorPosX : 0,
 								connectorPosY : 0,
-								status: "missing"
+								status: "missing",
+								lastModified:new Date()
 							)
 								
 							if (!powerConnector.save(flush: true)){

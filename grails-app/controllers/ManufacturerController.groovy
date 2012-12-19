@@ -197,6 +197,8 @@ class ManufacturerController {
 			fromManufacturerAlias.each{
 				toManufacturer.findOrCreateByName(it.name, true)
 			}
+			//merging fromManufacturer as AKA of toManufacturer
+			toManufacturer.findOrCreateByName(fromManufacturer.name, true)
 			
 			// Delete manufacturer record.
 			fromManufacturer.delete()

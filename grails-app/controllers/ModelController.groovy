@@ -662,10 +662,13 @@ class ModelController {
 		if(!toModelAlias.contains(fromModel.modelName)){
 			def fromModelAlias = ModelAlias.findAllByModel(fromModel)
 			ModelAlias.executeUpdate("delete from ModelAlias mo where mo.model = ${fromModel.id}")
+			
 			fromModelAlias.each{
-				def modelAlias = new ModelAlias(name:it.name,model:toModel, manufacturer:toModel.manufacturer ).save(insert:true)
+				toModel.findOrCreateByName(it.name, true)
 			}
-						
+			//merging fromModel as AKA of toModel
+			toModel.findOrCreateByName(fromModel.modelName, true)
+			
 			// Delete model record
 			fromModel.delete()
 			
