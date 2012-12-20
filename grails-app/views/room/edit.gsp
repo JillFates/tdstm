@@ -77,25 +77,27 @@
 			<g:if test="${rack.rackType == 'Rack'}">
 			 <g:if test="${rack.model?.layoutStyle == null}">	
 				<div align="center"  id="rack_${rack.id}" style="top:${rack.roomY}px; left:${rack.roomX}px;" 
-				onmouseout="updateXYPositions(this.id)" onclick="addShadowCss(this.id,event)"  
-				class="${ rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_L' } ">
+				onmouseout="updateXYPositions(this.id)"   
+				class="${ rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_L' } dragRack draggable">
 				</g:if>
 				<g:else>
 				<div align="center"  id="rack_${rack.id}" style="top:${rack.roomY}px; left:${rack.roomX}px;"
-				 onmouseout="updateXYPositions(this.id)" onclick="addShadowCss(this.id,event)" 
-				 class="${rack.model?.layoutStyle}">
+				onmouseout="updateXYPositions(this.id)" 
+				 class="${rack.model?.layoutStyle} dragRack draggable">
 				</g:else>
 					<span id="rackLabel_${rack.id}"><br>${rack.tag}</br></span>
 				</div>
 			</g:if>
 			<g:else>
-				<div align="center" id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" onmouseover="addShadowCss(this.id)" class="room_${rack.rackType}_${rack.front}">
+				<div align="center" id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" 
+					class="room_${rack.rackType}_${rack.front} ">
 					<span id="rackLabel_${rack.id}" style="background-color:white; z-index:1;" ><br>${rack.tag}</br></span>
 				</div>
 			</g:else>
 		</g:each>
 		<g:each in="${newRacks}" var="rack">
-			<div align="center"id="rack_${rack}" style="top:0px;left:0px;display: none;" onmouseout="updateXYPositions(this.id)" onmouseover="addShadowCss(this.id)" class="rack_highlight_no_L" >
+			<div align="center"id="rack_${rack}" style="top:0px;left:0px;display: none;" onmouseout="updateXYPositions(this.id)"
+				 class="rack_highlight_no_L  dragggable" >
 				<span id="rackLabel_${rack}" style="background-color:white;z-index:1; "><br>&nbsp;</br></span>
 			</div>
 		</g:each>
@@ -165,13 +167,111 @@
 
 $(document).ready(function() {
 	$(".focusShadow").bind("focus", function(e) {
-		addShadowCss(this.id);
+		addShadowCss($(this).attr("id"));
     }); 
 	$(".focusShadow").bind("blur", function(e) {
-		delShadowCss(this.id)
+		delShadowCss($(this).attr("id"))
     });    
+    $(".dragRack").click(function(event) {
+       if (event.shiftKey) {
+           if($(this).hasClass('objectSelected')){
+        	   delShadowCss($(this).attr("id"))
+           } else {
+           	   addShadowCss($(this).attr("id"));
+           }
+       } else {
+    	   $(".dragRack").removeClass("objectSelected")
+    	   addShadowCss($(this).attr("id"));
+       }
+	});
 })
 
+/**
+ * Multi div darg function function.
+ */
+$(".draggable").draggable({
+     start: function(event, ui) {
+          posTopArray = [];
+          posLeftArray = [];
+          if ($(this).hasClass("objectSelected")) {  
+               $(".objectSelected").each(function(i) {
+                    thiscsstop = $(this).css('top');
+                    if (thiscsstop == 'auto') thiscsstop = 0; 
+
+                    thiscssleft = $(this).css('left');
+                    if (thiscssleft == 'auto') thiscssleft = 0; 
+
+                    posTopArray[i] = parseInt(thiscsstop);
+                    posLeftArray[i] = parseInt(thiscssleft);
+               });
+          }
+
+          begintop = $(this).offset().top; 
+          beginleft = $(this).offset().left;
+     },
+     drag: function(event, ui) {
+          var topdiff = $(this).offset().top - begintop; 
+          var leftdiff = $(this).offset().left - beginleft;
+
+          if ($(this).hasClass("objectSelected")) {
+               $(".objectSelected").each(function(i) {
+                    $(this).css('top', posTopArray[i] + topdiff);
+                    $(this).css('left', posLeftArray[i] + leftdiff);
+
+                    var rackId = $(this).attr("id").split("_")[1]
+                    
+                    $("#roomXId_"+rackId).val(posLeftArray[i] + leftdiff)
+                	$("#roomYId_"+rackId).val(posTopArray[i] + topdiff)
+               });
+          }
+     }
+});
+
+/**
+ *  using this method for NUDGING : move div(s) 1 px to all direction using arrow keys.
+ */
+$(document).bind('keydown',function(evt) {
+
+	 $(".objectSelected").each(function(i) {
+		 var x = $(this).css('top')
+		 var y = $(this).css('left')
+		 var top = x.substring(0,x.indexOf('px'))
+	     var left = y.substring(0,y.indexOf('px'))
+	     var rackId = $(this).attr("id").split("_")[1]
+		 switch(evt.keyCode) {
+		    case 37:
+		    	evt.preventDefault();
+		    	$(this).css('left', (parseInt(left)-1)+"px"); 
+                
+                $("#roomXId_"+rackId).val((parseInt(left)-1))
+            	$("#roomYId_"+rackId).val(top)
+		        break;
+			case 38:
+				evt.preventDefault();
+				$(this).css('top', (parseInt(top)-1)+"px"); 
+                
+                $("#roomXId_"+rackId).val(left)
+            	$("#roomYId_"+rackId).val((parseInt(top)-1))
+			    break;
+			case 39:
+				evt.preventDefault();
+				$(this).css('left', (parseInt(left)+1)+"px"); 
+                
+                $("#roomXId_"+rackId).val((parseInt(left)+1))
+            	$("#roomYId_"+rackId).val(top)
+			    break;
+			case 40:
+				evt.preventDefault();
+				$(this).css('top', (parseInt(top)+1)+"px"); 
+                
+                $("#roomXId_"+rackId).val(left)
+            	$("#roomYId_"+rackId).val((parseInt(top)+1))
+			    break;
+			    break;
+			}
+     });
+});
+   
 function enableDraggableRack(){
 	  var showDrag = $("#showRoomObjects").is(':checked')
 	  var drag = 'off'
@@ -235,9 +335,6 @@ function updateXYPositions(id){
 	$("#roomXId_"+rackId).val(x)
 	$("#roomYId_"+rackId).val(y)
 
-	//$("#"+id).removeClass("objectSelected")
-	//var rowId = id.split("_")[1]
-	//$("#rackEditRow_"+rowId).removeClass("objectRowSelected")
 }
 
 function addShadowCss(id, event){
@@ -250,6 +347,7 @@ function addShadowCss(id, event){
 function deselectAll(){
 	  $(".objectRowSelected").removeClass("objectRowSelected")
 	  $(".objectSelected").removeClass("objectSelected")
+	  $(".multiSelect").removeClass("multiSelect")
 }
 function delShadowCss(id){
 	var rackId = id.split("_")[1]
