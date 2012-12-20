@@ -66,7 +66,7 @@ function unCheckAll() {
  */
 function loadPersonDiv(personId,renderPage,redirectTo){
 	jQuery.ajax({
-		url : '../person/loadGeneral',
+		url : '/tdstm/person/loadGeneral',
 		data : {
 			'personId' : personId,'tab':renderPage
 		},
