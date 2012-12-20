@@ -1,9 +1,9 @@
 import org.jsecurity.SecurityUtils
 
-import com.tds.asset.AssetCableMap;
 import com.tds.asset.AssetEntity
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 
 class Model {
@@ -204,6 +204,38 @@ class Model {
 			}
 		}
         return alias
+	}
+	
+	/**
+	 * Used to create a model for a given model name and manufacturer.
+	 *
+	 * @param modelName - String modelName name of model
+	 * @param manufacturer - object of manufacturer for which we creating the model.
+	 * @param assetType - (optional param )String assetType asset type of model  (default : 'unknown')
+	 * @param usize - (optional param )Integer usize , usize of model  (default : 'unknown')
+	 * @return object of Model if created else null.
+	 */
+	def static createModelByModelName(def modelName, def manufacturer, def assetType='Server',  def usize=1){
+		def model = new Model( modelName:modelName, manufacturer:manufacturer, assetType:assetType, sourceTDS : 0, usize :usize )
+		if ( !model.validate() || !model.save(flush:true) ) {
+			def etext = "Unable to create model" + GormUtil.allErrorsString( model )
+			model = null
+		} else {
+			def powerConnector = new ModelConnector(model : model,
+				connector : 1,
+				label : "Pwr1",
+				type : "Power",
+				labelPosition : "Right",
+				connectorPosX : 0,
+				connectorPosY : 0,
+				status: "missing",
+			)
+				
+			if (!powerConnector.save(flush: true)){
+				def etext = "Unable to create Power Connectors for ${model}" + GormUtil.allErrorsString( powerConnector )
+			}
+		}
+		return model
 	}
 	
 }

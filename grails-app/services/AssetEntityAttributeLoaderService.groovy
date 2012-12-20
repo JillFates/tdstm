@@ -452,15 +452,18 @@ class AssetEntityAttributeLoaderService {
 		//assetEntity.assetType = assetEntity.assetType ? assetEntity.assetType : "Server"
 		def dtvManufacturer = dtvList.find{it.eavAttribute.attributeCode == "manufacturer"}
 		def dtvUsize = dtvList.find{it.eavAttribute.attributeCode == "usize"}?.importValue
-		if(modelValue && dtvManufacturer){
+		if(dtvManufacturer){
 			def manufacturerName = dtvManufacturer?.correctedValue ? dtvManufacturer?.correctedValue : dtvManufacturer?.importValue
 			// first checking imported value in manufacturer table .
 			def manufacturer = manufacturerName ? Manufacturer.findByName(manufacturerName) : null
 			if( !manufacturer && manufacturerName){
-				// if not found in manufacturer table then searching in  manufacturer_alias table if found assign to manufacturerAlias.manufacturer .
+				// if not found in manufacturer table then searching in manufacturer_alias table as it should exist per previous manufacturer creation
+				// if found assign to manufacturerAlias.manufacturer.
 				manufacturer = ManufacturerAlias.findByName( manufacturerName )?.manufacturer
 			}
 			if(manufacturer){
+				// if modelValue exist using that else using 'unknown' as modelValue  
+				modelValue = modelValue?:'unknown'
 				// if manufacturer searching in model table if found assigning .
 				model = Model.findByModelNameAndManufacturer( modelValue, manufacturer )
 				if( !model ){
@@ -470,27 +473,8 @@ class AssetEntityAttributeLoaderService {
 						def dtvAssetType = dtvList.find{it.eavAttribute.attributeCode == "assetType"}
 						def assetType = dtvAssetType?.correctedValue ? dtvAssetType?.correctedValue : dtvAssetType?.importValue
 						assetType = assetType ? assetType : "Server"
-						model = new Model( modelName:modelValue, manufacturer:manufacturer, assetType:assetType, sourceTDS : 0, usize : dtvUsize ?: 1 )
-						if ( !model.validate() || !model.save(flush:true) ) {
-							def etext = "Unable to create model" + GormUtil.allErrorsString( model )
-							log.error(etext)
-						} else {
-							def powerConnector = new ModelConnector(model : model,
-								connector : 1,
-								label : "Pwr1",
-								type : "Power",
-								labelPosition : "Right",
-								connectorPosX : 0,
-								connectorPosY : 0,
-								status: "missing",
-								lastModified:new Date()
-							)
-								
-							if (!powerConnector.save(flush: true)){
-								def etext = "Unable to create Power Connectors for ${model}" + GormUtil.allErrorsString( powerConnector )
-								log.error(etext)
-							}
-						}
+						def usize =  dtvUsize ?: 1
+						model = Model.createModelByModelName(modelValue, manufacturer, assetType, usize) 
 					}
 				}
 			}
@@ -501,6 +485,8 @@ class AssetEntityAttributeLoaderService {
 		}
 		return model
 	}
+	
+	
 	/* To get DataTransferValue source/target Team
 	 * @param dataTransferValue,moveBundle
 	 * @author srinivas
