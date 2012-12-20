@@ -9,7 +9,6 @@
 	href="${resource(dir:'css',file:'tabcontent.css')}" />
 <link rel="shortcut icon"
 	href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-<%--<g:javascript src="FusionCharts.js" /> --%>
 <g:javascript src="yahoo.ui.dashboard.js" />
 </head>
 <body>
