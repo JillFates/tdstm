@@ -168,14 +168,14 @@ class AssetEntityController {
 		session.setAttribute("BATCH_ID",0)
 		session.setAttribute("TOTAL_ASSETS",0)
 		if( params.message ) {
-			flash.message = params.message
+		  flash.message = params.message
 		}
 		render( view:"importExport", model : [ assetsByProject: assetsByProject,
 					projectId: projectId,
 					moveBundleInstanceList: moveBundleInstanceList,
 					dataTransferSetImport: dataTransferSetImport,
 					dataTransferSetExport: dataTransferSetExport,
-					dataTransferBatchs: dataTransferBatchs ] )
+					dataTransferBatchs: dataTransferBatchs, args:params.list("args")] )
 	}
 	/* -----------------------------------------------------
 	 * To Export the assets
@@ -442,8 +442,8 @@ class AssetEntityController {
 							}
 						}
 					}
-					session.setAttribute("TOTAL_ASSETS",(assetsCount+filesCount+databaseCount+appCount+dependencyCount))
 					if(params.asset == 'asset'){
+						session.setAttribute("TOTAL_ASSETS",assetsCount)
 						def eavEntityType = EavEntityType.findByDomainName('AssetEntity')
 						def serverDataTransferBatch = new DataTransferBatch()
 						serverDataTransferBatch.statusCode = "PENDING"
@@ -501,6 +501,7 @@ class AssetEntityController {
 					}
 					//  Process applciation
 					if(params.application=='application'){
+						session.setAttribute("TOTAL_ASSETS",appCount)
 						def eavEntityType = EavEntityType.findByDomainName('Application')
 						def appDataTransferBatch = new DataTransferBatch()
 						appDataTransferBatch.statusCode = "PENDING"
@@ -758,13 +759,18 @@ class AssetEntityController {
 
 				} // generate error message
 				workbook.close()
-				added = serverAdded + appAdded   + dbAdded + filesAdded + dependencyAdded
-				if (skipped.size() > 0) {
-					flash.message = " Storage Uploaded Successfully with ${added} records. and  ${skipped} Records skipped Please click the Manage Batches to review and post these changes."
-				} else {
-					flash.message = " Storage uploaded successfully with ${added} records.  Please click the Manage Batches to review and post these changes."
-				}
-				redirect( action:assetImport, params:[ message:flash.message] )
+				added = serverAdded + appAdded + dbAdded + filesAdded + dependencyAdded
+				
+				flash.message =  "assetEntity.upload.message" 
+				def addMessage = serverAdded ? ("${serverAdded} Servers, "): "" 
+					addMessage += appAdded ? ("$appAdded Applications, "): ""
+					addMessage += dbAdded ? ("$dbAdded Databases, "): ""
+					addMessage += filesAdded ? ("$filesAdded Storage, "): ""
+					
+				def args = [added, addMessage ? addMessage.substring(0,addMessage.lastIndexOf(",")) :" ", 
+							skipped.size() ? (skipped+" Records skipped. ") : " " ]
+				
+				redirect( action:assetImport, params:[  message:flash.message, args:args] )
 				return;
 			}
 		} catch( NumberFormatException ex ) {

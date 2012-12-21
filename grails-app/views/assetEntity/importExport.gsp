@@ -35,10 +35,12 @@
   <body>
    
     <div class="body">
-      <g:if test="${flash.message}">
-        <div class="message">${flash.message}</div>
-      </g:if>
-      
+    <g:if test="${flash.message && args}">
+    	<div class="message"><g:message code="${flash.message}" args="${args}" /></div>
+    </g:if>
+    <g:elseif test="${!args && flash.message}">
+    	<div class="message">${flash.message}</div>
+    </g:elseif>
         <h1>Asset Import</h1>
         <g:form action="upload" method="post" name="importForm" enctype="multipart/form-data" >
           <input type="hidden" value="${projectId}" name="projectIdImport" />
