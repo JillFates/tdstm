@@ -5,6 +5,7 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdsops.commons.lang.exception
 
 class Model {
 	// TODO - modelName should be renamed to name (as it is in the db - confusing)
@@ -196,7 +197,7 @@ class Model {
 	def findOrCreateAliasByName(name, def createIfNotFound = false) {
 		name = name.trim()
 		def alias = ModelAlias.findByNameAndModel(name,this)
-		if( !alias && createIfNotFound){
+			if( !alias && createIfNotFound){
 			alias = new ModelAlias(name:name, model:this, manufacturer:this.manufacturer)
 			if (! alias.save()) {
 				alias.errors.allErrors.each { log.error it}
@@ -231,8 +232,11 @@ class Model {
 				status: "missing",
 			)
 				
-			if (!powerConnector.save(flush: true)){
-				def etext = "Unable to create Power Connectors for ${model}" + GormUtil.allErrorsString( powerConnector )
+			if ( !powerConnector.save(flush: true)) {
+				throw new PersistenceException("Unable to create Power Connectors for ${model}")
+					.addContextValue('messageCode', 'model.create.connector.failure')
+					.addContextValue('messageArgs', [model])
+					.addContextValue('gorm', GormUtil.allErrorsString( powerConnector ) );
 			}
 		}
 		return model
