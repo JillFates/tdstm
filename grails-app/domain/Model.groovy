@@ -5,7 +5,7 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
-import com.tdsops.commons.lang.exception
+import com.tdsops.commons.lang.exception.PersistenceException
 
 class Model {
 	// TODO - modelName should be renamed to name (as it is in the db - confusing)
