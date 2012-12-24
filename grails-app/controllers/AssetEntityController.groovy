@@ -854,7 +854,9 @@ class AssetEntityController {
 			//set MIME TYPE as Excel
 			def exportType = filenametoSet.split("/")[2]
 			exportType = exportType.substring(0,exportType.indexOf("_template.xls"))
-			def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString().replace(" ","_")
+			SimpleDateFormat fileFormat = new SimpleDateFormat("yyyy-MM-dd");
+			def exportDate = fileFormat.format(TimeUtil.nowGMT())
+			def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString().replace(" ","_")+"-"+exportDate
 			response.setContentType( "application/vnd.ms-excel" )
 			response.setHeader( "Content-Disposition", "attachment; filename=\""+exportType+'-'+filename+".xls\"" )
 			//create workbook and sheet

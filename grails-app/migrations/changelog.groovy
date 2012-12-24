@@ -7,5 +7,6 @@ databaseChangeLog = {
 	include file: '20121214-drop-aka.groovy'
 	include file: '20121218-update-version-on-manu-model.groovy'
 	include file: '20121218-add-indexes-model-tables.groovy'
+	include file: '20121224-cleanup-excel-templates.groovy'
 	
 }

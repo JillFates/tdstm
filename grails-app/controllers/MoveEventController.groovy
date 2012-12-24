@@ -543,7 +543,7 @@ class MoveEventController {
 			 
 		}
 		def  preMoveSize = AssetComment.countByMoveEventAndCategory(moveEventInstance, 'premove')
-		def  sheduleSize = AssetComment.countByMoveEventAndCategoryNotInList(moveEventInstance, ['premove','postmove'])
+		def  sheduleSize = AssetComment.countByMoveEventAndCategoryInList(moveEventInstance, ['shutdown','physical','moveday','startup'])
 		def  postMoveSize = AssetComment.countByMoveEventAndCategory(moveEventInstance, 'postmove')
 		return [applcationAssigned:applcationAssigned, assetCount:assetCount, databaseCount:databaseCount, fileCount:fileCount, otherAssetCount:otherAssetCount,
 			    preMoveSize: preMoveSize, sheduleSize:sheduleSize, postMoveSize:postMoveSize, bundles:bundles,moveEventInstance:moveEventInstance]
@@ -566,7 +566,7 @@ class MoveEventController {
 			}
 			def bundles = moveEventInstance.moveBundles
 			def today = new Date()
-			def formatter = new SimpleDateFormat("yy/MM/dd");
+			def formatter = new SimpleDateFormat("yyyy-MM-dd");
 			today = formatter.format(today)
 			def moveEventList = MoveEvent.findAllByProject(project)
 			def applcationAssigned = 0
@@ -598,7 +598,7 @@ class MoveEventController {
 				 unresolvedIssues = AssetComment.findAll("from AssetComment a where a.assetEntity in ${asset} and a.isResolved = ? and a.commentType = ? and a.category in ('general', 'discovery', 'planning','walkthru')",[0,'issue'])
 			}
 			preMoveIssue = AssetComment.findAllByMoveEventAndCategory(moveEventInstance, 'premove') 
-			def sheduleIssue = AssetComment.findAllByMoveEventAndCategoryNotInList(moveEventInstance, ['premove','postmove'])
+			def sheduleIssue = AssetComment.findAllByMoveEventAndCategoryInList(moveEventInstance, ['shutdown','physical','moveday','startup'])
 			postMoveIssue = AssetComment.findAllByMoveEventAndCategory(moveEventInstance, 'postmove') 
 			//TODO - Move controller code into Service .
 			def preMoveCheckListError = reportsService.generatePreMoveCheckList(projectId,moveEventInstance).allErrors.size()
@@ -609,7 +609,7 @@ class MoveEventController {
 						def workbook = Workbook.getWorkbook( file, wbSetting )
 						//set MIME TYPE as Excel
 						response.setContentType( "application/vnd.ms-excel" )
-						def filename = 	"${project.name} - ${moveEventInstance.name} Runbook v${currentVersion} - ${today}"
+						def filename = 	"${project.name} - ${moveEventInstance.name} Runbook v${currentVersion} -${today}"
 						filename = filename.replace(".xls",'')
 						response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
 						response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
@@ -626,7 +626,7 @@ class MoveEventController {
 						def postMoveSheet = book.getSheet("Post-move")
 						def summarySheet = book.getSheet("Index")
 						
-						def scheduleSheet = book.getSheet("Shutdown")
+						def scheduleSheet = book.getSheet("Schedule")
 						
 						
 						def preMoveColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment','assignedTo', 'status','estStart','', 'notes']
@@ -661,8 +661,7 @@ class MoveEventController {
 												'sourceRackPosition','sourceBladeChassis','sourceBladePosition',
 												'targetLocation','targetRoom','targetRack', 'targetRackPosition','targetBladeChassis',
 												'targetBladePosition','custom1','custom2','custom3','custom4','custom5','custom6','custom7','custom8',
-												'moveBundle','sourceTeamMt','targetTeamMt','sourceTeamLog','sourceTeamSa','targetTeamSa','sourceTeamDba',
-												'truck','cart','shelf','railType','appOwner','appSme','priority','planStatus','usize'
+												'moveBundle','truck','cart','shelf','railType','priority','planStatus','usize'
 						   						]
 						
 						def unresolvedIssueColumnList = ['id', 'comment', 'commentType','commentAssetEntity','resolution','resolvedBy','createdBy',
