@@ -360,3 +360,8 @@ th.desc a {
 .inProgress {
 	 background-color:#0000FF;
 }
+
+.spanAnchor{
+	font-weight: bold;
+	cursor: pointer
+}

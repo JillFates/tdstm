@@ -133,11 +133,66 @@ a:hover {
 		</td>
 	</tr>
 </table>
+<span class="spanAnchor" style="float:right" onclick="openFlushDiv()"> Flush import data </span>
+ 
 </div>
+	<div id="flushOldBatchId" style="display: none;" title="Flush import data">
+	<div id="respMsgId" style="display: none" class="message">${flash.message}</div>
+		  <input type="radio" name="deleteHistory" id="doNothing" value="doNothing" checked="checked"> <label for="doNothing">Do Nothing </label><br>
+		  <input type="radio" name="deleteHistory" id="overTwoMonths" value="overTwoMonths" > <label for="overTwoMonths">Over Two Months</label><br>
+		  <input type="radio" name="deleteHistory" id="anyProcessed" value="anyProcessed" > <label for="anyProcessed">Any Processed</label> <br>
+		  <input type="radio" name="deleteHistory" id="all" value="all" > <label for="all">All uploaded and processed data</label> <br>
+		  <div id="processDivId" style="display: none">
+	  		<img id="processingId" src="../images/processing.gif" />
+		  </div>
+		  
+		  <div class="buttons">
+			  <input type="button" id="processData" class="save" value="Submit" onclick="processBatch()"/> 
+			  <input type="button"  class="save" value="cancel" id="processData" />
+		  </div>
+	</div>
 </div>
+
+
 <script>
 	currentMenuId = "#adminMenu";
 	$("#adminMenuId a").css('background-color','#003366')
+	
+	$(document).ready(function() {
+		$("#flushOldBatchId").dialog({ autoOpen: false })
+	})
+	
+	function processBatch(){
+		var value=$('input:radio[name=deleteHistory]:checked').val()
+		if(value=="doNothing"){
+			 $("#flushOldBatchId").dialog('close');
+		} else {
+			jQuery.ajax({
+				url: '../admin/processOldData',
+				data: {'deleteHistory':value},
+				type:'POST',
+				beforeSend:function(jqXHR){
+					$('#processDivId').show(); 
+					$("#respMsgId").hide();
+					$("#processingId").show();
+				},
+				success: function(data) {
+					$("#processingId").hide();
+					$("#respMsgId").show().html(data)
+				},
+				error:function(jqXHR, textStatus, errorThrown){
+					$("#processingId").hide();
+					$("#respMsgId").show().html("An unexpected error occurred. Please close and reload form to see if the problem persists")
+				}
+			})
+		}
+	}
+	
+	function openFlushDiv(){
+		 $("#flushOldBatchId").dialog('option', 'width', '500px')
+		 $("#flushOldBatchId").dialog('option', 'position', ['center','top']);
+		 $("#flushOldBatchId").dialog('open');
+	}
 </script>
 </body>
 </html>

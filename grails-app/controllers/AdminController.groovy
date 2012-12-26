@@ -995,4 +995,33 @@ class AdminController {
 		def results = [orphanDeatils : orphanDeatils, query:query]  
 		render results as JSON
 	}
+	/**
+	 * this method is used to flush imported processed data or unprocessed data or both
+	 * @param deleteHistory : the time constraint the end user want to delete the records .
+	 * @return : count of record that is deleted.
+	 */
+	
+	def processOldData = {
+		def deleteHistory = params.deleteHistory
+		StringBuffer queryForData = new StringBuffer("FROM data_transfer_value")
+		StringBuffer queryForBatch = new StringBuffer("FROM data_transfer_batch")
+		switch(deleteHistory){
+	   		case "anyProcessed" :
+			   queryForBatch.append(" WHERE status_code = 'completed'")
+			   queryForData.append(" WHERE data_transfer_batch_id  IN (SELECT batch_id $queryForBatch) ")
+			break;
+			case "overTwoMonths" :
+				queryForBatch.append(" WHERE date_created <= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 60 DAY)")
+				queryForData.append(" WHERE data_transfer_batch_id IN (SELECT batch_id $queryForBatch )")
+			break;
+		}
+		
+		def records = jdbcTemplate.queryForInt("SELECT count(*) FROM (SELECT 1 as count ${queryForData} group by data_transfer_batch_id,row_id) a")
+		
+		jdbcTemplate.update("DELETE $queryForData")
+		jdbcTemplate.update( "DELETE $queryForBatch")
+		
+		def msg = "Deleted  $records import batches"
+		render msg
+	}
 }
