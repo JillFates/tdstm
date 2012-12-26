@@ -28,4 +28,11 @@ databaseChangeLog = {
 													 'appOwner','appSme')"""
 			)
 	}
+	
+	changeSet(author: "lokanada", id: "20121226 TM-1154.2") {
+		comment("""delete eav_attribute associated tables data where attribute_id not in eav_attribute(orphan data)""")
+		sql("DELETE FROM eav_entity_attribute WHERE attribute_id NOT IN ( SELECT attribute_id FROM eav_attribute)")
+		sql("DELETE FROM eav_attribute_option WHERE attribute_id NOT IN ( SELECT attribute_id FROM eav_attribute)")
+		sql("DELETE FROM eav_entity_datatype WHERE attribute_id NOT IN ( SELECT attribute_id FROM eav_attribute)")
+	}
 }
