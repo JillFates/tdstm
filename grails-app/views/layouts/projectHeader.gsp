@@ -22,6 +22,7 @@
    <script type="text/javascript">
    		$(document).ready(function() {
       		$("#personDialog").dialog({ autoOpen: false })
+      		$("#userPrefDivId").dialog({ autoOpen: false })
       		var currentURL = window.location.pathname
       		${remoteFunction(controller:'userLogin', action:'updateLastPageLoad', params:'\'url=\' + currentURL ')}
      	})
@@ -48,6 +49,8 @@
     }
     def partyGroup = session.getAttribute("PARTYGROUP")?.PARTYGROUP ;
     def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");
+	def user = UserLogin.findByPerson( person )
+	def userPrefs = UserPreference.findAllByUserLogin(user)
     %>
   <body>
     <div class="main_body">
@@ -467,7 +470,7 @@
 			<td style="vertical-align:top"><span class="megamenuSection">${session.getAttribute("LOGIN_PERSON").name }</span><br />
 				<ul>
 					<li><g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">Account settings...</g:remoteLink></li>
-					<li><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${session.getAttribute('LOGIN_PERSON').id}" onclick="resetPreference(this.name)">Reset preferences</a><a href="#" id="newpreferenceId" style="display:none;" >Preferences were reset</a></li>
+					<li><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${user}" onclick="editPreference()">Edit preferences</a></li>
 					<li>&nbsp;</li>
 					<g:if test="${person?.modelScore}">
 					<li><a href="/tdstm/person/list/18?maxRows=25&tag_tr_=true&tag_p_=1&tag_mr_=25&tag_s_5_modelScore=desc">Model Score: ${person?.modelScore}</a></li>
@@ -649,5 +652,7 @@
       </div>
     </div>
     <g:javascript src="tdsmenu.js" />
+    <div id="userPrefDivId" style="display: none" title="${session.getAttribute("LOGIN_PERSON").name } Preferences">
+    </div>
   </body>
 </html>

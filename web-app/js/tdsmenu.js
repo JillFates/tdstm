@@ -301,13 +301,33 @@
 			new Ajax.Request('/tdstm/project/setPower',{asynchronous:true,evalScripts:true,onComplete:function(e){updateTimeZone( e )},parameters:'p=' + p });
 		}
 		function resetPreference(user){
-			new Ajax.Request('/tdstm/person/resetPreferences',{asynchronous:true,evalScripts:true,onComplete:function(e){changeResetMessage()},parameters:'user=' + user });
-	}
-		function changeResetMessage(){
-			$("#resetPreferenceId").fadeTo("fast", .5).removeAttr("onClick"); 
-			$("#newpreferenceId").css("display","inline")
+			new Ajax.Request('/tdstm/person/resetPreferences',{asynchronous:true,evalScripts:true,onSuccess:function(e){changeResetMessage(e)},parameters:'user=' + user });
+		}
+		function changeResetMessage(e){
+			$("#userPrefDivId").html("")
+			$('#userPrefDivId').dialog('close')
+			window.location.reload()
 		}
 		
+		function editPreference(){
+			new Ajax.Request('/tdstm/person/editPreference',{asynchronous:true,evalScripts:true,
+						onSuccess:function(e){
+							$("#userPrefDivId").html(e.responseText)
+							$("#userPrefDivId").dialog('option', 'width', 'auto')
+							$("#userPrefDivId").dialog("open")
+						}
+					})
+			
+		}
+		function removeUserPrefs(prefCode){
+			new Ajax.Request('/tdstm/person/removeUserPreference?prefCode='+prefCode,
+								{asynchronous:true,evalScripts:true,
+									onSuccess:function(e){
+										 $("#pref_"+prefCode).remove()
+									}
+								})
+			
+		}
 		//page load startup stuff
 		
 		showSubMenu(currentMenuId);

@@ -850,4 +850,73 @@ class PersonController {
 		}
 	 return checkList
 	}
-}	
+	
+	/**
+	 * This action is used to handle ajax request and to delete preference except Preference Code : Current Dashboard
+	 * @param prefCode : Preference Code that is requested for being deleted
+	 * @return : boolean
+	 */
+	def removeUserPreference = {
+		def prefCode = params.prefCode
+		if(prefCode != "Current Dashboard")
+			userPreferenceService.removePreference(prefCode)
+			
+		render true
+	}
+	
+	/**
+	 * This action is used to display Current logged user's Preferences with preference code (converted to comprehensive words)
+	 * with their corresponding value
+	 * @param N/A : 
+	 * @return : A Map containing key as preference code and value as map'svalue.
+	 */
+	def editPreference = {
+		def loggedUser = securityService.getUserLogin()
+		def prefs = UserPreference.findAllByUserLogin( loggedUser ,[sort:"preferenceCode"])
+		def prefMap = [:]
+		def labelMap = ["CONSOLE_TEAM_TYPE" : "Console Team Type", "SUPER_CONSOLE_REFRESH" : "Console Refresh Time",
+						 "CART_TRACKING_REFRESH" : "Cart tarcking Refresh Time", "BULK_WARNING" : "Bulk Warning",
+						 "DASHBOARD_REFRESH" : "Dashboard Refresh Time", "CURR_TZ" : "Time Zone","CURR_POWER_TYPE" : "Power Type",
+						 "START_PAGE" : "Welcome Page", "StaffingRole" : "Default Preoject Staffing Role",
+						 "StaffingLocation" : "Default Preoject Staffing Location", "StaffingPhases" : "Default Preoject Staffing Phase",
+						 "StaffingScale" : "Default Preoject Staffing Scale", "preference" : "Preference", "DraggableRack" : "Draggable Rack",
+						 "PMO_COLUMN1" : "PMO Column 1 Filter", "PMO_COLUMN2" : "PMO Column 2 Filter", "PMO_COLUMN3" : "PMO Column 3 Filter",
+						 "PMO_COLUMN4" : "PMO Column 4 Filter", "ShowAddIcons" : "Rack Add Icons"
+					  ]
+		prefs.each { pref->
+			switch( pref.preferenceCode ) {
+				case "MOVE_EVENT" :
+					prefMap.put((pref.preferenceCode), "Move Event / "+MoveEvent.get(pref.value).name)
+					break;
+				
+				case "CURR_PROJ" :
+					prefMap.put((pref.preferenceCode), "Project / "+Project.get(pref.value).name)
+					break;
+				
+				case "CURR_BUNDLE" :
+					prefMap.put((pref.preferenceCode), "Move Bundle / "+MoveBundle.get(pref.value).name)
+					break;
+				
+				case "PARTYGROUP" :
+					prefMap.put((pref.preferenceCode), "Company / "+PartyGroup.get(pref.value).name)
+					break;
+				
+				case "CURR_ROOM" :
+					prefMap.put((pref.preferenceCode), "Room / "+Room.get(pref.value).roomName)
+					break;
+				
+				case "StaffingRole" :
+				    def role = RoleType.get(pref.value).description
+					prefMap.put((pref.preferenceCode), "Default Preoject Staffing Role / "+role.substring(role.lastIndexOf(':') +1))
+					break;
+				
+				default :
+					prefMap.put((pref.preferenceCode), (labelMap[pref.preferenceCode] ?: pref.preferenceCode )+" / "+ pref.value)
+					break;
+			}
+		}
+		
+		
+		render(template:"showPreference",model:[prefMap:prefMap])
+	}
+}
