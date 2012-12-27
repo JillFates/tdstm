@@ -313,7 +313,7 @@
 			new Ajax.Request('/tdstm/person/editPreference',{asynchronous:true,evalScripts:true,
 						onSuccess:function(e){
 							$("#userPrefDivId").html(e.responseText)
-							$("#userPrefDivId").dialog('option', 'width', 'auto')
+							$("#userPrefDivId").dialog('option', 'width', '400px')
 							$("#userPrefDivId").dialog("open")
 						}
 					})

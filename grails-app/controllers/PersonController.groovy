@@ -881,7 +881,7 @@ class PersonController {
 						 "StaffingLocation" : "Default Preoject Staffing Location", "StaffingPhases" : "Default Preoject Staffing Phase",
 						 "StaffingScale" : "Default Preoject Staffing Scale", "preference" : "Preference", "DraggableRack" : "Draggable Rack",
 						 "PMO_COLUMN1" : "PMO Column 1 Filter", "PMO_COLUMN2" : "PMO Column 2 Filter", "PMO_COLUMN3" : "PMO Column 3 Filter",
-						 "PMO_COLUMN4" : "PMO Column 4 Filter", "ShowAddIcons" : "Rack Add Icons"
+						 "PMO_COLUMN4" : "PMO Column 4 Filter", "ShowAddIcons" : "Rack Add Icons", "MY_TASK":"My Task Refresh Time"
 					  ]
 		prefs.each { pref->
 			switch( pref.preferenceCode ) {
@@ -906,7 +906,7 @@ class PersonController {
 					break;
 				
 				case "StaffingRole" :
-				    def role = RoleType.get(pref.value).description
+				    def role = pref.value == "0" ? "All" : RoleType.get(pref.value).description
 					prefMap.put((pref.preferenceCode), "Default Preoject Staffing Role / "+role.substring(role.lastIndexOf(':') +1))
 					break;
 				
