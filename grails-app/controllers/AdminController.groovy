@@ -1024,4 +1024,29 @@ class AdminController {
 		def msg = "Deleted  $records import batches"
 		render msg
 	}
+	
+	/**
+	 * This method is used to get the processed and pending batches counts
+	 * @params N/A : 
+	 * @return : String formatted to display processed and pending batches and records
+	 */
+	def getBatchRecords = {
+		String queryForRecords ="""SELECT COUNT(*) AS batchCount, IF(SUM(noOfRows),SUM(noOfRows),0) AS records
+									  FROM (SELECT * FROM (SELECT data_transfer_batch_id, COUNT(*) AS noOfRows  FROM data_transfer_value dtv
+									  LEFT OUTER JOIN data_transfer_batch dtb ON dtv.data_transfer_batch_id = dtb.batch_id
+									  WHERE dtb.status_code = 'completed' GROUP BY data_transfer_batch_id, row_id ) a GROUP BY data_transfer_batch_id ) b
+								   UNION
+								   SELECT COUNT(*) AS batchCount, IF(SUM(noOfRows),SUM(noOfRows),0) AS records
+									 FROM (SELECT * FROM (SELECT data_transfer_batch_id, COUNT(*) as noOfRows  FROM data_transfer_value dtv
+									 LEFT OUTER JOIN data_transfer_batch dtb ON dtv.data_transfer_batch_id = dtb.batch_id
+									 WHERE dtb.status_code = 'pending'	GROUP BY data_transfer_batch_id, row_id ) a GROUP BY data_transfer_batch_id ) b;
+								"""
+		
+		def recordsLegend = jdbcTemplate.queryForList( queryForRecords ) 
+		
+		def pendingInfo = "Current: ${recordsLegend[0].batchCount} batches / ${recordsLegend[0].records} records process,"+
+						  (recordsLegend[1] ? "${recordsLegend[0].batchCount} batches / ${recordsLegend[0].records} records pending" : "0 batches / 0 records pending")
+		
+		render pendingInfo
+	}
 }

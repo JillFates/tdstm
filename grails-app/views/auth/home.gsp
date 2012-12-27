@@ -105,7 +105,7 @@ a:hover {
 		<table>
 			<thead>
 				<tr>
-					<th colspan="2">List of Party Actions</th>
+					<th colspan="2">Misc. Admin functions</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -125,7 +125,8 @@ a:hover {
 				<tr class="odd">
 					<td><g:link controller="admin" action="orphanSummary"
 						style="color:black">Manage Orphan Records</g:link></td>
-					<td></td>
+					<td><a style="color:black" href="#" onclick="openFlushDiv()"> Flush import data </a>
+					</td>
 				</tr>
 			</tbody>
 		</table>
@@ -133,23 +134,21 @@ a:hover {
 		</td>
 	</tr>
 </table>
-<span class="spanAnchor" style="float:right" onclick="openFlushDiv()"> Flush import data </span>
- 
+
 </div>
-	<div id="flushOldBatchId" style="display: none;" title="Flush import data">
-	<div id="respMsgId" style="display: none" class="message">${flash.message}</div>
-		  <input type="radio" name="deleteHistory" id="doNothing" value="doNothing" checked="checked"> <label for="doNothing">Do Nothing </label><br>
-		  <input type="radio" name="deleteHistory" id="overTwoMonths" value="overTwoMonths" > <label for="overTwoMonths">Over Two Months</label><br>
-		  <input type="radio" name="deleteHistory" id="anyProcessed" value="anyProcessed" > <label for="anyProcessed">Any Processed</label> <br>
-		  <input type="radio" name="deleteHistory" id="all" value="all" > <label for="all">All uploaded and processed data</label> <br>
-		  <div id="processDivId" style="display: none">
-	  		<img id="processingId" src="../images/processing.gif" />
-		  </div>
-		  
-		  <div class="buttons">
-			  <input type="button" id="processData" class="save" value="Submit" onclick="processBatch()"/> 
-			  <input type="button"  class="save" value="cancel" id="processData" />
-		  </div>
+	<div id="flushOldBatchId" class="personShow" style="display: none;" title="Flush import data">
+	<div id="respMsgId" style="display: none" class="message"></div>
+	<div id="processDivId" style="display: none">
+		<img src="../images/processing.gif" />
+	</div>
+	<input type="radio" name="deleteHistory" id="doNothing" value="doNothing" checked="checked"> <label for="doNothing">Do Nothing </label><br>
+	<input type="radio" name="deleteHistory" id="overTwoMonths" value="overTwoMonths" > <label for="overTwoMonths">Over Two Months</label><br>
+	<input type="radio" name="deleteHistory" id="anyProcessed" value="anyProcessed" > <label for="anyProcessed">Any Processed</label> <br>
+	<input type="radio" name="deleteHistory" id="all" value="all" > <label for="all">All processed AND pending data</label> <br>
+	<div class="buttons">
+		<input type="button" id="processData" class="save" value="Submit" onclick="processBatch()"/> 
+		<input type="button"  class="save" value="Cancel" id="processData" onclick="jQuery('#flushOldBatchId').dialog('close')"/>
+	</div>
 	</div>
 </div>
 
@@ -174,14 +173,14 @@ a:hover {
 				beforeSend:function(jqXHR){
 					$('#processDivId').show(); 
 					$("#respMsgId").hide();
-					$("#processingId").show();
+					$("#processDivId").show()
 				},
 				success: function(data) {
-					$("#processingId").hide();
+					$("#processDivId").hide()
 					$("#respMsgId").show().html(data)
 				},
 				error:function(jqXHR, textStatus, errorThrown){
-					$("#processingId").hide();
+					$("#processDivId").hide()
 					$("#respMsgId").show().html("An unexpected error occurred. Please close and reload form to see if the problem persists")
 				}
 			})
@@ -189,9 +188,27 @@ a:hover {
 	}
 	
 	function openFlushDiv(){
-		 $("#flushOldBatchId").dialog('option', 'width', '500px')
-		 $("#flushOldBatchId").dialog('option', 'position', ['center','top']);
-		 $("#flushOldBatchId").dialog('open');
+		 jQuery.ajax({
+			url: '../admin/getBatchRecords',
+			type:'POST',
+			beforeSend:function(jqXHR){
+				 $("#flushOldBatchId").dialog('option', 'width', '500px')
+				 $("#flushOldBatchId").dialog('option', 'position', ['center','top']);
+				 $("#flushOldBatchId").dialog('open');
+				 $("#getRecordsInfoId").show()
+				 $("#respMsgId").hide()
+				 $("#processDivId").show()
+			},
+			success: function(data) {
+				 $("#respMsgId").html(data)
+				 $("#processDivId").hide()
+				 $("#respMsgId").show()
+			},
+			error:function(jqXHR, textStatus, errorThrown){
+				alert("An unexpected error occurred while opening Flush import div. Please reload form to see if the problem persists")
+			}
+		 })
+		
 	}
 </script>
 </body>
