@@ -1,6 +1,3 @@
-var B1 = []
-var B2 = []
-var taskManagerTimePref = "60"
 
 /**
  * Action to invoke Change status ajax call from TaskManager and MyTasks
