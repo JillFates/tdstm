@@ -365,7 +365,7 @@ function enableButton(list){
 
 function getAuditDetails(redirectTo, assetType, value){
 	new Ajax.Request('../assetEntity/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,
-		onComplete:function(e){alert(e.responseText)
+		onComplete:function(e){
 			$("#auditDetailViewId").html(e.responseText)
 			$("#auditDetailViewId").show()
 		}}
