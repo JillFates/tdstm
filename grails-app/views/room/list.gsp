@@ -401,7 +401,6 @@ function getRackLayout( rackId ){
 		$("#rack_"+rackId).addClass("objectSelected")
 		
 		var forWhom = $("#auditCheckId").val() == 1 ? "room" : ""
-			alert(forWhom)
 		new Ajax.Request('../rackLayouts/save',{asynchronous:true,evalScripts:true,onSuccess:function(e){updateRackPower( rackId )},onComplete:function(e){jQuery('#rackLayout').html(e.responseText);},parameters:moveBundleId+'rackId='+rackId+'&backView=off&showCabling=off&otherBundle='+otherBundle+'&bundleName=on&hideIcons=on&forWhom='+forWhom});return false;
 	}
 }
