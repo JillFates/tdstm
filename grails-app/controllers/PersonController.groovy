@@ -877,9 +877,9 @@ class PersonController {
 		def labelMap = ["CONSOLE_TEAM_TYPE" : "Console Team Type", "SUPER_CONSOLE_REFRESH" : "Console Refresh Time",
 						 "CART_TRACKING_REFRESH" : "Cart tarcking Refresh Time", "BULK_WARNING" : "Bulk Warning",
 						 "DASHBOARD_REFRESH" : "Dashboard Refresh Time", "CURR_TZ" : "Time Zone","CURR_POWER_TYPE" : "Power Type",
-						 "START_PAGE" : "Welcome Page", "StaffingRole" : "Default Preoject Staffing Role",
-						 "StaffingLocation" : "Default Preoject Staffing Location", "StaffingPhases" : "Default Preoject Staffing Phase",
-						 "StaffingScale" : "Default Preoject Staffing Scale", "preference" : "Preference", "DraggableRack" : "Draggable Rack",
+						 "START_PAGE" : "Welcome Page", "StaffingRole" : "Default Project Staffing Role",
+						 "StaffingLocation" : "Default Project Staffing Location", "StaffingPhases" : "Default Project Staffing Phase",
+						 "StaffingScale" : "Default Project Staffing Scale", "preference" : "Preference", "DraggableRack" : "Draggable Rack",
 						 "PMO_COLUMN1" : "PMO Column 1 Filter", "PMO_COLUMN2" : "PMO Column 2 Filter", "PMO_COLUMN3" : "PMO Column 3 Filter",
 						 "PMO_COLUMN4" : "PMO Column 4 Filter", "ShowAddIcons" : "Rack Add Icons", "MY_TASK":"My Task Refresh Time"
 					  ]
@@ -907,7 +907,7 @@ class PersonController {
 				
 				case "StaffingRole" :
 				    def role = pref.value == "0" ? "All" : RoleType.get(pref.value).description
-					prefMap.put((pref.preferenceCode), "Default Preoject Staffing Role / "+role.substring(role.lastIndexOf(':') +1))
+					prefMap.put((pref.preferenceCode), "Default Project Staffing Role / "+role.substring(role.lastIndexOf(':') +1))
 					break;
 				
 				default :
