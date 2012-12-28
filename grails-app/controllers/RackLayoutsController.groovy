@@ -66,7 +66,6 @@ class RackLayoutsController {
 	}
 	
 	def save = {
-
 		session.setAttribute( "RACK_FILTERS", params )
 		List bundleId = request.getParameterValues("moveBundle")
 		def maxUSize = 42
@@ -298,7 +297,8 @@ class RackLayoutsController {
 				def frontViewRows
 				def paramsMap = [:]
 				paramsMap = [ "rackLayoutsHasPermission" : rackLayoutsHasPermission, "assetDetails":assetDetails, "includeBundleName": includeBundleName,
-								"backView":backView, "showCabling":params.showCabling, "hideIcons":hideIcons, "redirectTo":redirectTo, "rackId":rack.id]
+								"backView":backView, "showCabling":params.showCabling, "hideIcons":hideIcons, "redirectTo":redirectTo, "rackId":rack.id,
+								"forWhom":params.forWhom]
 				
 				if(backView) {
 					backViewRows = getRackLayout(paramsMap)
@@ -358,6 +358,7 @@ class RackLayoutsController {
 		def hideIcons =  paramsMap.hideIcons
 		def redirectTo = paramsMap.redirectTo
 		def rackId = paramsMap.rackId
+		def forWhom = paramsMap.forWhom
 		asset.each {
 			def row = new StringBuffer("<tr>")
 			if(it.asset) {
@@ -394,7 +395,11 @@ class RackLayoutsController {
 								hasBlades = true
 								bladeTable = generateBladeLayout(it, overlapAsset, rackLayoutsHasPermission, hideIcons, redirectTo, rackId)
 							}
-							assetTag += """<a href="javascript:getEntityDetails('${redirectTo}','${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>" 
+							if(forWhom){
+								assetTag += """<a href="javascript:getAuditDetails('roomAudit','${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>"
+							} else {
+								assetTag += """<a href="javascript:getEntityDetails('${redirectTo}','${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>"
+							} 
 							if(hasBlades){
 								assetTag += "<br/>"+bladeTable
 							}
@@ -407,7 +412,12 @@ class RackLayoutsController {
 							bladeTable = generateBladeLayout(it, overlappedAsset,rackLayoutsHasPermission, hideIcons, redirectTo, rackId)
 						}
 						cabling = !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : ""
-						assetTag += """<a href="javascript:getEntityDetails('${redirectTo}','${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>&nbsp;"
+						if(forWhom){
+							assetTag += """<a href="javascript:getAuditDetails('roomAudit','${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>&nbsp;"
+						} else {
+							assetTag += """<a href="javascript:getEntityDetails('${redirectTo}','${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>&nbsp;"
+						}
+						
 						if(hasBlades){
 							assetTag += "<br/>"+bladeTable
 						}
@@ -794,7 +804,6 @@ class RackLayoutsController {
 	def savePreference = {
 		def preference = params.preference
 		if(params.add == "true"){
-			println "inside if"
 			userPreferenceService.setPreference(preference, "true")
 		} else {
 			userPreferenceService.removePreference(preference)

@@ -399,8 +399,10 @@ function getRackLayout( rackId ){
 	   	
 		$(".objectSelected").removeClass("objectSelected")
 		$("#rack_"+rackId).addClass("objectSelected")
-
-		new Ajax.Request('../rackLayouts/save',{asynchronous:true,evalScripts:true,onSuccess:function(e){updateRackPower( rackId )},onComplete:function(e){jQuery('#rackLayout').html(e.responseText);},parameters:moveBundleId+'rackId='+rackId+'&backView=off&showCabling=off&otherBundle='+otherBundle+'&bundleName=on&hideIcons=on'});return false;
+		
+		var forWhom = $("#auditCheckId").val() == 1 ? "room" : ""
+			alert(forWhom)
+		new Ajax.Request('../rackLayouts/save',{asynchronous:true,evalScripts:true,onSuccess:function(e){updateRackPower( rackId )},onComplete:function(e){jQuery('#rackLayout').html(e.responseText);},parameters:moveBundleId+'rackId='+rackId+'&backView=off&showCabling=off&otherBundle='+otherBundle+'&bundleName=on&hideIcons=on&forWhom='+forWhom});return false;
 	}
 }
 </script>

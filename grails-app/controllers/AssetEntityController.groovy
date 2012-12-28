@@ -1445,6 +1445,9 @@ class AssetEntityController {
 				case "planningConsole":
 					forward( action:'getLists', params:[entity: 'server',dependencyBundle:session.getAttribute("dependencyBundle")])
 					break;
+				case "assetAudit":
+					render "AssetEntity ${assetEntityInstance.assetName} deleted"
+					break;
 				default:
 					redirect( action:list)
 			}
@@ -2859,12 +2862,16 @@ class AssetEntityController {
 		
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 			
-			[	label:frontEndLabel, assetEntity:assetEntity, 
+			def paramsMap = [label:frontEndLabel, assetEntity:assetEntity, 
 				supportAssets:supportAssets, dependentAssets:dependentAssets, 
 				redirectTo:params.redirectTo,
 				assetCommentList:assetCommentList,
-				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle
-			]
+				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle]
+		
+			if(params.redirectTo == "roomAudit") {
+				render(template:"auditDetails",model:paramsMap)
+			}
+			return paramsMap
 		}
 	}
 	
@@ -2896,13 +2903,20 @@ class AssetEntityController {
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
-
-		[assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-					planStatusOptions:planStatusOptions?.value, projectId:projectId, project: project, railTypeOption:railTypeOption?.value,
-					priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets,
-					manufacturers:manufacturers, models:models,redirectTo:params?.redirectTo, dependencyType:dependencyType,
-					dependencyStatus:dependencyStatus,servers:servers]
-
+		
+		def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
+							planStatusOptions:planStatusOptions?.value, projectId:projectId, project: project, railTypeOption:railTypeOption?.value,
+							priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets,
+							manufacturers:manufacturers, models:models,redirectTo:params?.redirectTo, dependencyType:dependencyType,
+							dependencyStatus:dependencyStatus,servers:servers]
+		
+		if(params.redirectTo == "roomAudit") {
+			def rooms = Room.findAllByProject(project)
+			paramsMap << ['rooms':rooms]
+			render(template:"auditEdit",model:paramsMap)
+		}
+		
+		return paramsMap
 	}
 
 	def update={
@@ -2962,6 +2976,9 @@ class AssetEntityController {
 					case "listComment":
 						forward(action:'listComment')
 						break;
+					case "roomAudit":
+						forward(action:'show', params:[redirectTo:redirectTo])
+						break;
 					case "planningConsole":
 				        forward(action:'getLists', params:[entity: params.tabType,labelsList:params.labels,dependencyBundle:session.getAttribute("dependencyBundle")])
 						break;
@@ -2972,7 +2989,7 @@ class AssetEntityController {
 			}
 		}
 		else {
-			flash.message = "Asset not created"
+			flash.message = "Asset not Updated"
 			assetEntityInstance.errors.allErrors.each{ flash.message += it }
 			redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_model:filterAttr.tag_f_model, tag_f_sourceLocation:filterAttr.tag_f_sourceLocation, tag_f_sourceRack:filterAttr.tag_f_sourceRack, tag_f_targetLocation:filterAttr.tag_f_targetLocation, tag_f_targetRack:filterAttr.tag_f_targetRack, tag_f_assetType:filterAttr.tag_f_assetType, tag_f_serialNumber:filterAttr.tag_f_serialNumber, tag_f_moveBundle:filterAttr.tag_f_moveBundle, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown,tag_s_1_application:filterAttr.tag_s_1_application,tag_s_2_assetName:filterAttr.tag_s_2_assetName,tag_s_3_model:filterAttr.tag_s_3_model,tag_s_4_sourceLocation:filterAttr.tag_s_4_sourceLocation,tag_s_5_sourceRack:filterAttr.tag_s_5_sourceRack,tag_s_6_targetLocation:filterAttr.tag_s_6_targetLocation,tag_s_7_targetRack:filterAttr.tag_s_7_targetRack,tag_s_8_assetType:filterAttr.tag_s_8_assetType,tag_s_9_assetTag:filterAttr.tag_s_9_assetTag,tag_s_10_serialNumber:filterAttr.tag_s_10_serialNumber,tag_s_11_moveBundle:filterAttr.tag_s_11_moveBundle,tag_s_12_depUp:filterAttr.tag_s_12_depUp,tag_s_13_depDown:filterAttr.tag_s_13_depDown])
 

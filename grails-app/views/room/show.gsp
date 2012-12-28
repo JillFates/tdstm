@@ -20,7 +20,10 @@
 					<input type="submit" class="submit" value="List" />
 					<tds:hasPermission permission='RoomEditView'>
 						<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
-					</tds:hasPermission> <br/>
+					</tds:hasPermission> 
+					<input type="checkbox" id="auditCheckId" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
+					<label for="auditCheckId"><b>Audit</b></label>
+					<br/>
 					</g:form>
 					</div>
 				</td>
@@ -89,7 +92,7 @@
 	<g:set var="numcols" value="${1}" />
 	<g:set var="tilecols" value="${roomInstance.roomWidth / 2}" />
 
-	<div id="room_layout" style="position:relative; width:650px; height:800px; overflow:auto; border:0px; float:left;">
+	<div id="room_layout" style="position:relative; width:300px; height:800px; overflow:auto; border:0px; float:left;margin-right:10px">
 		<table id="room_layout_table" cellpadding="0" cellspacing="0" style="width:${tilecols *42}px; height:${tilerows *42}px; border:0px;">
 			<g:while test="${numrows <= tilerows }">
 				<tr>
@@ -121,7 +124,7 @@
 			</g:each>
 		<span>Floor ${roomInstance.roomWidth}ft x ${roomInstance.roomDepth}ft = ${roomInstance.roomWidth * roomInstance.roomDepth} sqft</span>
 	</div>
-	<div style="float: right; margin-left: 20px;" id="rackLayout">
+	<div style="float:left ; margin-left: 20px;" id="rackLayout">
 	<table style="display:none" cellpadding=2 class="rack_elevation back">
 	<tr><th>U</th><th>Device</th><th>Bundle</th></tr>
 	<tr><td class='rack_upos'>42</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
@@ -167,10 +170,12 @@
 	<tr><td class='rack_upos'>2</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
 	<tr><td class='rack_upos'>1</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
 	</table>
+	
+	</div>
+	<div id="auditDetailViewId" class="table.rack_elevation.back" style="display: none;">
 	</div>
 </div>
-</div>
-</div>
+
 <script type="text/javascript">
 initializeRacksInRoom( [] )
 capacityView()

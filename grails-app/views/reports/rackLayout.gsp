@@ -68,7 +68,7 @@
 		<tr class="prop" id="bundleRow">
 			<td valign="top" class="name"><label> <b>Current Move Bundle:<span style="color: red;">*</span> </b></label></td>
 			<td valign="top" class="value" colspan="2">
-				<select id="bundleId" name="moveBundle" onchange="${remoteFunction(action:'getRackDetails', params:'\'bundleId=\' + this.value', onComplete:'updateRackDetails(e)')}">
+				<select id="bundleId" name="moveBundle" onchange="${remoteFunction(controller:'rackLayoutets', action:'getRackDetails', params:'\'bundles=\' + this.value', onComplete:'updateRackDetails(e)')}">
 					<option value="null" selected="selected">Please Select</option>
 					<g:each in="${moveBundleInstanceList}" var="moveBundleList">
 						<option value="${moveBundleList?.id}">${moveBundleList?.name}</option>

@@ -363,6 +363,49 @@ function enableButton(list){
 	}
 }
 
+function getAuditDetails(redirectTo, assetType, value){
+	new Ajax.Request('../assetEntity/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,
+		onComplete:function(e){alert(e.responseText)
+			$("#auditDetailViewId").html(e.responseText)
+			$("#auditDetailViewId").show()
+		}}
+	)
+}
+
+function editAudit(redirectTo, assetType, value){
+	new Ajax.Request('../assetEntity/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,
+		onComplete:function(e){
+			$("#auditDetailViewId").html(e.responseText)
+			$("#auditDetailViewId").show()
+		}}
+	)
+}
+
+function updateAudit(){
+	jQuery.ajax({
+		url: $('#editAssetsFormId').attr('action'),
+		data: $('#editAssetsFormId').serialize(),
+		type:'POST',
+		success: function(data) {
+			if(data.errMsg){
+				alert(data.errMsg)
+			}else{
+				$("#auditDetailViewId").html(data)
+				window.location.reload()
+			}
+		}
+	});
+}
+
+function deleteAudit(id,value){
+	new Ajax.Request('../assetEntity/delete?id='+id+'&dstPath=assetAudit',{asynchronous:true,evalScripts:true,
+		onComplete:function(data){
+				$("#auditDetailViewId").hide()
+				window.location.reload()
+		}}
+	)
+}
+
 /*function updateModel(rackId,value){
 	var val = value;
 	new Ajax.Request('../assetEntity/getModelsList?manufacturer='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){populateModelSelect(e,rackId);}})

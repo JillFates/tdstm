@@ -34,7 +34,7 @@ br.page-break-after {
   top: 70px; right: 5px; bottom: 25px;
   margin: 0;
   padding-right: 18px;
-  float: none !important;
+  float: left !important;
   overflow-y: auto !important;
   background-color: white;
 }
@@ -926,4 +926,8 @@ table.rack_elevation table.bladeTable td.errorBlade {
 	border-left-color: blue;
 	background-color: #FFF;
 	position:absolute;
+}
+#auditDetailViewId{
+	float: left;
+	width: 275px
 }
