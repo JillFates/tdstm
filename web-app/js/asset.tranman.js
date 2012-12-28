@@ -1702,14 +1702,14 @@ function deletePredRow( rowId ){
 	
 function enableCreateIcon(id){
 	$(".create_"+id).css("display","block")
-	$("#span_"+id).html("<img src='../i/db_delete.png'/>")
+	$("#span_"+id).html("<img src='../images/minus.gif'/>")
 	$("#span_"+id).attr("onClick","disableCreateIcon("+id+")")
 	new Ajax.Request('../rackLayouts/savePreference?preference=ShowAddIcons&add=true',{asynchronous:true,evalScripts:true })
 }
 
 function disableCreateIcon(id){
 	$(".create_"+id).css("display","none")
-	$("#span_"+id).html(" <img src='../i/rack_add2.png'/>")
+	$("#span_"+id).html(" <img src='../images/plus.gif'/>")
 	$("#span_"+id).attr("onClick","enableCreateIcon("+id+")")
 	new Ajax.Request('../rackLayouts/savePreference?preference=ShowAddIcons&add=false',{asynchronous:true,evalScripts:true })
 }

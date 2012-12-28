@@ -8,6 +8,7 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
 <title>Rack Elevation Report</title>
 </head>
 <body>
@@ -59,11 +60,11 @@
 					 <tds:hasPermission permission="EditAndDelete">
 						<g:if test="${showIconPref =='true'}">
 							<span id="span_${rackLayout?.rackId}" onclick="disableCreateIcon(${rackLayout?.rackId})"> 
-								<img src='../i/db_delete.png' /></span>
+								<img src='../images/minus.gif' /></span>
 						</g:if>
 						<g:else>
 							<span id="span_${rackLayout?.rackId}" onclick="enableCreateIcon(${rackLayout?.rackId})"> 
-								<img src="../i/rack_add2.png" /></span>
+								<img src="../images/plus.gif" /></span>
 						</g:else>
 					</tds:hasPermission>
 					 </h2>
