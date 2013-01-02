@@ -909,6 +909,11 @@ class PersonController {
 				    def role = pref.value == "0" ? "All" : RoleType.get(pref.value).description
 					prefMap.put((pref.preferenceCode), "Default Project Staffing Role / "+role.substring(role.lastIndexOf(':') +1))
 					break;
+					
+				case "AUDIT_VIEW" :
+					def value = pref.value == "0" ? "False" : "True"
+					prefMap.put((pref.preferenceCode), "Room Audit View / "+value)
+					break;
 				
 				default :
 					prefMap.put((pref.preferenceCode), (labelMap[pref.preferenceCode] ?: pref.preferenceCode )+" / "+ pref.value)

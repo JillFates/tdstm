@@ -229,18 +229,32 @@ class ModelController {
     }
 
     def show = {
-        def model = Model.get(params.id)
-		def subject = SecurityUtils.subject
-        if (!model) {
-        	flash.message = "Model not found with Id ${params.id}"
-            redirect(action: "list")
-        }
-        else {
-        	def modelConnectors = ModelConnector.findAllByModel( model,[sort:"id"] )
-			def modelAkas = WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(model, [sort:'name']).name)
-            return [ modelInstance : model, modelConnectors : modelConnectors, modelAkas:modelAkas,
-                    modelHasPermission:RolePermissions.hasPermission("ValidateModel") ]
-        }
+		def modelId = params.id
+		if(modelId && modelId.isNumber()){
+	        def model = Model.get(params.id)
+			def subject = SecurityUtils.subject
+	        if (!model) {
+	        	flash.message = "Model not found with Id ${params.id}"
+	            redirect(action: "list")
+	        }
+	        else {
+	        	def modelConnectors = ModelConnector.findAllByModel( model,[sort:"id"] )
+				def modelAkas = WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(model, [sort:'name']).name)
+				def paramsMap = [ modelInstance : model, modelConnectors : modelConnectors, modelAkas:modelAkas,
+	                  			  modelHasPermission:RolePermissions.hasPermission("ValidateModel") ]
+				if(params.redirectTo == "assetAudit"){
+					render(template: "modelAuditView", model: paramsMap )
+				}
+	            return paramsMap
+	        }
+		} else {
+			if(params.redirectTo == "assetAudit"){
+				render "<b>Model not found with Id ${params.id}</b>"
+			} else {
+				flash.message = "Model not found with Id ${params.id}"
+				redirect(action: "list")
+			}
+		}
     }
 
     def edit = {
@@ -262,8 +276,13 @@ class ModelController {
 				otherConnectors << i
 			}
 			def modelAliases = ModelAlias.findAllByModel(model, [sort:'name'])
-            return [ modelInstance: model, modelConnectors : modelConnectors, otherConnectors : otherConnectors, 
+			def paramsMap = [ modelInstance: model, modelConnectors : modelConnectors, otherConnectors : otherConnectors, 
                 nextConnector:nextConnector, modelAliases:modelAliases ]
+			
+			if(params.redirectTo == "assetAudit"){
+				render(template: "modelAuditEdit", model: paramsMap )
+			}
+            return paramsMap
         }
     }
 
@@ -498,6 +517,9 @@ class ModelController {
 				}
 				
 				flash.message = "${modelInstance.modelName} Updated"
+				if(params.redirectTo == "assetAudit"){
+					render(template: "modelAuditView", model: [modelInstance:modelInstance] )
+				}
                 redirect(action: "show", id: modelInstance.id)
             }
             else {
@@ -1198,5 +1220,23 @@ class ModelController {
         
 	
 		render duplicateAka
+	}
+	/**
+	 * this method is used to update model for audit view , not using update method as there have a lot of code in update action might degrade performance.
+	 * @param id : id of model for update
+	 * 
+	 */
+	def updateModel = {
+		def modelId = params.id
+		if(modelId && modelId.isNumber()){
+			def model = Model.get( params.id ) 
+			model.properties = params
+			if(!model.save(flush:true)){
+				model.errors.allErrors.each{
+					log.error it
+				}
+			}
+			render(template: "modelAuditView", model: [modelInstance:model] )
+		}
 	}
 }

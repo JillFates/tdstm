@@ -21,7 +21,8 @@
 					<tds:hasPermission permission='RoomEditView'>
 						<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
 					</tds:hasPermission> 
-					<input type="checkbox" id="auditCheckId" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
+					<input type="checkbox" id="auditCheckId" ${auditPref=='1' ? 'checked="checked"  value="1"' : 'value="0"'}
+					onclick="if(this.checked){this.value = 1} else {this.value = 0 }; saveAuditPref(this.value, ${roomInstance.id})" />
 					<label for="auditCheckId"><b>Audit</b></label>
 					<br/>
 					</g:form>

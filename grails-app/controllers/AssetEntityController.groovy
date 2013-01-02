@@ -1545,6 +1545,8 @@ class AssetEntityController {
 				redirect( controller:'room',action:list )
 			} else if(redirectTo == "rack"){
 				redirect( controller:'rackLayouts',action:'create' )
+			} else if(redirectTo == "assetAudit"){
+				render(template:'auditDetails', model:[assetEntity:assetEntityInstance])
 			} else {
 				redirect( action:list )
 			}
@@ -2791,7 +2793,7 @@ class AssetEntityController {
 			def manufacuterer = params.manufacturer ? Manufacturer.read(params.manufacturer) : manufacturers[0]
 			
 			def models =  Model.findAllByManufacturer( manufacuterer,[sort:'modelName',order:'asc'] )?.findAll{it.assetType == assetType }
-	
+			
 			def moveBundleList = MoveBundle.findAllByProject(project)
 			
 			def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
@@ -2802,10 +2804,16 @@ class AssetEntityController {
 			def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
 			def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)
 	
-			 [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-				planStatusOptions:planStatusOptions?.value, projectId:project.id ,railTypeOption:railTypeOption?.value,
-				priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers,redirectTo:params?.redirectTo,
-				models:models]
+			def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
+								planStatusOptions:planStatusOptions?.value, projectId:project.id ,railTypeOption:railTypeOption?.value,
+								priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers,redirectTo:params?.redirectTo,
+								models:models]
+			 
+			 if(params.redirectTo == "assetAudit") {
+				 render(template:"createAuditDetails",model:paramsMap)
+			 }
+			 
+			return paramsMap
 		}
 	}
 	

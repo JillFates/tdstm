@@ -1,14 +1,16 @@
 <g:form method="post"  name="editAssetsFormId" controller="assetEntity" action="update">
-<table>
+<div>
 <input type="hidden" name="redirectTo" value="${redirectTo}"/>
 <input type="hidden" name="id" value="${assetEntityInstance.id}"/>
 <input name="dependentCount" id="dependentCount" type="hidden" value="0"/>
 <input  name="supportCount"  id="supportCount" type="hidden" value="0"/>
+<table>
+	<tr><td colspan="2"><b>Asset Audit Edit</b></td></tr>
 	<tr class="prop" >
 		<td class="label">Location</td>
 		<td class="label" nowrap="nowrap">
-			<input type="text" name="sourceLocation" value="${assetEntityInstance.sourceLocation}" size="10" /> / 
-			<input type="text" name="sourceRoom" value="${assetEntityInstance.sourceRoom}" size="10" />
+			<input type="text" name="sourceLocation" value="${assetEntityInstance.sourceLocation}" size="6" /> / 
+			<input type="text" name="sourceRoom" value="${assetEntityInstance.sourceRoom}" size="6" />
 		</td>
 	</tr>
 	<tr class="prop">
@@ -18,28 +20,32 @@
 		</td>
 	</tr>
 	<tr class="prop">
-		<td class="label">Room</td>
+		<td class="label">Manufacturer</td>
 		<td class="label">
-		<g:select from="${rooms}" id="room" name="room.id" optionKey="id" optionValue="roomName"/>
+		 <div id="manufacturerId">
+		   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${assetEntityInstance.manufacturer?.id}" onChange="selectModel(this.value)" optionKey="id" optionValue="name" noSelection="${[null:'Unassigned']}" tabindex="13"/>
+		 </div>
 		</td>
 	</tr>
-	<tr class="prop">
-		<td class="label">Model</td>
+	<tr class="prop trAnchor" onclick="showModelAudit(${assetEntityInstance.model?.id})">
+		<td class="label"><b>Model</b></td>
 		<td class="label">
+		<div id="modelId">
 			<g:select from="${models}" id="modelName" name="model.id" optionKey="id" optionValue="modelName"/>
+		</div>
 		</td>
 	</tr>
 	<tr class="prop">
 		<td class="label">Type</td>
 		<td class="label">
-			<input type="text" name="assetType" value="${assetEntityInstance.assetType}">
+			<input type="text" id="assetTypeId" name="assetType" value="${assetEntityInstance.assetType}">
 		</td>
 	</tr>
 	<tr class="prop">
 		<td class="label">Rack</td>
 		<td class="label" nowrap="nowrap">
-			<input type="text" name="sourceRack" value="${assetEntityInstance.sourceRack}" size="10" > 
-			Pos :<input type="text" name="sourceRackPosition" value="${assetEntityInstance.sourceRackPosition }" size="10" ">
+			<input type="text" name="sourceRack" value="${assetEntityInstance.sourceRack}" size="6" > 
+			Pos :<input type="text" name="sourceRackPosition" value="${assetEntityInstance.sourceRackPosition }" size="6" ">
 		</td>
 	</tr>
 	<tr class="prop">
@@ -67,9 +73,11 @@
 		</td>
 	</tr>
 </table>
+</div>
 <div class="buttons">
 	<input type="button" class="edit" value="Update" onclick="updateAudit()" /> 
 	<input type="button" class="edit" value="Delete" onclick="deleteAudit(${assetEntityInstance.id},'server')" /> 
 	<input type="button" class="edit" value="More..." onclick="editEntity('room','Server', ${assetEntityInstance?.id})" /> 
-</div>
+</div><br>
+<div id="modelAuditId" style="display: none"></div>
 </g:form>

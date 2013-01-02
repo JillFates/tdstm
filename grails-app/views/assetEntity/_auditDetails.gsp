@@ -13,15 +13,15 @@
 		</td>
 	</tr>
 	<tr class="prop">
-		<td class="label">Room</td>
+		<td class="label">Manufacturer</td>
 		<td class="label">
-			${assetEntity.sourceRoom}
+			${assetEntity.manufacturer}
 		</td>
 	</tr>
-	<tr class="prop">
-		<td class="label">Model</td>
+	<tr class="prop trAnchor" onclick="showModelAudit(${assetEntity.model?.id})">
+		<td class="label"><a><b>Model</b></a></td>
 		<td class="label">
-			${assetEntity.model}
+			<a>${assetEntity.model}</a>
 		</td>
 	</tr>
 	<tr class="prop">
@@ -68,31 +68,5 @@
 </div>
 <br>
 <div >
-<table> 
- <tr><td colspan="2"><b>Model Details View</b></td></tr>
-	<tr class="prop">
-		<td class="label">Name</td>
-		<td class="label">
-			${assetEntity.model?.modelName}
-		</td>
-	</tr>
-	<tr class="prop">
-		<td class="label">Size</td>
-		<td class="label">
-			${assetEntity.model?.usize}
-		</td>
-	</tr>
-	<tr class="prop">
-		<td class="label">Manufacturer</td>
-		<td class="label">
-			${assetEntity.model?.manufacturer}
-		</td>
-	</tr>
-	</table>
-	<div class="buttons">
-		<input type="button" class="edit" value="Edit" onclick="editAudit('${redirectTo}','Server', ${assetEntity?.id})" /> 
-		<input type="button" class="edit" value="More..." onclick="getEntityDetails('room','Server', ${assetEntity?.id})" /> 
-	</div>
-</div>
-
+ <div id="modelAuditId" style="display: none"></div>
 </div>

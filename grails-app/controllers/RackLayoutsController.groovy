@@ -395,11 +395,7 @@ class RackLayoutsController {
 								hasBlades = true
 								bladeTable = generateBladeLayout(it, overlapAsset, rackLayoutsHasPermission, hideIcons, redirectTo, rackId)
 							}
-							if(forWhom){
-								assetTag += """<a href="javascript:getAuditDetails('roomAudit','${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>"
-							} else {
-								assetTag += """<a href="javascript:getEntityDetails('${redirectTo}','${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>"
-							} 
+							assetTag += """<a href="javascript:${forWhom ? "editAudit('roomAudit'" : "getEntityDetails('redirectTo'"},'${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>"
 							if(hasBlades){
 								assetTag += "<br/>"+bladeTable
 							}
@@ -412,11 +408,7 @@ class RackLayoutsController {
 							bladeTable = generateBladeLayout(it, overlappedAsset,rackLayoutsHasPermission, hideIcons, redirectTo, rackId)
 						}
 						cabling = !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : ""
-						if(forWhom){
-							assetTag += """<a href="javascript:getAuditDetails('roomAudit','${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>&nbsp;"
-						} else {
-							assetTag += """<a href="javascript:getEntityDetails('${redirectTo}','${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>&nbsp;"
-						}
+						assetTag += """<a href="javascript:${forWhom ? "editAudit('roomAudit'" : "getEntityDetails('redirectTo'"},'${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>&nbsp;"
 						
 						if(hasBlades){
 							assetTag += "<br/>"+bladeTable
@@ -494,7 +486,7 @@ class RackLayoutsController {
 				row.append("<td class='empty' nowrap>${it.rack}</td><td rowspan=1 class=${it.cssClass}>")
 				row.append("""<div ${showIconPref ? '' : 'style="display:none"'}  class="rack_menu create_${rackId}"><img src="../i/rack_add2.png">
 							<ul>
-								<li><a href="javascript:createAssetPage('Server','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
+								<li><a href="javascript:${forWhom ? "createAuditPage" : "createAssetPage"}('Server','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
 								<li><a href="javascript:listDialog('','','asc','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Assign asset </a></li>
 								<li><a href="javascript:listDialog('all','','asc','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Reassign asset </a></li>
 							</ul></img></div>&nbsp;</td><td>&nbsp;</td>""")

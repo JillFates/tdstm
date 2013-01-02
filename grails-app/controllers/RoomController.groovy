@@ -70,6 +70,13 @@ class RoomController {
             redirect(action: "list", params:[viewType : "list"])
         }
         else {
+			def auditView = 0
+			if(params.containsKey("auditView")){
+				auditView = params.auditView
+				userPreferenceService.setPreference("AUDIT_VIEW", params.auditView)
+			} else {
+				auditView = session.AUDIT_VIEW.AUDIT_VIEW
+			}
 			def project = Project.findById( projectId )
 			def roomInstanceList = Room.findAllByProject( project, [sort:"roomName",order:'asc'])
 			def moveBundleList = []
@@ -93,7 +100,8 @@ class RoomController {
 				moveBundleList = [id:'all']
 			}
             [roomInstance: roomInstance, roomInstanceList:roomInstanceList, moveBundleList:moveBundleList, project:project,
-			 racksList: racksList, source:params.source, target:params.target, projectId : projectId]
+			 racksList: racksList, source:params.source, target:params.target, projectId : projectId,
+			 auditPref:auditView]
         }
     }
 

@@ -1204,7 +1204,13 @@ a.tab_deselect {
 	float: left;
 	border: 0px;
 }
-
+.trAnchor{
+	color:#00E;
+	cursor: pointer;
+}
+.noWrapDiv {
+	white-space: nowrap;
+}
 a.task_action{float: left; position: relative; margin: 0 0 0 30px;cursor: pointer;}
 a.task_action span.task_icon{position: absolute; top: 0; left: 0;}
 a.task_action span.task_button { float: left; height: 16px; line-height: 16px;  padding: 0 5px 0 15px; color:#2C61AA;}
