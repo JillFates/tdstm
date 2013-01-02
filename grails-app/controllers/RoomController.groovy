@@ -70,12 +70,12 @@ class RoomController {
             redirect(action: "list", params:[viewType : "list"])
         }
         else {
-			def auditView = 0
+			def auditView 
 			if(params.containsKey("auditView")){
 				auditView = params.auditView
 				userPreferenceService.setPreference("AUDIT_VIEW", params.auditView)
 			} else {
-				auditView = session.AUDIT_VIEW?.AUDIT_VIEW
+				auditView = session.AUDIT_VIEW?.AUDIT_VIEW ?:0
 			}
 			def project = Project.findById( projectId )
 			def roomInstanceList = Room.findAllByProject( project, [sort:"roomName",order:'asc'])

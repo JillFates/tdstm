@@ -391,7 +391,6 @@ function updateAudit(){
 				alert(data.errMsg)
 			}else{
 				$("#auditDetailViewId").html(data)
-				window.location.reload()
 			}
 		}
 	});
@@ -402,6 +401,59 @@ function deleteAudit(id,value){
 		onComplete:function(data){
 				$("#auditDetailViewId").hide()
 				window.location.reload()
+		}}
+	)
+}
+
+function showModelAudit(id){
+	new Ajax.Request('../model/show?id='+id+'&redirectTo=assetAudit',{asynchronous:true,evalScripts:true,
+		onComplete:function(data){
+				$("#modelAuditId").html(data.responseText)
+				$("#modelAuditId").show()
+		}}
+	)
+	
+}
+
+function editModelAudit(id){
+	new Ajax.Request('../model/edit?id='+id+'&redirectTo=assetAudit',{asynchronous:true,evalScripts:true,
+		onComplete:function(data){
+				$("#modelAuditId").html(data.responseText)
+				$("#modelAuditId").show()
+		}}
+	)
+}
+
+function updateModelAudit(){
+	jQuery.ajax({
+		url: $('#modelAuditEdit').attr('action'),
+		data: $('#modelAuditEdit').serialize(),
+		type:'POST',
+		success: function(data) {
+			$("#modelAuditId").html(data)
+		}
+	});
+}
+function createAuditPage(type,source,rack,roomName,location,position){
+	new Ajax.Request('../assetEntity/create?redirectTo=assetAudit',{asynchronous:true,evalScripts:true,
+		onComplete:function(data){
+				$("#auditDetailViewId").html(data.responseText)
+				$("#auditLocationId").val(location)
+				$("#auditRoomId").val(location)
+				$("#assetTypeId").val(type)
+				$("#auditRackId").val(rack)
+				$("#auditPosId").val(position)
+				$("#auditLocationId").val(location)
+				$("#auditDetailViewId").show()
+		}}
+	)
+}
+
+
+function saveAuditPref(val, id){
+	new Ajax.Request('../room/show?id='+id+'&auditView='+val,{asynchronous:true,evalScripts:true,
+		onComplete:function(data){
+			openRoomView(data)
 		}}
 	)
 }
