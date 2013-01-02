@@ -25,7 +25,7 @@
 		<g:form action="edit" controller="model" target="new">
 			<input name="id" type="hidden" id="show_modelId" value="${modelInstance.id}"/>
 			<span class="button">
-				<input type="submit" class="edit" value="More"></input>
+				<input type="submit" class="edit" value="More..."></input>
 			</span>
 		</g:form>
 	</div>

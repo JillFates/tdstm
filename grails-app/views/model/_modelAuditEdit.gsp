@@ -23,13 +23,13 @@
 			</tr>
 		</table>
 	</div>
+	</g:form>
 	<div class="buttons">
 		<input type="button" class="edit" value="Update" onclick="updateModelAudit()" /> 
 		<g:form action="edit" controller="model" target="new">
-			<input  type="hidden" id="show_modelId"/>
+			<input name="id" type="hidden" id="show_modelId" value="${modelInstance.id}"/>
 			<span class="button">
-				<input type="submit" class="edit" value="Edit"></input>
+				<input type="submit" class="edit" value="More..."></input>
 			</span>
 		</g:form>
 	</div>
-</g:form>
