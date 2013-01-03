@@ -130,6 +130,7 @@ class WorkflowController {
 					}
 					/* create Standerd Workflow transitions to the workflow */
 					def stdWorkflowTransitions = WorkflowTransition.findAllByWorkflow( stdWorkflow )
+                    def defaultRole = RoleType.read("PROJ_MGR")
 					stdWorkflowTransitions.each{ stdWorkflowTransition ->
 						def workflowTransition = new WorkflowTransition(workflow : workflowInstance,
 							code : stdWorkflowTransition.code, 
@@ -140,11 +141,14 @@ class WorkflowController {
 							dashboardLabel : stdWorkflowTransition.dashboardLabel,
 							predecessor : stdWorkflowTransition.predecessor,
 							header : stdWorkflowTransition.header,
-							duration : stdWorkflowTransition.duration
+							duration : stdWorkflowTransition.duration,
+                            role : stdWorkflowTransition.role?:defaultRole
 							)
 						if (  workflowTransition.validate() && workflowTransition.save( flush:true) ) {
 							log.debug(" Workfolw step \"${workflowTransition}\" created")
-						} 
+						} else {
+                            log.error(" Workfolw step \"${workflowTransition}\" create issue:"+GormUtil.allErrorsString( workflowTransition ))
+						}
 					}
 					/* Create workflow roles based on the template roles*/
 					def swimlanes = Swimlane.findAllByWorkflow( workflowInstance )
