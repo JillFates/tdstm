@@ -45,12 +45,22 @@
 						<input type="button" class="submit" value="Cancel" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
 						<input type="submit" class="submit" value="Update" />
 					</td>
-					<td class="buttonR" style="padding-left: 190px;vertical-align:top;" colspan="5" nowrap="nowrap"><b>Draggable:</b>
-						<input type="checkbox" id="showRoomObjects" name="showRoomObjects" ${draggableRack == 'on'? 'checked' :'checked' } onclick="enableDraggableRack()"/>&nbsp;
-						<b>Add to Room:</b>&nbsp;<input type="button" class="submit" value="Rack" onclick="createRack(this.value)" />
-						<input type="button" class="submit" value="UPS" onclick="createRack(this.value)" />
-						<input type="button" class="submit" value="CRAC" onclick="createRack(this.value)" />
-						<input type="button" class="submit" value="Object" onclick="createRack(this.value)" />
+					<td class="buttonR" style="padding-left: 180px;vertical-align:top;" colspan="5" nowrap="nowrap">
+					    <span>
+						    <label for="addTargetRoom"><b>Target room:</b></label>
+							<input type="checkbox" id="addTargetRoom" name="addTargetRoom"/>&nbsp;
+						</span>
+                        <span>
+                            <label for="showRoomObjects"><b>Draggable:</b></label>
+                            <input type="checkbox" id="showRoomObjects" name="showRoomObjects" ${draggableRack == 'on'? 'checked' :'checked' } onclick="enableDraggableRack()"/>&nbsp;
+                        </span>
+						<span>
+				            <b>Add to Room:</b>&nbsp;
+					        <input type="button" class="submit" value="Rack" onclick="createRack(this.value)" />
+							<input type="button" class="submit" value="UPS" onclick="createRack(this.value)" />
+							<input type="button" class="submit" value="CRAC" onclick="createRack(this.value)" />
+							<input type="button" class="submit" value="Object" onclick="createRack(this.value)" />
+						</span>
 					</td>
 				</tr>
 			</tbody>

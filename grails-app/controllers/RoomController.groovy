@@ -173,7 +173,8 @@ class RoomController {
 					if(id < params.rackCount ){
 						def rack = Rack.get( id )
 						if( !rack ){
-							def newRack = Rack.findOrCreateWhere(source:1, 'project.id':roomInstance.project.id, location:roomInstance.location, 'room.id':roomInstance?.id, tag:params["tag_"+id])
+                            def source = params.addTargetRoom == "on" ? 0 : 1
+							def newRack = Rack.findOrCreateWhere(source:source, 'project.id':roomInstance.project.id, location:roomInstance.location, 'room.id':roomInstance?.id, tag:params["tag_"+id])
 							if(newRack){
 								newRack.roomX = params["roomX_"+id] ? Integer.parseInt(params["roomX_"+id]) : 0
 								newRack.roomY = params["roomY_"+id] ? Integer.parseInt(params["roomY_"+id]) : 0
