@@ -112,16 +112,19 @@ function showManufacView(e){
     $("#manufacturerId").html(resp);
     $("#manufacturers").removeAttr("multiple")
 }
-function selectModel(value){
+function selectModel(value, forWhom){
 	var val = value;
 	var assetType = $("#assetTypeId").val() ;
-	new Ajax.Request('../assetEntity/getModelsList?assetType='+assetType+'&manufacturer='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){showModelView(e);}})
+	new Ajax.Request('../assetEntity/getModelsList?assetType='+assetType+'&manufacturer='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){showModelView(e, forWhom);}})
 	//${remoteFunction(action:'getModelsList', params:'\'assetType=\' +assetType +\'&manufacturer=\'+ val', onComplete:'showModelView(e)' )}
 }
-function showModelView(e){
+function showModelView(e, forWhom){
     var resp = e.responseText;
     $("#modelId").html(resp);
     $("#models").removeAttr("multiple")
+    if(forWhom == "assetAudit"){
+    	$("#models").attr("onChange","editModelAudit(this.value)")
+    }
 }
 function showComment(id , action){
 	   var id = id
@@ -383,8 +386,8 @@ function editAudit(redirectTo, assetType, value){
 
 function updateAudit(){
 	jQuery.ajax({
-		url: $('#editAssetsFormId').attr('action'),
-		data: $('#editAssetsFormId').serialize(),
+		url: $('#editAssetsAuditFormId').attr('action'),
+		data: $('#editAssetsAuditFormId').serialize(),
 		type:'POST',
 		success: function(data) {
 			if(data.errMsg){

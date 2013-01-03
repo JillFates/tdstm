@@ -1,4 +1,4 @@
-<g:form method="post"  name="editAssetsFormId" controller="assetEntity" action="save">
+<g:form method="post"  name="editAssetsAuditFormId" controller="assetEntity" action="save">
 <div>
 <input type="hidden" name="redirectTo" value="${redirectTo}"/>
 <input name="attributeSet.id" type="hidden" value="1">
@@ -24,7 +24,7 @@
 		<td class="label">Manufacturer</td>
 		<td class="label">
 		 <div id="manufacturerId">
-		   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}"  onChange="selectModel(this.value)" optionKey="id" optionValue="name" noSelection="${[null:'Unassigned']}" tabindex="13"/>
+		   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}"  onChange="selectModel(this.value, 'assetAudit')" optionKey="id" optionValue="name" noSelection="${[null:'Unassigned']}" tabindex="13"/>
 		 </div>
 		</td>
 	</tr>
@@ -32,7 +32,8 @@
 		<td class="label"><b>Model</b></td>
 		<td class="label">
 		<div id="modelId">
-			<g:select from="${models}" id="modelName" name="model.id" optionKey="id" optionValue="modelName" noSelection="${[null:'Unassigned']}"/>
+			<g:select from="${models}" id="models" name="model.id" optionKey="id" optionValue="modelName" noSelection="${[null:'Unassigned']}"
+			onchange="editModelAudit(this.value)" />
 		</div>
 		</td>
 	</tr>
@@ -40,6 +41,12 @@
 		<td class="label">Type</td>
 		<td class="label">
 			<input type="text" id="assetTypeId" name="assetType" readonly="readonly">
+		</td>
+	</tr>
+	<tr class="prop">
+		<td class="label">Serial Number</td>
+		<td class="label">
+			<input type="text" id="serialNumber" name="serialNumber" />
 		</td>
 	</tr>
 	<tr class="prop">
