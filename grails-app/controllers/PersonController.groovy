@@ -914,6 +914,11 @@ class PersonController {
 					def value = pref.value == "0" ? "False" : "True"
 					prefMap.put((pref.preferenceCode), "Room Audit View / "+value)
 					break;
+					
+				case "JUST_REMAINING" :
+					def value = pref.value == "0" ? "False" : "True"
+					prefMap.put((pref.preferenceCode), "Just Remaining Check / "+value)
+					break;
 				
 				default :
 					prefMap.put((pref.preferenceCode), (labelMap[pref.preferenceCode] ?: pref.preferenceCode )+" / "+ pref.value)

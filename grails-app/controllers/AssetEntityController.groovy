@@ -3079,6 +3079,7 @@ class AssetEntityController {
 		def justRemaining = params.containsKey('justRemaining') ? params.justRemaining : "1"
 		def justMyTasks = params.containsKey('justMyTasks') ? params.justMyTasks : "0"
 		
+		
 		// log.info "listCommentsOrTasks: justRemaining=$justRemaining, justMyTasks=$justMyTasks"
 		
 		def assetCommentQuery = "FROM AssetComment a WHERE a.project = :project"
@@ -3259,12 +3260,19 @@ class AssetEntityController {
 			
 			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-			
+			def taskPref
+			//setting justRemaining checkbox value in userPreference
+			if(params.containsKey("justRemaining")){
+				userPreferenceService.setPreference("JUST_REMAINING", justRemaining)
+			} else {
+			    taskPref = session.JUST_REMAINING?.JUST_REMAINING ?:(userPreferenceService.getPreference("JUST_REMAINING")?:1 )
+			}
 			def model = [ assetCommentList:assetCommentList, rediectTo:'comment', 
 				justRemaining:justRemaining, justMyTasks:justMyTasks, 
 				moveEvents:moveEvents, filterEvent:filterEvent,staffRoles:taskService.getRolesForStaff(),
 			    timeToUpdate : timeToRefresh ?: 60,servers:servers, applications:applications, dbs:dbs,
-				files:files, dependencyType:dependencyType, dependencyStatus:dependencyStatus, assetDependency: new AssetDependency()]
+				files:files, dependencyType:dependencyType, dependencyStatus:dependencyStatus, assetDependency: new AssetDependency(),
+				taskPref:taskPref]
 	      	render (view:view ,model:model )
 		}
 	}
