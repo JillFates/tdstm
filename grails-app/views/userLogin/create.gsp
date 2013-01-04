@@ -53,7 +53,7 @@
             <div class="message">${flash.message}</div>
             </g:if>
             <g:form action="save" method="post" >
-                <div class="dialog">
+                <div class="dialog loginView">
                     <table>
                         <tbody>
 	                        <tr>

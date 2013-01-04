@@ -38,7 +38,7 @@
             <g:form method="post" name="editUserForm" autocomplete="off">
                 <input type="hidden" name="id" value="${userLoginInstance?.id}" />
                 <input type="hidden" name="companyId" value="${companyId}" />
-                <div class="dialog">
+                <div class="dialog loginView">
                     <table>
                         <tbody>
                          <tr>
