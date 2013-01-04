@@ -3260,13 +3260,12 @@ class AssetEntityController {
 			
 			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-			def taskPref
 			//setting justRemaining checkbox value in userPreference
 			if(params.containsKey("justRemaining")){
 				userPreferenceService.setPreference("JUST_REMAINING", justRemaining)
-			} else {
-			    taskPref = session.JUST_REMAINING?.JUST_REMAINING ?:(userPreferenceService.getPreference("JUST_REMAINING")?:1 )
 			}
+			def taskPref = userPreferenceService.getPreference("JUST_REMAINING") ?: "1"  
+
 			def model = [ assetCommentList:assetCommentList, rediectTo:'comment', 
 				justRemaining:justRemaining, justMyTasks:justMyTasks, 
 				moveEvents:moveEvents, filterEvent:filterEvent,staffRoles:taskService.getRolesForStaff(),
