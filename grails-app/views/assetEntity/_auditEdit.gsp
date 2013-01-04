@@ -23,8 +23,7 @@
 		<td class="label">Manufacturer</td>
 		<td class="label">
 		 <div id="manufacturerId">
-		   <input type="text" id="manufacturer" name="manufacturers" value="${assetEntityInstance.manufacturer?.name}" onkeyup="getAlikeManu(this.value)"
-			   onblur="clearAutoFill()" />
+		   <input type="text" id="manufacturer" name="manufacturers" value="${assetEntityInstance.manufacturer?.name}" onkeyup="getAlikeManu(this.value)"/>
 		 </div>
 		 <div id="autofillId" class="autoFillDiv" style="display: none;" ></div>
 		</td>
