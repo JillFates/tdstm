@@ -2,6 +2,7 @@ import net.tds.util.jmesa.AssetEntityBean
 import org.jsecurity.crypto.hash.Sha1Hash;
 import org.jsecurity.SecurityUtils;
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 import java.text.SimpleDateFormat
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
@@ -220,22 +221,27 @@ class UserLoginController {
     def create = {
 		def personId = params.id
 		def companyId = params.companyId
-		def personInstance
-		if(personId != null ){
-			personInstance = Person.findById( personId )
-			if(personInstance.lastName == null){
-				personInstance.lastName = ""
+		def person
+		if ( personId != null ) {
+			person = Person.findById( personId )
+			if (person.lastName == null) {
+				person.lastName = ""
 			}
 		}
 		
+	    def now = TimeUtil.nowGMT()
+		
         def userLoginInstance = new UserLogin()
         userLoginInstance.properties = params
-		def expiryDate = new Date(GormUtil.convertInToGMT( "now", "EDT" ).getTime() + 7776000000)
+		def expiryDate = new Date(now.getTime() + 7776000000)
         userLoginInstance.expiryDate = expiryDate
 		def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
 		def project = securityService.getUserCurrentProject()
-		def projectList = Project.list(sort:'name', order:'asc')
-		return ['userLoginInstance':userLoginInstance, personInstance:personInstance, companyId:companyId, roleList:roleList, projectList:projectList,
+		
+		//def projectList = Project.list(sort:'name', order:'asc')
+		def projectList = projectService.getActiveProject( now, false, person, 'name', 'asc' )
+		
+		return ['userLoginInstance':userLoginInstance, personInstance:person, companyId:companyId, roleList:roleList, projectList:projectList,
 			 	project:project]
     }
 	/*

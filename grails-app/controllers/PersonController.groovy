@@ -11,7 +11,9 @@ import org.jsecurity.SecurityUtils
 import org.jsecurity.crypto.hash.Sha1Hash
 
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 import com.tds.asset.AssetComment
+
 class PersonController {
     
 	def partyRelationshipService
@@ -23,7 +25,12 @@ class PersonController {
 
     // the delete, save and update actions only accept POST requests
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
-	// return Persons which are related to company
+
+	/**
+	 * Generates a list view of persons related to company
+	 * @param id - company id
+	 * @param companyName - optional search by name or 'ALL'
+	 */
     def list = {
         def companyId = params.id
         List personInstanceList = new ArrayList()
@@ -41,9 +48,10 @@ class PersonController {
 				companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
 				if(!companyId){
 					def person = user.person
+					// TODO: this should be refactored into the partyRelationshipService class
 					companyId = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+
-                                                            "and p.partyIdTo = :partyIdTo and p.roleTypeCodeFrom = 'COMPANY' "+
-                                                            "and p.roleTypeCodeTo = 'STAFF' ",[partyIdTo:person]).partyIdFrom[0]?.id
+                        "and p.partyIdTo = :partyIdTo and p.roleTypeCodeFrom = 'COMPANY' "+
+                        "and p.roleTypeCodeTo = 'STAFF' ",[partyIdTo:person]).partyIdFrom[0]?.id
 				}
 			}
 	        if ( companyId!= null && companyId != "" ) {
@@ -64,13 +72,14 @@ class PersonController {
 			} else {
 				personBean.setUserLogin("CREATE")
 			}
-			def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = :partyTo"+
-                                            " and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'",[partyTo:it])?.partyIdFrom
+			def userCompany = partyRelationshipService.getStaffCompany( it )
+
 			personBean.setDateCreated(it.dateCreated)
 			personBean.setLastUpdated(it.lastUpdated)
 			personBean.setUserCompany(userCompany.toString())
 			personsList.add(personBean)
 		}
+		
 		// Statements for JMESA integration
     	TableFacade tableFacade = new TableFacadeImpl("tag",request)
         tableFacade.items = personsList
@@ -93,11 +102,10 @@ class PersonController {
         if(!personInstance) {
             flash.message = "Person not found with id ${params.id}"
             redirect( action:list, params:[ id:companyId ] )
-        }
-        else { 
-        	//def company = partyRelationshipService.getSatffCompany( personInstance )
+        } else { 
+        	def company = partyRelationshipService.getStaffCompany( personInstance )
         	
-        	return [ personInstance : personInstance, companyId:companyId ] 
+        	return [ personInstance : personInstance, companyId:company.id ] 
         }
     }
 
@@ -241,15 +249,15 @@ class PersonController {
     //ajax overlay for Edit
     def editStaff = {
         def map = new HashMap()
-        def personInstance = Person.get( params.id )
+		// TODO - SECURITY - this should have some VALIDATION to who has access to which Staff...
+        def personInstance = Person.read( params.id )
         def role = params.role
-        def company = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = :person "+
-                                            "and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'", [person:personInstance])
+		def company = partyRelationshipService.getStaffCompany( personInstance )
         if(company == null){
         	map.put("companyId","")
         }else{
-            map.put("companyId",company.partyIdFrom.id)
-			map.put("companyName",company.partyIdFrom.name)
+            map.put("companyId",company.id)
+			map.put("companyName",company.name)
         }
         map.put("id", personInstance.id)
         map.put("firstName", personInstance.firstName)
@@ -497,21 +505,19 @@ class PersonController {
 	 * @ returns - staff list.
 	 * 
 	 */
-	def manageProjectStaff ={
+	def manageProjectStaff = {
 		def project = securityService.getUserCurrentProject()
-		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
-		def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
-		def projects = projectService.getActiveProject( now, projectHasPermission, 'name', 'asc' )
+		def hasShowAllProjectsPerm = RolePermissions.hasPermission("ShowAllProjects")
+		def now = TimeUtil.nowGMT()
+		def projects = projectService.getActiveProject( now, hasShowAllProjectsPerm, 'name', 'asc' )
 		def roleTypes = RoleType.findAllByDescriptionIlike("Staff%")
 		def role = params.role ? params.role : "MOVE_TECH"
 		def moveEventList = []
+
+		def loginPerson = securityService.getUserLoginPerson()
+		def userCompany = partyRelationshipService.getStaffCompany( loginPerson )
 		
-		def user = securityService.getUserLogin()
-		def loggedInPerson = user.person
-		def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' \
-                                        			and p.partyIdTo = :partyIdTo and p.roleTypeCodeFrom = 'COMPANY' \
-                                        			and p.roleTypeCodeTo = 'STAFF' ",[partyIdTo:loggedInPerson]).partyIdFrom
-		
+		// TODO - This logic needs to be reviewed
 		def isTdsEmp = userCompany.name == "TDS" ? true :false
 		
 		def currRole = userPreferenceService.getPreference("StaffingRole")?:"MOVE_TECH"
@@ -520,16 +526,16 @@ class PersonController {
 		def currScale = userPreferenceService.getPreference("StaffingScale")?:"6"
         def moveEvents
         def projectId = projects.find{it.id == project.id} ? project.id : 0
-        if(projectId == 0){
+        if (projectId == 0) {
             moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",[project:projects])
         } else {
-            project = Project.get(projectId)
+            project = Project.read(projectId)
             moveEvents = MoveEvent.findAll("from MoveEvent m where project =:project order by m.project.name , m.name asc",[project:project])
         }
         // Limit the events to today-30 days and newer (ie. don't show events over a month ago) 
         moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > new Date().minus(30)}
 		def paramsMap = [sortOn : 'lastName', firstProp : 'staff', orderBy : 'asc']
-		def staffList = getStaffList(projectId, currRole, currScale, currLoc, 0,paramsMap)
+		def staffList = getStaffList(project, currRole, currScale, currLoc, 0,paramsMap)
 		
 		def eventCheckStatuses = eventCheckStatus(staffList, moveEvents)
 		def staffCheckStatus = staffCheckStatus(staffList,project)
@@ -542,47 +548,81 @@ class PersonController {
 	}
 	
 	/*
-	 * 
-	 *@param projectId id of project from select
-	 *@param role - type of role to filter staff list
-	 *@param scale - duration in month  to filter staff list
-	 *@param location - location to filter staff list
-	 *Redirect to template for staffing list.
+	 * Generates an HTML table of Project Staffing based on a number of filters
+	 *
+	 * @param Integer projectId - id of project from select, 0 for ALL
+	 * @param String roletype - of role to filter staff list, '0' for all roles
+	 * @param Integer scale - duration in month  to filter staff list (1,2,3,6)
+	 * @param location - location to filter staff list
+	 * @return HTML 
 	 */
-	def loadFilteredStaff={
+	def loadFilteredStaff = {
 		def role = params.role
 		def projectId = params.project
 		def scale = params.scale
 		def location = params.location
 		def phase = params.list("phaseArr[]")
 		def assigned = params.assigned
+
+		def paramsMap = [sortOn : params.sortOn, firstProp : params.firstProp, orderBy : params.orderBy]
+		log.info("projectId:$projectId, role:$role, scale:$scale, location:$location, assigned:$assigned, paramsMap:$paramsMap")
+
+		// Save the user preferences from the filter
 		userPreferenceService.setPreference("StaffingRole",role)
 		userPreferenceService.setPreference("StaffingLocation",location)
 		userPreferenceService.setPreference("StaffingPhases",phase.toString().replace("[", "").replace("]", ""))
 		userPreferenceService.setPreference("StaffingScale",scale)
+
+		def now = TimeUtil.nowGMT()
+		def hasShowAllProjectPerm = RolePermissions.hasPermission("ShowAllProjects")
 		
-		def moveEvents 
-		def projects
 		def project
-		if(projectId=="0"){
-			def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
-			def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
-			projects = projectService.getActiveProject( now, projectHasPermission, 'name', 'asc' )
-			moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",[project:projects])
+		def moveEvents 
+		def projectList = []
+		def staffList = []
+		
+		if (projectId == '0') {
+			// Just get a list of the active projects
+			projectList = projectService.getActiveProject( now, hasShowAllProjectPerm, 'name', 'asc' )
 		} else {
-			project = Project.get(projectId)
-			moveEvents = MoveEvent.findAll("from MoveEvent m where project =:project order by m.project.name , m.name asc",[project:project])
+			// Add only the indicated project if exists and based on user's associate to the project
+			project = Project.read( projectId )
+			if (project) {
+				if ( hasShowAllProjectPerm ) {
+					projectList << project
+				} else {
+					// Lets make sure that the user has access to it (is assoicated with the project)
+					def staffProjectRoles = partyRelationshipService.getStaffProjectRoles(loginPerson.id, projectId)
+					if (staffProjectRoles.size() > 0) {
+						projectList << project
+					}
+				}
+			} else {
+				log.error("Didn't find project $projectId")
+			}
 		}
-        // Limit the events to today-30 days and newer (ie. don't show events over a month ago) 
-        moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > new Date().minus(30)}
-        def paramsMap = [sortOn : params.sortOn, firstProp : params.firstProp, orderBy : params.orderBy]
-		def staffList = getStaffList(projectId,role,scale,location,assigned,paramsMap);
+
+		// Find all Move Events for one or more Projects and the Staffing for the projects
+		if (projectList.size() > 0) {
+			moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",[project:projectList])
+			
+	        // Limit the events to today-30 days and newer (ie. don't show events over a month ago)
+	        moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > now.minus(30)}
+
+			// Now find Staff List for the list of projects
+			staffList = getStaffList(projectList, role, scale, location, assigned, paramsMap)
+		}
+		
+		
+		// log.info("staffList: $staffList")
 		def eventCheckStatuses = eventCheckStatus(staffList, moveEvents)
 		def staffCheckStatuses = []
 		if(projectId!="0"){
 			 staffCheckStatuses = staffCheckStatus(staffList ,project)
 		}
+		
 		def editPermission  = RolePermissions.hasPermission('EditProjectStaff')
+		
 		render(template:"projectStaffTable" ,model:[staffList:staffList, moveEventList:getBundleHeader(moveEvents),projectId:projectId,
 					eventCheckStatus:eventCheckStatuses, project:project,staffCheckStatus:staffCheckStatuses, editPermission:editPermission,
 					sortOn : params.sortOn, firstProp : params.firstProp, orderBy : params.orderBy != 'asc' ? 'asc' :'desc'])
@@ -590,30 +630,41 @@ class PersonController {
 	}
 	
 	/*
-	 *@param projectId - id of project from select
+	 * An internal function used to retrieve staffing for specified project, roles, etc.
+	 *@param projectList - array of Projects to get staffing for
 	 *@param role - type of role to filter staff list
 	 *@param scale - duration in month  to filter staff list
 	 *@param location - location to filter staff list
 	 */
-	def getStaffList(def projectId, def role, def scale, def location,def assigned,def paramsMap){
+	def getStaffList(def projectList, def role, def scale, def location,def assigned,def paramsMap){
 		def sortOn = paramsMap.sortOn ?:"lastName"
 		def orderBy = paramsMap.orderBy?:'asc'
 		def firstProp = paramsMap.firstProp ? (paramsMap.firstProp && paramsMap.firstProp == 'company' ? '' :paramsMap.firstProp) : 'staff'
-		def user = securityService.getUserLogin()
-		def loggedInPerson = user.person
-		def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' \
-												and p.partyIdTo = :partyIdTo and p.roleTypeCodeFrom = 'COMPANY' \
-												and p.roleTypeCodeTo = 'STAFF' ",[partyIdTo:loggedInPerson]).partyIdFrom
-		
-        def subject = SecurityUtils.subject
-        def isProjMgr
-        if( subject.hasRole("PROJ_MGR") && userCompany.name == "TDS"){
-            isProjMgr = true
-        }
-        
-		def project = Project.get( projectId )
-		def staffList = []
 
+	 	def staffRelations = partyRelationshipService.getAllProjectsStaff( projectList )
+		def c=staffRelations.size()
+		log.debug("Staff List: " + staffRelations)
+		if (role != '0') {
+			// Filter out only the roles requested
+			staffRelations = staffRelations.findAll { it.role.id == role }
+		}
+		log.debug("staffRelations: before=$c, after=${staffRelations.count()}")
+		def staffList = []
+		
+		staffRelations.each { staff -> 
+			// Add additional properties that aren't part of the Staff Relationships
+			// TODO - WHAT ARE THIS FIELDS???
+			staff.roleId = 'roleId?'	// I believe that this should be the ROLE code (e.g. MOVE_MGR)
+			staff.staffProject = 'staffProj.name?'	// This is the name of the project.
+
+			staffList << staff
+		}
+		/*
+
+		StringBuffer queryForStaff = new StringBuffer("FROM PartyRole  p")
+		def sqlArgs = [:]
+		log.info("staffList: $staffList")
+		
 		StringBuffer queryForStaff = new StringBuffer("FROM PartyRole  p")
 		def sqlArgs = [:]
 		
@@ -631,11 +682,12 @@ class PersonController {
 			def partyIds = partyRelationshipService.getProjectCompaniesStaff(projectId,'',true)
 			queryForStaff.append(" AND p.party IN (:partyIds) ")
 			sqlArgs << [partyIds : partyIds['staff']]
-			
 		}
 		
 		queryForStaff.append("group by p.party, p.roleType order by p.party,p.roleType ")
-		
+
+		log.info("queryForStaff: $queryForStaff")
+			
 		def partyRoles = PartyRole.findAll(queryForStaff,sqlArgs)
         def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
         def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
@@ -651,26 +703,26 @@ class PersonController {
                 def doAdd = true
                 if(assigned == "1"){
                     def hasProjReal
-                    if(projectId != "0"){
-                        hasProjReal = allProjRelations.find{it.partyIdFrom?.id == project.id && it.partyIdTo?.id == party?.id && 
-                                                            it.roleTypeCodeTo.id == relation.roleType?.id}
+                    if (projectId != "0") {
+                        hasProjReal = allProjRelations.find{ it.partyIdFrom?.id == project.id && it.partyIdTo?.id == party?.id && 
+                           it.roleTypeCodeTo.id == relation.roleType?.id}
                     } else {
                         hasProjReal = allProjRelations.find{it.partyIdTo.id == party.id && it.roleTypeCodeTo.id == relation.roleType.id}
                     }
-                    if(!hasProjReal){
+                    if (!hasProjReal) {
                         doAdd = false
                     }
                 }
                 if(doAdd){
 					
         			def company = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = :party "+
-                                                            "and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'",[party:party]).partyIdFrom
+                        "and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'",[party:party]).partyIdFrom
 					if(!isProjMgr){
     					if(company.id == userCompany.id){
     						addComUsers = true
     					} else if(projectId != "0" ){
     						def hasProjReal = allProjRelations.find{it.partyIdFrom?.id == project.id && it.partyIdTo?.id == party?.id && 
-                                                                it.roleTypeCodeTo.id == relation.roleType?.id}
+                                it.roleTypeCodeTo.id == relation.roleType?.id}
                             if(hasProjReal){
                                 addComUsers = true
                             }
@@ -692,6 +744,7 @@ class PersonController {
                 }
             }
 		}
+		*/
 		
 		staffList.sort{ a,b->
 			if(orderBy == 'asc'){
@@ -715,7 +768,7 @@ class PersonController {
 		def blackOutdays = person.blackOutDates.sort{it.exceptionDay}
 		def subject = SecurityUtils.subject
 		def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = :person"+
-                                                " and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ",[person:person]).partyIdFrom[0]
+            " and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ",[person:person]).partyIdFrom[0]
 		
 		def rolesForPerson = PartyRole.findAll("from PartyRole where party = :person and roleType.description like 'staff%' group by roleType",[person:person])?.roleType
 		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")

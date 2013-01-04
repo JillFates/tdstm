@@ -753,7 +753,7 @@ class MoveBundleController {
                     def workFlowSteps = WorkflowTransition.findAllByWorkflow(workFlow,[sort:'transId'])
                     workFlowSteps = workFlowSteps.findAll{![10, 20, 280, 900].contains(it.transId)}
                     def results = moveBundleService.createMoveBundleWorkflowTask([workflow:workFlowSteps.find{it.transId == 110}, bundleMoveEvent:bundleMoveEvent,
-                                                project:project, person:person, bundle:bundle, taskNumber:lastTask])
+                        project:project, person:person, bundle:bundle, taskNumber:lastTask])
                     def transportTask = results.stepTask
                     lastTask++
 					def previousTask

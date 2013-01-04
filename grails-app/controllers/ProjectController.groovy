@@ -2,6 +2,7 @@ import grails.converters.JSON
 import java.text.SimpleDateFormat
 import org.jsecurity.SecurityUtils
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
@@ -11,6 +12,8 @@ class ProjectController {
     def partyRelationshipService
     def stateEngineService
 	def projectService
+	def securityService
+	
     def index = { redirect(action:list,params:params) }
 
     // the delete, save and update actions only accept POST requests
@@ -24,10 +27,10 @@ class ProjectController {
 		def projectList
 		def partyProjectList
 		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
-		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
+		
 		def sort = params.sort ? params.sort : 'dateCreated' 
 		def order = params.order ? params.order : 'desc'
-	    def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
+	    def now = TimeUtil.nowGMT()
 		if(params._action_List=="Show Completed Projects"){
 			projectList = projectService.getCompletedProject( now, projectHasPermission, sort, order )
 			session.setAttribute("COMPLETED_PROJ", "COMPLETE")
@@ -59,15 +62,19 @@ class ProjectController {
 	        } else { 
 	        	// load transitions details into application memory.
 	        	//stateEngineService.loadWorkflowTransitionsIntoMap(projectInstance.workflowCode, 'project')
-	        	userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+
 	        	def currProj = session.getAttribute("CURR_PROJ");
 	        	def currProjectInstance = Project.get( currProj.CURR_PROJ )
-	        	def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
-	    		def userCompany = partyRelationshipService.getSatffCompany( loginUser.person )
-				userPreferenceService.setPreference( "PARTYGROUP", "${userCompany?.partyIdFrom?.id}" )
+	        	def loginPerson = securityService.getUserLoginPerson()
+	    		def userCompany = partyRelationshipService.getStaffCompany( loginPerson )
+
+				// Save and load various user preferences
+	        	userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+				userPreferenceService.setPreference( "PARTYGROUP", "${userCompany?.id}" )
 				userPreferenceService.loadPreferences("CURR_TZ")
 				userPreferenceService.loadPreferences("CURR_BUNDLE")
 				userPreferenceService.loadPreferences("MOVE_EVENT")
+
 				def currPowerType = session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE
 				if(!currPowerType){
 					userPreferenceService.setPreference( "CURR_POWER_TYPE", "Watts" )
@@ -124,9 +131,11 @@ class ProjectController {
         else { 
         	def currProj = session.getAttribute("CURR_PROJ");
         	def currProjectInstance = Project.get( currProj.CURR_PROJ )
-        	def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
-    		def userCompany = partyRelationshipService.getSatffCompany( loginUser.person )
-			userPreferenceService.setPreference( "PARTYGROUP", "${userCompany?.partyIdFrom?.id}" )
+        	def loginPerson = securityService.getUserLoginPerson()
+    		def userCompany = partyRelationshipService.getStaffCompany( loginPerson )
+
+			userPreferenceService.setPreference( "PARTYGROUP", "${userCompany?.id}" )
+			
         	def projectLogo
         	if(currProjectInstance){
         		projectLogo = ProjectLogo.findByProject(currProjectInstance)

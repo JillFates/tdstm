@@ -3,6 +3,7 @@ import java.text.SimpleDateFormat
 import jxl.*
 import jxl.write.*
 import jxl.read.biff.*
+
 class PartyRelationshipService {
 
     boolean transactional = true
@@ -36,14 +37,34 @@ class PartyRelationshipService {
 		return true
 	}
 	
+	/**
+	 * Used to retrieve the Company PartyGroup for a given Party
+	 * @param Party - a party object to get the Company PartyGroup
+	 * @return PartyGroup - the partyGroup that represents the company
+	 */
+	def getCompany( def party ) {
+		return getPartyGroup(party, 'COMPANY')
+	}
 	
-    /*
-     *  Method to return Staff Company
-     */
-    
-    def getSatffCompany( def staff ) {
-        def company = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'")
-        return company
+	/**
+	 * Used to retrieve the a PartyGroup for a given Party and Type
+	 * @param Party - a party object to get the Company PartyGroup
+	 * @param String - a party group type (e.g. COMPANY, PROJECT, etc)
+	 * @return PartyGroup - the partyGroup that represents the type for that party
+	 */
+	def getPartyGroup( def party, def type ) {
+		return PartyGroup.find("from PartyGroup as p where partyType = 'COMPANY' AND party = :party", [party:party])		
+	}
+	
+	/** 
+	 * Used to retrieve the Company (Party) for which a person is associated as a "STAFF" member
+	 * @param Party - the staff member
+	 * @return Party - the company Staff is associated with or NULL if no associations
+	 */
+    def getStaffCompany( def staff ) {
+        def relationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'")
+
+        return relationship?.partyIdFrom
     }
     /*
      *  Method will return Company Staff
@@ -169,6 +190,36 @@ class PartyRelationshipService {
         }
     	return list
     }
+
+    /**
+     *  Returns a list of staff for a specified project or list of projects
+	 * @param Project
+	 * @return Map[] - array of maps contain each Staff relationship to a project
+     */
+    def getAllProjectsStaff( def projects ) {
+    	def list = []
+
+    	def relations = PartyRelationship.findAll("FROM PartyRelationship p WHERE p.partyRelationshipType='PROJ_STAFF' AND " + 
+			"p.partyIdFrom IN (:projects) AND p.roleTypeCodeFrom='PROJECT'", [projects:projects])
+			
+        relations.each{ r ->
+            def company = PartyRelationship.findAll(
+				"from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $r.partyIdTo.id and p.roleTypeCodeFrom='COMPANY' " +
+				"and p.roleTypeCodeTo = 'STAFF' "
+				)
+
+            def map = [:]
+            map.company = company.partyIdFrom
+            map.staff = r.partyIdTo
+            map.name = r.partyIdTo.toString()
+            map.role = r.roleTypeCodeTo
+			map.project = r.partyIdFrom
+			
+            list<<map
+        }
+    	return list
+    }
+
     /*
      *  Method to create string list
      */
@@ -407,7 +458,23 @@ class PartyRelationshipService {
     		}
     		return dtParam
  	}
-     /*-------------------------------------------------------
+
+	/**
+	 * Used to get list of roles that a Staff member has on a Project
+	 * @param Integer staffId - staff person id
+	 * @param Integer projectId - project id that the staff may be associate with
+	 * @return array of role codes
+	 */
+	def getStaffProjectRoles(def staffId, def projectId) {
+		def roles = []
+		def projectRoles = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom=$projectId and p.partyIdTo=$staffId" )
+		projectRoles.each {
+			roles << it.roleTypeCodeTo
+		}
+		return roles
+	}
+	
+    /*-------------------------------------------------------
       *  Return the Projectmanagers 
       *  @author srinivas
       *  @param projectId
