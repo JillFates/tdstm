@@ -422,9 +422,8 @@ class AssetEntityAttributeLoaderService {
 	 * @param dataTransferValue
 	 * @author Lokanada Reddy
 	 */
-	def getdtvManufacturer( def dtv ) {
+	def getdtvManufacturer( def manufacturerValue ) {
 		def manufacturer
-		def manufacturerValue = dtv.correctedValue ? dtv.correctedValue : dtv.importValue
 		if(manufacturerValue){
 			manufacturer = Manufacturer.findByName( manufacturerValue )
 			if( !manufacturer ){
@@ -448,12 +447,29 @@ class AssetEntityAttributeLoaderService {
 	def getdtvModel(def dtv, def dtvList, def assetEntity ) {
 		def model
 		def modelValue = dtv.correctedValue ? dtv.correctedValue : dtv.importValue
-		try{
-		//assetEntity.assetType = assetEntity.assetType ? assetEntity.assetType : "Server"
 		def dtvManufacturer = dtvList.find{it.eavAttribute.attributeCode == "manufacturer"}
 		def dtvUsize = dtvList.find{it.eavAttribute.attributeCode == "usize"}?.importValue
 		if(dtvManufacturer){
 			def manufacturerName = dtvManufacturer?.correctedValue ? dtvManufacturer?.correctedValue : dtvManufacturer?.importValue
+			model = findOrCreateModel(manufacturerName, modelValue, '', true, dtvUsize, dtvList);
+		}
+		return model
+	}
+	
+	/**
+	 * Method used to find model by manufacturrName as well as create model if modelnot exist and manufacturer exist. 
+	 * @param manufacturerName : name of manufacturer
+	 * @param modelName : name of model
+	 * @param type : asset's asset type
+	 * @param create : a boolean flag to determine if model don't exist create model or not.
+	 * @param usize : usize of model (default 1)
+	 * @params dtvList : dataTransferValueList 
+	 * @return model instance
+	 */
+	def findOrCreateModel(def manufacturerName, def modelName, def type, def doCreate=true, def usize=1, def dtvList = []){
+		def model
+		try{
+		if( manufacturerName ){
 			// first checking imported value in manufacturer table .
 			def manufacturer = manufacturerName ? Manufacturer.findByName(manufacturerName) : null
 			if( !manufacturer && manufacturerName){
@@ -462,19 +478,23 @@ class AssetEntityAttributeLoaderService {
 				manufacturer = ManufacturerAlias.findByName( manufacturerName )?.manufacturer
 			}
 			if(manufacturer){
-				// if modelValue exist using that else using 'unknown' as modelValue  
-				modelValue = modelValue?:'unknown'
+				// if modelValue exist using that else using 'unknown' as modelValue
+				modelName = modelName?:'unknown'
 				// if manufacturer searching in model table if found assigning .
-				model = Model.findByModelNameAndManufacturer( modelValue, manufacturer )
+				model = Model.findByModelNameAndManufacturer( modelName, manufacturer )
 				if( !model ){
 					// if imported value is not in model table then search in model alias table .
-					model = ModelAlias.findByNameAndManufacturer(modelValue,manufacturer)?.model
-					if(!model){
-						def dtvAssetType = dtvList.find{it.eavAttribute.attributeCode == "assetType"}
-						def assetType = dtvAssetType?.correctedValue ? dtvAssetType?.correctedValue : dtvAssetType?.importValue
-						assetType = assetType ? assetType : "Server"
-						def usize =  dtvUsize ?: 1
-						model = Model.createModelByModelName(modelValue, manufacturer, assetType, usize) 
+					model = ModelAlias.findByNameAndManufacturer(modelName,manufacturer)?.model
+					if(!model && doCreate){
+						def assetType
+						if(type){
+							assetType = type
+						} else {
+							def dtvAssetType = dtvList.find{it.eavAttribute.attributeCode == "assetType"}
+							assetType = dtvAssetType?.correctedValue ? dtvAssetType?.correctedValue : dtvAssetType?.importValue
+							assetType = assetType ? assetType : "Server"
+						}
+						model = Model.createModelByModelName(modelName, manufacturer, assetType, usize)
 					}
 				}
 			}
@@ -483,9 +503,8 @@ class AssetEntityAttributeLoaderService {
 			ex.printStackTrace()
 			log.error("Unexpected exception:" + ex.toString() )
 		}
-		return model
+	  return model
 	}
-	
 	
 	/* To get DataTransferValue source/target Team
 	 * @param dataTransferValue,moveBundle

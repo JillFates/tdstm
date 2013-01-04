@@ -24,17 +24,19 @@
 		<td class="label">Manufacturer</td>
 		<td class="label">
 		 <div id="manufacturerId">
-		   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}"  onChange="selectModel(this.value, 'assetAudit')" optionKey="id" optionValue="name" noSelection="${[null:'Unassigned']}" tabindex="13"/>
+		   <input type="text" id="manufacturers" name="manufacturer" value="" onkeyup="getAlikeManu(this.value)" />
 		 </div>
+		 <div id="autofillId" class="autoFillDiv" style="display: none " ></div>
 		</td>
 	</tr>
 	<tr class="prop trAnchor" >
 		<td class="label"><b>Model</b></td>
 		<td class="label">
 		<div id="modelId">
-			<g:select from="${models}" id="models" name="model.id" optionKey="id" optionValue="modelName" noSelection="${[null:'Unassigned']}"
-			onchange="editModelAudit(this.value)" />
+		<input type="text" id="models" name="models" value="" onkeyup="getAlikeModel(this.value)" 
+			onblur="getAssetType(this.value);editModelAudit(this.value);"/>
 		</div>
+		 <div id="autofillIdModel" class="autoFillDiv"  style="display: none"></div>
 		</td>
 	</tr>
 	<tr class="prop">

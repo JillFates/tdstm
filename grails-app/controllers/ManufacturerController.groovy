@@ -248,4 +248,14 @@ class ManufacturerController {
 		}
 		render duplicateAka
 	}
+	
+	/**
+	 * render a list of suggestions for manufacturer's initial.
+	 * @param : value is initial for which user wants suggestions .
+	 */
+	def autoCompleteManufacturer ={
+		def initials = params.value
+		def manufacturers = initials ? Manufacturer.findAllByNameIlike(initials+"%") : []
+		[manufacturers:manufacturers]
+	}
 }

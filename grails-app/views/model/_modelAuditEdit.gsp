@@ -2,6 +2,7 @@
 	<div>
 	<input type="hidden" name="id" value="${modelInstance?.id}"> 
 	<input type="hidden" name="redirectTo" value="assetAudit"> 
+	<input type="hidden" id="manufacturer" value="${modelInstance?.modelName}"> 
 		<table>
 			<tr><td colspan="2"><b>Model Audit Edit</b></td></tr>
 			<tr>

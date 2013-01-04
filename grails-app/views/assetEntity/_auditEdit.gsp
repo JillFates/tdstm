@@ -23,18 +23,20 @@
 		<td class="label">Manufacturer</td>
 		<td class="label">
 		 <div id="manufacturerId">
-		   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${assetEntityInstance.manufacturer?.id}" 
-		   onChange="selectModel(this.value, 'assetAudit')" optionKey="id" optionValue="name" noSelection="${[null:'Unassigned']}"/>
+		   <input type="text" id="manufacturer" name="manufacturers" value="${assetEntityInstance.manufacturer?.name}" onkeyup="getAlikeManu(this.value)"
+			   onblur="clearAutoFill()" />
 		 </div>
+		 <div id="autofillId" class="autoFillDiv" style="display: none;" ></div>
 		</td>
 	</tr>
 	<tr class="prop trAnchor" >
 		<td class="label"><b>Model</b></td>
 		<td class="label">
 		<div id="modelId">
-			<g:select from="${models}" id="models" name="model.id" optionKey="id" optionValue="modelName"
-			 	value="${assetEntityInstance.model?.id }" onchange="editModelAudit(this.value)"/>
+		<input type="text" id="models" name="models" value="${assetEntityInstance.model?.modelName}" onkeyup="getAlikeModel(this.value)" 
+			onblur="getAssetType(this.value); editModelAudit(this.value);" />
 		</div>
+		 <div id="autofillIdModel" class="autoFillDiv" style="display: none;"></div>
 		</td>
 	</tr>
 	<tr class="prop">
@@ -103,13 +105,13 @@
 			<tr>
 				<td>Usize:</td>
 				<td><g:select id="usizeId" name="usize"
-						from="${assetEntityInstance.model.constraints.usize.inList}"
-						value="${assetEntityInstance.model.usize}"></g:select></td>
+						from="${assetEntityInstance.model?.constraints?.usize?.inList ?: (1..42)}"
+						value="${assetEntityInstance.model?.usize}"></g:select></td>
 			</tr>
 			<tr>
 				<td>Manufacturer</td>
 				<td>
-					${assetEntityInstance.model.manufacturer}
+					${assetEntityInstance.model?.manufacturer}
 				</td>
 			</tr>
 		</table>
@@ -118,7 +120,7 @@
 	<div class="buttons">
 		<input type="button" class="edit" value="Update" onclick="updateModelAudit()" /> 
 		<g:form action="edit" controller="model" target="new">
-			<input name="id" type="hidden" id="show_modelId" value="${assetEntityInstance.model.id}"/>
+			<input name="id" type="hidden" id="show_modelId" value="${assetEntityInstance.model?.id}"/>
 			<span class="button">
 				<input type="submit" class="edit" value="More..."></input>
 			</span>

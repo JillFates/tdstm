@@ -1211,6 +1211,18 @@ a.tab_deselect {
 .noWrapDiv {
 	white-space: nowrap;
 }
+.autoFillDiv {
+	height: 150px; 
+	overflow-y:auto;
+	position: absolute;
+	width: 163px;
+}
+.suggestionTable {
+	background: #fff
+}
+.loginView{
+	width: 450px
+}
 a.task_action{float: left; position: relative; margin: 0 0 0 30px;cursor: pointer;}
 a.task_action span.task_icon{position: absolute; top: 0; left: 0;}
 a.task_action span.task_button { float: left; height: 16px; line-height: 16px;  padding: 0 5px 0 15px; color:#2C61AA;}

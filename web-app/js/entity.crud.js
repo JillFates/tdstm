@@ -418,13 +418,18 @@ function showModelAudit(id){
 	
 }
 
-function editModelAudit(id){
-	new Ajax.Request('../model/edit?id='+id+'&redirectTo=assetAudit',{asynchronous:true,evalScripts:true,
-		onComplete:function(data){
-				$("#modelAuditId").html(data.responseText)
-				$("#modelAuditId").show()
-		}}
-	)
+function editModelAudit(val){
+	if(val){
+		var manufacturer = $("#manufacturer").val()
+		new Ajax.Request('../model/getModelDetailsByName?modelName='+val+'&manufacturerName='+manufacturer,{asynchronous:true,evalScripts:true,
+			onComplete:function(data){
+					$("#modelAuditId").html(data.responseText)
+					$("#modelAuditId").show()
+					$("#autofillIdModel").hide()
+					
+			}
+		})
+	}
 }
 
 function updateModelAudit(){
@@ -437,6 +442,7 @@ function updateModelAudit(){
 		}
 	});
 }
+
 function createAuditPage(type,source,rack,roomName,location,position){
 	new Ajax.Request('../assetEntity/create?redirectTo=assetAudit',{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
@@ -457,6 +463,56 @@ function saveAuditPref(val, id){
 	new Ajax.Request('../room/show?id='+id+'&auditView='+val,{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
 			openRoomView(data)
+		}}
+	)
+}
+
+var manuLoadRequest
+var modelLoadRequest
+
+function getAlikeManu(val) {
+ if(manuLoadRequest)manuLoadRequest.abort();
+ manuLoadRequest = jQuery.ajax({
+						url: '../manufacturer/autoCompleteManufacturer',
+						data: {'value':val},
+						type:'POST',
+						success: function(data) {
+							$("#autofillId").html(data)
+							$("#autofillId").show()
+						}
+					});
+	 
+}
+
+function getAlikeModel(val){
+	if(modelLoadRequest)modelLoadRequest.abort()
+	var manufacturer = $("#manufacturer").val()
+	modelLoadRequest = jQuery.ajax({
+							url: '../model/autoCompleteModel',
+							data: {'value':val,'manufacturer':manufacturer},
+							type:'POST',
+							success: function(data) {
+								$("#autofillIdModel").html(data)
+								$("#autofillIdModel").show()
+							}
+						});
+}
+function updateManu(name){
+	$("#manufacturer").val(name)
+	$("#autofillId").hide()
+	$("#models").val("")
+}
+
+function updateModel(name){
+	$("#models").val(name)
+	$("#models").focus()
+	$("#autofillIdModel").hide()
+}
+
+function getAssetType(val){
+	new Ajax.Request('../model/getModelType?value='+val,{asynchronous:true,evalScripts:true,
+		onComplete:function(data){
+			$("#assetTypeId").val(data.responseText)
 		}}
 	)
 }

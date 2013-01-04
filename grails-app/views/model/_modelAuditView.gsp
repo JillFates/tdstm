@@ -1,4 +1,5 @@
 <div>
+<input type="hidden" id="manufacturer" value="${modelInstance?.manufacturer}">
 <table> 
  <tr><td colspan="2"><b>Model Details View</b></td></tr>
 	<tr class="prop">
@@ -21,7 +22,7 @@
 	</tr>
 	</table>
 	<div class="buttons noWrapDiv">
-		<input type="button" class="edit" value="Edit" onclick="editModelAudit(${modelInstance.id})" /> 
+		<input type="button" class="edit" value="Edit" onclick="editModelAudit('${modelInstance.modelName}')" /> 
 		<g:form action="edit" controller="model" target="new">
 			<input name="id" type="hidden" id="show_modelId" value="${modelInstance.id}"/>
 			<span class="button">

@@ -13,6 +13,7 @@ import com.tds.asset.AssetOptions
 class RoomController {
 
 	def userPreferenceService
+	def securityService
 	def taskService
 	SessionFactory sessionFactory
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -486,21 +487,21 @@ class RoomController {
     */
    def getAssetsListToAddRack = {
 	   def order = params.order ? params.order : 'asc'
-	   def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+	   def project = securityService.getUserCurrentProject()
+	   def projectId = project.id
 	   def source = params.source
 	   def assetEntityList = null
 	   def sort = params.sort ?  params.sort : 'assetName'
 	   def assign = params.assign
+	   def excludeAssetType = ['Blade', 'Application', 'Database', 'Files', 'VM', 'Virtual', 'Virtual Machine']
+	   def query = "from AssetEntity where project =:projcet and assetType not in (:excludeAssetType) "
 	   if(assign != 'all') {
-		   if(source == '1'){
-			   	assetEntityList = AssetEntity.findAll("from AssetEntity where rackSource is null and project = ${projectId} and assetType != 'Blade' order by ${sort} ${order}")
-		   } else {
-		   		assetEntityList = AssetEntity.findAll("from AssetEntity where rackTarget is null and project = ${projectId} and assetType != 'Blade' order by ${sort} ${order}")
-		   }
-	   } else {
-	   		assetEntityList = AssetEntity.findAll("from AssetEntity where project = ${projectId} and assetType != 'Blade' order by ${sort} ${order}")
+		   query += " and (${source == '1' ? 'rackSource' : 'rackTarget'}) is null"
 	   }
 	   order = order == 'asc' ? 'desc' : 'asc'
+	   query += " order by ${sort} ${order}"
+	   assetEntityList = AssetEntity.findAll(query,[projcet:project, excludeAssetType:excludeAssetType ])
+	   
 	   def stringToReturn = new StringBuffer()
 	   stringToReturn.append("""<thead>
 									<tr>

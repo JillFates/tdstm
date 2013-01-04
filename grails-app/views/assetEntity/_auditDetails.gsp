@@ -76,6 +76,7 @@
 <div >
  <div id="modelAuditId" >
  <div>
+ <input type="hidden" id="manufacturer" value="${assetEntity.model?.manufacturer}">
  <table> 
  <tr><td colspan="2"><b>Model Details View</b></td></tr>
 	<tr class="prop">
@@ -98,9 +99,9 @@
 	</tr>
 	</table>
 	<div class="buttons noWrapDiv">
-		<input type="button" class="edit" value="Edit" onclick="editModelAudit(${assetEntity.model.id})" /> 
+		<input type="button" class="edit" value="Edit" onclick="editModelAudit('${assetEntity.model?.modelName}')" /> 
 		<g:form action="edit" controller="model" target="new">
-			<input name="id" type="hidden" id="show_modelId" value="${assetEntity.model.id}"/>
+			<input name="id" type="hidden" id="show_modelId" value="${assetEntity.model?.id}"/>
 			<span class="button">
 				<input type="submit" class="edit" value="More..."></input>
 			</span>

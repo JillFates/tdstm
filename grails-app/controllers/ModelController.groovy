@@ -258,32 +258,35 @@ class ModelController {
     }
 
     def edit = {
-        def model = Model.get(params.id)
-        if (!model) {
-            flash.message = "Model not found with Id ${params.id}"
-            redirect(action: "list")
-        }
-        else {
-        	def modelConnectors = ModelConnector.findAllByModel( model,[sort:"id"] )
-			def nextConnector = 0
-			try{
-				nextConnector = modelConnectors.size() > 0 ? Integer.parseInt(modelConnectors[modelConnectors.size()-1]?.connector) : 0
-			} catch( NumberFormatException ex){
-				nextConnector = modelConnectors.size()+1
-			}
-			def otherConnectors = []
-			for(int i = nextConnector+1 ; i<51; i++ ){
-				otherConnectors << i
-			}
-			def modelAliases = ModelAlias.findAllByModel(model, [sort:'name'])
-			def paramsMap = [ modelInstance: model, modelConnectors : modelConnectors, otherConnectors : otherConnectors, 
-                nextConnector:nextConnector, modelAliases:modelAliases ]
-			
-			if(params.redirectTo == "assetAudit"){
-				render(template: "modelAuditEdit", model: paramsMap )
-			}
-            return paramsMap
-        }
+		def modelId = params.id
+		if(modelId && modelId.isNumber()){
+	        def model = Model.get(params.id)
+	        if (!model) {
+	            flash.message = "Model not found with Id ${params.id}"
+	            redirect(action: "list")
+	        }
+	        else {
+	        	def modelConnectors = ModelConnector.findAllByModel( model,[sort:"id"] )
+				def nextConnector = 0
+				try{
+					nextConnector = modelConnectors.size() > 0 ? Integer.parseInt(modelConnectors[modelConnectors.size()-1]?.connector) : 0
+				} catch( NumberFormatException ex){
+					nextConnector = modelConnectors.size()+1
+				}
+				def otherConnectors = []
+				for(int i = nextConnector+1 ; i<51; i++ ){
+					otherConnectors << i
+				}
+				def modelAliases = ModelAlias.findAllByModel(model, [sort:'name'])
+				def paramsMap = [ modelInstance: model, modelConnectors : modelConnectors, otherConnectors : otherConnectors, 
+	                nextConnector:nextConnector, modelAliases:modelAliases ]
+				
+	            return paramsMap
+	        }
+		} else {
+			flash.message = "Model id ${params.id} is not a valid Id "
+			redirect(action: "list")
+		}
     }
 
     def update = {
@@ -1238,5 +1241,52 @@ class ModelController {
 			}
 			render(template: "modelAuditView", model: [modelInstance:model] )
 		}
+	}
+	
+	/**
+	 * render a list of suggestions for model's initial.
+	 * @param : value is initial for which user wants suggestions .
+	 * @return : sugesstion template.
+	 */
+	def autoCompleteModel ={
+		def initials = params.value
+		def manufacturer = params.manufacturer
+		def manu = Manufacturer.findByName( manufacturer )
+		def models = []
+		if( manu ){
+			models =  initials ? Model.findAllByModelNameIlikeAndManufacturer(initials+"%", manu) : []
+		}
+		[models:models]
+	}
+	
+	/**
+	 * Fetch models's type for model name
+	 * @param value : name of model name
+	 * @return model's assetType
+	 * 
+	 */
+	def getModelType ={
+		def modelName = params.value
+		def model = Model.findByModelName( modelName )
+		def modelType = model?.assetType ?: 'Server'
+		render modelType
+	}
+	
+	/**
+	 * Methods checks whether model exist in model or model alias table
+	 * @param modelName : name of model
+	 * @param manufacturerName : name of manufacturer
+	 * @return : modelAuditEdit template
+	 */
+	def getModelDetailsByName ={
+		def modelName = params.modelName
+		def manufacturerName = params.manufacturerName
+		def model = assetEntityAttributeLoaderService.findOrCreateModel(manufacturerName, modelName, '', false)
+		if(model){
+			render(template: "modelAuditEdit", model: [modelInstance:model] )
+		} else {
+			render "<b> No Model found of name ${params.modelName}</b>"
+		}
+		
 	}
 }

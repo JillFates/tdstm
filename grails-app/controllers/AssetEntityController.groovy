@@ -1497,6 +1497,9 @@ class AssetEntityController {
 		def maintExpDate = params.maintExpDate
 		def redirectTo = params?.redirectTo
 		session.setAttribute("USE_FILTERS", "true")
+		def modelName = params.models
+		def manufacturerName = params.manufacturers
+		def assetType = params.assetType ?: 'Server'
 		if(maintExpDate){
 			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
 		}
@@ -1510,7 +1513,11 @@ class AssetEntityController {
 			def rackId = newRedirectTo[1]
 			session.setAttribute("RACK_ID", rackId)
 		}
-
+		if( manufacturerName ){
+			params.manufacturer = assetEntityAttributeLoaderService.getdtvManufacturer( manufacturerName )
+			params.model = assetEntityAttributeLoaderService.findOrCreateModel(manufacturerName, modelName, assetType)
+		}
+		
 		def bundleId = getSession().getAttribute( "CURR_BUNDLE" )?.CURR_BUNDLE
 		def assetEntityInstance = new AssetEntity(params)
 		def projectId =  getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
@@ -2928,6 +2935,7 @@ class AssetEntityController {
 	}
 
 	def update={
+		
 		def attribute = session.getAttribute('filterAttr')
 		def filterAttr = session.getAttribute('filterAttributes')
 		session.setAttribute("USE_FILTERS","true")
@@ -2936,6 +2944,9 @@ class AssetEntityController {
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def maintExpDate = params.maintExpDate
+		def modelName = params.models
+		def manufacturerName = params.manufacturers
+		def assetType = params.assetType ?: 'Server'
 		if(maintExpDate){
 			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
 		}
@@ -2949,6 +2960,11 @@ class AssetEntityController {
 		if(retireDate){
 			params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
 		}
+		if( manufacturerName ){
+			params.manufacturer = assetEntityAttributeLoaderService.getdtvManufacturer( manufacturerName )
+			params.model = assetEntityAttributeLoaderService.findOrCreateModel(manufacturerName, modelName, assetType)
+		}
+		
 		def assetEntityInstance = AssetEntity.get(params.id)
 		assetEntityInstance.properties = params
 		if(!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {

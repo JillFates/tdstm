@@ -147,7 +147,8 @@ class DataTransferBatchController {
 	    								}
 										break;
 									case "manufacturer":
-	 										 		def manufacturerInstance = assetEntityAttributeLoaderService.getdtvManufacturer( it ) 
+										def manufacturerName = it.correctedValue ? it.correctedValue : it.importValue
+	 									def manufacturerInstance = assetEntityAttributeLoaderService.getdtvManufacturer( manufacturerName ) 
 					    				if( assetEntity."$attribName" != manufacturerInstance || isNewValidate == "true" ) {
 	    									isModified = "true"
 	    									assetEntity."$attribName" = manufacturerInstance 
