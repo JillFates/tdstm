@@ -57,6 +57,7 @@
 				<td colspan="4" style="border:0px;text-align:center">
 					<div class="close-icon" onclick="$(this).parents('td.rack_elevation_td').remove(); $(this).parents('table.rack_elevation').remove();"></div>
 					<h2>${rackLayout?.rack} in ${rackLayout?.room} (Back)
+					<g:if test="${params.commit != 'Print View'}">
 					 <tds:hasPermission permission="EditAndDelete">
 						<g:if test="${showIconPref =='true'}">
 							<span id="span_${rackLayout?.rackId}" onclick="disableCreateIcon(${rackLayout?.rackId})"> 
@@ -67,6 +68,7 @@
 								<img src="../images/plus.gif" /></span>
 						</g:else>
 					</tds:hasPermission>
+					</g:if>
 					 </h2>
 				</td>
 			</tr>
