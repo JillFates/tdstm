@@ -10,6 +10,9 @@ $(document).ready(function() {
 	currentMenuId = "#bundleMenu";
 	$("#bundleMenuId a").css('background-color','#003366')
 });
+$(window).load(function() {
+	$('.dashboard').addClass('dashboard_div');
+});
 </script>
 </head>
 <body>
@@ -19,7 +22,7 @@ $(document).ready(function() {
 		    <g:set var="percentageBundleReady" value="${applicationCount ? Math.round((bundleReady/applicationCount)*100) : 0}"/>
 			<g:set var="percentageUnassignedAppCount" value="${applicationCount ? Math.round((unassignedAppCount/applicationCount)*100) :100}"/>
 			<h1>Planning Dashboard</h1>
-			<div class="dashboard_div" style="float:left; width:250px;">
+			<div class="dashboard" style="float:left; width:250px;">
 					<span class="dashboard_head">Discovery Phase</span>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
@@ -92,7 +95,7 @@ $(document).ready(function() {
 					</table>
 			</div>
 
-			<div class="dashboard_div" style="float:left; width:250px;">
+			<div class="dashboard" style="float:left; width:250px;">
 					<span class="dashboard_head">Analysis Phase</span>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
@@ -191,7 +194,7 @@ $(document).ready(function() {
 					</table>
 				</div>
 			</div>
-			<div class="dashboard_div" style="float:right;">
+			<div class="dashboard" style="float:right;">
 					<span class="dashboard_head">Assignment and Execution Phases</span>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
