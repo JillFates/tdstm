@@ -65,6 +65,7 @@ class RoomController {
         def roomInstance = Room.get(params.id)
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		userPreferenceService.setPreference( "CURR_ROOM", "${roomInstance?.id}" )
+		def browserTestiPad = request.getHeader("User-Agent").toLowerCase().contains("ipad") ?:request.getHeader("User-Agent").toLowerCase().contains("mobile")
         if (!roomInstance) {
 			userPreferenceService.removePreference("CURR_ROOM")
             flash.message = "Current Room not found"
@@ -102,7 +103,7 @@ class RoomController {
 			}
             [roomInstance: roomInstance, roomInstanceList:roomInstanceList, moveBundleList:moveBundleList, project:project,
 			 racksList: racksList, source:params.source, target:params.target, projectId : projectId,
-			 auditPref:auditView]
+			 auditPref:auditView, browserTestiPad:browserTestiPad]
         }
     }
 

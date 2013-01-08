@@ -317,13 +317,15 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 <span id="Storage"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 </div>
 <script type="text/javascript">
-function openRoomView(e){
+function openRoomView(e,browser){
 	
 	var resp = e.responseText
 	$("#roomShowView").html(resp)
 	$("#roomShowView").show()
 	$("#roomListView").hide()
-	
+	if(browser){
+		$("#bundleId").removeAttr("multiple")
+	}
 	$("#room_layout").css("height","auto")
 }
 

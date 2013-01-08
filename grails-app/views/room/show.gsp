@@ -29,9 +29,16 @@
 					</div>
 				</td>
 				<td style="vertical-align:top;width:150px;">
-					<div style="width: 150px"><label><b>Highlight Bundles:</b></label><br /><br />
-						<g:select id="bundleId" name="moveBundleId" from="${MoveBundle.findAllByProject(project)}" value="${moveBundleList.id}" optionKey="id" optionValue="name" noSelection="${['all':'All']}" multiple="multiple" size="3"
-						  onChange="getRackDetails()"/>
+					<div style="width: 150px"><label><b>Highlight Bundles: </b></label><br /><br />
+					  <g:if test="${browserTestiPad}">
+						<g:select id="bundleId" name="moveBundleId" from="${MoveBundle.findAllByProject(project)}" value="${moveBundleList.id}" optionKey="id" optionValue="name" noSelection="${['all':'All']}"
+							onChange="getRackDetails('ipad')"
+						/>
+					  </g:if>
+					  <g:else>
+					  	<g:select id="bundleId" name="moveBundleId" from="${MoveBundle.findAllByProject(project)}" value="${moveBundleList.id}" optionKey="id" optionValue="name" noSelection="${['all':'All']}"
+					     	multiple="multiple" size="3" onChange="getRackDetails()"/>
+					  </g:else>
 					</div>
 				</td>
 				<td class="cap_tab" style="vertical-align:top;width:250px;">
@@ -61,7 +68,7 @@
 										<g:if test="${moveBundleList.id?.contains('all')}">
 											<input type="checkbox" name="otherBundle" id="otherBundle" disabled="disabled"  checked="checked" onclick="getRackLayout( $('#selectedRackId').val() )"/>
 										</g:if><g:else>
-											<input type="checkbox" name="otherBundle" id="otherBundle" onclick="getRackLayout( $('#selectedRackId').val() )"/>
+											<input type="checkbox" name="otherBundle" id="otherBundle" onclick="getRackLayout( $('#selectedRackId').val() )" checked="checked" disabled="disabled"/>
 										</g:else>
 										&nbsp;w/ other bundles</label>
 								</td>
@@ -186,9 +193,6 @@ function updateRackPower(rackId){
 	var capacityView = $("#capacityViewId").val()
 	var capacityType = $('input[name=capacityType]:checked').val()
 	var moveBundleId = ''
-	$("#bundleId option:selected").each(function () {
-		moveBundleId +="moveBundleId="+$(this).val()+"&"
-   	});
 	var otherBundle = $("#otherBundle").is(":checked") ? 'on' : ''
 	jQuery.ajax({
 		url: "getRackPowerData",
@@ -253,13 +257,13 @@ function capacityView(){
 	$("#createDialog").dialog("close")
 	$("#listDialog").dialog("close")
 }
-function getRackDetails(){
+function getRackDetails(browser){
 	var bundles = new Array()
 	$("#bundleId option:selected").each(function () {
 		bundles.push($(this).val())
    	});
    	var otherBundle = $("#otherBundle").val()
-	${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()+\'&moveBundleId=\'+bundles+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')+\'&otherBundle=\'+otherBundle', onComplete:'openRoomView(e)')}
+	${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()+\'&moveBundleId=\'+bundles+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')+\'&otherBundle=\'+otherBundle', onComplete:'openRoomView(e,browser)')}
 }
 
 function createAssetPage(type,source,rack,roomName,location,position){
