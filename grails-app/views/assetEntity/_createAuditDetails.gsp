@@ -24,7 +24,7 @@
 		<td class="label">Manufacturer</td>
 		<td class="label">
 		 <div id="manufacturerId">
-		   <input type="text" id="manufacturers" name="manufacturer" value="" onkeyup="getAlikeManu(this.value)" />
+		   <input type="text" id="manufacturersAuditId" name="manufacturers" value="" onkeyup="getAlikeManu(this.value)" />
 		 </div>
 		 <div id="autofillId" class="autoFillDiv" style="display: none " ></div>
 		</td>
@@ -33,8 +33,7 @@
 		<td class="label"><b>Model</b></td>
 		<td class="label">
 		<div id="modelId">
-		<input type="text" id="models" name="models" value="" onkeyup="getAlikeModel(this.value)" 
-			onblur="getAssetType(this.value);editModelAudit(this.value);"/>
+		<input type="text" id="modelsAuditId" name="models" value="" onkeyup="getAlikeModel(this.value)" />
 		</div>
 		 <div id="autofillIdModel" class="autoFillDiv"  style="display: none"></div>
 		</td>

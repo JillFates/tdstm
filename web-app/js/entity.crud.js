@@ -116,7 +116,7 @@ function selectModel(value, forWhom){
 	var val = value;
 	var assetType = $("#assetTypeId").val() ;
 	new Ajax.Request('../assetEntity/getModelsList?assetType='+assetType+'&manufacturer='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){showModelView(e, forWhom);}})
-	//${remoteFunction(action:'getModelsList', params:'\'assetType=\' +assetType +\'&manufacturer=\'+ val', onComplete:'showModelView(e)' )}
+	//${remoteFunction(action:'getModelsList', params:'\'assetType=\' +assetType +\'&=\'+ val', onComplete:'showModelView(e)' )}
 }
 function showModelView(e, forWhom){
     var resp = e.responseText;
@@ -420,7 +420,7 @@ function showModelAudit(id){
 
 function editModelAudit(val){
 	if(val){
-		var manufacturer = $("#manufacturer").val()
+		var manufacturer = $("#manufacturersAuditId").val()
 		new Ajax.Request('../model/getModelDetailsByName?modelName='+val+'&manufacturerName='+manufacturer,{asynchronous:true,evalScripts:true,
 			onComplete:function(data){
 					$("#modelAuditId").html(data.responseText)
@@ -486,7 +486,7 @@ function getAlikeManu(val) {
 
 function getAlikeModel(val){
 	if(modelLoadRequest)modelLoadRequest.abort()
-	var manufacturer = $("#manufacturer").val()
+	var manufacturer= $("#manufacturersAuditId").val()
 	modelLoadRequest = jQuery.ajax({
 							url: '../model/autoCompleteModel',
 							data: {'value':val,'manufacturer':manufacturer},
@@ -498,28 +498,30 @@ function getAlikeModel(val){
 						});
 }
 function updateManu(name){
-	$("#manufacturer").val(name)
+	$("#manufacturersAuditId").val(name)
 	$("#autofillId").hide()
-	$("#models").val("")
+	$("#modelsAuditId").val("")
 }
 
-function updateModel(name){
-	$("#models").val(name)
-	$("#models").focus()
+function updateModelForAudit(name){
+	$("#modelsAuditId").val(name)
+	$("#modelsAuditId").focus()
 	$("#autofillIdModel").hide()
+	$("#modelsAuditId").attr('onBlur','getAssetType("'+name+'")')
 }
 
 function getAssetType(val){
 	new Ajax.Request('../model/getModelType?value='+val,{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
 			$("#assetTypeId").val(data.responseText)
+			editModelAudit(""+val+"")
 		}}
 	)
 }
 
 /*function updateModel(rackId,value){
 	var val = value;
-	new Ajax.Request('../assetEntity/getModelsList?manufacturer='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){populateModelSelect(e,rackId);}})
+	new Ajax.Request('../assetEntity/getModelsList?='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){populateModelSelect(e,rackId);}})
 }
 function populateModelSelect(e,rackId){
     var resp = e.responseText;

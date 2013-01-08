@@ -76,7 +76,7 @@
 <div >
  <div id="modelAuditId" >
  <div>
- <input type="hidden" id="manufacturer" value="${assetEntity.model?.manufacturer}">
+ <input type="hidden" id="manufacturersAuditId" value="${assetEntity.model?.manufacturer}">
  <table> 
  <tr><td colspan="2"><b>Model Details View</b></td></tr>
 	<tr class="prop">
