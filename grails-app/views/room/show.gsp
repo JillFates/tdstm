@@ -93,7 +93,7 @@
 		</tbody>
 	</table>
 </div>
-<div id="roomLayout_body" style="width: 1200px; overflow-x: auto; border: 2px solid black">
+<div id="roomLayout_body" style="width: 1283px !important; border: 2px solid black">
 	<input id="selectedRackId" type="hidden">
 	<g:set var="numrows" value="${1}" />
 	<g:set var="tilerows" value="${roomInstance.roomDepth / 2}" />
