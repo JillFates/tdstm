@@ -57,7 +57,7 @@
 	<tr class="prop">
 		<td class="label">Validation</td>
 		<td class="label">
-			
+			${assetEntity.validation}
 		</td>
 	</tr>
 	<tr class="prop">

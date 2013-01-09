@@ -71,7 +71,8 @@
 	<tr class="prop">
 		<td class="label">Validation</td>
 		<td class="label">
-			
+		<g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" name="validation" noSelection="${['':' Please Select']}" 
+		 value="${assetEntityInstance.validation}"/>	
 		</td>
 	</tr>
 	<tr class="prop">
