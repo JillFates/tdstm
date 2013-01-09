@@ -91,6 +91,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	ProjectTeam targetTeamDba
 	
 	Integer currentStatus
+	String validation
 	
 	Integer dependencyBundle = 0
 	
@@ -178,7 +179,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		
 		
 		currentStatus( nullable:true )
-		
+		validation( blank:true, nullable:true, inList:['Discovery','Validated','DependencyReview','DependencyScan','BundleReady'] )
 		dependencyBundle( nullable:true )
 	}
 	
