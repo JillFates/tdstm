@@ -57,13 +57,13 @@
 	<tr class="prop">
 		<td class="label">Validation</td>
 		<td class="label">
-			${assetEntity.validation}
+
 		</td>
 	</tr>
 	<tr class="prop">
 		<td class="label">PlanStatus</td>
 		<td class="label">
-			${assetEntity.planStatus}
+			${assetEntity.planStatus}		
 		</td>
 	</tr>
 </table>

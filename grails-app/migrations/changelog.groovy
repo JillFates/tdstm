@@ -8,6 +8,5 @@ databaseChangeLog = {
 	include file: '20121218-update-version-on-manu-model.groovy'
 	include file: '20121218-add-indexes-model-tables.groovy'
 	include file: '20121224-cleanup-excel-templates.groovy'
-	include file: '20130109-alter-validation-column.groovy'
 	
 }
