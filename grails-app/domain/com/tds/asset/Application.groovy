@@ -21,7 +21,6 @@ class Application extends AssetEntity{
 	String useFrequency
 	String userLocations
 	String userCount
-	String validation
 	String latency
 	String testProc
 	String startupProc
@@ -47,7 +46,6 @@ class Application extends AssetEntity{
 		useFrequency( blank:true, nullable:true )
 		userLocations( blank:true, nullable:true )
 		userCount( blank:true, nullable:true )
-		validation( blank:true, nullable:true, inList:['Discovery','Validated','DependencyReview','DependencyScan','BundleReady'] )
 		latency( blank:true, nullable:true )
 		testProc( blank:true, nullable:true )
 		startupProc( blank:true, nullable:true )
