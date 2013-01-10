@@ -1553,7 +1553,7 @@ class AssetEntityController {
 			} else if(redirectTo == "rack"){
 				redirect( controller:'rackLayouts',action:'create' )
 			} else if(redirectTo == "assetAudit"){
-				render(template:'auditDetails', model:[assetEntity:assetEntityInstance])
+				render(template:'auditDetails', model:[assetEntity:assetEntityInstance, source:params.source])
 			} else {
 				redirect( action:list )
 			}
@@ -2884,6 +2884,7 @@ class AssetEntityController {
 				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle]
 		
 			if(params.redirectTo == "roomAudit") {
+				paramsMap << [source:params.source]
 				render(template:"auditDetails",model:paramsMap)
 			}
 			return paramsMap
@@ -2927,7 +2928,7 @@ class AssetEntityController {
 		
 		if(params.redirectTo == "roomAudit") {
 			def rooms = Room.findAllByProject(project)
-			paramsMap << ['rooms':rooms]
+					paramsMap << ['rooms':rooms, 'source':params.source]
 			render(template:"auditEdit",model:paramsMap)
 		}
 		
@@ -3001,7 +3002,7 @@ class AssetEntityController {
 						forward(action:'listComment')
 						break;
 					case "roomAudit":
-						forward(action:'show', params:[redirectTo:redirectTo])
+						forward(action:'show', params:[redirectTo:redirectTo, source:params.source])
 						break;
 					case "planningConsole":
 				        forward(action:'getLists', params:[entity: params.tabType,labelsList:params.labels,dependencyBundle:session.getAttribute("dependencyBundle")])

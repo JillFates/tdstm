@@ -396,7 +396,7 @@ class RackLayoutsController {
 								hasBlades = true
 								bladeTable = generateBladeLayout(it, overlapAsset, rackLayoutsHasPermission, hideIcons, redirectTo, rackId, commit)
 							}
-							assetTag += """<a href="javascript:${forWhom ? "editAudit('roomAudit'" : "getEntityDetails('redirectTo'"},'${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>"
+							assetTag += """<a href="javascript:${forWhom ? "editAudit('roomAudit','${it.source}'" : "getEntityDetails('redirectTo'"},'${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>"
 							if(hasBlades){
 								assetTag += "<br/>"+bladeTable
 							}
@@ -409,7 +409,7 @@ class RackLayoutsController {
 							bladeTable = generateBladeLayout(it, overlappedAsset,rackLayoutsHasPermission, hideIcons, redirectTo, rackId, commit)
 						}
 						cabling = !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : ""
-						assetTag += """<a href="javascript:${forWhom ? "editAudit('roomAudit'" : "getEntityDetails('redirectTo'"},'${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>&nbsp;"
+						assetTag += """<a href="javascript:${forWhom ? "editAudit('roomAudit','${it.source}'" : "getEntityDetails('redirectTo'"},'${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>&nbsp;"
 						
 						if(hasBlades){
 							assetTag += "<br/>"+bladeTable

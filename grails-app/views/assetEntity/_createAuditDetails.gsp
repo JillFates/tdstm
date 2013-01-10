@@ -5,6 +5,7 @@
 <input name="project.id" type="hidden" value="${projectId}" />
 <input name="dependentCount" id="dependentCount" type="hidden" value="0"/>
 <input  name="supportCount"  id="supportCount" type="hidden" value="0"/>
+<input  name="source"  id="sourceId" type="hidden" value="1"/>
 <table>
 	<tr><td colspan="2"><b>Asset Audit Create</b></td></tr>
 	<tr class="prop" >

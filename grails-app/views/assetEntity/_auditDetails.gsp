@@ -3,7 +3,7 @@
 	<tr class="prop">
 		<td class="label">Location</td>
 		<td class="label">
-			${assetEntity.sourceLocation} / ${assetEntity.sourceRoom}
+			${source=='1'? ''+assetEntity.sourceLocation+' / '+assetEntity.sourceRoom+'' : ''+assetEntity.targetLocation+' / '+assetEntity.targetRoom+''}
 		</td>
 	</tr>
 	<tr class="prop">
@@ -39,7 +39,7 @@
 	<tr class="prop">
 		<td class="label">Rack</td>
 		<td class="label">
-			${assetEntity.sourceRack} Pos : ${assetEntity.sourceRackPosition }
+			${source=='1'? ''+assetEntity.sourceRack+' / '+assetEntity.sourceRackPosition+'' : ''+assetEntity.targetRack+' / '+assetEntity.targetRackPosition+''}
 		</td>
 	</tr>
 	<tr class="prop">
@@ -68,7 +68,7 @@
 	</tr>
 </table>
 <div class="buttons">
-	<input type="button" class="edit" value="Edit" onclick="editAudit('roomAudit','Server', ${assetEntity?.id})" /> 
+	<input type="button" class="edit" value="Edit" onclick="editAudit('roomAudit','${source}','Server', ${assetEntity?.id})" /> 
 	<input type="button" class="edit" value="Delete" onclick="deleteAudit(${assetEntity.id},'server')" /> 
 	<input type="button" class="edit" value="More..." onclick="getEntityDetails('room','Server', ${assetEntity?.id})" /> 
 </div>

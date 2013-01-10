@@ -375,10 +375,16 @@ function getAuditDetails(redirectTo, assetType, value){
 	)
 }
 
-function editAudit(redirectTo, assetType, value){
-	new Ajax.Request('../assetEntity/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,
+function editAudit(redirectTo, source, assetType, value){
+	new Ajax.Request('../assetEntity/edit?id='+value+'&redirectTo='+redirectTo+'&source='+source,{asynchronous:true,evalScripts:true,
 		onComplete:function(e){
 			$("#auditDetailViewId").html(e.responseText)
+			if(source==0){
+				$("#auditLocationId").attr("name","targetLocation")
+				$("#auditRoomId").attr("name","targetRoom")
+				$("#auditRackId").attr("name","targetRack")
+				$("#auditPosId").attr("name","targetRackPosition")
+			}
 			$("#auditDetailViewId").show()
 		}}
 	)
@@ -448,11 +454,18 @@ function createAuditPage(type,source,rack,roomName,location,position){
 		onComplete:function(data){
 				$("#auditDetailViewId").html(data.responseText)
 				$("#auditLocationId").val(location)
-				$("#auditRoomId").val(location)
+				$("#auditRoomId").val(roomName)
 				$("#assetTypeId").val(type)
 				$("#auditRackId").val(rack)
 				$("#auditPosId").val(position)
 				$("#auditLocationId").val(location)
+				if(source==0){
+					$("#auditLocationId").attr("name","targetLocation")
+					$("#auditRoomId").attr("name","targetRoom")
+					$("#auditRackId").attr("name","targetRack")
+					$("#auditPosId").attr("name","targetRackPosition")
+					$("#sourceId").val("0")
+				}
 				$("#auditDetailViewId").show()
 		}}
 	)

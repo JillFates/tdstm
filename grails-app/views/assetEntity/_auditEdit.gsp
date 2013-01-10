@@ -4,13 +4,14 @@
 <input type="hidden" name="id" value="${assetEntityInstance.id}"/>
 <input name="dependentCount" id="dependentCount" type="hidden" value="0"/>
 <input  name="supportCount"  id="supportCount" type="hidden" value="0"/>
+<input  name="source"  id="sourceId" type="hidden" value="${source ?: 1}"/>
 <table>
 	<tr><td colspan="2"><b>Asset Audit Edit</b></td></tr>
 	<tr class="prop" >
 		<td class="label">Location</td>
 		<td class="label" nowrap="nowrap">
-			<input type="text" name="sourceLocation" value="${assetEntityInstance.sourceLocation}" size="6" /> / 
-			<input type="text" name="sourceRoom" value="${assetEntityInstance.sourceRoom}" size="6" />
+			<input type="text" ${source=='1' ? 'name="sourceLocation" value="'+assetEntityInstance.sourceLocation+'"' : 'name="targetLocation" value="'+assetEntityInstance.targetLocation+'"'} size="6" /> / 
+			<input type="text" ${source=='1' ? 'name="sourceRoom" value="'+assetEntityInstance.sourceRoom+'"' : 'name="targetRoom" value="'+assetEntityInstance.targetRoom+'"'} size="6" />
 		</td>
 	</tr>
 	<tr class="prop">
@@ -52,8 +53,8 @@
 	<tr class="prop">
 		<td class="label">Rack</td>
 		<td class="label" nowrap="nowrap">
-			<input type="text" name="sourceRack" value="${assetEntityInstance.sourceRack}" size="6" > 
-			Pos :<input type="text" name="sourceRackPosition" value="${assetEntityInstance.sourceRackPosition }" size="6" ">
+			<input type="text" ${source=='1' ? 'name="sourceRack" value="'+assetEntityInstance.sourceRack+'"' : 'name="targetRack" value="'+assetEntityInstance.targetRack+'"'} size="6" > 
+			Pos :<input type="text" ${source=='1' ? 'name="sourceRackPosition" value="'+assetEntityInstance.sourceRackPosition+'"' : 'name="targetRackPosition" value="'+assetEntityInstance.targetRackPosition+'"'} size="6">
 		</td>
 	</tr>
 	<tr class="prop">
@@ -70,8 +71,7 @@
 	</tr>
 	<tr class="prop">
 		<td class="label">Validation</td>
-		<td class="label">
-			<g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" name="validation" noSelection="${['':' Please Select']}" 
+		<td><g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" name="validation" noSelection="${['':' Please Select']}" 
 					 value="${assetEntityInstance.validation}"/>	
 		</td>
 	</tr>
