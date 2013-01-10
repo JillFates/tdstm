@@ -38,7 +38,7 @@ class TaskService {
 	def quartzScheduler
 	def workflowService
 	
-	static final List runbookCategories = [AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP]
+	static final List runbookCategories = [AssetCommentCategory.MOVEDAY, AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP]
 	static final List categoryList = AssetCommentCategory.getList()
 	static final List statusList = AssetCommentStatus.getList()
 	
@@ -712,14 +712,15 @@ class TaskService {
 	}
 	
 	/**
-	 * 	Used to delete all Task data that are associated to a specified move event
+	 * 	Used to delete all Task data that are associated to a specified move event. This deletes the task, notes and dependencies on other tasks.
 	 * @param moveEventId
+	 * @param deleteManual - boolean used to determine if manually created tasks should be deleted as well (default false)
 	 * @return void
 	 * 
 	 */
-	def deleteTaskData(def moveEventId){
+	def deleteTaskData(def moveEventId, def deleteManual=false) {
 		log.info("deleteTaskData() was called for moveEvent(${moveEventId})")
-		def tasksMap = getMoveEventTaskLists(moveEventId)
+		def tasksMap = getMoveEventTaskLists(moveEventId, false)
 		
 		if (tasksMap.tasksWithNotes.size() > 0) {
 			CommentNote.executeUpdate('DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids)', ['ids':tasksMap.tasksWithNotes] )
@@ -739,18 +740,19 @@ class TaskService {
 	 * Returns a map containing several lists of AssetComment ids for a specified moveEvent that include keys
 	 * tasksWithPred, tasksNoPred, TasksAll and TasksWithNotes
 	 * @param moveEventID
+	 * @param manualTasks - boolean flag if manually created tasks should be included in list (default true)
 	 * @return map of tasksWithPred, tasksNoPred, TasksAll and TasksWithNotes
 	 */
-	def getMoveEventTaskLists(def moveEventId) {
-		
+	def getMoveEventTaskLists(def moveEventId, def manualTasks=true) {
+		def manTasksSQL = manualTasks ? '' : ' AND c.auto_generated=true'
 		def query = """SELECT c.asset_comment_id AS id, 
 				( SELECT count(*) FROM task_dependency t WHERE t.asset_comment_id = c.asset_comment_id ) AS predCount,
 				( SELECT count(*) FROM comment_note n WHERE n.asset_comment_id = c.asset_comment_id ) AS noteCount
 			FROM asset_comment c 
 			WHERE 
 				c.move_event_id = ${moveEventId} AND
-				c.category IN (${GormUtil.asQuoteCommaDelimitedString(runbookCategories)})"""
-		log.info "getMoveEventTaskLists: query = ${query}"
+				c.category IN (${GormUtil.asQuoteCommaDelimitedString(runbookCategories)}) $manTasksSQL"""
+		log.debug "getMoveEventTaskLists: query = ${query}"
 		def tasksList = jdbcTemplate.queryForList(query)
 
 		def tasksWithPred=[]
@@ -951,16 +953,18 @@ class TaskService {
      * @param bundle, MoveBundle Instance
      * @return success message
      */
-    def deleteBundleWorkflowTasks(def bundle){
+    def deleteBundleWorkflowTasks(def bundle) {
        def bundledAssets = AssetEntity.findAll("from AssetEntity a where a.moveBundle = :bundle and a.project =:project\
-                                                and a.assetType not in ('application','database',' ','VM')",[bundle:bundle,project:bundle.project])
+           and a.assetType not in ('application','database',' ','VM')",[bundle:bundle,project:bundle.project])
 
        def assetComments = AssetComment.findAll("from AssetComment ac where commentType = 'issue' and \
-                                                ((ac.assetEntity in (:assets) and ac.workflowTransition is not null) \
-                                                 or ( ac.moveEvent = :moveEvent and ac.comment in (:comments)) \
-                                                 or ( ac.moveEvent = :moveEvent and ac.workflowTransition is not null )) ",
-                                                   [assets:bundledAssets, moveEvent:bundle.moveEvent, comments:["Begin Move Event", "Move Event Complete"]])
-       if(assetComments.size() > 0){
+			( (ac.assetEntity in (:assets) and ac.workflowTransition is not null) \
+             or ( ac.moveEvent = :moveEvent and ac.comment in (:comments)) \
+             or ( ac.moveEvent = :moveEvent and ac.workflowTransition is not null )\
+			) ",
+			[ assets:bundledAssets, moveEvent:bundle.moveEvent, comments:["Begin Move Event", "Move Event Complete"] ] )
+			
+       if (assetComments.size() > 0) {
            def taskDependency = TaskDependency.executeUpdate("delete from TaskDependency td where (td.predecessor in (:tasks) or td.assetComment in (:tasks))",
                [tasks:assetComments])
 
@@ -974,4 +978,40 @@ class TaskService {
            return
        }
    }
+
+   /**
+    * Create a Task based on a move bundle workflow step
+    * @param workflow
+    * @param assetEntity (optional)
+    * @return Map [errMsg, stepTask]
+    */
+   def createTaskBasedOnWorkflow(Map args){
+       def errMsg = ""
+       def stepTask = new AssetComment()
+           stepTask.comment = "${args.workflow.code}${args.assetEntity ? '-'+args.assetEntity?.assetName:''}"
+           stepTask.role = args.workflow.role?.id
+           stepTask.moveEvent = args.bundleMoveEvent
+           stepTask.category = args.workflow.category ? args.workflow.category : 'general'
+           stepTask.assetEntity = args.assetEntity
+           stepTask.duration = args.workflow.duration ? args.workflow.duration : 0
+           stepTask.priority = args.assetEntity?.priority ? args.assetEntity?.priority : 3
+           stepTask.status  = "Pending"
+           stepTask.workflowTransition = args.workflow
+           stepTask.project = args.project
+           stepTask.commentType = "issue"
+           stepTask.createdBy = args.person
+			 stepTask.taskNumber = args.taskNumber
+           stepTask.estStart = MoveBundleStep.findByMoveBundleAndTransitionId(args.bundle, args.workflow.transId)?.planStartTime
+           stepTask.estFinish = MoveBundleStep.findByMoveBundleAndTransitionId(args.bundle, args.workflow.transId)?.planCompletionTime
+			stepTask.autoGenerated = true
+
+       if(!stepTask.save(flush:true)){
+           stepTask.errors.allErrors.each{println it}
+           errMsg = "Failed to create WorkFlow Task. Process Failed"
+       }
+       
+       return [errMsg:errMsg, stepTask:stepTask]
+   }
+   
+
 }

@@ -501,12 +501,12 @@ class CommentService {
      * @param dependent, predecessor 
      * @param taskDepId, existing dependency Id
      * @param depId, successor/predecessor
-     * @return, validate message
+     * @return validate message
      */
     def saveAndUpdateTaskDependency( def task, def dependent, def taskDepId, def depId ){
         def errorMsg = ""
         def taskDependency = TaskDependency.get(taskDepId)
-        if( taskDependency && taskDependency.predecessor.id != Long.parseLong( depId )  ) {
+        if ( taskDependency && taskDependency.predecessor.id != Long.parseLong( depId )  ) {
             taskDependency.predecessor = dependent
             taskDependency.assetComment = task
         } else if( !taskDependency ) {
