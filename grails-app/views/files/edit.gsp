@@ -82,6 +82,8 @@
 							<td class="label" nowrap="nowrap"><label for="planStatus">PlanStatus</label></td>
 							<td><g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${fileInstance.planStatus}" />
 							</td>
+							<td class="label">Validation</td>
+							<td><g:select from="${fileInstance.constraints.validation.inList}" id="validation" name="validation" value="${fileInstance.validation}"/>	
 							</tr>
 						</tbody>
 					</table>

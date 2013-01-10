@@ -150,8 +150,8 @@ alert("${flash.message}")
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="railType">Rail Type</label></td>
 								<td >${assetEntity.railType}</td>
-								<td></td>
-								<td></td>
+								<td class="label">Validation</td>
+								<td>${assetEntity.validation}</td>
 								<td class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label></td>
 								<td>${assetEntity.virtualHost}</td>
 								<td>&nbsp</td>

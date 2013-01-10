@@ -142,8 +142,9 @@
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="railType">Rail Type</label></td>
 								 <td ><g:select id="railType" name ="railType" from="${railTypeOption}" value= "${assetEntityInstance.railType}" noSelection="${['':' Please Select']}" tabindex="64"/></td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
+								<td class="label">Validation</td>
+								<td><g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" name="validation" value="${assetEntityInstance.validation}"/>	
+								</td>
 								<td class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label>
 								<td><input type="text" id="virtualHost"
 									name="virtualHost" value="${assetEntityInstance.virtualHost}" size=10 tabindex="37"/></td>

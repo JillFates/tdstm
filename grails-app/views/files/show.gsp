@@ -125,6 +125,8 @@
 							<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label>
 							</td>
 							<td>${filesInstance.planStatus}</td>
+							<td class="label">Validation</td>
+							<td>${filesInstance.validation}</td>
 						</tr>
 					</tbody>
 				</table>

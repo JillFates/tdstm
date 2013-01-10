@@ -115,6 +115,8 @@
 								</g:else>
 							</td>
 							<td>${databaseInstance.custom8}</td>
+							<td class="label">Validation</td>
+							<td>${databaseInstance.validation}</td>
 						</tr>
 					</tbody>
 				</table>

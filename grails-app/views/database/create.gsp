@@ -68,6 +68,10 @@
 							<td><input type="text" id="custom7" name="custom7"  value="${databaseInstance.custom7}"  /></td>
 							<td class="label" nowrap="nowrap"><label for="custom8">${project.custom8 ?: 'Custom8'}</label></td>
 							<td><input type="text" id="custom8" name="custom8"  value="${databaseInstance.custom8}"  /></td>
+							<td class="label">Validation</td>
+							<td >
+								<g:select from="${databaseInstance.constraints.validation.inList}" id="validation" name="validation" value="Discovery"/>
+							</td>
 						</tr>
 					</tbody>
 				</table>
