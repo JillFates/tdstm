@@ -3,19 +3,16 @@ import com.tdssrc.grails.TimeUtil
 class ModelSyncBatch {
 	
 	String statusCode = "PENDING"
-	String source			// Where the batch originated (hostname?)
+	String source			// Where the batch originated
 	Date dateCreated
 	Date lastModified
-	Date changesSince		// Represents the date passed to master to get changes as of this date
+	Date changesSince		// Date passed to the master for filtering changes
 	UserLogin createdBy
 	
 	static hasMany = [ manufacturerSync:ManufacturerSync, modelSync:ModelSync ]	
 	
-	static constraints = {
-		statusCode( blank:false, inList:['PENDING','ACTIVE','DONE'] )
-		dateCreated( nullable:true )
-		lastModified( nullable:true )
-	}
+	// TODO - delete these
+	UserLogin userlogin
 	
 	static mapping = {
 		version false
@@ -25,11 +22,20 @@ class ModelSyncBatch {
 			statusCode sqltype: 'varchar(20)'
 		}
 	}
-
+	static constraints = {
+		statusCode( blank:false, size:0..20 )
+		dateCreated( nullable:true )
+		lastModified( nullable:true )
+	}
+	
+	/*
+	 * Date to insert in GMT
+	 */
 	def beforeInsert = {
-		dateCreated = lastModified = TimeUtil.nowGMT()
+		dateCreated = TimeUtil.convertInToGMT( "now", "EDT" )
+		lastModified = TimeUtil.convertInToGMT( "now", "EDT" )
 	}
 	def beforeUpdate = {
-		lastModified = TimeUtil.nowGMT()
+		lastModified = TimeUtil.convertInToGMT( "now", "EDT" )
 	}
 }
