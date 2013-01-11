@@ -57,7 +57,7 @@
     %>
   <body>
     <div class="main_body">
-      <input id="contextPath" value="${request.contextPath}"/>
+      <input id="contextPath" type="hidden" value="${request.contextPath}"/>
       <div class="tds_header">
       	<div class="header_left">
       		<g:if test="${setImage}">
