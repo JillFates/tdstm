@@ -29,7 +29,7 @@
 	<input type="hidden" id="filesChecked" value="${filesChecked}" />
 	
 	<div id="item1" style="float: left;z-index: 10000;">
-			 <g:render template="map" model="[file_name:file_name]"/>
+			 <g:render template="map" model="[file_name:file_name, eventColorCode:eventColorCode]"/>
 			<div id="legendDivIdGraph" style="float: left; border: 1px solid #ccc; margin-left: 3px; margin-top: 3px; width: 178px; background-color: white; position: absolute; display: none;">
 				<table id="legendId" cellpadding="0" cellspacing="0" style="margin-left: 5px; border: 0; width: 140px;">
 					<tr><td style="padding: 3px 3px;"><h3>Legend</h3></td></tr>

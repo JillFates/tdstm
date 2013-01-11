@@ -1,4 +1,4 @@
-<span id="panelLink" colspan="2" style="padding: 0px;cursor: pointer;"  onclick="hidePanel()"><h4>Control Panel</h4></span>
+<span id="panelLink" colspan="2" style="padding: 0px;cursor: pointer;"  onclick="openPanel()"><h4>Control Panel</h4></span>
 <div id="controlPanel" style="float: left;border: 1px solid #ccc;margin-left: 3px;margin-top: 3px;width: 150px; background-color:white;position: absolute;display: none;">
 				<table id="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;width: 148px;" >
 					<tr>

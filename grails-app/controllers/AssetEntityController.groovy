@@ -7,7 +7,7 @@ import java.util.Date
 import jxl.*
 import jxl.read.biff.*
 import jxl.write.*
-import net.tds.util.jmesa.AssetCommentBean;
+import net.tds.util.jmesa.AssetCommentBean
 import net.tds.util.jmesa.AssetEntityBean
 
 import java.io.File;
@@ -41,6 +41,7 @@ import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import groovy.time.TimeCategory
 import com.tdssrc.grails.ExportUtil
+import com.tdssrc.grails.ApplicationConstants
 
 class AssetEntityController {
 
@@ -3481,40 +3482,28 @@ class AssetEntityController {
 				def colorsCode = "rgb(${colorCode},${colorCode},${colorCode})"
 				eventColorCode << [(event.name):colorsCode]
 			}
-			if(assetDependentlist.size()<30){
-				force = -100
-				distance = 40
-				graphData << ["force":-100]
-				graphData << ["linkdistance":40]
-		    }else if(assetDependentlist.size()<200){
-				force = -80
-				distance = 30
-				graphData << ["force":-80]
-				graphData << ["linkdistance":30]
-		    }else{
-				force = -70
-				distance = 20
-				graphData << ["force":-70]
-				graphData << ["linkdistance":20]
-		    }
 			graphData << ["friction":friction]
-			def graphNodes = []
-			if(assetDependentlist.size()<30){
-				height = 400
-				width = 800
-				graphData << ["width":800]
-				graphData << ["height":400]
-		    }else if(assetDependentlist.size()<200){
-				height = 800
-				width = 1200
-				graphData << ["width":1200]
-				graphData << ["height":800]
-		    }else{
-				height = 2200
-				width = 1800
-				graphData << ["width":1800]
-				graphData << ["height":2200]
+			
+			if (assetDependentlist.size()<30) {
+				force = ApplicationConstants.graphDefaultSmallMap["force"]
+				distance = ApplicationConstants.graphDefaultSmallMap["linkdistance"]
+				width =  ApplicationConstants.graphDefaultSmallMap["width"]
+				height = ApplicationConstants.graphDefaultSmallMap["height"]
+				graphData << ApplicationConstants.graphDefaultSmallMap
+		    } else if(assetDependentlist.size()<200) {
+				force = ApplicationConstants.graphDefaultMediumMap["force"]
+				distance = ApplicationConstants.graphDefaultMediumMap["linkdistance"]
+				width =  ApplicationConstants.graphDefaultMediumMap["width"]
+				height = ApplicationConstants.graphDefaultMediumMap["height"]
+				graphData << ApplicationConstants.graphDefaultMediumMap
+		    } else {
+				force = ApplicationConstants.graphDefaultLargeMap["force"]
+				distance = ApplicationConstants.graphDefaultLargeMap["linkdistance"]
+				width =  ApplicationConstants.graphDefaultLargeMap["width"]
+				height = ApplicationConstants.graphDefaultLargeMap["height"]
+				graphData << ApplicationConstants.graphDefaultLargeMap
 		    }
+			def graphNodes = []
 			
 			assetDependentlist.each{
 				def name = ""
