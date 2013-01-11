@@ -117,7 +117,7 @@ class ManufacturerController {
 				manufacturerAlias.save(flush:true)
 			}
 			akaToSave.each{aka->
-				manufacturerInstance.findOrCreateByName(aka, true)
+				manufacturerInstance.findOrCreateAliasByName(aka, true)
 			}
 			
             if(!manufacturerInstance.hasErrors() && manufacturerInstance.save()) {
@@ -147,7 +147,7 @@ class ManufacturerController {
 			def akaNames = params.list('aka')
 			if(akaNames.size() > 0){
 				akaNames.each{aka->
-					manufacturerInstance.findOrCreateByName(aka, true)
+					manufacturerInstance.findOrCreateAliasByName(aka, true)
 				}
 			}
             flash.message = "Manufacturer ${manufacturerInstance.id} created"
@@ -195,10 +195,10 @@ class ManufacturerController {
 			def fromManufacturerAlias = ManufacturerAlias.findAllByManufacturer(fromManufacturer)
 			ManufacturerAlias.executeUpdate("delete from ManufacturerAlias ma where ma.manufacturer = ${fromManufacturer.id}")
 			fromManufacturerAlias.each{
-				toManufacturer.findOrCreateByName(it.name, true)
+				toManufacturer.findOrCreateAliasByName(it.name, true)
 			}
 			//merging fromManufacturer as AKA of toManufacturer
-			toManufacturer.findOrCreateByName(fromManufacturer.name, true)
+			toManufacturer.findOrCreateAliasByName(fromManufacturer.name, true)
 			
 			// Delete manufacturer record.
 			fromManufacturer.delete()

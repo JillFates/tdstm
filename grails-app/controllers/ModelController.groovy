@@ -210,7 +210,7 @@ class ModelController {
         	modelInstance.save(flush: true)
 			def akaNames = params.list('aka')
 			akaNames.each{ aka->
-				modelInstance.findOrCreateByName(aka.trim(), true)
+				modelInstance.findOrCreateAliasByName(aka.trim(), true)
 			}
             flash.message = "${modelInstance.modelName} created"
             redirect(action: "show", id: modelInstance.id)
@@ -399,7 +399,7 @@ class ModelController {
 					}
 				}
 				akaToSave.each{aka->
-					modelInstance.findOrCreateByName(aka, true)
+					modelInstance.findOrCreateAliasByName(aka, true)
 				}
 				
 				def connectorCount = 0
@@ -689,10 +689,10 @@ class ModelController {
 			ModelAlias.executeUpdate("delete from ModelAlias mo where mo.model = ${fromModel.id}")
 			
 			fromModelAlias.each{
-				toModel.findOrCreateByName(it.name, true)
+				toModel.findOrCreateAliasByName(it.name, true)
 			}
 			//merging fromModel as AKA of toModel
-			toModel.findOrCreateByName(fromModel.modelName, true)
+			toModel.findOrCreateAliasByName(fromModel.modelName, true)
 			
 			// Delete model record
 			fromModel.delete()
