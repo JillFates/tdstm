@@ -21,7 +21,7 @@ function loadFilteredStaff(sortOn , firstProp, orderBy) {
 		})
 	}
 	jQuery.ajax({
-		url : '../person/loadFilteredStaff',
+		url : $("#contextPath").val()+'/person/loadFilteredStaff',
 		data : {
 			'role' : role,
 			'location' : location,
@@ -66,7 +66,7 @@ function unCheckAll() {
  */
 function loadPersonDiv(personId,renderPage,redirectTo){
 	jQuery.ajax({
-		url : '/tdstm/person/loadGeneral',
+		url : $("#contextPath").val()+'/person/loadGeneral',
 		data : {
 			'personId' : personId,'tab':renderPage
 		},
@@ -169,7 +169,7 @@ function saveEventStaff(id){
 	var val = $("[id='"+id+"']").val()
 	var params = {'id':id, 'val':val }
 	jQuery.ajax({
-		url:'../person/saveEventStaff',
+		url: $("#contextPath").val()+'/person/saveEventStaff',
 		data: params,
 		type:'POST',
 		success: function(data) {
@@ -190,7 +190,7 @@ function saveProjectStaff(id){
 	var val = $("[id='"+id+"']").val()
 	var params = {'id':id, 'val':val }
 	jQuery.ajax({
-		url:'../person/saveProjectStaff',
+		url: $("#contextPath").val()+'/person/saveProjectStaff',
 		data: params,
 		type:'POST',
 		success: function(data) {
