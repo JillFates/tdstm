@@ -30,9 +30,10 @@ class CommentService {
 
 	def mailService					// SendMail MailService class
 	def jdbcTemplate
-	def taskService
-	def securityService
+	def partyRelationshipService
 	def quartzScheduler
+	def securityService
+	def taskService
 
 	private final List<String> statusToSendEmailFor = [
 		AssetCommentCategory.GENERAL,
@@ -133,6 +134,7 @@ class CommentService {
 				if (params.currentStatus) {
 					if (assetComment.status != params.currentStatus) {
 						log.warn "saveUpdateCommentAndNotes() user ${userLogin} attempted to change task (${assetComment.id}) status but was already changed"
+						// TODO - assignedTo may be changing at the same time, which is assigned below. Need to review this as it is a potential edge case.
 						def whoDidIt = (assetComment.status == AssetCommentStatus.DONE) ? assetComment.resolvedBy : assetComment.assignedTo
 						switch (assetComment.status) {
 							case AssetCommentStatus.STARTED:
@@ -236,16 +238,15 @@ class CommentService {
 			
 				if (params.containsKey('assignedTo')) {
 					if (params.assignedTo && params.assignedTo.isNumber()){
-						// TODO - SECURITY - Need to validate that the assignedTo is a member of the project
-						def subject = SecurityUtils.subject
-						def person = Person.get(params.assignedTo)
-						if (!isNew && subject.hasRole("PROJ_MGR")){
-							assetComment.assignedTo = person
-						}else if(isNew){
-							assetComment.assignedTo = person
+						def person = Person.read(params.assignedTo)
+						if (person) {
+							def projectStaff = partyRelationshipService.getProjectStaff( project.id )
+							if (projectStaff.find { "${it.staff.id}" == params.assignedTo }) {
+								assetComment.assignedTo = person
+							} else {
+								log.error "User (${userLogin}) attempted to assign unrelated person (${params.assignedTo}) to project (${project})"
+							}
 						}
-					} else {
-						assetComment.assignedTo = null
 					}
 				}
 

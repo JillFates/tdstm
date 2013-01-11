@@ -97,6 +97,11 @@ class Model {
 		dateCreated( nullable:true )
 	}
 	
+	static transients = [
+		'findOrCreateAliasByName',
+		'createModelByModelName'
+	]
+	
 	static mapping  = {	
 		autoTimestamp false
 		columns {

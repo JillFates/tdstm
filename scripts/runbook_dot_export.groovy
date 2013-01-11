@@ -103,7 +103,9 @@ println """#
 # Exported on ${now}
 # This is  .DOT file format of the project tasks
 #
-digraph runbook {"""
+digraph runbook {
+	graph [rankdir=LR, fontsize=8, margin=0.001];
+"""
 
 sql.eachRow( query ) {
 //	AND t.task_number < 40

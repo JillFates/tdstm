@@ -1864,9 +1864,9 @@ class AssetEntityController {
 			}
 			
 			def predecessorTable = ""
-					def taskDependencies = assetComment.taskDependencies.sort{ it.predecessor.taskNumber }
-			//taskDependencies.sort{ it.predecessor.taskNumber }
+			def taskDependencies = assetComment.taskDependencies
 			if (taskDependencies.size() > 0) {
+				taskDependencies = taskDependencies.sort{ it.predecessor.taskNumber }
 				predecessorTable = new StringBuffer('<table cellspacing="0" style="border:0px;"><tbody>')
 				taskDependencies.each() { taskDep ->
 					def task = taskDep.predecessor
@@ -1876,9 +1876,10 @@ class AssetEntityController {
 			    }
 				predecessorTable.append('</tbody></table>')
 			}
-			def taskSuccessors = TaskDependency.findAllByPredecessor( assetComment ).sort{ it.assetComment.taskNumber }
+			def taskSuccessors = TaskDependency.findAllByPredecessor( assetComment )
 			def successorTable = ""
 			if (taskSuccessors.size() > 0) {
+				taskSuccessors = taskSuccessors.sort{ it.assetComment.taskNumber }
 				successorTable = new StringBuffer('<table  cellspacing="0" style="border:0px;" ><tbody>')
 				taskSuccessors.each() { successor ->
 					def task = successor.assetComment
@@ -3734,8 +3735,10 @@ class AssetEntityController {
 	}
     
 	/**
-	 * @param: forView
-	 * @return: HTML select of staff belongs to company and TDS
+	 * Provides a SELECT control with Staff associated with a project and the assigned staff selected if task id included
+	 * @param forView - The CSS ID for the SELECT control
+	 * @param id - the id of the existing task (aka comment)
+	 * @return HTML select of staff belongs to company and TDS
 	 * 
 	 */
 	def updateAssignedToSelect = {
@@ -3755,12 +3758,20 @@ class AssetEntityController {
 			}
 		}
 		if (person) selectedId = person.id
-		//log.debug "updateAssignedToSelect(): id=${params.id}, person=${person}, selectedId=${selectedId}" 
 
-		def projectStaff = partyRelationshipService.getProjectStaff( projectId )?.staff
-		projectStaff.sort{it.firstName}
+		def projectStaff = partyRelationshipService.getProjectStaff( projectId )
+		
+		// Now morph the list into a list of name: Role names
+		def list = []
+		projectStaff.each {
+			list << [id:it.staff.id, nameRole:"${it.staff.firstName} ${it.staff.lastName}: ${it.role.description.split(':')[1]?.trim()}"]
+		}
+		list.sort { it.nameRole }
+		
 		def firstOption = [value:'', display:'Unassigned']
-		def paramsMap = [selectId:viewId, selectName:viewId, options:projectStaff, optionKey:'id', optionSelected:selectedId, firstOption:firstOption ]
+		def paramsMap = [selectId:viewId, selectName:viewId, options:list, 
+			optionKey:'id', optionValue:'nameRole', 
+			optionSelected:selectedId, firstOption:firstOption ]
 		def assignedToSelect = HtmlUtil.generateSelect( paramsMap )
 		render assignedToSelect
 	}

@@ -178,15 +178,15 @@ class PartyRelationshipService {
      */
     def getProjectStaff( def projectId ){
     	def list = []
-    	def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' ")
+    	def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom=$projectId and p.roleTypeCodeFrom = 'PROJECT' ")
         projectStaff.each{staff ->
-            def map = new HashMap()
+            def map = [:]
             def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-            map.put("company", company.partyIdFrom)
-            map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
-            map.put("role", staff.roleTypeCodeTo)
-            map.put("staff", staff.partyIdTo)
-            list<<map
+            map.company = company.partyIdFrom
+            map.name = staff.partyIdTo.toString()
+            map.role = staff.roleTypeCodeTo
+            map.staff = staff.partyIdTo
+            list << map
         }
     	return list
     }

@@ -80,7 +80,14 @@ class AssetComment {
 		dateResolved( nullable:true  )
 		dueDate( nullable:true)
 		commentCode( blank:true, nullable:true  )
-		category( blank:false, nullable:false ,inList:['general', 'discovery', 'planning','walkthru','premove','moveday','shutdown','physical','startup','postmove'])
+		category( blank:false, nullable:false ,
+			inList:[
+				'general', 'discovery', 'planning','walkthru','premove',
+				'moveday','shutdown',
+				'physical','physical-source','physical-target',
+				'startup','postmove'
+			]
+		)
 		displayOption( blank:false, inList: ['G','U'] ) // Generic or User
 		attribute( blank:true, nullable:true  )
 		commentKey( blank:true, nullable:true  )

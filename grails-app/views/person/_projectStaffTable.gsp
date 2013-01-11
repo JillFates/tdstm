@@ -1,10 +1,8 @@
 <table>
 	<thead>
 	  <tr>
-		<th style="cursor: pointer;" onclick="loadFilteredStaff('lastName','staff')">Name <br/> (job title)
-		</th>
-		<th style="cursor: pointer;" onclick="loadFilteredStaff('company','company')">Company <br/>
-		</th>
+		<th style="cursor: pointer;" onclick="loadFilteredStaff('lastName','staff')">Name</th>
+		<th style="cursor: pointer;" onclick="loadFilteredStaff('company','company')">Company</th>
 		<th style="cursor: pointer;" onclick="loadFilteredStaff('description','role')">Role</th>
 		<g:if test="${projectId=='0'}"> <th>Project</th></g:if>
 		<g:else><th>${project?.name}</th></g:else>
@@ -36,7 +34,7 @@
 				<g:if test="${projectId=='0'}">
 				 <td style="cursor: pointer;" nowrap="nowrap">
 				    <span  id="projectList_${projectStaff?.staff.id}_${projectStaff?.role}"  onClick="loadPersonDiv(this.id,'generalInfoShow')" title="${projectStaff?.staffProject.toString().replace('[','').replace(']','')}" >
-						${projectStaff?.staffProject.size() > 1 ? 'mutiple' : projectStaff?.staffProject[0]}
+						${projectStaff?.staffProject.size() > 1 ? 'multiple' : projectStaff?.staffProject[0]}
 					</span>
 				 </td>
 				</g:if>
