@@ -67,7 +67,7 @@ import com.tdsops.tm.enums.domain.RoleTypeGroup
 			
 		} else {
 			// Get the User's default role(s)
-			PartyRole.findAllByParty( person ).each() {
+			PartyRole.findAllByParty( person )?.each() {
 				roles << it.roleType.id
 			}	
 			// log.error "*** Getting from PartyRole: roles=${roles}"

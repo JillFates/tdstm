@@ -62,7 +62,7 @@ class TaskService {
 		
 		// Get the user's roles for the current project
 		// TODO : Runbook: getUserTasks - should get the user's project roles instead of global roles
-		def roles = securityService.getPersonRoles(person, RoleTypeGroup.STAFF)
+		def roles = securityService.getPersonRoles(person, RoleTypeGroup.PROJ_STAFF, project)
 		def type=AssetCommentType.TASK
 		
 		def now = TimeUtil.nowGMT()
