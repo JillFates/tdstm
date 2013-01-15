@@ -10,6 +10,10 @@
 <meta name="viewport" content="height=device-height,width=device-width" />
 	
 <g:javascript library="application" />
+<script language="javascript" type="text/javascript">
+	/* break us out of any containing div or iframes */
+	if (top != self) { top.location.replace(self.location.href); }
+</script>
 </head>
 <body onload="document.loginForm.username.focus()">
 <div id="spinner" class="spinner" style="display: none;"><img
