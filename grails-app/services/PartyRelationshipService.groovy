@@ -4,6 +4,8 @@ import jxl.*
 import jxl.write.*
 import jxl.read.biff.*
 
+import com.tdssrc.grails.GormUtil
+
 class PartyRelationshipService {
 
     boolean transactional = true
@@ -465,12 +467,10 @@ class PartyRelationshipService {
 	 * @param Integer projectId - project id that the staff may be associate with
 	 * @return array of role codes
 	 */
-	def getStaffProjectRoles(def staffId, def projectId) {
-		def roles = []
+	def getProjectStaffFunction(def projectId, def staffId) {
+		
 		def projectRoles = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom=$projectId and p.partyIdTo=$staffId" )
-		projectRoles.each {
-			roles << it.roleTypeCodeTo
-		}
+		def roles = projectRoles.roleTypeCodeTo
 		return roles
 	}
 	
@@ -523,5 +523,60 @@ class PartyRelationshipService {
 			PartyRole.executeUpdate("delete from PartyRole where party = '$person.id' and roleType in (:roles)",[roles:existingRoles])
 		}
 	 }
+     
+    /**
+     * Update the user functions based on the functions list.
+     * @param project - project that associated with staff
+     * @param person - to which staff assign function
+     * @param functionIds - functions list that assigned to staff
+     * @return nothing
+     */
+    def updateStaffFunctionse(project, person, functionIds){
+        
+        def staffType = PartyRelationshipType.read("PROJ_STAFF")
+        def projectRole = RoleType.read("PROJECT")
+        
+        // If user deleted all functions.
+        if(!functionIds){
+            def existingFuncToDelete = PartyRelationship.findAll("from PartyRelationship where partyRelationshipType = :type and partyIdFrom = :project \
+                and partyIdTo =:person ", [type:staffType, project:project, person:person ])
+            PartyRelationship.withNewSession { existingFuncToDelete*.delete() }
+            
+            return;
+        }
+        
+        // If we are here, assuming we have some functions assigned to staff
+        
+        def functions = RoleType.findAllByIdInList(functionIds)
+        
+        // Delete the functions that are deleted from UI
+        def existingFuncToDelete = PartyRelationship.findAll("from PartyRelationship where partyRelationshipType = :type and partyIdFrom = :project \
+            and partyIdTo =:person and roleTypeCodeTo not in (:functions)", 
+            [type:staffType, project:project, person:person, functions:functions ])
+        PartyRelationship.withNewSession { existingFuncToDelete*.delete() }
+        
+        // get the list of functions that are already exists to ignore
+        def existingFuncToIgnore = PartyRelationship.findAll("from PartyRelationship where partyRelationshipType = :type and partyIdFrom = :project \
+            and partyIdTo =:person and roleTypeCodeTo in (:functions)",
+            [type:staffType, project:project, person:person, functions:functions ])?.roleTypeCodeTo
+        
+        // remove the existing functions to avoid multiple checks
+        functions.removeAll(existingFuncToIgnore)
+        
+        // Iterate through the functions and assign to staff if not exists
+        functions.each{ func ->
+            def partyRT = new PartyRelationship( partyRelationshipType : staffType, 
+                                                    partyIdFrom : project,
+                                                    roleTypeCodeFrom:projectRole,
+                                                    partyIdTo : person, 
+                                                    roleTypeCodeTo : func 
+                                              )
+            if ( !partyRT.validate() || !partyRT.save() ) {
+                def etext = "Unable to create Staff function " + GormUtil.allErrorsString( partyRT )
+                log.error( etext )
+            }
+        }
+        // TODO : return some message to send back to UI
+    }
 }
 

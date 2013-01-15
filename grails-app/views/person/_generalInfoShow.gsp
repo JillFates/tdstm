@@ -20,9 +20,9 @@
 				<table class="personTable">
 					<tbody>
 						<tr class="prop">
-							<td valign="top" class="name"><label for="firstName"><b>First
-										Name:&nbsp;<span style="color: red">*</span>
-								</b></label></td>
+							<td valign="top" class="name"><label for="firstName">First
+										Name:&nbsp;
+								</label></td>
 							<td valign="top" class="value" style="width: 40px"><span
 								class="personShow" id="firstNameId"
 								class="asset_details_block_task">
@@ -88,7 +88,7 @@
 						</tr>
 
 						<tr class="prop">
-							<td valign="top" class="name"><label for="nickName">Location
+							<td valign="top" class="name"><label for="nickName">City/State/Zip
 									:</label></td>
 							<td valign="top" class="value" colspan="2"><span
 								class="personShow" id="locationId">
@@ -110,14 +110,14 @@
 						</tr>
 
 						<tr class="prop">
-							<td valign="top" class="name"><label>Roles :</label></td>
+							<td valign="top" class="name"><label>Functions :</label></td>
 							<td valign="top" class="value" colspan="2">
 								<table style="border: 0px">
-									<tbody id="rolesTbodyId">
-										<g:each in="${rolesForPerson}" status="i" var="role">
-											<tr id="roleTrId_${i}">
+									<tbody id="funcsTbodyId">
+										<g:each in="${personFunctions}" status="i" var="function">
+											<tr id="funcTrId_${i}">
 												<td><span class="personShow">
-														${role.description.substring(role.description.lastIndexOf(':') +1).trim()}
+														${function.description.substring(function.description.lastIndexOf(':') +1).trim()}
 												</span><br /></td>
 											</tr>
 										</g:each>

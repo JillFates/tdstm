@@ -88,7 +88,7 @@
 					</tr>
 
 					<tr class="prop">
-						<td valign="top" class="name"><label for="nickName">Location
+						<td valign="top" class="name"><label for="nickName">City/State/Zip
 								:</label></td>
 						<td valign="top" class="value" colspan="2"><input type="text"
 							maxlength="64" id="locationId" name="location"
@@ -108,23 +108,23 @@
 					</tr>
 
 					<tr class="prop">
-						<td valign="top" class="name"><label>Roles :</label></td>
+						<td valign="top" class="name"><label>Functions :</label></td>
 						<td valign="top" class="value" colspan="2">
 							<table style="border: 0px">
-								<tbody id="rolesTbodyId">
-									<g:each in="${rolesForPerson}" status="i" var="role">
-										<tr id="roleTrId_${i}">
-											<td><g:select from="${availabaleRoles}" id="roleId"
-													name="role" value="${role.id}" optionKey="id"
+								<tbody id="funcsTbodyId">
+									<g:each in="${personFunctions}" status="i" var="function">
+										<tr id="funcTrId_${i}">
+											<td><g:select from="${availabaleFunctions}" id="functionId"
+													name="function" value="${function.id}" optionKey="id"
 													optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"
-													onChange="changeManageRole()" /> &nbsp;&nbsp; <a
-												href="javascript:deleteRolesRow('roleTrId_${i}')"><span
+													onChange="changeManageFuncs()" /> &nbsp;&nbsp; <a
+												href="javascript:deleteFuncsRow('funcTrId_${i}')"><span
 													class="clear_filter">X</span></a><br /></td>
 										</tr>
 									</g:each>
 								</tbody>
-							</table> <span style="cursor: pointer;" onclick="addRoles()"><b>Add
-									Roles </b></span>
+							</table> <span style="cursor: pointer;" onclick="addFunctions()"><b>Add
+									Function </b></span>
 						</td>
 					</tr>
 				</tbody>
@@ -132,11 +132,11 @@
 			</table>
 			<input type="hidden" id="maxSize" value="${sizeOfassigned }">
 
-			<input type="hidden" id="manageRolesId" name="manageRoles" value="0">
+			<input type="hidden" id="manageFuncsId" name="manageFuncs" value="0">
 
 
-			<div id="availableRolesId" style="display: none">
-				<g:select from="${availabaleRoles}" id="roleId" name="roleToAdd"
+			<div id="availableFuncsId" style="display: none">
+				<g:select from="${availabaleFunctions}" id="functionId" name="funcToAdd"
 					optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"
 					value="" optionKey="id" />
 			</div>
@@ -165,7 +165,7 @@
 								size="15" style="width: 112px; height: 14px;"
 								name="availability" id="availabilityId_${i}"
 								value="<tds:convertDate date='${blackOutDay.exceptionDay}' timeZone='${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}'/>" />
-								<a href="javascript:deleteRolesRow('dateTrId_${i}')">&nbsp;&nbsp;<span
+								<a href="javascript:deleteFuncsRow('dateTrId_${i}')">&nbsp;&nbsp;<span
 									class='clear_filter'>X</span></a></td>
 						</tr>
 					</g:each>

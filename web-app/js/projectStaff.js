@@ -129,24 +129,24 @@ function updatePerson(tab,form){
  * to Add roles for person
  */
 
-function addRoles(){
-	var selectHtml = $("#availableRolesId").html().replace("roleToAdd","role")
+function addFunctions(){
+	var selectHtml = $("#availableFuncsId").html().replace("funcToAdd","function")
 	var id=$("#maxSize").val()
-	$("#rolesTbodyId").append("<tr id='roleTrId_"+id+"'><td> "+ selectHtml +"<a href=\"javascript:deleteRolesRow(\'roleTrId_"+id+"')\">&nbsp;&nbsp;"+"<span class=\'clear_filter\'>X</span></a> </td></tr><br/>")
+	$("#funcsTbodyId").append("<tr id='roleTrId_"+id+"'><td> "+ selectHtml +"<a href=\"javascript:deleteFuncsRow(\'roleTrId_"+id+"')\">&nbsp;&nbsp;"+"<span class=\'clear_filter\'>X</span></a> </td></tr><br/>")
 	$("#maxSize").val(parseInt(id)+1)
-	$("#manageRolesId").val(parseInt($("#manageRolesId").val())+1)
+	$("#manageFuncsId").val(parseInt($("#manageFuncsId").val())+1)
 }
 /*
  * to delete roles for person
  */
 
-function deleteRolesRow( rowId ){
+function deleteFuncsRow( rowId ){
 	$("#"+rowId).remove()
-	$("#manageRolesId").val(parseInt($("#manageRolesId").val())+1)
+	$("#manageFuncsId").val(parseInt($("#manageFuncsId").val())+1)
 }
 
-function changeManageRole(){
-	$("#manageRolesId").val(1)
+function changeManageFuncs(){
+	$("#manageFuncsId").val(1)
 }
 
 /*
@@ -156,7 +156,7 @@ function changeManageRole(){
 function addBlackOutDay(){
 	var id = $("#availableId").val()
 	var inputHtml = $("#dateDivId").html().replace("availId","availId_"+id).replace("available","availability")
-	$("#blackOutDay").append("<tr id='roleTrId_"+id+"'><td>"+inputHtml +"<a href=\"javascript:deleteRolesRow(\'dateTrId_"+id+"')\">&nbsp;&nbsp;"+"<span class=\'clear_filter\'>X</span></a> </td></tr><br/>")
+	$("#blackOutDay").append("<tr id='roleTrId_"+id+"'><td>"+inputHtml +"<a href=\"javascript:deleteFuncsRow(\'dateTrId_"+id+"')\">&nbsp;&nbsp;"+"<span class=\'clear_filter\'>X</span></a> </td></tr><br/>")
 	showCalender("#availId_"+id)//$("#availabilityId_"+id).datepicker();
 	$("#availableId").val(parseInt($("#availableId").val())+1)
 

@@ -451,13 +451,12 @@ class PersonController {
 						userLogin.errors.allErrors.each{println it}
 					}
 				}
-				if(params.manageRoles != '0' && params.role){
-					if(params.role){
-						partyRelationshipService.updatePartyRoleByType('staff', personInstance, params.role)
-						Set newRoles = []
-						newRoles.addAll(params.role)
-						userPreferenceService.setUserRoles(newRoles, personInstance.id)
-					}
+                def functions = params.list("function")
+				if(params.manageFuncs != '0' || functions){
+                    def staffCompany = partyRelationshipService.getStaffCompany(personInstance)
+                    def companyProject = Project.findByClient(staffCompany)
+					if(companyProject)
+                        partyRelationshipService.updateStaffFunctionse(companyProject, personInstance,functions)
 				}
 				def personExpDates =params.list("availability")
 				if(personExpDates){
@@ -563,7 +562,7 @@ class PersonController {
 		def location = params.location
 		def phase = params.list("phaseArr[]")
 		def assigned = params.assigned
-
+		def loginPerson = securityService.getUserLoginPerson()
 		def paramsMap = [sortOn : params.sortOn, firstProp : params.firstProp, orderBy : params.orderBy]
 		log.info("projectId:$projectId, role:$role, scale:$scale, location:$location, assigned:$assigned, paramsMap:$paramsMap")
 
@@ -592,7 +591,7 @@ class PersonController {
 					projectList << project
 				} else {
 					// Lets make sure that the user has access to it (is assoicated with the project)
-					def staffProjectRoles = partyRelationshipService.getStaffProjectRoles(loginPerson.id, projectId)
+					def staffProjectRoles = partyRelationshipService.getProjectStaffFunction(projectId, loginPerson.id)
 					if (staffProjectRoles.size() > 0) {
 						projectList << project
 					}
@@ -767,18 +766,22 @@ class PersonController {
 		def person = Person.get(params.personId)
 		def blackOutdays = person.blackOutDates.sort{it.exceptionDay}
 		def subject = SecurityUtils.subject
-		def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = :person"+
-            " and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ",[person:person]).partyIdFrom[0]
-		
-		def rolesForPerson = PartyRole.findAll("from PartyRole where party = :person and roleType.description like 'staff%' group by roleType",[person:person])?.roleType
-		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
+		def company = partyRelationshipService.getStaffCompany( person )
+        def staffCompany = partyRelationshipService.getStaffCompany(person)
+        def companyProject = Project.findByClient(staffCompany)
+        def personFunctions = []
+        if(companyProject)
+            personFunctions = partyRelationshipService.getProjectStaffFunction(companyProject.id, person.id)
+            
+		def availabaleFunctions = RoleType.findAllByDescriptionIlike("Staff%")
+        
 		def isProjMgr = false
 		if( subject.hasRole("PROJ_MGR")){
 			isProjMgr = true
 		}
 		
-		render(template:tab ,model:[person:person, company:company, rolesForPerson:rolesForPerson, availabaleRoles:availabaleRoles, 
-            sizeOfassigned:(rolesForPerson.size()+1), blackOutdays:blackOutdays, isProjMgr:isProjMgr])
+		render(template:tab ,model:[person:person, company:company, personFunctions:personFunctions, availabaleFunctions:availabaleFunctions, 
+            sizeOfassigned:(personFunctions.size()+1), blackOutdays:blackOutdays, isProjMgr:isProjMgr])
 			
 	}
 	
