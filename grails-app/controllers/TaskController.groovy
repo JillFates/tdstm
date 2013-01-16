@@ -14,6 +14,7 @@ class TaskController {
 	def taskService
 
 def jdbcTemplate
+def grailsApplication
 
     def index = { }
 	
@@ -167,10 +168,13 @@ def jdbcTemplate
 		def moveEventId=params.moveEventId	
 		def moveEvent = MoveEvent.read(moveEventId)
 		
-		def tmpPath = "/tmp/"
-		def targetPath = "/var/www/tdstm/images/tmp/"
-		def targetURI = "/image/tmp/"
-		def dotExec = "/usr/bin/dot"
+		def tmpDir = grailsApplication.config.graph.tmpDir
+		def targetDir = grailsApplication.config.graph.targetDir
+		def targetURI = grailsApplication.config.graph.targetURI
+		def dotExec = grailsApplication.config.graph.graphviz.dotCmd
+		def graphType = grailsApplication.config.graph.graphviz.graphType
+
+		log.info "tmpDir=$tmpDir, targetDir=$targetDir, targetURI=$targetURI, dotExec=$dotExec, graphType=$graphType"
 		
 		if (! moveEvent) {
 			response.status=404
@@ -182,7 +186,7 @@ def jdbcTemplate
 		def now = new Date().format('yyyy-MM-dd H:m:s')
 		
 		def filename = "runbook-$moveEventId-${new Date().format('yyyyMMdd-HHmmss')}"
-		def dotFN = "${tmpPath}${filename}.dot"
+		def dotFN = "${tmpDir}${filename}.dot"
 		def dotFile = new File(dotFN);
 		def categories = GormUtil.asQuoteCommaDelimitedString(AssetComment.moveDayCategories)
 		
@@ -238,8 +242,8 @@ digraph runbook {
 
 		dotFile << "}\n"
 		
-		def imgFilename = "${filename}.svgz"				
-		def proc = "${dotExec} -Tsvgz -v -o ${targetPath}${imgFilename} ${dotFile}".execute()
+		def imgFilename = "${filename}.${graphType}"				
+		def proc = "${dotExec} -T${graphType} -v -o ${targetDir}${imgFilename} ${dotFile}".execute()
 	 	proc.waitFor()
 	
 		if (proc.exitValue() == 0) {
@@ -250,7 +254,7 @@ digraph runbook {
 		} else {
 			render "<pre>exit code: ${ proc.exitValue()}\n stderr: ${proc.err.text}\n stdout: ${proc.in.text}"
 			
-			def errFile = new File("${targetPath}${filename}.err")
+			def errFile = new File("${targetDir}${filename}.err")
 			errFile << "exit code:\n\n${ proc.exitValue()}\n\nstderr:\n${proc.err.text}\n\nstdout:\n${proc.in.text}"
 			
 			
