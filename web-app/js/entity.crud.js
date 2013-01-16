@@ -376,7 +376,8 @@ function getAuditDetails(redirectTo, assetType, value){
 }
 
 function editAudit(redirectTo, source, assetType, value){
-	new Ajax.Request('../assetEntity/edit?id='+value+'&redirectTo='+redirectTo+'&source='+source,{asynchronous:true,evalScripts:true,
+	new Ajax.Request('../assetEntity/edit?id='+value+'&redirectTo='+redirectTo+'&source='+source+'&assetType='+assetType,
+	{asynchronous:true,evalScripts:true,
 		onComplete:function(e){
 			$("#auditDetailViewId").html(e.responseText)
 			if(source==0){
@@ -450,7 +451,7 @@ function updateModelAudit(){
 }
 
 function createAuditPage(type,source,rack,roomName,location,position){
-	new Ajax.Request('../assetEntity/create?redirectTo=assetAudit',{asynchronous:true,evalScripts:true,
+	new Ajax.Request('../assetEntity/create?redirectTo=assetAudit'+'&assetType='+type,{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
 				$("#auditDetailViewId").html(data.responseText)
 				$("#auditLocationId").val(location)
@@ -459,7 +460,7 @@ function createAuditPage(type,source,rack,roomName,location,position){
 				$("#auditRackId").val(rack)
 				$("#auditPosId").val(position)
 				$("#auditLocationId").val(location)
-				if(source==0){
+				if(source==0 && type!='Blade'){
 					$("#auditLocationId").attr("name","targetLocation")
 					$("#auditRoomId").attr("name","targetRoom")
 					$("#auditRackId").attr("name","targetRack")
@@ -471,6 +472,19 @@ function createAuditPage(type,source,rack,roomName,location,position){
 	)
 }
 
+function createBladeAuditPage(source,blade,position,manufacturer,assetType,assetEntityId, moveBundleId){
+	new Ajax.Request('../assetEntity/create?redirectTo=assetAudit'+'&assetType='+assetType+'&source='+source,{asynchronous:true,evalScripts:true,
+		onComplete:function(data){
+				$("#auditDetailViewId").html(data.responseText)
+				$("#BladeChassisId").val(blade)
+				$("#bladePositionId").val(position)
+				$("#assetTypeId").val(assetType)
+				$("#moveBundleId").val(moveBundleId)
+				$("#sourceId").val(source)
+				$("#auditDetailViewId").show()
+		}}
+	)
+}
 
 function saveAuditPref(val, id){
 	new Ajax.Request('../room/show?id='+id+'&auditView='+val,{asynchronous:true,evalScripts:true,

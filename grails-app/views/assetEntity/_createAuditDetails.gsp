@@ -8,6 +8,7 @@
 <input  name="source"  id="sourceId" type="hidden" value="1"/>
 <table>
 	<tr><td colspan="2"><b>Asset Audit Create</b></td></tr>
+	<g:if test="${assetType != 'Blade'}" >
 	<tr class="prop" >
 		<td class="label">Location</td>
 		<td class="label" nowrap="nowrap">
@@ -15,6 +16,21 @@
 			<input type="text" id="auditRoomId" name="sourceRoom"  size="6" />
 		</td>
 	</tr>
+	</g:if>
+	<g:if test="${assetType == 'Blade'}">
+	<tr class="prop">
+		<td class="label">Blade</td>
+		<td class="label">
+			<input type="text" id="BladeChassisId" ${source=='1' ? 'name="sourceBladeChassis"' : 'name="targetBladeChassis"'} />
+		</td>
+	</tr>
+	<tr class="prop">
+		<td class="label">Blade Position</td>
+		<td class="label">
+			<input type="text" id="bladePositionId" ${source=='1' ? 'name="sourceBladePosition" ' : 'name="targetBladePosition"'} />
+		</td>
+	</tr>
+	</g:if>
 	<tr class="prop">
 		<td class="label">Name</td>
 		<td class="label">
@@ -51,6 +67,7 @@
 			<input type="text" id="serialNumber" name="serialNumber" />
 		</td>
 	</tr>
+	<g:if test="${assetType != 'Blade'}" >
 	<tr class="prop">
 		<td class="label">Rack</td>
 		<td class="label" nowrap="nowrap">
@@ -58,6 +75,7 @@
 			Pos :<input type="text" id="auditPosId" name="sourceRackPosition" size="6" >
 		</td>
 	</tr>
+	</g:if>
 	<tr class="prop">
 		<td class="label">Tag</td>
 		<td class="label">
@@ -67,7 +85,7 @@
 	<tr class="prop">
 		<td class="label">Bundle</td>
 		<td class="label">
-			<g:select from="${moveBundleList}" id="room" name="moveBundle.id" optionKey="id" optionValue="name" />
+			<g:select from="${moveBundleList}" id="moveBundleId" name="moveBundle.id" optionKey="id" optionValue="name" />
 		</td>
 	</tr>
 	<tr class="prop">

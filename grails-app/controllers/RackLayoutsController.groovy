@@ -360,6 +360,7 @@ class RackLayoutsController {
 		def rackId = paramsMap.rackId
 		def forWhom = paramsMap.forWhom
 		def commit = paramsMap.commit
+		
 		asset.each {
 			def row = new StringBuffer("<tr>")
 			if(it.asset) {
@@ -385,6 +386,8 @@ class RackLayoutsController {
 					def overlappedAsset
 					def overlappedAssets
 					def bladeTable = ""
+					def bladeLayoutMap = ['asset':it, 'permission':rackLayoutsHasPermission, 'hideIcons':hideIcons, 'redirectTo':redirectTo ,
+											'rackId':rackId, 'commit':commit, 'forWhom':forWhom]
 					if(location == 1)
 						overlappedAssets = AssetEntity.findAllWhere( project:assetEntity.project, assetTag : tagValue, sourceRack: assetEntity.sourceRack )
 					else 
@@ -394,7 +397,8 @@ class RackLayoutsController {
 							moveBundle += (overlapAsset?.moveBundle ? overlapAsset?.moveBundle.name : "") + "<br/>"
 							if(overlapAsset.model && overlapAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on')){
 								hasBlades = true
-								bladeTable = generateBladeLayout(it, overlapAsset, rackLayoutsHasPermission, hideIcons, redirectTo, rackId, commit)
+								bladeLayoutMap << ['overlappedAsset':overlapAsset]
+								bladeTable = generateBladeLayout(bladeLayoutMap)
 							}
 							assetTag += """<a href="javascript:${forWhom ? "editAudit('roomAudit','${it.source}'" : "getEntityDetails('redirectTo'"},'${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>"
 							if(hasBlades){
@@ -406,7 +410,8 @@ class RackLayoutsController {
 						moveBundle += (overlappedAsset?.moveBundle ? overlappedAsset?.moveBundle.name : "") + "<br/>"
 						if(overlappedAsset.model && overlappedAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on') ){
 							hasBlades = true
-							bladeTable = generateBladeLayout(it, overlappedAsset,rackLayoutsHasPermission, hideIcons, redirectTo, rackId, commit)
+							bladeLayoutMap << ['overlappedAsset':overlappedAsset]
+							bladeTable = generateBladeLayout(bladeLayoutMap)
 						}
 						cabling = !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : ""
 						assetTag += """<a href="javascript:${forWhom ? "editAudit('roomAudit','${it.source}'" : "getEntityDetails('redirectTo'"},'${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>&nbsp;"
@@ -512,7 +517,17 @@ class RackLayoutsController {
 	/*************************************************
 	 * Construct Balde layout for RackLayouts report
 	 **************************************************/
-	def generateBladeLayout(def assetDetails, def assetEntity, def rackLayoutsHasPermission, def hideIcons, def redirectTo, def rackId, def commit){
+	def generateBladeLayout(bladeLayoutMap){
+		
+		def assetDetails = bladeLayoutMap.asset
+		def assetEntity = bladeLayoutMap.overlappedAsset
+		def rackLayoutsHasPermission = bladeLayoutMap.permission
+		def hideIcons = bladeLayoutMap.hideIcons
+		def redirectTo = bladeLayoutMap.redirectTo
+		def rackId = bladeLayoutMap.rackId
+		def commit = bladeLayoutMap.commit
+		def forWhom = bladeLayoutMap.forWhom
+		
 		def showIconPref = userPreferenceService.getPreference("ShowAddIcons")
 		def bladeTable = '<table class="bladeTable"><tr>'
 		def rowspan = assetDetails.asset?.rowspan != 0 ? assetDetails.asset?.rowspan : 1
@@ -559,13 +574,13 @@ class RackLayoutsController {
 					if((bladeSpan == 2) &&  hasError )
 						bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>&nbsp;</td>"
 					else
-						bladeTable += """<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href="javascript:getEntityDetails('${redirectTo}','Blade',${blade.id})" title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"""
+						bladeTable += """<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href="javascript:${forWhom ? "editAudit('roomAudit','${assetDetails.source}'" : "getEntityDetails('${redirectTo}'" },'Blade',${blade.id})" title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"""
 				} else {
 					bladeTable += "<td class='emptyBlade' style='height:${tdHeight}px'>"
 					if(commit !="Print View"){
 						bladeTable += """<div ${showIconPref ? '' : 'style="display:none"'} class="rack_menu create_${rackId}"><img src="../i/rack_add2.png"/>
 							<ul>
-								<li><a href="javascript:createBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}','${assetEntity.manufacturer?.id}','Blade','${assetEntity?.id}','${assetEntity.moveBundle?.id}')">Create asset  </a></li>
+								<li><a href="javascript:${forWhom ? 'createBladeAuditPage' : 'createBladeDialog'}('${assetDetails.source}','${assetEntity.assetTag}','${i}','${assetEntity.manufacturer?.id}','Blade','${assetEntity?.id}','${assetEntity.moveBundle?.id}')">Create asset  </a></li>
 								<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}','assign')">Assign asset </a></li>
 								<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}','reassign')">Reassign asset </a></li>
 							</ul>

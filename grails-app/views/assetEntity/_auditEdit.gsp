@@ -7,6 +7,7 @@
 <input  name="source"  id="sourceId" type="hidden" value="${source ?: 1}"/>
 <table>
 	<tr><td colspan="2"><b>Asset Audit Edit</b></td></tr>
+	<g:if test="${assetType != 'Blade'}" >
 	<tr class="prop" >
 		<td class="label">Location</td>
 		<td class="label" nowrap="nowrap">
@@ -14,6 +15,21 @@
 			<input type="text" ${source=='1' ? 'name="sourceRoom" value="'+assetEntityInstance.sourceRoom+'"' : 'name="targetRoom" value="'+assetEntityInstance.targetRoom+'"'} size="6" />
 		</td>
 	</tr>
+	</g:if>
+	<g:if test="${assetType=='Blade'}">
+	<tr class="prop">
+		<td class="label">Blade</td>
+		<td class="label">
+			<input type="text" ${source=='1' ? 'name="sourceBladeChassis" value="'+assetEntityInstance.sourceBladeChassis+'"' : 'name="targetBladeChassis" value="'+assetEntityInstance.targetBladeChassis+'"'} />
+		</td>
+	</tr>
+	<tr class="prop">
+		<td class="label">Blade Position</td>
+		<td class="label">
+			<input type="text" ${source=='1' ? 'name="sourceBladePosition" value="'+assetEntityInstance.sourceBladePosition+'"' : 'name="targetBladePosition" value="'+assetEntityInstance.targetBladePosition+'"'} />
+		</td>
+	</tr>
+	</g:if>
 	<tr class="prop">
 		<td class="label">Name</td>
 		<td class="label">
@@ -50,6 +66,7 @@
 			<input type="text" id="serialNumber" name="serialNumber" value="${assetEntityInstance.serialNumber}">
 		</td>
 	</tr>
+	<g:if test="${assetType != 'Blade'}" >
 	<tr class="prop">
 		<td class="label">Rack</td>
 		<td class="label" nowrap="nowrap">
@@ -57,6 +74,7 @@
 			Pos :<input type="text" ${source=='1' ? 'name="sourceRackPosition" value="'+assetEntityInstance.sourceRackPosition+'"' : 'name="targetRackPosition" value="'+assetEntityInstance.targetRackPosition+'"'} size="6">
 		</td>
 	</tr>
+	</g:if>
 	<tr class="prop">
 		<td class="label">Tag</td>
 		<td class="label">
