@@ -456,7 +456,7 @@ class PersonController {
                     def staffCompany = partyRelationshipService.getStaffCompany(personInstance)
                     def companyProject = Project.findByClient(staffCompany)
 					if(companyProject)
-                        partyRelationshipService.updateStaffFunctionse(companyProject, personInstance,functions)
+                        partyRelationshipService.updateStaffFunctions(companyProject, personInstance,functions)
 				}
 				def personExpDates =params.list("availability")
 				if(personExpDates){

@@ -531,7 +531,7 @@ class PartyRelationshipService {
      * @param functionIds - functions list that assigned to staff
      * @return nothing
      */
-    def updateStaffFunctionse(project, person, functionIds){
+    def updateStaffFunctions(project, person, functionIds){
         
         def staffType = PartyRelationshipType.read("PROJ_STAFF")
         def projectRole = RoleType.read("PROJECT")
