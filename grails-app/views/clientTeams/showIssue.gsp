@@ -245,10 +245,16 @@
 </div>
 <script type="text/javascript">
 $( function() {
-	 if($('#statusEditId_'+${assetComment.id}).val()=='Completed'){
-	       $('#noteId_'+${assetComment.id}).hide()
-	       $('#resolutionId_'+${assetComment.id}).show()
+	 var objId = ${assetComment.id}
+	 var updatePerm = ${permissionForUpdate}
+	 if($('#statusEditId_'+objId).val()=='Completed'){
+	       $('#noteId_'+objId).hide()
+	       $('#resolutionId_'+objId).show()
 	 }
+	 $("#editComment_"+objId).keypress(function(e){
+		 if(updatePerm && e.keyCode==13){e.preventDefault(); validateComment(objId); }
+		 else if(!updatePerm && e.keyCode==13){e.preventDefault(); }
+	 });
 });
 
  function showResolve(){
@@ -261,12 +267,12 @@ $( function() {
    }
  }
  function validateComment(objId){
-	 var status = $('#statusEditId_'+${assetComment.id}).val()
-	 var params = {   'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 
-						 'category':$('#categoryEditId_'+objId).val(), 'assignedTo':$('#assignedToEditId_'+objId).val(),
-						 'status':$('#statusEditId_'+objId).val(),'currentStatus':$('#currentStatus_'+objId).val(), 
-						 'note':$('#noteEditId_'+objId).val(),'id':objId,'view':'myTask', 'tab': $('#tabId').val()
-						}
+	 var status = $('#statusEditId_'+objId).val()
+	 var params = {'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 
+				   'category':$('#categoryEditId_'+objId).val(), 'assignedTo':$('#assignedToEditId_'+objId).val(),
+				   'status':$('#statusEditId_'+objId).val(),'currentStatus':$('#currentStatus_'+objId).val(), 
+				   'note':$('#noteEditId_'+objId).val(),'id':objId,'view':'myTask', 'tab': $('#tabId').val()
+				  }
 		 jQuery.ajax({
 				url: '../task/update',
 				data: params,
@@ -277,7 +283,7 @@ $( function() {
 					} else {
 					     $('#myTaskList').html(data)
 					     $('#showStatusId_'+objId).show()
-						 $('#issueTrId_'+id).each(function(){
+						 $('#issueTrId_'+objId).each(function(){
 							$(this).removeAttr('onclick')
 							$(this).unbind("click").bind("click", function(){
 								hideStatus(objId,status)

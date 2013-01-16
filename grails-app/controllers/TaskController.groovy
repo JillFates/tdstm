@@ -13,8 +13,8 @@ class TaskController {
 	def commentService
 	def taskService
 
-def jdbcTemplate
-def grailsApplication
+    def jdbcTemplate
+    def grailsApplication
 
     def index = { }
 	
@@ -39,7 +39,7 @@ def grailsApplication
 			if (params.status == AssetCommentStatus.DONE) {
 				redirParams << [sync:1]
 			}
-				redirect(controller:'clientTeams', action:'listTasks', params:redirParams)			
+			forward(controller:'clientTeams', action:'listTasks', params:redirParams)			
 		} else {
 			// Coming from the Task Manager
 			render map as JSON

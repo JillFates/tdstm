@@ -253,12 +253,18 @@
 </div>
 <script type="text/javascript">
  $( function() {
-	 if($('#statusEditId_'+${assetComment.id}).val()=='Completed'){
-	       $('#noteId_'+${assetComment.id}).hide()
-	       $('#noteTrId_'+${assetComment.id}).hide()
-	       $('#resolutionId_'+${assetComment.id}).show()
-	       $('#resolutionTrId_'+${assetComment.id}).show()
+	 var objId = ${assetComment.id}
+	 var updatePerm = ${permissionForUpdate}
+	 if($('#statusEditId_'+objId).val()=='Completed'){
+	       $('#noteId_'+objId).hide()
+	       $('#noteTrId_'+objId).hide()
+	       $('#resolutionId_'+objId).show()
+	       $('#resolutionTrId_'+objId).show()
 	 }
+	 $("#editComment_"+objId).keypress(function(e){
+		 if(updatePerm && e.keyCode==13){e.preventDefault(); validateCommentMobile(objId); }
+		 else if(!updatePerm && e.keyCode==13){e.preventDefault(); }
+	 });
  });
 
  function showResolve(){
