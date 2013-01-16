@@ -3764,9 +3764,12 @@ class AssetEntityController {
 		// Now morph the list into a list of name: Role names
 		def list = []
 		projectStaff.each {
-			list << [id:it.staff.id, nameRole:"${it.staff.firstName} ${it.staff.lastName}: ${it.role.description.split(':')[1]?.trim()}"]
+			list << [ id:it.staff.id, 
+				nameRole:"${it.role.description.split(':')[1]?.trim()}: ${it.staff.firstName} ${it.staff.lastName}",
+				sortOn:"${it.role.description.split(':')[1]?.trim()},${it.staff.firstName} ${it.staff.lastName}"
+			]
 		}
-		list.sort { it.nameRole }
+		list.sort { it.sortOn }
 		
 		def firstOption = [value:'', display:'Unassigned']
 		def paramsMap = [selectId:viewId, selectName:viewId, options:list, 
