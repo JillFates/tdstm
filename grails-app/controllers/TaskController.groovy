@@ -170,7 +170,7 @@ def jdbcTemplate
 		def tmpPath = "/tmp/"
 		def targetPath = "/var/www/tdstm/images/tmp/"
 		def targetURI = "/image/tmp/"
-		def dotExec = "/usr/local/bin/dot"
+		def dotExec = "/usr/bin/dot"
 		
 		if (! moveEvent) {
 			response.status=404
@@ -238,8 +238,8 @@ digraph runbook {
 
 		dotFile << "}\n"
 		
-		def imgFilename = "${filename}.png"				
-		def proc = "${dotExec} -Tpng -v -o ${targetPath}${imgFilename} ${dotFile}".execute()
+		def imgFilename = "${filename}.svg"				
+		def proc = "${dotExec} -Tsvg -v -o ${targetPath}${imgFilename} ${dotFile}".execute()
 	 	proc.waitFor()
 	
 		if (proc.exitValue() == 0) {
