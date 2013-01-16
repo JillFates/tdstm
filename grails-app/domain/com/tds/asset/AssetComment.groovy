@@ -61,6 +61,11 @@ class AssetComment {
 	
 	// TODO : Add custom validator for role that checks that the role is legit for "Staff : *" of RoleType
 	
+	// Grouping of the various categories
+	def static final preMoveCategories = ['general', 'discovery', 'planning','walkthru','premove']
+	def static final moveDayCategories = ['moveday','shutdown',	'physical','physical-source','physical-target',	'startup']
+	def static final postMoveCategories = ['postmove']
+
 	static constraints = {	
 		// comment(size:255)	// TODO: add constraint for comment size
 		assetEntity(nullable:true )
@@ -80,14 +85,7 @@ class AssetComment {
 		dateResolved( nullable:true  )
 		dueDate( nullable:true)
 		commentCode( blank:true, nullable:true  )
-		category( blank:false, nullable:false ,
-			inList:[
-				'general', 'discovery', 'planning','walkthru','premove',
-				'moveday','shutdown',
-				'physical','physical-source','physical-target',
-				'startup','postmove'
-			]
-		)
+		category( blank:false, nullable:false ,	inList:preMoveCategories + moveDayCategories + postMoveCategories )
 		displayOption( blank:false, inList: ['G','U'] ) // Generic or User
 		attribute( blank:true, nullable:true  )
 		commentKey( blank:true, nullable:true  )
