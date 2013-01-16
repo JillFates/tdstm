@@ -12,6 +12,8 @@ import com.tdsops.tm.enums.domain.RoleTypeGroup
  class SecurityService {
 	
 	static transactional = true
+	
+    def jdbcTemplate
 
 	/**
 	 * Used to determine if the current user has a specified role
@@ -58,11 +60,14 @@ import com.tdsops.tm.enums.domain.RoleTypeGroup
 			// Need to lookup the User's Party role to the Project
 			def client=project.client
 			// TODO: runbook : getPersonRoles not fully implemented when the project is passed.  Need to test...
+			// THIS SHOULD BE LOOKING AT PARTY GROUP, NOT party_relationship - don't use
 			def sql = """SELECT role_type_code_to_id
 				FROM party_relationship
 				WHERE party_relationship_type_id='PROJ_STAFF' AND party_id_from_id=${client.id} AND party_id_to_id=${person.id} AND status_code='ENABLED'"""
 			// log.error "getPersonRoles: sql=${sql}"
 			roles = jdbcTemplate.queryForList(sql)
+			
+			log.error "Using getPersonRoles in unsupported manor"
 			// log.error "*** Getting from PartyRelationship"
 			
 		} else {

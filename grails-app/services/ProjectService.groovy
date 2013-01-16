@@ -3,6 +3,9 @@ import org.jsecurity.SecurityUtils
 class ProjectService {
 
     static transactional = true
+	def securityService
+	def partyRelationshipService
+	
 /*
  * Returns list of completed Project means projects whose completion time is less than today's date
  */

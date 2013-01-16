@@ -10,5 +10,6 @@ databaseChangeLog = {
 	include file: '20121224-cleanup-excel-templates.groovy'
 	include file: '20130109-alter-validation-column.groovy'
 	include file: '20130111-add-roletypes.groovy'
+	include file: '20130114-fix-roletypes.groovy'
 	
 }
