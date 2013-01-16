@@ -238,14 +238,14 @@ digraph runbook {
 
 		dotFile << "}\n"
 		
-		def imgFilename = "${filename}.svg"				
-		def proc = "${dotExec} -Tsvg -v -o ${targetPath}${imgFilename} ${dotFile}".execute()
+		def imgFilename = "${filename}.svgz"				
+		def proc = "${dotExec} -Tsvgz -v -o ${targetPath}${imgFilename} ${dotFile}".execute()
 	 	proc.waitFor()
 	
 		if (proc.exitValue() == 0) {
 			// Delete the dot file because we don't need it
 			dotFile.delete()
-			redirect(ur:"${targetURI}${imgFilename}")
+			redirect(uri:"${targetURI}${imgFilename}")
 			
 		} else {
 			render "<pre>exit code: ${ proc.exitValue()}\n stderr: ${proc.err.text}\n stdout: ${proc.in.text}"
