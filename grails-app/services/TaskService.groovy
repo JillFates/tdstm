@@ -34,6 +34,7 @@ class TaskService {
 	def dataSource
 	def jdbcTemplate
 	def namedParameterJdbcTemplate
+	def partyRelationshipService
 	def securityService
 	def quartzScheduler
 	def workflowService
@@ -60,9 +61,9 @@ class TaskService {
 
 		// log.info "getUserTasks: limitHistory=${limitHistory}, sortOn=${sortOn}, sortOrder=${sortOrder}, search=${search}"
 		
-		// Get the user's roles for the current project
-		// TODO : Runbook: getUserTasks - should get the user's project roles instead of global roles
-		def roles = securityService.getPersonRoles(person, RoleTypeGroup.STAFF)
+		// Get the user's functions (PKA roles) for the current project
+		def roles = partyRelationshipService.getProjectStaffFunctions(project.id, person.id)?.id
+		
 		def type=AssetCommentType.TASK
 		
 		def now = TimeUtil.nowGMT()

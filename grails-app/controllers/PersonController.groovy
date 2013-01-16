@@ -591,7 +591,7 @@ class PersonController {
 					projectList << project
 				} else {
 					// Lets make sure that the user has access to it (is assoicated with the project)
-					def staffProjectRoles = partyRelationshipService.getProjectStaffFunction(projectId, loginPerson.id)
+					def staffProjectRoles = partyRelationshipService.getProjectStaffFunctions(projectId, loginPerson.id)
 					if (staffProjectRoles.size() > 0) {
 						projectList << project
 					}
@@ -771,7 +771,7 @@ class PersonController {
         def companyProject = Project.findByClient(staffCompany)
         def personFunctions = []
         if(companyProject)
-            personFunctions = partyRelationshipService.getProjectStaffFunction(companyProject.id, person.id)
+            personFunctions = partyRelationshipService.getProjectStaffFunctions(companyProject.id, person.id)
             
 		def availabaleFunctions = RoleType.findAllByDescriptionIlike("Staff%")
         

@@ -462,16 +462,23 @@ class PartyRelationshipService {
  	}
 
 	/**
-	 * Used to get list of roles that a Staff member has on a Project
+	 * Used to get list of functions that a Staff member has been assigned to on a Project
 	 * @param Integer staffId - staff person id
 	 * @param Integer projectId - project id that the staff may be associate with
 	 * @return array of role codes
 	 */
-	def getProjectStaffFunction(def projectId, def staffId) {
+	def getProjectStaffFunctions(def projectId, def staffId) {
 		
-		def projectRoles = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom=$projectId and p.partyIdTo=$staffId" )
-		def roles = projectRoles.roleTypeCodeTo
-		return roles
+		def projectRoles = PartyRelationship.findAll("from PartyRelationship p \
+			where p.partyRelationshipType='PROJ_STAFF' \
+			and p.roleTypeCodeFrom='PROJECT' \
+			and p.partyIdFrom.id=? \
+			and p.partyIdTo.id=?", [projectId, staffId] )
+			
+		def functions = projectRoles.roleTypeCodeTo
+		
+		// log.info "getProjectStaffFunction(projectId:$projectId, staffId:$staffId) - $functions"
+		return functions
 	}
 	
     /*-------------------------------------------------------
@@ -481,7 +488,11 @@ class PartyRelationshipService {
       *-------------------------------------------------------*/
      def getProjectManagers( def projectId ){
     	 def list = []
-    	 def projectManagers = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeTo = 'PROJ_MGR' ")
+    	 def projectManagers = PartyRelationship.findAll("from PartyRelationship p \
+			where p.partyRelationshipType = 'PROJ_STAFF' \
+			and p.roleTypeCodeFrom='PROJECT' \
+			and p.partyIdFrom = $projectId \
+			and p.roleTypeCodeTo = 'PROJ_MGR' ")
     	 def managerNames = new StringBuffer()
     	 projectManagers.each{staff ->
     	 	managerNames.append(staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
