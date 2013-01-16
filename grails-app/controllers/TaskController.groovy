@@ -4,11 +4,16 @@ import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdssrc.grails.HtmlUtil
 
+import com.tdssrc.grails.GormUtil
+import org.apache.commons.lang.StringEscapeUtils
+
 class TaskController {
 	
 	def securityService
 	def commentService
 	def taskService
+
+def jdbcTemplate
 
     def index = { }
 	
@@ -148,5 +153,108 @@ class TaskController {
 	*/
 	def _actionButtonTd(tdId, button) {
 		return """<td id="${tdId}" width="8%" nowrap="nowrap">${button}</td>"""	
+	}
+	
+	/**
+	 * Generates a graph of the Move Event Tasks
+	 * @param moveEventId
+	 * @return redirect to URI of image or HTML showing the error
+	 */
+	def moveEventTaskGraph = {
+		
+		// TODO : refactor this code into the taskService appropriately
+		
+		def moveEventId=params.moveEventId	
+		def moveEvent = MoveEvent.read(moveEventId)
+		
+		def tmpPath = "/tmp/"
+		def targetPath = "/var/www/tdstm/images/tmp/"
+		def targetURI = "/image/tmp/"
+		def dotExec = "/usr/local/bin/dot"
+		
+		if (! moveEvent) {
+			response.status=404
+			render "404 Not Found"
+		} 
+		def project = moveEvent.project
+		def projectId = project.id
+
+		def now = new Date().format('yyyy-MM-dd H:m:s')
+		
+		def filename = "runbook-$moveEventId-${new Date().format('yyyyMMdd-HHmmss')}"
+		def dotFN = "${tmpPath}${filename}.dot"
+		def dotFile = new File(dotFN);
+		def categories = GormUtil.asQuoteCommaDelimitedString(AssetComment.moveDayCategories)
+		
+		def query = """
+			SELECT 
+			  t.task_number, 
+			  GROUP_CONCAT(s.task_number SEPARATOR ',') AS successors,
+			  IFNULL(a.asset_name,'') as asset, 
+			  t.comment as task, 
+			  t.role,
+			  -- IF(t.hard_assigned=1,t.role,'') as hard_assign, 
+			  IFNULL(CONCAT(first_name,' ', last_name),'') as hard_assign,
+			  t.duration
+			  -- IFNULL(t.est_start,'') AS est_start
+			FROM asset_comment t
+			LEFT OUTER JOIN task_dependency d ON d.predecessor_id=t.asset_comment_id
+			LEFT OUTER JOIN asset_comment s ON s.asset_comment_id=d.asset_comment_id
+			LEFT OUTER JOIN asset_entity a ON t.asset_entity_id=a.asset_entity_id
+			LEFT OUTER JOIN person ON t.owner_id=person.person_id
+			WHERE t.project_id=${projectId} AND t.move_event_id=${moveEventId} AND
+			  t.category IN ( ${categories} )
+			GROUP BY t.task_number
+			"""
+		def tasks = jdbcTemplate.queryForList(query)
+		
+		dotFile << """#
+# TDS Runbook for Project ${project}, Move Event ${moveEvent.name}
+# Exported on ${now}
+# This is  .DOT file format of the project tasks
+#
+digraph runbook {
+	graph [rankdir=LR, fontsize=8, margin=0.001];
+"""
+
+		tasks.each {
+		//	AND t.task_number < 40
+		//    println "Record: $it"
+		    def task = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
+		    task = (task.size() > 35) ? task[0..34] : task 
+			dotFile << "\t${it.task_number} [label=\"${task}\"];\n"
+			def successors = it.successors
+			if (successors) {
+				successors = (successors as Character[]).join('')
+		//		println "successors-a: ${successors}"
+				successors = successors.split(',')
+				successors.each { s -> 
+					if (s.size() > 0) {
+						dotFile << "\t${it.task_number} -> ${s};\n"
+					}
+				}
+			}	
+		}
+
+		dotFile << "}\n"
+		
+		def imgFilename = "${filename}.png"				
+		def proc = "${dotExec} -Tpng -v -o ${targetPath}${imgFilename} ${dotFile}".execute()
+	 	proc.waitFor()
+	
+		if (proc.exitValue() == 0) {
+			// Delete the dot file because we don't need it
+			dotFile.delete()
+			redirect(ur:"${targetURI}${imgFilename}")
+			
+		} else {
+			render "<pre>exit code: ${ proc.exitValue()}\n stderr: ${proc.err.text}\n stdout: ${proc.in.text}"
+			
+			def errFile = new File("${targetPath}${filename}.err")
+			errFile << "exit code:\n\n${ proc.exitValue()}\n\nstderr:\n${proc.err.text}\n\nstdout:\n${proc.in.text}"
+			
+			
+		}
+				
 	}
 }

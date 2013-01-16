@@ -12,6 +12,8 @@
 		     <tds:hasPermission permission='MoveEventShowView '>
 		        <span class="menuButton"><g:link class="create" action="create">New Event</g:link></span>
 		     </tds:hasPermission>
+				<span class="menuButton"><g:link class="create" controller="task" action="moveEventTaskGraph"
+					params="[moveEventId: moveEventInstance.id]">View Task Graph</g:link></span>
 		    </div>
 		    <br/>
             <g:if test="${flash.message}">
