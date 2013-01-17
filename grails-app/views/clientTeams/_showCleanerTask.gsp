@@ -25,12 +25,11 @@ function startprintjob(){
 	    // THIS IS THE PLACE TO ADD YOUR DATA
 	    jobdata.ClearRecords();
 	    jobdata.AddNewRecord();
-	    jobdata.SetDataField('assetName', document.issueUpdateForm.assetName.value); 
+	    jobdata.SetDataField('serverName', document.issueUpdateForm.assetName.value); 
 	    jobdata.SetDataField('assetTag', document.issueUpdateForm.assetTag.value);
 	    // now we print one copy of the label with default settings
 	    try {
 	    	job.PrintForm();
-		    save_field(document.issueUpdateForm.Printers)
 	    } catch (e) {
 		    alert ("TFORMer returned an error!" + e +
 		           "\nError description: " + e.description + 
@@ -261,7 +260,6 @@ function mySelect(x)
 								</option>
 							</g:each>
 						</select> 
-						<input type= "hidden" name="PrinterName" id="PrinterName"/>
 					</td>
 			</tr>
 			<tr>

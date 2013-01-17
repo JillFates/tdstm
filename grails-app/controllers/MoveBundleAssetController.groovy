@@ -716,8 +716,8 @@ class MoveBundleAssetController {
 					if(it.type == "Blade"){
 						def chassisAsset = AssetEntity.findWhere(assetTag:it.chassis,moveBundle:MoveBundle.get(it.bundle))
 						def pos = it.bladePos ? "-"+it.bladePos : ""
-						it.rack = chassisAsset.sourceRack +  pos
-						it.assetName = chassisAsset.assetName
+						it.rack = chassisAsset?.sourceRack +  pos
+						it.assetName = chassisAsset?.assetName
 					} else {
 						def pos = it.uposition ? "-"+it.uposition : ""
 						it.rack = it.rack + pos
