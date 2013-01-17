@@ -48,7 +48,7 @@ class UserLoginController {
 		SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
 		
 		def query = new StringBuffer("""SELECT role_type_id AS role, p.person_id AS personId, first_name AS firstName , u.username as username ,
-			last_name as lastName, pg.name AS company, u.active, ifnull(u.last_login,'') AS lastLogin, u.expiry_date AS expiryDate,
+			last_name as lastName, pg.name AS company, u.active, u.last_login AS lastLogin, u.expiry_date AS expiryDate,
 			u.created_date AS dateCreated, u.user_login_id AS userLoginId
 			FROM party_role pr 
 			LEFT OUTER JOIN person p on p.person_id=pr.party_id
@@ -98,7 +98,7 @@ class UserLoginController {
 			personLogin.setRole( it.role )
 			personLogin.setPerson(it.firstName +" "+ it.lastName)
 			personLogin.setCompany(it.company)
-			personLogin.setLastLogin(it.lastLogin ? formatter.parse(it.lastLogin) : null)
+			personLogin.setLastLogin(it.lastLogin)
 			personLogin.setDateCreated(it.dateCreated)
 			personLogin.setExpiryDate( it.expiryDate )
 			userLoginList.add(personLogin)
