@@ -13,8 +13,9 @@ class UserLoginController {
 	def partyRelationshipService
 	def userPreferenceService
 	def securityService
-    def projectService
-    
+	def projectService
+	def jdbcTemplate
+
 	def index = { redirect(action:list,params:params) }
 
 	// the delete, save and update actions only accept POST requests
@@ -44,37 +45,41 @@ class UserLoginController {
 
 		def userLoginInstanceList
 		def userLoginSize
+		SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
+		
+		def query = new StringBuffer("""SELECT role_type_id AS role, p.person_id AS personId, first_name AS firstName , u.username as username ,
+			last_name as lastName, pg.name AS company, u.active, ifnull(u.last_login,'') AS lastLogin, u.expiry_date AS expiryDate,
+			u.created_date AS dateCreated, u.user_login_id AS userLoginId
+			FROM party_role pr 
+			LEFT OUTER JOIN person p on p.person_id=pr.party_id
+			LEFT OUTER JOIN user_login u on u.person_id=p.person_id
+			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF' 
+					AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=pr.party_id
+			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
+			WHERE u.active = '${active}' """)
+						
 
 		def userLoginHasPermission = RolePermissions.hasPermission("ShowAllUsers")
 		if( userLoginHasPermission ){
 			if(params.companyName && params.companyName != "All" ){
+				// If companId is requested
 				def company  = PartyGroup.get(params.companyName)
 				companyId = company ? company.id : null
 			} 
 			if( !companyId && params.companyName != "All" ){
+				// Still if no companyId found trying to get companyId from the session
 				companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
 				if(!companyId){
+					// Still if no luck setting companyId as logged-in user's companyId .
 					def person = userLogin.person
-					companyId = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${person.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ").partyIdFrom[0]?.id
+					companyId = partyRelationshipService.getStaffCompany(person)?.id
 				}
 			}
-			if(companyId || params.companyName=="All"){
-				def personsList = partyRelationshipService.getCompanyStaff( companyId )
-				def personIds = ""
-				personsList.each{
-					personIds += "$it.id,"
-				}
-				if(personIds){
-				    personIds = personIds.substring(0,personIds.lastIndexOf(','))
-					def sort = params.sort ? params.sort : 'username'
-					def order = params.order ? params.order : 'asc'
-					
-					userLoginInstanceList = UserLogin.findAll("from UserLogin u where u.person in ($personIds) and active = '${active}' order by u.${sort} ${order}")
-					 
-				} else if(params.companyName=="All" ){
-					userLoginInstanceList = UserLogin.findAllByActive(active).sort{it.username}
-				}
-			}	
+			if(companyId){
+				query.append(" AND pg.party_group_id = $companyId ")
+			}
+			query.append(" ORDER BY pr.role_type_id, pg.name, first_name, last_name ")
+			userLoginInstanceList = jdbcTemplate.queryForList(query.toString())
 		} else {
 			userLoginInstanceList = []
 		}
@@ -88,14 +93,14 @@ class UserLoginController {
 		def userLoginList = []
 		userLoginInstanceList.each{
 			AssetEntityBean personLogin = new AssetEntityBean();
-			def userCompany = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${it.person?.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")?.partyIdFrom
-			personLogin.setId(it.id)
+			personLogin.setId(it.userLoginId)
 			personLogin.setUserName(it.username)
-			personLogin.setPerson(it.person.toString())
-			personLogin.setCompany(userCompany[0].toString())
-			personLogin.setLastLogin(it.lastLogin)
-			personLogin.setDateCreated(it.createdDate)
-			personLogin.setExpiryDate(it.expiryDate)
+			personLogin.setRole( it.role )
+			personLogin.setPerson(it.firstName +" "+ it.lastName)
+			personLogin.setCompany(it.company)
+			personLogin.setLastLogin(it.lastLogin ? formatter.parse(it.lastLogin) : null)
+			personLogin.setDateCreated(it.dateCreated)
+			personLogin.setExpiryDate( it.expiryDate )
 			userLoginList.add(personLogin)
 		}
 		// Statements for JMESA integration

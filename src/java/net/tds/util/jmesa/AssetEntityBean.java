@@ -55,7 +55,16 @@ public class AssetEntityBean implements Serializable {
 	private String company;
 	private Date dateCreated;
 	private Date expiryDate;
+	private String role;
 	
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
 	public String getUserName() {
 		return userName;
 	}

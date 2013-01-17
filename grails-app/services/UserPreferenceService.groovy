@@ -368,6 +368,6 @@ class UserPreferenceService  {
 	 */
 	def getPreferenceByUserAndCode(def userLogin, def preference){
 		def userPreference = UserPreference.findByUserLoginAndPreferenceCode(userLogin, preference)
-		return userPreference.value
+		return userPreference?.value
 	}
 }

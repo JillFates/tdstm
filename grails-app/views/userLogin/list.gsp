@@ -57,6 +57,9 @@
 			                     <jmesa:htmlColumn property="person" title="Person" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 									${fieldValue(bean:userLoginInstance, field:'person')}
 								 </jmesa:htmlColumn>
+								 <jmesa:htmlColumn property="role" title="Role" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+									${fieldValue(bean:userLoginInstance, field:'role')}
+								 </jmesa:htmlColumn>
 								  <jmesa:htmlColumn property="company" title="Company" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 									${userLoginInstance.company != 'null' ? userLoginInstance.company : '' }
 								 </jmesa:htmlColumn>
