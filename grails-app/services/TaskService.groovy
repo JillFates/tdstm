@@ -145,7 +145,7 @@ class TaskService {
 			sql.append("""AND t.role = 'CLEANER' """)
 		}else{
 			sql.append("""AND( t.assigned_to_id=:assignedToId OR
-						(t.role IN (:roles) AND t.status IN (:statuses) AND t.hard_assigned=0 OR (t.hard_assigned=1 AND t.assigned_to_id=:assignedToId) ) ) """)
+						(${roles ? 't.role IN (:roles) AND ' : ''}  t.status IN (:statuses) AND t.hard_assigned=0 OR (t.hard_assigned=1 AND t.assigned_to_id=:assignedToId) ) ) """)
 		}
 		
 		search = org.apache.commons.lang.StringUtils.trimToNull(search)
@@ -192,8 +192,8 @@ class TaskService {
 			sql.append( (sortAndOrder ? ', ' : '') + 'score DESC, task_number ASC' )
 		}
 		
-		//log.info "getUserTasks: SQL: " + sql.toString()
-		//log.info "getUserTasks: SQL params: " + sqlParams
+		log.error "getUserTasks: SQL: " + sql.toString()
+		log.error "getUserTasks: SQL params: " + sqlParams
 		// Get all tasks from the database and then filter out the TODOs based on a filtering
 		
 		def allTasks = namedParameterJdbcTemplate.queryForList( sql.toString(), sqlParams )
