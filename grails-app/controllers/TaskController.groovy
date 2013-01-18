@@ -159,6 +159,7 @@ class TaskController {
 	/**
 	 * Generates a graph of the Move Event Tasks
 	 * @param moveEventId
+	 * @param mode - flag as to what mode to display the graph as (s=status, ?=default)
 	 * @return redirect to URI of image or HTML showing the error
 	 */
 	def moveEventTaskGraph = {
@@ -174,7 +175,23 @@ class TaskController {
 		def dotExec = grailsApplication.config.graph.graphviz.dotCmd
 		def graphType = grailsApplication.config.graph.graphviz.graphType
 
-		log.info "tmpDir=$tmpDir, targetDir=$targetDir, targetURI=$targetURI, dotExec=$dotExec, graphType=$graphType"
+		def statusColor = [
+			(AssetCommentStatus.HOLD):['black', '#FFFF33'],
+			(AssetCommentStatus.PLANNED):['black', '#FFFFFF'],
+			(AssetCommentStatus.READY):['white', 'green'],
+			(AssetCommentStatus.PENDING):['black', '#FFFFFF'],
+			(AssetCommentStatus.STARTED):['white', 'darkturquoise'],
+			(AssetCommentStatus.DONE):['white', '#24488A'],
+			(AssetCommentStatus.TERMINATED):['white', 'black'],			
+		]
+
+		def mode = params.mode ?: ''
+		if (mode && ! "s".contains(mode)) {
+			mode = ''
+			log.warn "The wrong mode [$mode] was specified"
+		}
+			
+		// log.info "tmpDir=$tmpDir, targetDir=$targetDir, targetURI=$targetURI, dotExec=$dotExec, graphType=$graphType"
 		
 		if (! moveEvent) {
 			response.status=404
@@ -197,6 +214,7 @@ class TaskController {
 			  IFNULL(a.asset_name,'') as asset, 
 			  t.comment as task, 
 			  t.role,
+			  t.status,
 			  -- IF(t.hard_assigned=1,t.role,'') as hard_assign, 
 			  IFNULL(CONCAT(first_name,' ', last_name),'') as hard_assign,
 			  t.duration
@@ -218,15 +236,19 @@ class TaskController {
 # This is  .DOT file format of the project tasks
 #
 digraph runbook {
-	graph [rankdir=LR, fontsize=8, margin=0.001];
+	graph [rankdir=LR, margin=0.001];
+	node [ fontsize=10, fontname="Helvetica" ]
+  
 """
-
+	
+		def color=''
 		tasks.each {
 		//	AND t.task_number < 40
 		//    println "Record: $it"
 		    def task = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
+			color = mode == 's' ? "fillcolor=\"${statusColor[it.status][1]}\", fontcolor=\"${statusColor[it.status][0]}\", style=filled" : ''
 		    task = (task.size() > 35) ? task[0..34] : task 
-			dotFile << "\t${it.task_number} [label=\"${task}\"];\n"
+			dotFile << "\t${it.task_number} [label=\"${task}\" $color];\n"
 			def successors = it.successors
 			if (successors) {
 				successors = (successors as Character[]).join('')

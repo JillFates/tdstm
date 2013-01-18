@@ -87,6 +87,10 @@
 				<input type="checkbox" id="justMyTasksCB" ${ (justMyTasks=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'justMyTasks');"/>
 				<b> Just My Tasks</b>&nbsp;&nbsp;
 				<span style="float:right;">
+					<span class="menuButton"><g:link class="create" controller="task" action="moveEventTaskGraph"
+						params="[moveEventId:filterEvent,mode:'s']">View Task Graph</g:link>
+					</span>
+				
 					<input type="button" value="Refresh" onclick="submitForm()" style="cursor: pointer;">&nbsp;
 					<select id="selectTimedBarId"
 					    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', params:'\'timer=\'+ this.value +\'&prefFor=myTask\' ', onComplete:'changeTimebarPref(e)') }">
