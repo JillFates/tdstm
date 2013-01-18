@@ -998,8 +998,9 @@ class ClientTeamsController {
 		if (viewMode) { 
 			session.setAttribute('TASK_VIEW_MODE', viewMode)
 		}
-
 		// log.info "listComment() sort=${params.sort}, order=${params.order}"
+
+		def isCleaner = partyRelationshipService.staffHasFunction(project.id, person.id, 'CLEANER')
 
 		// Use the taskService.getUserTasks service to get all of the tasks [all,todo]
 		def tasks = taskService.getUserTasks(person, project, false, 7, params.sort, params.order, search )
@@ -1026,8 +1027,12 @@ class ClientTeamsController {
 		}
 		def timeToRefresh = getSession()?.getAttribute("MY_TASK")?.MY_TASK
 		// Determine the model and view
-		def model = [taskList:issueList, tab:tab, todoSize:todoSize, allSize:allSize, search:search, sort:params.sort, order:params.order,
-			      	 personId : person.id, timeToUpdate:timeToRefresh ?: 60, isOnIE : false]
+		def model = [taskList:issueList, tab:tab, todoSize:todoSize, allSize:allSize, 
+			search:search, sort:params.sort, order:params.order,
+	 		personId:person.id, isCleaner:isCleaner,
+			timeToUpdate:timeToRefresh ?: 60, 
+			isOnIE:false]
+			
 		def view = params.view == "myTask" ? "_tasks" : "myIssues"
 		if ( session.getAttribute('TASK_VIEW_MODE') == 'mobile') {
 			view = params.view == "myTask" ? "_tasks_m" : view+"_m"
@@ -1035,8 +1040,9 @@ class ClientTeamsController {
 			model << [timers:session.MY_ISSUE_REFRESH?.MY_ISSUE_REFRESH]
 		}
 		if ( request.getHeader ( "User-Agent" ).contains ( "MSIE" ) ) {
-			model << [isOnIE : true]
+			model.isOnIE= true
 		}
+		
 		// Send the user on his merry way
 		render (view:view, model:model)
 		
@@ -1055,47 +1061,92 @@ class ClientTeamsController {
 		render map as JSON
 	}
 	
-	def showIssue={
+	/**
+	 * Used in the MyTasks view to display the details of a Task/Comment
+	 * @param issueId
+	 * @return HTML that is used by an AJax call
+	 */
+	def showIssue ={
 		def project = securityService.getUserCurrentProject()
-		def assetComment = AssetComment.get(params.issueId)
+		def assetComment = AssetComment.findByIdAndProject(params.issueId, project)
+		
+		def selectCtrlId = "assignedToEditId_${assetComment.id}"
+		def assignToSelect = taskService.assignToSelectHtml(project.id, params.issueId, assetComment.assignedTo?.id, selectCtrlId)
+		
+		// Bounce back to the user if we didn't get a legit id, associated with the project
+		if (! assetComment ) {
+			def person = securityService.getUserLoginPerson()
+			log.error "${person} attempted an invalide access a task/comment with id ${params.issueId} on project $project"
+			render "Unable to find specified record"
+			return
+		}
+		
 		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def etFinish
-		def noteList = assetComment.notes.sort{it.dateCreated}
-		def notes = []
-		def browserTest = false
+		def etFinish	
+			
+		def browserTest = false		
 		if ( !request.getHeader ( "User-Agent" ).contains ( "MSIE" ) ) {
 			browserTest = true
 		}
+		
+		def noteList = assetComment.notes.sort{it.dateCreated}
+		def notes = []
 		noteList.each{
 			def dateCreated = TimeUtil.convertInToUserTZ(it.dateCreated, tzId).format("E, d MMM 'at ' HH:mma")
 			notes << [dateCreated , it.createdBy.toString() ,it.note]
 		}
+		
 		def viewMode = session.getAttribute("TASK_VIEW_MODE")
-		def subject = SecurityUtils.subject
-		def permissionForUpdate = false
-		def userLogin = securityService.getUserLogin()
+		
+		// Determine if the user should be able to edit the task. The rules are:
+		// 1. If ADMIN, CLIENT_ADMIN or CLIENT_MGR can always edit
+		// 2. Can ALWAYS add a NOTE.
+		// 3. Change person - when task is in the PENDING/READY status? 
+		 
+		def assignmentPerm = false
+		def categoryPerm = false
+		def permissionForUpdate = true
+
+		if (securityService.hasRole( ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR'])) {
+			assignmentPerm = categoryPerm = true
+		} else {
+			// AssignmentPerm can be changed if task is not completed/terminated
+			assignmentPerm = ! [AssetCommentStatus.DONE, AssetCommentStatus.TERMINATED].contains(assetComment.status)
+		}
+		
+		/*
 		if( subject.hasRole("PROJ_MGR")){
 			permissionForUpdate = true
 		} else if(assetComment.assignedTo==userLogin.person || (assetComment.hardAssigned==0 && assetComment.role)){
-		          def predList = assetComment.taskDependencies
-				  def predComments = predList.predecessor
-				  Set predStatus = predComments.status
-				  if(predStatus.size()==1 && predStatus.contains("Completed")){
-					  permissionForUpdate = true
-				  }
+		   def predList = assetComment.taskDependencies
+		   def predComments = predList.predecessor
+		   Set predStatus = predComments.status
+		   if (predStatus.size()==1 && predStatus.contains("Completed")){
+			  permissionForUpdate = true
+		   }
 		}
-		if(assetComment?.estFinish){
+		*/
+		
+		if (assetComment?.estFinish){
 			etFinish = estformatter.format(GormUtil.convertInToUserTZ(assetComment.estFinish, tzId));
 		}
+		
 		def successor = TaskDependency.findAllByPredecessor( assetComment )
 		def projectStaff = partyRelationshipService.getProjectStaff( project.id )?.staff
 		projectStaff.sort{it.firstName}
 	    
-		def model = [assetComment:assetComment,notes:notes, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1,
-											permissionForUpdate:permissionForUpdate, successor:successor, etFinish:etFinish, projectStaff:projectStaff,
-											browserTest:browserTest]
-		
+		def model = [ assetComment:assetComment,
+			notes:notes, 
+			statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1,
+			permissionForUpdate:permissionForUpdate, 
+			assignmentPerm:assignmentPerm, 
+			categoryPerm:categoryPerm,
+			successor:successor, 
+			etFinish:etFinish, 
+			projectStaff:projectStaff,
+			browserTest:browserTest,
+			assignToSelect:assignToSelect]
 		
 		if(viewMode=='mobile'){
 			render (view:'showIssue_m',model:model)

@@ -34,10 +34,11 @@ import com.tdsops.tm.enums.domain.RoleTypeGroup
 	boolean hasRole( java.util.ArrayList roles ) {
 		boolean found = false
 		roles.each() {
-			if (SecurityUtils.subject.hasRole( it ) ) {
+			if (! found && SecurityUtils.subject.hasRole( it ) ) {
 				found = true
 			}
 		}
+		return found
 	}
 	
 	/**

@@ -10,10 +10,10 @@
 </head>
 <body>
 		<div class="menu4">
-		<g:if test="${isOnIE}">
+		<g:if test="${isOnIE && isCleaner}">
 		<OBJECT id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C"
-				CODEBASE="${resource(dir:'resource',file:'TFORMer60.cab')}"
-				style="height: 1px;"></OBJECT>
+			CODEBASE="${resource(dir:'resource',file:'TFORMer60.cab')}"
+			style="height: 1px;"></OBJECT>
 		</g:if>
 			<ul>
 					<g:if test="${tab && tab == 'todo'}">
@@ -144,22 +144,21 @@
 		</table>
 	</div>
 <script type="text/javascript">
-/*----------------------------------------------------------
-	* To load the installed printers into session by initializing TFORMer
-	*---------------------------------------------------------*/
-	if(${isOnIE}){
-		function initializeTF(){
-			window.TF.RefreshOSPrinters();
-			var def = "";
-			var dropdown = new Array();
-			for (i = 0; i < window.TF.GetOSPrintersCount(); i++){
-				dropdown.push(window.TF.GetOSPrinter(i))
-			}
-			${remoteFunction(controller:'moveTech', action:'setPrintersIntoSession', params:'\'dropdown=\' + dropdown')}
+	<g:if test="${isOnIE && isCleaner}">
+    /*
+     * To load the installed printers into session by initializing TFORMer
+     */
+	$(function() {
+		window.TF.RefreshOSPrinters();
+		var def = "";
+		var dropdown = new Array();
+		for (i = 0; i < window.TF.GetOSPrintersCount(); i++){
+			dropdown.push(window.TF.GetOSPrinter(i))
 		}
-		initializeTF()
-	}
-	$( function() {
+		${remoteFunction(controller:'moveTech', action:'setPrintersIntoSession', params:'\'dropdown=\' + dropdown')}
+	});
+	</g:if>
+	$(function() {
 		$('#issueTimebar').width($('#issueTable').width())
 		$('#selectTimedBarId').val(${timeToUpdate})
 		taskManagerTimePref = ${timeToUpdate}
@@ -190,10 +189,10 @@
 				new Ajax.Request('../assetEntity/updateStatusSelect?id='+id,{asynchronous:false,evalScripts:true,
 					onComplete:function(e){
 						var resp = e.responseText;
-							resp = resp.replace("statusEditId","statusEditId_"+id).replace("showResolve(this.value)","showResolve()")
-							$('#statusEditTrId_'+id).html(resp)
-							// $('#statusEditId_'+id).val(status)
-			 			}
+						resp = resp.replace("statusEditId","statusEditId_"+id).replace("showResolve(this.value)","showResolve()")
+						$('#statusEditTrId_'+id).html(resp)
+						// $('#statusEditId_'+id).val(status)
+			 		}
 				})
 			}
 		});

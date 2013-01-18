@@ -33,34 +33,45 @@
 			<tr>
 				<td valign="top" class="name"><label for="comment">Task:</label></td>
 				<td colspan="3">
-				  <input type="text"  title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" value="${assetComment.comment}" style="width: 500px"/>
+				  <input type="text" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" value="${assetComment.comment}" style="width: 500px"/>
 				</td>
 			</tr>	
 			<tr>
 				<td valign="middle" class="name"><label>Dependencies:</label></td>
-				<td valign="top" class="name" colspan="3"><label>Predecessors:</label>&nbsp;&nbsp;
-				<span style="width: 50%">
-							<g:each in="${assetComment.taskDependencies}" var="task">
-							<span class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}" onclick="showAssetComment(${task.predecessor.id})">
-								${task.predecessor.category}&nbsp;&nbsp;&nbsp;&nbsp;${task.predecessor}
-							</span>
-							</g:each>&nbsp;&nbsp;
-				</span>
-				<label>Successors:</label>
-				<span  style="width: 50%">
-							<g:each in="${successor}" var="task">
-							<span class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}" onclick="showAssetComment(${task.assetComment.id})">
-								${task.assetComment.category}&nbsp;&nbsp;&nbsp;&nbsp;${task.assetComment}
-							</span>
-							</g:each>
-				</span>
+				<td valign="top" class="name" colspan="3">
+				<div style="width:400px; float:left">
+					<fieldset>
+					<legend>Predecessors</legend>
+					<g:each in="${assetComment.taskDependencies}" var="task">
+					<span class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}" onclick="showAssetComment(${task.predecessor.id})">
+						${task.assetComment.taskNumber}:${task.assetComment.comment} (${task.assetComment.category})
+					</span>
+					<br/>
+					</g:each>
+					</fieldset>
+				</div>
+				<div style="width:400px; float:left; margin-left:30px;">
+					<fieldset>
+					<legend>Successors</legend>
+					<g:each in="${successor}" var="task">
+					<span class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}" onclick="showAssetComment(${task.assetComment.id})">
+						${task.assetComment.taskNumber}:${task.assetComment.comment} (${task.assetComment.category})
+					</span>
+					<br/>
+					</g:each>
+					</fieldset>
+				</div>
 				</td>
 			</tr>
 		 	
+			<tr class="prop" id="teamId"  >
+				<td valign="top" class="name"><label for="team">Function:</label></td>
+				<td valign="top" class="value" id="team_${assetComment.id}" colspan="3" nowrap="nowrap">${assetComment.role}</td>
+			</tr>
 			<tr class="prop issue" id="assignedToTrEditId" >
 				<td valign="top" class="name"><label for="assignedTo">Assigned:</label></td>
 				<td valign="top" id="assignedToEditTdId" style="width: 20%;" colspan="3" >
-					<g:select id="assignedToEditId_${assetComment.id}" name="assignedTo" from="${projectStaff}" value="${assetComment.assignedTo?.id}" optionKey="id" noSelection="['':'please select']"></g:select>
+					${assignToSelect}
 				</td>
 			</tr> 
 			<tr class="prop issue" id="estFinishShowId"  >
@@ -72,8 +83,8 @@
 				<td valign="top" class="value" colspan="3"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="${assetComment.category}"></g:select></td>
 			</tr>
 			<tr>
-			<g:if test="${assetComment.assetEntity}">
-		   		  <td>Asset:</td><td style="width: 1%">&nbsp;${assetComment?.assetEntity.assetName}</td>
+				<g:if test="${assetComment.assetEntity}">
+		   			<td>Asset:</td><td style="width: 1%">&nbsp;${assetComment?.assetEntity.assetName}</td>
 		   		</g:if>
 		   		<g:if test="${assetComment.moveEvent}">
 		   		  <td style="width: 6%">Move Event:</td><td>${assetComment?.moveEvent.name}</td>
@@ -138,12 +149,7 @@
 			
 			<tr>
 			    <td class="buttonR" >
-					<g:if test="${permissionForUpdate==true}">
-						<input type="button" value="Update Task" onclick="validateComment(${assetComment.id})" />
-					</g:if>
-					<g:else>
-						<input type="button" value="Update Task" disabled="disabled" />
-					</g:else>
+					<input type="button" value="Update Task" onclick="validateComment(${assetComment.id})" />
 				</td>
 				<td class="buttonR" colspan="3" style="text-align:right;padding: 5px 3px;">
 					<input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" />
@@ -246,15 +252,24 @@
 <script type="text/javascript">
 $( function() {
 	 var objId = ${assetComment.id}
-	 var updatePerm = ${permissionForUpdate}
 	 if($('#statusEditId_'+objId).val()=='Completed'){
 	       $('#noteId_'+objId).hide()
 	       $('#resolutionId_'+objId).show()
 	 }
+	
+	// Disable the AssignTo SELECT if user doensn't have permission
+	var editAssignTo=${assignmentPerm ? 'true' : 'false'}
+	if (!editAssignTo) {
+		$('#assignedToEditId_'+objId).attr('disabled', 'disabled');
+	}
+	
+	 /*
+	 var updatePerm = ${permissionForUpdate}
 	 $("#editComment_"+objId).keypress(function(e){
-		 if(updatePerm && e.keyCode==13){e.preventDefault(); validateComment(objId); }
-		 else if(!updatePerm && e.keyCode==13){e.preventDefault(); }
+		 if (updatePerm && e.keyCode==13){e.preventDefault(); validateComment(objId); }
+		 else if(!updatePerm && e.keyCode==13) {e.preventDefault(); }
 	 });
+	*/
 });
 
  function showResolve(){

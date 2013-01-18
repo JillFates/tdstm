@@ -192,8 +192,9 @@ class TaskService {
 			sql.append( (sortAndOrder ? ', ' : '') + 'score DESC, task_number ASC' )
 		}
 		
-		log.error "getUserTasks: SQL: " + sql.toString()
-		log.error "getUserTasks: SQL params: " + sqlParams
+		// log.error "getUserTasks: SQL: " + sql.toString()
+		// log.error "getUserTasks: SQL params: " + sqlParams
+		
 		// Get all tasks from the database and then filter out the TODOs based on a filtering
 		
 		def allTasks = namedParameterJdbcTemplate.queryForList( sql.toString(), sqlParams )
@@ -1016,4 +1017,42 @@ class TaskService {
    }
    
 
+	/**
+	 * Generates a SELECT control for selecting a staff assign to
+	 * @param projectId	Id of the project to get staff for
+	 * @param taskId - task that 
+	 * @param elementId CSS element id
+	 * @param defaultId
+	 * @return HTML of a SELECT control
+	 */
+	def assignToSelectHtml(projectId, taskId, defaultId, elementId) {
+		def selectedId = 0
+
+		// Find the person assigned to existing comment or default to the current user
+		if (taskId) {
+			def task = AssetComment.read(taskId)
+			selectedId = task.assignedTo ? task.assignedTo.id : defaultId
+		} 
+
+		def projectStaff = partyRelationshipService.getProjectStaff( projectId )
+	
+		// Now morph the list into a list of name: Role names
+		def list = []
+		projectStaff.each {
+			list << [ id:it.staff.id, 
+				nameRole:"${it.role.description.split(':')[1]?.trim()}: ${it.staff.firstName} ${it.staff.lastName}",
+				sortOn:"${it.role.description.split(':')[1]?.trim()},${it.staff.firstName} ${it.staff.lastName}"
+			]
+		}
+		list.sort { it.sortOn }
+	
+		def firstOption = [value:'', display:'Unassigned']
+		def paramsMap = [selectId:elementId, selectName:elementId, options:list, 
+			optionKey:'id', optionValue:'nameRole', 
+			optionSelected:selectedId, firstOption:firstOption ]
+		def assignedToSelect = HtmlUtil.generateSelect( paramsMap )
+		
+		return assignedToSelect
+	}
+	
 }

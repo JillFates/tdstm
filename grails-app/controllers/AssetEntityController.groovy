@@ -3743,6 +3743,9 @@ class AssetEntityController {
 	 * 
 	 */
 	def updateAssignedToSelect = {
+		
+		// TODO : Need to refactor this function to use the new TaskService.assignToSelectHtml method
+		
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
 		def viewId = params.forView

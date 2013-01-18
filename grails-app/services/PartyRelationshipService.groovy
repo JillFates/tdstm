@@ -481,6 +481,25 @@ class PartyRelationshipService {
 		return functions
 	}
 	
+	/**
+	 * Used to determine if a person/staff is assigned a particular function for a given project
+	 * @param projectId
+	 * @param staffId
+	 * @param function	- a single or array of function codes (e.g. 'PROJ_MGR' or ['PROJ_MGR', 'ACCT_MGR'])
+	 * @return boolean
+	 */
+	boolean staffHasFunction(projectId, staffId, function) {
+		def projectRoles = PartyRelationship.findAll("from PartyRelationship p \
+			where p.partyRelationshipType='PROJ_STAFF' \
+			and p.roleTypeCodeFrom='PROJECT' \
+			and p.partyIdFrom.id=? \
+			and p.partyIdTo.id=? \
+			and p.roleTypeCodeTo.id in (?)", [projectId, staffId, function] )
+			
+		return projectRoles.size() > 0
+	}
+	
+	
     /*-------------------------------------------------------
       *  Return the Projectmanagers 
       *  @author srinivas
