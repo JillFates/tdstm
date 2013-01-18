@@ -203,6 +203,14 @@
 	});
 
 	B1.Start(100);
+	
+function onScan(ev){
+	var scan = ev.data;
+	document.forms[0].search.value = scan.value;
+	document.forms[0].submit();
+}
+document.addEventListener("BarcodeScanned", onScan, false);
+
 </script>
 </body>
 </html>

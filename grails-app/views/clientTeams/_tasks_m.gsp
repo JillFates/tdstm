@@ -123,3 +123,13 @@
 	</div>
     </g:form>
 </div>
+
+<script type="text/javascript" >
+function onScan(ev){
+	var scan = ev.data;
+	document.forms[0].search.value = scan.value;
+	document.forms[0].submit();
+}
+
+document.addEventListener("BarcodeScanned", onScan, false);
+</script>
