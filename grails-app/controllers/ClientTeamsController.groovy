@@ -63,7 +63,7 @@ class ClientTeamsController {
 					def swimlane = Swimlane.findByNameAndWorkflow(role ? role : "MOVE_TECH", Workflow.findByProcess(moveBundle.workflowCode) )
 					
 					def hasSourceAssets = AssetEntity.find("from AssetEntity WHERE sourceTeamMt = $teamId OR sourceTeamSa = $teamId OR sourceTeamDba = $teamId")
-					if(hasSourceAssets || role =="CLEANER"){
+					if (hasSourceAssets || role =="CLEANER"){
 						def sourceAssetsList = bundleAssetsList.findAll{it[sourceTeamType.get(role)]?.id == teamId }
 						def sourceAssets = sourceAssetsList.size()
 						
@@ -152,10 +152,14 @@ class ClientTeamsController {
 			"ORDER BY dueDate asc , dateCreated desc", 
 			[ project:projectInstance, assignedTo:personInstance, type:AssetCommentType.TASK ])
 		def cssTodo = todo.size() > 0 ? 'buttonTodo' : 'buttonBlank'
+		
+		def model = [ sourceTeams:sourceTeams , targetTeams:targetTeams, projectId:projectId,todo:todo.size(),cssTodo:cssTodo]
+		
 		if( viewMode != 'web'){
-			render( view:'list_m', model:[ sourceTeams:sourceTeams , targetTeams:targetTeams, projectId:projectId,todo:todo.size(),cssTodo:cssTodo] )
+			// Mobile view
+			render( view:'list_m', model:model )
 		} else {
-			return [ sourceTeams:sourceTeams , targetTeams:targetTeams , projectId:projectId,todo:todo.size(),cssTodo:cssTodo]
+			return model
 		}
 		
 	}
@@ -1042,6 +1046,8 @@ class ClientTeamsController {
 		if ( request.getHeader ( "User-Agent" ).contains ( "MSIE" ) ) {
 			model.isOnIE= true
 		}
+		
+		// log.info "======= View is $view =========="
 		
 		// Send the user on his merry way
 		render (view:view, model:model)
