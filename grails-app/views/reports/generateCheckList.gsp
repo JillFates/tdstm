@@ -72,7 +72,7 @@
 											${staff.name}
 										</td>
 										<td>
-											${staff.company}
+											${staff.company[0]}
 										</td>
 										<td>
 											${staff.role}
@@ -418,7 +418,7 @@
 						</g:if>
 					</g:each></td>
 			</tr>
-			<tr>
+			<%--<tr>
 				<td>&nbsp;</td>
 				<td>
 					${teamAssignment}<br />
@@ -431,7 +431,7 @@
 				</td>
 
 			</tr>
-			<tr>
+			--%><tr>
 				<td>&nbsp;</td>
 				<td>
 					${userLogin}<br />

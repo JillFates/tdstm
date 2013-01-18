@@ -127,7 +127,8 @@ class ReportsService {
 	/**
 	* @param assetEntityList,moveBundles,projectInstance
 	* @param assetEntityList
-	* @return summaryOk,issue,dependenciesOk,dependencies,missingRacks,missedRacks,duplicatesTag,duplicatesAssetTagNames,duplicates,duplicatesAssetNames
+	* @return summaryOk,issue,dependenciesOk,dependencies,missingRacks,missedRacks,duplicatesTag,duplicatesAssetTagNames,
+	*          duplicates,duplicatesAssetNames
 	*/
 	
 	def getAssetInfo(assetEntityList,moveBundles,projectInstance,currProj,moveEventInstance,eventErrorList){
@@ -145,10 +146,16 @@ class ReportsService {
 			summaryOk << [(moveBundle) :  counts ]
 		}
 		
-		def duplicatesAssetNames = jdbcTemplate.queryForList("SELECT asset_name as assetName , count(*) as counts , asset_type as type from asset_entity where project_id = $currProj and asset_name is not null and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_name ,asset_type HAVING COUNT(*) > 1")
+		def duplicatesAssetNames = jdbcTemplate.queryForList("""SELECT asset_name as assetName , count(*) as counts , asset_type as type 
+                                    from asset_entity where project_id = $currProj and asset_name is not null and move_bundle_id in 
+                                    (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) 
+                                    GROUP BY asset_name ,asset_type HAVING COUNT(*) > 1""")
 		
 		String duplicates = ""
-		def nullAssetname = jdbcTemplate.queryForList("SELECT asset_name as assetName ,asset_tag as tag,  asset_type as type from asset_entity where project_id = $currProj and asset_name is null and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) ")
+		def nullAssetname = jdbcTemplate.queryForList("""SELECT asset_name as assetName ,asset_tag as tag,  asset_type as type from asset_entity 
+                                                        where project_id = $currProj and asset_name is null and move_bundle_id in 
+                                                        (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) """
+                                                        )
 		if(duplicatesAssetNames.size()>0){
 			duplicates += """<span style="color: red;"><b>Naming Check: <br></br></span>"""
 			eventErrorList << 'Assets'
@@ -163,7 +170,10 @@ class ReportsService {
 		    blankAssets += """<span style="color: green;"><b>Blank Naming Check: OK: No error: "Blank names: 0"<br></br></span>"""
 		}
 		
-		def duplicatesAssetTagNames = jdbcTemplate.queryForList("SELECT asset_tag as tag , count(*) as counts from asset_entity where project_id = $currProj and asset_tag is not null and asset_type in ('Server','VM','Blade') and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) GROUP BY asset_tag HAVING COUNT(*) > 1")
+		def duplicatesAssetTagNames = jdbcTemplate.queryForList("""SELECT asset_tag as tag , count(*) as counts from asset_entity 
+                                       where project_id = $currProj and asset_tag is not null and asset_type in ('Server','VM','Blade') 
+                                       and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) 
+                                        GROUP BY asset_tag HAVING COUNT(*) > 1""")
 		
 		String duplicatesTag = ""
 		
@@ -173,7 +183,9 @@ class ReportsService {
 		}else{
 			duplicatesTag += """<span style="color: green;"><b>Asset Tag: OK <br></br></span>"""
 		}
-		def nullAssetTag =  jdbcTemplate.queryForList("SELECT asset_name as assetName ,asset_tag as tag,  asset_type as type from asset_entity where project_id = $currProj and asset_tag is null and asset_type in ('Server','VM','Blade') and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) ")
+		def nullAssetTag =  jdbcTemplate.queryForList("""SELECT asset_name as assetName ,asset_tag as tag,  asset_type as type 
+                            from asset_entity where project_id = $currProj and asset_tag is null and asset_type in ('Server','VM','Blade') 
+                            and move_bundle_id in (select move_bundle_id from move_bundle where move_event_id = ${moveEventInstance.id}) """)
 		def blankAssetTag = ''
 		if(nullAssetTag.size()>0){
 			blankAssetTag += """<span style="color: red;"><b>Blank Tag Check: ${nullAssetTag.size()} assets with no asset tags <br></br></span>"""
@@ -182,7 +194,10 @@ class ReportsService {
 			blankAssetTag += """<span style="color: green;"><b>Blank Tag Check: OK: No error: "Blank tag: 0"<br></br></span>"""
 		}
 		
-		def missingRacks = AssetEntity.findAll("from AssetEntity asset where  asset.project.id=${currProj} and asset.assetType not in('Application','Files','Database','VM') and asset.moveBundle.moveEvent.id=${moveEventInstance.id} and (sourceRack='' or targetRack='' or sourceRackPosition = '' or targetRackPosition = '') group by asset.assetName").assetName
+		def missingRacks = AssetEntity.findAll("from AssetEntity asset where  asset.project.id=${currProj} and asset.assetType not in (:type) \
+                            and asset.moveBundle.moveEvent = :event and \
+                            (sourceRack='' or targetRack='' or sourceRackPosition = '' or targetRackPosition = '') \
+                            group by asset.assetName",[type:['Application','Files','Database','VM'], event:moveEventInstance]).assetName
 		
 		String missedRacks = ""
 		if(missingRacks.size()>0){
@@ -202,16 +217,20 @@ class ReportsService {
 		dependencies.sort()
 		String dependenciesOk = ""
 		if(dependencies.size()>0){
-			dependenciesOk +="""<span style="color: red;"><b>Dependency found: ${dependencies.size} Dependency Found:<br></br></b></span> <div style="margin-left:50px;"> ${dependencies.toString().replace('[','').replace(']','')}</div>"""
+			dependenciesOk +="""<span style="color: red;"><b>Dependency found: ${dependencies.size} Dependency Found:<br></br></b></span> 
+                                    <div style="margin-left:50px;"> ${dependencies.toString().replace('[','').replace(']','')}</div>
+                                """
 			eventErrorList << 'Assets'
 		}else{
 			dependenciesOk +="""<span style="color: green;"><b>Dependency: OK-No Dependencies: </b><br></br></span>"""
 		}
 		
-		String assetId = assetEntityList.id
-		assetId = assetId.replace("[","('").replace(",","','").replace("]","')")
+		def assetId = assetEntityList.id
 		
-		def issues = AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in ${assetId} and commentType ='issue' and  isResolved =0 order by comment.assetEntity.assetName ")
+		def categories = ['shutdown','moveday','startup','physical','physical-source','physical-target']
+		def issues = AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in (:assetIds) and commentType ='issue' \
+            and  isResolved =0 and comment.category not in (:categories) order by comment.assetEntity.assetName ",
+            [assetIds:assetEntityList.id, categories:categories])
 		def issue = ""
 		if(issues.size()>0){
 			issue +="""<span style="color: red;"><b>Asset Issues: Unresolved Issues  </b><br></br></span>"""
@@ -220,7 +239,8 @@ class ReportsService {
 			issue +="""<span style="color: green;"><b>Asset Issues: OK  </b><br></br></span>"""
 		}
 		
-		def specialInstruction = AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in ${assetId}  and  mustVerify = 1 order by comment.assetEntity.assetName ")
+		def specialInstruction = AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in (:assetIds)  and  mustVerify = 1 order by comment.assetEntity.assetName ",
+                                                        [assetIds : assetId])
 		def importantInstruction = ""
 		if(specialInstruction.size()>0){
 			importantInstruction +="""<span style="color: red;"><b>Special Instruction: </b><br></br></span>"""
@@ -230,7 +250,10 @@ class ReportsService {
 		}
 		
 		
-		Set questionedDependencies = AssetDependency.findAll("from AssetDependency dependency where (dependency.asset in $assetId or dependency.dependent in $assetId) and dependency.status='Questioned' and dependency.asset.moveBundle.moveEvent.id = ${moveEventInstance.id} order by dependency.asset.assetName ").asset.assetName
+		Set questionedDependencies = AssetDependency.findAll("from AssetDependency dependency where (dependency.asset.id in (:assetIds) or \
+            dependency.dependent.id in (:assetIds)) and dependency.status in (:statuses) and dependency.asset.moveBundle.moveEvent = :event \
+            order by dependency.asset.assetName ",[assetIds : assetId, event:moveEventInstance, statuses:['Questioned','Unknown']]).asset.assetName
+
 		def questionedDependency = questionedDependencies.toList()
 		questionedDependency.sort()
 		def questioned = ''
@@ -239,8 +262,8 @@ class ReportsService {
 		}else{
 		    questioned +="""<span style="color: green;"><b>Dependencies Questioned: OK  </b><br></br></span>"""
 		}
-		
-		def nonAssetIssue = AssetComment.findAll("from AssetComment a where a.assetEntity is null and a.moveEvent = ?",[moveEventInstance])
+		def nonAssetIssue = AssetComment.findAll("from AssetComment a where a.moveEvent = :event and a.category not in(:categories) ",
+                                                [event: moveEventInstance, categories:categories])
 		def eventIssues = ''
 		if(nonAssetIssue.size()>0){
 			eventIssues +="""<span style="color: red;"><b>Event Issues: </b><br></br></span>"""
@@ -355,18 +378,12 @@ class ReportsService {
 		}
 		
 		
-		def list = []
+		def list = partyRelationshipService.getProjectStaff(currProj)
+		list.sort{ a, b -> a.company[0] <=> b.company[0] ?: a.role?.toString() <=> b.role?.toString() }
 		
 		def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $currProj and p.roleTypeCodeFrom = 'PROJECT' ")
 		
 		projectStaff.each{staff ->
-			def map = new HashMap()
-			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-			map.put("company", company.partyIdFrom[0])
-			map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
-			map.put("role", staff.roleTypeCodeTo)
-			list<<map
-
 			def user = UserLogin.findByPerson(Person.get(staff.partyIdTo.id))
 			
 			if(!user){
