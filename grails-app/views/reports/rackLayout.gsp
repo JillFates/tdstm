@@ -26,7 +26,7 @@
 				var rack = racks[i]
 				var locvalue = rack.location ? rack.location : 'blank';
 				var rmvalue = rack.room ? rack.room : 'blank';
-				var ravalue = rack.rack ? rack.rack : 'blank';
+				var ravalue = rack.tag ? rack.tag : 'blank';
 				var value = locvalue +"~"+rmvalue +"~"+ ravalue
 				var text =  locvalue +"/"+rmvalue +"/"+ ravalue
 				var option = document.createElement("option")
@@ -68,7 +68,7 @@
 		<tr class="prop" id="bundleRow">
 			<td valign="top" class="name"><label> <b>Current Move Bundle:<span style="color: red;">*</span> </b></label></td>
 			<td valign="top" class="value" colspan="2">
-				<select id="bundleId" name="moveBundle" onchange="${remoteFunction(controller:'rackLayoutets', action:'getRackDetails', params:'\'bundles=\' + this.value', onComplete:'updateRackDetails(e)')}">
+				<select id="bundleId" name="moveBundle" onchange="${remoteFunction(controller:'rackLayouts', action:'getRackDetails', params:'\'bundles=\' + this.value', onComplete:'updateRackDetails(e)')}">
 					<option value="null" selected="selected">Please Select</option>
 					<g:each in="${moveBundleInstanceList}" var="moveBundleList">
 						<option value="${moveBundleList?.id}">${moveBundleList?.name}</option>
