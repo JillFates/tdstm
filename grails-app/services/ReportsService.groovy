@@ -379,7 +379,7 @@ class ReportsService {
 		
 		
 		def list = partyRelationshipService.getProjectStaff(currProj)
-		list.sort{ a, b -> a.company[0] <=> b.company[0] ?: a.role?.toString() <=> b.role?.toString() }
+        list.sort{ a, b -> a.company[0]?.toString() <=> b.company[0]?.toString() ?: a.role?.toString() <=> b.role?.toString() }
 		
 		def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $currProj and p.roleTypeCodeFrom = 'PROJECT' ")
 		
