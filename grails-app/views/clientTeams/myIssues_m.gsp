@@ -1,48 +1,48 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<title>My Tasks</title>
+	<title>My Tasks - Transition Manager</title>
+	<meta name="viewport" content="initial-scale=.86; width=device-width ;" />
 	<jq:plugin name="jquery"/>
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.core.css')}" />
-<link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-<script type="text/javascript" src="${resource(dir:'js' ,file:'ui.datepicker.js') }" />
-<meta name="viewport" content="height=device-height,width=320" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.core.css')}" />
+	<link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	<script type="text/javascript" src="${resource(dir:'js' ,file:'ui.datepicker.js') }" />
 	
-<script type="text/javascript">    	
-	window.addEventListener('load', function(){
-		setTimeout(scrollTo, 0, 0, 1);
-	}, false);
+	<script type="text/javascript">    	
+		window.addEventListener('load', function(){
+			setTimeout(scrollTo, 0, 0, 1);
+		}, false);
 
-	function setFocus(){
-		document.issueAssetForm.search.focus();
-	}
+		function setFocus(){
+			document.issueAssetForm.search.focus();
+		}
 	
-	function updateOrientation(){
-		var displayStr = "Orientation : ";
-		switch(window.orientation) {
-                    case 0,180:
-			displayStr += "Portrait";
-			var elems = document.getElementsByClassName("col2");
-			for(var i = 0; i < elems.length; i++) elems[i].style.display = "none";
-                    break;
-                    case -90,90:
-			displayStr += "Landscape";
-			var elems = document.getElementsByClassName("col2");
-			for(var i = 0; i < elems.length; i++) elems[i].style.display = "block";
-                    break;
-                }
-		document.issueAssetForm.search.value = displayStr;
-	}
-</script>      
+		function updateOrientation(){
+			var displayStr = "Orientation : ";
+			switch(window.orientation) {
+	                    case 0,180:
+				displayStr += "Portrait";
+				var elems = document.getElementsByClassName("col2");
+				for(var i = 0; i < elems.length; i++) elems[i].style.display = "none";
+	                    break;
+	                    case -90,90:
+				displayStr += "Landscape";
+				var elems = document.getElementsByClassName("col2");
+				for(var i = 0; i < elems.length; i++) elems[i].style.display = "block";
+	                    break;
+	                }
+			document.issueAssetForm.search.value = displayStr;
+		}
+	</script>      
 </head>
 <body onorientationchange="updateOrientation();">
-	<div class="mainbody" style="width: 320px;">
-	   <div id="mobtitle">TransitionManager&trade; - Mobile</div>
-	     <div id="myTaskListMobile">
+	<div class="mainbody" style="width: 100%;">
+	   <div style="width: 100%;" id="mobtitle">TransitionManager&trade; - Mobile</div>
+	     <div style="width: 100%;" id="myTaskListMobile">
 		 	<g:render template="tasks_m"/>
 		 </div>
 		<g:link class="mobfooter" action="listTasks" params="[viewMode:'web', tab:tab]">Use Full Site</g:link>
@@ -210,6 +210,14 @@ function zxcOpacity(obj,opc){
 	});
 
 	B1.Start(60);
+	
+	function onScan(ev){
+		var scan = ev.data;
+		document.forms[0].search.value = scan.value;
+		document.forms[0].submit();
+	}
+	document.addEventListener("BarcodeScanned", onScan, false);
+	
 </script>
 </body>
 </html>

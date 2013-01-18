@@ -48,7 +48,7 @@
  **************************
  */
 --%>
-<div id="myIssueList" class="mobbodyweb" style="width: 100%">
+<div style="width: 100%;" id="myIssueList" class="mobbodyweb">
 	<input id="issueId" name="issueId" type="hidden" value="" />
 	<input name="tab" id="tab_m" type="hidden" value="${tab}" />
 	<div id="mydiv" onclick="this.style.display = 'none';setFocus();">
@@ -57,14 +57,14 @@
 			<div class="message"><ul>${flash.message}</ul></div>
 		</g:if> 
 	</div>		
-	<div id="taskId" style="float: left; width:320px; margin: 2px 0;"></div>
+	<div id="taskId" style="float: left; width:100%; margin: 1px;"></div>
 	<div id="assetIssueDiv" style="float: left; width: 100%;">
-		<table id="issueTable" cellspacing="0px" style="width: 320px;">
+		<table id="issueTable" cellspacing="0px" style="width:100%;">
 			<thead>
 				<tr>
-					<g:sortableColumn class="sort_column" style="width:140px;"  action="listTasks" property="number_comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:100px;" action="listTasks" property="assetName" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:80px;" action="listTasks" property="status" title="Status" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:45%;"  action="listTasks" property="number_comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:35%;" action="listTasks" property="assetName" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:20%;" action="listTasks" property="status" title="Status" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
 				</tr>
 			</thead>
 			<tbody>
@@ -123,13 +123,3 @@
 	</div>
     </g:form>
 </div>
-
-<script type="text/javascript" >
-function onScan(ev){
-	var scan = ev.data;
-	document.forms[0].search.value = scan.value;
-	document.forms[0].submit();
-}
-
-document.addEventListener("BarcodeScanned", onScan, false);
-</script>
