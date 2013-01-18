@@ -1,5 +1,7 @@
 <%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus" %>
-<%@page import="com.tdssrc.grails.GormUtil"%>
+<%@page import="com.tds.asset.AssetComment" %>
+<%@page import="com.tdssrc.grails.TimeUtil"%>
+<g:set var="now" value="${TimeUtil.nowGMT()}" />
 <%--
 /*
  **************************
@@ -51,7 +53,12 @@
 							${item?.assetName}
 						</td>
 						<td id="lastUpdated_${item?.id}" class="asset_details_block">
-							<tds:elapsedAgo start="${item?.lastUpdated}" end="${GormUtil.convertInToGMT(new Date(), null)}"/>
+							<g:if test="${AssetComment.moveDayCategories.contains(item.category)}">
+								<tds:elapsedAgo start="${item?.statusUpdated}" end="${now}"/>
+							</g:if>
+							<g:else>
+								<tds:elapsedAgo start="${item?.lastUpdated}" end="${now}"/>
+							</g:else>
 						</td>
 						<td id="estFinish_${item?.id}" class="asset_details_block">
 								<tds:convertDate date="${item?.estFinish}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
