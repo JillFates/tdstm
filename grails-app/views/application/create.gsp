@@ -90,7 +90,7 @@
 								<td ><input type="text" id="appSource"	name="appSource" value="${applicationInstance.appSource}" tabindex="15" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
-								<td ><input type="text" id="appOwner" name="appOwner"	value="${applicationInstance.appOwner}" tabindex="25" />
+								<td ><input type="text" id="appOwner" name="appOwner"	value="" tabindex="25" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label>
 								</td>
