@@ -1277,6 +1277,7 @@ class AssetEntityController {
 		def assetEntityInstanceList
 
 		// TODO - Some of the else if test params.moveEvent while others don't which doesn't seem correct. 
+		// TODO - Remove unused if else and optimize it.
 		if(params.moveEvent=='unAssigned' && params.filter=='All'){
 			
 			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','VM','Blade') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundle ")
@@ -1321,7 +1322,19 @@ class AssetEntityController {
 		
 		    assetEntityInstanceList = AssetEntity.findAll("from AssetEntity ae where project = $projectId and ae.assetType = 'VM' and ( ae.moveBundle in $moveBundle or ae.moveBundle is null) ")
 			
-		} else{
+		}else if(params.filter=='toValidate'){
+		   def validateArgs = [project:project, moveBundles:moveBundleList, validation:'Discovery']
+		   if( params.type == 'other'){
+			   validateArgs << [assetType:['Server','VM','Blade','Application','Database','Files']]
+		   } else {
+		   	   params.type == 'physical' ? validateArgs << [assetType:['Server','Blade']] : validateArgs << [assetType:['VM']]
+		   }
+		   assetEntityInstanceList = AssetEntity.findAll("FROM AssetEntity ae WHERE project = :project AND ae.validation = :validation \
+				AND ae.assetType ${params.type=='other' ? 'NOT IN ':'IN '} (:assetType)\
+			    AND ( ae.moveBundle IN (:moveBundles) OR ae.moveBundle is null)", validateArgs )
+			
+		}
+		 else{
 		
 		    assetEntityInstanceList = AssetEntity.findAllByProjectAndAssetTypeNotInList( project,["Application","Database","Files"], params )
 		}
@@ -3116,7 +3129,7 @@ class AssetEntityController {
 					moveEvent = MoveEvent.findByIdAndProject(moveEventId,project)
 				}
 			}
-			if (moveEvent) {
+			if (moveEvent && params.section != 'dashBoard') {
 				// Add filter to SQL statement and update the user's preferences
 				assetCommentQuery += " AND a.moveEvent = :moveEvent "
 				sqlArgs << [ moveEvent:moveEvent]
@@ -3171,6 +3184,10 @@ class AssetEntityController {
 						assetCommentQuery += "AND status != :status"
 						sqlArgs << [ status:AssetCommentStatus.COMPLETED]
 					}
+					break
+				case "analysisIssue" :
+					assetCommentQuery += " AND a.status = :status AND category in (:category)"
+					sqlArgs << [ status:AssetCommentStatus.READY, category:['general','planning'] ]
 					break
 				// this should not be the default any more...	
 				//default :

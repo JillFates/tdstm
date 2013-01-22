@@ -524,8 +524,15 @@ class MoveBundleController {
 			String eventMoveBundles = allMoveBundle
 			eventMoveBundles = eventMoveBundles.replace("[[","('").replace(",", "','").replace("], [","','").replace("]]","')").replace("]',' [", "','")
 			if(allMoveBundle.size()>0){
-				potential = Application.findAll("from AppMoveEvent am right join am.application a where a.moveBundle.useOfPlanning = true and a.project=$projectId and (a.moveBundle.moveEvent != ${moveEvent.id} or a.moveBundle.moveEvent is null) and (am.moveEvent = ${moveEvent.id} or am.moveEvent is null) and (am.value = '?' or am.value is null or am.value = '') and (a.planStatus is null or a.planStatus in ('Unassigned',''))").size()
-				optional = Application.findAll("from AppMoveEvent am right join am.application a where a.moveBundle.useOfPlanning = true  and a.project=$projectId and (a.moveBundle.moveEvent != ${moveEvent.id} or a.moveBundle.moveEvent is null) and (am.moveEvent = ${moveEvent.id} or am.moveEvent is null) and am.value = 'Y' and (a.planStatus is null or a.planStatus in ('Unassigned',''))").size()
+				def potentialQuery = "from AppMoveEvent am right join am.application a where a.moveBundle.useOfPlanning =:useOfPlanning \
+						and a.project=:project and (a.moveBundle.moveEvent != :moveEvent or a.moveBundle.moveEvent is null) \
+						and (am.moveEvent = :moveEvent or am.moveEvent is null)\
+						and (a.planStatus is null or a.planStatus in ('Unassigned',''))"
+				
+				def queryArgs = [useOfPlanning:true, project:project, moveEvent:moveEvent]
+				
+				potential = Application.findAll(potentialQuery+" and (am.value = '?' or am.value is null or am.value = '') ",queryArgs).size()
+				optional = Application.findAll(potentialQuery+" and am.value = 'Y' ",queryArgs).size()
 			}
 			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,'potential':potential,'optional':optional,'moveEvent':moveEvent.id]
 			def dbCount = moveBundleIds ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.assetType = 'Database' and (ae.moveBundle.id in ${moveBundleIds} or ae.moveBundle.id is null) and ae.project.id = ${projectId}")[0] : ""
@@ -608,7 +615,8 @@ class MoveBundleController {
 		def pendingAppDependenciesCount = applicationsOfPlanningBundle ? AssetDependency.countByAssetInListAndStatusInList(applicationsOfPlanningBundle,['Unknown','Questioned']) : 0
 		def pendingServerDependenciesCount = serversOfPlanningBundle ? AssetDependency.countByAssetInListAndStatusInList(serversOfPlanningBundle,['Unknown','Questioned']) : 0
 
-		def issues = AssetComment.findAll("FROM AssetComment a where a.assetEntity.project = ? and a.commentType = ? and a.isResolved = 0 and category in ('general','planning')",[project, "issue"])
+		def issues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status =:status  \
+			and a.category in (:category)",[project:project, type:AssetCommentType.TASK, status: AssetCommentStatus.READY , category:['general','planning']])
 
 		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle where project_id = $projectId group by dependency_bundle order by dependency_bundle  limit 48 ;""")
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
@@ -618,9 +626,12 @@ class MoveBundleController {
 			time = formatter.format(date)
 		}
 		def today = new Date()
-		def dueOpenIssue = AssetComment.findAll('from AssetComment a  where a.assetEntity.project = ? and a.category= ? and a.dueDate < ? and a.isResolved = 0',[project,'discovery',today]).size()
-		def openIssue =  AssetComment.findAll('from AssetComment a  where a.assetEntity.project = ? and a.category= ? and a.isResolved = 0',[project,'discovery']).size()
-		def generalOverDue = AssetComment.findAll("from AssetComment a  where a.assetEntity.project = ? and a.category in ('general','planning')  and a.dueDate < ? and a.isResolved = 0",[project,today]).size()
+		def issueQuery = "from AssetComment a  where a.assetEntity.project =:project and a.category in (:category) and a.status != :status"
+		def issueArgs = [project:project, status:AssetCommentStatus.COMPLETED]
+		
+		def openIssue =  AssetComment.findAll(issueQuery,issueArgs << [category : ['discovery']]).size()
+		def dueOpenIssue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs<< [category : ['discovery'], dueDate:today]).size()
+		def generalOverDue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs<< [category : ['general','planning'], dueDate:today]).size()
 
 		def planningConsoleList = []
 		assetDependencyList.each{dependencyBundle->
@@ -643,7 +654,20 @@ class MoveBundleController {
 		def dependencyReview = moveBundleList ? Application.executeQuery("select count(ap) from Application ap where ap.assetType  ='Application' and ap.project.id = ${projectId} and validation = 'DependencyReview' and (ap.moveBundle.id in ${mbList} or ap.moveBundle.id is null)")[0] : 0
 		def bundleReady = moveBundleList ? Application.executeQuery("select count(ap) from Application  ap where ap.assetType ='Application' and ap.project.id = ${projectId} and validation = 'BundleReady' and (ap.moveBundle.id in ${mbList} or ap.moveBundle.id is null)")[0] : 0
 		
-		def appToValidate = moveBundleList ? Application.executeQuery("select count(ap) from Application  ap where ap.assetType ='Application' and ap.validation = 'Discovery' and ap.project.id = ${projectId}  and (ap.moveBundle.id in ${mbList} or ap.moveBundle.id is null)")[0] : 0
+		def validateCountQuery = "select count(ae) from AssetEntity  ae where ae.assetType in (:assetType) \
+			and ae.validation = :validation and ae.project = :project  and (ae.moveBundle  in (:moveBundles) or ae.moveBundle.id is null)"
+		def validateArgs = [validation:'Discovery', project:project, moveBundles:moveBundleList]
+		
+		def appToValidate = moveBundleList ? AssetEntity.executeQuery(validateCountQuery , validateArgs<<[assetType:['Application']])[0] : 0
+		def psToValidate = moveBundleList ? AssetEntity.executeQuery(validateCountQuery , validateArgs<<[assetType:['Server','Blade']])[0] : 0
+		def vsToValidate = moveBundleList ? AssetEntity.executeQuery(validateCountQuery , validateArgs<<[assetType:['VM']])[0] : 0
+		def dbToValidate = moveBundleList ? AssetEntity.executeQuery(validateCountQuery , validateArgs<<[assetType:['Database']])[0] : 0
+		def fileToValidate = moveBundleList ? AssetEntity.executeQuery(validateCountQuery , validateArgs<<[assetType:['Files']])[0] : 0
+		
+		def otherToValidate = moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity  ae where ae.assetType not in (:assetType)\
+			and ae.validation = :validation and ae.project = :project and (ae.moveBundle  in (:moveBundles) or ae.moveBundle.id is null)",
+			validateArgs <<[assetType:['Server','VM','Blade','Application','Database','Files'] ])[0] : 0
+		
 		
 		return [moveBundleList:moveBundleList, applicationCount:applicationCount,appList:appList,unassignedAppCount:unassignedAppCount,
 			percentageAppCount:percentageAppCount, dbCount:databaseCount, fileCount:fileCount, otherAssetCount:otherAssetCount, assetCount:assetCount,assetList:assetList,
@@ -655,7 +679,8 @@ class MoveBundleController {
 			unlikelyLatency:unlikelyLatency,unknownLatency:unknownLatency,dependencyBundleCount:dependencyBundleCount,uniqueMoveEventList:uniqueMoveEventList,planningDashboard:'planningDashboard',bundleStartDate:bundleStartDate,
 			unassignedDbCount:unassignedDbCount,unassignedFilesCount:unassignedFilesCount,unassignedOtherCount:unassignedOtherCount,dbList:dbList,filesList:filesList,otherTypeList:otherTypeList,percentageOtherCount:percentageOtherCount,
 			percentageDBCount:percentageDBCount,percentageFilesCount:percentageFilesCount,openIssue:openIssue,dueOpenIssue:dueOpenIssue,generalOverDue:generalOverDue, dependencyScan:dependencyScan, validated:validated,
-			dependencyReview:dependencyReview, bundleReady:bundleReady, appToValidate:appToValidate]
+			dependencyReview:dependencyReview, bundleReady:bundleReady, appToValidate:appToValidate,psToValidate:psToValidate,vsToValidate:vsToValidate,
+			dbToValidate:dbToValidate, fileToValidate:fileToValidate, otherToValidate:otherToValidate]
 	}
 	
 	/**

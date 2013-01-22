@@ -55,23 +55,38 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${physicalCount}</td>
-							<td><g:link controller="assetEntity" action="list" params="[filter:'physicalServer']" class="links">Physical Servers</g:link></td>
+							<td><g:link controller="assetEntity" action="list" params="[filter:'physicalServer']" class="links">Physical Servers</g:link><br />
+							(<g:link controller="assetEntity" action="list" params="[filter:'toValidate', type:'physical']" class="links">
+								${psToValidate} to validate</g:link>)
+							</td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${virtualCount}</td>
-							<td><g:link controller="assetEntity" action="list" params="[filter:'virtual']" class="links">Virtual Servers</g:link></td>
+							<td><g:link controller="assetEntity" action="list" params="[filter:'virtual']" class="links">Virtual Servers</g:link><br />
+							(<g:link controller="assetEntity" action="list" params="[filter:'toValidate', type:'virtual']" class="links">
+								${vsToValidate} to validate</g:link>)
+							</td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${dbCount}</td>
-							<td><g:link controller="database" action="list" class="links">Databases</g:link></td>
+							<td><g:link controller="database" action="list" class="links">Databases</g:link><br />
+							(<g:link controller="database" action="list" params="[filter:'toValidate']" class="links">
+								${dbToValidate} to validate</g:link>)
+							</td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${fileCount}</td>
-							<td><g:link controller="files" action="list" class="links">Storage</g:link></td>
+							<td><g:link controller="files" action="list" class="links">Storage</g:link><br />
+							(<g:link controller="files" action="list" params="[filter:'toValidate']" class="links">
+								${fileToValidate} to validate</g:link>)
+							</td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${otherAssetCount}</td>
-							<td><g:link controller="assetEntity" action="list" params="[filter:'otherAsset']" class="links">Other Assets</g:link></td>
+							<td><g:link controller="assetEntity" action="list" params="[filter:'otherAsset']" class="links">Other Assets</g:link><br />
+							(<g:link controller="assetEntity" action="list" params="[filter:'toValidate', type:'other']" class="links">
+								${otherToValidate} to validate</g:link>)
+							</td>
 						</tr>
 					</table>
 					<br />
@@ -81,7 +96,7 @@ $(document).ready(function() {
 					<table style="float:left; border: 0px; margin-left: 10px;">
 						<tr>
 							<td style="width: 10px;text-align: right;">${openIssue}</td>
-							<td><g:link controller="assetEntity" action="listTasks" params="[filter:'Discovery']" class="links">Open Tasks</g:link></td>
+							<td><g:link controller="assetEntity" action="listTasks" params="[filter:'openIssue', tag_f_category:'discovery', section:'dashBoard']" class="links">Open Tasks</g:link></td>
 						</tr>
 						<g:if test="${dueOpenIssue>0}">
 						<tr>
@@ -161,7 +176,7 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${issuesCount}</td>
-							<td style="width: 150px;"><g:link controller="assetEntity" action="listTasks" params="[filter:'openIssue']" class="links">Open Tasks</g:link></td>
+							<td style="width: 150px;"><g:link controller="assetEntity" action="listTasks" params="[filter:'analysisIssue', section:'dashBoard']" class="links">Open Tasks</g:link></td>
 						</tr>
 						<g:if test="${generalOverDue>0}">
 						<tr>

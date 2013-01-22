@@ -49,7 +49,12 @@ class DatabaseController {
 			def moveBundles = moveEvent.moveBundles
 			def bundles = moveBundles.findAll {it.useOfPlanning == true}
 			databaseInstanceList= Database.findAllByMoveBundleInListAndAssetType(bundles,"Database")
-		}else{
+		}else if(params.filter == 'toValidate'){
+			databaseInstanceList =  AssetEntity.findAll("FROM AssetEntity ae WHERE project = :project AND ae.validation = :validation \
+				AND ae.assetType = :assetType AND ( ae.moveBundle IN (:moveBundles) OR ae.moveBundle is null)",
+				[project:project, moveBundles:moveBundleList, validation:'Discovery', assetType:'Database'])
+		}
+		else{
 			databaseInstanceList = Database.findAllByProject(project)
 		}
 		def databaseList = new ArrayList();

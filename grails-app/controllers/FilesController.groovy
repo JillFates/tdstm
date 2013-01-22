@@ -43,7 +43,11 @@ class FilesController {
 			def moveBundles = moveEvent.moveBundles
 			def bundles = moveBundles.findAll {it.useOfPlanning == true}
 			fileInstanceList= Files.findAllByMoveBundleInListAndAssetType(bundles,"Files")
-		}else{
+		} else if( params.filter == 'toValidate' ){
+			fileInstanceList =  AssetEntity.findAll("FROM AssetEntity ae WHERE project = :project AND ae.validation = :validation \
+				AND ae.assetType = :assetType AND ( ae.moveBundle IN (:moveBundles) OR ae.moveBundle is null)",
+				[project:project, moveBundles:moveBundleList, validation:'Discovery', assetType:'Files'])
+		} else{
 			fileInstanceList = Files.findAllByProject(project)
 		}
 		def filesList = new ArrayList();
