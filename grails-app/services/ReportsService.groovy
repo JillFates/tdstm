@@ -33,7 +33,7 @@ class ReportsService {
 
   //---------------------------------------For Teams---------------------------------------------------//
 		
-		def moveBundleTeamInfo = getMoveBundleTeamInfo(moveBundles, assetEntityList,eventErrorList)
+		def moveBundleTeamInfo = getMoveBundleTeamInfo(moveEventInstance, assetEntityList,eventErrorList)
 
   //---------------------------------------For Transport------------------------------------------------//
   
@@ -70,31 +70,43 @@ class ReportsService {
 	 * @return bundleMap, inValidUsers, teamAssignment, notAssignedToTeam
 	 */
 	
-	def getMoveBundleTeamInfo( moveBundles, assetEntityList,eventErrorList ){
+	def getMoveBundleTeamInfo( event, assetEntityList,eventErrorList){
+		def moveBundles = event.moveBundles.sort{it.name}
+		def project = event.project
 		def bundleMap = []
-		moveBundles.each{moveBundle->
-			def teamList = []
-			def teamsMember = [:]
-			def team = ProjectTeam.findAllByMoveBundle(moveBundle,[sort:'name'])
-			team.each{teams->
-				teamsMember = ['name':teams.name,
-							'role':teams.role,
-							'teamList':partyRelationshipService.getBundleTeamMembers(teams),
-							'assetSize':AssetEntity.findAllByMoveBundle(moveBundle).size(),
-							'moveBundle':moveBundle]
-				teamList << [teamsMember]
+		if ( project.runbookOn == 0 ) {
+			moveBundles.each{moveBundle->
+				def teamList = []
+				def team = ProjectTeam.findAllByMoveBundle(moveBundle,[sort:'name'])
+				team.each{teams->
+					teamList << ['name':teams.name,
+								'role':teams.role,
+								'teamList':partyRelationshipService.getBundleTeamMembers(teams),
+								'assetSize':AssetEntity.findAllByMoveBundle(moveBundle).size(),
+								'moveBundle':moveBundle]
+				}
+				bundleMap << ["name":moveBundle?.name, "size":team.size(),"teamList":teamList]
 			}
-			bundleMap << ["name":moveBundle?.name, "size":team.size(),"teamList":teamList]
-
+		} else {
+			def functions = RoleType.findAllByDescriptionIlike("Staff%")
+			functions.each { func->
+				bundleMap << ["name":func.description, "code":func.id, 
+								"assignedStaff":partyRelationshipService.getProjectStaffByFunction(func, project), 
+								"tasks":AssetComment.countByMoveEventAndRole(event, func.id)
+								]
+			}
+			bundleMap = bundleMap.findAll{it.assignedStaff.size()>0 || it.tasks>0}
 		}
-		def notAssignedToTeam = []
+		
 		def assetList = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(moveBundles,['Application','Database','Files'])
 		
+		def notAssignedToTeam = []
 		assetList.each{assetEntity->
 			if(assetEntity['sourceTeamMt']?.teamCode ==null || assetEntity['targetTeamMt']?.teamCode==null){
 				notAssignedToTeam << [assetEntity.assetName]
 			}
 		}
+		
 		def teamAssignment = ""
 		if(notAssignedToTeam.size()>0){
 			teamAssignment+="""<span style="color: red;"><b>MoveTech Assignment: Asset Not Assigned  </b><br></br></span>"""
@@ -102,6 +114,7 @@ class ReportsService {
 		}else{
 			teamAssignment+="""<span style="color: green;"><b>MoveTech Assignment: OK  </b><br></br></span>"""
 		}
+		
 		Set inValidUsers = []
 		bundleMap.teamList.teamList.each{lists->
 			lists.id[0].each{personId->
@@ -113,13 +126,14 @@ class ReportsService {
 			}
 
 		}
+		
 		def userLogin =""
-			if(inValidUsers.size()>0){
-				userLogin+="""<span style="color: red;"><b>Team Details Check: Team Member name Not Valid</b><br></br></span>"""
-				eventErrorList << 'Teams'
-			}else{
-				userLogin+="""<span style="color: green;"><b>Team Details Check: OK  </b><br></br></span>"""
-			}
+		if(inValidUsers.size()>0){
+			userLogin+="""<span style="color: red;"><b>Team Details Check: Team Member name Not Valid</b><br></br></span>"""
+			eventErrorList << 'Teams'
+		}else{
+			userLogin+="""<span style="color: green;"><b>Team Details Check: OK  </b><br></br></span>"""
+		}
 		return [bundleMap:bundleMap,inValidUsers:inValidUsers,
 			teamAssignment:teamAssignment, notAssignedToTeam:notAssignedToTeam,userLogin:userLogin,eventErrorList:eventErrorList]
 	}

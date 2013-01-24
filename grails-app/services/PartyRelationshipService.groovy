@@ -608,5 +608,24 @@ class PartyRelationshipService {
         }
         // TODO : return some message to send back to UI
     }
+	
+	/**
+	 * Used to get list of functions that a Staff member has been assigned to on a Project
+	 * @param instance function - function for which fetching assignee list
+	 * @param instance project - project that the staff may be associate with
+	 * @return array of assignee users
+	 */
+	def getProjectStaffByFunction(def function, def project) {
+		
+		def partyRelationship = PartyRelationship.findAll("from PartyRelationship p \
+			where p.partyRelationshipType='PROJ_STAFF' \
+			and p.roleTypeCodeFrom='PROJECT' \
+			and p.roleTypeCodeTo=:function \
+			and p.partyIdFrom=:project", [project:project, function:function] )
+			
+		def functions = partyRelationship.partyIdTo
+		
+		return functions
+	}
 }
 
