@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat
 
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
+import org.apache.commons.lang.StringUtils
 
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
@@ -476,32 +477,45 @@ class MoveBundleController {
 		def bundleStartDate = []
 		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
 	    Set uniqueMoveEventList = moveBundleList.moveEvent
-		
 		uniqueMoveEventList.remove(null)
+		
 		List moveEventList = []
 		moveEventList =  uniqueMoveEventList.toList()
 		moveEventList.sort{it?.name}
-		String mbList = moveBundleList.id.toString().replace('[', '(').replace(']', ')')
-		def applicationCount = moveBundleList ? Application.executeQuery("select count(ae) from Application ae where ae.assetType = 'Application' and (ae.moveBundle.id in ${mbList} or ae.moveBundle is null) and ae.project.id = ${projectId}")[0] : 0
+		
+		// Forming query for multi-uses
+		def countQuery = "SELECT count(ae) FROM AssetEntity ae WHERE ae.assetType IN (:type) AND (ae.moveBundle IN \
+			(:moveBundles) OR ae.moveBundle IS NULL) AND ae.project = :project "
+		def otherCountQuery =  StringUtils.replace(countQuery, 'IN', 'NOT IN', 1 )
+		def countArgs = [moveBundles:moveBundleList, project:project]
+		
+		def applicationCount = moveBundleList ? AssetEntity.executeQuery(countQuery, countArgs<<[type:['Application']])[0] : 0
 		def assetCount = AssetEntity.findAllByProjectAndAssetTypeNotInList(project,[
 			'Application',
 			'Database',
 			'Files'
 		],params).size()
-		def databaseCount= moveBundleList ? Database.executeQuery("select count(ae) from Database ae where ae.assetType = 'Database' and (ae.moveBundle.id in ${mbList} or ae.moveBundle is null) and ae.project.id = ${projectId}")[0] : 0
-		def fileCount=moveBundleList ? Files.executeQuery("select count(ae) from Files ae where ae.assetType = 'Files' and (ae.moveBundle.id in ${mbList} or ae.moveBundle is null) and ae.project.id = ${projectId}")[0] : 0
-		def otherAssetCount= moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.assetType not in ('Server','VM','Blade','Application','Files','Database','Appliances') and (ae.moveBundle.id in ${mbList} or ae.moveBundle is null) and ae.project.id = ${projectId}")[0] : 0
+		
+		def databaseCount= moveBundleList ? AssetEntity.executeQuery(countQuery, countArgs<<[type:['Database']])[0] : 0
+		def fileCount=moveBundleList ? AssetEntity.executeQuery(countQuery, countArgs<<[type:['Files']])[0] : 0
+		def otherAssetCount= moveBundleList ? AssetEntity.executeQuery(otherCountQuery, 
+			countArgs<<[type:['Server','VM','Blade','Application','Files','Database','Appliances']])[0] : 0
+		
 		def assignedAssetCount
 		def assignedApplicationCount
         def dbList = []
 		def filesList = []
 		def otherTypeList = []
+		
 		moveEventList.each{ moveEvent->
-			def moveBundles = moveEvent?.moveBundles
-			def moveBundle = moveBundles.findAll {it.useOfPlanning == true}
-			def moveBundleIds =  moveBundle.id.toString().replace("[","(").replace("]",")")
-			assignedApplicationCount = moveBundleIds ? Application.executeQuery("select count(ae) from Application ae where ae.assetType = 'Application' and (ae.moveBundle.id in ${moveBundleIds} or ae.moveBundle is null) and ae.project.id = ${projectId}")[0] : 0
+			// fetching move bundles for current moveEvent which was set 'true' for useOfPlanning 
+			def moveBundle = moveEvent?.moveBundles?.findAll {it.useOfPlanning == true}
+			def eventWiseArgs = [project:project, moveBundles:moveBundle]
+			
+			// fetching application count that are assigned to current move-event .
+			assignedApplicationCount = moveBundle ? AssetEntity.executeQuery(countQuery, eventWiseArgs << [type:['Application']])[0] : 0
 			appList << ['count':assignedApplicationCount , 'moveEvent':moveEvent.id]
+			
 			def startDate = moveBundle.startTime.sort()
 			startDate?.removeAll([null])
 			if(startDate.size()>0){
@@ -509,20 +523,18 @@ class MoveBundleController {
 				   bundleStartDate << bundleTimeformatter.format(startDate[0]) 
 				}
 			}
-			def physicalAssetCount = moveBundleIds ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.assetType in ('Server','Blade') and (ae.moveBundle.id in ${moveBundleIds} or ae.moveBundle is null) and ae.project.id = ${projectId}")[0] : ""
-			def virtualAssetCount = moveBundleIds ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.assetType = 'VM' and (ae.moveBundle.id in ${moveBundleIds} or ae.moveBundle is null) and ae.project.id = ${projectId}")[0] : ""
-			def count = moveBundleIds ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.assetType in ('Server', 'VM', 'Blade') and (ae.moveBundle.id in ${moveBundleIds} or ae.moveBundle is null) and ae.project.id = ${projectId}")[0] : ""
+			
+			// fetching physicalAsset (e.g. 'Server','Blade' ) and virtualAsset (e.g. 'VM')  count that are assigned to current move-event .
+			def physicalAssetCount = moveBundle ? AssetEntity.executeQuery(countQuery, eventWiseArgs << [type:['Server','Blade']])[0] : 0
+			def virtualAssetCount = moveBundle ? AssetEntity.executeQuery(countQuery, eventWiseArgs << [type:['VM']])[0] : 0
+			def count = moveBundle ? AssetEntity.executeQuery(countQuery, eventWiseArgs << [type:['Server', 'VM', 'Blade']])[0] : 0
+			
 			def potential = 0
 			def optional = 0
-			String moveBundleId =  moveBundle.id
-			moveBundleId = moveBundleId.replace("[","('").replace(",","','").replace("]","')")
+			
 			def moveEventId = moveEventList.id 
-			String moveEvents = moveEventId
-			moveEvents = moveEvents.replace("[","('").replace(",","','").replace("]","')")
-			def allMoveBundle = moveEventList.moveBundles.id
-			allMoveBundle.remove(moveBundle.id)
-			String eventMoveBundles = allMoveBundle
-			eventMoveBundles = eventMoveBundles.replace("[[","('").replace(",", "','").replace("], [","','").replace("]]","')").replace("]',' [", "','")
+			def allMoveBundle = moveEventList.moveBundles.id.findAll{it != moveBundle.id}
+			
 			if(allMoveBundle.size()>0){
 				def potentialQuery = "from AppMoveEvent am right join am.application a where a.moveBundle.useOfPlanning =:useOfPlanning \
 						and a.project=:project and (a.moveBundle.moveEvent != :moveEvent or a.moveBundle.moveEvent is null) \
@@ -534,37 +546,68 @@ class MoveBundleController {
 				potential = Application.findAll(potentialQuery+" and (am.value = '?' or am.value is null or am.value = '') ",queryArgs).size()
 				optional = Application.findAll(potentialQuery+" and am.value = 'Y' ",queryArgs).size()
 			}
-			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,'potential':potential,'optional':optional,'moveEvent':moveEvent.id]
-			def dbCount = moveBundleIds ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.assetType = 'Database' and (ae.moveBundle.id in ${moveBundleIds} or ae.moveBundle.id is null) and ae.project.id = ${projectId}")[0] : ""
+			
+			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,
+				'potential':potential,'optional':optional,'moveEvent':moveEvent.id]
+			
+			def dbCount = moveBundle ? AssetEntity.executeQuery(countQuery, eventWiseArgs << [type:['Database']])[0] : 0
 			dbList << ['moveEvent':moveEvent.id , 'count':dbCount]
-			def filesCount = moveBundleIds ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.assetType = 'Files' and (ae.moveBundle.id in ${moveBundleIds} or ae.moveBundle.id is null) and ae.project.id = ${projectId}")[0] : ""
+			
+			def filesCount = moveBundle ? AssetEntity.executeQuery(countQuery, eventWiseArgs << [type:['Files']])[0] : 0
 			filesList << ['moveEvent':moveEvent.id , 'count':filesCount]
-			def otherCount = moveBundleIds ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.assetType not in ('Server','VM','Blade','Application','Files','Database') and (ae.moveBundle.id in ${moveBundleIds} or ae.moveBundle is null) and ae.project.id = ${projectId}")[0] : ""
+			
+			def otherCount = moveBundle ? AssetEntity.executeQuery(otherCountQuery,
+			eventWiseArgs << [type:['Server','VM','Blade','Application','Files','Database','Appliances']])[0] : 0
 			otherTypeList << ['moveEvent':moveEvent.id , 'count':otherCount]
+			
 		}
-		def unassignedAppCount =  moveBundleList ? Application.executeQuery("select count(ap) from Application ap where ap.project = $projectId and ap.assetType='Application' and ap.moveBundle in $mbList and (ap.planStatus is null or ap.planStatus in ('Unassigned',''))")[0] : 0
+		
+		def unAssignedCountQuery = countQuery+" AND (ae.planStatus IS NULL OR ae.planStatus IN ('Unassigned',''))"
+		
+		def unassignedAppCount =  moveBundleList ? AssetEntity.executeQuery("SELECT COUNT(ae) FROM AssetEntity ae WHERE ae.project = :project \
+			AND ae.assetType IN (:type) AND ae.moveBundle IN (:moveBundles) AND (ae.planStatus is null OR ae.planStatus IN ('Unassigned',''))",
+			countArgs <<[type:['Application']])[0] : 0
+			
 		def totalAssignedApp = applicationCount - unassignedAppCount ;
-		int percentageAppCount = moveBundleList ? Application.executeQuery("select count(ap) from Application ap where ap.project = $projectId and ap.assetType='Application' and (ap.moveBundle in $mbList or ap.moveBundle is null ) and ap.moveBundle.moveEvent.runbookStatus = 'Done' ")[0] : 0
+		
+		int percentageAppCount = moveBundleList ? AssetEntity.executeQuery(countQuery+"and ae.moveBundle.moveEvent.runbookStatus=:runbookStatus ",
+			countArgs <<[type:['Application'], runbookStatus:'Done'])[0] : 0
+		
+		countArgs.remove('runbookStatus')
+		
 		if(applicationCount > 0){
 			percentageAppCount = Math.round((percentageAppCount/applicationCount)*100)
 		}else{
 			percentageAppCount = 0;
 		}
-		String moveBundles = moveBundleList.id
-		moveBundles = moveBundles.replace("[","('").replace(",","','").replace("]","')")
-		def unassignedAssetCount = moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.project = $projectId and ae.assetType in ('Server','VM','Blade') and (ae.planStatus is null or ae.planStatus in ('Unassigned','')) and (ae.moveBundle in $mbList or ae.moveBundle is null) ")[0] : 0
-		def unassignedPhysialAssetCount = moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.project = $projectId and ae.assetType in ('Server','Blade') and (ae.planStatus is null or ae.planStatus in ('Unassigned','')) and (ae.moveBundle in $mbList or ae.moveBundle is null)")[0] : 0
-		def unassignedVirtualAssetCount = moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.project = $projectId and ae.assetType='VM' and (ae.planStatus is null or ae.planStatus in ('Unassigned',''))  and (ae.moveBundle in $mbList or ae.moveBundle is null) ")[0] : 0
-		def unassignedDbCount = moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.project = $projectId and ae.assetType ='Database' and (ae.planStatus is null or ae.planStatus in ('Unassigned','')) and (ae.moveBundle in $mbList or ae.moveBundle is null) ")[0] : 0
-		def unassignedFilesCount = moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.project = $projectId and ae.assetType ='Files' and (ae.planStatus is null or ae.planStatus in ('Unassigned','')) and (ae.moveBundle in $mbList or ae.moveBundle is null) ")[0] : 0
-		def unassignedOtherCount = moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.project = $projectId and ae.assetType not in ('Server','VM','Blade','Application','Database','Files') and (ae.planStatus is null or ae.planStatus in ('Unassigned','')) and (ae.moveBundle in $mbList or ae.moveBundle is null)")[0] : 0
+		
+		def unassignedAssetCount = moveBundleList ? AssetEntity.executeQuery(unAssignedCountQuery, countArgs <<[type:['Server','VM','Blade']])[0] : 0
+		
+		def unassignedPhysialAssetCount = moveBundleList ? AssetEntity.executeQuery(unAssignedCountQuery, countArgs <<[type:['Server','Blade']])[0] : 0
+		
+		def unassignedVirtualAssetCount = moveBundleList ? AssetEntity.executeQuery(unAssignedCountQuery, countArgs <<[type:['VM']])[0] : 0
+		
+		def unassignedDbCount = moveBundleList ? AssetEntity.executeQuery(unAssignedCountQuery, countArgs <<[type:['Database']])[0] : 0
+		
+		def unassignedFilesCount = moveBundleList ? AssetEntity.executeQuery(unAssignedCountQuery, countArgs <<[type:['Files']])[0] : 0
+		
+		def unassignedOtherCount = moveBundleList ? AssetEntity.executeQuery(otherCountQuery+"and (ae.planStatus is null or ae.planStatus \
+			in ('Unassigned',''))", countArgs <<[type:['Server','VM','Blade','Application','Files','Database','Appliances']])[0] : 0
 
-		def assignedPhysicalAsset = moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.assetType in ('Server','Blade') and (ae.moveBundle.id in ${mbList} or ae.moveBundle is null) and ae.project.id = ${projectId}")[0] : 0
-		def assignedVirtualAsset = moveBundleList ?  AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.assetType in ('VM') and (ae.moveBundle.id in ${mbList} or ae.moveBundle is null) and ae.project.id = ${projectId}")[0] : 0
+		def assignedPhysicalAsset = moveBundleList ? AssetEntity.executeQuery(countQuery , countArgs <<[type:['Server','Blade']])[0] : 0
+		
+		def assignedVirtualAsset = moveBundleList ?  AssetEntity.executeQuery(countQuery , countArgs <<[type:['VM']])[0] : 0
+		
 		def totalPhysicalAssetCount = assignedPhysicalAsset + unassignedPhysialAssetCount ;
+		
 		def totalVirtualAssetCount = assignedVirtualAsset + unassignedVirtualAssetCount ;
-		int percentagePhysicalAssetCount = moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.project = $projectId and ae.assetType in ('Server','Blade')  and (ae.moveBundle in $mbList or ae.moveBundle is null) and ae.planStatus = 'Moved'")[0] : 0
-		int percentagevirtualAssetCount = moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.project = $projectId and ae.assetType = 'VM'  and (ae.moveBundle in $mbList or ae.moveBundle is null) and ae.planStatus = 'Moved'")[0] : 0
+		
+		int percentagePhysicalAssetCount = moveBundleList ? AssetEntity.executeQuery(countQuery +"and ae.planStatus = :planStatus", 
+			countArgs <<[type:['Server','Blade'], planStatus:'Moved'])[0] : 0
+		
+		int percentagevirtualAssetCount = moveBundleList ? AssetEntity.executeQuery(countQuery +"and ae.planStatus = :planStatus", 
+			countArgs <<[type:['VM']])[0] : 0
+		
 		if(unassignedPhysialAssetCount==assignedPhysicalAsset){
 			percentagePhysicalAssetCount = 0;
 		}else if(totalPhysicalAssetCount > 0){
@@ -572,6 +615,7 @@ class MoveBundleController {
 		}else if (unassignedPhysialAssetCount==0){
 			percentagePhysicalAssetCount=100;
 		}
+		
 		if(unassignedVirtualAssetCount==assignedVirtualAsset){
 			percentagevirtualAssetCount = 0;
 		}else if(totalVirtualAssetCount > 0){
@@ -581,50 +625,63 @@ class MoveBundleController {
 		}
 		
 		
-		int percentageDBCount = moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.project = $projectId and ae.assetType = 'Database'  and (ae.moveBundle in $mbList or ae.moveBundle is null) and ae.planStatus = 'Moved'")[0] : 0
+		int percentageDBCount = moveBundleList ? AssetEntity.executeQuery(countQuery +"and ae.planStatus = :planStatus", 
+			countArgs <<[type:['Database']])[0] : 0
+		
 		if(databaseCount > 0){
 			percentageDBCount = Math.round((percentageDBCount/databaseCount)*100)
 		}else{
 			percentageDBCount = 100;
 		}
 		
-		int percentageFilesCount = moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.project = $projectId and ae.assetType = 'Files'  and (ae.moveBundle in $mbList or ae.moveBundle is null) and  ae.planStatus = 'Moved'")[0] : 0
+		int percentageFilesCount = moveBundleList ? AssetEntity.executeQuery(countQuery +"and ae.planStatus = :planStatus", 
+			countArgs <<[type:['VM']])[0] : 0
 		if(fileCount > 0){
 			percentageFilesCount = Math.round((percentageFilesCount/fileCount)*100)
 		}else{
 			percentageFilesCount = 100;
 		}
 		
-		int percentageOtherCount = moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.project = $projectId and ae.assetType not in ('Server','VM','Blade','Application','Database','Files') and (ae.moveBundle in $mbList or ae.moveBundle is null) and ae.planStatus = 'Moved'")[0] : 0
+		int percentageOtherCount = moveBundleList ? AssetEntity.executeQuery(otherCountQuery+"and ae.planStatus = :planStatus",
+			countArgs <<[type:['Server','VM','Blade','Application','Files','Database','Appliances']])[0] : 0
 		if(otherAssetCount > 0){
 			percentageOtherCount = Math.round((percentageOtherCount/otherAssetCount)*100)
 		}else{
 			percentageOtherCount = 100;
 		}
-		def physicalCount= moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.assetType in ('Server','Blade') and (ae.moveBundle.id in ${mbList} or ae.moveBundle is null) and ae.project.id = ${projectId}")[0] : 0
-		def	virtualCount=moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity ae where ae.assetType = 'VM' and (ae.moveBundle.id in ${mbList} or ae.moveBundle is null) and ae.project.id = ${projectId}")[0] : 0
+		countArgs.remove('planStatus')
+		def physicalCount= moveBundleList ? AssetEntity.executeQuery(countQuery, countArgs <<[type:['Server','Blade']])[0] : 0
+		def	virtualCount=moveBundleList ? AssetEntity.executeQuery(countQuery, countArgs <<[type:['VM']])[0] : 0
 		def likelyLatencyCount=0;
 		def unlikelyLatencyCount=0;
 		def unknownLatencyCount=0;
 
-		def applicationsOfPlanningBundle = moveBundleList ? AssetEntity.findAll("from AssetEntity ae where ae.assetType = 'Application' and (ae.moveBundle.id in ${mbList} or ae.moveBundle is null) and ae.project.id = ${projectId}") : 0
-		def serversOfPlanningBundle = moveBundleList ? AssetEntity.findAll("from AssetEntity ae where ae.assetType in ('Server', 'VM', 'Blade') and (ae.moveBundle.id in ${mbList} or ae.moveBundle is null) and ae.project.id = ${projectId}") : 0
-
+		def applicationsOfPlanningBundle = moveBundleList ? AssetEntity.findAll("from AssetEntity ae where ae.assetType in (:type)  \
+			and (ae.moveBundle in (:moveBundles) or ae.moveBundle is null) and ae.project = :project", countArgs <<[type:['Application']]) : 0
+		
+		def serversOfPlanningBundle = moveBundleList ? AssetEntity.findAll("from AssetEntity ae where ae.assetType in (:type) \
+			and (ae.moveBundle in (:moveBundles) or ae.moveBundle is null) and ae.project = :project", countArgs <<[type:['Server', 'VM', 'Blade']]) : 0
+		
 		def appDependenciesCount = applicationsOfPlanningBundle ? AssetDependency.countByAssetInList(applicationsOfPlanningBundle) : 0
 		def serverDependenciesCount = serversOfPlanningBundle ? AssetDependency.countByAssetInList(serversOfPlanningBundle) : 0
-		def pendingAppDependenciesCount = applicationsOfPlanningBundle ? AssetDependency.countByAssetInListAndStatusInList(applicationsOfPlanningBundle,['Unknown','Questioned']) : 0
-		def pendingServerDependenciesCount = serversOfPlanningBundle ? AssetDependency.countByAssetInListAndStatusInList(serversOfPlanningBundle,['Unknown','Questioned']) : 0
+		
+		def pendingAppDependenciesCount = applicationsOfPlanningBundle ? 
+		AssetDependency.countByAssetInListAndStatusInList(applicationsOfPlanningBundle,['Unknown','Questioned']) : 0
+		
+		def pendingServerDependenciesCount = serversOfPlanningBundle ? 
+		AssetDependency.countByAssetInListAndStatusInList(serversOfPlanningBundle,['Unknown','Questioned']) : 0
 
 		def issues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status =:status  \
 			and a.category in (:category)",[project:project, type:AssetCommentType.TASK, status: AssetCommentStatus.READY , category:['general','planning']])
 
-		def assetDependencyList = jdbcTemplate.queryForList(""" select dependency_bundle as dependencyBundle from  asset_dependency_bundle where project_id = $projectId group by dependency_bundle order by dependency_bundle  limit 48 ;""")
+		def assetDependencyList = jdbcTemplate.queryForList("select dependency_bundle as dependencyBundle from  asset_dependency_bundle \
+			where project_id = $projectId  group by dependency_bundle order by dependency_bundle  limit 48")
+		
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
 		String time
 		def date = AssetDependencyBundle.findByProject(project,[sort:"lastUpdated",order:"desc"])?.lastUpdated
-		if(date){
-			time = formatter.format(date)
-		}
+		time = date ? formatter.format(date) : ''
+		
 		def today = new Date()
 		def issueQuery = "from AssetComment a  where a.assetEntity.project =:project and a.category in (:category) and a.status != :status"
 		def issueArgs = [project:project, status:AssetCommentStatus.COMPLETED]
@@ -642,44 +699,64 @@ class MoveBundleController {
 			planningConsoleList << ['dependencyBundle':dependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
 		}
 		
-		def likelyLatency = moveBundleList ? Application.executeQuery("select count(ae) from Application ae where ae.latency = 'N' and (ae.moveBundle.id in ${mbList} or ae.moveBundle is null) and ae.project.id = ${projectId}")[0] : 0
-		def unlikelyLatency = moveBundleList ? Application.executeQuery("select count(ae) from Application ae where ae.latency = 'Y' and (ae.moveBundle.id in ${mbList} or ae.moveBundle is null) and ae.project.id = ${projectId}")[0] : 0
-		def unknownLatency = moveBundleList ? Application.executeQuery("select count(ae) from Application ae where ae.project = $projectId  and (ae.latency is null or ae.latency = '') and (ae.moveBundle in $mbList or ae.moveBundle is null)")[0] : 0
+		def latencyQuery = "SELECT COUNT(ap) FROM Application ap WHERE ap.latency = :latency AND (ap.moveBundle IN (:moveBundles) \
+			OR ap.moveBundle IS NULL) AND ap.project = :project AND ap.assetType in (:type) "
+		
+		def likelyLatency = moveBundleList ? Application.executeQuery(latencyQuery,countArgs <<[latency:'N', type:['Application']])[0] : 0
+		def unlikelyLatency = moveBundleList ? Application.executeQuery(latencyQuery,countArgs <<[latency:'Y', type:['Application']])[0] : 0
+		
+		def unknownLatency = moveBundleList ? Application.executeQuery("select count(ae) from Application ae where ae.project = :project \
+			and (ae.latency is null or ae.latency = '') and (ae.moveBundle in (:moveBundles) or ae.moveBundle is null)",
+			[project:project, moveBundles:moveBundleList])[0] : 0
+		
+		countArgs.remove('latency')
 		
 		def depBundleIDCountSQL = "select count(distinct dependency_bundle) from asset_dependency_bundle where project_id = $projectId"
-        def dependencyBundleCount = jdbcTemplate.queryForInt(depBundleIDCountSQL)		
+        def dependencyBundleCount = jdbcTemplate.queryForInt(depBundleIDCountSQL)	
+			
+		def validateCountQuery = countQuery + "and ae.validation = :validation "
 		
-		def dependencyScan = moveBundleList ? Application.executeQuery("select count(ap) from Application ap where ap.assetType = 'Application' and ap.project.id = ${projectId} and validation = 'DependencyScan' and (ap.moveBundle.id in ${mbList} or ap.moveBundle is null)")[0] : 0
-		def validated = moveBundleList ? Application.executeQuery("select count(ap) from Application ap where ap.assetType ='Application' and ap.project.id = ${projectId} and validation = 'Validated' and (ap.moveBundle.id in ${mbList} or ap.moveBundle is null)")[0] : 0
-		def dependencyReview = moveBundleList ? Application.executeQuery("select count(ap) from Application ap where ap.assetType  ='Application' and ap.project.id = ${projectId} and validation = 'DependencyReview' and (ap.moveBundle.id in ${mbList} or ap.moveBundle.id is null)")[0] : 0
-		def bundleReady = moveBundleList ? Application.executeQuery("select count(ap) from Application  ap where ap.assetType ='Application' and ap.project.id = ${projectId} and validation = 'BundleReady' and (ap.moveBundle.id in ${mbList} or ap.moveBundle.id is null)")[0] : 0
+		def dependencyScan = moveBundleList ? Application.executeQuery(validateCountQuery ,
+			countArgs << [validation:'DependencyScan'] )[0] : 0
+	
+		def validated = moveBundleList ? Application.executeQuery(validateCountQuery ,
+			countArgs << [validation:'Validated'])[0] : 0
 		
-		def validateCountQuery = "select count(ae) from AssetEntity  ae where ae.assetType in (:assetType) \
-			and ae.validation = :validation and ae.project = :project  and (ae.moveBundle  in (:moveBundles) or ae.moveBundle.id is null)"
-		def validateArgs = [validation:'Discovery', project:project, moveBundles:moveBundleList]
+		def dependencyReview = moveBundleList ? Application.executeQuery(validateCountQuery ,
+			countArgs << [validation:'DependencyReview'])[0] : 0
 		
-		def appToValidate = moveBundleList ? AssetEntity.executeQuery(validateCountQuery , validateArgs<<[assetType:['Application']])[0] : 0
-		def psToValidate = moveBundleList ? AssetEntity.executeQuery(validateCountQuery , validateArgs<<[assetType:['Server','Blade']])[0] : 0
-		def vsToValidate = moveBundleList ? AssetEntity.executeQuery(validateCountQuery , validateArgs<<[assetType:['VM']])[0] : 0
-		def dbToValidate = moveBundleList ? AssetEntity.executeQuery(validateCountQuery , validateArgs<<[assetType:['Database']])[0] : 0
-		def fileToValidate = moveBundleList ? AssetEntity.executeQuery(validateCountQuery , validateArgs<<[assetType:['Files']])[0] : 0
+		def bundleReady = moveBundleList ? Application.executeQuery(validateCountQuery ,
+			countArgs << [validation:'BundleReady'])[0] : 0
 		
-		def otherToValidate = moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity  ae where ae.assetType not in (:assetType)\
+		countArgs << [validation:'Discovery']
+		
+		def appToValidate = moveBundleList ? AssetEntity.executeQuery(validateCountQuery , countArgs)[0] : 0
+		def psToValidate = moveBundleList ? AssetEntity.executeQuery(validateCountQuery , countArgs<<[type:['Server','Blade']])[0] : 0
+		def vsToValidate = moveBundleList ? AssetEntity.executeQuery(validateCountQuery , countArgs<<[type:['VM']])[0] : 0
+		def dbToValidate = moveBundleList ? AssetEntity.executeQuery(validateCountQuery , countArgs<<[type:['Database']])[0] : 0
+		def fileToValidate = moveBundleList ? AssetEntity.executeQuery(validateCountQuery , countArgs<<[type:['Files']])[0] : 0
+		
+		def otherToValidate = moveBundleList ? AssetEntity.executeQuery("select count(ae) from AssetEntity  ae where ae.assetType not in (:type)\
 			and ae.validation = :validation and ae.project = :project and (ae.moveBundle  in (:moveBundles) or ae.moveBundle.id is null)",
-			validateArgs <<[assetType:['Server','VM','Blade','Application','Database','Files'] ])[0] : 0
+			countArgs <<[type:['Server','VM','Blade','Application','Database','Files'] ])[0] : 0
 		
 		
-		return [moveBundleList:moveBundleList, applicationCount:applicationCount,appList:appList,unassignedAppCount:unassignedAppCount,
-			percentageAppCount:percentageAppCount, dbCount:databaseCount, fileCount:fileCount, otherAssetCount:otherAssetCount, assetCount:assetCount,assetList:assetList,
-			unassignedPhysialAssetCount:unassignedPhysialAssetCount, unassignedVirtualAssetCount:unassignedVirtualAssetCount,percentagePhysicalAssetCount:percentagePhysicalAssetCount,
-			percentagevirtualAssetCount:percentagevirtualAssetCount,physicalCount:physicalCount, virtualCount:virtualCount,
-			appDependenciesCount:appDependenciesCount,serverDependenciesCount:serverDependenciesCount, pendingAppDependenciesCount:pendingAppDependenciesCount,
-			pendingServerDependenciesCount:pendingServerDependenciesCount, issuesCount : issues.size(),likelyLatencyCount:likelyLatencyCount,unlikelyLatencyCount:unlikelyLatencyCount,
-			unknownLatencyCount:unknownLatencyCount,unassignedAssetCount:unassignedAssetCount,project:project,planningConsoleList:planningConsoleList,date:time,moveBundle:moveEventList,likelyLatency:likelyLatency,
-			unlikelyLatency:unlikelyLatency,unknownLatency:unknownLatency,dependencyBundleCount:dependencyBundleCount,uniqueMoveEventList:uniqueMoveEventList,planningDashboard:'planningDashboard',bundleStartDate:bundleStartDate,
-			unassignedDbCount:unassignedDbCount,unassignedFilesCount:unassignedFilesCount,unassignedOtherCount:unassignedOtherCount,dbList:dbList,filesList:filesList,otherTypeList:otherTypeList,percentageOtherCount:percentageOtherCount,
-			percentageDBCount:percentageDBCount,percentageFilesCount:percentageFilesCount,openIssue:openIssue,dueOpenIssue:dueOpenIssue,generalOverDue:generalOverDue, dependencyScan:dependencyScan, validated:validated,
-			dependencyReview:dependencyReview, bundleReady:bundleReady, appToValidate:appToValidate,psToValidate:psToValidate,vsToValidate:vsToValidate,
+		return [moveBundleList:moveBundleList, applicationCount:applicationCount, appList:appList, unassignedAppCount:unassignedAppCount,
+			percentageAppCount:percentageAppCount, dbCount:databaseCount, fileCount:fileCount, otherAssetCount:otherAssetCount, 
+			assetCount:assetCount,assetList:assetList, percentagePhysicalAssetCount:percentagePhysicalAssetCount, unlikelyLatencyCount:unlikelyLatencyCount,
+			unassignedPhysialAssetCount:unassignedPhysialAssetCount, unassignedVirtualAssetCount:unassignedVirtualAssetCount,
+			percentagevirtualAssetCount:percentagevirtualAssetCount, physicalCount:physicalCount, virtualCount:virtualCount,
+			appDependenciesCount:appDependenciesCount, serverDependenciesCount:serverDependenciesCount,
+			pendingAppDependenciesCount:pendingAppDependenciesCount, issuesCount : issues.size(), 
+			pendingServerDependenciesCount:pendingServerDependenciesCount, likelyLatencyCount:likelyLatencyCount,
+			unknownLatencyCount:unknownLatencyCount, unassignedAssetCount:unassignedAssetCount, project:project, planningConsoleList:planningConsoleList,
+			date:time, moveBundle:moveEventList, likelyLatency:likelyLatency, unlikelyLatency:unlikelyLatency, unknownLatency:unknownLatency,
+			dependencyBundleCount:dependencyBundleCount, uniqueMoveEventList:uniqueMoveEventList, planningDashboard:'planningDashboard',
+			bundleStartDate:bundleStartDate, unassignedDbCount:unassignedDbCount, unassignedFilesCount:unassignedFilesCount,
+			unassignedOtherCount:unassignedOtherCount, dbList:dbList, filesList:filesList, otherTypeList:otherTypeList,
+			percentageOtherCount:percentageOtherCount, percentageDBCount:percentageDBCount, percentageFilesCount:percentageFilesCount,
+			openIssue:openIssue, dueOpenIssue:dueOpenIssue, generalOverDue:generalOverDue, dependencyScan:dependencyScan, validated:validated,
+			dependencyReview:dependencyReview, bundleReady:bundleReady, appToValidate:appToValidate, psToValidate:psToValidate, vsToValidate:vsToValidate,
 			dbToValidate:dbToValidate, fileToValidate:fileToValidate, otherToValidate:otherToValidate]
 	}
 	

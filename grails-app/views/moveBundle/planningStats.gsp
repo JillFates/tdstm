@@ -14,7 +14,7 @@ $(document).ready(function() {
 </head>
 <body>
 	<div class="body">
-		<div style="width: 1283px !important;">
+		<div style="width: 1330px !important;">
 		    <g:set var="percentageAppToValidate" value="${applicationCount ? Math.round((appToValidate/applicationCount)*100) :100}"/>
 		    <g:set var="percentageBundleReady" value="${applicationCount ? Math.round((bundleReady/applicationCount)*100) : 0}"/>
 			<g:set var="percentageUnassignedAppCount" value="${applicationCount ? Math.round((unassignedAppCount/applicationCount)*100) :100}"/>
