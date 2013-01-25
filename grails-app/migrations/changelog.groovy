@@ -11,5 +11,6 @@ databaseChangeLog = {
 	include file: '20130109-alter-validation-column.groovy'
 	include file: '20130111-add-roletypes.groovy'
 	include file: '20130114-fix-roletypes.groovy'
+	include file: '20130125-add-entity-validation.groovy'
 	
 }

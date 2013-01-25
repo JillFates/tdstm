@@ -154,7 +154,7 @@
 								<td>&nbsp</td>
 								<td>&nbsp</td>
 								<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
-								<td colspan="2"><g:select id="planStatus" name ="planStatus" from="${planStatusOptions}" value= "${assetEntityInstance.planStatus}" noSelection="${['':' Please Select']}" tabindex="39" /></td>
+								<td colspan="2"><g:select id="planStatus" name ="planStatus" from="${planStatusOptions}" value= "Unassigned" noSelection="${['':' Please Select']}" tabindex="39" /></td>
 								<td class="label" nowrap="nowrap"><label for="cart">Cart / Shelf</label></td>
 								<td><input type="text" id="cart" name="cart" value="${assetEntityInstance.cart}" size=3 tabindex="62" />
 								<input type="text" id="shelf" name="shelf" value="${assetEntityInstance.shelf}" size=3 tabindex="63" /></td>

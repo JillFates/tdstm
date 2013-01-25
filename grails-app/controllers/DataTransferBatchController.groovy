@@ -169,6 +169,20 @@ class DataTransferBatchController {
 	    									assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
 	    								}
 										break;
+									case "validation":
+										if(!it.importValue){
+											assetEntity."$attribName" = 'Discovery'
+										} else {
+											assetEntity."$attribName" = it.importValue
+										}
+										break;
+									case "planStatus":
+										if(!it.importValue){
+											assetEntity."$attribName" = 'Unassigned'
+										} else {
+											assetEntity."$attribName" = it.importValue
+										}
+										break;
 									case "usize":
 										// Skip the insertion
 										break;
@@ -417,10 +431,16 @@ class DataTransferBatchController {
 											break;
 										case "validation":
 												if(!it.importValue){
-														def validation = "Discovery"
-														application."$attribName" = validation
+													application."$attribName" = "Discovery"
 												}else{
-												        application."$attribName" = it.importValue
+											        application."$attribName" = it.importValue
+												}
+												break;
+										case "planStatus":
+												if(!it.importValue){
+													application."$attribName" = 'Unassigned'
+												} else {
+													application."$attribName" = it.importValue
 												}
 												break;
 										default:
@@ -631,6 +651,20 @@ class DataTransferBatchController {
 										case "fileSize":
 											files."$attribName" = it.importValue ? Integer.parseInt(it.importValue) : 0
 										    break;
+										case "validation":
+											if(!it.importValue){
+												files."$attribName" = "Discovery"
+											}else{
+												files."$attribName" = it.importValue
+											}
+											break;
+										case "planStatus":
+											if(!it.importValue){
+												files."$attribName" = 'Unassigned'
+											} else {
+												files."$attribName" = it.importValue
+											}
+											break;
 										default:
 										if( it.eavAttribute.backendType == "int"){
 											def correctedPos
@@ -840,6 +874,20 @@ class DataTransferBatchController {
 									case "dbSize":
 										    dbInstance."$attribName" = it.importValue ? Integer.parseInt(it.importValue) : 0
 									    break;
+									case "validation":
+										if(!it.importValue){
+											dbInstance."$attribName" = "Discovery"
+										}else{
+											dbInstance."$attribName" = it.importValue
+										}
+										break;
+									case "planStatus":
+										if(!it.importValue){
+											dbInstance."$attribName" = 'Unassigned'
+										} else {
+											dbInstance."$attribName" = it.importValue
+										}
+										break;
 									default:
 									if( it.eavAttribute.backendType == "int"){
 										def correctedPos
