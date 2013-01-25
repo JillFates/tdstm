@@ -182,7 +182,7 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${issuesCount}</td>
-							<td style="width: 150px;"><g:link controller="assetEntity" action="listTasks" params="[filter:'analysisIssue', section:'dashBoard']" class="links">Open Tasks</g:link></td>
+							<td style="width: 150px;"><g:link controller="assetEntity" action="listTasks" params="[filter:'analysisIssue', justRemaining:0, moveEvent:0]" class="links">Open Tasks</g:link></td>
 						</tr>
 						<g:if test="${generalOverDue>0}">
 						<tr>
@@ -330,7 +330,7 @@ $(document).ready(function() {
 						<tr>
 							<td style="color: black"><b>Servers</b></td>
 							<td style="text-align: left;"><b>
-									<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'All']" class="links">${unassignedAssetCount}</g:link>
+									<g:link controller="assetEntity" action="list" params="[tag_f_planStatus:'unassigned']" class="links">${unassignedAssetCount}</g:link>
 							</b></td>
 								<g:each in="${assetList}" var="assetCount">
 									<td style="text-align: right;"><b>
@@ -348,7 +348,7 @@ $(document).ready(function() {
 							</g:if>
 							<g:else>
 							<b>
-								<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'physical']" class="links">
+								<g:link controller="assetEntity" action="list" params="[tag_f_planStatus:'unassigned']" class="links">
 								   ${unassignedPhysialAssetCount} (${(percentageUnassignedPhysicalAssetCount > 0 && percentageUnassignedPhysicalAssetCount < 1) ? 1 : Math.round(percentageUnassignedPhysicalAssetCount)}%)
 								</g:link>
 							</b>
@@ -372,7 +372,7 @@ $(document).ready(function() {
 							</g:if>
 							<g:else>
 							<b>
-								<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'virtual']" class="links">
+								<g:link controller="assetEntity" action="list" params="[tag_f_planStatus:'unassigned']" class="links">
 								   ${unassignedVirtualAssetCount} (${(percentageUnassignedVirtualCount > 0 && percentageUnassignedVirtualCount < 1) ? 1 : Math.round(percentageUnassignedVirtualCount)}%)
 								</g:link>
 							</b>
@@ -458,6 +458,17 @@ $(document).ready(function() {
 							<td style="text-align: right;"><b>
 								<g:link controller="assetEntity" action="list" params="[tag_f_planStatus:'moved']" class="links">${percentageOtherCount}%</g:link>
 							</b></td>
+						</tr>
+						<tr>
+                            <td style="color: black"><b>Open Tasks</b></td>
+                            <td style=" text-align: left;">
+							</td>
+							<g:each in="${openTasks}" var="tasks">
+								<td style="text-align: right;"><b>
+									<g:link controller="assetEntity" action="listTasks" params="[moveEvent:tasks.moveEvent, justRemaining:1]" class="links">${tasks.count}</g:link>
+								</b></td>
+							</g:each>
+							<td style="text-align: right;"></td>
 						</tr>
 					</tbody>
 				</table>

@@ -506,6 +506,7 @@ class MoveBundleController {
         def dbList = []
 		def filesList = []
 		def otherTypeList = []
+		def openTasks = []
 		
 		moveEventList.each{ moveEvent->
 			// fetching move bundles for current moveEvent which was set 'true' for useOfPlanning 
@@ -559,6 +560,12 @@ class MoveBundleController {
 			def otherCount = moveBundle ? AssetEntity.executeQuery(otherCountQuery,
 			eventWiseArgs << [type:['Server','VM','Blade','Application','Files','Database','Appliances']])[0] : 0
 			otherTypeList << ['moveEvent':moveEvent.id , 'count':otherCount]
+			
+			def openIssues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status in (:status) \
+				and a.moveEvent = :event" ,[project:project, type:AssetCommentType.TASK, 
+				status: [AssetCommentStatus.READY,AssetCommentStatus.STARTED], event:moveEvent])
+			
+			openTasks << ['moveEvent':moveEvent.id , 'count':openIssues.size()]
 			
 		}
 		
@@ -757,7 +764,7 @@ class MoveBundleController {
 			percentageOtherCount:percentageOtherCount, percentageDBCount:percentageDBCount, percentageFilesCount:percentageFilesCount,
 			openIssue:openIssue, dueOpenIssue:dueOpenIssue, generalOverDue:generalOverDue, dependencyScan:dependencyScan, validated:validated,
 			dependencyReview:dependencyReview, bundleReady:bundleReady, appToValidate:appToValidate, psToValidate:psToValidate, vsToValidate:vsToValidate,
-			dbToValidate:dbToValidate, fileToValidate:fileToValidate, otherToValidate:otherToValidate]
+			dbToValidate:dbToValidate, fileToValidate:fileToValidate, otherToValidate:otherToValidate, openTasks:openTasks]
 	}
 	
 	/**

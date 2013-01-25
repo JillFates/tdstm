@@ -12,5 +12,6 @@ databaseChangeLog = {
 	include file: '20130111-add-roletypes.groovy'
 	include file: '20130114-fix-roletypes.groovy'
 	include file: '20130125-add-entity-validation.groovy'
+	include file: '20130125-update-plantatus-validation.groovy'
 	
 }
