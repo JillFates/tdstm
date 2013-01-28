@@ -56,7 +56,7 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${physicalCount}</td>
-							<td><g:link controller="assetEntity" action="list" params="[filter:'physicalServer']" class="links">Physical Servers</g:link><br />
+							<td><g:link controller="assetEntity" action="list" params="[filter:'physical']" class="links">Physical Servers</g:link><br />
 							<g:if test="${ psToValidate > 0 }">
 							     (<g:link controller="assetEntity" action="list" params="[filter:'toValidate', type:'physical']" class="links">${psToValidate} to validate</g:link>)
 						    </g:if>
@@ -88,7 +88,7 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${otherAssetCount}</td>
-							<td><g:link controller="assetEntity" action="list" params="[filter:'otherAsset']" class="links">Other Assets</g:link><br />
+							<td><g:link controller="assetEntity" action="list" params="[filter:'other']" class="links">Other Assets</g:link><br />
 							<g:if test="${ otherToValidate > 0 }">
 							     (<g:link controller="assetEntity" action="list" params="[filter:'toValidate', type:'other']" class="links">${otherToValidate} to validate</g:link>)
 					        </g:if>
@@ -444,7 +444,7 @@ $(document).ready(function() {
 							</g:if>
 							<g:else>
                             <b>
-								<g:link controller="assetEntity" action="list" params="[moveEvent:'unAssigned',filter:'other']" class="links">
+								<g:link controller="assetEntity" action="list" params="[tag_f_planStatus:'unAssigned']" class="links">
 								   ${unassignedOtherCount}	(${(percentageUnassignedOtherCount > 0 && percentageUnassignedOtherCount < 1) ? 1 : Math.round(percentageUnassignedOtherCount)}%)
 								</g:link>
 							</b>

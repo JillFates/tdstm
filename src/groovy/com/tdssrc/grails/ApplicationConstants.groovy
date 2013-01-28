@@ -12,5 +12,9 @@ class ApplicationConstants {
 	
 	// Map for medium graph which have greater than 200 entities .
 	static def graphDefaultLargeMap = ["force":-70, "linkdistance":40, "width":1800, "height":2200]
+	
+	// Map for planning dashboard filters to asset list.
+	static def assetFilters = [All:['Server','VM','Blade'], physical:['Server','Blade'], virtual:['VM'],
+								other:['Server','VM','Blade','Application','Database','Files']]
 
 }

@@ -42,6 +42,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import groovy.time.TimeCategory
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.ApplicationConstants
+import org.apache.commons.lang.StringUtils
 
 class AssetEntityController {
 
@@ -1260,84 +1261,43 @@ class AssetEntityController {
 		def filterAttributes = [tag_f_assetName:params.tag_f_assetName,tag_f_model:params.tag_f_model,tag_f_sourceLocation:params.tag_f_sourceLocation,tag_f_sourceRack:params.tag_f_sourceRack,tag_f_targetLocation:params.tag_f_targetLocation,tag_f_targetRack:params.tag_f_targetRack,tag_f_assetType:params.tag_f_assetType,tag_f_assetType:params.tag_f_assetType,tag_f_serialNumber:params.tag_f_serialNumber,tag_f_moveBundle:params.tag_f_moveBundle,tag_f_depUp:params.tag_f_depUp,tag_f_depDown:params.tag_f_depDown,tag_s_1_application:params.tag_s_1_application,tag_s_2_assetName:params.tag_s_2_assetName,tag_s_3_model:params.tag_s_3_model,tag_s_4_sourceLocation:params.tag_s_4_sourceLocation,tag_s_5_sourceRack:params.tag_s_5_sourceRack,tag_s_6_targetLocation:params.tag_s_6_targetLocation,tag_s_7_targetRack:params.tag_s_7_targetRack,tag_s_8_assetType:params.tag_s_8_assetType,tag_s_9_assetTag:params.tag_s_9_assetTag,tag_s_10_serialNumber:params.tag_s_10_serialNumber,tag_s_11_moveBundle:params.tag_s_11_moveBundle,tag_s_12_depUp:params.tag_s_12_depUp,tag_s_13_depDown:params.tag_s_13_depDown]
 		session.setAttribute('filterAttributes', filterAttributes)
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		
 		def project = Project.findById( projectId )
 		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
-		String moveBundle = moveBundleList.id
-		moveBundle = moveBundle.replace("[","('").replace(",","','").replace("]","')")
-		String bundle
-		def bundledAsset
-		if(params.moveEvent && params.moveEvent!='unAssigned'){
-			def moveEvent = MoveEvent.get(params.moveEvent)
-			def moveBundles = moveEvent.moveBundles
-		    def  bundles = moveBundles.findAll {it.useOfPlanning == true}.id
-			bundledAsset = moveBundles.findAll {it.useOfPlanning == true}
-			String filterdBundle = bundles
-			bundle = filterdBundle.replace("[","('").replace(",","','").replace("]","')")
+		def args = [project:project, bundles:moveBundleList]
+		def queryArgs = params.filter == 'toValidate' ? args : (params.filter ? args << [assetType:ApplicationConstants.assetFilters[params.filter]] : args) 
+		
+		// if filter is requested for event so fetching move bundles associated with requested event.
+		if(params.moveEvent && params.moveEvent !='unAssigned'){
+			def moveEvent = MoveEvent.get( params.moveEvent )
+			def moveBundles = moveEvent?.moveBundles.id
+			
+			moveBundles = moveBundleList.findAll {moveBundles.contains(it.id)}
+			queryArgs << [bundles:moveBundles]
 		}
 		def assetEntityInstanceList
-
-		// TODO - Some of the else if test params.moveEvent while others don't which doesn't seem correct. 
-		// TODO - Remove unused if else and optimize it.
-		if(params.moveEvent=='unAssigned' && params.filter=='All'){
-			
-			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','VM','Blade') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundle ")
-			
-		}else if(params.moveEvent && params.moveEvent!='unAssigned' && params.filter=='All'){
+		// forming different query for different scenarios .
+		def query = "FROM AssetEntity ae WHERE ae.project = :project  AND ae.assetType ${params.filter == 'other' ? 'NOT IN':  'IN'}  (:assetType)"
 		
-			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','VM','Blade')  and moveBundle in $bundle ")
-			
-		}else if(params.moveEvent=='unAssigned' && params.filter=='physical'){
+		def assignedQuery = query+ "AND (ae.moveBundle IN (:bundles) OR ae.moveBundle IS NULL)"
+		def filterUnAssignedQuery = query +" AND ae.moveBundle in (:bundles) AND (ae.planStatus IS NULL OR ae.planStatus IN ('Unassigned',''))"
 		
-			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','Blade') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundle ")
-			
-		}else if(params.moveEvent && params.moveEvent!='unAssigned' && params.filter=='physical'){
-		
-			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('Server','Blade')  and moveBundle in $bundle ")
-			
-		}else if(params.moveEvent=='unAssigned' && params.filter=='virtual'){
-		
-			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('VM') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundle ")
-			
-		}else if(params.moveEvent && params.moveEvent!='unAssigned' && params.filter=='virtual'){
-		
-			assetEntityInstanceList= AssetEntity.findAll("from AssetEntity where project = $projectId and assetType in ('VM')  and moveBundle in $bundle ")
-			
-		}else if(params.moveEvent=='unAssigned' && params.filter=='other'){
-		
-		    assetEntityInstanceList =AssetEntity.findAll("from AssetEntity where project = $projectId and assetType not in ('Server','VM','Blade','Application','Database','Files') and (planStatus is null or planStatus in ('Unassigned','')) and moveBundle in $moveBundle ")
-		
-		}else if(params.moveEvent && params.moveEvent!='unAssigned' && params.filter=='other'){
-		
-		    assetEntityInstanceList =AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(bundledAsset,['Server','VM','Blade','Application','Files','Database'])
-		 
-		}else if(params.filter=='otherAsset'){
-		
-		    assetEntityInstanceList =AssetEntity.findAll("from AssetEntity ae where project = $projectId and ae.assetType not in ('Server','VM','Blade','Application','Database','Files','Appliances') and ( ae.moveBundle in $moveBundle or ae.moveBundle is null) ")
-		 
-		}else if(params.filter=='physicalServer'){
-		
-		    assetEntityInstanceList = AssetEntity.findAll("from AssetEntity ae where project = $projectId and ae.assetType in ('Server','Blade') and ( ae.moveBundle in $moveBundle or ae.moveBundle is null) ")
-			
-		}else if(params.filter=='virtual'){
-		
-		    assetEntityInstanceList = AssetEntity.findAll("from AssetEntity ae where project = $projectId and ae.assetType = 'VM' and ( ae.moveBundle in $moveBundle or ae.moveBundle is null) ")
-			
-		}else if(params.filter=='toValidate'){
-		   def validateArgs = [project:project, moveBundles:moveBundleList, validation:'Discovery']
-		   if( params.type == 'other'){
-			   validateArgs << [assetType:['Server','VM','Blade','Application','Database','Files']]
-		   } else {
-		   	   params.type == 'physical' ? validateArgs << [assetType:['Server','Blade']] : validateArgs << [assetType:['VM']]
-		   }
-		   assetEntityInstanceList = AssetEntity.findAll("FROM AssetEntity ae WHERE project = :project AND ae.validation = :validation \
-				AND ae.assetType ${params.type=='other' ? 'NOT IN ':'IN '} (:assetType)\
-			    AND ( ae.moveBundle IN (:moveBundles) OR ae.moveBundle is null)", validateArgs )
-			
-		}
-		 else{
-		
+		if ( params.filter=='toValidate' ) {
+			queryArgs << [validation:'Discovery']
+			if( params.type == 'other'){
+				queryArgs << [assetType:ApplicationConstants.assetFilters["other"]]
+			} else {
+			   params.type == 'physical' ? queryArgs << [assetType:ApplicationConstants.assetFilters["physical"]] : queryArgs << [assetType:ApplicationConstants.assetFilters["virtual"]]
+			}
+			assetEntityInstanceList = AssetEntity.findAll("FROM AssetEntity ae WHERE project = :project AND ae.validation = :validation \
+				 AND ae.assetType ${params.type=='other' ? 'NOT IN ':'IN '} (:assetType)\
+				 AND ( ae.moveBundle IN (:bundles) OR ae.moveBundle is null)", queryArgs )
+		} else if( params.filter ){
+			   assetEntityInstanceList= AssetEntity.findAll(assignedQuery,queryArgs)
+		} else {
 		    assetEntityInstanceList = AssetEntity.findAllByProjectAndAssetTypeNotInList( project,["Application","Database","Files"], params )
-		}
+		} 
+		
 		def commentSQL
 		def assetEntityList =  new ArrayList()
 		assetEntityInstanceList.each { assetEntity->
