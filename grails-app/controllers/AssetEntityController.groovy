@@ -1258,7 +1258,9 @@ class AssetEntityController {
 	 * @return assetList
 	 *-------------------------------------------*/
 	def list = {
-		def filterAttributes = [tag_f_assetName:params.tag_f_assetName,tag_f_model:params.tag_f_model,tag_f_sourceLocation:params.tag_f_sourceLocation,tag_f_sourceRack:params.tag_f_sourceRack,tag_f_targetLocation:params.tag_f_targetLocation,tag_f_targetRack:params.tag_f_targetRack,tag_f_assetType:params.tag_f_assetType,tag_f_assetType:params.tag_f_assetType,tag_f_serialNumber:params.tag_f_serialNumber,tag_f_moveBundle:params.tag_f_moveBundle,tag_f_depUp:params.tag_f_depUp,tag_f_depDown:params.tag_f_depDown,tag_s_1_application:params.tag_s_1_application,tag_s_2_assetName:params.tag_s_2_assetName,tag_s_3_model:params.tag_s_3_model,tag_s_4_sourceLocation:params.tag_s_4_sourceLocation,tag_s_5_sourceRack:params.tag_s_5_sourceRack,tag_s_6_targetLocation:params.tag_s_6_targetLocation,tag_s_7_targetRack:params.tag_s_7_targetRack,tag_s_8_assetType:params.tag_s_8_assetType,tag_s_9_assetTag:params.tag_s_9_assetTag,tag_s_10_serialNumber:params.tag_s_10_serialNumber,tag_s_11_moveBundle:params.tag_s_11_moveBundle,tag_s_12_depUp:params.tag_s_12_depUp,tag_s_13_depDown:params.tag_s_13_depDown]
+	     // Commented below code as we are not using this code  for now
+		
+		/*def filterAttributes = [tag_f_assetName:params.tag_f_assetName,tag_f_model:params.tag_f_model,tag_f_sourceLocation:params.tag_f_sourceLocation,tag_f_sourceRack:params.tag_f_sourceRack,tag_f_targetLocation:params.tag_f_targetLocation,tag_f_targetRack:params.tag_f_targetRack,tag_f_assetType:params.tag_f_assetType,tag_f_assetType:params.tag_f_assetType,tag_f_serialNumber:params.tag_f_serialNumber,tag_f_moveBundle:params.tag_f_moveBundle,tag_f_depUp:params.tag_f_depUp,tag_f_depDown:params.tag_f_depDown,tag_s_1_application:params.tag_s_1_application,tag_s_2_assetName:params.tag_s_2_assetName,tag_s_3_model:params.tag_s_3_model,tag_s_4_sourceLocation:params.tag_s_4_sourceLocation,tag_s_5_sourceRack:params.tag_s_5_sourceRack,tag_s_6_targetLocation:params.tag_s_6_targetLocation,tag_s_7_targetRack:params.tag_s_7_targetRack,tag_s_8_assetType:params.tag_s_8_assetType,tag_s_9_assetTag:params.tag_s_9_assetTag,tag_s_10_serialNumber:params.tag_s_10_serialNumber,tag_s_11_moveBundle:params.tag_s_11_moveBundle,tag_s_12_depUp:params.tag_s_12_depUp,tag_s_13_depDown:params.tag_s_13_depDown]
 		session.setAttribute('filterAttributes', filterAttributes)
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		
@@ -1358,8 +1360,63 @@ class AssetEntityController {
 			return [assetEntityInstanceList : null,projectId: projectId, servers : servers,
 				applications : applications, dbs : dbs, files : files, 
 				assetDependency: new AssetDependency() ]
+		}*/
+		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		return [assetDependency : new AssetDependency(), dependencyType:dependencyType, dependencyStatus:dependencyStatus]
+		
+	}
+	/**
+	 * This method is used by JQgrid to load assetList
+	 */
+	def listJson = {
+		def sortIndex = params.sidx ?: 'assetName'
+		def sortOrder  = params.sord ?: 'asc'
+		def maxRows = Integer.valueOf(params.rows)
+		def currentPage = Integer.valueOf(params.page) ?: 1
+		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		
+		def project = securityService.getUserCurrentProject()
+		def assetEntities = AssetEntity.createCriteria().list(max: maxRows, offset: rowOffset) {
+			 if (params.assetName) ilike('assetName', "%${params.assetName}%")
+			 if (params.assetType) ilike('assetType', "%${params.assetType}%")
+			 if (params.model) ilike('model', "%${params.model}%")
+			 if (params.sourceLocation) ilike('sourceLocation', "%${params.sourceLocation}%")
+			 if (params.sourceRack) ilike('sourceRack', "%${params.sourceRack}%")
+			 if (params.targetLocation) ilike('targetLocation', "%${params.targetLocation}%")
+			 if (params.targetRack) ilike('targetRack', "%${params.targetRack}%")
+			 if (params.assetTag) ilike('assetTag', "%${params.assetTag}%")
+			 if (params.serialNumber) ilike('serialNumber', "%${params.serialNumber}%")
+			 if (params.planStatus) { ilike('planStatus', "%${params.planStatus}%")}
+			 eq("project", project)
+			 not {'in'("assetType",["Application","Database","Files"])}
+			 order(sortIndex, sortOrder).ignoreCase() 
 		}
-
+			
+		def totalRows = assetEntities.totalCount
+		def numberOfPages = Math.ceil(totalRows / maxRows)
+		
+		def results = assetEntities?.collect { [ cell: ['',it.assetName, it.assetType,it.model?.modelName, it.sourceLocation,
+			it.sourceRack, it.targetLocation, it.targetRack, it.assetTag, it.serialNumber,it.planStatus, 
+			AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
+			AssetDependency.countByDependentAndStatusNotEqual(it, "Validated"),
+			AssetDependency.countByAssetAndStatusNotEqual(it, "Validated"),
+			AssetComment.find("from AssetComment ac where ac.assetEntity=:entity and commentType=:type and status!=:status",
+				[entity:it, type:'issue', status:'completed']) ? 'issue' : 
+				(AssetComment.find("from AssetComment ac where ac.assetEntity=:entity",[entity:it]) ? 'comment' : 'blank')], id: it.id,
+		    ]}
+		
+		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages] 
+		
+		render jsonData as JSON
+	}
+	/*
+	 * This action is default edit action for jqGrid edit , delete.
+	 */
+	def editAssetList = {
+		if(params.oper=="del"){
+			deleteBulkAsset{}
+		}
 	}
 	/* ----------------------------------------
 	 * delete assetEntity
@@ -3650,7 +3707,7 @@ class AssetEntityController {
 	*/
 	
 	def deleteBulkAsset={
-		def assetArray = params['assetLists[]']
+		def assetArray = params['id']
 		def assetList
 		if(assetArray.class.toString() == "class java.lang.String"){
 		  assetList = assetArray.split(",")

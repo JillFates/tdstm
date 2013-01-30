@@ -365,3 +365,7 @@ th.desc a {
 	font-weight: bold;
 	cursor: pointer
 }
+
+.ui-widget-header a {
+	color: #000000 !important;
+}

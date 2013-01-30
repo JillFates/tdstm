@@ -13,19 +13,12 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
-
-<link rel="stylesheet" type="text/css" href="${resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
-<script language="javascript" src="${resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
+<jqgrid:resources />
+<jqui:resources /> 
+<jqgrid:resources />
 
 <script type="text/javascript">
-function onInvokeAction(id) {
-    setExportToLimit(id, '');
-    createHiddenInputFieldsForLimitAndSubmit(id);
-}
-function onInvokeExportAction(id) {
-    var parameterString = createParameterStringForLimit(id);
-    location.href = 'list?' + parameterString;
-}
+// TODO : move this code to JS once verified in tmdev
 $(document).ready(function() {
 			$("#createEntityView").dialog({ autoOpen: false })
 			$("#showEntityView").dialog({ autoOpen: false })
@@ -38,103 +31,76 @@ $(document).ready(function() {
 	        $("#modelShowDialog").dialog({ autoOpen: false })
 	        $("#filterPane").draggable()
 	        
+<jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
+    editurl="'${createLink(action: 'editAssetList')}'"
+    colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','Target Location','Target Rack','Tag','Serial#','Plan Status','Dep#','Dep Up',
+        'Dep Down', 'id', 'commentType'"
+    colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false},
+      			  {name:'assetName',index: 'assetName', editable: true, formatter: myLinkFormatter },
+                  {name:'assetType', editable: true},
+                  {name:'model', editable: true}, 
+                  {name:'sourceLocation', editable: true},
+                  {name:'sourceRack', editable: true},
+                  {name:'targetLocation', editable: true},
+                  {name:'targetRack', editable: true},
+                  {name:'assetTag', editable: true},
+                  {name:'serialNumber', editable: true},
+                  {name:'planStatus', editable: true},
+                  {name:'depNumber', editable: false,sortable:false,search:false},
+                  {name:'depUp', editable: false,sortable:false,search:false },
+                  {name:'depDown', editable: false,sortable:false,search:false},
+                  {name:'id', hidden: true},
+                  {name:'commentType', hidden: true} "
+    sortname="'assetName'"
+    caption="'Asset List'"
+    height="'auto'"
+    width="1200"
+    rowNum="25"
+    rowList= "'25','50','100'"
+    multiselect="true"
+    viewrecords="true"
+    forceFit ="false"
+    showPager="true"
+    datatype="'json'">
+    <jqgrid:filterToolbar id="assetListId" searchOnEnter="false" />
+    <jqgrid:navigation id="assetListId" add="false" edit="false" del="true" search="false" refresh="true" />
+    <jqgrid:resize id="assetListId" resizeOffset="-2" />
+   
+</jqgrid:grid>
+
+
+function myLinkFormatter (cellvalue, options, rowObjcet) {
+	var value = cellvalue ? cellvalue : ''
+	return '<a href="javascript:getEntityDetails(\'assetEntity\',\''+rowObjcet[2]+'\','+options.rowId+')">'+value+'</a>'
+}
+
+function myCustomFormatter (cellVal,options,rowObject) {
+	var editButton = '<a href="javascript:editEntity(\'assetEntity\',\''+rowObject[1]+'\','+options.rowId+')">'+"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+	if(rowObject[14]=='issue'){
+		var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
+		editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_red.png')}' border='0px'/>"+"</a></span>"
+	} else if (rowObject[14]=='comment') {
+		var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
+		editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_bold.png')}' border='0px'/>"+"</a></span>"
+	} else {
+		editButton+='<span id="icon_'+options.rowId+'"><a href="javascript:createNewAssetComment('+options.rowId+',\''+rowObject[1]+'\')">'+"<img src='${resource(dir:'i',file:'db_table_light.png')}' border='0px'/>"+"</a></span>"
+	}
+    return editButton
+}
+
+$(".jqgfirstrow").hide()
 })
 </script>
 </head>
 <body>
-
+<br />
 <div class="body">
-<h1>AssetList</h1>
-<g:if test="${flash.message}">
-	<div class="message">${flash.message}</div>
-</g:if>
-<tds:hasPermission permission='EditAndDelete'>
-    <div style="margin-left: 5px;">
-		<input id="selectAssetId" type="checkbox" onclick="selectAllAssets()" title="Select All" />&nbsp;&nbsp;<label for="selectAssetId" style="cursor:pointer;"> <b>All</b></label>
-	</div>
-</tds:hasPermission>
 <div>
-	<form name="assetEntityForm" action="list">
-		<jmesa:tableFacade id="tag" items="${assetEntityList}" maxRows="25" exportTypes="csv,excel" stateAttr="restore" var="assetEntityInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
-		    <jmesa:htmlTable style=" border-collapse: separate">
-		        <jmesa:htmlRow highlighter="true">
-		        	<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" >
-		        	<tds:hasPermission permission='EditAndDelete'>
-		        		<g:checkBox name="assetCheckBox" id="checkId_${assetEntityInstance.id}" onclick="enableButton(assetEntityList)"></g:checkBox>
-		        		<a href="javascript:editEntity('assetEntity','${assetEntityInstance?.assetType}',${assetEntityInstance.id})"><img src="${resource(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
-		        	</tds:hasPermission>
-		        		<tds:hasPermission permission="CommentCrudView">
-							<span id="icon_${assetEntityInstance.id}">
-								<g:if test="${assetEntityInstance.commentType == 'issue'}">
-									<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-										<img src="${resource(dir:'i',file:'db_table_red.png')}" border="0px"/>
-									</g:remoteLink>
-								</g:if>
-								<g:elseif test="${assetEntityInstance.commentType == 'comment'}">
-								<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityInstance.id}" before="setAssetId('${assetEntityInstance.id}');" onComplete="listCommentsDialog(e,'never');">
-									<img src="${resource(dir:'i',file:'db_table_bold.png')}" border="0px"/>
-								</g:remoteLink>
-								</g:elseif>
-								<g:else>
-								<a href="javascript:createNewAssetComment(${assetEntityInstance.id},'${assetEntityInstance.assetName}');">
-									<img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px"/>
-								</a>
-								</g:else>
-							</span>
-					 </tds:hasPermission> 
-		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="assetName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<a id="assetName_${assetEntityInstance.id}" href="javascript:getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.assetName}</a>
-		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="assetType" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="assetType_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.assetType}</span>
-		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="model" title="Model" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="model_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.model}</span>
-		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="sourceLocation" sortable="true" title="Location" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="sourceLocation_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.sourceLocation}</span>
-		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="sourceRack" sortable="true" title="Rack" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="sourceRack_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.sourceRack}</span>
-		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="targetLocation" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="targetLocation_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.targetLocation}</span>
-		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="targetRack" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="targetRack_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.targetRack}</span>
-		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="assetTag" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="assetTag_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.assetTag}</span>
-		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="serialNumber" title="Serial #" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="serialNumber_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.serialNumber}</span>
-		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="planStatus" title="Plan Status" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="planStatus_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.planStatus}</span>
-		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="moveBundle" title="Bundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="moveBundle_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.moveBundle}</span>
-		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="dependencyBundleNumber" title="Dep #" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span id="dependencyBundleNumber_${assetEntityInstance.id}" onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.dependencyBundleNumber}</span>
-		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="depUp" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.depUp}</span>
-		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="depDown" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getEntityDetails('assetEntity','${assetEntityInstance.assetType}', ${assetEntityInstance.id} )">${assetEntityInstance.depDown}</span>
-		        	</jmesa:htmlColumn>
-		        </jmesa:htmlRow>
-			</jmesa:htmlTable>
-		</jmesa:tableFacade>
-	</form>
+	  <jqgrid:wrapper id="assetListId" /> 
 </div>
-
 <div class="buttons"><g:form>
 <tds:hasPermission permission='EditAndDelete'>
 	<span class="button"><input type="button" value="New Asset" class="create" onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Server\')')}"/></span>
-	<span class="button"><input id="deleteAsset" type="button" class="create" value="Delete Selected..."  title="Delete Selected" disabled="disabled"  onclick="deleteAssets(${assetEntityList.id},'server')" /></span>
 </tds:hasPermission>
 </g:form></div>
 </div> <%-- End of Body --%>
@@ -161,10 +127,7 @@ $(document).ready(function() {
 	<span id="Database"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 	<span id="Storage"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
 </div>
-
 <script>
-    var assetEntityList=${assetEntityList.id}
-
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')
 </script>
