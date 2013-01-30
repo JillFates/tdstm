@@ -111,7 +111,7 @@ sql.eachRow( query ) {
 //	AND t.task_number < 40
 //    println "Record: $it"
     def task = "${it.task_number}:${it.task}"
-    task = (task.size() > 20) ? task[0..19] : task 
+    task = (task.size() > 35) ? task[0..34] : task 
 	println "\t${it.task_number} [label=\"${task}\"];"
 	def successors = it.successors
 	if (successors) {

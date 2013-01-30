@@ -78,10 +78,20 @@ class TaskService {
 		//log.error "person:${person.id}"
 		// Find all Tasks assigned to the person OR assigned to a role that is not hard assigned (to someone else)
 		
-		StringBuffer sql = new StringBuffer("""SELECT t.asset_comment_id AS id, t.comment, t.est_finish AS estFinish, t.last_updated AS lastUpdated,
-		 	t.asset_entity_id AS assetEntity, t.status, t.assigned_to_id AS assignedTo, IFNULL(a.asset_name,'') AS assetName, t.role,
-		 	t.task_number AS taskNumber, t.est_finish AS estFinish, t.due_date AS dueDate, p.first_name AS firstName, p.last_name AS lastName,
-			t.status_updated AS statusUpdated, t.hard_assigned AS hardAssigned, t.category""")
+		StringBuffer sql = new StringBuffer("""SELECT t.asset_comment_id AS id, 
+			t.task_number AS taskNumber, 
+			t.role,
+		 	t.comment, 
+			t.est_finish AS estFinish, 
+			t.due_date AS dueDate, 
+			t.last_updated AS lastUpdated,
+			t.status_updated AS statusUpdated, 
+		 	t.asset_entity_id AS assetEntity, 
+			t.status, t.assigned_to_id AS assignedTo, 
+			IFNULL(a.asset_name,'') AS assetName, 
+			p.first_name AS firstName, p.last_name AS lastName,
+			t.hard_assigned AS hardAssigned, 
+			t.category""")
 
 		// Add in the Sort Scoring Algorithm into the SQL if we're going to return a list
 		if ( ! countOnly) {
