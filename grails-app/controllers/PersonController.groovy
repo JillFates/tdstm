@@ -642,14 +642,14 @@ class PersonController {
 		def firstProp = paramsMap.firstProp ? (paramsMap.firstProp && paramsMap.firstProp == 'company' ? '' :paramsMap.firstProp) : 'staff'
 		
 		// Adding Company TDS and Project partner in all companies list
-		def tdsCompany = PartyGroup.findByName('TDS')
+		Party tdsCompany = PartyGroup.findByName('TDS')
 		def partner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' \
 				and p.partyIdFrom in ( :projects ) and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ",[projects:projectList])?.partyIdToId
 		def companies = projectList.client
 		companies << tdsCompany
-		if(partner) companies << partner
+		//if(partner) companies << partner
 		
-		
+		println companies
 		def staffRelations = partyRelationshipService.getAllCompaniesStaff( companies )
 		def c=staffRelations.size()
 		log.debug("Staff List: " + staffRelations)
