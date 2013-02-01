@@ -455,8 +455,9 @@ class PersonController {
 				if(params.manageFuncs != '0' || functions){
                     def staffCompany = partyRelationshipService.getStaffCompany(personInstance)
                     def companyProject = Project.findByClient(staffCompany)
+                    partyRelationshipService.updateStaffFunctions(staffCompany, personInstance, functions, 'STAFF')
 					if(companyProject)
-                        partyRelationshipService.updateStaffFunctions(companyProject, personInstance,functions)
+                        partyRelationshipService.updateStaffFunctions(companyProject, personInstance,functions, "PROJ_STAFF")
 				}
 				def personExpDates =params.list("availability")
 				if(personExpDates){
@@ -534,7 +535,7 @@ class PersonController {
         // Limit the events to today-30 days and newer (ie. don't show events over a month ago) 
         moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > new Date().minus(30)}
 		def paramsMap = [sortOn : 'lastName', firstProp : 'staff', orderBy : 'asc']
-		def staffList = getStaffList(project, currRole, currScale, currLoc, 0,paramsMap)
+		def staffList = getStaffList([project], currRole, currScale, currLoc, 0,paramsMap)
 		
 		def eventCheckStatuses = eventCheckStatus(staffList, moveEvents)
 		def staffCheckStatus = staffCheckStatus(staffList,project)
@@ -639,8 +640,17 @@ class PersonController {
 		def sortOn = paramsMap.sortOn ?:"lastName"
 		def orderBy = paramsMap.orderBy?:'asc'
 		def firstProp = paramsMap.firstProp ? (paramsMap.firstProp && paramsMap.firstProp == 'company' ? '' :paramsMap.firstProp) : 'staff'
-
-	 	def staffRelations = partyRelationshipService.getAllProjectsStaff( projectList )
+		
+		// Adding Company TDS and Project partner in all companies list
+		def tdsCompany = PartyGroup.findByName('TDS')
+		def partner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' \
+				and p.partyIdFrom in ( :projects ) and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ",[projects:projectList])?.partyIdToId
+		def companies = projectList.client
+		companies << tdsCompany
+		if(partner) companies << partner
+		
+		
+		def staffRelations = partyRelationshipService.getAllCompaniesStaff( companies )
 		def c=staffRelations.size()
 		log.debug("Staff List: " + staffRelations)
 		if (role != '0') {
@@ -767,11 +777,9 @@ class PersonController {
 		def blackOutdays = person.blackOutDates.sort{it.exceptionDay}
 		def subject = SecurityUtils.subject
 		def company = partyRelationshipService.getStaffCompany( person )
-        def staffCompany = partyRelationshipService.getStaffCompany(person)
-        def companyProject = Project.findByClient(staffCompany)
+        def companyProject = Project.findByClient( company )
         def personFunctions = []
-        if(companyProject)
-            personFunctions = partyRelationshipService.getProjectStaffFunctions(companyProject.id, person.id)
+        personFunctions = partyRelationshipService.getCompanyStaffFunctions(company.id, person.id)
             
 		def availabaleFunctions = RoleType.findAllByDescriptionIlike("Staff%")
         

@@ -221,6 +221,34 @@ class PartyRelationshipService {
         }
     	return list
     }
+	/**
+	 *  Returns a list of staff for a specified Company or list of Companies
+	 * @param Project
+	 * @return Map[] - array of maps contain each Staff relationship to a project
+	 */
+	def getAllCompaniesStaff( def companies ) {
+		def list = []
+
+		def relations = PartyRelationship.findAll("FROM PartyRelationship p WHERE p.partyRelationshipType='STAFF' AND " +
+			"p.partyIdFrom IN (:companies) AND p.roleTypeCodeFrom='COMPANY'", [companies:companies])
+			
+		relations.each{ r ->
+			def company = PartyRelationship.findAll(
+				"from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $r.partyIdTo.id and p.roleTypeCodeFrom='COMPANY' " +
+				"and p.roleTypeCodeTo = 'STAFF' "
+				)
+
+			def map = [:]
+			map.company = company.partyIdFrom
+			map.staff = r.partyIdTo
+			map.name = r.partyIdTo.toString()
+			map.role = r.roleTypeCodeTo
+			map.project = r.partyIdFrom
+			
+			list<<map
+		}
+		return list
+	}
 
     /*
      *  Method to create string list
@@ -462,6 +490,26 @@ class PartyRelationshipService {
  	}
 
 	/**
+	 * Used to get list of functions that a Staff have
+	 * @param Integer staffId - staff person id
+	 * @param Integer CompanyId - company id that the staff associate with
+	 * @return array of role codes
+	 */
+	def getCompanyStaffFunctions(def companyId, def staffId) {
+		
+		def projectRoles = PartyRelationship.findAll("from PartyRelationship p \
+			where p.partyRelationshipType='STAFF' \
+			and p.roleTypeCodeFrom='COMPANY' \
+			and p.roleTypeCodeTo !='STAFF' \
+			and p.partyIdFrom.id=? \
+			and p.partyIdTo.id=?", [companyId, staffId] )
+			
+		def functions = projectRoles.roleTypeCodeTo
+		
+		return functions
+	}
+	
+	/**
 	 * Used to get list of functions that a Staff member has been assigned to on a Project
 	 * @param Integer staffId - staff person id
 	 * @param Integer projectId - project id that the staff may be associate with
@@ -561,17 +609,16 @@ class PartyRelationshipService {
      * @param functionIds - functions list that assigned to staff
      * @return nothing
      */
-    def updateStaffFunctions(project, person, functionIds){
+    def updateStaffFunctions(partyIdFrom, person, functionIds, def prTypeId="STAFF" ){
         
-        def staffType = PartyRelationshipType.read("PROJ_STAFF")
-        def projectRole = RoleType.read("PROJECT")
-        
+        def prType = PartyRelationshipType.read(prTypeId)
+        def roleType = RoleType.read(prType=="STAFF"?"PROJECT":"COMPANY")
+		def roleTypeCodeTo = RoleType.read('STAFF')
         // If user deleted all functions.
         if(!functionIds){
-            def existingFuncToDelete = PartyRelationship.findAll("from PartyRelationship where partyRelationshipType = :type and partyIdFrom = :project \
-                and partyIdTo =:person ", [type:staffType, project:project, person:person ])
+            def existingFuncToDelete = PartyRelationship.findAll("from PartyRelationship where partyRelationshipType = :type and partyIdFrom = :partyIdFrom \
+                and partyIdTo =:person and roleTypeCodeTo != :roleTypeCodeTo ", [type:prType, partyIdFrom:partyIdFrom, person:person,roleTypeCodeTo:roleTypeCodeTo ])
             PartyRelationship.withNewSession { existingFuncToDelete*.delete() }
-            
             return;
         }
         
@@ -580,24 +627,24 @@ class PartyRelationshipService {
         def functions = RoleType.findAllByIdInList(functionIds)
         
         // Delete the functions that are deleted from UI
-        def existingFuncToDelete = PartyRelationship.findAll("from PartyRelationship where partyRelationshipType = :type and partyIdFrom = :project \
-            and partyIdTo =:person and roleTypeCodeTo not in (:functions)", 
-            [type:staffType, project:project, person:person, functions:functions ])
+        def existingFuncToDelete = PartyRelationship.findAll("from PartyRelationship where partyRelationshipType = :type and partyIdFrom = :partyIdFrom \
+            and partyIdTo =:person and roleTypeCodeTo not in (:functions) and roleTypeCodeTo != :roleTypeCodeTo", 
+            [type:prType, partyIdFrom:partyIdFrom, person:person, functions:functions, roleTypeCodeTo:roleTypeCodeTo ])
         PartyRelationship.withNewSession { existingFuncToDelete*.delete() }
         
         // get the list of functions that are already exists to ignore
         def existingFuncToIgnore = PartyRelationship.findAll("from PartyRelationship where partyRelationshipType = :type and partyIdFrom = :project \
-            and partyIdTo =:person and roleTypeCodeTo in (:functions)",
-            [type:staffType, project:project, person:person, functions:functions ])?.roleTypeCodeTo
+            and partyIdTo =:person and roleTypeCodeTo in (:functions) and roleTypeCodeTo != :roleTypeCodeTo",
+            [type:prType, project:partyIdFrom, person:person, functions:functions,roleTypeCodeTo:roleTypeCodeTo ])?.roleTypeCodeTo
         
         // remove the existing functions to avoid multiple checks
         functions.removeAll(existingFuncToIgnore)
         
         // Iterate through the functions and assign to staff if not exists
         functions.each{ func ->
-            def partyRT = new PartyRelationship( partyRelationshipType : staffType, 
-                                                    partyIdFrom : project,
-                                                    roleTypeCodeFrom:projectRole,
+            def partyRT = new PartyRelationship( partyRelationshipType : prType, 
+                                                    partyIdFrom : partyIdFrom,
+                                                    roleTypeCodeFrom:roleType,
                                                     partyIdTo : person, 
                                                     roleTypeCodeTo : func 
                                               )
