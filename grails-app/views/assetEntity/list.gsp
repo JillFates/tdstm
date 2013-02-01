@@ -19,6 +19,7 @@
 
 <script type="text/javascript">
 // TODO : move this code to JS once verified in tmdev
+
 $(document).ready(function() {
 			$("#createEntityView").dialog({ autoOpen: false })
 			$("#showEntityView").dialog({ autoOpen: false })
@@ -30,13 +31,16 @@ $(document).ready(function() {
 	        $("#manufacturerShowDialog").dialog({ autoOpen: false })
 	        $("#modelShowDialog").dialog({ autoOpen: false })
 	        $("#filterPane").draggable()
-	        
+var filter = $("#filter").val()    
+var type = $("#type").val()  
+var event = $("#event").val()  
+
 <jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
-    editurl="'${createLink(action: 'editAssetList')}'"
-    colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','Target Location','Target Rack','Tag','Serial#','Plan Status','Dep#','Dep Up',
-        'Dep Down', 'id', 'commentType'"
+    editurl="'${createLink(action: 'deleteBulkAsset')}'"
+    colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','Target Location','Target Rack','Tag','Serial#','Plan Status','Bundle',
+        'Dep#','Dep Up', 'Dep Down', 'id', 'commentType'"
     colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false},
-      			  {name:'assetName',index: 'assetName', editable: true, formatter: myLinkFormatter },
+      			  {name:'assetName',index: 'assetName', editable: true, formatter: myLinkFormatter},
                   {name:'assetType', editable: true},
                   {name:'model', editable: true}, 
                   {name:'sourceLocation', editable: true},
@@ -46,6 +50,7 @@ $(document).ready(function() {
                   {name:'assetTag', editable: true},
                   {name:'serialNumber', editable: true},
                   {name:'planStatus', editable: true},
+                  {name:'moveBundle', editable: true},
                   {name:'depNumber', editable: false,sortable:false,search:false},
                   {name:'depUp', editable: false,sortable:false,search:false },
                   {name:'depDown', editable: false,sortable:false,search:false},
@@ -59,8 +64,10 @@ $(document).ready(function() {
     rowList= "'25','50','100'"
     multiselect="true"
     viewrecords="true"
-    forceFit ="false"
+    shrinkToFit="true"
+    forceFit ="true"
     showPager="true"
+    postData="{filter: filter, event:event, type:type}"
     datatype="'json'">
     <jqgrid:filterToolbar id="assetListId" searchOnEnter="false" />
     <jqgrid:navigation id="assetListId" add="false" edit="false" del="true" search="false" refresh="true" />
@@ -69,21 +76,28 @@ $(document).ready(function() {
 </jqgrid:grid>
 
 
+
 function myLinkFormatter (cellvalue, options, rowObjcet) {
 	var value = cellvalue ? cellvalue : ''
 	return '<a href="javascript:getEntityDetails(\'assetEntity\',\''+rowObjcet[2]+'\','+options.rowId+')">'+value+'</a>'
 }
 
 function myCustomFormatter (cellVal,options,rowObject) {
-	var editButton = '<a href="javascript:editEntity(\'assetEntity\',\''+rowObject[1]+'\','+options.rowId+')">'+"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+	var editButton = '<a href="javascript:editEntity(\'assetEntity\',\''+rowObject[1]+'\','+options.rowId+')">'+
+			"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 	if(rowObject[14]=='issue'){
-		var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
-		editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_red.png')}' border='0px'/>"+"</a></span>"
+		var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
+			+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
+		editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
+			+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_red.png')}' border='0px'/>"+"</a></span>"
 	} else if (rowObject[14]=='comment') {
-		var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
-		editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_bold.png')}' border='0px'/>"+"</a></span>"
+		var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
+			+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
+		editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
+			+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_bold.png')}' border='0px'/>"+"</a></span>"
 	} else {
-		editButton+='<span id="icon_'+options.rowId+'"><a href="javascript:createNewAssetComment('+options.rowId+',\''+rowObject[1]+'\')">'+"<img src='${resource(dir:'i',file:'db_table_light.png')}' border='0px'/>"+"</a></span>"
+		editButton+='<span id="icon_'+options.rowId+'"><a href="javascript:createNewAssetComment('+options.rowId+',\''+rowObject[1]+'\')">'
+			+"<img src='${resource(dir:'i',file:'db_table_light.png')}' border='0px'/>"+"</a></span>"
 	}
     return editButton
 }
@@ -100,7 +114,8 @@ $(".jqgfirstrow").hide()
 </div>
 <div class="buttons"><g:form>
 <tds:hasPermission permission='EditAndDelete'>
-	<span class="button"><input type="button" value="New Asset" class="create" onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Server\')')}"/></span>
+	<span class="button"><input type="button" value="New Asset" class="create" 
+	onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Server\')')}"/></span>
 </tds:hasPermission>
 </g:form></div>
 </div> <%-- End of Body --%>
@@ -109,11 +124,15 @@ $(".jqgfirstrow").hide()
 <div id="createEntityView" style="display: none;"></div>
 <div id="showEntityView" style="display: none;"></div>
 <div id="editEntityView" style="display: none;"></div>
+<input type="hidden" id="event" value="${event}"/>
+<input type="hidden" id="type" value="${type}"/>
+<input type="hidden" id="filter" value="${filter}"/>
 <div style="display: none;">
 	<table id="assetDependencyRow">
 	<tr>
 		<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
-		<td><g:select name="entity" from="['Server','Application','Database','Storage']" onchange='updateAssetsList(this.name, this.value)'></g:select></td>
+		<td><g:select name="entity" from="['Server','Application','Database','Storage']" onchange='updateAssetsList(this.name, this.value)'>
+			</g:select></td>
 		<td><span id="Server"><g:select name="asset" from="${servers}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span></td>
 		<td><g:select name="dtype" from="${dependencyType.value}"  optionValue="value"></g:select></td>
 		<td><g:select name="status" from="${dependencyStatus.value}" optionValue="value"></g:select></td>

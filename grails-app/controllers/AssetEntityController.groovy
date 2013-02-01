@@ -1361,9 +1361,17 @@ class AssetEntityController {
 				applications : applications, dbs : dbs, files : files, 
 				assetDependency: new AssetDependency() ]
 		}*/
+		def project = securityService.getUserCurrentProject()
+		def servers = AssetEntity.executeQuery("SELECT a.id, a.assetName FROM AssetEntity a WHERE assetType in ('Server','VM','Blade') AND project=$project.id ORDER BY assetName")
+		// TODO : change the following queries to use straight JDBC to only get the id and assetName since only used for SELECT
+		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
+		def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
+		def files = Files.findAll('from Files where assetType = ? and project =? order by assetName asc',['Files', project])
+		
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-		return [assetDependency : new AssetDependency(), dependencyType:dependencyType, dependencyStatus:dependencyStatus]
+		return [assetDependency : new AssetDependency(), dependencyType:dependencyType, dependencyStatus:dependencyStatus,
+			event:params.moveEvent, filter:params.filter, type:params.type, servers : servers, applications : applications, dbs : dbs, files : files ]
 		
 	}
 	/**
@@ -1377,6 +1385,8 @@ class AssetEntityController {
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		
 		def project = securityService.getUserCurrentProject()
+		
+		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
 		def assetEntities = AssetEntity.createCriteria().list(max: maxRows, offset: rowOffset) {
 			 if (params.assetName) ilike('assetName', "%${params.assetName}%")
 			 if (params.assetType) ilike('assetType', "%${params.assetType}%")
@@ -1388,8 +1398,10 @@ class AssetEntityController {
 			 if (params.assetTag) ilike('assetTag', "%${params.assetTag}%")
 			 if (params.serialNumber) ilike('serialNumber', "%${params.serialNumber}%")
 			 if (params.planStatus) { ilike('planStatus', "%${params.planStatus}%")}
+			 if (bundleList) 'in'('moveBundle', bundleList)
 			 eq("project", project)
-			 not {'in'("assetType",["Application","Database","Files"])}
+		 	 not {'in'("assetType",  ["Application","Database","Files"])}
+			
 			 order(sortIndex, sortOrder).ignoreCase() 
 		}
 			
@@ -1397,7 +1409,7 @@ class AssetEntityController {
 		def numberOfPages = Math.ceil(totalRows / maxRows)
 		
 		def results = assetEntities?.collect { [ cell: ['',it.assetName, it.assetType,it.model?.modelName, it.sourceLocation,
-			it.sourceRack, it.targetLocation, it.targetRack, it.assetTag, it.serialNumber,it.planStatus, 
+			it.sourceRack, it.targetLocation, it.targetRack, it.assetTag, it.serialNumber,it.planStatus,it.moveBundle?.name, 
 			AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
 			AssetDependency.countByDependentAndStatusNotEqual(it, "Validated"),
 			AssetDependency.countByAssetAndStatusNotEqual(it, "Validated"),
@@ -1410,14 +1422,6 @@ class AssetEntityController {
 		
 		render jsonData as JSON
 	}
-	/*
-	 * This action is default edit action for jqGrid edit , delete.
-	 */
-	def editAssetList = {
-		if(params.oper=="del"){
-			deleteBulkAsset{}
-		}
-	}
 	/* ----------------------------------------
 	 * delete assetEntity
 	 * @param assetEntityId
@@ -1428,20 +1432,10 @@ class AssetEntityController {
 		def assetEntityInstance = AssetEntity.get( params.id )
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		if(assetEntityInstance) {
-			ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${assetEntityInstance.id}")
-			AssetTransition.executeUpdate("delete from AssetTransition ast where ast.assetEntity = ${assetEntityInstance.id}")
-			ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = ${assetEntityInstance.id}")
-			AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = ${assetEntityInstance.id}")
-			ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = ${assetEntityInstance.id}")
-			AssetCableMap.executeUpdate("delete AssetCableMap where fromAsset = ? ",[assetEntityInstance])
-			AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-											toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-											where toAsset = ?""",[assetEntityInstance])
-			AssetDependency.executeUpdate("delete AssetDependency where asset = ? or dependent = ? ",[assetEntityInstance, assetEntityInstance])
-			AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = ${assetEntityInstance.id}")
-            
-			flash.message = "AssetEntity ${assetEntityInstance.assetName} deleted"
+			assetEntityService.deleteAsset(assetEntityInstance)
 			assetEntityInstance.delete()
+			flash.message = "AssetEntity ${assetEntityInstance.assetName} deleted"
+			
 			if(redirectAsset?.contains("room_")){
 				def newredirectAsset = redirectAsset.split("_")
 				redirectAsset = newredirectAsset[0]
@@ -3041,7 +3035,7 @@ class AssetEntityController {
 				        forward(action:'getLists', params:[entity: params.tabType,labelsList:params.labels,dependencyBundle:session.getAttribute("dependencyBundle")])
 						break;
 					default:
-						redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_model:filterAttr.tag_f_model, tag_f_sourceLocation:filterAttr.tag_f_sourceLocation, tag_f_sourceRack:filterAttr.tag_f_sourceRack, tag_f_targetLocation:filterAttr.tag_f_targetLocation, tag_f_targetRack:filterAttr.tag_f_targetRack, tag_f_assetType:filterAttr.tag_f_assetType, tag_f_serialNumber:filterAttr.tag_f_serialNumber, tag_f_moveBundle:filterAttr.tag_f_moveBundle, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown,tag_s_1_application:filterAttr.tag_s_1_application,tag_s_2_assetName:filterAttr.tag_s_2_assetName,tag_s_3_model:filterAttr.tag_s_3_model,tag_s_4_sourceLocation:filterAttr.tag_s_4_sourceLocation,tag_s_5_sourceRack:filterAttr.tag_s_5_sourceRack,tag_s_6_targetLocation:filterAttr.tag_s_6_targetLocation,tag_s_7_targetRack:filterAttr.tag_s_7_targetRack,tag_s_8_assetType:filterAttr.tag_s_8_assetType,tag_s_9_assetTag:filterAttr.tag_s_9_assetTag,tag_s_10_serialNumber:filterAttr.tag_s_10_serialNumber,tag_s_11_moveBundle:filterAttr.tag_s_11_moveBundle,tag_s_12_depUp:filterAttr.tag_s_12_depUp,tag_s_13_depDown:filterAttr.tag_s_13_depDown])
+						redirect( action:list)
 	
 				}
 			}
@@ -3707,43 +3701,18 @@ class AssetEntityController {
 	*/
 	
 	def deleteBulkAsset={
-		def assetArray = params['id']
-		def assetList
-		if(assetArray.class.toString() == "class java.lang.String"){
-		  assetList = assetArray.split(",")
-		}else{
-		  assetList = assetArray
-		}
+		def assetList = params.id.split(",")
 		def assetNames = []
-		def assetEntityInstance
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-	
-			for(int i=0 ; i<assetList.size();i++){
-			    assetEntityInstance = AssetEntity.get( assetList[i] )
-				
-				
-				if(assetEntityInstance) {
-					assetNames.add(assetEntityInstance.assetName)
-					ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${assetEntityInstance.id}")
-					AssetTransition.executeUpdate("delete from AssetTransition ast where ast.assetEntity = ${assetEntityInstance.id}")
-					AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity = ${assetEntityInstance.id}")
-					ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = ${assetEntityInstance.id}")
-					AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = ${assetEntityInstance.id}")
-					ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = ${assetEntityInstance.id}")
-					AssetCableMap.executeUpdate("delete AssetCableMap where fromAsset = ? ",[assetEntityInstance])
-					AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-													toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-													where toAsset = ?""",[assetEntityInstance])
-					AssetDependency.executeUpdate("delete AssetDependency where asset = ? or dependent = ? ",[assetEntityInstance, assetEntityInstance])
-					AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = ${assetEntityInstance.id}")
-					
-					
-					assetEntityInstance.delete()
-				}
-				String names = assetNames.toString().replace('[','').replace(']','')
-				flash.message = "AssetEntity ${names} deleted"
+		assetList.each{assetId->
+		    def assetEntity = AssetEntity.get( assetId )
+			if(assetEntity) {
+				assetNames.add(assetEntity.assetName)
+				assetEntityService.deleteAsset(assetEntity)
+				assetEntity.delete()
+			}
 		}
-	  render "success"
+        def names = assetNames.toString().replace('[','').replace(']','')
+	  render"AssetEntity ${names} deleted"
 	}
 	
 	def getWorkflowTransition={

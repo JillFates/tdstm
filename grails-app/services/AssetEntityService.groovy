@@ -1,12 +1,13 @@
-import java.text.SimpleDateFormat
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.jsecurity.SecurityUtils
 
+import com.tds.asset.ApplicationAssetMap
+import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetDependency
+import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
-import com.tds.asset.AssetComment
-import com.tds.asset.CommentNote
-
+import com.tds.asset.AssetEntityVarchar
+import com.tds.asset.AssetTransition
 import com.tdssrc.grails.GormUtil
 
 class AssetEntityService {
@@ -413,5 +414,24 @@ class AssetEntityService {
 	  def splList =   jdbcTemplate.queryForList( queryForSpecialExport )
 											
       return splList
+	}
+	
+	/**
+	 * Delete asset and associated records, User this method when we want to delete an Entity
+	 * @param assetEntityInstance
+	 * @return
+	 */
+	def deleteAsset(assetEntity){
+		ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = :asset",[asset:assetEntity])
+		AssetTransition.executeUpdate("delete from AssetTransition ast where ast.assetEntity = :asset",[asset:assetEntity])
+		ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = :asset",[asset:assetEntity])
+		AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = :asset",[asset:assetEntity])
+		ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = :asset",[asset:assetEntity])
+		AssetCableMap.executeUpdate("delete AssetCableMap where fromAsset = :asset",[asset:assetEntity])
+		AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
+											toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+											where toAsset = :asset""",[asset:assetEntity])
+		AssetDependency.executeUpdate("delete AssetDependency where asset = :asset or dependent = :dependent ",[asset:assetEntity, dependent:assetEntity])
+		AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = :asset",[asset:assetEntity])
 	}
 }
