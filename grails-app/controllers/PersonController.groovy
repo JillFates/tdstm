@@ -535,7 +535,7 @@ class PersonController {
         // Limit the events to today-30 days and newer (ie. don't show events over a month ago) 
         moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > new Date().minus(30)}
 		def paramsMap = [sortOn : 'lastName', firstProp : 'staff', orderBy : 'asc']
-		def staffList = getStaffList([project], currRole, currScale, currLoc, 0,paramsMap)
+		def staffList = getStaffList([project], currRole, currScale, currLoc, "0",paramsMap)
 		
 		def eventCheckStatuses = eventCheckStatus(staffList, moveEvents)
 		def staffCheckStatus = staffCheckStatus(staffList,project)
@@ -649,7 +649,6 @@ class PersonController {
 		companies << tdsCompany
 		//if(partner) companies << partner
 		
-		println companies
 		def staffRelations = partyRelationshipService.getAllCompaniesStaff( companies )
 		def c=staffRelations.size()
 		log.debug("Staff List: " + staffRelations)
@@ -660,13 +659,22 @@ class PersonController {
 		log.debug("staffRelations: before=$c, after=${staffRelations.count()}")
 		def staffList = []
 		
+		def projectStaff =PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' "+
+			"and p.partyIdFrom  in (:projects) and p.roleTypeCodeFrom = 'PROJECT' ",[projects:projectList])
+		
 		staffRelations.each { staff -> 
 			// Add additional properties that aren't part of the Staff Relationships
 			// TODO - WHAT ARE THIS FIELDS???
-			staff.roleId = 'roleId?'	// I believe that this should be the ROLE code (e.g. MOVE_MGR)
-			staff.staffProject = 'staffProj.name?'	// This is the name of the project.
-
-			staffList << staff
+			def person = Person.read(staff.staff.id)
+			if(person.active=='Y' ){
+				def hasAssociation =  projectStaff.find{it.partyIdTo.id == staff.staff.id && it.roleTypeCodeTo.id == staff.role.id }
+				if (assigned=="0" || (assigned=="1" && hasAssociation)){
+					staff.roleId = 'roleId?'	// I believe that this should be the ROLE code (e.g. MOVE_MGR)
+					staff.staffProject = 'staffProj.name?'	// This is the name of the project.
+		
+					staffList << staff
+				}
+			}
 		}
 		/*
 

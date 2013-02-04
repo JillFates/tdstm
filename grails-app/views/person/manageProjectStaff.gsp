@@ -81,7 +81,7 @@
 							</tr>
 						</table>
 					</td>
-					--%><td>
+					<td>
 				      <span><b>Scale</b></span><br/>
 					   <label for="scale">
 	          				<select id="scale" name="scale" onChange="loadFilteredStaff('lastName','staff')">
@@ -91,7 +91,7 @@
 	          				 <option value="6"> 6 Month </option>
 	          				</select>
 	            	   </label>
-				   </td>
+				   </td>--%>
 				</tr>            
             </table>
             <br/>
