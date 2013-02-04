@@ -129,6 +129,9 @@
 		document.issueAssetForm.action = 'listTasks'
 		document.issueAssetForm.submit()
 	}
+	function setTab(tab){
+		$("#tabId").val(tab)
+	}
 	
 function zxcAnimate(mde,obj,srt){
 	this.to=null;

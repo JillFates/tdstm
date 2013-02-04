@@ -78,6 +78,14 @@
 				<td valign="top" class="name"><label for="estFinish">Est.Finish:</label></td>
 				<td valign="top" class="value" id="estFinishShowId_${assetComment.id}" colspan="3" nowrap="nowrap">${etFinish}</td>
 			</tr>
+			<tr class="prop issue" id="estFinishShowId"  >
+				<td valign="top" class="name"><label for="estFinish">Due Date:</label></td>
+	          <td> <script type="text/javascript" charset="utf-8">
+		 		 	 jQuery(function($){$('.dateEditRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+            		</script>
+	          		<input type="text" class="dateEditRange" size="15" style="" name="dueDateCreateId" id="dueDateCreateId"
+							value="${dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
+            </tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="category">Category:</label></td>
 				<td valign="top" class="value" colspan="3"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="${assetComment.category}"></g:select></td>
@@ -286,7 +294,8 @@ $( function() {
 	 var params = {'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 
 				   'category':$('#categoryEditId_'+objId).val(), 'assignedTo':$('#assignedToEditId_'+objId).val(),
 				   'status':$('#statusEditId_'+objId).val(),'currentStatus':$('#currentStatus_'+objId).val(), 
-				   'note':$('#noteEditId_'+objId).val(),'id':objId,'view':'myTask', 'tab': $('#tabId').val()
+				   'note':$('#noteEditId_'+objId).val(),'id':objId,'view':'myTask', 'tab': $('#tabId').val(),
+				   'dueDate':$("#dueDateCreateId").val()
 				  }
 		 jQuery.ajax({
 				url: '../task/update',

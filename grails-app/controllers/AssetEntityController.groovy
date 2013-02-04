@@ -1834,10 +1834,7 @@ class AssetEntityController {
 		def personCreateObj
 		def dtCreated
 		def dtResolved
-		def etStart
-		def etFinish
-		def atStart
-		def dueDate
+		
 		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 		def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
@@ -1851,18 +1848,14 @@ class AssetEntityController {
 				personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")
 				dtResolved = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
 			}
-			if(assetComment.estStart){
-				etStart = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.estStart, tzId));
-			}
-			if(assetComment.estFinish){
-				etFinish = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.estFinish, tzId));
-			}
-			if(assetComment.actStart){
-				atStart = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.actStart, tzId));
-			}
-			if(assetComment.dueDate){
-				dueDate = dateFormatter.format(assetComment.dueDate);
-			}
+			
+			def etStart =  assetComment.estStart ? estformatter.format(TimeUtil.convertInToUserTZ(assetComment.estStart, tzId)) : ''
+			
+			def etFinish = assetComment.estFinish ? estformatter.format(TimeUtil.convertInToUserTZ(assetComment.estFinish, tzId)) : ''
+			
+			def atStart = assetComment.actStart ? estformatter.format(TimeUtil.convertInToUserTZ(assetComment.actStart, tzId)) : ''
+			
+		    def dueDate = assetComment.dueDate ? dateFormatter.format(TimeUtil.convertInToUserTZ(assetComment.dueDate, tzId)): ''
 	
 			def workflowTransition = assetComment?.workflowTransition
 			def workflow = workflowTransition?.name
@@ -1919,7 +1912,7 @@ class AssetEntityController {
 			commentList << [ 
 				assetComment:assetComment, personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
 				dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo?:'', assetName:assetComment.assetEntity?.assetName ?: "",
-				eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate?:'', etStart:etStart?:'', etFinish:etFinish?:'',atStart:atStart,notes:notes,
+				eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate, etStart:etStart, etFinish:etFinish,atStart:atStart,notes:notes,
 				workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,maxVal:maxVal,
 				cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1]
 		}else{

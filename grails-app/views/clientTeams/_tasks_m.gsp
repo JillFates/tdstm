@@ -10,19 +10,19 @@
 <div class="menu4">
 	<ul>
 		<g:if test="${tab && tab == 'todo'}">
-			<li><g:link elementId="taskLinkId" class="mobmenu mobselect"
-					action="listTasks" params='["tab":"todo","search":search]'>My Tasks: ${todoSize}
+			<li onclick="setTab('todo')"><g:link elementId="taskLinkId" class="mobmenu mobselect"
+					action="listTasks" params='["tab":"todo"]'>My Tasks: ${todoSize}
 				</g:link></li>
-			<li><g:link elementId="taskLinkAllId" class="mobmenu" 
-					action="listTasks" params='["tab":"all","search":search]'>All Tasks: ${allSize}
+			<li onclick="setTab('all')"><g:link elementId="taskLinkAllId" class="mobmenu" 
+					action="listTasks" params='["tab":"all"]'>All Tasks: ${allSize}
 				</g:link></li>
 		</g:if>
 		<g:if test="${tab && tab == 'all'}">
-			<li><g:link elementId="taskLinkId" class="mobmenu"
-					action="listTasks" params='["tab":"todo","search":search]'>My Tasks: ${todoSize}
+			<li onclick="setTab('todo')"><g:link elementId="taskLinkId" class="mobmenu"
+					action="listTasks" params='["tab":"todo"]'>My Tasks: ${todoSize}
 				</g:link></li>
-			<li><g:link elementId="taskLinkAllId" class="mobmenu mobselect"
-					action="listTasks" params='["tab":"all","search":search]'>All Tasks: ${allSize}
+			<li onclick="setTab('all')"><g:link elementId="taskLinkAllId" class="mobmenu mobselect"
+					action="listTasks" params='["tab":"all"]'>All Tasks: ${allSize}
 				</g:link></li>
 		</g:if>
 		<li>

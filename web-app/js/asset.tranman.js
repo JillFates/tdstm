@@ -733,6 +733,10 @@ function showAssetDialog( e , action ) {
 	      		     $('#estStartEditTrId').css('display','table-row')
 	      		     $('#estFinishShowId').html(params.etFinish)
 	      		     params.etFinish ? $('#estFinishEditId').val(params.etFinish) : $('#estFinishEditId').val('')
+	      		    		 
+      		    	 $('#dueDateShowId').html(params.dueDate)
+   	      		     params.dueDate ? $('#dueDateEditId').val(params.dueDate) : $('#dueDateEditId').val('')
+   	      		    		 
 	      		     $('#actStartShowId').html(params.atStart)
 	      		     $('#actStartEditId').val(params.atStart)
 	      		     $('#actFinishShowId').html(params.dtResolved)
@@ -1072,7 +1076,7 @@ function createIssue(asset, type, id){
 		commentChange('#createResolveDiv','createCommentForm')
 		$('#priorityCreateSpanId').css('display','inline-table')
 		$('#statusCreateTrId').css('display','table-row')
-		$('#assetEntityTrId').css('display','none')
+		//$('#assetEntityTrId').css('display','none')
 		if(asset){
 			$('#assetEntityTrId').css('display','table-row')
 			$('#assetEntityInputId').html(asset)
@@ -1318,7 +1322,7 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 		var params = { 'comment':$('#commentEditId').val(), 'commentType':$('#commentTypeEditId').val(),
 			'isResolved':$('#isResolvedEditId').val(), 'resolution':$('#resolutionEditId').val(), 
 			'mustVerify':$('#mustVerifyEditId').val(), 'category':$('#categoryEditId').val(), 
-			'assignedTo':$('#assignedToEdit').val(), 'dueDate':$('#dueDateEdit').val(), 
+			'assignedTo':$('#assignedToEdit').val(), 'dueDate':$('#dueDateEditId').val(), 
 			'moveEvent':$('#moveEventEditId').val(), 'status':$('#statusEditId').val(),
 //			'note':$('#noteEditId').val(),'assetEntity.id':$('#assetValueId').val(),
 			'estStart':$('#estStartEditId').val(), 'estFinish':$('#estFinishEditId').val(),

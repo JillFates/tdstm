@@ -89,13 +89,15 @@
 		</tr>
 		<tr class="issue" id="workFlowShow" style="display: none">
 			<td valign="top" class="name"><label for="durationShowId">Duration:</label></td>
-			<td valign="top" class="value"colspan="2">
-				<span id="durationShowId" />
-				<span id="durationScale" />
-			</td>
-			<td>
+			<td valign="top" class="value"colspan="3" nowrap="nowrap">
+				<span id="durationShowId" ></span>
+				<span id="durationScale" ></span>
+				&nbsp;&nbsp;&nbsp;&nbsp;
 				<span ><label for="priorityShowId">Priority:</label></span>
 				<span id="priorityShowId"></span>
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<span ><label for="dueDateShowId">Due Date:</label></span>
+				<span id="dueDateShowId"></span>
 			</td>
 		</tr>
     	<tr class="prop">
@@ -224,12 +226,6 @@
             	<g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
             	noSelection="['':'please select']" onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionId', 'predecessorId','')"></g:select>
 			</td>
-			<td nowrap="nowrap" colspan="2">
-        		<span id="priorityCreateSpanId" style="display: none">
-	        		<label for="priority">Priority:</label>
-	            	<g:select id="priority" name="priority" from="${1..5}" value="3"></g:select>
-            	</span>
-        	</td>
 		</tr>
 		<tr class="prop" id="workFlowTransitionTrId" style="display: none">
 			<td valign="top" class="name"><label>WorkFlow Step:</label></td>
@@ -250,6 +246,16 @@
         	<td valign="top" class="value" colspan="3">
         	  <input type="text" id="duration" name="duration" value="" size="3">
             	<g:select id="durationScale" name="durationScale " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>
+            	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              	<span id="priorityCreateSpanId" style="display: none">
+	        		<label for="priority">Priority:</label>
+	            	<g:select id="priority" name="priority" from="${1..5}" value="3"></g:select>
+            	</span>
+            	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              	<span id="dueDateCreateSpanId" >
+	        		 <input type="text" class="dateEditRange" size="15" style="" name="dueDateCreateId" id="dueDateCreateId"
+							value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+            	</span>
         	</td>
 		</tr>
 		<tr id="statusCreateTrId"  class="prop" style="display: none">
@@ -436,6 +442,14 @@
 				<span id="priorityEditSpanId">
 		        	    <label for="priority">Priority:</label>
 		            	<g:select id="priorityEdit" name="priorityEdit" from="${1..5}" value=""></g:select>
+	            </span> &nbsp;&nbsp;&nbsp;
+	            <span id="dueDateEditSpanId">
+		        	    <label for="dueDateEditId">Due Date:</label>
+		        	    <script type="text/javascript" charset="utf-8">
+				 		 	jQuery(function($){$('.dateEditRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+                 		 </script>
+		        	    <input type="text" class="dateEditRange" size="15" style="" name="dueDateEdit" id="dueDateEditId"
+							value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 	            </span>
         	</td>
 	        	

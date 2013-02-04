@@ -17,22 +17,23 @@
 		</g:if>
 			<ul>
 					<g:if test="${tab && tab == 'todo'}">
-						<li><g:link elementId="taskLinkId" class="mobmenu mobselect"
-								action="listTasks" params='["tab":"todo","search":search]'>My Tasks: <span id="toDOSpanId">${todoSize}</span>
+						<li onclick="setTab('todo')"><g:link elementId="taskLinkId" class="mobmenu mobselect"
+								action="listTasks" params='["tab":"todo"]'>My Tasks: <span id="toDOSpanId">${todoSize}</span>
+								
 							</g:link>
 						</li>
-						<li><g:link elementId="taskLinkAllId" class="mobmenu"
-								action="listTasks" params='["tab":"all","search":search]'>All Tasks: <span id="toDOAllSpanId">${allSize}</span>
+						<li onclick="setTab('all')"><g:link elementId="taskLinkAllId" class="mobmenu"
+								action="listTasks" params='["tab":"all"]'>All Tasks: <span id="toDOAllSpanId">${allSize}</span>
 							</g:link>
 						</li>
 					</g:if>
 					<g:if test="${tab && tab == 'all'}">
-						<li><g:link elementId="taskLinkId" class="mobmenu"
-								action="listTasks" params='["tab":"todo","search":search]'>My Tasks: <span id="allToDoSpanId">${todoSize}</span>
+						<li onclick="setTab('todo')"><g:link elementId="taskLinkId" class="mobmenu"
+								action="listTasks" params='["tab":"todo"]'>My Tasks: <span id="allToDoSpanId">${todoSize}</span>
 							</g:link>
 						</li>
-						<li><g:link elementId="taskLinkAllId" class="mobmenu mobselect"
-								action="listTasks" params='["tab":"all","search":search]'>All Tasks: <span id="allSpanId">${allSize}</span>
+						<li onclick="setTab('all')"><g:link elementId="taskLinkAllId" class="mobmenu mobselect"
+								action="listTasks" params='["tab":"all"]'>All Tasks: <span id="allSpanId">${allSize}</span>
 							</g:link>
 						</li>
 					</g:if>
@@ -57,6 +58,7 @@
 							onfocus="changeAction()" onblur="retainAction()" />
 						<input type="hidden" name="sort" value="${sort}" />
 						<input type="hidden" name="order" value="${order}" />
+						<input type="hidden" name="tab" id="tabId" value="${tab}" />
 					</g:form>
 				</div>
 				</div>
@@ -287,6 +289,9 @@ function pageRefresh(){
 	document.issueAssetForm.submit()
 }
 
+function setTab(tab){
+	$("#tabId").val(tab)
+}
 
 	setFocus();
 

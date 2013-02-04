@@ -1088,6 +1088,7 @@ class ClientTeamsController {
 		}
 		
 		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+		def dueFormatter = new SimpleDateFormat("MM/dd/yyyy");
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def etFinish	
 			
@@ -1137,6 +1138,7 @@ class ClientTeamsController {
 		if (assetComment?.estFinish){
 			etFinish = estformatter.format(GormUtil.convertInToUserTZ(assetComment.estFinish, tzId));
 		}
+		def dueDate = assetComment.dueDate ? dueFormatter.format(GormUtil.convertInToUserTZ(assetComment.dueDate, tzId)) : ''
 		
 		def successor = TaskDependency.findAllByPredecessor( assetComment )
 		def projectStaff = partyRelationshipService.getProjectStaff( project.id )?.staff
@@ -1152,6 +1154,7 @@ class ClientTeamsController {
 			etFinish:etFinish, 
 			projectStaff:projectStaff,
 			browserTest:browserTest,
+			dueDate:dueDate,
 			assignToSelect:assignToSelect]
 		
 		if(viewMode=='mobile'){

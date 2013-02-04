@@ -64,6 +64,7 @@
 								<tds:convertDate date="${item?.estFinish}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
 									format="MM/dd kk:mm" />
 						</td>
+						
 						<td id="statusTd_${item?.id}" class="asset_details_block">
 							${item?.status}<% // (${formatter.format(item?.score?: 0)}) %>
 						</td>
