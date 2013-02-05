@@ -25,7 +25,8 @@
 				   </td>
 				   <td>
 				       <span><b>Only Assigned</b></span><br/>
-	          				<input type="checkbox" name="assigned" id="assignedId"  onChange="if(this.checked){this.value = 1} else {this.value = 0 };loadFilteredStaff('lastName','staff')"/>
+	          				<input type="checkbox" name="assigned" id="assignedId"  onChange="if(this.checked){this.value = 1} else {this.value = 0 };loadFilteredStaff('lastName','staff')"
+	          				value="0"/>
 				   </td>
 				    <%--<td>
 				       <span><b>Location</b></span><br/>

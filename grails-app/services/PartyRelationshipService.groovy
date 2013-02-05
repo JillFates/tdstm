@@ -615,9 +615,10 @@ class PartyRelationshipService {
         def roleType = RoleType.read(prType=="STAFF"?"PROJECT":"COMPANY")
 		def roleTypeCodeTo = RoleType.read('STAFF')
         // If user deleted all functions.
+		def functionQuery = "from PartyRelationship where partyRelationshipType = :type and partyIdTo =:person and roleTypeCodeTo != :roleTypeCodeTo"
         if(!functionIds){
-            def existingFuncToDelete = PartyRelationship.findAll("from PartyRelationship where partyRelationshipType = :type and partyIdFrom = :partyIdFrom \
-                and partyIdTo =:person and roleTypeCodeTo != :roleTypeCodeTo ", [type:prType, partyIdFrom:partyIdFrom, person:person,roleTypeCodeTo:roleTypeCodeTo ])
+            def existingFuncToDelete = PartyRelationship.findAll(functionQuery, 
+				[type:prType, partyIdFrom:partyIdFrom, person:person,roleTypeCodeTo:roleTypeCodeTo ])
             PartyRelationship.withNewSession { existingFuncToDelete*.delete() }
             return;
         }
@@ -627,15 +628,25 @@ class PartyRelationshipService {
         def functions = RoleType.findAllByIdInList(functionIds)
         
         // Delete the functions that are deleted from UI
-        def existingFuncToDelete = PartyRelationship.findAll("from PartyRelationship where partyRelationshipType = :type and partyIdFrom = :partyIdFrom \
-            and partyIdTo =:person and roleTypeCodeTo not in (:functions) and roleTypeCodeTo != :roleTypeCodeTo", 
+        def existingFuncToDelete = PartyRelationship.findAll(functionQuery+" and partyIdFrom = :partyIdFrom  and roleTypeCodeTo not in (:functions)", 
             [type:prType, partyIdFrom:partyIdFrom, person:person, functions:functions, roleTypeCodeTo:roleTypeCodeTo ])
-        PartyRelationship.withNewSession { existingFuncToDelete*.delete() }
+		
+		// Delete all functions when deleting from Company
+		if(prTypeId=='STAFF'){
+			 def deletedFuncts = PartyRelationship.findAll(functionQuery+" and roleTypeCodeTo not in (:functions)", 
+					[type:PartyRelationshipType.read('PROJ_STAFF'), person:person, functions:functions, roleTypeCodeTo:roleTypeCodeTo ])
+			 
+			 def deletedEventStaff = MoveEventStaff.findAll("from MoveEventStaff where person =:person and role not in ( :role)",
+				 [person:person, role:functions])
+			 
+			 PartyRelationship.withNewSession { deletedFuncts*.delete() }
+			 MoveEventStaff.withNewSession { deletedEventStaff*.delete() }
+		}
+        PartyRelationship.withNewSession { existingFuncToDelete*.delete() }		
         
         // get the list of functions that are already exists to ignore
-        def existingFuncToIgnore = PartyRelationship.findAll("from PartyRelationship where partyRelationshipType = :type and partyIdFrom = :project \
-            and partyIdTo =:person and roleTypeCodeTo in (:functions) and roleTypeCodeTo != :roleTypeCodeTo",
-            [type:prType, project:partyIdFrom, person:person, functions:functions,roleTypeCodeTo:roleTypeCodeTo ])?.roleTypeCodeTo
+        def existingFuncToIgnore = PartyRelationship.findAll(functionQuery+" and roleTypeCodeTo in (:functions) and partyIdFrom = :partyIdFrom ",
+            [type:prType, partyIdFrom:partyIdFrom, person:person, functions:functions,roleTypeCodeTo:roleTypeCodeTo ])?.roleTypeCodeTo		
         
         // remove the existing functions to avoid multiple checks
         functions.removeAll(existingFuncToIgnore)
