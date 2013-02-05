@@ -330,7 +330,7 @@ $(document).ready(function() {
 						<tr>
 							<td style="color: black"><b>Servers</b></td>
 							<td style="text-align: left;"><b>
-									<g:link controller="assetEntity" action="list" params="[filter:'all', plannedStatus:'Unassigned']" class="links">${unassignedAssetCount}</g:link>
+									<g:link controller="assetEntity" action="list" params="[filter:'All', plannedStatus:'Unassigned']" class="links">${unassignedAssetCount}</g:link>
 							</b></td>
 								<g:each in="${assetList}" var="assetCount">
 									<td style="text-align: right;"><b>
