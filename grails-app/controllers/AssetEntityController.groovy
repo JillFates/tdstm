@@ -1258,121 +1258,19 @@ class AssetEntityController {
 	 * @return assetList
 	 *-------------------------------------------*/
 	def list = {
-	     // Commented below code as we are not using this code  for now
-		
-		/*def filterAttributes = [tag_f_assetName:params.tag_f_assetName,tag_f_model:params.tag_f_model,tag_f_sourceLocation:params.tag_f_sourceLocation,tag_f_sourceRack:params.tag_f_sourceRack,tag_f_targetLocation:params.tag_f_targetLocation,tag_f_targetRack:params.tag_f_targetRack,tag_f_assetType:params.tag_f_assetType,tag_f_assetType:params.tag_f_assetType,tag_f_serialNumber:params.tag_f_serialNumber,tag_f_moveBundle:params.tag_f_moveBundle,tag_f_depUp:params.tag_f_depUp,tag_f_depDown:params.tag_f_depDown,tag_s_1_application:params.tag_s_1_application,tag_s_2_assetName:params.tag_s_2_assetName,tag_s_3_model:params.tag_s_3_model,tag_s_4_sourceLocation:params.tag_s_4_sourceLocation,tag_s_5_sourceRack:params.tag_s_5_sourceRack,tag_s_6_targetLocation:params.tag_s_6_targetLocation,tag_s_7_targetRack:params.tag_s_7_targetRack,tag_s_8_assetType:params.tag_s_8_assetType,tag_s_9_assetTag:params.tag_s_9_assetTag,tag_s_10_serialNumber:params.tag_s_10_serialNumber,tag_s_11_moveBundle:params.tag_s_11_moveBundle,tag_s_12_depUp:params.tag_s_12_depUp,tag_s_13_depDown:params.tag_s_13_depDown]
-		session.setAttribute('filterAttributes', filterAttributes)
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		
-		def project = Project.findById( projectId )
-		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
-		def args = [project:project, bundles:moveBundleList]
-		def queryArgs = params.filter == 'toValidate' ? args : (params.filter ? args << [assetType:ApplicationConstants.assetFilters[params.filter]] : args) 
-		
-		// if filter is requested for event so fetching move bundles associated with requested event.
-		if(params.moveEvent && params.moveEvent !='unAssigned'){
-			def moveEvent = MoveEvent.get( params.moveEvent )
-			def moveBundles = moveEvent?.moveBundles.id
-			
-			moveBundles = moveBundleList.findAll {moveBundles.contains(it.id)}
-			queryArgs << [bundles:moveBundles]
-		}
-		def assetEntityInstanceList
-		// forming different query for different scenarios .
-		def query = "FROM AssetEntity ae WHERE ae.project = :project  AND ae.assetType ${params.filter == 'other' ? 'NOT IN':  'IN'}  (:assetType)"
-		
-		def assignedQuery = query+ "AND (ae.moveBundle IN (:bundles) OR ae.moveBundle IS NULL)"
-		def filterUnAssignedQuery = query +" AND ae.moveBundle in (:bundles) AND (ae.planStatus IS NULL OR ae.planStatus IN ('Unassigned',''))"
-		
-		if ( params.filter=='toValidate' ) {
-			queryArgs << [validation:'Discovery']
-			if( params.type == 'other'){
-				queryArgs << [assetType:ApplicationConstants.assetFilters["other"]]
-			} else {
-			   params.type == 'physical' ? queryArgs << [assetType:ApplicationConstants.assetFilters["physical"]] : queryArgs << [assetType:ApplicationConstants.assetFilters["virtual"]]
-			}
-			assetEntityInstanceList = AssetEntity.findAll("FROM AssetEntity ae WHERE project = :project AND ae.validation = :validation \
-				 AND ae.assetType ${params.type=='other' ? 'NOT IN ':'IN '} (:assetType)\
-				 AND ( ae.moveBundle IN (:bundles) OR ae.moveBundle is null)", queryArgs )
-		} else if( params.filter ){
-			   assetEntityInstanceList= AssetEntity.findAll(assignedQuery,queryArgs)
-		} else {
-		    assetEntityInstanceList = AssetEntity.findAllByProjectAndAssetTypeNotInList( project,["Application","Database","Files"], params )
-		} 
-		
-		def commentSQL
-		def assetEntityList =  new ArrayList()
-		assetEntityInstanceList.each { assetEntity->
-			AssetEntityBean assetBean = new AssetEntityBean();
-			assetBean.setId(assetEntity.id)
-			assetBean.setAssetName(assetEntity.assetName)
-			assetBean.setAssetType(assetEntity.assetType)
-			assetBean.setAssetTag(assetEntity.assetTag)
-			assetBean.setModel(assetEntity.model?.modelName)
-			assetBean.setSourceLocation(assetEntity.sourceLocation)
-			assetBean.setSourceRack(assetEntity.rackSource?.tag)
-			assetBean.setTargetLocation(assetEntity.targetLocation)
-			assetBean.setTargetRack(assetEntity.rackTarget?.tag)
-			assetBean.setMoveBundle(assetEntity.moveBundle?.name)
-			assetBean.setSerialNumber(assetEntity.serialNumber)
-			assetBean.setPlanStatus(assetEntity.planStatus)
-			assetBean.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
-			assetBean.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))
-			assetBean.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle)
 
-			commentSQL = "SELECT count(*) from asset_comment WHERE asset_entity_id=${assetEntity.id} AND comment_type='issue' AND is_resolved=0"
-			if (jdbcTemplate.queryForInt(commentSQL) > 0 ) {
-				assetBean.setCommentType("issue")
-			} else {
-				commentSQL = "SELECT count(*) from asset_comment WHERE asset_entity_id=${assetEntity.id}"
-				if (jdbcTemplate.queryForInt(commentSQL) > 0 ) {
-					assetBean.setCommentType("comment")
-				} else {
-					assetBean.setCommentType("blank")
-				}
-			}
-
-			assetEntityList.add(assetBean)
-		}
-		
-		def servers = AssetEntity.executeQuery("SELECT a.id, a.assetName FROM AssetEntity a WHERE assetType in ('Server','VM','Blade') AND project=$projectId ORDER BY assetName")
-		// TODO : change the following queries to use straight JDBC to only get the id and assetName since only used for SELECT 
-		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
-		def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
-		def files = Files.findAll('from Files where assetType = ? and project =? order by assetName asc',['Files', project])
-		
-		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-
-		try{
-			TableFacade tableFacade = new TableFacadeImpl("tag",request)
-			tableFacade.items = assetEntityList
-			Limit limit = tableFacade.limit
-			if(limit.isExported()){
-				tableFacade.setExportTypes(response,limit.getExportType())
-				tableFacade.setColumnProperties("id","application","assetName","shortName","serialNumber","assetTag","manufacturer","model","assetType","ipAddress","os","sourceLocation","sourceRoom","sourceRack","sourceRackPosition","sourceBladeChassis","sourceBladePosition","targetLocation","targetRoom","targetRack","targetRackPosition","targetBladeChassis","targetBladePosition","custom1","custom2","custom3","custom4","custom5","custom6","custom7","custom8","moveBundle","sourceTeamMt","targetTeamMt","sourceTeamLog","targetTeamLog","sourceTeamSa","targetTeamSa","sourceTeamDba","targetTeamDba","truck","cart","shelf","railType","appOwner","appSme","priority")
-				tableFacade.render()
-			}else
-				return [assetEntityList : assetEntityList,projectId: projectId, servers : servers,
-					applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency(), dependencyType:dependencyType, dependencyStatus:dependencyStatus,
-					staffRoles:taskService.getRolesForStaff() ]
-		} catch(Exception ex ){
-			return [assetEntityInstanceList : null,projectId: projectId, servers : servers,
-				applications : applications, dbs : dbs, files : files, 
-				assetDependency: new AssetDependency() ]
-		}*/
 		def project = securityService.getUserCurrentProject()
 		def servers = AssetEntity.executeQuery("SELECT a.id, a.assetName FROM AssetEntity a WHERE assetType in ('Server','VM','Blade') AND project=$project.id ORDER BY assetName")
 		// TODO : change the following queries to use straight JDBC to only get the id and assetName since only used for SELECT
 		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
 		def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
 		def files = Files.findAll('from Files where assetType = ? and project =? order by assetName asc',['Files', project])
-		
+
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		return [assetDependency : new AssetDependency(), dependencyType:dependencyType, dependencyStatus:dependencyStatus,
-			event:params.moveEvent, filter:params.filter, type:params.type, servers : servers, applications : applications, dbs : dbs, files : files ]
-		
+			event:params.moveEvent, filter:params.filter, type:params.type, plannedStatus:params.plannedStatus,  servers : servers, applications : applications, dbs : dbs, files : files ]
+
 	}
 	/**
 	 * This method is used by JQgrid to load assetList
@@ -1383,43 +1281,90 @@ class AssetEntityController {
 		def maxRows = Integer.valueOf(params.rows)
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
-		
+
 		def project = securityService.getUserCurrentProject()
+		def moveBundleList
 		
-		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
-		def assetEntities = AssetEntity.createCriteria().list(max: maxRows, offset: rowOffset) {
-			 if (params.assetName) ilike('assetName', "%${params.assetName}%")
-			 if (params.assetType) ilike('assetType', "%${params.assetType}%")
-			 if (params.model) ilike('model', "%${params.model}%")
-			 if (params.sourceLocation) ilike('sourceLocation', "%${params.sourceLocation}%")
-			 if (params.sourceRack) ilike('sourceRack', "%${params.sourceRack}%")
-			 if (params.targetLocation) ilike('targetLocation', "%${params.targetLocation}%")
-			 if (params.targetRack) ilike('targetRack', "%${params.targetRack}%")
-			 if (params.assetTag) ilike('assetTag', "%${params.assetTag}%")
-			 if (params.serialNumber) ilike('serialNumber', "%${params.serialNumber}%")
-			 if (params.planStatus) { ilike('planStatus', "%${params.planStatus}%")}
-			 if (bundleList) 'in'('moveBundle', bundleList)
-			 eq("project", project)
-		 	 not {'in'("assetType",  ["Application","Database","Files"])}
-			
-			 order(sortIndex, sortOrder).ignoreCase() 
+		if(params.event && params.event.isNumber()){
+			def moveEvent = MoveEvent.read( params.event )
+			moveBundleList = moveEvent?.moveBundles?.findAll {it.useOfPlanning == true}
+		} else {
+			moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
 		}
+		
+		def assetType = params.filter  ? ApplicationConstants.assetFilters[ params.filter ] : []
+
+		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
+		def models = params.model ? Model.findAllByModelNameIlike("%${params.model}%") : []
+		
+		def assetEntities = AssetEntity.createCriteria().list(max: maxRows, offset: rowOffset) {
+			eq("project", project)
+			if (params.assetName) 
+				ilike('assetName', "%${params.assetName}%")
+			if (params.assetType) 
+				ilike('assetType', "%${params.assetType}%")
+			if (models)
+				'in'('model', models)
+			if (params.sourceLocation)
+				ilike('sourceLocation', "%${params.sourceLocation}%")
+			if (params.sourceRack) 
+				ilike('sourceRack', "%${params.sourceRack}%")
+			if (params.targetLocation) 
+				ilike('targetLocation', "%${params.targetLocation}%")
+			if (params.targetRack) 
+				ilike('targetRack', "%${params.targetRack}%")
+			if (params.assetTag)
+				ilike('assetTag', "%${params.assetTag}%")
+			if (params.serialNumber)
+				ilike('serialNumber', "%${params.serialNumber}%")
+			if (params.planStatus)  
+				ilike('planStatus', "%${params.planStatus}%")
+			if (bundleList) 
+				'in'('moveBundle', bundleList)
+			if(params.plannedStatus) 
+				eq("planStatus", params.plannedStatus)
 			
+			// if filter have some value then this one is getting requested from planning dashboard to filter the asset list. else it will be blank.
+			if ( params.filter ) {
+				if (params.filter !='other')  // filter is not other means filter is in (Server, VM , Blade) and others is excepts (Server, VM , Blade).
+					'in'('assetType', assetType)
+				else 
+					not {'in'("assetType",  assetType)}
+					
+				or{
+					and {
+						'in'('moveBundle', moveBundleList) 
+					} 
+					and {
+						isNull('moveBundle')
+					}
+				}
+				if( params.type=='toValidate') 
+					eq ('validation','Discovery')
+				
+			} else {
+				not {'in'("assetType",  ["Application","Database","Files"])}
+			}
+			
+
+			order(sortIndex, sortOrder).ignoreCase()
+		}
+
 		def totalRows = assetEntities.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
-		
+
 		def results = assetEntities?.collect { [ cell: ['',it.assetName, it.assetType,it.model?.modelName, it.sourceLocation,
-			it.sourceRack, it.targetLocation, it.targetRack, it.assetTag, it.serialNumber,it.planStatus,it.moveBundle?.name, 
-			AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
-			AssetDependency.countByDependentAndStatusNotEqual(it, "Validated"),
-			AssetDependency.countByAssetAndStatusNotEqual(it, "Validated"),
-			AssetComment.find("from AssetComment ac where ac.assetEntity=:entity and commentType=:type and status!=:status",
-				[entity:it, type:'issue', status:'completed']) ? 'issue' : 
-				(AssetComment.find("from AssetComment ac where ac.assetEntity=:entity",[entity:it]) ? 'comment' : 'blank')], id: it.id,
-		    ]}
-		
-		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages] 
-		
+					it.sourceRack, it.targetLocation, it.targetRack, it.assetTag, it.serialNumber,it.planStatus,it.moveBundle?.name,
+					AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
+					AssetDependency.countByDependentAndStatusNotEqual(it, "Validated"),
+					AssetDependency.countByAssetAndStatusNotEqual(it, "Validated"),
+					AssetComment.find("from AssetComment ac where ac.assetEntity=:entity and commentType=:type and status!=:status",
+					[entity:it, type:'issue', status:'completed']) ? 'issue' :
+					(AssetComment.find("from AssetComment ac where ac.assetEntity=:entity",[entity:it]) ? 'comment' : 'blank')], id: it.id,
+			]}
+
+		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
+
 		render jsonData as JSON
 	}
 	/* ----------------------------------------

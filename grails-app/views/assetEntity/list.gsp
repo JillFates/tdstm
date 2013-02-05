@@ -31,10 +31,10 @@ $(document).ready(function() {
 	        $("#manufacturerShowDialog").dialog({ autoOpen: false })
 	        $("#modelShowDialog").dialog({ autoOpen: false })
 	        $("#filterPane").draggable()
-var filter = $("#filter").val()    
-var type = $("#type").val()  
-var event = $("#event").val()  
-
+var filter = '${filter}'
+var type = '${type}'
+var event = '${event}'
+var plannedStatus = '${plannedStatus}' 
 <jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','Target Location','Target Rack','Tag','Serial#','Plan Status','Bundle',
@@ -67,7 +67,7 @@ var event = $("#event").val()
     shrinkToFit="true"
     forceFit ="true"
     showPager="true"
-    postData="{filter: filter, event:event, type:type}"
+    postData="{filter: filter, event:event, type:type, plannedStatus:plannedStatus}"
     datatype="'json'">
     <jqgrid:filterToolbar id="assetListId" searchOnEnter="false" />
     <jqgrid:navigation id="assetListId" add="false" edit="false" del="true" search="false" refresh="true" />
@@ -124,9 +124,6 @@ $(".jqgfirstrow").hide()
 <div id="createEntityView" style="display: none;"></div>
 <div id="showEntityView" style="display: none;"></div>
 <div id="editEntityView" style="display: none;"></div>
-<input type="hidden" id="event" value="${event}"/>
-<input type="hidden" id="type" value="${type}"/>
-<input type="hidden" id="filter" value="${filter}"/>
 <div style="display: none;">
 	<table id="assetDependencyRow">
 	<tr>
