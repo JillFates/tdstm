@@ -40,7 +40,7 @@ var plannedStatus = '${plannedStatus}'
     colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','Target Location','Target Rack','Tag','Serial#','Plan Status','Bundle',
         'Dep#','Dep Up', 'Dep Down', 'id', 'commentType'"
     colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false},
-      			  {name:'assetName',index: 'assetName', editable: true, formatter: myLinkFormatter},
+      			  {name:'assetName',index: 'assetName', editable: true, formatter: myLinkFormatter, width:'300'},
                   {name:'assetType', editable: true},
                   {name:'model', editable: true}, 
                   {name:'sourceLocation', editable: true},
@@ -58,23 +58,19 @@ var plannedStatus = '${plannedStatus}'
                   {name:'commentType', hidden: true} "
     sortname="'assetName'"
     caption="'Asset List'"
-    height="'auto'"
+   	height="'auto'"
     width="1200"
     rowNum="25"
     rowList= "'25','50','100'"
     multiselect="true"
     viewrecords="true"
-    shrinkToFit="true"
-    forceFit ="true"
     showPager="true"
     postData="{filter: filter, event:event, type:type, plannedStatus:plannedStatus}"
     datatype="'json'">
     <jqgrid:filterToolbar id="assetListId" searchOnEnter="false" />
     <jqgrid:navigation id="assetListId" add="false" edit="false" del="true" search="false" refresh="true" />
     <jqgrid:resize id="assetListId" resizeOffset="-2" />
-   
 </jqgrid:grid>
-
 
 
 function myLinkFormatter (cellvalue, options, rowObjcet) {
@@ -102,7 +98,6 @@ function myCustomFormatter (cellVal,options,rowObject) {
     return editButton
 }
 
-$(".jqgfirstrow").hide()
 })
 </script>
 </head>
