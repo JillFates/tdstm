@@ -369,3 +369,17 @@ th.desc a {
 .ui-widget-header a {
 	color: #000000 !important;
 }
+
+span.cellWithoutBackground
+{
+    display:block;
+    background-image:none;
+    margin-right:-2px;
+    margin-left:-2px;
+    height:14px;
+    padding:4px;
+    cursor:pointer;
+}
+.pointer {
+	cursor:pointer;
+}

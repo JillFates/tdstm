@@ -28,6 +28,7 @@ function changeStatus(id, status, currentStatus, from){
 				if(from=="taskManager"){
 					$('#status_'+id).html(data.assetComment.status)
 					$('#status_'+id).parent().removeAttr('class').addClass(data.statusCss)
+				    $('#status_'+id).removeAttr('class').addClass(data.statusCss).addClass('cellWithoutBackground')
 				    if(status=="Started"){ 
 					    // $('#startTdId_'+id).hide() 
 					}else if(status=="Completed"){
@@ -95,6 +96,53 @@ function assignTask(id, user, status, from){
  * Used to show the action bar in Task Manager
  * @param spanId
  */
+function getActionBarGrid(spanId){
+   if(B2 != ''){ B2.Pause() }
+   var id = spanId//spanId.split('_')[1]
+   var trId =id// $('#'+spanId).parent().parent().attr('id')
+   if($('#row_d_'+id).html() == null ){
+   jQuery.ajax({
+		url: '../task/genActionBarHTML',
+		data: {'id':id},
+		type:'POST',
+		success: function(data) {
+				$('#span_'+spanId).parent().parent().find('span').each(function(){
+					if($(this).attr("id")){
+						$(this).removeAttr('onclick')
+						$(this).unbind("click").bind("click", function(){
+							hideActionBar("row_d_"+id,"span_"+spanId)
+					    });
+					}
+				})
+				//$('#span_'+spanId).attr('onClick','hideActionBar("row_d_'+id+'", '+spanId+')')
+				$('#'+trId).after("<tr id='row_d_"+id+"'> <td nowrap='nowrap' colspan='13' class='statusButtonBar'>"+data+"</td></tr>")
+			}
+		});
+   }
+}
+/**
+ * Used to hide the action bar in Task Manager
+ * @param rowId
+ * @param spanId
+ */
+function hideActionBarGrid(rowId,spanId){
+	var id = spanId.split('_')[1]
+	$('#'+rowId).remove()
+	$('#'+spanId).parent().parent().find('span').each(function(){
+		if($(this).attr("id")){
+			$(this).removeAttr('onclick')
+			$(this).unbind("click").bind("click", function(){
+				getActionBar(id)
+		    });
+		}
+	})
+	if(B2 != '' && taskManagerTimePref != 0){ B2.Restart(taskManagerTimePref) }
+}
+/**
+ * TODO : Remove this once verified in tmdev
+ * Used to show the action bar in Task Manager
+ * @param spanId
+ */
 function getActionBar(spanId){
    if(B2 != ''){ B2.Pause() }
    var id = spanId.split('_')[1]
@@ -119,6 +167,7 @@ function getActionBar(spanId){
    }
 }
 /**
+ * TODO : Remove this once verified in tmdev
  * Used to hide the action bar in Task Manager
  * @param rowId
  * @param spanId

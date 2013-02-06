@@ -3243,6 +3243,128 @@ class AssetEntityController {
 	      	render (view:view ,model:model )
 		}
 	}
+	
+    /**
+     * This action is temp action should be replaced with listTasks once tested in tmdev
+     * This provides list using jqGrid functionality
+     */
+	def listjqGrid={
+		
+		def project = securityService.getUserCurrentProject()
+		def moveEvents = MoveEvent.findAllByProject(project)
+		def person = securityService.getUserLoginPerson()
+
+		// Deal with the parameters
+		def isTask = AssetCommentType.TASK
+
+		def view = isTask ? 'listTasks' : 'listComment'
+		// def action = params.issueBox == "on" ? "issue" : params.resolvedBox  ? "resolved" : params.filter
+		def today = new Date()
+		def moveEvent
+		def filterEvent = 0
+		
+		if(params.containsKey("justRemaining")){
+			userPreferenceService.setPreference("JUST_REMAINING", params.justRemaining)
+		}
+		def justRemaining = userPreferenceService.getPreference("JUST_REMAINING") ?: "1"
+		// Set the Checkbox values to that which were submitted or default if we're coming into the list for the first time
+		def justMyTasks = params.containsKey('justMyTasks') ? params.justMyTasks : "0"
+		def timeToRefresh = getSession()?.getAttribute("MY_TASK")?.MY_TASK
+		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =${project.id} order by assetName asc")
+		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
+		def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
+		def files = Files.findAll('from Files where assetType = ? and project =? order by assetName asc',['Files', project])
+		
+		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		render (view:'listTaskjqGrid' ,model:[timeToUpdate : timeToRefresh ?: 60,servers:servers, applications:applications, dbs:dbs,
+				files:files, dependencyType:dependencyType, dependencyStatus:dependencyStatus, assetDependency: new AssetDependency()] )
+		
+	}
+	/**
+	 * This will be called from TaskManager screen to load jqgrid
+	 * @return : list of tasks as JSON
+	 */
+	def listTaskJSON ={
+		
+		def sortIndex = params.sidx ?: 'comment'
+		def sortOrder  = params.sord ?: 'asc'
+		def maxRows = Integer.valueOf(params.rows)
+		def currentPage = Integer.valueOf(params.page) ?: 1
+		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+
+		def project = securityService.getUserCurrentProject()
+		def moveBundleList
+		def runBookFormatter = new SimpleDateFormat("MM/dd kk:mm:ss")
+		def dueFormatter = new SimpleDateFormat("MM/dd")
+		
+		if(params.event && params.event.isNumber()){
+			def moveEvent = MoveEvent.read( params.event )
+			moveBundleList = moveEvent?.moveBundles?.findAll {it.useOfPlanning == true}
+		} else {
+			moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+		}
+		
+		def assetType = params.filter  ? ApplicationConstants.assetFilters[ params.filter ] : []
+
+		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
+		def models = params.model ? Model.findAllByModelNameIlike("%${params.model}%") : []
+		
+		def tasks = AssetComment.createCriteria().list(max: maxRows, offset: rowOffset) {
+			eq("project", project)
+			eq("commentType", AssetCommentType.TASK)
+			if (params.comment)
+				ilike('comment', "%${params.comment}%")
+			order(sortIndex, sortOrder).ignoreCase()
+		}
+
+		def totalRows = tasks.totalCount
+		def numberOfPages = Math.ceil(totalRows / maxRows)
+		def updatedTime
+		def updatedClass
+		def dueClass
+		def nowGMT = TimeUtil.nowGMT()
+		def results = tasks?.collect { 
+			updatedTime =  it.isRunbookTask() ? it.statusUpdated : it.lastUpdated
+			
+			def elapsed = TimeUtil.elapsed(it.statusUpdated, nowGMT)
+			def elapsedSec = elapsed.toMilliseconds() / 1000
+			
+			if (it.status == AssetCommentStatus.READY) {
+				if (elapsedSec >= 600) {
+					updatedClass = 'task_late'
+				} else if (elapsedSec >= 300) {
+					updatedClass = 'task_tardy'
+				}
+			} else if (it.status == AssetCommentStatus.STARTED) {
+				def dueInSecs = elapsedSec - (it.duration ?: 0) * 60
+				if (dueInSecs >= 600) {
+					updatedClass='task_late'
+				} else if (dueInSecs >= 300) {
+					updatedClass='task_tardy'
+				}
+			}
+			
+			if (it.estFinish) {
+				elapsed = TimeUtil.elapsed(it.estFinish, nowGMT)
+				elapsedSec = elapsed.toMilliseconds() / 1000
+				if (elapsedSec > 300) {
+					dueClass = 'task_overdue'
+				}
+			}
+			
+			[ cell: ['',it.taskNumber, it.comment, it.assetEntity?.assetName, it.assetEntity?.assetType,
+			 updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '',
+			 it.dueDate ? (it.isRunbookTask() ? runBookFormatter.format(it.dueDate) : dueFormatter.format(it.dueDate)) : '',
+			 it.status ?: '', it.hardAssigned ? '*' : '' + (it.assignedTo ? it.assignedTo?.firstName+" "+it.assignedTo?.lastName: '' ),
+			 it.role, it.category, TaskDependency.countByPredecessor( it ), it.score ?: 0,
+			 it.status ? "task_${it.status.toLowerCase()}" : 'task_na',updatedClass, dueClass, it.assetEntity?.id], id: it.id,
+			]}
+
+		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
+
+		render jsonData as JSON
+	}
 
 	def assetOptions = {
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
