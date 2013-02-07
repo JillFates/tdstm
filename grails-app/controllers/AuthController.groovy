@@ -14,6 +14,11 @@ class AuthController {
     def login = {
 		def redirectURL = session.REDIRECT_URL
 		if(!redirectURL){
+			// TODO - For some reason resource is NOT creating the URL correctly with the arguments so it's hardcoded for the time being.
+			// def url = g.resource(controller:'auth', action:'login', absolute:true).toString()
+			def url = g.resource(absolute:true).toString() + '/tdstm/auth/login'
+			// Adding the X-Login-URL header so that we can catch it in Ajax calls
+			response.setHeader('X-Login-URL', url)
 			return [ username: params.username, rememberMe: (params.rememberMe != null), targetUri: params.targetUri ]
 		} else {
 			redirect( url:redirectURL)

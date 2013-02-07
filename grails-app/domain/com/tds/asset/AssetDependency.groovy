@@ -3,8 +3,8 @@ import com.tdssrc.grails.GormUtil;
 
 class AssetDependency {
 
-	AssetEntity  asset
-	AssetEntity dependent
+	AssetEntity  asset			// The asset that that REQUIRES the 'dependent'
+	AssetEntity dependent		// The asset that SUPPORTS 'asset' 
 	String type = "Unknown"
 	String dataFlowFreq = "Unknown"
 	String dataFlowDirection = "Unknown"

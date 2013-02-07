@@ -28,7 +28,7 @@
                     <table>
                         <tbody>
                         <tr>
-							<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+							<td colspan="3"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 							</tr>
                         	<tr class="prop">
 	                            <td valign="top" class="name">Project:</td>
@@ -43,6 +43,10 @@
                                 <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'name','errors')}">
                                     <input type="text" id="name" name="name" value="${fieldValue(bean:moveEventInstance,field:'name')}"/>
                                 </td>
+								<td rowspan="10" width="40%">
+									<label for="runbookRecipe">Runbook Recipe:</label><br/>
+									<textarea name="runbookRecipe" id="runbookRecipe" cols="80" rows="30" wrap="hard">${moveEventInstance.runbookRecipe}</textarea>
+								</td>
                             </tr> 
                         
                             <tr class="prop">

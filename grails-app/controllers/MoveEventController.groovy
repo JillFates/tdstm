@@ -134,6 +134,23 @@ class MoveEventController {
     def update = {
         def moveEventInstance = MoveEvent.get( params.id )
         if(moveEventInstance) {
+	
+			// Validate that the runbook recipe syntax is okay
+			if (params.runbookRecipe?.size() > 0) {
+				def error
+				try {
+					Eval.me("[${params.runbookRecipe}]")
+				} catch (e) {
+					error = e.getMessage()
+					error = error.replaceAll(/[\r]/, '<br/>')
+				}
+				if (error) {
+					flash.message = "There was an error with the runtime recipe<br/>$error"
+					render(view:'edit',model:[moveEventInstance:moveEventInstance])
+					return
+				}
+			}
+	
             moveEventInstance.properties = params
             def moveBundles = request.getParameterValues("moveBundle")
 			
@@ -355,19 +372,41 @@ class MoveEventController {
 	
 	/**
 	 * Used to clear or reset any Task data for selected move event.
-     * @param  : moveEventId 
-     * @param : type (delete/clear)
+     * @param moveEventId
+     * @param type (delete/clear)
+	 * @return text
+	 * @usage ajax
 	 */
-	def clearTaskData = {
-		def moveEventId = params.moveEventId
-		if(moveEventId ){
-			if(params.type == 'clear'){
-				taskService.cleanTaskData(moveEventId)
-			} else if(params.type == 'delete'){
-				taskService.deleteTaskData(moveEventId)
+	def clearTaskData = {		
+		def project = securityService.getUserCurrentProject()
+		def moveEvent
+		def msg 
+		
+		// TODO - Need to create an ACL instead of using roles for this
+		if (!securityService.hasRole(['ADMIN','CLIENT_ADMIN','CLIENT_MGR']) ) {
+			msg = "You do not have the proper permissions to perform this task"
+		} else {	
+			if (params.moveEventId.isNumber()) {
+				moveEvent = MoveEvent.findByIdAndProject( params.moveEventId, project)
+				if (! moveEvent) {
+					msg = "You present do not have access to the move event"
+				}
+			} else {
+				msg = "Invalid Move Event specified"
 			}
 		}
-		render "success"
+		if (! msg) {
+			try {
+				if(params.type == 'clear'){
+					msg = taskService.resetTaskData(moveEvent)
+				} else if(params.type == 'delete'){
+					msg = taskService.deleteTaskData(moveEvent)
+				}
+			} catch(e) {
+				msg = e.getMessage()
+			}
+		}
+		render msg
 	}
 	
     /*------------------------------------------------
@@ -710,13 +749,14 @@ class MoveEventController {
 				return ;
 		
 	}
-	/*
-	 * markEventAssetAsMoved : Used to set asset's plan-status to 'Moved' for move event .
+	
+	/**
+	 * Used to set asset's plan-status to 'Moved' for the specified move event
+	 * @usage Ajax
 	 * @param moveEventId
 	 * @return  Count of record affected with this update or Error Message if any
 	 * 
 	 */
-	
 	def markEventAssetAsMoved = {
 		def assetAffected
 		def errorMsg
@@ -730,8 +770,9 @@ class MoveEventController {
 						errorMsg = "An unexpected condition with the move event occurred that is preventing an update"
 					}else{
 						def bundleForEvent = moveEvent.moveBundles
-						assetAffected = bundleForEvent ? AssetEntity.executeUpdate("update AssetEntity ae set ae.planStatus='Moved' where ae.moveBundle in (:bundles)\
-																	and  ae.planStatus !='Moved' ",[bundles:bundleForEvent]) : 0
+						assetAffected = bundleForEvent ? AssetEntity.executeUpdate("update AssetEntity ae \
+							set ae.planStatus = 'Moved' where ae.moveBundle in (:bundles) \
+							and ae.planStatus !='Moved' ",[bundles:bundleForEvent]) : 0
 					}
 				} else {
 					log.error "markEventAssetAsMoved: Specified moveEvent (${params.moveEventId}) was not found})"
@@ -740,5 +781,34 @@ class MoveEventController {
 			}
 		}
 		render errorMsg ? errorMsg : assetAffected
+	}
+	
+	/** 
+	 * Generates a runbook for a specified move event using a recipe 
+	 * @usage Ajax
+	 * @param moveEventId
+	 * @return Results or error message appropriately
+	 */	
+	def generateMovedayTasks = {
+					
+		def message
+				 
+		if (! securityService.hasRole(['ADMIN','CLIENT_ADMIN', 'CLIENT_MGR'])) {
+			message = 'Sorry but you do not have the permissions to perform this action'
+		} else {
+			def project = securityService.getUserCurrentProject()
+			def moveEvent 
+		
+			if (params.moveEventId?.isNumber()) {
+				moveEvent = MoveEvent.findByIdAndProject(params.moveEventId, project) 
+			}
+		
+			if (! moveEvent) {
+				message = "Invalid event id or you don't have access to this project/move event"
+			} else {
+				message = taskService.generateRunbook( securityService.getUserLoginPerson() , moveEvent ) 
+			}
+		}
+		render message
 	}
 }

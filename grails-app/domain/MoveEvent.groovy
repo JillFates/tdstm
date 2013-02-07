@@ -10,7 +10,6 @@ class MoveEvent {
 	static final String METHOD_LINEAR="L"
 	static final String METHOD_MANUAL="M"
 		
-		
     Project project
     String name
     String description
@@ -21,6 +20,7 @@ class MoveEvent {
 	String runbookBridge1
 	String runbookBridge2 
 	String videolink
+	String runbookRecipe
 
 	Date revisedCompletionTime		// Revised Completion Time of the MoveEvent which is only set as an exception
 
@@ -42,6 +42,7 @@ class MoveEvent {
 		runbookBridge1( blank:true, nullable:true )
 		runbookBridge2( blank:true, nullable:true )
 		videolink( blank:true, nullable:true )
+		runbookRecipe( blank:true, nullable:true )
 	}
 
 	static hasMany = [
@@ -55,6 +56,7 @@ class MoveEvent {
 		id column:'move_event_id'
         columns {
 	 		revisedCompletionTime sqlType: 'DateTime'
+			runbookRecipe sqlType: 'Text'
 		}        
 	}
 

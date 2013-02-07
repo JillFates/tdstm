@@ -8,6 +8,10 @@
 
 import org.jsecurity.SecurityUtils
 
+import com.tds.asset.Application
+import com.tds.asset.AssetDependency
+import com.tds.asset.Database
+import com.tds.asset.Files
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.CommentNote
@@ -15,7 +19,11 @@ import com.tds.asset.TaskDependency
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.AssetDependencyStatus
+import com.tdsops.tm.enums.domain.AssetDependencyType
 import com.tdsops.tm.enums.domain.RoleTypeGroup
+import com.tdsops.common.lang.GStringEval
+import com.tdsops.common.sql.SqlUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
@@ -29,7 +37,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 class TaskService {
 
-    static transactional = true
+	static transactional = true
 
 	def dataSource
 	def jdbcTemplate
@@ -48,14 +56,14 @@ class TaskService {
 	 * on the Person and Project.
 	 * @param person	A Person object representing the individual to get tasks for
 	 * @param project	A Project object representing the project to get tasks for
-	 * @param countOnly	Flag that when true will only return the counts of the tasks otherwise method returns list of tasks
+	 * @param countOnly Flag that when true will only return the counts of the tasks otherwise method returns list of tasks
 	 * @param limitHistory	A numeric value when set will limit the done tasks completed in the N previous days specificed by param 
-	 * @param search	A String value when provided will provided will limit the results to just the AssetEntity.AssetTag  
+	 * @param search	A String value when provided will provided will limit the results to just the AssetEntity.AssetTag	
 	 * @param sortOn	A String value when provided will sort the task lists by the specified column (limited to present list of columns), default sort on score
-	 * @param sortOrder	A String value with valid options [asc|desc], default [desc]
+	 * @param sortOrder A String value with valid options [asc|desc], default [desc]
 	 * @return Map	A map containing keys all and todo. Values will contain the task lists or counts based on countOnly flag
 	 */
-    def getUserTasks(person, project, countOnly=false, limitHistory=7, sortOn=null, sortOrder=null, search=null ) {
+	def getUserTasks(person, project, countOnly=false, limitHistory=7, sortOn=null, sortOrder=null, search=null ) {
 		// Need to initialize the NamedParameterJdbcTemplate to pass named params to a SQL statement
 		namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
 
@@ -81,12 +89,12 @@ class TaskService {
 		StringBuffer sql = new StringBuffer("""SELECT t.asset_comment_id AS id, 
 			t.task_number AS taskNumber, 
 			t.role,
-		 	t.comment, 
+			t.comment, 
 			t.est_finish AS estFinish, 
 			t.due_date AS dueDate, 
 			t.last_updated AS lastUpdated,
 			t.status_updated AS statusUpdated, 
-		 	t.asset_entity_id AS assetEntity, 
+			t.asset_entity_id AS assetEntity, 
 			t.status, t.assigned_to_id AS assignedTo, 
 			IFNULL(a.asset_name,'') AS assetName, 
 			p.first_name AS firstName, p.last_name AS lastName,
@@ -102,13 +110,13 @@ class TaskService {
 					- HOLD 900
 						+ last updated factor ASC
 					- DONE recently (60 seconds), to allow undo 800
-						+ actual finish factor DESC	
-					- STARTED tasks     700
-						- Hard assigned to user	+55
+						+ actual finish factor DESC 
+					- STARTED tasks		700
+						- Hard assigned to user +55
 						- by the user	+50
 						- + Est Start Factor to sort ASC
 					- READY tasks		600
-						- Hard assigned to user	+55
+						- Hard assigned to user +55
 						- Assigned to user		+50
 						- + Est Start factor to sort ASC
 					- PENDING tasks		500
@@ -134,7 +142,7 @@ class TaskService {
 				WHEN '${AssetCommentStatus.READY}' THEN 600 + 1 - UNIX_TIMESTAMP(IFNULL(t.est_start,:now)) / UNIX_TIMESTAMP(:now)
 				WHEN '${AssetCommentStatus.PENDING}' THEN 500 + 1 - UNIX_TIMESTAMP(IFNULL(t.est_start,:now)) / UNIX_TIMESTAMP(:now)
 				ELSE 0
-				END) +  
+				END) +	
 				IF(t.assigned_to_id=:assignedToId AND t.status IN('${AssetCommentStatus.STARTED}','${AssetCommentStatus.READY}'), IF(t.hard_assigned=1, 55, 50), 0) +
 				IF(t.assigned_to_id=:assignedToId AND t.status='${AssetCommentStatus.DONE}',50, 0) +
 				(6 - t.priority) * 5) AS score """)			
@@ -147,7 +155,7 @@ class TaskService {
 		// the user has unless the task is hard assigned to someone else in one of the groups.
 		sql.append("""FROM asset_comment t 
 			LEFT OUTER JOIN asset_entity a ON a.asset_entity_id = t.asset_entity_id 
-            LEFT OUTER JOIN person p ON p.person_id = t.assigned_to_id 
+			LEFT OUTER JOIN person p ON p.person_id = t.assigned_to_id 
 			WHERE t.project_id=:projectId AND t.comment_type=:type """)
 
 		// TODO - CLEANER role no longer exists
@@ -155,7 +163,7 @@ class TaskService {
 			sql.append("""AND t.role = 'CLEANER' """)
 		}else{
 			sql.append("""AND( t.assigned_to_id=:assignedToId OR
-						(${roles ? 't.role IN (:roles) AND ' : ''}  t.status IN (:statuses) AND t.hard_assigned=0 OR (t.hard_assigned=1 AND t.assigned_to_id=:assignedToId) ) ) """)
+						(${roles ? 't.role IN (:roles) AND ' : ''}	t.status IN (:statuses) AND t.hard_assigned=0 OR (t.hard_assigned=1 AND t.assigned_to_id=:assignedToId) ) ) """)
 		}
 		
 		search = org.apache.commons.lang.StringUtils.trimToNull(search)
@@ -222,9 +230,9 @@ class TaskService {
 		} else {
 			return ['all':allTasks, 'todo':todoTasks]
 		}
-    }
+	}
 
-    def getUserTasksOriginal(person, project, search=null, sortOn='c.dueDate', sortOrder='ASC, c.lastUpdated DESC' ) {
+	def getUserTasksOriginal(person, project, search=null, sortOn='c.dueDate', sortOrder='ASC, c.lastUpdated DESC' ) {
 		
 		// Get the user's roles for the current project
 		// TODO : Runbook: getUserTasks - should get the user's project roles instead of global roles
@@ -252,10 +260,10 @@ class TaskService {
 			sql.append(' WHERE ')
 		}
 		sql.append('c.project=:project AND c.commentType=:type ')
-		// TODO : runbook : my tasks should only show mine.  All should show mine and anything that my teams has started or complete
+		// TODO : runbook : my tasks should only show mine.	 All should show mine and anything that my teams has started or complete
 		sql.append('AND ( c.assignedTo=:assignedTo OR ( c.role IN (:roles) AND c.status IN (:statuses) AND c.hardAssigned != 1 ) ) ')
 
-		// TODO : Security : getUserTasks - sortOn/sortOrder should be defined instead of allowing user to INJECT, also shouldn't the column name have the 'a.' prefix?	
+		// TODO : Security : getUserTasks - sortOn/sortOrder should be defined instead of allowing user to INJECT, also shouldn't the column name have the 'a.' prefix? 
 		// Add the ORDER to the SQL
 		// sql.append("ORDER BY ${sortOn} ${sortOrder}")
 		
@@ -265,7 +273,7 @@ class TaskService {
 		def todoTasks = allTasks.findAll { [AssetCommentStatus.READY, AssetCommentStatus.STARTED].contains(it.status) }
 
 		return ['all':allTasks, 'todo':todoTasks]
-    }
+	}
 	
 	/**
 	 * Overloaded version of the setTaskStatus that has passes the logged in user's person object to the main method
@@ -276,7 +284,8 @@ class TaskService {
 	// Refactor to accept the Person
 	def setTaskStatus( task, status) {
 		def whom = securityService.getUserLoginPerson()
-		def isPM = securityService.hasRole("PROJ_MGR")
+		def isPM = partyRelationshipService.staffHasFunction(task.project.id, whom.id, 'PROJ_MGR')
+		
 		return setTaskStatus( task, status, whom, isPM )
 	}
 
@@ -288,7 +297,7 @@ class TaskService {
 	 * @return AssetComment the task object that was updated
 	 */
 	// TODO : We should probably refactor this into the AssetComment domain class as setStatus
-	def setTaskStatus(task, status, whom, isPM) {
+	def setTaskStatus(task, status, whom, isPM=false) {
 		
 		// If the current task.status or the persisted value equals the new status, then there's nutt'n to do.
 		if (task.status == status || task.getPersistentValue('status') == status) {
@@ -383,7 +392,7 @@ class TaskService {
 		
 		return task
 	}
- 	
+	
 	/**
 	* Triggers the invocation of the UpdateTaskSuccessorsJob Quartz job for the specified task id
 	* @param taskId
@@ -398,7 +407,7 @@ class TaskService {
 			def isPM = securityService.hasRole("PROJ_MGR")
 			long startTime = System.currentTimeMillis() + (250L)
 			Trigger trigger = new SimpleTrigger("tm-updateTaskSuccessors-${taskId}" + System.currentTimeMillis(), null, new Date(startTime) )
-	        trigger.jobDataMap.putAll( [ taskId:taskId, whomId:whom.id, status:status, isPM:isPM] )
+			trigger.jobDataMap.putAll( [ taskId:taskId, whomId:whom.id, status:status, isPM:isPM] )
 			trigger.setJobName('UpdateTaskSuccessorsJob')
 			trigger.setJobGroup('tdstm')
   
@@ -423,7 +432,7 @@ class TaskService {
 		def task 
 		
 		// This tasks will run parallel with the thread updating the current task to the state passed to this method. Therefore
-		// we need to make sure that the task has been updated.  We'll try for 3 seconds before giving up.
+		// we need to make sure that the task has been updated.	 We'll try for 3 seconds before giving up.
 		def cnt = 10
 		
 		while (cnt-- > 0) {
@@ -452,7 +461,7 @@ class TaskService {
 		//
 		// Now mark any successors as Ready if all of the successors' predecessors are DONE
 		//
-		if ( status ==  AssetCommentStatus.DONE ) {
+		if ( status ==	AssetCommentStatus.DONE ) {
 			def successorDeps = TaskDependency.findAllByPredecessor(task)
 			log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) found ${successorDeps ? successorDeps.size() : '0'} successors - $whom"
 			def i = 1
@@ -494,12 +503,12 @@ class TaskService {
 							log.info "taskStatusChangeEvent: successorTask(${taskToReady.id}) Saved"
 							return
 						}
-						if (! (  successorTask.validate() && successorTask.save(flush:true) ) ) {
+						if (! (	 successorTask.validate() && successorTask.save(flush:true) ) ) {
 							log.error "Failed Readying successor task [${taskToReady.id} " + GormUtil.allErrorsString(taskToReady)
 						}
 						*/
 							
-						log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) setting successorTask(#:${successorTask.taskNumber} Id:${successorTask.id}) to READY  - $whom"
+						log.info "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) setting successorTask(#:${successorTask.taskNumber} Id:${successorTask.id}) to READY	- $whom"
 						setTaskStatus(successorTask, AssetCommentStatus.READY, whom, isPM)
 						// log.info "taskStatusChangeEvent: successorTask(${successorTask.id}) Making READY - Successful"
 						if ( ! successorTask.validate() ) {
@@ -510,11 +519,11 @@ class TaskService {
 						
 						/*
 						 * OK - For anybody looking at this logic and questioning it, let me first say I'm confused too.  For some 
-						 * reason we do not need to invoke the save method here on the successor tasks that are being updated.  Some how
+						 * reason we do not need to invoke the save method here on the successor tasks that are being updated.	Some how
 						 * GORM is handling it auto-magically. The code originally was doing the save but would get a strange error:
-						 * 		[http-8080-1] ERROR errors.GrailsExceptionResolver  - Index: 1, Size: 0
-						 * 		java.lang.IndexOutOfBoundsException: Index: 1, Size: 0
-						 * 		at java.util.ArrayList.RangeCheck(ArrayList.java:547)
+						 *		[http-8080-1] ERROR errors.GrailsExceptionResolver	- Index: 1, Size: 0
+						 *		java.lang.IndexOutOfBoundsException: Index: 1, Size: 0
+						 *		at java.util.ArrayList.RangeCheck(ArrayList.java:547)
 						 * I therefore have commented it out.
 						 * John 8/2012
 						 */
@@ -532,7 +541,7 @@ class TaskService {
 					}
 				} else {
 					log.warn "updateTaskSuccessors - taskId(#:${task.taskNumber} Id:${task.id}) found successor task(#:${successorTask.taskNumber} Id:${successorTask.id}) " + 
-						"in unexpected status (${successorTask.status}  - $whom"
+						"in unexpected status (${successorTask.status}	- $whom"
 				} 
 			} // succDependencies?.each()
 		}
@@ -540,7 +549,7 @@ class TaskService {
 
 
 	/**
-	 * Used to determine the CSS class name that should be used when presenting a task, which is based on the task's status	
+	 * Used to determine the CSS class name that should be used when presenting a task, which is based on the task's status 
 	 * @param status
 	 * @return String The appropriate CSS style or task_na if the status is invalid
 	 */
@@ -567,8 +576,8 @@ class TaskService {
 	def genSelectForTaskDependency(taskDependency, task, idPrefix='taskDependencyEditId', name='predecessorEdit', project=null) {
 		//def sw = new org.springframework.util.StopWatch("genSelectForTaskDependency Stopwatch") 
 		//sw.start("Get predecessor")
-	    def predecessor = name=="predecessorEdit" ? taskDependency.predecessor : taskDependency.assetComment
-	    def category = predecessor.category
+		def predecessor = name=="predecessorEdit" ? taskDependency.predecessor : taskDependency.assetComment
+		def category = predecessor.category
 		if (! project) {
 			project = securityService.getUserCurrentProject()
 		}
@@ -585,7 +594,7 @@ class TaskService {
 		// log.info "genSelectForTaskDependency - SQL ${queryForPredecessor.toString()}"
 		def predecessors = AssetComment.findAll(queryForPredecessor.toString())
 		def paramsMap = [selectId:"${idPrefix}_${taskDependency.id}", selectName:"${name}", options:predecessors, optionKey:"id",
-			     			 optionSelected:predecessor.id]
+							 optionSelected:predecessor.id]
 		def selectControl = HtmlUtil.generateSelect( paramsMap )
 		//sw.stop()
 		//log.info "genSelectForTaskDependency - Stopwatch: ${sw.prettyPrint()}"
@@ -633,7 +642,7 @@ class TaskService {
 		
 		// Build the SELECT HTML
 		def cssId = task ? 'taskDependencyEditId' : 'taskDependencyId'
-	    def selectName = forWhom
+		def selectName = forWhom
 		def firstOption = [value:'', display:'Please Select']
 		def paramsMap = [ selectId:cssId, selectName:selectName, options:taskList, optionKey:'id', firstOption:firstOption]
 		def selectControl = HtmlUtil.generateSelect( paramsMap )
@@ -659,7 +668,7 @@ class TaskService {
 	/**
 	 * Comparies two statuses and returns -1 if 1st is before 2nd, 0 if equal, or 1 if 1st is after the 2nd
 	 * @param from	status moving from
-	 * @param to 	status moving to
+	 * @param to	status moving to
 	 * @return int 
 	 */
 	def compareStatus( from, to ) {
@@ -695,58 +704,72 @@ class TaskService {
 	}
 	
 	/**
-	 * 	Used to clear all Task data that are associated to a specified move event  
+	 *	Used to clear all Task data that are associated to a specified move event  
 	 * @param moveEventId
 	 * @return void
 	 */
-	def cleanTaskData(def moveEventId) {
+	def resetTaskData(def moveEvent) {
 		// We want to find all AssetComment records that have the MoveEvent or are associate with assets that are 
 		// with move bundles that are part of the move event. With that list, we will reset the
 		// AssetComment status to PENDING by default or READY if there are no predecessors and clear several other properties.
 		// We will also delete Task notes that are auto generated during the runbook execution.
-		log.info("cleanTaskData() was called for moveEvent(${moveEventId})")
-		def tasksMap = getMoveEventTaskLists(moveEventId)
-		
-		def updateSql = "UPDATE AssetComment ac \
-			SET ac.status = :status, ac.actStart = null, ac.actStart = null, ac.dateResolved = null, ac.resolvedBy = null, \
-				ac.isResolved=0, ac.statusUpdated = null \
-			WHERE ac.id in (:ids)"
+		def msg
+		log.info("resetTaskData() was called for moveEvent(${moveEvent})")
+		try {
+			def tasksMap = getMoveEventTaskLists(moveEvent.id)
+		    def taskResetCnt = notesDeleted = 0
+			def updateSql = "UPDATE AssetComment ac \
+				SET ac.status = :status, ac.actStart = null, ac.actStart = null, ac.dateResolved = null, ac.resolvedBy = null, \
+					ac.isResolved=0, ac.statusUpdated = null \
+				WHERE ac.id in (:ids)"
 			
-		if (tasksMap.tasksWithPred.size() > 0) {
-			AssetComment.executeUpdate(updateSql, ['status':AssetCommentStatus.PENDING, 'ids':tasksMap.tasksWithPred ] )
+			if (tasksMap.tasksWithPred.size() > 0) {
+				taskResetCnt = AssetComment.executeUpdate(updateSql, ['status':AssetCommentStatus.PENDING, 'ids':tasksMap.tasksWithPred ] )
+			}
+			if (tasksMap.tasksNoPred.size() > 0) {
+				taskResetCnt += AssetComment.executeUpdate(updateSql, ['status':AssetCommentStatus.READY, 'ids':tasksMap.tasksNoPred ] )
+			}
+			if (tasksMap.tasksWithNotes.size() > 0) {
+				// Delete any of the audit comments that are created during the move event
+				notesDeleted = CommentNote.executeUpdate("DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids) AND cn.isAudit=1", 
+					[ 'ids':tasksMap.tasksWithNotes ] )
+			}
+			
+			msg = "$taskRestCnt tasks reset and $notesDeleted audit notes were deleted"
+		} catch(e) {
+			log.error "An error occurred while trying to Reset tasks for moveEvent ${moveEvent} on project ${moveEvent.project}\n$e"
+			throw new RuntimeException("An unexpected error occured")
 		}
-		if (tasksMap.tasksNoPred.size() > 0) {
-			AssetComment.executeUpdate(updateSql, ['status':AssetCommentStatus.READY, 'ids':tasksMap.tasksNoPred ] )
-		}
-		if (tasksMap.tasksWithNotes.size() > 0) {
-			CommentNote.executeUpdate("DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids) AND cn.isAudit=1", 
-				[ 'ids':tasksMap.tasksWithNotes ] )
-		}
+		return msg
 	}
 	
 	/**
-	 * 	Used to delete all Task data that are associated to a specified move event. This deletes the task, notes and dependencies on other tasks.
+	 *	Used to delete all Task data that are associated to a specified move event. This deletes the task, notes and dependencies on other tasks.
 	 * @param moveEventId
 	 * @param deleteManual - boolean used to determine if manually created tasks should be deleted as well (default false)
 	 * @return void
 	 * 
 	 */
-	def deleteTaskData(def moveEventId, def deleteManual=false) {
-		log.info("deleteTaskData() was called for moveEvent(${moveEventId})")
-		def tasksMap = getMoveEventTaskLists(moveEventId, false)
+	def deleteTaskData(def moveEvent, def deleteManual=false) {
+		def msg
+		try {			
+			def depDeleted=0
+			def taskDeleted=0
+			def taskList = AssetComment.findAll('from AssetComment t where t.moveEvent.id=:meId', [meId:moveEvent.id])
+			if (taskList.size() > 0) {
+				depDeleted = TaskDependency.executeUpdate("delete from TaskDependency td where (td.predecessor in (:tasks) or td.assetComment in (:tasks))",
+				   [tasks:taskList])
+
+				taskDeleted = AssetComment.executeUpdate("delete from AssetComment a where a.id in (:ids)",[ids:taskList.id])
+			}
+			msg = "Deleted $taskDeleted tasks and $depDeleted dependencies"
+		} catch(e) {
+			log.error "An unexpected error occured while trying to delete autogenerated tasks for move event $moveEvent for project $moveEvent.project\n${e.getMessage()}"
+			// e.printStackTrace()
+			throw new RuntimeException("An unexpected error occured")
+		}
+		return msg	   
 		
-		if (tasksMap.tasksWithNotes.size() > 0) {
-			CommentNote.executeUpdate('DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids)', ['ids':tasksMap.tasksWithNotes] )
-		}
-		if (tasksMap.tasksAll.size() > 0) {
-			TaskDependency.executeUpdate('DELETE FROM TaskDependency td WHERE td.assetComment.id IN (:ids) OR td.predecessor.id IN (:ids)', ['ids':tasksMap.tasksAll] )
-			AssetComment.executeUpdate('DELETE FROM AssetComment ac WHERE ac.id IN (:ids)', ['ids':tasksMap.tasksAll] )
-		}
-        def event = MoveEvent.read(moveEventId)
-        def bundles = MoveBundle.findAllByMoveEvent( event )
-        bundles.each{ bundle->
-            deleteBundleWorkflowTasks(bundle)
-        }
 	}
 	
 	/** 
@@ -802,9 +825,9 @@ class TaskService {
 			 def skip=false
 			 for (int i=0; i < taskList.size(); i++) {
 				 if (taskList[i].id == predecessor.id ) {
-				 	skip = true
+					skip = true
 					break
-			 	}
+				}
 			 }
 			 
 			 // If it is not Completed, add it to the list and recursively look for more predecessors
@@ -836,7 +859,7 @@ class TaskService {
 			throw new TaskCompletionException("Unable to complete task [${task.taskNumber}] due to incomplete predecessor task # (${predecessors[0].taskNumber})")
 		 }
 
-		 // If automatically completing predecessors, check first to see if there are any on hold and stop 		 
+		 // If automatically completing predecessors, check first to see if there are any on hold and stop		 
 		 if (completePredecessors) {
 			 // TODO : Runbook - if/when we want to complete all predecessors, perhaps we should do it recursive since this logic only goes one level I believe.
 			 if ( predecessors.size() > 0 ) {
@@ -856,7 +879,7 @@ class TaskService {
 			 tasksToComplete += predecessors
 		 }
 
-	 	// Complete the task(s)
+		// Complete the task(s)
 		tasksToComplete.each() { activeTask ->
 			// activeTask.dateResolved = GormUtil.convertInToGMT( "now", "EDT" )
 			// activeTask.resolvedBy = userLogin.person
@@ -888,7 +911,7 @@ class TaskService {
 				if (makeReady) {
 					successorTask.status = AssetCommentStatus.READY
 					if (! (successorTask.validate() && successorTask.save(flush:true)) ) {
-					 	throw new TaskCompletionException("Unable to release task # ${successorTask.taskNumber} due to " +
+						throw new TaskCompletionException("Unable to release task # ${successorTask.taskNumber} due to " +
 							 GormUtil.allErrorsString(successorTask) )
 						log.error "Failed Readying successor task [${successorTask.id} " + GormUtil.allErrorsString(successorTask)
 					 }
@@ -933,103 +956,72 @@ class TaskService {
 		def rolesForStaff = RoleType.findAllByDescriptionIlike('staff%',[sort:'description'])
 		return rolesForStaff
 	}
-    
-    /**
-     * This method is used to generat HTML for a given type with list of dependencies
-     * @param depTasks, list of successors or dependencies 
-     * @param task, task for which dependencies table generating 
-     * @param dependency, for which table generating for
-     * @return
-     */
-    def genTableHtmlForDependencies(def depTasks, def task, def dependency){
-        def html = new StringBuffer("""<table id="${dependency}EditTableId" cellspacing="0" style="border:0px;width:0px"><tbody>""")
-        def optionList = AssetComment.constraints.category.inList.toList()
-        def i=1
-        depTasks.each{ depTask ->
-            def succecessor = depTask.assetComment
-            def paramsMap = [selectId:"predecessorCategoryEditId_${depTask.id}", selectName:'category', 
-                options:optionList, optionSelected:succecessor.category,
-                javascript:"onChange=\'fillPredecessor(this.id,this.value,${task.id},\"${dependency}Edit\")\'" ]
-            def selectCategory = HtmlUtil.generateSelect(paramsMap)
-            def selectPred = genSelectForTaskDependency(depTask, task , "${dependency}EditId" , "${dependency}Edit")
-            html.append("""<tr id="row_Edit_${depTask.id}"><td>""")
-            html.append(selectCategory)
-            html.append("""</td><td id="taskDependencyEditTdId_${depTask.id}">""")
-            html.append(selectPred)
-            html.append("""</td><td><a href="javascript:deletePredRow('row_Edit_${depTask.id}')"><span class="clear_filter"><u>X</u></span></a></td>""")
-        }
-        return html
-    }
-    
-    /**
-     * Delete all Bundle associated assets workflow tasks
-     * @param bundle, MoveBundle Instance
-     * @return success message
-     */
-    def deleteBundleWorkflowTasks(def bundle) {
-       def bundledAssets = AssetEntity.findAll("from AssetEntity a where a.moveBundle = :bundle and a.project =:project\
-           and a.assetType not in ('application','database',' ','VM')",[bundle:bundle,project:bundle.project])
-
-       def assetComments = AssetComment.findAll("from AssetComment ac where commentType = 'issue' and \
-			( (ac.assetEntity in (:assets) and ac.workflowTransition is not null) \
-             or ( ac.moveEvent = :moveEvent and ac.comment in (:comments)) \
-             or ( ac.moveEvent = :moveEvent and ac.workflowTransition is not null )\
-			) ",
-			[ assets:bundledAssets, moveEvent:bundle.moveEvent, comments:["Begin Move Event", "Move Event Complete"] ] )
-			
-       if (assetComments.size() > 0) {
-           def taskDependency = TaskDependency.executeUpdate("delete from TaskDependency td where (td.predecessor in (:tasks) or td.assetComment in (:tasks))",
-               [tasks:assetComments])
-
-           def assetComment  = AssetComment.executeUpdate("delete from AssetComment ac where ac.id in (:ids)",[ids:assetComments.id])
-       }
-       
-       // Set tasksCreated to false to enable user to create them again
-       bundle.tasksCreated = false
-       if ( !bundle.save() ) {
-           log.info "Exception while updating bundle.tasksCreated = false\n"+GormUtil.allErrorsString(bundle)
-           return
-       }
-   }
-
+	
+	/**
+	 * This method is used to generat HTML for a given type with list of dependencies
+	 * @param depTasks, list of successors or dependencies 
+	 * @param task, task for which dependencies table generating 
+	 * @param dependency, for which table generating for
+	 * @return
+	 */
+	def genTableHtmlForDependencies(def depTasks, def task, def dependency){
+		def html = new StringBuffer("""<table id="${dependency}EditTableId" cellspacing="0" style="border:0px;width:0px"><tbody>""")
+		def optionList = AssetComment.constraints.category.inList.toList()
+		def i=1
+		depTasks.each{ depTask ->
+			def succecessor = depTask.assetComment
+			def paramsMap = [selectId:"predecessorCategoryEditId_${depTask.id}", selectName:'category', 
+				options:optionList, optionSelected:succecessor.category,
+				javascript:"onChange=\'fillPredecessor(this.id,this.value,${task.id},\"${dependency}Edit\")\'" ]
+			def selectCategory = HtmlUtil.generateSelect(paramsMap)
+			def selectPred = genSelectForTaskDependency(depTask, task , "${dependency}EditId" , "${dependency}Edit")
+			html.append("""<tr id="row_Edit_${depTask.id}"><td>""")
+			html.append(selectCategory)
+			html.append("""</td><td id="taskDependencyEditTdId_${depTask.id}">""")
+			html.append(selectPred)
+			html.append("""</td><td><a href="javascript:deletePredRow('row_Edit_${depTask.id}')"><span class="clear_filter"><u>X</u></span></a></td>""")
+		}
+		return html
+	}
+	
    /**
-    * Create a Task based on a move bundle workflow step
-    * @param workflow
-    * @param assetEntity (optional)
-    * @return Map [errMsg, stepTask]
-    */
+	* Create a Task based on a move bundle workflow step
+	* @param workflow
+	* @param assetEntity (optional)
+	* @return Map [errMsg, stepTask]
+	*/
    def createTaskBasedOnWorkflow(Map args){
-       def errMsg = ""
-       def stepTask = new AssetComment()
-           stepTask.comment = "${args.workflow.code}${args.assetEntity ? '-'+args.assetEntity?.assetName:''}"
-           stepTask.role = args.workflow.role?.id
-           stepTask.moveEvent = args.bundleMoveEvent
-           stepTask.category = args.workflow.category ? args.workflow.category : 'general'
-           stepTask.assetEntity = args.assetEntity
-           stepTask.duration = args.workflow.duration ? args.workflow.duration : 0
-           stepTask.priority = args.assetEntity?.priority ? args.assetEntity?.priority : 3
-           stepTask.status  = "Pending"
-           stepTask.workflowTransition = args.workflow
-           stepTask.project = args.project
-           stepTask.commentType = "issue"
-           stepTask.createdBy = args.person
-           stepTask.taskNumber = args.taskNumber
-           stepTask.estStart = MoveBundleStep.findByMoveBundleAndTransitionId(args.bundle, args.workflow.transId)?.planStartTime
-           stepTask.estFinish = MoveBundleStep.findByMoveBundleAndTransitionId(args.bundle, args.workflow.transId)?.planCompletionTime
+	   def errMsg = ""
+	   def stepTask = new AssetComment()
+		   stepTask.comment = "${args.workflow.code}${args.assetEntity ? '-'+args.assetEntity?.assetName:''}"
+		   stepTask.role = args.workflow.role?.id
+		   stepTask.moveEvent = args.bundleMoveEvent
+		   stepTask.category = args.workflow.category ? args.workflow.category : 'general'
+		   stepTask.assetEntity = args.assetEntity
+		   stepTask.duration = args.workflow.duration ? args.workflow.duration : 0
+		   stepTask.priority = args.assetEntity?.priority ? args.assetEntity?.priority : 3
+		   stepTask.status	= "Pending"
+		   stepTask.workflowTransition = args.workflow
+		   stepTask.project = args.project
+		   stepTask.commentType = "issue"
+		   stepTask.createdBy = args.person
+		   stepTask.taskNumber = args.taskNumber
+		   stepTask.estStart = MoveBundleStep.findByMoveBundleAndTransitionId(args.bundle, args.workflow.transId)?.planStartTime
+		   stepTask.estFinish = MoveBundleStep.findByMoveBundleAndTransitionId(args.bundle, args.workflow.transId)?.planCompletionTime
 			stepTask.autoGenerated = true
 
-       if(!stepTask.save(flush:true)){
-           stepTask.errors.allErrors.each{println it}
-           errMsg = "Failed to create WorkFlow Task. Process Failed"
-       }
-       
-       return [errMsg:errMsg, stepTask:stepTask]
+	   if(!stepTask.save(flush:true)){
+		   stepTask.errors.allErrors.each{println it}
+		   errMsg = "Failed to create WorkFlow Task. Process Failed"
+	   }
+	   
+	   return [errMsg:errMsg, stepTask:stepTask]
    }
    
 
 	/**
 	 * Generates a SELECT control for selecting a staff assign to
-	 * @param projectId	Id of the project to get staff for
+	 * @param projectId Id of the project to get staff for
 	 * @param taskId - task that 
 	 * @param elementId CSS element id
 	 * @param defaultId
@@ -1064,5 +1056,518 @@ class TaskService {
 		
 		return assignedToSelect
 	}
+	
+	
+	/**
+	 * Retrieves the runbook recipe for a specified MoveEvent
+	 * @param moveEventId
+	 * @return Map containing Tasks[Map] and potentially Resources[Map]
+	 */
+	def getMoveEventRunbookRecipe( moveEvent ) {
+		def recipe
+		
+		if (moveEvent && moveEvent.runbookRecipe ) {
+			try {
+				recipe = Eval.me("[ ${moveEvent.runbookRecipe} ]")				
+			} catch (e) {
+				log.error "There is an error in the runbook recipe for project move event ${moveEvent.project} - ${moveEvent}\n${e.getMessage}"
+			}
+		}
+		return recipe
+	}
+	
+	/**
+	 * Used to fetch the last task number for a project
+	 * @param Project
+	 * @return Integer
+	 */
+	def getLastTaskNumber(project) {
+		def lastTaskNum = AssetComment.executeQuery('select MAX(a.taskNumber) from AssetComment a where project=?', [project])[0]		
+		// log.info "Last task number is $lastTaskNum"
+		
+		return lastTaskNum
+	}
+	
+	/**
+	 * Used to generate the runbook tasks for a specified project's Move Event
+	 * @param Person whom - the individual that is generating the tasks
+	 * @param MoveEvent moveEvent - the move event to process
+	 * @return String - the messages as to the success of the function
+	 */
+	def generateRunbook( whom, moveEvent ) {
+		// List of all move bundles associated with the move event
+		def bundleList = moveEvent.moveBundles
+		log.info "bundleList=[$bundleList] for moveEvent ${moveEvent.id}"		
+		def bundleIds = bundleList*.id
+		def project = moveEvent.project
+
+		// List of all assets associated with the move event
+		// def assetList = AssetEntity.findAll("from AssetEntity a WHERE a.moveBundle.id IN (:bundleIds)", [bundleIds:bundleIds] )
+		
+		if (bundleIds.size() == 0) {
+			return "There are no Move Bundles assigned to the Move Event, which are required."
+		}
+
+		def categories = GormUtil.asQuoteCommaDelimitedString(AssetComment.moveDayCategories) 
+		
+		// log.info "${assetList.size()} assets found for move event ${moveEvent}"
+		
+		// Fail if there are already moveday tasks that are autogenerated
+		def existingTasks = jdbcTemplate.queryForInt("select count(*) from asset_comment a where a.move_event_id=${moveEvent.id} \
+			and a.auto_generated=true and a.category in (${categories})")
+		// log.info "existingTask count=$existingTasks"
+		if ( existingTasks > 0 ) {
+			return "Unable to generate tasks as there are moveday tasks already generated for the project"
+		}
+
+		// Define a number of vars that will hold cached data about the tasks being generated for easier lookup, dependencies, etc
+		def lastTaskNum = getLastTaskNumber(project)		
+		def taskList = []			// an array that will contain list of all tasks that are inserted as they are created
+		def lastMilestone = null	// Will track the most recent milestone task
+		def assetsLatestTask = [:]	// This map array will contain reference of the assets' last assigned task
+		def taskSpecIds = [:]		// Used to track the ID #s of all of the taskSpecs in the recipe
+		
+		def wfList = null			// get list of workflows for each move bundle
+		
+		def newTask
+		def newDep
+		
+		def recipe = getMoveEventRunbookRecipe( moveEvent )
+		def recipeTasks = recipe?.tasks		
+		if (! recipeTasks || recipeTasks.size() == 0) {
+			return "There appears to be no runbook recipe or there is an error in its format"
+		}
+		// log.info "Runbook recipe: $recipe"
+
+		// These buffers are used to capture status output for short-term
+		StringBuffer out = new StringBuffer()
+		StringBuffer exceptions = new StringBuffer()
+		
+		def noSuccessorsSql = "select t.asset_comment_id as id \
+	    	from asset_comment t \
+	  		left outer join task_dependency d ON d.predecessor_id=t.asset_comment_id \
+			where t.move_event_id=${moveEvent.id} AND d.asset_comment_id is null AND \
+			t.category IN (${categories}) AND t.auto_generated=true"
+		log.info("noSuccessorsSql: $noSuccessorsSql")
+		
+		def taskCount = 0
+		def depCount = 0
+		def specCount = 0
+		
+		/**
+		 * A helper closure used by generateRunbook to link a task to its predecessors by asset or milestone
+		 * @param AssetComment (aka Task)
+		 */
+		def linkTaskToLastAssetOrMilestone = { taskToLink ->
+			// See if there is an asset and that there are previous tasks for the asset
+
+			// If the task is for an asset and there is a previous task for the asset
+			if ( taskToLink.assetEntity && assetsLatestTask.containsKey(taskToLink.assetEntity.id) ) {
+				
+				log.info "linkTaskToLastAssetOrMilestone in 1"
+				newDep = createTaskDependency( assetsLatestTask[taskToLink.assetEntity.id], taskToLink )
+				depCount++
+				assetsLatestTask[taskToLink.assetEntity.id] = taskToLink									
+				out.append("Created dependency (${newDep.id}) between milestone $lastMilestone and $taskToLink<br/>")
+				// Now we can associate this new task as the latest task for the asset									
+				assetsLatestTask.put(taskToLink.assetEntity.id, taskToLink)
+				
+			} else if (lastMilestone) {
+				log.info "linkTaskToLastAssetOrMilestone in 2"
+				newDep = createTaskDependency( lastMilestone, taskToLink )
+				depCount++
+				assetsLatestTask.put(taskToLink.assetEntity.id, taskToLink)
+				out.append("Created dependency (${newDep.id}) between milestone $lastMilestone and $taskToLink<br/>")									
+			} else {
+				exceptions.add("Task(${tnd}) has no predecessor tasks<br/>")
+			}
+			
+		}
+		/*
+		} else {
+			exceptions.add "Support dependency for asset ${sd.predecessor} to asset ${sd.asset} that is not in move " +
+				"event for taskSpec ${taskSpec}"								 
+		*/
+		
+		try {
+			recipeTasks.each { taskSpec ->
+				// Make sure that the user define the taskSpec.id and that it is NOT a duplicate from a previous step
+				// because it could cause adverse dependency linkings.
+				specCount++
+				if (! taskSpec.containsKey('id')) {
+					throw new RuntimeException("TaskSpec for step $specCount in list is missing the 'id' property")
+				}
+				if (taskSpecIds.containsKey(taskSpec.id)) {
+					throw new RuntimeException("TaskSpec for step $specCount duplicated id ${taskSpec.id} found in step ${taskSpecIds[taskSpec.id]}")
+				}
+				taskSpecIds.put(taskSpec.id, specCount)
+				
+				out.append("=======<br/>Processing taskSpec ${taskSpec.id}-${taskSpec.description}<br/>-------<br/>")
+				
+				// -------------------------
+				// Handle Milestone tasks
+				// -------------------------
+				if (taskSpec.containsKey('milestone') ) {
+					
+					// Create the milestone task
+					out.append("Creating milestone ${taskSpec.title}<br/>")
+					newTask = createTaskFromSpec(whom, ++lastTaskNum, moveEvent, taskSpec)
+					taskList << newTask
+					lastMilestone = newTask 
+					taskCount++
+
+					// Now find all tasks that don't have have successor (excluding the current milestone task) and
+					// create dependency where the milestone is the successor
+					def tasksNoSuccessors = jdbcTemplate.queryForList(noSuccessorsSql)
+					log.info("Found ${tasksNoSuccessors.count()} tasks with no successors")
+					if (tasksNoSuccessors.size()==0 && taskCount > 1 ) {
+						out.append("Found no successors for a milestone, which is unexpected but not necessarily wrong - Task $newTask<br/>")
+					}
+					tasksNoSuccessors.each() { p ->
+						// Create dependency as long as we're not referencing the task just created
+						if (p.id != newTask.id ) {
+							def predecessorTask = AssetComment.read(p.id)
+							newDep = createTaskDependency( predecessorTask, newTask )
+							depCount++
+							out.append("Created dependency (${newDep.id}) between $predecessorTask and $newTask<br/>")
+							if (predecessorTask.assetEntity) {
+								// Move the asset's last task to the milestone task
+								assetsLatestTask.put(predecessorTask.assetEntity.id, newTask)
+							}
+						}
+					}						
+				} else if (taskSpec.containsKey('action')) {
+					// -------------------------
+					// Handle ACTION TaskSpecs (e.g. OnCart, offCart, QARAck) Tasks
+					// -------------------------
+					exceptions.append("Action(${taskSpec.action}) presently not supported<br/>")
+					
+				} else {
+					// -------------------------
+					// Create Normal Tasks
+					// -------------------------
+					def assetsForTask = findAllAssetsWithFilter(moveEvent, taskSpec.filter)
+					log.info "Found (${assetsForTask?.size()}) assets for taskSpec ${taskSpec.id}-${taskSpec.description}"
+					if ( !assetsForTask || assetsForTask.size()==0) return // aka continue
+					
+					def tasksNeedingDependencies = []
+					def depCode=''
+
+					//
+					// Create a task for each asset based on the filtering of the taskSpec
+					//
+					assetsForTask?.each() { asset ->
+						newTask = createTaskFromSpec(whom, ++lastTaskNum, moveEvent, taskSpec, asset)
+						taskList << newTask
+						taskCount++
+						tasksNeedingDependencies << newTask
+						out.append("Created task $newTask<br/>")
+					}
+					
+					// Set some vars that will be used in the next iterator 
+					def specHasDependency = false		// Set to true if the spec references Dependencies
+
+					// Determine if we are looking at AssetDependency associations and if so if we're looking for Supports or Requires relationships.
+					// Supports are usually used in Shutdown and Requires in Startup
+					if ( taskSpec.filter?.containsKey('dependency') ) {
+						depCode = taskSpec.filter.dependency[0].toLowerCase()
+						specHasDependency = 'sr'.contains( depCode )
+						if ( ! specHasDependency ) {
+							// Someone messed up a Spec 
+							throw new RuntimeException("Task Spec ${taskSpec.id} has invalid filter.dependency value (${taskSpec.filter.dependency}) " +
+								"- valid options are [supports|requires]")	
+						}
+					}
+
+					log.info "specHasDependency=$specHasDependency"
+					//	
+					// Now iterate over all of the tasks just created for this taskSpec and assign dependencies 
+					//
+					out.append("# Creating dependencies on ${tasksNeedingDependencies.size()}<br/>")
+					tasksNeedingDependencies.each() { tnd ->
+						log.info "Processing task $tnd"
+						if (specHasDependency && tnd.assetEntity) {
+							//
+							// Process taskSpecs that reference AssetDependency records based on the filter
+							//
+							def assetDependencies = getAssetDependencies(tnd.assetEntity, taskSpec.filter)
+						
+							if (assetDependencies.size() == 0) {
+								exceptions.append("Asset(${tnd.assetEntity}) for Task(${tnd}) has no ${taskSpec.filter.dependency} relationships<br/>")
+
+								// Link task to the last known milestone or it's asset's previous task
+								linkTaskToLastAssetOrMilestone(tnd)
+							} else {
+								
+								// Look over the assets dependencies that are associated to the current task's asset and create predecessor relationships 
+								// We will warn on assets that are not part of the moveEvent that have dependency. We most likely will want to have tasks 
+								// for assets not moving in the future but will require discussion.
+								log.info "Iterate over ${assetDependencies.size()} dependencies for asset ${tnd.assetEntity}"
+								def tndHadDependency=false
+								assetDependencies.each { ad ->
+									// Get the Note that this should be the opposite of that used in the getAssetDependencies 
+									def predAsset = depCode == 's' ?  ad.dependent : ad.asset
+
+									// Make sure that the other asset is in one of the move bundles in the move event
+									def predMoveBundle = predAsset.moveBundle
+									if (! predMoveBundle || ! bundleIds.contains(predMoveBundle.id)) {
+										exceptions.append("Asset dependency references asset not in move event: task($tnd) between asset ${tnd.assetEntity} and ${predAsset}<br/>")
+									} else {
+										// Find the last task for the predAsset to create associations between tasks. If the predecessor was created
+										// during the same taskStep, assetsLatestTask may not yet be populated so we can scan the tasks created list for
+										// one with the same taskSpec id #
+										def previousTask = taskList.find { it.assetEntity?.id == predAsset.id && it.taskSpec == tnd.taskSpec }										
+										if (previousTask) {
+											log.info "Found task in taskList array - task (${previousTask})"
+										} else {
+											// Try finding latest task for the asset
+											if (assetsLatestTask.containsKey(predAsset.id)) {
+												previousTask = assetsLatestTask[predAsset.id]
+												log.info "Found task from assetsLatestTask array - task (${previousTask})"
+											}
+										}
+										if (previousTask) {
+											newDep = createTaskDependency(previousTask, tnd)
+											depCount++
+											assetsLatestTask.put(tnd.assetEntity.id, tnd)
+											tndHadDependency=true
+											out.append("Created dependency (${newDep.id}) between ${previousTask} and $tnd<br/>")
+										} else {
+											log.info "No predecessor task found for asset ($predAsset) to link to task ($tnd)"
+											exceptions.append("No predecessor task found for asset ($predAsset) to link to task ($tnd)<br/>")
+										}
+									}
+								}
+								if (! tndHadDependency) {
+									// If none of the dependencies worked out we need to tie the task to some other predecessor
+									linkTaskToLastAssetOrMilestone(tnd)											
+								}
+							}
+							
+						} else  {
+							log.info "Alternate dependency for task ${tnd}"
+							// Link task to the last known milestone or it's asset's previous task
+							linkTaskToLastAssetOrMilestone(tnd)
+							
+						}
+					} // tasksNeedingDependencies.each()
+				}
+			} 
+		} catch(e)	{
+			out.append("We blew up :-( <br/>")
+			out.append(e.toString())
+			e.printStackTrace()
+
+		}
+		
+		return "Status: $taskCount Tasks and $depCount Dependencies created<br/>Exceptions:<br/>" + exceptions.toString() + "Log:<br/>" + out.toString()
+		
+	}
+	
+	/**
+	 * A helper method called by generateRunbook to lookup the AssetDependency records for an Asset as specified in the taskSpec
+	 * @param Object asset - can be any asset type (Application, AssetEntity, Database or Files)
+	 * @param Map taskSpec - a Task specification map
+	 * @return List<AssetDependency> - list of dependencies
+ 	 */
+	def getAssetDependencies(asset, filter) {
+		def list = []
+		def depCode = filter.dependency[0].toLowerCase()
+		
+		// This is the list of properties that can be added to the search criteria from the Filter
+		def supportedFilterProps = ['status']
+		
+		// AssetEntity  asset			// The asset that that REQUIRES the 'dependent'
+		// AssetEntity dependent		// The asset that SUPPORTS 'asset' 
+		// log.info "depCode=$depCode"
+		def relateOn = ( depCode == 's' ? 'asset' : 'dependent' )
+		def sql = "from AssetDependency ad where ad.${relateOn}.id=:assetId and \
+			ad.status not in ('${AssetDependencyStatus.NA}', '${AssetDependencyStatus.ARCHIVED}') \
+			and ad.type <> '${AssetDependencyType.BATCH}'"
+			
+		def map = ['assetId':asset.id]
+		log.info "FILTER: $filter"
+		// Add additional WHERE expresions to the SQL
+		supportedFilterProps.each() { prop ->
+			if (filter?.containsKey(prop)) {
+				def sqlMap = SqlUtil.whereExpression("ad.$prop", filter[prop], prop)
+				if (sqlMap) {
+					sql = SqlUtil.appendToWhere(sql, sqlMap.sql)
+					if (sqlMap.param) {
+						map[prop] = sqlMap.param
+					}								
+				} else {
+					log.error "SqlUtil.whereExpression unable to resolve ${prop} expression [${filter[prop]}]"
+					throw new RuntimeException("Unable to resolve filter param:[${prop}] expression:[${filter[prop]}] while processing asset ${asset}")
+				}
+			}
+			
+		}
+		
+		log.info "getAssetDependencies SQL=$sql, PARAMS=$map"
+		list = AssetDependency.findAll(sql, map)
+		log.info "getAssetDependencies found ${list.size()} rows : $list"
+
+		return list
+		
+	}
+	
+	/**
+	 * Creates a task for a moveEvent based on a taskSpec from a recipe and defaults the status to READY
+	 * @param moveEvent object
+	 * @param Map taskSpec that contains the specifications for how to create the task
+	 * @param asset - The asset associated with the task if there appropriate
+	 * @return AssetComment (aka Task)
+	 */
+	def createTaskFromSpec(whom, taskNumber, moveEvent, taskSpec, asset=null) {
+		def task = new AssetComment(
+			taskNumber: taskNumber,
+			project: moveEvent.project, 
+			moveEvent: moveEvent, 
+			assetEntity: asset,
+			commentType: AssetCommentType.TASK,
+			status: AssetCommentStatus.READY,
+			createdBy: whom,
+			displayOption: 'U',
+			autoGenerated: true,
+			taskSpec: taskSpec.id )
+			
+		// Handle the various settings from the taskSpec
+		task.priority = taskSpec.containsKey('priority') ? taskSpec.priority : 3
+		task.duration = taskSpec.containsKey('duration') ? taskSpec.duration : 0
+		// TODO - Need to validate that the function code is correct
+		task.role = taskSpec.containsKey('team') ? taskSpec.team : ''
+		task.category = taskSpec.containsKey('category') ? taskSpec.category : AssetCommentCategory.MOVEDAY
+		
+		// TODO : Should be able to parse the duration for a character
+		task.durationScale = 'm'
+		
+		if (asset) {
+			task.comment = new GStringEval().toString(taskSpec.title, asset)
+			// Deal with the estimated times and such from the moveBundle workflows
+		} else {
+			task.comment = new GStringEval().toString(taskSpec.title, moveEvent)
+		}
+		// task.comment = taskSpec.title
+		// log.info "About to save task: ${task.category}"
+		if (! ( task.validate() && task.save(flush:true) ) ) {
+			throw new RuntimeException("Error while trying to create task. error=${GormUtil.allErrorsString(task)}, asset=$asset, TaskSpec=$taskSpec")
+		}
+
+		log.info "Saved task ${task.id} - ${task}"
+		
+		return task
+	}
+	
+	/**
+	 * Used to create a task dependency between two task
+	 * @param precessor
+	 * @param successor
+	 * @return TaskDependency
+	 * @throws RuntimeError if unable to save the dependency
+	 */
+	def createTaskDependency( predecessor, successor ) {
+		log.info "Creating dependency predecessor=$predecessor, successor=$successor"
+		def dependency = new TaskDependency(assetComment:successor, predecessor:predecessor)
+		if (! ( dependency.validate() && dependency.save(flush:true) ) ) {
+			throw new RuntimeException("Error while trying to create dependency between predecessor=$predecessor, successor=$successor<br/>Error=${GormUtil.allErrorsString(dependency)}, ")
+		}
+		successor.status = AssetCommentStatus.PENDING
+		if (! ( successor.validate() && successor.save(flush:true) ) ) {
+			throw new RuntimeException("Failed to update successor ($successor) status to PENDING<br/>Error=${GormUtil.allErrorsString(dependency)}")
+		}
+		
+		return dependency
+	}
+	
+	/**
+	 * This special method is used to find all assets of a moveEvent that match the criteria as defined in the filter map
+	 * @param MoveEvent
+	 * @param Map filter - contains various attributes that define the filtering
+	 * @return List<AssetEntity, Application, Database, File> based on the filter
+	 * @throws RuntimeException if query fails or there is invalid specifications in the filter criteria
+	 */
+	def findAllAssetsWithFilter(moveEvent, filter) {
+		
+		def queryOn = filter?.containsKey('class') ? filter['class'].toLowerCase() : 'device'
+		if (! ['device','application', 'database', 'files'].contains(queryOn) ) {
+			throw new RuntimeException("An invalid 'class' was specified for the filter (valid options are 'device','application', 'database', 'files') for $filter")
+		}
+		
+		def bundleList = moveEvent.moveBundles
+		def bundleIds = bundleList*.id
+
+		def assets
+		def where = ''
+		def project = moveEvent.project
+		def map = [:]
+		def sql
+		
+		map.bIds = bundleIds
+		log.info "bundleIds=[$bundleIds]"
+		
+		
+		/** 
+		 * A helper closure used below to manipulate the 'where' and 'map' variables to add additional
+		 * WHERE expressions based on the properties passed in the filter
+		 * @param String[] - list of the properties to examine
+		 */
+		def addWhereConditions = { list ->
+			list.each() { code ->
+				if (filter?.asset?.containsKey(code)) {
+					def sm = SqlUtil.whereExpression("a.$code", filter.asset[code], code)
+					if (sm) {
+						where = SqlUtil.appendToWhere(where, sm.sql)
+						if (sm.param) {
+							map[code] = sm.param
+						}								
+					} else {
+						log.error "SqlUtil.whereExpression unable to resolve ${code} expression [${filter.asset[code]}]"
+					}
+				}
+			}
+		}
+		
+		// Add additional WHERE clauses based on the following properties being present in the filter.asset 
+		addWhereConditions( ['assetName','assetTag','assetType', 'priority'] )
+		
+		try {
+			
+			switch(queryOn) {
+				case 'device':					
+					if (filter?.containsKey('virtual')) {
+						// Just Virtual devices
+						where = SqlUtil.appendToWhere(where, "a.assetType IN ('virtual', 'vm')")
+					} else if (filter?.containsKey('physical')) {
+						// Just Physical devices
+						where = SqlUtil.appendToWhere(where, "a.assetType not IN ('application', 'database', 'files', 'virtual', 'vm')")
+					} else {
+						// All Devices
+						where = SqlUtil.appendToWhere(where, "a.assetType not IN ('application', 'database', 'files')")
+					}
+					
+					sql = "from AssetEntity a where a.moveBundle.id in (:bIds) and $where"
+					log.info "findAllAssetsWithFilter: sql=$sql, map=$map"
+					assets = AssetEntity.findAll(sql, map)
+					break;
+					
+				case 'application':					
+					// Add additional WHERE clauses based on the following properties being present in the filter (Application domain specific)
+					addWhereConditions( ['appVendor','sme','sme2','businessUnit','criticality'] )
+					
+					sql = "from Application a where a.moveBundle.id in (:bIds)" + (where.size()>0 ? " and $where" : '')
+					log.info "findAllAssetsWithFilter: sql=$sql, map=$map"
+					assets = Application.findAll(sql, map)
+					break;
+				
+			} 
+		} catch (e) {
+			def msg = "An unexpected error occurred while trying to locate assets for filter $filter" + e.toString()
+			log.error "$msg\n"
+			throw new RuntimeException("$msg<br/>${e.getMessage()}")
+		}
+		
+		return assets
+	}	
 	
 }

@@ -34,6 +34,10 @@
                             <td valign="top" class="name">Name:</td>
                             
                             <td valign="top" class="value">${fieldValue(bean:moveEventInstance, field:'name')}</td>
+							<td rowspan="10" width="40%">
+								<label for="runbookRecipe">Runbook Recipe:</label><br/>
+								<textarea name="runbookRecipe" id="runbookRecipe" cols="80" rows="30" readonly="yes" wrap="hard">${moveEventInstance.runbookRecipe}</textarea>
+							</td>
                             
                         </tr>
                     
@@ -89,8 +93,6 @@
 				
 				            <td valign="top" class="value"><g:message code="event.inProgress.${moveEventInstance?.inProgress}" /></td>
 						</tr>
-                    
-                    
                     </tbody>
                 </table>
             </div>
@@ -100,10 +102,11 @@
                     <input type="hidden" name="id" id="moveEventId"  value="${moveEventInstance?.id}" />
                     <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this Event will remove any move news and any related step data?');" value="Delete" /></span>
-                    <span class="button"><input type="button" class="delete" value="Clear Dashboard History" onclick="clearHistoricData( $('#moveEventId').val() )"/></span>
-                 	<span class="button"><input type="button" class="delete" value="Delete Tasks" onclick="clearTaskData( $('#moveEventId').val(), 'delete' )"/></span>
-                    <span class="button"><input type="button" class="delete" value="Clear Task History" onclick="clearTaskData( $('#moveEventId').val(), 'clear' )"/></span>
-                    <span class="button"><input type="button" class="delete" value="Mark Assets Moved" onclick="markAssetsMoved( $('#moveEventId').val())"/></span>
+                    <span class="button"><input type="button" class="delete" value="Clear Dashboard History" onclick="clearHistoricData( $('#moveEventId').val())"/></span>
+                 	<span class="button"><input type="button" class="delete" value="Delete Generated Tasks" onclick="clearTaskData( $('#moveEventId').val(), 'delete')"/></span>
+                    <span class="button"><input type="button" class="delete" value="Reset Tasks" onclick="clearTaskData( $('#moveEventId').val(), 'reset')"/></span>
+                    <span class="button"><input type="button" class="edit" value="Generate Tasks" onclick="generateTasks( $('#moveEventId').val())"/></span>
+                    <span class="button"><input type="button" class="edit" value="Mark Assets Moved" onclick="markAssetsMoved( $('#moveEventId').val())"/></span>
                  </tds:hasPermission>
                 </g:form>
             </div>
@@ -124,13 +127,26 @@
    	function clearTaskData(moveEventId, type){
         $("#messageDiv").hide();
         $("#messageDiv").html("");
-       	var confirmStatus = confirm("Are you sure you want to permanently "+type+" the task data for this move event?")
-       	if(confirmStatus){
-	      	$("#messageDiv").html((type=='clear'?'Clearing':'Deleting')+' task history');
+       	var confirmStatus=confirm("Are you sure you want to permanently "+type.toUpperCase()+" the task data for this move event?")
+ 		if (confirmStatus) {
 		   	$("#messageDiv").show();
-       		${remoteFunction(action:'clearTaskData ', params:'\'moveEventId=\' + moveEventId +\'&type=\' + type ', 
-               	onSuccess:"jQuery('#messageDiv').html('Tasks have been '+(type=='clear' ? 'cleared' : 'deleted')+' successfully.')",
-               	onFailure:"jQuery('#messageDiv').html('An unexpected error has occurred and update was unsuccessful.')") }
+	      	$("#messageDiv").html((type=='reset' ? 'Resetting':'Deleting')+' tasks for the move event');
+     		$.ajax({
+    			url:'../clearTaskData',type:'POST',
+    			data: {'moveEventId':moveEventId, 'type':type},
+    			success: function(data, status, xhr) {
+					var url = xhr.getResponseHeader('X-Login-URL');
+					if (url) {
+						alert("Your session has expired and need to login again.");
+						window.location.href = url;
+					} else {
+	   					$('#messageDiv').html(xhr.status==200 ? data  : "Unexpected error occurred");						
+					}
+    			},
+    			error: function(xhr, textStatus, errorThrown) {
+    				$('#messageDiv').html("An unexpected error occurred and update was unsuccessful.");
+    			}
+    		});		
        	}
    	}
 
@@ -139,18 +155,44 @@
      	 $("#messageDiv").html("");
      	 var confirmStatus = confirm("Marking all event assets as Moved can't be undone. Are you sure?")
      	 if(confirmStatus){
+			$("#messageDiv").show();
+			$('#messageDiv').html("Setting assets to Moved, please wait...")			
      		jQuery.ajax({
     			url: '../markEventAssetAsMoved',
     			data: {'moveEventId':moveEventId},
     			success: function(data) {
-    				$("#messageDiv").show();
     				var text = isNaN(data) ? '' : 'assets marked as moved.'
     				$('#messageDiv').html(''+data+' '+text+'')
     			},
     			error: function(jqXHR, textStatus, errorThrown) {
-    				$("#messageDiv").show();
-    				$('#messageDiv').html("An unexpected error occurred and update was unsuccessful. ")
+    				$('#messageDiv').html("An unexpected error occurred and update was unsuccessful.")
     			}
+    		});
+         }
+   	}
+   	function generateTasks( moveEventId ){
+   		 $("#messageDiv").hide();
+     	 $("#messageDiv").html("");
+     	 var confirmStatus = confirm("Generate move day runbook tasks from recipe. Are you sure?")
+     	 if(confirmStatus){
+			$("#messageDiv").show();
+			$("#messageDiv").html("Generating move day runbook, please wait...");
+     		$.ajax({
+    			url:'../generateMovedayTasks',type:'POST',
+    			data: {'moveEventId':moveEventId},
+    			success: function(data, status, xhr) {
+					var url = xhr.getResponseHeader('X-Login-URL');
+					if (url) {
+						alert("Your session has expired and need to login again.");
+						window.location.href = url;
+					} else {
+	   					$('#messageDiv').html(xhr.status==200 ? data  : "Unexpected error occurred");						
+					}
+    			},
+    			error: function(xhr, textStatus, errorThrown) {
+    				$('#messageDiv').html("An unexpected error occurred and update was unsuccessful.");
+    			}
+
     		});
          }
    	}

@@ -1,6 +1,6 @@
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tds.asset.*
-import groovy.mock.interceptor.MockFor
+import groovy.mock.interceptor.*
 import grails.test.GrailsUnitTestCase
 import org.apache.log4j.* 
 
@@ -98,6 +98,26 @@ class TaskServiceTests extends GrailsUnitTestCase {
 		assertEquals AssetCommentStatus.STARTED, task.status
 		assertEquals 0, task.isResolved
 		// assertTrue task.notes.list().size() > 0
+		
+	}
+		
+	void testGetMoveEventRunbookRecipe() {
+		def text = "[ tasks: [ [ 'id':1000, 'description':'Start' ] ] ]"
+		def mock = new MockFor(MoveEvent)
+		def me = new MoveEvent(runbookRecipe:text)
+		MoveEvent.metaClass.static.read = { id -> return id == 1 ? me : null }
+		
+		def recipe = taskService.getMoveEventRunbookRecipe(1)
+		assertTrue recipe.size() > 0
+		
+		def task = recipe.tasks[0]
+		assertEquals 1000, task.id
+		assertEquals 'Start', task.description
+		
+		println recipe
+		
+		// See that it handles not getting an event as well
+		assertNull taskService.getMoveEventRunbookRecipe(2)
 		
 	}
 	
