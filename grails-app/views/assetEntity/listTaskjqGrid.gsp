@@ -48,41 +48,45 @@
 	    	}else{
 	   		  B2.Pause(0);
 	   	    }
+	    	var event = ${filterEvent}
+	    	var justRemaining = ${justRemaining}
+	    	var justMyTasks = ${justMyTasks}
 	    	<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
-            colNames="'Action', 'Task', 'Description', 'Asset', 'AssetType', 'Updated', 'Due', 'Status','Assigned To', 'Role', 'Category', 'Suc.', 'Score', 'id',
-                'statusCss'"
-            colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50},
+	            colNames="'Action', 'Task', 'Description', 'Asset', 'AssetType', 'Updated', 'Due', 'Status',
+		            'Assigned To', 'Role', 'Category', 'Suc.', 'Score', 'id', 'statusCss'"
+	            colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50},
             				{name:'taskNumber', editable: true},
                             {name:'comment', editable: true, width:500, formatter:taskFormatter},
                             {name:'assetEntity', editable: true, formatter:assetFormatter},
                             {name:'assetType', editable: true, formatter:taskFormatter},
-                            {name:'updated', editable: true, formatter: updatedFormatter},
+                            {name:'updated', editable: true, formatter: updatedFormatter,sortable:false,search:false},
                             {name:'dueDate', editable: true, formatter: dueFormatter},
                             {name:'status', editable: true, formatter: statusFormatter},
-                            {name:'assignedTo', editable: true, formatter:taskFormatter},
+                            {name:'assignedTo', editable: true, formatter:assignedFormatter},
                             {name:'role', editable: true, formatter:taskFormatter},
                             {name:'category', editable: true, formatter:taskFormatter},
-                            {name:'suc', editable: true, formatter:taskFormatter},
-                            {name:'score', editable: true, formatter:taskFormatter},
+                            {name:'suc', editable: true, formatter:taskFormatter,sortable:false,search:false},
+                            {name:'score', editable: true, formatter:taskFormatter, search:false},
                             {name:'id', hidden: true},
                             {name:'statusCss', hidden: true}"
-            sortname="'taskNumber'"
-            caption="'Task List'"
-            height="'auto'"
-            width="1200"
-           	rowNum="25"
-            rowList= "'25','50','100'"
-            scrollOffset="0"
-            viewrecords="true"
-            showPager="true"
-            datatype="'json'">
-            <jqgrid:filterToolbar id="taskListId" searchOnEnter="false" />
-            <jqgrid:navigation id="taskListId" add="false" edit="false" 
-                  del="false" search="false" refresh="true" />
-            <jqgrid:resize id="taskListId" resizeOffset="-2" />
-     		</jqgrid:grid>
-	   	    
+	            caption="'Task List'"
+	            height="'auto'"
+	            width="1200"
+	           	rowNum="25"
+	            rowList= "'25','50','100'"
+	            scrollOffset="0"
+	            viewrecords="true"
+	            postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks}"
+	            showPager="true"
+	            datatype="'json'">
+	            <jqgrid:filterToolbar id="taskListId" searchOnEnter="false" />
+	            <jqgrid:navigation id="taskListId" add="false" edit="false" 
+	                  del="false" search="false" refresh="true" />
+	            <jqgrid:resize id="taskListId" resizeOffset="-2" />
+	     		</jqgrid:grid>
+		   	    
         });
+	    	
         function myCustomFormatter (cellVal,options,rowObject) {
         	var editButton = '<a href="javascript:showAssetComment(\''+options.rowId+'\',\'edit\')">'+
        			"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
@@ -91,6 +95,9 @@
         function taskFormatter(cellVal,options,rowObject) {
         	  return '<span class="pointer" id="span_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal ? cellVal :"") + '</span>';
         }
+        function assignedFormatter(cellVal,options,rowObject) {
+      	  return '<span class="pointer" id="assignedToName_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal ? cellVal :"") + '</span>';
+      	}
         function statusFormatter(cellVal,options,rowObject){
             return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
          }
@@ -110,6 +117,7 @@
        	    if (e.keyCode == 27) { if(B2 != '' && taskManagerTimePref != 0){ B2.Restart( taskManagerTimePref ); }}   
        	});
 
+
 	</script>
 </head>
 <body>
@@ -126,18 +134,18 @@
 			<div>
 			<div>
 			<input type="hidden" id="manageTaskId" value="manageTask"/>
-			<form name="commentForm" id="commentForm" action="listTasks">
+			<form name="commentForm" id="commentForm" action="listjqGrid">
 			<input type="hidden" name="justRemaining" id="justRemaining" value="${justRemaining}" />
 			<input type="hidden" name="justMyTasks"   id="justMyTasks"   value="${justMyTasks}"/>
 			<span >
 				<b>Move Event </b>
-			 	<g:select from="${moveEvents}" name="moveEvent" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
+			 	<g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
 				&nbsp;&nbsp;
 				<input type="checkbox" id="justRemainingCB" ${ (justRemaining == '1' ? 'checked="checked"': '') } onclick="toggleCheckbox(this, 'justRemaining');"  />
-				<b> Just Remaining Tasks</b>
+				<b> <label for="justRemainingCB" >Just Remaining Tasks</label></b>
 				&nbsp;&nbsp;
 				<input type="checkbox" id="justMyTasksCB" ${ (justMyTasks=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'justMyTasks');"/>
-				<b> Just My Tasks</b>&nbsp;&nbsp;
+				<b><label for="justMyTasksCB" > Just My Tasks</label></b>&nbsp;&nbsp;
 				<span style="float:right;">
 					<span class="menuButton"><g:link class="create" controller="task" action="moveEventTaskGraph"
 						params="[moveEventId:filterEvent,mode:'s']">View Task Graph</g:link>

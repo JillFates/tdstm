@@ -3251,17 +3251,21 @@ class AssetEntityController {
 	def listjqGrid={
 		
 		def project = securityService.getUserCurrentProject()
-		def moveEvents = MoveEvent.findAllByProject(project)
-		def person = securityService.getUserLoginPerson()
+		def moveEvents = MoveEvent.findAllByProject(project)		
 
 		// Deal with the parameters
 		def isTask = AssetCommentType.TASK
+		
+		def filterEvent = 0
+		if(params.moveEvent){
+			filterEvent=params.moveEvent
+		}
+		
 
 		def view = isTask ? 'listTasks' : 'listComment'
 		// def action = params.issueBox == "on" ? "issue" : params.resolvedBox  ? "resolved" : params.filter
 		def today = new Date()
 		def moveEvent
-		def filterEvent = 0
 		
 		if(params.containsKey("justRemaining")){
 			userPreferenceService.setPreference("JUST_REMAINING", params.justRemaining)
@@ -3270,6 +3274,7 @@ class AssetEntityController {
 		// Set the Checkbox values to that which were submitted or default if we're coming into the list for the first time
 		def justMyTasks = params.containsKey('justMyTasks') ? params.justMyTasks : "0"
 		def timeToRefresh = getSession()?.getAttribute("MY_TASK")?.MY_TASK
+		
 		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =${project.id} order by assetName asc")
 		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
 		def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
@@ -3278,7 +3283,8 @@ class AssetEntityController {
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		render (view:'listTaskjqGrid' ,model:[timeToUpdate : timeToRefresh ?: 60,servers:servers, applications:applications, dbs:dbs,
-				files:files, dependencyType:dependencyType, dependencyStatus:dependencyStatus, assetDependency: new AssetDependency()] )
+				files:files, dependencyType:dependencyType, dependencyStatus:dependencyStatus, assetDependency: new AssetDependency(),
+				moveEvents:moveEvents, filterEvent:filterEvent, justRemaining:justRemaining, justMyTasks:justMyTasks] )
 		
 	}
 	/**
@@ -3287,22 +3293,37 @@ class AssetEntityController {
 	 */
 	def listTaskJSON ={
 		
-		def sortIndex = params.sidx ?: 'comment'
-		def sortOrder  = params.sord ?: 'asc'
+		def sortIndex = params.sidx 
+		def sortOrder  = params.sord 
 		def maxRows = Integer.valueOf(params.rows)
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 
 		def project = securityService.getUserCurrentProject()
+		def person = securityService.getUserLoginPerson()
 		def moveBundleList
 		def runBookFormatter = new SimpleDateFormat("MM/dd kk:mm:ss")
 		def dueFormatter = new SimpleDateFormat("MM/dd")
-		
-		if(params.event && params.event.isNumber()){
-			def moveEvent = MoveEvent.read( params.event )
-			moveBundleList = moveEvent?.moveBundles?.findAll {it.useOfPlanning == true}
+		def moveEvent
+		if ( params.moveEvent?.size() > 0) {
+			// zero (0) = All events
+			// log.info "listCommentsOrTasks: Handling MoveEvent based on params ${params.moveEvent}"
+			if (params.moveEvent != '0') {
+				moveEvent = MoveEvent.findByIdAndProject(params.moveEvent,project)
+				if (! moveEvent) {
+					log.warn "listCommentsOrTasks: ${person} tried to access moveEvent ${params.moveEvent} that was not found in project ${project.id}"
+				}
+			}
 		} else {
-			moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+			// Try getting the move Event from the user's session
+			def moveEventId = userPreferenceService.getPreference('MOVE_EVENT')
+			// log.info "listCommentsOrTasks: getting MOVE_EVENT preference ${moveEventId} for ${person}"
+			if (moveEventId) {
+				moveEvent = MoveEvent.findByIdAndProject(moveEventId,project)
+			}
+		}
+		if (moveEvent) {
+			userPreferenceService.setPreference( 'MOVE_EVENT', "${moveEvent.id}" )
 		}
 		
 		def assetType = params.filter  ? ApplicationConstants.assetFilters[ params.filter ] : []
@@ -3310,12 +3331,58 @@ class AssetEntityController {
 		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
 		def models = params.model ? Model.findAllByModelNameIlike("%${params.model}%") : []
 		
+		def assetTypes  = params.assetType ? AssetEntity.findAllByAssetTypeIlikeAndProject("%${params.assetType}%", project) : []
+		def assets = params.assetEntity ? AssetEntity.findAllByAssetNameIlikeAndProject("%${params.assetEntity}%", project) : []
+		
+		def taskNumbers = params.taskNumber ? AssetComment.findAll("from AssetComment where project =:project \
+			and taskNumber like '%${params.taskNumber}%'",[project:project])?.taskNumber : []
+
+	    def dates = params.dueDate ? AssetComment.findAll("from AssetComment where project =:project \
+			and dueDate like '%${params.dueDate}%'",[project:project])?.dueDate : []
+
+		def assigned = params.assignedTo ? Person.findAllByFirstNameIlikeOrLastNameIlike("%${params.assignedTo}%","%${params.assignedTo}%" ) : []
+
+		
 		def tasks = AssetComment.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", project)
 			eq("commentType", AssetCommentType.TASK)
 			if (params.comment)
 				ilike('comment', "%${params.comment}%")
-			order(sortIndex, sortOrder).ignoreCase()
+			if (params.status)
+				ilike('status', "%${params.status}%")
+			if (params.role)
+				ilike('role', "%${params.role}%")
+			if (params.category)
+				ilike('category', "%${params.category}%")
+			if (assetTypes)
+				'in'('assetEntity',assetTypes)
+			if (assets)
+				'in'('assetEntity',assets)
+			if (taskNumbers)
+				'in'('taskNumber' , taskNumbers)
+			if (dates)
+				'in'('dueDate' , dates)
+			if (assigned )
+				'in'('assignedTo' , assigned)
+			if(sortIndex && sortOrder){
+				order(sortIndex, sortOrder).ignoreCase()
+			} else {
+				and{
+					order('score','desc')
+					order('taskNumber','asc')
+					order('dueDate','asc')
+					order('dateCreated','desc')
+				}
+			}
+			if(moveEvent)
+				eq('moveEvent', moveEvent)
+				
+			if (params.justRemaining == "1") {
+				ne("status", AssetCommentStatus.COMPLETED)
+			}
+			if (params.justMyTasks == "1") {
+				eq("assignedTo",person)
+			}
 		}
 
 		def totalRows = tasks.totalCount
@@ -3352,11 +3419,12 @@ class AssetEntityController {
 					dueClass = 'task_overdue'
 				}
 			}
+			def assignedTo  = (it.assignedTo ? it.assignedTo?.firstName+" "+it.assignedTo?.lastName: '')
 			
 			[ cell: ['',it.taskNumber, it.comment, it.assetEntity?.assetName, it.assetEntity?.assetType,
 			 updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '',
 			 it.dueDate ? (it.isRunbookTask() ? runBookFormatter.format(it.dueDate) : dueFormatter.format(it.dueDate)) : '',
-			 it.status ?: '', it.hardAssigned ? '*' : '' + (it.assignedTo ? it.assignedTo?.firstName+" "+it.assignedTo?.lastName: '' ),
+			 it.status ?: '', it.hardAssigned ? '*'+assignedTo : '' +assignedTo,
 			 it.role, it.category, TaskDependency.countByPredecessor( it ), it.score ?: 0,
 			 it.status ? "task_${it.status.toLowerCase()}" : 'task_na',updatedClass, dueClass, it.assetEntity?.id], id: it.id,
 			]}
