@@ -35,6 +35,9 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.SqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
+import groovy.time.TimeDuration
+import groovy.time.TimeCategory
+
 class TaskService {
 
 	static transactional = true
@@ -1095,6 +1098,8 @@ class TaskService {
 	 * @return String - the messages as to the success of the function
 	 */
 	def generateRunbook( whom, moveEvent ) {
+		def startedAt = new Date()
+		
 		// List of all move bundles associated with the move event
 		def bundleList = moveEvent.moveBundles
 		log.info "bundleList=[$bundleList] for moveEvent ${moveEvent.id}"		
@@ -1360,7 +1365,11 @@ class TaskService {
 
 		}
 		
-		return "Status: $taskCount Tasks and $depCount Dependencies created<br/>Exceptions:<br/>" + exceptions.toString() + "Log:<br/>" + out.toString()
+		TimeDuration elapsed = TimeCategory.minus( new Date(), startedAt )
+		
+		log.info "A total of $taskCount Tasks and $depCount Dependencies created in $elapsed"
+		return "<h2>Status:</h2> $taskCount Tasks and $depCount Dependencies created in $elapsed<h2>Exceptions:</h2>" + 
+			exceptions.toString() + "<h2>Log:</h2>" + out.toString()
 		
 	}
 	
