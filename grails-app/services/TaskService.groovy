@@ -1535,10 +1535,10 @@ class TaskService {
 			
 			switch(queryOn) {
 				case 'device':					
-					if (filter?.containsKey('virtual')) {
+					if (filter?.asset?.containsKey('virtual')) {
 						// Just Virtual devices
 						where = SqlUtil.appendToWhere(where, "a.assetType IN ('virtual', 'vm')")
-					} else if (filter?.containsKey('physical')) {
+					} else if (filter?.asset?.containsKey('physical')) {
 						// Just Physical devices
 						where = SqlUtil.appendToWhere(where, "a.assetType not IN ('application', 'database', 'files', 'virtual', 'vm')")
 					} else {
