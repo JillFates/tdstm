@@ -14,7 +14,6 @@
 	<link rel="stylesheet" type="text/css" href="${g.resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
 	<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
-	<jq:resources />
     <jqui:resources /> 
     <jqgrid:resources />
 	<script type="text/javascript">
@@ -31,16 +30,6 @@
 			$("#createEntityView").dialog({ autoOpen: false })
 	    	currentMenuId = "#assetMenu";
 	    	$("#teamMenuId a").css('background-color','#003366')
-			<% // The .span_task_* are used to highlight the whole TD cell instead of just the text %>
-	    	$(".span_task_tardy").parent().addClass("task_tardy")
-	    	$(".span_task_late").parent().addClass("task_late")
-	    	$(".span_task_ready").parent().addClass("task_ready")
-	    	$(".span_task_hold").parent().addClass("task_hold")
-	    	$(".span_task_started").parent().addClass("task_started")
-	    	$(".span_task_pending").parent().addClass("task_pending")
-	    	$(".span_task_planned").parent().addClass("task_planned")
-	    	$(".span_task_completed").parent().addClass("task_completed")
-	    	$(".span_task_na").parent().addClass("task_na")	
 	    	$("#selectTimedBarId").val(${timeToUpdate})
 	    	taskManagerTimePref = ${timeToUpdate}
 	    	if(taskManagerTimePref != 0){
@@ -51,11 +40,12 @@
 	    	var event = ${filterEvent}
 	    	var justRemaining = ${justRemaining}
 	    	var justMyTasks = ${justMyTasks}
+	    	var filter = '${filter}'
 	    	<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
 	            colNames="'Action', 'Task', 'Description', 'Asset', 'AssetType', 'Updated', 'Due', 'Status',
 		            'Assigned To', 'Role', 'Category', 'Suc.', 'Score', 'id', 'statusCss'"
 	            colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50},
-            				{name:'taskNumber', editable: true},
+            				{name:'taskNumber', editable: true, formatter:taskFormatter},
                             {name:'comment', editable: true, width:500, formatter:taskFormatter},
                             {name:'assetEntity', editable: true, formatter:assetFormatter},
                             {name:'assetType', editable: true, formatter:taskFormatter},
@@ -76,7 +66,7 @@
 	            rowList= "'25','50','100'"
 	            scrollOffset="0"
 	            viewrecords="true"
-	            postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks}"
+	            postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter}"
 	            showPager="true"
 	            datatype="'json'">
 	            <jqgrid:filterToolbar id="taskListId" searchOnEnter="false" />
@@ -93,10 +83,10 @@
             return editButton
         }
         function taskFormatter(cellVal,options,rowObject) {
-        	  return '<span class="pointer" id="span_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal ? cellVal :"") + '</span>';
+        	  return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal ? cellVal :"") + '</span>';
         }
         function assignedFormatter(cellVal,options,rowObject) {
-      	  return '<span class="pointer" id="assignedToName_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal ? cellVal :"") + '</span>';
+      	  return '<span class="cellWithoutBackground pointer" id="assignedToName_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal ? cellVal :"") + '</span>';
       	}
         function statusFormatter(cellVal,options,rowObject){
             return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
@@ -109,7 +99,7 @@
        	 	return '<span id="span_'+options.rowId+'" class=" '+rowObject[15] +'" onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
         }
         function assetFormatter(cellVal,options,rowObject){
-        	return '<span class="pointer" onclick= "getEntityDetails(\'listComment\', \''+rowObject[4]+'\', '+rowObject[16]+')\" >' + (cellVal ? cellVal :"") + '</span>';
+        	return '<span class="cellWithoutBackground pointer" onclick= "getEntityDetails(\'listComment\', \''+rowObject[4]+'\', '+rowObject[16]+')\" >' + (cellVal ? cellVal :"") + '</span>';
         }
                 
         $(document).keyup(function(e) {
@@ -134,6 +124,7 @@
 			<div>
 			<div>
 			<input type="hidden" id="manageTaskId" value="manageTask"/>
+			<g:render template="commentCrud"/> 
 			<form name="commentForm" id="commentForm" action="listjqGrid">
 			<input type="hidden" name="justRemaining" id="justRemaining" value="${justRemaining}" />
 			<input type="hidden" name="justMyTasks"   id="justMyTasks"   value="${justMyTasks}"/>
@@ -191,7 +182,6 @@
 		</div>
   </div>
   
- <g:render template="commentCrud"/> 
  </div>
  </div>
  <script type="text/javascript">

@@ -3264,7 +3264,6 @@ class AssetEntityController {
 
 		def view = isTask ? 'listTasks' : 'listComment'
 		// def action = params.issueBox == "on" ? "issue" : params.resolvedBox  ? "resolved" : params.filter
-		def today = new Date()
 		def moveEvent
 		
 		if(params.containsKey("justRemaining")){
@@ -3284,7 +3283,7 @@ class AssetEntityController {
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		render (view:'listTaskjqGrid' ,model:[timeToUpdate : timeToRefresh ?: 60,servers:servers, applications:applications, dbs:dbs,
 				files:files, dependencyType:dependencyType, dependencyStatus:dependencyStatus, assetDependency: new AssetDependency(),
-				moveEvents:moveEvents, filterEvent:filterEvent, justRemaining:justRemaining, justMyTasks:justMyTasks] )
+				moveEvents:moveEvents, filterEvent:filterEvent, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:params.filter] )
 		
 	}
 	/**
@@ -3302,6 +3301,7 @@ class AssetEntityController {
 		def project = securityService.getUserCurrentProject()
 		def person = securityService.getUserLoginPerson()
 		def moveBundleList
+		def today = new Date()
 		def runBookFormatter = new SimpleDateFormat("MM/dd kk:mm:ss")
 		def dueFormatter = new SimpleDateFormat("MM/dd")
 		def moveEvent
@@ -3382,6 +3382,23 @@ class AssetEntityController {
 			}
 			if (params.justMyTasks == "1") {
 				eq("assignedTo",person)
+			}
+			switch(params.filter){
+				case "openIssue" :
+					eq('category',"discovery" )
+					break;
+				case "dueOpenIssue":
+					eq('category',"discovery" )
+					lt('dueDate',today)
+					break;
+				case "analysisIssue" :
+					eq("status", AssetCommentStatus.READY)
+					'in'('category', ['general','planning'])
+					break;
+				case "generalOverDue" :
+					'in'('category', ['general','planning'])
+					 lt('dueDate',today)
+					 break;
 			}
 		}
 
