@@ -1,6 +1,5 @@
 import org.jmesa.limit.Limit
-
-import com.tds.asset.AssetEntity
+import grails.converters.JSON
 
 import java.text.SimpleDateFormat
 
@@ -20,16 +19,19 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetOptions
 import com.tds.asset.AssetTransition
+import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
+import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.GormUtil
 
 class ApplicationController {
 	def partyRelationshipService
 	def assetEntityService
 	def taskService
+	def securityService
 	
 	def index = {
 		redirect(action:list,params:params)
@@ -39,7 +41,9 @@ class ApplicationController {
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
 	def  list ={
-		def filterAttributes = [tag_f_assetName:params.tag_f_assetName,tag_f_appOwner:params.tag_f_appOwner,tag_f_appSme:params.tag_f_appSme,tag_f_planStatus:params.tag_f_planStatus,tag_f_depUp:params.tag_f_depUp,tag_f_depDown:params.tag_f_depDown]
+		def project = securityService.getUserCurrentProject()
+		
+		/*def filterAttributes = [tag_f_assetName:params.tag_f_assetName,tag_f_appOwner:params.tag_f_appOwner,tag_f_appSme:params.tag_f_appSme,tag_f_planStatus:params.tag_f_planStatus,tag_f_depUp:params.tag_f_depUp,tag_f_depDown:params.tag_f_depDown]
 		session.setAttribute('filterAttributes', filterAttributes)
 		def projectId =  getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
@@ -108,9 +112,8 @@ class ApplicationController {
 			}
 			
 			appBeanList.add(appBeanInstance)
-		}
-		TableFacade tableFacade = new TableFacadeImpl("tag", request)
-		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
+		}*/
+		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$project.id order by assetName asc")
 		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
 		def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
 		def files = Files.findAll('from Files where assetType = ? and project =? order by assetName asc',['Files', project])
@@ -118,21 +121,72 @@ class ApplicationController {
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		
-		try{
+		/*try{
 			tableFacade.items = appBeanList
 			Limit limit = tableFacade.limit
 			if(limit.isExported()){
 				tableFacade.setExportTypes(response,limit.getExportType())
 				tableFacade.setColumnProperties("id","application","appOwner","appSme","movebundle","planStatus")
 				tableFacade.render()
-			} else {
-				return [assetEntityList : appBeanList , projectId: projectId, assetDependency: new AssetDependency(),
-					servers : servers, applications : applications, dbs : dbs, files : files,dependencyType:dependencyType,dependencyStatus:dependencyStatus,
-				    staffRoles:taskService.getRolesForStaff()]
-			}
+			} else {*/
+		return [projectId: project.id, assetDependency: new AssetDependency(),
+			servers : servers, applications : applications, dbs : dbs, files : files,dependencyType:dependencyType,dependencyStatus:dependencyStatus,
+		    staffRoles:taskService.getRolesForStaff()]
+			/*}
 		}catch(Exception e){
 			return [assetEntityList : null, projectId: projectId , servers : servers, applications : applications, dbs : dbs, files : files]
+		}*/
+	}
+	/**
+	 * This method is used by JQgrid to load appList
+	 */
+	def listJson = {
+		def sortIndex = params.sidx ?: 'assetName'
+		def sortOrder  = params.sord ?: 'asc'
+		def maxRows = Integer.valueOf(params.rows)
+		def currentPage = Integer.valueOf(params.page) ?: 1
+		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+
+		def project = securityService.getUserCurrentProject()
+		def moveBundleList
+
+		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
+		
+		def apps = Application.createCriteria().list(max: maxRows, offset: rowOffset) {
+			eq("project", project)
+			eq("assetType",  AssetType.APPLICATION.toString() )
+			if (params.assetName)
+				ilike('assetName', "%${params.assetName}%")
+			if (params.sme)
+				ilike('sme', "%${params.sme}%")
+			if (params.validation)
+				ilike('validation', "%${params.validation}%")
+			if (params.planStatus)
+				ilike('planStatus', "%${params.planStatus}%")
+			if (bundleList)
+				'in'('moveBundle', bundleList)
+			if(params.plannedStatus)
+				eq("planStatus", params.plannedStatus)
+
+			order(sortIndex, sortOrder).ignoreCase()
 		}
+
+		def totalRows = apps.totalCount
+		def numberOfPages = Math.ceil(totalRows / maxRows)
+
+		def results = apps?.collect { [ cell: ['',it.assetName, it.sme, it.validation, it.planStatus,
+					it.moveBundle?.name, AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
+					AssetDependency.countByDependentAndStatusNotEqual(it, "Validated"),
+					AssetDependency.countByAssetAndStatusNotEqual(it, "Validated"),
+					AssetComment.find("from AssetComment ac where ac.assetEntity=:entity and commentType=:type and status!=:status",
+					[entity:it, type:'issue', status:'completed']) ? 'issue' :
+					(AssetComment.find("from AssetComment ac where ac.assetEntity=:entity",[entity:it]) ? 'comment' : 'blank'),
+					it.assetType], id: it.id,
+			]}
+
+		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
+
+		render jsonData as JSON
 	}
 	def create ={
 		def applicationInstance = new Application(appOwner:'TDS')
@@ -365,7 +419,7 @@ class ApplicationController {
 		}		
 	}
 	def deleteBulkAsset={
-		def assetArray = params['assetLists[]']
+		def assetArray = params.id
 		def assetList
 		if(assetArray.class.toString() == "class java.lang.String"){
 		  assetList = assetArray.split(",")

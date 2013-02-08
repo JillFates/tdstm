@@ -1,3 +1,5 @@
+import grails.converters.JSON
+
 import java.text.SimpleDateFormat
 
 import net.tds.util.jmesa.AssetEntityBean
@@ -16,10 +18,12 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetOptions
 import com.tds.asset.AssetTransition
+import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
+import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.GormUtil
 
 
@@ -28,6 +32,7 @@ class DatabaseController {
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     def assetEntityService  
 	def taskService 
+	def securityService
     def index = {
 		redirect(action: "list", params: params)
     }
@@ -106,6 +111,55 @@ class DatabaseController {
 		
 		
 		
+	}
+	
+	/**
+	 * This method is used by JQgrid to load assetList
+	 */
+	def listJson = {
+		def sortIndex = params.sidx ?: 'assetName'
+		def sortOrder  = params.sord ?: 'asc'
+		def maxRows = Integer.valueOf(params.rows)
+		def currentPage = Integer.valueOf(params.page) ?: 1
+		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+
+		def project = securityService.getUserCurrentProject()
+		def moveBundleList
+		
+		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
+		
+		def dbs = Database.createCriteria().list(max: maxRows, offset: rowOffset) {
+			eq("project", project)
+			if (params.assetName)
+				ilike('assetName', "%${params.assetName}%")
+			if (params.dbFormat)
+				ilike('dbFormat', "%${params.dbFormat}%")
+			if (params.planStatus)
+				ilike('planStatus', "%${params.planStatus}%")
+			if (bundleList)
+				'in'('moveBundle', bundleList)
+				
+			eq("assetType",  AssetType.DATABASE.toString() )
+
+			order(sortIndex, sortOrder).ignoreCase()
+		}
+
+		def totalRows = dbs.totalCount
+		def numberOfPages = Math.ceil(totalRows / maxRows)
+
+		def results = dbs?.collect { [ cell: ['',it.assetName, it.dbFormat, it.validation, it.planStatus,
+					it.moveBundle?.name, AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
+					AssetDependency.countByDependentAndStatusNotEqual(it, "Validated"),
+					AssetDependency.countByAssetAndStatusNotEqual(it, "Validated"),
+					AssetComment.find("from AssetComment ac where ac.assetEntity=:entity and commentType=:type and status!=:status",
+					[entity:it, type:'issue', status:'completed']) ? 'issue' :
+					(AssetComment.find("from AssetComment ac where ac.assetEntity=:entity",[entity:it]) ? 'comment' : 'blank'),
+					it.assetType], id: it.id,
+			]}
+
+		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
+
+		render jsonData as JSON
 	}
 	
 	def show ={
@@ -303,7 +357,7 @@ class DatabaseController {
 		
 	}
 	def deleteBulkAsset={
-		def assetArray = params['assetLists[]']
+		def assetArray = params.id
 		def assetList
 		if(assetArray.class.toString() == "class java.lang.String"){
 		  assetList = assetArray.split(",")

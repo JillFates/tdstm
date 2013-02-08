@@ -11,17 +11,11 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-<link rel="stylesheet" type="text/css" href="${resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
-<script language="javascript" src="${resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
+<jqgrid:resources />
+<jqui:resources /> 
+<jqgrid:resources />
 <script type="text/javascript">
-function onInvokeAction(id) {
-    setExportToLimit(id, '');
-    createHiddenInputFieldsForLimitAndSubmit(id);
-}
-function onInvokeExportAction(id) {
-    var parameterString = createParameterStringForLimit(id);
-    location.href = 'list?' + parameterString;
-}
+
 $(document).ready(function() {
 	//$('#assetMenu').show();
 	$("#createEntityView").dialog({ autoOpen: false })
@@ -33,96 +27,80 @@ $(document).ready(function() {
     $("#editCommentDialog").dialog({ autoOpen: false })
 	$("#manufacturerShowDialog").dialog({ autoOpen: false })
 	$("#modelShowDialog").dialog({ autoOpen: false })
+
+
+	// JqGrid implementations 
+    <jqgrid:grid id="databaseId" url="'${createLink(action: 'listJson')}'"
+    editurl="'${createLink(action: 'deleteBulkAsset')}'"
+    colNames="'Actions','Name', 'DB Format','Plan Status','Bundle','Dep # ','Dep Up','Dep Down','id', 'commentType'"
+    colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'80'},
+      			  {name:'assetName',index: 'assetName', editable: true, formatter: myLinkFormatter, width:'300'},
+      			  {name:'dbFormat', editable: true},
+                  {name:'planStatus', editable: true}, 
+                  {name:'moveBundle', editable: true},
+                  {name:'depNumber', editable: false,sortable:false,search:false},
+                  {name:'depUp', editable: false,sortable:false,search:false },
+                  {name:'depDown', editable: false,sortable:false,search:false},
+                  {name:'id', hidden: true},
+                  {name:'commentType', hidden: true} "
+    sortname="'assetName'"
+    caption="'DB List'"
+   	height="'auto'"
+    width="1000"
+    rowNum="25"
+    rowList= "'25','50','100'"
+    multiselect="true"
+    viewrecords="true"
+    showPager="true"
+    datatype="'json'">
+    <jqgrid:filterToolbar id="databaseId" searchOnEnter="false" />
+    <jqgrid:navigation id="databaseId" add="false" edit="false" del="true" search="false" refresh="true" afterSubmit="deleteMessage"/>
+    <jqgrid:resize id="databaseId" resizeOffset="-2" />
+</jqgrid:grid>
+
+function myLinkFormatter (cellvalue, options, rowObjcet) {
+	var value = cellvalue ? cellvalue : ''
+	return '<a href="javascript:getEntityDetails(\'database\',\''+rowObjcet[10]+'\','+options.rowId+')">'+value+'</a>'
+}
+
+function myCustomFormatter (cellVal,options,rowObject) {
+	var editButton = '<a href="javascript:editEntity(\'database\',\''+rowObject[10]+'\','+options.rowId+')">'+
+			"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+	if(rowObject[9]=='issue'){
+		var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
+			+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
+		editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
+			+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_red.png')}' border='0px'/>"+"</a></span>"
+	} else if (rowObject[9]=='comment') {
+		var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
+			+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
+		editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
+			+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_bold.png')}' border='0px'/>"+"</a></span>"
+	} else {
+		editButton+='<span id="icon_'+options.rowId+'"><a href="javascript:createNewAssetComment('+options.rowId+',\''+rowObject[1]+'\')">'
+			+"<img src='${resource(dir:'i',file:'db_table_light.png')}' border='0px'/>"+"</a></span>"
+	}
+    return editButton
+}
 })
 </script>
 
-<title>Db list</title>
+<title>DB list</title>
 </head>
 <body>
-<div class="body">
 <h1>DB List</h1>
 <g:if test="${flash.message}">
-<div class="message">${flash.message}</div>
+	<div class="message">${flash.message}</div>
 </g:if>
-<div id="jmesaId" class="body">
+<div class="body">
+<br />
+<jqgrid:wrapper id="databaseId" /> 
+<div class="buttons">
 <tds:hasPermission permission='EditAndDelete'>
-	<div style="margin-left: 5px;">
-		<input id="selectAssetId" type="checkbox" onclick="selectAllAssets()" title="Select All" />&nbsp;&nbsp;<label for="selectAssetId" style="cursor:pointer;"> <b>All</b></label>
-	</div>
+	<span class="button"><input type="button" class="save" value="Create DB"
+		onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Database\')')}" /></span>
 </tds:hasPermission>
-	<form name="listDBForm" action="list">
-	
-		<jmesa:tableFacade id="tag" items="${databaseList}" maxRows="50"
-			exportTypes="csv,excel" stateAttr="restore" var="dataBaseInstance"
-			autoFilterAndSort="true" maxRowsIncrements="50,100,200">
-			
-			<jmesa:htmlTable style=" border-collapse: separate" editable="true">
-				<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
-				<input id="state" type="button" value="All.." onclick="selectAllAssets()" title="Select All" />
-					<jmesa:htmlColumn property="id" sortable="false" filterable="false"
-						cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions">
-						<tds:hasPermission permission='EditAndDelete'>
-							  <g:checkBox name="assetCheckBox" id="checkId_${dataBaseInstance.id}" onclick="enableButton(${databaseList.id})"></g:checkBox>
-							  <a href="javascript:editEntity('database','${dataBaseInstance?.assetType}',${dataBaseInstance?.id})"><img src="${resource(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
-						 </tds:hasPermission>
-					<tds:hasPermission permission="CommentCrudView">
-						<span id="icon_${dataBaseInstance.id}">
-							<g:if test="${dataBaseInstance.commentType == 'issue'}">
-								<g:remoteLink controller="assetEntity" action="listComments" id="${dataBaseInstance.id}" before='setAssetId(${dataBaseInstance.id});'	onComplete="listCommentsDialog( e ,'never' );">
-									<img src="${resource(dir:'i',file:'db_table_red.png')}"	border="0px"/>
-								</g:remoteLink>
-							</g:if>
-							<g:elseif test="${dataBaseInstance.commentType == 'comment'}">
-								<g:remoteLink controller="assetEntity" action="listComments" id="${dataBaseInstance.id}" before="setAssetId(${dataBaseInstance.id});" onComplete="listCommentsDialog( e ,'never' ); ">
-									<img src="${resource(dir:'i',file:'db_table_bold.png')}" border="0px"/>
-								</g:remoteLink>
-							</g:elseif>
-							<g:else>
-							<a href="javascript:createNewAssetComment(${dataBaseInstance.id},'${dataBaseInstance.assetName}');">
-								<img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px"/>
-							</a>
-							</g:else>
-						</span>
-					</tds:hasPermission>
-					</jmesa:htmlColumn>
-					<jmesa:htmlColumn property="assetName" title="Name" sortable="true"
-						filterable="true"
-						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-							<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.assetName}</span>
-					</jmesa:htmlColumn>
-					<jmesa:htmlColumn property="dbFormat" sortable="true"
-						title="DB Format" filterable="true"
-						cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.dbFormat}</a>
-					</jmesa:htmlColumn>
-					<jmesa:htmlColumn property="planStatus" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.planStatus}</span>
-					</jmesa:htmlColumn>
-					<jmesa:htmlColumn property="moveBundle" title="Bundle" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.moveBundle}</span>
-					</jmesa:htmlColumn>
-					<jmesa:htmlColumn property="dependencyBundleNumber" title="Dep #" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-						<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id})">${dataBaseInstance.dependencyBundleNumber}</span>
-					</jmesa:htmlColumn>
-					<jmesa:htmlColumn property="depUp" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id} )">${dataBaseInstance.depUp}</span>
-		        	</jmesa:htmlColumn>
-		        	<jmesa:htmlColumn property="depDown" sortable="true"  filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-		        		<span onclick="getEntityDetails('database','${dataBaseInstance.assetType}', ${dataBaseInstance.id} )">${dataBaseInstance.depDown}</span>
-		        	</jmesa:htmlColumn>
-				</jmesa:htmlRow>
-			</jmesa:htmlTable>
-		</jmesa:tableFacade>
-	</form>
-	
-	<div class="buttons">
-	<tds:hasPermission permission='EditAndDelete'>
-		<span class="button"><input type="button" class="save" value="Create DB"
-			onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Database\')')}" /></span>
-			<span class="button"><input id="deleteAsset" type="button" value="Delete Selected..." 
-			    class="save" title="Delete Selected" disabled="disabled"  onclick="deleteAssets(${databaseList.id},'database')" /></span>
-	</tds:hasPermission>
-	</div>
+</div>
 <div id="createEntityView" style="display: none;" ></div>
 <div id="showEntityView" style="display: none;"></div>
 <div id="editEntityView" style="display: none;"></div>
