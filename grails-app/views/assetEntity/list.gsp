@@ -13,6 +13,7 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 <jqgrid:resources />
 <jqui:resources /> 
 <jqgrid:resources />
