@@ -50,7 +50,7 @@ $(document).ready(function() {
 							<td style="width: 10px;text-align: right;">${applicationCount}</td>
 							<td><g:link controller="application" action="list" params="[filter:'applicationCount']" class="links">Applications</g:link><br />
 							<g:if test="${ appToValidate > 0 }">
-							     (<g:link controller="application" action="list" params="[filter:'appToValidate']" class="links">${appToValidate} to validate</g:link>)
+							     (<g:link controller="application" action="list" params="[filter:'applicationCount', validation:'Discovery']" class="links">${appToValidate} to validate</g:link>)
 							</g:if>
 							</td>
 						</tr>
@@ -72,17 +72,17 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${dbCount}</td>
-							<td><g:link controller="database" action="list" class="links">Databases</g:link><br />
+							<td><g:link controller="database" action="list" params="[filter:'db']" class="links">Databases</g:link><br />
 							<g:if test="${ dbToValidate > 0 }">
-							     (<g:link controller="database" action="list" params="[filter:'toValidate']" class="links">${dbToValidate} to validate</g:link>)
+							     (<g:link controller="database" action="list" params="[filter:'db', validation:'Discovery']" class="links">${dbToValidate} to validate</g:link>)
 						    </g:if>
 							</td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${fileCount}</td>
-							<td><g:link controller="files" action="list" class="links">Storage</g:link><br />
+							<td><g:link controller="files" action="list" params="[filter:'storage']" class="links">Storage</g:link><br />
 							<g:if test="${ fileToValidate > 0 }">
-							     (<g:link controller="files" action="list" params="[filter:'toValidate']" class="links">${fileToValidate} to validate</g:link>)
+							     (<g:link controller="files" action="list" params="[filter:'storage', validation:'Discovery']" class="links">${fileToValidate} to validate</g:link>)
 						    </g:if>
 							</td>
 						</tr>
@@ -130,7 +130,7 @@ $(document).ready(function() {
 
 								<div class="dashboard_bar_graph" style="width: ${percentageBundleReady}%"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${percentageBundleReady}%</b>
-									<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Ready</g:link>
+									<g:link controller="application" action="list" params="[filter:'applicationCount', validation:'BundleReady']">Applications Ready</g:link>
 								</div>
 							</g:else>
 							</td>
@@ -143,19 +143,19 @@ $(document).ready(function() {
 					<table style="float:left; border: 0px; margin-left: 10px;">
 						<tr>
 							<td style="width: 10px;text-align: right;">${validated}</td>
-							<td><g:link controller="application" action="list" params="[tag_f_validation:'Validated']" class="links">Validated</g:link></td>
+							<td><g:link controller="application" action="list" params="[filter:'applicationCount', validation:'Validated']" class="links">Validated</g:link></td>
 						</tr>
 						<tr>
                             <td style="width: 10px;text-align: right;">${dependencyScan}</td>
-                            <td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyScan']" class="links">DependencyScan</g:link></td>
+                            <td><g:link controller="application" action="list" params="[filter:'applicationCount', validation:'DependencyScan']" class="links">DependencyScan</g:link></td>
                         </tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${dependencyReview}</td>
-							<td><g:link controller="application" action="list" params="[tag_f_validation:'DependencyReview']" class="links">Dependency Review</g:link></td>
+							<td><g:link controller="application" action="list" params="[filter:'applicationCount', validation:'DependencyReview']" class="links">Dependency Review</g:link></td>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${bundleReady}</td>
-							<td><g:link controller="application" action="list" params="[tag_f_validation:'BundleReady']" class="links">Bundle Ready</g:link></td>
+							<td><g:link controller="application" action="list" params="[filter:'applicationCount', validation:'BundleReady']" class="links">Bundle Ready</g:link></td>
 						</tr>
 					</table>
 				</div>
@@ -198,16 +198,16 @@ $(document).ready(function() {
 					</h4>
 					<table style="border: 0px;">
 						<tr>
-							<td style="width: 10px;text-align: right;"><g:link controller="application" action="list" params="[latency:'likely']" class="links">${likelyLatency}</g:link></td>
-							<td><g:link controller="application" action="list" params="[latency:'likely']" class="links">Likely</g:link></td>
+							<td style="width: 10px;text-align: right;"><g:link controller="application" action="list" params="[filter:'applicationCount', latency:'N']" class="links">${likelyLatency}</g:link></td>
+							<td><g:link controller="application" action="list" params="[filter:'applicationCount', latency:'N']" class="links">Likely</g:link></td>
 						</tr>
 						<tr>
-							<td style="width: 10px;text-align: right;"><g:link controller="application" action="list" params="[latency:'UnKnown']" class="links">${unknownLatency}</g:link></td>
-							<td><g:link controller="application" action="list" params="[latency:'UnKnown']" class="links">Unknown</g:link></td>
+							<td style="width: 10px;text-align: right;"><g:link controller="application" action="list" params="[filter:'applicationCount',latency:'unknown']" class="links">${unknownLatency}</g:link></td>
+							<td><g:link controller="application" action="list" params="[filter:'applicationCount',latency:'unknown']" class="links">Unknown</g:link></td>
 						</tr>
 						<tr>
-							<td style="width: 10px;text-align: right;"><g:link controller="application" action="list" params="[latency:'UnLikely']" class="links">${unlikelyLatency }</g:link></td>
-							<td><g:link controller="application" action="list" params="[latency:'UnLikely']" class="links">UnLikely</g:link></td>
+							<td style="width: 10px;text-align: right;"><g:link controller="application" action="list" params="[filter:'applicationCount',latency:'Y']" class="links">${unlikelyLatency }</g:link></td>
+							<td><g:link controller="application" action="list" params="[filter:'applicationCount',latency:'Y']" class="links">UnLikely</g:link></td>
 						</tr>
 					</table>
 				</div>
@@ -292,7 +292,7 @@ $(document).ready(function() {
 							<g:else>
 							<b>
 
-								<g:link controller="application" action="list" params="[tag_f_planStatus:'unassigned']" class="links">
+								<g:link controller="application" action="list" params="[filter:'applicationCount', plannedStatus:'Unassigned']" class="links">
 									${unassignedAppCount} (${(percentageUnassignedAppCount > 0 && percentageUnassignedAppCount < 1) ? 1 : Math.round(percentageUnassignedAppCount)}%)
 								</g:link>
 							</b>
@@ -300,11 +300,11 @@ $(document).ready(function() {
 							</td>
 							<g:each in="${appList}" var="appCount">
 								<td style="text-align: right;"><b>
-									<g:link controller="application" action="list" params="[moveEvent:appCount.moveEvent]" class="links">${appCount.count}</g:link>
+									<g:link controller="application" action="list" params="[filter:'applicationCount',moveEvent:appCount.moveEvent]" class="links">${appCount.count}</g:link>
 								</b></td>
 							</g:each>
 							<td style="text-align: right;"><b>
-								<g:link controller="application" action="list" params="[tag_f_planStatus:'moved']" class="links">${percentageAppCount}%</g:link>
+								<g:link controller="application" action="list" params="[filter:'applicationCount', plannedStatus:'Moved']" class="links">${percentageAppCount}%</g:link>
 							</b></td>
 						</tr>
 						<tr>
@@ -396,7 +396,7 @@ $(document).ready(function() {
 							</g:if>
 							<g:else>
 							<b>
-								<g:link controller="database" action="list" params="[moveEvent:'unAssigned']" class="links">
+								<g:link controller="database" action="list" params="[filter:'db', plannedStatus:'Unassigned']" class="links">
 									${unassignedDbCount} (${(percentageUnassignedDbCount > 0 && percentageUnassignedDbCount < 1) ? 1 : Math.round(percentageUnassignedDbCount)}%)
 								</g:link>
 							</b>
@@ -404,11 +404,11 @@ $(document).ready(function() {
 							</td>
 								<g:each in="${dbList}" var="dbCount">
 									<td style="text-align: right;"><b>
-										<g:link controller="database" action="list" params="[moveEvent:dbCount.moveEvent,filter:'virtual']" class="links">${dbCount.count}</g:link>
+										<g:link controller="database" action="list" params="[filter:'db',moveEvent:dbCount.moveEvent]" class="links">${dbCount.count}</g:link>
 									</b></td>
 								</g:each>
 							<td style="text-align: right;"><b>
-								<g:link controller="database" action="list" params="[tag_f_planStatus:'moved']" class="links">${percentageDBCount}%</g:link>
+								<g:link controller="database" action="list" params="[filter:'db', plannedStatus:'Moved']" class="links">${percentageDBCount}%</g:link>
 							</b></td>
 						</tr>
 						<tr>
@@ -420,7 +420,7 @@ $(document).ready(function() {
 							</g:if>
 							<g:else>
                             <b>
-								<g:link controller="files" action="list" params="[moveEvent:'unAssigned']" class="links">
+								<g:link controller="files" action="list" params="[filter:'storage', plannedStatus:'Unassigned']" class="links">
 								${unassignedFilesCount} (${(percentageUnassignedFilesCount > 0 && percentageUnassignedFilesCount < 1) ? 1 : Math.round(percentageUnassignedFilesCount)}%)
 								</g:link>
 							</b>
@@ -428,11 +428,11 @@ $(document).ready(function() {
 							</td>
 								<g:each in="${filesList}" var="filesCount">
 									<td style="text-align: right;"><b>
-										<g:link controller="files" action="list" params="[moveEvent:filesCount.moveEvent]" class="links">${filesCount.count}</g:link>
+										<g:link controller="files" action="list" params="[filter:'storage', moveEvent:filesCount.moveEvent]" class="links">${filesCount.count}</g:link>
 									</b></td>
 								</g:each>
 							<td style="text-align: right;"><b>
-								<g:link controller="files" action="list" params="[tag_f_planStatus:'moved']" class="links">${percentageFilesCount}%</g:link>
+								<g:link controller="files" action="list" params="[filter:'storage', plannedStatus:'Moved']" class="links">${percentageFilesCount}%</g:link>
 							</b></td>
                         </tr>
                         <tr>

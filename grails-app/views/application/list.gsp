@@ -31,6 +31,12 @@ $(document).ready(function() {
     $("#filterPane").draggable()
 
    // JqGrid implementations 
+    var filter = '${filter}'
+	var latency = '${latency}'
+	var event = '${event}'
+	var plannedStatus = '${plannedStatus}' 
+	var validation = '${validation}'
+		
     <jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Name', 'App Sme','Validation', 'Plan Status','Bundle','Dep # ','Dep Up','Dep Down','id', 'commentType'"
@@ -54,12 +60,18 @@ $(document).ready(function() {
     multiselect="true"
     viewrecords="true"
     showPager="true"
+    postData="{filter: filter, event:event, latency:latency, plannedStatus:plannedStatus, validation:validation}"
     datatype="'json'">
     <jqgrid:filterToolbar id="applicationId" searchOnEnter="false" />
     <jqgrid:navigation id="applicationId" add="false" edit="false" del="true" search="false" refresh="true" />
     <jqgrid:resize id="applicationId" resizeOffset="-2" />
 </jqgrid:grid>
 
+	$("#del_applicationIdGrid").click(function(){
+    $("#applicationId").jqGrid("editGridRow","new",
+            {afterSubmit:deleteMessage}
+    		);
+     });
 
 function myLinkFormatter (cellvalue, options, rowObjcet) {
 	var value = cellvalue ? cellvalue : ''
@@ -85,7 +97,14 @@ function myCustomFormatter (cellVal,options,rowObject) {
 	}
     return editButton
 }
-	        
+function deleteMessage(response, postdata){
+	 $("#messageId").show()
+	 $("#messageDivId").hide()
+	 $("#messageId").html(response.responseText)
+	 $("#delmodapplicationIdGrid").hide()
+     return true
+}
+
 })
 </script>
 </head>
@@ -96,8 +115,11 @@ function myCustomFormatter (cellVal,options,rowObject) {
 <br/>
 <h1>Application List</h1>
 <g:if test="${flash.message}">
-<div class="message">${flash.message}</div>
+	<div id="messageDivId" class="message">${flash.message}</div>
 </g:if>
+<div >
+	<div id="messageId" class="message" style="display:none"></div>
+</div>
 <jqgrid:wrapper id="applicationId" /> 
 <g:render template="../assetEntity/commentCrud"/>
 <g:render template="../assetEntity/modelDialog"/>

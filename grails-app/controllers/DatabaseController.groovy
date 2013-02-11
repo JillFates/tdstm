@@ -38,54 +38,9 @@ class DatabaseController {
     }
 	
 	def list ={
-		def filterAttributes = [tag_f_assetName:params.tag_f_assetName,tag_f_dbFormat:params.tag_f_dbFormat,tag_f_moveBundle:params.tag_f_moveBundle,tag_f_planStatus:params.tag_f_planStatus,tag_f_depUp:params.tag_f_depUp,tag_f_depDown:params.tag_f_depDown]
-		session.setAttribute('filterAttributes', filterAttributes)
-		
-		def projectId =  getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = Project.read(projectId)
-		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
-		String moveBundle = moveBundleList.id
-		moveBundle = moveBundle.replace("[","('").replace(",","','").replace("]","')")
-		def databaseInstanceList
-		if(params.moveEvent=='unAssigned'){
-		    databaseInstanceList = Database.findAll("from Database where project = $projectId and assetType=? and moveBundle in $moveBundle and (planStatus is null or planStatus in ('Unassigned',''))",['Database'])
-		}else if(params.moveEvent && params.moveEvent!='unAssigned' ){
-			def moveEvent = MoveEvent.get(params.moveEvent)
-			def moveBundles = moveEvent.moveBundles
-			def bundles = moveBundles.findAll {it.useOfPlanning == true}
-			databaseInstanceList= Database.findAllByMoveBundleInListAndAssetType(bundles,"Database")
-		}else if(params.filter == 'toValidate'){
-			databaseInstanceList =  AssetEntity.findAll("FROM AssetEntity ae WHERE project = :project AND ae.validation = :validation \
-				AND ae.assetType = :assetType AND ( ae.moveBundle IN (:moveBundles) OR ae.moveBundle is null)",
-				[project:project, moveBundles:moveBundleList, validation:'Discovery', assetType:'Database'])
-		}
-		else{
-			databaseInstanceList = Database.findAllByProject(project)
-		}
-		def databaseList = new ArrayList();
-		databaseInstanceList.each {dataBaseentity ->
-			def assetEntity = AssetEntity.get(dataBaseentity.id)
-			AssetEntityBean dataBeanInstance = new AssetEntityBean();
-			dataBeanInstance.setId(dataBaseentity.id)
-			dataBeanInstance.setAssetType(dataBaseentity.assetType)
-			dataBeanInstance.setDbFormat(dataBaseentity.dbFormat)
-			dataBeanInstance.setAssetName(dataBaseentity.assetName)
-			dataBeanInstance.setMoveBundle(dataBaseentity?.moveBundle?.name)
-			dataBeanInstance.setPlanStatus(dataBaseentity.planStatus)
-			dataBeanInstance.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(assetEntity, "Validated"))
-			dataBeanInstance.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(assetEntity, "Validated"))
-			dataBeanInstance.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(dataBaseentity)?.dependencyBundle)
-			if(AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
-				dataBeanInstance.setCommentType("issue")
-			} else if(AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id)){
-				dataBeanInstance.setCommentType("comment")
-			} else {
-				dataBeanInstance.setCommentType("blank")
-			}
-			databaseList.add(dataBeanInstance)
-		}
-		TableFacade tableFacade = new TableFacadeImpl("tag", request)
-		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
+		def project = securityService.getUserCurrentProject()
+		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') \
+				and project =:project order by assetName asc",[project:project])
 		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
 		def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
 		def files = Files.findAll('from Files where assetType = ? and project =? order by assetName asc',['Files', project])
@@ -93,24 +48,10 @@ class DatabaseController {
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 
-		try{
-			tableFacade.items = databaseList
-			Limit limit = tableFacade.limit
-			if(limit.isExported()){
-				tableFacade.setExportTypes(response,limit.getExportType())
-				tableFacade.setColumnProperties("id","dbFormat","dbSize","moveBundle","planStatus")
-				tableFacade.render()
-			}else
-				return [databaseList : databaseList , projectId: projectId ,assetDependency: new AssetDependency(),
-					servers : servers, applications : applications, dbs : dbs, files : files, dependencyType:dependencyType,
-					dependencyStatus:dependencyStatus,staffRoles:taskService.getRolesForStaff()]
-		}catch(Exception e){
-			return [databaseList : null,projectId: projectId,
-					servers : servers, applications : applications, dbs : dbs, files : files]
-		}
-		
-		
-		
+		return [assetDependency: new AssetDependency(),
+			servers : servers, applications : applications, dbs : dbs, files : files, dependencyType:dependencyType,
+			dependencyStatus:dependencyStatus,staffRoles:taskService.getRolesForStaff(),
+			event:params.moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation]
 	}
 	
 	/**
@@ -126,7 +67,15 @@ class DatabaseController {
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList
 		
+		if(params.event && params.event.isNumber()){
+			def moveEvent = MoveEvent.read( params.event )
+			moveBundleList = moveEvent?.moveBundles?.findAll {it.useOfPlanning == true}
+		} else {
+			moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+		}
+		
 		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
+		
 		
 		def dbs = Database.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", project)
@@ -140,6 +89,24 @@ class DatabaseController {
 				'in'('moveBundle', bundleList)
 				
 			eq("assetType",  AssetType.DATABASE.toString() )
+			
+			if(params.filter){
+				or{
+					and {
+						'in'('moveBundle', moveBundleList)
+					}
+					and {
+						isNull('moveBundle')
+					}
+				}
+				
+				if( params.validation)
+					eq ('validation', params.validation)
+				
+				if(params.plannedStatus)
+					eq("planStatus", params.plannedStatus)
+				
+			}
 
 			order(sortIndex, sortOrder).ignoreCase()
 		}
@@ -147,7 +114,7 @@ class DatabaseController {
 		def totalRows = dbs.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
 
-		def results = dbs?.collect { [ cell: ['',it.assetName, it.dbFormat, it.validation, it.planStatus,
+		def results = dbs?.collect { [ cell: ['',it.assetName, it.dbFormat, it.validation,
 					it.moveBundle?.name, AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
 					AssetDependency.countByDependentAndStatusNotEqual(it, "Validated"),
 					AssetDependency.countByAssetAndStatusNotEqual(it, "Validated"),
@@ -323,25 +290,11 @@ class DatabaseController {
 		
 	}
 	def delete = {
-		def databaseInstance = Database.get( params.id )
-		def assetEntityInstance = AssetEntity.get(params.id)
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		if(assetEntityInstance) {
-			def assetName = assetEntityInstance.assetName
-			ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${assetEntityInstance.id}")
-			AssetTransition.executeUpdate("delete from AssetTransition ast where ast.assetEntity = ${assetEntityInstance.id}")
-			AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity = ${assetEntityInstance.id}")
-			ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = ${assetEntityInstance.id}")
-			AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = ${assetEntityInstance.id}")
-			ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = ${assetEntityInstance.id}")
-			AssetCableMap.executeUpdate("delete AssetCableMap where fromAsset = ? ",[assetEntityInstance])
-			AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-										   toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-										   where toAsset = ?""",[assetEntityInstance])
-			AssetDependency.executeUpdate("delete AssetDependency where asset = ? or dependent = ? ",[assetEntityInstance, assetEntityInstance])
-			AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = ${databaseInstance.id}")
-			databaseInstance.delete()
-			assetEntityInstance.delete()
+		def database = Database.get( params.id )
+		if( database ) {
+			def assetName = database.assetName
+			assetEntityService.deleteAsset( database )
+			database.delete()
 			
 			flash.message = "Database ${assetName} deleted"
 			if(params.dstPath =='planningConsole'){
@@ -356,42 +309,22 @@ class DatabaseController {
 		}
 		
 	}
+	/**
+	 * Delete multiple database.
+	 */
 	def deleteBulkAsset={
-		def assetArray = params.id
-		def assetList
-		if(assetArray.class.toString() == "class java.lang.String"){
-		  assetList = assetArray.split(",")
-		}else{
-		  assetList = assetArray
-		}
+		def assetList = params.id.split(",")
 		def assetNames = []
-		def assetEntityInstance
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-	
-			for(int i=0 ; i<assetList.size();i++){
-				assetEntityInstance = AssetEntity.get( assetList[i] )
-				def databaseInstance = Database.get( assetList[i] )
-				
-				if(assetEntityInstance) {
-					assetNames.add(assetEntityInstance.assetName)
-					ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${assetEntityInstance.id}")
-					AssetTransition.executeUpdate("delete from AssetTransition ast where ast.assetEntity = ${assetEntityInstance.id}")
-					AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity = ${assetEntityInstance.id}")
-					ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = ${assetEntityInstance.id}")
-					AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = ${assetEntityInstance.id}")
-					ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = ${assetEntityInstance.id}")
-					AssetCableMap.executeUpdate("delete AssetCableMap where fromAsset = ? ",[assetEntityInstance])
-					AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-												   toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-												   where toAsset = ?""",[assetEntityInstance])
-					AssetDependency.executeUpdate("delete AssetDependency where asset = ? or dependent = ? ",[assetEntityInstance, assetEntityInstance])
-					AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = ${databaseInstance.id}")
-					databaseInstance.delete()
-					assetEntityInstance.delete()
-				}
-			String names = assetNames.toString().replace('[','').replace(']','')
-			flash.message = "File ${names} deleted"
+		assetList.each{ assetId->
+			def database = Database.get( assetId )
+			if( database ) {
+				assetNames.add(database.assetName)
+				assetEntityService.deleteAsset( database )
+				database.delete()
+			}
 		}
-	  render "success"
+	  String names = assetNames.toString().replace('[','').replace(']','')
+	  
+	  render "Database ${names} deleted"
 	}
 }

@@ -30,6 +30,11 @@ $(document).ready(function() {
 
 
 	// JqGrid implementations 
+	var filter = '${filter}'
+	var event = '${event}'
+	var plannedStatus = '${plannedStatus}' 
+	var validation = '${validation}'
+		
     <jqgrid:grid id="databaseId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Name', 'DB Format','Plan Status','Bundle','Dep # ','Dep Up','Dep Down','id', 'commentType'"
@@ -51,27 +56,32 @@ $(document).ready(function() {
     rowList= "'25','50','100'"
     multiselect="true"
     viewrecords="true"
+   	postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation}"
     showPager="true"
     datatype="'json'">
     <jqgrid:filterToolbar id="databaseId" searchOnEnter="false" />
     <jqgrid:navigation id="databaseId" add="false" edit="false" del="true" search="false" refresh="true" afterSubmit="deleteMessage"/>
     <jqgrid:resize id="databaseId" resizeOffset="-2" />
 </jqgrid:grid>
+	$("#del_databaseIdGrid").click(function(){
+    $("#databaseId").jqGrid("editGridRow","new",
+            {afterSubmit:deleteMessage});
+     });
 
 function myLinkFormatter (cellvalue, options, rowObjcet) {
 	var value = cellvalue ? cellvalue : ''
-	return '<a href="javascript:getEntityDetails(\'database\',\''+rowObjcet[10]+'\','+options.rowId+')">'+value+'</a>'
+	return '<a href="javascript:getEntityDetails(\'database\',\''+rowObjcet[9]+'\','+options.rowId+')">'+value+'</a>'
 }
 
 function myCustomFormatter (cellVal,options,rowObject) {
-	var editButton = '<a href="javascript:editEntity(\'database\',\''+rowObject[10]+'\','+options.rowId+')">'+
+	var editButton = '<a href="javascript:editEntity(\'database\',\''+rowObject[9]+'\','+options.rowId+')">'+
 			"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
-	if(rowObject[9]=='issue'){
+	if(rowObject[8]=='issue'){
 		var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
 			+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
 		editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
 			+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_red.png')}' border='0px'/>"+"</a></span>"
-	} else if (rowObject[9]=='comment') {
+	} else if (rowObject[8]=='comment') {
 		var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
 			+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
 		editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
@@ -82,18 +92,29 @@ function myCustomFormatter (cellVal,options,rowObject) {
 	}
     return editButton
 }
+function deleteMessage(response, postdata){
+	 $("#messageId").show()
+	 $("#messageDivId").hide()
+	 $("#messageId").html(response.responseText)
+	 $("#delmoddatabaseIdGrid").hide()
+       return true
+}
 })
 </script>
 
 <title>DB list</title>
 </head>
 <body>
+
+	
+<div class="body">
 <h1>DB List</h1>
 <g:if test="${flash.message}">
-	<div class="message">${flash.message}</div>
+	<div id="messageDivId" class="message">${flash.message}</div>
 </g:if>
-<div class="body">
-<br />
+<div >
+	<div id="messageId" class="message" style="display:none"></div>
+</div>
 <jqgrid:wrapper id="databaseId" /> 
 <div class="buttons">
 <tds:hasPermission permission='EditAndDelete'>

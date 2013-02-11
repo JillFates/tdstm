@@ -43,76 +43,6 @@ class ApplicationController {
 	def  list ={
 		def project = securityService.getUserCurrentProject()
 		
-		/*def filterAttributes = [tag_f_assetName:params.tag_f_assetName,tag_f_appOwner:params.tag_f_appOwner,tag_f_appSme:params.tag_f_appSme,tag_f_planStatus:params.tag_f_planStatus,tag_f_depUp:params.tag_f_depUp,tag_f_depDown:params.tag_f_depDown]
-		session.setAttribute('filterAttributes', filterAttributes)
-		def projectId =  getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = Project.read(projectId)
-		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
-		String moveBundle = moveBundleList.id
-		moveBundle = moveBundle.replace("[","('").replace(",","','").replace("]","')")
-		def workFlow = project.workflowCode
-		def appEntityList
-		if(params.latency=='likely'){
-		
-			appEntityList= Application.findAllByLatencyAndMoveBundleInList('N',moveBundleList)
-			
-		}else if(params.latency=='UnKnown'){
-		
-			appEntityList= Application.findAll("from Application where project = $projectId  and (latency is null or latency = '') and moveBundle in $moveBundle")
-			
-		}else if(params.latency=='UnLikely'){
-		
-			appEntityList= Application.findAllByLatencyAndMoveBundleInList('Y',moveBundleList)
-			
-		}else if(params.moveEvent=='unAssigned'){
-		
-		    appEntityList= Application.findAll("from Application where project = $projectId and assetType=? and moveBundle in $moveBundle and (planStatus is null or planStatus in ('Unassigned',''))",['Application'])
-			
-		}else if(params.moveEvent && params.moveEvent!='unAssigned'){
-		
-		    def moveEvent = MoveEvent.get(params.moveEvent)
-			def moveBundles = moveEvent.moveBundles
-			def bundles = moveBundles.findAll {it.useOfPlanning == true}
-		    appEntityList= Application.findAllByMoveBundleInListAndAssetType(bundles,"Application")
-			
-		}else if(params.filter=='appToValidate'){
-		
-		    appEntityList= Application.findAll("from Application  ap where ap.assetType ='Application' and ap.validation = 'Discovery' and ap.project.id = ${projectId}  and (ap.moveBundle.id in ${moveBundle} or ap.moveBundle.id is null)")
-			
-		}else if(params.filter=='applicationCount'){
-		
-		    appEntityList = Application.findAll("from Application where  project.id = $projectId and assetType = 'Application' and (moveBundle in ${moveBundle} or moveBundle is null)")
-			
-		}else{
-		
-		    appEntityList = Application.findAllByProject(project)
-			
-		}
-		def appBeanList = new ArrayList()
-		appEntityList.each { appEntity->
-			AssetEntityBean appBeanInstance = new AssetEntityBean();
-			appBeanInstance.setId(appEntity.id)
-			appBeanInstance.setAssetName(appEntity.assetName)
-			appBeanInstance.setAssetType(appEntity.assetType)
-			appBeanInstance.setAppOwner(appEntity.appOwner)
-			appBeanInstance.setAppSme(appEntity.sme)
-			appBeanInstance.setMoveBundle(appEntity.moveBundle?.name)
-			appBeanInstance.setPlanStatus(appEntity.planStatus)
-			appBeanInstance.setValidation(appEntity.validation)
-			appBeanInstance.setDepUp(AssetDependency.countByDependentAndStatusNotEqual(appEntity, "Validated"))
-			appBeanInstance.setDepDown(AssetDependency.countByAssetAndStatusNotEqual(appEntity, "Validated"))
-			appBeanInstance.setDependencyBundleNumber(AssetDependencyBundle.findByAsset(appEntity)?.dependencyBundle)
-			
-			if(AssetComment.find("from AssetComment where assetEntity = ${appEntity?.id} and commentType = ? and isResolved = ?",['issue',0])){
-				appBeanInstance.setCommentType("issue")
-			} else if(AssetComment.find('from AssetComment where assetEntity = '+ appEntity?.id)){
-				appBeanInstance.setCommentType("comment")
-			} else {
-				appBeanInstance.setCommentType("blank")
-			}
-			
-			appBeanList.add(appBeanInstance)
-		}*/
 		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$project.id order by assetName asc")
 		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
 		def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
@@ -121,21 +51,10 @@ class ApplicationController {
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		
-		/*try{
-			tableFacade.items = appBeanList
-			Limit limit = tableFacade.limit
-			if(limit.isExported()){
-				tableFacade.setExportTypes(response,limit.getExportType())
-				tableFacade.setColumnProperties("id","application","appOwner","appSme","movebundle","planStatus")
-				tableFacade.render()
-			} else {*/
 		return [projectId: project.id, assetDependency: new AssetDependency(),
 			servers : servers, applications : applications, dbs : dbs, files : files,dependencyType:dependencyType,dependencyStatus:dependencyStatus,
-		    staffRoles:taskService.getRolesForStaff()]
-			/*}
-		}catch(Exception e){
-			return [assetEntityList : null, projectId: projectId , servers : servers, applications : applications, dbs : dbs, files : files]
-		}*/
+		    staffRoles:taskService.getRolesForStaff(), event:params.moveEvent, filter:params.filter, latency:params.latency, plannedStatus:params.plannedStatus,
+			validation:params.validation]
 	}
 	/**
 	 * This method is used by JQgrid to load appList
@@ -148,8 +67,16 @@ class ApplicationController {
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 
 		def project = securityService.getUserCurrentProject()
-		def moveBundleList
-
+		
+		def moveBundleList = []
+		
+		if(params.event && params.event.isNumber()){
+			def moveEvent = MoveEvent.read( params.event )
+			moveBundleList = moveEvent?.moveBundles?.findAll {it.useOfPlanning == true}
+		} else {
+			moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+		}
+		
 		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
 		
 		def apps = Application.createCriteria().list(max: maxRows, offset: rowOffset) {
@@ -167,6 +94,37 @@ class ApplicationController {
 				'in'('moveBundle', bundleList)
 			if(params.plannedStatus)
 				eq("planStatus", params.plannedStatus)
+				
+			if(params.filter){
+				or{
+					and {
+						'in'('moveBundle', moveBundleList)
+					}
+					and {
+						isNull('moveBundle')
+					}
+				}
+				
+				if( params.validation)
+					eq ('validation', params.validation)
+				
+			    if( params.latency && params.latency =='unknown'){
+					or{
+						and {
+							eq('latency', '')
+						}
+						and {
+							isNull('latency')
+						}
+					}
+				} else if ( params.latency && params.latency !='unknown') {
+					eq('latency', params.latency)
+				}
+				
+				if(params.plannedStatus)
+					eq("planStatus", params.plannedStatus)
+				
+			}
 
 			order(sortIndex, sortOrder).ignoreCase()
 		}
@@ -382,32 +340,15 @@ class ApplicationController {
 		}
 	}
 	def delete = {
-		def applicationInstance = Application.get( params.id )
-		def assetEntityInstance = AssetEntity.get(params.id)
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		if(assetEntityInstance) {
-			def assetName = assetEntityInstance.assetName
-			ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${assetEntityInstance.id}")
-			AssetTransition.executeUpdate("delete from AssetTransition ast where ast.assetEntity = ${assetEntityInstance.id}")
-			AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity = ${assetEntityInstance.id}")
-			ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = ${assetEntityInstance.id}")
-			AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = ${assetEntityInstance.id}")
-			ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = ${assetEntityInstance.id}")
-			AssetCableMap.executeUpdate("delete AssetCableMap where fromAsset = ? ",[assetEntityInstance])
-			AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-										   toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-										   where toAsset = ?""",[assetEntityInstance])
-			AssetDependency.executeUpdate("delete AssetDependency where asset = ? or dependent = ? ",[applicationInstance, applicationInstance])
+		def application = Application.get( params.id)
+		if(application) {
+				assetEntityService.deleteAsset( application )
+				// deleting all appmoveEvent associated records .
+				def appMove = AppMoveEvent.findAllByApplication( application );
+				AppMoveEvent.withNewSession{appMove*.delete()}
+				application.delete();
 			
-			AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = ${applicationInstance.id}")
-			def appMoveInstance = AppMoveEvent.findAllByApplication(applicationInstance);
-			appMoveInstance.each{
-			         it.delete(flush:true)
-			}
-			applicationInstance.delete();
-			assetEntityInstance.delete();
-			
-			flash.message = "Application ${assetName} deleted"
+			flash.message = "Application ${application.assetName} deleted"
 			if(params.dstPath =='planningConsole'){
 				forward( controller:'assetEntity',action:'getLists', params:[entity: 'Apps',dependencyBundle:session.getAttribute("dependencyBundle")])
 			}else{
@@ -415,47 +356,31 @@ class ApplicationController {
 			}
 		}
 		else {
-			flash.message = "Application not found with id ${params.id}"			
+			flash.message = "Application not found with id ${params.id}"	
+			redirect( action:list )
 		}		
 	}
+	/*
+	 * Delete multiple Application 
+	 */
 	def deleteBulkAsset={
-		def assetArray = params.id
-		def assetList
-		if(assetArray.class.toString() == "class java.lang.String"){
-		  assetList = assetArray.split(",")
-		}else{
-		  assetList = assetArray
-		}
+		def assetList = params.id.split(",")
 		def assetNames = []
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-			for(int i=0 ; i<assetList.size();i++){
-			    def assetEntityInstance = AssetEntity.get( assetList[i] )
-			    def applicationInstance = Application.get( assetList[i] )
-				if(assetEntityInstance) {
-					assetNames.add(assetEntityInstance.assetName)
-					ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset = ${assetEntityInstance.id}")
-					AssetTransition.executeUpdate("delete from AssetTransition ast where ast.assetEntity = ${assetEntityInstance.id}")
-					AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity = ${assetEntityInstance.id}")
-					ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = ${assetEntityInstance.id}")
-					AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = ${assetEntityInstance.id}")
-					ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = ${assetEntityInstance.id}")
-					AssetCableMap.executeUpdate("delete AssetCableMap where fromAsset = ? ",[assetEntityInstance])
-					AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-												   toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-												   where toAsset = ?""",[assetEntityInstance])
-					AssetDependency.executeUpdate("delete AssetDependency where asset = ? or dependent = ? ",[applicationInstance, applicationInstance])
-					
-					AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = ${applicationInstance.id}")
-					def appMoveInstance = AppMoveEvent.findAllByApplication(applicationInstance);
-					appMoveInstance.each{
-					         it.delete(flush:true)
-					}
-					applicationInstance.delete();
-					assetEntityInstance.delete();
-				}
-						String names = assetNames.toString().replace('[','').replace(']','')
-						flash.message = "Application ${names} deleted"
+		assetList.each{ assetId->
+		    def application = Application.get( assetId )
+			if( application ) {
+				assetNames.add(application.assetName)
+				assetEntityService.deleteAsset( application )
+				
+				// deleting all appmoveEvent associated records .
+				def appMove = AppMoveEvent.findAllByApplication( application );
+				AppMoveEvent.withNewSession{appMove*.delete()}
+				
+				application.delete();
 			}
-	  render "success"
+		}	
+		String names = assetNames.toString().replace('[','').replace(']','')
+		
+	  render "Aplication $names Deleted."
 	}	
 }

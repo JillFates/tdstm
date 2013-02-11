@@ -26,7 +26,11 @@ $(document).ready(function() {
     $("#editCommentDialog").dialog({ autoOpen: false })
 	$("#manufacturerShowDialog").dialog({ autoOpen: false })
 	$("#modelShowDialog").dialog({ autoOpen: false })
-
+	
+	var filter = '${filter}'
+	var event = '${event}'
+	var plannedStatus = '${plannedStatus}' 
+	var validation = '${validation}'
 
 	// JqGrid implementations 
     <jqgrid:grid id="storageId" url="'${createLink(action: 'listJson')}'"
@@ -51,6 +55,7 @@ $(document).ready(function() {
     rowList= "'25','50','100'"
     multiselect="true"
     viewrecords="true"
+   	postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation}"
     showPager="true"
     datatype="'json'">
     <jqgrid:filterToolbar id="storageId" searchOnEnter="false" />

@@ -72,6 +72,10 @@ var plannedStatus = '${plannedStatus}'
     <jqgrid:resize id="assetListId" resizeOffset="-2" />
 </jqgrid:grid>
 
+	$("#del_assetListIdGrid").click(function(){
+    $("#assetListId").jqGrid("editGridRow","new",
+            {afterSubmit:deleteMessage});
+     });
 
 function myLinkFormatter (cellvalue, options, rowObjcet) {
 	var value = cellvalue ? cellvalue : ''
@@ -98,12 +102,27 @@ function myCustomFormatter (cellVal,options,rowObject) {
     return editButton
 }
 
+function deleteMessage(response, postdata){
+	 $("#messageId").show()
+	 $("#messageDivId").hide()
+	 $("#messageId").html(response.responseText)
+	 $("#delmodassetListIdGrid").hide()
+      return true
+}
+
 })
 </script>
 </head>
 <body>
 <br />
 <div class="body">
+<h1>Asset List</h1>
+<g:if test="${flash.message}">
+	<div id="messageDivId" class="message">${flash.message}</div>
+</g:if>
+<div >
+	<div id="messageId" class="message" style="display:none"></div>
+</div>
 <div>
 	  <jqgrid:wrapper id="assetListId" /> 
 </div>
