@@ -36,11 +36,27 @@ var filter = '${filter}'
 var type = '${type}'
 var event = '${event}'
 var plannedStatus = '${plannedStatus}' 
+
+var assetName = '${assetName}'
+var planStatus = '${planStatus}'
+var moveBundle = '${moveBundle}'
+var assetType = '${assetType}'
+var model = '${model}'
+var sourceLocation = '${sourceLocation}'
+var sourceRack = '${sourceRack}'
+var targetLocation = '${targetLocation}'
+var targetRack = '${targetRack}'
+var assetTag = '${assetTag}'
+var serialNumber = '${serialNumber}'
+var sortIndex = '${sortIndex}'
+var sortOrder = '${sortOrder}'
+var moveBundleId = '${moveBundleId}'
+var windowWidth = $(window).width()- 50;
 <jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','Target Location','Target Rack','Tag','Serial#','Plan Status','Bundle',
         'Dep#','Dep Up', 'Dep Down', 'id', 'commentType'"
-    colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false},
+    colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false,width:'80'},
       			  {name:'assetName',index: 'assetName', editable: true, formatter: myLinkFormatter, width:'300'},
                   {name:'assetType', editable: true},
                   {name:'model', editable: true}, 
@@ -52,26 +68,30 @@ var plannedStatus = '${plannedStatus}'
                   {name:'serialNumber', editable: true},
                   {name:'planStatus', editable: true},
                   {name:'moveBundle', editable: true},
-                  {name:'depNumber', editable: false,sortable:false,search:false},
-                  {name:'depUp', editable: false,sortable:false,search:false },
-                  {name:'depDown', editable: false,sortable:false,search:false},
+                  {name:'depNumber', editable: false,sortable:false,search:false,width:'50'},
+                  {name:'depUp', editable: false,sortable:false,search:false ,width:'50'},
+                  {name:'depDown', editable: false,sortable:false,search:false,width:'50'},
                   {name:'id', hidden: true},
                   {name:'commentType', hidden: true} "
     sortname="'assetName'"
     caption="'Asset List'"
    	height="'auto'"
-    width="1200"
+    width="windowWidth"
     rowNum="25"
     rowList= "'25','50','100'"
     multiselect="true"
     viewrecords="true"
     showPager="true"
-    postData="{filter: filter, event:event, type:type, plannedStatus:plannedStatus}"
+    postData="{filter: filter, event:event, type:type, plannedStatus:plannedStatus, assetName:assetName, planStatus:planStatus, moveBundle:moveBundle,
+   			 planStatus : planStatus,moveBundle : moveBundle, assetType:assetType , model :model , sourceLocation: sourceLocation , sourceRack:sourceRack,
+    		 targetLocation:targetLocation, targetRack :targetRack,assetTag :assetTag,serialNumber:serialNumber, moveBundleId:moveBundleId}"
+    		 
     datatype="'json'">
     <jqgrid:filterToolbar id="assetListId" searchOnEnter="false" />
     <jqgrid:navigation id="assetListId" add="false" edit="false" del="true" search="false" refresh="true" />
     <jqgrid:resize id="assetListId" resizeOffset="-2" />
 </jqgrid:grid>
+	populateFilter();
 
 	$("#del_assetListIdGrid").click(function(){
     $("#assetListId").jqGrid("editGridRow","new",
@@ -107,15 +127,29 @@ function deleteMessage(response, postdata){
 	 $("#messageId").show()
 	 $("#messageDivId").hide()
 	 $("#messageId").html(response.responseText)
-	 $("#delmodassetListIdGrid").hide()
+	 $("#delmodassetListIdGrid").remove()
+	 $(".jqmOverlay").remove()
       return true
+}
+
+function populateFilter(){
+	$("#gs_assetName").val('${assetName}')
+	$("#gs_assetType").val('${assetType}')
+	$("#gs_model").val('${model}')
+	$("#gs_sourceLocation").val('${sourceLocation}')
+	$("#gs_sourceRack").val('${sourceRack}')
+	$("#gs_targetLocation").val('${targetLocation}')
+	$("#gs_targetRack").val('${targetRack}')
+	$("#gs_serialNumber").val('${serialNumber}')
+	$("#gs_planStatus").val('${planStatus}')
+	$("#gs_moveBundle").val('${moveBundle}')
+	$("#gs_assetTag").val('${assetTag}')
 }
 
 })
 </script>
 </head>
 <body>
-<br />
 <div class="body">
 <h1>Asset List</h1>
 <g:if test="${flash.message}">

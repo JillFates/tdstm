@@ -51,7 +51,8 @@ class DatabaseController {
 		return [assetDependency: new AssetDependency(),
 			servers : servers, applications : applications, dbs : dbs, files : files, dependencyType:dependencyType,
 			dependencyStatus:dependencyStatus,staffRoles:taskService.getRolesForStaff(),
-			event:params.moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation]
+			event:params.moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,
+			moveBundleId:params.moveBundleId]
 	}
 	
 	/**
@@ -90,6 +91,14 @@ class DatabaseController {
 				
 			eq("assetType",  AssetType.DATABASE.toString() )
 			
+			if(params.moveBundleId){
+				if(params.moveBundleId =='unAssigned'){
+					isNull('moveBundle')
+				} else {
+					eq('moveBundle', MoveBundle.read(params.moveBundleId))
+				}
+			}
+			
 			if(params.filter){
 				or{
 					and {
@@ -114,7 +123,7 @@ class DatabaseController {
 		def totalRows = dbs.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
 
-		def results = dbs?.collect { [ cell: ['',it.assetName, it.dbFormat, it.validation,
+		def results = dbs?.collect { [ cell: ['',it.assetName, it.dbFormat, it.planStatus,
 					it.moveBundle?.name, AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
 					AssetDependency.countByDependentAndStatusNotEqual(it, "Validated"),
 					AssetDependency.countByAssetAndStatusNotEqual(it, "Validated"),
@@ -278,7 +287,7 @@ class DatabaseController {
 						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
 						break;
 					default:
-						redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_dbFormat:filterAttr.tag_f_dbFormat, tag_f_moveBundle:filterAttr.tag_f_moveBundle, tag_f_planStatus:filterAttr.tag_f_planStatus, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown])
+						redirect(action:'list')
 				}
 			}
 		}

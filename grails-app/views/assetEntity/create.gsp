@@ -1,4 +1,30 @@
+<script type="text/javascript">
+	$("#asset_assetName").val($('#gs_assetName').val())
+	$("#asset_assetType").val($('#gs_assetType').val())
+	$("#asset_model").val($('#gs_model').val())
+	$("#asset_sourceLocation").val($('#gs_sourceLocation').val())
+	$("#asset_sourceRack").val($('#gs_sourceRack').val())
+	$("#asset_targetLocation").val($('#gs_targetLocation').val())
+	$("#asset_targetRack").val($('#gs_targetRack').val())
+	$("#asset_serialNumber").val($('#gs_serialNumber').val())
+	$("#asset_planStatus").val($('#gs_planStatus').val())
+	$("#asset_moveBundle").val($('#gs_moveBundle').val())
+	$("#asset_assetTag").val($('#gs_assetTag').val())
+	
+</script>
 <g:form method="post">
+	<input type="hidden" id="asset_assetName" name="assetNameFilter" value="" />
+	<input type="hidden" id="asset_assetType" name="assetTypeFilter" value="" />
+	<input type="hidden" id="asset_model" name="modelFilter" value="" />
+	<input type="hidden" id="asset_sourceLocation" name="sourceLocationFilter" value="" />
+	<input type="hidden" id="asset_sourceRack" name="sourceRackFilter" value="" />
+	<input type="hidden" id="asset_targetLocation" name="targetLocationFilter" value="" />
+	<input type="hidden" id="asset_targetRack" name="targetRackFilter" value="" />
+	<input type="hidden" id="asset_moveBundle" name="moveBundleFilter" value="" />
+	<input type="hidden" id="asset_serialNumber" name="serialNumberFilter" value="" />
+	<input type="hidden" id="asset_planStatus" name="planStatusFilter" value="" />
+	<input type="hidden" id="asset_assetTag" name="assetTagFilter" value="" />
+
 	<table style="border:0;width:1000px;">
 		<tr>
 			<td colspan="2">

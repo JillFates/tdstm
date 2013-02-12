@@ -37,6 +37,7 @@ $(document).ready(function() {
 	var event = '${event}'
 	var plannedStatus = '${plannedStatus}' 
 	var validation = '${validation}'
+	var moveBundleId = '${moveBundleId}'
 		
     <jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
@@ -61,7 +62,7 @@ $(document).ready(function() {
     multiselect="true"
     viewrecords="true"
     showPager="true"
-    postData="{filter: filter, event:event, latency:latency, plannedStatus:plannedStatus, validation:validation}"
+    postData="{filter: filter, event:event, latency:latency, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId}"
     datatype="'json'">
     <jqgrid:filterToolbar id="applicationId" searchOnEnter="false" />
     <jqgrid:navigation id="applicationId" add="false" edit="false" del="true" search="false" refresh="true" />

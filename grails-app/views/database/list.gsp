@@ -57,7 +57,7 @@ $(document).ready(function() {
     rowList= "'25','50','100'"
     multiselect="true"
     viewrecords="true"
-   	postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation}"
+   	postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId}"
     showPager="true"
     datatype="'json'">
     <jqgrid:filterToolbar id="databaseId" searchOnEnter="false" />
@@ -68,6 +68,7 @@ $(document).ready(function() {
     $("#databaseId").jqGrid("editGridRow","new",
             {afterSubmit:deleteMessage});
      });
+
 
 function myLinkFormatter (cellvalue, options, rowObjcet) {
 	var value = cellvalue ? cellvalue : ''

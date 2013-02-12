@@ -26,25 +26,25 @@
          <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 	          <td>${assetSummary.name}</td>
 	          <g:if test="${assetSummary.assetCount>0}">
-	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[tag_f_moveBundle:"${assetSummary.name}"]' >${assetSummary.assetCount}</g:link></td>
+	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[moveBundleId:"${assetSummary.id}"]' >${assetSummary.assetCount}</g:link></td>
 	          </g:if>
 	          <g:else>
 	           <td  style="text-align:right;"></td>
 	          </g:else>
 	          <g:if test="${assetSummary.applicationCount>0}">
-	            <td  style="text-align:right;"><g:link controller="application" action="list" params='[tag_f_moveBundle:"${assetSummary.name}"]'>${assetSummary.applicationCount}</g:link></td>
+	            <td  style="text-align:right;"><g:link controller="application" action="list" params='[moveBundleId:"${assetSummary.id}"]'>${assetSummary.applicationCount}</g:link></td>
 	          </g:if>
 	          <g:else>
 	           <td  style="text-align:right;"></td>
 	          </g:else>
 	          <g:if test="${assetSummary.databaseCount>0}">
-	            <td  style="text-align:right;"><g:link controller="database" action="list" params='[tag_f_moveBundle:"${assetSummary.name}"]'>${assetSummary.databaseCount}</g:link></td>
+	            <td  style="text-align:right;"><g:link controller="database" action="list" params='[moveBundleId:"${assetSummary.id}"]'>${assetSummary.databaseCount}</g:link></td>
 	          </g:if>
 	          <g:else>
 	           <td  style="text-align:right;"></td>
 	          </g:else>
 	          <g:if test="${assetSummary.filesCount>0}">
-	            <td  style="text-align:right;"><g:link controller="files" action="list" params='[tag_f_moveBundle:"${assetSummary.name}"]'>${assetSummary.filesCount}</g:link></td>
+	            <td  style="text-align:right;"><g:link controller="files" action="list" params='[moveBundleId:"${assetSummary.id}"]'>${assetSummary.filesCount}</g:link></td>
 	          </g:if>
 	          <g:else>
 	           <td  style="text-align:right;"></td>
@@ -54,25 +54,25 @@
          <tr class='odd'>
 	          <td  style="text-align:right;"><i>UnAssigned</i></td>
 	          <g:if test="${unassignedAssetCount>0}">
-	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[tag_s_11_moveBundle:"desc"]' >${unassignedAssetCount}</g:link></td>
+	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[moveBundleId:"unAssigned"]' >${unassignedAssetCount}</g:link></td>
 	          </g:if>
 	          <g:else>
 	              <td  style="text-align:right;"></td>
 	          </g:else>
 	          <g:if test="${unassignedAppCount>0}">
-	            <td  style="text-align:right;"><g:link controller="application" action="list" params='[tag_s_4_moveBundle:"desc"]'>${unassignedAppCount}</g:link></td>
+	            <td  style="text-align:right;"><g:link controller="application" action="list" params='[moveBundleId:"unAssigned"]'>${unassignedAppCount}</g:link></td>
 	          </g:if>
 	         <g:else>
 	              <td  style="text-align:right;"></td>
 	          </g:else>
 	           <g:if test="${unassignedAppCount>0}">
-	            <td  style="text-align:right;"><g:link controller="database" action="list" params='[tag_s_3_moveBundle:"desc"]'>${unassignedDBCount}</g:link></td>
+	            <td  style="text-align:right;"><g:link controller="database" action="list" params='[moveBundleId:"unAssigned"]'>${unassignedDBCount}</g:link></td>
 	          </g:if>
 	         <g:else>
 	              <td  style="text-align:right;"></td>
 	          </g:else>
 	           <g:if test="${unassignedAppCount>0}">
-	            <td  style="text-align:right;"><g:link controller="files" action="list" params='[tag_s_4_moveBundle:"desc"]'>${unassignedFilesCount}</g:link></td>
+	            <td  style="text-align:right;"><g:link controller="files" action="list" params='[moveBundleId:"unAssigned"]'>${unassignedFilesCount}</g:link></td>
 	          </g:if>
 	         <g:else>
 	              <td  style="text-align:right;"></td>

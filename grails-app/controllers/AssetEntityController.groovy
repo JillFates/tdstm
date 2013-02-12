@@ -92,7 +92,7 @@ class AssetEntityController {
 			(AssetCommentStatus.HOLD): [AssetCommentStatus.HOLD]
 		]
 	]
-	
+		
 	def index = {
 		redirect( action:list, params:params )
 	}
@@ -1258,7 +1258,9 @@ class AssetEntityController {
 	 * @return assetList
 	 *-------------------------------------------*/
 	def list = {
-
+		def filters = session.AE?.JQ_FILTERS
+		session.AE?.JQ_FILTERS = []
+		
 		def project = securityService.getUserCurrentProject()
 		def servers = AssetEntity.executeQuery("SELECT a.id, a.assetName FROM AssetEntity a WHERE assetType in ('Server','VM','Blade') AND project=$project.id ORDER BY assetName")
 		// TODO : change the following queries to use straight JDBC to only get the id and assetName since only used for SELECT
@@ -1268,8 +1270,12 @@ class AssetEntityController {
 
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-		return [assetDependency : new AssetDependency(), dependencyType:dependencyType, dependencyStatus:dependencyStatus,
-			event:params.moveEvent, filter:params.filter, type:params.type, plannedStatus:params.plannedStatus,  servers : servers, applications : applications, dbs : dbs, files : files ]
+		render(view:'list', model:[assetDependency : new AssetDependency(), dependencyType:dependencyType, dependencyStatus:dependencyStatus,
+			event:params.moveEvent, filter:params.filter, type:params.type, plannedStatus:params.plannedStatus,  servers : servers, 
+			applications : applications, dbs : dbs, files : files, assetName:filters?.assetNameFilter ?:'', assetType:filters?.assetTypeFilter ?:'', planStatus:filters?.planStatusFilter ?:'', 
+			moveBundle:filters?.moveBundleFilter ?:'', model:filters?.modelFilter ?:'', sourceLocation:filters?.sourceLocationFilter ?:'', sourceRack:filters?.sourceRackFilter ?:'',
+			targetLocation:filters?.targetLocationFilter ?:'', targetRack:filters?.targetRackFilter ?:'', assetTag:filters?.assetTagFilter ?:'', 
+			serialNumber:filters?.serialNumberFilter ?:'', sortIndex:filters?.sortIndex, sortOrder:filters?.sortOrder, moveBundleId:params.moveBundleId ]) 
 
 	}
 	/**
@@ -1284,6 +1290,8 @@ class AssetEntityController {
 
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList
+		
+		session.AE = [:]
 		
 		if(params.event && params.event.isNumber()){
 			def moveEvent = MoveEvent.read( params.event )
@@ -1323,6 +1331,14 @@ class AssetEntityController {
 				'in'('moveBundle', bundleList)
 			if(params.plannedStatus) 
 				eq("planStatus", params.plannedStatus)
+				
+			if(params.moveBundleId){
+				if(params.moveBundleId =='unAssigned'){
+					isNull('moveBundle')
+				} else {
+			    	eq('moveBundle', MoveBundle.read(params.moveBundleId))
+				}
+			}
 			
 			// if filter have some value then this one is getting requested from planning dashboard to filter the asset list. else it will be blank.
 			if ( params.filter ) {
@@ -1525,7 +1541,8 @@ class AssetEntityController {
 			} else if(redirectTo == "assetAudit"){
 				render(template:'auditDetails', model:[assetEntity:assetEntityInstance, source:params.source, assetType:params.assetType])
 			} else {
-				redirect( action:list )
+				session.AE?.JQ_FILTERS = params
+				redirect( action:list)
 			}
 		}
 		else {
@@ -2973,6 +2990,7 @@ class AssetEntityController {
 				        forward(action:'getLists', params:[entity: params.tabType,labelsList:params.labels,dependencyBundle:session.getAttribute("dependencyBundle")])
 						break;
 					default:
+						session.AE?.JQ_FILTERS = params
 						redirect( action:list)
 	
 				}
@@ -2981,7 +2999,8 @@ class AssetEntityController {
 		else {
 			flash.message = "Asset not Updated"
 			assetEntityInstance.errors.allErrors.each{ flash.message += it }
-			redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_model:filterAttr.tag_f_model, tag_f_sourceLocation:filterAttr.tag_f_sourceLocation, tag_f_sourceRack:filterAttr.tag_f_sourceRack, tag_f_targetLocation:filterAttr.tag_f_targetLocation, tag_f_targetRack:filterAttr.tag_f_targetRack, tag_f_assetType:filterAttr.tag_f_assetType, tag_f_serialNumber:filterAttr.tag_f_serialNumber, tag_f_moveBundle:filterAttr.tag_f_moveBundle, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown,tag_s_1_application:filterAttr.tag_s_1_application,tag_s_2_assetName:filterAttr.tag_s_2_assetName,tag_s_3_model:filterAttr.tag_s_3_model,tag_s_4_sourceLocation:filterAttr.tag_s_4_sourceLocation,tag_s_5_sourceRack:filterAttr.tag_s_5_sourceRack,tag_s_6_targetLocation:filterAttr.tag_s_6_targetLocation,tag_s_7_targetRack:filterAttr.tag_s_7_targetRack,tag_s_8_assetType:filterAttr.tag_s_8_assetType,tag_s_9_assetTag:filterAttr.tag_s_9_assetTag,tag_s_10_serialNumber:filterAttr.tag_s_10_serialNumber,tag_s_11_moveBundle:filterAttr.tag_s_11_moveBundle,tag_s_12_depUp:filterAttr.tag_s_12_depUp,tag_s_13_depDown:filterAttr.tag_s_13_depDown])
+			session.AE?.JQ_FILTERS = params
+			redirect( action:list)
 
 		}
 
@@ -3552,7 +3571,7 @@ class AssetEntityController {
 			def applicationCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,"Application").size()
 			def databaseCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,"Database").size()
 			def filesCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,"Files").size()
-			assetSummaryList << ["name":moveBundle, "assetCount":assetCount, "applicationCount":applicationCount, "databaseCount":databaseCount, "filesCount":filesCount]
+			assetSummaryList << ["name":moveBundle, "assetCount":assetCount, "applicationCount":applicationCount, "databaseCount":databaseCount, "filesCount":filesCount, id:moveBundle.id]
 		}
 
 		unassignedAssetCount = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId and assetType not in ('Application','Database','Files')").size()

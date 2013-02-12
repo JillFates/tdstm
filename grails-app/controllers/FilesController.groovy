@@ -46,7 +46,7 @@ class FilesController {
 		return [assetDependency: new AssetDependency(), servers : servers, applications : applications, dbs : dbs,
 			files : files,dependencyType:dependencyType,dependencyStatus:dependencyStatus,
 			event:params.moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,
-			staffRoles:taskService.getRolesForStaff()]
+			staffRoles:taskService.getRolesForStaff(), moveBundleId:params.moveBundleId]
 		
 	}
 	/**
@@ -88,6 +88,14 @@ class FilesController {
 			}
 			
 			eq("assetType",  AssetType.FILES.toString() )
+			
+			if(params.moveBundleId){
+				if(params.moveBundleId =='unAssigned'){
+					isNull('moveBundle')
+				} else {
+					eq('moveBundle', MoveBundle.read(params.moveBundleId))
+				}
+			}
 			
 			if(params.filter){
 				or{
@@ -252,7 +260,7 @@ class FilesController {
 						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
 						break;
 					default:
-						redirect( action:list,params:[tag_f_assetName:filterAttr.tag_f_assetName, tag_f_fileFormat:filterAttr.tag_f_fileFormat,tag_f_fileSize:filterAttr.tag_f_fileSize, tag_f_moveBundle:filterAttr.tag_f_moveBundle, tag_f_planStatus:filterAttr.tag_f_planStatus, tag_f_depUp:filterAttr.tag_f_depUp, tag_f_depDown:filterAttr.tag_f_depDown])
+						redirect( action:'list')
 				}
 			}
 		}

@@ -54,7 +54,7 @@ class ApplicationController {
 		return [projectId: project.id, assetDependency: new AssetDependency(),
 			servers : servers, applications : applications, dbs : dbs, files : files,dependencyType:dependencyType,dependencyStatus:dependencyStatus,
 		    staffRoles:taskService.getRolesForStaff(), event:params.moveEvent, filter:params.filter, latency:params.latency, plannedStatus:params.plannedStatus,
-			validation:params.validation]
+			validation:params.validation, moveBundleId:params.moveBundleId]
 	}
 	/**
 	 * This method is used by JQgrid to load appList
@@ -95,6 +95,14 @@ class ApplicationController {
 			if(params.plannedStatus)
 				eq("planStatus", params.plannedStatus)
 				
+			if(params.moveBundleId){
+				if(params.moveBundleId =='unAssigned'){
+					isNull('moveBundle')
+				} else {
+					eq('moveBundle', MoveBundle.read(params.moveBundleId))
+				}
+			}
+			
 			if(params.filter){
 				or{
 					and {
