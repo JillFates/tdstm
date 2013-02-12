@@ -35,7 +35,8 @@ $(document).ready(function() {
 	var event = '${event}'
 	var plannedStatus = '${plannedStatus}' 
 	var validation = '${validation}'
-		
+	var moveBundleId = '${moveBundleId}'
+				
     <jqgrid:grid id="databaseId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Name', 'DB Format','Plan Status','Bundle','Dep # ','Dep Up','Dep Down','id', 'commentType'"
