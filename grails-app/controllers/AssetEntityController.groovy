@@ -3269,9 +3269,13 @@ class AssetEntityController {
      */
 	def listjqGrid={
 		
+		if(params.initSession)
+			session.TASK = [:]
+			
 		def project = securityService.getUserCurrentProject()
-		def moveEvents = MoveEvent.findAllByProject(project)		
-
+		def moveEvents = MoveEvent.findAllByProject(project)
+		def filters = session.TASK?.JQ_FILTERS
+		
 		// Deal with the parameters
 		def isTask = AssetCommentType.TASK
 		
@@ -3300,9 +3304,13 @@ class AssetEntityController {
 		
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		
 		render (view:'listTaskjqGrid' ,model:[timeToUpdate : timeToRefresh ?: 60,servers:servers, applications:applications, dbs:dbs,
 				files:files, dependencyType:dependencyType, dependencyStatus:dependencyStatus, assetDependency: new AssetDependency(),
-				moveEvents:moveEvents, filterEvent:filterEvent, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:params.filter] )
+				moveEvents:moveEvents, filterEvent:filterEvent, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:params.filter,
+				comment:filters?.comment ?:'', taskNumber:filters?.taskNumber ?:'', assetName:filters?.assetEntity ?:'', assetType:filters?.assetType ?:'',
+				dueDate : filters?.dueDate ?:'', status : filters?.status ?:'', assignedTo : filters?.assignedTo ?:'', role: filters?.role ?:'',
+				category: filters?.category ?:''] )
 		
 	}
 	/**
@@ -3311,8 +3319,9 @@ class AssetEntityController {
 	 */
 	def listTaskJSON ={
 		
-		def sortIndex = params.sidx 
-		def sortOrder  = params.sord 
+		def sortIndex =  params.sidx ? params.sidx : session.TASK?.JQ_FILTERS?.sidx
+		def sortOrder =  params.sidx ? params.sord : session.TASK?.JQ_FILTERS?.sord
+		
 		def maxRows = Integer.valueOf(params.rows)
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
@@ -3323,7 +3332,7 @@ class AssetEntityController {
 		def today = new Date()
 		def runBookFormatter = new SimpleDateFormat("MM/dd kk:mm:ss")
 		def dueFormatter = new SimpleDateFormat("MM/dd")
-		def moveEvent
+		def moveEvent		
 		if ( params.moveEvent?.size() > 0) {
 			// zero (0) = All events
 			// log.info "listCommentsOrTasks: Handling MoveEvent based on params ${params.moveEvent}"
@@ -3464,7 +3473,12 @@ class AssetEntityController {
 			 it.role, it.category, TaskDependency.countByPredecessor( it ), it.score ?: 0,
 			 it.status ? "task_${it.status.toLowerCase()}" : 'task_na',updatedClass, dueClass, it.assetEntity?.id], id: it.id,
 			]}
-
+		
+		// If sessions variables exists, set them with params and sort
+		session.TASK?.JQ_FILTERS = params
+		session.TASK?.JQ_FILTERS?.sidx = sortIndex
+		session.TASK?.JQ_FILTERS?.sord = sortOrder
+		
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 
 		render jsonData as JSON

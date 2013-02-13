@@ -42,6 +42,16 @@
 	    	var justRemaining = ${justRemaining}
 	    	var justMyTasks = ${justMyTasks}
 	    	var filter = '${filter}'
+		    var comment = '${comment}'
+	    	var taskNumber = '${taskNumber}'
+		    var assetEntity = '${assetName}'
+			var assetType = '${assetType}'
+			var dueDate = '${dueDate}'
+			var status = '${status}'
+			var assignedTo = '${assignedTo}'
+			var role = '${role}'
+			var category = '${category}'
+					
 	    	<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
 	            colNames="'Action', 'Task', 'Description', 'Asset', 'AssetType', 'Updated', 'Due', 'Status',
 		            'Assigned To', 'Role', 'Category', 'Suc.', 'Score', 'id', 'statusCss'"
@@ -67,7 +77,8 @@
 	            rowList= "'25','50','100'"
 	            scrollOffset="0"
 	            viewrecords="true"
-	            postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter}"
+	            postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
+	            	assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category}"
 	            showPager="true"
 	            datatype="'json'">
 	            <jqgrid:filterToolbar id="taskListId" searchOnEnter="false" />
@@ -75,9 +86,9 @@
 	                  del="false" search="false" refresh="true" />
 	            <jqgrid:resize id="taskListId" resizeOffset="-2" />
 	     		</jqgrid:grid>
-		   	    
+	     		populateFilter();
         });
-	    	
+       
         function myCustomFormatter (cellVal,options,rowObject) {
         	var editButton = '<a href="javascript:showAssetComment(\''+options.rowId+'\',\'edit\')">'+
        			"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
@@ -102,7 +113,18 @@
         function assetFormatter(cellVal,options,rowObject){
         	return '<span class="cellWithoutBackground pointer" onclick= "getEntityDetails(\'listComment\', \''+rowObject[4]+'\', '+rowObject[16]+')\" >' + (cellVal ? cellVal :"") + '</span>';
         }
-                
+
+        function populateFilter(){
+        	$("#gs_comment").val('${comment}')
+        	$("#gs_taskNumber").val('${taskNumber}')
+        	$("#gs_assetEntity").val('${assetName}')
+    	    $("#gs_assetType").val('${assetType}')
+    		$("#gs_dueDate").val('${dueDate}')
+    		$("#gs_status").val('${status}')
+    	    $("#gs_assignedTo").val('${assignedTo}')
+    		$("#gs_role").val('${role}')
+    		$("#gs_category").val('${category}')
+        }     
         $(document).keyup(function(e) {
         	// esc to stop timer
        	    if (e.keyCode == 27) { if(B2 != '' && taskManagerTimePref != 0){ B2.Restart( taskManagerTimePref ); }}   
@@ -126,7 +148,7 @@
 			<div>
 			<input type="hidden" id="manageTaskId" value="manageTask"/>
 			<g:render template="commentCrud"/> 
-			<form name="commentForm" id="commentForm" action="listjqGrid">
+			<form name="commentForm" id="commentForm" method="post" action="listjqGrid">
 			<input type="hidden" name="justRemaining" id="justRemaining" value="${justRemaining}" />
 			<input type="hidden" name="justMyTasks"   id="justMyTasks"   value="${justMyTasks}"/>
 			<span >
@@ -218,7 +240,7 @@ function toggleCheckbox(chkbox, field) {
 			if (sec>0){
 				this.to=setTimeout(function(){ oop.Time(); },1000);
 			}else{
-				pageRefresh();
+				submitForm();
 			}
 		},
 		Pause:function(sec){
