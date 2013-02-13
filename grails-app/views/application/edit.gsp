@@ -1,4 +1,19 @@
+<script type="text/javascript">
+	$("#appl_assetName").val($('#gs_assetName').val())
+	$("#appl_sme").val($('#gs_sme').val())
+	$("#appl_validation").val($('#gs_validation').val())
+	$("#appl_planStatus").val($('#gs_planStatus').val())
+	$("#appl_moveBundle").val($('#gs_moveBundle').val())
+	
+</script>
 <g:form method="post" action="update" name="editAssetsFormId">
+
+	<input type="hidden" id="appl_assetName" name="assetNameFilter" value="" />
+	<input type="hidden" id="appl_sme" name="appSmeFilter" value="" />
+	<input type="hidden" id="appl_validation" name="appValidationFilter" value="" />
+	<input type="hidden" id="appl_moveBundle" name="moveBundleFilter" value="" />
+	<input type="hidden" id="appl_planStatus" name="planStatusFilter" value="" />
+
 	<input type="hidden" name="id" value="${applicationInstance?.id}" />
 	<table style="border: 0">
 		<tr>

@@ -38,6 +38,11 @@ $(document).ready(function() {
 	var plannedStatus = '${plannedStatus}' 
 	var validation = '${validation}'
 	var moveBundleId = '${moveBundleId}'
+	var appName = '${appName}'
+	var planStatus = '${planStatus}'
+	var moveBundle = '${moveBundle}'
+	var validationFilter = '${validationFilter}'
+	var appSme = '${appSme}'
 		
     <jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
@@ -62,13 +67,15 @@ $(document).ready(function() {
     multiselect="true"
     viewrecords="true"
     showPager="true"
-    postData="{filter: filter, event:event, latency:latency, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId}"
+    postData="{filter: filter, event:event, latency:latency, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId,
+    	assetName:appName, planStatus:planStatus, moveBundle:moveBundle, validation:validationFilter, sme:appSme}"
     datatype="'json'">
     <jqgrid:filterToolbar id="applicationId" searchOnEnter="false" />
     <jqgrid:navigation id="applicationId" add="false" edit="false" del="true" search="false" refresh="true" />
     <jqgrid:resize id="applicationId" resizeOffset="-2" />
 </jqgrid:grid>
-
+	populateFilter();
+	
 	$("#del_applicationIdGrid").click(function(){
     $("#applicationId").jqGrid("editGridRow","new",
             {afterSubmit:deleteMessage}
@@ -105,6 +112,14 @@ function deleteMessage(response, postdata){
 	 $("#messageId").html(response.responseText)
 	 $("#delmodapplicationIdGrid").hide()
      return true
+}
+
+function populateFilter(){
+	$("#gs_assetName").val('${appName}')
+	$("#gs_sme").val('${appSme}')
+	$("#gs_validation").val('${validationFilter}')
+	$("#gs_planStatus").val('${planStatus}')
+	$("#gs_moveBundle").val('${moveBundle}')
 }
 
 })

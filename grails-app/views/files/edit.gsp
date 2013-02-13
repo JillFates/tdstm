@@ -1,4 +1,16 @@
+<script type="text/javascript">
+	$("#file_assetName").val($('#gs_assetName').val())
+	$("#file_fileFormat").val($('#gs_fileFormat').val())
+	$("#file_fileSize").val($('#gs_fileSize').val())
+	$("#file_planStatus").val($('#gs_planStatus').val())
+	$("#file_moveBundle").val($('#gs_moveBundle').val())
+</script>
 <g:form method="post" action="update" name="editAssetsFormId">
+	<input type="hidden" id="file_assetName" name="assetNameFilter" value="" />
+	<input type="hidden" id="file_fileFormat" name="fileFormatFilter" value="" />
+	<input type="hidden" id="file_fileSize" name="fileSizeFilter" value="" />
+	<input type="hidden" id="file_planStatus" name="planStatusFilter" value="" />
+	<input type="hidden" id="file_moveBundle" name="moveBundleFilter" value="" />
 	<input type="hidden" name="id" value="${fileInstance?.id}" />
 	<table style="border: 0;">
 		<tr>

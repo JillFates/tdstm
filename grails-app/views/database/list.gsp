@@ -36,6 +36,10 @@ $(document).ready(function() {
 	var plannedStatus = '${plannedStatus}' 
 	var validation = '${validation}'
 	var moveBundleId = '${moveBundleId}'
+	var dbName = '${dbName}'
+	var planStatus = '${planStatus}'
+	var moveBundle = '${moveBundle}'
+	var dbFormat = '${validationFilter}'
 				
     <jqgrid:grid id="databaseId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
@@ -58,13 +62,15 @@ $(document).ready(function() {
     rowList= "'25','50','100'"
     multiselect="true"
     viewrecords="true"
-   	postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId}"
+   	postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId,
+   		assetName:dbName, planStatus:planStatus, moveBundle:moveBundle, dbFormat:dbFormat}"
     showPager="true"
     datatype="'json'">
     <jqgrid:filterToolbar id="databaseId" searchOnEnter="false" />
     <jqgrid:navigation id="databaseId" add="false" edit="false" del="true" search="false" refresh="true" afterSubmit="deleteMessage"/>
     <jqgrid:resize id="databaseId" resizeOffset="-2" />
 </jqgrid:grid>
+	populateFilter();
 	$("#del_databaseIdGrid").click(function(){
     $("#databaseId").jqGrid("editGridRow","new",
             {afterSubmit:deleteMessage});
@@ -102,6 +108,13 @@ function deleteMessage(response, postdata){
 	 $("#delmoddatabaseIdGrid").hide()
        return true
 }
+function populateFilter(){
+	$("#gs_assetName").val('${dbName}')
+	$("#gs_dbFormat").val('${dbFormat}')
+	$("#gs_planStatus").val('${planStatus}')
+	$("#gs_moveBundle").val('${moveBundle}')
+}
+
 })
 </script>
 

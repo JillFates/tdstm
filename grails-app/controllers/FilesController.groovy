@@ -33,6 +33,8 @@ class FilesController {
 		 	
 	}
 	def list={
+		def filters = session.FILES?.JQ_FILTERS
+		session.FILES?.JQ_FILTERS = []
 		def project = securityService.getUserCurrentProject()
 		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade')\
 					and project =:project order by assetName asc",[project:project])
@@ -46,7 +48,9 @@ class FilesController {
 		return [assetDependency: new AssetDependency(), servers : servers, applications : applications, dbs : dbs,
 			files : files,dependencyType:dependencyType,dependencyStatus:dependencyStatus,
 			event:params.moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,
-			staffRoles:taskService.getRolesForStaff(), moveBundleId:params.moveBundleId]
+			staffRoles:taskService.getRolesForStaff(), moveBundleId:params.moveBundleId, fileName:filters?.assetNameFilter ?:'', 
+			fileFormat:filters?.fileFormatFilter, fileSize:filters?.fileSizeFilter,
+			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'']
 		
 	}
 	/**
@@ -61,6 +65,8 @@ class FilesController {
 
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList
+		session.FILES = [:]
+		
 		if(params.event && params.event.isNumber()){
 			def moveEvent = MoveEvent.read( params.event )
 			moveBundleList = moveEvent?.moveBundles?.findAll {it.useOfPlanning == true}
@@ -153,12 +159,14 @@ class FilesController {
 				if(!filesInstance.hasErrors() && filesInstance.save()) {
 					flash.message = "Storage ${filesInstance.assetName} created"
 					assetEntityService.createOrUpdateFilesDependencies(params, filesInstance)
-			        redirect(action:list)
+			        session.FILES?.JQ_FILTERS = params
+					redirect( action:list)
 				}
 				else {
 					flash.message = "Storage not created"
 					filesInstance.errors.allErrors.each{ flash.message += it}
-					redirect(action:list)
+					session.FILES?.JQ_FILTERS = params
+					redirect( action:list)
 				}
 		
 			
@@ -260,7 +268,8 @@ class FilesController {
 						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
 						break;
 					default:
-						redirect( action:'list')
+						session.FILES?.JQ_FILTERS = params
+						redirect( action:list)
 				}
 			}
 		}

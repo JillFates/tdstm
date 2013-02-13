@@ -41,6 +41,8 @@ class ApplicationController {
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
 	def  list ={
+		def filters = session.APP?.JQ_FILTERS
+		session.APP?.JQ_FILTERS = []
 		def project = securityService.getUserCurrentProject()
 		
 		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$project.id order by assetName asc")
@@ -54,7 +56,8 @@ class ApplicationController {
 		return [projectId: project.id, assetDependency: new AssetDependency(),
 			servers : servers, applications : applications, dbs : dbs, files : files,dependencyType:dependencyType,dependencyStatus:dependencyStatus,
 		    staffRoles:taskService.getRolesForStaff(), event:params.moveEvent, filter:params.filter, latency:params.latency, plannedStatus:params.plannedStatus,
-			validation:params.validation, moveBundleId:params.moveBundleId]
+			validation:params.validation, moveBundleId:params.moveBundleId, appName:filters?.assetNameFilter ?:'', appSme : filters?.appSmeFilter ?:'', 
+			validationFilter:filters?.appValidationFilter ?:'', moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'']
 	}
 	/**
 	 * This method is used by JQgrid to load appList
@@ -65,11 +68,10 @@ class ApplicationController {
 		def maxRows = Integer.valueOf(params.rows)
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
-
 		def project = securityService.getUserCurrentProject()
 		
 		def moveBundleList = []
-		
+		session.APP = [:]
 		if(params.event && params.event.isNumber()){
 			def moveEvent = MoveEvent.read( params.event )
 			moveBundleList = moveEvent?.moveBundles?.findAll {it.useOfPlanning == true}
@@ -195,12 +197,14 @@ class ApplicationController {
 					appMoveInstance.errors.allErrors.each { println it }
 				}
 			}
-			redirect(action:list)
+			session.APP?.JQ_FILTERS = params
+			redirect( action:list)
 		}
 		else {
 			flash.message = "Application not created"
 			applicationInstance.errors.allErrors.each{ flash.message += it }
-			redirect(action:list)
+			session.APP?.JQ_FILTERS = params
+			redirect( action:list)
 		}
 
 	}
@@ -337,7 +341,8 @@ class ApplicationController {
 						break;
 					
 					default:
-						redirect( action:list,params:[tag_f_assetName:filterAttr?.tag_f_assetName, tag_f_appOwner:filterAttr?.tag_f_appOwner, tag_f_appSme:filterAttr?.tag_f_appSme, tag_f_planStatus:filterAttr?.tag_f_planStatus, tag_f_depUp:filterAttr?.tag_f_depUp, tag_f_depDown:filterAttr?.tag_f_depDown])
+						session.APP?.JQ_FILTERS = params
+						redirect( action:list)
 				}
 			}
 		}

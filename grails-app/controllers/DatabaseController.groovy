@@ -38,6 +38,8 @@ class DatabaseController {
     }
 	
 	def list ={
+		def filters = session.DB?.JQ_FILTERS
+		session.DB?.JQ_FILTERS = []
 		def project = securityService.getUserCurrentProject()
 		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') \
 				and project =:project order by assetName asc",[project:project])
@@ -52,7 +54,8 @@ class DatabaseController {
 			servers : servers, applications : applications, dbs : dbs, files : files, dependencyType:dependencyType,
 			dependencyStatus:dependencyStatus,staffRoles:taskService.getRolesForStaff(),
 			event:params.moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,
-			moveBundleId:params.moveBundleId]
+			moveBundleId:params.moveBundleId, dbName:filters?.assetNameFilter ?:'', dbFormat:filters?.dbFormatFilter,
+			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'']
 	}
 	
 	/**
@@ -67,6 +70,7 @@ class DatabaseController {
 
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList
+		session.DB = [:]
 		
 		if(params.event && params.event.isNumber()){
 			def moveEvent = MoveEvent.read( params.event )
@@ -193,11 +197,13 @@ class DatabaseController {
 				if(!dbInstance.hasErrors() && dbInstance.save()) {
 					flash.message = "Database ${dbInstance.assetName} created"
 					assetEntityService.createOrUpdateDatabaseDependencies(params, dbInstance)
-			        redirect(action:list)
+			        session.DB?.JQ_FILTERS = params
+					redirect( action:list)
 		 	    }else {
 					flash.message = "Database not created"
 					dbInstance.errors.allErrors.each{ flash.message += it  }
-					redirect(action:list)
+					session.DB?.JQ_FILTERS = params
+					redirect( action:list)
 				}
 				
 		
@@ -287,7 +293,8 @@ class DatabaseController {
 						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
 						break;
 					default:
-						redirect(action:'list')
+						session.DB?.JQ_FILTERS = params
+						redirect( action:list)
 				}
 			}
 		}

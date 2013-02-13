@@ -1,4 +1,14 @@
+<script type="text/javascript">
+	$("#db_assetName").val($('#gs_assetName').val())
+	$("#db_dbFormat").val($('#gs_dbFormat').val())
+	$("#db_planStatus").val($('#gs_planStatus').val())
+	$("#db_moveBundle").val($('#gs_moveBundle').val())
+</script>
 <g:form method="post">
+<input type="hidden" id="db_assetName" name="assetNameFilter" value="" />
+<input type="hidden" id="db_dbFormat" name="dbFormatFilter" value="" />
+<input type="hidden" id="db_planStatus" name="planStatusFilter" value="" />
+<input type="hidden" id="db_moveBundle" name="moveBundleFilter" value="" />
 <table style="border: 0">
 	<tr>
 		<td colspan="2">

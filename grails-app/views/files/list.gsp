@@ -33,6 +33,11 @@ $(document).ready(function() {
 	var plannedStatus = '${plannedStatus}' 
 	var validation = '${validation}'
 	var	moveBundleId = '${moveBundleId}'
+	var fileName = '${fileName}'
+	var planStatus = '${planStatus}'
+	var moveBundle = '${moveBundle}'
+	var fileFormat = '${fileFormat}'
+	var fileSize = '${fileSize}'
 	// JqGrid implementations 
     <jqgrid:grid id="storageId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
@@ -56,14 +61,15 @@ $(document).ready(function() {
     rowList= "'25','50','100'"
     multiselect="true"
     viewrecords="true"
-   	postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId}"
+   	postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId, assetName:fileName, 
+   	   	planStatus:planStatus, moveBundle:moveBundle, fileFormat:fileFormat, fileSize:fileSize}"
     showPager="true"
     datatype="'json'">
     <jqgrid:filterToolbar id="storageId" searchOnEnter="false" />
     <jqgrid:navigation id="storageId" add="false" edit="false" del="true" search="false" refresh="true"/>
     <jqgrid:resize id="storageId" resizeOffset="-2" />
 </jqgrid:grid>
-
+	populateFilter();
 
 function myLinkFormatter (cellvalue, options, rowObjcet) {
 	var value = cellvalue ? cellvalue : ''
@@ -90,6 +96,13 @@ function myCustomFormatter (cellVal,options,rowObject) {
     return editButton
 }
 
+function populateFilter(){
+	$("#gs_assetName").val('${fileName}')
+	$("#gs_fileFormat").val('${fileFormat}')
+	$("#gs_fileSize").val('${fileSize}')
+	$("#gs_planStatus").val('${planStatus}')
+	$("#gs_moveBundle").val('${moveBundle}')
+}
 })
 
 </script>
