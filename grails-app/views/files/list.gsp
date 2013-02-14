@@ -38,6 +38,7 @@ $(document).ready(function() {
 	var moveBundle = '${moveBundle}'
 	var fileFormat = '${fileFormat}'
 	var fileSize = '${fileSize}'
+	var sizePref = '${sizePref}'
 	// JqGrid implementations 
     <jqgrid:grid id="storageId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
@@ -57,8 +58,8 @@ $(document).ready(function() {
     caption="'Storage List'"
    	height="'auto'"
     width="1000"
-    rowNum="25"
-    rowList= "'25','50','100'"
+   	rowNum="sizePref"
+ 	rowList= "'25','100','500','1000'"
     multiselect="true"
     viewrecords="true"
    	postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId, assetName:fileName, 

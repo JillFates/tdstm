@@ -40,7 +40,8 @@ $(document).ready(function() {
 	var planStatus = '${planStatus}'
 	var moveBundle = '${moveBundle}'
 	var dbFormat = '${validationFilter}'
-				
+	var sizePref = '${sizePref}'
+					
     <jqgrid:grid id="databaseId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Name', 'DB Format','Plan Status','Bundle','Dep # ','Dep Up','Dep Down','id', 'commentType'"
@@ -58,8 +59,8 @@ $(document).ready(function() {
     caption="'DB List'"
    	height="'auto'"
     width="1000"
-    rowNum="25"
-    rowList= "'25','50','100'"
+   	rowNum="sizePref"
+ 	rowList= "'25','100','500','1000'"
     multiselect="true"
     viewrecords="true"
    	postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId,

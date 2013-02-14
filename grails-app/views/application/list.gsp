@@ -43,6 +43,7 @@ $(document).ready(function() {
 	var moveBundle = '${moveBundle}'
 	var validationFilter = '${validationFilter}'
 	var appSme = '${appSme}'
+	var sizePref = '${sizePref}'
 		
     <jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
@@ -62,8 +63,8 @@ $(document).ready(function() {
     caption="'Application List'"
    	height="'auto'"
     width="1000"
-    rowNum="25"
-    rowList= "'25','50','100'"
+    rowNum="sizePref"
+    rowList= "'25','100','500','1000'"
     multiselect="true"
     viewrecords="true"
     showPager="true"

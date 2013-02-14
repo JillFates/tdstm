@@ -33,6 +33,7 @@ class DatabaseController {
     def assetEntityService  
 	def taskService 
 	def securityService
+	def userPreferenceService
     def index = {
 		redirect(action: "list", params: params)
     }
@@ -49,13 +50,14 @@ class DatabaseController {
 		
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-
+		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
+		
 		return [assetDependency: new AssetDependency(),
 			servers : servers, applications : applications, dbs : dbs, files : files, dependencyType:dependencyType,
 			dependencyStatus:dependencyStatus,staffRoles:taskService.getRolesForStaff(),
 			event:params.moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,
 			moveBundleId:params.moveBundleId, dbName:filters?.assetNameFilter ?:'', dbFormat:filters?.dbFormatFilter,
-			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'']
+			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref]
 	}
 	
 	/**
@@ -71,6 +73,8 @@ class DatabaseController {
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList
 		session.DB = [:]
+		
+		userPreferenceService.setPreference("assetListSize", "${maxRows}")
 		
 		if(params.event && params.event.isNumber()){
 			def moveEvent = MoveEvent.read( params.event )

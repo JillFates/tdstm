@@ -32,6 +32,7 @@ class ApplicationController {
 	def assetEntityService
 	def taskService
 	def securityService
+	def userPreferenceService
 	
 	def index = {
 		redirect(action:list,params:params)
@@ -52,12 +53,14 @@ class ApplicationController {
 		
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
 		
 		return [projectId: project.id, assetDependency: new AssetDependency(),
 			servers : servers, applications : applications, dbs : dbs, files : files,dependencyType:dependencyType,dependencyStatus:dependencyStatus,
 		    staffRoles:taskService.getRolesForStaff(), event:params.moveEvent, filter:params.filter, latency:params.latency, plannedStatus:params.plannedStatus,
 			validation:params.validation, moveBundleId:params.moveBundleId, appName:filters?.assetNameFilter ?:'', appSme : filters?.appSmeFilter ?:'', 
-			validationFilter:filters?.appValidationFilter ?:'', moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'']
+			validationFilter:filters?.appValidationFilter ?:'', moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'',
+			sizePref:sizePref]
 	}
 	/**
 	 * This method is used by JQgrid to load appList
@@ -72,6 +75,7 @@ class ApplicationController {
 		
 		def moveBundleList = []
 		session.APP = [:]
+		userPreferenceService.setPreference("assetListSize", "${maxRows}")
 		if(params.event && params.event.isNumber()){
 			def moveEvent = MoveEvent.read( params.event )
 			moveBundleList = moveEvent?.moveBundles?.findAll {it.useOfPlanning == true}

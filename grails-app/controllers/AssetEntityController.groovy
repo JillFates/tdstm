@@ -1270,12 +1270,14 @@ class AssetEntityController {
 
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
 		render(view:'list', model:[assetDependency : new AssetDependency(), dependencyType:dependencyType, dependencyStatus:dependencyStatus,
 			event:params.moveEvent, filter:params.filter, type:params.type, plannedStatus:params.plannedStatus,  servers : servers, 
 			applications : applications, dbs : dbs, files : files, assetName:filters?.assetNameFilter ?:'', assetType:filters?.assetTypeFilter ?:'', planStatus:filters?.planStatusFilter ?:'', 
 			moveBundle:filters?.moveBundleFilter ?:'', model:filters?.modelFilter ?:'', sourceLocation:filters?.sourceLocationFilter ?:'', sourceRack:filters?.sourceRackFilter ?:'',
 			targetLocation:filters?.targetLocationFilter ?:'', targetRack:filters?.targetRackFilter ?:'', assetTag:filters?.assetTagFilter ?:'', 
-			serialNumber:filters?.serialNumberFilter ?:'', sortIndex:filters?.sortIndex, sortOrder:filters?.sortOrder, moveBundleId:params.moveBundleId ]) 
+			serialNumber:filters?.serialNumberFilter ?:'', sortIndex:filters?.sortIndex, sortOrder:filters?.sortOrder, moveBundleId:params.moveBundleId,
+			sizePref:sizePref ]) 
 
 	}
 	/**
@@ -1284,7 +1286,7 @@ class AssetEntityController {
 	def listJson = {
 		def sortIndex = params.sidx ?: 'assetName'
 		def sortOrder  = params.sord ?: 'asc'
-		def maxRows = Integer.valueOf(params.rows)
+		def maxRows =  Integer.valueOf(params.rows) 
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 
@@ -1292,6 +1294,7 @@ class AssetEntityController {
 		def moveBundleList
 		
 		session.AE = [:]
+		userPreferenceService.setPreference("assetListSize", "${maxRows}")
 		
 		if(params.event && params.event.isNumber()){
 			def moveEvent = MoveEvent.read( params.event )
@@ -3304,13 +3307,14 @@ class AssetEntityController {
 		
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
 		
 		render (view:'listTaskjqGrid' ,model:[timeToUpdate : timeToRefresh ?: 60,servers:servers, applications:applications, dbs:dbs,
 				files:files, dependencyType:dependencyType, dependencyStatus:dependencyStatus, assetDependency: new AssetDependency(),
 				moveEvents:moveEvents, filterEvent:filterEvent, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:params.filter,
 				comment:filters?.comment ?:'', taskNumber:filters?.taskNumber ?:'', assetName:filters?.assetEntity ?:'', assetType:filters?.assetType ?:'',
 				dueDate : filters?.dueDate ?:'', status : filters?.status ?:'', assignedTo : filters?.assignedTo ?:'', role: filters?.role ?:'',
-				category: filters?.category ?:''] )
+				category: filters?.category ?:'', moveEvent:moveEvent, sizePref:sizePref] )
 		
 	}
 	/**
@@ -3325,6 +3329,8 @@ class AssetEntityController {
 		def maxRows = Integer.valueOf(params.rows)
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		
+		userPreferenceService.setPreference("assetListSize", "${maxRows}")
 
 		def project = securityService.getUserCurrentProject()
 		def person = securityService.getUserLoginPerson()

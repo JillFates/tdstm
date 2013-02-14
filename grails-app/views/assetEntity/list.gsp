@@ -52,6 +52,7 @@ var sortIndex = '${sortIndex}'
 var sortOrder = '${sortOrder}'
 var moveBundleId = '${moveBundleId}'
 var windowWidth = $(window).width()- 50;
+var sizePref = '${sizePref}'
 <jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','Target Location','Target Rack','Tag','Serial#','Plan Status','Bundle',
@@ -77,8 +78,8 @@ var windowWidth = $(window).width()- 50;
     caption="'Asset List'"
    	height="'auto'"
     width="windowWidth"
-    rowNum="25"
-    rowList= "'25','50','100'"
+    rowNum="sizePref"
+    rowList= "'25','100','500','1000'"
     multiselect="true"
     viewrecords="true"
     showPager="true"
@@ -92,7 +93,6 @@ var windowWidth = $(window).width()- 50;
     <jqgrid:resize id="assetListId" resizeOffset="-2" />
 </jqgrid:grid>
 	populateFilter();
-
 	$("#del_assetListIdGrid").click(function(){
     $("#assetListId").jqGrid("editGridRow","new",
             {afterSubmit:deleteMessage});

@@ -51,6 +51,7 @@
 			var assignedTo = '${assignedTo}'
 			var role = '${role}'
 			var category = '${category}'
+			var sizePref = '${sizePref}'
 					
 	    	<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
 	            colNames="'Action', 'Task', 'Description', 'Asset', 'AssetType', 'Updated', 'Due', 'Status',
@@ -73,8 +74,8 @@
 	            caption="'Task List'"
 	            height="'auto'"
 	            width="1200"
-	           	rowNum="25"
-	            rowList= "'25','50','100'"
+            	rowNum="sizePref"
+	            rowList= "'25','100', '500','1000'"
 	            scrollOffset="0"
 	            viewrecords="true"
 	            postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
