@@ -825,4 +825,42 @@ class RackLayoutsController {
 		
 	 render true
 	}
+	
+	/**
+	 * Assigning power automatically  through the devices in the rack connecting each to power. 
+	 * If the model has one power connector it goes to A. 
+	 * If two connectors, the second connects to B and so on.
+	 * Set the color for the power connection to black.
+	 * If the connector is already connected to power, don't change that one.
+	 * In some cases a pair of devices might be connected to opposite power sources (one A and the other B power)
+	 * 
+	 *  @param rackId - id of requested rack.
+	 *  @return -  flash message
+	*/
+	def assignPowers = {
+		def rack = Rack.read(params.rackId)
+		def rackAssets = rack.assets
+		def toPowers = ["A","B","C"]
+		rackAssets.each { asset->
+			def assetCablePowerList = AssetCableMap.findAllByFromAsset( asset ).findAll{it.fromConnectorNumber.type == "Power"}
+			assetCablePowerList = assetCablePowerList.size() > 3 ? assetCablePowerList[0..2] : assetCablePowerList
+			assetCablePowerList.eachWithIndex{ assetCablePower, i ->
+				if(!assetCablePower.toPower){
+					assetCablePower.toAsset = assetCablePower.fromAsset
+					assetCablePower.toAssetRack = assetCablePower?.fromAsset?.rackTarget?.tag
+					assetCablePower.toAssetUposition = 0
+					assetCablePower.toConnectorNumber = null
+					assetCablePower.toPower = toPowers[i]
+					assetCablePower.color = 'Black'
+					assetCablePower.status = 'cabled'
+					
+					if(!assetCablePower.save(flush:true)){
+						assetCablePower.errors.allErrors.each { println it }
+					}
+				}
+			}
+		}
+		render "Rack ${rack.tag} wired"
+	}
+		
 }

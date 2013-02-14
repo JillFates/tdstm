@@ -353,6 +353,11 @@
 			$('#commit').val($(this).val());
 		});
 	});
+	function assignPowers(id){
+		if(confirm("Connect devices to power?")){
+		  ${remoteFunction(action:'assignPowers', params:'\'rackId=\' + id', onSuccess:'alert(e.responseText)')}
+		}
+	}
 	function createAssetPage(type,source,rack,roomName,location,position){
 		${remoteFunction(action:'create',controller:'assetEntity',params:['redirectTo':'rack'], onComplete:'createEntityView(e,type,source,rack,roomName,location,position)')}
 	}
