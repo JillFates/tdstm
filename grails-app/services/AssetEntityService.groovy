@@ -1,14 +1,19 @@
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.jsecurity.SecurityUtils
 
+import com.tds.asset.Application
 import com.tds.asset.ApplicationAssetMap
 import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
-import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntityVarchar
+import com.tds.asset.AssetOptions
 import com.tds.asset.AssetTransition
+import com.tds.asset.AssetType
+import com.tds.asset.Database
+import com.tds.asset.Files
 import com.tdssrc.grails.GormUtil
 
 class AssetEntityService {
@@ -435,5 +440,30 @@ class AssetEntityService {
 											where toAsset = :asset""",[asset:assetEntity])
 		AssetDependency.executeUpdate("delete AssetDependency where asset = :asset or dependent = :dependent ",[asset:assetEntity, dependent:assetEntity])
 		AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = :asset",[asset:assetEntity])
+	}
+	
+	/**
+	 * 
+	 * @param project
+	 * @return
+	 */
+	def entityInfo(def project ){
+		def servers = AssetEntity.executeQuery("SELECT a.id, a.assetName FROM AssetEntity a WHERE assetType in ('${AssetType.SERVER.toString()}','${AssetType.VM.toString()}','Blade')\
+					AND project=:project ORDER BY assetName", [project:project])
+
+		def applications =  Application.executeQuery("SELECT a.id, a.assetName FROM Application a WHERE assetType =? and project =?\
+					ORDER BY assetName", [AssetType.APPLICATION.toString(), project])
+
+		def dbs = Database.executeQuery("SELECT d.id, d.assetName FROM Database d where assetType = ? and project =? \
+					order by assetName asc",[AssetType.DATABASE.toString(), project])
+		
+		def files = Files.executeQuery("SELECT f.id, f.assetName FROM Files f where assetType = ? and project =? \
+					order by assetName asc",[AssetType.FILES.toString(), project])
+		
+		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		
+		return [servers:servers, applications:applications, dbs:dbs, files:files,
+				 dependencyType:dependencyType, dependencyStatus:dependencyStatus,]
 	}
 }

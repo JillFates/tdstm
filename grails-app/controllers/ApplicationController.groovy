@@ -46,21 +46,16 @@ class ApplicationController {
 		session.APP?.JQ_FILTERS = []
 		def project = securityService.getUserCurrentProject()
 		
-		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$project.id order by assetName asc")
-		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
-		def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
-		def files = Files.findAll('from Files where assetType = ? and project =? order by assetName asc',['Files', project])
-		
-		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		def entities = assetEntityService.entityInfo( project )
 		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
 		
 		return [projectId: project.id, assetDependency: new AssetDependency(),
-			servers : servers, applications : applications, dbs : dbs, files : files,dependencyType:dependencyType,dependencyStatus:dependencyStatus,
-		    staffRoles:taskService.getRolesForStaff(), event:params.moveEvent, filter:params.filter, latency:params.latency, plannedStatus:params.plannedStatus,
-			validation:params.validation, moveBundleId:params.moveBundleId, appName:filters?.assetNameFilter ?:'', appSme : filters?.appSmeFilter ?:'', 
-			validationFilter:filters?.appValidationFilter ?:'', moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'',
-			sizePref:sizePref]
+			servers : entities.servers, applications : entities.applications, dbs : entities.dbs, files : entities.files,dependencyType:entities.dependencyType, 
+			dependencyStatus:entities.dependencyStatus,event:params.moveEvent, filter:params.filter, latency:params.latency,
+		    staffRoles:taskService.getRolesForStaff(), plannedStatus:params.plannedStatus, appSme : filters?.appSmeFilter ?:'',
+			validation:params.validation, moveBundleId:params.moveBundleId, appName:filters?.assetNameFilter ?:'', sizePref:sizePref, 
+			validationFilter:filters?.appValidationFilter ?:'', moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:''
+			]
 	}
 	/**
 	 * This method is used by JQgrid to load appList

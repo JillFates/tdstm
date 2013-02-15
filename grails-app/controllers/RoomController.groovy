@@ -15,6 +15,7 @@ class RoomController {
 	def userPreferenceService
 	def securityService
 	def taskService
+	def assetEntityService
 	SessionFactory sessionFactory
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -30,16 +31,12 @@ class RoomController {
 		def roomInstanceList = Room.findAllByProject( project, params )
 		def roomId = getSession().getAttribute( "CURR_ROOM" )?.CURR_ROOM
 		def roomInstance = new Room()
-		def servers = AssetEntity.findAllByAssetTypeAndProject('Server',project)
-		def applications = Application.findAllByAssetTypeAndProject('Application',project)
-		def dbs = Database.findAllByAssetTypeAndProject('Database',project)
-		def files = Files.findAllByAssetTypeAndProject('Files',project)
-		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		def entities = assetEntityService.entityInfo( project )
+		
 		[roomInstanceList: roomInstanceList, roomInstanceTotal: roomInstanceList.size(), 
-		 projectId:projectId, roomId:roomId, viewType:params.viewType, roomInstance:roomInstance, servers : servers, 
-				applications : applications, dbs : dbs, files : files ,filterRackId:rackIds, staffRoles:taskService.getRolesForStaff(),
-				dependencyType:dependencyType, dependencyStatus:dependencyStatus]
+		 projectId:projectId, roomId:roomId, viewType:params.viewType, roomInstance:roomInstance, servers : entities.servers, 
+				applications : entities.applications, dbs : entities.dbs, files : entities.files ,filterRackId:rackIds, staffRoles:taskService.getRolesForStaff(),
+				dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus]
     }
 
     def create = {

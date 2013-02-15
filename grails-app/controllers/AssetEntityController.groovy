@@ -1262,23 +1262,16 @@ class AssetEntityController {
 		session.AE?.JQ_FILTERS = []
 		
 		def project = securityService.getUserCurrentProject()
-		def servers = AssetEntity.executeQuery("SELECT a.id, a.assetName FROM AssetEntity a WHERE assetType in ('Server','VM','Blade') AND project=$project.id ORDER BY assetName")
-		// TODO : change the following queries to use straight JDBC to only get the id and assetName since only used for SELECT
-		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
-		def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
-		def files = Files.findAll('from Files where assetType = ? and project =? order by assetName asc',['Files', project])
-
-		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
-		render(view:'list', model:[assetDependency : new AssetDependency(), dependencyType:dependencyType, dependencyStatus:dependencyStatus,
-			event:params.moveEvent, filter:params.filter, type:params.type, plannedStatus:params.plannedStatus,  servers : servers, 
-			applications : applications, dbs : dbs, files : files, assetName:filters?.assetNameFilter ?:'', assetType:filters?.assetTypeFilter ?:'', planStatus:filters?.planStatusFilter ?:'', 
-			moveBundle:filters?.moveBundleFilter ?:'', model:filters?.modelFilter ?:'', sourceLocation:filters?.sourceLocationFilter ?:'', sourceRack:filters?.sourceRackFilter ?:'',
+		def entities = assetEntityService.entityInfo( project )
+		
+		render(view:'list', model:[assetDependency : new AssetDependency(), dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
+			event:params.moveEvent, filter:params.filter, type:params.type, plannedStatus:params.plannedStatus,  servers : entities.servers, 
+			applications : entities.applications, dbs : entities.dbs, files : entities.files, assetName:filters?.assetNameFilter ?:'', 
+			assetType:filters?.assetTypeFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sourceRack:filters?.sourceRackFilter ?:'',
+			moveBundle:filters?.moveBundleFilter ?:'', model:filters?.modelFilter ?:'', sourceLocation:filters?.sourceLocationFilter ?:'', 
 			targetLocation:filters?.targetLocationFilter ?:'', targetRack:filters?.targetRackFilter ?:'', assetTag:filters?.assetTagFilter ?:'', 
 			serialNumber:filters?.serialNumberFilter ?:'', sortIndex:filters?.sortIndex, sortOrder:filters?.sortOrder, moveBundleId:params.moveBundleId,
-			staffRoles:taskService.getRolesForStaff(), sizePref:sizePref ]) 
-
+			staffRoles:taskService.getRolesForStaff(), sizePref:userPreferenceService.getPreference("assetListSize")?: '25'  ]) 
 	}
 	/**
 	 * This method is used by JQgrid to load assetList
@@ -1311,7 +1304,7 @@ class AssetEntityController {
 		def assetEntities = AssetEntity.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", project)
 			if (params.assetName) 
-				ilike('assetName', "%${params.assetName}%")
+				ilike('assetName', "%${params.assetName.trim()}%")
 			if (params.assetType) 
 				ilike('assetType', "%${params.assetType}%")
 			if (models)
@@ -3035,242 +3028,6 @@ class AssetEntityController {
 	 */
 	def listTasks = {
 		params.commentType=AssetCommentType.TASK
-		listCommentsOrTasks{}
-	}
-
-	/**
-	 * Used to generate the List of Comments, which leverages a shared closeure with the above listTasks controller
-	 */
-	def listComment = {
-		params.commentType=AssetCommentType.COMMENT
-		listCommentsOrTasks{}
-	}
-	
-	/**
-	 * Shared closure used by listTasks and listComment controller methods
-	 */
-	def listCommentsOrTasks = {
-		def project = securityService.getUserCurrentProject()
-		def moveEvents = MoveEvent.findAllByProject(project)
-		def person = securityService.getUserLoginPerson()
-
-		// Deal with the parameters
-		def isTask = params.commentType == AssetCommentType.TASK
-
-		def view = isTask ? 'listTasks' : 'listComment'
-		// def action = params.issueBox == "on" ? "issue" : params.resolvedBox  ? "resolved" : params.filter
-		def today = new Date()
-		def moveEvent
-		def filterEvent = 0     
-		
-		if(params.containsKey("justRemaining")){
-			userPreferenceService.setPreference("JUST_REMAINING", params.justRemaining)
-		}
-		def justRemaining = userPreferenceService.getPreference("JUST_REMAINING") ?: "1"
-		// Set the Checkbox values to that which were submitted or default if we're coming into the list for the first time
-		def justMyTasks = params.containsKey('justMyTasks') ? params.justMyTasks : "0"
-		
-		
-		// log.info "listCommentsOrTasks: justRemaining=$justRemaining, justMyTasks=$justMyTasks"
-		
-		def assetCommentQuery = "FROM AssetComment a WHERE a.project = :project"
-		def sqlArgs = [project:project]
-		
-		if ( ! isTask ) {
-			// For comments we will filter just on the commentType
-			assetCommentQuery += " AND commentType = :commentType "
-			sqlArgs << [ commentType:AssetCommentType.COMMENT]
-		} else {
-			// For tasks, we have a number of different filters that we need to manage
-			
-		    if ( params.moveEvent?.size() > 0) {
-				// zero (0) = All events
-				// log.info "listCommentsOrTasks: Handling MoveEvent based on params ${params.moveEvent}"
-				if (params.moveEvent != '0') {
-					moveEvent = MoveEvent.findByIdAndProject(params.moveEvent,project)
-					if (! moveEvent) {
-						log.warn "listCommentsOrTasks: ${person} tried to access moveEvent ${params.moveEvent} that was not found in project ${project.id}"
-					}
-				}
-			} else {
-				// Try getting the move Event from the user's session
-				def moveEventId = userPreferenceService.getPreference('MOVE_EVENT')
-				// log.info "listCommentsOrTasks: getting MOVE_EVENT preference ${moveEventId} for ${person}"
-				if (moveEventId) {
-					moveEvent = MoveEvent.findByIdAndProject(moveEventId,project)
-				}
-			}
-			if (moveEvent && params.section != 'dashBoard') {
-				// Add filter to SQL statement and update the user's preferences
-				assetCommentQuery += " AND a.moveEvent = :moveEvent "
-				sqlArgs << [ moveEvent:moveEvent]
-				userPreferenceService.setPreference( 'MOVE_EVENT', "${moveEvent.id}" )
-				filterEvent = moveEvent.id
-				// log.info "listCommentsOrTasks: setting MOVE_EVENT preference to ${moveEvent.id} for ${person}"
-			}
-
-			def action = params.filter
-			
-			assetCommentQuery += " AND commentType = :commentType "
-			sqlArgs << [ commentType: AssetCommentType.TASK ]
-			
-			if (justMyTasks == "1") {
-				assetCommentQuery += ' AND a.assignedTo = :assignedTo'
-				sqlArgs << [ assignedTo:person]
-			}
-			if (justRemaining == "1") {
-				assetCommentQuery += ' AND status != :status'
-				sqlArgs << [ status:AssetCommentStatus.COMPLETED ]
-			}
-			
-			switch (action){
-				// Believe that most of these actions come from the Planning Dashboard
-				case "issue":
-					if(params.resolvedBox == "on" ) {
-						assetCommentQuery += " AND a.assignedTo = :assignedTo AND status != :status"
-						sqlArgs << [ assignedTo:person, status:AssetCommentStatus.COMPLETED]
-					} else {
-						assetCommentQuery += " AND  a.assignedTo = :assignedTo "
-						sqlArgs << [ assignedTo:person]
-					}
-					break
-				case "openIssue" :
-					assetCommentQuery += " AND a.status != :status AND category = :category"
-					sqlArgs << [ status:AssetCommentStatus.COMPLETED, category:"discovery" ]
-					break
-				case "generalOverDue" :
-					assetCommentQuery += " AND category in ('general','planning') AND a.dueDate < :dueDate AND a.status != :status"
-					sqlArgs << [ dueDate:today, status:AssetCommentStatus.COMPLETED ]
-					break
-				case "Discovery" :
-					assetCommentQuery += " AND a.category= :category "
-					sqlArgs << [ category:"discovery"]
-					break
-				case "dueOpenIssue" :
-					assetCommentQuery += " AND a.category= :category AND a.dueDate < :dueDate"
-					sqlArgs << [ category:"discovery", dueDate:today]
-					break
-				case "resolved" :
-					if(params.resolvedBox == "on" ) {
-						assetCommentQuery += "AND status != :status"
-						sqlArgs << [ status:AssetCommentStatus.COMPLETED]
-					}
-					break
-				case "analysisIssue" :
-					assetCommentQuery += " AND a.status = :status AND category in (:category)"
-					sqlArgs << [ status:AssetCommentStatus.READY, category:['general','planning'] ]
-					break
-				// this should not be the default any more...	
-				//default :
-				//	assetCommentQuery += " AND status != :status "
-				//	sqlArgs << [ status:AssetCommentStatus.COMPLETED ]
-				//	break
-					
-		   }
-			assetCommentQuery += " ORDER BY score DESC, taskNumber ASC, dueDate ASC, dateCreated DESC "
-		}
-		//log.info "listCommentsOrTasks: SQL filter=${assetCommentQuery}"
-		def commentList = AssetComment.findAll(assetCommentQuery,sqlArgs)
-		// def start = new Date()
-		// log.info "_listCommentsOrTasks:after SQL : ${TimeCategory.minus(new Date(), start)}"
-		// start = new Date()
-		
-		// Initialize all comment property in to bean for jmesa.
-		def assetCommentList = new ArrayList(commentList.size())	// preallocate the size of the array to improve performance
-		def i=0
-		commentList.each{comment->
-			AssetCommentBean assetBean = new AssetCommentBean();
-			assetBean.with {
-				setId(comment.id)
-				setTaskNumber(comment.taskNumber)
-				setDescription(comment.comment)
-				setCommentType(comment.commentType)
-				setAssetName(comment.assetEntity?.assetName ?:'')
-				setAssetType(comment.assetEntity?.assetType ?:'')
-				setStatus(comment.status)
-				setLastUpdated(isTask && comment.isRunbookTask() ? comment.statusUpdated : comment.lastUpdated)
-				setDueDate(isTask && comment.isRunbookTask() ? comment.estFinish : comment.dueDate)
-				setAssignedTo(comment.assignedTo ? (comment.assignedTo?.firstName +" "+ comment.assignedTo?.lastName) : '' )
-				setRole(comment.role)
-				setCategory(org.apache.commons.lang.StringUtils.capitalize(comment.category))
-				setScore(comment.score ?: 0)
-				setAssetEntityId( comment.assetEntity?.id )
-				assetBean.setRunbookTask( comment.isRunbookTask() )
-				setSuccCount( TaskDependency.findAllByPredecessor( comment ).size())
-				setHardAssigned(comment.hardAssigned)
-				// TODO - Performance Issue - some reason calling the method on the Service class here is causing a 1+ min delay so the status style is hard coded
-				// assetBean.setStatusClass( taskService.getCssClassForStatus(comment.status) )
-				setStatusClass( comment.status ? "task_${comment.status.toLowerCase()}" : 'task_na' )
-
-				// Set the Last Updated elapsed time and CSS style appropriately
-				// For READY tasks, show tardy or late if they go over 5/10 minutes respectively with no activity
-				// For STARTED, show tardy or late if they go beyond the STARTED time + duration for 5/10 minutes respectively
-				// If the task is not completed within 5 min of the original planned finish indicate that the task was overdue
-				def nowGMT = TimeUtil.nowGMT()
-				def elapsed = TimeUtil.elapsed(comment.statusUpdated, nowGMT)
-				def elapsedSec = elapsed.toMilliseconds() / 1000
-				if (comment.status == AssetCommentStatus.READY) {
-					if (elapsedSec >= 600) {
-						setUpdatedClass('task_late')
-					} else if (elapsedSec >= 300) {
-						setUpdatedClass('task_tardy')
-					}
-				} else if (comment.status == AssetCommentStatus.STARTED) {
-					def dueInSecs = elapsedSec - (comment.duration ?: 0) * 60
-					if (dueInSecs >= 600) {
-						setUpdatedClass('task_late')
-					} else if (dueInSecs >= 300) {
-						setUpdatedClass('task_tardy')
-					}
-				}
-				if (comment.estFinish) {
-					elapsed = TimeUtil.elapsed(comment.estFinish, nowGMT)
-					elapsedSec = elapsed.toMilliseconds() / 1000
-					if (elapsedSec > 300) {
-						setDueClass('task_overdue')
-					}
-				}
-			}
-			assetCommentList[i++] = assetBean
-		}
-		//log.info "listCommentsOrTasks: creating list took: ${TimeCategory.minus(new Date(), start)}"
-		//start = new Date()
-		
-		TableFacade tableFacade = new TableFacadeImpl("tag",request)
-		tableFacade.items = assetCommentList
-		Limit limit = tableFacade.limit
-		if(limit.isExported()){
-			tableFacade.setExportTypes(response,limit.getExportType())
-			// TODO : the column properties will be different for the Comments vs Tasks...
-			tableFacade.setColumnProperties("comment","commentType","assetEntity","mustVerify","isResolved","resolution","resolvedBy","createdBy","commentCode","category",'score',"displayOption")
-			tableFacade.render()
-		} else {
-			// log.info "_listCommentsOrTasks:about to render : ${TimeCategory.minus(new Date(), start)}"
-			// TODO : clean-up : the rediectTo param is spelled wrong and should be redirectTo
-			def timeToRefresh = getSession()?.getAttribute("MY_TASK")?.MY_TASK
-			def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =${project.id} order by assetName asc")
-			def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
-			def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
-			def files = Files.findAll('from Files where assetType = ? and project =? order by assetName asc',['Files', project])
-			
-			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-
-			def model = [ assetCommentList:assetCommentList, rediectTo:'comment', 
-				justRemaining:justRemaining, justMyTasks:justMyTasks, 
-				moveEvents:moveEvents, filterEvent:filterEvent,staffRoles:taskService.getRolesForStaff(),
-			    timeToUpdate : timeToRefresh ?: 60,servers:servers, applications:applications, dbs:dbs,
-				files:files, dependencyType:dependencyType, dependencyStatus:dependencyStatus, assetDependency: new AssetDependency(),
-				]
-	      	render (view:view ,model:model )
-		}
-	}
-	
-    /**
-     * This action is temp action should be replaced with listTasks once tested in tmdev
-     * This provides list using jqGrid functionality
-     */
-	def listjqGrid={
 		
 		if(params.initSession)
 			session.TASK = [:]
@@ -3286,38 +3043,20 @@ class AssetEntityController {
 		if(params.moveEvent){
 			filterEvent=params.moveEvent
 		}
-		
-
-		def view = isTask ? 'listTasks' : 'listComment'
-		// def action = params.issueBox == "on" ? "issue" : params.resolvedBox  ? "resolved" : params.filter
 		def moveEvent
 		
 		if(params.containsKey("justRemaining")){
 			userPreferenceService.setPreference("JUST_REMAINING", params.justRemaining)
 		}
-		def justRemaining = userPreferenceService.getPreference("JUST_REMAINING") ?: "1"
-		// Set the Checkbox values to that which were submitted or default if we're coming into the list for the first time
-		def justMyTasks = params.containsKey('justMyTasks') ? params.justMyTasks : "0"
-		def timeToRefresh = getSession()?.getAttribute("MY_TASK")?.MY_TASK
-		
-		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =${project.id} order by assetName asc")
-		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
-		def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
-		def files = Files.findAll('from Files where assetType = ? and project =? order by assetName asc',['Files', project])
-		
-		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
-		
 		if ( params.moveEvent?.size() > 0) {
-				// zero (0) = All events
-				// log.info "listCommentsOrTasks: Handling MoveEvent based on params ${params.moveEvent}"
-				if (params.moveEvent != '0') {
-					moveEvent = MoveEvent.findByIdAndProject(params.moveEvent,project)
-					if (! moveEvent) {
-						log.warn "listCommentsOrTasks: ${person} tried to access moveEvent ${params.moveEvent} that was not found in project ${project.id}"
-					}
+			// zero (0) = All events
+			// log.info "listCommentsOrTasks: Handling MoveEvent based on params ${params.moveEvent}"
+			if (params.moveEvent != '0') {
+				moveEvent = MoveEvent.findByIdAndProject(params.moveEvent,project)
+				if (! moveEvent) {
+					log.warn "listCommentsOrTasks: ${person} tried to access moveEvent ${params.moveEvent} that was not found in project ${project.id}"
 				}
+			}
 		} else {
 			// Try getting the move Event from the user's session
 			def moveEventId = userPreferenceService.getPreference('MOVE_EVENT')
@@ -3326,15 +3065,69 @@ class AssetEntityController {
 				moveEvent = MoveEvent.findByIdAndProject(moveEventId,project)
 			}
 		}
+		if (moveEvent && params.section != 'dashBoard') {
+				// Add filter to SQL statement and update the user's preferences
+				userPreferenceService.setPreference( 'MOVE_EVENT', "${moveEvent.id}" )
+				filterEvent = moveEvent.id
+		}
+		def justRemaining = userPreferenceService.getPreference("JUST_REMAINING") ?: "1"
+		// Set the Checkbox values to that which were submitted or default if we're coming into the list for the first time
+		def justMyTasks = params.containsKey('justMyTasks') ? params.justMyTasks : "0"
+		def timeToRefresh = getSession()?.getAttribute("MY_TASK")?.MY_TASK
+		def entities = assetEntityService.entityInfo( project )
 		
-		render (view:'listTaskjqGrid' ,model:[timeToUpdate : timeToRefresh ?: 60,servers:servers, applications:applications, dbs:dbs,
-				files:files, dependencyType:dependencyType, dependencyStatus:dependencyStatus, assetDependency: new AssetDependency(),
-				moveEvents:moveEvents, filterEvent:filterEvent, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:params.filter,
+		return [timeToUpdate : timeToRefresh ?: 60,servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
+				files:entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, assetDependency: new AssetDependency(),
+				moveEvents:moveEvents, filterEvent:filterEvent , justRemaining:justRemaining, justMyTasks:justMyTasks, filter:params.filter,
 				comment:filters?.comment ?:'', taskNumber:filters?.taskNumber ?:'', assetName:filters?.assetEntity ?:'', assetType:filters?.assetType ?:'',
 				dueDate : filters?.dueDate ?:'', status : filters?.status ?:'', assignedTo : filters?.assignedTo ?:'', role: filters?.role ?:'',
-				category: filters?.category ?:'', moveEvent:moveEvent, staffRoles:taskService.getRolesForStaff(), sizePref:sizePref] )
-		
+				category: filters?.category ?:'', moveEvent:moveEvent, staffRoles:taskService.getRolesForStaff(), 
+				sizePref:userPreferenceService.getPreference("assetListSize")?: '25']
 	}
+
+	/**
+	 * Used to generate the List of Comments, which leverages a shared closeure with the above listTasks controller
+	 */
+	def listComment = {
+		params.commentType=AssetCommentType.COMMENT
+		def project = securityService.getUserCurrentProject()
+		
+		def commentList = AssetComment.findAll("FROM AssetComment a WHERE a.project = :project AND commentType = :commentType"
+			,[project:project, commentType:AssetCommentType.COMMENT])
+		
+		def assetCommentList = new ArrayList(commentList.size())	// preallocate the size of the array to improve performance
+		def i=0
+		commentList.each{comment->
+			AssetCommentBean assetBean = new AssetCommentBean();
+			assetBean.with {
+				setId(comment.id)
+				setDescription(comment.comment)
+				setCommentType(comment.commentType)
+				setAssetName(comment.assetEntity?.assetName ?:'')
+				setAssetType(comment.assetEntity?.assetType ?:'')
+				setLastUpdated(comment.lastUpdated)
+				setCategory(org.apache.commons.lang.StringUtils.capitalize(comment.category))
+				setAssetEntityId( comment.assetEntity?.id )
+			}
+			assetCommentList[i++] = assetBean
+		}
+		
+		TableFacade tableFacade = new TableFacadeImpl("tag",request)
+		tableFacade.items = assetCommentList
+		Limit limit = tableFacade.limit
+		if(limit.isExported()){
+			tableFacade.setExportTypes(response,limit.getExportType())
+			tableFacade.setColumnProperties("comment","lastUpdated","commentType","assetEntity","assetType","category")
+			tableFacade.render()
+		} else {
+			def entities = assetEntityService.entityInfo( project )
+		    return [ assetCommentList:assetCommentList, rediectTo:'comment',
+				staffRoles:taskService.getRolesForStaff(),servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
+				files:entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, assetDependency: new AssetDependency(),
+				]
+		}
+	}
+	
 	/**
 	 * This will be called from TaskManager screen to load jqgrid
 	 * @return : list of tasks as JSON

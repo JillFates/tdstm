@@ -13,15 +13,11 @@
 	<script language="javascript" src="${g.resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
 	<link rel="stylesheet" type="text/css" href="${g.resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
 	<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+    <jqui:resources /> 
+    <jqgrid:resources />
 	<script type="text/javascript">
-        function onInvokeAction(id) {
-            setExportToLimit(id, '');
-            createHiddenInputFieldsForLimitAndSubmit(id);
-        }
-        function onInvokeExportAction(id) {
-            var parameterString = createParameterStringForLimit(id);
-            location.href = '../list?' + parameterString;
-        }
         $(document).ready(function() {
         	$('#issueTimebar').width($(window).width()+'px')
             
@@ -35,16 +31,6 @@
 			$("#createEntityView").dialog({ autoOpen: false })
 	    	currentMenuId = "#assetMenu";
 	    	$("#teamMenuId a").css('background-color','#003366')
-			<% // The .span_task_* are used to highlight the whole TD cell instead of just the text %>
-	    	$(".span_task_tardy").parent().addClass("task_tardy")
-	    	$(".span_task_late").parent().addClass("task_late")
-	    	$(".span_task_ready").parent().addClass("task_ready")
-	    	$(".span_task_hold").parent().addClass("task_hold")
-	    	$(".span_task_started").parent().addClass("task_started")
-	    	$(".span_task_pending").parent().addClass("task_pending")
-	    	$(".span_task_planned").parent().addClass("task_planned")
-	    	$(".span_task_completed").parent().addClass("task_completed")
-	    	$(".span_task_na").parent().addClass("task_na")	
 	    	$("#selectTimedBarId").val(${timeToUpdate})
 	    	taskManagerTimePref = ${timeToUpdate}
 	    	if(taskManagerTimePref != 0){
@@ -52,12 +38,100 @@
 	    	}else{
 	   		  B2.Pause(0);
 	   	    }
+	    	var event = ${filterEvent}
+	    	var justRemaining = ${justRemaining}
+	    	var justMyTasks = ${justMyTasks}
+	    	var filter = '${filter}'
+		    var comment = '${comment}'
+	    	var taskNumber = '${taskNumber}'
+		    var assetEntity = '${assetName}'
+			var assetType = '${assetType}'
+			var dueDate = '${dueDate}'
+			var status = '${status}'
+			var assignedTo = '${assignedTo}'
+			var role = '${role}'
+			var category = '${category}'
+			var sizePref = '${sizePref}'
+					
+	    	<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
+	            colNames="'Action', 'Task', 'Description', 'Asset', 'AssetType', 'Updated', 'Due', 'Status',
+		            'Assigned To', 'Role', 'Category', 'Suc.', 'Score', 'id', 'statusCss'"
+	            colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50},
+            				{name:'taskNumber', editable: true, formatter:taskFormatter},
+                            {name:'comment', editable: true, width:500, formatter:taskFormatter},
+                            {name:'assetEntity', editable: true, formatter:assetFormatter},
+                            {name:'assetType', editable: true, formatter:taskFormatter},
+                            {name:'updated', editable: true, formatter: updatedFormatter,sortable:false,search:false},
+                            {name:'dueDate', editable: true, formatter: dueFormatter},
+                            {name:'status', editable: true, formatter: statusFormatter},
+                            {name:'assignedTo', editable: true, formatter:assignedFormatter},
+                            {name:'role', editable: true, formatter:taskFormatter},
+                            {name:'category', editable: true, formatter:taskFormatter},
+                            {name:'suc', editable: true, formatter:taskFormatter,sortable:false,search:false},
+                            {name:'score', editable: true, formatter:taskFormatter, search:false},
+                            {name:'id', hidden: true},
+                            {name:'statusCss', hidden: true}"
+	            caption="'Task List'"
+	            height="'auto'"
+	            width="1200"
+            	rowNum="sizePref"
+	            rowList= "'25','100', '500','1000'"
+	            scrollOffset="0"
+	            viewrecords="true"
+	            postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
+	            	assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category}"
+	            showPager="true"
+	            datatype="'json'">
+	            <jqgrid:filterToolbar id="taskListId" searchOnEnter="false" />
+	            <jqgrid:navigation id="taskListId" add="false" edit="false" 
+	                  del="false" search="false" refresh="true" />
+	            <jqgrid:resize id="taskListId" resizeOffset="-2" />
+	     		</jqgrid:grid>
+	     		populateFilter();
         });
+       
+        function myCustomFormatter (cellVal,options,rowObject) {
+        	var editButton = '<a href="javascript:showAssetComment(\''+options.rowId+'\',\'edit\')">'+
+       			"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+            return editButton
+        }
+        function taskFormatter(cellVal,options,rowObject) {
+        	  return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal ? cellVal :"") + '</span>';
+        }
+        function assignedFormatter(cellVal,options,rowObject) {
+      	  return '<span class="cellWithoutBackground pointer" id="assignedToName_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal ? cellVal :"") + '</span>';
+      	}
+        function statusFormatter(cellVal,options,rowObject){
+            return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
+         }
+
+        function updatedFormatter(cellVal,options,rowObject){
+        	 return '<span id="span_'+options.rowId+'" class="cellWithoutBackground '+rowObject[14] +'" onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
+        }
+        function dueFormatter(cellVal,options,rowObject){
+       	 	return '<span id="span_'+options.rowId+'" class=" '+rowObject[15] +'" onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
+        }
+        function assetFormatter(cellVal,options,rowObject){
+        	return '<span class="cellWithoutBackground pointer" onclick= "getEntityDetails(\'listComment\', \''+rowObject[4]+'\', '+rowObject[16]+')\" >' + (cellVal ? cellVal :"") + '</span>';
+        }
+
+        function populateFilter(){
+        	$("#gs_comment").val('${comment}')
+        	$("#gs_taskNumber").val('${taskNumber}')
+        	$("#gs_assetEntity").val('${assetName}')
+    	    $("#gs_assetType").val('${assetType}')
+    		$("#gs_dueDate").val('${dueDate}')
+    		$("#gs_status").val('${status}')
+    	    $("#gs_assignedTo").val('${assignedTo}')
+    		$("#gs_role").val('${role}')
+    		$("#gs_category").val('${category}')
+        }     
         $(document).keyup(function(e) {
         	// esc to stop timer
        	    if (e.keyCode == 27) { if(B2 != '' && taskManagerTimePref != 0){ B2.Restart( taskManagerTimePref ); }}   
        	});
-        	        
+
+
 	</script>
 </head>
 <body>
@@ -74,18 +148,19 @@
 			<div>
 			<div>
 			<input type="hidden" id="manageTaskId" value="manageTask"/>
-			<form name="commentForm" id="commentForm" action="listTasks">
+			<g:render template="commentCrud"/> 
+			<form name="commentForm" id="commentForm" method="post" action="listTasks">
 			<input type="hidden" name="justRemaining" id="justRemaining" value="${justRemaining}" />
 			<input type="hidden" name="justMyTasks"   id="justMyTasks"   value="${justMyTasks}"/>
 			<span >
 				<b>Move Event </b>
-			 	<g:select from="${moveEvents}" name="moveEvent" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
+			 	<g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
 				&nbsp;&nbsp;
 				<input type="checkbox" id="justRemainingCB" ${ (justRemaining == '1' ? 'checked="checked"': '') } onclick="toggleCheckbox(this, 'justRemaining');"  />
-				<b> Just Remaining Tasks</b>
+				<b> <label for="justRemainingCB" >Just Remaining Tasks</label></b>
 				&nbsp;&nbsp;
 				<input type="checkbox" id="justMyTasksCB" ${ (justMyTasks=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'justMyTasks');"/>
-				<b> Just My Tasks</b>&nbsp;&nbsp;
+				<b><label for="justMyTasksCB" > Just My Tasks</label></b>&nbsp;&nbsp;
 				<span style="float:right;">
 					<span class="menuButton"><g:link class="create" controller="task" action="moveEventTaskGraph"
 						params="[moveEventId:filterEvent,mode:'s']">View Task Graph</g:link>
@@ -104,59 +179,7 @@
 				</span>
 			</span>
 			<br/></br>
-				<jmesa:tableFacade id="tag" items="${assetCommentList}" maxRows="50" stateAttr="restore" var="commentInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100,250,500,1000" >
-					<jmesa:htmlTable style=" border-collapse: separate" editable="true">
-						<jmesa:htmlRow highlighter="true" style="cursor: pointer;" >
-							<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" nowrap>
-				        		<a href="javascript:showAssetComment(${commentInstance?.id}, 'edit')"><img src="${g.resource(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
-							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="taskNumber" title="Task" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-								<span id="taskNumber_${commentInstance?.id}"  onclick="getActionBar(this.id)">${commentInstance.taskNumber ? commentInstance.taskNumber :''}</span>
-							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Description" nowrap>
-								<span id="description_${commentInstance?.id}" onclick="getActionBar(this.id)">${StringUtil.ellipsis(commentInstance.description, 45)}</span>
-							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="assetName" title="Asset" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-        	                 	<span onclick="javascript:getEntityDetails('listComment', '${commentInstance.assetType}', '${commentInstance.assetEntityId}');">${commentInstance.assetName}</span>
-							</jmesa:htmlColumn>
-							<jmesa:htmlColumn width="50px" property="assetType" sortable="true" filterable="true" title="AssetType">
-                	         	<span id="assetType_${commentInstance?.id}" onclick="getActionBar(this.id)">${commentInstance?.assetType == 'Files' ? 'Storage' : commentInstance?.assetType}</span>
-							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="lastUpdated" title="Updated" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-								<span id="lastUpdated_${commentInstance?.id}" onclick="getActionBar(this.id)" class="span_${commentInstance.updatedClass}"><tds:elapsedAgo start="${commentInstance.lastUpdated}" end="${TimeUtil.nowGMT()}"/></span>
-							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="dueDate" title="Due" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-							 	<span id="dueDate_${commentInstance?.id}" onclick="getActionBar(this.id)" class="${commentInstance.dueClass}">
-								<tds:convertDate date="${commentInstance.dueDate}" format="${commentInstance.isRunbookTask() ? 'MM/dd kk:mm:ss' : 'MM/dd'}"/></span>
-							</jmesa:htmlColumn>
-							
-							<jmesa:htmlColumn property="status" title="Status" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-							 	<span id="status_${commentInstance?.id}" onclick="getActionBar(this.id);" class="span_${commentInstance.statusClass}">${commentInstance.status}</span>
-							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="assignedTo" title="Assigned To" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-        	                 	<span id="assignedTo_${commentInstance?.id}" onclick="getActionBar(this.id);">${(commentInstance?.hardAssigned?'* ':'')}<span id="assignedToName_${commentInstance?.id}">${commentInstance.assignedTo?:''}</span></span>
-							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="role" title="Role" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-        	                 	<span id="role_${commentInstance?.id}" onclick="getActionBar(this.id);">${commentInstance.role}</span>
-							</jmesa:htmlColumn>
-							 <%--
-    	                     <jmesa:htmlColumn property="mustVerify" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-    	                     	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show')"><g:if test ="${commentInstance.mustVerify == 1}"></g:if><g:else><g:checkBox name="myVerifyBox" value="${true}" disabled="true"/></g:else></span>
-    	                     </jmesa:htmlColumn>
-        	                 --%>
-							<jmesa:htmlColumn width="50px" property="category" sortable="true" filterable="true" title="Category">
-                             	<span id="category_${commentInstance?.id}" onclick="getActionBar(this.id);">${commentInstance.category}</span>
-							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="succCount" title="Suc." sortable="true" filterable="true"  cellEditor="org.jmesa.view.editor.BasicCellEditor">
-							 	<span id="succCount_${commentInstance?.id}" onclick="getActionBar(this.id);">${ commentInstance.succCount}</span>
-							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="score" title="Score" sortable="true" filterable="false">
-							 	<span id="score__${commentInstance?.id}" onclick="getActionBar(this.id);">${commentInstance.score}</span>
-							</jmesa:htmlColumn>
-						</jmesa:htmlRow>
-					</jmesa:htmlTable>
-				</jmesa:tableFacade>
-			</form>
+				<jqgrid:wrapper id="taskListId" />
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 		      <span class="menuButton"><a class="create" href="javascript:createIssue('','','')">Create Issue/Task</a></span>
 	       	</div>
@@ -169,21 +192,19 @@
 			<tr>
 				<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
 				<td><g:select name="entity" from="['Server','Application','Database','Storage']" onchange='updateAssetsList(this.name, this.value)'></g:select></td>
-				<td><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></td>
+				<td><span id="Server"><g:select name="asset" from="${servers}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span></td>
 				<td><g:select name="dtype" from="${dependencyType.value}"  optionValue="value"></g:select></td>
 				<td><g:select name="status" from="${dependencyStatus.value}" optionValue="value"></g:select></td>
 			</tr>
 			</table>
 		</div>
 		<div style="display: none;">
-			<span id="Server"><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
-			<span id="Application"><g:select name="asset" from="${applications}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
-			<span id="Database"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
-			<span id="Storage"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+			<span id="Application"><g:select name="asset" from="${applications}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span>
+			<span id="Database"><g:select name="asset" from="${dbs}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span>
+			<span id="Storage"><g:select name="asset" from="${files}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span>
 		</div>
   </div>
   
- <g:render template="commentCrud"/> 
  </div>
  </div>
  <script type="text/javascript">
@@ -219,7 +240,7 @@ function toggleCheckbox(chkbox, field) {
 			if (sec>0){
 				this.to=setTimeout(function(){ oop.Time(); },1000);
 			}else{
-				pageRefresh();
+				submitForm();
 			}
 		},
 		Pause:function(sec){

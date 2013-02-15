@@ -42,21 +42,14 @@ class DatabaseController {
 		def filters = session.DB?.JQ_FILTERS
 		session.DB?.JQ_FILTERS = []
 		def project = securityService.getUserCurrentProject()
-		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') \
-				and project =:project order by assetName asc",[project:project])
-		def applications = Application.findAll('from Application where assetType = ? and project =? order by assetName asc',['Application', project])
-		def dbs = Database.findAll('from Database where assetType = ? and project =? order by assetName asc',['Database', project])
-		def files = Files.findAll('from Files where assetType = ? and project =? order by assetName asc',['Files', project])
-		
-		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		def entities = assetEntityService.entityInfo( project )
 		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
 		
 		return [assetDependency: new AssetDependency(),
-			servers : servers, applications : applications, dbs : dbs, files : files, dependencyType:dependencyType,
-			dependencyStatus:dependencyStatus,staffRoles:taskService.getRolesForStaff(),
+			servers : entities.servers, applications : entities.applications, dbs : entities.dbs, files : entities.files, 
+			dependencyStatus:entities.dependencyStatus,staffRoles:taskService.getRolesForStaff(),dependencyType:entities.dependencyType,
 			event:params.moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,
-			moveBundleId:params.moveBundleId, dbName:filters?.assetNameFilter ?:'', dbFormat:filters?.dbFormatFilter,
+			moveBundleId:params.moveBundleId, dbName:filters?.assetNameFilter ?:'', dbFormat:filters?.dbFormatFilter?:'',
 			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref]
 	}
 	

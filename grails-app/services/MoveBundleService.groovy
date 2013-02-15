@@ -26,6 +26,7 @@ class MoveBundleService {
 	def stateEngineService
 	def userPreferenceService
 	def sessionFactory
+	def assetEntityService
     
 	boolean transactional = true
 	
@@ -474,12 +475,7 @@ class MoveBundleService {
 			 planningConsoleList << ['dependencyBundle':assetDependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
 		 }
 		 
-		 def servers = AssetEntity.findAll("from AssetEntity where assetType in ('${AssetType.SERVER.toString()}','${AssetType.VM.toString()}','Blade') and project =$projectId order by assetName asc")
-		 def applications = Application.findAllByAssetTypeAndProject(AssetType.APPLICATION.toString(),projectInstance,[sort:'assetName'])
-		 def dbs = Database.findAllByAssetTypeAndProject(AssetType.DATABASE.toString(),projectInstance,[sort:'assetName'])
-		 def files = Files.findAllByAssetTypeAndProject(AssetType.FILES.toString(),projectInstance,[sort:'assetName'])
-		 def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-		 def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		def entities = assetEntityService.entityInfo( projectInstance )
  
 		 // Get the time that the bundles were processed
 		 String time
@@ -498,10 +494,11 @@ class MoveBundleService {
 		 
 		 def moveBundles = MoveBundle.findAllByProject(projectInstance)
  
-		 def map = [assetDependencyList:assetDependencyList, dependencyType:dependencyType, planningConsoleList:planningConsoleList,
-				 date:time, dependencyStatus:dependencyStatus, assetDependency:new AssetDependency(), dependencyBundleCount:dependencyBundleCount,
-				 servers:servers, applications:applications, dbs:dbs, files:files,moveBundle:moveBundleList,applicationListSize:applicationListSize,
-				 physicalListSize:physicalListSize,virtualListSize:virtualListSize,asset:'Apps',allMoveBundles:moveBundles]
+		 def map = [assetDependencyList:assetDependencyList, dependencyType:entities.dependencyType, planningConsoleList:planningConsoleList,
+				 date:time, dependencyStatus:entities.dependencyStatus, assetDependency:new AssetDependency(), dependencyBundleCount:dependencyBundleCount,
+				 servers:entities.servers, applications:entities.applications, dbs:entities.dbs, files:entities.files,moveBundle:moveBundleList,
+				 applicationListSize:applicationListSize, physicalListSize:physicalListSize,virtualListSize:virtualListSize,asset:'Apps',
+				 allMoveBundles:moveBundles]
 		 
 		 return map
 	 }

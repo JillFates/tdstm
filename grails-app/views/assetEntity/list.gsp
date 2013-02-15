@@ -14,10 +14,10 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+<link href="/tdstm/css/jqgrid/ui.jqgrid.css" rel="stylesheet" type="text/css">
+<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" 
+	href="/tdstm/plugins/jquery-ui-1.8.15/jquery-ui/themes/ui-lightness/jquery-ui-1.8.15.custom.css">
 <jqgrid:resources />
-<jqui:resources /> 
-<jqgrid:resources />
-
 <script type="text/javascript">
 // TODO : move this code to JS once verified in tmdev
 
@@ -51,7 +51,7 @@ var serialNumber = '${serialNumber}'
 var sortIndex = '${sortIndex}'
 var sortOrder = '${sortOrder}'
 var moveBundleId = '${moveBundleId}'
-var windowWidth = $(window).width()- 50;
+var windowWidth = $(window).width() - $(window).width()*5/100 ;
 var sizePref = '${sizePref}'
 <jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
@@ -97,6 +97,7 @@ var sizePref = '${sizePref}'
     $("#assetListId").jqGrid("editGridRow","new",
             {afterSubmit:deleteMessage});
      });
+    
 
 function myLinkFormatter (cellvalue, options, rowObjcet) {
 	var value = cellvalue ? cellvalue : ''
@@ -106,12 +107,12 @@ function myLinkFormatter (cellvalue, options, rowObjcet) {
 function myCustomFormatter (cellVal,options,rowObject) {
 	var editButton = '<a href="javascript:editEntity(\'assetEntity\',\''+rowObject[1]+'\','+options.rowId+')">'+
 			"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
-	if(rowObject[14]=='issue'){
+	if(rowObject[15]=='issue'){
 		var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
 			+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
 		editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
 			+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_red.png')}' border='0px'/>"+"</a></span>"
-	} else if (rowObject[14]=='comment') {
+	} else if (rowObject[15]=='comment') {
 		var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
 			+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
 		editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
@@ -188,9 +189,9 @@ function populateFilter(){
 <%-- This DIV is used by the Asset Dependency DIVs to populate the form --%>
 <div style="display: none;">
 <%-- The "Server" SELECT was duplicated above so we are leveraging it above by adding the SPAN tag there. --%>
-	<span id="Application"><g:select name="asset" from="${applications}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
-	<span id="Database"><g:select name="asset" from="${dbs}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
-	<span id="Storage"><g:select name="asset" from="${files}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></span>
+	<span id="Application"><g:select name="asset" from="${applications}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span>
+	<span id="Database"><g:select name="asset" from="${dbs}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span>
+	<span id="Storage"><g:select name="asset" from="${files}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span>
 </div>
 <script>
 	currentMenuId = "#assetMenu";

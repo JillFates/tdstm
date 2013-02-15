@@ -102,12 +102,12 @@ $(document).ready(function() {
 					<table style="float:left; border: 0px; margin-left: 10px;">
 						<tr>
 							<td style="width: 10px;text-align: right;">${openIssue}</td>
-							<td><g:link controller="assetEntity" action="listjqGrid" params="[filter:'openIssue', moveEvent:'0', justRemaining:1]" class="links">Open Tasks</g:link></td>
+							<td><g:link controller="assetEntity" action="listTasks" params="[filter:'openIssue', moveEvent:'0', justRemaining:1]" class="links">Open Tasks</g:link></td>
 						</tr>
 						<g:if test="${dueOpenIssue>0}">
 						<tr>
 						    <td style="width: 10px;text-align: right;color: red;"><b>${dueOpenIssue}</b></td>
-							<td><g:link controller="assetEntity" action="listjqGrid" params="[filter:'dueOpenIssue', moveEvent:'0', justRemaining:1]" class="links">Overdue</g:link></td>
+							<td><g:link controller="assetEntity" action="listTasks" params="[filter:'dueOpenIssue', moveEvent:'0', justRemaining:1]" class="links">Overdue</g:link></td>
 						</tr>
 						</g:if>
 					</table>
@@ -182,12 +182,12 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${issuesCount}</td>
-							<td style="width: 150px;"><g:link controller="assetEntity" action="listjqGrid" params="[filter:'analysisIssue', justRemaining:0, moveEvent:0]" class="links">Open Tasks</g:link></td>
+							<td style="width: 150px;"><g:link controller="assetEntity" action="listTasks" params="[filter:'analysisIssue', justRemaining:0, moveEvent:0]" class="links">Open Tasks</g:link></td>
 						</tr>
 						<g:if test="${generalOverDue>0}">
 						<tr>
 						    <td style="width: 10px;text-align: right;color: red;"><b>${generalOverDue}</b></td>
-							<td><g:link controller="assetEntity" action="listjqGrid" params="[filter:'generalOverDue', justRemaining:1, moveEvent:0]" class="links">Overdue</g:link></td>
+							<td><g:link controller="assetEntity" action="listTasks" params="[filter:'generalOverDue', justRemaining:1, moveEvent:0]" class="links">Overdue</g:link></td>
 						</tr>
 						</g:if>
 					</table>
@@ -465,7 +465,7 @@ $(document).ready(function() {
 							</td>
 							<g:each in="${openTasks}" var="tasks">
 								<td style="text-align: right;"><b>
-									<g:link controller="assetEntity" action="listjqGrid" params="[moveEvent:tasks.moveEvent, justRemaining:1]" class="links">${tasks.count}</g:link>
+									<g:link controller="assetEntity" action="listTasks" params="[moveEvent:tasks.moveEvent, justRemaining:1]" class="links">${tasks.count}</g:link>
 								</b></td>
 							</g:each>
 							<td style="text-align: right;"></td>
