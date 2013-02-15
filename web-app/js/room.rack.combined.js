@@ -439,3 +439,8 @@ function updateCell(color){
 		$("#colorId option:selected").addClass(color)
 	}
 }
+function assignPowers(id){
+	if(confirm("Connect devices to power?")){
+		new Ajax.Request($("#contextPath").val()+'/rackLayouts/assignPowers?rackId='+id,{asynchronous:true,evalScripts:true,onSuccess:function(e){alert(e.responseText);}})
+	}
+}
