@@ -1277,7 +1277,7 @@ class AssetEntityController {
 			moveBundle:filters?.moveBundleFilter ?:'', model:filters?.modelFilter ?:'', sourceLocation:filters?.sourceLocationFilter ?:'', sourceRack:filters?.sourceRackFilter ?:'',
 			targetLocation:filters?.targetLocationFilter ?:'', targetRack:filters?.targetRackFilter ?:'', assetTag:filters?.assetTagFilter ?:'', 
 			serialNumber:filters?.serialNumberFilter ?:'', sortIndex:filters?.sortIndex, sortOrder:filters?.sortOrder, moveBundleId:params.moveBundleId,
-			sizePref:sizePref ]) 
+			staffRoles:taskService.getRolesForStaff(), sizePref:sizePref ]) 
 
 	}
 	/**
@@ -3309,12 +3309,30 @@ class AssetEntityController {
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
 		
+		if ( params.moveEvent?.size() > 0) {
+				// zero (0) = All events
+				// log.info "listCommentsOrTasks: Handling MoveEvent based on params ${params.moveEvent}"
+				if (params.moveEvent != '0') {
+					moveEvent = MoveEvent.findByIdAndProject(params.moveEvent,project)
+					if (! moveEvent) {
+						log.warn "listCommentsOrTasks: ${person} tried to access moveEvent ${params.moveEvent} that was not found in project ${project.id}"
+					}
+				}
+		} else {
+			// Try getting the move Event from the user's session
+			def moveEventId = userPreferenceService.getPreference('MOVE_EVENT')
+			// log.info "listCommentsOrTasks: getting MOVE_EVENT preference ${moveEventId} for ${person}"
+			if (moveEventId) {
+				moveEvent = MoveEvent.findByIdAndProject(moveEventId,project)
+			}
+		}
+		
 		render (view:'listTaskjqGrid' ,model:[timeToUpdate : timeToRefresh ?: 60,servers:servers, applications:applications, dbs:dbs,
 				files:files, dependencyType:dependencyType, dependencyStatus:dependencyStatus, assetDependency: new AssetDependency(),
 				moveEvents:moveEvents, filterEvent:filterEvent, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:params.filter,
 				comment:filters?.comment ?:'', taskNumber:filters?.taskNumber ?:'', assetName:filters?.assetEntity ?:'', assetType:filters?.assetType ?:'',
 				dueDate : filters?.dueDate ?:'', status : filters?.status ?:'', assignedTo : filters?.assignedTo ?:'', role: filters?.role ?:'',
-				category: filters?.category ?:'', moveEvent:moveEvent, sizePref:sizePref] )
+				category: filters?.category ?:'', moveEvent:moveEvent, staffRoles:taskService.getRolesForStaff(), sizePref:sizePref] )
 		
 	}
 	/**

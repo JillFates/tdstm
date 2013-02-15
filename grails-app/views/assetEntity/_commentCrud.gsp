@@ -206,7 +206,7 @@
 			<td valign="middle" nowrap="nowrap" colspan="3">
 				<span id="assignedCreateSpan"></span>&nbsp;/&nbsp;
 				<g:select id="roleType" name="roleType" from="${staffRoles}" noSelection="['':'Unassigned']" value="" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}" onChange="roleChange(this.value)"></g:select> &nbsp;
-				<input type="checkbox" id="hardAssigned" name="hardAssigned" value="1"  checked="checked"
+				<input type="checkbox" id="hardAssigned" name="hardAssigned" value="0"
 					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />&nbsp;
 				<label for="hardAssigned" >Fixed Assignment</label>&nbsp;&nbsp;
 			</td>
@@ -215,7 +215,7 @@
 			<td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
 			<td valign="top" class="value" colspan="3">
 				<g:select id="moveEvent" name="moveEvent" from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}"
-				 optionKey='id' optionValue="name" noSelection="['':'please select']"></g:select>
+				 optionKey='id' optionValue="name" noSelection="['':'please select']" value="${moveEvent?.id}"></g:select>
 			</td>
 		</tr>
 		<tr class="prop" >
@@ -253,6 +253,7 @@
             	</span>
             	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               	<span id="dueDateCreateSpanId" >
+              		 <label for="dueDateCreateId">Due Date:</label>
 	        		 <input type="text" class="dateEditRange" size="15" style="" name="dueDateCreateId" id="dueDateCreateId"
 							value="" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
             	</span>
