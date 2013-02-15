@@ -690,7 +690,7 @@ class MoveBundleController {
 		time = date ? formatter.format(date) : ''
 		
 		def today = new Date()
-		def issueQuery = "from AssetComment a  where a.assetEntity.project =:project and a.category in (:category) and a.status != :status"
+		def issueQuery = "from AssetComment a  where a.project =:project and a.category in (:category) and a.status != :status"
 		def issueArgs = [project:project, status:AssetCommentStatus.COMPLETED]
 		
 		def openIssue =  AssetComment.findAll(issueQuery,issueArgs << [category : ['discovery']]).size()
