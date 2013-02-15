@@ -690,8 +690,8 @@ class MoveBundleController {
 		time = date ? formatter.format(date) : ''
 		
 		def today = new Date()
-		def issueQuery = "from AssetComment a  where a.project =:project and a.category in (:category) and a.status != :status"
-		def issueArgs = [project:project, status:AssetCommentStatus.COMPLETED]
+		def issueQuery = "s a  where a.project =:project and a.category in (:category) and a.status != :status and a.commentType =:type"
+		def issueArgs = [project:project, status:AssetCommentStatus.COMPLETED, type:AssetCommentType.TASK.toString()]
 		
 		def openIssue =  AssetComment.findAll(issueQuery,issueArgs << [category : ['discovery']]).size()
 		def dueOpenIssue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs<< [category : ['discovery'], dueDate:today]).size()
