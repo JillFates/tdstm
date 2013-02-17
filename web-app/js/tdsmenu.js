@@ -145,62 +145,62 @@
 				if(e == "#adminMegaMenu"){
 					$("#adminMenuId a").css('background-color','lightblue');
 					$("#adminMenuId a").css('border-right-color','lightblue');
-					$("#adminMenuId a").css('color','#0366b0');
+					$("#adminMenuId a").css('color','#354E81');
 					$("#adminAnchor").css("display","inline")
 				}
 				if(e == "#projectMegaMenu"){
 					$("#projectMenuId a").css('background-color','lightblue');
 					$("#projectMenuId a").css('border-right-color','lightblue');
-					$("#projectMenuId a").css('color','#0366b0');
+					$("#projectMenuId a").css('color','#354E81');
 					$("#projectAnchor").css("display","inline")
 				}
 				if(e == "#racksMegaMenu"){
 					$("#roomMenuId a").css('background-color','lightblue');
 					$("#roomMenuId a").css('border-right-color','lightblue');
-					$("#roomMenuId a").css('color','#0366b0');
+					$("#roomMenuId a").css('color','#354E81');
 					$("#rackMenuId a").css('background-color','lightblue');
 					$("#rackMenuId a").css('border-right-color','lightblue');
-					$("#rackMenuId a").css('color','#0366b0');
+					$("#rackMenuId a").css('color','#354E81');
 					$("#rackAnchor").css("display","inline")
 				}
 				if(e == "#assetMegaMenu"){
 					$("#assetMenuId a").css('background-color','lightblue');
 					$("#assetMenuId a").css('border-right-color','lightblue');
-					$("#assetMenuId a").css('color','#0366b0');
+					$("#assetMenuId a").css('color','#354E81');
 					$("#assetAnchor").css("display","inline")
 					
 				}
 				if(e == "#bundleMegaMenu"){
 					$("#eventMenuId a").css('background-color','lightblue');
 					$("#eventMenuId a").css('border-right-color','lightblue');
-					$("#eventMenuId a").css('color','#0366b0');
+					$("#eventMenuId a").css('color','#354E81');
 					$("#bundleMenuId a").css('background-color','lightblue');
 					$("#bundleMenuId a").css('border-right-color','lightblue');
-					$("#bundleMenuId a").css('color','#0366b0');
+					$("#bundleMenuId a").css('color','#354E81');
 					$("#bundleAnchor").css("display","inline")
 				}
 				if(e == "#teamMegaMenu"){
 					$("#teamMenuId a").css('background-color','lightblue');
 					$("#teamMenuId a").css('border-right-color','lightblue');
-					$("#teamMenuId a").css('color','#0366b0');
+					$("#teamMenuId a").css('color','#354E81');
 					$("#teamAnchor").css("display","inline")
 				}
 				if(e == "#consoleMegaMenu"){
 					$("#consoleMenuId a").css('background-color','lightblue');
 					$("#consoleMenuId a").css('border-right-color','lightblue');
-					$("#consoleMenuId a").css('color','#0366b0');
+					$("#consoleMenuId a").css('color','#354E81');
 					$("#consoleAnchor").css("display","inline")
 				}
 				if(e == "#dashboardMegaMenu"){
 					$("#dashboardMenuId a").css('background-color','lightblue');
 					$("#dashboardMenuId a").css('border-right-color','lightblue');
-					$("#dashboardMenuId a").css('color','#0366b0');
+					$("#dashboardMenuId a").css('color','#354E81');
 					$("#dashboardAnchor").css("display","inline")
 				}
 				if(e == "#reportsMegaMenu"){
 					$("#reportsMenuId a").css('background-color','lightblue');
 					$("#reportsMenuId a").css('border-right-color','lightblue');
-					$("#reportsMenuId a").css('color','#0366b0');
+					$("#reportsMenuId a").css('color','#354E81');
 					$("#reportAnchor").css("display","inline")
 				}
 				if(e == "#userMegaMenu"){
@@ -216,38 +216,38 @@
 			resetmenu2();
 		}
 		function resetmenu2 () {
-			$("#adminMenuId a").css('background-color','#0366b0');
-			$("#adminMenuId a").css('border-right-color','#0366b0');
+			$("#adminMenuId a").css('background-color','#354E81');
+			$("#adminMenuId a").css('border-right-color','#354E81');
 			$("#adminMenuId a").css('color','#9ACAEE');
-			$("#projectMenuId a").css('background-color','#0366b0');
-			$("#projectMenuId a").css('border-right-color','#0366b0');
+			$("#projectMenuId a").css('background-color','#354E81');
+			$("#projectMenuId a").css('border-right-color','#354E81');
 			$("#projectMenuId a").css('color','#9ACAEE');
-			$("#roomMenuId a").css('background-color','#0366b0');
-			$("#roomMenuId a").css('border-right-color','#0366b0');
+			$("#roomMenuId a").css('background-color','#354E81');
+			$("#roomMenuId a").css('border-right-color','#354E81');
 			$("#roomMenuId a").css('color','#9ACAEE');
-			$("#rackMenuId a").css('background-color','#0366b0');
-			$("#rackMenuId a").css('border-right-color','#0366b0');
+			$("#rackMenuId a").css('background-color','#354E81');
+			$("#rackMenuId a").css('border-right-color','#354E81');
 			$("#rackMenuId a").css('color','#9ACAEE');
-			$("#assetMenuId a").css('background-color','#0366b0');
-			$("#assetMenuId a").css('border-right-color','#0366b0');
+			$("#assetMenuId a").css('background-color','#354E81');
+			$("#assetMenuId a").css('border-right-color','#354E81');
 			$("#assetMenuId a").css('color','#9ACAEE');
-			$("#eventMenuId a").css('background-color','#0366b0');
-			$("#eventMenuId a").css('border-right-color','#0366b0');
+			$("#eventMenuId a").css('background-color','#354E81');
+			$("#eventMenuId a").css('border-right-color','#354E81');
 			$("#eventMenuId a").css('color','#9ACAEE');
-			$("#bundleMenuId a").css('background-color','#0366b0');
-			$("#bundleMenuId a").css('border-right-color','#0366b0');
+			$("#bundleMenuId a").css('background-color','#354E81');
+			$("#bundleMenuId a").css('border-right-color','#354E81');
 			$("#bundleMenuId a").css('color','#9ACAEE');
-			$("#teamMenuId a").css('background-color','#0366b0');
-			$("#teamMenuId a").css('border-right-color','#0366b0');
+			$("#teamMenuId a").css('background-color','#354E81');
+			$("#teamMenuId a").css('border-right-color','#354E81');
 			$("#teamMenuId a").css('color','#9ACAEE');
-			$("#consoleMenuId a").css('background-color','#0366b0');
-			$("#consoleMenuId a").css('border-right-color','#0366b0');
+			$("#consoleMenuId a").css('background-color','#354E81');
+			$("#consoleMenuId a").css('border-right-color','#354E81');
 			$("#consoleMenuId a").css('color','#9ACAEE');
-			$("#dashboardMenuId a").css('background-color','#0366b0');
-			$("#dashboardMenuId a").css('border-right-color','#0366b0');
+			$("#dashboardMenuId a").css('background-color','#354E81');
+			$("#dashboardMenuId a").css('border-right-color','#354E81');
 			$("#dashboardMenuId a").css('color','#9ACAEE');
-			$("#reportsMenuId a").css('background-color','#0366b0');
-			$("#reportsMenuId a").css('border-right-color','#0366b0');
+			$("#reportsMenuId a").css('background-color','#354E81');
+			$("#reportsMenuId a").css('border-right-color','#354E81');
 			$("#reportsMenuId a").css('color','#9ACAEE');
 			$("#userMenuId").css('background-color','');
 			$("#adminAnchor").css('color','#9ACAEE')

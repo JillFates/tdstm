@@ -1,9 +1,9 @@
 #menubar {
-      border-top: 2px solid #0366b0;
-      border-right: 2px solid #0366b0;
-      border-bottom: 2px solid #0366b0;
-      border-left: 2px solid #0366b0;
-      background-color: #0366b0;
+      border-top: 2px solid #354E81;
+      border-right: 2px solid #354E81;
+      border-bottom: 2px solid #354E81;
+      border-left: 2px solid #354E81;
+      background-color: #354E81;
       color: #9ACAEE;
       height: 1.4em;
       line-height: 1.2em;
@@ -26,7 +26,7 @@
     .menu_new ul {
       display: none;
       position: absolute;
-      background-color: #0366b0;
+      background-color: #354E81;
       color: black;
       list-style: none;
       margin: 0.1em 0 0 -8px;
@@ -43,7 +43,7 @@
     }
     
     .menu_new ul li a {
-      background-color: #0366b0;
+      background-color: #354E81;
       width:180px;
       color: #9ACAEE;
       font:11px Tahoma;
@@ -88,10 +88,10 @@
     .tzmenu ul li a {
       background-color: #efefef;
       width:80px;
-      color: #0366b0;
+      color: #354E81;
       font:11px Tahoma;
 	  font-weight:bold;
-	  border:1px solid #0366b0;	
+	  border:1px solid #354E81;	
 	  text-align:left;
 	  padding:3px;
 	  display: block;  
@@ -99,7 +99,7 @@
     
     .tzmenu ul li a:hover {
       color: #ffffff;
-      background-color: #0366b0;
+      background-color: #354E81;
     }
     
     div.tzmenu:hover ul {
@@ -135,10 +135,10 @@
     .rack_menu ul li a {
       background-color: #efefef;
       width:80px;
-      color: #0366b0;
+      color: #354E81;
       font:11px Tahoma;
 	  font-weight:bold;
-	  border:1px solid #0366b0;	
+	  border:1px solid #354E81;	
 	  text-align:left;
 	  padding:3px;
 	  display: block;  
@@ -147,7 +147,7 @@
     
     .rack_menu ul li a:hover {
       color: #ffffff;
-      background-color: #0366b0;
+      background-color: #354E81;
     }
     
     div.rack_menu:hover ul {
@@ -165,7 +165,7 @@
     .menu_new_asset ul {
       display: none;
       position: absolute;
-      background-color: #0366b0;
+      background-color: #354E81;
       color: black;
       list-style: none;
       margin: 0.1em 0 0 -8px;
@@ -182,7 +182,7 @@
     }
     
     .menu_new_asset ul li a {
-      background-color: #0366b0;
+      background-color: #354E81;
       width:150px;
       color: #9ACAEE;
       font:11px Tahoma;
@@ -212,7 +212,7 @@
     .menu_normal ul {
       display: none;
       position: absolute;
-      background-color: #0366b0;
+      background-color: #354E81;
       color: black;
       list-style: none;
       margin: 0.1em 0 0 -8px;
@@ -228,7 +228,7 @@
     }
     
     .menu_normal ul li a {
-      background-color: #0366b0;
+      background-color: #354E81;
       width:180px;
       color: #9ACAEE;
       font:11px Tahoma;
