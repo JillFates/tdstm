@@ -238,7 +238,7 @@
           		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Are you sure you want to permanently clear transitions for assets in this bundle?');" value="Clear Asset History" action="clearBundleAssetHistory"/></span>
           </g:if>
               <span class="button" style="display:${!moveBundleInstance.tasksCreated ? 'block':'none'}">
-                <input type="button" id="createTasksInput" class="edit" value="Create Tasks" onclick="createTask(${moveBundleInstance?.id})">  
+                <input type="button" id="createTasksInput" class="edit" value="Generate Tasks" onclick="createTask(${moveBundleInstance?.id})">  
               </span>
               <span class="button"><input type="button" id="deleteTaskInput" class="edit" value="Delete Tasks" onclick="deleteTask(${moveBundleInstance?.id})">  </span>
           </tds:hasPermission>

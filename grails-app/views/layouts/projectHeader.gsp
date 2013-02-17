@@ -64,7 +64,7 @@
     	  		<img src="${createLink(controller:'project', action:'showImage', id:setImage)}" style="height: 30px;"/>
     	  	</g:if>
 	      	<g:else>      	
-     			<a href="http://www.transitionaldata.com/" target="new"><img src="${resource(dir:'images',file:'tds2.png')}" style="float: left;border: 0px;height: 30px;"/></a>      	    	 
+     			<a href="http://www.transitionaldata.com/" target="new"><img src="${resource(dir:'images',file:'tds3.png')}" style="float: left;border: 0px;height: 30px;"/></a>      	    	 
     		</g:else>
     	</div>
       <div class="title">&nbsp;TransitionManager&trade; 
@@ -85,7 +85,7 @@
 				<a id="userAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="showMegaMenu('#userMegaMenu')" href="javascript:showMegaMenu('#userMegaMenu')" style="float:left;display:inline"></a> </span>
 			</g:remoteLink>
 			</div>
-			<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>
+			<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EST' }</span>
 				time<ul>
 				<li><a href="javascript:setUserTimeZone('GMT')">GMT</a></li>
 				<li><a href="javascript:setUserTimeZone('PST')">PST</a></li>

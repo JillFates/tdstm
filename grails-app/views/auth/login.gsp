@@ -24,7 +24,7 @@
 	<tr>
 		<td style="text-align: center;">
 			<a href="http://www.transitionaldata.com/" target="new">
-			<img src="${resource(dir:'images',file:'tds2b.png')}" border="0" alt="Visit TDS" /></a>
+			<img src="${resource(dir:'images',file:'tds3b.png')}" border="0" alt="Visit TDS" /></a>
 			<br />
 			<h1>TransitionManager&trade;</h1>
 		</td>
