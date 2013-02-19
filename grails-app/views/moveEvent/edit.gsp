@@ -45,7 +45,7 @@
                                 </td>
 								<td rowspan="10" width="40%">
 									<label for="runbookRecipe">Runbook Recipe:</label><br/>
-									<textarea name="runbookRecipe" id="runbookRecipe" cols="80" rows="30" wrap="hard">${moveEventInstance.runbookRecipe}</textarea>
+									<textarea name="runbookRecipe" id="runbookRecipe" cols="80" rows="30" wrap="soft">${moveEventInstance.runbookRecipe}</textarea>
 								</td>
                             </tr> 
                         
