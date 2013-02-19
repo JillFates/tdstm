@@ -242,9 +242,9 @@ class ReportsService {
 		def assetId = assetEntityList.id
 		
 		def categories = ['shutdown','moveday','startup','physical','physical-source','physical-target']
-		def issues = AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in (:assetIds) and commentType ='issue' \
+		def issues = assetId ? AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in (:assetIds) and commentType ='issue' \
             and  isResolved =0 and comment.category not in (:categories) order by comment.assetEntity.assetName ",
-            [assetIds:assetEntityList.id, categories:categories])
+            [assetIds:assetId, categories:categories]) : []
 		def issue = ""
 		if(issues.size()>0){
 			issue +="""<span style="color: red;"><b>Asset Issues: Unresolved Issues  </b><br></br></span>"""
@@ -253,8 +253,8 @@ class ReportsService {
 			issue +="""<span style="color: green;"><b>Asset Issues: OK  </b><br></br></span>"""
 		}
 		
-		def specialInstruction = AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in (:assetIds)  and  mustVerify = 1 order by comment.assetEntity.assetName ",
-                                                        [assetIds : assetId])
+		def specialInstruction = assetId ? AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in (:assetIds)  and  mustVerify = 1 order by comment.assetEntity.assetName ",
+                                                        [assetIds : assetId]) : []
 		def importantInstruction = ""
 		if(specialInstruction.size()>0){
 			importantInstruction +="""<span style="color: red;"><b>Special Instruction: </b><br></br></span>"""
@@ -264,9 +264,9 @@ class ReportsService {
 		}
 		
 		
-		Set questionedDependencies = AssetDependency.findAll("from AssetDependency dependency where (dependency.asset.id in (:assetIds) or \
+		Set questionedDependencies = assetId ? AssetDependency.findAll("from AssetDependency dependency where (dependency.asset.id in (:assetIds) or \
             dependency.dependent.id in (:assetIds)) and dependency.status in (:statuses) and dependency.asset.moveBundle.moveEvent = :event \
-            order by dependency.asset.assetName ",[assetIds : assetId, event:moveEventInstance, statuses:['Questioned','Unknown']]).asset.assetName
+            order by dependency.asset.assetName ",[assetIds : assetId, event:moveEventInstance, statuses:['Questioned','Unknown']]).asset.assetName : []
 
 		def questionedDependency = questionedDependencies.toList()
 		questionedDependency.sort()

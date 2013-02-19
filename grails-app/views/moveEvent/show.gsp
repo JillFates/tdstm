@@ -153,7 +153,7 @@
    	function markAssetsMoved( moveEventId ){
    		 $("#messageDiv").hide();
      	 $("#messageDiv").html("");
-     	 var confirmStatus = confirm("Marking all event assets as Moved can't be undone. Are you sure?")
+     	 var confirmStatus = confirm("Change asset locations to targets? (No undo, please backup prior)")
      	 if(confirmStatus){
 			$("#messageDiv").show();
 			$('#messageDiv').html("Setting assets to Moved, please wait...")			
