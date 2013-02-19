@@ -441,6 +441,45 @@ function updateCell(color){
 }
 function assignPowers(id){
 	if(confirm("Connect devices to power?")){
-		new Ajax.Request($("#contextPath").val()+'/rackLayouts/assignPowers?rackId='+id,{asynchronous:true,evalScripts:true,onSuccess:function(e){alert(e.responseText);}})
+		new Ajax.Request($("#contextPath").val()+'/rackLayouts/assignPowers?rackId='+id,{asynchronous:true,evalScripts:true,
+			onSuccess:function(e){
+				$("#anchor_"+id).html("<img src='../images/power-off.png' />")
+			 }})
 	}
 }
+function getAssignedDetails(forWhom, rackId){
+	var selectedBundles  = new Array()
+	var selectedSourceRoom =  new Array()
+	var selectedTargetRoom =  new Array()
+	if(forWhom == 'rack'){
+		$("#bundleId option:selected").each(function () {
+			selectedBundles.push($(this).val())
+	   	});
+		$("#sourceRackIdSelect option:selected").each(function () {
+			selectedSourceRoom.push($(this).val())
+	   	});
+		$("#targetRackIdSelect option:selected").each(function () {
+			selectedTargetRoom.push($(this).val())
+	   	});
+	} 
+	jQuery.ajax({
+		url: "../rackLayouts/getAssignedCables",
+		data: {'moveBundle':selectedBundles, 'sourcerack':selectedSourceRoom, 'targetrack':selectedTargetRoom, 'rackId':rackId},
+		type:'POST',
+		success: function(data) {
+			    if (data) {
+				    for(i=0;i<data.rackIds.length;i++){
+				    	var rackId = data.rackIds[i]
+					    var cssClass = data.data[rackId]
+				    	if(cssClass == "Assigned"){
+				    		$("#anchor_"+rackId).html("<img src='../images/power-off.png'/>")
+					    } else {
+					    	$("#anchor_"+rackId).html("<img src='../images/power-icon.png'/>")
+						}
+				    }
+				}
+		}
+	});
+   	
+}
+

@@ -67,8 +67,8 @@
 							<span id="span_${rackLayout?.rackId}" onclick="enableCreateIcon(${rackLayout?.rackId})"> 
 								<img src="../images/plus.gif" /></span>
 						</g:else>
-						<a id="span_${rackLayout?.rackId}" href="javascript:" onclick="assignPowers(${rackLayout?.rackId})"> 
-								<img src="${resource(dir:'images',file:'power-icon.png')}"  title="auto power"/></a>
+						<span id="anchor_${rackLayout?.rackId}" onclick="assignPowers(${rackLayout?.rackId})"> 
+						</span>
 					</tds:hasPermission>
 					</g:if>
 					 </h2>

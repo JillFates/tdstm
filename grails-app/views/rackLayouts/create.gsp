@@ -120,7 +120,8 @@
 				data: $(form).serialize(),
 				type:'POST',
 				success: function(data) {
-					$('#rackLayout').html(data);
+					getAssignedDetails('rack','');
+					$('#rackLayout').html(data);					
 				}
 			});
 	 		return false;

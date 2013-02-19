@@ -402,7 +402,12 @@ function getRackLayout( rackId ){
 		$("#rack_"+rackId).addClass("objectSelected")
 		
 		var forWhom = $("#auditCheckId").val() == 1 ? "room" : ""
-		new Ajax.Request('../rackLayouts/save',{asynchronous:true,evalScripts:true,onSuccess:function(e){updateRackPower( rackId )},onComplete:function(e){jQuery('#rackLayout').html(e.responseText);},parameters:moveBundleId+'rackId='+rackId+'&backView=off&showCabling=off&otherBundle='+otherBundle+'&bundleName=on&hideIcons=on&forWhom='+forWhom});return false;
+		new Ajax.Request('../rackLayouts/save',{asynchronous:true,evalScripts:true,
+			onSuccess:function(e){updateRackPower( rackId )},
+			onComplete:function(e){
+					jQuery('#rackLayout').html(e.responseText);
+					getAssignedDetails('room', rackId)
+				},parameters:moveBundleId+'rackId='+rackId+'&backView=off&showCabling=off&otherBundle='+otherBundle+'&bundleName=on&hideIcons=on&forWhom='+forWhom});return false;
 	}
 }
 </script>

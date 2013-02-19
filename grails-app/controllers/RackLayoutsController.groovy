@@ -18,6 +18,7 @@ class RackLayoutsController {
 	def sessionFactory
 	def taskService
 	def assetEntityService
+	def securityService
 	
 	def static final statusDetails = ["missing":"Unknown", "cabledDetails":"Assigned","empty":"Empty","cabled":"Cabled"]
 	
@@ -849,7 +850,7 @@ class RackLayoutsController {
 					assetCablePower.toConnectorNumber = null
 					assetCablePower.toPower = toPowers[i]
 					assetCablePower.color = 'Black'
-					assetCablePower.status = 'cabled'
+					assetCablePower.status = 'cabledDetails'
 					
 					if(!assetCablePower.save(flush:true)){
 						assetCablePower.errors.allErrors.each { println it }
@@ -858,6 +859,96 @@ class RackLayoutsController {
 			}
 		}
 		render "Rack ${rack.tag} wired"
+	}
+	
+	/**
+	 * this action is used to get info. of racks power cabling
+	 * @param : moveBundle[] : list of multiple bundle
+	 * @param : sourcerack[] : list of source racks
+	 * @param : targetrack[] : list of target racks
+	 * @return : json list
+	 */
+	def getAssignedCables = {
+		List bundleId = request.getParameterValues("moveBundle[]")
+		def sourceRacks = new ArrayList()
+		def targetRacks = new ArrayList()
+		def project = securityService.getUserCurrentProject()
+		def moveBundles = MoveBundle.findAllByProject( project )
+		def rackId = params.rackId
+		def racks = []
+		if(!rackId) {
+			if(bundleId && !bundleId.contains("all")){
+				def bundlesString = bundleId.toString().replace("[","(").replace("]",")")
+				moveBundles = MoveBundle.findAll("from MoveBundle m where id in ${bundlesString} ")
+			}
+			
+			if(request && request.getParameterValues("sourcerack[]") != ['none']) {
+				List rack = request.getParameterValues("sourcerack[]")
+				if(rack){
+					if(rack.contains("none")){
+						rack.remove("none")
+					}
+					if(rack && rack[0] == "") {
+						moveBundles.each{ bundle->
+							bundle.sourceRacks.each{ sourceRack->
+								if( !sourceRacks.contains( sourceRack ) )
+									sourceRacks.add( sourceRack )
+							}
+						}
+					} else {
+						rack.each {
+							def thisRack = Rack.get(new Long(it))
+							if( !sourceRacks.contains( thisRack ) )
+								sourceRacks.add( thisRack )
+						}
+					}
+				}
+				sourceRacks = sourceRacks.sort { it.tag }
+			}
+	
+			if(request && request.getParameterValues("targetrack[]") != ['none']) {
+				List rack = request.getParameterValues("targetrack[]")
+				if(rack){
+					if(rack.contains("none")){
+						rack.remove("none")
+					}
+					if(rack && rack[0] == "") {
+						moveBundles.each{ bundle->
+							bundle.targetRacks.each{ targetRack->
+								if( !targetRacks.contains( targetRack ) )
+									targetRacks.add( targetRack	)
+							}
+						}
+					} else {
+						rack.each {
+							def thisRack = Rack.get(new Long(it))
+							if( !targetRacks.contains( thisRack ) )
+								targetRacks.add( thisRack )
+						}
+					}
+				}
+				targetRacks = targetRacks.sort { it.tag }
+			}
+			racks = sourceRacks + targetRacks
+		} else if(racks.size() == 0 && rackId){
+			racks = Rack.findAllById(rackId)
+		}
+		def resultMap = [:]
+		racks.each{ racksObj->
+			def flag = "notAssigned"
+			racksObj.assets.each { asset->
+				def assetCablePowerList = AssetCableMap.findAllByFromAsset( asset ).findAll{it.fromConnectorNumber.type == "Power"}
+				resultMap << [(racksObj.id) : flag]
+				assetCablePowerList.each {assetCablePower->
+					if(assetCablePower.toPower) {
+						flag = "Assigned"
+						resultMap << [(racksObj.id) : flag]
+					}
+				}
+			}
+		}
+		def data = ['rackIds':racks.id,'data':resultMap]
+		render  data as JSON
 	}
 		
 }
