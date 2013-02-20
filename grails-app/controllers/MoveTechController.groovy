@@ -1,16 +1,16 @@
 /*
  * MoveTech Login 
  */
-/*import org.jsecurity.authc.AuthenticationException
-import org.jsecurity.authc.UsernamePasswordToken
-import org.jsecurity.SecurityUtils
+/*import org.apache.shiro.authc.AuthenticationException
+import org.apache.shiro.authc.UsernamePasswordToken
+import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder*/
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 class MoveTechController {
-    def jsecSecurityManager
+    def shiroSecurityManager
     def userPreferenceService
     def partyRelationshipService
     def stateEngineService
@@ -334,7 +334,7 @@ class MoveTechController {
             // Perform the actual login. An AuthenticationException
             // will be thrown if the username is unrecognised or the
             // password is incorrect.
-            this.jsecSecurityManager.login( authToken )
+            this.shiroSecurityManager.login( authToken )
             // Check User and Person Activi status
             if( barcodeText == "ct" ) {
 	            redirect ( controller:'moveTech', params:actionScreen )

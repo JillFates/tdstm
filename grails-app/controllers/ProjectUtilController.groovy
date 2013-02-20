@@ -3,7 +3,7 @@ import java.util.Date
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity

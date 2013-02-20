@@ -1,6 +1,7 @@
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
+
 class AuthFilters {
-	// List of controllers that we need to validate autorization on
+	// List of controllers that we need to validate authorization on
 	static webSvcCtrl = ['moveEventNews', 'wsDashboard']
   
 	def filters = {

@@ -1,6 +1,6 @@
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import com.tdssrc.grails.GormUtil
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 

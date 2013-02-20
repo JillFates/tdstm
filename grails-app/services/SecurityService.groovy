@@ -6,7 +6,7 @@
 
 import javax.servlet.http.HttpSession
 import org.springframework.web.context.request.RequestContextHolder
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 import com.tdsops.tm.enums.domain.RoleTypeGroup
  
  class SecurityService {

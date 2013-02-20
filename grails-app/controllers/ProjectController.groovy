@@ -1,6 +1,6 @@
 import grails.converters.JSON
 import java.text.SimpleDateFormat
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import org.jmesa.facade.TableFacade

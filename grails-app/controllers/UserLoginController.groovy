@@ -1,6 +1,6 @@
 import net.tds.util.jmesa.AssetEntityBean
-import org.jsecurity.crypto.hash.Sha1Hash;
-import org.jsecurity.SecurityUtils;
+import org.apache.shiro.crypto.hash.Sha1Hash;
+import org.apache.shiro.SecurityUtils;
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import java.text.SimpleDateFormat

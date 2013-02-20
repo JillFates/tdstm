@@ -6,7 +6,7 @@
  *
  */
 
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 
 import com.tds.asset.Application
 import com.tds.asset.AssetDependency
@@ -1369,6 +1369,11 @@ class TaskService {
 		
 		log.info "A total of $taskCount Tasks and $depCount Dependencies created in $elapsed"
 		return "<h2>Status:</h2> $taskCount Tasks and $depCount Dependencies created in $elapsed<h2>Exceptions:</h2>" + 
+			
+			
+			
+			
+			
 			exceptions.toString() + "<h2>Log:</h2>" + out.toString()
 		
 	}

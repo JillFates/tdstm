@@ -1,5 +1,5 @@
 package com.tdssrc.eav
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 /*
  * The EavAttributeAuditLog provides an audit log tracking the user, date and
  * reason for the change.  Any domains that extend EavEntityDatatypeAuditable will

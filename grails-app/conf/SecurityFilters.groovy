@@ -1,4 +1,5 @@
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
+
 class SecurityFilters {
     def filters = {
         // Creating, modifying, or deleting a Party,person, project,partyGroup requires the ADMIN role.

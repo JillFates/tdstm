@@ -1,6 +1,6 @@
 package com.tdssrc.grails;
 
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 
 public class GormUtil {
 	def public static allErrorsString = { domain, separator=" : " ->

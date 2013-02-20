@@ -1,5 +1,5 @@
 import java.text.SimpleDateFormat;
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 import com.tdssrc.grails.GormUtil
 /**
  * The StepSnapshot domain represents a point in time representation of the status of a Step in a MoveBundle. A group of

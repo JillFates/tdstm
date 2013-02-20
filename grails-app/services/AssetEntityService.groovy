@@ -1,5 +1,5 @@
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 
 import com.tds.asset.Application
 import com.tds.asset.ApplicationAssetMap

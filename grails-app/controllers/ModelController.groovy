@@ -12,7 +12,7 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
 

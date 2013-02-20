@@ -8,7 +8,7 @@ import net.tds.util.jmesa.NewsEditorBean
 
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity

@@ -2,7 +2,7 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
 
 import com.tdssrc.grails.GormUtil

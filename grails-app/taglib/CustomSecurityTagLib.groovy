@@ -1,7 +1,7 @@
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 
 import com.tdssrc.grails.GormUtil;
 

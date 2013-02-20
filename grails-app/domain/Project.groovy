@@ -1,5 +1,5 @@
 import com.tdssrc.grails.GormUtil
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 
 class Project extends PartyGroup {
 

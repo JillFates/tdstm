@@ -1,12 +1,13 @@
-import org.jsecurity.authc.AuthenticationException
-import org.jsecurity.authc.UsernamePasswordToken
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.authc.AuthenticationException
+import org.apache.shiro.authc.UsernamePasswordToken
+import org.apache.shiro.SecurityUtils
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 
 class AuthController {
-    def jsecSecurityManager
+	
+    def shiroSecurityManager
     def userPreferenceService
 
     def index = { redirect(action: 'login', params: params) }
@@ -37,7 +38,7 @@ class AuthController {
 	            // Perform the actual login. An AuthenticationException
 	            // will be thrown if the username is unrecognised or the
 	            // password is incorrect.
-	            this.jsecSecurityManager.login(authToken)
+	            SecurityUtils.subject.login(authToken)
 	            // Check User and Person Activi status
 	            
 	            def activeStatus = userPreferenceService.checkActiveStatus()

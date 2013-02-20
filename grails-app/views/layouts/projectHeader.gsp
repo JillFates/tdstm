@@ -74,7 +74,7 @@
       </div>
         <div class="header_right" id="userMenuId"><br />
           <div style="font-weight: bold;">
-          <jsec:isLoggedIn>
+          <shiro:isLoggedIn>
 			<strong>
 			<div style="float: left;">
 			<g:if test="${isIE6}">
@@ -100,7 +100,7 @@
 			</div>
 			</strong>
               &nbsp;&nbsp;<g:link controller="auth" action="signOut"></g:link>
-          </jsec:isLoggedIn>
+          </shiro:isLoggedIn>
           </div>
         </div>
       </div>

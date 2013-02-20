@@ -940,10 +940,10 @@
 			for( i = 0; i < steps.length; i++ ) {
 				var percentage = $("#percentage_"+moveBundleId+"_"+steps[i].tid).html()
 				if(percentage != "100%" && percentage != "0%"){
-					<jsec:hasAnyRole in="['ADMIN']">
+					<shiro:hasAnyRole in="['ADMIN']">
 					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).show();
 					post_init( "chart_"+moveBundleId+"_"+steps[i].tid, steps[i].dialInd )
-					</jsec:hasAnyRole>
+					</shiro:hasAnyRole>
 				} else {
 					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).hide();
 				}

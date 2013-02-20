@@ -3,7 +3,7 @@
  * aggregate of MoveBundle.MoveBundleStep.StepSnapshot records.  These records are created as part of the MoveBundleService.
  */
 import com.tdssrc.grails.GormUtil
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 
 class MoveEventSnapshot {
 	static final String TYPE_PLANNED="P"

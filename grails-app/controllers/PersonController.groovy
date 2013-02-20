@@ -7,8 +7,8 @@ import net.tds.util.jmesa.PersonBean
 
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
-import org.jsecurity.SecurityUtils
-import org.jsecurity.crypto.hash.Sha1Hash
+import org.apache.shiro.SecurityUtils
+import org.apache.shiro.crypto.hash.Sha1Hash
 
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil

@@ -1,4 +1,4 @@
-import org.jsecurity.SecurityUtils;
+import org.apache.shiro.SecurityUtils;
 
 /*---------------------------------------
  * @author : Lokanath Reddy

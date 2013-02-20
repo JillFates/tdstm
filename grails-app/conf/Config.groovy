@@ -55,9 +55,12 @@ grails.plugin.databasemigration.updateOnStartFileNames = ['changelog.groovy']
 grails.plugin.databasemigration.dbDocController.enabled = true
 
 //
-// For JSecurity
+// For Shiro Security Plugin
 //
-jsecurity.legacy.filter.enabled = true
+// jsecurity.legacy.filter.enabled = true
+security.shiro.annotationdriven.enabled = true
+// fix the strategy in Config.groovy to point to (http://groovy-grails.blogspot.com/search?q=shiro)
+security.shiro.authentication.strategy = new org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy()
 
 //
 // SendMail Configuration

@@ -1,4 +1,4 @@
-import org.jsecurity.crypto.hash.Sha1Hash
+import org.apache.shiro.crypto.hash.Sha1Hash
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdssrc.eav.*
@@ -7,6 +7,9 @@ import com.tdssrc.grails.GormUtil
 
 import groovy.sql.Sql
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+
+import org.apache.shiro.crypto.hash.Sha256Hash
+
 
 class BootStrap {
 	def assetEntityAttributeLoaderService
@@ -23,6 +26,12 @@ class BootStrap {
 		if ( grails.util.GrailsUtil.environment.equals("production") ) return
 
 		// createInitialData()
+		
+		def john = UserLogin.read(11)
+		john.password = new Sha256Hash("xyzzy").toHex()
+		if (! john.save()) {
+			log.error "had an issue with setting John's password"
+		}
 		
 	}
 		

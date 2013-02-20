@@ -1,6 +1,6 @@
 import javax.servlet.http.HttpSession
 
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 import org.springframework.web.context.request.RequestContextHolder
 
 import com.tds.asset.ApplicationAssetMap

@@ -1,7 +1,7 @@
 import grails.converters.JSON
 
 import org.apache.poi.hssf.record.formula.functions.T
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetEntity

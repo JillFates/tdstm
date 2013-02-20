@@ -57,7 +57,7 @@
       </div>
         <div class="header_right"><br />
           <div style="font-weight: bold;">
-          <jsec:isLoggedIn>
+          <shiro:isLoggedIn>
           	<g:if test="${isIE6}">
 				<span><img title="Note: MS IE6 has limited capability so functions have been reduced." src="${resource(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
 			</g:if>
@@ -84,7 +84,7 @@
 	              </strong>
               </g:remoteLink>
               &nbsp;<g:link controller="auth" action="signOut">sign out</g:link>
-          </jsec:isLoggedIn>
+          </shiro:isLoggedIn>
           </div>
         </div>
       </div>
@@ -93,9 +93,9 @@
          <div class="menu1">
           <ul>
             <li><g:link class="home" controller="projectUtil">Project Manager</g:link></li>
-            <jsec:hasRole name="ADMIN">
+            <shiro:hasRole name="ADMIN">
               <li><g:link class="home" controller="auth" action="home">Administration </g:link> </li>
-            </jsec:hasRole>
+            </shiro:hasRole>
           </ul>
         </div> 
         </div>--%>
@@ -113,10 +113,10 @@
     <li><g:link class="home" controller="projectUtil">Main</g:link></li>
     <li><g:link class="home" controller="projectUtil"
         action="searchList">Search</g:link></li>
-    <jsec:hasRole name="CLIENT_ADMIN">
+    <shiro:hasRole name="CLIENT_ADMIN">
         <li><g:link class="home" controller="project" action="create">Add</g:link>
         </li>
-    </jsec:hasRole>
+    </shiro:hasRole>
     <li><a href="#">Import/Export</a></li>
 </ul>
 </div>

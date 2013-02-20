@@ -1,6 +1,6 @@
 package com.tdssrc.eav
 
-import org.jsecurity.SecurityUtils
+import org.apache.shiro.SecurityUtils
 class EavEntity {
 
 	Date dateCreated
