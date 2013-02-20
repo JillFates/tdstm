@@ -36,7 +36,7 @@ $(document).ready(function() {
 
 								<div class="dashboard_bar_graph" style="width: ${100 - percentageAppToValidate}%"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${100 - percentageAppToValidate}%</b>
-									<g:link controller="application" action="list" params="[validation:'Discovery']">Applications Validated</g:link>
+									<g:link controller="application" action="list" params="[filter:'applicationCount', validation:'Discovery']">Applications Validated</g:link>
 								</div>
 							</g:else>
 							</td>
@@ -229,7 +229,7 @@ $(document).ready(function() {
 
 								<div class="dashboard_bar_graph" style="width: ${100-percentageUnassignedAppCount}%"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${100-percentageUnassignedAppCount}%</b>
-									<g:link controller="application" action="list" params="[validation:'BundleReady']">Applications Assigned</g:link>
+									<g:link controller="application" action="list" params="[filter:'applicationCount',plannedStatus:'Unassigned']">Applications Assigned</g:link>
 								</div>
 							</g:else>
 							</td>
@@ -248,7 +248,7 @@ $(document).ready(function() {
 
 								<div class="dashboard_bar_graph" style="width: ${percentageAppCount}%"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${percentageAppCount}%</b>
-									<g:link controller="application" action="list" params="[tag_f_planStatus:'moved']">Applications Moved</g:link>
+									<g:link controller="application" action="list" params="[filter:'applicationCount', plannedStatus:'Moved']">Applications Moved</g:link>
 								</div>
 							</g:else>
 							</td>

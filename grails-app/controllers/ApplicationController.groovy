@@ -114,8 +114,8 @@ class ApplicationController {
 					}
 				}
 				
-				if( params.validation)
-					eq ('validation', params.validation)
+				if( params.validationFilter)
+					eq ('validation', params.validationFilter)
 				
 			    if( params.latency && params.latency =='unknown'){
 					or{

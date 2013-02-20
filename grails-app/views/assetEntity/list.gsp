@@ -84,7 +84,7 @@ var sizePref = '${sizePref}'
     viewrecords="true"
     showPager="true"
     postData="{filter: filter, event:event, type:type, plannedStatus:plannedStatus, assetName:assetName, planStatus:planStatus, moveBundle:moveBundle,
-   			 planStatus : planStatus,moveBundle : moveBundle, assetType:assetType , model :model , sourceLocation: sourceLocation , sourceRack:sourceRack,
+   			 moveBundle : moveBundle, assetType:assetType , model :model , sourceLocation: sourceLocation , sourceRack:sourceRack,
     		 targetLocation:targetLocation, targetRack :targetRack,assetTag :assetTag,serialNumber:serialNumber, moveBundleId:moveBundleId}"
     		 
     datatype="'json'">
@@ -142,7 +142,12 @@ function populateFilter(){
 	$("#gs_targetLocation").val('${targetLocation}')
 	$("#gs_targetRack").val('${targetRack}')
 	$("#gs_serialNumber").val('${serialNumber}')
-	$("#gs_planStatus").val('${planStatus}')
+	if(planStatus) {
+		$("#gs_planStatus").val(planStatus)
+	} else if (plannedStatus){
+		$("#gs_planStatus").val(plannedStatus)
+	}
+	
 	$("#gs_moveBundle").val('${moveBundle}')
 	$("#gs_assetTag").val('${assetTag}')
 }

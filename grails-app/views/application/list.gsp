@@ -68,7 +68,7 @@ $(document).ready(function() {
     multiselect="true"
     viewrecords="true"
     showPager="true"
-    postData="{filter: filter, event:event, latency:latency, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId,
+    postData="{filter: filter, event:event, latency:latency, plannedStatus:plannedStatus, validationFilter:validation, moveBundleId:moveBundleId,
     	assetName:appName, planStatus:planStatus, moveBundle:moveBundle, validation:validationFilter, sme:appSme}"
     datatype="'json'">
     <jqgrid:filterToolbar id="applicationId" searchOnEnter="false" />
@@ -118,8 +118,16 @@ function deleteMessage(response, postdata){
 function populateFilter(){
 	$("#gs_assetName").val('${appName}')
 	$("#gs_sme").val('${appSme}')
-	$("#gs_validation").val('${validationFilter}')
-	$("#gs_planStatus").val('${planStatus}')
+	if(validationFilter){
+		$("#gs_validation").val('${validationFilter}')
+	} else if( validation ) {
+		$("#gs_validation").val('${validation}')
+	}
+	if(planStatus){
+		$("#gs_planStatus").val('${planStatus}')
+	} else if( plannedStatus ){
+		$("#gs_planStatus").val( plannedStatus )
+	}
 	$("#gs_moveBundle").val('${moveBundle}')
 }
 
