@@ -1,14 +1,12 @@
 import grails.converters.JSON
 
 import org.apache.poi.hssf.record.formula.functions.T
-
-import com.tds.asset.Application
-import com.tds.asset.AssetCableMap
-import com.tds.asset.AssetEntity
-import com.tds.asset.Database
-import com.tds.asset.Files
 import org.hibernate.SessionFactory
-import com.tds.asset.AssetOptions
+
+import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
+import com.tdsops.tm.enums.domain.AssetCommentStatus
 
 class RoomController {
 
@@ -81,26 +79,41 @@ class RoomController {
 			def moveBundleList = []
 			def moveBundleId = params.moveBundleId
 			def racksList = []
+			def racks = []
+			def moveBundlesMap = MoveBundle.executeQuery("SELECT m.id as bundleId , m.name from MoveBundle m \
+					where m.project =:project",[project :project])
+			
+			LinkedList bundleLists = new LinkedList(moveBundlesMap);
+			bundleLists.addFirst(['taskReady', 'Task Ready'])
+			
 			if(moveBundleId && !moveBundleId.contains("all")){
-				def bundles = moveBundleId.split(",").collect{id-> Long.parseLong(id) }
-				moveBundleList = MoveBundle.findAllByIdInList(bundles)
-				moveBundleList.each{ moveBundle->
-					moveBundle.sourceRacks.findAll{it.room?.id == roomInstance?.id}.each{ sourceRack->
-						if( !racksList.contains( sourceRack ) )
-							racksList.add( sourceRack )
+				if (moveBundleId=="taskReady") {
+					def roomAssets =  roomInstance.sourceAssets + roomInstance.targetAssets
+					Set assetsByStatus = AssetComment.findAllByAssetEntityInListAndStatusInList(roomAssets,[AssetCommentStatus.STARTED, AssetCommentStatus.READY]).assetEntity
+				    racks = assetsByStatus.rackSource +  assetsByStatus.rackTarget
+					racks.removeAll([null])
+				} else {
+					def bundles = moveBundleId.split(",").collect{id-> Long.parseLong(id) }
+					moveBundleList = MoveBundle.findAllByIdInList(bundles)
+					moveBundleList.each{ moveBundle->
+						moveBundle.sourceRacks.findAll{it.room?.id == roomInstance?.id}.each{ sourceRack->
+							if( !racksList.contains( sourceRack ) )
+								racksList.add( sourceRack )
+						}
+						moveBundle.targetRacks.findAll{it.room?.id == roomInstance?.id}.each{ targetRack->
+							if( !racksList.contains( targetRack ) )
+								racksList.add( targetRack )
+						}
 					}
-					moveBundle.targetRacks.findAll{it.room?.id == roomInstance?.id}.each{ targetRack->
-						if( !racksList.contains( targetRack ) )
-							racksList.add( targetRack )
-					}
-				}
+				}				
 			} else {
 				racksList = Rack.findAllByRoom(roomInstance)
 				moveBundleList = [id:'all']
 			}
+			
             [roomInstance: roomInstance, roomInstanceList:roomInstanceList, moveBundleList:moveBundleList, project:project,
 			 racksList: racksList, source:params.source, target:params.target, projectId : projectId,
-			 auditPref:auditView, browserTestiPad:browserTestiPad]
+			 auditPref:auditView, browserTestiPad:browserTestiPad, statusList:racks, bundleList:bundleLists, moveBundleId:moveBundleId]
         }
     }
 

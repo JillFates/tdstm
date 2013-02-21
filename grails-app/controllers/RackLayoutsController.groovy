@@ -4,12 +4,10 @@ import org.apache.poi.hssf.record.formula.functions.T
 import org.apache.shiro.SecurityUtils
 
 import com.tds.asset.AssetCableMap
+import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdssrc.grails.GormUtil
-import com.tds.asset.Application
-import com.tds.asset.Database
-import com.tds.asset.Files
-import com.tds.asset.AssetOptions
 
 class RackLayoutsController {
 	def userPreferenceService
@@ -149,7 +147,7 @@ class RackLayoutsController {
 				racks = Rack.findAllById(rackId)
 				moveBundles = []
 				bundleId = request.getParameterValues("moveBundleId")
-				if(bundleId && !bundleId.contains("all")){
+				if(bundleId && !bundleId.contains("all") && !bundleId.contains("taskReady")){
 					def moveBundleId = bundleId.collect{id->Long.parseLong(id)}
 					moveBundles = MoveBundle.findAllByIdInList(moveBundleId)
 				}
@@ -420,14 +418,21 @@ class RackLayoutsController {
 					}
 				}
 				if(backView) {
+					def tasks = AssetComment.findAllByAssetEntityAndStatusInList(it.asset?.assetEntity, [AssetCommentStatus.STARTED, AssetCommentStatus.READY])
+					def taskAnchors = ""
+					tasks.each{
+						taskAnchors+="<a href='#' title='${it.taskNumber+':'+it.comment}' onclick=\"javascript:showAssetComment(${it.id},'show')\" >T</a> &nbsp;"
+					}
 					if(cabling != "" && it.cssClass != "rack_error"){
 						def assetCables = AssetCableMap.findByFromAsset(it.asset?.assetEntity)
 						if( hasBlades && showCabling != 'on'){
 							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
-							if ( assetCables )
-								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'>view</a></td>")
-							else
-								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp;</td>")
+							if ( assetCables ){
+								row.append("""<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' 
+										onclick='openCablingDiv(${it.asset?.assetEntity.id})'>view</a> 
+										&nbsp${taskAnchors}</td>""")
+							}else
+								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp;${taskAnchors}</td>")
 						} else {
 							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' colspan='3' class='${it.cssClass}'>")
 							row.append("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;'>${assetTag}</td>")
@@ -437,9 +442,9 @@ class RackLayoutsController {
 							else
 								row.append("<td style='border:0;'>&nbsp;</td>")
 							if ( assetCables )
-								row.append("<td style='border:0;'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'>view</a></td></tr>")
+								row.append("<td style='border:0;'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'>view &nbsp; ${taskAnchors}</a></td></tr>")
 							else
-								row.append("<td style='border:0;'>&nbsp;</td></tr>")
+								row.append("<td style='border:0;'>&nbsp;${taskAnchors}</td></tr>")
 								
 							row.append("<tr><td colspan='3' style='border:0;'>${cabling}</td></tr></table></td>")	
 						}
@@ -456,9 +461,9 @@ class RackLayoutsController {
 						if(it.cssClass != "rack_error") {
 							def assetCables = AssetCableMap.findByFromAsset(it.asset?.assetEntity)
 							if ( assetCables )
-								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'>view</a></td>")
+								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'>view ${taskAnchors}</a></td>")
 							else
-								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp;</td>")
+								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp; ${taskAnchors}</td>")
 							
 						} else {
 							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>Devices Overlap</td>")

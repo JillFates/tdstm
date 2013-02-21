@@ -31,12 +31,12 @@
 				<td style="vertical-align:top;width:150px;">
 					<div style="width: 150px"><label><b>Highlight Bundles: </b></label><br /><br />
 					  <g:if test="${browserTestiPad}">
-						<g:select id="bundleId" name="moveBundleId" from="${MoveBundle.findAllByProject(project)}" value="${moveBundleList.id}" optionKey="id" optionValue="name" noSelection="${['all':'All']}"
+						<g:select id="bundleId" name="moveBundleId" from="${bundleList}" value="${moveBundleId=='taskReady'? 'taskReady' :moveBundleList.id}" optionKey="id" optionValue="name" noSelection="${['all':'All']}"
 							onChange="getRackDetails('ipad')"
 						/>
 					  </g:if>
 					  <g:else>
-					  	<g:select id="bundleId" name="moveBundleId" from="${MoveBundle.findAllByProject(project)}" value="${moveBundleList.id}" optionKey="id" optionValue="name" noSelection="${['all':'All']}"
+					  	<g:select id="bundleId" name="moveBundleId" from="${bundleList}" value="${moveBundleId=='taskReady'? 'taskReady' :moveBundleList.id}" optionKey ="${-2}" optionValue ="${1}" noSelection="${['all':'All']}"
 					     	multiple="multiple" size="3" onChange="getRackDetails()"/>
 					  </g:else>
 					</div>
@@ -115,7 +115,7 @@
 				<g:if test="${rack.rackType == 'Rack'}">
 					<a href="#" onclick="getRackLayout(${rack.id })">
 	                 <g:if test="${rack?.model?.layoutStyle == null}">			
-					    <div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack?.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleList.id) ? 'rack_highlight_'+rack.front : source=='true' && rack.source == 1 ? 'rack_highlight_'+rack.front : target == 'true' && rack.source == 0 ? 'rack_highlight_'+rack.front : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_'+rack.front }">
+					    <div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack?.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleList.id) ? 'rack_highlight_'+rack.front :  statusList?.id.contains(rack.id) ? 'rack_highlight_'+rack.front : source=='true' && rack.source == 1 ? 'rack_highlight_'+rack.front : target == 'true' && rack.source == 0 ? 'rack_highlight_'+rack.front : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_'+rack.front }">
 					 </g:if>
 					 <g:else>
 					     <div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="${rack.model?.layoutStyle}">
