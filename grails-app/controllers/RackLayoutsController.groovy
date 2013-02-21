@@ -429,7 +429,7 @@ class RackLayoutsController {
 							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
 							if ( assetCables ){
 								row.append("""<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' 
-										onclick='openCablingDiv(${it.asset?.assetEntity.id})'>view</a> 
+										onclick='openCablingDiv(${it.asset?.assetEntity.id})'>cable</a> 
 										&nbsp${taskAnchors}</td>""")
 							}else
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp;${taskAnchors}</td>")
@@ -442,7 +442,7 @@ class RackLayoutsController {
 							else
 								row.append("<td style='border:0;'>&nbsp;</td>")
 							if ( assetCables )
-								row.append("<td style='border:0;'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'>view &nbsp; ${taskAnchors}</a></td></tr>")
+								row.append("<td style='border:0;'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'>cable &nbsp; ${taskAnchors}</a></td></tr>")
 							else
 								row.append("<td style='border:0;'>&nbsp;${taskAnchors}</td></tr>")
 								
@@ -461,7 +461,7 @@ class RackLayoutsController {
 						if(it.cssClass != "rack_error") {
 							def assetCables = AssetCableMap.findByFromAsset(it.asset?.assetEntity)
 							if ( assetCables )
-								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'>view ${taskAnchors}</a></td>")
+								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'>cable ${taskAnchors}</a></td>")
 							else
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp; ${taskAnchors}</td>")
 							

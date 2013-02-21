@@ -29,7 +29,7 @@
 					</div>
 				</td>
 				<td style="vertical-align:top;width:150px;">
-					<div style="width: 150px"><label><b>Highlight Bundles: </b></label><br /><br />
+					<div style="width: 150px"><label><b>Highlight : </b></label><br /><br />
 					  <g:if test="${browserTestiPad}">
 						<g:select id="bundleId" name="moveBundleId" from="${bundleList}" value="${moveBundleId=='taskReady'? 'taskReady' :moveBundleList.id}" optionKey="id" optionValue="name" noSelection="${['all':'All']}"
 							onChange="getRackDetails('ipad')"
