@@ -668,14 +668,19 @@ class MoveEventController {
 						def scheduleSheet = book.getSheet("Schedule")
 						
 						
-						def preMoveColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment','assignedTo', 'status','estStart','', 'notes']
+						def preMoveColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment','assignedTo', 'status','estStart','','', 'notes',
+								         				'duration', 'estStart','estFinish','actStart',
+								         				'actFinish', 'workflow']
 						
-						def sheduleColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role', 'assignedTo', 
-												 'duration', 'actStart','estFinish'
-												]
-						
-						def postMoveColumnList = ['taskNumber', 'assetEntity', 'comment','assignedTo', 'status', 'estFinish', 'dateResolved' , 'notes']
-						
+ 						def sheduleColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role', 'assignedTo', '',
+	 						        				'duration', 'estStart','estFinish', 'actStart','actFinish', 'workflow'
+ 						        				]
+
+	        			def postMoveColumnList = ['taskNumber', 'assetEntity', 'comment','assignedTo', 'status', 'estFinish', 'dateResolved' , 'notes',
+							        				'taskDependencies','duration','estStart','estFinish','actStart',
+							        				'actFinish','workflow'
+							        			]
+	        						
 						def serverColumnList = ['id', 'application', 'assetName', '','serialNumber', 'assetTag', 'manufacturer', 'model', 'assetType', '', '', '']
 						
 						def appColumnList = ['assetName', 'appVendor', 'appVersion', 'appTech', 'appAccess', 'appSource','license','description',
@@ -704,8 +709,9 @@ class MoveEventController {
 						   						]
 						
 						def unresolvedIssueColumnList = ['id', 'comment', 'commentType','commentAssetEntity','resolution','resolvedBy','createdBy',
-														 'dueDate','assignedTo','category','dateCreated','dateResolved'
-														]
+						              				'dueDate','assignedTo','category','dateCreated','dateResolved', 'assignedTo','status','taskDependencies','duration','estStart','estFinish','actStart',
+						              				'actFinish','workflow'
+						              			]
 						
 						
 						summarySheet.addCell( new Label( 1, 1, String.valueOf(project.name )) )

@@ -532,25 +532,28 @@ class MoveBundleService {
 				 def attribName = columnList[c]
 				 switch(attribName){
 					 case "taskDependencies":
-					 	cellValue = WebUtil.listAsMultiValueString(exportList[r-startRow]."${columnList[c]}"?.predecessor)
+					 	cellValue = WebUtil.listAsPipeSepratedString(exportList[r-startRow]."${columnList[c]}"?.predecessor)
 						break;
 					 case "assetEntity":
 					 	cellValue = exportList[r-startRow]."${columnList[c]}"?.assetType == "Application" ?  String.valueOf(exportList[r-startRow]."${columnList[c]}"?.assetName) : ''
 						break;
 					 case "duration":
-						 cellValue = exportList[r-startRow]."${columnList[c]}" ?  String.valueOf(exportList[r-startRow]."${columnList[c]}"+exportList[r-startRow].durationScale) : ''
+						cellValue = exportList[r-startRow]."${columnList[c]}" ?  String.valueOf(exportList[r-startRow]."${columnList[c]}"+exportList[r-startRow].durationScale) : ''
 						 break;
 					 case "commentAssetEntity":
-						 cellValue = exportList[r-startRow].assetEntity ?  String.valueOf(exportList[r-startRow].assetEntity?.assetName) : ''
+						cellValue = exportList[r-startRow].assetEntity ?  String.valueOf(exportList[r-startRow].assetEntity?.assetName) : ''
 						 break;
 					 case "notes":
-						 cellValue = exportList[r-startRow].notes ?  String.valueOf(WebUtil.listAsMultiValueString(exportList[r-startRow].notes)) : ''
+						cellValue = exportList[r-startRow].notes ?  String.valueOf(WebUtil.listAsMultiValueString(exportList[r-startRow].notes)) : ''
 						 break;
+					 case "workflow":
+						cellValue = exportList[r-startRow].workflowTransition ? String.valueOf(exportList[r-startRow].workflowTransition?.name) : ''
+						  break;
 				     case "":
-						 cellValue = ""
+						cellValue = ""
 						 break;
 					 default:
-						 cellValue = String.valueOf(exportList[r-startRow]?."${columnList[c]}" ?:'')
+						cellValue = String.valueOf(exportList[r-startRow]?."${columnList[c]}" ?:'')
 						 break;
 				 }
 				 sheet.addCell( new Label( c, r, cellValue) )

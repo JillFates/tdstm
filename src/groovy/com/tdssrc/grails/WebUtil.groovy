@@ -23,5 +23,16 @@ class WebUtil {
 		
 		return list
 	}
+	
+	/**
+	 * Returns multi-value String of a List
+	 */
+	def public static listAsPipeSepratedString = { param ->
+		
+		String list = param.toString()
+		list = list.replace("[","").replace("]","").replaceAll(",","|")
+		
+		return list
+	}
 
 }
