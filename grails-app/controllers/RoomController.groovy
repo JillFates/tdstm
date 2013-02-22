@@ -87,11 +87,12 @@ class RoomController {
 			bundleLists.addFirst(['taskReady', 'Task Ready'])
 			
 			if(moveBundleId && !moveBundleId.contains("all")){
-				if (moveBundleId=="taskReady") {
+				if (moveBundleId.contains("taskReady")) {
 					def roomAssets =  roomInstance.sourceAssets + roomInstance.targetAssets
 					Set assetsByStatus = AssetComment.findAllByAssetEntityInListAndStatusInList(roomAssets,[AssetCommentStatus.STARTED, AssetCommentStatus.READY]).assetEntity
 				    racks = assetsByStatus.rackSource +  assetsByStatus.rackTarget
 					racks.removeAll([null])
+					moveBundleId = 'taskReady'
 				} else {
 					def bundles = moveBundleId.split(",").collect{id-> Long.parseLong(id) }
 					moveBundleList = MoveBundle.findAllByIdInList(bundles)
