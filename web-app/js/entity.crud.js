@@ -546,6 +546,15 @@ function getAssetType(val){
 	)
 }
 
+function setType(id){
+	new Ajax.Request('../assetEntity/getAssetModelType?id='+id,{asynchronous:true,evalScripts:true,
+		onComplete:function(data){
+			$("#assetTypeId").val(data.responseText)
+		}}
+	)
+	
+}
+
 /*function updateModel(rackId,value){
 	var val = value;
 	new Ajax.Request('../assetEntity/getModelsList?='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){populateModelSelect(e,rackId);}})

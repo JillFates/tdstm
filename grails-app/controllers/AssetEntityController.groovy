@@ -1482,6 +1482,8 @@ class AssetEntityController {
 		def modelName = params.models
 		def manufacturerName = params.manufacturers
 		def assetType = params.assetType ?: 'Server'
+		userPreferenceService.setPreference("lastManufacturer", Manufacturer.read(params.manufacturer.id)?.name)
+		userPreferenceService.setPreference("lastType", assetType)
 		if(maintExpDate){
 			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
 		}
@@ -2772,11 +2774,12 @@ class AssetEntityController {
 	
 			def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 			def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute , [sort:"value"])
-			def assetType = params.assetType ? params.assetType : "Server"
+			def assetType = userPreferenceService.getPreference("lastType") ?: "Server"
 			def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
-			def manufacuterer = params.manufacturer ? Manufacturer.read(params.manufacturer) : manufacturers[0]
+			def sessionManu = userPreferenceService.getPreference("lastManufacturer")
+			def manufacuterer =  sessionManu ? Manufacturer.findByName(sessionManu) : manufacturers[0]
 			
-			def models =  Model.findAllByManufacturer( manufacuterer,[sort:'modelName',order:'asc'] )?.findAll{it.assetType == assetType }
+			def models =  Model.findAllByManufacturer( manufacuterer,[sort:'modelName',order:'asc'] )//?.findAll{it.assetType == assetType }
 			
 			def moveBundleList = MoveBundle.findAllByProject(project)
 			
@@ -2791,7 +2794,7 @@ class AssetEntityController {
 			def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 								planStatusOptions:planStatusOptions?.value, projectId:project.id ,railTypeOption:railTypeOption?.value,
 								priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers,redirectTo:params?.redirectTo,
-								models:models]
+								models:models, assetType:assetType, manufacuterer:manufacuterer]
 			 
 			 if(params.redirectTo == "assetAudit") {
 				 paramsMap << ['source':params.source, 'assetType':params.assetType]
@@ -2875,7 +2878,7 @@ class AssetEntityController {
 
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute,[sort:"value"])
 		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetEntityInstance.assetType])?.manufacturer
-		def models = assetEntityInstance.manufacturer ? Model.findAllByManufacturer( assetEntityInstance.manufacturer,[sort:'modelName',order:'asc'] )?.findAll{it.assetType == assetEntityInstance.assetType } : []
+		def models = assetEntityInstance.manufacturer ? Model.findAllByManufacturer( assetEntityInstance.manufacturer,[sort:'modelName',order:'asc'] ): []
 
 
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
@@ -2926,6 +2929,9 @@ class AssetEntityController {
 		def modelName = params.models
 		def manufacturerName = params.manufacturers
 		def assetType = params.assetType ?: 'Server'
+		userPreferenceService.setPreference("lastManufacturer", Manufacturer.read(params.manufacturer.id)?.name)
+		userPreferenceService.setPreference("lastType", assetType)
+		
 		if(maintExpDate){
 			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
 		}
@@ -3010,15 +3016,10 @@ class AssetEntityController {
 	}
 	def getModelsList = {
 		def manufacturer = params.manufacturer
-		def assetType = params.assetType
 		def models
 		if(manufacturer!="null"){
 			def manufacturerInstance = Manufacturer.read(manufacturer)
-			if(assetType){
-				models = manufacturerInstance ? Model.findAllByManufacturer( manufacturerInstance,[sort:'modelName',order:'asc'] )?.findAll{it.assetType == assetType } : null
-			} else {
-				models = Model.findAllByManufacturer( manufacturerInstance,[sort:'modelName',order:'asc'] )
-			}
+			models = Model.findAllByManufacturer( manufacturerInstance,[sort:'modelName',order:'asc'] )
 		}
 		render (view :'ModelView' , model:[models : models])
 	}
@@ -3896,6 +3897,20 @@ class AssetEntityController {
 			return
 		}
 	 return
+	}
+	
+	/**
+	 * Fetch Asset's modelType to use to select asset type fpr asset acording to model 
+	 * @param : id - Requested model's id
+	 * @return : assetType if exist for requested model else 0
+	 */
+    def getAssetModelType = {
+		def assetType = 0
+		if(params.id && params.id.isNumber()){
+			def model = Model.read( params.id )
+			assetType = model.assetType ?: 0
+		} 
+	 render assetType
 	}
     
 }
