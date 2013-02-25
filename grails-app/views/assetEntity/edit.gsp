@@ -25,7 +25,7 @@
 <input type="hidden" id="asset_serialNumber" name="serialNumberFilter" value="" />
 <input type="hidden" id="asset_planStatus" name="planStatusFilter" value="" />
 <input type="hidden" id="asset_assetTag" name="assetTagFilter" value="" />
-
+<g:set var="isBlade" value="${assetEntityInstance.assetType == 'Blade' ? false : true}"/>
 	<table style="border:0;width:1000px;">
 		<tr>
 			<td colspan="2">
@@ -104,9 +104,9 @@
 								<td ><input type="text" id="os" name="os" value="${assetEntityInstance.os}"  tabindex="24"/></td>
 								<td class="label" nowrap="nowrap"><label for="sourceRackId">Rack/Cab</label></td>
 								<td><input type="text" id="sourceRackId"
-									name="sourceRack" value="${assetEntityInstance.rackSource?.tag}" size=10 tabindex="33"/></td>
+									name="sourceRack" value="${assetEntityInstance.rackSource?.tag}" size=10 tabindex="33"  ${assetEntityInstance.assetType == 'Blade' ? 'disabled="disabled"' : '' }/></td>
 									<td><input type="text" id="targetRackId"
-									name="targetRack" value="${assetEntityInstance.rackTarget?.tag}" size=10 tabindex="44" /></td>
+									name="targetRack" value="${assetEntityInstance.rackTarget?.tag}" size=10 tabindex="44" ${assetEntityInstance.assetType == 'Blade' ? 'disabled="disabled"' : '' }/></td>
 								<td class="label" nowrap="nowrap"><label for="custom4">${assetEntityInstance.project.custom4 ?: 'Custom4' }</label></td>
 								<td ><input type="text" id="custom4" name="custom4" value="${assetEntityInstance.custom4}" size=8 tabindex="53" /></td>
 							</tr>
@@ -122,9 +122,9 @@
 								
 								<td class="label" nowrap="nowrap"><label for="sourceRackPositionId">Position</label>
 								<td><input type="text" id="sourceRackPositionId"
-									name="sourceRackPosition" value="${assetEntityInstance.sourceRackPosition}" size=10 tabindex="34" /></td>
+									name="sourceRackPosition" value="${assetEntityInstance.sourceRackPosition}" size=10 tabindex="34" ${assetEntityInstance.assetType == 'Blade' ? 'disabled="disabled"' : '' }/></td>
 									<td><input type="text" id="targetRackPositionId"
-									name="targetRackPosition" value="${assetEntityInstance.targetRackPosition}" size=10 tabindex="44"/></td>
+									name="targetRackPosition" value="${assetEntityInstance.targetRackPosition}" size=10 tabindex="44"  ${assetEntityInstance.assetType == 'Blade' ? 'disabled="disabled"' : '' }/></td>
 								</td>
 								<td class="label" nowrap="nowrap"><label for="custom5">${assetEntityInstance.project.custom5 ?: 'Custom5' }</label></td>
 								<td ><input type="text" id="custom5" name="custom5" value="${assetEntityInstance.custom5}" size=8 tabindex="54"/></td>
@@ -142,10 +142,14 @@
 									value="<tds:convertDate date="${assetEntityInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" tabindex="27" />" > 
 								</td>
 								<td class="label" nowrap="nowrap"><label for="sourceBladeChassis">Blade</label></td>
-								<td><input type="text" id="sourceBladeChassis"
-									name="sourceBladeChassis" value="${assetEntityInstance.sourceBladeChassis}" size=10 tabindex="35"/></td>
-									<td><input type="text" id="targetBladeChassis"
-									name="targetBladeChassis" value="${assetEntityInstance.targetBladeChassis}" size=10 tabindex="45" /></td>
+								<td>
+									<g:select id='sourceBladeChassis' from='${sourceChassisSelect}' optionKey='${-2}' optionValue='${1}'
+									  name="sourceBladeChassis" disabled="${isBlade}"  value="${assetEntityInstance.sourceBladeChassis}" noSelection="${['':' Please Select']}"/>
+								</td>
+									<td>
+										<g:select id='targetBladeChassis' from='${targetChassisSelect}' optionKey='${-2}' optionValue='${1}'
+										name="targetBladeChassis" disabled="${isBlade}"  value="${assetEntityInstance.targetBladeChassis}" noSelection="${['':' Please Select']}"/>
+									</td>
 								<td class="label" nowrap="nowrap"><label for="custom6">${assetEntityInstance.project.custom6 ?: 'Custom6' }</label></td>
 								<td ><input type="text" id="custom6" name="custom6" value="${assetEntityInstance.custom6}" size=8 tabindex="55" /></td>
 							</tr>
@@ -161,9 +165,9 @@
 								</td>
 								<td class="label" nowrap="nowrap"><label for="sourceBladePosition">Blade Position</label></td>
 								<td><input type="text" id="sourceBladePosition"
-									name="sourceBladePosition" value="${assetEntityInstance.sourceBladePosition}" size=10 tabindex="36"/></td>
+									name="sourceBladePosition" value="${assetEntityInstance.sourceBladePosition}" size=10 tabindex="36" ${assetEntityInstance.assetType != 'Blade' ? 'disabled="disabled"' : '' }/></td>
 									<td><input type="text" id="targetBladePosition"
-									name="targetBladePosition" value="${assetEntityInstance.targetBladePosition}" size=10 tabindex="46" /></td>
+									name="targetBladePosition" value="${assetEntityInstance.targetBladePosition}" size=10 tabindex="46"   ${assetEntityInstance.assetType != 'Blade' ? 'disabled="disabled"' : '' }/></td>
 								<td class="label" nowrap="nowrap"><label for="custom7">${assetEntityInstance.project.custom7 ?: 'Custom7' }</label></td>
 								<td ><input type="text" id="custom7" name="custom7" value="${assetEntityInstance.custom7}" size=8 tabindex="56"/></td>
 							</tr>

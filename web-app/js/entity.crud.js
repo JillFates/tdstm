@@ -104,6 +104,7 @@ function updateTitle( type ){
 }
 function selectManufacturer(value){
 	var val = value;
+	manipulateFields(val)
 	new Ajax.Request('../assetEntity/getManufacturersList?assetType='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){showManufacView(e);}})
 	//${remoteFunction(action:'getManufacturersList', params:'\'assetType=\' + val ', onComplete:'showManufacView(e)' )}
 	}
@@ -550,10 +551,41 @@ function setType(id){
 	new Ajax.Request('../assetEntity/getAssetModelType?id='+id,{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
 			$("#assetTypeId").val(data.responseText)
+			manipulateFields(data.responseText)
 		}}
-	)
+	)	
 	
 }
+
+function manipulateFields( val ){
+	if(val == 'Blade'){
+		$("#sourceRackId").attr('disabled','disabled')
+    	$("#targetRackId").attr('disabled','disabled')
+    	$("#sourceRackPositionId").attr('disabled','disabled')
+    	$("#targetRackPositionId").attr('disabled','disabled')
+    	$("#sourceRackId").val("")
+    	$("#targetRackId").val("")
+    	$("#sourceRackPositionId").val("")
+    	$("#targetRackPositionId").val("")
+    	$("#sourceBladeChassis").removeAttr("disabled")
+    	$("#targetBladeChassis").removeAttr("disabled")
+    	$("#sourceBladePosition").removeAttr("disabled")
+    	$("#targetBladePosition").removeAttr("disabled")
+ 	}else{
+    	$("#sourceRackId").removeAttr("disabled")
+    	$("#targetRackId").removeAttr("disabled")
+    	$("#sourceRackPositionId").removeAttr("disabled")
+    	$("#targetRackPositionId").removeAttr("disabled")
+    	$("#sourceBladeChassis").val("")
+    	$("#targetBladeChassis").val("")
+    	$("#sourceBladePosition").val("")
+    	$("#targetBladePosition").val("")
+    	$("#sourceBladeChassis").attr('disabled','disabled')
+    	$("#targetBladeChassis").attr('disabled','disabled')
+    	$("#sourceBladePosition").attr('disabled','disabled')
+    	$("#targetBladePosition").attr('disabled','disabled')
+    }
+} 
 
 /*function updateModel(rackId,value){
 	var val = value;

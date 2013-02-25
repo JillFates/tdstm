@@ -2901,11 +2901,23 @@ class AssetEntityController {
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
 		
+		def sourceBladeChassis = assetEntityInstance.roomSource ? AssetEntity.findAllByRoomSource(assetEntityInstance.roomSource)?.findAll{it.assetType == 'Blade Chassis'} : []
+		def targetBladeChassis = assetEntityInstance.roomTarget ? AssetEntity.findAllByRoomTarget(assetEntityInstance.roomTarget)?.findAll{it.assetType == 'Blade Chassis'} : []
+		def sourceChassisSelect = []
+		def targetChassisSelect = []
+		
+		sourceBladeChassis.each{
+			sourceChassisSelect << [it.assetName, "${it.assetTag+'-'+''+it.assetName}"]
+		}
+		targetBladeChassis.each{
+			targetChassisSelect << [it.assetName, "${it.assetTag+'-'+''+it.assetName}"]
+		}
 		def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 							planStatusOptions:planStatusOptions?.value, projectId:projectId, project: project, railTypeOption:railTypeOption?.value,
 							priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets,
 							manufacturers:manufacturers, models:models,redirectTo:params?.redirectTo, dependencyType:dependencyType,
-							dependencyStatus:dependencyStatus,servers:servers]
+							dependencyStatus:dependencyStatus,servers:servers, sourceChassisSelect:sourceChassisSelect, 
+							targetChassisSelect:targetChassisSelect]
 		
 		if(params.redirectTo == "roomAudit") {
 			def rooms = Room.findAllByProject(project)
@@ -2929,7 +2941,9 @@ class AssetEntityController {
 		def modelName = params.models
 		def manufacturerName = params.manufacturers
 		def assetType = params.assetType ?: 'Server'
-		userPreferenceService.setPreference("lastManufacturer", Manufacturer.read(params.manufacturer.id)?.name)
+		if(params.manufacturer.id && params.manufacturer.id.isNumber())
+			userPreferenceService.setPreference("lastManufacturer", Manufacturer.read(params.manufacturer.id)?.name)
+			
 		userPreferenceService.setPreference("lastType", assetType)
 		
 		if(maintExpDate){
@@ -2949,6 +2963,17 @@ class AssetEntityController {
 			params.manufacturer = assetEntityAttributeLoaderService.getdtvManufacturer( manufacturerName )
 			params.model = assetEntityAttributeLoaderService.findOrCreateModel(manufacturerName, modelName, assetType)
 		}
+		if(!params.SourceRoom)
+			params.roomSource=null
+			
+		if(!params.TargetRoom)
+			params.roomTarget=null
+		
+		if(!params.sourceRack)
+			params.rackSource=null
+		
+		if(!params.TargetRack)
+			params.rackTarget=null
 		
 		def assetEntityInstance = AssetEntity.get(params.id)
 		assetEntityInstance.properties = params

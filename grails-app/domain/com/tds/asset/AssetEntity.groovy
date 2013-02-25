@@ -228,10 +228,10 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	def updateRacks() {
 		try{
 			// Make sure the asset points to source/target racks if there is enough information for it
-			if (assetType != 'Blade' && project != null ) {
+			if ( project != null ) {
 				if( sourceLocation && sourceRoom ){
 					roomSource = Room.findOrCreateWhere(source:1, 'project.id':project.id, location:sourceLocation, roomName:sourceRoom )
-					if( sourceRack ) {
+					if( sourceRack && assetType != 'Blade') {
 						rackSource = Rack.findOrCreateWhere(source:1, 'project.id':project.id, location:sourceLocation, 'room.id':roomSource?.id, tag:sourceRack)
 					}
 					save(flush:true)
@@ -239,7 +239,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 				}
 				if (targetLocation && targetRoom){
 					roomTarget = Room.findOrCreateWhere(source:0, 'project.id':project.id, location:targetLocation, roomName:targetRoom )
-					if( targetRack ) {
+					if( targetRack && assetType != 'Blade') {
 						rackTarget = Rack.findOrCreateWhere(source:0, 'project.id':project.id, location:targetLocation, 'room.id':roomTarget?.id, tag:targetRack)
 					}
 					save(flush:true)
