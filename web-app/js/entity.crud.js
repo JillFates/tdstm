@@ -102,15 +102,18 @@ function updateTitle( type ){
 	$("#showEntityView").dialog( "option", "title", 'Show '+type );
 	$("#editEntityView").dialog( "option", "title", 'Edit '+type );
 }
-function selectManufacturer(value){
+function selectManufacturer(value, forWhom){
 	var val = value;
 	manipulateFields(val)
-	new Ajax.Request('../assetEntity/getManufacturersList?assetType='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){showManufacView(e);}})
-	//${remoteFunction(action:'getManufacturersList', params:'\'assetType=\' + val ', onComplete:'showManufacView(e)' )}
-	}
-function showManufacView(e){
+	new Ajax.Request('../assetEntity/getManufacturersList?assetType='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){showManufacView(e, forWhom);}})
+}
+function showManufacView(e, forWhom){
     var resp = e.responseText;
-    $("#manufacturerId").html(resp);
+    if(forWhom == 'edit')
+    	$("#manufacturerEditId").html(resp);
+    else 
+    	$("#manufacturerId").html(resp);
+   
     $("#manufacturers").removeAttr("multiple")
 }
 function selectModel(value, forWhom){
@@ -559,31 +562,32 @@ function setType(id){
 
 function manipulateFields( val ){
 	if(val == 'Blade'){
-		$("#sourceRackId").attr('disabled','disabled')
-    	$("#targetRackId").attr('disabled','disabled')
-    	$("#sourceRackPositionId").attr('disabled','disabled')
-    	$("#targetRackPositionId").attr('disabled','disabled')
+		$("#sourceRackId").attr('readonly','readonly')
+    	$("#targetRackId").attr('readonly','readonly')
+    	$("#sourceRackPositionId").attr('readonly','readonly')
+    	$("#sourceRackPositionId").val("")
+    	$("#targetRackPositionId").attr('readonly','readonly')
     	$("#sourceRackId").val("")
     	$("#targetRackId").val("")
     	$("#sourceRackPositionId").val("")
     	$("#targetRackPositionId").val("")
-    	$("#sourceBladeChassis").removeAttr("disabled")
-    	$("#targetBladeChassis").removeAttr("disabled")
-    	$("#sourceBladePosition").removeAttr("disabled")
-    	$("#targetBladePosition").removeAttr("disabled")
+    	$("#sourceBladeChassis").removeAttr("onChange")
+    	$("#targetBladeChassis").removeAttr("onChange")
+    	$("#sourceBladePosition").removeAttr("readonly")
+    	$("#targetBladePosition").removeAttr("readonly")
  	}else{
-    	$("#sourceRackId").removeAttr("disabled")
-    	$("#targetRackId").removeAttr("disabled")
-    	$("#sourceRackPositionId").removeAttr("disabled")
-    	$("#targetRackPositionId").removeAttr("disabled")
+    	$("#sourceRackId").removeAttr("readonly")
+    	$("#targetRackId").removeAttr("readonly")
+    	$("#sourceRackPositionId").removeAttr("readonly")
+    	$("#targetRackPositionId").removeAttr("readonly")
     	$("#sourceBladeChassis").val("")
     	$("#targetBladeChassis").val("")
     	$("#sourceBladePosition").val("")
     	$("#targetBladePosition").val("")
-    	$("#sourceBladeChassis").attr('disabled','disabled')
-    	$("#targetBladeChassis").attr('disabled','disabled')
-    	$("#sourceBladePosition").attr('disabled','disabled')
-    	$("#targetBladePosition").attr('disabled','disabled')
+    	$("#sourceBladeChassis").attr('onChange','this.selectedIndex = 0')
+		$("#targerBladeChassis").attr('onChange','this.selectedIndex = 0')
+    	$("#sourceBladePosition").attr('readonly','readonly')
+    	$("#targetBladePosition").attr('readonly','readonly')
     }
 } 
 

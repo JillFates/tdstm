@@ -25,7 +25,7 @@
 <input type="hidden" id="asset_serialNumber" name="serialNumberFilter" value="" />
 <input type="hidden" id="asset_planStatus" name="planStatusFilter" value="" />
 <input type="hidden" id="asset_assetTag" name="assetTagFilter" value="" />
-<g:set var="isBlade" value="${assetEntityInstance.assetType == 'Blade' ? false : true}"/>
+<g:set var="isBlade" value="${assetEntityInstance.assetType == 'Blade' ? true : false}"/>
 	<table style="border:0;width:1000px;">
 		<tr>
 			<td colspan="2">
@@ -45,7 +45,7 @@
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
-								<td ><g:select from="${assetTypeOptions}" id="assetTypeId" name="assetType" value="${assetEntityInstance.assetType}" onChange="selectManufacturer(this.value)" tabindex="12"/></td>
+								<td ><g:select from="${assetTypeOptions}" id="assetTypeId" name="assetType" value="${assetEntityInstance.assetType}" onChange="selectManufacturer(this.value, 'edit')" tabindex="12"/></td>
 								<td class="label" nowrap="nowrap"><label for="priority">Priority</label>
 								</td>
 								<td ><g:select id="priority" name ="priority" from="${priorityOption}" value= "${assetEntityInstance.priority}" noSelection="${['':' Please Select']}" tabindex="21"/>
@@ -69,7 +69,7 @@
 									</g:else>	
 								</td>
 								 <td >
-								 <div id="manufacturerId">
+								 <div id="manufacturerEditId">
 								   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${assetEntityInstance.manufacturer?.id}" onChange="selectModel(this.value)" optionKey="id" optionValue="name" noSelection="${[null:'Unassigned']}" tabindex="13"/>
 								 </div>
 								</td>
@@ -103,10 +103,10 @@
 								<td class="label" nowrap="nowrap"><label for="os">OS</label></td>
 								<td ><input type="text" id="os" name="os" value="${assetEntityInstance.os}"  tabindex="24"/></td>
 								<td class="label" nowrap="nowrap"><label for="sourceRackId">Rack/Cab</label></td>
-								<td><input type="text" id="sourceRackId"
-									name="sourceRack" value="${assetEntityInstance.rackSource?.tag}" size=10 tabindex="33"  ${assetEntityInstance.assetType == 'Blade' ? 'disabled="disabled"' : '' }/></td>
-									<td><input type="text" id="targetRackId"
-									name="targetRack" value="${assetEntityInstance.rackTarget?.tag}" size=10 tabindex="44" ${assetEntityInstance.assetType == 'Blade' ? 'disabled="disabled"' : '' }/></td>
+								<td><input type="text" id="sourceRackId" value="${assetEntityInstance.assetType != 'Blade' ? assetEntityInstance.rackSource?.tag : ''}"
+									 name="sourceRack"  size=10 tabindex="33"  ${assetEntityInstance.assetType == 'Blade' ? 'readonly="readonly"' : '' }/></td>
+									<td><input type="text" id="targetRackId" value="${assetEntityInstance.assetType != 'Blade' ? assetEntityInstance.rackTarget?.tag : ''}"
+									name="targetRack"  size=10 tabindex="44" ${assetEntityInstance.assetType == 'Blade' ? 'readonly="readonly"' : '' }/></td>
 								<td class="label" nowrap="nowrap"><label for="custom4">${assetEntityInstance.project.custom4 ?: 'Custom4' }</label></td>
 								<td ><input type="text" id="custom4" name="custom4" value="${assetEntityInstance.custom4}" size=8 tabindex="53" /></td>
 							</tr>
@@ -121,10 +121,10 @@
 								</td>
 								
 								<td class="label" nowrap="nowrap"><label for="sourceRackPositionId">Position</label>
-								<td><input type="text" id="sourceRackPositionId"
-									name="sourceRackPosition" value="${assetEntityInstance.sourceRackPosition}" size=10 tabindex="34" ${assetEntityInstance.assetType == 'Blade' ? 'disabled="disabled"' : '' }/></td>
-									<td><input type="text" id="targetRackPositionId"
-									name="targetRackPosition" value="${assetEntityInstance.targetRackPosition}" size=10 tabindex="44"  ${assetEntityInstance.assetType == 'Blade' ? 'disabled="disabled"' : '' }/></td>
+								<td><input type="text" id="sourceRackPositionId" value="${assetEntityInstance.assetType != 'Blade' ? assetEntityInstance.sourceRackPosition : ''}"
+									name="sourceRackPosition"  size=10 tabindex="34" ${assetEntityInstance.assetType == 'Blade' ? 'readonly="readonly"' : '' }/></td>
+									<td><input type="text" id="targetRackPositionId" value="${assetEntityInstance.assetType != 'Blade' ? assetEntityInstance.targetRackPosition : ''}"
+									name="targetRackPosition"  size=10 tabindex="44"  ${assetEntityInstance.assetType == 'Blade' ? 'readonly="readonly"' : '' }/></td>
 								</td>
 								<td class="label" nowrap="nowrap"><label for="custom5">${assetEntityInstance.project.custom5 ?: 'Custom5' }</label></td>
 								<td ><input type="text" id="custom5" name="custom5" value="${assetEntityInstance.custom5}" size=8 tabindex="54"/></td>
@@ -144,11 +144,11 @@
 								<td class="label" nowrap="nowrap"><label for="sourceBladeChassis">Blade</label></td>
 								<td>
 									<g:select id='sourceBladeChassis' from='${sourceChassisSelect}' optionKey='${-2}' optionValue='${1}'
-									  name="sourceBladeChassis" disabled="${isBlade}"  value="${assetEntityInstance.sourceBladeChassis}" noSelection="${['':' Please Select']}"/>
+									  name="sourceBladeChassis" value="${assetEntityInstance.sourceBladeChassis}" noSelection="${['':' Please Select']}"/>
 								</td>
 									<td>
 										<g:select id='targetBladeChassis' from='${targetChassisSelect}' optionKey='${-2}' optionValue='${1}'
-										name="targetBladeChassis" disabled="${isBlade}"  value="${assetEntityInstance.targetBladeChassis}" noSelection="${['':' Please Select']}"/>
+										name="targetBladeChassis"  value="${assetEntityInstance.targetBladeChassis}" noSelection="${['':' Please Select']}"/>
 									</td>
 								<td class="label" nowrap="nowrap"><label for="custom6">${assetEntityInstance.project.custom6 ?: 'Custom6' }</label></td>
 								<td ><input type="text" id="custom6" name="custom6" value="${assetEntityInstance.custom6}" size=8 tabindex="55" /></td>
@@ -165,9 +165,9 @@
 								</td>
 								<td class="label" nowrap="nowrap"><label for="sourceBladePosition">Blade Position</label></td>
 								<td><input type="text" id="sourceBladePosition"
-									name="sourceBladePosition" value="${assetEntityInstance.sourceBladePosition}" size=10 tabindex="36" ${assetEntityInstance.assetType != 'Blade' ? 'disabled="disabled"' : '' }/></td>
+									name="sourceBladePosition" value="${assetEntityInstance.sourceBladePosition}" size=10 tabindex="36" ${assetEntityInstance.assetType != 'Blade' ? 'readonly="readonly"' : '' }/></td>
 									<td><input type="text" id="targetBladePosition"
-									name="targetBladePosition" value="${assetEntityInstance.targetBladePosition}" size=10 tabindex="46"   ${assetEntityInstance.assetType != 'Blade' ? 'disabled="disabled"' : '' }/></td>
+									name="targetBladePosition" value="${assetEntityInstance.targetBladePosition}" size=10 tabindex="46"   ${assetEntityInstance.assetType != 'Blade' ? 'readonly="readonly"' : '' }/></td>
 								<td class="label" nowrap="nowrap"><label for="custom7">${assetEntityInstance.project.custom7 ?: 'Custom7' }</label></td>
 								<td ><input type="text" id="custom7" name="custom7" value="${assetEntityInstance.custom7}" size=8 tabindex="56"/></td>
 							</tr>
@@ -329,5 +329,11 @@ $(document).ready(function() {
 	$('#distanceId').val($('#distance').val())
 	$('#frictionId').val($('#friction').val())
 	$('#forceId').val($('#force').val())
+	var isBlade = '${isBlade}'
+	if(isBlade){
+		$("#sourceBladeChassis").attr('onChange','this.selectedIndex = 0')
+		$("#targerBladeChassis").attr('onChange','this.selectedIndex = 0')
+	}
+	
 })
 </script>
