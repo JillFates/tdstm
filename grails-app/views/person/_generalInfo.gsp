@@ -108,7 +108,7 @@
 					</tr>
 
 					<tr class="prop">
-						<td valign="top" class="name"><label>Functions :</label></td>
+						<td valign="top" class="name"><label>Team :</label></td>
 						<td valign="top" class="value" colspan="2">
 							<table style="border: 0px">
 								<tbody id="funcsTbodyId">
@@ -124,7 +124,7 @@
 									</g:each>
 								</tbody>
 							</table> <span style="cursor: pointer;" onclick="addFunctions()"><b>Add
-									Function </b></span>
+									Team </b></span>
 						</td>
 					</tr>
 				</tbody>

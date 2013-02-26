@@ -110,7 +110,7 @@
 						</tr>
 
 						<tr class="prop">
-							<td valign="top" class="name"><label>Functions :</label></td>
+							<td valign="top" class="name"><label>Team :</label></td>
 							<td valign="top" class="value" colspan="2">
 								<table style="border: 0px">
 									<tbody id="funcsTbodyId">
