@@ -565,6 +565,21 @@ class TaskService {
 		// log.error "getCssClassForStatus('${status})=${css}"
 		return css 
 	}
+	
+	
+	/**
+	 * Used to determine the CSS class name that should be used inside rack to show relevant status images according to there status
+	 * @param status
+	 * @return String The appropriate CSS style or task_na if the status is invalid
+	 */
+	def getCssClassForRackStatus( status ) {
+		def css = 'task_na'
+		
+		if (AssetCommentStatus.list.contains(status)) {
+			css = "rack_task_${status.toLowerCase()}"
+		}
+		return css
+	}
 
 	/**
 	 * Returns the HTML for a SELECT control that contains list of tasks based on a TaskDependency. This logic assumes that the TaskDependency(ies)

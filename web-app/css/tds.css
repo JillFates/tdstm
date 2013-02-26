@@ -518,6 +518,19 @@
 	color: red;
 }
 
+.rack_task_hold{
+	background :url(../images/task_hold.png) no-repeat scroll 0 0 transparent !important;
+	text-decoration: none!important;
+}
+.rack_task_ready {
+   background :url(../images/task_ready.png) no-repeat scroll 0 0 transparent !important;
+	text-decoration: none !important;
+}
+.rack_task_started {
+	background :url(../images/task_started.png) no-repeat scroll 0 0 transparent !important;
+	text-decoration: none !important;
+}
+
 /* older movetech workflow styles */
 .asset_pending{
 	background-color:#FFFFFF;
