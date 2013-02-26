@@ -84,16 +84,10 @@ class RoomController {
 					where m.project =:project",[project :project])
 			
 			LinkedList bundleLists = new LinkedList(moveBundlesMap);
-			bundleLists.addFirst(['taskReady', 'Task Ready'])
-			
-			if(moveBundleId && !moveBundleId.contains("all")){
-				if (moveBundleId.contains("taskReady")) {
-					def roomAssets =  roomInstance.sourceAssets + roomInstance.targetAssets
-					Set assetsByStatus = AssetComment.findAllByAssetEntityInListAndStatusInList(roomAssets,[AssetCommentStatus.STARTED, AssetCommentStatus.READY]).assetEntity
-				    racks = assetsByStatus.rackSource +  assetsByStatus.rackTarget
-					racks.removeAll([null])
-					moveBundleId = 'taskReady'
-				} else {
+			bundleLists.addFirst(['taskReady', 'Active Tasks'])
+			def statusList = [:]
+			if(moveBundleId && !moveBundleId.contains("all") && !moveBundleId.contains("taskReady")){
+					userPreferenceService.removePreference("highlightTasks")
 					def bundles = moveBundleId.split(",").collect{id-> Long.parseLong(id) }
 					moveBundleList = MoveBundle.findAllByIdInList(bundles)
 					moveBundleList.each{ moveBundle->
@@ -106,15 +100,28 @@ class RoomController {
 								racksList.add( targetRack )
 						}
 					}
-				}				
-			} else {
+			} else if ( moveBundleId?.contains("all") ) {
+				userPreferenceService.removePreference("highlightTasks")
 				racksList = Rack.findAllByRoom(roomInstance)
 				moveBundleList = [id:'all']
+			} else if( userPreferenceService.getPreference("highlightTasks") || moveBundleId?.contains("taskReady") ) {
+					def roomAssets =  roomInstance.sourceAssets + roomInstance.targetAssets
+					Set assetsByStatus = AssetComment.findAllByAssetEntityInListAndStatusInList(roomAssets,
+										[AssetCommentStatus.STARTED, AssetCommentStatus.READY, AssetCommentStatus.HOLD]).assetEntity
+				    racks = assetsByStatus.rackSource +  assetsByStatus.rackTarget
+					racks.removeAll([null])
+					racks.each{
+						def statuses = AssetComment.findAllByAssetEntityInListOrAssetEntityInList(it.sourceAssets, it.targetAssets)?.status 
+						def statusCss = statuses.contains("Hold") ? "task_hold" : (statuses.contains("Started") ? "task_started" : "task_ready")
+						statusList << [(it.id) : statusCss]
+					}
+					userPreferenceService.setPreference("highlightTasks", moveBundleId)
+					moveBundleId = 'taskReady'
 			}
 			
             [roomInstance: roomInstance, roomInstanceList:roomInstanceList, moveBundleList:moveBundleList, project:project,
 			 racksList: racksList, source:params.source, target:params.target, projectId : projectId,
-			 auditPref:auditView, browserTestiPad:browserTestiPad, statusList:racks, bundleList:bundleLists, moveBundleId:moveBundleId]
+			 auditPref:auditView, browserTestiPad:browserTestiPad, statusList:statusList, bundleList:bundleLists, moveBundleId:moveBundleId]
         }
     }
 

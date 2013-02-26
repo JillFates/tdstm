@@ -451,7 +451,7 @@
 /* class for dashboards */
 
 .task_hold{
-   background-color:#FFFF33;
+   background-color:#FFFF33 !important;
    color:black;
    font-weight: bold;
 }
@@ -471,12 +471,12 @@
 	font-weight: bold;
 }
 .task_ready {
-   background-color: green;
+   background-color: green !important;
    color: white;
    font-weight: bold;
 }
 .task_started {
-	background-color: darkturquoise;
+	background-color: darkturquoise!important;
 	color: white;
 	font-weight: bold;
 }

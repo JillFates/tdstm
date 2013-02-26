@@ -421,7 +421,8 @@ class RackLayoutsController {
 					def tasks = AssetComment.findAllByAssetEntityAndStatusInList(it.asset?.assetEntity, [AssetCommentStatus.STARTED, AssetCommentStatus.READY])
 					def taskAnchors = ""
 					tasks.each{
-						taskAnchors+="<a href='#' title='${it.taskNumber+':'+it.comment}' onclick=\"javascript:showAssetComment(${it.id},'show')\" >T</a> &nbsp;"
+						taskAnchors+="""<a href='#' class='${taskService.getCssClassForStatus(it.status)}' title='${it.taskNumber+':'+it.comment}' 
+							onclick=\"javascript:showAssetComment(${it.id},'show')\" > T</a> &nbsp;"""
 					}
 					if(cabling != "" && it.cssClass != "rack_error"){
 						def assetCables = AssetCableMap.findByFromAsset(it.asset?.assetEntity)
