@@ -3037,7 +3037,9 @@ class AssetEntityController {
 	def getManufacturersList = {
 		def assetType = params.assetType
 		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
-		render (view :'manufacturerView' , model:[manufacturers : manufacturers])
+		def prefVal =  userPreferenceService.getPreference("lastManufacturer")
+		def selectedManu = prefVal ? Manufacturer.findByName( prefVal )?.id : null
+		render (view :'manufacturerView' , model:[manufacturers : manufacturers, selectedManu:selectedManu])
 	}
 	def getModelsList = {
 		def manufacturer = params.manufacturer
