@@ -1101,6 +1101,8 @@ class TaskService {
 	 */
 	def getLastTaskNumber(project) {
 		def lastTaskNum = AssetComment.executeQuery('select MAX(a.taskNumber) from AssetComment a where project=?', [project])[0]		
+		
+		if (! lastTaskNum) lastTaskNum = 0
 		// log.info "Last task number is $lastTaskNum"
 		
 		return lastTaskNum
@@ -1140,6 +1142,18 @@ class TaskService {
 			return "Unable to generate tasks as there are moveday tasks already generated for the project"
 		}
 
+		// Get the various workflow steps that will be used to populate things like the workflows ids, durations, teams, etc when creating tasks
+		def workflowStepSql = "select mb.move_bundle_id, wft.*, mbs.* \
+			from move_bundle mb \
+			left outer join workflow wf ON wf.process = mb.workflow_code \
+			left outer join workflow_transition wft ON wft.workflow_id=wf.workflow_id \
+			left outer join move_bundle_step mbs ON mbs.move_bundle_id=mb.move_bundle_id AND mbs.transition_id=wft.trans_id \
+			where mb.move_bundle_id IN (${GormUtil.asCommaDelimitedString(bundleIds)})"
+		def workflowSteps = jdbcTemplate.queryForList(workflowStepSql)
+			
+		// log.info "Workflow steps SQL= ${workflowStepSql}"	
+		// log.info "Found ${workflowSteps.size()} workflow steps for moveEvent ${moveEvent}"
+		
 		// Define a number of vars that will hold cached data about the tasks being generated for easier lookup, dependencies, etc
 		def lastTaskNum = getLastTaskNumber(project)		
 		def taskList = []			// an array that will contain list of all tasks that are inserted as they are created
@@ -1153,6 +1167,7 @@ class TaskService {
 		def newDep
 		
 		def recipe = getMoveEventRunbookRecipe( moveEvent )
+		def recipeId = recipe?.id
 		def recipeTasks = recipe?.tasks		
 		if (! recipeTasks || recipeTasks.size() == 0) {
 			return "There appears to be no runbook recipe or there is an error in its format"
@@ -1166,9 +1181,10 @@ class TaskService {
 		def noSuccessorsSql = "select t.asset_comment_id as id \
 	    	from asset_comment t \
 	  		left outer join task_dependency d ON d.predecessor_id=t.asset_comment_id \
-			where t.move_event_id=${moveEvent.id} AND d.asset_comment_id is null AND \
-			t.category IN (${categories}) AND t.auto_generated=true"
-		log.info("noSuccessorsSql: $noSuccessorsSql")
+			where t.move_event_id=${moveEvent.id} AND d.asset_comment_id is null \
+			AND t.auto_generated=true \
+			AND t.category IN (${categories}) "
+		// log.info("noSuccessorsSql: $noSuccessorsSql")
 		
 		def taskCount = 0
 		def depCount = 0
@@ -1199,7 +1215,7 @@ class TaskService {
 				assetsLatestTask.put(taskToLink.assetEntity.id, taskToLink)
 				out.append("Created dependency (${newDep.id}) between milestone $lastMilestone and $taskToLink<br/>")									
 			} else {
-				exceptions.add("Task(${tnd}) has no predecessor tasks<br/>")
+				exceptions.append("Task(${tnd}) has no predecessor tasks<br/>")
 			}
 			
 		}
@@ -1209,10 +1225,45 @@ class TaskService {
 				"event for taskSpec ${taskSpec}"								 
 		*/
 		
+		// 
+		/**
+		 * getWorkflowStep - a Closure used to lookup the workflow step from a few parameters
+		 * @param String workflowStepCode 
+		 * @param Integer moveBundleId (default null)
+		 * @return Map from workflowSteps list or null if not found
+		 */
+		def getWorkflowStep = { workflowStepCode, moveBundleId=null -> 
+			def wfsd = null
+			if (moveBundleId && workflowStepCode) {
+				wfsd = workflowSteps.find{ it.move_bundle_id==moveBundleId && it.code == workflowStepCode }
+				if (!wfsd) {
+					exceptions.append("Unable to find workflow step code $workflowStepCode for bundleId $moveBundleId<br/>")
+				}
+			} else if (workflowStepCode) {
+				// We have a workflow code but don't know which bundle. This will happen on the start and Completed tasks as there are no
+				// Assets associated to the step and therefore can't tie it to a bundle. This is a bit of a hack in that it is just going to
+				// find the first move bundle. We could improve this to find the one with the latest completion time which is what we're getting 
+				// it for in a Milestone.
+				wfsd = workflowSteps.find{ it.code == workflowStepCode }
+				if (!wfsd) {
+					exceptions.append("Unable to find workflow step code $workflowStepCode<br/>")
+				}
+			}
+			return wfsd
+		}
+		
+		def taskSpecIndex = 0
+		def maxPreviousEstFinish = null		// Holds the max Est Finish from the previous taskSpec
+		def workflow
+		
 		try {
 			recipeTasks.each { taskSpec ->
+				taskSpecIndex++
+				
 				// Make sure that the user define the taskSpec.id and that it is NOT a duplicate from a previous step
 				// because it could cause adverse dependency linkings.
+				log.info "##### Processing taskSpec $taskSpec"
+
 				specCount++
 				if (! taskSpec.containsKey('id')) {
 					throw new RuntimeException("TaskSpec for step $specCount in list is missing the 'id' property")
@@ -1221,6 +1272,8 @@ class TaskService {
 					throw new RuntimeException("TaskSpec for step $specCount duplicated id ${taskSpec.id} found in step ${taskSpecIds[taskSpec.id]}")
 				}
 				taskSpecIds.put(taskSpec.id, specCount)
+				
+				def taskWorkflowCode = taskSpec.containsKey('workflow') ? taskSpec.workflow : null
 				
 				out.append("=======<br/>Processing taskSpec ${taskSpec.id}-${taskSpec.description}<br/>-------<br/>")
 				
@@ -1231,7 +1284,9 @@ class TaskService {
 					
 					// Create the milestone task
 					out.append("Creating milestone ${taskSpec.title}<br/>")
-					newTask = createTaskFromSpec(whom, ++lastTaskNum, moveEvent, taskSpec)
+					
+					workflow = getWorkflowStep(taskWorkflowCode)		
+					newTask = createTaskFromSpec(recipeId, whom, ++lastTaskNum, moveEvent, taskSpec, workflow)
 					taskList << newTask
 					lastMilestone = newTask 
 					taskCount++
@@ -1239,7 +1294,7 @@ class TaskService {
 					// Now find all tasks that don't have have successor (excluding the current milestone task) and
 					// create dependency where the milestone is the successor
 					def tasksNoSuccessors = jdbcTemplate.queryForList(noSuccessorsSql)
-					log.info("Found ${tasksNoSuccessors.count()} tasks with no successors")
+					log.info "Found ${tasksNoSuccessors.count()} tasks with no successors"
 					if (tasksNoSuccessors.size()==0 && taskCount > 1 ) {
 						out.append("Found no successors for a milestone, which is unexpected but not necessarily wrong - Task $newTask<br/>")
 					}
@@ -1260,7 +1315,7 @@ class TaskService {
 					// -------------------------
 					// Handle ACTION TaskSpecs (e.g. OnCart, offCart, QARAck) Tasks
 					// -------------------------
-					exceptions.append("Action(${taskSpec.action}) presently not supported<br/>")
+					exceptions.append("Action(${taskSpec.action}) in taskSpec id ${taskSpec.id} presently not supported<br/>")
 					
 				} else {
 					// -------------------------
@@ -1277,7 +1332,8 @@ class TaskService {
 					// Create a task for each asset based on the filtering of the taskSpec
 					//
 					assetsForTask?.each() { asset ->
-						newTask = createTaskFromSpec(whom, ++lastTaskNum, moveEvent, taskSpec, asset)
+						workflow = getWorkflowStep(taskWorkflowCode, asset.moveBundle.id)
+						newTask = createTaskFromSpec(recipeId, whom, ++lastTaskNum, moveEvent, taskSpec, workflow, asset)
 						taskList << newTask
 						taskCount++
 						tasksNeedingDependencies << newTask
@@ -1374,22 +1430,17 @@ class TaskService {
 				}
 			} 
 		} catch(e)	{
-			out.append("We blew up :-( <br/>")
-			out.append(e.toString())
+			exceptions.append("We BLEW UP damn it!<br/>")
+			exceptions.append(e.toString())
 			e.printStackTrace()
-
 		}
 		
 		TimeDuration elapsed = TimeCategory.minus( new Date(), startedAt )
 		
 		log.info "A total of $taskCount Tasks and $depCount Dependencies created in $elapsed"
 		return "<h2>Status:</h2> $taskCount Tasks and $depCount Dependencies created in $elapsed<h2>Exceptions:</h2>" + 
-			
-			
-			
-			
-			
-			exceptions.toString() + "<h2>Log:</h2>" + out.toString()
+	
+		exceptions.toString() + "<h2>Log:</h2>" + out.toString()
 		
 	}
 	
@@ -1448,7 +1499,7 @@ class TaskService {
 	 * @param asset - The asset associated with the task if there appropriate
 	 * @return AssetComment (aka Task)
 	 */
-	def createTaskFromSpec(whom, taskNumber, moveEvent, taskSpec, asset=null) {
+	def createTaskFromSpec(recipeId, whom, taskNumber, moveEvent, taskSpec, workflow=null, asset=null) {
 		def task = new AssetComment(
 			taskNumber: taskNumber,
 			project: moveEvent.project, 
@@ -1459,25 +1510,44 @@ class TaskService {
 			createdBy: whom,
 			displayOption: 'U',
 			autoGenerated: true,
+			recipe: recipeId,
 			taskSpec: taskSpec.id )
 			
 		// Handle the various settings from the taskSpec
 		task.priority = taskSpec.containsKey('priority') ? taskSpec.priority : 3
-		task.duration = taskSpec.containsKey('duration') ? taskSpec.duration : 0
-		// TODO - Need to validate that the function code is correct
-		task.role = taskSpec.containsKey('team') ? taskSpec.team : ''
-		task.category = taskSpec.containsKey('category') ? taskSpec.category : AssetCommentCategory.MOVEDAY
+		if (taskSpec.containsKey('duration')) task.duration = taskSpec.duration
+		if (taskSpec.containsKey('team')) task.role = taskSpec.team
+		if (taskSpec.containsKey('category')) task.category = taskSpec.category
+		
+		def defCat = task.category
+		task.category = null
 		
 		// TODO : Should be able to parse the duration for a character
 		task.durationScale = 'm'
 		
 		if (asset) {
 			task.comment = new GStringEval().toString(taskSpec.title, asset)
-			// Deal with the estimated times and such from the moveBundle workflows
 		} else {
 			task.comment = new GStringEval().toString(taskSpec.title, moveEvent)
 		}
-		// task.comment = taskSpec.title
+			
+		// Set various values if there is a workflow associated to this taskSpec and Asset
+		if (workflow) {
+			// log.info "Applying workflow values to task $taskNumber - values=$workflow"
+			if (workflow.workflow_transition_id) { task.workflowTransition = WorkflowTransition.read(workflow.workflow_transition_id) }
+			if (! task.role && workflow.role_id) { task.role = workflow.role_id }
+			if (! task.category && workflow.category) { task.category = workflow.category }
+			if (! task.estStart && workflow.plan_start_time) { task.estStart = workflow.plan_start_time }
+			if (! task.estFinish && workflow.plan_completion_time) { task.estFinish = workflow.plan_completion_time }
+			if (! task.duration && workflow.duration != null) {
+				task.duration = workflow.duration
+				task.durationScale = workflow.duration_scale ?: 'm'
+			}
+		}
+		
+		if (task.duration == null) task.duration=0
+		if (task.category == null) task.category = defCat
+		
 		// log.info "About to save task: ${task.category}"
 		if (! ( task.validate() && task.save(flush:true) ) ) {
 			throw new RuntimeException("Error while trying to create task. error=${GormUtil.allErrorsString(task)}, asset=$asset, TaskSpec=$taskSpec")

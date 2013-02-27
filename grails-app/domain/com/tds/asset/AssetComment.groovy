@@ -206,7 +206,7 @@ class AssetComment {
 	 * @return Boolean true if is runbook task
 	 */
 	def isRunbookTask() {
-		return [AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP].contains(this.category)
+		return moveDayCategories.contains(this.category)
 	}
 	
 	// Extend the dateResolved setter to also set the isResolved appropriately

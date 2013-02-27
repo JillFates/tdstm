@@ -3175,8 +3175,8 @@ class AssetEntityController {
 		def person = securityService.getUserLoginPerson()
 		def moveBundleList
 		def today = new Date()
-		def runBookFormatter = new SimpleDateFormat("MM/dd kk:mm:ss")
-		def dueFormatter = new SimpleDateFormat("MM/dd")
+		def runBookFormatter = new SimpleDateFormat("MM/dd kk:mm")
+		def dueFormatter = new SimpleDateFormat("MM/dd/yyyy")
 		def moveEvent		
 		if ( params.moveEvent?.size() > 0) {
 			// zero (0) = All events
@@ -3233,8 +3233,14 @@ class AssetEntityController {
 				'in'('assetEntity',assets)
 			if (taskNumbers)
 				'in'('taskNumber' , taskNumbers)
-			if (dates)
-				'in'('dueDate' , dates)
+			if (dates) {
+				and {
+					or {
+						'in'('dueDate' , dates)
+						'in'('estFinish', dates)
+					}
+				}
+			}
 			if (assigned )
 				'in'('assignedTo' , assigned)
 			if(sortIndex && sortOrder){
@@ -3311,9 +3317,16 @@ class AssetEntityController {
 			}
 			def assignedTo  = (it.assignedTo ? it.assignedTo?.firstName+" "+it.assignedTo?.lastName: '')
 			
+			def dueDate='' 
+			if (it.isRunbookTask()) {
+				dueDate = it.estFinish ? runBookFormatter.format(it.estFinish) : ''
+			} else {
+				dueDate = it.dueDate ? dueFormatter.format(it.dueDate) : ''
+			}
+			
 			[ cell: ['',it.taskNumber, it.comment, it.assetEntity?.assetName, it.assetEntity?.assetType,
 			 updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '',
-			 it.dueDate ? (it.isRunbookTask() ? runBookFormatter.format(it.dueDate) : dueFormatter.format(it.dueDate)) : '',
+			 dueDate,
 			 it.status ?: '', it.hardAssigned ? '*'+assignedTo : '' +assignedTo,
 			 it.role, it.category, TaskDependency.countByPredecessor( it ), it.score ?: 0,
 			 it.status ? "task_${it.status.toLowerCase()}" : 'task_na',updatedClass, dueClass, it.assetEntity?.id], id: it.id,
