@@ -174,9 +174,8 @@ class TaskController {
 		def targetURI = grailsApplication.config.graph.targetURI
 		def dotExec = grailsApplication.config.graph?.graphviz?.dotCmd
 		def graphType = grailsApplication.config.graph?.graphviz?.graphType
-		def deleteDotFile = grailsApplication.config.graph?.deleteDotFile 
-		if (deleteDotFile == null) deleteDotFile = true
-
+		def deleteDotFile = grailsApplication.config.graph?.containsKey('deleteDotFile') ? grailsApplication.config.graph.deleteDotFile : true
+		
 		def statusColor = [
 			(AssetCommentStatus.HOLD):['black', '#FFFF33'],
 			(AssetCommentStatus.PLANNED):['black', '#FFFFFF'],
