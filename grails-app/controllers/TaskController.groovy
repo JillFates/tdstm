@@ -174,6 +174,7 @@ class TaskController {
 		def targetURI = grailsApplication.config.graph.targetURI
 		def dotExec = grailsApplication.config.graph.graphviz.dotCmd
 		def graphType = grailsApplication.config.graph.graphviz.graphType
+		def deleteDotFile = grailsApplication.config.graph.containsKey('deleteDotFile') ? grailsApplication.config.graph.deleteDotFile : true
 
 		def statusColor = [
 			(AssetCommentStatus.HOLD):['black', '#FFFF33'],
@@ -269,8 +270,8 @@ digraph runbook {
 	 	proc.waitFor()
 	
 		if (proc.exitValue() == 0) {
-			// Delete the dot file because we don't need it
-			dotFile.delete()
+			// Delete the dot file because we don't need it and configured to delete it automatically
+			if (deleteDotFile) dotFile.delete()
 			redirect(uri:"${targetURI}${imgFilename}")
 			
 		} else {
