@@ -330,9 +330,12 @@ $(document).ready(function() {
 	$('#frictionId').val($('#friction').val())
 	$('#forceId').val($('#force').val())
 	var isBlade = '${isBlade}'
-	if(isBlade){
+	if(isBlade == 'false'){
 		$("#sourceBladeChassis").attr('onChange','this.selectedIndex = 0')
 		$("#targerBladeChassis").attr('onChange','this.selectedIndex = 0')
+	} else {
+		$("#sourceBladeChassis").removeAttr('onChange')
+		$("#targerBladeChassis").removeAttr('onChange')
 	}
 	
 })

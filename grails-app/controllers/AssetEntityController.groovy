@@ -2907,10 +2907,10 @@ class AssetEntityController {
 		def targetChassisSelect = []
 		
 		sourceBladeChassis.each{
-			sourceChassisSelect << [it.assetName, "${it.assetTag+'-'+''+it.assetName}"]
+			sourceChassisSelect << [it.assetTag, "${it.assetTag+'-'+''+it.assetName}"]
 		}
 		targetBladeChassis.each{
-			targetChassisSelect << [it.assetName, "${it.assetTag+'-'+''+it.assetName}"]
+			targetChassisSelect << [it.assetTag, "${it.assetTag+'-'+''+it.assetName}"]
 		}
 		def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 							planStatusOptions:planStatusOptions?.value, projectId:projectId, project: project, railTypeOption:railTypeOption?.value,
