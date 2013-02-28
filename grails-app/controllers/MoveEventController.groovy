@@ -1,10 +1,11 @@
 import grails.converters.JSON
 
-import java.io.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.io.*
 
 import jxl.*
+import jxl.format.UnderlineStyle
 import jxl.read.biff.*
 import jxl.write.*
 
@@ -19,7 +20,6 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetTransition
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.WebUtil
 
 class MoveEventController {
 	
@@ -33,6 +33,7 @@ class MoveEventController {
 	def reportsService
 	def taskService
 	def securityService
+	def projectService
 	
     def index = { redirect(action:list,params:params) }
 
@@ -593,6 +594,7 @@ class MoveEventController {
 			def project = Project.get(projectId)
 			def moveEventInstance = MoveEvent.get(params.eventId)
 			def currentVersion = moveEventInstance.runbookVersion
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			if(params.version=='on'){
 				if(moveEventInstance.runbookVersion){
 					moveEventInstance.runbookVersion = currentVersion + 1
@@ -655,7 +657,7 @@ class MoveEventController {
 						def book = Workbook.createWorkbook( response.getOutputStream(), workbook )
 						
 						def serverSheet = book.getSheet("Servers")
-						def personelSheet = book.getSheet("Personnel")
+						def personelSheet = book.getSheet("Staff")
 						def preMoveSheet = book.getSheet("Pre-move")
 						def dbSheet = book.getSheet("Database")
 						def filesSheet = book.getSheet("Storage")
@@ -690,6 +692,8 @@ class MoveEventController {
 											 'url','custom1','custom2','custom3','custom4','custom5','custom6','custom7','custom8'
 											 ]
 						
+						def impactedAppColumnList =['id' ,'assetName' ,'' ,'startupProc' ,'description' ,'sme' ,'' ,'' ,'' ,'' ,'' ,'' ]
+						
 						def dbColumnList = ['id', 'assetName', 'dbFormat', 'dbSize', 'description', 'supportType','retireDate', 'maintExpDate',
 											'environment','ipAddress', 'planStatus','custom1','custom2','custom3','custom4','custom5',
 											'custom6','custom7','custom8'
@@ -714,28 +718,33 @@ class MoveEventController {
 						              			]
 						
 						
-						summarySheet.addCell( new Label( 1, 1, String.valueOf(project.name )) )
+						def projManager = projectService.getProjectManagerByProject(project.id).partyIdTo
+						def moveManager = projectService.getMoveManagerByProject(project.id).partyIdTo
+						
+						summarySheet.addCell( new Label( 1, 1, String.valueOf(project.name ), getCellFormat(jxl.format.Colour.SEA_GREEN, jxl.format.Pattern.SOLID )) )
 						summarySheet.addCell( new Label( 2, 3, String.valueOf(project.name )) )
-						summarySheet.addCell( new Label( 2, 4, String.valueOf(moveEventInstance.name )) )
+						summarySheet.addCell( new Label( 2, 6, String.valueOf(projManager.firstName +" "+projManager.lastName)) )
+						summarySheet.addCell( new Label( 4, 6, String.valueOf(moveManager.firstName +" "+moveManager.lastName)) )
+						summarySheet.addCell( new  Label( 2, 4, String.valueOf(moveEventInstance.name )) )
 						summarySheet.addCell( new Label( 2, 10, String.valueOf(moveEventInstance.name )) )
 						
-						moveBundleService.issueExport(assets, serverColumnList, serverSheet, 5)
+						moveBundleService.issueExport(assets, serverColumnList, serverSheet, tzId, 5)
 						
-						//moveBundleService.issueExport(applications, appColumnList, appSheet, 5)
+						moveBundleService.issueExport(applications, impactedAppColumnList, appSheet, tzId, 5)
 						
-						moveBundleService.issueExport(databases, dbColumnList, dbSheet, 4)
+						moveBundleService.issueExport(databases, dbColumnList, dbSheet, tzId, 4)
 						
-						moveBundleService.issueExport(files, filesColumnList, filesSheet, 1)
+						moveBundleService.issueExport(files, filesColumnList, filesSheet, tzId, 1)
 						
-						moveBundleService.issueExport(others, othersColumnList, otherSheet, 1)
+						moveBundleService.issueExport(others, othersColumnList, otherSheet,tzId, 1)
 						
-						moveBundleService.issueExport(unresolvedIssues, unresolvedIssueColumnList, issueSheet, 1)
+						moveBundleService.issueExport(unresolvedIssues, unresolvedIssueColumnList, issueSheet, tzId, 1)
 						
-						moveBundleService.issueExport(sheduleIssue, sheduleColumnList, scheduleSheet, 7)
+						moveBundleService.issueExport(sheduleIssue, sheduleColumnList, scheduleSheet, tzId, 7)
 						
-						moveBundleService.issueExport(preMoveIssue, preMoveColumnList, preMoveSheet, 7)
+						moveBundleService.issueExport(preMoveIssue, preMoveColumnList, preMoveSheet, tzId, 7)
 						
-						moveBundleService.issueExport(postMoveIssue, postMoveColumnList,  postMoveSheet, 7)
+						moveBundleService.issueExport(postMoveIssue, postMoveColumnList,  postMoveSheet, tzId, 7)
 						  
 							  
 						def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' ")
@@ -755,6 +764,20 @@ class MoveEventController {
 				return ;
 		
 	}
+	
+	/**
+	 * 
+	 * @param colour
+	 * @param pattern
+	 * @return
+	 * @throws WriteException
+	 */
+	def getCellFormat(jxl.format.Colour colour, jxl.format.Pattern pattern) throws WriteException {
+		WritableFont cellFont = new WritableFont(WritableFont.ARIAL, 14, WritableFont.BOLD, false, UnderlineStyle.NO_UNDERLINE, jxl.format.Colour.WHITE);
+		WritableCellFormat cellFormat = new WritableCellFormat(cellFont);
+		cellFormat.setBackground(colour, pattern);
+		return cellFormat;
+	 }
 	
 	/**
 	 * Used to set asset's plan-status to 'Moved' for the specified move event

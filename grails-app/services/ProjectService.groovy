@@ -85,5 +85,26 @@ class ProjectService {
 		
 		return projects
 	}
+	/**
+	 * This method is used to get partyRelationShip instance to fetch project manager for requested project.
+	 * @param projectId
+	 * @return partyRelationShip instance
+	 */
+	def getProjectManagerByProject(def projectId){
+		def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' \
+				and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
+		
+		return projectManager
+	}
 	
+	/**
+	 * This method is used to get partyRelationShip instance to fetch move manager for requested project.
+	 * @param projectId
+	 * @return partyRelationShip instance
+	 */
+	def getMoveManagerByProject (def projectId){
+		def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' \
+			and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
+		return moveManager
+	}
 }
