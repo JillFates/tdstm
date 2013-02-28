@@ -3293,6 +3293,9 @@ class AssetEntityController {
 			def elapsed = TimeUtil.elapsed(it.statusUpdated, nowGMT)
 			def elapsedSec = elapsed.toMilliseconds() / 1000
 			
+			// clear out the CSS classes for overDue/Updated
+			updatedClass = dueClass = ''
+			
 			if (it.status == AssetCommentStatus.READY) {
 				if (elapsedSec >= 600) {
 					updatedClass = 'task_late'
