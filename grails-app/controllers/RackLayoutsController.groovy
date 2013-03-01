@@ -599,13 +599,13 @@ class RackLayoutsController {
 		bladeTable += '</table>'
 	}
 	/********************************************
-	 * Trim Name if over 30 characters and add "...".
+	 * Trim Name if over 22, trim to 20 characters and add "...".
 	 ********************************************/
 	def private trimString( name ){
 		def trimmedVal = name
 		def length = name.length()
-		if(length > 30){
-			trimmedVal = trimmedVal.substring(0,30)+"..."
+		if(length > 22){
+			trimmedVal = trimmedVal.substring(0,20)+"..."
 		}
 		return trimmedVal
 	}
