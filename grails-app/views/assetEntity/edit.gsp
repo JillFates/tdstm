@@ -332,10 +332,10 @@ $(document).ready(function() {
 	var isBlade = '${isBlade}'
 	if(isBlade == 'false'){
 		$("#sourceBladeChassis").attr('onChange','this.selectedIndex = 0')
-		$("#targerBladeChassis").attr('onChange','this.selectedIndex = 0')
+		$("#targetBladeChassis").attr('onChange','this.selectedIndex = 0')
 	} else {
 		$("#sourceBladeChassis").removeAttr('onChange')
-		$("#targerBladeChassis").removeAttr('onChange')
+		$("#targetBladeChassis").removeAttr('onChange')
 	}
 	
 })

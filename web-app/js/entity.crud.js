@@ -585,7 +585,7 @@ function manipulateFields( val ){
     	$("#sourceBladePosition").val("")
     	$("#targetBladePosition").val("")
     	$("#sourceBladeChassis").attr('onChange','this.selectedIndex = 0')
-		$("#targerBladeChassis").attr('onChange','this.selectedIndex = 0')
+		$("#targetBladeChassis").attr('onChange','this.selectedIndex = 0')
     	$("#sourceBladePosition").attr('readonly','readonly')
     	$("#targetBladePosition").attr('readonly','readonly')
     }
