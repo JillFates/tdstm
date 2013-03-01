@@ -11,7 +11,7 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.core.css')}" />
 	<link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	<script type="text/javascript" src="${resource(dir:'js' ,file:'ui.datepicker.js') }" />
-	
+    
 	<script type="text/javascript">    	
 		window.addEventListener('load', function(){
 			setTimeout(scrollTo, 0, 0, 1);
@@ -41,20 +41,76 @@
 </head>
 <body onorientationchange="updateOrientation();">
 	<div class="mainbody" style="width: 100%;">
-	   <div style="width: 100%;" id="mobtitle">TransitionManager&trade; - Mobile</div>
+	   <div style="width: 100%;" id="mobtitle">TransitionManager&trade; - Mobile 
+		   <span id="userSpanId"  onclick="loadUserPref(${person.id})">${person.firstName}
+		   <a id="userAnchor" class="ui-icon ui-icon-triangle-1-s" href="#"></a></span>
+	   </div>
+	   <div id="mobilePrefDialog" class="megamenu" style="display: none;" >
+	</div>
 	     <div style="width: 100%;" id="myTaskListMobile">
 		 	<g:render template="tasks_m"/>
 		 </div>
 		<g:link class="mobfooter" action="listTasks" params="[viewMode:'web', tab:tab]">Use Full Site</g:link>
 	</div>
-  </div>
+	<input type="hidden" id="timeBarValueId" value="0"/>
 <script type="text/javascript">
-	$( function() {
+	$(document).ready(function() {
 	  $('#issueTimebar').width($('#issueTable').width())
-	});
+	  $('#mobilePrefDialog').width($('#issueTable').width())
+	  taskManagerTimePref = ${timeToUpdate} 
+	  if(taskManagerTimePref != 0){
+			B1.Start(taskManagerTimePref);
+	  }else{
+			B1.Pause(0);
+	  }
+	 });
 
 	function setFocus(){
 		document.issueAssetForm.search.focus();
+    }
+    function setTimer(value){
+    	jQuery.ajax({
+			url: '../clientConsole/setTimePreference',
+			data: {'timer':value, prefFor:'myTask'},
+			type:'POST',
+			success: function(data) {
+				var timeUpdate = eval("(" + data.responseText + ")")
+				if(timeUpdate){
+					timedUpdate(timeUpdate[0].updateTime.MY_TASK)
+				}
+				taskManagerTimePref = value
+				if(taskManagerTimePref != 0){
+					B1.Start(value);
+				} else {
+					B1.Pause(0);
+				}
+			}
+		});
+    }
+    function loadUserPref(personId){
+    	jQuery.ajax({
+			url: 'loadUserMobilePref',
+			data: {'personId':personId},
+			type:'POST',
+			success: function(data) {
+				
+				 $('#mobilePrefDialog').html(data)
+				 $('#selectTimedBarId').val(taskManagerTimePref)
+				 $('#mobilePrefDialog').show()
+				 $('#userSpanId').attr("onClick","hideUserPref("+personId+")")
+				 B1.Pause()
+			}
+		});
+    }
+
+    function hideUserPref( personId ) {
+    	 $('#mobilePrefDialog').hide()//dialog("close")
+    	 $('#userSpanId').attr("onClick","loadUserPref("+personId+")")
+    	 if(taskManagerTimePref != 0){ 
+ 			B1.Restart( taskManagerTimePref ); 
+ 		 } else {  
+ 			B1.Pause(0); 
+ 		 }
     }
 	function issueDetails(id){
 		jQuery.ajax({
@@ -197,14 +253,28 @@ function zxcOpacity(obj,opc){
 		Time:function(sec){
 			var oop=this,sec=this.sec-Math.floor((new Date()-this.srt)/1000);
 		//	this.oop.obj.innerHTML=sec+' sec';
+			$('#timeBarValueId').val(sec)
 			if (sec>0){
 				this.to=setTimeout(function(){ oop.Time(); },1000);
 			}else{
 				pageRefresh();
 			}
 		},
-		Pause:function(){
+		Pause:function(sec){
 			clearTimeout(this.to);
+			if(sec==0){
+				this.oop.animate(sec,'',sec*1000);
+			}else{
+				this.oop.animate($('#issueTimebarId').width(),$('#issueTimebarId').width(),sec*1000);
+			}
+		},
+		Restart:function(sec){
+			clearTimeout(this.to);
+			var second = $('#timeBarValueId').val()
+			this.oop.animate($('#issueTimebarId').width(),this.max,second*1000);
+			this.srt=new Date();
+			this.sec=second;
+			this.Time();
 		}
 	}
 
@@ -212,7 +282,6 @@ function zxcOpacity(obj,opc){
 		ID:'issueTimebar'
 	});
 
-	B1.Start(60);
 	
 	function onScan(ev){
 		var scan = ev.data;

@@ -605,8 +605,12 @@ class ProjectController {
     	if(selectProject){
     		def projectInstance = Project.findByProjectCode(params.selectProject)
 	        userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+			def browserTest = request.getHeader("User-Agent").toLowerCase().contains("mobile")
 			
-	        if(userPreferenceService.getPreference('START_PAGE')=='Current Dashboard'){
+			
+	        if ( browserTest || params.mobileSelect ){
+				redirect(controller:'clientTeams', action:'listTasks', params:[viewMode:'mobile'])
+			}else if(userPreferenceService.getPreference('START_PAGE')=='Current Dashboard'){
 			    if(RolePermissions.hasPermission('MoveBundleShowView')){
 					 redirect(controller:'moveBundle',action:'planningStats')
 				}else{

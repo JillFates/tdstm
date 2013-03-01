@@ -245,6 +245,21 @@
 	right:0px;
 	width:300px;
 }
+#userAnchor{
+	float:left;
+	display:inline; 
+	position: absolute;
+}
+#userSpanId{
+	float:right;
+	margin-right: 30px;
+	cursor: pointer;
+	
+}
+#mobilePrefDialog {
+	top:20px;
+	height:300px;
+}
 .megamenu ul {
 	width:auto;
 	padding-top:0px;

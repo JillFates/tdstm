@@ -23,6 +23,7 @@ class ClientTeamsController {
 	def jdbcTemplate
 	def clientTeamsService
 	def workflowService
+	def projectService
 
 	def static final statusDetails = ["missing":"Unknown", "cabledDetails":"Cabled with Details","empty":"Empty","cabled":"Cabled"]
 	protected static targetTeamColumns = ['MOVE_TECH':'target_team_id', 'CLEANER':'target_team_log_id','SYS_ADMIN':'target_team_sa_id',"DB_ADMIN":'target_team_dba_id']
@@ -1035,7 +1036,7 @@ class ClientTeamsController {
 			search:search, sort:params.sort, order:params.order,
 	 		personId:person.id, isCleaner:isCleaner,
 			timeToUpdate:timeToRefresh ?: 60, 
-			isOnIE:false]
+			isOnIE:false, person:person]
 			
 		def view = params.view == "myTask" ? "_tasks" : "myIssues"
 		if ( session.getAttribute('TASK_VIEW_MODE') == 'mobile') {
@@ -1164,6 +1165,28 @@ class ClientTeamsController {
 			def view = isCleaner ? '_showCleanerTask' : 'showIssue'
 			
 			render (view:view,model:model)
+		}
+	}
+	
+	/**
+	 * Used in MyTask mobile view to show user preference e.g. project, timer , Teams
+	 * @param: personId : Requested person's id .
+	 */
+	def loadUserMobilePref = {
+		def person = Person.read(params.personId)
+		if(person){
+			def now = TimeUtil.nowGMT()
+			def timeToRefresh = getSession()?.getAttribute("MY_TASK")?.MY_TASK
+			def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
+			def company = partyRelationshipService.getStaffCompany( person )
+			def personTeams =  partyRelationshipService.getCompanyStaffFunctions(company.id, person.id)
+			def projects =  projectService.getActiveProject( now, projectHasPermission)
+			def project = securityService.getUserCurrentProject()
+			
+			render( template:"mobilePref", model:[person:person, personTeams:personTeams, projects:projects, project:project,
+					timeToUpdate:timeToRefresh])
+		} else {
+		  	render "Person id ${params.personId} is not existed. "
 		}
 	}
 }
