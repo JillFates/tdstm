@@ -22,7 +22,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td><select id="selectTimedBarId"
+				<td>Refresh : <select id="selectTimedBarId"
 					onchange="setTimer(this.value)">
 						<option value="0">Manual</option>
 						<option value="60">1 Min</option>
