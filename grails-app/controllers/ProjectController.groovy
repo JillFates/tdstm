@@ -28,8 +28,8 @@ class ProjectController {
 		def partyProjectList
 		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
 		
-		def sort = params.sort ? params.sort : 'dateCreated' 
-		def order = params.order ? params.order : 'desc'
+		def sort = params.sort ? params.sort : 'projectCode' 
+		def order = params.order ? params.order : 'asc'
 	    def now = TimeUtil.nowGMT()
 		if(params._action_List=="Show Completed Projects"){
 			projectList = projectService.getCompletedProject( now, projectHasPermission, sort, order )
