@@ -22,11 +22,23 @@ function startprintjob(){
 		    job.RepositoryName = $('#urlPath').val();   
 		    job.FormName = form.FormName.value;                   
 		    job.PrinterName = form.PrinterName.value;
+	    var labelsCount = document.issueUpdateForm.labels.value;  
 	    // THIS IS THE PLACE TO ADD YOUR DATA
 	    jobdata.ClearRecords();
-	    jobdata.AddNewRecord();
-	    jobdata.SetDataField('serverName', document.issueUpdateForm.assetName.value); 
-	    jobdata.SetDataField('assetTag', document.issueUpdateForm.assetTag.value);
+	    
+	    for(var label = 0; label < labelsCount; label++) {
+		    jobdata.AddNewRecord();
+		    jobdata.SetDataField('serverName', document.issueUpdateForm.assetName.value); 
+		    jobdata.SetDataField('assetTag', document.issueUpdateForm.assetTag.value);
+		    
+            jobdata.SetDataField('model',   document.issueUpdateForm.model.value);       
+            jobdata.SetDataField('cart',document.issueUpdateForm.cart.value);               
+            jobdata.SetDataField('shelf',document.issueUpdateForm.shelf.value);
+            jobdata.SetDataField('room',document.issueUpdateForm.room.value);
+            jobdata.SetDataField('rack',document.issueUpdateForm.rack.value);
+            jobdata.SetDataField('upos',document.issueUpdateForm.upos.value);
+            jobdata.SetDataField('cartQty',document.issueUpdateForm.cartQty.value);
+	    }
 	    // now we print one copy of the label with default settings
 	    try {
 	    	job.PrintForm();
@@ -136,6 +148,13 @@ function mySelect(x)
 		<input type="hidden" name="PrinterName" id="PrinterName" />
 		<input type="hidden" id="RepPath" name="RepPath" />
 		<input type="hidden" name="urlPath" id="urlPath" value="<g:resource dir="resource" file="racking_label.tff" absolute="true"/>" />
+		<input name="model" type="hidden" value="${assetEntity?.model}" />
+        <input name="cart" type="hidden" value="${assetEntity?.cart}" />
+        <input name="shelf" type="hidden" value="${assetEntity?.shelf}" />
+        <input name="room" type="hidden" value="${assetEntity?.targetRoom}" />
+        <input name="rack" type="hidden" value="${assetEntity?.targetRack}" />
+        <input name="upos" type="hidden" value="${assetEntity?.targetRackPosition}" />
+        <input name="cartQty" type="hidden" value="${cartQty}" />
 		<table style="margin-left: -2px;">
 			<tr>
 				<td class="heading" colspan=2><a class="heading" href="#comments">Task details:</a></td>
@@ -259,6 +278,13 @@ function mySelect(x)
 									${printer}
 								</option>
 							</g:each>
+						</select> 
+						<b>Quantity: </b>
+						<select name="labels" id="labelQuantity">
+								<option value="1">1</option>
+								<option value="2" >2</option>
+								<option value="3" selected="selected">3</option>
+								<option value="4">4</option>
 						</select> 
 					</td>
 			</tr>

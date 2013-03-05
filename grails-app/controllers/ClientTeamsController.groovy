@@ -1156,7 +1156,14 @@ class ClientTeamsController {
 			projectStaff:projectStaff,
 			browserTest:browserTest,
 			dueDate:dueDate,
-			assignToSelect:assignToSelect]
+			assignToSelect:assignToSelect,
+            assetEntity:null,
+            cartQty:0
+            ]
+        if(assetComment.assetEntity){
+            def asset = assetComment.assetEntity
+            model << [ assetEntity:asset, cartQty:AssetEntity.countByCartAndMoveBundle(asset.cart, asset.moveBundle) ]
+        }
 		
 		if(viewMode=='mobile'){
 			render (view:'showIssue_m',model:model)
