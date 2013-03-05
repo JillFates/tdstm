@@ -9,119 +9,7 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 	<g:javascript src="tech_teams.js" />
 	<g:javascript src="asset.comment.js" />
-<script type="text/javascript" language="Javascript1.2">
-var sHint = "C:\\temp\\output";
-//=============================================================================
-// PRINT HERE
-//=============================================================================
-function startprintjob(){
-	try{
-		var job = window.TF.CreateJob();
-		var form = window.document.issueUpdateForm;
-		var jobdata = job.NewJobDataRecordSet();
-		    job.RepositoryName = $('#urlPath').val();   
-		    job.FormName = form.FormName.value;                   
-		    job.PrinterName = form.PrinterName.value;
-	    var labelsCount = document.issueUpdateForm.labels.value;  
-	    // THIS IS THE PLACE TO ADD YOUR DATA
-	    jobdata.ClearRecords();
-	    
-	    for(var label = 0; label < labelsCount; label++) {
-		    jobdata.AddNewRecord();
-		    jobdata.SetDataField('serverName', document.issueUpdateForm.assetName.value); 
-		    jobdata.SetDataField('assetTag', document.issueUpdateForm.assetTag.value);
-		    
-            jobdata.SetDataField('model',   document.issueUpdateForm.model.value);       
-            jobdata.SetDataField('cart',document.issueUpdateForm.cart.value);               
-            jobdata.SetDataField('shelf',document.issueUpdateForm.shelf.value);
-            jobdata.SetDataField('room',document.issueUpdateForm.room.value);
-            jobdata.SetDataField('rack',document.issueUpdateForm.rack.value);
-            jobdata.SetDataField('upos',document.issueUpdateForm.upos.value);
-            jobdata.SetDataField('cartQty',document.issueUpdateForm.cartQty.value);
-	    }
-	    // now we print one copy of the label with default settings
-	    try {
-	    	job.PrintForm();
-	    } catch (e) {
-		    alert ("TFORMer returned an error!" + e +
-		           "\nError description: " + e.description + 
-		           "\nError name: " + e.name + 
-		           "\nError number: " + e.number + 
-		           "\nError message: " + e.message);
-	    }
-	}catch(ex){
-		alert("It appears that your security settings are preventing printing. Please add this site to your Trusted Sites in setup.")
-	}
-}
 
-//=============================================================================
-// Add a new option to select element
-//=============================================================================
-function AddOption (selElement, text, value)
-{
-  opt = new Option(text, value, false, true);
-  selElement.options[0] = opt;
-}
-
-//=============================================================================
-// Set default data for TFORMer Runtime Properties
-//=============================================================================
-function InitData()
-{
-	//To check the Instructions for enable the Clean Button
-	var printButton = $('#printButton');
-	if(!printButton.disabled){ 
-		printButton.focus();
-	}
-	var form = window.document.issueUpdateForm;
-	var path = window.location.href;
-	var i = -1;
-	// the following code evaluates the path to the demo repository
-	for (n=1; n<=3; n++)
-	{
-		i = path.lastIndexOf('/');
-		if (i != -1)
-		{
-			path = path.substring(0,i)                              // one directory level up
-		}
-	}
-	if (path.substr (0, 8) == "file:///")			                  // do not use URL-style for Repository file name - remove file:///
-	    path = path.substr (8);
-    path= unescape(path);	
-    form.RepPath.value 	= path + '/Demo Repository/Demos.tfr';  // repository name
-    form.FormName.value = 'BarcodeLabels';											// form name
-    form.PrinterName.value = ''																	// use default printer
-	// get list of installed printers
-	var dropdown = document.issueUpdateForm.Printers;
-	AddOption (dropdown, "Zebra (ZPL-II)", "ZPL:" + sHint + ".ZPL");
-
-	
-	retrieve_field(document.issueUpdateForm.Printers)
-	
-	mySelect(dropdown);
-	
-}
-
-//=============================================================================
-// Handle Browse Button
-//=============================================================================
-function FileFind_onchange()
-{
-var form = window.document.issueUpdateForm;
-
-  form.RepPath.value = form.FileFind.value;
-}
-
-//=============================================================================
-// The selected dprinter has changed
-//=============================================================================
-function mySelect(x)
-{
-	$('#PrinterName').val( x.options[x.selectedIndex].value );
-	
-}
-
-</script>
 </head>
 <body>
 	<a name="top"></a>
@@ -142,19 +30,19 @@ function mySelect(x)
 		</g:if>
 	<g:form name="issueUpdateForm" controller="task" action="update">
 		<a name="comments"></a>
-		<input id="issueId" name="id" type="hidden" value="${assetComment.id}" />
-		<input id="redirectTo" name="redirectTo" type="hidden" value="taskList" />
+		<input type="hidden" name="id" id="issueId" value="${assetComment.id}" />
+		<input type="hidden" name="redirectTo" id="redirectTo" value="taskList" />
 		<input type="hidden" name="FormName" id="FormName" />
 		<input type="hidden" name="PrinterName" id="PrinterName" />
-		<input type="hidden" id="RepPath" name="RepPath" />
+		<input type="hidden" name="RepPath" id="RepPath" />
 		<input type="hidden" name="urlPath" id="urlPath" value="<g:resource dir="resource" file="racking_label.tff" absolute="true"/>" />
-		<input name="model" type="hidden" value="${assetEntity?.model}" />
-        <input name="cart" type="hidden" value="${assetEntity?.cart}" />
-        <input name="shelf" type="hidden" value="${assetEntity?.shelf}" />
-        <input name="room" type="hidden" value="${assetEntity?.targetRoom}" />
-        <input name="rack" type="hidden" value="${assetEntity?.targetRack}" />
-        <input name="upos" type="hidden" value="${assetEntity?.targetRackPosition}" />
-        <input name="cartQty" type="hidden" value="${cartQty}" />
+		<input type="hidden" name="model" id="model" value="${assetEntity?.model}" />
+        <input type="hidden" name="cart" id="cart" value="${assetEntity?.cart}" />
+        <input type="hidden" name="shelf" id="shelf" value="${assetEntity?.shelf}" />
+        <input type="hidden" name="room" id="room" value="${assetEntity?.targetRoom}" />
+        <input type="hidden" name="rack" id="rack" value="${assetEntity?.targetRack}" />
+        <input type="hidden" name="upos" id="upos" value="${assetEntity?.targetRackPosition}" />
+        <input type="hidden" name="cartQty" id="cartQty" value="${cartQty}" />
 		<table style="margin-left: -2px;">
 			<tr>
 				<td class="heading" colspan=2><a class="heading" href="#comments">Task details:</a></td>
@@ -298,7 +186,7 @@ function mySelect(x)
 					</g:else>
 				</td>
 				<td class="buttonR" style="text-align:right;padding: 5px 3px;">
-					<input type="button" id="printButton" value="Print" ${browserTest ? 'disabled="disabled"' : "" } onclick="startprintjob()"  />
+					<input type="button" id="printButton" value="Print" ${browserTest ? 'disabled="disabled"' : "" } onclick="startprintjob();"  />
 				</td>
 				<td class="buttonR" colspan="2" style="text-align:right;padding: 5px 3px;">
 					<input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" />
@@ -463,11 +351,135 @@ $( function() {
 
 
  </script>
- <script>
+ <script type="text/javascript">
 	currentMenuId = "#teamMenuId";
 	$("#teamMenuId a").css('background-color','#003366')
 	InitData();
 	
+</script>
+<script type="text/javascript" language="javascript">
+
+var sHint = "C:\\temp\\output";
+//=============================================================================
+// PRINT HERE
+//=============================================================================
+
+
+function startprintjob() {
+	alert('model:' + $("#model").val() 
+		 + ", cart: " + $("#cart").val()
+		 + ", shelf: " + $("#shelf").val()
+		 + ", room: " + $("#room").val()
+		 + ", rack: " + $("#rack").val()
+		 + ", upos: " + $("#upos").val()
+	     + ", urlPath: " + $("#urlPath").val());
+
+		var job = window.TF.CreateJob();
+	    job.RepositoryName = $("#urlPath").val();  
+	    job.FormName = form.FormName.value;                   
+	    job.PrinterName = form.PrinterName.value;
+		var form = window.document.issueUpdateForm;
+		var jobdata = job.NewJobDataRecordSet();
+	    var labelsCount = document.issueUpdateForm.labels.value;  
+	    // THIS IS THE PLACE TO ADD YOUR DATA
+	    jobdata.ClearRecords();
+	    
+	    for(var label = 0; label < labelsCount; label++) {
+		    jobdata.AddNewRecord();
+		    jobdata.SetDataField('serverName', $("#assetName").val());
+		    jobdata.SetDataField('assetTag', $("#assetTag").val());
+		    
+            jobdata.SetDataField('model', $("#model").val());     
+            jobdata.SetDataField('cart', $("#cart").val());           
+            jobdata.SetDataField('shelf', $("#shelf").val());
+            jobdata.SetDataField('room', $("#room").val());
+            jobdata.SetDataField('rack', $("#rack").val());
+            jobdata.SetDataField('upos', $("#upos").val());
+            jobdata.SetDataField('cartQty', $("#cartQty").val());
+	    }
+	    // now we print one copy of the label with default settings
+	    try {
+	    	job.PrintForm();
+	    } catch (e) {
+		    alert ("TFORMer returned an error!" + e +
+		           "\nError description: " + e.description + 
+		           "\nError name: " + e.name + 
+		           "\nError number: " + e.number + 
+		           "\nError message: " + e.message);
+	    }
+	}catch(ex){
+		alert("It appears that your security settings are preventing printing. Please add this site to your Trusted Sites in setup.")
+	}
+
+}
+
+//=============================================================================
+// Add a new option to select element
+//=============================================================================
+function AddOption (selElement, text, value)
+{
+  opt = new Option(text, value, false, true);
+  selElement.options[0] = opt;
+}
+
+//=============================================================================
+// Set default data for TFORMer Runtime Properties
+//=============================================================================
+function InitData()
+{
+	//To check the Instructions for enable the Clean Button
+	var printButton = $('#printButton');
+	if(!printButton.disabled){ 
+		printButton.focus();
+	}
+	var form = window.document.issueUpdateForm;
+	var path = window.location.href;
+	var i = -1;
+	// the following code evaluates the path to the demo repository
+	for (n=1; n<=3; n++)
+	{
+		i = path.lastIndexOf('/');
+		if (i != -1)
+		{
+			path = path.substring(0,i)                              // one directory level up
+		}
+	}
+	if (path.substr (0, 8) == "file:///")			                  // do not use URL-style for Repository file name - remove file:///
+	    path = path.substr (8);
+    path= unescape(path);	
+    form.RepPath.value 	= path + '/Demo Repository/Demos.tfr';  // repository name
+    form.FormName.value = 'BarcodeLabels';											// form name
+    form.PrinterName.value = ''																	// use default printer
+	// get list of installed printers
+	var dropdown = document.issueUpdateForm.Printers;
+	AddOption (dropdown, "Zebra (ZPL-II)", "ZPL:" + sHint + ".ZPL");
+
+	
+	retrieve_field(document.issueUpdateForm.Printers)
+	
+	mySelect(dropdown);
+	
+}
+
+//=============================================================================
+// Handle Browse Button
+//=============================================================================
+function FileFind_onchange()
+{
+var form = window.document.issueUpdateForm;
+
+  form.RepPath.value = form.FileFind.value;
+}
+
+//=============================================================================
+// The selected dprinter has changed
+//=============================================================================
+function mySelect(x)
+{
+	$('#PrinterName').val( x.options[x.selectedIndex].value );
+	
+}
+
 </script>
 </body>
 </html>

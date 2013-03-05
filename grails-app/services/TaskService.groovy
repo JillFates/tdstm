@@ -1628,7 +1628,7 @@ class TaskService {
 		}
 		
 		// Add additional WHERE clauses based on the following properties being present in the filter.asset 
-		addWhereConditions( ['assetName','assetTag','assetType', 'priority'] )
+		addWhereConditions( ['assetName','assetTag','assetType', 'priority', 'status'] )
 		
 		try {
 			
