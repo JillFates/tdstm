@@ -19,7 +19,7 @@
     <jqgrid:resources />
 	<script type="text/javascript">
         $(document).ready(function() {
-        	$('#issueTimebar').width($(window).width()+'px')
+            $('#issueTimebar').width($(window).width()+'px')
             
         	$('#assetMenu').show();
         	$("#commentsListDialog").dialog({ autoOpen: false })
@@ -113,7 +113,7 @@
         }
         function assetFormatter(cellVal,options,rowObject){
         	return '<span class="cellWithoutBackground pointer" onclick= "getEntityDetails(\'listComment\', \''+rowObject[4]+'\', '+rowObject[16]+')\" >' + (cellVal ? cellVal :"") + '</span>';
-        }
+        }        
 
         function populateFilter(){
         	$("#gs_comment").val('${comment}')
@@ -152,7 +152,7 @@
 			<form name="commentForm" id="commentForm" method="post" action="listTasks">
 			<input type="hidden" name="justRemaining" id="justRemaining" value="${justRemaining}" />
 			<input type="hidden" name="justMyTasks"   id="justMyTasks"   value="${justMyTasks}"/>
-			<span >
+			<span  style="white-space: nowrap;">
 				<b>Move Event </b>
 			 	<g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
 				&nbsp;&nbsp;
@@ -161,10 +161,8 @@
 				&nbsp;&nbsp;
 				<input type="checkbox" id="justMyTasksCB" ${ (justMyTasks=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'justMyTasks');"/>
 				<b><label for="justMyTasksCB" > Just My Tasks</label></b>&nbsp;&nbsp;
-				<span style="float:right;">
-					<span class="menuButton"><g:link class="create" controller="task" action="moveEventTaskGraph"
+					<span class="menuButton" style="position:absolute; margin-left:430px;"><g:link class="create" controller="task" action="moveEventTaskGraph"
 						params="[moveEventId:filterEvent,mode:'s']">View Task Graph</g:link>
-					</span>
 				
 					<input type="button" value="Refresh" onclick="submitForm()" style="cursor: pointer;">&nbsp;
 					<select id="selectTimedBarId"
