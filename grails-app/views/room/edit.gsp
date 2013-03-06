@@ -100,7 +100,7 @@
 			</g:if>
 			<g:else>
 				<div align="center" id="rack_${rack.id}" style="top:${rack.roomY}px;left:${rack.roomX}px;" onmouseout="updateXYPositions(this.id)" 
-					class="room_${rack.rackType}_${rack.front} ">
+					class="room_${rack.rackType}_${rack.front} dragRack draggable">
 					<span id="rackLabel_${rack.id}" style="background-color:white; z-index:1;" ><br>${rack.tag}</br></span>
 				</div>
 			</g:else>
@@ -191,6 +191,7 @@ $(document).ready(function() {
            }
        } else {
     	   $(".dragRack").removeClass("objectSelected")
+    	   $(".objectRowSelected").removeClass("objectRowSelected")
     	   addShadowCss($(this).attr("id"));
        }
 	});
