@@ -105,6 +105,7 @@ function getActionBarGrid(spanId){
 		url: '../task/genActionBarHTML',
 		data: {'id':id},
 		type:'POST',
+		async:false,
 		success: function(data) {
 				$('#span_'+spanId).parent().parent().find('span').each(function(){
 					if($(this).attr("id")){
