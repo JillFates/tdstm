@@ -233,7 +233,7 @@ function validatePersonForm(form) {
 	var allFields = $("form[name = "+form+"] input[type = 'text']");
 	
 	jQuery.each(allFields , function(i, field) {
-		field.value=field.value.trim()
+		field.value= $.trim(field.value)
 	});
 	
 	var firstName = $(
