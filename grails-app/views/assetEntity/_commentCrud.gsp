@@ -395,7 +395,7 @@
 			</td>
 			<td colspan="4">
 				<g:select id="categoryEditId" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general"
-				onChange="updateWorkflowTransitions(jQuery('#createAssetCommentId').val(), this.value, 'workFlowTransitionEditId', 'predecessorId',jQuery('#createAssetCommentId').html())"></g:select>
+				onChange="updateWorkflowTransitions(jQuery('#assetValueId').val(), this.value, 'workFlowTransitionEditId', 'predecessorId',jQuery('#updateCommentId').val())"></g:select>
 			</td>
         </tr>
         <tr id="commentTypeEditTrId">

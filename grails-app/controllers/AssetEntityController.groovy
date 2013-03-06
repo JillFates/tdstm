@@ -3760,7 +3760,8 @@ class AssetEntityController {
 		def assetCommentId = params.assetCommentId
         def assetComment = AssetComment.read(assetCommentId)
 		def assetEntity = AssetEntity.get(params.assetId)
-		def workFlowInstance = Workflow.findByProcess(project.workflowCode)
+        def workflowCode = assetEntity?.moveBundle?.workflowCode ?: project.workflowCode
+		def workFlowInstance = Workflow.findByProcess(workflowCode)
 		def workFlowTransition = WorkflowTransition.findAllByWorkflowAndCategory(workFlowInstance, params.category)
         
 		//def workFlowTransition = WorkflowTransition.findAllByWorkflow(workFlowInstance) TODO : should be removed after completion of this new feature

@@ -403,7 +403,7 @@ class MoveBundleController {
 		def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle , transitionId)
 		if( !moveBundleStep ){
 			moveBundleStep = new MoveBundleStep(moveBundle:moveBundle, transitionId:transitionId, calcMethod:"L")
-			moveBundleStep.label = stateEngineService.getDashboardLabel( moveBundle.project.workflowCode, transitionId )
+			moveBundleStep.label = stateEngineService.getDashboardLabel( moveBundle.workflowCode, transitionId )
 			if ( !moveBundleStep.validate() || !moveBundleStep.save(flush:true) ) {
 				def etext = "Unable to create moveBundleStep" +
 						GormUtil.allErrorsString( moveBundleStep )

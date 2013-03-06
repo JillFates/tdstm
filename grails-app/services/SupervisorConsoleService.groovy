@@ -16,7 +16,7 @@ class SupervisorConsoleService {
      * @return : Query for Supervisor console  
      *----------------------------------------*/
     def getQueryForConsole( def moveBundleInstance, def params, def type ) {
-    	// filter params
+        // filter params
         def application = params.application
         def currentState = params.currentState
         def appOwner = params.appOwner
@@ -30,7 +30,10 @@ class SupervisorConsoleService {
 		def projectId = params.projectId 
 		projectId = projectId ? projectId : userPreferenceService.getSession().getAttribute( "CURR_PROJ" )?.CURR_PROJ
         def projectInstance = Project.findById( projectId )
-		
+        def workflowCode = projectInstance.workflowCode
+        if(moveBundleInstance instanceof MoveBundle) {
+            workflowCode = moveBundleInstance.workflowCode;
+        }
 		def role 
 		if(filterTeam){
 			role = ProjectTeam.read(filterTeam)?.role
@@ -43,27 +46,27 @@ class SupervisorConsoleService {
 				role = "MANAGER"
 			}
 		}
-		def releasedId = stateEngineService.getStateId( projectInstance.workflowCode, "Release" )
-		def holdId = stateEngineService.getStateId( projectInstance.workflowCode, "Hold" )
-        def cleanedId = stateEngineService.getStateId( projectInstance.workflowCode, "Cleaned" )
-        def onCartId = stateEngineService.getStateId( projectInstance.workflowCode, "OnCart" )
-        def onTruckId = stateEngineService.getStateId( projectInstance.workflowCode, "OnTruck" )
-	    def offTruckId = stateEngineService.getStateId( projectInstance.workflowCode, "OffTruck" )
-		def unrackedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Unracked" ) )
-		def rerackedId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, "Reracked" ) )
-		def stagedId = stateEngineService.getStateId( projectInstance.workflowCode, "Staged" )
+		def releasedId = stateEngineService.getStateId( workflowCode, "Release" )
+		def holdId = stateEngineService.getStateId( workflowCode, "Hold" )
+        def cleanedId = stateEngineService.getStateId( workflowCode, "Cleaned" )
+        def onCartId = stateEngineService.getStateId( workflowCode, "OnCart" )
+        def onTruckId = stateEngineService.getStateId( workflowCode, "OnTruck" )
+	    def offTruckId = stateEngineService.getStateId( workflowCode, "OffTruck" )
+		def unrackedId = Integer.parseInt( stateEngineService.getStateId( workflowCode, "Unracked" ) )
+		def rerackedId = Integer.parseInt( stateEngineService.getStateId( workflowCode, "Reracked" ) )
+		def stagedId = stateEngineService.getStateId( workflowCode, "Staged" )
 		
-		def swimlane = Swimlane.findByNameAndWorkflow( role, Workflow.findByProcess(projectInstance.workflowCode) )
+		def swimlane = Swimlane.findByNameAndWorkflow( role, Workflow.findByProcess(workflowCode) )
 		
 		def minSource = swimlane.minSource ? swimlane.minSource : "Release"
-		def minSourceId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, minSource ) )
+		def minSourceId = Integer.parseInt( stateEngineService.getStateId( workflowCode, minSource ) )
 		def minTarget = swimlane.minTarget ? swimlane.minTarget : "Staged"
-		def minTargetId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, minTarget ) )
+		def minTargetId = Integer.parseInt( stateEngineService.getStateId( workflowCode, minTarget ) )
 		
 		def maxSource = swimlane.maxSource ? swimlane.maxSource : "Unracked"
-		def maxSourceId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, maxSource ) )
+		def maxSourceId = Integer.parseInt( stateEngineService.getStateId( workflowCode, maxSource ) )
 		def maxTarget = swimlane.maxTarget ? swimlane.maxTarget : "Reracked"
-		def maxTargetId = Integer.parseInt( stateEngineService.getStateId( projectInstance.workflowCode, maxTarget ) )
+		def maxTargetId = Integer.parseInt( stateEngineService.getStateId( workflowCode, maxTarget ) )
         
 		
 		
@@ -146,7 +149,7 @@ class SupervisorConsoleService {
 			}
 		}
 		if(currentState){
-			def stateId = stateEngineService.getStateIdAsInt( projectInstance.workflowCode, currentState )
+			def stateId = stateEngineService.getStateIdAsInt( workflowCode, currentState )
 			if(currentState != 'Hold'){
 				queryForConsole.append(" and pm.current_state_id = $stateId group by ae.asset_entity_id having minstate != $holdId" )
 			} else {
@@ -165,7 +168,7 @@ class SupervisorConsoleService {
 		} else {
 			queryForConsole.append(" order by dateCreated desc ")
 		}
-		return queryForConsole.toString()
+        return queryForConsole.toString()
     }
 	 /*----------------------------------------
      * @author : Lokanath Reddy
