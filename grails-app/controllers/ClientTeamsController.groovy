@@ -1079,10 +1079,10 @@ class ClientTeamsController {
 		
 		def selectCtrlId = "assignedToEditId_${assetComment.id}"
 		def assignToSelect = taskService.assignToSelectHtml(project.id, params.issueId, assetComment.assignedTo?.id, selectCtrlId)
+		def person = securityService.getUserLoginPerson()
 		
 		// Bounce back to the user if we didn't get a legit id, associated with the project
 		if (! assetComment ) {
-			def person = securityService.getUserLoginPerson()
 			log.error "${person} attempted an invalide access a task/comment with id ${params.issueId} on project $project"
 			render "Unable to find specified record"
 			return
@@ -1093,10 +1093,8 @@ class ClientTeamsController {
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def etFinish	
 			
-		def browserTest = false		
-		if ( !request.getHeader ( "User-Agent" ).contains ( "MSIE" ) ) {
-			browserTest = true
-		}
+		def isCleaner = partyRelationshipService.staffHasFunction(project.id, person.id, 'CLEANER')
+		def canPrint = request.getHeader ( "User-Agent" ).contains ( "MSIE" ) && isCleaner
 		
 		def noteList = assetComment.notes.sort{it.dateCreated}
 		def notes = []
@@ -1154,7 +1152,7 @@ class ClientTeamsController {
 			successor:successor, 
 			etFinish:etFinish, 
 			projectStaff:projectStaff,
-			browserTest:browserTest,
+			canPrint:canPrint,
 			dueDate:dueDate,
 			assignToSelect:assignToSelect,
             assetEntity:null,
@@ -1168,7 +1166,6 @@ class ClientTeamsController {
 		if(viewMode=='mobile'){
 			render (view:'showIssue_m',model:model)
 		}else{
-			def isCleaner = assetComment.role == 'CLEANER' ? true : false
 			def view = isCleaner ? '_showCleanerTask' : 'showIssue'
 			
 			render (view:view,model:model)

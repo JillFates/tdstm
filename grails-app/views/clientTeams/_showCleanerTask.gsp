@@ -20,11 +20,10 @@
 				<div style="color: red; font-size:15px"><ul>${flash.message}</ul></div>
 			</g:if> 
 		</div>
-		<g:if test="${browserTest == true}">
+		<g:if test="${canPrint == false}">
 			<div style="color: red;">
 				<ul>
-					<li>Please note that in order to print barcode labels you
-						will need to use the Internet Explorer browser</li>
+					<li>Please note that in order to print barcode labels you will need the to use Windows Internet Explorer browser.</li>
 				</ul>
 			</div>
 		</g:if>
@@ -159,7 +158,7 @@
 			<tr class="prop">
 					<td valign="top" class="name"><label for="resolution">Printers :</label></td>
 					<td>
-						<select type="hidden" id="Printers" name="Printers"	${browserTest ? 'disabled="disabled"' : "" } onChange="javascript:mySelect(this);">
+						<select type="hidden" id="Printers" name="Printers"	${canPrint ? '' : 'disabled="disabled"' } onChange="javascript:mySelect(this);">
 							<option value="Zebra (ZPL-II)">Zebra (ZPL-II)</option>
 							<g:each in="${session.getAttribute( 'PRINTERS' )}" var="printer">
 								<option value="${printer}">
@@ -186,7 +185,7 @@
 					</g:else>
 				</td>
 				<td class="buttonR" style="text-align:right;padding: 5px 3px;">
-					<input type="button" id="printButton" value="Print" ${browserTest ? 'disabled="disabled"' : "" } onclick="startprintjob();"  />
+					<input type="button" id="printButton" value="Print" ${canPrint ? '': 'disabled="disabled"' } onclick="startprintjob();"  />
 				</td>
 				<td class="buttonR" colspan="2" style="text-align:right;padding: 5px 3px;">
 					<input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" />
@@ -351,12 +350,6 @@ $( function() {
 
 
  </script>
- <script type="text/javascript">
-	currentMenuId = "#teamMenuId";
-	$("#teamMenuId a").css('background-color','#003366')
-	InitData();
-	
-</script>
 <script type="text/javascript" language="javascript">
 
 var sHint = "C:\\temp\\output";
@@ -366,22 +359,34 @@ var sHint = "C:\\temp\\output";
 
 
 function startprintjob() {
-	alert('model:' + $("#model").val() 
-		 + ", cart: " + $("#cart").val()
-		 + ", shelf: " + $("#shelf").val()
-		 + ", room: " + $("#room").val()
-		 + ", rack: " + $("#rack").val()
-		 + ", upos: " + $("#upos").val()
-	     + ", urlPath: " + $("#urlPath").val());
+	
+	/*
+	alert('model:' + $("#model").val());
+	alert(", cart: " + $("#cart").val());
+	alert(", shelf: " + $("#shelf").val());
+	alert(", room: " + $("#room").val());
+	alert('first time2');
+	alert(", rack: " + $("#rack").val());
+	alert(", upos: " + $("#upos").val());
+    alert(", urlPath: " + $("#urlPath").val());
+    alert('first time3');
+    */
 
-		var job = window.TF.CreateJob();
-	    job.RepositoryName = $("#urlPath").val();  
-	    job.FormName = form.FormName.value;                   
-	    job.PrinterName = form.PrinterName.value;
-		var form = window.document.issueUpdateForm;
+	try {
+		var tform = window.TF;
+		if (typeof tform == 'undefined') {
+			alert("Sorry but the necessary TFORMer ActiveX needed for label printing wasn't loaded.");
+			return;
+		}
+		var job = tform.CreateJob();
 		var jobdata = job.NewJobDataRecordSet();
-	    var labelsCount = document.issueUpdateForm.labels.value;  
-	    // THIS IS THE PLACE TO ADD YOUR DATA
+	    var labelsCount = $('#labelQuantity').val();
+	
+		// var form = window.document.issueUpdateForm;
+	    job.RepositoryName = $("#urlPath").val();  
+	    job.FormName = $('#FormName').val();
+	    job.PrinterName = $('#PrinterName').val();
+	   
 	    jobdata.ClearRecords();
 	    
 	    for(var label = 0; label < labelsCount; label++) {
@@ -401,14 +406,17 @@ function startprintjob() {
 	    try {
 	    	job.PrintForm();
 	    } catch (e) {
-		    alert ("TFORMer returned an error!" + e +
+			if (e.message!="Error: The operation was canceled by the user. ") { 
+		    	alert ("TFORMer returned an error!" + e +
 		           "\nError description: " + e.description + 
 		           "\nError name: " + e.name + 
 		           "\nError number: " + e.number + 
 		           "\nError message: " + e.message);
+			}
 	    }
 	}catch(ex){
-		alert("It appears that your security settings are preventing printing. Please add this site to your Trusted Sites in setup.")
+		alert("It appears that your security settings are preventing printing. Please add this site to your Trusted Sites in setup." + 
+		   "\nException was:" + ex.message);
 	}
 
 }
@@ -446,14 +454,13 @@ function InitData()
 	}
 	if (path.substr (0, 8) == "file:///")			                  // do not use URL-style for Repository file name - remove file:///
 	    path = path.substr (8);
-    path= unescape(path);	
+    path=unescape(path);	
     form.RepPath.value 	= path + '/Demo Repository/Demos.tfr';  // repository name
     form.FormName.value = 'BarcodeLabels';											// form name
     form.PrinterName.value = ''																	// use default printer
 	// get list of installed printers
 	var dropdown = document.issueUpdateForm.Printers;
 	AddOption (dropdown, "Zebra (ZPL-II)", "ZPL:" + sHint + ".ZPL");
-
 	
 	retrieve_field(document.issueUpdateForm.Printers)
 	
@@ -480,6 +487,11 @@ function mySelect(x)
 	
 }
 
+</script>
+<script type="text/javascript">
+	currentMenuId = "#teamMenuId";
+	$("#teamMenuId a").css('background-color','#003366')
+	InitData();
 </script>
 </body>
 </html>
