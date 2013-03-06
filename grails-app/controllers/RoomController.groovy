@@ -592,6 +592,7 @@ class RoomController {
 		def maxU = 42
 		def maxPower = 1
 		def location = room?.source == 1 ? "source" : "target"
+		def rackCountMap = [:]
 		racks.each{rack->
 			def rackPower = rack.powerA + rack.powerB + rack.powerC
 			if( rackPower && maxPower < rackPower ){
@@ -632,6 +633,7 @@ class RoomController {
 						}else{
 						    rackData["${rack.id}"] = "rack_cap20"
 						}
+						rackCountMap << [("rack_"+rack.id) : usedRacks]
 						
 					}else{
 						if(usedRacks <= Math.round(maxU*0.2)){
@@ -649,7 +651,7 @@ class RoomController {
 						}else{
 						    rackData["${rack.id}"] = "rack_cap100"
 						}
-						
+						rackCountMap << [("rack_"+rack.id) : usedRacks]
 					}
 					break;
 			  case "Power":
@@ -694,6 +696,8 @@ class RoomController {
 		// Implement the Scale display  
 		capacityData.rackData = rackData
 		capacityData.racks = racks.id
+		capacityData.rackCountMap = rackCountMap
+		
 		def powerType = session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
 		powerType = powerType ?: "Watts"
 		maxPower = powerType != "Watts" ? Math.round(maxPower / 110) : maxPower

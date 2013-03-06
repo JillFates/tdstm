@@ -115,11 +115,12 @@
 				<g:if test="${rack.rackType == 'Rack'}">
 					<a href="#" onclick="getRackLayout(${rack.id })">
 	                 <g:if test="${rack?.model?.layoutStyle == null}">			
-					    <div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack?.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleList.id) ? 'rack_highlight_'+rack.front : statusList[rack.id] ? 'rack_highlight_'+rack.front+' '+statusList[rack.id] : source=='true' && rack.source == 1 ? 'rack_highlight_'+rack.front : target == 'true' && rack.source == 0 ? 'rack_highlight_'+rack.front : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_'+rack.front }">
+					    <div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack?.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleList.id) ? 'rack_highlight_'+rack.front : statusList[rack.id] ? 'rack_highlight_'+rack.front+' '+statusList[rack.id] : source=='true' && rack.source == 1 ? 'rack_highlight_'+rack.front : target == 'true' && rack.source == 0 ? 'rack_highlight_'+rack.front : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_'+rack.front } adjustRack">
 					 </g:if>
 					 <g:else>
-					     <div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="${rack.model?.layoutStyle}">
+					     <div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="${rack.model?.layoutStyle} ">
 					 </g:else>
+					    <span id="cap_count_${rack.id}" class="capCount" >&nbsp;</span>
 						<div id="rack_div_${i}" class="racktop_label" onclick="$('#selectedRackId').val(this.id)">${rack.tag}</div>
 					</div>
 					</a>
@@ -219,6 +220,19 @@ function capacityView(){
 		success: function(data) {
 			if(data != "None"){
 				var racks = data.racks
+				$(".adjustRack").each(function(){
+ 					var divId = $(this).attr('id').split("_")[1]
+ 					var rackCount = data.rackCountMap[$(this).attr('id')]
+ 					if(rackCount || rackCount == 0){
+ 		 		   	 	$('#cap_count_'+divId).html(rackCount)
+ 		 		   	 	$('#cap_count_'+divId).show()
+ 					}else {
+ 						$('#cap_count_'+divId).html("&nbsp;")
+ 						$('#cap_count_'+divId).hide()
+ 						
+ 					}
+ 					
+				})
 				$("#cap20").addClass("rack_cap20").html(data.view["cap20"])
 				$("#cap32").addClass("rack_cap32").html(data.view["cap32"])
 				$("#cap44").addClass("rack_cap44").html(data.view["cap44"])
@@ -247,6 +261,11 @@ function capacityView(){
 				$(".rack_cap80").removeClass("rack_cap80")
 				$(".rack_cap100").removeClass("rack_cap100")
 				$("#scale_div").hide()
+				$(".adjustRack").each(function(){
+ 					var divId = $(this).attr('id').split("_")[1]
+ 		 		    $('#cap_count_'+divId).html("&nbsp;")
+ 					
+				})
 			}
 			 updateRackPower($("#selectedRackId").val())
 		}
