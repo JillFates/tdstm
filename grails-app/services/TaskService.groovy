@@ -1705,7 +1705,7 @@ class TaskService {
 						}
 					
 						sql = "from AssetEntity a where a.moveBundle.id in (:bIds) and $where"
-						log.info "findAllAssetsWithFilter: sql=$sql, map=$map"
+						log.info "findAllAssetsWithFilter: DEVICE sql=$sql, map=$map"
 						assets = AssetEntity.findAll(sql, map)
 						break;
 					
@@ -1714,10 +1714,27 @@ class TaskService {
 						addWhereConditions( ['appVendor','sme','sme2','businessUnit','criticality'] )
 					
 						sql = "from Application a where a.moveBundle.id in (:bIds)" + (where.size()>0 ? " and $where" : '')
-						log.info "findAllAssetsWithFilter: sql=$sql, map=$map"
+						log.info "findAllAssetsWithFilter: APPLICATION sql=$sql, map=$map"
 						assets = Application.findAll(sql, map)
 						break;
-				
+					
+					case 'database':
+						sql = "from Database a where a.moveBundle.id in (:bIds)" + (where.size()>0 ? " and $where" : '')
+						log.info "findAllAssetsWithFilter: DATABASE sql=$sql, map=$map"
+						assets = Database.findAll(sql, map)
+						break;
+
+					case 'files':
+						sql = "from Files a where a.moveBundle.id in (:bIds)" + (where.size()>0 ? " and $where" : '')
+						log.info "findAllAssetsWithFilter: FILES sql=$sql, map=$map"
+						assets = Files.findAll(sql, map)
+						break;
+						
+						
+					default: 
+						log.error "Invalid class '$queryOn' specified in filter ($filter)<br/>"
+						throw new RuntimeException("Invalid class '$queryOn' specified in filter ($filter)")
+						break;
 				} 
 			} catch (e) {
 				def msg = "An unexpected error occurred while trying to locate assets for filter $filter" + e.toString()
