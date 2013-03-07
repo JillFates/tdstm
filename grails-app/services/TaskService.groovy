@@ -1272,6 +1272,7 @@ class TaskService {
 				taskSpecIndex++
 				
 				def tasksNeedingDependencies = []
+				def depCode=''
 				
 				// Make sure that the user define the taskSpec.id and that it is NOT a duplicate from a previous step
 				// because it could cause adverse dependency linkings.
@@ -1369,8 +1370,6 @@ class TaskService {
 					log.info "Found (${assetsForTask?.size()}) assets for taskSpec ${taskSpec.id}-${taskSpec.description}"
 					if ( !assetsForTask || assetsForTask.size()==0) return // aka continue
 					
-					def depCode=''
-
 					//
 					// Create a task for each asset based on the filtering of the taskSpec
 					//
