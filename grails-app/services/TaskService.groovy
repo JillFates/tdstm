@@ -1123,6 +1123,10 @@ class TaskService {
 		def bundleIds = bundleList*.id
 		def project = moveEvent.project
 
+		// These buffers are used to capture status output for short-term
+		StringBuffer out = new StringBuffer()
+		StringBuffer exceptions = new StringBuffer()
+		
 		// List of all assets associated with the move event
 		// def assetList = AssetEntity.findAll("from AssetEntity a WHERE a.moveBundle.id IN (:bundleIds)", [bundleIds:bundleIds] )
 		
@@ -1143,7 +1147,7 @@ class TaskService {
 		}
 
 		// Get the various workflow steps that will be used to populate things like the workflows ids, durations, teams, etc when creating tasks
-		def workflowStepSql = "select mb.move_bundle_id, wft.*, mbs.* \
+		def workflowStepSql = "select mb.move_bundle_id AS moveBundleId, wft.*, mbs.* \
 			from move_bundle mb \
 			left outer join workflow wf ON wf.process = mb.workflow_code \
 			left outer join workflow_transition wft ON wft.workflow_id=wf.workflow_id \
@@ -1160,6 +1164,7 @@ class TaskService {
 		def lastMilestone = null	// Will track the most recent milestone task
 		def assetsLatestTask = [:]	// This map array will contain reference of the assets' last assigned task
 		def taskSpecIds = [:]		// Used to track the ID #s of all of the taskSpecs in the recipe
+		def groups = [:]			// Used to hold groups of assets as defined in the groups section of the recipe that can then be reference in taskSpec filters
 		
 		def wfList = null			// get list of workflows for each move bundle
 		
@@ -1168,15 +1173,21 @@ class TaskService {
 		
 		def recipe = getMoveEventRunbookRecipe( moveEvent )
 		def recipeId = recipe?.id
+		def recipeGroups = recipe?.groups
 		def recipeTasks = recipe?.tasks		
 		if (! recipeTasks || recipeTasks.size() == 0) {
 			return "There appears to be no runbook recipe or there is an error in its format"
 		}
 		// log.info "Runbook recipe: $recipe"
 
-		// These buffers are used to capture status output for short-term
-		StringBuffer out = new StringBuffer()
-		StringBuffer exceptions = new StringBuffer()
+		// Load up the 'groups' if any are defined
+		if ( recipeGroups ) {
+			recipeGroups.each() { g -> 
+				groups[g.name] = findAllAssetsWithFilter(moveEvent, g.filter, groups, exceptions)
+				out.append("Group ${g.name} has ${groups[g.name].size()} asset(s)<br/>")
+			}
+			
+		}
 		
 		def noSuccessorsSql = "select t.asset_comment_id as id \
 	    	from asset_comment t \
@@ -1235,7 +1246,7 @@ class TaskService {
 		def getWorkflowStep = { workflowStepCode, moveBundleId=null -> 
 			def wfsd = null
 			if (moveBundleId && workflowStepCode) {
-				wfsd = workflowSteps.find{ it.move_bundle_id==moveBundleId && it.code == workflowStepCode }
+				wfsd = workflowSteps.find{ it.moveBundleId==moveBundleId && it.code == workflowStepCode }
 				if (!wfsd) {
 					exceptions.append("Unable to find workflow step code $workflowStepCode for bundleId $moveBundleId<br/>")
 				}
@@ -1321,7 +1332,7 @@ class TaskService {
 					// -------------------------
 					// Create Normal Tasks
 					// -------------------------
-					def assetsForTask = findAllAssetsWithFilter(moveEvent, taskSpec.filter)
+					def assetsForTask = findAllAssetsWithFilter(moveEvent, taskSpec.filter, groups, exceptions)
 					log.info "Found (${assetsForTask?.size()}) assets for taskSpec ${taskSpec.id}-${taskSpec.description}"
 					if ( !assetsForTask || assetsForTask.size()==0) return // aka continue
 					
@@ -1466,7 +1477,7 @@ class TaskService {
 			and ad.type <> '${AssetDependencyType.BATCH}'"
 			
 		def map = ['assetId':asset.id]
-		log.info "FILTER: $filter"
+		// log.info "FILTER: $filter"
 		// Add additional WHERE expresions to the SQL
 		supportedFilterProps.each() { prop ->
 			if (filter?.containsKey(prop)) {
@@ -1586,84 +1597,133 @@ class TaskService {
 	 * @return List<AssetEntity, Application, Database, File> based on the filter
 	 * @throws RuntimeException if query fails or there is invalid specifications in the filter criteria
 	 */
-	def findAllAssetsWithFilter(moveEvent, filter) {
+	def findAllAssetsWithFilter(moveEvent, filter, groups, exceptions) {
+		def assets = []
 		
-		def queryOn = filter?.containsKey('class') ? filter['class'].toLowerCase() : 'device'
-		if (! ['device','application', 'database', 'files'].contains(queryOn) ) {
-			throw new RuntimeException("An invalid 'class' was specified for the filter (valid options are 'device','application', 'database', 'files') for $filter")
-		}
+		if (filter?.containsKey('group') ) {
+			//log.info("Groups contains $groups")
+			log.info("findAllAssetsWithFilter for group ${filter.group}")
+			// Return an array of assets that were created by a previously defined group 
+			def groupProp = ( filter.group instanceof String || filter.group instanceof GString ) ? [filter.group] : filter.group
+			groupProp.each() { g -> 
+				if (groups.containsKey(g)) {
+					assets.addAll( groups[g] )
+					log.info("findAllAssetsWithFilter added assets")
+				} else {
+					exceptions.append("Filter reference undefined group (${filter.group}) - filter $filter<br/>")
+					log.error("Filter reference undefined group (${filter.group}) - filter $filter in moveEvent $moveEvent")					
+				}
+			}
 		
-		def bundleList = moveEvent.moveBundles
-		def bundleIds = bundleList*.id
+		} else {
+			// 
+			// Perform an actual filter to find assets
+			//
+			def queryOn = filter?.containsKey('class') ? filter['class'].toLowerCase() : 'device'
+			if (! ['device','application', 'database', 'files'].contains(queryOn) ) {
+				throw new RuntimeException("An invalid 'class' was specified for the filter (valid options are 'device','application', 'database', 'files') for $filter")
+			}
+		
+			def bundleList = moveEvent.moveBundles
+			def bundleIds = bundleList*.id
 
-		def assets
-		def where = ''
-		def project = moveEvent.project
-		def map = [:]
-		def sql
+			def where = ''
+			def project = moveEvent.project
+			def map = [:]
+			def sql
 		
-		map.bIds = bundleIds
-		log.info "bundleIds=[$bundleIds]"
+			map.bIds = bundleIds
+			log.info "bundleIds=[$bundleIds]"
 		
-		
-		/** 
-		 * A helper closure used below to manipulate the 'where' and 'map' variables to add additional
-		 * WHERE expressions based on the properties passed in the filter
-		 * @param String[] - list of the properties to examine
-		 */
-		def addWhereConditions = { list ->
-			list.each() { code ->
-				if (filter?.asset?.containsKey(code)) {
-					def sm = SqlUtil.whereExpression("a.$code", filter.asset[code], code)
-					if (sm) {
-						where = SqlUtil.appendToWhere(where, sm.sql)
-						if (sm.param) {
-							map[code] = sm.param
-						}								
-					} else {
-						log.error "SqlUtil.whereExpression unable to resolve ${code} expression [${filter.asset[code]}]"
+			/** 
+			 * A helper closure used below to manipulate the 'where' and 'map' variables to add additional
+			 * WHERE expressions based on the properties passed in the filter
+			 * @param String[] - list of the properties to examine
+			 */
+			def addWhereConditions = { list ->
+				list.each() { code ->
+					if (filter?.asset?.containsKey(code)) {
+						log.info("addWhereConditions: code $code matched")						
+						def sm = SqlUtil.whereExpression("a.$code", filter.asset[code], code)
+						if (sm) {
+							where = SqlUtil.appendToWhere(where, sm.sql)
+							if (sm.param) {
+								map[code] = sm.param
+							}								
+						} else {
+							log.error "SqlUtil.whereExpression unable to resolve ${code} expression [${filter.asset[code]}]"
+						}
 					}
 				}
 			}
-		}
 		
-		// Add additional WHERE clauses based on the following properties being present in the filter.asset 
-		addWhereConditions( ['assetName','assetTag','assetType', 'priority', 'status'] )
+			// Add additional WHERE clauses based on the following properties being present in the filter.asset 
+			def validProperties = ['assetName','assetTag','assetType', 'priority', 'status']
+			(1..8).each() { validProperties.add("custom$it".toString()) }	// Add custom1..custom8
+			log.info("findAllAssetsWithFilter: validProperties=$validProperties")
+			addWhereConditions( validProperties )
 		
-		try {
-			
-			switch(queryOn) {
-				case 'device':					
-					if (filter?.asset?.containsKey('virtual')) {
-						// Just Virtual devices
-						where = SqlUtil.appendToWhere(where, "a.assetType IN ('virtual', 'vm')")
-					} else if (filter?.asset?.containsKey('physical')) {
-						// Just Physical devices
-						where = SqlUtil.appendToWhere(where, "a.assetType not IN ('application', 'database', 'files', 'virtual', 'vm')")
+			//
+			// Param 'exclude'
+			// Handle exclude filter parameter that will add a NOT IN () cause to the where for references to one or more groups
+			//
+			if (filter?.asset?.containsKey('exclude')) {
+				def excludes = []
+				def excludeProp = ( filter.asset.exclude instanceof String || filter.asset.exclude instanceof GString ) ? [filter.asset.exclude] : filter.asset.exclude				
+				excludeProp.each() { ex -> 
+					if (ex[0] == '@') {
+						// Referencing a group
+						def gName = ex.substring(1)
+						if (groups?.containsKey(gName)) {
+							excludes.addAll(groups[gName])							
+						} else {
+							exceptions.append("Filter 'exclude' reference undefined group ($gName) - filter $filter<br/>")
+						}
 					} else {
-						// All Devices
-						where = SqlUtil.appendToWhere(where, "a.assetType not IN ('application', 'database', 'files')")
+						exceptions.append("Filter 'exclude' reference undefined support value ($ex) - filter $filter<br/>")
 					}
+				}
+				if (excludes.size() > 0) {
+					where = SqlUtil.appendToWhere(where, 'a.id NOT in (:excludes)')
+					map.put('excludes', excludes*.id)
+				}
+			}
+			
+			// Assemble the SQL and attempt to execute it
+			try {
+				switch(queryOn) {
+					case 'device':					
+						if (filter?.asset?.containsKey('virtual')) {
+							// Just Virtual devices
+							where = SqlUtil.appendToWhere(where, "a.assetType IN ('virtual', 'vm')")
+						} else if (filter?.asset?.containsKey('physical')) {
+							// Just Physical devices
+							where = SqlUtil.appendToWhere(where, "a.assetType not IN ('application', 'database', 'files', 'virtual', 'vm')")
+						} else {
+							// All Devices
+							where = SqlUtil.appendToWhere(where, "a.assetType not IN ('application', 'database', 'files')")
+						}
 					
-					sql = "from AssetEntity a where a.moveBundle.id in (:bIds) and $where"
-					log.info "findAllAssetsWithFilter: sql=$sql, map=$map"
-					assets = AssetEntity.findAll(sql, map)
-					break;
+						sql = "from AssetEntity a where a.moveBundle.id in (:bIds) and $where"
+						log.info "findAllAssetsWithFilter: sql=$sql, map=$map"
+						assets = AssetEntity.findAll(sql, map)
+						break;
 					
-				case 'application':					
-					// Add additional WHERE clauses based on the following properties being present in the filter (Application domain specific)
-					addWhereConditions( ['appVendor','sme','sme2','businessUnit','criticality'] )
+					case 'application':					
+						// Add additional WHERE clauses based on the following properties being present in the filter (Application domain specific)
+						addWhereConditions( ['appVendor','sme','sme2','businessUnit','criticality'] )
 					
-					sql = "from Application a where a.moveBundle.id in (:bIds)" + (where.size()>0 ? " and $where" : '')
-					log.info "findAllAssetsWithFilter: sql=$sql, map=$map"
-					assets = Application.findAll(sql, map)
-					break;
+						sql = "from Application a where a.moveBundle.id in (:bIds)" + (where.size()>0 ? " and $where" : '')
+						log.info "findAllAssetsWithFilter: sql=$sql, map=$map"
+						assets = Application.findAll(sql, map)
+						break;
 				
-			} 
-		} catch (e) {
-			def msg = "An unexpected error occurred while trying to locate assets for filter $filter" + e.toString()
-			log.error "$msg\n"
-			throw new RuntimeException("$msg<br/>${e.getMessage()}")
+				} 
+			} catch (e) {
+				def msg = "An unexpected error occurred while trying to locate assets for filter $filter" + e.toString()
+				log.error "$msg\n"
+				throw new RuntimeException("$msg<br/>${e.getMessage()}")
+			}
 		}
 		
 		return assets
