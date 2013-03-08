@@ -147,7 +147,7 @@ class MoveEventController {
 				}
 				if (error) {
 					flash.message = "There was an error with the runtime recipe<br/>$error"
-					render(view:'edit',model:[moveEventInstance:moveEventInstance])
+					render(view:'edit',model:[moveEventInstance:moveEventInstance, moveBundles:MoveBundle.findAllByProject( moveEventInstance.project )])
 					return
 				}
 			}
