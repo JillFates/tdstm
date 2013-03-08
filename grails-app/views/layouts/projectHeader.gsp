@@ -168,7 +168,7 @@
 					<table class="mmtable"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Client/Project</span><br />
 						<ul >
-							<li><g:link class="mmlink" controller="project" action="list" params="[active:'active',tag_s_2_startDate:'desc']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link></li>
+							<li><g:link class="mmlink" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link></li>
 							<tds:hasPermission permission='CreateProject'>
 							<li><g:link class="mmlink" controller="project" action="create"  onclick="hideMegaMenu('projectMegaMenu')">Create Project</g:link></li>
 							</tds:hasPermission>
