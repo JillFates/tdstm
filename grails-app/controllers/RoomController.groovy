@@ -130,7 +130,8 @@ class RoomController {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
 		def rackInstanceList = Rack.findAllByRoom(roomInstance , [sort:"tag"])
-		def modelList = Model.findAllByRoomObject(true);
+		def prefVal = userPreferenceService.getPreference("roomTableShowAll")?: 'FALSE'
+		def modelList = Model.findAllByRoomObject(true);		
 		def newRacks = []
 		for(int i = 50000 ; i<50051; i++ ){
 			newRacks << i
@@ -142,7 +143,7 @@ class RoomController {
         else {
 			def draggableRack = session.getAttribute( "DraggableRack" )?.DraggableRack
 			[roomInstance: roomInstance, rackInstanceList:rackInstanceList, newRacks : newRacks, 
-				modelList:modelList, draggableRack:draggableRack]
+				modelList:modelList, draggableRack:draggableRack, prefVal:prefVal]
         }
     }
 
@@ -150,6 +151,7 @@ class RoomController {
         def roomInstance = Room.get(params.id)
 		def powerType = session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
 		List rackIds = request.getParameterValues("rackId")
+		userPreferenceService.setPreference("roomTableShowAll", params.showAll=='1' ? 'TRUE' : 'FALSE')
         if (roomInstance) {
     		roomInstance.roomName = params.roomName
 			roomInstance.location = params.location

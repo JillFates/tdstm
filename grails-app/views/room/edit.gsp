@@ -45,10 +45,15 @@
 						<input type="button" class="submit" value="Cancel" onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
 						<input type="submit" class="submit" value="Update" />
 					</td>
-					<td class="buttonR" style="padding-left: 180px;vertical-align:top;" colspan="5" nowrap="nowrap">
+					<td class="buttonR" style="padding-left: 180px;vertical-align:top;" colspan="6" nowrap="nowrap">
 					    <span>
 						    <label for="addTargetRoom"><b>Target room:</b></label>
 							<input type="checkbox" id="addTargetRoom" name="addTargetRoom"/>&nbsp;
+						</span>
+						<span>
+						    <label for="showAll"><b>Show All:</b></label>
+							<input type="checkbox" id="showAll" name="showAll" ${prefVal && prefVal == 'TRUE' ?  'value="1" checked="checked"' :  ' value="0"' }
+							onclick="if(this.checked){this.value = 1} else {this.value = 0 }; showRackTable(this.value)"/>&nbsp;
 						</span>
                         <span>
                             <label for="showRoomObjects"><b>Draggable:</b></label>
@@ -107,7 +112,7 @@
 		</g:each>
 		<g:each in="${newRacks}" var="rack">
 			<div align="center"id="rack_${rack}" style="top:0px;left:0px;display: none;" onmouseout="updateXYPositions(this.id)"
-				 class="rack_highlight_no_L  dragggable" >
+				 class="rack_highlight_no_L  draggable" >
 				<span id="rackLabel_${rack}" style="background-color:white;z-index:1; "><br>&nbsp;</br></span>
 			</div>
 		</g:each>
@@ -115,7 +120,7 @@
 </div>
 	<div style="left:580px;" id="roomObjects">
 
-		<table border="0">
+		<table border="0" id="rackTableId">
 			<tr>
 				<th>Rack<input type="hidden" id="rackCount" name="rackCount" value="50000"></th>
 				<th>X</th>
@@ -129,7 +134,7 @@
 				<th>Assets</th>
 			</tr>
 		<g:each in="${rackInstanceList}" var="rack" status="i">
-			<tr id="rackEditRow_${rack.id}" class="${(i % 2) == 0 ? 'odd' : 'even'}" >
+			<tr id="rackEditRow_${rack.id}" class="${(i % 2) == 0 ? 'odd' : 'even'} rowShow" >
 				<td>
 					<input type="hidden" name="rackId" value="${rack.id}"/>${rack.source == 1 ? 'S' : 'T' }
 					<input type="text" class="focusShadow" id="tag_${rack.id}"  name="tag_${rack.id}" value="${rack.tag}" size="10" onchange="changeLabel(${rack.id},this.value)" />
@@ -186,16 +191,47 @@ $(document).ready(function() {
        if (event.shiftKey) {
            if($(this).hasClass('objectSelected')){
         	   delShadowCss($(this).attr("id"))
+        	   if($("#showAll").val()=='0')
+        	   	showRackTable()
            } else {
            	   addShadowCss($(this).attr("id"));
+           	   if($("#showAll").val()=='0')
+           	     showRackTable()
            }
        } else {
     	   $(".dragRack").removeClass("objectSelected")
     	   $(".objectRowSelected").removeClass("objectRowSelected")
     	   addShadowCss($(this).attr("id"));
+    	   if($("#showAll").val()=='0')
+    	   	showRackTable()
        }
 	});
+	if($("#showAll").val() == "1")
+	   $('.rowShow').show()
+    else
+	   $('.rowShow').hide()
+
+	$("#roomObjects").height($("#rackTableId").height())
+	
 })
+
+function showRackTable(){
+   var rackIdArr = new Array();
+   
+   $('.objectSelected').each(function(){
+ 		var rackId = $(this).attr('id').split("_")[1]
+ 		rackIdArr.push(rackId)
+   })
+   if($("#showAll").val() == "1")
+	   $('.rowShow').show()
+   else
+	   $('.rowShow').hide()
+   
+   for(i=0; i<rackIdArr.length; i++){
+	   $("#rackEditRow_"+rackIdArr[i]).show()
+   }
+   $("#roomObjects").height($("#rackTableId").height())
+}
 
 /**
  * Multi div darg function function.
@@ -404,6 +440,7 @@ function createRack(value){
 		$("#newPowerA_"+newRackId).val('0')
 		$("#newPowerB_"+newRackId).val('0')
 	}
+	$("#roomObjects").height($("#rackTableId").height())
 }
 function changeLabel(id,value){
 	$("#rackLabel_"+id).html(value)
