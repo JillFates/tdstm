@@ -1176,6 +1176,10 @@ class TaskService {
 		}
 		// log.info "Runbook recipe: $recipe"
 
+		// Load the taskSpecIds array used for validation, etc
+		def taskSpecList = recipeTasks*.id.toString()
+		log.info "taskSpecList=$taskSpecList"
+		
 		// Load up the 'groups' if any are defined
 		if ( recipeGroups ) {
 			recipeGroups.each() { g -> 
@@ -1222,7 +1226,7 @@ class TaskService {
 				assetsLatestTask.put(taskToLink.assetEntity.id, taskToLink)
 				out.append("Created dependency (${newDep.id}) between milestone $lastMilestone and $taskToLink<br/>")									
 			} else {
-				exceptions.append("Task(${tnd}) has no predecessor tasks<br/>")
+				exceptions.append("Task(${taskToLink}) has no predecessor tasks<br/>")
 			}
 			
 		}
@@ -1259,16 +1263,13 @@ class TaskService {
 			return wfsd
 		}
 		
-		def taskSpecIndex = 0
 		def maxPreviousEstFinish = null		// Holds the max Est Finish from the previous taskSpec
 		def workflow
-		
 		try {
 			recipeTasks.each { taskSpec ->
-				taskSpecIndex++
 				
-				def tasksNeedingDependencies = []
-						def depCode=''
+				def tasksNeedingPredecessors = []
+				def depCode=''
 				
 				// Make sure that the user define the taskSpec.id and that it is NOT a duplicate from a previous step
 				// because it could cause adverse dependency linkings.
@@ -1332,8 +1333,8 @@ class TaskService {
 					} else {
 						newTask = createTaskFromSpec(recipeId, whom, ++lastTaskNum, moveEvent, taskSpec, null)
 						taskList << newTask
-						tasksNeedingDependencies << newTask
-						taskCount++					
+						tasksNeedingPredecessors << newTask
+						taskCount++		
 					}
 			
 					
@@ -1360,8 +1361,14 @@ class TaskService {
 					
 				} else {
 					// -------------------------
-					// Create Normal Tasks
+					// Create Normal Tasks (tasks based on Assets)
 					// -------------------------
+					
+					// Normal tasks need to have a filter
+					if (! taskSpec.filter || taskSpec.filter.size() == 0) {
+						exceptions.append("TaskSpec id ${taskSpec.id} for asset based task requires a filter<br/>")						
+					}
+					
 					def assetsForTask = findAllAssetsWithFilter(moveEvent, taskSpec.filter, groups, exceptions)
 					log.info "Found (${assetsForTask?.size()}) assets for taskSpec ${taskSpec.id}-${taskSpec.description}"
 					if ( !assetsForTask || assetsForTask.size()==0) return // aka continue
@@ -1374,7 +1381,8 @@ class TaskService {
 						newTask = createTaskFromSpec(recipeId, whom, ++lastTaskNum, moveEvent, taskSpec, workflow, asset)
 						taskList << newTask
 						taskCount++
-						tasksNeedingDependencies << newTask
+						tasksNeedingPredecessors << newTask
+						// assetsLatestTask.put(asset.id, newTask)
 						out.append("Created task $newTask<br/>")
 					}
 				}
@@ -1382,7 +1390,7 @@ class TaskService {
 				//
 				// DEPENDENCY MAPPING - Now wire up the tasks that were just created
 				//
-				if 	(tasksNeedingDependencies.size() > 0) {
+				if 	(tasksNeedingPredecessors.size() > 0) {
 					// Set some vars that will be used in the next iterator 
 					def specHasDependency = false		// Set to true if the spec references Dependencies
 					def specHasPredecessor = false
@@ -1405,16 +1413,52 @@ class TaskService {
 						specHasPredecessor = true
 						
 						// Get the list of predecessor Tasks
-						predecessorTasks = taskList.findAll { it.taskSpec == taskSpec.predecessor }
+						def predCode = taskSpec.predecessor.substring(1)
+						log.info "Processing taskSpec $taskSpec.id predecessor $predCode"
+						switch(taskSpec.predecessor[0]) {
+							case '#':
+								// Find all predecessor tasks that have the taskSpec ID #
+								if (taskSpecList.contains(predCode)) {
+									predecessorTasks = taskList.findAll { it.taskSpec.toString() == predCode.toString() }									
+								} else {
+									throw new RuntimeException("Task Spec ${taskSpec.id} 'predecessor' value ($taskSpec.predecessor) references undefined taskSpec.ID.")
+								}	
+								break
+								
+							case '@':
+								// Find the latest task for all of the assets of the specified GROUP
+								log.info("assetsLatestTask has ${assetsLatestTask.size()} assets")
+								if (groups.containsKey(predCode)) {
+									groups[predCode].each() { asset ->
+										if (assetsLatestTask.containsKey(asset.id)) {
+											predecessorTasks << assetsLatestTask[asset.id]											
+										} else {
+											exceptions.append("Task Spec ${taskSpec.id} 'predecessor' unable to find previous task for asset $asset<br/>")
+										}
+									}									
+								} else {
+									throw new RuntimeException("Task Spec ${taskSpec.id} 'predecessor' value ($taskSpec.predecessor) references undefined group.")
+								}
+								break
+							
+							default:
+								log.error("MoveEvent $moveEvent - Task Spec ${taskSpec.id} has invalid 'predecessor' value (${taskSpec.predecessor})")
+								throw new RuntimeException("Task Spec ${taskSpec.id} has invalid 'predecessor' value (${taskSpec.predecessor}) " +
+									"- valid options are [ #TaskSpec.ID | @GROUP ]")	
+						}
+						
 						log.info("Processing taskSpec.predecessor and found ${predecessorTasks.size()} tasks")
+						if (predecessorTasks.size() == 0) {
+							// We SHOULD of found some tasks so bomb if we don't
+							throw new RuntimeException("Task Spec ${taskSpec.id} 'predecessor' (${taskSpec.predecessor}) found NO predecessor tasks")
+						}
 					}
 					
-					log.info "specHasDependency=$specHasDependency"
 					//	
 					// Now iterate over all of the tasks just created for this taskSpec and assign dependencies 
 					//
-					out.append("# Creating dependencies on ${tasksNeedingDependencies.size()}<br/>")
-					tasksNeedingDependencies.each() { tnd ->
+					out.append("# Creating dependencies on ${tasksNeedingPredecessors.size()}<br/>")
+					tasksNeedingPredecessors.each() { tnd ->
 						log.info "Processing task $tnd"
 						if (specHasPredecessor) {
 							// 
@@ -1424,11 +1468,8 @@ class TaskService {
 							// Wire up the task to the list of predecessor tasks
 							predecessorTasks.each() { predTask ->
 								newDep = createTaskDependency(predTask, tnd)
+								out.append("Created predecessor dependency (${newDep.id}) between ${predTask} and $tnd<br/>")									
 								depCount++
-								if (tnd.assetEntity) {
-									assetsLatestTask.put(tnd.assetEntity.id, tnd)
-									out.append("Created predecessor dependency (${newDep.id}) between ${predTask} and $tnd<br/>")									
-								}
 							}
 							
 						} else if (specHasDependency && tnd.assetEntity) {
@@ -1495,9 +1536,17 @@ class TaskService {
 							linkTaskToLastAssetOrMilestone(tnd)
 							
 						}
-					} // tasksNeedingDependencies.each()
-				}
-			} 
+						
+						// Link the latest task to the asset
+						if (tnd.assetEntity) {
+							assetsLatestTask.put(tnd.assetEntity.id, tnd)
+						}
+						
+					} // tasksNeedingPredecessors.each()
+					
+					
+				} // if (tasksNeedingPredecessors.size() > 0)	
+			} // recipeTasks.each() {}
 		} catch(e)	{
 			exceptions.append("We BLEW UP damn it!<br/>")
 			exceptions.append(e.toString())
