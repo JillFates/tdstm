@@ -161,13 +161,9 @@ class TaskService {
 			LEFT OUTER JOIN person p ON p.person_id = t.assigned_to_id 
 			WHERE t.project_id=:projectId AND t.comment_type=:type """)
 
-		// TODO - CLEANER role no longer exists
-		if(roles.contains('CLEANER')){
-			sql.append("""AND t.role = 'CLEANER' """)
-		}else{
-			sql.append("""AND( t.assigned_to_id=:assignedToId OR
-						(${roles ? 't.role IN (:roles) AND ' : ''}	t.status IN (:statuses) AND t.hard_assigned=0 OR (t.hard_assigned=1 AND t.assigned_to_id=:assignedToId) ) ) """)
-		}
+			sql.append("AND( t.assigned_to_id=:assignedToId OR \
+				(${roles ? 't.role IN (:roles) AND ' : ''}	t.status IN (:statuses) \
+				AND t.hard_assigned=0 OR (t.hard_assigned=1 AND t.assigned_to_id=:assignedToId) ) ) ")
 		
 		search = org.apache.commons.lang.StringUtils.trimToNull(search)
 		if (search) {
@@ -213,8 +209,8 @@ class TaskService {
 			sql.append( (sortAndOrder ? ', ' : '') + 'score DESC, task_number ASC' )
 		}
 		
-		// log.error "getUserTasks: SQL: " + sql.toString()
-		// log.error "getUserTasks: SQL params: " + sqlParams
+		//log.info "getUserTasks: SQL: " + sql.toString()
+		//log.info "getUserTasks: SQL params: " + sqlParams
 		
 		// Get all tasks from the database and then filter out the TODOs based on a filtering
 		
@@ -1272,7 +1268,7 @@ class TaskService {
 				taskSpecIndex++
 				
 				def tasksNeedingDependencies = []
-				def depCode=''
+						def depCode=''
 				
 				// Make sure that the user define the taskSpec.id and that it is NOT a duplicate from a previous step
 				// because it could cause adverse dependency linkings.
