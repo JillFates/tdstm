@@ -176,6 +176,7 @@ class TaskController {
 		def graphType = grailsApplication.config.graph?.graphviz?.graphType
 		def deleteDotFile = grailsApplication.config.graph?.containsKey('deleteDotFile') ? grailsApplication.config.graph.deleteDotFile : true
 		
+		// Color scheme for status key:[font, background]
 		def statusColor = [
 			(AssetCommentStatus.HOLD):['black', '#FFFF33'],
 			(AssetCommentStatus.PLANNED):['black', '#FFFFFF'],
@@ -183,7 +184,8 @@ class TaskController {
 			(AssetCommentStatus.PENDING):['black', '#FFFFFF'],
 			(AssetCommentStatus.STARTED):['white', 'darkturquoise'],
 			(AssetCommentStatus.DONE):['white', '#24488A'],
-			(AssetCommentStatus.TERMINATED):['white', 'black'],			
+			(AssetCommentStatus.TERMINATED):['white', 'black'],	
+			'ERROR': ['red', 'white'],		// Use if the status doesn't match
 		]
 
 		def mode = params.mode ?: ''
@@ -195,8 +197,8 @@ class TaskController {
 		// log.info "tmpDir=$tmpDir, targetDir=$targetDir, targetURI=$targetURI, dotExec=$dotExec, graphType=$graphType"
 		
 		if (! moveEvent) {
-			response.status=404
-			render "404 Not Found"
+			render "Viewing a graph requires that you select a specific move event first."
+			return
 		} 
 		def project = moveEvent.project
 		def projectId = project.id
@@ -247,7 +249,8 @@ digraph runbook {
 		//	AND t.task_number < 40
 		//    println "Record: $it"
 		    def task = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
-			color = mode == 's' ? "fillcolor=\"${statusColor[it.status][1]}\", fontcolor=\"${statusColor[it.status][0]}\", style=filled" : ''
+			def colorKey = statusColor.containsKey() ? it.status : 'ERROR'
+			color = mode == 's' ? "fillcolor=\"${statusColor[colorKey][1]}\", fontcolor=\"${statusColor[colorKey][0]}\", style=filled" : ''
 		    task = (task.size() > 35) ? task[0..34] : task 
 			dotFile << "\t${it.task_number} [label=\"${task}\" $color];\n"
 			def successors = it.successors
