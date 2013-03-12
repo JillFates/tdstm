@@ -55,11 +55,11 @@ class HtmlUtil {
 	 * @param onClick - javascript to embed into the onclick event
 	 * @return String - HTML for the button
 	 */
-	def public static actionButton(label, icon, id, onclick) {
+	def public static actionButton(label, icon, id, onclick, def href='javascript:') {
 		def name = label.toLowerCase().replace(' ', '').replace('.','')
 		def buttonId = name + "_button_" + id
 		def labelId = name + "_text_" + id
-		return """<a id="${buttonId}" class="task_action ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
+		return """<a id="${buttonId}" href="${href}" class="task_action ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action"
 			onclick="${onclick}">
 			<span class="ui-button-icon-primary ui-icon ${icon} task_icon"></span>
 			<span id="${labelId}" class="ui-button-text task_button">${label}</span>

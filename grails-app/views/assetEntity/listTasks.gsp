@@ -1,6 +1,7 @@
 <%@page import="com.tds.asset.AssetComment"%>
 <%@page import="com.tdssrc.grails.TimeUtil"%>
 <%@page import="com.tdssrc.grails.StringUtil"%>
+<%@page import="com.tdssrc.grails.HtmlUtil"%>
 <%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus"%>
 <html>
 <head>
@@ -10,8 +11,6 @@
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="entity.crud.js" />
-	<script language="javascript" src="${g.resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
-	<link rel="stylesheet" type="text/css" href="${g.resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
 	<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
@@ -161,8 +160,8 @@
 				&nbsp;&nbsp;
 				<input type="checkbox" id="justMyTasksCB" ${ (justMyTasks=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'justMyTasks');"/>
 				<b><label for="justMyTasksCB" > Just My Tasks</label></b>&nbsp;&nbsp;
-					<span class="menuButton" style="position:absolute; margin-left:430px;"><g:link class="create" controller="task" action="moveEventTaskGraph"
-						params="[moveEventId:filterEvent,mode:'s']">View Task Graph</g:link>
+					<span style="position:absolute; margin-left:430px;">
+					${HtmlUtil.actionButton('View Task Graph', 'ui-icon-zoomin', 'graph', '','../task/moveEventTaskGraph?moveEventId='+filterEvent+'&mode=s')}&nbsp;
 				
 					<input type="button" value="Refresh" onclick="submitForm()" style="cursor: pointer;">&nbsp;
 					<select id="selectTimedBarId"
