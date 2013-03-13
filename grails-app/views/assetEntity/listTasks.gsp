@@ -31,6 +31,13 @@
 	    	currentMenuId = "#assetMenu";
 	    	$("#teamMenuId a").css('background-color','#003366')
 	    	$("#selectTimedBarId").val(${timeToUpdate})
+	    	$("#viewtaskgraph_button_graph").click(function(event){
+				 var moveEvent = $("#moveEventId").val()
+				 if(moveEvent == '0'){
+				 	alert("Please select a move event first.")
+				 	event.preventDefault()
+				 }
+			});
 	    	taskManagerTimePref = ${timeToUpdate}
 	    	if(taskManagerTimePref != 0){
 	    	  B2.Start(taskManagerTimePref);
