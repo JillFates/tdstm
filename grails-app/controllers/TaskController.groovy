@@ -249,7 +249,7 @@ digraph runbook {
 		//	AND t.task_number < 40
 		//    println "Record: $it"
 		    def task = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
-			def colorKey = statusColor.containsKey() ? it.status : 'ERROR'
+			def colorKey = statusColor.containsKey(it.status) ? it.status : 'ERROR'
 			color = mode == 's' ? "fillcolor=\"${statusColor[colorKey][1]}\", fontcolor=\"${statusColor[colorKey][0]}\", style=filled" : ''
 		    task = (task.size() > 35) ? task[0..34] : task 
 			dotFile << "\t${it.task_number} [label=\"${task}\" $color];\n"
