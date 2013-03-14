@@ -380,7 +380,7 @@ class ClientConsoleController {
 	def setTimePreference = {
         def timer = params.timer
         def updateTime =[]
-		def sessionKey = params.prefFor ? "MY_TASK" : "CLIENT_CONSOLE_REFRESH"
+        def sessionKey = params.prefFor ? params.prefFor : "CLIENT_CONSOLE_REFRESH"
         if(timer){
             userPreferenceService.setPreference( sessionKey, "${timer}" )
         }

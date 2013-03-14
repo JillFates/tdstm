@@ -1030,7 +1030,7 @@ class ClientTeamsController {
 			def css = taskService.getCssClassForStatus( task.status )
 			issueList << ['item':task,'css':css]
 		}
-		def timeToRefresh = getSession()?.getAttribute("MY_TASK")?.MY_TASK
+		def timeToRefresh =  userPreferenceService.getPreference("MYTASKS_REFRESH")
 		// Determine the model and view
 		def model = [taskList:issueList, tab:tab, todoSize:todoSize, allSize:allSize, 
 			search:search, sort:params.sort, order:params.order,

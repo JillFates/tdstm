@@ -71,7 +71,7 @@
     function setTimer(value){
     	jQuery.ajax({
 			url: '../clientConsole/setTimePreference',
-			data: {'timer':value, prefFor:'myTask'},
+			data: {'timer':value, prefFor:'MYTASKS_REFRESH'},
 			type:'POST',
 			success: function(data) {
 				var timeUpdate = eval("(" + data.responseText + ")")

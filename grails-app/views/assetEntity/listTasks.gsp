@@ -158,6 +158,7 @@
 			<form name="commentForm" id="commentForm" method="post" action="listTasks">
 			<input type="hidden" name="justRemaining" id="justRemaining" value="${justRemaining}" />
 			<input type="hidden" name="justMyTasks"   id="justMyTasks"   value="${justMyTasks}"/>
+			<input type="hidden" id="myPage" value="taskManager" />
 			<span  style="white-space: nowrap;">
 				<b>Move Event </b>
 			 	<g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
@@ -172,7 +173,7 @@
 				
 					<input type="button" value="Refresh" onclick="submitForm()" style="cursor: pointer;">&nbsp;
 					<select id="selectTimedBarId"
-					    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', params:'\'timer=\'+ this.value +\'&prefFor=myTask\' ', onComplete:'changeTimebarPref(e)') }">
+					    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', params:'\'timer=\'+ this.value +\'&prefFor=TASKMGR_REFRESH\' ', onComplete:'changeTimebarPref(e)') }">
 						<option value="0">Manual</option>
 						<option value="60" selected="selected">1 Min</option>
 						<option value="120">2 Min</option>

@@ -192,7 +192,11 @@ function hideActionBar(rowId,spanId){
 function changeTimebarPref(data){
 	 var timeUpdate = eval("(" + data.responseText + ")")
 		if(timeUpdate){
-			timedUpdate(timeUpdate[0].updateTime.MY_TASK)
+			if($("#myPage").val() == 'taskManager'){
+				timedUpdate(timeUpdate[0].updateTime.TASKMGR_REFRESH)
+			} else {
+				timedUpdate(timeUpdate[0].updateTime.MYTASKS_REFRESH)
+			}
 		}
 }
 /**

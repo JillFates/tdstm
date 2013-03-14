@@ -41,7 +41,7 @@
 							<input type="button" value="Refresh" onclick="pageRefresh()" style="cursor: pointer;"/>&nbsp;
 							<select id="selectTimedBarId"
 							    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', 
-								params:'\'timer=\'+ this.value +\'&prefFor=myTask\' ', onComplete:'changeTimebarPref(e)') }">
+								params:'\'timer=\'+ this.value +\'&prefFor=MYTASKS_REFRESH\' ', onComplete:'changeTimebarPref(e)') }">
 								<option value="0">Manual</option>
 								<option value="60">1 Min</option>
 								<option value="120">2 Min</option>
@@ -59,6 +59,7 @@
 						<input type="hidden" name="sort" value="${sort}" />
 						<input type="hidden" name="order" value="${order}" />
 						<input type="hidden" name="tab" id="tabId" value="${tab}" />
+						<input type="hidden" id="myPage" value="mytask" />
 					</g:form>
 				</div>
 				</div>

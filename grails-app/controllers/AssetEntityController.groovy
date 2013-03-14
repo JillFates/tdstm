@@ -3103,7 +3103,7 @@ class AssetEntityController {
 		def justRemaining = userPreferenceService.getPreference("JUST_REMAINING") ?: "1"
 		// Set the Checkbox values to that which were submitted or default if we're coming into the list for the first time
 		def justMyTasks = params.containsKey('justMyTasks') ? params.justMyTasks : "0"
-		def timeToRefresh = getSession()?.getAttribute("MY_TASK")?.MY_TASK
+		def timeToRefresh = userPreferenceService.getPreference("TASKMGR_REFRESH")
 		def entities = assetEntityService.entityInfo( project )
 		
 		return [timeToUpdate : timeToRefresh ?: 60,servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
