@@ -425,31 +425,12 @@ class RoomController {
 		   def prevUsize = 0
 		   assetsInRack.findAll{ it.assetType != 'Blade' }.each{ assetEntity ->
 			   // Calculating current assets's position .
-			   def currAssetPos = location == "source" ? assetEntity.sourceRackPosition : assetEntity.targetRackPosition
-			   def assetUsize = 0  // Initialized  to 0 to take the count of usize 0 if assets are overlapping.
-			   // if assets are not overLapping then it should go inside condition to calculate asset's max usize.
-			   def thisUsize
-			   if( assetPos != currAssetPos &&  currAssetPos > (assetPos+prevUsize-1) ){ // if assets are not overlapping
-				   // fetching  all assets  of current rack position .
-				   def assetsAtPos = getAssetsAtPosByRackAndLoc(rack, location, assetEntity.sourceRackPosition)
-				   // Assigning usize of that assets which has max usize .
-				   thisUsize = assetsAtPos.model?.usize.sort().reverse()[0]?:1
-				   assetUsize = thisUsize
-			   } else if (currAssetPos > assetPos && currAssetPos < (assetPos+prevUsize)){ // If assets are overlapping
-					   def assetsAtPos = getAssetsAtPosByRackAndLoc(rack, location, assetEntity.targetRackPosition)
-					   //Assigning usize of that assets which has max usize .
-					   thisUsize = assetsAtPos.model?.usize.sort().reverse()[0]?:1
-					   if((assetPos + prevUsize) < (currAssetPos + thisUsize)){
-						   assetUsize =  thisUsize - ((assetPos + prevUsize ) - (currAssetPos))
-					   } else {
-						   thisUsize = thisUsize > prevUsize ? thisUsize : prevUsize
-					   }
-			   }
-			   thisRackUsedSpace += assetUsize
+			   def posResult = getRackPosDetails(assetEntity, assetPos, prevUsize, location, rack)
+			   thisRackUsedSpace += posResult.assetUsize
 			   
 			   // Assigning rack position to keep track on upcoming asset's position in loop .
-			   assetPos = assetUsize > 0 ? currAssetPos : assetPos
-			   prevUsize = thisUsize > 0 ? thisUsize : prevUsize
+			   assetPos = posResult.assetUsize > 0 ? posResult.currAssetPos : assetPos
+			   prevUsize = posResult.thisUsize > 0 ? posResult.thisUsize : prevUsize
 		   }
 		   spaceString = params.capacityType != "Used" ? (thisRackTotalSpace-thisRackUsedSpace)+" remaining of "+thisRackTotalSpace+" RU" : thisRackUsedSpace+" used of "+thisRackTotalSpace+" RU"
 		   assets.each{ asset->
@@ -638,28 +619,9 @@ class RoomController {
 			def assetPos = 0 // a flag to determine the previous asset's  rack position .
 			def prevUsize = 0 // a flag to determine the previous asset's  usize . 
 			assetsInRack.findAll{ it.assetType != 'Blade' }.each{ assetEntity ->
-				// Calculating current assets's position .
-				def currAssetPos = location == "source" ? assetEntity.sourceRackPosition : assetEntity.targetRackPosition
-				def assetUsize = 0  // Initialized  to 0 to take the count of usize 0 if assets are overlapping.
-				// if assets are not overLapping then it should go inside condition to calculate asset's max usize.
-				def thisUsize
-				if( assetPos != currAssetPos &&  currAssetPos > (assetPos+prevUsize-1) ){ // if assets are not overlapping
-					// fetching  all assets  of current rack position .
-					def assetsAtPos = getAssetsAtPosByRackAndLoc(rack, location, assetEntity.sourceRackPosition) 
-					// Assigning usize of that assets which has max usize .
-					thisUsize = assetsAtPos.model?.usize.sort().reverse()[0]?:1 
-					assetUsize = thisUsize 
-				} else if (currAssetPos > assetPos && currAssetPos < (assetPos+prevUsize)){ // If assets are overlapping
-						def assetsAtPos = getAssetsAtPosByRackAndLoc(rack, location, assetEntity.targetRackPosition) 
-						//Assigning usize of that assets which has max usize .
-						thisUsize = assetsAtPos.model?.usize.sort().reverse()[0]?:1
-						if((assetPos + prevUsize) < (currAssetPos + thisUsize)){
-							assetUsize =  thisUsize - ((assetPos + prevUsize ) - (currAssetPos)) 
-						} else {
-							thisUsize = thisUsize > prevUsize ? thisUsize : prevUsize
-						}
-				}
-				usedRacks += assetUsize
+
+            def posResult = getRackPosDetails(assetEntity, assetPos, prevUsize, location, rack)
+			    usedRacks += posResult.assetUsize
 				
 				def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.toPower is not null AND cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? ",["Power",assetEntity])
 				def powerConnectorsAssigned = powerConnectors.size()
@@ -671,8 +633,8 @@ class RoomController {
 					}
 				}
 				// Assigning rack position to keep track on upcoming asset's position in loop .
-				assetPos = assetUsize > 0 ? currAssetPos : assetPos
-				prevUsize = thisUsize > 0 ? thisUsize : prevUsize
+				assetPos = posResult.assetUsize > 0 ? posResult.currAssetPos : assetPos
+				prevUsize = posResult.thisUsize > 0 ? posResult.thisUsize : prevUsize
 			}
 			switch(capacityView){
 				case "Space":
@@ -830,10 +792,43 @@ class RoomController {
 	 * @param rackPos - the position of rack where we are requesting this method to fetch the assets
 	 * @return - list of assets at requested position
 	 */ 
-	def getAssetsAtPosByRackAndLoc(rack, location, rackPos) {
-		def assetsAtThisPos = location == "source" ? AssetEntity.findAllBySourceRackPositionAndRackSource(rackPos, rack) :
-			AssetEntity.findAllByTargetRackPositionAndRackTarget(rackPos , rack)
+    def getAssetsAtPosByRackAndLoc(rack, location, assetEntity) {
+		def assetsAtThisPos = location == "source" ? AssetEntity.findAllBySourceRackPositionAndRackSource(assetEntity.sourceRackPosition, rack) :
+			AssetEntity.findAllByTargetRackPositionAndRackTarget(assetEntity.targetRackPosition , rack)
 	
 	    return assetsAtThisPos
+	}
+   
+   /**
+	 * This method is used to get information of assets and there relevant pos., and usize to count rack used count .
+	 * @param assetEntity : instance of assetEntity .
+	 * @param assetPos : previous asset rack position .
+	 * @param prevUsize : previous asset's model usize .
+	 * @param location : location of rack could be source or target .
+	 * @param rack : instance of rack .
+	 * @return : a map contains info like current and previous asset's usize and like current and previous asset's rack position .
+	 */
+	def getRackPosDetails(assetEntity, assetPos, prevUsize, location, rack){
+		def currAssetPos = location == "source" ? assetEntity.sourceRackPosition : assetEntity.targetRackPosition
+		def assetUsize = 0  // Initialized  to 0 to take the count of usize 0 if assets are overlapping.
+		// if assets are not overLapping then it should go inside condition to calculate asset's max usize.
+		def thisUsize
+		if( assetPos != currAssetPos &&  currAssetPos > (assetPos+prevUsize-1) ){ // if assets are not overlapping
+			// fetching  all assets  of current rack position .
+			def assetsAtPos = getAssetsAtPosByRackAndLoc(rack, location, assetEntity)
+			// Assigning usize of that assets which has max usize .
+			thisUsize = assetsAtPos.model?.usize.sort().reverse()[0]?:1
+			assetUsize = thisUsize
+		} else if (currAssetPos > assetPos && currAssetPos < (assetPos+prevUsize)){ // If assets are overlapping
+				def assetsAtPos = getAssetsAtPosByRackAndLoc(rack, location, assetEntity)
+				//Assigning usize of that assets which has max usize .
+				thisUsize = assetsAtPos.model?.usize.sort().reverse()[0]?:1
+				if((assetPos + prevUsize) < (currAssetPos + thisUsize)){
+					assetUsize =  thisUsize - ((assetPos + prevUsize ) - (currAssetPos))
+				} else {
+					thisUsize = thisUsize > prevUsize ? thisUsize : prevUsize
+				}
+		}
+		return [thisUsize:thisUsize, prevUsize:prevUsize, assetUsize:assetUsize, currAssetPos:currAssetPos]
 	}
 }
