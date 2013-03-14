@@ -295,7 +295,7 @@ class WorkflowService {
 	 def completeWorkflowTask( assetEntity, userLogin, process, state) {
 		 def task = getTaskFromAssetAndWorkflow(assetEntity, state)
 		 def message = ''
-		 log.info "completeWorkflowTask: asset:${assetEntity.id}, user:${userLogin}, process:${process}, state:${state}, task:${task.id}"
+		 log.info "completeWorkflowTask: asset:${assetEntity.id}, user:${userLogin}, process:${process}, state:${state}, task:${task?.id}"
 		 if (task) {
 			 // TODO : calling completeTask with false doesn't allow for updating multiple states at once
 			 // message = taskService.completeTask(task.id, userLogin.id, false)

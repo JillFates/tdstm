@@ -1,4 +1,5 @@
 import grails.converters.JSON
+import com.tdsops.tm.enums.domain.AssetCommentStatus
 class MoveEventNewsController {
 	// *** Initialize Services
 	def jdbcTemplate
@@ -31,7 +32,8 @@ class MoveEventNewsController {
 									left join move_bundle mb on (mb.move_bundle_id = ae.move_bundle_id)
 									left join move_event me on ( me.move_event_id = mb.move_event_id ) 
 									left join project p on (p.project_id = ae.project_id) 
-									where mb.move_event_id = ${moveEvent.id} and  ac.comment_type = 'issue' and p.project_id = ${projectId} """ )
+									where mb.move_event_id = ${moveEvent.id} and  ac.comment_type = 'issue' and p.project_id = ${projectId} 
+									and ac.status = '${AssetCommentStatus.HOLD}'""" )
 				def moveEventNewsQuery = new StringBuffer( """SELECT mn.move_event_news_id as id,  'N' as type, 
 									DATE_FORMAT( date_created,'%Y/%m/%d %r') as created,  
 									message as text, if(is_archived = 0, 'L','A') as state  from move_event_news mn 
