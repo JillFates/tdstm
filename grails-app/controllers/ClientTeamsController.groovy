@@ -1181,7 +1181,11 @@ class ClientTeamsController {
 			render (view:'showIssue_m',model:model)
 		}else{
 			def view = isCleaner ? '_showCleanerTask' : 'showIssue'
-			
+			if(isCleaner){
+				def lblQty= session.getAttribute('printLabelQuantity') ?: userPreferenceService.getPreference( "printLabelQuantity" )
+				def printerName=session.getAttribute('PRINTER_NAME') ?: userPreferenceService.getPreference( "PRINTER_NAME" )
+				model << [lblQty:lblQty, prefPrinter:printerName]
+			}
 			render (view:view,model:model)
 		}
 	}

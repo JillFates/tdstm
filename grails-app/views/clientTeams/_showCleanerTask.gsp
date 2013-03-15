@@ -158,21 +158,16 @@
 			<tr class="prop">
 					<td valign="top" class="name"><label for="resolution">Printers :</label></td>
 					<td nowrap="nowrap">
-						<select type="hidden" id="Printers" name="Printers"	${canPrint ? '' : 'disabled="disabled"' } onChange="javascript:mySelect(this);">
-							<option value="Zebra (ZPL-II)">Zebra (ZPL-II)</option>
+						<select type="hidden" id="Printers" name="Printers"	${canPrint ? '' : 'disabled="disabled"' } onChange="startprintjob();">
+							<option value="Zebra (ZPL-II)" >Zebra (ZPL-II)</option>
 							<g:each in="${session.getAttribute( 'PRINTERS' )}" var="printer">
-								<option value="${printer}">
+								<option value="${printer}" ${prefPrinter==printer ? 'selected="selected"' : ''}>
 									${printer}
 								</option>
 							</g:each>
 						</select> 
 						<b>Quantity: </b>
-						<select name="labels" id="labelQuantity">
-								<option value="1">1</option>
-								<option value="2" >2</option>
-								<option value="3" selected="selected">3</option>
-								<option value="4">4</option>
-						</select> 
+						<g:select  name="labels" id="labelQuantity" from="${1..4}" value="${lblQty}" onchange="${remoteFunction(controller:'task', action:'setLabelQuantityPref',params:'\'selected=\'+ this.value+\'&prefFor=printLabelQuantity\'')}"/>
 					</td>
 			</tr>
 			<tr>
@@ -409,7 +404,12 @@ var sHint = "C:\\temp\\output";
 
 
 function startprintjob() {
-	
+	var selectval=  $("#Printers").val();
+	jQuery.ajax({
+		url: '../task/setLabelQuantityPref',
+		data:{'selected':selectval, 'prefFor':'PRINTER_NAME'},
+		type:'POST'
+	});
 	/*
 	alert('model:' + $("#model").val());
 	alert(", cart: " + $("#cart").val());
@@ -477,7 +477,7 @@ function startprintjob() {
 function AddOption (selElement, text, value)
 {
   opt = new Option(text, value, false, true);
-  selElement.options[0] = opt;
+//selElement.options[0] = opt;
 }
 
 //=============================================================================

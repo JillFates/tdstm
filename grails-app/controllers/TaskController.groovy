@@ -12,7 +12,7 @@ class TaskController {
 	def securityService
 	def commentService
 	def taskService
-
+	def userPreferenceService
     def jdbcTemplate
     def grailsApplication
 
@@ -286,5 +286,20 @@ digraph runbook {
 			
 		}
 				
+	}
+	
+	/**
+	 * Used in MyTask to set user preference for printername and quantity .
+	 * @param prefFor - Key 
+	 * @param selected : value
+	 */
+	def setLabelQuantityPref ={
+		def key = params.prefFor
+		def selected=params.list('selected[]')[0] ?:params.selected
+		if(selected){
+			userPreferenceService.setPreference( key, selected )
+			session.setAttribute(key,selected)
+		}
+		render true
 	}
 }
