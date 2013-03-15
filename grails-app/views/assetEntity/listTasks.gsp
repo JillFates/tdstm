@@ -61,7 +61,7 @@
 					
 	    	<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
 	            colNames="'Action', 'Task', 'Description', 'Asset', 'AssetType', 'Updated', 'Due', 'Status',
-		            'Assigned To', 'Role', 'Category', 'Suc.', 'Score', 'id', 'statusCss'"
+		            'Assigned To', 'Team', 'Category', 'Suc.', 'Score', 'id', 'statusCss'"
 	            colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50},
             				{name:'taskNumber', editable: true, formatter:taskFormatter},
                             {name:'comment', editable: true, width:500, formatter:taskFormatter},
@@ -168,7 +168,7 @@
 				&nbsp;&nbsp;
 				<input type="checkbox" id="justMyTasksCB" ${ (justMyTasks=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'justMyTasks');"/>
 				<b><label for="justMyTasksCB" > Just Mine</label></b>&nbsp;&nbsp;
-				<span class="Button"><a class="task_action ui-button ui-state-default ui-corner-all" href="javascript:createIssue('','','')">
+				<span class="Button"><a class="task_action ui-button ui-state-default ui-corner-all" style="position:absolute; margin-left:10px;" href="javascript:createIssue('','','')">
 					<span class="ui-button-text task_button">Create Task</span></a>
 				</span>
 					<span style="position:absolute; margin-left:430px;">
