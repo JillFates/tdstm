@@ -1164,20 +1164,29 @@ class TaskService {
 		
 		def wfList = null			// get list of workflows for each move bundle
 		
+		def isMilestone=false		// Will flag if the current taskSpec is a milestone
+		def isGateway = false
+		def isAsset = false
+		def isGeneral = false
+		def isAction = false
+		def isRequired=true			// Used to hold the taskSpec.predecessor.required param or default to true
+		def failure = ''			// Will hold the message if there is an exception
+
 		def newTask
 		def newDep
+		def msg
 		
 		def recipe = getMoveEventRunbookRecipe( moveEvent )
 		def recipeId = recipe?.id
 		def recipeGroups = recipe?.groups
 		def recipeTasks = recipe?.tasks		
 		if (! recipeTasks || recipeTasks.size() == 0) {
-			return "There appears to be no runbook recipe or there is an error in its format"
+				return "There appears to be no runbook recipe or there is an error in its format"
 		}
 		// log.info "Runbook recipe: $recipe"
 
 		// Load the taskSpecIds array used for validation, etc
-		def taskSpecList = recipeTasks*.id.toString()
+		def taskSpecList = recipeTasks*.id
 		log.info "taskSpecList=$taskSpecList"
 		
 		// Load up the 'groups' if any are defined
@@ -1205,36 +1214,45 @@ class TaskService {
 		 * A helper closure used by generateRunbook to link a task to its predecessors by asset or milestone
 		 * @param AssetComment (aka Task)
 		 */
+		def linkTaskToMilestone = { taskToLink ->
+			if (lastMilestone) {
+				log.info "linkTaskToMilestone - $taskToLink"
+				newDep = createTaskDependency( lastMilestone, taskToLink )
+				depCount++
+				if (isRequired) {
+					assetsLatestTask[taskToLink.assetEntity.id] = taskToLink
+				}
+				// assetsLatestTask.put(taskToLink.assetEntity.id, taskToLink)
+				out.append("Created dependency (${newDep.id}) between milestone $lastMilestone and $taskToLink<br/>")									
+			} else {
+				log.info "linkTaskToMilestone Task(${taskToLink}) has no predecessor tasks"
+				exceptions.append("Task(${taskToLink}) has no predecessor tasks<br/>")
+			}			
+		}
+		
+		
+		/**
+		 * A helper closure used by generateRunbook to link a task to its predecessors by asset or milestone
+		 * @param AssetComment (aka Task)
+		 */
 		def linkTaskToLastAssetOrMilestone = { taskToLink ->
 			// See if there is an asset and that there are previous tasks for the asset
-
-			// If the task is for an asset and there is a previous task for the asset
 			if ( taskToLink.assetEntity && assetsLatestTask.containsKey(taskToLink.assetEntity.id) ) {
-				
-				log.info "linkTaskToLastAssetOrMilestone in 1"
+				log.info "linkTaskToLastAssetOrMilestone - $taskToLink"
 				newDep = createTaskDependency( assetsLatestTask[taskToLink.assetEntity.id], taskToLink )
 				depCount++
-				assetsLatestTask[taskToLink.assetEntity.id] = taskToLink									
+				if (isMilestone || isRequired) {
+					assetsLatestTask[taskToLink.assetEntity.id] = taskToLink
+				}
 				out.append("Created dependency (${newDep.id}) between milestone $lastMilestone and $taskToLink<br/>")
 				// Now we can associate this new task as the latest task for the asset									
 				assetsLatestTask.put(taskToLink.assetEntity.id, taskToLink)
 				
-			} else if (lastMilestone) {
-				log.info "linkTaskToLastAssetOrMilestone in 2"
-				newDep = createTaskDependency( lastMilestone, taskToLink )
-				depCount++
-				assetsLatestTask.put(taskToLink.assetEntity.id, taskToLink)
-				out.append("Created dependency (${newDep.id}) between milestone $lastMilestone and $taskToLink<br/>")									
 			} else {
-				exceptions.append("Task(${taskToLink}) has no predecessor tasks<br/>")
-			}
-			
+				log.info "linkTaskToLastAssetOrMilestone: isRequired=$isRequired, task.asset=${taskToLink.assetEntity}, assetsLatestTask=$assetsLatestTask"
+				linkTaskToMilestone( taskToLink )
+			}			
 		}
-		/*
-		} else {
-			exceptions.add "Support dependency for asset ${sd.predecessor} to asset ${sd.asset} that is not in move " +
-				"event for taskSpec ${taskSpec}"								 
-		*/
 		
 		// 
 		/**
@@ -1267,14 +1285,25 @@ class TaskService {
 		def workflow
 		try {
 			recipeTasks.each { taskSpec ->
+				def tasksNeedingPredecessors = []	// Used for wiring up predecessors in 2nd half of method
+				isMilestone = false
+				isGateway = false
+				isAsset = false
+				isGeneral = false
+				isAction = false
+				def depMode = ''			// Holds [s|r] for assetTask.predecessor.mode to indicate s)upports or r)equires
+				def mapMode = ''
+				def hasPredecessor = false
+				def hasGroup = false
+				def hasTaskSpec = false
 				
-				def tasksNeedingPredecessors = []
-				def depCode=''
-				
-				// Make sure that the user define the taskSpec.id and that it is NOT a duplicate from a previous step
 				// because it could cause adverse dependency linkings.
 				log.info "##### Processing taskSpec $taskSpec"
 
+				// ----
+				// VALIDATION of the TaskSpec
+				// ----
+				// Make sure that the user define the taskSpec.id and that it is NOT a duplicate from a previous step
 				specCount++
 				if (! taskSpec.containsKey('id')) {
 					throw new RuntimeException("TaskSpec for step $specCount in list is missing the 'id' property")
@@ -1283,226 +1312,490 @@ class TaskService {
 					throw new RuntimeException("TaskSpec for step $specCount duplicated id ${taskSpec.id} found in step ${taskSpecIds[taskSpec.id]}")
 				}
 				taskSpecIds.put(taskSpec.id, specCount)
+
+				// Determine if the taskSpec has the predecessor.required property and if it is of the Boolean type
+				if ( taskSpec.containsKey('predecessor') ) {
+					def predecessor = taskSpec.predecessor
+					if ( ! ( predecessor instanceof java.util.LinkedHashMap) ) {
+						throw new RuntimeException("TaskSpec (${taskSpec.id}) has invalid syntax for parameter 'predecessor' (${predecessor} ISA ${predecessor.getClass()}).")
+					} else {
+						hasPredecessor = true
+						if ( predecessor.containsKey('required') && ! (predecessor.required instanceof Boolean) ) {
+							msg = "TaskSpec (${taskSpec.id}) property 'predecessor.required' has invalid value (${predecessor.required}) "
+							log.error("$msg for Move Event $moveEvent")
+							throw new RuntimeException(msg)
+						} else {
+							isRequired = predecessor.containsKey('required') ? predecessor.required : true
+						}
+						if ( predecessor.containsKey('mode') ) {
+							depMode = predecessor.mode[0].toLowerCase()
+							if ( ! 'sr'.contains( depMode ) ) {
+								log.info("Task Spec ${taskSpec.id} has invalid predecessor.mode value (${predecessor.mode})")
+								throw new RuntimeException("Task Spec ${taskSpec.id} has invalid predecessor value (${predecessor.mode}) " +
+									"- valid options are [supports|requires]")	
+							}
+						}
+						
+						hasGroup = predecessor.containsKey('group')
+						hasTaskSpec = predecessor.containsKey('taskSpec')
+							
+						if ( depMode && ! taskSpec.filter ) {
+							log.info("Task Spec ${taskSpec.id} contains predecessor.mode which also requires a filter for assets")
+							throw new RuntimeException("Task Spec ${taskSpec.id} contains predecessor.mode which also requires a filter for assets")
+						}
+						
+						// Check for mutually exclusive mode, group and taskSpec
+						if ( (depMode && ( hasGroup || hasTaskSpec )) || (hasGroup && hasTaskSpec) ) {
+							msg = "Task Spec ${taskSpec.id} contains predecessor 'mode', 'group' and/or 'taskSpec' which mutually exclusive"
+							log.info(msg)
+							throw new RuntimeException(msg)							
+						}	
+						
+						// Make sure we have one of the three methods to find predecessors
+						if (! (depMode || hasGroup || hasTaskSpec) ) {
+							msg = "Task Spec ${taskSpec.id} contains predecessor requires on of the properties 'mode', 'group' or 'taskSpec'"
+							log.info(msg)
+							throw new RuntimeException(msg)							
+						}	
+					}
+				}
+ 				
+				// ----
 				
 				def taskWorkflowCode = taskSpec.containsKey('workflow') ? taskSpec.workflow : null
 				
-				out.append("=======<br/>Processing taskSpec ${taskSpec.id}-${taskSpec.description}<br/>-------<br/>")
+				// Validate that the taskSpec has the proper type
+				def stepType = taskSpec.containsKey('type') ? taskSpec.type.toLowerCase() : 'asset'
+				def validStepTypes = ['action','asset','gateway','milestone']
+				if ( ! validStepTypes.contains(stepType) ) {
+					msg = "TaskSpec ${taskSpecIds[taskSpec.id]} has invalid 'type' value ($stepType) for Move Event $moveEvent."
+					log.error(msg)
+					throw new RuntimeException("$msg Valid types are [${validStepTypes.join('|')}]")
+				}
 				
-				// -------------------------
-				// Handle Milestone tasks
-				// -------------------------
-				if (taskSpec.containsKey('milestone') ) {
-					
-					// Create the milestone task
-					out.append("Creating milestone ${taskSpec.title}<br/>")
-					
-					workflow = getWorkflowStep(taskWorkflowCode)		
-					newTask = createTaskFromSpec(recipeId, whom, ++lastTaskNum, moveEvent, taskSpec, workflow)
-					taskList << newTask
-					lastMilestone = newTask 
-					taskCount++
+				out.append("=======<br/>Processing taskSpec ${taskSpec.id}-${taskSpec.description} ($stepType):<br/>")
 
-					// Now find all tasks that don't have have successor (excluding the current milestone task) and
-					// create dependency where the milestone is the successor
-					def tasksNoSuccessors = jdbcTemplate.queryForList(noSuccessorsSql)
-					log.info "Found ${tasksNoSuccessors.count()} tasks with no successors"
-					if (tasksNoSuccessors.size()==0 && taskCount > 1 ) {
-						out.append("Found no successors for a milestone, which is unexpected but not necessarily wrong - Task $newTask<br/>")
-					}
-					tasksNoSuccessors.each() { p ->
-						// Create dependency as long as we're not referencing the task just created
-						if (p.id != newTask.id ) {
-							def predecessorTask = AssetComment.read(p.id)
-							newDep = createTaskDependency( predecessorTask, newTask )
-							depCount++
-							out.append("Created dependency (${newDep.id}) between $predecessorTask and $newTask<br/>")
-							if (predecessorTask.assetEntity) {
-								// Move the asset's last task to the milestone task
-								assetsLatestTask.put(predecessorTask.assetEntity.id, newTask)
-							}
-						}
-					}	
+				switch (stepType) {
 					
-				} else if (taskSpec.containsKey('gateway') ) {						
-					// -------------------------
-					// Handle GATEWAY tasks
-					// -------------------------
-					// We create a simple task and then wire-in the dependencies to tasks generated by taskSpec referenced in predecessor property
-					if (! taskSpec.containsKey('predecessor') || ! taskSpec.predecessor ) {
-						exceptions.append("Gateway TaskSpec ID ${taskSpec.id} is missing required 'predecessor' property<br/>")
-					} else {
+					case 'milestone':
+						// -------------------------
+						// Handle Milestone tasks
+						// -------------------------
+						out.append("Creating milestone ${taskSpec.title}<br/>")
+						
+						isMilestone = true
+						workflow = getWorkflowStep(taskWorkflowCode)		
+						newTask = createTaskFromSpec(recipeId, whom, ++lastTaskNum, moveEvent, taskSpec, workflow)
+						taskList << newTask
+						lastMilestone = newTask 
+						taskCount++
+
+						// Now find all tasks that don't have have successor (excluding the current milestone task) and
+						// create dependency where the milestone is the successor
+						def tasksNoSuccessors = jdbcTemplate.queryForList(noSuccessorsSql)
+						log.info "SQL for noSuccessorsSql: $noSuccessorsSql"
+						log.info "generateRunbook: Found ${tasksNoSuccessors.count()} tasks with no successors for milestone ${taskSpec.id}, $moveEvent"
+					
+						if (tasksNoSuccessors.size()==0 && taskCount > 1 ) {
+							out.append("Found no successors for a milestone, which is unexpected but not necessarily wrong - Task $newTask<br/>")
+						}
+						tasksNoSuccessors.each() { p ->
+							// Create dependency as long as we're not referencing the task just created
+							if (p.id != newTask.id ) {
+								def predecessorTask = AssetComment.read(p.id)
+								newDep = createTaskDependency( predecessorTask, newTask )
+								depCount++
+								out.append("Created dependency (${newDep.id}) between $predecessorTask and $newTask<br/>")
+								if (predecessorTask.assetEntity) {
+									// Move the asset's last task to the milestone task
+									assetsLatestTask.put(predecessorTask.assetEntity.id, newTask)
+								}
+							}
+						}	
+						break
+						
+					case 'gateway':
+						// Handle GATEWAY tasks
+						// We create a simple task and then wire-in the dependencies to tasks generated by taskSpec referenced in predecessor property
+						isGateway = true
+						if (depMode) {
+							msg = "TaskSpec (${taskSpec.id}) of type 'gateway' does not support 'mode' property"
+							log.info(msg)
+							throw new RuntimeException(msg)
+						}
+						if (! hasPredecessor ) {
+							msg = "Gateway TaskSpec ID ${taskSpec.id} is missing required 'predecessor' property"
+							log.info(msg)
+							throw new RuntimeException(msg)							
+						}
+						
+						log.info("##### CREATING GATEWAY")
 						newTask = createTaskFromSpec(recipeId, whom, ++lastTaskNum, moveEvent, taskSpec, null)
 						taskList << newTask
 						tasksNeedingPredecessors << newTask
-						taskCount++		
-					}
-			
-					
-				} else if (taskSpec.containsKey('action')) {
-					// -------------------------
-					// Handle ACTION TaskSpecs (e.g. OnCart, offCart, QARAck) Tasks
-					// -------------------------
-					switch(taskSpec.action.toLowerCase()) {
-						case 'rollcall':
-							def rcTasks = createRollcallTasks( moveEvent, lastTaskNum, whom, recipeId, taskSpec )
-							if (rcTasks.size() > 0) {
-								taskList.addAll(rcTasks)
-								taskCount += rcTasks.size()
-								lastTaskNum = rcTasks.last().taskNumber
-							} else {
-								exceptions.append("Roll Call action did not create any tasks<br/>")
-							}
-							out.append("${rcTasks.size()} Roll Call tasks were created<br/>")
-							break
+						taskCount++	
+						mapMode = 'DIRECT_MODE'
+
+						msg = "Created GW task $newTask from taskSpec ${taskSpec.id}"
+						log.info(msg)
+						out.append("$msg<br/>")
+						
+						break
+
+					case 'action':
+						// Handle ACTION TaskSpecs (e.g. OnCart, offCart, QARAck) Tasks
+						isAction = true
+						switch(taskSpec.action.toLowerCase()) {
+							case 'rollcall':
+								def rcTasks = createRollcallTasks( moveEvent, lastTaskNum, whom, recipeId, taskSpec )
+								if (rcTasks.size() > 0) {
+									taskList.addAll(rcTasks)
+									tasksNeedingPredecessors.addAll(rcTasks)
+									taskCount += rcTasks.size()
+									lastTaskNum = rcTasks.last().taskNumber
+									mapMode = 'DIRECT_MODE'
+								} else {
+									exceptions.append("Roll Call action did not create any tasks<br/>")
+								}
+								out.append("${rcTasks.size()} Roll Call tasks were created<br/>")
+								break
 							
-						default:
-							exceptions.append("Action(${taskSpec.action}) in taskSpec id ${taskSpec.id} presently not supported<br/>")
-					}
+							default:
+								exceptions.append("Action(${taskSpec.action}) in taskSpec id ${taskSpec.id} presently not supported<br/>")
+						}
+						break
 					
-				} else {
-					// -------------------------
-					// Create Normal Tasks (tasks based on Assets)
-					// -------------------------
+					case 'asset':
 					
-					// Normal tasks need to have a filter
-					if (! taskSpec.filter || taskSpec.filter.size() == 0) {
-						exceptions.append("TaskSpec id ${taskSpec.id} for asset based task requires a filter<br/>")						
-					}
+						// -------------------------
+						// Create ASSET based Tasks
+						// -------------------------
+						isAsset = true
+						// Normal tasks need to have a filter
+						if (! taskSpec.filter || taskSpec.filter.size() == 0) {
+							exceptions.append("TaskSpec id ${taskSpec.id} for asset based task requires a filter<br/>")						
+						}
 					
-					def assetsForTask = findAllAssetsWithFilter(moveEvent, taskSpec.filter, groups, exceptions)
-					log.info "Found (${assetsForTask?.size()}) assets for taskSpec ${taskSpec.id}-${taskSpec.description}"
-					if ( !assetsForTask || assetsForTask.size()==0) return // aka continue
+						def assetsForTask = findAllAssetsWithFilter(moveEvent, taskSpec.filter, groups, exceptions)
+						log.info "Found (${assetsForTask?.size()}) assets for taskSpec ${taskSpec.id}-${taskSpec.description}"
+						if ( !assetsForTask || assetsForTask.size()==0) return // aka continue
 					
-					//
-					// Create a task for each asset based on the filtering of the taskSpec
-					//
-					assetsForTask?.each() { asset ->
-						workflow = getWorkflowStep(taskWorkflowCode, asset.moveBundle.id)
-						newTask = createTaskFromSpec(recipeId, whom, ++lastTaskNum, moveEvent, taskSpec, workflow, asset)
-						taskList << newTask
-						taskCount++
-						tasksNeedingPredecessors << newTask
-						// assetsLatestTask.put(asset.id, newTask)
-						out.append("Created task $newTask<br/>")
-					}
+						//
+						// Create a task for each asset based on the filtering of the taskSpec
+						//
+						assetsForTask?.each() { asset ->
+							workflow = getWorkflowStep(taskWorkflowCode, asset.moveBundle.id)
+							newTask = createTaskFromSpec(recipeId, whom, ++lastTaskNum, moveEvent, taskSpec, workflow, asset)
+							taskList << newTask
+							taskCount++
+							tasksNeedingPredecessors << newTask
+							// assetsLatestTask.put(asset.id, newTask)
+							out.append("Created task $newTask<br/>")
+						} 
+						
+						// If we have predecessor.mode the we're doing linkage via Asset Dependency
+						mapMode = depMode ? 'ASSET_DEP_MODE' : 'DIRECT_MODE'
+						
+						break
+						
+					case 'general':
+						// ---------------------------
+						// Create GENERAL type Task(s)
+						// ---------------------------
+						isGeneral=true
+						throw new RuntimeException("Task Spec ${taskSpec.id} references type 'general' that is not presently implemented.")
+						
+					default:
+						// We should NEVER get into this code but just in case...
+						log.error("Task Spec ${taskSpec.id} has an unhandled type ($stepType) in the code for move event $moveEvent")
+						throw new RuntimeException("Task Spec ${taskSpec.id} has an unhandled type ($stepType) in the code")
+						
+				} // switch (stepType)
+				
+				// ------------------------------------------------------------------------------------
+				// DEPENDENCY MAPPING - Now wire up the tasks that were just created
+				// ------------------------------------------------------------------------------------
+				
+				// Mapping will be done for the following use-cases:
+				//
+				//   ASSET_MODE: Map dependencies based on asset relationships.
+				//        i. TaskSpec contains predecessor.mode - then wire tasksNeedingPredecessors to their assets' previous step or prior milestone if none was found 
+				//       ii. This can support group and other predecessor filter parameters
+				//      iii. If group is presented then the tasksNeedingPredecessors will be wired to those found in the group and exceptions reported for those not found
+				//   TASK_MODE: Map dependencies based on predecessor.taskSpec
+				//        i. tasksNeedingPredecessors and referenced taskSpec both have assets then they will be wired one-to-one
+				//       ii. Either tasksNeedingPredecessors or referenced taskSpec DON'T have assets, all tasksNeedingPredecessors will be wired to all tasks from taskSpec
+				//
+				// The predecessor.required when false, will not update the asset with the latest task for any of the above use-cases
+				
+				if 	(tasksNeedingPredecessors.size() == 0) {
+					// Skip this section if there is no need to continue
+					return
 				}
 				
-				//
-				// DEPENDENCY MAPPING - Now wire up the tasks that were just created
-				//
-				if 	(tasksNeedingPredecessors.size() > 0) {
-					// Set some vars that will be used in the next iterator 
-					def specHasDependency = false		// Set to true if the spec references Dependencies
-					def specHasPredecessor = false
-					def predecessorTasks = []
-					
-					// Determine if we are looking at AssetDependency associations and if so if we're looking for Supports or Requires relationships.
-					// Supports are usually used in Shutdown and Requires in Startup
-					if ( taskSpec.filter?.containsKey('dependency') ) {
-						depCode = taskSpec.filter.dependency[0].toLowerCase()
-						specHasDependency = 'sr'.contains( depCode )
-						if ( ! specHasDependency ) {
-							// Someone messed up a Spec 
-							throw new RuntimeException("Task Spec ${taskSpec.id} has invalid filter.dependency value (${taskSpec.filter.dependency}) " +
-								"- valid options are [supports|requires]")	
-						}
-					}
+				// Set some vars that will be used in the next iterator 
+				def predecessorTasks = []
 
-					if (taskSpec.containsKey('predecessor')) {
-						// TODO - validate that the ID references a valid predecessor taskSpec
-						specHasPredecessor = true
+				// Make sure predecessor is an array
+				if ( ! taskSpec.predecessor instanceof java.util.ArrayList) {
+					log.info("Task Spec ${taskSpec.id} predecessor property is not properly formatted.")
+					throw new RuntimeException("Task Spec ${taskSpec.id} predecessor property is not properly formatted.")
+				}
+				
+				// Determine if the predecessor tasks will be required to flow through the tasksNeedingPredecessors or just that there is an successor relationship
+				// If false, we just don't update the assets' latest task in the array.
+				isRequired = hasPredecessor && taskSpec.predecessor.containsKey('required') ? taskSpec.predecessor.required : true
+				if ( ! (isRequired instanceof java.lang.Boolean) ) {
+					log.info("Task Spec ${taskSpec.id} has invalid value for taskSpec.predecessor.required (${isRequired.class})")
+					throw new RuntimeException("Task Spec ${taskSpec.id} has invalid value for taskSpec.predecessor.required")
+				}
+				
+				def predAssets = [:]
+				
+				// Perform some setup based on the mode
+				switch(mapMode) {
+					
+					case 'ASSET_DEP_MODE':
+						break
 						
-						// Get the list of predecessor Tasks
-						def predCode = taskSpec.predecessor.substring(1)
-						log.info "Processing taskSpec $taskSpec.id predecessor $predCode"
-						switch(taskSpec.predecessor[0]) {
-							case '#':
-								// Find all predecessor tasks that have the taskSpec ID #
-								if (taskSpecList.contains(predCode)) {
-									predecessorTasks = taskList.findAll { it.taskSpec.toString() == predCode.toString() }									
-								} else {
-									throw new RuntimeException("Task Spec ${taskSpec.id} 'predecessor' value ($taskSpec.predecessor) references undefined taskSpec.ID.")
-								}	
-								break
-								
-							case '@':
+					case 'DIRECT_MODE':
+					
+						// Cases 
+						// = using taskSpec - preload predecessorTasks with tasks matching taskSpec
+						// = using group - preload predAssets map with assets within the group
+						// = has no predecessor defined - n/a 
+						
+						if ( hasGroup ) {
+							// If there are any groups defined then preload all of the assets that are included in the groups to be used 
+							// in the next each/switch code block.
+
+							// Put the group property into an array if not already an array
+							def taskGroups = ( taskSpec.predecessor.group instanceof java.util.ArrayList ) ? taskSpec.predecessor.group : [taskSpec.predecessor.group]
+
+							// Iterate over the list of groups to consolidate one or more groups into 	
+							taskGroups.each() { groupCode -> 
+								if (groupCode.size() == 0) {
+									log.info("generateRunbook: 'filter.group' value ($filter.group) has undefined group code.")
+									throw new RuntimeException("'filter.group' value ($filter.group) has undefined group code for taskSpec(${taskSpec.id}")
+								}
+
 								// Find the latest task for all of the assets of the specified GROUP
 								log.info("assetsLatestTask has ${assetsLatestTask.size()} assets")
-								if (groups.containsKey(predCode)) {
-									groups[predCode].each() { asset ->
-										if (assetsLatestTask.containsKey(asset.id)) {
-											predecessorTasks << assetsLatestTask[asset.id]											
-										} else {
-											exceptions.append("Task Spec ${taskSpec.id} 'predecessor' unable to find previous task for asset $asset<br/>")
-										}
+								if (groups.containsKey(groupCode)) {
+									hasGroup=true
+									groups[groupCode].each() { asset ->
+										predAssets.put(asset.id, asset)
+									
+										//if (assetsLatestTask.containsKey(asset.id)) {
+										//	predecessorTasks[asset.id] = assetsLatestTask[asset.id]											
+										//} else {
+										//	exceptions.append("Task Spec ${taskSpec.id} 'predecessor' unable to find previous task for asset $asset<br/>")
+										//}
+									
 									}									
 								} else {
 									throw new RuntimeException("Task Spec ${taskSpec.id} 'predecessor' value ($taskSpec.predecessor) references undefined group.")
 								}
-								break
-							
-							default:
-								log.error("MoveEvent $moveEvent - Task Spec ${taskSpec.id} has invalid 'predecessor' value (${taskSpec.predecessor})")
-								throw new RuntimeException("Task Spec ${taskSpec.id} has invalid 'predecessor' value (${taskSpec.predecessor}) " +
-									"- valid options are [ #TaskSpec.ID | @GROUP ]")	
-						}
-						
-						log.info("Processing taskSpec.predecessor and found ${predecessorTasks.size()} tasks")
-						if (predecessorTasks.size() == 0) {
-							// We SHOULD of found some tasks so bomb if we don't
-							throw new RuntimeException("Task Spec ${taskSpec.id} 'predecessor' (${taskSpec.predecessor}) found NO predecessor tasks")
-						}
-					}
+							} 
 					
-					//	
-					// Now iterate over all of the tasks just created for this taskSpec and assign dependencies 
-					//
-					out.append("# Creating dependencies on ${tasksNeedingPredecessors.size()}<br/>")
-					tasksNeedingPredecessors.each() { tnd ->
-						log.info "Processing task $tnd"
-						if (specHasPredecessor) {
-							// 
-							// HANDLE TaskSpec's that have 'predecessor' property
+							//log.info("Processing taskSpec.predecessor and found ${predecessorTasks.size()} tasks")
+							//if (predecessorTasks.size() == 0) {
+								// We SHOULD of found some tasks so bomb if we don't
+							//	log.info("Task Spec ${taskSpec.id} 'predecessor' (${taskSpec.predecessor}) found NO predecessor tasks")
+							//	throw new RuntimeException("Task Spec ${taskSpec.id} 'predecessor' (${taskSpec.predecessor}) found NO predecessor tasks")
+							//}
+						} else if (hasTaskSpec) {
+							// Populate predecessorTasks with all tasks referenced in the taskSpec.predecessor.taskSpec
+
+							// Put the group property into an array if not already an array
+							def taskSpecs = ( taskSpec.predecessor.taskSpec instanceof java.util.ArrayList ) ? taskSpec.predecessor.taskSpec : [taskSpec.predecessor.taskSpec]
+							log.info("taskSpec (${taskSpec.id}) has taskSpecs of $taskSpecs")
+							// Iterate over the list of taskSpec IDs	
+							taskSpecs.each() { ts -> 
+								log.info("ts=$ts")
+								// Find all predecessor tasks that have the taskSpec ID #
+								if ( taskSpecList.contains( ts ) ) {
+									predecessorTasks.addAll( taskList.findAll { it.taskSpec.toString() == ts.toString() } )									
+								} else {
+									msg = "Task Spec ${taskSpec.id} 'predecessor.taskSpec' value ($ts) references undefined taskSpec.ID."
+									log.info(msg)
+									throw new RuntimeException(msg)
+								}	
+							}
+						}
+											
+						break
+						
+					default:
+						throw new RuntimeException("Unhandled switch statement for Task Spec ${taskSpec.id} ($mapMode)")
+
+				} // switch(mapMode)
+				
+				//	
+				// Now iterate over all of the tasks just created for this taskSpec and assign dependencies 
+				//
+				out.append("# Creating predecessors for ${tasksNeedingPredecessors.size()} tasks<br/>")
+				
+				tasksNeedingPredecessors.each() { tnp ->
+					log.info("tasksNeedingPredecessors.each(): Processing $mapMode for task $tnp")
+					def wasWired=false
+
+					switch(mapMode) {
+												
+						case 'DIRECT_MODE':
+							// Link based on ???
+							// Link the current task to it's asset's latest task if it exists or to the milestone
 							//
-							
-							// Wire up the task to the list of predecessor tasks
-							predecessorTasks.each() { predTask ->
-								newDep = createTaskDependency(predTask, tnd)
-								out.append("Created predecessor dependency (${newDep.id}) between ${predTask} and $tnd<br/>")									
-								depCount++
+							// Find the last task for the predAsset to create associations between tasks. If the predecessor was created
+							// during the same taskStep, assetsLatestTask may not yet be populated so we can scan the tasks created list for
+							// one with the same taskSpec id #
+														
+							if (hasGroup) {
+								//
+								// --- GROUPS ---
+								//
+								
+								// The predecessor.group was defined so we are dealing with ASSETS and will link tasks one of two ways:
+								//   1. If tasks have assets then we bind the current task to the asset's latest task if found in the group. If no found then link current task to milestone
+								//   2. If task does NOT have assets, then we bind the current task as successor to latest task of ALL assets in the list
+								if (tnp.assetEntity) {
+									
+									log.info "Processing from hasGroup #1"
+									// #1 - Link task to it's asset's latest task if the asset was in the group and there is an previous task otherwise link it to the milestone if one exists
+									if (predAssets.containsKey( tnp.assetEntity.id )) {
+										// Find the latest asset for the task.assetEntity
+										if (assetsLatestTask.containsKey(tnp.assetEntity.id)) {										
+											newDep = createTaskDependency(assetsLatestTask[tnp.assetEntity.id], tnp)
+											depCount++
+											wasWired = true
+											if (isRequired) {
+												assetsLatestTask.put(tnp.assetEntity.id, tnp)
+											}
+										} else {
+											// Wire to last milestone
+											msg = "No predecessor task found for asset ($tnp.assetEntity) to link to task ($tnp) in taskSpec ${taskSpec.id} (DIRECT_MODE/group)"
+											log.info(msg)
+											exceptions.append("${msg}<br/>")
+											linkTaskToMilestone(tnp)
+										}
+									} else {
+										msg = "Asset ($tnp.assetEntity) was not found in group for taskSpec ${taskSpec.id} (DIRECT_MODE/group)"
+										log.info(msg)
+										exceptions.append("${msg}<br/>")										
+									}
+								} else {
+									// #2 - Wire latest tasks for all assets in group to this task
+									log.info "Processing from hasGroup #2 isRequired=$isRequired"
+									
+									// log.info("predAssets=$predAssets")
+									predAssets.each() { predAssetId, predAsset ->
+										//log.info("predAsset=$predAsset")										
+										if ( assetsLatestTask.containsKey(predAsset.id)) {
+											newDep = createTaskDependency(assetsLatestTask[predAsset.id], tnp)
+											depCount++
+											wasWired = true
+											if (isRequired) {
+												assetsLatestTask.put(predAsset.id, tnp)
+											}
+										}
+									}
+								}					
+								
+							} else if ( hasTaskSpec ) {
+								//
+								// --- TASKSPEC ---
+								//
+								
+								log.info "Processing from hasTaskSpec"
+								
+								// Use the predecessorTasks array that was initialized earlier and if those tasks and the current task have assets then wire up
+								// the predecessor one-to-one for each asset otherwise wire the current task to all tasks in the predecessorTasks. If both have assets and 
+								// we are unable to find a predecessor task for the same asset, the current task will be wired to the most recent milestone if it exists.
+								if (predecessorTasks.size() > 0) {
+									
+									// See if we're linking task to task by asset 
+									if (predecessorTasks[0].assetEntity && tnp.assetEntity) {
+										// Wire asset-to-asset for tasks if there is a match
+										def predTask = predecessorTasks.find { it.assetEntity.id == tnp.assetEntity.id }
+										if (predTask) {										
+											newDep = createTaskDependency(predTask, tnp)
+											depCount++
+											if (isRequired) {
+												assetsLatestTask.put(tnp.assetEntity.id, tnp)
+											}
+											wasWired = true
+										} else {
+											msg = "No predecessor task for asset (${tnp.assetEntity}) found to link to task ($tnp) in taskSpec ${taskSpec.id} (DIRECT_MODE/taskSpec)"
+											log.info(msg)
+											exceptions.append("${msg}<br/>")
+										}
+									} else {
+										// Link all predecessorTasks to tnp
+										// Wire the current task as the successor to all tasks specified in the predecessor.taskSpec property
+										predecessorTasks.each() { predTask -> 
+											newDep = createTaskDependency(predTask, tnp)
+											depCount++
+											if ( isRequired ) {
+												// Update the Asset's last task based on if the previous task is for an asset or the current one is for an asset
+												if ( predTask.assetEntity ) {
+													assetsLatestTask.put(predTask.assetEntity.id, tnp)
+												} else if ( tnp.assetEntity )  {
+													assetsLatestTask.put(tnp.assetEntity.id, tnp)
+												}
+											}
+										}
+										wasWired = predecessorTasks.size() > 0										
+									} 
+								} else {
+									msg = "Predecessor task list was empty for taskSpec in taskSpec ${taskSpec.id} (DIRECT_MODE/taskSpec)"
+									log.info(msg)
+									exceptions.append("${msg}<br/>")
+								}
+																	
+							} else {
+								//
+								// --- BASIC ASSET PREDECESSOR --
+								//
+								
+								log.info "Processing from Basic Asset Predecessor"
+								
+								linkTaskToLastAssetOrMilestone(tnp)
+								wasWired = true
 							}
 							
-						} else if (specHasDependency && tnd.assetEntity) {
+							break
+								
+						case 'ASSET_DEP_MODE':
 							//
 							// HANDLE TaskSpecs that reference AssetDependency records based on the filter
 							//
-							def assetDependencies = getAssetDependencies(tnd.assetEntity, taskSpec.filter)
-						
+							def assetDependencies = getAssetDependencies(tnp.assetEntity, taskSpec, depMode)
+				
 							if (assetDependencies.size() == 0) {
-								exceptions.append("Asset(${tnd.assetEntity}) for Task(${tnd}) has no ${taskSpec.filter.dependency} relationships<br/>")
+								exceptions.append("Asset(${tnp.assetEntity}) for Task(${tnp}) has no ${taskSpec.dependency} relationships<br/>")
 
 								// Link task to the last known milestone or it's asset's previous task
-								linkTaskToLastAssetOrMilestone(tnd)
-							} else {
+								linkTaskToLastAssetOrMilestone(tnp)
+								wasWired = true
 								
+							} else {
 								// Look over the assets dependencies that are associated to the current task's asset and create predecessor relationships 
-								// We will warn on assets that are not part of the moveEvent that have dependency. We most likely will want to have tasks 
-								// for assets not moving in the future but will require discussion.
-								log.info "Iterate over ${assetDependencies.size()} dependencies for asset ${tnd.assetEntity}"
-								def tndHadDependency=false
+								// We will warn on assets that are not part of the moveEvent that have dependency. 
+								// TODO : We most likely will want to have tasks for assets not moving in the future but will require discussion.
+								log.info "Iterate over ${assetDependencies.size()} dependencies for asset ${tnp.assetEntity}"
 								assetDependencies.each { ad ->
 									// Get the Note that this should be the opposite of that used in the getAssetDependencies 
-									def predAsset = depCode == 's' ?  ad.dependent : ad.asset
+									def predAsset = depMode == 's' ?  ad.dependent : ad.asset
 
 									// Make sure that the other asset is in one of the move bundles in the move event
 									def predMoveBundle = predAsset.moveBundle
 									if (! predMoveBundle || ! bundleIds.contains(predMoveBundle.id)) {
-										exceptions.append("Asset dependency references asset not in move event: task($tnd) between asset ${tnd.assetEntity} and ${predAsset}<br/>")
+										exceptions.append("Asset dependency references asset not in move event: task($tnp) between asset ${tnp.assetEntity} and ${predAsset}<br/>")
 									} else {
 										// Find the last task for the predAsset to create associations between tasks. If the predecessor was created
 										// during the same taskStep, assetsLatestTask may not yet be populated so we can scan the tasks created list for
 										// one with the same taskSpec id #
-										def previousTask = taskList.find { it.assetEntity?.id == predAsset.id && it.taskSpec == tnd.taskSpec }										
+										def previousTask = taskList.find { it.assetEntity?.id == predAsset.id && it.taskSpec == tnp.taskSpec }										
 										if (previousTask) {
 											log.info "Found task in taskList array - task (${previousTask})"
 										} else {
@@ -1513,50 +1806,53 @@ class TaskService {
 											}
 										}
 										if (previousTask) {
-											newDep = createTaskDependency(previousTask, tnd)
+											newDep = createTaskDependency(previousTask, tnp)
 											depCount++
-											assetsLatestTask.put(tnd.assetEntity.id, tnd)
-											tndHadDependency=true
-											out.append("Created dependency (${newDep.id}) between ${previousTask} and $tnd<br/>")
+											if (isRequired) {
+												assetsLatestTask.put(tnp.assetEntity.id, tnp)
+											}
+											wasWired=true
+											out.append("Created dependency (${newDep.id}) between ${previousTask} and $tnp<br/>")
 										} else {
-											log.info "No predecessor task found for asset ($predAsset) to link to task ($tnd)"
-											exceptions.append("No predecessor task found for asset ($predAsset) to link to task ($tnd)<br/>")
+											log.info "No predecessor task found for asset ($predAsset) to link to task ($tnp)"
+											exceptions.append("No predecessor task found for asset ($predAsset) to link to task ($tnp)<br/>")
+											linkTaskToMilestone(tnp)
 										}
 									}
 								}
-								if (! tndHadDependency) {
-									// If none of the dependencies worked out we need to tie the task to some other predecessor
-									linkTaskToLastAssetOrMilestone(tnd)											
-								}
 							}
 							
-						} else  {
-							log.info "Alternate dependency for task ${tnd}"
-							// Link task to the last known milestone or it's asset's previous task
-							linkTaskToLastAssetOrMilestone(tnd)
+							break
+
+						default:
+					
+							msg = "Unsupported switch value ($mapMode) for taskSpec (${taskSpec.id}) on processing task $tnp"
+							log.info(msg)
+							throw new RuntimeException(msg)
 							
-						}
 						
-						// Link the latest task to the asset
-						if (tnd.assetEntity) {
-							assetsLatestTask.put(tnd.assetEntity.id, tnd)
-						}
-						
-					} // tasksNeedingPredecessors.each()
+					} // switch(mapMode)
+			
+					if (! wasWired ) {
+						// If the task wasn't wired to any predecessors, then try to wire it to the latest milestone
+						linkTaskToMilestone(tnp)
+					}
 					
-					
-				} // if (tasksNeedingPredecessors.size() > 0)	
+				} // tasksNeedingPredecessors.each()
+
 			} // recipeTasks.each() {}
 		} catch(e)	{
-			exceptions.append("We BLEW UP damn it!<br/>")
-			exceptions.append(e.toString())
+			failure = e.toString()
+			// exceptions.append("We BLEW UP damn it!<br/>")
+			// exceptions.append(failure)
 			e.printStackTrace()
 		}
 		
 		TimeDuration elapsed = TimeCategory.minus( new Date(), startedAt )
 		
 		log.info "A total of $taskCount Tasks and $depCount Dependencies created in $elapsed"
-		return "<h2>Status:</h2> $taskCount Tasks and $depCount Dependencies created in $elapsed<h2>Exceptions:</h2>" + 
+		if (failure) failure = "Generation FAILED: $failure<br/>"
+		return "<h2>Status:</h2>${failure}$taskCount Tasks and $depCount Dependencies created in $elapsed<h2>Exceptions:</h2>" + 
 	
 		exceptions.toString() + "<h2>Log:</h2>" + out.toString()
 		
@@ -1568,17 +1864,16 @@ class TaskService {
 	 * @param Map taskSpec - a Task specification map
 	 * @return List<AssetDependency> - list of dependencies
  	 */
-	def getAssetDependencies(asset, filter) {
+	def getAssetDependencies(asset, taskSpec, depMode) {
 		def list = []
-		def depCode = filter.dependency[0].toLowerCase()
+		def filter = taskSpec.filter
 		
 		// This is the list of properties that can be added to the search criteria from the Filter
-		def supportedFilterProps = ['status']
+		def supportedFilterProps = ['status', 'type', 'dataFlowFreq', 'dataFlowDirection']
 		
 		// AssetEntity  asset			// The asset that that REQUIRES the 'dependent'
 		// AssetEntity dependent		// The asset that SUPPORTS 'asset' 
-		// log.info "depCode=$depCode"
-		def relateOn = ( depCode == 's' ? 'asset' : 'dependent' )
+		def relateOn = ( depMode == 's' ? 'asset' : 'dependent' )
 		def sql = "from AssetDependency ad where ad.${relateOn}.id=:assetId and \
 			ad.status not in ('${AssetDependencyStatus.NA}', '${AssetDependencyStatus.ARCHIVED}') \
 			and ad.type <> '${AssetDependencyType.BATCH}'"
@@ -1668,6 +1963,7 @@ class TaskService {
 		
 		// log.info "About to save task: ${task.category}"
 		if (! ( task.validate() && task.save(flush:true) ) ) {
+			log.error("createTaskFromSpec: Failed creating task error=${GormUtil.allErrorsString(task)}, asset=$asset, TaskSpec=$taskSpec")
 			throw new RuntimeException("Error while trying to create task. error=${GormUtil.allErrorsString(task)}, asset=$asset, TaskSpec=$taskSpec")
 		}
 
@@ -1699,32 +1995,83 @@ class TaskService {
 	
 	/**
 	 * This special method is used to find all assets of a moveEvent that match the criteria as defined in the filter map
-	 * @param MoveEvent
+	 * @param MoveEvent moveEvent object
 	 * @param Map filter - contains various attributes that define the filtering
+	 * @param loadedGroups Map<List> - A mapped list of the groups and associated assets that have already been loaded
 	 * @return List<AssetEntity, Application, Database, File> based on the filter
 	 * @throws RuntimeException if query fails or there is invalid specifications in the filter criteria
 	 */
-	def findAllAssetsWithFilter(moveEvent, filter, groups, exceptions) {
+	def findAllAssetsWithFilter(moveEvent, filter, loadedGroups, exceptions) {
 		def assets = []
 		
-		if (filter?.containsKey('group') ) {
+		if ( filter?.containsKey('group') ) {
+			//
+			// HANDLE filter.group
+			//
+			
 			//log.info("Groups contains $groups")
-			log.info("findAllAssetsWithFilter for group ${filter.group}")
-			// Return an array of assets that were created by a previously defined group 
-			def groupProp = ( filter.group instanceof String || filter.group instanceof GString ) ? [filter.group] : filter.group
-			groupProp.each() { g -> 
-				if (groups.containsKey(g)) {
-					assets.addAll( groups[g] )
-					log.info("findAllAssetsWithFilter added assets")
+			log.info("findAllAssetsWithFilter: group ${filter.group}")
+
+			// Put the group property into an array if not already an array
+			def groups = ( filter.group instanceof java.util.ArrayList ) ? filter.group : [filter.group]
+				
+			// Iterate over the list of groups	
+			groups.each() { groupCode -> 
+				if (groupCode.size() == 0) {
+					log.info("findAllAssetsWithFilter: 'filter.group' value ($filter.group) has undefined group code.")
+					throw new RuntimeException("'filter.group' value ($filter.group) has undefined group code.")
+				}
+				
+				// Find all of the assets of the specified GROUP
+				// log.info("assetsLatestTask has ${assetsLatestTask.size()} assets")
+				if (loadedGroups.containsKey(groupCode)) {
+					assets.addAll( loadedGroups[groupCode] )
+					log.info("findAllAssetsWithFilter: added ${loadedGroups[groupCode].size()} asset(s) for group $groupCode")
 				} else {
-					exceptions.append("Filter reference undefined group (${filter.group}) - filter $filter<br/>")
-					log.error("Filter reference undefined group (${filter.group}) - filter $filter in moveEvent $moveEvent")					
+					log.error("findAllAssetsWithFilter: 'filter.group' value ($filter.group) references undefined group ($groupCode).")
+					throw new RuntimeException("'filter.group' value ($filter.group) references undefined group ($groupCode).")
 				}
 			}
-		
+			if (assets.size() == 0) {
+				log.info("findAllAssetsWithFilter: 'filter.taskSpec' group filter found no assets .")
+				throw new RuntimeException("''filter.taskSpec' group filter ($groups) contains no assets.")
+			}
+			
+		} else if (filter?.containsKey('taskSpec')) {
+			//
+			// HANDLE filter.taskSpec
+			//
+
+			log.info("findAllAssetsWithFilter: taskSpec ${filter.taskSpec}")
+
+			// Put the group property into an array if not already an array
+			def taskSpecs = ( filter.taskSpec instanceof java.util.ArrayList ) ? filter.taskSpec : [filter.taskSpec]
+				
+			// Iterate over the list of groups	
+			taskSpecs.each() { ts -> 
+				// Find all predecessor tasks that have the taskSpec ID # and then add the tasks assetEntity to the assets list 
+				def predecessorTasks = taskList.findAll { it.taskSpec.toString() == ts.toString() }
+				if ( predecessorsTasks.size() > 0) {
+					if  (predecessorsTasks[0].assetEntity ) {
+						assets.addAll( predecessorsTasks*.assetEntity )
+					} else {
+						log.info("findAllAssetsWithFilter: 'filter.taskSpec' value ($filter.taskSpec) references taskSpec ($groupCode) that does not contain assets.")
+						throw new RuntimeException("'filter.group' value ($filter.taskSpec) references taskSpec ($taskSpec) that does not contain assets.")								
+					}
+				} else {
+					log.info("findAllAssetsWithFilter: 'filter.taskSpec' value ($filter.taskSpec) references undefined taskSpec.ID ($ts).")
+					throw new RuntimeException("'filter.taskSpec' value ($filter.taskSpec) references undefined taskSpec.ID ($ts).")
+				}	
+			}
+			
+			if (assets.size() == 0) {
+				log.info("findAllAssetsWithFilter: 'filter.taskSpec' taskSpecs filter found no assets .")
+				throw new RuntimeException("''filter.taskSpec' taskSpecs filter ($taskSpecs) contains no assets.")
+			}
+			
 		} else {
 			// 
-			// Perform an actual filter to find assets
+			// HANDLE performing an actual filter to find assets
 			//
 			def queryOn = filter?.containsKey('class') ? filter['class'].toLowerCase() : 'device'
 			if (! ['device','application', 'database', 'files'].contains(queryOn) ) {
@@ -1765,7 +2112,7 @@ class TaskService {
 			}
 		
 			// Add additional WHERE clauses based on the following properties being present in the filter.asset 
-			def validProperties = ['assetName','assetTag','assetType', 'priority', 'status']
+			def validProperties = ['assetName','assetTag','assetType', 'priority', 'truck', 'cart', 'sourceLocation', 'targetLocation', 'planStatus']
 			(1..8).each() { validProperties.add("custom$it".toString()) }	// Add custom1..custom8
 			log.info("findAllAssetsWithFilter: validProperties=$validProperties")
 			addWhereConditions( validProperties )
@@ -1776,18 +2123,12 @@ class TaskService {
 			//
 			if (filter?.asset?.containsKey('exclude')) {
 				def excludes = []
-				def excludeProp = ( filter.asset.exclude instanceof String || filter.asset.exclude instanceof GString ) ? [filter.asset.exclude] : filter.asset.exclude				
-				excludeProp.each() { ex -> 
-					if (ex[0] == '@') {
-						// Referencing a group
-						def gName = ex.substring(1)
-						if (groups?.containsKey(gName)) {
-							excludes.addAll(groups[gName])							
-						} else {
-							exceptions.append("Filter 'exclude' reference undefined group ($gName) - filter $filter<br/>")
-						}
+				def excludeProp = filter.asset.exclude instanceof java.util.ArrayList ? filter.asset.exclude : [filter.asset.exclude]				
+				excludeProp.each() { exGroup -> 
+					if (loadedGroups?.containsKey(exGroup)) {
+						excludes.addAll(loadedGroups[exGroup])							
 					} else {
-						exceptions.append("Filter 'exclude' reference undefined support value ($ex) - filter $filter<br/>")
+						exceptions.append("Filter 'exclude' reference undefined group ($gName) for filter $filter<br/>")
 					}
 				}
 				if (excludes.size() > 0) {
@@ -1816,7 +2157,7 @@ class TaskService {
 						assets = AssetEntity.findAll(sql, map)
 						break;
 					
-					case 'application':					
+					case 'application':
 						// Add additional WHERE clauses based on the following properties being present in the filter (Application domain specific)
 						addWhereConditions( ['appVendor','sme','sme2','businessUnit','criticality'] )
 					
@@ -1826,12 +2167,16 @@ class TaskService {
 						break;
 					
 					case 'database':
+						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
+						addWhereConditions( ['dbFormat','dbSize'] )
 						sql = "from Database a where a.moveBundle.id in (:bIds)" + (where.size()>0 ? " and $where" : '')
 						log.info "findAllAssetsWithFilter: DATABASE sql=$sql, map=$map"
 						assets = Database.findAll(sql, map)
 						break;
 
-					case 'files':
+					case ~/files|file|storage/:
+						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
+						addWhereConditions( ['fileFormat','fileSize', 'sizeUnit', 'LUN'] )
 						sql = "from Files a where a.moveBundle.id in (:bIds)" + (where.size()>0 ? " and $where" : '')
 						log.info "findAllAssetsWithFilter: FILES sql=$sql, map=$map"
 						assets = Files.findAll(sql, map)
