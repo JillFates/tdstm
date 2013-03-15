@@ -3170,6 +3170,7 @@ class AssetEntityController {
 		def maxRows = Integer.valueOf(params.rows)
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		
 		userPreferenceService.setPreference("assetListSize", "${maxRows}")
 
@@ -3324,9 +3325,9 @@ class AssetEntityController {
 			
 			def dueDate='' 
 			if (it.isRunbookTask()) {
-				dueDate = it.estFinish ? runBookFormatter.format(it.estFinish) : ''
+				dueDate = it.estFinish ? runBookFormatter.format(TimeUtil.convertInToUserTZ(it.estFinish, tzId)) : ''
 			} else {
-				dueDate = it.dueDate ? dueFormatter.format(it.dueDate) : ''
+				dueDate = it.dueDate ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.dueDate, tzId)) : ''
 			}
 			
 			[ cell: ['',it.taskNumber, it.comment, it.assetEntity?.assetName, it.assetEntity?.assetType,

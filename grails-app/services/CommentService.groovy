@@ -252,7 +252,7 @@ class CommentService {
 
 				if (params.containsKey('dueDate') ) { 
 					// log.info "saveUpdateCommentAndNotes: dueDate=[${params.dueDate}]"
-					assetComment.dueDate = params.dueDate ? formatter.parse(params.dueDate) : null
+					assetComment.dueDate = params.dueDate ? TimeUtil.convertInToGMT(formatter.parse(params.dueDate), tzId)  : null
 				}
 	
 			}
