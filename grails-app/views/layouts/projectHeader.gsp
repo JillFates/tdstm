@@ -473,7 +473,7 @@
 				<ul>
 					<li><g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">Account settings...</g:remoteLink></li>
 					<li><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${user}" onclick="editPreference()">Edit preferences</a></li>
-					<li>&nbsp;</li>
+					<li><g:link class="home mmlink" action="listTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li>
 					<g:if test="${person?.modelScore}">
 					<li><a href="/tdstm/person/list/18?maxRows=25&tag_tr_=true&tag_p_=1&tag_mr_=25&tag_s_5_modelScore=desc">Model Score: ${person?.modelScore}</a></li>
 					</g:if>
