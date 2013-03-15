@@ -359,7 +359,8 @@ function enableActions(){
 function showMergeDialog(){
 	var inputCheckBox = $("input:checked")
 	var checkBoxId = inputCheckBox.attr('id')
-	var sRoomId = inputCheckBox.attr('id').substring(11,checkBoxId.length)
+	var sRoomId = inputCheckBox.attr('name').substring(inputCheckBox.attr('name').indexOf("_")+1,checkBoxId.length)
+	alert(sRoomId)
 	$("#mergeRoomDialog table tr").each(function() {
 		var rowId = $(this).attr('id')
 		if(rowId.substring(9,rowId.length) == sRoomId){
