@@ -1080,7 +1080,7 @@ class ClientTeamsController {
 		def project = securityService.getUserCurrentProject()
 		def assetComment = AssetComment.findByIdAndProject(params.issueId, project)
 		
-		def cartQty = ''
+		def cartQty = '	'
 		def moveEvent = assetComment.moveEvent
 		
 		// Determine the cart quantity
@@ -1093,7 +1093,7 @@ class ClientTeamsController {
 				cartQty = cart.total
 			}
 		}
-		log.info "cartQty ($cartQty)"
+		// log.info "cartQty ($cartQty)"
 		
 		def selectCtrlId = "assignedToEditId_${assetComment.id}"
 		def assignToSelect = taskService.assignToSelectHtml(project.id, params.issueId, assetComment.assignedTo?.id, selectCtrlId)
@@ -1173,7 +1173,7 @@ class ClientTeamsController {
 			canPrint:canPrint,
 			dueDate:dueDate,
 			assignToSelect:assignToSelect,
-            assetEntity:null,
+            assetEntity:assetComment.assetEntity,
             cartQty:cartQty
             ]
 	
