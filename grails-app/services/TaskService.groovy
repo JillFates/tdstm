@@ -44,7 +44,7 @@ class TaskService {
 
 	def dataSource
 	def jdbcTemplate
-	def namedParameterJdbcTemplate
+	// def namedParameterJdbcTemplate
 	def partyRelationshipService
 	def securityService
 	def quartzScheduler
@@ -68,7 +68,7 @@ class TaskService {
 	 */
 	def getUserTasks(person, project, countOnly=false, limitHistory=7, sortOn=null, sortOrder=null, search=null ) {
 		// Need to initialize the NamedParameterJdbcTemplate to pass named params to a SQL statement
-		namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
+		def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
 
 		// log.info "getUserTasks: limitHistory=${limitHistory}, sortOn=${sortOn}, sortOrder=${sortOrder}, search=${search}"
 		
@@ -1088,6 +1088,35 @@ class TaskService {
 			}
 		}
 		return recipe
+	}
+	
+	/**
+	 * Determines the number of assets and how many are completed on a particular cart
+	 * @param MoveEvent object
+	 * @param String cartName
+	 * @return Map - containing [total:#, done:#] or null if cart not found
+	 **/
+	def getCartQuantities(moveEvent, cartName) {
+		def map = null
+		if (moveEvent) {			
+			def bundleIds = moveEvent.moveBundles*.id
+			// log.info "bundleIds=[$bundleIds] for moveEvent ${moveEvent.id}"	
+		
+			def cartQtySQL = """SELECT count(*) AS total, SUM(IF(task.status=:status,1,0)) AS done 
+				FROM asset_entity ae
+				JOIN asset_comment task ON task.asset_entity_id=ae.asset_entity_id AND move_event_id=:moveEventId
+				WHERE move_bundle_id IN (:moveBundleIds) AND task.role='CLEANER' 
+				AND ae.cart=:cartName
+				ORDER BY cart"""
+			
+			def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
+			def params = [status:AssetCommentStatus.DONE, moveEventId:moveEvent.id, moveBundleIds:bundleIds, cartName:cartName]
+			def cartInfo = namedParameterJdbcTemplate.queryForList( cartQtySQL, params )
+			log.info "moveEvent ${moveEvent.id} : bundleIds $bundleIds : cart $cartName : info $cartInfo"
+			if (cartInfo) map=cartInfo[0]
+
+		}
+		return map
 	}
 	
 	/**

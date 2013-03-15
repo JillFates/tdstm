@@ -1080,6 +1080,21 @@ class ClientTeamsController {
 		def project = securityService.getUserCurrentProject()
 		def assetComment = AssetComment.findByIdAndProject(params.issueId, project)
 		
+		def cartQty = ''
+		def moveEvent = assetComment.moveEvent
+		
+		// Determine the cart quantity
+		// The quantity only appears on the last label scanned/printed for a particular cart. This is used to notify
+		// the logistics and transport people that the cart is ready to wrap up.
+		if (moveEvent && assetComment.assetEntity?.cart && assetComment.role == "CLEANER" && assetComment.status != AssetCommentStatus.DONE) {
+			def cart = taskService.getCartQuantities(moveEvent, assetComment.assetEntity.cart)
+			if (cart && ( cart.total - cart.done ) == 1) {
+				// Only set the cartQty if we're printing the LAST set of labels for a cart (done is 1 less than total)
+				cartQty = cart.total
+			}
+		}
+		log.info "cartQty ($cartQty)"
+		
 		def selectCtrlId = "assignedToEditId_${assetComment.id}"
 		def assignToSelect = taskService.assignToSelectHtml(project.id, params.issueId, assetComment.assignedTo?.id, selectCtrlId)
 		def person = securityService.getUserLoginPerson()
@@ -1159,13 +1174,9 @@ class ClientTeamsController {
 			dueDate:dueDate,
 			assignToSelect:assignToSelect,
             assetEntity:null,
-            cartQty:0
+            cartQty:cartQty
             ]
-        if(assetComment.assetEntity){
-            def asset = assetComment.assetEntity
-            model << [ assetEntity:asset, cartQty:AssetEntity.countByCartAndMoveBundle(asset.cart, asset.moveBundle) ]
-        }
-		
+	
 		if(viewMode=='mobile'){
 			render (view:'showIssue_m',model:model)
 		}else{
