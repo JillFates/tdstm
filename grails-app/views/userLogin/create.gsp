@@ -89,10 +89,10 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="username"><b>Username:&nbsp;<span style="color: red">*</span></b></label>
+                                    <label for="username"><b>Username (use email):&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'username','errors')}">
-                                    <input type="text" maxlength="25" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}"/>
+                                    <input type="text" maxlength="50" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}"/>
                                 <g:hasErrors bean="${userLoginInstance}" field="username">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="username"/>

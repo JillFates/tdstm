@@ -17,7 +17,7 @@ class UserLogin {
 	
 	static constraints = {
 		person( nullable: false )
-		username( blank: false, unique:true, size:2..25 )
+		username( blank: false, unique:true, size:2..50 )
 		// TODO : Add a password constraint on size, and other rules
 		password( blank: false, nullable: false, password: true )
 		createdDate( nullable: true )
@@ -31,7 +31,7 @@ class UserLogin {
 		version false
 		autoTimestamp false
 		id column:'user_login_id'
-		username sqlType: 'varchar(25)'
+		username sqlType: 'varchar(50)'
 		password sqlType: 'varchar(100)'  // size must me more than 20 because it will store as encrypted code
 		// TODO - active column should not be varchar(20) as it is only 1 char
 		active sqlType:'varchar(20)'
