@@ -1244,7 +1244,7 @@ class TaskService {
 				if (isMilestone || isRequired) {
 					assetsLatestTask[taskToLink.assetEntity.id] = taskToLink
 				}
-				out.append("Created dependency (${newDep.id}) between milestone $lastMilestone and $taskToLink<br/>")
+				out.append("Created dependency between ${assetsLatestTask[taskToLink.assetEntity.id]} and $taskToLink<br/>")
 				// Now we can associate this new task as the latest task for the asset									
 				assetsLatestTask.put(taskToLink.assetEntity.id, taskToLink)
 				
