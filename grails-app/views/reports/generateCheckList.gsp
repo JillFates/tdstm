@@ -62,7 +62,7 @@
 						<thead>
 							<th>Staff Name</th>
 							<th>Company</th>
-							<th>Role</th>
+							<th>Team</th>
 						</thead>
 						<tbody>
 							<g:each in="${list}" var="staff" status="i">

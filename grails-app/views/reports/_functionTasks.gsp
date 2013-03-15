@@ -2,7 +2,7 @@
 	<thead>
 		<tr>
 			<th width="100px;">Team</th>
-			<th width="100px;">Role</th>
+			<th width="100px;">Team Code</th>
 			<th width="150px;">Team Members</th>
 			<th width="50px;">Tasks</th>
 		</tr>

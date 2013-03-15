@@ -80,7 +80,7 @@
 		 		
 		 		var roleType = document.getElementById("roleType_"+i).value;
 				if( roleType == "" ){
-					alert("Please Select Role");
+					alert("Please Select Team");
 					return false;
 				}else{
 					return true;					
@@ -99,7 +99,7 @@
 					if(roleType != "null" && roleType != ""){
 						return true;
 					}else{
-						alert("please select Role ");
+						alert("please select Team ");
 						return false;
 					}
 				} else {
@@ -125,7 +125,7 @@
 					alert(email +" is not a valid e-mail address ")
 					returnVal =  false;
 				} else if( !roleType ){
-					alert("please select Role ");
+					alert("please select Team ");
 					returnVal =  false;
 				}
 				return returnVal
@@ -154,7 +154,7 @@
 
 			<th>Company</th>
 
-			<th>Role</th>
+			<th>Team</th>
 
 		</tr>
 	</thead>
@@ -256,7 +256,7 @@
                             </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="active">Role:</label>
+                                    <label for="active">Team:</label>
                                 </td>
                                 <td valign="top" class="value ">
                                <tds:personRoleSelect name="roleType" id="roleType" optionKey="id" from="${RoleType.list()}" value="${roleType?.id}" isNew="true" ></tds:personRoleSelect>
@@ -342,7 +342,7 @@
                             </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="active"><b>Role:</b></label>
+                                    <label for="active"><b>Team:</b></label>
                                 </td>
 	                                <td valign="top" class="value ">
 	                                <span name="active" id="showRole" ></span>
@@ -364,7 +364,7 @@
 			<th>Company</th>
 			<th>Name</th>
 			<th>Title</th>
-			<th>Role&nbsp;<span style="color: red">*</span></th>
+			<th>Team&nbsp;<span style="color: red">*</span></th>
 			<th>Action</th>
 
 		</tr>
@@ -468,7 +468,7 @@
                             </tr> 
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="active"><b>Role:&nbsp;<span style="color: red">*</span></b></label>
+                                    <label for="active"><b>Team:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ">
                                <tds:personRoleSelect name="roleType" id="roleType" optionKey="id" from="${RoleType.list()}" value="${roleType?.id}" isNew="true" ></tds:personRoleSelect>
