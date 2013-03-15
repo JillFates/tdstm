@@ -157,7 +157,7 @@
 			</g:if>
 			<tr class="prop">
 					<td valign="top" class="name"><label for="resolution">Printers :</label></td>
-					<td>
+					<td nowrap="nowrap">
 						<select type="hidden" id="Printers" name="Printers"	${canPrint ? '' : 'disabled="disabled"' } onChange="javascript:mySelect(this);">
 							<option value="Zebra (ZPL-II)">Zebra (ZPL-II)</option>
 							<g:each in="${session.getAttribute( 'PRINTERS' )}" var="printer">
@@ -186,6 +186,8 @@
 				</td>
 				<td class="buttonR" style="text-align:right;padding: 5px 3px;">
 					<input type="button" id="printButton" value="Print" ${canPrint ? '': 'disabled="disabled"' } onclick="startprintjob();"  />
+					<input type="button" id="printAndDoneButton" value="Print And Done"  
+							onclick="printAndMarkDone(${assetComment.id}, 'Completed', '${assetComment.status}');"  />
 				</td>
 				<td class="buttonR" colspan="2" style="text-align:right;padding: 5px 3px;">
 					<input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" />
@@ -293,6 +295,7 @@ $( function() {
 	       $('#noteId_'+${assetComment.id}).hide()
 	       $('#resolutionId_'+${assetComment.id}).show()
 	 }
+		 document.onkeyup = keyCheck;
 });
 
  function showResolve(){
@@ -304,6 +307,53 @@ $( function() {
        $('#resolutionId_'+${assetComment.id}).hide()
    }
  }
+function keyCheck( e ){
+	var currentFocus = document.activeElement.id
+	var focusId = currentFocus.substring(0,currentFocus.indexOf("_"))
+	if(currentFocus != 'search' && focusId != 'editComment' && focusId != 'noteEditId' ){
+	  if(!e && window.event) e=window.event;
+	  var keyID = e.keyCode;
+	  if(keyID == 13){
+		  $("#printAndDoneButton").click()
+		  return;
+	  } else if(keyID == 80){
+	       startprintjob();
+	  }
+	  var labelQty = keyID - 48 
+	  if(labelQty < 5 && labelQty > 0){
+	       $('#labelQuantity').focus()
+		  if($("input:focus").length < 1){
+		  	$('#labelQuantity').val(labelQty);
+		  }
+	  }
+    }
+}
+		
+
+ function printAndMarkDone(id, status, currentStatus){
+ 	startprintjob();
+	 jQuery.ajax({
+		url: '../task/update',
+		data: {'id':id,'status':status,'currentStatus':currentStatus,view:'myTask'},
+		type:'POST',
+		success: function(data) {
+			if (typeof data.error !== 'undefined') {
+				alert(data.error);
+			} else {
+				 hideStatus(id, status)
+				 $('#issueTrId_'+id).attr('onClick','hideStatus('+id+',"'+status+'")')
+				 if(status=='Started'){
+				 	$('#started_'+id).hide()
+				 }
+				 $("#search").focus()
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			alert("An unexpected error occurred while attempting to update task/comment")
+		}
+	});
+ }
+ 
  function validateComment(objId){
 	 var status = $('#statusEditId_'+${assetComment.id}).val()
 	 var params = {   'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 

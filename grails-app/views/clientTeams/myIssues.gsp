@@ -156,6 +156,7 @@
 			dropdown.push(window.TF.GetOSPrinter(i))
 		}
 		${remoteFunction(controller:'moveTech', action:'setPrintersIntoSession', params:'\'dropdown=\' + dropdown')}
+		
 	});
 	</g:if>
 	$(function() {
@@ -167,6 +168,11 @@
 		}else{
 			B1.Pause(0);
 		}
+		var searchedAssetId = '${searchedAssetId}'
+		var searchedAssetStatus = '${searchedAssetStatus}'
+		if( searchedAssetId ){
+			issueDetails(searchedAssetId,searchedAssetStatus);
+	    }
 	});
 
 	function setFocus(){
@@ -194,6 +200,7 @@
 						// $('#statusEditId_'+id).val(status)
 			 		}
 				})
+				$("#labelQuantity").focus();
 			}
 		});
 	}

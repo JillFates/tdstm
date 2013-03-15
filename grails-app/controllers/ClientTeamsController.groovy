@@ -1037,7 +1037,10 @@ class ClientTeamsController {
 	 		personId:person.id, isCleaner:isCleaner,
 			timeToUpdate:timeToRefresh ?: 60, 
 			isOnIE:false, person:person]
-			
+		
+		if(search && taskList.size() > 0){
+			model  << [searchedAssetId : taskList*.id[0], searchedAssetStatus : taskList*.status[0]]
+		}
 		def view = params.view == "myTask" ? "_tasks" : "myIssues"
 		if ( session.getAttribute('TASK_VIEW_MODE') == 'mobile') {
 			view = params.view == "myTask" ? "_tasks_m" : view+"_m"
