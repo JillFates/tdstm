@@ -33,6 +33,12 @@
 				</select></td>
 			</tr>
 			<tr>
+				<td>
+					<g:link class="mmlink" action="listTasks" params="[viewMode:'web', tab:tab]">Switch to Full Site</g:link>
+					<br />
+				</td>
+			</tr>
+			<tr>
 				<td><g:link class="mmlink" controller="auth" action="signOut">Sign out</g:link></td>
 			</tr>
 		</table>

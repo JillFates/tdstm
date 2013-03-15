@@ -77,9 +77,6 @@
 		
 	    <br />
 	    <input type="hidden" id="timeBarValueId" value="0"/>
-		<div>
-			<g:link class="mobfooter" action="listTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link>
-		</div>
 <%--
 /*
  **************************

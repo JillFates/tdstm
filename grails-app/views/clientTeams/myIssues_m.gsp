@@ -42,15 +42,13 @@
 <body onorientationchange="updateOrientation();">
 	<div class="mainbody" style="width: 100%;">
 	   <div style="width: 100%;" id="mobtitle">TransitionManager&trade; - Mobile 
-		   <span id="userSpanId"  onclick="loadUserPref(${person.id})">${person.firstName}
-		   <a id="userAnchor" class="ui-icon ui-icon-triangle-1-s" href="#"></a></span>
+		   <span id="userSpanId"  onclick="loadUserPref(${person.id})">${person.firstName}&nbsp;<a id="userAnchor" class="ui-icon ui-icon-triangle-1-s" href="#"></a></span>
 	   </div>
 	   <div id="mobilePrefDialog" class="megamenu" style="display: none;" >
 	</div>
 	     <div style="width: 100%;" id="myTaskListMobile">
 		 	<g:render template="tasks_m"/>
 		 </div>
-		<g:link class="mobfooter" action="listTasks" params="[viewMode:'web', tab:tab]">Use Full Site</g:link>
 	</div>
 	<input type="hidden" id="timeBarValueId" value="0"/>
 <script type="text/javascript">
