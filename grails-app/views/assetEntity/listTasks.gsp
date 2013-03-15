@@ -164,10 +164,13 @@
 			 	<g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
 				&nbsp;&nbsp;
 				<input type="checkbox" id="justRemainingCB" ${ (justRemaining == '1' ? 'checked="checked"': '') } onclick="toggleCheckbox(this, 'justRemaining');"  />
-				<b> <label for="justRemainingCB" >Just Remaining Tasks</label></b>
+				<b> <label for="justRemainingCB" >Just Remaining</label></b>
 				&nbsp;&nbsp;
 				<input type="checkbox" id="justMyTasksCB" ${ (justMyTasks=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'justMyTasks');"/>
-				<b><label for="justMyTasksCB" > Just My Tasks</label></b>&nbsp;&nbsp;
+				<b><label for="justMyTasksCB" > Just Mine</label></b>&nbsp;&nbsp;
+				<span class="Button"><a class="task_action ui-button ui-state-default ui-corner-all" href="javascript:createIssue('','','')">
+					<span class="ui-button-text task_button">Create Task</span></a>
+				</span>
 					<span style="position:absolute; margin-left:430px;">
 					${HtmlUtil.actionButton('View Task Graph', 'ui-icon-zoomin', 'graph', '','../task/moveEventTaskGraph?moveEventId='+filterEvent+'&mode=s')}&nbsp;
 				
@@ -186,7 +189,7 @@
 			<br/></br>
 				<jqgrid:wrapper id="taskListId" />
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-		      <span class="menuButton"><a class="create" href="javascript:createIssue('','','')">Create Issue/Task</a></span>
+		      <span class="menuButton"><a class="create" href="javascript:createIssue('','','')">Create Task</a></span>
 	       	</div>
 		</div>
 		<div id="showEntityView" style="display: none;"></div>
