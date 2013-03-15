@@ -3,7 +3,7 @@
 	  <tr>
 		<th style="cursor: pointer;" onclick="loadFilteredStaff('lastName','staff')">Name</th>
 		<th style="cursor: pointer;" onclick="loadFilteredStaff('company','company')">Company</th>
-		<th style="cursor: pointer;" onclick="loadFilteredStaff('description','role')">Role</th>
+		<th style="cursor: pointer;" onclick="loadFilteredStaff('description','role')">Team</th>
 		<g:if test="${projectId=='0'}"> <th>Project</th></g:if>
 		<g:else><th>${project?.name}</th></g:else>
 		<g:each in ="${moveEventList}" var="moveEvent" >

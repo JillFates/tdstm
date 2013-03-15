@@ -223,7 +223,7 @@
 					</td>
 				</tr>
 				<tr class="prop">
-					<td valign="top" class="name"><label for="roles">Roles :</label></td>
+					<td valign="top" class="name"><label for="roles">Teams :</label></td>
 					<td valign="top" class="value" colspan="2">
 						<g:select from="${availabaleRoles}" id="roleId" name="role"
 							optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"
