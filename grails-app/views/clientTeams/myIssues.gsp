@@ -43,6 +43,7 @@
 							    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', 
 								params:'\'timer=\'+ this.value +\'&prefFor=MYTASKS_REFRESH\' ', onComplete:'changeTimebarPref(e)') }">
 								<option value="0">Manual</option>
+								<option value="30">30 sec</option>
 								<option value="60">1 Min</option>
 								<option value="120">2 Min</option>
 								<option value="180">3 Min</option>

@@ -60,7 +60,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="username"><b>Username:&nbsp;<span style="color: red">*</span></b></label>
+                                    <label for="username"><b>Username (use email):&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'username','errors')}">
                                     <input type="text" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}"/>

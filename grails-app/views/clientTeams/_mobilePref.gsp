@@ -25,6 +25,7 @@
 				<td>Refresh : <select id="selectTimedBarId"
 					onchange="setTimer(this.value)">
 						<option value="0">Manual</option>
+						<option value="30">30 sec</option>
 						<option value="60">1 Min</option>
 						<option value="120">2 Min</option>
 						<option value="180">3 Min</option>
