@@ -298,7 +298,6 @@ digraph runbook {
 		def selected=params.list('selected[]')[0] ?:params.selected
 		if(selected){
 			userPreferenceService.setPreference( key, selected )
-			session.setAttribute(key,selected)
 		}
 		render true
 	}

@@ -158,7 +158,8 @@
 			<tr class="prop">
 					<td valign="top" class="name"><label for="resolution">Printers :</label></td>
 					<td nowrap="nowrap">
-						<select type="hidden" id="Printers" name="Printers"	${canPrint ? '' : 'disabled="disabled"' } onChange="startprintjob();">
+						<select type="hidden" id="Printers" name="Printers"	${canPrint ? '' : 'disabled="disabled"' } 
+							onchange="${remoteFunction(controller:'task', action:'setLabelQuantityPref',params:'\'selected=\'+ this.value+\'&prefFor=PRINTER_NAME\'')}">
 							<option value="Zebra (ZPL-II)" >Zebra (ZPL-II)</option>
 							<g:each in="${session.getAttribute( 'PRINTERS' )}" var="printer">
 								<option value="${printer}" ${prefPrinter==printer ? 'selected="selected"' : ''}>
@@ -167,7 +168,8 @@
 							</g:each>
 						</select> 
 						<b>Quantity: </b>
-						<g:select  name="labels" id="labelQuantity" from="${1..4}" value="${lblQty}" onchange="${remoteFunction(controller:'task', action:'setLabelQuantityPref',params:'\'selected=\'+ this.value+\'&prefFor=printLabelQuantity\'')}"/>
+						<g:select  name="labels" id="labelQuantity" from="${1..4}" value="${lblQty}" 
+							onchange="${remoteFunction(controller:'task', action:'setLabelQuantityPref',params:'\'selected=\'+ this.value+\'&prefFor=printLabelQuantity\'')}"/>
 					</td>
 			</tr>
 			<tr>
@@ -404,12 +406,6 @@ var sHint = "C:\\temp\\output";
 
 
 function startprintjob() {
-	var selectval=  $("#Printers").val();
-	jQuery.ajax({
-		url: '../task/setLabelQuantityPref',
-		data:{'selected':selectval, 'prefFor':'PRINTER_NAME'},
-		type:'POST'
-	});
 	/*
 	alert('model:' + $("#model").val());
 	alert(", cart: " + $("#cart").val());
