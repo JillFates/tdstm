@@ -238,13 +238,17 @@ class CommentService {
 			
 				if (params.containsKey('assignedTo')) {
 					if (params.assignedTo && params.assignedTo.isNumber()){
-						def person = Person.read(params.assignedTo)
-						if (person) {
-							def projectStaff = partyRelationshipService.getProjectStaff( project.id )
-							if (projectStaff.find { "${it.staff.id}" == params.assignedTo }) {
-								assetComment.assignedTo = person
-							} else {
-								log.error "User (${userLogin}) attempted to assign unrelated person (${params.assignedTo}) to project (${project})"
+						if(params.assignedTo == '0'){ // if unassigned is selected .
+							assetComment.assignedTo = null
+						} else {
+							def person = Person.read(params.assignedTo)
+							if (person) {
+								def projectStaff = partyRelationshipService.getProjectStaff( project.id )
+								if (projectStaff.find { "${it.staff.id}" == params.assignedTo }) {
+									assetComment.assignedTo = person
+								} else {
+									log.error "User (${userLogin}) attempted to assign unrelated person (${params.assignedTo}) to project (${project})"
+								}
 							}
 						}
 					}

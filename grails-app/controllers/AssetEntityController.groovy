@@ -3821,7 +3821,7 @@ class AssetEntityController {
 		}
 		list.sort { it.sortOn }
 		
-		def firstOption = [value:'', display:'Unassigned']
+		def firstOption = [value:'0', display:'Unassigned']
 		def paramsMap = [selectId:viewId, selectName:viewId, options:list, 
 			optionKey:'id', optionValue:'nameRole', 
 			optionSelected:selectedId, firstOption:firstOption ]

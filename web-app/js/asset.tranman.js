@@ -677,6 +677,9 @@ function showAssetDialog( e , action ) {
 		      		 if(params.assignedTo){
 				      	 $('#assignedToTdId').html(params.assignedTo.firstName + " " + params.assignedTo.lastName)
 				      	 $('#assignedToEdit').val(params.assignedTo.id)
+		      		 } else {
+		      			$('#assignedToTdId').html("")
+				      	$('#assignedToEdit').val(0)
 		      		 }
 		      		 var notes = params.notes
 		      		 var noteTable = '<table style="border:0px">'
