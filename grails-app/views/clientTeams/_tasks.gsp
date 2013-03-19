@@ -41,9 +41,10 @@
 			<tbody>
 				<g:each status="i" in="${taskList}" var="issue">
 					<g:set var="item" value="${issue?.item}"/>
-					<tr id="issueTrId_${item?.id}" class="${issue.css}"
+					<tr id="issueTrId_${item?.id}" class="actionBar ${issue.css}"
+					    data-itemId="${item?.id}" data-status="${item?.status}"
 						style="cursor: pointer;"
-						onclick="openStatus(${item?.id},'${item?.status}')">
+						>
 						<td id="comment_${item?.id}"
 							class="asset_details_block_task">
 							${item?.taskNumber?item?.taskNumber+' - ' : ''}

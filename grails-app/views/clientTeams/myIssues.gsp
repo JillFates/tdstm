@@ -176,6 +176,30 @@
 	    }
 	});
 
+    $(".actionBar").die().live('click',function(){
+		var id = $(this).attr('data-itemId');
+		var status = $(this).attr('data-status');
+		var showStatusTr = $('#showStatusId_'+id);
+		if(status=='Started'){
+			$('#started_'+id).hide();
+			$('#image_'+id).hide();
+		}
+		alert("here "+$(this).data('state'))
+		if(!$(this).data('state')){
+			showStatusTr.show();
+			$(this).data('state',true);
+		} else{
+			showStatusTr.hide();
+			$(this).data('state',false);
+			$('#detailTdId_'+id).hide();
+			if(taskManagerTimePref !=0){
+				B1.Restart(taskManagerTimePref);
+			}else {
+				B1.Pause(0);
+			}
+		}
+	});
+	
 	function setFocus(){
 		document.issueAssetForm.search.focus();
 	}
@@ -252,37 +276,6 @@
 		//$('#issueTr_'+id).attr('onClick','issueDetails('+id+',"'+status+'")');
 	}
 
-	function openStatus(id,status){
-		if(status=='Started'){
-			$('#started_'+id).css('display','none')
-			$('#image_'+id).css('display','none')
-		}
-		$('#showStatusId_'+id).show()
-		$('#issueTrId_'+id).each(function(){
-			$(this).removeAttr('onclick')
-			$(this).unbind("click").bind("click", function(){
-				hideStatus(id,status)
-		    });
-		})
-	}
-
-	function hideStatus(id,status){
-		$('#showStatusId_'+id).hide()
-		$('#detailTdId_'+id).css('display','none')
-		$('#issueTrId_'+id).each(function(){
-			$(this).removeAttr('onclick')
-			$(this).unbind("click").bind("click", function(){
-				openStatus(id,status)
-		    });
-		})
-		if(taskManagerTimePref !=0){
-			B1.Restart(taskManagerTimePref);
-		}else {
-			B1.Pause(0);
-		}
-	}
-
- 
 function changeAction(){
 	 document.issueAssetForm.action = 'listTasks'
 }
