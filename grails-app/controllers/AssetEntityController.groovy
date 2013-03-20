@@ -782,7 +782,7 @@ class AssetEntityController {
 			return;
 		} catch( Exception ex ) {
 			ex.printStackTrace()
-			flash.message = grailsApplication.metadata[ 'app.file.format' ]+ex
+			flash.message = ex
 			redirect( action:assetImport, params:[ message:flash.message] )
 			return;
 		}
