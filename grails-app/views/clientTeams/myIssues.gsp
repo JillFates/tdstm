@@ -184,7 +184,6 @@
 			$('#started_'+id).hide();
 			$('#image_'+id).hide();
 		}
-		alert("here "+$(this).data('state'))
 		if(!$(this).data('state')){
 			showStatusTr.show();
 			$(this).data('state',true);

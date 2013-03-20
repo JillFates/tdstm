@@ -118,7 +118,8 @@
        	 	return '<span id="span_'+options.rowId+'" class=" '+rowObject[15] +'" onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
         }
         function assetFormatter(cellVal,options,rowObject){
-        	return '<span class="cellWithoutBackground pointer" onclick= "getEntityDetails(\'listComment\', \''+rowObject[4]+'\', '+rowObject[16]+')\" >' + (cellVal ? cellVal :"") + '</span>';
+        	return cellVal ? '<span class="cellWithoutBackground pointer" onclick= "getEntityDetails(\'listComment\', \''+rowObject[4]+'\', '+rowObject[16]+')\" >' + (cellVal) + '</span>' :
+        		"<span class='cellWithoutBackground pointer'></span>"
         }        
 
         function populateFilter(){

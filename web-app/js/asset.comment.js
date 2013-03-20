@@ -96,30 +96,57 @@ function assignTask(id, user, status, from){
  * Used to show the action bar in Task Manager
  * @param spanId
  */
+var actionBarLoadReq
 function getActionBarGrid(spanId){
    if(B2 != ''){ B2.Pause() }
-   var id = spanId//spanId.split('_')[1]
-   var trId =id// $('#'+spanId).parent().parent().attr('id')
-   if($('#row_d_'+id).html() == null ){
-   jQuery.ajax({
-		url: '../task/genActionBarHTML',
-		data: {'id':id},
-		type:'POST',
-		async:false,
-		success: function(data) {
-				$('#span_'+spanId).parent().parent().find('span').each(function(){
-					if($(this).attr("id")){
-						$(this).removeAttr('onclick')
-						$(this).unbind("click").bind("click", function(){
-							hideActionBar("row_d_"+id,"span_"+spanId)
-					    });
-					}
-				})
-				//$('#span_'+spanId).attr('onClick','hideActionBar("row_d_'+id+'", '+spanId+')')
-				$('#'+trId).after("<tr id='row_d_"+id+"'> <td nowrap='nowrap' colspan='13' class='statusButtonBar'>"+data+"</td></tr>")
-			}
-		});
-   }
+   var id = spanId
+   $('#span_'+spanId).parent().parent().find('span').each(function(){
+		if($(this).attr("id")){
+			$(this).removeAttr('onclick')
+		}
+   });
+   $('#'+id).after("<tr id='load_d_"+id+"'><td nowrap='nowrap' colspan='13' class='statusButtonBar' ><img src='../images/spinner.gif'/></td></tr>")
+   if(actionBarLoadReq)actionBarLoadReq.abort();
+   actionBarLoadReq = jQuery.ajax({
+							url: '../task/genActionBarHTML',
+							data: {'id':id},
+							type:'POST',
+							success: function(data, status, xhr) {
+									$('#load_d_'+id).remove()
+									var url = xhr.getResponseHeader('X-Login-URL');
+									if (url) {
+										alert("Your session has expired and need to login again.");
+										window.location.href = url;
+									} else {
+										if(!$("#row_d_"+id).html() && data)
+											$('#'+id).after("<tr id='row_d_"+id+"'> <td nowrap='nowrap' colspan='13' class='statusButtonBar'>"+data+"</td></tr>")
+											
+										$('#span_'+spanId).parent().parent().find('span').each(function(){
+											if($(this).attr("id")){
+												$(this).removeAttr('onclick')
+												$(this).unbind("click").bind("click", function(){
+													hideActionBarGrid("row_d_"+id,"span_"+spanId)
+											    });
+											}
+										})
+									 }
+							},
+				    		error: function(xhr, textStatus, errorThrown) {
+				    			$('#load_d_'+id).remove()
+				    			if(!$("#row_d_"+id).html()){
+									$('#'+id).after("<tr id='row_d_"+id+"'><td nowrap='nowrap' colspan='13' class='statusButtonBar'>"+
+											"An unexpected error occurred while populating action bar.</td></tr>")
+				    			}
+				    			$('#span_'+spanId).parent().parent().find('span').each(function(){
+									if($(this).attr("id")){
+										$(this).removeAttr('onclick')
+										$(this).unbind("click").bind("click", function(){
+											hideActionBarGrid("row_d_"+id,"span_"+spanId)
+									    });
+									}
+								})
+				    		}
+						});
 }
 /**
  * Used to hide the action bar in Task Manager
@@ -133,53 +160,7 @@ function hideActionBarGrid(rowId,spanId){
 		if($(this).attr("id")){
 			$(this).removeAttr('onclick')
 			$(this).unbind("click").bind("click", function(){
-				getActionBar(id)
-		    });
-		}
-	})
-	if(B2 != '' && taskManagerTimePref != 0){ B2.Restart(taskManagerTimePref) }
-}
-/**
- * TODO : Remove this once verified in tmdev
- * Used to show the action bar in Task Manager
- * @param spanId
- */
-function getActionBar(spanId){
-   if(B2 != ''){ B2.Pause() }
-   var id = spanId.split('_')[1]
-   var trId = $('#'+spanId).parent().parent().attr('id')
-   if($('#row_d_'+id).html() == null ){
-   jQuery.ajax({
-		url: '../task/genActionBarHTML',
-		data: {'id':id},
-		type:'POST',
-		success: function(data) {
-				$('#'+spanId).parent().parent().find('span').each(function(){
-					if($(this).attr("id")){
-						$(this).removeAttr('onclick')
-						$(this).unbind("click").bind("click", function(){
-							hideActionBar("row_d_"+id,spanId)
-					    });
-					}
-				})
-				$('#'+trId).after("<tr id='row_d_"+id+"'> <td nowrap='nowrap' colspan='13' class='statusButtonBar'>"+data+"</td></tr>")
-			}
-		});
-   }
-}
-/**
- * TODO : Remove this once verified in tmdev
- * Used to hide the action bar in Task Manager
- * @param rowId
- * @param spanId
- */
-function hideActionBar(rowId,spanId){
-	$('#'+rowId).remove()
-	$('#'+spanId).parent().parent().find('span').each(function(){
-		if($(this).attr("id")){
-			$(this).removeAttr('onclick')
-			$(this).unbind("click").bind("click", function(){
-				getActionBar(spanId)
+				getActionBarGrid(id)
 		    });
 		}
 	})
