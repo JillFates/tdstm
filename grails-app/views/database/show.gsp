@@ -71,9 +71,9 @@
 								</g:if>
 								<g:else><label for="custom4">${databaseInstance.project.custom4 ?:'Custom4'}</label></g:else>
 							</td>
+							<td>${databaseInstance.custom4}</td>
 						</tr>
 						<tr>
-							<td>${databaseInstance.custom4}</td>
 							<td class="label" nowrap="nowrap">
 								<g:if test="${(databaseInstance.custom5)?.length()>= 4 &&(databaseInstance.custom5)?.substring(0, 4)=='http'}">
 									<a href="javascript:window.open('${databaseInstance.custom5}','help');" style="color:#00E">${databaseInstance.project.custom5 !=null ? databaseInstance.project.custom5:'Custom5'}</a>
