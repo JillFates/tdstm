@@ -24,16 +24,16 @@
 		<input id="redirectTo" name="redirectTo" type="hidden" value="taskList" />
 		<table style="margin-left: -2px;">
 			<tr>
-				<td class="heading" colspan=2><a class="heading" href="#comments">Task details:</a></td>
+				<td class="heading" colspan="2"><a class="heading" href="#comments">Task details:</a></td>
 			</tr>
 			<tr>
-			<td colspan="3">
+				<td colspan="3">
 			</td>
 			</tr>		
 			<tr>
 				<td valign="top" class="name"><label for="comment">Task:</label></td>
 				<td colspan="3">
-				  <input type="text" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" value="${assetComment.comment}" style="width: 500px"/>
+					<input type="text" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" value="${assetComment.comment}" style="width: 500px"/>
 				</td>
 			</tr>	
 			<tr>
@@ -63,9 +63,8 @@
 				</div>
 				</td>
 			</tr>
-		 	
 			<tr class="prop" id="teamId"  >
-				<td valign="top" class="name"><label for="team">Function:</label></td>
+				<td valign="top" class="name"><label for="team">Team:</label></td>
 				<td valign="top" class="value" id="team_${assetComment.id}" colspan="3" nowrap="nowrap">${assetComment.role}</td>
 			</tr>
 			<tr class="prop issue" id="assignedToTrEditId" >
@@ -75,11 +74,11 @@
 				</td>
 			</tr> 
 			<tr class="prop issue" id="estFinishShowId"  >
-				<td valign="top" class="name"><label for="estFinish">Est.Finish:</label></td>
+				<td valign="top" class="name"><label for="estFinish">Est. Finish:</label></td>
 				<td valign="top" class="value" id="estFinishShowId_${assetComment.id}" colspan="3" nowrap="nowrap">${etFinish}</td>
 			</tr>
-			<tr class="prop issue" id="estFinishShowId"  >
-				<td valign="top" class="name"><label for="estFinish">Due Date:</label></td>
+			<tr class="prop issue" id="dueDateShowId"  >
+				<td valign="top" class="name"><label for="dueDateCreateId">Due Date:</label></td>
 	          <td> <script type="text/javascript" charset="utf-8">
 		 		 	 jQuery(function($){$('.dateEditRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
             		</script>
@@ -109,13 +108,13 @@
 				</td>
 				<td style="width: 20%;" id="statusEditTrId_${assetComment.id}" colspan="3">
 					<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
-					noSelection="['':'please select']"  onChange="showResolve()" ${statusWarn==1 ? 'disabled="true"' : ''}></g:select>
-				</td>	
+					noSelection="['':'please select']" onChange="showResolve()" ${statusWarn==1 ? 'disabled="true"' : ''}></g:select>
+				</td>
 			</tr>				
 			 <tr class="prop">
 				<td valign="top" class="name"><label for="notes">Previous Notes:</label></td>
 				<td valign="top" class="value" colspan="3"><div id="previousNote" style="width: 380px;">
-				 <table style="table-layout: fixed; width: 100%;border: 1px solid green;" >
+				<table style="table-layout: fixed; width: 100%;border: 1px solid green;" >
                    <g:each in="${notes}" var="note" status="i" >
                     <tr>
 	                    <td>${note[0]}</td>
@@ -157,10 +156,10 @@
 			
 			<tr>
 			    <td class="buttonR" >
-					<input type="button" value="Update Task" onclick="validateComment(${assetComment.id})" />
+					<input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" />
 				</td>
 				<td class="buttonR" colspan="3" style="text-align:right;padding: 5px 3px;">
-					<input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" />
+					<input type="button" value="Update Task" onclick="validateComment(${assetComment.id})" />
 				</td>
 			</tr>	
 		</table>
@@ -202,7 +201,7 @@
 		--%><div class="clear" style="margin:4px;"></div>
 		<a name="detail" ></a>
 		<g:if test="${assetComment?.assetEntity}">
-		 	<div style="float: left;width: 100%">
+			<div style="float: left;width:100%">
 				<table style="float: left;margin-left: -2px;">
 				<tr>
 					<td class="heading"><a href="#detail">${assetComment?.assetEntity?.assetType == 'Files' ? 'Storage' : assetComment?.assetEntity?.assetType} Details</a></td>
@@ -210,7 +209,7 @@
 				</tr>
 				<tr><td colspan=2>
 				<dl>
-	               <g:if test="${assetComment?.assetEntity?.assetType=='Application'}">
+	            	<g:if test="${assetComment?.assetEntity?.assetType=='Application'}">
 		                <dt>Application Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
 						<dt>Validation:</dt><dd>&nbsp;${assetComment?.assetEntity.validation}</dd>
 						<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
@@ -272,7 +271,7 @@ $( function() {
 	 /*
 	 var updatePerm = ${permissionForUpdate}
 	 $("#editComment_"+objId).keypress(function(e){
-		 if (updatePerm && e.keyCode==13){e.preventDefault(); validateComment(objId); }
+		 if(updatePerm && e.keyCode==13){e.preventDefault(); validateComment(objId); }
 		 else if(!updatePerm && e.keyCode==13) {e.preventDefault(); }
 	 });
 	*/
@@ -288,13 +287,13 @@ $( function() {
    }
  }
  function validateComment(objId){
-	 var status = $('#statusEditId_'+objId).val()
-	 var params = {'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 
-				   'category':$('#categoryEditId_'+objId).val(), 'assignedTo':$('#assignedToEditId_'+objId).val(),
-				   'status':$('#statusEditId_'+objId).val(),'currentStatus':$('#currentStatus_'+objId).val(), 
-				   'note':$('#noteEditId_'+objId).val(),'id':objId,'view':'myTask', 'tab': $('#tabId').val(),
-				   'dueDate':$("#dueDateCreateId").val()
-				  }
+	var status = $('#statusEditId_'+objId).val()
+	var params = {'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 
+					'category':$('#categoryEditId_'+objId).val(), 'assignedTo':$('#assignedToEditId_'+objId).val(),
+					'status':$('#statusEditId_'+objId).val(),'currentStatus':$('#currentStatus_'+objId).val(), 
+					'note':$('#noteEditId_'+objId).val(),'id':objId,'view':'myTask', 'tab': $('#tabId').val(),
+					'dueDate':$("#dueDateCreateId").val()
+				}
 		 jQuery.ajax({
 				url: '../task/update',
 				data: params,
@@ -332,10 +331,8 @@ $( function() {
 		}
 		return trunc;
  }
-	
-
- </script>
- <script>
+</script>
+<script>
 	currentMenuId = "#teamMenuId";
 	$("#teamMenuId a").css('background-color','#003366')
 </script>
