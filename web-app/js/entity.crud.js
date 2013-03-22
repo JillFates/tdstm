@@ -561,34 +561,19 @@ function setType(id){
 }
 
 function manipulateFields( val ){
-	if(val == 'Blade'){
-		$("#sourceRackId").attr('readonly','readonly')
-    	$("#targetRackId").attr('readonly','readonly')
-    	$("#sourceRackPositionId").attr('readonly','readonly')
-    	$("#sourceRackPositionId").val("")
-    	$("#targetRackPositionId").attr('readonly','readonly')
-    	$("#sourceRackId").val("")
-    	$("#targetRackId").val("")
-    	$("#sourceRackPositionId").val("")
-    	$("#targetRackPositionId").val("")
-    	$("#sourceBladeChassis").removeAttr("onChange")
-    	$("#targetBladeChassis").removeAttr("onChange")
-    	$("#sourceBladePosition").removeAttr("readonly")
-    	$("#targetBladePosition").removeAttr("readonly")
- 	}else{
-    	$("#sourceRackId").removeAttr("readonly")
-    	$("#targetRackId").removeAttr("readonly")
-    	$("#sourceRackPositionId").removeAttr("readonly")
-    	$("#targetRackPositionId").removeAttr("readonly")
-    	$("#sourceBladeChassis").val("")
-    	$("#targetBladeChassis").val("")
-    	$("#sourceBladePosition").val("")
-    	$("#targetBladePosition").val("")
-    	$("#sourceBladeChassis").attr('onChange','this.selectedIndex = 0')
-		$("#targetBladeChassis").attr('onChange','this.selectedIndex = 0')
-    	$("#sourceBladePosition").attr('readonly','readonly')
-    	$("#targetBladePosition").attr('readonly','readonly')
-    }
+	if(val=='Blade'){
+		$(".bladeLabel").show()
+		$(".rackLabel").hide()
+		$(".vmLabel").hide()
+	 } else if(val=='VM') {
+		$(".bladeLabel").hide()
+		$(".rackLabel").hide()
+		$(".vmLabel").show()
+	} else {
+		$(".bladeLabel").hide()
+		$(".rackLabel").show()
+		$(".vmLabel").hide()
+	}
 } 
 
 /*function updateModel(rackId,value){
