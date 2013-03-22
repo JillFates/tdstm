@@ -232,8 +232,10 @@ class ApplicationController {
 			def project = Project.read(projectId)
 		    def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 			def appMoveEventlist = AppMoveEvent.findAllByApplication(applicationInstance).value
-			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo, assetComment:assetComment, assetCommentList:assetCommentList,
-			  appMoveEvent:appMoveEvent,moveEventList:moveEventList,appMoveEvent:appMoveEventlist,dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle]
+			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, 
+			  redirectTo : params.redirectTo, assetComment:assetComment, assetCommentList:assetCommentList,
+			  appMoveEvent:appMoveEvent, moveEventList:moveEventList, appMoveEvent:appMoveEventlist, project:project,
+			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle]
 		}
 	}
 

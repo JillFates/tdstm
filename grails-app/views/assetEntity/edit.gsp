@@ -10,7 +10,22 @@
 	$("#asset_planStatus").val($('#gs_planStatus').val())
 	$("#asset_moveBundle").val($('#gs_moveBundle').val())
 	$("#asset_assetTag").val($('#gs_assetTag').val())
-	
+	$(document).ready(function() { 
+		var assetType = $("#assetTypeId").val()
+		if(assetType =='Blade'){
+			$(".bladeLabel").show()
+			$(".rackLabel").hide()
+			$(".vmLabel").hide()
+		 } else if(assetType=='VM') {
+			$(".bladeLabel").hide()
+			$(".rackLabel").hide()
+			$(".vmLabel").show()
+		} else {
+			$(".bladeLabel").hide()
+			$(".rackLabel").show()
+			$(".vmLabel").hide()
+		}
+	})
 </script>
 <g:form method="post"  name="editAssetsFormId"  action="update">
 
@@ -40,8 +55,6 @@
 								<td>&nbsp</td>
 								<td class="label_sm">Source</td>
 								<td class="label_sm">Target</td>
-								<td class="label" nowrap="nowrap"><label for="custom1">${assetEntityInstance.project.custom1 ?: 'Custom1' }</label></td>
-								<td ><input type="text" id="custom1" name="custom1" value="${assetEntityInstance.custom1}" size=8 tabindex="51"/></td>
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
@@ -55,8 +68,6 @@
 									name="sourceLocation" value="${assetEntityInstance.sourceLocation}" size=10 tabindex="31"/></td>
 									<td><input type="text" id="targetLocationId"
 									name="targetLocation" value="${assetEntityInstance.targetLocation}" size=10 tabindex="41"/></td>
-								<td class="label" nowrap="nowrap"><label for="custom2">${assetEntityInstance.project.custom2 ?: 'Custom2' }</label></td>
-								<td ><input type="text" id="custom2" name="custom2" value="${assetEntityInstance.custom2}" size=8 tabindex="51"/></td>
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap">
@@ -82,8 +93,6 @@
 									name="sourceRoom" value="${assetEntityInstance.roomSource?.roomName}" size=10 tabindex="32"/></td>
 									<td><input type="text" id="targetRoomId"
 									name="targetRoom" value="${assetEntityInstance.roomTarget?.roomName}" size=10 tabindex="42" /></td>
-								<td class="label" nowrap="nowrap"><label for="custom3">${assetEntityInstance.project.custom3 ?: 'Custom3' }</label></td>
-								<td ><input type="text" id="custom3" name="custom3" value="${assetEntityInstance.custom3}" size=8 tabindex="52" /></td>
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap">
@@ -102,13 +111,20 @@
 								</td>
 								<td class="label" nowrap="nowrap"><label for="os">OS</label></td>
 								<td ><input type="text" id="os" name="os" value="${assetEntityInstance.os}"  tabindex="24"/></td>
-								<td class="label" nowrap="nowrap"><label for="sourceRackId">Rack/Cab</label></td>
-								<td><input type="text" id="sourceRackId" value="${assetEntityInstance.assetType != 'Blade' ? assetEntityInstance.rackSource?.tag : ''}"
-									 name="sourceRack"  size=10 tabindex="33"  ${assetEntityInstance.assetType == 'Blade' ? 'readonly="readonly"' : '' }/></td>
-									<td><input type="text" id="targetRackId" value="${assetEntityInstance.assetType != 'Blade' ? assetEntityInstance.rackTarget?.tag : ''}"
-									name="targetRack"  size=10 tabindex="44" ${assetEntityInstance.assetType == 'Blade' ? 'readonly="readonly"' : '' }/></td>
-								<td class="label" nowrap="nowrap"><label for="custom4">${assetEntityInstance.project.custom4 ?: 'Custom4' }</label></td>
-								<td ><input type="text" id="custom4" name="custom4" value="${assetEntityInstance.custom4}" size=8 tabindex="53" /></td>
+								<td class="label rackLabel"  nowrap="nowrap" id="rackId"><label for="sourceRackId">Rack/Cab</label></td>
+								<td class="label bladeLabel" nowrap="nowrap" id="bladeId" style="display: none"><label for="sourceBladeChassisId">Blade</label></td>
+								<td class="label vmLabel" style="display: none" class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label>
+								<td class="rackLabel"><input type="text" id="sourceRackId"
+									name="sourceRack" value="${assetEntityInstance.sourceRack}" size=10 tabindex="33" /></td>
+								<td class="rackLabel"><input type="text" id="targetRackId"
+									name="targetRack" value="${assetEntityInstance.targetRack}" size=10 tabindex="44" /></td>
+								<td class="bladeLabel" style="display: none"><g:select id='sourceBladeChassis' from='${sourceChassisSelect}' optionKey='${-2}' optionValue='${1}'
+									  name="sourceBladeChassis" value="${assetEntityInstance.sourceBladeChassis}" noSelection="${['':' Please Select']}"/></td>
+								<td class="bladeLabel" style="display: none"><g:select id='targetBladeChassis' from='${targetChassisSelect}' optionKey='${-2}' optionValue='${1}'
+										name="targetBladeChassis"  value="${assetEntityInstance.targetBladeChassis}" noSelection="${['':' Please Select']}"/></td>
+								<td class="vmLabel" style="display: none"><input type="text" id="virtualHost" name="virtualHost" value="${assetEntityInstance.virtualHost}" size=10 tabindex="37" /></td>
+								<td class="vmLabel" style="display: none">&nbsp;</td>
+								
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="shortName">Alt Name</label></td>
@@ -121,13 +137,16 @@
 								</td>
 								
 								<td class="label" nowrap="nowrap"><label for="sourceRackPositionId">Position</label>
-								<td><input type="text" id="sourceRackPositionId" value="${assetEntityInstance.assetType != 'Blade' ? assetEntityInstance.sourceRackPosition : ''}"
-									name="sourceRackPosition"  size=10 tabindex="34" ${assetEntityInstance.assetType == 'Blade' ? 'readonly="readonly"' : '' }/></td>
-									<td><input type="text" id="targetRackPositionId" value="${assetEntityInstance.assetType != 'Blade' ? assetEntityInstance.targetRackPosition : ''}"
-									name="targetRackPosition"  size=10 tabindex="44"  ${assetEntityInstance.assetType == 'Blade' ? 'readonly="readonly"' : '' }/></td>
-								</td>
-								<td class="label" nowrap="nowrap"><label for="custom5">${assetEntityInstance.project.custom5 ?: 'Custom5' }</label></td>
-								<td ><input type="text" id="custom5" name="custom5" value="${assetEntityInstance.custom5}" size=8 tabindex="54"/></td>
+								<td class="rackLabel"><input type="text" id="sourceRackPositionId"
+									name="sourceRackPosition" value="${assetEntityInstance.sourceRackPosition}" size=10 tabindex="34" /></td>
+								<td class="rackLabel"> <input type="text" id="targetRackPositionId"
+									name="targetRackPosition" value="${assetEntityInstance.targetRackPosition}" size=10 tabindex="44" /></td>
+								<td class="bladeLabel"><input type="text" id="sourceBladePositionId"
+									name="sourceBladePosition" value="${assetEntityInstance.sourceBladePosition}" size=10 tabindex="36"/></td>
+								<td class="bladeLabel"><input type="text" id="targetBladePositionId"
+									name="targetBladePosition" value="${assetEntityInstance.targetBladePosition}" size=10 tabindex="46" /></td>	
+								<td class="vmLabel">&nbsp;</td>
+								<td class="vmLabel">&nbsp;</td>	
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="serialNumber">Serial #</label></td>
@@ -141,17 +160,8 @@
 				                    </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate" tabindex="27"
 									value="<tds:convertDate date="${assetEntityInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" tabindex="27" />" > 
 								</td>
-								<td class="label" nowrap="nowrap"><label for="sourceBladeChassis">Blade</label></td>
-								<td>
-									<g:select id='sourceBladeChassis' from='${sourceChassisSelect}' optionKey='${-2}' optionValue='${1}'
-									  name="sourceBladeChassis" value="${assetEntityInstance.sourceBladeChassis}" noSelection="${['':' Please Select']}"/>
-								</td>
-									<td>
-										<g:select id='targetBladeChassis' from='${targetChassisSelect}' optionKey='${-2}' optionValue='${1}'
-										name="targetBladeChassis"  value="${assetEntityInstance.targetBladeChassis}" noSelection="${['':' Please Select']}"/>
-									</td>
-								<td class="label" nowrap="nowrap"><label for="custom6">${assetEntityInstance.project.custom6 ?: 'Custom6' }</label></td>
-								<td ><input type="text" id="custom6" name="custom6" value="${assetEntityInstance.custom6}" size=8 tabindex="55" /></td>
+								<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
+								<td colspan="2"><g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${assetEntityInstance.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="38" noSelection="${['null':' Please Select']}"/></td>
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="assetTag">Tag</label></td>
@@ -163,48 +173,21 @@
 					                	    </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate" tabindex="28"
 									value="<tds:convertDate date="${assetEntityInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" > 
 								</td>
-								<td class="label" nowrap="nowrap"><label for="sourceBladePosition">Blade Position</label></td>
-								<td><input type="text" id="sourceBladePosition"
-									name="sourceBladePosition" value="${assetEntityInstance.sourceBladePosition}" size=10 tabindex="36" ${assetEntityInstance.assetType != 'Blade' ? 'readonly="readonly"' : '' }/></td>
-									<td><input type="text" id="targetBladePosition"
-									name="targetBladePosition" value="${assetEntityInstance.targetBladePosition}" size=10 tabindex="46"   ${assetEntityInstance.assetType != 'Blade' ? 'readonly="readonly"' : '' }/></td>
-								<td class="label" nowrap="nowrap"><label for="custom7">${assetEntityInstance.project.custom7 ?: 'Custom7' }</label></td>
-								<td ><input type="text" id="custom7" name="custom7" value="${assetEntityInstance.custom7}" size=8 tabindex="56"/></td>
+								<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
+								<td colspan="2"><g:select id="planStatus" name ="planStatus" from="${planStatusOptions}" value= "${assetEntityInstance.planStatus}" noSelection="${['':' Please Select']}" tabindex="39"/></td>
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="railType">Rail Type</label></td>
 								 <td ><g:select id="railType" name ="railType" from="${railTypeOption}" value= "${assetEntityInstance.railType}" noSelection="${['':' Please Select']}" tabindex="64"/></td>
+								<td class="label" nowrap="nowrap"><label for="truck">Truck/Cart/Shelf</label></td>
+								<td ><input type="text" id="truck" name="truck" value="${assetEntityInstance.truck}" size=3 tabindex="61" />
+								<input type="text" id="cart" name="cart" value="${assetEntityInstance.cart}" size=3 tabindex="62" />
+								<input type="text" id="shelf" name="shelf" value="${assetEntityInstance.shelf}" size=2 tabindex="63" /></td>
 								<td class="label">Validation</td>
-								<td><g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" name="validation" value="${assetEntityInstance.validation}"/>	
+								<td  colspan="2"><g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" name="validation" value="${assetEntityInstance.validation}"/>	
 								</td>
-								<td class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label>
-								<td><input type="text" id="virtualHost"
-									name="virtualHost" value="${assetEntityInstance.virtualHost}" size=10 tabindex="37"/></td>
-								<td>&nbsp</td>
-								<td class="label" nowrap="nowrap"><label for="custom8">${assetEntityInstance.project.custom8 ?: 'Custom8' }</label></td>
-								<td ><input type="text" id="custom8" name="custom8" value="${assetEntityInstance.custom8}" size=8 tabindex="57" /></td>
 							</tr>
-							<tr>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-								<td colspan="2"><g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${assetEntityInstance.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="38" noSelection="${['null':' Please Select']}"/></td>
-								<td class="label" nowrap="nowrap"><label for="truck">Truck</label></td>
-								<td ><input type="text" id="truck" name="truck" value="${assetEntityInstance.truck}" size=6 tabindex="61"/></td>
-							</tr>
-							<tr>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
-								<td colspan="2"><g:select id="planStatus" name ="planStatus" from="${planStatusOptions}" value= "${assetEntityInstance.planStatus}" noSelection="${['':' Please Select']}" tabindex="39"/></td>
-								<td class="label" nowrap="nowrap"><label for="cart">Cart / Shelf</label></td>
-								<td nowrap="nowrap"><input type="text" id="cart" name="cart" value="${assetEntityInstance.cart}" size=3 tabindex="62" />
-								<input type="text" id="shelf" name="shelf" value="${assetEntityInstance.shelf}" size=2 tabindex="63"/></td>
-							</tr>
+							<g:render template="customEdit" ></g:render>
 						</tbody>
 					</table>
 				</div></td>

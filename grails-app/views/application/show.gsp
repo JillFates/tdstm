@@ -149,83 +149,9 @@
 							<td>${applicationInstance.startupProc ? applicationInstance.startupProc : '?'}
 							</td>
 						</tr>
-						<tr>
-							<td class="label" nowrap="nowrap">
-								<g:if test="${(applicationInstance.custom1)?.length()>= 4 &&(applicationInstance.custom1)?.substring(0, 4)=='http'}">
-											<a href="javascript:window.open('${applicationInstance.custom1}','help');" style="color:#00E">${applicationInstance.project.custom1!=null ? applicationInstance.project.custom1 : 'Custom1'}</a>
-								</g:if>
-								<g:else>
-									 ${applicationInstance.project.custom1 ?: 'Custom1'}
-								</g:else>
-							</td>
-							<td>${applicationInstance.custom1}</td>
-							
-							<td class="label" nowrap="nowrap">
-								<g:if test="${(applicationInstance.custom2)?.length()>= 4 &&(applicationInstance.custom2)?.substring(0, 4)=='http'}">
-											<a href="javascript:window.open('${applicationInstance.custom2}','help');" style="color:#00E">${applicationInstance.project.custom2!=null ? applicationInstance.project.custom2 : 'Custom2'}</a>
-								</g:if>
-								<g:else>
-									 ${applicationInstance.project.custom2 ?: 'Custom2'}
-								</g:else>
-							</td>
-							<td>${applicationInstance.custom2}</td>
-							<td class="label" nowrap="nowrap">
-								<g:if test="${(applicationInstance.custom3)?.length()>= 4 &&(applicationInstance.custom3)?.substring(0, 4)=='http'}">
-											<a href="javascript:window.open('${applicationInstance.custom3}','help');" style="color:#00E">${applicationInstance.project.custom3!=null ? applicationInstance.project.custom3 : 'Custom3'}</a>
-								</g:if>
-								<g:else>
-									${applicationInstance.project.custom3 ?: 'Custom3'}
-								</g:else>
-							</td>
-							<td>${applicationInstance.custom3}</td>
-							<td class="label" nowrap="nowrap">
-								<g:if test="${(applicationInstance.custom4)?.length()>= 4 &&(applicationInstance.custom4)?.substring(0, 4)=='http'}">
-											<a href="javascript:window.open('${applicationInstance.custom4}','help');" style="color:#00E">${applicationInstance.project.custom4!=null ? applicationInstance.project.custom4 : 'Custom4'}</a>
-								</g:if>
-								<g:else>
-									 ${applicationInstance.project.custom4 ?: 'Custom4'}
-								</g:else>
-							</td>
-							<td>${applicationInstance.custom4}</td>
-						</tr>
-						<tr>
-						    <td class="label" nowrap="nowrap">
-								<g:if test="${(applicationInstance.custom5)?.length()>= 4 &&(applicationInstance.custom5)?.substring(0, 4)=='http'}">
-											<a href="javascript:window.open('${applicationInstance.custom5}','help');" style="color:#00E">${applicationInstance.project.custom5 !=null ? applicationInstance.project.custom5 : 'Custom5'}</a>
-								</g:if>
-								<g:else>
-									${applicationInstance.project.custom5 ?: 'Custom5'}
-								</g:else>
-							</td>
-							<td>${applicationInstance.custom5}</td>
-							<td class="label" nowrap="nowrap">
-								<g:if test="${(applicationInstance.custom6)?.length()>= 4 &&(applicationInstance.custom6)?.substring(0, 4)=='http'}">
-											<a href="javascript:window.open('${applicationInstance.custom6}','help');" style="color:#00E">${applicationInstance.project.custom6 !=null ? applicationInstance.project.custom6 : 'Custom6'}</a>
-								</g:if>
-								<g:else>
-									 ${applicationInstance.project.custom6 ?: 'Custom6'}
-								</g:else>
-							</td>
-							<td>${applicationInstance.custom6}</td>
-							<td class="label" nowrap="nowrap">
-								<g:if test="${(applicationInstance.custom7)?.length()>= 4 &&(applicationInstance.custom7)?.substring(0, 4)=='http'}">
-											<a href="javascript:window.open('${applicationInstance.custom7}','help');" style="color:#00E">${applicationInstance.project.custom7!=null ? applicationInstance.project.custom7 : 'Custom7'}</a>
-								</g:if>
-								<g:else>
-									 ${applicationInstance.project.custom7 ?: 'Custom7'}
-								</g:else>
-							</td>
-							<td>${applicationInstance.custom7}</td>
-							<td class="label" nowrap="nowrap">
-								<g:if test="${(applicationInstance.custom8)?.length()>= 4 &&(applicationInstance.custom8)?.substring(0, 4)=='http'}">
-											<a href="javascript:window.open('${applicationInstance.custom8}','help');" style="color:#00E">${applicationInstance.project.custom8!=null ? applicationInstance.project.custom8 : 'Custom8'}</a>
-								</g:if>
-								<g:else>
-									${applicationInstance.project.custom8 ?: 'Custom8'}
-								</g:else>
-							</td>
-							<td>${applicationInstance.custom8}</td>
-						</tr>
+						
+						<g:render template="../assetEntity/customShow" model="['assetEntity':applicationInstance]"></g:render>
+						
 						<tr>
 							<td class="label" nowrap="nowrap"><label for="license">URL</label></td>
 							<td colspan="7"><a href="${applicationInstance.url}" style="color:#00E">${applicationInstance.url}</a>

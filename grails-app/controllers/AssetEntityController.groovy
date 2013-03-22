@@ -2862,7 +2862,7 @@ class AssetEntityController {
 			
 			def paramsMap = [label:frontEndLabel, assetEntity:assetEntity, 
 				supportAssets:supportAssets, dependentAssets:dependentAssets, 
-				redirectTo:params.redirectTo,
+				redirectTo:params.redirectTo, project:project,
 				assetCommentList:assetCommentList,
 				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle]
 		

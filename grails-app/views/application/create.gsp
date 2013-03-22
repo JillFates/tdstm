@@ -163,34 +163,7 @@
 								</td>
 								
 							</tr>
-							<tr>
-								<td class="label" nowrap="nowrap"><label for="custom1">${project?.custom1 ?: 'Custom1'} </label></td>
-								<td ><input type="text" id="custom1"	name="custom1" value="${applicationInstance.custom1}" tabindex="17" />
-								</td>
-								<td class="label" nowrap="nowrap"><label for="custom1">${project?.custom2 ?: 'Custom2'}</label></td>
-								<td ><input type="text" id="custom2"	name="custom2" value="${applicationInstance.custom2}"  tabindex="28"/>
-								</td>
-								<td class="label" nowrap="nowrap"><label for="custom3">${project?.custom3 ?: 'Custom3'}</label></td>
-								<td ><input type="text" id="custom3"	name="custom3" value="${applicationInstance.custom3}"  tabindex="38"  />
-								</td>
-								<td class="label" nowrap="nowrap"><label for="custom4">${project?.custom4 ?: 'Custom4'}</label></td>
-								<td ><input type="text" id="custom4"	name="custom4" value="${applicationInstance.custom4}" tabindex="48" />
-								</td>
-							</tr>
-							<tr>
-								<td class="label" nowrap="nowrap"><label for="custom5">${project?.custom5 ?: 'Custom5'}</label></td>
-								<td ><input type="text" id="custom5"	name="custom5" value="${applicationInstance.custom5}" tabindex="18"/>
-								</td>
-								<td class="label" nowrap="nowrap"><label for="custom6">${project?.custom6 ?: 'Custom6'}</label></td>
-								<td ><input type="text" id="custom6"	name="custom6" value="${applicationInstance.custom6}"  tabindex="29"/>
-								</td>
-								<td class="label" nowrap="nowrap"><label for="custom7">${project?.custom7 ?: 'Custom7'}</label></td>
-								<td ><input type="text" id="custom7"	name="custom7" value="${applicationInstance.custom7}" tabindex="39" />
-								</td>
-								<td class="label" nowrap="nowrap"><label for="custom8">${project?.custom8 ?: 'Custom8'}</label></td>
-								<td ><input type="text" id="custom8"	name="custom8" value="${applicationInstance.custom8}" tabindex="49"  />
-								</td>
-							</tr>
+							<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="license">URL</label></td>
 								<td colspan="7"><input type="text" id="url" name="url" value="${applicationInstance.url}" size=50 tabindex="19" />

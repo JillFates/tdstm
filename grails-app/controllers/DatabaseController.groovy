@@ -142,6 +142,7 @@ class DatabaseController {
 	def show ={
 		def id = params.id
 		def databaseInstance = Database.get( id )
+		def project = securityService.getUserCurrentProject()
 		if(!databaseInstance) {
 			flash.message = "Application not found with id ${params.id}"
 			redirect(action:list)
@@ -161,7 +162,8 @@ class DatabaseController {
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 			
 			[ databaseInstance : databaseInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo, 
-			  assetComment:assetComment, assetCommentList:assetCommentList,dependencyBundleNumber:AssetDependencyBundle.findByAsset(databaseInstance)?.dependencyBundle]
+			  assetComment:assetComment, assetCommentList:assetCommentList,dependencyBundleNumber:AssetDependencyBundle.findByAsset(databaseInstance)?.dependencyBundle,
+			  project:project]
 		}
 	}
 	

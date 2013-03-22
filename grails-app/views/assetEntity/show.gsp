@@ -4,6 +4,24 @@ alert("${flash.message}")
 </script>
 <% flash.message = null %>
 </g:if>
+<script type="text/javascript">
+$(document).ready(function() { 
+	var assetType = "${assetEntity.assetType}"
+	if(assetType=='Blade'){
+		$(".bladeLabel").show()
+		$(".rackLabel").hide()
+		$(".vmLabel").hide()
+	} else if(assetType=='VM') {
+		$(".bladeLabel").hide()
+		$(".rackLabel").hide()
+		$(".vmLabel").show()
+	} else {
+		$(".bladeLabel").hide()
+		$(".rackLabel").show()
+		$(".vmLabel").hide()
+	}
+})
+</script>
  	<g:form method="post">
  	<table style="border:0;width:1000px;">
 		<tr>
@@ -22,15 +40,7 @@ alert("${flash.message}")
 								<td>&nbsp</td>
 								<td class="label_sm">Source</td>
 								<td class="label_sm">Target</td>
-								<td class="label" nowrap="nowrap">
-								   <g:if test="${(assetEntity.custom1)?.length()>= 4 && (assetEntity.custom1)?.substring(0, 4)=='http'}">
-										<a href="javascript:window.open('${assetEntity.custom1}','help');" style="color:#00E">${assetEntity.project.custom1!=null ? assetEntity.project.custom1 : 'Custom1'}</a>
-								    </g:if>
-								    <g:else>
-								         ${assetEntity.project.custom1 ?:'Custom1'}
-							        </g:else>
-							    </td>
-							    <td width="60">${assetEntity.custom1 }</td>
+								
 							    
 							</tr>
 							<tr class="prop">
@@ -41,15 +51,7 @@ alert("${flash.message}")
 								<td class="label" nowrap="nowrap"><label for="sourceLocation">Location</label></td>
 								<td>${assetEntity.sourceLocation}</td>
 								<td>${assetEntity.targetLocation}</td>
-								<td class="label" nowrap="nowrap">
-								<g:if test="${(assetEntity.custom2)?.length()>= 4 && (assetEntity.custom2)?.substring(0, 4)=='http'}">
-										<a href="javascript:window.open('${assetEntity.custom2}','help');" style="color:#00E">${assetEntity.project.custom2!=null ? assetEntity.project.custom2 : 'Custom2'}</a>
-							    </g:if>
-							    <g:else>
-								   ${assetEntity.project.custom2 ?:'Custom2'}
-							    </g:else>
-							    </td>
-							    <td>${assetEntity.custom2}</td>
+								
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="manufacturer">Manufacturer</label></td>
@@ -59,15 +61,7 @@ alert("${flash.message}")
 								<td class="label" nowrap="nowrap"><label for="sourceRoom">Room</label></td>
 								<td>${assetEntity.roomSource?.roomName}</td>
 								<td>${assetEntity.roomTarget?.roomName}</td>
-								<td class="label" nowrap="nowrap">
-								<g:if test="${(assetEntity.custom3)?.length()>= 4 && (assetEntity.custom3)?.substring(0, 4)=='http'}">
-										<a href="javascript:window.open('${assetEntity.custom3}','help');" style="color:#00E">${assetEntity.project.custom3!=null ? assetEntity.project.custom3 : 'Custom3'}</a>
-							    </g:if>
-							    <g:else>
-								   ${assetEntity.project.custom3 ?:'Custom3'}
-							    </g:else>
-							    </td>
-							    <td>${assetEntity.custom3}</td>
+								
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="model">Model</label></td>
@@ -76,18 +70,20 @@ alert("${flash.message}")
 								</td>
 								<td class="label" nowrap="nowrap"><label for="os">OS</label></td>
 								<td >${assetEntity.os}</td>
-								<td class="label" nowrap="nowrap"><label for="sourceRack">Rack/Cab</label></td>
-								<td>${assetEntity.rackSource?.tag}</td>
-								<td>${assetEntity.rackTarget?.tag}</td>
-								<td class="label" nowrap="nowrap">
-								<g:if test="${(assetEntity.custom4)?.length()>= 4 && (assetEntity.custom4)?.substring(0, 4)=='http'}">
-										<a href="javascript:window.open('${assetEntity.custom4}','help');" style="color:#00E">${assetEntity.project.custom4!=null ? assetEntity.project.custom4 : 'Custom4'}</a>
-							    </g:if>
-							    <g:else>
-								   ${assetEntity.project.custom4 ?:'Custom4'}
-							    </g:else>
-							    </td>
-							    <td>${assetEntity.custom4}</td>
+								
+								<td class="label rackLabel"  nowrap="nowrap" id="rackId"><label for="sourceRackId">Rack/Cab</label></td>
+								<td class="label bladeLabel" nowrap="nowrap" id="bladeId" style="display: none"><label for="sourceBladeChassisId">Blade</label></td>
+								<td class="label vmLabel" style="display: none" class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label>
+								
+								<td class=" rackLabel">${assetEntity.rackSource?.tag}</td>
+								<td class=" rackLabel">${assetEntity.rackTarget?.tag}</td>
+								
+								<td class=" bladeLabel" style="display: none">${assetEntity.sourceBladeChassis}</td>
+								<td class=" bladeLabel" style="display: none" >${assetEntity.targetBladeChassis}</td>
+								
+								<td class="vmLabel" style="display: none">${assetEntity.virtualHost}</td>
+								<td class="vmLabel" style="display: none"></td>
+								
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="shortName">Alt Name</label></td>
@@ -97,15 +93,7 @@ alert("${flash.message}")
 								<td class="label" nowrap="nowrap"><label for="sourceRack">Position</label></td>
 								<td>${assetEntity.sourceRackPosition}</td>
 								<td>${assetEntity.targetRackPosition}</td>
-								<td class="label" nowrap="nowrap">
-								<g:if test="${(assetEntity.custom5)?.length()>= 4 && (assetEntity.custom5)?.substring(0, 4)=='http'}">
-										<a href="javascript:window.open('${assetEntity.custom5}','help');" style="color:#00E">${assetEntity.project.custom5!=null ? assetEntity.project.custom5 : 'Custom5'}</a>
-							    </g:if>
-							    <g:else>
-								   ${assetEntity.project.custom5 ?:'Custom5'}
-							    </g:else>
-							    </td>
-							    <td>${assetEntity.custom5}</td>
+								
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="serialNumber">S/N</label></td>
@@ -114,18 +102,9 @@ alert("${flash.message}")
 								<td><tds:convertDate date="${assetEntity?.retireDate}"
 							  		timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="sourceBladeChassis">Blade</label></td>
-								<td>${assetEntity.sourceBladeChassis}</td>
-								<td>${assetEntity.targetBladeChassis}</td>
-								<td class="label" nowrap="nowrap">
-								<g:if test="${(assetEntity.custom6)?.length()>= 4 && (assetEntity.custom6)?.substring(0, 4)=='http'}">
-										<a href="javascript:window.open('${assetEntity.custom6}','help');" style="color:#00E">${assetEntity.project.custom6!=null ? assetEntity.project.custom6 : 'Custom6'}</a>
-							    </g:if>
-							    <g:else>
-								   ${assetEntity.project.custom6 ?:'Custom6'}
-							    </g:else>
-							    </td>
-							    <td>${assetEntity.custom6}</td>
+								<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
+								<td colspan="2">${assetEntity.moveBundle}${dependencyBundleNumber?' / ' : ''}${dependencyBundleNumber}</td>
+								
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="assetTag">Tag</label></td>
@@ -134,60 +113,21 @@ alert("${flash.message}")
 								<td><tds:convertDate date="${assetEntity?.maintExpDate}"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							        </td>
-								<td class="label" nowrap="nowrap"><label for="sourceBladePosition">Blade Position</label></td>
-								<td>${assetEntity.sourceBladePosition}</td>
-								<td>${assetEntity.targetBladePosition}</td>
-								<td class="label" nowrap="nowrap">
-									<g:if test="${(assetEntity.custom7)?.length()>= 4 && (assetEntity.custom7)?.substring(0, 4)=='http'}">
-										<a href="javascript:window.open('${assetEntity.custom7}','help');" style="color:#00E">${assetEntity.project.custom7!=null ? assetEntity.project.custom7 : 'Custom7'}</a>
-							    </g:if>
-							    <g:else>
-								   ${assetEntity.project.custom7 ?:'Custom7'}
-							    </g:else>
-								</td>
-								<td>${assetEntity.custom7}</td>
+								<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
+								<td colspan="2">${assetEntity.planStatus}</td>
+								
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="railType">Rail Type</label></td>
 								<td >${assetEntity.railType}</td>
+								<td class="label" nowrap="nowrap"><label for="truck">Truck/Cart/Shelf</label></td>
+								<td >${assetEntity.truck}/${assetEntity.cart}${assetEntity.shelf? ' / ' : ''}</td>
 								<td class="label">Validation</td>
 								<td>${assetEntity.validation}</td>
-								<td class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label></td>
-								<td>${assetEntity.virtualHost}</td>
-								<td>&nbsp</td>
-								<td class="label" nowrap="nowrap">
-									<g:if test="${(assetEntity.custom8)?.length()>= 4 && (assetEntity.custom8)?.substring(0, 4)=='http'}">
-										<a href="javascript:window.open('${assetEntity.custom8}','help');" style="color:#00E">${assetEntity.project.custom8!=null ? assetEntity.project.custom8 : 'Custom8'}</a>
-							    </g:if>
-							    <g:else>
-								   ${assetEntity.project.custom8 ?:'Custom8'}
-							    </g:else>
-								</td>
-								<td>${assetEntity.custom8}</td>
+								<td>&nbsp;</td>
+								
 							</tr>
-							<tr class="prop">
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-								<td >${assetEntity.moveBundle}${dependencyBundleNumber?' / ' : ''}${dependencyBundleNumber}</td>
-								<td>&nbsp</td>
-								<td class="label" nowrap="nowrap"><label for="truck">Truck</label></td>
-								<td >${assetEntity.truck}</td>
-							</tr>
-							<tr class="prop">
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
-								<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
-								<td >${assetEntity.planStatus}</td>
-								<td>&nbsp</td>
-								<td class="label" nowrap="nowrap"><label for="cart">Cart/Shelf</label></td>
-								<td >${assetEntity.cart}${assetEntity.shelf? ' / ' : ''}${assetEntity.shelf}</td>							
-							</tr>
-							
+							<g:render template="customShow" ></g:render>
 						</tbody>
 					</table>
 				</div></td>

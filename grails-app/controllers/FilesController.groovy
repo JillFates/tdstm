@@ -169,6 +169,7 @@ class FilesController {
 	 }
 	def show ={
 		def id = params.id
+		def project = securityService.getUserCurrentProject()
 		def filesInstance = Files.get( id )
 		if(!filesInstance) {
 			flash.message = "Storage not found with id ${params.id}"
@@ -189,7 +190,7 @@ class FilesController {
 			
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 			[ filesInstance : filesInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList,
-			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(filesInstance)?.dependencyBundle]
+			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(filesInstance)?.dependencyBundle, project:project]
 		}
 	}
 	def edit ={
