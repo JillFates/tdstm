@@ -13,6 +13,7 @@ class Project extends PartyGroup {
     String projectType = "Standard"
 	Integer lastAssetId
 	Integer runbookOn=0		// Flag that indicates that the project should use the runbook mode for various screens
+    Integer customFieldsShown = 8
     
 	// Custom field labels
     	String custom1
@@ -23,6 +24,22 @@ class Project extends PartyGroup {
     	String custom6
     	String custom7
     	String custom8
+    	String custom9
+		String custom10
+		String custom11
+		String custom12
+		String custom13
+		String custom14
+		String custom15
+		String custom16
+		String custom17
+		String custom18
+		String custom19
+		String custom20
+		String custom21
+		String custom22
+		String custom23
+		String custom24
 		
 	static hasMany = [ dataTransferBatch : DataTransferBatch ]
 	
@@ -47,6 +64,23 @@ class Project extends PartyGroup {
 		custom6( blank:true, nullable:true )
 		custom7( blank:true, nullable:true )
 		custom8( blank:true, nullable:true )
+		custom9( blank:true, nullable:true )
+		custom10( blank:true, nullable:true )
+		custom11( blank:true, nullable:true )
+		custom12( blank:true, nullable:true )
+		custom13( blank:true, nullable:true )
+		custom14( blank:true, nullable:true )
+		custom15( blank:true, nullable:true )
+		custom16( blank:true, nullable:true )
+		custom17( blank:true, nullable:true )
+		custom18( blank:true, nullable:true )
+		custom19( blank:true, nullable:true )
+		custom20( blank:true, nullable:true )
+		custom21( blank:true, nullable:true )
+		custom22( blank:true, nullable:true )
+		custom23( blank:true, nullable:true )
+		custom24( blank:true, nullable:true )
+		customFieldsShown( blank:false, nullable:false, inList:[0, 4 ,8, 12, 16 ,20, 24] )
 		lastAssetId( nullable:true )
 		runbookOn(nullable:true)
 	}

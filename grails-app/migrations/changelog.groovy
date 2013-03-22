@@ -15,5 +15,8 @@ databaseChangeLog = {
 	include file: '20130125-update-plantatus-validation.groovy'
 	include file: '20130213-add-model-usize.groovy'
 	include file: '20130315-change-userlogin-username-size.groovy'
+	include file: '20130321-add-custom-fields.groovy'
+	include file: '20130322-add-entity-customs.groovy'
+	include file: '20130322-update-custom-field-shown.groovy'
 	
 }

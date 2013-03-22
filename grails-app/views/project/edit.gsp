@@ -1,23 +1,24 @@
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="projectHeader" />
-        <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-        <title>Edit Project</title>
-         <% def currProj = session.getAttribute("CURR_PROJ");
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="layout" content="projectHeader" />
+<link type="text/css" rel="stylesheet"
+	href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+<title>Edit Project</title>
+<% def currProj = session.getAttribute("CURR_PROJ");
 		    def projectId = currProj.CURR_PROJ ;
 		    def currProjObj;
 		    if( projectId != null){
 		      currProjObj = Project.findById(projectId);
 		    }
     	%>
-    </head>
-    <body>
-        
-        <div class="body">
-            <h1>Edit Project</h1>
+</head>
+<body>
 
-	        <br/>
+	<div class="body">
+		<h1>Edit Project</h1>
+
+		 <br/>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
@@ -182,116 +183,288 @@
 			                  <input type="hidden" id="companyManagersId" value="${companyStaff.size()+clientStaff.size()+ 1}" />
 			                </td>
 			              </tr>
-			              <tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="custom1"><g:message code="project.custom1.label" default="Custom1 Label" />:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom1', 'errors')}">
-                                    <g:textField name="custom1" value="${projectInstance?.custom1}" />
-                                </td>
-                                <td valign="top" class="name">
-                                  <label for="custom2"><g:message code="project.custom2.label" default="Custom2 Label" />:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom2', 'errors')}">
-                                    <g:textField name="custom2" value="${projectInstance?.custom2}" />
-                                </td>
-                           </tr>
-                           <tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="custom3"><g:message code="project.custom3.label" default="Custom3 Label" />:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom3', 'errors')}">
-                                    <g:textField name="custom3" value="${projectInstance?.custom3}" />
-                                </td>
-                                <td valign="top" class="name">
-                                  <label for="custom4"><g:message code="project.custom4.label" default="Custom4 Label" />:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom4', 'errors')}">
-                                    <g:textField name="custom4" value="${projectInstance?.custom4}" />
-                                </td>
-                           </tr>
-                           <tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="custom5"><g:message code="project.custom5.label" default="Custom5 Label" />:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom5', 'errors')}">
-                                    <g:textField name="custom5" value="${projectInstance?.custom5}" />
-                                </td>
-                                <td valign="top" class="name">
-                                  <label for="custom6"><g:message code="project.custom6.label" default="Custom6 Label" />:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom6', 'errors')}">
-                                    <g:textField name="custom6" value="${projectInstance?.custom6}" />
-                                </td>
-                           </tr>
-                           <tr class="prop">
-                                <td valign="top" class="name">
-                                  <label for="custom7"><g:message code="project.custom7.label" default="Custom7 Label" />:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom7', 'errors')}">
-                                    <g:textField name="custom7" value="${projectInstance?.custom7}" />
-                                </td>
-                                <td valign="top" class="name">
-                                  <label for="custom8"><g:message code="project.custom8.label" default="Custom8 Label" />:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom8', 'errors')}">
-                                    <g:textField name="custom8" value="${projectInstance?.custom8}" />
-                                </td>
-                           </tr>
-						   <tr class="prop">
-			
-					            <td valign="top" class="name">Workflow Code:</td>
-					
-					          <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
-			              	    <g:select id="workflowCode" name="workflowCode"
-								      from="${workflowCodes}"
-								      value="${projectInstance?.workflowCode}" noSelection="['':'Please Select']" onChange="warnForWorkflow()"></g:select> &nbsp;&nbsp;
-							    <span class="name">
-                                <label for="runbookOn">Runbook Driven:</label>
-                                </span>&nbsp;
-                                <span class="value ${hasErrors(bean: projectInstance, field: 'runbookOn', 'errors')}">
-                                   <input type="checkbox" name="runbookOn" id="runbookOn" ${ (projectInstance.runbookOn == 1 ? 'checked="checked"':'') }  />
-                               	</span>
-								<g:hasErrors bean="${projectInstance}" field="workflowCode">
-				                    <div class="errors">
-				                      <g:renderErrors bean="${projectInstance}" as="list" field="workflowCode"/>
-				                    </div>
-				                  </g:hasErrors>
-								</td>
-								<td valign="top" class="name">
-				                  <label for="inProgress">Display Transitions in Status bar:</label>
-				                </td>
-				                <td valign="top">
-									<g:select id="trackChanges" name="trackChanges"	from="${projectInstance.constraints.trackChanges.inList}" 
-									value="${projectInstance.trackChanges}" valueMessagePrefix="project.trackChanges"></g:select>
-				                  <g:hasErrors bean="${projectInstance}" field="trackChanges">
-				                    <div class="errors">
-				                      <g:renderErrors bean="${projectInstance}" as="list" field="trackChanges"/>
-				                    </div>
-				                  </g:hasErrors>
-				                </td>
-			        	  </tr>
-			              <tr class="prop">
-			                <td valign="top" class="name">
-			                  <label for="dateCreated">Date Created:</label>
-			                </td>
-			                <td valign="top" class="value"><tds:convertDateTime date="${projectInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
-			                <td valign="top" class="name">
-			                  <label for="lastUpdated">Last Updated:</label>
-			                </td>
-			                <td valign="top" class="value"><tds:convertDateTime date="${projectInstance?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
-			              </tr>
-                        
-                        </tbody>
-                    </table>
-                </div>
-                <div class="buttons">
-                    <span class="button"><g:actionSubmit class="save" value="Update" onclick="return validateDates()"/></span>
-                    <span class="button"><g:actionSubmit class="delete" onclick="if(confirm('Warning: This will delete the ${projectInstance?.name} project and all of the assets, events, bundles, and any historic data?')){document.editProjectForm.action = 'delete'};" value="Delete" /></span>
-                </div>
-            </g:form>
-        </div>
-        <script type="text/javascript">
+						<tr>
+							<td valign="top" class="name"><label for="customFieldCount">
+									Custom Fields Shown: </label></td>
+							<td valign="top" class="value"><g:select id="customcount" name="customFieldsShown" from="${projectInstance.constraints.customFieldsShown.inList}"
+									 value="${projectInstance.customFieldsShown}" onchange="showCustomFields(this.value);" /></td>
+						</tr>
+						<tr class="prop custom_table" id="custom_count_1"
+							style="display: none;">
+							<td valign="top" class="name"><label for="custom1"><g:message
+										code="project.custom1.label" default="Custom1 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom1', 'errors')}">
+								<g:textField name="custom1" value="${projectInstance?.custom1}" />
+							</td>
+							<td valign="top" class="name"><label for="custom2"><g:message
+										code="project.custom2.label" default="Custom2 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom2', 'errors')}">
+								<g:textField name="custom2" value="${projectInstance?.custom2}" />
+							</td>
+						</tr>
+						<tr class="prop custom_table" id="custom_count_2"
+							style="display: none;">
+							<td valign="top" class="name"><label for="custom3"><g:message
+										code="project.custom3.label" default="Custom3 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom3', 'errors')}">
+								<g:textField name="custom3" value="${projectInstance?.custom3}" />
+							</td>
+							<td valign="top" class="name"><label for="custom4"><g:message
+										code="project.custom4.label" default="Custom4 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom4', 'errors')}">
+								<g:textField name="custom4" value="${projectInstance?.custom4}" />
+							</td>
+						</tr>
+						<tr class="prop custom_table" id="custom_count_3"
+							style="display: none;">
+							<td valign="top" class="name"><label for="custom5"><g:message
+										code="project.custom5.label" default="Custom5 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom5', 'errors')}">
+								<g:textField name="custom5" value="${projectInstance?.custom5}" />
+							</td>
+							<td valign="top" class="name"><label for="custom6"><g:message
+										code="project.custom6.label" default="Custom6 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom6', 'errors')}">
+								<g:textField name="custom6" value="${projectInstance?.custom6}" />
+							</td>
+						</tr>
+						<tr class="prop custom_table" id="custom_count_4"
+							style="display: none;">
+							<td valign="top" class="name"><label for="custom7"><g:message
+										code="project.custom7.label" default="Custom7 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom7', 'errors')}">
+								<g:textField name="custom7" value="${projectInstance?.custom7}" />
+							</td>
+							<td valign="top" class="name"><label for="custom8"><g:message
+										code="project.custom8.label" default="Custom8 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom8', 'errors')}">
+								<g:textField name="custom8" value="${projectInstance?.custom8}" />
+							</td>
+						</tr>
+						<tr class="prop custom_table" id="custom_count_5"
+							style="display: none;">
+							<td valign="top" class="name"><label for="custom9"><g:message
+										code="project.custom1.label" default="Custom9 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom9', 'errors')}">
+								<g:textField name="custom9" value="${projectInstance?.custom9}" />
+							</td>
+							<td valign="top" class="name"><label for="custom10"><g:message
+										code="project.custom2.label" default="Custom10 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom10', 'errors')}">
+								<g:textField name="custom10"
+									value="${projectInstance?.custom10}" />
+							</td>
+						</tr>
+						<tr class="prop custom_table" id="custom_count_6"
+							style="display: none;">
+							<td valign="top" class="name"><label for="custom11"><g:message
+										code="project.custom3.label" default="Custom11 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom11', 'errors')}">
+								<g:textField name="custom11"
+									value="${projectInstance?.custom11}" />
+							</td>
+							<td valign="top" class="name"><label for="custom12"><g:message
+										code="project.custom4.label" default="Custom12 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom12', 'errors')}">
+								<g:textField name="custom12"
+									value="${projectInstance?.custom12}" />
+							</td>
+						</tr>
+						<tr class="prop custom_table" id="custom_count_7"
+							style="display: none;">
+							<td valign="top" class="name"><label for="custom13"><g:message
+										code="project.custom1.label" default="Custom13 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom13', 'errors')}">
+								<g:textField name="custom13"
+									value="${projectInstance?.custom13}" />
+							</td>
+							<td valign="top" class="name"><label for="custom14"><g:message
+										code="project.custom2.label" default="Custom14 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom14', 'errors')}">
+								<g:textField name="custom14"
+									value="${projectInstance?.custom14}" />
+							</td>
+						</tr>
+						<tr class="prop custom_table" id="custom_count_8"
+							style="display: none;">
+							<td valign="top" class="name"><label for="custom15"><g:message
+										code="project.custom3.label" default="Custom15 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom15', 'errors')}">
+								<g:textField name="custom15"
+									value="${projectInstance?.custom15}" />
+							</td>
+							<td valign="top" class="name"><label for="custom16"><g:message
+										code="project.custom4.label" default="Custom16 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom16', 'errors')}">
+								<g:textField name="custom16"
+									value="${projectInstance?.custom16}" />
+							</td>
+						</tr>
+						<tr class="prop custom_table" id="custom_count_9"
+							style="display: none;">
+							<td valign="top" class="name"><label for="custom17"><g:message
+										code="project.custom1.label" default="Custom17 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom17', 'errors')}">
+								<g:textField name="custom17"
+									value="${projectInstance?.custom17}" />
+							</td>
+							<td valign="top" class="name"><label for="custom18"><g:message
+										code="project.custom2.label" default="Custom18 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom18', 'errors')}">
+								<g:textField name="custom18"
+									value="${projectInstance?.custom18}" />
+							</td>
+						</tr>
+						<tr class="prop custom_table" id="custom_count_10"
+							style="display: none;">
+							<td valign="top" class="name"><label for="custom19"><g:message
+										code="project.custom3.label" default="Custom19 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom19', 'errors')}">
+								<g:textField name="custom19"
+									value="${projectInstance?.custom19}" />
+							</td>
+							<td valign="top" class="name"><label for="custom20"><g:message
+										code="project.custom4.label" default="Custom20 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom20', 'errors')}">
+								<g:textField name="custom20"
+									value="${projectInstance?.custom20}" />
+							</td>
+						</tr>
+						<tr class="prop custom_table" id="custom_count_11"
+							style="display: none;">
+							<td valign="top" class="name"><label for="custom21"><g:message
+										code="project.custom1.label" default="Custom21 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom21', 'errors')}">
+								<g:textField name="custom21"
+									value="${projectInstance?.custom21}" />
+							</td>
+							<td valign="top" class="name"><label for="custom22"><g:message
+										code="project.custom2.label" default="Custom22 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom22', 'errors')}">
+								<g:textField name="custom22"
+									value="${projectInstance?.custom22}" />
+							</td>
+						</tr>
+						<tr class="prop custom_table" id="custom_count_12"
+							style="display: none;">
+							<td valign="top" class="name"><label for="custom23"><g:message
+										code="project.custom3.label" default="Custom23 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom23', 'errors')}">
+								<g:textField name="custom23"
+									value="${projectInstance?.custom23}" />
+							</td>
+							<td valign="top" class="name"><label for="custom24"><g:message
+										code="project.custom4.label" default="Custom24 Label" />:</label></td>
+							<td valign="top"
+								class="value ${hasErrors(bean: projectInstance, field: 'custom24', 'errors')}">
+								<g:textField name="custom24"
+									value="${projectInstance?.custom24}" />
+							</td>
+						</tr>
+						<tr class="prop">
+
+							<td valign="top" class="name">Workflow Code:</td>
+
+							<td valign="top"
+								class="value ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
+								<g:select id="workflowCode" name="workflowCode"
+									from="${workflowCodes}"
+									value="${projectInstance?.workflowCode}"
+									noSelection="['':'Please Select']" onChange="warnForWorkflow()"></g:select>
+								&nbsp;&nbsp; <span class="name"> <label for="runbookOn">Runbook
+										Driven:</label>
+							</span>&nbsp; <span
+								class="value ${hasErrors(bean: projectInstance, field: 'runbookOn', 'errors')}">
+									<input type="checkbox" name="runbookOn" id="runbookOn"
+									${ (projectInstance.runbookOn == 1 ? 'checked="checked"':'') } />
+							</span> <g:hasErrors bean="${projectInstance}" field="workflowCode">
+									<div class="errors">
+										<g:renderErrors bean="${projectInstance}" as="list"
+											field="workflowCode" />
+									</div>
+								</g:hasErrors>
+							</td>
+							<td valign="top" class="name"><label for="inProgress">Display
+									Transitions in Status bar:</label></td>
+							<td valign="top"><g:select id="trackChanges"
+									name="trackChanges"
+									from="${projectInstance.constraints.trackChanges.inList}"
+									value="${projectInstance.trackChanges}"
+									valueMessagePrefix="project.trackChanges"></g:select> <g:hasErrors
+									bean="${projectInstance}" field="trackChanges">
+									<div class="errors">
+										<g:renderErrors bean="${projectInstance}" as="list"
+											field="trackChanges" />
+									</div>
+								</g:hasErrors></td>
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name"><label for="dateCreated">Date
+									Created:</label></td>
+							<td valign="top" class="value"><tds:convertDateTime
+									date="${projectInstance?.dateCreated}"
+									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+							</td>
+							<td valign="top" class="name"><label for="lastUpdated">Last
+									Updated:</label></td>
+							<td valign="top" class="value"><tds:convertDateTime
+									date="${projectInstance?.lastUpdated}"
+									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+							</td>
+						</tr>
+
+					</tbody>
+				</table>
+			</div>
+			<div class="buttons">
+				<span class="button"><g:actionSubmit class="save"
+						value="Update" onclick="return validateDates()" /></span> <span
+					class="button"><g:actionSubmit class="delete"
+						onclick="if(confirm('Warning: This will delete the ${projectInstance?.name} project and all of the assets, events, bundles, and any historic data?')){document.editProjectForm.action = 'delete'};"
+						value="Delete" /></span>
+			</div>
+		</g:form>
+	</div>
+	<script type="text/javascript">
+	 $(document).ready(function() {
+		var customCol = ${projectInstance.customFieldsShown}
+		showCustomFields(customCol);
+	 });
+	  function showCustomFields(value) {
+		  var count=value/2;  
+      	  var i;
+      	  $(".custom_table").hide();
+		  if(value!='0'){
+			  for(i=1;i<=count;i++){
+	       			$("#custom_table").show();
+	                      $("#custom_count_"+i).show();
+	     		}
+		  }
+	  }
+        
         function appendPartnerStaff(e) {
   	      // The response comes back as a bunch-o-JSON
   	      //alert("make sure that the project isn't saved with a staff member from the previous partner");
