@@ -90,8 +90,9 @@
 	            datatype="'json'">
 	            <jqgrid:filterToolbar id="taskListId" searchOnEnter="false" />
 	            <jqgrid:navigation id="taskListId" add="false" edit="false" 
-	                  del="false" search="false" refresh="true" />
+	                  del="false" search="false" refresh="false" />
 	            <jqgrid:resize id="taskListId" resizeOffset="-2" />
+	            <jqgrid:refreshButton id="taskListId" />
 	     		</jqgrid:grid>
 	     		populateFilter();
         });
@@ -175,7 +176,7 @@
 					<span style="position:absolute; margin-left:430px;">
 					${HtmlUtil.actionButton('View Task Graph', 'ui-icon-zoomin', 'graph', '','../task/moveEventTaskGraph?moveEventId='+filterEvent+'&mode=s')}&nbsp;
 				
-					<input type="button" value="Refresh" onclick="submitForm()" style="cursor: pointer;">&nbsp;
+					<input type="button" value="Refresh" onclick="loadGrid()" style="cursor: pointer;">&nbsp;
 					<select id="selectTimedBarId"
 					    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', params:'\'timer=\'+ this.value +\'&prefFor=TASKMGR_REFRESH\' ', onComplete:'changeTimebarPref(e)') }">
 						<option value="0">Manual</option>
@@ -224,6 +225,17 @@ function toggleCheckbox(chkbox, field) {
  function submitForm(){
      $('#commentForm').submit()
  }
+ 
+ function loadGrid(){
+	 $(".ui-icon-refresh").click()
+	 var timePref = $("#selectTimedBarId").val()
+	 if(timePref != 0){
+		 B2.Start(timePref);
+	 } else{
+		 B2.Pause(0);
+	 }
+ }
+ 
  function pageRefresh(){
    window.location.reload()
  }
@@ -249,7 +261,7 @@ function toggleCheckbox(chkbox, field) {
 			if (sec>0){
 				this.to=setTimeout(function(){ oop.Time(); },1000);
 			}else{
-				submitForm();
+				loadGrid();
 			}
 		},
 		Pause:function(sec){
