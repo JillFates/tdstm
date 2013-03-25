@@ -27,26 +27,26 @@
 				<td class="heading" colspan="2"><a class="heading" href="#comments">Task details:</a></td>
 			</tr>
 			<tr>
-				<td colspan="3">
+				<td colspan="2">
 			</td>
 			</tr>		
 			<tr>
 				<td valign="top" class="name"><label for="comment">Task:</label></td>
-				<td colspan="3">
-					<input type="text" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" value="${assetComment.comment}" style="width: 500px"/>
+				<td>
+					<input type="text" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" value="${assetComment.comment}" style="width: 100%" />
 				</td>
 			</tr>	
 			<tr>
 				<td valign="middle" class="name"><label>Dependencies:</label></td>
-				<td valign="top" class="name" colspan="3">
+				<td valign="top" class="name">
 				<div style="width:400px; float:left">
 					<fieldset>
 					<legend>Predecessors</legend>
 					<g:each in="${assetComment.taskDependencies}" var="task">
-					<span class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}" onclick="showAssetComment(${task.predecessor.id})">
+						<span class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}" onclick="showAssetComment(${task.predecessor.id})">
 						${task.assetComment.taskNumber}:${task.assetComment.comment} (${task.assetComment.category})
-					</span>
-					<br/>
+						</span>
+						<br/>
 					</g:each>
 					</fieldset>
 				</div>
@@ -54,10 +54,10 @@
 					<fieldset>
 					<legend>Successors</legend>
 					<g:each in="${successor}" var="task">
-					<span class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}" onclick="showAssetComment(${task.assetComment.id})">
+						<span class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}" onclick="showAssetComment(${task.assetComment.id})">
 						${task.assetComment.taskNumber}:${task.assetComment.comment} (${task.assetComment.category})
-					</span>
-					<br/>
+						</span>
+						<br/>
 					</g:each>
 					</fieldset>
 				</div>
@@ -65,55 +65,57 @@
 			</tr>
 			<tr class="prop" id="teamId"  >
 				<td valign="top" class="name"><label for="team">Team:</label></td>
-				<td valign="top" class="value" id="team_${assetComment.id}" colspan="3" nowrap="nowrap">${assetComment.role}</td>
+				<td valign="top" class="value" id="team_${assetComment.id}" nowrap="nowrap">${assetComment.role}</td>
 			</tr>
 			<tr class="prop issue" id="assignedToTrEditId" >
 				<td valign="top" class="name"><label for="assignedTo">Assigned:</label></td>
-				<td valign="top" id="assignedToEditTdId" style="width: 20%;" colspan="3" >
+				<td valign="top" id="assignedToEditTdId" >
 					${assignToSelect}
 				</td>
 			</tr> 
 			<tr class="prop issue" id="estFinishShowId"  >
 				<td valign="top" class="name"><label for="estFinish">Est. Finish:</label></td>
-				<td valign="top" class="value" id="estFinishShowId_${assetComment.id}" colspan="3" nowrap="nowrap">${etFinish}</td>
+				<td valign="top" class="value" id="estFinishShowId_${assetComment.id}" nowrap="nowrap">${etFinish}</td>
 			</tr>
 			<tr class="prop issue" id="dueDateShowId"  >
 				<td valign="top" class="name"><label for="dueDateCreateId">Due Date:</label></td>
-	          <td> <script type="text/javascript" charset="utf-8">
-		 		 	 jQuery(function($){$('.dateEditRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+				<td>
+					<script type="text/javascript" charset="utf-8">
+					jQuery(function($){$('.dateEditRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
             		</script>
 	          		<input type="text" class="dateEditRange" size="15" style="" name="dueDateCreateId" id="dueDateCreateId"
-							value="${dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
+							value="${dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+				</td>
             </tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="category">Category:</label></td>
-				<td valign="top" class="value" colspan="3"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="${assetComment.category}"></g:select></td>
+				<td valign="top" class="value"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="${assetComment.category}"></g:select></td>
 			</tr>
 			<tr>
 				<g:if test="${assetComment.assetEntity}">
-		   			<td>Asset:</td><td style="width: 1%">&nbsp;${assetComment?.assetEntity.assetName}</td>
+		   			<td>Asset:</td><td>&nbsp;${assetComment?.assetEntity.assetName}</td>
 		   		</g:if>
 		   		<g:if test="${assetComment.moveEvent}">
-		   		  <td style="width: 6%">Move Event:</td><td>${assetComment?.moveEvent.name}</td>
+					<td>Move Event:</td><td>${assetComment?.moveEvent.name}</td>
 		   		</g:if>
 		   	</tr>
 		   	<tr class="prop">
 				<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
-				<td valign="top" class="value" colspan="3"><span id="categoryEditId">${assetComment?.createdBy} on <tds:convertDate date="${assetComment?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span></td>
+				<td valign="top" class="value"><span id="categoryEditId">${assetComment?.createdBy} on <tds:convertDate date="${assetComment?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span></td>
 			</tr>
 			<tr class="prop" >
 				<td valign="top" class="name">
 					<label for="status">Status:</label>
 					<input id="currentStatus_${assetComment.id}" name="currentStatus" type="hidden" value="${assetComment.status}" />
 				</td>
-				<td style="width: 20%;" id="statusEditTrId_${assetComment.id}" colspan="3">
+				<td id="statusEditTrId_${assetComment.id}">
 					<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
 					noSelection="['':'please select']" onChange="showResolve()" ${statusWarn==1 ? 'disabled="true"' : ''}></g:select>
 				</td>
 			</tr>				
 			 <tr class="prop">
 				<td valign="top" class="name"><label for="notes">Previous Notes:</label></td>
-				<td valign="top" class="value" colspan="3"><div id="previousNote" style="width: 380px;">
+				<td valign="top" class="value"><div id="previousNote" style="width: 380px;">
 				<table style="table-layout: fixed; width: 100%;border: 1px solid green;" >
                    <g:each in="${notes}" var="note" status="i" >
                     <tr>
@@ -127,20 +129,20 @@
 			</tr>
 		    <tr class="prop" id="noteId_${assetComment.id}">
 				<td valign="top" class="name"><label for="notes">Note:</label></td>
-				<td valign="top" class="value" colspan="3">
+				<td valign="top" class="value">
 				   <textarea cols="80" rows="4" id="noteEditId_${assetComment.id}" name="note" style="width:100%;padding:0px;"></textarea>
 				</td>
 			</tr>
 			<tr class="prop" id="resolutionId_${assetComment.id}" style="display: none;">
 				<td valign="top" class="name"><label for="resolution">Resolution:</label></td>
-				<td valign="top" class="value" colspan="3">
+				<td valign="top" class="value">
 					<textarea cols="100" rows="4" style="width:100%;padding:0px;" id="resolutionEditId_${assetComment.id}" name="resolution" >${assetComment.resolution}</textarea>
 				</td>
 			</tr> 
 			<g:if test="${assetComment.dateResolved}">
 				<tr class="prop">
 					<td valign="top" class="name"><label for="resolution">Resolved At:</label></td>
-					<td valign="top" class="value" colspan="3">
+					<td valign="top" class="value">
 						<span id="dateResolvedTd" ><tds:convertDate date="${assetComment?.dateResolved}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span>
 					</td>
 				</tr> 
@@ -148,7 +150,7 @@
 			<g:if test="${assetComment.resolvedBy}">
 				<tr class="prop">
 					<td valign="top" class="name"><label for="resolution">Resolved By:</label></td>
-					<td valign="top" class="value" colspan="3">
+					<td valign="top" class="value">
 						<span id="resolvedByTd" >${assetComment.resolvedBy}</span>
 					</td>
 				</tr> 
@@ -158,7 +160,7 @@
 			    <td class="buttonR" >
 					<input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" />
 				</td>
-				<td class="buttonR" colspan="3" style="text-align:right;padding: 5px 3px;">
+				<td class="buttonR" style="text-align:right;padding: 5px 3px;">
 					<input type="button" value="Update Task" onclick="validateComment(${assetComment.id})" />
 				</td>
 			</tr>	
