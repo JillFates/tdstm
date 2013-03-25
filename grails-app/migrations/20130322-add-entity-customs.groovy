@@ -63,4 +63,11 @@ databaseChangeLog = {
 			}
 		}
 	}
+    /*
+     *While inserting custom (9..24) sheet_name updated as 'Application' instead of 'Applications'
+     */
+    changeSet(author: "lokanada", id: "20130325 TM-1263-6") {
+        comment("Set the sheet_name='Applications'  where it is 'Application'")
+        sql("UPDATE data_transfer_attribute_map SET sheet_name='Applications' WHERE sheet_name = 'Application'")
+    }
 }

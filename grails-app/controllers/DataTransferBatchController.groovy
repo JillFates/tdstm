@@ -623,6 +623,7 @@ class DataTransferBatchController {
 					
 						if( files && flag == 0 ) {
 							files.project = project
+							files.sizeUnit = "GB"
 							dtvList.each {
 								def attribName = it.eavAttribute.attributeCode
 									switch(attribName){
