@@ -3835,14 +3835,16 @@ class AssetEntityController {
 	 * @return render HTML
 	 */
 	def updateStatusSelect = {
-		
-		def mapKey = securityService.hasRole( ['ADMIN','SUPERVISOR','CLIENT_ADMIN','CLIENT_MGR'] ) ? 'ALL' : 'LIMITED'
+	
+		//Changing code to populate all select options without checking security roles.
+		def mapKey = 'ALL'//securityService.hasRole( ['ADMIN','SUPERVISOR','CLIENT_ADMIN','CLIENT_MGR'] ) ? 'ALL' : 'LIMITED'
 		def optionForRole = statusOptionForRole.get(mapKey)
-		def status = AssetComment.read(params.id)?.status ?: '*EMPTY*'
+		def taskId = params.id
+		def status = taskId ? (AssetComment.read(taskId)?.status?: '*EMPTY*') : AssetCommentStatus.READY
 		def optionList = optionForRole.get(status)
 		def firstOption = [value:'', display:'Please Select']
-		def selectId = params.id ? "statusEditId" : "statusCreateId"
-		def optionSelected = params.id ? (status != '*EMPTY*' ? status : 'na' ): AssetCommentStatus.READY
+		def selectId = taskId ? "statusEditId" : "statusCreateId"
+		def optionSelected = taskId ? (status != '*EMPTY*' ? status : 'na' ): AssetCommentStatus.READY
 		def paramsMap = [selectId:selectId, selectName:'statusEditId', selectClass:"task_${optionSelected.toLowerCase()}",
 			javascript:"onChange='this.className=this.options[this.selectedIndex].className'", 
 			options:optionList, optionSelected:optionSelected, firstOption:firstOption,
