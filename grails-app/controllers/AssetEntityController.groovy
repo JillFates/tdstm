@@ -1482,9 +1482,9 @@ class AssetEntityController {
 		def modelName = params.models
 		def manufacturerName = params.manufacturers
 		def assetType = params.assetType ?: 'Server'
-		if (params.manufacturer?.id )
+		if (params.("manufacturer.id") && params.("manufacturer.id").isNumber()){
 		   userPreferenceService.setPreference("lastManufacturer", Manufacturer.read(params.manufacturer.id)?.name)
-		  
+		} 
 		userPreferenceService.setPreference("lastType", assetType)
 		if(maintExpDate){
 			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
@@ -2943,7 +2943,8 @@ class AssetEntityController {
 		def modelName = params.models
 		def manufacturerName = params.manufacturers
 		def assetType = params.assetType ?: 'Server'
-		if(params.manufacturer.id && params.manufacturer.id.isNumber())
+		
+		if(params.("manufacturer.id") && params.("manufacturer.id").isNumber())
 			userPreferenceService.setPreference("lastManufacturer", Manufacturer.read(params.manufacturer.id)?.name)
 			
 		userPreferenceService.setPreference("lastType", assetType)
