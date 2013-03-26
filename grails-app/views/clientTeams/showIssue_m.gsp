@@ -71,7 +71,7 @@
 			</tr>
 			<tr class="prop issue" id="assignedToTrEditId" >
 				<td valign="top" class="name"><label for="assignedTo">Assigned:</label></td>
-				<td valign="top" id="assignedToEditTdId" style="" >
+				<td valign="top" id="assignedToEditTdId" >
 					${assignToSelect}
 				</td>
 			</tr> 
@@ -99,7 +99,7 @@
 					<label for="status">Status:</label>
 					<input id="currentStatus_${assetComment.id}" name="currentStatus" type="hidden" value="${assetComment.status}" />
 				</td>
-				<td style="width: 20%;" id="statusEditTrId_${assetComment.id}" >
+				<td id="statusEditTrId_${assetComment.id}" >
 					<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
 					noSelection="['':'please select']" onChange="showResolve()" ${statusWarn==1 ? 'disabled="true"' : ''}></g:select>
 				</td>	
@@ -138,7 +138,7 @@
 			<g:if test="${assetComment.resolvedBy}">
 				<tr class="prop">
 					<td valign="top" class="name"><label for="resolution">Resolved By:</label></td>
-					<td valign="top" class="value" colspan="1">
+					<td valign="top" class="value">
 						<span id="resolvedByTd" >${assetComment.resolvedBy} on <tds:convertDate date="${assetComment?.dateResolved}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span>
 					</td>
 				</tr> 
