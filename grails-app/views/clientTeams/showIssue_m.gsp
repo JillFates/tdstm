@@ -39,7 +39,7 @@
 			</tr>		
 			<tr>
 				<td colspan="2">
-					<input type="text" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" value="${assetComment.comment}"/>
+					<input type="text" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" value="${assetComment.comment}" style="width:95%" />
 				</td>
 			</tr>	
 			<tr>
