@@ -1555,6 +1555,8 @@ class AssetEntityController {
 				redirect( controller:'room',action:list )
 			} else if(params.redirectTo == "rack"){
 				redirect( controller:'rackLayouts',action:'create' )
+			} else if(redirectTo == "assetAudit"){
+				render(template:'createAuditDetails', model:[assetEntity:assetEntityInstance, source:params.source, assetType:params.assetType])
 			} else {
 				redirect( action:list, params:[projectId: projectId] )
 			}

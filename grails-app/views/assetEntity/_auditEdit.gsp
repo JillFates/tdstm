@@ -1,3 +1,17 @@
+<script type="text/javascript">
+$(document).ready(function() { 
+	var assetType = $("#assetTypeId").val()
+	if(assetType =='Blade'){
+		$(".bladeLabel").show()
+		$(".rackLabel").hide()
+		$(".vmLabel").hide()
+	 } else {
+		$(".bladeLabel").hide()
+		$(".rackLabel").show()
+		$(".vmLabel").hide()
+	}
+})
+</script>
 <g:form method="post"  name="editAssetsAuditFormId" controller="assetEntity" action="update">
 <div>
 <input type="hidden" name="redirectTo" value="${redirectTo}"/>
@@ -7,29 +21,32 @@
 <input  name="source"  id="sourceId" type="hidden" value="${source ?: 1}"/>
 <table>
 	<tr><td colspan="2"><b>Asset Audit Edit</b></td></tr>
-	<g:if test="${assetType != 'Blade'}" >
-	<tr class="prop" >
-		<td class="label">Location</td>
+	<tr class="prop rackLabel" >
+		<td class="label ">Location</td>
 		<td class="label" nowrap="nowrap">
 			<input type="text" ${source=='1' ? 'name="sourceLocation" value="'+assetEntityInstance.sourceLocation+'"' : 'name="targetLocation" value="'+assetEntityInstance.targetLocation+'"'} size="6" /> / 
 			<input type="text" ${source=='1' ? 'name="sourceRoom" value="'+assetEntityInstance.sourceRoom+'"' : 'name="targetRoom" value="'+assetEntityInstance.targetRoom+'"'} size="6" />
 		</td>
 	</tr>
-	</g:if>
-	<g:if test="${assetType=='Blade'}">
-	<tr class="prop">
+	<tr class="prop bladeLabel">
 		<td class="label">Blade</td>
 		<td class="label">
-			<input type="text" ${source=='1' ? 'name="sourceBladeChassis" value="'+assetEntityInstance.sourceBladeChassis+'"' : 'name="targetBladeChassis" value="'+assetEntityInstance.targetBladeChassis+'"'} />
+		<g:if test="${source=='1'}">
+		<g:select id='sourceBladeChassis' from='${sourceChassisSelect}' optionKey='${-2}' optionValue='${1}'
+			  name="sourceBladeChassis" value="${assetEntityInstance.sourceBladeChassis }" noSelection="${['':' Please Select']}"/>
+		</g:if>
+		<g:else>
+		<g:select id='targetBladeChassis' from='${targetChassisSelect}' optionKey='${-2}' optionValue='${1}'
+				name="targetBladeChassis"  value="${assetEntityInstance.targetBladeChassis}" noSelection="${['':' Please Select']}"/>
+		</g:else>
 		</td>
 	</tr>
-	<tr class="prop">
+	<tr class="prop bladeLabel">
 		<td class="label">Blade Position</td>
 		<td class="label">
-			<input type="text" ${source=='1' ? 'name="sourceBladePosition" value="'+assetEntityInstance.sourceBladePosition+'"' : 'name="targetBladePosition" value="'+assetEntityInstance.targetBladePosition+'"'} />
+			<input type="text" ${source=='1' ? 'name="sourceBladePosition" value="'+assetEntityInstance.sourceBladePosition +'"' : 'name="targetBladePosition" value="'+assetEntityInstance.targetBladePosition+'"'} />
 		</td>
 	</tr>
-	</g:if>
 	<tr class="prop">
 		<td class="label">Name</td>
 		<td class="label">
@@ -39,25 +56,28 @@
 	<tr class="prop">
 		<td class="label">Manufacturer</td>
 		<td class="label">
-		 <div id="manufacturerId">
-		   <input type="text" id="manufacturersAuditId" name="manufacturers" value="${assetEntityInstance.manufacturer?.name}" onkeyup="getAlikeManu(this.value)"/>
+		 <div id="manufacturerEditId">
+		   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${assetEntityInstance.manufacturer?.id}" 
+		   	onChange="selectModel(this.value)" 
+		   optionKey="id" optionValue="name" noSelection="${[null:'Unassigned']}" tabindex="13"/>
 		 </div>
-		 <div id="autofillId" class="autoFillDiv" style="display: none;" ></div>
 		</td>
 	</tr>
 	<tr class="prop trAnchor" >
 		<td class="label"><b>Model</b></td>
 		<td class="label">
 		<div id="modelId">
-		<input type="text" id="modelsAuditId" name="models" value="${assetEntityInstance.model?.modelName}" onkeyup="getAlikeModel(this.value)" />
+	    <g:select id="model" name ="model.id" from="${models}" value= "${assetEntityInstance.model?.id}" optionKey="id" optionValue="modelName"  
+	    	noSelection="${[null:' Unassigned']}" tabindex="14"
+		  	 optionValue="${{it.modelName+' '+(it.modelStatus =='new' ? '?' :'')}}" onChange="setType(this.value)"/>
 		</div>
-		 <div id="autofillIdModel" class="autoFillDiv" style="display: none;"></div>
 		</td>
 	</tr>
 	<tr class="prop">
 		<td class="label">Type</td>
 		<td class="label">
-			<input type="text" id="assetTypeId" name="assetType" value="${assetEntityInstance.assetType}">
+			<g:select from="${assetTypeOptions}" id="assetTypeId" name="assetType" value="${assetEntityInstance.assetType}" 
+			onChange="selectManufacturer(this.value, 'edit')" tabindex="12" />
 		</td>
 	</tr>
 	<tr class="prop">
@@ -66,15 +86,13 @@
 			<input type="text" id="serialNumber" name="serialNumber" value="${assetEntityInstance.serialNumber}">
 		</td>
 	</tr>
-	<g:if test="${assetType != 'Blade'}" >
-	<tr class="prop">
+	<tr class="prop rackLabel">
 		<td class="label">Rack</td>
 		<td class="label" nowrap="nowrap">
 			<input type="text" ${source=='1' ? 'name="sourceRack" value="'+assetEntityInstance.sourceRack+'"' : 'name="targetRack" value="'+assetEntityInstance.targetRack+'"'} size="6" > 
 			Pos :<input type="text" ${source=='1' ? 'name="sourceRackPosition" value="'+assetEntityInstance.sourceRackPosition+'"' : 'name="targetRackPosition" value="'+assetEntityInstance.targetRackPosition+'"'} size="6">
 		</td>
 	</tr>
-	</g:if>
 	<tr class="prop">
 		<td class="label">Tag</td>
 		<td class="label">
@@ -88,15 +106,15 @@
 		</td>
 	</tr>
 	<tr class="prop">
-		<td class="label">Validation</td>
-		<td><g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" name="validation" noSelection="${['':' Please Select']}" 
-					 value="${assetEntityInstance.validation}"/>	
-		</td>
-	</tr>
-	<tr class="prop">
 		<td class="label">PlanStatus</td>
 		<td class="label">
 			<g:select id="planStatus" name ="planStatus" from="${planStatusOptions}" value= "${assetEntityInstance.planStatus}" noSelection="${['':' Please Select']}"/>
+		</td>
+	</tr>
+	<tr class="prop">
+		<td class="label">Validation</td>
+		<td><g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" name="validation" noSelection="${['':' Please Select']}" 
+					 value="${assetEntityInstance.validation}"/>	
 		</td>
 	</tr>
 </table>

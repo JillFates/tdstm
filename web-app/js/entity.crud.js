@@ -455,7 +455,7 @@ function updateModelAudit(){
 }
 
 function createAuditPage(type,source,rack,roomName,location,position){
-	new Ajax.Request('../assetEntity/create?redirectTo=assetAudit'+'&assetType='+type,{asynchronous:true,evalScripts:true,
+	new Ajax.Request('../assetEntity/create?redirectTo=assetAudit'+'&assetType='+type+'&source='+source,{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
 				$("#auditDetailViewId").html(data.responseText)
 				$("#auditLocationId").val(location)

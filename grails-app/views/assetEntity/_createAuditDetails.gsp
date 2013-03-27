@@ -1,3 +1,17 @@
+<script type="text/javascript">
+$(document).ready(function() { 
+	var assetType = $("#assetTypeId").val()
+	if(assetType =='Blade'){
+		$(".bladeLabel").show()
+		$(".rackLabel").hide()
+		$(".vmLabel").hide()
+	 } else {
+		$(".bladeLabel").hide()
+		$(".rackLabel").show()
+		$(".vmLabel").hide()
+	}
+})
+</script>
 <g:form method="post"  name="editAssetsAuditFormId" controller="assetEntity" action="save">
 <div>
 <input type="hidden" name="redirectTo" value="${redirectTo}"/>
@@ -8,7 +22,6 @@
 <input  name="source"  id="sourceId" type="hidden" value="1"/>
 <table>
 	<tr><td colspan="2"><b>Asset Audit Create</b></td></tr>
-	<g:if test="${assetType != 'Blade'}" >
 	<tr class="prop" >
 		<td class="label">Location</td>
 		<td class="label" nowrap="nowrap">
@@ -16,21 +29,18 @@
 			<input type="text" id="auditRoomId" name="sourceRoom"  size="6" />
 		</td>
 	</tr>
-	</g:if>
-	<g:if test="${assetType == 'Blade'}">
-	<tr class="prop">
+	<tr class="prop bladeLabel">
 		<td class="label">Blade</td>
 		<td class="label">
 			<input type="text" id="BladeChassisId" ${source=='1' ? 'name="sourceBladeChassis"' : 'name="targetBladeChassis"'} />
 		</td>
 	</tr>
-	<tr class="prop">
+	<tr class="prop bladeLabel">
 		<td class="label">Blade Position</td>
 		<td class="label">
 			<input type="text" id="bladePositionId" ${source=='1' ? 'name="sourceBladePosition" ' : 'name="targetBladePosition"'} />
 		</td>
 	</tr>
-	</g:if>
 	<tr class="prop">
 		<td class="label">Name</td>
 		<td class="label">
@@ -40,25 +50,25 @@
 	<tr class="prop">
 		<td class="label">Manufacturer</td>
 		<td class="label">
-		 <div id="manufacturerId">
-		   <input type="text" id="manufacturersAuditId" name="manufacturers" value="" onkeyup="getAlikeManu(this.value)" />
+		  <div id="manufacturerId">
+		   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${manufacuterer?.id}" 
+		   		onChange="selectModel(this.value)" optionKey="id" optionValue="name" noSelection="${[null:' Unassigned']}" tabindex="13" />
 		 </div>
-		 <div id="autofillId" class="autoFillDiv" style="display: none " ></div>
 		</td>
 	</tr>
 	<tr class="prop trAnchor" >
 		<td class="label"><b>Model</b></td>
 		<td class="label">
 		<div id="modelId">
-		<input type="text" id="modelsAuditId" name="models" value="" onkeyup="getAlikeModel(this.value)" />
-		</div>
-		 <div id="autofillIdModel" class="autoFillDiv"  style="display: none"></div>
-		</td>
+	    <g:select id="model" name ="model.id" from="${models}" value= "${assetEntityInstance.model}" noSelection="${[null:' Unassigned']}" tabindex="14" 
+	  		optionKey="id" optionValue="${{it.modelName+' '+(it.modelStatus =='new' ? '?' :'')}}" onChange="setType(this.value)"/>
+	 	</div>
 	</tr>
 	<tr class="prop">
 		<td class="label">Type</td>
 		<td class="label">
-			<input type="text" id="assetTypeId" name="assetType" readonly="readonly">
+			<g:select from="${assetTypeOptions}" id="assetTypeId" name="assetType" value="${assetEntityInstance.assetType}" 
+			onChange="selectManufacturer(this.value, 'edit')" tabindex="12" />
 		</td>
 	</tr>
 	<tr class="prop">
@@ -67,15 +77,13 @@
 			<input type="text" id="serialNumber" name="serialNumber" />
 		</td>
 	</tr>
-	<g:if test="${assetType != 'Blade'}" >
-	<tr class="prop">
+	<tr class="prop rackLabel">
 		<td class="label">Rack</td>
 		<td class="label" nowrap="nowrap">
-			<input type="text" name="sourceRack"  id="auditRackId" size="6" > 
-			Pos :<input type="text" id="auditPosId" name="sourceRackPosition" size="6" >
+			<input type="text" ${source=='1' ? 'name="sourceRack" ' : 'name="targetRack" '} size="6" > 
+			Pos :<input type="text" ${source=='1' ? 'name="sourceRackPosition" ' : 'name="targetRackPosition" '} size="6">
 		</td>
 	</tr>
-	</g:if>
 	<tr class="prop">
 		<td class="label">Tag</td>
 		<td class="label">
@@ -89,16 +97,16 @@
 		</td>
 	</tr>
 	<tr class="prop">
+		<td class="label">PlanStatus</td>
+		<td class="label">
+			<g:select id="planStatus" name ="planStatus" from="${planStatusOptions}"  noSelection="${['':' Please Select']}"/>
+		</td>
+	</tr>
+	<tr class="prop">
 		<td class="label">Validation</td>
 		<td class="label">
 			<g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" name="validation" value="Discovery"
 			noSelection="${['':' Please Select']}" />
-		</td>
-	</tr>
-	<tr class="prop">
-		<td class="label">PlanStatus</td>
-		<td class="label">
-			<g:select id="planStatus" name ="planStatus" from="${planStatusOptions}"  noSelection="${['':' Please Select']}"/>
 		</td>
 	</tr>
 </table>
