@@ -163,7 +163,7 @@ class DataTransferBatchController {
 	    								}
 										break;
 									case "assetType":
-										if(assetEntity.model){
+										if(assetEntity.model){ //if model already exist considering model's asset type and ignoring imported asset type.
 											assetEntity."$attribName" = assetEntity.model.assetType
 										} else {
 	    									assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue

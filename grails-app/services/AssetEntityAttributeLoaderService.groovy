@@ -484,7 +484,7 @@ class AssetEntityAttributeLoaderService {
 				model = Model.findByModelNameAndManufacturer( modelName, manufacturer )
 				if( !model ){
 					// if imported value is not in model table then search in model alias table .
-					model = ModelAlias.findByNameAndManufacturer(modelName,manufacturer)?.model
+					model = ModelAlias.findByNameAndManufacturer(modelName,manufacturer)
 					if(!model && doCreate){
 						def assetType
 						if(type){
