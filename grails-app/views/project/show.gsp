@@ -104,7 +104,7 @@
 
             </td>
 
-            <td valign="top" class="name">Move Manager:</td>
+            <td valign="top" class="name">Event Manager:</td>
             <td valign="top" class="value">
 
 	            <g:if test="${moveManager?.partyIdTo?.lastName}">${moveManager?.partyIdTo?.lastName},</g:if>

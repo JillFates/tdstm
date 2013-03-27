@@ -3,12 +3,12 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
 <meta name="layout" content="projectHeader" />
-<title>WEB Move Results</title>
+<title>WEB Event Results</title>
 </head>
 <body>
   <div class="body">
   <g:if test="${summary}">
-    <h1> SUMMARY Move Results</h1>
+    <h1> SUMMARY Event Results</h1>
 	  <table>
 	       <thead>
 	         <tr>
@@ -38,7 +38,7 @@
 	  </table>
   </g:if>
   <g:else>
-  <h1>DETAILED Move Results</h1>
+  <h1>DETAILED Event Results</h1>
 	  <table>
 	       <thead>
 	         <tr>

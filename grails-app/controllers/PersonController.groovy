@@ -602,7 +602,7 @@ class PersonController {
 			}
 		}
 
-		// Find all Move Events for one or more Projects and the Staffing for the projects
+		// Find all Events for one or more Projects and the Staffing for the projects
 		if (projectList.size() > 0) {
 			moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",[project:projectList])
 			
@@ -958,7 +958,7 @@ class PersonController {
 		prefs.each { pref->
 			switch( pref.preferenceCode ) {
 				case "MOVE_EVENT" :
-					prefMap.put((pref.preferenceCode), "Move Event / "+MoveEvent.get(pref.value).name)
+					prefMap.put((pref.preferenceCode), "Event / "+MoveEvent.get(pref.value).name)
 					break;
 				
 				case "CURR_PROJ" :
@@ -966,7 +966,7 @@ class PersonController {
 					break;
 				
 				case "CURR_BUNDLE" :
-					prefMap.put((pref.preferenceCode), "Move Bundle / "+MoveBundle.get(pref.value).name)
+					prefMap.put((pref.preferenceCode), "Bundle / "+MoveBundle.get(pref.value).name)
 					break;
 				
 				case "PARTYGROUP" :

@@ -96,7 +96,7 @@
 		   			<td>Asset:</td><td>&nbsp;${assetComment?.assetEntity.assetName}</td>
 		   		</g:if>
 		   		<g:if test="${assetComment.moveEvent}">
-					<td>Move Event:</td><td>${assetComment?.moveEvent.name}</td>
+					<td>Event:</td><td>${assetComment?.moveEvent.name}</td>
 		   		</g:if>
 		   	</tr>
 		   	<tr class="prop">
@@ -189,7 +189,7 @@
 		   		  <dt>Asset Entity:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
 		   		</g:if>
 		   		<g:if test="${assetComment.moveEvent}">
-		   		  <dt>Move Event:</dt><dd>&nbsp;${assetComment?.moveEvent.name}</dd>
+		   		  <dt>Event:</dt><dd>&nbsp;${assetComment?.moveEvent.name}</dd>
 		   		</g:if>
 		   		<dt>Status:</dt><dd>&nbsp;${assetComment?.status}</dd>
 		   		<dt>Resolution:</dt><dd>&nbsp;${assetComment?.resolution}</dd>

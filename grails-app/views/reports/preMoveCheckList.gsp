@@ -3,12 +3,12 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
-<title>Pre-Move Checklist</title>
+<title>Pre-Event Checklist</title>
 </head>
 <body>
 
 	<div class="body">
-		<h1>Pre-Move Checklist</h1>
+		<h1>Pre-Event Checklist</h1>
 		<div class="message" id="preMoveErrorId" style="display: none">Please select the event to start the report.</div>
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>

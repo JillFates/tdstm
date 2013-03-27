@@ -2,7 +2,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="projectHeader" />
-    <title>Show Move Bundle</title>
+    <title>Show Bundle</title>
     <script type="text/javascript">
     	
    /*
@@ -67,7 +67,7 @@
 	function createTask(id){
 		$("#messageDiv").hide();
         $("#messageDiv").html('');
-       	var confirmStatus = confirm('Are you sure you want to create all tasks for this move event?')
+       	var confirmStatus = confirm('Are you sure you want to create all tasks for this event?')
        	if(confirmStatus){
 		   $("#createTasksInput").attr("disabled",true);		   
 		   $("#deleteTasksInput").attr("disabled",true);		   
@@ -113,7 +113,7 @@
 		</div>
     <div class="body" style="width: 330px;">
     	<div class="steps_table" style="float: none;">
-      	<span class="span"><b> Show Move Bundle </b></span>
+      	<span class="span"><b> Show Bundle </b></span>
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
@@ -174,7 +174,7 @@
             </tr>
 
             <tr class="prop">
-              <td valign="top" class="name">Move Manager:</td>
+              <td valign="top" class="name">Event Manager:</td>
 
               <td valign="top" class="value">
                 <g:if test="${moveManager}">
@@ -184,7 +184,7 @@
 
             </tr>
             <tr class="prop">
-              <td valign="top" class="name">Move Event:</td>
+              <td valign="top" class="name">Event:</td>
 
               <td valign="top" class="value">
               	<g:each var="e" in="${moveBundleInstance.moveEvent}">
@@ -232,8 +232,8 @@
           <input type="hidden" name="projectId" value="${projectId}" />
           <tds:hasPermission permission='MoveBundleEditView '>
 	          <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
-	          <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this bundle will remove any move teams and any related step data?');" value="Delete" /></span>
-	          <span class="button"><g:actionSubmit class="delete" action="deleteBundleAndAssets" onclick="return confirm('WARNING: Deleting this bundle will remove any move teams, any related step data, AND ASSIGNED ASSETS? (NO UNDO)?');" value="Delete bundle and assets" /></span>
+	          <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this bundle will remove any teams and any related step data?');" value="Delete" /></span>
+	          <span class="button"><g:actionSubmit class="delete" action="deleteBundleAndAssets" onclick="return confirm('WARNING: Deleting this bundle will remove any teams, any related step data, AND ASSIGNED ASSETS? (NO UNDO)?');" value="Delete bundle and assets" /></span>
           <g:if test="${showHistoryButton}">
           		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Are you sure you want to permanently clear transitions for assets in this bundle?');" value="Clear Asset History" action="clearBundleAssetHistory"/></span>
           </g:if>

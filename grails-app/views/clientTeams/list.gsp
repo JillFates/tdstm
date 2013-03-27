@@ -33,7 +33,7 @@
 			<th>Team Name (loc)</th>
 			<th>Role</th>
 			<th>Team Members</th>
-			<th>Move Bundle</th>
+			<th>Bundle</th>
 		</tr></thead>
 		<tbody>
             	<g:each in="${sourceTeams}" status="i" var="projectTeamInstance">

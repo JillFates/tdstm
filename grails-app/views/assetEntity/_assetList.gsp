@@ -41,7 +41,7 @@
 						<th>Asset Type</th>
 						<th>Asset Tag</th>
 						<th>Serial #</th>
-						<th>Move Bundle</th>
+						<th>Bundle</th>
 						<th>Dep Up</th>
 						<th>Dep Down</th>
 					</tr>

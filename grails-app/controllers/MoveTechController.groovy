@@ -173,11 +173,11 @@ class MoveTechController {
 	                    		if ( projectTeamInstance ){
 	                                //Validating is Logindate between startdate and completedate
 									if ( nowDate < moveBundleInstance.startTime || nowDate > moveBundleInstance.completionTime ) {
-	                                    flash.message = message( code :"Move bundle presently inactive" )
+	                                    flash.message = message( code :"Bundle presently inactive" )
 	                                    redirect( action: 'login' )
 	                                    return;
 	                                } else if ( nowDate < projectInstance.startDate || nowDate > projectInstance.completionDate ) {
-	                                    flash.message = message( code :"Move bundle Project presently inactive" )
+	                                    flash.message = message( code :"Bundle Project presently inactive" )
 	                                    redirect( action: 'login' )
 	                                    return;
 	                                } else {
@@ -199,13 +199,13 @@ class MoveTechController {
 	                                        moveTech['project'] = projectInstance.name
 	                                        checkAuth( barcodeText.get(0), moveTech )
 	                                    } else {
-	                                        flash.message = message ( code : "No assets assigned to team for move bundle" )
+	                                        flash.message = message ( code : "No assets assigned to team for bundle" )
 	                                        redirect( action: 'login' )
 	                                        return;
 	                                    }
 	                                }
 	                            } else {
-	                            	flash.message = message ( code : "Unknown move bundle team" )
+	                            	flash.message = message ( code : "Unknown bundle team" )
 	                                redirect( action: 'login' )
 	                                return;
 	                            }
@@ -215,7 +215,7 @@ class MoveTechController {
 	                            return;
 	                    	}
 	                    } else {
-	                    	flash.message = message ( code : "Unknown move bundle" )
+	                    	flash.message = message ( code : "Unknown bundle" )
 	                        redirect ( action: 'login' )
 	                        return;
 	                    }
@@ -228,11 +228,11 @@ class MoveTechController {
 	                    		if ( projectTeamInstance != null && projectTeamInstance.teamCode == "Logistics" ) {
 	                                //Validating is Logindate between startdate and completedate
 	                                if ( nowDate < moveBundleInstance.startTime || nowDate > moveBundleInstance.completionTime ) {
-	                                    flash.message = message( code :"Move bundle presently inactive" )
+	                                    flash.message = message( code :"bundle presently inactive" )
 	                                    redirect( action: 'login' )
 	                                    return;
 	                                } else if ( nowDate < projectInstance.startDate || nowDate > projectInstance.completionDate ) {
-	                                    flash.message = message ( code : "Move bundle Project presently inactive" )
+	                                    flash.message = message ( code : "bundle Project presently inactive" )
 	                                    redirect ( action: 'login' )
 	                                    return;
 	                                } else {
@@ -251,7 +251,7 @@ class MoveTechController {
 	                                        moveTech[ 'project' ] = projectInstance.name
 	                                        checkAuth( barcodeText.get(0), moveTech )
 	                                    } else {
-	                                        flash.message = message ( code : "No assets assigned to team for move bundle" )
+	                                        flash.message = message ( code : "No assets assigned to team for bundle" )
 	                                        redirect ( action: 'login' )
 	                                        return;
 	                                    }
@@ -267,7 +267,7 @@ class MoveTechController {
 	                            return;
 	                    	}
 	                    } else {
-	                    	flash.message = message ( code : "Unknown move bundle" )
+	                    	flash.message = message ( code : "Unknown bundle" )
 	                        redirect ( action: 'login' )
 	                        return;
 	                    }
@@ -563,7 +563,7 @@ class MoveTechController {
                     def teamId
                     /*def bundleName = assetItem.moveBundle?.id        
                     if ( bundleName != Integer.parseInt ( params.bundle ) ) {
-                        flash.message = message( code : "The asset [${assetItem.assetName}] is not part of move bundle [${params.bundle}] " )
+                        flash.message = message( code : "The asset [${assetItem.assetName}] is not part of bundle [${params.bundle}] " )
                         if ( checkHome ) {
                             redirect ( action: 'index',
                                 params:["bundle":params.bundle, "team":params.team, "project":params.project,
@@ -1098,7 +1098,7 @@ class MoveTechController {
                         }
                     }*/
                     /*if ( bundleId != Integer.parseInt ( moveBundleId ) ) {
-                        flash.message = message ( code : "The asset [${assetItem.assetName}] is not part of move bundle [${moveBundleId}]" )
+                        flash.message = message ( code : "The asset [${assetItem.assetName}] is not part of bundle [${moveBundleId}]" )
                         if ( textSearch ) {
                             render ( view:'logisticsAssetSearch',
                                 model:[ teamMembers:teamMembers, projMap:projMap, assetComment:assetComment, stateVal:stateVal,

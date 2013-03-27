@@ -67,7 +67,7 @@
 			</td>
 		</tr>
 		<tr id="moveShowId" class="prop" style="display: none;">
-			<td valign="top" class="name" id="eventTdId"><label for="moveEvent">Move Event:</label></td>
+			<td valign="top" class="name" id="eventTdId"><label for="moveEvent">Event:</label></td>
 			<td valign="top" class="value" id="eventShowValueId" colspan="3"></td>
 		</tr>
 		<tr class="issue" id="categoryTrId">
@@ -212,7 +212,7 @@
 			</td>
 		</tr>
 		<tr class="prop" id="moveEventTrId" style="display: none">
-			<td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
+			<td valign="top" class="name"><label for="moveEvent">Event:</label></td>
 			<td valign="top" class="value" colspan="3">
 				<g:select id="moveEvent" name="moveEvent" from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}"
 				 optionKey='id' optionValue="name" noSelection="['':'please select']" value="${moveEvent?.id}"></g:select>
@@ -382,7 +382,7 @@
 			</td>
 		</tr>
 		<tr class="prop" id="moveEventEditTrId" style="display: none">
-			<td valign="top" class="name"><label for="moveEvent">Move Event:</label></td>
+			<td valign="top" class="name"><label for="moveEvent">Event:</label></td>
 			<td valign="top" colspan="3">
             <g:select id="moveEventEditId" name="moveEvent" from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}"
              optionKey='id' optionValue="name" noSelection="['':'please select']"></g:select>

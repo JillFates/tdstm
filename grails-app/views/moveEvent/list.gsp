@@ -2,7 +2,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="projectHeader" />
-        <title>Move Event List</title>
+        <title>Event List</title>
         <link rel="stylesheet" type="text/css" href="${resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
 		<script language="javascript" src="${resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
 		<script type="text/javascript">
@@ -14,7 +14,7 @@
     </head>
     <body>
         <div class="body">
-            <h1>Move Event List</h1>
+            <h1>Event List</h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
@@ -35,7 +35,7 @@
 								 <jmesa:htmlColumn property="calcMethod" title="Calculated Type" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 									<g:message code="step.calcMethod.${moveEventInstance.calcMethod}" />
 								 </jmesa:htmlColumn>
-								 <jmesa:htmlColumn property="moveBundlesString" title="Move Bundles" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+								 <jmesa:htmlColumn property="moveBundlesString" title="Bundles" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 									${moveEventInstance.moveBundlesString}
 								 </jmesa:htmlColumn>
 			                 </jmesa:htmlRow>

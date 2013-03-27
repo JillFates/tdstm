@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="projectHeader" />
-    <title>Create MoveBundle</title>
+    <title>Create Bundle</title>
 
     <script type="text/javascript">
       function initialize(){
@@ -37,7 +37,7 @@
   <body>
    
     <div class="body">
-      <h1>Create MoveBundle</h1>
+      <h1>Create Bundle</h1>
       <div class="nav" style="border: 1px solid #CCCCCC; height: 11px;">
 			<span class="menuButton"><g:link class="list" action="list">Bundle List</g:link></span>
 		</div>
@@ -162,10 +162,8 @@
               </tr>
 
               <tr class="prop">
-                <td valign="top" class="name"><label for="moveManager">Move
-                Manager:</label></td>
-                <td valign="top" class="value"><select id="moveManagerId"
-                                                         name="moveManager">
+                <td valign="top" class="name"><label for="moveManager">Event Manager:</label></td>
+                <td valign="top" class="value"><select id="moveManagerId" name="moveManager">
                     <option value="" selected="selected">Please Select</option>
 
                     <g:each status="i" in="${managers}" var="managers">

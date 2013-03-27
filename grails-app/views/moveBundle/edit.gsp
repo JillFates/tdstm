@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="projectHeader" />
-    <title>Edit MoveBundle</title>
+    <title>Edit Bundle</title>
 
 	<link rel="stylesheet" href="${resource(dir:'css',file:'jquery-ui.css')}" type="text/css"/>
 	<g:javascript src="jquery/jquery.ui.widget.js"/>
@@ -53,7 +53,7 @@
       
         <input type="hidden" name="id" value="${moveBundleInstance?.id}" />
         <div class="steps_table">
-        <span class="span"><b> Edit Move Bundle </b></span>
+        <span class="span"><b> Edit Bundle </b></span>
           <table>
             <tbody>
 			<tr>
@@ -174,10 +174,8 @@
               </tr>
 
               <tr class="prop">
-                <td valign="top" class="name"><label for="moveManager">Move
-                Manager:</label></td>
-                <td valign="top" class="value"><select id="moveManagerId"
-                                    name="moveManager">
+                <td valign="top" class="name"><label for="moveManager">Event Manager:</label></td>
+                <td valign="top" class="value"><select id="moveManagerId" name="moveManager">
 
                     <option value="" selected="selected">Please Select</option>
 
@@ -190,7 +188,7 @@
 
               <tr class="prop">
                 <td valign="top" class="name">
-                  <label for="operationalOrder">Move Event:</label>
+                  <label for="operationalOrder">Event:</label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'moveEvent','errors')}">
                   <g:select from="${MoveEvent.findAllByProject(Project.get(projectId))}" id="moveEvent" name="moveEvent.id" 

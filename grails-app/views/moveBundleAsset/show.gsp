@@ -30,7 +30,7 @@
             </tr>
 
             <tr class="prop">
-              <td valign="top" class="name">Move Bundle:</td>
+              <td valign="top" class="name">Bundle:</td>
 
               <td valign="top" class="value"><g:link controller="moveBundle" action="show" id="${moveBundleAssetInstance?.moveBundle?.id}">${moveBundleAssetInstance?.moveBundle?.encodeAsHTML()}</g:link></td>
 

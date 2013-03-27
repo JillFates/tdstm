@@ -1,5 +1,3 @@
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -23,7 +21,7 @@
 
                    	        <g:sortableColumn property="id" title="Id" />
 
-                   	        <th>Move Bundle</th>
+                   	        <th>Bundle</th>
 
                    	        <th>Asset</th>
 

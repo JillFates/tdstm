@@ -157,7 +157,7 @@ class TaskController {
 	}
 	
 	/**
-	 * Generates a graph of the Move Event Tasks
+	 * Generates a graph of the Event Tasks
 	 * @param moveEventId
 	 * @param mode - flag as to what mode to display the graph as (s=status, ?=default)
 	 * @return redirect to URI of image or HTML showing the error
@@ -197,7 +197,7 @@ class TaskController {
 		// log.info "tmpDir=$tmpDir, targetDir=$targetDir, targetURI=$targetURI, dotExec=$dotExec, graphType=$graphType"
 		
 		if (! moveEvent) {
-			render "Viewing a graph requires that you select a specific move event first."
+			render "Viewing a graph requires that you select a specific event first."
 			return
 		} 
 		def project = moveEvent.project
@@ -234,7 +234,7 @@ class TaskController {
 		def tasks = jdbcTemplate.queryForList(query)
 		
 		dotFile << """#
-# TDS Runbook for Project ${project}, Move Event ${moveEvent.name}
+# TDS Runbook for Project ${project}, Event ${moveEvent.name}
 # Exported on ${now}
 # This is  .DOT file format of the project tasks
 #

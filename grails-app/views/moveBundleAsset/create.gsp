@@ -1,5 +1,3 @@
-
-
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -28,7 +26,7 @@
 
               <tr class="prop">
                 <td valign="top" class="name">
-                  <label for="moveBundle">Move Bundle:</label>
+                  <label for="moveBundle">Bundle:</label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleAssetInstance,field:'moveBundle','errors')}">
                   <g:select optionKey="id" from="${MoveBundle.list()}" name="moveBundle.id" value="${moveBundleAssetInstance?.moveBundle?.id}" ></g:select>

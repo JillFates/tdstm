@@ -34,7 +34,7 @@
 	    	$("#viewtaskgraph_button_graph").click(function(event){
 				 var moveEvent = $("#moveEventId").val()
 				 if(moveEvent == '0'){
-				 	alert("Please select a move event first.")
+				 	alert("Please select an event first.")
 				 	event.preventDefault()
 				 }
 			});
@@ -162,7 +162,7 @@
 			<input type="hidden" name="justMyTasks"   id="justMyTasks"   value="${justMyTasks}"/>
 			<input type="hidden" id="myPage" value="taskManager" />
 			<span  style="white-space: nowrap;">
-				<b>Move Event </b>
+				<b>Event </b>
 			 	<g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
 				&nbsp;&nbsp;
 				<input type="checkbox" id="justRemainingCB" ${ (justRemaining == '1' ? 'checked="checked"': '') } onclick="toggleCheckbox(this, 'justRemaining');"  />

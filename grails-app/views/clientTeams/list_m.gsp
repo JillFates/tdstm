@@ -46,7 +46,7 @@
 			<th class="sort_column">Team (loc)</th>
 			<th class="sort_column">Role</th>
 			<th class="sort_column">Members</th>
-			<th class="sort_column">Move Bundle</th>
+			<th class="sort_column">Bundle</th>
 		</tr></thead>
 		<tbody>
             	<g:each in="${sourceTeams}" status="i" var="projectTeamInstance">

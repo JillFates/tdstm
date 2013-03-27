@@ -77,17 +77,17 @@
 						<div id="summary_gauge_div" align="center">
 							<g:if test="${manualOverrideViewPermission}">
 								<a href="#manualSummary" onclick="javascript:$('#manualSumStatusSpan').show();"> 
-									<img id="summary_gauge" alt="Move Event Summary"
+									<img id="summary_gauge" alt="Event Summary"
 									src="${resource(dir:'i/dials',file:'dial-50.png')}"	style="border: 0px;"> 
 								</a>
 							</g:if>
 							<g:else>
-								<img id="summary_gauge" alt="Move Event Summary"
+								<img id="summary_gauge" alt="Event Summary"
 									src="${resource(dir:'i/dials',file:'dial-50.png')}"
 									style="border: 0px;">
 							</g:else>
 						</div>
-						Move Status vs. Plan <br /> 
+						Event Status vs. Plan <br /> 
 						<span id="manualSumStatusSpan" style="display: none; width: 10px;"> 
 						<span style="font-weight: normal; font-size: 12px;">Manual :</span> 
 						<input type="checkbox" name="manual" value="" id="checkBoxId" /> 
@@ -104,7 +104,7 @@
 				<div id="revised_summary">
 					<div id="topindright" style="display: none;">
 						<div id="revised_gauge_div" align="center">
-							<img id="revised_gauge" alt="Move Event Revised Summary"
+							<img id="revised_gauge" alt="Event Revised Summary"
 								src="${resource(dir:'i/dials',file:'dial-50.png')}">
 						</div>
 						Status vs. Revised Plan
@@ -121,7 +121,7 @@
 			<!-- News section starts here-->
 			<div id="newssection">
 				<div id="newstop">
-					<div id="newsheading">Move News</div>
+					<div id="newsheading">Event News</div>
 					<div id="newsmenu">
 						<ul id="newstabs" class="shadetabs">
 							<li><a href="#" rel="news_live_div" class="selected">Live</a>
@@ -547,7 +547,7 @@
 		YAHOO.util.Event.onAvailable('doc',YAHOO.example.init, YAHOO.example, true);
 	}
 	moveDataSteps()
-	/* set time to load the move news and move bundle data*/
+	/* set time to load the news and bundle data*/
 	var handler = 0
 	function timedUpdate( updateTime ) {
 		if(updateTime != 'never'){
@@ -557,7 +557,7 @@
 			clearInterval(handler)
 		}
 	}
-	/* script to assign the move evnt value*/
+	/* script to assign the event value*/
 	var moveEvent = "${moveEvent?.id}"
 	if(moveEvent){
 		$("#moveEvent").val(moveEvent)
@@ -598,7 +598,7 @@
 			});
 		}
 	}
-	/* Update the Move news once ajax call success*/
+	/* Update the news once ajax call success*/
 	function updateMoveEventNews( news ){
 		
 		var offset = $("#timezone").val()
@@ -795,7 +795,7 @@
 		 }
 	 }
 
-	 /* update move bundal data once ajax call success */
+	 /* update bundle data once ajax call success */
 	
 	function updateMoveBundleSteps( dataPointStep ) {
 		try{
@@ -1026,7 +1026,7 @@
 				validate = true;
 			}
 		} else{
-			alert("Please Assign MoveEvent to Current Bundle")
+			alert("Please Assign Event to Current Bundle")
 		}
 		if(validate){
 			timedUpdate( $("#updateTimeId").val() );

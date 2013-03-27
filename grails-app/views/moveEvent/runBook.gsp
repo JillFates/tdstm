@@ -4,7 +4,7 @@
 <body>
  <div class="body">
  <table style="width: 400px">
- <th colspan="2"> SUMMARY for Move-Event : ${moveEventInstance.name}</th>
+ <th colspan="2"> SUMMARY for Event : ${moveEventInstance.name}</th>
  <tr>
 	 <td> Bundles :</td>
 	 <td>${bundles?.size() }</td>
@@ -30,7 +30,7 @@
 	 <td>${otherAssetCount}</td>
  </tr>
   <tr>
-	 <td> Pre-move tasks :</td>
+	 <td> Pre-event tasks :</td>
 	 <td>${preMoveSize}</td>
  </tr>
  <tr>
@@ -38,7 +38,7 @@
 	 <td>${sheduleSize}</td>
  </tr>
  <tr>
-	 <td>Post-move tasks:</td>
+	 <td>Post-event tasks:</td>
 	 <td>${postMoveSize}</td>
  </tr>
  <tr><td>

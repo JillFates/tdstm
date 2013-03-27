@@ -75,7 +75,7 @@ a:hover {
 			</div>
 			<br/>
 			<div>
-				<h1 style="margin-right: 0px;"><b>Upcoming Move Bundles</b></h1>
+				<h1 style="margin-right: 0px;"><b>Upcoming Events</b></h1>
 				<table>
 					<thead>
 						<tr>

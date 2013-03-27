@@ -26,7 +26,7 @@
 						<th nowrap="nowrap"><input id="selectId" type="checkbox"   onclick="selectAll()" title="Select All" />&nbsp;Actions</th>
 						<th>Name</th>
 						<th>DB Format</th>
-						<th>Move Bundle</th>
+						<th>Bundle</th>
 						<th>Plan Status</th>
 						<th>Dep Up</th>
 						<th>Dep Down</th>

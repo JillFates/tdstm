@@ -2,11 +2,11 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="projectHeader" />
-        <title>Edit Move Event</title>
+        <title>Edit Event</title>
     </head>
     <body>
         <div class="body">
-            <h1>Edit Move Event</h1>
+            <h1>Edit Event</h1>
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 		      <span class="menuButton"><g:link class="list" action="list">Events List</g:link></span>
 		     <tds:hasPermission permission='MoveEventEditView '>
@@ -61,7 +61,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="moveBundles">Move Bundles:</label>
+                                    <label for="moveBundles">Bundles:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'moveBundles','errors')}">
 									<ul>

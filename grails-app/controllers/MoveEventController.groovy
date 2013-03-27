@@ -351,7 +351,7 @@ class MoveEventController {
 			}
         }
     /*------------------------------------------------------
-     * Clear out any snapshot data records and reset any summary steps for given move event.
+     * Clear out any snapshot data records and reset any summary steps for given event.
      * @author : Lokanada Reddy
      * @param  : moveEventId
      *----------------------------------------------------*/
@@ -372,7 +372,7 @@ class MoveEventController {
     }
 	
 	/**
-	 * Used to clear or reset any Task data for selected move event.
+	 * Used to clear or reset any Task data for selected event.
      * @param moveEventId
      * @param type (delete/clear)
 	 * @return text
@@ -390,10 +390,10 @@ class MoveEventController {
 			if (params.moveEventId.isNumber()) {
 				moveEvent = MoveEvent.findByIdAndProject( params.moveEventId, project)
 				if (! moveEvent) {
-					msg = "You present do not have access to the move event"
+					msg = "You present do not have access to the event"
 				}
 			} else {
-				msg = "Invalid Move Event specified"
+				msg = "Invalid Event specified"
 			}
 		}
 		if (! msg) {
@@ -780,7 +780,7 @@ class MoveEventController {
 	 }
 	
 	/**
-	 * Used to set asset's plan-status to 'Moved' for the specified move event
+	 * Used to set asset's plan-status to 'Moved' for the specified event
 	 * @usage Ajax
 	 * @param moveEventId
 	 * @return  Count of record affected with this update or Error Message if any
@@ -796,7 +796,7 @@ class MoveEventController {
 				if(moveEvent){
 					if (moveEvent.project.id != project.id) {
 						log.error "markEventAssetAsMoved: moveEvent.project (${moveEvent.id}) does not match user's current project (${project.id})"
-						errorMsg = "An unexpected condition with the move event occurred that is preventing an update"
+						errorMsg = "An unexpected condition with the event occurred that is preventing an update"
 					}else{
 						def bundleForEvent = moveEvent.moveBundles
 						assetAffected = bundleForEvent ? jdbcTemplate.update("update asset_entity  \
@@ -810,7 +810,7 @@ class MoveEventController {
 					}
 				} else {
 					log.error "markEventAssetAsMoved: Specified moveEvent (${params.moveEventId}) was not found})"
-					errorMsg = "An unexpected condition with the move event occurred that is preventing an update."
+					errorMsg = "An unexpected condition with the event occurred that is preventing an update."
 			    }
 			}
 		}
@@ -818,7 +818,7 @@ class MoveEventController {
 	}
 	
 	/** 
-	 * Generates a runbook for a specified move event using a recipe 
+	 * Generates a runbook for a specified event using a recipe 
 	 * @usage Ajax
 	 * @param moveEventId
 	 * @return Results or error message appropriately
@@ -838,7 +838,7 @@ class MoveEventController {
 			}
 		
 			if (! moveEvent) {
-				message = "Invalid event id or you don't have access to this project/move event"
+				message = "Invalid event id or you don't have access to this project/event"
 			} else {
 				message = taskService.generateRunbook( securityService.getUserLoginPerson() , moveEvent ) 
 			}

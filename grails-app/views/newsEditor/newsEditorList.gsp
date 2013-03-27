@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Move Event News</title>
+<title>Event News</title>
 
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
@@ -193,7 +193,7 @@ function validateCreateNewsForm(){
 </div>
 <div style="width: 100%; height: auto; border: 1px solid #5F9FCF; margin-top: 10px; padding: 10px 5px 10px 5px;">
 <span style="position: absolute; text-align: center; width: auto; margin: -17px 0 0 10px; padding: 0px 8px; background: #ffffff;"><b>Display
-Move News and Issues</b></span>
+News and Issues</b></span>
 <jmesa:tableFacade id="tag" items="${newsAndCommentsList}" maxRows="25" stateAttr="restore" var="assetCommentInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
        <jmesa:htmlTable style=" border-collapse: separate">
            <jmesa:htmlRow highlighter="true">

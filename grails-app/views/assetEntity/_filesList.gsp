@@ -27,7 +27,7 @@
 						<th>Name</th>
 						<th>Storage Format</th>
 						<th>Storage Size</th>
-						<th>Move Bundle</th>
+						<th>Bundle</th>
 						<th>Plan Status</th>
 						<th>Dep Up</th>
 						<th>Dep Down</th>

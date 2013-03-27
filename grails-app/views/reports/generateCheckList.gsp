@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Pre-Move Checklist</title>
+<title>Pre-Event Checklist</title>
 <script>
 	$(document).ready(function() {
 	    currentMenuId = "#reportsMenu";
@@ -14,7 +14,7 @@
 <body>
 	<div>
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
-			<b>Pre-Move Checklist - ${project.name} : ${moveEvent.name }</b>
+			<b>Pre-Event Checklist - ${project.name} : ${moveEvent.name }</b>
 		</div> 
 		<div style="color: black; font-size: 15px;text-align: center;">
 			${time}
@@ -103,7 +103,7 @@
 			<tr>
 				<td></td>
 				<td><span style="color: green;"><b>Bundles: OK
-							&nbsp;&nbsp; ${moveBundleSize} Move Bundles;&nbsp;${moveBundles.toString().replace('[','').replace(']','')}
+							&nbsp;&nbsp; ${moveBundleSize} Bundles;&nbsp;${moveBundles.toString().replace('[','').replace(']','')}
 					</b></span></td>
 			</tr>
 			<tr>

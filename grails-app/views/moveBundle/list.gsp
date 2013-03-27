@@ -4,7 +4,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <meta name="layout" content="projectHeader" />
-  <title>MoveBundle List</title>
+  <title>Bundle List</title>
 <script language="javascript" src="${resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
 <link rel="stylesheet" type="text/css" href="${resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
 <script type="text/javascript">
@@ -17,7 +17,7 @@ function onInvokeAction(id) {
 <body>
 
 <div class="body">
-  <h1>MoveBundle List</h1>
+  <h1>Bundle List</h1>
   <g:if test="${flash.message}">
     <div class="message">${flash.message}</div>
   </g:if>

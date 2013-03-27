@@ -148,7 +148,7 @@
 					<tr><td width="5px"><hr style="width: 30px;color:rgb(56,56,56);"></hr></td><td>Valid Links</td></tr>
 					<tr><td><hr style="width: 30px;color:red;"></hr></td><td>Questioned</td></tr>
 					<tr><td><hr style="width: 30px;color:rgb(224,224,224);"></hr></td><td>N/A</td></tr>
-					<tr><td nowrap="nowrap" colspan="2"><span style="color: Gray;"><h4>Move Events:</h4></span></td></tr>
+					<tr><td nowrap="nowrap" colspan="2"><span style="color: Gray;"><h4>Events:</h4></span></td></tr>
 					<g:each in="${eventColorCode}" var="color">
 						<tr>
 						   <td><input type="text" size="1"

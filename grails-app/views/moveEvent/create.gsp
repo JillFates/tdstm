@@ -2,11 +2,11 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="projectHeader" />
-        <title>Create Move Event</title>         
+        <title>Create Event</title>         
     </head>
     <body>
         <div class="body">
-            <h1>Create Move Event</h1>
+            <h1>Create Event</h1>
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 		      <span class="menuButton"><g:link class="list" action="list">Events List</g:link></span>
 		    </div>
@@ -55,7 +55,7 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
-                                    <label for="moveBundle">Move Bundle:</label>
+                                    <label for="moveBundle">Bundle:</label>
                                 </td>
                                 <td  valign="top" style="text-align:left;" class="value">
 	                                <ul id="moveBundleList">
@@ -141,7 +141,7 @@
             		moveBundlesString += "<input type='checkbox' name='moveBundle' value="+moveBundle.id+"> &nbsp;"+moveBundle.name+"<br>"		
 				}
         	} else {
-        		moveBundlesString = "<li> There are no Move Bundles associsted with selected Project</li>"
+        		moveBundlesString = "<li> There are no Bundles associsted with selected Project</li>"
         	}
             $("#moveBundleList").html( moveBundlesString )
         }

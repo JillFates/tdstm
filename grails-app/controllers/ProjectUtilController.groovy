@@ -169,7 +169,7 @@ class ProjectUtilController {
 						println etext
 					} else {
 						/*
-						 *  Create Move Bundle Steps
+						 *  Create Bundle Steps
 						 */
 						copyMoveBundleStep(moveBundle, bundle, timeDelta )
 
@@ -360,7 +360,7 @@ class ProjectUtilController {
 		}
 	}
 	/*
-	 *  copy move news from temp project to demo project.
+	 *  copy news from temp project to demo project.
 	 */
 	def copyMoveEventNews( def moveEvent, def oldEvent){
 		def tempMoveEventNews = MoveEventNews.findAllByMoveEvent( oldEvent )

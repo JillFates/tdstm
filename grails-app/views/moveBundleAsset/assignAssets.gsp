@@ -247,7 +247,7 @@
 					<input type="hidden" name="orderField" value="${orderField}"/>
 					<input type="hidden" name="sideField" value="${sideField}"/>
 					<tr>
-						<td valign="top" >Move Bundle:
+						<td valign="top" >Bundle:
 						<select name="bundleLeft" id="bundleLeftId" onchange="bundleChange();" >
 							<option value="">Unassigned</option>
 							<g:each in="${moveBundles}" var="moveBundle">
@@ -256,7 +256,7 @@
 						</select>
 						</td>
 						<td valign="top" ><label>&nbsp;</label></td>
-						<td valign="top" >Move Bundle:
+						<td valign="top" >Bundle:
 						<select name="bundleRight" id="bundleRightId" onchange="bundleChange();" >
 							<g:each in="${moveBundles}" var="moveBundle">
 			                	<option value="${moveBundle.id}">${moveBundle}</option>
