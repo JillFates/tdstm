@@ -20,35 +20,7 @@
       	var targetRacks = rackDetails[0].targetRackList;
       	generateOptions(sourceSelectObj,sourceRacks,'none');
       	generateOptions(targetSelectObj,targetRacks,'all');
-      	var hideIcons = "${rackFilters?.hideIcons}"
-	        if(hideIcons == "on"){
-	            $("#hideIcons").attr("checked",true)
-	        }
 	        
-	      	var backView = "${rackFilters?.backView}"
-	        if(backView == "on"){
-	                $("#backViewId").attr("checked",true)
-	        }
-	        
-	      	var frontView = "${rackFilters?.frontView}"
-	        if(frontView == "on"){
-	                $("#frontView").attr("checked",true)
-	        }
-	        
-	      	var bundleName = "${rackFilters?.bundleName}"
-	        if(bundleName == "on"){
-	                $("#bundleNameId").attr("checked",true)
-	        }
-	        
-	      	var otherBundle = "${rackFilters?.otherBundle}"
-	        if(otherBundle == "on"){
-	                $("#otherBundleId").attr("checked",true)
-	        }
-	        
-	      	var showCabling = "${rackFilters?.showCabling}"
-	        if(showCabling == "on"){
-	                $("#showCabling").attr("checked",true)
-	        }
       	var targetList = "${targetRackFilter}"
       	var targetArray =	targetList.split(",")
       	if(sourceList=='none'){
@@ -107,15 +79,19 @@
 			});
       	}
      }
+     var reqLoadRack
      function submitForm(form){
      	if($("#bundleId").val() == 'null') {
      		alert("Please select bundle")
-     	} else if( !$("#frontView").is(":checked") && !$("#backView").is(":checked") && !$("#frontViewId").is(":checked") && !$("#backViewId").is(":checked") ) {
+     		return false;
+     	} else if( !$("#frontView").is(":checked") && !$("#backViewId").is(":checked") ) {
      		alert("Please select print view")
+     		return false;
      	} else if($('#commit').val() == 'Generate') {
 			$("#cablingDialogId").dialog("close")
 			$('#rackLayout').html('Loading...');
-			jQuery.ajax({
+		if(reqLoadRack) reqLoadRack.abort();
+		reqLoadRack = jQuery.ajax({
 				url: $(form).attr('action'),
 				data: $(form).serialize(),
 				type:'POST',
@@ -194,19 +170,12 @@
 			
 			<td>
 				<div style="width:150px">
-					<label for="frontView" ><input type="checkbox" name="frontView" id="frontView" />&nbsp;Front</label>&nbsp
-					<g:if test="${useCheck}">
-					   <label for="backView" ><input type="checkbox" name="backView" id="backViewId" />&nbsp;Back</label><br />
-					   <label for="bundleName" ><input type="checkbox" name="bundleName" id="bundleNameId" />&nbsp;w/ bundle names</label><br />
-					   <label for="otherBundle" ><input type="checkbox" name="otherBundle" id="otherBundleId" />&nbsp;w/ other bundles</label><br />
-					 </g:if>
-                    <g:else>
-                        <label for="backView" ><input type="checkbox" name="backView" id="backView" checked="checked"/>&nbsp;Back</label><br />
-						<label for="bundleName" ><input type="checkbox" name="bundleName" id="bundleName" checked="checked" />&nbsp;w/ bundle names</label><br />
-						<label for="otherBundle" ><input type="checkbox" name="otherBundle" id="otherBundle" checked="checked" />&nbsp;w/ other bundles</label><br />
-					</g:else>
+					<label for="frontView" ><input type="checkbox" name="frontView" id="frontView" ${frontCheck ? 'checked="checked"' : '' }/>&nbsp;Front</label>&nbsp
+				    <label for="backView" ><input type="checkbox" name="backView" id="backViewId" ${backCheck ? 'checked="checked"' : '' }/>&nbsp;Back</label><br />
+				    <label for="bundleName" ><input type="checkbox" name="bundleName" id="bundleNameId" ${wBundleCheck ? 'checked="checked"': '' }/>&nbsp;w/ bundle names</label><br />
+				    <label for="otherBundle" ><input type="checkbox" name="otherBundle" id="otherBundleId" ${woBundleCheck ? 'checked="checked"' :'' }/>&nbsp;w/ other bundles</label><br />
 					
-					<label for="showCabling" ><input type="checkbox" name="showCabling" id="showCabling" />&nbsp;w/ diagrams</label><br />
+					<label for="showCabling" ><input type="checkbox" name="showCabling" id="showCabling" ${wDCheck ? 'checked="checked"' :'' }/>&nbsp;w/ diagrams</label><br />
 				</div>
 			</td>
 			

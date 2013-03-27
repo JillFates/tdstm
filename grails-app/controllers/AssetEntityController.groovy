@@ -1478,7 +1478,6 @@ class AssetEntityController {
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def maintExpDate = params.maintExpDate
 		def redirectTo = params?.redirectTo
-		session.setAttribute("USE_FILTERS", "true")
 		def modelName = params.models
 		def manufacturerName = params.manufacturers
 		def assetType = params.assetType ?: 'Server'
@@ -1537,6 +1536,7 @@ class AssetEntityController {
 			if(redirectTo == "room"){
 				redirect( controller:'room',action:list )
 			} else if(redirectTo == "rack"){
+				session.setAttribute("USE_FILTERS", "true")
 				redirect( controller:'rackLayouts',action:'create' )
 			} else if(redirectTo == "assetAudit"){
 				render(template:'auditDetails', model:[assetEntity:assetEntityInstance, source:params.source, assetType:params.assetType])
@@ -2934,7 +2934,6 @@ class AssetEntityController {
 		
 		def attribute = session.getAttribute('filterAttr')
 		def filterAttr = session.getAttribute('filterAttributes')
-		session.setAttribute("USE_FILTERS","true")
 		def redirectTo = params.redirectTo
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
@@ -2993,6 +2992,7 @@ class AssetEntityController {
 						redirect( controller:'room',action:list )
 						break;
 					case "rack":
+						session.setAttribute("USE_FILTERS","true")
 						redirect( controller:'rackLayouts',action:'create' )
 						break;
 					case "console":

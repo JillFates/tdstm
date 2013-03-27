@@ -25,14 +25,23 @@ class RackLayoutsController {
 		def sourceRack= ""
 		def bundle= ""
 		def rackFilters
-		def useCheck = false
+		def frontCheck = false
+		def backCheck = true
+		def wBundleCheck = true
+		def woBundleCheck = true
+		def wDCheck = false
 		if(session.getAttribute("USE_FILTERS")=="true"){
-		    useCheck = true
 			rackFilters = session.getAttribute( "RACK_FILTERS")
 			if(rackFilters){
 				targetRack = rackFilters?.targetrack ? rackFilters?.targetrack?.toString().replace("[","").replace("]","") : ""
 				sourceRack = rackFilters?.sourcerack ? rackFilters?.sourcerack?.toString().replace("[","").replace("]","") : ""
 				bundle = rackFilters?.moveBundle ? rackFilters?.moveBundle?.toString().replace("[","").replace("]","") : ""
+				frontCheck = rackFilters?.frontView ? true : false
+				backCheck = rackFilters?.backView ? true : false
+				wBundleCheck = rackFilters?.bundleName ? true : false
+				woBundleCheck = rackFilters?.otherBundle ? true : false
+				wDCheck = rackFilters?.showCabling ? true : false
+				
 			}
 		}
 		
@@ -57,8 +66,9 @@ class RackLayoutsController {
 		return [moveBundleInstanceList: moveBundleInstanceList, projectInstance:project, projectId:projectId,
 				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models ,servers:entities.servers, 
 				applications : entities.applications, dbs : entities.dbs, files : entities.files, rackFilters:rackFilters, targetRackFilter:targetRack,
-				bundle:bundle,sourceRackFilter:sourceRack,rackLayoutsHasPermission:RolePermissions.hasPermission("rackLayouts"),useCheck:useCheck,
-				staffRoles:taskService.getRolesForStaff(), dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus]
+				bundle:bundle,sourceRackFilter:sourceRack,rackLayoutsHasPermission:RolePermissions.hasPermission("rackLayouts"),
+				staffRoles:taskService.getRolesForStaff(), dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
+				frontCheck:frontCheck, backCheck:backCheck, wBundleCheck:wBundleCheck, woBundleCheck:woBundleCheck, wDCheck:wDCheck]
 	}
 	
 	def save = {
