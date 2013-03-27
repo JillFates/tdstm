@@ -334,6 +334,13 @@
 	background-color: lightyellow;
 	box-shadow: 2px 3px 3px lightgray inset;
 }
+.dashboard_bar_base_small{
+	padding: 0px;
+	width: 100%;
+	height: 5px; 
+	background-color: lightyellow;
+	box-shadow: 0px 0px 0px;
+}
 .dashboard_bar_graph0{
 	position: relative;
 	top: -5px;
@@ -344,6 +351,14 @@
 	background-color:#BFF3A5; 
 	z-index:-1;
 	height:24px;
+	border-right-width: 3px;
+	border-color: lightgray;
+	border-right-style: inset;
+}
+.dashboard_bar_graph_small{
+	background-color:#BFF3A5; 
+	z-index:-1;
+	height:5px;
 	border-right-width: 3px;
 	border-color: lightgray;
 	border-right-style: inset;

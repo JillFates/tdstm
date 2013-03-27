@@ -16,6 +16,12 @@ $(document).ready(function() {
 	<div class="body">
 		<div style="width: 1330px !important;">
 		    <g:set var="percentageAppToValidate" value="${applicationCount ? Math.round((appToValidate/applicationCount)*100) :100}"/>
+		    <g:set var="percentagePSToValidate" value="${applicationCount ? Math.round((psToValidate/physicalCount)*100) :100}"/>
+		    <g:set var="percentageVMToValidate" value="${applicationCount ? Math.round((vsToValidate/virtualCount)*100) :100}"/>
+		    <g:set var="percentageDBToValidate" value="${applicationCount ? Math.round((dbToValidate/dbCount)*100) :100}"/>
+		    <g:set var="percentageStorToValidate" value="${applicationCount ? Math.round((fileToValidate/fileCount)*100) :100}"/>
+		    <g:set var="percentageOtherToValidate" value="${applicationCount ? Math.round((otherToValidate/otherAssetCount)*100) :100}"/>
+
 		    <g:set var="percentageBundleReady" value="${applicationCount ? Math.round((bundleReady/applicationCount)*100) : 0}"/>
 			<g:set var="percentageUnassignedAppCount" value="${applicationCount ? Math.round((unassignedAppCount/applicationCount)*100) :100}"/>
 			<h1>Planning Dashboard</h1>
@@ -50,49 +56,97 @@ $(document).ready(function() {
 							<td style="width: 10px;text-align: right;">${applicationCount}</td>
 							<td><g:link controller="application" action="list" params="[filter:'applicationCount']" class="links">Applications</g:link><br />
 							<g:if test="${ appToValidate > 0 }">
-							     (<g:link controller="application" action="list" params="[filter:'applicationCount', validation:'Discovery']" class="links">${appToValidate} to validate</g:link>)
+								(<g:link controller="application" action="list" params="[filter:'applicationCount', validation:'Discovery']" class="links">${appToValidate} to validate</g:link>)
+								</td><td></td>
 							</g:if>
-							</td>
+							<g:else>
+								</td><td></td>
+							</g:else>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${physicalCount}</td>
 							<td><g:link controller="assetEntity" action="list" params="[filter:'physical']" class="links">Physical Servers</g:link><br />
 							<g:if test="${ psToValidate > 0 }">
 							     (<g:link controller="assetEntity" action="list" params="[filter:'physical', type:'toValidate']" class="links">${psToValidate} to validate</g:link>)
-						    </g:if>
-							</td>
+								</td>
+								<td>
+									<div class="dashboard_bar_base_small" >
+	
+									<div class="dashboard_bar_graph_small" style="width: ${100 - percentagePSToValidate}%" ></div>
+									<div>
+								</td>
+							</g:if>
+							<g:else>
+								</td><td></td>
+							</g:else>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${virtualCount}</td>
 							<td><g:link controller="assetEntity" action="list" params="[filter:'virtual']" class="links">Virtual Servers</g:link><br />
 							<g:if test="${ vsToValidate > 0 }">
 							     (<g:link controller="assetEntity" action="list" params="[filter:'virtual', type:'toValidate']" class="links">${vsToValidate} to validate</g:link>)
+								</td>
+								<td>
+									<div class="dashboard_bar_base_small" >
+	
+									<div class="dashboard_bar_graph_small" style="width: ${100 - percentageVMToValidate}%" ></div>
+									<div>
+								</td>
 							</g:if>
-							</td>
+							<g:else>
+								</td><td></td>
+							</g:else>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${dbCount}</td>
 							<td><g:link controller="database" action="list" params="[filter:'db']" class="links">Databases</g:link><br />
 							<g:if test="${ dbToValidate > 0 }">
 							     (<g:link controller="database" action="list" params="[filter:'db', validation:'Discovery']" class="links">${dbToValidate} to validate</g:link>)
-						    </g:if>
-							</td>
+								</td>
+								<td>
+									<div class="dashboard_bar_base_small" >
+	
+									<div class="dashboard_bar_graph_small" style="width: ${100 - percentageDBToValidate}%" ></div>
+									<div>
+								</td>
+							</g:if>
+							<g:else>
+								</td><td></td>
+							</g:else>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${fileCount}</td>
 							<td><g:link controller="files" action="list" params="[filter:'storage']" class="links">Storage</g:link><br />
 							<g:if test="${ fileToValidate > 0 }">
 							     (<g:link controller="files" action="list" params="[filter:'storage', validation:'Discovery']" class="links">${fileToValidate} to validate</g:link>)
-						    </g:if>
-							</td>
+								</td>
+								<td>
+									<div class="dashboard_bar_base_small" >
+	
+									<div class="dashboard_bar_graph_small" style="width: ${100 - percentageStorToValidate}%" ></div>
+									<div>
+								</td>
+							</g:if>
+							<g:else>
+								</td><td></td>
+							</g:else>
 						</tr>
 						<tr>
 							<td style="width: 10px;text-align: right;">${otherAssetCount}</td>
 							<td><g:link controller="assetEntity" action="list" params="[filter:'other']" class="links">Other Assets</g:link><br />
 							<g:if test="${ otherToValidate > 0 }">
 							     (<g:link controller="assetEntity" action="list" params="[filter:'other', type:'toValidate']" class="links">${otherToValidate} to validate</g:link>)
-					        </g:if>
-							</td>
+								</td>
+								<td>
+									<div class="dashboard_bar_base_small" >
+	
+									<div class="dashboard_bar_graph_small" style="width: ${100 - percentageOtherToValidate}%" ></div>
+									<div>
+								</td>
+							</g:if>
+							<g:else>
+								</td><td></td>
+							</g:else>
 						</tr>
 					</table>
 					<br />
