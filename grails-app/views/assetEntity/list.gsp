@@ -76,7 +76,7 @@ var sizePref = '${sizePref}'
                   {name:'commentType', hidden: true} "
     sortname="'assetName'"
     caption="'Asset List'"
-   	height="'auto'"
+   	height="'100%'"
     width="windowWidth"
     rowNum="sizePref"
     rowList= "'25','100','500','1000'"

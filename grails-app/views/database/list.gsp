@@ -57,7 +57,7 @@ $(document).ready(function() {
                   {name:'commentType', hidden: true} "
     sortname="'assetName'"
     caption="'DB List'"
-   	height="'auto'"
+   	height="'100%'"
     width="1000"
    	rowNum="sizePref"
  	rowList= "'25','100','500','1000'"

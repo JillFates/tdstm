@@ -78,7 +78,7 @@
                             {name:'id', hidden: true},
                             {name:'statusCss', hidden: true}"
 	            caption="'Task List'"
-	            height="'auto'"
+	            height="'100%'"
 	            width="1200"
             	rowNum="sizePref"
 	            rowList= "'25','100', '500','1000'"
