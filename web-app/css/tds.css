@@ -336,10 +336,12 @@
 }
 .dashboard_bar_base_small{
 	padding: 0px;
-	width: 100%;
+	padding-right: 5px;
+	width: 50%;
 	height: 5px; 
 	background-color: lightyellow;
 	box-shadow: 0px 0px 0px;
+	border: 1px solid #63a242;
 }
 .dashboard_bar_graph0{
 	position: relative;
