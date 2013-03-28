@@ -87,8 +87,13 @@ class Room {
 	}
 	
 	def getRackCount(){
-		return Rack.findAllByRoom(this).size()
+		return Rack.countByRoom(this)
 	}
+
+	def getRackCountByType( type ){
+		return Rack.countByRoomAndRackType(this, type)
+	}
+	
 	def getAssetCount(){
 		return AssetEntity.findAll("FROM AssetEntity where roomSource=? or roomTarget = ?",[this, this]).size()
 	}

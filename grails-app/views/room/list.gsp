@@ -96,7 +96,7 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 
 				<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "stateProv")}</td>
 				
-				<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "rackCount")}</td>
+				<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${roomInstance.getRackCountByType('Rack')}</td>
 
 				<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "assetCount")}</td>
 
@@ -110,10 +110,10 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 		<input type="button" class="edit" value="Create Room" onclick="$('#createRoomDialog').dialog('open');$('#mergeRoomDialog').dialog('close')"/>
 	 </tds:hasPermission>
 		 <tds:hasPermission permission='MergeRoom'>
-			<span class="button"><input class="create" id="mergeId" type="button" value="Merge" onclick="showMergeDialog()" style="display: none;"/></span>
+			<span class="button"><input class="create disableButton" id="mergeId" type="button" value="Merge" onclick="showMergeDialog()" disabled="disabled" /></span>
 		 </tds:hasPermission>
 		 <tds:hasPermission permission='DeleteRoom'>
-			<g:actionSubmit class="delete" action="delete" id="deleteId" value="Delete" style="display: none;"/>
+			<g:actionSubmit class="delete disableButton" action="delete" id="deleteId" value="Delete" disabled="disabled"/>
 		</tds:hasPermission>
 	</span>
 </div>
@@ -338,7 +338,8 @@ function enableActions(){
 	    }
 	});
 	if(enableButtons == 1){
-		$("#mergeId").show()
+		$("#mergeId").removeAttr("disabled");
+		$("#mergeId").removeClass('disableButton')
 		var checkBoxId = $("input:checked").attr('name')
 		var roomId = checkBoxId.substring(9,checkBoxId.length)
 		jQuery.ajax({
@@ -347,20 +348,21 @@ function enableActions(){
 			type:'POST',
 			success: function(data) {
 				if(data == null || data == ""){
-					$("#deleteId").show()
+					$("#deleteId").removeAttr("disabled");
+					$("#deleteId").removeClass('disableButton')
 				}
 			}
 		});
 	} else {
-		$("#mergeId").hide()
-		$("#deleteId").hide()
+		$("#mergeId, #deleteId").attr("disabled", "disabled");
+		$("#mergeId, #deleteId").addClass('disableButton')
 	}
 }
 function showMergeDialog(){
 	var inputCheckBox = $("input:checked")
 	var checkBoxId = inputCheckBox.attr('id')
 	var sRoomId = inputCheckBox.attr('name').substring(inputCheckBox.attr('name').indexOf("_")+1,checkBoxId.length)
-	alert(sRoomId)
+
 	$("#mergeRoomDialog table tr").each(function() {
 		var rowId = $(this).attr('id')
 		if(rowId.substring(9,rowId.length) == sRoomId){
