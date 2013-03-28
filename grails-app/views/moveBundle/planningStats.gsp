@@ -72,7 +72,7 @@ $(document).ready(function() {
 								<td style="width:100px;padding-left:0px;">
 									<div class="dashboard_bar_base_small" >
 	
-									<div class="dashboard_bar_graph_small" style="width: ${100 - percentagePSToValidate * 0.5}%" ></div>
+									<div class="dashboard_bar_graph_small" style="width: ${100 - percentagePSToValidate)}%" ></div>
 									<div>
 								</td>
 							</g:if>
@@ -89,7 +89,7 @@ $(document).ready(function() {
 								<td style="width:100px;padding-left:0px;">
 									<div class="dashboard_bar_base_small" >
 	
-									<div class="dashboard_bar_graph_small" style="width: ${100 - percentageVMToValidate * 0.5}%" ></div>
+									<div class="dashboard_bar_graph_small" style="width: ${100 - percentageVMToValidate)}%" ></div>
 									<div>
 								</td>
 							</g:if>
@@ -106,7 +106,7 @@ $(document).ready(function() {
 								<td style="width:100px;padding-left:0px;">
 									<div class="dashboard_bar_base_small" >
 	
-									<div class="dashboard_bar_graph_small" style="width: ${100 - percentageDBToValidate * 0.5}%" ></div>
+									<div class="dashboard_bar_graph_small" style="width: ${100 - percentageDBToValidate)}%" ></div>
 									<div>
 								</td>
 							</g:if>
@@ -123,7 +123,7 @@ $(document).ready(function() {
 								<td style="width:100px;padding-left:0px;">
 									<div class="dashboard_bar_base_small" >
 	
-									<div class="dashboard_bar_graph_small" style="width: ${100 - percentageStorToValidate * 0.5}%" ></div>
+									<div class="dashboard_bar_graph_small" style="width: ${100 - percentageStorToValidate)}%" ></div>
 									<div>
 								</td>
 							</g:if>
@@ -140,7 +140,7 @@ $(document).ready(function() {
 								<td style="width:100px;padding-left:0px;">
 									<div class="dashboard_bar_base_small" >
 	
-									<div class="dashboard_bar_graph_small" style="width: ${100 - percentageOtherToValidate * 0.5}%" ></div>
+									<div class="dashboard_bar_graph_small" style="width: ${100 - percentageOtherToValidate}%" ></div>
 									<div>
 								</td>
 							</g:if>
