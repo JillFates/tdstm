@@ -9,6 +9,32 @@
 $(document).ready(function() { 
 	currentMenuId = "#bundleMenu";
 	$("#bundleMenuId a").css('background-color','#003366')
+	
+	var percentageAppToValidate=100-"${applicationCount ? Math.round((appToValidate/applicationCount)*100) :100}";
+	$("#discoverybar").animate({width: percentageAppToValidate+"%" }, 1000);
+	
+    var percentageBundleReady="${applicationCount ? Math.round((bundleReady/applicationCount)*100) : 0}";
+	$("#analysisbar").animate({width: percentageBundleReady+"%" }, 1000);
+	
+    var percentageUnassignedAppCount=100-"${applicationCount ? Math.round((unassignedAppCount/applicationCount)*100) :100}";
+	$("#assignmentbar").animate({width: percentageUnassignedAppCount+"%" }, 1000);
+	
+	$("#appmovedbar").animate({width: "${percentageAppCount}%" }, 1000);
+	
+	var percentagePSToValidate=100-"${applicationCount ? Math.round((psToValidate/physicalCount)*100) :100}";
+	$("#physicalbar").animate({width: percentagePSToValidate+"%" }, 1000);
+	
+	var percentageVMToValidate=100-"${applicationCount ? Math.round((vsToValidate/virtualCount)*100) :100}";
+	$("#virtualbar").animate({width: percentageVMToValidate+"%" }, 1000);
+	
+	var percentageDBToValidate=100-"${applicationCount ? Math.round((dbToValidate/dbCount)*100) :100}";
+	$("#dbbar").animate({width: percentageDBToValidate+"%" }, 1000);
+	
+	var percentageStorToValidate=100-"${applicationCount ? Math.round((fileToValidate/fileCount)*100) :100}";
+	$("#filebar").animate({width: percentageStorToValidate+"%" }, 1000);
+	
+	var percentageOtherToValidate=100-"${applicationCount ? Math.round((otherToValidate/otherAssetCount)*100) :100}";
+	$("#assetbar").animate({width: percentageOtherToValidate+"%" }, 1000);
 });
 </script>
 </head>
@@ -40,7 +66,7 @@ $(document).ready(function() {
 
 							</g:elseif><g:else>
 
-								<div class="dashboard_bar_graph" style="width: ${100 - percentageAppToValidate}%"></div>
+								<div class="dashboard_bar_graph" id="discoverybar" style="width:0%;"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${100 - percentageAppToValidate}%</b>
 									<g:link controller="application" action="list" params="[filter:'applicationCount', validation:'Discovery']">Applications Validated</g:link>
 								</div>
@@ -72,7 +98,7 @@ $(document).ready(function() {
 								<td style="width:100px;padding-left:0px;">
 									<div class="dashboard_bar_base_small" >
 	
-									<div class="dashboard_bar_graph_small" style="width: ${100 - percentagePSToValidate}%" ></div>
+									<div class="dashboard_bar_graph_small" id="physicalbar" style="width:0%;" ></div>
 									<div>
 								</td>
 							</g:if>
@@ -89,7 +115,7 @@ $(document).ready(function() {
 								<td style="width:100px;padding-left:0px;">
 									<div class="dashboard_bar_base_small" >
 	
-									<div class="dashboard_bar_graph_small" style="width: ${100 - percentageVMToValidate}%" ></div>
+									<div class="dashboard_bar_graph_small" id="virtualbar" style="width:0%;" ></div>
 									<div>
 								</td>
 							</g:if>
@@ -106,7 +132,7 @@ $(document).ready(function() {
 								<td style="width:100px;padding-left:0px;">
 									<div class="dashboard_bar_base_small" >
 	
-									<div class="dashboard_bar_graph_small" style="width: ${100 - percentageDBToValidate}%" ></div>
+									<div class="dashboard_bar_graph_small" id="dbbar" style="width:0%;" ></div>
 									<div>
 								</td>
 							</g:if>
@@ -123,7 +149,7 @@ $(document).ready(function() {
 								<td style="width:100px;padding-left:0px;">
 									<div class="dashboard_bar_base_small" >
 	
-									<div class="dashboard_bar_graph_small" style="width: ${100 - percentageStorToValidate}%" ></div>
+									<div class="dashboard_bar_graph_small" id="filebar" style="width: 0%;" ></div>
 									<div>
 								</td>
 							</g:if>
@@ -140,7 +166,7 @@ $(document).ready(function() {
 								<td style="width:100px;padding-left:0px;">
 									<div class="dashboard_bar_base_small" >
 	
-									<div class="dashboard_bar_graph_small" style="width: ${100 - percentageOtherToValidate}%" ></div>
+									<div class="dashboard_bar_graph_small" id="assetbar" style="width: 0%;" ></div>
 									<div>
 								</td>
 							</g:if>
@@ -182,7 +208,7 @@ $(document).ready(function() {
 
 							</g:elseif><g:else>
 
-								<div class="dashboard_bar_graph" style="width: ${percentageBundleReady}%"></div>
+								<div class="dashboard_bar_graph" id="analysisbar" style="width:0%;"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${percentageBundleReady}%</b>
 									<g:link controller="application" action="list" params="[filter:'applicationCount', validation:'BundleReady']">Applications Ready</g:link>
 								</div>
@@ -281,7 +307,7 @@ $(document).ready(function() {
 
 							</g:elseif><g:else>
 
-								<div class="dashboard_bar_graph" style="width: ${100-percentageUnassignedAppCount}%"></div>
+								<div class="dashboard_bar_graph" id="assignmentbar" style="width:0%;"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${100-percentageUnassignedAppCount}%</b>
 									<g:link controller="application" action="list" params="[filter:'applicationCount',plannedStatus:'Unassigned']">Applications Assigned</g:link>
 								</div>
@@ -300,9 +326,9 @@ $(document).ready(function() {
 
 							</g:elseif><g:else>
 
-								<div class="dashboard_bar_graph" style="width: ${percentageAppCount}%"></div>
+								<div class="dashboard_bar_graph" id="appmovedbar"style="width:0%;"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${percentageAppCount}%</b>
-									<g:link controller="application" action="list" params="[filter:'applicationCount', plannedStatus:'Moved']">Applications Moved</g:link>
+						 			 <g:link controller="application" action="list" params="[filter:'applicationCount', plannedStatus:'Moved']">Applications Moved</g:link>
 								</div>
 							</g:else>
 							</td>
