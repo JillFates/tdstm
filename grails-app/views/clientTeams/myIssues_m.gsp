@@ -18,6 +18,7 @@
 		}, false);
 
 		function setFocus(){
+			document.issueAssetForm.search.value = ''
 			document.issueAssetForm.search.focus();
 		}
 	

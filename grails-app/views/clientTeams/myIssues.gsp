@@ -200,7 +200,7 @@
 	});
 	
 	function setFocus(){
-		document.issueAssetForm.search.focus();
+		$("#search").val('').focus();
 	}
 	function issueDetails(id,status) {
 		// hideStatus(id,status)

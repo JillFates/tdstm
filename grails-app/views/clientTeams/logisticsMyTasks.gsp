@@ -14,6 +14,7 @@
 	})
 
 	function setFocus(){
+		document.bundleTeamAssetForm.search.value = '';
 		document.bundleTeamAssetForm.search.focus();
 	}
 
