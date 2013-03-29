@@ -39,6 +39,7 @@ $(document).ready(function() {
 	var fileFormat = '${fileFormat}'
 	var fileSize = '${fileSize}'
 	var sizePref = '${sizePref}'
+	var listCaption ="Storage List <span class='capBtn'><input type='button' value='Create Storage'  onclick='createAssetDetails(\"Files\")'/></span>"
 	// JqGrid implementations 
     <jqgrid:grid id="storageId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
@@ -55,7 +56,7 @@ $(document).ready(function() {
                   {name:'id', hidden: true},
                   {name:'commentType', hidden: true} "
     sortname="'assetName'"
-    caption="'Storage List'"
+    caption="listCaption"
    	height="'100%'"
     width="1000"
    	rowNum="sizePref"
@@ -120,7 +121,7 @@ function populateFilter(){
 	<tds:hasPermission permission='EditAndDelete'>
 		<span class="button"><input type="button" class="save"
 			value="Create Storage"
-			onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Storage\')')}" />
+			onclick='createAssetDetails("Files")' />
 		</span>
 	</tds:hasPermission>
 	</div>

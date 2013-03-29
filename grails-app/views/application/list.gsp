@@ -44,7 +44,7 @@ $(document).ready(function() {
 	var validationFilter = '${validationFilter}'
 	var appSme = '${appSme}'
 	var sizePref = '${sizePref}'
-		
+	var listCaption ="Application List <span class='capBtn'><input type='button' value='Create App'  onclick='createAssetDetails(\"Application\")'/></span>"	
     <jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Name', 'App Sme','Validation', 'Plan Status','Bundle','Dep # ','Dep Up','Dep Down','id', 'commentType'"
@@ -60,7 +60,7 @@ $(document).ready(function() {
                   {name:'id', hidden: true},
                   {name:'commentType', hidden: true} "
     sortname="'assetName'"
-    caption="'Application List'"
+    caption="listCaption"
    	height="'100%'"
     width="1000"
     rowNum="sizePref"
@@ -151,7 +151,7 @@ function populateFilter(){
 <g:render template="../assetEntity/modelDialog"/>
 <div class="buttons"> 
 <tds:hasPermission permission='EditAndDelete'>
-		<span class="button"><input type="button" class="save" value="Create App" onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Application\')')}"/></span>
+		<span class="button"><input type="button" class="save" value="Create App" onclick='createAssetDetails("Application")'/></span>
 </tds:hasPermission>
 </div>
 <div id="createEntityView" style="display: none;" ></div>

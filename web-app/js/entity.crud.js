@@ -9,6 +9,23 @@ function createEntityView(e, type,source,rack,roomName,location,position){
 	 updateTitle(type)
 	 updateAssetInfo(source,rack,roomName,location,position)
 }
+
+function createAssetDetails(type){
+	switch(type){
+	 case "Application":
+		new Ajax.Request('../application/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Application');}})
+		break;
+	 case "Database":
+		new Ajax.Request('../database/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Database');}})
+		break;
+	 case "Files":
+		new Ajax.Request('../files/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Storage');}})
+		break;
+	 default :
+		new Ajax.Request('../assetEntity/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Server');}})
+	 }
+}
+
 function getEntityDetails(redirectTo, type, value){
 	 switch(type){
 	 case "Application":

@@ -53,6 +53,7 @@ var sortOrder = '${sortOrder}'
 var moveBundleId = '${moveBundleId}'
 var windowWidth = $(window).width() - $(window).width()*5/100 ;
 var sizePref = '${sizePref}'
+var listCaption ="Asset List <span class='capBtn'><input type='button' value='New Asset' onclick='createAssetDetails(\"assetEntity\")'/></span>"
 <jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','Target Location','Target Rack','Tag','Serial#','Plan Status','Bundle',
@@ -75,7 +76,7 @@ var sizePref = '${sizePref}'
                   {name:'id', hidden: true},
                   {name:'commentType', hidden: true} "
     sortname="'assetName'"
-    caption="'Asset List'"
+    caption="listCaption"
    	height="'100%'"
     width="windowWidth"
     rowNum="sizePref"
@@ -151,7 +152,6 @@ function populateFilter(){
 	$("#gs_moveBundle").val('${moveBundle}')
 	$("#gs_assetTag").val('${assetTag}')
 }
-
 })
 </script>
 </head>
@@ -170,7 +170,7 @@ function populateFilter(){
 <div class="buttons"><g:form>
 <tds:hasPermission permission='EditAndDelete'>
 	<span class="button"><input type="button" value="New Asset" class="create" 
-	onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Server\')')}"/></span>
+	onclick='createAssetDetails("assetEntity")'/></span>
 </tds:hasPermission>
 </g:form></div>
 </div> <%-- End of Body --%>

@@ -41,7 +41,7 @@ $(document).ready(function() {
 	var moveBundle = '${moveBundle}'
 	var dbFormat = '${validationFilter}'
 	var sizePref = '${sizePref}'
-					
+	var listCaption ="DB List <span class='capBtn'><input type='button' value='Create DB'  onclick='createAssetDetails(\"Database\")'/></span>"				
     <jqgrid:grid id="databaseId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Name', 'DB Format','Plan Status','Bundle','Dep # ','Dep Up','Dep Down','id', 'commentType'"
@@ -56,7 +56,7 @@ $(document).ready(function() {
                   {name:'id', hidden: true},
                   {name:'commentType', hidden: true} "
     sortname="'assetName'"
-    caption="'DB List'"
+    caption="listCaption"
    	height="'100%'"
     width="1000"
    	rowNum="sizePref"
@@ -136,7 +136,7 @@ function populateFilter(){
 <div class="buttons">
 <tds:hasPermission permission='EditAndDelete'>
 	<span class="button"><input type="button" class="save" value="Create DB"
-		onclick="${remoteFunction(action:'create', onComplete:'createEntityView(e, \'Database\')')}" /></span>
+		onclick='createAssetDetails("Database")' /></span>
 </tds:hasPermission>
 </div>
 <div id="createEntityView" style="display: none;" ></div>
