@@ -59,8 +59,8 @@
 			var role = '${role}'
 			var category = '${category}'
 			var sizePref = '${sizePref}'
-			var listCaption ="Tasks:
-				<span class='capBtn'><input type='button' value='Create Task' onclick='createIssue(\'\',\'\',\'\')'/></span>
+			var listCaption ="Tasks: \
+				<span class='capBtn'><input type='button' value='Create Task' onclick='createIssue()'/></span> \
 				<span class='capBtn'><input type='button' value='Bulk Edit' onclick='bulkEditTasks()'/></span>"
 					
 	    	<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
