@@ -148,6 +148,51 @@ function getActionBarGrid(spanId){
 				    		}
 						});
 }
+function getBulkActionBarGrid(taskIds){
+jQuery.ajax({
+	url: '../task/genBulkActionBarHTML',
+	data: {'id':taskIds},
+	type:'POST',
+	success: function(resp, status, xhr) {
+		   for(i=0; i<taskIds.length; i++){
+			   var data = resp[taskIds[i]]
+			   $('#'+taskIds[i]).after("<tr id='load_d_"+taskIds[i]+"'><td nowrap='nowrap' colspan='13' class='statusButtonBar' ><img src='../images/spinner.gif'/></td></tr>")
+			   $('#load_d_'+taskIds[i]).remove()
+			   
+			   if(!$("#row_d_"+taskIds[i]).html() && data)
+					$('#'+taskIds[i]).after("<tr id='row_d_"+taskIds[i]+"'> <td nowrap='nowrap' colspan='13' class='statusButtonBar'>"+data+"</td></tr>")
+					
+				$('#'+taskIds[i]).find('span').each(function(){
+					if($(this).attr("id")){
+						$(this).removeAttr('onclick')
+						var thisId = this.id.split('_')[1]
+						$(this).unbind("click").bind("click", function(){
+							hideActionBarGrid("row_d_"+thisId,this.id)
+					    });
+					}
+				})
+		   }
+	},
+	error: function(xhr, textStatus, errorThrown) {
+		for(i=0; i<taskIds.length; i++){
+			$('#load_d_'+taskIds[i]).remove()
+			if(!$("#row_d_"+taskIds[i]).html()){
+				$('#'+taskIds[i]).after("<tr id='row_d_"+taskIds[i]+"'><td nowrap='nowrap' colspan='13' class='statusButtonBar'>"+
+						"An unexpected error occurred while populating action bar.</td></tr>")
+			}
+			$('#'+taskIds[i]).find('span').each(function(){
+				if($(this).attr("id")){
+					$(this).removeAttr('onclick')
+					var thisId = this.id.split('_')[1]
+					$(this).unbind("click").bind("click", function(){
+						hideActionBarGrid("row_d_"+thisId,this.id)
+				    });
+				}
+			})
+		}
+	}
+});
+}
 /**
  * Used to hide the action bar in Task Manager
  * @param rowId

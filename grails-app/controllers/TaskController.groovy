@@ -109,10 +109,19 @@ class TaskController {
 	 */
 	def genActionBarHTML = {
 		def comment = AssetComment.get(params.id)
-		def userLogin = securityService.getUserLogin()
-		
+		def actionBar = getActionBarData(comment); 
+		render actionBar.toString()
+	}
+	
+	/**
+	 * Used to generate action Bar for task  
+	 * @param comment : instance of asset comment
+	 * @return : Action Bar HTML code.
+	 */
+	def getActionBarData (comment){
 		// There are a total of 13 columns so we'll subtract for each conditional button
-		def cols=12 
+		def cols=12
+		def userLogin = securityService.getUserLogin()
 		
 		StringBuffer actionBar = new StringBuffer("""<table style="border:0px"><tr>""")
 		if (comment) {
@@ -147,7 +156,8 @@ class TaskController {
 
 		actionBar.append(""" <td colspan='${cols}'>&nbsp;</td>
 			</tr></table>""")
-		render actionBar.toString()
+		
+		return actionBar
 	}
 	/**
 	* Used by the getActionBarHTML to wrap the button HTML into <td>...</td>
@@ -300,5 +310,23 @@ digraph runbook {
 			userPreferenceService.setPreference( key, selected )
 		}
 		render true
+	}
+	
+	/**
+	 * Used in Task Manager auto open action bar which status is ready or started.
+	 * @param : id[] : list of id whose status is ready or started
+	 * @return : map consist of id of task and action bar 
+	 */
+	def genBulkActionBarHTML = {
+		def taskIds =  params.list("id[]")
+		def resultMap = [:]
+		taskIds.each{
+			def comment = AssetComment.read(it)
+			if( comment ){
+				def actionBar = getActionBarData( comment );
+				resultMap << [(it): actionBar.toString()]
+			}
+		}
+		render resultMap as JSON
 	}
 }

@@ -39,6 +39,7 @@
 				 }
 			});
 	    	taskManagerTimePref = ${timeToUpdate}
+
 	    	if(taskManagerTimePref != 0){
 	    	  B2.Start(taskManagerTimePref);
 	    	}else{
@@ -58,6 +59,7 @@
 			var role = '${role}'
 			var category = '${category}'
 			var sizePref = '${sizePref}'
+			var listCaption ="Task List <span class='capBtn'><input type='button' value='Bulk Edit' onclick='bulkEditTasks()'/></span>"
 					
 	    	<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
 	            colNames="'Action', 'Task', 'Description', 'Asset', 'AssetType', 'Updated', 'Due', 'Status',
@@ -77,7 +79,7 @@
                             {name:'score', editable: true, formatter:taskFormatter, search:false},
                             {name:'id', hidden: true},
                             {name:'statusCss', hidden: true}"
-	            caption="'Task List'"
+	            caption="listCaption"
 	            height="'100%'"
 	            width="1200"
             	rowNum="sizePref"
@@ -139,6 +141,14 @@
        	    if (e.keyCode == 27) { if(B2 != '' && taskManagerTimePref != 0){ B2.Restart( taskManagerTimePref ); }}   
        	});
 
+       function bulkEditTasks(){
+           var ids = new Array();
+           $(".task_started, .task_ready").each(function(){
+                var taskId = $(this).attr('id').split("_")[1]
+		 		ids.push(taskId)
+		   })
+		   getBulkActionBarGrid( ids )
+       }
 
 	</script>
 </head>
