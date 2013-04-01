@@ -59,7 +59,9 @@
 			var role = '${role}'
 			var category = '${category}'
 			var sizePref = '${sizePref}'
-			var listCaption ="Task List <span class='capBtn'><input type='button' value='Bulk Edit' onclick='bulkEditTasks()'/></span>"
+			var listCaption ="Tasks:
+				<span class='capBtn'><input type='button' value='Create Task' onclick='createIssue(\'\',\'\',\'\')'/></span>
+				<span class='capBtn'><input type='button' value='Bulk Edit' onclick='bulkEditTasks()'/></span>"
 					
 	    	<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
 	            colNames="'Action', 'Task', 'Description', 'Asset', 'AssetType', 'Updated', 'Due', 'Status',
@@ -177,12 +179,8 @@
 				&nbsp;&nbsp;
 				<input type="checkbox" id="justRemainingCB" ${ (justRemaining == '1' ? 'checked="checked"': '') } onclick="toggleCheckbox(this, 'justRemaining');"  />
 				<b> <label for="justRemainingCB" >Just Remaining</label></b>
-				&nbsp;&nbsp;
 				<input type="checkbox" id="justMyTasksCB" ${ (justMyTasks=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'justMyTasks');"/>
 				<b><label for="justMyTasksCB" > Just Mine</label></b>&nbsp;&nbsp;
-				<span class="Button"><a class="task_action ui-button ui-state-default ui-corner-all" style="position:absolute; margin-left:10px;" href="javascript:createIssue('','','')">
-					<span class="ui-button-text task_button">Create Task</span></a>
-				</span>
 					<span style="position:absolute; margin-left:430px;">
 					${HtmlUtil.actionButton('View Task Graph', 'ui-icon-zoomin', 'graph', '','../task/moveEventTaskGraph?moveEventId='+filterEvent+'&mode=s')}&nbsp;
 				
