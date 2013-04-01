@@ -233,7 +233,6 @@ function zxcOpacity(obj,opc){
 	obj.style.filter='alpha(opacity='+opc+')';
 	obj.style.opacity=obj.style.MozOpacity=obj.style.WebkitOpacity=obj.style.KhtmlOpacity=opc/100-.001;
 }
-	setFocus();
 
 	function Bar(o){
 	var obj=document.getElementById(o.ID);
@@ -280,15 +279,15 @@ function zxcOpacity(obj,opc){
 	var B1=new Bar({
 		ID:'issueTimebar'
 	});
-
 	
 	function onScan(ev){
 		var scan = ev.data;
-		document.forms[0].search.value = scan.value;
-		document.forms[0].submit();
+		document.issueAssetForm.search.value = scan.value;
+		document.issueAssetForm.submit();
 	}
 	document.addEventListener("BarcodeScanned", onScan, false);
 	
+setFocus();
 </script>
 </body>
 </html>
