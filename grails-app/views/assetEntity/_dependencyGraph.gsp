@@ -33,6 +33,7 @@
 			<div id="legendDivIdGraph" style="float: left; border: 1px solid #ccc; margin-left: 3px; margin-top: 3px; width: 178px; background-color: white; position: absolute; display: none;">
 				<table id="legendId" cellpadding="0" cellspacing="0" style="margin-left: 5px; border: 0; width: 140px;">
 					<tr><td style="padding: 3px 3px;"><h3>Legend</h3></td></tr>
+					<tr><td colspan="2"><span style="color: blue;"><h4>Nodes:</h4></span></td></tr>
 					<tr>
 						<td nowrap="nowrap" ><img src="${resource(dir:'images',file:'iconApp.png')}" height="14" /></td>
 						<td><span style="vertical-align: text-top;">Apps</span></td>
@@ -48,6 +49,10 @@
 					<tr>
 						<td nowrap="nowrap" ><img src="${resource(dir:'images',file:'iconStorage.png')}" height="21" /></td>
 						<td><span style="vertical-align: text-top;">Storage</span></td>
+					</tr>
+					<tr>
+						<td nowrap="nowrap" ><img src="${resource(dir:'images',file:'iconNetwork.png')}" height="16" /></td>
+						<td><span style="vertical-align: text-top;">Network</span></td>
 					</tr>
 					<tr><td width="5px" ><hr style="width: 30px;color:rgb(56,56,56);"></hr></td><td>Valid Links</td></tr>
 					<tr><td ><hr style="width: 30px;color:red;"></hr></td><td>Questioned</td></tr>

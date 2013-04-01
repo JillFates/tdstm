@@ -459,11 +459,14 @@ class AssetEntityService {
 		
 		def files = Files.executeQuery("SELECT f.id, f.assetName FROM Files f where assetType = ? and project =? \
 					order by assetName asc",[AssetType.FILES.toString(), project])
+
+		def networks = AssetEntity.executeQuery("SELECT a.id, a.assetName FROM AssetEntity a where assetType = ? and project =? \
+			order by assetName asc",[AssetType.NETWORK.toString(), project])
 		
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		
 		return [servers:servers, applications:applications, dbs:dbs, files:files,
-				 dependencyType:dependencyType, dependencyStatus:dependencyStatus,]
+				 dependencyType:dependencyType, dependencyStatus:dependencyStatus, networks:networks]
 	}
 }

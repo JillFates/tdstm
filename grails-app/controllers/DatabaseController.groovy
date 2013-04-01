@@ -46,7 +46,7 @@ class DatabaseController {
 		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
 		
 		return [assetDependency: new AssetDependency(),
-			servers : entities.servers, applications : entities.applications, dbs : entities.dbs, files : entities.files, 
+			servers : entities.servers, applications : entities.applications, dbs : entities.dbs, files : entities.files,networks : entities.networks, 
 			dependencyStatus:entities.dependencyStatus,staffRoles:taskService.getRolesForStaff(),dependencyType:entities.dependencyType,
 			event:params.moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,
 			moveBundleId:params.moveBundleId, dbName:filters?.assetNameFilter ?:'', dbFormat:filters?.dbFormatFilter?:'',

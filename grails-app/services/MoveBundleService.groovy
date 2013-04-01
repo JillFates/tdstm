@@ -495,7 +495,7 @@ class MoveBundleService {
 				 date:time, dependencyStatus:entities.dependencyStatus, assetDependency:new AssetDependency(), dependencyBundleCount:dependencyBundleCount,
 				 servers:entities.servers, applications:entities.applications, dbs:entities.dbs, files:entities.files,moveBundle:moveBundleList,
 				 applicationListSize:applicationListSize, physicalListSize:physicalListSize,virtualListSize:virtualListSize,asset:'Apps',
-				 allMoveBundles:moveBundles]
+				 allMoveBundles:moveBundles, networks:entities.networks]
 		 
 		 return map
 	 }

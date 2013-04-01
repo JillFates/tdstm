@@ -65,7 +65,7 @@ class RackLayoutsController {
 		session.removeAttribute("RACK_FILTERS")
 		return [moveBundleInstanceList: moveBundleInstanceList, projectInstance:project, projectId:projectId,
 				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models ,servers:entities.servers, 
-				applications : entities.applications, dbs : entities.dbs, files : entities.files, rackFilters:rackFilters, targetRackFilter:targetRack,
+				applications : entities.applications, dbs : entities.dbs, files : entities.files,networks : entities.networks, rackFilters:rackFilters, targetRackFilter:targetRack,
 				bundle:bundle,sourceRackFilter:sourceRack,rackLayoutsHasPermission:RolePermissions.hasPermission("rackLayouts"),
 				staffRoles:taskService.getRolesForStaff(), dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
 				frontCheck:frontCheck, backCheck:backCheck, wBundleCheck:wBundleCheck, woBundleCheck:woBundleCheck, wDCheck:wDCheck]

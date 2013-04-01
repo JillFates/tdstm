@@ -5,7 +5,8 @@ public enum AssetType {
 	VM('VM'),
 	APPLICATION('Application'),
 	DATABASE('Database'),
-	FILES('Files')
+	FILES('Files'),
+	NETWORK('Network')
 
 	String name
 	AssetType(String name) {

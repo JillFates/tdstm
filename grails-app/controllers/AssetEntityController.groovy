@@ -1266,7 +1266,7 @@ class AssetEntityController {
 		
 		render(view:'list', model:[assetDependency : new AssetDependency(), dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
 			event:params.moveEvent, filter:params.filter, type:params.type, plannedStatus:params.plannedStatus,  servers : entities.servers, 
-			applications : entities.applications, dbs : entities.dbs, files : entities.files, assetName:filters?.assetNameFilter ?:'', 
+			applications : entities.applications, dbs : entities.dbs, files : entities.files,  networks :entities.networks, assetName:filters?.assetNameFilter ?:'', 
 			assetType:filters?.assetTypeFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sourceRack:filters?.sourceRackFilter ?:'',
 			moveBundle:filters?.moveBundleFilter ?:'', model:filters?.modelFilter ?:'', sourceLocation:filters?.sourceLocationFilter ?:'', 
 			targetLocation:filters?.targetLocationFilter ?:'', targetRack:filters?.targetRackFilter ?:'', assetTag:filters?.assetTagFilter ?:'', 
@@ -2286,6 +2286,7 @@ class AssetEntityController {
 			def applications = Application.findAllByAssetTypeAndProject('Application',projectInstance)
 			def dbs = Database.findAllByAssetTypeAndProject('Database',projectInstance)
 			def files = Files.findAllByAssetTypeAndProject('Files',projectInstance)
+			def networks = AssetEntity.findAllByAssetTypeAndProject('Network',projectInstance)
 
 			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
@@ -2298,7 +2299,7 @@ class AssetEntityController {
 				applicationList : applicationList, appOwnerList : appOwnerList, appSmeList : appSmeList,
 				transitionStates : transitionStates, params:params, totalAssetsOnHold:totalAssetsOnHold,
 				totalSourcePending: totalSourcePending, totalTargetPending: totalTargetPending, role: role, teamType:teamType, assetDependency: new AssetDependency() ,
-				servers:servers , applications:applications ,dbs:dbs,files:files, dependencyType:dependencyType, dependencyStatus:dependencyStatus,
+				servers:servers , applications:applications ,dbs:dbs,files:files,networks:networks, dependencyType:dependencyType, dependencyStatus:dependencyStatus,
 				staffRoles:taskService.getRolesForStaff() ]
 		} else {
 			flash.message = "Please create bundle to view Console"
@@ -3110,7 +3111,7 @@ class AssetEntityController {
 		def entities = assetEntityService.entityInfo( project )
 		
 		return [timeToUpdate : timeToRefresh ?: 60,servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
-				files:entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, assetDependency: new AssetDependency(),
+				files:entities.files,networks:entities.networks, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, assetDependency: new AssetDependency(),
 				moveEvents:moveEvents, filterEvent:filterEvent , justRemaining:justRemaining, justMyTasks:justMyTasks, filter:params.filter,
 				comment:filters?.comment ?:'', taskNumber:filters?.taskNumber ?:'', assetName:filters?.assetEntity ?:'', assetType:filters?.assetType ?:'',
 				dueDate : filters?.dueDate ?:'', status : filters?.status ?:'', assignedTo : filters?.assignedTo ?:'', role: filters?.role ?:'',
@@ -3602,6 +3603,10 @@ class AssetEntityController {
 					if(labels.contains("files"))
 						name = it.asset.assetName
 					shape = "diamond"
+				}else if(it.asset.assetType == 'Network'){
+					if(labels.contains("networks"))
+						name = it.asset.assetName
+					shape = "cross"
 				}
 				def moveEventName = it.asset.moveBundle?.moveEvent?.name
 				graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle, 
@@ -3703,7 +3708,12 @@ class AssetEntityController {
 				if(labels.contains("files"))
 					name = it.asset.assetName
 				shape = "diamond"
+			} else if(it.asset.assetType == 'Network'){
+					if(labels.contains("networks"))
+						name = it.asset.assetName
+					shape = "cross"
 			}
+			
 			def moveEventName = it.asset.moveBundle?.moveEvent?.name
 				graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle, 
 								shape:shape, size : size, title: title,color:eventColorCode[moveEventName]?eventColorCode[moveEventName]:"red"]

@@ -40,7 +40,7 @@ class FilesController {
 		def entities = assetEntityService.entityInfo( project )
 		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
 		
-		return [assetDependency: new AssetDependency(), servers : entities.servers, applications : entities.applications, dbs : entities.dbs,
+		return [assetDependency: new AssetDependency(), servers : entities.servers, applications : entities.applications, dbs : entities.dbs, networks : entities.networks ,
 			files : entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
 			event:params.moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,
 			staffRoles:taskService.getRolesForStaff(), moveBundleId:params.moveBundleId, fileName:filters?.assetNameFilter ?:'', 

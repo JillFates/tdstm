@@ -50,7 +50,7 @@ class ApplicationController {
 		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
 		
 		return [projectId: project.id, assetDependency: new AssetDependency(),
-			servers : entities.servers, applications : entities.applications, dbs : entities.dbs, files : entities.files,dependencyType:entities.dependencyType, 
+			servers : entities.servers, applications : entities.applications, dbs : entities.dbs, files : entities.files, networks : entities.networks, dependencyType:entities.dependencyType, 
 			dependencyStatus:entities.dependencyStatus,event:params.moveEvent, filter:params.filter, latency:params.latency,
 		    staffRoles:taskService.getRolesForStaff(), plannedStatus:params.plannedStatus, appSme : filters?.appSmeFilter ?:'',
 			validation:params.validation, moveBundleId:params.moveBundleId, appName:filters?.assetNameFilter ?:'', sizePref:sizePref, 

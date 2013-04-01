@@ -117,6 +117,24 @@
 						</g:else>
 					</tr>
 					<tr>
+						<g:if test="${labels?.contains('networks')}">
+							<td><img src="${resource(dir:'images',file:'iconNetwork.png')}" height="16" /></td>
+							<td colspan="2" style="padding: 0px;">
+								<input type="checkbox" name="labels" id="networkLabel" checked="checked" value="networks" class="pointer"/>
+								<label for="networkLabel" style="vertical-align: text-top;">Network
+								</label>
+							</td>
+						</g:if>
+						<g:else>
+							<td><img src="${resource(dir:'images',file:'iconNetwork.png')}" height="16" /></td>
+							<td colspan="2" style="padding: 0px;">
+								<input type="checkbox" id="networkLabel" name="labels" value="networks" class="pointer"/>
+								<label for="networkLabel" style="vertical-align: text-top;">Network
+								</label>
+							</td>
+						</g:else>
+					</tr>
+					<tr>
 						<td colspan="2" style="padding: 0px;text-align: center;">
 						<input type="button" value="Refresh Map"  class="pointer" onclick="refreshMap($('#forceId').val(), $('#linksId').val() ,$('#frictionId').val(), $('#heightId').val(), $('#widthId').val())">
 						</td>
@@ -144,6 +162,11 @@
 						<td nowrap="nowrap"><img
 							src="${resource(dir:'images',file:'iconStorage.png')}" height="21" /></td>
 							<td><span style="vertical-align: text-top;">Storage</span></td>
+					</tr>
+					<tr>
+						<td nowrap="nowrap"><img
+							src="${resource(dir:'images',file:'iconNetwork.png')}" height="16" /></td>
+							<td><span style="vertical-align: text-top;">Network</span></td>
 					</tr>
 					<tr><td width="5px"><hr style="width: 30px;color:rgb(56,56,56);"></hr></td><td>Valid Links</td></tr>
 					<tr><td><hr style="width: 30px;color:red;"></hr></td><td>Questioned</td></tr>

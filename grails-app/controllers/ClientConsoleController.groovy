@@ -303,6 +303,7 @@ class ClientConsoleController {
 			def applications = Application.findAllByAssetTypeAndProject('Application',project)
 			def dbs = Database.findAllByAssetTypeAndProject('Database',project)
 			def files = Files.findAllByAssetTypeAndProject('Files',project)
+			def networks = AssetEntity.findAllByAssetTypeAndProject('Network',project)
 			
 			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
@@ -317,7 +318,7 @@ class ClientConsoleController {
 				clientConsoleCommentHasPermission:RolePermissions.hasPermission("ClientConsoleComment"),
 				clientConsoleCheckBoxHasPermission:RolePermissions.hasPermission("ClientConsoleCheckBox"),
 				columns:columns, assetsInView:assetsInView, totalAssets:totalAssets, attributesList:attributesList, servers : servers, 
-				applications : applications, dbs : dbs, files : files, assetDependency: new AssetDependency(), project:project,
+				applications : applications, dbs : dbs, files : files,networks:networks, assetDependency: new AssetDependency(), project:project,
 				showAllOption:showAllOption, bundleId:bundleId, staffRoles:taskService.getRolesForStaff(),dependencyType:dependencyType,
 				dependencyStatus:dependencyStatus ]
 	    	

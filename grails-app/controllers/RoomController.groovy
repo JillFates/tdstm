@@ -27,12 +27,12 @@ class RoomController {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
 		def roomInstanceList = Room.findAllByProject( project, params )
-		def roomId = getSession().getAttribute( "CURR_ROOM" )?.CURR_ROOM
+  		def roomId = getSession().getAttribute( "CURR_ROOM" )?.CURR_ROOM
 		def roomInstance = new Room()
 		def entities = assetEntityService.entityInfo( project )
 		
 		[roomInstanceList: roomInstanceList, roomInstanceTotal: roomInstanceList.size(), 
-		 projectId:projectId, roomId:roomId, viewType:params.viewType, roomInstance:roomInstance, servers : entities.servers, 
+		 projectId:projectId, roomId:roomId, viewType:params.viewType, roomInstance:roomInstance, servers : entities.servers, networks : entities.networks,
 				applications : entities.applications, dbs : entities.dbs, files : entities.files ,filterRackId:rackIds, staffRoles:taskService.getRolesForStaff(),
 				dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus]
     }
