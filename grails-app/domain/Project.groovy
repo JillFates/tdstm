@@ -80,7 +80,7 @@ class Project extends PartyGroup {
 		custom22( blank:true, nullable:true )
 		custom23( blank:true, nullable:true )
 		custom24( blank:true, nullable:true )
-		customFieldsShown( blank:false, nullable:false, inList:[0, 4 ,8, 12, 16 ,20, 24] )
+		customFieldsShown( nullable:false, inList:[0, 4 ,8, 12, 16 ,20, 24] )
 		lastAssetId( nullable:true )
 		runbookOn(nullable:true)
 	}

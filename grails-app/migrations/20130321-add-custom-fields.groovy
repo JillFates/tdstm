@@ -38,4 +38,28 @@ databaseChangeLog = {
 				}
 			}
 	}
+	
+	//Add column custom_fields_shown in project, this change log for tm.tdsops
+	changeSet(author: "lokanada", id: "20130402 TM-1263-8") {
+		comment('Updated custom_fields_shown constraint and datatype.')
+		
+		preConditions(onFail:'MARK_RAN') {
+            not {
+                columnExists(schemaName:'tdstm', tableName:'project', columnName:'custom_fields_shown' )
+            }
+		}
+		addColumn(tableName: "project") {
+			column(name: "custom_fields_shown", type: "TINYINT(2)")
+		}
+	}
+	
+	//Updating custom_fields_shown's constraint and data_type, this change log for tmdev.tdsops
+	changeSet(author: "lokanada", id: "20130402 TM-1263-9") {
+		comment('Updated custom_fields_shown constraint and datatype.')
+        preConditions(onFail:'MARK_RAN') {
+            columnExists(schemaName:'tdstm', tableName:'project', columnName:'custom_fields_shown' )
+        }
+		sql("ALTER TABLE project MODIFY COLUMN custom_fields_shown TINYINT(2) NOT NULL DEFAULT 8")
+	}
+	
 }
