@@ -217,6 +217,9 @@
 									<g:if test="${support?.asset?.assetType=='Server'|| support?.asset.assetType=='Blade' || support?.asset.assetType=='VM'}">
 									<td><g:select name="asset_support_${i}" from="${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType in (\'Server\',\'VM\',\'Blade\') and project = ? order by assetName asc ',[project])}" value="${support?.asset?.id}" optionKey="id" optionValue="assetName"  style="width:105px;"></g:select></td>
 									</g:if>
+									 <g:elseif test="${support?.asset?.assetType!='Application'|| support?.asset.assetType!='Database' || support?.asset.assetType!='Files'}">
+									<td><g:select name="asset_support_${i}" from="${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType not in (\'Server\',\'VM\',\'Blade\',\'Application\',\'Database\',\'Files\') and project = ? order by assetName asc ',[project])}" value="${support?.asset?.id}" optionKey="id" optionValue="assetName" style="width:105px;"></g:select></td>
+									</g:elseif>
 									<g:else>
 									<td><g:select name="asset_support_${i}" from="${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType = ? and project =? order by assetName asc',[support?.asset?.assetType, project])}" value="${support?.asset?.id}" optionKey="id" optionValue="assetName"  style="width:105px;"></g:select></td>
 									</g:else>
@@ -254,6 +257,9 @@
 								<g:if test="${dependent?.dependent?.assetType=='Server'|| dependent?.dependent?.assetType=='Blade' || dependent?.dependent?.assetType=='VM'}">
 								  <td><g:select name="asset_dependent_${i}" from="${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType in (\'Server\',\'VM\',\'Blade\') and project = ? order by assetName asc ',[project])}" value="${dependent?.dependent?.id}" optionKey="id" optionValue="assetName"  style="width:105px;"></g:select></td>
 								</g:if>
+								 <g:elseif test="${support?.asset?.assetType!='Application'|| support?.asset.assetType!='Database' || support?.asset.assetType!='Files'}">
+								<td><g:select name="asset_support_${i}" from="${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType not in (\'Server\',\'VM\',\'Blade\',\'Application\',\'Database\',\'Files\') and project = ? order by assetName asc ',[project])}" value="${support?.asset?.id}" optionKey="id" optionValue="assetName" style="width:105px;"></g:select></td>
+								</g:elseif>
 								<g:else>
 								  <td><g:select name="asset_dependent_${i}" from="${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? order by assetName asc ',[dependent?.dependent?.assetType, project])}" value="${dependent?.dependent?.id}" optionKey="id" optionValue="assetName"  style="width:105px;"></g:select></td>
 								</g:else>
