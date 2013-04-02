@@ -21,19 +21,19 @@ $(document).ready(function() {
 	
 	$("#appmovedbar").animate({width: "${percentageAppCount}%" }, 1000);
 	
-	var percentagePSToValidate=100-"${applicationCount ? Math.round((psToValidate/physicalCount)*100) :100}";
+	var percentagePSToValidate=100-"${physicalCount ? Math.round((psToValidate/physicalCount)*100) :100}";
 	$("#physicalbar").animate({width: percentagePSToValidate+"%" }, 1000);
 	
-	var percentageVMToValidate=100-"${applicationCount ? Math.round((vsToValidate/virtualCount)*100) :100}";
+	var percentageVMToValidate=100-"${virtualCount ? Math.round((vsToValidate/virtualCount)*100) :100}";
 	$("#virtualbar").animate({width: percentageVMToValidate+"%" }, 1000);
 	
-	var percentageDBToValidate=100-"${applicationCount ? Math.round((dbToValidate/dbCount)*100) :100}";
+	var percentageDBToValidate=100-"${dbCount ? Math.round((dbToValidate/dbCount)*100) :100}";
 	$("#dbbar").animate({width: percentageDBToValidate+"%" }, 1000);
 	
-	var percentageStorToValidate=100-"${applicationCount ? Math.round((fileToValidate/fileCount)*100) :100}";
+	var percentageStorToValidate=100-"${fileCount ? Math.round((fileToValidate/fileCount)*100) :100}";
 	$("#filebar").animate({width: percentageStorToValidate+"%" }, 1000);
 	
-	var percentageOtherToValidate=100-"${applicationCount ? Math.round((otherToValidate/otherAssetCount)*100) :100}";
+	var percentageOtherToValidate=100-"${otherAssetCount ? Math.round((otherToValidate/otherAssetCount)*100) :100}";
 	$("#assetbar").animate({width: percentageOtherToValidate+"%" }, 1000);
 });
 </script>
@@ -42,11 +42,11 @@ $(document).ready(function() {
 	<div class="body">
 		<div style="width: 1330px !important;">
 		    <g:set var="percentageAppToValidate" value="${applicationCount ? Math.round((appToValidate/applicationCount)*100) :100}"/>
-		    <g:set var="percentagePSToValidate" value="${applicationCount ? Math.round((psToValidate/physicalCount)*100) :100}"/>
-		    <g:set var="percentageVMToValidate" value="${applicationCount ? Math.round((vsToValidate/virtualCount)*100) :100}"/>
-		    <g:set var="percentageDBToValidate" value="${applicationCount ? Math.round((dbToValidate/dbCount)*100) :100}"/>
-		    <g:set var="percentageStorToValidate" value="${applicationCount ? Math.round((fileToValidate/fileCount)*100) :100}"/>
-		    <g:set var="percentageOtherToValidate" value="${applicationCount ? Math.round((otherToValidate/otherAssetCount)*100) :100}"/>
+		    <g:set var="percentagePSToValidate" value="${physicalCount ? Math.round((psToValidate/physicalCount)*100) :100}"/>
+		    <g:set var="percentageVMToValidate" value="${virtualCount ? Math.round((vsToValidate/virtualCount)*100) :100}"/>
+		    <g:set var="percentageDBToValidate" value="${dbCount ? Math.round((dbToValidate/dbCount)*100) :100}"/>
+		    <g:set var="percentageStorToValidate" value="${fileCount ? Math.round((fileToValidate/fileCount)*100) :100}"/>
+		    <g:set var="percentageOtherToValidate" value="${otherAssetCount ? Math.round((otherToValidate/otherAssetCount)*100) :100}"/>
 
 		    <g:set var="percentageBundleReady" value="${applicationCount ? Math.round((bundleReady/applicationCount)*100) : 0}"/>
 			<g:set var="percentageUnassignedAppCount" value="${applicationCount ? Math.round((unassignedAppCount/applicationCount)*100) :100}"/>
