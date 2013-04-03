@@ -92,7 +92,7 @@
 			<g:if test="${rack.rackType == 'Rack'}">
 			 <g:if test="${rack.model?.layoutStyle == null}">	
 				<div align="center"  id="rack_${rack.id}" style="top:${rack.roomY}px; left:${rack.roomX}px;" 
-				onmouseout="updateXYPositions(this.id)"   
+				onmouseout="updateXYPositions(this.id)" onclick="showRoomObjects(this.id)"
 				class="${ rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_L' } dragRack draggable">
 				</g:if>
 				<g:else>
@@ -101,6 +101,7 @@
 				 class="${rack.model?.layoutStyle} dragRack draggable">
 				</g:else>
 					<span id="rackLabel_${rack.id}"><br>${rack.tag}</br></span>
+					<div id="rackDetailDiv_${rack.id}" class="rackDetailDiv dragRack draggable" style="top:${rack.roomY-50}px;left:${rack.roomX-40}px;" ></div>
 				</div>
 			</g:if>
 			<g:else>
@@ -114,6 +115,7 @@
 			<div align="center"id="rack_${rack}" style="top:0px;left:0px;display: none;" onmouseout="updateXYPositions(this.id)"
 				 class="rack_highlight_no_L  draggable" >
 				<span id="rackLabel_${rack}" style="background-color:white;z-index:1; "><br>&nbsp;</br></span>
+				<div id="rackDetailDiv_${rack}" class="rackDetailDiv" style="top:-30px;left:75px;display: none;"></div>
 			</div>
 		</g:each>
 	</div>
@@ -214,6 +216,21 @@ $(document).ready(function() {
 	$("#roomObjects").height($("#rackTableId").height())
 	
 })
+
+function showRoomObjects(rackid){
+	var id=rackid.split("_")[1];
+	$.ajax({
+		url: "../room/roomObject",
+		data:{'id':id},
+		type:'POST',
+		datatype:'json',
+		success: function(data) {
+			$(".rackDetailDiv").hide();
+			$("#rackDetailDiv_"+id).html(data);
+			$("#rackDetailDiv_"+id).show();	
+		}
+	});
+}
 
 function showRackTable(){
    var rackIdArr = new Array();
@@ -439,21 +456,28 @@ function createRack(value){
 		updateRackStyle(newRackId,'L','Object')
 		$("#newPowerA_"+newRackId).val('0')
 		$("#newPowerB_"+newRackId).val('0')
+	}else{
+		showRoomObjects("rack_"+newRackId)
 	}
 	$("#roomObjects").height($("#rackTableId").height())
 }
+
 function changeLabel(id,value){
 	$("#rackLabel_"+id).html(value)
 }
+
 function changeRackType(id,value){
 	$("#rack_"+id).html(value)
 }
+
 function objectSelectedOn(id){
 	$("#rack_"+id).addClass("objectSelected")
 }
+
 function objectSelectedOff(id){
 	$("#rack_"+id).removeClass("objectSelected")
 }
+
 function updateRackStyle(id, frontValue, rackTypeValue){
 	$("#rack_"+id).removeAttr("class")
 	if(rackTypeValue == "Rack"){
@@ -463,6 +487,7 @@ function updateRackStyle(id, frontValue, rackTypeValue){
 	}
 	updateXYPositions("rack_"+id)
 }
+
 function changeRackPosition(rackId, value, position){
 	if(!isNaN(value)){
 		$("#rack_"+rackId).css(position,value+"px")
@@ -470,6 +495,7 @@ function changeRackPosition(rackId, value, position){
 		alert("Please enter Numerics")
 	}
 }
+
 function roundValue(value,id){
 	var chndValue = Math.round(value)
 	$("#"+id).val( chndValue )

@@ -145,7 +145,19 @@ class RoomController {
 			[roomInstance: roomInstance, rackInstanceList:rackInstanceList, newRacks : newRacks, 
 				modelList:modelList, draggableRack:draggableRack, prefVal:prefVal]
         }
+		
     }
+
+	/**
+	 * Provide layout to create/edit rack.
+	 * @param id:Rack id
+	 * @return room layout 
+	 */
+	def roomObject = {
+		def rack = Rack.get(params.id)
+		if(!rack) rack = new Rack()
+		render (template:"roomObject", model:[rack:rack, rackId:params.id])
+	}
 
     def update = {
         def roomInstance = Room.get(params.id)
