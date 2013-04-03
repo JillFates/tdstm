@@ -41,7 +41,7 @@ $(document).ready(function() {
 	var moveBundle = '${moveBundle}'
 	var dbFormat = '${validationFilter}'
 	var sizePref = '${sizePref}'
-	var listCaption ="DB List <span class='capBtn'><input type='button' value='Create DB'  onclick='createAssetDetails(\"Database\")'/></span>"				
+	var listCaption ="DataBases:<span class='capBtn'><input type='button' value='Create DB'  onclick='createAssetDetails(\"Database\")'/></span>"				
     <jqgrid:grid id="databaseId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Name', 'DB Format','Plan Status','Bundle','Dep # ','Dep Up','Dep Down','id', 'commentType'"
@@ -77,7 +77,7 @@ $(document).ready(function() {
             {afterSubmit:deleteMessage});
      });
 
-
+	$.jgrid.formatter.integer.thousandsSeparator='';
 function myLinkFormatter (cellvalue, options, rowObjcet) {
 	var value = cellvalue ? cellvalue : ''
 	return '<a href="javascript:getEntityDetails(\'database\',\''+rowObjcet[9]+'\','+options.rowId+')">'+value+'</a>'

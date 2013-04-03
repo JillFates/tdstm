@@ -53,7 +53,7 @@ var sortOrder = '${sortOrder}'
 var moveBundleId = '${moveBundleId}'
 var windowWidth = $(window).width() - $(window).width()*5/100 ;
 var sizePref = '${sizePref}'
-var listCaption ="Asset List <span class='capBtn'><input type='button' value='New Asset' onclick='createAssetDetails(\"assetEntity\")'/></span>"
+var listCaption ="Assets: <span class='capBtn'><input type='button' value='New Asset' onclick='createAssetDetails(\"assetEntity\")'/></span>"
 <jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','Target Location','Target Rack','Tag','Serial#','Plan Status','Bundle',
@@ -99,7 +99,7 @@ var listCaption ="Asset List <span class='capBtn'><input type='button' value='Ne
             {afterSubmit:deleteMessage});
      });
     
-
+	$.jgrid.formatter.integer.thousandsSeparator='';
 function myLinkFormatter (cellvalue, options, rowObjcet) {
 	var value = cellvalue ? cellvalue : ''
 	return '<a href="javascript:getEntityDetails(\'assetEntity\',\''+rowObjcet[2]+'\','+options.rowId+')">'+value+'</a>'

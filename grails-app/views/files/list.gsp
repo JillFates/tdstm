@@ -39,7 +39,7 @@ $(document).ready(function() {
 	var fileFormat = '${fileFormat}'
 	var fileSize = '${fileSize}'
 	var sizePref = '${sizePref}'
-	var listCaption ="Storage List <span class='capBtn'><input type='button' value='Create Storage'  onclick='createAssetDetails(\"Files\")'/></span>"
+	var listCaption ="Storages:<span class='capBtn'><input type='button' value='Create Storage'  onclick='createAssetDetails(\"Files\")'/></span>"
 	// JqGrid implementations 
     <jqgrid:grid id="storageId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
@@ -73,6 +73,7 @@ $(document).ready(function() {
 </jqgrid:grid>
 	populateFilter();
 
+	$.jgrid.formatter.integer.thousandsSeparator='';
 function myLinkFormatter (cellvalue, options, rowObjcet) {
 	var value = cellvalue ? cellvalue : ''
 	return '<a href="javascript:getEntityDetails(\'files\',\''+rowObjcet[10]+'\','+options.rowId+')">'+value+'</a>'

@@ -44,7 +44,7 @@ $(document).ready(function() {
 	var validationFilter = '${validationFilter}'
 	var appSme = '${appSme}'
 	var sizePref = '${sizePref}'
-	var listCaption ="Application List <span class='capBtn'><input type='button' value='Create App'  onclick='createAssetDetails(\"Application\")'/></span>"	
+	var listCaption ="Applications:<span class='capBtn'><input type='button' value='Create App'  onclick='createAssetDetails(\"Application\")'/></span>"	
     <jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Name', 'App Sme','Validation', 'Plan Status','Bundle','Dep # ','Dep Up','Dep Down','id', 'commentType'"
@@ -83,6 +83,7 @@ $(document).ready(function() {
     		);
      });
 
+	$.jgrid.formatter.integer.thousandsSeparator='';
 function myLinkFormatter (cellvalue, options, rowObjcet) {
 	var value = cellvalue ? cellvalue : ''
 	return '<a href="javascript:getEntityDetails(\'application\',\''+rowObjcet[10]+'\','+options.rowId+')">'+value+'</a>'
