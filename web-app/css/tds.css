@@ -1278,3 +1278,6 @@ span.task_button_disabled { float: left; height: 16px; line-height: 16px;  paddi
 	width: 150px;
 }
 
+.rackDetailDiv {
+	display: none; position: relative; width: 253px; border: 0px solid black; float: left; background-color: white; z-index: 99;
+}
