@@ -151,6 +151,7 @@
                 var taskId = $(this).attr('id').split("_")[1]
 		 		ids.push(taskId)
 		   })
+		   if(B2 != ''){ B2.Pause() }
 		   getBulkActionBarGrid( ids )
        }
 
