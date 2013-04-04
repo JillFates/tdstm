@@ -43,6 +43,7 @@ import groovy.time.TimeCategory
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.ApplicationConstants
 import org.apache.commons.lang.StringUtils
+import com.tds.asset.AssetType
 
 class AssetEntityController {
 
@@ -3990,5 +3991,105 @@ class AssetEntityController {
 		} 
 	 render assetType
 	}
-    
+	
+    /**
+     * This action is used to populate support and dependent asset for asset edit.
+     * @param id : asset is
+     * @return : HTML code containing support and dependent edit form .
+     */
+	def populateDependency ={
+		StringBuffer supports = new StringBuffer("")
+		StringBuffer dependents = new StringBuffer("")
+		if(params.id && params.id.isNumber()){
+			def assetEntity = AssetEntity.read( params.id )
+			if( assetEntity ){
+				def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by \
+						a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
+				def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by \
+						a.asset.assetType,a.asset.assetName asc",[assetEntity])
+				
+				def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+				def priorityOption = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
+		
+				def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+				def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+				
+				def nonNetworkTypes = [AssetType.SERVER.toString(),AssetType.APPLICATION.toString(),AssetType.VM.toString(),
+								AssetType.FILES.toString(),AssetType.DATABASE.toString(),AssetType.BLADE.toString()]
+			
+				supportAssets.eachWithIndex{ sa, i->
+					def freqParam = ['options':sa.constraints.dataFlowFreq.inList, 'selectName':"dataFlowFreq_support_${i}", 'optionSelected':sa.dataFlowFreq]
+					def freqSelect = HtmlUtil.generateSelect(freqParam)
+					
+					def assetTypesParam = ['options':['Server','Application','Database','Storage','Network'], 'selectName':"entity_support_${i}", 
+						'optionSelected':(sa?.asset?.assetType=='Files'?'Storage':( nonNetworkTypes.contains(sa?.asset?.assetType) ? sa?.asset?.assetType : 'Network')), 
+						'javascript':'onChange="updateAssetsList(this.name, this.value)"']
+					def typeSelect = HtmlUtil.generateSelect(assetTypesParam)
+					
+					def entities = getAssetsByType(sa?.asset?.assetType)
+					def nameParam = ['options':entities, 'selectName':"asset_support_${i}", 'optionKey':'id', 'optionValue':'assetName',
+						'optionSelected':sa?.asset?.id, selectClass : "assetSelect"]
+					def nameSelect = HtmlUtil.generateSelect( nameParam )
+					
+					def typeParam = ['options':dependencyType, 'selectName':"dtype_support_${i}", 'optionKey':'value','optionValue':'value', 'optionSelected':sa.type]
+					def sTypeSelect = HtmlUtil.generateSelect( typeParam )
+					
+					def statusParam = ['options':dependencyStatus, 'selectName':"status_support_${i}", 'optionKey':'value', 'optionValue':'value', 'optionSelected':sa.status]
+					def statusSelect = HtmlUtil.generateSelect( statusParam )
+					
+					supports.append("""<tr id='row_s_${i}'><td>${freqSelect}</td> <td>${typeSelect}</td> <td>${nameSelect}</td><td>${sTypeSelect}</td>
+						<td>${statusSelect}</td><td><a href="javascript:deleteRow('row_s_${i}')"><span class='clear_filter'><u>X</u></span></a></td>""")
+				}
+				
+				dependentAssets.eachWithIndex{ da, i->
+					def freqParam = ['options':da.constraints.dataFlowFreq.inList, 'selectName':"dataFlowFreq_dependent_${i}", 'optionSelected':da.dataFlowFreq]
+					def freqSelect = HtmlUtil.generateSelect(freqParam)
+					
+					def assetTypesParam = ['options':['Server','Application','Database','Storage','Network'], 'selectName':"entity_dependent_${i}",
+						'optionSelected':(da?.dependent?.assetType=='Files'?'Storage':( nonNetworkTypes.contains(da?.dependent?.assetType) ? da?.dependent?.assetType : 'Network')),
+						 'javascript':'onChange="updateAssetsList(this.name, this.value)"']
+					def typeSelect = HtmlUtil.generateSelect(assetTypesParam)
+					
+					def entities = getAssetsByType(da?.dependent?.assetType)
+					def nameParam = ['options':entities, 'selectName':"asset_dependent_${i}", 'optionKey':'id', 'optionValue':'assetName',
+						'optionSelected':da?.dependent?.id, selectClass : "assetSelect"]
+					def nameSelect = HtmlUtil.generateSelect( nameParam )
+					
+					def typeParam = ['options':dependencyType, 'selectName':"dtype_dependent_${i}", 'optionKey':'value', 'optionValue':'value', 'optionSelected':da.type]
+					def sTypeSelect = HtmlUtil.generateSelect( typeParam )
+					
+					def statusParam = ['options':dependencyStatus, 'selectName':"status_dependent_${i}", 'optionKey':'value', 'optionValue':'value', 'optionSelected':da.status]
+					def statusSelect = HtmlUtil.generateSelect( statusParam )
+					
+					dependents.append("""<tr id='row_d_${i}'><td>${freqSelect}</td> <td>${typeSelect}</td> <td>${nameSelect}</td><td>${sTypeSelect}</td>
+						<td>${statusSelect}</td><td><a href="javascript:deleteRow('row_d_${i}')"><span class='clear_filter'><u>X</u></span></a></td>""")
+				}
+			}
+			
+		}
+		def dependentMap = ['supports':supports.toString(), 'dependents':dependents.toString()]
+		render dependentMap as JSON
+	}
+	
+	/**
+	 * This method is used to get assets by asset type
+	 * @param assetType
+	 * @return
+	 */
+	def getAssetsByType(assetType){
+		def entities = []
+		def project = securityService.getUserCurrentProject()
+		if(assetType){
+			if(assetType=='Server' || assetType=='Blade' || assetType=='VM'){
+			  entities = AssetEntity.findAll('from AssetEntity where assetType in (:type) and project = :project order by assetName asc ',
+				  [type:["Server", "VM", "Blade"], project:project])
+			} else if(assetType != 'Application' && assetType != 'Database' && assetType != 'Files'){
+			  entities = AssetEntity.findAll('from AssetEntity where assetType not in (:type) and project = :project order by assetName asc ',
+				  [type:["Server", "VM", "Blade", "Application", "Database", "Files"], project:project])
+			} else{
+			  entities = AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? order by assetName asc ',[assetType, project])
+			}
+		}
+	  return entities
+	}
 }

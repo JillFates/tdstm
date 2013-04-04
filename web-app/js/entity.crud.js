@@ -101,9 +101,9 @@ function addAssetDependency( type,forWhom ){
 	var rowNo = $("#"+type+"Count").val()
 	var rowData = $("#assetDependencyRow tr").html().replace(/dataFlowFreq/g,"dataFlowFreq_"+type+"_"+rowNo).replace(/asset/g,"asset_"+type+"_"+rowNo).replace(/dtype/g,"dtype_"+type+"_"+rowNo).replace(/status/g,"status_"+type+"_"+rowNo).replace(/entity/g,"entity_"+type+"_"+rowNo)
 	if(type!="support"){
-		$("#createDependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+		$("#"+forWhom+"DependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
 	} else {
-		$("#createSupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+		$("#"+forWhom+"SupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
 	}
 	$("#"+type+"Count").val(parseInt(rowNo)+1)
 }
@@ -592,6 +592,21 @@ function manipulateFields( val ){
 		$(".vmLabel").hide()
 	}
 } 
+
+function populateDependency(assetId){
+	jQuery.ajax({
+		url: '../assetEntity/populateDependency',
+		data: {'id':assetId},
+		type:'POST',
+		success: function(data) {
+			$("#editSupportsList").html(data.supports)
+			$("#editDependentsList").html(data.dependents)				
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			alert("An Unexpected error while populating dependent asset.")
+		}
+	});
+}
 
 /*function updateModel(rackId,value){
 	var val = value;

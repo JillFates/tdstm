@@ -183,7 +183,7 @@
 			<td valign="top">
 				<div style="width: auto;">
 					<span style="float: left;"><h1>Supports:</h1></span>
-					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('support')"></span>
+					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('support', 'create')"></span>
 					<br/>
 					<table style="width: 100%;">
 						<thead>
@@ -203,7 +203,7 @@
 			<td valign="top">
 				<div style="width: auto;">
 					<span style="float: left;"><h1>Is dependent on:</h1></span>
-					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('dependent')"></span>
+					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('dependent', 'create')"></span>
 					<br/>
 					<table style="width: 100%;">
 						<thead>

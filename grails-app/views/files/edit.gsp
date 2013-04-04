@@ -4,6 +4,12 @@
 	$("#file_fileSize").val($('#gs_fileSize').val())
 	$("#file_planStatus").val($('#gs_planStatus').val())
 	$("#file_moveBundle").val($('#gs_moveBundle').val())
+	
+	$(document).ready(function() { 
+		// Ajax to populate dependency selects in edit pages
+		var assetId = '${fileInstance.id}'
+		populateDependency(assetId)
+	})
 </script>
 <g:form method="post" action="update" name="editAssetsFormId">
 	<input type="hidden" id="file_assetName" name="assetNameFilter" value="" />
@@ -77,7 +83,7 @@
 			<td valign="top">
 				<div style="width: auto;">
 					<span style="float: left;"><h1>Supports:</h1></span>
-					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('support')"></span>
+					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('support','edit')"></span>
 					<br/>
 					<table style="width: 100%;">
 						<thead>
@@ -90,34 +96,17 @@
 								<th>&nbsp;</th>
 							</tr>
 						</thead>
-						<tbody id="createSupportsList">
-							<g:each in="${supportAssets}" var="support" status="i">
-								<tr id='row_s_${i}'>
-									<td><g:select name="dataFlowFreq_support_${i}" value="${support.dataFlowFreq}" from="${support.constraints.dataFlowFreq.inList}" /></td>
-									<td><g:select name="entity_support_${i}" from="['Server','Application','Database','Storage','Network']" onchange='updateAssetsList(this.name, this.value)' value="${support?.asset?.assetType == 'Files' ? 'Storage' : support?.asset?.assetType}"></g:select></td>
-									<g:if test="${support?.asset.assetType=='Server'|| support?.asset.assetType=='Blade' || support?.asset.assetType=='VM'}">
-								        <td class="dep-${support.status}"><g:select name="asset_support_${i}" from="${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType in (\'Server\',\'VM\',\'Blade\') and project = ? order by assetName asc ',[project])}" value="${support?.asset?.id}" optionKey="id" optionValue="assetName"  style="width:105px;"></g:select></td>
-									</g:if>
-									 <g:elseif test="${support?.asset?.assetType!='Application'|| support?.asset.assetType!='Database' || support?.asset.assetType!='Files'}">
-									<td><g:select name="asset_support_${i}" from="${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType not in (\'Server\',\'VM\',\'Blade\',\'Application\',\'Database\',\'Files\') and project = ? order by assetName asc ',[project])}" value="${support?.asset?.id}" optionKey="id" optionValue="assetName" style="width:105px;"></g:select></td>
-									</g:elseif>
-									<g:else>
-										<td class="dep-${support.status}"><g:select name="asset_support_${i}" from="${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType = ? and project =? order by assetName asc',[support?.asset?.assetType, project])}" value="${support?.asset?.id}" optionKey="id" optionValue="assetName"  style="width:105px;"></g:select></td>
-									</g:else>
-									<td><g:select name="dtype_support_${i}" value="${support.type}" from="${dependencyType.value}" optionValue="value"  />
-									</td>
-									<td><g:select name="status_support_${i}" value="${support.status}" from="${dependencyStatus.value}" optionValue="value" />
-									</td>
-									<td><a href="javascript:deleteRow('row_s_${i}')"><span class='clear_filter'><u>X</u></span></a></td>
-								</tr>
-							</g:each>
+						<tbody id="editSupportsList">
+							<tr>
+								<td colspan="5"><span><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/> </span></td>
+							</tr>
 						</tbody>
 					</table>
 				</div></td>
 			<td valign="top">
 				<div style="width: auto;">
 					<span style="float: left;"><h1>Is dependent on:</h1></span>
-					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('dependent')"></span>
+					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('dependent','edit')"></span>
 					<br/>
 					<table style="width: 100%;">
 						<thead>
@@ -130,27 +119,10 @@
 								<th>&nbsp;</th>
 							</tr>
 						</thead>
-						<tbody id="createDependentsList">
-						<g:each in="${dependentAssets}" var="dependent" status="i">
-							<tr id='row_d_${i}'>
-								<td><g:select name="dataFlowFreq_dependent_${i}" value="${dependent.dataFlowFreq}" from="${dependent.constraints.dataFlowFreq.inList}" /></td>
-								<td><g:select name="entity_dependent_${i}" from="['Server','Application','Database','Storage','Network']" onchange='updateAssetsList(this.name, this.value)' value="${dependent?.dependent?.assetType == 'Files' ? 'Storage' : dependent?.dependent?.assetType}"></g:select></td>
-								<g:if test="${dependent?.dependent?.assetType=='Server'|| dependent?.dependent?.assetType=='Blade' || dependent?.dependent?.assetType=='VM'}">
-								  <td><g:select name="asset_dependent_${i}" from="${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType in (\'Server\',\'VM\',\'Blade\') and project = ? order by assetName asc ',[project])}" value="${dependent?.dependent?.id}" optionKey="id" optionValue="assetName"  style="width:105px;"></g:select></td>
-								</g:if>
-								 <g:elseif test="${support?.asset?.assetType!='Application'|| support?.asset.assetType!='Database' || support?.asset.assetType!='Files'}">
-								<td><g:select name="asset_support_${i}" from="${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType not in (\'Server\',\'VM\',\'Blade\',\'Application\',\'Database\',\'Files\') and project = ? order by assetName asc ',[project])}" value="${support?.asset?.id}" optionKey="id" optionValue="assetName" style="width:105px;"></g:select></td>
-								</g:elseif>
-								<g:else>
-								  <td><g:select name="asset_dependent_${i}" from="${com.tds.asset.AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? order by assetName asc ',[dependent?.dependent?.assetType, project])}" value="${dependent?.dependent?.id}" optionKey="id" optionValue="assetName"  style="width:105px;"></g:select></td>
-								</g:else>
-								<td><g:select name="dtype_dependent_${i}" value="${dependent.type}" from="${dependencyType.value}" optionValue="value" />
-								</td>
-								<td><g:select name="status_dependent_${i}" value="${dependent.status}" from="${dependencyStatus.value}" optionValue="value" />
-								</td>
-								<td><a href="javascript:deleteRow('row_d_${i}')"><span class='clear_filter'><u>X</u></span></a></td>
-							</tr>
-						</g:each>
+						<tbody id="editDependentsList">
+						<tr>
+							<td colspan="5"><span><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/> </span></td>
+						</tr>
 						</tbody>
 					</table>
 				</div></td>
