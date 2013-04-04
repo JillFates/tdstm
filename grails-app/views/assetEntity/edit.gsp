@@ -58,7 +58,7 @@
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
-								<td ><g:select from="${assetTypeOptions}" id="assetTypeId" name="assetType" value="${assetEntityInstance.assetType}" onChange="selectManufacturer(this.value, 'edit')" tabindex="12"/></td>
+								<td ><g:select from="${assetTypeOptions}" id="assetTypeId" name="assetType" value="${assetType}" onChange="selectManufacturer(this.value, 'Edit')" tabindex="12"/></td>
 								<td class="label" nowrap="nowrap"><label for="priority">Priority</label>
 								</td>
 								<td ><g:select id="priority" name ="priority" from="${priorityOption}" value= "${assetEntityInstance.priority}" noSelection="${['':' Please Select']}" tabindex="21"/>
@@ -81,7 +81,7 @@
 								</td>
 								 <td >
 								 <div id="manufacturerEditId">
-								   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${assetEntityInstance.manufacturer?.id}" onChange="selectModel(this.value)" optionKey="id" optionValue="name" noSelection="${[null:'Unassigned']}" tabindex="13"/>
+								   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${manufacturer?.id}" onChange="selectModel(this.value,'Edit')" optionKey="id" optionValue="name" noSelection="${[null:'Unassigned']}" tabindex="13"/>
 								 </div>
 								</td>
 								<td class="label" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
@@ -104,8 +104,8 @@
 									</g:else>
 								</td>
 								<td>
-								<div id="modelId">
-								   <g:select id="model" name ="model.id" from="${models}" value= "${assetEntityInstance.model?.id}" optionKey="id" optionValue="modelName"  noSelection="${[null:' Unassigned']}" tabindex="14"
+								<div id="modelEditId">
+								   <g:select id="model" name ="model.id" from="${models}" value= "${assetEntityInstance.model}" optionKey="id" optionValue="modelName"  noSelection="${[null:' Unassigned']}" tabindex="14"
 								   optionValue="${{it.modelName+' '+(it.modelStatus =='new' ? '?' :'')}}" onChange="setType(this.value)"/>
 								 </div>
 								</td>

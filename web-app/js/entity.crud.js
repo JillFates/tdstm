@@ -97,7 +97,7 @@ function isValidDate( date ){
   	} 
   	return returnVal;
 }
-function addAssetDependency( type ){
+function addAssetDependency( type,forWhom ){
 	var rowNo = $("#"+type+"Count").val()
 	var rowData = $("#assetDependencyRow tr").html().replace(/dataFlowFreq/g,"dataFlowFreq_"+type+"_"+rowNo).replace(/asset/g,"asset_"+type+"_"+rowNo).replace(/dtype/g,"dtype_"+type+"_"+rowNo).replace(/status/g,"status_"+type+"_"+rowNo).replace(/entity/g,"entity_"+type+"_"+rowNo)
 	if(type!="support"){
@@ -122,26 +122,26 @@ function updateTitle( type ){
 function selectManufacturer(value, forWhom){
 	var val = value;
 	manipulateFields(val)
-	new Ajax.Request('../assetEntity/getManufacturersList?assetType='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){showManufacView(e, forWhom);}})
+	new Ajax.Request('../assetEntity/getManufacturersList?assetType='+val+'&forWhom='+forWhom,{asynchronous:true,evalScripts:true,onComplete:function(e){showManufacView(e, forWhom);}})
 }
 function showManufacView(e, forWhom){
     var resp = e.responseText;
-    if(forWhom == 'edit')
+    if(forWhom == 'Edit')
     	$("#manufacturerEditId").html(resp);
     else 
-    	$("#manufacturerId").html(resp);
+    	$("#manufacturerCreateId").html(resp);
    
     $("#manufacturers").removeAttr("multiple")
 }
 function selectModel(value, forWhom){
 	var val = value;
 	var assetType = $("#assetTypeId").val() ;
-	new Ajax.Request('../assetEntity/getModelsList?assetType='+assetType+'&manufacturer='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){showModelView(e, forWhom);}})
+	new Ajax.Request('../assetEntity/getModelsList?assetType='+assetType+'&manufacturer='+val+'&forWhom='+forWhom,{asynchronous:true,evalScripts:true,onComplete:function(e){showModelView(e, forWhom);}})
 	//${remoteFunction(action:'getModelsList', params:'\'assetType=\' +assetType +\'&=\'+ val', onComplete:'showModelView(e)' )}
 }
 function showModelView(e, forWhom){
     var resp = e.responseText;
-    $("#modelId").html(resp);
+    $("#model"+forWhom+"Id").html(resp);
     $("#models").removeAttr("multiple")
     if(forWhom == "assetAudit"){
     	$("#models").attr("onChange","editModelAudit(this.value)")

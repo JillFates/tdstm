@@ -50,16 +50,16 @@ $(document).ready(function() {
 	<tr class="prop">
 		<td class="label">Manufacturer</td>
 		<td class="label">
-		  <div id="manufacturerId">
+		  <div id="manufacturerCreateId">
 		   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${manufacuterer?.id}" 
-		   		onChange="selectModel(this.value)" optionKey="id" optionValue="name" noSelection="${[null:' Unassigned']}" tabindex="13" />
+		   		onChange="selectModel(this.value,'Create')" optionKey="id" optionValue="name" noSelection="${[null:' Unassigned']}" tabindex="13" />
 		 </div>
 		</td>
 	</tr>
 	<tr class="prop trAnchor" >
 		<td class="label"><b>Model</b></td>
 		<td class="label">
-		<div id="modelId">
+		<div id="modelCreateId">
 	    <g:select id="model" name ="model.id" from="${models}" value= "${assetEntityInstance.model}" noSelection="${[null:' Unassigned']}" tabindex="14" 
 	  		optionKey="id" optionValue="${{it.modelName+' '+(it.modelStatus =='new' ? '?' :'')}}" onChange="setType(this.value)"/>
 	 	</div>
@@ -68,7 +68,7 @@ $(document).ready(function() {
 		<td class="label">Type</td>
 		<td class="label">
 			<g:select from="${assetTypeOptions}" id="assetTypeId" name="assetType" value="${assetEntityInstance.assetType}" 
-			onChange="selectManufacturer(this.value, 'edit')" tabindex="12" />
+			onChange="selectManufacturer(this.value, 'Create')" tabindex="12" />
 		</td>
 	</tr>
 	<tr class="prop">

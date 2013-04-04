@@ -58,7 +58,7 @@
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
-								<td ><g:select from="${assetTypeOptions}" id="assetTypeId" name="assetType" value="${assetType}" onChange="selectManufacturer(this.value)" tabindex="12" /></td>
+								<td ><g:select from="${assetTypeOptions}" id="assetTypeId" name="assetType" value="${assetType}" onChange="selectManufacturer(this.value,'Create')" tabindex="12" /></td>
 								<td class="label" nowrap="nowrap"><label for="priority">Priority</label>
 								</td>
 								<td ><g:select id="priority" name ="priority" from="${priorityOption}" value= "${assetEntityInstance.priority}" noSelection="${['':' Please Select']}" tabindex="21" />
@@ -72,8 +72,8 @@
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="manufacturer">Manufacturer</label></td>
 								 <td >
-								 <div id="manufacturerId">
-								   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${manufacuterer?.id}" onChange="selectModel(this.value)" optionKey="id" optionValue="name" noSelection="${[null:' Unassigned']}" tabindex="13" />
+								 <div id="manufacturerCreateId">
+								   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${manufacuterer?.id}" onChange="selectModel(this.value,'Create')" optionKey="id" optionValue="name" noSelection="${[null:' Unassigned']}" tabindex="13" />
 								 </div>
 								</td>
 								<td class="label" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
@@ -89,7 +89,7 @@
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="model">Model</label></td>
 								<td>
-								<div id="modelId">
+								<div id="modelCreateId">
 								   <g:select id="model" name ="model.id" from="${models}" value= "${assetEntityInstance.model}" noSelection="${[null:' Unassigned']}" tabindex="14" 
 								  		optionKey="id" optionValue="${{it.modelName+' '+(it.modelStatus =='new' ? '?' :'')}}" onChange="setType(this.value)"/>
 								 </div>

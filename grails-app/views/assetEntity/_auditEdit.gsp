@@ -58,7 +58,7 @@ $(document).ready(function() {
 		<td class="label">
 		 <div id="manufacturerEditId">
 		   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${assetEntityInstance.manufacturer?.id}" 
-		   	onChange="selectModel(this.value)" 
+		   	onChange="selectModel(this.value,'Edit')" 
 		   optionKey="id" optionValue="name" noSelection="${[null:'Unassigned']}" tabindex="13"/>
 		 </div>
 		</td>
@@ -66,7 +66,7 @@ $(document).ready(function() {
 	<tr class="prop trAnchor" >
 		<td class="label"><b>Model</b></td>
 		<td class="label">
-		<div id="modelId">
+		<div id="modelEditId">
 	    <g:select id="model" name ="model.id" from="${models}" value= "${assetEntityInstance.model?.id}" optionKey="id" optionValue="modelName"  
 	    	noSelection="${[null:' Unassigned']}" tabindex="14"
 		  	 optionValue="${{it.modelName+' '+(it.modelStatus =='new' ? '?' :'')}}" onChange="setType(this.value)"/>
@@ -77,7 +77,7 @@ $(document).ready(function() {
 		<td class="label">Type</td>
 		<td class="label">
 			<g:select from="${assetTypeOptions}" id="assetTypeId" name="assetType" value="${assetEntityInstance.assetType}" 
-			onChange="selectManufacturer(this.value, 'edit')" tabindex="12" />
+			onChange="selectManufacturer(this.value, 'Edit')" tabindex="12" />
 		</td>
 	</tr>
 	<tr class="prop">

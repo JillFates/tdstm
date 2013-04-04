@@ -2783,8 +2783,8 @@ class AssetEntityController {
 			def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
 			def sessionManu = userPreferenceService.getPreference("lastManufacturer")
 			def manufacuterer =  sessionManu ? Manufacturer.findByName(sessionManu) : manufacturers[0]
-			
-			def models =  Model.findAllByManufacturer( manufacuterer,[sort:'modelName',order:'asc'] )//?.findAll{it.assetType == assetType }
+			def models=[]
+			models=getModelSortedByStatus(manufacuterer)
 			
 			def moveBundleList = MoveBundle.findAllByProject(project)
 			
@@ -2883,7 +2883,8 @@ class AssetEntityController {
 
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute,[sort:"value"])
 		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetEntityInstance.assetType])?.manufacturer
-		def models = assetEntityInstance.manufacturer ? Model.findAllByManufacturer( assetEntityInstance.manufacturer,[sort:'modelName',order:'asc'] ): []
+		def models=[]
+		models=getModelSortedByStatus(assetEntityInstance.manufacturer)
 
 
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
@@ -3045,16 +3046,31 @@ class AssetEntityController {
 		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
 		def prefVal =  userPreferenceService.getPreference("lastManufacturer")
 		def selectedManu = prefVal ? Manufacturer.findByName( prefVal )?.id : null
-		render (view :'manufacturerView' , model:[manufacturers : manufacturers, selectedManu:selectedManu])
+		render (view :'manufacturerView' , model:[manufacturers : manufacturers, selectedManu:selectedManu,forWhom:params.forWhom ])
 	}
 	def getModelsList = {
 		def manufacturer = params.manufacturer
-		def models
+		def models=[]
 		if(manufacturer!="null"){
 			def manufacturerInstance = Manufacturer.read(manufacturer)
-			models = Model.findAllByManufacturer( manufacturerInstance,[sort:'modelName',order:'asc'] )
+			models=getModelSortedByStatus(manufacturerInstance)
 		}
-		render (view :'ModelView' , model:[models : models])
+		render (view :'ModelView' , model:[models : models, forWhom:params.forWhom])
+	}
+	
+	/**
+	 * 
+	 * @param manufacturer
+	 * @return
+	 */
+	def getModelSortedByStatus(manufacturerInstance){
+		def models= []
+		def modelListFull = Model.findAllByManufacturerAndModelStatus( manufacturerInstance,'full',[sort:'modelName',order:'asc'] )
+		def modelListValid =Model.findAllByManufacturerAndModelStatus(manufacturerInstance,'valid',[sort:'modelName',order:'asc'] )
+		def modelListNew = Model.findAllByManufacturerAndModelStatusInList(manufacturerInstance,['new','',null],[sort:'modelName',order:'asc'] )
+		models = modelListFull+modelListValid+modelListNew
+		
+		return models
 	}
 	
 	/**
