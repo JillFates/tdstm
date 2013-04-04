@@ -251,7 +251,8 @@
 					</tds:hasPermission>
 					<td style="vertical-align:top"><span class="megamenuSection">Assets</span><br />
 						<ul>
-							<li><g:link class="mmlink" controller="assetEntity"  onclick="hideMegaMenu('assetMegaMenu')">List Assets</g:link> </li>
+							<li><g:link class="mmlink" controller="assetEntity" action="assetSummary">Summary</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity"  onclick="hideMegaMenu('assetMegaMenu')">List Assets</g:link></li>
 							<li><g:link class="mmlink" controller="application" action="list"  onclick="hideMegaMenu('assetMegaMenu')">List Apps</g:link></li>
 							<li><g:link class="mmlink" controller="database"  onclick="hideMegaMenu('assetMegaMenu')">List DBs</g:link></li>
 							<li><g:link class="mmlink" controller="files"  onclick="hideMegaMenu('assetMegaMenu')">List Storage</g:link></li>
