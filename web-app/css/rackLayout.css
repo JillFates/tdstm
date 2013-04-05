@@ -25,6 +25,9 @@ br.page-break-after {
 .objectSelected {
 	box-shadow: #888 5px 5px 10px;
 }
+.divShadow {
+	box-shadow: #888 5px 5px 10px;
+}
 .objectRowSelected {
 	box-shadow: #888 5px 5px 10px;
 }

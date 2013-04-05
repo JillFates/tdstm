@@ -33,7 +33,7 @@ var Drag = {
 
 	start : function(e)
 	{
-		e.addClass("objectSelected");
+		//e.addClass("objectSelected");
  		var o = Drag.obj = this;
 		e = Drag.fixE(e);
 		var y = parseInt(o.vmode ? o.root.style.top  : o.root.style.bottom);

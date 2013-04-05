@@ -3,31 +3,30 @@
 <g:set var="rack_id" value="${rack.id?:rackId }"></g:set>
 	<tr>
 		<td>Name : <span id="sourceId"></span></td>
-		<td><input type="text" id="tag_${rack_id}" size="14" value="${rack.tag}"  onchange="changeLabel(${rack_id},this.value)"/></td>
+		<td><input type="text" id="tagDiv_${rack_id}" size="14" value="${rack.tag}"  onchange="changeLabel(${rack_id},this.value);changeRackDetails(${rack_id},this.value,'tag'); "/></td>
 	</tr>
 	<tr>
 		<td>X/Y/Facing:</td>
-		<td><input id="roomXId_${rack_id}" class="govav" size="2" value="${rack.roomX}" name="roomXId_${rack_id}" onkeyup="changeRackPosition(${rack_id},this.value, 'left')"/> 
-			<input id="roomYId_${rack_id}" class="vinod" size="1" value="${rack.roomY}" name="roomYId_${rack_id}" onkeyup="changeRackPosition(${rack_id},this.value, 'top')"/> 
-			<g:select id="frontId_${rack}" name="front_${rack}" size="1" from="${Rack.constraints.front.inList}" onchange="updateRackStyle(${rack}, this.value, jQuery('#rackTypeId_'+${rack}).val())" style="width:40px;"></g:select></td>
+		<td><input id="roomXDivId_${rack_id}" size="2" value="${rack.roomX}"  onkeyup="changeRackPosition(${rack_id},this.value, 'left')" onchange="changeRackRoomDetails(${rack_id},this.value,'roomX')"/> 
+			<input id="roomYDivId_${rack_id}" size="2" value="${rack.roomY}"  onkeyup="changeRackPosition(${rack_id},this.value, 'top')" onchange="changeRackRoomDetails(${rack_id},this.value,'roomY')"/> 
+			<g:select id="frontIdDiv_${rack}" from="${Rack.constraints.front.inList}" onchange="updateRackStyle(${rack}, this.value, jQuery('#rackTypeId_'+${rack_id}).val())" style="width:40px;" onchange="changeRackRoomDetails(${rack_id},this.value,'front')"></g:select></td>
 	</tr>
 	<tr>
 		<td>Power A/B/C:(${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE!="Watts"?"Amps":"W"})<span id="unitsId"></span></td>
-		<td><input id="powerAId" size="2" name="powerA_${rack_id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerA ? (rack.powerA / 110).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA):0}"/>
-			<input id="powerBId" size="2" name="powerA_${rack_id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerB ? (rack.powerB / 110).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB):0}"/> 
-			<input id="powerCId" size="1" name="powerA_${rack_id}" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerC ? (rack.powerC / 110).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC):0}"/>
+		<td><input id="powerAId" size="2"  value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerA ? (rack.powerA / 110).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA):0}" onchange="changeRackDetails(${rack_id},this.value,'powerA')"/>
+			<input id="powerBId" size="2"  value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerB ? (rack.powerB / 110).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB):0}" onchange="changeRackDetails(${rack_id},this.value,'powerB')"/> 
+			<input id="powerCId" size="2"  value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerC ? (rack.powerC / 110).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC):0}" onchange="changeRackDetails(${rack_id},this.value,'powerC')"/>
 		</td>
 	</tr>
 	<tr>
 		<td>Type :</td>
-		<td><input id="typeId" size="14" name="rackType_${rack_id}" value="${rack.rackType}"></input></td>
+		<td><g:select id="rackTypeDivId_${rack_id}" from="${Rack.constraints.rackType.inList}" value="${rack.rackType}" 
+			onchange=" changeRackRoomDetails(${rack_id},this.value,'rackType'); updateRackStyle(${rack.id}, jQuery('#frontId_'+${rack.id}).val(), this.value); " style="width:100px;">
+		</g:select></td>
 	</tr>
 	<tr>
 		<td>Model:</td>
-		<td><g:select name="rackType_${rack_id}"
-				from="${Rack.constraints.rackType.inList}" value="${rack.rackType}"
-				onchange="updateRackStyle(${rack_id}, jQuery('#frontId_'+${rack_id}).val(), this.value)"
-				style="width:100px;"></g:select></td>
+		<td><span id="modelSpanDiv_${rack_id}"><g:select class="rackModel" id="modelDiv_${rack_id}"  from="${modelList}" noSelection="[null:'Select Model']" value="${rack.model?.id}" optionKey="id" optionValue="${{it.manufacturer.name+' / '+it.modelName} }" onchange="changeRackDetails(${rack_id},this.value,'model')"></g:select></span></td>
 	</tr>
 	<tr>
 		<td>Assets:</td>
