@@ -3060,15 +3060,18 @@ class AssetEntityController {
 	}
 	
 	/**
-	 * 
+	 * Sorting model list in asset Create and Edit page to display full or validated model first 
+	 * 	and after that mode which status is new or null .
 	 * @param manufacturer
-	 * @return
+	 * @return sorted model list 
 	 */
-	def getModelSortedByStatus(manufacturerInstance){
+	def getModelSortedByStatus(manufacturer){
 		def models= []
-		def modelListFull = Model.findAllByManufacturerAndModelStatus( manufacturerInstance,'full',[sort:'modelName',order:'asc'] )
-		def modelListValid =Model.findAllByManufacturerAndModelStatus(manufacturerInstance,'valid',[sort:'modelName',order:'asc'] )
-		def modelListNew = Model.findAllByManufacturerAndModelStatusInList(manufacturerInstance,['new','',null],[sort:'modelName',order:'asc'] )
+		def modelListFull = Model.findAllByManufacturerAndModelStatus( manufacturer,'full',[sort:'modelName',order:'asc'] )
+		def modelListValid =Model.findAllByManufacturerAndModelStatus(manufacturer,'valid',[sort:'modelName',order:'asc'] )
+		def modelListNew = Model.findAll("from Model where manufacturer = :manu and (modelStatus is null or modelStatus in ('new', '')) order by modelName asc",
+			[manu:manufacturer])
+		
 		models = modelListFull+modelListValid+modelListNew
 		
 		return models

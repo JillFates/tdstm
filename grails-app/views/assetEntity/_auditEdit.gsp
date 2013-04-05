@@ -44,7 +44,7 @@ $(document).ready(function() {
 	<tr class="prop bladeLabel">
 		<td class="label">Blade Position</td>
 		<td class="label">
-			<input type="text" ${source=='1' ? 'name="sourceBladePosition" value="'+assetEntityInstance.sourceBladePosition +'"' : 'name="targetBladePosition" value="'+assetEntityInstance.targetBladePosition+'"'} />
+			<input type="text" ${source=='1' ? 'name="sourceBladePosition" value="'+(assetEntityInstance.sourceBladePosition ?:'') +'"' : 'name="targetBladePosition" value="'+(assetEntityInstance.targetBladePosition ?:'')+'"'} />
 		</td>
 	</tr>
 	<tr class="prop">
@@ -69,14 +69,14 @@ $(document).ready(function() {
 		<div id="modelEditId">
 	    <g:select id="model" name ="model.id" from="${models}" value= "${assetEntityInstance.model?.id}" optionKey="id" optionValue="modelName"  
 	    	noSelection="${[null:' Unassigned']}" tabindex="14"
-		  	 optionValue="${{it.modelName+' '+(it.modelStatus =='new' ? '?' :'')}}" onChange="setType(this.value)"/>
+		  	 optionValue="${{it.modelName+' '+(it.modelStatus =='new' || !it.modelStatus ? '?' :'')}}" onChange="setType(this.value,'Edit')"/>
 		</div>
 		</td>
 	</tr>
 	<tr class="prop">
 		<td class="label">Type</td>
 		<td class="label">
-			<g:select from="${assetTypeOptions}" id="assetTypeId" name="assetType" value="${assetEntityInstance.assetType}" 
+			<g:select from="${assetTypeOptions}" id="assetTypeEditId" name="assetType" value="${assetEntityInstance.assetType}" 
 			onChange="selectManufacturer(this.value, 'Edit')" tabindex="12" />
 		</td>
 	</tr>
@@ -90,7 +90,7 @@ $(document).ready(function() {
 		<td class="label">Rack</td>
 		<td class="label" nowrap="nowrap">
 			<input type="text" ${source=='1' ? 'name="sourceRack" value="'+assetEntityInstance.sourceRack+'"' : 'name="targetRack" value="'+assetEntityInstance.targetRack+'"'} size="6" > 
-			Pos :<input type="text" ${source=='1' ? 'name="sourceRackPosition" value="'+assetEntityInstance.sourceRackPosition+'"' : 'name="targetRackPosition" value="'+assetEntityInstance.targetRackPosition+'"'} size="6">
+			Pos :<input type="text" ${source=='1' ? 'name="sourceRackPosition" value="'+(assetEntityInstance.sourceRackPosition ?:'')+'"' : 'name="targetRackPosition" value="'+(assetEntityInstance.targetRackPosition ?:'')+'"'} size="6">
 		</td>
 	</tr>
 	<tr class="prop">

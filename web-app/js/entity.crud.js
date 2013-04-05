@@ -478,16 +478,20 @@ function createAuditPage(type,source,rack,roomName,location,position){
 				$("#auditLocationId").val(location)
 				$("#auditRoomId").val(roomName)
 				$("#assetTypeId").val(type)
-				$("#auditRackId").val(rack)
-				$("#auditPosId").val(position)
-				$("#auditLocationId").val(location)
+				$(".bladeLabel").hide()
+				$(".rackLabel").show()
 				if(source==0 && type!='Blade'){
 					$("#auditLocationId").attr("name","targetLocation")
 					$("#auditRoomId").attr("name","targetRoom")
 					$("#auditRackId").attr("name","targetRack")
 					$("#auditPosId").attr("name","targetRackPosition")
 					$("#sourceId").val("0")
-				}
+					$("#targetRack").val(rack)
+					$("#targetRackPosition").val(position)
+				} else if (source=="1" && type!='Blade'){
+					$("#sourceRack").val(rack)
+					$("#sourceRackPosition").val(position)
+				}				
 				$("#auditDetailViewId").show()
 		}}
 	)
@@ -502,6 +506,8 @@ function createBladeAuditPage(source,blade,position,manufacturer,assetType,asset
 				$("#assetTypeId").val(assetType)
 				$("#moveBundleId").val(moveBundleId)
 				$("#sourceId").val(source)
+				$(".bladeLabel").show()
+				$(".rackLabel").hide()
 				$("#auditDetailViewId").show()
 		}}
 	)
@@ -567,10 +573,10 @@ function getAssetType(val){
 	)
 }
 
-function setType(id){
+function setType(id, forWhom){
 	new Ajax.Request('../assetEntity/getAssetModelType?id='+id,{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
-			$("#assetTypeId").val(data.responseText)
+			$("#assetType"+forWhom+"Id").val(data.responseText)
 			manipulateFields(data.responseText)
 		}}
 	)	

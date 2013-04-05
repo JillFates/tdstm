@@ -60,14 +60,14 @@ $(document).ready(function() {
 		<td class="label"><b>Model</b></td>
 		<td class="label">
 		<div id="modelCreateId">
-	    <g:select id="model" name ="model.id" from="${models}" value= "${assetEntityInstance.model}" noSelection="${[null:' Unassigned']}" tabindex="14" 
-	  		optionKey="id" optionValue="${{it.modelName+' '+(it.modelStatus =='new' ? '?' :'')}}" onChange="setType(this.value)"/>
+	    <g:select id="model" name ="model.id" from="${models}" value="${assetEntityInstance.model}" noSelection="${[null:' Unassigned']}" tabindex="14" 
+	  		optionKey="id" optionValue="${{it.modelName+' '+(it.modelStatus =='new' || !it.modelStatus ? '?' :'')}}" onChange="setType(this.value,'Create')"/>
 	 	</div>
 	</tr>
 	<tr class="prop">
 		<td class="label">Type</td>
 		<td class="label">
-			<g:select from="${assetTypeOptions}" id="assetTypeId" name="assetType" value="${assetEntityInstance.assetType}" 
+			<g:select from="${assetTypeOptions}" id="assetTypeCreateId" name="assetType" value="${assetEntityInstance.assetType}" 
 			onChange="selectManufacturer(this.value, 'Create')" tabindex="12" />
 		</td>
 	</tr>
@@ -80,8 +80,8 @@ $(document).ready(function() {
 	<tr class="prop rackLabel">
 		<td class="label">Rack</td>
 		<td class="label" nowrap="nowrap">
-			<input type="text" ${source=='1' ? 'name="sourceRack" ' : 'name="targetRack" '} size="6" > 
-			Pos :<input type="text" ${source=='1' ? 'name="sourceRackPosition" ' : 'name="targetRackPosition" '} size="6">
+			<input  type="text" ${source=='1' ? 'id="sourceRack" name="sourceRack" ' : 'id="targetRack" name="targetRack"'} size="6" > 
+			Pos :<input type="text" ${source=='1' ? 'id="sourceRackPosition" name="sourceRackPosition" ' : 'id="targetRackPosition" name="targetRackPosition" '} size="6">
 		</td>
 	</tr>
 	<tr class="prop">

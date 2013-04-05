@@ -63,7 +63,7 @@
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
-								<td ><g:select from="${assetTypeOptions}" id="assetTypeId" name="assetType" value="${assetType}" onChange="selectManufacturer(this.value, 'Edit')" tabindex="12"/></td>
+								<td ><g:select from="${assetTypeOptions}" id="assetTypeEditId" name="assetType" value="${assetEntityInstance.assetType}" onChange="selectManufacturer(this.value, 'Edit')" tabindex="12"/></td>
 								<td class="label" nowrap="nowrap"><label for="priority">Priority</label>
 								</td>
 								<td ><g:select id="priority" name ="priority" from="${priorityOption}" value= "${assetEntityInstance.priority}" noSelection="${['':' Please Select']}" tabindex="21"/>
@@ -86,7 +86,7 @@
 								</td>
 								 <td >
 								 <div id="manufacturerEditId">
-								   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${manufacturer?.id}" onChange="selectModel(this.value,'Edit')" optionKey="id" optionValue="name" noSelection="${[null:'Unassigned']}" tabindex="13"/>
+								   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${assetEntityInstance.manufacturer?.id}" onChange="selectModel(this.value,'Edit')" optionKey="id" optionValue="name" noSelection="${[null:'Unassigned']}" tabindex="13"/>
 								 </div>
 								</td>
 								<td class="label" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
@@ -110,8 +110,8 @@
 								</td>
 								<td>
 								<div id="modelEditId">
-								   <g:select id="model" name ="model.id" from="${models}" value= "${assetEntityInstance.model}" optionKey="id" optionValue="modelName"  noSelection="${[null:' Unassigned']}" tabindex="14"
-								   optionValue="${{it.modelName+' '+(it.modelStatus =='new' ? '?' :'')}}" onChange="setType(this.value)"/>
+								   <g:select id="model" name ="model.id" from="${models}" value= "${assetEntityInstance.model?.id}" optionKey="id" optionValue="modelName"  noSelection="${[null:' Unassigned']}" tabindex="14"
+								   optionValue="${{it.modelName+' '+(it.modelStatus =='new' || !it.modelStatus ? '?' :'')}}" onChange="setType(this.value, 'Edit')"/>
 								 </div>
 								</td>
 								<td class="label" nowrap="nowrap"><label for="os">OS</label></td>
