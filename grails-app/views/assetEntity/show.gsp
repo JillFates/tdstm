@@ -20,6 +20,14 @@ $(document).ready(function() {
 		$(".rackLabel").show()
 		$(".vmLabel").hide()
 	}
+	var prefVal = '${prefValue}'
+
+	if(prefVal == 'FALSE'){
+		$(".resolved").hide()
+	} else{
+		$(".resolved").show()
+	}
+	
 })
 </script>
  	<g:form method="post">
@@ -248,20 +256,26 @@ $(document).ready(function() {
 				<thead>
 				<tr>
 					<th nowrap>Action</th>
-					<th nowrap>Comment</th>
-					<th nowrap>Comment Type</th>
-					<th nowrap>Resolved</th>
+					<th nowrap></th>
+					<th nowrap>Task/comment</th>
+					<th nowrap>Status&nbsp;&nbsp;
+					<input type="checkbox" name="showAll" id="showAll" ${prefValue && prefValue == 'TRUE' ?  'value="1" checked="checked"'  : 'value="0"'} 
+					onchange="${remoteFunction(controller:'assetEntity', action:'setShowAllPreference',params:'\'selected=\'+ this.value')}" 
+					onclick="if(this.checked){this.value = 1; $('.resolved').show();$('#showEntityView').dialog('option', 'height', 'auto')} else {this.value = 0 ; $('.resolved').hide();$('#showEntityView').dialog('option', 'height', 'auto')}"/>
+					&nbsp;&nbsp;<label for="showAll">All</label></th>
 					<th nowrap>Category</th>  
+					<th nowrap>AssignedTo</th>
 				</tr>
 				</thead>
 				<tbody id="listCommentsTbodyIds">
 				<g:each status="i" in="${assetCommentList}"  var="commentList">
-				<tr style="cursor: pointer;">
+				<tr style="cursor: pointer;" class="${commentList.status == 'Completed' || commentList.status=='Pending' ? 'resolved' : 'ready' }">
 					<td><a href ="javascript:showComment(${commentList.id},'edit')" ><img src="${resource(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a></td>
+					<td onclick="javascript:showComment(${commentList.id},'show')" style="text-align: center;">${commentList.taskNumber ?:'c'}</td>
 					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.comment}</td>
-					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.commentType}</td>
-					<td ><g:if test ="${commentList.commentType =='issue' && commentList.isResolved == 1}"><g:checkBox name="myCheckbox" value="${true}" disabled="true"/></g:if><g:else>&nbsp</g:else></td>
+					<td onclick="javascript:showComment(${commentList.id},'show')">${commentList.status}</td>
 					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.category}</td>
+					<td onclick="javascript:showComment(${commentList.id},'show')">${commentList.assignedTo}/${commentList.role}</td>
 				</tr>
 				</g:each>
 				</tbody>

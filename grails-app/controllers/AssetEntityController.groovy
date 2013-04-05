@@ -2862,13 +2862,15 @@ class AssetEntityController {
 			dependentAssets = AssetDependency.findAll("from AssetDependency as a where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
 			supportAssets 	= AssetDependency.findAll("from AssetDependency as a where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
 		
+			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
+			
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 			
-			def paramsMap = [label:frontEndLabel, assetEntity:assetEntity, 
+			def paramsMap = [label:frontEndLabel, assetEntity:assetEntity,
 				supportAssets:supportAssets, dependentAssets:dependentAssets, 
 				redirectTo:params.redirectTo, project:project,
 				assetCommentList:assetCommentList,
-				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle]
+				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle , prefValue:prefValue ]
 		
 			if(params.redirectTo == "roomAudit") {
 				paramsMap << [source:params.source, assetType:params.assetType]
@@ -2877,7 +2879,13 @@ class AssetEntityController {
 			return paramsMap
 		}
 	}
-	
+	/**
+	 * Used to set showAllAssetTasks preference , which is used to show all or hide the inactive tasks
+	 */
+	def setShowAllPreference={
+		userPreferenceService.setPreference("showAllAssetTasks", params.selected=='1' ? 'TRUE' : 'FALSE')
+		render true
+	}
 	def edit ={
 		def assetEntityInstance = AssetEntity.get(params.id)
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
@@ -3060,18 +3068,15 @@ class AssetEntityController {
 	}
 	
 	/**
-	 * Sorting model list in asset Create and Edit page to display full or validated model first 
-	 * 	and after that mode which status is new or null .
+	 * 
 	 * @param manufacturer
-	 * @return sorted model list 
+	 * @return
 	 */
-	def getModelSortedByStatus(manufacturer){
+	def getModelSortedByStatus(manufacturerInstance){
 		def models= []
-		def modelListFull = Model.findAllByManufacturerAndModelStatus( manufacturer,'full',[sort:'modelName',order:'asc'] )
-		def modelListValid =Model.findAllByManufacturerAndModelStatus(manufacturer,'valid',[sort:'modelName',order:'asc'] )
-		def modelListNew = Model.findAll("from Model where manufacturer = :manu and (modelStatus is null or modelStatus in ('new', '')) order by modelName asc",
-			[manu:manufacturer])
-		
+		def modelListFull = Model.findAllByManufacturerAndModelStatus( manufacturerInstance,'full',[sort:'modelName',order:'asc'] )
+		def modelListValid =Model.findAllByManufacturerAndModelStatus(manufacturerInstance,'valid',[sort:'modelName',order:'asc'] )
+		def modelListNew = Model.findAllByManufacturerAndModelStatusInList(manufacturerInstance,['new','',null],[sort:'modelName',order:'asc'] )
 		models = modelListFull+modelListValid+modelListNew
 		
 		return models

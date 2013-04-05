@@ -188,9 +188,10 @@ class FilesController {
 				assetComment = "blank" 
 			}
 			
+			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 			[ filesInstance : filesInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList,
-			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(filesInstance)?.dependencyBundle, project:project]
+			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(filesInstance)?.dependencyBundle, project:project ,prefValue:prefValue]
 		}
 	}
 	def edit ={

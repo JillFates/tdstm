@@ -226,6 +226,7 @@ class ApplicationController {
 			} else {
 				assetComment = "blank"
 			}
+			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)	
 			def appMoveEvent = AppMoveEvent.findAllByApplication(applicationInstance)
 			def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
@@ -235,7 +236,7 @@ class ApplicationController {
 			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, 
 			  redirectTo : params.redirectTo, assetComment:assetComment, assetCommentList:assetCommentList,
 			  appMoveEvent:appMoveEvent, moveEventList:moveEventList, appMoveEvent:appMoveEventlist, project:project,
-			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle]
+			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle ,prefValue:prefValue]
 		}
 	}
 

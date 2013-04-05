@@ -161,9 +161,10 @@ class DatabaseController {
 			}
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 			
+			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
 			[ databaseInstance : databaseInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo, 
 			  assetComment:assetComment, assetCommentList:assetCommentList,dependencyBundleNumber:AssetDependencyBundle.findByAsset(databaseInstance)?.dependencyBundle,
-			  project:project]
+			  project:project ,prefValue:prefValue]
 		}
 	}
 	

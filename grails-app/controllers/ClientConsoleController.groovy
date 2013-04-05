@@ -29,6 +29,7 @@ class ClientConsoleController {
 	 def jdbcTemplate
 	 def pmoAssetTrackingService
 	 def taskService
+	 def assetEntityService
 	 def index = { 
 		 redirect(action:list,params:params)
 	 }
@@ -299,14 +300,7 @@ class ClientConsoleController {
 				}
 				attributesList << [attributeCode: attribute.attributeCode, frontendLabel:frontendLabel]
 			}
-			def servers = AssetEntity.findAllByAssetTypeAndProject('Server',project)
-			def applications = Application.findAllByAssetTypeAndProject('Application',project)
-			def dbs = Database.findAllByAssetTypeAndProject('Database',project)
-			def files = Files.findAllByAssetTypeAndProject('Files',project)
-			def networks = AssetEntity.findAllByAssetTypeAndProject('Network',project)
-			
-			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+			def entities = assetEntityService.entityInfo( project )
 			
             return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
 				column1List:column1List, column2List:column2List,column3List:column3List, column4List:column4List,projectId:project.id, lastPoolTime : lastPoolTime,
@@ -317,10 +311,10 @@ class ClientConsoleController {
                 clientConsoleBulkEditHasPermission:RolePermissions.hasPermission("ClientConsoleBulkEdit"),
 				clientConsoleCommentHasPermission:RolePermissions.hasPermission("ClientConsoleComment"),
 				clientConsoleCheckBoxHasPermission:RolePermissions.hasPermission("ClientConsoleCheckBox"),
-				columns:columns, assetsInView:assetsInView, totalAssets:totalAssets, attributesList:attributesList, servers : servers, 
-				applications : applications, dbs : dbs, files : files,networks:networks, assetDependency: new AssetDependency(), project:project,
-				showAllOption:showAllOption, bundleId:bundleId, staffRoles:taskService.getRolesForStaff(),dependencyType:dependencyType,
-				dependencyStatus:dependencyStatus ]
+				columns:columns, assetsInView:assetsInView, totalAssets:totalAssets, attributesList:attributesList, servers: entities.servers, 
+				applications: entities.applications, dbs : entities.dbs, files : entities.files, networks:entities.networks, assetDependency: new AssetDependency(), project:project,
+				showAllOption:showAllOption, bundleId:bundleId, staffRoles:taskService.getRolesForStaff(),dependencyType:entities.dependencyType,
+				dependencyStatus:entities.dependencyStatus ]
 	    	
 		 }
 	}
