@@ -499,7 +499,7 @@ function updateXYPositions(id){
 	$("#roomYId_"+rackId).val(y)
 	$("#roomXDivId_"+rackId).val(x)
 	$("#roomYDivId_"+rackId).val(y)
-
+	
 }
 
 function addShadowCss(id, event){
@@ -584,7 +584,6 @@ function objectSelectedOff(id){
 }
 
 function updateRackStyle(id, frontValue, rackTypeValue){
-    alert(frontValue)
 	$("#rack_"+id).removeAttr("class")
 	if(rackTypeValue == "Rack"){
 		$("#rack_"+id).addClass("rack_highlight_no_"+frontValue)
