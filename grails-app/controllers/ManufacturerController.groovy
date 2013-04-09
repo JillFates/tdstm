@@ -15,6 +15,7 @@ class ManufacturerController {
     def jdbcTemplate
 	def sessionFactory
 	def securityService
+	def userPreferenceService
 	
     def index = { redirect(action:list,params:params) }
 
@@ -22,46 +23,41 @@ class ManufacturerController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
     def list = {
-        
-        if(!params.sort){ 
-        	params.sort = 'name'
-			params.order = 'asc'
-        }
-		boolean filter = params.filter
-		if(filter){
-			session.modelFilters.each{
-				if(it.key.contains("tag")){
-					request.parameterMap[it.key] = [session.modelFilters[it.key]]
-				}
-			}
-		} else {
-			session.modelFilters = params
-		}
-		def manufacturerList =  new ArrayList()
-        def manufacturersList = Manufacturer.list( params )
-		manufacturersList.each{manufacturer->
-			AssetEntityBean assetBeanInstance = new AssetEntityBean();
-			assetBeanInstance.setId(manufacturer.id)
-			assetBeanInstance.setName(manufacturer.name)
-			assetBeanInstance.setDescription(manufacturer.description)
-			assetBeanInstance.setAka(WebUtil.listAsMultiValueString(ManufacturerAlias.findAllByManufacturer( manufacturer )?.name))
-			assetBeanInstance.setModelCount(manufacturer.modelsCount)
-			assetBeanInstance.setCount(AssetEntity.countByManufacturer(manufacturer))
-			
-			manufacturerList.add(assetBeanInstance)
-		}
-		
-		
-        TableFacade tableFacade = new TableFacadeImpl("tag",request)
-        tableFacade.items = manufacturerList
-        Limit limit = tableFacade.limit
-		if(limit.isExported()){
-            tableFacade.setExportTypes(response,limit.getExportType())
-            tableFacade.setColumnProperties("name","aka","description")
-            tableFacade.render()
-        }else
-            return [manufacturersList : manufacturerList]
+		return 
     }
+  
+	/**
+	 * This method is used by JQgrid to load manufacturerList
+	 */
+	def listJson={
+		def sortIndex = params.sidx ?: 'modelName'
+		def sortOrder  = params.sord ?: 'asc'
+		def maxRows = Integer.valueOf(params.rows)
+		def currentPage = Integer.valueOf(params.page) ?: 1
+		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		
+		session.MAN = [:]
+		def manufacturers = Manufacturer.createCriteria().list(max: maxRows, offset: rowOffset) {
+			if (params.name)
+				ilike('name', "%${params.name}%")
+			if (params.description)
+				ilike('description', "%${params.description}%")
+			
+			order(sortIndex, sortOrder).ignoreCase()
+		}
+
+		def totalRows = manufacturers.totalCount
+		def numberOfPages = Math.ceil(totalRows / maxRows)
+
+		def results = manufacturers?.collect { [ cell: [ it.name, ManufacturerAlias.findAllByManufacturer( it )?.name,it.description, it.modelsCount,
+					AssetEntity.countByManufacturer(it)], id: it.id,
+			]}
+
+		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
+
+		render jsonData as JSON
+		
+	}
 
     def show = {
         def manufacturerInstance = Manufacturer.get( params.id )

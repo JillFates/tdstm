@@ -26,7 +26,9 @@ class ModelController {
 	//Initialize services
     def jdbcTemplate
 	def assetEntityAttributeLoaderService 
-    def sessionFactory 
+    def sessionFactory
+	def securityService
+	def userPreferenceService
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -35,47 +37,55 @@ class ModelController {
     }
 
     def list = {
-		boolean filter = params.filter
-		if(filter){
-			session.modelFilters.each{
-				if(it.key.contains("tag")){
-					request.parameterMap[it.key] = [session.modelFilters[it.key]]
-				}
-			}
-		} else {
-			session.modelFilters = params
-		}
-       // params.max = Math.min(params.max ? params.int('max') : 25, 100)
-		if(!params.sort) params.sort = 'modelName'
-    	if(!params.order) params.order = 'asc'
-		def modelsList
-		if(params.sort == 'connector'){
-			String hql = '''
-				SELECT m.id
-				FROM Model m LEFT JOIN m.modelConnectors AS connector 
-				GROUP BY m.id
-				ORDER BY COUNT(connector)
-			'''
-			hql += params.order
-			def offset = params.offset ? Integer.parseInt( params.offset ) : 0
-			def ids = Model.executeQuery(hql,[ max : params.max, offset: offset ])
-			modelsList = Model.getAll(ids)
-		} else {
-			modelsList = Model.list(params)
-		}
-        TableFacade tableFacade = new TableFacadeImpl("tag",request)
-        tableFacade.items = modelsList
-        Limit limit = tableFacade.limit
-		if(limit.isExported()){
-            tableFacade.setExportTypes(response,limit.getExportType())
-            tableFacade.setColumnProperties("modelName","manufacturer","description","assetType","powerDesign","noOfConnectors")
-            tableFacade.render()
-        }else
-            return [modelsList : modelsList]
-        
-       // [modelInstanceList: modelsList, modelInstanceTotal: Model.count()]
+		return 
     }
+    
+	/**
+	 * This method is used by JQgrid to load modelList
+	 */
+	def listJson = {
+		def sortIndex = params.sidx ?: 'modelName'
+		def sortOrder  = params.sord ?: 'asc'
+		def maxRows = Integer.valueOf(params.rows)
+		def currentPage = Integer.valueOf(params.page) ?: 1
+		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		def project = securityService.getUserCurrentProject()
+		
+		def manuList = params.manufacturer ? Manufacturer.findAllByNameIlike("%${params.manufacturer}%"): []
+		def powers=params.powerUse ? Model.findAll("from Model where powerUse like '%${params.powerUse}%'").powerUse :[]
+		def sorceTds=params.sourceTDS ? Model.findAll("from Model where sourceTDS like '%${params.sourceTDS}%'").sourceTDS :[]
+		
+        def models = Model.createCriteria().list(max: maxRows, offset: rowOffset) {
+				if (params.modelName)
+					ilike('modelName', "%${params.modelName}%")
+				if (params.manufacturer)
+					'in' ('manufacturer', manuList)
+				if (params.description)
+					ilike('description', "%${params.description}%")
+				if (params.assetType)
+					ilike('assetType', "%${params.assetType}%")
+				if (powers)
+					'in'('powerUse', powers)
+				if (sorceTds)
+					'in'('sourceTDS',sorceTds)
+				if (params.modelStatus)
+					ilike('modelStatus', "%${params.modelStatus}%")
+	
+				order(sortIndex, sortOrder).ignoreCase()
+			}
 
+		def totalRows = models.totalCount
+		def numberOfPages = Math.ceil(totalRows / maxRows)
+
+		def results = models?.collect { [ cell: [it.modelName, it.manufacturer?.name, it.description, it.assetType,
+					it.powerUse, it.noOfConnectors, it.assetsCount, it.sourceTDSVersion, it.sourceTDS, it.modelStatus], id: it.id,
+			]}
+
+		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
+
+		render jsonData as JSON
+    }
+	
     def create = {
     	def modelId = params.modelId
         def modelInstance = new Model()
