@@ -273,6 +273,9 @@ th.desc a {
     text-align: left;
     width: 85%;
 }
+.prop .valueNW {
+    text-align: left;
+}
 
 .prop .bundle {
     text-align: left;
