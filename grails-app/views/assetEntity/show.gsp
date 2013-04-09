@@ -255,16 +255,16 @@ $(document).ready(function() {
 				<table id="listCommentsTables">
 				<thead>
 				<tr>
-					<th nowrap>Action</th>
-					<th nowrap></th>
+					<th nowrap style="Width:40px;">Action</th>
+					<th nowrap style="Width:40px;"></th>
 					<th nowrap>Task/comment</th>
-					<th nowrap>Status&nbsp;&nbsp;
+					<th nowrap style="Width:100px;">Status&nbsp;(&nbsp;
 					<input type="checkbox" name="showAll" id="showAll" ${prefValue && prefValue == 'TRUE' ?  'value="1" checked="checked"'  : 'value="0"'} 
 					onchange="${remoteFunction(controller:'assetEntity', action:'setShowAllPreference',params:'\'selected=\'+ this.value')}" 
 					onclick="if(this.checked){this.value = 1; $('.resolved').show();$('#showEntityView').dialog('option', 'height', 'auto')} else {this.value = 0 ; $('.resolved').hide();$('#showEntityView').dialog('option', 'height', 'auto')}"/>
-					&nbsp;&nbsp;<label for="showAll">All</label></th>
-					<th nowrap>Category</th>  
-					<th nowrap>AssignedTo</th>
+					&nbsp;<label for="showAll">All )</label></th>
+					<th nowrap style="Width:50px;">Category</th>  
+					<th nowrap style="Width:150px;">Assigned To</th>
 				</tr>
 				</thead>
 				<tbody id="listCommentsTbodyIds">
