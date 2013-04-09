@@ -8,40 +8,41 @@
 					<tbody>
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="assetName">Name</label></td>
-							<td style="font-weight:bold;">${databaseInstance?.assetName}</td>
+							<td class="valueNW" style="font-weight:bold;">${databaseInstance?.assetName}</td>
 							<td class="label" nowrap="nowrap">Description</td>
-							<td colspan="5">${databaseInstance.description}</td>
+							<td class="valueNW" colspan="5">${databaseInstance.description}</td>
 						</tr>
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
-							<td>${databaseInstance?.assetType}</td>
+							<td class="valueNW">${databaseInstance?.assetType}</td>
 							<td class="label" nowrap="nowrap"><label for="supportType">Support</label></td>
-							<td>${databaseInstance?.supportType}</td>
+							<td class="valueNW">${databaseInstance?.supportType}</td>
 							<td class="label" nowrap="nowrap"><label for="environment">Environment</label></td>
-							<td colspan="3">${databaseInstance?.environment}</td>
+							<td class="valueNW" colspan="3">${databaseInstance?.environment}</td>
 						</tr>
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="dbFormat">Format</label></td>
-							<td>${databaseInstance?.dbFormat}</td>
+							<td class="valueNW">${databaseInstance?.dbFormat}</td>
 							<td class="label" nowrap="nowrap">Retire</td>
-							<td><tds:convertDate date="${databaseInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
-							</td>
+							<td class="valueNW"><tds:convertDate date="${databaseInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
 							<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-							<td colspan="3">${databaseInstance?.moveBundle} / ${dependencyBundleNumber}</td>
+							<td class="valueNW" colspan="3">${databaseInstance?.moveBundle} / ${dependencyBundleNumber}</td>
 						</tr>
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="dbSize">Size</label></td>
-							<td>${databaseInstance?.dbSize}</td>
+							<td class="valueNW">${databaseInstance?.dbSize}</td>
 							<td class="label" nowrap="nowrap">Maint Exp.</td>
-							<td><tds:convertDate date="${databaseInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
+							<td class="valueNW"><tds:convertDate date="${databaseInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
 							<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
-							<td colspan="3">${databaseInstance?.planStatus}</td>
+							<td class="valueNW" colspan="3">${databaseInstance?.planStatus}</td>
 						</tr>
 						<tr>
-							<td class="label" nowrap="nowrap"><label>Version</label></td><td></td>
-							<td class="label" nowrap="nowrap"><label>SME1</label></td><td></td>
+							<td class="label" nowrap="nowrap"><label>Version</label></td>
+							<td></td>
+							<td class="label" nowrap="nowrap"><label>SME1</label></td>
+							<td></td>
 							<td class="label">Validation</td>
-							<td colspan="3">${databaseInstance.validation}</td>
+							<td class="valueNW" colspan="3">${databaseInstance.validation}</td>
 						</tr>
 						<g:render template="../assetEntity/customShow" model="[assetEntity:databaseInstance, 'project':project]"></g:render>
 					</tbody>
@@ -142,16 +143,16 @@
 				<table id="listCommentsTables">
 				<thead>
 				<tr>
-					<th nowrap style="Width:40px;">Action</th>
-					<th nowrap style="Width:40px;"></th>
+					<th nowrap class="headerwidth3"></th>
+					<th nowrap class="headerwidth3">#</th>
 					<th nowrap>Task/comment</th>
-					<th nowrap style="Width:100px;">Status&nbsp;(&nbsp;
+					<th nowrap class="headerwidth12">Status&nbsp;(&nbsp;
 					<input type="checkbox" name="showAll" id="showAll" ${prefValue && prefValue == 'TRUE' ?  'value="1" checked="checked"'  : 'value="0"'} 
 					onchange="${remoteFunction(controller:'assetEntity', action:'setShowAllPreference',params:'\'selected=\'+ this.value')}" 
 					onclick="if(this.checked){this.value = 1; $('.resolved').show();$('#showEntityView').dialog('option', 'height', 'auto')} else {this.value = 0 ; $('.resolved').hide();$('#showEntityView').dialog('option', 'height', 'auto')}"/>
 					&nbsp;<label for="showAll">All )</label></th>
-					<th nowrap style="Width:50px;">Category</th>  
-					<th nowrap style="Width:150px;">Assigned To</th>
+					<th nowrap class="headerwidth6">Category</th>  
+					<th nowrap class="headerwidth20">Assigned To</th>
 				</tr>
 				</thead>
 				<tbody id="listCommentsTbodyIds">
@@ -162,7 +163,7 @@
 					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.comment}</td>
 					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.status}</td>
 					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.category}</td>
-					<td onclick="javascript:showComment(${commentList.id},'show')">${commentList.assignedTo}/${commentList.role}</td>
+					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.assignedTo}/${commentList.role}</td>
 				</tr>
 				</g:each>
 				</tbody>
@@ -182,7 +183,7 @@
 					   <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>
 					</g:if>
 					<g:else>
-					   <span class="button"><input id="deleteId"	 name="deleteId"  class="save" value="Delete" onclick=" deleteAsset($('#databaseId').val(),'database')" value="Delete" /> </span>
+					   <span class="button"><input id="deleteId" name="deleteId" class="save" value="Delete" onclick=" deleteAsset($('#databaseId').val(),'database')" /> </span>
 					</g:else>
 					</tds:hasPermission>
 					<tds:hasPermission permission="CommentCrudView">	

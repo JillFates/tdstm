@@ -612,6 +612,30 @@
 	background-color: black;
 }
 
+/* asset detail styles */
+.headerwidth3 {
+	width: 30px;
+}
+.headerwidth4 {
+	width: 40px;
+}
+.headerwidth6 {
+	width: 60px;
+}
+.headerwidth10 {
+	width: 100px;
+}
+.headerwidth12 {
+	width: 120px;
+}
+.headerwidth13 {
+	width: 130px;
+}
+.headerwidth20 {
+	width: 200px;
+}
+
+
 /* dashboards label display for IE only */
 	.verticaltext {
 	writing-mode: tb-rl;

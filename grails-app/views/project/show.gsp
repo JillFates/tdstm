@@ -33,95 +33,59 @@
     <div class="dialog" id="updateShow">
       <table style="border-style:solid solid none solid;">
         <tbody>
-
-          <tr class="prop">
-            <td valign="top" class="name">Associated Client:</td>
-
-            <td valign="top" class="valueNW">${projectInstance?.client}</td>
-
-            <td valign="top" class="name">Project Code:</td>
-
-            <td valign="top" class="valueNW">${fieldValue(bean:projectInstance, field:'projectCode')}</td>
-
-          </tr>
-
-          <tr class="prop">
-            <td valign="top" class="name">Project Name:</td>
-
-            <td valign="top" class="valueNW">${fieldValue(bean:projectInstance, field:'name')}</td>
-
-	       	<td valign="top" class="name">Project Type:</td>
-
-          	<td valign="top" class="valueNW">${fieldValue(bean:projectInstance, field:'projectType')}</td>
-          </tr>
-
-          <tr class="prop">
-            <td valign="top" class="name">Description:</td>
-
-            <td valign="top" class="valueNW"><textarea cols="40"  rows="3" readOnly="true" >${fieldValue(bean:projectInstance, field:'description')}</textarea></td>
-
-            <td valign="top" class="name">Comment:</td>
-
-            <td valign="top" class="valueNW"><textarea cols="40"  rows="3" readOnly="true" >${fieldValue(bean:projectInstance, field:'comment')}</textarea></td>
-
-          </tr>
-
-          <tr class="prop">
-            <td valign="top" class="name">Start Date:</td>
-
-            <td valign="top" class="valueNW"><tds:convertDate date="${projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-
-            <td valign="top" class="name">Completion Date:</td>
-
-            <td valign="top" class="valueNW"><tds:convertDate date="${projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-
-          </tr>
-
-          <tr class="prop">
-            <td valign="top" class="name">Associated Partner:</td>
-
-            <td valign="top" class="valueNW">${projectPartner?.partyIdTo}</td>
-
-            <td valign="top" class="name">Partner Image:</td>
-
-			<g:if test="${projectLogoForProject}">
-
-            <td valign="top" class="valueNW"><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;"/></td>
-
-			</g:if>
-
-          </tr>
-
-          <tr class="prop">
-            <td valign="top" class="name">Project Manager:</td>
-            <td valign="top" class="valueNW">
-
-                <g:if test="${projectManager?.partyIdTo?.lastName}">${projectManager?.partyIdTo?.lastName},</g:if>
-
-                <g:if test="${projectManager?.partyIdTo?.firstName}"> ${projectManager?.partyIdTo?.firstName}</g:if>
-
-                <g:if test="${projectManager?.partyIdTo?.title}"> - ${projectManager?.partyIdTo?.title}</g:if>
-
-            </td>
-
-            <td valign="top" class="name">Event Manager:</td>
-            <td valign="top" class="valueNW">
-
-	            <g:if test="${moveManager?.partyIdTo?.lastName}">${moveManager?.partyIdTo?.lastName},</g:if>
-
-	            <g:if test="${moveManager?.partyIdTo?.firstName}"> ${moveManager?.partyIdTo?.firstName}</g:if>
-
-	            <g:if test="${moveManager?.partyIdTo?.title}"> - ${moveManager?.partyIdTo?.title}</g:if>
-
-            </td>
-          </tr>
-          <tr class="prop">
+		<tr class="prop">
+			<td valign="top" class="name">Associated Client:</td>
+			<td valign="top" class="valueNW">${projectInstance?.client}</td>
+			<td valign="top" class="name">Project Code:</td>
+			<td valign="top" class="valueNW">${fieldValue(bean:projectInstance, field:'projectCode')}</td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name">Project Name:</td>
+			<td valign="top" class="valueNW">${fieldValue(bean:projectInstance, field:'name')}</td>
+			<td valign="top" class="name">Project Type:</td>
+			<td valign="top" class="valueNW">${fieldValue(bean:projectInstance, field:'projectType')}</td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name">Description:</td>
+			<td valign="top" class="valueNW"><textarea cols="40"  rows="3" readOnly="true" >${fieldValue(bean:projectInstance, field:'description')}</textarea></td>
+			<td valign="top" class="name">Comment:</td>
+			<td valign="top" class="valueNW"><textarea cols="40"  rows="3" readOnly="true" >${fieldValue(bean:projectInstance, field:'comment')}</textarea></td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name">Start Date:</td>
+			<td valign="top" class="valueNW"><tds:convertDate date="${projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+			<td valign="top" class="name">Completion Date:</td>
+			<td valign="top" class="valueNW"><tds:convertDate date="${projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+		</tr>
+		<tr class="prop">
+          	<td valign="top" class="name">Associated Partner:</td>
+			<td valign="top" class="valueNW">${projectPartner?.partyIdTo}</td>
+			<td valign="top" class="name">Partner Image:</td>
+			<td valign="top" class="valueNW">
+				<g:if test="${projectLogoForProject}"><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;"/></g:if>
+			</td>
+		</tr>
+		<tr class="prop">
+			<td valign="top" class="name">Project Manager:</td>
+			<td valign="top" class="valueNW">
+				<g:if test="${projectManager?.partyIdTo?.lastName}">${projectManager?.partyIdTo?.lastName},</g:if>
+				<g:if test="${projectManager?.partyIdTo?.firstName}"> ${projectManager?.partyIdTo?.firstName}</g:if>
+				<g:if test="${projectManager?.partyIdTo?.title}"> - ${projectManager?.partyIdTo?.title}</g:if>
+			</td>
+			<td valign="top" class="name">Event Manager:</td>
+			<td valign="top" class="valueNW">
+				<g:if test="${moveManager?.partyIdTo?.lastName}">${moveManager?.partyIdTo?.lastName},</g:if>
+				<g:if test="${moveManager?.partyIdTo?.firstName}"> ${moveManager?.partyIdTo?.firstName}</g:if>
+				<g:if test="${moveManager?.partyIdTo?.title}"> - ${moveManager?.partyIdTo?.title}</g:if>
+			</td>
+		</tr>
+		<tr class="prop">
 			<td valign="top" class="name"><g:message code="project.customFieldsShown.label" default="Custom Fields Shown" />:</td>
 			<td valign="top" class="valueNW" colspan="3">${fieldValue(bean: projectInstance, field: "customFieldsShown")}</td>
-          </tr>
-          </tbody>
+		</tr>
+		</tbody>
       </table>
-      <table style="border-style:none solid none solid;">
+    <table style="border-style:none solid none solid;">
       <tbody>
       <tr>
       </tr>

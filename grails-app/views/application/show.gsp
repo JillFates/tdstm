@@ -5,157 +5,90 @@
 				<table>
 					<tbody>
 						<tr>
-							<td class="label" nowrap="nowrap"><label for="assetName">Name</label>
-							</td>
-							<td style="font-weight:bold;">
-								${applicationInstance.assetName}
-							</td>
+							<td class="label" nowrap="nowrap"><label for="assetName">Name</label></td>
+							<td style="font-weight:bold;">${applicationInstance.assetName}</td>
 							<td class="label" nowrap="nowrap">Description</td>
-							<td colspan="3">${applicationInstance.description}</td>
+							<td colspan="5">${applicationInstance.description}</td>
 						</tr>
 						<tr>
-							<td class="label" nowrap="nowrap"><label for="assetType">Type</label>
-							</td>
-							<td>
-								${applicationInstance.assetType}
-							</td>
-							<td class="label" nowrap="nowrap"><label for="supportType">Support</label>
-							</td>
-							<td>
-								${applicationInstance.supportType}
-							</td>
-							<td class="label" nowrap="nowrap"><label for="appFunction">Function</label>
-							</td>
-							<td>
-								${applicationInstance.appFunction}
-							</td>
-							<td class="label" nowrap="nowrap"><label for="userCount">Users</label>
-							</td>
-							<td>${applicationInstance.userCount}</td>
+							<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
+							<td class="valueNW">${applicationInstance.assetType}</td>
+							<td class="label" nowrap="nowrap"><label for="supportType">Support</label></td>
+							<td class="valueNW">${applicationInstance.supportType}</td>
+							<td class="label" nowrap="nowrap"><label for="appFunction">Function</label></td>
+							<td class="valueNW">${applicationInstance.appFunction}</td>
+							<td class="label" nowrap="nowrap"><label for="userCount">Users</label></td>
+							<td class="valueNW">${applicationInstance.userCount}</td>
 						</tr>
 						<tr>
-							<td class="label" nowrap="nowrap"><label for="appVendor">Vendor</label>
-							</td>
-							<td>
-								${applicationInstance.appVendor}
-							</td>
-							<td class="label" nowrap="nowrap"><label for="sme">SME1</label>
-							</td>
-							<td>
-								${applicationInstance.sme}
-							</td>
-							<td class="label" nowrap="nowrap"><label for="environment">Environment</label>
-							</td>
-							<td>
-								${applicationInstance.environment}
-							</td>
+							<td class="label" nowrap="nowrap"><label for="appVendor">Vendor</label></td>
+							<td class="valueNW">${applicationInstance.appVendor}</td>
+							<td class="label" nowrap="nowrap"><label for="sme">SME1</label></td>
+							<td class="valueNW">${applicationInstance.sme}</td>
+							<td class="label" nowrap="nowrap"><label for="environment">Environment</label></td>
+							<td class="valueNW">${applicationInstance.environment}</td>
 							<td class="label" nowrap="nowrap"><label for="userLocations">User Location</label></td>
-							<td>
-								${applicationInstance.userLocations}
-							</td>
+							<td class="valueNW">${applicationInstance.userLocations}</td>
 						</tr>
 						<tr>
-							<td class="label" nowrap="nowrap"><label for="appVersion">Version</label>
-							</td>
-							<td>
-								${applicationInstance.appVersion}
-							</td>
-							<td class="label" nowrap="nowrap"><label for="sme2">SME2</label>
-							</td>
-							<td>
-								${applicationInstance.sme2}
-							</td>
-							<td class="label" nowrap="nowrap"><label for="criticality">Criticality</label>
-							</td>
-							<td>
-								${applicationInstance.criticality}
-							</td>
+							<td class="label" nowrap="nowrap"><label for="appVersion">Version</label></td>
+							<td class="valueNW">${applicationInstance.appVersion}</td>
+							<td class="label" nowrap="nowrap"><label for="sme2">SME2</label></td>
+							<td class="valueNW">${applicationInstance.sme2}</td>
+							<td class="label" nowrap="nowrap"><label for="criticality">Criticality</label></td>
+							<td class="valueNW">${applicationInstance.criticality}</td>
 							<td class="label" nowrap="nowrap"><label for="useFrequency">Use Frequency</label></td>
-							<td>
-								${applicationInstance.useFrequency}
-							</td>
+							<td class="valueNW">${applicationInstance.useFrequency}</td>
 						</tr>
 						<tr>
-							<td class="label" nowrap="nowrap"><label for="appTech">Tech.</label>
-							</td>
-							<td>
-								${applicationInstance.appTech}
-							</td>
+							<td class="label" nowrap="nowrap"><label for="appTech">Tech.</label></td>
+							<td class="valueNW">${applicationInstance.appTech}</td>
 							<td class="label" nowrap="nowrap"><label for="businessUnit">Bus Unit</label></td>
-							<td>
-								${applicationInstance.businessUnit}
-							</td>
-							<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label>
-							</td>
-							<td>
-								${applicationInstance.moveBundle} / ${dependencyBundleNumber}
-							</td>
-							</td>
+							<td class="valueNW">${applicationInstance.businessUnit}</td>
+							<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
+							<td class="valueNW">${applicationInstance.moveBundle} / ${dependencyBundleNumber}</td>
 							<td class="label" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label></td>
-							<td>
-								${applicationInstance.drRpoDesc}
-							</td>
+							<td class="valueNW">${applicationInstance.drRpoDesc}</td>
 						</tr>
 						<tr>
-							<td class="label" nowrap="nowrap"><label for="appSource">Source</label>
-							</td>
-							<td>
-								${applicationInstance.appSource}
-							</td>
-							<td class="label" nowrap="nowrap"><label for="appOwner">App Owner</label>
-							</td>
-							<td>
-								${applicationInstance.appOwner}
-							</td>
+							<td class="label" nowrap="nowrap"><label for="appSource">Source</label></td>
+							<td class="valueNW">${applicationInstance.appSource}</td>
+							<td class="label" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
+							<td class="valueNW">${applicationInstance.appOwner}</td>
 							<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
-							<td>
-								${applicationInstance.planStatus}
-							</td>
+							<td class="valueNW">${applicationInstance.planStatus}</td>
 							<td class="label" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label></td>
-							<td>${applicationInstance.drRtoDesc}
-							</td>
+							<td class="valueNW">${applicationInstance.drRtoDesc}</td>
 						</tr>
-						
 						<tr>
-							<td class="label" nowrap="nowrap"><label for="license">License</label>
-							</td>
-							<td>
-								${applicationInstance.license}
-							</td>
+							<td class="label" nowrap="nowrap"><label for="license">License</label></td>
+							<td class="valueNW">${applicationInstance.license}</td>
 							<td class="label" nowrap="nowrap">Retire</td>
 							<td><tds:convertDate
 									date="${applicationInstance?.retireDate}"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
 							<td class="label" nowrap="nowrap">Validation</td>
-							<td>${applicationInstance.validation}
-							</td>
+							<td>${applicationInstance.validation}</td>
 							<td class="label" nowrap="nowrap"><label for="testProc">Test Proc OK</label></td>
-							<td>${applicationInstance.testProc ? applicationInstance.testProc : '?'}
-							</td>
+							<td>${applicationInstance.testProc ? applicationInstance.testProc : '?'}</td>
 						</tr>
 						<tr>
 							<td></td>
 							<td></td>
 							<td class="label" nowrap="nowrap">Maint Exp.</td>
-							<td><tds:convertDate
+							<td class="valueNW"><tds:convertDate
 									date="${applicationInstance?.maintExpDate}" formate="12hrs"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
 							<td class="label" nowrap="nowrap"><label for="latency">Latency OK</label></td>
-							<td>
-								${applicationInstance.latency ? applicationInstance.latency : '?'}
-							</td>
+							<td class="valueNW">${applicationInstance.latency ? applicationInstance.latency : '?'}</td>
 							<td class="label" nowrap="nowrap"><label for="startupProc">Startup Proc OK</label></td>
-							<td>${applicationInstance.startupProc ? applicationInstance.startupProc : '?'}
-							</td>
+							<td class="valueNW">${applicationInstance.startupProc ? applicationInstance.startupProc : '?'}</td>
 						</tr>
-						
 						<g:render template="../assetEntity/customShow" model="['assetEntity':applicationInstance]"></g:render>
-						
 						<tr>
 							<td class="label" nowrap="nowrap"><label for="license">URL</label></td>
-							<td colspan="7"><a href="${applicationInstance.url}" style="color:#00E">${applicationInstance.url}</a>
-							</td>
+							<td class="valueNW" colspan="7"><a href="${applicationInstance.url}" style="color:#00E">${applicationInstance.url}</a></td>
 						</tr>
                         <tr>
 						   	<td class="label" nowrap="nowrap" ><label for="events">Event</label></td>
@@ -203,17 +136,17 @@
 								</td>
 								<g:if test="${support?.asset?.moveBundle!=applicationInstance.moveBundle && support.status == 'Validated' }" >
 									<td style="background-color: red">
-										     ${support?.asset?.moveBundle}
+										${support?.asset?.moveBundle}
 									</td>
 								 </g:if>
 								 <g:elseif test="${support?.asset?.moveBundle!=applicationInstance.moveBundle }" >
 									<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
-										    <b>${support?.asset?.moveBundle}</b>
+										<b>${support?.asset?.moveBundle}</b>
 									</td>
 								 </g:elseif>
 								 <g:else>
 								    <td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
-									   ${support?.asset?.moveBundle}
+										${support?.asset?.moveBundle}
 								    </td>
 								 </g:else>
 								<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
@@ -289,16 +222,16 @@
 				<table id="listCommentsTables">
 				<thead>
 				<tr>
-					<th nowrap style="Width:40px;">Action</th>
-					<th nowrap style="Width:40px;"></th>
+					<th nowrap class="headerwidth3"></th>
+					<th nowrap class="headerwidth3">#</th>
 					<th nowrap>Task/comment</th>
-					<th nowrap style="Width:100px;">Status&nbsp;(&nbsp;
+					<th nowrap class="headerwidth12">Status&nbsp;(&nbsp;
 					<input type="checkbox" name="showAll" id="showAll" ${prefValue && prefValue == 'TRUE' ?  'value="1" checked="checked"'  : 'value="0"'} 
 					onchange="${remoteFunction(controller:'assetEntity', action:'setShowAllPreference',params:'\'selected=\'+ this.value')}" 
 					onclick="if(this.checked){this.value = 1; $('.resolved').show();$('#showEntityView').dialog('option', 'height', 'auto')} else {this.value = 0 ; $('.resolved').hide();$('#showEntityView').dialog('option', 'height', 'auto')}"/>
 					&nbsp;<label for="showAll">All )</label></th>
-					<th nowrap style="Width:50px;">Category</th>  
-					<th nowrap style="Width:150px;">Assigned To</th>
+					<th nowrap class="headerwidth6">Category</th>  
+					<th nowrap class="headerwidth20">Assigned To</th>
 				</tr>
 				</thead>
 				<tbody id="listCommentsTbodyIds">
@@ -309,7 +242,7 @@
 					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.comment}</td>
 					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.status}</td>
 					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.category}</td>
-					<td onclick="javascript:showComment(${commentList.id},'show')">${commentList.assignedTo}/${commentList.role}</td>
+					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.assignedTo}/${commentList.role}</td>
 				</tr>
 				</g:each>
 				</tbody>
@@ -330,7 +263,7 @@
 					   <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>
 					</g:if>
 					<g:else>
-					   <span class="button"><input id="deleteId"	 name="deleteId"  class="save" value="Delete" onclick=" deleteAsset($('#applicationId').val(),'app')" value="Delete" /> </span>
+					   <span class="button"><input id="deleteId"	 name="deleteId"  class="save" value="Delete" onclick=" deleteAsset($('#applicationId').val(),'app')" /> </span>
 					</g:else>
 					</tds:hasPermission>
 					<tds:hasPermission permission="CommentCrudView">	

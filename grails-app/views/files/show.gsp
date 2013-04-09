@@ -6,56 +6,40 @@
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="assetName">Name</label></td>
 							<td style="font-weight:bold;">${filesInstance.assetName}</td>
-
 							<td class="label" nowrap="nowrap"><label for="description">Description</label></td>
-							<td colspan="3">${filesInstance.description}</td>
-
+							<td class="value" colspan="5">${filesInstance.description}</td>
 						</tr>
-
 						<tr class="prop">
-							<td class="label" nowrap="nowrap"><label for="assetType">App
-									Type</label></td>
-							<td>${filesInstance.assetType == 'Files' ? 'Storage' : filesInstance.assetType}</td>
-							
-							<td class="label" nowrap="nowrap"><label for="lun">LUN
-							</label></td>
-							<td>${filesInstance.LUN}</td>
-							
-
-							<td class="label" nowrap="nowrap"><label for="supportType">Support
-							</label></td>
-							<td>${filesInstance.supportType}</td>
-							<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label>
-							</td>
-							<td>${filesInstance.planStatus}</td>
+							<td class="label" nowrap="nowrap"><label for="assetType">App Type</label></td>
+							<td class="valueNW">${filesInstance.assetType == 'Files' ? 'Storage' : filesInstance.assetType}</td>
+							<td class="label" nowrap="nowrap"><label for="lun">LUN</label></td>
+							<td class="valueNW">${filesInstance.LUN}</td>
+							<td class="label" nowrap="nowrap"><label for="supportType">Support</label></td>
+							<td class="valueNW">${filesInstance.supportType}</td>
+							<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
+							<td class="valueNW">${filesInstance.planStatus}</td>
 						</tr>
-
 						<tr class="prop">
-							<td class="label" nowrap="nowrap"><label for="fileFormat">
-									Format </label></td>
-							<td>${filesInstance.fileFormat}</td>
-							<td class="label" nowrap="nowrap"><label for="environment">Environment
-							</label></td>
-							<td>${filesInstance.environment}</td>
-
-							<td class="label" nowrap="nowrap"><label for="fileSize">Size
-							</label></td>
-							<td>${filesInstance.fileSize}&nbsp;${filesInstance.sizeUnit}</td>
+							<td class="label" nowrap="nowrap"><label for="fileFormat">Format</label></td>
+							<td class="valueNW">${filesInstance.fileFormat}</td>
+							<td class="label" nowrap="nowrap"><label for="environment">Environment</label></td>
+							<td class="valueNW">${filesInstance.environment}</td>
+							<td class="label" nowrap="nowrap"><label for="fileSize">Size</label></td>
+							<td class="valueNW">${filesInstance.fileSize}&nbsp;${filesInstance.sizeUnit}</td>
 							<td class="label">Validation</td>
-							<td>${filesInstance.validation}</td>
+							<td class="valueNW">${filesInstance.validation}</td>
 						</tr>
 						<tr>
-							
-							
 						</tr>
 						<g:render template="../assetEntity/customShow" model="[assetEntity:filesInstance]"></g:render>
 					</tbody>
 				</table>
-			</div></td>
+			</div>
+		</td>
 	</tr>
 	<tr>
-	<td valign="top">
-		<div>
+		<td valign="top">
+			<div>
 			<h1>Supports:</h1>
 			<table style="width: 400px;">
 				<thead>
@@ -77,15 +61,13 @@
 							<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">${support?.asset?.assetName}</td>
 							<g:if test="${support?.asset?.moveBundle!=filesInstance.moveBundle && support.status == 'Validated' }" >
 							<td style="background-color: red"> ${support?.asset?.moveBundle}</td></g:if>
-						    <g:elseif test="${support?.asset?.moveBundle!=filesInstance.moveBundle }" >
+							<g:elseif test="${support?.asset?.moveBundle!=filesInstance.moveBundle }" >
 							<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
 								<b>${support?.asset?.moveBundle}</b>
 							</td>
 							</g:elseif>
 							<g:else>
-							<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
-							${support?.asset?.moveBundle}
-							</td>
+							<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">${support?.asset?.moveBundle}</td>
 							</g:else>
 							<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">${support.type}</td>
 							<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">${support.status}</td>
@@ -116,18 +98,16 @@
 								${dependent.dependent?.assetType  == 'Files' ? 'Storage' : dependent.dependent?.assetType}</td>
 							<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">${dependent.dependent?.assetName}</td>
 							<g:if test="${dependent.dependent?.moveBundle!=filesInstance.moveBundle && dependent.status == 'Validated' }" >
-									<td style="background-color: red">
-										     ${dependent.dependent?.moveBundle}
-									</td>
+									<td style="background-color: red">${dependent.dependent?.moveBundle}</td>
 								</g:if>
 								<g:elseif test="${dependent.dependent?.moveBundle!=filesInstance.moveBundle }" >
 									<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
-										    <b>${dependent.dependent?.moveBundle}</b>
+										<b>${dependent.dependent?.moveBundle}</b>
 									</td>
 								</g:elseif>
 								<g:else>
 								    <td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
-										   ${dependent.dependent?.moveBundle}
+										${dependent.dependent?.moveBundle}
 									</td>
 								</g:else>
 							<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">${dependent.type}</td>
@@ -146,16 +126,16 @@
 				<table id="listCommentsTables">
 				<thead>
 				<tr>
-					<th nowrap style="Width:40px;">Action</th>
-					<th nowrap style="Width:40px;"></th>
+					<th nowrap class="headerwidth3"></th>
+					<th nowrap class="headerwidth3">#</th>
 					<th nowrap>Task/comment</th>
-					<th nowrap style="Width:100px;">Status&nbsp;(&nbsp;
+					<th nowrap class="headerwidth12">Status&nbsp;(&nbsp;
 					<input type="checkbox" name="showAll" id="showAll" ${prefValue && prefValue == 'TRUE' ?  'value="1" checked="checked"'  : 'value="0"'} 
 					onchange="${remoteFunction(controller:'assetEntity', action:'setShowAllPreference',params:'\'selected=\'+ this.value')}" 
 					onclick="if(this.checked){this.value = 1; $('.resolved').show();$('#showEntityView').dialog('option', 'height', 'auto')} else {this.value = 0 ; $('.resolved').hide();$('#showEntityView').dialog('option', 'height', 'auto')}"/>
 					&nbsp;<label for="showAll">All )</label></th>
-					<th nowrap style="Width:50px;">Category</th>  
-					<th nowrap style="Width:150px;">Assigned To</th>
+					<th nowrap class="headerwidth6">Category</th>  
+					<th nowrap class="headerwidth20">Assigned To</th>
 				</tr>
 				</thead>
 				<tbody id="listCommentsTbodyIds">
@@ -166,7 +146,7 @@
 					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.comment}</td>
 					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.status}</td>
 					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.category}</td>
-					<td onclick="javascript:showComment(${commentList.id},'show')">${commentList.assignedTo}/${commentList.role}</td>
+					<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.assignedTo}/${commentList.role}</td>
 				</tr>
 				</g:each>
 				</tbody>
@@ -187,7 +167,7 @@
 					   <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>
 					</g:if>
 					<g:else>
-					   <span class="button"><input id="deleteId"	 name="deleteId"  class="save" value="Delete" onclick=" deleteAsset($('#filedeleteId').val(),'files')" value="Delete" /> </span>
+					   <span class="button"><input id="deleteId"	 name="deleteId"  class="save" value="Delete" onclick=" deleteAsset($('#filedeleteId').val(),'files')" /> </span>
 					</g:else>
 					</tds:hasPermission>
 					<tds:hasPermission permission="CommentCrudView">	
