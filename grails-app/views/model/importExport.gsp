@@ -54,7 +54,8 @@
             </thead>
             <tbody>
               <tr>
-				<td><label>Only TDS Models : </label> <g:checkBox id="checkImport" name="exportCheckbox" value="${true}" /></td>
+				<td><label>Only TDS Models : </label> <g:checkBox id="checkImport" name="exportCheckbox" value="1"
+				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" /></td>
 				<td style="padding-right: auto;" class="buttonR"><g:actionSubmit value="Export"  style ="margin-left: 102px;"/>
 			  </tr>             
               </tbody>

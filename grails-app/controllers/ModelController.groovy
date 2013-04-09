@@ -750,7 +750,10 @@ class ModelController {
 			def book = Workbook.createWorkbook( response.getOutputStream(), workbook )
 			
 			def manuSheet = book.getSheet("manufacturer")
-			def manufacturers = Model.findAll("FROM Model where sourceTDS = 1 GROUP BY manufacturer").manufacturer
+			def manufacturers = params.exportCheckbox ? Model.findAll("FROM Model where sourceTDS = 1 GROUP BY manufacturer").manufacturer :
+			 Manufacturer.findAll()
+			def dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
+			
 			for ( int r = 0; r < manufacturers.size(); r++ ) {
 				manuSheet.addCell( new Label( 0, r+1, String.valueOf(manufacturers[r].id )) )
 				manuSheet.addCell( new Label( 1, r+1, String.valueOf(manufacturers[r].name )) )
@@ -758,13 +761,8 @@ class ModelController {
 				manuSheet.addCell( new Label( 3, r+1, String.valueOf(manufacturers[r].description ? manufacturers[r].description : "" )) )
 			}
 			def modelSheet = book.getSheet("model")
-			def models = Model.findAllBySourceTDS(1)
-			if(params.exportCheckbox){
-				models = Model.findAllBySourceTDS(1)
-			} else {
-				models =Model.findAll()
-			}
-			
+			def models = params.exportCheckbox == '1' ? Model.findAllBySourceTDS(1) : Model.findAll()
+
 			for ( int r = 0; r < models.size(); r++ ) {
 				modelSheet.addCell( new Label( 0, r+1, String.valueOf(models[r].id )) )
 				modelSheet.addCell( new Label( 1, r+1, String.valueOf(models[r].modelName )) )
@@ -780,28 +778,32 @@ class ModelController {
 				modelSheet.addCell( new Label( 11, r+1, String.valueOf(models[r].powerNameplate ? models[r].powerNameplate : "" )) )
 				modelSheet.addCell( new Label( 12, r+1, String.valueOf(models[r].powerDesign ? models[r].powerDesign : "" )) )
 				modelSheet.addCell( new Label( 13, r+1, String.valueOf(models[r].powerUse ? models[r].powerUse : "" )) )
-				modelSheet.addCell( new Label( 14, r+1, String.valueOf(models[r].sourceTDSVersion ? models[r].sourceTDSVersion : 1 )) )
-				modelSheet.addCell( new Label( 15, r+1, String.valueOf(models[r].useImage == 1 ? "yes" : "no" )) )
-				modelSheet.addCell( new Label( 16, r+1, String.valueOf(models[r].usize ? models[r].usize : "")) )
-				modelSheet.addCell( new Label( 17, r+1, String.valueOf(models[r].height ? models[r].height : "")) )
-				modelSheet.addCell( new Label( 18, r+1, String.valueOf(models[r].weight ? models[r].weight : "")) )
-				modelSheet.addCell( new Label( 19, r+1, String.valueOf(models[r].depth ? models[r].depth : "")) )
-				modelSheet.addCell( new Label( 20, r+1, String.valueOf(models[r].width ? models[r].width : "")) )
-				modelSheet.addCell( new Label( 21, r+1, String.valueOf(models[r].layoutStyle ? models[r].layoutStyle: "")) )
-				modelSheet.addCell( new Label( 22, r+1, String.valueOf(models[r].productLine ? models[r].productLine :"")) )
-				modelSheet.addCell( new Label( 23, r+1, String.valueOf(models[r].modelFamily ? models[r].modelFamily :"")) )
-				modelSheet.addCell( new Label( 24, r+1, String.valueOf(models[r].endOfLifeDate ? models[r].endOfLifeDate :"")) )
-				modelSheet.addCell( new Label( 25, r+1, String.valueOf(models[r].endOfLifeStatus ? models[r].endOfLifeStatus :"")) )
-				modelSheet.addCell( new Label( 26, r+1, String.valueOf(models[r].createdBy ? models[r].createdBy :"")) )
-				modelSheet.addCell( new Label( 27, r+1, String.valueOf(models[r].updatedBy ? models[r].updatedBy :"")) )
-				modelSheet.addCell( new Label( 28, r+1, String.valueOf(models[r].validatedBy ? models[r].validatedBy : "")) )
-				modelSheet.addCell( new Label( 29, r+1, String.valueOf(models[r].sourceURL ? models[r].sourceURL :"")) )
-				modelSheet.addCell( new Label( 30, r+1, String.valueOf(models[r].modelStatus ? models[r].modelStatus:"")) )
-				modelSheet.addCell( new Label( 31, r+1, String.valueOf(models[r].modelScope ? models[r].modelScope :"")) )
+				modelSheet.addCell( new Label( 14, r+1, String.valueOf(models[r].roomObject==1 ? 'True' : 'False' )) )
+				modelSheet.addCell( new Label( 15, r+1, String.valueOf(models[r].sourceTDSVersion ? models[r].sourceTDSVersion : 1 )) )
+				modelSheet.addCell( new Label( 16, r+1, String.valueOf(models[r].useImage == 1 ? "yes" : "no" )) )
+				modelSheet.addCell( new Label( 17, r+1, String.valueOf(models[r].usize ? models[r].usize : "")) )
+				modelSheet.addCell( new Label( 18, r+1, String.valueOf(models[r].height ? models[r].height : "")) )
+				modelSheet.addCell( new Label( 19, r+1, String.valueOf(models[r].weight ? models[r].weight : "")) )
+				modelSheet.addCell( new Label( 20, r+1, String.valueOf(models[r].depth ? models[r].depth : "")) )
+				modelSheet.addCell( new Label( 21, r+1, String.valueOf(models[r].width ? models[r].width : "")) )
+				modelSheet.addCell( new Label( 22, r+1, String.valueOf(models[r].layoutStyle ? models[r].layoutStyle: "")) )
+				modelSheet.addCell( new Label( 23, r+1, String.valueOf(models[r].productLine ? models[r].productLine :"")) )
+				modelSheet.addCell( new Label( 24, r+1, String.valueOf(models[r].modelFamily ? models[r].modelFamily :"")) )
+				modelSheet.addCell( new Label( 25, r+1, String.valueOf(models[r].endOfLifeDate ? models[r].endOfLifeDate :"")) )
+				modelSheet.addCell( new Label( 26, r+1, String.valueOf(models[r].endOfLifeStatus ? models[r].endOfLifeStatus :"")) )
+				modelSheet.addCell( new Label( 27, r+1, String.valueOf(models[r].createdBy ? models[r].createdBy :"")) )
+				modelSheet.addCell( new Label( 28, r+1, String.valueOf(models[r].updatedBy ? models[r].updatedBy :"")) )
+				modelSheet.addCell( new Label( 29, r+1, String.valueOf(models[r].validatedBy ? models[r].validatedBy : "")) )
+				modelSheet.addCell( new Label( 30, r+1, String.valueOf(models[r].sourceURL ? models[r].sourceURL :"")) )
+				modelSheet.addCell( new Label( 31, r+1, String.valueOf(models[r].modelStatus ? models[r].modelStatus:"")) )
+				modelSheet.addCell( new Label( 32, r+1, String.valueOf(models[r].modelScope ? models[r].modelScope :"")) )
+				modelSheet.addCell( new Label( 33, r+1, String.valueOf(models[r].dateCreated ? dateFormatter.format(models[r].dateCreated) : '')) )
+				modelSheet.addCell( new Label( 34, r+1, String.valueOf(models[r].lastModified ? dateFormatter.format(models[r].lastModified) : '')) )
 
 			}
 			def connectorSheet = book.getSheet("connector")
-			def connectors = ModelConnector.findAll("FROM ModelConnector where model.sourceTDS = 1 order by model.id")
+			def connectors = params.exportCheckbox ? ModelConnector.findAll("FROM ModelConnector where model.sourceTDS = 1 order by model.id") : 
+				ModelConnector.findAll()
 			
 			for ( int r = 0; r < connectors.size(); r++ ) {
 				connectorSheet.addCell( new Label( 0, r+1, String.valueOf(connectors[r].id )) )
