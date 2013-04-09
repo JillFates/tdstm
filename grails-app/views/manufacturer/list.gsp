@@ -34,7 +34,7 @@ $(document).ready(function() {
 	$.jgrid.formatter.integer.thousandsSeparator='';
 	function myLinkFormatter (cellvalue, options, rowObjcet) {
 		var value = cellvalue ? cellvalue : ''
-		return '<a href="../manufacturer/show/'+options.rowId+'">'+value+'</a>'
+		return '<a href="../show/'+options.rowId+'">'+value+'</a>'
 	}
 });
 </script>
