@@ -831,7 +831,7 @@ class ModelController {
 			book.write()
 			book.close()
 		} catch( Exception ex ) {
-			flash.message = "Exception occurred while exporting data"+ex.printStackTrace()
+			flash.message = "Exception occurred while exporting data"+ex
 			redirect( controller:'model', action:"importExport")
 			return;
 		}
