@@ -37,6 +37,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 import groovy.time.TimeDuration
 import groovy.time.TimeCategory
+import groovy.text.GStringTemplateEngine as Engine
 
 class TaskService {
 
@@ -1281,7 +1282,6 @@ class TaskService {
 				// Now we can associate this new task as the latest task for the asset									
 				// assetsLatestTask.put(taskToLink.assetEntity.id, taskToLink)
 				
-				
 			} else {
 				log.info "linkTaskToLastAssetOrMilestone: isRequired=$isRequired, task.asset=${taskToLink.assetEntity}, assetsLatestTask=$assetsLatestTask"
 				linkTaskToMilestone( taskToLink )
@@ -1506,6 +1506,8 @@ class TaskService {
 						// Handle ACTION TaskSpecs (e.g. OnCart, offCart, QARAck) Tasks
 						isAction = true
 						switch(taskSpec.action.toLowerCase()) {
+							
+							// RollCall Tasks for each staff involved in the Move Event
 							case 'rollcall':
 								def rcTasks = createRollcallTasks( moveEvent, lastTaskNum, whom, recipeId, taskSpec )
 								if (rcTasks.size() > 0) {
@@ -1520,6 +1522,23 @@ class TaskService {
 								}
 								out.append("${rcTasks.size()} Roll Call tasks were created<br/>")
 								break
+								
+							// Create a task for each Rack that is associated with Assets in the filter and connect them 
+							// with the appropriate predecessors.
+							case 'rack':
+								def rackTasks = createRackTasks( moveEvent, lastTaskNum, whom, recipeId, taskSpec, groups, exceptions)
+								if (rackTasks.size() > 0) {
+									rackTasks.each() { rct ->
+										taskList[rct.id] = rct
+									}
+									tasksNeedingPredecessors.addAll(rackTasks)
+									lastTaskNum = rackTasks.last().taskNumber
+									mapMode = 'MULTI_ASSET_DEP_MODE'
+								} else {
+									exceptions.append("Rack action did not create any tasks for taskSpec(${taskSpec.id})<br/>")
+								}
+								out.append("${rackTasks.size()} Rack tasks were created for taskSpec(${taskSpec.id})<br/>")
+								break								
 							
 							default:
 								exceptions.append("Action(${taskSpec.action}) in taskSpec id ${taskSpec.id} presently not supported<br/>")
@@ -1639,7 +1658,7 @@ class TaskService {
 				//
 				// The predecessor.required when false, will not update the asset with the latest task for any of the above use-cases
 				
-				if 	(tasksNeedingPredecessors.size() > 0) {
+				if (tasksNeedingPredecessors.size() > 0) {
 				
 					// Set some vars that will be used in the next iterator 
 					def predecessorTasks = []
@@ -1664,6 +1683,7 @@ class TaskService {
 					switch(mapMode) {
 					
 						case 'ASSET_DEP_MODE':
+						case 'MULTI_ASSET_DEP_MODE':
 							break
 						
 						case 'DIRECT_MODE':
@@ -1956,10 +1976,28 @@ class TaskService {
 											}
 										}
 									}
-								}
-							
+								}							
 								break
-
+								
+							case 'MULTI_ASSET_DEP_MODE':
+								// In this case each task already has multiple assets injected into it so we'll just create the 
+								// necessary dependencies for the associatedAssets define in the task.	
+								if (! tnp.metaClass.hasProperty(tnp, 'associatedAssets') ) {
+									msg = "Task was missing expected assets for dependencies of task $tnp"
+									log.info(msg)
+									throw new RuntimeException(msg)
+								}
+								
+								// Iterate over the associated assets, setting it to the task and creating the predecessor
+								tnp.associatedAssets.each() { assocAsset ->
+									tnp.assetEntity = assocAsset
+									linkTaskToLastAssetOrMilestone(tnp)
+								}
+								tnp.assetEntity = null
+								wasWired = true
+								
+								break
+								
 							default:
 					
 								msg = "Unsupported switch value ($mapMode) for taskSpec (${taskSpec.id}) on processing task $tnp"
@@ -2373,6 +2411,104 @@ class TaskService {
 	
 		return assets
 	}	
+
+	/** 
+	 * This method is used to generate Roll-Call Tasks for a specified event which will create a sample task for each individual
+	 * that is assigned to the Event which lists their name and their TEAM assignment(s). 
+	 * @param moveEvent
+	 * @param category
+	 * @return List<AssetComment> the list of tasks that were created
+	 */
+	def createRackTasks( moveEvent, lastTaskNum, whom, recipeId, taskSpec, groups, exceptions ) {
+		def taskList = []
+		def loc
+		def msg
+		
+		// Validate that there is the required location poperty and is source or target
+		if (taskSpec.containsKey('location') ) {
+			loc = taskSpec.location.toLowerCase()
+			if (! ['source','target'].contains(loc) ) {
+				msg = "Rack taskspec (${taskSpec.id}) has invalid value (${taskSpec.location}) for 'location' property" 
+				log.error "$msg - moveEvent ${moveEvent}"
+				throw new RuntimeException(msg)
+			}
+		} else {
+			msg = "Rack taskspec (${taskSpec.id}) requires 'location' property" 
+			log.error "$msg - moveEvent ${moveEvent}"			
+			throw new RuntimeException("$msg (options 'source', 'target')")			
+		}
+		
+		// Get all the assets 			
+		def assetsForTask = findAllAssetsWithFilter(moveEvent, taskSpec.filter, groups, exceptions)
+
+		// Get the Distinct Racks from the list
+		def racks
+		if (loc == 'source') {
+			racks = assetsForTask.unique { aft ->
+				"${(aft.sourceLocation ?: '')}:${(aft.sourceRoom ?: '')}:${(aft.sourceRack ?: '')}"
+			}
+		} else {
+			racks = assetsForTask.unique { aft ->
+				"${(aft.targetLocation ?: '')}:${(aft.targetRoom ?: '')}:${(aft.targetRack ?: '')}"
+			}
+		}
+
+		log.info("Found ${racks.size()} racks for createRackTasks")
+
+		def template = new Engine().createTemplate(taskSpec.title)
+		
+		racks.each() { r ->
+			if ( r["${loc}Rack".toString()] ) {
+						
+				def task = new AssetComment(
+					taskNumber: ++lastTaskNum,
+					project: moveEvent.project, 
+					moveEvent: moveEvent, 
+					commentType: AssetCommentType.TASK,
+					status: AssetCommentStatus.READY,
+					createdBy: whom,
+					displayOption: 'U',
+					autoGenerated: true,
+					recipe: recipeId,
+					taskSpec: taskSpec.id )
+
+				// Map of fields that can be inserted into title					
+				def map = [
+					'location':r["${loc}Location"],
+					'room':r["${loc}Room"],
+					'rack':r["${loc}Rack"] ]
+
+				log.info "rack ${r.targetLocation} ${r.targetRoom} ${r.targetRack}, map=$map"
+					
+				task.comment = template.make(map).toString()
+				log.info "create rack task for rack $task"
+
+				// Handle the various settings from the taskSpec
+				if (taskSpec.containsKey('category')) task.category = taskSpec.category
+				
+				if (! ( task.validate() && task.save(flush:true) ) ) {
+					log.error "createRollcallTasks: failed to create task for $lastPerson on moveEvent $moveEvent"
+					throw new RuntimeException("Error while trying to create task. error=${GormUtil.allErrorsString(task)}")
+				}
+
+				// Determine all of the assets that are in the rack and then inject them into the task, which will be used
+				// by the dependency logic above to wire to predecessors.
+				def assetsInRack = []				
+				assetsInRack = assetsForTask.findAll {aft ->
+					aft["${loc}Location"] == r["${loc}Location"] && aft["${loc}Room"] == r["${loc}Room"] && aft["${loc}Rack"] == r["${loc}Rack"]
+				}
+				if (assetsInRack.size() == 0) {
+					log.error "Unable to find expected assets in rack for TaskSpec(${taskSpec.id}) in event $moveEvent"
+				} else {
+					task.metaClass.setProperty('associatedAssets', assetsInRack)
+				}
+				
+				taskList << task
+			}
+		}
+
+		return taskList	
+	}
 	
 	/** 
 	 * This method is used to generate Roll-Call Tasks for a specified event which will create a sample task for each individual
