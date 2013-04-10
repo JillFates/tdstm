@@ -2366,7 +2366,7 @@ class TaskService {
 					if (loadedGroups?.containsKey(exGroup)) {
 						excludes.addAll(loadedGroups[exGroup])							
 					} else {
-						exceptions.append("Filter 'exclude' reference undefined group ($gName) for filter $filter<br/>")
+						exceptions.append("Filter 'exclude' reference undefined group ($exGroup) for filter $filter<br/>")
 					}
 				}
 				if (excludes.size() > 0) {
