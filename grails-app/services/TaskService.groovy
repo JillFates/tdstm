@@ -1269,13 +1269,17 @@ class TaskService {
 		 */
 		def linkTaskToLastAssetOrMilestone = { taskToLink ->
 			// See if there is an asset and that there are previous tasks for the asset
-			if ( taskToLink.assetEntity && assetsLatestTask.containsKey(taskToLink.assetEntity.id) ) {
+			log.info "linkTaskToLastAssetOrMilestone: assetsLatestTask=${assetsLatestTask.size()}"
+			if ( taskToLink.assetEntity 
+				 && assetsLatestTask.containsKey(taskToLink.assetEntity.id) 
+				 && assetsLatestTask[taskToLink.assetEntity.id].taskNumber != taskToLink.taskNumber 
+			) {
 				log.info "linkTaskToLastAssetOrMilestone - $taskToLink"
 				newDep = createTaskDependency( assetsLatestTask[taskToLink.assetEntity.id], taskToLink, taskList, isRequired )
 				depCount++
 				if ( (isMilestone || isRequired) ) {
 					assetsLatestTask[taskToLink.assetEntity.id] = taskToLink
-					log.info "Added latest task $taskToLink to asset ${taskToLink.assetEntity} - 2"
+					log.info "linkTaskToLastAssetOrMilestone: Added latest task $taskToLink to asset ${taskToLink.assetEntity} - 2"
 					
 				}
 				out.append("Created dependency between ${assetsLatestTask[taskToLink.assetEntity.id]} and $taskToLink<br/>")
@@ -1283,7 +1287,7 @@ class TaskService {
 				// assetsLatestTask.put(taskToLink.assetEntity.id, taskToLink)
 				
 			} else {
-				log.info "linkTaskToLastAssetOrMilestone: isRequired=$isRequired, task.asset=${taskToLink.assetEntity}, assetsLatestTask=$assetsLatestTask"
+				log.info "linkTaskToLastAssetOrMilestone: isRequired=$isRequired, task.asset=${taskToLink.assetEntity}"
 				linkTaskToMilestone( taskToLink )
 			}			
 		}
@@ -1333,6 +1337,7 @@ class TaskService {
 				def hasGroup = false
 				def hasTaskSpec = false
 				def predecessor = null
+				def ignorePred = false
 				
 				// because it could cause adverse dependency linkings.
 				log.info "##### Processing taskSpec $taskSpec"
@@ -1366,6 +1371,13 @@ class TaskService {
 						} else {
 							isRequired = predecessor.containsKey('required') ? predecessor.required : true
 						}
+						if ( predecessor.containsKey('ignore') && ! (predecessor.ignore instanceof Boolean) ) {
+							msg = "TaskSpec (${taskSpec.id}) property 'predecessor.ignore' has invalid value (${predecessor.ignore}) "
+							log.error("$msg for Event $moveEvent")
+							throw new RuntimeException(msg)
+						} else {
+							ignorePred = predecessor.containsKey('ignore') ? predecessor.ignore : false
+						}
 						if ( predecessor.containsKey('mode') ) {
 							depMode = predecessor.mode[0].toLowerCase()
 							if ( ! 'sr'.contains( depMode ) ) {
@@ -1391,8 +1403,8 @@ class TaskService {
 						}	
 						
 						// Make sure we have one of the three methods to find predecessors
-						if (! (depMode || hasGroup || hasTaskSpec) ) {
-							msg = "Task Spec (${taskSpec.id}) contains predecessor requires on of the properties 'mode', 'group' or 'taskSpec'"
+						if (! (depMode || hasGroup || hasTaskSpec || ignorePred ) ) {
+							msg = "Task Spec (${taskSpec.id}) contains predecessor requires on of the properties 'mode', 'group', 'ignore' or 'taskSpec'"
 							log.info(msg)
 							throw new RuntimeException(msg)							
 						}	
@@ -1414,12 +1426,18 @@ class TaskService {
 				def taskWorkflowCode = taskSpec.containsKey('workflow') ? taskSpec.workflow : null
 				
 				// Validate that the taskSpec has the proper type
-				def stepType = taskSpec.containsKey('type') ? taskSpec.type.toLowerCase() : 'asset'
-				def validStepTypes = ['action','asset','general','gateway','milestone']
-				if ( ! validStepTypes.contains(stepType) ) {
-					msg = "TaskSpec (${taskSpec.id}) has invalid 'type' value ($stepType)"
-					log.error("$msg  for Event $moveEvent")
-					throw new RuntimeException("$msg - valid types are [${validStepTypes.join('|')}]")
+				def stepType 
+
+				if (taskSpec.containsKey('action')) {
+					stepType = 'action'
+				} else {
+					stepType = taskSpec.containsKey('type') ? taskSpec.type.toLowerCase() : 'asset'
+					def validStepTypes = ['action','asset','general','gateway','milestone']
+					if ( ! validStepTypes.contains(stepType) ) {
+						msg = "TaskSpec (${taskSpec.id}) has invalid 'type' value ($stepType)"
+						log.error("$msg  for Event $moveEvent")
+						throw new RuntimeException("$msg - valid types are [${validStepTypes.join('|')}]")
+					}
 				}
 				
 				out.append("=======<br/>Processing taskSpec ${taskSpec.id}-${taskSpec.description} ($stepType):<br/>")
@@ -1505,7 +1523,8 @@ class TaskService {
 					case 'action':
 						// Handle ACTION TaskSpecs (e.g. OnCart, offCart, QARAck) Tasks
 						isAction = true
-						switch(taskSpec.action.toLowerCase()) {
+						def action = taskSpec.action.toLowerCase()
+						switch(action) {
 							
 							// RollCall Tasks for each staff involved in the Move Event
 							case 'rollcall':
@@ -1526,18 +1545,23 @@ class TaskService {
 							// Create a task for each Rack that is associated with Assets in the filter and connect them 
 							// with the appropriate predecessors.
 							case 'rack':
-								def rackTasks = createRackTasks( moveEvent, lastTaskNum, whom, recipeId, taskSpec, groups, exceptions)
-								if (rackTasks.size() > 0) {
-									rackTasks.each() { rct ->
-										taskList[rct.id] = rct
+							case 'truck':
+							case 'room':
+							case 'cart':
+							case 'location':
+
+								def actionTasks = createAssetActionTasks(action, moveEvent, lastTaskNum, whom, recipeId, taskSpec, groups, exceptions)
+								if (actionTasks.size() > 0) {
+									actionTasks.each() { t ->
+										taskList[t.id] = t
 									}
-									tasksNeedingPredecessors.addAll(rackTasks)
-									lastTaskNum = rackTasks.last().taskNumber
+									tasksNeedingPredecessors.addAll(actionTasks)
+									lastTaskNum = actionTasks.last().taskNumber
 									mapMode = 'MULTI_ASSET_DEP_MODE'
 								} else {
-									exceptions.append("Rack action did not create any tasks for taskSpec(${taskSpec.id})<br/>")
+									exceptions.append("$action action did not create any tasks for taskSpec(${taskSpec.id})<br/>")
 								}
-								out.append("${rackTasks.size()} Rack tasks were created for taskSpec(${taskSpec.id})<br/>")
+								out.append("${actionTasks.size()} $action tasks were created for taskSpec(${taskSpec.id})<br/>")
 								break								
 							
 							default:
@@ -1568,7 +1592,7 @@ class TaskService {
 							workflow = getWorkflowStep(taskWorkflowCode, asset.moveBundle.id)
 							newTask = createTaskFromSpec(recipeId, whom, taskList, ++lastTaskNum, moveEvent, taskSpec, workflow, asset)
 							tasksNeedingPredecessors << newTask
-							// assetsLatestTask.put(asset.id, newTask)
+							assetsLatestTask.put(asset.id, newTask)
 							out.append("Created task $newTask<br/>")
 						} 
 						
@@ -1657,8 +1681,8 @@ class TaskService {
 				//       ii. Either tasksNeedingPredecessors or referenced taskSpec DON'T have assets, all tasksNeedingPredecessors will be wired to all tasks from taskSpec
 				//
 				// The predecessor.required when false, will not update the asset with the latest task for any of the above use-cases
-				
-				if (tasksNeedingPredecessors.size() > 0) {
+				log.info "&&&&& ignorePred=$ignorePred"
+				if (tasksNeedingPredecessors.size() > 0 && ! ignorePred ) {
 				
 					// Set some vars that will be used in the next iterator 
 					def predecessorTasks = []
@@ -1995,7 +2019,7 @@ class TaskService {
 								}
 								tnp.assetEntity = null
 								wasWired = true
-								
+
 								break
 								
 							default:
@@ -2327,7 +2351,7 @@ class TaskService {
 		
 			// Add additional WHERE clauses based on the following properties being present in the filter.asset 
 			def validProperties = ['assetName','assetTag','assetType', 'priority', 'truck', 'cart', 'sourceLocation', 'targetLocation', 'planStatus']
-			(1..8).each() { validProperties.add("custom$it".toString()) }	// Add custom1..custom8
+			(1..24).each() { validProperties.add("custom$it".toString()) }	// Add custom1..custom24
 			log.info("findAllAssetsWithFilter: validProperties=$validProperties")
 			addWhereConditions( validProperties )
 		
@@ -2411,55 +2435,113 @@ class TaskService {
 	
 		return assets
 	}	
-
+	
 	/** 
-	 * This method is used to generate Roll-Call Tasks for a specified event which will create a sample task for each individual
-	 * that is assigned to the Event which lists their name and their TEAM assignment(s). 
-	 * @param moveEvent
-	 * @param category
+	 * This method generates action tasks that optionally linking assets as predecessors. It presently supports (location, room, rack, 
+	 * cart and truck) groupings. It will create a task for each unique grouping and inject the list assets in the group into the associatedAssets
+	 * property to later be used to create the predecessor dependencies.
+	 *
+	 * @param String action - options [rack, cart, truck]
+	 * @param moveEvent - MoveEvent object
+	 * @param Integer lastTaskNum
+	 * @param Person whom - who is creating the tasks
+	 * @param Integer recipeId
+	 * @param Map taskSpec
+	 * @param List? groups
+	 * @param StringBuffer exceptions
 	 * @return List<AssetComment> the list of tasks that were created
 	 */
-	def createRackTasks( moveEvent, lastTaskNum, whom, recipeId, taskSpec, groups, exceptions ) {
+	def createAssetActionTasks(action, moveEvent, lastTaskNum, whom, recipeId, taskSpec, groups, exceptions ) {
 		def taskList = []
-		def loc
+		def loc 			// used for racks
 		def msg
 		
-		// Validate that there is the required location poperty and is source or target
-		if (taskSpec.containsKey('location') ) {
-			loc = taskSpec.location.toLowerCase()
-			if (! ['source','target'].contains(loc) ) {
-				msg = "Rack taskspec (${taskSpec.id}) has invalid value (${taskSpec.location}) for 'location' property" 
+		// Get all the assets 			
+		def assetsForAction = findAllAssetsWithFilter(moveEvent, taskSpec.filter, groups, exceptions)
+
+		def tasksToCreate = []	// List of tasks to create
+		tasksToCreate.addAll(0, assetsForAction)
+
+		// Closures used in the loop below
+		def findAssets
+		def validateForTask
+		
+		switch(action) {
+			case 'truck':
+			case 'cart':
+				tasksToCreate.unique { it[action] }
+				findAssets = { asset ->
+					assetsForTask.findAll { it[action] == asset[action] }
+				}
+				validateForTask = { asset -> asset[action] }
+				break
+
+			case 'rack':
+			case 'room':
+			case 'location':
+				// Validate that there is the required location poperty and is source or target
+				if (taskSpec.containsKey('disposition') ) {
+					loc = taskSpec.disposition.toLowerCase()
+					if (! ['source','target'].contains(loc) ) {
+						msg = "$action action taskspec (${taskSpec.id}) has invalid value (${taskSpec.location}) for 'disposition' property" 
+						log.error "$msg - moveEvent ${moveEvent}"
+						throw new RuntimeException(msg)
+					}
+				} else {
+					msg = "$action taskspec (${taskSpec.id}) requires 'disposition' property" 
+					log.error "$msg - moveEvent ${moveEvent}"			
+					throw new RuntimeException("$msg (options 'source', 'target')")			
+				}
+				
+				switch(action) {
+					case 'location':
+						// Get the Distinct Racks from the list which includes the location and room as well
+						tasksToCreate.unique { it["${loc}Location"] }
+						findAssets = { asset -> 
+							assetsForAction.findAll { it["${loc}Location"] == asset["${loc}Location"] }
+						}
+						break
+					case 'room':
+						// Get the Distinct Racks from the list which includes the location and room as well
+						tasksToCreate.unique { it["${loc}Location"] + ':' + it["${loc}Room"] }
+						findAssets = { asset -> 
+							assetsForAction.findAll { 
+								it["${loc}Location"] == asset["${loc}Location"] && 
+								it["${loc}Room"] == asset["${loc}Room"] }
+						}
+						break
+					case 'rack':
+						// Get the Distinct Racks from the list which includes the location and room as well
+						// log.info "%% assetsForAction before ${assetsForAction.size()}"
+						tasksToCreate.unique { it["${loc}Location"] + ':' + it["${loc}Room"] + ':' + it["${loc}Rack"] }
+						// log.info "%% assetsForAction after ${assetsForAction.size()}"
+						findAssets = { asset -> 
+							assetsForAction.findAll { 
+								// log.info "Finding match to $asset in ${assetsForAction.size()}"
+								it["${loc}Location"] == asset["${loc}Location"] && 
+								it["${loc}Room"] == asset["${loc}Room"] &&
+								it["${loc}Rack"] == asset["${loc}Rack"] }
+						}
+						break
+
+				}
+				validateForTask = { asset -> asset["${loc}${action.capitalize()}"]?.size() > 0 }
+				break
+
+			default:
+				msg = "Unhandled action ($action) for taskspec (${taskSpec.id}) in createAssetActionTasks method" 
 				log.error "$msg - moveEvent ${moveEvent}"
 				throw new RuntimeException(msg)
-			}
-		} else {
-			msg = "Rack taskspec (${taskSpec.id}) requires 'location' property" 
-			log.error "$msg - moveEvent ${moveEvent}"			
-			throw new RuntimeException("$msg (options 'source', 'target')")			
-		}
-		
-		// Get all the assets 			
-		def assetsForTask = findAllAssetsWithFilter(moveEvent, taskSpec.filter, groups, exceptions)
-
-		// Get the Distinct Racks from the list
-		def racks
-		if (loc == 'source') {
-			racks = assetsForTask.unique { aft ->
-				"${(aft.sourceLocation ?: '')}:${(aft.sourceRoom ?: '')}:${(aft.sourceRack ?: '')}"
-			}
-		} else {
-			racks = assetsForTask.unique { aft ->
-				"${(aft.targetLocation ?: '')}:${(aft.targetRoom ?: '')}:${(aft.targetRack ?: '')}"
-			}
 		}
 
-		log.info("Found ${racks.size()} racks for createRackTasks")
+		log.info("Found ${tasksToCreate.size()} $action for createAssetActionTasks and assetsForAction=${assetsForAction.size()}")
 
 		def template = new Engine().createTemplate(taskSpec.title)
 		
-		racks.each() { r ->
-			if ( r["${loc}Rack".toString()] ) {
-						
+		tasksToCreate.each() { ttc ->
+
+			if ( validateForTask(ttc) ) {
+				def map	= [:]	
 				def task = new AssetComment(
 					taskNumber: ++lastTaskNum,
 					project: moveEvent.project, 
@@ -2472,44 +2554,61 @@ class TaskService {
 					recipe: recipeId,
 					taskSpec: taskSpec.id )
 
-				// Map of fields that can be inserted into title					
-				def map = [
-					'location':r["${loc}Location"],
-					'room':r["${loc}Room"],
-					'rack':r["${loc}Rack"] ]
+				// Setup the map used by the template
+				switch(action) {
+					case 'truck':
+						map = [ truck: ttc.truck ]
+						break
+					case 'cart':
+						map = [ truck:ttc.truck, cart:ttc.cart ]
+						break
 
-				log.info "rack ${r.targetLocation} ${r.targetRoom} ${r.targetRack}, map=$map"
-					
+					// location/room/rack compound adding the details to the map
+					case 'rack': 
+						map.rack = ttc["${loc}Rack"] ?: ''
+					case 'room': 
+						map.room = ttc["${loc}Room"] ?: ''
+					case 'location': 
+						map.location = ttc["${loc}Location"] ?: ''
+						break
+				}
+
 				task.comment = template.make(map).toString()
-				log.info "create rack task for rack $task"
+				log.info "Creating $action task - $task"
 
 				// Handle the various settings from the taskSpec
+				task.priority = taskSpec.containsKey('priority') ? taskSpec.priority : 3
+				if (taskSpec.containsKey('duration')) task.duration = taskSpec.duration
+				if (taskSpec.containsKey('team')) task.role = taskSpec.team
 				if (taskSpec.containsKey('category')) task.category = taskSpec.category
-				
+				// TODO - Normalize this logic and sadd logic to update from Workflow if exists
+
 				if (! ( task.validate() && task.save(flush:true) ) ) {
-					log.error "createRollcallTasks: failed to create task for $lastPerson on moveEvent $moveEvent"
-					throw new RuntimeException("Error while trying to create task. error=${GormUtil.allErrorsString(task)}")
+					log.error "createAssetActionTasks failed to create task ($task) on moveEvent $moveEvent"
+					throw new RuntimeException("Error while trying to create task - error=${GormUtil.allErrorsString(task)}")
 				}
 
-				// Determine all of the assets that are in the rack and then inject them into the task, which will be used
+				// Determine all of the assets for the action type/key and then inject them into the task, which will be used
 				// by the dependency logic above to wire to predecessors.
-				def assetsInRack = []				
-				assetsInRack = assetsForTask.findAll {aft ->
-					aft["${loc}Location"] == r["${loc}Location"] && aft["${loc}Room"] == r["${loc}Room"] && aft["${loc}Rack"] == r["${loc}Rack"]
+				def assocAssets = []
+				if (! ( taskSpec.containsKey('predecessor') && taskSpec.predecessor.containsKey('ignore') ) )  {
+					// If we're not ignorning the predecessor
+					assocAssets = findAssets(ttc)			
+					if (assocAssets.size() == 0) {
+						msg = "Unable to find expected assets for $action in TaskSpec(${taskSpec.id})"
+						log.error "$msg on event $moveEvent"
+						throw new RuntimeException(msg)
+					}
+					// log.info "Added ${assocAssets.size()} assets as predecessors to task $task"
+					// assocAssets.each() { log.info "Asset $it" }
 				}
-				if (assetsInRack.size() == 0) {
-					log.error "Unable to find expected assets in rack for TaskSpec(${taskSpec.id}) in event $moveEvent"
-				} else {
-					task.metaClass.setProperty('associatedAssets', assetsInRack)
-				}
-				
+				task.metaClass.setProperty('associatedAssets', assocAssets)
 				taskList << task
 			}
 		}
 
 		return taskList	
 	}
-	
 	/** 
 	 * This method is used to generate Roll-Call Tasks for a specified event which will create a sample task for each individual
 	 * that is assigned to the Event which lists their name and their TEAM assignment(s). 
