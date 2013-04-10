@@ -42,8 +42,8 @@
 	                <span><input type="checkbox" id="applicationId" name="application" value="application"/>&nbsp;<label for="applicationId">Application</label></span>&nbsp;
 	                <span><input type="checkbox" id="filesId" name="files" value="files"  />&nbsp;<label for="filesId">Storage</label></span>&nbsp;
 	                <span><input type="checkbox" id="databaseId" name="database" value="database" />&nbsp;<label for="databaseId">Database</label></span>&nbsp;
-	                <span><input type="checkbox" id="roomId" name="room" value="room" />&nbsp;<label for="databaseId">Room</label></span>&nbsp;
-	                <span><input type="checkbox" id="rackId" name="rack" value="rack" />&nbsp;<label for="databaseId">Rack</label></span>&nbsp;
+	                <span><input type="checkbox" id="roomId" name="room" value="room" />&nbsp;<label for="roomId">Room</label></span>&nbsp;
+	                <span><input type="checkbox" id="rackId" name="rack" value="rack" />&nbsp;<label for="rackId">Rack</label></span>&nbsp;
 	                <span><input type="checkbox" id="dependencyId" name="dependency" value="dependency" />&nbsp;<label for="dependencyId">dependency</label></span>&nbsp;
 	                </td>
                </tr>

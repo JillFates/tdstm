@@ -870,6 +870,8 @@ class AssetEntityController {
 			def fileSheet
 			def titleSheet
 			def dependencySheet
+			def roomSheet
+			def rackSheet
 
 			def serverMap = [:]
 			def serverSheetColumnNames = [:]
@@ -942,6 +944,8 @@ class AssetEntityController {
 			dbSheet = book.getSheet( sheetNames[3] )
 			fileSheet = book.getSheet( sheetNames[4] )
 			dependencySheet = book.getSheet( sheetNames[5] )
+			roomSheet = book.getSheet( sheetNames[6] )
+			rackSheet = book.getSheet( sheetNames[7] )
 
 			if( flag == 0 ) {
 				flash.message = " Sheet not found, Please check it."
@@ -1150,7 +1154,7 @@ class AssetEntityController {
 							}
 						}
 					}
-
+					
 					if(params.dependency=='dependency'){
 						def assetDependent = AssetDependency.findAll("from AssetDependency where asset.project = ? ",[project])
 						def dependencyMap = ['AssetId':1,'DependentId':2, 'Type':3, 'DataFlowFreq':4, 'DataFlowDirection':5, 'status':6, 'comment':7]
@@ -1179,6 +1183,75 @@ class AssetEntityController {
 								dependencySheet.addCell( addContentToSheet )
 							}
 						}
+					}
+					//Export rooms
+					if(params.room=='room'){
+						def formatter = new SimpleDateFormat("MM/dd/yyyy")
+						def rooms = Room.findAllByProject(project)
+						def roomSize = rooms.size()
+						def roomMap = ['roomId':'id', 'Name':'roomName', 'Location':'location', 'Depth':'roomDepth', 'Width':'roomWidth',
+									   'Source':'source', 'Address':'address', 'City':'city', 'Country':'country', 'StateProv':'stateProv',
+									   'Postal Code':'postalCode', 'Date Created':'dateCreated', 'Last Updated':'lastUpdated'
+									  ]
+						
+						def roomCol = fileSheet.getColumns()
+						def roomSheetColumns = []
+						for ( int c = 0; c < roomCol; c++ ) {
+							def roomCellContent = roomSheet.getCell( c, 0 ).contents
+							roomSheetColumns << roomCellContent
+						}
+						roomSheetColumns.removeAll('')
+						for ( int r = 1; r <= roomSize; r++ ) {
+							roomSheetColumns.eachWithIndex{column, i->
+								def addContentToSheet
+								if(column == 'roomId'){
+									def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
+									addContentToSheet = new Number(0, r, (rooms[r-1].id))
+								} else {
+								   if(column=='Date Created' || column=='Last Updated')
+								   		addContentToSheet = new Label( i, r, rooms[r-1]."${roomMap[column]}" ? 
+											   String.valueOf( formatter.format(rooms[r-1]."${roomMap[column]}")): "" )
+								   else if(column =="Source")
+								 		addContentToSheet = new Label( i, r, String.valueOf(rooms[r-1]."${roomMap[column]}" ==1 ? "Source" : "Target" ) )
+								   else
+										addContentToSheet = new Label( i, r, String.valueOf(rooms[r-1]."${roomMap[column]}"?: "" ) )
+								}
+								roomSheet.addCell( addContentToSheet )
+							}
+					  }
+					}
+					
+					//Rack Exporting 
+					if(params.rack=='rack'){
+						def racks = Rack.findAllByProject(project)
+						def rackSize = racks.size()
+						def rackMap = ['rackId':'id', 'Tag':'tag', 'Location':'location', 'Room':'room', 'RoomX':'roomX',
+									   'RoomY':'roomY', 'PowerA':'powerA', 'PowerB':'powerB', 'PowerC':'powerC', 'Type':'rackType',
+									   'Front':'front', 'Model':'model', 'Source':'source', 'Model':'model'
+									  ]
+						
+						def rackCol = fileSheet.getColumns()
+						def rackSheetColumns = []
+						for ( int c = 0; c < rackCol; c++ ) {
+							def rackCellContent = rackSheet.getCell( c, 0 ).contents
+							rackSheetColumns << rackCellContent
+						}
+						rackSheetColumns.removeAll('')
+						for ( int r = 1; r <= rackSize; r++ ) {
+							rackSheetColumns.eachWithIndex{column, i->
+								def addContentToSheet
+								if(column == 'rackId'){
+									def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
+									addContentToSheet = new Number(0, r, (racks[r-1].id))
+								} else {
+								   if(column =="Source")
+										 addContentToSheet = new Label( i, r, String.valueOf(racks[r-1]."${rackMap[column]}" ==1 ? "Source" : "Target" ) )
+								   else
+										addContentToSheet = new Label( i, r, String.valueOf(racks[r-1]."${rackMap[column]}"?: "" ) )
+								}
+								rackSheet.addCell( addContentToSheet )
+							}
+					  }
 					}
 				}
 				//update data from Asset Comment table to EXCEL
