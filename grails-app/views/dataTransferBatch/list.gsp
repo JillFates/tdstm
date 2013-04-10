@@ -70,6 +70,11 @@
             <g:if test="${flash.message}">
             <div class="message" style="background: #f3f8fc">${flash.message}</div>
             </g:if>
+            <div >
+				<div id="messageId" class="message" style="display:none">
+				</div>
+			</div>
+			<span id="spinnerId" style="display: none">Reviewing ...<img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
             <div class="list">
                 <table>
                     <thead>
@@ -97,8 +102,30 @@
                     </thead>
                     <tbody>
                     <g:each in="${dataTransferBatchList}" status="i" var="dataTransferBatch">
+                    	  <span id="assetDisabledProcessId_${dataTransferBatch.id}" style="display: none;"><a href="javascript:" class="disableButton">Process</a></span>
+              			  <span id="assetProcessId_${dataTransferBatch.id}" style="display: none;" >
+              			  	<g:link action="serverProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >Process</g:link>
+              			  </span>
+              			  
+              			  <span id="appDisabledProcessId_${dataTransferBatch.id}" style="display: none;"><a href="javascript:" class="disableButton">Process</a></span>
+              			  <span id="appProcessId_${dataTransferBatch.id}" style="display: none;" >
+             			  	<g:link action="appProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >
+                            	   			<span>Process</span></g:link>
+	                      </span>
+	                      
+	                      <span id="dbDisabledProcessId_${dataTransferBatch.id}" style="display: none;"><a href="javascript:" class="disableButton">Process</a></span>
+              			  <span id="dbProcessId_${dataTransferBatch.id}" style="display: none;" >
+             			  	<g:link action="dbProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >
+                            	   			<span>Process</span></g:link>
+	                      </span>
+	                      
+	                      <span id="filesDisabledProcessId_${dataTransferBatch.id}" style="display: none;"><a href="javascript:" class="disableButton">Process</a></span>
+              			  <span id="filesProcessId_${dataTransferBatch.id}" style="display: none;" >
+             			  	<g:link action="fileProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >
+                            	   			<span>Process</span></g:link>
+	                      </span>
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                        
+                         
                             <td>${fieldValue(bean:dataTransferBatch, field:'id')}</td>
                         
                             <td><tds:convertDate date="${dataTransferBatch?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
@@ -117,16 +144,19 @@
                             <td>
 	                            <g:if test="${dataTransferBatch?.statusCode == 'PENDING'}">
 	                                <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'AssetEntity'}">
-	                            	   <g:link action="serverProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
+                           	   			<span id="assetReviewId_${dataTransferBatch.id}"><a href="javascript:" onclick="reviewBatch('${dataTransferBatch.id}','asset')">Review</a></span>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                                </g:if> 
 	                                 <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Application'}">
-	                            	   <g:link action="appProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
+	                                   <span id="appReviewId_${dataTransferBatch.id}"><a href="javascript:" onclick="reviewBatch('${dataTransferBatch.id}','app')">Review</a></span>
+	                            	   |<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                                 </g:if> 
 	                                 <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Database'}">
-	                            	   <g:link action="dbProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
+	                            	  <span id="dbReviewId_${dataTransferBatch.id}"><a href="javascript:" onclick="reviewBatch('${dataTransferBatch.id}','db')">Review</a></span>
+	                            	  |<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                                 </g:if>
 	                                 <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Files'}">
-	                            	   <g:link action="fileProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
+	                            	  <span id="filesReviewId_${dataTransferBatch.id}"><a href="javascript:" onclick="reviewBatch('${dataTransferBatch.id}','files')">Review</a></span>
+	                            	  |<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                                 </g:if> 
 	                                  <g:if test="${dataTransferBatch?.eavEntityType?.domainName == null}">
 	                            	   <g:link action="serverProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
@@ -141,6 +171,7 @@
                     </g:each>
                     </tbody>
                 </table>
+               
             </div>
              <div class="paginateButtons">
                 <g:paginate total="${DataTransferBatch.findAll('from DataTransferBatch where project = '+projectId).size()}" params ="[projectId:projectId]"/>
@@ -161,6 +192,26 @@
     		$("#assetMenuId a").css('background-color','#003366')
 			$('#assetMenu').show();
 			$('#reportsMenu').hide();
+
+			function reviewBatch(dataTransferBatchId, forWhom){
+				$("#messageId").html($("#spinnerId").html()).show()
+				jQuery.ajax({
+					url: '../dataTransferBatch/reviewBatch',
+					data: {'id':dataTransferBatchId},
+					type:'POST',
+					success: function(data) {
+						if(data.importPerm || !data.errorMsg)
+							$("#"+forWhom+"ReviewId_"+dataTransferBatchId).html($("#"+forWhom+"ProcessId_"+dataTransferBatchId).html())
+						else
+							$("#"+forWhom+"ReviewId_"+dataTransferBatchId).html($("#"+forWhom+"DisabledProcessId_"+dataTransferBatchId).html())
+							
+						data.errorMsg ? $("#messageId").html(data.errorMsg) : $("#messageId").html(" Reviewed , there were no errors in the review.")
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						alert("An Unexpected error while populating dependent asset.")
+					}
+				});
+			}
 		</script>
 		
     </body>

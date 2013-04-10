@@ -1089,6 +1089,86 @@ class DataTransferBatchController {
 		       e.printStackTrace()
 		}
 	}
+	
+	/**
+	 * This action used to review batch and find error in excel import if any 
+	 * @param : id- data transfer batch id
+	 * @return map containing error message if any and import permission  (NewModelsFromImport)
+	 */
+	def reviewBatch = {
+		
+		def dtBatch = DataTransferBatch.read(params.id)
+		def errorMsg = ""
+		def importPerm = RolePermissions.hasPermission("NewModelsFromImport")
+		if(dtBatch){
+			def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = "+
+				"$dtBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
+			def assetsSize = dataTransferValueRowList.size()
+			def dataTransferValues = DataTransferValue.findAllByDataTransferBatch( dtBatch )
+			def eavAttributeSet = EavAttributeSet.findById(1)
+			def assetIdList = []
+			def project = securityService.getUserCurrentProject()
+			def assetIds = AssetEntity.findAllByProject(project)?.id
+			def dupAssetIds = []
+			def notExistedIds = []
+			for( int dataTransferValueRow =0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
+				def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
+				def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
+				
+				def dtvList= dataTransferValues.findAll{ it.rowId == rowId  }
+				if(dtBatch.eavEntityType?.domainName == "AssetEntity"){
+					def importedModel 
+					def importedManu 
+					dtvList.each{
+						def attribName = it.eavAttribute.attributeCode
+						if(attribName == 'model')
+							importedModel  = it.importValue
+							
+						if(attribName == 'manufacturer')
+							importedManu  = it.importValue
+					}
+					// Verifying Model and manufacturer's pair in database if it's asset type is Server
+					errorMsg += verifyModelAndManuPair(importedModel, importedManu)
+				}
+				
+				// Checking for duplicate asset ids
+				if(assetEntityId && assetIdList.contains(assetEntityId))
+					dupAssetIds << assetEntityId
+				
+				// Checking for asset ids which does not exist in database
+				if(assetEntityId && !assetIds.contains((Long)(assetEntityId)))
+					notExistedIds << assetEntityId
+					
+				assetIdList << assetEntityId
+			}
+			if(dupAssetIds.size() > 0)
+				errorMsg += "Duplicate assetIDs #$dupAssetIds  <br/>"
+				
+			if(notExistedIds.size() > 0)
+				errorMsg += "No match found for assetIDs #$notExistedIds   <br/>"
+		} else{
+			errorMsg+=" ${params.id} does not exist for DataTransferBatch"
+		}
+		def returnMap = [errorMsg : errorMsg, importPerm:importPerm]
+		render returnMap as JSON
+	}
+	
+	/**
+	 * To Verify Manufacturer and Model pair from database
+	 * @param importedModel  : Imported Model from excel
+	 * @param importedManu   : Imported Manufacturer from excel
+	 * @return : if pair not found return error message
+	 */
+	def verifyModelAndManuPair(importedModel, importedManu){
+		 
+		def errorMsg = ''
+		def manu = Manufacturer.findByName(importedManu)
+	    def pairExist = Model.findByModelNameAndManufacturer(importedModel, manu)
+		if(!pairExist && importedManu && importedModel)
+		    errorMsg = "No match found for $importedManu / $importedModel <br/>"
+			
+		return errorMsg
+	}
 }
 
 	
