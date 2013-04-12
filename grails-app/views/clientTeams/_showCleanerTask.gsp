@@ -393,6 +393,11 @@ function keyCheck( e ){
 		return trunc;
  }
 
+ function hideStatus(id,status){
+	$('#showStatusId_'+id).hide()
+	$('#detailTdId_'+id).css('display','none')
+	B1.Start(60);
+}
 
  </script>
 <script type="text/javascript" language="javascript">
