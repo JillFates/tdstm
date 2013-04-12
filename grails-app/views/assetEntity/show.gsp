@@ -27,7 +27,10 @@ $(document).ready(function() {
 	} else{
 		$(".resolved").show()
 	}
-	
+	$(".showAllChecked").click(function(){
+		 var selected = $(this).is(":checked") ? '1' : '0'
+		 showTask(selected)
+	})
 })
 </script>
  	<g:form method="post">
@@ -249,9 +252,7 @@ $(document).ready(function() {
 					<th nowrap class="headerwidth3">#</th>
 					<th nowrap>Task/comment</th>
 					<th nowrap class="headerwidth12">Status&nbsp;(&nbsp;
-					<input type="checkbox" name="showAll" id="showAll" ${prefValue && prefValue == 'TRUE' ?  'value="1" checked="checked"'  : 'value="0"'} 
-					onchange="${remoteFunction(controller:'assetEntity', action:'setShowAllPreference',params:'\'selected=\'+ this.value')}" 
-					onclick="if(this.checked){this.value = 1; $('.resolved').show();$('#showEntityView').dialog('option', 'height', 'auto')} else {this.value = 0 ; $('.resolved').hide();$('#showEntityView').dialog('option', 'height', 'auto')}"/>
+					<input type="checkbox" name="showAll" id="showAll" class="showAllChecked" ${prefValue && prefValue == 'TRUE' ?  'checked="checked"'  : ''} />
 					&nbsp;<label for="showAll">All )</label></th>
 					<th nowrap class="headerwidth6">Category</th>  
 					<th nowrap class="headerwidth20">Assigned To</th>
