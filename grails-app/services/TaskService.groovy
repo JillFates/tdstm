@@ -432,8 +432,8 @@ class TaskService {
 		def task 
 		
 		// This tasks will run parallel with the thread updating the current task to the state passed to this method. Therefore
-		// we need to make sure that the task has been updated.	 We'll try for 3 seconds before giving up.
-		def cnt = 10
+		// we need to make sure that the task has been updated.	 We'll try for one minute in  before giving up.
+		def cnt = 120
 		
 		while (cnt-- > 0) {
 			task = AssetComment.get(taskId)
@@ -444,16 +444,16 @@ class TaskService {
 			if (task.status == status) {
 				break
 			} else {
-				this.sleep(300)
+				this.sleep(500)
 			}			
 		}
 		if (task.status != status) {
 			log.error "updateTaskSuccessors - task(#:${task.taskNumber} Id:${task.id}) status (${task.status}) not as expected '${status}' - $whom"
 			return
 		}
-		log.info "updateTaskSuccessors - securityService=${securityService ? securityService.getClass() : 'Undefined'}"
+		// log.info "updateTaskSuccessors - securityService=${securityService ? securityService.getClass() : 'Undefined'}"
 		
-		log.info "updateTaskSuccessors: Processing task(#:${task.taskNumber} Id:${task.id}) ${task} - $whom"
+		log.info "updateTaskSuccessors: Processing task(#:${task.taskNumber} Id:${task.id}) ${task} - $whom, waited ${ (120 - cnt) * 500}ms"
 		//	def currStatus = task.status
 			
 		// TODO: taskStatusChangeEvent : Add logic to handle READY for the SS predecessor type and correct the current code to not assume SF type
