@@ -428,7 +428,7 @@ class TaskService {
 	 * that may result in the updating of other tasks successor tasks.
 	 */
 	def updateTaskSuccessors( taskId, status, whomId, isPM ) {
-		log.info "updateTaskSuccessors - securityService=${securityService ? securityService.getClass() : 'Undefined'}"
+		log.info "updateTaskSuccessors - securityService=${securityService ? securityService.getClass() : 'Undefined'} for task $taskId"
 		def whom = Person.read(whomId)
 		if (! whom) {
 			log.error "updateTaskSuccessors - for task(#:${task.taskNumber} Id:${task.id}) unable to find person ${whomId}"
@@ -454,6 +454,8 @@ class TaskService {
 			} else {
 				session.clear()
 				this.sleep(500)
+				def taskStatusMap = jdbcTemplate.queryForMap("select status from asset_comment where asset_comment_id = $taskId")
+				log.info "updateTaskSuccessors: in loop $cnt - task $taskId status=$taskStatusMap"
 			}			
 		}
 		if (task.status != status) {
@@ -462,7 +464,7 @@ class TaskService {
 		}
 		// log.info "updateTaskSuccessors - securityService=${securityService ? securityService.getClass() : 'Undefined'}"
 		
-		log.info "updateTaskSuccessors: Processing task(#:${task.taskNumber} Id:${task.id}) ${task} - $whom, waited ${ (120 - cnt) * 500}ms"
+		log.info "updateTaskSuccessors: Processing task(#:${task.taskNumber} Id:${task.id}) ${task} - $whom, waited ${ (20 - cnt) * 500}ms"
 		//	def currStatus = task.status
 			
 		// TODO: taskStatusChangeEvent : Add logic to handle READY for the SS predecessor type and correct the current code to not assume SF type
