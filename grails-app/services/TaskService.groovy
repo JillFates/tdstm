@@ -1592,7 +1592,7 @@ class TaskService {
 							workflow = getWorkflowStep(taskWorkflowCode, asset.moveBundle.id)
 							newTask = createTaskFromSpec(recipeId, whom, taskList, ++lastTaskNum, moveEvent, taskSpec, workflow, asset)
 							tasksNeedingPredecessors << newTask
-							assetsLatestTask.put(asset.id, newTask)
+							// assetsLatestTask.put(asset.id, newTask)
 							out.append("Created task $newTask<br/>")
 						} 
 						
