@@ -39,6 +39,9 @@ import groovy.time.TimeDuration
 import groovy.time.TimeCategory
 import groovy.text.GStringTemplateEngine as Engine
 
+import org.hibernate.SessionFactory;
+import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
+
 class TaskService {
 
 	static transactional = true
@@ -50,6 +53,9 @@ class TaskService {
 	def securityService
 	def quartzScheduler
 	def workflowService
+
+	def ctx = AH.application.mainContext
+    def sessionFactory = ctx.sessionFactory
 	
 	static final List runbookCategories = [AssetCommentCategory.MOVEDAY, AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP]
 	static final List categoryList = AssetCommentCategory.getList()
@@ -432,9 +438,11 @@ class TaskService {
 		def task 
 		
 		// This tasks will run parallel with the thread updating the current task to the state passed to this method. Therefore
-		// we need to make sure that the task has been updated.	 We'll try for one minute in  before giving up.
-		def cnt = 120
-		
+		// we need to make sure that the task has been updated.	 We'll try for 10 seconds before giving up.
+		def cnt = 20
+
+		def session = sessionFactory.getCurrentSession()
+
 		while (cnt-- > 0) {
 			task = AssetComment.get(taskId)
 			if (! task) {
@@ -444,6 +452,7 @@ class TaskService {
 			if (task.status == status) {
 				break
 			} else {
+				session.clear()
 				this.sleep(500)
 			}			
 		}
