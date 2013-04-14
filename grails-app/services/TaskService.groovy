@@ -439,7 +439,7 @@ class TaskService {
 		
 		// This tasks will run parallel with the thread updating the current task to the state passed to this method. Therefore
 		// we need to make sure that the task has been updated.	 We'll try for 10 seconds before giving up.
-		def cnt = 20
+		def cnt = 40
 
 		def session = sessionFactory.getCurrentSession()
 
@@ -454,7 +454,7 @@ class TaskService {
 			} else {
 				session.clear()
 				this.sleep(500)
-				def taskStatusMap = jdbcTemplate.queryForMap("select status from asset_comment where asset_comment_id = $taskId")
+				def taskStatusMap = jdbcTemplate.queryForMap("select asset_comment_id, status, task_number, version from asset_comment where asset_comment_id = $taskId")
 				log.info "updateTaskSuccessors: in loop $cnt - task $taskId status=$taskStatusMap"
 			}			
 		}
@@ -464,7 +464,7 @@ class TaskService {
 		}
 		// log.info "updateTaskSuccessors - securityService=${securityService ? securityService.getClass() : 'Undefined'}"
 		
-		log.info "updateTaskSuccessors: Processing task(#:${task.taskNumber} Id:${task.id}) ${task} - $whom, waited ${ (20 - cnt) * 500}ms"
+		log.info "updateTaskSuccessors: Processing task(#:${task.taskNumber} Id:${task.id}) ${task} - $whom, waited ${ (40 - cnt) * 500}ms"
 		//	def currStatus = task.status
 			
 		// TODO: taskStatusChangeEvent : Add logic to handle READY for the SS predecessor type and correct the current code to not assume SF type
