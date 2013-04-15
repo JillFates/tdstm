@@ -1231,16 +1231,7 @@ class TaskService {
 		// Load the taskSpecIds array used for validation, etc
 		def taskSpecList = recipeTasks*.id
 		log.info "taskSpecList=$taskSpecList"
-		
-		// Load up the 'groups' if any are defined
-		if ( recipeGroups ) {
-			recipeGroups.each() { g -> 
-				groups[g.name] = findAllAssetsWithFilter(moveEvent, g.filter, groups, exceptions)
-				out.append("Group ${g.name} has ${groups[g.name].size()} asset(s)<br/>")
-			}
-			
-		}
-		
+				
 		def noSuccessorsSql = "select t.asset_comment_id as id \
 	    	from asset_comment t \
 	  		left outer join task_dependency d ON d.predecessor_id=t.asset_comment_id \
@@ -1333,6 +1324,29 @@ class TaskService {
 		def maxPreviousEstFinish = null		// Holds the max Est Finish from the previous taskSpec
 		def workflow
 		try {
+
+			// First load up the 'groups' if any are defined 
+			if ( recipeGroups ) {
+				def gCount = 0
+				recipeGroups.each() { g -> 
+					gCount++
+					if (! g.name || g.name.size() == 0) {
+						msg = "Group specification #${gCount} missing required 'name' property"
+						throw new RuntimeException(msg)					
+					}
+					if ( g.filter?.containsKey('taskSpec') ) {
+						msg = "Group specification (${g.name}) references a taskSpec which is not supported"
+						throw new RuntimeException(msg)
+					}
+					groups[g.name] = findAllAssetsWithFilter(moveEvent, g.filter, groups, exceptions)
+					if ( groups[g.name].size() == 0 ) {
+						exceptions.append("Found zero (0) assets for group ${g.name}<br/>")
+					}
+					out.append("Group ${g.name} has ${groups[g.name].size()} asset(s)<br/>")
+				}
+			}
+
+			// Now iterate over each of the task specs
 			recipeTasks.each { taskSpec ->
 				def tasksNeedingPredecessors = []	// Used for wiring up predecessors in 2nd half of method
 				isMilestone = false
@@ -2267,7 +2281,7 @@ class TaskService {
 			}
 			if (assets.size() == 0) {
 				log.info("findAllAssetsWithFilter: 'filter.taskSpec' group filter found no assets .")
-				throw new RuntimeException("''filter.taskSpec' group filter ($groups) contains no assets.")
+				// throw new RuntimeException("''filter.taskSpec' group filter ($groups) contains no assets.")
 			}
 			
 		} else if (filter?.containsKey('taskSpec')) {
@@ -2305,7 +2319,7 @@ class TaskService {
 			
 			if (assets.size() == 0) {
 				log.info("findAllAssetsWithFilter: 'filter.taskSpec' taskSpecs filter found no assets .")
-				throw new RuntimeException("''filter.taskSpec' taskSpecs filter ($taskSpecs) contains no assets.")
+				// throw new RuntimeException("''filter.taskSpec' taskSpecs filter ($taskSpecs) contains no assets.")
 			}
 			
 		} else {
