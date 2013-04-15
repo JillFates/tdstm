@@ -3201,7 +3201,9 @@ class AssetEntityController {
 				// Add filter to SQL statement and update the user's preferences
 				userPreferenceService.setPreference( 'MOVE_EVENT', "${moveEvent.id}" )
 				filterEvent = moveEvent.id
-		}
+		} else {
+        	userPreferenceService.removePreference( 'MOVE_EVENT' );
+	    }
 		def justRemaining = userPreferenceService.getPreference("JUST_REMAINING") ?: "1"
 		// Set the Checkbox values to that which were submitted or default if we're coming into the list for the first time
 		def justMyTasks = params.containsKey('justMyTasks') ? params.justMyTasks : "0"
