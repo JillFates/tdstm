@@ -454,7 +454,7 @@ class TaskService {
 			} else {
 				session.clear()
 				this.sleep(500)
-				def taskStatusMap = jdbcTemplate.queryForMap("select asset_comment_id, status, task_number, version from asset_comment where asset_comment_id = $taskId")
+				def taskStatusMap = jdbcTemplate.queryForMap("SELECT SQL_NO_CACHE asset_comment_id, status, task_number, version from asset_comment where asset_comment_id = $taskId")
 				log.info "updateTaskSuccessors: in loop $cnt - task $taskId status=$taskStatusMap"
 			}			
 		}
