@@ -3,16 +3,11 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="projectHeader" />
         <title>Create Manufacturer</title>      
         <g:javascript src="model.manufacturer.js" />   
     </head>
     <body>
         <div class="body">
-        <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-            <span class="menuButton"><g:link class="list" action="list"  params="[filter:true]">Manufacturer List</g:link></span>
-        </div>
-            <h1>Create Manufacturer</h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>

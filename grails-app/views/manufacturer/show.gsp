@@ -2,23 +2,17 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="projectHeader" />
+        <g:javascript src="model.manufacturer.js" />
         <title>Show Manufacturer</title>
         <script type="text/javascript">
 			$(document).ready(function() {
 			   $("#showMergeDialog").dialog({ autoOpen: false })
+			    $("#editManufacturerView").dialog({ autoOpen: false })
 			})
 		</script>
     </head>
     <body>
         <div class="body">
-         <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-            <span class="menuButton"><g:link class="create" action="create">New Manufacturer</g:link></span>
-        </div>
-            <h1>Show Manufacturer</h1>
-            <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
-            </g:if>
             <div class="dialog">
                 <table>
                     <tbody>
@@ -47,11 +41,13 @@
             <div class="buttons">
                 <g:form>
                     <input type="hidden" name="id" value="${manufacturerInstance?.id}" />
-                    <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
+                    <span class="button"><input type="button" class="edit" value="Edit"
+		onclick="showOrEditModelManuDetails('manufacturer',${manufacturerInstance?.id},'Manufacturer','edit','Edit')" /></span>
                     <span class="button"><input class="create" type="button" value="Merge" onclick="showMergeDialog()"/></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
                 </g:form>
             </div>
+            <div id="editManufacturerView" style="display: none;"></div>
             <div id="showMergeDialog" title="Select the item to merge to:" style="display: none;" class="list">
 				<table cellpadding="0" cellspacing="0">
 					<thead>

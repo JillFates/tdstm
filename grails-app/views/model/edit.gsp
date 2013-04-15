@@ -1,25 +1,17 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="projectHeader" />
     <title>Model - Edit</title>
-    <g:javascript src="drag_drop.js" />
-    <g:javascript src="model.manufacturer.js" />   
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
   </head>
   <body>
 <div class="body">
-<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-            <span class="menuButton"><g:link class="create" action="create">New Model</g:link></span>
-        </div>
 <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
 <div style="border: 0px;margin-top: 5px;" >
 <fieldset>
 <legend><b>Edit Model</b></legend>
-<g:form action="save"  enctype="multipart/form-data">
+<g:form action="update"  enctype="multipart/form-data" name="modelForm">
 <div style="margin-left: 10px;margin-right: 10px; width: auto;">
 <table style="border: 0px;">
 	<tbody>
@@ -240,7 +232,7 @@
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 				<div id="connector${modelConnector.connector}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">
 					<div>
-						<img src="../i/cabling/${modelConnector.status}.png"/>
+						<img src="${resource(dir:'i/cabling',file:modelConnector.status+'.png')}"/>
 					</div>
 					<div id="labelPositionDiv${modelConnector.connector}" class="connector_${modelConnector.labelPosition}">
 						<span id='connectorLabelText${modelConnector.connector}'>${modelConnector.label}</span>
@@ -302,7 +294,7 @@
 				<div class="buttons" style="margin-left: 10px;margin-right: 10px;"> 
 					<input name="id" value="${modelInstance.id}" type="hidden"/>
 					<span class="button">
-						<g:actionSubmit class="save" action="update" value="Update" onclick="return validateForm()"></g:actionSubmit>
+						<input type="button" class="save"  value="Update" onclick="updateModel('Model', 'modelForm')"/>
 						<g:actionSubmit class="delete" action="delete" value="Delete"></g:actionSubmit>
 						<g:actionSubmit class="show" action="cancel" value="Cancel"></g:actionSubmit>
 					</span>

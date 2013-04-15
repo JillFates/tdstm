@@ -36,7 +36,7 @@ function validateAKA(value,itemId,spanId,forWhom){
 	if(makeAjaxCall){
 		var params = {'name':value,'id':itemId}
 		jQuery.ajax({
-			url: '../'+forWhom+'/validateAKA',
+			url : $("#contextPath").val()+'/'+forWhom+'/validateAKA',
 			data: params,
 			complete: function(e) { 
 				if(e.responseText){
@@ -96,4 +96,70 @@ function convertPowerType(value,name){
 		preference = $('#powerDesignIdH').val()/110;
 		$('#powerDesignId').val(preference.toFixed(1));
 	}
+}
+
+function createModelManuDetails(controllerName,ForWhom){
+	jQuery.ajax({
+		url : $("#contextPath").val()+'/'+controllerName+'/create',
+		type : 'POST',
+		success : function(data) {
+			 $("#create"+ForWhom+"View").html(data);
+			 $("#create"+ForWhom+"View").dialog('option', 'width', 'auto')
+			 $("#create"+ForWhom+"View").dialog('option', 'position', ['center','top']);
+			 $("#create"+ForWhom+"View").dialog('open');
+		}
+	});
+	updateTitle(ForWhom,"create","Create")
+	}
+
+function showOrEditModelManuDetails(controllerName,id,ForWhom,view, name){
+	jQuery.ajax({
+		url : $("#contextPath").val()+'/'+controllerName+'/'+view+'/',
+		data : {'id' : id},
+		type : 'POST',
+		success : function(data) {
+			 $("#"+view+""+ForWhom+"View").html(data);
+			 $("#"+view+""+ForWhom+"View").dialog('option', 'width', 'auto')
+			 $("#"+view+""+ForWhom+"View").dialog('option', 'position', ['center','top']);
+			 $("#"+view+""+ForWhom+"View").dialog('open');
+		}
+	});
+	updateTitle(ForWhom,view, name)
+}
+
+function updateTitle( type, view, name){
+	$("#"+view+""+type+"View").dialog( "option", "title", name+" "+type );
+}
+
+function updateModel(ForWhom, formName){
+	$("#"+formName).ajaxSubmit({
+		success: function(data) { 
+			$("#editModelView").dialog('close')
+			$("#showModelView").html(data) 
+			$("#showModelView").dialog('option', 'width', 'auto')
+			$("#showModelView").dialog('option', 'position', ['center','top']);
+			$("#showModelView").dialog('open');
+		},
+		error: function(request, errordata, errorObject) { alert(errorObject.toString()); },
+		});
+}
+
+function updateManufacturer(forWhom){
+	jQuery.ajax({
+		url: $("#editManufacturerFormId").attr('action'),
+		data: $("#editManufacturerFormId").serialize(),
+		type:'POST',
+		success: function(data) {
+			if(data.errMsg){
+				alert(data.errMsg)
+			}else{
+				$("#edit"+forWhom+"View").dialog('close')
+				$("#show"+forWhom+"View").html(data)
+				$("#show"+forWhom+"View").dialog('option', 'width', 'auto')
+				$("#show"+forWhom+"View").dialog('option', 'position', ['center','top']);
+				$("#show"+forWhom+"View").dialog('open');
+			}
+		}
+	});
+	
 }

@@ -2,25 +2,18 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="projectHeader" />
     <title>Model</title>
     <g:javascript src="drag_drop.js" />
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
     <script type="text/javascript">
 		$(document).ready(function() {
 		   $("#showMergeDialog").dialog({ autoOpen: false })
+		    $("#editModelView").dialog({ autoOpen: false })
 		})
 	</script>
   </head>
   <body>
 <div class="body">
-<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-            <span class="menuButton"><g:link class="create" action="create">New Model</g:link></span>
-            <span class="menuButton"><g:link class="create" action="create" params="[modelId:modelInstance.id]">New Model(copy this)</g:link></span>
-        </div>
-<g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
-            </g:if>
 <div style="border: 0px;margin-top: 5px;">
 <fieldset>
 <legend><b>Model</b></legend>
@@ -233,7 +226,8 @@
 					<g:form action="update" >
 						<input name="id" value="${modelInstance.id}" type="hidden"/>
 						<span class="button">
-							<g:actionSubmit class="edit" action="edit" value="Edit"></g:actionSubmit>
+							<span class="button"><input type="button" class="save" value="Edit"
+									onclick="showOrEditModelManuDetails('model',${modelInstance?.id},'Model','edit','Edit')" /></span>
 							<span class="button"><input class="create" type="button" value="Merge" onclick="showMergeDialog()"/></span>
 							<g:actionSubmit class="delete" action="delete" value="Delete" onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>
 							<g:if test="${modelHasPermission && modelInstance?.modelStatus=='full'}">
@@ -248,6 +242,7 @@
 			</td>
 		</tr>
 </div>
+<div id="editModelView" style="display: none;"></div>
 </fieldset>
 <script type="text/javascript">
 $('div.connector_Left').each(function(index) {

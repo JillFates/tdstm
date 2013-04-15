@@ -3,25 +3,16 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="projectHeader" />
         <title>Edit Manufacturer</title>
-        <g:javascript src="model.manufacturer.js" />   
     </head>
     <body>
         <div class="body">
-	        <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-	            <span class="menuButton"><g:link class="create" action="create">New Manufacturer</g:link></span>
-	        </div>
-            <h1>Edit Manufacturer</h1>
-            <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
-            </g:if>
             <g:hasErrors bean="${manufacturerInstance}">
             <div class="errors">
                 <g:renderErrors bean="${manufacturerInstance}" as="list" />
             </div>
             </g:hasErrors>
-            <g:form method="post" >
+            <g:form method="post" action="update" name="editManufacturerFormId">
                 <input type="hidden" name="id" value="${manufacturerInstance?.id}" />
                 <div class="dialog">
                     <table>
@@ -72,8 +63,8 @@
                     </table>
                 </div>
                 <input type="hidden" name="deletedAka" id="deletedAka" />
-                <div class="buttons">
-                    <span class="button"><g:actionSubmit class="save" value="Update" /></span>
+                <div class="buttons" >
+                    <span class="button"><input type="button" class="save" value="Update" onclick="updateManufacturer('Manufacturer')"/></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
                 </div>
             </g:form>

@@ -4,13 +4,19 @@
         <meta name="layout" content="projectHeader" />
         <title>Model List</title>
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
+    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+<g:javascript src="model.manufacturer.js" />
+<g:javascript src="drag_drop.js" />
+<script src="${resource(dir:'js',file:'jquery.form.js')}"></script> 	
 <jqgrid:resources />
 <jqui:resources /> 
 <jqgrid:resources />
 
 <script type="text/javascript">
 $(document).ready(function() {
+	$("#createModelView").dialog({ autoOpen: false })
+	$("#showModelView").dialog({ autoOpen: false })
 	<jqgrid:grid id="modelId" url="'${createLink(action: 'listJson')}'"
 	    colNames="'Model Name','Manufacturer', 'Description','Asset Type', 'Power','No Of Connectors','Assets ','Version','Source TDS','Model Status'"
 	    colModel="{name:'modelName', index: 'modelName', width:'150',formatter: myLinkFormatter},
@@ -39,7 +45,7 @@ $(document).ready(function() {
 	$.jgrid.formatter.integer.thousandsSeparator='';
 	function myLinkFormatter (cellvalue, options, rowObjcet) {
 		var value = cellvalue ? cellvalue : ''
-		return '<a href="../show/'+options.rowId+'">'+value+'</a>'
+		return '<a href="javascript:showOrEditModelManuDetails(\'model\','+options.rowId+',\'Model\',\'show\',\'Show\')">'+value+'</a>'
 	}
 });
 </script>
@@ -54,10 +60,11 @@ $(document).ready(function() {
 	<div id="messageId" class="message" style="display:none"></div>
 </div>
 <jqgrid:wrapper id="modelId" />
+<div id="createModelView" style="display: none;" ></div>
+<div id="showModelView" style="display: none;"></div>
 <div class="buttons">
-<g:form action="create" method="post">
-				<span class="button"><g:actionSubmit class="save" action="Create" value="Create Model" /></span>
-</g:form>
+				<span class="button"><input type="button" class="save" value="Create Model"
+		onclick="createModelManuDetails('model','Model')" /></span>
 </div>
 </div>
 </body>

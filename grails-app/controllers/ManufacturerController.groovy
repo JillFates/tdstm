@@ -146,8 +146,8 @@ class ManufacturerController {
 					manufacturerInstance.findOrCreateAliasByName(aka, true)
 				}
 			}
-            flash.message = "Manufacturer ${manufacturerInstance.id} created"
-            redirect(action:show,id:manufacturerInstance.id)
+            flash.message = "Manufacturer ${manufacturerInstance.name} created"
+            redirect(action:list,id:manufacturerInstance.id)
         }
         else {
             render(view:'create',model:[manufacturerInstance:manufacturerInstance])

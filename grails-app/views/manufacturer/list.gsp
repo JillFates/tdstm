@@ -4,13 +4,15 @@
         <meta name="layout" content="projectHeader" />
         <title>Manufacturer List</title>
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-
+<g:javascript src="model.manufacturer.js" />
 <jqgrid:resources />
 <jqui:resources /> 
 <jqgrid:resources />
 
 <script type="text/javascript">
 $(document).ready(function() {
+	$("#createManufacturerView").dialog({ autoOpen: false })
+	$("#showManufacturerView").dialog({ autoOpen: false })
 	<jqgrid:grid id="manufacturerId" url="'${createLink(action: 'listJson')}'"
 	    colNames="'Name','AKA', 'Description','Models', 'AssetCount'"
 	    colModel="{name:'name', index: 'name', width:'100',formatter: myLinkFormatter},
@@ -34,7 +36,7 @@ $(document).ready(function() {
 	$.jgrid.formatter.integer.thousandsSeparator='';
 	function myLinkFormatter (cellvalue, options, rowObjcet) {
 		var value = cellvalue ? cellvalue : ''
-		return '<a href="../show/'+options.rowId+'">'+value+'</a>'
+			return '<a href="javascript:showOrEditModelManuDetails(\'manufacturer\','+options.rowId+',\'Manufacturer\',\'show\',\'Show\')">'+value+'</a>'
 	}
 });
 </script>
@@ -49,10 +51,11 @@ $(document).ready(function() {
 	<div id="messageId" class="message" style="display:none"></div>
 </div>
 <jqgrid:wrapper id="manufacturerId" />
+<div id="createManufacturerView" style="display: none;" ></div>
+<div id="showManufacturerView" style="display: none;" ></div>
 <div class="buttons">
-	<g:form>
-	    <span class="button"><g:actionSubmit class="create" value="New Manufacturer" action="create" /></span>
-	</g:form>
+	    <span class="button"><input type="button" class="save" value="Create Manufacturer"
+		onclick="createModelManuDetails('manufacturer','Manufacturer')"/></span>
 </div>
 </div>
 </body>

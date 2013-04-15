@@ -155,7 +155,7 @@ class ModelController {
 		}
 		def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
 		def frontImage = request.getFile('frontImage')
-        if( frontImage.bytes.size() > 0 ) {
+        if( frontImage?.bytes?.size() > 0 ) {
 			if( frontImage.getContentType() && frontImage.getContentType() != "application/octet-stream"){
 				if (! okcontents.contains(frontImage.getContentType())) {
 	        		flash.message = "Front Image must be one of: ${okcontents}"
@@ -169,7 +169,7 @@ class ModelController {
         	modelInstance.frontImage = null
         }
         def rearImage = request.getFile('rearImage')
-        if( rearImage.bytes.size() > 0 ) {
+        if( rearImage?.bytes?.size() > 0 ) {
 			if( rearImage.getContentType() && rearImage.getContentType() != "application/octet-stream"){
 				if (! okcontents.contains(rearImage.getContentType())) {
 	        		flash.message = "Rear Image must be one of: ${okcontents}"
@@ -223,7 +223,7 @@ class ModelController {
 				modelInstance.findOrCreateAliasByName(aka.trim(), true)
 			}
             flash.message = "${modelInstance.modelName} created"
-            redirect(action: "show", id: modelInstance.id)
+            redirect(action:list , id: modelInstance.id)
         }
         else {
         	flash.message = modelInstance.errors.allErrors.each{  log.error it }
@@ -359,9 +359,9 @@ class ModelController {
     	        		return;
     	        	}
     				frontImage = frontImage.bytes
-            	} else {
-            		frontImage = modelInstance.frontImage
             	}
+            } else {
+            		frontImage = modelInstance.frontImage
             }
             def rearImage = request?.getFile('rearImage')
             if( rearImage ) {
@@ -372,10 +372,10 @@ class ModelController {
     	        		return;
     	        	}
     				rearImage = rearImage.bytes
-            	} else {
+            	}
+            } else {
                 	rearImage = modelInstance.rearImage
                 }
-            }
 		
 			modelInstance.height = params.modelHeight != "" ? Integer.parseInt(params.modelHeight):0 
 			modelInstance.weight = params.modelWeight != "" ? Integer.parseInt(params.modelWeight):0 
@@ -386,7 +386,7 @@ class ModelController {
 			   modelInstance.updatedBy =  modelInstance.updatedBy
 			}else{
 			   modelInstance.updatedBy = person
-			}
+			}				
             modelInstance.properties = params
             modelInstance.rearImage = rearImage
             modelInstance.frontImage = frontImage
