@@ -81,7 +81,7 @@ function openSelectedRackLayout(){
 }
 function updateAssetBladeInfo(source,blade,position,manufacturer,moveBundle){
 	var target = source != '1' ? 'target' : 'source'
-	$("#assetTypeId").val("Blade")	
+	$("#assetTypeCreateId").val("Blade")	
 	$("#"+target+"BladeChassisId").val(blade)
 	$("#"+target+"BladePositionId").val(position)
 	$("#manufacturer").val(manufacturer)

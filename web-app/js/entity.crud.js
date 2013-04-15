@@ -135,7 +135,7 @@ function showManufacView(e, forWhom){
 }
 function selectModel(value, forWhom){
 	var val = value;
-	var assetType = $("#assetTypeId").val() ;
+	var assetType = $("#assetType"+forWhom+"Id").val() ;
 	new Ajax.Request('../assetEntity/getModelsList?assetType='+assetType+'&manufacturer='+val+'&forWhom='+forWhom,{asynchronous:true,evalScripts:true,onComplete:function(e){showModelView(e, forWhom);}})
 	//${remoteFunction(action:'getModelsList', params:'\'assetType=\' +assetType +\'&=\'+ val', onComplete:'showModelView(e)' )}
 }
@@ -477,7 +477,7 @@ function createAuditPage(type,source,rack,roomName,location,position){
 				$("#auditDetailViewId").html(data.responseText)
 				$("#auditLocationId").val(location)
 				$("#auditRoomId").val(roomName)
-				$("#assetTypeId").val(type)
+				$("#assetTypeCreateId").val(type)
 				$(".bladeLabel").hide()
 				$(".rackLabel").show()
 				if(source==0 && type!='Blade'){
@@ -503,7 +503,7 @@ function createBladeAuditPage(source,blade,position,manufacturer,assetType,asset
 				$("#auditDetailViewId").html(data.responseText)
 				$("#BladeChassisId").val(blade)
 				$("#bladePositionId").val(position)
-				$("#assetTypeId").val(assetType)
+				$("#assetTypeCreateId").val(assetType)
 				$("#moveBundleId").val(moveBundleId)
 				$("#sourceId").val(source)
 				$(".bladeLabel").show()
@@ -567,7 +567,7 @@ function updateModelForAudit(name){
 function getAssetType(val){
 	new Ajax.Request('../model/getModelType?value='+val,{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
-			$("#assetTypeId").val(data.responseText)
+			$("#assetTypeEditId").val(data.responseText)
 			editModelAudit(""+val+"")
 		}}
 	)

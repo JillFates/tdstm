@@ -1,6 +1,6 @@
 <script type="text/javascript">
 $(document).ready(function() { 
-	var assetType = $("#assetTypeId").val()
+	var assetType = $("#assetTypeCreateId").val()
 	if(assetType =='Blade'){
 		$(".bladeLabel").show()
 		$(".rackLabel").hide()

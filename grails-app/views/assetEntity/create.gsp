@@ -12,11 +12,11 @@
 	$("#asset_assetTag").val($('#gs_assetTag').val())
 	
 	$(document).ready(function() { 
-		if($("#assetTypeId").val()=='Blade'){
+		if($("#assetTypeCreateId").val()=='Blade'){
 			$(".bladeLabel").show()
 			$(".rackLabel").hide()
 			$(".vmLabel").hide()
-		} else if($("#assetTypeId").val()=='VM') {
+		} else if($("#assetTypeCreateId").val()=='VM') {
 			$(".bladeLabel").hide()
 			$(".rackLabel").hide()
 			$(".vmLabel").show()

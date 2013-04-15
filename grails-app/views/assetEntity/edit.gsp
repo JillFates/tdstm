@@ -11,7 +11,7 @@
 	$("#asset_moveBundle").val($('#gs_moveBundle').val())
 	$("#asset_assetTag").val($('#gs_assetTag').val())
 	$(document).ready(function() { 
-		var assetType = $("#assetTypeId").val()
+		var assetType = $("#assetTypeEditId").val()
 		if(assetType =='Blade'){
 			$(".bladeLabel").show()
 			$(".rackLabel").hide()
