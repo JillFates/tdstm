@@ -4,7 +4,6 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <title>Create Manufacturer</title>      
-        <g:javascript src="model.manufacturer.js" />   
     </head>
     <body>
         <div class="body">

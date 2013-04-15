@@ -98,40 +98,48 @@ function convertPowerType(value,name){
 	}
 }
 
-function createModelManuDetails(controllerName,ForWhom){
+function createModelManuDetails(controllerName,forWhom){
 	jQuery.ajax({
 		url : $("#contextPath").val()+'/'+controllerName+'/create',
 		type : 'POST',
 		success : function(data) {
-			 $("#create"+ForWhom+"View").html(data);
-			 $("#create"+ForWhom+"View").dialog('option', 'width', 'auto')
-			 $("#create"+ForWhom+"View").dialog('option', 'position', ['center','top']);
-			 $("#create"+ForWhom+"View").dialog('open');
+			 $("#create"+forWhom+"View").html(data);
+			 $("#create"+forWhom+"View").dialog('option', 'width', 'auto')
+			 $("#create"+forWhom+"View").dialog('option', 'position', ['center','top']);
+			 $("#show"+forWhom+"View").dialog('close');
+			 $("#edit"+forWhom+"View").dialog('close');
+			 $("#create"+forWhom+"View").dialog('open');
 		}
 	});
-	updateTitle(ForWhom,"create","Create")
+	updateTitle(forWhom,"create","Create")
 	}
 
-function showOrEditModelManuDetails(controllerName,id,ForWhom,view, name){
+function showOrEditModelManuDetails(controllerName,id,forWhom,view, name){
 	jQuery.ajax({
 		url : $("#contextPath").val()+'/'+controllerName+'/'+view+'/',
 		data : {'id' : id},
 		type : 'POST',
 		success : function(data) {
-			 $("#"+view+""+ForWhom+"View").html(data);
-			 $("#"+view+""+ForWhom+"View").dialog('option', 'width', 'auto')
-			 $("#"+view+""+ForWhom+"View").dialog('option', 'position', ['center','top']);
-			 $("#"+view+""+ForWhom+"View").dialog('open');
+			 $("#"+view+""+forWhom+"View").html(data);
+			 $("#"+view+""+forWhom+"View").dialog('option', 'width', 'auto')
+			 $("#"+view+""+forWhom+"View").dialog('option', 'position', ['center','top']);
+			 $("#create"+forWhom+"View").dialog('close');
+			 if(view=='edit')
+				 $("#show"+forWhom+"View").dialog('close');
+			 else if(view=='show')
+				 $("#edit"+forWhom+"View").dialog('close');
+			 
+			 $("#"+view+""+forWhom+"View").dialog('open');
 		}
 	});
-	updateTitle(ForWhom,view, name)
+	updateTitle(forWhom,view, name)
 }
 
 function updateTitle( type, view, name){
 	$("#"+view+""+type+"View").dialog( "option", "title", name+" "+type );
 }
 
-function updateModel(ForWhom, formName){
+function updateModel(forWhom, formName){
 	$("#"+formName).ajaxSubmit({
 		success: function(data) { 
 			$("#editModelView").dialog('close')

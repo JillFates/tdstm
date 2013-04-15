@@ -2,10 +2,6 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <title>Model - New</title>
-    <g:javascript src="drag_drop.js" />
-    <g:javascript src="model.manufacturer.js" />   
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
     
   </head>
   <body>
