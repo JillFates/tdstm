@@ -1341,6 +1341,8 @@ class TaskService {
 					groups[g.name] = findAllAssetsWithFilter(moveEvent, g.filter, groups, exceptions)
 					if ( groups[g.name].size() == 0 ) {
 						exceptions.append("Found zero (0) assets for group ${g.name}<br/>")
+					} else {
+						log.info "Group ${g.name} contains: ${groups[g.name]}"
 					}
 					out.append("Group ${g.name} has ${groups[g.name].size()} asset(s)<br/>")
 				}
@@ -1359,7 +1361,7 @@ class TaskService {
 				def depMode = ''			// Holds [s|r] for assetTask.predecessor.mode to indicate s)upports or r)equires
 				def mapMode = ''
 				def hasPredecessor = false
-				def hasGroup = false
+				def hasPredGroup = false
 				def hasTaskSpec = false
 				def predecessor = null
 				def ignorePred = false
@@ -1412,7 +1414,7 @@ class TaskService {
 							}
 						}
 						
-						hasGroup = predecessor.containsKey('group')
+						hasPredGroup = predecessor.containsKey('group')
 						hasTaskSpec = predecessor.containsKey('taskSpec')
 							
 						if ( depMode && ! taskSpec.filter ) {
@@ -1421,14 +1423,14 @@ class TaskService {
 						}
 						
 						// Check for mutually exclusive mode, group and taskSpec
-						if ( (depMode && ( hasGroup || hasTaskSpec )) || (hasGroup && hasTaskSpec) ) {
+						if ( (depMode && ( hasPredGroup || hasTaskSpec )) || (hasPredGroup && hasTaskSpec) ) {
 							msg = "Task Spec (${taskSpec.id}) contains predecessor 'mode', 'group' and/or 'taskSpec' which mutually exclusive"
 							log.info(msg)
 							throw new RuntimeException(msg)							
 						}	
 						
 						// Make sure we have one of the three methods to find predecessors
-						if (! (depMode || hasGroup || hasTaskSpec || ignorePred ) ) {
+						if (! (depMode || hasPredGroup || hasTaskSpec || ignorePred ) ) {
 							msg = "Task Spec (${taskSpec.id}) contains predecessor requires on of the properties 'mode', 'group', 'ignore' or 'taskSpec'"
 							log.info(msg)
 							throw new RuntimeException(msg)							
@@ -1617,7 +1619,6 @@ class TaskService {
 							workflow = getWorkflowStep(taskWorkflowCode, asset.moveBundle.id)
 							newTask = createTaskFromSpec(recipeId, whom, taskList, ++lastTaskNum, moveEvent, taskSpec, workflow, asset)
 							tasksNeedingPredecessors << newTask
-							// assetsLatestTask.put(asset.id, newTask)
 							out.append("Created task $newTask<br/>")
 						} 
 						
@@ -1742,10 +1743,10 @@ class TaskService {
 							// = using group - preload predAssets map with assets within the group
 							// = has no predecessor defined - n/a 
 						
-							if ( hasGroup ) {
+							if ( hasPredGroup ) {
 								// If there are any groups defined then preload all of the assets that are included in the groups to be used 
 								// in the next each/switch code block.
-
+								log.info "hasPredGroup - here"
 								// Put the group property into an array if not already an array
 								def taskGroups = ( taskSpec.predecessor.group instanceof java.util.ArrayList ) ? taskSpec.predecessor.group : [taskSpec.predecessor.group]
 
@@ -1759,7 +1760,7 @@ class TaskService {
 									// Find the latest task for all of the assets of the specified GROUP
 									log.info("assetsLatestTask has ${assetsLatestTask.size()} assets")
 									if (groups.containsKey(groupCode)) {
-										hasGroup=true
+										//hasPredGroup=true
 										groups[groupCode].each() { asset ->
 											predAssets.put(asset.id, asset)
 									
@@ -1837,7 +1838,7 @@ class TaskService {
 								// during the same taskStep, assetsLatestTask may not yet be populated so we can scan the tasks created list for
 								// one with the same taskSpec id #
 														
-								if (hasGroup) {
+								if (hasPredGroup) {
 									//
 									// --- GROUPS ---
 									//
@@ -1847,7 +1848,7 @@ class TaskService {
 									//   2. If task does NOT have assets, then we bind the current task as successor to latest task of ALL assets in the list
 									if (tnp.assetEntity) {
 									
-										log.info "Processing from hasGroup #1"
+										log.info "Processing from hasPredGroup #1"
 										// #1 - Link task to it's asset's latest task if the asset was in the group and there is an previous task otherwise link it to the milestone if one exists
 										if (predAssets.containsKey( tnp.assetEntity.id )) {
 											// Find the latest asset for the task.assetEntity
@@ -1873,7 +1874,7 @@ class TaskService {
 										}
 									} else {
 										// #2 - Wire latest tasks for all assets in group to this task
-										log.info "Processing from hasGroup #2 isRequired=$isRequired"
+										log.info "Processing from hasPredGroup #2 isRequired=$isRequired"
 									
 										// log.info("predAssets=$predAssets")
 										predAssets.each() { predAssetId, predAsset ->
@@ -1974,6 +1975,7 @@ class TaskService {
 
 									// Link task to the last known milestone or it's asset's previous task
 									linkTaskToLastAssetOrMilestone(tnp)
+									assetsLatestTask[tnp.assetEntity.id] = tnp
 									wasWired = true
 								
 								} else {
@@ -2021,7 +2023,7 @@ class TaskService {
 											} else {
 												log.info "No predecessor task found for asset ($predAsset) to link to task ($tnp)"
 												exceptions.append("No predecessor task found for asset ($predAsset) to link to task ($tnp)<br/>")
-												linkTaskToMilestone(tnp)
+												// linkTaskToMilestone(tnp)
 											}
 										}
 									}
@@ -2384,9 +2386,9 @@ class TaskService {
 			// Param 'exclude'
 			// Handle exclude filter parameter that will add a NOT IN () cause to the where for references to one or more groups
 			//
-			if (filter?.asset?.containsKey('exclude')) {
+			if (filter?.containsKey('exclude')) {
 				def excludes = []
-				def excludeProp = filter.asset.exclude instanceof java.util.ArrayList ? filter.asset.exclude : [filter.asset.exclude]				
+				def excludeProp = filter.exclude instanceof java.util.ArrayList ? filter.exclude : [filter.exclude]				
 				excludeProp.each() { exGroup -> 
 					if (loadedGroups?.containsKey(exGroup)) {
 						excludes.addAll(loadedGroups[exGroup])							
@@ -2398,6 +2400,7 @@ class TaskService {
 					where = SqlUtil.appendToWhere(where, 'a.id NOT in (:excludes)')
 					map.put('excludes', excludes*.id)
 				}
+				log.info "findAllAssetsWithFilter: excluding group(s) [${filter.exclude}] that has ${excludes.size()} assets"
 			}
 			
 			// Assemble the SQL and attempt to execute it
