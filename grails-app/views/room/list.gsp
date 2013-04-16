@@ -316,7 +316,7 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 <span id="Storage"><g:select name="asset" from="${files}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span>
 <span id="Network"><g:select name="asset" from="${networks}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span>
 </div>
-<script type="text/javascript">
+<script type="text/javascript">    
 function openRoomView(e,browser){
 	
 	var resp = e.responseText
@@ -414,6 +414,34 @@ function getRackLayout( rackId ){
 					getAssignedDetails('room', rackId)
 				},parameters:moveBundleId+'rackId='+rackId+'&backView=off&showCabling=off&otherBundle='+otherBundle+'&bundleName=on&hideIcons=on&forWhom='+forWhom});return false;
 	}
+}
+
+//Function to load js or css file dynamically
+function loadjscssfile(filename, filetype){
+	 if (filetype=="js"){ 
+	  var fileref=document.createElement('script')
+	  fileref.setAttribute("type","text/javascript")
+	  fileref.setAttribute("src", filename)
+	 }
+	 else if (filetype=="css"){
+	  var fileref=document.createElement("link")
+	  fileref.setAttribute("rel", "stylesheet")
+	  fileref.setAttribute("type", "text/css")
+	  fileref.setAttribute("href", filename)
+	 }
+	 if (typeof fileref!="undefined")
+	  document.getElementsByTagName("head")[0].appendChild(fileref)
+}
+
+//Function to remove js or css file dynamically
+function removejscssfile(filename, filetype){
+	 var targetelement=(filetype=="js")? "script" : (filetype=="css")? "link" : "none" 
+	 var targetattr=(filetype=="js")? "src" : (filetype=="css")? "href" : "none" 
+	 var allsuspects=document.getElementsByTagName(targetelement)
+	 for (var i=allsuspects.length; i>=0; i--){ 
+	     if (allsuspects[i] && allsuspects[i].getAttribute(targetattr)!=null && allsuspects[i].getAttribute(targetattr).indexOf(filename)!=-1)
+	  		 allsuspects[i].parentNode.removeChild(allsuspects[i]) 
+	 }
 }
 </script>
 <script>

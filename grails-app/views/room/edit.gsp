@@ -1,8 +1,5 @@
 <html>
 <head>
-<g:javascript src="jquery-1.9.1.js"></g:javascript>
-<g:javascript src="jquery-1.9.1-ui.js"></g:javascript>
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery-ui-effect.css')}" />
 </head>
 <body>
 
@@ -264,6 +261,10 @@
 	<script type="text/javascript">
 
 $(document).ready(function() {
+	loadjscssfile('/tdstm/js/jquery-1.9.1.js','js') // Loading jquery1.9.1 and suuprting files dynamically .
+	loadjscssfile('/tdstm/js/jquery-1.9.1-ui.js','js')
+	loadjscssfile('/tdstm/css/jquery-ui-effect.css','css')
+	
     var prefVal = '${prefVal}'
     if(prefVal=='FALSE'){
    	 	$("#roomObjects").hide()

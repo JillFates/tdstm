@@ -186,8 +186,29 @@
 </div>
 
 <script type="text/javascript">
+$(document).ready(function() {
+	$("#createEntityView").dialog({autoOpen: false})
+	$("#showEntityView").dialog({autoOpen: false})
+    $("#editEntityView").dialog({autoOpen: false})
+    $("#commentsListDialog").dialog({ autoOpen: false })
+    $("#createCommentDialog").dialog({ autoOpen: false })
+    $("#showCommentDialog").dialog({ autoOpen: false })
+    $("#editCommentDialog").dialog({ autoOpen: false })
+    $("#editDialog").dialog({ autoOpen: false })
+    $("#createRoomDialog").dialog({ autoOpen: false })
+    $("#mergeRoomDialog").dialog({ autoOpen: false })
+    $("#listDialog").dialog({ autoOpen: false })
+    $("#cablingDialogId").dialog({ autoOpen: false })
+    $("#manufacturerShowDialog").dialog({ autoOpen: false })
+	$("#modelShowDialog").dialog({ autoOpen: false })
+    removejscssfile('/tdstm/js/jquery-1.9.1.js','js')
+	removejscssfile('/tdstm/js/jquery-1.9.1-ui.js','js')
+	removejscssfile('/tdstm/css/jquery-ui-effect.css','css')
+})
 initializeRacksInRoom( [] )
 capacityView()
+
+
 function updateRackPower(rackId){
 	$("#selectedRackId").val(rackId)
 	$("#redirectTo").val("room_"+rackId)
