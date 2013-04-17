@@ -44,7 +44,7 @@
 					<legend>Predecessors</legend>
 					<g:each in="${assetComment.taskDependencies}" var="task">
 						<span class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}" onclick="showAssetComment(${task.predecessor.id})">
-						${task.assetComment.taskNumber}:${task.assetComment.comment} (${task.assetComment.category})
+						${task.predecessor.taskNumber}:${task.predecessor.comment} (${task.predecessor.category})
 						</span>
 						<br/>
 					</g:each>
