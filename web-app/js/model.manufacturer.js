@@ -80,21 +80,21 @@ function avoidDuplicate(spanId){
  * @param value
  * @param name
  */
-function convertPowerType(value,name){
-	
-	if(value=="Watts" && name =="powerType"){
-		$('#powerUseId').val( $('#powerUseIdH').val() );
-		$('#powerNameplateId').val( $('#powerNameplateIdH').val() );
-		$('#powerDesignId').val( $('#powerDesignIdH').val() );
-	} else if(value=="Amps" && name == "powerType"){
-		var preference = $('#powerUseIdH').val()/110;
-		$('#powerUseId').val(preference.toFixed(1));
-
-		preference = $('#powerNameplateIdH').val()/110;
-		$('#powerNameplateId').val(preference.toFixed(1));
-
-		preference = $('#powerDesignIdH').val()/110;
-		$('#powerDesignId').val(preference.toFixed(1));
+function convertPowerType(value, whom){
+	if(value=="Watts"){
+		var powerUsed = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0')? $('#powerUseIdH').val() : ($('#powerUse'+whom+'Id').val()*110)
+	    var powerNameplate =  ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0')  ? $('#powerNameplateIdH').val() : ($('#powerNameplate'+whom+'Id').val()*110)
+	    var powerDesign =  ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() !='0') ? $('#powerDesignIdH').val() : ($('#powerDesign'+whom+'Id').val()*110)
+		$('#powerUse'+whom+'Id').val(powerUsed);
+		$('#powerNameplate'+whom+'Id').val(powerNameplate);
+		$('#powerDesign'+whom+'Id').val(powerDesign);
+	} else if(value=="Amps"){
+		var powerUseA = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0') ? $('#powerUseIdH').val()/110 : ($('#powerUse'+whom+'Id').val()/110);
+		$('#powerUse'+whom+'Id').val(powerUseA.toFixed(1));
+		var powerNameplateA = ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() !='0') ? $('#powerNameplateIdH').val()/110 : ($('#powerNameplate'+whom+'Id').val()/110);
+		$('#powerNameplate'+whom+'Id').val(powerNameplateA.toFixed(1));
+		var powerDesignA = ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() !='0') ? $('#powerDesignIdH').val()/110 : ($('#powerDesign'+whom+'Id').val()/110);
+		$('#powerDesign'+whom+'Id').val(powerDesignA.toFixed(1));
 	}
 }
 
@@ -148,8 +148,8 @@ function updateModel(forWhom, formName){
 			$("#showModelView").dialog('option', 'position', ['center','top']);
 			$("#showModelView").dialog('open');
 		},
-		error: function(request, errordata, errorObject) { alert(errorObject.toString()); },
-		});
+		error: function(request, errordata, errorObject) { alert(errorObject.toString()); }
+	});
 }
 
 function updateManufacturer(forWhom){
@@ -170,4 +170,29 @@ function updateManufacturer(forWhom){
 		}
 	});
 	
+}
+
+
+function changePowerValue(whom){
+	var namePlatePower = $("#powerNameplate"+whom+"Id").val()
+	var powerDesign = $("#powerDesign"+whom+"Id").val()	
+	var powerUse= $("#powerUse"+whom+"Id").val()
+	if(powerDesign == "" || powerDesign == 0 || powerDesign == 0.0 ){
+	  $("#powerDesign"+whom+"Id").val(parseInt(namePlatePower)*0.5)
+	  if(whom=='Edit')
+		  $("#powerDesignIdH").val(parseInt(namePlatePower)*0.5)
+	}
+    if(powerUse == "" || powerUse == 0 || powerUse == 0.0 ){
+      $("#powerUse"+whom+"Id").val(parseInt(namePlatePower)*0.33)
+      if(whom=='Edit')
+    	   $("#powerUseIdH").val(parseInt(namePlatePower)*0.33)
+	}
+}
+
+function setStanderdPower(whom){
+	var namePlatePower = $("#powerNameplate"+whom+"Id").val()
+	var powerDesign = $("#powerDesign"+whom+"Id").val()	
+	var powerUse= $("#powerUse"+whom+"Id").val()
+	$("#powerDesign"+whom+"Id").val((parseInt(namePlatePower)*0.5).toFixed(0))  
+    $("#powerUse"+whom+"Id").val((parseInt(namePlatePower)*0.33).toFixed(0))
 }

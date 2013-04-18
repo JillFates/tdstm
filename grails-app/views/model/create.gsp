@@ -107,10 +107,12 @@
 		<tr>
 			<td valign="top" class="name" nowrap="nowrap">Power (Max/Design/Avg):</td>
 			<td>
-				<input type="text" size="4" name="powerNameplate" id="powerNameplateId" value="${modelInstance.powerNameplate}" onblur="chnagePowerValue(this.name)" ><a id ="namePlateId"  title="Make standard values from nameplate" style="cursor: pointer;vertical-align: top" onclick="setStanderdPower()"> >> </a>
-				<input type="text" size="4" name="powerDesign" id="powerDesignId" value="${modelInstance.powerDesign}" >&nbsp;
-				<input type="text" size="4" name="powerUse" id="powerUseId" value="${modelInstance.powerUse}" >&nbsp;
-				<g:select id="powerTypeId" name='powerType' from="${['Watts','Amps']}" value="${powerType}"> </g:select></td>
+				<input type="text" size="4" name="powerNameplate" id="powerNameplateCreateId" value="${modelInstance.powerNameplate}" 
+					onblur="changePowerValue('Create')" ><a id ="namePlateId"  title="Make standard values from nameplate" style="cursor: pointer;vertical-align: top" 
+					onclick="setStanderdPower('Create')"> >> </a>
+				<input type="text" size="4" name="powerDesign" id="powerDesignCreateId" value="${modelInstance.powerDesign}" >&nbsp;
+				<input type="text" size="4" name="powerUse" id="powerUseCreateId" value="${modelInstance.powerUse}" >&nbsp;
+				<g:select id="powerTypeId" name='powerType' from="${['Watts','Amps']}" value="${powerType}"></g:select></td>
 			</td>
 		    <td valign="top" class="name">Notes:</td>
 		    <td>
@@ -186,7 +188,7 @@
 			</td>
 			<td valign="top" class="name" nowrap="nowrap">Model Status :</td>
 			<td>
-				<g:select id="modelStatus" name='modelStatus' value ='${modelInstance.modelStatus}' from="${['new']}" > </g:select>
+				<g:select id="modelStatus" name='modelStatus' value ='${modelInstance.modelStatus}' from="${['new']}" ></g:select>
 			</td>
        </tr>
 	</tbody>
@@ -258,12 +260,11 @@
 			</tbody>
 		</table>
 	</div>
-	<tr>
+	    <tr>
 			<td colspan="2">
 				<div class="buttons" style="margin-left: 10px;margin-right: 10px;"> 
 					<span class="button">
 						<g:actionSubmit class="save" action="save" value="Save" onclick="return validateForm()"></g:actionSubmit>
-						 <span class="menuButton"><g:link class="list" action="list"  params="[filter:true]">Cancel</g:link></span>
 					</span>
 				</div>
 			</td>
@@ -388,24 +389,7 @@
 	}
 	showBladeFields($("#assetTypeId").val())
 	
-	function chnagePowerValue(name){
-		var namePlatePower = $("#powerNameplateId").val()
-		var powerDesign = $("#powerDesignId").val()	
-		var powerUse= $("#powerUseId").val()
-		if(powerDesign == ""){
-		  $("#powerDesignId").val(parseInt(namePlatePower)*0.5)  
-		}
-	    if(powerUse == ""){
-	      $("#powerUseId").val(parseInt(namePlatePower)*0.33)
-		}
-	}
-	function setStanderdPower(){
-		var namePlatePower = $("#powerNameplateId").val()
-		var powerDesign = $("#powerDesignId").val()	
-		var powerUse= $("#powerUseId").val()
-		$("#powerDesignId").val((parseInt(namePlatePower)*0.5).toFixed(0))  
-	    $("#powerUseId").val((parseInt(namePlatePower)*0.33).toFixed(0))
-    }
+	
 </script>
 <script>
 	currentMenuId = "#adminMenu";

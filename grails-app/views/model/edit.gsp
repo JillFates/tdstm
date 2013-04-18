@@ -114,13 +114,16 @@
 			<td>Power (Max/Design/Avg):</td>
 			<td>
 			    <g:set var="powerType" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE ?: 'Watts'}"/>
-				<input type="text" size="4" name="powerNameplate" id="powerNameplateId" value="${powerType != 'Watts' ? ( modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 110 ).toFloat().round(1) : '' ): modelInstance?.powerNameplate}" onblur="changePowerValue()" ><a id ="namePlateId"  title="Make standard values from nameplate" style="cursor: pointer;" onclick="setStanderdPower()"> >> </a>
+				<input type="text" size="4" name="powerNameplate" id="powerNameplateEditId"
+				 	value="${powerType != 'Watts' ? ( modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 110 ).toFloat().round(1) : '' ): modelInstance?.powerNameplate}" 
+					onblur="changePowerValue('Edit')" ><a id ="namePlateId"  title="Make standard values from nameplate" style="cursor: pointer;" 
+					onclick="setStanderdPower('Edit')"> >> </a>
 				<input type="hidden" id="powerNameplateIdH" value="${modelInstance?.powerNameplate}">
-				<input type="text" size="4" name="powerDesign" id="powerDesignId" value="${powerType != 'Watts' ? ( modelInstance?.powerDesign ?  (modelInstance?.powerDesign / 110 ).toFloat().round(1) : '' ) : modelInstance?.powerDesign}" >&nbsp;
+				<input type="text" size="4" name="powerDesign" id="powerDesignEditId" value="${powerType != 'Watts' ? ( modelInstance?.powerDesign ?  (modelInstance?.powerDesign / 110 ).toFloat().round(1) : '' ) : modelInstance?.powerDesign}" >&nbsp;
 				<input type="hidden" id="powerDesignIdH" value="${modelInstance?.powerDesign}" >
-                <input type="text" size="4" name="powerUse" id="powerUseId" value="${powerType != 'Watts' ?  ( modelInstance?.powerUse ? (modelInstance?.powerUse / 110 ).toFloat().round(1) : '') : modelInstance?.powerUse}" >&nbsp;
+                <input type="text" size="4" name="powerUse" id="powerUseEditId" value="${powerType != 'Watts' ?  ( modelInstance?.powerUse ? (modelInstance?.powerUse / 110 ).toFloat().round(1) : '') : modelInstance?.powerUse}" >&nbsp;
                 <input type="hidden" id="powerUseIdH" value="${modelInstance?.powerUse}" >
-				<g:select id="ptype" name='powerType' value="${powerType}" from="${['Watts','Amps']}" onchange="updatePowerType(this.value, this.name)"> </g:select>
+				<g:select id="ptype" name='powerType' value="${powerType}" from="${['Watts','Amps']}" onchange="updatePowerType(this.value,'Edit')"></g:select>
 			</td>
 			<td>Notes:</td>
 			<td>
@@ -128,7 +131,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td>Front image:</label></td>
+			<td>Front image:</td>
 			<td><input size="20" type="file" name="frontImage" id="frontImageId" /></td>
 			<td>Rear image:</td>
 			<td><input size="20" type="file" name="rearImage" id="rearImageId" />
@@ -209,7 +212,7 @@
 			<td>${modelInstance?.validatedBy}</td>
 			<td>Model Status :</td>
 			<g:if test="${modelInstance.powerUse >0}">
-				<td><g:select id="modelStatus" name='modelStatus' value ="${modelInstance?.modelStatus}" from="${['new','full','valid']}"> </g:select>
+				<td><g:select id="modelStatus" name='modelStatus' value ="${modelInstance?.modelStatus}" from="${['new','full','valid']}"></g:select>
 				<g:hasErrors bean="${modelInstance}" field="modelStatus">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelStatus" /></div>
 				</g:hasErrors>
@@ -296,7 +299,6 @@
 					<span class="button">
 						<input type="button" class="save"  value="Update" onclick="updateModel('Model', 'modelForm')"/>
 						<g:actionSubmit class="delete" action="delete" value="Delete"></g:actionSubmit>
-						<g:actionSubmit class="show" action="cancel" value="Cancel"></g:actionSubmit>
 					</span>
 				</div>
 			</td>
@@ -421,6 +423,7 @@
 		}
 	}
 	showBladeFields($("#assetTypeId").val())
+	
 	function verifyAndDeleteConnector( connector ){
 		var modelId = "${modelInstance.id}"
 		jQuery.ajax({
@@ -440,36 +443,12 @@
 			}
 		});
 	}
-	function updatePowerType( value , name){
-		convertPowerType(value,name)
+	
+	function updatePowerType( value , whom){
+		convertPowerType(value, whom)
 		${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + value ')}
 	}	
-
-
-	function changePowerValue(){
-		var pType = $("#ptype").val()
-		var namePlatePower = $("#powerNameplateId").val()
-		var powerDesign = $("#powerDesignId").val()	
-		var powerUse= $("#powerUseId").val()
-		if(powerDesign == 0 || powerDesign == 0.0  ){
-		  $("#powerDesignId").val(parseInt(namePlatePower)*0.5)
-		  $("#powerDesignIdH").val(parseInt(namePlatePower)*0.5)  
-		}
-	    if(powerUse == 0 || powerUse == 0.0 ){
-	      $("#powerUseId").val(parseInt(namePlatePower)*0.33)
-	      $("#powerUseIdH").val(parseInt(namePlatePower)*0.33)
-		}
-	  }
-
-	function setStanderdPower(){
-		var namePlatePower = $("#powerNameplateId").val()
-		var powerDesign = $("#powerDesignId").val()	
-		var powerUse= $("#powerUseId").val()
-		$("#powerDesignId").val((parseInt(namePlatePower)*0.5).toFixed(0))
-		$("#powerDesignIdH").val((parseInt(namePlatePower)*0.5).toFixed(0))
-	    $("#powerUseId").val((parseInt(namePlatePower)*0.33).toFixed(0))
-	    $("#powerUseIdH").val((parseInt(namePlatePower)*0.33).toFixed(0))
-    }
+	
 </script>
 <script>
 	currentMenuId = "#adminMenu";

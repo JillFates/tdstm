@@ -5,7 +5,8 @@
         <title>Model List</title>
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+    
 <g:javascript src="model.manufacturer.js" />
 <g:javascript src="drag_drop.js" />
 <script src="${resource(dir:'js',file:'jquery.form.js')}"></script> 	
@@ -24,8 +25,8 @@ $(document).ready(function() {
 	      			  {name:'description', editable: true,width:'100'},
 	                  {name:'assetType', editable: true, width:'100'},
 	                  {name:'powerUse', editable: true,width:'50'}, 
-	                  {name:'modelConnectors', editable: true,width:'80',search:false,sortable:false},
-	                  {name:'assets', editable: false,width:'50',search:false,sortable:false},
+	                  {name:'modelConnectors', editable: true,width:'80',search:false},
+	                  {name:'assets', editable: false,width:'50',search:false},
 	                  {name:'sourceTDSVersion', editable: false,width:'50',search:false},
 	                  {name:'sourceTDS', editable: false,width:'60'},
 	                  {name:'modelStatus',editable: false,width:'60' }"
@@ -63,8 +64,7 @@ $(document).ready(function() {
 <div id="createModelView" style="display: none;" ></div>
 <div id="showModelView" style="display: none;"></div>
 <div class="buttons">
-				<span class="button"><input type="button" class="save" value="Create Model"
-		onclick="createModelManuDetails('model','Model')" /></span>
+  <span class="button"><input type="button" class="save" value="Create Model" onclick="createModelManuDetails('model','Model')" /></span>
 </div>
 </div>
 </body>
