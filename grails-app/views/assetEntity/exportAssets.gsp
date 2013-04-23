@@ -48,7 +48,7 @@
 	                </td>
                </tr>
                <tr>
-              <tds:hasPermission permission="EditAndDelete ">
+              <tds:hasPermission permission="Export ">
                 <td class="buttonR">
                 	<input class="button" type="submit" value="Generate Standard"/> 
                 	<g:link controller="assetEntity" action="exportSpecialReport">

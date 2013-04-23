@@ -71,7 +71,7 @@
                   <td ><div id="progressbar" style="display: none;" ></div></td>
                 </tr>
                 <tr>
-                <tds:hasPermission permission="AssetMenuView">
+                <tds:hasPermission permission="Import">
                   <td class="buttonR"><input class="button" id="run" type="submit" value="Import Batch" /></td>
                  </tds:hasPermission>
                 </tr>

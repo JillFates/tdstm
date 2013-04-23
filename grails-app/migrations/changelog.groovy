@@ -19,5 +19,5 @@ databaseChangeLog = {
 	include file: '20130322-add-entity-customs.groovy'
 	include file: '20130322-update-custom-field-shown.groovy'
 	include file: '20130409-add-import-permission.groovy'
-	
+	include file: '20130423-add-import-export-permission.groovy'
 }

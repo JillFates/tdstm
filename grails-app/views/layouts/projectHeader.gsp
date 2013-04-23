@@ -235,12 +235,16 @@
 					<td style="vertical-align:top"><span class="megamenuSection">Manage Data</span><br />
 					
 						<ul>
-							<tds:hasPermission permission='EditAndDelete'>
+							<tds:hasPermission permission='Import'>
 							<li><g:link class="mmlink" controller="assetEntity" action="assetImport"  onclick="hideMegaMenu('assetMegaMenu')">Import Assets</g:link></li>
+							</tds:hasPermission>
+							<tds:hasPermission permission='EditAndDelete'>
 							<li><g:link class="mmlink" controller="dataTransferBatch" action="index" onclick="hideMegaMenu('assetMegaMenu')">Manage Batches</g:link></li>
 							</tds:hasPermission>
-							<tds:hasPermission permission='AssetMenuView'>
+							<tds:hasPermission permission='Export'>
 							<li><g:link class="mmlink" controller="assetEntity" action="exportAssets"  onclick="hideMegaMenu('assetMegaMenu')">Export Assets</g:link></li>
+							</tds:hasPermission>
+							<tds:hasPermission permission='AssetMenuView'>
 							<li><g:link class="mmlink" controller="assetEntity" action="listComment"  params="[tag_s_2_lastUpdated:'desc']" onclick="hideMegaMenu('assetMegaMenu')">Asset Comments</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='HelpMenuView'>
