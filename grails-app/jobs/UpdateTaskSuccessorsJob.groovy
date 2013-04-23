@@ -14,7 +14,7 @@ class UpdateTaskSuccessorsJob {
     static triggers = { }
 
 	// IOC services
-    def taskService 
+    def taskNonTranService 
 	def securityService
 
     /**
@@ -28,6 +28,6 @@ class UpdateTaskSuccessorsJob {
 		def whomId = dataMap.getLongValue('whomId')
 		def status = dataMap.getString('status')
 		def isPM = dataMap.getBoolean('isPM')
-		taskService.updateTaskSuccessors(taskId, status, whomId, isPM)
+		taskNonTranService.updateTaskSuccessors(taskId, status, whomId, isPM)
 	}
 }
