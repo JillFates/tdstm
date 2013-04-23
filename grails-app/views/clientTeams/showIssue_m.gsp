@@ -321,7 +321,6 @@
 						 B1.Start(60);
 				}
 			});
-	 }
  }
  function truncate( text ){
 		var trunc = text
