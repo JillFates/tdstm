@@ -49,9 +49,7 @@
 						<tbody>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="assetName">Name</label></td>
-								<td ><input type="text" id="assetName" name="assetName" value="${assetEntityInstance.assetName}" tabindex="11" /></td>
-								<td>&nbsp</td>
-								<td>&nbsp</td>
+								<td colspan="3"><input type="text" id="assetName" name="assetName" value="${assetEntityInstance.assetName}" tabindex="11" /></td>
 								<td>&nbsp</td>
 								<td class="label_sm">Source</td>
 								<td class="label_sm">Target</td>
