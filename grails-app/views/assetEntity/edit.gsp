@@ -28,7 +28,7 @@
 
 		// Ajax to populate dependency selects in edit pages
 		var assetId = '${assetEntityInstance.id}'
-		populateDependency(assetId)
+		populateDependency(assetId, 'asset')
 		
 	})
 </script>
@@ -197,54 +197,8 @@
 					</table>
 				</div></td>
 		</tr>
-<tr>
-			<td valign="top">
-				<div style="width: auto;">
-					<span style="float: left;"><h1>Supports:</h1></span>
-					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('support','edit')"></span>
-					<br/>
-					<table style="width: 100%;">
-						<thead>
-							<tr>
-								<th>Frequency</th>
-								<th>Type</th>
-								<th>Name</th>
-								<th>Type</th>
-								<th>Status</th>
-								<th>&nbsp;</th>
-							</tr>
-						</thead>
-						<tbody id="editSupportsList">
-						<tr id='spiner'>
-							<td colspan="5"><span><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/> </span></td>
-						</tr>
-						</tbody>
-					</table>
-				</div></td>
-			<td valign="top">
-				<div style="width: auto;">
-					<span style="float: left;"><h1>Is dependent on:</h1></span>
-					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('dependent', 'edit')"></span>
-					<br/>
-					<table style="width: 100%;">
-						<thead>
-							<tr>
-								<th>Frequency</th>
-								<th>Type</th>
-								<th>Name</th>
-								<th>Type</th>
-								<th>Status</th>
-								<th>&nbsp;</th>
-							</tr>
-						</thead>
-						<tbody id="editDependentsList">
-						<tr>
-							<td colspan="5"><span><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/> </span></td>
-						</tr>
-						</tbody>
-					</table>
-				</div>
-			</td>
+		<tr id="assetDependentId">
+			<td class="depSpin"><span><img alt="" src="${resource(dir:'images',file:'processing.gif')}"/> </span></td>
 		</tr>
 		<tr>
 			<td colspan="2">
@@ -261,14 +215,14 @@
 					<input type="hidden" id="labelsListId" name="labels" value =""/>
 					<input type="hidden" id="updateViewId" name="updateViewId" value =""/>
 					<g:if test="${redirectTo!='planningConsole'}">
-					  <span class="button"><g:actionSubmit class="save" value="Update/Close" action="Update" /> </span>
-					  <span class="button"><input type="button" class="save" value="Update/View" onclick="updateToShow()" /> </span>
+					  <span class="button"><g:actionSubmit class="save updateDep" value="Update/Close" action="Update" /> </span>
+					  <span class="button"><input type="button" class="save updateDep" value="Update/View" onclick="updateToShow()" /> </span>
 					  <span class="button"><g:actionSubmit class="delete"	onclick=" return confirm('Are you sure?');" value="Delete" /> </span>
 					</g:if>
 					<g:else>
 					  
-					  <span class="button"><input id="updatedId" name="updatedId" type="button" class="save" value="Update/Close" onclick="submitRemoteForm()"> </span>
-					  <span class="button"><input type="button" class="save" value="Update/View" onclick="updateToShow()" /> </span>
+					  <span class="button"><input id="updatedId" name="updatedId" type="button" class="save updateDep" value="Update/Close" onclick="submitRemoteForm()"> </span>
+					  <span class="button"><input type="button" class="save updateDep" value="Update/View" onclick="updateToShow()" /> </span>
 					  <span class="button"><input id="deleteId"	 name="deleteId"  class="save" value="Delete" onclick=" deleteAsset($('#assetId').val(),'server')" value="Delete" /> </span>
 					</g:else>
 					

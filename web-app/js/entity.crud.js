@@ -599,14 +599,15 @@ function manipulateFields( val ){
 	}
 } 
 
-function populateDependency(assetId){
+function populateDependency(assetId, whom){
+	$(".updateDep").attr('disabled','disabled')
 	jQuery.ajax({
 		url: '../assetEntity/populateDependency',
 		data: {'id':assetId},
 		type:'POST',
 		success: function(data) {
-			$("#editSupportsList").html(data.supports)
-			$("#editDependentsList").html(data.dependents)				
+			$("#"+whom+"DependentId").html(data)
+			$(".updateDep").removeAttr('disabled')
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			alert("An Unexpected error while populating dependent asset.")
