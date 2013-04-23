@@ -607,7 +607,7 @@ class TaskService {
 		log.info("resetTaskData() was called for moveEvent(${moveEvent})")
 		try {
 			def tasksMap = getMoveEventTaskLists(moveEvent.id)
-		    def taskResetCnt = notesDeleted = 0
+		    def (taskResetCnt, notesDeleted) = [0, 0]
 			def updateSql = "UPDATE AssetComment ac \
 				SET ac.status = :status, ac.actStart = null, ac.actStart = null, ac.dateResolved = null, ac.resolvedBy = null, \
 					ac.isResolved=0, ac.statusUpdated = null \
@@ -625,7 +625,7 @@ class TaskService {
 					[ 'ids':tasksMap.tasksWithNotes ] )
 			}
 			
-			msg = "$taskRestCnt tasks reset and $notesDeleted audit notes were deleted"
+			msg = "$taskResetCnt tasks reset and $notesDeleted audit notes were deleted"
 		} catch(e) {
 			log.error "An error occurred while trying to Reset tasks for moveEvent ${moveEvent} on project ${moveEvent.project}\n$e"
 			throw new RuntimeException("An unexpected error occured")

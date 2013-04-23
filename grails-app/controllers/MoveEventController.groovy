@@ -381,7 +381,7 @@ class MoveEventController {
 	def clearTaskData = {		
 		def project = securityService.getUserCurrentProject()
 		def moveEvent
-		def msg 
+		def msg = ""
 		
 		// TODO - Need to create an ACL instead of using roles for this
 		if (!securityService.hasRole(['ADMIN','CLIENT_ADMIN','CLIENT_MGR']) ) {
@@ -398,7 +398,7 @@ class MoveEventController {
 		}
 		if (! msg) {
 			try {
-				if(params.type == 'clear'){
+				if(params.type == 'reset'){
 					msg = taskService.resetTaskData(moveEvent)
 				} else if(params.type == 'delete'){
 					msg = taskService.deleteTaskData(moveEvent)
