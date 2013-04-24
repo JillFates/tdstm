@@ -43,7 +43,7 @@ class TaskNonTranService {
 
 		if (task.status != status) {
 			log.error "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) status (${task.status}) not as expected '${status}' - $whom, retrying"
-			taskService.triggerUpdateTaskSuccessors(taskId, status, tries) 
+			taskService.triggerUpdateTaskSuccessors(taskId, status, tries, whom, isPM) 
 			return
 		}
 

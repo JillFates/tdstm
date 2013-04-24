@@ -404,7 +404,7 @@ class TaskService {
 	* @param taskId
 	* @return void
 	*/
-	def triggerUpdateTaskSuccessors(taskId, status, tries=0) {
+	def triggerUpdateTaskSuccessors(taskId, status, tries=0, whom=null, isPM=false) {
 		def task = AssetComment.read(taskId)
 
 		if (++tries > 10) {
@@ -415,8 +415,10 @@ class TaskService {
 		if (! task) {
 			log.error "triggerUpdateTaskSuccessors - unable to find task id $taskId"
 		} else {
-			def whom = securityService.getUserLoginPerson()
-			def isPM = securityService.hasRole("PROJ_MGR")
+			if (whom == null) {
+				whom = securityService.getUserLoginPerson()
+				isPM = securityService.hasRole("PROJ_MGR")
+			}
 			long startTime = System.currentTimeMillis() + (250L)
 			Trigger trigger = new SimpleTrigger("tm-updateTaskSuccessors-${taskId}" + System.currentTimeMillis(), null, new Date(startTime) )
 			trigger.jobDataMap.putAll( [ taskId:taskId, whomId:whom.id, status:status, isPM:isPM, tries:tries.longValue() ] )
