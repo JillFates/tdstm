@@ -402,31 +402,36 @@ class TaskService {
 	/**
 	* Triggers the invocation of the UpdateTaskSuccessorsJob Quartz job for the specified task id
 	* @param taskId
+	* @param String the status that the task is/has been set to
+	* @param Person the person that is invoking this method (optional) if not passed it will find user via securityService
+	* @param Boolean flag if the whom person is a Project Manager (optional)
 	* @return void
 	*/
-	def triggerUpdateTaskSuccessors(taskId, status, tries=0, whom=null, isPM=false) {
+	def triggerUpdateTaskSuccessors(taskId, status, whom=null, isPM=false) {
 		def task = AssetComment.read(taskId)
 
+		/*
 		if (++tries > 10) {
 			log.error "triggerUpdateTaskSuccessors: aborting after $tries tries for task $task"
 			return
 		}
+		*/
 
 		if (! task) {
-			log.error "triggerUpdateTaskSuccessors - unable to find task id $taskId"
+			log.error "triggerUpdateTaskSuccessors: unable to find task id $taskId"
 		} else {
 			if (whom == null) {
 				whom = securityService.getUserLoginPerson()
 				isPM = securityService.hasRole("PROJ_MGR")
 			}
-			long startTime = System.currentTimeMillis() + (250L)
+			long startTime = System.currentTimeMillis() + (300L)
 			Trigger trigger = new SimpleTrigger("tm-updateTaskSuccessors-${taskId}" + System.currentTimeMillis(), null, new Date(startTime) )
-			trigger.jobDataMap.putAll( [ taskId:taskId, whomId:whom.id, status:status, isPM:isPM, tries:tries.longValue() ] )
+			trigger.jobDataMap.putAll( [ taskId:taskId, whomId:whom.id, status:status, isPM:isPM, tries:0L ] )
 			trigger.setJobName('UpdateTaskSuccessorsJob')
-			trigger.setJobGroup('tdstm')
+			trigger.setJobGroup('tdstm-task-update')
   
 			def result = quartzScheduler.scheduleJob(trigger)
-			log.info "triggerUpdateTaskSuccessors for task(#:${task.taskNumber} Id:${taskId}), status=$status, scheduled=$result - $whom"
+			log.info "triggerUpdateTaskSuccessors: scheduled job for task(#:${task.taskNumber} Id:${taskId}), status=$status, scheduled=$result - $whom"
 		}
 		
 	}

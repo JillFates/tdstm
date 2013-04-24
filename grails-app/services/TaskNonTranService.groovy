@@ -32,7 +32,7 @@ class TaskNonTranService {
 		def whom = Person.read(whomId)
 		if (! whom) {
 			log.error "updateTaskSuccessors: for task(#:${task.taskNumber} Id:${task.id}) unable to find person ${whomId}"
-			return			
+			return	'failed'		
 		}
 
 		def task 
@@ -43,32 +43,14 @@ class TaskNonTranService {
 
 		if (task.status != status) {
 			log.error "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) status (${task.status}) not as expected '${status}' - $whom, retrying"
-			taskService.triggerUpdateTaskSuccessors(taskId, status, tries, whom, isPM) 
-			return
+			// taskService.triggerUpdateTaskSuccessors(taskId, status, tries, whom, isPM) 
+			return 'reschedule'
 		}
 
-		/*
-		// Loop up to one minute, sleeping 100ms in between, until the previous task has a chance to commit the change
-		def cnt = 601
-		while (cnt-- > 0) {			
-			task = AssetComment.read(taskId)
-			if (! task) {
-				log.error "updateTaskSuccessors - unable to find taskId ${taskId}"
-				return
-			}
-			if (task.status == status) {
-				break
-			} else {
-				// session.clear()
-				this.sleep(100)
-			}			
-		}
-		if (task.status != status) {
-			log.error "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) status (${task.status}) not as expected '${status}' - $whom"
-			return
-		}
-		log.info "updateTaskSuccessors: Processing task(#:${task.taskNumber} Id:${task.id}) ${task} - $whom, waited ${ (600 - cnt) * 100}ms"
-		*/
+		// In here to test the rescheduling of the job
+		//if (tries < 3) {
+		//	return 'reschedule'
+		//}
 
 		def success=true
 		def msg=''
@@ -99,7 +81,7 @@ class TaskNonTranService {
 						def sql = "$predCountSQL ${successorTask.id}"
 						def predCount = jdbcTemplate.queryForInt(sql)
 						//def predCount = jdbcTemplate.queryForInt(predCountSQL, [successorTask.id]) -- this was NOT working...
-						log.info "updateTaskSuccessors: predCount=$predCount, $sql"
+						// log.info "updateTaskSuccessors: predCount=$predCount, $sql"
 						if (predCount > 0) {
 							log.info "updateTaskSuccessors: found ${predCount} task(s) not in the DONE state"
 						} else {
@@ -138,8 +120,10 @@ class TaskNonTranService {
 
 		if (success) {
 			log.info msg
+			return 'success'
 		} else {
 			log.error msg
+			return 'failed'
 		}
 	}
 
