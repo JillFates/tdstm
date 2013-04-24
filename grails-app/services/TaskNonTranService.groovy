@@ -25,7 +25,7 @@ class TaskNonTranService {
 	 * This is invoked by the AssetComment.beforeUpdate method in order to handle any status changes
 	 * that may result in the updating of other tasks successor tasks.
 	 */
-	def updateTaskSuccessors( taskId, status, whomId, isPM ) {
+	def updateTaskSuccessors( taskId, status, whomId, isPM, tries ) {
 		
 		// log.info "updateTaskSuccessors: securityService=${securityService ? securityService.getClass() : 'Undefined'} for task $taskId"
 
@@ -37,6 +37,17 @@ class TaskNonTranService {
 
 		def task 
 				
+		task = AssetComment.read(taskId)
+
+		log.info "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) invoked by $whom, isPM $isPM, $tries tries"
+
+		if (task.status != status) {
+			log.error "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) status (${task.status}) not as expected '${status}' - $whom, retrying"
+			taskService.triggerUpdateTaskSuccessors(taskId, status, tries) 
+			return
+		}
+
+		/*
 		// Loop up to one minute, sleeping 100ms in between, until the previous task has a chance to commit the change
 		def cnt = 601
 		while (cnt-- > 0) {			
@@ -57,6 +68,7 @@ class TaskNonTranService {
 			return
 		}
 		log.info "updateTaskSuccessors: Processing task(#:${task.taskNumber} Id:${task.id}) ${task} - $whom, waited ${ (600 - cnt) * 100}ms"
+		*/
 
 		def success=true
 		def msg=''

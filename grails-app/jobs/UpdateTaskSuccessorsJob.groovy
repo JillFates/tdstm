@@ -28,6 +28,7 @@ class UpdateTaskSuccessorsJob {
 		def whomId = dataMap.getLongValue('whomId')
 		def status = dataMap.getString('status')
 		def isPM = dataMap.getBoolean('isPM')
-		taskNonTranService.updateTaskSuccessors(taskId, status, whomId, isPM)
+		def tries = dataMap.getLongValue('tries')
+		taskNonTranService.updateTaskSuccessors(taskId, status, whomId, isPM, tries)
 	}
 }

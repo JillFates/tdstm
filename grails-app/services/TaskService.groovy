@@ -404,8 +404,14 @@ class TaskService {
 	* @param taskId
 	* @return void
 	*/
-	def triggerUpdateTaskSuccessors(taskId, status) {
+	def triggerUpdateTaskSuccessors(taskId, status, tries=0) {
 		def task = AssetComment.read(taskId)
+
+		if (++tries > 10) {
+			log.error "triggerUpdateTaskSuccessors: aborting after $tries tries for task $task"
+			return
+		}
+
 		if (! task) {
 			log.error "triggerUpdateTaskSuccessors - unable to find task id $taskId"
 		} else {
@@ -413,7 +419,7 @@ class TaskService {
 			def isPM = securityService.hasRole("PROJ_MGR")
 			long startTime = System.currentTimeMillis() + (250L)
 			Trigger trigger = new SimpleTrigger("tm-updateTaskSuccessors-${taskId}" + System.currentTimeMillis(), null, new Date(startTime) )
-			trigger.jobDataMap.putAll( [ taskId:taskId, whomId:whom.id, status:status, isPM:isPM] )
+			trigger.jobDataMap.putAll( [ taskId:taskId, whomId:whom.id, status:status, isPM:isPM, tries:tries.longValue() ] )
 			trigger.setJobName('UpdateTaskSuccessorsJob')
 			trigger.setJobGroup('tdstm')
   
@@ -2201,8 +2207,8 @@ class TaskService {
 			def bundleIds = bundleList*.id
 
 			// See if they are trying to filter on the Bundle Name
-			if (filter?.containsKey('bundle')) {
-				def moveBundle = MoveBundle.findByProjectAndName(filter.moveBundle)
+			if (filter?.asset?.containsKey('bundle')) {
+				def moveBundle = MoveBundle.findByProjectAndName(moveEvent.project, filter.asset.bundle)
 				if (moveBundle) {
 					bundleIds = moveBundle.id
 				} else {
@@ -2363,7 +2369,7 @@ class TaskService {
 			case 'cart':
 				tasksToCreate.unique { it[action] }
 				findAssets = { asset ->
-					assetsForTask.findAll { it[action] == asset[action] }
+					assetsForAction.findAll { it[action] == asset[action] }
 				}
 				validateForTask = { asset -> asset[action] }
 				break
