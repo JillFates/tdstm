@@ -125,7 +125,7 @@
        	 	return '<span id="span_'+options.rowId+'" class=" '+rowObject[15] +'" onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
         }
         function assetFormatter(cellVal,options,rowObject){
-        	return cellVal ? '<span class="cellWithoutBackground pointer" onclick= "getEntityDetails(\'listComment\', \''+rowObject[4]+'\', '+rowObject[16]+')\" >' + (cellVal) + '</span>' :
+        	return cellVal ? '<span class="cellWithoutBackground pointer" onclick= "getEntityDetails(\'listTask\', \''+rowObject[4]+'\', '+rowObject[16]+')\" >' + (cellVal) + '</span>' :
         		"<span class='cellWithoutBackground pointer'></span>"
         }        
 
@@ -168,6 +168,7 @@
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
+			<div id="taskMessageDiv" class="message" style="display: none;"></div>
 			<div>
 			<div>
 			<input type="hidden" id="manageTaskId" value="manageTask"/>

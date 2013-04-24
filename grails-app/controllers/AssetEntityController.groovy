@@ -3109,6 +3109,9 @@ class AssetEntityController {
 					case "planningConsole":
 				        forward(action:'getLists', params:[entity: params.tabType,labelsList:params.labels,dependencyBundle:session.getAttribute("dependencyBundle")])
 						break;
+					case "listTask":
+						render "Asset ${assetEntityInstance.assetName} updated."
+						break;
 					default:
 						session.AE?.JQ_FILTERS = params
 						redirect( action:list)

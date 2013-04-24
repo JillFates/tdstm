@@ -92,7 +92,12 @@
 					<input type = "hidden" id = "tabType" name="tabType" value =""/>
 					<input name="updateView" id="updateView" type="hidden" value=""/>
 					<g:if test="${redirectTo!='planningConsole'}">
-					  <span class="button"><g:actionSubmit class="save updateDep" value="Update/Close" action="Update" /> </span>
+					  <g:if test="${redirectTo=='listTask'}">
+					  	<span class="button"><input type="button" class="save updateDep" value="Update/Close" onclick="updateToRefresh()" /></span>
+					  </g:if>
+					  <g:else>
+					  	<span class="button"><g:actionSubmit class="save updateDep" value="Update/Close" action="Update" /></span>
+					  </g:else>
 					  <span class="button"><input type="button" class="save updateDep" value="Update/View" onclick="updateToShow()" /> </span>
 					  <span class="button"><g:actionSubmit class="delete"	onclick=" return confirm('Are you sure?');" value="Delete" /> </span>
 					</g:if>

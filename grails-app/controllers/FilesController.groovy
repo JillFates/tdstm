@@ -262,6 +262,9 @@ class FilesController {
 					case "listComment":
 						redirect( controller:'assetEntity', action:'listComment' , params:[projectId: projectId])
 						break;
+					case "listTask":
+						render "Storage ${filesInstance.assetName} updated."
+						break;
 				    case "planningConsole":
 						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
 						break;

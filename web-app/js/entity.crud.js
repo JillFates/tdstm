@@ -307,6 +307,21 @@ function updateToShow(){
 	});
 	
 }
+
+function updateToRefresh(){
+	jQuery.ajax({
+		url: $('#editAssetsFormId').attr('action'),
+		data: $('#editAssetsFormId').serialize(),
+		type:'POST',
+		success: function(data) {
+			$('#editEntityView').dialog('close')
+			$("#taskMessageDiv").html(data)
+			$("#taskMessageDiv").show()
+			loadGrid();
+		}
+	});
+}
+
 function selectAllAssets(){
 	$('#deleteAsset').attr('disabled',false)
 	var totalCheck = document.getElementsByName('assetCheckBox');
