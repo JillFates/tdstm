@@ -797,11 +797,12 @@
 
 	 /* update bundle data once ajax call success */
 	
-	function updateMoveBundleSteps( dataPointStep ) {
+	function updateMoveBundleSteps( bundleMap ) {
 		try{
 			var offset = $("#timezone").val()
-			
-			var snapshot = dataPointStep.snapshot;
+
+			var snapshot = bundleMap.snapshot;
+			var runbookOn = snapshot.runbookOn;
 			var moveBundleId = snapshot.moveBundleId;
 			var calcMethod = snapshot.calcMethod
 			var steps = snapshot.steps;
@@ -847,7 +848,7 @@
 			for( i = 0; i < steps.length; i++ ) {
 				$("#percentage_"+moveBundleId+"_"+steps[i].tid).html(isNaN(steps[i].tskComp / steps[i].tskTot) ? 0+ "%" : parseInt( (steps[i].tskComp / steps[i].tskTot ) * 100 ) +"%");
 				$("#percentage_"+moveBundleId+"_"+steps[i].tid).attr("class",steps[i].percentageStyle)
-				$("#tasks_"+moveBundleId+"_"+steps[i].tid).html(isNaN(steps[i].tskComp / steps[i].tskTot) ? "0(of 0)" : steps[i].tskComp+"(of "+steps[i].tskTot+")");
+				$("#tasks_"+moveBundleId+"_"+steps[i].tid).html(isNaN(steps[i].tskComp / steps[i].tskTot) ? "0 (of 0)" : steps[i].tskComp+" (of "+steps[i].tskTot+")");
 				$("#plan_start_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].planStart));
 				$("#plan_completion_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].planComp));
 				var startDelta = 0
@@ -917,9 +918,9 @@
 			});
 		 }
 	 }
-	function updateDials( dataPointStep ) {
+	function updateDials( bundleMap ) {
 		try{
-			var snapshot = dataPointStep.snapshot;
+			var snapshot = bundleMap.snapshot;
 			var moveBundleId = snapshot.moveBundleId;
 			var steps = snapshot.steps;
 			var revSum = snapshot.revSum;
