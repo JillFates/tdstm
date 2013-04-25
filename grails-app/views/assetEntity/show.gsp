@@ -121,7 +121,7 @@ $(document).ready(function() {
 								<td class="label" nowrap="nowrap"><label for="railType">Rail Type</label></td>
 								<td class="valueNW">${assetEntity.railType}</td>
 								<td class="label" nowrap="nowrap"><label for="truck">Truck/Cart/Shelf</label></td>
-								<td class="valueNW">${assetEntity.truck}/${assetEntity.cart}${assetEntity.shelf? ' / ' : ''}</td>
+								<td class="valueNW">${assetEntity.truck}/${assetEntity.cart}${assetEntity.shelf? ' / '+assetEntity.shelf : ''}</td>
 								<td class="label">Validation</td>
 								<td class="valueNW">${assetEntity.validation}</td>
 								<td>&nbsp;</td>
