@@ -637,6 +637,16 @@ function showAssetDialog( e , action ) {
 			B2.Pause()
 		}
 		$("#createCommentDialog").dialog("close")
+		
+		//used to hide predecessor table-row by default
+		$("#predecessorShowTr").hide()
+		$("#predecessorAddTr").hide()
+		$("#predecessorTrEditId").hide()
+		$("#downArrowShow").hide()
+		$("#upArrowShow").show()
+		$("#downArrowAdd").hide()
+		$("#upArrowAdd").show()
+		
 		var assetComments = eval('(' + e.responseText + ')');
 		if (assetComments) {
 			var params = assetComments[0]
@@ -690,11 +700,11 @@ function showAssetDialog( e , action ) {
 	      		    	 noteTable += "<tr><td>" + notes[i][0] + "</td><td>" + notes[i][1] + "</td><td><span>" + notes[i][2] + "</span></td></tr>"
 	      		    	 }
 	      		     noteTable += "</table>"
-	      		     if(params.predecessorTable.length==0 && params.successorTable.length==0){ 
+	      		    /* if(params.predecessorTable.length==0 && params.successorTable.length==0){ 
 	      		    	 $('#predecessorShowTr').css('display','none')
 	      		     }else{
 	      		    	$('#predecessorShowTr').css('display','table-row')
-	      		     }
+	      		     }*/
 	      		     
 	      		     if($('#manageTaskId').val()){
 	      		    	$('#fromMoveEventId').css('display','table-row')
@@ -710,7 +720,7 @@ function showAssetDialog( e , action ) {
 	                 $('#taskNumberSpanEditId').html('Task #: '+'<b>'+taskNumber+'</b>')
 	                 $('#taskNumberEditId').html('#: '+'<b>'+taskNumber+'</b>')
 	                 $('#successorShowTd').html(params.successorTable)
-	                 $('#predecessorTrEditId').css('display','table-row')
+	                 //$('#predecessorTrEditId').css('display','table-row')
 	    	      	 $('#previousNotesShowId').html(noteTable)
 	    	      	 $('#previousNote').html(noteTable)
 			      	 $('#noteEditId').val('')
@@ -765,11 +775,11 @@ function showAssetDialog( e , action ) {
 	      		     $('#commentTypeEditTdId').css('display','none')
 	      	      	 $('#typeListTdId').css('display','none')
 	      		     $('#commentShowTrId').css('display','none')
-	      		     $('#predecessorAddTr').css('display','table-row')
+	      		     //$('#predecessorAddTr').css('display','table-row')
 	      		     $('#workFlowShow').css('display','table-row')
 		      		 $('#estFinishTrEditId').css('display','table-row')
 		      		 $('#priorityEditId').css('display','table-row')
-	      		     $('#predecessorTrEditId').css('display','table-row')
+	      		     //$('#predecessorTrEditId').css('display','table-row')
 	      		     $('#durationEditId').css('display','table-row')
 	      		     $('#priorityShow').css('display','table-row')
 	      		     $('#estStartShowId').css('display','table-row')
@@ -1137,7 +1147,7 @@ function commentChange(resolveDiv,formName) {
 		$('#predecessorHeadTrId').css('display','table-row')
 		$('#predecessorTrId').css('display','table-row')
 		$("#predecessorAddTr").css('display', 'table-row');
-		$("#predecessorTrEditId").css('display', 'table-row');
+		//$("#predecessorTrEditId").css('display', 'table-row');
 		$('#priorityTrId').css('display', 'table-row');
 		$('#durationTrId').css('display', 'table-row');
 		$("#durationEditId").css('display', 'table-row');
@@ -1219,7 +1229,7 @@ if(type == "issue"){
 	$('#workFlowTransitionEditTrId').css('display', 'none')
 	$('#priorityEditId').css('display', 'none')
 	$('#predecessorHeadTrId').css('display','none')
-	$('#predecessorTrEditId').css('display', 'none')
+	//$('#predecessorTrEditId').css('display', 'none')
 	$('#durationEditId').css('display', 'none')
 }
 }
@@ -1274,11 +1284,13 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 		
 		$('select[name="predecessorSave"]').each(function(){
 			var savePredId = $(this).attr('id').split('_')[1]
-			predArr.push(savePredId+"_"+$(this).val())
+			if($(this).val())
+				predArr.push(savePredId+"_"+$(this).val())
 	    });
 		$('select[name="successorSave"]').each(function(){
 			var saveSuccId = $(this).attr('id').split('_')[1]
-			succArr.push(saveSuccId+"_"+$(this).val())
+			if($(this).val())
+				succArr.push(saveSuccId+"_"+$(this).val())
 	    });
 	    predArr = removeDuplicateElement(predArr)
 	    succArr = removeDuplicateElement(succArr)
@@ -1308,11 +1320,13 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 		var url = '../assetEntity/updateComment'
 		$('select[name="predecessorEdit"]').each(function(){
 			var predId = $(this).attr('id').split('_')[1]
-			predArr.push(predId+"_"+$(this).val())
+			if($(this).val())
+				predArr.push(predId+"_"+$(this).val())
 	    });
 		$('select[name="successorEdit"]').each(function(){
 			var succId = $(this).attr('id').split('_')[1]
-			succArr.push(succId+"_"+$(this).val())
+			if($(this).val())
+				succArr.push(succId+"_"+$(this).val())
 	    });
 		 predArr = removeDuplicateElement( predArr )
 		 succArr = removeDuplicateElement( succArr )
@@ -1608,6 +1622,19 @@ function fillPredecessor(id, category,commentId, forWhom){
 	})
 	
 }
+function generateDepSel(taskId, taskDependencyId, category, selectedPred, selectId, selectName){
+	jQuery.ajax({
+		url: '../assetEntity/generateDepSelect',
+		data: {'taskId':taskId, 'category':category},
+		type:'POST',
+		success: function(data) {
+			var selectBoxId = "#"+selectId+"_"+taskDependencyId
+			$(selectBoxId).html(data)
+			$(selectBoxId).val(selectedPred)
+			$(selectBoxId).removeAttr('onmouseover')
+		}
+	});
+}
 /*
  * to remove duplicate elemment in a array .
  */
@@ -1721,3 +1748,16 @@ function disableCreateIcon(id){
 	new Ajax.Request('../rackLayouts/savePreference?preference=ShowAddIcons&add=false',{asynchronous:true,evalScripts:true })
 }
 
+function togglePredecessor(forWhom,view){
+	if(forWhom=='up'){
+		$("#predecessor"+view+"Tr").show()
+		$("#predecessorTrEditId").show()
+		$("#upArrow"+view).hide()
+		$("#downArrow"+view).show()
+	}else{
+		$("#predecessor"+view+"Tr").hide()
+		$("#predecessorTrEditId").hide()
+		$("#downArrow"+view).hide()
+		$("#upArrow"+view).show()
+	}
+}

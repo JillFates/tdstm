@@ -3992,6 +3992,39 @@ class AssetEntityController {
 			render taskService.genTableHtmlForDependencies(taskDependencies, task, "predecessor")
 		}
 	}
+
+	/**
+	 * Generats options for task dependency select
+	 * @param : taskId  : id of task for which select options are generating .
+	 * @param : category : category for options .
+	 * @return : options
+	 */
+	def generateDepSelect = {
+		
+		def taskId=params.taskId
+		def project = securityService.getUserCurrentProject()
+		def projectId = project.id
+		
+		def task = AssetComment.read(taskId)
+		def category = params.category
+		
+		def queryForPredecessor = new StringBuffer("""FROM AssetComment a WHERE a.project=${projectId} \
+			AND a.category='${category}'\
+			AND a.commentType='${AssetCommentType.TASK}'\
+			AND a.id != ${task.id} """)
+		if (task.moveEvent) {
+			queryForPredecessor.append("AND a.moveEvent.id=${task.moveEvent.id}")
+		}
+		queryForPredecessor.append(""" ORDER BY a.taskNumber ASC""")
+		def predecessors = AssetComment.findAll(queryForPredecessor.toString())
+		
+		StringBuffer options = new StringBuffer("")
+		predecessors.each{
+			options.append("<option value='${it.id}' >"+it.toString()+"</option>")
+		}
+		render options.toString()
+	}
+	
 	/**
      * Generates an HTML table containing all the successor for a task with corresponding Category and Tasks SELECT controls for
      * a speciied assetList of successors HTML SELECT control for the AssetComment at editing time

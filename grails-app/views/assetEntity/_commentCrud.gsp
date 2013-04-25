@@ -104,6 +104,10 @@
 			<td valign="top" class="name"><label for="status">Status:</label></td>
 			<td valign="top" class="value" id="statusShowId" colspan="1" style="width: 20%"></td>
 		</tr>
+		<tr>
+		<td id="downArrowShow" style="display:none;"><span class="Arrowcursor"><img alt="" src="${resource(dir:'images',file:'down_arrow.png')}" onclick="togglePredecessor('down','Show')"/> </span></td>
+		<td id="upArrowShow"><span class="Arrowcursor"><img alt="" src="${resource(dir:'images',file:'up_arrow.png')}" onclick="togglePredecessor('up','Show')"/> </span></td>
+		</tr>
 		<tr class="prop" id="predecessorShowTr" style="display: none">
 			<td valign="top"><label for="precessorShowId">Predecessor:</label></td>
 			<td valign="top" id="predecessorShowTd" colspan="2" width="34%"></td>
@@ -459,6 +463,10 @@
 			<td valign="top" class="name"><label for="status">Status:</label></td>
 			<td colspan="3" id="statusEditTrId">
 			</td>
+		</tr>
+		<tr>
+		<td id="downArrowAdd" style="display:none;"><span class="Arrowcursor"><img alt="" src="${resource(dir:'images',file:'down_arrow.png')}" onclick="togglePredecessor('down','Add')"/> </span></td>
+		<td id="upArrowAdd"><span class="Arrowcursor"><img alt="" src="${resource(dir:'images',file:'up_arrow.png')}" onclick="togglePredecessor('up','Add')"/> </span></td>
 		</tr>
 		<tr class="prop" id="predecessorAddTr" style="display: none">
 			<td valign="top" class="name"><label for="predecessorEditTd">Predecessors:</label>

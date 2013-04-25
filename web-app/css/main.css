@@ -395,3 +395,6 @@ span.cellWithoutBackground
 .depSpin{
 	text-align: center;
 }
+.Arrowcursor{
+	cursor: pointer;
+}

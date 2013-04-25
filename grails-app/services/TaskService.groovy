@@ -480,24 +480,11 @@ class TaskService {
 		//def sw = new org.springframework.util.StopWatch("genSelectForTaskDependency Stopwatch") 
 		//sw.start("Get predecessor")
 		def predecessor = name=="predecessorEdit" ? taskDependency.predecessor : taskDependency.assetComment
-		def category = predecessor.category
-		if (! project) {
-			project = securityService.getUserCurrentProject()
-		}
-		def projectId = project.id
 		def moveEvent = task.moveEvent
-		def queryForPredecessor = new StringBuffer("""FROM AssetComment a WHERE a.project=${projectId} \
-			AND a.category='${category}'\
-			AND a.commentType='${AssetCommentType.TASK}'\
-			AND a.id != ${task.id} """)
-		if (moveEvent) {
-			queryForPredecessor.append("AND a.moveEvent.id=${moveEvent.id}")
-		}
-		queryForPredecessor.append(""" ORDER BY a.taskNumber ASC""")
-		// log.info "genSelectForTaskDependency - SQL ${queryForPredecessor.toString()}"
-		def predecessors = AssetComment.findAll(queryForPredecessor.toString())
-		def paramsMap = [selectId:"${idPrefix}_${taskDependency.id}", selectName:"${name}", options:predecessors, optionKey:"id",
-							 optionSelected:predecessor.id]
+		def category = predecessor.category
+		def paramsMap = [selectId:"${idPrefix}_${taskDependency.id}", selectName:"${name}", options:[predecessor] , optionKey:"id",
+						  optionSelected:predecessor.id, 
+					      javascript:"onmouseover=\'generateDepSel(${task.id}, ${taskDependency.id}, \"${category}\", \"${predecessor.id}\", \"${idPrefix}\", \"${name}\")\'"]
 		def selectControl = HtmlUtil.generateSelect( paramsMap )
 		//sw.stop()
 		//log.info "genSelectForTaskDependency - Stopwatch: ${sw.prettyPrint()}"
@@ -872,7 +859,7 @@ class TaskService {
 		def optionList = AssetComment.constraints.category.inList.toList()
 		def i=1
 		depTasks.each{ depTask ->
-			def succecessor = depTask.assetComment
+			def succecessor = dependency == 'predecessor' ? depTask.predecessor : depTask.assetComment
 			def paramsMap = [selectId:"predecessorCategoryEditId_${depTask.id}", selectName:'category', 
 				options:optionList, optionSelected:succecessor.category,
 				javascript:"onChange=\'fillPredecessor(this.id,this.value,${task.id},\"${dependency}Edit\")\'" ]
