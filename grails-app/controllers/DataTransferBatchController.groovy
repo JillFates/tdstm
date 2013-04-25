@@ -94,9 +94,9 @@ class DataTransferBatchController {
     					def isNewValidate
     					def isFormatError = 0
 		    			def assetEntity
-		    			if( assetEntityId && AssetEntity.get(assetEntityId).project.id == project.id) {
+		    			if( assetEntityId ) {
 		    				assetEntity = AssetEntity.get(assetEntityId)
-							if(assetEntity?.id != null && assetEntity.project.id == project.id ){
+							if(assetEntity && assetEntity.project?.id == project.id ){
 								existingAssetsList.add( assetEntity )
 			    				if ( dataTransferBatch.dataTransferSet.id == 1 ) {
 			    					def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, assetEntity, dtvList, project )
@@ -110,8 +110,12 @@ class DataTransferBatchController {
 			    				} else {
 			    					flag = 0;
 			    				}
-							} 
-		    			} else if(!assetEntityId || AssetEntity.get(assetEntityId).project.id != project.id) {
+							} else if(assetEntity && assetEntity.project?.id != project.id){
+								assetEntity = new AssetEntity()
+								assetEntity.attributeSet = eavAttributeSet
+								isNewValidate = "true"
+						    } 
+		    			} else if(!assetEntityId) {
 		    				assetEntity = new AssetEntity()
 		    				assetEntity.attributeSet = eavAttributeSet
 		    				isNewValidate = "true"
@@ -376,9 +380,9 @@ class DataTransferBatchController {
     					def isNewValidate
     					def isFormatError = 0
 		    			def assetEntity
-		    			if( assetEntityId && AssetEntity.get(assetEntityId).project.id == project.id ) {
+		    			if( assetEntityId ) {
 		    				application = Application.get(assetEntityId)
-							if(application?.id != null && application.project.id == project.id ){
+							if(application && application.project?.id == project.id ){
 								existingAssetsList.add( application )
 			    				if ( dataTransferBatch?.dataTransferSet.id == 1 ) {
 			    					def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, application, dtvList, project )
@@ -392,11 +396,12 @@ class DataTransferBatchController {
 			    				} else {
 			    					flag = 0;
 			    				}
-							} else {
-								unknowAssetIds++
-								unknowAssets += assetEntityId+"," 
+							} else if(application && application.project?.id != project.id){
+								application = new Application()
+			    				application.attributeSet = eavAttributeSet
+			    				isNewValidate = "true"
 							}
-		    			} else if(!assetEntityId || AssetEntity.get(assetEntityId).project.id != project.id){
+		    			} else if(!assetEntityId){
 		    				application = new Application()
 		    				application.attributeSet = eavAttributeSet
 		    				isNewValidate = "true"
@@ -596,9 +601,9 @@ class DataTransferBatchController {
 						def isNewValidate
 						def isFormatError = 0
 						def assetEntity
-						if( assetEntityId && AssetEntity.get(assetEntityId).project.id == project.id ) {
+						if( assetEntityId ) {
 							files = Files.get(assetEntityId)
-							if(files?.id != null && files.project.id == project.id ){
+							if(files && files.project?.id == project.id ){
 								existingAssetsList.add( files )
 								if ( dataTransferBatch?.dataTransferSet.id == 1 ) {
 									def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, files, dtvList, project )
@@ -611,11 +616,12 @@ class DataTransferBatchController {
 								} else {
 									flag = 0;
 								}
-							} else {
-								unknowAssetIds++
-								unknowAssets += assetEntityId+","
+							} else if(files && files.project?.id != project.id){
+								files = new Files()
+								files.attributeSet = eavAttributeSet
+								isNewValidate = "true"
 							}
-						} else if(!assetEntityId || AssetEntity.get(assetEntityId).project.id != project.id){
+						} else if(!assetEntityId){
 							files = new Files()
 							files.attributeSet = eavAttributeSet
 							isNewValidate = "true"
@@ -820,9 +826,9 @@ class DataTransferBatchController {
 					def isFormatError = 0
 					def assetEntity
 					log.info("Processing rowId=${rowId}, assetId=${assetEntityId}")
-					if( assetEntityId && AssetEntity.get(assetEntityId).project.id == project.id ) {
+					if( assetEntityId ) {
 						dbInstance = Database.get(assetEntityId)
-						if(dbInstance?.id != null && dbInstance.project.id == project.id ){
+						if(dbInstance && dbInstance.project.id == project.id ){
 							existingAssetsList.add( dbInstance )
 							if ( dataTransferBatch?.dataTransferSet.id == 1 ) {
 								def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, dbInstance, dtvList, project )
@@ -835,9 +841,10 @@ class DataTransferBatchController {
 							} else {
 								flag = 0;
 							}
-						} else {
-							unknowAssetIds++
-							unknowAssets += assetEntityId+","
+						} else if(dbInstance && dbInstance.project?.id != project.id){
+							dbInstance = new Database()
+							dbInstance.attributeSet = eavAttributeSet
+							isNewValidate = "true"
 						}
 					} else if(!assetEntityId || AssetEntity.get(assetEntityId).project.id != project.id){
 						dbInstance = new Database()
