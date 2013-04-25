@@ -85,6 +85,8 @@ class WsDashboardController {
 					GROUP BY t.workflow_transition_id
 					ORDER BY mbs.transition_id
 				"""
+				
+				// TODO - Need to remove the "LEFT JOIN step_snapshot" above when eliminating the snapshoting
 
 				dataPointsForEachStep = jdbcTemplate.queryForList(taskStatsSql)
 
