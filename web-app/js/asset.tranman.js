@@ -642,10 +642,10 @@ function showAssetDialog( e , action ) {
 		$("#predecessorShowTr").hide()
 		$("#predecessorAddTr").hide()
 		$("#predecessorTrEditId").hide()
-		$("#downArrowShow").hide()
-		$("#upArrowShow").show()
-		$("#downArrowAdd").hide()
-		$("#upArrowAdd").show()
+		$(".leftArrowShow").hide()
+		$(".rightArrowShow").show()
+		$(".leftArrowAdd").hide()
+		$(".rightArrowAdd").show()
 		
 		var assetComments = eval('(' + e.responseText + ')');
 		if (assetComments) {
@@ -654,7 +654,6 @@ function showAssetDialog( e , action ) {
 				alert(params.error)
 			}else {
 				var ac = params.assetComment
-				
 				if(ac.comment == null) {
 					ac.comment = "";
 				}
@@ -738,6 +737,10 @@ function showAssetDialog( e , action ) {
 			      		 $('#overrideShow').attr('checked', true);
 			      		 $('#overrideEdit').attr('checked', true);
 			      	 }
+	      		     //predeccesor and successor count
+	      		     $('.predecssorCount').html(params.predecessorsCount)
+	      		     $('.successorCount').html(params.successorsCount)
+	      		     
 	      		     $('#hardAssignedEdit').val(ac.hardAssigned)
 	      		     $('#roleTdId').html(params.roles)
 	      		     ac.role ? $('#roleTypeEdit').val(ac.role) :$('#roleTypeEdit').val('')
@@ -1749,15 +1752,15 @@ function disableCreateIcon(id){
 }
 
 function togglePredecessor(forWhom,view){
-	if(forWhom=='up'){
+	if(forWhom=='right'){
 		$("#predecessor"+view+"Tr").show()
 		$("#predecessorTrEditId").show()
-		$("#upArrow"+view).hide()
-		$("#downArrow"+view).show()
+		$(".rightArrow"+view).hide()
+		$(".leftArrow"+view).show()
 	}else{
 		$("#predecessor"+view+"Tr").hide()
 		$("#predecessorTrEditId").hide()
-		$("#downArrow"+view).hide()
-		$("#upArrow"+view).show()
+		$(".leftArrow"+view).hide()
+		$(".rightArrow"+view).show()
 	}
 }

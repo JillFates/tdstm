@@ -105,13 +105,19 @@
 			<td valign="top" class="value" id="statusShowId" colspan="1" style="width: 20%"></td>
 		</tr>
 		<tr>
-		<td id="downArrowShow" style="display:none;"><span class="Arrowcursor"><img alt="" src="${resource(dir:'images',file:'down_arrow.png')}" onclick="togglePredecessor('down','Show')"/> </span></td>
-		<td id="upArrowShow"><span class="Arrowcursor"><img alt="" src="${resource(dir:'images',file:'up_arrow.png')}" onclick="togglePredecessor('up','Show')"/> </span></td>
+		<td colspan="2">Predecessors (<span class="predecssorCount">&nbsp;</span>) &nbsp;<span class="Arrowcursor rightArrowShow"><img alt="" style="vertical-align: middle;" src="${resource(dir:'images',file:'r_arrow.png')}" onclick="togglePredecessor('right','Show')"/></span>
+		<span class="Arrowcursor leftArrowShow" style="display:none;"><img alt="" style="vertical-align: middle;" src="${resource(dir:'images',file:'l_arrow.png')}" onclick="togglePredecessor('left','Show')"/></span>
+		</td>
+		<td></td>
+		<td>Successors (<span class="successorCount">&nbsp;</span>) &nbsp;<span class="Arrowcursor rightArrowShow"><img alt="" class="predArrow" src="${resource(dir:'images',file:'r_arrow.png')}" onclick="togglePredecessor('right','Show')"/> </span>
+		<span class="Arrowcursor leftArrowShow" style="display:none;"><img alt="" class="predArrow" src="${resource(dir:'images',file:'l_arrow.png')}" onclick="togglePredecessor('left','Show')"/></span>
+		</td>
+		<td></td>
 		</tr>
 		<tr class="prop" id="predecessorShowTr" style="display: none">
-			<td valign="top"><label for="precessorShowId">Predecessor:</label></td>
+			<td valign="top"><label for="precessorShowId">&nbsp;</label></td>
 			<td valign="top" id="predecessorShowTd" colspan="2" width="34%"></td>
-			<td valign="top"  style="float: left;"><label for="precessorShowId" >Successor:</label></td>
+			<td valign="top"  style="float: left;"><label for="precessorShowId" >&nbsp;</label></td>
 			<td valign="top" id="successorShowTd" colspan="2" width="76%" style="margin-left: 0px;float: left;"></td>
 		</tr>
 		<tr>
@@ -427,7 +433,8 @@
 			</td>
 		</tr>
 		<tr class="prop" id="workFlowTransitionEditTrId" style="display: none">
-			<td valign="top" class="name"><label for="workFlowTransitionEditId">WorkFlow Step:</label></td>
+			<td valign="top" class="name"><label for="workFlowTransitionEditId">WorkFlow Step:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			&nbsp;</label></td>
 			<td valign="top" class="value" colspan="3">
 			 <span id="workFlowTransitionEditId"></span>
 			<input type="checkbox" id="overrideEdit" name="override" value="0"
@@ -465,8 +472,12 @@
 			</td>
 		</tr>
 		<tr>
-		<td id="downArrowAdd" style="display:none;"><span class="Arrowcursor"><img alt="" src="${resource(dir:'images',file:'down_arrow.png')}" onclick="togglePredecessor('down','Add')"/> </span></td>
-		<td id="upArrowAdd"><span class="Arrowcursor"><img alt="" src="${resource(dir:'images',file:'up_arrow.png')}" onclick="togglePredecessor('up','Add')"/> </span></td>
+		<td colspan="1">Predecessors(<span class="predecssorCount">&nbsp;</span>)&nbsp;<span class="Arrowcursor rightArrowAdd"><img alt="" style="vertical-align: middle;" src="${resource(dir:'images',file:'r_arrow.png')}" onclick="togglePredecessor('right','Add')"/> </span>
+		<span class="Arrowcursor leftArrowAdd" style="display:none;"><img alt="" class="predArrow"  src="${resource(dir:'images',file:'l_arrow.png')}" onclick="togglePredecessor('left','Add')"/> </span>
+		</td>
+		<td style="text-align: center;">Successors (<span class="successorCount">&nbsp;</span>)&nbsp;<span class="Arrowcursor rightArrowAdd"><img alt="" style="vertical-align: middle;" src="${resource(dir:'images',file:'r_arrow.png')}" onclick="togglePredecessor('right','Add')"/> </span>
+		<span class="Arrowcursor leftArrowAdd" style="display:none;"><img alt="" class="predArrow" src="${resource(dir:'images',file:'l_arrow.png')}" onclick="togglePredecessor('left','Add')"/> </span>
+		</td>
 		</tr>
 		<tr class="prop" id="predecessorAddTr" style="display: none">
 			<td valign="top" class="name"><label for="predecessorEditTd">Predecessors:</label>

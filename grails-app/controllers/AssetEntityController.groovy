@@ -1932,6 +1932,8 @@ class AssetEntityController {
 				predecessorTable.append('</tbody></table>')
 			}
 			def taskSuccessors = TaskDependency.findAllByPredecessor( assetComment )
+			def successorsCount= taskSuccessors.size()
+			def predecessorsCount = taskDependencies.size()
 			def successorTable = ""
 			if (taskSuccessors.size() > 0) {
 				taskSuccessors = taskSuccessors.sort{ it.assetComment.taskNumber }
@@ -1952,7 +1954,8 @@ class AssetEntityController {
 				dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo?:'', assetName:assetComment.assetEntity?.assetName ?: "",
 				eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate, etStart:etStart, etFinish:etFinish,atStart:atStart,notes:notes,
 				workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,maxVal:maxVal,
-				cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1]
+				cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, 
+				successorsCount:successorsCount, predecessorsCount:predecessorsCount]
 		}else{
 		 def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - ${params.id} "
 		 log.error "showComment: show comment view - "+errorMsg

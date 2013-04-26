@@ -398,3 +398,6 @@ span.cellWithoutBackground
 .Arrowcursor{
 	cursor: pointer;
 }
+.predArrow{
+	vertical-align: middle;
+}
