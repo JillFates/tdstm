@@ -60,34 +60,33 @@ class WsDashboardController {
 	    		log.info "Getting runbook data "
 				def taskStatsSql = """
 					SELECT 
-						t.workflow_transition_id AS wfTranId, 
-						mbs.transition_id as tid,
+						wt.workflow_transition_id AS wfTranId, 
+						mbs.transition_id AS tid,
 						ss.id AS snapshotId,
 						mbs.label AS label, 
-						mbs.calc_method as calcMethod,
-						count(*) AS tskTot	,
+						mbs.calc_method AS calcMethod,
+						SUM(IF(t.asset_comment_id IS NULL, 0, 1)) AS tskTot,
 						SUM(IF(t.status='Pending',1,0)) AS tskPending,
 						SUM(IF(t.status='Ready',1,0)) AS tskReady,
 						SUM(IF(t.status='Started',1,0)) AS tskStarted,
 						SUM(IF(t.status='Completed',1,0)) AS tskComp,
 						SUM(IF(t.status='Hold',1,0)) AS tskHold,
 						ROUND(IF(count(*)>0,SUM(IF(t.status='Completed',1,0))/count(*)*100,100)) AS percComp,
-						DATE_FORMAT( mbs.plan_start_time ,'%Y/%m/%d %r' ) AS planStart,
-						DATE_FORMAT( mbs.plan_completion_time ,'%Y/%m/%d %r' ) AS planComp,
-						DATE_FORMAT( MIN(IF(ISNULL(act_start),date_resolved, act_start)),'%Y/%m/%d %r' ) AS actStart,
-						DATE_FORMAT( MAX(date_resolved),'%Y/%m/%d %r' ) AS actComp
-					FROM asset_comment t
-					JOIN asset_entity a ON a.asset_entity_id = t.asset_entity_id AND a.move_bundle_id=${moveBundleId}
-					JOIN workflow_transition wt ON wt.workflow_transition_id=t.workflow_transition_id
-					JOIN move_bundle_step mbs ON mbs.move_bundle_id=a.move_bundle_id AND mbs.transition_id=wt.trans_id
+						DATE_FORMAT( mbs.plan_start_time ,'%Y/%m/%d %r') AS planStart,
+						DATE_FORMAT( mbs.plan_completion_time ,'%Y/%m/%d %r') AS planComp,
+						MIN(IF(ISNULL(t.act_start),t.date_resolved, t.act_start)) AS actStart,
+						MAX(t.date_resolved) AS actComp
+					FROM move_bundle_step mbs
+					JOIN move_bundle mb ON mb.move_bundle_id=mbs.move_bundle_id
+					JOIN workflow wf ON wf.process=mb.workflow_code
+					JOIN workflow_transition wt ON wt.workflow_id=wf.workflow_id AND wt.trans_id=mbs.transition_id 
+					LEFT OUTER JOIN asset_entity a ON a.move_bundle_id=mbs.move_bundle_id
+					LEFT OUTER JOIN asset_comment t ON t.workflow_transition_id=wt.workflow_transition_id AND t.asset_entity_id=a.asset_entity_id
 					LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id 
-					WHERE t.project_id=${project.id} AND t.workflow_transition_id IS NOT NULL AND IFNULL(mbs.label,'') <> ''
-					GROUP BY t.workflow_transition_id
-					ORDER BY mbs.transition_id
+					where mbs.move_bundle_id=${moveBundleId}
+					group by wt.workflow_transition_id;
 				"""
 				
-				// TODO - Need to remove the "LEFT JOIN step_snapshot" above when eliminating the snapshoting
-
 				dataPointsForEachStep = jdbcTemplate.queryForList(taskStatsSql)
 
 	    	} else {
@@ -193,8 +192,8 @@ class WsDashboardController {
 					data.put( "percentageStyle", "step_statusbar_good" )
 				}*/
 			} else {
-				def actCompTime = new Date( data.actComp ).getTime() / 1000
-				if( actCompTime > planCompTime+59 ){  // 59s added to planCompletion to consider the minuits instead of seconds 
+				def actCompTime = new Date( data.actComp?.getTime() ).getTime() / 1000
+				if( actCompTime > planCompTime+59 ){  // 59s added to planCompletion to consider the minutes instead of seconds 
 					data.put( "percentageStyle", "step_statusbar_bad" )
 				} else {
 					data.put( "percentageStyle", "step_statusbar_good" )
