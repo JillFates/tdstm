@@ -57,7 +57,6 @@ class WsDashboardController {
 		// Get the step data either by runbook tasks or     	
     	if (moveBundle) {
 	    	if (project.runbookOn) {
-	    		log.info "Getting runbook data "
 				def taskStatsSql = """
 					SELECT 
 						wt.workflow_transition_id AS wfTranId, 
