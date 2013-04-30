@@ -14,7 +14,7 @@
 $(document).ready(function() {
 	
 	${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + "Apps" +\'&dependencyBundle=\'+ null', onComplete:'listUpdate(e)') }
-	
+	$("#checkBoxDiv").dialog({ autoOpen: false, resizable: false })
 	$("#createEntityView").dialog({ autoOpen: false })
 	$("#showEntityView").dialog({ autoOpen: false })
 	$("#editEntityView").dialog({ autoOpen: false })
@@ -30,20 +30,18 @@ $(document).ready(function() {
 
 });
 </script>
-
 </head>
 <body>
 	<input type="hidden" id="redirectTo" name="redirectTo" value="planningConsole" />
 	<div class="body">
 		<div id="dependencyTitle" style="float: left;">
 			<h1>Dependency Console</h1>
-			<img id="upArrow" style="display:none; margin-left: 179px; margin-top: -22px; float: left; " src="${resource(dir:'images',file:'triangle_up.png')}" onclick="collapsePage()"/>
-	        <img id="downArrow" style="float:left; margin-left: 179px; margin-top: -22px;" src="${resource(dir:'images',file:'triangle_down.png')}" onclick="openPage()"/>
 		</div>
 		 <tds:hasPermission permission='MoveBundleEditView'>
-		<div id="checkBoxDiv" style="float: left;margin-top:10px;display: none; margin-left: 50px;">
+		 <div id="checkBoxDiv"  title="Dependency Grouping Control">
+		<div id="checkBoxDivId">
 		<g:form name="checkBoxForm"> 
-			<div style="float: left;">
+			<div style="float: left; margin-left:18px;">
 			   <fieldset>
 			      <legend>Connection Type:</legend>
 					<g:each in="${dependencyType}" var="dependency">
@@ -66,13 +64,13 @@ $(document).ready(function() {
 					</g:each>
             </fieldset>
 			</div>
-			<div style="float: left;margin-left: 10px;" class="buttonR">
+			<div class="buttonR">
 				<input type="button" class="submit"
-					style="float: right; margin-top: 50px" value="Generate" onclick="submitCheckBox()" />
+					style="margin-top: 40px; margin-left: -27px;" value="Generate" onclick="submitCheckBox()" />
 			</div>
 			
 			</g:form>
-             
+         </div> 
 		</div>
 		</tds:hasPermission>
 		<div style="clear: both;"></div>
@@ -185,16 +183,6 @@ $(document).ready(function() {
 		   $('#items1').html(resp)
 		   $('#items1').css('display','block');
     }
-    function collapsePage(){
-      $('#checkBoxDiv').hide(300);
-      $('#upArrow').css('display','none')
-      $('#downArrow').css('display','inline')
-    }
-    function openPage(){
-        $('#checkBoxDiv').show(300)
-        $('#upArrow').css('display','inline')
-        $('#downArrow').css('display','none')
-      }
     function fillView(e){
     	var data = e.responseText
     	$('#item1').html(data)

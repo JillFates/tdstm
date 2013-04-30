@@ -3,7 +3,7 @@
 		<input type="hidden" id="tabTypeId" name="tabType" value="${asset}" />
 		<div style="margin-left: 20px; margin-bottom: 10px;">
 			<h3>
-				<b>Dependency Groups</b>
+				<b>Dependency Groups</b>&nbsp;&nbsp;&nbsp;<input  type="button"  class="submit" value="Regenerate..." onclick="showDependencyControlDiv()"  />
 			</h3>
 			&nbsp;Dependency Analysis Run&nbsp;${date}: There were
 			${dependencyBundleCount}

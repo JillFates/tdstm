@@ -650,3 +650,10 @@ function populateModelSelect(e,rackId){
     resp = resp.replace("model.id","model_"+rackId+"").replace("Unassigned","Select Model")
     $("#modelSpan_"+rackId).html(resp);
 }*/
+
+function showDependencyControlDiv(){
+	$("#checkBoxDiv").dialog('option', 'width', '350px')
+	$("#checkBoxDiv").dialog('option', 'position', ['center','top']);
+	$("#checkBoxDiv").dialog('open')
+	$("#checkBoxDivId").show();
+}
