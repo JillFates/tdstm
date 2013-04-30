@@ -1,6 +1,9 @@
 import grails.converters.JSON
-import com.tdssrc.grails.GormUtil
-import java.text.SimpleDateFormat
+
+import com.tds.asset.AssetEntity
+import com.tdssrc.eav.EavAttribute
+import com.tdssrc.eav.EavAttributeOption
+import com.tdssrc.grails.WebUtil
 class AdminController {
 	def jdbcTemplate
     def index = { }
@@ -1048,5 +1051,43 @@ class AdminController {
 						  (recordsLegend[1] ? "${recordsLegend[1].batchCount} batches / ${recordsLegend[1].records} records pending" : "0 batches / 0 records pending")
 		
 		render pendingInfo
+	}
+	
+	/**
+	 * This method is used to get the Asset type and their respective Asset Count and Model Count
+	 * @param:N/A
+	 */
+	def getAssetTypes ={
+		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
+		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute , [sort:"value"]).value
+		def returnMap = []
+		assetTypeOptions.each{type->
+			def assetCount = AssetEntity.countByAssetType(type) 
+			def modelCount = Model.countByAssetType(type)
+			returnMap << [type, assetCount, modelCount]
+		}
+		render (template:'getAssetTypes', model:['returnMap':returnMap])
+	}
+	
+	/**
+	 * This method is used to clean the UnUsed Asset types
+	 */
+	def cleanAssetTypes ={
+		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
+		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute , [sort:"value"]).value
+		def deletedTypes = []
+		assetTypeOptions.each{type->
+			def assetCount = AssetEntity.countByAssetType(type)
+			def modelCount = Model.countByAssetType(type)
+			if(assetCount==0 && modelCount==0){
+				def eavAttributeOption = EavAttributeOption.findByValue(type)
+				if(eavAttributeOption){
+					deletedTypes << type
+					eavAttributeOption.delete()
+				}
+			}
+		}
+		def msg = deletedTypes ? "Removed ${deletedTypes.size()} unused Types: ${WebUtil.listAsMultiValueString(deletedTypes)}" : ""
+		render msg
 	}
 }

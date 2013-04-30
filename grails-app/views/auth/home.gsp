@@ -2,6 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
+<g:javascript src="admin.js" />
 <title>TDS TransitionManager&trade; Admin Portal</title>
 <style type="text/css">
 a:hover {
@@ -15,6 +16,7 @@ a:hover {
 <div><g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
+<div id="showCleanTypeMsgId" style="display: none" class="message"></div>
 <table style="border: 0">
 	<tr>
 		<td style="vertical-align:top">
@@ -122,11 +124,15 @@ a:hover {
 					<td><g:link controller="userLogin" style="color:black">Manage Users</g:link></td>
 					<td><g:link controller="refCode" style="color:black">Manage RefCode</g:link></td>
 				</tr>
-				<tr class="odd">
+				<tr class="even">
 					<td><g:link controller="admin" action="orphanSummary"
 						style="color:black">Manage Orphan Records</g:link></td>
 					<td><a style="color:black" href="#" onclick="openFlushDiv()"> Flush import data </a>
 					</td>
+				</tr>
+				<tr class="odd">
+					<td><a style="color:black" href="#" onclick="openShowTypeDiv()"> Show/Clean Types </a></td>
+					<td></td>
 				</tr>
 			</tbody>
 		</table>
@@ -151,7 +157,18 @@ a:hover {
 	</div>
 	</div>
 </div>
-
+<div id="showOrCleanTypeId" title="Clean Asset Types">
+	<div id="cleanProcessId" style="display: none; " >
+		Processing...<img src="../images/processing.gif" /> 
+	</div>
+	<div id="cleanProcessDivId" class="cleanProcessDiv">
+		<img src="../images/processing.gif" />
+	</div>
+	<div class="buttons">
+		<input type="button" id="cleanTypes" class="save" value="Clean" onclick="cleanTypes()"/> 
+		<input type="button"  class="save" value="Cancel" onclick="jQuery('#showOrCleanTypeId').dialog('close')"/>
+	</div>
+</div>
 
 <script>
 	currentMenuId = "#adminMenu";
@@ -159,57 +176,9 @@ a:hover {
 	
 	$(document).ready(function() {
 		$("#flushOldBatchId").dialog({ autoOpen: false })
+		$("#showOrCleanTypeId").dialog({ autoOpen: false })
 	})
 	
-	function processBatch(){
-		var value=$('input:radio[name=deleteHistory]:checked').val()
-		if(value=="doNothing"){
-			 $("#flushOldBatchId").dialog('close');
-		} else {
-			jQuery.ajax({
-				url: '../admin/processOldData',
-				data: {'deleteHistory':value},
-				type:'POST',
-				beforeSend:function(jqXHR){
-					$('#processDivId').show(); 
-					$("#respMsgId").hide();
-					$("#processDivId").show()
-				},
-				success: function(data) {
-					$("#processDivId").hide()
-					$("#respMsgId").show().html(data)
-				},
-				error:function(jqXHR, textStatus, errorThrown){
-					$("#processDivId").hide()
-					$("#respMsgId").show().html("An unexpected error occurred. Please close and reload form to see if the problem persists")
-				}
-			})
-		}
-	}
-	
-	function openFlushDiv(){
-		 jQuery.ajax({
-			url: '../admin/getBatchRecords',
-			type:'POST',
-			beforeSend:function(jqXHR){
-				 $("#flushOldBatchId").dialog('option', 'width', '500px')
-				 $("#flushOldBatchId").dialog('option', 'position', ['center','top']);
-				 $("#flushOldBatchId").dialog('open');
-				 $("#getRecordsInfoId").show()
-				 $("#respMsgId").hide()
-				 $("#processDivId").show()
-			},
-			success: function(data) {
-				 $("#respMsgId").html(data)
-				 $("#processDivId").hide()
-				 $("#respMsgId").show()
-			},
-			error:function(jqXHR, textStatus, errorThrown){
-				alert("An unexpected error occurred while opening Flush import div. Please reload form to see if the problem persists")
-			}
-		 })
-		
-	}
 </script>
 </body>
 </html>
