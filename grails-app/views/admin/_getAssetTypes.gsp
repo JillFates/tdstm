@@ -14,10 +14,10 @@
 						${assets[0]}
 					</td>
 					<td>
-						${assets[1]}
+						${assets[2]}
 					</td>
 					<td>
-						${assets[2]}
+						${assets[1]}
 					</td>
 				</tr>
 			</g:each>
