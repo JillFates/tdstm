@@ -172,6 +172,8 @@ class DataTransferBatchController {
 										} else {
 	    									assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
 	    								}
+										//Storing imported asset type in EavAttributeOptions table if not exist
+										assetEntityAttributeLoaderService.findOrCreateAssetType(it.importValue, true)
 										break;
 									case "validation":
 										if(!it.importValue){

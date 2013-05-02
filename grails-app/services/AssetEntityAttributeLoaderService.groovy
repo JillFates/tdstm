@@ -590,4 +590,24 @@ class AssetEntityAttributeLoaderService {
  			}
  	    }
      }
+	 
+	 /**
+	  * Storing imported asset type in EavAttributeOptions table if not exist .
+	  * @param assetTypeName : assetTypeName is imported assetTypeName 
+	  * @param create : create (Boolean) a flag to determine assetType will get created or not
+	  * @return
+	  */
+	 def findOrCreateAssetType(assetTypeName, def create = false){
+		 def typeAttribute = EavAttribute.findByAttributeCode("assetType")
+		 def assetType = EavAttributeOption.findByValueAndAttribute(assetTypeName, typeAttribute)
+		 if(!assetType && create){
+			 def eavAttrOpt = new EavAttributeOption('value':assetTypeName, 'attribute':typeAttribute, 'sort':0)
+			 if(!eavAttrOpt.save(flush:true)){
+				 eavAttrOpt.errors.allErrors.each{
+					 log.error(it)
+				 }
+			 }
+		 }
+		 return assetType
+	 }
 }
