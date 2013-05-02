@@ -1174,7 +1174,8 @@ class ClientTeamsController {
 			dueDate:dueDate,
 			assignToSelect:assignToSelect,
             assetEntity:assetComment.assetEntity,
-            cartQty:cartQty
+            cartQty:cartQty,
+			project:project
             ]
 	
 		if(viewMode=='mobile'){
