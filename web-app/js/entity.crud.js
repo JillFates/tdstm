@@ -13,32 +13,32 @@ function createEntityView(e, type,source,rack,roomName,location,position){
 function createAssetDetails(type){
 	switch(type){
 	 case "Application":
-		new Ajax.Request('../application/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Application');}})
+		new Ajax.Request(contextPath+'/application/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Application');}})
 		break;
 	 case "Database":
-		new Ajax.Request('../database/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Database');}})
+		new Ajax.Request(contextPath+'/database/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Database');}})
 		break;
 	 case "Files":
-		new Ajax.Request('../files/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Storage');}})
+		new Ajax.Request(contextPath+'/files/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Storage');}})
 		break;
 	 default :
-		new Ajax.Request('../assetEntity/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Server');}})
+		new Ajax.Request(contextPath+'/assetEntity/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Server');}})
 	 }
 }
 
 function getEntityDetails(redirectTo, type, value){
 	 switch(type){
 	 case "Application":
-		new Ajax.Request('../application/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Application');}})
+		new Ajax.Request(contextPath+'/application/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Application');}})
 		break;
 	 case "Database":
-		new Ajax.Request('../database/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Database');}})
+		new Ajax.Request(contextPath+'/database/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Database');}})
 		break;
 	 case "Files":
-		new Ajax.Request('../files/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Storage');}})
+		new Ajax.Request(contextPath+'/files/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Storage');}})
 		break;
 	 default :
-		new Ajax.Request('../assetEntity/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Server');}})
+		new Ajax.Request(contextPath+'/assetEntity/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Server');}})
 	 }
 }
 function showEntityView(e, type){
@@ -65,16 +65,16 @@ function editEntity(redirectTo,type, value, source,rack,roomName,location,positi
 	}
 	 switch(type){
 		 case "Application":
-			new Ajax.Request('../application/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Application',source,rack,roomName,location,position);}})
+			new Ajax.Request(contextPath+'/application/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Application',source,rack,roomName,location,position);}})
 			break;
 		 case "Database":
-			new Ajax.Request('../database/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Database',source,rack,roomName,location,position);}})
+			new Ajax.Request(contextPath+'/database/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Database',source,rack,roomName,location,position);}})
 			break;
 		 case "Files":
-			new Ajax.Request('../files/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Storage',source,rack,roomName,location,position);}})
+			new Ajax.Request(contextPath+'/files/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Storage',source,rack,roomName,location,position);}})
 			break;
 		 default :
-			 new Ajax.Request('../assetEntity/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Server',source,rack,roomName,location,position);}})
+			 new Ajax.Request(contextPath+'/assetEntity/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Server',source,rack,roomName,location,position);}})
 	 }
 }
 function editEntityView(e, type,source,rack,roomName,location,position){
@@ -122,7 +122,7 @@ function updateTitle( type ){
 function selectManufacturer(value, forWhom){
 	var val = value;
 	manipulateFields(val)
-	new Ajax.Request('../assetEntity/getManufacturersList?assetType='+val+'&forWhom='+forWhom,{asynchronous:true,evalScripts:true,onComplete:function(e){showManufacView(e, forWhom);}})
+	new Ajax.Request(contextPath+'/assetEntity/getManufacturersList?assetType='+val+'&forWhom='+forWhom,{asynchronous:true,evalScripts:true,onComplete:function(e){showManufacView(e, forWhom);}})
 }
 function showManufacView(e, forWhom){
     var resp = e.responseText;
@@ -136,7 +136,7 @@ function showManufacView(e, forWhom){
 function selectModel(value, forWhom){
 	var val = value;
 	var assetType = $("#assetType"+forWhom+"Id").val() ;
-	new Ajax.Request('../assetEntity/getModelsList?assetType='+assetType+'&manufacturer='+val+'&forWhom='+forWhom,{asynchronous:true,evalScripts:true,onComplete:function(e){showModelView(e, forWhom);}})
+	new Ajax.Request(contextPath+'/assetEntity/getModelsList?assetType='+assetType+'&manufacturer='+val+'&forWhom='+forWhom,{asynchronous:true,evalScripts:true,onComplete:function(e){showModelView(e, forWhom);}})
 	//${remoteFunction(action:'getModelsList', params:'\'assetType=\' +assetType +\'&=\'+ val', onComplete:'showModelView(e)' )}
 }
 function showModelView(e, forWhom){
@@ -150,9 +150,9 @@ function showModelView(e, forWhom){
 function showComment(id , action){
 	   var id = id
 	   if(action =='edit'){
-	   new Ajax.Request('../assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog(e, 'edit');commentChangeShow();}})
+	   new Ajax.Request(contextPath+'/assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog(e, 'edit');commentChangeShow();}})
 	   }else{
-		   new Ajax.Request('../assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog(e, 'show');commentChangeShow();}})
+		   new Ajax.Request(contextPath+'/assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog(e, 'show');commentChangeShow();}})
 	   }
 }
 function validateFileFormat(){
@@ -182,7 +182,7 @@ function submitRemoteForm(){
 function deleteAsset(id,value){
 	var redirectTo = 'planningConsole'
 	if(value=='server'){
-		new Ajax.Request('../assetEntity/delete?id='+id+'&dstPath='+redirectTo,{asynchronous:true,evalScripts:true,
+		new Ajax.Request(contextPath+'/assetEntity/delete?id='+id+'&dstPath='+redirectTo,{asynchronous:true,evalScripts:true,
 			onComplete:function(data){
 			$('#editEntityView').dialog('close');
 			$('#showEntityView').dialog('close');
@@ -190,7 +190,7 @@ function deleteAsset(id,value){
 			}
 		})
 	}else if(value=='app'){
-		new Ajax.Request('../application/delete?id='+id+'&dstPath='+redirectTo,{asynchronous:true,evalScripts:true,
+		new Ajax.Request(contextPath+'/application/delete?id='+id+'&dstPath='+redirectTo,{asynchronous:true,evalScripts:true,
 			onComplete:function(data){
 			$('#editEntityView').dialog('close');
 			$('#showEntityView').dialog('close');
@@ -198,7 +198,7 @@ function deleteAsset(id,value){
 			}
 		})
 	}else if(value=='database'){
-		new Ajax.Request('../database/delete?id='+id+'&dstPath='+redirectTo,{asynchronous:true,evalScripts:true,
+		new Ajax.Request(contextPath+'/database/delete?id='+id+'&dstPath='+redirectTo,{asynchronous:true,evalScripts:true,
 			onComplete:function(data){
 			$('#editEntityView').dialog('close');
 			$('#showEntityView').dialog('close');
@@ -206,7 +206,7 @@ function deleteAsset(id,value){
 			}
 		})
 	}else {
-		new Ajax.Request('../files/delete?id='+id+'&dstPath='+redirectTo,{asynchronous:true,evalScripts:true,
+		new Ajax.Request(contextPath+'/files/delete?id='+id+'&dstPath='+redirectTo,{asynchronous:true,evalScripts:true,
 			onComplete:function(data){
 			$('#editEntityView').dialog('close');
 			$('#showEntityView').dialog('close');
@@ -218,7 +218,7 @@ function deleteAsset(id,value){
 }
 function submitCheckBox(){
 	var data = $('#checkBoxForm').serialize()
-	new Ajax.Request('../moveBundle/generateDependency?'+data,{asynchronous:true,evalScripts:true,
+	new Ajax.Request(contextPath+'/moveBundle/generateDependency?'+data,{asynchronous:true,evalScripts:true,
 		    onLoading:function(){
 		    	var processTab = jQuery('#processDiv');
 			    processTab.attr("style", "display:block");
@@ -355,13 +355,13 @@ function deleteAssets(list,action){
 			if(confirm("There is no undo! Are you sure you want to delete these ?")){
 				var url
 				if(action=='server'){
-					url='../assetEntity/deleteBulkAsset'
+					url=contextPath+'/assetEntity/deleteBulkAsset'
 				}else if(action=='application'){
-					url='../application/deleteBulkAsset'
+					url=contextPath+'/application/deleteBulkAsset'
 				}else if(action=='files'){
-					url='../files/deleteBulkAsset'
+					url=contextPath+'/files/deleteBulkAsset'
 				}else{
-					url='../database/deleteBulkAsset'
+					url=contextPath+'/database/deleteBulkAsset'
 				}
 				
 				jQuery.ajax({
@@ -403,7 +403,7 @@ function enableButton(list){
 }
 
 function getAuditDetails(redirectTo, assetType, value){
-	new Ajax.Request('../assetEntity/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,
+	new Ajax.Request(contextPath+'/assetEntity/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,
 		onComplete:function(e){
 			$("#auditDetailViewId").html(e.responseText)
 			$("#auditDetailViewId").show()
@@ -412,7 +412,7 @@ function getAuditDetails(redirectTo, assetType, value){
 }
 
 function editAudit(redirectTo, source, assetType, value){
-	new Ajax.Request('../assetEntity/edit?id='+value+'&redirectTo='+redirectTo+'&source='+source+'&assetType='+assetType,
+	new Ajax.Request(contextPath+'/assetEntity/edit?id='+value+'&redirectTo='+redirectTo+'&source='+source+'&assetType='+assetType,
 	{asynchronous:true,evalScripts:true,
 		onComplete:function(e){
 			$("#auditDetailViewId").html(e.responseText)
@@ -443,7 +443,7 @@ function updateAudit(){
 }
 
 function deleteAudit(id,value){
-	new Ajax.Request('../assetEntity/delete?id='+id+'&dstPath=assetAudit',{asynchronous:true,evalScripts:true,
+	new Ajax.Request(contextPath+'/assetEntity/delete?id='+id+'&dstPath=assetAudit',{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
 				$("#auditDetailViewId").hide()
 				window.location.reload()
@@ -452,7 +452,7 @@ function deleteAudit(id,value){
 }
 
 function showModelAudit(id){
-	new Ajax.Request('../model/show?id='+id+'&redirectTo=assetAudit',{asynchronous:true,evalScripts:true,
+	new Ajax.Request(contextPath+'/model/show?id='+id+'&redirectTo=assetAudit',{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
 				$("#modelAuditId").html(data.responseText)
 				$("#modelAuditId").show()
@@ -464,7 +464,7 @@ function showModelAudit(id){
 function editModelAudit(val){
 	if(val){
 		var manufacturer = $("#manufacturersAuditId").val()
-		new Ajax.Request('../model/getModelDetailsByName?modelName='+val+'&manufacturerName='+manufacturer,{asynchronous:true,evalScripts:true,
+		new Ajax.Request(contextPath+'/model/getModelDetailsByName?modelName='+val+'&manufacturerName='+manufacturer,{asynchronous:true,evalScripts:true,
 			onComplete:function(data){
 					$("#modelAuditId").html(data.responseText)
 					$("#modelAuditId").show()
@@ -487,7 +487,7 @@ function updateModelAudit(){
 }
 
 function createAuditPage(type,source,rack,roomName,location,position){
-	new Ajax.Request('../assetEntity/create?redirectTo=assetAudit'+'&assetType='+type+'&source='+source,{asynchronous:true,evalScripts:true,
+	new Ajax.Request(contextPath+'/assetEntity/create?redirectTo=assetAudit'+'&assetType='+type+'&source='+source,{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
 				$("#auditDetailViewId").html(data.responseText)
 				$("#auditLocationId").val(location)
@@ -513,7 +513,7 @@ function createAuditPage(type,source,rack,roomName,location,position){
 }
 
 function createBladeAuditPage(source,blade,position,manufacturer,assetType,assetEntityId, moveBundleId){
-	new Ajax.Request('../assetEntity/create?redirectTo=assetAudit'+'&assetType='+assetType+'&source='+source,{asynchronous:true,evalScripts:true,
+	new Ajax.Request(contextPath+'/assetEntity/create?redirectTo=assetAudit'+'&assetType='+assetType+'&source='+source,{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
 				$("#auditDetailViewId").html(data.responseText)
 				$("#BladeChassisId").val(blade)
@@ -529,7 +529,7 @@ function createBladeAuditPage(source,blade,position,manufacturer,assetType,asset
 }
 
 function saveAuditPref(val, id){
-	new Ajax.Request('../room/show?id='+id+'&auditView='+val,{asynchronous:true,evalScripts:true,
+	new Ajax.Request(contextPath+'/room/show?id='+id+'&auditView='+val,{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
 			openRoomView(data)
 		}}
@@ -542,7 +542,7 @@ var modelLoadRequest
 function getAlikeManu(val) {
  if(manuLoadRequest)manuLoadRequest.abort();
  manuLoadRequest = jQuery.ajax({
-						url: '../manufacturer/autoCompleteManufacturer',
+						url: contextPath+'/manufacturer/autoCompleteManufacturer',
 						data: {'value':val},
 						type:'POST',
 						success: function(data) {
@@ -557,7 +557,7 @@ function getAlikeModel(val){
 	if(modelLoadRequest)modelLoadRequest.abort()
 	var manufacturer= $("#manufacturersAuditId").val()
 	modelLoadRequest = jQuery.ajax({
-							url: '../model/autoCompleteModel',
+							url: contextPath+'/model/autoCompleteModel',
 							data: {'value':val,'manufacturer':manufacturer},
 							type:'POST',
 							success: function(data) {
@@ -580,7 +580,7 @@ function updateModelForAudit(name){
 }
 
 function getAssetType(val){
-	new Ajax.Request('../model/getModelType?value='+val,{asynchronous:true,evalScripts:true,
+	new Ajax.Request(contextPath+'/model/getModelType?value='+val,{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
 			$("#assetTypeEditId").val(data.responseText)
 			editModelAudit(""+val+"")
@@ -589,7 +589,7 @@ function getAssetType(val){
 }
 
 function setType(id, forWhom){
-	new Ajax.Request('../assetEntity/getAssetModelType?id='+id,{asynchronous:true,evalScripts:true,
+	new Ajax.Request(contextPath+'/assetEntity/getAssetModelType?id='+id,{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
 			$("#assetType"+forWhom+"Id").val(data.responseText)
 			manipulateFields(data.responseText)
@@ -617,7 +617,7 @@ function manipulateFields( val ){
 function populateDependency(assetId, whom){
 	$(".updateDep").attr('disabled','disabled')
 	jQuery.ajax({
-		url: '../assetEntity/populateDependency',
+		url: contextPath+'/assetEntity/populateDependency',
 		data: {'id':assetId},
 		type:'POST',
 		success: function(data) {
@@ -638,12 +638,12 @@ function showTask(selected){
 		 $('.resolved').hide();
 		 $('#showEntityView').dialog('option', 'height', 'auto')
 	}
-	new Ajax.Request($("#contextPath").val()+'/assetEntity/setShowAllPreference?selected='+selected,{asynchronous:true,evalScripts:true})
+	new Ajax.Request(contextPath+'/assetEntity/setShowAllPreference?selected='+selected,{asynchronous:true,evalScripts:true})
 
 }
 /*function updateModel(rackId,value){
 	var val = value;
-	new Ajax.Request('../assetEntity/getModelsList?='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){populateModelSelect(e,rackId);}})
+	new Ajax.Request('contextPath+/assetEntity/getModelsList?='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){populateModelSelect(e,rackId);}})
 }
 function populateModelSelect(e,rackId){
     var resp = e.responseText;

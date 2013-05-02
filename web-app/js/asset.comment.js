@@ -17,7 +17,7 @@ function changeStatus(id, status, currentStatus, from){
 
 	if(from == "myTask"){ params = {'id':id,'status':status,'currentStatus':currentStatus,redirectTo:'taskManager','view':'myTask','tab':$('#tabId').val() }}
 	jQuery.ajax({
-		url: '../task/update',
+		url:contextPath+'/task/update',
 		data: params,
 		type:'POST',
 		success: function(data) {
@@ -65,7 +65,7 @@ function assignTask(id, user, status, from){
 	$('#assigntome_text_'+id).attr('class', 'task_button_disabled')
  	
 	jQuery.ajax({
-		url: '../task/assignToMe',
+		url: contextPath+'/task/assignToMe',
 		data: {'id':id, 'user':user, 'status':status},
 		type:'POST',
 		success: function(data) {
@@ -108,7 +108,7 @@ function getActionBarGrid(spanId){
    $('#'+id).after("<tr id='load_d_"+id+"'><td nowrap='nowrap' colspan='13' class='statusButtonBar' ><img src='../images/spinner.gif'/></td></tr>")
    if(actionBarLoadReq)actionBarLoadReq.abort();
    actionBarLoadReq = jQuery.ajax({
-							url: '../task/genActionBarHTML',
+							url: contextPath+'/task/genActionBarHTML',
 							data: {'id':id},
 							type:'POST',
 							success: function(data, status, xhr) {
@@ -150,7 +150,7 @@ function getActionBarGrid(spanId){
 }
 function getBulkActionBarGrid(taskIds){
 jQuery.ajax({
-	url: '../task/genBulkActionBarHTML',
+	url: contextPath+'/task/genBulkActionBarHTML',
 	data: {'id':taskIds},
 	type:'POST',
 	success: function(resp, status, xhr) {

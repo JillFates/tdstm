@@ -2,7 +2,7 @@
 function openAssetEditDialig( id ){
 	$("#editFormId").val(id)
 	 var redirectTo = $('#redirectTo').val() == 'room' ? 'room' : 'rack'
-	new Ajax.Request('../assetEntity/edit?id='+id+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetDialog( e , 'edit');}})
+	new Ajax.Request(contextPath+'/assetEntity/edit?id='+id+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetDialog( e , 'edit');}})
 }
 function showEditAsset(e) {
 	var assetEntityAttributes = eval('(' + e.responseText + ')')
@@ -17,7 +17,7 @@ function showEditAsset(e) {
 }
 function createDialog(source,rack,roomName,location,position){
     var redirectTo = $('#redirectTo').val() == 'room' ? 'room' : 'rack'
-    new Ajax.Request('../assetEntity/create?redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e);updateAssetInfo(source,rack,roomName,location,position);}})
+    new Ajax.Request(contextPath+'/assetEntity/create?redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e);updateAssetInfo(source,rack,roomName,location,position);}})
   }
 function updateAssetInfo(source,rack,roomName,location,position){
 	var target = source != '1' ? 'target' : 'source'
@@ -45,7 +45,7 @@ function validateAssetEntity(formname) {
 }
 function listDialog(assign,sort,order,source,rack,roomName,location,position){
 	jQuery.ajax({
-		url: "../room/getAssetsListToAddRack",
+		url: contextPath+"/room/getAssetsListToAddRack",
 		data: "source="+source+"&rack="+rack+"&roomName="+roomName+"&location="+location+"&position="+position+"&sort="+sort+"&order="+order+"&assign="+assign,
 		type:'POST',
 		success: function(data) {
@@ -89,7 +89,7 @@ function updateAssetBladeInfo(source,blade,position,manufacturer,moveBundle){
 }
 function listBladeDialog(source,blade,position, assign){
 	jQuery.ajax({
-		url: "../room/getBladeAssetsListToAddRack",
+		url: contextPath+"/room/getBladeAssetsListToAddRack",
 		data: "source="+source+"&blade="+blade+"&position="+position+"&assign="+assign,
 		type:'POST',
 		success: function(data) {
@@ -120,7 +120,7 @@ function updateBladeEditForm(source,blade,position, bundleId){
 var click = 1
 function openCablingDiv( assetId ){
 	$("#assetEntityId").val(assetId)
-	new Ajax.Request('../rackLayouts/getCablingDetails?assetId='+assetId,{asynchronous:true,evalScripts:true,onComplete:function(e){showCablingDetails(e);}})
+	new Ajax.Request(contextPath+'/rackLayouts/getCablingDetails?assetId='+assetId,{asynchronous:true,evalScripts:true,onComplete:function(e){showCablingDetails(e);}})
 	$("#cablingDialogId").dialog( "option", "width", 400 )
 	$("#cablingDialogId").dialog("open")
 }
@@ -303,7 +303,7 @@ function validateRackData(value, field){
 		click = 1
 		if(value){
 			jQuery.ajax({
-				url: "../rackLayouts/getAutoCompleteDetails",
+				url: contextPath+"/rackLayouts/getAutoCompleteDetails",
 				data: "field=isValidRack&value="+value,
 				type:'POST',
 				success: function(data) {
@@ -331,7 +331,7 @@ function validateRackData(value, field){
 function getUpositionData(){
 	var rack = $("#rackId").val()
 	if(rack){
-		new Ajax.Request('../rackLayouts/getAutoCompleteDetails?field=uposition&rack='+rack,{asynchronous:true,evalScripts:true,onComplete:function(e){updateUpositionData(e);}})
+		new Ajax.Request(contextPath+'/rackLayouts/getAutoCompleteDetails?field=uposition&rack='+rack,{asynchronous:true,evalScripts:true,onComplete:function(e){updateUpositionData(e);}})
 	} else {
 		alert("Please enter rack data")
 	}
@@ -354,7 +354,7 @@ function validateUpositionData(value, field){
 		if(rack){
 			if(value){
 			jQuery.ajax({
-				url: "../rackLayouts/getAutoCompleteDetails",
+				url: contextPath+"/rackLayouts/getAutoCompleteDetails",
 				data: "field=isValidUposition&rack="+rack+"&value="+value,
 				type:'POST',
 				success: function(data) {
@@ -385,7 +385,7 @@ function getConnectorData(){
 		var rack = $("#rackId").val()
 		var uposition = $("#upositionId").val()
 		if(rack && uposition){
-			new Ajax.Request('../rackLayouts/getAutoCompleteDetails?field=connector&rack='+rack+'&uposition='+uposition,{asynchronous:true,evalScripts:true,onComplete:function(e){updateConnectorData(e);}})
+			new Ajax.Request(contextPath+'/rackLayouts/getAutoCompleteDetails?field=connector&rack='+rack+'&uposition='+uposition,{asynchronous:true,evalScripts:true,onComplete:function(e){updateConnectorData(e);}})
 		} else {
 			alert("Please enter rack data")
 		}
@@ -409,7 +409,7 @@ function validateConnectorData(value, field){
 		if(rack && uposition){
 			if(value){
 				jQuery.ajax({
-					url: "../rackLayouts/getAutoCompleteDetails",
+					url: contextPath+"/rackLayouts/getAutoCompleteDetails",
 					data: "field=isValidConnector&rack="+rack+"&uposition="+uposition+"&value="+value,
 					type:'POST',
 					success: function(data) {
@@ -463,7 +463,7 @@ function getAssignedDetails(forWhom, rackId){
 	   	});
 	} 
 	jQuery.ajax({
-		url: "../rackLayouts/getAssignedCables",
+		url: contextPath+"/rackLayouts/getAssignedCables",
 		data: {'moveBundle':selectedBundles, 'sourcerack':selectedSourceRoom, 'targetrack':selectedTargetRoom, 'rackId':rackId},
 		type:'POST',
 		success: function(data) {

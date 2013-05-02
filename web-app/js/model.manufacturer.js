@@ -36,7 +36,7 @@ function validateAKA(value,itemId,spanId,forWhom){
 	if(makeAjaxCall){
 		var params = {'name':value,'id':itemId}
 		jQuery.ajax({
-			url : $("#contextPath").val()+'/'+forWhom+'/validateAKA',
+			url : contextPath+'/'+forWhom+'/validateAKA',
 			data: params,
 			complete: function(e) { 
 				if(e.responseText){
@@ -100,7 +100,7 @@ function convertPowerType(value, whom){
 
 function createModelManuDetails(controllerName,forWhom){
 	jQuery.ajax({
-		url : $("#contextPath").val()+'/'+controllerName+'/create',
+		url : contextPath+'/'+controllerName+'/create',
 		type : 'POST',
 		success : function(data) {
 			 $("#create"+forWhom+"View").html(data);
@@ -116,7 +116,7 @@ function createModelManuDetails(controllerName,forWhom){
 
 function showOrEditModelManuDetails(controllerName,id,forWhom,view, name){
 	jQuery.ajax({
-		url : $("#contextPath").val()+'/'+controllerName+'/'+view+'/',
+		url : contextPath+'/'+controllerName+'/'+view+'/',
 		data : {'id' : id},
 		type : 'POST',
 		success : function(data) {
@@ -203,7 +203,7 @@ function compareOrMerge(){
 		ids.push(this.id.split("_")[2])
 	})
 	jQuery.ajax({
-		url: $("#contextPath").val()+'/model/compareOrMerge',
+		url: contextPath+'/model/compareOrMerge',
 		data: {'ids':ids},
 		type:'POST',
 		success: function(data) {
@@ -229,7 +229,7 @@ function meegeModel(){
 			modelToMerge.push(this.id.split("_")[1])
 		})
 		jQuery.ajax({
-			url: $("#contextPath").val()+'/model/mergeModels',
+			url: contextPath+'/model/mergeModels',
 			data: {'toId':targetModelId, 'fromId':modelToMerge},
 			type:'POST',
 			beforeSend: function(jqXHR){

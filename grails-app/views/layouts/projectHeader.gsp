@@ -32,6 +32,7 @@
      	var B1 = []
      	var B2 = []
      	var taskManagerTimePref = "60"
+     	var contextPath = "${request.contextPath}"
    </script>
   </head>
 	<% def currProj = session.getAttribute("CURR_PROJ");

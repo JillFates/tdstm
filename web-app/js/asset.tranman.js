@@ -58,7 +58,7 @@ var stdErrorMsg = 'An unexpected error occurred. Please close and reload form to
     	tb.html( tbody );
     	$('#createFormTbodyId').css('display','block');
 	      
-	    new Ajax.Request('../assetEntity/getAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){createAutoComplete(e);}})
+	    new Ajax.Request(contextPath+'/assetEntity/getAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){createAutoComplete(e);}})
 	    $("#assetTypeId").val("Server")
 		updateManufacturerOptions("Server", null, 1)
  }
@@ -173,7 +173,7 @@ function showAssetDialog( e , action ) {
 		editDiv.html( etbody );
     }
 	      
-	  new Ajax.Request('../assetEntity/getAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){updateAutoComplete(e);}}) 
+	  new Ajax.Request(contextPath+'/assetEntity/getAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){updateAutoComplete(e);}}) 
 	  $("#createDialog").dialog("close");
 	  if(action == 'edit'){
 	      $("#editDialog").dialog('option', 'width', '1000px');
@@ -195,7 +195,7 @@ function showAssetDialog( e , action ) {
 	  timedUpdate('never')
     }
     function updateManufacturerOptions(assetType, manufacturerId, type){
-    	new Ajax.Request('../manufacturer/getManufacturersListAsJSON?assetType='+assetType,{
+    	new Ajax.Request(contextPath+'/manufacturer/getManufacturersListAsJSON?assetType='+assetType,{
 			asynchronous:false,
 			evalScripts:true,
 			onComplete:function(e){
@@ -227,7 +227,7 @@ function showAssetDialog( e , action ) {
 		if(type == 1){
 			assetType = $("#assetTypeId").val()
 		}
-		new Ajax.Request('../model/getModelsListAsJSON?manufacturer='+manufacturer+"&assetType="+assetType,{
+		new Ajax.Request(contextPath+'/model/getModelsListAsJSON?manufacturer='+manufacturer+"&assetType="+assetType,{
 			asynchronous:false,
 			evalScripts:true,
 			onComplete:function(e){
@@ -306,7 +306,7 @@ function showAssetDialog( e , action ) {
 		      	}
     	}
     var safeQueryString = escape( assetEntityParams );
-    new Ajax.Request('../assetEntity/updateAssetEntity?id='+assetId+'&assetEntityParams='+safeQueryString,{asynchronous:true,evalScripts:true,onComplete:function(e){showEditAsset(e);}})
+    new Ajax.Request(contextPath+'/assetEntity/updateAssetEntity?id='+assetId+'&assetEntityParams='+safeQueryString,{asynchronous:true,evalScripts:true,onComplete:function(e){showEditAsset(e);}})
     
  }
     
@@ -315,7 +315,7 @@ function showAssetDialog( e , action ) {
  }
  
  function updateWorkflowTransitions(assetId, category, transitionID, predecessorID,id){
-	new Ajax.Request('../assetEntity/getWorkflowTransition?assetId='+assetId+'&category='+category+'&assetCommentId='+id,{asynchronous:true,evalScripts:true,
+	new Ajax.Request(contextPath+'/assetEntity/getWorkflowTransition?assetId='+assetId+'&category='+category+'&assetCommentId='+id,{asynchronous:true,evalScripts:true,
 		onComplete:function(e){
 			if(e.responseText.length=='0'){
 				$('#workFlowTransitionTrId').css('display','none')
@@ -350,7 +350,7 @@ function showAssetDialog( e , action ) {
   	var browser=navigator.appName;
   	var inputField = ""
   	if( name == "moveBundle"){
-  		new Ajax.Request('../moveBundle/projectMoveBundles',{
+  		new Ajax.Request(contextPath+'/moveBundle/projectMoveBundles',{
   				asynchronous:false,
   				evalScripts:true,
   				onComplete:function(e){
@@ -465,7 +465,7 @@ function showAssetDialog( e , action ) {
 	 	submitAction = 'delete';
 	}
 	if ( confirm(confirmMessage) ) {
-		$('form#editForm').attr({action: '../assetEntity/'+submitAction}).submit();
+		$('form#editForm').attr({action: contextPath+'/assetEntity/'+submitAction}).submit();
 		return true;
 	} else {
 		return false;
@@ -528,37 +528,37 @@ function showAssetDialog( e , action ) {
 			      commentTd.id = 'comment_'+commentObj.commentInstance.id
 			      commentTd.name = commentObj.commentInstance.id
 			   	  
-			      commentTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
+			      commentTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
 			      // = 'comment_'+commentObj.commentInstance.id
 			      var typeTd = document.createElement('td');
 			      typeTd.id = 'type_'+commentObj.commentInstance.id
 			      typeTd.name = commentObj.commentInstance.id
-			      typeTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'show' );commentChangeShow();}})}
+			      typeTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'show' );commentChangeShow();}})}
 			      
 			      var dueDateTd = document.createElement('td');
 			      dueDateTd.id = 'dueDate_'+commentObj.commentInstance.id
 			      dueDateTd.name = commentObj.commentInstance.id					   	  
-			      dueDateTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
+			      dueDateTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
 			      
 			      var resolveTd = document.createElement('td');
 				  resolveTd.id = 'resolve_'+commentObj.commentInstance.id
 				  resolveTd.name = commentObj.commentInstance.id
-			      resolveTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'show' );commentChangeShow();}})}					      
+			      resolveTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'show' );commentChangeShow();}})}					      
 			      var verifyTd = document.createElement('td');
 			      
 				  verifyTd.id = 'verify_'+commentObj.commentInstance.id
 				  verifyTd.name = commentObj.commentInstance.id
-			      verifyTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'show' );commentChangeShow();}})}
+			      verifyTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'show' );commentChangeShow();}})}
 			      
 			      var categoryTd = document.createElement('td');
 			      categoryTd.id = 'category_'+commentObj.commentInstance.id
 			      categoryTd.name = commentObj.commentInstance.id					   	  
-			      categoryTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
+			      categoryTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
 			      
 			      var commentCodeTd = document.createElement('td');
 			      commentCodeTd.id = 'commentCode_'+commentObj.commentInstance.id
 			      commentCodeTd.name = commentObj.commentInstance.id					   	  
-			      commentCodeTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
+			      commentCodeTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
 			      				     
 			      
 			      
@@ -569,7 +569,7 @@ function showAssetDialog( e , action ) {
 			      //link.href = '#'
 			      link.id = 'link_'+commentObj.commentInstance.id
 			      link.name = commentObj.commentInstance.id
-			      link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChangeEdit('editResolveDiv','editCommentForm');}})} //;return false
+			      link.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );commentChangeEdit('editResolveDiv','editCommentForm');}})} //;return false
 			      var commentText = document.createTextNode(truncate(commentObj.commentInstance.comment));
 			      var typeText = document.createTextNode(commentObj.commentInstance.commentType); 
 			      var formatedDueDate = formatDueDate(commentObj.commentInstance.dueDate);
@@ -920,42 +920,42 @@ function showAssetDialog( e , action ) {
 				  var commentTd = document.createElement('td');
 				  commentTd.id = 'comment_'+assetComments.assetComment.id
 				  commentTd.name = assetComments.assetComment.id
-				  commentTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
+				  commentTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
 				  var typeTd = document.createElement('td');
 				  typeTd.id = 'type_'+assetComments.assetComment.id
 				  typeTd.name = assetComments.assetComment.id
-				  typeTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
+				  typeTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
 				  
 				  var dueDateTd = document.createElement('td');
 				  dueDateTd.id = 'type_'+assetComments.assetComment.id
 				  dueDateTd.name = assetComments.assetComment.id
-				  dueDateTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
+				  dueDateTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
 				  
 				  var categoryTd = document.createElement('td');
 				  categoryTd.id = 'category_'+assetComments.assetComment.id
 				  categoryTd.name = assetComments.assetComment.id
-				  categoryTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
+				  categoryTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
 				  
 				  var commentCodeTd = document.createElement('td');
 				  commentCodeTd.id = 'commentCode_'+assetComments.assetComment.id
 				  commentCodeTd.name = assetComments.assetComment.id
-				  commentCodeTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
+				  commentCodeTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
 				  
 				  var resolveTd = document.createElement('td');
 				  resolveTd.id = 'resolve_'+assetComments.assetComment.id
 				  resolveTd.name = assetComments.assetComment.id
-			      resolveTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'show' );commentChangeShow();}})}					      
+			      resolveTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'show' );commentChangeShow();}})}					      
 			   	  var verifyTd = document.createElement('td');
 				  verifyTd.id = 'verify_'+assetComments.assetComment.id
 				  verifyTd.name = assetComments.assetComment.id
-				  verifyTd.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
+				  verifyTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
 				  var image = document.createElement('img');
 			      image.src = "../images/skin/database_edit.png"
 			      image.border = 0
 				  var link = document.createElement('a');
 				  link.href = '#'
 				  link.id = 'link_'+assetComments.assetComment.id
-				  link.onclick = function(){new Ajax.Request('../assetEntity/showComment?id='+assetComments.assetComment.id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );}})} //;return false
+				  link.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+assetComments.assetComment.id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, 'edit' );}})} //;return false
 			      var commentText = document.createTextNode(truncate(assetComments.assetComment.comment));
 			      var typeText = document.createTextNode(assetComments.assetComment.commentType);
 			      var formatedDueDate = formatDueDate(assetComments.assetComment.dueDate);
@@ -1251,7 +1251,7 @@ function updateAssetCommentIcon( assetComments ){
 	var link = document.createElement('a');
 	link.href = '#'
 		
-	link.onclick = function(){setAssetId(assetComments.assetComment.assetEntity.id);new Ajax.Request('../assetEntity/listComments?id='+assetComments.assetComment.assetEntity.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
+	link.onclick = function(){setAssetId(assetComments.assetComment.assetEntity.id);new Ajax.Request(contextPath+'/assetEntity/listComments?id='+assetComments.assetComment.assetEntity.id,{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog(e,'never');}})} //;return false
 	if( assetComments.status ){
 		link.innerHTML = "<img src=\"../i/db_table_red.png\" border=\"0px\">"
 	}else{
@@ -1303,7 +1303,7 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 		}
 		$('#predecessorTableId').html("")
 		$('#successorTableId').html("")
-		var url = '../assetEntity/saveComment'
+		var url = contextPath+'/assetEntity/saveComment'
 		var params = { 'comment':$('#comment').val(), 'commentType':$('#commentType').val(),
 			'isResolved':$('#isResolved').val(), 'resolution':$('#resolution').val(),
 			'mustVerify':$('#mustVerify').val(), 'category':$('#createCategory').val(),
@@ -1320,7 +1320,7 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 	} else {
 		$('#taskDependencyTdId').html("")
 		$('#relatedIssueEditId').html("")
-		var url = '../assetEntity/updateComment'
+		var url = contextPath+'/assetEntity/updateComment'
 		$('select[name="predecessorEdit"]').each(function(){
 			var predId = $(this).attr('id').split('_')[1]
 			if($(this).val())
@@ -1408,7 +1408,7 @@ function textCounter(fieldId, maxlimit) {
  * 
  */
 function showManufacturer(id){
-	new Ajax.Request('../manufacturer/getManufacturerAsJSON?id='+id,{
+	new Ajax.Request(contextPath+'/manufacturer/getManufacturerAsJSON?id='+id,{
 		asynchronous:false,
 		evalScripts:true,
 		onComplete:function(e){
@@ -1423,7 +1423,7 @@ function showManufacturer(id){
 	})
 }
 function showModel(id){
-	new Ajax.Request('../model/getModelAsJSON?id='+id,{
+	new Ajax.Request(contextPath+'/model/getModelAsJSON?id='+id,{
 		asynchronous:false,
 		evalScripts:true,
 		onComplete:function(e){
@@ -1524,7 +1524,7 @@ function createComments(asset, assetName){
 	
 }
 function showAssetComment(id ,type){
-	new Ajax.Request('../assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, type );commentChangeShow();}})
+	new Ajax.Request(contextPath+'/assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, type );commentChangeShow();}})
 }
 
 function updateCommentsLists(){
@@ -1581,7 +1581,7 @@ function addPredecessor(issueCategory,predecessorCategory,comment,row,span, tabl
 			category =$('#'+issueCategory).val()
 		}
 	var commentId = comment ? $('#'+comment).val() : ''
-	new Ajax.Request('../assetEntity/predecessorSelectHtml?category='+category+'&commentId='+commentId+'&forWhom='+forWhom, {asynchronous:false,evalScripts:true,
+	new Ajax.Request(contextPath+'/assetEntity/predecessorSelectHtml?category='+category+'&commentId='+commentId+'&forWhom='+forWhom, {asynchronous:false,evalScripts:true,
 		 onComplete:function(e){
 		     $('#'+span).html(e.responseText)
 		     $('#taskDependencyTdId').html(e.responseText)
@@ -1616,7 +1616,7 @@ function addPredecessor(issueCategory,predecessorCategory,comment,row,span, tabl
 }
 function fillPredecessor(id, category,commentId, forWhom){
 	var row = id.split('_')[1]
-	new Ajax.Request('../assetEntity/predecessorSelectHtml?category='+category+'&commentId='+commentId+'&forWhom='+forWhom, {asynchronous:true,evalScripts:true,
+	new Ajax.Request(contextPath+'/assetEntity/predecessorSelectHtml?category='+category+'&commentId='+commentId+'&forWhom='+forWhom, {asynchronous:true,evalScripts:true,
 		 onComplete:function(e){
 			 var resp =  e.responseText.replace('taskDependencyId','taskDependencyId_'+row).replace('taskDependencyEditId','taskDependencyEditId_'+row)
 			 $('#taskDependencySaveTdId_'+row).html(resp)
@@ -1627,7 +1627,7 @@ function fillPredecessor(id, category,commentId, forWhom){
 }
 function generateDepSel(taskId, taskDependencyId, category, selectedPred, selectId, selectName){
 	jQuery.ajax({
-		url: '../assetEntity/generateDepSelect',
+		url:contextPath+'/assetEntity/generateDepSelect',
 		data: {'taskId':taskId, 'category':category},
 		type:'POST',
 		success: function(data) {
@@ -1654,7 +1654,7 @@ function generateDepSel(taskId, taskDependencyId, category, selectedPred, select
 	  return newArray;
 }
 function updateAssignedToList(forView,span,id){
-	new Ajax.Request('../assetEntity/updateAssignedToSelect?forView='+forView+'&id='+id,{
+	new Ajax.Request(contextPath+'/assetEntity/updateAssignedToSelect?forView='+forView+'&id='+id,{
 		asynchronous:true, evalScripts:true,
 		onSuccess:function(e){
 			$('#'+span).html(e.responseText)
@@ -1665,7 +1665,7 @@ function updateAssignedToList(forView,span,id){
 	})
 }
 function updateStatusSelect(taskId){
-	new Ajax.Request('../assetEntity/updateStatusSelect?id='+taskId,{asynchronous:true,evalScripts:true,
+	new Ajax.Request(contextPath+'/assetEntity/updateStatusSelect?id='+taskId,{asynchronous:true,evalScripts:true,
 		 onComplete:function(e){
 			 if(taskId) {
 				 $('#statusEditTrId').html(e.responseText)
@@ -1677,7 +1677,7 @@ function updateStatusSelect(taskId){
 }
 function loadEditPredecessor(id){
 	$('#predecessorEditId').html('');
-	new Ajax.Request('../assetEntity/predecessorTableHtml?commentId='+id,{asynchronous:true,evalScripts:true,
+	new Ajax.Request(contextPath+'/assetEntity/predecessorTableHtml?commentId='+id,{asynchronous:true,evalScripts:true,
 		onLoading:function(){
 			var processTab = jQuery('#processDiv');
 		    processTab.css("display", "table-row");
@@ -1701,7 +1701,7 @@ function loadEditPredecessor(id){
 }
 function loadEditSucccessor(id){
 	$('#successorEditId').html('');
-	new Ajax.Request('../assetEntity/successorTableHtml?commentId='+id,{asynchronous:true,evalScripts:true,
+	new Ajax.Request(contextPath+'/assetEntity/successorTableHtml?commentId='+id,{asynchronous:true,evalScripts:true,
 	    onSuccess:function(e){
 	    	 var resp = e.responseText;
 	    	 if(resp.length > 0){
@@ -1721,7 +1721,7 @@ function deleteComment(commentId, assetEntityIdShow, complete){
 	var completeFunc =  complete == "update" ? function(e){ listCommentsDialog(e,'never'); } : function(e) { updateCommentsLists(); }
 	if(confirm('Are you sure?')){
 		jQuery.ajax({
-			url: '../assetEntity/deleteComment',
+			url: contextPath+'/assetEntity/deleteComment',
 			data: {'id':$('#commentId').val(),'assetEntity':$('#assetEntityIdShow').val()},
 			complete: completeFunc
 		});
@@ -1741,14 +1741,14 @@ function enableCreateIcon(id){
 	$(".create_"+id).css("display","block")
 	$("#span_"+id).html("<img src='../images/minus.gif'/>")
 	$("#span_"+id).attr("onClick","disableCreateIcon("+id+")")
-	new Ajax.Request('../rackLayouts/savePreference?preference=ShowAddIcons&add=true',{asynchronous:true,evalScripts:true })
+	new Ajax.Request(contextPath+'/rackLayouts/savePreference?preference=ShowAddIcons&add=true',{asynchronous:true,evalScripts:true })
 }
 
 function disableCreateIcon(id){
 	$(".create_"+id).css("display","none")
 	$("#span_"+id).html(" <img src='../images/plus.gif'/>")
 	$("#span_"+id).attr("onClick","enableCreateIcon("+id+")")
-	new Ajax.Request('../rackLayouts/savePreference?preference=ShowAddIcons&add=false',{asynchronous:true,evalScripts:true })
+	new Ajax.Request(contextPath+'/rackLayouts/savePreference?preference=ShowAddIcons&add=false',{asynchronous:true,evalScripts:true })
 }
 
 function togglePredecessor(forWhom,view){

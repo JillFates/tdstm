@@ -4,7 +4,7 @@ function processBatch(){
 			 $("#flushOldBatchId").dialog('close');
 		} else {
 			jQuery.ajax({
-				url: '../admin/processOldData',
+				url: contextPath+'/admin/processOldData',
 				data: {'deleteHistory':value},
 				type:'POST',
 				beforeSend:function(jqXHR){
@@ -26,7 +26,7 @@ function processBatch(){
 	
 	function openFlushDiv(){
 		 jQuery.ajax({
-			url: '../admin/getBatchRecords',
+			url: contextPath+'/admin/getBatchRecords',
 			type:'POST',
 			beforeSend:function(jqXHR){
 				 $("#flushOldBatchId").dialog('option', 'width', '500px')
@@ -54,7 +54,7 @@ function processBatch(){
 		$("#cleanProcessId").hide()
 		$("#cleanProcessDivId").hide()
 		 jQuery.ajax({
-				url: '../admin/getAssetTypes',
+				url: contextPath+'/admin/getAssetTypes',
 				type:'POST',
 				beforeSend:function(jqXHR){
 					$("#showOrCleanTypeId").dialog('option', 'width', '500px')
@@ -77,7 +77,7 @@ function processBatch(){
 	 function cleanTypes(){
 		 $("#cleanProcessId").show()
 		 jQuery.ajax({
-				url: '../admin/cleanAssetTypes',
+				url: contextPath+'/admin/cleanAssetTypes',
 				type:'POST',
 				success: function(data) {	
 					if(data){
