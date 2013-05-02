@@ -99,7 +99,13 @@ class Model {
 	
 	static transients = [
 		'findOrCreateAliasByName',
-		'createModelByModelName'
+		'createModelByModelName',
+		'noOfConnectors',
+		'assetTypeList',
+		'assetsCount',
+		'source',
+		'manufacturerName',
+		'aliases'
 	]
 	
 	static mapping  = {	

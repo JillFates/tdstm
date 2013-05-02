@@ -406,3 +406,11 @@ span.cellWithoutBackground
 	height: 500px;
 	overflow-x: auto;
 }
+.headClass{
+	background: none repeat scroll 0 0 #CCCCCC;
+    color: #000000;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 16px;
+    padding: 2px 6px;
+}

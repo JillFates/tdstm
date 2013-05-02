@@ -18,6 +18,10 @@
 $(document).ready(function() {
 	$("#createModelView").dialog({ autoOpen: false })
 	$("#showModelView").dialog({ autoOpen: false })
+	$("#showOrMergeId").dialog({ autoOpen: false })
+	var listCaption ="Models: \
+				<span class='capBtn'><input type='button' value='New Model' onclick='createModelManuDetails(\"model\",\"Model\")'/></span> \
+				<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='compareOrMerge()' disabled='disabled'/></span>"
 	<jqgrid:grid id="modelId" url="'${createLink(action: 'listJson')}'"
 	    colNames="'Model Name','Manufacturer', 'Description','Asset Type', 'Power','No Of Connectors','Assets ','Version','Source TDS','Model Status'"
 	    colModel="{name:'modelName', index: 'modelName', width:'150',formatter: myLinkFormatter},
@@ -31,16 +35,19 @@ $(document).ready(function() {
 	                  {name:'sourceTDS', editable: false,width:'60'},
 	                  {name:'modelStatus',editable: false,width:'60' }"
 	    sortname="'modelName'"
-	    caption="'Models'"
+	    caption="listCaption"
 	   	height="'100%'"
 	    width="1100"
 	    rowNum="'25'"
 	    rowList= "'25','100','500','1000'"
 	    viewrecords="true"
+    	multiselect="true"
 	    showPager="true"
+		loadComplete="initCheck"
 	    datatype="'json'">
 	    <jqgrid:filterToolbar id="modelId" searchOnEnter="false" />
-	    <jqgrid:navigation id="modelId" add="false" edit="false" del="false" search="false" refresh="true" />
+	    <jqgrid:navigation id="modelId" add="false" edit="false" del="false" search="false"/>
+	    <jqgrid:refreshButton id="modelId" />
 	    <jqgrid:resize id="modelId" resizeOffset="-2" />
 	</jqgrid:grid>
 	$.jgrid.formatter.integer.thousandsSeparator='';
@@ -48,21 +55,35 @@ $(document).ready(function() {
 		var value = cellvalue ? cellvalue : ''
 		return '<a href="javascript:showOrEditModelManuDetails(\'model\','+options.rowId+',\'Model\',\'show\',\'Show\')">'+value+'</a>'
 	}
+	function initCheck() {
+		 $('.cbox').change(function() {
+			 var checkedLen = $('.cbox:checkbox:checked').length
+			 if(checkedLen > 1 && checkedLen < 5) {
+				$("#compareMergeId").removeAttr("disabled")
+			 }else{
+				$("#compareMergeId").attr("disabled","disabled")
+			 }
+		})
+	}
 });
+
 </script>
 </head>
 <body>
 <div class="body">
 <h1>Model List</h1>
 <g:if test="${flash.message}">
-	<div id="messageDivId" class="message">${flash.message}</div>
+	<div id="messageDivId" class="message" >${flash.message}</div>
 </g:if>
 <div >
-	<div id="messageId" class="message" style="display:none"></div>
+	<div id="messageId" class="message" style="display:none">
+	</div>
 </div>
+<span id="spinnerId" style="display: none">Merging ...<img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 <jqgrid:wrapper id="modelId" />
 <div id="createModelView" style="display: none;" ></div>
 <div id="showModelView" style="display: none;"></div>
+<div id="showOrMergeId" style="display: none;" title="Compare/Merge Models"></div>
 <div class="buttons">
   <span class="button"><input type="button" class="save" value="Create Model" onclick="createModelManuDetails('model','Model')" /></span>
 </div>

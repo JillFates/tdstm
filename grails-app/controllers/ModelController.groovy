@@ -9,6 +9,7 @@ import jxl.read.biff.*
 import jxl.write.*
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
@@ -29,6 +30,7 @@ class ModelController {
     def sessionFactory
 	def securityService
 	def userPreferenceService
+	def modelService
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -677,57 +679,35 @@ class ModelController {
 		def toModel = Model.get(params.id)
 		def fromModel = Model.get(params.fromId)
 		
-		//	Revise Asset, and any other records that may point to this model
-		def fromModelAssets = AssetEntity.findAllByModel( fromModel )
-		fromModelAssets.each{ assetEntity->
-			assetEntity.model = toModel
-			assetEntity.assetType = toModel.assetType
-			assetEntity.save(flush:true)
-			assetEntityAttributeLoaderService.updateModelConnectors( assetEntity )
-		}
-    	// Delete model associated record
-		AssetCableMap.executeUpdate("delete AssetCableMap where fromConnectorNumber in (from ModelConnector where model = ${fromModel.id})")
-		AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-												toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-												where toConnectorNumber in (from ModelConnector where model = ${fromModel.id})""")
-    	ModelConnector.executeUpdate("delete ModelConnector where model = ?",[fromModel])
-		def toModelAlias = ModelAlias.findAllByModel(toModel).name
+		def assetUpdated = modelService.mergeModel(fromModel, toModel)
 		
-		// Add to the AKA field list in the target record
-		if(!toModelAlias.contains(fromModel.modelName)){
-			def fromModelAlias = ModelAlias.findAllByModel(fromModel)
-			ModelAlias.executeUpdate("delete from ModelAlias mo where mo.model = ${fromModel.id}")
-			
-			fromModelAlias.each{
-				toModel.findOrCreateAliasByName(it.name, true)
-			}
-			//merging fromModel as AKA of toModel
-			toModel.findOrCreateAliasByName(fromModel.modelName, true)
-			
-			// Delete model record
-			fromModel.delete()
-			
-			def principal = SecurityUtils.subject?.principal
-			def user
-			if( principal ){
-				user = UserLogin.findByUsername( principal )
-				def person = user.person
-				def bonusScore = person.modelScoreBonus ? person.modelScoreBonus:0
-				if(user){
-					person.modelScoreBonus = bonusScore+10
-					person.modelScore = person.modelScoreBonus + person.modelScore
-				    person.save(flush:true)
-				}
-		}
-		} else {
-			//	Delete model record
-			fromModel.delete()
-			sessionFactory.getCurrentSession().flush();
-		}
-		// Return to model list view with the flash message "Merge completed."
-    	flash.message = "Merge completed."
+    	flash.message = "Merge Completed, $assetUpdated assets updated"
     	redirect(action:list)
     }
+	
+	
+	
+	/**
+	 * @param : toId id of target model
+	 * @param : fromId[] id of model that is being merged
+     * @return : message
+	 */
+	def mergeModels ={
+		
+		def toModel = Model.get(params.toId)
+		def fromModelsId = params.list("fromId[]")
+		def mergedModel = []
+		def msg = ""
+		def assetUpdated = 0
+		fromModelsId.each{
+			def fromModel = Model.get(it)
+			assetUpdated += modelService.mergeModel(fromModel, toModel)
+			mergedModel << fromModel
+		}
+		msg+="${mergedModel.size()}  models were merged to ${toModel.modelName} . ${assetUpdated} assets were updated."
+		render msg
+	}
+	
     /*
      * 
      */
@@ -1300,5 +1280,54 @@ class ModelController {
 			render "<b> No Model found of name ${params.modelName}</b>"
 		}
 		
+	}
+	
+	/**
+     *@param : ids[] list of ids to compare
+     *@return 
+     */
+	def compareOrMerge ={
+		def ids = params.list("ids[]")
+		def models = []
+		ids.each{
+			def id = Long.parseLong(it)
+			def model = Model.get(id)
+			if(model){
+				models << model
+			}
+		}
+		
+		// Sorting Model in order of status (valid, full, new)
+		def sortedModel = []
+		def validModel = models.findAll{it.modelStatus == 'valid'}
+		def fullModel = models.findAll{it.modelStatus == 'full'}
+		def newmodel =  models.findAll{it.modelStatus == 'new'} 
+		
+		sortedModel = validModel + fullModel + newmodel
+		
+		// Defined a HashMap as 'columnList' where key is displaying label and value is property of label .
+		def columnList =  [ 'Model Name': 'modelName', 'Manufatcurer':'manufacturer', 'AKA': 'aliases' , 'Asset Type':'assetType','Usize':'usize', 
+							'Dimensions(inches)':'', 'Weight(pounds)':'weight', 'Layout Style':'layoutStyle', 'Product Line':'productLine', 
+							'Model Family':'modelFamily', 'End Of Life Date':'endOfLifeDate','End Of Life Status':'endOfLifeStatus',
+							'Power(Max/Design/Avg)':'powerUse','Notes':'description', 'Front Image':'frontImage', 'Rear Image':'rearImage', 'Room Object': 'roomObject',
+							'Use Image':'useImage','Blade Rows':'bladeRows', 'Blade Count':'bladeCount','Blade Label Count':'bladeLabelCount',
+							'Blade Height':'bladeHeight', 'Created By':'createdBy', 'Updated By':'updatedBy', 'Validated By':'validatedBy',
+							'Source TDS':'sourceTDS','Source URL':'sourceURL', 'Model Status':'modelStatus', 'Merge To':'']
+
+		
+	   // Checking whether models have any Model of Type 'Blade Chassis' or 'Blade' .
+	   def hasBladeChassis = sortedModel.find{it.assetType=='Blade Chassis'}
+	   def hasBlade = sortedModel.find{it.assetType=='Blade'}
+	   
+	   // If models to compare are not of type 'Blade Chassis' or 'Blade' removing from Map 
+       if(!hasBladeChassis){
+		   ['Blade Rows', 'Blade Count', 'Blade Label Count'].each{
+			   columnList.remove(it)
+			}
+	   }
+	   if(!hasBlade)
+		   columnList.remove('Blade Height')
+		
+		render(template:"compareOrMerge", model:[models:sortedModel, columnList:columnList, hasBladeChassis:hasBladeChassis, hasBlade:hasBlade])
 	}
 }

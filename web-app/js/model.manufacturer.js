@@ -196,3 +196,57 @@ function setStanderdPower(whom){
 	$("#powerDesign"+whom+"Id").val((parseInt(namePlatePower)*0.5).toFixed(0))  
     $("#powerUse"+whom+"Id").val((parseInt(namePlatePower)*0.33).toFixed(0))
 }
+
+function compareOrMerge(){
+	var ids = new Array()
+	$('.cbox:checkbox:checked').each(function(){
+		ids.push(this.id.split("_")[2])
+	})
+	jQuery.ajax({
+		url: $("#contextPath").val()+'/model/compareOrMerge',
+		data: {'ids':ids},
+		type:'POST',
+		success: function(data) {
+			$("#showOrMergeId").html(data)
+			$("#showOrMergeId").dialog('option', 'width', 'auto')
+			$("#showOrMergeId").dialog('option', 'position', ['center','top']);
+			$("#showOrMergeId").dialog('open')
+		}
+	});
+	
+}
+
+function meegeModel(){
+	var returnStatus =  confirm('This will merge the selected models and change any associated assets.');
+	if(returnStatus){
+		var targetModelId 
+		var modelToMerge = new Array()
+		$('input[name=mergeRadio]:radio:checked').each(function(){
+			targetModelId = this.id.split("_")[1]
+		})
+		
+		$('input[name=mergeRadio]:radio:not(:checked)').each(function(){
+			modelToMerge.push(this.id.split("_")[1])
+		})
+		jQuery.ajax({
+			url: $("#contextPath").val()+'/model/mergeModels',
+			data: {'toId':targetModelId, 'fromId':modelToMerge},
+			type:'POST',
+			beforeSend: function(jqXHR){
+				$("#showOrMergeId").dialog('close')
+				$("#messageId").html($("#spinnerId").html())
+				$("#messageId").show()
+			},success: function(data) {
+				$("#spinnerId").hide()
+				$("#messageId").html(data)
+				$(".ui-icon-refresh").click()
+			}
+		});
+	} else {
+		return false
+	}
+}
+
+function removeCol(id){
+	$(".col_"+id).remove()
+}
