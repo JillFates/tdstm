@@ -245,7 +245,7 @@
 				</g:else>
 				 <g:each in="${ (1..project.customFieldsShown) }" var="customCount">
 					 <g:if test="${assetComment?.assetEntity.('custom'+customCount)}">
-						<dt>Custom${customCount}:</dt><dd>&nbsp;${assetComment?.assetEntity.('custom'+customCount)}</dd>
+						<dt>${project.('custom'+customCount) ?: 'Custom'+customCount }:</dt><dd>&nbsp;${assetComment?.assetEntity.('custom'+customCount)}</dd>
 					 </g:if>
 					</g:each>
 			</dl>
