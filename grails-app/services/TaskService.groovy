@@ -39,6 +39,8 @@ import groovy.time.TimeDuration
 import groovy.time.TimeCategory
 import groovy.text.GStringTemplateEngine as Engine
 
+import grails.util.GrailsNameUtils
+
 import org.hibernate.SessionFactory;
 import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 
@@ -53,6 +55,7 @@ class TaskService {
 	def securityService
 	def quartzScheduler
 	def workflowService
+	def grailsApplication
 
 	def ctx = AH.application.mainContext
     def sessionFactory = ctx.sessionFactory
@@ -1440,6 +1443,7 @@ class TaskService {
 							case 'room':
 							case 'cart':
 							case 'location':
+							case 'set':
 
 								def actionTasks = createAssetActionTasks(action, moveEvent, lastTaskNum, whom, recipeId, taskSpec, groups, exceptions)
 								if (actionTasks.size() > 0) {
@@ -2351,21 +2355,46 @@ class TaskService {
 		// Get all the assets 			
 		def assetsForAction = findAllAssetsWithFilter(moveEvent, taskSpec.filter, groups, exceptions)
 
+		// If there were no assets we can bail out of this method
+		if (assetsForAction.size() == 0) {
+			return taskList
+		}
+
 		def tasksToCreate = []	// List of tasks to create
+
+		// We will put all of the assets into the array. Below the unique method will be invoke to create a subset of entries
+		// for which we'll create tasks from.
 		tasksToCreate.addAll(0, assetsForAction)
 
 		// Closures used in the loop below
 		def findAssets
 		def validateForTask
 		
+		def groupOn = action
 		switch(action) {
+			case 'set':
+				if (! taskSpec.containsKey('setOn') || taskSpec.setOn.size() == 0 ) {
+					throw new RuntimeException("Taskspec (${taskSpec.id}) is missing required 'setOn' attribute")
+				}
+				groupOn = taskSpec.setOn
+				// TODO : add logic to convert custom labels to the appropriate custom# entry
+
+				// Validate that the setOn attribute references a valid property
+				if (! assetsForAction[0].properties.containsKey(groupOn)) {
+					throw new RuntimeException("Taskspec (${taskSpec.id}) setOn attribute references an undefined property ($groupOn). <br/>Properties include [${assetsForAction[0].properties.keySet().join(', ')}]")
+				}
+
+				// Now fall into the case 'cart' below to finish up the setup
+
 			case 'truck':
 			case 'cart':
-				tasksToCreate.unique { it[action] }
+				// Get the unique list of tasks based on the setOn attribute that MUST reference a property on the asset
+				tasksToCreate.unique { it[groupOn] }
+				// Define the closure used to find the assets that is used below to gather the assets for each of the tasks.
 				findAssets = { asset ->
-					assetsForAction.findAll { it[action] == asset[action] }
+					assetsForAction.findAll { it[groupOn] == asset[groupOn] }
 				}
-				validateForTask = { asset -> asset[action] }
+				validateForTask = { asset -> asset[groupOn] }
 				break
 
 			case 'rack':
@@ -2448,9 +2477,14 @@ class TaskService {
 
 				// Setup the map used by the template
 				switch(action) {
+					case 'set':
+						map = [ set: ttc[groupOn] ]
+						break
+
 					case 'truck':
 						map = [ truck: ttc.truck ]
 						break
+
 					case 'cart':
 						map = [ truck:ttc.truck, cart:ttc.cart ]
 						break
