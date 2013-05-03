@@ -414,3 +414,9 @@ span.cellWithoutBackground
     line-height: 16px;
     padding: 2px 6px;
 }
+.willRemain{
+	background-color: lightgreen;
+}
+.willDelete{
+	background-color: yellow;
+}

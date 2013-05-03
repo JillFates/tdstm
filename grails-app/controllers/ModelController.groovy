@@ -699,6 +699,18 @@ class ModelController {
 		def mergedModel = []
 		def msg = ""
 		def assetUpdated = 0
+		//Saving toModel before merge
+		def formatter = new SimpleDateFormat("MM/dd/yyyy");
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		if(params.endOfLifeDate){
+			params.endOfLifeDate =  GormUtil.convertInToGMT(formatter.parse(params.endOfLifeDate), tzId)
+		} else {
+			params.endOfLifeDate=null
+		}
+		toModel.properties = params
+		if(!toModel.save(flush:true)){
+			toModel.errors.allErrors.each{println it}
+		}
 		fromModelsId.each{
 			def fromModel = Model.get(it)
 			assetUpdated += modelService.mergeModel(fromModel, toModel)

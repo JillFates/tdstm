@@ -216,35 +216,92 @@ function compareOrMerge(){
 	
 }
 
-function meegeModel(){
+function mergeModel(){
 	var returnStatus =  confirm('This will merge the selected models and change any associated assets.');
-	if(returnStatus){
+	if(returnStatus ){
 		var targetModelId 
 		var modelToMerge = new Array()
 		$('input[name=mergeRadio]:radio:checked').each(function(){
 			targetModelId = this.id.split("_")[1]
 		})
-		
+		if(!targetModelId){
+			alert("Please select Target Model")
+			return
+		}
 		$('input[name=mergeRadio]:radio:not(:checked)').each(function(){
 			modelToMerge.push(this.id.split("_")[1])
 		})
+		var params = {};
+		$(".input_"+targetModelId).each(function(){
+			if(this.name!='manufacturer' && this.name!='createdBy' && this.name!='updatedBy')
+				params[this.name] = this.value;
+		})
+		params['toId'] = targetModelId;
+		params['fromId'] = modelToMerge;
 		jQuery.ajax({
 			url: contextPath+'/model/mergeModels',
-			data: {'toId':targetModelId, 'fromId':modelToMerge},
+			data: params,
 			type:'POST',
 			beforeSend: function(jqXHR){
 				$("#showOrMergeId").dialog('close')
 				$("#messageId").html($("#spinnerId").html())
 				$("#messageId").show()
-			},success: function(data) {
+			},
+			success: function(data) {
 				$("#spinnerId").hide()
 				$("#messageId").html(data)
 				$(".ui-icon-refresh").click()
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$("#spinnerId").hide()
+				$("#messageId").hide()
+				alert("An unexpected error occurred while attempting to Merge Model ")
 			}
+			
 		});
 	} else {
 		return false
 	}
+}
+function switchTarget( id ){
+	$(".editAll").hide()
+	$(".showAll").show()
+	$(".showFrom_"+id).hide()
+	$(".editTarget_"+id).show()
+	
+	var field = new Array()
+	
+	var targetModelId 
+	var modelToMerge = new Array()
+	field = ['usize', 'height', 'width', 'depth', 'weight', 'layoutStyle','productLine', 'modelFamily', 'endOfLifeDate', 'endOfLifeStatus',
+                'powerNameplate', 'powerDesign', 'powerUse', 'description', 'bladeRows', 'bladeCount', 'bladeLabelCount', 'sourceURL', 'modelStatus']
+	
+	$('input[name=mergeRadio]:radio:checked').each(function(){
+		targetModelId = this.id.split("_")[1]
+	})
+	
+	$('input[name=mergeRadio]:radio:not(:checked)').each(function(){
+			modelToMerge.push(this.id.split("_")[1])
+	})
+	
+	for(i=0; i<field.length; i++ ){
+		for(j=0; j<modelToMerge.length; j++){
+			if($("#"+field[i]+"_edit_"+modelToMerge[j]).val() && !$("#"+field[i]+"_edit_"+targetModelId).val()){
+				$("#"+field[i]+"_td_"+modelToMerge[j]).addClass('willRemain')
+			} else {
+				$("#"+field[i]+"_td_"+modelToMerge[j]).addClass('willDelete')
+			}
+		}
+	}
+	
+	$(".col_"+targetModelId).removeClass('willDelete')
+	$(".col_"+targetModelId).removeClass('willRemain')
+	$(".input_"+id).each(function(){
+		if(this.value)
+			$(this).addClass('willRemain')
+		else
+			$(this).addClass('willDelete')
+	})
 }
 
 function removeCol(id){
