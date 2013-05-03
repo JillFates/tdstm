@@ -34,7 +34,8 @@ class AdminController {
 				SELECT 'application_asset_map' as mainTable,'asset_id' as refId,'Null' as type,count(*) as totalCount FROM application_asset_map asm where asm.asset_id is null) asm
 			WHERE asm.totalCount > 0
 				
-			UNION
+			UNION 
+		
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR ASSET_COMMENT-------------------------------------------*/
 			SELECT * FROM ( SELECT 'asset_comment' as mainTable,'asset_entity_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_comment ac where ac.asset_entity_id not in (select ae.asset_entity_id from asset_entity ae )
 				UNION
@@ -274,13 +275,13 @@ class AdminController {
 		summaryRecords << jdbcTemplate.queryForList( moveSummaryQuery )	
 			
 		def partySummaryQuery = """
-			/*-----------------------------------ORPHAN RESULTS QUERY FOR APPLICATION-------------------------------------------*/	
+			/*-----------------------------------ORPHAN RESULTS QUERY FOR APPLICATION-------------------------------------------	
 			SELECT * FROM ( SELECT 'application' as mainTable,'owner_id' as refId,'Orphan' as type,count(*) as totalCount FROM application app where app.owner_id not in (select p.party_group_id from party_group p )
 				UNION
 				SELECT 'application' as mainTable,'owner_id' as refId,'Null' as type,count(*) as totalCount FROM application app where app.owner_id is null ) ap
 			WHERE ap.totalCount > 0
 						
-			UNION
+			UNION */
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR PARTY-------------------------------------------*/
 			SELECT * FROM  ( SELECT 'party' as mainTable,'party_id' as refId,'Orphan' as type,count(*) as totalCount FROM party p 
 							where p.party_id not in (select distinct pr.party_id from 
