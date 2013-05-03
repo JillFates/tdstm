@@ -21,4 +21,5 @@ databaseChangeLog = {
 	include file: '20130409-add-import-permission.groovy'
 	include file: '20130423-add-import-export-permission.groovy'
 	include file: '20130502-add-assetType-eav-attribute-options.groovy'
+	include file: '20130503-delete-orphan-records-model.groovy'
 }
