@@ -1,13 +1,11 @@
 package com.tds.asset
 
-//import PartyGroup
 
 import com.tdssrc.grails.GormUtil
 
 class Application extends AssetEntity{
 	String appVendor
 	String appVersion
-	//PartyGroup owner
 	String sme
 	String sme2
 	String url
@@ -59,7 +57,6 @@ class Application extends AssetEntity{
 		autoTimestamp false
 		tablePerHierarchy false
 		id column:'app_id'
-		//owner ignoreNotFound: true
 	}
 	/*
 	 * Date to insert in GMT

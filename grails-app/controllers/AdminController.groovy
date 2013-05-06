@@ -275,13 +275,6 @@ class AdminController {
 		summaryRecords << jdbcTemplate.queryForList( moveSummaryQuery )	
 			
 		def partySummaryQuery = """
-			/*-----------------------------------ORPHAN RESULTS QUERY FOR APPLICATION-------------------------------------------	
-			SELECT * FROM ( SELECT 'application' as mainTable,'owner_id' as refId,'Orphan' as type,count(*) as totalCount FROM application app where app.owner_id not in (select p.party_group_id from party_group p )
-				UNION
-				SELECT 'application' as mainTable,'owner_id' as refId,'Null' as type,count(*) as totalCount FROM application app where app.owner_id is null ) ap
-			WHERE ap.totalCount > 0
-						
-			UNION */
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR PARTY-------------------------------------------*/
 			SELECT * FROM  ( SELECT 'party' as mainTable,'party_id' as refId,'Orphan' as type,count(*) as totalCount FROM party p 
 							where p.party_id not in (select distinct pr.party_id from 
