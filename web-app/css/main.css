@@ -420,3 +420,9 @@ span.cellWithoutBackground
 .willDelete{
 	background-color: yellow;
 }
+.select2-choice{
+	font-weight: normal !important;
+}
+.assetSelect{
+	width:150px;
+}
