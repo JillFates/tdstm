@@ -1172,7 +1172,16 @@ class DataTransferBatchController {
 		 
 		def errorMsg = ''
 		def manu = Manufacturer.findByName(importedManu)
-	    def pairExist = Model.findByModelNameAndManufacturer(importedModel, manu)
+		if( !manu ){
+			manu = ManufacturerAlias.findByName( importedManu )?.manufacturer
+		}
+		def modelName = Model.findByModelName(importedModel)?.modelName
+		if(!modelName){
+			modelName = ModelAlias.findByNameAndManufacturer(importedModel,manu)?.model?.modelName
+			if(!modelName)
+				modelName = importedModel
+		}
+	    def pairExist = Model.findByModelNameAndManufacturer(modelName, manu)
 		if(!pairExist && importedManu && importedModel)
 		    errorMsg = "No match found for $importedManu / $importedModel <br/>"
 			
