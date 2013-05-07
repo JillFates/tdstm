@@ -219,7 +219,7 @@ class CustomTagLib {
 		def label
 
 		def isUrl=false
-		if (text.size() > 11) {
+		if (text?.size() > 11) {
 			isUrl = text ==~ /(?i)^https?:\/\/.*/ 
 			if (isUrl) {
 				def tokens = text.tokenize('|')
