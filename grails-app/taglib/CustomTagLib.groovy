@@ -203,4 +203,44 @@ class CustomTagLib {
 	def actionButton = { attrs ->
 		out << HtmlUtil.actionButton( attrs['label'], attrs['icon'], attrs['id'], attrs['onclick'] )
 	}
+
+	/**
+	 * Used to output text as URL if it matches or straight text otherwise
+	 * @param text - text or URL to be displayed, for URL if there is a pipe (|) character after the URL, then the follow text will be used as the link (required)
+	 * @param target - set the A 'target' tag appropriately (optional)
+	 * @param class - when presented it will be added to the style if it is a link (optional)
+	 *
+	 */
+	def textAsLink = { attrs ->
+		def text = attrs['text']
+		def target = attrs['target'] ?: ''
+		def css = attrs['class'] ?: ''
+		def url
+		def label
+
+		def isUrl=false
+		if (text.size() > 11) {
+			isUrl = text ==~ /(?i)^https?:\/\/.*/ 
+			if (isUrl) {
+				def tokens = text.tokenize('|')
+				url = tokens[0]
+				label = tokens.size() > 1 ? tokens[1] : url
+			}
+		}
+
+		if (isUrl) {
+			out << "<a href=\"$url\""
+			if (target) {
+				out << " target=\"$target\""
+			}
+			if (css) {
+				out << " class=\"$css\""
+			}
+			out << ">$label</a>"
+		} else {
+			out << text
+		}
+
+	}
+
 }

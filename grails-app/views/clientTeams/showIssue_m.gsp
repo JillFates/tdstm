@@ -203,7 +203,7 @@
 					<td class="heading"><a href="#detail">Details</a></td>
 					<td><span style="float:right;"><a href="#top">Top</a></span></td>
 			</tr>
-			<tr><td colspan=2>
+			<tr class="prop"><td colspan=2>
 			<dl>
 	            	<g:if test="${assetComment?.assetEntity?.assetType=='Application'}">
 	                <dt>Application Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
@@ -243,9 +243,10 @@
 						<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	
 					</g:else>
 				</g:else>
-				 <g:each in="${ (1..project.customFieldsShown) }" var="customCount">
-					 <g:if test="${assetComment?.assetEntity.('custom'+customCount)}">
-						<dt>${project.('custom'+customCount) ?: 'Custom'+customCount }:</dt><dd>&nbsp;${assetComment?.assetEntity.('custom'+customCount)}</dd>
+				 <g:each in="${ (1..project.customFieldsShown) }" var="i">
+					 <g:if test="${assetComment?.assetEntity.('custom'+i)}">
+						<dt>${project.('custom'+i) ?: 'Custom'+i }:</dt>
+						<dd>&nbsp;<tds:textAsLink  text="${assetComment?.assetEntity.('custom'+i)}" target="_new"/></dd>
 					 </g:if>
 					</g:each>
 			</dl>

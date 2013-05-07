@@ -282,6 +282,11 @@ th.desc a {
     width: 50%;
 }
 
+.prop a {
+    /* #5f9fcf */
+    color:#00E !important;
+}
+
 /* ACTION BUTTONS */
 
 .buttons {

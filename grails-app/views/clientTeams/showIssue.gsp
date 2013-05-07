@@ -167,7 +167,7 @@
 		</table>
 </g:form>
 
-		<%--<div class="clear" style="margin:4px;"></div>
+		<%-- <div class="clear" style="margin:4px;"></div>
 		<a name="detail"></a>
 	 	<div>
 
@@ -200,7 +200,8 @@
 		</tr>
 		</table>
 		</div>
-		--%><div class="clear" style="margin:4px;"></div>
+		--%>
+		<div class="clear" style="margin:4px;"></div>
 		<a name="detail" ></a>
 		<g:if test="${assetComment?.assetEntity}">
 			<div style="float: left;width:100%">
@@ -209,7 +210,7 @@
 					<td class="heading"><a href="#detail">${assetComment?.assetEntity?.assetType == 'Files' ? 'Storage' : assetComment?.assetEntity?.assetType} Details</a></td>
 					<td><span style="float:right;"><a href="#top">Top</a></span></td>
 				</tr>
-				<tr><td colspan=2>
+				<tr class="prop"><td colspan=2>
 				<dl>
 	            	<g:if test="${assetComment?.assetEntity?.assetType=='Application'}">
 		                <dt>Application Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
@@ -249,10 +250,12 @@
 							<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	
 						</g:else>
 					</g:else>
-					 <g:each in="${ (1..project.customFieldsShown) }" var="customCount" >
-						 <g:if test="${assetComment?.assetEntity.('custom'+customCount)}">
-							<dt>${project.('custom'+customCount) ?: 'Custom'+customCount }:</dt><dd>&nbsp;${assetComment?.assetEntity.('custom'+customCount)}</dd>
-						 </g:if>
+					<br />
+					<g:each in="${ (1..project.customFieldsShown) }" var="i" >
+						<g:if test="${assetComment?.assetEntity?.('custom'+i)?.size() > 0}">
+							<dt>${project.('custom'+i) ?: 'custom'+i }:</dt>
+							<dd>&nbsp;<tds:textAsLink text="${assetComment?.assetEntity.('custom'+i)}" target="_new"/></dd>
+						</g:if>
 					</g:each>
 				</dl>
 			</tr>
