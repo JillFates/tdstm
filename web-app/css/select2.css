@@ -29,14 +29,14 @@ Version: 3.3.2 Timestamp: Mon Mar 25 12:14:18 PDT 2013
 
 .select2-container .select2-choice {
     display: block;
-    height: 26px;
+    height: 20px;
     padding: 0 0 0 8px;
     overflow: hidden;
     position: relative;
 
     border: 1px solid #aaa;
     white-space: nowrap;
-    line-height: 26px;
+    line-height: 20px;
     color: #444;
     text-decoration: none;
 
