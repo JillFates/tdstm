@@ -30,15 +30,15 @@ class UpdateTaskSuccessorsJob {
 		def whomId = dataMap.getLongValue('whomId')
 		def status = dataMap.getString('status')
 		def isPM = dataMap.getBoolean('isPM')
-		long tries = dataMap.getLongValue('tries')
+		long tries = dataMap.getLongValue('tries') + 1
 		
-		log.info "updateTaskSuccessors Job started for task $taskId (attempt #$tries)"
+		log.info "updateTaskSuccessors Job started for task id $taskId (attempt #$tries)"
 
 		// Invoke the service method
 		def result = taskNonTranService.updateTaskSuccessors(taskId, status, whomId, isPM, tries)
 
 		if (result == 'reschedule') {
-			if (++tries > 10) {
+			if (tries > 10) {
 				log.error "Bailing out of job for task $taskId update status to $status"
 				return
 			}
@@ -54,7 +54,7 @@ class UpdateTaskSuccessorsJob {
 			map.put("tries", tries)
 			trigger.jobDataMap.putAll(map)
 			log.info "JobDataMap = $map"
-			
+
 			// reschedule the job
 			String triggerName = trigger.getName()
 			context.getScheduler().rescheduleJob(triggerName, trigger.getGroup(), trigger)
