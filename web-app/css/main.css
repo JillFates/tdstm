@@ -179,6 +179,12 @@ th.asc a {
 th.desc a {
     background-image: url(../images/skin/sorted_desc.gif);
 }
+
+table.inner {
+    border: 0px;
+    border-spacing:0;
+}
+
 .teamstatus_pending {
 	color: black;
 	background-color:#ccc;

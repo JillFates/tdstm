@@ -104,22 +104,43 @@
 			<td valign="top" class="name"><label for="status">Status:</label></td>
 			<td valign="top" class="value" id="statusShowId" colspan="1" style="width: 20%"></td>
 		</tr>
+
+
+		<%-- Dependencies Section --%> 
+
 		<tr>
-		<td colspan="2">Predecessors (<span class="predecssorCount">&nbsp;</span>) &nbsp;<span class="Arrowcursor rightArrowShow"><img alt="" style="vertical-align: middle;" src="${resource(dir:'images',file:'r_arrow.png')}" onclick="togglePredecessor('right','Show')"/></span>
-		<span class="Arrowcursor leftArrowShow" style="display:none;"><img alt="" style="vertical-align: middle;" src="${resource(dir:'images',file:'l_arrow.png')}" onclick="togglePredecessor('left','Show')"/></span>
-		</td>
-		<td></td>
-		<td>Successors (<span class="successorCount">&nbsp;</span>) &nbsp;<span class="Arrowcursor rightArrowShow"><img alt="" class="predArrow" src="${resource(dir:'images',file:'r_arrow.png')}" onclick="togglePredecessor('right','Show')"/> </span>
-		<span class="Arrowcursor leftArrowShow" style="display:none;"><img alt="" class="predArrow" src="${resource(dir:'images',file:'l_arrow.png')}" onclick="togglePredecessor('left','Show')"/></span>
-		</td>
-		<td></td>
+			<td valign="top">Dependencies:</td>
+			<td valign="top" colspan="3">
+				<table class="inner">
+					<tr>
+						<td width="50%">Predecessors:</td>
+						<td width="50%">Successors:</td>
+					</tr>
+					<tr>
+						<td id="predecessorShowTd"></td>
+						<td id="successorShowTd"></td>
+					</tr>
+				</table>
+			</td>
 		</tr>
-		<tr class="prop" id="predecessorShowTr" style="display: none">
-			<td valign="top"><label for="precessorShowId">&nbsp;</label></td>
-			<td valign="top" id="predecessorShowTd" colspan="2" width="34%"></td>
-			<td valign="top"  style="float: left;"><label for="precessorShowId" >&nbsp;</label></td>
-			<td valign="top" id="successorShowTd" colspan="2" width="76%" style="margin-left: 0px;float: left;"></td>
+		<%-- Disabled the expand/collapse logic for the time being
+			<td colspan="2">
+				Dependencies: Predecessors (<span class="predecssorCount">&nbsp;</span>) &nbsp;
+				<span class="Arrowcursor rightArrowShow"><img alt="" style="vertical-align: middle;" src="${resource(dir:'images',file:'triangle_down.png')}" onclick="toggleDependencies('right','Show')"/></span>
+				<span class="Arrowcursor leftArrowShow" style="display:none;"><img alt="" style="vertical-align: middle;" src="${resource(dir:'images',file:'triangle_up.png')}" onclick="toggleDependencies('left','Show')"/></span>
+			</td>
+			<td></td>
+			<td>
+				Successors (<span class="successorCount">&nbsp;</span>) &nbsp;
+				<span class="Arrowcursor rightArrowShow"><img alt="" class="predArrow" src="${resource(dir:'images',file:'triangle_down.png')}" onclick="toggleDependencies('right','Show')"/> </span>
+				<span class="Arrowcursor leftArrowShow" style="display:none;"><img alt="" class="predArrow" src="${resource(dir:'images',file:'triangle_up.png')}" onclick="toggleDependencies('left','Show')"/></span>
+			</td>
+			<td></td>
 		</tr>
+		--%>
+		<%-- ---------------------- --%>
+
+
 		<tr>
 			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 			<td valign="top" class="value" id="createdById" colspan="3"></td>
@@ -370,11 +391,11 @@
 	<input type="hidden" name="assetName" id="assetValueId" value="" />
 	<input type="hidden" id="statuWarnId" value="" />
   <div>
-	<table id="updateCommentTable" style="border: 0px;">
+	<table id="updateCommentTable" class="inner">
 	   <% // TODO : Replace DB lookup in GSP with data from controller %>
 		<tr class="prop">
 			<td valign="top" class="name" id="commentEditTdId"><label><b>Task <span id="taskNumberEditId"></span>:</b></label></label></td>
-			<td valign="top" class="value" colspan="3">
+			<td valign="top" class="value" colspan="2">
 				<textarea cols="80" rows="2" id="commentEditId" name="comment"></textarea>
 			</td>
 		</tr>
@@ -433,13 +454,12 @@
 			</td>
 		</tr>
 		<tr class="prop" id="workFlowTransitionEditTrId" style="display: none">
-			<td valign="top" class="name"><label for="workFlowTransitionEditId">WorkFlow Step:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			&nbsp;</label></td>
+			<td valign="top" class="name"><label for="workFlowTransitionEditId">Workflow Step:</label></td>
 			<td valign="top" class="value" colspan="3">
-			 <span id="workFlowTransitionEditId"></span>
-			<input type="checkbox" id="overrideEdit" name="override" value="0"
-				onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
-			 <label for="overrideEdit">Overridden</label>
+				<span id="workFlowTransitionEditId"></span>
+				<input type="checkbox" id="overrideEdit" name="override" value="0"
+					onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />
+				 <label for="overrideEdit">Overridden</label>
 			</td>
 		</tr>
 		<tr class="prop" id="assetTrId">
@@ -448,7 +468,7 @@
 		</tr>
 		<tr class="prop" id="durationEditId" style="display: none">
         	<td valign="top" class="name"><label for="durationEdit ">Duration:</label></td>
-        	<td valign="top" class="value" colspan="3">
+        	<td valign="top" class="value" colspan="4">
 				<input type="text" id="durationEdit" name="durationEdit" value="" size="3"/>
 				<g:select id="durationScaleEdit" name="durationScaleEdit " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>&nbsp;&nbsp;
 				<span id="priorityEditSpanId">
@@ -471,43 +491,74 @@
 			<td colspan="3" id="statusEditTrId">
 			</td>
 		</tr>
+
+		<%-- Dependencies section --%>
+
+		<tr class="prop">
+			<td valign="top">
+				<%-- Disabled the collapse/expand capabilities for the moment
+				<span id="dependCollapsed" class="Arrowcursor rightArrowAdd"><img alt="" style="vertical-align: middle;" src="${resource(dir:'images',file:'expand-32.png')}" width="24" onclick="toggleDependencies('e','Add')"/></span>
+
+				<span id="dependExpanded" class="Arrowcursor leftArrowAdd" style="display:none;"><img alt="" class="predArrow"  style="vertical-align: middle;" src="${resource(dir:'images',file:'collapse-32.png')}" width="24" onclick="toggleDependencies('c','Add')"/></span>
+				--%>
+				Dependencies:
+			</td>
+			<td colspan="3"><table class="inner">
+				<tr>
+					<td width="50%">
+						Predecessor Tasks <a class="button" id="predAddButton" href="javascript:" 
+						onclick="addPredecessor('categoryEditId', '','updateCommentId', 'predecessorEditTr', 'relatedIssueEditId', 'predecessorEditTableId', 'predecessorEdit');">
+						&nbsp;&nbsp;<img src="${resource(dir:'/images', file:'add16.png')}" style="vertical-align: middle;" /> Add
+						</a>
+					</td>
+					<td width="50%"> 
+						Successor Tasks <a class="button" id="succAddButton" href="javascript:"  
+						onclick="addPredecessor('categoryEditId', '','updateCommentId','predecessorEditTr', 'relatedIssueEditId', 'successorEditTableId', 'successorEdit');">
+						&nbsp;&nbsp;<img src="${resource(dir:'/images', file:'add16.png')}" style="vertical-align: middle;" /> Add
+						</a>
+					</td>
+				</tr>
+				<tr>
+					<td valign="top"><span id="predecessorEditId"></span></td>
+					<td valign="top"><span id="successorEditId"></span></td>
+				</tr>
+			</table></td>
 		<tr>
-		<td colspan="1">Predecessors(<span class="predecssorCount">&nbsp;</span>)&nbsp;<span class="Arrowcursor rightArrowAdd"><img alt="" style="vertical-align: middle;" src="${resource(dir:'images',file:'r_arrow.png')}" onclick="togglePredecessor('right','Add')"/> </span>
-		<span class="Arrowcursor leftArrowAdd" style="display:none;"><img alt="" class="predArrow"  src="${resource(dir:'images',file:'l_arrow.png')}" onclick="togglePredecessor('left','Add')"/> </span>
-		</td>
-		<td style="text-align: center;">Successors (<span class="successorCount">&nbsp;</span>)&nbsp;<span class="Arrowcursor rightArrowAdd"><img alt="" style="vertical-align: middle;" src="${resource(dir:'images',file:'r_arrow.png')}" onclick="togglePredecessor('right','Add')"/> </span>
-		<span class="Arrowcursor leftArrowAdd" style="display:none;"><img alt="" class="predArrow" src="${resource(dir:'images',file:'l_arrow.png')}" onclick="togglePredecessor('left','Add')"/> </span>
-		</td>
-		</tr>
-		<tr class="prop" id="predecessorAddTr" style="display: none">
-			<td valign="top" class="name"><label for="predecessorEditTd">Predecessors:</label>
-			  <a class="button" href="javascript:" onclick="addPredecessor('categoryEditId','','updateCommentId','predecessorEditTr','relatedIssueEditId','predecessorEditTableId','predecessorEdit');"> Add </a>
-			</td>
-			<td><span style="margin-left: 380px;">Successors:</span>
-			  <a class="button" href="javascript:" onclick="addPredecessor('categoryEditId','','updateCommentId','predecessorEditTr','relatedIssueEditId','successorEditTableId','successorEdit');"> Add </a>
-			</td>
-		</tr>
-		<tr class="prop" id="predecessorEditTr" style="display: none">
-			<td valign="top" class="name"><label for="predecessorEditTd">Pred:</label></td>
-			<td valign="top" class="value" id="predecessorEditTd" colspan="2">
-			  <g:select id="predecessorCategoryEdit"  from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general" noSelection="['':'please select']" onChange="addPredecessor('','predecessorCategoryEdit','updateCommentId','predecessorEditTr','relatedIssueEditId')"/>
-			</td>
-			<td id="relatedIssueEditId">
-			</td>
-		</tr>
-		
 		<tr id="processDiv" style="display: none;" >
-		<td></td>
-		 <td colspan="4" >
-			<img id="processingId" src="../images/processing.gif" />
-		 </td>
+			<td></td>
+			<td><img id="processingId" src="../images/processing.gif" /></td>
 		</tr>
-        <tr class="prop" id="predecessorTrEditId" style="display: none">
-			<td valign="top" class="name"></td>
-			<td nowrap="nowrap" width="auto;"> <span id="predecessorEditId" style="width: 50%;float: left"></span> <span id="successorEditId" style="width: 40%;float:left;"></span>
-			</td>
-			
-		</tr>
+
+		<%-- JM 5/8/2013 - don't understand the point of this code so commented out as I believe it was replaced by the above section
+		<tr><td>	
+			<table class="inner">
+				<tr class="prop" id="predecessorEditTr" style="display: none">
+					<td valign="top" class="name"><label for="predecessorEditTd">Pred:</label></td>
+					<td valign="top" class="value" id="predecessorEditTd" colspan="2">
+					  <g:select id="predecessorCategoryEdit"  from="${com.tds.asset.AssetComment.constraints.category.inList}" value="general" noSelection="['':'please select']" onChange="addPredecessor('','predecessorCategoryEdit','updateCommentId','predecessorEditTr','relatedIssueEditId')"/>
+					</td>
+					<td id="relatedIssueEditId">
+					</td>
+				</tr>
+				
+				<tr id="processDiv" style="display: none;" >
+				<td></td>
+				 <td colspan="4" >
+					<img id="processingId" src="../images/processing.gif" />
+				 </td>
+				</tr>
+		        <tr class="prop" id="predecessorTrEditId" style="display: none">
+					<td valign="top" class="name"></td>
+					<td nowrap="nowrap" width="auto;"> <span id="predecessorEditId" style="width: 50%;float: left"></span> <span id="successorEditId" style="width: 40%;float:left;"></span>
+					</td>
+					
+				</tr>
+			</table>
+		</td></tr>
+		--%>
+
+		<%-- ----------- --%>
+
 		<tr>
 			<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 			<td valign="top" class="value" id="createdByEditId" colspan="3"></td>

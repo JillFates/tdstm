@@ -1751,15 +1751,19 @@ function disableCreateIcon(id){
 	new Ajax.Request(contextPath+'/rackLayouts/savePreference?preference=ShowAddIcons&add=false',{asynchronous:true,evalScripts:true })
 }
 
-function togglePredecessor(forWhom,view){
+function toggleDependencies(forWhom,view){
 	if(forWhom=='right'){
 		$("#predecessor"+view+"Tr").show()
 		$("#predecessorTrEditId").show()
+		$("#predAddButton").show()
+		$("#succAddButton").show()
 		$(".rightArrow"+view).hide()
 		$(".leftArrow"+view).show()
 	}else{
 		$("#predecessor"+view+"Tr").hide()
 		$("#predecessorTrEditId").hide()
+		$("#predAddButton").hide()
+		$("#succAddButton").hide()
 		$(".leftArrow"+view).hide()
 		$(".rightArrow"+view).show()
 	}
