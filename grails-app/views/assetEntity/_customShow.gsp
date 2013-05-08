@@ -4,7 +4,7 @@
 			<tr class="prop">
 		</g:if>
 			<td class="label" nowrap="nowrap">${project.('custom'+i) ?: 'custom'+i }</td>
-			<td width="60"><tds:textAsLink text="${assetEntity?.('custom'+i)}" target="_new"/></td>
+			<td class="valueNW" width="60"><tds:textAsLink text="${assetEntity?.('custom'+i)}" target="_new"/></td>
 		<g:if test="${i % 4 == 0}">
 			</tr>
 		</g:if>
