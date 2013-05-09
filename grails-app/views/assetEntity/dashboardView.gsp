@@ -9,11 +9,10 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-<link rel="stylesheet" href="${resource(dir:'css',file:'select2.css')}" type="text/css"/>
+
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
-<g:javascript src="select2.js" />
-<g:javascript src="select2.min.js" />
+
 <style type="text/css">
 td .odd {
 	background: #DDDDDD;
@@ -985,7 +984,7 @@ function onInvokeAction(id) {
 	<tr>
 		<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
 		<td><g:select name="entity" from="['Server','Application','Database','Storage','Network']" onchange='updateAssetsList(this.name, this.value)'></g:select></td>
-		<td><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:150px;"></g:select></td>
+		<td><g:select name="asset" from="${servers}" optionKey="id" optionValue="assetName" style="width:90px;"></g:select></td>
 		<td><g:select name="dtype" from="${dependencyType.value}"  optionValue="value"></g:select></td>
 		<td><g:select name="status" from="${dependencyStatus.value}" optionValue="value"></g:select></td>
 	</tr>

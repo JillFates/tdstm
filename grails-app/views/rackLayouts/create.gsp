@@ -7,12 +7,11 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-<link rel="stylesheet" href="${resource(dir:'css',file:'select2.css')}" type="text/css"/>
+
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="room.rack.combined.js"/>
 <g:javascript src="entity.crud.js" />
-<g:javascript src="select2.js" />
-<g:javascript src="select2.min.js" />
+
 
 <title>Rack View</title>
 <script type="text/javascript">
@@ -288,7 +287,7 @@
 	
 		<td><g:select name="dataFlowFreq" from="${com.tds.asset.AssetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
 		<td><g:select name="entity" from="['Server','Application','Database','Storage','Network']" onchange='updateAssetsList(this.name, this.value)'></g:select></td>
-		<td><span id="Server"><g:select name="asset" from="${servers}" optionKey="${-2}" optionValue="${1}" style="width:150px;"></g:select></span></td>
+		<td><span id="Server"><g:select name="asset" from="${servers}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span></td>
 		<td><g:select name="dtype" from="${dependencyType.value}" optionValue="value"></g:select></td>
 		<td><g:select name="status" from="${dependencyStatus.value}" optionValue="value"></g:select></td>
 	</tr>

@@ -106,7 +106,6 @@ function addAssetDependency( type,forWhom ){
 		$("#"+forWhom+"SupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
 	}
 	$("#"+type+"Count").val(parseInt(rowNo)+1)
-	$("#asset_"+type+"_"+rowNo).select2()
 }
 function deleteRow( rowId ){
 	$("#"+rowId).remove()
@@ -114,7 +113,6 @@ function deleteRow( rowId ){
 function updateAssetsList( name, value ){
 	var idValues = name.split("_")
 	$("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']").html($("#"+value+" select").html())
-	$("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']").select2().select2('val','-1')
 }
 function updateTitle( type ){
 	$("#createEntityView").dialog( "option", "title", 'Create '+type );
@@ -625,7 +623,6 @@ function populateDependency(assetId, whom){
 		success: function(data) {
 			$("#"+whom+"DependentId").html(data)
 			$(".updateDep").removeAttr('disabled')
-			$(".assetSelect").select2();
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			alert("An Unexpected error while populating dependent asset.")
