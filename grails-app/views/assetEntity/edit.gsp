@@ -201,8 +201,8 @@
 		<tr>
 			<td colspan="2">
 				<div class="buttons">
-				    <input name="dependentCount" id="dependentCount" type="hidden" value="${dependentAssets.size()}"/>
-					<input  name="supportCount"  id="supportCount" type="hidden" value="${supportAssets.size()}"/>
+				    <input name="dependentCount" id="edit_dependentCount" type="hidden" value="${dependentAssets.size()}"/>
+					<input  name="supportCount"  id="edit_supportCount" type="hidden" value="${supportAssets.size()}"/>
 					<input name="attributeSet.id" type="hidden" value="1"/>
 					<input name="project.id" type="hidden" value="${projectId}"/>
 					<input name="id" id="assetId" type="hidden" value="${assetEntityInstance.id}"/>

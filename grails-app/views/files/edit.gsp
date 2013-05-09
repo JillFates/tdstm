@@ -85,8 +85,8 @@
 		<tr>
 			<td colspan="2">
 				<div class="buttons">
-				<input name="dependentCount" id="dependentCount" type="hidden" value="${dependentAssets.size()}">
-					<input  name="supportCount"  id="supportCount" type="hidden" value="${supportAssets.size()}">
+				<input name="dependentCount" id="edit_dependentCount" type="hidden" value="${dependentAssets.size()}">
+					<input  name="supportCount"  id="edit_supportCount" type="hidden" value="${supportAssets.size()}">
 					<input name="redirectTo" type="hidden" value="${redirectTo}">
 					<input type = "hidden" id ="filesId"  value ="${fileInstance.id}"/>
 					<input type = "hidden" id = "tabType" name="tabType" value =""/>

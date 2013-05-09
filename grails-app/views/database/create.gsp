@@ -116,8 +116,8 @@
 	<tr>
 		<td colspan="2">
 			<div class="buttons">
-				<input name="dependentCount" id="dependentCount" type="hidden" value="0" />
-				<input name="supportCount" id="supportCount" type="hidden" value="0" />
+				<input name="dependentCount" id="create_dependentCount" type="hidden" value="0" />
+				<input name="supportCount" id="create_supportCount" type="hidden" value="0" />
 				<input name="attributeSet.id" type="hidden" value="1" />
 				<input name="project.id" type="hidden" value="${projectId}" />
 				<span class="button"><g:actionSubmit class="save" value="Save" /></span>
