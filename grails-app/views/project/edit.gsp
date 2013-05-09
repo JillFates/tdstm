@@ -4,7 +4,6 @@
 <meta name="layout" content="projectHeader" />
 <link type="text/css" rel="stylesheet"
 	href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-<g:javascript src="project.js"></g:javascript>
 <title>Edit Project</title>
 <% def currProj = session.getAttribute("CURR_PROJ");
 		    def projectId = currProj.CURR_PROJ ;
@@ -273,8 +272,100 @@
 		var customCol = ${projectInstance.customFieldsShown}
 		showCustomFields(customCol, 2);
 	 });
+	 function showCustomFields(value, columnCount) {
+   	  $(".custom_table").hide();
+   	  if(value=='0'){
+   		  $("#custom_table").hide();
+   	  } else {
+    		 for(i=1;i<=value;){
+   		    $("#custom_table").show();
+   	        $("#custom_count_"+i).show();
+   	        i=i+parseInt(columnCount)
+   		 }
+        }  
+     }
         
-       
+        function appendPartnerStaff(e) {
+  	      // The response comes back as a bunch-o-JSON
+  	      //alert("make sure that the project isn't saved with a staff member from the previous partner");
+  	      if(confirm(" Partner has been changed, Make sure that do you want to change the staff members ")){
+  	      
+  	      // evaluate JSON
+  	      var rselect = document.getElementById('projectManagerId')
+  	      var mselect = document.getElementById('moveManagerId')
+  	      var projectPartner = document.getElementById('projectPartnerId');
+  	      var projectPartnerVal = projectPartner[document.getElementById('projectPartnerId').selectedIndex].innerHTML;
+  	
+  	      var pmExeOptgroup = document.getElementById('pmGroup')
+  	      var mmExeOptgroup = document.getElementById('mmGroup')
+  	      var pmOptgroup
+  	      var mmOptgroup
+  	
+  	      if(pmExeOptgroup == null){
+  	      pmOptgroup = document.createElement('optgroup');
+  	      }else{
+  	      pmOptgroup = pmExeOptgroup
+  	      }
+  	      if(mmExeOptgroup == null){
+  	      mmOptgroup = document.createElement('optgroup');
+  	      }else{
+  	      mmOptgroup = mmExeOptgroup
+  	      }
+  	
+  	      if(projectPartnerVal != "None" ){
+  	      pmOptgroup.label = projectPartnerVal;
+  	      pmOptgroup.id = "pmGroup";
+  	      mmOptgroup.label = projectPartnerVal;
+  	      mmOptgroup.id = "mmGroup";
+  	      } else {
+  	      pmOptgroup.label = "";
+  	      mmOptgroup.label = "";
+  	      }
+  	      try {
+  	      rselect.appendChild(pmOptgroup, null) // standards compliant; doesn't work in IE
+  	      mselect.appendChild(mmOptgroup, null)
+  	      } catch(ex) {
+  	      rselect.appendChild(pmOptgroup) // IE only
+  	      mselect.appendChild(mmOptgroup)
+  	      }
+  	      // Clear all previous options
+  	      var l = rselect.length
+  	      var compSatff = document.getElementById('companyManagersId').value
+  	      while (l > compSatff) {
+  	      l--
+  	      rselect.remove(l)
+  	      mselect.remove(l)
+  	      }
+  	      
+  	      var managers = eval("(" + e.responseText + ")")
+  	      // Rebuild the select
+  	      if (managers) {
+  	
+  	      var length = managers.partnerStaff.length
+  	      for (var i=0; i < length; i++) {
+  	      var manager = managers.partnerStaff[i]
+  	      var popt = document.createElement('option');
+  	      popt.innerHTML = manager.name
+  	      popt.value = manager.id
+  	      var mopt = document.createElement('option');
+  	      mopt.innerHTML = manager.name
+  	      mopt.value = manager.id
+  	      try {
+  	      pmOptgroup.appendChild(popt, null) // standards compliant; doesn't work in IE
+  	      mmOptgroup.appendChild(mopt, null)
+  	      } catch(ex) {
+  	      pmOptgroup.appendChild(popt) // IE only
+  	      mmOptgroup.appendChild(mopt)
+  	      }
+  	      }
+  	      }
+  	      }else{
+  	      var partnerObj = document.getElementById("projectPartnerId")
+  	      <% if( projectPartner != null){ %>
+  	      partnerObj.value = "${projectPartner?.partyIdTo.id}"
+  	      <%} %>
+  	      }
+        }
         
         function editProject(){
             var pmObj = document.getElementById("projectManagerId")

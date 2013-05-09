@@ -5,7 +5,7 @@
 <title>Create Project</title>
 
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-<g:javascript src="project.js"></g:javascript>
+
 <script type="text/javascript">
 
       $(document).ready(function() {
@@ -15,8 +15,35 @@
           formatDate(now,'completionDate')
 
       })
-     
+      function formatDate(dateValue,value)
+	  {
+    	    var M = "" + (dateValue.getMonth()+1);
+    	    var MM = "0" + M;
+    	    MM = MM.substring(MM.length-2, MM.length);
+    	    var D = "" + (dateValue.getDate());
+    	    var DD = "0" + D;
+    	    DD = DD.substring(DD.length-2, DD.length);
+    	    var YYYY = "" + (dateValue.getFullYear()); 
+	        var currentDate = MM + "/" +DD + "/" + YYYY
+	        if(value=='startDate'){
+	          $("#startDateId").val(currentDate);
+	        }else{
+	          $("#completionDateId").val(currentDate);
+		    }
+	  }
 
+      function showCustomFields(value, columnCount) {
+    	  $(".custom_table").hide();
+    	  if(value=='0'){
+    		  $("#custom_table").hide();
+    	  } else {
+     		 for(i=1;i<=value;){
+    		    $("#custom_table").show();
+    	        $("#custom_count_"+i).show();
+    	        i=i+parseInt(columnCount)
+    		 }
+         }  
+      }
 		  
       function updateMastersList(e){
       // The response comes back as a bunch-o-JSON
@@ -184,7 +211,41 @@
 	      var clientObj = document.getElementById('clientId').value
 	      ${remoteFunction(action:'getPartnerStaffList', params:'\'client=\'+ clientObj +\'&partner=\'+partnerVal', onComplete:'updateMastersList(e)')}
       }
-     
+      function textCounter(field, maxlimit) {
+	      if (field.value.length > maxlimit) // if too long...trim it!
+	      {
+	      field.value = field.value.substring(0, maxlimit);
+	      return false;
+	      }
+	      else
+	      {
+	      return true;
+	      }
+      }
+      function setCompletionDate(startDate){
+    	var completionDateObj = document.createProjectForm.completionDate;
+    	if(completionDateObj.value == ""){
+    		completionDateObj.value = startDate;
+    	}
+      }
+      var dateRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d$/;
+      function isValidDate( date ){
+          var returnVal = true;
+        	if( date && !dateRegExp.test(date) ){
+            	alert("Date should be in 'mm/dd/yyyy' format");
+            	returnVal  =  false;
+        	} 
+        	return returnVal;
+        }
+        function validateDates(){
+            var returnval = false
+            var startDateId = $("#startDateId").val();
+            var completionDateId = $("#completionDateId").val();
+            if(isValidDate(startDateId) && isValidDate(completionDateId)){
+          	  returnval = true;
+            } 
+            return returnval;
+        }
     </script>
 <%
 	def currProj = session.getAttribute("CURR_PROJ");
