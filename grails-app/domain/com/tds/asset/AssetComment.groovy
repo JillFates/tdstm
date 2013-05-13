@@ -47,7 +47,7 @@ class AssetComment {
 	Integer slack					// Indicated the original or recalculated slack time that this task has based on other predecessors of successors of this task
 	WorkflowTransition workflowTransition	// The transition that this task was cloned from
 	Integer workflowOverride = 0			// Flag that the Transition values (duration) has been overridden
-	String role	// TODO : Determine proper name.
+	String role			// This is the team that will perform the task
 	Integer taskNumber	// TODO : constraint type short int min 1, max ?, nullable 
 	Integer score		// Derived property that calculates the weighted score for sorting on priority
 	
@@ -68,6 +68,7 @@ class AssetComment {
 	def static final preMoveCategories = ['general', 'discovery', 'planning','walkthru','premove']
 	def static final moveDayCategories = ['moveday','shutdown',	'physical','physical-source','physical-target',	'startup']
 	def static final postMoveCategories = ['postmove']
+	def static final AUTOMATIC_ROLE = 'AUTO'
 
 	static constraints = {	
 		// comment(size:255)	// TODO: add constraint for comment size
@@ -136,6 +137,9 @@ class AssetComment {
 			durationScale sqltype: 'char', length:1
 		}
 		/*
+			NOTE THAT THIS LOGIC IS DUPLICATED IN THE TaskService.getUserTasks method SO IT NEEDS TO BE MAINTAINED TOGETHER
+
+
 			The objectives are sort the list descending in this order:
 				- HOLD 900
 					+ last updated factor ASC
@@ -171,6 +175,7 @@ class AssetComment {
 			WHEN '${AssetCommentStatus.READY}' THEN 600 + 1 - IFNULL(est_start,NOW())/NOW() \
 			WHEN '${AssetCommentStatus.PENDING}' THEN 500 + 1 - IFNULL(est_start,NOW())/NOW() \
 			ELSE 0 END + \
+			IF(role='${AssetComment.AUTOMATIC_ROLE}',-100,0) + \
 			(6 - priority) * 5"			
 	}
 

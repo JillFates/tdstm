@@ -198,6 +198,9 @@ class TaskController {
 			'ERROR': ['red', 'white'],		// Use if the status doesn't match
 		]
 
+		// Used to display tasks that are completed automatically
+		def autoFontColor = '#848484'
+
 		def mode = params.mode ?: ''
 		if (mode && ! "s".contains(mode)) {
 			mode = ''
@@ -243,6 +246,8 @@ class TaskController {
 			"""
 		def tasks = jdbcTemplate.queryForList(query)
 		
+		def styleDef = "rounded, filled"
+
 		dotFile << """#
 # TDS Runbook for Project ${project}, Event ${moveEvent.name}
 # Exported on ${now}
@@ -250,23 +255,43 @@ class TaskController {
 #
 digraph runbook {
 	graph [rankdir=LR, margin=0.001];
-	node [ fontsize=10, fontname="Helvetica" ]
+	node [ fontsize=10, fontname="Helvetica", shape="rect" style="${styleDef}" ]
   
 """
 	
-		def color=''
+		def style=''
+		def fontcolor=''
+		def fontsize=''
+		def fillcolor
+		def attribs
+
 		tasks.each {
-		//	AND t.task_number < 40
-		//    println "Record: $it"
 		    def task = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
+		    def tooltip  = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
 			def colorKey = statusColor.containsKey(it.status) ? it.status : 'ERROR'
-			color = mode == 's' ? "fillcolor=\"${statusColor[colorKey][1]}\", fontcolor=\"${statusColor[colorKey][0]}\", style=filled" : ''
+
+			style = styleDef
+			fillcolor = statusColor[colorKey][1]
+
+			log.info "task ${it.comment}: role ${it.role}, ${AssetComment.AUTOMATIC_ROLE}, (${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'})"
+			// if ("${it.roll}" == "${AssetComment.AUTOMATIC_ROLE}" ) {
+			if ( "${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes' ) {
+				fontcolor = autoFontColor 
+				fontsize = '8'
+				style += ',dashed'
+			} else {
+				fontcolor = statusColor[colorKey][0]
+				fontsize = '10'
+			}
+
+			// style = mode == 's' ? "fillcolor=\"${statusColor[colorKey][1]}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\", style=filled" : ''
+			attribs = "fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
+
 		    task = (task.size() > 35) ? task[0..34] : task 
-			dotFile << "\t${it.task_number} [label=\"${task}\" $color];\n"
+			dotFile << "\t${it.task_number} [label=\"${task}\" style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
 			def successors = it.successors
 			if (successors) {
 				successors = (successors as Character[]).join('')
-		//		println "successors-a: ${successors}"
 				successors = successors.split(',')
 				successors.each { s -> 
 					if (s.size() > 0) {

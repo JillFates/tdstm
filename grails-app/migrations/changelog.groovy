@@ -1,5 +1,11 @@
 databaseChangeLog = {
 
+/*
+ *	Going to start commenting out migrations that are greater than 2 months old since we don't try to migrate anything older 
+ *	and it unnecessarily slows down the startup process.
+*/
+
+/*	
 	include file: '20121206-fix-staff-system-roles.groovy'
 	include file: '20121210-fix-models-manu-nulldates.groovy'
 	include file: '20121211-add-projectStaff-permission.groovy'
@@ -14,6 +20,8 @@ databaseChangeLog = {
 	include file: '20130125-add-entity-validation.groovy'
 	include file: '20130125-update-plantatus-validation.groovy'
 	include file: '20130213-add-model-usize.groovy'
+*/
+
 	include file: '20130315-change-userlogin-username-size.groovy'
 	include file: '20130321-add-custom-fields.groovy'
 	include file: '20130322-add-entity-customs.groovy'
@@ -24,4 +32,5 @@ databaseChangeLog = {
 	include file: '20130503-delete-orphan-records-model.groovy'
 	include file: '20130503-drop-application-owner-id.groovy'
 	include file: '20130509-update-asset-type-case.groovy'
+	include file: '20130510-add-automatic-service-person.groovy'
 }

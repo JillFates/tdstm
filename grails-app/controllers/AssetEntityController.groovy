@@ -3225,7 +3225,9 @@ class AssetEntityController {
 				moveEvents:moveEvents, filterEvent:filterEvent , justRemaining:justRemaining, justMyTasks:justMyTasks, filter:params.filter,
 				comment:filters?.comment ?:'', taskNumber:filters?.taskNumber ?:'', assetName:filters?.assetEntity ?:'', assetType:filters?.assetType ?:'',
 				dueDate : filters?.dueDate ?:'', status : filters?.status ?:'', assignedTo : filters?.assignedTo ?:'', role: filters?.role ?:'',
-				category: filters?.category ?:'', moveEvent:moveEvent, staffRoles:taskService.getRolesForStaff(), 
+				category: filters?.category ?:'', moveEvent:moveEvent, 
+				staffRoles:taskService.getTeamRolesForTasks(), 
+//				staffRoles:taskService.getRolesForStaff(), 
 				sizePref:userPreferenceService.getPreference("assetListSize")?: '25']
 	}
 
@@ -3435,7 +3437,7 @@ class AssetEntityController {
 					dueClass = 'task_overdue'
 				}
 			}
-			def assignedTo  = (it.assignedTo ? it.assignedTo?.firstName+" "+it.assignedTo?.lastName: '')
+			def assignedTo  = (it.assignedTo ? it.assignedTo.toString() : '')
 			
 			def dueDate='' 
 			if (it.isRunbookTask()) {

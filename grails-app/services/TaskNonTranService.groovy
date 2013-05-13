@@ -85,9 +85,17 @@ class TaskNonTranService {
 						if (predCount > 0) {
 							log.info "updateTaskSuccessors: found ${predCount} task(s) not in the DONE state"
 						} else {
+
+							def setStatusTo = AssetCommentStatus.READY
+							if (successorTask.role == AssetComment.AUTOMATIC_ROLE) {
+								// If this is an automated task, we'll mark it DONE instead of READY and indicate that it was completed by
+								// the Automated Task person.
+								setStatusTo = AssetCommentStatus.DONE
+								// whom = taskService.getAutomaticPerson()	// don't need this since it is duplicated
+							}
 								
-							log.info "updateTaskSuccessors: pred task(#:${task.taskNumber} Id:${task.id}) triggering successor task (#:${successorTask.taskNumber} Id:${successorTask.id}) to READY	by $whom"
-							taskService.setTaskStatus(successorTask, AssetCommentStatus.READY, whom, isPM)
+							log.info "updateTaskSuccessors: pred task(#:${task.taskNumber} Id:${task.id}) triggering successor task (#:${successorTask.taskNumber} Id:${successorTask.id}) to $setStatusTo by $whom"
+							taskService.setTaskStatus(successorTask, setStatusTo, whom, isPM)
 							// log.info "taskStatusChangeEvent: successorTask(${successorTask.id}) Making READY - Successful"
 							if ( ! successorTask.validate() ) {
 								msg = "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) failed READY of successor task(#:${successorTask.taskNumber} Id:${successorTask.id}) - $whom : " + GormUtil.allErrorsString(successorTask)

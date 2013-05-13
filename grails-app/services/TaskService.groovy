@@ -119,6 +119,9 @@ class TaskService {
 			sqlParams << [now:now, minAgo:minAgo]
 			
 			/*
+				
+				NOTE THAT THIS LOGIC IS DUPLICATED IN THE AssetComment Domain for score formula SO IT NEEDS TO BE MAINTAINED TOGETHER
+
 				The objectives are sort the list descending in this order:
 					- HOLD 900
 						+ last updated factor ASC
@@ -140,6 +143,7 @@ class TaskService {
 						- DONE by others	+0 + actual finish factor DESC
 					- All other statuses ?
 					- Task # DESC (handled outside the score)
+					- AUTO tasks have lessor priority than normal PENDING tasks
 				
 				The inverse of Priority will be added to any score * 5 so that Priority tasks bubble up above hard assigned to user
 				
@@ -158,6 +162,7 @@ class TaskService {
 				END) +	
 				IF(t.assigned_to_id=:assignedToId AND t.status IN('${AssetCommentStatus.STARTED}','${AssetCommentStatus.READY}'), IF(t.hard_assigned=1, 55, 50), 0) +
 				IF(t.assigned_to_id=:assignedToId AND t.status='${AssetCommentStatus.DONE}',50, 0) +
+				IF(t.role='AUTO', -100, 0) +
 				(6 - t.priority) * 5) AS score """)			
 		}
 		
@@ -327,6 +332,11 @@ class TaskService {
 
 		log.info "setTaskStatus - task(#:${task.taskNumber} Id:${task.id}) status=${status}, previousStatus=${previousStatus}, revertStatus=${revertStatus} - $whom"
 
+		// Override the whom if this is an automated task being completed
+		if (task.role == AssetComment.AUTOMATIC_ROLE && status == AssetCommentStatus.DONE) {
+			whom = getAutomaticPerson()
+		}
+
 		// Setting of AssignedTO:
 		//
 		// We are going to update the AssignedTo when the task is marked Started or Done unless the current user has the 
@@ -385,7 +395,7 @@ class TaskService {
 				
 			case AssetCommentStatus.DONE:
 				if ( task.isDirty('status') && task.getPersistentValue('status') != status) {						
-					triggerUpdateTaskSuccessors(task.id, status)
+					triggerUpdateTaskSuccessors(task.id, status, whom, isPM)
 				}
 				task.assignedTo = assignee
 				task.resolvedBy = assignee
@@ -846,7 +856,16 @@ class TaskService {
 	 * @return list of roles that is only starts with 'staff'
 	 */
 	def getRolesForStaff( ) {
-		def rolesForStaff = RoleType.findAllByDescriptionIlike('staff%',[sort:'description'])
+		def rolesForStaff = RoleType.findAllByDescriptionIlikeAndIdNotEqual('staff%', AssetComment.AUTOMATIC_ROLE, [sort:'description'])
+		return rolesForStaff
+	}
+
+	/**
+	 * This method is used to get the team rolls that can be assigned to tasks. This is similar to that of Roles for Staff but also includes
+	 * Automated.
+	 */
+	def getTeamRolesForTasks() {
+		def rolesForStaff = RoleType.findAllByDescriptionIlike('staff%', [sort:'description'])
 		return rolesForStaff
 	}
 	
@@ -1010,6 +1029,18 @@ class TaskService {
 		// log.info "Last task number is $lastTaskNum"
 		
 		return lastTaskNum
+	}
+
+	/**
+	 * Used to retrieve the Person object that represent the person that completes automated tasks
+	 * @return Person
+	 */
+	def getAutomaticPerson() {
+		def auto = Person.findByLastNameAndFirstName('Task', 'Automated')
+		if (! auto) {
+			log.error 'Unable to find Automated Task Person as expected'
+		} 
+		return auto
 	}
 	
 	/**
