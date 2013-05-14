@@ -7,7 +7,10 @@
 							<td class="label" nowrap="nowrap"><label for="assetName">Name</label></td>
 							<td style="font-weight:bold;">${filesInstance.assetName}</td>
 							<td class="label" nowrap="nowrap"><label for="description">Description</label></td>
-							<td class="value" colspan="5">${filesInstance.description}</td>
+							<td class="value" colspan="2">${filesInstance.description}</td>
+							<td></td>
+							<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
+							<td class="valueNW">${filesInstance?.moveBundle} / ${dependencyBundleNumber}</td>
 						</tr>
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="assetType">App Type</label></td>

@@ -31,9 +31,13 @@
 									value="${fileInstance.assetName}" />
 								</td>
 								<td class="label" nowrap="nowrap">Description</td>
-								<td colspan="3"><input type="text" id="description"
+								<td colspan="2"><input type="text" id="description"
 									name="description"
 									value="${fileInstance.description}" size="50" />
+								</td>
+								<td></td>
+								<td class="label" nowrap="nowrap">Bundle</td>
+								<td><g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${fileInstance?.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="34" />
 								</td>
 							</tr>
 							<tr>
