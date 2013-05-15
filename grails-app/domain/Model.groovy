@@ -149,6 +149,7 @@ class Model {
 		if( principal ){
 			createdBy  = UserLogin.findByUsername( principal )?.person
 		}
+		prependHttp()
 	}
 	def beforeUpdate = {
 		lastModified = TimeUtil.nowGMT()
@@ -165,6 +166,7 @@ class Model {
 			bladeCount = null
 			bladeLabelCount = null
 		}
+		prependHttp()
 	}
 	
 	def beforeDelete = {
@@ -251,6 +253,18 @@ class Model {
 			}
 		}
 		return model
+	}
+	
+	/**
+	 * This method is used to prepend "http" for sourceURL if http:// does not exist.  
+	 */
+	def prependHttp(){
+		if(sourceURL && sourceURL?.size() > 10){
+			def isUrl = sourceURL ==~ /(?i)^https?:\/\/.*/
+			if (!isUrl) {
+				sourceURL = "http://"+sourceURL
+			}
+		}
 	}
 	
 }

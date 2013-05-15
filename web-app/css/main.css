@@ -434,3 +434,9 @@ span.cellWithoutBackground
 .assetSelect{
 	width:105px;
 }
+.ellipsis{
+	white-space:nowrap; 
+	width:200px; 
+	overflow:hidden; 
+	text-overflow:ellipsis;
+}

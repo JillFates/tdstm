@@ -136,7 +136,7 @@
 			<td>Updated By:</td>
 			<td>${modelInstance?.updatedBy}</td>
 		    <td>Source URL:</td>
-			<td>${modelInstance?.sourceURL}</td>
+			<td><div class="ellipsis"><tds:textAsLink text="${modelInstance?.sourceURL}" target="_new" /></div></td>
 		</tr>
 		<tr>
 		    <td>Validated By:</td>
