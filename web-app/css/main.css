@@ -434,6 +434,9 @@ span.cellWithoutBackground
 .assetSelect{
 	width:105px;
 }
+#viewGraphSpanId{
+	position:absolute; 
+}
 .ellipsis{
 	white-space:nowrap; 
 	width:200px; 

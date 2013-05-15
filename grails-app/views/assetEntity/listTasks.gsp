@@ -31,6 +31,7 @@
 			$("#createEntityView").dialog({ autoOpen: false })
 	    	currentMenuId = "#assetMenu";
 	    	$("#teamMenuId a").css('background-color','#003366')
+	    	$("#viewGraphSpanId").css('margin-left',$(window).width()*3.3/100+'%')
 	    	$("#selectTimedBarId").val(${timeToUpdate})
 	    	$("#viewtaskgraph_button_graph").click(function(event){
 				 var moveEvent = $("#moveEventId").val()
@@ -60,6 +61,7 @@
 			var role = '${role}'
 			var category = '${category}'
 			var sizePref = '${sizePref}'
+			var windowWidth = $(window).width() - $(window).width()*5/100 ;
 			var listCaption ="Tasks: \
 				<span class='capBtn'><input type='button' value='Create Task' onclick='createIssue()'/></span> \
 				<span class='capBtn'><input type='button' value='Bulk Edit' onclick='bulkEditTasks()'/></span>"
@@ -68,23 +70,23 @@
 	            colNames="'Action', 'Task', 'Description', 'Asset', 'AssetType', 'Updated', 'Due', 'Status',
 		            'Assigned To', 'Team', 'Category', 'Suc.', 'Score', 'id', 'statusCss'"
 	            colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50},
-            				{name:'taskNumber', editable: true, formatter:taskFormatter},
-                            {name:'comment', editable: true, width:500, formatter:taskFormatter},
-                            {name:'assetEntity', editable: true, formatter:assetFormatter},
+            				{name:'taskNumber', editable: true, formatter:taskFormatter, width:80},
+                            {name:'comment', editable: true, width:680, formatter:taskFormatter},
+                            {name:'assetEntity', editable: true, formatter:assetFormatter, width:200},
                             {name:'assetType', editable: true, formatter:taskFormatter},
                             {name:'updated', editable: true, formatter: updatedFormatter,sortable:false,search:false},
                             {name:'dueDate', editable: true, formatter: dueFormatter},
                             {name:'status', editable: true, formatter: statusFormatter},
-                            {name:'assignedTo', editable: true, formatter:assignedFormatter},
+                            {name:'assignedTo', editable: true, formatter:assignedFormatter, width:200},
                             {name:'role', editable: true, formatter:taskFormatter},
                             {name:'category', editable: true, formatter:taskFormatter},
-                            {name:'suc', editable: true, formatter:taskFormatter,sortable:false,search:false},
-                            {name:'score', editable: true, formatter:taskFormatter, search:false},
+                            {name:'suc', editable: true, formatter:taskFormatter,sortable:false,search:false, width:50},
+                            {name:'score', editable: true, formatter:taskFormatter, search:false, width:70},
                             {name:'id', hidden: true},
                             {name:'statusCss', hidden: true}"
 	            caption="listCaption"
 	            height="'100%'"
-	            width="1200"
+	            width="windowWidth"
             	rowNum="sizePref"
 	            rowList= "'25','100', '500','1000'"
 	            scrollOffset="0"
@@ -155,7 +157,6 @@
 		   if(B2 != ''){ B2.Pause() }
 		   getBulkActionBarGrid( ids )
        }
-
 	</script>
 </head>
 <body>
@@ -186,7 +187,7 @@
 				<b> <label for="justRemainingCB" >Just Remaining</label></b>
 				<input type="checkbox" id="justMyTasksCB" ${ (justMyTasks=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'justMyTasks');"/>
 				<b><label for="justMyTasksCB" > Just Mine</label></b>&nbsp;&nbsp;
-					<span style="position:absolute; margin-left:430px;">
+					<span id="viewGraphSpanId">
 					${HtmlUtil.actionButton('View Task Graph', 'ui-icon-zoomin', 'graph', '','../task/moveEventTaskGraph?moveEventId='+filterEvent+'&mode=s')}&nbsp;
 				
 					<input type="button" value="Refresh" onclick="loadGrid()" style="cursor: pointer;">&nbsp;
