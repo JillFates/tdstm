@@ -31,7 +31,6 @@
 				<thead>
 					<tr class="header">
 						<th nowrap="nowrap"><input id="selectId" type="checkbox" onclick="selectAll()" title="Select All" />&nbsp;Actions</th>
-						<th>Application</th>
 						<th>Asset Name</th>
 						<th>Model</th>
 						<th>Source Location</th>
@@ -40,10 +39,11 @@
 						<th>Target rack</th>
 						<th>Asset Type</th>
 						<th>Asset Tag</th>
-						<th>Serial #</th>
+						<th>Validation</th>
 						<th>Bundle</th>
-						<th>Dep Up</th>
-						<th>Dep Down</th>
+						<th>Plan Status</th>
+						<th>TBD</th>
+						<th>Conflict</th>
 					</tr>
 
 				</thead>
@@ -75,9 +75,6 @@
 			 				</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.application}</span>
-							</td>
-							<td><span
 								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.assetName}</span>
 							</td>
 							<td><span
@@ -102,16 +99,19 @@
 								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.assetTag}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.serialNumber}</span>
+								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.validation}</span>
 							</td>
 							<td><span
 								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.moveBundle}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${ com.tds.asset.AssetDependency.countByDependentAndStatusNotEqual(com.tds.asset.AssetEntity.get(asset.id),'Validated') }</span>
+								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.planStatus}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${ com.tds.asset.AssetDependency.countByAssetAndStatusNotEqual(com.tds.asset.AssetEntity.get(asset.id),'Validated') }</span>
+								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${(asset.depUp + asset.depDown)?:''}</span>
+							</td>
+							<td><span
+								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.conflictCount[0]?:''}</span>
 							</td>
 						</tr>
 					</g:each>

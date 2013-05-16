@@ -823,7 +823,7 @@ class MoveBundleController {
 		assetList.each{assetId->
 			def assetInstance = AssetEntity.get(assetId)
 			assetInstance.moveBundle = moveBundleInstance
-			assetInstance.planStatus = 'Assigned'
+			assetInstance.planStatus = params.planStatus
 			if(!assetInstance.save(flush:true)){
 				assetInstance.errors.allErrors.each{
 			          log.error it 		

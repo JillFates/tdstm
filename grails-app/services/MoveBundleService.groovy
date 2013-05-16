@@ -7,6 +7,7 @@ import org.springframework.dao.IncorrectResultSizeDataAccessException
 import com.tds.asset.ApplicationAssetMap
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
+import com.tds.asset.AssetOptions
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
@@ -469,7 +470,10 @@ class MoveBundleService {
 			 def appCount = assetDependentlist.findAll{ it.asset.assetType == AssetType.APPLICATION.toString() }.size()
 			 def serverCount = assetDependentlist.findAll{ it.asset.assetType == AssetType.SERVER.toString() }.size()
 			 def vmCount = assetDependentlist.findAll{it.asset.assetType == AssetType.VM.toString() }.size()
-			 planningConsoleList << ['dependencyBundle':assetDependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
+			 def dbCount = assetDependentlist.findAll{it.asset.assetType == AssetType.DATABASE.toString() }.size()
+			 def fileCount = assetDependentlist.findAll{it.asset.assetType == AssetType.FILES.toString() }.size()
+			 planningConsoleList << ['dependencyBundle':assetDependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount, 
+			                         'dbCount':dbCount, 'fileCount':fileCount]
 		 }
 		 
 		def entities = assetEntityService.entityInfo( projectInstance )
@@ -482,19 +486,22 @@ class MoveBundleService {
 			 time = formatter.format(date)
 		 }
 		 def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance,true)
-		 
+		 def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		 def  assetDependentlist = AssetDependencyBundle.findAllByProject(projectInstance)?.sort{it.dependencyBundle}
 		
 		 def physicalListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.SERVER.toString() }.size()
 		 def virtualListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.VM.toString() }.size()
 		 def applicationListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.APPLICATION.toString() }.size()
+		 def databaseListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.DATABASE.toString() }.size()
+		 def filesListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.FILES.toString() }.size()
 		 
 		 def moveBundles = MoveBundle.findAllByProject(projectInstance)
  
 		 def map = [assetDependencyList:assetDependencyList, dependencyType:entities.dependencyType, planningConsoleList:planningConsoleList,
 				 date:time, dependencyStatus:entities.dependencyStatus, assetDependency:new AssetDependency(), dependencyBundleCount:dependencyBundleCount,
-				 servers:entities.servers, applications:entities.applications, dbs:entities.dbs, files:entities.files,moveBundle:moveBundleList,
-				 applicationListSize:applicationListSize, physicalListSize:physicalListSize,virtualListSize:virtualListSize,asset:'Apps',
+				 servers:entities.servers, applications:entities.applications, dbs:entities.dbs, files:entities.files,moveBundle:moveBundleList, planStatusOptions:planStatusOptions,
+				 applicationListSize:applicationListSize, physicalListSize:physicalListSize,virtualListSize:virtualListSize,
+				 asset:'Apps', databaseListSize:databaseListSize, filesListSize:filesListSize,
 				 allMoveBundles:moveBundles, networks:entities.networks]
 		 
 		 return map

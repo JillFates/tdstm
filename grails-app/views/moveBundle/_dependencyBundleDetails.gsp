@@ -21,15 +21,21 @@
 				<div style="overflow-x:scroll; max-width: 137px;">
 					<table cellpadding="4" cellspacing="0" style="border: 0px; width: 137px">
 						<tr class="odd">
-							<td><b>Dependency Group</b></td>
+							<td><b>Group</b></td>
 						<tr class="even">
 							<td><b>Applications</b></td>
 						</tr>
 						<tr class="odd">
-							<td><b>Physical Servers</b></td>
+							<td><b>Phys Servers</b></td>
 						</tr>
 						<tr class="even">
-							<td><b>Virtual Servers</b></td>
+							<td><b>Virt. Servers</b></td>
+						</tr>
+						<tr class="odd">
+							<td><b>DB</b></td>
+						</tr>
+						<tr class="even">
+							<td><b>Storage</b></td>
 						</tr>
 					</table>
 				</div>
@@ -84,6 +90,31 @@
 								<g:each in="${planningConsoleList}" var="asset">
 									<td id="vm_${asset.dependencyBundle}">
 										${asset.vmCount }
+									</td>
+								</g:each>
+							</tr>
+							
+							<tr class="odd">
+								<g:if test="${planningDashboard!='planningDashboard'}">
+									<td id="db_all"  class="db_count"><span id="allDatabaseCount">
+											${databaseListSize }
+									</span></td>
+								</g:if>
+								<g:each in="${planningConsoleList}" var="asset">
+									<td id="db_${asset.dependencyBundle}">
+										${asset.dbCount }
+									</td>
+								</g:each>
+							</tr>
+							<tr class="even">
+								<g:if test="${planningDashboard!='planningDashboard'}">
+									<td id="file_all"  class="file_count"><span id="allFileCount">
+											${filesListSize }
+									</span></td>
+								</g:if>
+								<g:each in="${planningConsoleList}" var="asset">
+									<td id="file_${asset.dependencyBundle}">
+										${asset.fileCount }
 									</td>
 								</g:each>
 							</tr>

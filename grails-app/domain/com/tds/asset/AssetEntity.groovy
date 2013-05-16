@@ -1,5 +1,6 @@
 package com.tds.asset
 
+
 import Manufacturer
 import Model
 import MoveBundle
@@ -10,8 +11,9 @@ import Rack
 import Room
 
 import java.util.Date
-
 import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enums.domain.AssetDependencyStatus
+
 
 class AssetEntity extends com.tdssrc.eav.EavEntity {
 	
@@ -289,5 +291,33 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	}
 	def getMoveBundleName(){
 		return this.moveBundle?.name
+	}
+	
+	/**
+	 *this method is used to count of dependencies to assets with bundles not the same as this asset and the status is not Archived or Not Applicable
+	 * @return conflictedCount
+	 */
+	def transient getConflictCount(){
+		return AssetDependency.executeQuery("SELECT COUNT(ad) FROM AssetDependency ad WHERE (ad.asset =:asset OR ad.dependent =:asset)\
+											AND (ad.asset.moveBundle !=:bundle OR ad.dependent.moveBundle != :bundle) \
+											and status not in (:status)",
+											[asset:this, bundle:moveBundle, status:[AssetDependencyStatus.ARCHIVED.toString(), AssetDependencyStatus.NA.toString()]]
+										   )
+	}
+	
+	/**
+	 * this method is used to count of dependencies to dependent and status is not Validated.
+	 * @return dependencyUp Count
+	 */
+	def transient getDepUp(){
+		return AssetDependency.countByDependentAndStatusNotEqual(this, 'Validated')
+	}
+	
+	/**
+	 * this method is used to count of dependencies to assets and the status is not Validated.
+	 * @return dependencyDown Count
+	 */
+	def transient getDepDown(){
+		return AssetDependency.countByAssetAndStatusNotEqual(this, 'Validated')
 	}
 }

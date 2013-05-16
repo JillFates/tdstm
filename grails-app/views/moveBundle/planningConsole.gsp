@@ -99,6 +99,11 @@ $(document).ready(function() {
 		        </tr>
 		        <tr>
 		           <td>
+		             <span style="color:#EFEFEF "><b>Plan Status</b></span> &nbsp;&nbsp;<g:select name="planStatus" id="plannedStatus" from="${planStatusOptions}" optionKey="value" optionValue="value"></g:select><br></br>
+		           </td>
+		        </tr>
+		        <tr>
+		           <td>
 		            <div>
 						<label for="planningBundle" ><input type="radio" name="bundles" id="planningBundle" value="planningBundle" checked="checked" onChange="changeBundles(this.id)" />&nbsp;<span style="color:#EFEFEF "><b>Planning Bundles</b></span></label>
 						<label for="allBundles" ><input type="radio" name="bundles" id="allBundles" value="allBundles" onChange="changeBundles(this.id)" />&nbsp;<span style="color:#EFEFEF "><b>All Bundles</b></span></label><br />
@@ -152,11 +157,15 @@ $(document).ready(function() {
 		$('.app_count').removeClass('app_count')
 		$('.server_count').removeClass('server_count')
 		$('.vm_count').removeClass('vm_count')
+		$('.db_count').removeClass('db_count')
+		$('.file_count').removeClass('file_count')
 		
 		$('#span_'+id).addClass('highlightSpan')
 		$('#app_'+id).addClass('app_count')
 		$('#server_'+id).addClass('server_count')
 		$('#vm_'+id).addClass('vm_count')
+		$('#db_'+id).addClass('db_count')
+		$('#file_'+id).addClass('file_count')
 		
 		
 		 

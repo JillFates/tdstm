@@ -25,12 +25,12 @@
 					<tr class="header">
 						<th nowrap="nowrap"><input id="selectId" type="checkbox"  onclick="selectAll()" title="Select All" />&nbsp;Actions</th>
 						<th>Name</th>
-						<th>App Owner</th>
 						<th>App Sme</th>
+						<th>Validation</th>
 						<th>Bundle</th>
 						<th>Plan Status</th>
-						<th>Dep Up</th>
-						<th>Dep Down</th>
+						<th>TBD</th>
+						<th>Conflict</th>
 					</tr>
 
 				</thead>
@@ -63,11 +63,10 @@
 								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app.assetName}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app?.owner}</span>
-							</td>
-
-							<td><span
 								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app.appSme}</span>
+							</td>
+							<td><span
+								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app?.validation}</span>
 							</td>
 							<td><span
 								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app.moveBundle}</span>
@@ -77,10 +76,10 @@
 
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${ com.tds.asset.AssetDependency.countByDependentAndStatusNotEqual(com.tds.asset.AssetEntity.get(app.id),'Validated') }</span>
+								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${(app.depUp + app.depDown)?:''}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${ com.tds.asset.AssetDependency.countByAssetAndStatusNotEqual(com.tds.asset.AssetEntity.get(app.id),'Validated') }</span>
+								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app.conflictCount[0]?:''}</span>
 							</td>
 						</tr>
 					</g:each>

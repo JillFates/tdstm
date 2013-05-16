@@ -26,11 +26,11 @@
 						<th nowrap="nowrap"><input id="selectId" type="checkbox"   onclick="selectAll()" title="Select All" />&nbsp;Actions</th>
 						<th>Name</th>
 						<th>Storage Format</th>
-						<th>Storage Size</th>
+						<th>Validation</th>
 						<th>Bundle</th>
 						<th>Plan Status</th>
-						<th>Dep Up</th>
-						<th>Dep Down</th>
+						<th>TBD</th>
+						<th>Conflict</th>
 					</tr>
 
 				</thead>
@@ -65,11 +65,10 @@
 							<td><span
 								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${files.fileFormat}</span>
 							</td>
-                            <td><span
-								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${files.fileSize}</span>
-							</td>
-
 							<td><span
+								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${files.validation}</span>
+							</td>
+   							<td><span
 								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${files.moveBundle}</span>
 							</td>
 							<td><span
@@ -77,10 +76,10 @@
 
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${ com.tds.asset.AssetDependency.countByDependentAndStatusNotEqual(com.tds.asset.AssetEntity.get(files.id),'Validated') }</span>
+								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${(files.depUp + files.depDown)?:''}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${ com.tds.asset.AssetDependency.countByAssetAndStatusNotEqual(com.tds.asset.AssetEntity.get(files.id),'Validated') }</span>
+								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${files.conflictCount[0]?:''}</span>
 							</td>
 						</tr>
 					</g:each>

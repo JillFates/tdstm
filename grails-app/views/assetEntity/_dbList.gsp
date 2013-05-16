@@ -26,10 +26,11 @@
 						<th nowrap="nowrap"><input id="selectId" type="checkbox"   onclick="selectAll()" title="Select All" />&nbsp;Actions</th>
 						<th>Name</th>
 						<th>DB Format</th>
+						<th>Validation</th>
 						<th>Bundle</th>
 						<th>Plan Status</th>
-						<th>Dep Up</th>
-						<th>Dep Down</th>
+						<th>TBD</th>
+						<th>Conflict</th>
 					</tr>
 
 				</thead>
@@ -64,7 +65,9 @@
 							<td><span
 								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${database.dbFormat}</span>
 							</td>
-
+							<td><span
+								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${database.validation}</span>
+							</td>
 							<td><span
 								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${database.moveBundle}</span>
 							</td>
@@ -73,10 +76,10 @@
 
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${ com.tds.asset.AssetDependency.countByDependentAndStatusNotEqual(com.tds.asset.AssetEntity.get(database.id),'Validated') }</span>
+								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${(database.depUp + database.depDown)?:''}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${ com.tds.asset.AssetDependency.countByAssetAndStatusNotEqual(com.tds.asset.AssetEntity.get(database.id),'Validated') }</span>
+								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${database.conflictCount[0]?:''}</span>
 							</td>
 						</tr>
 					</g:each>

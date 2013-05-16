@@ -894,7 +894,16 @@ td .dep-Questioned {
 .vm_count{
 	border-left: 1px solid #63A242;
 	border-right: 1px solid #63A242;
-	border-bottom: 1px solid white;
+}
+.db_count{
+	border-left: 1px solid #63A242;
+	border-right: 1px solid #63A242;
+	background-color: white;
+}
+.file_count{
+	border-left: 1px solid #63A242;
+	border-right: 1px solid #63A242;
+	border-bottom: 0px solid white;
 }
 #dependency_group {
 	overflow-x:scroll; 
