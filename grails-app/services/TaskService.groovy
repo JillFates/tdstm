@@ -2248,7 +2248,7 @@ class TaskService {
 		log.info "traverseDependencies: Found ${logicDep.size()} logical dependencies for $origAsset"
 		logicDep.each() { d ->
 			def depAsset = d[assocAssetPropName]
-			if (! depAsset.isaLogicalType() ) 
+			if (! depAsset.isaLogicalType() ) {
 				// Add any real asset to the dependency list
 				depList.add(d)
 				log.info "traverseDependencies: Adding dependency on ${d[assocAssetPropName]}"
