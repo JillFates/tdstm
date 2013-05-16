@@ -264,13 +264,15 @@ digraph runbook {
 		def fontsize=''
 		def fillcolor
 		def attribs
+		def color
+
+		style = styleDef
 
 		tasks.each {
 		    def task = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
 		    def tooltip  = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
 			def colorKey = statusColor.containsKey(it.status) ? it.status : 'ERROR'
 
-			style = styleDef
 			fillcolor = statusColor[colorKey][1]
 
 			log.info "task ${it.comment}: role ${it.role}, ${AssetComment.AUTOMATIC_ROLE}, (${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'})"
@@ -278,14 +280,16 @@ digraph runbook {
 			if ( "${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes' ) {
 				fontcolor = autoFontColor 
 				fontsize = '8'
-				style += ',dashed'
+				// style += ',dashed'
+				color = autoFontColor
 			} else {
 				fontcolor = statusColor[colorKey][0]
 				fontsize = '10'
+				color = 'black'
 			}
 
 			// style = mode == 's' ? "fillcolor=\"${statusColor[colorKey][1]}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\", style=filled" : ''
-			attribs = "fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
+			attribs = "color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
 
 		    task = (task.size() > 35) ? task[0..34] : task 
 			dotFile << "\t${it.task_number} [label=\"${task}\" style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"

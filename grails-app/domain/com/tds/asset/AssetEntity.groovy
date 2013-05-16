@@ -239,6 +239,10 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 			hasRemoteMgmt sqltype: 'tinyint(1)'
 		}
 	}
+
+	// Need to indicate the getters that would otherwise be mistaken as db properties
+	static transients = ['modelName', 'moveBundleName', 'conflictCount', 'depUp', 'depDown']
+
 	/*
 	 * Date to insert in GMT
 	 */
@@ -292,19 +296,69 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	def getMoveBundleName(){
 		return this.moveBundle?.name
 	}
+
+	//
+	// A few methods to distinquish what type of asset that we are dealing with
+	//
+	def isaDevice() {
+		return ( ! isaApplication() && ! isaNetwork() && ! isaStorage() )
+		// return ['server','vm','blade','chassis'].contains(assetType.toLowerCase())
+		// return entityType == AssetEntityType.DEVICE		
+	}
+	def isaApplication() {
+		return assetType.toLowerCase() == 'application'
+		// return entityType == AssetEntityType.APPLICATION
+	}
+	def isaNetwork() {
+		return false
+		// TODO - Fix isNetwork when domain is implemented
+		// return assetType.toLowerCase() == 'network'		
+		// return entityType == AssetEntityType.NETWORK
+	}
+	def isaStorage() {
+		return ['files','storage'].contains(assetType.toLowerCase())
+		// return entityType == AssetEntityType.STORAGE
+	}
+	/**
+	 * Used to determine if the asset is considered a logic type of object (e.g. Network, Database, Storage)
+	 * @return Boolean true if asset is logical
+	 */
+	def isaLogicalType() {
+		return (! isaDevice() && ! isaApplication() )
+	}
+
+	/*
+	// Used to get the super class of the asset such as Application or Database
+	def getSuperObject(readonly = false) {
+		if (isApplication()) {
+			return readonly ? Application.read(id) : Application.get(id)
+		} else if (isStorage() ) {
+			return readonly ? Files.read(id) : Files.get(id)			
+		} else if (isNetwork()) {
+			// TODO - Fix getSuper when Network domain is implemented
+			return this
+		} else {
+			return this
+		}
+	} 
+	*/
 	
 	/**
 	 *this method is used to count of dependencies to assets with bundles not the same as this asset and the status is not Archived or Not Applicable
 	 * @return conflictedCount
 	 */
 	def transient getConflictCount(){
-		return AssetDependency.executeQuery("SELECT COUNT(ad) FROM AssetDependency ad WHERE (ad.asset =:asset OR ad.dependent =:asset)\
-											AND (ad.asset.moveBundle !=:bundle OR ad.dependent.moveBundle != :bundle) \
-											and status not in (:status)",
-											[asset:this, bundle:moveBundle, status:[AssetDependencyStatus.ARCHIVED.toString(), AssetDependencyStatus.NA.toString()]]
-										   )
+		return AssetDependency.executeQuery(
+			"SELECT COUNT(ad) FROM AssetDependency ad WHERE (ad.asset =:asset OR ad.dependent =:asset) \
+			AND (ad.asset.moveBundle !=:bundle OR ad.dependent.moveBundle != :bundle) \
+			and status not in (:status)",
+			[	asset:this, 
+				bundle:moveBundle, 
+			  	status:[AssetDependencyStatus.ARCHIVED.toString(), AssetDependencyStatus.NA.toString()]
+			]
+		)
 	}
-	
+
 	/**
 	 * this method is used to count of dependencies to dependent and status is not Validated.
 	 * @return dependencyUp Count
@@ -320,4 +374,5 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	def transient getDepDown(){
 		return AssetDependency.countByAssetAndStatusNotEqual(this, 'Validated')
 	}
+
 }

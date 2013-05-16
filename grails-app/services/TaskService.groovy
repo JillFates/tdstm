@@ -1100,6 +1100,7 @@ class TaskService {
 		def lastMilestone = null	// Will track the most recent milestone task
 		def assetsLatestTask = [:]	// This map array will contain reference of the assets' last assigned task
 		def taskSpecList = [:]		// Used to track the ID #s of all of the taskSpecs in the recipe and holds last task created for some special cases
+		def missedDepList = [:]		// Will contain the list of 
 		def groups = [:]			// Used to hold groups of assets as defined in the groups section of the recipe that can then be reference in taskSpec filters
 		def terminalTasks = []		// Maintains the list of general tasks indicated that are terminal so that milestones don't connect to them as successors
 		
@@ -1643,7 +1644,28 @@ class TaskService {
 				//       ii. Either tasksNeedingPredecessors or referenced taskSpec DON'T have assets, all tasksNeedingPredecessors will be wired to all tasks from taskSpec
 				//
 				// The predecessor.required when false, will not update the asset with the latest task for any of the above use-cases
-				log.info "&&&&& ignorePred=$ignorePred"
+				
+
+				/**
+				 * Helper closure method used to add missing dependency details onto the stack to wire up tasks later on
+				 * @param String smdKey - the lookup key (missedPredKey)
+				 * @param AssetComment smdTask - the task that failed the dependency lookup
+				 * @param Boolean smdIsRequired - the flag if the dependency was required in the taskspec
+				 * @param AssetComment smdLastMs - the current last milestone at the time that the smdTask was created
+				 */
+				def saveMissingDep = { smdKey, smdTask, smdIsRequired, smdLastMS ->
+
+					// exceptions.append("No predecessor task found for asset ($predAsset) to link to task ($tnp)<br/>")
+					
+					// Add the dependency on the missed Dependency list as we may be able to link it up later on
+					if (! missedDepList.containsKey(smdKey)) {
+						missedDepList[smdKey] = []
+					}
+					log.info "Added Missing Dep to stack ($smdKey) for task $smdTask"
+					missedDepList[smdKey].add([taskId:smdTask.id, isRequired:smdIsRequired, msTaskId:smdLastMS?.id ])
+					// log.info "missedDepList = $missedDepList"
+				}
+
 				if (tasksNeedingPredecessors.size() > 0 && ! ignorePred ) {
 				
 					// Set some vars that will be used in the next iterator 
@@ -1735,7 +1757,7 @@ class TaskService {
 											taskList.each() { id, t -> 
 												if (t.taskSpec.toString() == ts.toString()) {
 													predecessorTasks << t
-													log.info "Added task to predecessorTasks ${t.class}"
+													log.info "Added task to predecessorTasks ${t}"
 												}
 											}
 											// predecessorTasks.addAll( taskList.findAll { id, t -> t.taskSpec.toString() == ts.toString() } )	
@@ -1762,6 +1784,35 @@ class TaskService {
 				
 					tasksNeedingPredecessors.each() { tnp ->
 						log.info("tasksNeedingPredecessors.each(): Processing $mapMode for task $tnp")
+
+
+						if (tnp.assetEntity) {
+							// Attempt to resolve any missed dependencies that may have occurred during an earlier step in the process.
+							// This can for instance when there are multiple Application shutdown taskSpec and there were references in  
+							// an earlier task spec that references an application created in subsquent steps. We track this in the 
+							// missedDepList. Missed dependencies are ONLY matched if they both occur in the same category (e.g. Shutdown)
+							def missedPredKey = "${tnp.assetEntity?.id}|${tnp.category}"
+							log.info "#-#-#-#-# missedDepList lookup for: $missedPredKey"
+							if (missedDepList[missedPredKey]?.size() > 0) {
+								def tnpId = tnp.assetEntity.id
+								log.info "Trying to find missed pred for '$missedPredKey' of asset $tnp"
+								// Iterate over the missed dependencies and now create them
+								missedDepList[missedPredKey].each() {
+									def prevTask = AssetComment.get(it.taskId)
+									if (prevTask) {
+										log.info "Resolved missed dependency between $prevTask and $tnp"
+										depCount += createTaskDependency(prevTask, tnp, taskList, it.isRequired, out)
+									} else {
+										msg = "Uable to find task associated with missed dependency (id:${it.taskId})"
+										log.error msg
+										exceptions.append("${msg}<br/>")
+									} 
+								}
+								// Remove the missing dep from the missing list
+								missedDepList.remove(missedPredKey)
+							}
+						}
+
 						def wasWired=false
 
 						switch(mapMode) {
@@ -1870,8 +1921,13 @@ class TaskService {
 												wasWired = true
 											} else {
 												msg = "No predecessor task for asset (${tnp.assetEntity}) found to link to task ($tnp) in taskSpec ${taskSpec.id} (DIRECT_MODE/taskSpec)"
-												log.info(msg)
-												exceptions.append("${msg}<br/>")
+
+												// Push the task onto the missing pred stack to be wired later if possible
+												// TODO - Need to validate that this is necessary as it might wire things wrong
+												saveMissingDep("${tnp.assetEntity.id}|${tnp.category}", tnp, isRequired, lastMilestone)
+
+												//log.info(msg)
+												//exceptions.append("${msg}<br/>")
 											}
 										} else {
 											// Link all predecessorTasks to tnp
@@ -1919,6 +1975,8 @@ class TaskService {
 								//
 								// HANDLE TaskSpecs that reference AssetDependency records based on the filter
 								//
+
+								// Get a list of dependencies for the current asset
 								def assetDependencies = getAssetDependencies(tnp.assetEntity, taskSpec, depMode)
 				
 								if (assetDependencies.size() == 0) {
@@ -1935,7 +1993,6 @@ class TaskService {
 									// TODO : We most likely will want to have tasks for assets not moving in the future but will require discussion.
 									log.info "Iterate over ${assetDependencies.size()} dependencies for asset ${tnp.assetEntity}"
 									assetDependencies.each { ad ->
-
 
 										// Note that this should be the opposite of that used in the getAssetDependencies 
 										def predAsset = depMode == 's' ?  ad.dependent : ad.asset
@@ -1973,8 +2030,20 @@ class TaskService {
 												}
 												wasWired=true
 											} else {
-												log.info "No predecessor task found for asset ($predAsset) to link to task ($tnp)"
-												exceptions.append("No predecessor task found for asset ($predAsset) to link to task ($tnp)<br/>")
+												log.info "No predecessor task found for asset ($predAsset) to link to task ($tnp) ASSET_DEP_MODE"
+												// exceptions.append("No predecessor task found for asset ($predAsset) to link to task ($tnp)<br/>")
+												
+												// Push this task onto the stack to be wired up later on
+												saveMissingDep("${predAsset.id}|${tnp.category}", tnp, isRequired, lastMilestone)
+												/*
+												// Add the dependency on the missed Dependency list as we may be able to link it up later on
+												if (! missedDepList.containsKey(missedPredKey)) {
+													missedDepList[missedPredKey] = []
+												}
+												log.info "Added Missing Dep - $missedPredKey"
+												missedDepList[missedPredKey].add(
+													[taskId:tnp.id, isRequired:isRequired, msTaskId:lastMilestone?.id ] )
+												*/
 												// linkTaskToMilestone(tnp)
 											}
 										}
@@ -2023,6 +2092,10 @@ class TaskService {
 				lastTaskSpec = taskSpec
 
 			} // recipeTasks.each() {}
+
+			// *******************************************
+			// TODO - Iterate over the missedDepList and wire tasks to their milestone
+			// *******************************************
 		} catch(e)	{
 			failure = e.toString()
 			// exceptions.append("We BLEW UP damn it!<br/>")
@@ -2048,6 +2121,7 @@ class TaskService {
  	 */
 	def getAssetDependencies(asset, taskSpec, depMode) {
 		def list = []
+		def finalList = []
 		def filter = taskSpec.filter
 		
 		// This is the list of properties that can be added to the search criteria from the Filter
@@ -2055,13 +2129,25 @@ class TaskService {
 		
 		// AssetEntity  asset			// The asset that that REQUIRES the 'dependent'
 		// AssetEntity dependent		// The asset that SUPPORTS 'asset' 
-		def relateOn = ( depMode == 's' ? 'asset' : 'dependent' )
-		def sql = "from AssetDependency ad where ad.${relateOn}.id=:assetId and \
+		def currAssetPropName 
+		def assocAssetPropName 
+		if ( depMode == 's' ) {
+			currAssetPropName = 'asset' 
+			assocAssetPropName = 'dependent'
+		} else {
+			currAssetPropName = 'dependent' 
+			assocAssetPropName = 'asset'
+
+		}
+
+		def baseSql = "from AssetDependency ad where ad.${currAssetPropName}.id=:assetId and \
 			ad.status not in ('${AssetDependencyStatus.NA}', '${AssetDependencyStatus.ARCHIVED}') \
 			and ad.type <> '${AssetDependencyType.BATCH}'"
-			
+
+		def sql = baseSql
+
 		def map = ['assetId':asset.id]
-		// log.info "FILTER: $filter"
+
 		// Add additional WHERE expresions to the SQL
 		supportedFilterProps.each() { prop ->
 			if (filter?.containsKey(prop)) {
@@ -2079,12 +2165,98 @@ class TaskService {
 			
 		}
 		
-		log.info "getAssetDependencies SQL=$sql, PARAMS=$map"
+		log.info "getAssetDependencies: SQL=$sql, PARAMS=$map"
 		list = AssetDependency.findAll(sql, map)
-		log.info "getAssetDependencies found ${list.size()} rows : $list"
+		log.info "getAssetDependencies: found ${list.size()} rows : $list"
 
-		return list
+		// Now need to find the nested logic associations (e.g. APP > DB > SRV or APP > Storage > SAN) and 
+		// add the dependency of the logic asset to the current asset's dependencies.
+		list.each() { dep ->
+
+			// finalList.add(dep)
+
+			// Call the recursive routine that will find any nested dependencies (e.g. App > DB > DB App or App > LUN > Storage App)
+			def nestedDep = traverseDependencies(asset, dep, currAssetPropName, assocAssetPropName, baseSql)
+			if (nestedDep.size() > 0) {
+				finalList.addAll(nestedDep)
+			}
+
+			// TODO - getAssetDependencies() - prevent linking App > VM > VMW Cluster as this is typically unnecessary
+			// TODO - getAssetDependencies() - need to determine if we need to bind blades to chassis as dependencies
+
+		}
+
+		// Need to force a unique list because we could end up with a lot of duplicate asset interdepencies
+		// We will therefore find all of the unique asset ids on the associated side of the dependency map
+		log.info "getAssetDependencies: ${finalList.size()} dependencies after traversing dependencies"
+		finalList.unique { it[assocAssetPropName].id }
+		log.info "getAssetDependencies: ${finalList.size()} dependencies after uniquing the list"
+
+		return finalList
 		
+	}
+
+	/**
+	 * This is a recursive helper method used by getAssetDependencies to traverse the dependencies of an asset to find other correlating 
+	 * assets that should be linked from a dependency standpoint. It will examine the assets in the dependency and if the related to asset
+	 * is a logical then it will traverse logical's dependencies to find a real asset. If the origin asset is an application and it finds
+	 * a device dependency, it will attempt to traverse to find any dependency application, primarilly looking for database clusters, 
+	 * VM Clusters or Storage Apps (e.g. App > Server > logical DB > DB App; or App > logical DB > DB App).
+	 *
+	 * Rules:
+	 *   A) if orig asset is device and 2nd is application - add app and stop
+	 *   B) if orig is app and 2nd is app - add app and stop (scenario 3)
+	 *   C) if orig is app and 2nd is logical - recurse and if next level is non-logical add (scenario 1)
+	 *   D) if orig is app and 2nd is device - add the device and recurse but don't add any additional devices (just looking for apps) (scenario 5)
+	 *
+	 * @param assetEntity - the originating asset for the dependency walk
+	 * @param AssetDependency - the current dependency being inspected 
+	 * @param String - the dependency property name that represents the current asset we're focused on 
+	 * @param String - the dependency property name that represents the assocated asset
+	 * @param String - the SQL used to perform the query on the dependencies
+	 * @param Array<AssetDependency> - list of dependencies accumlated by the recursive function
+	 * @param Integer - the recursive depth
+	 * @return Array<AssetDependency> - the list of dependencies accumlated by the recursive function
+	 */
+	def traverseDependencies(origAsset, dependency, currAssetPropName, assocAssetPropName, sql) {
+		def depList = []
+		def assocAsset = dependency[assocAssetPropName]
+		def origIsApp = origAsset.isaApplication()
+		def assocIsLogical = assocAsset.isaLogicalType()
+
+		// Only traversing if original asset is an application
+		// TODO - traverseDependencies() need to determine if we'll traverse other things besides Applications 
+		if (!origIsApp) {
+			return [dependency]
+		}
+
+		// Determine if the dependency is a logical type then traverse to its dependencies and if we hit a non-logical
+		// asset, add it to the dependency list
+		//if (assocAsset.isaDatabase() || assocAsset.isaStorage() || assocAsset.isaNetwork() ) {
+
+		// Graph #3 & #4 - this breaks #5
+		// If we have an App to App relationship at the first level, no need to go any further, just return the dependency
+		if (! assocIsLogical) {
+			return [dependency]
+		}
+
+		// Graph #1 & #2
+		// First level we have a Logical so let's find its dependencies and link up appropriately
+		// def currAsset = dependency[currAssetPropName]
+		def logicDep = AssetDependency.findAll(sql, ['assetId': assocAsset.id])
+
+		log.info "traverseDependencies: Found ${logicDep.size()} logical dependencies for $origAsset"
+		logicDep.each() { d ->
+			def depAsset = d[assocAssetPropName]
+			if (! depAsset.isaLogicalType() ) 
+			// Add any real asset to the dependency list
+			if ( ! isLogical ) {
+				depList.add(d)
+				log.info "traverseDependencies: Adding dependency on ${d[assocAssetPropName]}"
+			}
+		}
+
+		return depList
 	}
 	
 	/**
@@ -2181,6 +2353,10 @@ class TaskService {
 		}
 		*/
 		
+		if (predecessor.id == successor.id) {
+			log.error "createTaskDependency: attempted to create dependency with single task $predecessor"
+		}
+
 		def dependency = new TaskDependency(assetComment:successor, predecessor:predecessor)
 		if (! ( dependency.validate() && dependency.save(flush:true) ) ) {
 			throw new RuntimeException("Error while trying to create dependency between predecessor=$predecessor, successor=$successor<br/>Error=${GormUtil.allErrorsString(dependency)}, ")
@@ -2343,7 +2519,7 @@ class TaskService {
 			}
 		
 			// Add additional WHERE clauses based on the following properties being present in the filter.asset 
-			def validProperties = ['assetName','assetTag','assetType', 'priority', 'truck', 'cart', 'sourceLocation', 'targetLocation', 'planStatus']
+			def validProperties = ['assetName','assetTag','assetType', 'priority', 'truck', 'cart', 'shelf', 'sourceLocation', 'targetLocation', 'planStatus']
 			(1..24).each() { validProperties.add("custom$it".toString()) }	// Add custom1..custom24
 			log.info("findAllAssetsWithFilter: validProperties=$validProperties")
 			addWhereConditions( validProperties )
