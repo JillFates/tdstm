@@ -2249,8 +2249,7 @@ class TaskService {
 		logicDep.each() { d ->
 			def depAsset = d[assocAssetPropName]
 			if (! depAsset.isaLogicalType() ) 
-			// Add any real asset to the dependency list
-			if ( ! isLogical ) {
+				// Add any real asset to the dependency list
 				depList.add(d)
 				log.info "traverseDependencies: Adding dependency on ${d[assocAssetPropName]}"
 			}
