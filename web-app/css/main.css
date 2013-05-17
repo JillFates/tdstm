@@ -443,3 +443,28 @@ span.cellWithoutBackground
 	overflow:hidden; 
 	text-overflow:ellipsis;
 }
+.assetFieldTable {
+	width: 67%;
+	margin-left: 150px;
+}
+
+.assetFieldSpan {
+	margin-left: 50px;
+	cursor: pointer;
+}
+
+.assetFieldHeader1 {
+	margin-left: 10px;
+}
+
+.assetFieldHeader2 {
+	margin-left: 40px;
+}
+
+.assetFieldbutton {
+	margin-left: 150px;
+}
+
+.Critical{
+	background-color:LightGreen;
+}

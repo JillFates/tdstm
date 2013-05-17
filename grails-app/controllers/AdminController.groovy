@@ -1,11 +1,14 @@
 import grails.converters.JSON
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetImportance
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
 class AdminController {
 	def jdbcTemplate
+	def sessionFactory
     def index = { }
     
     def orphanSummary = {
@@ -1083,5 +1086,47 @@ class AdminController {
 		}
 		def msg = deletedTypes ? "Removed ${deletedTypes.size()} unused Types: ${WebUtil.listAsMultiValueString(deletedTypes)}" : ""
 		render msg
+	}	
+	def assetFields ={
+		
+	}
+	/**
+	 * 
+	 */
+	def showFieldImportance ={
+		def entityType = params.entityType
+		def data = AssetImportance.findByEntityTypeAndProject(entityType, null)?.data 
+		def assetImportance = data ? JSON.parse(data) : null 
+		def returnMap = [assetImp : assetImportance]
+		render returnMap as JSON
+	}
+	
+	/**
+	 * 
+	 * 
+	 */
+	def updateFieldImportance ={
+		def entityType = params.entityType
+		def assetImp = AssetImportance.findByEntityTypeAndProject(entityType, null)
+		def data = params.jsonString
+		try{
+			if(data)
+				def jsonInput = new JSONObject(data)
+				
+			if(!assetImp)
+				assetImp = new AssetImportance('entityType':entityType, 'data':data)
+			else
+				assetImp.data = data
+				
+			if(!assetImp.save(flush:true)){
+				assetImp.errors.allErrors.each{
+					log.error it
+				}
+			}
+		} catch(Exception ex){
+			log.error "An error occurred while parsing the inputBody of '${params.jsonString}': ${ex}"
+		}
+		// TODO : Send error message back
+		forward (action:'showFieldImportance', params:params)
 	}
 }
