@@ -3445,13 +3445,26 @@ class AssetEntityController {
 			} else {
 				dueDate = it.dueDate ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.dueDate, tzId)) : ''
 			}
-			
-			[ cell: ['',it.taskNumber, it.comment, it.assetEntity?.assetName, it.assetEntity?.assetType,
-			 updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '',
-			 dueDate,
-			 it.status ?: '', it.hardAssigned ? '*'+assignedTo : '' +assignedTo,
-			 it.role, it.category, TaskDependency.countByPredecessor( it ), it.score ?: 0,
-			 it.status ? "task_${it.status.toLowerCase()}" : 'task_na',updatedClass, dueClass, it.assetEntity?.id], id: it.id,
+
+			// Have the dependency count be a link to the Task Neighborhood graph
+			def nGraphUrl = '<a href="' + HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:it.id]) +
+				'">' + TaskDependency.countByPredecessor( it ) + '</a>'
+
+			[ cell: [
+				'',
+				it.taskNumber, 
+				it.comment, 
+				it.assetEntity?.assetName, it.assetEntity?.assetType,
+				updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '',
+				dueDate,
+				it.status ?: '', it.hardAssigned ? '*'+assignedTo : '' + assignedTo,
+				it.role, it.category, 
+				nGraphUrl, 
+				it.score ?: 0,
+				it.status ? "task_${it.status.toLowerCase()}" : 'task_na',
+				updatedClass, dueClass, it.assetEntity?.id
+				], 
+				id:it.id,
 			]}
 		
 		// If sessions variables exists, set them with params and sort
