@@ -226,8 +226,7 @@ digraph runbook {
 			    def tooltip  = "${task.taskNumber}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
 				def colorKey = taskService.taskStatusColorMap.containsKey(task.status) ? task.status : 'ERROR'
 				def fillcolor = taskService.taskStatusColorMap[colorKey][1]
-				// def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:task.id, absolute:true])
-				def url = HtmlUtil.createLink([id:task.id, absolute:true])
+				def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:task.id, absolute:true])
 
 				if ( "${task.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes' ) {
 					fontcolor = taskService.taskStatusColorMap['AUTO_TASK'][0] 
