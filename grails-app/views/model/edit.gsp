@@ -298,7 +298,6 @@
 					<input name="id" value="${modelInstance.id}" type="hidden"/>
 					<span class="button">
 						<input type="button" class="save"  value="Update" onclick="updateModel('Model', 'modelForm')"/>
-						<g:actionSubmit class="delete" action="delete" value="Delete"></g:actionSubmit>
 					</span>
 				</div>
 			</td>
