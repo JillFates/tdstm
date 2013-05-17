@@ -2,12 +2,14 @@ package com.tdssrc.grails
 
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import org.codehaus.groovy.grails.web.util.WebUtils
+import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 
 /**
  * The HtmlUtil class contains method to generate HTML from server side e.g. Select Box
  */
 class HtmlUtil {
-	
+	def static final g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
+
 	/**
 	 * Generate the HTML for a SELECT control based on a map of parameters
 	 * @param String selectId - the CSS ID to use for the <SELECT> element
@@ -102,5 +104,14 @@ class HtmlUtil {
 		}
 		
 		return remoteIp.toString()
+	}
+
+	/**
+	 * Used to create a Grails formed URL using the resource tablib
+	 * @param Map parameters used by the g:createLink tag
+	 * @return String URL
+	 */
+	def public static createLink(map) {
+		g.createLink(map)
 	}
 }

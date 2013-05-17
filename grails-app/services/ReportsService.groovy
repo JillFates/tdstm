@@ -8,6 +8,8 @@ class ReportsService {
 
 	def partyRelationshipService
 	def jdbcTemplate
+    def grailsApplication
+
 	static transactional = true
 
 	def generatePreMoveCheckList(def currProj , def moveEventInstance) {
@@ -488,4 +490,47 @@ class ReportsService {
 		return[modelList:modelList,modelError:modelError]
 		
 	}
+
+	/**
+	 * Attempts to generate a dot graph file based on application graph property configurations from the 
+	 * dotText passed to the method.
+	 * @param String filenamePrefix - a prefix used when creating the filename that will include the datetime plus a random #
+	 * @param String dotText - the dot sytax used to define the graph
+	 * @return String the URI to access the resulting file
+	 * @throws RuntimeException when the generation fails, the exception message will contain the output from the dot command
+	 */
+	def generateDotGraph( filenamePrefix, dotText ) {
+
+		def tmpDir = grailsApplication.config.graph.tmpDir
+		def targetDir = grailsApplication.config.graph.targetDir
+		def targetURI = grailsApplication.config.graph.targetURI
+		def dotExec = grailsApplication.config.graph?.graphviz?.dotCmd
+		def graphType = grailsApplication.config.graph?.graphviz?.graphType
+		def deleteDotFile = grailsApplication.config.graph?.containsKey('deleteDotFile') ? grailsApplication.config.graph.deleteDotFile : true
+		def random = org.apache.commons.lang.math.RandomUtils.nextInt()
+		def filename = "$filenamePrefix-${new Date().format('yyyyMMdd-HHmmss')}-$random"
+		def imgFilename = "${filename}.${graphType}"				
+
+		// log.info "dot: $dotText"
+
+		// Create the dot file
+		def dotFN = "${tmpDir}${filename}.dot"
+		def dotFile = new File(dotFN);
+		dotFile << dotText
+
+		def proc = "${dotExec} -T${graphType} -v -o ${targetDir}${imgFilename} ${dotFile}".execute()
+	 	proc.waitFor()
+	
+		if (proc.exitValue() == 0) {
+			// Delete the dot file because we don't need it and configured to delete it automatically
+			if (deleteDotFile) dotFile.delete()
+			return "${targetURI}${imgFilename}"
+		} else {
+			def errFile = new File("${targetDir}${filename}.err")
+			errFile << "exit code:\n\n${ proc.exitValue()}\n\nstderr:\n${proc.err.text}\n\nstdout:\n${proc.in.text}"
+
+			throw new RuntimeException("exit code: ${ proc.exitValue()}\n stderr: ${proc.err.text}\n stdout: ${proc.in.text}")
+		}
+	}
+
 }

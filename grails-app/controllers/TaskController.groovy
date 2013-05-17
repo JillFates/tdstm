@@ -3,7 +3,6 @@ import grails.converters.JSON
 import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdssrc.grails.HtmlUtil
-
 import com.tdssrc.grails.GormUtil
 import org.apache.commons.lang.StringEscapeUtils
 
@@ -14,7 +13,7 @@ class TaskController {
 	def taskService
 	def userPreferenceService
     def jdbcTemplate
-    def grailsApplication
+    def reportsService
 
     def index = { }
 	
@@ -167,6 +166,114 @@ class TaskController {
 	}
 	
 	/**
+	 * Generates a graph of the tasks in the neighborhood around a given task
+	 * @param taskId
+	 * @return redirect to URI of image or HTML showing the error
+	 */
+	def neighborhoodGraph = {
+		
+		def taskId=params.id
+		if (! taskId || ! taskId.isNumber()) {
+			render "Invalid task id supplied"
+			return
+		}	
+		def project = securityService.getUserCurrentProject()
+		def rootTask = AssetComment.findByIdAndProject(taskId, project) {
+			render "Task not found"
+			return
+		}
+
+		def depList = taskService.getNeighborhood(taskId)
+		if (depList.size() == 0) {
+			render "No task dependencies found"
+			return
+		}
+
+		def now = new Date().format('yyyy-MM-dd H:m:s')
+		def styleDef = "rounded, filled"
+
+		def dotText = new StringBuffer()
+
+		dotText << """#
+# TDS Runbook for Project ${project}, Task ${rootTask}
+# Exported on ${now}
+# This is  .DOT file format of the project tasks
+#
+digraph runbook {
+	graph [rankdir=LR, margin=0.001];
+	node [ fontsize=10, fontname="Helvetica", shape="rect" style="${styleDef}" ]
+  
+"""
+	
+		def style=''
+		def fontcolor=''
+		def fontsize=''
+		def attribs
+		def color
+
+		style = styleDef
+
+		def tasks = []
+
+		// helper closure that outputs the task info in a dot node format
+		def outputTaskNode = { task, rootId ->
+			if (! tasks.contains(task.id)) {
+				tasks << task.id
+
+			    def label = "${task.taskNumber}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
+			    label = (label.size() < 31) ? label : label[0..30]
+
+			    def tooltip  = "${task.taskNumber}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
+				def colorKey = taskService.taskStatusColorMap.containsKey(task.status) ? task.status : 'ERROR'
+				def fillcolor = taskService.taskStatusColorMap[colorKey][1]
+				// def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:task.id, absolute:true])
+				def url = HtmlUtil.createLink([id:task.id, absolute:true])
+
+				if ( "${task.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes' ) {
+					fontcolor = taskService.taskStatusColorMap['AUTO_TASK'][0] 
+					color = taskService.taskStatusColorMap['AUTO_TASK'][1]
+					fontsize = '8'
+				} else {
+					fontcolor = taskService.taskStatusColorMap[colorKey][0]
+					color = 'black'	// edge color
+					fontsize = '10'
+				}
+
+				// Make the center root task stand out
+				if ("${task.id}" == rootId) {
+					style = "dashed, bold"
+				} else {
+					style = styleDef
+				}
+
+				attribs = "color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
+
+				dotText << "\t${task.taskNumber} [label=\"${label}\" URL=\"$url\", style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
+			}
+
+		}
+
+		// Iterate over the dependency list outputting the two nodes for each and the relationship
+		depList.each() { d ->
+			outputTaskNode(d.assetComment, taskId)
+			outputTaskNode(d.predecessor, taskId)
+
+			dotText << "\t${d.predecessor.taskNumber} -> ${d.assetComment.taskNumber};\n"
+
+		}
+
+		dotText << "}\n"
+		
+		try {
+			def uri = reportsService.generateDotGraph("neighborhood-$taskId", dotText.toString() )
+			redirect(uri:uri)
+		} catch(e) {
+			render "<pre>${e.getMessage()}</pre>"
+		}				
+	}
+	
+
+	/**
 	 * Generates a graph of the Event Tasks
 	 * @param moveEventId
 	 * @param mode - flag as to what mode to display the graph as (s=status, ?=default)
@@ -174,53 +281,27 @@ class TaskController {
 	 */
 	def moveEventTaskGraph = {
 		
-		// TODO : refactor this code into the taskService appropriately
-		
+		def project = securityService.getUserCurrentProject()
 		def moveEventId=params.moveEventId	
-		def moveEvent = MoveEvent.read(moveEventId)
-		
-		def tmpDir = grailsApplication.config.graph.tmpDir
-		def targetDir = grailsApplication.config.graph.targetDir
-		def targetURI = grailsApplication.config.graph.targetURI
-		def dotExec = grailsApplication.config.graph?.graphviz?.dotCmd
-		def graphType = grailsApplication.config.graph?.graphviz?.graphType
-		def deleteDotFile = grailsApplication.config.graph?.containsKey('deleteDotFile') ? grailsApplication.config.graph.deleteDotFile : true
-		
-		// Color scheme for status key:[font, background]
-		def statusColor = [
-			(AssetCommentStatus.HOLD):['black', '#FFFF33'],
-			(AssetCommentStatus.PLANNED):['black', '#FFFFFF'],
-			(AssetCommentStatus.READY):['white', 'green'],
-			(AssetCommentStatus.PENDING):['black', '#FFFFFF'],
-			(AssetCommentStatus.STARTED):['white', 'darkturquoise'],
-			(AssetCommentStatus.DONE):['white', '#24488A'],
-			(AssetCommentStatus.TERMINATED):['white', 'black'],	
-			'ERROR': ['red', 'white'],		// Use if the status doesn't match
-		]
+		if (! moveEventId || ! moveEventId.isNumber()) {
+			render "Invalid move event id supplied"
+			return
+		}
 
-		// Used to display tasks that are completed automatically
-		def autoFontColor = '#848484'
-
+		def moveEvent = MoveEvent.findByIdAndProject(moveEventId, project)
+		if (! moveEvent) {
+			render "Move event not found"
+			return
+		}
+		
 		def mode = params.mode ?: ''
 		if (mode && ! "s".contains(mode)) {
 			mode = ''
 			log.warn "The wrong mode [$mode] was specified"
 		}
-			
-		// log.info "tmpDir=$tmpDir, targetDir=$targetDir, targetURI=$targetURI, dotExec=$dotExec, graphType=$graphType"
 		
-		if (! moveEvent) {
-			render "Viewing a graph requires that you select a specific event first."
-			return
-		} 
-		def project = moveEvent.project
 		def projectId = project.id
 
-		def now = new Date().format('yyyy-MM-dd H:m:s')
-		
-		def filename = "runbook-$moveEventId-${new Date().format('yyyyMMdd-HHmmss')}"
-		def dotFN = "${tmpDir}${filename}.dot"
-		def dotFile = new File(dotFN);
 		def categories = GormUtil.asQuoteCommaDelimitedString(AssetComment.moveDayCategories)
 		
 		def query = """
@@ -246,9 +327,13 @@ class TaskController {
 			"""
 		def tasks = jdbcTemplate.queryForList(query)
 		
+		def now = new Date().format('yyyy-MM-dd H:m:s')
+
 		def styleDef = "rounded, filled"
 
-		dotFile << """#
+		def dotText = new StringBuffer()
+
+		dotText << """#
 # TDS Runbook for Project ${project}, Event ${moveEvent.name}
 # Exported on ${now}
 # This is  .DOT file format of the project tasks
@@ -271,60 +356,47 @@ digraph runbook {
 		tasks.each {
 		    def task = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
 		    def tooltip  = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
-			def colorKey = statusColor.containsKey(it.status) ? it.status : 'ERROR'
+			def colorKey = taskService.taskStatusColorMap.containsKey(it.status) ? it.status : 'ERROR'
 
-			fillcolor = statusColor[colorKey][1]
+			fillcolor = taskService.taskStatusColorMap[colorKey][1]
 
 			log.info "task ${it.comment}: role ${it.role}, ${AssetComment.AUTOMATIC_ROLE}, (${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'})"
 			// if ("${it.roll}" == "${AssetComment.AUTOMATIC_ROLE}" ) {
 			if ( "${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes' ) {
-				fontcolor = autoFontColor 
+				fontcolor = taskService.taskStatusColorMap['AUTO_TASK'][0] 
+				color = taskService.taskStatusColorMap['AUTO_TASK'][1]
 				fontsize = '8'
-				// style += ',dashed'
-				color = autoFontColor
 			} else {
-				fontcolor = statusColor[colorKey][0]
+				fontcolor = taskService.taskStatusColorMap[colorKey][0]
 				fontsize = '10'
 				color = 'black'
 			}
 
-			// style = mode == 's' ? "fillcolor=\"${statusColor[colorKey][1]}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\", style=filled" : ''
+			// style = mode == 's' ? "fillcolor=\"${taskService.taskStatusColorMap[colorKey][1]}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\", style=filled" : ''
 			attribs = "color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
 
 		    task = (task.size() > 35) ? task[0..34] : task 
-			dotFile << "\t${it.task_number} [label=\"${task}\" style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
+			dotText << "\t${it.task_number} [label=\"${task}\" style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
 			def successors = it.successors
 			if (successors) {
 				successors = (successors as Character[]).join('')
 				successors = successors.split(',')
 				successors.each { s -> 
 					if (s.size() > 0) {
-						dotFile << "\t${it.task_number} -> ${s};\n"
+						dotText << "\t${it.task_number} -> ${s};\n"
 					}
 				}
 			}	
 		}
 
-		dotFile << "}\n"
+		dotText << "}\n"
 		
-		def imgFilename = "${filename}.${graphType}"				
-		def proc = "${dotExec} -T${graphType} -v -o ${targetDir}${imgFilename} ${dotFile}".execute()
-	 	proc.waitFor()
-	
-		if (proc.exitValue() == 0) {
-			// Delete the dot file because we don't need it and configured to delete it automatically
-			if (deleteDotFile) dotFile.delete()
-			redirect(uri:"${targetURI}${imgFilename}")
-			
-		} else {
-			render "<pre>exit code: ${ proc.exitValue()}\n stderr: ${proc.err.text}\n stdout: ${proc.in.text}"
-			
-			def errFile = new File("${targetDir}${filename}.err")
-			errFile << "exit code:\n\n${ proc.exitValue()}\n\nstderr:\n${proc.err.text}\n\nstdout:\n${proc.in.text}"
-			
-			
-		}
-				
+		try {
+			def uri = reportsService.generateDotGraph("runbook-$moveEventId", dotText.toString() )
+			redirect(uri:uri)
+		} catch(e) {
+			render "<pre>${e.getMessage()}</pre>"
+		}				
 	}
 	
 	/**

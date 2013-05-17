@@ -63,7 +63,20 @@ class TaskService {
 	static final List runbookCategories = [AssetCommentCategory.MOVEDAY, AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP]
 	static final List categoryList = AssetCommentCategory.getList()
 	static final List statusList = AssetCommentStatus.getList()
-	
+
+	// Color scheme for status key:[font, background]
+	static final Map taskStatusColorMap = [
+		(AssetCommentStatus.HOLD):['black', '#FFFF33'],
+		(AssetCommentStatus.PLANNED):['black', 'white'],
+		(AssetCommentStatus.READY):['white', 'green'],
+		(AssetCommentStatus.PENDING):['black', 'white'],
+		(AssetCommentStatus.STARTED):['white', 'darkturquoise'],
+		(AssetCommentStatus.DONE):['white', '#24488A'],
+		(AssetCommentStatus.TERMINATED):['white', 'black'],	
+		'AUTO_TASK':['#848484','#848484'],	// [font, edge]
+		'ERROR': ['red', 'white'],		// Use if the status doesn't match
+	]
+
 	/**
 	 * The getUserTasks method is used to retreive the user's TODO and ALL tasks lists or the count results of the lists. The list results are based 
 	 * on the Person and Project.
@@ -1041,6 +1054,53 @@ class TaskService {
 			log.error 'Unable to find Automated Task Person as expected'
 		} 
 		return auto
+	}
+
+	/**
+	 * Used to get a list of the neighboring tasks (dependencies) surrounding a particular task
+	 * @param Integer taskId - the task id number to start with
+	 * @param Integer blocks - the number blocks out that the list should retrieve (default 3)
+	 * @return List<TaskDependency> - the list of tasks dependencies surrounding the task
+	 */
+	def getNeighborhood( taskId, blocks=2 ) {
+		def list = []
+
+		// A recursive helper method that will traverse each of the neighbors out the # of blocks passed in
+		def neighbors 
+		neighbors = { tId, predOrSucc, depth ->
+			log.info "In the hood $depth for $tId"
+			def findCol
+			def nextCol
+			if (predOrSucc == 'p') {
+				findCol = 'assetComment'
+				nextCol = 'predecessor'
+			} else {
+				findCol = 'predecessor'
+				nextCol = 'assetComment'
+			}
+
+			if (depth > 0) {
+				def td = TaskDependency.findAll("from TaskDependency td where td.${findCol}.id=?", [tId])
+				// log.info "Found ${td.size()} going to $predOrSucc"
+				if (td.size() > 0) {
+					list.addAll(td)
+					if (depth > 0) {
+						td.each { t ->
+							log.info "Neighbor ${t.assetComment.id} : ${t.predecessor}" 
+							neighbors( t[nextCol].id, predOrSucc, (depth - 1) )
+						}
+					}
+				}
+			}
+		} 
+		taskId = taskId.toLong()
+
+		neighbors(taskId, 's', blocks) 
+		neighbors(taskId, 'p', blocks) 
+
+		//log.info "getNeighborhood: found ${list.size()} tasks in the hood"
+		list.each() { log.info "dep match: ${it.assetComment.id} : ${it.predecessor.id}"}
+		return list
 	}
 	
 	/**
