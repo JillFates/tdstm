@@ -38,12 +38,12 @@ class UpdateTaskSuccessorsJob {
 		def result = taskNonTranService.updateTaskSuccessors(taskId, status, whomId, isPM, tries)
 
 		if (result == 'reschedule') {
-			if (tries > 10) {
-				log.error "Bailing out of job for task $taskId update status to $status"
+			if (tries > 100) {
+				log.error "Gave up on waiting for task $taskId status to update to '$status'"
 				return
 			}
 
-			// Reschedule the job for 100ms
+			// Reschedule the job for 500ms
 			long nextFiring = System.currentTimeMillis() + 100    // in 100ms
 			Date nextFiringDate = new Date(nextFiring)
 			Trigger trigger = context.getTrigger()
