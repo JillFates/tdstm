@@ -3446,7 +3446,7 @@ class AssetEntityController {
 				dueDate = it.dueDate ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.dueDate, tzId)) : ''
 			}
 
-			depCount = TaskDependency.countByPredecessor( it )
+			def depCount = TaskDependency.countByPredecessor( it )
 			// Have the dependency count be a link to the Task Neighborhood graph if there are dependencies
 			def nGraphUrl = depCount ?: '<a href="' + HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:it.id]) +
 				'" target="_blank",>' +  + '</a>'
