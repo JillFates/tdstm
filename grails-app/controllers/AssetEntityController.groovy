@@ -3448,7 +3448,7 @@ class AssetEntityController {
 
 			def depCount = TaskDependency.countByPredecessor( it )
 			// Have the dependency count be a link to the Task Neighborhood graph if there are dependencies
-			def nGraphUrl = depCount > 0 ? depCount : '<a href="' + HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:it.id]) +
+			def nGraphUrl = depCount == 0 ? depCount : '<a href="' + HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:it.id]) +
 				'" target="_blank",>' + depCount + '</a>'
 
 			[ cell: [
