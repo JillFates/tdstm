@@ -1,11 +1,17 @@
 import grails.converters.JSON
+
 import java.text.SimpleDateFormat
-import org.apache.shiro.SecurityUtils
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.TimeUtil
+
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
+
+import com.tds.asset.FieldImportance
+import com.tdssrc.eav.EavAttribute
+import com.tdssrc.eav.EavEntityType
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 
 class ProjectController {
     def userPreferenceService
@@ -667,5 +673,85 @@ class ProjectController {
 		def power = params.p
 		userPreferenceService.setPreference( "CURR_POWER_TYPE", power )
 		render power
+	}
+	
+	/**
+	 * This action is used to create json data to redirect on assetFields and populate over there 
+	 */
+	def assetFields ={
+		
+		//C stands for CRITICAL
+		//V stands for valuable
+		//I stands for ignore
+		def importanceMap = [["name":"C","sy":"!!"],["name":"V","sy":"!"],["name":"I","sy":"X"]]
+		
+		//DIS stands for Discovery
+		//VL stands for Validated
+		//DR stands for DependencyReview
+		//DS stands for DependencyScan
+		//BR stands for BundleReady
+		
+		def validationsMap = [["name":"DIS", "imp": importanceMap], ["name":"VL",  "imp": importanceMap],
+			["name":"DR",  "imp": importanceMap],["name":"DS",  "imp": importanceMap], ["name":"BR",  "imp": importanceMap]]
+		
+		def eavEntityType = EavEntityType.findByDomainName('AssetEntity')
+		def attributes = EavAttribute.findAllByEntityType( eavEntityType )
+		def returnMap = []
+		attributes.each{prop->
+			returnMap << ['name':prop.frontendLabel, 'property':prop.attributeCode, 'validations':validationsMap]
+		}
+	  
+		return [returnMap : returnMap as JSON]
+	}
+	
+	/**
+	 *This action is used to get field importance and display it to user
+	 *@param : entityType type of entity for which user is requested for importance .
+	 *@return : json data
+	 */
+	def showFieldImportance ={
+		def entityType = params.entityType
+		def project = securityService.getUserCurrentProject()
+		def data = FieldImportance.findByEntityTypeAndProject(entityType, project)?.config
+		def FieldImportance = data ? JSON.parse(data) : null
+		def returnMap = [assetImp : FieldImportance]
+		if(params.errorMsg)
+			returnMap << ['errorMsg':params.errorMsg]
+			
+		render returnMap as JSON
+	}
+	
+	/**
+	 *This action is used to update field importance and display it to user
+	 *@param : entityType type of entity for which user is requested for importance .
+	 *@return 
+	 */
+	def updateFieldImportance ={
+		def entityType = params.entityType
+		def project = securityService.getUserCurrentProject()
+		def assetImp = FieldImportance.findByEntityTypeAndProject(entityType, project)
+		def data = params.jsonString
+		def errorMsg = ""
+		try{
+			if(data)
+				def jsonInput = new JSONObject(data)
+			
+			if(!assetImp)
+				assetImp = new FieldImportance('entityType':entityType, 'config':data, 'project':project)
+			else
+				assetImp.config = data
+				
+			if(!assetImp.save(flush:true)){
+				assetImp.errors.allErrors.each{
+					log.error it
+				}
+			}
+		} catch(Exception ex){
+			log.error "An error occurred : ${ex}"
+			errorMsg+= "${ex}"
+			params << [errorMsg:ex]
+		}
+		// TODO : Send error message back
+		forward (action:'showFieldImportance', params:params)
 	}
 }
