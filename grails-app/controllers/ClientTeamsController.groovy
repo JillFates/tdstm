@@ -1203,7 +1203,7 @@ class ClientTeamsController {
 			def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
 			def company = partyRelationshipService.getStaffCompany( person )
 			def personTeams =  partyRelationshipService.getCompanyStaffFunctions(company.id, person.id)
-			def projects =  projectService.getActiveProject( now, projectHasPermission)
+			def projects =  projectService.getActiveProject( now, projectHasPermission,'name','asc')
 			def project = securityService.getUserCurrentProject()
 			
 			render( template:"mobilePref", model:[person:person, personTeams:personTeams, projects:projects, project:project,
