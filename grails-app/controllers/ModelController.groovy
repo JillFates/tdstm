@@ -253,11 +253,11 @@ class ModelController {
 	        	def modelConnectors = ModelConnector.findAllByModel( model,[sort:"id"] )
 				def modelAkas = WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(model, [sort:'name']).name)
 				def paramsMap = [ modelInstance : model, modelConnectors : modelConnectors, modelAkas:modelAkas,
-	                  			  modelHasPermission:RolePermissions.hasPermission("ValidateModel") ]
-				if(params.redirectTo == "assetAudit"){
-					render(template: "modelAuditView", model: paramsMap )
-				}
-	            return paramsMap
+	                  			  modelHasPermission:RolePermissions.hasPermission("ValidateModel"), redirectTo: params.redirectTo ]
+				
+				def view = params.redirectTo == "assetAudit" ? "modelAuditView" : (params.redirectTo == "modelDialog" ? "_show" : "show")
+				
+				render( view:view, model:paramsMap )
 	        }
 		} else {
 			if(params.redirectTo == "assetAudit"){
@@ -291,9 +291,11 @@ class ModelController {
 				}
 				def modelAliases = ModelAlias.findAllByModel(model, [sort:'name'])
 				def paramsMap = [ modelInstance: model, modelConnectors : modelConnectors, otherConnectors : otherConnectors, 
-	                nextConnector:nextConnector, modelAliases:modelAliases ]
+	                nextConnector:nextConnector, modelAliases:modelAliases, redirectTo:params.redirectTo ]
 				
-	            return paramsMap
+				def view = params.redirectTo== "modelDialog" ? "_edit" : "edit"
+				render(view: view, model: paramsMap )
+				
 	        }
 		} else {
 			flash.message = "Model id ${params.id} is not a valid Id "
@@ -352,33 +354,39 @@ class ModelController {
 			params.powerDesign = powerDesign
 			params.powerUse = powerUsed
             def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
-    		def frontImage = request?.getFile('frontImage')
-            if( frontImage ) {
-    			if( frontImage.getContentType() && frontImage.getContentType() != "application/octet-stream"){
+    		def frontImage 
+            if( request?.getFile('frontImage') ) {
+				frontImage = request?.getFile('frontImage')
+    			if( frontImage?.getContentType() && frontImage?.getContentType() != "application/octet-stream"){
     				if (! okcontents.contains(frontImage.getContentType())) {
     	        		flash.message = "Front Image must be one of: ${okcontents}"
     	        		render(view: "create", model: [modelInstance: modelInstance])
     	        		return;
     	        	}
     				frontImage = frontImage.bytes
-            	}
-            } else {
+					
+            	} else {
             		frontImage = modelInstance.frontImage
+				}
+            } else {
+            	frontImage = modelInstance.frontImage
             }
-            def rearImage = request?.getFile('rearImage')
-            if( rearImage ) {
-    			if( rearImage.getContentType() && rearImage.getContentType() != "application/octet-stream"){
+            def rearImage 
+            if( request?.getFile('rearImage') ) {
+				rearImage = request?.getFile('rearImage')
+    			if( rearImage?.getContentType() && rearImage?.getContentType() != "application/octet-stream"){
     				if (! okcontents.contains(rearImage.getContentType())) {
     	        		flash.message = "Rear Image must be one of: ${okcontents}"
     	        		render(view: "create", model: [modelInstance: modelInstance])
     	        		return;
     	        	}
     				rearImage = rearImage.bytes
-            	}
+            	} else {
+					rearImage = modelInstance.rearImage
+				} 
             } else {
-                	rearImage = modelInstance.rearImage
-                }
-		
+            	rearImage = modelInstance.rearImage
+            }
 			modelInstance.height = params.modelHeight != "" ? Integer.parseInt(params.modelHeight):0 
 			modelInstance.weight = params.modelWeight != "" ? Integer.parseInt(params.modelWeight):0 
 			modelInstance.depth  = params.modelDepth  != "" ? Integer.parseInt(params.modelDepth):0 
@@ -392,11 +400,11 @@ class ModelController {
             modelInstance.properties = params
             modelInstance.rearImage = rearImage
             modelInstance.frontImage = frontImage
-			
+						
 			def oldModelManufacturer = modelInstance.manufacturer.id
 			def oldModelType = modelInstance.assetType          
 			
-			if (!modelInstance.hasErrors() && modelInstance.save()) {
+			if (!modelInstance.hasErrors() && modelInstance.save(flush:true)) {
 				
 				def deletedAka = params.deletedAka
 				def akaToSave = params.list('aka')
@@ -535,9 +543,9 @@ class ModelController {
 				if(params.redirectTo == "assetAudit"){
 					render(template: "modelAuditView", model: [modelInstance:modelInstance] )
 				}
-                redirect(action: "show", id: modelInstance.id)
-            }
-            else {
+				forward(action: "show", params:[id: modelInstance.id, redirectTo:params.redirectTo])
+				
+            }else {
 				modelInstance.errors.allErrors.each {log.error it}
             	def modelConnectors = ModelConnector.findAllByModel( modelInstance )
 				def otherConnectors = []

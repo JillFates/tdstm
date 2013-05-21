@@ -101,6 +101,7 @@ function convertPowerType(value, whom){
 function createModelManuDetails(controllerName,forWhom){
 	jQuery.ajax({
 		url : contextPath+'/'+controllerName+'/create',
+		data : {'forWhom':'modelDialog'},
 		type : 'POST',
 		success : function(data) {
 			 $("#create"+forWhom+"View").html(data);
@@ -117,7 +118,7 @@ function createModelManuDetails(controllerName,forWhom){
 function showOrEditModelManuDetails(controllerName,id,forWhom,view, name){
 	jQuery.ajax({
 		url : contextPath+'/'+controllerName+'/'+view+'/',
-		data : {'id' : id},
+		data : {'id' : id,'redirectTo':'modelDialog'},
 		type : 'POST',
 		success : function(data) {
 			 $("#"+view+""+forWhom+"View").html(data);
