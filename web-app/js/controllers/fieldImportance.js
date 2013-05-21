@@ -60,7 +60,7 @@ function assetFieldImportanceCtrl($scope,$http) {
 		$http({
 			url : contextPath+"/project/updateFieldImportance",
 			method: "POST",
-			params:{'jsonString':$("#jsonId").val(), 'entityType':type}
+			data:{'jsonString':$("#jsonId").val(), 'entityType':type}
 			}).success (function(resp) {
 				if(!resp.errorMsg){
 					var importSign = {"C":'!!!', 'V':'!!', 'I':'!'} 

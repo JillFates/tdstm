@@ -727,10 +727,10 @@ class ProjectController {
 	 *@return 
 	 */
 	def updateFieldImportance ={
-		def entityType = params.entityType
+		def entityType = request.JSON.entityType
 		def project = securityService.getUserCurrentProject()
 		def assetImp = FieldImportance.findByEntityTypeAndProject(entityType, project)
-		def data = params.jsonString
+		def data = request.JSON.jsonString
 		def errorMsg = ""
 		try{
 			if(data)
@@ -741,7 +741,7 @@ class ProjectController {
 			else
 				assetImp.config = data
 				
-			if(!assetImp.save(flush:true)){
+			if(!assetImp.save()){
 				assetImp.errors.allErrors.each{
 					log.error it
 				}
@@ -751,7 +751,8 @@ class ProjectController {
 			errorMsg+= "${ex}"
 			params << [errorMsg:ex]
 		}
+		
 		// TODO : Send error message back
-		forward (action:'showFieldImportance', params:params)
+		forward (action:'showFieldImportance', params:['entityType':request.JSON.entityType])
 	}
 }
