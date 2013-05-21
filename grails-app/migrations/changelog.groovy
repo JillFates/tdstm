@@ -34,4 +34,5 @@ databaseChangeLog = {
 	include file: '20130509-update-asset-type-case.groovy'
 	include file: '20130510-add-automatic-service-person.groovy'
 	include file: '20130520-add-field-importance-table.groovy'
+	include file: '20130521-add-missing-eav-attribute.groovy'
 }

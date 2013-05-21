@@ -58,6 +58,8 @@ class DataTransferBatchController {
     	sessionFactory.getCurrentSession().clear();
     	session.setAttribute("TOTAL_BATCH_ASSETS",0)
     	session.setAttribute("TOTAL_PROCESSES_ASSETS",0)
+		def formatter = new SimpleDateFormat("yyyy-MM-dd")
+		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
@@ -188,6 +190,20 @@ class DataTransferBatchController {
 										} else {
 											assetEntity."$attribName" = it.importValue
 										}
+										break;
+									case "retireDate":
+										if(it.importValue){
+											def retireDate = it.importValue
+												isModified = "true"
+												assetEntity."$attribName" = GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
+										}
+										break;
+									case "maintExpDate":
+										if(it.importValue){
+											def maintExpDate = it.importValue
+												isModified = "true"
+												assetEntity."$attribName" = GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
+											 }
 										break;
 									case "usize":
 										// Skip the insertion

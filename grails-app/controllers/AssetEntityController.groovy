@@ -1053,6 +1053,8 @@ class AssetEntityController {
 									addContentToSheet = new Label( serverMap[colName], r, "" )
 								} else if(attribute == "usize"){
 									addContentToSheet = new Label(serverMap[colName], r, asset[r-1]?.model?.usize?.toString() ?:"" )
+								} else if(attribute == "retireDate" || attribute == "maintExpDate"){
+									addContentToSheet = new Label(serverMap[colName], r, (asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll]) ? fileFormat.format(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll])) :''))
 								} else {
 									//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
 									if( bundleMoveAndClientTeams.contains(serverDTAMap.eavAttribute.attributeCode[coll]) ) {

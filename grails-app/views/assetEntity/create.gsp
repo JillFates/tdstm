@@ -49,7 +49,9 @@
 						<tbody>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="assetName">Name</label></td>
-								<td colspan="3"><input type="text" id="assetName" name="assetName" value="${assetEntityInstance.assetName}" tabindex="11" /></td>
+								<td><input type="text" id="assetName" name="assetName" value="${assetEntityInstance.assetName}" tabindex="11" /></td>
+								<td class="label" nowrap="nowrap"><label for="environment">Environment</label></td>
+								<td><g:select id="environment" name="environment" from="${assetEntityInstance.constraints.environment.inList}" value="${assetEntityInstance.environment}"  tabindex="32"></g:select></td>
 								<td>&nbsp</td>
 								<td class="label_sm">Source</td>
 								<td class="label_sm">Target</td>

@@ -44,8 +44,10 @@ $(document).ready(function() {
 						<tbody>
 							<tr  class="prop">
 								<td class="label" nowrap="nowrap"><label for="assetName">Name</label></td>
-								<td colspan="3" style="font-weight:bold">${assetEntity.assetName}</td>
-								<td>&nbsp</td>
+								<td style="font-weight:bold">${assetEntity.assetName}</td>
+								<td class="label" nowrap="nowrap"><label for="assetName">Environment</label></td>
+								<td class="valueNW">${assetEntity.environment}</td>
+								<td>&nbsp;</td>
 								<td class="label_sm">Source</td>
 								<td class="label_sm">Target</td>
 							</tr>
