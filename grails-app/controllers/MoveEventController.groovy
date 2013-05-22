@@ -718,13 +718,13 @@ class MoveEventController {
 						              			]
 						
 						
-						def projManager = projectService.getProjectManagerByProject(project.id).partyIdTo
-						def moveManager = projectService.getMoveManagerByProject(project.id).partyIdTo
+						def projManager = projectService.getProjectManagerByProject(project.id)?.partyIdTo
+						def moveManager = projectService.getMoveManagerByProject(project.id)?.partyIdTo
 						
 						summarySheet.addCell( new Label( 1, 1, String.valueOf(project.name ), getCellFormat(jxl.format.Colour.SEA_GREEN, jxl.format.Pattern.SOLID )) )
 						summarySheet.addCell( new Label( 2, 3, String.valueOf(project.name )) )
-						summarySheet.addCell( new Label( 2, 6, String.valueOf(projManager.firstName +" "+projManager.lastName)) )
-						summarySheet.addCell( new Label( 4, 6, String.valueOf(moveManager.firstName +" "+moveManager.lastName)) )
+						summarySheet.addCell( new Label( 2, 6, String.valueOf(projManager?.firstName +" "+projManager?.lastName)) )
+						summarySheet.addCell( new Label( 4, 6, String.valueOf(moveManager?.firstName +" "+moveManager?.lastName)) )
 						summarySheet.addCell( new  Label( 2, 4, String.valueOf(moveEventInstance.name )) )
 						summarySheet.addCell( new Label( 2, 10, String.valueOf(moveEventInstance.name )) )
 						
@@ -750,9 +750,9 @@ class MoveEventController {
 						def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' ")
 						for ( int r = 8; r <= (projectStaff.size()+7); r++ ) {
 							def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${projectStaff[0].partyIdTo.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-							personelSheet.addCell( new Label( 1, r, String.valueOf( projectStaff[r-8].partyIdTo.firstName+" "+ projectStaff[r-8].partyIdTo.lastName)) )
+							personelSheet.addCell( new Label( 1, r, String.valueOf( projectStaff[r-8].partyIdTo?.firstName+" "+ projectStaff[r-8].partyIdTo?.lastName)) )
 							personelSheet.addCell( new Label( 2, r, String.valueOf(projectStaff[r-8].roleTypeCodeTo )) )
-							personelSheet.addCell( new Label( 5, r, String.valueOf(projectStaff[r-8].partyIdTo.email ? projectStaff[r-8].partyIdTo.email : '')) )
+							personelSheet.addCell( new Label( 5, r, String.valueOf(projectStaff[r-8].partyIdTo?.email ? projectStaff[r-8].partyIdTo?.email : '')) )
 						}
 						book.write()
 						book.close()
