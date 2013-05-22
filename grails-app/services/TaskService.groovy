@@ -43,6 +43,7 @@ import grails.util.GrailsNameUtils
 
 import org.hibernate.SessionFactory;
 import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
+import org.apache.commons.lang.StringUtils as SU
 
 class TaskService {
 
@@ -1486,7 +1487,9 @@ class TaskService {
  				
 				// ----
 				
+				// Get the Workflow code if there is one specified in the task spec and then lookup the code for the workflow details
 				def taskWorkflowCode = taskSpec.containsKey('workflow') ? taskSpec.workflow : null
+				workflow = taskWorkflowCode ? getWorkflowStep(taskWorkflowCode) : null		
 				
 				// Validate that the taskSpec has the proper type
 				def stepType 
@@ -1514,8 +1517,7 @@ class TaskService {
 						out.append("Creating milestone ${taskSpec.title}<br/>")
 						
 						isMilestone = true
-						workflow = getWorkflowStep(taskWorkflowCode)		
-						newTask = createTaskFromSpec(recipeId, whom, taskList, ++lastTaskNum, moveEvent, taskSpec, workflow)
+						newTask = createTaskFromSpec(recipeId, whom, taskList, ++lastTaskNum, moveEvent, taskSpec, projectStaff, exceptions, workflow)
 						lastMilestone = newTask 
 
 						// Identify that this taskSpec is a collection type
@@ -1580,7 +1582,7 @@ class TaskService {
 							throw new RuntimeException(msg)							
 						}
 						
-						newTask = createTaskFromSpec(recipeId, whom, taskList, ++lastTaskNum, moveEvent, taskSpec, null)
+						newTask = createTaskFromSpec(recipeId, whom, taskList, ++lastTaskNum, moveEvent, taskSpec, projectStaff, exceptions, null)
 						tasksNeedingPredecessors << newTask
 						mapMode = 'DIRECT_MODE'
 
@@ -1627,7 +1629,7 @@ class TaskService {
 								// Track that this taskSpec is a collection type
 								collectionTaskSpecIds << taskSpec.id
 
-								def actionTasks = createAssetActionTasks(action, moveEvent, lastTaskNum, whom, recipeId, taskSpec, groups, exceptions)
+								def actionTasks = createAssetActionTasks(action, moveEvent, lastTaskNum, whom, recipeId, taskSpec, groups, workflow, exceptions)
 								if (actionTasks.size() > 0) {
 									// Throw the new task(s) into the collective taskList using the id as the key
 									actionTasks.each() { t ->
@@ -1668,7 +1670,7 @@ class TaskService {
 						//
 						assetsForTask?.each() { asset ->
 							workflow = getWorkflowStep(taskWorkflowCode, asset.moveBundle.id)
-							newTask = createTaskFromSpec(recipeId, whom, taskList, ++lastTaskNum, moveEvent, taskSpec, workflow, asset)
+							newTask = createTaskFromSpec(recipeId, whom, taskList, ++lastTaskNum, moveEvent, taskSpec, projectStaff, exceptions, workflow, asset)
 							tasksNeedingPredecessors << newTask
 							out.append("Created task $newTask<br/>")
 						} 
@@ -1697,7 +1699,7 @@ class TaskService {
 						genTitles.each() { gt -> 
 							// Replace the potential title:[array] with just the current title
 							taskSpec.title = gt
-							newTask = createTaskFromSpec(recipeId, whom, taskList, ++lastTaskNum, moveEvent, taskSpec, null, null)
+							newTask = createTaskFromSpec(recipeId, whom, taskList, ++lastTaskNum, moveEvent, taskSpec, projectStaff, exceptions, null, null)
 
 							if (isTerminal) {
 								// Track all terminal tasks so that they don't get linked by milestones
@@ -2375,7 +2377,7 @@ class TaskService {
 	 * @param asset - The asset associated with the task if there appropriate
 	 * @return AssetComment (aka Task)
 	 */
-	def createTaskFromSpec(recipeId, whom, taskList, taskNumber, moveEvent, taskSpec, workflow=null, asset=null) {
+	def createTaskFromSpec(recipeId, whom, taskList, taskNumber, moveEvent, taskSpec, projectStaff, exceptions, workflow=null, asset=null) {
 		def task = new AssetComment(
 			taskNumber: taskNumber,
 			project: moveEvent.project, 
@@ -2429,6 +2431,9 @@ class TaskService {
 			throw new RuntimeException("Error while trying to create task. error=${GormUtil.allErrorsString(task)}, asset=$asset, TaskSpec=$taskSpec")
 		}
 
+		// Perform the AssignedTo logic
+		assignWhomToTask(task, taskSpec, workflow, projectStaff, exceptions)
+
 		taskList[task.id] = task
 		
 		log.info "Saved task ${task.id} - ${task}"
@@ -2459,7 +2464,6 @@ class TaskService {
 			log.info "successor has hasSuccessorTaskFlag flag"
 		}
 		*/
-
 
 		// Need to see if the dependency was previously created. In addition, in the case of a missed dependency where there is a reversed
 		// taskSpec dependency (e.g. Auto App Shutdowns) we can get into the situation where a dependency is improperly created so we'll
@@ -2741,7 +2745,7 @@ class TaskService {
 	 * @param StringBuffer exceptions
 	 * @return List<AssetComment> the list of tasks that were created
 	 */
-	def createAssetActionTasks(action, moveEvent, lastTaskNum, whom, recipeId, taskSpec, groups, exceptions ) {
+	def createAssetActionTasks(action, moveEvent, lastTaskNum, whom, recipeId, taskSpec, groups, workflow, exceptions ) {
 		def taskList = []
 		def loc 			// used for racks
 		def msg
@@ -2924,6 +2928,10 @@ class TaskService {
 					// assocAssets.each() { log.info "Asset $it" }
 				}
 				task.metaClass.setProperty('associatedAssets', assocAssets)
+
+				// Perform the AssignedTo logic
+				assignWhomToTask(task, taskSpec, workflow, projectStaff, exceptions)
+
 				taskList << task
 			}
 		}
@@ -3009,65 +3017,68 @@ class TaskService {
 	 * In the event that it can't resolve the person it will log an exception.
 	 * The team property will be set if available, which will override the workflow team if workflow is also provided.
 	 */
-	private def assignWhomToTask = { taskForAssign, taskSpec, workflow, exceptions ->
+	private def assignWhomToTask = { task, taskSpec, workflow, projectStaff, exceptions ->
 
 		// Set the Team independently of the direct person assignment
 		if (taskSpec.containsKey('team')) {
-			taskForAssign.role = taskSpec.team
+			task.role = taskSpec.team
 		} else if (workflow && workflow.role_id) {
-			taskForAssign.role = workflow.role_id
+			task.role = workflow.role_id
 		}
 
 		if (taskSpec.containsKey('whom') && taskSpec.whom.size() > 1 ) {
-			def whomPerson = taskSpec.whom
+			def whom = taskSpec.whom
+
+			log.info "assignWhomToTask() 'whom=$whom, task $task"
 
 			// See if we have an indirect reference and if so, we will lookup the reference value that will result in either a person's name or @TEAM
-			if (whomPerson[0] == '#') {
-				if ( ! taskForAssign.assetEntity ) {
-					throw new RuntimeException("Illegally used whom property reference ($whomPerson) on non-asset taskSpec (${taskSpec.id})")
+			if (whom[0] == '#') {
+				if ( ! task.assetEntity ) {
+					throw new RuntimeException("Illegally used whom property reference ($whom) on non-asset taskSpec (${taskSpec.id})")
 				}
 
 				try {
-					whomPerson = getIndirectPropRef(taskForAssign.assetEntity, whomPerson)
+					whom = getIndirectPropertyRef(task.assetEntity, whom)
 				} catch (e) {
 					exceptions.append("${e.getMessage()}<br/>")
-					log.info "doAssignment() Unable to resolve indirect reference (${taskSpec.whom}) for TaskSpec (${taskSpec.id})<br/>"
+					log.info "doAssignment() Unable to resolve indirect reference (${taskSpec.whom}) for TaskSpec (${taskSpec.id}) - ${e.getMessage()}<br/>"
 					return
 				}
 			}
 
-			def whomLC = whomPerson.toLowerCase()
+			// def whomLC = whom.toLowerCase()
 			def person
 
 			// See if we already resolved this one - good for non-referenced lookups (e.g #sme1)
-			if ( resolvedWhoms.containsKey(whomLC) ) {
-				if ( resolvedWhoms[whomLC] ) {
-					// Cool - we already had this one so we don't have to look it up again
-					taskForAssign.assignedTo = resolvedWhoms[whomLC]
-				}
-			} else {
-				if (whomPerson[0] == '@') {
+		//	//if ( resolvedWhoms.containsKey(whomLC) ) {
+		//		if ( resolvedWhoms[whomLC] ) {
+		//			// Cool - we already had this one so we don't have to look it up again
+		//			task.assignedTo = resolvedWhoms[whomLC]
+		//		}
+		//	} else {
+				if (whom[0] == '@') {
 					// team reference
-					def teamAssign = whomPerson[1..-1]
+					def teamAssign = whom[1..-1]
 					// TODO - Add team name validation
-					taskForAssign.team = teamAssign
+					task.team = teamAssign
 				} else {
 					// Assignment by name or email
-					person = findPerson(propValue)
+					person = lookupPerson(whom, projectStaff)
 					if (person) {
 						// We had a static person reference in the taskSpec so we can cache for subsequent lookups 
-						resolvedWhoms[whomLC] = person
+						//resolvedWhoms[whomLC] = person
+						task.assignedTo = person
 					} else {
-						exceptions.append("Person assignment failed for TaskSpec (${taskSpec.id}) where whom ($whomPerson) not found<br/>")
+						exceptions.append("Person assignment failed for TaskSpec (${taskSpec.id}) where whom ($whom) not found<br/>")
 					}
 				}
-			}
+		//	}
 
 		}
 
 		// Do the fixed/hard assignment appropriately if a person was assigned
-		if (taskForAssign.assignedTo && taskSpec.containsKey('whomFixed') && taskSpec.whomFixed == true) {
-			taskForAssign.hardAssigned = 1
+		if (task.assignedTo && taskSpec.containsKey('whomFixed') && taskSpec.whomFixed == true) {
+			task.hardAssigned = 1
 		}
 	}
 
@@ -3081,26 +3092,28 @@ class TaskService {
 	 * @return String - the string (name or email) from the referenced or indirect referenced property
 	 * @throws RuntimeException if a reference is made to an invalid fieldname
 	 */
-	private def getIndirectPropRef = { asset, propertyRef, depth=0 ->
-		
+	private def getIndirectPropertyRef = { asset, propertyRef, depth=0 ->
+		log.info "getIndirectPropRef() property=$propertyRef, depth=$depth"
 		def value
-		def propRef = propertyRef	// Want to hold onto the original value for the exception message
+		def property = propertyRef	// Want to hold onto the original value for the exception message
 
-		if (propRef[0] == '#') {
+		if (property[0] == '#') {
 			// strip off the #
-			propRef = propRef[1..-1]
+			property = property[1..-1]
 		}	
 
 		// Deal with propery name inconsistency
-		if (propRef == 'sme1') propRef = 'sme'
+		if (property == 'sme1') property = 'sme'
 
 		// Check to make sure that the asset has the field referenced
-		if (! asset.metaClass.hasProperty(asset, propRef) ) {
-			throw new RuntimeException("Invalid property name ($propertyRef)")
+		if (! asset.metaClass.hasProperty(asset, property) ) {
+			throw new RuntimeException("Invalid property name ($property)")
 		}
 
-		if ( asset[propRef][0] == '#' && depth == 0)  {
-			value = getIndirectPropRef( asset, propRef, 1)
+		if ( asset[property][0] == '#' && depth == 0)  {
+			value = getIndirectPropRef( asset, property, 1)
+		} else {
+			value = asset[property]
 		}
 
 		return value
@@ -3113,25 +3126,30 @@ class TaskService {
 	 * @return Person - if a person was located otherwise null
 	 * @throws RuntimeException if the person is not found
 	 */
-	private def findPerson = { whomToFind, projectStaff ->
+	private def lookupPerson = { whomToFind, projectStaff ->
+		log.info "lookupPerson() for ($whomToFind) in staff (${projectStaff.size()})"
 		def person 
 		if (whomToFind.contains('@')) {
 			// Email lookup
 			person = projectStaff.find() { it.email.toLowerCase() == whomToFind.toLowerCase() }
 		} else {
-			def names = whomToFind.toLowerCase().split()
+			//def names = whomToFind.toLowerCase().split()
+			def names = whomToFind.split()
 			if (names.size() == 1) {
 				// Nickname lookup
-				person = projectStaff.find() { it.nickName.toLowerCase() == names[0] }
+				person = projectStaff.find() { SU.equalsIgnoreCase(it.staff.nickName, names[0]) }
+				//person = projectStaff.find() { it.nickName?.toLowerCase() == names[0] }
 			} else if (names.size() == 2) {
 				// Fullname lookup
-				person = projectStaff.find() { it.firstName.toLowerCase() == names[0] && it.lastName.toLowerCase() == names[1] }
+				person = projectStaff.find() { SU.equalsIgnoreCase(it.staff.firstName, names[0])  &&  SU.equalsIgnoreCase(it.staff.lastName, names[1]) }
+				if (!person) {
+					log.info "lookupPerson() unable to find person [${names[0]}] [${names[1]}]" // : $projectStaff"
+				}
 			} else {
 				throw new RuntimeException("Assign person ($whomToFind) due to to many spaces")
 			}
 		}
-
-		return person
+		return person?.staff
 	}
 
 	/**
@@ -3148,7 +3166,5 @@ class TaskService {
 		missedDepList[key].add( [ taskId:task.id, isRequired:isRequired, msTaskId:lastMilestoneTask?.id , dependency:dependency ] )
 		log.info "saveMissingDep() Added missing predecessor to stack ($key) for task $task. Now have ${missedDepList[key].size()} missed predecessors"
 	}
-
-
 
 }
