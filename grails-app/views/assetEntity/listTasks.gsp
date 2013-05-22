@@ -11,7 +11,7 @@
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="entity.crud.js" />
-	
+	<g:javascript src="model.manufacturer.js"/>
 	<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
@@ -29,6 +29,9 @@
  	        $("#showEntityView").dialog({ autoOpen: false })
 			$("#editEntityView").dialog({ autoOpen: false })
 			$("#createEntityView").dialog({ autoOpen: false })
+			$("#editManufacturerView").dialog({ autoOpen: false})
+			$("#manufacturerShowDialog").dialog({ autoOpen: false })
+			$("#modelShowDialog").dialog({ autoOpen: false })
 	    	currentMenuId = "#assetMenu";
 	    	$("#teamMenuId a").css('background-color','#003366')
 	    	$("#viewGraphSpanId").css('margin-left',$(window).width()*3.3/100+'%')
@@ -208,9 +211,11 @@
 		      <span class="menuButton"><a class="create" href="javascript:createIssue('','','')">Create Task</a></span>
 	       	</div>
 		</div>
+		<g:render template="../assetEntity/modelDialog" />
 		<div id="showEntityView" style="display: none;"></div>
 		<div id="editEntityView" style="display: none;"></div>
 		<div id="createEntityView" style="display: none;"></div>
+		<div id="editManufacturerView" style="display: none;"></div>
 		<div style="display: none;">
 		<table id="assetDependencyRow">
 			<tr>

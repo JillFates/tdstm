@@ -6,7 +6,7 @@
 <title>Asset List</title>
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
-
+<g:javascript src="model.manufacturer.js"/>
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
@@ -32,6 +32,7 @@ $(document).ready(function() {
 	        $("#editCommentDialog").dialog({ autoOpen: false })
 	        $("#manufacturerShowDialog").dialog({ autoOpen: false })
 	        $("#modelShowDialog").dialog({ autoOpen: false })
+	        $("#editManufacturerView").dialog({ autoOpen: false})
 	        $("#filterPane").draggable()
 var filter = '${filter}'
 var type = '${type}'
@@ -180,6 +181,7 @@ function populateFilter(){
 <div id="createEntityView" style="display: none;"></div>
 <div id="showEntityView" style="display: none;"></div>
 <div id="editEntityView" style="display: none;"></div>
+<div id="editManufacturerView" style="display: none;"></div>
 <div style="display: none;">
 	<table id="assetDependencyRow">
 	<tr>

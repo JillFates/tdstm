@@ -16,7 +16,7 @@
 
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
-	
+<g:javascript src="model.manufacturer.js"/>	
 
 <style type="text/css" media="screen">
 	.tranCell {
@@ -301,6 +301,7 @@
 </g:form>
 <g:render template="../assetEntity/commentCrud"/>
 <g:render template="../assetEntity/modelDialog"/>
+<div id="editManufacturerView" style="display: none;"></div>
 <div class="contextMenu" id="myMenu"></div>
 <div class="contextMenu" id="transitionMenu" style="visibility: hidden;">
 	<ul>
@@ -315,6 +316,7 @@
 </div>
 <div id ="showEntityView" style="display: none" title="Show Asset"></div>
 <div id ="editEntityView" style="display: none" title="Edit Asset"></div>
+<div id="editManufacturerView" style="display: none;"></div>
 <div style="display: none;">
 <table id="assetDependencyRow">
 	<tr>
@@ -405,6 +407,7 @@
 	    $("#showChangeStatusDialog").dialog({ autoOpen: false })
 	    $("#manufacturerShowDialog").dialog({ autoOpen: false })
 	    $("#modelShowDialog").dialog({ autoOpen: false })
+	    $("#editManufacturerView").dialog({ autoOpen: false})
 		var role = "${role}";
 		// Show menu when #myDiv is clicked
 		if(role) {

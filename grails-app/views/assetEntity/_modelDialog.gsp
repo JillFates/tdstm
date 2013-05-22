@@ -19,10 +19,8 @@
 	</div>
 	<tds:hasPermission permission='ModelDialogView'>
 	<div class="buttons">
-	    <g:form controller="manufacturer" action="edit" target="new">
 	        <input type="hidden" name="id" id="show_manufacturerId" />
-	        <span class="button"><input type="submit" class="edit" value="Edit" onclick="$('#manufacturerShowDialog').dialog('close')"/></span>
-	    </g:form>
+	        <span class="button"><input type="button" class="edit" value="Edit" onclick="showOrEditModelManuDetails('manufacturer',$('#show_manufacturerId').val(),'Manufacturer','edit','Edit');$('#manufacturerShowDialog').dialog('close');"/></span>
 	</div>
 	</tds:hasPermission>
 </div>

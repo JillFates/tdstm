@@ -11,7 +11,7 @@
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="room.rack.combined.js"/>
 <g:javascript src="entity.crud.js" />
-
+<g:javascript src="model.manufacturer.js"/>
 
 <title>Rack View</title>
 <script type="text/javascript">
@@ -121,6 +121,7 @@
 		$("#createCommentDialog").dialog({ autoOpen: false })
 	    $("#showCommentDialog").dialog({ autoOpen: false })
 	    $("#editCommentDialog").dialog({ autoOpen: false })
+	    $("#editManufacturerView").dialog({ autoOpen: false})
 	})
 	// Script to get the combined rack list
 	function getRackDetails( objId ){
@@ -279,6 +280,7 @@
 <div id ="createEntityView" style="display: none"></div>
 <div id ="showEntityView" style="display: none" ></div>
 <div id ="editEntityView" style="display: none" ></div>
+<div id="editManufacturerView" style="display: none;"></div>
 <input type="hidden" id="role" value="role"/>
 
 <div style="display: none;">

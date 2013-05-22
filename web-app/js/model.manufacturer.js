@@ -162,11 +162,11 @@ function updateManufacturer(forWhom){
 			if(data.errMsg){
 				alert(data.errMsg)
 			}else{
-				$("#edit"+forWhom+"View").dialog('close')
-				$("#show"+forWhom+"View").html(data)
-				$("#show"+forWhom+"View").dialog('option', 'width', 'auto')
-				$("#show"+forWhom+"View").dialog('option', 'position', ['center','top']);
-				$("#show"+forWhom+"View").dialog('open');
+				$("#edit"+forWhom+"View").html(data)
+				$("#edit"+forWhom+"View").dialog( "option", "title", "Show Manufacturer" );
+				$("#edit"+forWhom+"View").dialog('option', 'width', 'auto')
+				$("#edit"+forWhom+"View").dialog('option', 'height', 'auto')
+				$("#edit"+forWhom+"View").dialog('option', 'position', ['center','top']);
 			}
 		}
 	});

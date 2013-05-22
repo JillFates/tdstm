@@ -14,7 +14,7 @@
 <g:javascript src="drag_drop.js" />
 <g:javascript src="room.rack.combined.js"/>
 <g:javascript src="entity.crud.js" />
-	
+<g:javascript src="model.manufacturer.js"/>	
 
 <script type="text/javascript">
 var roomId = "${roomId}"
@@ -42,6 +42,7 @@ $(document).ready(function() {
     $("#createCommentDialog").dialog({ autoOpen: false })
     $("#showCommentDialog").dialog({ autoOpen: false })
     $("#editCommentDialog").dialog({ autoOpen: false })
+    $("#editManufacturerView").dialog({ autoOpen: false})
 })
 </script>
 </head>
@@ -298,6 +299,7 @@ ${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomVie
 <div id ="createEntityView" style="display: none" ></div>
 <div id ="showEntityView" style="display: none"></div>
 <div id ="editEntityView" style="display: none"></div>
+<div id="editManufacturerView" style="display: none;"></div>
 <input type="hidden" id="role" value="role"/>
 
 <div style="display: none;">
