@@ -1057,49 +1057,96 @@ class TaskService {
 	}
 
 	/**
-	 * Used to get a list of the neighboring tasks (dependencies) surrounding a particular task
+	 * Used to get a list of the neighboring tasks (dependencies) adjacent to a particular task. 
+	 * It will move out N number of blocks building the list of dependencies. The outer nodes will have one of two
+	 * properties injected into them which represents the adjacent depencies which are just outside the hood. The properties 
+	 * will be (predecessorDepCount | successorDepCount) based on which side of the relationship they are. These DepCounts will
+	 * be presented in the graph as badges indicating the quantity of the adjacent tasks 
+	 *  
 	 * @param Integer taskId - the task id number to start with
 	 * @param Integer blocks - the number blocks out that the list should retrieve (default 3)
 	 * @return List<TaskDependency> - the list of tasks dependencies surrounding the task
 	 */
 	def getNeighborhood( taskId, blocks=2 ) {
 		def list = []
+		def findProp	// Is set to the TaskDependency property name used to find the current nodes (e.g. 'predecessor' when looking for successors)
+		def nextProp	// The opposite property name to findProp
+		def findCol		// The db column name that is used to find the adjacent task dep count on the outer edges of the neighborhood
+		//def nextCol		// The DB column name that represents the findCol property in the domain object
+		def depCountName	// The name of the property that will be injected into the edge nodes with the count (predecessorDepCount | successorDepCount)
 
 		// A recursive helper method that will traverse each of the neighbors out the # of blocks passed in
 		def neighbors 
-		neighbors = { tId, predOrSucc, depth ->
-			log.info "In the hood $depth for $tId"
-			def findCol
-			def nextCol
-			if (predOrSucc == 'p') {
-				findCol = 'assetComment'
-				nextCol = 'predecessor'
-			} else {
-				findCol = 'predecessor'
-				nextCol = 'assetComment'
-			}
-
+		neighbors = { tId, depth ->
+			// log.info "In the hood $depth for $tId"
 			if (depth > 0) {
-				def td = TaskDependency.findAll("from TaskDependency td where td.${findCol}.id=?", [tId])
+				def td = TaskDependency.findAll("from TaskDependency td where td.${findProp}.id=?", [tId])
 				// log.info "Found ${td.size()} going to $predOrSucc"
 				if (td.size() > 0) {
-					list.addAll(td)
 					if (depth > 0) {
 						td.each { t ->
-							log.info "Neighbor ${t.assetComment.id} : ${t.predecessor}" 
-							neighbors( t[nextCol].id, predOrSucc, (depth - 1) )
+							// log.info "Neighbor ${t.assetComment.id} : ${t.predecessor}" 
+							neighbors( t[nextProp].id, (depth - 1) )
 						}
 					}
+
+					//
+					// Deal with the edge tasks by injecting the outside task dependency counts
+					//
+					if (depth == 1 ){
+						// On the outer nodes, we want to get the quantity of dependencies on the other side of the tracks for
+						// each of them correspondingly. It will invoke a query to get a list so as to limit the number of queries
+						// to one per level vs one per node. Therefore it needs to iterate through the results to match up with the 
+						// corresponding TaskDependency. It will use the meta.setProperty to inject the count appropriately.
+						def ids = td[nextProp]*.id
+						// isPred = nextProp == 'predecessor'
+						
+//						def sql = "SELECT $nextProp as id, count(*) as cnt FROM task_dependency WHERE $nextProp in (" .
+//							GormUtil.asCommaDelimitedString(ids) . ') group by id'
+						def sql = "SELECT $findCol as id, count(*) as cnt FROM task_dependency WHERE $findCol in (" +
+							GormUtil.asCommaDelimitedString(ids) + ") group by id"
+						log.info "SQL = $sql, ids=$ids"
+						def outerDeps = jdbcTemplate.queryForList(sql)
+						log.info "getNeighborhood() : found ${outerDeps.size()} tasks on the other side of the tracks of $ids"
+						td.each() { t ->
+							// Try to match up the outer dep count to the task dependency node
+							def outerDep = outerDeps?.find() { od -> od.id == t[nextProp].id }
+							def outerDepCount = outerDep ? outerDep.cnt : 0
+							t.metaClass.setProperty(depCountName, outerDepCount)	
+							log.info "getNeighborhood(): Found $outerDepCount outer depend for task # ${t[findProp].taskNumber} (id:${t[findProp].id})"
+						}
+					}
+					
+					if (depth==1) {
+						td.each() { t ->
+							log.info "getNeighborhood: dependency $t - $depCountName = ${t[depCountName]} outside dep"
+						}				
+					}
+
+					// tnp.metaClass.setProperty('chainPeerTask', assetsLatestTask[tnp.assetEntity.id])
+					list.addAll(td)
+
 				}
 			}
-		} 
+		}
 		taskId = taskId.toLong()
 
-		neighbors(taskId, 's', blocks) 
-		neighbors(taskId, 'p', blocks) 
+		// Get the successors
+		findProp = 'predecessor'
+		nextProp = 'assetComment'
+		findCol = 'predecessor_id'
+		depCountName = 'successorDepCount'
+		neighbors(taskId, blocks) 
+
+		// Get the predecessor
+		findProp = 'assetComment'
+		nextProp = 'predecessor'
+		findCol = 'asset_comment_id'
+		depCountName = 'predecessorDepCount'
+		neighbors(taskId, blocks) 
 
 		//log.info "getNeighborhood: found ${list.size()} tasks in the hood"
-		list.each() { log.info "dep match: ${it.assetComment.id} : ${it.predecessor.id}"}
+		// list.each() { log.info "dep match: ${it.assetComment.id} : ${it.predecessor.id}"}
 		return list
 	}
 	
@@ -1160,7 +1207,7 @@ class TaskService {
 		def lastMilestone = null	// Will track the most recent milestone task
 		def assetsLatestTask = [:]	// This map array will contain reference of the assets' last assigned task
 		def taskSpecList = [:]		// Used to track the ID #s of all of the taskSpecs in the recipe and holds last task created for some special cases
-		def missedDepList = [:]		// Will contain the list of 
+		def missedDepList = [:].withDefault {[]}		// Will contain the list of 
 		def groups = [:]			// Used to hold groups of assets as defined in the groups section of the recipe that can then be reference in taskSpec filters
 		def terminalTasks = []		// Maintains the list of general tasks indicated that are terminal so that milestones don't connect to them as successors
 		
@@ -1301,6 +1348,12 @@ class TaskService {
 			}
 		}
 		
+		// The following vars are used by doAssigmnet to retain previously looked up persons
+		def resolvedWhoms = [:]
+		def whomLastTaskSpec
+		// Preload all the staff for the project
+		def projectStaff = partyRelationshipService.getProjectStaff( project.id )
+
 		
 		def maxPreviousEstFinish = null		// Holds the max Est Finish from the previous taskSpec
 		def workflow
@@ -1706,26 +1759,6 @@ class TaskService {
 				// The predecessor.required when false, will not update the asset with the latest task for any of the above use-cases
 				
 
-				/**
-				 * Helper closure method used to add missing dependency details onto the stack to wire up tasks later on
-				 * @param String smdKey - the lookup key (missedPredKey)
-				 * @param AssetComment smdTask - the task that failed the dependency lookup
-				 * @param Boolean smdIsRequired - the flag if the dependency was required in the taskspec
-				 * @param AssetComment smdLastMs - the current last milestone at the time that the smdTask was created
-				 */
-				def saveMissingDep = { smdKey, smdTask, smdIsRequired, smdLastMS ->
-
-					// exceptions.append("No predecessor task found for asset ($predAsset) to link to task ($tnp)<br/>")
-					
-					// Add the dependency on the missed Dependency list as we may be able to link it up later on
-					if (! missedDepList.containsKey(smdKey)) {
-						missedDepList[smdKey] = []
-					}
-					log.info "Added Missing Dep to stack ($smdKey) for task $smdTask"
-					missedDepList[smdKey].add([taskId:smdTask.id, isRequired:smdIsRequired, msTaskId:smdLastMS?.id ])
-					// log.info "missedDepList = $missedDepList"
-				}
-
 				if (tasksNeedingPredecessors.size() > 0 && ! ignorePred ) {
 				
 					// Set some vars that will be used in the next iterator 
@@ -1840,10 +1873,10 @@ class TaskService {
 					//	
 					// Now iterate over all of the tasks just created for this taskSpec and assign dependencies 
 					//
-					out.append("# Creating predecessors for ${tasksNeedingPredecessors.size()} tasks<br/>")
+					out.append("###### Creating predecessors for ${tasksNeedingPredecessors.size()} tasks<br/>")
 				
 					tasksNeedingPredecessors.each() { tnp ->
-						log.info("tasksNeedingPredecessors.each(): Processing $mapMode for task $tnp")
+						log.info("### tasksNeedingPredecessors.each(): Processing $mapMode for task $tnp")
 
 
 						if (tnp.assetEntity) {
@@ -1851,25 +1884,41 @@ class TaskService {
 							// This can for instance when there are multiple Application shutdown taskSpec and there were references in  
 							// an earlier task spec that references an application created in subsquent steps. We track this in the 
 							// missedDepList. Missed dependencies are ONLY matched if they both occur in the same category (e.g. Shutdown)
-							def missedPredKey = "${tnp.assetEntity?.id}|${tnp.category}"
-							log.info "#-#-#-#-# missedDepList lookup for: $missedPredKey"
-							if (missedDepList[missedPredKey]?.size() > 0) {
+							def missedDepKey = "${tnp.assetEntity.id}_${tnp.category}"
+							log.info "missedDepList lookup for: $missedDepKey"
+							if (missedDepList[missedDepKey]) {
 								def tnpId = tnp.assetEntity.id
-								log.info "Trying to find missed pred for '$missedPredKey' of asset $tnp"
+								log.info "Trying to find missed pred for '$missedDepKey' of asset $tnp"
 								// Iterate over the missed dependencies and now create them
-								missedDepList[missedPredKey].each() {
+								missedDepList[missedDepKey].each() {
 									def prevTask = AssetComment.get(it.taskId)
 									if (prevTask) {
 										log.info "Resolved missed dependency between $prevTask and $tnp"
-										depCount += createTaskDependency(prevTask, tnp, taskList, it.isRequired, out)
+										// The missed relationship earlier was that this asset was a predecessor however it hadn't been created yet
+
+										// Lets see if we have an inverse relationship (e.g. Auto App Shutdown) so that we can switch the sequence
+										// that the tasks are to be completed.
+										def inverse = false
+										if (taskSpec.predecessor?.containsKey('inverseOnType')) {
+											def inverseOnType = taskSpec.predecessor.inverseOnType
+											inverseOnType = (inverseOnType instanceof java.util.ArrayList) ? inverseOnType : [inverseOnType]
+											inverse = (it.dependency && inverseOnType.contains(it.dependency.type)) 
+										}
+										if (inverse) {
+											depCount += createTaskDependency(prevTask, tnp, taskList, it.isRequired, out)
+											log.info "Inversed task predecessor due to inverseOnType"
+										} else {
+											depCount += createTaskDependency(tnp, prevTask, taskList, it.isRequired, out)
+										}
 									} else {
-										msg = "Uable to find task associated with missed dependency (id:${it.taskId})"
+										msg = "Unable to find task associated with missed dependency (id:${it.taskId})"
 										log.error msg
 										exceptions.append("${msg}<br/>")
 									} 
 								}
 								// Remove the missing dep from the missing list
-								missedDepList.remove(missedPredKey)
+								// missedDepList.remove(missedDepKey)
+								// log.info "Removed missed predecessors for $missedDepKey"
 							}
 						}
 
@@ -1984,7 +2033,7 @@ class TaskService {
 
 												// Push the task onto the missing pred stack to be wired later if possible
 												// TODO - Need to validate that this is necessary as it might wire things wrong
-												saveMissingDep("${tnp.assetEntity.id}|${tnp.category}", tnp, isRequired, lastMilestone)
+												saveMissingDep(missedDepList, "${tnp.assetEntity.id}_${tnp.category}", taskSpec, tnp, isRequired, lastMilestone)
 
 												//log.info(msg)
 												//exceptions.append("${msg}<br/>")
@@ -2057,6 +2106,8 @@ class TaskService {
 										// Note that this should be the opposite of that used in the getAssetDependencies 
 										def predAsset = depMode == 's' ?  ad.dependent : ad.asset
 
+										log.info "Matching dependencies to asset $predAsset"
+
 										// Make sure that the other asset is in one of the bundles in the event
 										def predMoveBundle = predAsset.moveBundle
 										if (! predMoveBundle || ! bundleIds.contains(predMoveBundle.id)) {
@@ -2094,7 +2145,7 @@ class TaskService {
 												// exceptions.append("No predecessor task found for asset ($predAsset) to link to task ($tnp)<br/>")
 												
 												// Push this task onto the stack to be wired up later on
-												saveMissingDep("${predAsset.id}|${tnp.category}", tnp, isRequired, lastMilestone)
+												saveMissingDep(missedDepList, "${predAsset.id}_${tnp.category}", taskSpec, tnp, isRequired, lastMilestone, ad)
 												/*
 												// Add the dependency on the missed Dependency list as we may be able to link it up later on
 												if (! missedDepList.containsKey(missedPredKey)) {
@@ -2182,10 +2233,9 @@ class TaskService {
 	def getAssetDependencies(asset, taskSpec, depMode) {
 		def list = []
 		def finalList = []
-		def filter = taskSpec.filter
 		
 		// This is the list of properties that can be added to the search criteria from the Filter
-		def supportedFilterProps = ['status', 'type', 'dataFlowFreq', 'dataFlowDirection']
+		def supportedPredFilterProps = ['status', 'type', 'dataFlowFreq', 'dataFlowDirection']
 		
 		// AssetEntity  asset			// The asset that that REQUIRES the 'dependent'
 		// AssetEntity dependent		// The asset that SUPPORTS 'asset' 
@@ -2209,23 +2259,23 @@ class TaskService {
 		def map = ['assetId':asset.id]
 
 		// Add additional WHERE expresions to the SQL
-		supportedFilterProps.each() { prop ->
-			if (filter?.containsKey(prop)) {
-				def sqlMap = SqlUtil.whereExpression("ad.$prop", filter[prop], prop)
+		supportedPredFilterProps.each() { prop ->
+			if (taskSpec.predecessor?.containsKey(prop)) {
+				def sqlMap = SqlUtil.whereExpression("ad.$prop", taskSpec.predecessor[prop], prop)
 				if (sqlMap) {
 					sql = SqlUtil.appendToWhere(sql, sqlMap.sql)
 					if (sqlMap.param) {
 						map[prop] = sqlMap.param
 					}								
 				} else {
-					log.error "SqlUtil.whereExpression unable to resolve ${prop} expression [${filter[prop]}]"
-					throw new RuntimeException("Unable to resolve filter param:[${prop}] expression:[${filter[prop]}] while processing asset ${asset}")
+					log.error "SqlUtil.whereExpression unable to resolve ${prop} expression [${taskSpec.predecessor[prop]}]"
+					throw new RuntimeException("Unable to resolve filter param:[${prop}] expression:[${taskSpec.predecessor[prop]}] while processing asset ${asset}")
 				}
 			}
 			
 		}
 		
-		log.info "getAssetDependencies: SQL=$sql, PARAMS=$map"
+		log.info "getAssetDependencies: depMode=$depMode, SQL=$sql, PARAMS=$map"
 		list = AssetDependency.findAll(sql, map)
 		log.info "getAssetDependencies: found ${list.size()} rows : $list"
 
@@ -2342,7 +2392,6 @@ class TaskService {
 		// Handle the various settings from the taskSpec
 		task.priority = taskSpec.containsKey('priority') ? taskSpec.priority : 3
 		if (taskSpec.containsKey('duration')) task.duration = taskSpec.duration
-		if (taskSpec.containsKey('team')) task.role = taskSpec.team
 		if (taskSpec.containsKey('category')) task.category = taskSpec.category
 		
 		def defCat = task.category
@@ -2361,7 +2410,7 @@ class TaskService {
 		if (workflow) {
 			// log.info "Applying workflow values to task $taskNumber - values=$workflow"
 			if (workflow.workflow_transition_id) { task.workflowTransition = WorkflowTransition.read(workflow.workflow_transition_id) }
-			if (! task.role && workflow.role_id) { task.role = workflow.role_id }
+			// if (! task.role && workflow.role_id) { task.role = workflow.role_id }
 			if (! task.category && workflow.category) { task.category = workflow.category }
 			if (! task.estStart && workflow.plan_start_time) { task.estStart = workflow.plan_start_time }
 			if (! task.estFinish && workflow.plan_completion_time) { task.estFinish = workflow.plan_completion_time }
@@ -2400,7 +2449,6 @@ class TaskService {
 	 * @throws RuntimeError if unable to save the dependency
 	 */
 	def createTaskDependency( predecessor, successor, taskList, isRequired, out, count=0 ) {
-		count++
 
 		log.info "Creating dependency $count predecessor=$predecessor, successor=$successor "
 		/*		
@@ -2411,7 +2459,19 @@ class TaskService {
 			log.info "successor has hasSuccessorTaskFlag flag"
 		}
 		*/
-		
+
+
+		// Need to see if the dependency was previously created. In addition, in the case of a missed dependency where there is a reversed
+		// taskSpec dependency (e.g. Auto App Shutdowns) we can get into the situation where a dependency is improperly created so we'll
+		// only create the first, which is created by the missed dependency (e.g. db -> app and later app -> db)
+		if ( TaskDependency.findByAssetCommentAndPredecessor(successor, predecessor) || 
+			 TaskDependency.findByAssetCommentAndPredecessor(predecessor, successor)) {
+			log.info "createTaskDependency() dependency already exists"
+			return count
+		}
+
+		count++
+
 		if (predecessor.id == successor.id) {
 			log.error "createTaskDependency: attempted to create dependency with single task $predecessor"
 		}
@@ -2437,6 +2497,7 @@ class TaskService {
 
 		// Here is the recursive loop if the predecessor has a peer
 		if (predecessor.metaClass?.hasProperty(predecessor, 'chainPeerTask')) {
+			log.info "createTaskDependency() Invoking recursively due to predecessor having chainPeerTask (${predecessor.chainPeerTask})"
 			count = createTaskDependency( predecessor.chainPeerTask, successor, taskList, isRequired, out, count)
 		}
 		
@@ -2460,7 +2521,7 @@ class TaskService {
 			//
 			
 			//log.info("Groups contains $groups")
-			log.info("findAllAssetsWithFilter: group ${filter.group}")
+			//log.info("findAllAssetsWithFilter: group ${filter.group}")
 
 			// Put the group property into an array if not already an array
 			def groups = ( filter.group instanceof java.util.ArrayList ) ? filter.group : [filter.group]
@@ -2468,7 +2529,7 @@ class TaskService {
 			// Iterate over the list of groups	
 			groups.each() { groupCode -> 
 				if (groupCode.size() == 0) {
-					log.info("findAllAssetsWithFilter: 'filter.group' value ($filter.group) has undefined group code.")
+					log.error("findAllAssetsWithFilter: 'filter.group' value ($filter.group) has undefined group code.")
 					throw new RuntimeException("'filter.group' value ($filter.group) has undefined group code.")
 				}
 				
@@ -2580,7 +2641,7 @@ class TaskService {
 			// Add additional WHERE clauses based on the following properties being present in the filter.asset 
 			def validProperties = ['assetName','assetTag','assetType', 'priority', 'truck', 'cart', 'shelf', 'sourceLocation', 'targetLocation', 'planStatus']
 			(1..24).each() { validProperties.add("custom$it".toString()) }	// Add custom1..custom24
-			log.info("findAllAssetsWithFilter: validProperties=$validProperties")
+			// log.info("findAllAssetsWithFilter: validProperties=$validProperties")
 			addWhereConditions( validProperties )
 		
 			//
@@ -2869,6 +2930,7 @@ class TaskService {
 
 		return taskList	
 	}
+
 	/** 
 	 * This method is used to generate Roll-Call Tasks for a specified event which will create a sample task for each individual
 	 * that is assigned to the Event which lists their name and their TEAM assignment(s). 
@@ -2876,7 +2938,7 @@ class TaskService {
 	 * @param category
 	 * @return List<AssetComment> the list of tasks that were created
 	 */
-	def createRollcallTasks( moveEvent, lastTaskNum, whom, recipeId, taskSpec ) {
+	private def createRollcallTasks( moveEvent, lastTaskNum, whom, recipeId, taskSpec ) {
 		
 		def taskList = []
 		def staffList = MoveEventStaff.findAllByMoveEvent(moveEvent, [sort:'person'])
@@ -2934,4 +2996,159 @@ class TaskService {
 		return taskList	
 	}
 	
+
+	/**
+	 * Helper closure used to manage the assignment of whom will perform the task
+	 * This will look for the team, whom and whomFixed parameters from the taskSpec and do the assignment accordingly.
+	 * The whom property has several methodologies to indicate whom based on the prefix which are:
+	 *    #propertyName - will look up the in person in the asset property accordingly (e.g. #sme2 will look to the sme2 field for the person)
+	 *    	@team - if used in a referenced property it will set the team instead of the person
+	 *    emailAddress - will lookup the person associated to the project by their email address
+	 *    firstName lastName - will lookup the person by first name and last name for people associated to the project
+	 * Note that when using the #propertyName, that it too can use the hash(#) or at(@) symbols to resolve the person.
+	 * In the event that it can't resolve the person it will log an exception.
+	 * The team property will be set if available, which will override the workflow team if workflow is also provided.
+	 */
+	private def assignWhomToTask = { taskForAssign, taskSpec, workflow, exceptions ->
+
+		// Set the Team independently of the direct person assignment
+		if (taskSpec.containsKey('team')) {
+			taskForAssign.role = taskSpec.team
+		} else if (workflow && workflow.role_id) {
+			taskForAssign.role = workflow.role_id
+		}
+
+		if (taskSpec.containsKey('whom') && taskSpec.whom.size() > 1 ) {
+			def whomPerson = taskSpec.whom
+
+			// See if we have an indirect reference and if so, we will lookup the reference value that will result in either a person's name or @TEAM
+			if (whomPerson[0] == '#') {
+				if ( ! taskForAssign.assetEntity ) {
+					throw new RuntimeException("Illegally used whom property reference ($whomPerson) on non-asset taskSpec (${taskSpec.id})")
+				}
+
+				try {
+					whomPerson = getIndirectPropRef(taskForAssign.assetEntity, whomPerson)
+				} catch (e) {
+					exceptions.append("${e.getMessage()}<br/>")
+					log.info "doAssignment() Unable to resolve indirect reference (${taskSpec.whom}) for TaskSpec (${taskSpec.id})<br/>"
+					return
+				}
+			}
+
+			def whomLC = whomPerson.toLowerCase()
+			def person
+
+			// See if we already resolved this one - good for non-referenced lookups (e.g #sme1)
+			if ( resolvedWhoms.containsKey(whomLC) ) {
+				if ( resolvedWhoms[whomLC] ) {
+					// Cool - we already had this one so we don't have to look it up again
+					taskForAssign.assignedTo = resolvedWhoms[whomLC]
+				}
+			} else {
+				if (whomPerson[0] == '@') {
+					// team reference
+					def teamAssign = whomPerson[1..-1]
+					// TODO - Add team name validation
+					taskForAssign.team = teamAssign
+				} else {
+					// Assignment by name or email
+					person = findPerson(propValue)
+					if (person) {
+						// We had a static person reference in the taskSpec so we can cache for subsequent lookups 
+						resolvedWhoms[whomLC] = person
+					} else {
+						exceptions.append("Person assignment failed for TaskSpec (${taskSpec.id}) where whom ($whomPerson) not found<br/>")
+					}
+				}
+			}
+
+		}
+
+		// Do the fixed/hard assignment appropriately if a person was assigned
+		if (taskForAssign.assignedTo && taskSpec.containsKey('whomFixed') && taskSpec.whomFixed == true) {
+			taskForAssign.hardAssigned = 1
+		}
+	}
+
+	/**
+	 * Helper closure to recursive lookup indirect property references (only single nesting)
+	 * This supports two situations:
+	 *    1) taskSpec whom:'#prop' and asset.prop contains name/email
+	 *    2) taskSpec whom:'#prop' and asset.prop contains #prop2 reference (indirect reference)
+	 * @param AssetComment 
+	 * @param String propName
+	 * @return String - the string (name or email) from the referenced or indirect referenced property
+	 * @throws RuntimeException if a reference is made to an invalid fieldname
+	 */
+	private def getIndirectPropRef = { asset, propertyRef, depth=0 ->
+		
+		def value
+		def propRef = propertyRef	// Want to hold onto the original value for the exception message
+
+		if (propRef[0] == '#') {
+			// strip off the #
+			propRef = propRef[1..-1]
+		}	
+
+		// Deal with propery name inconsistency
+		if (propRef == 'sme1') propRef = 'sme'
+
+		// Check to make sure that the asset has the field referenced
+		if (! asset.metaClass.hasProperty(asset, propRef) ) {
+			throw new RuntimeException("Invalid property name ($propertyRef)")
+		}
+
+		if ( asset[propRef][0] == '#' && depth == 0)  {
+			value = getIndirectPropRef( asset, propRef, 1)
+		}
+
+		return value
+	}
+
+	/**
+	 * Helper closure to find the person by name or email address
+	 * @param String whom - either an email or firstName lastName and it will figure out what to do
+	 * @param List of project staff
+	 * @return Person - if a person was located otherwise null
+	 * @throws RuntimeException if the person is not found
+	 */
+	private def findPerson = { whomToFind, projectStaff ->
+		def person 
+		if (whomToFind.contains('@')) {
+			// Email lookup
+			person = projectStaff.find() { it.email.toLowerCase() == whomToFind.toLowerCase() }
+		} else {
+			def names = whomToFind.toLowerCase().split()
+			if (names.size() == 1) {
+				// Nickname lookup
+				person = projectStaff.find() { it.nickName.toLowerCase() == names[0] }
+			} else if (names.size() == 2) {
+				// Fullname lookup
+				person = projectStaff.find() { it.firstName.toLowerCase() == names[0] && it.lastName.toLowerCase() == names[1] }
+			} else {
+				throw new RuntimeException("Assign person ($whomToFind) due to to many spaces")
+			}
+		}
+
+		return person
+	}
+
+	/**
+	 * Helper closure method used to add missing dependency details onto the stack to wire up tasks later on
+	 * @param Map Array - the list used to track all of the missed dependencies
+	 * @param String key - the lookup key (missedPredKey - assetId_category)
+	 * @param Map Array - the TaskSpec used to create the task(s)
+	 * @param AssetComment task - the task that failed the dependency lookup
+	 * @param Boolean isRequired - the flag if the dependency was required in the taskspec
+	 * @param AssetComment lastMilestoneTask - the current last milestone at the time that the smdTask was created
+	 * @param AssetDependency dependency - the dependency record that was used to link assets together (not always present)
+	 */
+	private def saveMissingDep = { missedDepList, key, taskSpec, task, isRequired, lastMilestoneTask, dependency=null ->
+		missedDepList[key].add( [ taskId:task.id, isRequired:isRequired, msTaskId:lastMilestoneTask?.id , dependency:dependency ] )
+		log.info "saveMissingDep() Added missing predecessor to stack ($key) for task $task. Now have ${missedDepList[key].size()} missed predecessors"
+	}
+
+
+
 }

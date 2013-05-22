@@ -228,6 +228,7 @@ digraph runbook {
 				def fillcolor = taskService.taskStatusColorMap[colorKey][1]
 				def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:task.id, absolute:true])
 
+				// TODO - JPM - outputTaskNode() the following boolean statement doesn't work any other way which is really screwy
 				if ( "${task.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes' ) {
 					fontcolor = taskService.taskStatusColorMap['AUTO_TASK'][0] 
 					color = taskService.taskStatusColorMap['AUTO_TASK'][1]
@@ -248,17 +249,37 @@ digraph runbook {
 				attribs = "color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
 
 				dotText << "\t${task.taskNumber} [label=\"${label}\" URL=\"$url\", style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
+
 			}
 
 		}
 
-		// Iterate over the dependency list outputting the two nodes for each and the relationship
+		// helper closure to output the count node for the adjacent tasks
+		def outputOuterNodeCount = { taskNode, isPred, count ->
+			log.info "neighborhoodGraph() outputing edge node ${taskNode.taskNumber}, Predecessor? ${isPred?'yes':'no'}"
+			def cntNode = "C${taskNode.taskNumber}"
+			dotText << "\t$cntNode [label=\"$count\" tooltip=\"There are $count adjacent task(s)\"];\n" 
+			// dotText << "\t$cntNode [label=\"$count\" style=\"invis\" tooltip=\"There are $count adjacent task(s)\"];\n" 
+			if (isPred) {
+				dotText << "\t$cntNode -> ${taskNode.taskNumber};\n"				
+			} else {
+				dotText << "\t${taskNode.taskNumber} -> $cntNode;\n"
+			}
+		}
+
+		// Iterate over the task dependency list outputting the two nodes in the relationship. If it is an outer node 
 		depList.each() { d ->
-			outputTaskNode(d.assetComment, taskId)
+			outputTaskNode(d.successor, taskId)
 			outputTaskNode(d.predecessor, taskId)
 
 			dotText << "\t${d.predecessor.taskNumber} -> ${d.assetComment.taskNumber};\n"
 
+			// Check for properties predecessorDepCount | successorDepCount to create the outer dependency count nodes
+			if (d.metaClass.hasProperty(d, 'successorDepCount')) {
+				outputOuterNodeCount(d.successor, false, d.successorDepCount)
+			} else if (d.metaClass.hasProperty(d, 'predecessorDepCount')) {
+				outputOuterNodeCount(d.predecessor, true, d.predecessorDepCount)
+			}
 		}
 
 		dotText << "}\n"
