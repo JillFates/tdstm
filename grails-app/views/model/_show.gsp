@@ -227,11 +227,17 @@
 						<input name="id" value="${modelInstance.id}" type="hidden"/>
 						 <input type="hidden" name="redirectTo" value="${redirectTo}" />
 						<span class="button">
+						
 						   <g:if test="${redirectTo=='modelDialog'}">
 								<span class="button"><input type="button" class="save" value="Edit"
 										onclick="showOrEditModelManuDetails('model',${modelInstance?.id},'Model','edit','Edit')" /></span>
 								<span class="button"><input class="create" type="button" value="Merge" onclick="showMergeDialog()"/></span>
-								<g:actionSubmit class="delete" action="delete" value="Delete" onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>
+								<g:if test="${modelRef}">
+									<g:actionSubmit class="delete" action="delete" value="Delete"  disabled="disabled" onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>
+								</g:if>
+								<g:else>
+									<g:actionSubmit class="delete" action="delete" value="Delete"></g:actionSubmit>
+								</g:else>
 								<g:if test="${modelHasPermission && modelInstance?.modelStatus=='full'}">
 								  <input type="button" class="edit" value="Validate" onclick="validateModel(${modelInstance.id})"/>
 								</g:if>
@@ -240,9 +246,16 @@
 								</g:else>
 						   </g:if>
 						   <g:else>
+						   ${modelRef}
 								<g:actionSubmit class="edit" action="edit" value="Edit"></g:actionSubmit>
 								<span class="button"><input class="create" type="button" value="Merge" onclick="showMergeDialog()"/></span>
-								<g:actionSubmit class="delete" action="delete" value="Delete" onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>
+								<g:if test="${modelRef}">
+									<g:actionSubmit class="delete" action="delete" value="Delete"  disabled="disabled" 
+									 onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>
+								</g:if>
+								<g:else>
+									<g:actionSubmit class="delete" action="delete" value="Delete"></g:actionSubmit>
+								</g:else>
 								<g:if test="${modelHasPermission && modelInstance?.modelStatus=='full'}">
 								  <input type="button" class="edit" value="Validate" onclick="validateModel(${modelInstance.id})"/>
 								</g:if>

@@ -252,10 +252,12 @@ class ModelController {
 	        else {
 	        	def modelConnectors = ModelConnector.findAllByModel( model,[sort:"id"] )
 				def modelAkas = WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(model, [sort:'name']).name)
+				def modelRef = isModelReferenced( model )
 				def paramsMap = [ modelInstance : model, modelConnectors : modelConnectors, modelAkas:modelAkas,
-	                  			  modelHasPermission:RolePermissions.hasPermission("ValidateModel"), redirectTo: params.redirectTo ]
+	                  			  modelHasPermission:RolePermissions.hasPermission("ValidateModel"), redirectTo: params.redirectTo, 
+								  modelRef:modelRef]
 				
-				def view = params.redirectTo == "assetAudit" ? "modelAuditView" : (params.redirectTo == "modelDialog" ? "_show" : "show")
+				def view = params.redirectTo == "assetAudit" ? "_modelAuditView" : (params.redirectTo == "modelDialog" ? "_show" : "show")
 				
 				render( view:view, model:paramsMap )
 	        }
@@ -562,40 +564,46 @@ class ModelController {
     }
 
     def delete = {
-        def modelInstance = Model.get(params.id)
-		def principal = SecurityUtils.subject?.principal
-		def user
-		def person
-		if( principal ){
-			user  = UserLogin.findByUsername( principal )
-		    person = user.person
+        def model = Model.get(params.id)
+		def modelRef = isModelReferenced( model )
+		if(!modelRef){
+			def principal = SecurityUtils.subject?.principal
+			def user
+			def person
+			if( principal ){
+				user  = UserLogin.findByUsername( principal )
+			    person = user.person
+			}
+	        if(model) {
+	            try {
+	                model.delete(flush: true)
+					if(user){
+						int bonusScore = person?.modelScoreBonus ? person?.modelScoreBonus:0
+					    person.modelScoreBonus = bonusScore+1
+						int score =  person.modelScore ?: 0
+						person.modelScore = score+bonusScore;
+					}
+					if(!person.save(flush:true)){
+						person.errors.allErrors.each{
+							println it
+							}
+					}
+					
+	                flash.message = "${model} deleted"
+	                redirect(action: "list")
+	            } catch (org.springframework.dao.DataIntegrityViolationException e) {
+	            	flash.message = "${model} not deleted"
+	                redirect(action: "show", id: params.id)
+	            }
+	        }
+	        else {
+	        	flash.message = "Model not found with Id ${params.id}"
+	            redirect(action: "list")
+	        }
+		} else{
+			flash.message = "Model ${model.modelName} can not be deleted, it is referenced ."
+			redirect(action: "list")
 		}
-        if(modelInstance) {
-            try {
-                modelInstance.delete(flush: true)
-				if(user){
-					int bonusScore = person?.modelScoreBonus ? person?.modelScoreBonus:0
-				    person.modelScoreBonus = bonusScore+1
-					int score =  person.modelScore ?: 0
-					person.modelScore = score+bonusScore;
-				}
-				if(!person.save(flush:true)){
-					person.errors.allErrors.each{
-						println it
-						}
-				}
-				
-                flash.message = "${modelInstance} deleted"
-                redirect(action: "list")
-            } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            	flash.message = "${modelInstance} not deleted"
-                redirect(action: "show", id: params.id)
-            }
-        }
-        else {
-        	flash.message = "Model not found with Id ${params.id}"
-            redirect(action: "list")
-        }
     }
     /*
      *  Send FrontImage as inputStream
@@ -1349,5 +1357,23 @@ class ModelController {
 		   columnList.remove('Blade Height')
 		
 		render(template:"compareOrMerge", model:[models:sortedModel, columnList:columnList, hasBladeChassis:hasBladeChassis, hasBlade:hasBlade])
+	}
+	
+	/**
+	 * This Method checks whether model contains any reference or not
+	 * @param model
+	 * @return flag
+	 */
+	def isModelReferenced(model){
+		def flag = false 
+		def assetRef = AssetEntity.findByModel( model )
+		def modelConnRef = ModelConnector.findByModel( model )
+		def modelAliasRef = ModelAlias.findByModel( model )
+		def rackRef = Rack.findByModel( model)
+		
+		if(assetRef || modelConnRef || modelAliasRef || rackRef)
+			flag=true
+			
+	    return flag
 	}
 }
