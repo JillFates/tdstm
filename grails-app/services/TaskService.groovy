@@ -1518,6 +1518,7 @@ class TaskService {
 						
 						isMilestone = true
 						newTask = createTaskFromSpec(recipeId, whom, taskList, ++lastTaskNum, moveEvent, taskSpec, projectStaff, exceptions, workflow)
+						def prevMilestone = lastMilestone
 						lastMilestone = newTask 
 
 						// Identify that this taskSpec is a collection type
@@ -1543,7 +1544,11 @@ class TaskService {
 						log.info "generateRunbook: Found ${tasksNoSuccessors.count()} tasks with no successors for milestone ${taskSpec.id}, $moveEvent"
 					
 						if (tasksNoSuccessors.size()==0 && taskList.size() > 1 ) {
-							out.append("Found no successors for a milestone, which is unexpected but not necessarily wrong - Task $newTask<br/>")
+							if (prevMilestone) {
+								depCount += createTaskDependency( prevMilestone, newTask, taskList, true, out)
+							} else {
+								out.append("Found no successors for a milestone, which is unexpected but not necessarily wrong - Task $newTask<br/>")
+							}
 						}
 						tasksNoSuccessors.each() { p ->
 							// Create dependency as long as we're not referencing the task just created
