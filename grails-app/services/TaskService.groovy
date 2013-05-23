@@ -3132,35 +3132,47 @@ class TaskService {
 	 */
 	private def lookupPerson = { whom, projectStaff ->
 		log.info "lookupPerson() for ($whom) in staff (${projectStaff.size()})"
-		def person 
+		
+		def person, names, lname, fname
+		def tryToFind = true
+
+		if (whom.size() == 0) {
+			return null
+		}
+
 		if (whom.contains('@')) {
 			// Email lookup
 			person = projectStaff.find() { it.email.toLowerCase() == whom.toLowerCase() }
 		} else {
-			//def names = whom.toLowerCase().split()
-			def names = whom.split()
-			if (names.size() == 1) {
-				// Nickname lookup
-				person = projectStaff.find() { SU.equalsIgnoreCase(it.staff.nickName, names[0]) }
-				//person = projectStaff.find() { it.nickName?.toLowerCase() == names[0] }
-			} else if (names.size() == 2) {
-				// Fullname lookup
-				def fname, lname
-				if (names[0].contains(',')) {
-					fname = names[1]
-					lname = names[0].replaceFirst(',')
+			// Lastname, Firstname 
+			if (whom.contains(',')) {
+				names = whom.split(',')
+				fname = names[1].trim()
+				lname = names[0].trim()
+			} else {
+				names = whom.split()
+				if (names.size() == 1) {
+					// Nickname lookup
+					person = projectStaff.find() { SU.equalsIgnoreCase(it.staff.nickName, names[0]) }
+					tryToFind = false
+				} else if (names.size() == 2) {
+					// Firstname Lastname
+					fname = names[0].trim()
+					lname = names[1].trim()
 				} else {
-					fname = names[0]
-					lname = names[1]
+					// Multi-part lastname (e.g. Gabriel Van Helsing)
+					fname = names[0].trim()
+					lname = names[1..-1].join(' ').trim()
 				}
+			}
+			if (tryToFind) {
 				person = projectStaff.find() { SU.equalsIgnoreCase(it.staff.firstName, fname)  &&  SU.equalsIgnoreCase(it.staff.lastName, lname) }
 				if (!person) {
 					log.info "lookupPerson() unable to find person [${fname}] [${lname}]" // : $projectStaff"
 				}
-			} else {
-				throw new RuntimeException("Assign person ($whom) due to to many spaces")
 			}
 		}
+
 		return person?.staff
 	}
 
