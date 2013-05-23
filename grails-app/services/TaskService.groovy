@@ -3040,7 +3040,7 @@ class TaskService {
 				try {
 					whom = getIndirectPropertyRef(task.assetEntity, whom)
 				} catch (e) {
-					exceptions.append("${e.getMessage()}<br/>")
+					exceptions.append("${e.getMessage()}, taskSpec (${taskSpec.id}), task $task<br/>")
 					log.info "doAssignment() Unable to resolve indirect reference (${taskSpec.whom}) for TaskSpec (${taskSpec.id}) - ${e.getMessage()}<br/>"
 					return
 				}
@@ -3093,7 +3093,7 @@ class TaskService {
 	 * @throws RuntimeException if a reference is made to an invalid fieldname
 	 */
 	private def getIndirectPropertyRef = { asset, propertyRef, depth=0 ->
-		log.info "getIndirectPropRef() property=$propertyRef, depth=$depth"
+		log.info "getIndirectPropertyRef() property=$propertyRef, depth=$depth"
 		def value
 		def property = propertyRef	// Want to hold onto the original value for the exception message
 
@@ -3107,11 +3107,15 @@ class TaskService {
 
 		// Check to make sure that the asset has the field referenced
 		if (! asset.metaClass.hasProperty(asset, property) ) {
-			throw new RuntimeException("Invalid property name ($property)")
+			throw new RuntimeException("Invalid property name ($propertyRef) used in name lookup in asset $asset")
 		}
 
-		if ( asset[property][0] == '#' && depth == 0)  {
-			value = getIndirectPropRef( asset, property, 1)
+		if ( asset[property][0] == '#' ) {
+			if (depth == 0)  {
+				value = getIndirectPropertyRef( asset, asset[property], 1)
+			} else {
+				throw new RuntimeException("Multiple nested indirection is not supported name lookup in property $propertyRef for asset $asset")
+			}
 		} else {
 			value = asset[property]
 		}
@@ -3126,27 +3130,35 @@ class TaskService {
 	 * @return Person - if a person was located otherwise null
 	 * @throws RuntimeException if the person is not found
 	 */
-	private def lookupPerson = { whomToFind, projectStaff ->
-		log.info "lookupPerson() for ($whomToFind) in staff (${projectStaff.size()})"
+	private def lookupPerson = { whom, projectStaff ->
+		log.info "lookupPerson() for ($whom) in staff (${projectStaff.size()})"
 		def person 
-		if (whomToFind.contains('@')) {
+		if (whom.contains('@')) {
 			// Email lookup
-			person = projectStaff.find() { it.email.toLowerCase() == whomToFind.toLowerCase() }
+			person = projectStaff.find() { it.email.toLowerCase() == whom.toLowerCase() }
 		} else {
-			//def names = whomToFind.toLowerCase().split()
-			def names = whomToFind.split()
+			//def names = whom.toLowerCase().split()
+			def names = whom.split()
 			if (names.size() == 1) {
 				// Nickname lookup
 				person = projectStaff.find() { SU.equalsIgnoreCase(it.staff.nickName, names[0]) }
 				//person = projectStaff.find() { it.nickName?.toLowerCase() == names[0] }
 			} else if (names.size() == 2) {
 				// Fullname lookup
-				person = projectStaff.find() { SU.equalsIgnoreCase(it.staff.firstName, names[0])  &&  SU.equalsIgnoreCase(it.staff.lastName, names[1]) }
+				def fname, lname
+				if (names[0].contains(',')) {
+					fname = names[1]
+					lname = names[0].replaceFirst(',')
+				} else {
+					fname = names[0]
+					lname = names[1]
+				}
+				person = projectStaff.find() { SU.equalsIgnoreCase(it.staff.firstName, fname)  &&  SU.equalsIgnoreCase(it.staff.lastName, lname) }
 				if (!person) {
-					log.info "lookupPerson() unable to find person [${names[0]}] [${names[1]}]" // : $projectStaff"
+					log.info "lookupPerson() unable to find person [${fname}] [${lname}]" // : $projectStaff"
 				}
 			} else {
-				throw new RuntimeException("Assign person ($whomToFind) due to to many spaces")
+				throw new RuntimeException("Assign person ($whom) due to to many spaces")
 			}
 		}
 		return person?.staff
