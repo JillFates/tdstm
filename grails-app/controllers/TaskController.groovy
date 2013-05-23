@@ -174,18 +174,18 @@ class TaskController {
 		
 		def taskId=params.id
 		if (! taskId || ! taskId.isNumber()) {
-			render "Invalid task id supplied"
+			render "An invalid task id was supplied. Please contact support if this problem persists."
 			return
 		}	
 		def project = securityService.getUserCurrentProject()
 		def rootTask = AssetComment.findByIdAndProject(taskId, project) {
-			render "Task not found"
+			render "Sorry but the task not found. Please contact support if this problem persists."
 			return
 		}
 
 		def depList = taskService.getNeighborhood(taskId)
 		if (depList.size() == 0) {
-			render "No task dependencies found"
+			render "The task has no interdependencies with other tasks so a map wasn't generated."
 			return
 		}
 

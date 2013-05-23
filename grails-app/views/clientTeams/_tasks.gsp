@@ -1,6 +1,7 @@
 <%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus" %>
 <%@page import="com.tds.asset.AssetComment" %>
 <%@page import="com.tdssrc.grails.TimeUtil"%>
+<%@page import="com.tdssrc.grails.HtmlUtil"%>
 <g:set var="now" value="${TimeUtil.nowGMT()}" />
 <%--
 /*
@@ -83,8 +84,14 @@
 							<tds:actionButton label="Done" icon="ui-icon-check" id="${item?.id}"  
 								onclick="changeStatus('${item?.id}','${AssetCommentStatus.DONE}', '${item?.status}', 'taskManager')"/>
 							</g:if>
+
 							<tds:actionButton label="Details..." icon="ui-icon-zoomin" id="${item?.id}"  
 								onclick="issueDetails(${item?.id},'${item?.status}')"/>
+
+							<tds:actionButton label="View Graph" icon="ui-icon-zoomin" id="${item?.id}"  
+								onclick="window.open('${ HtmlUtil.createLink([controller:'task',action:'neighborhoodGraph', id: item?.id]) }','_blank');"  
+							/>
+
 							<g:if test="${ personId != issue.item.assignedTo && issue.item.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]}">
 							<tds:actionButton label="Assign To Me" icon="ui-icon-person" id="${item?.id}"  
 								onclick="assignTask('${item?.id}','${issue.item.assignedTo}', '${issue.item.status}','myTask')"/>
