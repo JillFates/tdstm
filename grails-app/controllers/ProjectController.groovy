@@ -713,6 +713,24 @@ class ProjectController {
 		def entityType = params.entityType
 		def project = securityService.getUserCurrentProject()
 		def data = FieldImportance.findByEntityTypeAndProject(entityType, project)?.config
+		
+		//If config does not exist set the default config.
+		if(!data && project.id != 2){
+			def defaultProj =  Project.read(2) // default project id is '2'.
+			
+			//Fetching default config from default project.
+			def defaultConfig = FieldImportance.findByEntityTypeAndProject(entityType, defaultProj)?.config
+			
+			//Saving it into current project's field importance .
+			def fieldImp = new FieldImportance(entityType:entityType, project:project, config:defaultConfig)
+			if(!fieldImp.save(flush:true)){
+				fieldImp.errors.allErrors.each{
+					log.error it
+				}
+			}
+			data = fieldImp.config
+		}
+		
 		def FieldImportance = data ? JSON.parse(data) : null
 		def returnMap = [assetImp : FieldImportance]
 		if(params.errorMsg)
