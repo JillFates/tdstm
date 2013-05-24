@@ -1,6 +1,6 @@
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
-
-
+/**
+ * The Default project will be used to handle the field preferences and more in feature.
+ **/
 databaseChangeLog = {
 	changeSet(author: "lokanada", id: "2013052 TM-1895-10") {
 	grailsChange {
@@ -71,6 +71,21 @@ databaseChangeLog = {
 				sql.execute("update project set project_id = 2, client_id = 3 where project_id= ${project.id}")
 				sql.execute("update party_group set party_group_id = 2 where party_group_id= ${project.id}")
 				sql.execute("update party set party_id = 2 where party_id= ${project.id}")
+                
+                def updatedProject = Project.read(2)
+                def companyParty = PartyGroup.findByName( "TDS" )
+                def partyRelationshipType = PartyRelationshipType.findById( "PROJ_COMPANY" )
+                def roleTypeFrom = RoleType.findById( "PROJECT" )
+                def roleTypeTo = RoleType.findById( "COMPANY" )
+                
+                def partyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, 
+                                                partyIdFrom:updatedProject, roleTypeCodeFrom:roleTypeFrom, 
+                                                partyIdTo:companyParty, roleTypeCodeTo:roleTypeTo, 
+                                                statusCode:"ENABLED" )
+                if ( ! partyRelationship.validate() || !partyRelationship.save( insert:true, flush:true ) ) {
+                    throw new RuntimeException('Creating partyRelationship failed')
+                }
+        
 				
 			}
 		}
