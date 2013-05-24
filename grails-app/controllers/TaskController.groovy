@@ -241,7 +241,7 @@ digraph runbook {
 
 				// Make the center root task stand out
 				if ("${task.id}" == rootId) {
-					style = "dashed, bold"
+					style = "dashed, bold, filled"
 				} else {
 					style = styleDef
 				}
@@ -326,6 +326,7 @@ digraph runbook {
 		
 		def query = """
 			SELECT 
+			  t.asset_comment_id AS id,
 			  t.task_number, 
 			  GROUP_CONCAT(s.task_number SEPARATOR ',') AS successors,
 			  IFNULL(a.asset_name,'') as asset, 
@@ -395,8 +396,10 @@ digraph runbook {
 			// style = mode == 's' ? "fillcolor=\"${taskService.taskStatusColorMap[colorKey][1]}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\", style=filled" : ''
 			attribs = "color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
 
+			def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:"${it.id}", absolute:true])
+
 		    task = (task.size() > 35) ? task[0..34] : task 
-			dotText << "\t${it.task_number} [label=\"${task}\" style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
+			dotText << "\t${it.task_number} [label=\"${task}\"  URL=\"$url\", style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
 			def successors = it.successors
 			if (successors) {
 				successors = (successors as Character[]).join('')
