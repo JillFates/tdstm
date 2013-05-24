@@ -66,10 +66,10 @@ class WsDashboardController {
 
 				def taskStatsSql = """
 					SELECT 
-						wt.workflow_transition_id AS wfTranId, 
-						mbs.transition_id AS tid,
-						ss.id AS snapshotId,
-						mbs.label AS label, 
+						t.workflow_transition_id AS wfTranId, 
+						wft.trans_id AS tid,
+						0 AS snapshotId,
+						mbs.label, 
 						mbs.calc_method AS calcMethod,
 						SUM(IF(t.asset_comment_id IS NULL, 0, 1)) AS tskTot,
 						SUM(IF(t.status='Pending',1,0)) AS tskPending,
@@ -82,15 +82,13 @@ class WsDashboardController {
 						DATE_FORMAT( mb.completion_time ,'%Y/%m/%d %r') AS planComp,
 						DATE_FORMAT( MIN(IFNULL(t.act_start, t.date_resolved)),'%Y/%m/%d %r') AS actStart,
 						DATE_FORMAT( MAX(t.date_resolved), '%Y/%m/%d %r' ) AS actComp
-					FROM move_bundle_step mbs
-					JOIN move_bundle mb ON mb.move_bundle_id=mbs.move_bundle_id
-					JOIN workflow wf ON wf.process=mb.workflow_code
-					JOIN workflow_transition wt ON wt.workflow_id=wf.workflow_id AND wt.trans_id=mbs.transition_id 
-					LEFT OUTER JOIN asset_entity a ON a.move_bundle_id=mbs.move_bundle_id
-					LEFT OUTER JOIN asset_comment t ON t.workflow_transition_id=wt.workflow_transition_id AND t.asset_entity_id=a.asset_entity_id
-					LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id 
-					where mbs.move_bundle_id=${moveBundleId}
-					group by wt.workflow_transition_id;
+					FROM asset_entity a
+					JOIN asset_comment t ON t.asset_entity_id = a.asset_entity_id
+					JOIN workflow_transition wft ON wft.workflow_transition_id=t.workflow_transition_id
+					JOIN move_bundle mb ON mb.move_bundle_id=a.move_bundle_id
+					JOIN move_bundle_step mbs ON mbs.move_bundle_id=a.move_bundle_id AND mbs.transition_id=wft.trans_id
+					WHERE a.move_bundle_id = ${moveBundleId}
+					GROUP BY t.workflow_transition_id;
 				"""
 				
 				dataPointsForEachStep = jdbcTemplate.queryForList(taskStatsSql)
