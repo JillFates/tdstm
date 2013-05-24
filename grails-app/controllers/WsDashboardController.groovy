@@ -1,10 +1,14 @@
 import grails.converters.JSON
 import java.text.SimpleDateFormat
+
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
+
 class WsDashboardController {
 	
 	def jdbcTemplate
 	def securityService
+	def taskService
 
 	/**
 	 * This control returns the data used to render the Event Dashboard including the work flow steps and the statistics of 
@@ -57,6 +61,9 @@ class WsDashboardController {
 		// Get the step data either by runbook tasks or     	
     	if (moveBundle) {
 	    	if (project.runbookOn) {
+
+	    		// TODO - remove references to mbs MoveBundleStep 
+
 				def taskStatsSql = """
 					SELECT 
 						wt.workflow_transition_id AS wfTranId, 
@@ -71,10 +78,10 @@ class WsDashboardController {
 						SUM(IF(t.status='Completed',1,0)) AS tskComp,
 						SUM(IF(t.status='Hold',1,0)) AS tskHold,
 						ROUND(IF(count(*)>0,SUM(IF(t.status='Completed',1,0))/count(*)*100,100)) AS percComp,
-						DATE_FORMAT( mbs.plan_start_time ,'%Y/%m/%d %r') AS planStart,
-						DATE_FORMAT( mbs.plan_completion_time ,'%Y/%m/%d %r') AS planComp,
-						MIN(IF(ISNULL(t.act_start),t.date_resolved, t.act_start)) AS actStart,
-						MAX(t.date_resolved) AS actComp
+						DATE_FORMAT( mb.start_time ,'%Y/%m/%d %r') AS planStart,
+						DATE_FORMAT( mb.completion_time ,'%Y/%m/%d %r') AS planComp,
+						DATE_FORMAT( MIN(IFNULL(t.act_start, t.date_resolved)),'%Y/%m/%d %r') AS actStart,
+						DATE_FORMAT( MAX(t.date_resolved), '%Y/%m/%d %r' ) AS actComp
 					FROM move_bundle_step mbs
 					JOIN move_bundle mb ON mb.move_bundle_id=mbs.move_bundle_id
 					JOIN workflow wf ON wf.process=mb.workflow_code
@@ -87,6 +94,8 @@ class WsDashboardController {
 				"""
 				
 				dataPointsForEachStep = jdbcTemplate.queryForList(taskStatsSql)
+
+				// log.info "bundleData() SQL = $taskStatsSql"
 
 	    	} else {
 
@@ -134,7 +143,7 @@ class WsDashboardController {
 			}
 		}
 
-		def sysTime = GormUtil.convertInToGMT( "now", "EDT" )
+		def sysTime = TimeUtil.nowGMT()
 		def sysTimeInMs = sysTime.getTime() / 1000
 		def sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss a");
 
@@ -158,7 +167,8 @@ class WsDashboardController {
 			}
 			
 			if( !data.actComp ){
-				if( sysTimeInMs > planCompTime+59 && data.tskComp < data.tskTot){  // 59s added to planCompletion to consider the minuits instead of seconds 
+				// 59s is added to planCompletion to consider the minutes instead of seconds 
+				if( sysTimeInMs > planCompTime+59 && data.tskComp < data.tskTot) {  
 					data.put( "percentageStyle", "step_statusbar_bad" )
 				} else{
 					def remainingStepTime = planCompTime - sysTimeInMs
@@ -191,13 +201,17 @@ class WsDashboardController {
 					data.put( "percentageStyle", "step_statusbar_good" )
 				}*/
 			} else {
-				def actCompTime = new Date( data.actComp?.getTime() ).getTime() / 1000
+				def actCompTime = new Date( data.actComp ).getTime() / 1000
 				if( actCompTime > planCompTime+59 ){  // 59s added to planCompletion to consider the minutes instead of seconds 
 					data.put( "percentageStyle", "step_statusbar_bad" )
 				} else {
 					data.put( "percentageStyle", "step_statusbar_good" )
 				}
 			}
+
+			def dialIndicator = taskService.calcStepDialIndicator ( moveBundle.startTime, moveBundle.completionTime, 
+				data.actStart, data.actFinish, (data.tskTot ? data.tskTot : 0), data.tskComp)
+			data.put('dialInd', dialIndicator)
 		}
 		
 		def planSumCompTime

@@ -893,87 +893,14 @@
 		}
 		
 	}
-	<%--
-	function getDialsData( bundleId ) {
-		 var moveEvent = $("#moveEvent").val()
-		 if(doUpdate){
-			 jQuery.ajax({
-			        type:"GET",
-			        async : true,
-			        cache: false,
-			        url:"../ws/dashboard/bundleData/"+ bundleId+"?moveEventId="+moveEvent,
-			        dataType: 'json',
-			        success:updateDials,
-	                error:function (xhr, ajaxOptions, thrownError){
-				 		if(doUpdate && errorCode ==  xhr.status ){
-			            	clearInterval(handler);
-			            	$("#update").css("color","red");
-			            	if( xhr.status == "403"){
-			             		alert("403 Forbidden occurred, user don't have permission to load the current project data.");
-			             	}
-				 		} else {
-				 			errorCode = xhr.status;
-				 		}    
-			 		}     
-			});
-		 }
-	 }
-	function updateDials( bundleMap ) {
-		try{
-			var snapshot = bundleMap.snapshot;
-			var moveBundleId = snapshot.moveBundleId;
-			var steps = snapshot.steps;
-			var revSum = snapshot.revSum;
-			var planSum = snapshot.planSum
-	
-			if( snapshot.planDelta > 0){
-				$(".sum_statusbar_good").attr("class","sum_statusbar_bad")
-				$("#status_color").html("RED")
-			} else {
-				$(".sum_statusbar_bad").attr("class","sum_statusbar_good")
-				$("#status_color").html("GREEN")
-			}
-			updateSummaryGauge("summary_gauge",planSum.dialInd ? planSum.dialInd : '50');
-			
-			if(snapshot.revisedComp) {
-				updateSummaryGauge("revised_gauge",revSum.dialInd)
-			}
-			for( i = 0; i < steps.length; i++ ) {
-				var percentage = $("#percentage_"+moveBundleId+"_"+steps[i].tid).html()
-				if(percentage != "100%" && percentage != "0%"){
-					<shiro:hasAnyRole in="['ADMIN']">
-					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).show();
-					post_init( "chart_"+moveBundleId+"_"+steps[i].tid, steps[i].dialInd )
-					</shiro:hasAnyRole>
-				} else {
-					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).hide();
-				}
-			}
-			clearTimeout(timer)
-			dialReload = false;
-		} catch(ex){alert(ex)}
-		
-	}  --%>
+
 	/* function to render the dials */
 	function post_init( divId, dialInd ){
-
 		var dInd = dialInd % 2 == 0 ? dialInd : dialInd+1
 		var src = "../i/dials/dial-"+dInd+"sm.png";
         $("#"+divId).attr("src", src);
         $("#"+divId).attr("title", dialInd);
 		
-		<%--try{
-			//var myChart = new FusionCharts("${resource(dir:'swf',file:'AngularGauge.swf')}", "myChartId2b", "100", "75", "0", "0");
-			updateChartXML( divId, stepDialData( dialInd ) ); 
-			//myChart.setDataXML( xmlData );
-			//myChart.render(divId);
-		} catch(e){
-			if(doUpdate){
-				clearInterval(handler);
-	      		doUpdate = false;
-	      		$("#update").css("color","red")
-			}
-		} --%>
 	}
 	function updateSummaryGauge( divId, dialInd ){
 		var dInd = dialInd % 2 == 0 ? dialInd : dialInd+1
@@ -985,12 +912,6 @@
 		//myChart.setDataXML( xmlData );
 	   	//myChart.render(divId); --%>
 	}
-	<%--function updateRevisedGauge( divId, dialInd ){
-		   //var myChart = new FusionCharts("${resource(dir:'swf',file:'AngularGauge.swf')}", "myChartId1", "180", "136", "0", "0");
-		updateChartXML( divId, revisedDialData( dialInd ) ); 
-	    //myChart.setDataXML( xmlData );
-	   	//myChart.render(divId); 
-	}--%>
 	/*
 	will popup the dialog to create news
 	*/
