@@ -35,6 +35,7 @@ class CommentService {
 	def securityService
 	def taskService
 
+	// TODO : This should use an array defined in AssetCommentCategory instead as that is where people will add new statuses
 	private final List<String> statusToSendEmailFor = [
 		AssetCommentCategory.GENERAL,
 		AssetCommentCategory.DISCOVERY,
