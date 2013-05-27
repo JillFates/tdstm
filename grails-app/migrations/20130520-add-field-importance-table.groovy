@@ -24,4 +24,16 @@ databaseChangeLog = {
 			column(name:"project_id")
 		}
 	}
+	changeSet(author: "lokanada", id: "20130527 TM-1895-1") {
+		comment('adding "phase" column in "field importance" table ')
+		
+		preConditions(onFail:'MARK_RAN') {
+			not {
+				columnExists(schemaName:'tdstm', tableName:'field_importance', columnName:'phase' )
+			}
+		}
+		addColumn(tableName: "field_importance") {
+			column(name: "phase", type: "varchar(25)")
+		}
+	}
 }

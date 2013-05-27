@@ -4,7 +4,11 @@
    */
 
 function assetFieldImportanceCtrl($scope,$http) {
-	$scope.newObject={}; // initializing jsonObject
+	$scope.Discovery={}; 
+	$scope.Validated={};
+	$scope.DependencyReview={};
+	$scope.DependencyScan={};// initializing jsonObject
+	$scope.BundleReady={};
 	$scope.fields = returnMap
 	
   
@@ -33,17 +37,30 @@ function assetFieldImportanceCtrl($scope,$http) {
 			}).success (function(resp) {
 				if(!resp.errorMsg){
 					var importSign = {"C":'!!!', 'V':'!!', 'I':'!'} 
-					var data
-					if(resp.assetImp){
-						data = resp.assetImp
-						$scope.newObject=data
-					}
+					Object.keys(resp).forEach(function(key) {
+						var data = resp[ key ]
+						var phase = key
+						if(data){
+							if(phase=="Discovery")
+								$scope.Discovery=data
+							else if(phase=="Validated")
+								$scope.Validated=data
+							else if(phase=="DependencyReview")
+								$scope.DependencyReview=data
+							else if(phase=="DependencyScan")
+								$scope.DependencyScan=data
+							else if(phase=="BundleReady")
+								$scope.BundleReady=data
+						}
 						
-					Object.keys(data).forEach(function(key) {
-				        var value = data [key]
-				        $("#"+key).html(importSign[value])
-				        $("#td_"+key).addClass(value);
-				    });
+						Object.keys(data).forEach(function(key) {
+					        var value = data [key]
+					        $("#"+phase+"_"+key).html(importSign[value])
+					        $("#td_"+phase+"_"+key).addClass(value);
+					    });
+					})
+					
+					
 					$(".assetDivId").show();
 					$("#showId").hide();
 					$("#hideId").show();
@@ -60,21 +77,37 @@ function assetFieldImportanceCtrl($scope,$http) {
 		$http({
 			url : contextPath+"/project/updateFieldImportance",
 			method: "POST",
-			data:{'jsonString':$("#jsonId").val(), 'entityType':type}
+			data:{'config':{'Discovery_jsonString':$("#disJsonId").val(), 'Validated_jsonString':$("#vlJsonId").val(),
+				  'DependencyReview_jsonString':$("#drJsonId").val(),'DependencyScan_jsonString':$("#dsJsonId").val(),
+				  'BundleReady_jsonString':$("#brJsonId").val()},'entityType':type}
 			}).success (function(resp) {
 				if(!resp.errorMsg){
 					var importSign = {"C":'!!!', 'V':'!!', 'I':'!'} 
-					$(".radioShow").hide()
-					var data = resp.assetImp
-					if(data){
-						$scope.newObject=data
-					}
-					Object.keys(data).forEach(function(key) {
-				        var value = data [key]
-				        $("#"+key).html(importSign[value])
-				        $("#td_"+key).addClass(value);
-					});
+					Object.keys(resp).forEach(function(key) {
+						var data = resp[ key ]
+						var phase = key
+						if(data){
+							if(phase=="Discovery")
+								$scope.Discovery=data
+							else if(phase=="Validated")
+								$scope.Validated=data
+							else if(phase=="DependencyReview")
+								$scope.DependencyReview=data
+							else if(phase=="DependencyScan")
+								$scope.DependencyScan=data
+							else if(phase=="BundleReady")
+								$scope.BundleReady=data
+						}
+						
+						Object.keys(data).forEach(function(key) {
+					        var value = data [key]
+					        $("#"+phase+"_"+key).html(importSign[value])
+					        $("#td_"+phase+"_"+key).addClass(value);
+					    });
+					})
+					
 					$(".radioEdit").show()
+					$(".radioShow").hide();
 					$("#edit").show();
 					$("#update").hide();
 				} else {

@@ -1,6 +1,5 @@
 package com.tds.asset
 
-
 import Manufacturer
 import Model
 import MoveBundle
@@ -11,8 +10,9 @@ import Rack
 import Room
 
 import java.util.Date
-import com.tdssrc.grails.GormUtil
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
+import com.tdsops.tm.enums.domain.ValidationType;
+import com.tdssrc.grails.GormUtil
 
 
 class AssetEntity extends com.tdssrc.eav.EavEntity {
@@ -211,7 +211,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		sourceTeamDba( nullable:true )
 		targetTeamDba( nullable:true )
 
-		validation( blank:true, nullable:true, inList:['Discovery','Validated','DependencyReview','DependencyScan','BundleReady'] )		
+		validation( blank:true, nullable:true, inList:ValidationType.getList() )		
 		currentStatus( nullable:true )
 		dependencyBundle( nullable:true )
 	}

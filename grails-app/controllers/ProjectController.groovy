@@ -691,14 +691,11 @@ class ProjectController {
 		//DS stands for DependencyScan
 		//BR stands for BundleReady
 		
-		def validationsMap = [["name":"DIS", "imp": importanceMap], ["name":"VL",  "imp": importanceMap],
-			["name":"DR",  "imp": importanceMap],["name":"DS",  "imp": importanceMap], ["name":"BR",  "imp": importanceMap]]
-		
 		def eavEntityType = EavEntityType.findByDomainName('AssetEntity')
 		def attributes = EavAttribute.findAllByEntityType( eavEntityType )
 		def returnMap = []
 		attributes.each{prop->
-			returnMap << ['name':prop.frontendLabel, 'property':prop.attributeCode, 'validations':validationsMap]
+			returnMap << ['name':prop.frontendLabel, 'property':prop.attributeCode, 'importance':importanceMap]
 		}
 	  
 		return [returnMap : returnMap as JSON]
@@ -712,10 +709,18 @@ class ProjectController {
 	def showFieldImportance ={
 		def entityType = params.entityType
 		def project = securityService.getUserCurrentProject()
-		def data = FieldImportance.findByEntityTypeAndProject(entityType, project)?.config
-		
-		//If config does not exist set the default config.
-		if(!data && project.id != 2){
+		def phase = ['Discovery', 'Validated', 'DependencyReview', 'DependencyScan', 'BundleReady']
+		def phaseMap = [:]
+		def data
+		phase.each{ph->
+			data = FieldImportance.find("from FieldImportance where project=:project and entityType=:entityType and phase=:phase",
+				 [project:project, entityType:entityType, phase:ph])?.config
+			if(data) 
+				phaseMap << [(ph):JSON.parse(data)]
+				
+		}
+		 //this is commented for now untill John enabled default Project migration script.
+		/*if(!data && project.id != 2){
 			def defaultProj =  Project.read(2) // default project id is '2'.
 			
 			//Fetching default config from default project.
@@ -729,14 +734,9 @@ class ProjectController {
 				}
 			}
 			data = fieldImp.config
-		}
-		
-		def FieldImportance = data ? JSON.parse(data) : null
-		def returnMap = [assetImp : FieldImportance]
-		if(params.errorMsg)
-			returnMap << ['errorMsg':params.errorMsg]
+		}*/
 			
-		render returnMap as JSON
+		render phaseMap as JSON
 	}
 	
 	/**
@@ -747,27 +747,28 @@ class ProjectController {
 	def updateFieldImportance ={
 		def entityType = request.JSON.entityType
 		def project = securityService.getUserCurrentProject()
-		def assetImp = FieldImportance.findByEntityTypeAndProject(entityType, project)
-		def data = request.JSON.jsonString
-		def errorMsg = ""
+		def allConfig = request.JSON.config
 		try{
-			if(data)
-				def jsonInput = new JSONObject(data)
-			
-			if(!assetImp)
-				assetImp = new FieldImportance('entityType':entityType, 'config':data, 'project':project)
-			else
-				assetImp.config = data
-				
-			if(!assetImp.save()){
-				assetImp.errors.allErrors.each{
-					log.error it
+			allConfig.each{key, value->
+				def phase = key.split("_")[0]
+				def assetImp = FieldImportance.find("from FieldImportance where project=:project and entityType=:entityType\
+						and phase=:phase", [project:project, entityType:entityType, phase:phase])
+				def jsonInput = new JSONObject(value)
+					
+				if(!assetImp)
+					assetImp = new FieldImportance('entityType':entityType, 'config':value, 'project':project, 'phase':phase)
+				else{
+					assetImp.config = value
+					assetImp.phase = phase
+				}
+				if(!assetImp.save()){
+					assetImp.errors.allErrors.each{
+						log.error it
+					}
 				}
 			}
 		} catch(Exception ex){
 			log.error "An error occurred : ${ex}"
-			errorMsg+= "${ex}"
-			params << [errorMsg:ex]
 		}
 		
 		// TODO : Send error message back
