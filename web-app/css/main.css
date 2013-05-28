@@ -443,28 +443,31 @@ span.cellWithoutBackground
 	overflow:hidden; 
 	text-overflow:ellipsis;
 }
-.assetFieldTable {
-	width: 67%;
-	margin-left: 150px;
-}
 
-.assetFieldSpan {
-	margin-left: 50px;
-	cursor: pointer;
+.fieldTable{
+	border:0px;
+	width :auto;
+	margin-left: 10px;
 }
 
 .assetFieldHeader1 {
 	margin-left: 10px;
 }
 
-.assetFieldHeader2 {
-	margin-left: 40px;
-}
-
-.assetFieldbutton {
-	margin-left: 150px;
-}
-
 .C{
 	background-color:LightGreen;
+}
+#stylingNoteId{
+	display:none;
+	position:absolute;
+	margin-left:850px;
+	width:350px;
+}
+
+div.field_list{
+	border: 1px solid #63A242;
+	display: none;
+}
+div.field_list table {
+	border: 0px;
 }

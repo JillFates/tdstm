@@ -19,7 +19,7 @@
 				<td id="td_${assetType.value}_${validation}_{{field.property}}" class="tdClass_{{field.property}}_${validation}_${assetType.value}">
 					<span id="${assetType.value}_${validation}_{{field.property}}" class="radioEdit_${assetType.value}">&nbsp;</span>
 					<span ng-repeat="imp in field.importance" class="radioShow_${assetType.value}" style="display: none;">
-					<input type="radio" ng-model="AE_${validation}[field.property]" ng-change="radioChange(imp.name,field.property,'${validation}','${assetType.value}')"
+					<input type="radio" ng-model="DB_${validation}[field.property]" ng-change="radioChange(imp.name,field.property,'${validation}','${assetType.value}')"
 						name="${assetType.value}_${validation}_{{field.name}}" value="{{imp.name}} " id="${assetType.value}_${validation}_{{field.property}}-{{imp.name}}" />{{imp.sy}}
 					</span>
 				</td>
@@ -35,9 +35,9 @@
 		</tds:hasPermission>
 	</span>
 </div>
-<input type="hidden" id="${assetType.value}_disJsonId" value="{{AE_Discovery}}" />
-<input type="hidden" id="${assetType.value}_vlJsonId" value="{{AE_Validated}}" />
-<input type="hidden" id="${assetType.value}_drJsonId" value="{{AE_DependencyReview}}" />
-<input type="hidden" id="${assetType.value}_dsJsonId" value="{{AE_DependencyScan}}" />
-<input type="hidden" id="${assetType.value}_brJsonId" value="{{AE_BundleReady}}" />
+	<input type="hidden" id="${assetType.value}_disJsonId" value="{{DB_Discovery}}" />
+	<input type="hidden" id="${assetType.value}_vlJsonId" value="{{DB_Validated}}" />
+	<input type="hidden" id="${assetType.value}_drJsonId" value="{{DB_DependencyReview}}" />
+	<input type="hidden" id="${assetType.value}_dsJsonId" value="{{DB_DependencyScan}}" />
+	<input type="hidden" id="${assetType.value}_brJsonId" value="{{DB_BundleReady}}" />
 </div>

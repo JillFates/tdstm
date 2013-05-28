@@ -13,4 +13,7 @@ class EntityType {
 	static final getList() {
 		return [ AE, APP, DB, STORAGE ]
 	}
+	static final getListAsMap() {
+		return [ asset:AE, app:APP, db:DB, file:STORAGE ]
+	}
 }

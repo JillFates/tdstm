@@ -8,6 +8,7 @@ import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
 
 import com.tds.asset.FieldImportance
+import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
@@ -676,29 +677,28 @@ class ProjectController {
 	}
 	
 	/**
-	 * This action is used to create json data to redirect on assetFields and populate over there 
+	 * This action is used to render the static page
 	 */
 	def assetFields ={
 		
-		//C stands for CRITICAL
-		//V stands for valuable
-		//I stands for ignore
+		return []
+	}
+	
+    /**
+     * To create json data to for a given entity type
+     *@param : entityType type of entity.
+	 *@return : json data
+     */
+	def getAssetFields ={
+		
+		def assetType=params.entityType
+		
 		def importanceMap = [["name":"C","sy":"!!"],["name":"V","sy":"!"],["name":"I","sy":"X"]]
-		
-		//DIS stands for Discovery
-		//VL stands for Validated
-		//DR stands for DependencyReview
-		//DS stands for DependencyScan
-		//BR stands for BundleReady
-		
-		def eavEntityType = EavEntityType.findByDomainName('AssetEntity')
+				
+		def eavEntityType = EavEntityType.findByDomainName(assetType)
 		def attributes = EavAttribute.findAllByEntityType( eavEntityType )
-		def returnMap = []
-		attributes.each{prop->
-			returnMap << ['name':prop.frontendLabel, 'property':prop.attributeCode, 'importance':importanceMap]
-		}
-	  
-		return [returnMap : returnMap as JSON]
+		def returnMap = attributes.collect{prop-> return ['name':prop.frontendLabel, 'property':prop.attributeCode, 'importance':importanceMap]	}
+		render returnMap as JSON
 	}
 	
 	/**
@@ -709,7 +709,7 @@ class ProjectController {
 	def showFieldImportance ={
 		def entityType = params.entityType
 		def project = securityService.getUserCurrentProject()
-		def phase = ['Discovery', 'Validated', 'DependencyReview', 'DependencyScan', 'BundleReady']
+		def phase = ValidationType.getList()
 		def phaseMap = [:]
 		def data
 		phase.each{ph->

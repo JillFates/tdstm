@@ -13,13 +13,13 @@
 		<tr>
 		<td id="imageId_${assetType.value}" style="display: none;"><img src="../images/processing.gif" /></td>
 		</tr>
-		<tr ng-repeat="field in ${assetType.value}">
+		<tr ng-repeat="field in ${assetType.value.value}">
 			<td>{{field.name}}</td>
 			<g:each in="${ValidationType.list}" var="validation">
-				<td id="td_${assetType.value}_${validation}_{{field.property}}" class="tdClass_{{field.property}}_${validation}_${assetType.value}">
+				<td id="td_${assetType.value.value}_${validation}_{{field.property}}" class="tdClass_{{field.property}}_${validation}_${assetType.value}">
 					<span id="${assetType.value}_${validation}_{{field.property}}" class="radioEdit_${assetType.value}">&nbsp;</span>
 					<span ng-repeat="imp in field.importance" class="radioShow_${assetType.value}" style="display: none;">
-					<input type="radio" ng-model="AE_${validation}[field.property]" ng-change="radioChange(imp.name,field.property,'${validation}','${assetType.value}')"
+					<input type="radio" ng-model="F_${validation}[field.property]" ng-change="radioChange(imp.name,field.property,'${validation}','${assetType.value}')"
 						name="${assetType.value}_${validation}_{{field.name}}" value="{{imp.name}} " id="${assetType.value}_${validation}_{{field.property}}-{{imp.name}}" />{{imp.sy}}
 					</span>
 				</td>
@@ -35,9 +35,9 @@
 		</tds:hasPermission>
 	</span>
 </div>
-<input type="hidden" id="${assetType.value}_disJsonId" value="{{AE_Discovery}}" />
-<input type="hidden" id="${assetType.value}_vlJsonId" value="{{AE_Validated}}" />
-<input type="hidden" id="${assetType.value}_drJsonId" value="{{AE_DependencyReview}}" />
-<input type="hidden" id="${assetType.value}_dsJsonId" value="{{AE_DependencyScan}}" />
-<input type="hidden" id="${assetType.value}_brJsonId" value="{{AE_BundleReady}}" />
+	<input type="hidden" id="${assetType.value}_disJsonId" value="{{F_Discovery}}" />
+	<input type="hidden" id="${assetType.value}_vlJsonId" value="{{F_Validated}}" />
+	<input type="hidden" id="${assetType.value}_drJsonId" value="{{F_DependencyReview}}" />
+	<input type="hidden" id="${assetType.value}_dsJsonId" value="{{F_DependencyScan}}" />
+	<input type="hidden" id="${assetType.value}_brJsonId" value="{{F_BundleReady}}" />
 </div>

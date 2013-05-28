@@ -19,14 +19,14 @@
 				<td id="td_${assetType.value}_${validation}_{{field.property}}" class="tdClass_{{field.property}}_${validation}_${assetType.value}">
 					<span id="${assetType.value}_${validation}_{{field.property}}" class="radioEdit_${assetType.value}">&nbsp;</span>
 					<span ng-repeat="imp in field.importance" class="radioShow_${assetType.value}" style="display: none;">
-					<input type="radio" ng-model="AE_${validation}[field.property]" ng-change="radioChange(imp.name,field.property,'${validation}','${assetType.value}')"
+					<input type="radio" ng-model="APP_${validation}[field.property]" ng-change="radioChange(imp.name,field.property,'${validation}','${assetType.value}')"
 						name="${assetType.value}_${validation}_{{field.name}}" value="{{imp.name}} " id="${assetType.value}_${validation}_{{field.property}}-{{imp.name}}" />{{imp.sy}}
 					</span>
 				</td>
 			</g:each>		
 		</tr>
 	</table>
-</div>
+	</div>
 <div class="buttons">
 	<span class="button">
     	<input id="update_${assetType.value}" class="save" type="button" value="Update" ng-click="updateAssetForm('${assetType.value}')" style="display: none" />
@@ -35,9 +35,9 @@
 		</tds:hasPermission>
 	</span>
 </div>
-<input type="hidden" id="${assetType.value}_disJsonId" value="{{AE_Discovery}}" />
-<input type="hidden" id="${assetType.value}_vlJsonId" value="{{AE_Validated}}" />
-<input type="hidden" id="${assetType.value}_drJsonId" value="{{AE_DependencyReview}}" />
-<input type="hidden" id="${assetType.value}_dsJsonId" value="{{AE_DependencyScan}}" />
-<input type="hidden" id="${assetType.value}_brJsonId" value="{{AE_BundleReady}}" />
+	<input type="hidden" id="${assetType.value}_disJsonId" value="{{APP_Discovery}}" />
+	<input type="hidden" id="${assetType.value}_vlJsonId" value="{{APP_Validated}}" />
+	<input type="hidden" id="${assetType.value}_drJsonId" value="{{APP_DependencyReview}}" />
+	<input type="hidden" id="${assetType.value}_dsJsonId" value="{{APP_DependencyScan}}" />
+	<input type="hidden" id="${assetType.value}_brJsonId" value="{{APP_BundleReady}}" />
 </div>
