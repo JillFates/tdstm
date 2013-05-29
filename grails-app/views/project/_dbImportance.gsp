@@ -11,7 +11,7 @@
 			<th>BundleReady</th>
 		</tr>
 		<tr>
-		<td id="imageId_${assetType.value}" style="display: none;"><img src="../images/processing.gif" /></td>
+		<td id="imageId_${assetType.value}" style="display: none;"><img src="${resource(dir:'images',file:'processing.gif')}" /></td>
 		</tr>
 		<tr ng-repeat="field in ${assetType.value}">
 			<td>{{field.name}}</td>
@@ -29,7 +29,8 @@
 </div>
 <div class="buttons">
 	<span class="button">
-    	<input id="update_${assetType.value}" class="save" type="button" value="Update" ng-click="updateAssetForm('${assetType.value}')" style="display: none" />
+    	<input class="update_${assetType.value} save" type="button" value="Update" ng-click="updateAssetForm('${assetType.value}')" style="display: none" />
+		<input class="update_${assetType.value} delete" type="button" value="Cancel" ng-click="cancelAssetForm('${assetType.value}')" style="display: none" />
 		<tds:hasPermission permission='ProjectEditView'>
 			<input id="edit_${assetType.value}" class="edit" type="button" value="Edit" ng-click="editAssets('${assetType.value}')" />
 		</tds:hasPermission>

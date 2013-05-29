@@ -68,6 +68,7 @@ function assetFieldImportanceCtrl($scope,$http) {
 			$("#hideId_"+type).show();
 		} else {
 			$(".assetDivId_"+type).hide();
+			$scope.cancelAssetForm(type);
 			$("#hideId_"+type).hide();
 			$("#showId_"+type).show();
 			var visable = false
@@ -77,14 +78,18 @@ function assetFieldImportanceCtrl($scope,$http) {
 			if(!visable) $("#stylingNoteId").hide(); 
 		}
 	}
-	
 	$scope.editAssets = function(type) {
 		$(".radioShow_"+type).show();
 		$(".radioEdit_"+type).hide();
-		$("#update_"+type).show();
+		$(".update_"+type).show();
 		$("#edit_"+type).hide();
 	}
-	
+	$scope.cancelAssetForm = function(type){
+		$(".radioShow_"+type).hide();
+		$(".radioEdit_"+type).show();
+		$(".update_"+type).hide();
+		$("#edit_"+type).show();
+	}
 	$scope.showAssetForm = function(type) {
 		$http({
 			url : contextPath+"/project/showFieldImportance",
@@ -99,7 +104,6 @@ function assetFieldImportanceCtrl($scope,$http) {
 						if(data){
 							$scope.assignData(data,type,phase)
 						}
-						
 						Object.keys(data).forEach(function(key) {
 					        var value = data [key]
 					        $("#"+type+"_"+phase+"_"+key).html(importSign[value])
@@ -113,8 +117,6 @@ function assetFieldImportanceCtrl($scope,$http) {
 				alert("An Unexpected error while showing the asset fields.")
 			});
 	}
-	
-	
 	$scope.updateAssetForm = function(type) {
 		$http({
 			url : contextPath+"/project/updateFieldImportance",
@@ -131,18 +133,16 @@ function assetFieldImportanceCtrl($scope,$http) {
 						if(data){
 							$scope.assignData(data,type,phase)
 						}
-						
 						Object.keys(data).forEach(function(key) {
 					        var value = data [key]
 					        $("#"+type+"_"+phase+"_"+key).html(importSign[value])
 					        $("#td_"+type+"_"+phase+"_"+key).addClass(value);
 					    });
 					})
-					
 					$(".radioEdit_"+type).show()
 					$(".radioShow_"+type).hide();
 					$("#edit_"+type).show();
-					$("#update_"+type).hide();
+					$(".update_"+type).hide();
 				} else {
 					alert(resp.errorMsg)
 				}
@@ -150,15 +150,12 @@ function assetFieldImportanceCtrl($scope,$http) {
 				alert("An Unexpected error while showing the asset fields.")
 			});
 	}
-	
 	$scope.radioChange = function(value,field,name,type) {
 		if(value=='C')
 			$(".tdClass_"+field+"_"+name+"_"+type).addClass(value);
 		else
 			$(".tdClass_"+field+"_"+name+"_"+type).removeClass('C');
-		
 	}
-	
 	$scope.assignData = function (data,type,phase){
 		switch(type){
 		case "AssetEntity":

@@ -51,9 +51,9 @@
 <g:each in="${EntityType.listAsMap}" var="entityType">
 	<tr>
 		<td><h1>${entityType.value}</h1></td>
-		<td><h1>
-			<span id="showId_${entityType.value}" class="Arrowcursor" ng-click="showAssets('show', '${entityType.value}')">|></span>
-			<span id="hideId_${entityType.value}" class="Arrowcursor" ng-click="showAssets('hide','${entityType.value}')" style="display: none;">V</span></h1>
+		<td>
+			<span id="showId_${entityType.value}" class="Arrowcursor"  ng-click="showAssets('show', '${entityType.value}')"><img class="assetImage" src="${resource(dir:'images',file:'triangle_right.png')}" /></span>
+			<span id="hideId_${entityType.value}" class="Arrowcursor" ng-click="showAssets('hide','${entityType.value}')" style="display: none;"><img class="assetImage" src="${resource(dir:'images',file:'triangle_down.png')}" /></span>
 		</td>
 	</tr>
 	<tr>
