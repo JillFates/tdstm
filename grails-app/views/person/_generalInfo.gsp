@@ -6,10 +6,10 @@
 			onclick="switchTab(${person.id},'generalInfoEditId','generalEditHeadId')">General</a></li>
 		<li><a href="#" id="availEditHeadId" class="mobmenu"
 			onclick="switchTab(${person.id},'availabilityEditId','availEditHeadId')">Availability</a></li>
-		<g:if test="${isProjMgr==true}">
+		<tds:hasPermission permission='EditTDSPerson'>
 			<li><a href="#" id="tdsEditHeadId" class="mobmenu"
 				onclick="switchTab(${person.id},'tdsUtilityEditId','tdsEditHeadId')">TDS</a></li>
-		</g:if>
+		</tds:hasPermission>
 	</ul>
 </div>
 <g:form name="personDialogForm" action="updatePerson">
