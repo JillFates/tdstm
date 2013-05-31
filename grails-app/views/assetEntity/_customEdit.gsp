@@ -7,7 +7,7 @@
 		</g:if>
 			<td class="label" nowrap="nowrap">${project.('custom'+i) ?: 'Custom'+i }</td>
 			<td>
-				<input type="text" id="custom${i}" name="custom${i}" value="${assetEntityInstance.('custom'+i)}" tabindex="${tabOffset + 1}"/>
+				<input type="text" id="custom${i}" class="custom${i} ${config.('custom'+i)}" name="custom${i}" value="${assetEntityInstance.('custom'+i)}" tabindex="${tabOffset + 1}"/>
 			</td>
 		<g:if test="${i % 4 == 0}">
 			</tr>

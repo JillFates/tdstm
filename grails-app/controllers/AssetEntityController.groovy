@@ -39,6 +39,8 @@ import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.EntityType
+import com.tdsops.tm.enums.domain.ValidationType
 import groovy.time.TimeCategory
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.ApplicationConstants
@@ -2874,11 +2876,15 @@ class AssetEntityController {
 	
 			def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
 			def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)
-	
+			
+			
+			def data = FieldImportance.find("from FieldImportance where project=:project and entityType=:entityType and phase=:phase",
+				[project:project, entityType:EntityType.AE, phase:ValidationType.DIS])?.config
+			def config=JSON.parse(data);
 			def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 								planStatusOptions:planStatusOptions?.value, projectId:project.id ,railTypeOption:railTypeOption?.value,
 								priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers,redirectTo:params?.redirectTo,
-								models:models, assetType:assetType, manufacuterer:manufacuterer]
+								models:models, assetType:assetType, manufacuterer:manufacuterer, config:config]
 			 
 			 if(params.redirectTo == "assetAudit") {
 				 paramsMap << ['source':params.source, 'assetType':params.assetType]
@@ -2944,11 +2950,12 @@ class AssetEntityController {
 			
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 			
+			
 			def paramsMap = [label:frontEndLabel, assetEntity:assetEntity,
 				supportAssets:supportAssets, dependentAssets:dependentAssets, 
 				redirectTo:params.redirectTo, project:project,
 				assetCommentList:assetCommentList,
-				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle , prefValue:prefValue ]
+				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle , prefValue:prefValue]
 		
 			if(params.redirectTo == "roomAudit") {
 				paramsMap << [source:params.source, assetType:params.assetType]
@@ -4189,4 +4196,22 @@ class AssetEntityController {
 		}
 	  return entities
 	}
+	/**
+	 * This method is used to get config by entityType and phase
+	 * @param type,phase
+	 * @return
+	 */
+	 def getassetImportance = {
+		 def phaseMap = [:]
+		 def phase= params.phase
+		 def assetType= params.type
+		 def project = securityService.getUserCurrentProject()
+		 def data = FieldImportance.find("from FieldImportance where project=:project and entityType=:entityType and phase=:phase",
+				 [project:project, entityType:assetType, phase:phase])?.config
+			if(data) 
+				phaseMap << ['config':JSON.parse(data)]
+		 	 
+		 render phaseMap as JSON
+	 }
+	
 }

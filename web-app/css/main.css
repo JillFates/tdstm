@@ -457,6 +457,9 @@ span.cellWithoutBackground
 .C{
 	background-color:LightGreen;
 }
+.V{
+	background-color:yellow;
+}
 #stylingNoteId{
 	display:none;
 	position:absolute;

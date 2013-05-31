@@ -657,3 +657,24 @@ function showDependencyControlDiv(){
 	$("#checkBoxDiv").dialog('open')
 	$("#checkBoxDivId").show();
 }
+
+function assetFieldImportance(phase,type){
+	jQuery.ajax({
+		url: contextPath+'/assetEntity/getassetImportance',
+		data: {'phase':phase, 'type':type},
+		type:'POST',
+		success: function(resp) {
+			$("input,select").removeClass("V")
+			$("input,select").removeClass("C")
+			var config = resp.config
+			Object.keys(config).forEach(function(key) {
+				var value = config[key]
+		        $("."+key).addClass(value);
+			});
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			alert("An Unexpected error while getting asset.")
+		}
+	});
+	
+}
