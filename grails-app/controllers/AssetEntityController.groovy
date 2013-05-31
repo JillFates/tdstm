@@ -2871,11 +2871,12 @@ class AssetEntityController {
 	
 			def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
 			def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)
-			
+			def config = [:]
 			
 			def data = FieldImportance.find("from FieldImportance where project=:project and entityType=:entityType and phase=:phase",
 				[project:project, entityType:EntityType.AE, phase:ValidationType.DIS])?.config
-			def config=JSON.parse(data);
+			if(data)
+				 config=JSON.parse(data);
 			def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 								planStatusOptions:planStatusOptions?.value, projectId:project.id ,railTypeOption:railTypeOption?.value,
 								priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers,redirectTo:params?.redirectTo,
@@ -2950,7 +2951,7 @@ class AssetEntityController {
 				redirectTo:params.redirectTo, project:project,
 				assetCommentList:assetCommentList,
 				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle ,
-				 prefValue:prefValue]
+				 prefValue:prefValue,config:config]
 		
 			if(params.redirectTo == "roomAudit") {
 				paramsMap << [source:params.source, assetType:params.assetType]
