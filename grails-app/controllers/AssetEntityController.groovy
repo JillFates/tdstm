@@ -2945,13 +2945,12 @@ class AssetEntityController {
 			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
 			
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
-			
 			def paramsMap = [label:frontEndLabel, assetEntity:assetEntity,
 				supportAssets:supportAssets, dependentAssets:dependentAssets, 
 				redirectTo:params.redirectTo, project:project,
 				assetCommentList:assetCommentList,
 				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle ,
-				 prefValue:prefValue,config:config]
+				 prefValue:prefValue]
 		
 			if(params.redirectTo == "roomAudit") {
 				paramsMap << [source:params.source, assetType:params.assetType]
