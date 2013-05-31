@@ -2,7 +2,6 @@ import grails.converters.JSON
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.util.Date
 
 import jxl.*
 import jxl.read.biff.*
@@ -10,42 +9,38 @@ import jxl.write.*
 import net.tds.util.jmesa.AssetCommentBean
 import net.tds.util.jmesa.AssetEntityBean
 
-import java.io.File;
+import org.apache.commons.lang.StringUtils
+import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
-import org.apache.shiro.SecurityUtils
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
 
 import com.tds.asset.Application
-import com.tds.asset.ApplicationAssetMap
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
-import com.tds.asset.AssetEntityVarchar
-import com.tds.asset.CommentNote
 import com.tds.asset.AssetOptions
 import com.tds.asset.AssetTransition
+import com.tds.asset.AssetType
 import com.tds.asset.Database
+import com.tds.asset.FieldImportance
 import com.tds.asset.Files
 import com.tds.asset.TaskDependency
+import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.EntityType
+import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.eav.*
+import com.tdssrc.grails.ApplicationConstants
+import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
-import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdsops.tm.enums.domain.AssetCommentStatus
-import com.tdsops.tm.enums.domain.EntityType
-import com.tdsops.tm.enums.domain.ValidationType
-import groovy.time.TimeCategory
-import com.tdssrc.grails.ExportUtil
-import com.tdssrc.grails.ApplicationConstants
-import org.apache.commons.lang.StringUtils
-import com.tds.asset.AssetType
 
 class AssetEntityController {
 
@@ -2950,12 +2945,12 @@ class AssetEntityController {
 			
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 			
-			
 			def paramsMap = [label:frontEndLabel, assetEntity:assetEntity,
 				supportAssets:supportAssets, dependentAssets:dependentAssets, 
 				redirectTo:params.redirectTo, project:project,
 				assetCommentList:assetCommentList,
-				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle , prefValue:prefValue]
+				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle ,
+				 prefValue:prefValue]
 		
 			if(params.redirectTo == "roomAudit") {
 				paramsMap << [source:params.source, assetType:params.assetType]
