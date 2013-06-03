@@ -52,7 +52,7 @@
 								<td class="label" nowrap="nowrap"><label for="assetName">Name</label></td>
 								<td><input type="text" id="assetName" class="${config.assetName}" name="assetName" value="${assetEntityInstance.assetName}" tabindex="11" /></td>
 								<td class="label" nowrap="nowrap"><label for="environment">Environment</label></td>
-								<td><g:select id="environment" class="${config.environment}" name="environment" from="${assetEntityInstance.constraints.environment.inList}" value="${assetEntityInstance.environment}"  tabindex="32"></g:select></td>
+								<td><g:select id="environment" class="environment ${config.environment}" name="environment" from="${assetEntityInstance.constraints.environment.inList}" value="${assetEntityInstance.environment}"  tabindex="32"></g:select></td>
 								<td>&nbsp</td>
 								<td class="label_sm">Source</td>
 								<td class="label_sm">Target</td>
@@ -143,7 +143,7 @@
 								<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'retireDate','errors')}">
 								    <script type="text/javascript" charset="utf-8">
 				           				jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-				        				</script> <input type="text" class="retireDate ${config.retireDate}" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate" tabindex="27"
+				        				</script> <input type="text" class="dateRange ${config.retireDate}" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate" tabindex="27"
 									value="<tds:convertDate date="${assetEntityInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" tabindex="27" />" > 
 								</td>
 								<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
@@ -157,7 +157,7 @@
 								<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'maintExpDate','errors')}">
 								<script type="text/javascript" charset="utf-8">
 					                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-					                    </script> <input type="text" class="${config.maintExpDate}" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate" tabindex="28"
+					                    </script> <input type="text" class="dateRange ${config.maintExpDate}" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate" tabindex="28"
 									value="<tds:convertDate date="${assetEntityInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />" > 
 								</td>
 								<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
