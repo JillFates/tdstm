@@ -669,7 +669,7 @@ function assetFieldImportance(phase,type){
 			var config = resp.config
 			Object.keys(config).forEach(function(key) {
 				var value = config[key]
-		        $("."+key).addClass(value);
+		        $(".dialog input[name="+key+"],select[name="+key+"]").addClass(value);
 			});
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
