@@ -36,4 +36,11 @@ databaseChangeLog = {
 			column(name: "phase", type: "varchar(25)")
 		}
 	}
+	changeSet(author: "lokanada", id: "20130604 TM-1895-2") {
+		comment('altering "phase" column in "field importance" table ')
+		preConditions(onFail:'MARK_RAN') {
+			columnExists(schemaName:'tdstm', tableName:'field_importance', columnName:'phase' )
+		}
+		sql("ALTER TABLE field_importance MODIFY COLUMN phase VARCHAR(25)")
+	}
 }
