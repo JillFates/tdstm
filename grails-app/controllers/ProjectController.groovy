@@ -772,6 +772,7 @@ class ProjectController {
 		}
 		
 		// TODO : Send error message back
-		forward (action:'showFieldImportance', params:['entityType':request.JSON.entityType])
+		//forward (action:'showFieldImportance', params:['entityType':request.JSON.entityType])
+		render "success"
 	}
 }

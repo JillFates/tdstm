@@ -125,27 +125,11 @@ function assetFieldImportanceCtrl($scope,$http) {
 				  'DependencyReview_jsonString':$("#"+type+"_drJsonId").val(),'DependencyScan_jsonString':$("#"+type+"_dsJsonId").val(),
 				  'BundleReady_jsonString':$("#"+type+"_brJsonId").val()},'entityType':type}
 			}).success (function(resp) {
-				if(!resp.errorMsg){
-					var importSign = {"C":'!!!', 'V':'!!', 'I':'!'} 
-					Object.keys(resp).forEach(function(key) {
-						var data = resp[ key ]
-						var phase = key
-						if(data){
-							$scope.assignData(data,type,phase)
-						}
-						Object.keys(data).forEach(function(key) {
-					        var value = data [key]
-					        $("#"+type+"_"+phase+"_"+key).html(importSign[value])
-					        $("#td_"+type+"_"+phase+"_"+key).addClass(value);
-					    });
-					})
-					$(".radioEdit_"+type).show()
-					$(".radioShow_"+type).hide();
-					$("#edit_"+type).show();
-					$(".update_"+type).hide();
-				} else {
-					alert(resp.errorMsg)
-				}
+				$scope.showAssetForm(type);
+				$(".radioEdit_"+type).show()
+				$(".radioShow_"+type).hide();
+				$("#edit_"+type).show();
+				$(".update_"+type).hide();
 			}).error(function(resp, status, headers, config) {
 				alert("An Unexpected error while showing the asset fields.")
 			});
