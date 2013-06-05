@@ -680,7 +680,6 @@ class ProjectController {
 	 * This action is used to render the static page
 	 */
 	def assetFields ={
-		
 		return []
 	}
 	
@@ -692,12 +691,13 @@ class ProjectController {
 	def getAssetFields ={
 		
 		def assetType=params.entityType
-		
-		def importanceMap = [["name":"C","sy":"!!"],["name":"V","sy":"!"],["name":"I","sy":"X"]]
-				
+		def project = securityService.getUserCurrentProject()
 		def eavEntityType = EavEntityType.findByDomainName(assetType)
 		def attributes = EavAttribute.findAllByEntityType( eavEntityType )
-		def returnMap = attributes.collect{prop-> return ['name':prop.frontendLabel, 'property':prop.attributeCode, 'importance':importanceMap]	}
+		def returnMap = attributes.collect{p->
+			return ['id':(p.attributeCode.contains('custom') && project[p.attributeCode])? project[p.attributeCode]:p.frontendLabel, 'label':p.attributeCode]
+		}
+
 		render returnMap as JSON
 	}
 	
@@ -761,10 +761,9 @@ class ProjectController {
 					assetImp.config = value
 					assetImp.phase = phase
 				}
-				if(!assetImp.save()){
-					assetImp.errors.allErrors.each{
-						log.error it
-					}
+				if(!assetImp.validate() || !assetImp.save()){
+					def etext = "updateFieldImportance Unable to create FieldImportance"+GormUtil.allErrorsString( assetImp )
+					log.error( etext )
 				}
 			}
 		} catch(Exception ex){

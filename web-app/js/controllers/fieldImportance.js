@@ -1,40 +1,109 @@
   //-----------------------------Angular.js Implementation .--------------------//
-  /*
-   * this function is used for assetFields angularjs
-   */
 
-function assetFieldImportanceCtrl($scope,$http) {
-	// initializing jsonObject
-	$scope.AE_Discovery={}; 
-	$scope.AE_Validated={};
-	$scope.AE_DependencyReview={};
-	$scope.AE_DependencyScan={};
-	$scope.AE_BundleReady={};
+var app = angular.module("MyApp", []);
+
+app.directive('editImportance', [function () {
+    var options = ['C', 'I', 'N', 'H'];
+    var tmpl=''
+    for (var i=0;i<options.length;i++){
+    		tmpl += '<div class="pickbox" ng-click="assignData(' + options[i] + ')">' +options[i]+ '</div>';
+    }
+    return {
+        restrict: 'CA',
+        replace: false,
+        transclude: false,
+        scope: {
+            field: '=field',
+            phase: '=phase',
+            selected: '=selected'
+        },
+        template: tmpl
+        //tried with link: function but giving undefined value
+        /*,link: function (scope, elem, attrs) {
+        	scope.assignData=function(value){
+       	     console.log(value);
+        }
+        }*/
+}
+}]);
+
+app.controller('assetFieldImportanceCtrl', function ($scope,$http) {
 	
-	$scope.APP_Discovery={}; 
-	$scope.APP_Validated={};
-	$scope.APP_DependencyReview={};
-	$scope.APP_DependencyScan={};
-	$scope.APP_BundleReady={};
+	//initializing phase
+	$scope.phases = [
+	                 {
+	                	 id: 'D',
+	                	 label: 'Discovery'
+	                 }, {
+	                	 id: 'V',
+	                	 label: 'Validation'
+	                 },{
+	                	 id: 'R',
+	                	 label: 'DependencyReview'
+	                 },{
+	                	 id: 'S',
+	                	 label: 'DependencyScan'
+	                 },{
+	                	 id: 'B',
+	                	 label: 'BundleReady'
+	                 }];
+	//initializing importance
+	$scope.importance = {
+	        name: {
+	            phase: {
+	                'D': 'I',
+	                'V': 'C'
+	            }
+	        },
+	        location: {
+	            phase: {
+	                'D': 'N',
+	                'V': 'I'
+	            }
+	        },
+	        sme1: {
+	            phase: {
+	                'D': 'N',
+	                'V': 'N'
+	            }
+	        },
+	        sme2: {
+	            phase: {
+	                'D': 'N',
+	                'V': 'N'
+	            }
+	        }
+	    };
+	//initializing section
+	$scope.section = { 
+					'AssetEntity':'h', 
+					'Application':'h', 
+					'Database':'h', 
+					'Files':'h' 
+				};
+    
+    $scope.toggleSection = function( s ) {
+        $scope.section[s] = $scope.section[s] == 'h' ? 's' : 'h'
+       if($scope.fields == undefined)
+        $scope.getAssetFields(s);
+    }
 	
-	$scope.DB_Discovery={}; 
-	$scope.DB_Validated={};
-	$scope.DB_DependencyReview={};
-	$scope.DB_DependencyScan={};
-	$scope.DB_BundleReady={};
-	
-	$scope.F_Discovery={}; 
-	$scope.F_Validated={};
-	$scope.F_DependencyReview={};
-	$scope.F_DependencyScan={};
-	$scope.F_BundleReady={};
-	
-	// initializing AssetFields
-	$scope.AssetEntity = {};
-	$scope.Application ={};
-	$scope.Database ={};
-	$scope.Files ={};
-	
+    $scope.showSection = function( s ) {
+        return $scope.section[s] == 's'|| $scope.section[s] == 'e';
+    }
+    
+    $scope.editMode = function (s) {
+        return $scope.section[s] == 'e'
+    }
+
+    $scope.toggleEditMode = function (s) {
+        $scope.section[s] = $scope.section[s] == 'e' ? 's' : 'e'
+    }
+    
+    $scope.setImportance = function (field, phase, value) {
+        $scope.importance[field]['phase'][phase] = value;
+    }
+    //get assetFields from server and updated to $scope.fields
 	$scope.getAssetFields = function(type) {
 		$http({
 		url : contextPath+"/project/getAssetFields",
@@ -42,154 +111,7 @@ function assetFieldImportanceCtrl($scope,$http) {
 		async: true,
 		method: "GET"
 		}).success (function(resp) {
-			if(type=="AssetEntity")
-			$scope.AssetEntity =resp
-			else if(type=="Application")
-			$scope.Application =resp
-			else if(type=="Database")
-			$scope.Database =resp
-			else if(type=="Files")
-			$scope.Files =resp
-			$("#imageId_"+type).hide();
-			$scope.showAssetForm(type);
+			$scope.fields =resp
 		});
 	}
-	$scope.showAssets = function(forWhom, type) {
-		if (forWhom == 'show') {
-			if($scope[type][0] == undefined){
-				$("#imageId_"+type).show();
-				$scope.getAssetFields(type);
-			}else{
-				$scope.showAssetForm(type);
-			}
-			$("#stylingNoteId").show();
-			$(".assetDivId_"+type).show();
-			$("#showId_"+type).hide();
-			$("#hideId_"+type).show();
-		} else {
-			$(".assetDivId_"+type).hide();
-			$scope.cancelAssetForm(type);
-			$("#hideId_"+type).hide();
-			$("#showId_"+type).show();
-			var visable = false
-			$.each( $(".field_list"), function() {
-				if($(this).css('display')== 'block') visable = true;
-			});
-			if(!visable) $("#stylingNoteId").hide(); 
-		}
-	}
-	$scope.editAssets = function(type) {
-		$(".radioShow_"+type).show();
-		$(".radioEdit_"+type).hide();
-		$(".update_"+type).show();
-		$("#edit_"+type).hide();
-	}
-	$scope.cancelAssetForm = function(type){
-		$(".radioShow_"+type).hide();
-		$(".radioEdit_"+type).show();
-		$(".update_"+type).hide();
-		$("#edit_"+type).show();
-	}
-	$scope.showAssetForm = function(type) {
-		$http({
-			url : contextPath+"/project/showFieldImportance",
-			params:{'entityType':type},
-			method: "GET"
-			}).success (function(resp) {
-				if(!resp.errorMsg){
-					var importSign = {"C":'!!!', 'V':'!!', 'I':'!'} 
-					Object.keys(resp).forEach(function(key) {
-						var data = resp[ key ]
-						var phase = key
-						if(data){
-							$scope.assignData(data,type,phase)
-						}
-						Object.keys(data).forEach(function(key) {
-					        var value = data [key]
-					        $("#"+type+"_"+phase+"_"+key).html(importSign[value])
-					        $("#td_"+type+"_"+phase+"_"+key).addClass(value);
-					    });
-					})
-				} else {
-					alert(resp.errorMsg)
-				}
-			}).error(function(resp, status, headers, config) {
-				alert("An Unexpected error while showing the asset fields.")
-			});
-	}
-	$scope.updateAssetForm = function(type) {
-		$http({
-			url : contextPath+"/project/updateFieldImportance",
-			method: "POST",
-			data:{'config':{'Discovery_jsonString':$("#"+type+"_disJsonId").val(), 'Validated_jsonString':$("#"+type+"_vlJsonId").val(),
-				  'DependencyReview_jsonString':$("#"+type+"_drJsonId").val(),'DependencyScan_jsonString':$("#"+type+"_dsJsonId").val(),
-				  'BundleReady_jsonString':$("#"+type+"_brJsonId").val()},'entityType':type}
-			}).success (function(resp) {
-				$scope.showAssetForm(type);
-				$(".radioEdit_"+type).show()
-				$(".radioShow_"+type).hide();
-				$("#edit_"+type).show();
-				$(".update_"+type).hide();
-			}).error(function(resp, status, headers, config) {
-				alert("An Unexpected error while showing the asset fields.")
-			});
-	}
-	$scope.radioChange = function(value,field,name,type) {
-		if(value=='C')
-			$(".tdClass_"+field+"_"+name+"_"+type).addClass(value);
-		else
-			$(".tdClass_"+field+"_"+name+"_"+type).removeClass('C');
-	}
-	$scope.assignData = function (data,type,phase){
-		switch(type){
-		case "AssetEntity":
-					if(phase=="Discovery")
-						$scope.AE_Discovery=data
-					else if(phase=="Validated")
-						$scope.AE_Validated=data
-					else if(phase=="DependencyReview")
-						$scope.AE_DependencyReview=data
-					else if(phase=="DependencyScan")
-						$scope.AE_DependencyScan=data
-					else if(phase=="BundleReady")
-						$scope.AE_BundleReady=data
-					break;
-		case "Application":
-					if(phase=="Discovery")
-						$scope.APP_Discovery=data
-					else if(phase=="Validated")
-						$scope.APP_Validated=data
-					else if(phase=="DependencyReview")
-						$scope.APP_DependencyReview=data
-					else if(phase=="DependencyScan")
-						$scope.APP_DependencyScan=data
-					else if(phase=="BundleReady")
-						$scope.APP_BundleReady=data
-					break;
-		case "Database":
-					if(phase=="Discovery")
-						$scope.DB_Discovery=data
-					else if(phase=="Validated")
-						$scope.DB_Validated=data
-					else if(phase=="DependencyReview")
-						$scope.DB_DependencyReview=data
-					else if(phase=="DependencyScan")
-						$scope.DB_DependencyScan=data
-					else if(phase=="BundleReady")
-						$scope.DB_BundleReady=data
-					break;
-		case "Files":
-					if(phase=="Discovery")
-						$scope.F_Discovery=data
-					else if(phase=="Validated")
-						$scope.F_Validated=data
-					else if(phase=="DependencyReview")
-						$scope.F_DependencyReview=data
-					else if(phase=="DependencyScan")
-						$scope.F_DependencyScan=data
-					else if(phase=="BundleReady")
-						$scope.F_BundleReady=data
-					break;
-				}
-	}
-}
+});

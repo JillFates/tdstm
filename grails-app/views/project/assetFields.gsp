@@ -9,60 +9,57 @@
 <g:javascript src="controllers/fieldImportance.js" />
 </head>
 <body>
-<br><br>
-<h1 class="assetFieldHeader1">Project Field Important</h1>
-<div ng-app id="ng-app" ng-controller="assetFieldImportanceCtrl">
-<div id="stylingNoteId">
-<b>Styling Notes:</b>
-<br>
-<table>
-	<tr>
-		<td class="C">Name</td>
-		<td>ServerX05</td>
-		<td>Critical</td>
-	</tr>
-	<tr>
-		<td>Type</td>
-		<td>Server</td>
-		<td>Valuable</td>
-	</tr>
-	<tr>
-		<td>Manufacturer</td>
-		<td>HP</td>
-		<td>Ignore</td>
-	</tr>
-	<tr>
-		<td colspan="3">......</td>
-	</tr>
-	<g:each in="['Critical','Valuable','Ignore']" var="imp">
+	<br>
+	<br>
+	<h1 class="assetFieldHeader1">Project Field Importantance</h1>
+<div ng-app="MyApp" id="ng-app" ng-controller="assetFieldImportanceCtrl">
+	<table class="fieldTable">
 		<tr>
-			<td ${imp=='Critical'? 'class="C"' : ''}>
-				<input type="radio" ${imp=='Critical'? 'checked="checked"' : 'onclick="this.checked = false;"'}/>
-				<input type="radio" ${imp=='Valuable'? 'checked="checked"' : 'onclick="this.checked = false;"'}/>
-				<input type="radio" ${imp=='Ignore'? 'checked="checked"' : 'onclick="this.checked = false;"'}/>
+			<td><h1>AssetEntity</h1></td>
+			<td>
+			<span ng-click="toggleSection('AssetEntity')">
+				<img ng-hide="showSection('AssetEntity')" class="assetImage" src="${resource(dir:'images',file:'triangle_right.png')}" /> 
+				<img ng-show="showSection('AssetEntity')" class="assetImage" src="${resource(dir:'images',file:'triangle_down.png')}" /> 
+			</span>
 			</td>
-			<td>&nbsp;</td>
-			<td>${imp}</td>
 		</tr>
-	</g:each>
-</table>
-</div>
-<table class="fieldTable">
-<g:each in="${EntityType.listAsMap}" var="entityType">
-	<tr>
-		<td><h1>${entityType.value}</h1></td>
-		<td>
-			<span id="showId_${entityType.value}" class="Arrowcursor"  ng-click="showAssets('show', '${entityType.value}')"><img class="assetImage" src="${resource(dir:'images',file:'triangle_right.png')}" /></span>
-			<span id="hideId_${entityType.value}" class="Arrowcursor" ng-click="showAssets('hide','${entityType.value}')" style="display: none;"><img class="assetImage" src="${resource(dir:'images',file:'triangle_down.png')}" /></span>
-		</td>
-	</tr>
-	<tr>
-		<td></td>
-		<td><g:render template="${entityType.key}Importance" model="['assetType':entityType]"></g:render></td>
-	<tr>
+	</table>
+	
+<div ng-show="showSection('AssetEntity')" class="assetImage crudTable">
 
-</g:each>
-</table>
+<!-- show field Importance div which will be repeated for all assetTypes and moved to a template-->
+		<div ng-hide="editMode('AssetEntity')" >
+			<table>
+				<tr>
+					<th>Field</th>
+					<th ng-repeat="phase in phases">{{phase.label}}</th>
+				</tr>
+				<tr ng-repeat="field in fields">
+					<td>{{field.id}}</td>
+					<td ng-repeat="phase in phases">{{importance[field['id']]['phase'][phase['id']]}}</td>
+				</tr>
+				</table>
+			<button ng-click="toggleEditMode('AssetEntity')">Edit</button>
+	</div>
+	
+<!-- edit field Importance div which will be repeated for all assetTypes and moved to a template-->	
+		<div ng-show="editMode('AssetEntity')" >
+				<table style="padding:4px;">
+					<tr>
+						<th>Field</th>
+						<th ng-repeat="phase in phases">{{phase.label}}</th>
+					</tr>
+					<tr ng-repeat="field in fields">
+						<td>{{field.id}}</td>
+						<td ng-repeat="phase in phases" width="180">
+                            <span edit-importance>REPLACED</span>
+                       </td>
+					</tr>
+				</table>
+				<button ng-click="toggleEditMode('AssetEntity')">Save</button>
+		</div>
+
+</div>
 </div>
 </body>
 </html>

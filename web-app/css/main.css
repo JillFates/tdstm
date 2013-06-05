@@ -476,4 +476,19 @@ div.field_list table {
 }
 .assetImage{
 	margin-top: 12px;
+	cursor: pointer;
+}
+.assetFieldTable{
+	width :auto;
+	margin-left: 100px;
+}
+.pickbox { 
+    text-align:center;
+    display:block;
+    float:left;
+    width:30px;
+}
+.crudTable{
+	width :1150px;
+	margin-left: 100px;
 }
