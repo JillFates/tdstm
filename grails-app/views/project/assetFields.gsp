@@ -11,55 +11,31 @@
 <body>
 	<br>
 	<br>
-	<h1 class="assetFieldHeader1">Project Field Importantance</h1>
+	<h1 class="assetFieldHeader1">Project Field Importance</h1>
 <div ng-app="MyApp" id="ng-app" ng-controller="assetFieldImportanceCtrl">
-	<table class="fieldTable">
-		<tr>
-			<td><h1>AssetEntity</h1></td>
+	<table class="fieldTable" data-ng-init="types=['AssetEntity','Application','Database','Files']">
+		<tr ng-repeat="type in types">
+			<td><h1>{{type}}</h1></td>
 			<td>
-			<span ng-click="toggleSection('AssetEntity')">
-				<img ng-hide="showSection('AssetEntity')" class="assetImage" src="${resource(dir:'images',file:'triangle_right.png')}" /> 
-				<img ng-show="showSection('AssetEntity')" class="assetImage" src="${resource(dir:'images',file:'triangle_down.png')}" /> 
+			<span ng-click="toggleSection(type)">
+				<img ng-hide="showSection(type)" class="assetImage" src="${resource(dir:'images',file:'triangle_right.png')}" /> 
+				<img ng-show="showSection(type)" class="assetImage" src="${resource(dir:'images',file:'triangle_down.png')}" /> 
 			</span>
 			</td>
 		</tr>
 	</table>
+<!-- need to iterate show and edit divs for all assetTypes-->
+	<!-- show Importance div -->
+	<div ng-show="showSection('AssetEntity')" ng-hide="editMode('AssetEntity')">
+		<span assetentityshow></span>
+		<button ng-click="toggleEditMode('AssetEntity')">Edit</button>
+	</div>	
 	
-<div ng-show="showSection('AssetEntity')" class="assetImage crudTable">
-
-<!-- show field Importance div which will be repeated for all assetTypes and moved to a template-->
-		<div ng-hide="editMode('AssetEntity')" >
-			<table>
-				<tr>
-					<th>Field</th>
-					<th ng-repeat="phase in phases">{{phase.label}}</th>
-				</tr>
-				<tr ng-repeat="field in fields">
-					<td>{{field.id}}</td>
-					<td ng-repeat="phase in phases">{{importance[field['id']]['phase'][phase['id']]}}</td>
-				</tr>
-				</table>
-			<button ng-click="toggleEditMode('AssetEntity')">Edit</button>
+	<!-- edit Importance div -->
+	<div ng-show="editMode('AssetEntity')">
+	<span assetentityedit></span>
+		<button ng-click="toggleEditMode('AssetEntity')">Save</button>
 	</div>
-	
-<!-- edit field Importance div which will be repeated for all assetTypes and moved to a template-->	
-		<div ng-show="editMode('AssetEntity')" >
-				<table style="padding:4px;">
-					<tr>
-						<th>Field</th>
-						<th ng-repeat="phase in phases">{{phase.label}}</th>
-					</tr>
-					<tr ng-repeat="field in fields">
-						<td>{{field.id}}</td>
-						<td ng-repeat="phase in phases" width="180">
-                            <span edit-importance>REPLACED</span>
-                       </td>
-					</tr>
-				</table>
-				<button ng-click="toggleEditMode('AssetEntity')">Save</button>
-		</div>
-
-</div>
 </div>
 </body>
 </html>

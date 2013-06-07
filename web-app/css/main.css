@@ -487,6 +487,7 @@ div.field_list table {
     display:block;
     float:left;
     width:30px;
+    cursor:pointer;
 }
 .crudTable{
 	width :1150px;
