@@ -13,29 +13,25 @@
 	<br>
 	<h1 class="assetFieldHeader1">Project Field Importance</h1>
 <div ng-app="MyApp" id="ng-app" ng-controller="assetFieldImportanceCtrl">
-	<table class="fieldTable" data-ng-init="types=['AssetEntity','Application','Database','Files']">
+<div data-ng-init="types=['AssetEntity','Application','Database','Files']">
+	<table class="fieldTable">
 		<tr ng-repeat="type in types">
-			<td><h1>{{type}}</h1></td>
+			<td class="assetTd"><h1>{{type}}</h1></td>
+			<td class="assetTd">
+				<span ng-click="toggleSection(type)">
+					<img ng-hide="showSection(type)" class="assetImage" src="${resource(dir:'images',file:'triangle_right.png')}" /> 
+					<img ng-show="showSection(type)" class="assetImage" src="${resource(dir:'images',file:'triangle_down.png')}" /> 
+				</span>
+			</td>
 			<td>
-			<span ng-click="toggleSection(type)">
-				<img ng-hide="showSection(type)" class="assetImage" src="${resource(dir:'images',file:'triangle_right.png')}" /> 
-				<img ng-show="showSection(type)" class="assetImage" src="${resource(dir:'images',file:'triangle_down.png')}" /> 
-			</span>
+				<div ng-show="showSection(type)" class="crudTable">
+				 	<div ng-include src="'showImportance.gsp'"></div>
+					<div ng-include src="'editImportance.gsp'"></div>
+				</div>
 			</td>
 		</tr>
 	</table>
-<!-- need to iterate show and edit divs for all assetTypes-->
-	<!-- show Importance div -->
-	<div ng-show="showSection('AssetEntity')" ng-hide="editMode('AssetEntity')">
-		<span assetentityshow></span>
-		<button ng-click="toggleEditMode('AssetEntity')">Edit</button>
-	</div>	
-	
-	<!-- edit Importance div -->
-	<div ng-show="editMode('AssetEntity')">
-	<span assetentityedit></span>
-		<button ng-click="toggleEditMode('AssetEntity')">Save</button>
-	</div>
+</div>
 </div>
 </body>
 </html>

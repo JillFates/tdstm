@@ -489,7 +489,9 @@ div.field_list table {
     width:30px;
     cursor:pointer;
 }
+.assetTd{
+	vertical-align: top;
+}
 .crudTable{
-	width :1150px;
-	margin-left: 100px;
+	margin-top: 12px;
 }

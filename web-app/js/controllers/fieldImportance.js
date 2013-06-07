@@ -5,10 +5,10 @@ var app = angular.module("MyApp", []);
 //factory which return assetFields and phases
 app.factory('fieldFactory',function($http){
 	return{
-		getFields : function() {
+		getFields : function(type) {
 	        return $http({
 	            url: contextPath+"/project/getAssetFields",
-	            params:{'entityType':'AssetEntity'},
+	            params:{'entityType':type},
 	            method: 'GET'
 	        })
 	    },
@@ -35,54 +35,26 @@ app.directive("importanceDiv", function() {
 	          alert("Importance="+id);
 	        };
 	      },
-	    template: "<div class='pickbox' ng-repeat='datum in data' ng-click='toggle(datum)'>{{datum}} </div>"
+	    template: "<div class='pickbox'  ng-repeat='datum in data' ng-click='toggle(datum)'>{{datum}} </div>"
 	}
 });
 
-//show template directive
-app.directive("assetentityshow", function() {
-	return {
-	    restrict: 'CA',
-	    scope: {},
-	    templateUrl:contextPath+'/project/showImportance.gsp',
-	    controller: function ($scope, $http, $attrs,fieldFactory) {
-	    	$scope.fields = [];
-	    	fieldFactory.getFields().success(function(data){
-	    	   $scope.fields=data;
-	    	   });
-	    	$scope.phases=fieldFactory.getPhases();
-	    }
-	}
-});
-
-//edit template directive
-app.directive("assetentityedit", function() {
-	return {
-	    restrict: 'CA',
-	    scope: {},
-	    templateUrl:contextPath+'/project/editImportance.gsp',
-	    controller: function ($scope, $http, $attrs,fieldFactory) {
-	    	$scope.fields = [];
-	    	fieldFactory.getFields().success(function(data){
-	    	   $scope.fields=data;
-	    	   });
-	    	$scope.phases=fieldFactory.getPhases();
-	    }
-	}
-});
-
-app.controller('editMain', function($scope) {
+app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) {
+	$scope.phases=fieldFactory.getPhases();
 	$scope.data = ['C','I','N','H'];
-});
-
-app.controller('assetFieldImportanceCtrl', function ($scope,$http) {
-	$scope.importance= [];
+	
 	//initializing section
 	$scope.section = {'AssetEntity':'h','Application':'h','Database':'h','Files':'h'};
 	
 	$scope.toggleSection = function( s ) {
+		$scope.fields = [];
         $scope.section[s] = $scope.section[s] == 'h' ? 's' : 'h';
-    }
+        if($scope.section[s] == 's'){
+        	fieldFactory.getFields(s).success(function(data){
+        		$scope.fields=data;
+        	});
+        };
+	}
 	
     $scope.showSection = function( s ) {
         return $scope.section[s] == 's'|| $scope.section[s] == 'e';

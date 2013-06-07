@@ -1,8 +1,8 @@
 
 <!-- Assets edit template -->
 
-<div ng-controller="editMain">
-	<table style="padding: 4px;">
+<div ng-show="editMode(type)">
+	<table class="list">
 		<tr>
 			<th>Field</th>
 			<th ng-repeat="phase in phases">{{phase.label}}</th>
@@ -13,4 +13,5 @@
 				<importance-div data="data"></importance-div></td>
 		</tr>
 	</table>
+	<button ng-click="toggleEditMode(type)">Save</button></td>
 </div>
