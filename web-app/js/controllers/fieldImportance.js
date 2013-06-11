@@ -23,23 +23,36 @@ app.factory('fieldFactory',function($http){
 	 }
 });
 
-app.directive("importanceDiv", function() {
-	return {
-	    restrict: 'E',
-	    scope: { data: '=',
-	    		 field: '=field',
-	    		 phase: '=phase'
-	    	},
-	    controller: function($scope) {
-	        $scope.toggle = function(id) {
-	          alert("Importance="+id);
-	        };
-	      },
-	    template: "<div class='pickbox'  ng-repeat='datum in data' ng-click='toggle(datum)'>{{datum}} </div>"
-	}
-});
-
 app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) {
+		//initializing	importance(for time being I just hard coded) 							
+		 $scope.importance = {
+						        assetName: {
+						            phase: {
+						                'D': 'N'
+						            }
+						        },
+						        shortName: {
+						            phase: {
+						                'D': 'N'
+						            }
+						        },
+						        assetTag: {
+						        	phase: {
+						                'D': 'N'
+						            }
+						        },
+						        assetType: {
+						        	phase: {
+						                'D': 'N'
+						            }
+						        },
+						        manufacturer: {
+						        	phase: {
+						                'D': 'N'
+						            }
+						        }
+		 				};
+		 
 	$scope.phases=fieldFactory.getPhases();
 	$scope.data = ['C','I','N','H'];
 	
@@ -53,7 +66,7 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
         	fieldFactory.getFields(s).success(function(data){
         		$scope.fields=data;
         	});
-        };
+        }
 	}
 	
     $scope.showSection = function( s ) {
@@ -67,8 +80,13 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
     $scope.toggleEditMode = function (s) {
         $scope.section[s] = $scope.section[s] == 'e' ? 's' : 'e'
     }
+    $scope.assignData = function(value,field,phase) {
+    	console.log(field+"_"+phase+"_"+value);
+    	$scope.importance[field]['phase'][phase] ='C'
+        $scope.setImportance(field, phase, value);
+      };
     
     $scope.setImportance = function (field, phase, value) {
-        $scope.importance[field]['phase'][phase] = value;
-    }	
+    	$scope.importance[field]['phase'][phase] = value;
+    };
 });

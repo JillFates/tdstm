@@ -9,7 +9,7 @@
 		</tr>
 		<tr ng-repeat="field in fields">
 			<td>{{field.id}}</td>
-			<td ng-repeat="phase in phases">{{importance[field.id]['phase'][phase.id]}}</td>
+			<td ng-repeat="phase in phases">{{importance[field.label]['phase'][phase.id]}}</td>
 		</tr>
 	</table>
 	<button ng-click="toggleEditMode(type)">Edit</button></td>
