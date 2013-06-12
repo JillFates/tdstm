@@ -1,3 +1,5 @@
+import com.tds.asset.FieldImportance;
+
 import grails.converters.JSON
 
 import java.text.SimpleDateFormat
@@ -700,45 +702,33 @@ class ProjectController {
 
 		render returnMap as JSON
 	}
-	
 	/**
-	 *This action is used to get field importance and display it to user
-	 *@param : entityType type of entity for which user is requested for importance .
+	 * Initialising importance for a given entity type.
+	 *@param : entityType type of entity.
 	 *@return : json data
 	 */
-	def showFieldImportance ={
-		def entityType = params.entityType
+	def getImportance ={
+		def entityType=params.entityType
 		def project = securityService.getUserCurrentProject()
-		def phase = ValidationType.getList()
-		def phaseMap = [:]
-		def data
-		phase.each{ph->
-			data = FieldImportance.find("from FieldImportance where project=:project and entityType=:entityType and phase=:phase",
-				 [project:project, entityType:entityType, phase:ph])?.config
-			if(data) 
-				phaseMap << [(ph):JSON.parse(data)]
-				
-		}
-		 //this is commented for now untill John enabled default Project migration script.
-		/*if(!data && project.id != 2){
-			def defaultProj =  Project.read(2) // default project id is '2'.
-			
-			//Fetching default config from default project.
-			def defaultConfig = FieldImportance.findByEntityTypeAndProject(entityType, defaultProj)?.config
-			
-			//Saving it into current project's field importance .
-			def fieldImp = new FieldImportance(entityType:entityType, project:project, config:defaultConfig)
-			if(!fieldImp.save(flush:true)){
-				fieldImp.errors.allErrors.each{
-					log.error it
-				}
+		//hard coded for now need to get from enum.
+		def phases = ['D','V','R','S','B']
+		def parseData = [:]
+		def phase =[:]
+		def data = FieldImportance.findByProjectAndEntityType(project,entityType)?.config
+		if(data)
+			parseData=JSON.parse(data)
+		def eavEntityType = EavEntityType.findByDomainName(entityType)
+		def attributes = EavAttribute.findAllByEntityType( eavEntityType )?.attributeCode
+		def returnMap = attributes.inject([:]){rmap, field->
+			def pmap = phases.inject([:]){map, item->
+				map[item]=parseData[field] ? parseData[field]['phase'][item]:'N'
+				return map
 			}
-			data = fieldImp.config
-		}*/
-			
-		render phaseMap as JSON
+			rmap[field] = ['phase': pmap]
+			return rmap
+		}
+		render returnMap as JSON
 	}
-	
 	/**
 	 *This action is used to update field importance and display it to user
 	 *@param : entityType type of entity for which user is requested for importance .
@@ -747,31 +737,23 @@ class ProjectController {
 	def updateFieldImportance ={
 		def entityType = request.JSON.entityType
 		def project = securityService.getUserCurrentProject()
-		def allConfig = request.JSON.config
+		def allConfig = request.JSON.jsonString as JSON;
 		try{
-			allConfig.each{key, value->
-				def phase = key.split("_")[0]
 				def assetImp = FieldImportance.find("from FieldImportance where project=:project and entityType=:entityType\
-						and phase=:phase", [project:project, entityType:entityType, phase:phase])
-				def jsonInput = new JSONObject(value)
-					
+						                          ", [project:project, entityType:entityType])
 				if(!assetImp)
-					assetImp = new FieldImportance('entityType':entityType, 'config':value, 'project':project, 'phase':phase)
+				//for time being hard coding phase column need to write dbMigration to drop it.
+					assetImp = new FieldImportance(entityType:entityType, config:allConfig, project:project, phase:'phase')
 				else{
-					assetImp.config = value
-					assetImp.phase = phase
+					assetImp.config = allConfig
 				}
 				if(!assetImp.validate() || !assetImp.save()){
 					def etext = "updateFieldImportance Unable to create FieldImportance"+GormUtil.allErrorsString( assetImp )
 					log.error( etext )
 				}
-			}
 		} catch(Exception ex){
 			log.error "An error occurred : ${ex}"
 		}
-		
-		// TODO : Send error message back
-		//forward (action:'showFieldImportance', params:['entityType':request.JSON.entityType])
 		render "success"
 	}
 }

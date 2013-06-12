@@ -9,11 +9,10 @@
 		</tr>
 		<tr ng-repeat="field in fields">
 			<td>{{field.id}}</td>
-			<td ng-repeat="phase in phases" width="180">
-			<div class='pickbox' ng-repeat='datum in data' ng-click='assignData(datum,field.label,phase.id)'>{{datum}}</div>
+			<td ng-repeat="phase in phases" width="180" >
+			<div class='pickbox' ng-repeat='datum in data' ng-style="myStyle" ng-click="myStyle={'background-color':'red'}; assignData(datum,field.label,phase.id);">{{datum}}</div>
 		</td>
 		</tr>
 	</table>
-	<button ng-click="toggleEditMode(type)">Save</button>
-	<textarea rows="5" cols="50">{{importance}}</textarea>
+	<button ng-click="toggleEditMode(type);updateAsset(type);">Save</button>
 </div>

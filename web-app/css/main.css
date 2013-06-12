@@ -455,10 +455,13 @@ span.cellWithoutBackground
 }
 
 .C{
-	background-color:LightGreen;
+	background-color:#009900;
 }
-.V{
-	background-color:yellow;
+.I{
+	background-color:#00FF66;
+}
+.H{
+	background-color:#CCCCCC ;
 }
 #stylingNoteId{
 	display:none;
