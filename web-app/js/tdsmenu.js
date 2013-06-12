@@ -84,7 +84,7 @@
 	            if(!oldPassword){
 		        	alert("Old Password should not be blank ")
 		            returnVal = false
-		        } else if(!checkPassword()){
+		        } else if(!checkPassword($("#newPasswordId")[0])){
 		        	alert("New Password does not meet all the requirements ")
 		            returnVal = false
 		        }
@@ -98,93 +98,60 @@
 											+'&powerType='+powerType+'&startPage='+startPage});
 	        }
 		}
-		function checkPassword(){			
+		function checkPassword(field){
 			var requirements = 0;
-	    	var password = $("#newPasswordId").val();
-			var noMatch;
+			var password = field.value;
+			var context = 0;
+			var noMatch = {item:null};
 	    	var score = 0;
+	    	
+			if(field.id == "newPasswordId" && $("[id='lengthRequirementId']").length > 1){
+				context = 1;
+			}
 			
-			var color = '#cc0000';
-			var text = '';
-			if (password.match(/.{8}/)){
-				color = '#00aa00';
-				text = ' OK';
+			score += passwordMatch(password, $("[id='lengthRequirementId']")[context], /.{8}/, 'Password must be at least 8 characters long', {item:null});
+			requirements += passwordMatch(password, $("[id='lowercaseRequirementId']")[context], /[a-z]+/, 'Lowercase characters', noMatch);
+			requirements += passwordMatch(password, $("[id='uppercaseRequirementId']")[context], /[A-Z]+/, 'Uppercase characters', noMatch);
+			requirements += passwordMatch(password, $("[id='numericRequirementId']")[context], /[0-9]+/, 'Numeric characters', noMatch);
+			requirements += passwordMatch(password, $("[id='symbolRequirementId']")[context], /.*[~!@#\$%\^&\*_\-\+=`\|\\\(\)\{\}\[\]:;"'<>\,\.\?\/].*/, 'Nonalphanumeric characters', noMatch);
+			if(passwordMatch(requirements + "", $("[id='passwordRequirementsId']")[context], /[3-4]+/, 'Password must contain at least 3 of these requirements: ', noMatch) == 1){
 				score++;
+				if(noMatch.item != null)
+					noMatch.item.style.color = "#555555";
 			}
-			$('#lengthRequirementId').attr('style', 'color:' + color + ';');
-			$('#lengthRequirementId').html('Password must be at least 8 characters long' + text);
-			
-			color = '#cc0000';
-			text = '';
-			if (password.match(/[a-z]/)){
-				color = '#00aa00';
-				text = ' OK';
-				requirements++;
-			}
-			else
-				noMatch = $('#lowercaseRequirementId');
-			$('#lowercaseRequirementId').attr('style', 'color:' + color + ';');
-			$('#lowercaseRequirementId').html('Lowercase characters' + text);
-			
-			color = '#cc0000';
-			text = '';
-			if (password.match(/[A-Z]/)){
-				color = '#00aa00';
-				text = ' OK';
-				requirements++;
-			}
-			else
-				noMatch = $('#uppercaseRequirementId');
-			$('#uppercaseRequirementId').attr('style', 'color:' + color + ';');
-			$('#uppercaseRequirementId').html('Uppercase characters' + text);
-			
-			color = '#cc0000';
-			text = '';
-			if (password.match(/\d+/)){
-				color = '#00aa00';
-				text = ' OK';
-				requirements++;
-			}
-			else
-				noMatch = $('#numericRequirementId');
-			$('#numericRequirementId').attr('style', 'color:' + color + ';');
-			$('#numericRequirementId').html('Numeric characters' + text);
-			
-			color = '#cc0000';
-			text = '';
-			if (password.match(/.[~!@#$%\^&\*_\-\+=`\|\\\(\)\{\}\[\]:;"'<>\,\.?\/]/)){
-				color = '#00aa00';
-				text = ' OK';
-				requirements++;
-			}
-			else
-				noMatch = $('#symbolRequirementId');
-			$('#symbolRequirementId').attr('style', 'color:' + color + ';');
-			$('#symbolRequirementId').html('Nonalphanumeric characters' + text);
-			
-			color = '#cc0000';
-			text = '';
-			if (requirements >= 3){
-				color = '#00aa00';
-				text = 'OK';
-				score++;
-				if(noMatch)
-					noMatch.attr('style', 'color:#555555;');
-			}
-			$('#passwordRequirementsId').attr('style', 'color:' + color + ';');
-			$('#passwordRequirementsId').html('Password must contain at least 3 of these requirements: ' + text);
 			
 			if(score == 2)
 				return true;
 			return false;
+		}
+		function passwordMatch(password, element, regex, baseText, noMatch){
+			var returnVal = 0;
+			color = '#cc0000';
+			text = '';
+			if (password.match(regex)){
+				color = '#00aa00';
+				text = ' OK';
+				returnVal = 1;
+			}
+			else
+				noMatch.item = element;
+			element.style.color = color;
+			element.innerHTML = baseText + text;
+			return returnVal;
 		}
 		function togglePasswordVisibility(box){
 			var newState = "text";
 			if(box.checked){
 				newState = 'password';
 			}
-			$("#oldPasswordId")[0].type = newState;
-			$("#newPasswordId")[0].type = newState;
+			if(box.id == "showPasswordEditId"){
+				$("#password")[0].type = newState;
+			} else if(box.id == "showPasswordCreateId"){
+				$("#oldPasswordId")[0].type = newState;
+			} else{
+				$("#oldPasswordId")[0].type = newState;
+				$("#newPasswordId")[0].type = newState;
+			}
 		}
 		function updateWelcome( e ){
 			var ret = eval("(" + e.responseText + ")");

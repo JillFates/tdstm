@@ -644,7 +644,7 @@
                     	<label for="password">New Password:&nbsp;</label>
 					</td>
                     <td valign="top" class="value">
-						<input type="text" maxlength="25" name="newPassword" onkeyup="checkPassword()" id="newPasswordId" value=""/>
+						<input type="text" maxlength="25" name="newPassword" onkeyup="checkPassword(this)" id="newPasswordId" value=""/>
 					</td>
 				</tr>
 				<tr>

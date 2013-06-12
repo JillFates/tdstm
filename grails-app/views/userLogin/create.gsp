@@ -100,13 +100,20 @@
 					            </g:hasErrors>
                                 </td>
                             </tr> 
-                        	
+                        	<tr>
+								<td>
+									Hide password:
+								</td>
+								<td>
+									<input type="checkbox" onchange="togglePasswordVisibility(this)" id="showPasswordEditId"/>
+								</td>
+							</tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="password">Password:&nbsp;</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'password','errors')}">
-                                    <input type="password" maxlength="25" id="password" name="password" value=""/>
+                                    <input type="text" maxlength="25" onkeyup="checkPassword(this)" id="password" name="password" value=""/>
                                 <g:hasErrors bean="${userLoginInstance}" field="password">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="password"/>
@@ -114,6 +121,21 @@
 					            </g:hasErrors>
                                 </td>
                             </tr>
+                            <tr>
+								<td>
+									Requirements:
+								</td>
+								<td>
+									<em id="lengthRequirementId">Password must be at least 8 characters long</em><br/>
+									<b id="passwordRequirementsId">Password must contain at least 3 of these requirements: </b><br/>
+									<ul>
+										<li><em id="uppercaseRequirementId">Uppercase characters</em></li>
+										<li><em id="lowercaseRequirementId">Lowercase characters</em></li>
+										<li><em id="numericRequirementId">Numeric characters</em></li>
+										<li><em id="symbolRequirementId">Nonalphanumeric characters</em></li>
+									</ul>
+								</td>
+							</tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="expiryDate"><g:message code="userLogin.expiryDate.label" default="Expiry Date" />:</label>

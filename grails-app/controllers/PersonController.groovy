@@ -412,7 +412,7 @@ class PersonController {
 			requirements++;
 		if (password ==~ /.*[A-Z]+.*/)
 			requirements++;
-		if (password ==~ /.*\d+.*/)
+		if (password ==~ /.*[0-9]+.*/)
 			requirements++;
 		if (password ==~ /.*[~!@#$%\^&\*_\-\+=`\|\\\(\)\{\}\[\]:;"'<>\,\.?\/]+.*/)
 			requirements++;

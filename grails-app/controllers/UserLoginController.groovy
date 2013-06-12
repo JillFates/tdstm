@@ -179,29 +179,34 @@ class UserLoginController {
 	        	}
 	        	def password = params.password
 	        	def oldPassword = userLoginInstance.password
-	        	userLoginInstance.properties = params
-	        	if(password != ""){
-	        		//	convert password onto Hash code
-	                userLoginInstance.password = new Sha1Hash(params['password']).toHex()
-	        	}else{
-	        		userLoginInstance.password = oldPassword
-	        	}
-	            if( !userLoginInstance.hasErrors() && userLoginInstance.save(flush:true) ) {
-	            	def assignedRoles = request.getParameterValues("assignedRole");
-	            	def person = params.person.id
-					def personInstance = Person.get(person)
-					partyRelationshipService.updatePartyRoleByType('system', personInstance, assignedRoles)
-	            	userPreferenceService.setUserRoles(assignedRoles, person)
-					userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "CURR_PROJ", params.project)
-	                flash.message = "UserLogin ${userLoginInstance} updated"
-	                redirect( action:show, id:userLoginInstance.id, params:[ companyId:companyId ] )
-	            } else {
-	            	def person = userLoginInstance.person
-	            	def availableRoles = userPreferenceService.getAvailableRoles( person )
-	                def assignedRoles = userPreferenceService.getAssignedRoles( person )
-	                status.setRollbackOnly()
-	                render(view:'edit',model:[userLoginInstance:userLoginInstance, availableRoles:availableRoles, assignedRoles:assignedRoles, companyId:companyId ])
-	            }
+				if(!checkPassword(params['password']) && password != ""){
+	                flash.message = "The password must meet all the requirements"
+					redirect( action:edit, id:userLoginInstance.id, params:[ companyId:companyId ] )
+				} else{
+		        	userLoginInstance.properties = params
+		        	if(password != ""){
+		        		//	convert password onto Hash code
+		                userLoginInstance.password = new Sha1Hash(params['password']).toHex()
+		        	}else{
+		        		userLoginInstance.password = oldPassword
+		        	}
+		            if( !userLoginInstance.hasErrors() && userLoginInstance.save(flush:true) ) {
+		            	def assignedRoles = request.getParameterValues("assignedRole");
+		            	def person = params.person.id
+						def personInstance = Person.get(person)
+						partyRelationshipService.updatePartyRoleByType('system', personInstance, assignedRoles)
+		            	userPreferenceService.setUserRoles(assignedRoles, person)
+						userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "CURR_PROJ", params.project)
+		                flash.message = "UserLogin ${userLoginInstance} updated"
+		                redirect( action:show, id:userLoginInstance.id, params:[ companyId:companyId ] )
+		            } else {
+		            	def person = userLoginInstance.person
+		            	def availableRoles = userPreferenceService.getAvailableRoles( person )
+		                def assignedRoles = userPreferenceService.getAssignedRoles( person )
+		                status.setRollbackOnly()
+		                render(view:'edit',model:[userLoginInstance:userLoginInstance, availableRoles:availableRoles, assignedRoles:assignedRoles, companyId:companyId ])
+		            }
+				}
 	        }
 	        else {
 	            flash.message = "UserLogin not found with id ${params.id}"
@@ -268,31 +273,56 @@ class UserLoginController {
         //userLoginInstance.createdDate = new Date()
         def companyId = params.companyId
         //convert password onto Hash code
-        userLoginInstance.password = new Sha1Hash(params['password']).toHex()
-        if(!userLoginInstance.hasErrors() && userLoginInstance.save()) {
-        	def assignedRoles = request.getParameterValues("assignedRole");
-        	def person = params.person.id
-        	userPreferenceService.setUserRoles(assignedRoles, person)
-			userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "START_PAGE", "Current Dashboard")
-			userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "CURR_PROJ", params.project)
-			def tZPreference = new UserPreference()
-			tZPreference.userLogin = userLoginInstance
-			tZPreference.preferenceCode = "CURR_TZ"
-			tZPreference.value = "EDT"
-			tZPreference.save( insert: true)
-            flash.message = "UserLogin ${userLoginInstance} created"
-            redirect( action:show, id:userLoginInstance.id, params:[ companyId:companyId ] )
-        }
-        else {
+		def success = false
+	    if(checkPassword(params['password'])) {
+			userLoginInstance.password = new Sha1Hash(params['password']).toHex()
+	        if(!userLoginInstance.hasErrors() && userLoginInstance.save()) {
+	        	def assignedRoles = request.getParameterValues("assignedRole");
+	        	def person = params.person.id
+	        	userPreferenceService.setUserRoles(assignedRoles, person)
+				userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "START_PAGE", "Current Dashboard")
+				userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "CURR_PROJ", params.project)
+				def tZPreference = new UserPreference()
+				tZPreference.userLogin = userLoginInstance
+				tZPreference.preferenceCode = "CURR_TZ"
+				tZPreference.value = "EDT"
+				tZPreference.save( insert: true)
+	            flash.message = "UserLogin ${userLoginInstance} created"
+	            redirect( action:show, id:userLoginInstance.id, params:[ companyId:companyId ] )
+				success = true
+	        }
+		}
+        if(!success){
         	def assignedRole = request.getParameterValues("assignedRole");
         	def personId = params.personId
     		def personInstance
     		if(personId != null ){
     			personInstance = Person.findById( personId )
     		}
+	            flash.message = "Password must follow all the requirements"
             render(view:'create',model:[ userLoginInstance:userLoginInstance,assignedRole:assignedRole,personInstance:personInstance, companyId:companyId ])
         }
     }
+	// Checks if a password meets the proper criteria
+	def boolean checkPassword(String password) {
+		def requirements = 0;
+		def score = 0;
+		
+		if (password ==~ /.{8}.*/)
+			score++;
+		if (password ==~ /.*[a-z]+.*/)
+			requirements++;
+		if (password ==~ /.*[A-Z]+.*/)
+			requirements++;
+		if (password ==~ /.*[0-9]+.*/)
+			requirements++;
+		if (password ==~ /.*[~!@#$%\^&\*_\-\+=`\|\\\(\)\{\}\[\]:;"'<>\,\.?\/]+.*/)
+			requirements++;
+		if (requirements >= 3)
+			score++;
+		
+		return score == 2
+	}
 	/*======================================================
 	 *  Update recent page load time into userLogin
 	 *=====================================================*/
