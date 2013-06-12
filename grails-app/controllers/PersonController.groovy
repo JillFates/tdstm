@@ -402,15 +402,38 @@ class PersonController {
 		if(params.oldPassword == "")
 			return updatePerson(params)
 		
-		def userLogin = UserLogin.findByPerson(Person.findById(params.id))
-		def password = userLogin.password
-		def passwordInput = new Sha1Hash(params.oldPassword).toHex()
+		def requirements = 0;
+		def password = "" + params.newPassword;
+		def score = 0;
 		
-		if(password.equals(passwordInput))
-			return updatePerson(params)
-		def ret = []
-		ret << [pass:"no"]
-		render  ret as JSON
+		if (password ==~ /.{8}.*/)
+			score++;
+		if (password ==~ /.*[a-z]+.*/)
+			requirements++;
+		if (password ==~ /.*[A-Z]+.*/)
+			requirements++;
+		if (password ==~ /.*\d+.*/)
+			requirements++;
+		if (password ==~ /.*[~!@#$%\^&\*_\-\+=`\|\\\(\)\{\}\[\]:;"'<>\,\.?\/]+.*/)
+			requirements++;
+		if (requirements >= 3)
+			score++;
+		
+		if(score == 2){
+			def userLogin = UserLogin.findByPerson(Person.findById(params.id))
+			def truePassword = userLogin.password
+			def passwordInput = new Sha1Hash(params.oldPassword).toHex()
+			
+			if(truePassword.equals(passwordInput))
+				return updatePerson(params)
+			def ret = []
+			ret << [pass:"no"]
+			render  ret as JSON
+		} else {
+			def ret = []
+			ret << [pass:"invalid"]
+			render  ret as JSON
+		}
 	}
 	/*-----------------------------------------------------------
 	 * Update the person details and user password, Return person first name

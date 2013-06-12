@@ -52,7 +52,7 @@
 			$("#emailId").val(personDetails.person.email);
 			$("#titleId").val(personDetails.person.title);
 			$("#expiryDateId").val(personDetails.expiryDate);
-			$("#personDialog").dialog('option', 'width', 500)
+			$("#personDialog").dialog('option', 'width', 540)
 		    $("#personDialog").dialog("open")
 		}
 		function changePersonDetails(){
@@ -60,7 +60,6 @@
 	    	var firstName = $("#firstNameId").val()
 	    	var oldPassword = $("#oldPasswordId").val()
 	    	var newPassword = $("#newPasswordId").val()
-	    	var newPasswordConfirm = $("#newPasswordConfirmId").val()
 	        var email = $("#emailId").val()
 	        var expiryDate = $("#expiryDateId").val()
 	        var powerType = $("#powerTypeId").val()
@@ -81,37 +80,118 @@
 	        } else if(expiryDate != "null" && !dateRegExpForExp.test(expiryDate)){
 		        alert("Expiry Date should be in 'mm/dd/yyyy HH:MM AM/PM' format")
 		        returnVal = false
-	        } else if(oldPassword+newPassword+newPasswordConfirm != ""){
+	        } else if(oldPassword+newPassword != ""){
 	            if(!oldPassword){
 		        	alert("Old Password should not be blank ")
 		            returnVal = false
-		        } else if(!newPassword){
-		        	alert("New Password should not be blank ")
+		        } else if(!checkPassword()){
+		        	alert("New Password does not meet all the requirements ")
 		            returnVal = false
-		        } else if(!newPasswordConfirm){
-			       	alert("New Password (Confirm) should not be blank")
-		            returnVal = false
-			    } else if(oldPassword.length < 6 && newPassword.length < 6 && newPasswordConfirm.length < 6){
-					alert("A password must be at least 6 characters long ")
-		            returnVal = false
-				} else if(newPassword != newPasswordConfirm){
-					alert("New Password and New Password (Confirm) must be the same ")
-		            returnVal = false
-				}
+		        }
 	        }
 	        if(returnVal){
 				new Ajax.Request('/tdstm/person/checkPassword',{asynchronous:true,evalScripts:true,onComplete:function(e){updateWelcome(e)},parameters:'id=' + $('#personId').val() 
 											+'&firstName='+$('#firstNameId').val() +'&lastName='+$('#lastNameId').val()
 											+'&nickName='+$('#nickNameId').val()+'&title='+$('#titleId').val()+'&oldPassword='+$('#oldPasswordId').val()
-											+'&newPassword='+$('#newPasswordId').val()+'&newPasswordConfirm='+$('#newPasswordConfirmId').val()
+											+'&newPassword='+$('#newPasswordId').val()
 											+'&timeZone='+$('#timeZoneId').val()+'&email='+$('#emailId').val()+'&expiryDate='+expiryDate
 											+'&powerType='+powerType+'&startPage='+startPage});
 	        }
+		}
+		function checkPassword(){			
+			var requirements = 0;
+	    	var password = $("#newPasswordId").val();
+			var noMatch;
+	    	var score = 0;
+			
+			var color = '#cc0000';
+			var text = '';
+			if (password.match(/.{8}/)){
+				color = '#00aa00';
+				text = ' OK';
+				score++;
+			}
+			$('#lengthRequirementId').attr('style', 'color:' + color + ';');
+			$('#lengthRequirementId').html('Password must be at least 8 characters long' + text);
+			
+			color = '#cc0000';
+			text = '';
+			if (password.match(/[a-z]/)){
+				color = '#00aa00';
+				text = ' OK';
+				requirements++;
+			}
+			else
+				noMatch = $('#lowercaseRequirementId');
+			$('#lowercaseRequirementId').attr('style', 'color:' + color + ';');
+			$('#lowercaseRequirementId').html('Lowercase characters' + text);
+			
+			color = '#cc0000';
+			text = '';
+			if (password.match(/[A-Z]/)){
+				color = '#00aa00';
+				text = ' OK';
+				requirements++;
+			}
+			else
+				noMatch = $('#uppercaseRequirementId');
+			$('#uppercaseRequirementId').attr('style', 'color:' + color + ';');
+			$('#uppercaseRequirementId').html('Uppercase characters' + text);
+			
+			color = '#cc0000';
+			text = '';
+			if (password.match(/\d+/)){
+				color = '#00aa00';
+				text = ' OK';
+				requirements++;
+			}
+			else
+				noMatch = $('#numericRequirementId');
+			$('#numericRequirementId').attr('style', 'color:' + color + ';');
+			$('#numericRequirementId').html('Numeric characters' + text);
+			
+			color = '#cc0000';
+			text = '';
+			if (password.match(/.[~!@#$%\^&\*_\-\+=`\|\\\(\)\{\}\[\]:;"'<>\,\.?\/]/)){
+				color = '#00aa00';
+				text = ' OK';
+				requirements++;
+			}
+			else
+				noMatch = $('#symbolRequirementId');
+			$('#symbolRequirementId').attr('style', 'color:' + color + ';');
+			$('#symbolRequirementId').html('Nonalphanumeric characters' + text);
+			
+			color = '#cc0000';
+			text = '';
+			if (requirements >= 3){
+				color = '#00aa00';
+				text = 'OK';
+				score++;
+				if(noMatch)
+					noMatch.attr('style', 'color:#555555;');
+			}
+			$('#passwordRequirementsId').attr('style', 'color:' + color + ';');
+			$('#passwordRequirementsId').html('Password must contain at least 3 of these requirements: ' + text);
+			
+			if(score == 2)
+				return true;
+			return false;
+		}
+		function togglePasswordVisibility(box){
+			var newState = "text";
+			if(box.checked){
+				newState = 'password';
+			}
+			$("#oldPasswordId")[0].type = newState;
+			$("#newPasswordId")[0].type = newState;
 		}
 		function updateWelcome( e ){
 			var ret = eval("(" + e.responseText + ")");
 			if(ret[0].pass == "no")
 				alert("Old Password is incorrect")
+			else if(ret[0].pass == "invalid")
+				alert("New Password does not meet the requirements")
 			else{
 				$("#loginUserId").html(ret[0].name)
 				$("#tzId").html(ret[0].tz)

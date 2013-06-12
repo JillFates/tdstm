@@ -622,31 +622,44 @@
                        <input type="text" name ="modelScore" id ="modelScoreId" readonly="readonly" value="${person?.modelScore}"/>
 					</td>
 				</tr>
+				<tr>
+					<td>
+						Hide password:
+					</td>
+					<td>
+						<input type="checkbox" onchange="togglePasswordVisibility(this)" id="showPasswordId"/>
+					</td>
+				</tr>
               	<tr class="prop">
                 	<td valign="top" class="name">
                     	<label for="password">Old Password:&nbsp;</label>
 					</td>
                     <td valign="top" class="value">
                     	<input type="hidden" id="personId" name="personId" value=""/>
-						<input type="password" maxlength="25" name="oldPassword" id="oldPasswordId" value=""/>
+						<input type="text" maxlength="25" name="oldPassword" id="oldPasswordId" value=""/>
 					</td>
 				</tr>
-
               	<tr class="prop">
                 	<td valign="top" class="name">
                     	<label for="password">New Password:&nbsp;</label>
 					</td>
                     <td valign="top" class="value">
-						<input type="password" maxlength="25" name="newPassword" id="newPasswordId" value=""/>
+						<input type="text" maxlength="25" name="newPassword" onkeyup="checkPassword()" id="newPasswordId" value=""/>
 					</td>
 				</tr>
-
-              	<tr class="prop">
-                	<td valign="top" class="name">
-                    	<label for="password">New Password (confirm):&nbsp;</label>
+				<tr>
+					<td>
+						Requirements:
 					</td>
-                    <td valign="top" class="value">
-						<input type="password" maxlength="25" name="newPasswordConfirm" id="newPasswordConfirmId" value=""/>
+					<td>
+						<em id="lengthRequirementId">Password must be at least 8 characters long</em><br/>
+						<b id="passwordRequirementsId">Password must contain at least 3 of these requirements: </b><br/>
+						<ul>
+							<li><em id="uppercaseRequirementId">Uppercase characters</em></li>
+							<li><em id="lowercaseRequirementId">Lowercase characters</em></li>
+							<li><em id="numericRequirementId">Numeric characters</em></li>
+							<li><em id="symbolRequirementId">Nonalphanumeric characters</em></li>
+						</ul>
 					</td>
 				</tr>
               </tbody>
