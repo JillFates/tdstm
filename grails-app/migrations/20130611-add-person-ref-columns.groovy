@@ -12,7 +12,7 @@ def ctx = AH.application.mainContext
 def jdbcTemplate = ctx.jdbcTemplate
 databaseChangeLog = {
 	// This Changeset is used for migrate sme record to sme_id column
-	changeSet(author: "lokanada", id: "20130611 TM-1904-11") {
+	changeSet(author: "lokanada", id: "20130611 TM-1904-1") {
 		comment('Add "sme_id" column in Application table')
 		preConditions(onFail:'MARK_RAN') {
 			not {
@@ -42,7 +42,7 @@ databaseChangeLog = {
 	}
 	
 	// This Changeset is used for migrate sme2 record to sme2_id column
-	changeSet(author: "lokanada", id: "20130611 TM-1904-12") {
+	changeSet(author: "lokanada", id: "20130611 TM-1904-2") {
 		comment('Add "sme2_id" column in Application table')
 		preConditions(onFail:'MARK_RAN') {
 			not {
@@ -72,7 +72,7 @@ databaseChangeLog = {
 	
 	// This Changeset is used for migrate app_owner record to app_owner_id column
 	
-	changeSet(author: "lokanada", id: "20130611 TM-1904-13") {
+	changeSet(author: "lokanada", id: "20130611 TM-1904-3") {
 		comment('Add "app_owner_id" column in Application table')
 		preConditions(onFail:'MARK_RAN') {
 			not {
@@ -100,7 +100,8 @@ databaseChangeLog = {
 }
 
 /**
- * This method we are using to Migrate record for sme , sme2 and appOwner. 
+ * This method we are using to Migrate record for sme , sme2 and appOwner. but we are not migrating data here so here we are 
+ * creating person only if person does not exist.
  * @param record : list of application where sme , sme2 and appOwner exist
  * @param column : column is name of column in table (e.g. app_owner)
  * @param prop : property of column in domain
@@ -150,10 +151,10 @@ def migrateRecord(record, column, prop, domain, jdbcTemplate){
 					//so trying to fix it .
 					
 					/*if(domain=="Application")
-						jdbcTemplate.execute("update application set ${column} = ${personId} where app_id= ${app.id}")
+						jdbcTemplate.execute("update application set ${column} = ${person.id} where app_id= ${app.id}")
 					else
-						jdbcTemplate.execute("update asset_entity set ${column} = ${person.id} where asset_entity_id= ${app.id}")
-					*/
+						jdbcTemplate.execute("update asset_entity set ${column} = ${person.id} where asset_entity_id= ${app.id}")*/
+					
 				}
 		}
 }
