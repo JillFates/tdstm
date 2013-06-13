@@ -63,7 +63,7 @@
                                     <label for="username"><b>Username (use email):&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'username','errors')}">
-                                    <input type="text" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}"/>
+                                    <input type="text" onkeyup="checkPassword($('#password')[0])" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}"/>
                                 <g:hasErrors bean="${userLoginInstance}" field="username">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="username"/>
@@ -98,6 +98,7 @@
 									Requirements:
 								</td>
 								<td>
+									<em id="usernameRequirementId">Password must not contain the username</em><br/>
 									<em id="lengthRequirementId">Password must be at least 8 characters long</em><br/>
 									<b id="passwordRequirementsId">Password must contain at least 3 of these requirements: </b><br/>
 									<ul>
@@ -152,7 +153,7 @@
                             </tr>
 	                        <g:each in="${roleList}" var="role">
                             	<tr class="prop">
-                            	 <td valign="top" class="value" >
+                            	 <td valign="top" class="name" >
                             	     ${role}:
                             	 </td>
                             	 <td valign="top" class="value" >

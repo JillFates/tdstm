@@ -101,14 +101,16 @@
 		function checkPassword(field){
 			var requirements = 0;
 			var password = field.value;
+			var username = username = $('#username').val().toLowerCase();
+			if(field.id == "newPasswordId")
+				username = $('#prefUsernameId').val().toLowerCase();
 			var context = 0;
 			var noMatch = {item:null};
 	    	var score = 0;
-	    	
 			if(field.id == "newPasswordId" && $("[id='lengthRequirementId']").length > 1){
 				context = 1;
 			}
-			
+			score += passwordMatch(password.toLowerCase(), $("[id='usernameRequirementId']")[context], new RegExp('.*' + username + '.*'), 'Password must not contain the username', {item:null});
 			score += passwordMatch(password, $("[id='lengthRequirementId']")[context], /.{8}/, 'Password must be at least 8 characters long', {item:null});
 			requirements += passwordMatch(password, $("[id='lowercaseRequirementId']")[context], /[a-z]+/, 'Lowercase characters', noMatch);
 			requirements += passwordMatch(password, $("[id='uppercaseRequirementId']")[context], /[A-Z]+/, 'Uppercase characters', noMatch);
@@ -120,7 +122,7 @@
 					noMatch.item.style.color = "#555555";
 			}
 			
-			if(score == 2)
+			if(score == 3)
 				return true;
 			return false;
 		}
@@ -128,13 +130,14 @@
 			var returnVal = 0;
 			color = '#cc0000';
 			text = '';
-			if (password.match(regex)){
+
+			if (!(element.id == 'usernameRequirementId') == (password.match(regex) != null)){
 				color = '#00aa00';
 				text = ' OK';
 				returnVal = 1;
-			}
-			else
+			} else {
 				noMatch.item = element;
+			}
 			element.style.color = color;
 			element.innerHTML = baseText + text;
 			return returnVal;

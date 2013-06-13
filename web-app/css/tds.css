@@ -1299,7 +1299,7 @@ a.tab_deselect {
 	background: #fff
 }
 .loginView{
-	width: 450px
+	width: 500px
 }
 a.task_action{float: left; position: relative; margin: 0 0 0 30px;cursor: pointer;}
 a#viewtaskgraph_button_graph{ margin: 5px 0 0 30px;}

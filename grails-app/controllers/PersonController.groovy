@@ -401,26 +401,11 @@ class PersonController {
 	def checkPassword = {
 		if(params.oldPassword == "")
 			return updatePerson(params)
-		
-		def requirements = 0;
 		def password = "" + params.newPassword;
-		def score = 0;
 		
-		if (password ==~ /.{8}.*/)
-			score++;
-		if (password ==~ /.*[a-z]+.*/)
-			requirements++;
-		if (password ==~ /.*[A-Z]+.*/)
-			requirements++;
-		if (password ==~ /.*[0-9]+.*/)
-			requirements++;
-		if (password ==~ /.*[~!@#$%\^&\*_\-\+=`\|\\\(\)\{\}\[\]:;"'<>\,\.?\/]+.*/)
-			requirements++;
-		if (requirements >= 3)
-			score++;
-		
-		if(score == 2){
-			def userLogin = UserLogin.findByPerson(Person.findById(params.id))
+			
+		def userLogin = UserLogin.findByPerson(Person.findById(params.id))
+		if(securityService.validPassword(userLogin.username, params.newPassword)){
 			def truePassword = userLogin.password
 			def passwordInput = new Sha1Hash(params.oldPassword).toHex()
 			

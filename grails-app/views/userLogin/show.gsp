@@ -25,7 +25,7 @@
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
-            <div class="dialog">
+            <div class="dialog loginView">
                 <table>
                     <tbody>
 
@@ -82,7 +82,7 @@
 
                         <g:each in="${roleList}" var="role">
                             	<tr class="prop">
-                            	 <td valign="top" class="value" >
+                            	 <td valign="top" class="name" >
                             	     ${role}:
                             	 </td>
                             	 <td valign="top" class="value" >

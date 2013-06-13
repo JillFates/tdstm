@@ -179,7 +179,7 @@ class UserLoginController {
 	        	}
 	        	def password = params.password
 	        	def oldPassword = userLoginInstance.password
-				if(!checkPassword(params['password']) && password != ""){
+				if(!securityService.validPassword(params['username'], params['password']) && password != ""){
 	                flash.message = "The password must meet all the requirements"
 					redirect( action:edit, id:userLoginInstance.id, params:[ companyId:companyId ] )
 				} else{
@@ -274,7 +274,7 @@ class UserLoginController {
         def companyId = params.companyId
         //convert password onto Hash code
 		def success = false
-	    if(checkPassword(params['password'])) {
+	    if(securityService.validPassword(params['username'], params['password'])) {
 			userLoginInstance.password = new Sha1Hash(params['password']).toHex()
 	        if(!userLoginInstance.hasErrors() && userLoginInstance.save()) {
 	        	def assignedRoles = request.getParameterValues("assignedRole");
@@ -303,26 +303,6 @@ class UserLoginController {
             render(view:'create',model:[ userLoginInstance:userLoginInstance,assignedRole:assignedRole,personInstance:personInstance, companyId:companyId ])
         }
     }
-	// Checks if a password meets the proper criteria
-	def boolean checkPassword(String password) {
-		def requirements = 0;
-		def score = 0;
-		
-		if (password ==~ /.{8}.*/)
-			score++;
-		if (password ==~ /.*[a-z]+.*/)
-			requirements++;
-		if (password ==~ /.*[A-Z]+.*/)
-			requirements++;
-		if (password ==~ /.*[0-9]+.*/)
-			requirements++;
-		if (password ==~ /.*[~!@#$%\^&\*_\-\+=`\|\\\(\)\{\}\[\]:;"'<>\,\.?\/]+.*/)
-			requirements++;
-		if (requirements >= 3)
-			score++;
-		
-		return score == 2
-	}
 	/*======================================================
 	 *  Update recent page load time into userLogin
 	 *=====================================================*/

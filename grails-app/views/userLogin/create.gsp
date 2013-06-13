@@ -62,20 +62,20 @@
 							</td>
 							</tr>
                             <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="person"><b>Person:&nbsp;<span style="color: red">*</span></b></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'person','errors')}">
+								<td valign="top" class="name">
+        							<label for="person"><b>Person:&nbsp;<span style="color: red">*</span></b></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'person','errors')}">
 
-                                <g:if test="${personInstance}">
+								<g:if test="${personInstance}">
 
-	                                <g:select optionKey="id" from="${personInstance}" name="person.id" value="${personInstance?.id}" ></g:select>
-	                                <input type="hidden" name="personId" value="${personInstance?.id}" >
+									<g:select optionKey="id" from="${personInstance}" name="person.id" value="${personInstance?.id}" ></g:select>
+									<input type="hidden" name="personId" value="${personInstance?.id}" >
 
-                                </g:if>
+								</g:if>
 
-                                <g:else>
-                                    <g:select optionKey="id" from="${Person.executeQuery('from Person p where p.id not in (select person.id from UserLogin u) order by p.firstName')}" name="person.id" value="${userLoginInstance?.person?.id}" ></g:select>
+								<g:else>
+	                                <g:select optionKey="id" from="${Person.executeQuery('from Person p where p.id not in (select person.id from UserLogin u) order by p.firstName')}" name="person.id" value="${userLoginInstance?.person?.id}" ></g:select>
                                     
                                 </g:else>
 
@@ -92,7 +92,7 @@
                                     <label for="username"><b>Username (use email):&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'username','errors')}">
-                                    <input type="text" maxlength="50" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}"/>
+                                    <input type="text" maxlength="50" onkeyup="checkPassword($('#password')[0])" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}"/>
                                 <g:hasErrors bean="${userLoginInstance}" field="username">
 					            <div class="errors">
 					                <g:renderErrors bean="${userLoginInstance}" as="list" field="username"/>
@@ -126,6 +126,7 @@
 									Requirements:
 								</td>
 								<td>
+									<em id="usernameRequirementId">Password must not contain the username</em><br/>
 									<em id="lengthRequirementId">Password must be at least 8 characters long</em><br/>
 									<b id="passwordRequirementsId">Password must contain at least 3 of these requirements: </b><br/>
 									<ul>
@@ -192,7 +193,7 @@
                             </tr>
                             <g:each in="${roleList}" var="role">
                             	<tr class="prop">
-                            	 <td valign="top" class="value" >
+                            	 <td valign="top" class="name" >
                             	     ${role}:
                             	 </td>
                             	 <td valign="top" class="value" >
@@ -305,7 +306,7 @@
                     </table>
                 </div>
                 <div class="buttons">
-                    <span class="button"><input class="save" type="submit" value="Create" onclick="selectAllAssigned()"/></span>
+					<span class="button"><input class="save" type="submit" value="Create" onclick="selectAllAssigned()"/></span>
                 </div>
             </g:form>
         </div>

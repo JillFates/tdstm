@@ -32,7 +32,7 @@
      	var B1 = []
      	var B2 = []
      	var taskManagerTimePref = "60"
-     	var contextPath = "${request.contextPath}"
+		var contextPath = "${request.contextPath}"
    </script>
   </head>
 	<% def currProj = session.getAttribute("CURR_PROJ");
@@ -54,6 +54,7 @@
     def partyGroup = session.getAttribute("PARTYGROUP")?.PARTYGROUP ;
     def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");
 	def user = UserLogin.findByPerson( person )
+	def username = user.username
 	def userPrefs = UserPreference.findAllByUserLogin(user)
     %>
   <body>
@@ -528,6 +529,15 @@
 						<input type="text" maxlength="64" id="firstNameId" name="firstName"/>
 					</td>
 				</tr>
+				
+                <tr class="prop" style="display:none;">
+					<td valign="top" class="name">
+						<label for="username"><b>User Name:&nbsp;<span style="color: red">*</span></b></label>
+					</td>
+					<td valign="top" class="value">
+						<input type="text" maxlength="64" id="prefUsernameId" name="username" value="${user.username}"/>
+					</td>
+				</tr>
 
                 <tr class="prop">
                   <td valign="top" class="name">
@@ -652,6 +662,7 @@
 						Requirements:
 					</td>
 					<td>
+						<em id="usernameRequirementId">Password must not contain the username</em><br/>
 						<em id="lengthRequirementId">Password must be at least 8 characters long</em><br/>
 						<b id="passwordRequirementsId">Password must contain at least 3 of these requirements: </b><br/>
 						<ul>
