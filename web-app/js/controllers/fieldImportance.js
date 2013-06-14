@@ -2,13 +2,12 @@
 
 var app = angular.module("MyApp", []);
 
-//factory which return assetFields and phases
+//factory which return Fields,phases and importance
 app.factory('fieldFactory',function($http){
 	return{
-		getFields : function(type) {
+		getFields : function() {
 			return $http({
 				url: contextPath+"/project/getAssetFields",
-				params:{'entityType':type},
 				method: 'GET'
 			})
 		},
@@ -20,10 +19,9 @@ app.factory('fieldFactory',function($http){
 			   	         {'id':'B','label':'BundleReady'}];
 			return phases;
 		},
-		getImportance : function(type) {
+		getImportance : function() {
 			return $http({
 				url: contextPath+"/project/getImportance",
-				params:{'entityType':type},
 				method: 'GET'
 			})
 		}
@@ -31,24 +29,21 @@ app.factory('fieldFactory',function($http){
 });
 
 app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) {
-	//initializing	importance(for time being I just hard coded) 							
+	$scope.fields = [];
+	$scope.importance = [];
+	fieldFactory.getFields().success(function(data){
+		$scope.fields=data;
+	});
+	fieldFactory.getImportance().success(function(data){
+		$scope.importance=data;
+	});
 	$scope.phases=fieldFactory.getPhases();
 	$scope.data = ['C','I','N','H'];
 	//initializing section
 	$scope.section = {'AssetEntity':'h','Application':'h','Database':'h','Files':'h'};
 
 	$scope.toggleSection = function( s ) {
-		$scope.importance = [];
-		$scope.fields = [];
 		$scope.section[s] = $scope.section[s] == 'h' ? 's' : 'h';
-		if($scope.section[s] == 's'){
-			fieldFactory.getFields(s).success(function(data){
-				$scope.fields=data;
-			});
-			fieldFactory.getImportance(s).success(function(data){
-				$scope.importance=data;
-			});
-		}
 	}
 
 	$scope.showSection = function( s ) {
@@ -62,20 +57,20 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 	$scope.toggleEditMode = function (s) {
 		$scope.section[s] = $scope.section[s] == 'e' ? 's' : 'e'
 	}
-	$scope.assignData = function(value,field,phase) {
+	$scope.assignData = function(type,value,field,phase) {
 		console.log(field+"_"+phase+"_"+value);
-		$scope.importance[field]['phase'][phase] ='C'
-			$scope.setImportance(field, phase, value);
+		$scope.importance[type][field]['phase'][phase] ='C'
+			$scope.setImportance(type,field, phase, value);
 	};
 
-	$scope.setImportance = function (field, phase, value) {
-		$scope.importance[field]['phase'][phase] = value;
+	$scope.setImportance = function (type,field, phase, value) {
+		$scope.importance[type][field]['phase'][phase] = value;
 	};
 	$scope.updateAsset = function (type) {
 		$http({
 			url : contextPath+"/project/updateFieldImportance",
 			method: "POST",
-			data:{'jsonString':$scope.importance, 'entityType':type}
+			data:{'jsonString':$scope.importance[type], 'entityType':type}
 		}).success (function(resp) {
 			console.log(resp);
 		}).error(function(resp, status, headers, config) {

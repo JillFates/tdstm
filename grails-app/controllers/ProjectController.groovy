@@ -10,7 +10,8 @@ import org.jmesa.facade.TableFacadeImpl
 import org.jmesa.limit.Limit
 
 import com.tds.asset.FieldImportance
-import com.tdsops.tm.enums.domain.ValidationType
+import com.tdsops.tm.enums.domain.EntityType
+import com.tdsops.tm.enums.domain.ValidationType;
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
@@ -692,65 +693,92 @@ class ProjectController {
      */
 	def getAssetFields ={
 		
-		def assetType=params.entityType
+		def assetTypes=EntityType.list
+		def fieldMap= [:]
 		def project = securityService.getUserCurrentProject()
-		def eavEntityType = EavEntityType.findByDomainName(assetType)
-		def attributes = EavAttribute.findAllByEntityType( eavEntityType )
-		def returnMap = attributes.collect{p->
-			return ['id':(p.attributeCode.contains('custom') && project[p.attributeCode])? project[p.attributeCode]:p.frontendLabel, 'label':p.attributeCode]
+		assetTypes.each{type->
+			def eavEntityType = EavEntityType.findByDomainName(type)
+			def attributes = EavAttribute.findAllByEntityType( eavEntityType )
+			def returnMap = attributes.collect{p->
+				return ['id':(p.attributeCode.contains('custom') && project[p.attributeCode])? project[p.attributeCode]:p.frontendLabel, 'label':p.attributeCode]
+			}
+			fieldMap << [(type):returnMap]
 		}
-
-		render returnMap as JSON
+		render fieldMap as JSON
 	}
 	/**
 	 * Initialising importance for a given entity type.
 	 *@param : entityType type of entity.
-	 *@return : json data
+	 *@return : json data, example map
+	 *{
+		AssetEntity:{
+			assetName:{phase:{D:C,V:C,R:H,S:I,B:C}},
+			assetTag:{phase:{D:N,V:N,R:N,S:N,B:N}},..............
+			environment:{phase:{D:N,V:N,R:N,S:N,B:N}}},
+		Application:{
+			assetName:{phase:{D:N,V:N:N,S:N,B:N}},
+			appVendor:{phase:{D:C,V:H,R:I,S:C,B:H}},....
+			custom8:{phase:{D:N,V:N,R:N,N,B:N}}},
+		Files:{
+			assetName:{phase:{D:N,V:N,R:N,S:N,B:N}},
+			fileFormat:{phase:{D:N,V:N,N,S:N,B:N}},........
+			url:{phase:{D:N,V:N,R:N,S:N,B:N}}},
+		Database:{
+			assetName:{phase:{D:N,V:N,R:N,S:N,B:N}},
+			dbFormat:{phase:{D:N,V:N,R:N,S:N,B:N}},.............
+			custom8:{phase:{D:N,V:N,R:N,S:N,B:N}}}
+		}
 	 */
 	def getImportance ={
-		def entityType=params.entityType
+		def assetTypes=EntityType.list
 		def project = securityService.getUserCurrentProject()
 		//hard coded for now need to get from enum.
-		def phases = ['D','V','R','S','B']
-		def parseData = [:]
+		def phases = ValidationType.getListAsMap().keySet()
 		def phase =[:]
-		def data = FieldImportance.findByProjectAndEntityType(project,entityType)?.config
-		if(data)
-			parseData=JSON.parse(data)
-		def eavEntityType = EavEntityType.findByDomainName(entityType)
-		def attributes = EavAttribute.findAllByEntityType( eavEntityType )?.attributeCode
-		def returnMap = attributes.inject([:]){rmap, field->
-			def pmap = phases.inject([:]){map, item->
-				map[item]=parseData[field] ? parseData[field]['phase'][item]:'N'
-				return map
+		def impMap =[:]
+		assetTypes.each{type->
+			def parseData= [:]
+			
+			def data = FieldImportance.findByProjectAndEntityType(project,type)?.config
+			if(data)
+				parseData=JSON.parse(data)
+				
+			def eavEntityType = EavEntityType.findByDomainName(type)
+			def attributes = EavAttribute.findAllByEntityType( eavEntityType )?.attributeCode
+			def returnMap = attributes.inject([:]){rmap, field->
+				def pmap = phases.inject([:]){map, item->
+					map[item]=parseData[field] ? parseData[field]['phase'][item]:'N'
+					return map
+				}
+				rmap[field] = ['phase': pmap]
+				return rmap
 			}
-			rmap[field] = ['phase': pmap]
-			return rmap
+			impMap << [(type):returnMap]
 		}
-		render returnMap as JSON
+		render impMap as JSON
 	}
+	
 	/**
 	 *This action is used to update field importance and display it to user
 	 *@param : entityType type of entity for which user is requested for importance .
-	 *@return 
+	 *@return success string 
 	 */
 	def updateFieldImportance ={
 		def entityType = request.JSON.entityType
 		def project = securityService.getUserCurrentProject()
 		def allConfig = request.JSON.jsonString as JSON;
 		try{
-				def assetImp = FieldImportance.find("from FieldImportance where project=:project and entityType=:entityType\
-						                          ", [project:project, entityType:entityType])
-				if(!assetImp)
-				//for time being hard coding phase column need to write dbMigration to drop it.
-					assetImp = new FieldImportance(entityType:entityType, config:allConfig, project:project, phase:'phase')
-				else{
-					assetImp.config = allConfig
-				}
-				if(!assetImp.validate() || !assetImp.save()){
-					def etext = "updateFieldImportance Unable to create FieldImportance"+GormUtil.allErrorsString( assetImp )
-					log.error( etext )
-				}
+			def assetImp = FieldImportance.find("from FieldImportance where project=:project and entityType=:entityType\
+					                          ", [project:project, entityType:entityType])
+			if(!assetImp)
+				assetImp = new FieldImportance(entityType:entityType, config: allConfig.toString(), project:project)
+			else{
+				assetImp.config = allConfig.toString()
+			}
+			if(!assetImp.validate() || !assetImp.save()){
+				def etext = "updateFieldImportance Unable to create FieldImportance"+GormUtil.allErrorsString( assetImp )
+				log.error( etext )
+			}
 		} catch(Exception ex){
 			log.error "An error occurred : ${ex}"
 		}

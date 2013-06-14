@@ -7,9 +7,9 @@
 			<th>Field</th>
 			<th ng-repeat="phase in phases">{{phase.label}}</th>
 		</tr>
-		<tr ng-repeat="field in fields">
+		<tr ng-repeat="field in fields[type]">
 			<td>{{field.id}}</td>
-			<td ng-repeat="phase in phases" class="{{importance[field.label]['phase'][phase.id]}}">{{importance[field.label]['phase'][phase.id]}}</td>
+			<td ng-repeat="phase in phases" class="{{importance[type][field.label]['phase'][phase.id]}}">{{importance[type][field.label]['phase'][phase.id]}}</td>
 		</tr>
 	</table>
 	<button ng-click="toggleEditMode(type)">Edit</button></td>

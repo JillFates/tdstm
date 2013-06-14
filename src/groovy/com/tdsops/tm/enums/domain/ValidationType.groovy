@@ -14,4 +14,7 @@ class ValidationType {
 	static final getList() {
 		return [ DIS, VL, DR, DS, BR ]
 	}
+	static final getListAsMap() {
+		return [ D:DIS, V:VL, R:DR, S:DS, B:BR  ]
+	}
 }
