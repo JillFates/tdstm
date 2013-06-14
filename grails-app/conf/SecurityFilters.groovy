@@ -27,6 +27,28 @@ class SecurityFilters {
             }
         }
         
+		checkForcePasswordChange(controller:'*', action:'*'){
+			before = {
+				def subject = SecurityUtils.subject
+				if(subject != null){
+					def principal = subject.principal
+					def userLoginInstance
+					if(principal != null){
+						userLoginInstance = UserLogin.findByUsername(principal)
+						if(userLoginInstance.forcePasswordChange){
+							if((controllerName == 'auth' && (actionName == 'login' || actionName == 'signIn' || actionName == 'signOut')) || (controllerName == 'userLogin' && (actionName == 'changePassword' || actionName == 'updatePassword'))){
+								return true;
+							} else {
+								flash.message = "Your password has expired and must be changed"
+								redirect(controller:'userLogin', action:'changePassword', params:[ userLoginInstance:userLoginInstance ])
+								return false
+							}
+						}
+					}
+				}
+			}		
+		}
+		
         /*
          *   Statements to Check the Session status
          */

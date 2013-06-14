@@ -1,5 +1,6 @@
 import com.tds.asset.AssetTransition
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 class UserLogin {
 	String username
 	String password
@@ -8,6 +9,8 @@ class UserLogin {
 	String active
 	Date lastPage
 	Date expiryDate
+	Date passwordChangedDate = TimeUtil.nowGMT()
+	Boolean forcePasswordChange = false
     
 	static belongsTo = [ person:Person ]
 	static hasMany = [
@@ -25,6 +28,8 @@ class UserLogin {
 		active( nullable:false, inList:['Y', 'N'] )
 		lastPage( nullable: true )
 		expiryDate( nullable: false )
+		passwordChangedDate( nullable: false)
+		forcePasswordChange( nullable: false)
 	}
 
 	static mapping  = {
@@ -35,7 +40,10 @@ class UserLogin {
 		password sqlType: 'varchar(100)'  // size must me more than 20 because it will store as encrypted code
 		// TODO - active column should not be varchar(20) as it is only 1 char
 		active sqlType:'varchar(20)'
+		forcePasswordChange sqltype: 'boolean'
+		passwordChangedDate sqltype: 'DateTime'
 		person ignoreNotFound: true
+		passwordChangedDate ignoreNotFound: true
 	}
 
 	String toString(){
@@ -46,5 +54,9 @@ class UserLogin {
 	 */
 	def getPersonDetails(){
 		return "${this.person.firstName} ${this.person.lastName}"
+	}
+	
+	def isActive(){
+		return TimeUtil.nowGMT() < expiryDate && active == 'Y' && person.active == 'Y'
 	}
 }

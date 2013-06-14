@@ -39,12 +39,12 @@ class AuthController {
 	            // will be thrown if the username is unrecognised or the
 	            // password is incorrect.
 	            SecurityUtils.subject.login(authToken)
-	            // Check User and Person Activi status
-	            
-	            def activeStatus = userPreferenceService.checkActiveStatus()
-	            if(!activeStatus){
-	                flash.message = "User Authentication has been Disabled"
-	                redirect(action: 'login')
+				
+				// If the user is no longer active, redirect them to the login page and display a message
+	            if(!UserLogin.findByUsername(params.username).isActive()){
+					SecurityUtils.subject.logout()
+					flash.message = message(code: "userLogin.accountDisabled.message")
+					redirect(action: 'login', params: params)
 	            } else {
 		            // If a controller redirected to this page, redirect back
 		            // to it. Otherwise redirect to the root URI.
@@ -112,7 +112,7 @@ class AuthController {
 	            if (params.targetUri) {
 	                m['targetUri'] = params.targetUri
 	            }
-	
+				
 	            // Now redirect back to the login page.
 	            redirect(action: 'login', params: m)
 	        }
@@ -120,6 +120,7 @@ class AuthController {
 			def remoteIp = HtmlUtil.getRemoteIp()
 			log.warn "Authentication failure for user '${params.username}' : IP ${remoteIp}"
 			flash.message = "Authentication failure for user '${params.username}'."
+			
 			redirect(action: 'login', params: params)
     	}
     }

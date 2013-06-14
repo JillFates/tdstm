@@ -101,9 +101,11 @@
 		function checkPassword(field){
 			var requirements = 0;
 			var password = field.value;
-			var username = username = $('#username').val().toLowerCase();
+			var username;
 			if(field.id == "newPasswordId")
 				username = $('#prefUsernameId').val().toLowerCase();
+			else
+				username = $('#username').val().toLowerCase();
 			var context = 0;
 			var noMatch = {item:null};
 	    	var score = 0;

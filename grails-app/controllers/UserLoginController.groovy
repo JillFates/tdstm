@@ -184,9 +184,11 @@ class UserLoginController {
 					redirect( action:edit, id:userLoginInstance.id, params:[ companyId:companyId ] )
 				} else{
 		        	userLoginInstance.properties = params
+					userLoginInstance.forcePasswordChange = params.forcePasswordChange
 		        	if(password != ""){
 		        		//	convert password onto Hash code
 		                userLoginInstance.password = new Sha1Hash(params['password']).toHex()
+						userLoginInstance.passwordChangedDate = TimeUtil.nowGMT()
 		        	}else{
 		        		userLoginInstance.password = oldPassword
 		        	}
@@ -315,5 +317,27 @@ class UserLoginController {
 			session.REDIRECT_URL = params.url
 		}
 		render "SUCCESS"
-	 }
+	}
+	def changePassword = {
+		def principal = SecurityUtils.subject?.principal
+		def userLoginInstance = UserLogin.findByUsername(principal)
+		render(view:'changePassword',model:[ userLoginInstance:userLoginInstance])
+		return [ userLoginInstance : userLoginInstance]
+	}
+	def updatePassword = {
+		def subject = SecurityUtils.subject
+		def principal = subject.principal
+		def userLoginInstance = UserLogin.findByUsername(principal)
+		if(params.password != null && userLoginInstance != null && securityService.validPassword(userLoginInstance.username, params.password)) {
+			userLoginInstance.setPassword(new Sha1Hash(params.password).toHex())
+			userLoginInstance.passwordChangedDate = TimeUtil.nowGMT()
+			userLoginInstance.forcePasswordChange = false
+            flash.message = "Password updated"
+			redirect(controller:'project', action:'show', params:[ userLoginInstance:userLoginInstance ])
+		} else {
+            flash.message = "Password must follow all the requirements"
+			redirect(action:'changePassword', params:[ userLoginInstance:userLoginInstance ])
+		}
+		return
+	}
 }
