@@ -4,6 +4,16 @@
 <div ng-show="editMode(type)">
 	<table>
 		<tr>
+			<td colspan="10" class="buttons">
+				<div>
+					<span class="button">
+						<input type="button" value="Update" class="save" ng-click="toggleEditMode(type);updateAsset(type);" />
+						<input type="button" value="Cancel" class="delete" ng-click="toggleSection(type)" />
+					</span>
+				</div>
+			</td>
+		</tr>
+		<tr>
 			<th>Field</th>
 			<th ng-repeat="phase in phases">{{phase.label}}</th>
 		</tr>
@@ -14,10 +24,4 @@
 		</td>
 		</tr>
 	</table>
-	<div class="buttons">
-		<span class="button">
-			<input type="button" value="Update" class="save" ng-click="toggleEditMode(type);updateAsset(type);" />
-			<input type="button" value="Cancel" class="delete" ng-click="toggleSection(type)" />
-		</span>
-	</div>
 </div>

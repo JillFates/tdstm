@@ -498,3 +498,7 @@ div.field_list table {
 .crudTable{
 	margin-top: 12px;
 }
+td.buttons{
+	padding: 0px;
+	margin-top: 0px !important;
+}

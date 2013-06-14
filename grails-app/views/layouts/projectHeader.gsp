@@ -174,7 +174,7 @@
 							<tds:hasPermission permission='CreateProject'>
 							<li><g:link class="mmlink" controller="project" action="create"  onclick="hideMegaMenu('projectMegaMenu')">Create Project</g:link></li>
 							</tds:hasPermission>
-							<li><g:link class="mmlink" controller="project" action="assetFields" onclick="hideMegaMenu('adminMegaMenu')">Asset Fields</g:link> </li>
+							<li><g:link class="mmlink" controller="project" action="assetFields" onclick="hideMegaMenu('adminMegaMenu')">Field Importance</g:link> </li>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMClientProjectSettings?cover=print','help');"  onclick="hideMegaMenu('projectMegaMenu')">help</a></li>
 							</tds:hasPermission>

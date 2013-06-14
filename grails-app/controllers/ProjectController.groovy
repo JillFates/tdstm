@@ -740,7 +740,6 @@ class ProjectController {
 			if(data)
 				parseData=JSON.parse(data)
 			if(!parseData){
-				// TODO : Read it from default Project and if not exists read default
 				parseData = generateDefaultConfig(type)
 			}
 			impMap << [(type):parseData]
@@ -781,16 +780,23 @@ class ProjectController {
 	 * @return
 	 */
 	def generateDefaultConfig(def type){
-		def eavEntityType = EavEntityType.findByDomainName(type)
-		def attributes = EavAttribute.findAllByEntityType( eavEntityType )?.attributeCode
-		def phases = ValidationType.getListAsMap().keySet()
-		def returnMap = attributes.inject([:]){rmap, field->
-			def pmap = phases.inject([:]){map, item->
-				map[item]="N"
-				return map
+		def defautlProject = Project.findByProjectCode("TM_DEFAULT_PROJECT")
+		def returnMap = [:]
+		def data = FieldImportance.findByProjectAndEntityType(defautlProject,type)?.config
+		if(data)
+			returnMap=JSON.parse(data)
+		if(!returnMap){
+			def eavEntityType = EavEntityType.findByDomainName(type)
+			def attributes = EavAttribute.findAllByEntityType( eavEntityType )?.attributeCode
+			def phases = ValidationType.getListAsMap().keySet()
+			returnMap = attributes.inject([:]){rmap, field->
+				def pmap = phases.inject([:]){map, item->
+					map[item]="N"
+					return map
+				}
+				rmap[field] = ['phase': pmap]
+				return rmap
 			}
-			rmap[field] = ['phase': pmap]
-			return rmap
 		}
 		return returnMap
 	}
