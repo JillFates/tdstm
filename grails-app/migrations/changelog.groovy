@@ -36,6 +36,7 @@ databaseChangeLog = {
 	include file: '20130520-add-field-importance-table.groovy'
 	include file: '20130521-add-missing-eav-attribute.groovy'
 	include file: '20130530-add-person-permission.groovy'
+	include file: '20130614-add-userlogin-passwordchange-columns.groovy'
 	//include file: '20130611-add-person-ref-columns.groovy'  // TODO : enable after John's review
 	//include file: '20130612-migrate-person-ref-records.groovy' // TODO : enable after John's review
     //include file: '20130522-create-default-project.groovy' // TODO : enable after John's review
