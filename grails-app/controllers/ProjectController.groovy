@@ -732,9 +732,6 @@ class ProjectController {
 	def getImportance ={
 		def assetTypes=EntityType.list
 		def project = securityService.getUserCurrentProject()
-		//hard coded for now need to get from enum.
-		def phases = ValidationType.getListAsMap().keySet()
-		def phase =[:]
 		def impMap =[:]
 		assetTypes.each{type->
 			def parseData= [:]
@@ -742,18 +739,11 @@ class ProjectController {
 			def data = FieldImportance.findByProjectAndEntityType(project,type)?.config
 			if(data)
 				parseData=JSON.parse(data)
-				
-			def eavEntityType = EavEntityType.findByDomainName(type)
-			def attributes = EavAttribute.findAllByEntityType( eavEntityType )?.attributeCode
-			def returnMap = attributes.inject([:]){rmap, field->
-				def pmap = phases.inject([:]){map, item->
-					map[item]=parseData[field] ? parseData[field]['phase'][item]:'N'
-					return map
-				}
-				rmap[field] = ['phase': pmap]
-				return rmap
+			if(!parseData){
+				// TODO : Read it from default Project and if not exists read default
+				parseData = generateDefaultConfig(type)
 			}
-			impMap << [(type):returnMap]
+			impMap << [(type):parseData]
 		}
 		render impMap as JSON
 	}
@@ -783,5 +773,25 @@ class ProjectController {
 			log.error "An error occurred : ${ex}"
 		}
 		render "success"
+	}
+	
+	/**
+	 * Create default importance map by assigning normal to all
+	 * @param entity type
+	 * @return
+	 */
+	def generateDefaultConfig(def type){
+		def eavEntityType = EavEntityType.findByDomainName(type)
+		def attributes = EavAttribute.findAllByEntityType( eavEntityType )?.attributeCode
+		def phases = ValidationType.getListAsMap().keySet()
+		def returnMap = attributes.inject([:]){rmap, field->
+			def pmap = phases.inject([:]){map, item->
+				map[item]="N"
+				return map
+			}
+			rmap[field] = ['phase': pmap]
+			return rmap
+		}
+		return returnMap
 	}
 }

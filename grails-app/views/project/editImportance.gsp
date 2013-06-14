@@ -2,7 +2,7 @@
 <!-- Assets edit template -->
 
 <div ng-show="editMode(type)">
-	<table class="list">
+	<table>
 		<tr>
 			<th>Field</th>
 			<th ng-repeat="phase in phases">{{phase.label}}</th>
@@ -14,5 +14,10 @@
 		</td>
 		</tr>
 	</table>
-	<button ng-click="toggleEditMode(type);updateAsset(type);">Save</button>
+	<div class="buttons">
+		<span class="button">
+			<input type="button" value="Update" class="save" ng-click="toggleEditMode(type);updateAsset(type);" />
+			<input type="button" value="Cancel" class="delete" ng-click="toggleSection(type)" />
+		</span>
+	</div>
 </div>

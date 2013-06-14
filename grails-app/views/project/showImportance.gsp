@@ -2,7 +2,7 @@
 
 <!-- Assets show template -->
 <div ng-hide="editMode(type)">
-	<table class="list">
+	<table>
 		<tr>
 			<th>Field</th>
 			<th ng-repeat="phase in phases">{{phase.label}}</th>
@@ -12,5 +12,11 @@
 			<td ng-repeat="phase in phases" class="{{importance[type][field.label]['phase'][phase.id]}}">{{importance[type][field.label]['phase'][phase.id]}}</td>
 		</tr>
 	</table>
-	<button ng-click="toggleEditMode(type)">Edit</button></td>
+	<div class="buttons">
+		<span class="button">
+			<tds:hasPermission permission='ProjectEditView'>
+				<input type="button" value="Edit" class="edit" ng-click="toggleEditMode(type)" />
+			</tds:hasPermission>
+		</span>
+	</div>
 </div>
