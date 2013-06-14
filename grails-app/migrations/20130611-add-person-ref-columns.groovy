@@ -1,8 +1,7 @@
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 
-import com.tds.asset.Application
-import com.tds.asset.AssetEntity
+import com.tdssrc.grails.GormUtil
 
 /**
  * This Changelog is written to add column for sme, sme2 and app_owner to use person reference. 
@@ -28,7 +27,7 @@ databaseChangeLog = {
 		
 		grailsChange {
 			change { 
-				def appList = sql.rows("""SELECT ap.app_id as id, ap.sme as sme, p.client_id as clientId
+				def appList = sql.rows("""SELECT ap.app_id as id, ap.sme as sme, p.client_id as clientId, p.project_code as projCode
 										  from application ap
 										  left join  asset_entity ae on ap.app_id = ae.asset_entity_id
 										  left join  project p on ae.project_id = p.project_id
@@ -58,7 +57,7 @@ databaseChangeLog = {
 		
 		grailsChange {
 			change {
-				def appList = sql.rows("""SELECT ap.app_id as id, ap.sme2 as sme2, p.client_id as clientId
+				def appList = sql.rows("""SELECT ap.app_id as id, ap.sme2 as sme2, p.client_id as clientId, p.project_code as projCode
 										  from application ap
 										  left join  asset_entity ae on ap.app_id = ae.asset_entity_id
 										  left join  project p on ae.project_id = p.project_id
@@ -88,7 +87,7 @@ databaseChangeLog = {
 		
 		grailsChange {
 			change {
-				def appList = sql.rows("""SELECT a.asset_entity_id as id, a.app_owner as appOwner,
+				def appList = sql.rows("""SELECT a.asset_entity_id as id, a.app_owner as appOwner, p.project_code as projCode,
 								p.client_id as clientId from asset_entity  a left join  project p  
 								on a.project_id = p.project_id 
 								where app_owner !='' """)
@@ -111,51 +110,63 @@ databaseChangeLog = {
  */
 def migrateRecord(record, column, prop, domain, jdbcTemplate){
 		record.each{app->
-			def sme = app."${prop}"?.trim()
-				def firstName
-				def lastName
-				def splittedName
-				if(sme.contains(",")){
-					splittedName = sme.split(",")
-					firstName = splittedName[1].trim()
-					lastName = splittedName[0].trim()
-				} else if(StringUtils.containsAny(sme, " ")){
-					splittedName = sme.split("\\s+")
-					firstName = splittedName[0].trim()
-					lastName = splittedName[1].trim()
-				} else {
-					firstName = sme.trim()
+			def name = app."${prop}"?.trim() // fullname which is there in sme , sme2 and appOwner fields .
+			def firstName
+			def lastName
+			
+			/* If ',' exist in full name assuming pair as lastName,FirstName else assuming as FirstName LastName else
+				assuming as firstName only. 
+			*/			
+			if(name.contains(",")){
+				def splittedName = name.split(",")
+				firstName = splittedName[1].trim()
+				lastName = splittedName[0].trim()
+			} else if(StringUtils.containsAny(name, " ")){
+				def splittedName = name.split("\\s+")
+				firstName = splittedName[0].trim()
+				lastName = splittedName[1].trim()
+			} else {
+				firstName = name.trim()
+			}
+			
+			/*Fetching all person which exist in current project's company */
+			def personList = Person.findAll("from Person s where s.id in \
+							(select p.partyIdTo from PartyRelationship p where p.partyRelationshipType = 'STAFF'\
+							 and p.partyIdFrom = $app.clientId and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' )")
+			
+			/*Searching person in project's company list. if found using found person else create a new person*/						    
+			def person = personList.find{it.firstName==firstName && it.lastName==lastName}
+			
+			if(!person && firstName){
+				/*If person does not exist we are creating person with firstName and lastName and with current asset's project's comapny*/
+				
+				person = new Person('firstName':firstName, 'lastName':lastName, 'staffType':'Contractor')
+				if(!person.save(insert:true, flush:true)){
+					throw new RuntimeException('migrateRecord Unable to create Person'+GormUtil.allErrorsString( person ))
 				}
+				def partyRelationshipType = PartyRelationshipType.findById( "STAFF" )
+				def roleTypeFrom = RoleType.findById( "COMPANY" )
+				def roleTypeTo = RoleType.findById( "STAFF" )
 				
-				def person = Person.findByFirstNameAndLastName(firstName, lastName)
-				
-				if(!person && firstName){
-					person = new Person('firstName':firstName, 'lastName':lastName, 'staffType':'Contractor')
-					if(!person.save(insert:true, flush:true)){
-						person.errors.allErrors.each {
-							 println it
-						}
-					}
-					def partyRelationshipType = PartyRelationshipType.findById( "STAFF" )
-					def roleTypeFrom = RoleType.findById( "COMPANY" )
-					def roleTypeTo = RoleType.findById( "STAFF" )
-					
-					def partyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType,
-						'partyIdFrom.id' :app.clientId, roleTypeCodeFrom:roleTypeFrom, partyIdTo:person,
-						roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" )
-					.save( insert:true, flush:true )
-				}
-				
-				if(person){
-					//TODO : while running this block of code getting "getting-lock-wait-timeout-exceeded-try-restarting-transaction"  error,
-					//so trying to fix it .
-					
-					/*if(domain=="Application")
+				def partyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType,
+					'partyIdFrom.id' :app.clientId, roleTypeCodeFrom:roleTypeFrom, partyIdTo:person,
+					roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" )
+				.save( insert:true, flush:true )
+			}
+			
+			if(person){
+				/*
+				 * TODO : while running this block of code getting "getting-lock-wait-timeout-exceeded-try-restarting-transaction"  error,
+				 * so used another migration script '20130612-migrate-person-ref-records.groovy' to migrate person records.
+				 */	
+							
+				/*	if(domain=="Application")
 						jdbcTemplate.execute("update application set ${column} = ${person.id} where app_id= ${app.id}")
 					else
-						jdbcTemplate.execute("update asset_entity set ${column} = ${person.id} where asset_entity_id= ${app.id}")*/
-					
-				}
+						jdbcTemplate.execute("update asset_entity set ${column} = ${person.id} where asset_entity_id= ${app.id}")
+				*/
+				
+			}
 		}
 }
 

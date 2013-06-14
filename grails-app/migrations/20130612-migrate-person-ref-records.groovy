@@ -90,7 +90,13 @@ def migrateRecord(record, column, prop, domain, jdbcTemplate){
 					firstName = sme.trim()
 				}
 				
-				def person = Person.findByFirstNameAndLastName(firstName, lastName)
+				/*Fetching person which exist in current project's company */
+				def personList = Person.findAll("from Person s where s.id in \
+								(select p.partyIdTo from PartyRelationship p where p.partyRelationshipType = 'STAFF'\
+								 and p.partyIdFrom = $app.clientId and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' )")
+				
+				/*Searching person in project's company list. if found using this else create it*/						    
+				def person = personList.find{it.firstName==firstName && it.lastName==lastName}
 				if(person){
 					if(domain=="Application")
 						jdbcTemplate.execute("update application set ${column} = ${person.id} where app_id= ${app.id}")
