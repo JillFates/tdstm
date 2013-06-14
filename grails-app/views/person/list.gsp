@@ -67,9 +67,9 @@
 							 <g:link controller="userLogin" action="create" id="${personBean.id}" params="[companyId:companyId]">CREATE</g:link>
 						</g:else>
 					 </jmesa:htmlColumn>
-					 <jmesa:htmlColumn property="userCompany" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.DateCellEditor">${personBean.userCompany}</jmesa:htmlColumn>
-	                 <jmesa:htmlColumn property="dateCreated" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor"><tds:convertDateTime date="${personBean.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
-	                 <jmesa:htmlColumn property="lastUpdated" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor"><tds:convertDateTime date="${personBean.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
+					 <jmesa:htmlColumn property="userCompany" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${personBean.userCompany}</jmesa:htmlColumn>
+	                 <jmesa:htmlColumn property="dateCreated" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.BasicCellEditor"><tds:convertDateTime date="${personBean.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
+	                 <jmesa:htmlColumn property="lastUpdated" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.BasicCellEditor"><tds:convertDateTime date="${personBean.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
 	               <jmesa:htmlColumn property="modelScore" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 	                     <g:remoteLink controller="person" action="editShow" id="${personBean.id}" params="[companyId:companyId]" onComplete ="showPersonDialog( e );">${personBean.modelScore}</g:remoteLink>
 					 </jmesa:htmlColumn>

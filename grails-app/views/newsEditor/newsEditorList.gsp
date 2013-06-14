@@ -197,7 +197,7 @@ News and Issues</b></span>
 <jmesa:tableFacade id="tag" items="${newsAndCommentsList}" maxRows="25" stateAttr="restore" var="assetCommentInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
        <jmesa:htmlTable style=" border-collapse: separate">
            <jmesa:htmlRow highlighter="true">
-               	<jmesa:htmlColumn property="createdAt" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor">
+               	<jmesa:htmlColumn property="createdAt" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 					<span onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}">
 						<tds:convertDateTime date="${assetCommentInstance?.createdAt}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 					</span>
@@ -214,7 +214,7 @@ News and Issues</b></span>
 	            <jmesa:htmlColumn property="resolution" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 	            	<span onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}"><tds:truncate value="${assetCommentInstance.resolution}"/></span>
 	            </jmesa:htmlColumn>
-	            <jmesa:htmlColumn property="resolvedAt" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor">
+	            <jmesa:htmlColumn property="resolvedAt" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 	            	<span onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}">
 	            		<tds:convertDateTime date="${assetCommentInstance?.resolvedAt}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 	            	</span>

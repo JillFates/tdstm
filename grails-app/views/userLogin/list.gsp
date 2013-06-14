@@ -63,13 +63,13 @@
 								  <jmesa:htmlColumn property="company" title="Company" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 									${userLoginInstance.company != 'null' ? userLoginInstance.company : '' }
 								 </jmesa:htmlColumn>
-								 <jmesa:htmlColumn property="lastLogin" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor">
+								 <jmesa:htmlColumn property="lastLogin" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 									<tds:convertDateTime date="${userLoginInstance?.lastLogin}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
   								 </jmesa:htmlColumn>
-			                     <jmesa:htmlColumn property="dateCreated" title="Created Date" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor">
+			                     <jmesa:htmlColumn property="dateCreated" title="Created Date" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 			                     	<tds:convertDateTime date="${userLoginInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 								 </jmesa:htmlColumn>
-			                     <jmesa:htmlColumn property="expiryDate" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.DateCellEditor">
+			                     <jmesa:htmlColumn property="expiryDate" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.BasicCellEditor">
 			                     	<tds:convertDateTime date="${userLoginInstance?.expiryDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 			                     </jmesa:htmlColumn>
 			                 </jmesa:htmlRow>
