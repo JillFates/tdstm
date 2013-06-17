@@ -9,6 +9,7 @@ class AuthController {
 	
     def shiroSecurityManager
     def userPreferenceService
+	def securityService
 
     def index = { redirect(action: 'login', params: params) }
 
@@ -20,13 +21,29 @@ class AuthController {
 			def url = g.resource(absolute:true).toString() + '/tdstm/auth/login'
 			// Adding the X-Login-URL header so that we can catch it in Ajax calls
 			response.setHeader('X-Login-URL', url)
-			return [ username: params.username, rememberMe: (params.rememberMe != null), targetUri: params.targetUri ]
+			return [ username: params.username, rememberMe: (params.rememberMe != null)]
 		} else {
 			redirect( url:redirectURL)
 		}
     }
 
     def signIn = {
+		
+		def loginMap = {
+            // Keep the username and "remember me" setting so that the
+            // user doesn't have to enter them again.
+			def m = [ username: params.username ]
+			if (params.rememberMe) {
+				m['rememberMe'] = true
+			}
+			
+			// Remember the target URI too.
+			if (params.targetUri) {
+				m['targetUri'] = params.targetUri
+			}
+			return m
+		}
+		
     	try {
 	        def authToken = new UsernamePasswordToken(params.username, params.password)
 	        // Support for "remember me"
@@ -40,17 +57,17 @@ class AuthController {
 	            // password is incorrect.
 	            SecurityUtils.subject.login(authToken)
 				
-				def userLogin = SecurityUtils.getUserLogin()
+				def userLogin = securityService.getUserLogin()
 				if (! userLogin) {
 					log.error "signIn() : unable to locate UserLogin for ${params.username}"
 					throw new AuthenticationException('Unable to locate user account')
 				}
 
 				// If the user is no longer active, redirect them to the login page and display a message
-	            if (userLogin.isActive()) {
-					log.info "User ${param.username} attempted to login but account is inactive"
-					flash.message = message(code: 'userLogin.accountDisabled.message')
+	            if ( ! userLogin.isActive() ) {
+					log.info "User ${params.username} attempted to login but account is inactive"
 					SecurityUtils.subject.logout()
+					flash.message = message(code: 'userLogin.accountDisabled.message')
 					redirect(action: 'login', params:params)
 	            } else {
 		            // If a controller redirected to this page, redirect back
@@ -105,30 +122,19 @@ class AuthController {
 	            // Authentication failed, so display the appropriate message
 	            // on the login page.
 				def remoteIp = HtmlUtil.getRemoteIp()
-	            log.warn "Authentication failure user '${params.username}', IP ${remoteIp}"
+	            log.warn "1 Authentication failure user '${params.username}', IP ${remoteIp} : ${ex.toString()}"
 	            flash.message = message(code: "login.failed")
-	
-	            // Keep the username and "remember me" setting so that the
-	            // user doesn't have to enter them again.
-	            def m = [ username: params.username ]
-	            if (params.rememberMe) {
-	                m['rememberMe'] = true
-	            }
-	
-	            // Remember the target URI too.
-	            if (params.targetUri) {
-	                m['targetUri'] = params.targetUri
-	            }
 				
 	            // Now redirect back to the login page.
-	            redirect(action: 'login', params: m)
+	            redirect(action: 'login', params: loginMap())
 	        }
      	} catch(Exception e) {
 			def remoteIp = HtmlUtil.getRemoteIp()
-			log.warn "Authentication failure for user '${params.username}' : IP ${remoteIp}"
+			log.warn "2 Authentication failure for user '${params.username}' : IP ${remoteIp} : ${e.toString()}"
 			flash.message = "Authentication failure for user '${params.username}'."
 			
-			redirect(action: 'login', params: params)
+			// Now redirect back to the login page.
+			redirect(action: 'login', params: loginMap())
     	}
     }
 

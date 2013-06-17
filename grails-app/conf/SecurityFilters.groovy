@@ -1,10 +1,10 @@
 import org.apache.shiro.SecurityUtils
 
 class SecurityFilters {
-	 def filters = {
+	
+	def securityService
+	def filters = {
 
-		def subject = SecurityUtils.subject
-		def principal = subject.principal
 
 		// Creating, modifying, or deleting a Party,person, project,partyGroup requires the ADMIN role.
 		partyCrud(controller: "(party|person|project|partyGroup)", action: "(create|edit|save|update|delete)") {
@@ -34,9 +34,11 @@ class SecurityFilters {
 		// Check to see if the userLogin has forcePasswordChange set and only allow him to access appropriate actions
 		checkForcePasswordChange(controller:'*', action:'*'){
 			before = {
+				def subject = SecurityUtils.subject
+				def principal = subject.principal
 				if (subject != null) {
 					if (principal != null) {
-						def userLoginInstance = SecurityService.getUserLogin()
+						def userLoginInstance = securityService.getUserLogin()
 						if ( userLoginInstance?.forcePasswordChange == 'Y' ) {
 							if ( 
 								(controllerName == 'auth' && ['login','signIn','signOut'].contains(actionName) ) ||
@@ -59,9 +61,11 @@ class SecurityFilters {
 		 */
 		sessionExpireCheck(controller:'*', action:'*') {
 			before = {
-				 if (controllerName == 'moveTech' && principal == null) {
+				def subject = SecurityUtils.subject
+				def principal = subject.principal
+				if (controllerName == 'moveTech' && principal == null) {
 					return true
-				 } else if( controllerName != 'auth' && principal == null ) {
+				} else if( controllerName != 'auth' && principal == null ) {
 					flash.message = "Your login session has expired.  Please login again."
 					redirect(controller:'auth', action:'login')
 					return false					
