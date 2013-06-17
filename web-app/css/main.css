@@ -463,10 +463,10 @@ span.cellWithoutBackground
 .H{
 	background-color:#CCCCCC ;
 }
-#stylingNoteId{
+.stylingNote{
 	display:none;
 	position:absolute;
-	margin-left:850px;
+	margin-left:1010px;
 	width:350px;
 }
 
@@ -478,7 +478,6 @@ div.field_list table {
 	border: 0px;
 }
 .assetImage{
-	margin-top: 12px;
 	cursor: pointer;
 }
 .assetFieldTable{

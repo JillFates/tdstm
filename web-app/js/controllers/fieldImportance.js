@@ -35,15 +35,25 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 		$scope.fields=data;
 	});
 	fieldFactory.getImportance().success(function(data){
-		$scope.importance=data;
+		$scope.importance = data;
 	});
 	$scope.phases=fieldFactory.getPhases();
 	$scope.data = ['C','I','N','H'];
 	//initializing section
 	$scope.section = {'AssetEntity':'h','Application':'h','Database':'h','Files':'h'};
-
+	//initializing notes to display styling notes div.
+	$scope.notes=[{'id':'C','field':'Name','type':'ServerX05','imp':'C-Critical'},
+	              {'id':'I','field':'Type','type':'Server','imp':'I-Ignore'},
+	              {'id':'N','field':'Manufacturer','type':'HP','imp':'N-Normal'},
+	              {'id':'H','field':'Model','type':'Dell','imp':'H-Hidden'}];
+	
 	$scope.toggleSection = function( s ) {
 		$scope.section[s] = $scope.section[s] == 'h' ? 's' : 'h';
+		//for time being used javaScript to show/hide styling div.
+		$(".stylingNote").show();
+		var imglength=$('.dgImages:visible').length;
+		if($scope.section[s] == 'h' && imglength==3)
+			$(".stylingNote").hide();
 	}
 
 	$scope.showSection = function( s ) {
@@ -73,6 +83,18 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 			data:{'jsonString':$scope.importance[type], 'entityType':type}
 		}).success (function(resp) {
 			console.log(resp);
+		}).error(function(resp, status, headers, config) {
+			alert("An Unexpected error while showing the asset fields.")
+		});
+	}
+	
+	$scope.cancelAsset= function (type) {
+		$http({
+			url : contextPath+"/project/cancelImportance",
+			method: "POST",
+			data:{'entityType':type}
+		}).success (function(resp) {
+			$scope.importance[type]=resp;
 		}).error(function(resp, status, headers, config) {
 			alert("An Unexpected error while showing the asset fields.")
 		});

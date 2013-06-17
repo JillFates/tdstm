@@ -731,21 +731,23 @@ class ProjectController {
 	 */
 	def getImportance ={
 		def assetTypes=EntityType.list
-		def project = securityService.getUserCurrentProject()
 		def impMap =[:]
 		assetTypes.each{type->
-			def parseData= [:]
-			
-			def data = FieldImportance.findByProjectAndEntityType(project,type)?.config
-			if(data)
-				parseData=JSON.parse(data)
-			if(!parseData){
-				parseData = generateDefaultConfig(type)
-			}
-			impMap << [(type):parseData]
+			impMap << [(type):getConfig(type)]
 		}
 		render impMap as JSON
 	}
+	/**
+	 * This action is used to render importance for a given entity type.
+	 * @param entity type
+	 * @return json data
+	 */
+	def cancelImportance = {
+		def entityType = request.JSON.entityType
+		def project = securityService.getUserCurrentProject()
+		def parseData = getConfig(entityType)
+		render parseData as JSON
+    }
 	
 	/**
 	 *This action is used to update field importance and display it to user
@@ -799,5 +801,22 @@ class ProjectController {
 			}
 		}
 		return returnMap
+	}
+	/**
+	 * This action useed to get the config from field importance Table.
+	 * @param entity type
+	 * @return
+	 */
+	def getConfig(def entityType){
+		def project = securityService.getUserCurrentProject()
+		def parseData= [:]
+		def data = FieldImportance.findByProjectAndEntityType(project,entityType)?.config
+		if(data)
+			parseData=JSON.parse(data)
+		if(!parseData){
+			parseData = generateDefaultConfig(entityType)
+		}
+		
+		return parseData
 	}
 }
