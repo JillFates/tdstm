@@ -34,17 +34,24 @@ class AuthController {
 	            authToken.rememberMe = true
 	        }
 	
-	        try{
+	        try {
 	            // Perform the actual login. An AuthenticationException
 	            // will be thrown if the username is unrecognised or the
 	            // password is incorrect.
 	            SecurityUtils.subject.login(authToken)
 				
+				def userLogin = SecurityUtils.getUserLogin()
+				if (! userLogin) {
+					log.error "signIn() : unable to locate UserLogin for ${params.username}"
+					throw new AuthenticationException('Unable to locate user account')
+				}
+
 				// If the user is no longer active, redirect them to the login page and display a message
-	            if(!UserLogin.findByUsername(params.username).isActive()){
+	            if (userLogin.isActive()) {
+					log.info "User ${param.username} attempted to login but account is inactive"
+					flash.message = message(code: 'userLogin.accountDisabled.message')
 					SecurityUtils.subject.logout()
-					flash.message = message(code: "userLogin.accountDisabled.message")
-					redirect(action: 'login', params: params)
+					redirect(action: 'login', params:params)
 	            } else {
 		            // If a controller redirected to this page, redirect back
 		            // to it. Otherwise redirect to the root URI.
