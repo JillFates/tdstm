@@ -80,7 +80,9 @@ class ProjectService {
 				"pr.partyIdTo = ${company?.id} and roleTypeCodeFrom = 'PROJECT' )" +
 				" OR " +
 				"p.client = ${company?.id} order by ${sortOn} ${orderBy}"
-			projects = Project.findAll(query).findAll{it.completionDate && it.completionDate.getTime() > timeNow.getTime()}
+			projects = Project.findAll(query)
+			if (projects)
+				projects = projects.findAll{it.completionDate && it.completionDate.getTime() > timeNow.getTime()}
 		}
 		
 		return projects

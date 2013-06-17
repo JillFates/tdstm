@@ -35,10 +35,10 @@ class SecurityFilters {
 		checkForcePasswordChange(controller:'*', action:'*'){
 			before = {
 				def subject = SecurityUtils.subject
-				def principal = subject.principal
-				if (subject != null) {
-					if (principal != null) {
-						def userLoginInstance = securityService.getUserLogin()
+				if (subject) {
+					def principal = subject.principal
+					if (principal) {
+						def userLoginInstance = UserLogin.findByUsername( principal + "" )//securityService.getUserLogin()
 						if ( userLoginInstance?.forcePasswordChange == 'Y' ) {
 							if ( 
 								(controllerName == 'auth' && ['login','signIn','signOut'].contains(actionName) ) ||

@@ -16,9 +16,7 @@ class AuthController {
     def login = {
 		def redirectURL = session.REDIRECT_URL
 		if(!redirectURL){
-			// TODO - For some reason resource is NOT creating the URL correctly with the arguments so it's hardcoded for the time being.
-			// def url = g.resource(controller:'auth', action:'login', absolute:true).toString()
-			def url = g.resource(absolute:true).toString() + '/tdstm/auth/login'
+			def url = HtmlUtil.createLink([controller:'auth', action:'login', absolute:true])
 			// Adding the X-Login-URL header so that we can catch it in Ajax calls
 			response.setHeader('X-Login-URL', url)
 			return [ username: params.username, rememberMe: (params.rememberMe != null)]
@@ -69,7 +67,7 @@ class AuthController {
 					SecurityUtils.subject.logout()
 					flash.message = message(code: 'userLogin.accountDisabled.message')
 					redirect(action: 'login', params:params)
-	            } else {
+				} else {
 		            // If a controller redirected to this page, redirect back
 		            // to it. Otherwise redirect to the root URI.
 		            def targetUri = params.targetUri ?: "/"
@@ -122,7 +120,7 @@ class AuthController {
 	            // Authentication failed, so display the appropriate message
 	            // on the login page.
 				def remoteIp = HtmlUtil.getRemoteIp()
-	            log.warn "1 Authentication failure user '${params.username}', IP ${remoteIp} : ${ex.toString()}"
+	            log.warn "1 Authentication failure user '${params.username}', IP ${remoteIp} : ${ex.getMessage()}"
 	            flash.message = message(code: "login.failed")
 				
 	            // Now redirect back to the login page.
@@ -130,7 +128,7 @@ class AuthController {
 	        }
      	} catch(Exception e) {
 			def remoteIp = HtmlUtil.getRemoteIp()
-			log.warn "2 Authentication failure for user '${params.username}' : IP ${remoteIp} : ${e.toString()}"
+			log.warn "2 Authentication failure for user '${params.username}' : IP ${remoteIp} : ${e.getMessage()}"
 			flash.message = "Authentication failure for user '${params.username}'."
 			
 			// Now redirect back to the login page.

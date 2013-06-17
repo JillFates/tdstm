@@ -74,7 +74,7 @@ class HtmlUtil {
 	 * @param status
 	 * @return String The appropriate CSS style or task_na if the status is invalid
 	 */
-	//TODO : Overriding the service method here since facing some issue to inject service class here,  need to clean up ASAP” in HtmlUilt
+	//TODO : Overriding the service method here since facing some issue to inject service class here,  need to clean up ASAP in HtmlUilt
 	def public static getCssClassForStatus( status ) {
 		def css = 'task_na'
 		
@@ -112,6 +112,6 @@ class HtmlUtil {
 	 * @return String URL
 	 */
 	def public static createLink(map) {
-		g.createLink(map)
+		g.createLink(map).toString()
 	}
 }

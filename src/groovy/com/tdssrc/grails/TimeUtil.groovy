@@ -189,7 +189,7 @@ class TimeUtil {
 	 * Used to get the current time in GMT
 	 * @return Date 	The current datetime in GMT
 	 */
-	public static Date nowGMT() {
+	/*public static Date nowGMT() {
 		return convertInToGMT("now", "EDT" )
-	}
+	}*/
 }

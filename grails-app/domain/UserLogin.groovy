@@ -1,16 +1,16 @@
 import com.tds.asset.AssetTransition
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
+
 class UserLogin {
 	String username
 	String password
-	Date createdDate = GormUtil.convertInToGMT( "now", "EDT" )
+	Date createdDate = TimeUtil.nowGMT()
 	Date lastLogin
 	String active
 	Date lastPage
 	Date expiryDate
 	Date passwordChangedDate = TimeUtil.nowGMT()
-	Boolean forcePasswordChange = false
+	String forcePasswordChange = 'N'
     
 	static belongsTo = [ person:Person ]
 	static hasMany = [
@@ -29,7 +29,7 @@ class UserLogin {
 		lastPage( nullable: true )
 		expiryDate( nullable: false )
 		passwordChangedDate( nullable: false)
-		forcePasswordChange( nullable: false)
+		//forcePasswordChange( nullable: false)
 	}
 
 	static mapping  = {
@@ -40,23 +40,25 @@ class UserLogin {
 		password sqlType: 'varchar(100)'  // size must me more than 20 because it will store as encrypted code
 		// TODO - active column should not be varchar(20) as it is only 1 char
 		active sqlType:'varchar(20)'
-		forcePasswordChange sqltype: 'boolean'
+		forcePasswordChange sqltype: 'char(1)'
 		passwordChangedDate sqltype: 'DateTime'
-		person ignoreNotFound: true
-		passwordChangedDate ignoreNotFound: true
+		//person ignoreNotFound: true
+		//passwordChangedDate ignoreNotFound: true
 	}
 
-	String toString(){
-		username
+	static transients = ['personDetails', 'isActive']
+	
+	String toString() {
+		return username ?:'no username found'
 	}
 	/*
 	 *  Render person details as firstName + lastName
 	 */
-	def getPersonDetails(){
+	def getPersonDetails() {
 		return "${this.person.firstName} ${this.person.lastName}"
 	}
 	
-	def isActive(){
+	def isActive() {
 		return TimeUtil.nowGMT() < expiryDate && active == 'Y' && person.active == 'Y'
 	}
 }

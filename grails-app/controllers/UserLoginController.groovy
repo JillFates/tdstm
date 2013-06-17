@@ -328,10 +328,16 @@ class UserLoginController {
 		def subject = SecurityUtils.subject
 		def principal = subject.principal
 		def userLoginInstance = UserLogin.findByUsername(principal)
-		if(params.password != null && userLoginInstance != null && securityService.validPassword(userLoginInstance.username, params.password)) {
-			userLoginInstance.setPassword(new Sha1Hash(params.password).toHex())
+		if(userLoginInstance && securityService.validPassword(userLoginInstance.username, params.password)) {
+			def newPassword = new Sha1Hash(params.password).toHex()
+			if(userLoginInstance.password == newPassword){
+	            flash.message = "New password must be different from the old password"
+				redirect(action:'changePassword', params:[ userLoginInstance:userLoginInstance ])
+				return
+			}
+			userLoginInstance.setPassword(newPassword)
 			userLoginInstance.passwordChangedDate = TimeUtil.nowGMT()
-			userLoginInstance.forcePasswordChange = false
+			userLoginInstance.forcePasswordChange = 'N'
             flash.message = "Password updated"
 			redirect(controller:'project', action:'show', params:[ userLoginInstance:userLoginInstance ])
 		} else {

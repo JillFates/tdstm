@@ -159,21 +159,22 @@ import com.tdsops.tm.enums.domain.RoleTypeGroup
 	def boolean validPassword(String username, String password){
 		def requirements = 0;
 		def score = 0;
-		
-		if (password ==~ /.{8}.*/)
-			score++;
-		if (password ==~ /.*[a-z]+.*/)
-			requirements++;
-		if (password ==~ /.*[A-Z]+.*/)
-			requirements++;
-		if (password ==~ /.*[0-9]+.*/)
-			requirements++;
-		if (password ==~ /.*[~!@#$%\^&\*_\-\+=`\|\\\(\)\{\}\[\]:;"'<>\,\.?\/]+.*/)
-			requirements++;
-		if (requirements >= 3)
-			score++;
-		if(!password.toLowerCase().contains(username.toLowerCase()))
-			score++;
+		if (password && username){
+			if (password ==~ /.{8}.*/)
+				score++;
+			if (password ==~ /.*[a-z]+.*/)
+				requirements++;
+			if (password ==~ /.*[A-Z]+.*/)
+				requirements++;
+			if (password ==~ /.*[0-9]+.*/)
+				requirements++;
+			if (password ==~ /.*[~!@#$%\^&\*_\-\+=`\|\\\(\)\{\}\[\]:;"'<>\,\.?\/]+.*/)
+				requirements++;
+			if (requirements >= 3)
+				score++;
+			if(!password.toLowerCase().contains(username.toLowerCase()))
+				score++;
+		}
 		return score == 3
 	}
 	
