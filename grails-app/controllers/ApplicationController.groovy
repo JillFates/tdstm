@@ -159,7 +159,7 @@ class ApplicationController {
 		def applicationInstance = new Application(appOwner:'TDS')
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
-		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId = session.getAttribute( "CURR_PROJ" )?.CURR_PROJ
 		def project = Project.read(projectId)
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)

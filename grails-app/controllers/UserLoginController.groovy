@@ -184,7 +184,10 @@ class UserLoginController {
 					redirect( action:edit, id:userLoginInstance.id, params:[ companyId:companyId ] )
 				} else{
 		        	userLoginInstance.properties = params
-					userLoginInstance.forcePasswordChange = params.forcePasswordChange
+					if(params.forcePasswordChange)
+						userLoginInstance.forcePasswordChange = 'Y'
+					else
+						userLoginInstance.forcePasswordChange = 'N'
 		        	if(password != ""){
 		        		//	convert password onto Hash code
 		                userLoginInstance.password = new Sha1Hash(params['password']).toHex()
@@ -312,7 +315,7 @@ class UserLoginController {
 		def principal = SecurityUtils.subject?.principal
 		if( principal ){
 			def userLogin = UserLogin.findByUsername( principal )
-			userLogin.lastPage = GormUtil.convertInToGMT( "now", "EDT" )
+			userLogin.lastPage = TimeUtil.nowGMT()
 			userLogin.save(flush:true)
 			session.REDIRECT_URL = params.url
 		}

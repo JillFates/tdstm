@@ -46,7 +46,7 @@ class UserLogin {
 		//passwordChangedDate ignoreNotFound: true
 	}
 
-	static transients = ['personDetails', 'isActive']
+	static transients = ['personDetails', 'userActive']
 	
 	String toString() {
 		return username ?:'no username found'
@@ -58,7 +58,8 @@ class UserLogin {
 		return "${this.person.firstName} ${this.person.lastName}"
 	}
 	
-	def isActive() {
-		return TimeUtil.nowGMT() < expiryDate && active == 'Y' && person.active == 'Y'
+	// Check if the user has not expired and is flagged as active
+	def userActive() {
+		return (TimeUtil.nowGMT() < expiryDate) && (active == 'Y') && (person.active == 'Y')
 	}
 }

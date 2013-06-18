@@ -87,7 +87,7 @@ import com.tdsops.tm.enums.domain.RoleTypeGroup
 	// TODO : getUserCurrentProject - move to userPreferenceService
 	def getUserCurrentProject() {
 		def project
-		def projectId = RequestContextHolder.currentRequestAttributes().getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectId = RequestContextHolder.currentRequestAttributes().getSession().getAttribute( "CURR_PROJ" )?.CURR_PROJ
 		if ( projectId ) {
 			project = Project.get( projectId )
 		}
