@@ -15,11 +15,13 @@ import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enums.domain.ValidationType
 
 class AssetEntityService {
 
     static transactional = true
 	def jdbcTemplate
+	def projectService
 	
 	def createOrUpdateAssetEntityDependencies(def params, def assetEntityInstance) {
 		
@@ -468,5 +470,25 @@ class AssetEntityService {
 		
 		return [servers:servers, applications:applications, dbs:dbs, files:files,
 				 dependencyType:dependencyType, dependencyStatus:dependencyStatus, networks:networks]
+	}
+	/**
+	 * This method is used to get config by entityType and validation
+	 * @param type,validation
+	 * @return
+	 */
+	def getConfig (def type, def validation) {
+		def allconfig = projectService.getConfig(type)
+		def fields = projectService.getFields(type)
+		def config = [:]
+		def validationType
+		def valList=ValidationType.getValuesAsMap()
+		valList.each{v ->
+			if(v.key==validation)
+				validationType=v.value
+		}
+		fields.each{f ->
+			config << [(f.label):allconfig[f.label]['phase'][validationType]]
+		}
+		return config
 	}
 }

@@ -64,7 +64,7 @@ class AssetEntityController {
 	def commentService
 	def securityService
 	def taskService
-
+	
 	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
 	protected static targetTeamType = ['MOVE_TECH':'targetTeamMt', 'CLEANER':'targetTeamLog','SYS_ADMIN':'targetTeamSa',"DB_ADMIN":'targetTeamDba']
@@ -2873,12 +2873,9 @@ class AssetEntityController {
 	
 			def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
 			def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)
-			def config = [:]
+			//fieldImportance for Discovery by default
+			def config = assetEntityService.getConfig('AssetEntity','Discovery')
 			
-			def data = FieldImportance.find("from FieldImportance where project=:project and entityType=:entityType and phase=:phase",
-				[project:project, entityType:EntityType.AE, phase:ValidationType.DIS])?.config
-			if(data)
-				 config=JSON.parse(data);
 			def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 								planStatusOptions:planStatusOptions?.value, projectId:project.id ,railTypeOption:railTypeOption?.value,
 								priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers,redirectTo:params?.redirectTo,
@@ -2946,13 +2943,17 @@ class AssetEntityController {
 		
 			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
 			
+			//field importance styling for respective validation.
+			def validationType = assetEntity.validation
+			def config = assetEntityService.getConfig('AssetEntity',validationType)
+			
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 			def paramsMap = [label:frontEndLabel, assetEntity:assetEntity,
 				supportAssets:supportAssets, dependentAssets:dependentAssets, 
 				redirectTo:params.redirectTo, project:project,
 				assetCommentList:assetCommentList,
 				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle ,
-				 prefValue:prefValue]
+				 prefValue:prefValue, config:config]
 		
 			if(params.redirectTo == "roomAudit") {
 				paramsMap << [source:params.source, assetType:params.assetType]
@@ -2985,9 +2986,11 @@ class AssetEntityController {
 
 		def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
 		def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)
-
-
-
+		
+		//fieldImportance Styling for default validation.
+		def validationType = assetEntityInstance.validation
+		def config = assetEntityService.getConfig('AssetEntity',validationType)
+		
 		def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntityInstance])
 		def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntityInstance])
 		
@@ -3018,7 +3021,7 @@ class AssetEntityController {
 							priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets,
 							manufacturers:manufacturers, models:models,redirectTo:params?.redirectTo, dependencyType:dependencyType,
 							dependencyStatus:dependencyStatus,servers:servers, sourceChassisSelect:sourceChassisSelect, 
-							targetChassisSelect:targetChassisSelect, nonNetworkTypes:nonNetworkTypes]
+							targetChassisSelect:targetChassisSelect, nonNetworkTypes:nonNetworkTypes, config:config]
 		
 		if(params.redirectTo == "roomAudit") {
 			def rooms = Room.findAllByProject(project)
@@ -4194,21 +4197,15 @@ class AssetEntityController {
 	  return entities
 	}
 	/**
-	 * This method is used to get config by entityType and phase
-	 * @param type,phase
+	 * This method is used to get validation for particular fields
+	 * @param type,validation
 	 * @return
 	 */
 	 def getassetImportance = {
-		 def phaseMap = [:]
-		 def phase= params.phase
-		 def assetType= params.type
-		 def project = securityService.getUserCurrentProject()
-		 def data = FieldImportance.find("from FieldImportance where project=:project and entityType=:entityType and phase=:phase",
-				 [project:project, entityType:assetType, phase:phase])?.config
-			if(data) 
-				phaseMap << ['config':JSON.parse(data)]
-		 	 
-		 render phaseMap as JSON
+		 def assetType = params.type
+		 def validation = params.validation
+		 def configMap = assetEntityService.getConfig(assetType,validation)
+		 render configMap as JSON
 	 }
 	
 }

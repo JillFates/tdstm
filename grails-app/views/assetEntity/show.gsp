@@ -44,88 +44,88 @@ $(document).ready(function() {
 						<tbody>
 							<tr  class="prop">
 								<td class="label" nowrap="nowrap"><label for="assetName">Name</label></td>
-								<td style="font-weight:bold">${assetEntity.assetName}</td>
+								<td style="font-weight:bold" class="${config.assetName}">${assetEntity.assetName}</td>
 								<td class="label" nowrap="nowrap"><label for="assetName">Environment</label></td>
-								<td class="valueNW">${assetEntity.environment}</td>
+								<td class="valueNW ${config.environment}">${assetEntity.environment}</td>
 								<td>&nbsp;</td>
 								<td class="label_sm">Source</td>
 								<td class="label_sm">Target</td>
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
-								<td class="valueNW">${assetEntity.assetType}</td>
+								<td class="valueNW ${config.assetType}">${assetEntity.assetType}</td>
 								<td class="label" nowrap="nowrap"><label for="priority">Priority</label></td>
-								<td class="valueNW">${assetEntity.priority}</td>
+								<td class="valueNW ${config.priority}">${assetEntity.priority}</td>
 								<td class="label" nowrap="nowrap"><label for="sourceLocation">Location</label></td>
-								<td class="valueNW">${assetEntity.sourceLocation}</td>
-								<td class="valueNW">${assetEntity.targetLocation}</td>
+								<td class="valueNW ${config.sourceLocation}">${assetEntity.sourceLocation}</td>
+								<td class="valueNW ${config.targetLocation}">${assetEntity.targetLocation}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="manufacturer">Manufacturer</label></td>
-								<td class="valueNW"><a href='javascript:showManufacturer(${assetEntity.manufacturer?.id})' style='color:#00E'>${assetEntity.manufacturer}</a></td>
+								<td class="valueNW ${config.manufacturer}"><a href='javascript:showManufacturer(${assetEntity.manufacturer?.id})' style='color:#00E'>${assetEntity.manufacturer}</a></td>
 								<td class="label" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
-								<td class="valueNW">${assetEntity.ipAddress}</td>
+								<td class="valueNW ${config.ipAddress}">${assetEntity.ipAddress}</td>
 								<td class="label" nowrap="nowrap"><label for="sourceRoom">Room</label></td>
-								<td class="valueNW">${assetEntity.roomSource?.roomName}</td>
-								<td class="valueNW">${assetEntity.roomTarget?.roomName}</td>
+								<td class="valueNW ${config.sourceRoom}" >${assetEntity.roomSource?.roomName}</td>
+								<td class="valueNW ${config.targetRoom}">${assetEntity.roomTarget?.roomName}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="model">Model</label></td>
-								<td class="valueNW"><a href='javascript:showModel(${assetEntity.model?.id})' style='color:#00E'>${assetEntity.model}</a>
+								<td class="valueNW ${config.model}"><a href='javascript:showModel(${assetEntity.model?.id})' style='color:#00E'>${assetEntity.model}</a>
 								  <g:if test="${assetEntity.model?.modelStatus=='new' && assetEntity.model?.usize==1}"> <span style="color: red;"><b>?</b></span></g:if>
 								</td>
 								<td class="label" nowrap="nowrap"><label for="os">OS</label></td>
-								<td class="valueNW">${assetEntity.os}</td>
+								<td class="valueNW ${config.os}">${assetEntity.os}</td>
 
 								<td class="label rackLabel"  nowrap="nowrap" id="rackId"><label for="sourceRackId">Rack/Cab</label></td>
 								<td class="label bladeLabel" nowrap="nowrap" id="bladeId" style="display: none"><label for="sourceBladeChassisId">Blade</label></td>
 								<td class="label vmLabel" style="display: none" class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label></td>
 
-								<td class=" rackLabel">${assetEntity.rackSource?.tag}</td>
-								<td class=" rackLabel">${assetEntity.rackTarget?.tag}</td>
+								<td class=" rackLabel ${config.sourceRack}">${assetEntity.rackSource?.tag}</td>
+								<td class=" rackLabel ${config.targetRack}">${assetEntity.rackTarget?.tag}</td>
 
-								<td class=" bladeLabel" style="display: none">${assetEntity.sourceBladeChassis}</td>
-								<td class=" bladeLabel" style="display: none" >${assetEntity.targetBladeChassis}</td>
+								<td class=" bladeLabel ${config.sourceBladeChassis}" style="display: none">${assetEntity.sourceBladeChassis}</td>
+								<td class=" bladeLabel ${config.targetBladeChassis}" style="display: none" >${assetEntity.targetBladeChassis}</td>
 
-								<td class="vmLabel" style="display: none">${assetEntity.virtualHost}</td>
+								<td class="vmLabel ${config.virtualHost}" style="display: none">${assetEntity.virtualHost}</td>
 								<td class="vmLabel" style="display: none"></td>
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="shortName">Alt Name</label></td>
-								<td class="valueNW">${assetEntity.shortName}</td>
+								<td class="valueNW ${config.shortName}">${assetEntity.shortName}</td>
 								<td class="label" nowrap="nowrap"><label for="supportType">Support Type</label></td>
-								<td class="valueNW">${assetEntity.supportType}</td>
+								<td class="valueNW ${config.supportType}">${assetEntity.supportType}</td>
 								<td class="label" nowrap="nowrap"><label for="sourceRack">Position</label></td>
-								<td class="valueNW">${assetEntity.sourceRackPosition}</td>
-								<td class="valueNW">${assetEntity.targetRackPosition}</td>
+								<td class="valueNW ${config.sourceRackPosition}">${assetEntity.sourceRackPosition}</td>
+								<td class="valueNW ${config.targetRackPosition}">${assetEntity.targetRackPosition}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="serialNumber">S/N</label></td>
-								<td class="valueNW">${assetEntity.serialNumber}</td>
+								<td class="valueNW ${config.serialNumber}">${assetEntity.serialNumber}</td>
 								<td class="label"><label for="retireDate">Retire Date:</label></td>
-								<td class="valueNW"><tds:convertDate date="${assetEntity?.retireDate}"
+								<td class="valueNW ${config.retireDate}"><tds:convertDate date="${assetEntity?.retireDate}"
 							  		timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-								<td class="valueNW" colspan="2">${assetEntity.moveBundle}${dependencyBundleNumber?' / ' : ''}${dependencyBundleNumber}</td>
+								<td class="valueNW ${config.moveBundle}" colspan="2">${assetEntity.moveBundle}${dependencyBundleNumber?' / ' : ''}${dependencyBundleNumber}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="assetTag">Tag</label></td>
-								<td class="valueNW">${assetEntity.assetTag}</td>
+								<td class="valueNW ${config.assetTag}">${assetEntity.assetTag}</td>
 								<td class="label"><label for="maintExpDate">Maint Exp.</label></td>
-								<td class="valueNW"><tds:convertDate date="${assetEntity?.maintExpDate}"
+								<td class="valueNW ${config.maintExpDate}"><tds:convertDate date="${assetEntity?.maintExpDate}"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							        </td>
 								<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
-								<td class="valueNW" colspan="2">${assetEntity.planStatus}</td>
+								<td class="valueNW ${config.planStatus}" colspan="2">${assetEntity.planStatus}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label" nowrap="nowrap"><label for="railType">Rail Type</label></td>
-								<td class="valueNW">${assetEntity.railType}</td>
+								<td class="valueNW ${config.railType}">${assetEntity.railType}</td>
 								<td class="label" nowrap="nowrap"><label for="truck">Truck/Cart/Shelf</label></td>
-								<td class="valueNW">${assetEntity.truck}/${assetEntity.cart}${assetEntity.shelf? ' / '+assetEntity.shelf : ''}</td>
+								<td class="valueNW ${config.truck}">${assetEntity.truck}/${assetEntity.cart}${assetEntity.shelf? ' / '+assetEntity.shelf : ''}</td>
 								<td class="label">Validation</td>
-								<td class="valueNW">${assetEntity.validation}</td>
+								<td class="valueNW ${config.validation}">${assetEntity.validation}</td>
 								<td>&nbsp;</td>
 							</tr>
 							<g:render template="customShow" ></g:render>

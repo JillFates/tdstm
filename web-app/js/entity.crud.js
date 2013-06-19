@@ -661,15 +661,15 @@ function showDependencyControlDiv(){
 function assetFieldImportance(phase,type){
 	jQuery.ajax({
 		url: contextPath+'/assetEntity/getassetImportance',
-		data: {'phase':phase, 'type':type},
+		data: {'validation':phase, 'type':type},
 		type:'POST',
 		success: function(resp) {
-			$("input,select").removeClass("V")
 			$("input,select").removeClass("C")
-			var config = resp.config
-			Object.keys(config).forEach(function(key) {
-				var value = config[key]
-		        $(".dialog input[name="+key+"],select[name="+key+"]").addClass(value);
+			$("input,select").removeClass("H")
+			$("input,select").removeClass("I")
+			Object.keys(resp).forEach(function(key) {
+				var value = resp[key]
+		        $(".dialog input[name="+key+"],select[name="+key+"],input[name="+key+".id],select[name="+key+".id]").addClass(value);
 			});
 		},
 		error: function(jqXHR, textStatus, errorThrown) {

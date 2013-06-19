@@ -1,4 +1,9 @@
 import org.apache.shiro.SecurityUtils
+import grails.converters.JSON
+import com.tds.asset.FieldImportance
+import com.tdsops.tm.enums.domain.ValidationType;
+import com.tdssrc.eav.EavAttribute
+import com.tdssrc.eav.EavEntityType
 
 class ProjectService {
 
@@ -108,5 +113,63 @@ class ProjectService {
 		def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' \
 			and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
 		return moveManager
+	}
+	/**
+	 * To action is used to get the fields
+	 *@param : entityType type of entity.
+	 *@return 
+	 */
+	def getFields(def entityType){
+		def project = securityService.getUserCurrentProject()
+		def eavEntityType = EavEntityType.findByDomainName(entityType)
+		def attributes = EavAttribute.findAllByEntityType( eavEntityType )
+		def returnMap = attributes.collect{ p->
+			return ['id':(p.attributeCode.contains('custom') && project[p.attributeCode])? project[p.attributeCode]:p.frontendLabel, 'label':p.attributeCode]
+		}
+		return returnMap
+	}
+	
+	/**
+	 * This action useed to get the config from field importance Table.
+	 * @param entity type
+	 * @return
+	 */
+	def getConfig(def entityType){
+		def project = securityService.getUserCurrentProject()
+		def parseData= [:]
+		def data = FieldImportance.findByProjectAndEntityType(project,entityType)?.config
+		if(data)
+			parseData=JSON.parse(data)
+		if(!parseData){
+			parseData = generateDefaultConfig(entityType)
+		}
+		
+		return parseData
+	}
+	/**
+	 * Create default importance map by assigning normal to all
+	 * @param entity type
+	 * @return
+	 */
+	def generateDefaultConfig(def type){
+		def defautlProject = Project.findByProjectCode("TM_DEFAULT_PROJECT")
+		def returnMap = [:]
+		def data = FieldImportance.findByProjectAndEntityType(defautlProject,type)?.config
+		if(data)
+			returnMap=JSON.parse(data)
+		if(!returnMap){
+			def eavEntityType = EavEntityType.findByDomainName(type)
+			def attributes = EavAttribute.findAllByEntityType( eavEntityType )?.attributeCode
+			def phases = ValidationType.getListAsMap().keySet()
+			returnMap = attributes.inject([:]){rmap, field->
+				def pmap = phases.inject([:]){map, item->
+					map[item]="N"
+					return map
+				}
+				rmap[field] = ['phase': pmap]
+				return rmap
+			}
+		}
+		return returnMap
 	}
 }

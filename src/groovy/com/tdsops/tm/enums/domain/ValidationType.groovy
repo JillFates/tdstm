@@ -17,4 +17,7 @@ class ValidationType {
 	static final getListAsMap() {
 		return [ D:DIS, V:VL, R:DR, S:DS, B:BR  ]
 	}
+	static final getValuesAsMap() {
+		return [ Discovery:'D', Validated:'V', DependencyReview:'R', DependencyScan:'S', BundleReady:'B'  ]
+	}
 }
