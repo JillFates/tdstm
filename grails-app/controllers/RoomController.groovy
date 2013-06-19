@@ -238,11 +238,13 @@ class RoomController {
 			rack.sourceAssets.each{assetEntity ->
 				assetEntity.sourceRack = rack.tag
 				assetEntity.sourceRoom = roomInstance.roomName
+				assetEntity.sourceLocation =  roomInstance.location
 				assetEntity.save()
 	        }
 			rack.targetAssets.each{assetEntity ->
 				assetEntity.targetRack = rack.tag
 				assetEntity.targetRoom = roomInstance.roomName
+				assetEntity.targetLocation =  roomInstance.location
 				assetEntity.save()
 	        }
     	}
@@ -251,6 +253,7 @@ class RoomController {
     }
 	
 	private void flush() {
+		println "inside flush"
 		def hbSession = sessionFactory.currentSession
 		hbSession.flush()
 		hbSession.clear()
