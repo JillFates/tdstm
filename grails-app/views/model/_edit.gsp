@@ -231,10 +231,19 @@
 </div>
 <div style="float: left;">
 	<div>
-		<div id="cablingPanel">
+		<div id="cablingPanelEdit" style="height: auto; " class="cablingPanel">
 			<g:if test="${modelInstance.rearImage}">
 				<img id="rearImage" src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" style="display: ${modelInstance.useImage != 1 ? 'none':'block' }"/>
+				<script type="text/javascript">
+					$("#cablingPanelEdit").css("background-color","#FFF")
+				</script>
 			</g:if>
+			<g:else>
+				<script type="text/javascript">
+					var usize = "${modelInstance.usize}"
+					$("#cablingPanelEdit").css("height",usize*30)
+				</script>
+			</g:else>
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 				<div id="connector${modelConnector.connector}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">
 					<div>
@@ -331,7 +340,6 @@
 		initializeConnectors( usize, null )
 	} else {
 		initializeConnectors( 3, 'auto' )
-		$("#cablingPanel").css("background-color","#FFF")
 	}
 	$('div.connector_Left').each(function(index) {
 		$(this).attr("style","margin-left:-"+$(this).children().width()+"px");
