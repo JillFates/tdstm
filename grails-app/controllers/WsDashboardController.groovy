@@ -78,8 +78,8 @@ class WsDashboardController {
 						SUM(IF(t.status='Completed',1,0)) AS tskComp,
 						SUM(IF(t.status='Hold',1,0)) AS tskHold,
 						ROUND(IF(count(*)>0,SUM(IF(t.status='Completed',1,0))/count(*)*100,100)) AS percComp,
-						DATE_FORMAT( mb.start_time ,'%Y/%m/%d %r') AS planStart,
-						DATE_FORMAT( mb.completion_time ,'%Y/%m/%d %r') AS planComp,
+						DATE_FORMAT( mbs.plan_start_time ,'%Y/%m/%d %r') AS planStart,
+						DATE_FORMAT( mbs.plan_completion_time ,'%Y/%m/%d %r') AS planComp,
 						DATE_FORMAT( MIN(IFNULL(t.act_start, t.date_resolved)),'%Y/%m/%d %r') AS actStart,
 						DATE_FORMAT( MAX(t.date_resolved), '%Y/%m/%d %r' ) AS actComp
 					FROM asset_entity a

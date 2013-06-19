@@ -55,7 +55,7 @@ body{
 	font-size:12px;
 	width:auto;
 	text-align:center;
-	background-position:top;
+    background-position:top;
 	background-repeat:repeat-x;
 	}
 .body_bg{
@@ -269,10 +269,10 @@ body{
 	
 #newssection{
 	border:1px solid #e4e2e2;
-	background-image:url(../images/news_bg.png);
+	background-image:url(../images/news_bg.jpg);
 	background-position:top;
-	background-repeat:repeat-x;
-	height:130px;
+	background-repeat:repeat;
+	height:200px;
 	margin-top:3px;
 	}
 	
@@ -295,7 +295,7 @@ body{
 #newsblock{
 	text-align:left;
 	padding-left:25px;
-	height:90px;
+	height:150px;
 	}
 #newsbox{
 	float:left;
@@ -311,7 +311,7 @@ body{
 }
 
 #toparrow{
-	height:80px;
+	height:140px;
 	}
 
 .newstime{
@@ -740,4 +740,7 @@ input, select, textarea {
 	font:11px verdana,arial,helvetica,sans-serif;
 	margin:2px 0;
 	padding:2px 4px;
+}
+.Arrowcursor{
+	cursor:pointer;
 }

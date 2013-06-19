@@ -131,15 +131,15 @@
 							</li>
 						</ul>
 					</div>
-					<div style="float: left; margin-left: 5px; margin-top:12px;">
-						<input type="button" value="Add News" onclick="opencreateNews()">
+					<div style="float: left; margin-left: 5px; margin-top:10px;">
+						<input class="Arrowcursor" type="button" value="Add News" onclick="opencreateNews()">
 					</div>
 				</div>
 				<div style="clear: both"></div>
 				<div id="newsblock">
 					<div id="newsbox">
 						<div id="container"
-							style="position: absolute; width: 900px; height: 70px; overflow: hidden; border: 0px solid grey">
+							style="position: absolute; width: 900px; height: 145px; overflow: hidden; border: 0px solid grey">
 							<div id="content"
 								style="position: relative; width: 900px; left: 0px; top: -5px">
 								<div id="news_live_div" class="tabcontent">
@@ -612,9 +612,9 @@
 			var liId = news[i].type+"_"+news[i].id
 			var createdTime = convertTime(offset,news[i].created)
 			if(state == "A"){
-				archived +=	"<li id="+liId+" onclick='openEditNewsDialog(this.id)'><span class='newstime'>"+createdTime+" :</span> <span class='normaltext'>"+news[i].text+"</span></li>";
+				archived +=	"<li id="+liId+" onclick='openEditNewsDialog(this.id)'><span class='newstime'>"+createdTime+" :</span> <span class='normaltext Arrowcursor'>"+news[i].text+"</span></li>";
 			} else {
-				live +=	"<li id="+liId+" onclick='openEditNewsDialog(this.id)'><span class='newstime'>"+createdTime +" :</span> <span class='normaltext'>"+news[i].text+"</span></li>";
+				live +=	"<li id="+liId+" onclick='openEditNewsDialog(this.id)'><span class='newstime'>"+createdTime +" :</span> <span class='normaltext Arrowcursor'>"+news[i].text+"</span></li>";
 				scrollText += createdTime+" : "+news[i].text +". "
 			}
 		}
