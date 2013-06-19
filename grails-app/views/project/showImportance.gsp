@@ -7,9 +7,7 @@
 			<td colspan="10" class="buttons">
 				<div>
 					<span class="button">
-						<tds:hasPermission permission='ProjectEditView'>
 							<input type="button" value="Edit" class="edit" ng-click="toggleEditMode(type.name)" />
-						</tds:hasPermission>
 					</span>
 				</div>
 			</td>
