@@ -145,9 +145,12 @@ class FilesController {
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
 		def moveBundleList = MoveBundle.findAllByProject(project)
-
+		//fieldImportance for Discovery by default
+		def config = assetEntityService.getConfig('Files','Discovery')
+		
 		[fileInstance:fileInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-					planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project,planStatusOptions:planStatusOptions.value]
+					planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project,
+					planStatusOptions:planStatusOptions.value, config:config]
 	}
 	def save = {
 				params.assetType = "Files"
@@ -187,11 +190,14 @@ class FilesController {
 			} else {
 				assetComment = "blank" 
 			}
+			//field importance styling for respective validation.
+			def validationType = assetEntity.validation
+			def config = assetEntityService.getConfig('Files',validationType)
 			
 			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 			[ filesInstance : filesInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList,
-			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(filesInstance)?.dependencyBundle, project:project ,prefValue:prefValue]
+			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(filesInstance)?.dependencyBundle, project:project ,prefValue:prefValue, config:config]
 		}
 	}
 	def edit ={
@@ -215,10 +221,14 @@ class FilesController {
 			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 			def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
-
+			//fieldImportance Styling for default validation.
+			def validationType = fileInstance.validation
+			def config = assetEntityService.getConfig('Files',validationType)
+			
 			[fileInstance:fileInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
 						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, 
-						dependentAssets:dependentAssets, redirectTo : params.redirectTo, dependencyType:dependencyType, dependencyStatus:dependencyStatus,servers:servers]
+						dependentAssets:dependentAssets, redirectTo : params.redirectTo, dependencyType:dependencyType, 
+						dependencyStatus:dependencyStatus,servers:servers, config:config]
 		}
 		
 	}

@@ -6,89 +6,89 @@
 					<tbody>
 						<tr>
 							<td class="label" nowrap="nowrap"><label for="assetName">Name</label></td>
-							<td style="font-weight:bold;">${applicationInstance.assetName}</td>
+							<td style="font-weight:bold;" class="${config.assetName}">${applicationInstance.assetName}</td>
 							<td class="label" nowrap="nowrap">Description</td>
-							<td colspan="5">${applicationInstance.description}</td>
+							<td colspan="5" class="${config.description}">${applicationInstance.description}</td>
 						</tr>
 						<tr>
 							<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
 							<td class="valueNW">${applicationInstance.assetType}</td>
 							<td class="label" nowrap="nowrap"><label for="supportType">Support</label></td>
-							<td class="valueNW">${applicationInstance.supportType}</td>
+							<td class="valueNW ${config.supportType}">${applicationInstance.supportType}</td>
 							<td class="label" nowrap="nowrap"><label for="appFunction">Function</label></td>
-							<td class="valueNW">${applicationInstance.appFunction}</td>
+							<td class="valueNW ${config.appFunction}">${applicationInstance.appFunction}</td>
 							<td class="label" nowrap="nowrap"><label for="userCount">Users</label></td>
-							<td class="valueNW">${applicationInstance.userCount}</td>
+							<td class="valueNW ${config.userCount}">${applicationInstance.userCount}</td>
 						</tr>
 						<tr>
 							<td class="label" nowrap="nowrap"><label for="appVendor">Vendor</label></td>
-							<td class="valueNW">${applicationInstance.appVendor}</td>
+							<td class="valueNW ${config.appVendor}">${applicationInstance.appVendor}</td>
 							<td class="label" nowrap="nowrap"><label for="sme">SME1</label></td>
-							<td class="valueNW">${applicationInstance.sme}</td>
+							<td class="valueNW ${config.sme}">${applicationInstance.sme}</td>
 							<td class="label" nowrap="nowrap"><label for="environment">Environment</label></td>
-							<td class="valueNW">${applicationInstance.environment}</td>
+							<td class="valueNW ${config.environment}">${applicationInstance.environment}</td>
 							<td class="label" nowrap="nowrap"><label for="userLocations">User Location</label></td>
-							<td class="valueNW">${applicationInstance.userLocations}</td>
+							<td class="valueNW ${config.userLocations}">${applicationInstance.userLocations}</td>
 						</tr>
 						<tr>
 							<td class="label" nowrap="nowrap"><label for="appVersion">Version</label></td>
-							<td class="valueNW">${applicationInstance.appVersion}</td>
+							<td class="valueNW ${config.appVersion}">${applicationInstance.appVersion}</td>
 							<td class="label" nowrap="nowrap"><label for="sme2">SME2</label></td>
-							<td class="valueNW">${applicationInstance.sme2}</td>
+							<td class="valueNW ${config.sme2}">${applicationInstance.sme2}</td>
 							<td class="label" nowrap="nowrap"><label for="criticality">Criticality</label></td>
-							<td class="valueNW">${applicationInstance.criticality}</td>
+							<td class="valueNW ${config.criticality}">${applicationInstance.criticality}</td>
 							<td class="label" nowrap="nowrap"><label for="useFrequency">Use Frequency</label></td>
-							<td class="valueNW">${applicationInstance.useFrequency}</td>
+							<td class="valueNW ${config.useFrequency}">${applicationInstance.useFrequency}</td>
 						</tr>
 						<tr>
 							<td class="label" nowrap="nowrap"><label for="appTech">Tech.</label></td>
-							<td class="valueNW">${applicationInstance.appTech}</td>
+							<td class="valueNW ${config.appTech}">${applicationInstance.appTech}</td>
 							<td class="label" nowrap="nowrap"><label for="businessUnit">Bus Unit</label></td>
-							<td class="valueNW">${applicationInstance.businessUnit}</td>
+							<td class="valueNW ${config.businessUnit}">${applicationInstance.businessUnit}</td>
 							<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-							<td class="valueNW">${applicationInstance.moveBundle} / ${dependencyBundleNumber}</td>
+							<td class="valueNW ${config.moveBundle}">${applicationInstance.moveBundle} / ${dependencyBundleNumber}</td>
 							<td class="label" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label></td>
-							<td class="valueNW">${applicationInstance.drRpoDesc}</td>
+							<td class="valueNW ${config.drRpoDesc}">${applicationInstance.drRpoDesc}</td>
 						</tr>
 						<tr>
 							<td class="label" nowrap="nowrap"><label for="appSource">Source</label></td>
-							<td class="valueNW">${applicationInstance.appSource}</td>
+							<td class="valueNW ${config.appSource}">${applicationInstance.appSource}</td>
 							<td class="label" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
-							<td class="valueNW">${applicationInstance.appOwner}</td>
+							<td class="valueNW ${config.owner}">${applicationInstance.appOwner}</td>
 							<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
-							<td class="valueNW">${applicationInstance.planStatus}</td>
+							<td class="valueNW ${config.planStatus}">${applicationInstance.planStatus}</td>
 							<td class="label" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label></td>
-							<td class="valueNW">${applicationInstance.drRtoDesc}</td>
+							<td class="valueNW ${config.drRtoDesc}">${applicationInstance.drRtoDesc}</td>
 						</tr>
 						<tr>
 							<td class="label" nowrap="nowrap"><label for="license">License</label></td>
-							<td class="valueNW">${applicationInstance.license}</td>
+							<td class="valueNW ${config.license}">${applicationInstance.license}</td>
 							<td class="label" nowrap="nowrap">Retire</td>
-							<td><tds:convertDate
+							<td class="${config.retireDate}"><tds:convertDate
 									date="${applicationInstance?.retireDate}"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
 							<td class="label" nowrap="nowrap">Validation</td>
-							<td>${applicationInstance.validation}</td>
+							<td class="${config.validation}">${applicationInstance.validation}</td>
 							<td class="label" nowrap="nowrap"><label for="testProc">Test Proc OK</label></td>
-							<td>${applicationInstance.testProc ? applicationInstance.testProc : '?'}</td>
+							<td class="${config.testProc}">${applicationInstance.testProc ? applicationInstance.testProc : '?'}</td>
 						</tr>
 						<tr>
 							<td></td>
 							<td></td>
 							<td class="label" nowrap="nowrap">Maint Exp.</td>
-							<td class="valueNW"><tds:convertDate
+							<td class="valueNW ${config.maintExpDate}"><tds:convertDate
 									date="${applicationInstance?.maintExpDate}" formate="12hrs"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
 							<td class="label" nowrap="nowrap"><label for="latency">Latency OK</label></td>
-							<td class="valueNW">${applicationInstance.latency ? applicationInstance.latency : '?'}</td>
+							<td class="valueNW ${config.latency}">${applicationInstance.latency ? applicationInstance.latency : '?'}</td>
 							<td class="label" nowrap="nowrap"><label for="startupProc">Startup Proc OK</label></td>
-							<td class="valueNW">${applicationInstance.startupProc ? applicationInstance.startupProc : '?'}</td>
+							<td class="valueNW ${config.startupProc}">${applicationInstance.startupProc ? applicationInstance.startupProc : '?'}</td>
 						</tr>
 						<g:render template="../assetEntity/customShow" model="['assetEntity':applicationInstance]"></g:render>
 						<tr>
 							<td class="label" nowrap="nowrap"><label for="license">URL</label></td>
-							<td class="valueNW" colspan="7"><a href="${applicationInstance.url}" style="color:#00E">${applicationInstance.url}</a></td>
+							<td class="valueNW ${config.url}" colspan="7"><a href="${applicationInstance.url}" style="color:#00E">${applicationInstance.url}</a></td>
 						</tr>
                         <tr>
 						   	<td class="label" nowrap="nowrap" ><label for="events">Event</label></td>

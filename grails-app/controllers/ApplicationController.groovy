@@ -164,9 +164,11 @@ class ApplicationController {
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
-
+		//fieldImportance for Discovery by default
+		def config = assetEntityService.getConfig('Application','Discovery')
+		
 		[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-					planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project,moveEventList:moveEventList]
+		planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project,moveEventList:moveEventList,config:config]
 	}
 	def save = {
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
@@ -233,10 +235,15 @@ class ApplicationController {
 			def project = Project.read(projectId)
 		    def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 			def appMoveEventlist = AppMoveEvent.findAllByApplication(applicationInstance).value
+			
+			//field importance styling for respective validation.
+			def validationType = assetEntity.validation
+			def config = assetEntityService.getConfig('Application',validationType)
+			
 			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, 
 			  redirectTo : params.redirectTo, assetComment:assetComment, assetCommentList:assetCommentList,
 			  appMoveEvent:appMoveEvent, moveEventList:moveEventList, appMoveEvent:appMoveEventlist, project:project,
-			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle ,prefValue:prefValue]
+			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle ,prefValue:prefValue, config:config]
 		}
 	}
 
@@ -272,10 +279,14 @@ class ApplicationController {
 				   appMoveInstance.save(flush:true)
 			   }
 			}
+			//fieldImportance Styling for default validation.
+			def validationType = applicationInstance.validation
+			def config = assetEntityService.getConfig('Application',validationType)
+			
 			[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
 						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets,
 						dependentAssets:dependentAssets, redirectTo : params.redirectTo,dependencyType:dependencyType, dependencyStatus:dependencyStatus,
-						moveEvent:moveEvent,servers:servers]
+						moveEvent:moveEvent,servers:servers, config:config]
 		}
 
 	}

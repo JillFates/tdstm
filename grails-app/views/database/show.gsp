@@ -8,33 +8,33 @@
 					<tbody>
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="assetName">Name</label></td>
-							<td class="valueNW" style="font-weight:bold;">${databaseInstance?.assetName}</td>
+							<td class="valueNW ${config.assetName}" style="font-weight:bold;">${databaseInstance?.assetName}</td>
 							<td class="label" nowrap="nowrap">Description</td>
-							<td class="valueNW" colspan="5">${databaseInstance.description}</td>
+							<td class="valueNW ${config.description}" colspan="5">${databaseInstance.description}</td>
 						</tr>
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
 							<td class="valueNW">${databaseInstance?.assetType}</td>
 							<td class="label" nowrap="nowrap"><label for="supportType">Support</label></td>
-							<td class="valueNW">${databaseInstance?.supportType}</td>
+							<td class="valueNW ${config.supportType}">${databaseInstance?.supportType}</td>
 							<td class="label" nowrap="nowrap"><label for="environment">Environment</label></td>
-							<td class="valueNW" colspan="3">${databaseInstance?.environment}</td>
+							<td class="valueNW ${config.environment}" colspan="3">${databaseInstance?.environment}</td>
 						</tr>
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="dbFormat">Format</label></td>
-							<td class="valueNW">${databaseInstance?.dbFormat}</td>
+							<td class="valueNW ${config.dbFormat}">${databaseInstance?.dbFormat}</td>
 							<td class="label" nowrap="nowrap">Retire</td>
-							<td class="valueNW"><tds:convertDate date="${databaseInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
+							<td class="valueNW ${config.retireDate}"><tds:convertDate date="${databaseInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
 							<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-							<td class="valueNW" colspan="3">${databaseInstance?.moveBundle} / ${dependencyBundleNumber}</td>
+							<td class="valueNW ${config.moveBundle}" colspan="3">${databaseInstance?.moveBundle} / ${dependencyBundleNumber}</td>
 						</tr>
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="dbSize">Size</label></td>
-							<td class="valueNW">${databaseInstance?.dbSize}</td>
+							<td class="valueNW ${config.dbSize}">${databaseInstance?.dbSize}</td>
 							<td class="label" nowrap="nowrap">Maint Exp.</td>
-							<td class="valueNW"><tds:convertDate date="${databaseInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
+							<td class="valueNW ${config.maintExpDate}"><tds:convertDate date="${databaseInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
 							<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
-							<td class="valueNW" colspan="3">${databaseInstance?.planStatus}</td>
+							<td class="valueNW ${config.planStatus}" colspan="3">${databaseInstance?.planStatus}</td>
 						</tr>
 						<tr>
 							<td class="label" nowrap="nowrap"><label>Version</label></td>
@@ -42,7 +42,7 @@
 							<td class="label" nowrap="nowrap"><label>SME1</label></td>
 							<td></td>
 							<td class="label">Validation</td>
-							<td class="valueNW" colspan="3">${databaseInstance.validation}</td>
+							<td class="valueNW ${config.validation}" colspan="3">${databaseInstance.validation}</td>
 						</tr>
 						<g:render template="../assetEntity/customShow" model="[assetEntity:databaseInstance, 'project':project]"></g:render>
 					</tbody>

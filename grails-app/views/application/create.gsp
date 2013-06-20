@@ -21,9 +21,9 @@
 						<tbody>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label></td>
-								<td ><input type="text" id="assetName" name="assetName" value="${applicationInstance.assetName}" tabindex="10" /></td>
+								<td ><input type="text" id="assetName" class="${config.assetName}" name="assetName" value="${applicationInstance.assetName}" tabindex="10" /></td>
 								<td class="label" nowrap="nowrap">Description</td>
-								<td colspan="3"><input type="text" id="description" name="description" value="" size="50" tabindex="20" />
+								<td colspan="3"><input type="text" id="description" class="${config.description}" name="description" value="" size="50" tabindex="20" />
 								</td>
 							</tr>
 							<tr>
@@ -31,35 +31,35 @@
 								<td ><input type="text" id="assetType" name="assetType" value="Application" readonly="readonly" /></td>
 								<td class="label" nowrap="nowrap"><label for="supportType">Support</label>
 								</td>
-								<td ><input type="text" id="supportType"
+								<td ><input type="text" id="supportType" class="${config.supportType}"
 									name="supportType" value="${applicationInstance.supportType}"  tabindex="21" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="appFunction">Function</label>
 								</td>
-								<td ><input type="text" id="appFunction"
+								<td ><input type="text" id="appFunction" class="${config.appFunction}"
 									name="appFunction" value="${applicationInstance.appFunction}"  tabindex="31" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="userCount">Users</label>
 								</td>
-								<td ><input type="text" id="userId" name="userCount" value="${applicationInstance.userCount}"  tabindex="41" />
+								<td ><input type="text" id="userId" class="${config.userCount}" name="userCount" value="${applicationInstance.userCount}"  tabindex="41" />
 								</td>
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="appVendor">Vendor</label></td>
-								<td ><input type="text" id="appVendor"
+								<td ><input type="text" id="appVendor" class="${config.appVendor}"
 									name="appVendor" value="${applicationInstance.appVendor}"  tabindex="11" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="sme">SME1</label></td>
-								<td ><input type="text" id="sme" name="sme"
+								<td ><input type="text" id="sme" name="sme" class="${config.sme}"
 									value="${applicationInstance.sme}"  tabindex="22" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="environment">Environment</label>
 								</td>
-								<td ><g:select id="environment" name="environment" from="${applicationInstance.constraints.environment.inList}" value="${applicationInstance.environment}"  tabindex="32"></g:select>
+								<td ><g:select id="environment" class="${config.environment}" name="environment" from="${applicationInstance.constraints.environment.inList}" value="${applicationInstance.environment}"  tabindex="32"></g:select>
 								</td>
 								<td class="label" nowrap="nowrap"><label for="userLocations">User Location</label>
 								</td>
-								<td ><input type="text" id="userLocations"
+								<td ><input type="text" id="userLocations" class="${config.userLocations}"
 									name="userLocations"
 									value="${applicationInstance.userLocations}"  tabindex="42" />
 								</td>
@@ -67,57 +67,57 @@
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="appVersion">Version</label>
 								</td>
-								<td ><input type="text" id="appVersion"
+								<td ><input type="text" id="appVersion" class="${config.appVersion}"
 									name="appVersion" value="${applicationInstance.appVersion}"  tabindex="13" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="sme2">SME2</label></td>
-								<td ><input type="text" id="sme2" name="sme2"
+								<td ><input type="text" id="sme2" name="sme2" class="${config.sme2}"
 									value="${applicationInstance.sme2}"  tabindex="23" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="criticality">Criticality</label>
 								</td>
-								<td ><g:select id="criticality" name="criticality" from="${applicationInstance.constraints.criticality.inList}" value="${applicationInstance.criticality}"  tabindex="33"></g:select></td>
+								<td ><g:select id="criticality" class="${config.criticality}" name="criticality" from="${applicationInstance.constraints.criticality.inList}" value="${applicationInstance.criticality}"  tabindex="33"></g:select></td>
 								<td class="label" nowrap="nowrap"><label for="useFrequency">Use	Frequency</label>
 								</td>
-								<td ><input type="text" id="useFrequency" name="useFrequency" value="${applicationInstance.useFrequency}" tabindex="43" />
+								<td ><input type="text" id="useFrequency" class="${config.useFrequency}" name="useFrequency" value="${applicationInstance.useFrequency}" tabindex="43" />
 								</td>
 
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="appTech">Tech.</label></td>
-								<td ><input type="text" id="appTech" name="appTech" value="${applicationInstance.appTech}" tabindex="14" />
+								<td ><input type="text" id="appTech" class="${config.appTech}" name="appTech" value="${applicationInstance.appTech}" tabindex="14" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="businessUnit">Bus	Unit</label>
 								</td>
-								<td ><input type="text" id="businessUnit" name="businessUnit" value="${applicationInstance.businessUnit}" tabindex="24" />
+								<td ><input type="text" id="businessUnit" class="${config.businessUnit}" name="businessUnit" value="${applicationInstance.businessUnit}" tabindex="24" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-								<td ><g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${applicationInstance.moveBundle}" optionKey="id" optionValue="name" tabindex="34" />
+								<td ><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${applicationInstance.moveBundle}" optionKey="id" optionValue="name" tabindex="34" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label>
 								</td>
-								<td ><input type="text" id="drRpoDesc"	name="drRpoDesc" value="${applicationInstance.drRpoDesc}" tabindex="44" />
+								<td ><input type="text" id="drRpoDesc"	class="${config.drRpoDesc}" name="drRpoDesc" value="${applicationInstance.drRpoDesc}" tabindex="44" />
 								</td>
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="appSource">Source</label></td>
-								<td ><input type="text" id="appSource"	name="appSource" value="${applicationInstance.appSource}" tabindex="15" />
+								<td ><input type="text" id="appSource"	class="${config.appSource}" name="appSource" value="${applicationInstance.appSource}" tabindex="15" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
-								<td ><input type="text" id="appOwner" name="appOwner"	value="" tabindex="25" />
+								<td ><input type="text" id="appOwner" class="${config.owner}" name="appOwner"	value="" tabindex="25" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label>
 								</td>
-								<td ><g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${applicationInstance.planStatus}" tabindex="35" />
+								<td ><g:select from="${planStatusOptions}" id="planStatus" class="${config.planStatus}" name="planStatus" value="${applicationInstance.planStatus}" tabindex="35" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label>
 								</td>
-								<td ><input type="text" id="drRtoDesc"	name="drRtoDesc" value="${applicationInstance.drRtoDesc}" tabindex="45" />
+								<td ><input type="text" id="drRtoDesc"	class="${config.drRtoDesc}" name="drRtoDesc" value="${applicationInstance.drRtoDesc}" tabindex="45" />
 								</td>
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="license">License</label></td>
-								<td ><input type="text" id="license" name="license" value="${applicationInstance.license}" tabindex="16" />
+								<td ><input type="text" id="license" class="${config.license}" name="license" value="${applicationInstance.license}" tabindex="16" />
 								</td>
 								<td class="label"><label for="retireDate">Retire Date:</label>
 								</td>
@@ -126,16 +126,16 @@
 								    <script type="text/javascript" charset="utf-8">
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 									</script>
-									<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate" tabindex="26"
+									<input type="text" class="dateRange ${config.retireDate}" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate" tabindex="26"
 									value="<tds:convertDate date="${applicationInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" /> 
 								</td>
 								<td class="label" nowrap="nowrap"><label for="testProcs">Validation</label>
 								</td>
-								<td ><g:select  id="validation"	name="validation" from="${applicationInstance.constraints.validation.inList }"  value="" tabindex="36" />
+								<td ><g:select  id="validation" class="${config.validation}" name="validation" from="${applicationInstance.constraints.validation.inList }" onChange="assetFieldImportance(this.value,'Application')"  value="" tabindex="36" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="testProcs">Test Proc OK</label>
 								</td>
-								<td ><g:select  id="testProc"	name="testProc"  from="${['Y', 'N']}" value="?"
+								<td ><g:select  id="testProc"	class="${config.testProc}" name="testProc"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="46" />
 								</td>
 							</tr>
@@ -148,17 +148,17 @@
 								    <script type="text/javascript" charset="utf-8">
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 									</script>
-									<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate" tabindex="27" 
+									<input type="text" class="dateRange ${config.maintExpDate}" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate" tabindex="27" 
 									value="<tds:convertDate date="${applicationInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />" /> 
 								</td>
 								<td class="label" nowrap="nowrap"><label for="latency">Latency OK</label>
 								</td>
-								<td ><g:select  id="latency"	name="latency"  from="${['Y', 'N']}" value="?"
+								<td ><g:select  id="latency" class="${config.latency}"	name="latency"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="37" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="startupProc">Startup Proc OK</label>
 								</td>
-								<td ><g:select  id="testProcs"	name="startupProc" from="${['Y', 'N']}" value="?"
+								<td ><g:select  id="testProcs" class="${config.startupProc}" name="startupProc" from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="47" />
 								</td>
 								
@@ -166,7 +166,7 @@
 							<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="license">URL</label></td>
-								<td colspan="7"><input type="text" id="url" name="url" value="${applicationInstance.url}" size=50 tabindex="19" />
+								<td colspan="7"><input type="text" id="url" class="${config.url}" name="url" value="${applicationInstance.url}" size=50 tabindex="19" />
 								</td>
 							</tr>
 							<tr>
