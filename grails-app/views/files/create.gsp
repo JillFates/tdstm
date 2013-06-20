@@ -71,7 +71,7 @@
 								</td>
 								<td><input type="text" id="fileSize" class="${config.fileSize}" name="fileSize" size="10"
 									value="${fileInstance.fileSize}" /> &nbsp;
-									<g:select from="${com.tds.asset.Files.constraints.sizeUnit.inList}" name="sizeUnit" class="${config.sizeUnit}"  id="sizeUnit" value="GB"/>
+									<g:select from="${com.tds.asset.Files.constraints.sizeUnit.inList}" name="sizeUnit" id="sizeUnit" value="GB"/>
 								</td>
 								<td class="label">Validation</td>
 								<td>
