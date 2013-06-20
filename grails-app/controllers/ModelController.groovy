@@ -1334,7 +1334,7 @@ class ModelController {
 		sortedModel = validModel + fullModel + newmodel
 		
 		// Defined a HashMap as 'columnList' where key is displaying label and value is property of label .
-		def columnList =  [ 'Model Name': 'modelName', 'Manufatcurer':'manufacturer', 'AKA': 'aliases' , 'Asset Type':'assetType','Usize':'usize', 
+		def columnList =  [ 'Model Name': 'modelName', 'Manufacturer':'manufacturer', 'AKA': 'aliases' , 'Asset Type':'assetType','Usize':'usize', 
 							'Dimensions(inches)':'', 'Weight(pounds)':'weight', 'Layout Style':'layoutStyle', 'Product Line':'productLine', 
 							'Model Family':'modelFamily', 'End Of Life Date':'endOfLifeDate','End Of Life Status':'endOfLifeStatus',
 							'Power(Max/Design/Avg)':'powerUse','Notes':'description', 'Front Image':'frontImage', 'Rear Image':'rearImage', 'Room Object': 'roomObject',

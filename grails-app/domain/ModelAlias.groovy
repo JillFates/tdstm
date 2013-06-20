@@ -11,7 +11,7 @@ class ModelAlias {
 	Date dateCreated
 		
 	static constraints = {
-		name nullable:false, blank:false, unique:['manufacturer']
+		name nullable:false, blank:true, unique:['manufacturer']
 		manufacturer nullable:false
 		model nullable:false
     }

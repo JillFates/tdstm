@@ -66,11 +66,11 @@ class ModelService {
 			
 			// Delete model record
 			fromModel.delete()
+			sessionFactory.getCurrentSession().flush();
 			
 			def principal = SecurityUtils.subject?.principal
-			def user
 			if( principal ){
-				user = UserLogin.findByUsername( principal )
+				def user = UserLogin.findByUsername( principal )
 				def person = user.person
 				def bonusScore = person.modelScoreBonus ? person.modelScoreBonus:0
 				if(user){

@@ -9,7 +9,7 @@
     
 <g:javascript src="model.manufacturer.js" />
 <g:javascript src="drag_drop.js" />
-<script src="${resource(dir:'js',file:'jquery.form.js')}"></script> 	
+<script src="${resource(dir:'js',file:'jquery.form.js')}"></script>
 <jqgrid:resources />
 <jqui:resources /> 
 <jqgrid:resources />
@@ -24,16 +24,16 @@ $(document).ready(function() {
 				<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='compareOrMerge()' disabled='disabled'/></span>"
 	<jqgrid:grid id="modelId" url="'${createLink(action: 'listJson')}'"
 	    colNames="'Model Name','Manufacturer', 'Description','Asset Type', 'Power','No Of Connectors','Assets ','Version','Source TDS','Model Status'"
-	    colModel="{name:'modelName', index: 'modelName', width:'150',formatter: myLinkFormatter},
-	      			  {name:'manufacturer', editable: true, width:'100'},
-	      			  {name:'description', editable: true,width:'100'},
-	                  {name:'assetType', editable: true, width:'100'},
-	                  {name:'powerUse', editable: true,width:'50'}, 
-	                  {name:'modelConnectors', editable: true,width:'80',search:false},
-	                  {name:'assets', editable: false,width:'50',search:false},
-	                  {name:'sourceTDSVersion', editable: false,width:'50',search:false},
-	                  {name:'sourceTDS', editable: false,width:'60'},
-	                  {name:'modelStatus',editable: false,width:'60' }"
+	    colModel="{name:'modelName', index: 'modelName', width:'150',formatter: myLinkFormatter, fixed:false},
+	      			  {name:'manufacturer', editable: true, width:'100', fixed:false},
+	      			  {name:'description', editable: true,width:'100', fixed:false},
+	                  {name:'assetType', editable: true, width:'100', fixed:false},
+	                  {name:'powerUse', editable: true,width:'50', fixed:false},
+	                  {name:'modelConnectors', editable: true,width:'80',search:false, fixed:false},
+	                  {name:'assets', editable: false,width:'50',search:false, fixed:false},
+	                  {name:'sourceTDSVersion', editable: false,width:'50',search:false, fixed:false},
+	                  {name:'sourceTDS', editable: false,width:'60', fixed:false},
+	                  {name:'modelStatus',editable: false,width:'60', fixed:false}"
 	    sortname="'modelName'"
 	    caption="listCaption"
 	   	height="'100%'"
@@ -42,7 +42,8 @@ $(document).ready(function() {
 	    rowList= "'25','100','500','1000'"
 	    viewrecords="true"
     	multiselect="true"
-	    showPager="true"
+        showPager="true"
+        forceFit="true"
 		loadComplete="initCheck"
 	    datatype="'json'">
 	    <jqgrid:filterToolbar id="modelId" searchOnEnter="false" />

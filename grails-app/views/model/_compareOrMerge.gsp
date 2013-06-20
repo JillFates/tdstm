@@ -70,8 +70,14 @@
 	         </g:elseif>
 	         
 	         <g:elseif test="${column =='Merge To'}">
-	         	<td id="${columnList.get(column)+'_td_'+model.id}" class="col_${model.id}"><input type="radio" class="merge" name="mergeRadio" id="merge_${model.id}" 
-	         	 	onclick="switchTarget(${model.id})"/>
+	         	<td id="${columnList.get(column)+'_td_'+model.id}" class="col_${model.id}">
+	         	<input type="radio" class="merge" name="mergeRadio" id="merge_${model.id}" onclick="switchTarget(${model.id})" />
+	         	<g:if test="${j==0}">
+		         	<script type="text/javascript" charset="utf-8">
+						$("#merge_${model.id}").attr('checked', 'checked')
+						switchTarget(${model.id})
+					</script>
+				</g:if>
 	         	</td>
 	         </g:elseif>
 	         

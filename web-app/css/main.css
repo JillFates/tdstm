@@ -57,7 +57,7 @@ input, select, textarea {
     padding: 2px 4px;
 }
 select {
-   padding: 2px 2px 2px 0;
+	padding: 2px 2px 2px 0;
 }
 
 .body {
@@ -500,4 +500,29 @@ div.field_list table {
 td.buttons{
 	padding: 0px;
 	margin-top: 0px !important;
+}
+
+.ui-jqgrid-htable {
+	border-width: 0px !important;
+}
+
+.ui-jqgrid-btable {
+	border-width: 0px !important;
+}
+
+.ui-pg-selbox {
+	line-height:normal;
+	padding:0px;
+}
+
+.ui-search-input {
+	padding:1px 0px;
+}
+
+.ui-th-column div {
+	padding:0px;
+}
+
+div.ui-jqgrid {
+	width:100% !important;
 }

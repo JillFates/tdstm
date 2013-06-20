@@ -265,6 +265,33 @@ function mergeModel(){
 	}
 }
 function switchTarget( id ){
+	
+	// If any of the fields of the target were changed, make the same changes to the span
+	$(".editAll:visible").children().each(function(){
+		var span = $(this).parent().siblings()
+		if($(this).attr('type') == 'checkbox')
+			span.children().val(span.children().val())
+		else {
+			var toSpan = ''
+			$(this).parent().children("input").each(function(i){
+				if(i > 0)
+					toSpan = toSpan + '/'
+				if($(this).siblings().length > 0 && ! $(this).val())
+					toSpan = toSpan + 'null'
+				else
+					toSpan = toSpan + $(this).val()
+			})
+			if(toSpan.length > 20)
+				toSpan = toSpan.substring(0, 20) + '...'
+			span.html(toSpan)
+		}
+	})
+	
+	// Trim the three non-editable fields at the top of the form
+	$("#showOrMergeId div table tbody").children(":eq(1)").children().children().each(function(){trimField($(this))})
+	$("#showOrMergeId div table tbody").children(":eq(2)").children().each(function(){trimField($(this))})
+	$("#showOrMergeId div table tbody").children(":eq(3)").children().children().each(function(){trimField($(this))})
+	
 	$(".editAll").hide()
 	$(".showAll").show()
 	$(".showFrom_"+id).hide()
@@ -289,8 +316,10 @@ function switchTarget( id ){
 		for(j=0; j<modelToMerge.length; j++){
 			if($("#"+field[i]+"_edit_"+modelToMerge[j]).val() && !$("#"+field[i]+"_edit_"+targetModelId).val()){
 				$("#"+field[i]+"_td_"+modelToMerge[j]).addClass('willRemain')
+				$("#"+field[i]+"_td_"+modelToMerge[j]).removeClass('willDelete')
 			} else {
 				$("#"+field[i]+"_td_"+modelToMerge[j]).addClass('willDelete')
+				$("#"+field[i]+"_td_"+modelToMerge[j]).removeClass('willRemain')
 			}
 		}
 	}
@@ -298,11 +327,21 @@ function switchTarget( id ){
 	$(".col_"+targetModelId).removeClass('willDelete')
 	$(".col_"+targetModelId).removeClass('willRemain')
 	$(".input_"+id).each(function(){
-		if(this.value)
+		if($(this).val()){
 			$(this).addClass('willRemain')
-		else
+			$(this).removeClass('willDelete')
+		}
+		else{
 			$(this).addClass('willDelete')
+			$(this).removeClass('willRemain')
+		}
 	})
+}
+
+// Trims the contents of fields with more than 40 characters
+function trimField( source ) {
+	if(source.html().length > 40)
+		source.html(source.html().substring(0, 40) + '...')
 }
 
 function removeCol(id){

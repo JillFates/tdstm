@@ -7,7 +7,6 @@
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
     <script type="text/javascript">
 		$(document).ready(function() {
-		   $("#showMergeDialog").dialog({ autoOpen: false })
 		    $("#editModelView").dialog({ autoOpen: false })
 		})
 	</script>
@@ -200,26 +199,6 @@
 			</tbody>
 		</table>
 	</div>
-	<div id="showMergeDialog" title="Select the item to merge to:" style="display: none;" class="list">
-		<table cellpadding="0" cellspacing="0" >
-			<thead>
-				<tr><th>Name</th><th>AKA</th><th>Type</th></tr>
-			</thead>
-            <tbody>
-            	<g:each in="${Model.findAll('from Model where id != ? and manufacturer = ?', [modelInstance?.id, modelInstance?.manufacturer])?.sort{it.modelName}}" status="i" var="model">
-            		<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                     <td valign="top" class="name">
-                     	<g:link action="merge" id="${model.id}" params="[fromId:modelInstance?.id]" style="font-weight: ${modelAkas ? 'bold' : 'normal'}">
-                      	${model.modelName}
-                      </g:link>
-                     </td>
-                     <td valign="top" class="value">${WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(model).name)}</td>
-                     <td valign="top" class="value">${model?.assetType}</td>
-                 </tr>
-            	</g:each>
-            </tbody>
-        </table>
-	</div>
 	<tr>
 			<td colspan="2">
 				<div class="buttons" style="margin-left: 10px;margin-right: 10px;"> 
@@ -231,7 +210,6 @@
 						   <g:if test="${redirectTo=='modelDialog'}">
 								<span class="button"><input type="button" class="save" value="Edit"
 										onclick="showOrEditModelManuDetails('model',${modelInstance?.id},'Model','edit','Edit')" /></span>
-								<span class="button"><input class="create" type="button" value="Merge" onclick="showMergeDialog()"/></span>
 								<g:if test="${modelRef}">
 									<g:actionSubmit class="delete" action="delete" value="Delete"  disabled="disabled" onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>
 								</g:if>
@@ -248,7 +226,6 @@
 						   <g:else>
 						   ${modelRef}
 								<g:actionSubmit class="edit" action="edit" value="Edit"></g:actionSubmit>
-								<span class="button"><input class="create" type="button" value="Merge" onclick="showMergeDialog()"/></span>
 								<g:if test="${modelRef}">
 									<g:actionSubmit class="delete" action="delete" value="Delete"  disabled="disabled" 
 									 onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>
@@ -291,11 +268,6 @@ function validateModelDependency( modelId ){
 		}
 	});
 	return returnValue
-}
-function showMergeDialog(){
-	$("#showMergeDialog").dialog('option', 'height', 530)
-	$("#showMergeDialog").dialog('option', 'width', 500)
-    $("#showMergeDialog").dialog('open')
 }
 
 function updatePowerType(value,name){
