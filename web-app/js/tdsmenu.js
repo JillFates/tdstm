@@ -178,7 +178,25 @@
 			var sURL = unescape(window.location);
 			window.location.href = sURL;
 		}
+		//Function to wait for .5 sec to show megamenu to avoid unintended hover.
+		var tipTimer = null;
+		function clearTipTimer() {
+		    if (tipTimer) {
+		        clearTimeout(tipTimer);
+		        tipTimer = null;
+		    }
+		}
+		function waitForMenu(e){
+	        clearTipTimer();
+	        tipTimer = setTimeout(function() {
+	            tipTimer = null;
+	            showMegaMenu(e);
+	        }, 500);
+		}
+		
 		function showMegaMenu(e){
+			
+		    
 			$('#adminMegaMenu').hide();
 			$('#projectMegaMenu').hide();
 			$('#racksMegaMenu').hide();
@@ -326,6 +344,7 @@
 		// set close timer
 		function mclosetime() {
 			closetimer = window.setTimeout(closeMegaMenu, timeout);
+			clearTipTimer();
 		}
 		// cancel close timer
 		function mcancelclosetime() {
