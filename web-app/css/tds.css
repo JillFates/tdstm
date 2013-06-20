@@ -238,17 +238,17 @@
 	width:200px;
 }
 #reportsMegaMenu {
-	width:600px;
+	width:426px;
 }
 #userMegaMenu {
-	top:24px;
-	right:0px;
-	width:300px;
+	right: 107px;
+    top: 30px;
+    width: 300px;
 }
 #userAnchor{
 	float:left;
 	display:inline; 
-	position: absolute;
+	/* position: absolute; */
 }
 #userSpanId{
 	float:right;
@@ -835,7 +835,7 @@ td .dep-Questioned {
 	display: none;  left:0px  !important;    position: absolute  !important; top: 20px; 
 }
 .reports {
-	display: none;  left:-527px  !important;    position: absolute  !important; top: 20px; 
+	display: none;  left:-351px   !important;    position: absolute  !important; top: 20px; 
 }
 .client { display: none;  left:0px  !important;    position: absolute  !important; top:20px;}
 .admin { display: none;  left:0px  !important;    position: absolute  !important; top:50px;}
@@ -1313,4 +1313,7 @@ span.task_button_disabled { float: left; height: 16px; line-height: 16px;  paddi
 
 .rackDetailDiv {
 	display: none; position: relative; width: 253px; border: 0px solid black; float: left; background-color: white; z-index: 99;
+}
+.compareColumn{
+	width: 250px
 }
