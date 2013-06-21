@@ -455,13 +455,13 @@ span.cellWithoutBackground
 }
 
 .C{
-	background-color:#009900;
+	background-color:#009900 !important;
 }
 .I{
-	background-color:#00FF66;
+	background-color:#00FF66 !important;
 }
 .H{
-	background-color:#CCCCCC ;
+	background-color:#CCCCCC !important;
 }
 .stylingNote{
 	display:none;

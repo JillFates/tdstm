@@ -727,7 +727,7 @@ class ProjectController {
 		def assetTypes=EntityType.list
 		def impMap =[:]
 		assetTypes.each{type->
-			impMap << [(type):projectService.getConfig(type)]
+			impMap << [(type):projectService.getConfigByEntity(type)]
 		}
 		render impMap as JSON
 	}
@@ -739,7 +739,7 @@ class ProjectController {
 	def cancelImportance = {
 		def entityType = request.JSON.entityType
 		def project = securityService.getUserCurrentProject()
-		def parseData = projectService.getConfig(entityType)
+		def parseData = projectService.getConfigByEntity(entityType)
 		render parseData as JSON
     }
 	

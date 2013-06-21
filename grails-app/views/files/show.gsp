@@ -4,32 +4,32 @@
 				<table>
 					<tbody>
 						<tr class="prop">
-							<td class="label" nowrap="nowrap"><label for="assetName">Name</label></td>
+							<td class="label ${config.assetName}" nowrap="nowrap"><label for="assetName">Name</label></td>
 							<td style="font-weight:bold;" class="${config.assetName}">${filesInstance.assetName}</td>
-							<td class="label" nowrap="nowrap"><label for="description">Description</label></td>
+							<td class="label ${config.description}" nowrap="nowrap"><label for="description">Description</label></td>
 							<td class="value ${config.description}" colspan="2">${filesInstance.description}</td>
 							<td></td>
-							<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
+							<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
 							<td class="valueNW ${config.moveBundle}">${filesInstance?.moveBundle} / ${dependencyBundleNumber}</td>
 						</tr>
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="assetType">App Type</label></td>
 							<td class="valueNW">${filesInstance.assetType == 'Files' ? 'Storage' : filesInstance.assetType}</td>
 							<td class="label" nowrap="nowrap"><label for="lun">LUN</label></td>
-							<td class="valueNW ${config.LUN}">${filesInstance.LUN}</td>
-							<td class="label" nowrap="nowrap"><label for="supportType">Support</label></td>
+							<td class="valueNW">${filesInstance.LUN}</td>
+							<td class="label ${config.supportType}" nowrap="nowrap"><label for="supportType">Support</label></td>
 							<td class="valueNW ${config.supportType}">${filesInstance.supportType}</td>
-							<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
+							<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
 							<td class="valueNW ${config.planStatus}">${filesInstance.planStatus}</td>
 						</tr>
 						<tr class="prop">
-							<td class="label" nowrap="nowrap"><label for="fileFormat">Format</label></td>
+							<td class="label ${config.fileFormat}" nowrap="nowrap"><label for="fileFormat">Format</label></td>
 							<td class="valueNW ${config.fileFormat}">${filesInstance.fileFormat}</td>
-							<td class="label" nowrap="nowrap"><label for="environment">Environment</label></td>
+							<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment</label></td>
 							<td class="valueNW ${config.environment}">${filesInstance.environment}</td>
-							<td class="label" nowrap="nowrap"><label for="fileSize">Size</label></td>
+							<td class="label ${config.fileSize}" nowrap="nowrap"><label for="fileSize">Size</label></td>
 							<td class="valueNW ${config.fileSize}">${filesInstance.fileSize}&nbsp;${filesInstance.sizeUnit}</td>
-							<td class="label">Validation</td>
+							<td class="label ${config.validation}">Validation</td>
 							<td class="valueNW ${config.validation}">${filesInstance.validation}</td>
 						</tr>
 						<tr>

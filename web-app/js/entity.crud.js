@@ -664,12 +664,14 @@ function assetFieldImportance(phase,type){
 		data: {'validation':phase, 'type':type},
 		type:'POST',
 		success: function(resp) {
-			$("input,select").removeClass("C")
-			$("input,select").removeClass("H")
-			$("input,select").removeClass("I")
+			$("td,input,select").removeClass("C")
+			$("td,input,select").removeClass("H")
+			$("td,input,select").removeClass("I")
+			$("td,input,select").removeClass("N")
 			Object.keys(resp).forEach(function(key) {
 				var value = resp[key]
 		        $(".dialog input[name="+key+"],select[name="+key+"],input[name="+key+".id],select[name="+key+".id]").addClass(value);
+				$(".dialog label[for="+key+"],label[for="+key+"Id]").parent().addClass(value);
 			});
 		},
 		error: function(jqXHR, textStatus, errorThrown) {

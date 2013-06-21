@@ -134,7 +134,7 @@ class ProjectService {
 	 * @param entity type
 	 * @return
 	 */
-	def getConfig(def entityType){
+	def getConfigByEntity(def entityType){
 		def project = securityService.getUserCurrentProject()
 		def parseData= [:]
 		def data = FieldImportance.findByProjectAndEntityType(project,entityType)?.config

@@ -5,7 +5,7 @@
 		<g:if test="${i % 4 == 1}">
 			<tr class="prop">
 		</g:if>
-			<td class="label" nowrap="nowrap">${project.('custom'+i) ?: 'Custom'+i }</td>
+			<td class="label ${config?.('custom'+i)}" nowrap="nowrap"><label for="custom${i}">${project.('custom'+i) ?: 'Custom'+i }</label></td>
 			<td>
 				<input type="text" id="custom${i}" class="${config?.('custom'+i)}" name="custom${i}" value="${assetEntityInstance.('custom'+i)}" tabindex="${tabOffset + 1}"/>
 			</td>
@@ -13,4 +13,4 @@
 			</tr>
 		</g:if>
 	</g:each>
-</g:if>
+</g:if> 

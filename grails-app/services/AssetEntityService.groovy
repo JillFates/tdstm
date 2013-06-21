@@ -477,7 +477,7 @@ class AssetEntityService {
 	 * @return
 	 */
 	def getConfig (def type, def validation) {
-		def allconfig = projectService.getConfig(type)
+		def allconfig = projectService.getConfigByEntity(type)
 		def fields = projectService.getFields(type)
 		def config = [:]
 		def validationType

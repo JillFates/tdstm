@@ -20,44 +20,44 @@
 					<table>
 						<tbody>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label></td>
+								<td class="label ${config.assetName}" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label></td>
 								<td ><input type="text" id="assetName" class="${config.assetName}" name="assetName" value="${applicationInstance.assetName}" tabindex="10" /></td>
-								<td class="label" nowrap="nowrap">Description</td>
+								<td class="label ${config.description}" nowrap="nowrap">Description</td>
 								<td colspan="3"><input type="text" id="description" class="${config.description}" name="description" value="" size="50" tabindex="20" />
 								</td>
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
 								<td ><input type="text" id="assetType" name="assetType" value="Application" readonly="readonly" /></td>
-								<td class="label" nowrap="nowrap"><label for="supportType">Support</label>
+								<td class="label ${config.supportType}" nowrap="nowrap"><label for="supportType">Support</label>
 								</td>
 								<td ><input type="text" id="supportType" class="${config.supportType}"
 									name="supportType" value="${applicationInstance.supportType}"  tabindex="21" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="appFunction">Function</label>
+								<td class="label ${config.appFunction}" nowrap="nowrap"><label for="appFunction">Function</label>
 								</td>
 								<td ><input type="text" id="appFunction" class="${config.appFunction}"
 									name="appFunction" value="${applicationInstance.appFunction}"  tabindex="31" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="userCount">Users</label>
+								<td class="label ${config.userCount}" nowrap="nowrap"><label for="userCount">Users</label>
 								</td>
 								<td ><input type="text" id="userId" class="${config.userCount}" name="userCount" value="${applicationInstance.userCount}"  tabindex="41" />
 								</td>
 							</tr>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="appVendor">Vendor</label></td>
+								<td class="label ${config.appVendor}" nowrap="nowrap"><label for="appVendor">Vendor</label></td>
 								<td ><input type="text" id="appVendor" class="${config.appVendor}"
 									name="appVendor" value="${applicationInstance.appVendor}"  tabindex="11" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="sme">SME1</label></td>
+								<td class="label ${applicationInstance.sme}" nowrap="nowrap"><label for="sme">SME1</label></td>
 								<td ><input type="text" id="sme" name="sme" class="${config.sme}"
 									value="${applicationInstance.sme}"  tabindex="22" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="environment">Environment</label>
+								<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment</label>
 								</td>
 								<td ><g:select id="environment" class="${config.environment}" name="environment" from="${applicationInstance.constraints.environment.inList}" value="${applicationInstance.environment}"  tabindex="32"></g:select>
 								</td>
-								<td class="label" nowrap="nowrap"><label for="userLocations">User Location</label>
+								<td class="label ${config.userLocations}" nowrap="nowrap"><label for="userLocations">User Location</label>
 								</td>
 								<td ><input type="text" id="userLocations" class="${config.userLocations}"
 									name="userLocations"
@@ -65,61 +65,61 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="appVersion">Version</label>
+								<td class="label ${config.appVersion}" nowrap="nowrap"><label for="appVersion">Version</label>
 								</td>
 								<td ><input type="text" id="appVersion" class="${config.appVersion}"
 									name="appVersion" value="${applicationInstance.appVersion}"  tabindex="13" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="sme2">SME2</label></td>
+								<td class="label ${config.sme2}" nowrap="nowrap"><label for="sme2">SME2</label></td>
 								<td ><input type="text" id="sme2" name="sme2" class="${config.sme2}"
 									value="${applicationInstance.sme2}"  tabindex="23" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="criticality">Criticality</label>
+								<td class="label ${config.criticality}" nowrap="nowrap"><label for="criticality">Criticality</label>
 								</td>
 								<td ><g:select id="criticality" class="${config.criticality}" name="criticality" from="${applicationInstance.constraints.criticality.inList}" value="${applicationInstance.criticality}"  tabindex="33"></g:select></td>
-								<td class="label" nowrap="nowrap"><label for="useFrequency">Use	Frequency</label>
+								<td class="label ${config.useFrequency}" nowrap="nowrap"><label for="useFrequency">Use	Frequency</label>
 								</td>
 								<td ><input type="text" id="useFrequency" class="${config.useFrequency}" name="useFrequency" value="${applicationInstance.useFrequency}" tabindex="43" />
 								</td>
 
 							</tr>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="appTech">Tech.</label></td>
+								<td class="label ${config.appTech}" nowrap="nowrap"><label for="appTech">Tech.</label></td>
 								<td ><input type="text" id="appTech" class="${config.appTech}" name="appTech" value="${applicationInstance.appTech}" tabindex="14" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="businessUnit">Bus	Unit</label>
+								<td class="label ${config.businessUnit}" nowrap="nowrap"><label for="businessUnit">Bus	Unit</label>
 								</td>
 								<td ><input type="text" id="businessUnit" class="${config.businessUnit}" name="businessUnit" value="${applicationInstance.businessUnit}" tabindex="24" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
+								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
 								<td ><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${applicationInstance.moveBundle}" optionKey="id" optionValue="name" tabindex="34" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label>
+								<td class="label ${config.drRpoDesc}" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label>
 								</td>
 								<td ><input type="text" id="drRpoDesc"	class="${config.drRpoDesc}" name="drRpoDesc" value="${applicationInstance.drRpoDesc}" tabindex="44" />
 								</td>
 							</tr>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="appSource">Source</label></td>
+								<td class="label ${config.appSource}" nowrap="nowrap"><label for="appSource">Source</label></td>
 								<td ><input type="text" id="appSource"	class="${config.appSource}" name="appSource" value="${applicationInstance.appSource}" tabindex="15" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
+								<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
 								<td ><input type="text" id="appOwner" class="${config.owner}" name="appOwner"	value="" tabindex="25" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="planStatus">Plan Status</label>
+								<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label>
 								</td>
 								<td ><g:select from="${planStatusOptions}" id="planStatus" class="${config.planStatus}" name="planStatus" value="${applicationInstance.planStatus}" tabindex="35" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label>
+								<td class="label ${config.drRtoDesc}" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label>
 								</td>
 								<td ><input type="text" id="drRtoDesc"	class="${config.drRtoDesc}" name="drRtoDesc" value="${applicationInstance.drRtoDesc}" tabindex="45" />
 								</td>
 							</tr>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="license">License</label></td>
+								<td class="label ${config.license}" nowrap="nowrap"><label for="license">License</label></td>
 								<td ><input type="text" id="license" class="${config.license}" name="license" value="${applicationInstance.license}" tabindex="16" />
 								</td>
-								<td class="label"><label for="retireDate">Retire Date:</label>
+								<td class="label ${config.retireDate}"><label for="retireDate">Retire Date:</label>
 								</td>
 								<td valign="top"
 									class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}">
@@ -129,11 +129,11 @@
 									<input type="text" class="dateRange ${config.retireDate}" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate" tabindex="26"
 									value="<tds:convertDate date="${applicationInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" /> 
 								</td>
-								<td class="label" nowrap="nowrap"><label for="testProcs">Validation</label>
+								<td class="label ${config.validation}" nowrap="nowrap"><label for="validation">Validation</label>
 								</td>
 								<td ><g:select  id="validation" class="${config.validation}" name="validation" from="${applicationInstance.constraints.validation.inList }" onChange="assetFieldImportance(this.value,'Application')"  value="" tabindex="36" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="testProcs">Test Proc OK</label>
+								<td class="label ${config.testProc}" nowrap="nowrap"><label for="testProc">Test Proc OK</label>
 								</td>
 								<td ><g:select  id="testProc"	class="${config.testProc}" name="testProc"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="46" />
@@ -142,7 +142,7 @@
 							<tr>
 							    <td></td>
 							    <td></td>
-							    <td  class="label"><label for="maintExpDate">Maint Exp.</label></td>
+							    <td  class="label ${config.maintExpDate}"><label for="maintExpDate">Maint Exp.</label></td>
 								<td valign="top"
 										class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}">
 								    <script type="text/javascript" charset="utf-8">
@@ -151,21 +151,21 @@
 									<input type="text" class="dateRange ${config.maintExpDate}" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate" tabindex="27" 
 									value="<tds:convertDate date="${applicationInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />" /> 
 								</td>
-								<td class="label" nowrap="nowrap"><label for="latency">Latency OK</label>
+								<td class="label ${config.latency}" nowrap="nowrap"><label for="latency">Latency OK</label>
 								</td>
 								<td ><g:select  id="latency" class="${config.latency}"	name="latency"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="37" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="startupProc">Startup Proc OK</label>
+								<td class="label ${config.startupProc}" nowrap="nowrap"><label for="startupProc">Startup Proc OK</label>
 								</td>
-								<td ><g:select  id="testProcs" class="${config.startupProc}" name="startupProc" from="${['Y', 'N']}" value="?"
+								<td ><g:select  id="startupProc" class="${config.startupProc}" name="startupProc" from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="47" />
 								</td>
 								
 							</tr>
 							<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
 							<tr>
-								<td class="label" nowrap="nowrap"><label for="license">URL</label></td>
+								<td class="label ${config.url}" nowrap="nowrap"><label for="license">URL</label></td>
 								<td colspan="7"><input type="text" id="url" class="${config.url}" name="url" value="${applicationInstance.url}" size=50 tabindex="19" />
 								</td>
 							</tr>
