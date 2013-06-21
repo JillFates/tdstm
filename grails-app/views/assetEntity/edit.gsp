@@ -78,7 +78,7 @@
 								<td class="label ${config.manufacturer}" nowrap="nowrap">
 									
 									<g:if test="${assetEntityInstance.manufacturer?.id}">
-										<a href='javascript:showManufacturer(${assetEntityInstance.manufacturer?.id})' style='color:#00E'>Manufacturer</a>
+										<label for="manufacturer"><a href='javascript:showManufacturer(${assetEntityInstance.manufacturer?.id})' style='color:#00E'>Manufacturer</a></label>
 									</g:if>
 									<g:else>
 										<label for="manufacturer">Manufacturer</label>
@@ -102,7 +102,7 @@
 							<tr>
 								<td class="label ${config.model}" nowrap="nowrap">
 									<g:if test="${assetEntityInstance.model?.id}">
-										<a href='javascript:showModel(${assetEntityInstance.model?.id})' style='color:#00E'>Model</a>
+										<label for="model"><a href='javascript:showModel(${assetEntityInstance.model?.id})' style='color:#00E'>Model</a></label>
 									</g:if>
 									<g:else>
 										<label for="model">Model</label>
