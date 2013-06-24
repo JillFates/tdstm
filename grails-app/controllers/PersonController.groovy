@@ -202,7 +202,7 @@ class PersonController {
     def save = {
 		def project = securityService.getUserCurrentProject()
 		def personList = partyRelationshipService.getCompanyStaff(project.client.id)
-		def person = personList.find{it.firstName==firstName && it.lastName==lastName}
+		def person = personList.find{it.firstName==params.firstName && it.lastName==params.lastName}
 		
 		def fullName = params.firstName+" "+(params.lastName ?:"")
 		def isPersonExist = true
@@ -231,7 +231,7 @@ class PersonController {
 	        }
 		}
 		def paramsMap = [ id: person.id, name:fullName, isPersonExist:isPersonExist, fieldName:params.fieldName]
-		if(params.createstaff == "person"){
+		if(params.forWhom == "person"){
 			redirect( action:list )
 		}else{
 			render paramsMap as JSON

@@ -147,6 +147,7 @@
           <div class="buttons">
             <span class="button">
             <g:if test="${forWhom =='person'}">
+            	<input type="hidden" name="forWhom" value="${forWhom}"  />
             	<input class="save" type="submit" value="Create" />
             </g:if>
             <g:else>
