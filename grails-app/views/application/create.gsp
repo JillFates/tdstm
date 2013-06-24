@@ -131,7 +131,7 @@
 								</td>
 								<td class="label ${config.validation}" nowrap="nowrap"><label for="validation">Validation</label>
 								</td>
-								<td ><g:select  id="validation" class="${config.validation}" name="validation" from="${applicationInstance.constraints.validation.inList }" onChange="assetFieldImportance(this.value,'Application')"  value="" tabindex="36" />
+								<td ><g:select  id="validation" class="${config.validation}" name="validation" from="${applicationInstance.constraints.validation.inList }" onChange="assetCustoms('',this.value,'Application');assetFieldImportance(this.value,'Application');"  value="" tabindex="36" />
 								</td>
 								<td class="label ${config.testProc}" nowrap="nowrap"><label for="testProc">Test Proc OK</label>
 								</td>
@@ -163,7 +163,9 @@
 								</td>
 								
 							</tr>
-							<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
+							<tbody class="customTemplate">
+								<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
+							</tbody>
 							<tr>
 								<td class="label ${config.url}" nowrap="nowrap"><label for="license">URL</label></td>
 								<td colspan="7"><input type="text" id="url" class="${config.url}" name="url" value="${applicationInstance.url}" size=50 tabindex="19" />

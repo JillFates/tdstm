@@ -22,6 +22,7 @@ class AssetEntityService {
     static transactional = true
 	def jdbcTemplate
 	def projectService
+	def securityService
 	
 	def createOrUpdateAssetEntityDependencies(def params, def assetEntityInstance) {
 		
@@ -477,6 +478,7 @@ class AssetEntityService {
 	 * @return
 	 */
 	def getConfig (def type, def validation) {
+		def project = securityService.getUserCurrentProject()
 		def allconfig = projectService.getConfigByEntity(type)
 		def fields = projectService.getFields(type)
 		def config = [:]
@@ -489,6 +491,17 @@ class AssetEntityService {
 		fields.each{f ->
 			config << [(f.label):allconfig[f.label]['phase'][validationType]]
 		}
-		return config
+		
+		//used to hide the customs whose fieldImportance is "H"
+		def customs = []
+		def hiddenConfig = []
+		(1..(project.customFieldsShown)).each{i->
+			customs << i
+			if(config.('custom'+i)=='H')
+			hiddenConfig << i
+		}
+		customs.removeAll(hiddenConfig)
+		
+		return [project:project, config:config, customs:customs]
 	}
 }

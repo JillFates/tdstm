@@ -2873,13 +2873,14 @@ class AssetEntityController {
 	
 			def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
 			def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)
-			//fieldImportance for Discovery by default
-			def config = assetEntityService.getConfig('AssetEntity','Discovery')
 			
+			//fieldImportance for Discovery by default
+			def configMap = assetEntityService.getConfig('AssetEntity','Discovery')
+				
 			def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 								planStatusOptions:planStatusOptions?.value, projectId:project.id ,railTypeOption:railTypeOption?.value,
 								priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers,redirectTo:params?.redirectTo,
-								models:models, assetType:assetType, manufacuterer:manufacuterer, config:config]
+								models:models, assetType:assetType, manufacuterer:manufacuterer, config:configMap.config ,customs:configMap.customs]
 			 
 			 if(params.redirectTo == "assetAudit") {
 				 paramsMap << ['source':params.source, 'assetType':params.assetType]
@@ -2945,7 +2946,7 @@ class AssetEntityController {
 			
 			//field importance styling for respective validation.
 			def validationType = assetEntity.validation
-			def config = assetEntityService.getConfig('AssetEntity',validationType)
+			def configMap = assetEntityService.getConfig('AssetEntity',validationType)
 			
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 			def paramsMap = [label:frontEndLabel, assetEntity:assetEntity,
@@ -2953,7 +2954,7 @@ class AssetEntityController {
 				redirectTo:params.redirectTo, project:project,
 				assetCommentList:assetCommentList,
 				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle ,
-				 prefValue:prefValue, config:config]
+				 prefValue:prefValue, config:configMap.config, customs:configMap.customs]
 		
 			if(params.redirectTo == "roomAudit") {
 				paramsMap << [source:params.source, assetType:params.assetType]
@@ -2989,7 +2990,7 @@ class AssetEntityController {
 		
 		//fieldImportance Styling for default validation.
 		def validationType = assetEntityInstance.validation
-		def config = assetEntityService.getConfig('AssetEntity',validationType)
+		def configMap = assetEntityService.getConfig('AssetEntity',validationType)
 		
 		def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntityInstance])
 		def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntityInstance])
@@ -3021,7 +3022,7 @@ class AssetEntityController {
 							priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets,
 							manufacturers:manufacturers, models:models,redirectTo:params?.redirectTo, dependencyType:dependencyType,
 							dependencyStatus:dependencyStatus,servers:servers, sourceChassisSelect:sourceChassisSelect, 
-							targetChassisSelect:targetChassisSelect, nonNetworkTypes:nonNetworkTypes, config:config]
+							targetChassisSelect:targetChassisSelect, nonNetworkTypes:nonNetworkTypes, config:configMap.config, customs:configMap.customs]
 		
 		if(params.redirectTo == "roomAudit") {
 			def rooms = Room.findAllByProject(project)
@@ -4205,7 +4206,19 @@ class AssetEntityController {
 		 def assetType = params.type
 		 def validation = params.validation
 		 def configMap = assetEntityService.getConfig(assetType,validation)
-		 render configMap as JSON
+		 render configMap.config as JSON
+	 }
+	 /**
+	  * This method is used to get custom list.
+	  * @param type,validation
+	  * @return
+	  */
+	 def getCustoms ={
+		 def assetEntityInstance = params.id ? AssetEntity.get(params.id): new AssetEntity(appOwner:'')
+		 def assetType = params.type
+		 def validation = params.validation
+		 def configMap = assetEntityService.getConfig(assetType,validation)
+		 render (template:'customEdit', model:[project:configMap.project, customs:configMap.customs, assetEntityInstance:assetEntityInstance])
 	 }
 	
 }

@@ -75,10 +75,12 @@
 								</td>
 								<td class="label ${config.validation}"><label for="validation">Validation</label></td>
 								<td>
-									<g:select from="${fileInstance.constraints.validation.inList}" class="${config.validation}" id="validation" name="validation"  onChange="assetFieldImportance(this.value,'Files')" value="Discovery"/>
+									<g:select from="${fileInstance.constraints.validation.inList}" class="${config.validation}" id="validation" name="validation"  onChange="assetCustoms('',this.value,'Files');assetFieldImportance(this.value,'Files');" value="Discovery"/>
 								</td>
 							</tr>
-							<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:fileInstance]"></g:render>
+							<tbody class="customTemplate">
+								<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:fileInstance]"></g:render>
+							</tbody>
 						</tbody>
 					</table>
 				</div>

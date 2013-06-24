@@ -769,4 +769,14 @@ class ProjectController {
 		}
 		render "success"
 	}
+	/**
+	 *This action is used to retrive default project field importance and display it to user
+	 *@param : entityType type of entity for which user is requested for importance .
+	 *@return 
+	 */
+	def retriveDefaultImportance={
+		def entityType = request.JSON.entityType
+		def parseData = projectService.generateDefaultConfig(entityType)
+		render parseData as JSON
+	}
 }

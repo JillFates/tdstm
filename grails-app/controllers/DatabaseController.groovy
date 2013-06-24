@@ -162,12 +162,12 @@ class DatabaseController {
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 			//field importance styling for respective validation.
 			def validationType = assetEntity.validation
-			def config = assetEntityService.getConfig('Database',validationType)
+			def configMap = assetEntityService.getConfig('Database',validationType)
 			
 			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
 			[ databaseInstance : databaseInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo, 
 			  assetComment:assetComment, assetCommentList:assetCommentList,dependencyBundleNumber:AssetDependencyBundle.findByAsset(databaseInstance)?.dependencyBundle,
-			  project:project ,prefValue:prefValue, config:config]
+			  project:project ,prefValue:prefValue, config:configMap.config, customs:configMap.customs]
 		}
 	}
 	
@@ -180,10 +180,11 @@ class DatabaseController {
 		def project = Project.read(projectId)
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		//fieldImportance for Discovery by default
-		def config = assetEntityService.getConfig('Database','Discovery')
+		def configMap = assetEntityService.getConfig('Database','Discovery')
 		
 		[databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-					planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project, config:config]
+				planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project, 
+			  config:configMap.config, customs:configMap.customs]
 	}
 	
 	def save = {
@@ -238,11 +239,12 @@ class DatabaseController {
 			def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
 			//fieldImportance Styling for default validation.
 			def validationType = databaseInstance.validation
-			def config = assetEntityService.getConfig('Database',validationType) 
+			def configMap = assetEntityService.getConfig('Database',validationType) 
 			
 			[databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project:project,
 						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, 
-						dependentAssets:dependentAssets, redirectTo : params.redirectTo, dependencyType:dependencyType, dependencyStatus:dependencyStatus,servers:servers, config:config]
+						dependentAssets:dependentAssets, redirectTo : params.redirectTo, dependencyType:dependencyType, dependencyStatus:dependencyStatus,servers:servers, 
+						config:configMap.config, customs:configMap.customs]
 		}
 		
 		}

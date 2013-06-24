@@ -68,7 +68,6 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 		$scope.section[s] = $scope.section[s] == 'e' ? 's' : 'e'
 	}
 	$scope.assignData = function(type,value,field,phase) {
-		console.log(field+"_"+phase+"_"+value);
 		$scope.importance[type][field]['phase'][phase] ='C'
 			$scope.setImportance(type,field, phase, value);
 	};
@@ -91,6 +90,18 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 	$scope.cancelAsset= function (type) {
 		$http({
 			url : contextPath+"/project/cancelImportance",
+			method: "POST",
+			data:{'entityType':type}
+		}).success (function(resp) {
+			$scope.importance[type]=resp;
+		}).error(function(resp, status, headers, config) {
+			alert("An Unexpected error while showing the asset fields.")
+		});
+	}
+	
+	$scope.retriveDefaultImp = function (type){
+		$http({
+			url : contextPath+"/project/retriveDefaultImportance",
 			method: "POST",
 			data:{'entityType':type}
 		}).success (function(resp) {

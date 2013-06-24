@@ -658,6 +658,20 @@ function showDependencyControlDiv(){
 	$("#checkBoxDivId").show();
 }
 
+function assetCustoms(id,phase,type){
+	jQuery.ajax({
+		url: contextPath+'/assetEntity/getCustoms',
+		data: {'id':id,'validation':phase, 'type':type},
+		async: false,
+		type:'POST',
+		success: function(resp) {
+         $(".customTemplate").html(resp);
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			alert("An Unexpected error while getting asset.")
+		}
+	});
+}
 function assetFieldImportance(phase,type){
 	jQuery.ajax({
 		url: contextPath+'/assetEntity/getassetImportance',

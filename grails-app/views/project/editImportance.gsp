@@ -9,6 +9,7 @@
 					<span class="button">
 						<input type="button" value="Update" class="save" ng-click="toggleEditMode(type.name);updateAsset(type.name);" />
 						<input type="button" value="Cancel" class="delete" ng-click="toggleSection(type.name);cancelAsset(type.name);" />
+						<input type="button" value="Retrieve" class="edit" ng-click="retriveDefaultImp(type.name)" />
 					</span>
 				</div>
 			</td>
