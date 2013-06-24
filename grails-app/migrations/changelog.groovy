@@ -40,5 +40,6 @@ databaseChangeLog = {
 	include file: '20130611-add-person-ref-columns.groovy' 
 	include file: '20130612-migrate-person-ref-records.groovy' 
     //include file: '20130522-create-default-project.groovy' // TODO : enable after John's review
+	include file: '20130624-update-recent-users-expiry-dates.groovy'
     
 }

@@ -67,7 +67,7 @@ class AuthController {
 					log.info "User ${params.username} attempted to login but account is inactive"
 					SecurityUtils.subject.logout()
 					flash.message = message(code: 'userLogin.accountDisabled.message')
-					redirect(action: 'login', params:params)
+					redirect(action: 'login', params:loginMap())
 				} else {
 					// If a controller redirected to this page, redirect back
 					// to it. Otherwise redirect to the root URI.
@@ -115,6 +115,7 @@ class AuthController {
 							 redirect(controller:'projectUtil')
 					   }
 					}
+					log.info "User '${params.username}' has signed in"
 				}
 			}
 			catch (AuthenticationException ex){
@@ -135,7 +136,6 @@ class AuthController {
 			// Now redirect back to the login page.
 			redirect(action: 'login', params: loginMap())
 		}
-		log.info "User '${params.username}' has signed in"
 	}
 
 	def signOut = {
