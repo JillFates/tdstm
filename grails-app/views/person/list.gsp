@@ -103,7 +103,8 @@
      
      <div id="createStaffDialog" title="Create Staff" style="display:none;">
       <div class="dialog">
-      <g:render template="createStaff" model="[forWhom:'person']"></g:render>
+	      <div id="showOrMergeId" style="display: none;" title="Compare/Merge Persons"></div>
+	      <g:render template="createStaff" model="[forWhom:'person']"></g:render>
       </div>
     </div>
   </body>
