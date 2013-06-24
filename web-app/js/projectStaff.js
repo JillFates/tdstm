@@ -266,4 +266,17 @@ function validatePersonForm(form) {
 	}
 	return returnVal
 }
-
+ function createPersonDetails(forWhom){
+		 jQuery.ajax({
+				url : contextPath+'/person/save',
+				data : $('#createDialogForm').serialize(),
+				type : 'POST',
+				success : function(data) {
+					$("#createStaffDialog").dialog('close')
+					if(!data.isPersonExist)
+						$('#'+data.fieldName).append('<option value="'+data.id+'" selected>'+data.name+'</option>');
+					else
+						$('#'+data.fieldName).val(data.id)
+				}
+			});
+}

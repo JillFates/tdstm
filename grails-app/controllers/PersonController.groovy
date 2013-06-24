@@ -5,14 +5,16 @@ import java.text.SimpleDateFormat
 
 import net.tds.util.jmesa.PersonBean
 
-import org.jmesa.facade.TableFacade
-import org.jmesa.facade.TableFacadeImpl
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.crypto.hash.Sha1Hash
+import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
+import org.jmesa.facade.TableFacade
+import org.jmesa.facade.TableFacadeImpl
 
+import com.tds.asset.Application
+import com.tds.asset.AssetComment
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
-import com.tds.asset.AssetComment
 
 class PersonController {
     
@@ -20,6 +22,8 @@ class PersonController {
 	def userPreferenceService
 	def securityService
 	def projectService
+	def sessionFactory
+	def jdbcTemplate
 	
     def index = { redirect(action:list,params:params) }
 
@@ -196,31 +200,43 @@ class PersonController {
     }
     //Save the Person Detais
     def save = {
+		def project = securityService.getUserCurrentProject()
+		def personList = partyRelationshipService.getCompanyStaff(project.client.id)
+		def person = personList.find{it.firstName==firstName && it.lastName==lastName}
 		
-        def personInstance = new Person( params )
-        //personInstance.dateCreated = new Date()
-        if ( !personInstance.hasErrors() && personInstance.save() ) {
-        	def fullName 
-			if(params.lastName == ""){
-				fullName = params.firstName
-			}else{
-				fullName = params.firstName+" "+params.lastName
-			}
-            def companyId = params.company
-            if ( companyId != "" ) {
-                def companyParty = Party.findById( companyId )
-                def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", personInstance, "STAFF" )
-            }
-			userPreferenceService.setUserRoles([params.role], personInstance.id)
-            flash.message = "Person ${fullName} created"
-            //redirect( action:list, id:personInstance.id , params:[companyId:companyId] )
-            redirect( action:list )
-        }
-        else {
-            def companyId = params.company
-            flash.message = "Person FirstName cannot be blank. "
-            redirect( action:list )
-        }
+		def fullName = params.firstName+" "+(params.lastName ?:"")
+		def isPersonExist = true
+		if(!person){
+			isPersonExist = false
+        	person = new Person( params )
+	        if ( !person.hasErrors() && person.save() ) {
+	        	
+	            def companyId = params.company
+	            if ( companyId != "" ) {
+	                def companyParty = Party.findById( companyId )
+	                def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", person, "STAFF" )
+	            }
+				userPreferenceService.setUserRoles([params.role], person.id)
+	            flash.message = "Person ${fullName} created"
+				
+	            //redirect( action:list, id:person.id , params:[companyId:companyId] )
+				
+	        }else {
+				person.errors.each{
+					log.error"-->"+it
+				}
+	            def companyId = params.company
+	            flash.message = "Person FirstName cannot be blank. "
+	            redirect( action:list )
+	        }
+		}
+		def paramsMap = [ id: person.id, name:fullName, isPersonExist:isPersonExist, fieldName:params.fieldName]
+		if(params.createstaff == "person"){
+			redirect( action:list )
+		}else{
+			render paramsMap as JSON
+		}
+        
     }
     //	Ajax Overlay for show
     def editShow = {
@@ -1008,5 +1024,188 @@ class PersonController {
 		
 		
 		render(template:"showPreference",model:[prefMap:prefMap])
+	}
+	
+	/**
+	 * This action is Used to populate CompareOrMergePerson dialog.
+	 * @param : ids[] is array of 2 id which user want to compare or merge
+	 * @return : all column list , person list and userlogin list which we are display at client side
+	 */
+	def compareOrMerge ={
+		
+		def ids = params.list("ids[]")
+		def personsMap = [:]
+		def userLogins= []
+		ids.each{
+			def id = Long.parseLong(it)
+			def person = Person.get(id)
+			if(person){
+				personsMap << [(person) : partyRelationshipService.getStaffCompany( person )?.id]
+				def userLogin = UserLogin.findByPerson(person)
+				userLogins << userLogin
+			}
+		}
+		
+		// Defined a HashMap as 'columnList' where key is displaying label and value is property of label for Person .
+		def columnList =  [ 'Merge To':'','First Name': 'firstName', 'Last Name': 'lastName', 'Nick Name': 'nickName' , 'Active':'active','Title':'title',
+							'Email':'email', 'Department':'department', 'Location':'location', 'State Prov':'stateProv',
+							'Country':'country', 'Work Phone':'workPhone','Mobile Phone':'mobilePhone',
+							'Model Score':'modelScore','Model Score Bonus':'modelScoreBonus', 'Person Image URL':'personImageURL', 
+							'KeyWords':'keyWords', 'Tds Note':'tdsNote','Tds Link':'tdsLink', 'Staff Type':'staffType',
+							'TravelOK':'travelOK', 'Black Out Dates':'blackOutDates', 'Roles':''
+						  ]
+		
+		// Defined a HashMap as 'columnList' where key is displaying label and value is property of label for UserLogin .
+		def loginInfoColumns = ['Username':'username', 'Active':'active', 'Created Date':'createdDate', 'Last Login':'lastLogin',
+								'Last Page':'lastPage', 'Expiry Date':'expiryDate'
+							   ]
+		
+		render(template:"compareOrMerge", model:[personsMap:personsMap, columnList:columnList, loginInfoColumns:loginInfoColumns,
+					userLogins:userLogins])
+	}
+	
+	/**
+	 * This action is used  to merge Person 
+	 * @param : toId is requested id of person into which second person will get merge
+	 * @param : fromId is requested id of person which will be merged
+	 * @return : Appropriate message after merging
+	 */
+	
+	def mergePerson ={
+		def toPerson = Person.get(params.toId)
+		def fromPerson = Person.get(params.fromId)
+		def toUserLogin = UserLogin.findByPerson( toPerson )
+		def fromUserLogin = UserLogin.findByPerson( fromPerson )
+		
+		def personDomain = new DefaultGrailsDomainClass( Person.class )
+		def notToUpdate = ['beforeDelete','beforeInsert', 'beforeUpdate','id', 'firstName','blackOutDates']
+		personDomain.properties.each{
+			def prop = it.name
+			if(it.isPersistent() && !toPerson."${prop}" && !notToUpdate.contains(prop)){
+				toPerson."${prop}" = fromPerson."${prop}"
+			}
+		}
+		def expDateFromPerson = ExceptionDates.findAllByPerson(fromPerson).exceptionDay
+		expDateFromPerson.each{
+			def expDay = new ExceptionDates('exceptionDay':it, person:toPerson).save(flush:true)
+		}
+		
+		if(!toPerson.save(flush:true)){
+			toPerson.errors.allErrors.each{println it}
+		}
+		//Calling method to merge roles
+		mergeRoles(toPerson, fromPerson)
+		mergeUserLogin(toUserLogin, fromUserLogin, toPerson)
+		updatePersonReference(fromPerson, toPerson)
+		
+		fromPerson.delete()
+		
+		flash.message = "$fromPerson Merged to $toPerson"
+		
+		render "$fromPerson Merged to $toPerson"
+	}
+	
+	/**
+	 * This action is used to merge Person's UserLogin according to criteria
+     * 1. If neither account has a UserLogin - nothing to do
+     * 2. If Person being merged into the master has a UserLogin but master doesn't, assign the UserLogin to the master Person record.
+     * 3. If both Persons have a UserLogin,select the UserLogin that has the most recent login activity. If neither have login activity, 
+     *	  choose the oldest login account.
+	 * @param fromUserLogin : instance of fromUserLogin
+	 * @param toUserLogin : instance of toUserLogin
+	 * @param toPerson: instance of toPerson
+	 * @return
+	 */
+	def mergeUserLogin(toUserLogin, fromUserLogin, toPerson){
+		if(fromUserLogin && !toUserLogin){
+			fromUserLogin.person = toPerson
+			fromUserLogin.save(flush:true)
+		} else if(fromUserLogin && toUserLogin){
+			if(fromUserLogin.lastLogin && toUserLogin.lastLogin){
+				if (fromUserLogin.lastLogin > toUserLogin.lastLogin){
+					fromUserLogin.person = toPerson
+					toUserLogin.delete()
+				} else {
+					fromUserLogin.delete()
+				}
+			} else{
+				if(fromUserLogin.dateCreated > toUserLogin.dateCreated){
+					fromUserLogin.person = toPerson
+					toUserLogin.delete()
+				} else{
+					fromUserLogin.delete()
+				}
+			}
+		}
+		if(fromUserLogin && toUserLogin)
+		updateUserLoginRefrence(fromUserLogin, toUserLogin);
+	}
+	
+	/**
+	 * This method is used to update Person reference from 'fromPerson' to  'fromPerson'
+	 * @param fromPerson : instance of fromPerson
+	 * @param toPerson : instance of toPerson
+	 * @return
+	 */
+	def updatePersonReference(fromPerson, toPerson){
+		def domainRelatMap = ['application':['sme_id','sme2_id'], 'asset_comment':['resolved_by', 'created_by', 'assigned_to_id'], 
+			'asset_dependency':['created_by','updated_by'], 'asset_entity':['app_owner_id'], 'comment_note':['created_by_id'],
+			'exception_dates':['person_id'], 'model':['created_by', 'updated_by', 'validated_by'],
+			'model_sync':['created_by_id', 'updated_by_id', 'validated_by_id'], 'move_event_news':['archived_by', 'created_by'],
+			'move_event_staff':['person_id'], 'workflow':['updated_by']]
+		
+		domainRelatMap.each{key, value->
+			value.each{prop->
+				jdbcTemplate.update("UPDATE ${key} SET ${prop} = ${toPerson.id} where ${prop}=${fromPerson.id}")
+			}
+		}
+	}
+	
+	/**
+	 * This method is used to update userlogin reference from 'fromUserLogin' to  'toUserLogin'
+	 * @param fromUserLogin : instance of fromUserLogin
+	 * @param toUserLogin : instance of toUserLogin
+	 * @return
+	 */
+	def updateUserLoginRefrence(fromUserLogin, toUserLogin){
+		def domainRelatMap = ['asset_transition':['user_login_id'], 'data_transfer_batch':['user_login_id'],'model_sync':['created_by_id']]
+		domainRelatMap.each{key, value->
+			value.each{prop->
+				jdbcTemplate.update("UPDATE ${key} SET ${prop} = ${toUserLogin.id} where ${prop}=${fromUserLogin.id}")
+			}
+		}
+	}
+	
+	/**
+	 * This method is used to merge roles.
+	 * @param toPerson : instance of toPerson
+	 * @param fromPerson : instance of fromPerson
+	 * @return void
+	 */
+	def mergeRoles(toPerson, fromPerson){
+		def fromCompany = partyRelationshipService.getStaffCompany( fromPerson )
+		def toCompany = partyRelationshipService.getStaffCompany( toPerson )
+		def fromRoles = fromPerson.getPersonRoles(fromCompany.id)
+		def toRoles = toPerson.getPersonRoles(toCompany.id)
+		//Getting common functions which is same for toPerson and 
+		def commonFunc = fromRoles.intersect(toRoles)
+		def prType = PartyRelationshipType.read('STAFF')
+		def roleTypeCodeTo = RoleType.read('STAFF')
+		def roleTypeCodeFrom = RoleType.read('COMPANY')
+		
+		//If same function is there so deleting those from fromPerson
+		if(commonFunc){
+			def remCommonFunc = PartyRelationship.findAll("from PartyRelationship where partyRelationshipType = :type and partyIdTo =:person \
+				and roleTypeCodeTo in (:commonFunc) and partyIdFrom =:fromCompany",[type:prType, person:fromPerson, 
+				commonFunc:commonFunc, fromCompany:fromCompany])
+			PartyRelationship.withNewSession { remCommonFunc*.delete() }
+		}
+		
+		//Updating functions for party relationsip 
+		PartyRelationship.executeUpdate("UPDATE PartyRelationship p SET p.partyIdTo=:toPerson, p.partyIdFrom =:toCompany where p.partyRelationshipType=:prType \
+			and p.roleTypeCodeFrom=:roleTypeCodeFrom and p.roleTypeCodeTo !=:roleTypeCodeTo and p.partyIdFrom =:fromCompany \
+			and p.partyIdTo =:fromPerson", [toPerson:toPerson, fromPerson:fromPerson, prType:prType, roleTypeCodeTo:roleTypeCodeTo,
+				roleTypeCodeFrom:roleTypeCodeFrom, toCompany:toCompany , fromCompany:fromCompany])
+		
 	}
 }

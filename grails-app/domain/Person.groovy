@@ -69,6 +69,11 @@ class Person extends Party {
             travelOK sqlType: 'tinyint'
 		}
 	}
+	
+	def partyRelationshipService
+	transient def getPersonRoles(companyId){
+		def personFunctions = partyRelationshipService.getCompanyStaffFunctions(companyId, this.id)
+	}
 
 	String toString(){
 		"$firstName $lastName"
