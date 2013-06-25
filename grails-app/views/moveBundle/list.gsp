@@ -30,7 +30,7 @@ function onInvokeAction(id) {
 						<g:link  action="show" id="${moveBundle?.id}">${moveBundle?.name}</g:link>
 					 </jmesa:htmlColumn>
 					 <jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${moveBundle?.description}</jmesa:htmlColumn>
-					 <jmesa:htmlColumn property="operationalOrder" title="Order" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${moveBundle?.operationalOrder}</jmesa:htmlColumn>
+					 <jmesa:htmlColumn property="useOfPlanning" title="Planning" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${moveBundle?.useOfPlanning?'Y':' '}</jmesa:htmlColumn>
 					 <jmesa:htmlColumn property="assetQty" title="Asset Qty" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${moveBundle?.assetQty}</jmesa:htmlColumn>
                      <jmesa:htmlColumn property="startTime" title="Start" sortable="true" filterable="true" pattern="MM/dd/yyyy" cellEditor="org.jmesa.view.editor.BasicCellEditor"><tds:convertDateTime date="${moveBundle?.startTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
                      <jmesa:htmlColumn property="completionTime" title="Completion" sortable="true" filterable="true" pattern="MM/dd/yyyy" cellEditor="org.jmesa.view.editor.BasicCellEditor"><tds:convertDateTime date="${moveBundle?.completionTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
