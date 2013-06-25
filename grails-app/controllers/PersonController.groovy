@@ -1093,11 +1093,16 @@ class PersonController {
 		if(!toPerson.save(flush:true)){
 			toPerson.errors.allErrors.each{println it}
 		}
-		//Calling method to merge roles
-		mergeRoles(toPerson, fromPerson)
-		mergeUserLogin(toUserLogin, fromUserLogin, toPerson)
-		updatePersonReference(fromPerson, toPerson)
 		
+		//Calling method to merge roles
+		mergeUserLogin(toUserLogin, fromUserLogin, toPerson)
+		//Updating person reference from 'fromPerson' to 'toPerson'
+		updatePersonReference(fromPerson, toPerson)
+		//Updating ProjectRelationship relation from 'fromPerson' to 'toPerson'
+		updateProjectRelationship(fromPerson, toPerson)
+		
+		sessionFactory.getCurrentSession().flush();
+		sessionFactory.getCurrentSession().clear();
 		fromPerson.delete()
 		
 		flash.message = "$fromPerson Merged to $toPerson"
@@ -1138,11 +1143,11 @@ class PersonController {
 			}
 		}
 		if(fromUserLogin && toUserLogin)
-		updateUserLoginRefrence(fromUserLogin, toUserLogin);
+			updateUserLoginRefrence(fromUserLogin, toUserLogin);
 	}
 	
 	/**
-	 * This method is used to update Person reference from 'fromPerson' to  'fromPerson'
+	 * This method is used to update Person reference from 'fromPerson' to  'toPerson'
 	 * @param fromPerson : instance of fromPerson
 	 * @param toPerson : instance of toPerson
 	 * @return
@@ -1177,35 +1182,38 @@ class PersonController {
 	}
 	
 	/**
-	 * This method is used to merge roles.
-	 * @param toPerson : instance of toPerson
-	 * @param fromPerson : instance of fromPerson
+	 * This method is used to update person reference in PartyRelationship table.
+	 * @param toPerson : instance of Person
+	 * @param fromPerson : instance of Person
 	 * @return void
 	 */
-	def mergeRoles(toPerson, fromPerson){
-		def fromCompany = partyRelationshipService.getStaffCompany( fromPerson )
-		def toCompany = partyRelationshipService.getStaffCompany( toPerson )
-		def fromRoles = fromPerson.getPersonRoles(fromCompany.id)
-		def toRoles = toPerson.getPersonRoles(toCompany.id)
-		//Getting common functions which is same for toPerson and 
-		def commonFunc = fromRoles.intersect(toRoles)
-		def prType = PartyRelationshipType.read('STAFF')
-		def roleTypeCodeTo = RoleType.read('STAFF')
-		def roleTypeCodeFrom = RoleType.read('COMPANY')
-		
-		//If same function is there so deleting those from fromPerson
-		if(commonFunc){
-			def remCommonFunc = PartyRelationship.findAll("from PartyRelationship where partyRelationshipType = :type and partyIdTo =:person \
-				and roleTypeCodeTo in (:commonFunc) and partyIdFrom =:fromCompany",[type:prType, person:fromPerson, 
-				commonFunc:commonFunc, fromCompany:fromCompany])
-			PartyRelationship.withNewSession { remCommonFunc*.delete() }
+	def updateProjectRelationship(Party fromPerson, Party toPerson){
+		try{
+			//Written all sql as GORM blowing up this block of code.
+			def allRelations = jdbcTemplate.queryForList("SELECT p.party_relationship_type_id AS prType, p.party_id_from_id AS pIdFrom, \
+						p.party_id_to_id AS pIdTo, p.role_type_code_from_id AS rTypeCodeFrom, p.role_type_code_to_id AS rTypeCodeTo \
+						FROM party_relationship p WHERE p.party_id_to_id = ${fromPerson.id}")
+
+			allRelations.each{ relation->
+				def res = jdbcTemplate.queryForList("SELECT 1 FROM party_relationship p WHERE \
+							p.party_relationship_type_id='${relation.prType}' AND p.party_id_from_id =${relation.pIdFrom} \
+							AND p.party_id_to_id =${toPerson.id} AND p.role_type_code_from_id='${relation.rTypeCodeFrom}'\
+							AND p.role_type_code_to_id ='${relation.rTypeCodeTo}'")
+				
+				if(res){
+					jdbcTemplate.update("DELETE FROM party_relationship   \
+					   WHERE party_relationship_type_id = '${relation.prType}'\
+					   AND role_type_code_from_id = '${relation.rTypeCodeFrom}' AND role_type_code_to_id='${relation.rTypeCodeTo}' \
+				   	   AND party_id_to_id = ${fromPerson.id} AND party_id_from_id = ${relation.pIdFrom}")
+				} else {
+				   jdbcTemplate.update("UPDATE party_relationship SET party_id_to_id = ${toPerson.id} \
+					   WHERE party_relationship_type_id = '${relation.prType}'\
+					   AND role_type_code_from_id = '${relation.rTypeCodeFrom}' AND role_type_code_to_id='${relation.rTypeCodeTo}' \
+				   	   AND party_id_to_id = ${fromPerson.id} AND party_id_from_id = ${relation.pIdFrom}")
+				}
+			}
+		} catch(Exception ex){
+			ex.printStackTrace()
 		}
-		
-		//Updating functions for party relationsip 
-		PartyRelationship.executeUpdate("UPDATE PartyRelationship p SET p.partyIdTo=:toPerson, p.partyIdFrom =:toCompany where p.partyRelationshipType=:prType \
-			and p.roleTypeCodeFrom=:roleTypeCodeFrom and p.roleTypeCodeTo !=:roleTypeCodeTo and p.partyIdFrom =:fromCompany \
-			and p.partyIdTo =:fromPerson", [toPerson:toPerson, fromPerson:fromPerson, prType:prType, roleTypeCodeTo:roleTypeCodeTo,
-				roleTypeCodeFrom:roleTypeCodeFrom, toCompany:toCompany , fromCompany:fromCompany])
-		
 	}
 }
