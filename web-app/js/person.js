@@ -17,7 +17,7 @@ function compareOrMerge(){
 }
 
 function mergePerson(){
-    	var returnStatus =  confirm('This will merge the selected Person');
+    var returnStatus =  confirm('This will merge the selected Person');
 	if(returnStatus ){
 		var targetModelId 
 		var modelToMerge
@@ -49,7 +49,7 @@ function mergePerson(){
 			error: function(jqXHR, textStatus, errorThrown) {
 				$("#spinnerId").hide()
 				$("#messageId").hide()
-				alert("An unexpected error occurred while attempting to Merge Model ")
+				alert("An unexpected error occurred while attempting to Merge Persons")
 			}
 			
 		});

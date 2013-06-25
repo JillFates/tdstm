@@ -1134,7 +1134,7 @@ class PersonController {
 					fromUserLogin.delete()
 				}
 			} else{
-				if(fromUserLogin.dateCreated > toUserLogin.dateCreated){
+				if(fromUserLogin.createdDate > toUserLogin.createdDate){
 					fromUserLogin.person = toPerson
 					toUserLogin.delete()
 				} else{
