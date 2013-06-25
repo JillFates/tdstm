@@ -53,7 +53,7 @@
 							class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td nowrap="nowrap">
 							<g:checkBox name="checkBox" id="checkId_${asset.id}" ></g:checkBox>
-							<a href="javascript:editEntity('planningConsole','Server', ${asset.id})"><img
+							<a href="javascript:editEntity('dependencyConsole','Server', ${asset.id})"><img
 									src="/tdstm/images/skin/database_edit.png" border="0px" />
 							</a> <span id="icon_15651">
 							 <g:if test="${AssetComment.find('from AssetComment where assetEntity = '+asset.id+' and commentType = ? and isResolved = ?',['issue',0])}">
@@ -75,43 +75,43 @@
 			 				</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.assetName}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.assetName}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.model}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.model}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.sourceLocation}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.sourceLocation}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.sourceRack}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.sourceRack}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.targetLocation}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.targetLocation}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.targetRack}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.targetRack}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.assetType}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.assetType}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.assetTag}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.assetTag}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.validation}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.validation}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.moveBundle}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.moveBundle}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.planStatus}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.planStatus}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${(asset.depUp + asset.depDown)?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${(asset.depUp + asset.depDown)?:''}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Server', ${asset.id} )">${asset.conflictCount[0]?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.conflictCount[0]?:''}</span>
 							</td>
 						</tr>
 					</g:each>

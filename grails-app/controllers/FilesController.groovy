@@ -276,7 +276,7 @@ class FilesController {
 					case "listTask":
 						render "Storage ${filesInstance.assetName} updated."
 						break;
-				    case "planningConsole":
+				    case "dependencyConsole":
 						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
 						break;
 					default:
@@ -300,7 +300,7 @@ class FilesController {
 			files.delete()
 			
 			flash.message = "Storage ${assetName} deleted"
-			if(params.dstPath =='planningConsole'){
+			if(params.dstPath =='dependencyConsole'){
 				forward( controller:'assetEntity',action:'getLists', params:[entity: 'files',dependencyBundle:session.getAttribute("dependencyBundle")])
 			}else{
 				redirect( action:list )

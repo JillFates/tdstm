@@ -354,7 +354,7 @@ class ApplicationController {
 					case "listTask":
 						render "Application ${applicationInstance.assetName} updated."
 						break;
-					case "planningConsole":
+					case "dependencyConsole":
 						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
 						break;
 					
@@ -380,7 +380,7 @@ class ApplicationController {
 				application.delete();
 			
 			flash.message = "Application ${application.assetName} deleted"
-			if(params.dstPath =='planningConsole'){
+			if(params.dstPath =='dependencyConsole'){
 				forward( controller:'assetEntity',action:'getLists', params:[entity: 'Apps',dependencyBundle:session.getAttribute("dependencyBundle")])
 			}else{
 				redirect( action:list )

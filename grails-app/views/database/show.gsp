@@ -178,7 +178,7 @@
 					<input type="hidden" name="id" id ="databaseId" value="${databaseInstance?.id}" />
 					<tds:hasPermission permission='EditAndDelete'>
 					<span class="button"><input type="button" class="edit" value="Edit" onclick="editEntity('${redirectTo}','Database',${databaseInstance?.id})" /> </span>
-					<g:if test="${redirectTo!='planningConsole'}">
+					<g:if test="${redirectTo!='dependencyConsole'}">
 					   <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>
 					</g:if>
 					<g:else>

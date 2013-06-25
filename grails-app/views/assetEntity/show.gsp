@@ -285,7 +285,7 @@ $(document).ready(function() {
 					<span class="button">
 					<input type="button" class="edit" value="Edit" onclick="editEntity('${redirectTo}','Server', ${assetEntity?.id})" /> </span>
 					<input type ="hidden" id = "dstPath" name = "dstPath" value ="${redirectTo}"/>
-					<g:if test="${redirectTo!='planningConsole'}">
+					<g:if test="${redirectTo!='dependencyConsole'}">
 					   <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>
 					</g:if>
 					<g:else>

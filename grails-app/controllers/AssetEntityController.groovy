@@ -1499,7 +1499,7 @@ class AssetEntityController {
 				case "files":
 					redirect( controller:'files', action:list)
 					break;
-				case "planningConsole":
+				case "dependencyConsole":
 					forward( action:'getLists', params:[entity: 'server',dependencyBundle:session.getAttribute("dependencyBundle")])
 					break;
 				case "assetAudit":
@@ -3119,7 +3119,7 @@ class AssetEntityController {
 					case "roomAudit":
 						forward(action:'show', params:[redirectTo:redirectTo, source:params.source, assetType:params.assetType])
 						break;
-					case "planningConsole":
+					case "dependencyConsole":
 				        forward(action:'getLists', params:[entity: params.tabType,labelsList:params.labels,dependencyBundle:session.getAttribute("dependencyBundle")])
 						break;
 					case "listTask":
@@ -3621,7 +3621,7 @@ class AssetEntityController {
 		def assetDependentlist
 		if(params.dependencyBundle!= 'null'){
 			 assetDependentlist = AssetDependencyBundle.findAllByDependencyBundleAndProject(params.dependencyBundle,project)
-		}else{
+		}else{	
 			 assetDependentlist = AssetDependencyBundle.findAllByProject(project)?.sort{it.dependencyBundle}
 		}
 		session.setAttribute('dependencyBundle',params.dependencyBundle)
@@ -3716,6 +3716,8 @@ class AssetEntityController {
 				graphData << ApplicationConstants.graphDefaultLargeMap
 		    }
 			def graphNodes = []
+			
+			
 			
 			assetDependentlist.each{
 				def name = ""

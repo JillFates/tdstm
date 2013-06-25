@@ -40,7 +40,7 @@
 							class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td>
 							<g:checkBox name="checkBox" id="checkId_${app.id}" ></g:checkBox>
-							<a href="javascript:editEntity('planningConsole','Application', ${app.id})"><img
+							<a href="javascript:editEntity('dependencyConsole','Application', ${app.id})"><img
 									src="/tdstm/images/skin/database_edit.png" border="0px" />
 							</a> <span id="icon_15651"> <g:if test="${AssetComment.find('from AssetComment where assetEntity = '+app.id+' and commentType = ? and isResolved = ?',['issue',0])}">
 							   <g:remoteLink controller="assetEntity" action="listComments" id="${app.id}" before="setAssetId('${app.id}');" onComplete="listCommentsDialog(e,'never');">
@@ -60,26 +60,26 @@
 						    </g:else> </span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app.assetName}</span>
+								onclick="getEntityDetails('dependencyConsole','Application', ${app.id} )">${app.assetName}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app.appSme}</span>
+								onclick="getEntityDetails('dependencyConsole','Application', ${app.id} )">${app.appSme}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app?.validation}</span>
+								onclick="getEntityDetails('dependencyConsole','Application', ${app.id} )">${app?.validation}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app.moveBundle}</span>
+								onclick="getEntityDetails('dependencyConsole','Application', ${app.id} )">${app.moveBundle}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app.planStatus}</span>
+								onclick="getEntityDetails('dependencyConsole','Application', ${app.id} )">${app.planStatus}</span>
 
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${(app.depUp + app.depDown)?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Application', ${app.id} )">${(app.depUp + app.depDown)?:''}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Application', ${app.id} )">${app.conflictCount[0]?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Application', ${app.id} )">${app.conflictCount[0]?:''}</span>
 							</td>
 						</tr>
 					</g:each>

@@ -302,7 +302,7 @@ class DatabaseController {
 					case "listTask":
 						render "Database ${databaseInstance.assetName} updated."
 						break;
-					case "planningConsole":
+					case "dependencyConsole":
 						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
 						break;
 					default:
@@ -326,7 +326,7 @@ class DatabaseController {
 			database.delete()
 			
 			flash.message = "Database ${assetName} deleted"
-			if(params.dstPath =='planningConsole'){
+			if(params.dstPath =='dependencyConsole'){
 				forward( controller:'assetEntity',action:'getLists', params:[entity: 'database',dependencyBundle:session.getAttribute("dependencyBundle")])
 			}else{
 				redirect( action:list )

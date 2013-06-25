@@ -49,7 +49,7 @@
 										style="cursor: pointer;"
 										onclick="getList($('#tabTypeId').val(),null)">All</span></td>
 								</g:if>
-								<g:each in="${planningConsoleList}" var="asset">
+								<g:each in="${dependencyConsoleList}" var="asset">
 									<td id="span_${asset.dependencyBundle}"><span
 										style="cursor: pointer; color: grey;"
 										onclick="getList( $('#tabTypeId').val() , ${asset.dependencyBundle})">
@@ -63,7 +63,7 @@
 											${applicationListSize }
 									</span></td>
 								</g:if>
-								<g:each in="${planningConsoleList}" var="asset">
+								<g:each in="${dependencyConsoleList}" var="asset">
 									<td id="app_${asset.dependencyBundle}">
 										${asset.appCount }
 									</td>
@@ -75,7 +75,7 @@
 											${physicalListSize }
 									</span></td>
 								</g:if>
-								<g:each in="${planningConsoleList}" var="asset">
+								<g:each in="${dependencyConsoleList}" var="asset">
 									<td id="server_${asset.dependencyBundle}">
 										${asset.serverCount }
 									</td>
@@ -87,7 +87,7 @@
 											${virtualListSize }
 									</span></td>
 								</g:if>
-								<g:each in="${planningConsoleList}" var="asset">
+								<g:each in="${dependencyConsoleList}" var="asset">
 									<td id="vm_${asset.dependencyBundle}">
 										${asset.vmCount }
 									</td>
@@ -100,7 +100,7 @@
 											${databaseListSize }
 									</span></td>
 								</g:if>
-								<g:each in="${planningConsoleList}" var="asset">
+								<g:each in="${dependencyConsoleList}" var="asset">
 									<td id="db_${asset.dependencyBundle}">
 										${asset.dbCount }
 									</td>
@@ -112,7 +112,7 @@
 											${filesListSize }
 									</span></td>
 								</g:if>
-								<g:each in="${planningConsoleList}" var="asset">
+								<g:each in="${dependencyConsoleList}" var="asset">
 									<td id="file_${asset.dependencyBundle}">
 										${asset.fileCount }
 									</td>

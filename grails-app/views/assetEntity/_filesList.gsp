@@ -40,7 +40,7 @@
 							class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td>
 							<g:checkBox name="checkBox" id="checkId_${files.id}" ></g:checkBox>
-							<a href="javascript:editEntity('planningConsole','Files', ${files.id})"><img
+							<a href="javascript:editEntity('dependencyConsole','Files', ${files.id})"><img
 									src="/tdstm/images/skin/database_edit.png" border="0px" />
 							</a> <span id="icon_15651"> <g:if test="${AssetComment.find('from AssetComment where assetEntity = '+files.id+' and commentType = ? and isResolved = ?',['issue',0])}">
 							   <g:remoteLink controller="assetEntity" action="listComments" id="${files.id}" before="setAssetId('${files.id}');" onComplete="listCommentsDialog(e,'never');">
@@ -60,26 +60,26 @@
 						    </g:else> </a> </span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${files.assetName}</span>
+								onclick="getEntityDetails('dependencyConsole','Files', ${files.id} )">${files.assetName}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${files.fileFormat}</span>
+								onclick="getEntityDetails('dependencyConsole','Files', ${files.id} )">${files.fileFormat}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${files.validation}</span>
+								onclick="getEntityDetails('dependencyConsole','Files', ${files.id} )">${files.validation}</span>
 							</td>
    							<td><span
-								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${files.moveBundle}</span>
+								onclick="getEntityDetails('dependencyConsole','Files', ${files.id} )">${files.moveBundle}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${files.planStatus}</span>
+								onclick="getEntityDetails('dependencyConsole','Files', ${files.id} )">${files.planStatus}</span>
 
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${(files.depUp + files.depDown)?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Files', ${files.id} )">${(files.depUp + files.depDown)?:''}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Files', ${files.id} )">${files.conflictCount[0]?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Files', ${files.id} )">${files.conflictCount[0]?:''}</span>
 							</td>
 						</tr>
 					</g:each>

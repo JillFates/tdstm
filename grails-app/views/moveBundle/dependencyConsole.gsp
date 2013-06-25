@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <meta name="layout" content="projectHeader" />
-<title>Planning Console</title>
+<title>Dependency Console</title>
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
 <g:javascript src="model.manufacturer.js"/>
@@ -27,15 +27,15 @@ $(document).ready(function() {
 	$("#manufacturerShowDialog").dialog({ autoOpen: false })
 	$("#modelShowDialog").dialog({ autoOpen: false })
 	$("#moveBundleSelectId").dialog({ autoOpen: false })
-	$("#editManufacturerView").dialog({ autoOpen: false})  
-	currentMenuId = "#bundleMenu";
-	$("#bundleMenuId a").css('background-color','#003366')
+	$("#editManufacturerView").dialog({ autoOpen: false})
+	currentMenuId = "#assetMenu";
+	$("#assetMenuId a").css('background-color','#003366')	
 
 });
 </script>
 </head>
 <body>
-	<input type="hidden" id="redirectTo" name="redirectTo" value="planningConsole" />
+	<input type="hidden" id="redirectTo" name="redirectTo" value="dependencyConsole" />
 	<div class="body">
 		<div id="dependencyTitle" style="float: left;">
 			<h1>Dependency Console</h1>

@@ -180,7 +180,7 @@ function submitRemoteForm(){
  		return false;
 }
 function deleteAsset(id,value){
-	var redirectTo = 'planningConsole'
+	var redirectTo = 'dependencyConsole'
 	if(value=='server'){
 		new Ajax.Request(contextPath+'/assetEntity/delete?id='+id+'&dstPath='+redirectTo,{asynchronous:true,evalScripts:true,
 			onComplete:function(data){

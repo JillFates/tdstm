@@ -40,7 +40,7 @@
 							class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td>
 							<g:checkBox name="checkBox" id="checkId_${database.id}" ></g:checkBox>
-							<a href="javascript:editEntity('planningConsole','Database', ${database.id})"><img
+							<a href="javascript:editEntity('dependencyConsole','Database', ${database.id})"><img
 									src="/tdstm/images/skin/database_edit.png" border="0px" />
 							</a> <span id="icon_15651"> <g:if test="${AssetComment.find('from AssetComment where assetEntity = '+database.id+' and commentType = ? and isResolved = ?',['issue',0])}">
 							   <g:remoteLink controller="assetEntity" action="listComments" id="${database.id}" before="setAssetId('${database.id}');" onComplete="listCommentsDialog(e,'never');">
@@ -60,26 +60,26 @@
 						    </g:else> </span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${database.assetName}</span>
+								onclick="getEntityDetails('dependencyConsole','Database', ${database.id} )">${database.assetName}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${database.dbFormat}</span>
+								onclick="getEntityDetails('dependencyConsole','Database', ${database.id} )">${database.dbFormat}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${database.validation}</span>
+								onclick="getEntityDetails('dependencyConsole','Database', ${database.id} )">${database.validation}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${database.moveBundle}</span>
+								onclick="getEntityDetails('dependencyConsole','Database', ${database.id} )">${database.moveBundle}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${database.planStatus}</span>
+								onclick="getEntityDetails('dependencyConsole','Database', ${database.id} )">${database.planStatus}</span>
 
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${(database.depUp + database.depDown)?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Database', ${database.id} )">${(database.depUp + database.depDown)?:''}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('planningConsole','Database', ${database.id} )">${database.conflictCount[0]?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Database', ${database.id} )">${database.conflictCount[0]?:''}</span>
 							</td>
 						</tr>
 					</g:each>

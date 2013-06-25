@@ -706,13 +706,13 @@ class MoveBundleController {
 		def dueOpenIssue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs<< [category : ['discovery'], dueDate:today]).size()
 		def generalOverDue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs<< [category : ['general','planning'], dueDate:today]).size()
 
-		def planningConsoleList = []
+		def dependencyConsoleList = []
 		assetDependencyList.each{dependencyBundle->
 			def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundleAndProject(dependencyBundle.dependencyBundle,project)
 			def appCount = assetDependentlist.findAll{it.asset.assetType == 'Application'}.size()
 			def serverCount = assetDependentlist.findAll{it.asset.assetType == 'Server' || it.asset.assetType == 'Blade' }.size()
 			def vmCount = assetDependentlist.findAll{it.asset.assetType == 'VM'}.size()
-			planningConsoleList << ['dependencyBundle':dependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
+			dependencyConsoleList << ['dependencyBundle':dependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
 		}
 		
 		def latencyQuery = "SELECT COUNT(ap) FROM Application ap WHERE ap.latency = :latency AND (ap.moveBundle IN (:moveBundles) \
@@ -768,7 +768,7 @@ class MoveBundleController {
 			appDependenciesCount:appDependenciesCount, serverDependenciesCount:serverDependenciesCount,
 			pendingAppDependenciesCount:pendingAppDependenciesCount, issuesCount : issues.size(), 
 			pendingServerDependenciesCount:pendingServerDependenciesCount, likelyLatencyCount:likelyLatencyCount,
-			unknownLatencyCount:unknownLatencyCount, unassignedAssetCount:unassignedAssetCount, project:project, planningConsoleList:planningConsoleList,
+			unknownLatencyCount:unknownLatencyCount, unassignedAssetCount:unassignedAssetCount, project:project, dependencyConsoleList:dependencyConsoleList,
 			date:time, moveBundle:moveEventList, likelyLatency:likelyLatency, unlikelyLatency:unlikelyLatency, unknownLatency:unknownLatency,
 			dependencyBundleCount:dependencyBundleCount, uniqueMoveEventList:uniqueMoveEventList, planningDashboard:'planningDashboard',
 			bundleStartDate:bundleStartDate, unassignedDbCount:unassignedDbCount, unassignedFilesCount:unassignedFilesCount,
@@ -782,11 +782,11 @@ class MoveBundleController {
 	/**
 	 * Control function to render the Planning Console 
 	 */
-	def planningConsole = {
+	def dependencyConsole = {
 	
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		
-		return moveBundleService.getPlanningConsoleMap(projectId)
+		return moveBundleService.getdependencyConsoleMap(projectId)
 	}
 	
 	/*
@@ -810,7 +810,7 @@ class MoveBundleController {
 		moveBundleService.generateDependencyGroups(projectId, connectionTypes, statusTypes)
 
 		// Now get the model and display results
-		render(template:'dependencyBundleDetails', model:moveBundleService.getPlanningConsoleMap(projectId) )
+		render(template:'dependencyBundleDetails', model:moveBundleService.getdependencyConsoleMap(projectId) )
 	}
 	
 	/**

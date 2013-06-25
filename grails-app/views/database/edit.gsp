@@ -91,7 +91,7 @@
 				<input type = "hidden" id = "dbId"  value ="${databaseInstance.id}"/>
 				<input type = "hidden" id = "tabType" name="tabType" value =""/>
 				<input name="updateView" id="updateView" type="hidden" value=""/>
-				<g:if test="${redirectTo!='planningConsole'}">
+				<g:if test="${redirectTo!='dependencyConsole'}">
 					 <g:if test="${redirectTo=='listTask'}">
 					  	<span class="button"><input type="button" class="save updateDep" value="Update/Close" onclick="updateToRefresh()" /></span>
 					  </g:if>

@@ -216,7 +216,7 @@
 					<input type = "hidden" id = "tabType" name="tabType" value =""/>
 					<input type="hidden" id="labelsListId" name="labels" value =""/>
 					<input type="hidden" id="updateViewId" name="updateViewId" value =""/>
-					<g:if test="${redirectTo!='planningConsole'}">
+					<g:if test="${redirectTo!='dependencyConsole'}">
 					  <g:if test="${redirectTo=='listTask'}">
 					  	<span class="button"><input type="button" class="save updateDep" value="Update/Close" onclick="updateToRefresh()" /></span>
 					  </g:if>

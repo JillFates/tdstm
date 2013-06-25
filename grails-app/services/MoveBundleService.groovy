@@ -452,11 +452,11 @@ class MoveBundleService {
 	 }
 	 
 	 /*
-	  * Used by several controller functions to generate the mapping arguments used by the planningConsole view
+	  * Used by several controller functions to generate the mapping arguments used by the dependencyConsole view
 	  */
-	 def getPlanningConsoleMap(projectId) {
+	 def getdependencyConsoleMap(projectId) {
 		 def projectInstance = Project.get(projectId)
-		 def planningConsoleList = []
+		 def dependencyConsoleList = []
 		 def depBundleIDCountSQL = "SELECT count(distinct dependency_bundle) FROM asset_dependency_bundle WHERE project_id = $projectId"
 		 def depBundleIdSQL = "SELECT distinct dependency_bundle AS dependencyBundle FROM asset_dependency_bundle WHERE project_id = $projectId ORDER BY dependency_bundle"
 		 
@@ -464,7 +464,7 @@ class MoveBundleService {
 		 
 		 def assetDependencyList = jdbcTemplate.queryForList(depBundleIdSQL)
 		 
-		 // Iterate over the Asset Dependency list to construct the planningConsoleList of values
+		 // Iterate over the Asset Dependency list to construct the dependencyConsoleList of values
 		 assetDependencyList.each{ assetDependencyBundle->
 			 def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundleAndProject(assetDependencyBundle.dependencyBundle,projectInstance)
 			 def appCount = assetDependentlist.findAll{ it.asset.assetType == AssetType.APPLICATION.toString() }.size()
@@ -472,7 +472,7 @@ class MoveBundleService {
 			 def vmCount = assetDependentlist.findAll{it.asset.assetType == AssetType.VM.toString() }.size()
 			 def dbCount = assetDependentlist.findAll{it.asset.assetType == AssetType.DATABASE.toString() }.size()
 			 def fileCount = assetDependentlist.findAll{it.asset.assetType == AssetType.FILES.toString() }.size()
-			 planningConsoleList << ['dependencyBundle':assetDependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount, 
+			 dependencyConsoleList << ['dependencyBundle':assetDependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount, 
 			                         'dbCount':dbCount, 'fileCount':fileCount]
 		 }
 		 
@@ -497,7 +497,7 @@ class MoveBundleService {
 		 
 		 def moveBundles = MoveBundle.findAllByProject(projectInstance)
  
-		 def map = [assetDependencyList:assetDependencyList, dependencyType:entities.dependencyType, planningConsoleList:planningConsoleList,
+		 def map = [assetDependencyList:assetDependencyList, dependencyType:entities.dependencyType, dependencyConsoleList:dependencyConsoleList,
 				 date:time, dependencyStatus:entities.dependencyStatus, assetDependency:new AssetDependency(), dependencyBundleCount:dependencyBundleCount,
 				 servers:entities.servers, applications:entities.applications, dbs:entities.dbs, files:entities.files,moveBundle:moveBundleList, planStatusOptions:planStatusOptions,
 				 applicationListSize:applicationListSize, physicalListSize:physicalListSize,virtualListSize:virtualListSize,
