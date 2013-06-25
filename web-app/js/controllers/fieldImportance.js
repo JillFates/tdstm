@@ -67,9 +67,18 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 	$scope.toggleEditMode = function (s) {
 		$scope.section[s] = $scope.section[s] == 'e' ? 's' : 'e'
 	}
+	//Constant consists of all customs as list
+	var FIELD_LIST = [];
+	for(i=1;i<25;i++){
+		FIELD_LIST.push("custom"+i);
+	}
 	$scope.assignData = function(type,value,field,phase) {
-		$scope.importance[type][field]['phase'][phase] ='C'
-			$scope.setImportance(type,field, phase, value);
+		//checking condition that hidden will only work for customs1.. 24
+			if(value!= 'H'){
+				$scope.setImportance(type,field, phase, value);
+			}else if(value == "H" && FIELD_LIST.indexOf(field) != -1){
+				$scope.setImportance(type,field, phase, value);
+			}
 	};
 
 	$scope.setImportance = function (type,field, phase, value) {
