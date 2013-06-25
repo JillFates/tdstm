@@ -1317,3 +1317,10 @@ span.task_button_disabled { float: left; height: 16px; line-height: 16px;  paddi
 .compareColumn{
 	width: 250px
 }
+
+#predeccessorShowTd {
+	vertical-align: top !important;
+}
+#successorShowTd {
+	vertical-align: top !important;
+}
