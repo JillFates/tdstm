@@ -47,7 +47,7 @@ class UserLoginController {
 		def userLoginSize
 		SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
 		
-		def query = new StringBuffer("""SELECT role_type_id AS role, p.person_id AS personId, first_name AS firstName , u.username as username ,
+		def query = new StringBuffer("""SELECT GROUP_CONCAT(role_type_id) AS role, p.person_id AS personId, first_name AS firstName , u.username as username ,
 			last_name as lastName, pg.name AS company, u.active, u.last_login AS lastLogin, u.expiry_date AS expiryDate,
 			u.created_date AS dateCreated, u.user_login_id AS userLoginId
 			FROM party_role pr 
@@ -78,7 +78,7 @@ class UserLoginController {
 			if(companyId){
 				query.append(" AND pg.party_group_id = $companyId ")
 			}
-			query.append(" ORDER BY pr.role_type_id, pg.name, first_name, last_name ")
+			query.append(" GROUP BY pr.party_id ORDER BY pr.role_type_id, pg.name, first_name, last_name ")
 			userLoginInstanceList = jdbcTemplate.queryForList(query.toString())
 		} else {
 			userLoginInstanceList = []
