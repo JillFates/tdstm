@@ -11,7 +11,7 @@ def ctx = AH.application.mainContext
 def jdbcTemplate = ctx.jdbcTemplate
 databaseChangeLog = {
 	// This Changeset is used for migrate sme record to sme_id column
-	changeSet(author: "lokanada", id: "20130611 TM-1904-1") {
+	changeSet(author: "lokanada", id: "20130611 TM-1904-7") {
 		comment('Add "sme_id" column in Application table')
 		preConditions(onFail:'MARK_RAN') {
 			not {
@@ -41,7 +41,7 @@ databaseChangeLog = {
 	}
 	
 	// This Changeset is used for migrate sme2 record to sme2_id column
-	changeSet(author: "lokanada", id: "20130611 TM-1904-2") {
+	changeSet(author: "lokanada", id: "20130611 TM-1904-8") {
 		comment('Add "sme2_id" column in Application table')
 		preConditions(onFail:'MARK_RAN') {
 			not {
@@ -71,7 +71,7 @@ databaseChangeLog = {
 	
 	// This Changeset is used for migrate app_owner record to app_owner_id column
 	
-	changeSet(author: "lokanada", id: "20130611 TM-1904-3") {
+	changeSet(author: "lokanada", id: "20130611 TM-1904-9") {
 		comment('Add "app_owner_id" column in Application table')
 		preConditions(onFail:'MARK_RAN') {
 			not {

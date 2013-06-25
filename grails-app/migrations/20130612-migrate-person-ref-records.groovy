@@ -13,7 +13,7 @@ def ctx = AH.application.mainContext
 def jdbcTemplate = ctx.jdbcTemplate
 databaseChangeLog = {
 	// This Changeset is used for migrate sme record to sme_id column
-	changeSet(author: "lokanada", id: "20130612 TM-1904-4") {
+	changeSet(author: "lokanada", id: "20130612 TM-1904-10") {
 		comment('Add "sme_id" column in Application table')
 		grailsChange {
 			change {
@@ -30,7 +30,7 @@ databaseChangeLog = {
 	}
 	
 	// This Changeset is used for migrate sme2 record to sme2_id column
-	changeSet(author: "lokanada", id: "20130612 TM-1904-5") {
+	changeSet(author: "lokanada", id: "20130612 TM-1904-11") {
 		comment('Add "sme2_id" column in Application table')
 		grailsChange {
 			change {
@@ -48,7 +48,7 @@ databaseChangeLog = {
 	
 	// This Changeset is used for migrate app_owner record to app_owner_id column
 	
-	changeSet(author: "lokanada", id: "20130611 TM-1904-6") {
+	changeSet(author: "lokanada", id: "20130611 TM-1904-12") {
 		comment('Add "app_owner_id" column in Application table')
 		grailsChange {
 			change {
