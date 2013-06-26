@@ -272,7 +272,6 @@ function validatePersonForm(form) {
 				data : $('#createDialogForm').serialize(),
 				type : 'POST',
 				success : function(data) {
-					alert(data.errMsg)
 					if(data.errMsg){
 						alert(data.errMsg)
 					}else{
