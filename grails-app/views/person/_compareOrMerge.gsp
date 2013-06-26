@@ -52,16 +52,22 @@
 						</g:elseif>
 						<g:else>
 							<td id="${columnList.get(column)+'_td_'+person.id}">
-							<span class="showAll showFrom_${person.id}">
-									${columnList.get(column) ? person.(columnList.get(column)) : ''}
-							</span>
+							
 							<g:if test="${!['Active', 'Model Score', 'Model Score Bonus', 'Staff Type'].contains(column)}">
+								<span class="showAll showFrom_${person.id}">
+									${columnList.get(column) ? person.(columnList.get(column)) : ''}
+								</span>
 								 <span class="editAll editTarget_${person.id}" style="display: none;">
 			         	 			 <input type="text" id="${columnList.get(column)+'_edit_'+person.id}" 
 				         	 			 name="${columnList.get(column)}" class="input_${person.id}" 
 				         	 			 value="${columnList.get(column) ? person.(columnList.get(column)) : ''}"/>
 			         	 		 </span>
 		         	 		 </g:if>
+		         	 		 <g:else>
+		         	 			 <span>
+									${columnList.get(column) ? person.(columnList.get(column)) : ''}
+								</span>
+		         	 		 </g:else>
 							</td>
 						</g:else>
 					</g:each>
