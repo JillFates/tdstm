@@ -1081,6 +1081,11 @@ class PersonController {
 		def toUserLogin = UserLogin.findByPerson( toPerson )
 		def fromUserLogin = UserLogin.findByPerson( fromPerson )
 		
+		toPerson.properties = params
+		if(!toPerson.save(flush:true)){
+			log.error GormUtil.allErrorsString(toPerson)
+		}
+		
 		def personDomain = new DefaultGrailsDomainClass( Person.class )
 		def notToUpdate = ['beforeDelete','beforeInsert', 'beforeUpdate','id', 'firstName','blackOutDates']
 		personDomain.properties.each{

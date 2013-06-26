@@ -31,10 +31,16 @@ function mergePerson(){
 		$('input[name=mergeRadio]:radio:not(:checked)').each(function(){
 			modelToMerge = this.id.split("_")[1]
 		})
-		
+		var params = {};
+		$(".input_"+targetModelId).each(function(){
+			if(this.name!='manufacturer' && this.name!='createdBy' && this.name!='updatedBy')
+				params[this.name] = this.value;
+		})
+		params['toId'] = targetModelId;
+		params['fromId'] = modelToMerge;
 		jQuery.ajax({
 			url: contextPath+'/person/mergePerson',
-			data: {'toId':targetModelId, 'fromId':modelToMerge},
+			data: params,
 			type:'POST',
 			beforeSend: function(jqXHR){
 				$("#showOrMergeId").dialog('close')
@@ -56,4 +62,31 @@ function mergePerson(){
 	} else {
 		return false
 	}
+}
+
+function switchTarget(targetId){
+	
+	$(".editAll:visible").children().each(function(){
+		var span = $(this).parent().siblings()
+		if($(this).attr('type') == 'checkbox'){
+			span.children().val(span.children().val())
+		}else {
+			var toSpan = ''
+			$(this).parent().children("input").each(function(i){
+				if($(this).siblings().length > 0 && ! $(this).val())
+					toSpan = toSpan + 'null'
+				else
+					toSpan = toSpan + $(this).val()
+			})
+			if(toSpan.length > 20)
+				toSpan = toSpan.substring(0, 20) + '...'
+			span.html(toSpan)
+		}
+	})
+	
+	$(".editAll").hide()
+	$(".showAll").show() 
+	$(".editTarget_"+targetId).show()
+	$(".showFrom_"+targetId).hide()
+	
 }
