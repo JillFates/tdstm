@@ -263,7 +263,7 @@ class AssetEntityController {
 		// create workbook
 		def workbook
 		def titleSheet
-		def sheetNameMap = ['Title','Servers','Applications','Databases','Storage','Dependencies']
+		def sheetNameMap = ['Title','Applications','Servers','Databases','Storage','Dependencies']
 		def appNameMap = [:]
 		def databaseNameMap = [:]
 		def filesNameMap = [:]

@@ -167,29 +167,24 @@
 				<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#projectMegaMenu')" href="javascript:waitForMenu('#projectMegaMenu')" style="display: inline"></a></g:link>
 				<div class="megamenu client" id="projectMegaMenu" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" style="display: none;">
 					<table class="mmtable"><tr>
-					<td style="vertical-align:top"><span class="megamenuSection">Client/Project</span><br />
+					<g:if test="${currProjObj}">
+					<td style="vertical-align:top"><span class="megamenuSection">For <strong><g:if test="${currProjObj.name.size()>25}">${currProjObj.name.substring(0,25)+'...'}</g:if><g:else>${currProjObj.name}</g:else></strong></span><br />
 						<ul >
 							<li><g:link class="mmlink" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link></li>
-							<tds:hasPermission permission='CreateProject'>
-							<li><g:link class="mmlink" controller="project" action="create"  onclick="hideMegaMenu('projectMegaMenu')">Create Project</g:link></li>
-							</tds:hasPermission>
-							<li><g:link class="mmlink" controller="project" action="assetFields" onclick="hideMegaMenu('adminMegaMenu')">Field Importance</g:link> </li>
-							<tds:hasPermission permission='HelpMenuView'>
-							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMClientProjectSettings?cover=print','help');"  onclick="hideMegaMenu('projectMegaMenu')">help</a></li>
-							</tds:hasPermission>
-						</ul>
-					</td>
-					<g:if test="${currProjObj}">
-					<td style="vertical-align:top"><span class="megamenuSection">For <strong>${currProjObj.name}</strong></span><br />
-						<ul >
-							<li><g:link class="mmlink" controller="projectUtil"  onclick="hideMegaMenu('projectMegaMenu')">Project Settings</g:link></li>
+							<li><g:link class="mmlink" controller="projectUtil" onclick="hideMegaMenu('projectMegaMenu')"><g:if test="${currProjObj.name.size()>20}">${currProjObj.name.substring(0,20)+'...'}</g:if><g:else>${currProjObj.name}</g:else> Settings</g:link></li>
 							<li><g:link class="mmlink" controller="person" action="manageProjectStaff"  onclick="hideMegaMenu('projectMegaMenu')">Project Staff</g:link></li>
+					</g:if>
+					<g:else>
+					<td style="vertical-align:top"><span class="megamenuSection">No Project Selected</strong></span><br />
+						<ul>
+							<li><g:link class="mmlink" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link></li>
+					</g:else>
+							<li><g:link class="mmlink" controller="project" action="assetFields" onclick="hideMegaMenu('adminMegaMenu')">Field Importance</g:link> </li>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMProjectStaff?cover=print','help');"  onclick="hideMegaMenu('projectMegaMenu')">help</a></li>
 							</tds:hasPermission>
 						</ul>
 					</td>
-					</g:if>
 					</tr></table>
 				</div>
 				
@@ -255,8 +250,8 @@
 							<tds:hasPermission permission='MoveBundleEditView'>
 							  <li><g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">Dependencies</g:link></li>
 							</tds:hasPermission>
-							<li><g:link class="mmlink" controller="assetEntity"  onclick="hideMegaMenu('assetMegaMenu')">List Assets</g:link></li>
 							<li><g:link class="mmlink" controller="application" action="list"  onclick="hideMegaMenu('assetMegaMenu')">List Apps</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity"  onclick="hideMegaMenu('assetMegaMenu')">List Servers</g:link></li>
 							<li><g:link class="mmlink" controller="database"  onclick="hideMegaMenu('assetMegaMenu')">List DBs</g:link></li>
 							<li><g:link class="mmlink" controller="files"  onclick="hideMegaMenu('assetMegaMenu')">List Storage</g:link></li>
 							<tds:hasPermission permission='HelpMenuView'>

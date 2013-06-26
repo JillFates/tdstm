@@ -217,7 +217,7 @@
 	box-shadow: 3px 3px 3px #888;
 }
 #projectMegaMenu {
-	width:300px;
+	width:200px;
 }
 #racksMegaMenu {
 	width:250px;
@@ -300,6 +300,9 @@
 }
 .mmtable {
 	border:0px;
+}
+.tzmenu {
+	background-color: transparent !important;
 }
 
 .menu3 {

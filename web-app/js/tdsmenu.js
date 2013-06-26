@@ -274,7 +274,7 @@
 					$("#reportAnchor").css("display","inline")
 				}
 				if(e == "#userMegaMenu"){
-					$("#userMenuId").css('background-color','lightblue');
+					$("#userMenuId div").css('background-color','lightblue');
 				}
 			}
 		}
@@ -319,7 +319,7 @@
 			$("#reportsMenuId a").css('background-color','#354E81');
 			$("#reportsMenuId a").css('border-right-color','#354E81');
 			$("#reportsMenuId a").css('color','#9ACAEE');
-			$("#userMenuId").css('background-color','');
+			$("#userMenuId div").css('background-color','');
 			$("#adminAnchor").css('color','#9ACAEE')
 			$("#projectAnchor").css('color','#9ACAEE')
 			$("#rackAnchor").css('color','#9ACAEE')
@@ -339,7 +339,7 @@
 			if(currentMenuId == "#consoleMenu"){$("#consoleMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#dashboardMenu"){$("#dashboardMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#reportsMenu"){$("#reportsMenuId a").css('background-color','#003366')}
-			if(currentMenuId == "#userMenu"){$("#userMenuId").css('background-color','')}
+			if(currentMenuId == "#userMenu"){$("#userMenuId div").css('background-color','')}
 		}
 		// set close timer
 		function mclosetime() {

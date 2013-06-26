@@ -111,8 +111,10 @@ function deleteRow( rowId ){
 	$("#"+rowId).remove()
 }
 function updateAssetsList( name, value ){
+	alert('name: '+name+' value:'+value)
 	var idValues = name.split("_")
 	$("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']").html($("#"+value+" select").html())
+	alert($("#"+value+" select").html())
 }
 function updateTitle( type ){
 	$("#createEntityView").dialog( "option", "title", 'Create '+type );
@@ -626,7 +628,7 @@ function populateDependency(assetId, whom){
 		url: contextPath+'/assetEntity/populateDependency',
 		data: {'id':assetId},
 		type:'POST',
-		success: function(data) {
+		success: function(data) { 
 			$("#"+whom+"DependentId").html(data)
 			$(".updateDep").removeAttr('disabled')
 		},

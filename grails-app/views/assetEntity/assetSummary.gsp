@@ -25,14 +25,14 @@
    <g:each in="${assetSummaryList}" var="assetSummary" status="i">
          <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 	          <td>${assetSummary.name}</td>
-	          <g:if test="${assetSummary.assetCount>0}">
-	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[moveBundleId:"${assetSummary.id}"]' >${assetSummary.assetCount}</g:link></td>
+	          <g:if test="${assetSummary.applicationCount>0}">
+	            <td  style="text-align:right;"><g:link controller="application" action="list" params='[moveBundleId:"${assetSummary.id}"]'>${assetSummary.applicationCount}</g:link></td>
 	          </g:if>
 	          <g:else>
 	           <td  style="text-align:right;"></td>
 	          </g:else>
-	          <g:if test="${assetSummary.applicationCount>0}">
-	            <td  style="text-align:right;"><g:link controller="application" action="list" params='[moveBundleId:"${assetSummary.id}"]'>${assetSummary.applicationCount}</g:link></td>
+	          <g:if test="${assetSummary.assetCount>0}">
+	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[moveBundleId:"${assetSummary.id}"]' >${assetSummary.assetCount}</g:link></td>
 	          </g:if>
 	          <g:else>
 	           <td  style="text-align:right;"></td>

@@ -167,15 +167,15 @@ function populateFilter(){
 	<table id="assetDependencyRow">
 	<tr>
 		<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
-		<td><g:select name="entity" from="['Server','Application','Database','Storage','Network']" onchange='updateAssetsList(this.name, this.value)'></g:select></td>
-		<td><span id="Server"><g:select name="asset" from="${servers}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span></td>
+		<td><g:select name="entity" from="['Application','Server','Database','Storage','Network']" onchange='updateAssetsList(this.name, this.value)'></g:select></td>
+		<td><span id="Application"><g:select name="asset" from="${applications}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span></td>
 		<td><g:select name="dtype" from="${dependencyType.value}"  optionValue="value""></g:select></td>
 		<td><g:select name="status" from="${dependencyStatus.value}" optionValue="value"></g:select></td>
 	</tr>
 	</table>
 </div>
 <div style="display: none;">
-	<span id="Application"><g:select name="asset" from="${applications}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span>
+	<span id="Server"><g:select name="asset" from="${servers}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span>
 	<span id="Database"><g:select name="asset" from="${dbs}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span>
 	<span id="Storage"><g:select name="asset" from="${files}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span>
 	<span id="Network"><g:select name="asset" from="${networks}" optionKey="${-2}" optionValue="${1}" style="width:90px;"></g:select></span>
