@@ -1088,6 +1088,9 @@ class AdminController {
 		def msg = deletedTypes ? "Removed ${deletedTypes.size()} unused Types: ${WebUtil.listAsMultiValueString(deletedTypes)}" : ""
 		render msg
 	}	
-	
+	def bootstrap ={
+		def contextPath = request.contextPath
+		return [contextPath:contextPath]
+	}
 	
 }
