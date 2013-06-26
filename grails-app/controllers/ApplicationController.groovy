@@ -176,7 +176,7 @@ class ApplicationController {
 		def configMap = assetEntityService.getConfig('Application','Discovery')
 		
 		[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-			planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project,moveEventList:moveEventList,
+			planStatusOptions:planStatusOptions?.value, projectId:project.id, project:project,moveEventList:moveEventList,
 			config:configMap.config, customs:configMap.customs, personList:personList, company:project.client]
 	}
 	def save = {
