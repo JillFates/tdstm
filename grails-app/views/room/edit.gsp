@@ -260,49 +260,64 @@
 	</div>
 	<script type="text/javascript">
 
+	var isClicking = false
+	
 $(document).ready(function() {
 	loadjscssfile('/tdstm/js/jquery-1.9.1.js','js') // Loading jquery1.9.1 and suuprting files dynamically .
 	loadjscssfile('/tdstm/js/jquery-1.9.1-ui.js','js')
 	loadjscssfile('/tdstm/css/jquery-ui-effect.css','css')
 	
-    var prefVal = '${prefVal}'
-    if(prefVal=='FALSE'){
-   	 	$("#roomObjects").hide()
-    }    
+	var prefVal = '${prefVal}'
+	if(prefVal=='FALSE'){
+		$("#roomObjects").hide()
+	}
 	$(".focusShadow").bind("focus", function(e) {
 		addShadowCss($(this).attr("id"));
-    }); 
+	});
 	$(".focusShadow").bind("blur", function(e) {
 		delShadowCss($(this).attr("id"))
-    });    
-    $(".dragRack").click(function(event) {
-       if (event.shiftKey) {
-    	   $("#roomObjects").show()
-           if($(this).hasClass('objectSelected')){
-        	   delShadowCss($(this).attr("id"))
-        	   if($("#showAll").val()=='0')
-        	   	showRackTable()
-           } else {
-           	   addShadowCss($(this).attr("id"));
-           	   if($("#showAll").val()=='0')
-           	     showRackTable()
-           }
-       } else {
-    	   $(".dragRack").removeClass("objectSelected")
-    	   $(".objectRowSelected").removeClass("objectRowSelected")
-    	   addShadowCss($(this).attr("id"));
-    	   if($("#showAll").val() == '0')
-    	   		$("#roomObjects").hide()
-    	   		
-    	   showRoomObjectsDiv($(this).attr("id"))
-    	   if($("#showAll").val()=='0')
-    	   	showRackTable()
-       }
+	});
+	$(".dragRack").mousedown(function(event){
+		isClicking = true
+	});
+	$(".dragRack").mouseup(function(event){
+		if(isClicking) {
+			selectRack($(this), event.shiftKey)
+		} else {
+			$(".objectSelected").each(function(i) {
+				delShadowCss($(this).attr("id"))
+			});
+			showRoomObjectsDiv($(this).attr("id"))
+		}
+		isClicking = false
 	});
 	
 	$("#roomObjects").height($("#rackTableId").height())
 	
 })
+
+// Selects @param rack, a clicked rack, and deselects all other racks if @param multi is false
+function selectRack (rack, multi) {
+	var selected = rack.hasClass('objectSelected')
+	
+	if(! multi){
+		deselectAll()
+		if($("#showAll").val() == '0')
+			$("#roomObjects").hide()
+	} else {
+		$("#roomObjects").show()
+	}
+	
+	if(selected)
+		delShadowCss(rack.attr("id"));
+	else
+		addShadowCss(rack.attr("id"));
+		
+	if($("#showAll").val()=='0' && $(".objectSelected").length > 0)
+		showRackTable()
+	else
+		$("#roomObjects").hide()
+}
 
 function showRoomObjectsDiv(rackId){
 	var draggable = $("#showAll:checkbox")
@@ -322,7 +337,7 @@ function showRoomObjectsDiv(rackId){
 				$("#rackDetailDiv_"+id).html(data);
 				$("#rackDetailDivv_"+id).html(data);
 				$("#rackDetailDiv_"+id).css("left",(parseInt(x)+70)+"px")
-				$("#rackDetailDiv_"+id).css("top",(parseInt(y)-503)+"px")
+				$("#rackDetailDiv_"+id).css("top",(parseInt(y)+50)+"px")
 				$("#rackDetailDiv_"+id).show("fold", {horizFirst: true }, 1000);	
 				$("#rackDetailDivv_"+id).show("fold", {horizFirst: true }, 1000);
 			}
@@ -351,44 +366,47 @@ function showRackTable(){
 }
 
 /**
- * Multi div darg function function.
+ * Multi div drag function function.
  */
 $(".draggable").draggable({
-     start: function(event, ui) {
-          posTopArray = [];
-          posLeftArray = [];
-          if ($(this).hasClass("objectSelected")) {  
-               $(".objectSelected").each(function(i) {
-                    thiscsstop = $(this).css('top');
-                    if (thiscsstop == 'auto') thiscsstop = 0; 
+	start: function(event, ui) {
+		posTopArray = [];
+		posLeftArray = [];
+		isClicking = false
+		
+		if(! $(this).hasClass("objectSelected"))
+			selectRack($(this), false)
+		
+		$(".objectSelected").each(function(i) {
+			thiscsstop = $(this).css('top');
+			if (thiscsstop == 'auto') thiscsstop = 0; 
 
-                    thiscssleft = $(this).css('left');
-                    if (thiscssleft == 'auto') thiscssleft = 0; 
+			thiscssleft = $(this).css('left');
+			if (thiscssleft == 'auto') thiscssleft = 0; 
 
-                    posTopArray[i] = parseInt(thiscsstop);
-                    posLeftArray[i] = parseInt(thiscssleft);
-               });
-          }
+			posTopArray[i] = parseInt(thiscsstop);
+			posLeftArray[i] = parseInt(thiscssleft);
+		});
 
-          begintop = $(this).offset().top; 
-          beginleft = $(this).offset().left;
-     },
-     drag: function(event, ui) {
-          var topdiff = $(this).offset().top - begintop; 
-          var leftdiff = $(this).offset().left - beginleft;
+		begintop = $(this).offset().top;
+		beginleft = $(this).offset().left;
+	},
+	drag: function(event, ui) {
+		var topdiff = $(this).offset().top - begintop;
+		var leftdiff = $(this).offset().left - beginleft;
 
-          if ($(this).hasClass("objectSelected")) {
-               $(".objectSelected").each(function(i) {
-                    $(this).css('top', posTopArray[i] + topdiff);
-                    $(this).css('left', posLeftArray[i] + leftdiff);
+		if ($(this).hasClass("objectSelected")) {
+			$(".objectSelected").each(function(i) {
+				$(this).css('top', posTopArray[i] + topdiff);
+				$(this).css('left', posLeftArray[i] + leftdiff);
 
-                    var rackId = $(this).attr("id").split("_")[1]
-                    
-                    $("#roomXId_"+rackId).val(posLeftArray[i] + leftdiff)
-                	$("#roomYId_"+rackId).val(posTopArray[i] + topdiff)
-               });
-          }
-     }
+				var rackId = $(this).attr("id").split("_")[1]
+				
+				$("#roomXId_"+rackId).val(posLeftArray[i] + leftdiff)
+			 	$("#roomYId_"+rackId).val(posTopArray[i] + topdiff)
+			});
+		}
+	}
 });
 
 /**
@@ -511,11 +529,11 @@ function addShadowCss(id, event){
 	
 }
 function deselectAll(){
-	  $(".objectRowSelected").removeClass("objectRowSelected")
-	  $(".objectSelected").removeClass("objectSelected")
-	  $(".multiSelect").removeClass("multiSelect")
-	  $(".rackDetailDiv").hide("fold", {horizFirst: true }, 1000);
-	  $(".rackDetailDivv").hide("fold", {horizFirst: true }, 1000);
+	$(".objectRowSelected").removeClass("objectRowSelected")
+	$(".objectSelected").removeClass("objectSelected")
+	$(".multiSelect").removeClass("multiSelect")
+	$(".rackDetailDiv").hide("fold", {horizFirst: true }, 1000);
+	$(".rackDetailDivv").hide("fold", {horizFirst: true }, 1000);
 }
 function delShadowCss(id){
 	var rackId = id.split("_")[1]
