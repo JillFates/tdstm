@@ -48,6 +48,42 @@ class PartyRelationshipService {
 		return getPartyGroup(party, 'COMPANY')
 	}
 	
+    /*
+     * Used to get list of clients for the specified company
+     * @param Party - the company that has clients to be found
+     * @param sortOn - property to sort on (default name)
+     * @return Array of PartyRelationship
+     */
+    def getCompanyClients( company, sortOn='name') {
+
+        def query = "from PartyRelationship p where p.partyRelationshipType = 'CLIENTS' and p.partyIdFrom = :company and " +
+            "p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'CLIENT'"
+        def clients = PartyRelationship.findAll( query, [company:company] )
+        if (clients && sortOn) {  
+            clients?.sort{it.partyIdTo.(sortOn)}
+        }
+
+        return clients
+    }   
+
+    /*
+     * Used to get list of Partners for the specified company
+     * @param Party - the company that has partners to be found
+     * @param sortOn - property to sort on (default name)
+     * @return Array of PartyRelationship
+     */
+    def getCompanyPartners( company, sortOn='name') {
+
+        def query = "from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = :company and " +
+            "p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER'"
+        def partners = PartyRelationship.findAll( query, [company:company] )
+        if (partners && sortOn) {  
+            partners?.sort{it.partyIdTo.(sortOn)}
+        }
+
+        return partners
+    }   
+
 	/**
 	 * Used to retrieve the a PartyGroup for a given Party and Type
 	 * @param Party - a party object to get the Company PartyGroup
@@ -98,7 +134,7 @@ class PartyRelationshipService {
     	return companies
     
     }
-    
+
     /*
      *  Method to Update  the roleTypeTo 
      */

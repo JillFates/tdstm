@@ -194,6 +194,7 @@ class ProjectController {
 				     workflowCodes:workflowCodes ]
         }
     }
+
     /*
      * Update the Project details
      */
@@ -386,45 +387,28 @@ class ProjectController {
             redirect( action:list, id:params.id )
         }
     }
-    /*
-     * Populate create view
-     */
-    def create = {
-    	def workflowCodes = []
-        def projectInstance = new Project()
-        projectInstance.properties = params
-        /*
-        def relationshipTypeClient = PartyRelationshipType.findById( 'PROJ_CLIENT' )
-        def relationshipTypePartner = PartyRelationshipType.findById( 'PROJ_PARTNER' )
-        def relationshipTypeStaff = PartyRelationshipType.findById( 'PROJ_STAFF' )
-         */
-        try {
-	        def tdsParty = PartyGroup.findByName( 'TDS' )
-	        
-	        /*def roleTypeCompany = RoleType.findById( 'COMPANY' )
-	        def roleTypeClient = RoleType.findById( 'CLIENT' )
-	        def roleTypePartner = RoleType.findById( 'PARTNER' )
-	        def roleTypeStaff = RoleType.findById( 'STAFF' )
-	         */
-	        // 	Populate a SELECT listbox with a list of all CLIENTS relationship to COMPANY (TDS)
-	        def clients = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'CLIENTS' and p.partyIdFrom = $tdsParty.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'CLIENT' order by p.partyIdTo " ) 
-	        clients.sort{it.partyIdTo?.name}
-	        //	Populate a SELECT listbox with a list of all PARTNERS relationship to COMPANY (TDS)
-	        //def partners = PartyRelationship.findAllWhere( partyRelationshipType: relationshipTypePartner, partyIdFrom: tdsParty, roleTypeCodeFrom: roleTypeCompany, roleTypeCodeTo: roleTypePartner )
-	        def partners = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = $tdsParty.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER' order by p.partyIdTo" )
-	        partners.sort{it.partyIdTo?.name}
-	        //	Populate a SELECT listbox with a list of all STAFF relationship to COMPANY (TDS)
-	        //def managers = PartyRelationship.findAllWhere( partyRelationshipType: relationshipTypeStaff, partyIdFrom: tdsParty, roleTypeCodeFrom: roleTypeCompany, roleTypeCodeTo: roleTypeStaff )
-	        def managers = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $tdsParty.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
-	        managers.sort{it.partyIdTo?.lastName}
-	        workflowCodes = stateEngineService.getWorkflowCode()
-	        return [ 'projectInstance':projectInstance, 'clients':clients , 'partners':partners , 'managers':managers, 'workflowCodes': workflowCodes ]
-        
-        } catch (Exception e) {
-        	flash.message = "Company not found"
-            redirect(action:list)
-        }
-    }
+
+	/*
+	 * Populate and present the create view for a new project
+	 */
+	def create = {
+		def projectInstance = new Project()
+		projectInstance.properties = params
+
+		def tdsParty = PartyGroup.findByName( 'TDS' )
+
+		def clients = partyRelationshipService.getCompanyClients(tdsParty)
+
+		def partners = partyRelationshipService.getCompanyPartners(tdsParty)
+
+		def managers = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = ${tdsParty.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
+		managers?.sort{it.partyIdTo?.lastName}
+		
+		def workflowCodes = stateEngineService.getWorkflowCode()
+
+		return [ projectInstance:projectInstance, clients:clients , partners:partners , managers:managers, workflowCodes: workflowCodes ]
+	}
+
     /*
      * create the project and PartyRelationships for the fields prompted
      */
