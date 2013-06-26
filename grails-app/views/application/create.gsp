@@ -4,9 +4,16 @@
 	$("#appl_validation").val($('#gs_validation').val())
 	$("#appl_planStatus").val($('#gs_planStatus').val())
 	$("#appl_moveBundle").val($('#gs_moveBundle').val())
+	$("#createStaffDialog").dialog({ autoOpen: false })
+	
+	var myOption = "<option value='0'>Add Person...</option>"
+
+	$("#sme1 option:first").after(myOption);
+	$("#sme2 option:first").after(myOption);
+	$("#appOwner option:first").after(myOption);
 	
 </script>
-<g:form method="post">
+<g:form method="post" action="save"  onsubmit="return validateSme()">
 	<input type="hidden" id="appl_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="appl_sme" name="appSmeFilter" value="" />
 	<input type="hidden" id="appl_validation" name="appValidationFilter" value="" />
@@ -50,8 +57,8 @@
 									name="appVendor" value="${applicationInstance.appVendor}"  tabindex="11" />
 								</td>
 								<td class="label ${applicationInstance.sme}" nowrap="nowrap"><label for="sme">SME1</label></td>
-								<td ><input type="text" id="sme" name="sme" class="${config.sme}"
-									value="${applicationInstance.sme}"  tabindex="22" />
+								<td ><g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme}"  optionKey="id" optionValue="${{it.firstName+' '+(it.lastName?:'') }}" 
+													onchange="openPersonDiv(this.value,this.id)" tabindex="38" noSelection="${['':' Please Select']}" />
 								</td>
 								<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment</label>
 								</td>
@@ -71,8 +78,8 @@
 									name="appVersion" value="${applicationInstance.appVersion}"  tabindex="13" />
 								</td>
 								<td class="label ${config.sme2}" nowrap="nowrap"><label for="sme2">SME2</label></td>
-								<td ><input type="text" id="sme2" name="sme2" class="${config.sme2}"
-									value="${applicationInstance.sme2}"  tabindex="23" />
+								<td ><g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2}" optionKey="id" optionValue="${{it.firstName+' '+(it.lastName?:'') }}" 
+											onchange="openPersonDiv(this.value, this.id)" tabindex="38" noSelection="${['':' Please Select']}" />
 								</td>
 								<td class="label ${config.criticality}" nowrap="nowrap"><label for="criticality">Criticality</label>
 								</td>
@@ -104,7 +111,8 @@
 								<td ><input type="text" id="appSource"	class="${config.appSource}" name="appSource" value="${applicationInstance.appSource}" tabindex="15" />
 								</td>
 								<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
-								<td ><input type="text" id="appOwner" class="${config.owner}" name="appOwner"	value="" tabindex="25" />
+								<td ><g:select from="${personList}" id="appOwner" name="appOwner.id" class="${config.owner}" optionKey="id" optionValue="${{it.firstName+' '+(it.lastName?:'')}}" 
+											onchange="openPersonDiv(this.value, this.id)" tabindex="38" noSelection="${['':' Please Select']}" />
 								</td>
 								<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label>
 								</td>
@@ -241,11 +249,23 @@
 					<input name="attributeSet.id" type="hidden" value="1" />
 					<input name="project.id" type="hidden" value="${projectId}" />
 					<span class="button"><g:actionSubmit class="save" value="Save" /> </span>
+					 </span>
 				</div></td>
 		</tr>
 	</table>
 </g:form>
+
 <script>
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')
+	
+    function validateSme(){
+	    var flag = true
+		if($("#sme1").val()=='0' || $("#sme2").val()=='0' || $("#appOwner").val()=='0'){
+			flag = false
+			alert("Please De-select 'Add-Person' Option from sme , sme2 or appOwner select")
+			return flag
+		}
+		return flag
+	}
 </script>

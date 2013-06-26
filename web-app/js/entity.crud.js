@@ -287,24 +287,30 @@ function submitMoveForm(){
 		}
 	});
 }
-function updateToShow(){
+function updateToShow(forWhom){
 	$('#updateView').val('updateView')
-	jQuery.ajax({
-		url: $('#editAssetsFormId').attr('action'),
-		data: $('#editAssetsFormId').serialize(),
-		type:'POST',
-		success: function(data) {
-			if(data.errMsg){
-				alert(data.errMsg)
-			}else{
-				$('#editEntityView').dialog('close')
-				$('#showEntityView').html(data)
-				$("#showEntityView").dialog('option', 'width', 'auto')
-				$("#showEntityView").dialog('option', 'position', ['center','top']);
-				$("#showEntityView").dialog('open');
+	var flag=true
+	if(forWhom=='app'){
+		flag = validateSme()
+	}
+	if(flag){
+		jQuery.ajax({
+			url: $('#editAssetsFormId').attr('action'),
+			data: $('#editAssetsFormId').serialize(),
+			type:'POST',
+			success: function(data) {
+				if(data.errMsg){
+					alert(data.errMsg)
+				}else{
+					$('#editEntityView').dialog('close')
+					$('#showEntityView').html(data)
+					$("#showEntityView").dialog('option', 'width', 'auto')
+					$("#showEntityView").dialog('option', 'position', ['center','top']);
+					$("#showEntityView").dialog('open');
+				}
 			}
-		}
-	});
+		});
+	}
 	
 }
 

@@ -95,7 +95,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	Room roomSource
 	Rack rackTarget
 	Room roomTarget
-	String appOwner = ""
+	Person appOwner 
 	String appSme = ""
 
 	// MoveBundleAsset fields
@@ -198,7 +198,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		roomSource( nullable:true )
 		rackTarget( nullable:true )
 		roomTarget( nullable:true )
-		appOwner( blank:true, nullable:true )
+		appOwner( nullable:true )
 		appSme( blank:true, nullable:true )
 	
 		// MoveBundleAsset fields
@@ -233,6 +233,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		planStatus column:'new_or_old'
 		sourceTeamMt column:'source_team_id'
 		targetTeamMt column:'target_team_id'
+		appOwner column:'app_owner_id'
 		moveBundle ignoreNotFound:true
 		owner ignoreNotFound: true
 		columns {

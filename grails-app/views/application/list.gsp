@@ -6,7 +6,7 @@
 <title>Application list</title>
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
-
+<g:javascript src="projectStaff.js" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
@@ -30,6 +30,7 @@ $(document).ready(function() {
     $("#editCommentDialog").dialog({ autoOpen: false })
     $("#manufacturerShowDialog").dialog({ autoOpen: false })
     $("#modelShowDialog").dialog({ autoOpen: false })
+   	$("#createStaffDialog").dialog({ autoOpen: false })
     $("#filterPane").draggable()
 
    // JqGrid implementations 
@@ -159,6 +160,9 @@ function populateFilter(){
 <div id="createEntityView" style="display: none;" ></div>
 <div id="showEntityView" style="display: none;"></div>
 <div id="editEntityView" style="display: none;"></div>
+<div id="createStaffDialog" style="display:none;">
+	<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
+</div>
 <div style="display: none;">
 	<table id="assetDependencyRow">
 	<tr>

@@ -8,9 +8,15 @@
 		// Ajax to populate dependency selects in edit pages
 		var assetId = '${applicationInstance.id}'
 		populateDependency(assetId, 'application')
+
+		var myOption = "<option value='0'>Add Person...</option>"
+
+		$("#sme1Edit option:first").after(myOption);
+		$("#sme2Edit option:first").after(myOption);
+		$("#appOwnerEdit option:first").after(myOption);
 	})
 </script>
-<g:form method="post" action="update" name="editAssetsFormId">
+<g:form method="post" action="update" name="editAssetsFormId" onsubmit="return validateSme()">
 
 	<input type="hidden" id="appl_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="appl_sme" name="appSmeFilter" value="" />
@@ -56,8 +62,8 @@
 									name="appVendor" value="${applicationInstance.appVendor}"  tabindex="11" />
 								</td>
 								<td class="label ${config.sme}" nowrap="nowrap"><label for="sme">SME1</label></td>
-								<td ><input type="text" id="sme" name="sme" class="${config.sme}"
-									value="${applicationInstance.sme}"  tabindex="22" />
+								<td ><g:select from="${personList}" id="sme1Edit" name="sme.id" class="${config.sme}" optionKey="id" optionValue="${{it.firstName+' '+(it.lastName?:'') }}" 
+													onchange="openPersonDiv(this.value,this.id)" value="${applicationInstance.sme?.id}"  tabindex="38" noSelection="${['':' Please Select']}" />
 								</td>
 								<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment</label>
 								</td>
@@ -77,8 +83,8 @@
 									name="appVersion" value="${applicationInstance.appVersion}"  tabindex="12" />
 								</td>
 								<td class="label ${config.sme2}" nowrap="nowrap"><label for="sme2">SME2</label></td>
-								<td ><input type="text" id="sme2" class="${config.sme2}" name="sme2"
-									value="${applicationInstance.sme2}"  tabindex="23" />
+								<td ><g:select from="${personList}" id="sme2Edit" name="sme2.id" class="${config.sme2}" optionKey="id" optionValue="${{it.firstName+' '+(it.lastName?:'') }}" 
+											onchange="openPersonDiv(this.value, this.id)" value="${applicationInstance.sme2?.id}" tabindex="38" noSelection="${['':' Please Select']}" />
 								</td>
 								<td class="label ${config.criticality}" nowrap="nowrap"><label for="criticality">Criticality</label>
 								</td>
@@ -109,7 +115,8 @@
 								<td ><input type="text" id="appSource"	class="${config.appSource}" name="appSource" value="${applicationInstance.appSource}" tabindex="14" />
 								</td>
 								<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
-								<td ><input type="text" id="appOwner" class="${config.owner}" name="appOwner"	value="${applicationInstance.appOwner}" tabindex="25" />
+								<td ><g:select from="${personList}" id="appOwnerEdit" class="${config.owner}" name="appOwner.id"  optionKey="id" optionValue="${{it.firstName+' '+(it.lastName?:'')}}" 
+											onchange="openPersonDiv(this.value, this.id)" value="${applicationInstance.appOwner?.id}" tabindex="25" noSelection="${['':' Please Select']}" />
 								</td>
 								<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label>
 								</td>
@@ -214,7 +221,7 @@
 					  <g:else>
 					  	<span class="button"><g:actionSubmit class="save updateDep" value="Update/Close" action="Update" /></span>
 					  </g:else>
-					  <span class="button"><input type="button" class="save updateDep" value="Update/View" onclick="updateToShow()" /> </span>
+					  <span class="button"><input type="button" class="save updateDep" value="Update/View" onclick="updateToShow('app'); " /> </span>
 					  <span class="button"><g:actionSubmit class="delete"	onclick=" return confirm('Are you sure?');" value="Delete" /> </span>
 					</g:if>
 					<g:else>
@@ -230,4 +237,14 @@
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')
 	$('#tabType').val($('#assetTypesId').val())
+	
+	function validateSme(){
+	    var flag = true
+		if($("#sme1Edit").val()=='0' || $("#sme2Edit").val()=='0' || $("#appOwnerEdit").val()=='0'){
+			flag = false
+			alert("Please De-select 'Add-Person' Option from sme , sme2 or appOwner select")
+			return flag
+		}
+		return flag
+	}
 </script>

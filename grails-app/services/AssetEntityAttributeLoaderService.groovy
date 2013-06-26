@@ -1,8 +1,8 @@
-import java.io.*
-
 import jxl.*
 import jxl.read.biff.*
 import jxl.write.*
+
+import org.apache.commons.lang.StringUtils
 
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetEntity
@@ -17,6 +17,8 @@ class AssetEntityAttributeLoaderService {
 
 	boolean transactional = true
 	def eavAttribute
+	def securityService
+	def partyRelationshipService
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
 	protected static targetTeamType = ['MOVE_TECH':'targetTeamMt', 'CLEANER':'targetTeamLog','SYS_ADMIN':'targetTeamSa',"DB_ADMIN":'targetTeamDba']
 	protected static sourceTeamType = ['MOVE_TECH':'sourceTeamMt', 'CLEANER':'sourceTeamLog','SYS_ADMIN':'sourceTeamSa',"DB_ADMIN":'sourceTeamDba']
@@ -609,5 +611,50 @@ class AssetEntityAttributeLoaderService {
 			 }
 		 }
 		 return assetType
+	 }
+	 
+	 /**
+	  * This method is used to find a person object after importing and if not found create it
+	  * @param importValue is value what is there in excel file consist firstName and LastName
+	  * @param create : create is flag which will determine if person does not exist in db should they create record or not
+	  * @return instance of person
+	  */
+	 def findOrCreatePerson(importValue, def create = false){
+		 def project = securityService.getUserCurrentProject()
+		 def firstName
+		 def lastName
+		 if(importValue.contains(",")){
+			  def splittedName = importValue.split(",")
+			 firstName = splittedName[1].trim()
+			 lastName = splittedName[0].trim()
+		 } else if(StringUtils.containsAny(importValue, " ")){
+			  def splittedName = importValue.split("\\s+")
+			  firstName = splittedName[0].trim()
+			  lastName = splittedName[1].trim()
+		 } else {
+			 firstName = importValue.trim()
+		 }
+		 
+		 //Serching Person in compnies staff list .
+		 def personList = partyRelationshipService.getCompanyStaff(project.client.id)
+		 def person = personList.find{it.firstName==firstName && it.lastName==lastName}
+		 if(!person && firstName && create){
+			 log.debug "Person $firstName $lastName does not found in selected company"
+			 person = new Person('firstName':firstName, 'lastName':lastName, 'staffType':'Contractor')
+			 if(!person.save(insert:true, flush:true)){
+				 def etext = "findOrCreatePerson Unable to create Person"+GormUtil.allErrorsString( person )
+				 log.error( etext )
+			 }
+			 def partyRelationshipType = PartyRelationshipType.findById( "STAFF" )
+			 def roleTypeFrom = RoleType.findById( "COMPANY" )
+			 def roleTypeTo = RoleType.findById( "STAFF" )
+			 
+			 def partyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType,
+				 partyIdFrom :project.client, roleTypeCodeFrom:roleTypeFrom, partyIdTo:person,
+				 roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" )
+			 .save( insert:true, flush:true )
+		 }
+		 
+		return person
 	 }
 }

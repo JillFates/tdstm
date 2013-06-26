@@ -1,13 +1,14 @@
 package com.tds.asset
 
 
+import Person
 import com.tdssrc.grails.GormUtil
 
 class Application extends AssetEntity{
 	String appVendor
 	String appVersion
-	String sme
-	String sme2
+	Person sme
+	Person sme2
 	String url
 	String appTech
 	String appAccess
@@ -30,9 +31,9 @@ class Application extends AssetEntity{
     static constraints = {
 		appVendor( blank:true, nullable:true )
 		appVersion( blank:true, nullable:true )
-		appOwner( blank:true, nullable:true )
-		sme( blank:true, nullable:true )
-		sme2( blank:true, nullable:true )
+		appOwner( nullable:true )
+		sme( nullable:true )
+		sme2( nullable:true )
 		url( blank:true, nullable:true )
 		appTech( blank:true, nullable:true )
 		appAccess( blank:true, nullable:true )
@@ -57,6 +58,8 @@ class Application extends AssetEntity{
 		autoTimestamp false
 		tablePerHierarchy false
 		id column:'app_id'
+		sme column:'sme_id'
+		sme2 column:'sme2_id'
 	}
 	/*
 	 * Date to insert in GMT

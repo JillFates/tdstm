@@ -221,13 +221,17 @@ class PersonController {
 				
 	            //redirect( action:list, id:person.id , params:[companyId:companyId] )
 				
-	        }else {
-				person.errors.each{
-					log.error"-->"+it
-				}
+	        }else { 
+				def errMsg = GormUtil.allErrorsString(person)
 	            def companyId = params.company
 	            flash.message = "Person FirstName cannot be blank. "
-	            redirect( action:list )
+				if(params.forWhom == "person"){
+					redirect( action:list )
+				}else{
+					def errMap = [errMsg : errMsg]
+					render errMap as JSON
+					return
+				}
 	        }
 		}
 		def paramsMap = [ id: person.id, name:fullName, isPersonExist:isPersonExist, fieldName:params.fieldName]

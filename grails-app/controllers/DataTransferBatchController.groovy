@@ -450,7 +450,7 @@ class DataTransferBatchController {
 										     }
 											break;
 										case "owner":
-												application."$attribName" = application.owner
+											   application."$attribName" = application.owner
 											break;
 										case "validation":
 												if(!it.importValue){
@@ -465,6 +465,24 @@ class DataTransferBatchController {
 												} else {
 													application."$attribName" = it.importValue
 												}
+												break;
+										case "sme":
+												if(it.importValue){
+													def person = assetEntityAttributeLoaderService.findOrCreatePerson(it.importValue, true)
+													application."$attribName" = person
+												} 
+												break;
+										case "sme2":
+												if(it.importValue){
+													def person = assetEntityAttributeLoaderService.findOrCreatePerson(it.importValue, true)
+													application."$attribName" = person
+												} 
+												break;
+										case "appOwner":
+												if(it.importValue){
+													def person = assetEntityAttributeLoaderService.findOrCreatePerson(it.importValue, true)
+													application."$attribName" = person
+												} 
 												break;
 										default:
 										if( it.eavAttribute.backendType == "int"){

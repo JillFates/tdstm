@@ -49,12 +49,18 @@ class ApplicationController {
 		def entities = assetEntityService.entityInfo( project )
 		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
 		
+		
+		def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
+		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
+		def company = project.client
+		
 		return [projectId: project.id, assetDependency: new AssetDependency(),
 			servers : entities.servers, applications : entities.applications, dbs : entities.dbs, files : entities.files, networks : entities.networks, dependencyType:entities.dependencyType, 
 			dependencyStatus:entities.dependencyStatus,event:params.moveEvent, filter:params.filter, latency:params.latency,
 		    staffRoles:taskService.getRolesForStaff(), plannedStatus:params.plannedStatus, appSme : filters?.appSmeFilter ?:'',
 			validation:params.validation, moveBundleId:params.moveBundleId, appName:filters?.assetNameFilter ?:'', sizePref:sizePref, 
-			validationFilter:filters?.appValidationFilter ?:'', moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:''
+			validationFilter:filters?.appValidationFilter ?:'', moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'',
+			totalCompanies:companiesList, availabaleRoles:availabaleRoles, company:company
 			]
 	}
 	/**
@@ -141,7 +147,7 @@ class ApplicationController {
 		def totalRows = apps.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
 
-		def results = apps?.collect { [ cell: ['',it.assetName, it.sme, it.validation, it.planStatus,
+		def results = apps?.collect { [ cell: ['',it.assetName, (it.sme ? it.sme.toString() : ''), it.validation, it.planStatus,
 					it.moveBundle?.name, AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
 					AssetDependency.countByDependentAndStatusNotEqual(it, "Validated"),
 					AssetDependency.countByAssetAndStatusNotEqual(it, "Validated"),
@@ -159,17 +165,19 @@ class ApplicationController {
 		def applicationInstance = new Application(appOwner:'TDS')
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
-		def projectId = session.getAttribute( "CURR_PROJ" )?.CURR_PROJ
-		def project = Project.read(projectId)
+		def project = securityService.getUserCurrentProject()
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
+	
+		def personList = partyRelationshipService.getCompanyStaff( project.client?.id )
+		
 		//fieldImportance for Discovery by default
 		def configMap = assetEntityService.getConfig('Application','Discovery')
 		
 		[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-		planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project,moveEventList:moveEventList,
-			config:configMap.config, customs:configMap.customs]
+			planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project,moveEventList:moveEventList,
+			config:configMap.config, customs:configMap.customs, personList:personList, company:project.client]
 	}
 	def save = {
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
@@ -254,8 +262,7 @@ class ApplicationController {
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
-		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = Project.read(projectId)
+		def project = securityService.getUserCurrentProject()
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 
 		def id = params.id
@@ -271,7 +278,7 @@ class ApplicationController {
 			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 			def moveEvent = MoveEvent.findAllByProject(project,[sort:'name'])
-			def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
+			def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =${project.id} order by assetName asc")
 			moveEvent.each{
 			   def appMoveList = AppMoveEvent.findByApplicationAndMoveEvent(applicationInstance,it)
 			   if(!appMoveList){
@@ -281,14 +288,16 @@ class ApplicationController {
 				   appMoveInstance.save(flush:true)
 			   }
 			}
+			def personList = partyRelationshipService.getCompanyStaff( project.client?.id )
+			
 			//fieldImportance Styling for default validation.
 			def validationType = applicationInstance.validation
 			def configMap = assetEntityService.getConfig('Application',validationType)
 			
 			[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
-						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets,
+						planStatusOptions:planStatusOptions?.value, projectId:project.id, supportAssets: supportAssets,
 						dependentAssets:dependentAssets, redirectTo : params.redirectTo,dependencyType:dependencyType, dependencyStatus:dependencyStatus,
-						moveEvent:moveEvent,servers:servers, config:configMap.config, customs:configMap.customs]
+						moveEvent:moveEvent,servers:servers, personList:personList, config:configMap.config, customs:configMap.customs]
 		}
 
 	}
@@ -308,7 +317,7 @@ class ApplicationController {
 		if(retireDate){
 			params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
 		}
-		def applicationInstance = Application.get(params.id)
+		def applicationInstance = Application.get(params.id)		
 		applicationInstance.properties = params
 		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
 			flash.message = "Application ${applicationInstance.assetName} Updated"

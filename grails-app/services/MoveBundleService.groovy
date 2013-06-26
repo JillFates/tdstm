@@ -25,8 +25,7 @@ class MoveBundleService {
 	def userPreferenceService
 	def sessionFactory
 	def assetEntityService
-    
-	boolean transactional = true
+    def partyRelationshipService
 	
 	/*----------------------------------------------
 	 * @author : Lokanada Reddy
@@ -496,13 +495,18 @@ class MoveBundleService {
 		 def filesListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.FILES.toString() }.size()
 		 
 		 def moveBundles = MoveBundle.findAllByProject(projectInstance)
+		 
+		 def personList = partyRelationshipService.getCompanyStaff( projectInstance.client?.id )
+		 
+		 def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
+		 def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
  
 		 def map = [assetDependencyList:assetDependencyList, dependencyType:entities.dependencyType, dependencyConsoleList:dependencyConsoleList,
 				 date:time, dependencyStatus:entities.dependencyStatus, assetDependency:new AssetDependency(), dependencyBundleCount:dependencyBundleCount,
 				 servers:entities.servers, applications:entities.applications, dbs:entities.dbs, files:entities.files,moveBundle:moveBundleList, planStatusOptions:planStatusOptions,
 				 applicationListSize:applicationListSize, physicalListSize:physicalListSize,virtualListSize:virtualListSize,
-				 asset:'Apps', databaseListSize:databaseListSize, filesListSize:filesListSize,
-				 allMoveBundles:moveBundles, networks:entities.networks]
+				 asset:'Apps', databaseListSize:databaseListSize, filesListSize:filesListSize, totalCompanies:companiesList,
+				 allMoveBundles:moveBundles, networks:entities.networks, personList:personList, company:projectInstance.client, availabaleRoles:availabaleRoles]
 		 
 		 return map
 	 }

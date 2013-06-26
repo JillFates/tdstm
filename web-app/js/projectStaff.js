@@ -272,11 +272,29 @@ function validatePersonForm(form) {
 				data : $('#createDialogForm').serialize(),
 				type : 'POST',
 				success : function(data) {
-					$("#createStaffDialog").dialog('close')
-					if(!data.isPersonExist)
-						$('#'+data.fieldName).append('<option value="'+data.id+'" selected>'+data.name+'</option>');
-					else
-						$('#'+data.fieldName).val(data.id)
+					alert(data.errMsg)
+					if(data.errMsg){
+						alert(data.errMsg)
+					}else{
+						$("#createStaffDialog").dialog('close')
+						if(!data.isPersonExist)
+							$('#'+data.fieldName).append('<option value="'+data.id+'" selected>'+data.name+'</option>');
+						else
+							$('#'+data.fieldName).val(data.id)
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					alert(textStatus +"->"+errorThrown)
 				}
 			});
+}
+ 
+function openPersonDiv(value, fieldName){
+		if(value=="0"){
+			$("#createStaffDialog").show()
+			$("#createStaffDialog").dialog('option', 'width', 500)
+			$("#createStaffDialog").dialog("open")
+			$("#fieldName").val( fieldName )
+			$("#createStaffDialog").dialog( "option", "title", "Create Person" );
+		}
 }

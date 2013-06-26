@@ -7,6 +7,7 @@
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
 <g:javascript src="model.manufacturer.js"/>
+<g:javascript src="projectStaff.js" />
 <script type="text/javascript" src="${resource(dir:'d3',file:'d3.v2.js')} "></script>
 <link rel="stylesheet" href="${resource(dir:'d3/force',file:'force.css')}" type="text/css"/>
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
@@ -28,6 +29,7 @@ $(document).ready(function() {
 	$("#modelShowDialog").dialog({ autoOpen: false })
 	$("#moveBundleSelectId").dialog({ autoOpen: false })
 	$("#editManufacturerView").dialog({ autoOpen: false})
+	$("#createStaffDialog").dialog({ autoOpen: false })
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')	
 
@@ -126,6 +128,9 @@ $(document).ready(function() {
 		<div id="showEntityView" style="display: none;"></div>
 		<div id="editEntityView" style="display: none;"></div>
 		<div id="editManufacturerView" style="display: none;"></div>
+		<div id="createStaffDialog" style="display:none;">
+			<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
+		</div>
 		<div style="display: none;">
 		  <g:select name="moveBundleList" id="moveBundleList_all" from="${allMoveBundles}" optionKey="id"></g:select><br></br>
 		  <g:select name="moveBundleList" id="moveBundleList_planning" from="${moveBundle}" optionKey="id"></g:select><br></br>
