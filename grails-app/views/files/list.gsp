@@ -59,7 +59,6 @@ $(document).ready(function() {
     sortname="'assetName'"
     caption="listCaption"
    	height="'100%'"
-    width="1000"
    	rowNum="sizePref"
  	rowList= "'25','100','500','1000'"
     multiselect="true"
@@ -70,7 +69,6 @@ $(document).ready(function() {
     datatype="'json'">
     <jqgrid:filterToolbar id="storageId" searchOnEnter="false" />
     <jqgrid:navigation id="storageId" add="false" edit="false" del="true" search="false" refresh="true"/>
-    <jqgrid:resize id="storageId" resizeOffset="-2" />
 </jqgrid:grid>
 	populateFilter();
 
@@ -107,13 +105,22 @@ function populateFilter(){
 	$("#gs_planStatus").val('${planStatus}')
 	$("#gs_moveBundle").val('${moveBundle}')
 }
+$('#storageIdWrapper').width($('.fluid').width()-16) // 16 pixels comptensates for the border/padding/etc and the scrollbar
+$('#storageIdGrid').fluidGrid({ base:'#storageIdWrapper', offset: 0 });
 })
+$(window).resize(resizeGrid);
+
+// Called when the window is resized to resize the grid wrapper 
+function resizeGrid(){
+	$('#storageIdWrapper').width($('.fluid').width()-2) // 2 pixels comptensates for the border/padding/etc
+	$('#storageIdGrid').fluidGrid({ base:'#storageIdWrapper', offset: 0 });
+}
 
 </script>
 
 </head>
 <body>
-<div class="body">
+<div class="body fluid">
 <h1>Storage List</h1>
 <g:if test="${flash.message}">
 <div class="message">${flash.message}</div>

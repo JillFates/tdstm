@@ -23,7 +23,6 @@ $(document).ready(function() {
 	    sortname="'name'"
 	    caption="'Manufacturers'"
 	   	height="'100%'"
-	    width="1000"
 	    rowNum="'25'"
 	    rowList= "'25','100','500','1000'"
 	    viewrecords="true"
@@ -31,18 +30,26 @@ $(document).ready(function() {
 	    datatype="'json'">
 	    <jqgrid:filterToolbar id="manufacturerId" searchOnEnter="false" />
 	    <jqgrid:navigation id="manufacturerId" add="false" edit="false" del="false" search="false" refresh="true" />
-	    <jqgrid:resize id="manufacturerId" resizeOffset="-2" />
 	</jqgrid:grid>
 	$.jgrid.formatter.integer.thousandsSeparator='';
 	function myLinkFormatter (cellvalue, options, rowObjcet) {
 		var value = cellvalue ? cellvalue : ''
 			return '<a href="javascript:showOrEditModelManuDetails(\'manufacturer\','+options.rowId+',\'Manufacturer\',\'show\',\'Show\')">'+value+'</a>'
 	}
-});
+	$('#manufacturerIdWrapper').width($('.fluid').width()-16) // 16 pixels comptensates for the border/padding/etc and the scrollbar
+	$('#manufacturerIdGrid').fluidGrid({ base:'#manufacturerIdWrapper', offset: 0 });
+})
+$(window).resize(resizeGrid);
+
+// Called when the window is resized to resize the grid wrapper 
+function resizeGrid(){
+	$('#manufacturerIdWrapper').width($('.fluid').width()-2) // 2 pixels comptensates for the border/padding/etc
+	$('#manufacturerIdGrid').fluidGrid({ base:'#manufacturerIdWrapper', offset: 0 });
+}
 </script>
 </head>
 <body>
-<div class="body">
+<div class="body fluid">
 <h1>Manufacturer List</h1>
 <g:if test="${flash.message}">
 	<div id="messageDivId" class="message">${flash.message}</div>

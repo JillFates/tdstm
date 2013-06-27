@@ -46,7 +46,7 @@ $(document).ready(function() {
     <jqgrid:grid id="databaseId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Name', 'DB Format','Plan Status','Bundle','Dep # ','Dep Up','Dep Down','id', 'commentType'"
-    colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'80'},
+    colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'50', fixed:false},
       			  {name:'assetName',index: 'assetName', editable: true, formatter: myLinkFormatter, width:'300'},
       			  {name:'dbFormat', editable: true},
                   {name:'planStatus', editable: true}, 
@@ -59,7 +59,6 @@ $(document).ready(function() {
     sortname="'assetName'"
     caption="listCaption"
    	height="'100%'"
-    width="1000"
    	rowNum="sizePref"
  	rowList= "'25','100','500','1000'"
     multiselect="true"
@@ -116,8 +115,16 @@ function populateFilter(){
 	$("#gs_planStatus").val('${planStatus}')
 	$("#gs_moveBundle").val('${moveBundle}')
 }
-
+$('#databaseIdWrapper').width($('.fluid').width()-16) // 16 pixels comptensates for the border/padding/etc and the scrollbar
+$('#databaseIdGrid').fluidGrid({ base:'#databaseIdWrapper', offset: 0 });
 })
+$(window).resize(resizeGrid);
+
+// Called when the window is resized to resize the grid wrapper 
+function resizeGrid(){
+	$('#databaseIdWrapper').width($('.fluid').width()-2) // 2 pixels comptensates for the border/padding/etc
+	$('#databaseIdGrid').fluidGrid({ base:'#databaseIdWrapper', offset: 0 });
+}
 </script>
 
 <title>DB list</title>
@@ -125,7 +132,7 @@ function populateFilter(){
 <body>
 
 	
-<div class="body">
+<div class="body fluid">
 <h1>DB List</h1>
 <g:if test="${flash.message}">
 	<div id="messageDivId" class="message">${flash.message}</div>

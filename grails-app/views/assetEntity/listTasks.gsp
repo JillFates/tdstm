@@ -72,7 +72,7 @@
 	    	<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
 	            colNames="'Action', 'Task', 'Description', 'Asset', 'AssetType', 'Updated', 'Due', 'Status',
 		            'Assigned To', 'Team', 'Category', 'Suc.', 'Score', 'id', 'statusCss'"
-	            colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50},
+	            colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
             				{name:'taskNumber', editable: true, formatter:taskFormatter, width:80},
                             {name:'comment', editable: true, width:680, formatter:taskFormatter},
                             {name:'assetEntity', editable: true, formatter:assetFormatter, width:200},
@@ -89,7 +89,6 @@
                             {name:'statusCss', hidden: true}"
 	            caption="listCaption"
 	            height="'100%'"
-	            width="windowWidth"
             	rowNum="sizePref"
 	            rowList= "'25','100', '500','1000'"
 	            scrollOffset="0"
@@ -101,11 +100,19 @@
 	            <jqgrid:filterToolbar id="taskListId" searchOnEnter="false" />
 	            <jqgrid:navigation id="taskListId" add="false" edit="false" 
 	                  del="false" search="false" refresh="false" />
-	            <jqgrid:resize id="taskListId" resizeOffset="-2" />
 	            <jqgrid:refreshButton id="taskListId" />
 	     		</jqgrid:grid>
 	     		populateFilter();
-        });
+				$('#taskListIdWrapper').width($('.fluid').width()-16) // 16 pixels comptensates for the border/padding/etc and the scrollbar
+				$('#taskListIdGrid').fluidGrid({ base:'#taskListIdWrapper', offset: 0 });
+			})
+			$(window).resize(resizeGrid);
+
+			// Called when the window is resized to resize the grid wrapper 
+			function resizeGrid(){
+				$('#taskListIdWrapper').width($('.fluid').width()-2) // 2 pixels comptensates for the border/padding/etc
+				$('#taskListIdGrid').fluidGrid({ base:'#taskListIdWrapper', offset: 0 });
+			}
 		
         $.jgrid.formatter.integer.thousandsSeparator='';
 
@@ -164,11 +171,11 @@
 </head>
 <body>
 	<input type="hidden" id="timeBarValueId" value="0"/>
-	<div class="body">
+	<div id="outerBodyId" class="body">
 		<div class="taskTimebar" id="issueTimebar" >
 			<div id="issueTimebarId"></div>
 		</div>
-		<div class="body">
+		<div class="body fluid">
 			<h1>Task Manager</h1>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>

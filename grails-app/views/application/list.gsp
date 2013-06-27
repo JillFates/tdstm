@@ -50,7 +50,7 @@ $(document).ready(function() {
     <jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Name', 'App Sme','Validation', 'Plan Status','Bundle','Dep # ','Dep Up','Dep Down','id', 'commentType'"
-    colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'80'},
+    colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'50', fixed:true},
       			  {name:'assetName',index: 'assetName', editable: true, formatter: myLinkFormatter, width:'300'},
       			  {name:'sme', editable: true},
                   {name:'validation', editable: true, width:'200'},
@@ -64,18 +64,19 @@ $(document).ready(function() {
     sortname="'assetName'"
     caption="listCaption"
    	height="'100%'"
-    width="1000"
     rowNum="sizePref"
     rowList= "'25','100','500','1000'"
     multiselect="true"
     viewrecords="true"
     showPager="true"
-    postData="{filter: filter, event:event, latency:latency, plannedStatus:plannedStatus, validationFilter:validation, moveBundleId:moveBundleId,
+	loadComplete=function(){
+		resizeGrid()
+    }
+	postData="{filter: filter, event:event, latency:latency, plannedStatus:plannedStatus, validationFilter:validation, moveBundleId:moveBundleId,
     	assetName:appName, planStatus:planStatus, moveBundle:moveBundle, validation:validationFilter, sme:appSme}"
     datatype="'json'">
     <jqgrid:filterToolbar id="applicationId" searchOnEnter="false" />
     <jqgrid:navigation id="applicationId" add="false" edit="false" del="true" search="false" refresh="true" />
-    <jqgrid:resize id="applicationId" resizeOffset="-2" />
 </jqgrid:grid>
 	populateFilter();
 	
@@ -133,15 +134,20 @@ function populateFilter(){
 	}
 	$("#gs_moveBundle").val('${moveBundle}')
 }
-
+	$('#applicationIdWrapper').width($('.fluid').width()-16) // 16 pixels comptensates for the border/padding/etc and the scrollbar
+	$('#applicationIdGrid').fluidGrid({ base:'#applicationIdWrapper', offset: 0 });
 })
+$(window).resize(resizeGrid);
+
+// Called when the window is resized to resize the grid wrapper 
+function resizeGrid(){
+	$('#applicationIdWrapper').width($('.fluid').width()-2) // 2 pixels comptensates for the border/padding/etc
+	$('#applicationIdGrid').fluidGrid({ base:'#applicationIdWrapper', offset: 0 });
+}
 </script>
 </head>
 <body>
-
-<div class="body">
-
-<br/>
+<div class="body fluid">
 <h1>Application List</h1>
 <g:if test="${flash.message}">
 	<div id="messageDivId" class="message">${flash.message}</div>
@@ -149,7 +155,7 @@ function populateFilter(){
 <div >
 	<div id="messageId" class="message" style="display:none"></div>
 </div>
-<jqgrid:wrapper id="applicationId" /> 
+<jqgrid:wrapper id="applicationId" />
 <g:render template="../assetEntity/commentCrud"/>
 <g:render template="../assetEntity/modelDialog"/>
 <div class="buttons"> 

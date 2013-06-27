@@ -93,7 +93,6 @@ var listCaption ="Assets: <span class='capBtn'><input type='button' value='New A
     datatype="'json'">
     <jqgrid:filterToolbar id="assetListId" searchOnEnter="false" />
     <jqgrid:navigation id="assetListId" add="false" edit="false" del="true" search="false" refresh="true" />
-    <jqgrid:resize id="assetListId" resizeOffset="-2" />
 </jqgrid:grid>
 	populateFilter();
 	$("#del_assetListIdGrid").click(function(){
@@ -154,11 +153,20 @@ function populateFilter(){
 	$("#gs_moveBundle").val('${moveBundle}')
 	$("#gs_assetTag").val('${assetTag}')
 }
+$('#assetListIdWrapper').width($('.fluid').width()-16) // 16 pixels comptensates for the border/padding/etc and the scrollbar
+$('#assetListIdGrid').fluidGrid({ base:'#assetListIdWrapper', offset: 0 });
 })
+$(window).resize(resizeGrid);
+
+// Called when the window is resized to resize the grid wrapper 
+function resizeGrid(){
+	$('#assetListIdWrapper').width($('.fluid').width()-2) // 2 pixels comptensates for the border/padding/etc
+	$('#assetListIdGrid').fluidGrid({ base:'#assetListIdWrapper', offset: 0 });
+}
 </script>
 </head>
 <body>
-<div class="body">
+<div class="body fluid">
 <h1>Asset List</h1>
 <g:if test="${flash.message}">
 	<div id="messageDivId" class="message">${flash.message}</div>

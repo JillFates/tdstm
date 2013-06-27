@@ -435,7 +435,9 @@ span.cellWithoutBackground
 	width:105px;
 }
 #viewGraphSpanId{
-	position:absolute; 
+	position:relative;
+	float: right !important;
+	margin: 0px !important;
 }
 .ellipsis{
 	white-space:nowrap; 
@@ -523,6 +525,19 @@ td.buttons{
 	padding:0px;
 }
 
-div.ui-jqgrid {
-	width:100% !important;
+.fluid {
+	box-sizing: border-box;
+	width: 100% !important;
+	margin: 0px !important;
+	padding-top: 0px;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-bottom: 15px;
+}
+#gridTableId tbody tr td {
+	padding:0px;
+}
+#outerBodyId {
+	padding: 0px !important;
+	margin: 0px !important;
 }
