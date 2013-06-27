@@ -132,6 +132,7 @@
         <tds:hasPermission permission='ProjectDelete'>
           <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Warning: This will delete the ${projectInstance?.name} project and all of the assets, events, bundles, and any historic data?');" value="Delete" /></span>
         </tds:hasPermission>
+        <span class="menuButton"><g:link class="create" controller="project" action="assetFields">Field Importance</g:link></span>
       </g:form>
     </div></div>
 <script>
