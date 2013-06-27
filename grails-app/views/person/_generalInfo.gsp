@@ -34,19 +34,19 @@
 					</tr>
 
 					<tr class="prop">
+						<td valign="top" class="name"><label for="middleName">Middle
+								Name:</label></td>
+						<td valign="top" class="value" colspan="2" width="50%"><input
+							type="text" maxlength="64" id="middleNameId" name="middleName"
+							value="${person.middleName}" size="10" /></td>
+					</tr>
+
+					<tr class="prop">
 						<td valign="top" class="name"><label for="lastName">Last
 								Name:</label></td>
 						<td valign="top" class="value" colspan="2" width="50%"><input
 							type="text" maxlength="64" id="lastNameId" name="lastName"
 							value="${person.lastName}" size="10" /></td>
-					</tr>
-
-					<tr class="prop">
-						<td valign="top" class="name"><label for="middleName">Middle
-								Name:</label></td>
-						<td valign="top" class="value" colspan="2" width="50%"><input
-							type="text" maxlength="64" id="lastNameId" name="middleName"
-							value="${person.middleName}" size="10" /></td>
 					</tr>
 
 					<tr class="prop">
