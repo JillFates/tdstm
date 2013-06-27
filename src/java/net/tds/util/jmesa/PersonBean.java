@@ -12,6 +12,7 @@ public class PersonBean implements Serializable {
 	private long id;
 	private long userLoginId;
 	private String firstName;
+	private String middleName;
 	private String lastName;
 	private String userLogin;
 	private Date dateCreated;
@@ -53,6 +54,14 @@ public class PersonBean implements Serializable {
 
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
+	}
+
+	public String getMiddleName() {
+		return middleName;
+	}
+
+	public void setMiddleName(String middleName) {
+		this.middleName = middleName;
 	}
 
 	public String getLastName() {

@@ -70,6 +70,9 @@
 	              	 <jmesa:htmlColumn property="firstName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor"  nowrap>
 	                     <span id="${personBean.id}" style="cursor: pointer;" onClick="loadPersonDiv(this.id,'generalInfoShow')"><b>${personBean.firstName}</b></span>
 					 </jmesa:htmlColumn>
+					 <jmesa:htmlColumn property="middleName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
+						<span id="${personBean.id}" style="cursor: pointer;" onClick="loadPersonDiv(this.id,'generalInfoShow')"><b>${personBean.middleName}</b></span>
+					 </jmesa:htmlColumn>
 					 <jmesa:htmlColumn property="lastName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
 						<span id="${personBean.id}" style="cursor: pointer;" onClick="loadPersonDiv(this.id,'generalInfoShow')"><b>${personBean.lastName}</b></span>
 					 </jmesa:htmlColumn>

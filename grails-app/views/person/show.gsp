@@ -27,6 +27,14 @@
 		</tr>
 
 		<tr class="prop">
+			<td valign="top" class="name">Middle Name:</td>
+
+			<td valign="top" class="value">${fieldValue(bean:personInstance,
+			field:'middleName')}</td>
+
+		</tr>
+
+		<tr class="prop">
 			<td valign="top" class="name">Last Name:</td>
 
 			<td valign="top" class="value">${fieldValue(bean:personInstance,

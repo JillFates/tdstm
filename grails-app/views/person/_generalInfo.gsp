@@ -42,7 +42,15 @@
 					</tr>
 
 					<tr class="prop">
-						<td valign="top" class="name"><label for="lastName">Company:</label>
+						<td valign="top" class="name"><label for="middleName">Middle
+								Name:</label></td>
+						<td valign="top" class="value" colspan="2" width="50%"><input
+							type="text" maxlength="64" id="lastNameId" name="middleName"
+							value="${person.middleName}" size="10" /></td>
+					</tr>
+
+					<tr class="prop">
+						<td valign="top" class="name"><label for="company">Company:</label>
 						</td>
 						<td valign="top" class="value" colspan="2"><input type="text"
 							maxlength="64" id="companyId" name="Company" value="${company}" />

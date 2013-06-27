@@ -521,6 +521,15 @@
 
                 <tr class="prop">
                   <td valign="top" class="name">
+                    <label for="middleName">Middle Name:</label>
+                  </td>
+                  <td valign="top" class="value">
+                    <input type="text" maxlength="64" id="middleNameId" name="middleName"/>
+                  </td>
+                </tr>
+
+                <tr class="prop">
+                  <td valign="top" class="name">
                     <label for="lastName">Last Name:</label>
                   </td>
                   <td valign="top" class="value">

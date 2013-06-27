@@ -36,6 +36,20 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
+                                    <label for="middleName">Middle Name:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:personInstance,field:'middleName','errors')}">
+                                    <input type="text" maxlength="34" size="34" id="middleName" name="middleName" value="${fieldValue(bean:personInstance,field:'middleName')}"/>
+                                <g:hasErrors bean="${personInstance}" field="middleName">
+					            <div class="errors">
+					                <g:renderErrors bean="${personInstance}" as="list" field="middleName"/>
+					            </div>
+					            </g:hasErrors>
+                                </td>
+                            </tr> 
+                        
+                            <tr class="prop">
+                                <td valign="top" class="name">
                                     <label for="lastName">Last Name:</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:personInstance,field:'lastName','errors')}">

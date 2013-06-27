@@ -37,6 +37,14 @@
 						</tr>
 
 						<tr class="prop">
+							<td valign="top" class="name"><label for="middleName">Middle
+									Name:</label></td>
+							<td valign="top" class="value" colspan="2" width="50%"><span
+								class="personShow" id="middleNameId"> ${person.middleName}
+							</span></td>
+						</tr>
+
+						<tr class="prop">
 							<td valign="top" class="name"><label for="lastName">Last
 									Name:</label></td>
 							<td valign="top" class="value" colspan="2" width="50%"><span
@@ -45,7 +53,7 @@
 						</tr>
 
 						<tr class="prop">
-							<td valign="top" class="name"><label for="lastName">Company:</label>
+							<td valign="top" class="name"><label for="company">Company:</label>
 							</td>
 							<td valign="top" class="value" colspan="2"><span
 								class="personShow" id="companyId">
@@ -62,7 +70,7 @@
 							</span></td>
 						</tr>
 						<tr class="prop">
-							<td valign="top" class="name"><label for="nickName">Email:</label>
+							<td valign="top" class="name"><label for="email">Email:</label>
 							</td>
 							<td valign="top" class="value" colspan="2"><span
 								class="personShow" id="emailId">
@@ -101,7 +109,7 @@
 						</tr>
 
 						<tr class="prop">
-							<td valign="top" class="name"><label for="nickName">Active
+							<td valign="top" class="name"><label for="active">Active
 									:</label></td>
 							<td valign="top" class="value" colspan="2"><span
 								class="personShow" id="activeId">

@@ -37,6 +37,7 @@
 		        document.editForm.company.value = person.companyId
 		      	document.editForm.id.value = person.id
 		      	document.editForm.firstName.value = person.firstName
+		      	document.editForm.middleName.value = person.middleName
 		      	document.editForm.lastName.value = person.lastName
 		      	document.editForm.nickName.value = person.nickName
 		      	document.editForm.title.value = person.title
@@ -53,6 +54,7 @@
 	      		
                 $("#showCompanyId").html( person.companyName )      		
 				$("#showFirstName").html( person.firstName )
+				$("#showMiddleName").html( person.middleName )
 				$("#showLastName").html( person.lastName )
 				$("#showNickName").html( person.nickName)
 				$("#showTitle").html( person.title)
@@ -211,6 +213,15 @@
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
+                                    <label for="middleName">Middle Name:</label>
+                                </td>
+                                <td valign="top" class="value">
+                                    <input type="text" maxlength="64" id="middleName" name="middleName" value=""/>
+                                </td>
+                            </tr> 
+                        
+                            <tr class="prop">
+                                <td valign="top" class="name">
                                     <label for="lastName">Last Name:</label>
                                 </td>
                                 <td valign="top" class="value">
@@ -295,6 +306,15 @@
                                 </td>
                                 <td valign="top" class="value ">
                                     <span id="showFirstName" name="firstName" value=""></span>
+                                </td>
+                            </tr> 
+                        
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="middleName"><b>Middle Name:</b></label>
+                                </td>
+                                <td valign="top" class="name">
+                                    <span id="showMiddleName" name="middleName" value=""></span>
                                 </td>
                             </tr> 
                         
@@ -426,6 +446,15 @@
                                 </td>
                                 <td valign="top" class="value ">
                                     <input type="text" maxlength="64" id="firstName" name="firstName" value=""/>
+                                </td>
+                            </tr> 
+                        
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="middleName">Middle Name:</label>
+                                </td>
+                                <td valign="top" class="value">
+                                    <input type="text" maxlength="64" id="middleName" name="middleName" value=""/>
                                 </td>
                             </tr> 
                         

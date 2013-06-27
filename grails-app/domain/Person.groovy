@@ -1,6 +1,7 @@
 class Person extends Party {
 
 	String firstName
+	String middleName
 	String lastName
 	String nickName
 	String active = "Y"
@@ -30,6 +31,7 @@ class Person extends Party {
 	 */
 	 static constraints = {
 		 firstName( blank:false, nullable:false, maxLength:34 )
+		 middleName( blank:true, nullable:true, maxLength:34 )
 		 lastName( blank:true, nullable:true, maxLength:34 )
 		 title( blank:true, nullable:true, maxLength:34 )
 		 nickName( blank:true, nullable:true, maxLength:34 )
@@ -62,6 +64,7 @@ class Person extends Party {
 		id column:'person_id'
 		columns {
 			firstName sqlType:'varchar(34)'
+			middleName sqlType:'varchar(20)'
 			lastName sqlType:'varchar(34)'
 			nickName sqlType:'varchar(34)'
 			title sqlType:'varchar(34)'
@@ -76,7 +79,7 @@ class Person extends Party {
 	}
 
 	String toString(){
-		"$firstName $lastName"
+		"$firstName " + middleName?middleName:"" + "$lastName"
 	}
 
 }
