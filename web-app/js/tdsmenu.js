@@ -186,12 +186,16 @@
 		        tipTimer = null;
 		    }
 		}
-		function waitForMenu(e){
-	        clearTipTimer();
-	        tipTimer = setTimeout(function() {
-	            tipTimer = null;
-	            showMegaMenu(e);
-	        }, 500);
+		function waitForMenu(e, isMobile){
+			if(isMobile=='true'){
+				showMegaMenu(e)
+			}else{
+		        clearTipTimer();
+		        tipTimer = setTimeout(function() {
+		            tipTimer = null;
+		            showMegaMenu(e);
+		        }, 500);
+			}
 		}
 		
 		function showMegaMenu(e){
