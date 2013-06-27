@@ -14,6 +14,7 @@ grails.project.dependency.resolution = {
 	log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
 
 	repositories {
+		mavenRepo("http://tmdev.tdsops.com/grails-maven")
 		grailsPlugins()
 		grailsHome()
 		grailsCentral()
@@ -26,5 +27,6 @@ grails.project.dependency.resolution = {
 	plugins {
 		runtime ':database-migration:1.0'
 		runtime ':shiro:1.1.4'
+		// compile ':mongodb:1.0.0.RC4'
 	}
 }
