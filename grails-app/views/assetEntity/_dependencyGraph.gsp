@@ -98,6 +98,8 @@ $(document).ready(function() {
 	}else{
 	  $('#filesLabel').attr('checked',false)
 	}
+	if( ! document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1"))
+		$('.tabInner').html('Your browser does not support SVG, see <a href="http://caniuse.com/svg">http://caniuse.com/svg</a> for more details.')
 })
 function increaseValue(action, id ){
 	var value = parseFloat($("#"+id).val())
