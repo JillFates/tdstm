@@ -42,10 +42,6 @@ databaseChangeLog = {
     //include file: '20130522-create-default-project.groovy' // TODO : enable after John's review
 	include file: '20130624-update-recent-users-expiry-dates.groovy'
 	include file: '20130626-update-person-staff_type.groovy'
-	//
-	// Had to remove this migration script because it was causing issues in the deployment at Sentara
-	// com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Duplicate column name 'middle_name'
-	//
-	// include file: '20130627-add-person-middlename-column.groovy' 
+	include file: '20130627-add-person-middlename-column.groovy'
     
 }
