@@ -108,7 +108,7 @@
 				username = $('#username').val().toLowerCase();
 			var context = 0;
 			var noMatch = {item:null};
-	    	var score = 0;
+			var score = 0;
 			if(field.id == "newPasswordId" && $("[id='lengthRequirementId']").length > 1){
 				context = 1;
 			}
@@ -181,26 +181,24 @@
 		//Function to wait for .5 sec to show megamenu to avoid unintended hover.
 		var tipTimer = null;
 		function clearTipTimer() {
-		    if (tipTimer) {
-		        clearTimeout(tipTimer);
-		        tipTimer = null;
-		    }
+			if (tipTimer) {
+				clearTimeout(tipTimer);
+				tipTimer = null;
+			}
 		}
 		function waitForMenu(e, isMobile){
 			if(isMobile=='true'){
 				showMegaMenu(e)
 			}else{
-		        clearTipTimer();
-		        tipTimer = setTimeout(function() {
-		            tipTimer = null;
-		            showMegaMenu(e);
-		        }, 500);
+				clearTipTimer();
+				tipTimer = setTimeout(function() {
+					tipTimer = null;
+					showMegaMenu(e);
+				}, 500);
 			}
 		}
 		
 		function showMegaMenu(e){
-			
-		    
 			$('#adminMegaMenu').hide();
 			$('#projectMegaMenu').hide();
 			$('#racksMegaMenu').hide();
@@ -214,7 +212,7 @@
 			resetmenu2();
 			if(e!=""){
 				$(e).show();
-				mcancelclosetime();	// cancel close timer
+				clearTipTimer()
 				megamenuitem = e;
 				if(e == "#adminMegaMenu"){
 					$("#adminMenuId a").css('background-color','lightblue');
@@ -345,18 +343,6 @@
 			if(currentMenuId == "#reportsMenu"){$("#reportsMenuId a").css('background-color','#003366')}
 			if(currentMenuId == "#userMenu"){$("#userMenuId div").css('background-color','')}
 		}
-		// set close timer
-		function mclosetime() {
-			closetimer = window.setTimeout(closeMegaMenu, timeout);
-			clearTipTimer();
-		}
-		// cancel close timer
-		function mcancelclosetime() {
-		if(closetimer) {
-			window.clearTimeout(closetimer);
-			closetimer = null;
-			}
-		}
 		function showSubMenu(e) {
 			$('#adminMenu').hide();
 			$('#projectMenu').hide();
@@ -427,7 +413,7 @@
 		$('#dashboardMegaMenu').css("top", $('#dashboardMenuId').offset().bottom +1+"px");
 		$('#reportsMegaMenu').css("top", $('#reportsMenuId').offset().bottom +1+"px");
 
+		$('textarea').attr('value', '')
 		var timeout = 500;
-		var closetimer = 0;
 		var megamenuitem = 0;
 		document.onclick = closeMegaMenu;// close mega when click-out

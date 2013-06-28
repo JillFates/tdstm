@@ -83,7 +83,7 @@
 			<g:if test="${isIE6}">
 				<span><img title="Note: MS IE6 has limited capability so functions have been reduced." src="${resource(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
 			</g:if>
-			<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onmouseover="waitForMenu('#userMegaMenu')" onmouseout="mclosetime()" onComplete="updatePersonDetails(e)" style="float:left;display:inline">
+			<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onmouseover="waitForMenu('#userMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" onComplete="updatePersonDetails(e)" style="float:left;display:inline">
 			&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name }
 				<a id="userAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#userMegaMenu')" href="javascript:showMegaMenu('#userMegaMenu')" style="float:left;display:inline"></a> </span>
 			</g:remoteLink>
@@ -112,9 +112,9 @@
 	      <div class="menu2">
 	      <ul>
 			<tds:hasPermission permission='AdminMenuView'>
-			<li id="adminMenuId"><g:link class="home menuhideright" onmouseover="waitForMenu('#adminMegaMenu', '${isMDev}')" onmouseout="mclosetime()" controller="auth" action="home">Admin
-				<a id="adminAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#adminMegaMenu')" href="javascript:showMegaMenu('#adminMegaMenu')" style="display: inline"></a></g:link>
-    		    <div class="megamenu admin" id="adminMegaMenu" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+			<li id="adminMenuId"><g:link class="home menuhideright" onmouseover="waitForMenu('#adminMegaMenu', '${isMDev}')" onmouseout="waitForMenu('', '${isMDev}')" controller="auth" action="home">Admin
+				<a id="adminAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#adminMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" href="javascript:showMegaMenu('#adminMegaMenu')" style="display: inline"></a></g:link>
+    		    <div class="megamenu admin" id="adminMegaMenu" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" style="display: none;">
 					<table class="mmtable room_rack"><tr>
 					<td style="vertical-align:top" nowrap="nowrap"><span class="megamenuSection">Administration</span><br />
 						<ul >
@@ -164,9 +164,9 @@
 			</li>
 			</tds:hasPermission>
 
-			<li id="projectMenuId" style="position:relative; float: left;" ><g:link class="home" onmouseover="waitForMenu('#projectMegaMenu','${isMDev}')" onmouseout="mclosetime()" controller="projectUtil">Client/Project
-				<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#projectMegaMenu')" href="javascript:showMegaMenu('#projectMegaMenu')" style="display: inline"></a></g:link>
-				<div class="megamenu client" id="projectMegaMenu" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+			<li id="projectMenuId" style="position:relative; float: left;" ><g:link class="home" onmouseover="waitForMenu('#projectMegaMenu','${isMDev}')" onmouseout="waitForMenu('', '${isMDev}')" controller="projectUtil">Client/Project
+				<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#projectMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" href="javascript:showMegaMenu('#projectMegaMenu')" style="display: inline"></a></g:link>
+				<div class="megamenu client" id="projectMegaMenu" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" style="display: none;">
 					<table class="mmtable"><tr>
 					<g:if test="${currProjObj}">
 					<td style="vertical-align:top"><span class="megamenuSection">For <strong><g:if test="${currProjObj.name.size()>25}">${currProjObj.name.substring(0,25)+'...'}</g:if><g:else>${currProjObj.name}</g:else></strong></span><br />
@@ -191,8 +191,8 @@
 				
 			</li>
 
-			<li id="roomMenuId" style="position:relative; float: left;"><g:link class="home" onmouseover="waitForMenu('#racksMegaMenu', '${isMDev}')" onmouseout="mclosetime()" controller="room">Rooms</g:link>
-				<div class="megamenu rooms" id="racksMegaMenu" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+			<li id="roomMenuId" style="position:relative; float: left;"><g:link class="home" onmouseover="waitForMenu('#racksMegaMenu', '${isMDev}')" onmouseout="waitForMenu('', '${isMDev}')" controller="room">Rooms</g:link>
+				<div class="megamenu rooms" id="racksMegaMenu" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" style="display: none;">
 					<table class="mmtable room_rack" ><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Rooms</span><br />
 						<ul >
@@ -214,14 +214,14 @@
 				</div>
 			</li>
 			<tds:hasPermission permission='RackMenuView'>
-			<li id="rackMenuId" ><g:link class="home" onmouseover="waitForMenu('#racksMegaMenu', '${isMDev}')" onmouseout="mclosetime()" controller="rackLayouts" action="create">Racks
-				<a id="rackAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#racksMegaMenu')" href="javascript:showMegaMenu('#racksMegaMenu')" style="float: left"></a></g:link>
+			<li id="rackMenuId" ><g:link class="home" onmouseover="waitForMenu('#racksMegaMenu', '${isMDev}')" onmouseout="waitForMenu('', '${isMDev}')" controller="rackLayouts" action="create">Racks
+				<a id="rackAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#racksMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" href="javascript:showMegaMenu('#racksMegaMenu')" style="float: left"></a></g:link>
 				</li>
             </tds:hasPermission>
 	        <tds:hasPermission permission='AssetMenuView'>
-			<li id="assetMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="waitForMenu('#assetMegaMenu', '${isMDev}')" onmouseout="mclosetime()" controller="assetEntity" action="assetSummary" >Assets
-				<a id="assetAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#assetMegaMenu')" href="javascript:showMegaMenu('#assetMegaMenu')" style="display: inline"></a></g:link>
-				<div class="megamenu rooms" id="assetMegaMenu" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+			<li id="assetMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="waitForMenu('#assetMegaMenu', '${isMDev}')" onmouseout="waitForMenu('', '${isMDev}')" controller="assetEntity" action="assetSummary" >Assets
+				<a id="assetAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#assetMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" href="javascript:showMegaMenu('#assetMegaMenu')" style="display: inline"></a></g:link>
+				<div class="megamenu rooms" id="assetMegaMenu" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" style="display: none;">
 					<table class="mmtable room_rack"><tr>
 					<tds:hasPermission permission='EditAndDelete'>
 					<td style="vertical-align:top"><span class="megamenuSection">Manage Data</span><br />
@@ -265,9 +265,9 @@
 			</li>
 			</tds:hasPermission>
 			<tds:hasPermission permission='EventMenuView'>
-			<li id="eventMenuId" style="position:relative; float: left;"><g:link class="home" onmouseover="waitForMenu('#bundleMegaMenu', '${isMDev}')" onmouseout="mclosetime()" controller="moveEvent" action="show" id="${moveEventId}">Events </g:link>
+			<li id="eventMenuId" style="position:relative; float: left;"><g:link class="home" onmouseover="waitForMenu('#bundleMegaMenu', '${isMDev}')" onmouseout="waitForMenu('', '${isMDev}')" controller="moveEvent" action="show" id="${moveEventId}">Events </g:link>
 			
-				<div class="megamenu rooms" id="bundleMegaMenu" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+				<div class="megamenu rooms" id="bundleMegaMenu" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" style="display: none;">
 					<table class="mmtable " ><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Events</span><br />
 						<ul>
@@ -309,13 +309,13 @@
 			</li>
 			</tds:hasPermission>
 			<tds:hasPermission permission='BundleMenuView'>
-			<li id="bundleMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="waitForMenu('#bundleMegaMenu', '${isMDev}')" onmouseout="mclosetime()" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]" id="${moveBundleId}">Bundles
-				<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#bundleMegaMenu')" href="javascript:showMegaMenu('#bundleMegaMenu')" style="display: inline"></a></g:link>
+			<li id="bundleMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="waitForMenu('#bundleMegaMenu', '${isMDev}')" onmouseout="waitForMenu('', '${isMDev}')" controller="moveBundle" action="show" params="[projectId:currProjObj?.id]" id="${moveBundleId}">Bundles
+				<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#bundleMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" href="javascript:showMegaMenu('#bundleMegaMenu')" style="display: inline"></a></g:link>
 			</li>
 
-			<li id="teamMenuId" style="position:relative; float:left;"><a class="home" onmouseover="waitForMenu('#teamMegaMenu','${isMDev}')" href="/tdstm/clientTeams/listTasks" >Tasks</a>
-				<a id="teamMenuAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#teamMegaMenu')" href="javascript:showMegaMenu('#teamMegaMenu')" style="display: inline"></a>
-				<div class="megamenu rooms" id="teamMegaMenu" onmouseover="showMegaMenu('#teamMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+			<li id="teamMenuId" style="position:relative; float:left;"><a class="home" onmouseover="waitForMenu('#teamMegaMenu','${isMDev}')" onmouseout="waitForMenu('', '${isMDev}')" href="/tdstm/clientTeams/listTasks" >Tasks</a>
+				<a id="teamMenuAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#teamMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" href="javascript:showMegaMenu('#teamMegaMenu')" style="display: inline"></a>
+				<div class="megamenu rooms" id="teamMegaMenu" onmouseover="showMegaMenu('#teamMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" style="display: none;">
 					<table class="mmtable"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Tasks</span><br />
 						<ul>
@@ -334,9 +334,9 @@
 			</li>
             </tds:hasPermission>
 	        <tds:hasPermission permission='ConsoleMenuView'>
-			<li id="consoleMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="waitForMenu('#consoleMegaMenu', '${isMDev}')" onmouseout="mclosetime()" controller="assetEntity" action="dashboardView" params="['showAll':'show']">Console
-				<a id="consoleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#consoleMegaMenu')" href="javascript:showMegaMenu('#consoleMegaMenu')" style="display: inline"></a></g:link>
-			    <div class="megamenu rooms" id="consoleMegaMenu" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+			<li id="consoleMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="waitForMenu('#consoleMegaMenu', '${isMDev}')" onmouseout="waitForMenu('', '${isMDev}')" controller="assetEntity" action="dashboardView" params="['showAll':'show']">Console
+				<a id="consoleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#consoleMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" href="javascript:showMegaMenu('#consoleMegaMenu')" style="display: inline"></a></g:link>
+			    <div class="megamenu rooms" id="consoleMegaMenu" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" style="display: none;">
 					<table class="mmtable room_rack"><tr>
 					<td style="vertical-align:top"  ><span class="megamenuSection">Supervisor Console</span><br />
 						<ul>
@@ -378,9 +378,9 @@
 			</li>
 	        </tds:hasPermission>
 			<tds:hasPermission permission='DashBoardMenuView'> 
-			<li id="dashboardMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="waitForMenu('#dashboardMegaMenu', '${isMDev}')" controller="moveBundle" action="planningStats"  >Dashboards</g:link>
-				<a id="dashboardAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#dashboardMegaMenu')" href="javascript:showMegaMenu('#dashboardMegaMenu')" style="display: inline"></a>
-				<div class="megamenu rooms" id="dashboardMegaMenu" onmouseover="showMegaMenu('#dashboardMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+			<li id="dashboardMenuId" style="position:relative; float:left;"><g:link class="home" onmouseover="waitForMenu('#dashboardMegaMenu', '${isMDev}')" onmouseout="waitForMenu('', '${isMDev}')" controller="moveBundle" action="planningStats"  >Dashboards</g:link>
+				<a id="dashboardAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#dashboardMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" href="javascript:showMegaMenu('#dashboardMegaMenu')" style="display: inline"></a>
+				<div class="megamenu rooms" id="dashboardMegaMenu" onmouseover="showMegaMenu('#dashboardMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" style="display: none;">
 					<table class="mmtable"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Live Dashboards</span><br />
 						<ul>
@@ -401,9 +401,9 @@
 			</li>
 			</tds:hasPermission>
 	        <tds:hasPermission permission='ReportMenuView'>
-			<li id="reportsMenuId" style="position:relative; float: left;"><g:link class="home" onmouseover="waitForMenu('#reportsMegaMenu', '${isMDev}')" onmouseout="mclosetime()" controller="reports" params="[projectId:currProjObj?.id]">Reports
-	        	<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#reportsMegaMenu')" href="javascript:('#reportsMegaMenu')" style="display: inline"></a></g:link>
-				<div  class="megamenu reports" id="reportsMegaMenu" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="mclosetime()" style="display: none;">
+			<li id="reportsMenuId" style="position:relative; float: left;"><g:link class="home" onmouseover="waitForMenu('#reportsMegaMenu', '${isMDev}')" onmouseout="waitForMenu('', '${isMDev}')" controller="reports" params="[projectId:currProjObj?.id]">Reports
+	        	<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#reportsMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" href="javascript:('#reportsMegaMenu')" style="display: inline"></a></g:link>
+				<div  class="megamenu reports" id="reportsMegaMenu" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" style="display: none;">
 					<table class="mmtable "><tr>
 					<tds:hasPermission permission='ShowDiscovery'>
 					<td style="vertical-align:top"><span class="megamenuSection">Discovery</span><br />
@@ -453,7 +453,7 @@
 	        </tds:hasPermission>
 	      </ul>
 	    </div>
-		<div class="megamenu" id="userMegaMenu" onmouseover="showMegaMenu('#userMegaMenu')" onmouseout="mclosetime()" style="display: none; width:255px">
+		<div class="megamenu" id="userMegaMenu" onmouseover="showMegaMenu('#userMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" style="display: none; width:255px">
 			<table class="mmtable"><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">${session.getAttribute("LOGIN_PERSON").name }</span><br />
 				<ul>
@@ -479,18 +479,18 @@
 			</div>
 			<script type="text/javascript">
 			function updateEventHeader( e ){
-	   	     var newsAndStatus = eval("(" + e.responseText + ")")
-	   	     	$("#head_mycrawlerId").html(newsAndStatus[0].news);
-	   	     	$("#head_crawler").addClass(newsAndStatus[0].cssClass)
-	   	     	$("#moveEventStatus").html(newsAndStatus[0].status)
-	   		}
+				var newsAndStatus = eval("(" + e.responseText + ")")
+				$("#head_mycrawlerId").html(newsAndStatus[0].news);
+				$("#head_crawler").addClass(newsAndStatus[0].cssClass)
+				$("#moveEventStatus").html(newsAndStatus[0].status)
+			}
 			${remoteFunction(controller:'moveEvent', action:'getMoveEventNewsAndStatus', params:'\'id='+moveEventId+'\'',onComplete:'updateEventHeader(e)')}
 			</script>
 		</g:if>
-    </g:if>
-      <div class="main_bottom"><div id="messageDiv" class="message" style="display:none"></div><g:layoutBody /></div>
-	  
-    </div>
+	</g:if>
+	<div class="main_bottom"><div id="messageDiv" class="message" style="display:none"></div><g:layoutBody /></div>
+	
+	</div>
     <div id="personDialog" title="Edit Person" style="display:none;">
       <div class="dialog">
           <div class="dialog">
@@ -500,7 +500,7 @@
 					<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 				</tr>
 
-                <tr class="prop">
+				<tr class="prop">
 					<td valign="top" class="name">
 						<label for="firstName"><b>First Name:&nbsp;<span style="color: red">*</span></b></label>
 					</td>
@@ -509,7 +509,7 @@
 					</td>
 				</tr>
 				
-                <tr class="prop" style="display:none;">
+				<tr class="prop" style="display:none;">
 					<td valign="top" class="name">
 						<label for="username"><b>User Name:&nbsp;<span style="color: red">*</span></b></label>
 					</td>
@@ -518,13 +518,13 @@
 					</td>
 				</tr>
 
-                <tr class="prop">
-                  <td valign="top" class="name">
-                    <label for="middleName">Middle Name:</label>
-                  </td>
-                  <td valign="top" class="value">
-                    <input type="text" maxlength="64" id="middleNameId" name="middleName"/>
-                  </td>
+				<tr class="prop">
+				  <td valign="top" class="name">
+					<label for="middleName">Middle Name:</label>
+				  </td>
+				  <td valign="top" class="value">
+					<input type="text" maxlength="64" id="middleNameId" name="middleName"/>
+	              </td>
                 </tr>
 
                 <tr class="prop">
