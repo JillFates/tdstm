@@ -57,12 +57,21 @@
 									name="appVendor" value="${applicationInstance.appVendor}"  tabindex="11" />
 								</td>
 								<td class="label ${applicationInstance.sme}" nowrap="nowrap"><label for="sme">SME1</label></td>
-								<td ><g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme}"  optionKey="id" optionValue="${{it.firstName+' '+(it.lastName?:'') }}" 
-													onchange="openPersonDiv(this.value,this.id)" tabindex="38" noSelection="${['':' Please Select']}" />
+								<td >
+									<g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme}"  optionKey="id" 
+										optionValue="${{ it.toString() }}" 
+										onchange="openPersonDiv(this.value,this.id)" 
+										tabindex="38" 
+										noSelection="${['':' Please Select']}" 
+									/>
 								</td>
 								<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment</label>
 								</td>
-								<td ><g:select id="environment" class="${config.environment}" name="environment" from="${applicationInstance.constraints.environment.inList}" value="${applicationInstance.environment}"  tabindex="32"></g:select>
+								<td >
+									<g:select id="environment" class="${config.environment}" name="environment" 
+										from="${applicationInstance.constraints.environment.inList}" 
+										value="${applicationInstance.environment}"  tabindex="32">
+									</g:select>
 								</td>
 								<td class="label ${config.userLocations}" nowrap="nowrap"><label for="userLocations">User Location</label>
 								</td>
@@ -78,8 +87,13 @@
 									name="appVersion" value="${applicationInstance.appVersion}"  tabindex="13" />
 								</td>
 								<td class="label ${config.sme2}" nowrap="nowrap"><label for="sme2">SME2</label></td>
-								<td ><g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2}" optionKey="id" optionValue="${{it.firstName+' '+(it.lastName?:'') }}" 
-											onchange="openPersonDiv(this.value, this.id)" tabindex="38" noSelection="${['':' Please Select']}" />
+								<td >
+									<g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2}" optionKey="id" 
+										optionValue="${{ it.toString() }}" 
+										onchange="openPersonDiv(this.value, this.id)" 
+										tabindex="38" 
+										noSelection="${['':' Please Select']}" 
+									/>
 								</td>
 								<td class="label ${config.criticality}" nowrap="nowrap"><label for="criticality">Criticality</label>
 								</td>
@@ -111,8 +125,13 @@
 								<td ><input type="text" id="appSource"	class="${config.appSource}" name="appSource" value="${applicationInstance.appSource}" tabindex="15" />
 								</td>
 								<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
-								<td ><g:select from="${personList}" id="appOwner" name="appOwner.id" class="${config.owner}" optionKey="id" optionValue="${{it.firstName+' '+(it.lastName?:'')}}" 
-											onchange="openPersonDiv(this.value, this.id)" tabindex="38" noSelection="${['':' Please Select']}" />
+								<td >
+									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${config.owner}" optionKey="id" 
+										optionValue="${{ it.toString() }}" 
+										onchange="openPersonDiv(this.value, this.id)" 
+										tabindex="38" 
+										noSelection="${['':' Please Select']}" 
+									/>
 								</td>
 								<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label>
 								</td>

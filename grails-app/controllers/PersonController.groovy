@@ -10,14 +10,14 @@ import org.apache.shiro.crypto.hash.Sha1Hash
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
-
+import org.apache.commons.lang3.StringUtils
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 
 class PersonController {
-    
+	
 	def partyRelationshipService
 	def userPreferenceService
 	def securityService
@@ -25,28 +25,28 @@ class PersonController {
 	def sessionFactory
 	def jdbcTemplate
 	
-    def index = { redirect(action:list,params:params) }
+	def index = { redirect(action:list,params:params) }
 
-    // the delete, save and update actions only accept POST requests
-    def allowedMethods = [delete:'POST', save:'POST', update:'POST']
+	// the delete, save and update actions only accept POST requests
+	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
 	/**
 	 * Generates a list view of persons related to company
 	 * @param id - company id
 	 * @param companyName - optional search by name or 'ALL'
 	 */
-    def list = {
-        def companyId = params.id
-        List personInstanceList = new ArrayList()
-        def companiesList
-        def query = "from PartyGroup as p where partyType = 'COMPANY' order by p.name "
-        companiesList = PartyGroup.findAll( query )
+	def list = {
+		def companyId = params.id
+		List personInstanceList = new ArrayList()
+		def companiesList
+		def query = "from PartyGroup as p where partyType = 'COMPANY' order by p.name "
+		companiesList = PartyGroup.findAll( query )
 		def user = securityService.getUserLogin()
 		
 		if(params.containsKey("companyName") && params.companyName=="All"){
 			personInstanceList = Person.findAll( "from Person p order by p.lastName" )
 		} else {
-		    if(params.containsKey("companyName")){
+			if(params.containsKey("companyName")){
 				companyId  = PartyGroup.findByName(params.companyName)?.id
 			}else{
 				companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
@@ -54,19 +54,20 @@ class PersonController {
 					def person = user.person
 					// TODO: this should be refactored into the partyRelationshipService class
 					companyId = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+
-                        "and p.partyIdTo = :partyIdTo and p.roleTypeCodeFrom = 'COMPANY' "+
-                        "and p.roleTypeCodeTo = 'STAFF' ",[partyIdTo:person]).partyIdFrom[0]?.id
+						"and p.partyIdTo = :partyIdTo and p.roleTypeCodeFrom = 'COMPANY' "+
+						"and p.roleTypeCodeTo = 'STAFF' ",[partyIdTo:person]).partyIdFrom[0]?.id
 				}
 			}
-	        if ( companyId!= null && companyId != "" ) {
-	        	personInstanceList = partyRelationshipService.getCompanyStaff( companyId )     	
-	        } 
+			if ( companyId!= null && companyId != "" ) {
+				personInstanceList = partyRelationshipService.getCompanyStaff( companyId )     	
+			} 
 		}
 		List personsList = new ArrayList()
 		personInstanceList.each{
 			PersonBean personBean = new PersonBean()
 			personBean.setId(it.id)
 			personBean.setFirstName(it.firstName)
+			personBean.setMiddleName(it.middleName)
 			personBean.setLastName(it.lastName)
 			personBean.setModelScore(it.modelScore)
 			def userLogin = UserLogin.findByPerson(it);
@@ -85,242 +86,275 @@ class PersonController {
 		}
 		
 		// Statements for JMESA integration
-    	TableFacade tableFacade = new TableFacadeImpl("tag",request)
-        tableFacade.items = personsList
+		TableFacade tableFacade = new TableFacadeImpl("tag",request)
+		tableFacade.items = personsList
 		
 		def company
 		if(companyId){
 			if(params.companyName!="All"){
-			    company = PartyGroup.findById(companyId)
+				company = PartyGroup.findById(companyId)
 			}
 		}
 		userPreferenceService.setPreference( "PARTYGROUP", companyId.toString() )
 		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
 		return [ personsList: personsList, companyId:companyId,totalCompanies:companiesList, company:company, availabaleRoles:availabaleRoles]
-    }
+	}
 
-    def show = {
-			
-        def personInstance = Person.get( params.id )
-        def companyId = params.companyId
-        if(!personInstance) {
-            flash.message = "Person not found with id ${params.id}"
-            redirect( action:list, params:[ id:companyId ] )
-        } else { 
-        	def company = partyRelationshipService.getStaffCompany( personInstance )
-        	
-        	return [ personInstance : personInstance, companyId:company.id ] 
-        }
-    }
-
-    def delete = {
+	def show = {
 			
 		def personInstance = Person.get( params.id )
-        def companyId = params.companyId
-        if ( personInstance ) {
-	        def partyInstance = Party.findById( personInstance.id )      
-	        def partyRelnInst = PartyRelationship.findAll("from PartyRelationship pr where pr.partyIdTo = ${personInstance.id}")         
-	        def partyRole = PartyRole.findAll("from PartyRole p where p.party =${partyInstance.id}")      
-	        def loginInst = UserLogin.find("from UserLogin ul where ul.person = ${personInstance.id}")
-	        if ( loginInst ) {
-		        def preferenceInst = UserPreference.findAll("from UserPreference up where up.userLogin = ${loginInst.id}")
-		        preferenceInst.each{
-		          it.delete()
-		          }
-		        loginInst.delete()
-	        }       
-		    partyRelnInst.each{
-		   	it.delete()
-		    }
-		    partyRole.each{
-		    it.delete()
-		    }      
-	      	partyInstance.delete()      
-            personInstance.delete()
-        	if( personInstance.lastName == null ) {
-        		personInstance.lastName = ""
-        	}
-            flash.message = "Person ${personInstance} deleted"
-            redirect( action:list, params:[ id:companyId ] )
-        }
-        else {
-            flash.message = "Person not found with id ${params.id}"
-            redirect( action:list, params:[ id:companyId ] )
-        }
-    }
-	// return person details to EDIT form
-    def edit = {
-        def personInstance = Person.get( params.id )
-        def companyId = params.companyId
-        if(!personInstance) {
-            flash.message = "Person not found with id ${params.id}"
-            redirect( action:list, params:[ id:companyId ] )
-        }
-        else {
-        	
-            return [ personInstance : personInstance, companyId:companyId ]
-        }
-    }
+		def companyId = params.companyId
+		if(!personInstance) {
+			flash.message = "Person not found with id ${params.id}"
+			redirect( action:list, params:[ id:companyId ] )
+		} else { 
+			def company = partyRelationshipService.getStaffCompany( personInstance )
+			
+			return [ personInstance : personInstance, companyId:company.id ] 
+		}
+	}
 
-    def update = {       
-	        
-        def personInstance = Person.get( params.id )
-	        
-        //personInstance.lastUpdated = new Date()
-	        
-        def companyId = params.company
-        if(personInstance) {
-            personInstance.properties = params
+	def delete = {
+			
+		def personInstance = Person.get( params.id )
+		def companyId = params.companyId
+		if ( personInstance ) {
+			def partyInstance = Party.findById( personInstance.id )      
+			def partyRelnInst = PartyRelationship.findAll("from PartyRelationship pr where pr.partyIdTo = ${personInstance.id}")         
+			def partyRole = PartyRole.findAll("from PartyRole p where p.party =${partyInstance.id}")      
+			def loginInst = UserLogin.find("from UserLogin ul where ul.person = ${personInstance.id}")
+			if ( loginInst ) {
+				def preferenceInst = UserPreference.findAll("from UserPreference up where up.userLogin = ${loginInst.id}")
+				preferenceInst.each{
+				  it.delete()
+				  }
+				loginInst.delete()
+			}       
+			partyRelnInst.each{
+			it.delete()
+			}
+			partyRole.each{
+			it.delete()
+			}      
+			partyInstance.delete()      
+			personInstance.delete()
+			if( personInstance.lastName == null ) {
+				personInstance.lastName = ""
+			}
+			flash.message = "Person ${personInstance} deleted"
+			redirect( action:list, params:[ id:companyId ] )
+		}
+		else {
+			flash.message = "Person not found with id ${params.id}"
+			redirect( action:list, params:[ id:companyId ] )
+		}
+	}
+	// return person details to EDIT form
+	def edit = {
+		def personInstance = Person.get( params.id )
+		def companyId = params.companyId
+		if(!personInstance) {
+			flash.message = "Person not found with id ${params.id}"
+			redirect( action:list, params:[ id:companyId ] )
+		}
+		else {
+			
+			return [ personInstance : personInstance, companyId:companyId ]
+		}
+	}
+
+	/**
+	 * Used to update the Person domain objects
+	 */
+	def update = {
+			
+		def personInstance = Person.get( params.id )
+			
+		def companyId = params.company
+		if(personInstance) {
+			personInstance.properties = params
 			personInstance.tempForUpdate = Math.random().toString()
-            if ( !personInstance.hasErrors() && personInstance.save() ) {
-            	if(companyId != null ){
-    	            def companyParty = Party.findById(companyId)
-    	            partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', personInstance, "STAFF")
-                }
-                flash.message = "Person ${params.firstName} ${params.lastName} updated"
-                redirect( action:list, params:[ id:companyId ])
-            }
-            else {
-                flash.message = "Person ${params.firstName} ${params.lastName} not updated "
-                redirect( action:list, params:[ id:companyId ])
-            }
-        }
-        else {
-            flash.message = "Person not found with id ${params.id}"
-            redirect( action:list, params:[ id:companyId ])
-        }
-    }
-    // return person instance and companies 
-    def create = {
-        def personInstance = new Person()
-        personInstance.properties = params
-        // def companies = partyRelationshipService.getCompaniesList()
-       	def companyId = params.companyId 
-        return [ 'personInstance':personInstance, companyId:companyId ]
-    }
-    //Save the Person Detais
-    def save = {
-		def project = securityService.getUserCurrentProject()
-		def personList = partyRelationshipService.getCompanyStaff(project.client.id)
-		def person = personList.find{it.firstName==params.firstName && it.lastName==params.lastName}
-		
-		def fullName = params.firstName+" "+(params.lastName ?:"")
-		def isPersonExist = true
-		if(!person){
-			isPersonExist = false
-        	person = new Person( params )
-	        if ( !person.hasErrors() && person.save() ) {
-	        	
-	            def companyId = params.company
-	            if ( companyId != "" ) {
-	                def companyParty = Party.findById( companyId )
-	                def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", person, "STAFF" )
-	            }
-				userPreferenceService.setUserRoles([params.role], person.id)
-	            flash.message = "Person ${fullName} created"
-				
-	            //redirect( action:list, id:person.id , params:[companyId:companyId] )
-				
-	        }else { 
-				def errMsg = GormUtil.allErrorsString(person)
-	            def companyId = params.company
-	            flash.message = "Person FirstName cannot be blank. "
-				if(params.forWhom == "person"){
-					redirect( action:list )
-				}else{
-					def errMap = [errMsg : errMsg]
-					render errMap as JSON
-					return
+			if ( !personInstance.hasErrors() && personInstance.save() ) {
+				if(companyId != null ){
+					def companyParty = Party.findById(companyId)
+					partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', personInstance, "STAFF")
 				}
-	        }
+				flash.message = "Person ${params.firstName} ${params.lastName} updated"
+				redirect( action:list, params:[ id:companyId ])
+			}
+			else {
+				flash.message = "Person ${params.firstName} ${params.lastName} not updated "
+				redirect( action:list, params:[ id:companyId ])
+			}
 		}
-		def paramsMap = [ id: person.id, name:fullName, isPersonExist:isPersonExist, fieldName:params.fieldName]
-		if(params.forWhom == "person"){
+		else {
+			flash.message = "Person not found with id ${params.id}"
+			redirect( action:list, params:[ id:companyId ])
+		}
+	}
+
+	/**
+	 * Used to save a new Person domain object
+	 * @param forWhom - used to indicate if the submit is from a person form otherwise it is invoked from Ajax call
+	 */
+	def save = {
+		// When forWhom == 'person' we're working with the company submitted with the form otherwise we're 
+		// going to use the company associated with the current project.
+		def isAjaxCall = params.forWhom != "person"
+		def companyId
+		def companyParty
+
+		if (isAjaxCall) {
+			// First try to see if the person already exists for the current project
+			def project = securityService.getUserCurrentProject()
+			companyId = project.client.id
+		} else {
+			companyId = params.company
+		}
+		if ( companyId != "" ) {
+			companyParty = Party.findById( companyId )
+		}
+		def errMsg
+		def isExistingPerson = false 
+		def name
+		def person
+
+		// Look to allow easy breakout for exceptions
+		while(true) {
+			if (! companyParty) {
+				errMsg = 'Unable to locate proper company to associate person to'
+				break;
+			}
+
+			// Get list of all staff for the company and then try to find the individual so that we don't duplicate
+			// the creation.
+			def personList = partyRelationshipService.getCompanyStaff(companyId)
+			person = personList.find {
+				// Find person using case-insensitive search
+				StringUtils.equalsIgnoreCase(it.firstName, params.firstName) &&
+				( ( StringUtils.isEmpty(params.lastName) && StringUtils.isEmpty(it.lastName) ) ||  StringUtils.equalsIgnoreCase(it.lastName, params.lastName) ) &&
+				( ( StringUtils.isEmpty(params.middleName) && StringUtils.isEmpty(it.middleName) ) ||  StringUtils.equalsIgnoreCase(it.middleName, params.middleName) )
+			}
+
+			isExistingPerson = person ? true : false
+			if (isExistingPerson ) {
+				errMsg = 'A person with that name already exists'
+				break
+			} else {
+				// Create the person and relationship appropriately
+
+				person = new Person( params )
+				if ( !person.hasErrors() && person.save() ) {					
+					def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", person, "STAFF" )
+					userPreferenceService.setUserRoles([params.role], person.id)
+					if (! isAjaxCall) {
+						// Just add a message for the form submission to know that the person was created
+						flash.message = "A record for ${person.toString()} was created"
+					}
+				} else {
+					errMsg = GormUtil.allErrorsString(person)
+					break
+				}
+			}
+
+			name = person.toString()
+			break
+		}
+		
+		if (errMsg)
+			log.info "save() had errors: $errMsg"
+
+		if (isAjaxCall) {
+			def map = errMsg ? [errMsg : errMsg] : [ id: person.id, name:name, isExistingPerson:isExistingPerson, fieldName:params.fieldName]
+			render map as JSON
+		} else {
+			if (errMsg) 
+				flash.message = errMsg
 			redirect( action:list )
-		}else{
-			render paramsMap as JSON
 		}
-        
-    }
-    //	Ajax Overlay for show
-    def editShow = {
-        
-        def personInstance = Person.get( params.id )        
-        def companyId = params.companyId
-        def companyParty = Party.findById(companyId)
+
+	}
+
+
+	//	Ajax Overlay for show
+	def editShow = {
+		
+		def personInstance = Person.get( params.id )        
+		def companyId = params.companyId
+		def companyParty = Party.findById(companyId)
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-        def dateCreatedByFormat = formatter.format(GormUtil.convertInToUserTZ( personInstance.dateCreated, tzId ) )
-        def lastUpdatedFormat = formatter.format(GormUtil.convertInToUserTZ( personInstance.lastUpdated, tzId ) )
-        if(!personInstance) {
-            flash.message = "Person not found with id ${params.id}"
-            redirect( action:list, params:[ id:companyId ] )
-        }
-        else {       	
+		def dateCreatedByFormat = formatter.format(GormUtil.convertInToUserTZ( personInstance.dateCreated, tzId ) )
+		def lastUpdatedFormat = formatter.format(GormUtil.convertInToUserTZ( personInstance.lastUpdated, tzId ) )
+		if(!personInstance) {
+			flash.message = "Person not found with id ${params.id}"
+			redirect( action:list, params:[ id:companyId ] )
+		}
+		else {       	
 
-        	def items = [id: personInstance.id, firstName: personInstance.firstName, lastName: personInstance.lastName, 
+			def items = [id: personInstance.id, firstName: personInstance.firstName, lastName: personInstance.lastName, 
 						 nickName: personInstance.nickName, title: personInstance.title, active: personInstance.active, 
 						 dateCreated: dateCreatedByFormat, lastUpdated: lastUpdatedFormat, companyId: companyId,
 						 companyParty:companyParty, email: personInstance.email, department: personInstance.department,
 						 location: personInstance.location, workPhone: personInstance.workPhone, mobilePhone: personInstance.mobilePhone]
-            render items as JSON
-        }
-    }
-    //ajax overlay for Edit
-    def editStaff = {
-        def map = new HashMap()
+			render items as JSON
+		}
+	}
+	//ajax overlay for Edit
+	def editStaff = {
+		def map = new HashMap()
 		// TODO - SECURITY - this should have some VALIDATION to who has access to which Staff...
-        def personInstance = Person.read( params.id )
-        def role = params.role
+		def personInstance = Person.read( params.id )
+		def role = params.role
 		def company = partyRelationshipService.getStaffCompany( personInstance )
-        if(company == null){
-        	map.put("companyId","")
-        }else{
-            map.put("companyId",company.id)
+		if(company == null){
+			map.put("companyId","")
+		}else{
+			map.put("companyId",company.id)
 			map.put("companyName",company.name)
-        }
-        map.put("id", personInstance.id)
-        map.put("firstName", personInstance.firstName)
-        map.put("lastName", personInstance.lastName)
-        map.put("nickName", personInstance.nickName)
-        map.put("title", personInstance.title)
-        map.put("email", personInstance.email)
+		}
+		map.put("id", personInstance.id)
+		map.put("firstName", personInstance.firstName)
+		map.put("lastName", personInstance.lastName)
+		map.put("nickName", personInstance.nickName)
+		map.put("title", personInstance.title)
+		map.put("email", personInstance.email)
 		map.put("active", personInstance.active)
-        map.put("role", role)
-        render map as JSON
-    }
+		map.put("role", role)
+		render map as JSON
+	}
 	/*
 	 *  Remote method to update Staff Details
 	 */
 	def updateStaff = {
-    	def personInstance = Person.get( params.id )
-    	def projectId = session.CURR_PROJ.CURR_PROJ
-    	def roleType = params.roleType
-    	def companyId = params.company
-    	//personInstance.lastUpdated = new Date()
-    	if(personInstance) {
-    		personInstance.properties = params
-    		if(personInstance.lastName == null){
+		def personInstance = Person.get( params.id )
+		def projectId = session.CURR_PROJ.CURR_PROJ
+		def roleType = params.roleType
+		def companyId = params.company
+		//personInstance.lastUpdated = new Date()
+		if(personInstance) {
+			personInstance.properties = params
+			if(personInstance.lastName == null){
 				personInstance.lastName = ""	
 			}
-            if ( !personInstance.hasErrors() && personInstance.save() ) {
-	            def projectParty = Project.findById(projectId)
-	            if(companyId != ""){
-                    def companyParty = Party.findById(companyId)
-                    partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', personInstance, "STAFF")
-	            }
-	            def partyRelationship = partyRelationshipService.updatePartyRelationshipRoleTypeTo("PROJ_STAFF", projectParty, 'PROJECT', personInstance, roleType)
-            	 
-	            flash.message = "Person ${personInstance} updated"
-                redirect( action:projectStaff, params:[ projectId:projectId ])
-            } else {
-            	flash.message = "Person ${personInstance} not updated"
-            	redirect( action:projectStaff, params:[ projectId:projectId ])
-            }
-    	} else {
-    		flash.message = "Person not found with id ${params.id}"
-    		redirect( action:projectStaff, params:[ projectId:projectId ])
-    	}
+			if ( !personInstance.hasErrors() && personInstance.save() ) {
+				def projectParty = Project.findById(projectId)
+				if(companyId != ""){
+					def companyParty = Party.findById(companyId)
+					partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', personInstance, "STAFF")
+				}
+				def partyRelationship = partyRelationshipService.updatePartyRelationshipRoleTypeTo("PROJ_STAFF", projectParty, 'PROJECT', personInstance, roleType)
+				 
+				flash.message = "Person ${personInstance} updated"
+				redirect( action:projectStaff, params:[ projectId:projectId ])
+			} else {
+				flash.message = "Person ${personInstance} not updated"
+				redirect( action:projectStaff, params:[ projectId:projectId ])
+			}
+		} else {
+			flash.message = "Person not found with id ${params.id}"
+			redirect( action:projectStaff, params:[ projectId:projectId ])
+		}
 	}
 	/*
 	 *  Return Project Staff 
@@ -334,7 +368,7 @@ class PersonController {
 		def companiesStaff = partyRelationshipService.getProjectCompaniesStaff( projectId,'' )
 		def projectCompanies = partyRelationshipService.getProjectCompanies( projectId )
 		return [ projectStaff:projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies, 
-                projectId:projectId, submit:submit, personHasPermission:RolePermissions.hasPermission("AddPerson") ]
+				projectId:projectId, submit:submit, personHasPermission:RolePermissions.hasPermission("AddPerson") ]
 	}
 	/*
 	 *	Method to add Staff to project through Ajax Overlay 
@@ -344,25 +378,25 @@ class PersonController {
 		def compositeId = id.split("-")
 		def flag = false
 		if(compositeId){
-	    	def personId = compositeId[1]
-	    	def roleType = compositeId[2]
+			def personId = compositeId[1]
+			def roleType = compositeId[2]
 			def projectId = compositeId[3]
-	    	def projectParty = Project.findById( projectId )
-	    	def personParty = Person.findById( personId )
-            def projectStaff
+			def projectParty = Project.findById( projectId )
+			def personParty = Person.findById( personId )
+			def projectStaff
 			if(params.val == "0"){
 				projectStaff = partyRelationshipService.deletePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
-                def moveEvents = MoveEvent.findAllByProject(projectParty)
-                def results = MoveEventStaff.executeUpdate("delete from MoveEventStaff where moveEvent in (:moveEvents) and person = :person and role = :role",[moveEvents:moveEvents, person:personParty,role:RoleType.read(roleType)])
+				def moveEvents = MoveEvent.findAllByProject(projectParty)
+				def results = MoveEventStaff.executeUpdate("delete from MoveEventStaff where moveEvent in (:moveEvents) and person = :person and role = :role",[moveEvents:moveEvents, person:personParty,role:RoleType.read(roleType)])
 			}else{
-	    		projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
+				projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
 			}
 
 			flag = projectStaff ? true : false
 		}
 		
 		render flag
-    }
+	}
 	/*
 	 * Method to save person details and create party relation with Project as well 
 	 */
@@ -393,7 +427,7 @@ class PersonController {
 			flash.message = " Person FirstName cannot be blank. "
 			redirect( action:'projectStaff', params:[ projectId:projectId,submit:'Add' ] )
 		}
-    }
+	}
 	/*-----------------------------------------------------------
 	 * Will return person details for a given personId as JSON
 	 * @author : Lokanada Reddy 
@@ -401,17 +435,17 @@ class PersonController {
 	 * @return : person details as JSON
 	 *----------------------------------------------------------*/
 	def getPersonDetails = {
-    	def personId = params.id
+		def personId = params.id
 		def person = Person.findById( personId  )
 		def userLogin = UserLogin.findByPerson( person )
 		
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-        def expiryDate = userLogin.expiryDate ? formatter.format(GormUtil.convertInToUserTZ(userLogin.expiryDate,tzId)) : ""
+		def expiryDate = userLogin.expiryDate ? formatter.format(GormUtil.convertInToUserTZ(userLogin.expiryDate,tzId)) : ""
 		
-        def personDetails = [person:person, expiryDate: expiryDate]
+		def personDetails = [person:person, expiryDate: expiryDate]
 		render personDetails as JSON
-    }
+	}
 	/*-----------------------------------------------------------
 	 * Check if the user inputed password is correct, and if so call the update method
 	 * @author : Ross Macfarlane 
@@ -450,12 +484,12 @@ class PersonController {
 			def personInstance = Person.get(params.id)
 			def ret = []
 			params.travelOK == "1" ? params : (params.travelOK = 0)
-            
-            if(!personInstance.staffType && !params.staffType)
-                params.staffType = 'Hourly'
-            
+			
+			if(!personInstance.staffType && !params.staffType)
+				params.staffType = 'Hourly'
+			
 			personInstance.properties = params
-            
+			
 			def personId
 			if ( !personInstance.hasErrors() && personInstance.save(flush:true) ) {
 				personId = personInstance.id
@@ -479,13 +513,13 @@ class PersonController {
 						userLogin.errors.allErrors.each{println it}
 					}
 				}
-                def functions = params.list("function")
+				def functions = params.list("function")
 				if(params.manageFuncs != '0' || functions){
-                    def staffCompany = partyRelationshipService.getStaffCompany(personInstance)
-                    def companyProject = Project.findByClient(staffCompany)
-                    partyRelationshipService.updateStaffFunctions(staffCompany, personInstance, functions, 'STAFF')
+					def staffCompany = partyRelationshipService.getStaffCompany(personInstance)
+					def companyProject = Project.findByClient(staffCompany)
+					partyRelationshipService.updateStaffFunctions(staffCompany, personInstance, functions, 'STAFF')
 					if(companyProject)
-                        partyRelationshipService.updateStaffFunctions(companyProject, personInstance,functions, "PROJ_STAFF")
+						partyRelationshipService.updateStaffFunctions(companyProject, personInstance,functions, "PROJ_STAFF")
 				}
 				def personExpDates =params.list("availability")
 				if(personExpDates){
@@ -515,7 +549,7 @@ class PersonController {
 				ret << [name:personInstance.firstName, tz:getSession().getAttribute( "CURR_TZ" )?.CURR_TZ]
 				render  ret as JSON
 			}
-    }
+	}
 	
 	def resetPreferences ={
 		def person = Person.findById(params.user)
@@ -552,23 +586,23 @@ class PersonController {
 		def currLoc = userPreferenceService.getPreference("StaffingLocation")?:"All"
 		def currPhase = userPreferenceService.getPreference("StaffingPhases")?:"All"
 		def currScale = userPreferenceService.getPreference("StaffingScale")?:"6"
-        def moveEvents
-        def projectId = projects.find{it.id == project.id} ? project.id : 0
-        if (projectId == 0) {
-            moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",[project:projects])
-        } else {
-            project = Project.read(projectId)
-            moveEvents = MoveEvent.findAll("from MoveEvent m where project =:project order by m.project.name , m.name asc",[project:project])
-        }
-        // Limit the events to today-30 days and newer (ie. don't show events over a month ago) 
-        moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > new Date().minus(30)}
+		def moveEvents
+		def projectId = projects.find{it.id == project.id} ? project.id : 0
+		if (projectId == 0) {
+			moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",[project:projects])
+		} else {
+			project = Project.read(projectId)
+			moveEvents = MoveEvent.findAll("from MoveEvent m where project =:project order by m.project.name , m.name asc",[project:project])
+		}
+		// Limit the events to today-30 days and newer (ie. don't show events over a month ago) 
+		moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > new Date().minus(30)}
 		def paramsMap = [sortOn : 'lastName', firstProp : 'staff', orderBy : 'asc']
 		def staffList = getStaffList([project], currRole, currScale, currLoc, "0",paramsMap)
 		
 		def eventCheckStatuses = eventCheckStatus(staffList, moveEvents)
 		def staffCheckStatus = staffCheckStatus(staffList,project)
 		def editPermission  = RolePermissions.hasPermission('EditProjectStaff')
-	    [projects:projects, projectId:project.id, roleTypes:roleTypes, staffList:staffList,
+		[projects:projects, projectId:project.id, roleTypes:roleTypes, staffList:staffList,
 			 moveEventList:getBundleHeader( moveEvents ), currRole:currRole, currLoc:currLoc,
 			 currPhase:currPhase, currScale:currScale, project:project, eventCheckStatus:eventCheckStatuses,staffCheckStatus:staffCheckStatus,
 			 isTdsEmp:isTdsEmp, editPermission:editPermission]
@@ -634,8 +668,8 @@ class PersonController {
 		if (projectList.size() > 0) {
 			moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",[project:projectList])
 			
-	        // Limit the events to today-30 days and newer (ie. don't show events over a month ago)
-	        moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > now.minus(30)}
+			// Limit the events to today-30 days and newer (ie. don't show events over a month ago)
+			moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > now.minus(30)}
 
 			// Now find Staff List for the list of projects
 			staffList = getStaffList(projectList, role, scale, location, assigned, paramsMap)
@@ -734,60 +768,60 @@ class PersonController {
 		log.info("queryForStaff: $queryForStaff")
 			
 		def partyRoles = PartyRole.findAll(queryForStaff,sqlArgs)
-        def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
-        def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
-        def activeProjects = projectService.getActiveProject( now, projectHasPermission, 'name', 'asc' )
-        def allProjRelations = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' \
-                                                        and p.roleTypeCodeFrom = 'PROJECT' and p.partyIdFrom in (:partyIdFrom)",
-                                                        [partyIdFrom:activeProjects])
+		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
+		def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
+		def activeProjects = projectService.getActiveProject( now, projectHasPermission, 'name', 'asc' )
+		def allProjRelations = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' \
+														and p.roleTypeCodeFrom = 'PROJECT' and p.partyIdFrom in (:partyIdFrom)",
+														[partyIdFrom:activeProjects])
 		partyRoles.each { relation->
-            Party party = relation.party
-            def person = Person.read(party.id)
-            def addComUsers = isProjMgr ?: false
-            if(person.active == "Y"){
-                def doAdd = true
-                if(assigned == "1"){
-                    def hasProjReal
-                    if (projectId != "0") {
-                        hasProjReal = allProjRelations.find{ it.partyIdFrom?.id == project.id && it.partyIdTo?.id == party?.id && 
-                           it.roleTypeCodeTo.id == relation.roleType?.id}
-                    } else {
-                        hasProjReal = allProjRelations.find{it.partyIdTo.id == party.id && it.roleTypeCodeTo.id == relation.roleType.id}
-                    }
-                    if (!hasProjReal) {
-                        doAdd = false
-                    }
-                }
-                if(doAdd){
+			Party party = relation.party
+			def person = Person.read(party.id)
+			def addComUsers = isProjMgr ?: false
+			if(person.active == "Y"){
+				def doAdd = true
+				if(assigned == "1"){
+					def hasProjReal
+					if (projectId != "0") {
+						hasProjReal = allProjRelations.find{ it.partyIdFrom?.id == project.id && it.partyIdTo?.id == party?.id && 
+						   it.roleTypeCodeTo.id == relation.roleType?.id}
+					} else {
+						hasProjReal = allProjRelations.find{it.partyIdTo.id == party.id && it.roleTypeCodeTo.id == relation.roleType.id}
+					}
+					if (!hasProjReal) {
+						doAdd = false
+					}
+				}
+				if(doAdd){
 					
-        			def company = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = :party "+
-                        "and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'",[party:party]).partyIdFrom
+					def company = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = :party "+
+						"and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'",[party:party]).partyIdFrom
 					if(!isProjMgr){
-    					if(company.id == userCompany.id){
-    						addComUsers = true
-    					} else if(projectId != "0" ){
-    						def hasProjReal = allProjRelations.find{it.partyIdFrom?.id == project.id && it.partyIdTo?.id == party?.id && 
-                                it.roleTypeCodeTo.id == relation.roleType?.id}
-                            if(hasProjReal){
-                                addComUsers = true
-                            }
-    					}
+						if(company.id == userCompany.id){
+							addComUsers = true
+						} else if(projectId != "0" ){
+							def hasProjReal = allProjRelations.find{it.partyIdFrom?.id == project.id && it.partyIdTo?.id == party?.id && 
+								it.roleTypeCodeTo.id == relation.roleType?.id}
+							if(hasProjReal){
+								addComUsers = true
+							}
+						}
 					}
 					if( addComUsers ){
-	        			def projectStaff = allProjRelations.findAll{it.partyIdTo.id == party.id && it.roleTypeCodeTo.id == relation.roleType.id}?.partyIdFrom
-	                    def map = new HashMap()
-	                    map.put("company", company)
-	        			map.put("name", party.firstName+" "+ party.lastName)
-	        			map.put("role", relation.roleType)
-	        			map.put("staff", party)
-	        			map.put("project",projectId)
-	        			map.put("roleId", relation.roleType.id)
-	        			map.put("staffProject", projectStaff?.name)
+						def projectStaff = allProjRelations.findAll{it.partyIdTo.id == party.id && it.roleTypeCodeTo.id == relation.roleType.id}?.partyIdFrom
+						def map = new HashMap()
+						map.put("company", company)
+						map.put("name", party.firstName+" "+ party.lastName)
+						map.put("role", relation.roleType)
+						map.put("staff", party)
+						map.put("project",projectId)
+						map.put("roleId", relation.roleType.id)
+						map.put("staffProject", projectStaff?.name)
 					
-	    				staffList << map
+						staffList << map
 					}
-                }
-            }
+				}
+			}
 		}
 		*/
 		
@@ -813,19 +847,19 @@ class PersonController {
 		def blackOutdays = person.blackOutDates.sort{it.exceptionDay}
 		def subject = SecurityUtils.subject
 		def company = partyRelationshipService.getStaffCompany( person )
-        def companyProject = Project.findByClient( company )
-        def personFunctions = []
-        personFunctions = partyRelationshipService.getCompanyStaffFunctions(company.id, person.id)
-            
+		def companyProject = Project.findByClient( company )
+		def personFunctions = []
+		personFunctions = partyRelationshipService.getCompanyStaffFunctions(company.id, person.id)
+			
 		def availabaleFunctions = RoleType.findAllByDescriptionIlike("Staff%")
-        
+		
 		def isProjMgr = false
 		if( subject.hasRole("PROJ_MGR")){
 			isProjMgr = true
 		}
 		
 		render(template:tab ,model:[person:person, company:company, personFunctions:personFunctions, availabaleFunctions:availabaleFunctions, 
-            sizeOfassigned:(personFunctions.size()+1), blackOutdays:blackOutdays, isProjMgr:isProjMgr])
+			sizeOfassigned:(personFunctions.size()+1), blackOutdays:blackOutdays, isProjMgr:isProjMgr])
 			
 	}
 	
@@ -884,7 +918,7 @@ class PersonController {
 		   if(moveEventStaff && params.val == "0"){
 			  moveEventStaff.delete(flush:true)
 		   } else if( !moveEventStaff ){
-		      def projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, roleType )
+			  def projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, roleType )
 			  moveEventStaff = new MoveEventStaff()
 			  moveEventStaff.person = person
 			  moveEventStaff.moveEvent = moveEvent
@@ -940,7 +974,7 @@ class PersonController {
 			def roleId = staffObj.role.id
 			def staffId = staffObj.staff.id
 			def projectStaff =PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' "+
-                                                        "and p.partyIdFrom = $project.id and p.roleTypeCodeFrom = 'PROJECT' ")
+														"and p.partyIdFrom = $project.id and p.roleTypeCodeFrom = 'PROJECT' ")
 			def hasAssociation = projectStaff.find{it.partyIdTo.id == staffId && it.roleTypeCodeTo.id == roleId && it.partyIdFrom.id == it.partyIdFrom.id}
 			def checkMap = [:]
 			def checkId = "p-${staffObj.staff?.id}-${staffObj?.role?.id}-${project.id}" 
@@ -1006,7 +1040,7 @@ class PersonController {
 					break;
 				
 				case "StaffingRole" :
-				    def role = pref.value == "0" ? "All" : RoleType.get(pref.value).description
+					def role = pref.value == "0" ? "All" : RoleType.get(pref.value).description
 					prefMap.put((pref.preferenceCode), "Default Project Staffing Role / "+role.substring(role.lastIndexOf(':') +1))
 					break;
 					
@@ -1121,10 +1155,10 @@ class PersonController {
 	
 	/**
 	 * This action is used to merge Person's UserLogin according to criteria
-     * 1. If neither account has a UserLogin - nothing to do
-     * 2. If Person being merged into the master has a UserLogin but master doesn't, assign the UserLogin to the master Person record.
-     * 3. If both Persons have a UserLogin,select the UserLogin that has the most recent login activity. If neither have login activity, 
-     *	  choose the oldest login account.
+	 * 1. If neither account has a UserLogin - nothing to do
+	 * 2. If Person being merged into the master has a UserLogin but master doesn't, assign the UserLogin to the master Person record.
+	 * 3. If both Persons have a UserLogin,select the UserLogin that has the most recent login activity. If neither have login activity, 
+	 *	  choose the oldest login account.
 	 * @param fromUserLogin : instance of fromUserLogin
 	 * @param toUserLogin : instance of toUserLogin
 	 * @param toPerson: instance of toPerson
@@ -1213,12 +1247,12 @@ class PersonController {
 					jdbcTemplate.update("DELETE FROM party_relationship   \
 					   WHERE party_relationship_type_id = '${relation.prType}'\
 					   AND role_type_code_from_id = '${relation.rTypeCodeFrom}' AND role_type_code_to_id='${relation.rTypeCodeTo}' \
-				   	   AND party_id_to_id = ${fromPerson.id} AND party_id_from_id = ${relation.pIdFrom}")
+					   AND party_id_to_id = ${fromPerson.id} AND party_id_from_id = ${relation.pIdFrom}")
 				} else {
 				   jdbcTemplate.update("UPDATE party_relationship SET party_id_to_id = ${toPerson.id} \
 					   WHERE party_relationship_type_id = '${relation.prType}'\
 					   AND role_type_code_from_id = '${relation.rTypeCodeFrom}' AND role_type_code_to_id='${relation.rTypeCodeTo}' \
-				   	   AND party_id_to_id = ${fromPerson.id} AND party_id_from_id = ${relation.pIdFrom}")
+					   AND party_id_to_id = ${fromPerson.id} AND party_id_from_id = ${relation.pIdFrom}")
 				}
 			}
 		} catch(Exception ex){

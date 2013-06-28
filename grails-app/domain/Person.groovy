@@ -1,5 +1,7 @@
 class Person extends Party {
 
+	def partyRelationshipService
+
 	String firstName
 	String middleName
 	String lastName
@@ -22,7 +24,6 @@ class Person extends Party {
 	String staffType
 	Integer travelOK = 1
 
-
 	static hasMany =[
 		blackOutDates : ExceptionDates
 	]
@@ -31,7 +32,7 @@ class Person extends Party {
 	 */
 	 static constraints = {
 		 firstName( blank:false, nullable:false, maxLength:34 )
-		 middleName( blank:true, nullable:true, maxLength:34 )
+		 middleName( blank:true, nullable:true, maxLength:20 )
 		 lastName( blank:true, nullable:true, maxLength:34 )
 		 title( blank:true, nullable:true, maxLength:34 )
 		 nickName( blank:true, nullable:true, maxLength:34 )
@@ -73,13 +74,17 @@ class Person extends Party {
 		}
 	}
 	
-	def partyRelationshipService
-	transient def getPersonRoles(companyId){
-		def personFunctions = partyRelationshipService.getCompanyStaffFunctions(companyId, this.id)
+	/**
+	 * Get's the person's roles for a specified company
+	 * @param Integer - company id
+	 * @return Array of Staff Functions
+	 */
+	def getPersonRoles(companyId){
+		partyRelationshipService.getCompanyStaffFunctions(companyId, this.id)
 	}
 
 	String toString(){
-		"$firstName " + middleName?middleName:"" + "$lastName"
+		firstName + ( middleName ? " $middleName" : '' ) + ( lastName ? " $lastName" : '' )
 	}
 
 }

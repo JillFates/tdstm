@@ -266,34 +266,38 @@ function validatePersonForm(form) {
 	}
 	return returnVal
 }
- function createPersonDetails(forWhom){
-		 jQuery.ajax({
-				url : contextPath+'/person/save',
-				data : $('#createDialogForm').serialize(),
-				type : 'POST',
-				success : function(data) {
-					if(data.errMsg){
-						alert(data.errMsg)
-					}else{
-						$("#createStaffDialog").dialog('close')
-						if(!data.isPersonExist)
-							$('#'+data.fieldName).append('<option value="'+data.id+'" selected>'+data.name+'</option>');
-						else
-							$('#'+data.fieldName).val(data.id)
-					}
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					alert(textStatus +"->"+errorThrown)
-				}
-			});
+
+/**
+ * Ajax service function to call the person/save method and then update the select specified by fieldName
+ */
+function createPersonDetails(forWhom){
+	jQuery.ajax({
+		url : contextPath+'/person/save',
+		data : $('#createDialogForm').serialize(),
+		type : 'POST',
+		success : function(data) {
+			if (data.errMsg) {
+				alert(data.errMsg)
+			} else {
+				$("#createStaffDialog").dialog('close')
+				if(!data.isExistingPerson)
+					$('#'+data.fieldName).append('<option value="'+data.id+'" selected>'+data.name+'</option>');
+				else
+					$('#'+data.fieldName).val(data.id)
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			alert("An unexpected error occurred : " + textStatus + " : " + errorThrown)
+		}
+	});
 }
  
 function openPersonDiv(value, fieldName){
-		if(value=="0"){
-			$("#createStaffDialog").show()
-			$("#createStaffDialog").dialog('option', 'width', 500)
-			$("#createStaffDialog").dialog("open")
-			$("#fieldName").val( fieldName )
-			$("#createStaffDialog").dialog( "option", "title", "Create Person" );
-		}
+	if(value=="0"){
+		$("#createStaffDialog").show()
+		$("#createStaffDialog").dialog('option', 'width', 500)
+		$("#createStaffDialog").dialog("open")
+		$("#fieldName").val( fieldName )
+		$("#createStaffDialog").dialog( "option", "title", "Create Person" );
+	}
 }
