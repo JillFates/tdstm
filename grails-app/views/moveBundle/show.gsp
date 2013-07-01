@@ -64,51 +64,14 @@
 		return check
 	}
 
-	function createTask(id){
-		$("#messageDiv").hide();
-        $("#messageDiv").html('');
-       	var confirmStatus = confirm('Are you sure you want to create all tasks for this event?')
-       	if(confirmStatus){
-		   $("#createTasksInput").attr("disabled",true);		   
-		   $("#deleteTasksInput").attr("disabled",true);		   
-	       $("#messageDiv").html('Creating all tasks for the bundle. Please note that this may take a few minutes to complete.');
-		   $("#messageDiv").show();
-		   new Ajax.Request('../createTask?bundleId='+id,
-			{asynchronous:true,evalScripts:true,
-				onComplete:function(e){
-					$("#messageDiv").html(e.responseText);
-					$("#deleteTasksInput").attr("disabled",false);
-				}
-			})
-		}
-	}
 
-	function deleteTask(id){
-		$("#messageDiv").hide();
-        $("#messageDiv").html('');
-		if(confirm("Are you sure you want to delete the generated tasks?")){
-	       $("#messageDiv").html('Deleting all tasks for the bundle.');
-		   $("#messageDiv").show();
-		   $("#createTaskInput").attr("disabled",true);		   
-		   $("#deleteTaskInput").attr("disabled",true);		   
-		   new Ajax.Request('../deleteWorkflowTasks?bundleId='+id, 
-			{asynchronous:true,evalScripts:true,
-				onComplete:function(e){
-					$("#messageDiv").html(e.responseText);
-					$("#createTasksInput").attr('disabled',false);
-					$("#createTasksInput").show();
-					$("#deleteTasksInput").attr("disabled",false);
-				}
-			})
-		}
-	}
     </script>
   </head>
   <body>   
     <div class="nav" style="border: 1px solid #CCCCCC; height: 11px;width: 250px; margin:9px 14px 0px">
 			<span class="menuButton"><g:link class="list" action="list">Bundle List</g:link></span>
 		    <tds:hasPermission permission='MoveBundleEditView '>
-		    	<span class="menuButton"><g:link class="create" action="create" >New Bundle</g:link></span>
+		    	<span class="menuButton"><g:link class="create" action="create" >Create Bundle</g:link></span>
 			</tds:hasPermission>
 		</div>
     <div class="body" style="width: 330px;">
@@ -237,10 +200,6 @@
           <g:if test="${showHistoryButton}">
           		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Are you sure you want to permanently clear transitions for assets in this bundle?');" value="Clear Asset History" action="clearBundleAssetHistory"/></span>
           </g:if>
-              <span class="button" style="display:${!moveBundleInstance.tasksCreated ? 'block':'none'}">
-                <input type="button" id="createTasksInput" class="edit" value="Generate Tasks" onclick="createTask(${moveBundleInstance?.id})">  
-              </span>
-              <span class="button"><input type="button" id="deleteTaskInput" class="edit" value="Delete Tasks" onclick="deleteTask(${moveBundleInstance?.id})">  </span>
           </tds:hasPermission>
         </g:form>
       </div>

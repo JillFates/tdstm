@@ -10,7 +10,7 @@
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 		      <span class="menuButton"><g:link class="list" action="list">Events List</g:link></span>
 		     <tds:hasPermission permission='MoveEventShowView '>
-		        <span class="menuButton"><g:link class="create" action="create">New Event</g:link></span>
+		        <span class="menuButton"><g:link class="create" action="create">Create Event</g:link></span>
 		     </tds:hasPermission>
 				<span class="menuButton"><g:link class="create" controller="task" action="moveEventTaskGraph"
 					params="[moveEventId: moveEventInstance.id]">View Task Graph</g:link></span>
