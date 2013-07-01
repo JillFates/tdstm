@@ -3579,30 +3579,27 @@ class AssetEntityController {
 		int totalApplication =0;
 		int totalDatabase = 0;
 		int totalFiles = 0;
-		int unassignedAssetCount = 0;
-		int unassignedAppCount = 0;
-		int unassignedDBCount = 0;
-		int unassignedFilesCount = 0;
 
 		moveBundleList.each{ moveBundle->
-			def assetCount = AssetEntity.findAllByMoveBundleAndAssetTypeNotInList( moveBundle,["Application","Database","Files"], params ).size()
-			def applicationCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,"Application").size()
-			def databaseCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,"Database").size()
-			def filesCount = AssetEntity.findAllByMoveBundleAndAssetType(moveBundle,"Files").size()
-			assetSummaryList << ["name":moveBundle, "assetCount":assetCount, "applicationCount":applicationCount, "databaseCount":databaseCount, "filesCount":filesCount, id:moveBundle.id]
+			def assetCount = AssetEntity.countByMoveBundleAndAssetTypeNotInList( moveBundle,["Application","Database","Files"], params )
+			def applicationCount = Application.countByMoveBundle(moveBundle)
+			def databaseCount = Database.countByMoveBundle(moveBundle)
+			def filesCount = Files.countByMoveBundle(moveBundle)
+			assetSummaryList << ["name":moveBundle, "assetCount":assetCount, "applicationCount":applicationCount, 
+				"databaseCount":databaseCount, "filesCount":filesCount, id:moveBundle.id]
 		}
-
-		unassignedAssetCount = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId and assetType not in ('Application','Database','Files')").size()
-		unassignedAppCount = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId and assetType='Application'").size()
-		unassignedDBCount = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId and assetType='Database'").size()
-		unassignedFilesCount = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $projectId and assetType='Files'").size()
+		
+		def unassignedAssetCount = AssetEntity.executeQuery("SELECT COUNT(*) FROM AssetEntity WHERE moveBundle = null \
+						AND project = $projectId AND assetType NOT IN ('Application','Database','Files')")[0]
+		def unassignedAppCount = Application.executeQuery("SELECT COUNT(*) FROM Application WHERE moveBundle = null AND project = $projectId ")[0]
+		def unassignedDBCount = Database.executeQuery("SELECT COUNT(*) FROM Database WHERE moveBundle = null AND project = $projectId ")[0]
+		def unassignedFilesCount = Files.executeQuery("SELECT COUNT(*) FROM Files WHERE moveBundle = null AND project = $projectId ")[0]
 
 		assetSummaryList.each{asset->
 			totalAsset=totalAsset + asset.assetCount
 			totalApplication = totalApplication + asset.applicationCount
 			totalDatabase = totalDatabase + asset.databaseCount
 			totalFiles = totalFiles + asset.filesCount
-
 		}
 		totalAsset = totalAsset + unassignedAssetCount ;
 		totalApplication = totalApplication + unassignedAppCount;

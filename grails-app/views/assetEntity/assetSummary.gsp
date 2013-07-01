@@ -14,8 +14,8 @@
      <thead>
       <tr>
 	     <th>Bundle</th>
-	     <th style="text-align:center;"><g:link controller="assetEntity" action="list">Assets</g:link> </th>
-	     <th style="text-align:center;"><g:link controller="application" action="list">Applications</g:link></th>
+	     <th style="text-align:center;"><g:link controller="application" action="list">Applications</g:link> </th>
+	     <th style="text-align:center;"><g:link controller="assetEntity" action="list">Assets</g:link></th>
 	     <th style="text-align:center;"><g:link controller="database" action="list">Database</g:link></th>
 	     <th style="text-align:center;"><g:link controller="files" action="list">Storage</g:link></th>
 	   </tr>
@@ -53,25 +53,25 @@
     </g:each>
          <tr class='odd'>
 	          <td  style="text-align:right;"><i>UnAssigned</i></td>
-	          <g:if test="${unassignedAssetCount>0}">
-	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[moveBundleId:"unAssigned"]' >${unassignedAssetCount}</g:link></td>
-	          </g:if>
-	          <g:else>
-	              <td  style="text-align:right;"></td>
-	          </g:else>
 	          <g:if test="${unassignedAppCount>0}">
 	            <td  style="text-align:right;"><g:link controller="application" action="list" params='[moveBundleId:"unAssigned"]'>${unassignedAppCount}</g:link></td>
 	          </g:if>
 	         <g:else>
 	              <td  style="text-align:right;"></td>
 	          </g:else>
-	           <g:if test="${unassignedAppCount>0}">
+	          <g:if test="${unassignedAssetCount>0}">
+	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[moveBundleId:"unAssigned"]' >${unassignedAssetCount}</g:link></td>
+	          </g:if>
+	          <g:else>
+	              <td  style="text-align:right;"></td>
+	          </g:else>
+	           <g:if test="${unassignedDBCount>0}">
 	            <td  style="text-align:right;"><g:link controller="database" action="list" params='[moveBundleId:"unAssigned"]'>${unassignedDBCount}</g:link></td>
 	          </g:if>
 	         <g:else>
 	              <td  style="text-align:right;"></td>
 	          </g:else>
-	           <g:if test="${unassignedAppCount>0}">
+	           <g:if test="${unassignedFilesCount>0}">
 	            <td  style="text-align:right;"><g:link controller="files" action="list" params='[moveBundleId:"unAssigned"]'>${unassignedFilesCount}</g:link></td>
 	          </g:if>
 	         <g:else>
@@ -80,8 +80,8 @@
          </tr> 
         <tr class='odd'>
 	          <td  style="text-align:right;"><b>Total</b></td>
-	          <td  style="text-align:right;"><b><g:link controller="assetEntity" action="list">${totalAsset}</g:link></b></td>
 	          <td  style="text-align:right;"><b><g:link controller="application" action="list">${totalApplication}</g:link></b></td>
+	          <td  style="text-align:right;"><b><g:link controller="assetEntity" action="list">${totalAsset}</g:link></b></td>
 	          <td  style="text-align:right;"><b><g:link controller="database" action="list">${totalDatabase}</g:link></b></td>
 	          <td  style="text-align:right;"><b><g:link controller="files" action="list">${totalFiles}</g:link></b></td>
          </tr> 
