@@ -602,19 +602,10 @@ class ProjectController {
 			def browserTest = request.getHeader("User-Agent").toLowerCase().contains("mobile")
 			
 			
-	        if ( browserTest || params.mobileSelect ){
+	        if ( browserTest || params.mobileSelect )
 				redirect(controller:'clientTeams', action:'listTasks', params:[viewMode:'mobile'])
-			}else if(userPreferenceService.getPreference('START_PAGE')=='Current Dashboard'){
-			    if(RolePermissions.hasPermission('MoveBundleShowView')){
-					 redirect(controller:'moveBundle',action:'planningStats')
-				}else{
-				     redirect(controller:'projectUtil')
-				}
-			}else if(userPreferenceService.getPreference('START_PAGE')=='Admin Portal'){
-				redirect(controller:'auth' , action:'home')
-			}else{
+			else
 			    redirect(controller:'project', action:"show", id: projectInstance.id )
-			}
     	} else {
     		flash.message = "Please select Project"
     		redirect( action:"list" )

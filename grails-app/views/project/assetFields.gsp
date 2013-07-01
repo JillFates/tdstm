@@ -27,7 +27,7 @@
 				</tr>
 			</table>
 		</div>
-		<div data-ng-init="types=[{'id':'AssetEntity','name':'AssetEntity'},{'id':'Application','name':'Application'},{'id':'Database','name':'Database'},{'id':'Storage','name':'Files'}]">
+		<div data-ng-init="types=[{'id':'Application','name':'Application'},{'id':'AssetEntity','name':'AssetEntity'},{'id':'Database','name':'Database'},{'id':'Storage','name':'Files'}]">
 	<table class="fieldTable">
 		<tr ng-repeat="type in types">
 			<td class="assetTd"><h1 ng-click="toggleSection(type.name)" class="assetImage">{{type.id}}
