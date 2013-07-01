@@ -244,9 +244,16 @@ class PersonController {
 				// Create the person and relationship appropriately
 
 				person = new Person( params )
-				if ( !person.hasErrors() && person.save() ) {					
+				if ( !person.hasErrors() && person.save() ) {			
+					//Receiving added functions		
+					def functions = params.list("function")
 					def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", person, "STAFF" )
-					userPreferenceService.setUserRoles([params.role], person.id)
+					if(functions){
+						userPreferenceService.setUserRoles(functions, person.id)
+						def staffCompany = partyRelationshipService.getStaffCompany(person)
+						//Adding requested functions to Person .
+						partyRelationshipService.updateStaffFunctions(staffCompany, person, functions, 'STAFF')
+					}
 					if (! isAjaxCall) {
 						// Just add a message for the form submission to know that the person was created
 						flash.message = "A record for ${person.toString()} was created"

@@ -146,17 +146,26 @@
                     	<g:textField name="mobilePhone" value="${personInstance?.mobilePhone}" size="34"/>
 					</td>
 				</tr>
+				
 				<tr class="prop">
-					<td valign="top" class="name"><label for="roles">Teams :</label></td>
+					<td valign="top" class="name"><label>Team :</label></td>
 					<td valign="top" class="value" colspan="2">
-						<g:select from="${availabaleRoles}" id="roleId" name="role"
-							optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"
-							value="" optionKey="id" />
+						<table style="border: 0px">
+							<tbody id="funcsCreateTbodyId">
+							</tbody>
+						</table> <span style="cursor: pointer;" onclick="addFunctionsCreate()"><b>Add
+								Team </b></span>
 					</td>
 				</tr>
-              </tbody>
+				</tbody>
             </table>
           </div>
+          <div id="availableFuncsCreateId" style="display: none">
+				<g:select from="${availabaleRoles}" id="functionId" name="funcToAdd"
+					optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"
+					value="" optionKey="id" />
+			</div>
+			<input type="hidden" id="maxSize" value="0">
           <div class="buttons">
             <span class="button">
             <g:if test="${forWhom =='person'}">
@@ -172,3 +181,12 @@
           </div>
         </g:form>
       </div>
+      <script type="text/javascript"> 
+       function addFunctionsCreate(){
+    	  	var selectHtml = $("#availableFuncsCreateId").html().replace("funcToAdd","function")
+    		var id=$("#maxSize").val()
+    		$("#funcsCreateTbodyId").append("<tr id='roleTrId_"+id+"'><td> "+ selectHtml +"<a href=\"javascript:deleteFuncsRow(\'roleTrId_"+id+"')\">&nbsp;&nbsp;"+"<span class=\'clear_filter\'>X</span></a> </td></tr><br/>")
+    		$("#maxSize").val(parseInt(id)+1)
+       }
+      
+      </script>
