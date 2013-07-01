@@ -3,7 +3,7 @@
  */
 databaseChangeLog = {
 	// This Changeset is used to add the nullable varchar(20) column middle_name with a default value of ''
-	changeSet(author: "Ross", id: "20130627 TM-1946-3") {
+	changeSet(author: "Ross", id: "20130627 TM-1946-4") {
 		comment("Add column middle_name of datatype nullable varchar(20) with a default value of ''")
 		preConditions(onFail:'MARK_RAN') {
 			not {
