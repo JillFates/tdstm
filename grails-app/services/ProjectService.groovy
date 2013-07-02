@@ -11,29 +11,24 @@ class ProjectService {
 	def securityService
 	def partyRelationshipService
 	
-/*
- * Returns list of completed Project means projects whose completion time is less than today's date
- */
-
-    def getCompletedProject( timeNow, projectHasPermission, sortOn, orderBy ) {
+	/*
+	 * Returns list of completed Project means projects whose completion time is less than today's date
+	 */
+    def getCompletedProject( timeNow, projectHasPermission, String sortOn='name',String orderBy='desc', def params = [:]) {
 		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
-		def projects = []
-		if(projectHasPermission){
-			projects = Project.createCriteria().list {
-				and {
-					lt("completionDate", timeNow)
-				}
-				order(sortOn, orderBy)
-			}
-		} else {
-			def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+
-					"and partyIdTo = ${loginUser.person.id} and roleTypeCodeFrom = 'COMPANY' and roleTypeCodeTo = 'STAFF' ")
-			def query = "from Project p where p.id in (select pr.partyIdFrom from PartyRelationship pr where "+
-					"pr.partyIdTo = ${userCompany?.partyIdFrom?.id} and roleTypeCodeFrom = 'PROJECT') or "+
-					"p.client = ${userCompany?.partyIdFrom?.id} order by ${sortOn} ${orderBy}"
-			projects = Project.findAll(query).findAll{it.completionDate && it.completionDate.getTime() < timeNow.getTime()}
+		def projects
+		def parties
+		def companyId
+		
+		if(!projectHasPermission){
+			def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' \
+				and partyIdTo = ${loginUser.person.id} and roleTypeCodeFrom = 'COMPANY' and roleTypeCodeTo = 'STAFF' ")
+			companyId = userCompany?.partyIdFrom
+			parties = PartyRelationship.executeQuery("SELECT pr.partyIdFrom FROM PartyRelationship pr WHERE \
+						pr.partyIdTo = ${companyId?.id} AND pr.roleTypeCodeFrom = 'PROJECT' ")
 		}
 		
+		projects = projectFilter( parties, projectHasPermission, companyId, timeNow, params, "completed")
 		return  projects
 	}
 
@@ -46,9 +41,9 @@ class ProjectService {
 	 * @param String orderBy - order to which the sort is done (default 'desc')
 	 * @return Project[] - an array of Project objects
 	 */
-	def getActiveProject( def timeNow, def viewAllPerm, String sortOn='name', String orderBy='desc' ) {
+	def getActiveProject( def timeNow, def viewAllPerm, String sortOn='name', String orderBy='desc', def params = [:]) {
 		Person nullPerson = null
-		return getActiveProject(timeNow, viewAllPerm, nullPerson, sortOn, orderBy)
+		return getActiveProject(timeNow, viewAllPerm, nullPerson, sortOn, orderBy, params)
 	}
 	
 	/**
@@ -60,36 +55,64 @@ class ProjectService {
 	 * @param String orderBy - order to which the sort is done (default 'desc')
 	 * @return Project[] - an array of Project objects
 	 */
-	def getActiveProject( def timeNow, def viewAllPerm, Person person, String sortOn='name', String orderBy='desc' ) {
-		def projects = []
-		if (viewAllPerm){
-			projects = Project.createCriteria().list {
-				and {
-					ge("completionDate", timeNow)
-				}
-				order(sortOn, orderBy)
-			}
-		} else {
-			
-			// Lookup the logged in user if a person was not passed to the method
-			person = person ?: securityService.getUserLoginPerson() 
-			def company = partyRelationshipService.getStaffCompany( person )
-			
-			/*
-						def loginPerson = UserLogin.findByUsername(SecurityUtils.subject.principal)
-						def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+
-								"and partyIdTo = ${loginUser.person.id} and roleTypeCodeFrom = 'COMPANY' and roleTypeCodeTo = 'STAFF' ")
-			*/
-			def query = "FROM Project p WHERE p.id IN " +
-			    "( SELECT pr.partyIdFrom FROM PartyRelationship pr WHERE "+
-				"pr.partyIdTo = ${company?.id} and roleTypeCodeFrom = 'PROJECT' )" +
-				" OR " +
-				"p.client = ${company?.id} order by ${sortOn} ${orderBy}"
-			projects = Project.findAll(query)
-			if (projects)
-				projects = projects.findAll{it.completionDate && it.completionDate.getTime() > timeNow.getTime()}
+	def getActiveProject( def timeNow, def viewAllPerm, Person person, String sortOn='name', String orderBy='desc', def params = [:] ) {
+		def projects 
+		def company
+		def parties
+		if(!viewAllPerm){
+			person = person ?: securityService.getUserLoginPerson()
+			company = partyRelationshipService.getStaffCompany( person )
+			parties = PartyRelationship.executeQuery("SELECT pr.partyIdFrom FROM PartyRelationship pr WHERE \
+							pr.partyIdTo = ${company?.id} AND pr.roleTypeCodeFrom = 'PROJECT' ")
 		}
 		
+		projects = projectFilter( parties, viewAllPerm, company, timeNow, params, "active")
+		
+		return projects
+	}
+	
+    /**
+     * Returns list of Active Projects based on the filters selected by the user in projectList
+     * @param parties - list of Party to filter project if user do not have viewAll perm
+     * @param viewAllPerm - perm to view all projects
+     * @param company - company instance associated with user
+     * @param timeNow - current time
+     * @return Project[] - an array list of Project objects
+     */
+	def projectFilter( def parties, def viewAllPerm,def company ,def timeNow, def params = [:], def active="active"){
+		def maxRows = params.rows ? Integer.valueOf(params.rows) : 25
+		def currentPage = params.page ? Integer.valueOf(params.page) : 1
+		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		
+		def startDates = params.startDate ? Project.findAll("from Project where startDate like '%${params.startDate}%'")?.startDate : []
+		def completionDates = params.completionDate ? Project.findAll("from Project where completionDate like '%${params.completionDate}%'")?.completionDate : []
+		
+		def projects = Project.createCriteria().list(max: maxRows, offset: rowOffset) {
+			if (!viewAllPerm){
+				or {
+					if(parties)
+						'in'("id",parties.id)
+					eq('client', company)
+				}
+			}
+			if(active == "active"){
+				ge("completionDate", timeNow)
+			}else{
+				lt('completionDate', timeNow)
+			}
+			if (params.projectCode)
+				ilike('projectCode', "%${params.projectCode}%")
+			if (params.name)
+				ilike('name', "%${params.name}%")
+			if (params.comment)
+				ilike('comment', "%${params.comment}%")
+			if (startDates)
+				'in'('startDate' , startDates)
+			if (completionDates)
+				'in'('completionDate' , completionDates)
+				
+			order(params.sidx ?: 'projectCode', params.sord ?: 'asc')
+		}
 		return projects
 	}
 	/**

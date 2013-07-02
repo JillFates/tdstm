@@ -19,6 +19,7 @@ import com.tds.asset.TaskDependency;
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
 import com.tdsops.tm.enums.domain.*
+import com.tdssrc.grails.TimeUtil
 
 class MoveBundleController {
 
@@ -40,20 +41,58 @@ class MoveBundleController {
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
 	def list = {
-
-		if(!params.sort) params.sort = 'startTime'
-		if(!params.order) params.order = 'asc'
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def moveBundleList = []
-		def projectInstance = Project.findById( projectId )
-		def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance, [sort:'name'] )
-		// Statements for JMESA integration
-		TableFacade tableFacade = new TableFacadeImpl("tag",request)
-		tableFacade.items = moveBundleInstanceList
-		return [moveBundleInstanceList : moveBundleInstanceList]
-
 	}
+	
+	/**
+	 * Used to generate the List for Bundles using jqgrid.
+	 * @return : list of bundles as JSON
+	 */
+	def listJson = {
+		def sortIndex = params.sidx ?: 'name'
+		def sortOrder  = params.sord ?: 'asc'
+		def maxRows = Integer.valueOf(params.rows)
+		def currentPage = Integer.valueOf(params.page) ?: 1
+		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		def project = securityService.getUserCurrentProject()
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def dueFormatter = new SimpleDateFormat("MM/dd/yyyy")
+		
+		def startDates = params.startTime ? MoveBundle.findAll("from MoveBundle where project =:project and startTime like '%${params.startTime}%'",[project:project])?.startTime : []
+		def completionDates = params.completionTime ? MoveBundle.findAll("from MoveBundle where project =:project and completionTime like '%${params.completionTime}%'",[project:project])?.completionTime : []
+		
+		def bundleList = MoveBundle.createCriteria().list(max: maxRows, offset: rowOffset) {
+				if (params.name)
+					ilike('name', "%${params.name}%")
+				if (params.description)
+					ilike('description', "%${params.description}%")
+				if (params.useOfPlanning)
+					eq('useOfPlanning', (params.useOfPlanning.equalsIgnoreCase('Y') ? true : false))
+				if (startDates) 
+					'in'('startTime' , startDates)
+				if (completionDates)
+					'in'('completionTime' , completionDates)
+				
+				if(sortIndex!='assetQty')	
+					order(sortIndex, sortOrder).ignoreCase()
+		}
+		def totalRows = bundleList.totalCount
+		def numberOfPages = Math.ceil(totalRows / maxRows)
+		
+		//Sorting by assetQuantity per page
+		if(sortIndex=='assetQty')
+			bundleList.sort{(sortOrder=='desc' ? -it.assetQty : it.assetQty)}
+		
+		def results = bundleList?.collect {
+			[ cell: [it.name, it.description, (it.useOfPlanning ? 'Y' : 'N'), it.assetQty, 
+				(it.startTime ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.startTime, tzId)):''),
+				(it.completionTime ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.completionTime, tzId)):'')],
+				 id: it.id]
+			}
 
+		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
+
+		render jsonData as JSON
+	}
 	def show = {
 		userPreferenceService.loadPreferences("MOVE_EVENT")
 		def moveBundleId = params.id

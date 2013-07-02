@@ -3,61 +3,81 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <title>Project List</title>
-<script language="javascript" src="${resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
-<link rel="stylesheet" type="text/css" href="${resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
+<link type="text/css" rel="stylesheet"
+	href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+<script src="${resource(dir:'js',file:'jquery.form.js')}"></script>
+<jqgrid:resources />
+<jqui:resources />
+<jqgrid:resources />
+
 <script type="text/javascript">
-function onInvokeAction(id) {
-    setExportToLimit(id, '');
-    createHiddenInputFieldsForLimitAndSubmit(id);
-}
-function onInvokeExportAction(id) {
-    var parameterString = createParameterStringForLimit(id);
-    location.href = 'list?' + parameterString;
-}
-</script>
+		
+$(document).ready(function() {
+	var listCaption ="Projects: \
+	<tds:hasPermission permission='CreateProject'>\
+		<span class='capBtn'><input type='button' value='Create Project' onClick=\"window.location.href=\'"+contextPath+"/project/create\'\"/></span> \
+		<span class='capBtn'><input type='button' class='save' onClick=\"window.location.href=\'"+contextPath+"/projectUtil/createDemo\'\" value='Create Demo Project' /></span>\
+	</tds:hasPermission>\
+	<span class='capBtn' style='${active=='active' ? 'display:none':'' }'><a href=\'"+contextPath+"/project/list?active=active\'> \
+	<input type='button' value='Show Active Projects'/></a></span>\
+	<span class='capBtn' style='${active=='completed' ? 'display:none':'' }'><a href=\'"+contextPath+"/project/list?active=completed\'> \
+	<input type='button' value='Show Completed Projects'/></a></span>"
+	
+	var isActive = '${active}'
+	<jqgrid:grid id="projectGridId" url="'${createLink(action: 'listJson')}'"
+		colNames="'Project Code','Name', 'Start Date','Completion Date', 'Comment'"
+		colModel="{name:'projectCode', index: 'projectCode', width:'150',formatter: myLinkFormatter},
+					  {name:'name', editable: true, width:'150'},
+					  {name:'startDate', editable: true,width:'150'},
+					  {name:'completionDate', editable: true, width:'150'},
+					  {name:'comment', editable: true,width:'100'}"
+		sortname="'projectCode'"
+		caption="listCaption"
+		height="'100%'"
+		width="'500px'"
+		rowNum="'25'"
+		rowList= "'25','100','500','1000'"
+		viewrecords="true"
+		postData="{isActive:isActive}"
+		showPager="true"
+		datatype="'json'">
+		<jqgrid:filterToolbar id="projectGridId" searchOnEnter="false" />
+		<jqgrid:navigation id="projectGridId" add="false" edit="false" del="false" search="false"/>
+		<jqgrid:refreshButton id="projectGridId" />
+	</jqgrid:grid>
+	$.jgrid.formatter.integer.thousandsSeparator='';
+	function myLinkFormatter (cellvalue, options, rowObjcet) {
+		var value = cellvalue ? cellvalue : ''
+		return '<a href="'+contextPath+'/project/addUserPreference/'+options.rowId+'">'+value+'</a>'
+	}
+});
+		</script>
 </head>
 <body>
-
-<div class="body"><br/>
-<g:if test="${flash.message}">
-	<div class="message">${flash.message}</div>
-</g:if>
-<div>
-	<div class="buttons"> 
-		<g:form action="list" method="post">
-		<tds:hasPermission permission='CreateProject'>
-			<span class="button"><g:actionSubmit class="save" action="Create" value="Create Project" /></span>
-			<span class="button"><input type="button" class="save" onclick="javascript:location.href='../projectUtil/createDemo'" value="Create Demo Project" /></span>
-		</tds:hasPermission>
-		<g:if test="${session.getAttribute('COMPLETED_PROJ') == 'COMPLETE'}">
-			<span class="menuButton"> <g:link class="save" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">Show Active Projects</g:link></span>		
-		</g:if >
-		<g:else>
-			<span class="menuButton"><g:link class="save"controller="project" action="list" params="[active:'false',_action_List:'Show Completed Projects']" >Show Completed Projects </g:link></span>
-		</g:else>
-		</g:form>															
+	<div class="body fluid">
+		<h1>Project List</h1>
+		<g:if test="${flash.message}">
+			<div id="messageDivId" class="message">
+				${flash.message}
+			</div>
+		</g:if>
+		<div>
+			<div id="messageId" class="message" style="display: none"></div>
+		</div>
+		<table id="gridTableId" style="width: 50% !important;">
+			<tr>
+				<td><jqgrid:wrapper id="projectGridId" /></td>
+			</tr>
+			<tr>
+				<td><div class="buttons">
+				<g:form>
+					<tds:hasPermission permission='CreateProject '>
+  						<span class="button"><g:actionSubmit class="save" action="Create" value="Create Project" /></span>
+  					</tds:hasPermission>
+  				</g:form>
+  				</div></td>
+			</tr>
+		</table>
 	</div>
-	<form name="projectForm" action="list">
-         <jmesa:tableFacade id="tag" items="${projectList}" maxRows="25" stateAttr="restore" var="projectInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
-             <jmesa:htmlTable style=" border-collapse: separate">
-                 <jmesa:htmlRow highlighter="true">
-                     <jmesa:htmlColumn property="projectCode" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-					 <g:link controller="project" action="addUserPreference" params="['selectProject':projectInstance.projectCode]">${projectInstance.projectCode}</g:link>
-					 </jmesa:htmlColumn>
-					 <jmesa:htmlColumn property="name" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${projectInstance.name}</jmesa:htmlColumn>
-                     <jmesa:htmlColumn property="startDate" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.BasicCellEditor"><tds:convertDate date="${projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
-                     <jmesa:htmlColumn property="completionDate" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.BasicCellEditor"><tds:convertDate date="${projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
-                     <jmesa:htmlColumn property="comment" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${projectInstance.comment}</jmesa:htmlColumn>
-                 </jmesa:htmlRow>
-             </jmesa:htmlTable>
-         </jmesa:tableFacade>
-     </form>
-</div>
-</div>
-<script>
-	currentMenuId = "#projectMenu";
-	$("#projectMenuId a").css('background-color','#003366')
-	
-</script>
 </body>
 </html>

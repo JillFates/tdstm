@@ -30,35 +30,45 @@ class ProjectController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
     def list = {
-		def active
-		if(params.active=="active"){
-			session.removeAttribute("COMPLETED_PROJ")
-		}
-		def projectList
-		def partyProjectList
-		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
-		
-		def sort = params.sort ? params.sort : 'projectCode' 
-		def order = params.order ? params.order : 'asc'
-	    def now = TimeUtil.nowGMT()
-		if(params._action_List=="Show Completed Projects"){
-			projectList = projectService.getCompletedProject( now, projectHasPermission, sort, order )
-			session.setAttribute("COMPLETED_PROJ", "COMPLETE")
-		} else if(session.getAttribute("COMPLETED_PROJ")=="COMPLETE"){
-			projectList = projectService.getCompletedProject( now, projectHasPermission, sort, order )
-		} else {
-			projectList = projectService.getActiveProject( now, projectHasPermission, sort, order )
-		}
-		TableFacade tableFacade = new TableFacadeImpl("tag",request)
-        tableFacade.items = projectList
-        Limit limit = tableFacade.limit
-		if(limit.isExported()){
-            tableFacade.setExportTypes(response,limit.getExportType())
-            tableFacade.setColumnProperties("projectCode","name","comment")
-            tableFacade.render()
-        }else
-        	return [ projectList:projectList]
+		return [active:params.active?:'active']
     }
+	/**
+	 * Used to generate the List for projects using jqgrid.
+	 * @return : list of projects as JSON
+	 */
+	def listJson = {
+		def sortIndex = params.sidx ?: 'projectCode'
+		def sortOrder  = params.sord ?: 'asc'
+		def maxRows = Integer.valueOf(params.rows)
+		def currentPage = Integer.valueOf(params.page) ?: 1
+		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def dueFormatter = new SimpleDateFormat("MM/dd/yyyy")
+		
+		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
+		def now = TimeUtil.nowGMT()
+		
+		def projectList 
+		if( params.isActive == "active" )
+			projectList =  projectService.getActiveProject( now, projectHasPermission, sortIndex, sortOrder, params)
+		else	
+			projectList =  projectService.getCompletedProject ( now, projectHasPermission, sortIndex, sortOrder, params)
+		
+		def totalRows = projectList.totalCount
+		def numberOfPages = Math.ceil(totalRows / maxRows)
+
+		def results = projectList?.collect { 
+			def startDate = ''
+			def completionDate = ''
+			startDate = it.startDate ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.startDate, tzId)) : ''
+			completionDate = it.completionDate ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.completionDate, tzId)) : ''
+			[ cell: [it.projectCode, it.name, startDate, completionDate,it.comment], id: it.id,]
+			}
+
+		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
+
+		render jsonData as JSON
+	}
     /*
      *  return the details of Project
      */
@@ -595,9 +605,9 @@ class ProjectController {
      * Action to setPreferences
      */
     def addUserPreference = {
-    	def selectProject = params.selectProject
+    	def selectProject = params.id
     	if(selectProject){
-    		def projectInstance = Project.findByProjectCode(params.selectProject)
+    		def projectInstance = Project.read(params.id)
 	        userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
 			def browserTest = request.getHeader("User-Agent").toLowerCase().contains("mobile")
 			
@@ -605,7 +615,7 @@ class ProjectController {
 	        if ( browserTest || params.mobileSelect )
 				redirect(controller:'clientTeams', action:'listTasks', params:[viewMode:'mobile'])
 			else
-			    redirect(controller:'project', action:"show", id: projectInstance.id )
+			    redirect(controller:'project', action:"show", id: params.id )
     	} else {
     		flash.message = "Please select Project"
     		redirect( action:"list" )

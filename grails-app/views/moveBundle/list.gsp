@@ -1,57 +1,72 @@
-
-
 <html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-  <meta name="layout" content="projectHeader" />
-  <title>Bundle List</title>
-<script language="javascript" src="${resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
-<link rel="stylesheet" type="text/css" href="${resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
-<script type="text/javascript">
-function onInvokeAction(id) {
-    setExportToLimit(id, '');
-    createHiddenInputFieldsForLimitAndSubmit(id);
-}
-</script>
-</head>
-<body>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="layout" content="projectHeader" />
+        <title>Bundle List</title>
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+		<script src="${resource(dir:'js',file:'jquery.form.js')}"></script>
+		<jqgrid:resources />
+		<jqui:resources /> 
+		<jqgrid:resources />
 
-<div class="body">
-  <h1>Bundle List</h1>
-  <g:if test="${flash.message}">
-    <div class="message">${flash.message}</div>
-  </g:if>
-  <div>
-    <form name="projectForm" action="list">
-         <jmesa:tableFacade id="tag" items="${moveBundleInstanceList}" maxRows="25" stateAttr="restore" var="moveBundle" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
-             <jmesa:htmlTable style=" border-collapse: separate">
-                 <jmesa:htmlRow highlighter="true">
-                     <jmesa:htmlColumn property="name" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-						<g:link  action="show" id="${moveBundle?.id}">${moveBundle?.name}</g:link>
-					 </jmesa:htmlColumn>
-					 <jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${moveBundle?.description}</jmesa:htmlColumn>
-					 <jmesa:htmlColumn property="useOfPlanning" title="Planning" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${moveBundle?.useOfPlanning?'Y':' '}</jmesa:htmlColumn>
-					 <jmesa:htmlColumn property="assetQty" title="Asset Qty" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${moveBundle?.assetQty}</jmesa:htmlColumn>
-                     <jmesa:htmlColumn property="startTime" title="Start" sortable="true" filterable="true" pattern="MM/dd/yyyy" cellEditor="org.jmesa.view.editor.BasicCellEditor"><tds:convertDateTime date="${moveBundle?.startTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
-                     <jmesa:htmlColumn property="completionTime" title="Completion" sortable="true" filterable="true" pattern="MM/dd/yyyy" cellEditor="org.jmesa.view.editor.BasicCellEditor"><tds:convertDateTime date="${moveBundle?.completionTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
-                 </jmesa:htmlRow>
-             </jmesa:htmlTable>
-         </jmesa:tableFacade>
-     </form>
-  </div>
-
-  <div class="buttons"> 
-  <g:form>
-	<input type="hidden" id="projectId" name="projectId" value="${projectId}"/>
-	<tds:hasPermission permission='MoveBundleEditView '>
-  	<span class="button"><g:actionSubmit	class="save" action="Create" value="Create" /></span>
-  	</tds:hasPermission>
-  </g:form>
-  </div>
-</div>
-   <script>
-	currentMenuId = "#bundleMenu";
-	$("#bundleMenuId a").css('background-color','#003366')
-   </script>
-</body>
+		<script type="text/javascript">
+		$(document).ready(function() {	
+			var listCaption ="Bundles:<span class='capBtn'>"+
+				"<input type='button' value='Create Bundle' onClick=\"window.location.href=\'"+contextPath+"/moveBundle/create\'\"/></span>"			
+			<jqgrid:grid id="bundleGridId" url="'${createLink(action: 'listJson')}'"
+				colNames="'Name', 'Description','Planning', 'Asset Qty', 'Start', 'Completion'"
+				colModel="{name:'name', index: 'name', width:'150',formatter: myLinkFormatter},
+							  {name:'description', editable: true, width:'150'},
+							  {name:'useOfPlanning', editable: true,width:'150'},
+							  {name:'assetQty', editable: true,width:'100', search:false},
+							  {name:'startTime', editable: true, width:'150'},
+							  {name:'completionTime', editable: true,width:'100'}"
+				sortname="'name'"
+				caption="listCaption"
+				height="'100%'"
+				width="'500px'"
+				rowNum="'25'"
+				rowList= "'25','100','500','1000'"
+				viewrecords="true"
+				showPager="true"
+				datatype="'json'">
+				<jqgrid:filterToolbar id="bundleGridId" searchOnEnter="false" />
+				<jqgrid:navigation id="bundleGridId" add="false" edit="false" del="false" search="false"/>
+				<jqgrid:refreshButton id="bundleGridId" />
+			</jqgrid:grid>
+			$.jgrid.formatter.integer.thousandsSeparator='';
+			function myLinkFormatter (cellvalue, options, rowObjcet) {
+				var value = cellvalue ? cellvalue : ''
+					return '<a href="'+contextPath+'/moveBundle/show/'+options.rowId+'">'+value+'</a>'
+			}
+		});
+		</script>
+	</head>
+	<body>
+		<div class="body fluid">
+			<h1>Bundle List</h1>
+			<g:if test="${flash.message}">
+				<div id="messageDivId" class="message" >${flash.message}</div>
+			</g:if>
+			<div >
+				<div id="messageId" class="message" style="display:none">
+				</div>
+			</div>
+			<table id="gridTableId" style="width:58%!important;">
+				<tr>
+					<td><jqgrid:wrapper id="bundleGridId" /></td>
+				</tr>
+				<tr>
+					<td><div class="buttons"> 
+  				<g:form>
+					<input type="hidden" id="projectId" name="projectId" value="${projectId}"/>
+						<tds:hasPermission permission='MoveBundleEditView '>
+  					<span class="button"><g:actionSubmit class="save" action="Create" value="Create Bundle" /></span>
+  					</tds:hasPermission>
+  				</g:form>
+  </div></td>
+				</tr>
+			</table>
+		</div>
+	</body>
 </html>
