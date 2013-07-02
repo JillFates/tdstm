@@ -44,14 +44,6 @@ class MoveEventController {
 	 * will return the list of MoveEvents
 	 */
     def list = {
-    	def moveEventInstanceList
-        if(!params.max) params.max = 10
-        def currProj = session.getAttribute("CURR_PROJ").CURR_PROJ;
-    	if(currProj) moveEventInstanceList = MoveEvent.findAllByProject( Project.get( currProj ))
-		// Statements for JMESA integration
-    	TableFacade tableFacade = new TableFacadeImpl("tag",request)
-        tableFacade.items = moveEventInstanceList
-        [ moveEventInstanceList: moveEventInstanceList, projectId : currProj ]
     }
 	
 	/**
