@@ -111,10 +111,8 @@ function deleteRow( rowId ){
 	$("#"+rowId).remove()
 }
 function updateAssetsList( name, value ){
-	alert('name: '+name+' value:'+value)
 	var idValues = name.split("_")
 	$("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']").html($("#"+value+" select").html())
-	alert($("#"+value+" select").html())
 }
 function updateTitle( type ){
 	$("#createEntityView").dialog( "option", "title", 'Create '+type );
