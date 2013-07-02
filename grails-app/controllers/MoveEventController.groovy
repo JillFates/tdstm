@@ -9,6 +9,7 @@ import jxl.format.UnderlineStyle
 import jxl.read.biff.*
 import jxl.write.*
 
+import org.apache.commons.lang.StringUtils
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder
@@ -52,6 +53,47 @@ class MoveEventController {
         tableFacade.items = moveEventInstanceList
         [ moveEventInstanceList: moveEventInstanceList, projectId : currProj ]
     }
+	
+	/**
+	 * 
+	 */
+	def listJson ={
+		
+		def sortIndex = params.sidx ?: 'name'
+		def sortOrder  = params.sord ?: 'asc'
+		def maxRows =  Integer.valueOf(params.rows)
+		def currentPage = Integer.valueOf(params.page) ?: 1
+		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+
+		def project = securityService.getUserCurrentProject()
+		def inProg = params.inProgress ? getInprogList(params.inProgress) : null
+		
+		def events = MoveEvent.createCriteria().list(max: maxRows, offset: rowOffset) {
+			eq("project", project)
+			if (params.name)
+				ilike('name', "%${params.name.trim()}%")
+			if (params.description)
+				ilike('description', "%${params.description}%")
+			if (params.runbookStatus)
+				ilike('runbookStatus', "%${params.runbookStatus}%")
+			if (inProg)
+				'in'('inProgress', inProg)
+				
+			order(sortIndex, sortOrder).ignoreCase()
+		}
+		
+		def totalRows = events.totalCount
+		def numberOfPages = Math.ceil(totalRows / maxRows)
+			
+		def results = events?.collect { [ cell: [it.name, it.description, g.message(code: "event.inProgress.${it.inProgress}"), it.runbookStatus,
+					it.moveBundlesString], id: it.id,
+			]}
+		
+		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
+		
+		render jsonData as JSON
+	}
+	
 	/*
 	 * return the MoveEvent details for selected MoveEvent
 	 * @param : MoveEvent Id
@@ -844,5 +886,22 @@ class MoveEventController {
 			}
 		}
 		render message
+	}
+	
+	/**
+	 * This method is used to filter inProgress property , As we are displaying different label in list so user may serch according to
+	 * displayed label but in DB we have different values what we are displaying in label 
+	 * e.g. for auto - Auto Start, true - Started ..
+	 * @param inProgress with what character user filterd InProgress property
+	 * @return matched db property of inProgress
+	 */
+	def getInprogList(inProgress){
+		def progList = ['Auto Start':'auto', 'Started':'true', 'Stopped':'false']
+		def returnList = []
+		progList.each{key, value->
+			if(StringUtils.containsIgnoreCase(key, inProgress))
+				returnList <<  value
+		}
+		return returnList
 	}
 }
