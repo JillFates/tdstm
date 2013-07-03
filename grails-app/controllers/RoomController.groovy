@@ -1,7 +1,7 @@
 import grails.converters.JSON
 
-import org.apache.poi.hssf.record.formula.functions.T
 import org.hibernate.SessionFactory
+import org.apache.commons.lang.math.NumberUtils 
 
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
@@ -181,8 +181,8 @@ class RoomController {
 				racks.each{rack->
                 	if(rackIds?.contains(rack.id.toString())){
 						rack.tag = params["tag_"+rack.id]
-	                	rack.roomX = params["roomX_"+rack.id] ? Integer.parseInt(params["roomX_"+rack.id]) : 0
-	                	rack.roomY = params["roomY_"+rack.id] ? Integer.parseInt(params["roomY_"+rack.id]) : 0
+	                	rack.roomX = params["roomX_"+rack.id] ? NumberUtils.toDouble(params["roomX_"+rack.id],0).round() :0 
+	                	rack.roomY = params["roomY_"+rack.id] ? NumberUtils.toDouble(params["roomY_"+rack.id],0).round() :0
 	                	rack.powerA = params["powerA_"+rack.id] ? Float.parseFloat(params["powerA_"+rack.id]) : 0
 						rack.powerB = params["powerB_"+rack.id] ? Float.parseFloat(params["powerB_"+rack.id]) : 0
 						rack.powerC = params["powerC_"+rack.id] ? Float.parseFloat(params["powerC_"+rack.id]) : 0
@@ -210,8 +210,8 @@ class RoomController {
                             def source = params.addTargetRoom == "on" ? 0 : 1
 							def newRack = Rack.findOrCreateWhere(source:source, 'project.id':roomInstance.project.id, location:roomInstance.location, 'room.id':roomInstance?.id, tag:params["tag_"+id])
 							if(newRack){
-								newRack.roomX = params["roomX_"+id] ? Integer.parseInt(params["roomX_"+id]) : 0
-								newRack.roomY = params["roomY_"+id] ? Integer.parseInt(params["roomY_"+id]) : 0
+								newRack.roomX = params["roomX_"+id] ? NumberUtils.toDouble(params["roomX_"+id],0).round() :0
+								newRack.roomY = params["roomY_"+id] ? NumberUtils.toDouble(params["roomY_"+id],0).round() :0
 								newRack.powerA = params["powerA_"+id] ? Float.parseFloat(params["powerA_"+id]) : 0
 								newRack.powerB = (params["powerB_"+id]) ? Float.parseFloat(params["powerB_"+id]) : 0
 								newRack.powerC = (params["powerC_"+id]) ? Float.parseFloat(params["powerC_"+id]) : 0
