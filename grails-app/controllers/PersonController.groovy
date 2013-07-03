@@ -8,13 +8,12 @@ import net.tds.util.jmesa.PersonBean
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.crypto.hash.Sha1Hash
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
-import org.jmesa.facade.TableFacade
-import org.jmesa.facade.TableFacadeImpl
 import org.apache.commons.lang3.StringUtils
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.HtmlUtil
 
 class PersonController {
 	
@@ -36,68 +35,108 @@ class PersonController {
 	 * @param companyName - optional search by name or 'ALL'
 	 */
 	def list = {
-		def companyId = params.id
-		List personInstanceList = new ArrayList()
-		def companiesList
-		def query = "from PartyGroup as p where partyType = 'COMPANY' order by p.name "
-		companiesList = PartyGroup.findAll( query )
-		def user = securityService.getUserLogin()
-		
-		if(params.containsKey("companyName") && params.companyName=="All"){
-			personInstanceList = Person.findAll( "from Person p order by p.lastName" )
+		def listJsonUrl
+		def companyId = params.companyId ?: 'All'
+		if(companyId && companyId != 'All'){
+			def map = [controller:'person', action:'listJson', id:"${companyId}"]
+			listJsonUrl = HtmlUtil.createLink(map)
 		} else {
-			if(params.containsKey("companyName")){
-				companyId  = PartyGroup.findByName(params.companyName)?.id
-			}else{
-				companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
-				if(!companyId){
-					def person = user.person
-					// TODO: this should be refactored into the partyRelationshipService class
-					companyId = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+
-						"and p.partyIdTo = :partyIdTo and p.roleTypeCodeFrom = 'COMPANY' "+
-						"and p.roleTypeCodeTo = 'STAFF' ",[partyIdTo:person]).partyIdFrom[0]?.id
-				}
-			}
-			if ( companyId!= null && companyId != "" ) {
-				personInstanceList = partyRelationshipService.getCompanyStaff( companyId )     	
-			} 
+			def map = [controller:'person', action:'listJson']
+			listJsonUrl = HtmlUtil.createLink(map)+'/All'
 		}
-		List personsList = new ArrayList()
-		personInstanceList.each{
-			PersonBean personBean = new PersonBean()
-			personBean.setId(it.id)
-			personBean.setFirstName(it.firstName)
-			personBean.setMiddleName(it.middleName)
-			personBean.setLastName(it.lastName)
-			personBean.setModelScore(it.modelScore)
-			def userLogin = UserLogin.findByPerson(it);
-			if(userLogin){
-				personBean.setUserLogin(userLogin.username)
-				personBean.setUserLoginId(userLogin.id)
-			} else {
-				personBean.setUserLogin("CREATE")
-			}
-			def userCompany = partyRelationshipService.getStaffCompany( it )
-
-			personBean.setDateCreated(it.dateCreated)
-			personBean.setLastUpdated(it.lastUpdated)
-			personBean.setUserCompany(userCompany.toString())
-			personsList.add(personBean)
-		}
+		def partyGroupList = PartyGroup.findAllByPartyType( PartyType.read("COMPANY")).sort{it.name}
 		
-		// Statements for JMESA integration
-		TableFacade tableFacade = new TableFacadeImpl("tag",request)
-		tableFacade.items = personsList
-		
-		def company
-		if(companyId){
-			if(params.companyName!="All"){
-				company = PartyGroup.findById(companyId)
-			}
-		}
 		userPreferenceService.setPreference( "PARTYGROUP", companyId.toString() )
-		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
-		return [ personsList: personsList, companyId:companyId,totalCompanies:companiesList, company:company, availabaleRoles:availabaleRoles]
+		return [companyId:companyId, partyGroupList:partyGroupList, listJsonUrl:listJsonUrl]
+	}
+	
+	def listJson = {
+		def sortIndex = params.sidx ?: 'lastname'
+		def sortOrder  = params.sord ?: 'asc'
+		def maxRows = Integer.valueOf(params.rows?:'25')
+		def currentPage = Integer.valueOf(params.page?:'1')
+		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		def companyId
+		def personInstanceList
+		def filterParams = ['firstname':params.firstname, 'middlename':params.middlename, 'lastname':params.lastname, 'userLogin':params.userLogin, 'company':params.company, 'dateCreated':params.dateCreated, 'lastUpdated':params.lastUpdated, 'modelScore':params.modelScore]
+		
+		// Validate that the user is sorting by a valid column
+		if( ! sortIndex in filterParams)
+			sortIndex = 'lastname'
+		
+		def active = params.activeUsers ? params.activeUsers : session.getAttribute("InActive")
+		if(!active){
+			active = 'Y'
+		}
+		
+		def query = new StringBuffer("""SELECT * FROM ( SELECT p.person_id AS personId, p.first_name AS firstName, 
+			p.middle_name as middlename, IFNULL(p.last_name,'') as lastName, IFNULL(u.username, 'CREATE') as userLogin, pg.name AS company, u.active, 
+			date_created AS dateCreated, last_updated AS lastUpdated, u.user_login_id AS userLoginId, IFNULL(p.model_score, 0) AS modelScore 
+			FROM party pa
+			LEFT OUTER JOIN person p on p.person_id=pa.party_id 
+			LEFT OUTER JOIN user_login u on p.person_id=u.person_id 
+			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF' 
+				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=pa.party_id 
+			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id 
+			""")
+		
+		if(params.id && params.id != "All" ){
+			// If companyId is requested
+			companyId = params.id
+		}
+		if( !companyId && params.id != "All" ){
+			// Still if no companyId found trying to get companyId from the session
+			companyId = session.getAttribute("PARTYGROUP")?.PARTYGROUP
+			if(!companyId){
+				// Still if no luck setting companyId as logged-in user's companyId .
+				def person = securityService.getUserLogin().person
+				companyId = partyRelationshipService.getStaffCompany(person)?.id
+			}
+		}
+		if(companyId){
+			query.append(" WHERE pg.party_group_id = $companyId ")
+		}
+		
+		query.append(" GROUP BY pa.party_id ORDER BY " + sortIndex + " " + sortOrder + ", IFNULL(p.last_name,'') DESC, p.first_name DESC) as people")
+		
+		// Handle the filtering by each column's text field
+		def firstWhere = true
+		filterParams.each {
+			if(it.getValue())
+				if(firstWhere){
+					query.append(" WHERE people.${it.getKey()} LIKE '%${it.getValue()}%'")
+					firstWhere = false
+				} else {
+					query.append(" AND people.${it.getKey()} LIKE '%${it.getValue()}%'")
+				}
+		}
+		
+		personInstanceList = jdbcTemplate.queryForList(query.toString())
+		
+		// Limit the returned results to the user's page size and number
+		def totalRows = personInstanceList.size()
+		def numberOfPages = Math.ceil(totalRows / maxRows)
+		if(totalRows > 0)
+			personInstanceList = personInstanceList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
+		else
+			personInstanceList = []
+		
+		
+		def map = [controller:'person', action:'listJson', id:"${params.companyId}"]
+		def listJsonUrl = HtmlUtil.createLink(map)
+		def createUrl = HtmlUtil.createLink([controller:'userLogin', action:'create'])
+		def editUrl = HtmlUtil.createLink([controller:'userLogin', action:'edit'])
+		
+		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
+		def results = personInstanceList?.collect {
+			[ cell: ['<a href="javascript:loadPersonDiv('+it.personId+',\'generalInfoShow\')">'+it.firstname+'</a>', 
+			'<a href="javascript:loadPersonDiv('+it.personId+',\'generalInfoShow\')">'+it.middlename+'</a>', 
+			'<a href="javascript:loadPersonDiv('+it.personId+',\'generalInfoShow\')">'+it.lastname+'</a>', 
+			'<a href="'+((it.userLoginId)?("${editUrl+'/'+it.userLoginId}"):("${createUrl+'/'+it.personId}"))+'">'+it.userLogin+'</a>', 
+			it.company, it.dateCreated, it.lastUpdated, it.modelScore], id: it.personId ]}
+		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
+		render jsonData as JSON
+	
 	}
 
 	def show = {
@@ -849,9 +888,10 @@ class PersonController {
 	 *@return NA
 	 */
 	def loadGeneral = {
+		log.info "class: ${params.personId.class}    value: ${params.personId}"
 		def tab = params.tab ?: 'generalInfoShow'
 		def person = Person.get(params.personId)
-		def blackOutdays = person.blackOutDates.sort{it.exceptionDay}
+		def blackOutdays = person.blackOutDates?.sort{it.exceptionDay}
 		def subject = SecurityUtils.subject
 		def company = partyRelationshipService.getStaffCompany( person )
 		def companyProject = Project.findByClient( company )

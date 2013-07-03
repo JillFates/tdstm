@@ -8,6 +8,9 @@
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}"  />
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}"  />
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}"  />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+	<jqui:resources />
+	<jqgrid:resources />
 	<link rel="stylesheet" type="text/css" href="${resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
 	<script language="javascript" src="${resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
 	<g:javascript src="projectStaff.js" />
@@ -19,7 +22,7 @@
 	}
 	 
 	</script>
-		<script type="text/javascript">
+	<script type="text/javascript">
 		 $(document).ready(function() {
 		  $("#filterSelect").change(function(ev) {
 			    ev.preventDefault();
@@ -27,7 +30,7 @@
 			  });
 		 })
 		
-		</script>
+	</script>
     <script type="text/javascript">
       $(document).ready(function() {
         $("#personGeneralViewId").dialog({ autoOpen: false })
@@ -42,59 +45,90 @@
 			 }
 		})
       })
-      
-     
-   </script>
+	</script>
+		<script type="text/javascript">
+		$(document).ready(function() {
+			var listCaption ="Users: \
+			<tds:hasPermission permission='PersonCreateView'>\
+				<span class='capBtn'><input type='button' value='Create Person' onClick=\"window.location.href=\'"+contextPath+"/person/create\'\"/></span> \
+			</tds:hasPermission>\
+			<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='compareOrMerge()' disabled='disabled'/></span>"
+			$("#personGeneralViewId").dialog({ autoOpen: false })
+			$("#createStaffDialog").dialog({ autoOpen: false })
+			
+			$("#filterSelect").change(function(ev) {
+				ev.preventDefault();
+				$("#formId").submit();
+			});
+			<jqgrid:grid id="personId" url="'${''+listJsonUrl?:'no'}'"
+				colNames="'First Name', 'Middle Name', 'Last Name', 'User Login', 'User Company', 'Date Created', 'Last Updated', 'Model Score'"
+				colModel="{name:'firstname', width:'80'},
+					{name:'middlename', width:'80'},
+					{name:'lastname', index: 'lastname', width:'80'},
+					{name:'userLogin', width:'80'},
+					{name:'company', editable: true,width:'100'},
+					{name:'dateCreated', editable: true,width:'50', formatter:formatDate},
+					{name:'lastUpdated', editable: true,width:'50', formatter:formatDate},
+					{name:'modelScore', editable: true,width:'50'}"
+				sortname="'lastname'"
+				caption="listCaption"
+				height="'100%'"
+				rowNum="'25'"
+				rowList= "'25','100','500','1000'"
+				multiselect="true"
+				viewrecords="true"
+				showPager="true"
+				loadComplete="initCheck"
+				datatype="'json'">
+				<jqgrid:filterToolbar id="personId" searchOnEnter="false" />
+				<jqgrid:navigation id="personId" add="false" edit="false" del="false" search="false" refresh="true" />
+			</jqgrid:grid>
+			$.jgrid.formatter.integer.thousandsSeparator='';
+			
+			function formatDate (cellvalue, options, rowObject) {
+				if(cellvalue)
+					return cellvalue.substring(0,10) // Cut off the timestamp portion of the date
+				return 'Never'
+			}
+			
+			function initCheck() {
+				 $('.cbox').change(function() {
+					 var checkedLen = $('.cbox:checkbox:checked').length
+					 if(checkedLen > 1 && checkedLen < 5) {
+						$("#compareMergeId").removeAttr("disabled")
+					 }else{
+						$("#compareMergeId").attr("disabled","disabled")
+					 }
+				})
+			}
+			
+			$('#personIdWrapper').width($('.fluid').width()-16) // 16 pixels comptensates for the border/padding/etc and the scrollbar
+			$('#personIdGrid').fluidGrid({ base:'#personIdWrapper', offset: 0 });
+		})
+		$(window).resize(resizeGrid);
 
+		// Called when the window is resized to resize the grid wrapper 
+		function resizeGrid(){
+			$('#personIdWrapper').width($('.fluid').width()-2) // 2 pixels comptensates for the border/padding/etc
+			$('#personIdGrid').fluidGrid({ base:'#personIdWrapper', offset: 0 });
+		}
+		
+	</script>
   </head>
   <body>
    
-    <div class="body">
+    <div class="body fluid">
       <h1>Staff List</h1>
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
 	 <span id="spinnerId" style="display: none">Merging ...<img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
-      <div>
-      <form name="personForm" id="formId">
-          <div class="buttonR"> 
-          	<g:select id="filterSelect" name="companyName" from="${totalCompanies}" value="${company}"  noSelection="['All':'All']" />
-          		<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='compareOrMerge()' disabled='disabled'/></span>
-          </div>
-	      <jmesa:tableFacade id="tag" items="${personsList}" maxRows="25" stateAttr="restore" var="personBean" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
-	          <jmesa:htmlTable style=" border-collapse: separate">
-	              <jmesa:htmlRow highlighter="true">
-	                 <jmesa:htmlColumn sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor"  nowrap>
-	                     <g:checkBox name="checkChange" class="cbox" id="checkId_${personBean.id}" ></g:checkBox>
-					 </jmesa:htmlColumn>
-	              	 <jmesa:htmlColumn property="firstName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor"  nowrap>
-	                     <span id="${personBean.id}" style="cursor: pointer;" onClick="loadPersonDiv(this.id,'generalInfoShow')"><b>${personBean.firstName}</b></span>
-					 </jmesa:htmlColumn>
-					 <jmesa:htmlColumn property="middleName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-						<span id="${personBean.id}" style="cursor: pointer;" onClick="loadPersonDiv(this.id,'generalInfoShow')"><b>${personBean.middleName}</b></span>
-					 </jmesa:htmlColumn>
-					 <jmesa:htmlColumn property="lastName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-						<span id="${personBean.id}" style="cursor: pointer;" onClick="loadPersonDiv(this.id,'generalInfoShow')"><b>${personBean.lastName}</b></span>
-					 </jmesa:htmlColumn>
-					 <jmesa:htmlColumn property="userLogin" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-						<g:if test="${personBean.userLoginId}">
-							 <g:link controller="userLogin" action="edit" id="${personBean.userLoginId}" params="[companyId:companyId]"><b>${personBean.userLogin}</b></g:link>
-						</g:if>
-						<g:else>
-							 <g:link controller="userLogin" action="create" id="${personBean.id}" params="[companyId:companyId]">CREATE</g:link>
-						</g:else>
-					 </jmesa:htmlColumn>
-					 <jmesa:htmlColumn property="userCompany" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">${personBean.userCompany}</jmesa:htmlColumn>
-	                 <jmesa:htmlColumn property="dateCreated" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.BasicCellEditor"><tds:convertDateTime date="${personBean.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
-	                 <jmesa:htmlColumn property="lastUpdated" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.BasicCellEditor"><tds:convertDateTime date="${personBean.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></jmesa:htmlColumn>
-	               <jmesa:htmlColumn property="modelScore" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-	                     <g:remoteLink controller="person" action="editShow" id="${personBean.id}" params="[companyId:companyId]" onComplete ="showPersonDialog( e );">${personBean.modelScore}</g:remoteLink>
-					 </jmesa:htmlColumn>
-	              </jmesa:htmlRow>
-	          </jmesa:htmlTable>
-	      </jmesa:tableFacade>
-	  </form>
-      </div>
+	<div>
+		<g:form name="personForm" id="formId" url="[action:'list', controller:'person', params:'[companyId:${companyId}]']">
+			<g:select id="filterSelect" name="companyId" from="${partyGroupList}" value="${companyId}"  optionKey="id" optionValue="name" noSelection="['All':'All']" />
+		</g:form>
+		<jqgrid:wrapper id="personId" />
+	</div>
     <tds:hasPermission permission='PersonCreateView'>
         <div class="buttons"><g:form>
             <input type="hidden" value="${companyId}" name="companyId" />

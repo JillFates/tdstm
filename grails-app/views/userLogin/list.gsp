@@ -1,81 +1,96 @@
 
 
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="projectHeader" />
-        <title>UserLogin List</title>
-        <link rel="stylesheet" type="text/css" href="${resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
-		<script language="javascript" src="${resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+		<meta name="layout" content="projectHeader" />
+		<title>UserLogin List</title>
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}"  />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}"  />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}"  />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}"  />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+		<jqui:resources />
+		<jqgrid:resources />
+		<g:javascript src="projectStaff.js" />
+		<g:javascript src="person.js" />
 		<script type="text/javascript">
 		function onInvokeAction(id) {
-		    setExportToLimit(id, '');
-		    createHiddenInputFieldsForLimitAndSubmit(id);
+			setExportToLimit(id, '');
+			createHiddenInputFieldsForLimitAndSubmit(id);
 		}
 		</script>
 		<script type="text/javascript">
-		 $(document).ready(function() {
-		  $("#filterSelect").change(function(ev) {
-			    ev.preventDefault();
-			    $("#formId").submit();
-			  });
-		 })
+		$(document).ready(function() {
+			var listCaption ="Users: \
+			<tds:hasPermission permission='CreateUserLogin'>\
+				<span class='capBtn'><input type='button' value='Create User Login' onClick=\"window.location.href=\'"+contextPath+"/userLogin/create\'\"/></span> \
+			</tds:hasPermission>\
+			<span class='capBtn'><input type='button' value=' Show ${(session.getAttribute('InActive') == 'N')?'Active':'Inactive'} Users' onClick=\"window.location.href=\'"+contextPath+"/userLogin/list/?activeUsers=${(session.getAttribute('InActive') == 'N')?'Y':'N'}\'\"/></span>"
+			$("#personGeneralViewId").dialog({ autoOpen: false })
+			$("#createStaffDialog").dialog({ autoOpen: false })
+			
+			$("#filterSelect").change(function(ev) {
+				ev.preventDefault();
+				$("#formId").submit();
+			});
+			<jqgrid:grid id="userLoginId" url="'${''+listJsonUrl?:'no'}'"
+				colNames="'Username', 'Person', 'Roles', 'Company','Last Login', 'Date Created', 'Expiry Date'"
+				colModel="{name:'username', index: 'username', width:'80'},
+					{name:'fullname', editable: true, width:'100'},
+					{name:'roles', editable: true,width:'100'},
+					{name:'company', editable: true, width:'100'},
+					{name:'lastLogin', editable: true,width:'50', formatter:formatDate},
+					{name:'dateCreated', editable: true,width:'50', formatter:formatDate},
+					{name:'expiryDate', editable: true,width:'50', formatter:formatDate}"
+				sortname="'username'"
+				caption="listCaption"
+				height="'100%'"
+				rowNum="'25'"
+				rowList= "'25','100','500','1000'"
+				viewrecords="true"
+				showPager="true"
+				datatype="'json'">
+				<jqgrid:filterToolbar id="userLoginId" searchOnEnter="false" />
+				<jqgrid:navigation id="userLoginId" add="false" edit="false" del="false" search="false" refresh="true" />
+			</jqgrid:grid>
+			$.jgrid.formatter.integer.thousandsSeparator='';
+			
+			function formatDate (cellvalue, options, rowObject) {
+				if(cellvalue)
+					return cellvalue.substring(0,10) // Cut off the timestamp portion of the date
+				return 'Never'
+			}
+			
+			$('#userLoginIdWrapper').width($('.fluid').width()-16) // 16 pixels comptensates for the border/padding/etc and the scrollbar
+			$('#userLoginIdGrid').fluidGrid({ base:'#userLoginIdWrapper', offset: 0 });
+		})
+		$(window).resize(resizeGrid);
+
+		// Called when the window is resized to resize the grid wrapper 
+		function resizeGrid(){
+			$('#userLoginIdWrapper').width($('.fluid').width()-2) // 2 pixels comptensates for the border/padding/etc
+			$('#userLoginIdGrid').fluidGrid({ base:'#userLoginIdWrapper', offset: 0 });
+		}
 		
 		</script>
-	        
-    </head>
-    <body>
-
-    
-        <div class="body" >
-            <h1>UserLogin List</h1>
-            
-            <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-            <span class="menuButton"><g:link class="create" action="create" params="[companyId:companyId]">New UserLogin</g:link></span>
-            <g:if test="${session.getAttribute('InActive') == 'N'}">
-              <span class="menuButton"><g:link class="create" action="list" params="[activeUsers:'Y',companyName:companyId]">Show Active Users</g:link></span>
-            </g:if>
-            <g:else>
-              <span class="menuButton"><g:link class="create" action="list" params="[activeUsers:'N',companyName:companyId]">Show Inactive Users</g:link></span>
-            </g:else>
-        </div>
-        
-        <br/>
-            <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
-            </g:if>
-            <form name="userForm" id="formId">
-            <div> 
-            <g:select id="filterSelect" name="companyName" from="${partyGroupList}" value="${companyId}"  optionKey="id" optionValue="name" noSelection="['All':'All']" />
-            </div>
-			         <jmesa:tableFacade id="tag" items="${userLoginInstanceList}" maxRows="25" stateAttr="restore" var="userLoginInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
-			             <jmesa:htmlTable style=" border-collapse: separate">
-			                 <jmesa:htmlRow highlighter="true">
-			                 	 <jmesa:htmlColumn property="userName" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-		                         		<g:link action="show" id="${userLoginInstance.id}" params="[companyId:companyId]">${userLoginInstance.userName}</g:link>
-								 </jmesa:htmlColumn>
-			                     <jmesa:htmlColumn property="person" title="Person" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-									${fieldValue(bean:userLoginInstance, field:'person')}
-								 </jmesa:htmlColumn>
-								 <jmesa:htmlColumn property="role" title="Role" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-									${fieldValue(bean:userLoginInstance, field:'role')}
-								 </jmesa:htmlColumn>
-								  <jmesa:htmlColumn property="company" title="Company" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-									${userLoginInstance.company != 'null' ? userLoginInstance.company : '' }
-								 </jmesa:htmlColumn>
-								 <jmesa:htmlColumn property="lastLogin" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-									<tds:convertDateTime date="${userLoginInstance?.lastLogin}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-  								 </jmesa:htmlColumn>
-			                     <jmesa:htmlColumn property="dateCreated" title="Created Date" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-			                     	<tds:convertDateTime date="${userLoginInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-								 </jmesa:htmlColumn>
-			                     <jmesa:htmlColumn property="expiryDate" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-			                     	<tds:convertDateTime date="${userLoginInstance?.expiryDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-			                     </jmesa:htmlColumn>
-			                 </jmesa:htmlRow>
-			             </jmesa:htmlTable>
-			         </jmesa:tableFacade>
-			     </form>
-            </div>
-    </body>
+			
+	</head>
+	<body>
+		<div class="body fluid" >
+			<h1>UserLogin List</h1>
+			<br/>
+			<g:if test="${flash.message}">
+				<div class="message">${flash.message}</div>
+			</g:if>
+			<div>
+				<g:form id="formId" url="[action:'list', controller:'userLogin', params:'[companyId:${companyId}]']">
+					<g:select id="filterSelect" name="companyId" from="${partyGroupList}" value="${companyId}"  optionKey="id" optionValue="name" noSelection="['All':'All']" />
+				</g:form>
+			</div>
+			<jqgrid:wrapper id="userLoginId" />
+			<div id="personGeneralViewId" style="display: none;" title="Manage Staff "></div>
+			</div>
+		</div>
+	</body>
 </html>

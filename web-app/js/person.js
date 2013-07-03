@@ -1,7 +1,7 @@
 function compareOrMerge(){
 	var ids = new Array()
 	$('.cbox:checkbox:checked').each(function(){
-		ids.push(this.id.split("_")[1])
+		ids.push(this.id.split("_")[2])
 	})
 	jQuery.ajax({
 		url: contextPath+'/person/compareOrMerge',

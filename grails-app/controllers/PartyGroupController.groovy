@@ -1,10 +1,11 @@
-import org.jmesa.facade.TableFacade
-import org.jmesa.facade.TableFacadeImpl
+import grails.converters.JSON
+import com.tdssrc.grails.HtmlUtil
 
 class PartyGroupController {
     
 	def partyRelationshipService
     def userPreferenceService
+	def jdbcTemplate
 	
     def index = { redirect(action:list,params:params) }
 
@@ -12,24 +13,61 @@ class PartyGroupController {
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 	// Will Return PartyGroup list where PartyType = COMPANY
 	def list = {
-		boolean filter = params.filter
-		if(filter){
-			session.companyFilters.each{
-				if(it.key.contains("tag")){
-					request.parameterMap[it.key] = [session.companyFilters[it.key]]
-				}
-			}
-		} else {
-			session.companyFilters = params
-		}
-		def sort = params.sort ? params.sort : 'lastUpdated'
-		def order = params.order ? params.order : 'desc'
-		def partyGroupList = PartyGroup.findAllByPartyType( PartyType.read("COMPANY") ,[sort:sort, order:order])
-		// Statements for JMESA integration
-    	TableFacade tableFacade = new TableFacadeImpl("tag",request)
-        tableFacade.items = partyGroupList
-        return [ partyGroupList: partyGroupList ]
+        return [ listJsonUrl:HtmlUtil.createLink([controller:'person', action:'listJson']) ]
     }
+	
+	def listJson = {
+		def sortIndex = params.sidx ?: 'companyName'
+		def sortOrder  = params.sord ?: 'asc'
+		def maxRows = Integer.valueOf(params.rows?:'25')
+		def currentPage = Integer.valueOf(params.page?:'1')
+		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		def companyInstanceList
+		def filterParams = ['companyName':params.companyName, 'dateCreated':params.dateCreated, 'lastUpdated':params.lastUpdated]
+		
+		// Validate that the user is sorting by a valid column
+		if( ! sortIndex in filterParams)
+			sortIndex = 'companyName'
+		
+		def active = params.activeUsers ? params.activeUsers : session.getAttribute("InActive")
+		if(!active){
+			active = 'Y'
+		}
+		
+		def query = new StringBuffer("""SELECT * FROM ( SELECT name as companyName, party_group_id as companyId, p.date_created as dateCreated, p.last_updated AS lastUpdated 
+			FROM party_group pg
+			INNER JOIN party p ON party_type_id='COMPANY' AND p.party_id=pg.party_group_id
+			GROUP BY party_group_id ORDER BY """ + sortIndex + """ """ + sortOrder + """) as companies""")
+		
+		// Handle the filtering by each column's text field
+		def firstWhere = true
+		filterParams.each {
+			if(it.getValue())
+				if(firstWhere){
+					query.append(" WHERE companies.${it.getKey()} LIKE '%${it.getValue()}%'")
+					firstWhere = false
+				} else {
+					query.append(" AND companies.${it.getKey()} LIKE '%${it.getValue()}%'")
+				}
+		}
+		
+		companyInstanceList = jdbcTemplate.queryForList(query.toString())
+		
+		// Limit the returned results to the user's page size and number
+		def totalRows = companyInstanceList.size()
+		def numberOfPages = Math.ceil(totalRows / maxRows)
+		if(totalRows > 0)
+			companyInstanceList = companyInstanceList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
+		else
+			companyInstanceList = []
+		
+		def showUrl = HtmlUtil.createLink([controller:'partyGroup', action:'show'])
+		
+		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
+		def results = companyInstanceList?.collect {[ cell: ['<a href="' + showUrl + '/' + it.companyId + '">'+it.companyName+'</a>', it.dateCreated, it.lastUpdated], id: it.companyId ]}
+		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
+		render jsonData as JSON
+	}
 
     def show = {
         def partyGroupInstance = PartyGroup.get( params.id )
