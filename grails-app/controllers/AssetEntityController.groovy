@@ -1352,7 +1352,6 @@ class AssetEntityController {
 	 * This method is used by JQgrid to load assetList
 	 */
 	def listJson = {
-		log.info "start"
 		def sortIndex = params.sidx ?: 'assetName'
 		def sortOrder  = params.sord ?: 'asc'
 		def maxRows =  Integer.valueOf(params.rows) 
@@ -1377,9 +1376,7 @@ class AssetEntityController {
 		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
 		def models = params.model ? Model.findAllByModelNameIlike("%${params.model}%") : []
 		
-		log.info "before criteria"
-		def assetEntities = AssetEntity.createCriteria().list(max: maxRows, offset: rowOffset) {	
-			log.info "doot"
+		def assetEntities = AssetEntity.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", project)
 			if (params.assetName) 
 				ilike('assetName', "%${params.assetName.trim()}%")
@@ -1414,7 +1411,6 @@ class AssetEntityController {
 				}
 			}
 			
-			log.info "dooot"
 			// if filter have some value then this one is getting requested from planning dashboard to filter the asset list. else it will be blank.
 			if ( params.filter ) {
 				if (params.filter !='other')  // filter is not other means filter is in (Server, VM , Blade) and others is excepts (Server, VM , Blade).
@@ -1437,18 +1433,12 @@ class AssetEntityController {
 				not {'in'("assetType",  ["Application","Database","Files"])}
 			}
 			
-			log.info "doooot"
 			order(sortIndex, sortOrder).ignoreCase()
 		}
 		
-		log.info "done criteria"
 		
 		def totalRows = assetEntities.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
-		
-		assetEntities.each{
-			log.info "dep: ${AssetDependency.countByDependentAndStatusNotEqual(it, "Validated")} asset: ${AssetDependency.countByAssetAndStatusNotEqual(it, "Validated")}"
-		}
 		
 		def results = assetEntities?.collect { [ cell: ['',it.assetName, it.assetType,it.model?.modelName, it.sourceLocation,
 					it.sourceRack, it.targetLocation, it.targetRack, it.assetTag, it.serialNumber,it.planStatus,it.moveBundle?.name,
