@@ -254,7 +254,7 @@
 							<li><g:link class="mmlink" controller="assetEntity" action="exportAssets"  onclick="hideMegaMenu('assetMegaMenu')">Export</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='AssetMenuView'>
-							<li><g:link class="mmlink" controller="assetEntity" action="listComment"  params="[tag_s_2_lastUpdated:'desc']" onclick="hideMegaMenu('assetMegaMenu')">Asset Comments</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" action="listComment"  onclick="hideMegaMenu('assetMegaMenu')">Asset Comments</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('assetMegaMenu')">help</a></li>

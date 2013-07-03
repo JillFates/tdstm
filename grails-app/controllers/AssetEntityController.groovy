@@ -3245,45 +3245,69 @@ class AssetEntityController {
 	 * Used to generate the List of Comments, which leverages a shared closeure with the above listTasks controller
 	 */
 	def listComment = {
-		params.commentType=AssetCommentType.COMMENT
-		def project = securityService.getUserCurrentProject()
-		
-		def commentList = AssetComment.findAll("FROM AssetComment a WHERE a.project = :project AND commentType = :commentType"
-			,[project:project, commentType:AssetCommentType.COMMENT])
-		
-		def assetCommentList = new ArrayList(commentList.size())	// preallocate the size of the array to improve performance
-		def i=0
-		commentList.each{comment->
-			AssetCommentBean assetBean = new AssetCommentBean();
-			assetBean.with {
-				setId(comment.id)
-				setDescription(comment.comment)
-				setCommentType(comment.commentType)
-				setAssetName(comment.assetEntity?.assetName ?:'')
-				setAssetType(comment.assetEntity?.assetType ?:'')
-				setLastUpdated(comment.lastUpdated)
-				setCategory(org.apache.commons.lang.StringUtils.capitalize(comment.category))
-				setAssetEntityId( comment.assetEntity?.id )
-			}
-			assetCommentList[i++] = assetBean
-		}
-		
-		TableFacade tableFacade = new TableFacadeImpl("tag",request)
-		tableFacade.items = assetCommentList
-		Limit limit = tableFacade.limit
-		if(limit.isExported()){
-			tableFacade.setExportTypes(response,limit.getExportType())
-			tableFacade.setColumnProperties("comment","lastUpdated","commentType","assetEntity","assetType","category")
-			tableFacade.render()
-		} else {
+			def project = securityService.getUserCurrentProject()
 			def entities = assetEntityService.entityInfo( project )
-		    return [ assetCommentList:assetCommentList, rediectTo:'comment',
-				staffRoles:taskService.getRolesForStaff(),servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
+		    return [ rediectTo:'comment', servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
 				files:entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, assetDependency: new AssetDependency(),
 				]
-		}
 	}
 	
+	/**
+	 * Used to generate list of comments using jqgrid
+	 * @return : list of tasks as JSON
+	 */
+	def listCommentJson ={
+		def sortIndex = params.sidx ?: 'lastUpdated'
+		def sortOrder  = params.sord ?: 'asc'
+		def maxRows = Integer.valueOf(params.rows)
+		def currentPage = Integer.valueOf(params.page) ?: 1
+		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		
+		def project = securityService.getUserCurrentProject()
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def dueFormatter = new SimpleDateFormat("MM/dd/yyyy")
+		def lastUpdatedTime = params.lastUpdated ? AssetComment.findAll("from AssetComment where project =:project \
+						and commentType =:comment and lastUpdated like '%${params.lastUpdated}%'",
+						[project:project,comment:AssetCommentType.COMMENT])?.lastUpdated : []
+		
+		
+		def assetCommentList = AssetComment.createCriteria().list(max: maxRows, offset: rowOffset) {
+				eq("project", project)
+				eq("commentType", AssetCommentType.COMMENT)
+				createAlias("assetEntity","ae")
+				if (params.comment)
+					ilike('comment', "%${params.comment}%")
+				if (params.commentType)
+					ilike('commentType', "%${params.commentType}%")
+				if (params.category)
+					ilike('category', "%${params.category}%")
+				if(lastUpdatedTime)
+					'in'('lastUpdated',lastUpdatedTime)
+				if (params.assetType)
+					ilike('ae.assetType',"%${params.assetType}%")
+				if (params.assetName)
+					ilike('ae.assetName',"%${params.assetName}%")
+				def sid = sortIndex  =='assetName' || sortIndex  =='assetType' ? "ae.${sortIndex}" : sortIndex
+				order(sid, sortOrder).ignoreCase()
+			}
+		def totalRows = assetCommentList.totalCount
+		def numberOfPages = Math.ceil(totalRows / maxRows)
+
+		def results = assetCommentList?.collect {
+			[ cell: ['',it.comment, 
+					it.lastUpdated ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.lastUpdated, tzId)):'',
+					it.commentType ,
+					it.assetEntity?.assetName ?:'',
+					it.assetEntity?.assetType ?:'',
+					it.category,
+					 it.assetEntity?.id], 
+					id: it.id]
+			}
+
+		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
+
+		render jsonData as JSON
+	}
 	/**
 	 * This will be called from TaskManager screen to load jqgrid
 	 * @return : list of tasks as JSON
@@ -3333,9 +3357,6 @@ class AssetEntityController {
 		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
 		def models = params.model ? Model.findAllByModelNameIlike("%${params.model}%") : []
 		
-		def assetTypes  = params.assetType ? AssetEntity.findAllByAssetTypeIlikeAndProject("%${params.assetType}%", project) : []
-		def assets = params.assetEntity ? AssetEntity.findAllByAssetNameIlikeAndProject("%${params.assetEntity}%", project) : []
-		
 		def taskNumbers = params.taskNumber ? AssetComment.findAll("from AssetComment where project =:project \
 			and taskNumber like '%${params.taskNumber}%'",[project:project])?.taskNumber : []
 
@@ -3348,6 +3369,7 @@ class AssetEntityController {
 		def tasks = AssetComment.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", project)
 			eq("commentType", AssetCommentType.TASK)
+			createAlias("assetEntity","ae")
 			if (params.comment)
 				ilike('comment', "%${params.comment}%")
 			if (params.status)
@@ -3356,10 +3378,10 @@ class AssetEntityController {
 				ilike('role', "%${params.role}%")
 			if (params.category)
 				ilike('category', "%${params.category}%")
-			if (assetTypes)
-				'in'('assetEntity',assetTypes)
-			if (assets)
-				'in'('assetEntity',assets)
+			if (params.assetType)
+					ilike('ae.assetType',"%${params.assetType}%")
+			if (params.assetName)
+					ilike('ae.assetName',"%${params.assetName}%")
 			if (taskNumbers)
 				'in'('taskNumber' , taskNumbers)
 			if (dates) {
@@ -3372,8 +3394,10 @@ class AssetEntityController {
 			}
 			if (assigned )
 				'in'('assignedTo' , assigned)
+				
+			def sid = sortIndex  =='assetName' || sortIndex  =='assetType' ? "ae.${sortIndex}" : sortIndex
 			if(sortIndex && sortOrder){
-				order(sortIndex, sortOrder).ignoreCase()
+				order(sid, sortOrder).ignoreCase()
 			} else {
 				and{
 					order('score','desc')

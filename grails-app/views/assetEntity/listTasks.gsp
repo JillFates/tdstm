@@ -75,7 +75,7 @@
 	            colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
             				{name:'taskNumber', editable: true, formatter:taskFormatter, width:80},
                             {name:'comment', editable: true, width:680, formatter:taskFormatter},
-                            {name:'assetEntity', editable: true, formatter:assetFormatter, width:200},
+                            {name:'assetName', editable: true, formatter:assetFormatter, width:200},
                             {name:'assetType', editable: true, formatter:taskFormatter},
                             {name:'updated', editable: true, formatter: updatedFormatter,sortable:false,search:false},
                             {name:'dueDate', editable: true, formatter: dueFormatter},

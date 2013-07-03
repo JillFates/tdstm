@@ -6,10 +6,13 @@
         <title>Asset Comment</title>
          <g:javascript src="asset.tranman.js" />
           <g:javascript src="entity.crud.js" />
-        <script language="javascript" src="${resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
-        <link rel="stylesheet" type="text/css" href="${resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
+        <link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
         <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
         <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
+       <jqgrid:resources />
+		<jqui:resources /> 
+		<jqgrid:resources />
+		
         <script type="text/javascript">
         function onInvokeAction(id) {
             setExportToLimit(id, '');
@@ -37,6 +40,43 @@
 	    	$(".span_planned").parent().addClass("task_planned")
 	    	$(".span_completed").parent().addClass("task_completed")
 	    	$(".span_na").parent().addClass("task_na")
+
+	    	<jqgrid:grid id="listCommentGridId" url="'${createLink(action: 'listCommentJson')}'"
+				colNames="'Action', 'Description','Updated', 'Type', 'Asset', 'AssetType','category'"
+				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:40, fixed:true},
+							  {name:'comment', editable: true, width:'350',formatter: myLinkFormatter},
+							  {name:'lastUpdated', editable: true,width:'80',formatter: myLinkFormatter},
+							  {name:'commentType', editable: true,width:'80',formatter: myLinkFormatter},
+							  {name:'assetName', editable: true, width:'180',formatter: assetFormatter},
+							  {name:'assetType', editable: true,width:'80',formatter: myLinkFormatter},
+							  {name:'category', editable: true,width:'80',formatter: myLinkFormatter}"
+				sortname="'lastUpdated'"
+				sortorder="'desc'"
+				caption="'Asset Comment:'"
+				height="'100%'"
+				width="'500px'"
+				rowNum="'25'"
+				rowList= "'25','100','500','1000'"
+				viewrecords="true"
+				showPager="true"
+				datatype="'json'">
+				<jqgrid:filterToolbar id="listCommentGridId" searchOnEnter="false" />
+				<jqgrid:navigation id="listCommentGridId" add="false" edit="false" del="false" search="false"/>
+				<jqgrid:refreshButton id="listCommentGridId" />
+			</jqgrid:grid>
+			$.jgrid.formatter.integer.thousandsSeparator='';
+			function myLinkFormatter (cellvalue, options, rowObjcet) {
+				var value = cellvalue ? cellvalue : ''
+					return '<span class="Arrowcursor" onclick="javascript:showAssetComment(\''+options.rowId+'\',\'show\')">'+value+'</span>'
+			}
+			function myCustomFormatter (cellVal,options,rowObject) {
+	        	var editButton = '<a href="javascript:showAssetComment(\''+options.rowId+'\',\'edit\')">'+
+	       			"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+	            return editButton
+	        }
+			function assetFormatter(cellVal,options,rowObject){
+	        	return cellVal ? '<span class="Arrowcursor" onclick= "getEntityDetails(\'listComment\', \''+rowObject[5]+'\', '+rowObject[7]+')\" >' + (cellVal) + '</span>' : "" 
+	        } 
         });
         </script>
 </head>
@@ -49,49 +89,11 @@
 			</g:if>
 			<div>
 			<div>
-			<input type="hidden" id="manageTaskId" value="manageTask"/>
-			<form name="commentForm" id="commentForm" action="listComment">
-				<jmesa:tableFacade id="tag" items="${assetCommentList}" maxRows="50" stateAttr="restore" var="commentInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100,250" >
-					<jmesa:htmlTable style=" border-collapse: separate" editable="true">
-						<jmesa:htmlRow highlighter="true" style="cursor: pointer;">
-							<jmesa:htmlColumn property="id" sortable="false" filterable="false" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Actions" nowrap>
-				        		<a href="javascript:showAssetComment(${commentInstance?.id}, 'edit')"><img src="${resource(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a>
-							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="description" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" title="Description" nowrap>
-								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.description?.size() > 40 ? commentInstance.description?.substring(0,40)+'..' : commentInstance.description}</span>
-							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="lastUpdated" title="Updated" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor" nowrap>
-								<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.lastUpdated}" format="MM/dd"  /></span>
-							</jmesa:htmlColumn>
-							<%--<jmesa:htmlColumn property="dueDate" title="Due" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');"><tds:convertDate date="${commentInstance.dueDate}" format="MM/dd"/></span>
-							</jmesa:htmlColumn>
-							--%>
-							<jmesa:htmlColumn property="commentType" title="Type" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-							 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.commentType}</span>
-							</jmesa:htmlColumn>
-							<%--<jmesa:htmlColumn property="assignedToString" title="Assigned To" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-        	                 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.assignedTo}</span>
-							</jmesa:htmlColumn>
-							<jmesa:htmlColumn property="role" title="Role" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-        	                 	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.role}</span>
-							</jmesa:htmlColumn>
-    	                     <jmesa:htmlColumn property="mustVerify" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-    	                     	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show')"><g:if test ="${commentInstance.mustVerify == 1}"></g:if><g:else><g:checkBox name="myVerifyBox" value="${true}" disabled="true"/></g:else></span>
-    	                     </jmesa:htmlColumn>
-        	                 --%><jmesa:htmlColumn property="assetName" title="Asset" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-        	                 	<span onclick="javascript:getEntityDetails('listComment', '${commentInstance.assetType}', '${commentInstance.assetEntityId}');">${commentInstance.assetName}</span>
-							</jmesa:htmlColumn>
-							<jmesa:htmlColumn width="50px" property="assetType" sortable="true" filterable="true" title="AssetType">
-                	         	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance?.assetType == 'Files' ? 'Storage' : commentInstance?.assetType}</span>
-							</jmesa:htmlColumn>
-							<jmesa:htmlColumn width="50px" property="category" sortable="true" filterable="true" title="category">
-                             	<span onclick="javascript:showAssetComment(${commentInstance?.id}, 'show');">${commentInstance.category}</span>
-							</jmesa:htmlColumn>
-						</jmesa:htmlRow>
-					</jmesa:htmlTable>
-				</jmesa:tableFacade>
-			</form>
+			<table id="gridTableId" style="width:58%!important;">
+				<tr>
+					<td><jqgrid:wrapper id="listCommentGridId" /></td>
+				</tr>
+			</table>
             </div>
             <div id="showEntityView" style="display: none;"></div>
 			<div id="editEntityView" style="display: none;"></div>

@@ -9,8 +9,12 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
-<script language="javascript" src="${resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
-<link rel="stylesheet" type="text/css" href="${resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+
+<jqgrid:resources />
+<jqui:resources /> 
+<jqgrid:resources />
+		
 <script type="text/javascript">
 function onInvokeAction(id) {
     setExportToLimit(id, '');
@@ -22,14 +26,58 @@ function onInvokeAction(id) {
 $(document).ready(function() {
     $("#showEditCommentDialog").dialog({ autoOpen: false })
     $("#createNewsDialog").dialog({ autoOpen: false })
-})
+	var moveEvent = '${moveEventId}'
+	var viewFilter = '${viewFilter}'
+	var moveBundle = '${bundleId}'
+	var windowWidth = $(window).width() - $(window).width()*5/100 ;
+		
+    <jqgrid:grid id="listNewsGridId" url="'${createLink(action: 'listEventNewsJson')}'"
+				colNames="'Created At', 'Created By','Comment Type', 'Comment', 'Resolution', 'Resolved At','Resolved By'"
+				colModel="{name:'createdAt', formatter: myLinkFormatter,width:'40'},
+							  {name:'createdBy', editable: true, formatter: myLinkFormatter, width:'60'},
+							  {name:'commentType', formatter: myLinkFormatter, editable: true, search:false, width:'40'},
+							  {name:'comment', formatter: myLinkFormatter, editable: true,width:'250'},
+							  {name:'resolution', formatter: myLinkFormatter, editable: true, width:'150'},
+							  {name:'resolvedAt', formatter: myLinkFormatter, editable: true,width:'40'},
+							  {name:'resolvedBy', formatter: myLinkFormatter, editable: true,width:'60'}"
+				sortname="'comment'"
+				caption="'Display News and Issues:'"
+				height="'100%'"
+				width="windowWidth"
+				rowNum="'25'"
+				rowList= "'25','100','500','1000'"
+				viewrecords="true"
+				showPager="true"
+				postData="{moveEvent: moveEvent, viewFilter:viewFilter, moveBundle:moveBundle}"
+				datatype="'json'">
+				<jqgrid:filterToolbar id="listNewsGridId" searchOnEnter="false" />
+				<jqgrid:navigation id="listNewsGridId" add="false" edit="false" del="false" search="false"/>
+				<jqgrid:refreshButton id="listNewsGridId" />
+			</jqgrid:grid>
+			$.jgrid.formatter.integer.thousandsSeparator='';
+			function myLinkFormatter (cellvalue, options, rowObject) {
+				//console.log()
+				return cellvalue ? '<span class="Arrowcursor" onclick= "getCommentDetails(\''+options.rowId+'\', \''+rowObject[2]+'\')\" >' + (cellvalue) + '</span>' : "" 
+			}
+});
 /*-------------------------------------------
  * @author : Lokanada Reddy
  * @param  : assetComment / moveEventNews object based on comment Type as JSON object
  * @return : Edit form
  *-------------------------------------------*/
+ function getCommentDetails(id,type){
+	 
+	 jQuery.ajax({
+			url: contextPath+"/newsEditor/getCommetOrNewsData",
+			data: {'id':id , 'commentType':type},
+			type:'POST',
+			success: function(data) {
+				showEditCommentForm( data, id)
+			}
+		});
+	 }
 function showEditCommentForm(e , rowId){
-	var assetComments = eval('(' + e.responseText + ')');
+	var assetComments = e
 	if (assetComments) {
 		var tbody = $("#commetAndNewsBodyId > tr");
 		tbody.each(function(n, row){
@@ -71,7 +119,7 @@ function showEditCommentForm(e , rowId){
 			$("#showEditCommentDialog").dialog('option','title','Edit News Comment');
 
 		} else {
-
+			
 			$('#commentTypeId').val("issue")
 			$('#dateResolvedId').html(assetComments[0].dtResolved);
 			$('#isResolvedId').val(assetComments[0].commentObject.isResolved)
@@ -95,10 +143,10 @@ function showEditCommentForm(e , rowId){
 			
 		}
      	
-		$("#showEditCommentDialog").dialog('option', 'width', 'auto');
-		$("#showEditCommentDialog").dialog('option', 'position', ['center','top']);
-		$("#showEditCommentDialog").dialog("open");
-		$("#createNewsDialog").dialog("close");
+			$("#showEditCommentDialog").dialog('option', 'width', 'auto');
+			$("#showEditCommentDialog").dialog('option', 'position', ['center','top']);
+			$("#showEditCommentDialog").dialog("open");
+			$("#createNewsDialog").dialog("close");
 		}
 }
 /*-------------------------------------------
@@ -191,40 +239,13 @@ function validateCreateNewsForm(){
 		</tr>
 	</table>
 </div>
+<div>
 <div style="width: 100%; height: auto; border: 1px solid #5F9FCF; margin-top: 10px; padding: 10px 5px 10px 5px;">
 <span style="position: absolute; text-align: center; width: auto; margin: -17px 0 0 10px; padding: 0px 8px; background: #ffffff;"><b>Display
 News and Issues</b></span>
-<jmesa:tableFacade id="tag" items="${newsAndCommentsList}" maxRows="25" stateAttr="restore" var="assetCommentInstance" autoFilterAndSort="true" maxRowsIncrements="25,50,100">
-       <jmesa:htmlTable style=" border-collapse: separate">
-           <jmesa:htmlRow highlighter="true">
-               	<jmesa:htmlColumn property="createdAt" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-					<span onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}">
-						<tds:convertDateTime date="${assetCommentInstance?.createdAt}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-					</span>
-				</jmesa:htmlColumn>
-				<jmesa:htmlColumn property="createdBy" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-					<span onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}">${assetCommentInstance.createdBy}</span>
-				</jmesa:htmlColumn>
-				<jmesa:htmlColumn property="commentType" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-					<span onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}">${assetCommentInstance.commentType}</span>
-				</jmesa:htmlColumn>
-				<jmesa:htmlColumn property="comment" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-					<span onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}">${assetCommentInstance.comment}</span>
-				</jmesa:htmlColumn>
-	            <jmesa:htmlColumn property="resolution" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-	            	<span onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}"><tds:truncate value="${assetCommentInstance.resolution}"/></span>
-	            </jmesa:htmlColumn>
-	            <jmesa:htmlColumn property="resolvedAt" sortable="true" filterable="true" pattern="MM/dd/yyyy hh:mm a" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-	            	<span onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}">
-	            		<tds:convertDateTime date="${assetCommentInstance?.resolvedAt}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-	            	</span>
-	            </jmesa:htmlColumn>
-	            <jmesa:htmlColumn property="resolvedBy" sortable="true" filterable="true" cellEditor="org.jmesa.view.editor.BasicCellEditor">
-	            	<span onclick="${remoteFunction(action:'getCommetOrNewsData',params:'\'id=\'+'+assetCommentInstance.id+'+\'&commentType='+assetCommentInstance?.commentType+'\'', onComplete:'showEditCommentForm( e, '+i+')')}"><tds:truncate value="${assetCommentInstance.resolvedBy}"/></span>
-	            </jmesa:htmlColumn>
-        </jmesa:htmlRow>
-    </jmesa:htmlTable>
-</jmesa:tableFacade>
+	<jqgrid:wrapper id="listNewsGridId" />
+</div>
+</div>
 </g:form>
 <div class="paginateButtons" style="padding: 0px;">
 <g:form name="paginateRows" action="newsEditorList">
@@ -329,7 +350,7 @@ News and Issues</b></span>
 	<input name="projectId" value="${projectId}" type="hidden"/>
 	<input name="moveBundle" value="${params.moveBundle}" type="hidden"/>
 	<input name="viewFilter" value="${params.viewFilter}" type="hidden"/>
-	<input name="moveEvent.id" value="${moveEvent?.id}" type="hidden" id="moveEventId"/>
+	<input name="moveEvent.id" value="${moveEventId}" type="hidden" id="moveEventId"/>
 		<div class="dialog" style="border: 1px solid #5F9FCF">
 		<table id="createCommentTable" style="border: 0px">
 			<tr>
