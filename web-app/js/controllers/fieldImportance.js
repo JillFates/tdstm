@@ -43,7 +43,7 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 	$scope.section = {'AssetEntity':'h','Application':'h','Database':'h','Files':'h'};
 	//initializing notes to display styling notes div.
 	$scope.notes=[{'id':'C','field':'Name','type':'ServerX05','imp':'C-Critical'},
-	              {'id':'I','field':'Type','type':'Server','imp':'I-Ignore'},
+	              {'id':'I','field':'Type','type':'Server','imp':'I-Important'},
 	              {'id':'N','field':'Manufacturer','type':'HP','imp':'N-Normal'},
 	              {'id':'H','field':'Model','type':'Dell','imp':'H-Hidden'}];
 	

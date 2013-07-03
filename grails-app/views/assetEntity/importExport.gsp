@@ -86,7 +86,7 @@
 	                <span><input type="checkbox" id="assetId" name="asset" value="asset" checked="checked"/>&nbsp;<label for="assetId">Server</label></span>&nbsp;
 	                <span><input type="checkbox" id="databaseId" name="database" value="database" />&nbsp;<label for="databaseId">Database</label></span>&nbsp;
 	                <span><input type="checkbox" id="filesId" name="files" value="files"  />&nbsp;<label for="filesId">Storage</label></span>&nbsp;
-	                <span><input type="checkbox" id="dependencyId" name="dependency" value="dependency" />&nbsp;<label for="dependencyId">dependency</label></span>&nbsp;
+	                <span><input type="checkbox" id="dependencyId" name="dependency" value="dependency" />&nbsp;<label for="dependencyId">Dependency</label></span>&nbsp;
 	                </td>
                 </tr>
               </tbody>
