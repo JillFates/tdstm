@@ -61,6 +61,7 @@ class MoveBundleController {
 		def completionDates = params.completionTime ? MoveBundle.findAll("from MoveBundle where project =:project and completionTime like '%${params.completionTime}%'",[project:project])?.completionTime : []
 		
 		def bundleList = MoveBundle.createCriteria().list(max: maxRows, offset: rowOffset) {
+				eq('project',project)
 				if (params.name)
 					ilike('name', "%${params.name}%")
 				if (params.description)
