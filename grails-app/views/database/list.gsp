@@ -45,15 +45,15 @@ $(document).ready(function() {
 	var listCaption ="DataBases:<span class='capBtn'><input type='button' value='Create DB'  onclick='createAssetDetails(\"Database\")'/></span>"				
     <jqgrid:grid id="databaseId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
-    colNames="'Actions','Name', 'DB Format','Plan Status','Bundle','Dep # ','Dep Up','Dep Down','id', 'commentType'"
+    colNames="'Actions','Name', 'DB Format','Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType'"
     colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'50', fixed:false},
       			  {name:'assetName',index: 'assetName', editable: true, formatter: myLinkFormatter, width:'300'},
       			  {name:'dbFormat', editable: true},
                   {name:'planStatus', editable: true}, 
                   {name:'moveBundle', editable: true},
                   {name:'depNumber', editable: false,sortable:false,search:false},
-                  {name:'depUp', editable: false,sortable:false,search:false },
-                  {name:'depDown', editable: false,sortable:false,search:false},
+                  {name:'depResolve', editable: false,sortable:false,search:false },
+                  {name:'depConflicts', editable: false,sortable:false,search:false},
                   {name:'id', hidden: true},
                   {name:'commentType', hidden: true} "
     sortname="'assetName'"

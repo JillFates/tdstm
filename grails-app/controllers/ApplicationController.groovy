@@ -149,7 +149,7 @@ class ApplicationController {
 
 		def results = apps?.collect { [ cell: ['',it.assetName, (it.sme ? it.sme.toString() : ''), it.validation, it.planStatus,
 					it.moveBundle?.name, AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
-					AssetDependency.countByDependentAndStatusNotEqual(it, "Validated"),
+					(it.depToResolve ?it.depToResolve:''),(it.depToConflict ?it.depToConflict:''),
 					AssetDependency.countByAssetAndStatusNotEqual(it, "Validated"),
 					AssetComment.find("from AssetComment ac where ac.assetEntity=:entity and commentType=:type and status!=:status",
 					[entity:it, type:'issue', status:'completed']) ? 'issue' :

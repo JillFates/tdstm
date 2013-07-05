@@ -1440,10 +1440,11 @@ class AssetEntityController {
 		def totalRows = assetEntities.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
 		
-		def results = assetEntities?.collect { [ cell: ['',it.assetName, it.assetType,it.model?.modelName, it.sourceLocation,
+		def results = assetEntities?.collect { 
+			[ cell: ['',it.assetName, it.assetType,it.model?.modelName, it.sourceLocation,
 					it.sourceRack, it.targetLocation, it.targetRack, it.assetTag, it.serialNumber,it.planStatus,it.moveBundle?.name,
-					AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
-					(AssetDependency.countByDependentAndStatusNotEqual(it, "Validated")+AssetDependency.countByAssetAndStatusNotEqual(it, "Validated")!=0)?(AssetDependency.countByDependentAndStatusNotEqual(it, "Validated")+AssetDependency.countByAssetAndStatusNotEqual(it, "Validated")):(''),
+					AssetDependencyBundle.findByAsset(it)?.dependencyBundle, (it.depToResolve ?it.depToResolve:''),
+					(it.depToConflict ?it.depToConflict:''),
 					AssetComment.find("from AssetComment ac where ac.assetEntity=:entity and commentType=:type and status!=:status",
 					[entity:it, type:'issue', status:'completed']) ? 'issue' :
 					(AssetComment.find("from AssetComment ac where ac.assetEntity=:entity",[entity:it]) ? 'comment' : 'blank')], id: it.id,

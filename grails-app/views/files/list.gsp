@@ -44,7 +44,7 @@ $(document).ready(function() {
 	// JqGrid implementations 
     <jqgrid:grid id="storageId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
-    colNames="'Actions','Name', 'Storage Format', 'Storage Size', 'Plan Status','Bundle','Dep # ','Dep Up','Dep Down','id', 'commentType'"
+    colNames="'Actions','Name', 'Storage Format', 'Storage Size', 'Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType'"
     colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'80'},
       			  {name:'assetName',index: 'assetName', editable: true, formatter: myLinkFormatter, width:'300'},
       			  {name:'fileFormat', editable: true},
@@ -52,8 +52,8 @@ $(document).ready(function() {
                   {name:'planStatus', editable: true}, 
                   {name:'moveBundle', editable: true},
                   {name:'depNumber', editable: false,sortable:false,search:false},
-                  {name:'depUp', editable: false,sortable:false,search:false },
-                  {name:'depDown', editable: false,sortable:false,search:false},
+                  {name:'depResolve', editable: false,sortable:false,search:false },
+                  {name:'depConflicts', editable: false,sortable:false,search:false},
                   {name:'id', hidden: true},
                   {name:'commentType', hidden: true} "
     sortname="'assetName'"

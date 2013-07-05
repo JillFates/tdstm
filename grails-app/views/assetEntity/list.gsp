@@ -59,7 +59,7 @@ var listCaption ="Assets: <span class='capBtn'><input type='button' value='New A
 <jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','Target Location','Target Rack','Tag','Serial#','Plan Status','Bundle',
-        'Dep Group #','Dep to resolve', 'id', 'commentType'"
+        'Dep Group #','Dep to resolve', 'Dep Conflicts', 'id', 'commentType'"
     colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false,width:'60', fixed:true},
       			  {name:'assetName',index: 'assetName', editable: true, formatter: myLinkFormatter, width:'300'},
                   {name:'assetType', editable: true},
@@ -74,6 +74,7 @@ var listCaption ="Assets: <span class='capBtn'><input type='button' value='New A
                   {name:'moveBundle', editable: true},
                   {name:'depNumber', editable: false,sortable:false,search:false,width:'90', fixed:true},
                   {name:'depToResolve', editable: false,sortable:false,search:false ,width:'100', fixed:true},
+                  {name:'depToConflict', editable: false,sortable:false,search:false ,width:'100', fixed:true},
                   {name:'id', hidden: true},
                   {name:'commentType', hidden: true} "
     sortname="'assetName'"

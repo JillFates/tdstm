@@ -375,5 +375,26 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	def transient getDepDown(){
 		return AssetDependency.countByAssetAndStatusNotEqual(this, 'Validated')
 	}
+	
+	/**
+	 * this method is used to count of dependencies to assets where status in QUESTIONED,UNKNOWN.
+	 * @return
+	 */
+	def getDepToResolve(){
+		return AssetDependency.countByAssetAndStatusInList(this, 
+			[AssetDependencyStatus.QUESTIONED,AssetDependencyStatus.UNKNOWN])
+	}
+	
+	/**
+	 * this method is used to count of dependencies to assets where the status in QUESTIONED,UNKNOWN,VALIDATED 
+	 * of different MoveBundle.
+	 * @return
+	 */
+	def getDepToConflict(){
+		return AssetDependency.findAll(" FROM AssetDependency ad \
+				WHERE ad.status IN (:status) AND ad.asset=:asset AND ad.dependent.moveBundle!=:bundle",
+				[asset:this, bundle:this.moveBundle,
+				 status:[AssetDependencyStatus.VALIDATED, AssetDependencyStatus.UNKNOWN, AssetDependencyStatus.QUESTIONED]]).size()
+	}
 
 }

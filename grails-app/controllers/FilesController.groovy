@@ -125,8 +125,7 @@ class FilesController {
 
 		def results = files?.collect { [ cell: ['',it.assetName, it.fileFormat, it.fileSize, it.planStatus,
 					it.moveBundle?.name, AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
-					AssetDependency.countByDependentAndStatusNotEqual(it, "Validated"),
-					AssetDependency.countByAssetAndStatusNotEqual(it, "Validated"),
+					(it.depToResolve ?it.depToResolve:''),(it.depToConflict ?it.depToConflict:''),
 					AssetComment.find("from AssetComment ac where ac.assetEntity=:entity and commentType=:type and status!=:status",
 					[entity:it, type:'issue', status:'completed']) ? 'issue' :
 					(AssetComment.find("from AssetComment ac where ac.assetEntity=:entity",[entity:it]) ? 'comment' : 'blank'),
