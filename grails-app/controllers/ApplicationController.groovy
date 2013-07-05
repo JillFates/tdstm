@@ -318,8 +318,9 @@ class ApplicationController {
 			params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
 		}
 		def applicationInstance = Application.get(params.id)
-		applicationInstance.sme= null
-		applicationInstance.sme2= null
+		applicationInstance.sme = null
+		applicationInstance.sme2 = null
+		applicationInstance.appOwner = null
 		applicationInstance.properties = params
 		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
 			flash.message = "Application ${applicationInstance.assetName} Updated"
