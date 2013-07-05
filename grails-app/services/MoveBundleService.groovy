@@ -505,7 +505,7 @@ class MoveBundleService {
 				 date:time, dependencyStatus:entities.dependencyStatus, assetDependency:new AssetDependency(), dependencyBundleCount:dependencyBundleCount,
 				 servers:entities.servers, applications:entities.applications, dbs:entities.dbs, files:entities.files,moveBundle:moveBundleList, planStatusOptions:planStatusOptions,
 				 applicationListSize:applicationListSize, physicalListSize:physicalListSize,virtualListSize:virtualListSize,
-				 asset:'Apps', databaseListSize:databaseListSize, filesListSize:filesListSize, totalCompanies:companiesList,
+				 asset:'Apps', databaseListSize:databaseListSize, filesListSize:filesListSize, partyGroupList:companiesList,
 				 allMoveBundles:moveBundles, networks:entities.networks, personList:personList, company:projectInstance.client, availabaleRoles:availabaleRoles]
 		 
 		 return map

@@ -13,7 +13,7 @@
                        <label>Company:</label>
                    </td>
                    <td valign="top" class="value ">
-                   <g:select name="company" id="companyId" optionKey="id" optionValue="name" from="${totalCompanies}" value="${company?.id}"/>
+                   <g:select name="company" id="companyId" optionKey="id" optionValue="name" from="${partyGroupList}" value="${company?.id}"/>
                    </td>
 				</tr> 
                 <tr class="prop">

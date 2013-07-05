@@ -50,7 +50,7 @@
 		$(document).ready(function() {
 			var listCaption ="Users: \
 			<tds:hasPermission permission='PersonCreateView'>\
-				<span class='capBtn'><input type='button' value='Create Person' onClick=\"window.location.href=\'"+contextPath+"/person/create\'\"/></span> \
+				<span class='capBtn'><input type='button' value='Create Person' onClick=\"openPersonDiv(0, \'Create Person\')\"/></span> \
 			</tds:hasPermission>\
 			<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='compareOrMerge()' disabled='disabled'/></span>"
 			$("#personGeneralViewId").dialog({ autoOpen: false })
@@ -139,11 +139,11 @@
      <div id="personGeneralViewId" style="display: none;" title="Manage Staff "></div>
      
      <div id="createStaffDialog" title="Create Staff" style="display:none;">
-      <div class="dialog">
-	      <div id="showOrMergeId" style="display: none;" title="Compare/Merge Persons"></div>
 	      <g:render template="createStaff" model="[forWhom:'person']"></g:render>
-      </div>
-    </div>
+     </div>
+     <div class="dialog">
+	      <div id="showOrMergeId" style="display: none;" title="Compare/Merge Persons"></div>
+     </div>
   </body>
 </html>
                

@@ -60,7 +60,7 @@ class ApplicationController {
 		    staffRoles:taskService.getRolesForStaff(), plannedStatus:params.plannedStatus, appSme : filters?.appSmeFilter ?:'',
 			validation:params.validation, moveBundleId:params.moveBundleId, appName:filters?.assetNameFilter ?:'', sizePref:sizePref, 
 			validationFilter:filters?.appValidationFilter ?:'', moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'',
-			totalCompanies:companiesList, availabaleRoles:availabaleRoles, company:company
+			partyGroupList:companiesList, availabaleRoles:availabaleRoles, company:company
 			]
 	}
 	/**

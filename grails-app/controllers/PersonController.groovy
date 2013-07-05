@@ -36,6 +36,7 @@ class PersonController {
 	 */
 	def list = {
 		def listJsonUrl
+		def company
 		def companyId = params.companyId ?: 'All'
 		if(companyId && companyId != 'All'){
 			def map = [controller:'person', action:'listJson', id:"${companyId}"]
@@ -44,10 +45,18 @@ class PersonController {
 			def map = [controller:'person', action:'listJson']
 			listJsonUrl = HtmlUtil.createLink(map)+'/All'
 		}
+		
 		def partyGroupList = PartyGroup.findAllByPartyType( PartyType.read("COMPANY")).sort{it.name}
 		
+		// Used to set the default value of company select in the create staff dialog
+		if(companyId && companyId != 'All')
+			company = PartyGroup.find( "from PartyGroup as p where partyType = 'COMPANY' AND p.id = ${companyId} " )
+		else
+			company = securityService.getUserCurrentProject()?.client
+		
 		userPreferenceService.setPreference( "PARTYGROUP", companyId.toString() )
-		return [companyId:companyId, partyGroupList:partyGroupList, listJsonUrl:listJsonUrl]
+		def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
+		return [companyId:companyId, company:company, partyGroupList:partyGroupList, listJsonUrl:listJsonUrl]
 	}
 	
 	def listJson = {
@@ -70,7 +79,7 @@ class PersonController {
 		}
 		
 		def query = new StringBuffer("""SELECT * FROM ( SELECT p.person_id AS personId, p.first_name AS firstName, 
-			p.middle_name as middlename, IFNULL(p.last_name,'') as lastName, IFNULL(u.username, 'CREATE') as userLogin, pg.name AS company, u.active, 
+			IFNULL(p.middle_name,'') as middlename, IFNULL(p.last_name,'') as lastName, IFNULL(u.username, 'CREATE') as userLogin, pg.name AS company, u.active, 
 			date_created AS dateCreated, last_updated AS lastUpdated, u.user_login_id AS userLoginId, IFNULL(p.model_score, 0) AS modelScore 
 			FROM party pa
 			LEFT OUTER JOIN person p on p.person_id=pa.party_id 
