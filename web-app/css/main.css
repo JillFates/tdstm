@@ -542,3 +542,29 @@ td.buttons{
 	margin: 0px !important;
 	width: 100% !important;
 }
+.headRow {
+	font-weight: bold !important;
+	text-decoration:underline !important;
+	background-color:#ffffff !important;
+	width:100px;
+}
+.leftCells {
+	width: 4% !important;
+	background-color:#ffffff;
+}
+.conflictApp {
+	margin-top: 20px;
+	padding-bottom: 20px;
+	border-width: 0px;
+}
+.conflictAppBody {
+	padding-right:20px !important;
+	border-width: 0px;
+}
+.inlineLink {
+	display: inline !important;
+	
+}
+.inlineLink:hover {
+	text-decoration: underline !important;
+}

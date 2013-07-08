@@ -397,10 +397,10 @@
 				</div>
 			</li>
 			</tds:hasPermission>
-	        <tds:hasPermission permission='ReportMenuView'>
+			<tds:hasPermission permission='ReportMenuView'>
 			<li id="reportsMenuId" style="position:relative; float: left;"><g:link class="home" onmouseover="waitForMenu('#reportsMegaMenu', '${isMDev}')" onmouseout="waitForMenu('', '${isMDev}')" controller="reports" params="[projectId:currProjObj?.id]">Reports
-	        	<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#reportsMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" href="javascript:('#reportsMegaMenu')" style="display: inline"></a></g:link>
-				<div  class="megamenu reports" id="reportsMegaMenu" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" style="display: none;">
+				<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#reportsMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" href="javascript:('#reportsMegaMenu')" style="display: inline"></a></g:link>
+				<div class="megamenu reports" id="reportsMegaMenu" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" style="display: none;">
 					<table class="mmtable "><tr>
 					<tds:hasPermission permission='ShowDiscovery'>
 					<td style="vertical-align:top"><span class="megamenuSection">Discovery</span><br />
@@ -415,12 +415,17 @@
 						</ul>
 					</td>
 					</tds:hasPermission>
+					<td style="vertical-align:top"><span class="megamenuSection">Planning</span><br />
+						<ul>
+							<li><a href="/tdstm/reports/applicationConflicts" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Application Conflicts</a> </li>
+						</ul>
+					</td>
 					<tds:hasPermission permission='ShowMovePrep'>
 					<td style="vertical-align:top"><span class="megamenuSection">Event Prep</span><br />
 						<ul >
-						    <tds:hasPermission permission="ShowMovePrep">
-						    <li><a href="/tdstm/reports/preMoveCheckList" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Pre-event Checklist</a> </li>
-						    </tds:hasPermission>
+							<tds:hasPermission permission="ShowMovePrep">
+							<li><a href="/tdstm/reports/preMoveCheckList" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Pre-event Checklist</a> </li>
+							</tds:hasPermission>
 							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Login+Badges" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Login Badges</a> </li>
 							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Asset+Tag" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Asset Tags</a> </li>
 							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Team+Worksheets" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Event Team Worksheets</a> </li>

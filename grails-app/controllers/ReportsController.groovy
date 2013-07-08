@@ -1322,5 +1322,36 @@ class ReportsController {
 		redirect( action:"preMoveCheckList")
 		
 	}
+	def applicationConflicts = {
+		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectInstance = Project.findById( currProj ) 
+		def moveBundleList = MoveBundle.findAllByProject(projectInstance)
+		def moveBundleId = securityService.getUserCurrentMoveBundleId()
+		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId]
+	}
+	def generateApplicationConflicts = {
+		def project = securityService.getUserCurrentProject()
+		def moveBundleId = params.moveBundle
+		def moveBundleInstance
+		def errorMsg = "Please select a MoveBundle"
+		def conflicts = params.conflicts == 'on'
+		def unresolved = params.unresolved == 'on'
+		
+		if( moveBundleId && moveBundleId.isNumber() ){
+			def isProjMoveBundle  = MoveBundle.findByIdAndProject( moveBundleId, project )
+			if ( !isProjMoveBundle ) {
+				errorMsg = " User tried to access moveBundle ${moveBundleId} that was not found in project : ${project} "
+				log.warn "generateCheckList: User tried to access moveBundle ${moveBundleId} that was not found in project : ${project}"
+			} else {
+				errorMsg = ""
+				userPreferenceService.setPreference( "MOVE_BUNDLE", "${moveBundleId}" )
+				moveBundleInstance = MoveBundle.get(moveBundleId)
+				log.info "con:${conflicts} unres:${unresolved}"
+				return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved)
+			}
+		}
+		flash.message = errorMsg
+		redirect( action:"generateApplicationConflicts")
+	}
 }
  

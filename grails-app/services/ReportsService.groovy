@@ -3,6 +3,7 @@ import java.text.SimpleDateFormat
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetComment
+import com.tds.asset.Application
 
 class ReportsService {
 
@@ -64,7 +65,52 @@ class ReportsService {
 			   'dashBoardOk':eventBundleInfo.dashBoardOk,'allErrors':allErrors,'nullAssetTag':assetsInfo.nullAssetTag,'blankAssetTag':assetsInfo.blankAssetTag,'modelList':modelInfo.modelList,'modelError':modelInfo.modelError,
 			   'eventIssues':assetsInfo.eventIssues,'nonAssetIssue':assetsInfo.nonAssetIssue]
 
-	} 
+	}
+	
+	/**
+	 * Calculates the data to be used by the generateApplicationConflicts view to create a report of applications with issues in a bundle
+	 * @param int currProj - The id of the user's curret project
+	 * @param int moveBundleId - The id of the moveBundle to generate the report for
+	 * @param boolean conflicts - If true, apps with dependencies in other moveBundles will be shown
+	 * @param boolean unresolved - If true, apps with dependencies with status 'Questioned' or 'Unknown' will be shown
+	 * @return Map - The parameters used by the view to generate the report
+	 */
+	def genApplicationConflicts(def currProj , def moveBundleId, def conflicts, def unresolved) {
+		def projectInstance = Project.findById( currProj )
+		ArrayList appList = new ArrayList()
+		
+		def appsInBundle = Application.findAllByMoveBundle(MoveBundle.findById(moveBundleId))
+		appsInBundle.each {
+			def showApp = false
+			def dependsOnList = AssetDependency.findAllByAsset(it)
+			def supportsList = AssetDependency.findAllByDependent(it)
+			def dependsOnIssueCount = 0
+			def supportsIssueCount = 0
+			
+			dependsOnList.each{
+				def conflictIssue = (it.asset.moveBundle?.id != it.dependent.moveBundle?.id)
+				def statusIssue = it.status in ['Questioned','Unknown']
+				showApp = showApp || ( conflicts && conflictIssue ) || ( unresolved && statusIssue )
+				
+				if(conflictIssue || statusIssue)
+					dependsOnIssueCount++
+			}
+			
+			supportsList.each{
+				def conflictIssue = (it.asset.moveBundle?.id != it.dependent.moveBundle?.id)
+				def statusIssue = it.status in ['Questioned','Unknown']
+				showApp = showApp || ( conflicts && conflictIssue ) || ( unresolved && statusIssue )
+				
+				if(conflictIssue || statusIssue)
+					supportsIssueCount++
+			}
+			
+			if(showApp)
+				appList.add([ 'app':it, 'dependsOnList':dependsOnList, 'supportsList':supportsList, 'dependsOnIssueCount':dependsOnIssueCount, 'supportsIssueCount':supportsIssueCount ])
+		}
+		
+		return['project':projectInstance, 'appList':appList, 'moveBundle':MoveBundle.findById(moveBundleId), 'columns':9]
+	}
 	
 	/**
 	 * @param moveBundles
