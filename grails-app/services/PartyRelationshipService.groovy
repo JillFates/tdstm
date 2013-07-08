@@ -60,7 +60,7 @@ class PartyRelationshipService {
 			"p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'CLIENT'"
 		def clients = PartyRelationship.findAll( query, [company:company] )
 		if (clients && sortOn) {  
-			clients?.sort{it.partyIdTo.(sortOn)}
+			clients?.sort{it.partyIdTo.("$sortOn")}
 		}
 
 		return clients
@@ -78,7 +78,7 @@ class PartyRelationshipService {
 			"p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER'"
 		def partners = PartyRelationship.findAll( query, [company:company] )
 		if (partners && sortOn) {  
-			partners?.sort{it.partyIdTo.(sortOn)}
+			partners?.sort{it.partyIdTo.("$sortOn")}
 		}
 
 		return partners
