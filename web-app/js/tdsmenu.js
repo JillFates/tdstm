@@ -383,10 +383,8 @@
 		}
 		
 		function editPreference(){
-			alert("inside pref----")
 			new Ajax.Request('/tdstm/person/editPreference',{asynchronous:true,evalScripts:true,
 						onSuccess:function(e){
-							alert(e.responseText);
 							$("#userPrefDivId").html(e.responseText)
 							$("#userPrefDivId").dialog('option', 'width', '400px')
 							$("#userPrefDivId").dialog("open")
