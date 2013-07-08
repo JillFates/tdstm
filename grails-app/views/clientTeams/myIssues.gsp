@@ -18,7 +18,7 @@
 			<ul>
 					<g:if test="${tab && tab == 'todo'}">
 						<li onclick="setTab('todo')"><g:link elementId="taskLinkId" class="mobmenu mobselect"
-								action="listTasks" params='["tab":"todo"]'>My Tasks: <span id="toDOSpanId">${todoSize}</span>
+								action="listTasks" params='["tab":"todo"]'>Ready Tasks: <span id="toDOSpanId">${todoSize}</span>
 								
 							</g:link>
 						</li>
@@ -29,7 +29,7 @@
 					</g:if>
 					<g:if test="${tab && tab == 'all'}">
 						<li onclick="setTab('todo')"><g:link elementId="taskLinkId" class="mobmenu"
-								action="listTasks" params='["tab":"todo"]'>My Tasks: <span id="allToDoSpanId">${todoSize}</span>
+								action="listTasks" params='["tab":"todo"]'>Ready Tasks: <span id="allToDoSpanId">${todoSize}</span>
 							</g:link>
 						</li>
 						<li onclick="setTab('all')"><g:link elementId="taskLinkAllId" class="mobmenu mobselect"

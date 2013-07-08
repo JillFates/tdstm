@@ -187,6 +187,18 @@
 			}
 		}
 		function waitForMenu(e, isMobile){
+			if(e=='#teamMegaMenu'){
+				jQuery.ajax({
+					url: contextPath+'/clientTeams/getToDoCount',
+					type:'POST',
+					success: function(resp) {
+						$("#todoCountProjectId").html(resp.count)
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						alert("An Unexpected error while getting asset.")
+					}
+				});
+			}
 			if(isMobile=='true'){
 				showMegaMenu(e)
 			}else{
@@ -371,8 +383,10 @@
 		}
 		
 		function editPreference(){
+			alert("inside pref----")
 			new Ajax.Request('/tdstm/person/editPreference',{asynchronous:true,evalScripts:true,
 						onSuccess:function(e){
+							alert(e.responseText);
 							$("#userPrefDivId").html(e.responseText)
 							$("#userPrefDivId").dialog('option', 'width', '400px')
 							$("#userPrefDivId").dialog("open")

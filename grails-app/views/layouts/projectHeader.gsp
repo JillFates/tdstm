@@ -315,7 +315,8 @@
 					<table class="mmtable"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Tasks</span><br />
 						<ul>
-							<li><a class="mmlink" id="MyTasksMenuId" href="/tdstm/clientTeams/listTasks" onclick="hideMegaMenu('teamMegaMenu')">My Tasks</a></li>
+							<li><a class="mmlink" id="MyTasksMenuId" href="/tdstm/clientTeams/listTasks" onclick="hideMegaMenu('teamMegaMenu')">My Tasks 
+							(<span id="todoCountProjectId">&nbsp;</span>)</a></li>
 							<tds:hasPermission permission='ShowMoveTechsAndAdmins'>
 							<li><g:link class="mmlink" controller="assetEntity" action="listTasks"  params="[initSession:true]" onclick="hideMegaMenu('assetMegaMenu')">Task Manager</g:link></li>
 							</tds:hasPermission>

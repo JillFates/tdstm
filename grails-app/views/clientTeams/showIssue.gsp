@@ -75,7 +75,8 @@
 			</tr> 
 			<tr class="prop issue" id="estFinishShowId"  >
 				<td valign="top" class="name"><label for="estFinish">Est. Finish:</label></td>
-				<td valign="top" class="value" id="estFinishShowId_${assetComment.id}" nowrap="nowrap">${etFinish}</td>
+				<td valign="top" class="value" id="estFinishShowId_${assetComment.id}" nowrap="nowrap">
+				<tds:convertDate date="${assetComment.estFinish}" format="M/d kk:mm" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 			</tr>
 			<tr class="prop issue" id="dueDateShowId"  >
 				<td valign="top" class="name"><label for="dueDateCreateId">Due Date:</label></td>
@@ -89,19 +90,22 @@
             </tr>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="category">Category:</label></td>
-				<td valign="top" class="value"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="${assetComment.category}"></g:select></td>
+				<td valign="top" class="value"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="${assetComment.category}"></g:select>
+				<g:if test="${assetComment.moveEvent}">
+		   		  <span style="margin-left:60px;">Move Event:</span>
+		   		  <span style="margin-left:10px;">${assetComment?.moveEvent.name}</span>
+		   		</g:if>
+				</td>
 			</tr>
 			<tr>
 				<g:if test="${assetComment.assetEntity}">
 		   			<td>Asset:</td><td>&nbsp;${assetComment?.assetEntity.assetName}</td>
 		   		</g:if>
-		   		<g:if test="${assetComment.moveEvent}">
-					<td>Event:</td><td>${assetComment?.moveEvent.name}</td>
-		   		</g:if>
 		   	</tr>
 		   	<tr class="prop">
 				<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
-				<td valign="top" class="value"><span id="categoryEditId">${assetComment?.createdBy} on <tds:convertDate date="${assetComment?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span></td>
+				<td valign="top" class="value"><span id="categoryEditId">${assetComment?.createdBy} on 
+				<tds:convertDate date="${assetComment?.dateCreated}" format="M/d" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span></td>
 			</tr>
 			<tr class="prop" >
 				<td valign="top" class="name">
@@ -115,7 +119,7 @@
 			</tr>				
 			 <tr class="prop">
 				<td valign="top" class="name"><label for="notes">Previous Notes:</label></td>
-				<td valign="top" class="value"><div id="previousNote" style="width: 380px;">
+				<td valign="top" class="value"><div id="previousNote">
 				<table style="table-layout: fixed; width: 100%;border: 1px solid green;" >
                    <g:each in="${notes}" var="note" status="i" >
                     <tr>
@@ -139,23 +143,15 @@
 					<textarea cols="100" rows="4" style="width:100%;padding:0px;" id="resolutionEditId_${assetComment.id}" name="resolution" >${assetComment.resolution}</textarea>
 				</td>
 			</tr> 
-			<g:if test="${assetComment.dateResolved}">
-				<tr class="prop">
-					<td valign="top" class="name"><label for="resolution">Resolved At:</label></td>
-					<td valign="top" class="value">
-						<span id="dateResolvedTd" ><tds:convertDate date="${assetComment?.dateResolved}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span>
-					</td>
-				</tr> 
-			</g:if>
 			<g:if test="${assetComment.resolvedBy}">
 				<tr class="prop">
 					<td valign="top" class="name"><label for="resolution">Resolved By:</label></td>
 					<td valign="top" class="value">
-						<span id="resolvedByTd" >${assetComment.resolvedBy}</span>
+						<span id="resolvedByTd" >${assetComment.resolvedBy} on 
+						<tds:convertDate date="${assetComment?.dateResolved}" format="M/d" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span>
 					</td>
 				</tr> 
 			</g:if>
-			
 			<tr>
 			    <td class="buttonR" >
 					<input type="button" value="Cancel" onclick="cancelButton(${assetComment.id})" />

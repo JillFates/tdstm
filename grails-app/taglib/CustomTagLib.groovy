@@ -38,6 +38,12 @@ class CustomTagLib {
 				case "MM/dd kk:mm" :
 					out << dtParam[5..6]+'/'+dtParam[8..9]+' '+dtParam[11..15]
 					break
+				case "M/d" :
+					out << (dtParam[5] =='0' ? dtParam[6] : dtParam[5..6])+'/'+ (dtParam[8] == '0'? dtParam[9]: dtParam[8..9])+'/'+dtParam[0..3]
+					break
+				case "M/d kk:mm" :
+					out << (dtParam[5] =='0' ? dtParam[6] : dtParam[5..6])+'/'+ (dtParam[8] == '0'? dtParam[9]: dtParam[8..9])+'/'+dtParam[0..3]+' '+dtParam[11..15]
+					break
 				default:
 					out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]
 					break

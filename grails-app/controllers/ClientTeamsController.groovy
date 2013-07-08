@@ -1109,7 +1109,6 @@ class ClientTeamsController {
 		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 		def dueFormatter = new SimpleDateFormat("MM/dd/yyyy");
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def etFinish	
 			
 		def isCleaner = partyRelationshipService.staffHasFunction(project.id, person.id, 'CLEANER')
 		def canPrint = request.getHeader ( "User-Agent" ).contains ( "MSIE" ) && isCleaner
@@ -1151,10 +1150,7 @@ class ClientTeamsController {
 		   }
 		}
 		*/
-		
-		if (assetComment?.estFinish){
-			etFinish = estformatter.format(GormUtil.convertInToUserTZ(assetComment.estFinish, tzId));
-		}
+
 		def dueDate = assetComment.dueDate ? dueFormatter.format(GormUtil.convertInToUserTZ(assetComment.dueDate, tzId)) : ''
 		
 		def successor = TaskDependency.findAllByPredecessor( assetComment )
@@ -1168,7 +1164,6 @@ class ClientTeamsController {
 			assignmentPerm:assignmentPerm, 
 			categoryPerm:categoryPerm,
 			successor:successor, 
-			etFinish:etFinish, 
 			projectStaff:projectStaff,
 			canPrint:canPrint,
 			dueDate:dueDate,
