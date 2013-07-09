@@ -56,7 +56,10 @@ class PersonController {
 		
 		userPreferenceService.setPreference( "PARTYGROUP", companyId.toString() )
 		def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
-		return [companyId:companyId, company:company, partyGroupList:partyGroupList, listJsonUrl:listJsonUrl]
+		//used to show roles in addTeam select
+		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
+		return [companyId:companyId, company:company, partyGroupList:partyGroupList, 
+					listJsonUrl:listJsonUrl, availabaleRoles:availabaleRoles]
 	}
 	
 	def listJson = {
