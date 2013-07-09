@@ -236,6 +236,8 @@ function submitCheckBox(){
 			    assetTab.attr("style", "display:block");
 			    $('#upArrow').css('display','inline');
 			    $('#downArrow').css('display','none');
+			}, onFailure: function() { 
+				alert("Please associate appropriate assets to one or more 'Planning' bundles before continuing"); 
 			}
 		});
 }

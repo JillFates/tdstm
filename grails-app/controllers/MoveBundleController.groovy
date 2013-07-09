@@ -847,7 +847,7 @@ class MoveBundleController {
 		String statusTypes = WebUtil.checkboxParamAsString( request.getParameterValues( "status" ) )
 		
 		// Generate the Dependency Groups
-		moveBundleService.generateDependencyGroups(projectId, connectionTypes, statusTypes)
+		flash.message = moveBundleService.generateDependencyGroups(projectId, connectionTypes, statusTypes)
 
 		// Now get the model and display results
 		render(template:'dependencyBundleDetails', model:moveBundleService.getdependencyConsoleMap(projectId) )

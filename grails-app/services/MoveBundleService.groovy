@@ -333,10 +333,11 @@ class MoveBundleService {
 
 		 // Get array of moveBundle ids
 		 def moveBundleList = moveBundleText.replaceAll(', ',',').tokenize(',')
+		 def errMsg
 		 
 		 def assetTypeList =  MoveBundleController.dependecyBundlingAssetType
-		 
-		 // Query to fetch dependent asset list with dependency type and status and move bundle list with use for planning .
+		 if(moveBundleText){
+			 // Query to fetch dependent asset list with dependency type and status and move bundle list with use for planning .
 		 def queryForAssets = """SELECT a.asset_entity_id as assetId FROM asset_entity a
 			LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id Or ad.dependent_id = a.asset_entity_id
 			WHERE a.asset_type in ${assetTypeList}
@@ -447,6 +448,9 @@ class MoveBundleService {
 			 AND move_bundle_id in (${moveBundleText})
 		     AND ae.asset_type in (${assetTypes})"""
 		 def x = jdbcTemplate.execute(stragglerSQL)
+		 } else {
+		 	errMsg="Please associate appropriate assets to one or more 'Planning' bundles before continuing."
+		 }
 		 
 	 }
 	 
