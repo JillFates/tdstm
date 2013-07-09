@@ -2684,7 +2684,7 @@ class AssetEntityController {
 	 *-------------------------------------------*/
 	//  To get unique list of task for list of assets through ajax
 	def getList = {
-		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
+		def projectInstance = securityService.getUserCurrentProject()
 		def assetArray = params.assetArray
 		Set common = new HashSet()
 		def taskList = []
@@ -3635,181 +3635,217 @@ class AssetEntityController {
 			unassignedFilesCount:unassignedFilesCount]
 
 	}
-	def getLists ={
+
+	/**
+	 * Used by the dependency console to load up the individual tabs for a dependency bundle
+	 * @param String entity - the entity type to view (server,database,file,app)
+	 * @param Integer dependencyBundle - the dependency bundle ID 
+	 * @return String HTML representing the page
+	 */
+	def getLists = {
+
 		session.removeAttribute('assetDependentlist')
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-	    def project = Project.findById( projectId )
+
+		def project = securityService.getUserCurrentProject()
+		def projectId = project.id
+
 		def assetDependentlist
-		if(params.dependencyBundle!= 'null'){
-			 assetDependentlist = AssetDependencyBundle.findAllByDependencyBundleAndProject(params.dependencyBundle,project)
-		}else{	
-			 assetDependentlist = AssetDependencyBundle.findAllByProject(project)?.sort{it.dependencyBundle}
+		// def start = new Date()
+		if (params.dependencyBundle && params.dependencyBundle.isNumber() ){
+			assetDependentlist = AssetDependencyBundle.findAllByDependencyBundleAndProject(params.dependencyBundle,project)
+		} else {	
+			assetDependentlist = AssetDependencyBundle.findAllByProject(project)?.sort{it.dependencyBundle}
 		}
-		session.setAttribute('dependencyBundle',params.dependencyBundle)
-		session.setAttribute('assetDependentlist',assetDependentlist)
-		switch(params.entity){
-		case "Apps" :
-			def applicationList = assetDependentlist.findAll{it.asset.assetType ==  'Application' }
-			def filesDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Files' }.size()
-			def assetEntityListSize = assetDependentlist.findAll{it.asset.assetType ==  'VM' || it.asset.assetType ==  'Server' }.size()
-			def dbDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Database'}.size()
-			def applicationListSize = applicationList.size()
-			render(template:"appList",model:[appList:applicationList.asset,assetEntityListSize:assetEntityListSize,applicationListSize:applicationListSize,dependencyBundle:params.dependencyBundle,
-				                               filesDependentListSize:filesDependentListSize,appDependentListSize:applicationListSize,dbDependentListSize:dbDependentListSize,asset:'Apps'])
-			break;
-		case "server":
-			def assetEntityList = assetDependentlist.findAll{it.asset.assetType ==  'VM' || it.asset.assetType ==  'Server'}
-			def filesDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Files' }.size()
-			def appDependentListSize = assetDependentlist.findAll{it.asset.assetType=='Application' }.size()
-			def dbDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Database'}.size()
-			def assetEntityListSize = assetEntityList.size()
-			render(template:"assetList",model:[assetList:assetEntityList.asset,assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
-				                               filesDependentListSize:filesDependentListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbDependentListSize,asset:'server'])
-			break;
-		case "database" :
-			def databaseList = assetDependentlist.findAll{it.asset.assetType ==  'Database' }
-			def filesDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Files' }.size()
-			def appDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.size()
-			def assetEntityListSize = assetDependentlist.findAll{it.asset.assetType == 'VM' || it.asset.assetType ==  'Server' }.size()
-			def dbDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Database'}.size()
-			def dbListSize = databaseList.size()
-			render(template:"dbList",model:[databaseList:databaseList.asset,assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
-				                               filesDependentListSize:filesDependentListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbListSize,asset:'database'])
-			break;
-		case "files" :
-			def filesList = assetDependentlist.findAll{it.asset.assetType ==  'Files' }
-			def dbDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Database' }.size()
-			def appDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.size()
-			def assetEntityListSize = assetDependentlist.findAll{it.asset.assetType ==  'VM' || it.asset.assetType ==  'Server' }.size()
-			def filesListSize = filesList.size()
-			render(template:"filesList",model:[filesList:filesList.asset,assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
-										   filesDependentListSize:filesListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbDependentListSize,asset:'files'])
-			break;
-		case "graph" :
-			def filesListSize = assetDependentlist.findAll{it.asset.assetType ==  'Files' }.size()
-			def dbDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Database' }.size()
-			def appDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.size()
-			def assetEntityListSize = assetDependentlist.findAll{it.asset.assetType ==  'VM' || it.asset.assetType ==  'Server' }.size()
-			def graphData = [:]
-			def force 
-			def distance 
-			def friction = params.friction && params.friction != 'undefined' ? params.friction : 0.8
-			def height 
-			def width 
-			def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
-			Set uniqueMoveEventList = moveBundleList.moveEvent
-		    uniqueMoveEventList.remove(null)
-		    List moveEventList = []
-		    moveEventList =  uniqueMoveEventList.toList()
-		    moveEventList.sort{it?.name}
-			def eventColorCode = [:]
-			int colorDiff
-			if(moveEventList.size()){
-			   colorDiff = (232/moveEventList.size()).intValue()
-			}
-			def labelList = params.labelsList
-			labelList = labelList?.replace(" ","")
-			List labels = labelList ?  labelList.split(",") : []
-			moveEventList.eachWithIndex{ event, i -> 
-				def colorCode = colorDiff * i
-				def colorsCode = "rgb(${colorCode},${colorCode},${colorCode})"
-				eventColorCode << [(event.name):colorsCode]
-			}
-			graphData << ["friction":friction]
-			
-			if (assetDependentlist.size()<30) {
-				force = ApplicationConstants.graphDefaultSmallMap["force"]
-				distance = ApplicationConstants.graphDefaultSmallMap["linkdistance"]
-				width =  ApplicationConstants.graphDefaultSmallMap["width"]
-				height = ApplicationConstants.graphDefaultSmallMap["height"]
-				graphData << ApplicationConstants.graphDefaultSmallMap
-		    } else if(assetDependentlist.size()<200) {
-				force = ApplicationConstants.graphDefaultMediumMap["force"]
-				distance = ApplicationConstants.graphDefaultMediumMap["linkdistance"]
-				width =  ApplicationConstants.graphDefaultMediumMap["width"]
-				height = ApplicationConstants.graphDefaultMediumMap["height"]
-				graphData << ApplicationConstants.graphDefaultMediumMap
-		    } else {
-				force = ApplicationConstants.graphDefaultLargeMap["force"]
-				distance = ApplicationConstants.graphDefaultLargeMap["linkdistance"]
-				width =  ApplicationConstants.graphDefaultLargeMap["width"]
-				height = ApplicationConstants.graphDefaultLargeMap["height"]
-				graphData << ApplicationConstants.graphDefaultLargeMap
-		    }
-			def graphNodes = []
-			
-			
-			
-			assetDependentlist.each{
-				def name = ""
-				def shape = "circle"
-				def size = 150
-				def title = it.asset.assetName
-				def color = ''				
-				if(it.asset.assetType == "Application"){
-					if(labels.contains("apps"))
-						name = it.asset.assetName
-					shape = "gray"
-				} else if(['VM','Server','Blade'].contains(it.asset.assetType)){
-					if(labels.contains("servers"))
-						name = it.asset.assetName
-					shape = "square"
-				} else if(it.asset.assetType == 'Database'){
-					if(labels.contains("databases"))
-						name = it.asset.assetName
-					shape = "triangle-up"
-				} else if(it.asset.assetType == 'Files'){
-					if(labels.contains("files"))
-						name = it.asset.assetName
-					shape = "diamond"
-				}else if(it.asset.assetType == 'Network'){
-					if(labels.contains("networks"))
-						name = it.asset.assetName
-					shape = "cross"
-				}
-				def moveEventName = it.asset.moveBundle?.moveEvent?.name
-				graphNodes << ["id":it.asset.id,"name":name,"type":it.asset.assetType,"group":it.dependencyBundle, 
-								shape:shape, size : size, title: title,color:eventColorCode[moveEventName]?eventColorCode[moveEventName]:"red"]
-		}
-			graphData << ["nodes":graphNodes]
-			def assetDependencies = AssetDependency.findAll("From AssetDependency where asset.project = :project OR dependent.project = :project",[project:project])
-			def graphLinks = []
-			assetDependencies.each{
-				def opacity
-				def statusColor = ''
-				if(it.status=='Questioned'){
-				statusColor='red'
-				opacity = 1
-				}else if(it.status=='Unknown'|| it.status=='Validated') {
-					statusColor='gray'
-					opacity = 1
-				}else{
-					statusColor='gray'
-					opacity = 0.2
-				}
-				def sourceIndex = graphNodes.id.indexOf(it.asset.id)
-				def targetIndex = graphNodes.id.indexOf(it.dependent.id)
-				if(sourceIndex != -1 && targetIndex != -1){
-					graphLinks << ["source":sourceIndex,"target":targetIndex,"value":2,"statusColor":statusColor,"opacity":opacity,"distance":50]
-				}
-			}
-			graphData << ["links":graphLinks]
-			JSON output = graphData as JSON
-			def currentfile = ApplicationHolder.application.parentContext.getResource( "/d3/force/force.js" ).getFile()
-			assetEntityService.deleteTempGraphFiles("/d3/force", "G_")
-			def file_name = "G_${new Date().getTime()}"
-			def file_path = currentfile.absolutePath.replace("force.js",file_name)
-			File file = new File(file_path)
-			file.write(output.toString())
-			render(template:'dependencyGraph',model:[assetEntityListSize:assetEntityListSize,dependencyBundle:params.dependencyBundle,
-										   filesDependentListSize:filesListSize,appDependentListSize:appDependentListSize,dbDependentListSize:dbDependentListSize,
-										   asset:'graph', force:force, distance:distance,friction:friction,height:height,width:width, labels:labels , appChecked:labels.contains('apps') ? true : false , serverChecked:labels.contains('servers') ? true : false,
-										   filesChecked:labels.contains('files') ? true : false,eventColorCode:eventColorCode, file_name:file_name])
-			break;
-		}
-	}
+		//log.error "getLists() : query for assetDependentlist took ${TimeUtil.elapsed(start)}"
+		// Took 0.296 seconds
+
+		// WTF is this for?
+		// session.setAttribute('dependencyBundle',params.dependencyBundle)
+		// session.setAttribute('assetDependentlist',assetDependentlist)
+
+		def serverTypes = [ AssetType.SERVER.toString(), AssetType.BLADE.toString(), AssetType.SERVER.toString() ]
+	//	def APP = AssetType.APPLICATION.toString()
+	//	def DB = AssetType.DATABASE.toString()
+	//	def FILES = AssetType.FILES.toString()
+
+		def model = [:]
+		//Date start = new Date()
+		if (params.entity != 'Apps')
+			model.appDependentListSize = assetDependentlist.findAll{it.asset.assetType == AssetType.APPLICATION.toString() }.size()
+		if (params.entity != 'server')
+			model.assetEntityListSize = assetDependentlist.findAll{serverTypes.contains( it.asset.assetType) }.size()
+		if (params.entity != 'database')
+			model.dbDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  AssetType.DATABASE.toString() }.size()
+		if (params.entity != 'graph')
+			model.filesDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  AssetType.FILES.toString() }.size()
+		//log.error "getLists() : iterating to get list sizes took ${TimeUtil.elapsed(start)}"
+		// Took 5.262 seconds
 	
-	def reloadMap={
+		model.dependencyBundle = params.dependencyBundle
+		model.asset = params.entity
+
+		switch(params.entity) {
+			case "Apps" :
+				def applicationList = assetDependentlist.findAll{it.asset.assetType ==  AssetType.APPLICATION.toString() }
+				
+				model.appList = applicationList.asset 
+				model.applicationListSize = applicationList.size()
+
+				render( template:"appList", model:model )
+				break
+
+			case "server":
+				def assetEntityList = assetDependentlist.findAll { serverTypes.contains(it.asset.assetType) }
+				model.assetList = assetEntityList.asset
+				model.assetEntityListSize = assetEntityList.size()
+				render( template:"assetList", model:model)
+				break
+
+			case "database" :
+				def databaseList = assetDependentlist.findAll{it.asset.assetType == AssetType.DATABASE.toString() }
+				model.databaseList = databaseList.asset
+				model.dbDependentListSize = databaseList.size()
+				render(template:'dbList', model:model)
+				break
+
+			case "files" :
+				def filesList = assetDependentlist.findAll{it.asset.assetType == AssetType.FILES.toString() }
+				model.filesList = filesList.asset
+				model.filesDependentListSize = filesList.size()
+				render(template:"filesList", model:model)
+				break
+
+			case "graph" :
+				def filesListSize = assetDependentlist.findAll{it.asset.assetType ==  'Files' }.size()
+				def appDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.size()
+
+				def graphData = [:]
+				def force 
+				def distance 
+				def friction = params.friction && params.friction != 'undefined' ? params.friction : 0.8
+				def height 
+				def width 
+				def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+				Set uniqueMoveEventList = moveBundleList.moveEvent
+			    uniqueMoveEventList.remove(null)
+			    List moveEventList = []
+			    moveEventList =  uniqueMoveEventList.toList()
+			    moveEventList.sort{it?.name}
+				def eventColorCode = [:]
+				int colorDiff
+				if (moveEventList.size()) {
+				   colorDiff = (232/moveEventList.size()).intValue()
+				}
+				def labelList = params.labelsList
+				labelList = labelList?.replace(" ","")
+				List labels = labelList ?  labelList.split(",") : []
+				moveEventList.eachWithIndex{ event, i -> 
+					def colorCode = colorDiff * i
+					def colorsCode = "rgb(${colorCode},${colorCode},${colorCode})"
+					eventColorCode << [(event.name):colorsCode]
+				}
+				graphData << ["friction":friction]
+				
+				if (assetDependentlist.size()<30) {
+					force = ApplicationConstants.graphDefaultSmallMap["force"]
+					distance = ApplicationConstants.graphDefaultSmallMap["linkdistance"]
+					width =  ApplicationConstants.graphDefaultSmallMap["width"]
+					height = ApplicationConstants.graphDefaultSmallMap["height"]
+					graphData << ApplicationConstants.graphDefaultSmallMap
+			    } else if(assetDependentlist.size()<200) {
+					force = ApplicationConstants.graphDefaultMediumMap["force"]
+					distance = ApplicationConstants.graphDefaultMediumMap["linkdistance"]
+					width =  ApplicationConstants.graphDefaultMediumMap["width"]
+					height = ApplicationConstants.graphDefaultMediumMap["height"]
+					graphData << ApplicationConstants.graphDefaultMediumMap
+			    } else {
+					force = ApplicationConstants.graphDefaultLargeMap["force"]
+					distance = ApplicationConstants.graphDefaultLargeMap["linkdistance"]
+					width =  ApplicationConstants.graphDefaultLargeMap["width"]
+					height = ApplicationConstants.graphDefaultLargeMap["height"]
+					graphData << ApplicationConstants.graphDefaultLargeMap
+			    }
+				def graphNodes = []
+				
+				assetDependentlist.each {
+					def name = ''
+					def shape = 'circle'
+					def size = 150
+					def title = it.asset.assetName
+					def color = ''				
+					if (it.asset.assetType == AssetType.APPLICATION.toString() ) {
+						name = labels.contains("apps") ? it.asset.assetName : ''
+					} else if(serverTypes.contains(it.asset.assetType)) {
+						name = labels.contains("servers") ? it.asset.assetName : ''
+						shape = 'square'
+					} else if(it.asset.assetType == AssetType.DATABASE.toString() ) {
+						name = labels.contains("databases") ? it.asset.assetName : ''
+						shape = 'triangle-up'
+					} else if(it.asset.assetType == AssetType.FILES.toString() ) {
+						name = labels.contains("files") ? it.asset.assetName : ''
+						shape = 'diamond'
+					}else if(it.asset.assetType == AssetType.FILES.toString() ) {
+						name = labels.contains("networks") ? it.asset.assetName : ''
+						shape = 'cross'
+					}
+					def moveEventName = it.asset.moveBundle?.moveEvent?.name
+					graphNodes << [ 
+						id:it.asset.id, name:name, 
+						type:it.asset.assetType, group:it.dependencyBundle, 
+						shape:shape, size:size, title:title, 
+						color:eventColorCode[moveEventName]?eventColorCode[moveEventName]:'red'
+					]
+				}
+
+				graphData << ["nodes":graphNodes]
+				def assetDependencies = AssetDependency.findAll("From AssetDependency where asset.project = :project OR dependent.project = :project",[project:project])
+				def graphLinks = []
+				assetDependencies.each{
+					def opacity = 1
+					def statusColor = 'gray'
+					if(it.status=='Questioned'){
+						statusColor='red'
+					}else if(it.status=='Unknown'|| it.status=='Validated') {
+						// nothing special
+					} else {
+						opacity = 0.2
+					}
+					def sourceIndex = graphNodes.id.indexOf(it.asset.id)
+					def targetIndex = graphNodes.id.indexOf(it.dependent.id)
+					if(sourceIndex != -1 && targetIndex != -1){
+						graphLinks << ["source":sourceIndex,"target":targetIndex,"value":2,"statusColor":statusColor,"opacity":opacity,"distance":50]
+					}
+				}
+
+				graphData << ["links":graphLinks]
+				JSON output = graphData as JSON
+				def currentfile = ApplicationHolder.application.parentContext.getResource( "/d3/force/force.js" ).getFile()
+				assetEntityService.deleteTempGraphFiles("/d3/force", "G_")
+				def file_name = "G_${new Date().getTime()}"
+				def file_path = currentfile.absolutePath.replace("force.js",file_name)
+				File file = new File(file_path)
+				file.write(output.toString())
+
+				model.force = force
+				model.distance = distance
+				model.friction = friction
+				model.height = height
+				model.width = width
+				model.labels = labels 
+				model.appChecked = labels.contains('apps')
+				model.serverChecked = labels.contains('servers')
+				model.filesChecked = labels.contains('files')
+				model.eventColorCode = eventColorCode
+				model.file_name = file_name
+
+				render(template:'dependencyGraph',model:model)
+
+				break
+		} // switch
+
+	} 
+	
+	def reloadMap = {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
 		def graphData = [:]

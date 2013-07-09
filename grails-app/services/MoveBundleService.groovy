@@ -453,66 +453,258 @@ class MoveBundleService {
 		 }
 		 
 	 }
-	 
+
 	 /*
 	  * Used by several controller functions to generate the mapping arguments used by the dependencyConsole view
+	  * @param projectId - the project Id to lookup the map data for
+	  * @return MapArray of properties 
 	  */
-	 def getdependencyConsoleMap(projectId) {
-		 def projectInstance = Project.get(projectId)
-		 def dependencyConsoleList = []
-		 def depBundleIDCountSQL = "SELECT count(distinct dependency_bundle) FROM asset_dependency_bundle WHERE project_id = $projectId"
-		 def depBundleIdSQL = "SELECT distinct dependency_bundle AS dependencyBundle FROM asset_dependency_bundle WHERE project_id = $projectId ORDER BY dependency_bundle"
+	def dependencyConsoleMap2(projectId) {
+		def startAll = new Date()
+		def projectInstance = Project.get(projectId)
+		def dependencyConsoleList = []
+
+		// This will hold the totals of each, element 0 is all and element 1 will be All minus group 0
+		def stats = [
+			app: [0,0],
+			db:  [0,0],
+			server: [0,0],
+			vm: [0,0],
+			storage: [0,0]
+		]
+
+		def depSql = """SELECT  
+		   adb.dependency_bundle as dependencyBundle, 
+		   count(distinct adb.asset_id) as assetCnt, 
+		   group_concat(distinct a.move_bundle_id) as moveBundles,
+		   sum(if(a.new_or_old='Assigned',1,0)) as statusAssigned,
+		   sum(if(a.validation<>'BundleReady',1,0)) as notBundleReady,
+		   sum(if(a.asset_type in ('server','blade','appliance'), 1, 0)) as serverCount,
+		   sum(if(a.asset_type in ('vm','virtual'), 1, 0)) as vmCount,
+		   sum(if(a.asset_type in ('files','storage'), 1, 0)) as storageCount,
+		   sum(if(a.asset_type = 'database', 1, 0)) as dbCount,
+		   sum(if(a.asset_type = 'application', 1, 0)) as appCount,
+		   ( select sum(if(ad1.status in ('Questioned','Unknown') or ad2.status in ('Questioned','Unknown'), 1,0))
+		     from asset_entity sa join asset_dependency_bundle sadb ON sa.asset_entity_id=sadb.asset_id 
+		     left join asset_dependency ad1 ON ad1.asset_id=sa.asset_entity_id 
+		     left join asset_dependency ad2 ON ad2.asset_id=sa.asset_entity_id
+		     where sadb.project_id=$projectId and sadb.dependency_bundle = adb.dependency_bundle
+		   ) as needsReview
+		   
+		from asset_dependency_bundle adb
+		join asset_entity a ON a.asset_entity_id=adb.asset_id
+		where adb.project_id=${projectId}
+		GROUP BY adb.dependency_bundle
+		ORDER BY adb.dependency_bundle"""
+
+		def dependList = jdbcTemplate.queryForList(depSql)
+
+		// log.info "dependencyConsoleMap() : dependList[0]"
+
+		dependList.each { group ->
+			def statusClass = 'white'
+			if (group.moveBundles.contains(',') || group.needsReview > 0) {
+				statusClass = 'yellow'
+			} else if ( group.notBundleReady == 0 ) {
+				statusClass = 'blue'
+			} else if ( group.statusAssigned == group.assetCnt ) {
+				statusClass = 'blue'
+			}
+
+			// Loop through the list to create map to be used by the view
+			dependencyConsoleList << [
+				dependencyBundle: group.dependencyBundle,
+				appCount: group.appCount,
+				serverCount: group.serverCount,
+				vmCount: group.vmCount, 
+				dbCount: group.dbCount, 
+				fileCount: group.fileCount,
+				statusClass: statusClass
+			]
+
+			// -1 will be multipled for the quantity of group 0 to remove it from the totals below
+			def sign = group==0 ? -1 : 1
+
+			// Accumulate the totals for ALL and 1+ (aka All - 0)
+			stats.app[0] +=  group.appCount
+			stats.app[0] +=  group.appCount * sign
+			stats.db[0] +=  group.dbCount
+			stats.db[0] +=  group.dbCount * sign
+			stats.server[0] +=  group.serverCount
+			stats.server[0] +=  group.serverCount * sign
+			stats.vm[0] +=  group.vmCount
+			stats.vm[0] +=  group.vmCount * sign
+			stats.storage[0] +=  group.storageCount
+			stats.storage[0] +=  group.storageCount * sign
+		}
+
+		// Get list of distinct dependencyBundle ids
+//		def assetDependencyList = dependList.groupBy({it.dependencyBundle}).dependencyBundle
+		def assetDependencyList = dependList.dependencyBundle
+
+		// log.info "dependencyConsoleMap() : assetDependencyList = $assetDependencyList"
+		log.info "dependencyConsoleMap() : stats = $stats"
+
+		def entities = assetEntityService.entityInfo( projectInstance )
+ 
+		// Get the time that the bundles were processed by searching the AssetDependencyBundle entries
+		String time
+		def date = AssetDependencyBundle.findByProject(projectInstance,[sort:'lastUpdated', order:'desc', max:1])?.lastUpdated
+		if (date){
+			def formatter = new SimpleDateFormat('MMM dd,yyyy hh:mm a');
+			time = formatter.format(date)
+		}
+
+		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance,true)
+		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		def assetDependentlist = AssetDependencyBundle.findAllByProject(projectInstance)?.sort{it.dependencyBundle}
+				 
+		def moveBundles = MoveBundle.findAllByProject(projectInstance)
 		 
-		 def dependencyBundleCount = jdbcTemplate.queryForInt(depBundleIDCountSQL)
+		// JPM - don't think that this is required
+		// def personList = partyRelationshipService.getCompanyStaff( projectInstance.client?.id )
+		// def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
+		// def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
+ 
+		def map = [ 
+			company:projectInstance.client,
+			asset:'Apps',
+			date:time,
+
+			assetDependencyList: 	assetDependencyList, 
+			dependencyType: 		entities.dependencyType, 
+			dependencyConsoleList: 	dependencyConsoleList,
+			dependencyStatus: 		entities.dependencyStatus, 
+			assetDependency: 		new AssetDependency(), 
+			dependencyBundleCount: 	assetDependencyList.size(),
+			moveBundle: moveBundleList, 
+			allMoveBundles:moveBundles, 
+			planStatusOptions: planStatusOptions,
+
+			servers: entities.servers, 
+			applications: entities.applications, 
+			dbs: entities.dbs, 
+			files: entities.files,
+			networks:entities.networks, 
+			
+			applicationListSize: stats.app[0], 
+			physicalListSize: stats.server[0], 
+			virtualListSize: stats.vm[0],
+			databaseListSize: stats.db[0], 
+			filesListSize: stats.storage[0]
+
+			// totalCompanies:companiesList,
+			// personList:personList, 
+			// availabaleRoles:availabaleRoles,
+		]
+		log.info "dependencyConsoleMap() : OVERALL took ${TimeUtil.elapsed(startAll)}"
+
+		return map
+	}			
+
+	 /*
+	  * Used by several controller functions to generate the mapping arguments used by the dependencyConsole view
+	  * @param projectId - the project Id to lookup the map data for
+	  * @return MapArray of properties 
+	  */
+	def dependencyConsoleMap(projectId) {
+		def startAll = new Date()
+		def projectInstance = Project.get(projectId)
+		def dependencyConsoleList = []
+
+		def depBundleIDCountSQL = "SELECT count(distinct dependency_bundle) FROM asset_dependency_bundle WHERE project_id = $projectId"
+		def depBundleIdSQL = "SELECT distinct dependency_bundle AS dependencyBundle FROM asset_dependency_bundle WHERE project_id = $projectId ORDER BY dependency_bundle"		 
+		def dependencyBundleCount = jdbcTemplate.queryForInt(depBundleIDCountSQL) 
+		def assetDependencyList = jdbcTemplate.queryForList(depBundleIdSQL)
 		 
-		 def assetDependencyList = jdbcTemplate.queryForList(depBundleIdSQL)
-		 
-		 // Iterate over the Asset Dependency list to construct the dependencyConsoleList of values
-		 assetDependencyList.each{ assetDependencyBundle->
-			 def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundleAndProject(assetDependencyBundle.dependencyBundle,projectInstance)
-			 def appCount = assetDependentlist.findAll{ it.asset.assetType == AssetType.APPLICATION.toString() }.size()
-			 def serverCount = assetDependentlist.findAll{ it.asset.assetType == AssetType.SERVER.toString() }.size()
-			 def vmCount = assetDependentlist.findAll{it.asset.assetType == AssetType.VM.toString() }.size()
-			 def dbCount = assetDependentlist.findAll{it.asset.assetType == AssetType.DATABASE.toString() }.size()
-			 def fileCount = assetDependentlist.findAll{it.asset.assetType == AssetType.FILES.toString() }.size()
-			 dependencyConsoleList << ['dependencyBundle':assetDependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount, 
-			                         'dbCount':dbCount, 'fileCount':fileCount]
-		 }
+		Date start1 = new Date()
+		// Iterate over the Asset Dependency list to construct the dependencyConsoleList of values
+		assetDependencyList.each{ assetDependencyBundle->
+			// Date start2 = new Date()
+			def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundleAndProject(assetDependencyBundle.dependencyBundle,projectInstance)
+			def appCount = assetDependentlist.findAll{ it.asset.assetType == AssetType.APPLICATION.toString() }.size()
+			def serverCount = assetDependentlist.findAll{ [AssetType.SERVER.toString(), AssetType.BLADE.toString()].contains( it.asset.assetType ) }.size()
+			def vmCount = assetDependentlist.findAll{it.asset.assetType == AssetType.VM.toString() }.size()
+			def dbCount = assetDependentlist.findAll{it.asset.assetType == AssetType.DATABASE.toString() }.size()
+			def fileCount = assetDependentlist.findAll{it.asset.assetType == AssetType.FILES.toString() }.size()
+
+			dependencyConsoleList << [
+				'dependencyBundle':assetDependencyBundle.dependencyBundle,
+				'appCount':appCount,
+				'serverCount':serverCount,
+				'vmCount':vmCount, 
+				'dbCount':dbCount, 
+				'fileCount':fileCount 
+			]
+
+			// log.info "dependencyConsoleMap() : assetDependencyList.each(${assetDependencyBundle.dependencyBundle}) took ${TimeUtil.elapsed(start2)}"
+
+		}
+		log.info "dependencyConsoleMap() : assetDependencyList.each(OVERALL) took ${TimeUtil.elapsed(start1)}"
 		 
 		def entities = assetEntityService.entityInfo( projectInstance )
  
-		 // Get the time that the bundles were processed
-		 String time
-		 def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
-		 def date = AssetDependencyBundle.findByProject(projectInstance,[sort:"lastUpdated",order:"desc"])?.lastUpdated
-		 if(date){
-			 time = formatter.format(date)
-		 }
-		 def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance,true)
-		 def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
-		 def  assetDependentlist = AssetDependencyBundle.findAllByProject(projectInstance)?.sort{it.dependencyBundle}
+		// Get the time that the bundles were processed by searching the AssetDependencyBundle entries
+		String time
+		def date = AssetDependencyBundle.findByProject(projectInstance,[sort:'lastUpdated', order:'desc', max:1])?.lastUpdated
+		if(date){
+			def formatter = new SimpleDateFormat('MMM dd,yyyy hh:mm a');
+			time = formatter.format(date)
+		}
+
+		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance,true)
+		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		def  assetDependentlist = AssetDependencyBundle.findAllByProject(projectInstance)?.sort{it.dependencyBundle}
 		
-		 def physicalListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.SERVER.toString() }.size()
-		 def virtualListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.VM.toString() }.size()
-		 def applicationListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.APPLICATION.toString() }.size()
-		 def databaseListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.DATABASE.toString() }.size()
-		 def filesListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.FILES.toString() }.size()
+		def physicalListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.SERVER.toString() }.size()
+		def virtualListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.VM.toString() }.size()
+		def applicationListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.APPLICATION.toString() }.size()
+		def databaseListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.DATABASE.toString() }.size()
+		def filesListSize = assetDependentlist.findAll{ it.asset.assetType == AssetType.FILES.toString() }.size()
 		 
-		 def moveBundles = MoveBundle.findAllByProject(projectInstance)
+		def moveBundles = MoveBundle.findAllByProject(projectInstance)
 		 
-		 def personList = partyRelationshipService.getCompanyStaff( projectInstance.client?.id )
-		 
-		 def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
-		 def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
+		// JPM - don't think that this is required
+		def personList = partyRelationshipService.getCompanyStaff( projectInstance.client?.id )
+		def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
+		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
  
-		 def map = [assetDependencyList:assetDependencyList, dependencyType:entities.dependencyType, dependencyConsoleList:dependencyConsoleList,
-				 date:time, dependencyStatus:entities.dependencyStatus, assetDependency:new AssetDependency(), dependencyBundleCount:dependencyBundleCount,
-				 servers:entities.servers, applications:entities.applications, dbs:entities.dbs, files:entities.files,moveBundle:moveBundleList, planStatusOptions:planStatusOptions,
-				 applicationListSize:applicationListSize, physicalListSize:physicalListSize,virtualListSize:virtualListSize,
-				 asset:'Apps', databaseListSize:databaseListSize, filesListSize:filesListSize, partyGroupList:companiesList,
-				 allMoveBundles:moveBundles, networks:entities.networks, personList:personList, company:projectInstance.client, availabaleRoles:availabaleRoles]
-		 
-		 return map
+		def map = [ 
+			asset:'Apps', 
+			date:time, 
+
+			assetDependencyList: 	assetDependencyList, 
+			dependencyType: 		entities.dependencyType, 
+			dependencyConsoleList: 	dependencyConsoleList,
+			dependencyStatus: 		entities.dependencyStatus, 
+			assetDependency: 		new AssetDependency(), 
+			dependencyBundleCount: 	dependencyBundleCount,
+			
+			servers:entities.servers, 
+			applications:entities.applications, 
+			dbs:entities.dbs, 
+			files:entities.files,
+			networks:entities.networks, 
+			
+			applicationListSize:applicationListSize, 
+			physicalListSize:physicalListSize, 
+			virtualListSize:virtualListSize,
+			databaseListSize:databaseListSize, 
+			filesListSize:filesListSize, 
+
+			moveBundle:moveBundleList, 
+			allMoveBundles:moveBundles, 
+			planStatusOptions:planStatusOptions, 
+			
+			// What are these four params used for???
+			partyGroupList:companiesList,
+			personList:personList, 
+			availabaleRoles:availabaleRoles,
+			company:projectInstance.client
+		]
+		log.info "dependencyConsoleMap() : OVERALL took ${TimeUtil.elapsed(startAll)}"
+
+		return map
 	 }
      
      /**

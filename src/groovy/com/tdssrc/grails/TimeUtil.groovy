@@ -53,6 +53,15 @@ class TimeUtil {
 	}
 	
 	/**
+	 * Returns the elapsed duration that occured between a start time and now
+	 * @param Date	starting Datetime
+	 * @return TimeDuration
+	 */
+	public static TimeDuration elapsed(def start) {
+		return elapsed(start, new Date())
+	}
+
+	/**
 	 * Returns the elapsed duration that occured between two date objects as a groovy.time.TimeDuration
 	 * @param Date	starting Datetime
 	 * @param Date	ending datetime

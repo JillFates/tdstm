@@ -820,13 +820,16 @@ class MoveBundleController {
 	}
 	
 	/**
-	 * Control function to render the Planning Console 
+	 * Control function to render the Dependency Console 
 	 */
 	def dependencyConsole = {
 	
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		Date start = new Date()
+		def map = moveBundleService.dependencyConsoleMap(projectId)
+		log.info "dependencyConsole() : moveBundleService.dependencyConsoleMap() took ${TimeUtil.elapsed(start)}"
 		
-		return moveBundleService.getdependencyConsoleMap(projectId)
+		return map
 	}
 	
 	/*
@@ -850,7 +853,7 @@ class MoveBundleController {
 		flash.message = moveBundleService.generateDependencyGroups(projectId, connectionTypes, statusTypes)
 
 		// Now get the model and display results
-		render(template:'dependencyBundleDetails', model:moveBundleService.getdependencyConsoleMap(projectId) )
+		render(template:'dependencyBundleDetails', model:moveBundleService.dependencyConsoleMap(projectId) )
 	}
 	
 	/**
