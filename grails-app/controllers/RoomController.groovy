@@ -167,8 +167,8 @@ class RoomController {
         if (roomInstance) {
     		roomInstance.roomName = params.roomName
 			roomInstance.location = params.location
-			roomInstance.roomWidth = params.roomWidth ? Integer.parseInt(params.roomWidth) : null
-			roomInstance.roomDepth = params.roomDepth ? Integer.parseInt(params.roomDepth) : null
+			roomInstance.roomWidth = params.roomWidth ? NumberUtils.toDouble(params.roomWidth,0).round() : null
+			roomInstance.roomDepth = params.roomDepth ? NumberUtils.toDouble(params.roomDepth,0).round() : null
 			roomInstance.address = params.address
 			roomInstance.city = params.city
 			roomInstance.stateProv = params.stateProv
@@ -183,9 +183,9 @@ class RoomController {
 						rack.tag = params["tag_"+rack.id]
 	                	rack.roomX = params["roomX_"+rack.id] ? NumberUtils.toDouble(params["roomX_"+rack.id],0).round() :0 
 	                	rack.roomY = params["roomY_"+rack.id] ? NumberUtils.toDouble(params["roomY_"+rack.id],0).round() :0
-	                	rack.powerA = params["powerA_"+rack.id] ? Float.parseFloat(params["powerA_"+rack.id]) : 0
-						rack.powerB = params["powerB_"+rack.id] ? Float.parseFloat(params["powerB_"+rack.id]) : 0
-						rack.powerC = params["powerC_"+rack.id] ? Float.parseFloat(params["powerC_"+rack.id]) : 0
+	                	rack.powerA = params["powerA_"+rack.id] ? NumberUtils.toDouble(params["powerA_"+rack.id],0).round() : 0
+						rack.powerB = params["powerB_"+rack.id] ? NumberUtils.toDouble(params["powerB_"+rack.id],0).round() : 0
+						rack.powerC = params["powerC_"+rack.id] ? NumberUtils.toDouble(params["powerC_"+rack.id],0).round() : 0
 						if(powerType != "Watts"){
 							rack.powerA = Math.round(rack.powerA * 110)
 							rack.powerB = Math.round(rack.powerB * 110)
@@ -212,9 +212,9 @@ class RoomController {
 							if(newRack){
 								newRack.roomX = params["roomX_"+id] ? NumberUtils.toDouble(params["roomX_"+id],0).round() :0
 								newRack.roomY = params["roomY_"+id] ? NumberUtils.toDouble(params["roomY_"+id],0).round() :0
-								newRack.powerA = params["powerA_"+id] ? Float.parseFloat(params["powerA_"+id]) : 0
-								newRack.powerB = (params["powerB_"+id]) ? Float.parseFloat(params["powerB_"+id]) : 0
-								newRack.powerC = (params["powerC_"+id]) ? Float.parseFloat(params["powerC_"+id]) : 0
+								newRack.powerA = params["powerA_"+id] ? NumberUtils.toDouble(params["powerA_"+id],0).round() : 0
+								newRack.powerB = (params["powerB_"+id]) ? NumberUtils.toDouble(params["powerB_"+id],0).round() : 0
+								newRack.powerC = (params["powerC_"+id]) ? NumberUtils.toDouble(params["powerC_"+id],0).round() : 0
                                 def model = params["model_"+id] != "null" ?  Model.get(params["model_"+id]) : null
                                 newRack.manufacturer = model?.manufacturer
                                 newRack.model = model
