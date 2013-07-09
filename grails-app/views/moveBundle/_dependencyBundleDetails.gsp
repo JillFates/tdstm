@@ -2,6 +2,9 @@
 	<div>
 		<input type="hidden" id="tabTypeId" name="tabType" value="${asset}" />
 		<div style="margin-left: 20px; margin-bottom: 10px;">
+		<g:if test="${flash.message}">
+        	<div class="message">${flash.message}</div>
+     	 </g:if>
 			<h3>
 				<b>Dependency Groups</b>&nbsp;&nbsp;&nbsp;<input  type="button"  class="submit" value="Regenerate..." onclick="showDependencyControlDiv()"  />
 			</h3>
