@@ -1336,6 +1336,8 @@ class ReportsController {
 		def errorMsg = "Please select a MoveBundle"
 		def conflicts = params.conflicts == 'on'
 		def unresolved = params.unresolved == 'on'
+		if( params.moveBundle == 'useForPlanning' )
+			return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved, true)
 		
 		if( moveBundleId && moveBundleId.isNumber() ){
 			def isProjMoveBundle  = MoveBundle.findByIdAndProject( moveBundleId, project )
@@ -1346,12 +1348,12 @@ class ReportsController {
 				errorMsg = ""
 				userPreferenceService.setPreference( "MOVE_BUNDLE", "${moveBundleId}" )
 				moveBundleInstance = MoveBundle.get(moveBundleId)
-				log.info "con:${conflicts} unres:${unresolved}"
-				return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved)
+				//def eventsProjectInfo = getEventsProjectInfo(moveEventInstance,projectInstance,currProj,moveBundles,eventErrorList)
+				return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved, false)//.add(['time':])
 			}
 		}
 		flash.message = errorMsg
-		redirect( action:"generateApplicationConflicts")
+		redirect( action:"applicationConflicts")
 	}
 }
  

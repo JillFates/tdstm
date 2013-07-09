@@ -75,11 +75,18 @@ class ReportsService {
 	 * @param boolean unresolved - If true, apps with dependencies with status 'Questioned' or 'Unknown' will be shown
 	 * @return Map - The parameters used by the view to generate the report
 	 */
-	def genApplicationConflicts(def currProj , def moveBundleId, def conflicts, def unresolved) {
+	def genApplicationConflicts(def currProj , def moveBundleId, def conflicts, def unresolved, def planning) {
 		def projectInstance = Project.findById( currProj )
 		ArrayList appList = new ArrayList()
+		def appsInBundle
+		log.info "****bundle:${moveBundleId} conflicts:${conflicts} unresolved:${unresolved} planning:${planning} "//type:${MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance, true).class} list:${MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance, true).toList()}"
 		
-		def appsInBundle = Application.findAllByMoveBundle(MoveBundle.findById(moveBundleId))
+		if(planning) {
+			appsInBundle = Application.findAllByMoveBundleInList(MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance, true).toList())
+		} else {
+			appsInBundle = Application.findAllByMoveBundle(MoveBundle.findById(moveBundleId))
+		}
+		log.info "${appsInBundle}"
 		appsInBundle.each {
 			def showApp = false
 			def dependsOnList = AssetDependency.findAllByAsset(it)
@@ -87,8 +94,8 @@ class ReportsService {
 			def dependsOnIssueCount = 0
 			def supportsIssueCount = 0
 			
-			dependsOnList.each{
-				def conflictIssue = (it.asset.moveBundle?.id != it.dependent.moveBundle?.id)
+			dependsOnList.each {
+				def conflictIssue = (it.asset.moveBundle?.id != it.dependent.moveBundle?.id) && ( it.status in ['Validated','Questioned','Unknown'] )
 				def statusIssue = it.status in ['Questioned','Unknown']
 				showApp = showApp || ( conflicts && conflictIssue ) || ( unresolved && statusIssue )
 				
@@ -96,8 +103,8 @@ class ReportsService {
 					dependsOnIssueCount++
 			}
 			
-			supportsList.each{
-				def conflictIssue = (it.asset.moveBundle?.id != it.dependent.moveBundle?.id)
+			supportsList.each {
+				def conflictIssue = (it.asset.moveBundle?.id != it.dependent.moveBundle?.id) && ( it.status in ['Validated','Questioned','Unknown'] )
 				def statusIssue = it.status in ['Questioned','Unknown']
 				showApp = showApp || ( conflicts && conflictIssue ) || ( unresolved && statusIssue )
 				
@@ -105,11 +112,11 @@ class ReportsService {
 					supportsIssueCount++
 			}
 			
-			if(showApp)
+			if(showApp || ( ! conflicts && ! unresolved ) )
 				appList.add([ 'app':it, 'dependsOnList':dependsOnList, 'supportsList':supportsList, 'dependsOnIssueCount':dependsOnIssueCount, 'supportsIssueCount':supportsIssueCount ])
 		}
 		
-		return['project':projectInstance, 'appList':appList, 'moveBundle':MoveBundle.findById(moveBundleId), 'columns':9]
+		return['project':projectInstance, 'appList':appList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : (moveBundleId), 'columns':9]
 	}
 	
 	/**

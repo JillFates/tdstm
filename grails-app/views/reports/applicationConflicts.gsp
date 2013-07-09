@@ -19,7 +19,7 @@
 				<tbody>
 					<tr>
 						<td><g:select from="${moveBundles}" id="moveBundleId" name="moveBundle"
-								optionKey="id" optionValue="name" value="${moveBundleId}"/></td>
+								optionKey="id" optionValue="name" value="${moveBundleId}" noSelection="['useForPlanning':'Use For Planning']"/></td>
 					</tr>
 					<tr>
 						<td>

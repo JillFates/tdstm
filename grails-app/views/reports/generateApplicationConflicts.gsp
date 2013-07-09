@@ -18,7 +18,8 @@
 <body>
 	<div class="body" style="width:1000px;">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
-			<b>Application Conflicts - ${project.name} : ${moveBundle}</b>
+			<b>Application Conflicts - ${project.name} : ${moveBundle}</b><br/>
+			This analysis was performed on <tds:convertDateTime date="${new Date()}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> for ${session.getAttribute("LOGIN_PERSON").name }.
 		</div> 
 		<div style="color: black; font-size: 15px;text-align: center;">
 			${time}
@@ -36,7 +37,8 @@
 								<thead>
 									<tr>
 										<th colspan="${columns}">
-											<a href="javascript:getEntityDetails('Application','Application',${application.app.id})" class="inlineLink">${application.app.assetName}</a> - Supports ${application.supportsList.size()} + Depends on ${application.dependsOnList.size()}
+											<a href="javascript:getEntityDetails('Application','Application',${application.app.id})" class="inlineLink">${application.app.assetName}</a>
+											<g:if test="${application.app.moveBundle.useOfPlanning}"> (${application.app.moveBundle})</g:if> - Supports ${application.supportsList.size()} , Depends on ${application.dependsOnList.size()}
 										</th>
 									</tr>
 								</thead>
@@ -74,7 +76,7 @@
 													${supports.dataFlowFreq}
 												</td>
 												<td>
-													<g:if test="${supports.asset.moveBundle != moveBundle}"><b style="color:red;">${supports.asset.moveBundle}</b></g:if>
+													<g:if test="${supports.asset.moveBundle != application.app.moveBundle}"><b style="color:red;">${supports.asset.moveBundle}</b></g:if>
 													<g:else>${supports.asset.moveBundle}</g:else>
 												</td>
 												<td>
@@ -117,7 +119,7 @@
 													${depOn.dataFlowFreq}
 												</td>
 												<td>
-													<g:if test="${depOn.dependent.moveBundle != moveBundle}"><b style="color:red;">${depOn.dependent.moveBundle}</b></g:if>
+													<g:if test="${depOn.dependent.moveBundle != application.app.moveBundle}"><b style="color:red;">${depOn.dependent.moveBundle}</b></g:if>
 													<g:else>${depOn.dependent.moveBundle}</g:else>
 												</td>
 												<td>
