@@ -12,11 +12,12 @@ $(document).ready(function() {
 	
 	var percentageAppToValidate=100-"${applicationCount ? Math.round((appToValidate/applicationCount)*100) :100}";
 	$("#discoverybar").animate({width: percentageAppToValidate+"%" }, 1000);
+	$("#applicationbar").animate({width: percentageAppToValidate+"%" }, 1000);
 	
-    var percentageBundleReady="${applicationCount ? Math.round((bundleReady/applicationCount)*100) : 0}";
+	var percentageBundleReady="${applicationCount ? Math.round((bundleReady/applicationCount)*100) : 0}";
 	$("#analysisbar").animate({width: percentageBundleReady+"%" }, 1000);
 	
-    var percentageUnassignedAppCount=100-"${applicationCount ? Math.round((unassignedAppCount/applicationCount)*100) :100}";
+	var percentageUnassignedAppCount=100-"${applicationCount ? Math.round((unassignedAppCount/applicationCount)*100) :100}";
 	$("#assignmentbar").animate({width: percentageUnassignedAppCount+"%" }, 1000);
 	
 	$("#appmovedbar").animate({width: "${percentageAppCount}%" }, 1000);
@@ -83,7 +84,13 @@ $(document).ready(function() {
 							<td style="padding-right:0px;"><g:link controller="application" action="list" params="[filter:'applicationCount']" class="links">Applications</g:link><br />
 							<g:if test="${ appToValidate > 0 }">
 								(<g:link controller="application" action="list" params="[filter:'applicationCount', validation:'Discovery']" class="links">${appToValidate} to validate</g:link>)
-								</td><td></td>
+								</td>
+								<td style="width:100px;padding-left:0px;">
+									<div class="dashboard_bar_base_small" >
+	
+									<div class="dashboard_bar_graph_small" id="applicationbar" style="width:0%;" ></div>
+									</div>
+								</td>
 							</g:if>
 							<g:else>
 								</td><td></td>
@@ -99,7 +106,7 @@ $(document).ready(function() {
 									<div class="dashboard_bar_base_small" >
 	
 									<div class="dashboard_bar_graph_small" id="physicalbar" style="width:0%;" ></div>
-									<div>
+									</div>
 								</td>
 							</g:if>
 							<g:else>
@@ -116,7 +123,7 @@ $(document).ready(function() {
 									<div class="dashboard_bar_base_small" >
 	
 									<div class="dashboard_bar_graph_small" id="virtualbar" style="width:0%;" ></div>
-									<div>
+									</div>
 								</td>
 							</g:if>
 							<g:else>
@@ -133,7 +140,7 @@ $(document).ready(function() {
 									<div class="dashboard_bar_base_small" >
 	
 									<div class="dashboard_bar_graph_small" id="dbbar" style="width:0%;" ></div>
-									<div>
+									</div>
 								</td>
 							</g:if>
 							<g:else>
@@ -150,7 +157,7 @@ $(document).ready(function() {
 									<div class="dashboard_bar_base_small" >
 	
 									<div class="dashboard_bar_graph_small" id="filebar" style="width: 0%;" ></div>
-									<div>
+									</div>
 								</td>
 							</g:if>
 							<g:else>
@@ -167,7 +174,7 @@ $(document).ready(function() {
 									<div class="dashboard_bar_base_small" >
 	
 									<div class="dashboard_bar_graph_small" id="assetbar" style="width: 0%;" ></div>
-									<div>
+									</div>
 								</td>
 							</g:if>
 							<g:else>
