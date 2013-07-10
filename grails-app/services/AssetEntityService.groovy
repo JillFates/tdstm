@@ -489,7 +489,9 @@ class AssetEntityService {
 				validationType=v.value
 		}
 		fields.each{f ->
+			if(allconfig[f.label])
 			config << [(f.label):allconfig[f.label]['phase'][validationType]]
+			
 		}
 		
 		//used to hide the customs whose fieldImportance is "H"
