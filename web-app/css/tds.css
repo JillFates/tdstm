@@ -327,7 +327,7 @@
 .dashboard_div {
 	margin-top: 10px;
 	margin-left: 5px;
-	height: 420px;
+	height: 450px;
 	background-image: url(../images/news_bg.jpg);
 	background-size: contain;
 }
@@ -848,6 +848,8 @@ td .dep-Questioned {
 	white-space:nowrap;
 }
 
+/* Used mostly in the Dependency Console */
+
 .tabs {
 	margin-top: 10px;
 	margin-left: 20px;
@@ -881,26 +883,41 @@ td .dep-Questioned {
     padding: 5px;
 
 }
-.highlightSpan {
+.depGroup {
+	cursor: pointer;
+	color: grey;
+}
+.depGroupConflict {
 	background-color: yellow;
+}
+.depGroupReady {
+	background-color: lightgreen;
+}
+.depGroupDone {
+	background-color: #5f9fcf;
+}
+.depGroupSelected {
+	border-top: 2px solid #63A242;
+	border-left: 2px solid #63A242;
+	border-right: 2px solid #63A242;
 	font-weight: bold;
 }
 .app_count{
-	border-left: 1px solid #63A242;
-	border-right: 1px solid #63A242;
+	border-left: 2px solid #63A242;
+	border-right: 2px solid #63A242;
 }
 .server_count{
-	border-left: 1px solid #63A242;
-	border-right: 1px solid #63A242;
+	border-left: 2px solid #63A242;
+	border-right: 2px solid #63A242;
 	background-color: white;
 }
 .vm_count{
-	border-left: 1px solid #63A242;
-	border-right: 1px solid #63A242;
+	border-left: 2px solid #63A242;
+	border-right: 2px solid #63A242;
 }
 .db_count{
-	border-left: 1px solid #63A242;
-	border-right: 1px solid #63A242;
+	border-left: 2px solid #63A242;
+	border-right: 2px solid #63A242;
 	background-color: white;
 }
 .file_count{
@@ -912,6 +929,7 @@ td .dep-Questioned {
 	overflow-x:scroll; 
 	max-width: 1350px;
 }
+
 .pointer {
 	cursor: pointer;
 }
