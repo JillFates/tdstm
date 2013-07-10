@@ -46,69 +46,68 @@
 						<table id="dependencyTableId" cellpadding="4" cellspacing="0" style="border: 0px;">
 							<tr class="odd">
 								<td id="span_all" class="">
-									<span style="cursor: pointer;" onclick="getList($('#tabTypeId').val(), null)">All</span>
+									<span class="depGroup" onclick="getList($('#tabTypeId').val(), null)">All</span>
 								</td>
 								<td id="span_onePlus">
-									<span style="cursor: pointer; color: grey;" onclick="getList( $('#tabTypeId').val(), 'onePlus')">1+</span>
+									<span class="depGroup" onclick="getList( $('#tabTypeId').val(), 'onePlus')">1+</span>
 								</td>
 								<g:each in="${dependencyConsoleList}" var="asset">
 									<td id="span_${asset.dependencyBundle}" class="${asset.statusClass}">
-										<span style="cursor: pointer; color: grey;"
-											onclick="getList( $('#tabTypeId').val().toLowerCase(), ${asset.dependencyBundle})">${asset.dependencyBundle}</span>
+										<span class="depGroup" onclick="getList( $('#tabTypeId').val().toLowerCase(), ${asset.dependencyBundle})">${asset.dependencyBundle}</span>
 									</td>
 								</g:each>
 							</tr>
 							<tr class="even">
 								<td id="app_all" class="app_count">
-									<span id="allAppCount">${gridStats.app[0]}</span>
+									<span id="allAppCount">${gridStats.app[0] ?: '&nbsp;' }</span>
 								</td>
 								<td id="app_onePlus">${gridStats.app[1]}</td>
 								<g:each in="${dependencyConsoleList}" var="asset">
 									<td id="app_${asset.dependencyBundle}">
-										${asset.appCount }
+										${asset.appCount ?: '&nbsp;' }
 									</td>
 								</g:each>
 							</tr>
 							<tr class="odd">
 								<td id="server_all" class="server_count">
-									<span id="allServerCount">${gridStats.server[0]}</span></td>
-								<td id="server_onePlus">${gridStats.server[1]}</td>
+									<span id="allServerCount">${gridStats.server[0] ?: '&nbsp;' }</span></td>
+								<td id="server_onePlus">${gridStats.server[1] ?: '&nbsp;' }</td>
 								<g:each in="${dependencyConsoleList}" var="asset">
 									<td id="server_${asset.dependencyBundle}">
-										${asset.serverCount }
+										${asset.serverCount ?: '&nbsp;' }
 									</td>
 								</g:each>
 							</tr>
 							<tr class="even">
 								<td id="vm_all" class="vm_count">
-									<span id="allVirtualCount">${gridStats.vm[0]}</span>
+									<span id="allVirtualCount">${gridStats.vm[0] ?: '&nbsp;' }</span>
 								</td>
-								<td id="vm_onePlus">${gridStats.vm[1]}</td>
+								<td id="vm_onePlus">${gridStats.vm[1] ?: '&nbsp;' }</td>
 								<g:each in="${dependencyConsoleList}" var="asset">
 									<td id="vm_${asset.dependencyBundle}">
-										${asset.vmCount }
+										${asset.vmCount ?: '&nbsp;' }
 									</td>
 								</g:each>
 							</tr>
 							<tr class="odd">
 								<td id="db_all" class="db_count">
-									<span id="allDatabaseCount">${gridStats.db[0]}</span>
+									<span id="allDatabaseCount">${gridStats.db[0] ?: '&nbsp;' }</span>
 								</td>
-								<td id="db_onePlus">${gridStats.db[1]}</td>
+								<td id="db_onePlus">${gridStats.db[1] ?: '&nbsp;' }</td>
 								<g:each in="${dependencyConsoleList}" var="asset">
 									<td id="db_${asset.dependencyBundle}">
-										${asset.dbCount }
+										${asset.dbCount ?: '&nbsp;' }
 									</td>
 								</g:each>
 							</tr>
 							<tr class="even">
 								<td id="file_all"  class="file_count">
-									<span id="allFileCount">${gridStats.storage[0]}</span>
+									<span id="allFileCount">${gridStats.storage[0] ?: '&nbsp;' }</span>
 								</td>
-								<td id="file_onePlus">${gridStats.storage[1]}</td>
+								<td id="file_onePlus">${gridStats.storage[1] ?: '&nbsp;' }</td>
 								<g:each in="${dependencyConsoleList}" var="asset">
-									<td id="file_${asset.dependencyBundle}">
-										${asset.storageCount }
+									<td id="file_${asset.dependencyBundle ?: '&nbsp;' }">
+										${asset.storageCount ?: '&nbsp;' }
 									</td>
 								</g:each>
 							</tr>
