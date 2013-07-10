@@ -3,14 +3,14 @@ databaseChangeLog = {
 
 	/* this changeSet will add 'shutdown_duration', 'startup_duration', 'testing_duration', 'shutdown_by', 'startup_by', 'testing_by', 'shutdown_fixed',
 	   'startup_fixed', 'testing_fixed' in eav_attribute and associated table for import and export.  */
-	changeSet(author: "lokanada", id: "20130710 TM-1981-1") {
+	changeSet(author: "lokanada", id: "20130710 TM-1981-3") {
 		comment(""" Inserting 'shutdown_duration', 'startup_duration', 'testing_duration', 'shutdown_by', 'startup_by', 'testing_by', 'shutdown_fixed',
-					'startup_fixed', 'testing_fixed' in  data_transfer_attribute_map """)
+					'startup_fixed', 'testing_fixed' in  data_transfer_attribute_map  """)
 		preConditions(onFail:'MARK_RAN') {
 			sqlCheck(expectedResult:'0', """select count(*) from eav_attribute where attribute_code in
-						("shutdown_duration","startup_duration","testing_duration","shutdown_by","startup_by",
-							"testing_by","shutdown_fixed","startup_fixed","testing_fixed") 
-						and entity_type_id = (select entity_type_id from eav_entity_type where domain_name ="Application")""")
+						("shutdownDuration","startupDuration","testingDuration","shutdownBy","startupBy",
+							"testingBy","shutdownFixed","startupFixed","testingFixed") 
+						and entity_type_id = (select entity_type_id from eav_entity_type where domain_name ="Application"  )""")
 		}
 		
 		grailsChange {
@@ -68,11 +68,11 @@ databaseChangeLog = {
 	}
 	
 	//this changeSet will add 'external_ref_id' column in data_transfer_attribute_map and related tables for import and export.
-	changeSet(author: "lokanada", id: "20130710 TM-1981-2") {
+	changeSet(author: "lokanada", id: "20130710 TM-1981-4") {
 		comment(" inserting 'external_ref_id' in  data_transfer_attribute_map ")
 		preConditions(onFail:'MARK_RAN') {
-			sqlCheck(expectedResult:'0', """select count(*) from eav_attribute where attribute_code="external_ref_id"
-						and entity_type_id = (select entity_type_id from eav_entity_type where domain_name ="AssetEntity")""")
+			sqlCheck(expectedResult:'0', """select count(*) from eav_attribute where attribute_code="externalRefId"
+						and entity_type_id = (select entity_type_id from eav_entity_type where domain_name ="AssetEntity ")""")
 		}
 		
 		grailsChange {

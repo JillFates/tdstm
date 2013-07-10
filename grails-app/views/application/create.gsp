@@ -190,9 +190,6 @@
 								</td>
 								
 							</tr>
-							<tbody class="customTemplate">
-								<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
-							</tbody>
 							<tr>
 								<td class="label ${config.url}" nowrap="nowrap"><label for="license">URL</label></td>
 								<td><input type="text" id="url" class="${config.url}" name="url" value="${applicationInstance.url}" tabindex="19" />
@@ -239,8 +236,11 @@
 								<td ><input type="text" id="testingDuration" name="testingDuration"
 											value="${applicationInstance.testingDuration}" tabindex="55" size="7"/>m
 								</td>
-							
 							</tr>
+							<tbody class="customTemplate">
+								<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
+							</tbody>
+							
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="events">Event</label>
 								</td>
@@ -323,9 +323,13 @@
 	
     function validateSme(){
 	    var flag = true
-		if($("#sme1").val()=='0' || $("#sme2").val()=='0' || $("#appOwner").val()=='0'){
+		if($("#sme1").val()=='0' || $("#sme2").val()=='0' || $("#appOwner").val()=='0' ){
 			flag = false
 			alert("Please De-select 'Add-Person' Option from sme , sme2 or appOwner select")
+			return flag
+		} else if (isNaN($("#shutdownDuration").val()) || isNaN($("#startupDuration").val()) || isNaN($("#testingDuration").val())){
+			flag = false
+			alert("Please enter numeric value for Shutdown Duration, Startup Duration, Testing Duration ")
 			return flag
 		}
 		return flag

@@ -196,10 +196,6 @@
 								</td>
 								
 							</tr>
-							<tbody class="customTemplate">
-								<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
-							</tbody>
-							<tr>
 							<tr>
 								<td class="label ${config.url}" nowrap="nowrap"><label for="license">URL</label></td>
 								<td ><input type="text" id="url" name="url" value="${applicationInstance.url}" tabindex="18" />
@@ -250,6 +246,10 @@
 											value="${applicationInstance.testingDuration}" tabindex="55"  size="7"/>m
 								</td>
 							</tr>
+							<tbody class="customTemplate">
+								<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
+							</tbody>
+							<tr>
 							<tr>
 								<td class="label" nowrap="nowrap" ><label for="events">Event</label></td>
 								<td colspan="7">
