@@ -3655,43 +3655,45 @@ class AssetEntityController {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
 
+		def depSql = """SELECT  
+		   sum(if(a.asset_type in ( ${AssetType.getPhysicalServerTypesAsString()} ), 1, 0)) as serverCount,
+		   sum(if(a.asset_type in ( ${AssetType.getVirtualServerTypesAsString()} ), 1, 0)) as vmCount,
+		   sum(if(a.asset_type in ( ${AssetType.getStorageTypesAsString()} ), 1, 0)) as storageCount,
+		   sum(if(a.asset_type = '${AssetType.DATABASE.toString()}', 1, 0)) as dbCount,
+		   sum(if(a.asset_type = '${AssetType.APPLICATION.toString()}', 1, 0)) as appCount
+		from asset_dependency_bundle adb
+		join asset_entity a ON a.asset_entity_id=adb.asset_id
+		where adb.project_id=${projectId}
+		"""
+
 		def assetDependentlist
 		// def start = new Date()
-		if (params.dependencyBundle && params.dependencyBundle.isNumber() ){
+		if (params.dependencyBundle && params.dependencyBundle.isNumber() ) {
+			// Get just the assets for a particular dependency group id
 			assetDependentlist = AssetDependencyBundle.findAllByDependencyBundleAndProject(params.dependencyBundle,project)
-		} else {	
+			depSql += " and adb.dependency_bundle = ${params.dependencyBundle}"
+		} else if (params.dependencyBundle == 'onePlus') {
+			// Get all the groups other than zero - these are the groups that have interdependencies
+			assetDependentlist = AssetDependencyBundle.findAllByProjectAndDependencyBundleGreaterThan(project, 0)?.sort{it.dependencyBundle}
+			depSql += " and adb.dependency_bundle > 0"
+		} else {
+			// Get 'all' assets that were bundled
 			assetDependentlist = AssetDependencyBundle.findAllByProject(project)?.sort{it.dependencyBundle}
 		}
 		//log.error "getLists() : query for assetDependentlist took ${TimeUtil.elapsed(start)}"
 		// Took 0.296 seconds
 
-		// WTF is this for?
-		// session.setAttribute('dependencyBundle',params.dependencyBundle)
-		// session.setAttribute('assetDependentlist',assetDependentlist)
+		def stats = jdbcTemplate.queryForMap(depSql)
 
-		def serverTypes = [ AssetType.SERVER.toString(), AssetType.BLADE.toString(), AssetType.SERVER.toString() ]
-	//	def APP = AssetType.APPLICATION.toString()
-	//	def DB = AssetType.DATABASE.toString()
-	//	def FILES = AssetType.FILES.toString()
+		def model = [entity: (params.entity ?: 'apps'), stats:stats]
 
-		def model = [:]
-		//Date start = new Date()
-		if (params.entity != 'Apps')
-			model.appDependentListSize = assetDependentlist.findAll{it.asset.assetType == AssetType.APPLICATION.toString() }.size()
-		if (params.entity != 'server')
-			model.assetEntityListSize = assetDependentlist.findAll{serverTypes.contains( it.asset.assetType) }.size()
-		if (params.entity != 'database')
-			model.dbDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  AssetType.DATABASE.toString() }.size()
-		if (params.entity != 'graph')
-			model.filesDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  AssetType.FILES.toString() }.size()
-		//log.error "getLists() : iterating to get list sizes took ${TimeUtil.elapsed(start)}"
-		// Took 5.262 seconds
-	
 		model.dependencyBundle = params.dependencyBundle
 		model.asset = params.entity
 
+		def serverTypes = AssetType.getAllServerTypes()
+		
 		switch(params.entity) {
-			case "Apps" :
+			case "apps" :
 				def applicationList = assetDependentlist.findAll{it.asset.assetType ==  AssetType.APPLICATION.toString() }
 				
 				model.appList = applicationList.asset 
@@ -3722,7 +3724,7 @@ class AssetEntityController {
 				break
 
 			case "graph" :
-				def filesListSize = assetDependentlist.findAll{it.asset.assetType ==  'Files' }.size()
+				def filesListSize = assetDependentlist.findAll{ AssetType.getStorageTypes().contains(it.asset.assetType)}.size()
 				def appDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.size()
 
 				def graphData = [:]

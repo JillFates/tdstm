@@ -1,21 +1,15 @@
+<%--
+    This is used by the dependency Console
+--%>
 <%@page import="com.tds.asset.AssetComment"%>
 <div class="tabs">
-	<ul>
-		
-		<li id="appli" class="active"><a href="javascript:getList('Apps',${dependencyBundle})">Apps(${appDependentListSize})</a>
-		</li>
-		<li id="serverli" ><a
-			href="javascript:getList('server',${dependencyBundle})"><span>Servers(${assetEntityListSize})</span> </a></li>
-		<li id="dbli" ><a href="#item3"><a href="javascript:getList('database',${dependencyBundle})">DB(${dbDependentListSize})</a></li>
-		<li id="fileli" ><a href="javascript:getList('files',${dependencyBundle})">Storage(${filesDependentListSize})</a></li>
-		<li id="graphli"><a href="javascript:getList('graph',${dependencyBundle})">Map</a></li>
-	</ul>
-	 <div id ="selectionAppId">
-	    <input type="hidden" id="assetTypeId" name="assetType" value="${asset}" />
-	    <input type="hidden" id="assetTypesId" name="assetType" value="Apps" />
-	   <tds:hasPermission permission='MoveBundleEditView'>
-		<input id="state" type="button"  class="submit" value="Assignment" onclick="changeMoveBundle($('#assetTypeId').val(),${appList.id})"  />
-	  </tds:hasPermission>
+	<g:render template="depConsoleTabs" model="${[entity:entity, stats:stats, dependencyBundle:dependencyBundle]}"/>
+	<div id ="selectionAppId">
+		<input type="hidden" id="assetTypeId" name="assetType" value="${asset}" />
+		<input type="hidden" id="assetTypesId" name="assetType" value="Apps" />
+		<tds:hasPermission permission='MoveBundleEditView'>
+			<input id="state" type="button"  class="submit" value="Assignment" onclick="changeMoveBundle($('#assetTypeId').val(),${appList.id})"  />
+		</tds:hasPermission>
 	</div>
 	<div class="tabInner">
 		<div id="item1">

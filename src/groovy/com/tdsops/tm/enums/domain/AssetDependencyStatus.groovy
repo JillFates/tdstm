@@ -12,4 +12,20 @@ class AssetDependencyStatus {
 	static final getList() {
 		return [ UNKNOWN, QUESTIONED, VALIDATED, ARCHIVED, NA ]
 	}
+
+	/**
+	 * Returns the list of codes that are considered needing to be reviewed
+	 * @return List<String>
+	 */
+	static final List getReviewCodes() {
+		[QUESTIONED, UNKNOWN]
+	}
+
+	/**
+	 * Returns the list of codes that are considered neeind to be reviewed as a quote comma delimited string
+	 * @return String
+	 */
+	static final String getReviewCodesAsString() {
+		"'$QUESTIONED','$UNKNOWN'"
+	}
 }	

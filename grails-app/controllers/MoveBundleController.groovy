@@ -827,8 +827,7 @@ class MoveBundleController {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		Date start = new Date()
 		def map = moveBundleService.dependencyConsoleMap(projectId)
-		log.info "dependencyConsole() : moveBundleService.dependencyConsoleMap() took ${TimeUtil.elapsed(start)}"
-		
+		//log.info "dependencyConsole() : moveBundleService.dependencyConsoleMap() took ${TimeUtil.elapsed(start)}"
 		return map
 	}
 	

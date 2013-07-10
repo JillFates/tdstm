@@ -1,20 +1,14 @@
+<%--
+    This is used by the dependency Console
+--%>
 <%@page import="com.tds.asset.AssetComment"%>
 <div class="tabs">
-	<ul>
-		
-		<li id="appli" ><a href="javascript:getList('Apps',${dependencyBundle})">Apps(${appDependentListSize})</a>
-		</li>
-		<li id="serverli" ><a
-			href="javascript:getList('server',${dependencyBundle})"><span>Servers(${assetEntityListSize})</span> </a></li>
-		<li id="dbli"  ><a href="#item3"><a href="javascript:getList('database',${dependencyBundle})">DB(${dbDependentListSize})</a></li>
-		<li id="fileli" class="active"><a href="javascript:getList('files',${dependencyBundle})">Storage(${filesDependentListSize})</a></li>
-		<li id="graphli"><a href="javascript:getList('graph',${dependencyBundle})">Map</a></li>
-	</ul>
+	<g:render template="depConsoleTabs" model="${[entity:entity, stats:stats, dependencyBundle:dependencyBundle]}"/>
 	<div id ="selectionFilesId">
 	    <input type="hidden" id="assetTypeId" name="assetType" value="${asset}" />
 	    <input type="hidden" id="assetTypesId" name="assetType" value="files" />
 	    <tds:hasPermission permission='MoveBundleEditView'>
-		<input id="state" type="button"  class="submit" value="Assignment" onclick="changeMoveBundle($('#assetTypeId').val(),${filesList.id})"  />
+			<input id="state" type="button"  class="submit" value="Assignment" onclick="changeMoveBundle($('#assetTypeId').val(),${filesList.id})"  />
 		</tds:hasPermission>
 	 </div>
 	<div class="tabInner">

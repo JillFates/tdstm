@@ -16,7 +16,7 @@
 
 $(document).ready(function() {
 	
-	${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + "Apps" +\'&dependencyBundle=\'+ null', onComplete:'listUpdate(e)') }
+	// ${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + "apps" +\'&dependencyBundle=\'+ null', onComplete:'listUpdate(e)') }
 	$("#checkBoxDiv").dialog({ autoOpen: false, resizable: false })
 	$("#createEntityView").dialog({ autoOpen: false })
 	$("#showEntityView").dialog({ autoOpen: false })
@@ -78,8 +78,9 @@ $(document).ready(function() {
          </div> 
 		</div>
 		</tds:hasPermission>
+
 		<div style="clear: both;"></div>
-		 <tds:hasPermission permission='MoveBundleEditView'>
+		<tds:hasPermission permission='MoveBundleEditView'>
 			<div id = "dependencyBundleDetailsId" >
 				<g:render template="dependencyBundleDetails" />
 			</div>
@@ -177,23 +178,17 @@ $(document).ready(function() {
 		
 		 
 		switch(value){
-		case "server" :
-			$('#assetCheck').attr('checked','false')
-			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
-			break;
-		case "Apps" :
-			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
-			break;
-		case "database" :
-			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
-			break;
-		case "files" :
-			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
-			break;
-		case "graph" :
-			var labelsList = "apps"
-			${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&force=\'+ force+\'&distance=\'+ distance+\'&labelsList=\'+ labelsList', onComplete:'listUpdate(e)') }
-			break;
+			case "server" :
+				$('#assetCheck').attr('checked','false')
+			case "apps" :
+			case "database" :
+			case "files" :
+				${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
+				break
+			case "graph" :
+				var labelsList = "apps"
+				${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&force=\'+ force+\'&distance=\'+ distance+\'&labelsList=\'+ labelsList', onComplete:'listUpdate(e)') }
+				break
 		}
 	}
 	function listUpdate(e){
