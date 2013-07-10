@@ -189,7 +189,7 @@
 			<input type="hidden" name="justRemaining" id="justRemaining" value="${justRemaining}" />
 			<input type="hidden" name="justMyTasks"   id="justMyTasks"   value="${justMyTasks}"/>
 			<input type="hidden" id="myPage" value="taskManager" />
-			<span  style="white-space: nowrap;">
+			<span>
 				<b>Event </b>
 			 	<g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
 				&nbsp;&nbsp;

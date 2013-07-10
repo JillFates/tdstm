@@ -487,11 +487,11 @@ div.field_list table {
 	margin-left: 100px;
 }
 .pickbox { 
-    text-align:center;
-    display:block;
-    float:left;
-    width:30px;
-    cursor:pointer;
+	text-align:center;
+	display:block;
+	float:left;
+	width:30px;
+	cursor:pointer;
 }
 .assetTd{
 	vertical-align: top;
@@ -527,6 +527,8 @@ td.buttons{
 
 .fluid {
 	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
 	width: 100% !important;
 	margin: 0px !important;
 	padding-top: 0px;
