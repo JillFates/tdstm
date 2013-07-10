@@ -166,7 +166,7 @@ class ProjectService {
 		if(!parseData){
 			parseData = generateDefaultConfig(entityType)
 		}
-		
+		parseData = updateConfigForMissingFields(parseData, entityType)
 		return parseData
 	}
 	/**
@@ -178,12 +178,12 @@ class ProjectService {
 		def defautlProject = Project.findByProjectCode("TM_DEFAULT_PROJECT")
 		def returnMap = [:]
 		def data = FieldImportance.findByProjectAndEntityType(defautlProject,type)?.config
+		def phases = ValidationType.getListAsMap().keySet()
 		if(data)
 			returnMap=JSON.parse(data)
 		if(!returnMap){
 			def eavEntityType = EavEntityType.findByDomainName(type)
 			def attributes = EavAttribute.findAllByEntityType( eavEntityType )?.attributeCode
-			def phases = ValidationType.getListAsMap().keySet()
 			returnMap = attributes.inject([:]){rmap, field->
 				def pmap = phases.inject([:]){map, item->
 					map[item]="N"
@@ -194,5 +194,25 @@ class ProjectService {
 			}
 		}
 		return returnMap
+	}
+	/**
+	 * Update default importance map for missing fields by assigning normal to all
+	 * @param entity type,parseData
+	 * @return
+	 */
+	def updateConfigForMissingFields(parseData, type){
+		def fields = getFields(type)
+		def phases = ValidationType.getListAsMap().keySet()
+		fields.each{f->
+		if(!parseData[f.label]){
+				def pmap = phases.inject([:]){map, item->
+					map[item]="N"
+					return map
+				}
+				def labelMap = ['phase': pmap]
+				parseData << [(f.label) : labelMap]
+			}
+		}
+		return parseData
 	}
 }
