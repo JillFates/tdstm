@@ -52,34 +52,44 @@ class ModelController {
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		def project = securityService.getUserCurrentProject()
+		def modelInstanceList
+		def userLogin = securityService.getUserLogin()
+		def filterParams = ['modelName':params.modelName, 'manufacturer':params.manufacturer, 'description':params.description, 'assetType':params.assetType,'powerUse':params.powerUse, 'noOfConnectors':params.connectors, 'assetsCount':params.assetCount, 'sourceTDSVersion':params.version, 'sourceTDS':params.sourceTds, 'modelStatus':params.status]
+			
+		def query = new StringBuffer("""SELECT * FROM ( SELECT m.model_id AS modelId, man.name AS manufacturer, 
+			m.name AS modelName, m.description AS description, m.asset_type AS assetType, m.power_use AS powerUse, 
+			(SELECT COUNT(*) FROM model_connector WHERE model_connector.model_id=m.model_id) AS noOfConnectors, 
+			m.model_status AS modelStatus, m.sourcetds AS sourceTDS, m.sourcetdsversion AS sourceTDSVersion, 
+			(SELECT COUNT(*) FROM asset_entity AS ae WHERE ae.model_id=m.model_id) AS assetsCount 
+			FROM model m 
+			LEFT OUTER JOIN model_connector mc on m.model_id=mc.model_id 
+			LEFT OUTER JOIN model_sync ms on m.model_id=ms.model_id 
+			LEFT OUTER JOIN manufacturer man on man.manufacturer_id=m.manufacturer_id """)
+		query.append("ORDER BY " + sortIndex + " " + sortOrder + ") AS models")
 		
-		def manuList = params.manufacturer ? Manufacturer.findAllByNameIlike("%${params.manufacturer}%"): []
-		def powers=params.powerUse ? Model.findAll("from Model where powerUse like '%${params.powerUse}%'").powerUse :[]
-		def sorceTds=params.sourceTDS ? Model.findAll("from Model where sourceTDS like '%${params.sourceTDS}%'").sourceTDS :[]
+		// Handle the filtering by each column's text field
+		def firstWhere = true
+		filterParams.each {
+			if(it.getValue())
+				if(firstWhere){
+					query.append(" WHERE models.${it.getKey()} LIKE '%${it.getValue()}%'")
+					firstWhere = false
+				} else {
+					query.append(" AND models.${it.getKey()} LIKE '%${it.getValue()}%'")
+				}
+		}
 		
-        def models = Model.createCriteria().list(max: maxRows, offset: rowOffset) {
-				if (params.modelName)
-					ilike('modelName', "%${params.modelName}%")
-				if (params.manufacturer)
-					'in' ('manufacturer', manuList)
-				if (params.description)
-					ilike('description', "%${params.description}%")
-				if (params.assetType)
-					ilike('assetType', "%${params.assetType}%")
-				if (powers)
-					'in'('powerUse', powers)
-				if (sorceTds)
-					'in'('sourceTDS',sorceTds)
-				if (params.modelStatus)
-					ilike('modelStatus', "%${params.modelStatus}%")
-	
-				order(sortIndex, sortOrder).ignoreCase()
-			}
-
-		def totalRows = models.totalCount
+		modelInstanceList = jdbcTemplate.queryForList(query.toString())
+		
+		// Limit the returned results to the user's page size and number
+		def totalRows = modelInstanceList.size()
 		def numberOfPages = Math.ceil(totalRows / maxRows)
+		if(totalRows > 0)
+			modelInstanceList = modelInstanceList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
+		else
+			modelInstanceList = []
 
-		def results = models?.collect { [ cell: [it.modelName, it.manufacturer?.name, it.description, it.assetType,
+		def results = modelInstanceList?.collect { [ cell: [it.modelName, it.manufacturer, it.description, it.assetType,
 					it.powerUse, it.noOfConnectors, it.assetsCount, it.sourceTDSVersion, it.sourceTDS, it.modelStatus], id: it.id,
 			]}
 

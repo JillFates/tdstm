@@ -20,7 +20,7 @@
 			$("#showModelView").dialog({ autoOpen: false })
 			$("#showOrMergeId").dialog({ autoOpen: false })
 			var listCaption ="Models: \
-						<span class='capBtn'><input type='button' value='New Model' onclick='createModelManuDetails(\"model\",\"Model\")'/></span> \
+						<span class='capBtn'><input type='button' value='Create Model' onclick='createModelManuDetails(\"model\",\"Model\")'/></span> \
 						<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='compareOrMerge()' disabled='disabled'/></span>"
 			<jqgrid:grid id="modelId" url="'${createLink(action: 'listJson')}'"
 				colNames="'Model Name','Manufacturer', 'Description','Asset Type', 'Power','No Of Connectors','Assets ','Version','Source TDS','Model Status'"
@@ -30,7 +30,7 @@
 							  {name:'assetType', editable: true, width:'100'},
 							  {name:'powerUse', editable: true,width:'50'},
 							  {name:'modelConnectors', editable: true,width:'80',search:false},
-							  {name:'assets', editable: false,width:'50',search:false},
+							  {name:'assetsCount', editable: false,width:'50',search:false},
 							  {name:'sourceTDSVersion', editable: false,width:'50',search:false},
 							  {name:'sourceTDS', editable: false,width:'60'},
 							  {name:'modelStatus',editable: false,width:'60'}"
