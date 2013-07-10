@@ -571,7 +571,9 @@ class ReportsService {
 		def dotFile = new File(dotFN);
 		dotFile << dotText
 
-		def proc = "${dotExec} -T${graphType} -v -o ${targetDir}${imgFilename} ${dotFile}".execute()
+		def cmd = "${dotExec} -T${graphType} -v -o ${targetDir}${imgFilename} ${dotFile}"
+		log.info "generateDotGraph() about to execute command: $cmd"
+		def proc = cmd.execute()
 	 	proc.waitFor()
 	
 		if (proc.exitValue() == 0) {
