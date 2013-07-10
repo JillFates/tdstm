@@ -33,6 +33,10 @@
 							<td class="valueNW ${config.validation}">${filesInstance.validation}</td>
 						</tr>
 						<tr>
+						<tr>
+							<td class="label" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
+							<td>${filesInstance.externalRefId}</td>
+						</tr>
 						</tr>
 						<g:render template="../assetEntity/customShow" model="[assetEntity:filesInstance]"></g:render>
 					</tbody>

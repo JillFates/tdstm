@@ -28,6 +28,18 @@ class Application extends AssetEntity{
 	String drRtoDesc
 	String moveDowntimeTolerance
 	
+	String shutdownBy
+	Integer shutdownFixed = 0 
+	Integer shutdownDuration 
+	
+	String startupBy
+	Integer startupFixed = 0
+	Integer startupDuration
+	
+	String testingBy
+	Integer testingFixed = 0
+	Integer testingDuration
+	
     static constraints = {
 		appVendor( blank:true, nullable:true )
 		appVersion( blank:true, nullable:true )
@@ -52,6 +64,18 @@ class Application extends AssetEntity{
 		drRpoDesc( blank:true, nullable:true )
 		drRtoDesc( blank:true, nullable:true )
 		moveDowntimeTolerance( blank:true, nullable:true )
+		
+		shutdownBy (nullable:true )
+		shutdownFixed (nullable:true )
+		shutdownDuration (nullable:true )
+		
+		startupBy (nullable:true )
+		startupFixed (nullable:true )
+		startupDuration (nullable:true )
+		
+		testingBy (nullable:true )
+		testingFixed (nullable:true )
+		testingDuration (nullable:true )
     }
 	static mapping  = {
 		version true
@@ -60,6 +84,11 @@ class Application extends AssetEntity{
 		id column:'app_id'
 		sme column:'sme_id'
 		sme2 column:'sme2_id'
+		columns {
+			shutdownFixed sqltype: 'tinyint(1)'
+			startupFixed sqltype: 'tinyint(1)'
+			testingFixed sqltype: 'tinyint(1)'
+		}
 	}
 	/*
 	 * Date to insert in GMT

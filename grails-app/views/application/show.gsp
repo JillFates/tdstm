@@ -88,7 +88,39 @@
 						<g:render template="../assetEntity/customShow" model="['assetEntity':applicationInstance]"></g:render>
 						<tr>
 							<td class="label ${config.url}" nowrap="nowrap"><label for="license">URL</label></td>
-							<td class="valueNW ${config.url}" colspan="7"><a href="${applicationInstance.url}" style="color:#00E">${applicationInstance.url}</a></td>
+							<td class="valueNW ${config.url}" ><a href="${applicationInstance.url}" style="color:#00E">${applicationInstance.url}</a></td>
+							<td class="label" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
+							<td>${applicationInstance.externalRefId}</td>
+							<td class="label" nowrap="nowrap"><label for="license">Shutdown By</label></td>
+							<td class="valueNW" nowrap="nowrap">${shutdownBy}
+								<input type="checkbox" id="shutdownFixedShowId" disabled="disabled" name="shutdownFixed"
+										${applicationInstance.shutdownFixed ==1? 'checked="checked"' : ''}/>
+									<label for="shutdownFixedId" >Fixed</label>
+							</td>
+							<td class="label" nowrap="nowrap"><label for="shutdownDuration">Shutdown Dur.</label></td>
+							<td class="valueNW" nowrap="nowrap">${applicationInstance.shutdownDuration} m</td>
+							
+						</tr>
+						
+						<tr>
+							<td class="label" nowrap="nowrap"><label for="license">Startup By</label></td>
+							<td class="valueNW " nowrap="nowrap">${startupBy}
+								<input type="checkbox" id="startupFixedShowId" disabled="disabled" name="startupFixed" value="${applicationInstance.startupFixed}" 
+										${applicationInstance.startupFixed ==1? 'checked="checked"' : ''}/>
+									<label for="startupFixedId" >Fixed</label>
+							</td>
+							<td class="label" nowrap="nowrap"><label for="shutdownDuration">Startup Dur.</label></td>
+							<td class="valueNW" nowrap="nowrap">${applicationInstance.startupDuration} m</td>
+							
+							<td class="label" nowrap="nowrap"><label for="license">testing By</label></td>
+							<td class="valueNW ${config.url}" nowrap="nowrap">${testingBy}
+								<input type="checkbox" id="testingFixedShowId" disabled="disabled" name="testingFixed" 
+										${applicationInstance.testingFixed ==1? 'checked="checked"' : ''} />
+									<label for="testingFixedId" >Fixed</label>
+							</td>
+							<td class="label" nowrap="nowrap"><label for="testingDuration">Testing Dur.</label></td>
+							<td class="valueNW" nowrap="nowrap">${applicationInstance.testingDuration} m</td>
+							
 						</tr>
                         <tr>
 						   	<td class="label" nowrap="nowrap" ><label for="events">Event</label></td>

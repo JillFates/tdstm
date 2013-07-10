@@ -78,6 +78,10 @@
 									<g:select from="${fileInstance.constraints.validation.inList}" class="${config.validation}" id="validation" name="validation"  onChange="assetCustoms('',this.value,'Files');assetFieldImportance(this.value,'Files');" value="Discovery"/>
 								</td>
 							</tr>
+							<tr>
+								<td class="label" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
+								<td><input type="text" id="externalRefId" name="externalRefId" value="${fileInstance.externalRefId}" tabindex="11" /></td>
+							</tr>
 							<tbody class="customTemplate">
 								<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:fileInstance]"></g:render>
 							</tbody>

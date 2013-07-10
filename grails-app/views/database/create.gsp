@@ -63,6 +63,10 @@
 							<td class="label ${config.validation}"><label for="validation">Validation</label></td>
 							<td colspan="3"><g:select from="${databaseInstance.constraints.validation.inList}" id="validation" class="${config.validation}" onChange="assetCustoms('',this.value,'Database');assetFieldImportance(this.value,'Database');" name="validation" value="Discovery"/></td>
 						</tr>
+						<tr>
+							<td class="label" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
+							<td><input type="text" id="externalRefId" name="externalRefId" value="${databaseInstance.externalRefId}" tabindex="11" /></td>
+						</tr>
 						<tbody class="customTemplate">
 							<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:databaseInstance]"></g:render>
 						</tbody>

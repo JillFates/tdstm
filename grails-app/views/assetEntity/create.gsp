@@ -175,6 +175,10 @@
 									<g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" class="${config.validation}" name="validation" onChange="assetCustoms('',this.value,'AssetEntity');assetFieldImportance(this.value,'AssetEntity');" value="Discovery"/>
 								</td>
 							</tr>
+							<tr>
+								<td class="label" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
+								<td><input type="text" id="externalRefId" name="externalRefId" value="${assetEntityInstance.externalRefId}" tabindex="11" /></td>
+							</tr>
 							<tbody class="customTemplate">
 								<g:render template="customEdit" ></g:render>
 							</tbody>

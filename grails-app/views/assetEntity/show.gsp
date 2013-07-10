@@ -128,6 +128,10 @@ $(document).ready(function() {
 								<td class="valueNW ${config.validation}">${assetEntity.validation}</td>
 								<td>&nbsp;</td>
 							</tr>
+							<tr>
+								<td class="label" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
+								<td>${assetEntity.externalRefId}</td>
+							</tr>
 							<g:render template="customShow" ></g:render>
 						</tbody>
 					</table>

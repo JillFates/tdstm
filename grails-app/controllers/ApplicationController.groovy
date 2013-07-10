@@ -3,28 +3,15 @@ import grails.converters.JSON
 
 import java.text.SimpleDateFormat
 
-import net.tds.util.jmesa.AssetEntityBean
-
-import org.jmesa.facade.TableFacade
-import org.jmesa.facade.TableFacadeImpl
-import org.jmesa.limit.Limit
-
 import com.tds.asset.Application
-import com.tds.asset.ApplicationAssetMap
-import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
-import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetOptions
-import com.tds.asset.AssetTransition
 import com.tds.asset.AssetType
-import com.tds.asset.Database
-import com.tds.asset.Files
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
-import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.GormUtil
 
 class ApplicationController {
@@ -171,13 +158,14 @@ class ApplicationController {
 		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 	
 		def personList = partyRelationshipService.getCompanyStaff( project.client?.id )
+		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
 		
 		//fieldImportance for Discovery by default
 		def configMap = assetEntityService.getConfig('Application','Discovery')
 		
 		[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 			planStatusOptions:planStatusOptions?.value, projectId:project.id, project:project,moveEventList:moveEventList,
-			config:configMap.config, customs:configMap.customs, personList:personList, company:project.client]
+			config:configMap.config, customs:configMap.customs, personList:personList, company:project.client, availabaleRoles:availabaleRoles]
 	}
 	def save = {
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
@@ -249,14 +237,20 @@ class ApplicationController {
 			def validationType = assetEntity.validation
 			def configMap = assetEntityService.getConfig('Application',validationType)
 			
+			def shutdownBy = assetEntity.shutdownBy  ? getAppBy(assetEntity.shutdownBy) : ''
+			def startupBy = assetEntity.startupBy  ? getAppBy(assetEntity.startupBy) : ''
+			def testingBy = assetEntity.testingBy  ? getAppBy(assetEntity.testingBy) : ''
+			
+			
+			
 			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, 
 			  redirectTo : params.redirectTo, assetComment:assetComment, assetCommentList:assetCommentList,
 			  appMoveEvent:appMoveEvent, moveEventList:moveEventList, appMoveEvent:appMoveEventlist, project:project,
 			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle ,prefValue:prefValue, 
-			  config:configMap.config, customs:configMap.customs]
+			  config:configMap.config, customs:configMap.customs, shutdownBy:shutdownBy, startupBy:startupBy, testingBy:testingBy]
 		}
 	}
-
+    
 	def edit ={
  
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
@@ -290,6 +284,8 @@ class ApplicationController {
 			}
 			def personList = partyRelationshipService.getCompanyStaff( project.client?.id )
 			
+			def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
+			
 			//fieldImportance Styling for default validation.
 			def validationType = applicationInstance.validation
 			def configMap = assetEntityService.getConfig('Application',validationType)
@@ -297,7 +293,8 @@ class ApplicationController {
 			[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
 						planStatusOptions:planStatusOptions?.value, projectId:project.id, supportAssets: supportAssets,
 						dependentAssets:dependentAssets, redirectTo : params.redirectTo,dependencyType:dependencyType, dependencyStatus:dependencyStatus,
-						moveEvent:moveEvent,servers:servers, personList:personList, config:configMap.config, customs:configMap.customs]
+						moveEvent:moveEvent,servers:servers, personList:personList, config:configMap.config, customs:configMap.customs,
+						availabaleRoles:availabaleRoles]
 		}
 
 	}
@@ -322,6 +319,10 @@ class ApplicationController {
 		applicationInstance.sme2 = null
 		applicationInstance.appOwner = null
 		applicationInstance.properties = params
+		applicationInstance.shutdownFixed = params.shutdownFixed ?  1 : 0
+		applicationInstance.startupFixed = params.startupFixed ?  1 : 0
+		applicationInstance.testingFixed = params.testingFixed ?  1 : 0
+		
 		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
 			flash.message = "Application ${applicationInstance.assetName} Updated"
 			assetEntityService.createOrUpdateApplicationDependencies(params, applicationInstance)
@@ -425,5 +426,24 @@ class ApplicationController {
 		String names = assetNames.toString().replace('[','').replace(']','')
 		
 	  render "Aplication $names Deleted."
-	}	
+	}
+	
+	/**
+	 * This app to get shutdownBy, startupBy, testingBy 's displaying value 
+	 * @param byValue : application's shutdownBy, startupBy, testingBy
+	 * @return : value to display
+	 */
+	def getAppBy(byValue){
+		def byObj
+		if(byValue){
+			try{
+				byObj = Person.read(Long.parseLong(byValue))
+			}catch(NumberFormatException nfe){
+				def roleType = RoleType.read(byValue)
+				byObj = roleType ?
+					"@ "+roleType.description.substring(roleType.description.lastIndexOf(':') +1).trim() : "# "+byValue
+			}
+		}
+		return byObj
+	}
 }

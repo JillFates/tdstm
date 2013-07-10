@@ -111,6 +111,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	Integer currentStatus
 	String validation
 	
+	String externalRefId
+	
 	Integer dependencyBundle = 0
 	
 	static hasMany = [
@@ -214,6 +216,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		validation( blank:true, nullable:true, inList:ValidationType.getList() )		
 		currentStatus( nullable:true )
 		dependencyBundle( nullable:true )
+		externalRefId( blank:true, nullable:true )
 	}
 	
 	static mapping  = {	
