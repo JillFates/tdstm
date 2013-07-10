@@ -45,8 +45,8 @@
 							<td class="valueNW ${config.validation}" colspan="3">${databaseInstance.validation}</td>
 						</tr>
 						<tr>
-							<td class="label" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
-							<td>${databaseInstance.externalRefId}</td>
+							<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
+							<td class="${config.externalRefId}">${databaseInstance.externalRefId}</td>
 						</tr>
 						<g:render template="../assetEntity/customShow" model="[assetEntity:databaseInstance, 'project':project]"></g:render>
 					</tbody>

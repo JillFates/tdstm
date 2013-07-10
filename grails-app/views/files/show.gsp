@@ -34,8 +34,8 @@
 						</tr>
 						<tr>
 						<tr>
-							<td class="label" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
-							<td>${filesInstance.externalRefId}</td>
+							<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
+							<td class="${config.externalRefId}">${filesInstance.externalRefId}</td>
 						</tr>
 						</tr>
 						<g:render template="../assetEntity/customShow" model="[assetEntity:filesInstance]"></g:render>

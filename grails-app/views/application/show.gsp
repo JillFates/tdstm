@@ -88,40 +88,38 @@
 						<tr>
 							<td class="label ${config.url}" nowrap="nowrap"><label for="license">URL</label></td>
 							<td class="valueNW ${config.url}" ><a href="${applicationInstance.url}" style="color:#00E">${applicationInstance.url}</a></td>
-							<td class="label" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
-							<td>${applicationInstance.externalRefId}</td>
-							<td class="label" nowrap="nowrap"><label for="license">Shutdown By</label></td>
-							<td class="valueNW" nowrap="nowrap">${shutdownBy}
+							<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
+							<td class="${config.externalRefId}">${applicationInstance.externalRefId}</td>
+							<td class="label ${config.shutdownBy}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
+							<td class="valueNW ${config.shutdownBy}" nowrap="nowrap">${shutdownBy}
 							<g:if test="${applicationInstance.shutdownFixed ==1 }">
 								<input type="checkbox" id="shutdownFixedShowId" disabled="disabled" name="shutdownFixed" checked="checked"/>
 									<label for="shutdownFixedId" >Fixed</label>
 							</g:if>
 							</td>
-							<td class="label" nowrap="nowrap"><label for="shutdownDuration">Shutdown Dur.</label></td>
-							<td class="valueNW" nowrap="nowrap">${applicationInstance.shutdownDuration ? applicationInstance.shutdownDuration+'m' : ''}</td>
-							
+							<td class="label ${config.shutdownDuration}" nowrap="nowrap"><label for="shutdownDuration">Shutdown Dur.</label></td>
+							<td class="valueNW ${config.shutdownDuration}" nowrap="nowrap">${applicationInstance.shutdownDuration ? applicationInstance.shutdownDuration+'m' : ''}</td>
 						</tr>
 						<tr>
-							<td class="label" nowrap="nowrap"><label for="license">Startup By</label></td>
-							<td class="valueNW " nowrap="nowrap">${startupBy}
+							<td class="label ${config.startupBy}" nowrap="nowrap"><label for="startupBy">Startup By</label></td>
+							<td class="valueNW ${config.startupBy}" nowrap="nowrap">${startupBy}
 							<g:if test="${applicationInstance.startupFixed ==1 }">
 								<input type="checkbox" id="startupFixedShowId" disabled="disabled" name="startupFixed" value="${applicationInstance.startupFixed}" 
 										checked="checked"/>
 									<label for="startupFixedId" >Fixed</label>
 							</g:if>
 							</td>
-							<td class="label" nowrap="nowrap"><label for="shutdownDuration">Startup Dur.</label></td>
-							<td class="valueNW" nowrap="nowrap">${applicationInstance.startupDuration ? applicationInstance.startupDuration+'m' :''} </td>
-							
-							<td class="label" nowrap="nowrap"><label for="license">testing By</label></td>
-							<td class="valueNW ${config.url}" nowrap="nowrap">${testingBy}
+							<td class="label ${config.shutdownDuration}" nowrap="nowrap"><label for="shutdownDuration">Startup Dur.</label></td>
+							<td class="valueNW ${config.shutdownDuration}" nowrap="nowrap">${applicationInstance.startupDuration ? applicationInstance.startupDuration+'m' :''} </td>
+							<td class="label ${config.testingBy}" nowrap="nowrap"><label for="testingBy">testing By</label></td>
+							<td class="valueNW ${config.testingBy}" nowrap="nowrap">${testingBy}
 							  <g:if test="${applicationInstance.testingFixed ==1 }">
 								<input type="checkbox" id="testingFixedShowId" disabled="disabled" name="testingFixed" checked="checked" />
 									<label for="testingFixedId" >Fixed</label>
 							  </g:if>
 							</td>
-							<td class="label" nowrap="nowrap"><label for="testingDuration">Testing Dur.</label></td>
-							<td class="valueNW" nowrap="nowrap">${applicationInstance.testingDuration ? applicationInstance.testingDuration+'m' :''}</td>
+							<td class="label ${config.testingDuration}" nowrap="nowrap"><label for="testingDuration">Testing Dur.</label></td>
+							<td class="valueNW ${config.testingDuration}" nowrap="nowrap">${applicationInstance.testingDuration ? applicationInstance.testingDuration+'m' :''}</td>
 						</tr>
 						<g:render template="../assetEntity/customShow" model="['assetEntity':applicationInstance]"></g:render>
                         <tr>

@@ -200,49 +200,46 @@
 								<td class="label ${config.url}" nowrap="nowrap"><label for="license">URL</label></td>
 								<td ><input type="text" id="url" name="url" value="${applicationInstance.url}" tabindex="18" />
 								</td>
-								<td class="label" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
-								<td><input type="text" id="externalRefId" name="externalRefId" value="${applicationInstance.externalRefId}" tabindex="11" /></td>
-								<td class="label" nowrap="nowrap"><label for="license">Shutdown By</label></td>
+								<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
+								<td><input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" value="${applicationInstance.externalRefId}" tabindex="11" /></td>
+								<td class="label ${config.shutdownBy}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
 								<td >
-								   <g:render template="bySelect" model="[name:'shutdownBy' , id:'shutdownByEditId']"></g:render>
-									<input type="checkbox" id="shutdownFixedId" name="shutdownFixed" value="${applicationInstance.shutdownFixed}"
+								   <g:render template="bySelect" model="[name:'shutdownBy' , id:'shutdownByEditId', className:config.shutdownBy]"></g:render>
+									<input type="checkbox" id="shutdownFixedId"  name="shutdownFixed" value="${applicationInstance.shutdownFixed}"
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" 
-										${applicationInstance.shutdownFixed==1? 'checked="checked"' : ''}/>
-									<label for="shutdownFixedId" >Fixed</label>
+										${applicationInstance.shutdownFixed==1? 'checked="checked"' : ''}/>Fixed
 								</td>
-								<td class="label " nowrap="nowrap"><label for="shutdownDuration">Shutdown Duration </label>
+								<td class="label ${config.shutdownDuration}" nowrap="nowrap"><label for="shutdownDuration">Shutdown Duration </label>
 								</td>
 								<td ><input type="text" id="shutdownDuration" name="shutdownDuration"
 											value="${applicationInstance.shutdownDuration}" tabindex="55" size="7"/>m
 								</td>
 							</tr>
 							<tr>
-							<td class="label nowrap="nowrap"><label for="license">Startup By</label></td>
+							<td class="label ${config.startupBy}" nowrap="nowrap"><label for="startupBy">Startup By</label></td>
 								<td colspan="1" nowrap="nowrap">
-								   <g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId']"></g:render>
+								   <g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId', className:config.startupBy]"></g:render>
 									<input type="checkbox" id="startupFixed" name="startupFixed" value="${applicationInstance.startupFixed}"
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" 
-										${applicationInstance.startupFixed ==1? 'checked="checked"' : ''}/>
-									<label for="startupFixedId" >Fixed</label>
+										${applicationInstance.startupFixed ==1? 'checked="checked"' : ''}/>Fixed
 								</td>
-								<td class="label " nowrap="nowrap"><label for="startupDuration">Startup Duration </label>
+								<td class="label ${config.startupDuration}" nowrap="nowrap"><label for="startupDuration">Startup Duration </label>
 								</td>
-								<td ><input type="text" id="startupDuration" name="startupDuration"
+								<td ><input type="text" id="startupDuration" class="${config.startupDuration}" name="startupDuration"
 											value="${applicationInstance.startupDuration}" tabindex="55" size="7" />m
 								</td>
 								
 								
-								<td class="label" nowrap="nowrap"><label for="license">Testing By</label></td>
+								<td class="label ${config.testingBy}" nowrap="nowrap"><label for="testingBy">Testing By</label></td>
 								<td colspan="1" nowrap="nowrap">
-								  <g:render template="bySelect" model="[name:'testingBy', id:'testingByEditId']"></g:render>
+								  <g:render template="bySelect" model="[name:'testingBy', id:'testingByEditId', className:config.testingBy]"></g:render>
 									<input type="checkbox" id="testingFixedId" name="testingFixed" value="${applicationInstance.testingFixed}"
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" 
-										${applicationInstance.testingFixed ==1? 'checked="checked"' : ''}/>
-									<label for="testingFixedId" >Fixed</label>
+										${applicationInstance.testingFixed ==1? 'checked="checked"' : ''}/>Fixed
 								</td>
-								<td class="label " nowrap="nowrap"><label for="shutdownDuration">Testing Duration </label>
+								<td class="label ${config.testingDuration}" nowrap="nowrap"><label for="testingDuration">Testing Duration </label>
 								</td>
-								<td ><input type="text" id="testingDuration" name="testingDuration"
+								<td ><input type="text" id="testingDuration" class="${config.testingDuration}" name="testingDuration"
 											value="${applicationInstance.testingDuration}" tabindex="55"  size="7"/>m
 								</td>
 							</tr>

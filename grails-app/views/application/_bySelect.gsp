@@ -1,4 +1,4 @@
-<select id="${id}" name="${name}" style="width: 90px">
+<select  id="${id}" class="${className}" name="${name}" style="width: 90px">
 	<option value="" selected="selected">Select...</option>
 	<optgroup label="SME pointers" id="smeGroup">
 		<option value="SME1">SME1</option>
