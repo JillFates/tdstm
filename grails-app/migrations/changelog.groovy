@@ -44,5 +44,6 @@ databaseChangeLog = {
 	include file: '20130624-update-recent-users-expiry-dates.groovy'
 	include file: '20130626-update-person-staff_type.groovy'
 	include file: '20130709-add-new-fields-application-table.groovy'
+	include file: '20130710-add-new-app-field-import-export.groovy'
     
 }

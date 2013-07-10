@@ -506,4 +506,25 @@ class AssetEntityService {
 		
 		return [project:project, config:config, customs:customs]
 	}
+	
+	/**
+	 * This app to get shutdownBy, startupBy, testingBy 's displaying value
+	 * @param byValue : application's shutdownBy, startupBy, testingBy
+	 * @return : value to display
+	 */
+	def getAppBy(byValue, addPrefix = true){
+		def byObj
+		if(byValue){
+			try{
+				byObj = Person.read(Long.parseLong(byValue))
+			}catch(NumberFormatException nfe){
+				def roleType = RoleType.read(byValue)
+				if(addPrefix)
+					byObj = roleType ? "@ "+roleType.description.substring(roleType.description.lastIndexOf(':') +1).trim() : "# "+byValue
+				else
+					byObj = roleType ? roleType.description.substring(roleType.description.lastIndexOf(':') +1).trim() : byValue
+			}
+		}
+		return byObj
+	}
 }

@@ -484,6 +484,25 @@ class DataTransferBatchController {
 													application."$attribName" = person
 												} 
 												break;
+										case "shutdownBy":
+										case "startupBy":
+										case "testingBy":
+												if(it.importValue){
+													def person = assetEntityAttributeLoaderService.findOrCreatePerson(it.importValue, false)
+													if(person)
+														application."$attribName" = person.id
+													else {
+														application."$attribName" = it.importValue
+													}
+												}
+												break;
+										case "shutdownFixed":
+										case "startupFixed":
+										case "testingFixed":
+												if(it.importValue){
+													application."$attribName" = it.importValue.equalsIgnoreCase("yes") ? 1 : 0
+												}
+												break;
 										default:
 										if( it.eavAttribute.backendType == "int"){
 		    								def correctedPos

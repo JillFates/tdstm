@@ -87,13 +87,13 @@ $(document).ready(function() {
      });
 
 	$.jgrid.formatter.integer.thousandsSeparator='';
-function myLinkFormatter (cellvalue, options, rowObjcet) {
+function myLinkFormatter (cellvalue, options, rowObject) {
 	var value = cellvalue ? cellvalue : ''
-	return '<a href="javascript:getEntityDetails(\'application\',\''+rowObjcet[11]+'\','+options.rowId+')">'+value+'</a>'
+	return '<a href="javascript:getEntityDetails(\'application\',\'Application\','+options.rowId+')">'+value+'</a>'
 }
 
 function myCustomFormatter (cellVal,options,rowObject) {
-	var editButton = '<a href="javascript:editEntity(\'application\',\''+rowObject[11]+'\','+options.rowId+')">'+
+	var editButton = '<a href="javascript:editEntity(\'application\',\'Application\','+options.rowId+')">'+
 			"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 	if(rowObject[9]=='issue'){
 		var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"

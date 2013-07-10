@@ -237,9 +237,9 @@ class ApplicationController {
 			def validationType = assetEntity.validation
 			def configMap = assetEntityService.getConfig('Application',validationType)
 			
-			def shutdownBy = assetEntity.shutdownBy  ? getAppBy(assetEntity.shutdownBy) : ''
-			def startupBy = assetEntity.startupBy  ? getAppBy(assetEntity.startupBy) : ''
-			def testingBy = assetEntity.testingBy  ? getAppBy(assetEntity.testingBy) : ''
+			def shutdownBy = assetEntity.shutdownBy  ? assetEntityService.getAppBy(assetEntity.shutdownBy) : ''
+			def startupBy = assetEntity.startupBy  ? assetEntityService.getAppBy(assetEntity.startupBy) : ''
+			def testingBy = assetEntity.testingBy  ? assetEntityService.getAppBy(assetEntity.testingBy) : ''
 			
 			
 			
@@ -426,24 +426,5 @@ class ApplicationController {
 		String names = assetNames.toString().replace('[','').replace(']','')
 		
 	  render "Aplication $names Deleted."
-	}
-	
-	/**
-	 * This app to get shutdownBy, startupBy, testingBy 's displaying value 
-	 * @param byValue : application's shutdownBy, startupBy, testingBy
-	 * @return : value to display
-	 */
-	def getAppBy(byValue){
-		def byObj
-		if(byValue){
-			try{
-				byObj = Person.read(Long.parseLong(byValue))
-			}catch(NumberFormatException nfe){
-				def roleType = RoleType.read(byValue)
-				byObj = roleType ?
-					"@ "+roleType.description.substring(roleType.description.lastIndexOf(':') +1).trim() : "# "+byValue
-			}
-		}
-		return byObj
 	}
 }
