@@ -29,9 +29,9 @@
 							  {name:'description', editable: true,width:'100'},
 							  {name:'assetType', editable: true, width:'100'},
 							  {name:'powerUse', editable: true,width:'50'},
-							  {name:'modelConnectors', editable: true,width:'80',search:false},
-							  {name:'assetsCount', editable: false,width:'50',search:false},
-							  {name:'sourceTDSVersion', editable: false,width:'50',search:false},
+							  {name:'modelConnectors', editable: true,width:'80'},
+							  {name:'assetsCount', editable: false,width:'50'},
+							  {name:'sourceTDSVersion', editable: false,width:'50'},
 							  {name:'sourceTDS', editable: false,width:'60'},
 							  {name:'modelStatus',editable: false,width:'60'}"
 				sortname="'modelName'"
