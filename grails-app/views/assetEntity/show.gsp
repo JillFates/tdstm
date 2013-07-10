@@ -145,7 +145,7 @@ $(document).ready(function() {
 					<thead>
 						<tr>
 							<th>Frequency</th>
-							<th>Type</th>
+							<th>Class</th>
 							<th>Name</th>
 							<th>Bundle</th>
 							<th>Type</th>
@@ -198,7 +198,7 @@ $(document).ready(function() {
 					<thead>
 						<tr>
 							<th>Frequency</th>
-							<th>Type</th>
+							<th>Class</th>
 							<th>Name</th>
 							<th>Bundle</th>
 							<th>Type</th>

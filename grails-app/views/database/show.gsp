@@ -61,7 +61,7 @@
 				<thead>
 					<tr>
 						<th>Frequency</th>
-						<th>Type</th>
+						<th>Class</th>
 						<th>Name</th>
 						<th>Bundle</th>
 						<th>Type</th>
@@ -102,7 +102,7 @@
 				<thead>
 					<tr>
 						<th>Frequency</th>
-						<th>Type</th>
+						<th>Class</th>
 						<th>Name</th>
 						<th>Bundle</th>
 						<th>Type</th>
