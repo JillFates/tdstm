@@ -16,7 +16,14 @@ import com.tdssrc.grails.TimeUtil
 class UserPreferenceService  {
 
 	static transactional = true
+	def securityService
+	
     protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
+	
+	// defaults holds global defaults for certain values 
+	// TODO - load these from application settings
+	protected static defaults = ['CURR_TZ':'EST']
+	
 	/*
      * Return current session object
      */
@@ -52,7 +59,31 @@ class UserPreferenceService  {
      * Method will access the map stored into the user's session and 
      * return the value if found otherwise return null
      */
-   
+    def String get( String preferenceCode ) {
+		def value = null
+		def userLogin = securityService.getUserLogin()
+		if (userLogin) {
+			def userPref = UserPreference.findByUserLoginAndPreferenceCode( userLogin, preferenceCode)
+			if (userPref) {
+				value = userPref.value
+			}
+		}
+		
+		if (value == null && defaults.containsKey(preferenceCode)) {
+			value = defaults[preferenceCode]
+			// log.info "user preference $preferenceCode=$value from defaults"
+		}
+		
+		// log.info "user preference $preferenceCode=$value"
+		return value
+    }
+
+	/* 
+	 * Reads the preference stored in the database for a user instead of the mess that is going on with  
+	 * the getPreference()
+	 * @param String preferenceCode
+	 * @return String the user's saved preference or null if not found
+	 */
     def String getPreference( String preferenceCode ) {
     	loadPreferences(preferenceCode)
     	def currProj = getSession().getAttribute( preferenceCode )
@@ -63,8 +94,10 @@ class UserPreferenceService  {
 		// log.info "getPreference: preferenceCode=$preferenceCode, currProj=$currProj, prefValue=$prefValue"
     	return prefValue
     }
+	
+	
     /*
-     * Method will remove the user preference record for selected preferenceCode and loginUser
+ 	 * Method will remove the user preference record for selected preferenceCode and loginUser
      */
    
     def removePreference( String preferenceCode ) {

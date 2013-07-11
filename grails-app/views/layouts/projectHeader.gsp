@@ -9,11 +9,18 @@
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.core.css')}" />
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.dialog.css')}" />
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
+    <%-- 
+    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.min.css')}" />
+    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.responsive.min.css')}" />
+    --%>
     <link rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
 
     <g:javascript library="prototype" />
     <jq:plugin name="jquery.combined" />
     <g:javascript src="crawler.js" />
+    <%--
+    <g:javascript src="bootstrap/bootstrap.min.js" /> 
+    --%>
     <g:layoutHead />
    
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dropDown.css')}" />    
@@ -136,6 +143,7 @@
 							<li><g:link class="mmlink" controller="partyGroup" action="list" params="[active:'active',tag_s_2_name:'asc']" id="${partyGroup}" onclick="hideMegaMenu('adminMegaMenu')">List Companies</g:link></li>
 							<li><g:link class="mmlink" controller="person" id="${partyGroup}" onclick="hideMegaMenu('adminMegaMenu')">List Staff</g:link></li>
 							<li><g:link class="mmlink" controller="userLogin" id="${partyGroup}" onclick="hideMegaMenu('adminMegaMenu')">List Users</g:link></li>
+							<li><g:link class="mmlink" controller="admin" action="importAccounts" onclick="hideMegaMenu('adminMegaMenu')">Import Accounts</g:link></li>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMCreatePerson?cover=print','help');" onclick="hideMegaMenu('adminMegaMenu')">help</a></li>
 							</tds:hasPermission>

@@ -31,6 +31,15 @@ class SecurityFilters {
 			}
 		}
 
+		// Access to the Admin controll requires ADMIN role 
+		crud(controller: "admin", action: "*") {
+			before = {
+				accessControl {
+					role("ADMIN")
+				}
+			}
+		}
+
 		// Check to see if the userLogin has forcePasswordChange set and only allow him to access appropriate actions
 		checkForcePasswordChange(controller:'*', action:'*'){
 			before = {

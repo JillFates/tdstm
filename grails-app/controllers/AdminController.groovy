@@ -1,17 +1,27 @@
 import grails.converters.JSON
 
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.codehaus.groovy.runtime.TimeCategory
+import org.apache.commons.lang.math.NumberUtils
 
 import com.tds.asset.AssetEntity
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.GormUtil
+
 class AdminController {
 	def jdbcTemplate
 	def sessionFactory
+	def securityService
+	def partyRelationshipService 
+	def userPreferenceService   
+
+
     def index = { }
-    
+
+
     def orphanSummary = {
 		def summaryRecords = []
 		def orphanParty = """SELECT party_id as party_id FROM party p where p.party_id not in
@@ -1087,10 +1097,211 @@ class AdminController {
 		}
 		def msg = deletedTypes ? "Removed ${deletedTypes.size()} unused Types: ${WebUtil.listAsMultiValueString(deletedTypes)}" : ""
 		render msg
-	}	
+	}
+
+	/**
+	 * Just a sample of the Twitter Bootstrap implementation
+	 */
 	def bootstrap ={
 		def contextPath = request.contextPath
 		return [contextPath:contextPath]
 	}
 	
+
+	/**
+	 * A controller process to import user accounts
+	 */
+	def importAccounts = {
+
+		def people
+
+		def project = securityService.getUserCurrentProject()
+
+		def map = [step:'start', projectName:project.toString() ]
+ 
+		def filename = '/tmp/tdstm-account-import.csv'
+
+		// Inline closure to parse the CSV file and return array of mapped fields
+		def parseCsv = {file, header ->
+			def first = true
+			people = []
+			file.splitEachLine(",") { fields ->
+				if (first && header) {
+					first = false
+				} else {
+					people.add(
+						username: fields[0],
+						firstName: fields[1],
+						middleName: fields[2],
+						lastName: fields[3],
+						email: fields[7],
+						phone: fields[4]
+					)
+				}
+			}
+			return people
+		}
+
+		def lookForMatches = { 
+			def staff = partyRelationshipService.getCompanyStaff( project.client.id )
+			def matches = []
+			// Look over the people and try to find them in the system and then mark them as existing if they are.
+			for (int i=0 ; i < people.size; i++) {
+
+				def person = staff.find {
+					it.firstName == people[i].firstName &&
+					(it.lastName == people[i].lastName || ( ! it.lastName && ! people[i].lastName)) &&
+					(it.middleName == people[i].middleName || ( ! it.middleName && ! people[i].middleName))
+				} 
+
+				if (person) {
+					people[i].match = 'person'
+					matches << people[i]
+
+				} else {
+					if (people[i].username) {
+						def user = UserLogin.findByUsername(people[i].username)
+						if (user) {
+							people[i].match = 'username:'+user.id 
+							matches << people[i]
+						}
+					}
+				}
+			}
+			return matches
+		}
+
+		switch (params.step) {
+
+			case 'upload':
+				if (params.verifyProject != 'Y') {
+					flash.message = "You must confirm the project to import into before continuing"
+					return map
+				}
+				
+				// Handle the file upload
+				def f = request.getFile('myFile')
+				if (f.empty) {
+					flash.message = 'Upload file appears to be empty'
+					return map
+				}
+
+				// Save for step 3
+				def upload = new File('/tmp/tdstm-account-import.csv')
+				// upload.delete()
+				f.transferTo(upload)
+				def header = params.header == 'Y'
+
+				people = parseCsv(upload, header)
+				map.matches = lookForMatches()
+				map.people = people
+				map.step = 'review'
+				map.header = params.header
+
+				break
+
+			case 'post':
+
+				def createUserLogin = params.createUserlogin == 'Y'
+				def activateLogin = params.activateLogin == 'Y'
+				def randomPassword = params.randomPassword == 'Y'
+				def forcePasswordChange = params.forcePasswordChange == 'Y'
+				def password = params.password
+				def expireDays = NumberUtils.toInt(params.expireDays,90)
+				def header = params.header == 'Y'
+				def role = createUserLogin ? params.role : ''
+
+				def csv = new File('/tmp/tdstm-account-import.csv')
+
+				people = parseCsv(csv, header)
+				lookForMatches()
+
+				if (password) {
+					password = securityService.encrypt(password)
+				}
+
+				def expiryDate = new Date()
+
+				use(TimeCategory) {
+					expiryDate = expiryDate + expireDays.days
+				}
+				log.info "expiryDate=$expiryDate"
+
+				def failedPeople = []
+				def created = 0
+
+				people.each() { p -> 
+					if (! p.match ) {
+						def failed = false
+						def person = new Person(
+							firstName:p.firstName, 
+							middleName:p.middleName, 
+							lastName:p.lastName,
+							email:p.email,
+							workPhone: p.phone,
+							staffType: 'Salary'
+							)
+					
+						if (person.validate() && person.save(flush:true)) {
+							log.info "importAccounts() : created person $person"
+		 					partyRelationshipService.addCompanyStaff(project.client, person)
+
+		 					if (createUserLogin && p.username) {
+		 						def u = new UserLogin(
+		 							username: p.username,
+		 							password: password,
+		 							active: (activateLogin ? 'Y' : 'N'),
+		 							expiryDate: expiryDate,
+		 							person: person
+		 							)
+
+		 						if (! u.validate() || !u.save(flush:true)) {
+		 							p.error = GormUtil.allErrorsString(u)
+		 							failedPeople << p
+		 							failed = true
+		 						} else {
+		 							if (role) {
+		 								log.info "importAccounts() : creating Role $role for $person"
+			 							userPreferenceService.setUserRoles([role], person.id)
+									}
+
+		 							log.info "importAccounts() : created UserLogin $u"
+		 							def up = new UserPreference(
+		 								userLogin: u,
+		 								preferenceCode: 'CURR_PROJ',
+		 								value: project.id.toString()
+		 							)
+		 							if (! up.validate() || ! up.save()) {
+		 								log.error "importAccounts() : failed creating User Preference for $person : " + GormUtil.allErrorsString(up)
+		 								p.error = "Setting Default Project Errored"
+		 								failedPeople << p
+		 							}
+		 						}
+		 					}
+						} else {
+							p.error = GormUtil.allErrorsString(person)
+							failedPeople << p
+							failed = true
+						}
+
+						if (! failed) created++
+
+					}
+
+				} // people.each
+
+
+				map.step = 'results'
+				map.failedPeople = failedPeople
+				map.created = created
+				break
+
+			default: 
+				break
+
+		} // switch
+
+		return map
+
+	}
 }

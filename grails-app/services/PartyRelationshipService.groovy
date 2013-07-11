@@ -137,6 +137,15 @@ class PartyRelationshipService {
 	
 	}
 
+	/* 
+	 * Used to assign a person to a compnay
+	 * @param Party company
+	 * @param Person person to assign
+	 */
+	def addCompanyStaff( company, person ) {
+		updatePartyRelationshipPartyIdFrom("STAFF", company, 'COMPANY', person, "STAFF")
+	}
+
 	/*
 	 *  Method to Update  the roleTypeTo 
 	 */
@@ -634,7 +643,9 @@ class PartyRelationshipService {
 	  * @return void
 	  */
 	 def updatePartyRoleByType( type, person, assignedRoles ){
-		def existingRoles = PartyRole.findAll("from PartyRole where party = :person and roleType.description like '${type}%' and roleType.id not in (:roles) group by roleType",[roles:assignedRoles, person:person])?.roleType
+		def existingRoles = PartyRole.findAll(
+			"from PartyRole where party = :person and roleType.description like '${type}%' and roleType.id not in (:roles) group by roleType",
+			[roles:assignedRoles, person:person])?.roleType
 		if(existingRoles){
 			PartyRole.executeUpdate("delete from PartyRole where party = '$person.id' and roleType in (:roles)",[roles:existingRoles])
 		}

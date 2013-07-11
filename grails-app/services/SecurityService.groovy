@@ -7,6 +7,7 @@
 import javax.servlet.http.HttpSession
 import org.springframework.web.context.request.RequestContextHolder
 import org.apache.shiro.SecurityUtils
+import org.apache.shiro.crypto.hash.Sha1Hash
 import com.tdsops.tm.enums.domain.RoleTypeGroup
  
  class SecurityService {
@@ -177,5 +178,16 @@ import com.tdsops.tm.enums.domain.RoleTypeGroup
 		}
 		return score == 3
 	}
+
+	/** 
+	 * Encrypts a clear text password
+	 * @param String password
+	 * @return String Encripted passsword
+	 */
+
+	 String encrypt(String text) {
+	 	def etext = new Sha1Hash(text).toHex()
+	 	return etext.toString()
+	 }
 	
 }
