@@ -331,7 +331,7 @@ class MoveBundleService {
 
 		 // Find all move bundles that are flagged for Planning in the project and then get all assets in those bundles
 		 String moveBundleText = MoveBundle.findAllByUseOfPlanningAndProject(true,projectInstance).id
-		 moveBundleText = moveBundleText.replace("[",'').replace("]",'')
+		 moveBundleText = GormUtil.asCommaDelimitedString(moveBundleText)
 
 		 // Get array of moveBundle ids
 		 def moveBundleList = moveBundleText.replaceAll(', ',',').tokenize(',')
@@ -341,7 +341,7 @@ class MoveBundleService {
 		 if(moveBundleText){
 			 // Query to fetch dependent asset list with dependency type and status and move bundle list with use for planning .
 		 def queryForAssets = """SELECT a.asset_entity_id as assetId FROM asset_entity a
-			LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id Or ad.dependent_id = a.asset_entity_id
+			LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id OR ad.dependent_id = a.asset_entity_id
 			WHERE a.asset_type in ${assetTypeList}
 				AND a.move_bundle_id in (${moveBundleText}) """
 		 queryForAssets += connectionTypes == 'null' ? "" : " AND ad.type in (${connectionTypes}) "
@@ -496,40 +496,17 @@ class MoveBundleService {
 		     where sadb.project_id=$projectId and sadb.dependency_bundle = adb.dependency_bundle
 		   ) as needsReview
 		   
-		from asset_dependency_bundle adb
-		join asset_entity a ON a.asset_entity_id=adb.asset_id
-		where adb.project_id=${projectId}
+		FROM asset_dependency_bundle adb
+		JOIN asset_entity a ON a.asset_entity_id=adb.asset_id
+		WHERE adb.project_id=${projectId}
 		GROUP BY adb.dependency_bundle
 		ORDER BY adb.dependency_bundle"""
 
 		def dependList = jdbcTemplate.queryForList(depSql)
 
 		// log.info "dependencyConsoleMap() : dependList[0]"
- 		log.info "dependencyConsoleMap() : stats=$stats}"
+ 		// log.info "dependencyConsoleMap() : stats=$stats}"
 
-		/*
-		 	dependencyBundle:0, 
-		 	assetCnt:239, 
-		 	moveBundles:1415,283,624, 
-		 	statusAssigned:0, 
-		 	notBundleReady:239, 
-		 	serverCount:236, 
-		 	vmCount:0, 
-		 	storageCount:0, 
-		 	dbCount:0, 
-		 	appCount:3, 
-		 	needsReview:0]
-		*/
-
-/*
-1. If any asset has a bundle conflict, use .depGroupConflict. 
-depGroupConflict should override all else (so you don't need to continue loop if it helps)
-2. If all are assets are "Assigned" use .depGroupDone
-depGroupDone should override depgroupReady as most of the time assigned will be BundleReady
-so if all assets are assigned, ignore the validation status
-3. If all assets are "BundleReady" use .depGroupReady (if any aren't BundleReady, no need to continue to check on that loop)
-Bundle Conflict is if the (Status = Unknown or Validated) AND the bundles are not the same for both assets.
-*/
 		dependList.each { group ->
 			def statusClass = ''
 			if ( group.moveBundles?.contains(',') || group.needsReview > 0 ) {
@@ -586,11 +563,12 @@ Bundle Conflict is if the (Status = Unknown or Validated) AND the bundles are no
 			time = formatter.format(date)
 		}
 
-		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance,true)
-		// def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		// Used by the Assignment Dialog
+		def planningMoveBundles = MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance,true)
+		def allMoveBundles = MoveBundle.findAllByProject(projectInstance)
+		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		// def assetDependentlist = AssetDependencyBundle.findAllByProject(projectInstance)?.sort{it.dependencyBundle}
 				 
-		def moveBundles = MoveBundle.findAllByProject(projectInstance)
 		 
 		// JPM - don't think that this is required
 		// def personList = partyRelationshipService.getCompanyStaff( projectInstance.client?.id )
@@ -604,23 +582,23 @@ Bundle Conflict is if the (Status = Unknown or Validated) AND the bundles are no
 			asset:'apps',
 			date:time,
 
-			// assetDependencyList: 	assetDependencyList, 
 			dependencyType: 		entities.dependencyType, 
 			dependencyConsoleList: 	dependencyConsoleList,
 			dependencyStatus: 		entities.dependencyStatus, 
 			assetDependency: 		new AssetDependency(), 
-			// dependencyBundleCount: 	assetDependencyList.size(),
-			moveBundle: moveBundleList, 
-			allMoveBundles:moveBundles, 
-			// planStatusOptions: planStatusOptions,
+			moveBundle: planningMoveBundles, 
+			allMoveBundles: allMoveBundles, 
+			planStatusOptions: planStatusOptions,
 
+			gridStats:stats
+
+			//assetDependencyList: 	assetDependencyList, 
+			//dependencyBundleCount: 	assetDependencyList.size(),
 			//servers: entities.servers, 
 			//applications: entities.applications, 
 			//dbs: entities.dbs, 
 			//files: entities.files,
 			//networks:entities.networks,
-
-			gridStats:stats
 
 			// totalCompanies:companiesList,
 			// personList:personList, 
