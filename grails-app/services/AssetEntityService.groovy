@@ -514,7 +514,7 @@ class AssetEntityService {
 	 * @param stripPrefix : if true or not specified, the function will remove the # or @ character from the string
 	 * @return : value to display
 	 */
-	def ResolveByName(byValue, stripPrefix = true) {
+	def resolveByName(byValue, stripPrefix = true) {
 		def byObj = ''
 		if(byValue) {
 			if (byValue.isNumber()) {
