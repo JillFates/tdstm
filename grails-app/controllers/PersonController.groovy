@@ -1187,10 +1187,6 @@ class PersonController {
 				toPerson."${prop}" = fromPerson."${prop}"
 			}
 		}
-		def expDateFromPerson = ExceptionDates.findAllByPerson(fromPerson).exceptionDay
-		expDateFromPerson.each{
-			def expDay = new ExceptionDates('exceptionDay':it, person:toPerson).save(flush:true)
-		}
 		
 		if(!toPerson.save(flush:true)){
 			toPerson.errors.allErrors.each{println it}
@@ -1255,15 +1251,16 @@ class PersonController {
 	 * @return
 	 */
 	def updatePersonReference(fromPerson, toPerson){
-		def domainRelatMap = ['application':['sme_id','sme2_id'], 'asset_comment':['resolved_by', 'created_by', 'assigned_to_id'], 
-			'asset_dependency':['created_by','updated_by'], 'asset_entity':['app_owner_id'], 'comment_note':['created_by_id'],
+		def domainRelatMap = ['application':['sme_id', 'sme2_id', 'shutdown_by', 'startup_by', 'testing_by'], 
+			'asset_comment':['resolved_by', 'created_by', 'assigned_to_id'], 'comment_note':['created_by_id'],
+			'asset_dependency':['created_by','updated_by'], 'asset_entity':['app_owner_id'],
 			'exception_dates':['person_id'], 'model':['created_by', 'updated_by', 'validated_by'],
 			'model_sync':['created_by_id', 'updated_by_id', 'validated_by_id'], 'move_event_news':['archived_by', 'created_by'],
 			'move_event_staff':['person_id'], 'workflow':['updated_by']]
 		
 		domainRelatMap.each{key, value->
 			value.each{prop->
-				jdbcTemplate.update("UPDATE ${key} SET ${prop} = ${toPerson.id} where ${prop}=${fromPerson.id}")
+				jdbcTemplate.update("UPDATE ${key} SET ${prop} = '${toPerson.id}' where ${prop}= '${fromPerson.id}'")
 			}
 		}
 	}

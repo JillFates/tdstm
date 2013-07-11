@@ -656,7 +656,7 @@ class PartyRelationshipService {
 		def functionQuery = "from PartyRelationship where partyRelationshipType = :type and partyIdTo =:person and roleTypeCodeTo != :roleTypeCodeTo"
 		if(!functionIds){
 			def existingFuncToDelete = PartyRelationship.findAll(functionQuery, 
-				[type:prType, partyIdFrom:partyIdFrom, person:person,roleTypeCodeTo:roleTypeCodeTo ])
+				[type:prType, person:person,roleTypeCodeTo:roleTypeCodeTo ])
 			PartyRelationship.withNewSession { existingFuncToDelete*.delete() }
 			return;
 		}
