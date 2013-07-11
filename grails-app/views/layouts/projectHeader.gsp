@@ -119,7 +119,7 @@
 					<td style="vertical-align:top" nowrap="nowrap"><span class="megamenuSection">Administration</span><br />
 						<ul >
 							<li><g:link class="mmlink" controller="auth" action="home" onclick="hideMegaMenu('adminMegaMenu')">Admin Portal</g:link> </li>
-							<tds:hasPermission permission='HelpMenuView'>
+							<tds:hasPermission permission='RolePermissionView'>
 							<li><g:link class="mmlink" controller="permissions" action="show" onclick="hideMegaMenu('adminMegaMenu')">Role Permissions</g:link> </li>
 							</tds:hasPermission>
 							<li><g:link class="mmlink" controller="assetEntity" action="assetOptions" onclick="hideMegaMenu('adminMegaMenu')">Asset Options</g:link> </li>

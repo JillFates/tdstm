@@ -8,24 +8,34 @@ class PermissionsController {
 	}
 	
 	def show = {
-		def permissions = Permissions.withCriteria {
-			and {
-			   order('permissionGroup','asc')
-			   order('permissionItem','asc')
+		if(RolePermissions.hasPermission("RolePermissionView")){
+			def permissions = Permissions.withCriteria {
+				and {
+				   order('permissionGroup','asc')
+				   order('permissionItem','asc')
+				}
 			}
+			def rolePermissions = RolePermissions.list()
+			[permissions:permissions]
+		} else {
+			flash.message = "You don't have permission to access Permission List"
+			redirect(controller:'project', action: 'list')
 		}
-		def rolePermissions = RolePermissions.list()
-		[permissions:permissions]
 	} 
 	
 	def edit = {
-		def permissions = Permissions.withCriteria {
-			and {
-			   order('permissionGroup','asc')
-			   order('permissionItem','asc')
+		if(RolePermissions.hasPermission("RolePermissionView")){
+			def permissions = Permissions.withCriteria {
+				and {
+				   order('permissionGroup','asc')
+				   order('permissionItem','asc')
+				}
 			}
+			[permissions:permissions]
+		} else {
+			flash.message = "You don't have permission to access Permission List"
+			redirect(controller:'project', action: 'list')
 		}
-		[permissions:permissions]
 	}
 	
 	def update = {
