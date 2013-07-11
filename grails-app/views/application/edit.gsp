@@ -211,7 +211,7 @@
 								</td>
 								<td class="label ${config.shutdownDuration}" nowrap="nowrap"><label for="shutdownDuration">Shutdown Duration </label>
 								</td>
-								<td ><input type="text" id="shutdownDuration" name="shutdownDuration"
+								<td ><input type="text" id="shutdownDurationEdit" name="shutdownDuration"
 											value="${applicationInstance.shutdownDuration}" tabindex="55" size="7"/>m
 								</td>
 							</tr>
@@ -225,7 +225,7 @@
 								</td>
 								<td class="label ${config.startupDuration}" nowrap="nowrap"><label for="startupDuration">Startup Duration </label>
 								</td>
-								<td ><input type="text" id="startupDuration" class="${config.startupDuration}" name="startupDuration"
+								<td ><input type="text" id="startupDurationEdit" class="${config.startupDuration}" name="startupDuration"
 											value="${applicationInstance.startupDuration}" tabindex="55" size="7" />m
 								</td>
 								
@@ -239,7 +239,7 @@
 								</td>
 								<td class="label ${config.testingDuration}" nowrap="nowrap"><label for="testingDuration">Testing Duration </label>
 								</td>
-								<td ><input type="text" id="testingDuration" class="${config.testingDuration}" name="testingDuration"
+								<td ><input type="text" id="testingDurationEdit" class="${config.testingDuration}" name="testingDuration"
 											value="${applicationInstance.testingDuration}" tabindex="55"  size="7"/>m
 								</td>
 							</tr>
@@ -305,6 +305,10 @@
 		if($("#sme1Edit").val()=='0' || $("#sme2Edit").val()=='0' || $("#appOwnerEdit").val()=='0'){
 			flag = false
 			alert("Please De-select 'Add-Person' Option from sme , sme2 or appOwner select")
+			return flag
+		} else if (isNaN($("#shutdownDurationEdit").val()) || isNaN($("#startupDurationEdit").val()) || isNaN($("#testingDurationEdit").val())){
+			flag = false
+			alert("Please enter numeric value for Shutdown Duration, Startup Duration, Testing Duration ")
 			return flag
 		}
 		return flag
