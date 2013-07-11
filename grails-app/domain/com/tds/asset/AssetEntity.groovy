@@ -245,7 +245,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	}
 
 	// Need to indicate the getters that would otherwise be mistaken as db properties
-	static transients = ['modelName', 'moveBundleName', 'conflictCount', 'depUp', 'depDown']
+	static transients = ['modelName', 'moveBundleName', 'conflictCount', 'depUp', 'depDown', 'depToResolve', 'depToConflict']
 
 	/*
 	 * Date to insert in GMT
@@ -384,8 +384,11 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	 * @return
 	 */
 	def getDepToResolve(){
-		return AssetDependency.countByAssetAndStatusInList(this, 
-			[AssetDependencyStatus.QUESTIONED,AssetDependencyStatus.UNKNOWN])
+		return AssetDependency.findAll(" FROM AssetDependency ad \
+				WHERE (ad.status IN (:status)) AND (ad.asset=:asset OR ad.dependent=:asset)",
+				[asset:this, status:[AssetDependencyStatus.UNKNOWN, AssetDependencyStatus.QUESTIONED]]).size()
+		/*return AssetDependency.countByAssetAndStatusInList(this, 
+			[AssetDependencyStatus.QUESTIONED,AssetDependencyStatus.UNKNOWN])*/
 	}
 	
 	/**

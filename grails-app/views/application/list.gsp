@@ -56,9 +56,9 @@ $(document).ready(function() {
                   {name:'validation', editable: true, width:'200'},
                   {name:'planStatus', editable: true}, 
                   {name:'moveBundle', editable: true},
-                  {name:'depNumber', editable: false,sortable:false,search:false},
-                  {name:'depResolve', editable: false,sortable:false,search:false },
-                  {name:'depConflicts', editable: false,sortable:false,search:false},
+                  {name:'depNumber', editable: true},
+                  {name:'depResolve', editable: true},
+                  {name:'depConflicts', editable: true},
                   {name:'id', hidden: true},
                   {name:'commentType', hidden: true} "
     sortname="'assetName'"

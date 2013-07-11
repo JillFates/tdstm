@@ -13,6 +13,7 @@ import com.tds.asset.AssetType
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enums.domain.AssetDependencyStatus
 
 class ApplicationController {
 	def partyRelationshipService
@@ -20,6 +21,7 @@ class ApplicationController {
 	def taskService
 	def securityService
 	def userPreferenceService
+	def jdbcTemplate
 	
 	def index = {
 		redirect(action:list,params:params)
@@ -60,6 +62,7 @@ class ApplicationController {
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		def project = securityService.getUserCurrentProject()
+		def filterParams = ['assetName':params.assetName, 'sme':params.sme, 'validation':params.validation, 'planStatus':params.planStatus,'moveBundle':params.moveBundle, 'depNumber':params.depNumber,'depResolve':params.depResolve,'depConflicts':params.depConflicts]
 		
 		def moveBundleList = []
 		session.APP = [:]
@@ -73,76 +76,51 @@ class ApplicationController {
 		
 		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
 		
-		def apps = Application.createCriteria().list(max: maxRows, offset: rowOffset) {
-			eq("project", project)
-			eq("assetType",  AssetType.APPLICATION.toString() )
-			if (params.assetName)
-				ilike('assetName', "%${params.assetName}%")
-			if (params.sme)
-				ilike('sme', "%${params.sme}%")
-			if (params.validation)
-				ilike('validation', "%${params.validation}%")
-			if (params.planStatus)
-				ilike('planStatus', "%${params.planStatus}%")
-			if (bundleList)
-				'in'('moveBundle', bundleList)
-			if(params.plannedStatus)
-				eq("planStatus", params.plannedStatus)
-				
-			if(params.moveBundleId){
-				if(params.moveBundleId =='unAssigned'){
-					isNull('moveBundle')
+		def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
+		def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
+		
+		def query = new StringBuffer("""SELECT * FROM ( SELECT a.app_id AS appId, ae.asset_name AS assetName, 
+			CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS sme, ae.validation AS validation, 
+			ae.new_or_old AS planStatus, mb.name AS moveBundle, adb.dependency_bundle AS depNumber, 
+			COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, 
+			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts 
+			FROM application a 
+			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id 
+			LEFT OUTER JOIN person p ON a.sme_id=p.person_id 
+			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
+			LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
+			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 
+			LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN (${unknownQuestioned}) 
+			LEFT OUTER JOIN asset_dependency adc ON ae.asset_entity_id = adc.asset_id AND adc.status IN (${validUnkownQuestioned}) 
+				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.dependent_id) != mb.move_bundle_id 
+			LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN (${validUnkownQuestioned}) 
+				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id 
+			WHERE ae.project_id = ${project.id} 
+			GROUP BY app_id ORDER BY """ + sortIndex + " " + sortOrder + """
+			) AS apps""")
+		
+		// Handle the filtering by each column's text field
+		def firstWhere = true
+		filterParams.each {
+			if(it.getValue())
+				if(firstWhere){
+					query.append(" WHERE apps.${it.getKey()} LIKE '%${it.getValue()}%'")
+					firstWhere = false
 				} else {
-					eq('moveBundle', MoveBundle.read(params.moveBundleId))
+					query.append(" AND apps.${it.getKey()} LIKE '%${it.getValue()}%'")
 				}
-			}
-			
-			if(params.filter){
-				or{
-					and {
-						'in'('moveBundle', moveBundleList)
-					}
-					and {
-						isNull('moveBundle')
-					}
-				}
-				
-				if( params.validationFilter)
-					eq ('validation', params.validationFilter)
-				
-			    if( params.latency && params.latency =='unknown'){
-					or{
-						and {
-							eq('latency', '')
-						}
-						and {
-							isNull('latency')
-						}
-					}
-				} else if ( params.latency && params.latency !='unknown') {
-					eq('latency', params.latency)
-				}
-				
-				if(params.plannedStatus)
-					eq("planStatus", params.plannedStatus)
-				
-			}
-
-			order(sortIndex, sortOrder).ignoreCase()
 		}
-
-		def totalRows = apps.totalCount
+			
+		def appsList = jdbcTemplate.queryForList(query.toString())
+		
+		def totalRows = appsList.size()
 		def numberOfPages = Math.ceil(totalRows / maxRows)
-
-		def results = apps?.collect { [ cell: ['',it.assetName, (it.sme ? it.sme.toString() : ''), it.validation, it.planStatus,
-					it.moveBundle?.name, AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
-					(it.depToResolve ?it.depToResolve:''),(it.depToConflict ?it.depToConflict:''),
-					AssetDependency.countByAssetAndStatusNotEqual(it, "Validated"),
-					AssetComment.find("from AssetComment ac where ac.assetEntity=:entity and commentType=:type and status!=:status",
-					[entity:it, type:'issue', status:'completed']) ? 'issue' :
-					(AssetComment.find("from AssetComment ac where ac.assetEntity=:entity",[entity:it]) ? 'comment' : 'blank'),
-					it.assetType], id: it.id,
-			]}
+		
+		def results = appsList?.collect { [ cell: [
+			'',it.assetName, (it.sme ?: ''), it.validation, it.planStatus, it.moveBundle, 
+			it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,
+			(it.commentStatus!='completed' && it.commentType=='issue')?('issue'):(it.commentType?:'blank'),	it.assetType
+		], id: it.appId]}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 
