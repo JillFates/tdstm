@@ -2,8 +2,6 @@ import grails.converters.JSON
 
 import java.text.SimpleDateFormat
 
-import org.jmesa.facade.TableFacade
-import org.jmesa.facade.TableFacadeImpl
 import org.apache.commons.lang.StringUtils
 
 import com.tds.asset.Application

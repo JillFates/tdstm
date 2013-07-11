@@ -11,8 +11,6 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 	<jqui:resources />
 	<jqgrid:resources />
-	<link rel="stylesheet" type="text/css" href="${resource(dir:"plugins/jmesa-0.8/css",file:"jmesa.css")}" />
-	<script language="javascript" src="${resource(dir:"plugins/jmesa-0.8/js",file:"jmesa.js")}"></script>
 	<g:javascript src="projectStaff.js" />
 	<g:javascript src="person.js" />
 	<script type="text/javascript">

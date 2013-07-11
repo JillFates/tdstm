@@ -3,8 +3,6 @@ import grails.converters.JSON
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
-import net.tds.util.jmesa.PersonBean
-
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.crypto.hash.Sha1Hash
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass

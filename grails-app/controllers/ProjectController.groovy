@@ -5,9 +5,6 @@ import grails.converters.JSON
 import java.text.SimpleDateFormat
 
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.jmesa.facade.TableFacade
-import org.jmesa.facade.TableFacadeImpl
-import org.jmesa.limit.Limit
 
 import com.tds.asset.FieldImportance
 import com.tdsops.tm.enums.domain.EntityType

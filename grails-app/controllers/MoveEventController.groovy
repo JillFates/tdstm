@@ -13,8 +13,6 @@ import org.apache.commons.lang.StringUtils
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.jmesa.facade.TableFacade
-import org.jmesa.facade.TableFacadeImpl
 
 import com.tds.asset.Application
 import com.tds.asset.AssetComment

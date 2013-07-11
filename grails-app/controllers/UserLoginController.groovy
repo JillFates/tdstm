@@ -1,4 +1,3 @@
-import net.tds.util.jmesa.AssetEntityBean
 import org.apache.shiro.crypto.hash.Sha1Hash;
 import org.apache.shiro.SecurityUtils;
 import com.tdssrc.grails.GormUtil

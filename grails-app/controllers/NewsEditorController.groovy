@@ -4,11 +4,7 @@ import grails.converters.JSON
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
-import net.tds.util.jmesa.NewsEditorBean
-
 import org.apache.shiro.SecurityUtils
-import org.jmesa.facade.TableFacade
-import org.jmesa.facade.TableFacadeImpl
 
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
