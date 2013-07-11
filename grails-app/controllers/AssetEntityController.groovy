@@ -802,16 +802,13 @@ class AssetEntityController {
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername(principal)
 		def bundleSize = bundle.size()
+		
+		bundleNameList.append(bundle[0] != "" ? (bundleSize==1 ? MoveBundle.read( bundle[0] ).name : bundleSize+'Bundles') : 'All')		
 		for ( int i=0; i< bundleSize ; i++ ) {
-			if( bundle[i] == "" ) {
-				bundleNameList.append("ALL")
-			} else if( i != bundleSize - 1) {
-				bundleNameList.append( MoveBundle.findById( bundle[i] ) )
-				bundleNameList.append( "," )
+			if( i != bundleSize - 1) {
 				bundleList.append( bundle[i] + "," )
 			} else {
 				bundleList.append( bundle[i] )
-				bundleNameList.append( MoveBundle.findById( bundle[i] )?.name )
 			}
 		}
 		def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
@@ -857,10 +854,10 @@ class AssetEntityController {
 			def exportType = filenametoSet.split("/")[2]
 			exportType = exportType.substring(0,exportType.indexOf("_template.xls"))
 			SimpleDateFormat fileFormat = new SimpleDateFormat("yyyy-MM-dd");
-			def exportDate = fileFormat.format(TimeUtil.nowGMT())
-			def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString().replace(" ","_")+"-"+exportDate
-			response.setContentType( "application/vnd.ms-excel" )
-			response.setHeader( "Content-Disposition", "attachment; filename=\""+exportType+'-'+filename+".xls\"" )
+			SimpleDateFormat exportFileFormat = new SimpleDateFormat("yyyyMMdd");
+			def exportDate = exportFileFormat.format(TimeUtil.nowGMT())
+			def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString()
+			response.setContentType( "application/vnd.ms-excel" )			
 			//create workbook and sheet
 			book = Workbook.createWorkbook( response.getOutputStream(), workbook )
 			def serverSheet
@@ -871,6 +868,7 @@ class AssetEntityController {
 			def dependencySheet
 			def roomSheet
 			def rackSheet
+			def exportedEntity = ""
 
 			def serverMap = [:]
 			def serverSheetColumnNames = [:]
@@ -1033,6 +1031,7 @@ class AssetEntityController {
 						}
 					}
 					if(params.asset=='asset'){
+						exportedEntity +="S"
 						for ( int r = 1; r <= assetSize; r++ ) {
 							//Add assetId for walkthrough template only.
 							if( serverSheetColumnNames.containsKey("assetId") ) {
@@ -1067,6 +1066,7 @@ class AssetEntityController {
 						}
 					}
 					if(params.application=='application'){
+						exportedEntity +="A"
 						for ( int r = 1; r <= appSize; r++ ) {
 							//Add assetId for walkthrough template only.
 							if( appSheetColumnNames.containsKey("appId") ) {
@@ -1104,6 +1104,7 @@ class AssetEntityController {
 						}
 					}
 					if(params.database=='database'){
+						exportedEntity +="D"
 						for ( int r = 1; r <= dbSize; r++ ) {
 							//Add assetId for walkthrough template only.
 							if( dbSheetColumnNames.containsKey("dbId") ) {
@@ -1133,6 +1134,7 @@ class AssetEntityController {
 						}
 					}
 					if(params.files=='files'){
+						exportedEntity +="F"
 						for ( int r = 1; r <= fileSize; r++ ) {
 							//Add assetId for walkthrough template only.
 							if( fileSheetColumnNames.containsKey("filesId") ) {
@@ -1163,6 +1165,7 @@ class AssetEntityController {
 					}
 					
 					if(params.dependency=='dependency'){
+						exportedEntity +="X"
 						def assetDependent = AssetDependency.findAll("from AssetDependency where asset.project = ? ",[project])
 						def dependencyMap = ['AssetId':1,'DependentId':2, 'Type':3, 'DataFlowFreq':4, 'DataFlowDirection':5, 'status':6, 'comment':7]
 						def dependencyColumnNameList = ['AssetId','DependentId', 'Type', 'DataFlowFreq', 'DataFlowDirection', 'status', 'comment']
@@ -1193,6 +1196,7 @@ class AssetEntityController {
 					}
 					//Export rooms
 					if(params.room=='room'){
+						exportedEntity +="R"
 						def formatter = new SimpleDateFormat("MM/dd/yyyy")
 						def rooms = Room.findAllByProject(project)
 						def roomSize = rooms.size()
@@ -1230,6 +1234,7 @@ class AssetEntityController {
 					
 					//Rack Exporting 
 					if(params.rack=='rack'){
+						exportedEntity +="r"
 						def racks = Rack.findAllByProject(project)
 						def rackSize = racks.size()
 						def rackMap = ['rackId':'id', 'Tag':'tag', 'Location':'location', 'Room':'room', 'RoomX':'roomX',
@@ -1298,6 +1303,8 @@ class AssetEntityController {
 						}
 					}
 				}
+				filename += "-"+exportedEntity+"-"+exportDate
+				response.setHeader( "Content-Disposition", "attachment; filename=\""+exportType+'-'+filename+".xls\"" )
 				book.write()
 				book.close()
 				render( view: "importExport" )
