@@ -3046,7 +3046,7 @@ class AssetEntityController {
 		return paramsMap
 	}
 
-	def update={
+	def update = {
 		
 		def attribute = session.getAttribute('filterAttr')
 		def filterAttr = session.getAttribute('filterAttributes')
@@ -3133,8 +3133,9 @@ class AssetEntityController {
 						forward(action:'show', params:[redirectTo:redirectTo, source:params.source, assetType:params.assetType])
 						break;
 					case "dependencyConsole":
-				        forward(action:'getLists', params:[entity: params.tabType,labelsList:params.labels,dependencyBundle:session.getAttribute("dependencyBundle")])
+				        forward(action:'getLists', params:[entity:params.tabType,labelsList:params.labels, dependencyBundle:session.getAttribute("dependencyBundle")])
 						break;
+
 					case "listTask":
 						render "Asset ${assetEntityInstance.assetName} updated."
 						break;
@@ -3690,6 +3691,11 @@ class AssetEntityController {
 		//log.error "getLists() : query for assetDependentlist took ${TimeUtil.elapsed(start)}"
 		// Took 0.296 seconds
 
+		// Save the group id into the session as it is used to redirect the user back after updating assets or doing assignments
+		session.setAttribute('dependencyBundle', params.dependencyBundle)
+		// TODO : This pig of a list should NOT be stored into the session and the logic needs to be reworked
+		session.setAttribute('assetDependentlist', assetDependentlist)
+
 		def stats = jdbcTemplate.queryForMap(depSql)
 
 		def model = [entity: (params.entity ?: 'apps'), stats:stats]
@@ -3864,9 +3870,10 @@ class AssetEntityController {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
 		def graphData = [:]
+
 		def assetDependentlist = session.getAttribute('assetDependentlist')
-		def labelList = params.labelsList
-		labelList = labelList.replace(" ","")
+
+		def labelList = params.labelsList?.replace(" ","")
 		List labels = labelList ?  labelList.split(",") : []
 		def force = params.force && params.force != 'undefined' ? Integer.parseInt(params.force) : -70
 		def distance = params.distance && params.distance != 'undefined' ? Integer.parseInt(params.distance) : 20
@@ -3961,6 +3968,8 @@ class AssetEntityController {
 		render(template:'map',model:[asset:'graph', force:force, distance:distance,friction:friction,height:height,width:width, labels:labels,eventColorCode:eventColorCode,file_name:file_name])
 		
 	}
+
+
 	/**
 	* Delete multiple  Assets.
 	*/

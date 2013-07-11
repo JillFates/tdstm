@@ -174,8 +174,6 @@ $(document).ready(function() {
 		$('#vm_'+id).addClass('vm_count')
 		$('#db_'+id).addClass('db_count')
 		$('#file_'+id).addClass('file_count')
-		
-		
 		 
 		switch(value){
 			case "server" :
