@@ -508,21 +508,19 @@ class AssetEntityService {
 	}
 	
 	/**
-	 * This app to get shutdownBy, startupBy, testingBy 's displaying value
-	 * @param byValue : application's shutdownBy, startupBy, testingBy
+	 * Resolves the display string for the shutdownBy, startupBy, testingBy fields by either
+	 * getting the name of the person or stripping the prefix for SME/AppOwner or Role
+	 * @param byValue : application's shutdownBy, startupBy, or testingBy raw value
+	 * @param stripPrefix : if true or not specified, the function will remove the # or @ character from the string
 	 * @return : value to display
 	 */
-	def getAppBy(byValue, addPrefix = true){
-		def byObj
-		if(byValue){
-			try{
+	def ResolveByName(byValue, stripPrefix = true) {
+		def byObj = ''
+		if(byValue) {
+			if (byValue.isNumber()) {
 				byObj = Person.read(Long.parseLong(byValue))
-			}catch(NumberFormatException nfe){
-				def roleType = RoleType.read(byValue)
-				if(addPrefix)
-					byObj = roleType ? "@ "+roleType.description.substring(roleType.description.lastIndexOf(':') +1).trim() : "# "+byValue
-				else
-					byObj = roleType ? roleType.description.substring(roleType.description.lastIndexOf(':') +1).trim() : byValue
+			} else {
+				byObj = ( stripPrefix && ['@','#'].contains(byValue[0])) ? byValue[1..-1] : byValue
 			}
 		}
 		return byObj

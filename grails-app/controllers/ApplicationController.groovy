@@ -215,9 +215,9 @@ class ApplicationController {
 			def validationType = assetEntity.validation
 			def configMap = assetEntityService.getConfig('Application',validationType)
 			
-			def shutdownBy = assetEntity.shutdownBy  ? assetEntityService.getAppBy(assetEntity.shutdownBy) : ''
-			def startupBy = assetEntity.startupBy  ? assetEntityService.getAppBy(assetEntity.startupBy) : ''
-			def testingBy = assetEntity.testingBy  ? assetEntityService.getAppBy(assetEntity.testingBy) : ''
+			def shutdownBy = assetEntity.shutdownBy  ? assetEntityService.resolveByName(assetEntity.shutdownBy) : ''
+			def startupBy = assetEntity.startupBy  ? assetEntityService.resolveByName(assetEntity.startupBy) : ''
+			def testingBy = assetEntity.testingBy  ? assetEntityService.resolveByName(assetEntity.testingBy) : ''
 			
 			
 			

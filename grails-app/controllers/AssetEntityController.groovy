@@ -1084,7 +1084,7 @@ class AssetEntityController {
 									def depGroup = assetDepBundleList.find{it.asset.id==application[r-1].id}?.dependencyBundle?.toString()
 									addContentToSheet = new Label(appMap[colName], r, depGroup?:"" )
 								}else if(colName in ["ShutdownBy","StartupBy","TestingBy"] ){
-									def byWhom = application[r-1].(appDTAMap.eavAttribute.attributeCode[coll]) ? String.valueOf(assetEntityService.getAppBy(application[r-1].(appDTAMap.eavAttribute.attributeCode[coll]), false)) : ''
+									def byWhom = application[r-1].(appDTAMap.eavAttribute.attributeCode[coll]) ? String.valueOf(assetEntityService.resolveByName(application[r-1].(appDTAMap.eavAttribute.attributeCode[coll]), false)) : ''
 									addContentToSheet = new Label(appMap[colName], r, byWhom)
 								}else if(colName in ["ShutdownFixed" , "StartupFixed" ,"TestingFixed"] ){
 									def fixedFlag = application[r-1].(appDTAMap.eavAttribute.attributeCode[coll]) ? 'Yes' : 'No'
