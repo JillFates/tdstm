@@ -87,7 +87,7 @@ class ModelController {
 			modelInstanceList = []
 
 		def results = modelInstanceList?.collect { [ cell: [it.modelName, it.manufacturer, it.description, it.assetType,
-					it.powerUse, it.noOfConnectors, it.assetsCount, it.sourceTDSVersion, it.sourceTDS, it.modelStatus], id: it.id,
+					it.powerUse, it.noOfConnectors, it.assetsCount, it.sourceTDSVersion, it.sourceTDS, it.modelStatus], id: it.modelId
 			]}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
