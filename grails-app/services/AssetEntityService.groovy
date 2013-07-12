@@ -351,7 +351,7 @@ class AssetEntityService {
 											   IFNULL(mb.name,'') AS move_bundle,
 											   IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
 											   adb.dependency_bundle AS group_id,
-											   IFNULL(server.new_or_old,'') AS status,
+											   IFNULL(server.plan_status,'') AS status,
 											   IFNULL(server.environment, '') AS environment,
 											   IFNULL(application.criticality, '') AS criticality
 											FROM asset_entity server
@@ -377,7 +377,7 @@ class AssetEntityService {
 											   IFNULL(mb.name,'') AS move_bundle,
 											   IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
 											   adb.dependency_bundle AS group_id,
-											   IFNULL(dbsrv.new_or_old,'') AS status,
+											   IFNULL(dbsrv.plan_status,'') AS status,
 										   	   IFNULL(app.environment, '') AS environment,
 											   IFNULL(applic.criticality, '') AS criticality
 											FROM asset_entity app
@@ -403,7 +403,7 @@ class AssetEntityService {
 											   IFNULL(mb.name,'') AS move_bundle,
 											   IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
 											   adb.dependency_bundle AS group_id,
-											   IFNULL(clustersrv.new_or_old,'') AS status,
+											   IFNULL(clustersrv.plan_status,'') AS status,
 											   IFNULL(app.environment, '') AS environment,
 											   IFNULL(applic.criticality, '') AS criticality
 											 FROM asset_entity app
