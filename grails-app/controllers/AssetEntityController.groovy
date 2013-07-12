@@ -65,7 +65,8 @@ class AssetEntityController {
 	def securityService
 	def taskService
 	
-	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
+	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8','Custom9','Custom10',
+		'Custom11','Custom12','Custom13','Custom14','Custom15','Custom16','Custom17','Custom18','Custom19','Custom20','Custom21','Custom22','Custom23','Custom24']
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
 	protected static targetTeamType = ['MOVE_TECH':'targetTeamMt', 'CLEANER':'targetTeamLog','SYS_ADMIN':'targetTeamSa',"DB_ADMIN":'targetTeamDba']
 	protected static sourceTeamType = ['MOVE_TECH':'sourceTeamMt', 'CLEANER':'sourceTeamLog','SYS_ADMIN':'sourceTeamSa',"DB_ADMIN":'sourceTeamDba']
@@ -254,7 +255,7 @@ class AssetEntityController {
 			return;
 		}
 		def projectCustomLabels = new HashMap()
-		for(int i = 1; i< 9; i++){
+		for(int i = 1; i< 25; i++){
 			if (project["custom"+i]) projectCustomLabels.put(project["custom"+i], "Custom"+i)
 		}
 		// get File
@@ -276,18 +277,15 @@ class AssetEntityController {
 		int filesAdded = 0
 		int dependencyAdded = 0
 		int dependencyUpdated = 0
+		def appColumnslist = []
+		def databaseColumnslist = []
+		def filesColumnslist = []
 		//get column name and sheets
-		serverDTAMap.eachWithIndex { item, pos ->
-			if(customLabels.contains( item.columnName )){
-				def customLabel = project[item.eavAttribute?.attributeCode] ? project[item.eavAttribute?.attributeCode] : item.columnName
-				serverColumnslist.add( customLabel )
-			} else {
-				serverColumnslist.add( item.columnName )
-			}
-		}
-		def appColumnslist = appDTAMap.columnName
-		def databaseColumnslist = databaseDTAMap.columnName
-		def filesColumnslist = filesDTAMap.columnName
+		getColumnNames(serverDTAMap, serverColumnslist, project)
+		getColumnNames(appDTAMap, appColumnslist, project)
+		getColumnNames(databaseDTAMap, databaseColumnslist, project)
+		getColumnNames(filesDTAMap, filesColumnslist, project)
+		
 		/*	def dependencyColumnList = ['DependentId','Type','DataFlowFreq','DataFlowDirection','status','comment']
 		 def dependencyMap = ['DependentId':1, 'Type':2, 'DataFlowFreq':3, 'DataFlowDirection':4, 'status':5, 'comment':6]
 		 def DTAMap = [0:'dependent', 1:'type', 2:'dataFlowFreq', 3:'dataFlowDirection', 4:'status', 5:'comment']*/
@@ -521,7 +519,14 @@ class AssetEntityController {
 							if(name){
 								def dataTransferValueList = new StringBuffer()
 								for( int cols = 0; cols < appCol; cols++ ) {
-									def dataTransferAttributeMapInstance = appDTAMap.find{it.columnName == appSheet.getCell( cols, 0 ).contents}
+									
+									def dataTransferAttributeMapInstance
+									def projectCustomLabel = projectCustomLabels[appSheet.getCell( cols, 0 ).contents.toString()]
+									if(projectCustomLabel){
+										dataTransferAttributeMapInstance = appDTAMap.find{it.columnName == projectCustomLabel}
+									} else {
+										dataTransferAttributeMapInstance = appDTAMap.find{it.columnName == appSheet.getCell( cols, 0 ).contents}
+									}
 
 									if( dataTransferAttributeMapInstance != null ) {
 										def assetId
@@ -572,7 +577,13 @@ class AssetEntityController {
 							if(name){
 								def dataTransferValueList = new StringBuffer()
 								for( int cols = 0; cols < databaseCol; cols++ ) {
-									def dataTransferAttributeMapInstance = databaseDTAMap.find{it.columnName == databaseSheet.getCell( cols, 0 ).contents}
+									def dataTransferAttributeMapInstance
+									def projectCustomLabel = projectCustomLabels[databaseSheet.getCell( cols, 0 ).contents.toString()]
+									if(projectCustomLabel){
+										dataTransferAttributeMapInstance = databaseDTAMap.find{it.columnName == projectCustomLabel}
+									} else {
+										dataTransferAttributeMapInstance = databaseDTAMap.find{it.columnName == databaseSheet.getCell( cols, 0 ).contents}
+									}
 
 									if( dataTransferAttributeMapInstance != null ) {
 										def assetId
@@ -623,7 +634,13 @@ class AssetEntityController {
 							if(name){
 								def dataTransferValueList = new StringBuffer()
 								for( int cols = 0; cols < filesCol; cols++ ) {
-									def dataTransferAttributeMapInstance = filesDTAMap.find{it.columnName == filesSheet.getCell( cols, 0 ).contents}
+									def dataTransferAttributeMapInstance
+									def projectCustomLabel = projectCustomLabels[filesSheet.getCell( cols, 0 ).contents.toString()]
+									if(projectCustomLabel){
+										dataTransferAttributeMapInstance = filesDTAMap.find{it.columnName == projectCustomLabel}
+									} else {
+										dataTransferAttributeMapInstance = filesDTAMap.find{it.columnName == filesSheet.getCell( cols, 0 ).contents}
+									}
 
 									if( dataTransferAttributeMapInstance != null ) {
 										def assetId
@@ -1020,16 +1037,13 @@ class AssetEntityController {
 					def appcolumnNameListSize = appColumnNameList.size()
 					def dbcolumnNameListSize = dbColumnNameList.size()
 					def filecolumnNameListSize = fileColumnNameList.size()
+					
 					// update column header
-					for ( int head =0; head <= serverSheetColumnNames.size(); head++ ) {
-						def cellData = serverSheet.getCell(head,0)?.getContents()
-						def attributeMap = serverDTAMap.find{it.columnName ==  cellData }?.eavAttribute
-						if(attributeMap?.attributeCode && customLabels.contains( cellData )){
-							def columnLabel = project[attributeMap?.attributeCode] ? project[attributeMap?.attributeCode] : cellData
-							def customColumn = new Label(head,0, columnLabel )
-							serverSheet.addCell(customColumn)
-						}
-					}
+					updateColumnHeaders(serverSheet, serverDTAMap, serverSheetColumnNames, project)
+					updateColumnHeaders(appSheet, appDTAMap, appSheetColumnNames, project)
+					updateColumnHeaders(dbSheet, dbDTAMap, dbSheetColumnNames, project)
+					updateColumnHeaders(fileSheet, fileDTAMap, fileSheetColumnNames, project)
+					
 					if(params.asset=='asset'){
 						exportedEntity +="S"
 						for ( int r = 1; r <= assetSize; r++ ) {
@@ -4303,5 +4317,44 @@ class AssetEntityController {
 		 def configMap = assetEntityService.getConfig(assetType,validation)
 		 render (template:'customEdit', model:[project:configMap.project, customs:configMap.customs, assetEntityInstance:assetEntityInstance])
 	 }
+	 
+	 /**
+	  * This method is used to update sheet's column header with custom labels
+	  * @param sheet : sheet's instance 
+	  * @param entityDTAMap : dataTransferEntityMap for entity type
+	  * @param sheetColumnNames : column Names
+	  * @param project : project instance
+	  * @return
+	  */
+	 def updateColumnHeaders(sheet, entityDTAMap, sheetColumnNames, project){
+		 for ( int head =0; head <= sheetColumnNames.size(); head++ ) {
+			 def cellData = sheet.getCell(head,0)?.getContents()
+			 def attributeMap = entityDTAMap.find{it.columnName ==  cellData }?.eavAttribute
+			 if(attributeMap?.attributeCode && customLabels.contains( cellData )){
+				 def columnLabel = project[attributeMap?.attributeCode] ? project[attributeMap?.attributeCode] : cellData
+				 def customColumn = new Label(head,0, columnLabel )
+				 sheet.addCell(customColumn)
+			 }
+		 }
+		 return sheet
+	 }
 	
+	 /**
+	  * This method is used to update columnList with custom labels.
+	  * @param entityDTAMap :  dataTransferEntityMap for entity type
+	  * @param columnslist :  column Names
+	  * @param project :project instance
+	  * @return
+	  */
+	 def getColumnNames(entityDTAMap, columnslist, project){
+		 entityDTAMap.eachWithIndex { item, pos ->
+			 if(customLabels.contains( item.columnName )){
+				 def customLabel = project[item.eavAttribute?.attributeCode] ? project[item.eavAttribute?.attributeCode] : item.columnName
+				 columnslist.add( customLabel )
+			 } else {
+				 columnslist.add( item.columnName )
+			 }
+		 }
+		 return columnslist
+	 }
 }
