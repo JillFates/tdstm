@@ -479,7 +479,7 @@ class MoveBundleService {
 		   adb.dependency_bundle as dependencyBundle, 
 		   count(distinct adb.asset_id) as assetCnt, 
 		   group_concat(distinct a.move_bundle_id) as moveBundles,
-		   sum(if(a.new_or_old='Assigned',1,0)) as statusAssigned,
+		   sum(if(a.plan_status='Assigned',1,0)) as statusAssigned,
 		   sum(if(a.validation<>'BundleReady',1,0)) as notBundleReady,
 		   sum(if(a.asset_type in ( ${AssetType.getPhysicalServerTypesAsString()} ), 1, 0)) as serverCount,
 		   sum(if(a.asset_type in ( ${AssetType.getVirtualServerTypesAsString()} ), 1, 0)) as vmCount,

@@ -825,13 +825,13 @@ class MoveEventController {
 					}else{
 						def bundleForEvent = moveEvent.moveBundles
 						assetAffected = bundleForEvent ? jdbcTemplate.update("update asset_entity  \
-							set new_or_old = 'Moved', source_location = target_location, room_source_id = room_target_id ,\
+							set plan_status = 'Moved', source_location = target_location, room_source_id = room_target_id ,\
 								rack_source_id = rack_target_id, source_rack_position = target_rack_position, \
 								source_blade_chassis = target_blade_chassis, source_blade_position = target_blade_position, \
 								target_location = null, room_target_id = null, rack_target_id = null, target_rack_position = null,\
 								target_blade_chassis = null, target_blade_position = null\
 							where move_bundle_id in (SELECT mb.move_bundle_id FROM move_bundle mb WHERE mb.move_event_id =  $moveEvent.id) \
-								and new_or_old != 'Moved' ") : 0
+								and plan_status != 'Moved' ") : 0
 					}
 				} else {
 					log.error "markEventAssetAsMoved: Specified moveEvent (${params.moveEventId}) was not found})"

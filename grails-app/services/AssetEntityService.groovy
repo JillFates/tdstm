@@ -353,7 +353,7 @@ class AssetEntityService {
 											   adb.dependency_bundle AS group_id,
 											   IFNULL(server.custom4,'') AS storage_inventory,
 											   IFNULL(application.business_unit,'') AS dr_tier,
-											   IFNULL(server.new_or_old,'') AS status
+											   IFNULL(server.plan_status,'') AS status
 											FROM asset_entity server
 											JOIN asset_dependency srvappdep ON server.asset_entity_id = srvappdep.dependent_id
 											JOIN asset_entity app ON app.asset_entity_id = srvappdep.asset_id AND app.asset_type = 'Application'
@@ -379,7 +379,7 @@ class AssetEntityService {
 											   adb.dependency_bundle AS group_id,
 											   IFNULL(dbsrv.custom4,'') AS storage_inventory,
 											   IFNULL(applic.business_unit,'') AS dr_tier,
-											   IFNULL(dbsrv.new_or_old,'') AS status
+											   IFNULL(dbsrv.plan_status,'') AS status
 											FROM asset_entity app
 											JOIN application applic ON applic.app_id=app.asset_entity_id
 											JOIN asset_dependency appdbdep ON appdbdep.asset_id = app.asset_entity_id #AND appdbdep.type='DB'
@@ -405,7 +405,7 @@ class AssetEntityService {
 											   adb.dependency_bundle AS group_id,
 											   IFNULL(clustersrv.custom4,'') AS storage_inventory,
 											   IFNULL(applic.business_unit,'') AS dr_tier,
-											   IFNULL(clustersrv.new_or_old,'') AS status
+											   IFNULL(clustersrv.plan_status,'') AS status
 											 FROM asset_entity app
 											JOIN application applic ON applic.app_id=app.asset_entity_id
 											JOIN asset_dependency appdbdep ON appdbdep.asset_id = app.asset_entity_id # AND appdbdep.type='DB'
