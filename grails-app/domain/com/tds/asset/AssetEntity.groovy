@@ -233,7 +233,6 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		tablePerHierarchy false
 		id column:'asset_entity_id'
 		os column:'hinfo'
-		planStatus column:'new_or_old'
 		sourceTeamMt column:'source_team_id'
 		targetTeamMt column:'target_team_id'
 		appOwner column:'app_owner_id'
