@@ -40,8 +40,7 @@
             <div class="buttons">
                 <g:form>
                     <input type="hidden" name="id" value="${manufacturerInstance?.id}" />
-                    <span class="button"><input type="button" class="edit" value="Edit"
-		onclick="showOrEditModelManuDetails('manufacturer',${manufacturerInstance?.id},'Manufacturer','edit','Edit')" /></span>
+                    <span class="button"><input type="button" class="edit" value="Edit" onclick="showOrEditModelManuDetails('manufacturer',${manufacturerInstance?.id},'Manufacturer','edit','Edit')" /></span>
                     <span class="button"><input class="create" type="button" value="Merge" onclick="showMergeDialog()"/></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
                 </g:form>

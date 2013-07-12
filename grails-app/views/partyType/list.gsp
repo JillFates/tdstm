@@ -9,7 +9,7 @@
     <body>
         <div class="nav">
             <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
-            <span class="menuButton"><g:link class="create" action="create">New PartyType</g:link></span>
+            <span class="menuButton"><g:link class="create" action="create">Create PartyType</g:link></span>
         </div>
         <div class="body">
             <h1>PartyType List</h1>

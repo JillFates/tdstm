@@ -1,5 +1,3 @@
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -41,7 +39,7 @@
             </div>
              <div class="buttons">
                 <g:form>
-                    <span class="button"><g:actionSubmit class="create" value="New PartyRelationshipType" action="create" /></span>
+                    <span class="button"><g:actionSubmit class="create" value="Create PartyRelationshipType" action="create" /></span>
                 </g:form>
             </div>
         </div>

@@ -40,7 +40,7 @@ $(document).ready(function() {
 	var fileFormat = '${fileFormat}'
 	var fileSize = '${fileSize}'
 	var sizePref = '${sizePref}'
-	var listCaption ="Storages:<span class='capBtn'><input type='button' value='Create Storage'  onclick='createAssetDetails(\"Files\")'/></span>"
+	var listCaption ="Storages: <tds:hasPermission permission='EditAndDelete'><span class='capBtn'><input type='button' value='Create Storage' onclick='createAssetDetails(\"Files\")'/></span></tds:hasPermission>"
 	// JqGrid implementations 
     <jqgrid:grid id="storageId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
@@ -125,15 +125,8 @@ function resizeGrid(){
 <g:if test="${flash.message}">
 <div class="message">${flash.message}</div>
 </g:if>
-<jqgrid:wrapper id="storageId" /> 
-	<div class="buttons">
-	<tds:hasPermission permission='EditAndDelete'>
-		<span class="button"><input type="button" class="save"
-			value="Create Storage"
-			onclick='createAssetDetails("Files")' />
-		</span>
-	</tds:hasPermission>
-	</div>
+<jqgrid:wrapper id="storageId" />
+
 <div id="createEntityView" style="display: none;" ></div>
 <div id="showEntityView" style="display: none;"></div>
 <div id="editEntityView" style="display: none;"></div>	

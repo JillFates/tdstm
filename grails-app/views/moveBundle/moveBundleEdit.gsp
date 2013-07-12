@@ -44,7 +44,7 @@
     <div class="nav">
 
       <span class="menuButton"><g:link class="list" action="list">List Bundles</g:link></span>
-      <span class="menuButton"><g:link class="create" action="create">Add New Bundle</g:link></span>
+      <span class="menuButton"><g:link class="create" action="create">Create Bundle</g:link></span>
     </div>
     <div class="body">
 

@@ -39,8 +39,8 @@
 				height="'100%'"
 				rowNum="'25'"
 				rowList= "'25','100','500','1000'"
-				viewrecords="true"
 				multiselect="true"
+				viewrecords="true"
 				showPager="true"
 				loadComplete="initCheck"
 				datatype="'json'">
@@ -85,20 +85,11 @@
 				<div id="messageId" class="message" style="display:none">
 				</div>
 			</div>
+			<jqgrid:wrapper id="modelId" />
 			<span id="spinnerId" style="display: none">Merging ...<img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 			<div id="createModelView" style="display: none;" ></div>
 			<div id="showModelView" style="display: none;"></div>
 			<div id="showOrMergeId" style="display: none;" title="Compare/Merge Models"></div>
-			<table id="gridTableId">
-				<tr>
-					<td><jqgrid:wrapper id="modelId" /></td>
-				</tr>
-				<tr>
-					<td><div class="buttons">
-					  <span class="button"><input type="button" class="save" value="Create Model" onclick="createModelManuDetails('model','Model')" /></span>
-					</div></td>
-				</tr>
-			</table>
 		</div>
 	</body>
 </html>

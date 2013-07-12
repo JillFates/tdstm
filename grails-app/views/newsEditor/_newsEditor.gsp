@@ -44,7 +44,7 @@
 				</table>
 			</div>
 			<div class="buttons"><span class="button"> 
-				<input class="save" type="submit" value="Create" onclick="return validateCreateNewsForm()"/></span>
+				<input class="save" type="submit" value="Save" onclick="return validateCreateNewsForm()"/></span>
 					<span class="button"> 
 					<input class="delete" type="button" value="Cancel" onclick="this.form.reset();$('#createNewsDialog').dialog('close');"/>
 				</span>

@@ -1,5 +1,3 @@
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -14,15 +12,15 @@
         <div class="body">
             <h1>Create PartyType</h1>
             <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
+				<div class="message">${flash.message}</div>
             </g:if>
             <g:form action="save" method="post" >
                 <div class="dialog">
                     <table>
                         <tbody>
-                         <tr>
-						<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
-						</tr>
+							<tr>
+								<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+							</tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="id"><b></b>Code:&nbsp;<span style="color: red">*</span></b></label>
@@ -49,12 +47,11 @@
 					            </g:hasErrors>
                                 </td>
                             </tr> 
-                        
                         </tbody>
                     </table>
                 </div>
                 <div class="buttons">
-                    <span class="button"><input class="save" type="submit" value="Create" /></span>
+                    <span class="button"><input class="save" type="submit" value="Save" /></span>
                 </div>
             </g:form>
         </div>

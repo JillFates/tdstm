@@ -463,7 +463,7 @@
 	</div>
 	<div class="buttons">
 		<span class="button">
-			<input class="save" type="submit" value="Create" onclick="return validateDates();"/>
+			<input class="save" type="submit" value="Save" onclick="return validateDates();"/>
 		</span> 
 		<span class="button">
 			<input type="button" class="delete" value="Cancel" 

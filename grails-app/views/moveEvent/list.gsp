@@ -13,8 +13,8 @@
 <jqgrid:resources />
 <script type="text/javascript">
 $(document).ready(function() {
-	var listCaption ="Event List:<span class='capBtn'>"+
-		"<input type='button' value='Create Event'  onClick=\"window.location.href=\'"+contextPath+"/moveEvent/create\'\"/></span>"
+	var listCaption ="Event List: <tds:hasPermission permission='MoveEventEditView'><span class='capBtn'>"+
+		"<input type='button' value='Create Event'  onClick=\"window.location.href=\'"+contextPath+"/moveEvent/create\'\"/></span></tds:hasPermission>"
 	<jqgrid:grid id="moveEventListId" url="'${createLink(action: 'listJson')}'"
 	    colNames="'Name', 'Description','Status', 'Runbook Status', 'Bundles'"
 	    colModel="{name:'name',index: 'name', editable: true, width:'300',formatter: linkFormatter},
@@ -65,12 +65,6 @@ function resizeGrid(){
 		</g:if>
 		<div>
 			<jqgrid:wrapper id="moveEventListId" />
-		</div>
-		<div class="paginateButtons">
-			<tds:hasPermission permission='MoveEventEditView'>
-				<span class="menuButton"><g:link class="create"
-						action="create">Create New</g:link></span>
-			</tds:hasPermission>
 		</div>
 	</div>
 	<script>

@@ -208,7 +208,7 @@
 						<span class="button">
 						
 						   <g:if test="${redirectTo=='modelDialog'}">
-								<span class="button"><input type="button" class="save" value="Edit"
+								<span class="button"><input type="button" class="edit" value="Edit"
 										onclick="showOrEditModelManuDetails('model',${modelInstance?.id},'Model','edit','Edit')" /></span>
 								<g:if test="${modelRef}">
 									<g:actionSubmit class="delete" action="delete" value="Delete"  disabled="disabled" onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>

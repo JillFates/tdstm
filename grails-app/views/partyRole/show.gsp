@@ -1,5 +1,3 @@
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -10,7 +8,7 @@
         <div class="nav">
             <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
             <span class="menuButton"><g:link class="list" action="list">PartyRole List</g:link></span>
-            <span class="menuButton"><g:link class="create" action="create">New PartyRole</g:link></span>
+            <span class="menuButton"><g:link class="create" action="create">Create PartyRole</g:link></span>
         </div>
         <div class="body">
             <h1>Show PartyRole</h1>

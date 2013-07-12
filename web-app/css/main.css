@@ -274,13 +274,16 @@ table.inner {
     text-align: left;
     width: 15%;
     white-space: nowrap;
+	vertical-align: middle;
 }
 .prop .value {
     text-align: left;
     width: 85%;
+	vertical-align: middle;
 }
 .prop .valueNW {
     text-align: left;
+	vertical-align: middle;
 }
 
 .prop .bundle {

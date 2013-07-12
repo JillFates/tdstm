@@ -169,12 +169,12 @@
 					<tds:hasPermission permission='EditAndDelete'>
 						<span class="button"><input type="button" class="edit"
 							value="Edit" onclick="editEntity('${redirectTo}','Files', ${filesInstance?.id})" /> </span>
-					<g:if test="${redirectTo!='dependencyConsole'}">
-					   <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>
-					</g:if>
-					<g:else>
-					   <span class="button"><input id="deleteId"	 name="deleteId"  class="save" value="Delete" onclick=" deleteAsset($('#filedeleteId').val(),'files')" /> </span>
-					</g:else>
+						<g:if test="${redirectTo!='dependencyConsole'}">
+						   <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>
+						</g:if>
+						<g:else>
+						   <span class="button"><input id="deleteId" name="deleteId" class="delete" value="Delete" onclick=" deleteAsset($('#filedeleteId').val(),'files')" /> </span>
+						</g:else>
 					</tds:hasPermission>
 					<tds:hasPermission permission="CommentCrudView">	
 						<a href="javascript:createIssue('${filesInstance.assetName}','comment', ${filesInstance.id});">

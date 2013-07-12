@@ -52,12 +52,10 @@
 		</script>
     </head>
     <body>
-
-    	
         <div class="body fluid" style="width:50% !important;">
             <h1>Company List</h1>
             <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
+				<div class="message">${flash.message}</div>
             </g:if>
             <div>
 				<jqgrid:wrapper id="companyId" />

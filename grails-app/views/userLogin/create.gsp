@@ -1,5 +1,3 @@
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -315,7 +313,7 @@
                     </table>
                 </div>
                 <div class="buttons">
-					<span class="button"><input class="save" type="submit" value="Create" onclick="selectAllAssigned()"/></span>
+					<span class="button"><input class="save" type="submit" value="Save" onclick="selectAllAssigned()"/></span>
                 </div>
             </g:form>
         </div>

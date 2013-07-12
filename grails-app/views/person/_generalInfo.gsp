@@ -1,5 +1,3 @@
-
-
 <div class="menu4">
 	<ul>
 		<li><a href="#" id="generalEditHeadId" class="mobmenu mobselect"
@@ -250,8 +248,7 @@
 <div class="buttons buttonsToUpdate">
 	<input class="save" type="button" id="updateBId" value="Update"
 		onClick="updatePerson('generalInfoShow','personDialogForm')" /> <input
-		class="save" type="button" id="cancelBId" value="Cancel"
+		class="delete" type="button" id="cancelBId" value="Cancel"
 		onClick="closePersonDiv('personGeneralViewId')" />
 </div>
 </tds:hasPermission>
-

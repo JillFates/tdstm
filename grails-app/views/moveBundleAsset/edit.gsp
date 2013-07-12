@@ -8,7 +8,7 @@
     <div class="nav">
       <span class="menuButton"><a class="home" href="${resource(dir:'')}">Home</a></span>
       <span class="menuButton"><g:link class="list" action="list">MoveBundleAsset List</g:link></span>
-      <span class="menuButton"><g:link class="create" action="create">New MoveBundleAsset</g:link></span>
+      <span class="menuButton"><g:link class="create" action="create">Create MoveBundleAsset</g:link></span>
     </div>
     <div class="body">
       <h1>Edit MoveBundleAsset</h1>

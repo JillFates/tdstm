@@ -293,7 +293,7 @@ $(document).ready(function() {
 					   <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>
 					</g:if>
 					<g:else>
-					   <span class="button"><input id="deleteId" name="deleteId" class="save" value="Delete" onclick=" deleteAsset($('#assetsId').val(),'server')" /> </span>
+					   <span class="button"><input id="deleteId" name="deleteId" class="delete" value="Delete" onclick=" deleteAsset($('#assetsId').val(),'server')" /> </span>
 					</g:else>
 					<tds:hasPermission permission="CommentCrudView">	
 						<a href="javascript:createIssue('${assetEntity.assetName}','comment', ${assetEntity.id});">

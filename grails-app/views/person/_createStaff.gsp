@@ -1,5 +1,4 @@
 <div class="dialog">
-
         <g:form action="save" id="createDivFormId" method="post" name="createDialogForm" onsubmit="return validatePersonForm('createDialogForm')">
           <input type="hidden"  id="createstaff" name="createstaff" value="${forWhom}" />
           <div class="dialog">
@@ -170,17 +169,17 @@
             <span class="button">
             <g:if test="${forWhom =='person'}">
             	<input type="hidden" name="forWhom" value="${forWhom}"  />
-            	<input class="save" type="submit" value="Create" />
+            	<input class="save" type="submit" value="Save" />
             </g:if>
             <g:else>
                 <input type="hidden" id="fieldName" name="fieldName" />
-                <input class="save" type="button" value="Create" onClick="createPersonDetails()"/>
+                <input class="save" type="button" value="Save" onClick="createPersonDetails()"/>
            	</g:else>
             	<input class="delete" type="button" id="cancelBId" value="Cancel" onClick="closePersonDiv('createStaffDialog')"/>
 			</span>
           </div>
         </g:form>
-      </div>
+</div>
       <script type="text/javascript"> 
        function addFunctionsCreate(){
     	  	var selectHtml = $("#availableFuncsCreateId").html().replace("funcToAdd","function")

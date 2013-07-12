@@ -1,5 +1,3 @@
-
-
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -12,7 +10,7 @@
       <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 	            <span class="menuButton"><g:link class="list" action="list">RoleType List</g:link></span>
 	          <tds:hasPermission permission='CreateRoleType'>
-	            <span class="menuButton"><g:link class="create" action="create">New RoleType</g:link></span>
+	            <span class="menuButton"><g:link class="create" action="create">Create RoleType</g:link></span>
 	          </tds:hasPermission>
         	</div>
         	<br/>

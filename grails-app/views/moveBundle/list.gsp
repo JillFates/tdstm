@@ -11,8 +11,8 @@
 
 		<script type="text/javascript">
 		$(document).ready(function() {	
-			var listCaption ="Bundles:<span class='capBtn'>"+
-				"<input type='button' value='Create Bundle' onClick=\"window.location.href=\'"+contextPath+"/moveBundle/create\'\"/></span>"			
+			var listCaption ="Bundles: <tds:hasPermission permission='MoveBundleEditView'><span class='capBtn'>"+
+				"<input type='button' value='Create Bundle' onClick=\"window.location.href=\'"+contextPath+"/moveBundle/create\'\"/></span></tds:hasPermission>"			
 			<jqgrid:grid id="bundleGridId" url="'${createLink(action: 'listJson')}'"
 				colNames="'Name', 'Description','Planning', 'Asset Qty', 'Start', 'Completion'"
 				colModel="{name:'name', index: 'name', width:'150',formatter: myLinkFormatter},
@@ -55,16 +55,6 @@
 			<table id="gridTableId" style="width:58%!important;">
 				<tr>
 					<td><jqgrid:wrapper id="bundleGridId" /></td>
-				</tr>
-				<tr>
-					<td><div class="buttons"> 
-  				<g:form>
-					<input type="hidden" id="projectId" name="projectId" value="${projectId}"/>
-						<tds:hasPermission permission='MoveBundleEditView '>
-  					<span class="button"><g:actionSubmit class="save" action="Create" value="Create Bundle" /></span>
-  					</tds:hasPermission>
-  				</g:form>
-  </div></td>
 				</tr>
 			</table>
 		</div>

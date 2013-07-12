@@ -55,7 +55,7 @@ var sortOrder = '${sortOrder}'
 var moveBundleId = '${moveBundleId}'
 var windowWidth = $(window).width() - $(window).width()*5/100 ;
 var sizePref = '${sizePref}'
-var listCaption ="Assets: <span class='capBtn'><input type='button' value='New Asset' onclick='createAssetDetails(\"assetEntity\")'/></span>"
+var listCaption ="Assets: <tds:hasPermission permission='EditAndDelete'><span class=\"button\"><input type=\"button\" value=\"Create Asset\" class=\"create\" onclick='createAssetDetails(\"assetEntity\")'/></span></tds:hasPermission>"
 <jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','Target Location','Target Rack','Tag','Serial#','Plan Status','Bundle',
@@ -177,12 +177,6 @@ function resizeGrid(){
 <div>
 	  <jqgrid:wrapper id="assetListId" /> 
 </div>
-<div class="buttons"><g:form>
-<tds:hasPermission permission='EditAndDelete'>
-	<span class="button"><input type="button" value="New Asset" class="create" 
-	onclick='createAssetDetails("assetEntity")'/></span>
-</tds:hasPermission>
-</g:form></div>
 </div> <%-- End of Body --%>
 <g:render template="commentCrud"/>
 <g:render template="modelDialog"/>

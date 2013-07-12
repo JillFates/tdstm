@@ -1,5 +1,3 @@
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -10,7 +8,7 @@
         <div class="body">
 	        <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 	            <span class="menuButton"><g:link class="list" action="list">RefCode List</g:link></span>
-	            <span class="menuButton"><g:link class="create" action="create">New RefCode</g:link></span>
+	            <span class="menuButton"><g:link class="create" action="create">Create RefCode</g:link></span>
 	        </div>
             <h1>Edit RefCode</h1>
             <g:if test="${flash.message}">

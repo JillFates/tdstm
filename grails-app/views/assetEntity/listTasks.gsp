@@ -213,10 +213,7 @@
 				</span>
 			</span>
 			<br/></br>
-				<jqgrid:wrapper id="taskListId" />
-            <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-		      <span class="menuButton"><a class="create" href="javascript:createIssue('','','')">Create Task</a></span>
-	       	</div>
+			<jqgrid:wrapper id="taskListId" />
 		</div>
 		<g:render template="../assetEntity/modelDialog" />
 		<div id="showEntityView" style="display: none;"></div>

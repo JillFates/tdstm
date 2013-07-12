@@ -42,7 +42,7 @@ $(document).ready(function() {
 	var moveBundle = '${moveBundle}'
 	var dbFormat = '${validationFilter}'
 	var sizePref = '${sizePref}'
-	var listCaption ="DataBases:<span class='capBtn'><input type='button' value='Create DB'  onclick='createAssetDetails(\"Database\")'/></span>"				
+	var listCaption ="DataBases: <tds:hasPermission permission='EditAndDelete'><span class='capBtn'><input type='button' value='Create DB' onclick='createAssetDetails(\"Database\")'/></span></tds:hasPermission>"				
     <jqgrid:grid id="databaseId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Name', 'DB Format','Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType'"
@@ -141,12 +141,6 @@ function resizeGrid(){
 	<div id="messageId" class="message" style="display:none"></div>
 </div>
 <jqgrid:wrapper id="databaseId" /> 
-<div class="buttons">
-<tds:hasPermission permission='EditAndDelete'>
-	<span class="button"><input type="button" class="save" value="Create DB"
-		onclick='createAssetDetails("Database")' /></span>
-</tds:hasPermission>
-</div>
 <div id="createEntityView" style="display: none;" ></div>
 <div id="showEntityView" style="display: none;"></div>
 <div id="editEntityView" style="display: none;"></div>

@@ -1,5 +1,3 @@
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -14,15 +12,15 @@
         <div class="body">
             <h1>Create PartyRole</h1>
             <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
+				<div class="message">${flash.message}</div>
             </g:if>
             <g:form action="save" method="post" >
                 <div class="dialog">
                     <table>
                         <tbody>
-                         <tr>
-						<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
-						</tr>
+							<tr>
+								<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+							</tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="party">Party:</label>
@@ -43,11 +41,11 @@
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:partyRoleInstance,field:'roleType','errors')}">
                                     <g:select optionKey="id" from="${RoleType.list()}" name="roleType.id" value="${partyRoleInstance?.roleType?.id}" ></g:select>
-                                <g:hasErrors bean="${partyRoleInstance}" field="roleType">
-					            <div class="errors">
-					                <g:renderErrors bean="${partyRoleInstance}" as="list" field="roleType"/>
-					            </div>
-					            </g:hasErrors>
+									<g:hasErrors bean="${partyRoleInstance}" field="roleType">
+										<div class="errors">
+											<g:renderErrors bean="${partyRoleInstance}" as="list" field="roleType"/>
+										</div>
+									</g:hasErrors>
                                 </td>
                             </tr> 
                         
@@ -55,7 +53,7 @@
                     </table>
                 </div>
                 <div class="buttons">
-                    <span class="button"><input class="save" type="submit" value="Create" /></span>
+                    <span class="button"><input class="save" type="submit" value="Save" /></span>
                 </div>
             </g:form>
         </div>

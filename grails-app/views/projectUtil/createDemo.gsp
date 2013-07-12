@@ -75,7 +75,7 @@
 	</div>
 	<div class="buttons">
 		<span class="button">
-			<input class="save" type="submit" value="Create" />
+			<input class="save" type="submit" value="Save" />
 		</span> 
 		<span class="button">
 			<input type="button" class="delete" onclick="javascript:location.href='../project/list'" value="Cancel" />

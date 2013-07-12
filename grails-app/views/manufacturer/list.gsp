@@ -13,6 +13,7 @@
 $(document).ready(function() {
 	$("#createManufacturerView").dialog({ autoOpen: false })
 	$("#showManufacturerView").dialog({ autoOpen: false })
+	var listCaption = "Manufacturers: <span class='capBtn'><input type='button' value='Create Manufacturer' onClick=\"createModelManuDetails('manufacturer','Manufacturer')\"/></span> "
 	<jqgrid:grid id="manufacturerId" url="'${createLink(action: 'listJson')}'"
 	    colNames="'Name','AKA', 'Description','Models', 'AssetCount'"
 	    colModel="{name:'name', index: 'name', width:'100',formatter: myLinkFormatter},
@@ -21,7 +22,7 @@ $(document).ready(function() {
 	                  {name:'models', editable: true, width:'40',search:false,sortable:false}, 
 	                  {name:'assetCount', editable: true,width:'50',search:false,sortable:false}"
 	    sortname="'name'"
-	    caption="'Manufacturers'"
+	    caption="listCaption"
 	   	height="'100%'"
 	    rowNum="'25'"
 	    rowList= "'25','100','500','1000'"
@@ -49,21 +50,17 @@ function resizeGrid(){
 </script>
 </head>
 <body>
-<div class="body fluid">
-<h1>Manufacturer List</h1>
-<g:if test="${flash.message}">
-	<div id="messageDivId" class="message">${flash.message}</div>
-</g:if>
-<div >
-	<div id="messageId" class="message" style="display:none"></div>
-</div>
-<jqgrid:wrapper id="manufacturerId" />
-<div id="createManufacturerView" style="display: none;" ></div>
-<div id="showManufacturerView" style="display: none;" ></div>
-<div class="buttons">
-	    <span class="button"><input type="button" class="save" value="Create Manufacturer"
-		onclick="createModelManuDetails('manufacturer','Manufacturer')"/></span>
-</div>
-</div>
+	<div class="body fluid">
+		<h1>Manufacturer List</h1>
+		<g:if test="${flash.message}">
+			<div id="messageDivId" class="message">${flash.message}</div>
+		</g:if>
+		<div >
+			<div id="messageId" class="message" style="display:none"></div>
+		</div>
+		<jqgrid:wrapper id="manufacturerId" />
+		<div id="createManufacturerView" style="display: none;" ></div>
+		<div id="showManufacturerView" style="display: none;" ></div>
+	</div>
 </body>
 </html>

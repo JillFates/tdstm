@@ -57,7 +57,7 @@
             </div>
             <div class="buttons">
 				<g:form>
-			    	<span class="button"><g:actionSubmit class="create" value="New RefCode" action="create" /></span>
+			    	<span class="button"><g:actionSubmit class="create" value="Create RefCode" action="create" /></span>
 			    </g:form>
 			</div>
         </div>

@@ -15,8 +15,8 @@
 $(document).ready(function() {
 	var listCaption ="Projects: \
 	<tds:hasPermission permission='CreateProject'>\
-		<span class='capBtn'><input type='button' value='Create Project' onClick=\"window.location.href=\'"+contextPath+"/project/create\'\"/></span> \
-		<span class='capBtn'><input type='button' class='save' onClick=\"window.location.href=\'"+contextPath+"/projectUtil/createDemo\'\" value='Create Demo Project' /></span>\
+		<span class='capBtn'><input type='button' class='create' value='Create Project' onClick=\"window.location.href=\'"+contextPath+"/project/create\'\"/></span> \
+		<span class='capBtn'><input type='button' class='create' value='Create Demo Project' onClick=\"window.location.href=\'"+contextPath+"/projectUtil/createDemo\'\" /></span>\
 	</tds:hasPermission>\
 	<span class='capBtn' style='${active=='active' ? 'display:none':'' }'><a href=\'"+contextPath+"/project/list?active=active\'> \
 	<input type='button' value='Show Active Projects'/></a></span>\
@@ -67,15 +67,6 @@ $(document).ready(function() {
 		<table id="gridTableId" style="width: 50% !important;">
 			<tr>
 				<td><jqgrid:wrapper id="projectGridId" /></td>
-			</tr>
-			<tr>
-				<td><div class="buttons">
-				<g:form>
-					<tds:hasPermission permission='CreateProject '>
-  						<span class="button"><g:actionSubmit class="save" action="Create" value="Create Project" /></span>
-  					</tds:hasPermission>
-  				</g:form>
-  				</div></td>
 			</tr>
 		</table>
 	</div>

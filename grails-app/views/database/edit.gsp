@@ -108,7 +108,7 @@
 					<g:else>
 					  <span class="button"><input id="updatedId" name="updatedId" type="button" class="save updateDep" value="Update/Close" onclick="submitRemoteForm()"> </span>
 					  <span class="button"><input type="button" class="save updateDep" value="Update/View" onclick="updateToShow()" /> </span>
-					  <span class="button"><input id="deleteId"	 name="deleteId"  class="save" value="Delete" onclick=" deleteAsset($('#dbId').val(),'database')" value="Delete" /> </span>
+					  <span class="button"><input id="deleteId"	 name="deleteId"  class="delete" value="Delete" onclick=" deleteAsset($('#dbId').val(),'database')" value="Delete" /> </span>
 					</g:else>
 			</div>
 		</td>

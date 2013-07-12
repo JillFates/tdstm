@@ -1,5 +1,3 @@
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -51,7 +49,7 @@
             <div class="buttons">
 		<g:form>
 			<input type="hidden" name="bundleId" value="${bundleInstance?.id}" />
-			<span class="button"><g:actionSubmit class="create" action="Create" value="New Project Team" /></span>
+			<span class="button"><g:actionSubmit class="create" action="Create" value="Create Project Team" /></span>
 		</g:form>
             </div>
 	</div>            

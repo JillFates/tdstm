@@ -1,5 +1,3 @@
-
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -42,7 +40,7 @@
             </div>
             <div class="buttons">
                 <g:form>
-                    <span class="button"><g:actionSubmit class="create" action="Create" value="New Role Type"/></span>
+                    <span class="button"><g:actionSubmit class="create" action="Create" value="Create Role Type"/></span>
                 </g:form>
             </div>
         </div>

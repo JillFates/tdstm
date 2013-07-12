@@ -19,7 +19,7 @@
         <div class="body">
             <h1>Create Company</h1>
             <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
+				<div class="message">${flash.message}</div>
             </g:if>
 
             <g:form action="save" method="post" >
@@ -27,13 +27,13 @@
                     <table>
                         <tbody>
                         <tr>
-						<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+							<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 						</tr>
-                          <g:hasErrors bean="${partyGroupInstance}" idCheck>
-					            <div class="errors">
-					                <g:renderErrors bean="${partyGroupInstance}" as="list" idCheck/>
-					            </div>
-					            </g:hasErrors>
+                        <g:hasErrors bean="${partyGroupInstance}" idCheck>
+							<div class="errors">
+								<g:renderErrors bean="${partyGroupInstance}" as="list" idCheck/>
+							</div>
+						</g:hasErrors>
 
                            <!--  <tr class="prop">
                                 <td valign="top" class="name">
@@ -82,7 +82,7 @@
                     </table>
                 </div>
                 <div class="buttons">
-                    <span class="button"><input class="save" type="submit" value="Create" /></span>
+                    <span class="button"><input class="save" type="submit" value="Save" /></span>
                 </div>
             </g:form>
         </div>

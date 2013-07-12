@@ -10,7 +10,7 @@
         <div class="body">
 	         <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 	            <span class="menuButton"><g:link class="list" action="list">RefCode List</g:link></span>
-	            <span class="menuButton"><g:link class="create" action="create">New RefCode</g:link></span>
+	            <span class="menuButton"><g:link class="create" action="create">Create RefCode</g:link></span>
 	        </div>
             <h1>Show RefCode</h1>
             <g:if test="${flash.message}">

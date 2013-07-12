@@ -15,7 +15,7 @@
 
 	            <tds:hasPermission permission='CreateUserLogin'>
 
-	            <span class="menuButton"><g:link class="create" action="create" params="[companyId:companyId]">New UserLogin</g:link></span>
+	            <span class="menuButton"><g:link class="create" action="create" params="[companyId:companyId]">Create UserLogin</g:link></span>
 
 	            </tds:hasPermission>
 

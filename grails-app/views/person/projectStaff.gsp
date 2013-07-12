@@ -413,12 +413,12 @@
 </div>
 	<div class="buttons" style="width: 99%">
 	<g:form>
-		<span class="button"><input class="create"	type="button" value="Create New Staff" onclick="createProjectStaff()"/></span>
+		<span class="button"><input class="create"	type="button" value="Create Staff" onclick="createProjectStaff()"/></span>
 		<span class="button" style="padding-left:55%" ><input class="delete" type="button" value="Close" onclick="$('#addProjectStaff').dialog('close')"/></span>
 	</g:form>
 </div>
 </div>
-<div id="createPerson" style="display: none;" title="Create New Staff">
+<div id="createPerson" style="display: none;" title="Create Staff">
 <g:formRemote method="post" before="return validateCreateForm()" name="createForm" url="${[action:'savePerson']}" >
                 <input type="hidden" name="projectId" value="${projectId}" />
                 <div class="dialog">

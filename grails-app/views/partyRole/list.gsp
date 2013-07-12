@@ -8,7 +8,7 @@
     <body>
         <div class="nav">
             <span class="menuButton"><g:link class="home" controller="auth" action="home">Home</g:link></span>
-            <span class="menuButton"><g:link class="create" action="create">New PartyRole</g:link></span>
+            <span class="menuButton"><g:link class="create" action="create">Create PartyRole</g:link></span>
         </div>
         <div class="body">
             <h1>PartyRole List</h1>

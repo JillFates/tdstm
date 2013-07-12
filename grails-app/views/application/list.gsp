@@ -46,7 +46,10 @@ $(document).ready(function() {
 	var validationFilter = '${validationFilter}'
 	var appSme = '${appSme}'
 	var sizePref = '${sizePref}'
-	var listCaption ="Applications:<span class='capBtn'><input type='button' value='Create App'  onclick='createAssetDetails(\"Application\")'/></span>"	
+	var listCaption ="Applications: \
+		<tds:hasPermission permission='EditAndDelete'>\
+			<span class='capBtn'><input type='button' value='Create App'  onclick='createAssetDetails(\"Application\")'/></span>\
+		</tds:hasPermission>"	
     <jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Name', 'App Sme','Validation', 'Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType'"
@@ -158,11 +161,6 @@ function resizeGrid(){
 <jqgrid:wrapper id="applicationId" />
 <g:render template="../assetEntity/commentCrud"/>
 <g:render template="../assetEntity/modelDialog"/>
-<div class="buttons"> 
-<tds:hasPermission permission='EditAndDelete'>
-		<span class="button"><input type="button" class="save" value="Create App" onclick='createAssetDetails("Application")'/></span>
-</tds:hasPermission>
-</div>
 <div id="createEntityView" style="display: none;" ></div>
 <div id="showEntityView" style="display: none;"></div>
 <div id="editEntityView" style="display: none;"></div>

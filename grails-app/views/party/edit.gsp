@@ -11,7 +11,7 @@
 <h1>Edit Party</h1>
 <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 <span class="menuButton"><g:link class="list" action="list">Party List</g:link></span>
-<span class="menuButton"><g:link class="create" action="create">New Party</g:link></span>
+<span class="menuButton"><g:link class="create" action="create">Create Party</g:link></span>
 </div>
 <br>
 <g:if test="${flash.message}">
@@ -65,10 +65,10 @@
 		</tbody>
 	</table>
 	</div>
-	<div class="buttons"><span class="button"><g:actionSubmit
-		class="save" value="Update" /></span> <span class="button"><g:actionSubmit
-		class="delete" onclick="return confirm('Are you sure?');"
-		value="Delete" /></span></div>
+	<div class="buttons">
+		<span class="button"><g:actionSubmit class="save" value="Update" /></span>
+		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
+	</div>
 </g:form></div>
 </body>
 </html>
