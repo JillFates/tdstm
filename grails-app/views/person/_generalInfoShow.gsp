@@ -1,5 +1,3 @@
-
-
 <div class="menu4">
 	<ul>
 		<li><a href="#" id="generalShowHeadId" class="mobmenu mobselect"
