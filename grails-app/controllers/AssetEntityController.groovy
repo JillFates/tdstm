@@ -4201,7 +4201,7 @@ class AssetEntityController {
 	def exportSpecialReport = {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
-		def formatter = new SimpleDateFormat("yyyy/MM/dd")
+		def formatter = new SimpleDateFormat("yyyyMMdd")
 		def today = formatter.format(new Date())
 		try{
 			def filePath = "/templates/TDS-Storage-Inventory.xls"
@@ -4210,7 +4210,7 @@ class AssetEntityController {
 			def spcExpSheet = book.getSheet("SpecialExport")
 			def storageInventoryList = assetEntityService.getSpecialExportData( project )
 			def spcColumnList = ["server_id", "app_id", "server_name", "server_type", "app_name", "tru", "tru2", "move_bundle", "move_date",
-									"group_id", "storage_inventory", "dr_tier", "status" ]
+									"status","group_id", "environment", "criticality" ]
 			
 			for ( int r = 0; r < storageInventoryList.size(); r++ ) {
 				 for( int c = 0; c < spcColumnList.size(); c++){

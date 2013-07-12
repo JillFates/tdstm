@@ -351,9 +351,9 @@ class AssetEntityService {
 											   IFNULL(mb.name,'') AS move_bundle,
 											   IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
 											   adb.dependency_bundle AS group_id,
-											   IFNULL(server.custom4,'') AS storage_inventory,
-											   IFNULL(application.business_unit,'') AS dr_tier,
-											   IFNULL(server.plan_status,'') AS status
+											   IFNULL(server.new_or_old,'') AS status,
+											   IFNULL(server.environment, '') AS environment,
+											   IFNULL(application.criticality, '') AS criticality
 											FROM asset_entity server
 											JOIN asset_dependency srvappdep ON server.asset_entity_id = srvappdep.dependent_id
 											JOIN asset_entity app ON app.asset_entity_id = srvappdep.asset_id AND app.asset_type = 'Application'
@@ -362,7 +362,7 @@ class AssetEntityService {
 											LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id = server.asset_entity_id
 											WHERE
 											   server.project_id=${project.id}
-											   AND server.asset_type IN ('Server','VM', 'Load Balancer','Network', 'Storage')
+											   AND server.asset_type IN ('Server','VM', 'Load Balancer','Network', 'Storage', 'Blade')
 											   ORDER BY app_name, server_name
 											)
 											UNION DISTINCT
@@ -377,9 +377,9 @@ class AssetEntityService {
 											   IFNULL(mb.name,'') AS move_bundle,
 											   IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
 											   adb.dependency_bundle AS group_id,
-											   IFNULL(dbsrv.custom4,'') AS storage_inventory,
-											   IFNULL(applic.business_unit,'') AS dr_tier,
-											   IFNULL(dbsrv.plan_status,'') AS status
+											   IFNULL(dbsrv.new_or_old,'') AS status,
+										   	   IFNULL(app.environment, '') AS environment,
+											   IFNULL(applic.criticality, '') AS criticality
 											FROM asset_entity app
 											JOIN application applic ON applic.app_id=app.asset_entity_id
 											JOIN asset_dependency appdbdep ON appdbdep.asset_id = app.asset_entity_id #AND appdbdep.type='DB'
@@ -403,9 +403,9 @@ class AssetEntityService {
 											   IFNULL(mb.name,'') AS move_bundle,
 											   IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
 											   adb.dependency_bundle AS group_id,
-											   IFNULL(clustersrv.custom4,'') AS storage_inventory,
-											   IFNULL(applic.business_unit,'') AS dr_tier,
-											   IFNULL(clustersrv.plan_status,'') AS status
+											   IFNULL(clustersrv.new_or_old,'') AS status,
+											   IFNULL(app.environment, '') AS environment,
+											   IFNULL(applic.criticality, '') AS criticality
 											 FROM asset_entity app
 											JOIN application applic ON applic.app_id=app.asset_entity_id
 											JOIN asset_dependency appdbdep ON appdbdep.asset_id = app.asset_entity_id # AND appdbdep.type='DB'
