@@ -4222,9 +4222,10 @@ class AssetEntityController {
 			book.close()
 		}catch( Exception ex ){
 			log.error "Exception occurred while exporting data"+ex.printStackTrace()
-			return
+			flash.message = ex.getMessage()
+			redirect( action:exportAssets)
 		}
-	 return
+	 redirect( action:exportAssets)
 	}
 	
 	/**
