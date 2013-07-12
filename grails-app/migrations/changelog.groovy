@@ -46,5 +46,6 @@ databaseChangeLog = {
 	include file: '20130709-add-new-fields-application-table.groovy'
 	include file: '20130710-add-new-app-field-import-export.groovy'
 	include file: '20130713-add-permission-view-permission.groovy'
+	include file: '20130712-add-virtual_host-import-export.groovy'
     
 }
