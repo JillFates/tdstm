@@ -161,14 +161,14 @@ $(document).ready(function() {
 		var id = 'all'
 		if(dependencyBundle != null) id = dependencyBundle
 		
-		$('.highlightSpan').removeClass('highlightSpan')
+		$('.depGroupSelected').removeClass('depGroupSelected')
 		$('.app_count').removeClass('app_count')
 		$('.server_count').removeClass('server_count')
 		$('.vm_count').removeClass('vm_count')
 		$('.db_count').removeClass('db_count')
 		$('.file_count').removeClass('file_count')
 		
-		$('#span_'+id).addClass('highlightSpan')
+		$('#span_'+id).addClass('depGroupSelected')
 		$('#app_'+id).addClass('app_count')
 		$('#server_'+id).addClass('server_count')
 		$('#vm_'+id).addClass('vm_count')

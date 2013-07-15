@@ -106,7 +106,7 @@
 								</td>
 								<td id="file_onePlus">${gridStats.storage[1] ?: '&nbsp;' }</td>
 								<g:each in="${dependencyConsoleList}" var="asset">
-									<td id="file_${asset.dependencyBundle ?: '&nbsp;' }">
+									<td id="file_${asset.dependencyBundle ?: 0 }">
 										${asset.storageCount ?: '&nbsp;' }
 									</td>
 								</g:each>

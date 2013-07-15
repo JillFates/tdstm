@@ -921,9 +921,9 @@ td .dep-Questioned {
 	background-color: white;
 }
 .file_count{
-	border-left: 1px solid #63A242;
-	border-right: 1px solid #63A242;
-	border-bottom: 0px solid white;
+	border-left: 2px solid #63A242;
+	border-right: 2px solid #63A242;
+	border-bottom: 2px solid #63A242;
 }
 #dependency_group {
 	overflow-x:scroll; 
