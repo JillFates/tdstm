@@ -4,7 +4,7 @@
 	$("#db_planStatus").val($('#gs_planStatus').val())
 	$("#db_moveBundle").val($('#gs_moveBundle').val())
 </script>
-<g:form method="post">
+<g:form method="post"  name="createAssetsFormId">
 <input type="hidden" id="db_assetName" name="assetNameFilter" value="" />
 <input type="hidden" id="db_dbFormat" name="dbFormatFilter" value="" />
 <input type="hidden" id="db_planStatus" name="planStatusFilter" value="" />
@@ -61,7 +61,7 @@
 							<td class="label" nowrap="nowrap"><label>Version</label></td><td></td>
 							<td class="label" nowrap="nowrap"><label>SME1</label></td><td></td>
 							<td class="label ${config.validation}"><label for="validation">Validation</label></td>
-							<td colspan="3"><g:select from="${databaseInstance.constraints.validation.inList}" id="validation" class="${config.validation}" onChange="assetCustoms('',this.value,'Database');assetFieldImportance(this.value,'Database');" name="validation" value="Discovery"/></td>
+							<td colspan="3"><g:select from="${databaseInstance.constraints.validation.inList}" id="validation" class="${config.validation}" onChange="assetCustoms('create','Database');assetFieldImportance(this.value,'Database');" name="validation" value="Discovery"/></td>
 						</tr>
 						<tr>
 							<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>

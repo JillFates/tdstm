@@ -29,7 +29,7 @@
 	})
 	
 </script>
-<g:form method="post">
+<g:form method="post"  name="createAssetsFormId">
 	<input type="hidden" id="asset_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="asset_assetType" name="assetTypeFilter" value="" />
 	<input type="hidden" id="asset_model" name="modelFilter" value="" />
@@ -172,7 +172,7 @@
 								<input type="text" id="shelf" class="${config.shelf}" name="shelf" value="${assetEntityInstance.shelf}" size=2 tabindex="63" /></td>
 								<td class="label ${config.validation}"><label for="validation">Validation</label></td>
 								<td colspan="2">
-									<g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" class="${config.validation}" name="validation" onChange="assetCustoms('',this.value,'AssetEntity');assetFieldImportance(this.value,'AssetEntity');" value="Discovery"/>
+									<g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" class="${config.validation}" name="validation" onChange="assetCustoms('create','AssetEntity');assetFieldImportance(this.value,'AssetEntity');" value="Discovery"/>
 								</td>
 							</tr>
 							<tr>

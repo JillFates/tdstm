@@ -13,7 +13,7 @@
 	$("#appOwner option:first").after(myOption);
 	
 </script>
-<g:form method="post" action="save"  onsubmit="return validateSme()">
+<g:form method="post" action="save" name="createAssetsFormId" onsubmit="return validateSme()">
 	<input type="hidden" id="appl_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="appl_sme" name="appSmeFilter" value="" />
 	<input type="hidden" id="appl_validation" name="appValidationFilter" value="" />
@@ -158,7 +158,7 @@
 								</td>
 								<td class="label ${config.validation}" nowrap="nowrap"><label for="validation">Validation</label>
 								</td>
-								<td ><g:select  id="validation" class="${config.validation}" name="validation" from="${applicationInstance.constraints.validation.inList }" onChange="assetCustoms('',this.value,'Application');assetFieldImportance(this.value,'Application');"  value="" tabindex="36" />
+								<td ><g:select  id="validation" class="${config.validation}" name="validation" from="${applicationInstance.constraints.validation.inList }" onChange="assetCustoms('create','Application');assetFieldImportance(this.value,'Application');"  value="" tabindex="36" />
 								</td>
 								<td class="label ${config.testProc}" nowrap="nowrap"><label for="testProc">Test Proc OK</label>
 								</td>

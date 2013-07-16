@@ -4323,9 +4323,12 @@ class AssetEntityController {
 	  * @return
 	  */
 	 def getCustoms ={
-		 def assetEntityInstance = params.id ? AssetEntity.get(params.id): new AssetEntity(appOwner:'')
+		 def assetEntityInstance = params.id ? AssetEntity.read(params.id): new AssetEntity() // Read-only memory, 
+		 assetEntityInstance.properties=params
+		 
 		 def assetType = params.type
 		 def validation = params.validation
+		 
 		 def configMap = assetEntityService.getConfig(assetType,validation)
 		 render (template:'customEdit', model:[project:configMap.project, customs:configMap.customs, assetEntityInstance:assetEntityInstance])
 	 }

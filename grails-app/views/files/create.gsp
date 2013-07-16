@@ -5,7 +5,7 @@
 	$("#file_planStatus").val($('#gs_planStatus').val())
 	$("#file_moveBundle").val($('#gs_moveBundle').val())
 </script>
-<g:form method="post">
+<g:form method="post"  name="createAssetsFormId">
 	<input type="hidden" id="file_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="file_fileFormat" name="fileFormatFilter" value="" />
 	<input type="hidden" id="file_fileSize" name="fileSizeFilter" value="" />
@@ -75,7 +75,7 @@
 								</td>
 								<td class="label ${config.validation}"><label for="validation">Validation</label></td>
 								<td>
-									<g:select from="${fileInstance.constraints.validation.inList}" class="${config.validation}" id="validation" name="validation"  onChange="assetCustoms('',this.value,'Files');assetFieldImportance(this.value,'Files');" value="Discovery"/>
+									<g:select from="${fileInstance.constraints.validation.inList}" class="${config.validation}" id="validation" name="validation"  onChange="assetCustoms('create','Files');assetFieldImportance(this.value,'Files');" value="Discovery"/>
 								</td>
 							</tr>
 							<tr>

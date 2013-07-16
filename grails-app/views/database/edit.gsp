@@ -69,7 +69,7 @@
 							<td class="label" nowrap="nowrap"><label>Version</label></td><td></td>
 							<td class="label" nowrap="nowrap"><label>SME1</label></td><td></td>
 							<td class="label ${config.validation}"><label for="validation">Validation</label></td>
-							<td colspan="3"><g:select from="${databaseInstance.constraints.validation.inList}" id="validation" class="${config.validation}" name="validation" onChange="assetCustoms(${databaseInstance.id},this.value,'Database');assetFieldImportance(this.value,'Database');" value="${databaseInstance.validation}"/></td>
+							<td colspan="3"><g:select from="${databaseInstance.constraints.validation.inList}" id="validation" class="${config.validation}" name="validation" onChange="assetCustoms('edit','Database');assetFieldImportance(this.value,'Database');" value="${databaseInstance.validation}"/></td>
 						</tr>
 						<tr>
 							<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>

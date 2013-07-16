@@ -694,10 +694,12 @@ function showDependencyControlDiv(){
 	$("#checkBoxDivId").show();
 }
 
-function assetCustoms(id,phase,type){
+function assetCustoms(view, type){
+	var params = $("#"+view+"AssetsFormId").serializeArray();
+	params.push({"name":"type","value":type});
 	jQuery.ajax({
 		url: contextPath+'/assetEntity/getCustoms',
-		data: {'id':id,'validation':phase, 'type':type},
+		data:params,
 		async: false,
 		type:'POST',
 		success: function(resp) {
