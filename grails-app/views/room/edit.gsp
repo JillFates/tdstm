@@ -410,7 +410,8 @@ $(".draggable").draggable({
  *  using this method for NUDGING : move div(s) 1 px to all direction using arrow keys.
  */
 $(document).bind('keydown',function(evt) {
-
+	var focusedClass = $("*:focus").parent().parent().attr('class')
+	if(!focusedClass.contains('objectRowSelected')){
 	 $(".objectSelected").each(function(i) {
 		 var x = $(this).css('top')
 		 var y = $(this).css('left')
@@ -449,6 +450,7 @@ $(document).bind('keydown',function(evt) {
 			    break;
 			}
      });
+     }
 });
    
 function enableDraggableRack(){
