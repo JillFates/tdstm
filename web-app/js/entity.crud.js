@@ -99,7 +99,12 @@ function isValidDate( date ){
 }
 function addAssetDependency( type,forWhom ){
 	var rowNo = $("#"+forWhom+"_"+type+"Count").val()
-	var rowData = $("#assetDependencyRow tr").html().replace(/dataFlowFreq/g,"dataFlowFreq_"+type+"_"+rowNo).replace(/asset/g,"asset_"+type+"_"+rowNo).replace(/dtype/g,"dtype_"+type+"_"+rowNo).replace(/status/g,"status_"+type+"_"+rowNo).replace(/entity/g,"entity_"+type+"_"+rowNo)
+	var rowData = $("#assetDependencyRow tr").html()
+		.replace(/dataFlowFreq/g,"dataFlowFreq_"+type+"_"+rowNo)
+		.replace(/asset/g,"asset_"+type+"_"+rowNo)
+		.replace(/dtype/g,"dtype_"+type+"_"+rowNo)
+		.replace(/status/g,"status_"+type+"_"+rowNo)
+		.replace(/entity/g,"entity_"+type+"_"+rowNo);
 	if(type!="support"){
 		$("#"+forWhom+"DependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
 	} else {
@@ -107,12 +112,35 @@ function addAssetDependency( type,forWhom ){
 	}
 	$("#"+forWhom+"_"+type+"Count").val(parseInt(rowNo)+1)
 }
+
 function deleteRow( rowId ){
 	$("#"+rowId).remove()
 }
-function updateAssetsList( name, value ){
+
+function updateAssetsList(name, assetType, assetId ) {
 	var idValues = name.split("_")
-	$("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']").html($("#"+value+" select").html())
+	var csc = $("select[name='entity_"+idValues[1]+"_"+idValues[2]+"']")
+	var claz = csc.val()
+	var asc = $("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']")
+	asc.unbind('onmousedown')
+	asc.html($("#"+claz+" select").html())
+	// console.log("in updateAssetsList name="+name+", claz="+claz+", assetType="+assetType+", assetId="+assetId)
+
+	// Set the value if we were passing in the original value for a pre-existing asset
+	if ( 
+	  (claz == 'Application' && assetType == claz) ||
+	  (claz == 'Database' && assetType == claz) ||
+	  (claz == 'Network' && assetType == claz) ||
+	  (claz == 'Storage' && ( assetType == claz || assetType == 'Files')) || 
+	  (claz == 'Server' && assetType!='Application' && assetType!='Database' && assetType!='Network' && assetType!='Storage' && assetType!='Files') 
+	) {
+		// relookup the SELECT
+	    // $("select[name='asset_"+idValues[1]+"_"+idValues[2]+"'] option=[value='"+assetId+"']").attr('selected','selected')
+		asc.val(assetId)
+		//jQuery("select#selectBox option[value='requiredValue']").attr("selected",selected");
+		//console.log("updateAssetsList() setting select to assetId " + assetId)
+		//console.log(asc.html())
+	}
 }
 function updateTitle( type ){
 	$("#createEntityView").dialog( "option", "title", 'Create '+type );

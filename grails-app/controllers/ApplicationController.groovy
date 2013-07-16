@@ -29,7 +29,7 @@ class ApplicationController {
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
-	def  list ={
+	def list ={
 		def filters = session.APP?.JQ_FILTERS
 		session.APP?.JQ_FILTERS = []
 		def project = securityService.getUserCurrentProject()
@@ -43,8 +43,13 @@ class ApplicationController {
 		def company = project.client
 		
 		return [projectId: project.id, assetDependency: new AssetDependency(),
-			servers : entities.servers, applications : entities.applications, dbs : entities.dbs, files : entities.files, networks : entities.networks, dependencyType:entities.dependencyType, 
-			dependencyStatus:entities.dependencyStatus,event:params.moveEvent, filter:params.filter, latency:params.latency,
+			servers: entities.servers, 
+			applications: entities.applications, 
+			dbs: entities.dbs, 
+			files: entities.files, 
+			networks: entities.networks, 
+			dependencyType:entities.dependencyType, 
+			dependencyStatus:entities.dependencyStatus, event:params.moveEvent, filter:params.filter, latency:params.latency,
 		    staffRoles:taskService.getRolesForStaff(), plannedStatus:params.plannedStatus, appSme : filters?.appSmeFilter ?:'',
 			validation:params.validation, moveBundleId:params.moveBundleId, appName:filters?.assetNameFilter ?:'', sizePref:sizePref, 
 			validationFilter:filters?.appValidationFilter ?:'', moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'',

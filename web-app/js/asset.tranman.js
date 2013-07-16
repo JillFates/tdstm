@@ -1572,14 +1572,9 @@ function showResolve(value){
 	}
 	
 }
-function addPredecessor(issueCategory,predecessorCategory,comment,row,span, tableId,forWhom){
+function addPredecessor(issueCategory, predecessorCategory, comment, row, span, tableId, forWhom){
 	var rowNo = $("#predCount").val()
-	var category 
-		if(predecessorCategory){
-			category =  $('#'+predecessorCategory).val() 
-		}else{
-			category =$('#'+issueCategory).val()
-		}
+	var category = predecessorCategory ? $('#'+predecessorCategory).val() : $('#'+issueCategory).val()
 	var commentId = comment ? $('#'+comment).val() : ''
 	new Ajax.Request(contextPath+'/assetEntity/predecessorSelectHtml?category='+category+'&commentId='+commentId+'&forWhom='+forWhom, {asynchronous:false,evalScripts:true,
 		 onComplete:function(e){
@@ -1588,20 +1583,20 @@ function addPredecessor(issueCategory,predecessorCategory,comment,row,span, tabl
 	         var taskRow
 	         if(comment){
 	           taskRow =  $('#taskDependencyRow tr').html().replace("predecessorCategoryId","predecessorCategoryId_"+rowNo)
-	           											   .replace("taskDependencyId","taskDependencyEditId_"+rowNo)
-	           											   .replace("taskDependencyTdId","taskDependencyEditTdId_"+rowNo)
-	           											   .replace("taskDependencyEditId","taskDependencyEditId_"+rowNo)
-	           											   .replace(' name="predecessorSave"',' name="'+forWhom+'"')
-	           											   .replace("fillPredecessor(this.id, this.value,'')","fillPredecessor(this.id, this.value,"+commentId+",'"+forWhom+"')")
+	           		.replace("taskDependencyId","taskDependencyEditId_"+rowNo)
+	           		.replace("taskDependencyTdId","taskDependencyEditTdId_"+rowNo)
+	           		.replace("taskDependencyEditId","taskDependencyEditId_"+rowNo)
+	           		.replace(' name="predecessorSave"',' name="'+forWhom+'"')
+	           		.replace("fillPredecessor(this.id, this.value,'')","fillPredecessor(this.id, this.value,"+commentId+",'"+forWhom+"')")
 	            $('#'+tableId).append("<tr id='row_Edit_"+rowNo+"'>"+taskRow+"<td><a href=\"javascript:deleteRow(\'row_Edit_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td><tr>")
 	         }else{
 	         	taskRow =  $('#taskDependencyRow tr').html().replace("predecessorCategoryId","predecessorCategoryId_"+rowNo)
-	           											   .replace("taskDependencyId","taskDependencyId_"+rowNo)
-	           											   .replace("taskDependencyTdId","taskDependencySaveTdId_"+rowNo)
-	           											   .replace("taskDependencyEditId","taskDependencyEditId_"+rowNo)
-	           											   .replace(' name="predecessorEdit"',' name="'+forWhom+'"')
-	           											   .replace(' name="predecessorSave"',' name="'+forWhom+'"')
-	           											   .replace("fillPredecessor(this.id, this.value,'')","fillPredecessor(this.id, this.value,'','"+forWhom+"')")
+	           		.replace("taskDependencyId","taskDependencyId_"+rowNo)
+	           		.replace("taskDependencyTdId","taskDependencySaveTdId_"+rowNo)
+	           		.replace("taskDependencyEditId","taskDependencyEditId_"+rowNo)
+	           		.replace(' name="predecessorEdit"',' name="'+forWhom+'"')
+	           		.replace(' name="predecessorSave"',' name="'+forWhom+'"')
+	           		.replace("fillPredecessor(this.id, this.value,'')","fillPredecessor(this.id, this.value,'','"+forWhom+"')")
 	            $('#'+tableId).append("<tr id='row_d_"+rowNo+"'>"+taskRow+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
 	         }
 		     
@@ -1623,7 +1618,6 @@ function fillPredecessor(id, category,commentId, forWhom){
 		     $('#taskDependencyEditTdId_'+row).html(resp)
 		 }
 	})
-	
 }
 function generateDepSel(taskId, taskDependencyId, category, selectedPred, selectId, selectName){
 	jQuery.ajax({

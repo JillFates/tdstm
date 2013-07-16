@@ -333,10 +333,8 @@ digraph runbook {
 			  t.comment as task, 
 			  t.role,
 			  t.status,
-			  -- IF(t.hard_assigned=1,t.role,'') as hard_assign, 
 			  IFNULL(CONCAT(first_name,' ', last_name),'') as hard_assign,
 			  t.duration
-			  -- IFNULL(t.est_start,'') AS est_start
 			FROM asset_comment t
 			LEFT OUTER JOIN task_dependency d ON d.predecessor_id=t.asset_comment_id
 			LEFT OUTER JOIN asset_comment s ON s.asset_comment_id=d.asset_comment_id
@@ -346,6 +344,10 @@ digraph runbook {
 			  t.category IN ( ${categories} )
 			GROUP BY t.task_number
 			"""
+
+			//  -- IF(t.hard_assigned=1,t.role,'') as hard_assign, 
+			//  -- IFNULL(t.est_start,'') AS est_start
+
 		def tasks = jdbcTemplate.queryForList(query)
 		
 		def now = new Date().format('yyyy-MM-dd H:m:s')
@@ -381,7 +383,7 @@ digraph runbook {
 
 			fillcolor = taskService.taskStatusColorMap[colorKey][1]
 
-			log.info "task ${it.comment}: role ${it.role}, ${AssetComment.AUTOMATIC_ROLE}, (${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'})"
+			// log.info "task ${it.task}: role ${it.role}, ${AssetComment.AUTOMATIC_ROLE}, (${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'})"
 			// if ("${it.roll}" == "${AssetComment.AUTOMATIC_ROLE}" ) {
 			if ( "${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes' ) {
 				fontcolor = taskService.taskStatusColorMap['AUTO_TASK'][0] 
@@ -418,7 +420,7 @@ digraph runbook {
 			def uri = reportsService.generateDotGraph("runbook-$moveEventId", dotText.toString() )
 			redirect(uri:uri)
 		} catch(e) {
-			render "<pre>${e.getMessage()}</pre>"
+			render "<h1>Graph Generation Failed</h1>The error was:<p/><pre>${e.getMessage()}</pre>"
 		}				
 	}
 	

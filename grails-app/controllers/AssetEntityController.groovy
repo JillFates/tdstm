@@ -4243,58 +4243,69 @@ class AssetEntityController {
 	}
 	
     /**
-     * This action is used to populate support and dependent asset for asset edit.
+     * This action is used to populate the dependency section of the asset forms for support and dependent relationships
      * @param id : asset id
-     * @return : HTML code containing support and dependent edit form .
+     * @return : HTML code containing support and dependent edit form
      */
-	def populateDependency ={
+	def populateDependency = {
+
 		def returnMap = [:]
-		if(params.id && params.id.isNumber()){
-			def assetEntity = AssetEntity.read( params.id )
-			if( assetEntity ){
-				def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by \
-					a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
-				def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by \
-					a.asset.assetType,a.asset.assetName asc",[assetEntity])
-		
-				def assetsMap = [(AssetType.APPLICATION.toString()) : getAssetsByType(AssetType.APPLICATION.toString()), (AssetType.DATABASE.toString()) : getAssetsByType(AssetType.DATABASE.toString()),
-					(AssetType.FILES.toString()):getAssetsByType(AssetType.FILES.toString()), (AssetType.SERVER.toString()):getAssetsByType(AssetType.SERVER.toString()),
-					(AssetType.NETWORK.toString()):getAssetsByType(AssetType.NETWORK.toString()) ]
-				
+		def project = securityService.getUserCurrentProject()
+
+		if (params.id && params.id.isLong()) {
+			def assetEntity = AssetEntity.findByIdAndProject( params.id.toLong(), project )
+			if( assetEntity ) {
+
+				def dependentAssets = AssetDependency.findAll("from AssetDependency as a where asset = ? order by \
+					a.dependent.assetType, a.dependent.assetName",[assetEntity])
+				def supportAssets = AssetDependency.findAll("from AssetDependency as a where dependent = ? order by \
+					a.asset.assetType,a.asset.assetName", [assetEntity])
+/*	
+	Removed 7/16/03 - can remove soon	
+				def assetsMap = [
+					(AssetType.APPLICATION.toString()): assetEntityService.getAssetsByType(AssetType.APPLICATION.toString()), 
+					(AssetType.DATABASE.toString()): assetEntityService.getAssetsByType(AssetType.DATABASE.toString()),
+					(AssetType.FILES.toString()): assetEntityService.getAssetsByType(AssetType.FILES.toString()), 
+					(AssetType.SERVER.toString()): assetEntityService.getAssetsByType(AssetType.SERVER.toString()),
+					(AssetType.NETWORK.toString()): assetEntityService.getAssetsByType(AssetType.NETWORK.toString()) ]
+*/				
 				def nonNetworkTypes = [AssetType.SERVER.toString(),AssetType.APPLICATION.toString(),AssetType.VM.toString(),
 					AssetType.FILES.toString(),AssetType.DATABASE.toString(),AssetType.BLADE.toString()]
 				
 				def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 				def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 				
-				returnMap = [dependentAssets:dependentAssets, supportAssets:supportAssets, assetsMap:assetsMap,
-								nonNetworkTypes:nonNetworkTypes, dependencyType:dependencyType, dependencyStatus:dependencyStatus]
+				returnMap = [ 
+					dependentAssets:dependentAssets, 
+					supportAssets:supportAssets, 
+//					assetsMap:assetsMap,
+					nonNetworkTypes:nonNetworkTypes,
+					dependencyType:dependencyType, 
+					dependencyStatus:dependencyStatus ]
+			} else {
+				render "Invalid asset id for the your current project was received."
 			}
 		}
-		render(template: 'dependent', model:returnMap)
+		render(template: 'dependent', model: returnMap)
+	}
+
+	/**
+	 * Returns a lightweight list of assets filtered on  on the asset class
+	 * @param id - class of asset to filter on (e.g. Application, Database, Server)
+	 * @return JSON array of asset id, assetName
+	 */
+	def assetSelectDataByClass = {
+		def project = securityService.getUserCurrentProject()
+
+		def assetList = assetEntityService.getAssetsByType(params.id, project)
+		//log.info "getAssetSelectDataByClass() $assetList"
+		def assets = []
+		assetList?.each() { assets << [value: it.id, caption: it.assetName] 
+		}
+		def map = [assets:assets]
+		render map as JSON
 	}
 	
-	/**
-	 * This method is used to get assets by asset type
-	 * @param assetType
-	 * @return
-	 */
-	def getAssetsByType(assetType){
-		def entities = []
-		def project = securityService.getUserCurrentProject()
-		if(assetType){
-			if(assetType=='Server' || assetType=='Blade' || assetType=='VM'){
-			  entities = AssetEntity.findAll('from AssetEntity where assetType in (:type) and project = :project order by assetName asc ',
-				  [type:["Server", "VM", "Blade"], project:project])
-			} else if(assetType != 'Application' && assetType != 'Database' && assetType != 'Files'){
-			  entities = AssetEntity.findAll('from AssetEntity where assetType not in (:type) and project = :project order by assetName asc ',
-				  [type:["Server", "VM", "Blade", "Application", "Database", "Files"], project:project])
-			} else{
-			  entities = AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? order by assetName asc ',[assetType, project])
-			}
-		}
-	  return entities
-	}
 	/**
 	 * This method is used to get validation for particular fields
 	 * @param type,validation

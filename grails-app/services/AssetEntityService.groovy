@@ -525,4 +525,51 @@ class AssetEntityService {
 		}
 		return byObj
 	}
+
+	/**
+	 * This method is used to get assets by asset type
+	 * @param assetType
+	 * @return
+	 */
+	def getAssetsByType(assetType, project=null) {
+		def entities = []
+		def types
+
+		if (!project) 
+			project = securityService.getUserCurrentProject()
+
+		if (assetType) {
+			if (AssetType.getAllServerTypes().contains(assetType)) {
+				types = AssetType.getAllServerTypes()
+			} else if (AssetType.getStorageTypes().contains(assetType)) {
+				types = AssetType.getStorageTypes()
+			} else if ( [AssetType.APPLICATION.toString(), AssetType.DATABASE.toString()].contains(assetType)) {
+				types = [assetType]
+			}
+		}
+
+		// log.info "getAssetsByType() types=$types"
+
+		if (types) {
+		  entities = AssetEntity.findAllByProjectAndAssetTypeInList(project, types, [sort:'assetName'])
+		} else {
+			log.warn "getAssetsByType() calledwith unhandled type '$assetType'"
+		}	
+
+		/*
+			if (assetType=='Server' || assetType=='Blade' || assetType=='VM'){
+			  entities = AssetEntity.findAll('from AssetEntity where assetType in (:type) and project = :project order by assetName asc ',
+				  [type:["Server", "VM", "Blade"], project:project])
+			} else if (assetType != 'Application' && assetType != 'Database' && assetType != 'Files'){
+			  entities = AssetEntity.findAll('from AssetEntity where assetType not in (:type) and project = :project order by assetName asc ',
+				  [type:["Server", "VM", "Blade", "Application", "Database", "Files"], project:project])
+			} else{
+			  entities = AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? order by assetName asc ',[assetType, project])
+			}
+		}
+		*/
+	  	return entities
+	}
+
+
 }
