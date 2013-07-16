@@ -18,6 +18,7 @@
     <g:javascript library="prototype" />
     <jq:plugin name="jquery.combined" />
     <g:javascript src="crawler.js" />
+    <g:javascript src="datetimepicker.js"/>
     <%--
     <g:javascript src="bootstrap/bootstrap.min.js" /> 
     --%>

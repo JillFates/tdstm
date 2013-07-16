@@ -7,6 +7,8 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery-ui-effect.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery-ui-smoothness.css')}" />
 
 
 <title>Data Center Room List</title>
@@ -15,6 +17,10 @@
 <g:javascript src="room.rack.combined.js"/>
 <g:javascript src="entity.crud.js" />
 <g:javascript src="model.manufacturer.js"/>	
+<g:javascript src="jquery-1.9.1.js"/>	
+<g:javascript src="jquery-1.9.1-ui.js"/>
+<g:javascript src="datetimepicker.js"/>
+<g:javascript src="jquery-migrate-1.0.0.js"/>
 
 <script type="text/javascript">
 var roomId = "${roomId}"
@@ -419,36 +425,6 @@ function getRackLayout( rackId ){
 				},parameters:moveBundleId+'rackId='+rackId+'&backView=off&showCabling=off&otherBundle='+otherBundle+'&bundleName=on&hideIcons=on&forWhom='+forWhom});return false;
 	}
 }
-
-//Function to load js or css file dynamically
-function loadjscssfile(filename, filetype){
-	 if (filetype=="js"){ 
-	  var fileref=document.createElement('script')
-	  fileref.setAttribute("type","text/javascript")
-	  fileref.setAttribute("src", filename)
-	 }
-	 else if (filetype=="css"){
-	  var fileref=document.createElement("link")
-	  fileref.setAttribute("rel", "stylesheet")
-	  fileref.setAttribute("type", "text/css")
-	  fileref.setAttribute("href", filename)
-	 }
-	 if (typeof fileref!="undefined")
-	  document.getElementsByTagName("head")[0].appendChild(fileref)
-}
-
-//Function to remove js or css file dynamically
-function removejscssfile(filename, filetype){
-	 var targetelement=(filetype=="js")? "script" : (filetype=="css")? "link" : "none" 
-	 var targetattr=(filetype=="js")? "src" : (filetype=="css")? "href" : "none" 
-	 var allsuspects=document.getElementsByTagName(targetelement)
-	 for (var i=allsuspects.length; i>=0; i--){ 
-	     if (allsuspects[i] && allsuspects[i].getAttribute(targetattr)!=null && allsuspects[i].getAttribute(targetattr).indexOf(filename)!=-1)
-	  		 allsuspects[i].parentNode.removeChild(allsuspects[i]) 
-	 }
-}
-</script>
-<script>
 	currentMenuId = "#roomsMenu";
 	$("#roomMenuId a").css('background-color','#003366')
 </script>

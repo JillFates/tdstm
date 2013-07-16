@@ -938,3 +938,12 @@ table.rack_elevation table.bladeTable td.errorBlade {
 	font-size: 10px;
 	color: #000;
 }
+#datetimepicker_div {
+    border: 1px solid #777777;
+    display: none;
+    z-index: 99999 !important;
+}
+.ui-dialog .ui-dialog-titlebar-close span { 
+	display: block; 
+	margin: -8px !important; 
+}

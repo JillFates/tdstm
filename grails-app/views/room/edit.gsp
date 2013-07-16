@@ -263,9 +263,6 @@
 	var isClicking = false
 	
 $(document).ready(function() {
-	loadjscssfile('/tdstm/js/jquery-1.9.1.js','js') // Loading jquery1.9.1 and suuprting files dynamically .
-	loadjscssfile('/tdstm/js/jquery-1.9.1-ui.js','js')
-	loadjscssfile('/tdstm/css/jquery-ui-effect.css','css')
 	
 	var prefVal = '${prefVal}'
 	if(prefVal=='FALSE'){
