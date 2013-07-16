@@ -75,7 +75,7 @@
 								</td>
 								<td class="label ${config.validation}"><label for="validation">Validation</label></td>
 								<td>
-									<g:select from="${fileInstance.constraints.validation.inList}" class="${config.validation}" id="validation" name="validation"  onChange="assetCustoms('create','Files');assetFieldImportance(this.value,'Files');" value="Discovery"/>
+									<g:select from="${fileInstance.constraints.validation.inList}" class="${config.validation}" id="validation" name="validation"  onChange="assetFieldImportance(this.value,'Files');" value="Discovery"/>
 								</td>
 							</tr>
 							<tr>

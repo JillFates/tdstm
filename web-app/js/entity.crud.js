@@ -661,7 +661,7 @@ function populateDependency(assetId, whom){
 			$(".updateDep").removeAttr('disabled')
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
-			alert("An Unexpected error while populating dependent asset.")
+			alert("An unexpected error occurred while populating dependent asset.")
 		}
 	});
 }
@@ -703,13 +703,15 @@ function assetCustoms(view, type){
 		async: false,
 		type:'POST',
 		success: function(resp) {
-         $(".customTemplate").html(resp);
+			$(".customTemplate").html(resp);
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
-			alert("An Unexpected error while getting asset.")
+			alert("An unexpected error occurred while getting asset.")
 		}
 	});
 }
+
+// Sets the field importance style classes in the edit and create views for all asset classes
 function assetFieldImportance(phase,type){
 	jQuery.ajax({
 		url: contextPath+'/assetEntity/getassetImportance',
@@ -722,12 +724,12 @@ function assetFieldImportance(phase,type){
 			$("td,input,select").removeClass("N")
 			Object.keys(resp).forEach(function(key) {
 				var value = resp[key]
-		        $(".dialog input[name="+key+"],select[name="+key+"],input[name="+key+".id],select[name="+key+".id]").addClass(value);
+				$(".dialog input[name="+key+"],select[name="+key+"],input[name="+key+".id],select[name="+key+".id]").addClass(value);
 				$(".dialog label[for="+key+"],label[for="+key+"Id]").parent().addClass(value);
 			});
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
-			alert("An Unexpected error while getting asset.")
+			alert("An unexpected error occurred while getting asset.")
 		}
 	});
 	

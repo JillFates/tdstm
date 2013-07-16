@@ -3853,7 +3853,163 @@ class AssetEntityController {
 				}
 
 				graphData << ["links":graphLinks]
+
+				model.force = force
+				model.distance = distance
+				model.friction = friction
+				model.height = height
+				model.width = width
+				model.labels = labels 
+				model.appChecked = labels.contains('apps')
+				model.serverChecked = labels.contains('servers')
+				model.filesChecked = labels.contains('files')
+				model.eventColorCode = eventColorCode
+				model.nodes = graphNodes as JSON
+				model.links = graphLinks as JSON
+
+				render(template:'dependencyGraph',model:model)
+
+				break
+		} // switch
+
+	}
+	
+	
+	
+
+	/**
+	 * Used by the dependency console to load up the individual tabs for a dependency bundle
+	 * @param String entity - the entity type to view (server,database,file,app)
+	 * @param Integer dependencyBundle - the dependency bundle ID 
+	 * @return String HTML representing the page
+	 */
+	def depTest = {
+
+		session.removeAttribute('assetDependentlist')
+
+		def project = securityService.getUserCurrentProject()
+		def projectId = project.id
+
+		def depSql = """SELECT  
+		   sum(if(a.asset_type in ( ${AssetType.getPhysicalServerTypesAsString()} ), 1, 0)) as serverCount,
+		   sum(if(a.asset_type in ( ${AssetType.getVirtualServerTypesAsString()} ), 1, 0)) as vmCount,
+		   sum(if(a.asset_type in ( ${AssetType.getStorageTypesAsString()} ), 1, 0)) as storageCount,
+		   sum(if(a.asset_type = '${AssetType.DATABASE.toString()}', 1, 0)) as dbCount,
+		   sum(if(a.asset_type = '${AssetType.APPLICATION.toString()}', 1, 0)) as appCount
+		from asset_dependency_bundle adb
+		join asset_entity a ON a.asset_entity_id=adb.asset_id
+		where adb.project_id=${projectId}
+		"""
+
+		def assetDependentlist
+			// Get just the assets for a particular dependency group id
+		assetDependentlist = AssetDependencyBundle.findAllByDependencyBundleAndProject(6,project)
+		depSql += " and adb.dependency_bundle = ${6}"
+		
+		//log.error "getLists() : query for assetDependentlist took ${TimeUtil.elapsed(start)}"
+		// Took 0.296 seconds
+
+		// Save the group id into the session as it is used to redirect the user back after updating assets or doing assignments
+		session.setAttribute('dependencyBundle', 6)
+		// TODO : This pig of a list should NOT be stored into the session and the logic needs to be reworked
+		session.setAttribute('assetDependentlist', assetDependentlist)
+
+		def stats = jdbcTemplate.queryForMap(depSql)
+
+		def model = [entity: ('graph' ?: 'apps'), stats:stats]
+
+		model.dependencyBundle = 6
+		model.asset = 'graph'
+
+		def serverTypes = AssetType.getAllServerTypes()
+				def filesListSize = assetDependentlist.findAll{ AssetType.getStorageTypes().contains(it.asset.assetType)}.size()
+				def appDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.size()
+
+				def graphData = [:]
+				def force 
+				def distance 
+				def friction = 1//params.friction && params.friction != 'undefined' ? params.friction : 0.8
+				def height 
+				def width 
+				def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+				Set uniqueMoveEventList = moveBundleList.moveEvent
+			    uniqueMoveEventList.remove(null)
+			    List moveEventList = []
+			    moveEventList =  uniqueMoveEventList.toList()
+			    moveEventList.sort{it?.name}
+				def eventColorCode = [:]
+				int colorDiff
+				if (moveEventList.size()) {
+				   colorDiff = (232/moveEventList.size()).intValue()
+				}
+				moveEventList.eachWithIndex{ event, i -> 
+					def colorCode = colorDiff * i
+					def colorsCode = "rgb(${colorCode},${colorCode},${colorCode})"
+					eventColorCode << [(event.name):colorsCode]
+				}
+				graphData << ["friction":friction]
+				
+				if (assetDependentlist.size()<30) {
+					force = ApplicationConstants.graphDefaultSmallMap["force"]
+					distance = ApplicationConstants.graphDefaultSmallMap["linkdistance"]
+					width =  ApplicationConstants.graphDefaultSmallMap["width"]
+					height = ApplicationConstants.graphDefaultSmallMap["height"]
+					graphData << ApplicationConstants.graphDefaultSmallMap
+			    } else if(assetDependentlist.size()<200) {
+					force = ApplicationConstants.graphDefaultMediumMap["force"]
+					distance = ApplicationConstants.graphDefaultMediumMap["linkdistance"]
+					width =  ApplicationConstants.graphDefaultMediumMap["width"]
+					height = ApplicationConstants.graphDefaultMediumMap["height"]
+					graphData << ApplicationConstants.graphDefaultMediumMap
+			    } else {
+					force = ApplicationConstants.graphDefaultLargeMap["force"]
+					distance = ApplicationConstants.graphDefaultLargeMap["linkdistance"]
+					width =  ApplicationConstants.graphDefaultLargeMap["width"]
+					height = ApplicationConstants.graphDefaultLargeMap["height"]
+					graphData << ApplicationConstants.graphDefaultLargeMap
+			    }
+				def graphNodes = []
+				
+				assetDependentlist.each {
+					def name = ''
+					def shape = 'circle'
+					def size = 150
+					def title = it.asset.assetName
+					def color = ''				
+						name = it.asset.assetName
+						shape = 'square'
+					def moveEventName = it.asset.moveBundle?.moveEvent?.name
+					graphNodes << [ 
+						id:it.asset.id, name:name, 
+						type:it.asset.assetType, group:it.dependencyBundle, 
+						shape:shape, size:size, title:title, 
+						color:eventColorCode[moveEventName]?eventColorCode[moveEventName]:'red'
+					]
+				}
+
+				graphData << ["nodes":graphNodes]
+				def assetDependencies = AssetDependency.findAll("From AssetDependency where asset.project = :project OR dependent.project = :project",[project:project])
+				def graphLinks = []
+				assetDependencies.each{
+					def opacity = 1
+					def statusColor = 'gray'
+					if(it.status=='Questioned'){
+						statusColor='red'
+					}else if(it.status=='Unknown'|| it.status=='Validated') {
+						// nothing special
+					} else {
+						opacity = 0.2
+					}
+					def sourceIndex = graphNodes.id.indexOf(it.asset.id)
+					def targetIndex = graphNodes.id.indexOf(it.dependent.id)
+					if(sourceIndex != -1 && targetIndex != -1){
+						graphLinks << ["source":sourceIndex,"target":targetIndex,"value":2,"statusColor":statusColor,"opacity":opacity,"distance":50]
+					}
+				}
+
+				graphData << ["links":graphLinks]
 				JSON output = graphData as JSON
+				log.info "${output}"
 				def currentfile = ApplicationHolder.application.parentContext.getResource( "/d3/force/force.js" ).getFile()
 				assetEntityService.deleteTempGraphFiles("/d3/force", "G_")
 				def file_name = "G_${new Date().getTime()}"
@@ -3866,19 +4022,17 @@ class AssetEntityController {
 				model.friction = friction
 				model.height = height
 				model.width = width
-				model.labels = labels 
-				model.appChecked = labels.contains('apps')
-				model.serverChecked = labels.contains('servers')
-				model.filesChecked = labels.contains('files')
 				model.eventColorCode = eventColorCode
 				model.file_name = file_name
+				model.nodes = graphNodes as JSON
+				model.links = graphLinks as JSON
+				model.graphData = output
 
-				render(template:'dependencyGraph',model:model)
-
-				break
+				//render(template:'dependencyGraph',model:model)
+				return model
 		} // switch
-
-	} 
+	
+	
 	
 	def reloadMap = {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ

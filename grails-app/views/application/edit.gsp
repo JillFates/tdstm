@@ -164,7 +164,7 @@
 								</td>
 								<td class="label ${config.validation}" nowrap="nowrap"><label for="validation">Validation</label>
 								</td>
-								<td ><g:select  id="validation"	class="${config.validation}" name="validation" from="${applicationInstance.constraints.validation.inList }"  onChange="assetCustoms('edit','Application');assetFieldImportance(this.value,'Application')" value="${applicationInstance.validation}" tabindex="36" />
+								<td ><g:select  id="validation"	class="${config.validation}" name="validation" from="${applicationInstance.constraints.validation.inList }"  onChange="assetCustoms(${applicationInstance.id},this.value,'Application');assetFieldImportance(this.value,'Application')" value="${applicationInstance.validation}" tabindex="36" />
 								</td>
 								<td class="label ${config.testProc}" nowrap="nowrap"><label for="testProc">Test Proc OK</label>
 								</td>
