@@ -573,3 +573,6 @@ td.buttons{
 .inlineLink:hover {
 	text-decoration: underline !important;
 }
+.ynselect{
+	max-width: 50px !important;
+}

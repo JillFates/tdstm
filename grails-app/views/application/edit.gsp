@@ -168,7 +168,7 @@
 								</td>
 								<td class="label ${config.testProc}" nowrap="nowrap"><label for="testProc">Test Proc OK</label>
 								</td>
-								<td ><g:select  id="testProc"	class="${config.testProc}" name="testProc"  from="${['Y', 'N']}" value="?"
+								<td ><g:select  id="testProc"	class="${config.testProc} ynselect" name="testProc"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="46" value="${applicationInstance.testProc}" tabindex="46"/>
 								</td>
 							</tr>
@@ -186,12 +186,12 @@
 								</td>
 								<td class="label ${config.latency}" nowrap="nowrap"><label for="latency">Latency OK</label>
 								</td>
-								<td ><g:select  id="latency" class="${config.latency}"	name="latency"  from="${['Y', 'N']}" value="?"
+								<td ><g:select  id="latency" class="${config.latency} ynselect"	name="latency"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="46" value="${applicationInstance.latency}" tabindex="37" />
 								</td>
 								<td class="label ${config.startupProc}" nowrap="nowrap"><label for="startupProc">Startup Proc OK</label>
 								</td>
-								<td ><g:select  id="startupProc" class="${config.startupProc}" name="startupProc" from="${['Y', 'N']}" value="?"
+								<td ><g:select  id="startupProc" class="${config.startupProc} ynselect" name="startupProc" from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="46" value="${applicationInstance.startupProc}" tabindex="47"/>
 								</td>
 								
@@ -252,7 +252,7 @@
 								<td colspan="7">
 									<g:each in="${moveEvent}" var="moveEventList">
 										<div  class="label" style="float: left;width: auto;padding: 5px;" ><label for="moveEvent"><b>${moveEventList?.name}</b></label>
-	      								    <g:select id="okToMove__${moveEventList?.id}" name="okToMove_${moveEventList?.id}" from="${['Y', 'N']}" value="${AppMoveEvent.findByApplicationAndMoveEvent(applicationInstance,moveEventList)?.value}" noSelection="['':'?']" />
+	      								    <g:select id="okToMove__${moveEventList?.id}" class="ynselect" name="okToMove_${moveEventList?.id}" from="${['Y', 'N']}" value="${AppMoveEvent.findByApplicationAndMoveEvent(applicationInstance,moveEventList)?.value}" noSelection="['':'?']" />
 		                                  </label>
 		                                </div>
 									</g:each>

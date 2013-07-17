@@ -162,7 +162,7 @@
 								</td>
 								<td class="label ${config.testProc}" nowrap="nowrap"><label for="testProc">Test Proc OK</label>
 								</td>
-								<td ><g:select  id="testProc"	class="${config.testProc}" name="testProc"  from="${['Y', 'N']}" value="?"
+								<td ><g:select  id="testProc"	class="${config.testProc} ynselect" name="testProc"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="46" />
 								</td>
 							</tr>
@@ -180,12 +180,12 @@
 								</td>
 								<td class="label ${config.latency}" nowrap="nowrap"><label for="latency">Latency OK</label>
 								</td>
-								<td ><g:select  id="latency" class="${config.latency}"	name="latency"  from="${['Y', 'N']}" value="?"
+								<td ><g:select  id="latency" class="${config.latency} ynselect"	name="latency"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="37" />
 								</td>
 								<td class="label ${config.startupProc}" nowrap="nowrap"><label for="startupProc">Startup Proc OK</label>
 								</td>
-								<td ><g:select  id="startupProc" class="${config.startupProc}" name="startupProc" from="${['Y', 'N']}" value="?"
+								<td ><g:select  id="startupProc" class="${config.startupProc} ynselect" name="startupProc" from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="47" />
 								</td>
 								
@@ -245,7 +245,7 @@
 										<div class="label"
 											style="float: left; width: auto; padding: 5px;">
 											<label for="moveEvent"><b>${moveEvent.name}</b>
-											</label> <label for="moveEvent"> <g:select id="okToMove_${moveEvent.id}" name="okToMove_${moveEvent.id}" from="${['Y', 'N']}" 
+											</label> <label for="moveEvent"> <g:select id="okToMove_${moveEvent.id}" class="ynselect" name="okToMove_${moveEvent.id}" from="${['Y', 'N']}" 
 											value="?" noSelection="['':'?']" />
 											</label>
 										</div>
