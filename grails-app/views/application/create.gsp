@@ -13,7 +13,7 @@
 	$("#appOwner option:first").after(myOption);
 	
 </script>
-<g:form method="post" action="save" name="createAssetsFormId" onsubmit="return validateSme()">
+<g:form method="post" action="save" onsubmit="return validateSme()">
 	<input type="hidden" id="appl_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="appl_sme" name="appSmeFilter" value="" />
 	<input type="hidden" id="appl_validation" name="appValidationFilter" value="" />

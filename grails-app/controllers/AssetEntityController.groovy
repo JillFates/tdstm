@@ -4471,21 +4471,6 @@ class AssetEntityController {
 		 def configMap = assetEntityService.getConfig(assetType,validation)
 		 render configMap.config as JSON
 	 }
-	 /**
-	  * This method is used to get custom list.
-	  * @param type,validation
-	  * @return
-	  */
-	 def getCustoms ={
-		 def assetEntityInstance = params.id ? AssetEntity.read(params.id): new AssetEntity() // Read-only memory, 
-		 assetEntityInstance.properties=params
-		 
-		 def assetType = params.type
-		 def validation = params.validation
-		 
-		 def configMap = assetEntityService.getConfig(assetType,validation)
-		 render (template:'customEdit', model:[project:configMap.project, customs:configMap.customs, assetEntityInstance:assetEntityInstance])
-	 }
 	 
 	 /**
 	  * This method is used to update sheet's column header with custom labels

@@ -189,7 +189,7 @@
 								<input type="text" id="cart" class="${config.cart}" name="cart" value="${assetEntityInstance.cart}" size=3 tabindex="62" />
 								<input type="text" id="shelf" class="${config.shelf}" name="shelf" value="${assetEntityInstance.shelf}" size=2 tabindex="63" /></td>
 								<td class="label ${config.validation}"><label for="validation">Validation</label></td>
-								<td  colspan="2"><g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" class="${config.validation}" name="validation" onChange="assetCustoms(${assetEntityInstance.id},this.value,'AssetEntity');assetFieldImportance(this.value,'AssetEntity');" value="${assetEntityInstance.validation}"/>	
+								<td  colspan="2"><g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" class="${config.validation}" name="validation" onChange="assetFieldImportance(this.value,'AssetEntity');" value="${assetEntityInstance.validation}"/>	
 								</td>
 							</tr>
 							<tr>

@@ -75,7 +75,7 @@
 								<g:select from="${com.tds.asset.Files.constraints.sizeUnit.inList}" name="sizeUnit" id="sizeUnit" value="${fileInstance.sizeUnit}"/>
 								</td>
 								<td class="label ${config.validation}"><label for="validation">Validation</label></td>
-							<td><g:select from="${fileInstance.constraints.validation.inList}" id="validation" class="${config.validation}" name="validation" onChange="assetCustoms(${databaseInstance.id},this.value,'Files');assetFieldImportance(this.value,'Files')" value="${fileInstance.validation}"/>	
+							<td><g:select from="${fileInstance.constraints.validation.inList}" id="validation" class="${config.validation}" name="validation" onChange="assetFieldImportance(this.value,'Files')" value="${fileInstance.validation}"/>	
 							</tr>
 							<tr>
 								<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>

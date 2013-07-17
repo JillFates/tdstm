@@ -73,11 +73,20 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 		FIELD_LIST.push("custom"+i);
 	}
 	$scope.assignData = function(type,value,field,phase) {
-		//checking condition that hidden will only work for customs1.. 24
-			if(value!= 'H'){
+		//checking condition that for customs1.. 24 FI='H' must be same for all validation types.
+			if(FIELD_LIST.indexOf(field) != -1 && value=='H'){
+				$scope.phases.each(function(p){
+				$scope.setImportance(type,field, p.id, value);
+				});
+			}else if(value!= 'H'){ //checking condition that hidden will only work for customs1.. 24
 				$scope.setImportance(type,field, phase, value);
-			}else if(value == "H" && FIELD_LIST.indexOf(field) != -1){
-				$scope.setImportance(type,field, phase, value);
+				//checking condition to remove FI i.e Hidden for custom fields when FI is selected as C or I or N.
+					$scope.phases.each(function(p){
+						if(p.id!=phase && $scope.importance[type][field]['phase'][p.id]=='H')
+						$scope.setImportance(type,field, p.id, 'N');
+					});
+			}else{
+				$scope.setImportance(type,field, phase, 'N');
 			}
 	};
 

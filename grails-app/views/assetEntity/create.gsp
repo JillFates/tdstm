@@ -29,7 +29,7 @@
 	})
 	
 </script>
-<g:form method="post"  name="createAssetsFormId">
+<g:form method="post">
 	<input type="hidden" id="asset_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="asset_assetType" name="assetTypeFilter" value="" />
 	<input type="hidden" id="asset_model" name="modelFilter" value="" />

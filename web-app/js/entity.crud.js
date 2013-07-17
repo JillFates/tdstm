@@ -694,23 +694,6 @@ function showDependencyControlDiv(){
 	$("#checkBoxDivId").show();
 }
 
-function assetCustoms(view, type){
-	var params = $("#"+view+"AssetsFormId").serializeArray();
-	params.push({"name":"type","value":type});
-	jQuery.ajax({
-		url: contextPath+'/assetEntity/getCustoms',
-		data:params,
-		async: false,
-		type:'POST',
-		success: function(resp) {
-			$(".customTemplate").html(resp);
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			alert("An unexpected error occurred while getting asset.")
-		}
-	});
-}
-
 // Sets the field importance style classes in the edit and create views for all asset classes
 function assetFieldImportance(phase,type){
 	jQuery.ajax({
