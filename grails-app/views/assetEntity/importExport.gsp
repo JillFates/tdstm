@@ -105,7 +105,7 @@
                 <tr><td colspan="2">
 	                <span><input type="checkbox" id="applicationId" name="application" value="application" 
 	                		onclick="if(this.checked){this.value = 'TRUE' } else {this.value = 'FALSE'};importExportPreference(this.value,'ImportApplication')" 
-	                		${prefMap['importApplication']=='TRUE' ? 'checked="checked"' :''}/>&nbsp;
+	                		${prefMap['ImportApplication']=='TRUE' ? 'checked="checked"' :''}/>&nbsp;
 	                <label for="applicationId">Application</label></span>&nbsp;
 	                <span><input type="checkbox" id="assetId" name="asset" value="asset" 
 	                		onclick="if(this.checked){this.value = 'TRUE' } else {this.value = 'FALSE'};importExportPreference(this.value,'ImportServer')"
