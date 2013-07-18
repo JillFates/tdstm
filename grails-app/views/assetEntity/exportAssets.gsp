@@ -38,13 +38,34 @@
                 </select></td>
               </tr>                           
               <tr><td colspan="2">
-	                <span><input type="checkbox" id="applicationId" name="application" value="application"/>&nbsp;<label for="applicationId">Application</label></span>&nbsp;
-	                <span><input type="checkbox" id="assetId" name="asset" value="asset" checked="checked"/>&nbsp;<label for="assetId">Server</label></span>&nbsp;
-	                <span><input type="checkbox" id="databaseId" name="database" value="database" />&nbsp;<label for="databaseId">Database</label></span>&nbsp;
-	                <span><input type="checkbox" id="filesId" name="files" value="files"  />&nbsp;<label for="filesId">Storage</label></span>&nbsp;
-	                <span><input type="checkbox" id="roomId" name="room" value="room" />&nbsp;<label for="roomId">Room</label></span>&nbsp;
-	                <span><input type="checkbox" id="rackId" name="rack" value="rack" />&nbsp;<label for="rackId">Rack</label></span>&nbsp;
-	                <span><input type="checkbox" id="dependencyId" name="dependency" value="dependency" />&nbsp;<label for="dependencyId">Dependency</label></span>&nbsp;
+	                <span><input type="checkbox" id="applicationId" name="application" value="application" 
+	                		onclick="if(this.checked){this.value = 'TRUE' } else {this.value = 'FALSE'};importExportPreference(this.value,'ImportApplication')"
+	                		${prefMap['ImportApplication']=='TRUE' ? 'checked="checked"' :''}/>&nbsp;
+	                		<label for="applicationId">Application</label></span>&nbsp;
+	                <span><input type="checkbox" id="assetId" name="asset" value="asset" 
+	                		onclick="if(this.checked){this.value = 'TRUE' } else {this.value = 'FALSE'};importExportPreference(this.value,'ImportServer')"
+	                		${prefMap['ImportServer']=='TRUE' ? 'checked="checked"' :''}/>&nbsp;
+	                		<label for="assetId">Server</label></span>&nbsp;
+	                <span><input type="checkbox" id="databaseId" name="database" value="database"
+	                		onclick="if(this.checked){this.value = 'TRUE' } else {this.value = 'FALSE'};importExportPreference(this.value,'ImportDatabase')"
+	                	 	${prefMap['ImportDatabase']=='TRUE' ? 'checked="checked"' :''}/>&nbsp;
+	                		<label for="databaseId">Database</label></span>&nbsp;
+	                <span><input type="checkbox" id="filesId" name="files" value="files"
+	                onclick="if(this.checked){this.value = 'TRUE' } else {this.value = 'FALSE'};importExportPreference(this.value,'ImportStorage')"  
+	                		${prefMap['ImportStorage']=='TRUE' ? 'checked="checked"' :''}/>&nbsp;
+	                		<label for="filesId">Storage</label></span>&nbsp;
+	                <span><input type="checkbox" id="roomId" name="room" value="room" 
+	                		onclick="if(this.checked){this.value = 'TRUE' } else {this.value = 'FALSE'};importExportPreference(this.value,'ImportRoom')"
+	                		${prefMap['ImportRoom']=='TRUE' ? 'checked="checked"' :''}/>&nbsp;
+	                		<label for="roomId">Room</label></span>&nbsp;
+	                <span><input type="checkbox" id="rackId" name="rack" value="rack" 
+	                		onclick="if(this.checked){this.value = 'TRUE' } else {this.value = 'FALSE'};importExportPreference(this.value,'ImportRack')"
+	                		${prefMap['ImportRack']=='TRUE' ? 'checked="checked"' :''}/>&nbsp;
+	                		<label for="rackId">Rack</label></span>&nbsp;
+	                <span><input type="checkbox" id="dependencyId" name="dependency" value="dependency" 
+	                		onclick="if(this.checked){this.value = 'TRUE' } else {this.value = 'FALSE'};importExportPreference(this.value,'ImportDependency')"
+	                		${prefMap['ImportDependency']=='TRUE' ? 'checked="checked"' :''}/>&nbsp;
+	                		<label for="dependencyId">Dependency</label></span>&nbsp;
 	                </td>
                </tr>
                <tr>
@@ -65,6 +86,13 @@
 <script>
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')
+	
+	function importExportPreference(value,forWhom){
+		jQuery.ajax({
+			url:contextPath+'/assetEntity/setImportPerferences',
+			data:{'selected':value, 'prefFor':forWhom}
+		});
+	}
 </script>
   
   

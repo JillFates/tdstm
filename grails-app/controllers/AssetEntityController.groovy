@@ -173,6 +173,12 @@ class AssetEntityController {
 		if( params.message ) {
 		  flash.message = params.message
 		}
+		
+		def prefMap = [:]
+		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency'].each{t->
+		   prefMap << [(t) : userPreferenceService.getPreference(t)]
+		}
+		
 		def isMSIE = false
 		def userAgent = request.getHeader("User-Agent")
 		if (userAgent.contains("MSIE") || userAgent.contains("Firefox"))
@@ -182,7 +188,7 @@ class AssetEntityController {
 					projectId: projectId,
 					moveBundleInstanceList: moveBundleInstanceList,
 					dataTransferSetImport: dataTransferSetImport,
-					dataTransferSetExport: dataTransferSetExport,
+					dataTransferSetExport: dataTransferSetExport, prefMap:prefMap,
 					dataTransferBatchs: dataTransferBatchs, args:params.list("args"), isMSIE:isMSIE] )
 	}
 	/* -----------------------------------------------------
@@ -220,8 +226,14 @@ class AssetEntityController {
 			project = Project.findById(projectId)
 		}
 		def	dataTransferBatchs = DataTransferBatch.findAllByProject(project).size()
+		
+		def prefMap = [:]
+		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency','ImportRoom','ImportRack'].each{t->
+		   prefMap << [(t) : userPreferenceService.getPreference(t)]
+		}
+		
 		render (view:"exportAssets",model : [projectId: projectId,
-						dataTransferBatchs:dataTransferBatchs,
+						dataTransferBatchs:dataTransferBatchs, prefMap:prefMap,
 					moveBundleInstanceList: moveBundleInstanceList,
 					dataTransferSetExport: dataTransferSetExport])
 	}
@@ -4515,5 +4527,20 @@ class AssetEntityController {
 			 }
 		 }
 		 return columnslist
+	 }
+	 /**
+	  * This method is used to set Import perferences.(ImportApplication,ImportServer,ImportDatabase,
+	  * ImportStorage,ImportRoom,ImportRack,ImportDependency)
+	  * @param prefFor
+	  * @param selected
+	  */
+	 def setImportPerferences ={
+		 def key = params.prefFor
+		 def selected=params.selected
+		 if(selected){
+			 userPreferenceService.setPreference( key, selected )
+			 session.setAttribute(key,selected)
+		 }
+		 render true
 	 }
 }
