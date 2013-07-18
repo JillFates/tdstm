@@ -27,13 +27,34 @@
 	        $("#run").click(function(){
 	        	$("#progressbar").css("display","block")
 	        	clearInterval(handle);
-				handle=setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}",500);
+	        	if(${isMSIE}){
+	        		handle=setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}",500);
+		        } else {
+					handle=setInterval(getProgress,1500);
+		        }
 	        });
 		});
+
+
+		//This code is used to display progress bar at chrome as Chrome browser cancel all ajax request while uploading .
+		function getProgress(){	
+			 $("#iFrame").attr('src', contextPath+'/assetEntity/getProgress');
+		}
+		function onIFrameLoad() {
+		   var serverResponse = $("#iFrame").contents().find("pre").html();
+		   var jsonProgress = JSON.parse( serverResponse )
+		   if(jsonProgress){
+			   $("#progressbar").reportprogress(jsonProgress[0].imported,jsonProgress[0].total);
+		       if(jsonProgress[0].imported==jsonProgress[0].total){
+	  	         clearInterval(handle);
+		       }
+		   }
+		 }
 	</script>
+	
   </head>
   <body>
-   
+    <iframe id='iFrame' class="iFrame" onload='onIFrameLoad()'></iframe>     
     <div class="body">
     <g:if test="${flash.message && args}">
     	<div class="message"><g:message code="${flash.message}" args="${args}" /></div>

@@ -44,7 +44,12 @@ class DataTransferBatchController {
 		if( !params.max ) params.max = 10
 		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( project, "I", 
 				[sort:"dateCreated", order:"desc",max:params.max,offset:params.offset ? params.offset : 0] )
-		return [ dataTransferBatchList:dataTransferBatchList, projectId:projectId ]
+		
+		def isMSIE = false
+		def userAgent = request.getHeader("User-Agent")
+		if (userAgent.contains("MSIE") || userAgent.contains("Firefox"))
+			isMSIE = true
+		return [ dataTransferBatchList:dataTransferBatchList, projectId:projectId, isMSIE:isMSIE ]
     }
 
     /* -----------------------------------------------------------------------

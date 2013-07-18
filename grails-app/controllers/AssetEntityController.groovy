@@ -173,12 +173,17 @@ class AssetEntityController {
 		if( params.message ) {
 		  flash.message = params.message
 		}
+		def isMSIE = false
+		def userAgent = request.getHeader("User-Agent")
+		if (userAgent.contains("MSIE") || userAgent.contains("Firefox"))
+			isMSIE = true
+		
 		render( view:"importExport", model : [ assetsByProject: assetsByProject,
 					projectId: projectId,
 					moveBundleInstanceList: moveBundleInstanceList,
 					dataTransferSetImport: dataTransferSetImport,
 					dataTransferSetExport: dataTransferSetExport,
-					dataTransferBatchs: dataTransferBatchs, args:params.list("args")] )
+					dataTransferBatchs: dataTransferBatchs, args:params.list("args"), isMSIE:isMSIE] )
 	}
 	/* -----------------------------------------------------
 	 * To Export the assets

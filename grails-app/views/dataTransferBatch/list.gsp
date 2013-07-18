@@ -18,7 +18,7 @@
 			if(progress){
 				checkProgressBar = true;
 				$("#progressbar").reportprogress(progress[0].processed,progress[0].total);
-		        if(progress[0].imported==progress[0].total){
+		        if(progress[0].processed==progress[0].total){
 		        		checkProgressBar = false;
 		                clearInterval(handle);
 		                location.reload(true);
@@ -35,7 +35,11 @@
 				if(returnStatus){
 					$("#progressbar").css("display","block")
 				    clearInterval(handle);
-					handle=setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}",500);
+					if(${isMSIE}){
+						handle=setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}",500);
+					} else {
+						handle=setInterval(getProcessedDataInfo,1000);
+			        }
 					return true;
 				} else {
 					return false;
@@ -45,7 +49,23 @@
 				return false;
 			}
 		}
-
+		//This code is used to display progress bar at chrome as Chrome browser cancel all ajax request while uploading .
+		function getProcessedDataInfo(){	
+			 $("#iFrame").attr('src', contextPath+'/dataTransferBatch/getProgress');
+		}
+		function onIFrameLoad() {
+		   var serverResponse = $("#iFrame").contents().find("pre").html();
+		   var jsonProgress = JSON.parse( serverResponse )
+		   if(jsonProgress){
+			   checkProgressBar = true;
+			   $("#progressbar").reportprogress(jsonProgress[0].processed, jsonProgress[0].total);
+		       if(jsonProgress[0].processed==jsonProgress[0].total){
+		    	   checkProgressBar = false;
+	  	           clearInterval(handle);
+	  	           location.reload(true);
+		       }
+		   }
+		 }
 		function removeDataTrsferBatch(id){
 			var id = id
 	           jQuery.ajax({
@@ -53,8 +73,8 @@
                   data:{'id':id},
                   type:'POST',
                   success: function(data){
-                            window.location.reload();
-                            }
+                     window.location.reload();
+                  }
 			    });
 		}
 		
@@ -63,7 +83,7 @@
     <body>
     
 	    <br>
-        
+         <iframe id='iFrame'  class='iFrame' onload='onIFrameLoad()'></iframe>
         <div class="body">
         	<table style="border: 0"><tr><td><h1>Data Transfer Batch List</h1></td>
         	<td style="vertical-align: bottom;" align="right"><div id="progressbar" style="display: none;" /></td></tr> </table>
