@@ -364,7 +364,8 @@ class PersonController {
 			log.info "save() had errors: $errMsg"
 
 		if (isAjaxCall) {
-			def map = errMsg ? [errMsg : errMsg] : [ id: person.id, name:name, isExistingPerson:isExistingPerson, fieldName:params.fieldName]
+			def selectVariable=person.lastName+" "+person.firstName
+			def map = errMsg ? [errMsg : errMsg] : [ id: person.id, name:selectVariable, isExistingPerson:isExistingPerson, fieldName:params.fieldName]
 			render map as JSON
 		} else {
 			if (errMsg) 
