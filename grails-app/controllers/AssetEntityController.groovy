@@ -43,6 +43,7 @@ import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
+import RolePermissions
 
 class AssetEntityController {
 
@@ -4543,4 +4544,90 @@ class AssetEntityController {
 		 }
 		 render true
 	 }
+	 /**
+	  * Action to return on list Dependency
+	  */
+	 def listDependencies ={
+		 def hasPerm = RolePermissions.hasPermission("AssetDelete") 
+		 return [hasPerm:hasPerm]
+	 }
+	 /**
+	  * This method is to show list of dependencies using jqgrid.
+	  */
+	 def listDepJson ={
+		 def sortIndex = params.sidx ?: 'asset'
+		 def sortOrder  = params.sord ?: 'asc'
+		 def maxRows = Integer.valueOf(params.rows)
+		 def currentPage = Integer.valueOf(params.page) ?: 1
+		 def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		 def project = securityService.getUserCurrentProject()
+		 def sid
+		 def dependencies = AssetDependency.createCriteria().list(max: maxRows, offset: rowOffset) {
+			 createAlias("asset","ae")
+			 createAlias("dependent","d")
+			 createAlias("asset.moveBundle","am")
+			 createAlias("dependent.moveBundle","dm")
+			 eq('ae.project',project)
+			 if (params.assetType)
+				ilike('ae.assetType',"%${params.assetType}%")
+			 if (params.asset)
+				ilike('ae.assetName',"%${params.asset}%")
+			 if (params.dataFlowFreq)
+				 ilike('dataFlowFreq', "%${params.dataFlowFreq}%")
+			 if (params.depClass)
+				 ilike('d.assetType',"%${params.depClass}%")
+			 if (params.dependent)
+				 ilike('d.assetName',"%${params.dependent}%")
+			 if (params.type)
+				 ilike('type',"%${params.type}%")
+			 if (params.status)
+				 ilike('status',"%${params.status}%")
+			 if (params.bundle)
+				 ilike('am.name',"%${params.bundle}%")
+			 if (params.depBundle)
+				 ilike('dm.name',"%${params.depBundle}%")
+				 
+			 switch(sortIndex){
+				 case "asset" :
+					 sid= "ae.assetName"
+					 break;
+				 case "assetType":
+					 sid= "ae.assetType"
+					 break;
+				 case "dependent" :
+					 sid= "d.assetName"
+					 break;
+				 case "depClass" :
+					 sid= "d.assetType"
+					 break;
+				 case "bundle" :
+					 sid= "am.name"
+					 break;
+				 case "depBundle" :
+					 sid= "dm.name"
+					 break;
+				 default:
+					 sid= sortIndex
+					 break;
+			 }
+			 order(sid, sortOrder).ignoreCase()
+		 }
+	
+		 def totalRows = dependencies.totalCount
+		 def numberOfPages = Math.ceil(totalRows / maxRows)
+	
+		 def results = dependencies?.collect {
+			 [ cell:
+				 [
+				 it.asset?.assetName, it.asset?.assetType, it.asset?.moveBundle?.name, it.type,
+				 it.dependent?.assetName, it.dependent?.assetType, it.dependent?.moveBundle?.name,
+				 it.dataFlowFreq, it.status, it.asset?.id, it.dependent?.id
+				 ], id: it.id,
+			 ]}
+	
+		 def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
+	
+		 render jsonData as JSON
+	 }
+
 }

@@ -48,5 +48,6 @@ databaseChangeLog = {
 	include file: '20130713-add-permission-view-permission.groovy'
 	include file: '20130712-add-virtual_host-import-export.groovy'
 	include file: '20130712-change-asset-new-or-old-field-to-plan-status.groovy'
+	include file: '20130718-add-asset-edit-delete-permission.groovy'
     
 }
