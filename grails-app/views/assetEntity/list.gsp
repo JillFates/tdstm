@@ -55,7 +55,10 @@ var sortOrder = '${sortOrder}'
 var moveBundleId = '${moveBundleId}'
 var windowWidth = $(window).width() - $(window).width()*5/100 ;
 var sizePref = '${sizePref}'
-var listCaption ="Assets: <tds:hasPermission permission='EditAndDelete'><span class=\"button\"><input type=\"button\" value=\"Create Asset\" class=\"create\" onclick='createAssetDetails(\"assetEntity\")'/></span></tds:hasPermission>"
+var listCaption ="Assets: <tds:hasPermission permission='EditAndDelete'><span class=\"button\"><input type=\"button\" value=\"Create Asset\" class=\"create\" onclick='createAssetDetails(\"assetEntity\")'/></span></tds:hasPermission>\
+	<tds:hasPermission permission='AssetDelete'>\
+	<span class='capBtn'><input type='button' id='deleteAssetId' value='Bulk Delete' onclick='deleteAssets(\"AssetEntity\")' disabled='disabled'/></span>\
+	</tds:hasPermission>"
 <jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','Target Location','Target Rack','Tag','Serial#','Plan Status','Bundle',
@@ -84,6 +87,7 @@ var listCaption ="Assets: <tds:hasPermission permission='EditAndDelete'><span cl
     rowNum="sizePref"
     rowList= "'25','100','500','1000'"
     multiselect="true"
+   	loadComplete="initCheck"
     viewrecords="true"
     showPager="true"
     postData="{filter: filter, event:event, type:type, plannedStatus:plannedStatus, assetName:assetName, planStatus:planStatus, moveBundle:moveBundle,
@@ -92,7 +96,8 @@ var listCaption ="Assets: <tds:hasPermission permission='EditAndDelete'><span cl
     		 
     datatype="'json'">
     <jqgrid:filterToolbar id="assetListId" searchOnEnter="false" />
-    <jqgrid:navigation id="assetListId" add="false" edit="false" del="true" search="false" refresh="true" />
+    <jqgrid:navigation id="assetListId" add="false" edit="false" del="true" search="false" refresh="false" />
+    <jqgrid:refreshButton id="assetListId" />
 </jqgrid:grid>
 	populateFilter();
 	$("#del_assetListIdGrid").click(function(){

@@ -13,10 +13,10 @@
 $(document).ready(function() {
 	$("#showEntityView").dialog({ autoOpen: false })
 	$("#editEntityView").dialog({ autoOpen: false })
-	if(!${hasPerm}){
-		$(".ui-icon-trash").hide();
-	}
-	var listCaption ="Dependencies:<span class='capBtn'><input type='button' id='bulkDeleteId' value='Bulk Delete' onclick='bulkDeleteTasks();' disabled='disabled'/></span>"
+	var listCaption ="Dependencies: \
+		<tds:hasPermission permission='AssetDelete'>\
+		<span class='capBtn'><input type='button' id='deleteAssetId' value='Bulk Delete' onclick='deleteAssets(\"dependencies\")' disabled='disabled'/></span>\
+		</tds:hasPermission>"
 	<jqgrid:grid id="dependencyGridId" url="'${createLink(action: 'listDepJson')}'"
 		editurl="'${createLink(action: 'deleteBulkAsset')}'"
 	    colNames="'Asset','AssetClass', 'Bundle','Type', 'Dependency', 'Dep Class', 'Dep Bundle', 'Frequency', 'Status'"
@@ -27,8 +27,8 @@ $(document).ready(function() {
 	                  {name:'dependent', editable: true,formatter: dependentFormatter,width:'200'},
 	                  {name:'depClass', editable: true},
 	                  {name:'depBundle', editable: true},
-	                  {name:'dataFlowFreq', editable: true,width:'100'},
-	                  {name:'status', editable: true, width:'120'}"
+	                  {name:'dataFlowFreq', editable: true,width:'90'},
+	                  {name:'status', editable: true, width:'80'}"
 	    sortname="'asset'"
 	    caption="listCaption"
 	   	height="'100%'"
@@ -42,7 +42,6 @@ $(document).ready(function() {
 	    <jqgrid:filterToolbar id="dependencyGridId" searchOnEnter="false" />
 	    <jqgrid:navigation id="dependencyGridId" add="false" edit="false" del="false" search="false" refresh="false" />
 	    <jqgrid:refreshButton id="dependencyGridId" />
-	    <jqgrid:deleteButton id="dependencyGridId"  deleteButtonFunction="bulkDeleteTasks"/>
 	</jqgrid:grid>
 	$.jgrid.formatter.integer.thousandsSeparator='';
 	function myLinkFormatter (cellvalue, options, rowObjcet) {
@@ -53,41 +52,7 @@ $(document).ready(function() {
 		var value = cellvalue ? cellvalue : ''
 			return '<a href="javascript:getEntityDetails(\'dependencies\',\''+rowObjcet[5]+'\',\''+rowObjcet[10]+'\')">'+value+'</a>'
 	}
-	function initCheck() {
-		 $('.cbox').change(function() {
-			 var checkedLen = $('.cbox:checkbox:checked').length
-			 if(checkedLen > 0) {
-				$("#bulkDeleteId").removeAttr("disabled")
-			 }else{
-				$("#bulkDeleteId").attr("disabled","disabled")
-			 }
-		})
-	}
 })
-	function bulkDeleteTasks() {
-		var assetArr = new Array();
-          $(".cbox:checkbox:checked").each(function(){
-              var assetId = $(this).attr('id').split("_")[2]
-	 		  assetArr.push(assetId)
-	    })
-	    if(assetArr[0]){
-			if(confirm("There is no undo! Are you sure you want to delete these Dependencies..?")){
-				jQuery.ajax({
-					url: contextPath+'/assetEntity/deleteAssetDependency',
-					data: {'assetArr':assetArr},
-					type:'GET',
-					success: function(data) {
-						$(".ui-icon-refresh").click();
-						$("#messageId").show();
-						$("#messageId").html(data.resp);
-						$("#bulkDeleteId").attr("disabled","disabled")
-					}
-				})
-			 }
-	    }else{
- 			alert("Please select any row .")
-		}
-	}
 </script>
 </head>
 <body>

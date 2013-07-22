@@ -241,7 +241,9 @@
 							<li><g:link class="mmlink" controller="assetEntity"  onclick="hideMegaMenu('assetMegaMenu')">List Servers</g:link></li>
 							<li><g:link class="mmlink" controller="database"  onclick="hideMegaMenu('assetMegaMenu')">List DBs</g:link></li>
 							<li><g:link class="mmlink" controller="files"  onclick="hideMegaMenu('assetMegaMenu')">List Storage</g:link></li>
-							<li><g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')">List Dependencies</g:link></li>
+							<tds:hasPermission permission='EditAndDelete'>
+							  <li><g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')">List Dependencies</g:link></li>
+							</tds:hasPermission>
 							<tds:hasPermission permission='MoveBundleEditView'>
 							  <li><g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">Dependency Console</g:link></li>
 							</tds:hasPermission>

@@ -42,7 +42,10 @@ $(document).ready(function() {
 	var moveBundle = '${moveBundle}'
 	var dbFormat = '${validationFilter}'
 	var sizePref = '${sizePref}'
-	var listCaption ="DataBases: <tds:hasPermission permission='EditAndDelete'><span class='capBtn'><input type='button' value='Create DB' onclick='createAssetDetails(\"Database\")'/></span></tds:hasPermission>"				
+	var listCaption ="DataBases: <tds:hasPermission permission='EditAndDelete'><span class='capBtn'><input type='button' value='Create DB' onclick='createAssetDetails(\"Database\")'/></span></tds:hasPermission>\
+						<tds:hasPermission permission='AssetDelete'>\
+						<span class='capBtn'><input type='button' id='deleteAssetId' value='Bulk Delete' onclick='deleteAssets(\"Database\")' disabled='disabled'/></span>\
+						</tds:hasPermission>"				
     <jqgrid:grid id="databaseId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
     colNames="'Actions','Name', 'DB Format','Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType'"
@@ -62,14 +65,16 @@ $(document).ready(function() {
    	rowNum="sizePref"
  	rowList= "'25','100','500','1000'"
     multiselect="true"
+    loadComplete="initCheck"
     viewrecords="true"
    	postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId,
    		assetName:dbName, planStatus:planStatus, moveBundle:moveBundle, dbFormat:dbFormat}"
     showPager="true"
     datatype="'json'">
     <jqgrid:filterToolbar id="databaseId" searchOnEnter="false" />
-    <jqgrid:navigation id="databaseId" add="false" edit="false" del="true" search="false" refresh="true" afterSubmit="deleteMessage"/>
+    <jqgrid:navigation id="databaseId" add="false" edit="false" del="false" search="false" refresh="false" afterSubmit="deleteMessage"/>
     <jqgrid:resize id="databaseId" resizeOffset="-2" />
+    <jqgrid:refreshButton id="databaseId" />
 </jqgrid:grid>
 	populateFilter();
 	$("#del_databaseIdGrid").click(function(){

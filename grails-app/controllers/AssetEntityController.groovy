@@ -3880,18 +3880,33 @@ class AssetEntityController {
 	*/
 	
 	def deleteBulkAsset={
-		def assetList = params.id.split(",")
+		def assetList = params.list("assetLists[]")
 		def assetNames = []
-		assetList.each{assetId->
-		    def assetEntity = AssetEntity.get( assetId )
-			if(assetEntity) {
-				assetNames.add(assetEntity.assetName)
-				assetEntityService.deleteAsset(assetEntity)
-				assetEntity.delete()
+		def errMsg
+		try{
+			assetList= assetList.collect{ return Long.parseLong(it) }
+			if(params.type=="dependencies"){
+				def assetDependency = AssetDependency.findAllByIdInList(assetList)
+				assetDependency.each{ae->
+					assetNames << ae?.dependent?.assetName+"  AND Asset  "+ae?.asset?.assetName
+					ae.delete();
+				}
+			}else{
+				def assetEntity = AssetEntity.findAllByIdInList(assetList)
+				assetEntity.each{ae->
+					assetNames << ae.assetName
+					assetEntityService.deleteAsset(ae)
+					ae.delete()
+				}
 			}
+	        def names = WebUtil.listAsMultiValueString(assetNames)
+			errMsg = "${params.type ?: 'Asset'} ${names} deleted."
+		}catch(SQLException e){
+			e.printStackTrace();
+			errMsg = "Error while deleting ${params.type ?: 'Asset'}"
 		}
-        def names = assetNames.toString().replace('[','').replace(']','')
-	  render"AssetEntity ${names} deleted"
+		def respMap = [resp : errMsg]
+		render respMap as JSON
 	}
 	
 	def getWorkflowTransition={
@@ -4267,8 +4282,11 @@ class AssetEntityController {
 	  * Action to return on list Dependency
 	  */
 	 def listDependencies ={
-		 def hasPerm = RolePermissions.hasPermission("AssetDelete") 
-		 return [hasPerm:hasPerm]
+		 def hasPerm = RolePermissions.hasPermission("EditAndDelete")
+		 if(!hasPerm){
+		 	redirect (controller:"project", action:"list")
+			flash.message = "${message(code:'user.access.denied')}"
+		 }
 	 }
 	 /**
 	  * This method is to show list of dependencies using jqgrid.
@@ -4347,34 +4365,5 @@ class AssetEntityController {
 		 def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 	
 		 render jsonData as JSON
-	 }
-	
-	 /**
-	  * this action is used to delete asset and there relative dependency
-	  * @param : assetArr[] list of assetDependencyIds
-	  * @return : Deleted dependency names
-	  */
-	 def deleteAssetDependency ={
-		def errMsg 
-		def depNames=[]
-		def assetIds = params.list("assetArr[]")
-		try{
-			if(assetIds) {
-				assetIds.each{id->
-					if(id.isNumber()){
-						def assetDep =AssetDependency.get(id)
-						depNames << assetDep?.asset?.assetName+"  AND Dependency  "+assetDep?.dependent?.assetName
-						assetDep.delete();
-					}
-				}
-				def names = WebUtil.listAsMultiValueString(depNames)
-				errMsg = "Assets ${names} deleted."
-			}
-		}catch(SQLException e){
-			e.printStackTrace();
-			errMsg = "Error while deleting asset Depndency"
-		}
-		def respMap = [resp : errMsg]
-	  render respMap as JSON
 	 }
 }

@@ -49,6 +49,9 @@ $(document).ready(function() {
 	var listCaption ="Applications: \
 		<tds:hasPermission permission='EditAndDelete'>\
 			<span class='capBtn'><input type='button' value='Create App'  onclick='createAssetDetails(\"Application\")'/></span>\
+		</tds:hasPermission>\
+		<tds:hasPermission permission='AssetDelete'>\
+		<span class='capBtn'><input type='button' id='deleteAssetId' value='Bulk Delete' onclick='deleteAssets(\"Application\")' disabled='disabled'/></span>\
 		</tds:hasPermission>"	
     <jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
@@ -71,6 +74,7 @@ $(document).ready(function() {
     rowList= "'25','100','500','1000'"
     multiselect="true"
     viewrecords="true"
+   	loadComplete="initCheck"
     showPager="true"
 	loadComplete=function(){
 		resizeGrid()
@@ -79,7 +83,8 @@ $(document).ready(function() {
     	assetName:appName, planStatus:planStatus, moveBundle:moveBundle, validation:validationFilter, sme:appSme}"
     datatype="'json'">
     <jqgrid:filterToolbar id="applicationId" searchOnEnter="false" />
-    <jqgrid:navigation id="applicationId" add="false" edit="false" del="true" search="false" refresh="true" />
+    <jqgrid:navigation id="applicationId" add="false" edit="false" del="false" search="false" refresh="false" />
+    <jqgrid:refreshButton id="applicationId" />
 </jqgrid:grid>
 	populateFilter();
 	

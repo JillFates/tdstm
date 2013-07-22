@@ -374,52 +374,43 @@ function selectAllAssets(){
 	isFirst = true;
 	}
 }
-function deleteAssets(list,action){
+
+function initCheck() {
+	 $('.cbox').change(function() {
+		 var checkedLen = $('.cbox:checkbox:checked').length
+		 if(checkedLen > 0) {
+			$("#deleteAssetId").removeAttr("disabled")
+		 }else{
+			$("#deleteAssetId").attr("disabled","disabled")
+		 }
+	})
+}
+
+function deleteAssets(action){
 	var assetArr = new Array();
-	var j=0;
-	for(i=0; i< list.size() ; i++){
-		if($('#checkId_'+list[i]) != null){
-			var booCheck = $('#checkId_'+list[i]).is(':checked');
-			if(booCheck){
-				assetArr[j] = list[i];
-				j++;
-			}
-		}
-	}if(j == 0){
+    $(".cbox:checkbox:checked").each(function(){
+        var assetId = $(this).attr('id').split("_")[2]
+		  assetArr.push(assetId)
+  })
+  	if(!assetArr[0]){
 		alert('Please select the Asset');
 	}else{
-			if(confirm("There is no undo! Are you sure you want to delete these ?")){
-				var url
-				if(action=='server'){
-					url=contextPath+'/assetEntity/deleteBulkAsset'
-				}else if(action=='application'){
-					url=contextPath+'/application/deleteBulkAsset'
-				}else if(action=='files'){
-					url=contextPath+'/files/deleteBulkAsset'
-				}else{
-					url=contextPath+'/database/deleteBulkAsset'
-				}
-				
-				jQuery.ajax({
-				url: url,
-				data: {'assetLists':assetArr},
-				type:'POST',
-				success: function(data) {
-					if(data="success"){
-						window.location.reload()
-						var totalCheck = document.getElementsByName('assetCheckBox');
-						for(i=0;i<totalCheck.length;i++){
-							totalCheck[i].checked = false;
-							$('#deleteAsset').attr('disabled',true)
-						}
-						
-					}
+		if(confirm("There is no undo! Are you sure you want to delete these "+action+"..?")){
+			jQuery.ajax({
+			url:contextPath+'/assetEntity/deleteBulkAsset',
+			data: {'assetLists':assetArr,'type':action},
+			type:'POST',
+			success: function(data) {
+					$(".ui-icon-refresh").click();
+					$("#messageId").show();
+					$("#messageId").html(data.resp);
+					$('#deleteAssetId').attr('disabled',true)
 				}
 			});
 		}
 	}
-	
 }
+
 function enableButton(list){
 	var assetArr = new Array();
 	var j=0;

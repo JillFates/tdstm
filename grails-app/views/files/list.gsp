@@ -40,7 +40,10 @@ $(document).ready(function() {
 	var fileFormat = '${fileFormat}'
 	var fileSize = '${fileSize}'
 	var sizePref = '${sizePref}'
-	var listCaption ="Storages: <tds:hasPermission permission='EditAndDelete'><span class='capBtn'><input type='button' value='Create Storage' onclick='createAssetDetails(\"Files\")'/></span></tds:hasPermission>"
+	var listCaption ="Storages: <tds:hasPermission permission='EditAndDelete'><span class='capBtn'><input type='button' value='Create Storage' onclick='createAssetDetails(\"Files\")'/></span></tds:hasPermission>\
+						<tds:hasPermission permission='AssetDelete'>\
+						<span class='capBtn'><input type='button' id='deleteAssetId' value='Bulk Delete' onclick='deleteAssets(\"Files\")' disabled='disabled'/></span>\
+						</tds:hasPermission>"
 	// JqGrid implementations 
     <jqgrid:grid id="storageId" url="'${createLink(action: 'listJson')}'"
     editurl="'${createLink(action: 'deleteBulkAsset')}'"
@@ -62,13 +65,15 @@ $(document).ready(function() {
    	rowNum="sizePref"
  	rowList= "'25','100','500','1000'"
     multiselect="true"
+    loadComplete="initCheck"
     viewrecords="true"
    	postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId, assetName:fileName, 
    	   	planStatus:planStatus, moveBundle:moveBundle, fileFormat:fileFormat, fileSize:fileSize}"
     showPager="true"
     datatype="'json'">
     <jqgrid:filterToolbar id="storageId" searchOnEnter="false" />
-    <jqgrid:navigation id="storageId" add="false" edit="false" del="true" search="false" refresh="true"/>
+    <jqgrid:navigation id="storageId" add="false" edit="false" del="false" search="false" refresh="false"/>
+    <jqgrid:refreshButton id="storageId" />
 </jqgrid:grid>
 	populateFilter();
 
@@ -125,6 +130,9 @@ function resizeGrid(){
 <g:if test="${flash.message}">
 <div class="message">${flash.message}</div>
 </g:if>
+<div >
+	<div id="messageId" class="message" style="display:none"></div>
+</div>
 <jqgrid:wrapper id="storageId" />
 
 <div id="createEntityView" style="display: none;" ></div>
