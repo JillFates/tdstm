@@ -321,7 +321,7 @@ function updateToShow(forWhom){
 	$('#updateView').val('updateView')
 	var flag=true
 	if(forWhom=='app'){
-		flag = validateSme()
+		flag = validateFields()
 	}
 	if(flag){
 		jQuery.ajax({
