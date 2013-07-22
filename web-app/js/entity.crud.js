@@ -122,7 +122,7 @@ function updateAssetsList(name, assetType, assetId ) {
 	var csc = $("select[name='entity_"+idValues[1]+"_"+idValues[2]+"']")
 	var claz = csc.val()
 	var asc = $("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']")
-	asc.unbind('onmousedown')
+	asc.removeAttr('onmousedown')
 	asc.html($("#"+claz+" select").html())
 	// console.log("in updateAssetsList name="+name+", claz="+claz+", assetType="+assetType+", assetId="+assetId)
 
