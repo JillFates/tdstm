@@ -202,6 +202,11 @@ class AssetEntityController {
 	def assetExport = {
 		render( view:"assetExport" )
 	}
+	
+	/**
+	 * This action is used to redirect control export view  
+	 * render export form
+	 */
 	def exportAssets = {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project
@@ -2878,6 +2883,13 @@ class AssetEntityController {
 		}
 		render statusMsg
 	}
+	
+	/**
+	 * This action is used to redirect to create view .
+	 * @param : redirectTo 
+	 * @return : render to create page based on condition as if redirectTo is assetAudit then redirecting 
+	 * to auditCreate view
+	 */
 	def create = {
 		def project = securityService.getUserCurrentProject()
 		def errorMsg
@@ -3017,6 +3029,13 @@ class AssetEntityController {
 		userPreferenceService.setPreference("showAllAssetTasks", params.selected=='1' ? 'TRUE' : 'FALSE')
 		render true
 	}
+	
+	/**
+	 * This action is used to redirect to edit view .
+	 * @param : redirectTo
+	 * @return : render to edit page based on condition as if 'redirectTo' is roomAudit then redirecting
+	 * to auditEdit view
+	 */
 	def edit ={
 		def assetEntityInstance = AssetEntity.get(params.id)
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
@@ -3080,6 +3099,12 @@ class AssetEntityController {
 		return paramsMap
 	}
 
+	/**
+	 * This action is used to update assetEntity 
+	 * @param redirectTo : a flag to redirect view to page after update
+	 * @param id : id of assetEntity
+	 * @return : render to appropriate view
+	 */
 	def update = {
 		
 		def attribute = session.getAttribute('filterAttr')
@@ -3190,7 +3215,13 @@ class AssetEntityController {
 
 
 	}
-
+	
+    /**
+     * This action is used to get list of all Manufacturers ordered by manufacturer name display at
+     * assetEntity CRUD and AssetAudit CRUD
+     * @param assetType : requested assetType for which we need to get manufacturer list
+     * @return : render to manufacturerView
+     */
 	def getManufacturersList = {
 		def assetType = params.assetType
 		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
@@ -3198,6 +3229,12 @@ class AssetEntityController {
 		def selectedManu = prefVal ? Manufacturer.findByName( prefVal )?.id : null
 		render (view :'manufacturerView' , model:[manufacturers : manufacturers, selectedManu:selectedManu,forWhom:params.forWhom ])
 	}
+	
+	/**
+	 * This action is used to get list of all Models to display at assetEntity CRUD and AssetAudit CRUD
+	 * @param assetType : requested assetType for which we need to get manufacturer list
+	 * @return : render to manufacturerView
+	 */
 	def getModelsList = {
 		def manufacturer = params.manufacturer
 		def models=[]
@@ -3209,9 +3246,9 @@ class AssetEntityController {
 	}
 	
 	/**
-	 * 
-	 * @param manufacturer
-	 * @return
+	 * This method is used to sort model by status full, valid and new to display at Asset CRUD
+	 * @param manufacturerInstance : instance of Manufacturer for which model list is requested
+	 * @return : model list 
 	 */
 	def getModelSortedByStatus(manufacturerInstance){
 		def models= []
@@ -3560,6 +3597,9 @@ class AssetEntityController {
 		render jsonData as JSON
 	}
 
+	/**
+	 * This action is used to get AssetOptions by type to display at admin's AssetOption page .
+	 */
 	def assetOptions = {
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		
@@ -3572,6 +3612,10 @@ class AssetEntityController {
 		return [planStatusOptions:planStatusOptions, priorityOption:priorityOption,dependencyType:dependencyType, dependencyStatus:dependencyStatus]
 
 	}
+	
+	/**
+	 * This action is used to save AssetOptions by type to display at admin's AssetOption page .
+	 */
 	def saveAssetoptions = {
 		def assetOptionInstance = new AssetOptions()
 		def planStatusList = []
@@ -3614,6 +3658,9 @@ class AssetEntityController {
 	    render planStatusList as JSON
 	}
 	
+	/**
+	 * This action is used to delete  AssetOptions by type from admin's AssetOption page .
+	 */
 	def deleteAssetOptions ={
 		def assetOptionInstance
 		if(params.assetOptionType=="planStatus"){
@@ -3876,9 +3923,11 @@ class AssetEntityController {
 	}	
 
 	/**
-	* Delete multiple  Assets.
+	* Delete multiple  Assets, Apps, Databases and files .
+	* @param : assetLists[]  : list of ids for which assets are requested to deleted
+	* @return : appropriate message back to view
+	* 
 	*/
-	
 	def deleteBulkAsset={
 		def assetList = params.list("assetLists[]")
 		def assetNames = []
@@ -3909,6 +3958,11 @@ class AssetEntityController {
 		render respMap as JSON
 	}
 	
+	/**
+	 * This action is used to get workflowTransition select for comment id
+	 * @param assetCommentId : id of assetComment
+	 * @return select 
+	 */
 	def getWorkflowTransition={
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
