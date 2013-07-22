@@ -3,6 +3,8 @@ import org.apache.shiro.SecurityUtils
 
 class Project extends PartyGroup {
 
+	def static final DEFAULT_PROJECT_ID = 2
+
 	String projectCode
 	String description
 	String trackChanges = 'Y'
@@ -96,8 +98,33 @@ class Project extends PartyGroup {
 		}
 	}
 	
+	static transients = [ 'isDefaultProject', 'getDefaultProject', 'readDefaultProject' ]
+
 	String toString() {
 		"$projectCode : $name"
 	}
 	
+	/**
+	 * Used to retrieve the default Project for the appliction wit the get operator
+	 * @return Project - the default Project object
+	 */
+	static Project getDefaultProject() {
+		Project.get( DEFAULT_PROJECT_ID )
+	}
+
+	/**
+	 * Used to retrieve the default Project for the appliction with the read operator
+	 * @return Project - the default Project object
+	 */
+	static Project readDefaultProject() {
+		Project.read( DEFAULT_PROJECT_ID )
+	}
+
+	/**
+	 * Can be used to determine if this is the default project for the application
+	 * @return Boolean - true if the project is the default
+	 */
+	Boolean isDefaultProject() {
+		id == DEFAULT_PROJECT_ID
+	}
 }
