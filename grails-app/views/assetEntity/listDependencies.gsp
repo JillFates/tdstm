@@ -16,6 +16,7 @@ $(document).ready(function() {
 	if(!${hasPerm}){
 		$(".ui-icon-trash").hide();
 	}
+	var listCaption ="Dependencies:<span class='capBtn'><input type='button' id='bulkDeleteId' value='Bulk Delete' onclick='bulkDeleteTasks();' disabled='disabled'/></span>"
 	<jqgrid:grid id="dependencyGridId" url="'${createLink(action: 'listDepJson')}'"
 		editurl="'${createLink(action: 'deleteBulkAsset')}'"
 	    colNames="'Asset','AssetClass', 'Bundle','Type', 'Dependency', 'Dep Class', 'Dep Bundle', 'Frequency', 'Status'"
@@ -29,16 +30,19 @@ $(document).ready(function() {
 	                  {name:'dataFlowFreq', editable: true,width:'100'},
 	                  {name:'status', editable: true, width:'120'}"
 	    sortname="'asset'"
-	    caption="'Dependencies'"
+	    caption="listCaption"
 	   	height="'100%'"
 	    rowNum="'25'"
 	    rowList= "'25','100','500','1000'"
 	    viewrecords="true"
 	    multiselect="true"
+	    loadComplete="initCheck"
 	    showPager="true"
 	    datatype="'json'">
 	    <jqgrid:filterToolbar id="dependencyGridId" searchOnEnter="false" />
-	    <jqgrid:navigation id="dependencyGridId" add="false" edit="false" del="false" search="false" refresh="true" />
+	    <jqgrid:navigation id="dependencyGridId" add="false" edit="false" del="false" search="false" refresh="false" />
+	    <jqgrid:refreshButton id="dependencyGridId" />
+	    <jqgrid:deleteButton id="dependencyGridId"  deleteButtonFunction="bulkDeleteTasks"/>
 	</jqgrid:grid>
 	$.jgrid.formatter.integer.thousandsSeparator='';
 	function myLinkFormatter (cellvalue, options, rowObjcet) {
@@ -49,7 +53,41 @@ $(document).ready(function() {
 		var value = cellvalue ? cellvalue : ''
 			return '<a href="javascript:getEntityDetails(\'dependencies\',\''+rowObjcet[5]+'\',\''+rowObjcet[10]+'\')">'+value+'</a>'
 	}
+	function initCheck() {
+		 $('.cbox').change(function() {
+			 var checkedLen = $('.cbox:checkbox:checked').length
+			 if(checkedLen > 0) {
+				$("#bulkDeleteId").removeAttr("disabled")
+			 }else{
+				$("#bulkDeleteId").attr("disabled","disabled")
+			 }
+		})
+	}
 })
+	function bulkDeleteTasks() {
+		var assetArr = new Array();
+          $(".cbox:checkbox:checked").each(function(){
+              var assetId = $(this).attr('id').split("_")[2]
+	 		  assetArr.push(assetId)
+	    })
+	    if(assetArr[0]){
+			if(confirm("There is no undo! Are you sure you want to delete these Dependencies..?")){
+				jQuery.ajax({
+					url: contextPath+'/assetEntity/deleteAssetDependency',
+					data: {'assetArr':assetArr},
+					type:'GET',
+					success: function(data) {
+						$(".ui-icon-refresh").click();
+						$("#messageId").show();
+						$("#messageId").html(data.resp);
+						$("#bulkDeleteId").attr("disabled","disabled")
+					}
+				})
+			 }
+	    }else{
+ 			alert("Please select any row .")
+		}
+	}
 </script>
 </head>
 <body>

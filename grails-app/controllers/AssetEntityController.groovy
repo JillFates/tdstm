@@ -1,5 +1,6 @@
 import grails.converters.JSON
 
+import java.sql.SQLException;
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -43,6 +44,7 @@ import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WebUtil
 import RolePermissions
 
 class AssetEntityController {
@@ -4629,5 +4631,33 @@ class AssetEntityController {
 	
 		 render jsonData as JSON
 	 }
-
+	
+	 /**
+	  * this action is used to delete asset and there relative dependency
+	  * @param : assetArr[] list of assetDependencyIds
+	  * @return : Deleted dependency names
+	  */
+	 def deleteAssetDependency ={
+		def errMsg 
+		def depNames=[]
+		def assetIds = params.list("assetArr[]")
+		try{
+			if(assetIds) {
+				assetIds.each{id->
+					if(id.isNumber()){
+						def assetDep =AssetDependency.get(id)
+						depNames << assetDep?.asset?.assetName+"  AND Dependency  "+assetDep?.dependent?.assetName
+						assetDep.delete();
+					}
+				}
+				def names = WebUtil.listAsMultiValueString(depNames)
+				errMsg = "Assets ${names} deleted."
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
+			errMsg = "Error while deleting asset Depndency"
+		}
+		def respMap = [resp : errMsg]
+	  render respMap as JSON
+	 }
 }
