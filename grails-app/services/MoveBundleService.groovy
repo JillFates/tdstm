@@ -474,7 +474,7 @@ class MoveBundleService {
 			vm: [0,0],
 			storage: [0,0]
 		]
-
+		
 		def depSql = """SELECT  
 		   adb.dependency_bundle as dependencyBundle, 
 		   count(distinct adb.asset_id) as assetCnt, 
@@ -608,7 +608,20 @@ class MoveBundleService {
 
 		return map
 	}
-     
+	
+	/* Calculates the default paramters for the dependency map based on the number of nodes
+	 * @param nodeCount the number of nodes in the map
+	 * @return a map of values for the dependency map to use as parameters
+	 */
+	def getMapDefaults( def nodeCount) {
+		
+		def defaultsSmall = [ 'force':-500, 'linkSize':90, 'friction':0.8, 'width':800, 'height':400 ]
+		def defaultsMedium = [ 'force':-400, 'linkSize':80, 'friction':0.8, 'width':1200, 'height':600 ]
+		def defaultsLarge = [ 'force':-300, 'linkSize':40, 'friction':0.8, 'width':2000, 'height':1000 ]
+		
+		return (nodeCount<30) ? (defaultsSmall) : ( (nodeCount<200) ? (defaultsMedium) : (defaultsLarge) )
+    }
+	
     /**
       * Create Manual MoveEventSnapshot, when project is task driven. So dashboard dial default to manual 50
       * @param moveEvent
@@ -619,7 +632,7 @@ class MoveBundleService {
          if(moveEvent.project.runbookOn ==1){
              def moveEventSnapshot = new MoveEventSnapshot(moveEvent : moveEvent , dialIndicator:dialIndicator )
              if ( ! moveEventSnapshot.save( flush : true ) ){
-                 log.errlor("Unable to save changes to MoveEventSnapshot: ${moveEventSnapshot}")
+                 log.error("Unable to save changes to MoveEventSnapshot: ${moveEventSnapshot}")
              }
          }
      }

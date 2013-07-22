@@ -13,7 +13,10 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 
 <script type="text/javascript">
-
+// This variable must remain outside the scope of the rendered dependency map
+// to ensure that only one d3 force layout can be running at a time
+var force
+	
 $(document).ready(function() {
 	
 	// ${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + "apps" +\'&dependencyBundle=\'+ null', onComplete:'listUpdate(e)') }
@@ -184,8 +187,15 @@ $(document).ready(function() {
 				${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
 				break
 			case "graph" :
-				var labelsList = "apps"
-				${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&force=\'+ force+\'&distance=\'+ distance+\'&labelsList=\'+ labelsList', onComplete:'listUpdate(e)') }
+				var labelsList = "Application"
+				
+				var showControls = 'hide'
+				if($('#controlPanel').css('display') == 'block')
+					showControls = 'controls'
+				if($('#legendDivId').css('display') == 'block')
+					showControls = 'legend'
+				compressList()
+				${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&force=\'+ force+\'&distance=\'+ distance + compressList() + \'&showControls=\'+ showControls', onComplete:'listUpdate(e)') }
 				break
 		}
 	}
@@ -198,13 +208,6 @@ $(document).ready(function() {
     	var data = e.responseText
     	$('#item1').html(data)
     }
-    function refreshMap(force,distance,friction,height,width){
-    	var labelsList = " "
-    	$('#labelTree input:checked').each(function() {
-    		labelsList += $(this).val()+',';
-    	});
-    	${remoteFunction(controller:'assetEntity',action:'reloadMap', params:'\'&force=\'+ force+\'&distance=\'+ distance+\'&friction=\'+ friction+\'&height=\'+ height+\'&width=\'+ width+\'&labelsList=\'+ labelsList', onComplete:'fillView(e)' )}
-    }
     function changeBundles(id){
         if(id=="allBundles"){
         	$("#plannedMoveBundleList").html($("#moveBundleList_all").html())
@@ -212,6 +215,15 @@ $(document).ready(function() {
         	$("#plannedMoveBundleList").html($("#moveBundleList_planning").html())
         }
     }
+	function compressList() {
+		var objectString = ''
+		if($('#listCheckId').size() > 0){
+			var list = listCheck()
+			for (prop in list)
+				objectString += "&"+prop+"="+list[prop]
+		}
+		return objectString
+	}
 </script>
 </body>
 </html>

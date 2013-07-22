@@ -90,7 +90,7 @@ class ApplicationController {
 			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts 
 			FROM application a 
 			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id 
-			LEFT OUTER JOIN person p ON a.sme_id=p.person_id 
+			LEFT OUTER JOIN person p ON p.person_id=a.sme_id 
 			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
 			LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
 			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 
@@ -186,7 +186,6 @@ class ApplicationController {
 			session.APP?.JQ_FILTERS = params
 			redirect( action:list)
 		}
-
 	}
 	def show ={
 		def id = params.id

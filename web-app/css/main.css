@@ -573,6 +573,24 @@ td.buttons{
 .inlineLink:hover {
 	text-decoration: underline !important;
 }
+
+svg {
+	border: 1px solid blue;
+}
+#mapResizerId {
+	float:right;
+	vertical-align:bottom;
+}
+
+#mapReferenceId {
+	width: 200px;
+}
+#mapReferenceId tr td{
+	border-left: 1px solid green;
+	border-right: 1px solid green;
+	width: 200px;
+	cursor: pointer;
+}
 .ynselect{
 	max-width: 50px !important;
 }
