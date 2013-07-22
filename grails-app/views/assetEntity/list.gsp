@@ -96,7 +96,7 @@ var listCaption ="Assets: <tds:hasPermission permission='EditAndDelete'><span cl
     		 
     datatype="'json'">
     <jqgrid:filterToolbar id="assetListId" searchOnEnter="false" />
-    <jqgrid:navigation id="assetListId" add="false" edit="false" del="true" search="false" refresh="false" />
+    <jqgrid:navigation id="assetListId" add="false" edit="false" del="false" search="false" refresh="false" />
     <jqgrid:refreshButton id="assetListId" />
 </jqgrid:grid>
 	populateFilter();
