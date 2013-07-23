@@ -1,6 +1,6 @@
 <select  id="${id}" class="${className}" name="${name}" style="width: 90px">
 	<option value="" selected="selected">Select...</option>
-	<optgroup label="SME" id="smeGroup">
+	<optgroup label="By Reference" id="smeGroup">
 		<option value="#SME1">SME1</option>
 		<option value="#SME2">SME2</option>
 		<option value="#Owner">Owner</option>
