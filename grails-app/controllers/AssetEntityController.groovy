@@ -44,7 +44,7 @@ import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
-import com.tdssrc.grails.WebUtil
+
 import RolePermissions
 
 class AssetEntityController {
@@ -1932,11 +1932,11 @@ class AssetEntityController {
 		def assetComment = AssetComment.get(params.id)
 		if(assetComment){
 			if(assetComment.createdBy){
-				personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")
+				personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")?.lastNameFirst
 				dtCreated = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
 			}
 			if(assetComment.dateResolved){
-				personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")
+				personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")?.lastNameFirst
 				dtResolved = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
 			}
 			
@@ -1955,7 +1955,7 @@ class AssetEntityController {
 			def notes = []
 			noteList.each {
 				def dateCreated = TimeUtil.convertInToUserTZ(it.dateCreated, tzId).format("E, d MMM 'at ' HH:mma")
-				notes << [ dateCreated , it.createdBy.toString() ,it.note]
+				notes << [ dateCreated , it.createdBy.lastNameFirst ,it.note]
 			}
 			
 			// Get the name of the User Role by Name to display
@@ -2004,7 +2004,7 @@ class AssetEntityController {
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
 			commentList << [ 
 				assetComment:assetComment, personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
-				dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo?:'', assetName:assetComment.assetEntity?.assetName ?: "",
+				dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo?.lastNameFirst ?:'', assetName:assetComment.assetEntity?.assetName ?: "",
 				eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate, etStart:etStart, etFinish:etFinish,atStart:atStart,notes:notes,
 				workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,maxVal:maxVal,
 				cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, 
@@ -3556,7 +3556,7 @@ class AssetEntityController {
 					dueClass = 'task_overdue'
 				}
 			}
-			def assignedTo  = (it.assignedTo ? it.assignedTo.toString() : '')
+			def assignedTo  = (it.assignedTo ? it.assignedTo.lastNameFirst : '')
 			
 			def dueDate='' 
 			if (it.isRunbookTask()) {
@@ -3929,32 +3929,7 @@ class AssetEntityController {
 	* 
 	*/
 	def deleteBulkAsset={
-		def assetList = params.list("assetLists[]")
-		def assetNames = []
-		def errMsg
-		try{
-			assetList= assetList.collect{ return Long.parseLong(it) }
-			if(params.type=="dependencies"){
-				def assetDependency = AssetDependency.findAllByIdInList(assetList)
-				assetDependency.each{ae->
-					assetNames << ae?.dependent?.assetName+"  AND Asset  "+ae?.asset?.assetName
-					ae.delete();
-				}
-			}else{
-				def assetEntity = AssetEntity.findAllByIdInList(assetList)
-				assetEntity.each{ae->
-					assetNames << ae.assetName
-					assetEntityService.deleteAsset(ae)
-					ae.delete()
-				}
-			}
-	        def names = WebUtil.listAsMultiValueString(assetNames)
-			errMsg = "${params.type ?: 'Asset'} ${names} deleted."
-		}catch(SQLException e){
-			e.printStackTrace();
-			errMsg = "Error while deleting ${params.type ?: 'Asset'}"
-		}
-		def respMap = [resp : errMsg]
+		def respMap = [resp : assetEntityService.deleteBulkAssets(params.type, params.list("assetLists[]"))]
 		render respMap as JSON
 	}
 	
@@ -4021,7 +3996,7 @@ class AssetEntityController {
 		def list = []
 		projectStaff.each {
 			list << [ id:it.staff.id, 
-				nameRole:"${it.role.description.split(':')[1]?.trim()}: ${it.staff.firstName} ${it.staff.lastName}",
+				nameRole:"${it.role.description.split(':')[1]?.trim()}: ${it.staff.lastNameFirst}",
 				sortOn:"${it.role.description.split(':')[1]?.trim()},${it.staff.firstName} ${it.staff.lastName}"
 			]
 		}

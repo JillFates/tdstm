@@ -15,6 +15,7 @@ import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.WebUtil
 import com.tdsops.tm.enums.domain.ValidationType
 
 class AssetEntityService {
@@ -570,6 +571,38 @@ class AssetEntityService {
 		*/
 	  	return entities
 	}
-
-
+	/**
+	 * This method is used to delete assets by asset type
+	 * @param type
+	 * @param : assetList : list of ids for which assets are requested to deleted
+	 * @return
+	 */
+	def deleteBulkAssets(type, assetList){
+		def resp
+		def assetNames = []
+		try{
+			//Collecting as a list of data type long
+			assetList = assetList.collect{ return Long.parseLong(it) }
+			if(type == "dependencies"){
+				def assetDeps = AssetDependency.findAllByIdInList(assetList)
+				assetDeps.each{ad->
+					assetNames << ad?.dependent?.assetName+"  AND Asset  "+ad?.asset?.assetName
+					ad.delete()
+				}
+			}else{
+				def assetEntity = AssetEntity.findAllByIdInList(assetList)
+				assetEntity.each{ae->
+					assetNames << ae.assetName
+					deleteAsset(ae)
+					ae.delete()
+				}
+			}
+			def names = WebUtil.listAsMultiValueString( assetNames )
+			resp = "$type $names deleted."
+		}catch(Exception e){
+				e.printStackTrace()
+				resp = "Error while deleting $type"
+		}
+		return resp
+	}
 }

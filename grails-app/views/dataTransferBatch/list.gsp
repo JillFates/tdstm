@@ -150,7 +150,7 @@
                         
                             <td><tds:convertDate date="${dataTransferBatch?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
                         
-                            <td>${dataTransferBatch?.userLogin?.person?.lastName} ${dataTransferBatch?.userLogin?.person?.firstName}</td>
+                            <td>${dataTransferBatch?.userLogin?.person?.lastNameFirst}</td>
                         
                             <td>${dataTransferBatch?.dataTransferSet?.title}</td>
                             

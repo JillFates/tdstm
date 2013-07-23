@@ -130,7 +130,7 @@
 
               <td valign="top" class="value">
                 <g:if test="${projectManager}">
-                  ${projectManager?.partyIdTo?.lastName}, ${projectManager?.partyIdTo?.firstName} - ${projectManager?.partyIdTo?.title}
+                  ${projectManager?.partyIdTo?.lastNameFirstAndTitle}
                 </g:if>
               </td>
 
@@ -141,7 +141,7 @@
 
               <td valign="top" class="value">
                 <g:if test="${moveManager}">
-                  ${moveManager?.partyIdTo?.lastName}, ${moveManager?.partyIdTo?.firstName} - ${moveManager?.partyIdTo?.title}
+                  ${moveManager?.partyIdTo?.lastNameFirstAndTitle}
                 </g:if>
               </td>
 

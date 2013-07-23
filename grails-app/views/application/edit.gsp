@@ -67,7 +67,7 @@
 								<td class="label ${config.sme}" nowrap="nowrap"><label for="sme">SME1</label></td>
 								<td>
 									<g:select from="${personList}" id="sme1Edit" name="sme.id" class="${config.sme}" optionKey="id" 
-										optionValue="${{(it.lastName?:'')+' '+(it.firstName?:'')}}"
+										optionValue="${{it.lastNameFirst}}"
 										onchange="openPersonDiv(this.value,this.id)" value="${applicationInstance.sme?.id}" 
 										tabindex="38" 
 										noSelection="${['':' Please Select']}" 
@@ -93,7 +93,7 @@
 								<td class="label ${config.sme2}" nowrap="nowrap"><label for="sme2">SME2</label></td>
 								<td >
 									<g:select from="${personList}" id="sme2Edit" name="sme2.id" class="${config.sme2}" optionKey="id" 
-										optionValue="${{(it.lastName?:'')+' '+(it.firstName?:'')}}" 
+										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
 										value="${applicationInstance.sme2?.id}" 
 										tabindex="38" 
@@ -131,7 +131,7 @@
 								<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
 								<td >
 									<g:select from="${personList}" id="appOwnerEdit" class="${config.owner}" name="appOwner.id"  optionKey="id" 
-										optionValue="${{(it.lastName?:'')+' '+(it.firstName?:'')}}" 
+										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
 										value="${applicationInstance.appOwner?.id}" 
 										tabindex="25" 

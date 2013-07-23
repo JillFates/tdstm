@@ -24,7 +24,7 @@
 							<td class="label ${config.appVendor}" nowrap="nowrap"><label for="appVendor">Vendor</label></td>
 							<td class="valueNW ${config.appVendor}">${applicationInstance.appVendor}</td>
 							<td class="label ${config.sme}" nowrap="nowrap"><label for="sme">SME1</label></td>
-							<td class="valueNW ${config.sme}">${applicationInstance.sme}</td>
+							<td class="valueNW ${config.sme}">${applicationInstance.sme?.lastNameFirst}</td>
 							<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment</label></td>
 							<td class="valueNW ${config.environment}">${applicationInstance.environment}</td>
 							<td class="label ${config.userLocations}" nowrap="nowrap"><label for="userLocations">User Location</label></td>
@@ -34,7 +34,7 @@
 							<td class="label ${config.appVersion}" nowrap="nowrap"><label for="appVersion">Version</label></td>
 							<td class="valueNW ${config.appVersion}">${applicationInstance.appVersion}</td>
 							<td class="label ${config.sme2}" nowrap="nowrap"><label for="sme2">SME2</label></td>
-							<td class="valueNW ${config.sme2}">${applicationInstance.sme2}</td>
+							<td class="valueNW ${config.sme2}">${applicationInstance.sme2?.lastNameFirst}</td>
 							<td class="label ${config.criticality}" nowrap="nowrap"><label for="criticality">Criticality</label></td>
 							<td class="valueNW ${config.criticality}">${applicationInstance.criticality}</td>
 							<td class="label ${config.useFrequency}" nowrap="nowrap"><label for="useFrequency">Use Frequency</label></td>
@@ -54,7 +54,7 @@
 							<td class="label ${config.appSource}" nowrap="nowrap"><label for="appSource">Source</label></td>
 							<td class="valueNW ${config.appSource}">${applicationInstance.appSource}</td>
 							<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
-							<td class="valueNW ${config.owner}">${applicationInstance.appOwner}</td>
+							<td class="valueNW ${config.owner}">${applicationInstance.appOwner?.lastNameFirst}</td>
 							<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
 							<td class="valueNW ${config.planStatus}">${applicationInstance.planStatus}</td>
 							<td class="label ${config.drRtoDesc}" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label></td>

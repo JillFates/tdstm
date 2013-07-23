@@ -84,7 +84,7 @@ class ApplicationController {
 		def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
 		
 		def query = new StringBuffer("""SELECT * FROM ( SELECT a.app_id AS appId, ae.asset_name AS assetName, 
-			CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS sme, ae.validation AS validation, 
+			CONCAT(CONCAT(IFNULL(p.last_name,''),', '),CONCAT(p.first_name,' '),IFNULL(p.middle_name,'')) AS sme, ae.validation AS validation, 
 			ae.plan_status AS planStatus, mb.name AS moveBundle, adb.dependency_bundle AS depNumber, 
 			COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, 
 			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts 

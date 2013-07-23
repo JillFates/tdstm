@@ -68,17 +68,9 @@
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name">Project Manager:</td>
-			<td valign="top" class="valueNW">
-				<g:if test="${projectManager?.partyIdTo?.lastName}">${projectManager?.partyIdTo?.lastName},</g:if>
-				<g:if test="${projectManager?.partyIdTo?.firstName}"> ${projectManager?.partyIdTo?.firstName}</g:if>
-				<g:if test="${projectManager?.partyIdTo?.title}"> - ${projectManager?.partyIdTo?.title}</g:if>
-			</td>
+			<td valign="top" class="valueNW">${projectManager?.partyIdTo?.lastNameFirstAndTitle}</td>
 			<td valign="top" class="name">Event Manager:</td>
-			<td valign="top" class="valueNW">
-				<g:if test="${moveManager?.partyIdTo?.lastName}">${moveManager?.partyIdTo?.lastName},</g:if>
-				<g:if test="${moveManager?.partyIdTo?.firstName}"> ${moveManager?.partyIdTo?.firstName}</g:if>
-				<g:if test="${moveManager?.partyIdTo?.title}"> - ${moveManager?.partyIdTo?.title}</g:if>
-			</td>
+			<td valign="top" class="valueNW">${moveManager?.partyIdTo?.lastNameFirstAndTitle}</td>
 		</tr>
 		<tr class="prop">
 			<td valign="top" class="name"><g:message code="project.customFieldsShown.label" default="Custom Fields Shown" />:</td>

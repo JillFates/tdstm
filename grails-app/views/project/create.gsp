@@ -390,8 +390,7 @@
 					<option value="" selected="selected">Please Select</option>
 					<optgroup label="TDS" id="compPmGroup">
 						<g:each status="i" in="${managers}" var="managers">
-							<option value="${managers.partyIdTo.id}">${managers.partyIdTo.lastName}
-							<g:if test="${managers.partyIdTo.firstName}">,${managers.partyIdTo.firstName}</g:if> <g:if test="${managers.partyIdTo.title}"> - ${managers.partyIdTo.title}</g:if></option>
+							<option value="${managers.partyIdTo.id}">${managers.partyIdTo.lastNameFirstAndTitle}</option>
 						</g:each>
 					</optgroup>
 				</select></td>
@@ -402,8 +401,7 @@
 					<option value="" selected="selected">Please Select</option>
 					<optgroup label="TDS" id="compMmGroup">
 						<g:each status="i" in="${managers}" var="managers">
-							<option value="${managers.partyIdTo.id}">${managers.partyIdTo.lastName}
-							<g:if test="${managers.partyIdTo.firstName}">,${managers.partyIdTo.firstName}</g:if> <g:if test="${managers.partyIdTo.title}"> - ${managers.partyIdTo.title}</g:if>  </option>
+							<option value="${managers.partyIdTo.id}">${managers.partyIdTo.lastNameFirstAndTitle}</option>
 						</g:each>
 					</optgroup>
 				</select> <input type="hidden" id="companyManagersId" value="${managers.size()}"/></td>

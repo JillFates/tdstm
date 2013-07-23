@@ -82,9 +82,25 @@ class Person extends Party {
 	def getPersonRoles(companyId){
 		partyRelationshipService.getCompanyStaffFunctions(companyId, this.id)
 	}
-
+	
+	/**
+	 * This method is used to get person's name in 'LastName, FirstName MiddleName' format 
+	 * @return person name in 'LastName, FirstName MiddleName' format
+	 */
+	def getLastNameFirst(){
+		return ( lastName ? "${lastName}, ": '' ) + firstName + (  middleName ? " $middleName" : '' )
+	}
+	
+	/**
+	 * This method is used to get person's name in 'LastName, FirstName MiddleName - Title' format
+	 * @return person name in 'LastName, FirstName MiddleName - Title' format
+	 */
+	def getLastNameFirstAndTitle(){
+		return lastNameFirst+ ( title ? " - $title" : '' )
+	}
+	
 	String toString(){
 		firstName + ( middleName ? " $middleName" : '' ) + ( lastName ? " $lastName" : '' )
 	}
-
+	
 }

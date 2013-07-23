@@ -33,9 +33,8 @@
 				<td>
 				<g:each in="${projectTeamInstance?.teamMembers}" var="teamMember">
 					<g:if test="${teamMember.company[0]}">${teamMember.company[0]}:</g:if>
-					<g:if test="${teamMember?.staff?.lastName}">${teamMember?.staff?.lastName},</g:if>
-					${teamMember?.staff?.firstName}
-					<g:if test="${teamMember?.staff?.title}">- ${teamMember?.staff?.title}</g:if> <br/>
+					${teamMember?.staff?.lastNameFirstAndTitle}
+					<br/>
 				</g:each>
 				</td>
 				<td><tds:convertDateTime date="${projectTeamInstance?.projectTeam?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>

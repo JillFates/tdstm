@@ -684,7 +684,7 @@ function showAssetDialog( e , action ) {
 		      			 $('#resolutionEditTrId').css('display','none')
 		      		}
 		      		 if(params.assignedTo){
-				      	 $('#assignedToTdId').html(params.assignedTo.firstName + " " + params.assignedTo.lastName)
+				      	 $('#assignedToTdId').html(params.assignedTo)
 				      	 $('#assignedToEdit').val(params.assignedTo.id)
 		      		 } else {
 		      			$('#assignedToTdId').html("")
@@ -849,15 +849,15 @@ function showAssetDialog( e , action ) {
 		      	 $('#dateResolvedId').html(params.dtResolved)
 		      	 $('#dateResolvedEditId').html(params.dtResolved)
 		      	 if(params.personResolvedObj != null){
-			      	 $('#resolvedById').html(params.personResolvedObj.firstName+" "+params.personResolvedObj.lastName)
-			      	 $('#resolvedByEditId').html(params.personResolvedObj.firstName+" "+params.personResolvedObj.lastName)
+			      	 $('#resolvedById').html(params.personResolvedObj)
+			      	 $('#resolvedByEditId').html(params.personResolvedObj)
 		      	 }else{
 			      	 $('#resolvedById').html("")
 			      	 $('#resolvedByEditId').html("")
 		      	 }
 		      	
-		      	 $('#createdById').html(params.personCreateObj ? params.personCreateObj.firstName+" "+params.personCreateObj.lastName+" at "+params.dtCreated : '')
-		      	 $('#createdByEditId').html(params.personCreateObj ? params.personCreateObj.firstName+" "+params.personCreateObj.lastName+" at "+params.dtCreated : '')
+		      	 $('#createdById').html(params.personCreateObj ? params.personCreateObj+" at "+params.dtCreated : '')
+		      	 $('#createdByEditId').html(params.personCreateObj ? params.personCreateObj+" at "+params.dtCreated : '')
 		      	 $('#resolutionId').html(ac.resolution)
 		      	 $('#resolutionEditId').val(ac.resolution)
 		      	 $('#commentEditId').val(ac.comment)

@@ -93,12 +93,12 @@ function showEditCommentForm(e , rowId){
 		$('#assetTdId').val(assetComments[0].assetName)
 		$('#dateCreatedId').html(assetComments[0].dtCreated);
 		if(assetComments[0].personResolvedObj != null){
-			$('#resolvedById').html(assetComments[0].personResolvedObj.firstName+" "+assetComments[0].personResolvedObj.lastName);
+			$('#resolvedById').html(assetComments[0].personResolvedObj);
 		}else{
 			$('#resolvedById').html("");
 			$('#resolvedByEditId').html("");
 		}
-		$('#createdById').html(assetComments[0].personCreateObj.firstName+" "+assetComments[0].personCreateObj.lastName);
+		$('#createdById').html(assetComments[0].personCreateObj);
 		$('#resolutionId').val(assetComments[0].commentObject.resolution);
 		
 		if(assetComments[0].commentObject.commentType != 'issue'){

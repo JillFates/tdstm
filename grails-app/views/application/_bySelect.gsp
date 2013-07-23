@@ -12,7 +12,7 @@
 	</optgroup>
 	<optgroup label="Named Staff" id="staffGroup">
 		<g:each status="i" in="${personList}" var="person">
-			<option value="${person.id}">${ (person.lastName ?:'')+' '+(person.firstName?:'')} </option>
+			<option value="${person.id}">${person.lastNameFirst} </option>
 		</g:each>
 	</optgroup>
 </select>

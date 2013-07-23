@@ -1019,7 +1019,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def list = []
 		projectStaff.each {
 			list << [ id:it.staff.id, 
-				nameRole:"${it.role.description.split(':')[1]?.trim()}: ${it.staff.firstName} ${it.staff.lastName}",
+				nameRole:"${it.role.description.split(':')[1]?.trim()}: ${it.staff.lastNameFirst}",
 				sortOn:"${it.role.description.split(':')[1]?.trim()},${it.staff.firstName} ${it.staff.lastName}"
 			]
 		}
