@@ -9,6 +9,7 @@ import com.tdssrc.grails.GormUtil
 class PartyRelationshipService {
 
 	boolean transactional = true
+	def jdbcTemplate
 	/*
 	 * method to save party Relationship
 	 */
@@ -30,11 +31,12 @@ class PartyRelationshipService {
 	 * method to delete party Relationship
 	 */
 	def deletePartyRelationship( def relationshipType, def partyIdFrom, def roleTypeIdFrom, def partyIdTo, def roleTypeIdTo ) {
+		//log.info "------------------- relationshipType=${relationshipType} partyIdFrom=${partyIdFrom} roleTypeIdFrom=${roleTypeIdFrom} partyIdTo=${partyIdTo} roleTypeIdTo=${roleTypeIdTo} -------------------"
 		def partyRelationshipType = PartyRelationshipType.findById( relationshipType )
 		def roleTypeFrom = RoleType.findById( roleTypeIdFrom )
 		def roleTypeTo = RoleType.findById( roleTypeIdTo )
 		
-		def partyRelationInstance = PartyRelationship.findByStaffAndProjectAndRoleAndPartyRelationshipType(partyIdTo,partyIdFrom,roleTypeTo,partyRelationshipType)
+		def partyRelationInstance = PartyRelationship.getRelationshipInstance(partyIdTo,partyIdFrom,roleTypeTo,roleTypeFrom,partyRelationshipType)
 		partyRelationInstance.delete(flush:true)
 		return true
 	}
@@ -733,6 +735,22 @@ class PartyRelationshipService {
 		def functions = partyRelationship.partyIdTo
 		
 		return functions
+	}
+	
+	/**
+	 * Checks if a person is part of TDS
+	 * @param personId the id of the person to check
+	 * @return boolean true if the person is a TDS employee, false otherwise
+	 */
+	def isTdsEmployee ( personId ) {
+		def tdsEmployees = jdbcTemplate.queryForList("""
+			SELECT party_id_to_id as personId FROM tdstm.party_relationship p 
+				WHERE p.party_id_from_id = 18 
+					AND p.party_relationship_type_id = 'STAFF' 
+					AND p.role_type_code_from_id = 'COMPANY'
+					AND p.role_type_code_to_id = 'STAFF'
+		""")
+		return personId in tdsEmployees.personId
 	}
 }
 

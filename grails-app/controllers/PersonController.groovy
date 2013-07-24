@@ -470,31 +470,33 @@ class PersonController {
 				projectId:projectId, submit:submit, personHasPermission:RolePermissions.hasPermission("AddPerson") ]
 	}
 	/*
-	 *	Method to add Staff to project through Ajax Overlay 
+	 * Method to add Staff to project through Ajax Overlay 
 	 */
 	def saveProjectStaff = {
-		def id = params.id
-		def compositeId = id.split("-")
+		
 		def flag = false
-		if(compositeId){
-			def personId = compositeId[1]
-			def roleType = compositeId[2]
-			def projectId = compositeId[3]
+		def message = ''
+		
+		if(params.personId){
+			def personId = params.personId
+			def roleType = params.roleType
+			def projectId = params.projectId
 			def projectParty = Project.findById( projectId )
 			def personParty = Person.findById( personId )
 			def projectStaff
-			if(params.val == "0"){
+			if(params.val == "0") {
 				projectStaff = partyRelationshipService.deletePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
 				def moveEvents = MoveEvent.findAllByProject(projectParty)
 				def results = MoveEventStaff.executeUpdate("delete from MoveEventStaff where moveEvent in (:moveEvents) and person = :person and role = :role",[moveEvents:moveEvents, person:personParty,role:RoleType.read(roleType)])
-			}else{
+			} else {
 				projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
 			}
 
 			flag = projectStaff ? true : false
 		}
 		
-		render flag
+		def data = ['flag':flag, 'message':message]
+		render data as JSON
 	}
 	/*
 	 * Method to save person details and create party relation with Project as well 
@@ -667,19 +669,21 @@ class PersonController {
 	 * 
 	 */
 	def manageProjectStaff = {
-		def project = securityService.getUserCurrentProject()
+		def start = new Date()
+		
 		def hasShowAllProjectsPerm = RolePermissions.hasPermission("ShowAllProjects")
+		def hasEditTdsPerm = RolePermissions.hasPermission("EditTDSPerson")
 		def now = TimeUtil.nowGMT()
 		def projects = projectService.getActiveProject( now, hasShowAllProjectsPerm, 'name', 'asc' )
+		
+		def project = securityService.getUserCurrentProject()
 		def roleTypes = RoleType.findAllByDescriptionIlike("Staff%")
 		def role = params.role ? params.role : "MOVE_TECH"
 		def moveEventList = []
-
-		def loginPerson = securityService.getUserLoginPerson()
-		def userCompany = partyRelationshipService.getStaffCompany( loginPerson )
 		
-		// TODO - This logic needs to be reviewed
-		def isTdsEmp = userCompany.name == "TDS" ? true :false
+		// set the defaults for the checkboxes
+		def assigned = '1'
+		def onlyClientStaff = '1'
 		
 		def currRole = userPreferenceService.getPreference("StaffingRole")?:"MOVE_TECH"
 		def currLoc = userPreferenceService.getPreference("StaffingLocation")?:"All"
@@ -687,25 +691,61 @@ class PersonController {
 		def currScale = userPreferenceService.getPreference("StaffingScale")?:"6"
 		def moveEvents
 		def projectId = projects.find{it.id == project.id} ? project.id : 0
+		
 		if (projectId == 0) {
-			moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",[project:projects])
+			moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",[project:(projects?:project)])
 		} else {
 			project = Project.read(projectId)
 			moveEvents = MoveEvent.findAll("from MoveEvent m where project =:project order by m.project.name , m.name asc",[project:project])
 		}
+		
+		// if the "only client staff" button is not checked, show TDS employees as well
+		if (onlyClientStaff == '0')
+			companies.append(",18")
+		
+		def query = new StringBuffer("""
+			SELECT * FROM (
+				SELECT pr.party_id_to_id AS personId, CONCAT(IFNULL(p.first_name, ''), ' ', IFNULL(CONCAT(p.middle_name, ' '), ''), IFNULL(p.last_name, '')) AS fullName, CONCAT('[',pg.name,']') AS company, 
+					pr.role_type_code_to_id AS role, SUBSTRING(rt.description, INSTR(rt.description, ":")+2) AS team, p.last_name AS lastName, 
+					pr2.party_id_to_id IS NOT NULL AS project, IFNULL(GROUP_CONCAT(mes.move_event_id), 0) AS moveEvents, IFNULL(GROUP_CONCAT(DATE_FORMAT(ed.exception_day, '%Y-%m-%d')),'') AS unavailableDates 
+				FROM tdstm.party_relationship pr 
+					LEFT OUTER JOIN person p ON p.person_id = pr.party_id_to_id 
+					LEFT OUTER JOIN exception_dates ed ON ed.person_id = p.person_id 
+					LEFT OUTER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id 
+					LEFT OUTER JOIN role_type rt ON rt.role_type_code = pr.role_type_code_to_id 
+					LEFT OUTER JOIN party_relationship pr2 ON pr2.party_id_to_id = pr.party_id_to_id 
+						AND pr2.role_type_code_to_id = pr.role_type_code_to_id 
+						AND pr2.party_id_from_id IN (${projectId}) 
+						AND pr2.role_type_code_from_id = 'PROJECT'
+					LEFT OUTER JOIN move_event_staff mes ON mes.person_id = p.person_id 
+						AND mes.role_id = pr.role_type_code_to_id 
+				WHERE pr.role_type_code_from_id IN ('COMPANY') 
+					AND pr.party_relationship_type_id IN ('STAFF') 
+					AND pr.party_id_from_id = ${project.client.id} 
+				GROUP BY role, personId 
+				ORDER BY lastName ASC 
+			) AS companyStaff 
+			WHERE 1=1
+		""")
+		
+		if (assigned == '1')
+			query.append("AND companyStaff.project = 1 ")
+		if (currRole != '0')
+			query.append("AND companyStaff.role = '${currRole}'")
+			
+		query.append(" ORDER BY lastName ASC, team ASC ")
+		
+		def staffList = jdbcTemplate.queryForList(query.toString())
+		
 		// Limit the events to today-30 days and newer (ie. don't show events over a month ago) 
 		moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > new Date().minus(30)}
 		def paramsMap = [sortOn : 'lastName', firstProp : 'staff', orderBy : 'asc']
-		def staffList = getStaffList([project], currRole, currScale, currLoc, "0",paramsMap)
 		
-		def eventCheckStatuses = eventCheckStatus(staffList, moveEvents)
-		def staffCheckStatus = staffCheckStatus(staffList,project)
 		def editPermission  = RolePermissions.hasPermission('EditProjectStaff')
-		[projects:projects, projectId:project.id, roleTypes:roleTypes, staffList:staffList,
-			 moveEventList:getBundleHeader( moveEvents ), currRole:currRole, currLoc:currLoc,
-			 currPhase:currPhase, currScale:currScale, project:project, eventCheckStatus:eventCheckStatuses,staffCheckStatus:staffCheckStatus,
-			 isTdsEmp:isTdsEmp, editPermission:editPermission]
-		
+		return [projects:projects, projectId:project.id, roleTypes:roleTypes, staffList:staffList,
+			moveEventList:getBundleHeader( moveEvents ), currRole:currRole, currLoc:currLoc,
+			currPhase:currPhase, currScale:currScale, project:project, editPermission:editPermission]
+		log.error "Loading staff list took ${TimeUtil.elapsed(start)}"
 	}
 	
 	/*
@@ -718,16 +758,27 @@ class PersonController {
 	 * @return HTML 
 	 */
 	def loadFilteredStaff = {
-		def role = params.role
-		def projectId = params.project
+		def role = params.role ?: 'AUTO'
+		def projectId = (params.project.isNumber()) ? (params.project.toLong()) : (0)
 		def scale = params.scale
 		def location = params.location
 		def phase = params.list("phaseArr[]")
-		def assigned = params.assigned
+		def assigned = params.assigned ?: 1
+		def onlyClientStaff = params.onlyClientStaff ?: 1
 		def loginPerson = securityService.getUserLoginPerson()
-		def paramsMap = [sortOn : params.sortOn, firstProp : params.firstProp, orderBy : params.orderBy]
-		log.info("projectId:$projectId, role:$role, scale:$scale, location:$location, assigned:$assigned, paramsMap:$paramsMap")
-
+		
+		def sortableProps = ['lastName', 'fullName', 'company', 'team']
+		def orders = ['asc', 'desc']
+		def paramsMap = [sortOn : params.sortOn in sortableProps ? params.sortOn : 'fullName',
+		firstProp : params.firstProp, 
+		orderBy : params.orderBy in orders ? params.orderBy : 'asc']
+		def sortString = "${paramsMap.sortOn} ${paramsMap.orderBy}"
+		sortableProps.each {
+			sortString = sortString + ', ' + it + ' asc'
+		}
+		
+		//log.info("projectId:$projectId, role:$role, scale:$scale, location:$location, assigned:$assigned, paramsMap:$paramsMap")
+		
 		// Save the user preferences from the filter
 		userPreferenceService.setPreference("StaffingRole",role)
 		userPreferenceService.setPreference("StaffingLocation",location)
@@ -736,13 +787,17 @@ class PersonController {
 
 		def now = TimeUtil.nowGMT()
 		def hasShowAllProjectPerm = RolePermissions.hasPermission("ShowAllProjects")
+		def hasEditTdsPerm = RolePermissions.hasPermission("EditTDSPerson")
+		def editPermission  = RolePermissions.hasPermission('EditProjectStaff')
 		
 		def project
 		def moveEvents 
 		def projectList = []
-		def staffList = []
 		
-		if (projectId == '0') {
+		/* Create the list of projects to use in the view.
+		 * If the projectId is 0, use all active projects.
+		 * Otherwise, use the project specified by projectId. */
+		if (projectId == 0) {
 			// Just get a list of the active projects
 			projectList = projectService.getActiveProject( now, hasShowAllProjectPerm, 'name', 'asc' )
 		} else {
@@ -762,30 +817,74 @@ class PersonController {
 				log.error("Didn't find project $projectId")
 			}
 		}
-
+		
+		
 		// Find all Events for one or more Projects and the Staffing for the projects
 		if (projectList.size() > 0) {
 			moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",[project:projectList])
 			
 			// Limit the events to today-30 days and newer (ie. don't show events over a month ago)
 			moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > now.minus(30)}
-
-			// Now find Staff List for the list of projects
-			staffList = getStaffList(projectList, role, scale, location, assigned, paramsMap)
 		}
 		
-		
-		// log.info("staffList: $staffList")
-		def eventCheckStatuses = eventCheckStatus(staffList, moveEvents)
-		def staffCheckStatuses = []
-		if(projectId!="0"){
-			 staffCheckStatuses = staffCheckStatus(staffList ,project)
+		def companies = new StringBuffer('0')
+		def projects = new StringBuffer('0')
+		projectList.each {
+			companies.append(",${it.client.id}")
+			projects.append(",${it.id}")
 		}
 		
-		def editPermission  = RolePermissions.hasPermission('EditProjectStaff')
+		// if the "only client staff" button is not checked, show TDS employees as well
+		if (onlyClientStaff == '0')
+			companies.append(",18")
 		
-		render(template:"projectStaffTable" ,model:[staffList:staffList, moveEventList:getBundleHeader(moveEvents),projectId:projectId,
-					eventCheckStatus:eventCheckStatuses, project:project,staffCheckStatus:staffCheckStatuses, editPermission:editPermission,
+		// if the user doesn't have permission to edit TDS employees, remove TDS from the companies list
+		if( ! hasEditTdsPerm ) {
+			def tdsIndex = companies.indexOf("18")
+			if(tdsIndex != -1)
+				companies.replace(tdsIndex, tdsIndex+1, "0")
+		}
+		
+		def query = new StringBuffer("""
+			SELECT * FROM (
+				SELECT pr.party_id_to_id AS personId, CONCAT(IFNULL(p.first_name, ''), ' ', IFNULL(CONCAT(p.middle_name, ' '), ''), IFNULL(p.last_name, '')) AS fullName, CONCAT('[',pg.name,']') AS company, 
+					pr.role_type_code_to_id AS role, SUBSTRING(rt.description, INSTR(rt.description, ":")+2) AS team, p.last_name AS lastName,
+					pr2.party_id_to_id IS NOT NULL AS project, IFNULL(GROUP_CONCAT(mes.move_event_id), 0) AS moveEvents, IFNULL(GROUP_CONCAT(DATE_FORMAT(ed.exception_day, '%Y-%m-%d')),'') AS unavailableDates 
+				FROM tdstm.party_relationship pr 
+					LEFT OUTER JOIN person p ON p.person_id = pr.party_id_to_id 
+					LEFT OUTER JOIN exception_dates ed ON ed.person_id = p.person_id 
+					LEFT OUTER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id 
+					LEFT OUTER JOIN role_type rt ON rt.role_type_code = pr.role_type_code_to_id 
+					LEFT OUTER JOIN party_relationship pr2 ON pr2.party_id_to_id = pr.party_id_to_id 
+						AND pr2.role_type_code_to_id = pr.role_type_code_to_id 
+						AND pr2.party_id_from_id IN (${projects}) 
+						AND pr2.role_type_code_from_id = 'PROJECT'
+					LEFT OUTER JOIN move_event_staff mes ON mes.person_id = p.person_id 
+						AND mes.role_id = pr.role_type_code_to_id 
+				WHERE pr.role_type_code_from_id in ('COMPANY') 
+					AND pr.party_relationship_type_id in ('STAFF') 
+					AND pr.party_id_from_id IN (${companies}) 
+				GROUP BY role, personId 
+				ORDER BY fullName ASC 
+			) AS companyStaff 
+			WHERE 1=1 
+		""")
+		
+		if (assigned == '1')
+			query.append("AND companyStaff.project = 1 ")
+		if (role != '0')
+			query.append("AND companyStaff.role = '${role}' ")
+		
+		query.append("ORDER BY ${sortString}")
+		
+		def staffList = jdbcTemplate.queryForList(query.toString())
+		
+		/*staffList.each {
+			log.info "A ${it}"
+		}*/
+		
+		render(template:"projectStaffTable" ,model:[staffList:staffList, moveEventList:getBundleHeader(moveEvents),
+					projectId:projectId, project:project, editPermission:editPermission,
 					sortOn : params.sortOn, firstProp : params.firstProp, orderBy : params.orderBy != 'asc' ? 'asc' :'desc'])
 		
 	}
@@ -798,6 +897,7 @@ class PersonController {
 	 *@param location - location to filter staff list
 	 */
 	def getStaffList(def projectList, def role, def scale, def location,def assigned,def paramsMap){
+	
 		def sortOn = paramsMap.sortOn ?:"lastName"
 		def orderBy = paramsMap.orderBy?:'asc'
 		def firstProp = paramsMap.firstProp ? (paramsMap.firstProp && paramsMap.firstProp == 'company' ? '' :paramsMap.firstProp) : 'staff'
@@ -808,16 +908,16 @@ class PersonController {
 				and p.partyIdFrom in ( :projects ) and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ",[projects:projectList])?.partyIdToId
 		def companies = projectList.client
 		companies << tdsCompany
-		//if(partner) companies << partner
+		
 		
 		def staffRelations = partyRelationshipService.getAllCompaniesStaff( companies )
 		def c=staffRelations.size()
-		log.debug("Staff List: " + staffRelations)
+		
 		if (role != '0') {
 			// Filter out only the roles requested
 			staffRelations = staffRelations.findAll { it.role.id == role }
 		}
-		log.debug("staffRelations: before=$c, after=${staffRelations.count()}")
+		
 		def staffList = []
 		
 		def projectStaff =PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' "+
@@ -837,6 +937,7 @@ class PersonController {
 				}
 			}
 		}
+		
 		/*
 
 		StringBuffer queryForStaff = new StringBuffer("FROM PartyRole  p")
@@ -931,6 +1032,7 @@ class PersonController {
 				firstProp ? (b."${firstProp}"."${sortOn}" <=> a."${firstProp}"?."${sortOn}") : (b."${sortOn}".toString() <=> a."${sortOn}".toString())
 			}
 		}
+		
 		return staffList
 		
 	}
@@ -968,11 +1070,12 @@ class PersonController {
 	 *@param moveEvents list of moveEvent for selected project
 	 *@return MAP of bundle header containing projectName ,event name, start time and event id
 	 */
-	def getBundleHeader(moveEvents){
+	def getBundleHeader(moveEvents) {
 		def project = securityService.getUserCurrentProject()
 		def moveEventList = []
 		def bundleTimeformatter = new SimpleDateFormat("MMM dd")
-		if(project){
+		def moveEventDateFormatter = new SimpleDateFormat("yyyy-MM-dd")
+		if (project) {
 			def bundleStartDate = ""
 			def personAssignedToME = []
 			moveEvents.each{ moveEvent->
@@ -980,14 +1083,15 @@ class PersonController {
 				def moveBundle = moveEvent?.moveBundles
 				def startDate = moveBundle.startTime.sort()
 				startDate?.removeAll([null])
-				if(startDate.size()>0){
-					if(startDate[0]){
-					   bundleStartDate = bundleTimeformatter.format(startDate[0])
+				if (startDate.size()>0) {
+					if (startDate[0]) {
+						bundleStartDate = bundleTimeformatter.format(startDate[0])
 					}
 				}
 				moveMap.put("project", moveEvent.project.name)
 				moveMap.put("name", moveEvent.name)
 				moveMap.put("startTime", bundleStartDate)
+				moveMap.put("startDate", moveEventDateFormatter.format(moveEvent.eventTimes.start))
 				moveMap.put("id", moveEvent.id)
 				
 				moveEventList << moveMap
@@ -1003,86 +1107,53 @@ class PersonController {
 	 * @return if updated successful return true else return false
 	 */
 	def saveEventStaff = {
-	   def compositeId = params.id
-	   def flag = true
-	   if(compositeId){
-		   def project = securityService.getUserCurrentProject()
-		   def ids = compositeId.split("-")
-		   def personId = ids[1]
-		   def eventId = ids[2]
-		   def roleType = ids[3]
-		   def roleTypeInstance  = RoleType.findById( roleType )
-		   def moveEvent = MoveEvent.get( eventId )
-		   def person = Person.get( personId )
-		   def moveEventStaff = MoveEventStaff.findAllByStaffAndEventAndRole(person, moveEvent, roleTypeInstance)
-		   if(moveEventStaff && params.val == "0"){
-			  moveEventStaff.delete(flush:true)
-		   } else if( !moveEventStaff ){
-			  def projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, roleType )
-			  moveEventStaff = new MoveEventStaff()
-			  moveEventStaff.person = person
-			  moveEventStaff.moveEvent = moveEvent
-			  moveEventStaff.role = RoleType.findById( roleType )
-			  if(!moveEventStaff.save(flush:true)){
-				  moveEventStaff.errors.allErrors.each{ println it}
-				  flag = false
-			  }
-		   }
-	   }
-	   render flag
-	}
-	
-	/*
-	 * generates event check box status and id
-	 * @param staffList : list of staff 
-	 * @param events : list of Events  
-	 * @return : id and status of event related check box
-	 */
-	def eventCheckStatus(staffList, events){
-		def checkList = []
-		def moveEventStaffList = MoveEventStaff.findAllByPersonInListAndMoveEventInList(staffList.staff, events)
-		staffList.each { staffObj ->
-			def roleId = staffObj.role.id
-			def staffId = staffObj.staff.id
-			def eventList = []
-			def staffMap = [:]
-			events.each { event->
-				def eventId = event.id
-				def hasAssociation = moveEventStaffList.find{it.person.id == staffId && it.moveEvent.id == eventId && it.role.id == roleId}
-				
-				def checkMap = [:]
-				def checkId = "e-${staffObj.staff?.id}-${event.id}-${staffObj?.role?.id}"
-				checkMap.put('id', checkId)
-				checkMap.put("status", hasAssociation ? 'checked="checked"' : '' )
-				eventList << checkMap
+		
+		def flag = true
+		def message = ""
+		
+		// Check if the user has permission to edit the staff
+		if ( RolePermissions.hasPermission("EditProjectStaff") ) {
+			// Check if the person and events are not null
+			if ( params.personId && params.eventId ) {
+				// Check if the user is trying to edit a TDS employee without permission
+				if ( ! ( partyRelationshipService.isTdsEmployee(params.personId) && ! RolePermissions.hasPermission("EditTDSPerson") ) ) {
+					def personId = params.personId
+					def eventId = params.eventId
+					def roleType = params.roleType ?: 'AUTO'
+					def roleTypeInstance = RoleType.findById( roleType )
+					def moveEvent = MoveEvent.get( eventId )
+					def person = Person.get( personId )
+					def project = moveEvent.project ?: securityService.getUserCurrentProject()
+					
+					def moveEventStaff = MoveEventStaff.findAllByStaffAndEventAndRole(person, moveEvent, roleTypeInstance)
+					if(moveEventStaff && params.val == "0"){
+						moveEventStaff.delete(flush:true)
+					} else if( !moveEventStaff ) {
+						def projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, roleType )
+						moveEventStaff = new MoveEventStaff()
+						moveEventStaff.person = person
+						moveEventStaff.moveEvent = moveEvent
+						moveEventStaff.role = RoleType.findById( roleType )
+						if(!moveEventStaff.save(flush:true)){
+							moveEventStaff.errors.allErrors.each{ println it}
+							flag = false
+						}
+					}
+				} else {
+					message = "You do not have permission to edit TDS employees"
+					flag = false
+				}
+			} else {
+				message = "The selected person and move event are not both valid"
+				flag = false
 			}
-			staffMap.put((staffObj.staff.id+"_"+staffObj.role+'_'+staffObj.project), eventList)
-			checkList << staffMap
+		} else {
+			message = "You do not have permission to assign staff to events"
+			flag = false
 		}
-	 return checkList
-	}
-	
-	/*
-	 * generates Project staff check box status and id
-	 * @param staffList : list of staff
-	 * @param project : instance of project for which generating result
-	 * @return : id and status of project related check box
-	 */
-	def staffCheckStatus(staffList, project){
-		def checkList = []
-		staffList.each { staffObj ->
-			def roleId = staffObj.role.id
-			def staffId = staffObj.staff.id
-			def projectStaff =PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' "+
-														"and p.partyIdFrom = $project.id and p.roleTypeCodeFrom = 'PROJECT' ")
-			def hasAssociation = projectStaff.find{it.partyIdTo.id == staffId && it.roleTypeCodeTo.id == roleId && it.partyIdFrom.id == it.partyIdFrom.id}
-			def checkMap = [:]
-			def checkId = "p-${staffObj.staff?.id}-${staffObj?.role?.id}-${project.id}" 
-			checkMap.put('id', checkId)
-			checkMap.put("status", hasAssociation ? 'checked="checked"' : '' )
-			checkList << [(staffObj.staff.id+"_"+staffObj.role+'_'+staffObj.project): [checkMap]]
-		}
-	 return checkList
+		
+		def data = ['flag':flag, 'message':message]
+		render data as JSON
 	}
 	
 	/**

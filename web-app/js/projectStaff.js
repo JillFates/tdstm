@@ -3,11 +3,13 @@
  */
 var currentTabShow = "generalInfoShowId"
 var currentHeaderShow = "generalShowHeadId"
-function loadFilteredStaff(sortOn , firstProp, orderBy) {
+
+function loadFilteredStaff(sortOn , firstProp, orderBy, changed) {
 	var role = $("#role").val()
 	var location = $("#location").val()
 	var project = $("#project").val()
 	var scale = $("#scale").val()
+	var onlyClientStaff = $("#clientStaffId").val()
 	var assigned = $("#assignedId").val()
 	var orderBy = orderBy ? orderBy : $("#orderBy").val()
 	var phaseArr = new Array();
@@ -29,6 +31,7 @@ function loadFilteredStaff(sortOn , firstProp, orderBy) {
 			'scale' : scale,
 			'phaseArr' : phaseArr,
 			'assigned' : assigned,
+			'onlyClientStaff' : onlyClientStaff,
 			'sortOn':sortOn,
 			'firstProp':firstProp,
 			'orderBy':orderBy
@@ -165,16 +168,30 @@ function addBlackOutDay(){
 /*
  * Make a ajax call when user checks on checkbox for moveEvent
  */
-function saveEventStaff(id){
-	var val = $("[id='"+id+"']").val()
-	var params = {'id':id, 'val':val }
+function saveEventStaff (source) {
+	var row = source.parent().parent()
+	var val = source.val()
+	var eventId = source.parent().attr('id')
+	var personId = source.attr('id')
+	var roleType = row.find('#roleColumnId').attr('title')
+	
+	toggleChangedStyle(source)
+	
+	var project = row.find('#projectColumnId').children('input')
+	if( (project.size() > 0) && (project.val() == 0) && (val == 1) ) {
+		project.attr('checked','checked')
+		project.val(1)
+		toggleChangedStyle(project)
+	}
+	
+	var params = {'personId':personId, 'val':val, 'roleType':roleType, 'eventId':eventId }
 	jQuery.ajax({
 		url: contextPath+'/person/saveEventStaff',
 		data: params,
 		type:'POST',
 		success: function(data) {
-			if(data=="false"){
-			   alert("An unexpected error occurred while attempting to update Person's MoveEvent  ")
+			if(data.flag == "false"){
+			   alert(data.message)
 			}
 			loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc');
 		},
@@ -186,24 +203,55 @@ function saveEventStaff(id){
 /*
  * Make a ajax call when user checks on checkbox for Project to save project staff
  */
-function saveProjectStaff(id){
-	var val = $("[id='"+id+"']").val()
-	var params = {'id':id, 'val':val }
+function saveProjectStaff (source) {
+	var row = source.parent().parent()
+	var val = source.val()
+	var personId = source.attr('id')
+	var roleType = source.parent().siblings('#roleColumnId').attr('title')
+	var projectId = $('#project').find('[selected]').val()
+	
+	toggleChangedStyle(source)
+	
+	var events = row.find('input')
+	if( val == 0 ) {
+		events.each(function(){
+			if($(this).val() == 1) {
+				$(this).removeAttr('checked')
+				$(this).val(0)
+				toggleChangedStyle($(this))
+				$(this).val(1)
+			}
+		})
+	}
+	
+	var params = {'personId':personId, 'val':val, 'projectId':projectId, 'roleType':roleType }
 	jQuery.ajax({
 		url: contextPath+'/person/saveProjectStaff',
 		data: params,
 		type:'POST',
 		success: function(data) {
 			if(data=="false"){
-			   alert("An unexpected error occurred while attempting to update Person's MoveEvent  ")
+				//alert("An unexpected error occurred while attempting to update Person's Project  ")
+				alert("An unexpected error occurred while attempting to update Person's Project  ")
 			}
-			loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc');
+			loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc' );
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
-			alert("An unexpected error occurred while attempting to update Person's MoveEvent ")
+			alert("An unexpected error occurred while attempting to update Person's Project ")
 		}
 	});
 }
+/* 
+ * Whenever a property is changed on the manage project staff list, give it a style to confirm that it has been modified
+ */
+function toggleChangedStyle (source) {
+	source.html('aaaaaaaa')
+	if(source.val() == 0)
+		source.parent().addClass('uncheckedStaff')
+	else
+		source.parent().addClass('checkedStaffTemp')
+}
+
 /*
  * To Close dialog and set global variable again on default.
  */

@@ -203,7 +203,7 @@ table.inner {
 }
 
 .odd {
-    background: #f0f0f0;
+    background: #e0e0e0;
 }
 .even {
     background: #fff;
@@ -598,4 +598,20 @@ svg {
    display : none;
    visibility : hidden;
    height: 1px;
+}
+
+#staffFilterId {
+	max-width: 1000px;
+}
+.uncheckedStaff {
+	background: #ff0000 !important;
+}
+.checkedStaff {
+	background: #99ff99;
+}
+.checkedStaffTemp {
+	background: #00ff00;
+}
+.unavailibleStaff {
+	background: #ffaaaa;
 }
