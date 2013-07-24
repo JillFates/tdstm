@@ -23,6 +23,7 @@ class KeyValue  implements Serializable {
 			key sqltype: 'varchar(30)'
 			category sqltype: 'varchar(10)'
 		}
+		key column:'fi_key' //Changing  'key' column name as 'fi_key' cause 'key' is a reserved keyword in MYSQL
 	}
 
 	static transients = [ 'getCategoryList' ]
