@@ -78,4 +78,20 @@ class KeyValue  implements Serializable {
 		// This should pay attention to project.isDefaultProject() and not bother with defProject in that case.
 		// If defProject.value == value and project has the key then delete it.
 	}
+	
+	/**
+	 * Used to return a KeyValue record for the specified project and category.
+	 * If keyValue doesn't exist then it will fetch from defProject.
+	 * @param Project project - the project to get the override values from
+	 * @param Project defProject - the project to get the default values from (optional)
+	 * @param String category - the category of the key/value
+	 * @return List of KeyValue entries
+	 */
+	static def getAll(Project project, String category, Project defProject) {
+		def kv = KeyValue.findAllByProjectAndCategory(project, category)
+		if ( !kv && defProject ) {
+			kv = KeyValue.findAllByProjectAndCategory(defProject, category)
+		}
+		return kv
+	}
 }	

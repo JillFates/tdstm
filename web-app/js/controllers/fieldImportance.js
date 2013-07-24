@@ -31,6 +31,7 @@ app.factory('fieldFactory',function($http){
 app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) {
 	$scope.fields = [];
 	$scope.importance = [];
+	$scope.help = [];
 	fieldFactory.getFields().success(function(data){
 		$scope.fields=data;
 	});
@@ -49,6 +50,9 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 	
 	$scope.toggleSection = function( s ) {
 		$scope.section[s] = $scope.section[s] == 'h' ? 's' : 'h';
+		//for help text to initialize.
+		if($scope.section[s] == 's')
+			$scope.helpSection(s)
 		//for time being used javaScript to show/hide styling div.
 		$(".stylingNote").show();
 		var imglength=$('.dgImages:visible').length;
@@ -124,6 +128,29 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 			data:{'entityType':type}
 		}).success (function(resp) {
 			$scope.importance[type]=resp;
+		}).error(function(resp, status, headers, config) {
+			alert("An Unexpected error while showing the asset fields.")
+		});
+	}
+	
+	$scope.helpSection = function (type){
+		$http({
+			url : contextPath+"/common/tooltips",
+			method: "POST",
+			data:{'entityType':type}
+		}).success (function(resp) {
+			$scope.help=resp;
+		}).error(function(resp, status, headers, config) {
+			alert("An Unexpected error while showing the asset fields.")
+		});
+	}
+	$scope.updateHelp = function (type) {
+		$http({
+			url : contextPath+"/common/tooltipsUpdate",
+			method: "POST",
+			data:{'jsonString':$scope.help[type], 'entityType':type}
+		}).success (function(resp) {
+			console.log(resp);
 		}).error(function(resp, status, headers, config) {
 			alert("An Unexpected error while showing the asset fields.")
 		});

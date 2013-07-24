@@ -15,10 +15,12 @@
 		<tr>
 			<th>Field</th>
 			<th ng-repeat="phase in phases">{{phase.label}}</th>
+			<th>Help Text</th>
 		</tr>
 		<tr ng-repeat="field in fields[type.name]">
 			<td>{{field.id}}</td>
 			<td ng-repeat="phase in phases" class="{{importance[type.name][field.label]['phase'][phase.id]}}">{{importance[type.name][field.label]['phase'][phase.id]}}</td>
+			<td>{{help[type.name][field.label]}}</td>
 		</tr>
 	</table>
 </div>

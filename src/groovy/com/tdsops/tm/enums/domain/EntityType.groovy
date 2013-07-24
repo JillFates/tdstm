@@ -16,4 +16,8 @@ class EntityType {
 	static final getListAsMap() {
 		return [ asset:AE, app:APP, db:DB, file:STORAGE ]
 	}
+	static final getListAsCategory(type){
+		def ctgType=[ (AE):'tt_asset', (APP):'tt_app', (DB):'tt_database', (STORAGE):'tt_storage' ]
+		return ctgType.("$type")
+	}
 }
