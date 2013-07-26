@@ -429,7 +429,8 @@
 	var hasTimedOut = false;
 	var modWidth
 	$(document).ready(function() {
-
+		$("#showEditCommentDialog").dialog({autoOpen: false});
+		$("#createNews").dialog({autoOpen: false});
 		var viewPort = $(window).width();
 		modWidth = parseInt((viewPort-210) / 130);
 		$(".mod").css("width",(modWidth * 130 )+"px");
@@ -447,15 +448,10 @@
 				updateDash( $("#defaultBundleId").val() );
 			}, 100);
 		});
-		
-	    $("#showEditCommentDialog").dialog({
-	        autoOpen: false,
-	        resizable: false
- 		});
-	    $("#createNews").dialog({
-	        autoOpen: false,
-	        resizable: false
- 		});
+		// used to call the function once page loaded
+		getMoveEventNewsDetails($('#moveEvent').val())
+		moveDataSteps()
+	  
 	})
 	
 	
@@ -546,7 +542,6 @@
 		}();
 		YAHOO.util.Event.onAvailable('doc',YAHOO.example.init, YAHOO.example, true);
 	}
-	moveDataSteps()
 	/* set time to load the news and bundle data*/
 	var handler = 0
 	function timedUpdate( updateTime ) {
@@ -1096,8 +1091,6 @@
 		$(".mod").css("width",(modWidth * 130 )+"px");
 		return modWidth;
 	}
-	// used to call the function once page loaded
-	getMoveEventNewsDetails($('#moveEvent').val())
 	/*
 	 * validate the text area size
 	*/

@@ -16,8 +16,6 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 <link href="/tdstm/css/jqgrid/ui.jqgrid.css" rel="stylesheet" type="text/css">
-<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" 
-	href="/tdstm/plugins/jquery-ui-1.8.15/jquery-ui/themes/ui-lightness/jquery-ui-1.8.15.custom.css">
 <jqgrid:resources />
 <script type="text/javascript">
 // TODO : move this code to JS once verified in tmdev

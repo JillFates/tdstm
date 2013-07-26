@@ -5,9 +5,7 @@
         <title>Dependencies List</title>
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 <g:javascript src="entity.crud.js" />
-<jqgrid:resources />
-<jqui:resources /> 
-<jqgrid:resources />
+	<jqgrid:resources />
 
 <script type="text/javascript">
 $(document).ready(function() {

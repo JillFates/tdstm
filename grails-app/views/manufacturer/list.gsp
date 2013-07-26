@@ -6,9 +6,6 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 <g:javascript src="model.manufacturer.js" />
 <jqgrid:resources />
-<jqui:resources /> 
-<jqgrid:resources />
-
 <script type="text/javascript">
 $(document).ready(function() {
 	$("#createManufacturerView").dialog({ autoOpen: false })

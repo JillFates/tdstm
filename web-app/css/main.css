@@ -359,7 +359,7 @@ table.inner {
 	color: #B80000;
 
 	vertical-align: baseline;
-
+	
 }
 
 .menuButton a.save {
@@ -614,4 +614,8 @@ svg {
 }
 .unavailibleStaff {
 	background: #ffaaaa;
+}
+.ui-dialog .ui-dialog-titlebar-close span {
+display: block;
+margin: -8px !important;
 }

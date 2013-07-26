@@ -14,8 +14,7 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 <jqgrid:resources />
-<jqui:resources /> 
-<jqgrid:resources />
+
 <script type="text/javascript">
 
 $(document).ready(function() {

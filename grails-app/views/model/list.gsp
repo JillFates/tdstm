@@ -11,9 +11,6 @@
 		<g:javascript src="drag_drop.js" />
 		<script src="${resource(dir:'js',file:'jquery.form.js')}"></script>
 		<jqgrid:resources />
-		<jqui:resources /> 
-		<jqgrid:resources />
-
 		<script type="text/javascript">
 		$(document).ready(function() {
 			$("#createModelView").dialog({ autoOpen: false })

@@ -15,8 +15,7 @@
 	<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-    <jqui:resources /> 
-    <jqgrid:resources />
+	<jqgrid:resources />
 	<script type="text/javascript">
         $(document).ready(function() {
             $('#issueTimebar').width($(window).width()+'px')
