@@ -113,6 +113,7 @@ function addAssetDependency( type,forWhom ){
 		$("#"+forWhom+"SupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"')\"><span class='clear_filter'>X</span></a></td></tr>")
 	}
 	$("#"+forWhom+"_"+type+"Count").val(parseInt(rowNo)+1)
+	$(".assetSelect").combobox()
 }
 
 function deleteRow( rowId ){
@@ -126,7 +127,7 @@ function updateAssetsList(name, assetType, assetId ) {
 	var asc = $("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']")
 	asc.removeAttr('onmousedown')
 	asc.html($("#"+claz+" select").html())
-	// console.log("in updateAssetsList name="+name+", claz="+claz+", assetType="+assetType+", assetId="+assetId)
+	//console.log("in updateAssetsList name="+name+", claz="+claz+", assetType="+assetType+", assetId="+assetId)
 
 	// Set the value if we were passing in the original value for a pre-existing asset
 	if ( 
@@ -162,6 +163,7 @@ function showManufacView(e, forWhom){
     	$("#manufacturerCreateId").html(resp);
    
     $("#manufacturers").removeAttr("multiple")
+    $(".assetSelect").combobox()
 }
 function selectModel(value, forWhom){
 	var val = value;
@@ -176,6 +178,7 @@ function showModelView(e, forWhom){
     if(forWhom == "assetAudit"){
     	$("#models").attr("onChange","editModelAudit(this.value)")
     }
+    $(".assetSelect").combobox()
 }
 function showComment(id , action){
 	   var id = id

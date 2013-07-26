@@ -26,6 +26,7 @@
 			$(".rackLabel").show()
 			$(".vmLabel").hide()
 		}
+		$(".assetSelect").combobox();
 	})
 	
 </script>
@@ -59,7 +60,7 @@
 							</tr>
 							<tr>
 								<td class="label ${config.assetType}" nowrap="nowrap"><label for="assetType">Type</label></td>
-								<td><g:select from="${assetTypeOptions}" class="${config.assetType}" id="assetTypeCreateId" name="assetType" value="${assetType}" onChange="selectManufacturer(this.value,'Create')" tabindex="12" /></td>
+								<td><g:select from="${assetTypeOptions}" class="${config.assetType} assetSelect" id="assetTypeCreateId" name="assetType" value="${assetType}" onChange="selectManufacturer(this.value,'Create')" tabindex="12" /></td>
 								<td class="label ${config.priority}" nowrap="nowrap"><label for="priority">Priority</label>
 								</td>
 								<td ><g:select id="priority" class="${config.priority}" name ="priority" from="${priorityOption}" value= "${assetEntityInstance.priority}" noSelection="${['':' Please Select']}" tabindex="21" />
@@ -74,7 +75,7 @@
 								<td class="label ${config.manufacturer}" nowrap="nowrap"><label for="manufacturer">Manufacturer</label></td>
 								 <td >
 								 <div id="manufacturerCreateId">
-								   <g:select id="manufacturer" class="${config.manufacturer}" name="manufacturer.id" from="${manufacturers}" value="${manufacuterer?.id}" onChange="selectModel(this.value,'Create')" optionKey="id" optionValue="name" noSelection="${[null:' Unassigned']}" tabindex="13" />
+								   <g:select id="manufacturer" class="${config.manufacturer} assetSelect" name="manufacturer.id" from="${manufacturers}" value="${manufacuterer?.id}" onChange="selectModel(this.value,'Create')" optionKey="id" optionValue="name" noSelection="${[null:' Unassigned']}" tabindex="13" />
 								 </div>
 								</td>
 								<td class="label ${config.ipAddress}" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
@@ -91,7 +92,7 @@
 								<td class="label ${config.model}" nowrap="nowrap"><label for="model">Model</label></td>
 								<td>
 								<div id="modelCreateId">
-								   <g:select id="model" class="${config.model}" name ="model.id" from="${models}" value= "${assetEntityInstance.model}" noSelection="${[null:' Unassigned']}" tabindex="14" 
+								   <g:select id="model" class="${config.model} assetSelect" name ="model.id" from="${models}" value= "${assetEntityInstance.model}" noSelection="${[null:' Unassigned']}" tabindex="14" 
 								  		optionKey="id" optionValue="${{it.modelName+' '+(it.modelStatus =='new' || !it.modelStatus ? '?' :'')}}" onChange="setType(this.value, 'Create')"/>
 								 </div>
 								</td>

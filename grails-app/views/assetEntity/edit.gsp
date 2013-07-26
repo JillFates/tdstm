@@ -29,9 +29,11 @@
 		// Ajax to populate dependency selects in edit pages
 		var assetId = '${assetEntityInstance.id}'
 		populateDependency(assetId, 'asset')
-		
+
+		 $(".assetSelect").combobox();
 	})
 </script>
+
 <g:form method="post" name="editAssetsFormId"  action="update">
 
 <input type="hidden" id="asset_assetName" name="assetNameFilter" value="" />
@@ -46,7 +48,7 @@
 <input type="hidden" id="asset_planStatus" name="planStatusFilter" value="" />
 <input type="hidden" id="asset_assetTag" name="assetTagFilter" value="" />
 <g:set var="isBlade" value="${assetEntityInstance.assetType == 'Blade' ? true : false}"/>
-	<table style="border:0;width:1000px;">
+	<table style="border:0;width:1000px;" class="ui-widget">
 		<tr>
 			<td colspan="2">
 				<div class="dialog">
@@ -54,7 +56,7 @@
 						<tbody>
 							<tr>
 								<td class="label ${config.assetName}" nowrap="nowrap"><label for="assetName">Name</label></td>
-								<td><input type="text" id="assetName" name="assetName" class="${config.assetName}" value="${assetEntityInstance.assetName}" tabindex="11" /></td>
+								<td><input type="text" id="assetName" name="assetName" class="${config.assetName}" title="gagdjgajgdjgs" value="${assetEntityInstance.assetName}" tabindex="11" /></td>
 								<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment</label></td>
 								<td><g:select id="environment" name="environment" class="${config.environment}" from="${assetEntityInstance.constraints.environment.inList}" value="${assetEntityInstance.environment}"  tabindex="32"></g:select></td>
 								<td>&nbsp</td>
@@ -63,7 +65,7 @@
 							</tr>
 							<tr>
 								<td class="label ${config.assetType}" nowrap="nowrap"><label for="assetType">Type</label></td>
-								<td ><g:select from="${assetTypeOptions}"  class="${config.assetType}" id="assetTypeEditId" name="assetType" value="${assetEntityInstance.assetType}" onChange="selectManufacturer(this.value, 'Edit')" tabindex="12"/></td>
+								<td ><g:select from="${assetTypeOptions}"  class="${config.assetType} assetSelect" id="assetTypeEditId" name="assetType"  value="${assetEntityInstance.assetType}" onChange="selectManufacturer(this.value, 'Edit')" tabindex="12"/></td>
 								<td class="label ${config.priority}" nowrap="nowrap"><label for="priority">Priority</label>
 								</td>
 								<td ><g:select id="priority" name ="priority" class="${config.priority}" from="${priorityOption}" value= "${assetEntityInstance.priority}" noSelection="${['':' Please Select']}" tabindex="21"/>
@@ -86,7 +88,7 @@
 								</td>
 								 <td >
 								 <div id="manufacturerEditId">
-								   <g:select id="manufacturer" name="manufacturer.id" class="${config.manufacturer}" from="${manufacturers}" value="${assetEntityInstance.manufacturer?.id}" onChange="selectModel(this.value,'Edit')" optionKey="id" optionValue="name" noSelection="${[null:'Unassigned']}" tabindex="13"/>
+								   <g:select id="manufacturer" name="manufacturer.id" class="${config.manufacturer} assetSelect" from="${manufacturers}" value="${assetEntityInstance.manufacturer?.id}" onChange="selectModel(this.value,'Edit')" optionKey="id" optionValue="name" noSelection="${[null:'Unassigned']}" tabindex="13"/>
 								 </div>
 								</td>
 								<td class="label ${config.ipAddress}" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
@@ -110,7 +112,7 @@
 								</td>
 								<td>
 								<div id="modelEditId">
-								   <g:select id="model" class="${config.model}" name ="model.id" from="${models}" value= "${assetEntityInstance.model?.id}" optionKey="id" optionValue="modelName"  noSelection="${[null:' Unassigned']}" tabindex="14"
+								   <g:select id="model" class="${config.model} assetSelect" name ="model.id" from="${models}" value= "${assetEntityInstance.model?.id}" optionKey="id" optionValue="modelName"  noSelection="${[null:' Unassigned']}" tabindex="14"
 								   optionValue="${{it.modelName+' '+(it.modelStatus =='new' || !it.modelStatus ? '?' :'')}}" onChange="setType(this.value, 'Edit')"/>
 								 </div>
 								</td>
