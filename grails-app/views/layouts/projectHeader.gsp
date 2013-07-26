@@ -14,11 +14,15 @@
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.responsive.min.css')}" />
     --%>
     <link rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
-
+   	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery-ui-smoothness.css')}" />
+	<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" 
+		href="${resource(dir:'plugins/jquery-ui-1.8.15/jquery-ui/themes/ui-lightness',file:'jquery-ui-1.8.15.custom.css')}"/>
     <g:javascript library="prototype" />
-    <jq:plugin name="jquery.combined" />
+    <g:javascript src="jquery-1.9.1.js"/>	
+	<g:javascript src="jquery-1.9.1-ui.js"/>
+	<g:javascript src="datetimepicker.js"/>
+	<g:javascript src="jquery-migrate-1.0.0.js"/>
     <g:javascript src="crawler.js" />
-    <g:javascript src="datetimepicker.js"/>
     <%--
     <g:javascript src="bootstrap/bootstrap.min.js" /> 
     --%>
