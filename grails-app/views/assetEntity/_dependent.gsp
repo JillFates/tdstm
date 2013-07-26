@@ -32,7 +32,7 @@
 						</td>
 						<td><g:select name="dtype_support_${i}" value="${support.type}" from="${dependencyType.value}" optionValue="value" /></td>
 						<td><g:select name="status_support_${i}" value="${support.status}" from="${dependencyStatus.value}" optionValue="value" /></td>
-						<td><a href="javascript:deleteRow('row_s_${i}')"><span class='clear_filter'><u>X</u></span></a></td>
+						<td><a href="javascript:deleteRow('row_s_${i}')"><span class='clear_filter'>X</span></a></td>
 					</tr>
 				</g:each>
 			</tbody>
@@ -73,7 +73,7 @@
 					</td>
 					<td><g:select name="dtype_dependent_${i}" value="${dependent.type}" from="${dependencyType.value}" optionValue="value"/></td>
 					<td><g:select name="status_dependent_${i}" value="${dependent.status}" from="${dependencyStatus.value}" optionValue="value"/></td>
-					<td><a href="javascript:deleteRow('row_d_${i}')"><span class='clear_filter'><u>X</u></span></a></td>
+					<td><a href="javascript:deleteRow('row_d_${i}')"><span class='clear_filter'>X</span></a></td>
 				</tr>
 			</g:each>
 			</tbody>
