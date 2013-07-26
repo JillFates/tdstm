@@ -144,8 +144,7 @@ class ProjectService {
 	 */
 	def getFields(def entityType){
 		def project = securityService.getUserCurrentProject()
-		def eavEntityType = EavEntityType.findByDomainName(entityType)
-		def attributes = EavAttribute.findAllByEntityType( eavEntityType )
+		def attributes = getAttributes(entityType)
 		def returnMap = attributes.collect{ p->
 			return ['id':(p.attributeCode.contains('custom') && project[p.attributeCode])? project[p.attributeCode]:p.frontendLabel, 'label':p.attributeCode]
 		}
@@ -182,8 +181,7 @@ class ProjectService {
 		if(data)
 			returnMap=JSON.parse(data)
 		if(!returnMap){
-			def eavEntityType = EavEntityType.findByDomainName(type)
-			def attributes = EavAttribute.findAllByEntityType( eavEntityType )?.attributeCode
+			def attributes = getAttributes(type)?.attributeCode
 			returnMap = attributes.inject([:]){rmap, field->
 				def pmap = phases.inject([:]){map, item->
 					map[item]="N"
@@ -214,5 +212,15 @@ class ProjectService {
 			}
 		}
 		return parseData
+	}
+	/**
+	 *This method used to get attributes from eavAttribute based on EntityType.
+	 * @param entityType
+	 * @return
+	 */
+	def getAttributes(entityType){
+		def eavEntityType = EavEntityType.findByDomainName(entityType)
+		def attributes = EavAttribute.findAllByEntityType( eavEntityType )
+		return attributes
 	}
 }

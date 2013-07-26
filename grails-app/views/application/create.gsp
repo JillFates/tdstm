@@ -29,7 +29,7 @@
 							<tr>
 								<td class="label ${config.assetName}" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label></td>
 								<td ><input type="text" id="assetName" class="${config.assetName}" name="assetName" value="${applicationInstance.assetName}" tabindex="10" /></td>
-								<td class="label ${config.description}" nowrap="nowrap">Description</td>
+								<td class="label ${config.description}" nowrap="nowrap"><label for="assetName">Description</label></td>
 								<td colspan="3"><input type="text" id="description" class="${config.description}" name="description" value="" size="50" tabindex="20" />
 								</td>
 							</tr>
@@ -87,7 +87,7 @@
 									name="appVersion" value="${applicationInstance.appVersion}"  tabindex="13" />
 								</td>
 								<td class="label ${config.sme2}" nowrap="nowrap"><label for="sme2">SME2</label></td>
-								<td >
+								<td>
 									<g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2}" optionKey="id" 
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value, this.id)" 

@@ -1,4 +1,5 @@
 function createEntityView(e, type,source,rack,roomName,location,position){
+   	 getHelpTextAsToolTip(type);
 	 var resp = e.responseText;
 	 $("#createEntityView").html(resp);
 	 $("#createEntityView").dialog('option', 'width', 'auto')
@@ -6,7 +7,7 @@ function createEntityView(e, type,source,rack,roomName,location,position){
 	 $("#createEntityView").dialog('open');
 	 $("#editEntityView").dialog('close');
 	 $("#showEntityView").dialog('close');
-	 updateTitle(type)
+	 updateAssetTitle(type);
 	 updateAssetInfo(source,rack,roomName,location,position)
 }
 
@@ -56,7 +57,7 @@ function showEntityView(e, type){
 		 $("#showEntityView").dialog('open');
 		 $("#editEntityView").dialog('close');
 		 $("#createEntityView").dialog('close');
-		 updateTitle(type)
+		 updateAssetTitle(type)
      }
 }
 function editEntity(redirectTo,type, value, source,rack,roomName,location,position){
@@ -85,7 +86,8 @@ function editEntityView(e, type,source,rack,roomName,location,position){
 	 $("#editEntityView").dialog('open');
 	 $("#showEntityView").dialog('close');
 	 $("#createEntityView").dialog('close');
-	 updateTitle(type)
+	 getHelpTextAsToolTip(type);
+	 updateAssetTitle(type)
 	 updateAssetInfo(source,rack,roomName,location,position)
 }
 function isValidDate( date ){
@@ -106,9 +108,9 @@ function addAssetDependency( type,forWhom ){
 		.replace(/status/g,"status_"+type+"_"+rowNo)
 		.replace(/entity/g,"entity_"+type+"_"+rowNo);
 	if(type!="support"){
-		$("#"+forWhom+"DependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+		$("#"+forWhom+"DependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'>X</span></a></td></tr>")
 	} else {
-		$("#"+forWhom+"SupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"')\"><span class='clear_filter'><u>X</u></span></a></td></tr>")
+		$("#"+forWhom+"SupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"')\"><span class='clear_filter'>X</span></a></td></tr>")
 	}
 	$("#"+forWhom+"_"+type+"Count").val(parseInt(rowNo)+1)
 }
@@ -142,7 +144,7 @@ function updateAssetsList(name, assetType, assetId ) {
 		//console.log(asc.html())
 	}
 }
-function updateTitle( type ){
+function updateAssetTitle( type ){
 	$("#createEntityView").dialog( "option", "title", 'Create '+type );
 	$("#showEntityView").dialog( "option", "title", 'Show '+type );
 	$("#editEntityView").dialog( "option", "title", 'Edit '+type );
@@ -698,7 +700,7 @@ function assetFieldImportance(phase,type){
 			$("td,input,select").removeClass("N")
 			Object.keys(resp).forEach(function(key) {
 				var value = resp[key]
-				$(".dialog input[name="+key+"],select[name="+key+"],input[name="+key+".id],select[name="+key+".id]").addClass(value);
+				$(".dialog input[name="+key+"],select[name="+key+"],input[name='"+key+".id'],select[name='"+key+".id']").addClass(value);
 				$(".dialog label[for="+key+"],label[for="+key+"Id]").parent().addClass(value);
 			});
 		},
@@ -707,4 +709,24 @@ function assetFieldImportance(phase,type){
 		}
 	});
 	
+}
+
+function getHelpTextAsToolTip(type){
+	jQuery.ajax({
+		url: contextPath+'/common/getTooltips',
+		data: {'type':type},
+		type:'POST',
+		success: function(resp) {
+			Object.keys(resp).forEach(function(key) {
+				var value = resp[key]
+				$(".dialog input[name="+key+"],input[name='"+key+".id']" ).tooltip({ position: {my: "left top"} });
+				$(".dialog label[for="+key+"],label[for="+key+"Id]").tooltip({ position: {my: "left top"} });
+				$(".dialog input[name="+key+"],input[name='"+key+".id']").attr("title",value);
+				$(".dialog label[for="+key+"],label[for="+key+"Id]").attr("title",value);
+				});
+			},
+		error: function(jqXHR, textStatus, errorThrown) {
+			alert("An unexpected error occurred while getting asset.")
+		}
+	});
 }
