@@ -20,6 +20,7 @@
 						<th nowrap="nowrap"><input id="selectId" type="checkbox"  onclick="selectAll()" title="Select All" />&nbsp;Actions</th>
 						<th>Name</th>
 						<th>App Sme</th>
+						<th>Sme2</th>
 						<th>Validation</th>
 						<th>Bundle</th>
 						<th>Plan Status</th>
@@ -57,7 +58,10 @@
 								onclick="getEntityDetails('dependencyConsole','Application', ${app.id} )">${app.assetName}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Application', ${app.id} )">${app.appSme}</span>
+								onclick="getEntityDetails('dependencyConsole','Application', ${app.id} )">${app.sme}</span>
+							</td>
+							<td><span
+								onclick="getEntityDetails('dependencyConsole','Application', ${app.id} )">${app.sme2}</span>
 							</td>
 							<td><span
 								onclick="getEntityDetails('dependencyConsole','Application', ${app.id} )">${app?.validation}</span>
@@ -67,7 +71,6 @@
 							</td>
 							<td><span
 								onclick="getEntityDetails('dependencyConsole','Application', ${app.id} )">${app.planStatus}</span>
-
 							</td>
 							<td><span
 								onclick="getEntityDetails('dependencyConsole','Application', ${app.id} )">${(app.depUp + app.depDown)?:''}</span>
