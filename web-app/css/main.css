@@ -619,3 +619,11 @@ svg {
 display: block;
 margin: -8px !important;
 }
+.ui-widget-content{
+	color: black !important;
+    font-weight:normal !important;
+    width:105px;
+}
+.ui-autocomplete{
+	width:132px !important;
+}

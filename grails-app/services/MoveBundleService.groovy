@@ -572,8 +572,8 @@ class MoveBundleService {
 		 
 		// JPM - don't think that this is required
 		// def personList = partyRelationshipService.getCompanyStaff( projectInstance.client?.id )
-		// def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
-		// def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
+		 def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
+		 def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
  		
  		log.info "dependencyConsoleMap() : stats=$stats}"
 
@@ -590,19 +590,19 @@ class MoveBundleService {
 			allMoveBundles: allMoveBundles, 
 			planStatusOptions: planStatusOptions,
 
-			gridStats:stats
+			gridStats:stats,
 
 			//assetDependencyList: 	assetDependencyList, 
 			//dependencyBundleCount: 	assetDependencyList.size(),
-			//servers: entities.servers, 
-			//applications: entities.applications, 
-			//dbs: entities.dbs, 
-			//files: entities.files,
-			//networks:entities.networks,
+			servers: entities.servers, 
+			applications: entities.applications, 
+			dbs: entities.dbs, 
+			files: entities.files,
+			networks:entities.networks,
 
-			// totalCompanies:companiesList,
+			 partyGroupList:companiesList,
 			// personList:personList, 
-			// availabaleRoles:availabaleRoles,
+			 availabaleRoles:availabaleRoles
 		]
 		log.info "dependencyConsoleMap() : OVERALL took ${TimeUtil.elapsed(startAll)}"
 
