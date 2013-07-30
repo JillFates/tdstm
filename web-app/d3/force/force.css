@@ -10,4 +10,33 @@ line.link {
 
 text {
 	cursor: default;
+	fill: #ffffff !important;
+    pointer-events:none;
+}
+
+.ui-resizable-helper {
+	border: 2px dotted #00F;
+    z-index: 1000 !important;
+}
+.ui-resizable-helper {
+	border: 2px dotted #00F;
+    z-index: 1000 !important;
+}
+.ui-resizable-helper {
+	border: 2px dotted #00F;
+    z-index: 1000 !important;
+}
+#legendDivId {
+	z-index: 1001 !important;
+}
+#controlPanel {
+	z-index: 1001 !important;
+}
+#svgContainerId {
+	border-width:1px;
+	padding: 0px !important;
+	margin: 0px !important;
+}
+.ui-resizable-se {
+    background: none !important;
 }

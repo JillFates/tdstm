@@ -12,15 +12,15 @@
 		<tr>
 			<td style="padding: 3px 3px;" colspan="2"><h3>Control Panel</h3></td>
 		</tr>
-		<tr>
+		<tr title="Sets the amount of force between each node">
 			<td style="padding: 0px;width: 30px;">Force</td>
 			<td style="padding-left :5px;">
 				<img src="${resource(dir:'images',file:'minus.gif')}" height="18" class="pointer" onclick="modifyParameter('sub','forceId')"/>
-				<input type="text" id="forceId" name="force" value="${defaults.force}" disabled="disabled" style="width: 40px;border: 0px;background-color: #FFF;text-align: center;vertical-align: top;">
+				<input type="text" id="forceId" name="force" value="${(multiple)?(-30):(defaults.force)}" disabled="disabled" style="width: 40px;border: 0px;background-color: #FFF;text-align: center;vertical-align: top;">
 				<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer" onclick="modifyParameter('add','forceId')"/>
 			</td>
 		</tr>
-		<tr>
+		<tr title="Sets the desired length for the links">
 			<td style="padding: 0px;width: 30px;">Links</td>
 			<td style="padding-left :5px">
 				<img src="${resource(dir:'images',file:'minus.gif')}" height="18"  class="pointer" onclick="modifyParameter('sub','linkSizeId')"/>
@@ -28,15 +28,23 @@
 				<img src="${resource(dir:'images',file:'plus.gif')}" height="18"  class="pointer" onclick="modifyParameter('add','linkSizeId')"/>
 			</td>
 		</tr>
-		<tr>
+		<tr title="Sets the decay-rate of the nodes' velocity">
 			<td style="padding: 0px;width: 30px;">Friction</td>
 			<td style="padding-left :5px">
 				<img src="${resource(dir:'images',file:'minus.gif')}" height="18"  class="pointer" onclick="modifyParameter('sub','frictionId')"/>
-				<input type="text" id="frictionId" name="friction" value="${defaults.linkSize}" disabled="disabled" style="width: 40px;border: 0px;background-color: #FFF;text-align: center;" >
+				<input type="text" id="frictionId" name="friction" value="${defaults.friction}" disabled="disabled" style="width: 40px;border: 0px;background-color: #FFF;text-align: center;" >
 				<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer"  onclick="modifyParameter('add','frictionId')"/>
 			</td>
 		</tr>
-		<tr>
+		<tr title="Sets the accuracy of the forces (lower numbers will be slower, but more accurate)">
+			<td style="padding: 0px;width: 30px;">Theta</td>
+			<td style="padding-left :5px">
+				<img src="${resource(dir:'images',file:'minus.gif')}" height="18"  class="pointer" onclick="modifyParameter('sub','thetaId')"/>
+				<input type="text" id="thetaId" name="theta" value="${defaults.theta}" disabled="disabled" style="width: 40px;border: 0px;background-color: #FFF;text-align: center;" >
+				<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer"  onclick="modifyParameter('add','thetaId')"/>
+			</td>
+		</tr>
+		<tr title="Sets the height of the SVG in pixels">
 			<td style="padding: 0px;width: 30px;">Height</td>
 			<td style="padding-left :5px">
 				<img src="${resource(dir:'images',file:'minus.gif')}" height="18"  class="pointer" onclick="modifyParameter('sub','heightId')"/>
@@ -44,7 +52,7 @@
 				<img src="${resource(dir:'images',file:'plus.gif')}" height="18"  class="pointer" onclick="modifyParameter('add','heightId')"/>
 			</td>
 		</tr>
-		<tr>
+		<tr title="Sets the width of the SVG in pixels">
 			<td style="padding: 0px;width: 30px;">Width</td>
 			<td style="padding-left :5px">
 				<img src="${resource(dir:'images',file:'minus.gif')}" height="18"  class="pointer" onclick="modifyParameter('sub','widthId')"/>
@@ -93,7 +101,12 @@
 		</tr>
 		<tr>
 			<td colspan="2" style="padding: 0px;text-align: center;">
-			<input type="button" value="Defaults"  class="pointer" onclick="resetToDefaults()">
+				<input type="button" value="Defaults"  class="pointer" onclick="resetToDefaults()">
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="padding: 0px;text-align: center;">
+				<input id="playPauseButtonId" type="button" value="Freeze"  class="pointer" onclick="stopMap()">
 			</td>
 		</tr>
 	</table>

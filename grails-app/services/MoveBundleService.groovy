@@ -615,9 +615,9 @@ class MoveBundleService {
 	 */
 	def getMapDefaults( def nodeCount) {
 		
-		def defaultsSmall = [ 'force':-500, 'linkSize':90, 'friction':0.8, 'width':800, 'height':400 ]
-		def defaultsMedium = [ 'force':-400, 'linkSize':80, 'friction':0.8, 'width':1200, 'height':600 ]
-		def defaultsLarge = [ 'force':-300, 'linkSize':40, 'friction':0.8, 'width':2000, 'height':1000 ]
+		def defaultsSmall = [ 'force':-500, 'linkSize':90, 'friction':0.8, 'theta':0.3, 'width':800, 'height':400 ]
+		def defaultsMedium = [ 'force':-400, 'linkSize':80, 'friction':0.8, 'theta':0.5, 'width':1200, 'height':600 ]
+		def defaultsLarge = [ 'force':-300, 'linkSize':40, 'friction':0.8, 'theta':1, 'width':2000, 'height':1000 ]
 		
 		return (nodeCount<30) ? (defaultsSmall) : ( (nodeCount<200) ? (defaultsMedium) : (defaultsLarge) )
     }

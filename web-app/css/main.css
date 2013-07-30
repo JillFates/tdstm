@@ -576,6 +576,8 @@ td.buttons{
 
 svg {
 	border: 1px solid blue;
+	padding: 0px !important;
+	margin: 0px !important;
 }
 #mapResizerId {
 	float:right;
@@ -583,12 +585,13 @@ svg {
 }
 
 #mapReferenceId {
-	width: 200px;
+	width: 240px;
 }
 #mapReferenceId tr td{
 	border-left: 1px solid green;
 	border-right: 1px solid green;
-	width: 200px;
+	text-align: center;
+	width: auto;
 	cursor: pointer;
 }
 .ynselect{

@@ -377,7 +377,7 @@ class ApplicationController {
 			
 			flash.message = "Application ${application.assetName} deleted"
 			if(params.dstPath =='dependencyConsole'){
-				forward( controller:'assetEntity',action:'getLists', params:[entity: 'Apps',dependencyBundle:session.getAttribute("dependencyBundle")])
+				forward( controller:'assetEntity',action:'getLists', params:[entity: 'apps',dependencyBundle:session.getAttribute("dependencyBundle")])
 			}else{
 				redirect( action:list )
 			}

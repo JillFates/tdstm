@@ -3758,75 +3758,115 @@ class AssetEntityController {
 		"""
 
 		def assetDependentlist
-		
+		def selectionQuery = ''
+		def mapQuery = ''
+		def nodesQuery = ''
+		def multiple = false;
 		if (params.dependencyBundle && params.dependencyBundle.isNumber() ) {
 			// Get just the assets for a particular dependency group id
-			assetDependentlist = AssetDependencyBundle.findAllByDependencyBundleAndProject(params.dependencyBundle,project)
-			depSql += " and adb.dependency_bundle = ${params.dependencyBundle}"
+			selectionQuery = " and adb.dependency_bundle = ${params.dependencyBundle}"
+			mapQuery = " AND deps.bundle = ${params.dependencyBundle}"
+			nodesQuery = " AND dependency_bundle = ${params.dependencyBundle} "
 		} else if (params.dependencyBundle == 'onePlus') {
 			// Get all the groups other than zero - these are the groups that have interdependencies
-			assetDependentlist = AssetDependencyBundle.findAllByProjectAndDependencyBundleGreaterThan(project, 0)?.sort{it.dependencyBundle}
-			depSql += " and adb.dependency_bundle > 0"
+			multiple = true;
+			selectionQuery = " and adb.dependency_bundle > 0"
+			mapQuery = " AND deps.bundle > 0"
+			nodesQuery = " AND dependency_bundle > 0 "
 		} else {
 			// Get 'all' assets that were bundled
-			assetDependentlist = AssetDependencyBundle.findAllByProject(project)?.sort{it.dependencyBundle}
+			multiple = true;
 		}
+		assetDependentlist = jdbcTemplate.queryForList(""" 
+			SELECT deps.asset_id AS assetId, ae.asset_name AS assetName, deps.dependency_bundle AS bundle, 
+			ae.asset_type AS type, me.move_event_id AS moveEvent, app.criticality AS criticality 
+			FROM ( 
+				SELECT * FROM tdstm.asset_dependency_bundle 
+				WHERE project_id=${projectId} ${nodesQuery} 
+				ORDER BY dependency_bundle 
+			) AS deps 
+			LEFT OUTER JOIN asset_entity ae ON ae.asset_entity_id = deps.asset_id 
+			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id = ae.move_bundle_id 
+			LEFT OUTER JOIN move_event me ON me.move_event_id = mb.move_event_id 
+			LEFT OUTER JOIN application app ON app.app_id = ae.asset_entity_id  
+		""")
+		depSql += selectionQuery
 		//log.error "getLists() : query for assetDependentlist took ${TimeUtil.elapsed(start)}"
 		// Took 0.296 seconds
-
+		
 		// Save the group id into the session as it is used to redirect the user back after updating assets or doing assignments
 		session.setAttribute('dependencyBundle', params.dependencyBundle)
 		// TODO : This pig of a list should NOT be stored into the session and the logic needs to be reworked
-		session.setAttribute('assetDependentlist', assetDependentlist)
-
+		//session.setAttribute('assetDependentlist', assetDependentlist)
+		
 		def stats = jdbcTemplate.queryForMap(depSql)
-
+		
 		def model = [entity: (params.entity ?: 'apps'), stats:stats]
-
+		
 		model.dependencyBundle = params.dependencyBundle
 		model.asset = params.entity
-
+		
 		def serverTypes = AssetType.getAllServerTypes()
 		
+		// Switch on the desired entity type to be shown, and render the page for that type 
 		switch(params.entity) {
 			case "apps" :
-				def applicationList = assetDependentlist.findAll{it.asset.assetType ==  AssetType.APPLICATION.toString() }
+				def applicationList = assetDependentlist.findAll { it.type ==  AssetType.APPLICATION.toString() }
+				def appList = []
 				
-				model.appList = applicationList.asset 
+				applicationList.each {
+					appList << Application.read(it.assetId)
+				}
+				
+				model.appList = appList
 				model.applicationListSize = applicationList.size()
 
 				render( template:"appList", model:model )
 				break
 
 			case "server":
-				def assetEntityList = assetDependentlist.findAll { serverTypes.contains(it.asset.assetType) }
-				model.assetList = assetEntityList.asset
+				def assetEntityList = assetDependentlist.findAll { serverTypes.contains(it.type) }
+				def assetList = []
+				
+				assetEntityList.each {
+					assetList << AssetEntity.read(it.assetId)
+				}
+				
+				model.assetList = assetList
 				model.assetEntityListSize = assetEntityList.size()
 				render( template:"assetList", model:model)
 				break
 
 			case "database" :
-				def databaseList = assetDependentlist.findAll{it.asset.assetType == AssetType.DATABASE.toString() }
-				model.databaseList = databaseList.asset
+				def databaseList = assetDependentlist.findAll{it.type == AssetType.DATABASE.toString() }
+				def dbList = []
+				
+				databaseList.each {
+					dbList << Database.read(it.assetId)
+				}
+				model.databaseList = dbList
 				model.dbDependentListSize = databaseList.size()
 				render(template:'dbList', model:model)
 				break
 
 			case "files" :
-				def filesList = assetDependentlist.findAll{it.asset.assetType == AssetType.FILES.toString() }
-				model.filesList = filesList.asset
+				def filesList = assetDependentlist.findAll{it.type == AssetType.FILES.toString() }
+				def fileList = []
+				
+				filesList.each {
+					fileList << Files.read(it.assetId)
+				}
+				model.filesList = fileList
 				model.filesDependentListSize = filesList.size()
 				render(template:"filesList", model:model)
 				break
 
 			case "graph" :
-				def filesListSize = assetDependentlist.findAll{ AssetType.getStorageTypes().contains(it.asset.assetType)}.size()
-				def appDependentListSize = assetDependentlist.findAll{it.asset.assetType ==  'Application' }.size()
-
 				def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
 				Set uniqueMoveEventList = moveBundleList.moveEvent
 			    uniqueMoveEventList.remove(null)
 			    List moveEventList = []
+				
 			    moveEventList =  uniqueMoveEventList.toList()
 			    moveEventList.sort{it?.name}
 				
@@ -3836,7 +3876,7 @@ class AssetEntityController {
 				   colorDiff = (232/moveEventList.size()).intValue()
 				}
 				
-				def labelMap = ['Application':params.Application, 'Server':params.Server, 'Database':params.Database, 'Files':params.Files, 'Network':params.Network]
+				def labelMap = ['Application':(params.Application)?:('true'), 'Server':params.Server, 'Database':params.Database, 'Files':params.Files, 'Network':params.Network]
 				def labelList = params.labelsList
 				labelList = labelList?.replace(" ","")
 				List labels = labelList ?  labelList.split(",") : []
@@ -3844,68 +3884,127 @@ class AssetEntityController {
 				moveEventList.eachWithIndex{ event, i -> 
 					def colorCode = colorDiff * i
 					def colorsCode = "rgb(${colorCode},${colorCode},${colorCode})"
-					eventColorCode << [(event.name):colorsCode]
+					eventColorCode << [(event.id):colorsCode]
 				}
 				
 				// Create the Nodes
 				def graphNodes = []
+				def name = ''
+				def shape = 'circle'
+				def size = 150
+				def title = ''
+				def color = ''
+				def type = ''
+				def assetType = ''
+				def criticalitySizes = ['Minor':150, 'Important':187.5, 'Major':225, 'Critical':262.5]
+				def t1 = TimeUtil.elapsed(start).getMillis() + TimeUtil.elapsed(start).getSeconds()*1000
+				log.info "t1 = ${t1}"
+				log.info "Iterating through list of ${assetDependentlist.size()} items"
+				
+				
 				assetDependentlist.each {
-					def name = ''
-					def shape = 'circle'
-					def size = 150
-					def title = it.asset.assetName
-					def color = ''
-					def type = ''
-					if (it.asset.assetType == AssetType.APPLICATION.toString() ) {
+					assetType = it.type
+					size = 150
+					
+					if (assetType == AssetType.APPLICATION.toString() ) {
 						type = AssetType.APPLICATION.toString()
-					} else if(serverTypes.contains(it.asset.assetType)) {
+						shape = 'circle'
+						size = criticalitySizes[it.criticality]
+					} else if (serverTypes.contains(assetType)) {
 						type = AssetType.SERVER.toString()
 						shape = 'square'
-					} else if(it.asset.assetType == AssetType.DATABASE.toString() ) {
+					} else if (assetType == AssetType.DATABASE.toString() ) {
 						type = AssetType.DATABASE.toString()
 						shape = 'triangle-up'
-					} else if(it.asset.assetType in [AssetType.FILES.toString(), AssetType.STORAGE.toString()] ) {
+					} else if (assetType in [AssetType.FILES.toString(), AssetType.STORAGE.toString()] ) {
 						type = AssetType.FILES.toString()
 						shape = 'diamond'
-					}else if(it.asset.assetType == AssetType.NETWORK.toString() ) {
+					} else if (assetType == AssetType.NETWORK.toString() ) {
 						type = AssetType.NETWORK.toString()
 						shape = 'cross'
+					} else {
+						type = ''
+						shape = 'circle'
 					}
-					def moveEventName = it.asset.moveBundle?.moveEvent?.name
-					graphNodes << [ 
-						id:it.asset.id, name:it.asset.assetName, 
-						type:type, group:it.dependencyBundle, 
-						shape:shape, size:size, title:title, 
-						color:eventColorCode[moveEventName]?eventColorCode[moveEventName]:'red'
+					
+					def moveEventName = it.moveEvent ?: 0
+					graphNodes << [
+						id:it.assetId, name:it.assetName, 
+						type:type, group:it.bundle, 
+						shape:shape, size:size, title:it.assetName, 
+						color:eventColorCode[moveEventName]?:'red', 
+						dependsOn:[], supports:[]
 					]
 				}
 				
-				def defaults = moveBundleService.getMapDefaults(graphNodes.size())
+				// Create a seperate list of just the node ids to use while creating the links (this makes it much faster)
+				def nodeIds = []
+				graphNodes.each {
+					nodeIds << it.id
+				}
 				
+				// Report the time it took to create the nodes
+				def t2 = TimeUtil.elapsed(start).getMillis() + TimeUtil.elapsed(start).getSeconds()*1000
+				def td = t2-t1
+				log.info "Iterating through list of ${assetDependentlist.size()} items took ${td} millis, with an average of ${(td)/(assetDependentlist.size())} millis per item"
+				
+				// Set the defaults map to be used in the dependeny graph
+				def defaults = moveBundleService.getMapDefaults(graphNodes.size())
+				if ( multiple ) {
+					defaults.force = -30
+				}
+				
+				// Query for only the dependencies that will be shown
 				def depBundle = (params.dependencyBundle.isNumber() ? params.dependencyBundle : 0)
-				def assetDependencies = jdbcTemplate.queryForList("""
-					SELECT ad.asset_id AS assetId, ad.dependent_id AS dependentId, status FROM tdstm.asset_dependency ad 
-						LEFT OUTER JOIN asset_dependency_bundle adb ON (adb.asset_id = ad.asset_id) OR (adb.asset_id = ad.dependent_id) 
-						WHERE adb.project_id=${projectId} AND adb.dependency_bundle=${depBundle} 
-						GROUP BY asset_dependency_id""")
+				def query = """ 
+					SELECT * FROM ( 
+						SELECT ad.asset_id AS assetId, ad.dependent_id AS dependentId, status, 
+							IFNULL(adb.project_id, adb2.project_id) AS projectId, 
+							IFNULL(adb.dependency_bundle, adb2.dependency_bundle) AS bundle
+						FROM tdstm.asset_dependency ad 
+							LEFT OUTER JOIN asset_dependency_bundle adb ON (adb.asset_id = ad.asset_id) 
+							LEFT OUTER JOIN asset_dependency_bundle adb2 ON (adb2.asset_id = ad.dependent_id) 
+							GROUP BY asset_dependency_id 
+					) AS deps 
+					WHERE deps.projectId=${projectId} ${mapQuery}"""
+				def assetDependencies = jdbcTemplate.queryForList(query)
+				def multiCheck = new Date()
+				def dependenciesList = new ArrayList(assetDependencies)
+				
 				
 				// Create the links
 				def graphLinks = []
+				def i = 0
+				def opacity = 1
+				def statusColor = 'grey'
 				assetDependencies.each {
-					def opacity = 1
-					def statusColor = 'gray'
 					if(it.status=='Questioned') {
+						opacity = 1
 						statusColor='red'
 					} else if( ! ( it.status in ['Unknown','Validated'] ) ) {
 						opacity = 0.2
+						statusColor = 'grey'
+					} else {
+						opacity = 1
+						statusColor = 'grey'
 					}
-					def sourceIndex = graphNodes.id.indexOf(it.assetId)
-					def targetIndex = graphNodes.id.indexOf(it.dependentId)
+					def sourceIndex = nodeIds.indexOf(it.assetId)
+					def targetIndex = nodeIds.indexOf(it.dependentId)
 					if(sourceIndex != -1 && targetIndex != -1){
-						graphLinks << ["source":sourceIndex,"target":targetIndex,"value":2,"statusColor":statusColor,"opacity":opacity,"distance":50]
+						graphLinks << ["id":i, "source":sourceIndex,"target":targetIndex,"value":2,"statusColor":statusColor,"opacity":opacity]
+						i++
 					}
 				}
 				
+				// Set the dependency properties of the nodes
+				graphLinks.each {
+					def source = it.source
+					def target = it.target
+					graphNodes[source].dependsOn.add(it.id)
+					graphNodes[target].supports.add(it.id)
+				}
+				
+				// Create the model that will be used while rendering the page
 				model.defaults = defaults
 				model.defaultsJson = defaults as JSON
 				model.labels = labels
@@ -3917,11 +4016,14 @@ class AssetEntityController {
 				model.eventColorCode = eventColorCode
 				model.nodes = graphNodes as JSON
 				model.links = graphLinks as JSON
-
+				model.multiple = multiple
+				
+				// Render dependency graph
 				render(template:'dependencyGraph',model:model)
 				break
 		} // switch
 		log.error "Loading dependency console took ${TimeUtil.elapsed(start)}"
+		log.info "\n____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________"
 	}	
 
 	/**
