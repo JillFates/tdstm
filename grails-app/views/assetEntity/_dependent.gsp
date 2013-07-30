@@ -22,22 +22,21 @@
 			<tbody id="editSupportsList">
 				<g:each in="${supportAssets}" var="support" status="i">
 					<g:set var="type" value="${support?.asset?.assetType}"></g:set>
-					<tr id='row_s_${i}'>
-						<td><g:select name="dataFlowFreq_support_${i}" value="${support.dataFlowFreq}" from="${support.constraints.dataFlowFreq.inList}" /></td>
+					<tr id='row_s_${i}_${support.id}'>
+						<td><g:select name="dataFlowFreq_support_${support.id}" value="${support.dataFlowFreq}" from="${support.constraints.dataFlowFreq.inList}" /></td>
 						<td>
-							<g:select name="entity_support_${i}" id="entity_support_${i}" from="['Server','Application','Database','Storage','Network']" 
+							<g:select name="entity_support_${support.id}" id="entity_support_${support.id}" from="['Server','Application','Database','Storage','Network']" 
 								onChange="updateAssetsList(this.name)" 
-								value="${type=='Files' ? 'Storage' : (nonNetworkTypes.contains(type) ? type : 'Network')}">
-							</g:select>
+								value="${type== 'Files' ? 'Storage' : (nonNetworkTypes.contains(type) ? type : 'Network')}" />
 						</td>
 						<td id="assetListSupportTdId_${i}">
-							<select name="asset_support_${i}" class="assetSelect" onmousedown="updateAssetsList(this.name, '${type}', '${support?.asset?.id}')">
+							<select name="asset_support_${support.id}" class="assetSelect" onmousedown="updateAssetsList(this.name, '${type}', '${support?.asset?.id}')">
 								<option value="${support?.asset?.id}" selected>${support?.asset.assetName}</option>
 							</select>
 						</td>
-						<td><g:select name="dtype_support_${i}" value="${support.type}" from="${dependencyType.value}" optionValue="value" /></td>
-						<td><g:select name="status_support_${i}" value="${support.status}" from="${dependencyStatus.value}" optionValue="value" /></td>
-						<td><a href="javascript:deleteRow('row_s_${i}')"><span class='clear_filter'>X</span></a></td>
+						<td><g:select name="dtype_support_${support.id}" value="${support.type}" from="${dependencyType.value}" optionValue="value" /></td>
+						<td><g:select name="status_support_${support.id}" value="${support.status}" from="${dependencyStatus.value}" optionValue="value" /></td>
+						<td><a href="javascript:deleteRow('row_s_${i}_${support.id}', 'edit_supportAddedId')"><span class='clear_filter'>X</span></a></td>
 					</tr>
 				</g:each>
 			</tbody>
@@ -63,22 +62,21 @@
 			<tbody id="editDependentsList">
 			<g:each in="${dependentAssets}" var="dependent" status="i">
 			   <g:set var="type" value="${dependent?.dependent?.assetType}"></g:set>
-				<tr id='row_d_${i}'>
-					<td><g:select name="dataFlowFreq_dependent_${i}" value="${dependent.dataFlowFreq}" from="${dependent.constraints.dataFlowFreq.inList}" /></td>
+				<tr id='row_d_${i}_${dependent.id}'>
+					<td><g:select name="dataFlowFreq_dependent_${dependent.id}" value="${dependent.dataFlowFreq}" from="${dependent.constraints.dataFlowFreq.inList}" /></td>
 					<td>
-						<g:select name="entity_dependent_${i}" id="entity_dependent_${i}" from="['Server','Application','Database','Storage','Network']" 
-							onchange="updateAssetsList(this.name)" 
-							value="${type== 'Files' ? 'Storage' : (nonNetworkTypes.contains(type) ? type : 'Network')}">
-						</g:select>
+						<g:select name="entity_dependent_${dependent.id}" id="entity_dependent_${i}" from="['Server','Application','Database','Storage','Network']"
+							value="${type== 'Files' ? 'Storage' : (nonNetworkTypes.contains(type) ? type : 'Network')}"  
+							onchange="updateAssetsList(this.name)" />
 					</td>
 					<td id="assetListDependentTdId_${i}">
-						<select name="asset_dependent_${i}" class="assetSelect" onmousedown="updateAssetsList(this.name, '${type}', '${dependent?.dependent?.id}')">
+						<select name="asset_dependent_${dependent.id}" class="assetSelect" onmousedown="updateAssetsList(this.name, '${type}', '${dependent?.dependent?.id}')">
 							<option value="${dependent?.dependent?.id}" selected>${dependent?.dependent.assetName}</option>
 						</select>
 					</td>
-					<td><g:select name="dtype_dependent_${i}" value="${dependent.type}" from="${dependencyType.value}" optionValue="value"/></td>
-					<td><g:select name="status_dependent_${i}" value="${dependent.status}" from="${dependencyStatus.value}" optionValue="value"/></td>
-					<td><a href="javascript:deleteRow('row_d_${i}')"><span class='clear_filter'>X</span></a></td>
+					<td><g:select name="dtype_dependent_${dependent.id}" value="${dependent.type}" from="${dependencyType.value}" optionValue="value"/></td>
+					<td><g:select name="status_dependent_${dependent.id}" value="${dependent.status}" from="${dependencyStatus.value}" optionValue="value"/></td>
+					<td><a href="javascript:deleteRow('row_d_${i}_${dependent.id}', 'edit_dependentAddedId')"><span class='clear_filter'>X</span></a></td>
 				</tr>
 			</g:each>
 			</tbody>

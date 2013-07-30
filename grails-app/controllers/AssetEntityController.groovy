@@ -1658,8 +1658,9 @@ class AssetEntityController {
 			if(assetEntityInstance.model){
 				assetEntityAttributeLoaderService.createModelConnectors( assetEntityInstance )
 			}
-			assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance)
-			flash.message = "AssetEntity ${assetEntityInstance.assetName} created"
+			flash.message = "AssetEntity ${assetEntityInstance.assetName} created "
+			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance)
+			flash.message += "</br>"+errors 
 			if(redirectTo == "room"){
 				redirect( controller:'room',action:list )
 			} else if(redirectTo == "rack"){
@@ -3155,9 +3156,10 @@ class AssetEntityController {
 		def assetEntityInstance = AssetEntity.get(params.id)
 		assetEntityInstance.properties = params
 		if(!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {
-			flash.message = "Asset ${assetEntityInstance.assetName} Updated"
 			assetEntityInstance.updateRacks()
-			assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance)
+			flash.message = "Asset ${assetEntityInstance.assetName} Updated"
+			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance)
+			flash.message += errors
 			if(params.updateView == 'updateView'){
 				forward(action:'show', params:[id: params.id])
 				
@@ -3207,7 +3209,7 @@ class AssetEntityController {
 		}
 		else {
 			flash.message = "Asset not Updated"
-			assetEntityInstance.errors.allErrors.each{ flash.message += it }
+			assetEntityInstance.errors.a"</br>"+errorsrs.each{ flash.message += it }
 			session.AE?.JQ_FILTERS = params
 			redirect( action:list)
 
@@ -3217,7 +3219,7 @@ class AssetEntityController {
 	}
 	
     /**
-     * This action is used to get list of all Manufacturers ordered by manufacturer name display at
+     * This action is used to get list of all Manufacturerss ordered by manufacturer name display at
      * assetEntity CRUD and AssetAudit CRUD
      * @param assetType : requested assetType for which we need to get manufacturer list
      * @return : render to manufacturerView

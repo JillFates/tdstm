@@ -137,6 +137,8 @@
 				<div class="buttons">
 				<input name="dependentCount" id="create_dependentCount" type="hidden" value="0">
 					<input  name="supportCount"  id="create_supportCount" type="hidden" value="0">
+					<input type="hidden" id="create_supportAddedId" name="addedSupport" value ="0"/>
+					<input type="hidden" id="create_dependentAddedId" name="addedDep" value ="0"/>
 					<input name="attributeSet.id" type="hidden" value="1"> <input
 						name="project.id" type="hidden" value="${projectId}"> <span
 						class="button"><g:actionSubmit class="save" value="Save" onclick="return validateFileFormat()"/>

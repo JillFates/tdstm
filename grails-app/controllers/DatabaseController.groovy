@@ -195,7 +195,8 @@ class DatabaseController {
 				def dbInstance = new Database(params)
 				if(!dbInstance.hasErrors() && dbInstance.save()) {
 					flash.message = "Database ${dbInstance.assetName} created"
-					assetEntityService.createOrUpdateDatabaseDependencies(params, dbInstance)
+					def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, dbInstance)
+					flash.message +="</br>"+errors 
 			        session.DB?.JQ_FILTERS = params
 					redirect( action:list)
 		 	    }else {
@@ -262,7 +263,8 @@ class DatabaseController {
 		databaseInstance.properties = params
 		if(!databaseInstance.hasErrors() && databaseInstance.save(flush:true)) {
 			flash.message = "DataBase ${databaseInstance.assetName} Updated"
-			assetEntityService.createOrUpdateDatabaseDependencies(params, databaseInstance)
+			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, databaseInstance)
+			flash.message += "</br>"+errors
 			if(params.updateView == 'updateView'){
 				forward(action:'show', params:[id: params.id])
 				

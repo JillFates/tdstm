@@ -36,7 +36,7 @@ If this happens again and you'd like help diagnosing the problem, copy the text 
 		<strong>Servlet:</strong> ${request.'javax.servlet.error.servlet_name'}<br/>
 		<strong>URI:</strong> ${request.'javax.servlet.error.request_uri'}<br/>
 		<g:if test="${exception}">
-	  		<strong>Exception Message:</strong> ${exception.message?.encodeAsHTML()} <br />
+	  		<strong > Exception Message:</strong> <span> ${exception.message?.encodeAsHTML()} </span> <br />
 	  		<strong>Caused by:</strong> ${exception.cause?.message?.encodeAsHTML()} <br />
 	  		<strong>Class:</strong> ${exception.className} <br />
 	  		<strong>At Line:</strong> [${exception.lineNumber}] <br />

@@ -8,7 +8,6 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery-ui-effect.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery-ui-smoothness.css')}" />
 
 
 <title>Data Center Room List</title>

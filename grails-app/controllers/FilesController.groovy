@@ -151,7 +151,8 @@ class FilesController {
 				def filesInstance = new Files(params)
 				if(!filesInstance.hasErrors() && filesInstance.save()) {
 					flash.message = "Storage ${filesInstance.assetName} created"
-					assetEntityService.createOrUpdateFilesDependencies(params, filesInstance)
+					def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, filesInstance)
+					flash.message += "</br>"+errors 
 			        session.FILES?.JQ_FILTERS = params
 					redirect( action:list)
 				}
@@ -237,7 +238,8 @@ class FilesController {
 		filesInstance.properties = params
 		if(!filesInstance.hasErrors() && filesInstance.save(flush:true)) {
 			flash.message = "Storage ${filesInstance.assetName} Updated"
-			assetEntityService.createOrUpdateFilesDependencies(params, filesInstance)
+			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, filesInstance)
+			flash.message +="</br>"+errors 
 			if(params.updateView == 'updateView'){
 				forward(action:'show', params:[id: params.id])
 				

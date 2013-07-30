@@ -95,6 +95,10 @@
 				<input type = "hidden" id = "dbId"  value ="${databaseInstance.id}"/>
 				<input type = "hidden" id = "tabType" name="tabType" value =""/>
 				<input name="updateView" id="updateView" type="hidden" value=""/>
+				<input type="hidden" id="deletedDepId" name="deletedDep" value =""/>
+					
+				<input type="hidden" id="edit_supportAddedId" name="addedSupport" value ="0"/>
+				<input type="hidden" id="edit_dependentAddedId" name="addedDep" value ="0"/>
 				<g:if test="${redirectTo!='dependencyConsole'}">
 					 <g:if test="${redirectTo=='listTask'}">
 					  	<span class="button"><input type="button" class="save updateDep" value="Update/Close" onclick="updateToRefresh()" /></span>

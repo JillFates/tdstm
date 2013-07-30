@@ -163,7 +163,8 @@ class ApplicationController {
 		def applicationInstance = new Application(params)
 		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
 			flash.message = "Application ${applicationInstance.assetName} created"
-			assetEntityService.createOrUpdateApplicationDependencies(params, applicationInstance)
+			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, applicationInstance)
+			flash.message += "</br>"+errors
 			def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 			def project = Project.read(projectId)
 			def moveEventList = MoveEvent.findAllByProject(project).id
@@ -306,7 +307,8 @@ class ApplicationController {
 		
 		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
 			flash.message = "Application ${applicationInstance.assetName} Updated"
-			assetEntityService.createOrUpdateApplicationDependencies(params, applicationInstance)
+			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, applicationInstance)
+			flash.message += "</br>"+errors
 			def appMoveEventList = AppMoveEvent.findAllByApplication(applicationInstance)?.moveEvent?.id
 			if(appMoveEventList.size()>0){
 				for(int i : appMoveEventList){

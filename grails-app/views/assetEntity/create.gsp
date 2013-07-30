@@ -238,6 +238,8 @@
 					<input name="dependentCount" id="create_dependentCount" type="hidden" value="0" />
 					<input  name="supportCount"  id="create_supportCount" type="hidden" value="0" />
 					<input name="redirectTo" type="hidden" value="${redirectTo}">
+					<input type="hidden" id="create_supportAddedId" name="addedSupport" value ="0"/>
+					<input type="hidden" id="create_dependentAddedId" name="addedDep" value ="0"/>
 					<span class="button"><g:actionSubmit class="save" value="Save" /> </span>
 				</div></td>
 		</tr>

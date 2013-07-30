@@ -100,7 +100,7 @@ function isValidDate( date ){
   	return returnVal;
 }
 function addAssetDependency( type,forWhom ){
-	var rowNo = $("#"+forWhom+"_"+type+"Count").val()
+	var rowNo = $("#"+forWhom+"_"+type+"AddedId").val()
 	var rowData = $("#assetDependencyRow tr").html()
 		.replace(/dataFlowFreq/g,"dataFlowFreq_"+type+"_"+rowNo)
 		.replace(/asset/g,"asset_"+type+"_"+rowNo)
@@ -108,16 +108,21 @@ function addAssetDependency( type,forWhom ){
 		.replace(/status/g,"status_"+type+"_"+rowNo)
 		.replace(/entity/g,"entity_"+type+"_"+rowNo);
 	if(type!="support"){
-		$("#"+forWhom+"DependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"')\"><span class='clear_filter'>X</span></a></td></tr>")
+		$("#"+forWhom+"DependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"', 'edit_dependentAddedId')\"><span class='clear_filter'>X</span></a></td></tr>")
 	} else {
-		$("#"+forWhom+"SupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"')\"><span class='clear_filter'>X</span></a></td></tr>")
+		$("#"+forWhom+"SupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"', 'edit_supportAddedId')\"><span class='clear_filter'>X</span></a></td></tr>")
 	}
-	$("#"+forWhom+"_"+type+"Count").val(parseInt(rowNo)+1)
+	$("#"+forWhom+"_"+type+"AddedId").val(parseInt(rowNo)-1)
 	$(".assetSelect").combobox()
 }
 
-function deleteRow( rowId ){
+function deleteRow( rowId, forWhomId ){
 	$("#"+rowId).remove()
+	var id = rowId.split('_')[3]
+	if(id)
+		$("#deletedDepId").val(( $("#deletedDepId").val() ? $("#deletedDepId").val()+"," : "") + id)
+	else
+		$("#"+forWhomId).val(parseInt($("#"+forWhomId).val())+1)
 }
 
 function updateAssetsList(name, assetType, assetId ) {
@@ -343,6 +348,10 @@ function updateToShow(forWhom){
 					$("#showEntityView").dialog('option', 'position', ['center','top']);
 					$("#showEntityView").dialog('open');
 				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				var err = jqXHR.responseText
+				alert("An unexpected error occurred while updating Asset."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")))
 			}
 		});
 	}
