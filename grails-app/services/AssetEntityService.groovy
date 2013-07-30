@@ -118,7 +118,7 @@ class AssetEntityService {
 				}
 				if(!type.save(flush:true)){
 					log.error GormUtil.allErrorsString( type )
-					errMsg += "error while updating Dependency ${assetEntity.assetName} and ${depEntity.assetName} <br/>"
+					errMsg += "Unable to ${createNew ? 'add' : 'update'} dependency between ${assetEntity.assetName} and ${depEntity.assetName} <br/>"
 				}
 			}
 		}
