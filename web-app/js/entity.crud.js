@@ -664,6 +664,7 @@ function populateDependency(assetId, whom){
 		success: function(data) { 
 			$("#"+whom+"DependentId").html(data)
 			$(".updateDep").removeAttr('disabled')
+			$(".assetSelect").combobox();
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while populating dependent asset.")

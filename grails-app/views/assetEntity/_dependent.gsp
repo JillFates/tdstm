@@ -1,8 +1,3 @@
-<script type="text/javascript" >
-	$(document).ready(function() { 
-		$(".assetSelect").combobox();
-	})
-</script>
 <td valign="top" >
 	<div style="width: auto;" >
 		<span style="float: left;"><h1>Supports:</h1></span>

@@ -6,8 +6,6 @@
 <meta name="layout" content="projectHeader" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery-ui-effect.css')}" />
 
 
 <title>Data Center Room List</title>
@@ -16,10 +14,6 @@
 <g:javascript src="room.rack.combined.js"/>
 <g:javascript src="entity.crud.js" />
 <g:javascript src="model.manufacturer.js"/>	
-<g:javascript src="jquery-1.9.1.js"/>	
-<g:javascript src="jquery-1.9.1-ui.js"/>
-<g:javascript src="datetimepicker.js"/>
-<g:javascript src="jquery-migrate-1.0.0.js"/>
 
 <script type="text/javascript">
 var roomId = "${roomId}"
