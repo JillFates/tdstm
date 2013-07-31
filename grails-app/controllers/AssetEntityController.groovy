@@ -3952,6 +3952,14 @@ class AssetEntityController {
 				def defaults = moveBundleService.getMapDefaults(graphNodes.size())
 				if ( multiple ) {
 					defaults.force = -30
+					defaults.linkSize = 100
+				}
+				
+				if (params.blackBackground in ['true','false'])
+					userPreferenceService.setPreference('dependencyConsoleBlackBg', params.blackBackground)
+				defaults.blackBackground = false
+				if ( userPreferenceService.getPreference('dependencyConsoleBlackBg') == 'true' ) {
+					defaults.blackBackground = userPreferenceService.getPreference('dependencyConsoleBlackBg') == 'true'
 				}
 				
 				// Query for only the dependencies that will be shown

@@ -10,8 +10,11 @@ line.link {
 
 text {
 	cursor: default;
-	fill: #ffffff !important;
+	fill: #ffffff;
     pointer-events:none;
+}
+.blackText text {
+	fill: #000000 !important;
 }
 
 .ui-resizable-helper {

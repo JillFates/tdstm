@@ -32,8 +32,10 @@ $('#svgContainerId')
 	});
 var zoomBehavior;
 var vis = canvas
+var background
 var overlay
 var graph
+var defaults = ${defaultsJson}
 var links = ${links}
 var nodes = ${nodes}
 var graphstyle = "top:-120;z-index:-1;"
@@ -47,9 +49,8 @@ var defaultColor = '#0000ff'
 var selectedParentColor = '#00ff00'
 var selectedChildColor = '#00cc99'
 var selectedLinkColor = '#00dd00'
-var backgroundColor = '#000000'
+var backgroundColor = defaults.blackBackground ? '#000000' : '#ffffff'
 
-var defaults = ${defaultsJson}
 var widthCurrent
 var heightCurrent
 var nameList = listCheck();
@@ -83,7 +84,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.append('svg:g')
 			.on("mousedown", mousedown)
 	
-	var background = vis
+	background = vis
 		.append('svg:rect')
 			.attr('width', width)
 			.attr('height', height)
@@ -96,10 +97,14 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
         .on("drag", dragmove)
         .on("dragend", dragend);
 	
-	function dragstart(d, i) {}
+	var startAlpha = 0
+	
+	function dragstart(d, i) {
+		startAlpha = force.alpha()
+	}
 
 	function dragmove(d, i) {
-		console.log("dragmov "+d3.event.dx)
+		startAlpha = Math.min(startAlpha+0.005, 0.1)
 		d.x += d3.event.dx;
 		d.y += d3.event.dy;
 		d.px = d.x;
@@ -109,13 +114,12 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		
 		d.fix = true;
 		d.fixed = true;
-		force.resume();
+		force.alpha(startAlpha);
 	}
 
 	function dragend(d, i) {
 		d.fix = false;
 		d.fixed = false;
-		force.resume();
 	}
 	
 	// Rescales the contents of the svg. Called when the user scrolls.
@@ -290,7 +294,16 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 				.concat(d3.selectAll('svg g g path').filter(':not(.selected)')[0])
 				.concat(d3.selectAll('svg g g line').filter('.selected')[0])
 				.concat(d3.selectAll('svg g g path').filter('.selected')[0])
-			selection.order()
+			var alpha = Math.max(force.alpha(), 0.007);
+			$.each(force.nodes(), function(i, n) {
+				n.fixed = true;
+			})
+			selection.order();
+			force.stop();
+			$.each(force.nodes(), function(i, n) {
+				n.fixed = false;
+			})
+			force.alpha(alpha);
 		} else { // The funtion is deselected a node, so remove the selected class from all elements
 			d3.selectAll('svg g g line').filter('.selected')[0].each(function(o){
 				o.classList.remove('selected')
@@ -298,6 +311,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			d3.selectAll('svg g g path').filter('.selected')[0].each(function(o){
 				o.classList.remove('selected')
 			})
+			force.alpha(Math.max(force.alpha(), 0.007));
 		}
 	}
 	
@@ -307,7 +321,11 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	graph = vis.selectAll("g.node")
 		.data(nodes).enter()
 		.append("svg:g")
-			.attr("class", "node nodeLabel")
+	
+	if (backgroundColor == '#ffffff')
+		graph.attr("class", "node nodeLabel blackText")
+	else
+		graph.attr("class", "node nodeLabel")
 	
 	graph.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
 		.attr("dx", 12)
@@ -380,10 +398,15 @@ function rebuildMap (charge, linkSize, friction, theta, width, height, labels) {
 	widthCurrent = width
 	heightCurrent = height
 	
+	backgroundColor = $('#blackBackgroundId').is(':checked') ? '#000000' : '#ffffff'
+	
 	// Create the SVG element
 	canvas
 		.attr("width", width)
 		.attr("height", height)
+		.style('background-color', backgroundColor)
+	
+	background.attr('fill', backgroundColor)
 	
 	// Create the force layout
 	force
@@ -410,6 +433,11 @@ function rebuildMap (charge, linkSize, friction, theta, width, height, labels) {
 		.text(function(d) {
 			return (nameList[d.type+''])?(d.name):('');
 		});
+		
+		if (backgroundColor == '#ffffff')
+			graph.attr("class", "node nodeLabel blackText")
+		else
+			graph.attr("class", "node nodeLabel")
 }
 
 // Used by the defaults button to reset all control values to their default state

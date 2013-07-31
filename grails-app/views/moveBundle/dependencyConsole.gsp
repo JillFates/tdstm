@@ -188,14 +188,18 @@
 						break
 					case "graph" :
 						var labelsList = "Application"
-						
+						var blackBackground = null
 						var showControls = 'hide'
-						if($('#controlPanel').css('display') == 'block')
+						if ($('#controlPanel').css('display') == 'block')
 							showControls = 'controls'
-						if($('#legendDivId').css('display') == 'block')
+						if ($('#legendDivId').css('display') == 'block')
 							showControls = 'legend'
+						if ($('#blackBackgroundId').is(':checked'))
+							blackBackground = true
+						else if ($('#blackBackgroundId').is(':not(:checked)'))
+							blackBackground = false
 						compressList()
-						${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&force=\'+ force+\'&distance=\'+ distance + compressList() + \'&showControls=\'+ showControls', onComplete:'listUpdate(e)') }
+						${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&force=\'+ force+\'&distance=\'+ distance + compressList() + \'&showControls=\'+ showControls + \'&blackBackground=\'+ blackBackground', onComplete:'listUpdate(e)') }
 						break
 				}
 			}

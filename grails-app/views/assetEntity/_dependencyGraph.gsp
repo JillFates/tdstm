@@ -23,7 +23,7 @@ $(document).ready(function() {
 	}else{
 	  $('#filesLabel').attr('checked',false)
 	}
-	if( ! document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1"))
+	if( ! document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") )
 		$('.tabInner').html('Your browser does not support SVG, see <a href="http://caniuse.com/svg">http://caniuse.com/svg</a> for more details.')
 })
 
@@ -60,20 +60,22 @@ function hidePanel(){
 	$('#legendDivId').css('display','block')
 	$('#panelLink').attr('onClick','openPanel()')
 }
+
 function openPanel(source){
-	if(source == 'control') {
+	if ( $('#'+source).css('display') == 'block' ) {
+		$('#'+source).css('display', 'none')
+	} else if (source == 'controlPanel') {
 		$('#controlPanel').css('display','block')
 		$('#legendDivId').css('display','none')
-	}
-	if(source == 'legend') {
+	} else if (source == 'legendDivId') {
 		$('#controlPanel').css('display','none')
 		$('#legendDivId').css('display','block')
-	}
-	if(source == 'hide') {
+	} else if (source == 'hide') {
 		$('#controlPanel').css('display','none')
 		$('#legendDivId').css('display','none')
 	}
 }
+
 function listCheck(){
 	var labelsList = {}
 	$('#labelTree input[type="checkbox"]').each(function() {

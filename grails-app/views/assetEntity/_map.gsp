@@ -1,8 +1,8 @@
 <span id="panelLink" colspan="2" style="padding: 0px;">
 	<table id="mapReferenceId">
 		<tr>
-			<td onclick="openPanel('control')"><h4>Control Panel</h4></td>
-			<td onclick="openPanel('legend')"><h4>Legend</h4></td>
+			<td onclick="openPanel('controlPanel')"><h4>Control Panel</h4></td>
+			<td onclick="openPanel('legendDivId')"><h4>Legend</h4></td>
 			<td onclick="openPanel('hide')"><h4>Hide</h4></td>
 		</tr>
 	</table>
@@ -60,6 +60,11 @@
 				<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer"  onclick="modifyParameter('add','widthId')"/>
 			</td>
 		</tr>
+		<tr title="Sets the color of the background to black">
+			<td colspan="2" style="padding-left :0px">
+				Black Background&nbsp;&nbsp;&nbsp;<input type="checkbox" id="blackBackgroundId" name="blackBackground" ${(defaults.blackBackground)?('checked="checked"'):('')} style="border: 0px;background-color: #FFF;" onchange="rebuildMap($('#forceId').val(), $('#linkSizeId').val(), $('#frictionId').val(), $('#thetaId').val(), $(widthId).val(), $(heightId).val());">
+			</td>
+		</tr>
 		
 		<tr>
 			<td colspan="2" style="padding: 0px 0px 6px 0px ;text-align: left;"><h4>Show Labels</h4></td>
@@ -67,7 +72,7 @@
 		<tr>
 			<td><img src="${resource(dir:'images',file:'iconApp.png')}" height="14" /></td>
 			<td colspan="2" style="padding: 0px;">
-				<input type="checkbox" id="Application" name="labels" value="apps" ${(labelMap.Application=='true') ? 'checked' : ''} class="pointer" onchange="rebuildMap()">
+				<input type="checkbox" id="Application" name="labels" value="apps" ${( (! multiple) && labelMap.Application=='true' ) ? 'checked' : ''} class="pointer" onchange="rebuildMap()">
 				<label for="Application" style="vertical-align: text-top;">Apps &nbsp;&nbsp;&nbsp;</label>
 			</td>
 		</tr>
