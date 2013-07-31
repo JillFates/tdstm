@@ -1933,11 +1933,11 @@ class AssetEntityController {
 		def assetComment = AssetComment.get(params.id)
 		if(assetComment){
 			if(assetComment.createdBy){
-				personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")?.lastNameFirst
+				personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")?.toString()
 				dtCreated = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
 			}
 			if(assetComment.dateResolved){
-				personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")?.lastNameFirst
+				personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")?.toString()
 				dtResolved = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
 			}
 			
@@ -1956,7 +1956,7 @@ class AssetEntityController {
 			def notes = []
 			noteList.each {
 				def dateCreated = TimeUtil.convertInToUserTZ(it.dateCreated, tzId).format("E, d MMM 'at ' HH:mma")
-				notes << [ dateCreated , it.createdBy.lastNameFirst ,it.note]
+				notes << [ dateCreated , it.createdBy.toString() ,it.note]
 			}
 			
 			// Get the name of the User Role by Name to display
@@ -2005,7 +2005,7 @@ class AssetEntityController {
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
 			commentList << [ 
 				assetComment:assetComment, personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
-				dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo?.lastNameFirst ?:'', assetName:assetComment.assetEntity?.assetName ?: "",
+				dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo?.toString() ?:'', assetName:assetComment.assetEntity?.assetName ?: "",
 				eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate, etStart:etStart, etFinish:etFinish,atStart:atStart,notes:notes,
 				workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,maxVal:maxVal,
 				cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, 
@@ -3558,7 +3558,7 @@ class AssetEntityController {
 					dueClass = 'task_overdue'
 				}
 			}
-			def assignedTo  = (it.assignedTo ? it.assignedTo.lastNameFirst : '')
+			def assignedTo  = (it.assignedTo ? it.assignedTo.toString(): '')
 			
 			def dueDate='' 
 			if (it.isRunbookTask()) {
@@ -4100,7 +4100,7 @@ class AssetEntityController {
 		def list = []
 		projectStaff.each {
 			list << [ id:it.staff.id, 
-				nameRole:"${it.role.description.split(':')[1]?.trim()}: ${it.staff.lastNameFirst}",
+				nameRole:"${it.role.description.split(':')[1]?.trim()}: ${it.staff.toString()}",
 				sortOn:"${it.role.description.split(':')[1]?.trim()},${it.staff.firstName} ${it.staff.lastName}"
 			]
 		}

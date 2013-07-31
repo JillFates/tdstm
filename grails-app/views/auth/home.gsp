@@ -34,7 +34,7 @@ a:hover {
 				<tbody>
 					<g:each in="${recentUsers}" status="i"  var="user">			
 					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-						<td><g:link controller="person" action="show" id="${user.person?.id}">${user.person.lastNameFirst}</g:link></td>
+						<td><g:link controller="person" action="show" id="${user.person?.id}">${user.person}</g:link></td>
 						<td><g:link controller="userLogin" action="show" id="${user.id}">${user.username}</g:link></td>
 						<td><tds:convertDateTime date="${user.lastLogin}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 						<td><tds:convertDateTime date="${user.lastPage}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>

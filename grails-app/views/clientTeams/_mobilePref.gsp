@@ -5,7 +5,7 @@
 		<table style="border: 0px">
 			<tr>
 				<td><b>
-						${person.lastNameFirst}
+						${person}
 				</b></td>
 			</tr>
 			<g:each in="${personTeams}" var="team">

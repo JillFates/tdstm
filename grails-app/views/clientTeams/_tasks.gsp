@@ -71,7 +71,7 @@
 							${item?.status}<% // (${formatter.format(item?.score?: 0)}) %>
 						</td>
 						<td id="assignedToName_${item?.id}" class="asset_details_block">
-							${(item?.hardAssigned?'* ':'')} <span id="assignedToNameSpan_${item?.id}">${item.lastNameFirst}</span>
+							${(item?.hardAssigned?'* ':'')} <span id="assignedToNameSpan_${item?.id}">${(item?.firstName?:'')+' '+((item?.lastName != null)? item?.lastName :'')}</span>
 						</td>
 					</tr>
 					<tr id="showStatusId_${item?.id}" ${(todoSize!=1||search==''||search==null) ? 'style="display: none"' :''}>

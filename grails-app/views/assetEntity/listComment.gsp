@@ -10,8 +10,6 @@
         <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
         <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
        <jqgrid:resources />
-		<jqui:resources /> 
-		<jqgrid:resources />
 		
         <script type="text/javascript">
         function onInvokeAction(id) {
