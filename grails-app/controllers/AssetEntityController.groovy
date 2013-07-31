@@ -819,6 +819,7 @@ class AssetEntityController {
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername(principal)
 		def bundleSize = bundle.size()
+		def started
 		
 		bundleNameList.append(bundle[0] != "" ? (bundleSize==1 ? MoveBundle.read( bundle[0] ).name : bundleSize+'Bundles') : 'All')		
 		for ( int i=0; i< bundleSize ; i++ ) {
@@ -860,13 +861,12 @@ class AssetEntityController {
 		def workbook
 		def book
 		try {
+			started = new Date()
 			def assetDepBundleList = AssetDependencyBundle.findAllByProject(project)
 			def filenametoSet = dataTransferSetInstance.templateFilename
 			File file =  ApplicationHolder.application.parentContext.getResource(filenametoSet).getFile()
 			// Going to use temporary file because we were getting out of memory errors constantly on staging server
-			WorkbookSettings wbSetting = new WorkbookSettings()
-			wbSetting.setUseTemporaryFileDuringWrite(true)
-			workbook = Workbook.getWorkbook( file, wbSetting )
+
 			//set MIME TYPE as Excel
 			def exportType = filenametoSet.split("/")[2]
 			exportType = exportType.substring(0,exportType.indexOf("_template.xls"))
@@ -875,8 +875,17 @@ class AssetEntityController {
 			def exportDate = exportFileFormat.format(TimeUtil.nowGMT())
 			def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString()
 			response.setContentType( "application/vnd.ms-excel" )			
+			log.info "export() - Loading appDepBundle took ${TimeUtil.elapsed(started)}"
+			started = new Date()
+
 			//create workbook and sheet
+			WorkbookSettings wbSetting = new WorkbookSettings()
+			wbSetting.setUseTemporaryFileDuringWrite(true)
+			workbook = Workbook.getWorkbook( file, wbSetting )
 			book = Workbook.createWorkbook( response.getOutputStream(), workbook )
+			log.info "export() - Creating workbook took ${TimeUtil.elapsed(started)}"
+			started = new Date()
+
 			def serverSheet
 			def appSheet
 			def dbSheet
@@ -944,13 +953,14 @@ class AssetEntityController {
 			fileMap.put("DepGroup", null )
 			fileColumnNameList.add("DepGroup")
 			
+			// TODO : Lok - what does this code do? It seems to be getting the names of the sheets from the spreadsheet and then trying to look them up
+			// If anything, shouldn't it be looking for known names instead of positional references to the sheet names?
 			def sheetNames = book.getSheetNames()
 			def flag = 0
 			def sheetNamesLength = sheetNames.length
 			for( int i=0;  i < sheetNamesLength; i++ ) {
 				if ( serverSheetNameMap.containsValue( sheetNames[i].trim()) ) {
 					flag = 1
-
 				}
 			}
 			serverSheet = book.getSheet( sheetNames[1] )
@@ -962,9 +972,11 @@ class AssetEntityController {
 			rackSheet = book.getSheet( sheetNames[7] )
 
 			if( flag == 0 ) {
-				flash.message = " Sheet not found, Please check it."
+				flash.message = "Sheet not found, Please check it."
 				redirect( action:assetImport, params:[message:flash.message] )
-				return;
+				return
+
+			// TODO : remove this else as it is unnecessary	
 			} else {
 				def serverCol = serverSheet.getColumns()
 				for ( int c = 0; c < serverCol; c++ ) {
@@ -999,6 +1011,10 @@ class AssetEntityController {
 						fileMap.put( fileCellContent, c )
 					}
 				}
+
+				log.info "export() - Valdating columns took ${TimeUtil.elapsed(started)}"
+				started = new Date()
+
 				//calling method to check for Header
 				def serverCheckCol = checkHeader( serverColumnNameList, serverSheetColumnNames )
 				def appCheckCol = checkHeader( appColumnNameList, appSheetColumnNames )
@@ -1043,7 +1059,13 @@ class AssetEntityController {
 					updateColumnHeaders(appSheet, appDTAMap, appSheetColumnNames, project)
 					updateColumnHeaders(dbSheet, dbDTAMap, dbSheetColumnNames, project)
 					updateColumnHeaders(fileSheet, fileDTAMap, fileSheetColumnNames, project)
+
+					log.info "export() - Updating spreadsheet headers took ${TimeUtil.elapsed(started)}"
+					started = new Date()
 					
+					//
+					// Asset (Servers, etc)
+					//					
 					if(params.asset=='asset'){
 						exportedEntity +="S"
 						for ( int r = 1; r <= assetSize; r++ ) {
@@ -1058,65 +1080,130 @@ class AssetEntityController {
 								def addContentToSheet
 								def attribute = serverDTAMap.eavAttribute.attributeCode[coll]
 								def colName = serverColumnNameList.get(coll)
-								if(colName == "DepGroup"){
+								if (colName == "DepGroup"){
 									def depGroup = assetDepBundleList.find{it.asset.id==asset[r-1].id}?.dependencyBundle?.toString()
 									addContentToSheet = new Label(serverMap[colName], r, depGroup?: "" )
-								} else if ( attribute != "usize" && asset[r-1][attribute] == null ) {
-									addContentToSheet = new Label( serverMap[colName], r, "" )
-								} else if(attribute == "usize"){
-									addContentToSheet = new Label(serverMap[colName], r, asset[r-1]?.model?.usize?.toString() ?:"" )
+//								} else if ( attribute != "usize" && asset[r-1][attribute] == null ) {
+//									addContentToSheet = new Label( serverMap[colName], r, "" )
+								} else if(attribute == "usize") {
+									def usize = asset[r-1]?.model?.usize ?: 0
+									addContentToSheet = new jxl.write.Number(serverMap[colName], r, (Double)usize )
+								} else if( ['sourceRackPosition', 'targetRackPosition'].contains(attribute) ) {
+									def pos = asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll]) ?: 0
+									// Don't bother populating position if it is a zero
+									if (pos == 0) continue
+									addContentToSheet = new jxl.write.Number(serverMap[colName], r, (Double)pos )
 								} else if(attribute == "retireDate" || attribute == "maintExpDate"){
 									addContentToSheet = new Label(serverMap[colName], r, (asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll]) ? fileFormat.format(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll])) :''))
+								} else if ( asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll]) == null ) {
+									// Skip populating the cell if it is null
+									continue
 								} else {
 									//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
 									if( bundleMoveAndClientTeams.contains(serverDTAMap.eavAttribute.attributeCode[coll]) ) {
 										addContentToSheet = new Label( serverMap[colName], r, String.valueOf(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll]).teamCode) )
 									}else {
-										addContentToSheet = new Label( serverMap[colName], r, String.valueOf(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll])) )
+										addContentToSheet = new Label( serverMap[colName], r, String.valueOf( asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll]) ?: '') )
 									}
 								}
 								serverSheet.addCell( addContentToSheet )
 							}
 						}
+						log.info "export() - processing assets took ${TimeUtil.elapsed(started)}"
+						started = new Date()
+
 					}
-					if(params.application=='application'){
-						exportedEntity +="A"
-						for ( int r = 1; r <= appSize; r++ ) {
-							//Add assetId for walkthrough template only.
-							if( appSheetColumnNames.containsKey("appId") ) {
-								def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
-								def addAppId = new Number(0, r, (application[r-1].id))
-								appSheet.addCell( addAppId )
+
+					// Just a simple closure to create a text list from an array for debugging
+					def xportList = { list ->
+						def out = ''
+						def x = 0
+						list.each { out += "$x=$it\n"; x++}
+						return out
+					}
+
+					//
+					// Application
+					//
+					if ( params.containsKey('application') && params.application ) {
+						exportedEntity += 'A'
+
+						// This determines which columns are added as Number vs Label
+						def numericCols = []
+
+						// Flag to know if the AppId Column exists
+						def idColName = 'appId'
+						def hasIdCol = appSheetColumnNames.containsKey(idColName)
+
+						def rowNum = 0
+						application.each { app -> 
+							rowNum++
+
+							// Add the appId column to column 0 if it exists
+							if (hasIdCol) {
+								appSheet.addCell( new jxl.write.Number(appSheetColumnNames[idColName], rowNum, (Double)app.id) )
 							}
-							for ( int coll = 0; coll < appcolumnNameListSize; coll++ ) {
-								def addContentToSheet
-								def attribute = appDTAMap.eavAttribute.attributeCode[coll]
-								//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
-								def colName = appColumnNameList.get(coll)
-								addContentToSheet = new Label( appMap[colName], r, "" )
-								if(colName == "DepGroup"){
-									def depGroup = assetDepBundleList.find{it.asset.id==application[r-1].id}?.dependencyBundle?.toString()
-									addContentToSheet = new Label(appMap[colName], r, depGroup?:"" )
-								}else if(colName in ["ShutdownBy","StartupBy","TestingBy"] ){
-									def byWhom = application[r-1].(appDTAMap.eavAttribute.attributeCode[coll]) ? String.valueOf(assetEntityService.resolveByName(application[r-1].(appDTAMap.eavAttribute.attributeCode[coll]), false)) : ''
-									addContentToSheet = new Label(appMap[colName], r, byWhom)
-								}else if(colName in ["ShutdownFixed" , "StartupFixed" ,"TestingFixed"] ){
-									def fixedFlag = application[r-1].(appDTAMap.eavAttribute.attributeCode[coll]) ? 'Yes' : 'No'
-									addContentToSheet = new Label(appMap[colName], r, fixedFlag)
-								} else if ( application[r-1][attribute] == null ) {
-									addContentToSheet = new Label( appMap[colName], r, "" )
-								}else {
-									if( bundleMoveAndClientTeams.contains(appDTAMap.eavAttribute.attributeCode[coll]) ) {
-										addContentToSheet = new Label( appMap[colName], r, String.valueOf(application[r-1].(appDTAMap.eavAttribute.attributeCode[coll]).teamCode) )
-									}else {
-										addContentToSheet = new Label( appMap[colName], r, String.valueOf(application[r-1].(appDTAMap.eavAttribute.attributeCode[coll])) )
-									}
+									
+							for (int i=0; i < appColumnNameList.size(); i++) {
+								def colName = appColumnNameList[i]
+
+								// If the column isn't in the spreadsheet we'll skip over it
+								if ( ! appSheetColumnNames.containsKey(colName)) {
+									log.info "export() : skipping column $colName that is not in spreadsheet"
+									continue
 								}
-								appSheet.addCell( addContentToSheet )
-							}
-							
+
+								// Get the column number in the spreadsheet that contains the column name
+								def colNum = appSheetColumnNames[colName]
+
+								// Get the asset column name via the appDTAMap which is indexed to match the appColumnNameList
+								def assetColName = appDTAMap.eavAttribute.attributeCode[i]
+
+								def colVal = ''
+								switch(colName) {
+									case 'AppId':
+										colVal = app.id
+										break
+									case 'Owner':
+										colVal = app.appOwner?.toString()
+										break
+									case 'DepGroup':
+										// Find the Dependency Group that this app is bound to
+										colVal = assetDepBundleList.find {it.asset.id == app.id }?.dependencyBundle?.toString() ?: ''
+										break
+									case ~/ShutdownBy|StartupBy|TestingBy/:
+										colVal = app[assetColName] ? assetEntityService.resolveByName(app[assetColName], false) : ''
+										break
+									case ~/ShutdownFixed|StartupFixed|TestingFixed/:
+										colVal = app[assetColName] ? 'Yes' : 'No'
+										log.info "export() : field class type=$app[assetColName].className()}"
+										break
+									default:
+										colVal = app[assetColName]
+								}
+
+								// def colNum = appMap[colNum]
+								log.info("export() : rowNum=$rowNum, colNum=$colNum, colVal=$colVal")
+
+								if ( colVal != null) {
+									def cell 
+									if ( numericCols.contains(colName) )
+										cell = new Number(colNum, rowNum, (Double)colVal)
+									else 
+										cell = new Label( colNum, rowNum, String.valueOf(colVal) )
+
+									appSheet.addCell( cell )
+								}
+							}	
 						}
+						log.info "export() - processing apps took ${TimeUtil.elapsed(started)}"
+						started = new Date()
+
 					}
+
+					//
+					// Database
+					//
 					if(params.database=='database'){
 						exportedEntity +="D"
 						for ( int r = 1; r <= dbSize; r++ ) {
@@ -1147,6 +1234,10 @@ class AssetEntityController {
 							}
 						}
 					}
+
+					//
+					// Storage ( files )
+					//					
 					if(params.files=='files'){
 						exportedEntity +="F"
 						for ( int r = 1; r <= fileSize; r++ ) {
@@ -1178,6 +1269,9 @@ class AssetEntityController {
 						}
 					}
 					
+					//
+					// Dependencies
+					//					
 					if(params.dependency=='dependency'){
 						exportedEntity +="X"
 						def assetDependent = AssetDependency.findAll("from AssetDependency where asset.project = ? ",[project])
@@ -1325,7 +1419,7 @@ class AssetEntityController {
 			}
 		} catch( Exception fileEx ) {
 
-			flash.message = "Exception occurred wile exporting Excel. "
+			flash.message = "An unexpected exception occurred while exporting to Excel"
 			fileEx.printStackTrace();
 			redirect( action:exportAssets, params:[ message:flash.message] )
 			return;
@@ -1438,7 +1532,7 @@ class AssetEntityController {
 				}
 			}
 			
-			// if filter have some value then this one is getting requested from planning dashboard to filter the asset list. else it will be blank.
+			// if filter have some value then this one is getting requested from planning dashboard to filter the asset list. else it will be 1146.
 			if ( params.filter ) {
 				if (params.filter !='other')  // filter is not other means filter is in (Server, VM , Blade) and others is excepts (Server, VM , Blade).
 					'in'('assetType', assetType)
