@@ -36,9 +36,13 @@
 						<tbody>
 							<tr>
 								<td class="label ${config.assetName}" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label></td>
-								<td ><input type="text" id="assetName" class="${config.assetName}" name="assetName" value="${applicationInstance.assetName}" tabindex="10" /></td>
+								<td>
+									<input type="text" id="assetName" class="${config.assetName}" name="assetName" 
+										value="${applicationInstance.assetName}" tabindex="9" /></td>
 								<td class="label ${config.description}" nowrap="nowrap">Description</td>
-								<td colspan="3"><input type="text" id="description" class="${config.description}" name="description" value="${applicationInstance.description}" size="50" tabindex="20" />
+								<td colspan="3">
+									<input type="text" id="description" class="${config.description}" name="description" 
+										value="${applicationInstance.description}" size="50" tabindex="10" />
 								</td>
 							</tr>
 							<tr>
@@ -102,7 +106,13 @@
 								</td>
 								<td class="label ${config.criticality}" nowrap="nowrap"><label for="criticality">Criticality</label>
 								</td>
-								<td ><g:select id="criticality" class="${config.criticality}" name="criticality" from="${applicationInstance.constraints.criticality.inList}" value="${applicationInstance.criticality}"  tabindex="33"></g:select></td>
+								<td >
+									<g:select id="criticality" class="${config.criticality}" name="criticality" 
+										from="${applicationInstance.constraints.criticality.inList}" value="${applicationInstance.criticality}"  
+										noSelection="${['':'Please select']}"
+										tabindex="33">
+									</g:select>
+								</td>
 								<td class="label ${config.useFrequency}" nowrap="nowrap"><label for="useFrequency">Use	Frequency</label>
 								</td>
 								<td ><input type="text" id="useFrequency" class="${config.useFrequency}" name="useFrequency" value="${applicationInstance.useFrequency}" tabindex="43" />
@@ -201,7 +211,9 @@
 								<td ><input type="text" id="url" name="url" value="${applicationInstance.url}" tabindex="18" />
 								</td>
 								<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
-								<td><input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" value="${applicationInstance.externalRefId}" tabindex="11" /></td>
+								<td>
+									<input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" 
+									value="${applicationInstance.externalRefId}" tabindex="28" /></td>
 								<td class="label ${config.shutdownBy}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
 								<td >
 								   <g:render template="bySelect" model="[name:'shutdownBy' , id:'shutdownByEditId', className:config.shutdownBy]"></g:render>

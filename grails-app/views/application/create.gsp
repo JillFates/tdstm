@@ -28,18 +28,22 @@
 						<tbody>
 							<tr>
 								<td class="label ${config.assetName}" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label></td>
-								<td ><input type="text" id="assetName" class="${config.assetName}" name="assetName" value="${applicationInstance.assetName}" tabindex="10" /></td>
+								<td>
+									<input type="text" id="assetName" class="${config.assetName}" name="assetName" 
+										value="${applicationInstance.assetName}" tabindex="9" /></td>
 								<td class="label ${config.description}" nowrap="nowrap"><label for="assetName">Description</label></td>
-								<td colspan="3"><input type="text" id="description" class="${config.description}" name="description" value="" size="50" tabindex="20" />
+								<td colspan="3">
+									<input type="text" id="description" class="${config.description}" name="description" 
+										value="" size="50" tabindex="10" />
 								</td>
 							</tr>
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
-								<td ><input type="text" id="assetType" name="assetType" value="Application" readonly="readonly" /></td>
+								<td><input type="text" id="assetType" name="assetType" value="Application" readonly="readonly" /></td>
 								<td class="label ${config.supportType}" nowrap="nowrap"><label for="supportType">Support</label>
 								</td>
 								<td ><input type="text" id="supportType" class="${config.supportType}"
-									name="supportType" value="${applicationInstance.supportType}"  tabindex="21" />
+									name="supportType" value="${applicationInstance.supportType}" tabindex="20" />
 								</td>
 								<td class="label ${config.appFunction}" nowrap="nowrap"><label for="appFunction">Function</label>
 								</td>
@@ -48,7 +52,9 @@
 								</td>
 								<td class="label ${config.userCount}" nowrap="nowrap"><label for="userCount">Users</label>
 								</td>
-								<td ><input type="text" id="userId" class="${config.userCount}" name="userCount" value="${applicationInstance.userCount}"  tabindex="41" />
+								<td>
+									<input type="text" id="userId" class="${config.userCount}" name="userCount" 
+										value="${applicationInstance.userCount}"  tabindex="41" />
 								</td>
 							</tr>
 							<tr>
@@ -62,7 +68,8 @@
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value,this.id)" 
 										tabindex="38" 
-										noSelection="${['':' Please Select']}" 
+										noSelection="${['':'Please Select']}" 
+										tabIndex="21"
 									/>
 								</td>
 								<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment</label>
@@ -70,21 +77,23 @@
 								<td >
 									<g:select id="environment" class="${config.environment}" name="environment" 
 										from="${applicationInstance.constraints.environment.inList}" 
-										value="${applicationInstance.environment}"  tabindex="32">
+										value="${applicationInstance.environment}" 
+										tabindex="32">
 									</g:select>
 								</td>
 								<td class="label ${config.userLocations}" nowrap="nowrap"><label for="userLocations">User Location</label>
 								</td>
 								<td ><input type="text" id="userLocations" class="${config.userLocations}"
 									name="userLocations"
-									value="${applicationInstance.userLocations}"  tabindex="42" />
+									value="${applicationInstance.userLocations}" 
+									tabindex="42" />
 								</td>
 							</tr>
 							<tr>
 								<td class="label ${config.appVersion}" nowrap="nowrap"><label for="appVersion">Version</label>
 								</td>
 								<td ><input type="text" id="appVersion" class="${config.appVersion}"
-									name="appVersion" value="${applicationInstance.appVersion}"  tabindex="13" />
+									name="appVersion" value="${applicationInstance.appVersion}"  tabindex="12" />
 								</td>
 								<td class="label ${config.sme2}" nowrap="nowrap"><label for="sme2">SME2</label></td>
 								<td>
@@ -92,21 +101,33 @@
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
 										tabindex="38" 
-										noSelection="${['':' Please Select']}" 
+										noSelection="${['':'Please select']}" 
 									/>
 								</td>
-								<td class="label ${config.criticality}" nowrap="nowrap"><label for="criticality">Criticality</label>
+								<td class="label ${config.criticality}" nowrap="nowrap">
+									<label for="criticality">Criticality</label>
 								</td>
-								<td ><g:select id="criticality" class="${config.criticality}" name="criticality" from="${applicationInstance.constraints.criticality.inList}" value="${applicationInstance.criticality}"  tabindex="33"></g:select></td>
-								<td class="label ${config.useFrequency}" nowrap="nowrap"><label for="useFrequency">Use	Frequency</label>
+								<td>
+									<g:select id="criticality" class="${config.criticality}" name="criticality" 
+										from="${applicationInstance.constraints.criticality.inList}" 
+										value="${applicationInstance.criticality}" 
+										noSelection="${['':'Please select']}"
+										tabindex="33">
+									</g:select>
 								</td>
-								<td ><input type="text" id="useFrequency" class="${config.useFrequency}" name="useFrequency" value="${applicationInstance.useFrequency}" tabindex="43" />
+								<td class="label ${config.useFrequency}" nowrap="nowrap">
+									<label for="useFrequency">Use	Frequency</label>
+								</td>
+								<td>
+									<input type="text" id="useFrequency" name="useFrequency" 
+										class="${config.useFrequency}" value="${applicationInstance.useFrequency}" tabindex="43" />
 								</td>
 
 							</tr>
 							<tr>
 								<td class="label ${config.appTech}" nowrap="nowrap"><label for="appTech">Tech.</label></td>
-								<td ><input type="text" id="appTech" class="${config.appTech}" name="appTech" value="${applicationInstance.appTech}" tabindex="14" />
+								<td ><input type="text" id="appTech" class="${config.appTech}" name="appTech" 
+									value="${applicationInstance.appTech}" tabindex="13" />
 								</td>
 								<td class="label ${config.businessUnit}" nowrap="nowrap"><label for="businessUnit">Bus	Unit</label>
 								</td>
@@ -122,7 +143,8 @@
 							</tr>
 							<tr>
 								<td class="label ${config.appSource}" nowrap="nowrap"><label for="appSource">Source</label></td>
-								<td ><input type="text" id="appSource"	class="${config.appSource}" name="appSource" value="${applicationInstance.appSource}" tabindex="15" />
+								<td ><input type="text" id="appSource"	class="${config.appSource}" name="appSource" 
+									value="${applicationInstance.appSource}" tabindex="15" />
 								</td>
 								<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
 								<td >
@@ -170,12 +192,12 @@
 							    <td></td>
 							    <td></td>
 							    <td  class="label ${config.maintExpDate}"><label for="maintExpDate">Maint Exp.</label></td>
-								<td valign="top"
-										class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}">
+								<td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}">
 								    <script type="text/javascript" charset="utf-8">
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 									</script>
-									<input type="text" class="dateRange ${config.maintExpDate}" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate" tabindex="27" 
+									<input type="text" class="dateRange ${config.maintExpDate}" size="15" style="width: 112px; height: 14px;" 
+										name="maintExpDate" id="maintExpDate" tabindex="27" 
 									value="<tds:convertDate date="${applicationInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />" /> 
 								</td>
 								<td class="label ${config.latency}" nowrap="nowrap"><label for="latency">Latency OK</label>
@@ -195,7 +217,9 @@
 								<td><input type="text" id="url" class="${config.url}" name="url" value="${applicationInstance.url}" tabindex="19" />
 								</td>
 								<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
-								<td><input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" value="${applicationInstance.externalRefId}" tabindex="11" /></td>
+								<td>
+									<input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" 
+										value="${applicationInstance.externalRefId}" tabindex="28" /></td>
 								<td class="label ${config.shutdownBy}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
 								<td colspan="1" nowrap="nowrap">
 								  <g:render template="bySelect" model="[name:'shutdownBy', id:'shutdownById', className:config.shutdownBy]"></g:render>
