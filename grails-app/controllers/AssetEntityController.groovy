@@ -44,6 +44,7 @@ import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
+import org.apache.commons.lang.math.NumberUtils
 
 import RolePermissions
 
@@ -696,85 +697,59 @@ class AssetEntityController {
 							}
 						}
 					}
+					
 					if(params.dependency=='dependency'){
 						session.setAttribute("TOTAL_ASSETS",dependencyCount)
-						def currentProjectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-						def projectInstance = Project.get(currentProjectId)
-						def subjects = SecurityUtils.subject
-						def principals = subject.principal
-						def userLogins = UserLogin.findByUsername( principals )
+						def projectInstance = securityService.getUserCurrentProject()
+						def userLogins = securityService.getUserLogin()
 						def skippedUpdated =0
 						def skippedAdded=0
 						for ( int r = 1; r < dependencySheetRow ; r++ ) {
 							int cols = 0 ;
-							def name = dependencySheet.getCell( cols, r ).contents
-							def dependencyTransferValueList = new StringBuffer()
-							cols=0
-							if(dependencySheet.getCell( cols, r ).contents.replace("'","\\'")){
-								int id = Integer.parseInt(dependencySheet.getCell( cols, r ).contents.replace("'","\\'"))
-								AssetDependency asset =  AssetDependency.get(id)
-								if(asset){
-									def assetId = AssetEntity.get(Integer.parseInt(dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")))
-									def dependentId = AssetEntity.get(Integer.parseInt(dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")))
-									if(assetId.project.id==projectInstance.id && dependentId.project.id==projectInstance.id ){
-										asset.asset = assetId
-										asset.dependent = dependentId
-										asset.type = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-										asset.dataFlowFreq = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-										asset.dataFlowDirection = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-										asset.status = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-										asset.comment = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-										asset.updatedBy = userLogins.person
-										//asset.createdBy = userLogin.person
-										if(!asset.save(flush:true)){
-											asset.errors.allErrors.each { log.error  it }
-											skipped += ( r +1 )
-											skippedUpdated = skipped.size()
-										}
-									}else{
-											skipped += ( r +1 )
-											skippedUpdated = skipped.size()
-									}
+							def depId = NumberUtils.toDouble(dependencySheet.getCell( cols, r ).contents.replace("'","\\'"), 0).round()
+							def assetDep =  AssetDependency.get(depId)
+							def asset = AssetEntity.get(NumberUtils.toDouble(dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'"), 0).round())
+							def dependent = AssetEntity.get(NumberUtils.toDouble(dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'"), 0).round())
+							def depExist = AssetDependency.findByAssetAndDependent(asset, dependent)
+							def isNew = false
+							if(!assetDep){
+								if(!depExist){
+									assetDep = new AssetDependency()
+									isNew = true
 								}
-							}else{
-								AssetDependency dependency = new AssetDependency()
-								def assetId = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-								def dependentId = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-								def assetInstance = AssetEntity.get(Integer.parseInt(assetId))
-								def dependentInstance = AssetEntity.get(Integer.parseInt(dependentId))
-								if(assetInstance.project.id==projectInstance.id && dependentInstance.project.id == projectInstance.id){
-									if(assetId){
-										dependency.asset = assetInstance
-									}
-									if(dependentId){
-										dependency.dependent = dependentInstance
-									}
-									dependency.type = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-									dependency.dataFlowFreq = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-									dependency.dataFlowDirection = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-									dependency.status = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-									dependency.comment = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-									dependency.createdBy = userLogins?.person
-									dependency.updatedBy = userLogins?.person
-									if(!dependency.save(flush:true)){
-										dependency.errors.allErrors.each { log.error it }
-										skipped += ( r +1 )
-										skippedAdded = skipped.size()
-									}
-								}else{
-								      skipped += ( r +1 )
-								      skippedAdded = skipped.size()
-								}
-
 							}
+							
+							if(assetDep){
+								if(asset.project.id==projectInstance.id && dependent.project.id==projectInstance.id ){
+									assetDep.asset = asset
+									assetDep.dependent = dependent
+									assetDep.type = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+									assetDep.dataFlowFreq = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+									assetDep.dataFlowDirection = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+									assetDep.status = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+									assetDep.comment = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+									assetDep.updatedBy = userLogins.person
+									if(isNew)
+										asset.createdBy = userLogin.person
+										
+									if(!assetDep.save(flush:true)){
+										assetDep.errors.allErrors.each { log.error  it }
+										skipped += ( r +1 )
+										skippedUpdated = skipped.size()
+									}
+								} else {
+									skipped += ( r +1 )
+									skippedUpdated = skipped.size()
+								}
+							}
+									
 							dependencyAdded = (r-(skippedAdded+skippedUpdated))
 							if (r%50 == 0){
 								sessionFactory.getCurrentSession().flush();
 								sessionFactory.getCurrentSession().clear();
 							}
 
-						}
-
+					  }
 					}
 					for( int i=0;  i < sheetNamesLength; i++ ) {
 						if(sheetNames[i] == "Comments"){
@@ -1633,7 +1608,8 @@ class AssetEntityController {
 		def bundleId = getSession().getAttribute( "CURR_BUNDLE" )?.CURR_BUNDLE
 		def assetEntityInstance = new AssetEntity(params)
 		def projectId =  getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def projectInstance = Project.findById( projectId )
+		def projectInstance = securityService.getUserCurrentProject()
+		
 		assetEntityInstance.project = projectInstance
 		assetEntityInstance.owner = projectInstance.client
 		if(!params.assetTag){
@@ -1654,12 +1630,12 @@ class AssetEntityController {
 
 		if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
 			assetEntityInstance.updateRacks()
-
+			def loginUser = securityService.getUserLogin()
 			if(assetEntityInstance.model){
 				assetEntityAttributeLoaderService.createModelConnectors( assetEntityInstance )
 			}
 			flash.message = "AssetEntity ${assetEntityInstance.assetName} created "
-			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance)
+			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance, loginUser, projectInstance)
 			flash.message += "</br>"+errors 
 			if(redirectTo == "room"){
 				redirect( controller:'room',action:list )
@@ -3014,7 +2990,7 @@ class AssetEntityController {
 				redirectTo:params.redirectTo, project:project,
 				assetCommentList:assetCommentList,
 				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle ,
-				 prefValue:prefValue, config:configMap.config, customs:configMap.customs]
+				 prefValue:prefValue, config:configMap.config, customs:configMap.customs, errors:params.errors]
 		
 			if(params.redirectTo == "roomAudit") {
 				paramsMap << [source:params.source, assetType:params.assetType]
@@ -3157,11 +3133,13 @@ class AssetEntityController {
 		assetEntityInstance.properties = params
 		if(!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {
 			assetEntityInstance.updateRacks()
-			flash.message = "Asset ${assetEntityInstance.assetName} Updated"
-			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance)
+			def loginUser = securityService.getUserLogin()
+			def project = securityService.getUserCurrentProject()
+			flash.message = "Asset ${assetEntityInstance.assetName} Updated <br/>"
+			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance, loginUser, project)
 			flash.message += errors
 			if(params.updateView == 'updateView'){
-				forward(action:'show', params:[id: params.id])
+				forward(action:'show', params:[id: params.id, errors:errors])
 				
 			}else{
 				switch(redirectTo){

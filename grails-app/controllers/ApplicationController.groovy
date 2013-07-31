@@ -163,10 +163,10 @@ class ApplicationController {
 		def applicationInstance = new Application(params)
 		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
 			flash.message = "Application ${applicationInstance.assetName} created"
-			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, applicationInstance)
+			def loginUser = securityService.getUserLogin()
+			def project = securityService.getUserCurrentProject()
+			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, applicationInstance, loginUser, project)
 			flash.message += "</br>"+errors
-			def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
-			def project = Project.read(projectId)
 			def moveEventList = MoveEvent.findAllByProject(project).id
 			for(int i : moveEventList){
 				def okToMove = params["okToMove_"+i]
@@ -229,7 +229,8 @@ class ApplicationController {
 			  redirectTo : params.redirectTo, assetComment:assetComment, assetCommentList:assetCommentList,
 			  appMoveEvent:appMoveEvent, moveEventList:moveEventList, appMoveEvent:appMoveEventlist, project:project,
 			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle ,prefValue:prefValue, 
-			  config:configMap.config, customs:configMap.customs, shutdownBy:shutdownBy, startupBy:startupBy, testingBy:testingBy]
+			  config:configMap.config, customs:configMap.customs, shutdownBy:shutdownBy, startupBy:startupBy, testingBy:testingBy,
+			  errors:params.errors]
 		}
 	}
     
@@ -287,7 +288,7 @@ class ApplicationController {
 		session.setAttribute("USE_FILTERS","true")
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
-		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def project = securityService.getUserCurrentProject()
 		def maintExpDate = params.maintExpDate
 		if(maintExpDate){
 			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
@@ -307,7 +308,8 @@ class ApplicationController {
 		
 		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
 			flash.message = "Application ${applicationInstance.assetName} Updated"
-			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, applicationInstance)
+			def loginUser = securityService.getUserLogin()
+			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, applicationInstance, loginUser, project)
 			flash.message += "</br>"+errors
 			def appMoveEventList = AppMoveEvent.findAllByApplication(applicationInstance)?.moveEvent?.id
 			if(appMoveEventList.size()>0){
@@ -319,7 +321,7 @@ class ApplicationController {
 				}
 			}
 			if(params.updateView == 'updateView'){
-				forward(action:'show', params:[id: params.id])
+				forward(action:'show', params:[id: params.id, errors:errors])
 				
 			}else{
 				switch(params.redirectTo){
@@ -345,7 +347,7 @@ class ApplicationController {
 						redirect( controller:'files', action:list)
 						break;
 					case "listComment":
-						redirect( controller:'assetEntity', action:'listComment' , params:[projectId: projectId])
+						redirect( controller:'assetEntity', action:'listComment' , params:[projectId: project.id])
 						break;
 					case "listTask":
 						render "Application ${applicationInstance.assetName} updated."

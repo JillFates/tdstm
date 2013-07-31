@@ -160,7 +160,7 @@ class DatabaseController {
 			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
 			[ databaseInstance : databaseInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo, 
 			  assetComment:assetComment, assetCommentList:assetCommentList,dependencyBundleNumber:AssetDependencyBundle.findByAsset(databaseInstance)?.dependencyBundle,
-			  project:project ,prefValue:prefValue, config:configMap.config, customs:configMap.customs]
+			  project:project ,prefValue:prefValue, config:configMap.config, customs:configMap.customs, errors:params.errors]
 		}
 	}
 	
@@ -195,7 +195,9 @@ class DatabaseController {
 				def dbInstance = new Database(params)
 				if(!dbInstance.hasErrors() && dbInstance.save()) {
 					flash.message = "Database ${dbInstance.assetName} created"
-					def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, dbInstance)
+					def loginUser = securityService.getUserLogin()
+					def project = securityService.getUserCurrentProject()
+					def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, dbInstance, loginUser, project)
 					flash.message +="</br>"+errors 
 			        session.DB?.JQ_FILTERS = params
 					redirect( action:list)
@@ -263,10 +265,12 @@ class DatabaseController {
 		databaseInstance.properties = params
 		if(!databaseInstance.hasErrors() && databaseInstance.save(flush:true)) {
 			flash.message = "DataBase ${databaseInstance.assetName} Updated"
-			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, databaseInstance)
+			def loginUser = securityService.getUserLogin()
+			def project = securityService.getUserCurrentProject()
+			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, databaseInstance, loginUser, project)
 			flash.message += "</br>"+errors
 			if(params.updateView == 'updateView'){
-				forward(action:'show', params:[id: params.id])
+				forward(action:'show', params:[id: params.id, errors:errors])
 				
 			}else{
 				switch(params.redirectTo){

@@ -136,22 +136,24 @@ class FilesController {
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
-		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = Project.read(projectId)
+		def project = securityService.getUserCurrentProject()
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		//fieldImportance for Discovery by default
 		def configMap = assetEntityService.getConfig('Files','Discovery')
 		
 		[fileInstance:fileInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-					planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project,
+					planStatusOptions:planStatusOptions?.value, projectId:project.id, project:project,
 					planStatusOptions:planStatusOptions.value, config:configMap.config, customs:configMap.customs]
 	}
 	def save = {
 				params.assetType = "Files"
 				def filesInstance = new Files(params)
+				def project = securityService.getUserCurrentProject()
 				if(!filesInstance.hasErrors() && filesInstance.save()) {
 					flash.message = "Storage ${filesInstance.assetName} created"
-					def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, filesInstance)
+					def loginUser = securityService.getUserLogin()
+					
+					def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, filesInstance, loginUser, project)
 					flash.message += "</br>"+errors 
 			        session.FILES?.JQ_FILTERS = params
 					redirect( action:list)
@@ -193,7 +195,7 @@ class FilesController {
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 			[ filesInstance : filesInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList,
 			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(filesInstance)?.dependencyBundle, project:project ,prefValue:prefValue,
-			   config:configMap.config, customs:configMap.customs]
+			   config:configMap.config, customs:configMap.customs, errors:params.errors]
 		}
 	}
 	def edit ={
@@ -232,16 +234,17 @@ class FilesController {
 		def attribute = session.getAttribute('filterAttr')
 		def filterAttr = session.getAttribute('filterAttributes')
 		session.setAttribute("USE_FILTERS","true")
-		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def loginUser = securityService.getUserLogin()
+		def project = securityService.getUserCurrentProject()
 		def filesInstance = Files.get(params.id)
 		params.assetType = "Files"
 		filesInstance.properties = params
 		if(!filesInstance.hasErrors() && filesInstance.save(flush:true)) {
 			flash.message = "Storage ${filesInstance.assetName} Updated"
-			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, filesInstance)
+			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, filesInstance, loginUser, project)
 			flash.message +="</br>"+errors 
 			if(params.updateView == 'updateView'){
-				forward(action:'show', params:[id: params.id])
+				forward(action:'show', params:[id: params.id, errors:errors])
 				
 			}else{
 				switch(params.redirectTo){
@@ -267,7 +270,7 @@ class FilesController {
 						redirect( controller:'application', action:list)
 						break;
 					case "listComment":
-						redirect( controller:'assetEntity', action:'listComment' , params:[projectId: projectId])
+						redirect( controller:'assetEntity', action:'listComment' , params:[projectId: project.id])
 						break;
 					case "listTask":
 						render "Storage ${filesInstance.assetName} updated."

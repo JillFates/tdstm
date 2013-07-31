@@ -1,6 +1,9 @@
 <table style="border: 0">
 	<tr>
 		<td colspan="2"><div class="dialog" <tds:hasPermission permission='EditAndDelete'> ondblclick="editEntity('${redirectTo}','Storage', ${filesInstance?.id})"</tds:hasPermission>>
+				<g:if test="${errors}">
+					<div id="messageDivId" class="message">${errors}</div>
+				</g:if>
 				<table>
 					<tbody>
 						<tr class="prop">

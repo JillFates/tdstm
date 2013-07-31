@@ -1,5 +1,4 @@
 import org.apache.commons.lang.math.NumberUtils
-import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 import com.tds.asset.Application
@@ -30,32 +29,44 @@ class AssetEntityService {
 	 * This method is used to update dependencies for all entity types
 	 * @param params : params map received from client side
 	 * @param assetEntity : instance of entity including Server, Application, Database, Files
+	 * @param loginUser : Instance of current logged in user
+	 * @param project : Instance of current project
 	 * @return errorMsg : String of error came while updating dependencies (if any)
 	 */
 	
-	def createOrUpdateAssetEntityDependencies(def params, def assetEntity) {
-		
-		def loginUser = securityService.getUserLogin()
-		//Using NumberUtils (Apache lib)to avoid number format exceptions.
-		def supportCount = NumberUtils.toDouble(params.supportCount, 0).round()
-		def project = securityService.getUserCurrentProject()
+	def createOrUpdateAssetEntityDependencies(def params, def assetEntity, loginUser, project) {
 		def errorMsg = ""
-		
-		def deletedPreds = params.deletedDep
-		//deleting deleted dependencies from dialog
-		if(deletedPreds)
-			AssetDependency.executeUpdate("delete AssetDependency where id in ( $deletedPreds ) ")
-		
-		//Update supporting dependencies 
-		def supports = AssetDependency.findAll("FROM AssetDependency ad WHERE ad.dependent = :asset AND ad.dependent.project = :project",
-						[asset:assetEntity, project:project])
-		errorMsg+=addOrUpdateMultipleDeps(assetEntity, supports,  params, errorMsg, [user:loginUser, type:"support", key:"addedSupport", project:project] )
-		
-		//Update dependents dependencies 
-		def deps = AssetDependency.findAll("FROM AssetDependency ad WHERE ad.asset = :asset AND ad.dependent.project = :project",
-			[asset:assetEntity, project:project])
-		errorMsg+=addOrUpdateMultipleDeps(assetEntity, deps,  params, errorMsg, [user:loginUser, type:"dependent", key:"addedDep", project:project])
-		
+		AssetDependency.withTransaction(){status->
+			try{
+				validateAssetList([assetEntity.id], project) // Verifying assetEntity Exist in same project or not
+				
+				//Collecting deleted deps ids and fetching there instances list
+				def deletedDepIds = params.deletedDep ? params.deletedDep.split(",").collect{NumberUtils.toDouble(it, 0).round()} : []
+				def deletedDeps = params.deletedDep ? AssetDependency.findAllByIdInList(deletedDepIds) : []
+				
+				if(deletedDeps){
+					//Sending deleted dep list from browser to ensure all ids are of current project
+					validateAssetList(deletedDeps?.asset?.id+deletedDeps?.dependent?.id, project)
+					//After ensuring deleting deleted dependencies from dialog
+					AssetDependency.executeUpdate("delete AssetDependency where id in ( :deletedDeps ) ", [deletedDeps:deletedDeps.id])
+				}
+				//Update supporting dependencies 
+				def supports = AssetDependency.findAll("FROM AssetDependency ad WHERE ad.dependent = :asset AND ad.dependent.project = :project",
+								[asset:assetEntity, project:project])
+				
+				def supportMsg = addOrUpdateMultipleDeps(assetEntity, supports,  params, errorMsg, [user:loginUser, type:"support", key:"addedSupport", project:project] )
+				//Update dependents dependencies 
+				
+				def deps = AssetDependency.findAll("FROM AssetDependency ad WHERE ad.asset = :asset AND ad.dependent.project = :project",
+					[asset:assetEntity, project:project])
+				def depMsg = addOrUpdateMultipleDeps(assetEntity, deps,  params, errorMsg, [user:loginUser, type:"dependent", key:"addedDep", project:project])
+				
+				errorMsg = supportMsg + depMsg
+			} catch (RuntimeException rte){
+				status.setRollbackOnly()
+				return rte.getMessage()
+			}
+		}
 		return errorMsg
 	}
 	
@@ -63,17 +74,26 @@ class AssetEntityService {
 	 * A common method to forward dependency update or create request to next step based on conditions. 
 	 * @param entity : instance of Entities including AssetEntity, Application, Database, Files .
 	 * @param deps : list of dependents or supporters for entities as they need to updated .
-	 * @param params : map of params received feom client side .
+	 * @param params : map of params received from client side .
 	 * @param errorMsg : Reference of errorMsg String .
 	 * @param paramsMap : A map in argument contains additional params like loggedUser, type, key and project .
 	 * @return errorMsg : String of error came while updating dependencies (if any)
 	 */
 	def addOrUpdateMultipleDeps(def entity, def deps, def params, errorMsg, def paramsMap ){
+		//Collecting all received supports and dependent entities and sending to validate for current project
+		def assetIds = deps.collect{dep-> return NumberUtils.toDouble(params["asset_${paramsMap.type}_"+dep.id], 0).round()}
+		validateAssetList(assetIds, paramsMap.project)
+		//If everything is all right then processing it further for transaction
 		deps.each{dep->
-			if(entity.project.id == paramsMap.project.id)
-				errorMsg += addOrUpdateDeps(dep, dep.id, entity, params, paramsMap.user, paramsMap.type, false)
-		}
+			errorMsg += addOrUpdateDeps(dep, dep.id, entity, params, paramsMap.user, paramsMap.type, false)
+		}  
 		if(params.containsKey(paramsMap.key) && params[paramsMap.key] != "0"){
+			//Collecting all received supports and dependent added entities and sending to validate for current project
+			def newdepAssetIds = (0..(NumberUtils.toDouble(params[paramsMap.key], 0).round()+1)).collect{dep-> 
+				return NumberUtils.toDouble(params["asset_${paramsMap.type}_"+dep], 0).round()
+			}
+			validateAssetList(newdepAssetIds, paramsMap.project)
+			
 			(0..(NumberUtils.toDouble(params[paramsMap.key], 0).round()+1)).each{addedDep->
 				errorMsg += addOrUpdateDeps(new AssetDependency(), addedDep, entity, params, paramsMap.user, paramsMap.type, true)
 			}
@@ -106,7 +126,7 @@ class AssetEntityService {
 			
 			//Going update or save record if asset and dependency is belonging to same project and if a
 			//new record came to update already there in DB or not 		
-			if(depEntity.project.id == assetEntity.project.id && !alreadyExist){
+			if(!alreadyExist){
 				type.dataFlowFreq = params["dataFlowFreq_${depType}_"+idSuf]
 				type.type = params["dtype_${depType}_"+idSuf]
 				type.status = params["status_${depType}_"+idSuf]
@@ -120,9 +140,26 @@ class AssetEntityService {
 					log.error GormUtil.allErrorsString( type )
 					errMsg += "Unable to ${createNew ? 'add' : 'update'} dependency between ${assetEntity.assetName} and ${depEntity.assetName} <br/>"
 				}
+			} else {
+				errMsg += " The dependency between ${assetEntity.assetName} and ${depEntity.assetName} already exists, therefore the addition was ignored. <br/>"
 			}
 		}
 	  return errMsg
+	}
+	
+	/**
+	 * this method is used to verify asset belongs to current project or not, if Bad id found will throw a run time exception
+	 * @param assetIdList : list of assetIds
+	 * @param project : instance of project
+	 * @return : Void
+	 */
+	def validateAssetList(def assetIdList, def project){
+		def assetList = AssetEntity.findAllByIdInList( assetIdList )
+		def wrongId = assetList.find{it.project.id != project.id}
+		if(wrongId){
+			log.error "Updated ${wrongId.assetName} dependency  does not exist in current Project ${project.name}"
+			throw new RuntimeException("Updated ${wrongId.assetName} dependency  does not exist in current Project")
+		}
 	}
 	
 	/**

@@ -18,7 +18,7 @@ class AssetDependency {
 	Date lastUpdated
 
 	static constraints = {
-		asset( nullable:false )
+		asset( nullable:false, unique:['dependent', 'type'] )
 		dependent( nullable:true)
 		type( blank:false, nullable:false )
 		dataFlowFreq(blank:true, nullable:true, inList:[

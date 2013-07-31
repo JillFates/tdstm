@@ -40,6 +40,9 @@ $(document).ready(function() {
 			<tds:hasPermission permission='EditAndDelete'>
 				<div class="dialog" ondblclick="editEntity('${redirectTo}','Server', ${assetEntity?.id})">
 			</tds:hasPermission>
+			<g:if test="${errors}">
+				<div id="messageDivId" class="message">${errors}</div>
+			</g:if>
 					<table>
 						<tbody>
 							<tr  class="prop">
