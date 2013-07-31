@@ -3471,7 +3471,7 @@ class AssetEntityController {
 	 * This will be called from TaskManager screen to load jqgrid
 	 * @return : list of tasks as JSON
 	 */
-	def listTaskJSON ={
+	def listTaskJSON = {
 		
 		def sortIndex =  params.sidx ? params.sidx : session.TASK?.JQ_FILTERS?.sidx
 		def sortOrder =  params.sidx ? params.sord : session.TASK?.JQ_FILTERS?.sord
@@ -3968,7 +3968,7 @@ class AssetEntityController {
 				def color = ''
 				def type = ''
 				def assetType = ''
-				def criticalitySizes = ['Minor':150, 'Important':187.5, 'Major':225, 'Critical':262.5]
+				def criticalitySizes = ['Minor':150, 'Important':200, 'Major':300, 'Critical':400]
 				def t1 = TimeUtil.elapsed(start).getMillis() + TimeUtil.elapsed(start).getSeconds()*1000
 				log.info "t1 = ${t1}"
 				log.info "Iterating through list of ${assetDependentlist.size()} items"
