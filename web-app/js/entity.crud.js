@@ -404,9 +404,10 @@ function deleteAssets(action){
 	var assetArr = new Array();
     $(".cbox:checkbox:checked").each(function(){
         var assetId = $(this).attr('id').split("_")[2]
-		  assetArr.push(assetId)
+		if(assetId)  
+			assetArr.push(assetId)
   })
-  	if(!assetArr[0]){
+  	if(!assetArr){
 		alert('Please select the Asset');
 	}else{
 		if(confirm("There is no undo! Are you sure you want to delete these "+action+"..?")){
