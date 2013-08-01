@@ -56,8 +56,8 @@
   <body>
     <iframe id='iFrame' class="iFrame" onload='onIFrameLoad()'></iframe>     
     <div class="body">
-    <g:if test="${flash.message && args}">
-    	<div class="message"><g:message code="${flash.message}" args="${args}" /></div>
+    <g:if test="${warnMsg || flash.message && args }">
+    	<div class="message"><g:message code="${flash.message}" args="${args}" /> <br/>${warnMsg} </div>
     </g:if>
     <g:elseif test="${!args && flash.message}">
     	<div class="message">${flash.message}</div>

@@ -193,7 +193,7 @@ class AssetEntityController {
 					moveBundleInstanceList: moveBundleInstanceList,
 					dataTransferSetImport: dataTransferSetImport,
 					dataTransferSetExport: dataTransferSetExport, prefMap:prefMap,
-					dataTransferBatchs: dataTransferBatchs, args:params.list("args"), isMSIE:isMSIE] )
+					dataTransferBatchs: dataTransferBatchs, args:params.list("args"), isMSIE:isMSIE, warnMsg:params.warnMsg] )
 	}
 	/* -----------------------------------------------------
 	 * To Export the assets
@@ -261,6 +261,7 @@ class AssetEntityController {
 		//get project Name
 		def projectId
 		def project
+		def warnMsg = ""
 		def dataTransferSet = params.dataTransferSet
 		def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
 		def serverDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Servers" )
@@ -707,20 +708,24 @@ class AssetEntityController {
 						for ( int r = 1; r < dependencySheetRow ; r++ ) {
 							int cols = 0 ;
 							def depId = NumberUtils.toDouble(dependencySheet.getCell( cols, r ).contents.replace("'","\\'"), 0).round()
-							def assetDep =  AssetDependency.get(depId)
+							def assetDep =  depId ? AssetDependency.get(depId) : null
 							def asset = AssetEntity.get(NumberUtils.toDouble(dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'"), 0).round())
 							def dependent = AssetEntity.get(NumberUtils.toDouble(dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'"), 0).round())
 							def depExist = AssetDependency.findByAssetAndDependent(asset, dependent)
+							assetEntityService.validateAssetList([asset?.id ]+[dependent?.id]+[assetDep?.asset?.id]+[assetDep?.dependent?.id],  project)
 							def isNew = false
 							if(!assetDep){
 								if(!depExist){
 									assetDep = new AssetDependency()
 									isNew = true
+								}else{
+								     def msg = message(code: "assetEntity.dependency.warning", args: [asset.assetName, dependent.assetName])
+									 skippedAdded +=1
+									 log.error msg
+									 warnMsg += msg +"<br/>"
 								}
 							}
-							
 							if(assetDep){
-								if(asset.project.id==projectInstance.id && dependent.project.id==projectInstance.id ){
 									assetDep.asset = asset
 									assetDep.dependent = dependent
 									assetDep.type = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
@@ -730,26 +735,23 @@ class AssetEntityController {
 									assetDep.comment = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
 									assetDep.updatedBy = userLogins.person
 									if(isNew)
-										asset.createdBy = userLogin.person
+										assetDep.createdBy = userLogin.person
 										
 									if(!assetDep.save(flush:true)){
 										assetDep.errors.allErrors.each { log.error  it }
-										skipped += ( r +1 )
-										skippedUpdated = skipped.size()
+										isNew ? (skippedAdded +=1) : (skippedUpdated +=1)
+									} else {
+										isNew ? (dependencyAdded +=1) : (dependencyUpdated +=1)
 									}
-								} else {
-									skipped += ( r +1 )
-									skippedUpdated = skipped.size()
-								}
 							}
-									
-							dependencyAdded = (r-(skippedAdded+skippedUpdated))
 							if (r%50 == 0){
 								sessionFactory.getCurrentSession().flush();
 								sessionFactory.getCurrentSession().clear();
 							}
 
 					  }
+						warnMsg += """ $dependencyAdded Dependency Added, $dependencyUpdated Dependency updated, $skippedAdded Dependency skipped while
+										adding and $skippedUpdated Dependency skipped while updation"""
 					}
 					for( int i=0;  i < sheetNamesLength; i++ ) {
 						if(sheetNames[i] == "Comments"){
@@ -785,11 +787,12 @@ class AssetEntityController {
 					addMessage += appAdded ? ("$appAdded Applications, "): ""
 					addMessage += dbAdded ? ("$dbAdded Databases, "): ""
 					addMessage += filesAdded ? ("$filesAdded Storage, "): ""
+					addMessage +=  dependencyAdded ? ("$dependencyAdded Dependency, "): ""
 					
 				def args = [added, addMessage ? addMessage.substring(0,addMessage.lastIndexOf(",")) :" ", 
 							skipped.size() ? (skipped+" Records skipped. ") : " " ]
 				
-				redirect( action:assetImport, params:[  message:flash.message, args:args] )
+				redirect( action:assetImport, params:[  message:flash.message, args:args, warnMsg:warnMsg] )
 				return;
 			}
 		} catch( NumberFormatException ex ) {

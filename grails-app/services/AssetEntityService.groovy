@@ -158,7 +158,7 @@ class AssetEntityService {
 		def wrongId = assetList.find{it.project.id != project.id}
 		if(wrongId){
 			log.error "Updated ${wrongId.assetName} dependency  does not exist in current Project ${project.name}"
-			throw new RuntimeException("Updated ${wrongId.assetName} dependency  does not exist in current Project")
+			throw new RuntimeException("Updated ${wrongId.assetName} dependency  does not exist in current Project ${project.name}")
 		}
 	}
 	
