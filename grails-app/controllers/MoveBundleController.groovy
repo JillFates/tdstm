@@ -31,7 +31,7 @@ class MoveBundleController {
     def taskService
 	def userPreferenceService
     
-	protected static String dependecyBundlingAssetType = "('server','vm','blade','Application','Files','Database')"  
+	protected static String dependecyBundlingAssetType = "('server','vm','blade','Application','Files','Database','Appliance','Storage')"  
 	
 	def index = { redirect(action:list,params:params) }
 
@@ -857,7 +857,7 @@ class MoveBundleController {
 	/**
 	 * Controller that generates the Dependency Groups and displays the results
 	 */
-	def generateDependency = {		
+	def generateDependency = {
 		
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		
