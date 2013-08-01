@@ -34,7 +34,12 @@ class FilesController {
 		def project = securityService.getUserCurrentProject()
 		def entities = assetEntityService.entityInfo( project )
 		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
-		def moveEvent = MoveEvent.read(params.moveEvent)
+		
+		def moveEvent = null
+		if (params.moveEvent && params.moveEvent.isNumber()) {
+			log.info "it's good - ${params.moveEvent}"
+			moveEvent = MoveEvent.findByProjectAndId( project, params.moveEvent )
+		}
 		
 		return [assetDependency: new AssetDependency(), servers : entities.servers, applications : entities.applications, dbs : entities.dbs, networks : entities.networks ,
 			files : entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,

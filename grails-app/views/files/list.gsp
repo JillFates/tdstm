@@ -38,10 +38,11 @@
 				var fileFormat = '${fileFormat}'
 				var fileSize = '${fileSize}'
 				var sizePref = '${sizePref}'
-				var listCaption ="Storages: <tds:hasPermission permission='EditAndDelete'><span class='capBtn'><input type='button' value='Create Storage' onclick='createAssetDetails(\"Files\")'/></span></tds:hasPermission>\
-									<tds:hasPermission permission='AssetDelete'>\
-									<span class='capBtn'><input type='button' id='deleteAssetId' value='Bulk Delete' onclick='deleteAssets(\"Files\")' disabled='disabled'/></span>\
-									</tds:hasPermission>"
+				var listCaption ='Storages: <tds:hasPermission permission="EditAndDelete"><span class="capBtn"><input type="button" value="Create Storage" onclick="createAssetDetails(\'Files\')"/></span></tds:hasPermission>\
+					<tds:hasPermission permission="AssetDelete">\
+						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'Files\')" disabled="disabled"/></span>\
+					</tds:hasPermission>\
+					<g:if test="${moveEvent != null}"><g:link class="mmlink" controller="files" action="list"><span class="capBtn"><input type="button" value="Clear Filters" /></span></g:link></g:if>'
 				// JqGrid implementations 
 				<jqgrid:grid id="storageId" url="'${createLink(action: 'listJson')}'"
 				editurl="'${createLink(action: 'deleteBulkAsset')}'"
@@ -125,7 +126,7 @@
 	</head>
 	<body>
 		<div class="body fluid">
-			<h1>Storage List${(event)?(' for Move Event '+moveEvent.name):('')} <g:link class="mmlink" controller="files" action="list"><button>Reset View</button></g:link></h1>
+			<h1>Storage List${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>

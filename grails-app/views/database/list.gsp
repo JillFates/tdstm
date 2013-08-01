@@ -41,10 +41,11 @@
 				var moveBundle = '${moveBundle}'
 				var dbFormat = '${validationFilter}'
 				var sizePref = '${sizePref}'
-				var listCaption ="DataBases: <tds:hasPermission permission='EditAndDelete'><span class='capBtn'><input type='button' value='Create DB' onclick='createAssetDetails(\"Database\")'/></span></tds:hasPermission>\
-									<tds:hasPermission permission='AssetDelete'>\
-									<span class='capBtn'><input type='button' id='deleteAssetId' value='Bulk Delete' onclick='deleteAssets(\"Database\")' disabled='disabled'/></span>\
-									</tds:hasPermission>"				
+				var listCaption ='DataBases: <tds:hasPermission permission="EditAndDelete"><span class="capBtn"><input type="button" value="Create DB" onclick="createAssetDetails(\'Database\')"/></span></tds:hasPermission>\
+					<tds:hasPermission permission="AssetDelete">\
+						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'Database\')" disabled="disabled"/></span>\
+					</tds:hasPermission>\
+					<g:if test="${moveEvent != null}"><g:link class="mmlink" controller="database" action="list"><span class="capBtn"><input type="button" value="Clear Filters" /></span></g:link></g:if>'		
 				<jqgrid:grid id="databaseId" url="'${createLink(action: 'listJson')}'"
 				editurl="'${createLink(action: 'deleteBulkAsset')}'"
 				colNames="'Actions','Name', 'DB Format','Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType'"
@@ -138,7 +139,7 @@
 
 		
 		<div class="body fluid">
-			<h1>DB List${(event)?(' for Move Event '+moveEvent.name):('')} <g:link class="mmlink" controller="database" action="list"><button>Reset View</button></g:link></h1>
+			<h1>DB List${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
 			<g:if test="${flash.message}">
 				<div id="messageDivId" class="message">${flash.message}</div>
 			</g:if>

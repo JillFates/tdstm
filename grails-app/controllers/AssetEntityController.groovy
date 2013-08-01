@@ -1459,7 +1459,12 @@ class AssetEntityController {
 		
 		def project = securityService.getUserCurrentProject()
 		def entities = assetEntityService.entityInfo( project )
-		def moveEvent = MoveEvent.read(params.moveEvent)
+		
+		def moveEvent = null
+		if (params.moveEvent && params.moveEvent.isNumber()) {
+			log.info "it's good - ${params.moveEvent}"
+			moveEvent = MoveEvent.findByProjectAndId( project, params.moveEvent )
+		}
 		
 		render(view:'list', model:[assetDependency : new AssetDependency(), dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
 			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, type:params.type, plannedStatus:params.plannedStatus,  servers : entities.servers, 

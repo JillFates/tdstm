@@ -41,7 +41,12 @@ class ApplicationController {
 		def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
 		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
 		def company = project.client
-		def moveEvent = MoveEvent.read(params.moveEvent)
+		
+		def moveEvent = null
+		if (params.moveEvent && params.moveEvent.isNumber()) {
+			log.info "it's good - ${params.moveEvent}"
+			moveEvent = MoveEvent.findByProjectAndId( project, params.moveEvent )
+		}
 		
 		return [projectId: project.id, assetDependency: new AssetDependency(),
 			servers: entities.servers, 
@@ -123,7 +128,7 @@ class ApplicationController {
 		// Cut the list of selected applications down to only the rows that will be shown in the grid
 		def totalRows = appsList.size()
 		def numberOfPages = Math.ceil(totalRows / maxRows)
-		if(totalRows > 0)
+		if (totalRows > 0)
 			appsList = appsList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
 		else
 			appsList = []

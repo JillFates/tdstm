@@ -43,14 +43,16 @@
 				var moveBundle = '${moveBundle}'
 				var validationFilter = '${validationFilter}'
 				var appSme = '${appSme}'
+				
 				var sizePref = '${sizePref}'
-				var listCaption ="Applications: \
-					<tds:hasPermission permission='EditAndDelete'>\
-						<span class='capBtn'><input type='button' value='Create App'  onclick='createAssetDetails(\"Application\")'/></span>\
+				var listCaption ='Applications: \
+					<tds:hasPermission permission="EditAndDelete">\
+						<span class="capBtn"><input type="button" value="Create App"  onclick="createAssetDetails(\'Application\')"/></span>\
 					</tds:hasPermission>\
-					<tds:hasPermission permission='AssetDelete'>\
-						<span class='capBtn'><input type='button' id='deleteAssetId' value='Bulk Delete' onclick='deleteAssets(\"Application\")' disabled='disabled'/></span>\
-					</tds:hasPermission>"	
+					<tds:hasPermission permission="AssetDelete">\
+						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'Application\')" disabled="disabled"/></span>\
+					</tds:hasPermission>\
+					<g:if test="${moveEvent != null}"><g:link class="mmlink" controller="application" action="list"><span class="capBtn"><input type="button" value="Clear Filters" /></span></g:link></g:if>'
 				<jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"
 				editurl="'${createLink(action: 'deleteBulkAsset')}'"
 				colNames="'Actions','Name', 'App Sme','Validation', 'Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType', 'Event'"
@@ -163,7 +165,7 @@
 	</head>
 	<body>
 		<div class="body fluid">
-			<h1>Application List${(event)?(' for Move Event '+moveEvent.name):('')} <g:link class="mmlink" controller="application" action="list"><button>Reset View</button></g:link></h1>
+			<h1>Application List${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
 			<g:if test="${flash.message}">
 				<div id="messageDivId" class="message">${flash.message}</div>
 			</g:if>

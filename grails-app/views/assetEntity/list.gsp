@@ -53,10 +53,11 @@
 			var moveBundleId = '${moveBundleId}'
 			var windowWidth = $(window).width() - $(window).width()*5/100 ;
 			var sizePref = '${sizePref}'
-			var listCaption ="Assets: <tds:hasPermission permission='EditAndDelete'><span class=\"button\"><input type=\"button\" value=\"Create Asset\" class=\"create\" onclick='createAssetDetails(\"assetEntity\")'/></span></tds:hasPermission>\
-				<tds:hasPermission permission='AssetDelete'>\
-				<span class='capBtn'><input type='button' id='deleteAssetId' value='Bulk Delete' onclick='deleteAssets(\"AssetEntity\")' disabled='disabled'/></span>\
-				</tds:hasPermission>"
+			var listCaption ='Assets: <tds:hasPermission permission="EditAndDelete"><span class=\'button\'><input type=\'button\' value=\'Create Asset\' class=\'create\' onclick="createAssetDetails(\'assetEntity\')"/></span></tds:hasPermission>\
+				<tds:hasPermission permission="AssetDelete">\
+					<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'AssetEntity\')" disabled="disabled"/></span>\
+				</tds:hasPermission>\
+				<g:if test="${moveEvent != null}"><g:link class="mmlink" controller="assetEntity" action="list"><span class="capBtn"><input type="button" value="Clear Filters" /></span></g:link></g:if>'
 			<jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
 				editurl="'${createLink(action: 'deleteBulkAsset')}'"
 				colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','Target Location','Target Rack','Tag','Serial#','Plan Status','Bundle',
@@ -171,7 +172,7 @@
 	</head>
 	<body>
 		<div class="body fluid">
-			<h1>Asset List${(event)?(' for Move Event '+moveEvent.name):('')} <g:link class="mmlink" controller="assetEntity" action="list"><button>Reset View</button></g:link></h1>
+			<h1>Asset List${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
 			<g:if test="${flash.message}">
 				<div id="messageDivId" class="message">${flash.message}</div>
 			</g:if>
