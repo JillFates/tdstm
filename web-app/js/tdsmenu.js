@@ -206,7 +206,7 @@
 				tipTimer = setTimeout(function() {
 					tipTimer = null;
 					showMegaMenu(e);
-				}, 500);
+				}, 400);
 			}
 		}
 		
