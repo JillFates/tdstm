@@ -6,6 +6,7 @@
         <meta name="layout" content="projectHeader" />
         <title>Data Transfer Batch List</title>
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
+	<g:javascript src="jquery/ui.progressbar.js"/>
 	<script type="text/javascript">
 		/* ---------------------------------
 		 * 	Author : Lokanada Reddy		
@@ -55,7 +56,9 @@
 		}
 		function onIFrameLoad() {
 		   var serverResponse = $("#iFrame").contents().find("pre").html();
-		   var jsonProgress = JSON.parse( serverResponse )
+		   var jsonProgress
+		   if(serverResponse)
+		     jsonProgress = JSON.parse( serverResponse )
 		   if(jsonProgress){
 			   checkProgressBar = true;
 			   $("#progressbar").reportprogress(jsonProgress[0].processed, jsonProgress[0].total);

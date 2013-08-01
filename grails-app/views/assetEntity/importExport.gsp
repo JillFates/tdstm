@@ -4,6 +4,7 @@
     <meta name="layout" content="projectHeader" />
     <title>Asset Import</title>
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
+	<g:javascript src="jquery/ui.progressbar.js"/>
 	<script type="text/javascript">
 		/* ---------------------------------
 		 * 	Author : Lokanada Reddy		
@@ -42,7 +43,9 @@
 		}
 		function onIFrameLoad() {
 		   var serverResponse = $("#iFrame").contents().find("pre").html();
-		   var jsonProgress = JSON.parse( serverResponse )
+		   var jsonProgress
+		   if(serverResponse)
+		     jsonProgress = JSON.parse( serverResponse )
 		   if(jsonProgress){
 			   $("#progressbar").reportprogress(jsonProgress[0].imported,jsonProgress[0].total);
 		       if(jsonProgress[0].imported==jsonProgress[0].total){
@@ -54,9 +57,9 @@
 	
   </head>
   <body>
-    <iframe id='iFrame' class="iFrame" onload='onIFrameLoad()'></iframe>     
+  	<iframe id='iFrame' class="iFrame" onload='onIFrameLoad()'></iframe>   
     <div class="body">
-    <g:if test="${warnMsg || flash.message && args }">
+    <g:if test="${warnMsg || (message && args) }">
     	<div class="message"><g:message code="${flash.message}" args="${args}" /> <br/>${warnMsg} </div>
     </g:if>
     <g:elseif test="${!args && flash.message}">
