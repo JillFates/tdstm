@@ -27,8 +27,8 @@ a:link, a:visited, a:hover {
     font-weight: bold;
     text-decoration: none;
 }
-.links a:hover {
-	text-decoration: underline:
+.links:hover {
+	text-decoration: underline;
 }
 
 h1 {
