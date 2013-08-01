@@ -707,7 +707,7 @@ class PersonController {
 			SELECT * FROM (
 				SELECT pr.party_id_to_id AS personId, CONCAT(IFNULL(p.first_name, ''), ' ', IFNULL(CONCAT(p.middle_name, ' '), ''), IFNULL(p.last_name, '')) AS fullName, CONCAT('[',pg.name,']') AS company, 
 					pr.role_type_code_to_id AS role, SUBSTRING(rt.description, INSTR(rt.description, ":")+2) AS team, p.last_name AS lastName, 
-					pr2.party_id_to_id IS NOT NULL AS project, IFNULL(GROUP_CONCAT(mes.move_event_id) USING 'utf8', 0) AS moveEvents, IFNULL(GROUP_CONCAT(DATE_FORMAT(ed.exception_day, '%Y-%m-%d')) USING 'utf8','') AS unavailableDates 
+					pr2.party_id_to_id IS NOT NULL AS project, IFNULL(CONVERT(GROUP_CONCAT(mes.move_event_id) USING 'utf8'), 0) AS moveEvents, IFNULL(CONVERT(GROUP_CONCAT(DATE_FORMAT(ed.exception_day, '%Y-%m-%d')) USING 'utf8'),'') AS unavailableDates 
 				FROM tdstm.party_relationship pr 
 					LEFT OUTER JOIN person p ON p.person_id = pr.party_id_to_id 
 					LEFT OUTER JOIN exception_dates ed ON ed.person_id = p.person_id 
@@ -849,7 +849,7 @@ class PersonController {
 			SELECT * FROM (
 				SELECT pr.party_id_to_id AS personId, CONCAT(IFNULL(p.first_name, ''), ' ', IFNULL(CONCAT(p.middle_name, ' '), ''), IFNULL(p.last_name, '')) AS fullName, CONCAT('[',pg.name,']') AS company, 
 					pr.role_type_code_to_id AS role, SUBSTRING(rt.description, INSTR(rt.description, ":")+2) AS team, p.last_name AS lastName,
-					pr2.party_id_to_id IS NOT NULL AS project, IFNULL(GROUP_CONCAT(mes.move_event_id) USING 'utf8', 0) AS moveEvents, IFNULL(GROUP_CONCAT(DATE_FORMAT(ed.exception_day, '%Y-%m-%d')) USING 'utf8','') AS unavailableDates 
+					pr2.party_id_to_id IS NOT NULL AS project, IFNULL(CONVERT(GROUP_CONCAT(mes.move_event_id) USING 'utf8'), 0) AS moveEvents, IFNULL(CONVERT(GROUP_CONCAT(DATE_FORMAT(ed.exception_day, '%Y-%m-%d')) USING 'utf8'),'') AS unavailableDates 
 				FROM tdstm.party_relationship pr 
 					LEFT OUTER JOIN person p ON p.person_id = pr.party_id_to_id 
 					LEFT OUTER JOIN exception_dates ed ON ed.person_id = p.person_id 
