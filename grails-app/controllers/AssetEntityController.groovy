@@ -3477,7 +3477,7 @@ class AssetEntityController {
 	 * This will be called from TaskManager screen to load jqgrid
 	 * @return : list of tasks as JSON
 	 */
-	def listTaskJSON ={
+	def listTaskJSON = {
 		
 		def sortIndex =  params.sidx ? params.sidx : session.TASK?.JQ_FILTERS?.sidx
 		def sortOrder =  params.sidx ? params.sord : session.TASK?.JQ_FILTERS?.sord
@@ -3529,11 +3529,11 @@ class AssetEntityController {
 			and dueDate like '%${params.dueDate}%'",[project:project])?.dueDate : []
 
 		def assigned = params.assignedTo ? Person.findAllByFirstNameIlikeOrLastNameIlike("%${params.assignedTo}%","%${params.assignedTo}%" ) : []
+
 		
 		def tasks = AssetComment.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", project)
 			eq("commentType", AssetCommentType.TASK)
-
 			assetEntity {
 				if (params.assetType)
 					ilike('assetType', "%${params.assetType}%")
@@ -3975,7 +3975,7 @@ class AssetEntityController {
 				def color = ''
 				def type = ''
 				def assetType = ''
-				def criticalitySizes = ['Minor':150, 'Important':187.5, 'Major':225, 'Critical':262.5]
+				def criticalitySizes = ['Minor':150, 'Important':200, 'Major':300, 'Critical':400]
 				def t1 = TimeUtil.elapsed(start).getMillis() + TimeUtil.elapsed(start).getSeconds()*1000
 				log.info "t1 = ${t1}"
 				log.info "Iterating through list of ${assetDependentlist.size()} items"
@@ -4437,12 +4437,12 @@ class AssetEntityController {
 	 * @param type,validation
 	 * @return
 	 */
-	 def getassetImportance = {
-		 def assetType = params.type
-		 def validation = params.validation
-		 def configMap = assetEntityService.getConfig(assetType,validation)
-		 render configMap.config as JSON
-	 }
+	def getassetImportance = {
+		def assetType = params.type
+		def validation = params.validation
+		def configMap = assetEntityService.getConfig(assetType,validation)
+		render configMap.config as JSON
+	}
 	 
 	 /**
 	  * This method is used to update sheet's column header with custom labels
@@ -4452,42 +4452,42 @@ class AssetEntityController {
 	  * @param project : project instance
 	  * @return
 	  */
-	 def updateColumnHeaders(sheet, entityDTAMap, sheetColumnNames, project){
-		 for ( int head =0; head <= sheetColumnNames.size(); head++ ) {
-			 def cellData = sheet.getCell(head,0)?.getContents()
-			 def attributeMap = entityDTAMap.find{it.columnName ==  cellData }?.eavAttribute
-			 if(attributeMap?.attributeCode && customLabels.contains( cellData )){
-				 def columnLabel = project[attributeMap?.attributeCode] ? project[attributeMap?.attributeCode] : cellData
-				 def customColumn = new Label(head,0, columnLabel )
-				 sheet.addCell(customColumn)
-			 }
-		 }
-		 return sheet
-	 }
+	def updateColumnHeaders(sheet, entityDTAMap, sheetColumnNames, project){
+		for ( int head =0; head <= sheetColumnNames.size(); head++ ) {
+			def cellData = sheet.getCell(head,0)?.getContents()
+			def attributeMap = entityDTAMap.find{it.columnName ==  cellData }?.eavAttribute
+			if(attributeMap?.attributeCode && customLabels.contains( cellData )){
+				def columnLabel = project[attributeMap?.attributeCode] ? project[attributeMap?.attributeCode] : cellData
+				def customColumn = new Label(head,0, columnLabel )
+				sheet.addCell(customColumn)
+			}
+		}
+		return sheet
+	}
 	
-	 /**
-	  * This method is used to update columnList with custom labels.
-	  * @param entityDTAMap :  dataTransferEntityMap for entity type
-	  * @param columnslist :  column Names
-	  * @param project :project instance
-	  * @return
-	  */
-	 def getColumnNames(entityDTAMap, columnslist, project){
-		 entityDTAMap.eachWithIndex { item, pos ->
-			 if(customLabels.contains( item.columnName )){
-				 def customLabel = project[item.eavAttribute?.attributeCode] ? project[item.eavAttribute?.attributeCode] : item.columnName
-				 columnslist.add( customLabel )
-			 } else {
-				 columnslist.add( item.columnName )
-			 }
-		 }
-		 return columnslist
-	 }
-	 /**
-	  * This method is used to set Import perferences.(ImportApplication,ImportServer,ImportDatabase,
-	  * ImportStorage,ImportRoom,ImportRack,ImportDependency)
-	  * @param prefFor
-	  * @param selected
+	/**
+	 * This method is used to update columnList with custom labels.
+	 * @param entityDTAMap :  dataTransferEntityMap for entity type
+	 * @param columnslist :  column Names
+	 * @param project :project instance
+	 * @return
+	 */
+	def getColumnNames(entityDTAMap, columnslist, project){
+		entityDTAMap.eachWithIndex { item, pos ->
+			if(customLabels.contains( item.columnName )){
+				def customLabel = project[item.eavAttribute?.attributeCode] ? project[item.eavAttribute?.attributeCode] : item.columnName
+				columnslist.add( customLabel )
+			} else {
+				columnslist.add( item.columnName )
+			}
+		}
+		return columnslist
+	}
+	/**
+	 * This method is used to set Import perferences.(ImportApplication,ImportServer,ImportDatabase,
+	 * ImportStorage,ImportRoom,ImportRack,ImportDependency)
+	 * @param prefFor
+	 * @param selected
 	  */
 	 def setImportPerferences ={
 		 def key = params.prefFor
@@ -4508,82 +4508,69 @@ class AssetEntityController {
 			flash.message = "${message(code:'user.access.denied')}"
 		 }
 	 }
-	 /**
-	  * This method is to show list of dependencies using jqgrid.
-	  */
-	 def listDepJson ={
-		 def sortIndex = params.sidx ?: 'asset'
-		 def sortOrder  = params.sord ?: 'asc'
-		 def maxRows = Integer.valueOf(params.rows)
-		 def currentPage = Integer.valueOf(params.page) ?: 1
-		 def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
-		 def project = securityService.getUserCurrentProject()
-		 def sid
-		 def dependencies = AssetDependency.createCriteria().list(max: maxRows, offset: rowOffset) {
-			 createAlias("asset","ae")
-			 createAlias("dependent","d")
-			 createAlias("asset.moveBundle","am")
-			 createAlias("dependent.moveBundle","dm")
-			 eq('ae.project',project)
-			 if (params.assetType)
-				ilike('ae.assetType',"%${params.assetType}%")
-			 if (params.asset)
-				ilike('ae.assetName',"%${params.asset}%")
-			 if (params.dataFlowFreq)
-				 ilike('dataFlowFreq', "%${params.dataFlowFreq}%")
-			 if (params.depClass)
-				 ilike('d.assetType',"%${params.depClass}%")
-			 if (params.dependent)
-				 ilike('d.assetName',"%${params.dependent}%")
-			 if (params.type)
-				 ilike('type',"%${params.type}%")
-			 if (params.status)
-				 ilike('status',"%${params.status}%")
-			 if (params.bundle)
-				 ilike('am.name',"%${params.bundle}%")
-			 if (params.depBundle)
-				 ilike('dm.name',"%${params.depBundle}%")
-				 
-			 switch(sortIndex){
-				 case "asset" :
-					 sid= "ae.assetName"
-					 break;
-				 case "assetType":
-					 sid= "ae.assetType"
-					 break;
-				 case "dependent" :
-					 sid= "d.assetName"
-					 break;
-				 case "depClass" :
-					 sid= "d.assetType"
-					 break;
-				 case "bundle" :
-					 sid= "am.name"
-					 break;
-				 case "depBundle" :
-					 sid= "dm.name"
-					 break;
-				 default:
-					 sid= sortIndex
-					 break;
-			 }
-			 order(sid, sortOrder).ignoreCase()
-		 }
-	
-		 def totalRows = dependencies.totalCount
-		 def numberOfPages = Math.ceil(totalRows / maxRows)
-	
-		 def results = dependencies?.collect {
-			 [ cell:
-				 [
-				 it.asset?.assetName, it.asset?.assetType, it.asset?.moveBundle?.name, it.type,
-				 it.dependent?.assetName, it.dependent?.assetType, it.dependent?.moveBundle?.name,
-				 it.dataFlowFreq, it.status, it.asset?.id, it.dependent?.id
-				 ], id: it.id,
-			 ]}
-	
-		 def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
-	
-		 render jsonData as JSON
-	 }
+	/**
+	* This method is to show list of dependencies using jqgrid.
+	*/
+	def listDepJson ={
+		def sortIndex = params.sidx ?: 'asset'
+		def sortOrder  = params.sord ?: 'asc'
+		def maxRows = Integer.valueOf(params.rows)
+		def currentPage = Integer.valueOf(params.page) ?: 1
+		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		def project = securityService.getUserCurrentProject()
+		def sid
+		 
+		def filterParams = ['assetName':params.assetName, 'assetType':params.assetType, 'assetBundle':params.assetBundle, 'type':params.type,'dependentName':params.dependentName, 'dependentType':params.dependentType,'dependentBundle':params.dependentBundle,'status':params.status,'frequency':params.frequency]
+		 
+		StringBuffer query = new StringBuffer(""" 
+			SELECT * FROM ( 
+				SELECT asset_dependency_id AS id, ae.asset_name AS assetName, ae.asset_type AS assetType, mb.name AS assetBundle, ad.type AS type, 
+					aed.asset_name AS dependentName, aed.asset_type AS dependentType, mbd.name AS dependentBundle, 
+					ad.status AS status, ad.data_flow_freq AS frequency, ae.asset_entity_id AS assetId,  aed.asset_entity_id AS dependentId 
+				FROM tdstm.asset_dependency ad 
+				LEFT OUTER JOIN asset_entity ae ON ae.asset_entity_id = asset_id 
+				LEFT OUTER JOIN asset_entity aed ON aed.asset_entity_id = dependent_id 
+				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id = ae.move_bundle_id 
+				LEFT OUTER JOIN move_bundle mbd ON mbd.move_bundle_id = aed.move_bundle_id 
+				WHERE ae.project_id = ${project.id} 
+				ORDER BY ${sortIndex + " " + sortOrder}
+			) AS deps 
+		 """)
+		 
+		// Handle the filtering by each column's text field
+		def firstWhere = true
+		filterParams.each {
+			if(it.getValue())
+				if(firstWhere){
+					query.append(" WHERE deps.${it.getKey()} LIKE '%${it.getValue()}%'")
+					firstWhere = false
+				} else {
+					query.append(" AND deps.${it.getKey()} LIKE '%${it.getValue()}%'")
+				}
+		}
+		
+		
+		def dependencies = jdbcTemplate.queryForList(query.toString())
+		
+		def totalRows = Long.parseLong(dependencies.size().toString())
+		def numberOfPages = Math.ceil(totalRows / maxRows)
+		
+		if(totalRows > 0)
+			dependencies = dependencies[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
+		else
+			dependencies = []
+		
+		def results = dependencies?.collect {
+			[ cell:
+				[
+				it.assetName, it.assetType, it.assetBundle, it.type,
+				it.dependentName, it.dependentType, it.dependentBundle,
+				it.dataFlowFreq, it.status, it.assetId, it.dependentId
+				], id: it.id,
+			]}
+		
+		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
+		
+		render jsonData as JSON
+	}
 }
