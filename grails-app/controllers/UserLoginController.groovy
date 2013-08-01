@@ -129,6 +129,7 @@ class UserLoginController {
 			[ cell: [ '<a href="'+HtmlUtil.createLink([controller:'userLogin', action:'edit', id:"${it.userLoginId}"])+'">'+it.username+'</a>',
 			'<a href="javascript:loadPersonDiv('+it.personId+',\'generalInfoShow\')">'+it.fullname+'</a>', 
 			it.roles, it.company, it.lastLogin, it.dateCreated, it.expiryDate ], id: it.userLoginId ]}
+			
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 		render jsonData as JSON
 	}

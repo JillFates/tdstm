@@ -71,14 +71,14 @@ class ProjectService {
 		return projects
 	}
 	
-    /**
-     * Returns list of Active Projects based on the filters selected by the user in projectList
-     * @param parties - list of Party to filter project if user do not have viewAll perm
-     * @param viewAllPerm - perm to view all projects
-     * @param company - company instance associated with user
-     * @param timeNow - current time
-     * @return Project[] - an array list of Project objects
-     */
+	/**
+	 * Returns list of Active Projects based on the filters selected by the user in projectList
+	 * @param parties - list of Party to filter project if user do not have viewAll perm
+	 * @param viewAllPerm - perm to view all projects
+	 * @param company - company instance associated with user
+	 * @param timeNow - current time
+	 * @return Project[] - an array list of Project objects
+	 */
 	def projectFilter( def parties, def viewAllPerm,def company ,def timeNow, def params = [:], def active="active"){
 		def maxRows = params.rows ? Integer.valueOf(params.rows) : 25
 		def currentPage = params.page ? Integer.valueOf(params.page) : 1

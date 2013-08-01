@@ -719,14 +719,13 @@ class MoveBundleController {
 		def appDependenciesCount = applicationsOfPlanningBundle ? AssetDependency.countByAssetInList(applicationsOfPlanningBundle) : 0
 		def serverDependenciesCount = serversOfPlanningBundle ? AssetDependency.countByAssetInList(serversOfPlanningBundle) : 0
 		
+		
 		def pendingAppDependenciesCount = applicationsOfPlanningBundle ? 
-		AssetDependency.countByAssetInListAndStatusInList(applicationsOfPlanningBundle,['Unknown','Questioned']) : 0
+			AssetDependency.countByAssetInListAndStatusInList(applicationsOfPlanningBundle,['Unknown','Questioned']) : 0
 		
 		def pendingServerDependenciesCount = serversOfPlanningBundle ? 
 		AssetDependency.countByAssetInListAndStatusInList(serversOfPlanningBundle,['Unknown','Questioned']) : 0
 
-		def issues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status =:status  \
-			and a.category in (:category)",[project:project, type:AssetCommentType.TASK, status: AssetCommentStatus.READY , category:['general','planning']])
 
 		def assetDependencyList = jdbcTemplate.queryForList("select dependency_bundle as dependencyBundle from  asset_dependency_bundle \
 			where project_id = $projectId  group by dependency_bundle order by dependency_bundle  limit 48")
@@ -742,15 +741,18 @@ class MoveBundleController {
 		
 		def openIssue =  AssetComment.findAll(issueQuery,issueArgs << [category : ['discovery']]).size()
 		def dueOpenIssue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs<< [category : ['discovery'], dueDate:today]).size()
+		def issues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status =:status  \
+			and a.category in (:category)",[project:project, type:AssetCommentType.TASK, status: AssetCommentStatus.READY , category:['general','planning']])
 		def generalOverDue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs<< [category : ['general','planning'], dueDate:today]).size()
 
 		def dependencyConsoleList = []
-		assetDependencyList.each{dependencyBundle->
-			def assetDependentlist=AssetDependencyBundle.findAllByDependencyBundleAndProject(dependencyBundle.dependencyBundle,project)
-			def appCount = assetDependentlist.findAll{it.asset.assetType == 'Application'}.size()
-			def serverCount = assetDependentlist.findAll{it.asset.assetType == 'Server' || it.asset.assetType == 'Blade' }.size()
-			def vmCount = assetDependentlist.findAll{it.asset.assetType == 'VM'}.size()
-			dependencyConsoleList << ['dependencyBundle':dependencyBundle.dependencyBundle,'appCount':appCount,'serverCount':serverCount,'vmCount':vmCount]
+		assetDependencyList.each{ dependencyBundle ->
+			def assetDependentlist = AssetDependencyBundle.findAllByDependencyBundleAndProject(dependencyBundle.dependencyBundle,project)
+			def appCount = assetDependentlist.findAll{ it.asset.assetType == 'Application' }.size()
+			def serverCount = assetDependentlist.findAll{ it.asset.assetType in ['Server', 'Blade'] }.size()
+			def vmCount = assetDependentlist.findAll{ it.asset.assetType == 'VM' }.size()
+			
+			dependencyConsoleList << ['dependencyBundle':dependencyBundle.dependencyBundle, 'appCount':appCount, 'serverCount':serverCount, 'vmCount':vmCount]
 		}
 		
 		def latencyQuery = "SELECT COUNT(ap) FROM Application ap WHERE ap.latency = :latency AND (ap.moveBundle IN (:moveBundles) \
@@ -798,23 +800,39 @@ class MoveBundleController {
 			countArgs <<[type:['Server','VM','Blade','Application','Database','Files'] ])[0] : 0
 		
 		
-		return [moveBundleList:moveBundleList, applicationCount:applicationCount, appList:appList, unassignedAppCount:unassignedAppCount,
-			percentageAppCount:percentageAppCount, dbCount:databaseCount, fileCount:fileCount, otherAssetCount:otherAssetCount, 
-			assetCount:assetCount,assetList:assetList, percentagePhysicalAssetCount:percentagePhysicalAssetCount, unlikelyLatencyCount:unlikelyLatencyCount,
-			unassignedPhysialAssetCount:unassignedPhysialAssetCount, unassignedVirtualAssetCount:unassignedVirtualAssetCount,
-			percentagevirtualAssetCount:percentagevirtualAssetCount, physicalCount:physicalCount, virtualCount:virtualCount,
-			appDependenciesCount:appDependenciesCount, serverDependenciesCount:serverDependenciesCount,
-			pendingAppDependenciesCount:pendingAppDependenciesCount, issuesCount : issues.size(), 
-			pendingServerDependenciesCount:pendingServerDependenciesCount, likelyLatencyCount:likelyLatencyCount,
-			unknownLatencyCount:unknownLatencyCount, unassignedAssetCount:unassignedAssetCount, project:project, dependencyConsoleList:dependencyConsoleList,
-			date:time, moveBundle:moveEventList, likelyLatency:likelyLatency, unlikelyLatency:unlikelyLatency, unknownLatency:unknownLatency,
-			dependencyBundleCount:dependencyBundleCount, uniqueMoveEventList:uniqueMoveEventList, planningDashboard:'planningDashboard',
-			bundleStartDate:bundleStartDate, unassignedDbCount:unassignedDbCount, unassignedFilesCount:unassignedFilesCount,
-			unassignedOtherCount:unassignedOtherCount, dbList:dbList, filesList:filesList, otherTypeList:otherTypeList,
-			percentageOtherCount:percentageOtherCount, percentageDBCount:percentageDBCount, percentageFilesCount:percentageFilesCount,
-			openIssue:openIssue, dueOpenIssue:dueOpenIssue, generalOverDue:generalOverDue, dependencyScan:dependencyScan, validated:validated,
-			dependencyReview:dependencyReview, bundleReady:bundleReady, appToValidate:appToValidate, psToValidate:psToValidate, vsToValidate:vsToValidate,
-			dbToValidate:dbToValidate, fileToValidate:fileToValidate, otherToValidate:otherToValidate, openTasks:openTasks]
+		return [
+			
+			appList:appList, applicationCount:applicationCount, unassignedAppCount:unassignedAppCount, percentageAppCount:percentageAppCount, appToValidate:appToValidate, 
+			physicalCount:physicalCount, unassignedPhysialAssetCount:unassignedPhysialAssetCount, percentagePhysicalAssetCount:percentagePhysicalAssetCount, psToValidate:psToValidate, 
+			virtualCount:virtualCount, unassignedVirtualAssetCount:unassignedVirtualAssetCount, percentagevirtualAssetCount:percentagevirtualAssetCount, vsToValidate:vsToValidate, 
+			dbList:dbList, dbCount:databaseCount, unassignedDbCount:unassignedDbCount, percentageDBCount:percentageDBCount, dbToValidate:dbToValidate, 
+			filesList:filesList, fileCount:fileCount, unassignedFilesCount:unassignedFilesCount, percentageFilesCount:percentageFilesCount, fileToValidate:fileToValidate, 
+			otherTypeList:otherTypeList, otherAssetCount:otherAssetCount, unassignedOtherCount:unassignedOtherCount, percentageOtherCount:percentageOtherCount, otherToValidate:otherToValidate, 
+			
+			assetList:assetList, assetCount:assetCount, unassignedAssetCount:unassignedAssetCount, 
+			
+			likelyLatency:likelyLatency, likelyLatencyCount:likelyLatencyCount, 
+			unknownLatency:unknownLatency, unknownLatencyCount:unknownLatencyCount, 
+			unlikelyLatency:unlikelyLatency, unlikelyLatencyCount:unlikelyLatencyCount, 
+			
+			appDependenciesCount:appDependenciesCount, pendingAppDependenciesCount:pendingAppDependenciesCount, 
+			serverDependenciesCount:serverDependenciesCount, pendingServerDependenciesCount:pendingServerDependenciesCount, 
+			
+			project:project, 
+			moveBundle:moveEventList, 
+			moveBundleList:moveBundleList, 
+			dependencyConsoleList:dependencyConsoleList, 
+			dependencyBundleCount:dependencyBundleCount, 
+			uniqueMoveEventList:uniqueMoveEventList, 
+			planningDashboard:'planningDashboard', 
+			bundleStartDate:bundleStartDate, 
+			date:time, 
+			
+			issuesCount:issues.size(), 
+			openIssue:openIssue, dueOpenIssue:dueOpenIssue, 
+			openTasks:openTasks, generalOverDue:generalOverDue, 
+			
+			dependencyScan:dependencyScan, dependencyReview:dependencyReview, validated:validated, bundleReady:bundleReady]
 	}
 	
 	/**

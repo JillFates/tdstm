@@ -44,6 +44,7 @@
 					{name:'dateCreated', editable: true,width:'50', formatter:formatDate},
 					{name:'expiryDate', editable: true,width:'50', formatter:formatDate}"
 				sortname="'username'"
+				sortable = "true"
 				caption="listCaption"
 				height="'100%'"
 				rowNum="'25'"

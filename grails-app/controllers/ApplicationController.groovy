@@ -29,7 +29,7 @@ class ApplicationController {
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
-	def list ={
+	def list = {
 		def filters = session.APP?.JQ_FILTERS
 		session.APP?.JQ_FILTERS = []
 		def project = securityService.getUserCurrentProject()
@@ -41,6 +41,7 @@ class ApplicationController {
 		def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
 		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
 		def company = project.client
+		def moveEvent = MoveEvent.read(params.moveEvent)
 		
 		return [projectId: project.id, assetDependency: new AssetDependency(),
 			servers: entities.servers, 
@@ -53,20 +54,21 @@ class ApplicationController {
 		    staffRoles:taskService.getRolesForStaff(), plannedStatus:params.plannedStatus, appSme : filters?.appSmeFilter ?:'',
 			validation:params.validation, moveBundleId:params.moveBundleId, appName:filters?.assetNameFilter ?:'', sizePref:sizePref, 
 			validationFilter:filters?.appValidationFilter ?:'', moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'',
-			partyGroupList:companiesList, availabaleRoles:availabaleRoles, company:company
+			partyGroupList:companiesList, availabaleRoles:availabaleRoles, company:company, moveEvent:moveEvent
 			]
 	}
 	/**
-	 * This method is used by JQgrid to load appList
+	 * This method is used by JQgrid to load appList 
 	 */
 	def listJson = {
 		def sortIndex = params.sidx ?: 'assetName'
 		def sortOrder  = params.sord ?: 'asc'
-		def maxRows = Integer.valueOf(params.rows)
+		def maxRows = Integer.valueOf(params.rows?:'25')?:25
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		def project = securityService.getUserCurrentProject()
-		def filterParams = ['assetName':params.assetName, 'sme':params.sme, 'validation':params.validation, 'planStatus':params.planStatus,'moveBundle':params.moveBundle, 'depNumber':params.depNumber,'depResolve':params.depResolve,'depConflicts':params.depConflicts]
+		def filterParams = ['assetName':params.assetName, 'sme':params.sme, 'validation':params.validation, 'planStatus':params.planStatus,'moveBundle':params.moveBundle, 'depNumber':params.depNumber,'depResolve':params.depResolve,'depConflicts':params.depConflicts,'event':params.event]
+		def initialFilter = params.initialFilter in [true,false] ? params.initialFilter : false
 		
 		def moveBundleList = []
 		session.APP = [:]
@@ -85,13 +87,14 @@ class ApplicationController {
 		
 		def query = new StringBuffer("""SELECT * FROM ( SELECT a.app_id AS appId, ae.asset_name AS assetName, 
 			CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS sme, ae.validation AS validation, 
-			ae.plan_status AS planStatus, mb.name AS moveBundle, adb.dependency_bundle AS depNumber, 
+			ae.plan_status AS planStatus, mb.name AS moveBundle, adb.dependency_bundle AS depNumber, me.move_event_id AS event, 
 			COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, 
 			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts 
 			FROM application a 
 			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id 
 			LEFT OUTER JOIN person p ON p.person_id=a.sme_id 
 			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
+			LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
 			LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
 			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 
 			LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN (${unknownQuestioned}) 
@@ -114,23 +117,28 @@ class ApplicationController {
 					query.append(" AND apps.${it.getKey()} LIKE '%${it.getValue()}%'")
 				}
 		}
-			
+		
 		def appsList = jdbcTemplate.queryForList(query.toString())
 		
+		// Cut the list of selected applications down to only the rows that will be shown in the grid
 		def totalRows = appsList.size()
 		def numberOfPages = Math.ceil(totalRows / maxRows)
+		if(totalRows > 0)
+			appsList = appsList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
+		else
+			appsList = []
 		
 		def results = appsList?.collect { [ cell: [
 			'',it.assetName, (it.sme ?: ''), it.validation, it.planStatus, it.moveBundle, 
 			it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,
-			(it.commentStatus!='completed' && it.commentType=='issue')?('issue'):(it.commentType?:'blank'),	it.assetType
+			(it.commentStatus!='completed' && it.commentType=='issue')?('issue'):(it.commentType?:'blank'),	it.assetType, it.event
 		], id: it.appId]}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
-
+		
 		render jsonData as JSON
 	}
-	def create ={
+	def create = {
 		def applicationInstance = new Application(appOwner:'TDS')
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
@@ -234,8 +242,7 @@ class ApplicationController {
 		}
 	}
     
-	def edit ={
- 
+	def edit = {
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
@@ -282,7 +289,7 @@ class ApplicationController {
 
 	}
 
-	def update ={
+	def update = {
 		def attribute = session.getAttribute('filterAttr')
 		def filterAttr = session.getAttribute('filterAttributes')
 		session.setAttribute("USE_FILTERS","true")

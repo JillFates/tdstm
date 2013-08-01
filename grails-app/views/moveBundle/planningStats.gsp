@@ -530,11 +530,11 @@ $(document).ready(function() {
 								0
 							</g:if>
 							<g:else>
-                            <b>
-								<g:link controller="assetEntity" action="list" params="[filter:'other', plannedStatus:'Unassigned']" class="links">
-								   ${unassignedOtherCount}	(${(percentageUnassignedOtherCount > 0 && percentageUnassignedOtherCount < 1) ? 1 : Math.round(percentageUnassignedOtherCount)}%)
-								</g:link>
-							</b>
+								<b>
+									<g:link controller="assetEntity" action="list" params="[filter:'other', plannedStatus:'Unassigned']" class="links">
+									   ${unassignedOtherCount}	(${(percentageUnassignedOtherCount > 0 && percentageUnassignedOtherCount < 1) ? 1 : Math.round(percentageUnassignedOtherCount)}%)
+									</g:link>
+								</b>
 							</g:else>
 							</td>
 							<g:each in="${otherTypeList}" var="otherCount">
@@ -560,7 +560,7 @@ $(document).ready(function() {
 					</tbody>
 				</table>
 			</div>
-			</div>
-			</div>
+		</div>
+	</div>
 </body>
 </html>
