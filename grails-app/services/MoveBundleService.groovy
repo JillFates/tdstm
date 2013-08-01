@@ -478,7 +478,7 @@ class MoveBundleService {
 		def depSql = """SELECT  
 		   adb.dependency_bundle as dependencyBundle, 
 		   count(distinct adb.asset_id) as assetCnt, 
-		   group_concat(distinct a.move_bundle_id) as moveBundles,
+		   CONVERT( group_concat(distinct a.move_bundle_id) USING 'utf8') as moveBundles,
 		   sum(if(a.plan_status='Assigned',1,0)) as statusAssigned,
 		   sum(if(a.validation<>'BundleReady',1,0)) as notBundleReady,
 		   sum(if(a.asset_type in ( ${AssetType.getPhysicalServerTypesAsString()} ), 1, 0)) as serverCount,

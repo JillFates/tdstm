@@ -323,12 +323,13 @@ digraph runbook {
 		def projectId = project.id
 
 		def categories = GormUtil.asQuoteCommaDelimitedString(AssetComment.moveDayCategories)
+
 		
 		def query = """
 			SELECT 
 			  t.asset_comment_id AS id,
 			  t.task_number, 
-			  GROUP_CONCAT(s.task_number SEPARATOR ',') AS successors,
+			  CONVERT( GROUP_CONCAT(s.task_number SEPARATOR ',') USING 'utf8') AS successors,
 			  IFNULL(a.asset_name,'') as asset, 
 			  t.comment as task, 
 			  t.role,
