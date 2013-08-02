@@ -1,6 +1,7 @@
 package com.tdsops.common.sql
 
 import com.tdssrc.grails.StringUtil
+import org.apache.commons.lang.StringUtils
 
 /** 
  * This class provides a number of utility functions
@@ -69,4 +70,76 @@ class SqlUtil {
 		return map
 	}
 	
+	/**
+	 * Used to parse user input from filters so that we can create the appropriate SQL expression that will support boolean expressions
+	 * like <, <=, >, >= or - to cause a NOT filter
+	 * @param String text - the filter value
+	 * @param String defExpr - the default expression to use if the filter doesn't include a filter
+	 * @return List [text, expression] - the text with the expression stripped off and the appropriate expression
+	 */
+	static List parseExpression( text, defExpr='=') {
+		def expr = defExpr
+		def not = false
+
+		text = text.trim()
+
+		// Get the NOT (-) switch
+		if (text[0] == '-') {
+			not = true
+			text = StringUtils.substring(text, 1).trim()
+		}
+
+		if (['<=','>='].contains( StringUtils.substring(text, 0, 2) ) ) {
+			expr = StringUtils.substring(text, 0, 2)
+			text = StringUtils.substring(text,2).trim()
+		} else if ('<>='.contains( StringUtils.substring(text, 0, 1) ) ) {
+			expr = text[0]
+			text = StringUtils.substring(text, 1).trim()
+		}
+
+		// Handle placing NOT on the expression
+		if (not) {
+			//println "parseExpression() in NOT handler, expr=$expr xxx"
+			if (expr == '=')
+				expr = '<>'
+			else if (expr.toLowerCase() == 'like' )
+				expr = 'NOT ' + expr
+		}
+
+		//println "parseExpression() text '$text', expr '$expr'"
+		return [text, expr]
+	}
+
+	/*
+
+	// TODO - move these assertions to a testcase
+	def t,e
+	(t,e) = parseExpression('<5')
+	assert t=='5'
+	assert e=='<'
+
+	(t,e) = parseExpression('< 5 ')
+	assert t=='5'
+	assert e=='<'
+
+	(t,e) = parseExpression('<=5')
+	assert t=='5'
+	assert e=='<='
+
+	(t,e) = parseExpression('-5')
+	assert t=='5'
+	assert e=='<>'
+
+	(t,e) = parseExpression('>G')
+	assert t=='G'
+	assert e=='>'
+
+	(t,e) = parseExpression('G', 'like')
+	assert t=='G'
+	assert e=='like'
+
+	(t,e) = parseExpression('-G', 'like')
+	assert t=='G'
+	assert e=='NOT like'
+	*/
 }

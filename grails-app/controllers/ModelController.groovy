@@ -21,7 +21,7 @@ import com.tdssrc.grails.WebUtil
 
 class ModelController {
 	
-	//Initialize services
+	// Services and objects to be injected by IoC
     def jdbcTemplate
 	def assetEntityAttributeLoaderService 
     def sessionFactory
@@ -43,58 +43,118 @@ class ModelController {
 	 * This method is used by JQgrid to load modelList
 	 */
 	def listJson = {
-		def sortIndex = params.sidx ?: 'modelName'
-		def sortOrder  = params.sord ?: 'asc'
+		def sortOrder = (params.sord in ['asc','desc']) ? (params.sord) : ('asc')
 		def maxRows = Integer.valueOf(params.rows)
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
-		def project = securityService.getUserCurrentProject()
 		def modelInstanceList
-		def userLogin = securityService.getUserLogin()
-		def filterParams = ['modelName':params.modelName, 'manufacturer':params.manufacturer, 'description':params.description, 'assetType':params.assetType,'powerUse':params.powerUse, 'noOfConnectors':params.connectors, 'assetsCount':params.assetCount, 'sourceTDSVersion':params.version, 'sourceTDS':params.sourceTds, 'modelStatus':params.status]
-			
-		def query = new StringBuffer("""SELECT * FROM ( SELECT m.model_id AS modelId, man.name AS manufacturer, 
-			m.name AS modelName, m.description AS description, m.asset_type AS assetType, m.power_use AS powerUse, 
-			(SELECT COUNT(*) FROM model_connector WHERE model_connector.model_id=m.model_id) AS noOfConnectors, 
-			m.model_status AS modelStatus, m.sourcetds AS sourceTDS, m.sourcetdsversion AS sourceTDSVersion, 
-			(SELECT COUNT(*) FROM asset_entity AS ae WHERE ae.model_id=m.model_id) AS assetsCount 
-			FROM model m 
-			LEFT OUTER JOIN model_connector mc on m.model_id=mc.model_id 
-			LEFT OUTER JOIN model_sync ms on m.model_id=ms.model_id 
-			LEFT OUTER JOIN manufacturer man on man.manufacturer_id=m.manufacturer_id """)
-		query.append("ORDER BY " + sortIndex + " " + sortOrder + ") AS models")
 		
-		// Handle the filtering by each column's text field
-		def firstWhere = true
-		filterParams.each {
-			if(it.getValue())
-				if(firstWhere){
-					query.append(" WHERE models.${it.getKey()} LIKE '%${it.getValue()}%'")
-					firstWhere = false
-				} else {
-					query.append(" AND models.${it.getKey()} LIKE '%${it.getValue()}%'")
-				}
-		}
+		// This map contains all the possible fileds that the user could be sorting or filtering on
+		def filterParams = [
+			'modelName':params.modelName, 'manufacturer':params.manufacturer, 'description':params.description, 
+			'assetType':params.assetType,'powerUse':params.powerUse, 'noOfConnectors':params.modelConnectors, 
+			'assetsCount':params.assetsCount, 'sourceTDSVersion':params.sourceTDSVersion, 'sourceTDS':params.sourceTDS, 
+			'modelStatus':params.modelStatus]
+
+		// Cut the list of fields to filter by down to only the fields the user has entered text into
+		def usedFilters = filterParams.findAll { key, val -> val != null }
+				
+		// Get the actual list from the service
+		modelInstanceList = modelService.listOfFilteredModels(filterParams, params.sidx, sortOrder)
 		
-		modelInstanceList = jdbcTemplate.queryForList(query.toString())
-		
+		// TODO : this looks like a good utility function to refactor
 		// Limit the returned results to the user's page size and number
 		def totalRows = modelInstanceList.size()
 		def numberOfPages = Math.ceil(totalRows / maxRows)
-		if(totalRows > 0)
-			modelInstanceList = modelInstanceList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
-		else
-			modelInstanceList = []
 
-		def results = modelInstanceList?.collect { [ cell: [it.modelName, it.manufacturer, it.description, it.assetType,
-					it.powerUse, it.noOfConnectors, it.assetsCount, it.sourceTDSVersion, it.sourceTDS, it.modelStatus], id: it.modelId
-			]}
+		// Get the subset of all records based on the pagination
+		modelInstanceList = (totalRows > 0) ? modelInstanceList = modelInstanceList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)] : []
+		
+		// Reformat the list to allow jqgrid to use it
+		def results = modelInstanceList?.collect { 
+			[ 
+				id: it.modelId,
+				cell: [ 
+					it.modelName, it.manufacturer, it.description, it.assetType, it.powerUse, it.noOfConnectors, 
+					it.assetsCount, it.sourceTDSVersion, it.sourceTDS, it.modelStatus
+				]
+			]
+		}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 
 		render jsonData as JSON
+
     }
+		/*
+		// If the user is sorting by a valid column, order by that one instead of the default
+		if ( params.sidx in filterParams.keySet ) 
+			sortIndex = params.sidx	
+		
+		def query = new StringBuffer("SELECT ")
+		
+		// Add the columns that are to be used in the query 
+		aliasValuesBase.each {
+			query.append("${it.getValue()} AS ${it.getKey()}, ")
+		}
+		aliasValuesAggregate.each {
+			query.append("${it.getValue()} AS ${it.getKey()}, ")
+		}
+		
+		// Remove the extra comma from the last alias
+		query.deleteCharAt(query.length()-2)
+		
+		// Perform all the needed table joins
+		query.append(""" 
+			FROM model m 
+			LEFT OUTER JOIN model_connector mc on mc.model_id = m.model_id 
+			LEFT OUTER JOIN model_sync ms on ms.model_id = m.model_id 
+			LEFT OUTER JOIN manufacturer man on man.manufacturer_id = m.manufacturer_id 
+			LEFT OUTER JOIN asset_entity ae ON ae.model_id = m.model_id 
+		""")
+		
+		// Handle the filtering by each column's text field for base columns
+		def firstWhere = true
+		usedFilters.findAll {
+			it.getKey() in aliasValuesBase.keySet()
+		}.each {
+			if( it.getValue() )
+				if (firstWhere) {
+					query.append(" WHERE ${aliasValuesBase.get(it.getKey())} LIKE CONCAT('%',:${it.getKey()},'%')")
+					firstWhere = false
+				} else {
+					query.append(" AND ${aliasValuesBase.get(it.getKey())} LIKE CONCAT('%',:${it.getKey()},'%')\n")
+				}
+		}
+		
+		// Sort by the specified field
+		query.append("""
+			GROUP BY modelId
+			ORDER BY ${sortIndex} ${sortOrder}
+		""")
+		
+		// Handle the filtering by each column's text field for aggregate columns
+		def firstHaving = true
+		usedFilters.findAll {
+			it.getKey() in aliasValuesAggregate.keySet()
+		}.each {
+			if( it.getValue() )
+				if (firstHaving) {
+					query.append(" HAVING ${aliasValuesAggregate.get(it.getKey())} LIKE CONCAT('%',:${it.getKey()},'%')\n")
+					firstHaving = false
+				} else {
+					query.append(" AND ${aliasValuesAggregate.get(it.getKey())} LIKE CONCAT('%',:${it.getKey()},'%')\n")
+				}
+		}
+		
+		// Perform the query and store the results in a list
+		if (usedFilters.size() > 0)
+			modelInstanceList = namedParameterJdbcTemplate.queryForList(query.toString(), usedFilters)
+		else
+			modelInstanceList = jdbcTemplate.queryForList(query.toString())
+		*/
 	
+
     def create = {
     	def modelId = params.modelId
         def modelInstance = new Model()
