@@ -1069,7 +1069,7 @@ class AssetEntityController {
 					//
 					// Asset (Servers, etc)
 					//					
-					if ( params.containsKey('asset') && params.asset ) {
+					if(params.asset=='asset'){
 						exportedEntity +="S"
 						for ( int r = 1; r <= assetSize; r++ ) {
 							//Add assetId for walkthrough template only.
@@ -1207,7 +1207,7 @@ class AssetEntityController {
 					//
 					// Database
 					//
-					if (params.containsKey('database') && params.database ) {
+					if(params.database=='database'){
 						exportedEntity +="D"
 						for ( int r = 1; r <= dbSize; r++ ) {
 							//Add assetId for walkthrough template only.
@@ -1238,13 +1238,12 @@ class AssetEntityController {
 						}
 						log.info "export() - processing databases took ${TimeUtil.elapsed(started)}"
 						started = new Date()
-
 					}
 
 					//
 					// Storage ( files )
-					//	
-					if (params.containsKey('files') && params.files ) {				
+					//					
+					if(params.files=='files'){
 						exportedEntity +="F"
 						for ( int r = 1; r <= fileSize; r++ ) {
 							//Add assetId for walkthrough template only.
@@ -1279,8 +1278,8 @@ class AssetEntityController {
 					
 					//
 					// Dependencies
-					//		
-					if (params.containsKey('dependency') && params.dependency ) {				
+					//					
+					if(params.dependency=='dependency'){
 						exportedEntity +="X"
 						def assetDependent = AssetDependency.findAll("from AssetDependency where asset.project = ? ",[project])
 						def dependencyMap = ['AssetId':1,'DependentId':2, 'Type':3, 'DataFlowFreq':4, 'DataFlowDirection':5, 'status':6, 'comment':7]
@@ -1312,11 +1311,8 @@ class AssetEntityController {
 						log.info "export() - processing dependencies took ${TimeUtil.elapsed(started)}"
 						started = new Date()
 					}
-
-					//
-					// Export rooms
-					//
-					if (params.containsKey('room') && params.room ) {
+					//Export rooms
+					if(params.room=='room'){
 						exportedEntity +="R"
 						def formatter = new SimpleDateFormat("MM/dd/yyyy")
 						def rooms = Room.findAllByProject(project)
@@ -1350,15 +1346,13 @@ class AssetEntityController {
 								}
 								roomSheet.addCell( addContentToSheet )
 							}
-					  	}
-						log.info "export() - processing rooms took ${TimeUtil.elapsed(started)}"
-						started = new Date()
+					  }
+					  log.info "export() - processing rooms took ${TimeUtil.elapsed(started)}"
+					  started = new Date()
 					}
 					
-					//
-					// Rack Exporting 
-					//
-					if (params.containsKey('rack') && params.rack ) {
+					//Rack Exporting 
+					if(params.rack=='rack'){
 						exportedEntity +="r"
 						def racks = Rack.findAllByProject(project)
 						def rackSize = racks.size()
@@ -1388,12 +1382,11 @@ class AssetEntityController {
 								}
 								rackSheet.addCell( addContentToSheet )
 							}
-					  	}
-						log.info "export() - processing racks took ${TimeUtil.elapsed(started)}"
-						started = new Date()
+					  }
+					  log.info "export() - processing racks took ${TimeUtil.elapsed(started)}"
+					  started = new Date()
 					}
 				}
-
 				//update data from Asset Comment table to EXCEL
 				for( int sl=0;  sl < sheetNamesLength; sl++ ) {
 					def commentIt = new ArrayList()
