@@ -107,7 +107,7 @@
 								<th>&nbsp;</th>
 							</tr>
 						</thead>
-						<tbody id="createSupportsList">
+						<tbody id="createSupportsList" class="assetDependent">
 						</tbody>
 					</table>
 				</div></td>
@@ -127,7 +127,7 @@
 								<th>&nbsp;</th>
 							</tr>
 						</thead>
-						<tbody id="createDependentsList">
+						<tbody id="createDependentsList" class="assetDependent">
 						</tbody>
 					</table>
 				</div></td>

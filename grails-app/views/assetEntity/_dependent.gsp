@@ -24,7 +24,7 @@
 								onChange="updateAssetsList(this.name)" 
 								value="${type== 'Files' ? 'Storage' : (nonNetworkTypes.contains(type) ? type : 'Network')}" />
 						</td>
-						<td id="assetListSupportTdId_${i}">
+						<td id="assetListSupportTdId_${i}"  class='combo-td'>
 							<select name="asset_support_${support.id}" class="assetSelect" onmousedown="updateAssetsList(this.name, '${type}', '${support?.asset?.id}')">
 								<option value="${support?.asset?.id}" selected>${support?.asset.assetName}</option>
 							</select>
@@ -64,7 +64,7 @@
 							value="${type== 'Files' ? 'Storage' : (nonNetworkTypes.contains(type) ? type : 'Network')}"  
 							onchange="updateAssetsList(this.name)" />
 					</td>
-					<td id="assetListDependentTdId_${i}">
+					<td id="assetListDependentTdId_${i}"  class='combo-td'>
 						<select name="asset_dependent_${dependent.id}" class="assetSelect" onmousedown="updateAssetsList(this.name, '${type}', '${dependent?.dependent?.id}')">
 							<option value="${dependent?.dependent?.id}" selected>${dependent?.dependent.assetName}</option>
 						</select>

@@ -67,7 +67,7 @@
 									<g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme}"  optionKey="id" 
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value,this.id)" 
-										tabindex="38" 
+										tabindex="38"
 										noSelection="${['':'Please Select']}" 
 										tabIndex="21"
 									/>
@@ -101,7 +101,7 @@
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
 										tabindex="38" 
-										noSelection="${['':'Please select']}" 
+										noSelection="${['':'Please select']}"
 									/>
 								</td>
 								<td class="label ${config.criticality}" nowrap="nowrap">
@@ -299,7 +299,7 @@
 								<th>&nbsp;</th>
 							</tr>
 						</thead>
-						<tbody id="createSupportsList">
+						<tbody id="createSupportsList" class="assetDependent">
 						</tbody>
 					</table>
 				</div></td>
@@ -319,7 +319,7 @@
 								<th>&nbsp;</th>
 							</tr>
 						</thead>
-						<tbody id="createDependentsList">
+						<tbody id="createDependentsList" class="assetDependent" >
 						</tbody>
 					</table>
 				</div></td>
@@ -334,7 +334,6 @@
 					<input type="hidden" id="create_supportAddedId" name="addedSupport" value ="0"/>
 					<input type="hidden" id="create_dependentAddedId" name="addedDep" value ="0"/>
 					<span class="button"><g:actionSubmit class="save" value="Save" /> </span>
-					 </span>
 				</div></td>
 		</tr>
 	</table>

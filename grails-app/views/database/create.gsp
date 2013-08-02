@@ -92,7 +92,7 @@
 							<th>&nbsp;</th>
 						</tr>
 					</thead>
-					<tbody id="createSupportsList">
+					<tbody id="createSupportsList" class="assetDependent">
 					</tbody>
 				</table>
 			</div>
@@ -113,7 +113,7 @@
 							<th>&nbsp;</th>
 						</tr>
 					</thead>
-					<tbody id="createDependentsList">
+					<tbody id="createDependentsList" class="assetDependent">
 					</tbody>
 				</table>
 			</div>

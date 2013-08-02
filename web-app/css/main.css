@@ -627,11 +627,17 @@ margin: -8px !important;
     font-weight:normal !important;
     width:105px;
 }
-.assetDependentId .ui-widget-content{
+.assetDependent .ui-widget-content{
 	color: black !important;
     font-weight:normal !important;
-    width:55px;
+    width:85px !important;
 }
 .ui-autocomplete{
 	width:132px !important;
+}
+.custom-combobox-input {
+	padding:3px !important;
+}
+.combo-td {
+    width: 120px !important;	
 }

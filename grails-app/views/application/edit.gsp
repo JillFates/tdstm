@@ -275,7 +275,7 @@
 					</table>
 				</div></td>
 		</tr>
-		<tr id="applicationDependentId">
+		<tr id="applicationDependentId" class="assetDependent">
 			<td class="depSpin"><span><img alt="" src="${resource(dir:'images',file:'processing.gif')}"/> </span></td>
 		</tr>
 		<tr>

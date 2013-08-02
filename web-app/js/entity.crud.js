@@ -104,6 +104,7 @@ function addAssetDependency( type,forWhom ){
 	var rowData = $("#assetDependencyRow tr").html()
 		.replace(/dataFlowFreq/g,"dataFlowFreq_"+type+"_"+rowNo)
 		.replace(/asset/g,"asset_"+type+"_"+rowNo)
+		.replace(/dependenciesId/g,"dep_"+type+"_"+rowNo+"_"+forWhom)
 		.replace(/dtype/g,"dtype_"+type+"_"+rowNo)
 		.replace(/status/g,"status_"+type+"_"+rowNo)
 		.replace(/entity/g,"entity_"+type+"_"+rowNo);
@@ -112,8 +113,9 @@ function addAssetDependency( type,forWhom ){
 	} else {
 		$("#"+forWhom+"SupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"', 'edit_supportAddedId')\"><span class='clear_filter'>X</span></a></td></tr>")
 	}
+	$("#dep_"+type+"_"+rowNo+"_"+forWhom).addClass("assetSelect");
 	$("#"+forWhom+"_"+type+"AddedId").val(parseInt(rowNo)-1)
-	$(".assetSelect").combobox()
+	$(".assetSelect").combobox();
 }
 
 function deleteRow( rowId, forWhomId ){

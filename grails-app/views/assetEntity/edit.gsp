@@ -205,7 +205,7 @@
 					</table>
 				</div></td>
 		</tr>
-		<tr id="assetDependentId">
+		<tr id="assetDependentId" class="assetDependent">
 			<td class="depSpin"><span><img alt="" src="${resource(dir:'images',file:'processing.gif')}"/> </span></td>
 		</tr>
 		<tr>
