@@ -526,7 +526,10 @@ class AssetEntityController {
 							}
 						}
 					}
-					//  Process applciation
+
+					//
+					//  Process application
+					//
 					if(params.application=='application'){
 						session.setAttribute("TOTAL_ASSETS",appCount)
 						def eavEntityType = EavEntityType.findByDomainName('Application')
@@ -545,6 +548,7 @@ class AssetEntityController {
 							def name = appSheet.getCell( appColNo, r ).contents
 							if(name){
 								def dataTransferValueList = new StringBuffer()
+								// TODO - change the string appends to stringbuffer
 								for( int cols = 0; cols < appCol; cols++ ) {
 									
 									def dataTransferAttributeMapInstance
@@ -572,13 +576,16 @@ class AssetEntityController {
 									}
 								}
 								try{
-									jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
+									jdbcTemplate.update(
+										"insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "
+										+ dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(","))
+									)
 									appAdded = r
 								} catch (Exception e) {
 									skipped += ( r +1 )
 								}
 							}
-							if (r%50 == 0){
+							if (r % 50 == 0){
 								sessionFactory.getCurrentSession().flush();
 								sessionFactory.getCurrentSession().clear();
 							}
@@ -1128,7 +1135,7 @@ class AssetEntityController {
 					//
 					// Application
 					//
-					if ( params.containsKey('application') && params.application ) {
+					if ( params.application == 'application' ) {
 						exportedEntity += 'A'
 
 						// This determines which columns are added as Number vs Label
@@ -1168,7 +1175,7 @@ class AssetEntityController {
 										colVal = app.id
 										break
 									case 'Owner':
-										colVal = app.appOwner?.toString()
+										colVal = app.appOwner
 										break
 									case 'DepGroup':
 										// Find the Dependency Group that this app is bound to
@@ -1179,16 +1186,21 @@ class AssetEntityController {
 										break
 									case ~/ShutdownFixed|StartupFixed|TestingFixed/:
 										colVal = app[assetColName] ? 'Yes' : 'No'
-										log.info "export() : field class type=$app[assetColName].className()}"
+										//log.info "export() : field class type=$app[assetColName].className()}"
 										break
 									default:
 										colVal = app[assetColName]
 								}
 
-								// def colNum = appMap[colNum]
-								log.info("export() : rowNum=$rowNum, colNum=$colNum, colVal=$colVal")
+								// log.info("export() : rowNum=$rowNum, colNum=$colNum, colVal=$colVal")
 
 								if ( colVal != null) {
+
+									// TODO : Remove the First Last once full name parsing on import is resolved
+									if (colVal?.class.name == 'Person') {
+										colVal = (colVal.lastName ? "${colVal.lastName}, " : '') + colVal.firstName
+									}
+
 									def cell 
 									if ( numericCols.contains(colName) )
 										cell = new Number(colNum, rowNum, (Double)colVal)
@@ -1438,6 +1450,7 @@ class AssetEntityController {
 			return;
 		}
 	}
+
 	/* -------------------------------------------------------
 	 * To check the sheet headers
 	 * @param attributeList, SheetColumnNames
