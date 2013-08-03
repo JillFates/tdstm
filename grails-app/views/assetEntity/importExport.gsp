@@ -32,7 +32,8 @@
 	        	if(${isMSIE}){
 	        		handle=setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}",500);
 		        } else {
-					handle=setInterval(getProgress,1500);
+			        // Increased interval by 5 sec as server was hanging over chrome with quick server request. 
+					handle=setInterval(getProgress, 5000);
 		        }
 	        });
 		});
