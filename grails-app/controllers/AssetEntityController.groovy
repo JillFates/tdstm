@@ -1732,12 +1732,12 @@ class AssetEntityController {
 		}
 		
 		def bundleId = getSession().getAttribute( "CURR_BUNDLE" )?.CURR_BUNDLE
-		def assetEntityInstance = new AssetEntity(params)
+		def assetEntity = new AssetEntity(params)
 		def projectId =  getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def projectInstance = securityService.getUserCurrentProject()
 		
-		assetEntityInstance.project = projectInstance
-		assetEntityInstance.owner = projectInstance.client
+		assetEntity.project = projectInstance
+		assetEntity.owner = projectInstance.client
 		if(!params.assetTag){
 			def lastAssetId = projectInstance.lastAssetId
 			if(!lastAssetId){
@@ -1746,51 +1746,82 @@ class AssetEntityController {
 			while(AssetEntity.findByAssetTagAndProject("TDS-${lastAssetId}",projectInstance)){
 				lastAssetId = lastAssetId+1
 			}
-			assetEntityInstance.assetTag = "TDS-${lastAssetId}"
+			assetEntity.assetTag = "TDS-${lastAssetId}"
 			projectInstance.lastAssetId = lastAssetId + 1
 			if(!projectInstance.save(flush:true)){
 				log.error "Error while updating project.lastAssetId : ${projectInstance}"
 				projectInstance.errors.each { log.error  it }
 			}
 		}
-
-		if(!assetEntityInstance.hasErrors() && assetEntityInstance.save()) {
-			assetEntityInstance.updateRacks()
-			def loginUser = securityService.getUserLogin()
-			if(assetEntityInstance.model){
-				assetEntityAttributeLoaderService.createModelConnectors( assetEntityInstance )
-			}
-			flash.message = "AssetEntity ${assetEntityInstance.assetName} created "
-			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance, loginUser, projectInstance)
-			flash.message += "</br>"+errors 
-			if(redirectTo == "room"){
-				redirect( controller:'room',action:list )
-			} else if(redirectTo == "rack"){
-				session.setAttribute("USE_FILTERS", "true")
-				redirect( controller:'rackLayouts',action:'create' )
-			} else if(redirectTo == "assetAudit"){
-				render(template:'auditDetails', model:[assetEntity:assetEntityInstance, source:params.source, assetType:params.assetType])
-			} else {
-				session.AE?.JQ_FILTERS = params
-				redirect( action:list)
-			}
+			if(!assetEntity.hasErrors() && assetEntity.save()) {
+				assetEntity.updateRacks()
+				def loginUser = securityService.getUserLogin()
+				if(assetEntity.model){
+					assetEntityAttributeLoaderService.createModelConnectors( assetEntity )
+				}
+				flash.message = "AssetEntity ${assetEntity.assetName} created "
+				def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntity, loginUser, projectInstance)
+				flash.message += "</br>"+errors 
+				if(params.showView == 'showView'){
+					forward(action:'show', params:[id: assetEntity.id, errors:errors])
+					
+				} else{
+					redirectToReq( params, assetEntity, redirectTo, true )
+				}
+			}else {
+				flash.message = "AssetEntity ${assetEntity.assetName} not created"
+				def etext = "Unable to Update Asset" +
+						GormUtil.allErrorsString( assetEntity )
+				log.error  etext
+				redirectToReq(params, assetEntity, redirectTo, false )
 		}
-		else {
-
-			flash.message = "AssetEntity ${assetEntityInstance.assetName} not created"
-			def etext = "Unable to Update Asset" +
-					GormUtil.allErrorsString( assetEntityInstance )
-			log.error  etext
-			if(params.redirectTo == "room"){
-				redirect( controller:'room',action:list )
-			} else if(params.redirectTo == "rack"){
-				redirect( controller:'rackLayouts',action:'create' )
-			} else if(redirectTo == "assetAudit"){
-				render(template:'createAuditDetails', model:[assetEntity:assetEntityInstance, source:params.source, assetType:params.assetType])
-			} else {
-				redirect( action:list, params:[projectId: projectId] )
-			}
-		}
+	}
+	
+	def redirectToReq(params, entity, redirectTo, saved ){
+		switch (redirectTo){
+			case "room":
+				  redirect( controller:'room',action:list )
+				  break;
+			case "rack":
+				  session.setAttribute("USE_FILTERS", "true")
+				  redirect( controller:'rackLayouts',action:'create' )
+				  break;
+			case "assetAudit":
+					if(saved)
+						render(template:'auditDetails',	model:[assetEntity:entity, source:params.source, assetType:params.assetType])
+					else
+						forward(action:'create', params:params)
+				  break;
+		    case "console":
+				  redirect( action:dashboardView, params:[ showAll:'show',tag_f_assetName:params.tag_f_assetName,tag_f_priority:attribute.tag_f_priority,tag_f_assetTag:attribute.tag_f_assetTag,tag_f_assetName:attribute.tag_f_assetName,tag_f_status:attribute.tag_f_status,tag_f_sourceTeamMt:attribute.tag_f_sourceTeamMt,tag_f_targetTeamMt:attribute.tag_f_targetTeamMt,tag_f_commentType:attribute.tag_f_commentType,tag_s_1_priority:attribute.tag_s_1_priority,tag_s_2_assetTag:attribute.tag_s_2_assetTag,tag_s_3_assetName:attribute.tag_s_3_assetName,tag_s_4_status:attribute.tag_s_4_status,tag_s_5_sourceTeamMt:attribute.tag_s_5_sourceTeamMt,tag_s_6_targetTeamMt:attribute.tag_s_6_targetTeamMt,tag_s_7_commentType:attribute.tag_s_7_commentType])
+				  break;
+			case "clientConsole":
+				  redirect( controller:'clientConsole', action:list)
+				  break;
+		    case "application":
+				  redirect( controller:'application', action:list)
+				  break;
+			case "database":
+				  redirect( controller:'database', action:list)
+				  break;
+			case "files":
+				  redirect( controller:'files', action:list)
+				  break;
+			case "listComment":
+				  forward(action:'listComment')
+				  break;
+		    case "roomAudit":
+				  forward(action:'show', params:[redirectTo:redirectTo, source:params.source, assetType:params.assetType])
+				  break;
+		    case "dependencyConsole":
+				  forward(action:'getLists', params:[entity:params.tabType,labelsList:params.labels, dependencyBundle:session.getAttribute("dependencyBundle")])
+				  break;
+			case "listTask":
+				  render "Asset ${entity.assetName} updated."
+				  break;
+			default:
+			  	redirect( action:list)
+		  }
 	}
 
 	/*--------------------------------------------------------
@@ -3268,47 +3299,7 @@ class AssetEntityController {
 				forward(action:'show', params:[id: params.id, errors:errors])
 				
 			}else{
-				switch(redirectTo){
-					case "room":
-						redirect( controller:'room',action:list )
-						break;
-					case "rack":
-						session.setAttribute("USE_FILTERS","true")
-						redirect( controller:'rackLayouts',action:'create' )
-						break;
-					case "console":
-						redirect( action:dashboardView, params:[ showAll:'show',tag_f_assetName:params.tag_f_assetName,tag_f_priority:attribute.tag_f_priority,tag_f_assetTag:attribute.tag_f_assetTag,tag_f_assetName:attribute.tag_f_assetName,tag_f_status:attribute.tag_f_status,tag_f_sourceTeamMt:attribute.tag_f_sourceTeamMt,tag_f_targetTeamMt:attribute.tag_f_targetTeamMt,tag_f_commentType:attribute.tag_f_commentType,tag_s_1_priority:attribute.tag_s_1_priority,tag_s_2_assetTag:attribute.tag_s_2_assetTag,tag_s_3_assetName:attribute.tag_s_3_assetName,tag_s_4_status:attribute.tag_s_4_status,tag_s_5_sourceTeamMt:attribute.tag_s_5_sourceTeamMt,tag_s_6_targetTeamMt:attribute.tag_s_6_targetTeamMt,tag_s_7_commentType:attribute.tag_s_7_commentType])
-						break;
-					case "clientConsole":
-						redirect( controller:'clientConsole', action:list)
-						break;
-					case "application":
-						redirect( controller:'application', action:list)
-						break;
-					case "database":
-						redirect( controller:'database', action:list)
-						break;
-					case "files":
-						redirect( controller:'files', action:list)
-						break;
-					case "listComment":
-						forward(action:'listComment')
-						break;
-					case "roomAudit":
-						forward(action:'show', params:[redirectTo:redirectTo, source:params.source, assetType:params.assetType])
-						break;
-					case "dependencyConsole":
-				        forward(action:'getLists', params:[entity:params.tabType,labelsList:params.labels, dependencyBundle:session.getAttribute("dependencyBundle")])
-						break;
-
-					case "listTask":
-						render "Asset ${assetEntityInstance.assetName} updated."
-						break;
-					default:
-						session.AE?.JQ_FILTERS = params
-						redirect( action:list)
-	
-				}
+				redirectToReq(params, assetEntityInstance, redirectTo, false )
 			}
 		}
 		else {

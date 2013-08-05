@@ -205,8 +205,13 @@ class DatabaseController {
 					def project = securityService.getUserCurrentProject()
 					def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, dbInstance, loginUser, project)
 					flash.message +="</br>"+errors 
-			        session.DB?.JQ_FILTERS = params
-					redirect( action:list)
+					if(params.showView == 'showView'){
+						forward(action:'show', params:[id: dbInstance.id, errors:errors])
+						
+					}else{
+				        session.DB?.JQ_FILTERS = params
+						redirect( action:list)
+					}
 		 	    }else {
 					flash.message = "Database not created"
 					dbInstance.errors.allErrors.each{ flash.message += it  }

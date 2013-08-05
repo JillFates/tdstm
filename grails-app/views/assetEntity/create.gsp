@@ -30,7 +30,7 @@
 	})
 	
 </script>
-<g:form method="post">
+<g:form method="post" action="save" name="createAssetsFormId">
 	<input type="hidden" id="asset_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="asset_assetType" name="assetTypeFilter" value="" />
 	<input type="hidden" id="asset_model" name="modelFilter" value="" />
@@ -240,7 +240,9 @@
 					<input name="redirectTo" type="hidden" value="${redirectTo}">
 					<input type="hidden" id="create_supportAddedId" name="addedSupport" value ="0"/>
 					<input type="hidden" id="create_dependentAddedId" name="addedDep" value ="0"/>
-					<span class="button"><g:actionSubmit class="save" value="Save" /> </span>
+					<input name="showView" id="showView" type="hidden" value=""/>
+					<span class="button"><g:actionSubmit class="save" value="Save/Close" action="save" /></span>
+					<span class="button"><input type="button" class="save" value="Save/Show" onclick="saveToShow('AssetEntity')"/> </span>
 				</div></td>
 		</tr>
 	</table>

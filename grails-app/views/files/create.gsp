@@ -5,7 +5,7 @@
 	$("#file_planStatus").val($('#gs_planStatus').val())
 	$("#file_moveBundle").val($('#gs_moveBundle').val())
 </script>
-<g:form method="post">
+<g:form method="post" action="save" name="createAssetsFormId" onsubmit="return validateFileFormat()">
 	<input type="hidden" id="file_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="file_fileFormat" name="fileFormatFilter" value="" />
 	<input type="hidden" id="file_fileSize" name="fileSizeFilter" value="" />
@@ -140,9 +140,10 @@
 					<input type="hidden" id="create_supportAddedId" name="addedSupport" value ="0"/>
 					<input type="hidden" id="create_dependentAddedId" name="addedDep" value ="0"/>
 					<input name="attributeSet.id" type="hidden" value="1"> <input
-						name="project.id" type="hidden" value="${projectId}"> <span
-						class="button"><g:actionSubmit class="save" value="Save" onclick="return validateFileFormat()"/>
-					</span>
+						name="project.id" type="hidden" value="${projectId}"> 
+					<input name="showView" id="showView" type="hidden" value=""/>
+					<span class="button"><g:actionSubmit class="save" value="Save/Close" action="save" /></span>
+					<span class="button"><input type="button" class="save" value="Save/Show" onclick="saveToShow('Files')"/></span>
 				</div>
 			</td>
 		</tr>

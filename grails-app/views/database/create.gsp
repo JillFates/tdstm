@@ -4,7 +4,7 @@
 	$("#db_planStatus").val($('#gs_planStatus').val())
 	$("#db_moveBundle").val($('#gs_moveBundle').val())
 </script>
-<g:form method="post">
+<g:form method="post" action="save" name="createAssetsFormId">
 <input type="hidden" id="db_assetName" name="assetNameFilter" value="" />
 <input type="hidden" id="db_dbFormat" name="dbFormatFilter" value="" />
 <input type="hidden" id="db_planStatus" name="planStatusFilter" value="" />
@@ -128,7 +128,9 @@
 				<input name="project.id" type="hidden" value="${projectId}" />
 				<input type="hidden" id="create_supportAddedId" name="addedSupport" value ="0"/>
 				<input type="hidden" id="create_dependentAddedId" name="addedDep" value ="0"/>
-				<span class="button"><g:actionSubmit class="save" value="Save" /></span>
+				<input name="showView" id="showView" type="hidden" value=""/>
+				<span class="button"><g:actionSubmit class="save" value="Save/Close" action="save" /></span>
+				<span class="button"><input type="button" class="save" value="Save/Show" onclick="saveToShow('Database')"/></span>
 			</div>
 		</td>
 	</tr>

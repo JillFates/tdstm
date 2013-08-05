@@ -746,3 +746,60 @@ function getHelpTextAsToolTip(type){
 		}
 	});
 }
+
+function saveToShow(forWhom){
+	$('#showView').val('showView')
+	var flag=true
+	if(forWhom=='Application'){
+		flag = validateFields()
+	}
+	if(forWhom=='Files'){
+		flag = validateFileFormat()
+	}
+	if(flag){
+		jQuery.ajax({
+			url: $('#createAssetsFormId').attr('action'),
+			data: $('#createAssetsFormId').serialize(),
+			type:'POST',
+			success: function(data) {
+				if(data.errMsg){
+					alert(data.errMsg)
+				}else{
+					$('#createEntityView').dialog('close')
+					if($('.ui-icon-refresh').length)
+						$('.ui-icon-refresh').click();
+					$('#showEntityView').html(data)
+					$("#showEntityView").dialog('option', 'width', 'auto')
+					$("#showEntityView").dialog('option', 'position', ['center','top']);
+					$("#showEntityView").dialog('open');
+					updateAssetTitle(forWhom);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				var err = jqXHR.responseText
+				alert("An unexpected error occurred while creating Asset.")
+			}
+		});
+	}
+}
+
+function validateFields(){
+    var flag = true
+	if($("#sme1").val()=='0' || $("#sme2").val()=='0' || $("#appOwner").val()=='0' ){
+		flag = false
+		alert("Please De-select 'Add-Person' Option from sme , sme2 or appOwner select")
+		return flag
+	} else if (isNaN($("#shutdownDuration").val()) || isNaN($("#startupDuration").val()) || isNaN($("#testingDuration").val())){
+		flag = false
+		alert("Please enter numeric value for Shutdown Duration, Startup Duration, Testing Duration ")
+		return flag
+	} else {
+		$('select[name*="asset_"]').each( function() {
+			if( $(this).val() == 'null' )
+				flag = false
+		})
+		if( ! flag )
+			alert("Please select a valid asset for all dependencies ")
+	}
+	return flag
+}

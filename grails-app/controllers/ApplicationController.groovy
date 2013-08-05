@@ -191,8 +191,13 @@ class ApplicationController {
 					appMoveInstance.errors.allErrors.each { println it }
 				}
 			}
-			session.APP?.JQ_FILTERS = params
-			redirect( action:list)
+			if(params.showView == 'showView'){
+				forward(action:'show', params:[id: applicationInstance.id, errors:errors])
+				
+			}else{
+				session.APP?.JQ_FILTERS = params
+				redirect( action:list)
+			}
 		}
 		else {
 			flash.message = "Application not created"

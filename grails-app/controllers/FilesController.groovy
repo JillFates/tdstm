@@ -161,8 +161,13 @@ class FilesController {
 					
 					def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, filesInstance, loginUser, project)
 					flash.message += "</br>"+errors 
-			        session.FILES?.JQ_FILTERS = params
-					redirect( action:list)
+					if(params.showView == 'showView'){
+						forward(action:'show', params:[id: filesInstance.id, errors:errors])
+						
+					}else{
+				        session.FILES?.JQ_FILTERS = params
+						redirect( action:list)
+					}
 				}
 				else {
 					flash.message = "Storage not created"

@@ -13,7 +13,7 @@
 	$("#appOwner option:first").after(myOption);
 	
 </script>
-<g:form method="post" action="save" onsubmit="return validateFields()">
+<g:form method="post" action="save" name="createAssetsFormId" onsubmit="return validateFields()">
 	<input type="hidden" id="appl_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="appl_sme" name="appSmeFilter" value="" />
 	<input type="hidden" id="appl_validation" name="appValidationFilter" value="" />
@@ -333,7 +333,9 @@
 					<input name="project.id" type="hidden" value="${projectId}" />
 					<input type="hidden" id="create_supportAddedId" name="addedSupport" value ="0"/>
 					<input type="hidden" id="create_dependentAddedId" name="addedDep" value ="0"/>
-					<span class="button"><g:actionSubmit class="save" value="Save" /> </span>
+					<input name="showView" id="showView" type="hidden" value=""/>
+					<span class="button"><g:actionSubmit class="save" value="Save/Close" action="save" /></span>
+					<span class="button"><input type="button" class="save" value="Save/Show" onclick="saveToShow('Application')"/> </span>
 				</div></td>
 		</tr>
 	</table>
@@ -343,24 +345,4 @@
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')
 	
-    function validateFields(){
-	    var flag = true
-		if($("#sme1").val()=='0' || $("#sme2").val()=='0' || $("#appOwner").val()=='0' ){
-			flag = false
-			alert("Please De-select 'Add-Person' Option from sme , sme2 or appOwner select")
-			return flag
-		} else if (isNaN($("#shutdownDuration").val()) || isNaN($("#startupDuration").val()) || isNaN($("#testingDuration").val())){
-			flag = false
-			alert("Please enter numeric value for Shutdown Duration, Startup Duration, Testing Duration ")
-			return flag
-		} else {
-			$('select[name*="asset_"]').each( function() {
-				if( $(this).val() == 'null' )
-					flag = false
-			})
-			if( ! flag )
-				alert("Please select a valid asset for all dependencies ")
-		}
-		return flag
-	}
 </script>
