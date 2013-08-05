@@ -18,13 +18,16 @@
 	<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" 
 		href="${resource(dir:'plugins/jquery-ui-1.8.15/jquery-ui/themes/ui-lightness',file:'jquery-ui-1.8.15.custom.css')}"/>
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'combox.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'select2.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'combox.css')}" />
     <g:javascript library="prototype" />
     <g:javascript src="jquery-1.9.1.js"/>	
 	<g:javascript src="jquery-1.9.1-ui.js"/>
 	<g:javascript src="datetimepicker.js"/>
 	<g:javascript src="jquery-migrate-1.0.0.js"/>
     <g:javascript src="crawler.js" />
-    <g:javascript src="jquery.combox.js"/>
+	<g:javascript src="select2.js"/>
+	<g:javascript src="jquery.combox.js"/>	
     <%--
     <g:javascript src="bootstrap/bootstrap.min.js" /> 
     --%>

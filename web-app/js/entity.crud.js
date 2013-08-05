@@ -113,9 +113,9 @@ function addAssetDependency( type,forWhom ){
 	} else {
 		$("#"+forWhom+"SupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"', 'edit_supportAddedId')\"><span class='clear_filter'>X</span></a></td></tr>")
 	}
-	$("#dep_"+type+"_"+rowNo+"_"+forWhom).addClass("assetSelect");
+	$("#dep_"+type+"_"+rowNo+"_"+forWhom).addClass("assetSelect2");
 	$("#"+forWhom+"_"+type+"AddedId").val(parseInt(rowNo)-1)
-	$(".assetSelect").combobox();
+	$("select.assetSelect2").select2();
 }
 
 function deleteRow( rowId, forWhomId ){
