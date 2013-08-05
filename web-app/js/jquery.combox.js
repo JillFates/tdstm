@@ -23,6 +23,9 @@ $.widget( "custom.combobox", {
 										source : $.proxy(this, "_source")
 									}).tooltip({
 										tooltipClass : "ui-state-highlight"
+									}).click(function() { 
+										if(this.value == "Please select")
+											this.value = ""
 									})
 									
 									;
@@ -48,7 +51,6 @@ $.widget( "custom.combobox", {
 						},
 						_createShowAllButton : function() {
 							var input = this.input, wasOpen = false;
-							console.log(input.parent().prev())
 							$("<a>").attr("tabIndex", -1).appendTo(
 									this.wrapper).button({
 								icons : {
