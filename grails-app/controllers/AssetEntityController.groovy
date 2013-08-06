@@ -3976,7 +3976,7 @@ class AssetEntityController {
 				moveEventList.eachWithIndex{ event, i -> 
 					def colorCode = colorDiff * i
 					def colorsCode = "rgb(${colorCode},${colorCode},${colorCode})"
-					eventColorCode << [(event.id):colorsCode]
+					eventColorCode << [(event.name):colorsCode]
 				}
 				
 				// Create the Nodes
