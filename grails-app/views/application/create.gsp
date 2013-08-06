@@ -280,49 +280,8 @@
 					
 				</div></td>
 		</tr>
-		
-                             
 		<tr>
-			<td valign="top">
-				<div style="width: auto;">
-					<span style="float: left;"><h1>Supports:</h1></span>
-					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('support','create')" /></span>
-					<br/>
-					<table style="width: 100%;">
-						<thead>
-							<tr>
-								<th>Frequency</th>
-								<th>Class</th>
-								<th>Name</th>
-								<th>Type</th>
-								<th>Status</th>
-								<th>&nbsp;</th>
-							</tr>
-						</thead>
-						<tbody id="createSupportsList" class="assetDependent">
-						</tbody>
-					</table>
-				</div></td>
-			<td valign="top">
-				<div style="width: auto;">
-					<span style="float: left;"><h1>Is dependent on:</h1></span>
-					<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('dependent','create')" /></span>
-					<br/>
-					<table style="width: 100%;">
-						<thead>
-							<tr>
-								<th>Frequency</th>
-								<th>Class</th>
-								<th>Name</th>
-								<th>Type</th>
-								<th>Status</th>
-								<th>&nbsp;</th>
-							</tr>
-						</thead>
-						<tbody id="createDependentsList" class="assetDependent" >
-						</tbody>
-					</table>
-				</div></td>
+			<g:render template="../assetEntity/dependent" model="[whom:'create',supportAssets:[],dependentAssets:[]]"></g:render>
 		</tr>
 		<tr>
 			<td colspan="2">

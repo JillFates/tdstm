@@ -8,7 +8,7 @@
 	$(document).ready(function() { 
 		// Ajax to populate dependency selects in edit pages
 		var assetId = '${fileInstance.id}'
-		populateDependency(assetId,'files')
+		populateDependency(assetId,'files','edit')
 	})
 </script>
 <g:form method="post" action="update" name="editAssetsFormId">

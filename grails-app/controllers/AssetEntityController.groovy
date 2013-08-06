@@ -2545,15 +2545,9 @@ class AssetEntityController {
 			//Statements for JMESA integration
 			TableFacade tableFacade = new TableFacadeImpl("tag",request)
 			tableFacade.items = assetBeansList
-
-			def servers = AssetEntity.findAllByAssetTypeAndProject('Server',projectInstance)
-			def applications = Application.findAllByAssetTypeAndProject('Application',projectInstance)
-			def dbs = Database.findAllByAssetTypeAndProject('Database',projectInstance)
-			def files = Files.findAllByAssetTypeAndProject('Files',projectInstance)
-			def networks = AssetEntity.findAllByAssetTypeAndProject('Network',projectInstance)
-
-			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+			
+			def project = securityService.getUserCurrentProject()
+			def entities = assetEntityService.entityInfo( project )
 			
 			return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams,
 				assetBeansList:assetBeansList, moveBundleInstance:moveBundleInstance, project : projectInstance,
@@ -2562,9 +2556,11 @@ class AssetEntityController {
 				timeToUpdate : timeToUpdate ? timeToUpdate.SUPER_CONSOLE_REFRESH : "never", showAll : showAll,
 				applicationList : applicationList, appOwnerList : appOwnerList, appSmeList : appSmeList,
 				transitionStates : transitionStates, params:params, totalAssetsOnHold:totalAssetsOnHold,
-				totalSourcePending: totalSourcePending, totalTargetPending: totalTargetPending, role: role, teamType:teamType, assetDependency: new AssetDependency() ,
-				servers:servers , applications:applications ,dbs:dbs,files:files,networks:networks, dependencyType:dependencyType, dependencyStatus:dependencyStatus,
-				staffRoles:taskService.getRolesForStaff() ]
+				totalSourcePending: totalSourcePending, totalTargetPending: totalTargetPending, role: role, 
+				teamType:teamType, assetDependency: new AssetDependency() , servers:entities.servers , 
+				applications:entities.applications , dbs:entities.dbs, files:entities.files,
+				networks:entities.networks, dependencyType:entities.dependencyType, 
+				dependencyStatus:entities.dependencyStatus, staffRoles:taskService.getRolesForStaff() ]
 		} else {
 			flash.message = "Please create bundle to view Console"
 			redirect(controller:'project',action:'show')
@@ -4424,7 +4420,7 @@ class AssetEntityController {
 //					assetsMap:assetsMap,
 					nonNetworkTypes:nonNetworkTypes,
 					dependencyType:dependencyType, 
-					dependencyStatus:dependencyStatus ]
+					dependencyStatus:dependencyStatus, whom:params.whom]
 			} else {
 				render "Invalid asset id for the your current project was received."
 			}
@@ -4520,9 +4516,16 @@ class AssetEntityController {
 	  */
 	 def listDependencies ={
 		 def hasPerm = RolePermissions.hasPermission("EditAndDelete")
+		 def project = securityService.getUserCurrentProject()
+		 def entities = assetEntityService.entityInfo( project )
 		 if(!hasPerm){
 		 	redirect (controller:"project", action:"list")
 			flash.message = "${message(code:'user.access.denied')}"
+		 }else{
+		 	return [projectId: project.id, assetDependency: new AssetDependency(),
+				 	servers: entities.servers,applications: entities.applications,dbs: entities.dbs, 
+					files: entities.files, networks: entities.networks, 
+					dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus]
 		 }
 	 }
 	/**

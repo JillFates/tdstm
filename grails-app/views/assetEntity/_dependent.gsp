@@ -1,7 +1,7 @@
 <td valign="top" >
 	<div style="width: auto;" >
 		<span style="float: left;"><h1>Supports:</h1></span>
-		<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('support','edit')"></span>
+		<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('support','${whom}')"></span>
 		<br/>
 		<table style="width: 100%;">
 			<thead>
@@ -14,7 +14,7 @@
 					<th>&nbsp;</th>
 				</tr>
 			</thead>
-			<tbody id="editSupportsList">
+			<tbody id="${whom}SupportsList">
 				<g:each in="${supportAssets}" var="support" status="i">
 					<g:set var="type" value="${support?.asset?.assetType}"></g:set>
 					<tr id='row_s_${i}_${support.id}'>
@@ -31,7 +31,7 @@
 						</td>
 						<td><g:select name="dtype_support_${support.id}" value="${support.type}" from="${dependencyType.value}" optionValue="value" /></td>
 						<td><g:select name="status_support_${support.id}" value="${support.status}" from="${dependencyStatus.value}" optionValue="value" /></td>
-						<td><a href="javascript:deleteRow('row_s_${i}_${support.id}', 'edit_supportAddedId')"><span class='clear_filter'>X</span></a></td>
+						<td><a href="javascript:deleteRow('row_s_${i}_${support.id}', '${whom}_supportAddedId')"><span class='clear_filter'>X</span></a></td>
 					</tr>
 				</g:each>
 			</tbody>
@@ -41,7 +41,7 @@
 <td valign="top">
 	<div style="width: auto;">
 		<span style="float: left;"><h1>Is dependent on:</h1></span>
-		<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('dependent', 'edit')"></span>
+		<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('dependent', '${whom}')"></span>
 		<br/>
 		<table style="width: 100%;">
 			<thead>
@@ -54,7 +54,7 @@
 					<th>&nbsp;</th>
 				</tr>
 			</thead>
-			<tbody id="editDependentsList">
+			<tbody id="${whom}DependentsList">
 			<g:each in="${dependentAssets}" var="dependent" status="i">
 			   <g:set var="type" value="${dependent?.dependent?.assetType}"></g:set>
 				<tr id='row_d_${i}_${dependent.id}'>
@@ -71,7 +71,7 @@
 					</td>
 					<td><g:select name="dtype_dependent_${dependent.id}" value="${dependent.type}" from="${dependencyType.value}" optionValue="value"/></td>
 					<td><g:select name="status_dependent_${dependent.id}" value="${dependent.status}" from="${dependencyStatus.value}" optionValue="value"/></td>
-					<td><a href="javascript:deleteRow('row_d_${i}_${dependent.id}', 'edit_dependentAddedId')"><span class='clear_filter'>X</span></a></td>
+					<td><a href="javascript:deleteRow('row_d_${i}_${dependent.id}', '${whom}_dependentAddedId')"><span class='clear_filter'>X</span></a></td>
 				</tr>
 			</g:each>
 			</tbody>

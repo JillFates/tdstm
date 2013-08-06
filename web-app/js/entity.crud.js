@@ -658,21 +658,21 @@ function manipulateFields( val ){
 	}
 } 
 
-function populateDependency(assetId, whom){
+function populateDependency(assetId, whom, thisDialog){
 	$(".updateDep").attr('disabled','disabled')
-	jQuery.ajax({
-		url: contextPath+'/assetEntity/populateDependency',
-		data: {'id':assetId},
-		type:'POST',
-		success: function(data) { 
-			$("#"+whom+"DependentId").html(data)
-			$(".updateDep").removeAttr('disabled')
-			$(".assetSelect").combobox();
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			alert("An unexpected error occurred while populating dependent asset.")
-		}
-	});
+		jQuery.ajax({
+			url: contextPath+'/assetEntity/populateDependency',
+			data: {'id':assetId,'whom':thisDialog},
+			type:'POST',
+			success: function(data) { 
+				$("#"+whom+"DependentId").html(data)
+				$(".updateDep").removeAttr('disabled')
+				$(".assetSelect").combobox();
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert("An unexpected error occurred while populating dependent asset.")
+			}
+		});
 }
 
 function showTask(selected){

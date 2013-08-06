@@ -28,7 +28,7 @@
 
 		// Ajax to populate dependency selects in edit pages
 		var assetId = '${assetEntityInstance.id}'
-		populateDependency(assetId, 'asset')
+		populateDependency(assetId, 'asset', 'edit')
 
 		 $(".assetSelect").combobox();
 	})

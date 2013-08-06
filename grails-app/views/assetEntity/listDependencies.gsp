@@ -77,6 +77,7 @@
 			<div id="showEntityView" style="display: none;"></div>
 			<div id="editEntityView" style="display: none;"></div>
 			<jqgrid:wrapper id="dependencyGridId" />
+			<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
 		</div>
 	</body>
 </html>

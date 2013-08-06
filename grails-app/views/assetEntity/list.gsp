@@ -189,25 +189,7 @@
 		<div id="showEntityView" style="display: none;"></div>
 		<div id="editEntityView" style="display: none;"></div>
 		<div id="editManufacturerView" style="display: none;"></div>
-		<div style="display: none;">
-			<table id="assetDependencyRow">
-				<tr>
-					<td><g:select name="dataFlowFreq" from="${assetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
-					<td><g:select name="entity" from="['Server','Application','Database','Storage','Network']" onchange='updateAssetsList(this.name, this.value)'></g:select></td>
-					<td class='combo-td'><span id="Server"><g:select  name="asset" id="dependenciesId" from="${servers}" optionKey="${-2}" optionValue="${1}" noSelection="${['null':'Please select']}" style="width:120px;"></g:select></span></td>
-					<td><g:select name="dtype" from="${dependencyType.value}"  optionValue="value"></g:select></td>
-					<td><g:select name="status" from="${dependencyStatus.value}" optionValue="value"></g:select></td>
-				</tr>
-			</table>
-		</div>
-		<%-- This DIV is used by the Asset Dependency DIVs to populate the form --%>
-		<div style="display: none;">
-		<%-- The "Server" SELECT was duplicated above so we are leveraging it above by adding the SPAN tag there. --%>
-			<span id="Application"><g:select name="asset" from="${applications}" optionKey="${-2}" optionValue="${1}" noSelection="${['null':'Please select']}" style="width:90px;"></g:select></span>
-			<span id="Database"><g:select name="asset" from="${dbs}" optionKey="${-2}" optionValue="${1}" noSelection="${['null':'Please select']}" style="width:90px;"></g:select></span>
-			<span id="Storage"><g:select name="asset" from="${files}" optionKey="${-2}" optionValue="${1}" noSelection="${['null':'Please select']}" style="width:90px;"></g:select></span>
-			<span id="Network"><g:select name="asset" from="${networks}" optionKey="${-2}" optionValue="${1}" noSelection="${['null':'Please select']}" style="width:90px;"></g:select></span>
-		</div>
+		<g:render template="newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
 		<script>
 			currentMenuId = "#assetMenu";
 			$("#assetMenuId a").css('background-color','#003366')

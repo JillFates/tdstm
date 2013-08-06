@@ -7,7 +7,7 @@
 	$(document).ready(function() { 
 		// Ajax to populate dependency selects in edit pages
 		var assetId = '${applicationInstance.id}'
-		populateDependency(assetId, 'application')
+		populateDependency(assetId, 'application','edit')
 
 		var myOption = "<option value='0'>Add Person...</option>"
 
