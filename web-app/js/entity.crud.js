@@ -412,7 +412,7 @@ function deleteAssets(action){
   	if(!assetArr){
 		alert('Please select the Asset');
 	}else{
-		if(confirm("There is no undo! Are you sure you want to delete these "+action+"..?")){
+		if(confirm("You are about to delete all of the selected assets for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel.")){
 			jQuery.ajax({
 			url:contextPath+'/assetEntity/deleteBulkAsset',
 			data: {'assetLists':assetArr,'type':action},
