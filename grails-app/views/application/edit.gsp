@@ -217,7 +217,8 @@
 								<td class="label ${config.shutdownBy}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
 								<td >
 								   <g:render template="bySelect" model="[name:'shutdownBy' , id:'shutdownByEditId', className:config.shutdownBy]"></g:render>
-									<input type="checkbox" id="shutdownFixedId"  name="shutdownFixed" value="${applicationInstance.shutdownFixed}"
+									<input type="checkbox" id="shutdownByEditIdFixed"  name="shutdownFixed" value="${applicationInstance.shutdownFixed} "
+										${!applicationInstance.shutdownBy || applicationInstance.shutdownBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" 
 										${applicationInstance.shutdownFixed==1? 'checked="checked"' : ''}/>Fixed
 								</td>
@@ -231,7 +232,8 @@
 							<td class="label ${config.startupBy}" nowrap="nowrap"><label for="startupBy">Startup By</label></td>
 								<td colspan="1" nowrap="nowrap">
 								   <g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId', className:config.startupBy]"></g:render>
-									<input type="checkbox" id="startupFixed" name="startupFixed" value="${applicationInstance.startupFixed}"
+									<input type="checkbox" id="startupByEditIdFixed" name="startupFixed" value="${applicationInstance.startupFixed}"
+										${!applicationInstance.startupBy || applicationInstance.startupBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" 
 										${applicationInstance.startupFixed ==1? 'checked="checked"' : ''}/>Fixed
 								</td>
@@ -245,7 +247,8 @@
 								<td class="label ${config.testingBy}" nowrap="nowrap"><label for="testingBy">Testing By</label></td>
 								<td colspan="1" nowrap="nowrap">
 								  <g:render template="bySelect" model="[name:'testingBy', id:'testingByEditId', className:config.testingBy]"></g:render>
-									<input type="checkbox" id="testingFixedId" name="testingFixed" value="${applicationInstance.testingFixed}"
+									<input type="checkbox" id="testingByEditIdFixed" name="testingFixed" value="${applicationInstance.testingFixed}"
+										${!applicationInstance.testingBy || applicationInstance.testingBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" 
 										${applicationInstance.testingFixed ==1? 'checked="checked"' : ''}/>Fixed
 								</td>

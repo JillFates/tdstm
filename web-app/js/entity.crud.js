@@ -803,3 +803,16 @@ function validateFields(){
 	}
 	return flag
 }
+
+/**
+ * function is used to make hard assgined check box enabled - disabled based on criteria
+ * @param value : value of select
+ * @param gid : id of select
+ */
+function changeHard(value, gid){
+	if(value.indexOf('@')==0){
+		$("#"+gid+"Fixed").removeAttr("checked").attr("disabled", "disabled").val(0);
+	}else {
+		$("#"+gid+"Fixed").removeAttr("disabled");
+	}
+}

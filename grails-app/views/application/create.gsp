@@ -223,8 +223,8 @@
 								<td class="label ${config.shutdownBy}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
 								<td colspan="1" nowrap="nowrap">
 								  <g:render template="bySelect" model="[name:'shutdownBy', id:'shutdownById', className:config.shutdownBy]"></g:render>
-									<input type="checkbox" id="shutdownFixedId" name="shutdownFixed" value="0"
-										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />Fixed
+									<input type="checkbox" id="shutdownByIdFixed" name="shutdownFixed" value="0"
+										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" disabled="disabled"/>Fixed
 								</td>
 								<td class="label ${config.shutdownDuration}" nowrap="nowrap"><label for="shutdownDuration">Shutdown Duration </label>
 								</td>
@@ -236,8 +236,8 @@
 							<td class="label ${config.startupBy}" nowrap="nowrap"><label for="startupBy">Startup By</label></td>
 								<td colspan="1" nowrap="nowrap">
 								   <g:render template="bySelect"  model="[name:'startupBy', id:'startupById', className:config.startupBy]"></g:render>
-									<input type="checkbox" id="startupFixed"  name="startupFixed" value="0"
-										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />Fixed
+									<input type="checkbox" id="startupByIdFixed"  name="startupFixed" value="0"
+										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"  disabled="disabled"/>Fixed
 								</td>
 								
 								<td class="label ${config.startupDuration}" nowrap="nowrap"><label for="startupDuration">Startup Duration </label>
@@ -249,7 +249,7 @@
 								<td class="label ${config.testingBy}" nowrap="nowrap"><label for="testingBy">Testing By</label></td>
 								<td colspan="1" nowrap="nowrap">
 								  <g:render template="bySelect" model="[name:'testingBy', id:'testingById', className:config.testingBy]"></g:render>
-									<input type="checkbox" id="testingFixedId" name="testingFixed" value="0" 
+									<input type="checkbox" id="testingByIdFixed" name="testingFixed" value="0"  disabled="disabled"
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />Fixed
 								</td>
 								<td class="label ${config.shutdownDuration}" nowrap="nowrap"><label for="testingDuration">Testing Duration </label>

@@ -1,4 +1,4 @@
-<select  id="${id}" class="${className}" name="${name}" style="width: 90px">
+<select  id="${id}" class="${className}" name="${name}" style="width: 90px" onchange="changeHard(this.value, this.id)">
 	<option value="" selected="selected">Select...</option>
 	<optgroup label="By Reference" id="smeGroup">
 		<option value="#SME1">SME1</option>
