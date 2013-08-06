@@ -54,7 +54,8 @@ class UserLoginController {
 		def companyId
 		def userLoginInstanceList
 		def userLogin = securityService.getUserLogin()
-		def filterParams = ['username':params.username, 'fullname':params.person, 'roles':params.roles, 'company':params.company,'lastLogin':params.lastLogin, 'dateCreated':params.dateCreated, 'expiryDate':params.expiryDate]
+		def filterParams = ['username':params.username, 'fullname':params.fullname, 'roles':params.roles, 'company':params.company,
+			'lastLogin':params.lastLogin, 'dateCreated':params.dateCreated, 'expiryDate':params.expiryDate]
 		
 		// Validate that the user is sorting by a valid column
 		if( ! sortIndex in filterParams)
