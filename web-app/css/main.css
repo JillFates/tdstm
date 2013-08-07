@@ -468,13 +468,15 @@ span.cellWithoutBackground
 .H{
 	background-color:#CCCCCC !important;
 }
-.stylingNote{
+.legend{
 	display:none;
 	position:absolute;
-	margin-left:1124px;
+	margin-top:-19px;
 	width:350px;
 }
-
+.legendTable{
+	background-color: white !important;
+}
 div.field_list{
 	border: 1px solid #63A242;
 	display: none;

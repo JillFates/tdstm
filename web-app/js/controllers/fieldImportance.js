@@ -42,11 +42,21 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 	$scope.data = ['C','I','N','H'];
 	//initializing section
 	$scope.section = {'AssetEntity':'h','Application':'h','Database':'h','Files':'h'};
+	
+	//This code is used to Toggle Legend div.
+	$scope.image ='h'
+	$scope.showImage = function( ) {
+		return $scope.image == 's';
+	}
+	$scope.toggleImage = function( s ) {
+		$scope.image = $scope.image == 'h' ? 's' : 'h';
+	}
+	
 	//initializing notes to display styling notes div.
-	$scope.notes=[{'id':'C','field':'Name','type':'ServerX05','imp':'C-Critical'},
-	              {'id':'I','field':'Type','type':'Server','imp':'I-Important'},
-	              {'id':'N','field':'Manufacturer','type':'HP','imp':'N-Normal'},
-	              {'id':'H','field':'Model','type':'Dell','imp':'H-Hidden'}];
+	$scope.notes=[{'id':'C','field':'Name','type':'ServerX05','imp':'C)Critical'},
+	              {'id':'I','field':'Type','type':'Server','imp':'I)Important'},
+	              {'id':'N','field':'Manufacturer','type':'HP','imp':'N)Normal'},
+	              {'id':'H','field':'Model','type':'Dell','imp':'H)Hidden'}];
 	
 	$scope.toggleSection = function( s ) {
 		$scope.section[s] = $scope.section[s] == 'h' ? 's' : 'h';
@@ -54,10 +64,10 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 		if($scope.section[s] == 's')
 			$scope.helpSection(s)
 		//for time being used javaScript to show/hide styling div.
-		$(".stylingNote").show();
+		$(".legend").show();
 		var imglength=$('.dgImages:visible').length;
 		if($scope.section[s] == 'h' && imglength==3)
-			$(".stylingNote").hide();
+			$(".legend").hide();
 	}
 
 	$scope.showSection = function( s ) {
