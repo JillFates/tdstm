@@ -145,7 +145,7 @@
                 <label for="description">Room Object:</label>
             </td>
             <td valign="top" class="value ${hasErrors(bean:modelInstance,field:'roomObject','errors')}">
-                <input type="checkbox" id="roomObject" name="roomObject" ${modelInstance.roomObject ? 'checked="checked"' : ''}/>
+                <g:checkBox id="roomObject" name="roomObject" value='${modelInstance.roomObject}'/>
             </td>
         	<td>Use Image:</td>
 	        <td>
