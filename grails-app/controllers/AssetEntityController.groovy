@@ -4585,8 +4585,8 @@ class AssetEntityController {
 				[
 				it.assetName, it.assetType, it.assetBundle, it.type,
 				it.dependentName, it.dependentType, it.dependentBundle,
-				it.dataFlowFreq, it.status, it.assetId, it.dependentId
-				], id: it.id,
+				it.frequency, it.status, it.assetId, it.dependentId
+				], id: it.id
 			]}
 		
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]

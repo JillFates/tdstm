@@ -18,13 +18,13 @@
 				<jqgrid:grid id="dependencyGridId" url="'${createLink(action: 'listDepJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
 					colNames="'Asset','AssetClass', 'Bundle','Type', 'Depends On', 'Dep Class', 'Dep Bundle', 'Frequency', 'Status'"
-					colModel="{name:'assetName', index: 'assetId', width:'200',formatter: myLinkFormatter},
+					colModel="{name:'assetName', index: 'assetName', width:'200',formatter: myLinkFormatter},
 								  {name:'assetType', editable: true},
-								  {name:'assetbundle', editable: true},
+								  {name:'assetBundle', editable: true},
 								  {name:'type', editable: true}, 
 								  {name:'dependentName', editable: true,formatter: dependentFormatter,width:'200'},
-								  {name:'depType', editable: true},
-								  {name:'depBundle', editable: true},
+								  {name:'dependentType', editable: true},
+								  {name:'dependentBundle', editable: true},
 								  {name:'frequency', editable: true,width:'90'},
 								  {name:'status', editable: true, width:'80'}"
 					sortname="'assetName'"
