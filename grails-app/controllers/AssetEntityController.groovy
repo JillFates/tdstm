@@ -3344,10 +3344,10 @@ class AssetEntityController {
 	 * @return : model list 
 	 */
 	def getModelSortedByStatus(manufacturerInstance){
-		def models= []
-		def modelListFull = Model.findAllByManufacturerAndModelStatus( manufacturerInstance,'full',[sort:'modelName',order:'asc'] )
-		def modelListValid =Model.findAllByManufacturerAndModelStatus(manufacturerInstance,'valid',[sort:'modelName',order:'asc'] )
-		def modelListNew = Model.findAllByManufacturerAndModelStatusInList(manufacturerInstance,['new','',null],[sort:'modelName',order:'asc'] )
+		def models = Model.findAllByManufacturer( manufacturerInstance,[sort:'modelName',order:'asc'] )
+		def modelListFull = models.findAll{it.modelStatus == 'full'}
+		def modelListValid = models.findAll{it.modelStatus == 'valid'}
+		def modelListNew = models.findAll{!['full','valid'].contains(it.modelStatus)}
 		models = modelListFull+modelListValid+modelListNew
 		
 		return models
