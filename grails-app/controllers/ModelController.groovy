@@ -1396,7 +1396,7 @@ class ModelController {
 		def sortedModel = []
 		def validModel = models.findAll{it.modelStatus == 'valid'}
 		def fullModel = models.findAll{it.modelStatus == 'full'}
-		def newmodel =  models.findAll{it.modelStatus == 'new'} 
+		def newmodel =  models.findAll{!['full','valid'].contains(it.modelStatus)} 
 		
 		sortedModel = validModel + fullModel + newmodel
 		
