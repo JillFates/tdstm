@@ -7,7 +7,6 @@
     <title>Edit Bundle</title>
 
 	<link rel="stylesheet" href="${resource(dir:'css',file:'jquery-ui.css')}" type="text/css"/>
-	<g:javascript src="jquery/jquery.ui.widget.js"/>
 	<g:javascript src="jquery/jquery.ui.mouse.js"/>
 	<g:javascript src="jquery/jquery.ui.slider.js"/>
 
