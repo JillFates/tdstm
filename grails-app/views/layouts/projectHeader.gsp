@@ -75,6 +75,7 @@
     }
     def partyGroup = session.getAttribute("PARTYGROUP")?.PARTYGROUP ;
     def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");
+	def isIE7 = request.getHeader("User-Agent").contains("MSIE 7");
 	def isMDev = request.getHeader("User-Agent").contains("Mobile");
 	
 	def user = UserLogin.findByPerson( person )
@@ -103,8 +104,8 @@
           <shiro:isLoggedIn>
 			<strong>
 			<div style="float: left;">
-			<g:if test="${isIE6}">
-				<span><img title="Note: MS IE6 has limited capability so functions have been reduced." src="${resource(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
+			<g:if test="${isIE6 || isIE7}">
+				<span><img title="Note: MS IE6 and MS IE7 has limited capability so functions have been reduced." src="${resource(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
 			</g:if>
 			<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onmouseover="waitForMenu('#userMegaMenu')" onmouseout="waitForMenu('', '${isMDev}')" onComplete="updatePersonDetails(e)" style="float:left;display:inline">
 			&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name }

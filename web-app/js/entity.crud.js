@@ -1,5 +1,6 @@
 function createEntityView(e, type,source,rack,roomName,location,position){
-   	 getHelpTextAsToolTip(type);
+	 if(!isIE7OrLesser) 
+		getHelpTextAsToolTip(type);
 	 var resp = e.responseText;
 	 $("#createEntityView").html(resp);
 	 $("#createEntityView").dialog('option', 'width', 'auto')
@@ -86,7 +87,8 @@ function editEntityView(e, type,source,rack,roomName,location,position){
 	 $("#editEntityView").dialog('open');
 	 $("#showEntityView").dialog('close');
 	 $("#createEntityView").dialog('close');
-	 getHelpTextAsToolTip(type);
+	 if(!isIE7OrLesser)
+		 getHelpTextAsToolTip(type);
 	 updateAssetTitle(type)
 	 updateAssetInfo(source,rack,roomName,location,position)
 }
@@ -172,7 +174,8 @@ function showManufacView(e, forWhom){
     	$("#manufacturerCreateId").html(resp);
    
     $("#manufacturers").removeAttr("multiple")
-    $(".assetSelect").combobox()
+    if(!isIE7OrLesser)
+    	$(".assetSelect").combobox()
 }
 function selectModel(value, forWhom){
 	var val = value;
@@ -187,10 +190,10 @@ function showModelView(e, forWhom){
     if(forWhom == "assetAudit"){
     	$("#models").attr("onChange","editModelAudit(this.value)")
     }
-    $(".assetSelect").combobox();
-    
-    if(!isIE7OrLesser)
-    	$(".assetSelect2").select2();
+    if(!isIE7OrLesser){
+    	$(".assetSelect").combobox()
+    	$("select.assetSelect2").select2();
+    }
 }
 function showComment(id , action){
 	   var id = id
@@ -672,7 +675,8 @@ function populateDependency(assetId, whom, thisDialog){
 			success: function(data) { 
 				$("#"+whom+"DependentId").html(data)
 				$(".updateDep").removeAttr('disabled')
-				$(".assetSelect").combobox();
+				if(!isIE7OrLesser)
+					$(".assetSelect").combobox();
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				alert("An unexpected error occurred while populating dependent asset.")
@@ -719,11 +723,11 @@ function assetFieldImportance(phase,type){
 			$("td,input,select").removeClass("H")
 			$("td,input,select").removeClass("I")
 			$("td,input,select").removeClass("N")
-			Object.keys(resp).forEach(function(key) {
+			for (var key in resp) {
 				var value = resp[key]
 				$(".dialog input[name="+key+"],select[name="+key+"],input[name='"+key+".id'],select[name='"+key+".id']").addClass(value);
 				$(".dialog label[for="+key+"],label[for="+key+"Id]").parent().addClass(value);
-			});
+			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while getting asset.")
@@ -738,13 +742,13 @@ function getHelpTextAsToolTip(type){
 		data: {'type':type},
 		type:'POST',
 		success: function(resp) {
-			Object.keys(resp).forEach(function(key) {
-				var value = resp[key]
-				$(".dialog input[name="+key+"],input[name='"+key+".id']" ).tooltip({ position: {my: "left top"} });
-				$(".dialog label[for="+key+"],label[for="+key+"Id]").tooltip({ position: {my: "left top"} });
-				$(".dialog input[name="+key+"],input[name='"+key+".id']").attr("title",value);
-				$(".dialog label[for="+key+"],label[for="+key+"Id]").attr("title",value);
-				});
+			for (var key in resp) {
+					var value = resp[key]
+					$(".dialog input[name="+key+"],input[name='"+key+".id']" ).tooltip({ position: {my: "left top"} });
+					$(".dialog label[for="+key+"],label[for="+key+"Id]").tooltip({ position: {my: "left top"} });
+					$(".dialog input[name="+key+"],input[name='"+key+".id']").attr("title",value);
+					$(".dialog label[for="+key+"],label[for="+key+"Id]").attr("title",value);
+				}
 			},
 		error: function(jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while getting asset.")

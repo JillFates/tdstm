@@ -26,9 +26,10 @@
 			$(".rackLabel").show()
 			$(".vmLabel").hide()
 		}
-		$(".assetSelect").combobox();
-		if(!isIE7OrLesser)
-			$(".assetSelect2").select2();
+		if(!isIE7OrLesser){
+			$("select.assetSelect2").select2();
+			$(".assetSelect").combobox();
+		}
 	})
 	
 </script>
