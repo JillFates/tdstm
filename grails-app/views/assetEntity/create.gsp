@@ -27,6 +27,8 @@
 			$(".vmLabel").hide()
 		}
 		$(".assetSelect").combobox();
+		if(!isIE7OrLesser)
+			$(".assetSelect2").select2();
 	})
 	
 </script>
@@ -92,8 +94,7 @@
 								<td class="label ${config.model}" nowrap="nowrap"><label for="model">Model</label></td>
 								<td>
 								<div id="modelCreateId">
-								   <g:select id="model" class="${config.model} assetSelect" name ="model.id" from="${models}" value= "${assetEntityInstance.model}" noSelection="${[null:' Unassigned']}" tabindex="14" 
-								  		optionKey="id" optionValue="${{it.modelName+' '+(it.modelStatus =='new' || !it.modelStatus ? '?' :'')}}" onChange="setType(this.value, 'Create')"/>
+								  		<g:render template="modelView"  model="[clazz:config.model, models:models, assetEntity:assetEntityInstance, forWhom:'Create']" />
 								 </div>
 								</td>
 								<td class="label ${config.os}" nowrap="nowrap"><label for="os">OS</label></td>

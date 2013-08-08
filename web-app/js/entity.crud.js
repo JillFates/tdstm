@@ -187,7 +187,10 @@ function showModelView(e, forWhom){
     if(forWhom == "assetAudit"){
     	$("#models").attr("onChange","editModelAudit(this.value)")
     }
-    $(".assetSelect").combobox()
+    $(".assetSelect").combobox();
+    
+    if(!isIE7OrLesser)
+    	$(".assetSelect2").select2();
 }
 function showComment(id , action){
 	   var id = id

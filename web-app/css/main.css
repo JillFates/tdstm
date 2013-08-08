@@ -646,3 +646,6 @@ margin: -8px !important;
 .depSelect {
     width: 120px
 }
+.modelSelect {
+	width: 140px !important;	
+}

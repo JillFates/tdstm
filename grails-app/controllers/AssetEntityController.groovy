@@ -3335,7 +3335,7 @@ class AssetEntityController {
 			def manufacturerInstance = Manufacturer.read(manufacturer)
 			models=getModelSortedByStatus(manufacturerInstance)
 		}
-		render (view :'ModelView' , model:[models : models, forWhom:params.forWhom])
+		render (view :'_modelView' , model:[models : models, forWhom:params.forWhom])
 	}
 	
 	/**
@@ -3348,7 +3348,7 @@ class AssetEntityController {
 		def modelListFull = models.findAll{it.modelStatus == 'full'}
 		def modelListValid = models.findAll{it.modelStatus == 'valid'}
 		def modelListNew = models.findAll{!['full','valid'].contains(it.modelStatus)}
-		models = modelListFull+modelListValid+modelListNew
+		models = ['Validated':modelListValid, 'Unvalidated':modelListFull+modelListNew ]
 		
 		return models
 	}
