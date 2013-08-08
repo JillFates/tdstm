@@ -115,7 +115,9 @@ function addAssetDependency( type,forWhom ){
 	}
 	$("#dep_"+type+"_"+rowNo+"_"+forWhom).addClass("assetSelect2");
 	$("#"+forWhom+"_"+type+"AddedId").val(parseInt(rowNo)-1)
-	$("select.assetSelect2").select2();
+	
+	if(!isIE7OrLesser)
+		$("select.assetSelect2").select2();
 }
 
 function deleteRow( rowId, forWhomId ){
@@ -134,7 +136,7 @@ function updateAssetsList(name, assetType, assetId ) {
 	var asc = $("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']")
 	asc.removeAttr('onmousedown')
 	asc.html($("#"+claz+" select").html())
-	//console.log("in updateAssetsList name="+name+", claz="+claz+", assetType="+assetType+", assetId="+assetId)
+	console.log("in updateAssetsList name="+name+", claz="+claz+", assetType="+assetType+", assetId="+assetId)
 
 	// Set the value if we were passing in the original value for a pre-existing asset
 	if ( 
