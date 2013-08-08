@@ -10,7 +10,7 @@
 			<td class='combo-td'>
 				<span id="${forWhom}"><g:select name="asset" id="dependenciesId" 
 					from="${entities}" optionKey="${-2}" optionValue="${1}" 
-					noSelection="${['null':'Please select']}" style="width:90px;"></g:select>
+					noSelection="${['null':'Please select']}" class="depSelect"></g:select>
 				</span>
 			</td>
 			<td><g:select name="dtype" from="${dependencyType?.value}"  optionValue="value"></g:select></td>
@@ -20,13 +20,13 @@
 </div>
 <div style="display: none;">
 	<span id="Server"><g:select name="asset" from="${servers}" optionKey="${-2}" optionValue="${1}" 
-			noSelection="${['null':'Please select']}" style="width:90px;"></g:select></span>
+			noSelection="${['null':'Please select']}" class="depSelect"></g:select></span>
 	<span id="Application"><g:select name="asset" from="${applications}" optionKey="${-2}" optionValue="${1}" 
-			noSelection="${['null':'Please select']}" style="width:90px;"></g:select></span>
+			noSelection="${['null':'Please select']}" class="depSelect"></g:select></span>
 	<span id="Database"><g:select name="asset" from="${dbs}" optionKey="${-2}" optionValue="${1}" 
-			noSelection="${['null':'Please select']}" style="width:90px;"></g:select></span>
+			noSelection="${['null':'Please select']}" class="depSelect"></g:select></span>
 	<span id="Storage"><g:select name="asset" from="${files}" optionKey="${-2}" optionValue="${1}" 
-			noSelection="${['null':'Please select']}" style="width:90px;"></g:select></span>
+			noSelection="${['null':'Please select']}" class="depSelect"></g:select></span>
 	<span id="Network"><g:select name="asset" from="${networks}" optionKey="${-2}" optionValue="${1}" 
-			noSelection="${['null':'Please select']}" style="width:90px;"></g:select></span>
+			noSelection="${['null':'Please select']}" class="depSelect"></g:select></span>
 </div>

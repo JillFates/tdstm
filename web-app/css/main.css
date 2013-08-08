@@ -435,7 +435,7 @@ span.cellWithoutBackground
 	background-color: yellow;
 }
 .assetSelect{
-	width:105px;
+	width:135px;
 }
 #viewGraphSpanId{
 	position:relative;
@@ -642,4 +642,7 @@ margin: -8px !important;
 }
 .combo-td {
     width: 120px !important;	
+}
+.depSelect {
+    width: 120px
 }

@@ -53,6 +53,8 @@
      	var B2 = []
      	var taskManagerTimePref = "60"
 		var contextPath = "${request.contextPath}"
+		var isIE7OrLesser  = jQuery.browser.msie && parseInt(jQuery.browser.version) < 8 ? true : false  
+
    </script>
   </head>
 	<% def currProj = session.getAttribute("CURR_PROJ");
