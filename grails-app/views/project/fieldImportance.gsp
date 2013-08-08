@@ -9,16 +9,14 @@
 <g:javascript src="controllers/fieldImportance.js" />
 </head>
 <body>
-	<br>
-	<br>
 	<h1 class="assetFieldHeader1">Project Field Importance</h1>
 	<div ng-app="MyApp" id="ng-app" ng-controller="assetFieldImportanceCtrl">
 		<div class="legend" >
-				<h1 class="assetImage" ng-click="toggleImage()">Legend:
-					<img ng-show="showImage()" src="${resource(dir:'images',file:'triangle_right.png')}" /> 
-					<img ng-hide="showImage()" src="${resource(dir:'images',file:'triangle_down.png')}" /> 
+				<h1 class="assetImage" ng-click="toggleLegend()">Legend
+					<img ng-hide="showLegend()" src="${resource(dir:'images',file:'triangle_right.png')}" /> 
+					<img ng-show="showLegend()" src="${resource(dir:'images',file:'triangle_down.png')}" /> 
 				</h1>
-			<table class="legendTable" ng-hide="showImage()">
+			<table class="legendTable" ng-show="showLegend()">
 				<tr ng-repeat="note in notes">
 					<td>{{note.imp}}</td>
 					<td class="{{note.id}}">{{note.field}}</td>
@@ -29,7 +27,7 @@
 		<div data-ng-init="types=[{'id':'Application','name':'Application'},{'id':'AssetEntity','name':'AssetEntity'},{'id':'Database','name':'Database'},{'id':'Storage','name':'Files'}]">
 	<table class="fieldTable">
 		<tr ng-repeat="type in types">
-			<td class="assetTd" nowrap="nowrap"><h1 ng-click="toggleSection(type.name)" class="assetImage">{{type.id}}
+			<td class="assetTd" nowrap="nowrap"><h1 ng-click="toggleSection(type.name)" class="assetImage"><span ng-bind="type.id">Loading...</span>
 					<img ng-hide="showSection(type.name)"  class="dgImages" src="${resource(dir:'images',file:'triangle_right.png')}" /> 
 					<img ng-show="showSection(type.name)"  src="${resource(dir:'images',file:'triangle_down.png')}" /> </h1>
 			</td>

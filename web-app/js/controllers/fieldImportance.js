@@ -44,19 +44,21 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 	$scope.section = {'AssetEntity':'h','Application':'h','Database':'h','Files':'h'};
 	
 	//This code is used to Toggle Legend div.
-	$scope.image ='h'
-	$scope.showImage = function( ) {
-		return $scope.image == 's';
+	$scope.legend ='s'
+	$scope.showLegend = function( ) {
+		return $scope.legend == 's';
 	}
-	$scope.toggleImage = function( s ) {
-		$scope.image = $scope.image == 'h' ? 's' : 'h';
+	$scope.toggleLegend = function( s ) {
+		$scope.legend = $scope.legend == 'h' ? 's' : 'h';
 	}
 	
 	//initializing notes to display styling notes div.
-	$scope.notes=[{'id':'C','field':'Name','type':'ServerX05','imp':'C)Critical'},
-	              {'id':'I','field':'Type','type':'Server','imp':'I)Important'},
-	              {'id':'N','field':'Manufacturer','type':'HP','imp':'N)Normal'},
-	              {'id':'H','field':'Model','type':'Dell','imp':'H)Hidden'}];
+	$scope.notes = [
+		{'id':'C','field':'Name','type':'svoradb01','imp':'C)ritical'},
+	    {'id':'I','field':'Type','type':'Server','imp':'I)mportant'},
+	    {'id':'N','field':'Manufacturer','type':'HP','imp':'N)ormal'},
+	    {'id':'H','field':'*Custom ONLY*','type':'','imp':'H)idden'}
+	];
 	
 	$scope.toggleSection = function( s ) {
 		$scope.section[s] = $scope.section[s] == 'h' ? 's' : 'h';
@@ -66,7 +68,7 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 		//for time being used javaScript to show/hide styling div.
 		$(".legend").show();
 		var imglength=$('.dgImages:visible').length;
-		if($scope.section[s] == 'h' && imglength==3)
+		if ($scope.section[s] == 'h' && imglength==3)
 			$(".legend").hide();
 	}
 

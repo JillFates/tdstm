@@ -662,9 +662,9 @@ class ProjectController {
 	}
 	
 	/**
-	 * This action is used to render the static page
+	 * Action to render the Field Importance Show/Edit maintenance form for field importance and field tooltips
 	 */
-	def assetFields ={
+	def fieldImportance = {
 		return []
 	}
 	
