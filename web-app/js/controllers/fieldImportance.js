@@ -44,7 +44,7 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 	$scope.section = {'AssetEntity':'h','Application':'h','Database':'h','Files':'h'};
 	
 	//This code is used to Toggle Legend div.
-	$scope.legend ='s'
+	$scope.legend ='h'
 	$scope.showLegend = function( ) {
 		return $scope.legend == 's';
 	}

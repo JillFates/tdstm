@@ -27,7 +27,7 @@
 		<div data-ng-init="types=[{'id':'Application','name':'Application'},{'id':'AssetEntity','name':'AssetEntity'},{'id':'Database','name':'Database'},{'id':'Storage','name':'Files'}]">
 	<table class="fieldTable">
 		<tr ng-repeat="type in types">
-			<td class="assetTd" nowrap="nowrap"><h1 ng-click="toggleSection(type.name)" class="assetImage"><span ng-bind="type.id">Loading...</span>
+			<td class="assetTd" nowrap="nowrap"><h1 ng-click="toggleSection(type.name)" class="assetImage"><span ng-bind="type.id"></span>
 					<img ng-hide="showSection(type.name)"  class="dgImages" src="${resource(dir:'images',file:'triangle_right.png')}" /> 
 					<img ng-show="showSection(type.name)"  src="${resource(dir:'images',file:'triangle_down.png')}" /> </h1>
 			</td>
