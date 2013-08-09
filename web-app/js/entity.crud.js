@@ -115,11 +115,11 @@ function addAssetDependency( type,forWhom ){
 	} else {
 		$("#"+forWhom+"SupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"', 'edit_supportAddedId')\"><span class='clear_filter'>X</span></a></td></tr>")
 	}
-	$("#dep_"+type+"_"+rowNo+"_"+forWhom).addClass("assetSelect2");
+	$("#dep_"+type+"_"+rowNo+"_"+forWhom).addClass("assetSelect");
 	$("#"+forWhom+"_"+type+"AddedId").val(parseInt(rowNo)-1)
 	
 	if(!isIE7OrLesser)
-		$("select.assetSelect2").select2();
+		$("select.assetSelect").select2();
 }
 
 function deleteRow( rowId, forWhomId ){
@@ -140,6 +140,10 @@ function updateAssetsList(name, assetType, assetId ) {
 	asc.html($("#"+claz+" select").html())
 	console.log("in updateAssetsList name="+name+", claz="+claz+", assetType="+assetType+", assetId="+assetId)
 
+	if(assetId === undefined){
+		if(!isIE7OrLesser)
+	    	$("select.assetSelect").select2()
+	}
 	// Set the value if we were passing in the original value for a pre-existing asset
 	if ( 
 	  (claz == 'Application' && assetType == claz) ||
@@ -175,7 +179,7 @@ function showManufacView(e, forWhom){
    
     $("#manufacturers").removeAttr("multiple")
     if(!isIE7OrLesser)
-    	$(".assetSelect").combobox()
+    	$("select.assetSelect").select2()
 }
 function selectModel(value, forWhom){
 	var val = value;
@@ -191,8 +195,7 @@ function showModelView(e, forWhom){
     	$("#models").attr("onChange","editModelAudit(this.value)")
     }
     if(!isIE7OrLesser){
-    	$(".assetSelect").combobox()
-    	$("select.assetSelect2").select2();
+    	$("select.assetSelect").select2()
     }
 }
 function showComment(id , action){
@@ -644,7 +647,10 @@ function setType(id, forWhom){
 	new Ajax.Request(contextPath+'/assetEntity/getAssetModelType?id='+id,{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
 			$("#assetType"+forWhom+"Id").val(data.responseText)
+			if(!isIE7OrLesser)
+				$("select.assetSelect").select2()
 			manipulateFields(data.responseText)
+			
 		}}
 	)	
 	
@@ -676,7 +682,7 @@ function populateDependency(assetId, whom, thisDialog){
 				$("#"+whom+"DependentId").html(data)
 				$(".updateDep").removeAttr('disabled')
 				if(!isIE7OrLesser)
-					$(".assetSelect").combobox();
+					$("select.assetSelect").select2();
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				alert("An unexpected error occurred while populating dependent asset.")

@@ -1,7 +1,7 @@
 <%--<g:select id = "models" name="model.id" class="assetSelect" noSelection="${[null:' Unassigned']}" from="${models}" optionKey="id" optionValue="modelName"  value="${modelsList}"  
  optionValue="${{it.modelName+' '+(it.modelStatus =='new' || !it.modelStatus ? '?' :'')}}" onChange="setType(this.value,'${forWhom}')"/>--%>
 
-<select id="model" class="assetSelect2 modelSelect ${clazz}" name="model.id"
+<select id="model" class="assetSelect modelSelect ${clazz}" name="model.id"
 		onchange="setType(this.value, '${forWhom}')">
 	<option value="null" selected="selected">Unassigned</option>
 	<g:if test="${models.Validated}" >
