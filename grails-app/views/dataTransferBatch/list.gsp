@@ -20,9 +20,11 @@
 				checkProgressBar = true;
 				$("#progressbar").reportprogress(progress[0].processed,progress[0].total);
 		        if(progress[0].processed==progress[0].total){
+		        	/*
 		        		checkProgressBar = false;
 		                clearInterval(handle);
 		                location.reload(true);
+		             */
 		        }
 			}
 		}
@@ -33,7 +35,8 @@
 		function getProgress() {		
 			if ( !checkProgressBar ) {
 				var returnStatus =  confirm('Do you really want to process Batch ?');
-				if(returnStatus){
+				if(returnStatus) {
+					/*
 					$("#progressbar").css("display","block")
 				    clearInterval(handle);
 					if(${isMSIE}){
@@ -42,6 +45,7 @@
 						//Increased interval by 5 sec as server was hanging over chrome with quick server request.
 						handle=setInterval(getProcessedDataInfo,5000);
 			        }
+			        */
 					return true;
 				} else {
 					return false;
@@ -53,9 +57,10 @@
 		}
 		//This code is used to display progress bar at chrome as Chrome browser cancel all ajax request while uploading .
 		function getProcessedDataInfo(){	
-			 $("#iFrame").attr('src', contextPath+'/dataTransferBatch/getProgress');
+		//	 $("#iFrame").attr('src', contextPath+'/dataTransferBatch/getProgress');
 		}
 		function onIFrameLoad() {
+		/*
 		   var serverResponse = $("#iFrame").contents().find("pre").html();
 		   var jsonProgress
 		   if(serverResponse)
@@ -69,7 +74,8 @@
 	  	           location.reload(true);
 		       }
 		   }
-		 }
+		*/
+		}
 		function removeDataTrsferBatch(id){
 			var id = id
 	           jQuery.ajax({

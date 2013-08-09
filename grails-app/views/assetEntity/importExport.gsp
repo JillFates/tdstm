@@ -51,7 +51,7 @@
 		   if(jsonProgress){
 			   $("#progressbar").reportprogress(jsonProgress[0].imported,jsonProgress[0].total);
 		       if(jsonProgress[0].imported==jsonProgress[0].total){
-	  	         clearInterval(handle);
+	  	         clearInterval(handle);addMessage
 		       }
 		   }
 		 }
@@ -61,15 +61,14 @@
   <body>
   	<iframe id='iFrame' class="iFrame" onload='onIFrameLoad()'></iframe>   
     <div class="body">
-    <g:if test="${warnMsg || (message && args) }">
-    	<div class="message"><g:message code="${flash.message}" args="${args}" /> <br/>${warnMsg} </div>
-    </g:if>
-    <g:elseif test="${!args && flash.message}">
-    	<div class="message">${flash.message}</div>
-    </g:elseif>
-        <h1>Asset Import</h1>
+		<g:if test="${flash.error}">
+			<div class="errors">${flash.error}</div>
+		</g:if>
+		<g:if test="${flash.message}">
+			<div class="message">${flash.message}</div>
+		</g:if>
+    	<h1>Asset Import</h1>
         <g:form action="upload" method="post" name="importForm" enctype="multipart/form-data" >
-          <input type="hidden" value="${projectId}" name="projectIdImport" />
           <div class="dialog">
             <table>
               <thead>
@@ -120,7 +119,7 @@
 	                		onclick="importExportPreference($(this),'ImportDatabase')"
 	                		${prefMap['ImportDatabase'] =='true' ? 'checked="checked"' :''}/>&nbsp;
 	                <label for="databaseId">Database</label></span>&nbsp;
-	                <span><input type="checkbox" id="filesId" name="files" value="files"  
+	                <span><input type="checkbox" id="storageId" name="storage" value="storage"  
 	                		onclick="importExportPreference($(this),'ImportStorage')"
 	                		${prefMap['ImportStorage']=='true' ? 'checked="checked"' :''}/>&nbsp;
 	                <label for="filesId">Storage</label></span>&nbsp;

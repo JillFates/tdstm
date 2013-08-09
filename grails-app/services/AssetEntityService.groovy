@@ -138,10 +138,10 @@ class AssetEntityService {
 				}
 				if(!type.save(flush:true)){
 					log.error GormUtil.allErrorsString( type )
-					errMsg += "Unable to ${createNew ? 'add' : 'update'} dependency between ${assetEntity.assetName} and ${depEntity.assetName} <br/>"
+					errMsg += "<li>Unable to ${createNew ? 'add' : 'update'} dependency between ${assetEntity.assetName} and ${depEntity.assetName}"
 				}
 			} else {
-				errMsg += " The dependency between ${assetEntity.assetName} and ${depEntity.assetName} already exists, therefore the addition was ignored. <br/>"
+				errMsg += "<li>The dependency between ${assetEntity.assetName} and ${depEntity.assetName} already exists and therefore ignored"
 			}
 		}
 	  return errMsg
