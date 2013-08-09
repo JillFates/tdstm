@@ -502,7 +502,7 @@ class AssetEntityController {
 										try{
 											assetId = Integer.parseInt(serverSheet.getCell( 0, r ).contents)
 										} catch( NumberFormatException ex ) {
-											flash.error = "AssetId must be an Integer on the Server tab at row $r"
+											flash.error = "AssetId must be an Integer on the Server tab at row ${r+}"
 											forward action:forwardAction
 											return
 										}
@@ -565,7 +565,7 @@ class AssetEntityController {
 										try{
 											assetId = Integer.parseInt(appSheet.getCell( 0, r ).contents)
 										} catch( NumberFormatException ex ) {
-											flash.error = "AppId must be an Integer on the Application tab at row $r"
+											flash.error = "AppId must be an Integer on the Application tab at row ${r+1}"
 											forward action:'assetImport'
 											return
 										}
@@ -629,7 +629,7 @@ class AssetEntityController {
 										try{
 											assetId = Integer.parseInt(databaseSheet.getCell( 0, r ).contents)
 										} catch( NumberFormatException ex ) {
-											flash.error = "DBId must be an Integer on the Database tab at row $r"
+											flash.error = "DBId must be an Integer on the Database tab at row ${r+1}"
 											forward action:forwardAction
 										}
 									}
@@ -689,7 +689,7 @@ class AssetEntityController {
 										try{
 											assetId = Integer.parseInt(filesSheet.getCell( 0, r ).contents)
 										} catch( NumberFormatException ex ) {
-											flash.error = "StorageId must be an Integer on the Storage tab at row $r"
+											flash.error = "StorageId must be an Integer on the Storage tab at row ${r+1}"
 											forward action:forwardAction
 											return
 										}
