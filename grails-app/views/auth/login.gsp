@@ -59,11 +59,13 @@
 						<td />
 						<td class="buttonR"><input type="submit" value="Sign in" /></td>
 					</tr>
+					<g:if test="${ request.getHeader('User-Agent').contains('MSIE 6') || request.getHeader('User-Agent').contains('MSIE 7') }">
 					<tr>
 						<td colspan="2" >
-							<g:if test="${request.getHeader('User-Agent').contains('MSIE 6')}"><div class="message" >Note: MS IE6 has limited capability so functions have been reduced.</div></g:if>
+							<div class="message" >Warning: This site no longer supports Internet Explorer 6 or 7. We recommend that you use a newer browser for this site.</div>
 						</td>
 					</tr>
+					</g:if>
 				</tbody>
 			</table>
 		</g:form></div>
