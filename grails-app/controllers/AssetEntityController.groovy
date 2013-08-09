@@ -502,7 +502,7 @@ class AssetEntityController {
 										try{
 											assetId = Integer.parseInt(serverSheet.getCell( 0, r ).contents)
 										} catch( NumberFormatException ex ) {
-											flash.error = "AssetId must be an Integer on the Server tab at row ${r+}"
+											flash.error = "AssetId must be an Integer on the Server tab at row ${r+1}"
 											forward action:forwardAction
 											return
 										}
