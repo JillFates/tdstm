@@ -72,7 +72,7 @@
                     </table>
                 </div>
                 <div class="buttons">
-                    <span class="button"><g:actionSubmit class="save" value="updatePassword" /></span>
+                    <span class="button"><g:actionSubmit class="save" value="Save Password" action="updatePassword"/></span>
                 </div>
             </g:form>
         </div>

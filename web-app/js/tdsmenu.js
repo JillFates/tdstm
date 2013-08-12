@@ -98,7 +98,7 @@
 											+'&powerType='+powerType+'&startPage='+startPage});
 	        }
 		}
-		function checkPassword(field){
+		function checkPassword(field) {
 			var requirements = 0;
 			var password = field.value;
 			var username;
@@ -109,7 +109,7 @@
 			var context = 0;
 			var noMatch = {item:null};
 			var score = 0;
-			if(field.id == "newPasswordId" && $("[id='lengthRequirementId']").length > 1){
+			if (field.id == "newPasswordId" && $("[id='lengthRequirementId']").length > 1) {
 				context = 1;
 			}
 			score += passwordMatch(password.toLowerCase(), $("[id='usernameRequirementId']")[context], new RegExp('.*' + username + '.*'), 'Password must not contain the username', {item:null});
@@ -425,7 +425,6 @@
 		$('#dashboardMegaMenu').css("top", $('#dashboardMenuId').offset().bottom +1+"px");
 		$('#reportsMegaMenu').css("top", $('#reportsMenuId').offset().bottom +1+"px");
 
-		$('textarea').attr('value', '')
 		var timeout = 500;
 		var megamenuitem = 0;
 		document.onclick = closeMegaMenu;// close mega when click-out

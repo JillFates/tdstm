@@ -21,7 +21,7 @@ class ProjectUtilController {
 
 	def index = {
 
-		try{
+		try {
 			def principal = SecurityUtils.subject.principal
 			def userLogin = UserLogin.findByUsername( principal )
 			def userPreference = UserPreference.findAllByUserLoginAndPreferenceCode( userLogin, "CURR_PROJ" )
@@ -29,16 +29,16 @@ class ProjectUtilController {
 			if ( userPreference != null && userPreference != []) {
 				projectInstance = Project.findById( userPreference.value[0] )
 			}
-			if(projectInstance){
+			if (projectInstance) {
 				redirect( controller:"project", action:"show")
 			} else {
 				userPreferenceService.removePreference("CURR_PROJ")
-				if(params.message){
+				if (params.message) {
 					flash.message = params.message
 				}
-				redirect( action:"searchList" )
+				redirect( controller:"project", action:"list" )
 			}
-		} catch (Exception e){
+		} catch (Exception e) {
 			throw e
 		}
 	}

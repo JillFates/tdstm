@@ -25,16 +25,22 @@ class RoomController {
 		def rackIds = session.getAttribute("RACK_ID")
         params.max = Math.min(params.max ? params.int('max') : 100, 100)
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = Project.findById( projectId )
-		def roomInstanceList = Room.findAllByProject( project, params )
-  		def roomId = getSession().getAttribute( "CURR_ROOM" )?.CURR_ROOM
-		def roomInstance = new Room()
-		def entities = assetEntityService.entityInfo( project )
-		
-		[roomInstanceList: roomInstanceList, roomInstanceTotal: roomInstanceList.size(), 
-		 projectId:projectId, roomId:roomId, viewType:params.viewType, roomInstance:roomInstance, servers : entities.servers, networks : entities.networks,
-				applications : entities.applications, dbs : entities.dbs, files : entities.files ,filterRackId:rackIds, staffRoles:taskService.getRolesForStaff(),
-				dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus]
+		if (projectId) {
+			log.info "projectId=${projectId} class=${projectId.class}"
+			def project = Project.findById( projectId )
+			def roomInstanceList = Room.findAllByProject( project, params )
+			def roomId = getSession().getAttribute( "CURR_ROOM" )?.CURR_ROOM
+			def roomInstance = new Room()
+			def entities = assetEntityService.entityInfo( project )
+			
+			[roomInstanceList: roomInstanceList, roomInstanceTotal: roomInstanceList.size(), 
+			 projectId:projectId, roomId:roomId, viewType:params.viewType, roomInstance:roomInstance, servers : entities.servers, networks : entities.networks,
+					applications : entities.applications, dbs : entities.dbs, files : entities.files ,filterRackId:rackIds, staffRoles:taskService.getRolesForStaff(),
+					dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus]
+		} else {
+			flash.message = 'You must have a project selected before using this feature'
+			redirect(controller: "project", action: "list",params:[viewType : "list"])
+		}
     }
 
     def create = {
