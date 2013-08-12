@@ -65,6 +65,14 @@
 
                         </tr>
 
+						<tr class="prop">
+							<td valign="top" class="name">
+								<label for="forcePasswordChange">Force password change:</label>
+							</td>
+							<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'forcePasswordChange','errors')}">
+								<input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="${userLoginInstance.forcePasswordChange}" disabled="disabled" ${(userLoginInstance.forcePasswordChange=='Y')?'checked="checked"':''}/>
+							</td>
+						</tr>
                         
                         <tr class="prop">
                             <td valign="top" class="name">Created Date:</td>
