@@ -119,7 +119,7 @@ class ModelService {
 		]
 		
 		// These values are mapped to derived columns, so they will be used in the HAVING clause if included in the filter
-		def aliasValuesAggregate = [ 'noOfConnectors':'COUNT(mc.model_connectors_id)', 'assetsCount':'COUNT(ae.asset_entity_id)' ]
+		def aliasValuesAggregate = [ 'noOfConnectors':'COUNT(DISTINCT mc.model_connectors_id)', 'assetsCount':'COUNT(DISTINCT ae.asset_entity_id)' ]
 		
 		// If the user is sorting by a valid column, order by that one instead of the default
 		sortColumn = ( sortColumn && filterParams.containsKey(sortColumn) ) ? sortColumn : "man.name, m.name"
