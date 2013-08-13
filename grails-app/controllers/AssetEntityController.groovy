@@ -3883,7 +3883,7 @@ class AssetEntityController {
 		}
 		assetDependentlist = jdbcTemplate.queryForList(""" 
 			SELECT deps.asset_id AS assetId, ae.asset_name AS assetName, deps.dependency_bundle AS bundle, 
-			ae.asset_type AS type, me.move_event_id AS moveEvent, app.criticality AS criticality 
+			ae.asset_type AS type, me.move_event_id AS moveEvent, me.name AS eventName, app.criticality AS criticality 
 			FROM ( 
 				SELECT * FROM tdstm.asset_dependency_bundle 
 				WHERE project_id=${projectId} ${nodesQuery} 
@@ -4031,7 +4031,7 @@ class AssetEntityController {
 						shape = 'circle'
 					}
 					
-					def moveEventName = it.moveEvent ?: 0
+					def moveEventName = it.eventName ?: ''
 					graphNodes << [
 						id:it.assetId, name:it.assetName, 
 						type:type, group:it.bundle, 
