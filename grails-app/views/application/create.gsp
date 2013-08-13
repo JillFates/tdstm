@@ -64,7 +64,7 @@
 								</td>
 								<td class="label ${applicationInstance.sme}" nowrap="nowrap"><label for="sme">SME1</label></td>
 								<td >
-									<g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme}"  optionKey="id" 
+									<g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme} personContact"  optionKey="id" 
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value,this.id)" 
 										noSelection="${['':'Please Select']}" 
@@ -97,7 +97,7 @@
 								<td class="label ${config.sme2}" nowrap="nowrap"><label for="sme2">SME2</label></td>
 								<td class="suffleTd">
 								 <img src="../images/swapicon.png"  onclick="shufflePerson('sme1','sme2')" class="SuffleImage" />
-									<g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2} suffleSelect" optionKey="id" 
+									<g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2} suffleSelect personContact" optionKey="id" 
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
 										tabindex="22" 
@@ -132,7 +132,7 @@
 								<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
 								<td class="suffleTd">
 								 <img src="../images/swapicon.png" onclick="shufflePerson('sme2','appOwner')" class="SuffleImage" />
-									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${config.owner} suffleSelect" optionKey="id" 
+									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${config.owner} suffleSelect personContact" optionKey="id" 
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
 										tabindex="23" 

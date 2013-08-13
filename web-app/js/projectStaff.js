@@ -328,8 +328,10 @@ function createPersonDetails(forWhom){
 				alert(data.errMsg)
 			} else {
 				$("#createStaffDialog").dialog('close')
-				if(!data.isExistingPerson)
-					$('#'+data.fieldName).append('<option value="'+data.id+'" selected>'+data.name+'</option>');
+				if(!data.isExistingPerson){
+					$('.personContact').append('<option value="'+data.id+'">'+data.name+'</option>');
+					$('#'+data.fieldName+' option[value="'+data.id+'"]').attr('selected','selected');
+				}
 				else
 					$('#'+data.fieldName).val(data.id)
 			}
