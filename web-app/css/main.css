@@ -650,12 +650,13 @@ margin: -8px !important;
 	width: 140px !important;	
 }
 .SuffleImage {
-	height: 24px;
+	height: 16px;
     margin-left: 60px;
-    margin-top: -14px;
+    margin-top: -10px;
     position: absolute;
-    width: 24px;
+    width: 16px;
     z-index: 1;
+    cursor:pointer;
 }
 .suffleSelect{
 	margin-top:10px !important;

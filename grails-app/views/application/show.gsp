@@ -46,8 +46,8 @@
 						<tr>
 							<td class="label ${config.appTech}" nowrap="nowrap"><label for="appTech">Tech.</label></td>
 							<td class="valueNW ${config.appTech}">${applicationInstance.appTech}</td>
-							<td class="label ${config.businessUnit}" nowrap="nowrap"><label for="businessUnit">Bus Unit</label></td>
-							<td class="valueNW ${config.businessUnit}">${applicationInstance.businessUnit}</td>
+							<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
+							<td class="valueNW ${config.owner}">${applicationInstance.appOwner?.lastNameFirst}</td>
 							<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
 							<td class="valueNW ${config.moveBundle}">${applicationInstance.moveBundle} / ${dependencyBundleNumber}</td>
 							<td class="label ${config.drRpoDesc}" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label></td>
@@ -56,8 +56,8 @@
 						<tr>
 							<td class="label ${config.appSource}" nowrap="nowrap"><label for="appSource">Source</label></td>
 							<td class="valueNW ${config.appSource}">${applicationInstance.appSource}</td>
-							<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
-							<td class="valueNW ${config.owner}">${applicationInstance.appOwner?.lastNameFirst}</td>
+							<td class="label ${config.businessUnit}" nowrap="nowrap"><label for="businessUnit">Bus Unit</label></td>
+							<td class="valueNW ${config.businessUnit}">${applicationInstance.businessUnit}</td>
 							<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
 							<td class="valueNW ${config.planStatus}">${applicationInstance.planStatus}</td>
 							<td class="label ${config.drRtoDesc}" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label></td>

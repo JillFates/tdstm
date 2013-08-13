@@ -835,7 +835,7 @@ function changeHard(value, gid){
 function shufflePerson(sFrom,sTo){
 	var sFromVal=$("#"+sFrom).val()
 	var sToVal=$("#"+sTo).val()
-	if(sFromVal && sFromVal!=0 && sToVal && sToVal!=0){
+	if(sFromVal!='0' && sToVal!='0'){
 		$("#"+sFrom).val(sToVal)
 		$("#"+sTo).val(sFromVal)
 	}
