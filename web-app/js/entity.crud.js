@@ -294,17 +294,17 @@ function submitCheckBox(){
 }
 var isFirst = true;
 function selectAll(){
-	var totalCheck = document.getElementsByName('checkBox');
-	if($('#selectId').attr('checked')==true){
-	for(i=0;i<totalCheck.length;i++){
-	totalCheck[i].checked = true;
-	}
-	isFirst = false;
-	}else{
-	for(i=0;i<totalCheck.length;i++){
-	totalCheck[i].checked = false;
-	}
-	isFirst = true;
+	var totalCheck = $("input[name=checkBox]");
+	if($('#selectId').is(":checked")){
+		for(i=0;i<totalCheck.size();i++){
+			totalCheck[i].checked = true;
+		}
+		isFirst = false;
+	} else {
+		for(i=0;i<totalCheck.size();i++){
+			totalCheck[i].checked = false;
+		}
+		isFirst = true;
 	}
 }
 function changeMoveBundle(assetType,totalAsset){
