@@ -66,7 +66,7 @@
 			var windowWidth = $(window).width() - $(window).width()*5/100 ;
 			var listCaption ="Tasks: \
 				<span class='capBtn'><input type='button' value='Create Task' onclick='createIssue()'/></span> \
-				<span class='capBtn'><input type='button' value='Bulk Edit' onclick='bulkEditTasks()'/></span>"
+				<span class='capBtn'><input type='button' id='bulkEditId' class='bulkEdit' value='Bulk Edit' data-method='bulkEditTasks' /></span>"
 					
 	    	<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
 	            colNames="'Action', 'Task', 'Description', 'Asset', 'AssetType', 'Updated', 'Due', 'Status',
@@ -104,6 +104,18 @@
 	     		populateFilter();
 				$('#taskListIdWrapper').width($('.fluid').width()-16) // 16 pixels comptensates for the border/padding/etc and the scrollbar
 				$('#taskListIdGrid').fluidGrid({ base:'#taskListIdWrapper', offset: 0 });
+				
+	            $('.bulkEdit').on('click',function(){
+	                var method = $(this).data('method');
+	                if(method == "bulkEditTasks"){
+	                	$(this).attr('disabled', 'disabled');
+	                	$(this).data('method','hideActionBars');
+	                	bulkEditTasks();
+	                }else{
+	                	$(this).data('method','bulkEditTasks');
+	                	hideActionBars();
+	                }
+	            });
 			})
 			$(window).resize(resizeGrid);
 

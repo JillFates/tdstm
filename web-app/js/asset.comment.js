@@ -172,6 +172,7 @@ jQuery.ajax({
 					}
 				})
 		   }
+		   $('.bulkEdit').removeAttr("disabled");
 	},
 	error: function(xhr, textStatus, errorThrown) {
 		for(i=0; i<taskIds.length; i++){
@@ -193,6 +194,25 @@ jQuery.ajax({
 	}
 });
 }
+
+/**
+ * 
+ */
+function hideActionBars(){
+	$('.jqTable').find('.statusButtonBar').each(function(){
+		$(this).parent().prev().find('span').each(function(){
+			var $id = $(this).attr("id");
+			if($id){
+				var id = $id.split("_")[1];
+				$(this).removeAttr('onclick')
+				$(this).off("click").on("click", function(){
+					getActionBarGrid(id)
+			    });
+			}
+		});
+		$(this).parent().remove();
+	});
+}
 /**
  * Used to hide the action bar in Task Manager
  * @param rowId
@@ -204,7 +224,7 @@ function hideActionBarGrid(rowId,spanId){
 	$('#'+spanId).parent().parent().find('span').each(function(){
 		if($(this).attr("id")){
 			$(this).removeAttr('onclick')
-			$(this).unbind("click").bind("click", function(){
+			$(this).off("click").on("click", function(){
 				getActionBarGrid(id)
 		    });
 		}
