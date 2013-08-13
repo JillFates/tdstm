@@ -13,7 +13,7 @@
 	$("#appOwner option:first").after(myOption);
 	
 </script>
-<g:form method="post" action="save" name="createAssetsFormId" onsubmit="return validateFields()">
+<g:form method="post" action="save" name="createAssetsFormId" onsubmit="return validateFields('',this.name)">
 	<input type="hidden" id="appl_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="appl_sme" name="appSmeFilter" value="" />
 	<input type="hidden" id="appl_validation" name="appValidationFilter" value="" />
@@ -67,7 +67,6 @@
 									<g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme}"  optionKey="id" 
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value,this.id)" 
-										tabindex="38"
 										noSelection="${['':'Please Select']}" 
 										tabIndex="21"
 									/>
@@ -96,11 +95,12 @@
 									name="appVersion" value="${applicationInstance.appVersion}"  tabindex="12" />
 								</td>
 								<td class="label ${config.sme2}" nowrap="nowrap"><label for="sme2">SME2</label></td>
-								<td>
-									<g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2}" optionKey="id" 
+								<td class="suffleTd">
+								 <img src="../images/swapicon.png"  onclick="shufflePerson('sme1','sme2')" class="SuffleImage" />
+									<g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2} suffleSelect" optionKey="id" 
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
-										tabindex="38" 
+										tabindex="22" 
 										noSelection="${['':'Please select']}"
 									/>
 								</td>
@@ -129,9 +129,15 @@
 								<td ><input type="text" id="appTech" class="${config.appTech}" name="appTech" 
 									value="${applicationInstance.appTech}" tabindex="13" />
 								</td>
-								<td class="label ${config.businessUnit}" nowrap="nowrap"><label for="businessUnit">Bus	Unit</label>
-								</td>
-								<td ><input type="text" id="businessUnit" class="${config.businessUnit}" name="businessUnit" value="${applicationInstance.businessUnit}" tabindex="24" />
+								<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
+								<td class="suffleTd">
+								 <img src="../images/swapicon.png" onclick="shufflePerson('sme2','appOwner')" class="SuffleImage" />
+									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${config.owner} suffleSelect" optionKey="id" 
+										optionValue="${{it.lastNameFirst}}" 
+										onchange="openPersonDiv(this.value, this.id)" 
+										tabindex="23" 
+										noSelection="${['':' Please Select']}" 
+									/>
 								</td>
 								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
 								<td ><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${applicationInstance.moveBundle}" optionKey="id" optionValue="name" tabindex="34" />
@@ -146,14 +152,9 @@
 								<td ><input type="text" id="appSource"	class="${config.appSource}" name="appSource" 
 									value="${applicationInstance.appSource}" tabindex="15" />
 								</td>
-								<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
-								<td >
-									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${config.owner}" optionKey="id" 
-										optionValue="${{it.lastNameFirst}}" 
-										onchange="openPersonDiv(this.value, this.id)" 
-										tabindex="38" 
-										noSelection="${['':' Please Select']}" 
-									/>
+								<td class="label ${config.businessUnit}" nowrap="nowrap"><label for="businessUnit">Bus	Unit</label>
+								</td>
+								<td ><input type="text" id="businessUnit" class="${config.businessUnit}" name="businessUnit" value="${applicationInstance.businessUnit}" tabindex="24" />
 								</td>
 								<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label>
 								</td>

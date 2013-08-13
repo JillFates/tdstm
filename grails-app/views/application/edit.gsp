@@ -19,7 +19,7 @@
 		$("#testingByEditId").val('${applicationInstance.testingBy}')
 	})
 </script>
-<g:form method="post" action="update" name="editAssetsFormId" onsubmit="return validateFields()">
+<g:form method="post" action="update" name="editAssetsFormId" onsubmit="return validateFields('Edit',this.name)">
 
 	<input type="hidden" id="appl_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="appl_sme" name="appSmeFilter" value="" />
@@ -73,7 +73,7 @@
 									<g:select from="${personList}" id="sme1Edit" name="sme.id" class="${config.sme}" optionKey="id" 
 										optionValue="${{it.lastNameFirst}}"
 										onchange="openPersonDiv(this.value,this.id)" value="${applicationInstance.sme?.id}" 
-										tabindex="38" 
+										tabindex="22" 
 										noSelection="${['':' Please Select']}" 
 									/>
 								</td>
@@ -95,12 +95,13 @@
 									name="appVersion" value="${applicationInstance.appVersion}"  tabindex="12" />
 								</td>
 								<td class="label ${config.sme2}" nowrap="nowrap"><label for="sme2">SME2</label></td>
-								<td >
-									<g:select from="${personList}" id="sme2Edit" name="sme2.id" class="${config.sme2}" optionKey="id" 
+								<td class="suffleTd">
+								 <img src="../images/swapicon.png" onclick="shufflePerson('sme1Edit','sme2Edit')" class="SuffleImage"/>
+									<g:select from="${personList}" id="sme2Edit" name="sme2.id" class="${config.sme2} suffleSelect" optionKey="id" 
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
 										value="${applicationInstance.sme2?.id}" 
-										tabindex="38" 
+										tabindex="23" 
 										noSelection="${['':' Please Select']}" 
 									/>
 								</td>
@@ -122,9 +123,16 @@
 								<td class="label ${config.appTech}" nowrap="nowrap"><label for="appTech">Tech.</label></td>
 								<td ><input type="text" id="appTech" class="${config.appTech}" name="appTech" value="${applicationInstance.appTech}" tabindex="13" />
 								</td>
-								<td class="label ${config.businessUnit}" nowrap="nowrap"><label for="businessUnit">Bus	Unit</label>
-								</td>
-								<td ><input type="text" id="businessUnit" class="${config.businessUnit}" name="businessUnit" value="${applicationInstance.businessUnit}" tabindex="24" />
+								<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
+								<td class="suffleTd">
+								 <img src="../images/swapicon.png" onclick="shufflePerson('sme2Edit','appOwnerEdit')" class="SuffleImage" />
+									<g:select from="${personList}" id="appOwnerEdit" class="${config.owner} suffleSelect" name="appOwner.id"  optionKey="id" 
+										optionValue="${{it.lastNameFirst}}" 
+										onchange="openPersonDiv(this.value, this.id)" 
+										value="${applicationInstance.appOwner?.id}" 
+										tabindex="24" 
+										noSelection="${['':' Please Select']}" 
+									/>
 								</td>
 								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
 								<td ><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${applicationInstance.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="34" />
@@ -138,15 +146,9 @@
 								<td class="label ${config.appSource}" nowrap="nowrap"><label for="appSource">Source</label></td>
 								<td ><input type="text" id="appSource"	class="${config.appSource}" name="appSource" value="${applicationInstance.appSource}" tabindex="14" />
 								</td>
-								<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
-								<td >
-									<g:select from="${personList}" id="appOwnerEdit" class="${config.owner}" name="appOwner.id"  optionKey="id" 
-										optionValue="${{it.lastNameFirst}}" 
-										onchange="openPersonDiv(this.value, this.id)" 
-										value="${applicationInstance.appOwner?.id}" 
-										tabindex="25" 
-										noSelection="${['':' Please Select']}" 
-									/>
+								<td class="label ${config.businessUnit}" nowrap="nowrap"><label for="businessUnit">Bus	Unit</label>
+								</td>
+								<td ><input type="text" id="businessUnit" class="${config.businessUnit}" name="businessUnit" value="${applicationInstance.businessUnit}" tabindex="25" />
 								</td>
 								<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label>
 								</td>
@@ -318,25 +320,4 @@
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')
 	$('#tabType').val($('#assetTypesId').val())
-	
-	function validateFields(){
-	    var flag = true
-		if($("#sme1Edit").val()=='0' || $("#sme2Edit").val()=='0' || $("#appOwnerEdit").val()=='0'){
-			flag = false
-			alert("Please De-select 'Add-Person' Option from sme , sme2 or appOwner select")
-			return flag
-		} else if (isNaN($("#shutdownDurationEdit").val()) || isNaN($("#startupDurationEdit").val()) || isNaN($("#testingDurationEdit").val())){
-			flag = false
-			alert("Please enter numeric value for Shutdown Duration, Startup Duration, Testing Duration ")
-			return flag
-		} else {
-			$('select[name*="asset_"]').each( function() {
-				if( $(this).val() == 'null' )
-					flag = false
-			})
-			if( ! flag )
-				alert("Please select a valid asset for all dependencies ")
-		}
-		return flag
-	}
 </script>

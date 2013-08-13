@@ -344,7 +344,7 @@ function updateToShow(forWhom){
 	$('#updateView').val('updateView')
 	var flag=true
 	if(forWhom=='app'){
-		flag = validateFields()
+		flag = validateFields('Edit','editAssetsFormId')
 	}
 	if(flag){
 		jQuery.ajax({
@@ -766,7 +766,7 @@ function saveToShow(forWhom){
 	$('#showView').val('showView')
 	var flag=true
 	if(forWhom=='Application'){
-		flag = validateFields()
+		flag = validateFields('','createAssetsFormId')
 	}
 	if(forWhom=='Files'){
 		flag = validateFileFormat()
@@ -798,18 +798,18 @@ function saveToShow(forWhom){
 	}
 }
 
-function validateFields(){
+function validateFields(forWhom,formName){
     var flag = true
-	if($("#sme1").val()=='0' || $("#sme2").val()=='0' || $("#appOwner").val()=='0' ){
+	if($("#sme1"+forWhom).val()=='0' || $("#sme2"+forWhom).val()=='0' || $("#appOwner"+forWhom).val()=='0' ){
 		flag = false
 		alert("Please De-select 'Add-Person' Option from sme , sme2 or appOwner select")
 		return flag
-	} else if (isNaN($("#shutdownDuration").val()) || isNaN($("#startupDuration").val()) || isNaN($("#testingDuration").val())){
+	} else if (isNaN($("#shutdownDuration"+forWhom).val()) || isNaN($("#startupDuration"+forWhom).val()) || isNaN($("#testingDuration"+forWhom).val())){
 		flag = false
 		alert("Please enter numeric value for Shutdown Duration, Startup Duration, Testing Duration ")
 		return flag
 	} else {
-		$('select[name*="asset_"]').each( function() {
+		$('#'+formName+' select[name*="asset_"]').each( function() {
 			if( $(this).val() == 'null' )
 				flag = false
 		})
@@ -829,5 +829,14 @@ function changeHard(value, gid){
 		$("#"+gid+"Fixed").removeAttr("checked").attr("disabled", "disabled").val(0);
 	}else {
 		$("#"+gid+"Fixed").removeAttr("disabled");
+	}
+}
+
+function shufflePerson(sFrom,sTo){
+	var sFromVal=$("#"+sFrom).val()
+	var sToVal=$("#"+sTo).val()
+	if(sFromVal && sFromVal!=0 && sToVal && sToVal!=0){
+		$("#"+sFrom).val(sToVal)
+		$("#"+sTo).val(sFromVal)
 	}
 }

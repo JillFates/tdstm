@@ -649,3 +649,17 @@ margin: -8px !important;
 .modelSelect {
 	width: 140px !important;	
 }
+.SuffleImage {
+	height: 24px;
+    margin-left: 60px;
+    margin-top: -14px;
+    position: absolute;
+    width: 24px;
+    z-index: 1;
+}
+.suffleSelect{
+	margin-top:10px !important;
+}
+.suffleTd{
+	position:relative !important;
+}
