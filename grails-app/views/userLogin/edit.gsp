@@ -71,13 +71,21 @@
 					            </g:hasErrors>
                                 </td>
                             </tr>
+							
+                        	<tr>
+								<td>
+									Hide password:
+								</td>
+								<td>
+									<input type="checkbox" onchange="togglePasswordVisibility(this)" id="showPasswordEditId"/>
+								</td>
+							</tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="password">Password:&nbsp;</label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'password','errors')}">
                                     <input type="text" id="password" onkeyup="checkPassword(this)" name="password" value=""/>
-									<input type="checkbox" onchange="togglePasswordVisibility(this)" id="showPasswordEditId"/> (show)
 								
                                 <g:hasErrors bean="${userLoginInstance}" field="password">
 					            <div class="errors">
