@@ -46,7 +46,7 @@
 				<h1>Dependency Console</h1>
 			</div>
 			<tds:hasPermission permission='MoveBundleEditView'>
-				<div id="checkBoxDiv"  title="Dependency Grouping Control">
+				<div id="checkBoxDiv"  title="Dependency Grouping Control" style="display: none">
 					<div id="checkBoxDivId">
 						<g:form name="checkBoxForm"> 
 							<div style="float: left; margin-left:18px;">
