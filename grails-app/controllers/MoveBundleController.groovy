@@ -842,7 +842,7 @@ class MoveBundleController {
 	
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		Date start = new Date()
-		def map = moveBundleService.dependencyConsoleMap(projectId)
+		def map = moveBundleService.dependencyConsoleMap(projectId, params.bundle)
 		//log.info "dependencyConsole() : moveBundleService.dependencyConsoleMap() took ${TimeUtil.elapsed(start)}"
 		return map
 	}
@@ -868,7 +868,7 @@ class MoveBundleController {
 		flash.message = moveBundleService.generateDependencyGroups(projectId, connectionTypes, statusTypes)
 
 		// Now get the model and display results
-		render(template:'dependencyBundleDetails', model:moveBundleService.dependencyConsoleMap(projectId) )
+		render(template:'dependencyBundleDetails', model:moveBundleService.dependencyConsoleMap(projectId, params.bundle) )
 	}
 	
 	/**

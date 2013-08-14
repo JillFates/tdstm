@@ -35,7 +35,7 @@
 				$("#createStaffDialog").dialog({ autoOpen: false })
 				currentMenuId = "#assetMenu";
 				$("#assetMenuId a").css('background-color','#003366')	
-				
+
 			});
 		</script>
 	</head>
@@ -168,7 +168,8 @@
 					case "apps" :
 					case "database" :
 					case "files" :
-						${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle', onComplete:'listUpdate(e)') }
+						var bundle = $("#planningBundleSelectId").val()
+						${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&bundle=\'+ bundle', onComplete:'listUpdate(e)') }
 						break
 					case "graph" :
 						var labelsList = "Application"

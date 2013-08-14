@@ -30,7 +30,6 @@ a:link, a:visited, a:hover {
 .links:hover {
 	text-decoration: underline;
 }
-
 h1 {
     color: #214aa0;
     font-weight: normal;
@@ -668,4 +667,9 @@ margin: -8px !important;
 }
 .suffleTd{
 	position:relative !important;
+}
+.planBundleSel{
+	margin-left: 274px;
+    margin-top: -28px;
+    position: absolute;
 }

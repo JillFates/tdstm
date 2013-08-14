@@ -268,7 +268,8 @@ function deleteAsset(id,value){
 	
 }
 function submitCheckBox(){
-	var data = $('#checkBoxForm').serialize()
+	var moveBundleId = $("#planningBundleSelectId").val();
+	var data = $('#checkBoxForm').serialize() + "&bundle="+moveBundleId;
 	new Ajax.Request(contextPath+'/moveBundle/generateDependency?'+data,{asynchronous:true,evalScripts:true,
 		    onLoading:function(){
 		    	var processTab = jQuery('#processDiv');

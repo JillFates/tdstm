@@ -8,6 +8,12 @@
 			<h3>
 				<b>Dependency Groups</b>&nbsp;&nbsp;&nbsp;<input  type="button"  class="submit" value="Regenerate..." onclick="showDependencyControlDiv()"  />
 			</h3>
+			 <div class="planBundleSel">
+				<g:form name="bundleForm" action="dependencyConsole">	
+					Move Bundle: <g:select id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}"
+					 optionKey="id" value="${moveBundleId}" onchange="this.form.submit()"/>
+				</g:form>
+			</div>
 			&nbsp;Dependency Analysis last run on &nbsp;${date} and ${dependencyBundleCount} dependency group(s) were discovered
 		</div>
 		<div id="processDiv" style="display: none;">

@@ -3860,6 +3860,9 @@ class AssetEntityController {
 		join asset_entity a ON a.asset_entity_id=adb.asset_id
 		where adb.project_id=${projectId}
 		"""
+		if(params.bundle)
+			depSql+=" and a.move_bundle_id = ${params.bundle} "
+		
 
 		def assetDependentlist
 		def selectionQuery = ''
@@ -3881,7 +3884,7 @@ class AssetEntityController {
 			// Get 'all' assets that were bundled
 			multiple = true;
 		}
-		assetDependentlist = jdbcTemplate.queryForList(""" 
+		def queryFordepsList = """
 			SELECT deps.asset_id AS assetId, ae.asset_name AS assetName, deps.dependency_bundle AS bundle, 
 			ae.asset_type AS type, me.move_event_id AS moveEvent, me.name AS eventName, app.criticality AS criticality 
 			FROM ( 
@@ -3892,8 +3895,12 @@ class AssetEntityController {
 			LEFT OUTER JOIN asset_entity ae ON ae.asset_entity_id = deps.asset_id 
 			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id = ae.move_bundle_id 
 			LEFT OUTER JOIN move_event me ON me.move_event_id = mb.move_event_id 
-			LEFT OUTER JOIN application app ON app.app_id = ae.asset_entity_id  
-		""")
+			LEFT OUTER JOIN application app ON app.app_id = ae.asset_entity_id
+			"""
+		if(params.bundle)
+			queryFordepsList +=" AND ae.move_bundle_id = ${params.bundle} "
+			
+		assetDependentlist = jdbcTemplate.queryForList(queryFordepsList)
 		depSql += selectionQuery
 		//log.error "getLists() : query for assetDependentlist took ${TimeUtil.elapsed(start)}"
 		// Took 0.296 seconds

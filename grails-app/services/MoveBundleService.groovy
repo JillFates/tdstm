@@ -459,9 +459,10 @@ class MoveBundleService {
 	/*
 	 * Used by several controller functions to generate the mapping arguments used by the dependencyConsole view
 	 * @param projectId - the project Id to lookup the map data for
+	 * @param moveBundleId - move bundle id to filter for bundle
 	 * @return MapArray of properties 
 	 */
-	def dependencyConsoleMap(projectId) {
+	def dependencyConsoleMap(projectId, moveBundleId) {
 		def startAll = new Date()
 		def projectInstance = Project.get(projectId)
 		def dependencyConsoleList = []
@@ -475,7 +476,7 @@ class MoveBundleService {
 			storage: [0,0]
 		]
 		
-		def depSql = """SELECT  
+		def depSql = new StringBuffer("""SELECT  
 			adb.dependency_bundle as dependencyBundle, 
 			count(distinct adb.asset_id) as assetCnt, 
 			CONVERT( group_concat(distinct a.move_bundle_id) USING 'utf8') as moveBundles,
@@ -498,11 +499,14 @@ class MoveBundleService {
 			
 			FROM asset_dependency_bundle adb
 			JOIN asset_entity a ON a.asset_entity_id=adb.asset_id
-			WHERE adb.project_id=${projectId}
-			GROUP BY adb.dependency_bundle
-			ORDER BY adb.dependency_bundle"""
+			WHERE adb.project_id=${projectId}""")
 
-		def dependList = jdbcTemplate.queryForList(depSql)
+		    if( moveBundleId )
+				depSql.append(" AND a.move_bundle_id = ${moveBundleId}")
+			
+			depSql.append(" GROUP BY adb.dependency_bundle ORDER BY adb.dependency_bundle ")
+
+		def dependList = jdbcTemplate.queryForList(depSql.toString())
 
 		// log.info "dependencyConsoleMap() : dependList[0]"
  		// log.info "dependencyConsoleMap() : stats=$stats}"
@@ -602,7 +606,8 @@ class MoveBundleService {
 
 			partyGroupList:companiesList,
 			// personList:personList, 
-			availabaleRoles:availabaleRoles
+			availabaleRoles:availabaleRoles,
+			moveBundleId : moveBundleId
 		]
 		log.info "dependencyConsoleMap() : OVERALL took ${TimeUtil.elapsed(startAll)}"
 
