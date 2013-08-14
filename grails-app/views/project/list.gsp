@@ -6,8 +6,8 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 		<script src="${resource(dir:'js',file:'jquery.form.js')}"></script>
 		<jqgrid:resources />
-		<jqui:resources />
-
+		<g:javascript src="jqgrid-support.js" />
+		
 		<script type="text/javascript">
 			$(document).ready(function() {
 				var listCaption ="Projects: \
@@ -24,19 +24,16 @@
 				<jqgrid:grid id="projectGridId" url="'${createLink(action: 'listJson')}'"
 					colNames="'Project Code','Name', 'Start Date','Completion Date', 'Comment'"
 					colModel="{name:'projectCode', index: 'projectCode', width:'150',formatter: myLinkFormatter},
-								  {name:'name', editable: true, width:'150'},
-								  {name:'startDate', editable: true,width:'150'},
-								  {name:'completionDate', editable: true, width:'150'},
-								  {name:'comment', editable: true,width:'100'}"
+								  {name:'name', width:'150'},
+								  {name:'startDate',width:'150'},
+								  {name:'completionDate', width:'150'},
+								  {name:'comment',width:'100'}"
 					sortname="'projectCode'"
 					caption="listCaption"
 					height="'100%'"
-					rowNum="'25'"
-					rowList= "'25','100','500','1000'"
-					viewrecords="true"
 					postData="{isActive:isActive}"
-					showPager="true"
-					datatype="'json'">
+					gridComplete="function(){bindResize('projectGridId')}"
+					showPager="true">
 					<jqgrid:filterToolbar id="projectGridId" searchOnEnter="false" />
 					<jqgrid:navigation id="projectGridId" add="false" edit="false" del="false" search="false"/>
 					<jqgrid:refreshButton id="projectGridId" />
@@ -46,15 +43,7 @@
 					var value = cellvalue ? cellvalue : ''
 					return '<a href="'+contextPath+'/project/addUserPreference/'+options.rowId+'">'+value+'</a>'
 				}
-				
-				resizeGrid()
 			});
-			$(window).resize(resizeGrid);
-			
-			// Called when the window is resized to resize the grid wrapper 
-			function resizeGrid(){
-				$('#projectGridIdGrid').fluidGrid({ base:'#projectGridIdWrapper', offset: 0 });
-			}
 		</script>
 	</head>
 	<body>

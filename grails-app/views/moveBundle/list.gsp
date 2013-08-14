@@ -1,35 +1,30 @@
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="projectHeader" />
-        <title>Bundle List</title>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="layout" content="projectHeader" />
+		<title>Bundle List</title>
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 		<script src="${resource(dir:'js',file:'jquery.form.js')}"></script>
 		<jqgrid:resources />
-		<jqui:resources /> 
-		<jqgrid:resources />
-
+		<g:javascript src="jqgrid-support.js" />
+		
 		<script type="text/javascript">
-		$(document).ready(function() {	
+		$(document).ready(function() {
 			var listCaption ="Bundles: <tds:hasPermission permission='MoveBundleEditView'><span class='capBtn'>"+
 				"<input type='button' value='Create Bundle' onClick=\"window.location.href=\'"+contextPath+"/moveBundle/create\'\"/></span></tds:hasPermission>"			
 			<jqgrid:grid id="bundleGridId" url="'${createLink(action: 'listJson')}'"
 				colNames="'Name', 'Description','Planning', 'Asset Qty', 'Start', 'Completion'"
 				colModel="{name:'name', index: 'name', width:'150',formatter: myLinkFormatter},
-							  {name:'description', editable: true, width:'150'},
-							  {name:'useOfPlanning', editable: true,width:'150'},
-							  {name:'assetQty', editable: true,width:'100', search:false},
-							  {name:'startTime', editable: true, width:'150'},
-							  {name:'completionTime', editable: true,width:'100'}"
+					{name:'description', width:'150'},
+					{name:'useOfPlanning',width:'150'},
+					{name:'assetQty',width:'100', search:false},
+					{name:'startTime', width:'150'},
+					{name:'completionTime',width:'100'}"
 				sortname="'name'"
 				caption="listCaption"
-				height="'100%'"
 				width="'500px'"
-				rowNum="'25'"
-				rowList= "'25','100','500','1000'"
-				viewrecords="true"
-				showPager="true"
-				datatype="'json'">
+				gridComplete="function(){bindResize('bundleGridId')}"
+				showPager="true">
 				<jqgrid:filterToolbar id="bundleGridId" searchOnEnter="false" />
 				<jqgrid:navigation id="bundleGridId" add="false" edit="false" del="false" search="false"/>
 				<jqgrid:refreshButton id="bundleGridId" />

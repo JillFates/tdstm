@@ -7,6 +7,8 @@
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="projectStaff.js" />
+		<jqgrid:resources />
+		<g:javascript src="jqgrid-support.js" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
@@ -14,7 +16,6 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-		<jqgrid:resources />
 
 		<script type="text/javascript">
 			$(document).ready(function() {
@@ -30,7 +31,7 @@
 				$("#createStaffDialog").dialog({ autoOpen: false })
 				$("#filterPane").draggable()
 
-			   // JqGrid implementations 
+				// JqGrid implementations 
 				var filter = '${filter}'
 				var latency = '${latency}'
 				var event = '${event}'
@@ -54,36 +55,32 @@
 					</tds:hasPermission>\
 					<g:if test="${moveEvent != null}"><g:link class="mmlink" controller="application" action="list"><span class="capBtn"><input type="button" value="Clear Filters" /></span></g:link></g:if>'
 				<jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"
-				editurl="'${createLink(action: 'deleteBulkAsset')}'"
-				colNames="'Actions','Name', 'App Sme','Validation', 'Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType', 'Event'"
-				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'50', fixed:true},
-					{name:'assetName',index: 'assetName', editable: true, formatter: myLinkFormatter, width:'300'},
-					{name:'sme', editable: true},
-					{name:'validation', editable: true, width:'200'},
-					{name:'planStatus', editable: true}, 
-					{name:'moveBundle', editable: true},
-					{name:'depNumber', editable: true},
-					{name:'depResolve', editable: true},
-					{name:'depConflicts', editable: true},
-					{name:'id', hidden: true},
-					{name:'commentType', hidden: true},
-					{name:'event', hidden: true} "
-				sortname="'assetName'"
-				sortable = "true"
-				caption="listCaption"
-				height="'100%'"
-				rowNum="sizePref"
-				rowList= "'25','100','500','1000'"
-				multiselect="true"
-				viewrecords="true"
-				loadComplete="initCheck"
-				showPager="true"
-				loadComplete=function(){
-					resizeGrid()
-				}
-				postData="{filter: filter, event:event, latency:latency, plannedStatus:plannedStatus, validationFilter:validation, moveBundleId:moveBundleId,
-					assetName:appName, planStatus:planStatus, moveBundle:moveBundle, validation:validationFilter, sme:appSme}"
-				datatype="'json'">
+					editurl="'${createLink(action: 'deleteBulkAsset')}'"
+					colNames="'Actions','Name', 'App Sme','Validation', 'Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType', 'Event'"
+					colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'50', fixed:true},
+						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
+						{name:'sme'},
+						{name:'validation', width:'200'},
+						{name:'planStatus'}, 
+						{name:'moveBundle'},
+						{name:'depNumber'},
+						{name:'depResolve'},
+						{name:'depConflicts'},
+						{name:'id', hidden: true},
+						{name:'commentType', hidden: true},
+						{name:'event', hidden: true} "
+					sortname="'assetName'"
+					caption="listCaption"
+					rowNum="sizePref"
+					multiselect="true"
+					loadComplete="initCheck"
+					gridComplete="function(){bindResize('applicationId')}"
+					showPager="true"
+					loadComplete=function(){
+						resizeGrid()
+					}
+					postData="{filter: filter, event:event, latency:latency, plannedStatus:plannedStatus, validationFilter:validation, moveBundleId:moveBundleId,
+						assetName:appName, planStatus:planStatus, moveBundle:moveBundle, validation:validationFilter, sme:appSme}">
 					<jqgrid:filterToolbar id="applicationId" searchOnEnter="false" />
 					<jqgrid:navigation id="applicationId" add="false" edit="false" del="false" search="false" refresh="false" />
 					<jqgrid:refreshButton id="applicationId" />
@@ -150,17 +147,7 @@
 				
 				$("#gs_assetName").trigger( 'keydown' );
 			}
-
-				$('#applicationIdWrapper').width($('.fluid').width()-16) // 16 pixels comptensates for the border/padding/etc and the scrollbar
-				$('#applicationIdGrid').fluidGrid({ base:'#applicationIdWrapper', offset: 0 });
 			})
-			$(window).resize(resizeGrid);
-
-			// Called when the window is resized to resize the grid wrapper 
-			function resizeGrid() {
-				$('#applicationIdWrapper').width($('.fluid').width()-2) // 2 pixels comptensates for the border/padding/etc
-				$('#applicationIdGrid').fluidGrid({ base:'#applicationIdWrapper', offset: 0 });
-			}
 		</script>
 	</head>
 	<body>
@@ -169,7 +156,7 @@
 			<g:if test="${flash.message}">
 				<div id="messageDivId" class="message">${flash.message}</div>
 			</g:if>
-			<div >
+			<div>
 				<div id="messageId" class="message" style="display:none"></div>
 			</div>
 			<jqgrid:wrapper id="applicationId" />

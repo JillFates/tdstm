@@ -6,8 +6,10 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 		<g:javascript src="entity.crud.js" />
 		<jqgrid:resources />
+		<g:javascript src="jqgrid-support.js" />
 		
 		<script type="text/javascript">
+		
 			$(document).ready(function() {
 				$("#showEntityView").dialog({ autoOpen: false })
 				$("#editEntityView").dialog({ autoOpen: false })
@@ -28,20 +30,15 @@
 								  {name:'frequency', editable: true,width:'90'},
 								  {name:'status', editable: true, width:'80'}"
 					sortname="'assetName'"
-					sortable = "true"
 					caption="listCaption"
-					height="'100%'"
-					rowNum="'25'"
-					rowList= "'25','100','500','1000'"
-					viewrecords="true"
 					multiselect="true"
-					loadComplete="initCheck"
-					showPager="true"
-					datatype="'json'">
+					gridComplete="function(){bindResize('dependencyGridId')}"
+					showPager="true">
 					<jqgrid:filterToolbar id="dependencyGridId" searchOnEnter="false" />
 					<jqgrid:navigation id="dependencyGridId" add="false" edit="false" del="false" search="false" refresh="false" />
 					<jqgrid:refreshButton id="dependencyGridId" />
 				</jqgrid:grid>
+				
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
 					var value = cellvalue ? cellvalue : ''
@@ -52,17 +49,7 @@
 						return '<a href="javascript:getEntityDetails(\'dependencies\',\''+rowObjcet[5]+'\',\''+rowObjcet[10]+'\')">'+value+'</a>'
 				}
 				
-				$('#dependencyGridIdWrapper').width($('.fluid').width()-16) // 16 pixels comptensates for the border/padding/etc and the scrollbar
-				$('#dependencyGridIdGrid').fluidGrid({ base:'#dependencyGridIdWrapper', offset: 0 });
-				
 			})
-			$(window).resize(resizeGrid);
-			
-			// Called when the window is resized to resize the grid wrapper 
-			function resizeGrid(){
-				$('#dependencyGridIdWrapper').width($('.fluid').width()-2) // 2 pixels comptensates for the border/padding/etc
-				$('#dependencyGridIdGrid').fluidGrid({ base:'#dependencyGridIdWrapper', offset: 0 });
-			}
 		</script>
 	</head>
 	<body>

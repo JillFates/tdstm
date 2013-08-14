@@ -1,116 +1,105 @@
 <html>
 	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="layout" content="projectHeader" />
-	<title>Staff List</title>
-
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}"  />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}"  />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}"  />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}"  />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-	<jqgrid:resources />
-	<g:javascript src="projectStaff.js" />
-	<g:javascript src="person.js" />
-	<script type="text/javascript">
-	function onInvokeAction(id) {
-		setExportToLimit(id, '');
-		createHiddenInputFieldsForLimitAndSubmit(id);
-	}
-	 
-	</script>
-	<script type="text/javascript">
-		 $(document).ready(function() {
-		  $("#filterSelect").change(function(ev) {
-				ev.preventDefault();
-				$("#formId").submit();
-			  });
-		 })
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="layout" content="projectHeader" />
+		<title>Staff List</title>
 		
-	</script>
-	<script type="text/javascript">
-	$(document).ready(function() {
-		$("#personGeneralViewId").dialog({ autoOpen: false })
-		$("#createStaffDialog").dialog({ autoOpen: false })
-		$("#showOrMergeId").dialog({ autoOpen: false })
-		$('.cbox').change(function() {
-			var checkedLen = $('.cbox:checkbox:checked').length
-			if(checkedLen > 1 && checkedLen < 3) {
-				$("#compareMergeId").removeAttr("disabled")
-			} else {
-				$("#compareMergeId").attr("disabled","disabled")
-			}
-		})
-	})
-	</script>
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}"  />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}"  />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}"  />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}"  />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+		<jqgrid:resources />
+		<g:javascript src="projectStaff.js" />
+		<g:javascript src="person.js" />
+		<g:javascript src="jqgrid-support.js" />
 		<script type="text/javascript">
-		$(document).ready(function() {
-			var listCaption ="Staff: \
-			<tds:hasPermission permission='PersonCreateView'>\
-				<span class=\"button\"><input type=\"button\" value=\"Create Staff\" class=\"create\" onClick=\"createDialog()\"/></span> \
-			</tds:hasPermission>\
-			<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='compareOrMerge()' disabled='disabled'/></span>"
-			$("#personGeneralViewId").dialog({ autoOpen: false })
-			$("#createStaffDialog").dialog({ autoOpen: false })
-			
-			$("#filterSelect").change(function(ev) {
-				ev.preventDefault();
-				$("#formId").submit();
-			});
-			<jqgrid:grid id="personId" url="'${''+listJsonUrl?:'no'}'"
-				colNames="'First Name', 'Middle Name', 'Last Name', 'User Login', 'User Company', 'Date Created', 'Last Updated', 'Model Score'"
-				colModel="{name:'firstname', width:'80'},
-					{name:'middlename', width:'80'},
-					{name:'lastname', index: 'lastname', width:'80'},
-					{name:'userLogin', width:'80'},
-					{name:'company', editable: true,width:'100'},
-					{name:'dateCreated', editable: true,width:'50', formatter:formatDate},
-					{name:'lastUpdated', editable: true,width:'50', formatter:formatDate},
-					{name:'modelScore', editable: true,width:'50'}"
-				sortname="'lastname'"
-				caption="listCaption"
-				height="'100%'"
-				rowNum="'25'"
-				rowList= "'25','100','500','1000'"
-				multiselect="true"
-				viewrecords="true"
-				showPager="true"
-				loadComplete="initCheck"
-				datatype="'json'">
-				<jqgrid:filterToolbar id="personId" searchOnEnter="false" />
-				<jqgrid:navigation id="personId" add="false" edit="false" del="false" search="false" refresh="true" />
-			</jqgrid:grid>
-			$.jgrid.formatter.integer.thousandsSeparator='';
-			
-			function formatDate (cellvalue, options, rowObject) {
-				if(cellvalue)
-					return cellvalue.substring(0,10) // Cut off the timestamp portion of the date
-				return 'Never'
-			}
-			
-			function initCheck() {
-				 $('.cbox').change(function() {
-					 var checkedLen = $('.cbox:checkbox:checked').length
-					 if(checkedLen > 1 && checkedLen < 5) {
-						$("#compareMergeId").removeAttr("disabled")
-					 }else{
-						$("#compareMergeId").attr("disabled","disabled")
-					 }
-				})
-			}
-			
-			$('#personIdWrapper').width($('.fluid').width()-16) // 16 pixels comptensates for the border/padding/etc and the scrollbar
-			$('#personIdGrid').fluidGrid({ base:'#personIdWrapper', offset: 0 });
-		})
-		$(window).resize(resizeGrid);
-
-		// Called when the window is resized to resize the grid wrapper 
-		function resizeGrid(){
-			$('#personIdWrapper').width($('.fluid').width()-2) // 2 pixels comptensates for the border/padding/etc
-			$('#personIdGrid').fluidGrid({ base:'#personIdWrapper', offset: 0 });
+		function onInvokeAction(id) {
+			setExportToLimit(id, '');
+			createHiddenInputFieldsForLimitAndSubmit(id);
 		}
-		
-	</script>
+		 
+		</script>
+		<script type="text/javascript">
+			 $(document).ready(function() {
+			  $("#filterSelect").change(function(ev) {
+					ev.preventDefault();
+					$("#formId").submit();
+				  });
+			 })
+			
+		</script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$("#personGeneralViewId").dialog({ autoOpen: false })
+				$("#createStaffDialog").dialog({ autoOpen: false })
+				$("#showOrMergeId").dialog({ autoOpen: false })
+				$('.cbox').change(function() {
+					var checkedLen = $('.cbox:checkbox:checked').length
+					if(checkedLen > 1 && checkedLen < 3) {
+						$("#compareMergeId").removeAttr("disabled")
+					} else {
+						$("#compareMergeId").attr("disabled","disabled")
+					}
+				})
+			})
+		</script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				var listCaption ="Staff: \
+				<tds:hasPermission permission='PersonCreateView'>\
+					<span class=\"button\"><input type=\"button\" value=\"Create Staff\" class=\"create\" onClick=\"createDialog()\"/></span> \
+				</tds:hasPermission>\
+				<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='compareOrMerge()' disabled='disabled'/></span>"
+				$("#personGeneralViewId").dialog({ autoOpen: false })
+				$("#createStaffDialog").dialog({ autoOpen: false })
+				
+				$("#filterSelect").change(function(ev) {
+					ev.preventDefault();
+					$("#formId").submit();
+				});
+				<jqgrid:grid id="personId" url="'${''+listJsonUrl?:'no'}'"
+					colNames="'First Name', 'Middle Name', 'Last Name', 'User Login', 'User Company', 'Date Created', 'Last Updated', 'Model Score'"
+					colModel="{name:'firstname', width:'80'},
+						{name:'middlename', width:'80'},
+						{name:'lastname', index: 'lastname', width:'80'},
+						{name:'userLogin', width:'80'},
+						{name:'company',width:'100'},
+						{name:'dateCreated',width:'50', formatter:formatDate},
+						{name:'lastUpdated',width:'50', formatter:formatDate},
+						{name:'modelScore',width:'50'}"
+					sortname="'lastname'"
+					caption="listCaption"
+					multiselect="true"
+					gridComplete="function(){bindResize('personId')}"
+					showPager="true"
+					loadComplete="initCheck"
+					onSelectRow="validateMergeCount">
+					<jqgrid:filterToolbar id="personId" searchOnEnter="false" />
+					<jqgrid:navigation id="personId" add="false" edit="false" del="false" search="false" refresh="true" />
+				</jqgrid:grid>
+				$.jgrid.formatter.integer.thousandsSeparator='';
+				
+				function formatDate (cellvalue, options, rowObject) {
+					if(cellvalue)
+						return cellvalue.substring(0,10) // Cut off the timestamp portion of the date
+					return 'Never'
+				}
+				
+				function validateMergeCount() {
+					var checkedLen = $('.cbox:checkbox:checked').length
+					if(checkedLen > 1 && checkedLen < 5) {
+						$("#compareMergeId").removeAttr("disabled")
+					} else {
+						$("#compareMergeId").attr("disabled","disabled")
+					}
+				}
+				
+				function initCheck() {
+					$('.cbox').change(validateMergeCount)
+				}
+			})
+		</script>
 	</head>
 	<body>
 	<div class="body fluid">

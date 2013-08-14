@@ -641,22 +641,27 @@ margin: -8px !important;
 	padding:3px !important;
 }
 .combo-td {
-    width: 120px !important;	
+    width: 120px !important;
 }
 .depSelect {
     width: 135px
 }
 .modelSelect {
-	width: 140px !important;	
+	width: 140px !important;
+}
+
+.ui-jqgrid-htable thead {
+	z-index: 15 !important;
+	border-bottom: 1px solid #CCCCCC !important;
 }
 .SuffleImage {
 	height: 16px;
-    margin-left: 60px;
-    margin-top: -10px;
-    position: absolute;
-    width: 16px;
-    z-index: 1;
-    cursor:pointer;
+	margin-left: 60px;
+	margin-top: -10px;
+	position: absolute;
+	width: 16px;
+	z-index: 1;
+	cursor:pointer;
 }
 .suffleSelect{
 	margin-top:10px !important;

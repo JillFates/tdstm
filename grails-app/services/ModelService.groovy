@@ -185,7 +185,6 @@ class ModelService {
 		// Sort by the specified field
 		query.append(" ORDER BY ${sortColumn} ${sortOrder} ")
 		
-		// log.info "listOfFilteredModels() : query=${query}, queryParams=$queryParams"
 		
 		// Perform the query and store the results in a list
 		if (queryParams.size() > 0)

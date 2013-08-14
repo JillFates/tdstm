@@ -6,14 +6,15 @@
 		<title>Storage List</title>
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
-
+		<jqgrid:resources />
+		<g:javascript src="jqgrid-support.js" />
+		
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-		<jqgrid:resources />
 		<script type="text/javascript">
 			$(document).ready(function() {
 				//$('#assetMenu').show();
@@ -45,84 +46,70 @@
 					<g:if test="${moveEvent != null}"><g:link class="mmlink" controller="files" action="list"><span class="capBtn"><input type="button" value="Clear Filters" /></span></g:link></g:if>'
 				// JqGrid implementations 
 				<jqgrid:grid id="storageId" url="'${createLink(action: 'listJson')}'"
-				editurl="'${createLink(action: 'deleteBulkAsset')}'"
-				colNames="'Actions','Name', 'Storage Format', 'Storage Size', 'Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType'"
-				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'80'},
-							  {name:'assetName',index: 'assetName', editable: true, formatter: myLinkFormatter, width:'300'},
-							  {name:'fileFormat', editable: true},
-							  {name:'fileSize', editable: true},
-							  {name:'planStatus', editable: true}, 
-							  {name:'moveBundle', editable: true},
-							  {name:'depNumber', editable: false,sortable:false,search:false},
-							  {name:'depResolve', editable: false,sortable:false,search:false },
-							  {name:'depConflicts', editable: false,sortable:false,search:false},
-							  {name:'id', hidden: true},
-							  {name:'commentType', hidden: true} "
-				sortname="'assetName'"
-				sortable = "true"
-				caption="listCaption"
-				height="'100%'"
-				rowNum="sizePref"
-				rowList= "'25','100','500','1000'"
-				multiselect="true"
-				loadComplete="initCheck"
-				viewrecords="true"
-				postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId, assetName:fileName, 
-					planStatus:planStatus, moveBundle:moveBundle, fileFormat:fileFormat, fileSize:fileSize}"
-				showPager="true"
-				datatype="'json'">
-				<jqgrid:filterToolbar id="storageId" searchOnEnter="false" />
-				<jqgrid:navigation id="storageId" add="false" edit="false" del="false" search="false" refresh="false"/>
-				<jqgrid:refreshButton id="storageId" />
-			</jqgrid:grid>
+					editurl="'${createLink(action: 'deleteBulkAsset')}'"
+					colNames="'Actions','Name', 'Storage Format', 'Storage Size', 'Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType'"
+					colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'80'},
+						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
+						{name:'fileFormat'},
+						{name:'fileSize'},
+						{name:'planStatus'}, 
+						{name:'moveBundle'},
+						{name:'depNumber',sortable:false,search:false},
+						{name:'depResolve',sortable:false,search:false },
+						{name:'depConflicts',sortable:false,search:false},
+						{name:'id', hidden: true},
+						{name:'commentType', hidden: true} "
+					sortname="'assetName'"
+					caption="listCaption"
+					rowNum="sizePref"
+					multiselect="true"
+					loadComplete="initCheck"
+					gridComplete="function(){bindResize('storageId')}"
+					postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId, assetName:fileName, 
+						planStatus:planStatus, moveBundle:moveBundle, fileFormat:fileFormat, fileSize:fileSize}"
+					showPager="true">
+					<jqgrid:filterToolbar id="storageId" searchOnEnter="false" />
+					<jqgrid:navigation id="storageId" add="false" edit="false" del="false" search="false" refresh="false"/>
+					<jqgrid:refreshButton id="storageId" />
+				</jqgrid:grid>
 				populateFilter();
-
+				
 				$.jgrid.formatter.integer.thousandsSeparator='';
-			function myLinkFormatter (cellvalue, options, rowObjcet) {
-				var value = cellvalue ? cellvalue : ''
-				return '<a href="javascript:getEntityDetails(\'files\',\''+rowObjcet[10]+'\','+options.rowId+')">'+value+'</a>'
-			}
-
-			function myCustomFormatter (cellVal,options,rowObject) {
-				var editButton = '<a href="javascript:editEntity(\'files\',\''+rowObject[10]+'\','+options.rowId+')">'+
-						"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
-				if(rowObject[9]=='issue'){
-					var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
-						+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
-					editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
-						+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_red.png')}' border='0px'/>"+"</a></span>"
-				} else if (rowObject[9]=='comment') {
-					var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
-						+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
-					editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
-						+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_bold.png')}' border='0px'/>"+"</a></span>"
-				} else {
-					editButton+='<span id="icon_'+options.rowId+'"><a href="javascript:createNewAssetComment('+options.rowId+',\''+rowObject[1]+'\')">'
-						+"<img src='${resource(dir:'i',file:'db_table_light.png')}' border='0px'/>"+"</a></span>"
+				function myLinkFormatter (cellvalue, options, rowObjcet) {
+					var value = cellvalue ? cellvalue : ''
+					return '<a href="javascript:getEntityDetails(\'files\',\''+rowObjcet[10]+'\','+options.rowId+')">'+value+'</a>'
 				}
-				return editButton
-			}
-
-			function populateFilter(){
-				$("#gs_assetName").val('${fileName}')
-				$("#gs_fileFormat").val('${fileFormat}')
-				$("#gs_fileSize").val('${fileSize}')
-				$("#gs_planStatus").val('${planStatus}')
-				$("#gs_moveBundle").val('${moveBundle}')
-			}
-			$('#storageIdWrapper').width($('.fluid').width()-16) // 16 pixels comptensates for the border/padding/etc and the scrollbar
-			$('#storageIdGrid').fluidGrid({ base:'#storageIdWrapper', offset: 0 });
+				
+				function myCustomFormatter (cellVal,options,rowObject) {
+					var editButton = '<a href="javascript:editEntity(\'files\',\''+rowObject[10]+'\','+options.rowId+')">'+
+							"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+					if(rowObject[9]=='issue'){
+						var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
+							+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
+						editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
+							+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_red.png')}' border='0px'/>"+"</a></span>"
+					} else if (rowObject[9]=='comment') {
+						var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
+							+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
+						editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
+							+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_bold.png')}' border='0px'/>"+"</a></span>"
+					} else {
+						editButton+='<span id="icon_'+options.rowId+'"><a href="javascript:createNewAssetComment('+options.rowId+',\''+rowObject[1]+'\')">'
+							+"<img src='${resource(dir:'i',file:'db_table_light.png')}' border='0px'/>"+"</a></span>"
+					}
+					return editButton
+				}
+				
+				function populateFilter(){
+					$("#gs_assetName").val('${fileName}')
+					$("#gs_fileFormat").val('${fileFormat}')
+					$("#gs_fileSize").val('${fileSize}')
+					$("#gs_planStatus").val('${planStatus}')
+					$("#gs_moveBundle").val('${moveBundle}')
+				}
 			})
-			$(window).resize(resizeGrid);
-
-			// Called when the window is resized to resize the grid wrapper 
-			function resizeGrid(){
-				$('#storageIdWrapper').width($('.fluid').width()-2) // 2 pixels comptensates for the border/padding/etc
-				$('#storageIdGrid').fluidGrid({ base:'#storageIdWrapper', offset: 0 });
-			}
-
 		</script>
-
+		
 	</head>
 	<body>
 		<div class="body fluid">
@@ -134,7 +121,7 @@
 				<div id="messageId" class="message" style="display:none"></div>
 			</div>
 			<jqgrid:wrapper id="storageId" />
-
+			
 			<div id="createEntityView" style="display: none;"></div>
 			<div id="showEntityView" style="display: none;"></div>
 			<div id="editEntityView" style="display: none;"></div>	

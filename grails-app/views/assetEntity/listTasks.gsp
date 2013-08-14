@@ -12,50 +12,51 @@
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="entity.crud.js" />
 	<g:javascript src="model.manufacturer.js"/>
+	<jqgrid:resources />
+	<g:javascript src="jqgrid-support.js" />
 	<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-	<jqgrid:resources />
 	<script type="text/javascript">
-        $(document).ready(function() {
-            $('#issueTimebar').width($(window).width()+'px')
-            
-        	$('#assetMenu').show();
-        	$("#commentsListDialog").dialog({ autoOpen: false })
- 	        $("#createCommentDialog").dialog({ autoOpen: false })
- 	        $("#showCommentDialog").dialog({ autoOpen: false })
- 	        $("#editCommentDialog").dialog({ autoOpen: false })
- 	        $("#showEntityView").dialog({ autoOpen: false })
+		$(document).ready(function() {
+			$('#issueTimebar').width($(window).width()+'px')
+			
+			$('#assetMenu').show();
+			$("#commentsListDialog").dialog({ autoOpen: false })
+			$("#createCommentDialog").dialog({ autoOpen: false })
+			$("#showCommentDialog").dialog({ autoOpen: false })
+			$("#editCommentDialog").dialog({ autoOpen: false })
+			$("#showEntityView").dialog({ autoOpen: false })
 			$("#editEntityView").dialog({ autoOpen: false })
 			$("#createEntityView").dialog({ autoOpen: false })
 			$("#editManufacturerView").dialog({ autoOpen: false})
 			$("#manufacturerShowDialog").dialog({ autoOpen: false })
 			$("#modelShowDialog").dialog({ autoOpen: false })
-	    	currentMenuId = "#assetMenu";
-	    	$("#teamMenuId a").css('background-color','#003366')
-	    	$("#viewGraphSpanId").css('margin-left',$(window).width()*3.3/100+'%')
-	    	$("#selectTimedBarId").val(${timeToUpdate})
-	    	$("#viewtaskgraph_button_graph").click(function(event){
+			currentMenuId = "#assetMenu";
+			$("#teamMenuId a").css('background-color','#003366')
+			$("#viewGraphSpanId").css('margin-left',$(window).width()*3.3/100+'%')
+			$("#selectTimedBarId").val(${timeToUpdate})
+			$("#viewtaskgraph_button_graph").click(function(event){
 				 var moveEvent = $("#moveEventId").val()
 				 if(moveEvent == '0'){
 				 	alert("Please select an event first.")
 				 	event.preventDefault()
 				 }
 			});
-	    	taskManagerTimePref = ${timeToUpdate}
-
-	    	if(taskManagerTimePref != 0){
-	    	  B2.Start(taskManagerTimePref);
-	    	}else{
-	   		  B2.Pause(0);
-	   	    }
-	    	var event = ${filterEvent}
-	    	var justRemaining = ${justRemaining}
-	    	var justMyTasks = ${justMyTasks}
-	    	var filter = '${filter}'
-		    var comment = '${comment}'
-	    	var taskNumber = '${taskNumber}'
-		    var assetEntity = '${assetName}'
+			taskManagerTimePref = ${timeToUpdate}
+			
+			if (taskManagerTimePref != 0) {
+				B2.Start(taskManagerTimePref);
+			} else {
+				B2.Pause(0);
+			}
+			var event = ${filterEvent}
+			var justRemaining = ${justRemaining}
+			var justMyTasks = ${justMyTasks}
+			var filter = '${filter}'
+			var comment = '${comment}'
+			var taskNumber = '${taskNumber}'
+			var assetEntity = '${assetName}'
 			var assetType = '${assetType}'
 			var dueDate = '${dueDate}'
 			var status = '${status}'
@@ -68,116 +69,104 @@
 				<span class='capBtn'><input type='button' value='Create Task' onclick='createIssue()'/></span> \
 				<span class='capBtn'><input type='button' id='bulkEditId' class='bulkEdit' value='Bulk Edit' data-method='bulkEditTasks' /></span>"
 					
-	    	<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
-	            colNames="'Action', 'Task', 'Description', 'Asset', 'AssetType', 'Updated', 'Due', 'Status',
-		            'Assigned To', 'Team', 'Category', 'Suc.', 'Score', 'id', 'statusCss'"
-	            colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
-            				{name:'taskNumber', editable: true, formatter:taskFormatter, width:80},
-                            {name:'comment', editable: true, width:680, formatter:taskFormatter},
-                            {name:'assetName', editable: true, formatter:assetFormatter, width:200},
-                            {name:'assetType', editable: true, formatter:taskFormatter},
-                            {name:'updated', editable: true, formatter: updatedFormatter,sortable:false,search:false},
-                            {name:'dueDate', editable: true, formatter: dueFormatter},
-                            {name:'status', editable: true, formatter: statusFormatter},
-                            {name:'assignedTo', editable: true, formatter:assignedFormatter, width:200},
-                            {name:'role', editable: true, formatter:taskFormatter},
-                            {name:'category', editable: true, formatter:taskFormatter},
-                            {name:'suc', editable: true, formatter:taskFormatter,sortable:false,search:false, width:50},
-                            {name:'score', editable: true, formatter:taskFormatter, search:false, width:70},
-                            {name:'id', hidden: true},
-                            {name:'statusCss', hidden: true}"
-	            caption="listCaption"
-	            height="'100%'"
-            	rowNum="sizePref"
-	            rowList= "'25','100', '500','1000'"
-	            scrollOffset="0"
-	            viewrecords="true"
-	            postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
-	            	assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category}"
-	            showPager="true"
-	            datatype="'json'">
-	            <jqgrid:filterToolbar id="taskListId" searchOnEnter="false" />
-	            <jqgrid:navigation id="taskListId" add="false" edit="false" 
-	                  del="false" search="false" refresh="false" />
-	            <jqgrid:refreshButton id="taskListId" />
-	     		</jqgrid:grid>
-	     		populateFilter();
-				$('#taskListIdWrapper').width($('.fluid').width()-16) // 16 pixels comptensates for the border/padding/etc and the scrollbar
-				$('#taskListIdGrid').fluidGrid({ base:'#taskListIdWrapper', offset: 0 });
-				
-	            $('.bulkEdit').on('click',function(){
-	                var method = $(this).data('method');
-	                if(method == "bulkEditTasks"){
-	                	$(this).attr('disabled', 'disabled');
-	                	$(this).data('method','hideActionBars');
-	                	bulkEditTasks();
-	                }else{
-	                	$(this).data('method','bulkEditTasks');
-	                	hideActionBars();
-	                }
-	            });
-			})
-			$(window).resize(resizeGrid);
-
-			// Called when the window is resized to resize the grid wrapper 
-			function resizeGrid(){
-				$('#taskListIdWrapper').width($('.fluid').width()-2) // 2 pixels comptensates for the border/padding/etc
-				$('#taskListIdGrid').fluidGrid({ base:'#taskListIdWrapper', offset: 0 });
-			}
+			<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
+				colNames="'Action', 'Task', 'Description', 'Asset', 'AssetType', 'Updated', 'Due', 'Status',
+					'Assigned To', 'Team', 'Category', 'Suc.', 'Score', 'id', 'statusCss'"
+				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
+					{name:'taskNumber', formatter:taskFormatter, width:80},
+					{name:'comment', width:680, formatter:taskFormatter},
+					{name:'assetName', formatter:assetFormatter, width:200},
+					{name:'assetType', formatter:taskFormatter},
+					{name:'updated', formatter: updatedFormatter,sortable:false,search:false},
+					{name:'dueDate', formatter: dueFormatter},
+					{name:'status', formatter: statusFormatter},
+					{name:'assignedTo', formatter:assignedFormatter, width:200},
+					{name:'role', formatter:taskFormatter},
+					{name:'category', formatter:taskFormatter},
+					{name:'suc', formatter:taskFormatter,sortable:false,search:false, width:50},
+					{name:'score', formatter:taskFormatter, search:false, width:70},
+					{name:'id', hidden: true},
+					{name:'statusCss', hidden: true}"
+				caption="listCaption"
+				rowNum="sizePref"
+				scrollOffset="0"
+				gridComplete="function(){bindResize('taskListId')}"
+				postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
+					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category}"
+				showPager="true">
+				<jqgrid:filterToolbar id="taskListId" searchOnEnter="false" />
+				<jqgrid:navigation id="taskListId" add="false" edit="false" 
+					  del="false" search="false" refresh="false" />
+				<jqgrid:refreshButton id="taskListId" />
+			</jqgrid:grid>
+			populateFilter();
+			
+			$('.bulkEdit').on('click',function(){
+				var method = $(this).data('method');
+				if(method == "bulkEditTasks"){
+					$(this).attr('disabled', 'disabled');
+					$(this).data('method','hideActionBars');
+					bulkEditTasks();
+				}else{
+					$(this).data('method','bulkEditTasks');
+					hideActionBars();
+				}
+			});
+		})
 		
-        $.jgrid.formatter.integer.thousandsSeparator='';
-
-        function myCustomFormatter (cellVal,options,rowObject) {
-        	var editButton = '<a href="javascript:showAssetComment(\''+options.rowId+'\',\'edit\')">'+
-       			"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
-            return editButton
-        }
-        function taskFormatter(cellVal,options,rowObject) {
-            return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal ? cellVal :"") + '</span>';
-        }
-        function assignedFormatter(cellVal,options,rowObject) {
-      	  return '<span class="cellWithoutBackground pointer" id="assignedToName_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal ? cellVal :"") + '</span>';
-      	}
-        function statusFormatter(cellVal,options,rowObject){
-            return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
-         }
-
-        function updatedFormatter(cellVal,options,rowObject){
-        	 return '<span id="span_'+options.rowId+'" class="cellWithoutBackground '+rowObject[14] +'" onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
-        }
-        function dueFormatter(cellVal,options,rowObject){
-       	 	return '<span id="span_'+options.rowId+'" class=" '+rowObject[15] +'" onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
-        }
-        function assetFormatter(cellVal,options,rowObject){
-        	return cellVal ? '<span class="cellWithoutBackground pointer" onclick= "getEntityDetails(\'listTask\', \''+rowObject[4]+'\', '+rowObject[16]+')\" >' + (cellVal) + '</span>' :
-        		"<span class='cellWithoutBackground pointer'></span>"
-        }        
-
-        function populateFilter(){
-        	$("#gs_comment").val('${comment}')
-        	$("#gs_taskNumber").val('${taskNumber}')
-        	$("#gs_assetEntity").val('${assetName}')
-    	    $("#gs_assetType").val('${assetType}')
-    		$("#gs_dueDate").val('${dueDate}')
-    		$("#gs_status").val('${status}')
-    	    $("#gs_assignedTo").val('${assignedTo}')
-    		$("#gs_role").val('${role}')
-    		$("#gs_category").val('${category}')
-        }     
-        $(document).keyup(function(e) {
-        	// esc to stop timer
-       	    if (e.keyCode == 27) { if(B2 != '' && taskManagerTimePref != 0){ B2.Restart( taskManagerTimePref ); }}   
-       	});
-
-       function bulkEditTasks(){
-           var ids = new Array();
-           $(".task_started, .task_ready").each(function(){
-                var taskId = $(this).attr('id').split("_")[1]
-		 		ids.push(taskId)
-		   })
-		   if(B2 != ''){ B2.Pause() }
-		   getBulkActionBarGrid( ids )
-       }
+		$.jgrid.formatter.integer.thousandsSeparator='';
+		
+		function myCustomFormatter (cellVal,options,rowObject) {
+			var editButton = '<a href="javascript:showAssetComment(\''+options.rowId+'\',\'edit\')">'+
+				"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+			return editButton
+		}
+		function taskFormatter(cellVal,options,rowObject) {
+			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal ? cellVal :"") + '</span>';
+		}
+		function assignedFormatter(cellVal,options,rowObject) {
+		  return '<span class="cellWithoutBackground pointer" id="assignedToName_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal ? cellVal :"") + '</span>';
+		}
+		function statusFormatter(cellVal,options,rowObject){
+			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
+		 }
+		
+		function updatedFormatter(cellVal,options,rowObject){
+			 return '<span id="span_'+options.rowId+'" class="cellWithoutBackground '+rowObject[14] +'" onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
+		}
+		function dueFormatter(cellVal,options,rowObject){
+			return '<span id="span_'+options.rowId+'" class=" '+rowObject[15] +'" onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
+		}
+		function assetFormatter(cellVal,options,rowObject){
+			return cellVal ? '<span class="cellWithoutBackground pointer" onclick= "getEntityDetails(\'listTask\', \''+rowObject[4]+'\', '+rowObject[16]+')\" >' + (cellVal) + '</span>' :
+				"<span class='cellWithoutBackground pointer'></span>"
+		}
+		
+		function populateFilter(){
+			$("#gs_comment").val('${comment}')
+			$("#gs_taskNumber").val('${taskNumber}')
+			$("#gs_assetEntity").val('${assetName}')
+			$("#gs_assetType").val('${assetType}')
+			$("#gs_dueDate").val('${dueDate}')
+			$("#gs_status").val('${status}')
+			$("#gs_assignedTo").val('${assignedTo}')
+			$("#gs_role").val('${role}')
+			$("#gs_category").val('${category}')
+		}
+		$(document).keyup(function(e) {
+			// esc to stop timer
+			if (e.keyCode == 27) { if(B2 != '' && taskManagerTimePref != 0){ B2.Restart( taskManagerTimePref ); }}   
+		});
+		
+		function bulkEditTasks(){
+			var ids = new Array();
+			$(".task_started, .task_ready").each(function(){
+				var taskId = $(this).attr('id').split("_")[1]
+				ids.push(taskId)
+			})
+			if (B2 != '') { B2.Pause() }
+			getBulkActionBarGrid( ids )
+		}
 	</script>
 </head>
 <body>
