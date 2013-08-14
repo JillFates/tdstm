@@ -35,7 +35,7 @@
 				$("#createStaffDialog").dialog({ autoOpen: false })
 				currentMenuId = "#assetMenu";
 				$("#assetMenuId a").css('background-color','#003366')	
-				$("#dependencyDivId").css('width', ($(window).width()-185)+'px');
+				$("#dependencyDivId").css('max-width', ($(window).width()-185)+'px');
 			});
 		</script>
 	</head>
