@@ -24,13 +24,13 @@
 				<tds:hasPermission permission='CreateUserLogin'>\
 					<span class='capBtn'><input type='button' value='Create User Login' onClick=\"window.location.href=\'"+contextPath+"/userLogin/create\'\"/></span> \
 				</tds:hasPermission>\
-				<span class='capBtn'><input type='button' value=' Show ${(session.getAttribute('InActive') == 'N')?'Active':'Inactive'} Users' onClick=\"window.location.href=\'"+contextPath+"/userLogin/list/?activeUsers=${(session.getAttribute('InActive') == 'N')?'Y':'N'}\'\"/></span>"
+				<span class='capBtn'><input type='button' value=' Show ${(session.getAttribute('InActive') == 'N')?'Active':'Inactive'} Users' onClick=\"$(\'#showActiveId\').val(${(session.getAttribute('InActive') == 'N')?"\'Y\'":"\'N\'"});submitForm();\"/></span>"
 				$("#personGeneralViewId").dialog({ autoOpen: false })
 				$("#createStaffDialog").dialog({ autoOpen: false })
 				
 				$("#filterSelect").change(function(ev) {
 					ev.preventDefault();
-					$("#formId").submit();
+					submitForm();
 				});
 				<jqgrid:grid id="userLoginId" url="'${''+listJsonUrl?:'no'}'"
 					colNames="'Username', 'Person', 'Roles', 'Company','Last Login', 'Date Created', 'Expiry Date'"
@@ -57,6 +57,9 @@
 				}
 			})
 			
+			function submitForm () {
+				$("#formId").submit();
+			}
 		</script>
 			
 	</head>
@@ -68,13 +71,13 @@
 				<div class="message">${flash.message}</div>
 			</g:if>
 			<div>
-				<g:form id="formId" url="[action:'list', controller:'userLogin', params:'[companyId:${companyId}]']">
+				<g:form id="formId" url="[action:'list', controller:'userLogin', params:'[companyId:${companyId}, activeUsers:${activeUsers}]']">
 					<g:select id="filterSelect" name="companyId" from="${partyGroupList}" value="${companyId}"  optionKey="id" optionValue="name" noSelection="['All':'All']" />
+					<input id="showActiveId" name="activeUsers" hidden="hidden" value="${(session.getAttribute('InActive'))}" />
 				</g:form>
 			</div>
 			<jqgrid:wrapper id="userLoginId" />
 			<div id="personGeneralViewId" style="display: none;" title="Manage Staff "></div>
-			</div>
 		</div>
 	</body>
 </html>
