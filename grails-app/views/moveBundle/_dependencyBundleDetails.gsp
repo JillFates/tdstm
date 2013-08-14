@@ -48,7 +48,7 @@
 					</div>
 				</td>
 				<td style="padding: 0px;">
-					<div style="overflow-x:scroll; max-width: 1350px;">
+					<div id="dependencyDivId" style="overflow-x:scroll;">
 						<table id="dependencyTableId" cellpadding="4" cellspacing="0" style="border: 0px;">
 							<tr class="odd">
 								<td id="span_all" class="">
