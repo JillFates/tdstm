@@ -177,7 +177,7 @@ class DatabaseController {
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
-		def moveBundleList = MoveBundle.findAllByProject(project)
+		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		//fieldImportance for Discovery by default
 		def configMap = assetEntityService.getConfig('Database','Discovery')
 		
@@ -228,7 +228,7 @@ class DatabaseController {
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
-		def moveBundleList = MoveBundle.findAllByProject(project)
+		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		
 
 		def id = params.id

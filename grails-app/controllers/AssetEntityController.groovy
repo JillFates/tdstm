@@ -3065,7 +3065,7 @@ class AssetEntityController {
 			def models=[]
 			models=getModelSortedByStatus(manufacuterer)
 			
-			def moveBundleList = MoveBundle.findAllByProject(project)
+			def moveBundleList = MoveBundle.findAllByProject(project,[sort:"name"])
 			
 			def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 			
@@ -3191,7 +3191,7 @@ class AssetEntityController {
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
 
-		def moveBundleList = MoveBundle.findAllByProject(project)
+		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 
 		def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
 		def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)

@@ -59,11 +59,11 @@ $(document).ready(function() {
 	<tr class="prop trAnchor" >
 		<td class="label"><b>Model</b></td>
 		<td class="label">
-		<div id="modelCreateId">
-	    <g:select id="model" name ="model.id" from="${models}" value="${assetEntityInstance.model}" noSelection="${[null:' Unassigned']}" tabindex="14" 
-	  		optionKey="id" optionValue="${{it.modelName+' '+(it.modelStatus =='new' || !it.modelStatus ? '?' :'')}}" onChange="setType(this.value,'Create')"/>
-	 	</div>
-	</tr>
+			<div id="modelCreateId">
+			  		<g:render template="modelView"  model="[clazz:config.model, models:models, assetEntity:assetEntityInstance, forWhom:'Create']" />
+			 </div>
+		</td>
+		</tr>
 	<tr class="prop">
 		<td class="label">Type</td>
 		<td class="label">

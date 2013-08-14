@@ -67,9 +67,7 @@ $(document).ready(function() {
 		<td class="label"><b>Model</b></td>
 		<td class="label">
 		<div id="modelEditId">
-	    <g:select id="model" name ="model.id" from="${models}" value= "${assetEntityInstance.model?.id}" optionKey="id" optionValue="modelName"  
-	    	noSelection="${[null:' Unassigned']}" tabindex="14"
-		  	 optionValue="${{it.modelName+' '+(it.modelStatus =='new' || !it.modelStatus ? '?' :'')}}" onChange="setType(this.value,'Edit')"/>
+			<g:render template="modelView"  model="[clazz:config.model, models:models, assetEntity:assetEntityInstance, forWhom:'Edit']" />
 		</div>
 		</td>
 	</tr>

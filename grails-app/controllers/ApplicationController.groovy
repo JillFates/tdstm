@@ -148,7 +148,7 @@ class ApplicationController {
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
 		def project = securityService.getUserCurrentProject()
-		def moveBundleList = MoveBundle.findAllByProject(project)
+		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 	
