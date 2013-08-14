@@ -568,8 +568,8 @@ class MoveBundleService {
 		}
 
 		// Used by the Assignment Dialog
-		def planningMoveBundles = MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance,true)
-		def allMoveBundles = MoveBundle.findAllByProject(projectInstance)
+		def planningMoveBundles = MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance,true,[sort:'name'])
+		def allMoveBundles = MoveBundle.findAllByProject(projectInstance,[sort:'name'])
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		// def assetDependentlist = AssetDependencyBundle.findAllByProject(projectInstance)?.sort{it.dependencyBundle}
 				
