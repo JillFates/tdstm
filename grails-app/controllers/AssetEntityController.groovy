@@ -3898,7 +3898,7 @@ class AssetEntityController {
 			LEFT OUTER JOIN application app ON app.app_id = ae.asset_entity_id
 			"""
 		if(params.bundle)
-			queryFordepsList +=" AND ae.move_bundle_id = ${params.bundle} "
+			queryFordepsList +=" WHERE ae.move_bundle_id = ${params.bundle} "
 			
 		assetDependentlist = jdbcTemplate.queryForList(queryFordepsList)
 		depSql += selectionQuery
