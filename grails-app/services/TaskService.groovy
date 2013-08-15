@@ -1428,7 +1428,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					if ( groups[g.name].size() == 0 ) {
 						exceptions.append("Found zero (0) assets for group ${g.name}<br/>")
 					} else {
-						log.info "Group ${g.name} contains: ${groups[g.name]}"
+						log.info "Group ${g.name} contains: ${groups[g.name].size()} elements"
 					}
 					out.append("Group ${g.name} has ${groups[g.name].size()} asset(s)<br/>")
 				}
@@ -1685,7 +1685,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 								// Track that this taskSpec is a collection type
 								collectionTaskSpecIds << taskSpec.id
 
-								def actionTasks = createAssetActionTasks(action, moveEvent, lastTaskNum, whom, recipeId, taskSpec, groups, workflow, exceptions)
+								def actionTasks = createAssetActionTasks(action, moveEvent, lastTaskNum, whom, projectStaff,recipeId, taskSpec, groups, workflow, exceptions)
 								if (actionTasks.size() > 0) {
 									// Throw the new task(s) into the collective taskList using the id as the key
 									actionTasks.each() { t ->
@@ -2682,6 +2682,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			 * @param String[] - list of the properties to examine
 			 */
 			def addWhereConditions = { list ->
+				// log.info "findAllAssetsWithFilter: Building WHERE - list:$list, filter=${filter}"
 				list.each() { code ->
 					if (filter?.asset?.containsKey(code)) {
 						// log.info("addWhereConditions: code $code matched")						
@@ -2698,7 +2699,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				}
 			}
 		
-			// Add additional WHERE clauses based on the following properties being present in the filter.asset 
+			// Add WHERE clauses based on the following properties being present in the filter.asset (Common across all Asset Classes)
+			// TODO : Some of these properties are device specific and should be moved down into the device section (e.g. truck, cart, shelf)
 			def validProperties = ['assetName','assetTag','assetType', 'priority', 'truck', 'cart', 'shelf', 'sourceLocation', 'targetLocation', 'planStatus']
 			(1..24).each() { validProperties.add("custom$it".toString()) }	// Add custom1..custom24
 			// log.info("findAllAssetsWithFilter: validProperties=$validProperties")
@@ -2740,7 +2742,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							where = SqlUtil.appendToWhere(where, "a.assetType not IN ('application', 'database', 'files')")
 						}
 					
-						sql = "from AssetEntity a where a.moveBundle.id in (:bIds) and $where"
+						sql = "from AssetEntity a where a.moveBundle.id in (:bIds)" + ( where ? " and $where" : '')
 						log.info "findAllAssetsWithFilter: DEVICE sql=$sql, map=$map"
 						assets = AssetEntity.findAll(sql, map)
 						break;
@@ -2748,8 +2750,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					case 'application':
 						// Add additional WHERE clauses based on the following properties being present in the filter (Application domain specific)
 						addWhereConditions( ['appVendor','sme','sme2','businessUnit','criticality'] )
-					
-						sql = "from Application a where a.moveBundle.id in (:bIds)" + (where.size()>0 ? " and $where" : '')
+						
+						sql = "from Application a where a.moveBundle.id in (:bIds)" + ( where ? " and $where" : '')
 						log.info "findAllAssetsWithFilter: APPLICATION sql=$sql, map=$map"
 						assets = Application.findAll(sql, map)
 						break;
@@ -2757,7 +2759,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					case 'database':
 						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
 						addWhereConditions( ['dbFormat','dbSize'] )
-						sql = "from Database a where a.moveBundle.id in (:bIds)" + (where.size()>0 ? " and $where" : '')
+						sql = "from Database a where a.moveBundle.id in (:bIds)" + ( where ? " and $where" : '')
 						log.info "findAllAssetsWithFilter: DATABASE sql=$sql, map=$map"
 						assets = Database.findAll(sql, map)
 						break;
@@ -2765,7 +2767,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					case ~/files|file|storage/:
 						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
 						addWhereConditions( ['fileFormat','fileSize', 'sizeUnit', 'LUN'] )
-						sql = "from Files a where a.moveBundle.id in (:bIds)" + (where.size()>0 ? " and $where" : '')
+						sql = "from Files a where a.moveBundle.id in (:bIds)" + ( where ? " and $where" : '')
 						log.info "findAllAssetsWithFilter: FILES sql=$sql, map=$map"
 						assets = Files.findAll(sql, map)
 						break;
@@ -2795,13 +2797,14 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param moveEvent - MoveEvent object
 	 * @param Integer lastTaskNum
 	 * @param Person whom - who is creating the tasks
+	 * @param List<Person> - references of all staff associated with the project
 	 * @param Integer recipeId
 	 * @param Map taskSpec
 	 * @param List? groups
 	 * @param StringBuffer exceptions
 	 * @return List<AssetComment> the list of tasks that were created
 	 */
-	def createAssetActionTasks(action, moveEvent, lastTaskNum, whom, recipeId, taskSpec, groups, workflow, exceptions ) {
+	def createAssetActionTasks(action, moveEvent, lastTaskNum, whom, projectStaff, recipeId, taskSpec, groups, workflow, exceptions ) {
 		def taskList = []
 		def loc 			// used for racks
 		def msg
