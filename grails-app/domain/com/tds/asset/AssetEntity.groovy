@@ -351,7 +351,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	 * @return conflictedCount
 	 */
 	def transient getConflictCount(){
-		return AssetDependency.executeQuery(
+		return moveBundle ? AssetDependency.executeQuery(
 			"SELECT COUNT(ad) FROM AssetDependency ad WHERE (ad.asset =:asset OR ad.dependent =:asset) \
 			AND (ad.asset.moveBundle !=:bundle OR ad.dependent.moveBundle != :bundle) \
 			and status not in (:status)",
@@ -359,7 +359,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 				bundle:moveBundle, 
 			  	status:[AssetDependencyStatus.ARCHIVED.toString(), AssetDependencyStatus.NA.toString()]
 			]
-		)
+		) : [0]
 	}
 
 	/**
