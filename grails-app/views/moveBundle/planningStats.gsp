@@ -366,9 +366,9 @@ $(document).ready(function() {
 						<tr>
 							<th style="background-color: white;width:80px;">&nbsp;</th>
 							<th style="background-color: white;width:80px;">&nbsp;</th>
-							<g:each in="${moveBundle}" var="bundle">
+							<g:each in="${moveEventList}" var="event">
 								<th style="color: Blue; background-color: white;text-align: center;">
-									<b><g:link controller="application" action="list" params="[moveEvent:bundle.id]">${bundle}</g:link></b>
+									<b><g:link controller="application" action="list" params="[moveEvent:event.id]">${event}</g:link></b>
 								</th>
 							</g:each>
 							<th style="background-color: white;">Done</th>
@@ -376,8 +376,8 @@ $(document).ready(function() {
 						<tr>
 							<td style="background-color: white;width:80px;">&nbsp;</td>
 							<td style="color: Blue; background-color: white;width:45px;text-align: left;"><g:link controller="application" action="list" params="[moveEvent:'unAssigned']">To be</g:link></td>
-							<g:each in="${bundleStartDate}" var="startdate">
-								<td style="text-align: right;font-size: 10px"><b>${startdate}</b></td>
+							<g:each in="${moveEventList}" var="event">
+								<td style="text-align: center;font-size: 10px"><b>${eventStartDate[event.id]}</b></td>
 							</g:each>
 							<td style="background-color: white;">&nbsp;</td>
 						</tr>

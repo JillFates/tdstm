@@ -512,7 +512,7 @@ class MoveBundleController {
 		def bundleTimeformatter = new SimpleDateFormat("dd-MMM")
 		def appList = []
 		def assetList = []
-		def bundleStartDate = []
+		def eventStartDate = [:]
 		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
 	    Set uniqueMoveEventList = moveBundleList.moveEvent
 		uniqueMoveEventList.remove(null)
@@ -559,33 +559,28 @@ class MoveBundleController {
 		
 		moveEventList.each{ moveEvent->
 			// fetching bundles for current moveEvent which was set 'true' for useOfPlanning 
-			def moveBundle = moveEvent?.moveBundles?.findAll {it.useOfPlanning == true}
-			def eventWiseArgs = [project:project, moveBundles:moveBundle]
+			def moveBundles = moveEvent?.moveBundles?.findAll {it.useOfPlanning == true}
+			def eventWiseArgs = [project:project, moveBundles:moveBundles]
 			
 			// fetching application count that are assigned to current move-event .
-			assignedApplicationCount = moveBundle ? Application.executeQuery(appCountQuery, eventWiseArgs << [type:'Application'])[0] : 0
+			assignedApplicationCount = moveBundles ? Application.executeQuery(appCountQuery, eventWiseArgs << [type:'Application'])[0] : 0
 			appList << ['count':assignedApplicationCount , 'moveEvent':moveEvent.id]
 			
-			def startDate = moveBundle.startTime.sort()
-			startDate?.removeAll([null])
-			if(startDate.size()>0){
-				if(startDate[0]){
-				   bundleStartDate << bundleTimeformatter.format(startDate[0]) 
-				}
-			}
+			def startDate = moveBundles.startTime.sort()
+			startDate?.removeAll( [null] )
+			eventStartDate << [(moveEvent.id):(startDate && startDate[0] ? bundleTimeformatter.format(startDate[0]) : 'TBD')]
 			
 			// fetching physicalAsset (e.g. 'Server','Blade' ) and virtualAsset (e.g. 'VM')  count that are assigned to current move-event .
-			def physicalAssetCount = moveBundle ? AssetEntity.executeQuery(countQuery, eventWiseArgs << [type:['Server','Blade']])[0] : 0
-			def virtualAssetCount = moveBundle ? AssetEntity.executeQuery(countQuery, eventWiseArgs << [type:['VM']])[0] : 0
-			def count = moveBundle ? AssetEntity.executeQuery(countQuery, eventWiseArgs << [type:['Server', 'VM', 'Blade']])[0] : 0
+			def physicalAssetCount = moveBundles ? AssetEntity.executeQuery(countQuery, eventWiseArgs << [type:['Server','Blade']])[0] : 0
+			def virtualAssetCount = moveBundles ? AssetEntity.executeQuery(countQuery, eventWiseArgs << [type:['VM']])[0] : 0
+			def count = moveBundles ? AssetEntity.executeQuery(countQuery, eventWiseArgs << [type:['Server', 'VM', 'Blade']])[0] : 0
 			
 			def potential = 0
 			def optional = 0
 			
-			def moveEventId = moveEventList.id 
-			def allMoveBundle = moveEventList.moveBundles.id.findAll{it != moveBundle.id}
+			def otherMoveBundles = moveEventList.moveBundles.findAll{!(it.id in moveBundles.id)}
 			
-			if(allMoveBundle.size()>0){
+			if(otherMoveBundles.size()>0){
 				def potentialQuery = "from AppMoveEvent am right join am.application a where a.moveBundle.useOfPlanning =:useOfPlanning \
 						and a.project=:project and (a.moveBundle.moveEvent != :moveEvent or a.moveBundle.moveEvent is null) \
 						and (am.moveEvent = :moveEvent or am.moveEvent is null)\
@@ -600,13 +595,13 @@ class MoveBundleController {
 			assetList << ['physicalCount':physicalAssetCount,'virtualAssetCount':virtualAssetCount,'count':count,
 				'potential':potential,'optional':optional,'moveEvent':moveEvent.id]
 			
-			def dbCount = moveBundle ? Database.executeQuery(dbCountQuery, eventWiseArgs << [type:'Database'])[0] : 0
+			def dbCount = moveBundles ? Database.executeQuery(dbCountQuery, eventWiseArgs << [type:'Database'])[0] : 0
 			dbList << ['moveEvent':moveEvent.id , 'count':dbCount]
 			
-			def filesCount = moveBundle ? Files.executeQuery(filesCountQuery, eventWiseArgs << [type:'Files'])[0] : 0
+			def filesCount = moveBundles ? Files.executeQuery(filesCountQuery, eventWiseArgs << [type:'Files'])[0] : 0
 			filesList << ['moveEvent':moveEvent.id , 'count':filesCount]
 			
-			def otherCount = moveBundle ? AssetEntity.executeQuery(otherCountQuery,
+			def otherCount = moveBundles ? AssetEntity.executeQuery(otherCountQuery,
 			eventWiseArgs << [type:['Server','VM','Blade','Application','Files','Database','Appliances']])[0] : 0
 			otherTypeList << ['moveEvent':moveEvent.id , 'count':otherCount]
 			
@@ -827,13 +822,13 @@ class MoveBundleController {
 			serverDependenciesCount:serverDependenciesCount, pendingServerDependenciesCount:pendingServerDependenciesCount, 
 			
 			project:project, 
-			moveBundle:moveEventList, 
+			moveEventList:moveEventList, 
 			moveBundleList:moveBundleList, 
 			dependencyConsoleList:dependencyConsoleList, 
 			dependencyBundleCount:dependencyBundleCount, 
 			uniqueMoveEventList:uniqueMoveEventList, 
 			planningDashboard:'planningDashboard', 
-			bundleStartDate:bundleStartDate, 
+			eventStartDate:eventStartDate, 
 			date:time, 
 			
 			issuesCount:issues.size(), 
