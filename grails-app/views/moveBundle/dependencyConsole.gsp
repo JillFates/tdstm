@@ -213,6 +213,10 @@
 				}
 				return objectString
 			}
+			function assignedCheckbox(chkbox) {
+				$('#assinedGroup').val(chkbox.checked ? '1' : '0')
+				chkbox.form.submit()
+			}
 		</script>
 	</body>
 </html>

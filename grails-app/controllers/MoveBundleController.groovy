@@ -846,7 +846,12 @@ class MoveBundleController {
 	
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		Date start = new Date()
-		def map = moveBundleService.dependencyConsoleMap(projectId, params.bundle)
+		def assignedGroup = params.assinedGroup ?: userPreferenceService.getPreference("AssignedGroup") 
+		if(!assignedGroup)
+			assignedGroup = "1"
+		userPreferenceService.setPreference( "AssignedGroup", assignedGroup)
+		def map = moveBundleService.dependencyConsoleMap(projectId, params.bundle, assignedGroup)
+		
 		//log.info "dependencyConsole() : moveBundleService.dependencyConsoleMap() took ${TimeUtil.elapsed(start)}"
 		return map
 	}

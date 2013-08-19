@@ -462,7 +462,7 @@ class MoveBundleService {
 	 * @param moveBundleId - move bundle id to filter for bundle
 	 * @return MapArray of properties 
 	 */
-	def dependencyConsoleMap(projectId, moveBundleId) {
+	def dependencyConsoleMap(projectId, moveBundleId, isAssigned) {
 		def startAll = new Date()
 		def projectInstance = Project.get(projectId)
 		def dependencyConsoleList = []
@@ -549,6 +549,9 @@ class MoveBundleService {
 				stats.storage[1] +=  group.storageCount
 			}
 		}
+		
+		if(isAssigned=="1")
+			dependencyConsoleList = dependencyConsoleList.findAll{it.statusClass != "depGroupDone"}
 
 		// Get list of distinct dependencyBundle ids
 		// def assetDependencyList = dependList.groupBy({it.dependencyBundle}).dependencyBundle
@@ -607,7 +610,8 @@ class MoveBundleService {
 			partyGroupList:companiesList,
 			// personList:personList, 
 			availabaleRoles:availabaleRoles,
-			moveBundleId : moveBundleId
+			moveBundleId : moveBundleId,
+			isAssigned:isAssigned
 		]
 		log.info "dependencyConsoleMap() : OVERALL took ${TimeUtil.elapsed(startAll)}"
 
