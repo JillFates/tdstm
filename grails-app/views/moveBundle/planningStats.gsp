@@ -17,10 +17,11 @@ $(document).ready(function() {
 	var percentageBundleReady="${applicationCount ? Math.round((bundleReady/applicationCount)*100) : 0}";
 	$("#analysisbar").animate({width: percentageBundleReady+"%" }, 1000);
 	
-	var percentageUnassignedAppCount=100-"${applicationCount ? Math.round((unassignedAppCount/applicationCount)*100) :100}";
-	$("#assignmentbar").animate({width: percentageUnassignedAppCount+"%" }, 1000);
+	$("#confirmedbar").animate({width: "${confirmedAppCount}%" }, 1000);
 	
-	$("#appmovedbar").animate({width: "${percentageAppCount}%" }, 1000);
+	$("#appmovedbar").animate({width: "${movedAppCount}%" }, 1000);
+
+	$("#assignmentbar").animate({width: "${assignedAppCount}%"}, 1000);
 	
 	var percentagePSToValidate=100-"${physicalCount ? Math.round((psToValidate/physicalCount)*100) :100}";
 	$("#physicalbar").animate({width: percentagePSToValidate+"%" }, 1000);
@@ -304,10 +305,29 @@ $(document).ready(function() {
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
 							<td class="dashboard_bar_base" >
-							<g:if test="${percentageUnassignedAppCount == 100}">
+							<g:if test="${confirmedAppCount == 0}">
+								<div class="dashboard_bar_graph0" ><b>0% Applications Confirmed</b></div>
+
+							</g:if><g:elseif test="${confirmedAppCount == 100}">
+
+								<div class="task_completed" style="z-index:-1; height:24px; width: 100%"></div>
+								<div class="task_completed" style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>100% Applications Confirmed</b></div>
+
+							</g:elseif><g:else>
+
+								<div class="dashboard_bar_graph" id="confirmedbar" style="width:0%;"></div>
+								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${confirmedAppCount}%</b>
+									<g:link controller="application" action="list" params="[filter:'applicationCount',plannedStatus:'Unassigned']">Applications Confirmed</g:link>
+								</div>
+							</g:else>
+							</td>
+						</tr>
+						<tr>
+							<td class="dashboard_bar_base" >
+							<g:if test="${assignedAppCount == 0}">
 								<div class="dashboard_bar_graph0" ><b>0% Applications Assigned</b></div>
 
-							</g:if><g:elseif test="${percentageUnassignedAppCount == 0}">
+							</g:if><g:elseif test="${assignedAppCount == 100}">
 
 								<div class="task_completed" style="z-index:-1; height:24px; width: 100%"></div>
 								<div class="task_completed" style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>100% Applications Assigned</b></div>
@@ -315,7 +335,7 @@ $(document).ready(function() {
 							</g:elseif><g:else>
 
 								<div class="dashboard_bar_graph" id="assignmentbar" style="width:0%;"></div>
-								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${100-percentageUnassignedAppCount}%</b>
+								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${assignedAppCount}%</b>
 									<g:link controller="application" action="list" params="[filter:'applicationCount',plannedStatus:'Unassigned']">Applications Assigned</g:link>
 								</div>
 							</g:else>
@@ -323,10 +343,10 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td class="dashboard_bar_base" >
-							<g:if test="${percentageAppCount == 0}">
+							<g:if test="${movedAppCount == 0}">
 								<div class="dashboard_bar_graph0" ><b>0% Applications Moved</b></div>
 
-							</g:if><g:elseif test="${percentageAppCount == 100}">
+							</g:if><g:elseif test="${movedAppCount == 100}">
 
 								<div class="task_completed" style="z-index:-1; height:24px; width: 100%"></div>
 								<div class="task_completed" style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>100% Applications Moved</b></div>
@@ -334,7 +354,7 @@ $(document).ready(function() {
 							</g:elseif><g:else>
 
 								<div class="dashboard_bar_graph" id="appmovedbar"style="width:0%;"></div>
-								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${percentageAppCount}%</b>
+								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${movedAppCount}%</b>
 						 			 <g:link controller="application" action="list" params="[filter:'applicationCount', plannedStatus:'Moved']">Applications Moved</g:link>
 								</div>
 							</g:else>

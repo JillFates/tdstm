@@ -535,6 +535,10 @@ class MoveBundleController {
 		def countArgs = [moveBundles:moveBundleList, project:project]
 		
 		def applicationCount = moveBundleList ? Application.executeQuery(appCountQuery, countArgs<<[type:'Application'])[0] : 0
+		
+		def apps = moveBundleList ?  Application.findAll("FROM AssetEntity WHERE assetType IN (:type) AND (moveBundle IN \
+			(:moveBundles) OR moveBundle IS NULL) AND project = :project", [type:"Application", moveBundles:moveBundleList, project:project]) : []
+			
 		def assetCount = AssetEntity.findAllByProjectAndAssetTypeNotInList(project,[
 			'Application',
 			'Database',
@@ -624,16 +628,20 @@ class MoveBundleController {
 			
 		def totalAssignedApp = applicationCount - unassignedAppCount ;
 		
-		int percentageAppCount = moveBundleList ? AssetEntity.executeQuery(appCountQuery+"and ae.moveBundle.moveEvent.runbookStatus=:runbookStatus ",
-			countArgs <<[type:'Application', runbookStatus:'Done'])[0] : 0
+		//Calculating Moved Applications which planStatus is Moved
+		//TODO-Lok : Need to take planStatus from ENUM but as it is dynamic now so left for John's Review
+		int movedAppCount = moveBundleList ? apps.findAll{it.planStatus == 'Moved'}.size() : 0
+		movedAppCount = countAppPercentage(applicationCount, movedAppCount)
 		
-		countArgs.remove('runbookStatus')
+		//Assigned Apps  
+		int assignedAppCount = moveBundleList ? apps.findAll{it.planStatus in ['Moved', 'Assigned']}.size() : 0
+		assignedAppCount = countAppPercentage(applicationCount, assignedAppCount)
 		
-		if(applicationCount > 0){
-			percentageAppCount = Math.round((percentageAppCount/applicationCount)*100)
-		}else{
-			percentageAppCount = 0;
-		}
+		//Confirmed Apps
+		int confirmedAppCount = moveBundleList ? apps.findAll{it.planStatus in ['Assigned', 'Moved', 'Confirmed']}.size() : 0
+		confirmedAppCount = countAppPercentage(applicationCount, confirmedAppCount)
+		
+		//countArgs.remove('planStatus')
 		
 		def unassignedAssetCount = moveBundleList ? AssetEntity.executeQuery(unAssignedCountQuery, countArgs <<[type:['Server','VM','Blade']])[0] : 0
 		
@@ -802,7 +810,7 @@ class MoveBundleController {
 		
 		return [
 			
-			appList:appList, applicationCount:applicationCount, unassignedAppCount:unassignedAppCount, percentageAppCount:percentageAppCount, appToValidate:appToValidate, 
+			appList:appList, applicationCount:applicationCount, unassignedAppCount:unassignedAppCount, appToValidate:appToValidate, 
 			physicalCount:physicalCount, unassignedPhysialAssetCount:unassignedPhysialAssetCount, percentagePhysicalAssetCount:percentagePhysicalAssetCount, psToValidate:psToValidate, 
 			virtualCount:virtualCount, unassignedVirtualAssetCount:unassignedVirtualAssetCount, percentagevirtualAssetCount:percentagevirtualAssetCount, vsToValidate:vsToValidate, 
 			dbList:dbList, dbCount:databaseCount, unassignedDbCount:unassignedDbCount, percentageDBCount:percentageDBCount, dbToValidate:dbToValidate, 
@@ -832,7 +840,8 @@ class MoveBundleController {
 			openIssue:openIssue, dueOpenIssue:dueOpenIssue, 
 			openTasks:openTasks, generalOverDue:generalOverDue, 
 			
-			dependencyScan:dependencyScan, dependencyReview:dependencyReview, validated:validated, bundleReady:bundleReady]
+			dependencyScan:dependencyScan, dependencyReview:dependencyReview, validated:validated, bundleReady:bundleReady,
+			movedAppCount:movedAppCount, assignedAppCount:assignedAppCount, confirmedAppCount:confirmedAppCount]
 	}
 	
 	/**
@@ -1035,5 +1044,15 @@ class MoveBundleController {
         }
         render errMsg
     }
+	
+	/**
+	 * This method is used to calculate percentage of Filtered Apps on Total Planned apps.
+	 * @param totalAppCount : Total count of Application that is in Planned Bundle
+	 * @param filteredAppCount : This is filtered app based on PlanStatus
+	 * @return : Percentage of Calculated app
+	 */
+	def countAppPercentage(def totalAppCount, def filteredAppCount){
+		return totalAppCount ? Math.round((filteredAppCount/totalAppCount)*100) : 0
+	}
 }
 

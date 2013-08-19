@@ -1279,7 +1279,6 @@ the specific language governing permissions and limitations under the Apache Lic
 
             // show the elements
             maskCss=_makeMaskCss();
-
             mask.css(maskCss).show();
 
             this.dropdown.show();
