@@ -47,7 +47,7 @@
  </tr>
  
  <tr><td class="buttonR">
-				<input type="submit" class="submit"  value="Generate Runbook"  id="generateRunbookId"  onclick=" $('#moveEventForm').submit();"/>
+				<input type="submit" class="submit"  value="Export Runbook (Excel)"  id="generateRunbookId"  onclick=" $('#moveEventForm').submit();"/>
 	</td>
 </tr>
  

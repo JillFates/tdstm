@@ -580,6 +580,9 @@ class MoveEventController {
 		}
 	}
 	
+	/**
+	 * The front-end UI to exporting a Runbook spreadsheet
+	 */
 	def exportRunbook ={
 		def projectId =  session.CURR_PROJ.CURR_PROJ		
 		def project = Project.get(projectId)
@@ -588,7 +591,10 @@ class MoveEventController {
 		return [moveEventList:moveEventList]
 	}
 	
-	def runBook = {
+	/**
+	 * This provides runbookStats that is rendered into a window of the runbook exporting
+	 */
+	def runbookStats = {
 		def moveEventId = params.id
 		def projectId =  session.CURR_PROJ.CURR_PROJ
 		def project = Project.get(projectId)
@@ -614,180 +620,183 @@ class MoveEventController {
 			    preMoveSize: preMoveSize, sheduleSize:sheduleSize, postMoveSize:postMoveSize, bundles:bundles,moveEventInstance:moveEventInstance]
 	}
 	
-	def generateRunbook={
-			def projectId =  session.CURR_PROJ.CURR_PROJ
-			def project = Project.get(projectId)
-			def moveEventInstance = MoveEvent.get(params.eventId)
-			def currentVersion = moveEventInstance.runbookVersion
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-			if(params.version=='on'){
-				if(moveEventInstance.runbookVersion){
-					moveEventInstance.runbookVersion = currentVersion + 1
-					currentVersion = currentVersion + 1
-				}else{
-					moveEventInstance.runbookVersion = 1
-					currentVersion = 1
-				}
-				moveEventInstance.save(flush:true)
+	/**
+	 * The controller that actually does the runbook export generation to an Excel spreadsheet
+	 */
+	def exportRunbookToExcel={
+		def projectId =  session.CURR_PROJ.CURR_PROJ
+		def project = Project.get(projectId)
+		def moveEventInstance = MoveEvent.get(params.eventId)
+		def currentVersion = moveEventInstance.runbookVersion
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		if(params.version=='on'){
+			if(moveEventInstance.runbookVersion){
+				moveEventInstance.runbookVersion = currentVersion + 1
+				currentVersion = currentVersion + 1
+			}else{
+				moveEventInstance.runbookVersion = 1
+				currentVersion = 1
 			}
-			def bundles = moveEventInstance.moveBundles
-			def today = new Date()
-			def formatter = new SimpleDateFormat("yyyy-MM-dd");
-			today = formatter.format(today)
-			def moveEventList = MoveEvent.findAllByProject(project)
-			def applcationAssigned = 0
-			def assetCount = 0
-			def databaseCount = 0
-			def fileCount = 0
-			def otherAssetCount = 0
-			def applications = []
-			def assets = []
-			def databases = []
-			def files = []
-			def others = []
-			def unresolvedIssues = []
-			def preMoveIssue = []
-			def postMoveIssue = []
-			if(bundles?.size()>0){
-				 applications = Application.findAllByMoveBundleInListAndProject(bundles,project)
-				 applcationAssigned = Application.countByMoveBundleInListAndProject(bundles,project)
-				 assets = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(bundles,['Application','Database','Files'])
-				 assetCount = assets.size()
-				 databases = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Database',bundles)
-				 databaseCount = databases.size()
-				 files = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Files',bundles)
-				 fileCount=files.size()
-				 others = AssetEntity.findAllByAssetTypeNotInListAndMoveBundleInList(['Server','VM','Blade','Application','Files','Database'],bundles)
-				 otherAssetCount=others.size()
-				 def allAssets = AssetEntity.findAllByMoveBundleInListAndProject(bundles,project).id
-				 String asset = allAssets.toString().replace("[","('").replace(",","','").replace("]","')") 
-				 unresolvedIssues = AssetComment.findAll("from AssetComment a where a.assetEntity in ${asset} and a.isResolved = ? and a.commentType = ? and a.category in ('general', 'discovery', 'planning','walkthru')",[0,'issue'])
-			}
-			preMoveIssue = AssetComment.findAllByMoveEventAndCategory(moveEventInstance, 'premove') 
-			def sheduleIssue = AssetComment.findAllByMoveEventAndCategoryInList(moveEventInstance, ['shutdown','physical','moveday','startup'])
-			postMoveIssue = AssetComment.findAllByMoveEventAndCategory(moveEventInstance, 'postmove') 
-			//TODO - Move controller code into Service .
-			def preMoveCheckListError = reportsService.generatePreMoveCheckList(projectId,moveEventInstance).allErrors.size()
-			try {
-						File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Runbook.xls" ).getFile()
-						WorkbookSettings wbSetting = new WorkbookSettings()
-						wbSetting.setUseTemporaryFileDuringWrite(true)
-						def workbook = Workbook.getWorkbook( file, wbSetting )
-						//set MIME TYPE as Excel
-						response.setContentType( "application/vnd.ms-excel" )
-						def filename = 	"${project.name} - ${moveEventInstance.name} Runbook v${currentVersion} -${today}"
-						filename = filename.replace(".xls",'')
-						response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
-						response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
-						def book = Workbook.createWorkbook( response.getOutputStream(), workbook )
-						
-						def serverSheet = book.getSheet("Servers")
-						def personelSheet = book.getSheet("Staff")
-						def preMoveSheet = book.getSheet("Pre-move")
-						def dbSheet = book.getSheet("Database")
-						def filesSheet = book.getSheet("Storage")
-						def otherSheet = book.getSheet("Other")
-						def issueSheet = book.getSheet("Issues")
-						def appSheet = book.getSheet("Impacted Applications")
-						def postMoveSheet = book.getSheet("Post-move")
-						def summarySheet = book.getSheet("Index")
-						
-						def scheduleSheet = book.getSheet("Schedule")
-						
-						
-						def preMoveColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment','assignedTo', 'status','estStart','','', 'notes',
-								         				'duration', 'estStart','estFinish','actStart',
-								         				'actFinish', 'workflow']
-						
- 						def sheduleColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role', 'assignedTo', '',
-	 						        				'duration', 'estStart','estFinish', 'actStart','actFinish', 'workflow'
- 						        				]
+			moveEventInstance.save(flush:true)
+		}
+		def bundles = moveEventInstance.moveBundles
+		def today = new Date()
+		def formatter = new SimpleDateFormat("yyyy-MM-dd");
+		today = formatter.format(today)
+		def moveEventList = MoveEvent.findAllByProject(project)
+		def applcationAssigned = 0
+		def assetCount = 0
+		def databaseCount = 0
+		def fileCount = 0
+		def otherAssetCount = 0
+		def applications = []
+		def assets = []
+		def databases = []
+		def files = []
+		def others = []
+		def unresolvedIssues = []
+		def preMoveIssue = []
+		def postMoveIssue = []
+		if(bundles?.size()>0){
+			 applications = Application.findAllByMoveBundleInListAndProject(bundles,project)
+			 applcationAssigned = Application.countByMoveBundleInListAndProject(bundles,project)
+			 assets = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(bundles,['Application','Database','Files'])
+			 assetCount = assets.size()
+			 databases = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Database',bundles)
+			 databaseCount = databases.size()
+			 files = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Files',bundles)
+			 fileCount=files.size()
+			 others = AssetEntity.findAllByAssetTypeNotInListAndMoveBundleInList(['Server','VM','Blade','Application','Files','Database'],bundles)
+			 otherAssetCount=others.size()
+			 def allAssets = AssetEntity.findAllByMoveBundleInListAndProject(bundles,project).id
+			 String asset = allAssets.toString().replace("[","('").replace(",","','").replace("]","')") 
+			 unresolvedIssues = AssetComment.findAll("from AssetComment a where a.assetEntity in ${asset} and a.isResolved = ? and a.commentType = ? and a.category in ('general', 'discovery', 'planning','walkthru')",[0,'issue'])
+		}
+		preMoveIssue = AssetComment.findAllByMoveEventAndCategory(moveEventInstance, 'premove') 
+		def sheduleIssue = AssetComment.findAllByMoveEventAndCategoryInList(moveEventInstance, ['shutdown','physical','moveday','startup'])
+		postMoveIssue = AssetComment.findAllByMoveEventAndCategory(moveEventInstance, 'postmove') 
+		//TODO - Move controller code into Service .
+		def preMoveCheckListError = reportsService.generatePreMoveCheckList(projectId,moveEventInstance).allErrors.size()
+		try {
+			File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Runbook.xls" ).getFile()
+			WorkbookSettings wbSetting = new WorkbookSettings()
+			wbSetting.setUseTemporaryFileDuringWrite(true)
+			def workbook = Workbook.getWorkbook( file, wbSetting )
+			//set MIME TYPE as Excel
+			response.setContentType( "application/vnd.ms-excel" )
+			def filename = 	"${project.name} - ${moveEventInstance.name} Runbook v${currentVersion} -${today}"
+			filename = filename.replace(".xls",'')
+			response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
+			response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
+			def book = Workbook.createWorkbook( response.getOutputStream(), workbook )
+			
+			def serverSheet = book.getSheet("Servers")
+			def personelSheet = book.getSheet("Staff")
+			def preMoveSheet = book.getSheet("Pre-move")
+			def dbSheet = book.getSheet("Database")
+			def filesSheet = book.getSheet("Storage")
+			def otherSheet = book.getSheet("Other")
+			def issueSheet = book.getSheet("Issues")
+			def appSheet = book.getSheet("Impacted Applications")
+			def postMoveSheet = book.getSheet("Post-move")
+			def summarySheet = book.getSheet("Index")
+			
+			def scheduleSheet = book.getSheet("Schedule")
+			
+			
+			def preMoveColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment','assignedTo', 'status','estStart','','', 'notes',
+					         				'duration', 'estStart','estFinish','actStart',
+					         				'actFinish', 'workflow']
+			
+				def sheduleColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role', 'assignedTo', '',
+					        				'duration', 'estStart','estFinish', 'actStart','actFinish', 'workflow'
+				        				]
 
-	        			def postMoveColumnList = ['taskNumber', 'assetEntity', 'comment','assignedTo', 'status', 'estFinish', 'dateResolved' , 'notes',
-							        				'taskDependencies','duration','estStart','estFinish','actStart',
-							        				'actFinish','workflow'
-							        			]
-	        						
-						def serverColumnList = ['id', 'application', 'assetName', '','serialNumber', 'assetTag', 'manufacturer', 'model', 'assetType', '', '', '']
+			def postMoveColumnList = ['taskNumber', 'assetEntity', 'comment','assignedTo', 'status', 'estFinish', 'dateResolved' , 'notes',
+				        				'taskDependencies','duration','estStart','estFinish','actStart',
+				        				'actFinish','workflow'
+				        			]
 						
-						def appColumnList = ['assetName', 'appVendor', 'appVersion', 'appTech', 'appAccess', 'appSource','license','description',
-											 'supportType', 'sme', 'sme2', 'businessUnit','','retireDate','maintExpDate','appFunction',
-											 'environment','criticality','moveBundle', 'planStatus','userCount','userLocations','useFrequency',
-											 'drRpoDesc','drRtoDesc','moveDowntimeTolerance','validation','latency','testProc','startupProc',
-											 'url','custom1','custom2','custom3','custom4','custom5','custom6','custom7','custom8'
-											 ]
-						
-						def impactedAppColumnList =['id' ,'assetName' ,'' ,'startupProc' ,'description' ,'sme' ,'' ,'' ,'' ,'' ,'' ,'' ]
-						
-						def dbColumnList = ['id', 'assetName', 'dbFormat', 'dbSize', 'description', 'supportType','retireDate', 'maintExpDate',
-											'environment','ipAddress', 'planStatus','custom1','custom2','custom3','custom4','custom5',
-											'custom6','custom7','custom8'
-											]
-						
-						def filesColumnList = ['id', 'assetName', 'fileFormat', 'fileSize', 'description', 'supportType','retireDate', 'maintExpDate',
-											   'environment','ipAddress', 'planStatus','custom1','custom2','custom3','custom4','custom5',
-											   'custom6','custom7','custom8'
-											  ]
-						
-						def othersColumnList = ['id','application','assetName', 'shortName', 'serialNumber', 'assetTag', 'manufacturer',
-												'model','assetType','ipAddress', 'os', 'sourceLocation', 'sourceLocation','sourceRack',
-												'sourceRackPosition','sourceBladeChassis','sourceBladePosition',
-												'targetLocation','targetRoom','targetRack', 'targetRackPosition','targetBladeChassis',
-												'targetBladePosition','custom1','custom2','custom3','custom4','custom5','custom6','custom7','custom8',
-												'moveBundle','truck','cart','shelf','railType','priority','planStatus','usize'
-						   						]
-						
-						def unresolvedIssueColumnList = ['id', 'comment', 'commentType','commentAssetEntity','resolution','resolvedBy','createdBy',
-						              				'dueDate','assignedTo','category','dateCreated','dateResolved', 'assignedTo','status','taskDependencies','duration','estStart','estFinish','actStart',
-						              				'actFinish','workflow'
-						              			]
-						
-						
-						def projManager = projectService.getProjectManagerByProject(project.id)?.partyIdTo
-						def moveManager = projectService.getMoveManagerByProject(project.id)?.partyIdTo
-						
-						summarySheet.addCell( new Label( 1, 1, String.valueOf(project.name ), getCellFormat(jxl.format.Colour.SEA_GREEN, jxl.format.Pattern.SOLID )) )
-						summarySheet.addCell( new Label( 2, 3, String.valueOf(project.name )) )
-						summarySheet.addCell( new Label( 2, 6, String.valueOf(projManager?.firstName +" "+projManager?.lastName)) )
-						summarySheet.addCell( new Label( 4, 6, String.valueOf(moveManager?.firstName +" "+moveManager?.lastName)) )
-						summarySheet.addCell( new  Label( 2, 4, String.valueOf(moveEventInstance.name )) )
-						summarySheet.addCell( new Label( 2, 10, String.valueOf(moveEventInstance.name )) )
-						
-						moveBundleService.issueExport(assets, serverColumnList, serverSheet, tzId, 5)
-						
-						moveBundleService.issueExport(applications, impactedAppColumnList, appSheet, tzId, 5)
-						
-						moveBundleService.issueExport(databases, dbColumnList, dbSheet, tzId, 4)
-						
-						moveBundleService.issueExport(files, filesColumnList, filesSheet, tzId, 1)
-						
-						moveBundleService.issueExport(others, othersColumnList, otherSheet,tzId, 1)
-						
-						moveBundleService.issueExport(unresolvedIssues, unresolvedIssueColumnList, issueSheet, tzId, 1)
-						
-						moveBundleService.issueExport(sheduleIssue, sheduleColumnList, scheduleSheet, tzId, 7)
-						
-						moveBundleService.issueExport(preMoveIssue, preMoveColumnList, preMoveSheet, tzId, 7)
-						
-						moveBundleService.issueExport(postMoveIssue, postMoveColumnList,  postMoveSheet, tzId, 7)
-						  
-							  
-						def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' ")
-						for ( int r = 8; r <= (projectStaff.size()+7); r++ ) {
-							def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${projectStaff[0].partyIdTo.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-							personelSheet.addCell( new Label( 1, r, String.valueOf( projectStaff[r-8].partyIdTo?.firstName+" "+ projectStaff[r-8].partyIdTo?.lastName)) )
-							personelSheet.addCell( new Label( 2, r, String.valueOf(projectStaff[r-8].roleTypeCodeTo )) )
-							personelSheet.addCell( new Label( 5, r, String.valueOf(projectStaff[r-8].partyIdTo?.email ? projectStaff[r-8].partyIdTo?.email : '')) )
-						}
-						book.write()
-						book.close()
-					} catch( Exception ex ) {
-					  println "Exception occurred while exporting data"+ex.printStackTrace()
-					  
-					  return;
-				   }
-				return ;
-		
+			def serverColumnList = ['id', 'application', 'assetName', '','serialNumber', 'assetTag', 'manufacturer', 'model', 'assetType', '', '', '']
+			
+			def appColumnList = ['assetName', 'appVendor', 'appVersion', 'appTech', 'appAccess', 'appSource','license','description',
+								 'supportType', 'sme', 'sme2', 'businessUnit','','retireDate','maintExpDate','appFunction',
+								 'environment','criticality','moveBundle', 'planStatus','userCount','userLocations','useFrequency',
+								 'drRpoDesc','drRtoDesc','moveDowntimeTolerance','validation','latency','testProc','startupProc',
+								 'url','custom1','custom2','custom3','custom4','custom5','custom6','custom7','custom8'
+								 ]
+			
+			def impactedAppColumnList =['id' ,'assetName' ,'' ,'startupProc' ,'description' ,'sme' ,'' ,'' ,'' ,'' ,'' ,'' ]
+			
+			def dbColumnList = ['id', 'assetName', 'dbFormat', 'dbSize', 'description', 'supportType','retireDate', 'maintExpDate',
+								'environment','ipAddress', 'planStatus','custom1','custom2','custom3','custom4','custom5',
+								'custom6','custom7','custom8'
+								]
+			
+			def filesColumnList = ['id', 'assetName', 'fileFormat', 'fileSize', 'description', 'supportType','retireDate', 'maintExpDate',
+								   'environment','ipAddress', 'planStatus','custom1','custom2','custom3','custom4','custom5',
+								   'custom6','custom7','custom8'
+								  ]
+			
+			def othersColumnList = ['id','application','assetName', 'shortName', 'serialNumber', 'assetTag', 'manufacturer',
+									'model','assetType','ipAddress', 'os', 'sourceLocation', 'sourceLocation','sourceRack',
+									'sourceRackPosition','sourceBladeChassis','sourceBladePosition',
+									'targetLocation','targetRoom','targetRack', 'targetRackPosition','targetBladeChassis',
+									'targetBladePosition','custom1','custom2','custom3','custom4','custom5','custom6','custom7','custom8',
+									'moveBundle','truck','cart','shelf','railType','priority','planStatus','usize'
+			   						]
+			
+			def unresolvedIssueColumnList = ['id', 'comment', 'commentType','commentAssetEntity','resolution','resolvedBy','createdBy',
+			              				'dueDate','assignedTo','category','dateCreated','dateResolved', 'assignedTo','status','taskDependencies','duration','estStart','estFinish','actStart',
+			              				'actFinish','workflow'
+			              			]
+			
+			
+			def projManager = projectService.getProjectManagerByProject(project.id)?.partyIdTo
+			def moveManager = projectService.getMoveManagerByProject(project.id)?.partyIdTo
+			
+			summarySheet.addCell( new Label( 1, 1, String.valueOf(project.name ), getCellFormat(jxl.format.Colour.SEA_GREEN, jxl.format.Pattern.SOLID )) )
+			summarySheet.addCell( new Label( 2, 3, String.valueOf(project.name )) )
+			summarySheet.addCell( new Label( 2, 6, String.valueOf(projManager?.toString() )) )
+			summarySheet.addCell( new Label( 4, 6, String.valueOf(moveManager?.toString() )) )
+			summarySheet.addCell( new  Label( 2, 4, String.valueOf(moveEventInstance.name )) )
+			summarySheet.addCell( new Label( 2, 10, String.valueOf(moveEventInstance.name )) )
+			
+			moveBundleService.issueExport(assets, serverColumnList, serverSheet, tzId, 5)
+			
+			moveBundleService.issueExport(applications, impactedAppColumnList, appSheet, tzId, 5)
+			
+			moveBundleService.issueExport(databases, dbColumnList, dbSheet, tzId, 4)
+			
+			moveBundleService.issueExport(files, filesColumnList, filesSheet, tzId, 1)
+			
+			moveBundleService.issueExport(others, othersColumnList, otherSheet,tzId, 1)
+			
+			moveBundleService.issueExport(unresolvedIssues, unresolvedIssueColumnList, issueSheet, tzId, 1)
+			
+			moveBundleService.issueExport(sheduleIssue, sheduleColumnList, scheduleSheet, tzId, 7)
+			
+			moveBundleService.issueExport(preMoveIssue, preMoveColumnList, preMoveSheet, tzId, 7)
+			
+			moveBundleService.issueExport(postMoveIssue, postMoveColumnList,  postMoveSheet, tzId, 7)
+			  
+				  
+			def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' ")
+			for ( int r = 8; r <= (projectStaff.size()+7); r++ ) {
+				def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${projectStaff[0].partyIdTo.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
+				personelSheet.addCell( new Label( 1, r, String.valueOf( projectStaff[r-8].partyIdTo?.toString() )) )
+				personelSheet.addCell( new Label( 2, r, String.valueOf(projectStaff[r-8].roleTypeCodeTo )) )
+				personelSheet.addCell( new Label( 5, r, String.valueOf(projectStaff[r-8].partyIdTo?.email ? projectStaff[r-8].partyIdTo?.email : '')) )
+			}
+			book.write()
+			book.close()
+		} catch( Exception ex ) {
+			println "Exception occurred while exporting data"+ex.printStackTrace()
+		  
+			return
+		}
+		return
+	
 	}
 	
 	/**

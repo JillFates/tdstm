@@ -7,7 +7,7 @@
   <script type="text/javascript">
   </script>
   <body>
-   <g:form name="moveEventForm"  action="generateRunbook">
+   <g:form name="moveEventForm"  action="exportRunbookToExcel">
    <div class="body">
     <h1>Export Runbook</h1>
    
@@ -36,7 +36,7 @@
 		if(moveEvent){
 			boo = true;
 			jQuery.ajax({
-				url: '../moveEvent/runBook',
+				url: '../moveEvent/runbookStats',
 			 	data: {'id':moveEvent},
 				type:'POST',
 				complete: function(e) {
