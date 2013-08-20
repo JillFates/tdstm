@@ -1432,15 +1432,6 @@ class ModelController {
 	 * @return flag
 	 */
 	def isModelReferenced(model){
-		def flag = false 
-		def assetRef = AssetEntity.findByModel( model )
-		def modelConnRef = ModelConnector.findByModel( model )
-		def modelAliasRef = ModelAlias.findByModel( model )
-		def rackRef = Rack.findByModel( model)
-		
-		if(assetRef || modelConnRef || modelAliasRef || rackRef)
-			flag=true
-			
-	    return flag
+		return  AssetEntity.findByModel( model )
 	}
 }
