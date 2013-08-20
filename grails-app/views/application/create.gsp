@@ -11,6 +11,8 @@
 	$("#sme1 option:first").after(myOption);
 	$("#sme2 option:first").after(myOption);
 	$("#appOwner option:first").after(myOption);
+	if(!isIE7OrLesser)
+		$("select.assetSelect").select2();
 	
 </script>
 <g:form method="post" action="save" name="createAssetsFormId" onsubmit="return validateFields('',this.name)">
@@ -64,10 +66,10 @@
 								</td>
 								<td class="label ${applicationInstance.sme}" nowrap="nowrap"><label for="sme">SME1</label></td>
 								<td >
-									<g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme} personContact"  optionKey="id" 
+									<g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme} personContact assetSelect"  optionKey="id" 
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value,this.id)" 
-										noSelection="${['':'Please Select']}" 
+										noSelection="${['null':'Please Select']}" 
 										tabIndex="21"
 									/>
 								</td>
@@ -97,11 +99,11 @@
 								<td class="label ${config.sme2}" nowrap="nowrap"><label for="sme2">SME2</label></td>
 								<td class="suffleTd">
 								 <img src="../images/swapicon.png" onclick="shufflePerson('sme1','sme2')" class="SuffleImage"  alt="Swap Contacts" title="Swap Contacts"/>
-									<g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2} suffleSelect personContact" optionKey="id" 
+									<g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2} suffleSelect personContact assetSelect" optionKey="id" 
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
 										tabindex="22" 
-										noSelection="${['':'Please select']}"
+										noSelection="${['null':'Please select']}"
 									/>
 								</td>
 								<td class="label ${config.criticality}" nowrap="nowrap">
@@ -132,11 +134,11 @@
 								<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
 								<td class="suffleTd">
 								 <img src="../images/swapicon.png" onclick="shufflePerson('sme2','appOwner')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
-									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${config.owner} suffleSelect personContact" optionKey="id" 
+									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${config.owner} suffleSelect personContact assetSelect" optionKey="id" 
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
 										tabindex="23" 
-										noSelection="${['':' Please Select']}" 
+										noSelection="${['null':' Please Select']}" 
 									/>
 								</td>
 								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>

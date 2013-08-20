@@ -839,5 +839,7 @@ function shufflePerson(sFrom,sTo){
 	if(sFromVal!='0' && sToVal!='0'){
 		$("#"+sFrom).val(sToVal)
 		$("#"+sTo).val(sFromVal)
+		if(!isIE7OrLesser)
+			$("select.assetSelect").select2();
 	}
 }

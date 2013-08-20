@@ -329,8 +329,10 @@ function createPersonDetails(forWhom){
 			} else {
 				$("#createStaffDialog").dialog('close')
 				if(!data.isExistingPerson){
-					$('.personContact').append('<option value="'+data.id+'">'+data.name+'</option>');
+					$('select.assetSelect').append('<option value="'+data.id+'">'+data.name+'</option>');
 					$('#'+data.fieldName+' option[value="'+data.id+'"]').attr('selected','selected');
+					if(!isIE7OrLesser)
+						$("select.assetSelect").select2()
 				}
 				else
 					$('#'+data.fieldName).val(data.id)
