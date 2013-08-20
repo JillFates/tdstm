@@ -299,21 +299,7 @@
 					
 					<input type="hidden" id="edit_supportAddedId" name="addedSupport" value ="0"/>
 					<input type="hidden" id="edit_dependentAddedId" name="addedDep" value ="0"/>
-					<g:if test="${redirectTo!='dependencyConsole'}">
-					  <g:if test="${redirectTo=='listTask'}">
-					  	<span class="button"><input type="button" class="save updateDep" value="Update/Close" onclick="updateToRefresh()" /></span>
-					  </g:if>
-					  <g:else>
-					  	<span class="button"><g:actionSubmit class="save updateDep" value="Update/Close" action="Update" /></span>
-					  </g:else>
-					  <span class="button"><input type="button" class="save updateDep" value="Update/View" onclick="updateToShow('app'); " /> </span>
-					  <span class="button"><g:actionSubmit class="delete"	onclick=" return confirm('Are you sure?');" value="Delete" /> </span>
-					</g:if>
-					<g:else>
-					  <span class="button"><input id="updatedId" name="updatedId" type="button" class="save updateDep" value="Update/Close" onclick="submitRemoteForm()"> </span>
-					  <span class="button"><input type="button" class="save updateDep" value="Update/View" onclick="updateToShow()" /> </span>
-					  <span class="button"><input id="deleteId"	 name="deleteId"  class="save" value="Delete" onclick=" deleteAsset($('#appId').val(),'app')" value="Delete" /> </span>
-					</g:else>
+					<g:render template="../assetEntity/editButtons" model="[redirectTo:redirectTo,value:applicationInstance.id,whom:'app']"></g:render>
                 </div></td>
 		</tr>
 	</table>

@@ -193,18 +193,15 @@
 		</tr>
 		<tr>
 			<td colspan="19">
-				<div class="buttons">
-					<input name="attributeSet.id" type="hidden" value="1">
-					<input name="project.id" type="hidden" value="${projectId}" />
-					<input name="dependentCount" id="create_dependentCount" type="hidden" value="0" />
-					<input  name="supportCount"  id="create_supportCount" type="hidden" value="0" />
-					<input name="redirectTo" type="hidden" value="${redirectTo}">
-					<input type="hidden" id="create_supportAddedId" name="addedSupport" value ="0"/>
-					<input type="hidden" id="create_dependentAddedId" name="addedDep" value ="0"/>
-					<input name="showView" id="showView" type="hidden" value=""/>
-					<span class="button"><g:actionSubmit class="save" value="Save/Close" action="save" /></span>
-					<span class="button"><input type="button" class="save" value="Save/Show" onclick="saveToShow('AssetEntity')"/> </span>
-				</div></td>
+				<input name="attributeSet.id" type="hidden" value="1">
+				<input name="project.id" type="hidden" value="${projectId}" />
+				<input name="dependentCount" id="create_dependentCount" type="hidden" value="0" />
+				<input  name="supportCount"  id="create_supportCount" type="hidden" value="0" />
+				<input name="redirectTo" type="hidden" value="${redirectTo}">
+				<input type="hidden" id="create_supportAddedId" name="addedSupport" value ="0"/>
+				<input type="hidden" id="create_dependentAddedId" name="addedDep" value ="0"/>
+				<input name="showView" id="showView" type="hidden" value=""/>
+				<g:render template="createButtons" model="[whom:'AssetEntity']"></g:render>
 		</tr>
 	</table>
 </g:form>
