@@ -347,3 +347,29 @@ function trimField( source ) {
 function removeCol(id){
 	$(".col_"+id).remove()
 }
+
+function deleteModels(){
+		var modelArr = new Array();
+	    $(".cbox:checkbox:checked").each(function(){
+	        var modelId = $(this).attr('id').split("_")[2]
+			if(modelId)  
+				modelArr.push(modelId)
+	  })
+	  	if(!modelArr){
+			alert('Please select the Model');
+		}else{
+			if(confirm("You are about to delete all of the selected models for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel.")){
+				jQuery.ajax({
+				url:contextPath+'/model/deleteBulkModels',
+				data: {'modelLists':modelArr},
+				type:'POST',
+				success: function(data) {
+						$(".ui-icon-refresh").click();
+						$("#messageId").show();
+						$("#messageId").html(data);
+						$('#deleteModelId').attr('disabled',true)
+					}
+				});
+			}
+		}
+}

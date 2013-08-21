@@ -19,7 +19,8 @@
 				$("#showOrMergeId").dialog({ autoOpen: false })
 				var listCaption ="Models: \
 					<span class='capBtn'><input type='button' value='Create Model' onclick='createModelManuDetails(\"model\",\"Model\")'/></span> \
-					<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='compareOrMerge()' disabled='disabled'/></span>"
+					<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='compareOrMerge()' disabled='disabled'/></span>\
+					<span class='capBtn'><input type='button' id='deleteModelId' value='Bulk Delete' onclick='deleteModels()' disabled='disabled'/></span>"
 				<jqgrid:grid id="modelId" url="'${createLink(action: 'listJson')}'"
 					colNames="'Model Name','Manufacturer', 'Description','Asset Type', 'Power','No Of Connectors','Assets ','Version','Source TDS','Model Status'"
 					colModel="{name:'modelName', index: 'modelName', width:'150',formatter: myLinkFormatter},
@@ -36,9 +37,9 @@
 					caption="listCaption"
 					multiselect="true"
 					showPager="true"
-					loadComplete="initCheck"
+					loadComplete="initModelCheck"
 					gridComplete="function(){bindResize('modelId')}"
-					onSelectRow="validateMergeCount">
+					onSelectRow="validateModelCount">
 					<jqgrid:filterToolbar id="modelId" searchOnEnter="false" />
 					<jqgrid:navigation id="modelId" add="false" edit="false" del="false" search="false"/>
 					<jqgrid:refreshButton id="modelId" />
@@ -47,6 +48,22 @@
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
 					var value = cellvalue ? cellvalue : ''
 					return '<a href="javascript:showOrEditModelManuDetails(\'model\','+options.rowId+',\'Model\',\'show\',\'Show\')">'+value+'</a>'
+				}
+				function validateModelCount() {
+					var checkedLen = $('.cbox:checkbox:checked').length
+					if(checkedLen > 1 && checkedLen < 5) {
+						$("#compareMergeId").removeAttr("disabled")
+					} else {
+						$("#compareMergeId").attr("disabled","disabled")
+					}
+					if(checkedLen > 0) {
+						$("#deleteModelId").removeAttr("disabled")
+					} else {
+						$("#deleteModelId").attr("disabled","disabled")
+					}
+				}
+				function initModelCheck() {
+					$('.cbox').change(validateModelCount)
 				}
 			});
 		</script>

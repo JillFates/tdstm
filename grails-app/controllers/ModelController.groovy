@@ -1427,6 +1427,37 @@ class ModelController {
 	}
 	
 	/**
+	 * This Method is used to bulk delete models.
+	 * @param modelLists
+	 * @render resp message.
+	 */
+	def deleteBulkModels = {
+		def resp
+		def deletedModels = []
+		def skippedModels = []
+		def modelList = params.list("modelLists[]")
+		try{
+			modelList = modelList.collect{ return Long.parseLong(it) }
+			def models = Model.findAllByIdInList(modelList)
+			models.each{model->
+				if(!isModelReferenced( model )){
+					deletedModels << model
+					model.delete()
+				}else {
+					skippedModels << model
+				}
+			}
+			def delModelNames = WebUtil.listAsMultiValueString( deletedModels )
+			def skipModelNames = WebUtil.listAsMultiValueString( skippedModels )
+			resp = (delModelNames ? "Models $delModelNames are deleted.</br> " : "No Models Deleted </br>") + 
+					(skipModelNames ? " Models $skipModelNames skipped due to Asset Reference" : "")
+		}catch(Exception e){
+			e.printStackTrace()
+			resp = "Error while deleting Models"
+		} 
+		render resp
+	}
+	/**
 	 * This Method checks whether model contains any reference or not
 	 * @param model
 	 * @return flag
