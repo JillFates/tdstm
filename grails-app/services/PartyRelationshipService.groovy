@@ -4,8 +4,6 @@ import jxl.*
 import jxl.write.*
 import jxl.read.biff.*
 
-import org.apache.commons.lang.math.NumberUtils
-
 import com.tdssrc.grails.GormUtil
 
 class PartyRelationshipService {
@@ -15,22 +13,15 @@ class PartyRelationshipService {
 	/*
 	 * method to save party Relationship
 	 */
-	def savePartyRelationship( def relationshipType, def partyIdFrom, def roleTypeIdFrom, def partyIdToList, def roleTypeIdTo) {
+	def savePartyRelationship( def relationshipType, def partyIdFrom, def roleTypeIdFrom, def partyIdTo, def roleTypeIdTo ) {
 		try{
 			def partyRelationshipType = PartyRelationshipType.findById( relationshipType )
 			def roleTypeFrom = RoleType.findById( roleTypeIdFrom )
 			def roleTypeTo = RoleType.findById( roleTypeIdTo )
-			def partyRelationship
-			partyIdToList.each{party->
-				partyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyIdFrom,
-						roleTypeCodeFrom:roleTypeFrom, partyIdTo:party, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" )
-						
-				if(!partyRelationship.save( insert:true, flush:true )){
-					//log.error GormUtil.allErrorsString(partyRelationship)
-				}
-			}
-			return partyRelationship
 			
+			def partyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyIdFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyIdTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true, flush:true )
+	
+			return partyRelationship
 		} catch (Exception e) {
 			println"Exception-------------->"+e
 		}
@@ -186,35 +177,31 @@ class PartyRelationshipService {
 	/*
 	 *  Method to update PartyIdTo
 	 */
-	def updatePartyRelationshipPartyIdTo( def relationshipType, def partyIdFrom, def roleTypeIdFrom, def partyIdToList, def roleTypeIdTo){
-		
-		def partyFrom= Party.get( partyIdFrom )
-		def partyRelationshipType = PartyRelationshipType.get( relationshipType )
-		def roleTypeFrom = RoleType.get( roleTypeIdFrom )
-		def roleTypeTo = RoleType.get( roleTypeIdTo )
-			
-		if ( partyIdToList?.size() > 0 ){
-			partyIdToList = partyIdToList.collect{NumberUtils.toDouble(it,0).round()}
-			PartyRelationship.executeUpdate("delete FROM PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyIdFrom and \
-				p.partyIdTo.id not in (:partyIdTo) and p.roleTypeCodeFrom = '$roleTypeIdFrom' and p.roleTypeCodeTo = '$roleTypeIdTo' ",[partyIdTo:partyIdToList])
-
-			partyIdToList.each{ partyIdTo->
-				def partyRelationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyIdFrom and p.partyIdTo = $partyIdTo and p.roleTypeCodeFrom = '$roleTypeIdFrom' and p.roleTypeCodeTo = '$roleTypeIdTo' ")
-				def partyTo = Party.get( partyIdTo )
-				// condition to check whether partner has changed or not
-				if ( partyRelationship == null ) {
+	def updatePartyRelationshipPartyIdTo( def relationshipType, def partyIdFrom, def roleTypeIdFrom, def partyIdTo, def roleTypeIdTo ){
+		if ( partyIdTo != "" && partyIdTo != null ){
+			def partyRelationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyIdFrom and p.partyIdTo = $partyIdTo and p.roleTypeCodeFrom = '$roleTypeIdFrom' and p.roleTypeCodeTo = '$roleTypeIdTo' ")
+			def partyTo = Party.get( partyIdTo )
+			def partyFrom= Party.get( partyIdFrom )
+			def partyRelationshipType = PartyRelationshipType.get( relationshipType )
+			def roleTypeFrom = RoleType.get( roleTypeIdFrom )
+			def roleTypeTo = RoleType.get( roleTypeIdTo )
+			// condition to check whether partner has changed or not
+			if ( partyRelationship == null ) {
+				def otherRelationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyIdFrom  and p.roleTypeCodeFrom = '$roleTypeIdFrom' and p.roleTypeCodeTo = '$roleTypeIdTo' ")
+				if ( otherRelationship != null && otherRelationship != "" ) {
+					//	Delete existing partner and reinsert new partner For Project, if partner changed
+					otherRelationship.delete(flush:true)
+					def newPartyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true )
+				} else {
 					// Create Partner if there is no partner for this project
-					def newPartyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" )
-					if(!newPartyRelationship.save( insert:true, flush:true )){
-						//log.error GormUtil.allErrorsString(partyRelationship)
-					}
+					def newPartyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true )
 				}
 			}
 		} else {
 			//	if user select a blank then remove Partner
-			def otherRelationship = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyIdFrom  and p.roleTypeCodeFrom = '$roleTypeIdFrom' and p.roleTypeCodeTo = '$roleTypeIdTo' ")
-			otherRelationship.each {otherRelation->
-				otherRelation.delete(flush:true)
+			def otherRelationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdFrom = $partyIdFrom  and p.roleTypeCodeFrom = '$roleTypeIdFrom' and p.roleTypeCodeTo = '$roleTypeIdTo' ")
+			if ( otherRelationship != null && otherRelationship != "" ) {
+				otherRelationship.delete(flush:true)
 			}
 		}
 	}

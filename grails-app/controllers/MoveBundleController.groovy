@@ -281,8 +281,8 @@ class MoveBundleController {
 				}
 
 				//def projectManegerInstance = Party.findById( projectManagerId )
-				def updateMoveBundlePMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", [projectManagerId], "PROJ_MGR" )
-				def updateMoveBundleMMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", [moveManagerId], "MOVE_MGR" )
+				def updateMoveBundlePMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", projectManagerId, "PROJ_MGR" )
+				def updateMoveBundleMMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", moveManagerId, "MOVE_MGR" )
 				flash.message = "MoveBundle ${moveBundleInstance} updated"
 				//redirect(action:show,params:[id:moveBundleInstance.id, projectId:projectId])
 				redirect(action:show,id:moveBundleInstance.id)
@@ -349,11 +349,11 @@ class MoveBundleController {
 		if(!moveBundleInstance.hasErrors() && moveBundleInstance.save()) {
 			if( projectManager != null && projectManager != ""){
 				def projectManegerInstance = Party.findById( projectManager )
-				def pmPartyRelation = partyRelationshipService.savePartyRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance, "MOVE_BUNDLE", [projectManegerInstance], "PROJ_MGR")
+				def pmPartyRelation = partyRelationshipService.savePartyRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance, "MOVE_BUNDLE", projectManegerInstance, "PROJ_MGR")
 			}
 			if( moveManager != null && moveManager != "" ){
 				def moveManegerInstance = Party.findById( moveManager )
-				def mmPartyRelation = partyRelationshipService.savePartyRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance, "MOVE_BUNDLE", [moveManegerInstance], "MOVE_MGR")
+				def mmPartyRelation = partyRelationshipService.savePartyRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance, "MOVE_BUNDLE", moveManegerInstance, "MOVE_MGR")
 			}
 
 			flash.message = "MoveBundle ${moveBundleInstance} created"

@@ -108,16 +108,16 @@ class ProjectController {
 	        	def projectLogoForProject = ProjectLogo.findByProject(projectInstance)
 	        	//def projectClient = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_CLIENT' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'CLIENT' ")
 	        	def projectPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
-	        	def projectManagers = projectService.getProjectManagersByProject(projectInstance.id)
-				def moveManagers = projectService.getMoveManagersByProject(projectInstance.id)
+	        	def projectManager = projectService.getProjectManagerByProject(projectInstance.id)
+	        	def moveManager = projectService.getMoveManagerByProject(projectInstance.id)
 	
 	        	return [ projectInstance : projectInstance, projectPartner:projectPartner, 
-						 projectManager:projectManagers, moveManager:moveManagers, 
+						 projectManager:projectManager, moveManager:moveManager, 
 						 projectLogoForProject:projectLogoForProject ]
 	        }
 		} else {
-			flash.message = "Project not found with id ${params.id}"
-			redirect(action:list)
+		flash.message = "Project not found with id ${params.id}"
+		redirect(action:list)
 		}
     }
 
@@ -167,9 +167,9 @@ class ProjectController {
         	def projectCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_COMPANY' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'COMPANY' ")
         	//def projectClient = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_CLIENT' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'CLIENT' ")
         	def projectPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
-        	def projectManager = projectService.getProjectManagersByProject( projectInstance.id ) 
-        	def moveManager = projectService.getMoveManagersByProject( projectInstance.id )
-        	def companyStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = ${projectCompany?.partyIdTo?.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
+        	def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
+        	def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
+        	def companyStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
         	companyStaff.each {
         		if( it.partyIdTo.lastName == null ){
         			it.partyIdTo.lastName = ""
@@ -183,10 +183,10 @@ class ProjectController {
         		}
         	}
         	clientStaff.sort{it.partyIdTo.lastName}
-        	def companyPartners = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = ${projectCompany?.partyIdTo?.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER' order by p.partyIdTo" )
+        	def companyPartners = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER' order by p.partyIdTo" )
         	companyPartners.sort{it.partyIdTo.name}
         	if(projectPartner != null){
-        		partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = ${projectPartner?.partyIdTo?.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
+        		partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectPartner.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
         	    partnerStaff.each {
         		if( it.partyIdTo.lastName == null ){
         			it.partyIdTo.lastName = ""
@@ -284,8 +284,8 @@ class ProjectController {
             if( !projectInstance.hasErrors() && projectInstance.save() ) {
             	
             	def partnerId = params.projectPartner
-            	def projectManagerId = params.list("projectManager")
-            	def moveManagerId = params.list("moveManager")
+            	def projectManagerId = params.projectManager
+            	def moveManagerId = params.moveManager
             	//def projectRoleType = RoleType.findById( "PROJECT" ) 
             	//def projectStaffRelationshipType = PartyRelationshipType.findById( "PROJ_STAFF" )
 		        
@@ -293,12 +293,63 @@ class ProjectController {
             	// Statements to re-insert Partner
             	//-------------------------------
             	
-            	def updateProjectPartnerRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_PARTNER", projectInstance?.id, "PROJECT", [partnerId], "PARTNER" )
+            	def updateProjectPartnerRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_PARTNER", projectInstance?.id, "PROJECT", partnerId, "PARTNER" )
+            	/*
+            	if ( partnerId != "" && partnerId != null ){
+            		def projectPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' and p.partyIdFrom = $projectInstance.id and p.partyIdTo = $partnerId and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
+            		def partnerParty = Party.findById( partnerId )
+            		def partnerRelationshipType = PartyRelationshipType.findById( "PROJ_PARTNER" )
+            		def partnerRoleType = RoleType.findById( "PARTNER" )
+            		// condition to check whether partner has changed or not
+            		if ( projectPartner == null ) {
+		        		def otherPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
+                        if ( otherPartner != null && otherPartner != "" ) {
+                            //	Delete existing partner and reinsert new partner For Project, if partner changed
+                            otherPartner.delete()
+                            def projectPartnerRel = new PartyRelationship( partyRelationshipType:partnerRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:partnerParty, roleTypeCodeTo:partnerRoleType, statusCode:"ENABLED" ).save( insert:true )
+                        } else {
+                            // Create Partner if there is no partner for this project
+                            def projectPartnerRel = new PartyRelationship( partyRelationshipType:partnerRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:partnerParty, roleTypeCodeTo:partnerRoleType, statusCode:"ENABLED" ).save( insert:true )
+                        }
+            		}
+            	} else {
+            		//	if user select a blank then remove Partner
+            		def otherPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
+                    if ( otherPartner != null && otherPartner != "" ) {
+                        otherPartner.delete()
+                    }
+            	}
+            	*/
             	//---------------------------------------
             	// Statements to re-insert ProjectManager
             	//---------------------------------------
             	
             	def updateProjectManagerRel = partyRelationshipService.updatePartyRelationshipPartyIdTo( "PROJ_STAFF", projectInstance?.id, "PROJECT", projectManagerId, "PROJ_MGR" )
+            	/*
+            	if ( projectManagerId != "" && projectManagerId != null ) {
+            		def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.partyIdTo = $projectManagerId and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
+            		def projectManagerParty = Party.findById( projectManagerId )
+            		def projectManagerRoleType = RoleType.findById( "PROJ_MGR" )
+            		//	condition to check whether Project Manager has changed or not
+            		if ( projectManager == null ) {
+            			def otherprojectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
+                        if ( otherprojectManager != null && otherprojectManager != "" ) {
+                            //	Delete existing partner and reinsert new partner For Project, if partner changed
+                            otherprojectManager.delete()
+                            def projectManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:projectManagerParty, roleTypeCodeTo:projectManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
+                        } else {
+                            //	Create Project Manager if there is no Project Managet for this project
+                            def projectManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:projectManagerParty, roleTypeCodeTo:projectManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
+                        }
+            		}
+            	} else {
+            		//	if user select a blank then remove Project Manager
+            		def otherprojectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
+                    if ( otherprojectManager != null && otherprojectManager != "" ) {
+                        otherprojectManager.delete()
+                    }
+            	}
+            	*/
             	//---------------------------------------
             	// Statements to re-insert MoveManager
             	//---------------------------------------
@@ -423,27 +474,55 @@ class ProjectController {
         		image.save()
         	}
         	//def client = params.projectClient
-        	def partner = params.list("projectPartner")
-        	def projectManager = params.list("projectManager")
-        	def moveManager = params.list("moveManager")      	
+        	def partner = params.projectPartner
+        	def projectManager = params.projectManager
+        	def moveManager = params.moveManager      	
         	
         	def companyParty = PartyGroup.findByName( "TDS" )
-			
-			def partners = partner.collect(Party.findById(it))
-			def projMgrs = projectManager.collect(Party.findById(it))
-			def moveMgrs = moveManager.collect(Party.findById(it))
-			
+        	//def companyRelationshipType = PartyRelationshipType.findById( "PROJ_COMPANY" ) 
+        	//def projectRoleType = RoleType.findById( "PROJECT" ) 
+        	//def companyRoleType = RoleType.findById( "COMPANY" )
+        	//def projectStaffRelationshipType = PartyRelationshipType.findById( "PROJ_STAFF" )
         	// For Project to Company PartyRelationship
-        	def projectCompanyRel = partyRelationshipService.savePartyRelationship("PROJ_COMPANY", projectInstance, "PROJECT", [companyParty], "COMPANY" )
-        	if ( partner != null && partner != "" ) 
-        		def projectPartnerRel = partyRelationshipService.savePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", partners, "PARTNER" )
+        	def projectCompanyRel = partyRelationshipService.savePartyRelationship("PROJ_COMPANY", projectInstance, "PROJECT", companyParty, "COMPANY" )
+        		//new PartyRelationship( partyRelationshipType:companyRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:companyParty, roleTypeCodeTo:companyRoleType, statusCode:"ENABLED" ).save( insert:true )
+        	/*
+        	if ( client != null && client != "" ) {
+        		
+        		def clientParty = Party.findById(client)
+        		def clientRelationshipType = PartyRelationshipType.findById( "PROJ_CLIENT" )
+        		def clientRoleType = RoleType.findById( "CLIENT" )
+        		//	For Project to Client PartyRelationship
+        		def projectClientRel = new PartyRelationship( partyRelationshipType:clientRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:clientParty, roleTypeCodeTo:clientRoleType, statusCode:"ENABLED" ).save( insert:true )
+        	}
+        	*/
+        	if ( partner != null && partner != "" ) {
+        		
+        		def partnerParty = Party.findById(partner)
+        		//def partnerRelationshipType = PartyRelationshipType.findById( "PROJ_PARTNER" )
+        		//def partnerRoleType = RoleType.findById( "PARTNER" )
+        		//	For Project to Partner PartyRelationship
+        		def projectPartnerRel = partyRelationshipService.savePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", partnerParty, "PARTNER" )
+        			//new PartyRelationship( partyRelationshipType:partnerRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:partnerParty, roleTypeCodeTo:partnerRoleType, statusCode:"ENABLED" ).save( insert:true )
+        	}
         	
-        	if ( projectManager != null && projectManager != "" ) 
-        		partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", projMgrs, "PROJ_MGR")  
+        	if ( projectManager != null && projectManager != "" ) {
+        		
+        		def projectManagerParty = Party.findById(projectManager)
+        		//def projectManagerRoleType = RoleType.findById( "PROJ_MGR" )
+        		//	For Project to ProjectManager PartyRelationship
+        		def projectManagerRel = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", projectManagerParty, "PROJ_MGR" )  
+        			//new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:projectManagerParty, roleTypeCodeTo:projectManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
+        	}
         	
-        	if ( moveManager != null && moveManager != "" )
-        		partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", moveMgrs, "MOVE_MGR")
-        	
+        	if ( moveManager != null && moveManager != "" ) {
+        		
+        		def moveManagerParty = Party.findById(moveManager)
+        		//def moveManagerRoleType = RoleType.findById( "MOVE_MGR" )
+        		//	For Project to MoveManager PartyRelationship
+        		def moveManagerRel = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", moveManagerParty, "MOVE_MGR" )
+        			//new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:moveManagerParty, roleTypeCodeTo:moveManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
+        	}
         	// set the projectInstance as CURR_PROJ
         	userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )       	
         	

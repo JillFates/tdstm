@@ -145,7 +145,7 @@ class PartyGroupController {
         	if( partyType != null && partyType.id == "COMPANY" ){
         	
 	        	def companyParty = PartyGroup.findByName( "TDS" )
-	        	def partyRelationship = partyRelationshipService.savePartyRelationship( "CLIENTS", companyParty, "COMPANY", [partyGroupInstance], "CLIENT" )
+	        	def partyRelationship = partyRelationshipService.savePartyRelationship( "CLIENTS", companyParty, "COMPANY", partyGroupInstance, "CLIENT" )
 
         	}
             flash.message = "PartyGroup ${partyGroupInstance} created"

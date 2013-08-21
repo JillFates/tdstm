@@ -19,7 +19,6 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetTransition
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.WebUtil;
 
 class MoveEventController {
 	
@@ -753,13 +752,13 @@ class MoveEventController {
 			              			]
 			
 			
-			def projManager = projectService.getProjectManagersByProject(project.id)?.partyIdTo
-			def moveManager = projectService.getMoveManagersByProject(project.id)?.partyIdTo
+			def projManager = projectService.getProjectManagerByProject(project.id)?.partyIdTo
+			def moveManager = projectService.getMoveManagerByProject(project.id)?.partyIdTo
 			
 			summarySheet.addCell( new Label( 1, 1, String.valueOf(project.name ), getCellFormat(jxl.format.Colour.SEA_GREEN, jxl.format.Pattern.SOLID )) )
 			summarySheet.addCell( new Label( 2, 3, String.valueOf(project.name )) )
-			summarySheet.addCell( new Label( 2, 6, String.valueOf( WebUtil.listAsMultiValueString(projManager) )) )
-			summarySheet.addCell( new Label( 4, 6, String.valueOf(WebUtil.listAsMultiValueString(moveManager) )) )
+			summarySheet.addCell( new Label( 2, 6, String.valueOf(projManager?.toString() )) )
+			summarySheet.addCell( new Label( 4, 6, String.valueOf(moveManager?.toString() )) )
 			summarySheet.addCell( new  Label( 2, 4, String.valueOf(moveEventInstance.name )) )
 			summarySheet.addCell( new Label( 2, 10, String.valueOf(moveEventInstance.name )) )
 			
