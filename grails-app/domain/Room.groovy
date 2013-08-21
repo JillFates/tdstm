@@ -110,7 +110,7 @@ class Room {
 		def roomAddress = 
 			(this.address ? (forWhom == "link" ? this.address : this.address+"<br/>") : "") + 
 			(this.city ?: '' ) + 
-			(this.stateProv  ? ", ${this.stateProv}, " : '' ) +
+			(this.stateProv  ? ", ${this.stateProv}" : '' ) +
 			(this.postalCode ? "  ${this.postalCode}" : '' ) +
 			(this.country  ? " ${this.country}" : '' )
 		return 	roomAddress			   
