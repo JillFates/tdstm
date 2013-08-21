@@ -93,14 +93,26 @@ class Room {
 	def getRackCountByType( type ){
 		return Rack.countByRoomAndRackType(this, type)
 	}
-	
+
+	/**
+	 * Returned the number of assets assiged to racks in the room
+	 * @return Integer count of assets
+	 */	
 	def getAssetCount(){
-		return AssetEntity.findAll("FROM AssetEntity where roomSource=? or roomTarget = ?",[this, this]).size()
+		// TODO - jpm 8/13 - I would like to see this be a criteria with .count() instead so that the whole recordset isn't returned just to call size()
+		return AssetEntity.findAll(
+			'FROM AssetEntity where (roomSource=? and rackSource is not null) or (roomTarget = ? and rackTarget is not null)',
+			[this, this]
+		).size()
 	}
 	
-	def transient getRoomAddress(forWhom){
-		def roomAddress = (this.address ? (forWhom == "link" ? this.address : this.address+"<br/>") : "") + (this.city ? this.city+"," : "" )+ (this.stateProv  ? this.stateProv +"," : "" )+
-						   (this.postalCode ? this.postalCode+"," : "" )+(this.country  ? this.country: "" )
+	def transient getRoomAddress(forWhom) {
+		def roomAddress = 
+			(this.address ? (forWhom == "link" ? this.address : this.address+"<br/>") : "") + 
+			(this.city ?: '' ) + 
+			(this.stateProv  ? ", ${this.stateProv}, " : '' ) +
+			(this.postalCode ? "  ${this.postalCode}" : '' ) +
+			(this.country  ? " ${this.country}" : '' )
 		return 	roomAddress			   
 	}
 }
