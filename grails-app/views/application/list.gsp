@@ -75,6 +75,7 @@
 					multiselect="true"
 					loadComplete="initCheck"
 					gridComplete="function(){bindResize('applicationId')}"
+					onSelectRow="validateMergeCount"
 					showPager="true"
 					loadComplete=function(){
 						resizeGrid()

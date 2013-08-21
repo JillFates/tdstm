@@ -66,6 +66,7 @@
 					multiselect="true"
 					loadComplete="initCheck"
 					gridComplete="function(){bindResize('databaseId')}"
+					onSelectRow="validateMergeCount"
 					postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId,
 						assetName:dbName, planStatus:planStatus, moveBundle:moveBundle, dbFormat:dbFormat}"
 					showPager="true">

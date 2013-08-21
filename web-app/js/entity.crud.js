@@ -403,17 +403,6 @@ function selectAllAssets(){
 	}
 }
 
-function initCheck() {
-	 $('.cbox').change(function() {
-		 var checkedLen = $('.cbox:checkbox:checked').length
-		 if(checkedLen > 0) {
-			$("#deleteAssetId").removeAttr("disabled")
-		 }else{
-			$("#deleteAssetId").attr("disabled","disabled")
-		 }
-	})
-}
-
 function deleteAssets(action){
 	var assetArr = new Array();
     $(".cbox:checkbox:checked").each(function(){

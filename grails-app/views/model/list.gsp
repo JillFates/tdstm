@@ -48,18 +48,6 @@
 					var value = cellvalue ? cellvalue : ''
 					return '<a href="javascript:showOrEditModelManuDetails(\'model\','+options.rowId+',\'Model\',\'show\',\'Show\')">'+value+'</a>'
 				}
-				function validateMergeCount() {
-					var checkedLen = $('.cbox:checkbox:checked').length
-					if(checkedLen > 1 && checkedLen < 5) {
-						$("#compareMergeId").removeAttr("disabled")
-					} else {
-						$("#compareMergeId").attr("disabled","disabled")
-					}
-				}
-				
-				function initCheck() {
-					$('.cbox').change(validateMergeCount)
-				}
 			});
 		</script>
 	</head>

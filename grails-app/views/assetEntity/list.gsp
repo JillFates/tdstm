@@ -87,6 +87,7 @@
 					multiselect="true"
 					loadComplete="initCheck"
 					gridComplete="function(){bindResize('assetListId')}"
+					onSelectRow="validateMergeCount"
 					showPager="true"
 					postData="{filter: filter, event:event, type:type, plannedStatus:plannedStatus, assetName:assetName, planStatus:planStatus, moveBundle:moveBundle,
 						moveBundle : moveBundle, assetType:assetType , model :model , sourceLocation: sourceLocation , sourceRack:sourceRack,

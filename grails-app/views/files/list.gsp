@@ -65,6 +65,7 @@
 					multiselect="true"
 					loadComplete="initCheck"
 					gridComplete="function(){bindResize('storageId')}"
+					onSelectRow="validateMergeCount"
 					postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId, assetName:fileName, 
 						planStatus:planStatus, moveBundle:moveBundle, fileFormat:fileFormat, fileSize:fileSize}"
 					showPager="true">

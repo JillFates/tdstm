@@ -77,6 +77,10 @@ function resizeGrid (gridId) {
 	$('#'+gridId+'Grid').fluidGrid({ base:'#'+gridId+'Wrapper', offset: 0 });
 }
 
+/**
+ * This function is used to enable and disable compare/merge button in modelList,personList and BulkDelete button in assetLists 
+ * when click on particular row.
+ */
 function validateMergeCount() {
 	var checkedLen = $('.cbox:checkbox:checked').length
 	if(checkedLen > 1 && checkedLen < 5) {
@@ -84,8 +88,16 @@ function validateMergeCount() {
 	} else {
 		$("#compareMergeId").attr("disabled","disabled")
 	}
+	if(checkedLen > 0) {
+		$("#deleteAssetId").removeAttr("disabled")
+	} else {
+		$("#deleteAssetId").attr("disabled","disabled")
+	}
 }
-
+/**
+ * This function is used to enable and disable compare/merge button in modelList,personList and BulkDelete button in assetLists
+ * when click on particular CheckBox .
+ */
 function initCheck() {
 	$('.cbox').change(validateMergeCount)
 }
