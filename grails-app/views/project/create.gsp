@@ -386,8 +386,7 @@
 				<td valign="top" class="name" colspan="1"><label for="projectManager">Project
 				Manager:</label></td>
 				<td valign="top" class="value"><select id="projectManagerId"
-					name="projectManager">
-					<option value="" selected="selected">Please Select</option>
+					name="projectManager" multiple="multiple" size="4">
 					<optgroup label="TDS" id="compPmGroup">
 						<g:each status="i" in="${managers}" var="managers">
 							<option value="${managers.partyIdTo.id}">${managers.partyIdTo.lastNameFirstAndTitle}</option>
@@ -397,8 +396,7 @@
 				<td valign="top" class="name" colspan="1"><label for="moveManager">Move
 				Manager:</label></td>
 				<td valign="top" class="value"><select id="moveManagerId"
-					name="moveManager">
-					<option value="" selected="selected">Please Select</option>
+					name="moveManager" multiple="multiple" size="4">
 					<optgroup label="TDS" id="compMmGroup">
 						<g:each status="i" in="${managers}" var="managers">
 							<option value="${managers.partyIdTo.id}">${managers.partyIdTo.lastNameFirstAndTitle}</option>

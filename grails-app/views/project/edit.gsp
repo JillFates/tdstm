@@ -131,45 +131,43 @@
 							</g:else>
 						  </tr>
                            <tr class="prop">
-			                <td valign="top" class="name"><label for="projectManager">Project
-			                Manager:</label></td>
-			                <td valign="top" class="value"><select id="projectManagerId"
-			                                 name="projectManager">
-			                    <option value="" selected="selected">Please Select </option>
+			                <td valign="top" class="name"><label for="projectManager">Project Manager:</label></td>
+			                <td valign="top" class="value"><select id="projectManagerId" name="projectManager" multiple="multiple" size="4">
 			                    <optgroup label="TDS" >
 			                      <g:each status="i" in="${companyStaff}" var="companyStaff">
-			                        <option value="${companyStaff.partyIdTo.id}">${companyStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
+			                        <option value="${companyStaff.partyIdTo.id}" ${(projectManager.partyIdTo.id).contains(companyStaff.partyIdTo.id)? 'selected="selected"':''}>${companyStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
 			                      </g:each>
 			                    </optgroup>
 			                    <optgroup label="${projectInstance?.client}">
 			                      <g:each status="i" in="${clientStaff}" var="clientStaff">
-			                        <option value="${clientStaff?.partyIdTo.id}">${clientStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
+			                        <option value="${clientStaff?.partyIdTo.id}" ${(projectManager.partyIdTo.id).contains(clientStaff.partyIdTo.id)? 'selected="selected"':''}>${clientStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
 			                      </g:each>
 			                    </optgroup>
 			                    <optgroup label="${projectPartner?.partyIdTo}" id="pmGroup">
 			                      <g:each status="i" in="${partnerStaff}" var="partnerStaff">
-			                        <option value="${partnerStaff?.partyIdTo.id}">${partnerStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
+			                        <option value="${partnerStaff?.partyIdTo.id}" ${(projectManager.partyIdTo.id).contains(partnerStaff.partyIdTo.id)? 'selected="selected"':''}>${partnerStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
 			                      </g:each>
 			                    </optgroup>
 			                </select></td>
 			                <td valign="top" class="name"><label for="moveManager">Move
 			                Manager:</label></td>
-			                <td valign="top" class="value"><select id="moveManagerId"
-			                                 name="moveManager">
-			                    <option value="" selected="selected">Please Select</option>
+			                <td valign="top" class="value"><select id="moveManagerId" name="moveManager" size="4" multiple="multiple">
 			                    <optgroup label="TDS">
 			                      <g:each status="i" in="${companyStaff}" var="companyStaff">
-			                        <option value="${companyStaff?.partyIdTo.id}">${companyStaff?.partyIdTo.lastNameFirstAndTitle}</option>
+			                        <option value="${companyStaff?.partyIdTo.id}" ${(moveManager.partyIdTo.id).contains(companyStaff.partyIdTo.id)? 'selected="selected"':''}>
+			                        ${companyStaff?.partyIdTo.lastNameFirstAndTitle}</option>
 			                      </g:each>
 			                    </optgroup>
 			                    <optgroup label="${projectInstance?.client}">
 			                      <g:each status="i" in="${clientStaff}" var="clientStaff">
-			                        <option value="${clientStaff?.partyIdTo.id}">${clientStaff?.partyIdTo.lastNameFirstAndTitle}</option>
+			                        <option value="${clientStaff?.partyIdTo.id}" ${(moveManager.partyIdTo.id).contains(companyStaff.partyIdTo.id)? 'selected="selected"':''}>
+			                         ${clientStaff?.partyIdTo.lastNameFirstAndTitle}</option>
 			                      </g:each>
 			                    </optgroup>
 			                    <optgroup label="${projectPartner?.partyIdTo}" id="mmGroup">
 			                      <g:each status="i" in="${partnerStaff}" var="partnerStaff">
-			                        <option value="${partnerStaff?.partyIdTo.id}">${partnerStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
+			                        <option value="${partnerStaff?.partyIdTo.id}" ${(moveManager.partyIdTo.id).contains(companyStaff.partyIdTo.id)? 'selected="selected"':''}>
+			                        ${partnerStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
 			                      </g:each>
 			                    </optgroup>
 			                  </select>

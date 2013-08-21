@@ -121,11 +121,11 @@ class ProjectUtilController {
 			if(!projectInstance.hasErrors() && projectInstance.save(flush:true)){
 				// create party relation ship to demo project
 				def companyParty = PartyGroup.findByName( "TDS" )
-				def projectCompanyRel = partyRelationshipService.savePartyRelationship("PROJ_COMPANY", projectInstance, "PROJECT", companyParty, "COMPANY" )
+				def projectCompanyRel = partyRelationshipService.savePartyRelationship("PROJ_COMPANY", projectInstance, "PROJECT", [companyParty], "COMPANY" )
 				// create project partner
 				def tempProjectPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' and p.partyIdFrom = ${template} and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
 				if(tempProjectPartner){
-					def projectPartnerRel = partyRelationshipService.savePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", tempProjectPartner.partyIdTo, "PARTNER" )
+					def projectPartnerRel = partyRelationshipService.savePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", [tempProjectPartner.partyIdTo], "PARTNER" )
 				}
 				/* copy Project staff  */
 				def tempProjectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = ${template} and p.roleTypeCodeFrom = 'PROJECT' ")

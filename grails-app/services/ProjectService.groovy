@@ -120,8 +120,8 @@ class ProjectService {
 	 * @param projectId
 	 * @return partyRelationShip instance
 	 */
-	def getProjectManagerByProject(def projectId){
-		def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' \
+	def getProjectManagersByProject(def projectId){
+		def projectManager = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' \
 				and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
 		
 		return projectManager
@@ -132,8 +132,8 @@ class ProjectService {
 	 * @param projectId
 	 * @return partyRelationShip instance
 	 */
-	def getMoveManagerByProject (def projectId){
-		def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' \
+	def getMoveManagersByProject (def projectId){
+		def moveManager = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' \
 			and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
 		return moveManager
 	}

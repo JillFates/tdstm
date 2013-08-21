@@ -68,9 +68,19 @@
 						</tr>
 						<tr class="prop">
 							<td valign="top" class="name">Project Manager:</td>
-							<td valign="top" class="valueNW">${projectManager?.partyIdTo?.lastNameFirstAndTitle}</td>
+							<td valign="top" class="valueNW">
+							<ul>
+								<g:each in="${projectManager}" var="p">
+									<li>${p?.partyIdTo?.lastNameFirstAndTitle}</li>
+								</g:each>
+							</ul>
+							</td>
 							<td valign="top" class="name">Event Manager:</td>
-							<td valign="top" class="valueNW">${moveManager?.partyIdTo?.lastNameFirstAndTitle}</td>
+							<td valign="top" class="valueNW"><ul>
+								<g:each in="${moveManager}" var="m">
+									<li>${m?.partyIdTo?.lastNameFirstAndTitle}</li>
+								</g:each>
+							</ul></td>
 						</tr>
 						<tr class="prop">
 							<td valign="top" class="name"><g:message code="project.customFieldsShown.label" default="Custom Fields Shown" />:</td>

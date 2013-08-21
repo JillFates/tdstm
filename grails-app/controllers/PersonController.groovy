@@ -339,7 +339,7 @@ class PersonController {
 				if ( !person.hasErrors() && person.save() ) {			
 					//Receiving added functions		
 					def functions = params.list("function")
-					def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", person, "STAFF" )
+					def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", [person], "STAFF" )
 					if(functions){
 						userPreferenceService.setUserRoles(functions, person.id)
 						def staffCompany = partyRelationshipService.getStaffCompany(person)
@@ -489,7 +489,7 @@ class PersonController {
 				def moveEvents = MoveEvent.findAllByProject(projectParty)
 				def results = MoveEventStaff.executeUpdate("delete from MoveEventStaff where moveEvent in (:moveEvents) and person = :person and role = :role",[moveEvents:moveEvents, person:personParty,role:RoleType.read(roleType)])
 			} else {
-				projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
+				projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", [personParty], roleType )
 			}
 
 			flag = projectStaff ? true : false
@@ -512,11 +512,11 @@ class PersonController {
 			
 			if ( companyId != null && companyId != "" ) {
 				def companyParty = Party.findById( companyId )
-				def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", personInstance, "STAFF" )
+				def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", [personInstance], "STAFF" )
 			}
 			if ( projectId != null && projectId != "" && roleType != null) {
 				def projectParty = Party.findById( projectId )
-				def partyRelationship = partyRelationshipService.savePartyRelationship( "PROJ_STAFF", projectParty, "PROJECT", personInstance, roleType )
+				def partyRelationship = partyRelationshipService.savePartyRelationship( "PROJ_STAFF", projectParty, "PROJECT", [personInstance], roleType )
 			}
 			if(personInstance.lastName == null){
 				personInstance.lastName = ""	
@@ -1129,7 +1129,7 @@ class PersonController {
 					if(moveEventStaff && params.val == "0"){
 						moveEventStaff.delete(flush:true)
 					} else if( !moveEventStaff ) {
-						def projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, roleType )
+						def projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", [person], roleType )
 						moveEventStaff = new MoveEventStaff()
 						moveEventStaff.person = person
 						moveEventStaff.moveEvent = moveEvent
