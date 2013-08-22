@@ -246,12 +246,11 @@ class MoveBundleController {
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			def startTime = params.startTime
 			def completionTime = params.completionTime
-			if( startTime ){
-				moveBundleInstance.startTime =  GormUtil.convertInToGMT(formatter.parse( startTime ), tzId)
-			}
-			if( completionTime ){
-				moveBundleInstance.completionTime =  GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId)
-			}
+			
+			moveBundleInstance.startTime = startTime? GormUtil.convertInToGMT(formatter.parse( startTime ), tzId) : null
+			
+			moveBundleInstance.completionTime =  completionTime ? GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId) : null
+			
 			moveBundleInstance.tempForUpdate = Math.random().toString()
 			
 			moveBundleInstance.sourceRoom = params.sourceRoom ? Room.read( params.sourceRoom ) : null
