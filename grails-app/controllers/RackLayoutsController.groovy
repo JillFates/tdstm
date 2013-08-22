@@ -160,7 +160,7 @@ class RackLayoutsController {
 				session.setAttribute('RACK_ID',rackId)
 				redirectTo = 'room'
 				racks = Rack.findAllById(rackId)
-				moveBundles = []
+				//moveBundles = []
 				bundleId = request.getParameterValues("moveBundleId")
 				if(bundleId && !bundleId.contains("all") && !bundleId.contains("taskReady")){
 					def moveBundleId = bundleId.collect{id->Long.parseLong(id)}
@@ -309,7 +309,7 @@ class RackLayoutsController {
 				def paramsMap = [:]
 				paramsMap = [ "rackLayoutsHasPermission" : rackLayoutsHasPermission, "assetDetails":assetDetails, "includeBundleName": includeBundleName,
 								"backView":backView, "showCabling":params.showCabling, "hideIcons":hideIcons, "redirectTo":redirectTo, "rackId":rack.id,
-								"forWhom":params.forWhom, "commit":params.commit]
+								"forWhom":params.forWhom, "commit":params.commit, "bundle":moveBundles]
 				
 				if(backView) {
 					backViewRows = getRackLayout(paramsMap)
@@ -328,11 +328,11 @@ class RackLayoutsController {
 	
 	def getRackDetails = {
 		def bundleIds = params.bundles
-		def moveBundles
+		def moveBundles = []
 		if(bundleIds.contains('all')){
 			def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
 			moveBundles = MoveBundle.findAllByProject( Project.get( projectId ) )
-		} else {
+		} else if( bundleIds ){
 			moveBundles = MoveBundle.findAll( "from MoveBundle m where m.id in ($bundleIds)" )
 		}
 		
@@ -398,7 +398,7 @@ class RackLayoutsController {
 					def overlappedAssets
 					def bladeTable = ""
 					def bladeLayoutMap = ['asset':it, 'permission':rackLayoutsHasPermission, 'hideIcons':hideIcons, 'redirectTo':redirectTo ,
-											'rackId':rackId, 'commit':commit, 'forWhom':forWhom]
+											'rackId':rackId, 'commit':commit, 'forWhom':forWhom, "bundle": paramsMap.bundle]
 					if(location == 1)
 						overlappedAssets = AssetEntity.findAllWhere( project:assetEntity.project, assetTag : tagValue, sourceRack: assetEntity.sourceRack )
 					else 
@@ -546,6 +546,7 @@ class RackLayoutsController {
 		def rackId = bladeLayoutMap.rackId
 		def commit = bladeLayoutMap.commit
 		def forWhom = bladeLayoutMap.forWhom
+		def bundles = bladeLayoutMap.bundle
 		
 		def showIconPref = userPreferenceService.getPreference("ShowAddIcons")
 		def bladeTable = '<table class="bladeTable"><tr>'
@@ -553,9 +554,9 @@ class RackLayoutsController {
 		def tdHeight = rowspan * 6
 		def blades = []
 		if(assetDetails.asset.source == 1)
-			blades = AssetEntity.findAllWhere(project:assetEntity.project, moveBundle:assetEntity.moveBundle, assetType:'Blade', sourceBladeChassis:assetEntity.assetTag)
+			blades = AssetEntity.findAllWhere(project:assetEntity.project, assetType:'Blade', sourceBladeChassis:assetEntity.assetTag).findAll{it?.moveBundle?.id in bundles?.id}
 		else
-			blades = AssetEntity.findAllWhere(project:assetEntity.project, moveBundle:assetEntity.moveBundle, assetType:'Blade', targetBladeChassis:assetEntity.assetTag)
+			blades = AssetEntity.findAllWhere(project:assetEntity.project, assetType:'Blade', targetBladeChassis:assetEntity.assetTag).findAll{it?.moveBundle?.id in bundles?.id}
 
 		def fullRows = []
 		def chassisRows = assetEntity.model.bladeRows
