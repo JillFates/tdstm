@@ -36,6 +36,9 @@
 				currentMenuId = "#assetMenu";
 				$("#assetMenuId a").css('background-color','#003366')	
 				$("#dependencyDivId").css('max-width', ($(window).width()-185)+'px');
+				$(window).resize(function() {
+					$("#dependencyDivId").css('max-width', ($(window).width()-185)+'px');
+				});
 			});
 		</script>
 	</head>
