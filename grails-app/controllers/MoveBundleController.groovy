@@ -886,7 +886,8 @@ class MoveBundleController {
 		flash.message = moveBundleService.generateDependencyGroups(projectId, connectionTypes, statusTypes)
 
 		// Now get the model and display results
-		render(template:'dependencyBundleDetails', model:moveBundleService.dependencyConsoleMap(projectId, params.bundle) )
+		def isAssigned = userPreferenceService.getPreference( "AssignedGroup" )?: "1"
+		render(template:'dependencyBundleDetails', model:moveBundleService.dependencyConsoleMap(projectId, params.bundle, isAssigned) )
 	}
 	
 	/**
