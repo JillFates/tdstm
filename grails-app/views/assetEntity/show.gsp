@@ -84,11 +84,11 @@ $(document).ready(function() {
 								<td class="label bladeLabel ${config.sourceBladeChassis}" nowrap="nowrap" id="bladeId" style="display: none"><label for="sourceBladeChassisId">Blade</label></td>
 								<td class="label vmLabel ${config.virtualHost}" style="display: none" class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label></td>
 
-								<td class=" rackLabel ${config.sourceRack}">${assetEntity.rackSource?.tag}</td>
-								<td class=" rackLabel ${config.targetRack}">${assetEntity.rackTarget?.tag}</td>
+								<td class="rackLabel ${config.sourceRack}">${assetEntity.rackSource?.tag}</td>
+								<td class="rackLabel ${config.targetRack}">${assetEntity.rackTarget?.tag}</td>
 
-								<td class=" bladeLabel ${config.sourceBladeChassis}" style="display: none">${assetEntity.sourceBladeChassis}</td>
-								<td class=" bladeLabel ${config.targetBladeChassis}" style="display: none" >${assetEntity.targetBladeChassis}</td>
+								<td class="bladeLabel ${config.sourceBladeChassis}" style="display: none">${assetEntity.sourceBladeChassis}</td>
+								<td class="bladeLabel ${config.targetBladeChassis}" style="display: none" >${assetEntity.targetBladeChassis}</td>
 
 								<td class="vmLabel ${config.virtualHost}" style="display: none">${assetEntity.virtualHost}</td>
 								<td class="vmLabel" style="display: none"></td>
@@ -99,8 +99,10 @@ $(document).ready(function() {
 								<td class="label ${config.supportType}" nowrap="nowrap"><label for="supportType">Support Type</label></td>
 								<td class="valueNW ${config.supportType}">${assetEntity.supportType}</td>
 								<td class="label ${config.sourceRackPosition}" nowrap="nowrap"><label for="sourceRack">Position</label></td>
-								<td class="valueNW ${config.sourceRackPosition}">${assetEntity.sourceRackPosition}</td>
-								<td class="valueNW ${config.targetRackPosition}">${assetEntity.targetRackPosition}</td>
+								<td class="rackLabel valueNW ${config.sourceRackPosition}">${assetEntity.sourceRackPosition}</td>
+								<td class="rackLabel valueNW ${config.targetRackPosition}">${assetEntity.targetRackPosition}</td>
+								<td class="bladeLabel ${config.sourceBladePosition}" style="display: none" >${assetEntity.sourceBladePosition}</td>
+								<td class="bladeLabel ${config.targetBladePosition}" style="display: none" >${assetEntity.targetBladePosition}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label ${config.serialNumber}" nowrap="nowrap"><label for="serialNumber">S/N</label></td>
