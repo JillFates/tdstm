@@ -249,12 +249,14 @@
 						<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	
 					</g:else>
 				</g:else>
-				 <g:each in="${ (1..project.customFieldsShown) }" var="i">
-					 <g:if test="${assetComment?.assetEntity.('custom'+i)}">
-						<dt>${project.('custom'+i) ?: 'Custom'+i }:</dt>
-						<dd>&nbsp;<tds:textAsLink  text="${assetComment?.assetEntity.('custom'+i)}" target="_new"/></dd>
-					 </g:if>
-					</g:each>
+				<g:if test="${project.customFieldsShown > 0}">
+					 <g:each in="${ (1..project.customFieldsShown) }" var="i">
+						 <g:if test="${assetComment?.assetEntity.('custom'+i)}">
+							<dt>${project.('custom'+i) ?: 'Custom'+i }:</dt>
+							<dd>&nbsp;<tds:textAsLink  text="${assetComment?.assetEntity.('custom'+i)}" target="_new"/></dd>
+						 </g:if>
+					 </g:each>
+				</g:if>
 			</dl>
 		</tr>
 		</table>
