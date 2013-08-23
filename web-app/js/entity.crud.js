@@ -117,12 +117,8 @@ function addAssetDependency( type,forWhom ){
 	$("#dep_"+type+"_"+rowNo+"_"+forWhom).addClass("assetSelect");
 	$("#"+forWhom+"_"+type+"AddedId").val(parseInt(rowNo)-1)
 	
-	if(!isIE7OrLesser){
-		//$("select.assetSelect").select2();
-		console.log("#dep_"+type+"_"+rowNo+"_"+forWhom)
-		$("#dep_"+type+"_"+rowNo+"_"+forWhom).attr("multiple", "multiple")
-		$("#dep_"+type+"_"+rowNo+"_"+forWhom).select2();
-	}
+	if(!isIE7OrLesser)
+		$("select.assetSelect").select2();
 }
 
 function deleteRow( rowId, forWhomId ){
