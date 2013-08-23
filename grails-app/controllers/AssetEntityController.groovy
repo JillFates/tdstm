@@ -4007,7 +4007,7 @@ class AssetEntityController {
 				def color = ''
 				def type = ''
 				def assetType = ''
-				def criticalitySizes = ['Minor':150, 'Important':200, 'Major':300, 'Critical':400]
+				def criticalitySizes = ['Minor':150, 'Important':200, 'Major':325, 'Critical':500]
 				def t1 = TimeUtil.elapsed(start).getMillis() + TimeUtil.elapsed(start).getSeconds()*1000
 				log.info "t1 = ${t1}"
 				log.info "Iterating through list of ${assetDependentlist.size()} items"
@@ -4062,7 +4062,7 @@ class AssetEntityController {
 				// Set the defaults map to be used in the dependeny graph
 				def defaults = moveBundleService.getMapDefaults(graphNodes.size())
 				if ( multiple ) {
-					defaults.force = -30
+					defaults.force = -200
 					defaults.linkSize = 100
 				}
 				
