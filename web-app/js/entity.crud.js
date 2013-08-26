@@ -388,7 +388,7 @@ function updateToRefresh(){
 function selectAllAssets(){
 	$('#deleteAsset').attr('disabled',false)
 	var totalCheck = document.getElementsByName('assetCheckBox');
-	if($('#selectAssetId').attr('checked')==true){
+	if($('#selectAssetId').is(":checked")){
 	for(i=0;i<totalCheck.length;i++){
 	totalCheck[i].checked = true;
 	}

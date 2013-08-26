@@ -188,12 +188,12 @@
 		var selectHeader = true
 		if(moveType == "rightassetId"){
 			$("#assetsRightTbodyId input[type=checkbox]").each( function() {
-				if(!$(this).attr("checked"))
+				if(!$(this).is(":checked"))
 					selectHeader = false
 			})
 		} else {
 			$("#assetsLeftTbodyId input[type=checkbox]").each( function() {
-				if(!$(this).attr("checked"))
+				if(!$(this).is(":checked"))
 					selectHeader = false
 			})
 		}
