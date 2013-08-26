@@ -38,6 +38,7 @@ class MoveBundle extends Party {
 	]
 	static mapping  = {
 		version true
+		sort "name" // Sorting moveBundle list by name.
 		autoTimestamp false
 		id column:'move_bundle_id'
         columns {
