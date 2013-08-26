@@ -121,6 +121,7 @@ function retrieve_field(obj) {
 <script type="text/javascript">
 	$(document).ready(function() {
 		$("#serverInfoDialog").dialog({ autoOpen: false })
+		$('#textSearchId').focus();
 	})
 </script>
 <script type="text/javascript" language="Javascript1.2">var sHint = "C:\\temp\\output";
