@@ -51,5 +51,6 @@ databaseChangeLog = {
 	include file: '20130718-add-asset-edit-delete-permission.groovy'
 	include file: '20130723-add-keyvalue-table.groovy'
 	include file: '20130808-update-model-status.groovy'
+	include file: '20130826-update-comment-datatype-to-text.groovy'
     
 }
