@@ -31,6 +31,7 @@ $(document).ready(function() {
 		 var selected = $(this).is(":checked") ? '1' : '0'
 		 showTask(selected)
 	})
+	changeDocTitle('${assetEntity.assetName}');
 })
 </script>
  	<g:form method="post">

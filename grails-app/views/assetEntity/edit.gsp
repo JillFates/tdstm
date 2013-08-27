@@ -31,7 +31,7 @@
 		populateDependency(assetId, 'asset', 'edit')
 		if(!isIE7OrLesser)
 			$("select.assetSelect").select2();
-		
+		changeDocTitle('${assetEntityInstance.assetName}');
 	})
 </script>
 

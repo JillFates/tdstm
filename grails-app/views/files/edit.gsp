@@ -9,6 +9,8 @@
 		// Ajax to populate dependency selects in edit pages
 		var assetId = '${fileInstance.id}'
 		populateDependency(assetId,'files','edit')
+		
+		changeDocTitle('${filesInstance.assetName}');
 	})
 </script>
 <g:form method="post" action="update" name="editAssetsFormId">

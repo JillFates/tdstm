@@ -220,5 +220,6 @@
 			 var selected = $(this).is(":checked") ? '1' : '0'
 			 showTask(selected)
 		})
+		changeDocTitle('${databaseInstance.assetName}');
 	})
 </script>

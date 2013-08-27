@@ -61,6 +61,19 @@ function showEntityView(e, type){
 		 updateAssetTitle(type)
      }
 }
+var title = document.title;
+function changeDocTitle( newTitle ){
+	$(document).attr('title', newTitle);
+	$(document).keyup(function(e) {     
+	    if(e.keyCode== 27) {
+	    	$(document).attr('title', title);
+	    } 
+	});
+	$(".ui-dialog .ui-dialog-titlebar-close").click(function(){
+		$(document).attr('title', title);
+	});
+}
+
 function editEntity(redirectTo,type, value, source,rack,roomName,location,position){
 	if(redirectTo == "rack"){
 		redirectTo = $('#redirectTo').val() == 'rack' ? 'rack' : $('#redirectTo').val()

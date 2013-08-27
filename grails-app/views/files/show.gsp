@@ -208,5 +208,6 @@
 			 var selected = $(this).is(":checked") ? '1' : '0'
 			 showTask(selected)
 		})
+		changeDocTitle('${filesInstance.assetName}');
 	})
 </script>
