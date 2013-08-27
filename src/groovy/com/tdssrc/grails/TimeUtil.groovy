@@ -126,6 +126,16 @@ class TimeUtil {
 	}
 	
 	/**
+	 * Get the current datetime in GMT
+	 * @return Date The current date set in GMT in sql format date
+	 */
+	def public static nowGMTSQLFormat() {
+		SimpleDateFormat sqlFormatGmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+		sqlFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"))
+		return sqlFormatGmt.format(new Date())
+	}
+	
+	/**
 	 * Converts date into GMT
 	 * @param date
 	 * @return converted Date

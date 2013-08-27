@@ -60,6 +60,8 @@ class UserLoginController {
 		// Validate that the user is sorting by a valid column
 		if( ! sortIndex in filterParams)
 			sortIndex = 'username'
+			
+		def presentDate = TimeUtil.nowGMTSQLFormat()
 		
 		def active = params.activeUsers ? params.activeUsers : session.getAttribute("InActive")
 		if(!active){
@@ -76,7 +78,9 @@ class UserLoginController {
 				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=pr.party_id 
 			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id 
 			WHERE u.active = '${active}'""")
-		
+		if(active=='Y')
+			query.append(" AND u.expiry_date > '${presentDate}' ")
+				
 		if( RolePermissions.hasPermission("ShowAllUsers") ){
 			if(params.id && params.id != "All" ){
 				// If companyId is requested
