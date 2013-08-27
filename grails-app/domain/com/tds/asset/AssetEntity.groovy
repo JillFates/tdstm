@@ -1,17 +1,8 @@
 package com.tds.asset
 
-import Manufacturer
-import Model
-import MoveBundle
-import PartyGroup
-import Project
-import ProjectTeam
-import Rack
-import Room
-
-import java.util.Date
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
-import com.tdsops.tm.enums.domain.ValidationType;
+import com.tdsops.tm.enums.domain.ValidationType
+import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdssrc.grails.GormUtil
 
 
@@ -22,7 +13,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String shortName
 	String assetType = "Server"
 	Integer priority
-	String planStatus
+	String planStatus = AssetEntityPlanStatus.UNASSIGNED
 	Date purchaseDate
 	Double purchasePrice
 	String department
@@ -126,7 +117,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		shortName( blank:true, nullable:true )
 		assetType( blank:true, nullable:true )
 		priority( nullable:true )
-		planStatus( blank:true, nullable:true )
+		planStatus( blank:true, nullable:true, inList:AssetEntityPlanStatus.list )
 		purchaseDate( nullable:true )
 		purchasePrice( nullable:true )
 		department( blank:true, nullable:true )

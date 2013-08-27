@@ -16,12 +16,6 @@ class AssetCommentStatus {
 	static final String COMPLETED='Completed'
 	static final String DONE='Completed'
 	static final String TERMINATED='Terminated'
-	static final String UNASSIGNED='Unassigned'
-	static final String ASSIGNED='Assigned'
-	static final String CONFIRMED='Confirmed'
-	static final String LOCKED='Locked'
-	static final String MOVED='Moved'
-	
 	static final String[] list = [PLANNED, PENDING, READY, STARTED, DONE, HOLD]
 	static final getList() {
 		return list as List

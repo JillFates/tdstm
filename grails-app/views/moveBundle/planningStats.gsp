@@ -305,25 +305,6 @@ $(document).ready(function() {
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
 							<td class="dashboard_bar_base" >
-							<g:if test="${confirmedAppCount == 0}">
-								<div class="dashboard_bar_graph0" ><b>0% Applications Confirmed</b></div>
-
-							</g:if><g:elseif test="${confirmedAppCount == 100}">
-
-								<div class="task_completed" style="z-index:-1; height:24px; width: 100%"></div>
-								<div class="task_completed" style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>100% Applications Confirmed</b></div>
-
-							</g:elseif><g:else>
-
-								<div class="dashboard_bar_graph" id="confirmedbar" style="width:0%;"></div>
-								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${confirmedAppCount}%</b>
-									<g:link controller="application" action="list" params="[filter:'applicationCount',plannedStatus:'Unassigned']">Applications Confirmed</g:link>
-								</div>
-							</g:else>
-							</td>
-						</tr>
-						<tr>
-							<td class="dashboard_bar_base" >
 							<g:if test="${assignedAppCount == 0}">
 								<div class="dashboard_bar_graph0" ><b>0% Applications Assigned</b></div>
 
@@ -341,6 +322,26 @@ $(document).ready(function() {
 							</g:else>
 							</td>
 						</tr>
+						<tr>
+							<td class="dashboard_bar_base" >
+							<g:if test="${confirmedAppCount == 0}">
+								<div class="dashboard_bar_graph0" ><b>0% Applications Confirmed</b></div>
+
+							</g:if><g:elseif test="${confirmedAppCount == 100}">
+
+								<div class="task_completed" style="z-index:-1; height:24px; width: 100%"></div>
+								<div class="task_completed" style="position:relative; top:-20px;height:0px;margin-left:5px;"><b>100% Applications Confirmed</b></div>
+
+							</g:elseif><g:else>
+
+								<div class="dashboard_bar_graph" id="confirmedbar" style="width:0%;"></div>
+								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${confirmedAppCount}%</b>
+									<g:link controller="application" action="list" params="[filter:'applicationCount',plannedStatus:'Unassigned']">Applications Confirmed</g:link>
+								</div>
+							</g:else>
+							</td>
+						</tr>
+						
 						<tr>
 							<td class="dashboard_bar_base" >
 							<g:if test="${movedAppCount == 0}">
@@ -411,7 +412,7 @@ $(document).ready(function() {
 								</b></td>
 							</g:each>
 							<td style="text-align: right;"><b>
-								<g:link controller="application" action="list" params="[filter:'applicationCount', plannedStatus:'Moved']" class="links">${percentageAppCount}%</g:link>
+								<g:link controller="application" action="list" params="[filter:'applicationCount', plannedStatus:'Moved']" class="links">${percAppDoneCount}%</g:link>
 							</b></td>
 						</tr>
 						<tr>

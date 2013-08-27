@@ -512,10 +512,10 @@ class MoveBundleController {
 		def assetList = []
 		def eventStartDate = [:]
 		
-		def unassignedPlan = AssetCommentStatus.UNASSIGNED
-		def assignedPlan = AssetCommentStatus.ASSIGNED
-		def confirmedPlan = AssetCommentStatus.CONFIRMED
-		def movedPlan = AssetCommentStatus.MOVED
+		def unassignedPlan = AssetEntityPlanStatus.UNASSIGNED
+		def assignedPlan = AssetEntityPlanStatus.ASSIGNED
+		def confirmedPlan = AssetEntityPlanStatus.CONFIRMED
+		def movedPlan = AssetEntityPlanStatus.MOVED
 		
 		def app = AssetType.APPLICATION.toString()
 		def db = AssetType.DATABASE.toString()
@@ -637,14 +637,17 @@ class MoveBundleController {
 		movedAppCount = countAppPercentage(applicationCount, movedAppCount)
 		
 		//Assigned Apps  
-		int assignedAppCount = moveBundleList ? apps.findAll{it.planStatus in [movedPlan, assignedPlan]}.size() : 0
+		int assignedAppCount = moveBundleList ? apps.findAll{it.planStatus in [movedPlan, assignedPlan, confirmedPlan]}.size() : 0
 		assignedAppCount = countAppPercentage(applicationCount, assignedAppCount)
 		
 		//Confirmed Apps
-		int confirmedAppCount = moveBundleList ? apps.findAll{it.planStatus in [assignedPlan, movedPlan, confirmedPlan]}.size() : 0
+		int confirmedAppCount = moveBundleList ? apps.findAll{it.planStatus in [movedPlan, confirmedPlan]}.size() : 0
 		confirmedAppCount = countAppPercentage(applicationCount, confirmedAppCount)
 		
-		//countArgs.remove('planStatus')
+		//Calculating App count of which runbook status is done
+		// TODO : @John, can we have runbookStatus as enum 
+		def appDoneCount = moveBundleList ? apps.findAll{it.moveBundle?.moveEvent?.runbookStatus=='Done'}.size() : 0
+		def percAppDoneCount = countAppPercentage(applicationCount, appDoneCount)
 		
 		def unassignedAssetCount = moveBundleList ? AssetEntity.executeQuery(unAssignedCountQuery, countArgs <<[type:[server, vm, blade]])[0] : 0
 		
@@ -845,7 +848,8 @@ class MoveBundleController {
 			openTasks:openTasks, generalOverDue:generalOverDue, 
 			
 			dependencyScan:dependencyScan, dependencyReview:dependencyReview, validated:validated, bundleReady:bundleReady,
-			movedAppCount:movedAppCount, assignedAppCount:assignedAppCount, confirmedAppCount:confirmedAppCount]
+			movedAppCount:movedAppCount, assignedAppCount:assignedAppCount, confirmedAppCount:confirmedAppCount, 
+			percAppDoneCount:percAppDoneCount]
 	}
 	
 	/**
