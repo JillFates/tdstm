@@ -307,7 +307,7 @@ function selectAll(){
 		isFirst = true;
 	}
 }
-function changeMoveBundle(assetType,totalAsset){
+function changeMoveBundle(assetType,totalAsset,assignBundle){
 	var assetArr = new Array();
 	var j=0;
 	for(i=0; i< totalAsset.size() ; i++){
@@ -321,6 +321,8 @@ function changeMoveBundle(assetType,totalAsset){
 	}if(j == 0){
 		alert('Please select the Asset');
 	}else{
+		$('#plannedMoveBundleList').val(assignBundle);
+		$('#bundleSession').val(assignBundle);
 		$('#assetsTypeId').val(assetType)
 		$('#assetVal').val(assetArr);
 		$('#moveBundleSelectId').dialog('open')

@@ -98,13 +98,14 @@
 						
 					<input type="hidden" name="assetVal" id="assetVal" />
 					<input type="hidden" name="assetType" id="assetsTypeId"  />
+					<input type="hidden" name="bundleSession" id="bundleSession" /> 
 					<table style="border: 0px;">
 						<tr>
 							<td style="color:#EFEFEF ; width: 260px"> <b> Assign selected assets to :</b></td>
 						</tr>
 						<tr>
 							<td>
-								<span style="color:#EFEFEF "><b>Bundle</b></span> &nbsp;&nbsp;<g:select name="moveBundleList" id="plannedMoveBundleList" from="${moveBundle}" optionKey="id"></g:select><br></br>
+								<span style="color:#EFEFEF "><b>Bundle</b></span> &nbsp;&nbsp;<g:select name="moveBundle" id="plannedMoveBundleList" from="${moveBundle}" optionKey="id"  noSelection="${['':'Please Select']}"></g:select><br></br>
 							</td>
 						</tr>
 						<tr>
@@ -139,8 +140,8 @@
 				<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
 			</div>
 			<div style="display: none;">
-			  <g:select name="moveBundleList" id="moveBundleList_all" from="${allMoveBundles}" optionKey="id"></g:select><br></br>
-			  <g:select name="moveBundleList" id="moveBundleList_planning" from="${moveBundle}" optionKey="id"></g:select><br></br>
+			  <g:select id="moveBundleList_all" from="${allMoveBundles}" optionKey="id"  noSelection="${['':'Please Select']}"></g:select><br></br>
+			  <g:select id="moveBundleList_planning" from="${moveBundle}" optionKey="id" noSelection="${['':'Please Select']}"></g:select><br></br>
 			</div>
 			<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
 		</div>
@@ -201,10 +202,13 @@
 				$('#item1').html(data)
 			}
 			function changeBundles(id){
+				var bundle = $('#bundleSession').val()
 				if (id=="allBundles") {
 					$("#plannedMoveBundleList").html($("#moveBundleList_all").html())
+					$("#plannedMoveBundleList").val(bundle);
 				} else {
 					$("#plannedMoveBundleList").html($("#moveBundleList_planning").html())
+					$("#plannedMoveBundleList").val(bundle);
 				}
 			}
 			function compressList() {

@@ -895,7 +895,8 @@ class MoveBundleController {
 	 */
 	def saveAssetsToBundle={
 		def assetArray = params.assetVal
-		def moveBundleInstance = MoveBundle.findById(Integer.parseInt(params.moveBundleList))
+		def moveBundleInstance = MoveBundle.findById(Integer.parseInt(params.moveBundle))
+		session.ASSIGN_BUNDLE = params.moveBundle
 		def assetList = assetArray.split(",")
 		assetList.each{assetId->
 			def assetInstance = AssetEntity.get(assetId)
