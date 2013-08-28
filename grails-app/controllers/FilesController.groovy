@@ -163,7 +163,8 @@ class FilesController {
 					flash.message += "</br>"+errors 
 					if(params.showView == 'showView'){
 						forward(action:'show', params:[id: filesInstance.id, errors:errors])
-						
+					}else if(params.showView == 'closeView'){
+						render flash.message
 					}else{
 				        session.FILES?.JQ_FILTERS = params
 						redirect( action:list)
@@ -256,7 +257,8 @@ class FilesController {
 			flash.message +="</br>"+errors 
 			if(params.updateView == 'updateView'){
 				forward(action:'show', params:[id: params.id, errors:errors])
-				
+			}else if(params.updateView == 'closeView'){
+				render flash.message
 			}else{
 				switch(params.redirectTo){
 					case "room":

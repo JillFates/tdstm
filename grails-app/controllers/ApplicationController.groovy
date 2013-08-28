@@ -194,6 +194,8 @@ class ApplicationController {
 			if(params.showView == 'showView'){
 				forward(action:'show', params:[id: applicationInstance.id, errors:errors])
 				
+			}else if(params.showView == 'closeView'){
+				render flash.message
 			}else{
 				session.APP?.JQ_FILTERS = params
 				redirect( action:list)
@@ -340,6 +342,8 @@ class ApplicationController {
 			if(params.updateView == 'updateView'){
 				forward(action:'show', params:[id: params.id, errors:errors])
 				
+			}else if(params.updateView == 'closeView'){
+				render flash.message
 			}else{
 				switch(params.redirectTo){
 					case "room":

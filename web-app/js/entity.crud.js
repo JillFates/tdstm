@@ -355,8 +355,12 @@ function submitMoveForm(){
 		}
 	});
 }
-function updateToShow(forWhom){
-	$('#updateView').val('updateView')
+function updateToShow($me, forWhom){
+	var act = $me.data('action')
+	if(act=='close')
+		$('#updateView').val('closeView')
+	else
+		$('#updateView').val('updateView')
 	var flag=true
 	if(forWhom=='app'){
 		flag = validateFields('Edit','editAssetsFormId')
@@ -370,11 +374,20 @@ function updateToShow(forWhom){
 				if(data.errMsg){
 					alert(data.errMsg)
 				}else{
-					$('#editEntityView').dialog('close')
-					$('#showEntityView').html(data)
-					$("#showEntityView").dialog('option', 'width', 'auto')
-					$("#showEntityView").dialog('option', 'position', ['center','top']);
-					$("#showEntityView").dialog('open');
+					if(act=='close'){
+						$('#editEntityView').dialog('close')
+						$('#messageId').show();
+						$('#messageId').html(data);
+						if($('.ui-icon-refresh').length)
+							$('.ui-icon-refresh').click();
+					}else{
+						$('#editEntityView').dialog('close')
+						$('#showEntityView').html(data)
+						$("#showEntityView").dialog('option', 'width', 'auto')
+						$("#showEntityView").dialog('option', 'position', ['center','top']);
+						$("#showEntityView").dialog('open');
+					}
+					changeDocTitle(title)
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
@@ -766,8 +779,13 @@ function getHelpTextAsToolTip(type){
 	});
 }
 
-function saveToShow(forWhom){
-	$('#showView').val('showView')
+function saveToShow($me, forWhom){
+	var act = $me.data('action')
+	if(act=='close'){
+		$('#showView').val('closeView')
+	}else{
+		$('#showView').val('showView')
+	}
 	var flag=true
 	if(forWhom=='Application'){
 		flag = validateFields('','createAssetsFormId')
@@ -784,14 +802,23 @@ function saveToShow(forWhom){
 				if(data.errMsg){
 					alert(data.errMsg)
 				}else{
-					$('#createEntityView').dialog('close')
-					if($('.ui-icon-refresh').length)
-						$('.ui-icon-refresh').click();
-					$('#showEntityView').html(data)
-					$("#showEntityView").dialog('option', 'width', 'auto')
-					$("#showEntityView").dialog('option', 'position', ['center','top']);
-					$("#showEntityView").dialog('open');
-					updateAssetTitle(forWhom);
+					if(act=='close'){
+						$('#createEntityView').dialog('close')
+						if($('.ui-icon-refresh').length)
+							$('.ui-icon-refresh').click();
+						$('#messageId').show();
+						$('#messageId').html(data);
+					}else{
+						$('#createEntityView').dialog('close')
+						if($('.ui-icon-refresh').length)
+							$('.ui-icon-refresh').click();
+						$('#showEntityView').html(data)
+						$("#showEntityView").dialog('option', 'width', 'auto')
+						$("#showEntityView").dialog('option', 'position', ['center','top']);
+						$("#showEntityView").dialog('open');
+						updateAssetTitle(forWhom);
+					}
+					changeDocTitle(title)
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {

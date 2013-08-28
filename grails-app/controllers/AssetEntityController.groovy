@@ -1777,7 +1777,9 @@ class AssetEntityController {
 				if(params.showView == 'showView'){
 					forward(action:'show', params:[id: assetEntity.id, errors:errors])
 					
-				} else{
+				} else if(params.showView == 'closeView'){
+					render flash.message
+				}else{
 					redirectToReq( params, assetEntity, redirectTo, true )
 				}
 			}else {
@@ -3306,6 +3308,8 @@ class AssetEntityController {
 			if(params.updateView == 'updateView'){
 				forward(action:'show', params:[id: params.id, errors:errors])
 				
+			}else if(params.updateView == 'closeView'){
+				render flash.message
 			}else{
 				redirectToReq(params, assetEntityInstance, redirectTo, false )
 			}

@@ -207,7 +207,8 @@ class DatabaseController {
 					flash.message +="</br>"+errors 
 					if(params.showView == 'showView'){
 						forward(action:'show', params:[id: dbInstance.id, errors:errors])
-						
+					}else if(params.showView == 'closeView'){
+						render flash.message
 					}else{
 				        session.DB?.JQ_FILTERS = params
 						redirect( action:list)
@@ -282,7 +283,8 @@ class DatabaseController {
 			flash.message += "</br>"+errors
 			if(params.updateView == 'updateView'){
 				forward(action:'show', params:[id: params.id, errors:errors])
-				
+			}else if(params.updateView == 'closeView'){
+				render flash.message
 			}else{
 				switch(params.redirectTo){
 					case "room":
