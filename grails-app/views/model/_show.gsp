@@ -23,7 +23,7 @@
 			<td>Manufacturer:</td>
 			<td>${modelInstance?.manufacturer?.name}</td>
 			<td>Model Name: (<a href="#" 
-			 onclick="MyGoogle=window.open('http://www.google.com/#sclient=psy-ab&q='+escape('${modelInstance?.manufacturer?.name}'+' '+'${modelInstance?.modelName}'+' specifications'),'MyGoogle','toolbar=yes,location=yes,menubar=yes,scrollbars=yes,resizable=yes'); return false">search</a>)
+			 onclick="MyGoogle=window.open('http://www.google.com/#sclient=psy-ab&q='+escape('${modelInstance?.manufacturer?.name}'+' '+'${modelInstance?.modelName}'+' technical specifications pdf'),'MyGoogle','toolbar=yes,location=yes,menubar=yes,scrollbars=yes,resizable=yes'); return false">search</a>)
 			</td>
 			<td>${modelInstance?.modelName}</td>
 		</tr>
