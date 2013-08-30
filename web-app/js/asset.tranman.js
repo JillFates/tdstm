@@ -1318,19 +1318,7 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 			'assetEntity':objId ,'override':$('#override').val(),'role':$('#roleType').val(),
 			'taskDependency' : predArr,'taskSuccessor' : succArr,
 			'manageDependency':1, 'forWhom':forWhom};
-		var completeFunc = function(e) { 
-			if(forWhom=="update"){
-				$("#commentListId").html(e.responseText)
-				$("#createCommentDialog").dialog('close');
-			}else if($("#commentcloseId").val() =='close'){
-				$("#commentListId").html(e.responseText);
-				if($('#listCommentGridId .ui-icon-refresh').length)
-				$('.ui-icon-refresh').click();
-			}
-			else{
-				addCommentsToList(e); 
-			}
-		}
+		var completeFunc = function(e) { addCommentsToList(e); }
 	} else {
 		$('#taskDependencyTdId').html("")
 		$('#relatedIssueEditId').html("")
@@ -1368,7 +1356,8 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 			'id':objId, 'taskDependency':predArr,'taskSuccessor' : succArr,'manageDependency':1, 'open':open,'deletedPreds':$('#deletePredId').val()};
 		var completeFunc = function(e) { updateCommentsOnList(e); }
 	}
-	if($("#commentcloseId").val() =='close' && open!='view'){
+	if(open=='view'){ completeFunc = function(e) { showAssetCommentDialog( e , 'show');} }
+	else{
 		completeFunc = function(e) { 
 			$("#commentListId").html(e.responseText);
 			$("#editCommentDialog").dialog('close');
@@ -1376,9 +1365,7 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 			if($('#listCommentGridId .ui-icon-refresh').length)
 				$('.ui-icon-refresh').click();
 		}
-	}else if (redirectTo) { 
-		completeFunc = function(e) { updateCommentsLists(e); } }
-	else if(open=='view'){ completeFunc = function(e) { showAssetCommentDialog( e , 'show');} }
+	}
 	jQuery.ajax({
 		url: url,
 		data: params,
