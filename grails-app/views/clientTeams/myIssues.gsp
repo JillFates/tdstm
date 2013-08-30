@@ -7,6 +7,9 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
 	<link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	<g:javascript src="asset.comment.js" />
+	<g:javascript src="asset.tranman.js" />
+	<g:javascript src="entity.crud.js" />
+	<g:javascript src="model.manufacturer.js"/>
 <style>
 .ui-icon{
 	margin-top: 0px !important;
@@ -80,7 +83,13 @@
 				           <g:render template="tasks"/>
 				     </div>
 				</div>
-		
+				<g:render template="../assetEntity/modelDialog"/>
+				<div id="showEntityView" style="display: none;"></div>
+				<div id="editEntityView" style="display: none;"></div>
+				<div id="editManufacturerView" style="display: none;"></div>
+				<div id="createEntityView" style="display: none;"></div>
+				<g:render template="../assetEntity/commentCrud"/>
+				<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
 	    <br />
 	    <input type="hidden" id="timeBarValueId" value="0"/>
 <%--
@@ -149,6 +158,7 @@
 			</tr>
 		</table>
 	</div>
+
 <script type="text/javascript">
 	<g:if test="${isOnIE && isCleaner}">
     /*
@@ -233,7 +243,7 @@
 			}
 		});
 	}
-	function showAssetComment(id){
+	function showAssetCommentMyTasks(id){
 		$('#dependencyBox').css('display','table');
 		jQuery.ajax({
 			url: '../assetEntity/showComment',
@@ -347,6 +357,16 @@ function setTab(tab){
 <script>
 	currentMenuId = "#teamMenuId";
 	$("#teamMenuId a").css('background-color','#003366')
+	$(document).ready(function() {
+		$("#showEntityView").dialog({ autoOpen: false })
+		$("#editEntityView").dialog({ autoOpen: false })
+		$("#manufacturerShowDialog").dialog({ autoOpen: false })
+		$("#modelShowDialog").dialog({ autoOpen: false })
+		$("#showCommentDialog").dialog({ autoOpen: false })
+		$("#editCommentDialog").dialog({ autoOpen: false })
+		$("#editManufacturerView").dialog({ autoOpen: false})
+		$("#createCommentDialog").dialog({ autoOpen: false })
+	});
  </script>
 </body>
 </html>

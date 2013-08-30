@@ -669,7 +669,7 @@ function showAssetDialog( e , action ) {
 		      	 $('#isResolvedId').val(ac.isResolved)
 		      	 $('#categoryTdId').html(ac.category)
 		      	 $('#commentCodeTdId').html(ac.commentCode)
-		      	 $('#assetShowValueId').html(params.assetName)
+		      	 $('#assetShowValueId').html('<a href=\"javascript:getEntityDetails(\'listTask\',\''+params.assetType+'\', \''+params.assetId+'\')\">'+params.assetName+'</a>')
 			     $('#assetTrShowId').html(params.assetName)
 			     $('#eventShowValueId').html(params.eventName)
 			     $('#commentButtonEditId').removeAttr('onclick')

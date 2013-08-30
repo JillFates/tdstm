@@ -674,3 +674,7 @@ margin: -8px !important;
     margin-top: -28px;
     position: absolute;
 }
+.assetLink{
+	color : blue;
+	cursor: pointer;
+}

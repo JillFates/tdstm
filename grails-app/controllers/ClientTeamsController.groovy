@@ -7,6 +7,7 @@ import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.TaskDependency
+import com.tds.asset.AssetDependency
 import com.tdssrc.grails.GormUtil
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
@@ -24,6 +25,7 @@ class ClientTeamsController {
 	def clientTeamsService
 	def workflowService
 	def projectService
+	def assetEntityService
 
 	def static final statusDetails = ["missing":"Unknown", "cabledDetails":"Cabled with Details","empty":"Empty","cabled":"Cabled"]
 	protected static targetTeamColumns = ['MOVE_TECH':'target_team_id', 'CLEANER':'target_team_log_id','SYS_ADMIN':'target_team_sa_id',"DB_ADMIN":'target_team_dba_id']
@@ -977,7 +979,7 @@ class ClientTeamsController {
 		//log.error "PROJECT: ${project}"
 		def person = securityService.getUserLoginPerson()
 		//log.error "PERSON=${person}"
-
+		def entities = assetEntityService.entityInfo( project )
 		// If the request is being made as a redirect for a previous task update that was being completed, we need to sleep a moment
 		// to allow the Quartz job that updates successors to finish so that when the user sees the new results that it may have successors
 		// there were updated by the previous update.
@@ -1036,7 +1038,11 @@ class ClientTeamsController {
 			search:search, sort:params.sort, order:params.order,
 	 		personId:person.id, isCleaner:isCleaner,
 			timeToUpdate:timeToRefresh ?: 60, 
-			isOnIE:false, person:person]
+			isOnIE:false, person:person,servers : entities.servers, 
+			applications : entities.applications, dbs : entities.dbs, 
+			files : entities.files,  networks :entities.networks,
+			assetDependency : new AssetDependency(), dependencyType:entities.dependencyType, 
+			dependencyStatus:entities.dependencyStatus,]
 		
 		if(search && taskList.size() > 0){
 			model  << [searchedAssetId : taskList*.id[0], searchedAssetStatus : taskList*.status[0]]

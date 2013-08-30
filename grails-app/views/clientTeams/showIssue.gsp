@@ -43,7 +43,7 @@
 					<fieldset>
 					<legend>Predecessors</legend>
 					<g:each in="${assetComment.taskDependencies}" var="task">
-						<span class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}" onclick="showAssetComment(${task.predecessor.id})">
+						<span class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}" onclick="showAssetCommentMyTasks(${task.predecessor.id})">
 						${task.predecessor.taskNumber}:${task.predecessor.comment} (${task.predecessor.category})
 						</span>
 						<br/>
@@ -54,7 +54,7 @@
 					<fieldset>
 					<legend>Successors</legend>
 					<g:each in="${successor}" var="task">
-						<span class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}" onclick="showAssetComment(${task.assetComment.id})">
+						<span class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}" onclick="showAssetCommentMyTasks(${task.assetComment.id})">
 						${task.assetComment.taskNumber}:${task.assetComment.comment} (${task.assetComment.category})
 						</span>
 						<br/>
@@ -99,7 +99,7 @@
 			</tr>
 			<tr>
 				<g:if test="${assetComment.assetEntity}">
-		   			<td>Asset:</td><td>&nbsp;${assetComment?.assetEntity.assetName}</td>
+		   			<td>Asset:</td><td><span class="assetLink" onclick="getEntityDetails('myIssues','${assetComment.assetEntity?.assetType}','${assetComment?.assetEntity.id}')">&nbsp;${assetComment?.assetEntity.assetName}</span></td>
 		   		</g:if>
 		   	</tr>
 		   	<tr class="prop">
