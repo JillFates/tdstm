@@ -2173,7 +2173,13 @@ class AssetEntityController {
 	// def saveComment = { com.tdsops.tm.command.AssetCommentCommand cmd ->
 	def saveComment = {
 		def map = commentService.saveUpdateCommentAndNotes(session, params, true, flash)
-		render map as JSON
+		if( params.forWhom == "update" ){
+			def assetEntity = AssetEntity.get(params.assetEntity)
+			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
+			render(template:"commentList",model:[assetCommentList:assetCommentList])
+		} else {
+			render map as JSON
+		}
 	}
 	/* ------------------------------------------------------------
 	 * update comments
@@ -2193,6 +2199,10 @@ class AssetEntityController {
 				flash.message = map.error
 			}
 			forward(controller:"clientTeams", action:"listComment", params:[view:params.view, tab:params.tab])
+		} else if( params.open != "view" ){
+			def assetEntity = AssetComment.findById(params.id)?.assetEntity
+			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
+			render(template:"commentList",model:[assetCommentList:assetCommentList])
 		} else {
 			render map as JSON
 		}

@@ -1063,8 +1063,9 @@ function showAssetDialog( e , action ) {
 		return trunc;
 	}
 
-function createIssue(asset, type, id){
+function createIssue(asset, type, id, forWhom){
 	$("#createAssetCommentId").val(id)
+	$("#commentFromId").val(forWhom)
 	$("#comment").val('')
 	if(type=="comment"){
 		$('#typeCommentCreateId').css('display','none')
@@ -1304,6 +1305,7 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 		$('#predecessorTableId').html("")
 		$('#successorTableId').html("")
 		var url = contextPath+'/assetEntity/saveComment'
+		var forWhom = $("#commentFromId").val()
 		var params = { 'comment':$('#comment').val(), 'commentType':$('#commentType').val(),
 			'isResolved':$('#isResolved').val(), 'resolution':$('#resolution').val(),
 			'mustVerify':$('#mustVerify').val(), 'category':$('#createCategory').val(),
@@ -1315,8 +1317,20 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 			'duration':$('#duration').val(),'durationScale':$('#durationScale').val(),
 			'assetEntity':objId ,'override':$('#override').val(),'role':$('#roleType').val(),
 			'taskDependency' : predArr,'taskSuccessor' : succArr,
-			'manageDependency':1 };
-		var completeFunc = function(e) { addCommentsToList(e); }
+			'manageDependency':1, 'forWhom':forWhom};
+		var completeFunc = function(e) { 
+			if(forWhom=="update"){
+				$("#commentListId").html(e.responseText)
+				$("#createCommentDialog").dialog('close');
+			}else if($("#commentcloseId").val() =='close'){
+				$("#commentListId").html(e.responseText);
+				if($('#listCommentGridId .ui-icon-refresh').length)
+				$('.ui-icon-refresh').click();
+			}
+			else{
+				addCommentsToList(e); 
+			}
+		}
 	} else {
 		$('#taskDependencyTdId').html("")
 		$('#relatedIssueEditId').html("")
@@ -1351,11 +1365,20 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 			'duration':$('#durationEdit').val(),'durationScale':$('#durationScaleEdit').val(),
 			'override':$('#overrideEdit').val(),'role':$('#roleTypeEdit').val(),
 			'note':$('#noteEditId').val(),'taskDependency' : $("#taskDependencyEditId").val(),
-			'id':objId, 'taskDependency':predArr,'taskSuccessor' : succArr,'manageDependency':1, 'open':open, 'deletedPreds':$('#deletePredId').val()};
+			'id':objId, 'taskDependency':predArr,'taskSuccessor' : succArr,'manageDependency':1, 'open':open,'deletedPreds':$('#deletePredId').val()};
 		var completeFunc = function(e) { updateCommentsOnList(e); }
 	}
-	if (redirectTo) { completeFunc = function(e) { updateCommentsLists(e); } }
-	else if(open=='view'){ completeFunc = function(e) { showAssetCommentDialog( e , 'show'); } }
+	if($("#commentcloseId").val() =='close' && open!='view'){
+		completeFunc = function(e) { 
+			$("#commentListId").html(e.responseText);
+			$("#editCommentDialog").dialog('close');
+			$("#createCommentDialog").dialog('close');
+			if($('#listCommentGridId .ui-icon-refresh').length)
+				$('.ui-icon-refresh').click();
+		}
+	}else if (redirectTo) { 
+		completeFunc = function(e) { updateCommentsLists(e); } }
+	else if(open=='view'){ completeFunc = function(e) { showAssetCommentDialog( e , 'show');} }
 	jQuery.ajax({
 		url: url,
 		data: params,
@@ -1524,6 +1547,7 @@ function createComments(asset, assetName){
 	
 }
 function showAssetComment(id ,type){
+	$("#commentcloseId").val('close')
 	new Ajax.Request(contextPath+'/assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e, type );commentChangeShow();}})
 }
 

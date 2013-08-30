@@ -223,6 +223,7 @@
 		<input type="hidden" name="category" value="general" />
 		<input type="hidden" id="predCount"  value="-1" />
 		<input type="hidden" id="deletePredId" name="deletePredId" />
+		<input type="hidden" id="commentFromId" name="commentFromId" />
   <div class="dialog" style="border: 1px solid #5F9FCF">
 	<div>
 		<table id="createCommentTable" style="border: 0px;">
@@ -390,6 +391,7 @@
 	<input type="hidden" name="id" id="updateCommentId" value="" />
 	<input type="hidden" name="assetName" id="assetValueId" value="" />
 	<input type="hidden" id="statuWarnId" value="" />
+	<input type="hidden" id="commentcloseId" name="commentcloseId" />
   <div>
 	<table id="updateCommentTable" class="inner">
 	   <% // TODO : Replace DB lookup in GSP with data from controller %>
