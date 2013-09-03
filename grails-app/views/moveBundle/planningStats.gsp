@@ -301,7 +301,7 @@ $(document).ready(function() {
 				</div>
 			</div>
 			<div class="dashboard dashboard_div" style="float:left;">
-					<span class="dashboard_head">Assignment and Execution Phases</span>
+					<span class="dashboard_head">Execution Phase</span>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
 							<td class="dashboard_bar_base" >
