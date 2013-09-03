@@ -875,7 +875,7 @@ function shufflePerson(sFrom,sTo){
 	}
 }
 
-function changeMovebundle(assetId, depId){
+function changeMovebundle(assetId, depId, assetBundelId){
 	var splittedDep = depId.split("_")
 	jQuery.ajax({
 		url: contextPath+'/assetEntity/getChangedBundle',
@@ -883,7 +883,7 @@ function changeMovebundle(assetId, depId){
 		type:'POST',
 		success: function(resp) {
 			$("#moveBundle_"+splittedDep[1]+"_"+splittedDep[2]).val(resp.id)
-			changeMoveBundleColor(depId,assetId,resp.id,'')
+			changeMoveBundleColor(depId,assetBundelId,resp.id,'')
 		}
 	});
 }
@@ -893,8 +893,6 @@ function changeMoveBundleColor(depId,assetId,assetBundleId, status){
 	var bundleObj = $("#moveBundle_"+splittedDep[1]+"_"+splittedDep[2])
 	var status = status != '' ? status : $("#status_"+splittedDep[1]+"_"+splittedDep[2]).val()
 	var assetId = assetId != '' ? assetId : bundleObj.val()
-			
-	console.log(assetId+"--------------"+status)
 	bundleObj.removeAttr("class").removeAttr("style")
 	
 	if(assetId != assetBundleId && status == 'Validated'){

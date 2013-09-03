@@ -10,7 +10,7 @@
 			<td class='combo-td'>
 				<span id="${forWhom}"><g:select name="asset" id="dependenciesId" 
 					from="${entities}" optionKey="${-2}" optionValue="${1}" 
-					noSelection="${['null':'Please select']}" class="depSelect" onchange="changeMovebundle(this.value,this.id)"></g:select>
+					noSelection="${['null':'Please select']}" class="depSelect" onchange="changeMovebundle(this.value,this.id,jQuery('#moveBundle').val())"></g:select>
 				</span>
 			</td>
 			<td><g:select name="bundles" from="${moveBundleList}"  optionKey="id" optionValue="name" 

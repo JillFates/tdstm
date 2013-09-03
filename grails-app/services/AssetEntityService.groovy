@@ -118,8 +118,6 @@ class AssetEntityService {
 		//looking in DB whether added dependency exist or not
 		def depEntity = AssetEntity.get(NumberUtils.toDouble(params["asset_${depType}_"+idSuf],0).round())
 		
-		println "depEntity------------>"+depEntity
-		println "depEntity---asdsadas--------->"+params["moveBundle_${depType}_"+idSuf]
 		updateBundle(depEntity, params["moveBundle_${depType}_"+idSuf])
 		
 		def errMsg = "" // Initializing var to return error message (if came)
