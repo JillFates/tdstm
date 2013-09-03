@@ -256,28 +256,28 @@ class ModelController {
 			if(connectorCount > 0){
 	        	for(int i=1; i<=connectorCount; i++){
 	        		def modelConnector = new ModelConnector(model : modelInstance,
-	        												connector : params["connector"+i],
-															label : params["label"+i],
-															type :params["type"+i],
-															labelPosition : params["labelPosition"+i],
-															connectorPosX : Integer.parseInt(params["connectorPosX"+i]),
-															connectorPosY : Integer.parseInt(params["connectorPosY"+i]),
-															status:params["status"+i] )
+						connector : params["connector"+i],
+						label : params["label"+i],
+						type :params["type"+i],
+						labelPosition : params["labelPosition"+i],
+						connectorPosX : Integer.parseInt(params["connectorPosX"+i]),
+						connectorPosY : Integer.parseInt(params["connectorPosY"+i]),
+						status:params["status"+i] )
 	        		
 	        		if (!modelConnector.hasErrors() )
 	        			modelConnector.save(flush: true)
 	        	}
         	} else {
 				def powerConnector = new ModelConnector(model : modelInstance,
-														connector : 1,
-														label : "Pwr1",
-														type : "Power",
-														labelPosition : "Right",
-														connectorPosX : 0,
-														connectorPosY : 0,
-														status: "missing"
-														)
-				
+					connector : 1,
+					label : "Pwr1",
+					type : "Power",
+					labelPosition : "Right",
+					connectorPosX : 0,
+					connectorPosY : 0,
+					status: "missing"
+					)
+
 				if (!powerConnector.save(flush: true)){
 					def etext = "Unable to create Power Connectors for ${modelInstance}" +
 					GormUtil.allErrorsString( powerConnector )
@@ -293,8 +293,7 @@ class ModelController {
 			}
             flash.message = "${modelInstance.modelName} created"
             redirect(action:list , id: modelInstance.id)
-        }
-        else {
+        } else {
         	flash.message = modelInstance.errors.allErrors.each{  log.error it }
 			def	modelConnectors = modelTemplate ? ModelConnector.findAllByModel( modelTemplate ) : null
 	    	def otherConnectors = []
@@ -315,14 +314,13 @@ class ModelController {
 	        if (!model) {
 	        	flash.message = "Model not found with Id ${params.id}"
 	            redirect(action: "list")
-	        }
-	        else {
+	        } else {
 	        	def modelConnectors = ModelConnector.findAllByModel( model,[sort:"id"] )
 				def modelAkas = WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(model, [sort:'name']).name)
 				def modelRef = isModelReferenced( model )
 				def paramsMap = [ modelInstance : model, modelConnectors : modelConnectors, modelAkas:modelAkas,
-	                  			  modelHasPermission:RolePermissions.hasPermission("ValidateModel"), redirectTo: params.redirectTo, 
-								  modelRef:modelRef]
+					modelHasPermission:RolePermissions.hasPermission("ValidateModel"), redirectTo: params.redirectTo, 
+					modelRef:modelRef]
 				
 				def view = params.redirectTo == "assetAudit" ? "_modelAuditView" : (params.redirectTo == "modelDialog" ? "_show" : "show")
 				
@@ -345,8 +343,7 @@ class ModelController {
 	        if (!model) {
 	            flash.message = "Model not found with Id ${params.id}"
 	            redirect(action: "list")
-	        }
-	        else {
+	        } else {
 	        	def modelConnectors = ModelConnector.findAllByModel( model,[sort:"id"] )
 				def nextConnector = 0
 				try{
@@ -358,7 +355,7 @@ class ModelController {
 				for(int i = nextConnector+1 ; i<51; i++ ){
 					otherConnectors << i
 				}
-				def modelAliases = ModelAlias.findAllByModel(model, [sort:'name'])
+				def modelAliases = ModelAlias.findAllByModel(model)
 				def paramsMap = [ modelInstance: model, modelConnectors : modelConnectors, otherConnectors : otherConnectors, 
 	                nextConnector:nextConnector, modelAliases:modelAliases, redirectTo:params.redirectTo ]
 				
@@ -404,9 +401,7 @@ class ModelController {
 		if(endOfLifeDate){
 			params.endOfLifeDate =  GormUtil.convertInToGMT(formatter.parse(endOfLifeDate), tzId)
 		}
-		if( principal ){
-			user  = UserLogin.findByUsername( principal )
-		}
+		
         if (modelInstance) {
 			def powerNameplate = params.powerNameplate ? Float.parseFloat(params.powerNameplate) : 0
 			def powerDesign = params.powerDesign ? Float.parseFloat(params.powerDesign) : 0
@@ -514,15 +509,16 @@ class ModelController {
 								modelConnector.status = params["status"+i]
 								
 							} else if(connector){
-								modelConnector = new ModelConnector(model : modelInstance,
-			        												connector : params["connector"+i],
-																	label : params["label"+i],
-																	type : params["type"+i],
-																	labelPosition : params["labelPosition"+i],
-																	connectorPosX : Integer.parseInt(params["connectorPosX"+i]),
-																	connectorPosY : Integer.parseInt(params["connectorPosY"+i]),
-																	status : params["status"+i] )
-			        		
+								modelConnector = new ModelConnector(
+									model: modelInstance,
+									connector: params["connector"+i],
+									label: params["label"+i],
+									type: params["type"+i],
+									labelPosition: params["labelPosition"+i],
+									connectorPosX: Integer.parseInt(params["connectorPosX"+i]),
+									connectorPosY: Integer.parseInt(params["connectorPosY"+i]),
+									status: params["status"+i] )
+
 							}
 			        		if (modelConnector && !modelConnector.hasErrors() )
 			        			modelConnector.save(flush: true)
@@ -531,14 +527,14 @@ class ModelController {
 	        	} else {
 				
 					def powerConnector = new ModelConnector(model : modelInstance,
-															connector : 1,
-															label : "Pwr1",
-															type : "Power",
-															labelPosition : "Right",
-															connectorPosX : 0,
-															connectorPosY : 0,
-															status: "missing"
-															)
+						connector: 1,
+						label: "Pwr1",
+						type: "Power",
+						labelPosition: "Right",
+						connectorPosX: 0,
+						connectorPosY: 0,
+						status: "missing"
+					)
 					
 					if (!powerConnector.save(flush: true)){
 						def etext = "Unable to create Power Connectors for ${modelInstance}" +
@@ -556,12 +552,11 @@ class ModelController {
 						
 						if( !assetCableMap ){
 	    					assetCableMap = new AssetCableMap(
-	    														cable : "Cable"+connector.connector,
-	    														fromAsset: assetEntity,
-	    														fromConnectorNumber : connector,
-	    														status : connector.status
-	    														)
-							
+								cable : "Cable"+connector.connector,
+								fromAsset: assetEntity,
+								fromConnectorNumber : connector,
+								status : connector.status
+							)
 						}
 						if(assetEntity?.rackTarget && connector.type == "Power" && 
 							connector.label?.toLowerCase() == 'pwr1' && !assetCableMap.toPower){
@@ -582,8 +577,8 @@ class ModelController {
 					assetCableMaps.each{assetCableMap->
 						if(!assetConnectors.id?.contains(assetCableMap.fromConnectorNumber?.id)){
 							AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-														toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-														where toConnectorNumber = ${assetCableMap.fromConnectorNumber?.id}""")
+								toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+								where toConnectorNumber = ${assetCableMap.fromConnectorNumber?.id}""")
 							AssetCableMap.executeUpdate("delete AssetCableMap where fromConnectorNumber = ${assetCableMap.fromConnectorNumber?.id}")
 						}
 					}
@@ -614,7 +609,7 @@ class ModelController {
 				}
 				forward(action: "show", params:[id: modelInstance.id, redirectTo:params.redirectTo])
 				
-            }else {
+            } else {
 				modelInstance.errors.allErrors.each {log.error it}
             	def modelConnectors = ModelConnector.findAllByModel( modelInstance )
 				def otherConnectors = []
@@ -623,8 +618,7 @@ class ModelController {
 				}
                 render(view: "edit", model: [modelInstance: modelInstance, modelConnectors : modelConnectors, otherConnectors : otherConnectors])
             }
-        }
-        else {
+        } else {
             flash.message = "Model not found with Id ${params.id}"
             redirect(action: "list")
         }
