@@ -823,15 +823,13 @@ td .label_sm {
 	width: 5%;
 	padding: 0px 6px;
 }
-
-td .dep-Validated {
+.dep-Validated {
 	background: LightGreen; 
 }
-
-td .dep-Unknown {
+.dep-Unknown {
 	background: LightYellow; 
 }
-td .dep-Questioned {
+.dep-Questioned {
 	background: LightPink; 
 }
 .rooms {

@@ -78,7 +78,7 @@
 					    <g:if test="${showAllOption}">
 						  <option value="all">All</option>
 						</g:if>
-						<g:each status="i" in="${moveBundleInstanceList}" var="moveBundleInstance">
+						<g:each status="i" in="${moveBundleList}" var="moveBundleInstance">
 							<option value="${moveBundleInstance?.id}">${moveBundleInstance?.name}</option>
 						</g:each>
 					</select>

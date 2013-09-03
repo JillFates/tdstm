@@ -150,8 +150,8 @@
 				<label><b>Bundle</b></label><br />
 				<select id="bundleId" name="moveBundle" multiple="multiple" size="3" onchange="getRackDetails(this.id)" style="width:150px">
 					<option value="all" selected="selected">All</option>
-					<g:each in="${moveBundleInstanceList}" var="moveBundleList">
-						<option value="${moveBundleList?.id}">${moveBundleList?.name}</option>
+					<g:each in="${moveBundleList}" var="moveBundle">
+						<option value="${moveBundle?.id}">${moveBundle?.name}</option>
 					</g:each>
 				</select>
 			</td>

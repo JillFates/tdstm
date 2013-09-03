@@ -40,13 +40,13 @@ class FilesController {
 			log.info "it's good - ${params.moveEvent}"
 			moveEvent = MoveEvent.findByProjectAndId( project, params.moveEvent )
 		}
-		
+		def moveBundleList = MoveBundle.findAllByProject(project,[sort:"name"])
 		return [assetDependency: new AssetDependency(), servers : entities.servers, applications : entities.applications, dbs : entities.dbs, networks : entities.networks ,
 			files : entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
 			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,
 			staffRoles:taskService.getRolesForStaff(), moveBundleId:params.moveBundleId, fileName:filters?.assetNameFilter ?:'', 
 			fileFormat:filters?.fileFormatFilter, fileSize:filters?.fileSizeFilter,
-			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref]
+			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref, moveBundleList:moveBundleList]
 		
 	}
 	/**

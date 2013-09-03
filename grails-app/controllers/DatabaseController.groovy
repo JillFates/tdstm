@@ -44,13 +44,13 @@ class DatabaseController {
 			log.info "it's good - ${params.moveEvent}"
 			moveEvent = MoveEvent.findByProjectAndId( project, params.moveEvent )
 		}
-		
+		def moveBundleList = MoveBundle.findAllByProject(project,[sort:"name"])
 		return [assetDependency: new AssetDependency(),
 			servers : entities.servers, applications : entities.applications, dbs : entities.dbs, files : entities.files,networks : entities.networks, 
 			dependencyStatus:entities.dependencyStatus,staffRoles:taskService.getRolesForStaff(),dependencyType:entities.dependencyType,
 			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,
 			moveBundleId:params.moveBundleId, dbName:filters?.assetNameFilter ?:'', dbFormat:filters?.dbFormatFilter?:'',
-			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref]
+			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref, moveBundleList:moveBundleList]
 	}
 	
 	/**

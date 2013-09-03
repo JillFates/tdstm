@@ -47,7 +47,7 @@ class ApplicationController {
 			log.info "it's good - ${params.moveEvent}"
 			moveEvent = MoveEvent.findByProjectAndId( project, params.moveEvent )
 		}
-		
+		def moveBundleList = MoveBundle.findAllByProject(project,[sort:"name"])
 		return [projectId: project.id, assetDependency: new AssetDependency(),
 			servers: entities.servers, 
 			applications: entities.applications, 
@@ -59,7 +59,7 @@ class ApplicationController {
 		    staffRoles:taskService.getRolesForStaff(), plannedStatus:params.plannedStatus, appSme : filters?.appSmeFilter ?:'',
 			validation:params.validation, moveBundleId:params.moveBundleId, appName:filters?.assetNameFilter ?:'', sizePref:sizePref, 
 			validationFilter:filters?.appValidationFilter ?:'', moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'',
-			partyGroupList:companiesList, availabaleRoles:availabaleRoles, company:company, moveEvent:moveEvent
+			partyGroupList:companiesList, availabaleRoles:availabaleRoles, company:company, moveEvent:moveEvent, moveBundleList:moveBundleList 
 			]
 	}
 	/**

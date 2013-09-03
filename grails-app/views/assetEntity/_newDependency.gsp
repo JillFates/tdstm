@@ -10,11 +10,14 @@
 			<td class='combo-td'>
 				<span id="${forWhom}"><g:select name="asset" id="dependenciesId" 
 					from="${entities}" optionKey="${-2}" optionValue="${1}" 
-					noSelection="${['null':'Please select']}" class="depSelect"></g:select>
+					noSelection="${['null':'Please select']}" class="depSelect" onchange="changeMovebundle(this.value,this.id)"></g:select>
 				</span>
 			</td>
+			<td><g:select name="bundles" from="${moveBundleList}"  optionKey="id" optionValue="name" 
+				noSelection="${['':' Please Select']}" onchange="changeMoveBundleColor(this.name,this.value, jQuery('#moveBundle').val(),'')"></g:select></td>
 			<td><g:select name="dtype" from="${dependencyType?.value}"  optionValue="value"></g:select></td>
-			<td><g:select name="status" from="${dependencyStatus?.value}" optionValue="value"></g:select></td>
+			<td><g:select name="status" from="${dependencyStatus?.value}" optionValue="value"
+				onchange="changeMoveBundleColor(this.name,'', jQuery('#moveBundle').val(),this.value)"></g:select></td>
 		</tr>
 	</table>
 </div>

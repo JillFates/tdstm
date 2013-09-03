@@ -1497,7 +1497,7 @@ class AssetEntityController {
 		
 		def project = securityService.getUserCurrentProject()
 		def entities = assetEntityService.entityInfo( project )
-		
+		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		def moveEvent = null
 		if (params.moveEvent && params.moveEvent.isNumber()) {
 			log.info "it's good - ${params.moveEvent}"
@@ -1511,7 +1511,7 @@ class AssetEntityController {
 			moveBundle:filters?.moveBundleFilter ?:'', model:filters?.modelFilter ?:'', sourceLocation:filters?.sourceLocationFilter ?:'', 
 			targetLocation:filters?.targetLocationFilter ?:'', targetRack:filters?.targetRackFilter ?:'', assetTag:filters?.assetTagFilter ?:'', 
 			serialNumber:filters?.serialNumberFilter ?:'', sortIndex:filters?.sortIndex, sortOrder:filters?.sortOrder, moveBundleId:params.moveBundleId,
-			staffRoles:taskService.getRolesForStaff(), sizePref:userPreferenceService.getPreference("assetListSize")?: '25'  ]) 
+			staffRoles:taskService.getRolesForStaff(), sizePref:userPreferenceService.getPreference("assetListSize")?: '25' , moveBundleList:moveBundleList ]) 
 	}
 	/**
 	 * This method is used by JQgrid to load assetList
@@ -2279,7 +2279,7 @@ class AssetEntityController {
 		}
 		
 		// Get list of all moveBundles
-		def moveBundleInstanceList = MoveBundle.findAll("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
+		def moveBundleList = MoveBundle.findAll("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
 		
 		def filterAttr = [tag_f_priority:params.tag_f_priority,tag_f_assetTag:params.tag_f_assetTag,tag_f_assetName:params.tag_f_assetName,tag_f_status:params.tag_f_status,tag_f_sourceTeamMt:params.tag_f_sourceTeamMt,tag_f_targetTeamMt:params.tag_f_targetTeamMt,tag_f_commentType:params.tag_f_commentType,tag_s_1_priority:params.tag_s_1_priority,tag_s_2_assetTag:params.tag_s_2_assetTag,tag_s_3_assetName:params.tag_s_3_assetName,tag_s_4_status:params.tag_s_4_status,tag_s_5_sourceTeamMt:params.tag_s_5_sourceTeamMt,tag_s_6_targetTeamMt:params.tag_s_6_targetTeamMt,tag_s_7_commentType:params.tag_s_7_commentType]
 		session.setAttribute('filterAttr', filterAttr)
@@ -2573,7 +2573,7 @@ class AssetEntityController {
 			def project = securityService.getUserCurrentProject()
 			def entities = assetEntityService.entityInfo( project )
 			
-			return[ moveBundleInstanceList: moveBundleInstanceList, projectId:projectId, bundleTeams:bundleTeams,
+			return[ moveBundleList: moveBundleList, projectId:projectId, bundleTeams:bundleTeams,
 				assetBeansList:assetBeansList, moveBundleInstance:moveBundleInstance, project : projectInstance,
 				supportTeam:supportTeam, totalUnracked:totalUnracked, totalSourceAvail:totalSourceAvail,
 				totalTargetAvail:totalTargetAvail, totalReracked:totalReracked, totalAsset:totalAssetsSize,
@@ -3433,13 +3433,13 @@ class AssetEntityController {
 		def justMyTasks = params.containsKey('justMyTasks') ? params.justMyTasks : "0"
 		def timeToRefresh = userPreferenceService.getPreference("TASKMGR_REFRESH")
 		def entities = assetEntityService.entityInfo( project )
-		
+		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		return [timeToUpdate : timeToRefresh ?: 60,servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
 				files:entities.files,networks:entities.networks, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, assetDependency: new AssetDependency(),
 				moveEvents:moveEvents, filterEvent:filterEvent , justRemaining:justRemaining, justMyTasks:justMyTasks, filter:params.filter,
 				comment:filters?.comment ?:'', taskNumber:filters?.taskNumber ?:'', assetName:filters?.assetEntity ?:'', assetType:filters?.assetType ?:'',
 				dueDate : filters?.dueDate ?:'', status : filters?.status ?:'', assignedTo : filters?.assignedTo ?:'', role: filters?.role ?:'',
-				category: filters?.category ?:'', moveEvent:moveEvent, 
+				category: filters?.category ?:'', moveEvent:moveEvent, moveBundleList : moveBundleList,
 				staffRoles:taskService.getTeamRolesForTasks(), 
 //				staffRoles:taskService.getRolesForStaff(), 
 				sizePref:userPreferenceService.getPreference("assetListSize")?: '25']
@@ -3451,9 +3451,10 @@ class AssetEntityController {
 	def listComment = {
 			def project = securityService.getUserCurrentProject()
 			def entities = assetEntityService.entityInfo( project )
+			def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		    return [ rediectTo:'comment', servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
 				files:entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, assetDependency: new AssetDependency(),
-				]
+				moveBundleList:moveBundleList ]
 	}
 	
 	/**
@@ -4446,11 +4447,13 @@ class AssetEntityController {
 				
 				def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 				def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-				
+				def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 				returnMap = [ 
 					dependentAssets:dependentAssets, 
 					supportAssets:supportAssets, 
+					assetEntity:assetEntity,
 //					assetsMap:assetsMap,
+					moveBundleList:moveBundleList,
 					nonNetworkTypes:nonNetworkTypes,
 					dependencyType:dependencyType, 
 					dependencyStatus:dependencyStatus, whom:params.whom]
@@ -4551,6 +4554,7 @@ class AssetEntityController {
 		 def hasPerm = RolePermissions.hasPermission("EditAndDelete")
 		 def project = securityService.getUserCurrentProject()
 		 def entities = assetEntityService.entityInfo( project )
+		 def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		 if(!hasPerm){
 		 	redirect (controller:"project", action:"list")
 			flash.message = "${message(code:'user.access.denied')}"
@@ -4558,7 +4562,7 @@ class AssetEntityController {
 		 	return [projectId: project.id, assetDependency: new AssetDependency(),
 				 	servers: entities.servers,applications: entities.applications,dbs: entities.dbs, 
 					files: entities.files, networks: entities.networks, 
-					dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus]
+					dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, moveBundleList:moveBundleList]
 		 }
 	 }
 	/**
@@ -4625,5 +4629,19 @@ class AssetEntityController {
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 		
 		render jsonData as JSON
+	}
+	/**
+	* This method is used to change bundle when on change of asset in dependency.
+	* @param dependentId
+	* @param assetId
+	* @render resultMap
+	*/
+	 
+	def getChangedBundle = {
+		def dependent = AssetDependency.read(params.dependentId)
+		def depBundle = params.dependentId == "support" ? dependent?.asset?.moveBundle?.id : dependent?.dependent?.moveBundle?.id
+		def resultMap = ["id": AssetEntity.read(params.assetId)?.moveBundle?.id ,"status":dependent?.status, 
+			"depBundle":depBundle]
+		render resultMap as JSON
 	}
 }

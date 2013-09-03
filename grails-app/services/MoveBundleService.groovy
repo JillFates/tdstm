@@ -611,7 +611,8 @@ class MoveBundleService {
 			// personList:personList, 
 			availabaleRoles:availabaleRoles,
 			moveBundleId : moveBundleId,
-			isAssigned:isAssigned
+			isAssigned:isAssigned,
+			moveBundleList:allMoveBundles
 		]
 		log.info "dependencyConsoleMap() : OVERALL took ${TimeUtil.elapsed(startAll)}"
 

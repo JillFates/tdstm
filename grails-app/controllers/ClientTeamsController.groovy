@@ -1033,6 +1033,7 @@ class ClientTeamsController {
 			issueList << ['item':task,'css':css]
 		}
 		def timeToRefresh =  userPreferenceService.getPreference("MYTASKS_REFRESH")
+		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		// Determine the model and view
 		def model = [taskList:issueList, tab:tab, todoSize:todoSize, allSize:allSize, 
 			search:search, sort:params.sort, order:params.order,
@@ -1042,7 +1043,7 @@ class ClientTeamsController {
 			applications : entities.applications, dbs : entities.dbs, 
 			files : entities.files,  networks :entities.networks,
 			assetDependency : new AssetDependency(), dependencyType:entities.dependencyType, 
-			dependencyStatus:entities.dependencyStatus,]
+			dependencyStatus:entities.dependencyStatus,moveBundleList:moveBundleList,]
 		
 		if(search && taskList.size() > 0){
 			model  << [searchedAssetId : taskList*.id[0], searchedAssetStatus : taskList*.status[0]]

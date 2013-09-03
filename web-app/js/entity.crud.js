@@ -121,6 +121,7 @@ function addAssetDependency( type,forWhom ){
 		.replace(/dependenciesId/g,"dep_"+type+"_"+rowNo+"_"+forWhom)
 		.replace(/dtype/g,"dtype_"+type+"_"+rowNo)
 		.replace(/status/g,"status_"+type+"_"+rowNo)
+		.replace(/bundles/g,"moveBundle_"+type+"_"+rowNo)
 		.replace(/entity/g,"entity_"+type+"_"+rowNo);
 	if(type!="support"){
 		$("#"+forWhom+"DependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"', 'edit_dependentAddedId')\"><span class='clear_filter'>X</span></a></td></tr>")
@@ -871,5 +872,37 @@ function shufflePerson(sFrom,sTo){
 		$("#"+sTo).val(sFromVal)
 		if(!isIE7OrLesser)
 			$("select.assetSelect").select2();
+	}
+}
+
+function changeMovebundle(assetId, depId){
+	var splittedDep = depId.split("_")
+	jQuery.ajax({
+		url: contextPath+'/assetEntity/getChangedBundle',
+		data: {'assetId':assetId, 'dependentId':splittedDep[2], 'type':splittedDep[1]},
+		type:'POST',
+		success: function(resp) {
+			$("#moveBundle_"+splittedDep[1]+"_"+splittedDep[2]).val(resp.id)
+			changeMoveBundleColor(depId,assetId,resp.id,'')
+		}
+	});
+}
+
+function changeMoveBundleColor(depId,assetId,assetBundleId, status){
+	var splittedDep = depId.split("_")
+	var bundleObj = $("#moveBundle_"+splittedDep[1]+"_"+splittedDep[2])
+	var status = status != '' ? status : $("#status_"+splittedDep[1]+"_"+splittedDep[2]).val()
+	var assetId = assetId != '' ? assetId : bundleObj.val()
+			
+	console.log(assetId+"--------------"+status)
+	bundleObj.removeAttr("class").removeAttr("style")
+	
+	if(assetId != assetBundleId && status == 'Validated'){
+		bundleObj.css('background-color','red')
+	} else {
+		if(status != 'Questioned' && status != 'Validated')
+			bundleObj.addClass('dep-Unknown')
+		else
+			bundleObj.addClass('dep-'+status)
 	}
 }

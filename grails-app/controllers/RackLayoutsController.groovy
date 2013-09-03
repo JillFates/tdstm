@@ -49,7 +49,7 @@ class RackLayoutsController {
 		def projectId = currProj.CURR_PROJ
 		if ( projectId && projectId.isNumber() ) {
 			def project = Project.findById( projectId )
-			def moveBundleInstanceList = MoveBundle.findAllByProject( project )
+			def moveBundleList = MoveBundle.findAllByProject( project )
 			userPreferenceService.loadPreferences("CURR_BUNDLE")
 			def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
 			/* set first bundle as default if user pref not exist */
@@ -59,12 +59,12 @@ class RackLayoutsController {
 			def entities = assetEntityService.entityInfo( project )
 			
 			if(!currentBundle){
-				currentBundle = moveBundleInstanceList[0]?.id?.toString()
+				currentBundle = moveBundleList[0]?.id?.toString()
 				isCurrentBundle = false
 			}
 			session.removeAttribute("USE_FILTERS")
 			session.removeAttribute("RACK_FILTERS")
-			return [moveBundleInstanceList: moveBundleInstanceList, projectInstance:project, projectId:projectId,
+			return [moveBundleList: moveBundleList, projectInstance:project, projectId:projectId,
 					currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models ,servers:entities.servers, 
 					applications : entities.applications, dbs : entities.dbs, files : entities.files,networks : entities.networks, rackFilters:rackFilters, targetRackFilter:targetRack,
 					bundle:bundle,sourceRackFilter:sourceRack,rackLayoutsHasPermission:RolePermissions.hasPermission("rackLayouts"),

@@ -86,6 +86,8 @@ class AssetEntityService {
 		//If everything is all right then processing it further for transaction
 		deps.each{dep->
 			errorMsg += addOrUpdateDeps(dep, dep.id, entity, params, paramsMap.user, paramsMap.type, false)
+			updateBundle((paramsMap.type== "support" ? dep.asset : dep.dependent), params["moveBundle_${paramsMap.type}_"+dep.id])
+			
 		}  
 		if(params.containsKey(paramsMap.key) && params[paramsMap.key] != "0"){
 			//Collecting all received supports and dependent added entities and sending to validate for current project
@@ -100,7 +102,7 @@ class AssetEntityService {
 		}
 		return errorMsg
 	}
-	
+
 	/**
 	 * This common method is used to updating dependencies or create dependencies for given asset(entity)
 	 * @param type : instance of AssetDependency 
@@ -115,6 +117,11 @@ class AssetEntityService {
 	def addOrUpdateDeps(def type, def idSuf, def assetEntity, def params, def loginUser, def depType, def createNew = false){
 		//looking in DB whether added dependency exist or not
 		def depEntity = AssetEntity.get(NumberUtils.toDouble(params["asset_${depType}_"+idSuf],0).round())
+		
+		println "depEntity------------>"+depEntity
+		println "depEntity---asdsadas--------->"+params["moveBundle_${depType}_"+idSuf]
+		updateBundle(depEntity, params["moveBundle_${depType}_"+idSuf])
+		
 		def errMsg = "" // Initializing var to return error message (if came)
 		if(depEntity){
 			def alreadyExist = false //Initializing var to save dependency if dependency already exist
@@ -450,4 +457,21 @@ class AssetEntityService {
 		}
 		return resp
 	}
+	/**
+	 * This method is used to update assets bundle in dependencies.
+	 * @param entity
+	 * @param moveBundleId 
+	 */
+	def updateBundle(def entity, def moveBundleId){
+		
+		if(entity.moveBundle?.id != moveBundleId){
+			entity.moveBundle = MoveBundle.read(moveBundleId)
+			if(!entity.save()){
+				entity.errors.allErrors.each{
+					println it
+				}
+			}
+		}
+	}
+	
 }

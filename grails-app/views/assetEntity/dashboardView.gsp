@@ -502,7 +502,7 @@ function onInvokeAction(id) {
 				for="moveBundle">Move Bundle:</label>&nbsp;<select id="moveBundleId"
 				name="moveBundle" onchange="submitFormWithBundle('show')">
 
-				<g:each status="i" in="${moveBundleInstanceList}"
+				<g:each status="i" in="${moveBundleList}"
 					var="moveBundleInstance">
 					<option value="${moveBundleInstance?.id}">${moveBundleInstance?.name}</option>
 				</g:each>

@@ -302,7 +302,7 @@ class ClientConsoleController {
 			}
 			def entities = assetEntityService.entityInfo( project )
 			
-            return [moveBundleInstance:moveBundleInstance,moveBundleInstanceList:moveBundleInstanceList,assetEntityList:assetEntityList,
+            return [moveBundleInstance:moveBundleInstance,moveBundleList:moveBundleInstanceList,assetEntityList:assetEntityList,
 				column1List:column1List, column2List:column2List,column3List:column3List, column4List:column4List,projectId:project.id, lastPoolTime : lastPoolTime,
                 processTransitionList:processTransitionList,column2Value:params.column2,column1Value:params.column1,
                 column3Value:params.column3,column4Value:params.column4,timeToUpdate:timeToUpdate ? timeToUpdate.CLIENT_CONSOLE_REFRESH : "never", 
@@ -314,7 +314,7 @@ class ClientConsoleController {
 				columns:columns, assetsInView:assetsInView, totalAssets:totalAssets, attributesList:attributesList, servers: entities.servers, 
 				applications: entities.applications, dbs : entities.dbs, files : entities.files, networks:entities.networks, assetDependency: new AssetDependency(), project:project,
 				showAllOption:showAllOption, bundleId:bundleId, staffRoles:taskService.getRolesForStaff(),dependencyType:entities.dependencyType,
-				dependencyStatus:entities.dependencyStatus ]
+				dependencyStatus:entities.dependencyStatus]
 	    	
 		 }
 	}

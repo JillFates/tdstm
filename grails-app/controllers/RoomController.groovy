@@ -32,11 +32,11 @@ class RoomController {
 			def roomId = getSession().getAttribute( "CURR_ROOM" )?.CURR_ROOM
 			def roomInstance = new Room()
 			def entities = assetEntityService.entityInfo( project )
-			
+			def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 			[roomInstanceList: roomInstanceList, roomInstanceTotal: roomInstanceList.size(), 
 			 projectId:projectId, roomId:roomId, viewType:params.viewType, roomInstance:roomInstance, servers : entities.servers, networks : entities.networks,
 					applications : entities.applications, dbs : entities.dbs, files : entities.files ,filterRackId:rackIds, staffRoles:taskService.getRolesForStaff(),
-					dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus]
+					dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, moveBundleList:moveBundleList]
 		} else {
 			flash.message = 'You must have a project selected before using this feature'
 			redirect(controller: "project", action: "list",params:[viewType : "list"])
