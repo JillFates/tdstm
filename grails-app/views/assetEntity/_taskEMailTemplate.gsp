@@ -58,7 +58,7 @@
 			</td>
 		</tr>
 		<tr style="margin-top: 10px">
-			<td valign="top" class="name"  colspan="2"><a href="https://tm.tdsops.com/tdstm/clientTeams/listTasks">See my tasks</a></td>
+			<td valign="top" class="name"  colspan="2"><a href="${createLink(controller:'clientTeams',  action:'listTasks')}">See my tasks</a></td>
 	   </tr>
 	</table>
 	</div>
