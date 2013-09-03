@@ -41,12 +41,12 @@
                 <g:form>
                     <input type="hidden" name="id" value="${manufacturerInstance?.id}" />
                     <span class="button"><input type="button" class="edit" value="Edit" onclick="showOrEditModelManuDetails('manufacturer',${manufacturerInstance?.id},'Manufacturer','edit','Edit')" /></span>
-                    <span class="button"><input class="create" type="button" value="Merge" onclick="showMergeDialog()"/></span>
+                    <span class="button"><input class="create" type="button" value="Merge into" onclick="showMergeDialog()"/></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
                 </g:form>
             </div>
             <div id="editManufacturerView" style="display: none;"></div>
-            <div id="showMergeDialog" title="Select the item to merge to:" style="display: none;" class="list">
+            <div id="showMergeDialog" title="Select the item to merge INTO:" style="display: none;" class="list">
 				<table cellpadding="0" cellspacing="0">
 					<thead>
 						<tr><th>Name</th><th>AKA</th></tr>
