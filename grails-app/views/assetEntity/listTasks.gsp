@@ -19,7 +19,7 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 	<script type="text/javascript">
 		$(document).ready(function() {
-			$('#issueTimebar').width($(window).width()+'px')
+			$('#issueTimebar').width("100%")
 			
 			$('#assetMenu').show();
 			$("#commentsListDialog").dialog({ autoOpen: false })
@@ -35,7 +35,7 @@
 			currentMenuId = "#assetMenu";
 			$("#teamMenuId a").css('background-color','#003366')
 			$("#viewGraphSpanId").css('margin-left',$(window).width()*3.3/100+'%')
-			$("#selectTimedBarId").val(${timeToUpdate})
+			$("#selectTimedBarId").val(${timeToUpdate})			
 			$("#viewtaskgraph_button_graph").click(function(event){
 				 var moveEvent = $("#moveEventId").val()
 				 if(moveEvent == '0'){
@@ -44,6 +44,9 @@
 				 }
 			});
 			taskManagerTimePref = ${timeToUpdate}
+			$(window).resize(function() {
+				B2.Restart(taskManagerTimePref)
+			});
 			
 			if (taskManagerTimePref != 0) {
 				B2.Start(taskManagerTimePref);
@@ -257,7 +260,7 @@ function toggleCheckbox(chkbox, field) {
 	Bar.prototype={
 		Start:function(sec){
 			clearTimeout(this.to);
-			this.oop.animate(0,this.max,sec*1000);
+			this.oop.animate(0,$('#issueTimebar').width(),sec*1000);
 			this.srt=new Date();
 			this.sec=sec;
 			this.Time();
@@ -283,7 +286,7 @@ function toggleCheckbox(chkbox, field) {
 		Restart:function(sec){
 			clearTimeout(this.to);
 			var second = $('#timeBarValueId').val()
-			this.oop.animate($('#issueTimebarId').width(),this.max,second*1000);
+			this.oop.animate($('#issueTimebarId').width(),$('#issueTimebar').width(),second*1000);
 			this.srt=new Date();
 			this.sec=second;
 			this.Time();

@@ -72,7 +72,7 @@
 					</g:form>
 				</div>
 				</div>
-				<div class="issueTimebar" id="issueTimebar">
+				<div class="issueTimebar" id="issueTimebar" >
 						<div id="issueTimebarId"></div>
 				</div>
 				<div id="detailId"
@@ -176,7 +176,7 @@
 	});
 	</g:if>
 	$(function() {
-		$('#issueTimebar').width($('#issueTable').width())
+		$('#issueTimebar').width("100%")
 		$('#selectTimedBarId').val(${timeToUpdate})
 		taskManagerTimePref = ${timeToUpdate}
 		if(taskManagerTimePref != 0){
@@ -189,6 +189,9 @@
 		if( searchedAssetId ){
 			issueDetails(searchedAssetId,searchedAssetStatus);
 	    }
+		$(window).resize(function() {
+			B1.Restart(taskManagerTimePref)
+		});
 	});
 
     $(".actionBar").die().live('click',function(){
@@ -317,7 +320,7 @@ function setTab(tab){
 	Bar.prototype={
 		Start:function(sec){
 			clearTimeout(this.to);
-			this.oop.animate(0,this.max,sec*1000);
+			this.oop.animate(0,$("#issueTimebar").width(),sec*1000);
 			this.srt=new Date();
 			this.sec=sec;
 			this.Time();
@@ -343,7 +346,7 @@ function setTab(tab){
 		Restart:function(sec){
 			clearTimeout(this.to);
 			var second = $('#timeBarValueId').val()
-			this.oop.animate($('#issueTimebarId').width(),this.max,second*1000);
+			this.oop.animate($('#issueTimebarId').width(),$("#issueTimebar").width(),second*1000);
 			this.srt=new Date();
 			this.sec=second;
 			this.Time();
