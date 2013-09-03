@@ -191,15 +191,15 @@ class ModelController {
 			def person = user.person
 			def score = person?.modelScore? person?.modelScore:0
 			if(user && person){
-				     if(params?.modelStatus == "new"||params?.modelStatus=="full" ){
-						    person.modelScore = score+10
-					 }else{
-					        person.modelScore = score+20
-					 }
-					if(!person.save(flush:true)){
-						person.errors.allErrors.each{ println it }
-				    }				
-				}
+			     if(params?.modelStatus == "new"||params?.modelStatus=="full" ){
+					    person.modelScore = score+10
+				 }else{
+				        person.modelScore = score+20
+				 }
+				if(!person.save(flush:true)){
+					person.errors.allErrors.each{ println it }
+				}				
+			}
 		}
 		if(endOfLifeDate){
 			params.endOfLifeDate =  GormUtil.convertInToGMT(formatter.parse(endOfLifeDate), tzId)
@@ -288,8 +288,10 @@ class ModelController {
         	modelInstance.sourceTDSVersion = 1
         	modelInstance.save(flush: true)
 			def akaNames = params.list('aka')
-			akaNames.each{ aka->
-				modelInstance.findOrCreateAliasByName(aka.trim(), true)
+			akaNames.each{ aka ->
+				aka = aka.trim()
+				if (aka)  
+					modelInstance.findOrCreateAliasByName(aka, true)
 			}
             flash.message = "${modelInstance.modelName} created"
             redirect(action:list , id: modelInstance.id)
