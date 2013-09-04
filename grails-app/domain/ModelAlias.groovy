@@ -17,9 +17,7 @@ class ModelAlias {
 	static mapping = {
 		version false
 		autoTimestamp false
-		
-		// TODO : the index created is ModelAlias_Name_idx - don't understand why the declared name is wrong plus this index name is screwy
-		name index:'modelAliasModelIdx'
+		sort 'name'
 	}
 	
 	def beforeInsert = {
