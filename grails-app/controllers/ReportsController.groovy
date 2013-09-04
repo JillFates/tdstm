@@ -1,23 +1,28 @@
 import grails.converters.JSON
 
-import java.io.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.io.*
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import jxl.*
 import jxl.read.biff.*
 import jxl.write.*
 
-import org.apache.poi.hssf.record.formula.functions.T
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.apache.commons.lang.math.NumberUtils
 import org.apache.shiro.SecurityUtils
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
-import com.tds.asset.AssetDependency
+import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
+import com.tds.util.workbook.*;
 
 class ReportsController {
 	
@@ -28,7 +33,8 @@ class ReportsController {
 	def supervisorConsoleService 
 	def reportsService
 	def securityService
-	
+	def moveEventService
+	def moveBundleService
 	def index = { 
 		render(view:'home')
 	}
@@ -63,6 +69,11 @@ class ReportsController {
 	case "Issue Report":  
 					render( view:'issueReport',
 						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
+						break;
+	case "Task Report":
+					def moveEventInstanceList  = MoveEvent.findAllByProject(projectInstance,[sort:'name'])
+					render( view:'taskReport',
+						model:[moveEventInstanceList: moveEventInstanceList, projectInstance:projectInstance])
 						break;
 	case "Transportation Asset List":  
 					render( view:'transportationAssetReport',
@@ -1355,5 +1366,91 @@ class ReportsController {
 		flash.message = errorMsg
 		redirect( action:"applicationConflicts")
 	}
+	/*
+	 * Generate Issue Report
+	 */
+	def tasksReport = {
+		def project = securityService.getUserCurrentProject()
+		def allBundles = false
+		def taskList = []
+		def reportFields = []
+		def reqEvents = params.list("moveEvent").toList()
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		
+		if(reqEvents) {
+			
+			if( reqEvents.find{it=='all'} ){
+				reqEvents = MoveEvent.findAllByProject(project).id
+				allBundles = true
+			}
+			def badReqEventIds
+			if( !allBundles ){
+				reqEvents = reqEvents.collect {id-> NumberUtils.toDouble(id, 0).round() }
+				badReqEventIds = moveEventService.verifyEventsByProject(reqEvents, project)
+			}
+			
+			if( badReqEventIds ){
+				flash.message = "Event ids $badReqEventIds is not associated with current project.\
+							    Kindly request for project associated  Event ids ."
+				return
+			}
+			def types = params.wComment ? [AssetCommentType.ISSUE, AssetCommentType.COMMENT] : [AssetCommentType.ISSUE]
+			def argMap = ["events":reqEvents, "type":types, "project":project]
+			
+			def taskListHql = "FROM AssetComment WHERE project =:project AND moveEvent.id IN (:events) AND commentType IN (:type) "
+			
+			if( params.wUnresolved ){
+				taskListHql += "AND status != :status"
+				argMap << ["status":AssetCommentStatus.COMPLETED]
+			}
+			taskList = AssetComment.findAll(taskListHql, argMap)
+			
+			//Generating XLS Sheet
+			if(params._action_tasksReport == "Generate Xls"){
+				def filename = 	"${project.name}-TaskReport"
+				def book = WorkbookObject.getWritableWorkbook(response, filename, "/templates/TaskReport.xls" );
+				def tasksSheet = book.getSheet("tasks")
+				def preMoveColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment','assignedTo', 'status',
+							'estStart','','', 'notes', 'duration', 'estStart','estFinish','actStart', 'actFinish', 'workflow',
+							'createdBy', 'dateCreated', 'moveEvent']
+				moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId, 7)
+				
+				book.write()
+				book.close()
+			} else if(params._action_tasksReport == "Generate Pdf"){
+				 // TODO : Facing few issues while generating pdf , 
+			    //Currying clousre
+				//taskListAsPdf{}
+			}
+		}	
+		render (view :'tasksReport', model:[taskList : taskList, tzId:tzId]) 
+	}
+	
+	
+	/*def taskListAsPdf ={
+		def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
+		DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+		taskList.each{task ->
+			reportFields <<['taskNumber':task.taskNumber.toString() , 'taskDependencies':task.taskDependencies.assetComment.comment.toString() ,
+				"assetEntity":task.assetEntity?.assetName,
+				"comment":task.comment, "assignedTo":task.assignedTo.toString(), "status":task.status,
+				"datePlanned":GormUtil.convertInToUserTZ(task.estStart, tzId),"outStanding":'',"dateRequired":GormUtil.convertInToUserTZ(task.estStart, tzId ),
+				"clientName":project?.client?.name,
+				'projectName':project?.name,'notes':task.notes.toString(),
+				'duration':task.duration.toString(), 'estStart':GormUtil.convertInToUserTZ(task.estStart, tzId ),
+				'estFinish':task.estFinish,
+				'actStart':GormUtil.convertInToUserTZ(task.actStart, tzId ),
+				'actFinish':GormUtil.convertInToUserTZ(task.actFinish, tzId ), 'workflow':'',
+			'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
+		}
+		if(reportFields.size() <= 0) {
+			flash.message = " No Assets Were found for  selected values  "
+			redirect( action:'getBundleListForReportDialog', params:[reportId: 'Task Report'] )
+		}else {
+			def filename = 	"Task-${project?.name}_Report"
+			chain(controller:'jasper',action:'index',model:[data:reportFields],
+					params:["_format":"PDF","_name":"${filename}","_file":"taskReport"])
+		}
+	} */
 }
  
