@@ -20,8 +20,6 @@ databaseChangeLog = {
 	include file: '20130125-add-entity-validation.groovy'
 	include file: '20130125-update-plantatus-validation.groovy'
 	include file: '20130213-add-model-usize.groovy'
-*/
-
 	include file: '20130315-change-userlogin-username-size.groovy'
 	include file: '20130321-add-custom-fields.groovy'
 	include file: '20130322-add-entity-customs.groovy'
@@ -43,6 +41,7 @@ databaseChangeLog = {
     //include file: '20130522-create-default-project.groovy' // TODO : enable after John's review
 	include file: '20130624-update-recent-users-expiry-dates.groovy'
 	include file: '20130626-update-person-staff_type.groovy'
+*/
 	include file: '20130709-add-new-fields-application-table.groovy'
 	include file: '20130710-add-new-app-field-import-export.groovy'
 	include file: '20130713-add-permission-view-permission.groovy'
@@ -53,7 +52,7 @@ databaseChangeLog = {
 	include file: '20130808-update-model-status.groovy'
 	include file: '20130826-update-comment-datatype-to-text.groovy'
 	include file: '20130903-add-task-report-permission.groovy'
-	// include file: '20130903-add-index-to-ModelAlias.groovy'
+	include file: '20130903-add-index-to-ModelAlias.groovy'
 	include file: '20130905-update-asset-orphan-records-with-no-racks-rooms.groovy'
 	include file: '20130904-update-blades-room-and-location.groovy'
     
