@@ -118,15 +118,13 @@
 			requirements += passwordMatch(password, $("[id='uppercaseRequirementId']")[context], /[A-Z]+/, 'Uppercase characters', noMatch);
 			requirements += passwordMatch(password, $("[id='numericRequirementId']")[context], /[0-9]+/, 'Numeric characters', noMatch);
 			requirements += passwordMatch(password, $("[id='symbolRequirementId']")[context], /.*[~!@#\$%\^&\*_\-\+=`\|\\\(\)\{\}\[\]:;"'<>\,\.\?\/].*/, 'Nonalphanumeric characters', noMatch);
-			if(passwordMatch(requirements + "", $("[id='passwordRequirementsId']")[context], /[3-4]+/, 'Password must contain at least 3 of these requirements: ', noMatch) == 1){
+			if (passwordMatch(requirements + "", $("[id='passwordRequirementsId']")[context], /[3-4]+/, 'Password must contain at least 3 of these requirements: ', noMatch) == 1){
 				score++;
 				if(noMatch.item != null)
 					noMatch.item.style.color = "#555555";
 			}
 			
-			if(score == 3)
-				return true;
-			return false;
+			return (score == 3);
 		}
 		function passwordMatch(password, element, regex, baseText, noMatch){
 			var returnVal = 0;
@@ -195,7 +193,7 @@
 						$("#todoCountProjectId").html(resp.count)
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
-						alert("An Unexpected error while getting asset.")
+						console.log("Unable to lookup task count - " + textStatus)
 					}
 				});
 			}
