@@ -1744,10 +1744,13 @@ class AssetEntityController {
 		}
 		
 		def bundleId = getSession().getAttribute( "CURR_BUNDLE" )?.CURR_BUNDLE
-		def assetEntity = new AssetEntity(params)
 		def projectId =  getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def projectInstance = securityService.getUserCurrentProject()
 		
+		if(params.assetType == "Blade")
+			setBladeRoomAndLoc( params, projectInstance)
+		
+		def assetEntity = new AssetEntity(params)	
 		assetEntity.project = projectInstance
 		assetEntity.owner = projectInstance.client
 		if(!params.assetTag){
@@ -3309,12 +3312,16 @@ class AssetEntityController {
 		if(!params.TargetRack)
 			params.rackTarget=null
 		
+		def project = securityService.getUserCurrentProject()
+		
+		if(params.assetType == "Blade")
+			setBladeRoomAndLoc( params, project) 
+		
 		def assetEntityInstance = AssetEntity.get(params.id)
 		assetEntityInstance.properties = params
 		if(!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {
 			assetEntityInstance.updateRacks()
 			def loginUser = securityService.getUserLogin()
-			def project = securityService.getUserCurrentProject()
 			flash.message = "Asset ${assetEntityInstance.assetName} Updated <br/>"
 			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance, loginUser, project)
 			flash.message += errors
@@ -4646,5 +4653,27 @@ class AssetEntityController {
 		def resultMap = ["id": AssetEntity.read(params.assetId)?.moveBundle?.id ,"status":dependent?.status, 
 			"depBundle":depBundle]
 		render resultMap as JSON
+	}
+	
+	/**
+	 * Setting Blades Location and room as respective to their chassis location and rooms
+	 * @param params : params map
+	 * @param project: project instance
+	 * @return void
+	 */
+	def setBladeRoomAndLoc( params, project ){
+		def sourceBladeChassis = params.sourceBladeChassis ? AssetEntity.findByAssetTagAndProject( params.sourceBladeChassis, project ) : null
+		def targetBladeChassis = params.targetBladeChassis ? AssetEntity.findByAssetTagAndProject( params.targetBladeChassis, project ) : null
+		params.sourceLocation = sourceBladeChassis?.sourceLocation
+		params.sourceRoom = sourceBladeChassis?.sourceRoom
+		params.sourceRack = sourceBladeChassis?.sourceRack
+		params.roomSource = sourceBladeChassis?.roomSource
+		params.rackSource = sourceBladeChassis?.rackSource
+		
+		params.targetLocation = targetBladeChassis?.targetLocation
+		params.targetRoom = targetBladeChassis?.targetRoom
+		params.targetRack = sourceBladeChassis?.targetRack
+		params.roomTarget = sourceBladeChassis?.roomTarget
+		params.rackTarget = sourceBladeChassis?.rackTarget
 	}
 }
