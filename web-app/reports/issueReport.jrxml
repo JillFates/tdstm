@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="issueReport" pageWidth="1200" pageHeight="842" orientation="Landscape" columnWidth="1060" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
 	<property name="ireport.zoom" value="1.0"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="403"/>
 	<property name="ireport.y" value="0"/>
 	<style name="border">
 		<pen lineWidth="0.0"/>
@@ -41,7 +41,7 @@
 		<band/>
 	</background>
 	<title>
-		<band height="85">
+		<band height="110">
 			<staticText>
 				<reportElement x="350" y="13" width="300" height="72"/>
 				<textElement textAlignment="Center">
@@ -89,7 +89,7 @@
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{projectName}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{projectName}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -124,7 +124,7 @@
 				<textElement textAlignment="Center">
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Source / Target\n Room / Rack / UPos"]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA["Source / Target\n Room / Rack / UPos"]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="413" y="0" width="82" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
@@ -212,7 +212,7 @@
 				<textElement>
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{occuredAt}]]></textFieldExpression>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{occuredAt}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="border" stretchType="RelativeToTallestObject" x="679" y="0" width="85" height="20"/>
@@ -243,7 +243,7 @@
 				<textFieldExpression><![CDATA[$F{owner}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="border" stretchType="RelativeToTallestObject" x="852" y="0" width="131" height="20"/>
+				<reportElement style="border" stretchType="RelativeToTallestObject"  x="852" y="0" width="131" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
