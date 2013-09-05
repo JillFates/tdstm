@@ -1833,6 +1833,9 @@ class AssetEntityController {
 			case "listTask":
 				  render "Asset ${entity.assetName} updated."
 				  break;
+		    case "dependencies":
+				  redirect(action:listDependencies)
+				  break;
 			default:
 			  	redirect( action:list)
 		  }

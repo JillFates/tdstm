@@ -2,7 +2,7 @@
 	 <g:if test="${redirectTo=='listTask'}">
 	 	<span class="button"><input type="button" class="save updateDep" value="Update/Close" onclick="updateToRefresh()" /></span>
 	 </g:if>
-	 <g:elseif test="${redirectTo && !(redirectTo in ['application','database','files','myIssues'])}">
+	 <g:elseif test="${redirectTo && !(redirectTo in ['assetEntity','application','database','files','myIssues'])}">
 	 	<span class="button"><g:actionSubmit class="save updateDep" value="Update/Close" action="Update" /></span>
 	 </g:elseif>
 	 <g:else>
