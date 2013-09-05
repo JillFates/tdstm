@@ -115,4 +115,16 @@ class Room {
 			(this.country  ? " ${this.country}" : '' )
 		return 	roomAddress			   
 	}
+	
+	/**
+	 * Updating all Room reference as null
+	 */
+	def beforeDelete = {
+		AssetEntity.withNewSession{
+			AssetEntity.executeUpdate("Update AssetEntity set roomSource = null, sourceRoom = null, sourceLocation = null where roomSource = :roomId",[roomId:this])
+			AssetEntity.executeUpdate("Update AssetEntity set roomTarget = null, targetRoom = null, targetLocation = null where roomTarget = :roomId",[roomId:this])
+			MoveBundle.executeUpdate("Update MoveBundle set sourceRoom = null where sourceRoom = :roomId",[roomId:this])
+			MoveBundle.executeUpdate("Update MoveBundle set targetRoom = null where targetRoom = :roomId",[roomId:this])
+		}
+	}
 }

@@ -54,5 +54,6 @@ databaseChangeLog = {
 	include file: '20130826-update-comment-datatype-to-text.groovy'
 	include file: '20130903-add-task-report-permission.groovy'
 	include file: '20130903-add-index-to-ModelAlias.groovy'
+	include file: '20130905-update-asset-orphan-records-with-no-racks-rooms.groovy'
     
 }

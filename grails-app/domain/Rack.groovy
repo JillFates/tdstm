@@ -96,4 +96,14 @@ class Rack {
 		}
 		return returnVal
 	}
+	
+	/**
+	 * Updating reference of assetentity's  rackSource and sourceRack to null while deleting rack
+	 */
+	def beforeDelete = {
+		AssetEntity.withNewSession{
+			AssetEntity.executeUpdate("Update AssetEntity set rackSource = null, sourceRack = null where rackSource = :rack",[rack:this])
+			AssetEntity.executeUpdate("Update AssetEntity set rackTarget = null, targetRack = null where rackTarget = :rack",[rack:this])
+		}
+	}
 }
