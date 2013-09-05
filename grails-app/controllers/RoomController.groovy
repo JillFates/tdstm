@@ -28,7 +28,7 @@ class RoomController {
 		if (projectId) {
 			log.info "projectId=${projectId} class=${projectId.class}"
 			def project = Project.findById( projectId )
-			def roomInstanceList = Room.findAllByProject( project, params )
+			def roomInstanceList = Room.findAll("FROM Room WHERE project =:project order by location, roomName", [project:project])
 			def roomId = getSession().getAttribute( "CURR_ROOM" )?.CURR_ROOM
 			def roomInstance = new Room()
 			def entities = assetEntityService.entityInfo( project )
