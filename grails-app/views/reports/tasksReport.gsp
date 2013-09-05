@@ -24,9 +24,10 @@
 				<tr>
 					<th>Task #</th>
 					<th>Pred</th>
-					<th>Application</th>
+					<th>Related to</th>
 					<th>Task Description</th>
 					<th>Responsible Resource</th>
+					<th>Team</th>
 					<th>Status</th>
 					<th>Date Planned</th>
 					<th>Date Required</th>
@@ -37,8 +38,8 @@
 					<th>Estimated Finish</th>
 					<th>Actual Finish</th>
 					<th>WorkFlow Step</th>
-					<th>Created by</th>
 					<th>Created on</th>
+					<th>Created by</th>
 					<th>Event</th>
 				</tr>
 			</thead>
@@ -62,6 +63,9 @@
 							${task.assignedTo}
 						</td>
 						<td>
+							${task.role}
+						</td>
+						<td>
 							${task.status}
 						</td>
 						<td>NA</td>
@@ -78,10 +82,9 @@
 						<td><tds:convertDate date="${task.dateResolved }"/></td>
 						<td>NA</td>
 						<td>
-							${task.createdBy }
+							<tds:convertDate date="${task.dateCreated }"/>
 						</td>
-						<td><tds:convertDate date="${task.dateCreated }"
-								timeZone="${tzId}" /></td>
+						<td>${task.createdBy}</td>
 						<td>
 							${task.moveEvent }
 						</td>

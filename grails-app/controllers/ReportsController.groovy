@@ -1370,87 +1370,123 @@ class ReportsController {
 	 * Generate Issue Report
 	 */
 	def tasksReport = {
-		def project = securityService.getUserCurrentProject()
-		def allBundles = false
 		def taskList = []
-		def reportFields = []
 		def reqEvents = params.list("moveEvent").toList()
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		
 		if(reqEvents) {
-			
-			if( reqEvents.find{it=='all'} ){
-				reqEvents = MoveEvent.findAllByProject(project).id
-				allBundles = true
-			}
+			def project = securityService.getUserCurrentProject()
+			def allBundles = reqEvents.find{it=='all'} ? true : false
 			def badReqEventIds
+			
 			if( !allBundles ){
 				reqEvents = reqEvents.collect {id-> NumberUtils.toDouble(id, 0).round() }
+				//Verifying events id are in same project or not.
 				badReqEventIds = moveEventService.verifyEventsByProject(reqEvents, project)
 			}
 			
+			//if found any bad id returning to the user
 			if( badReqEventIds ){
 				flash.message = "Event ids $badReqEventIds is not associated with current project.\
 							    Kindly request for project associated  Event ids ."
 				return
 			}
-			def types = params.wComment ? [AssetCommentType.ISSUE, AssetCommentType.COMMENT] : [AssetCommentType.ISSUE]
-			def argMap = ["events":reqEvents, "type":types, "project":project]
 			
-			def taskListHql = "FROM AssetComment WHERE project =:project AND moveEvent.id IN (:events) AND commentType IN (:type) "
+			def argMap = ["type":AssetCommentType.ISSUE, "project":project]
+			def taskListHql = "FROM AssetComment WHERE project =:project AND commentType =:type "
+			
+			if(!allBundles){
+				taskListHql +=" AND moveEvent.id IN (:events) "
+				argMap <<["events":reqEvents]
+			}
 			
 			if( params.wUnresolved ){
 				taskListHql += "AND status != :status"
 				argMap << ["status":AssetCommentStatus.COMPLETED]
 			}
+			
 			taskList = AssetComment.findAll(taskListHql, argMap)
+			taskList.addAll( params.wComment ? AssetComment.findAllByCommentTypeAndProject(AssetCommentType.COMMENT, project): [])
 			
 			//Generating XLS Sheet
-			if(params._action_tasksReport == "Generate Xls"){
-				def filename = 	"${project.name}-TaskReport"
-				def book = WorkbookObject.getWritableWorkbook(response, filename, "/templates/TaskReport.xls" );
-				def tasksSheet = book.getSheet("tasks")
-				def preMoveColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment','assignedTo', 'status',
-							'estStart','','', 'notes', 'duration', 'estStart','estFinish','actStart', 'actFinish', 'workflow',
-							'createdBy', 'dateCreated', 'moveEvent']
-				moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId, 7)
-				
-				book.write()
-				book.close()
-			} else if(params._action_tasksReport == "Generate Pdf"){
-				 // TODO : Facing few issues while generating pdf , 
-			    //Currying clousre
-				//taskListAsPdf{}
+			
+			switch(params._action_tasksReport){
+				case "Generate Xls" :
+					  exportTaskReportExcel(taskList, tzId, project)
+					  break;
+					  
+				case "Generate Pdf" :
+					  exportTaskReportPdf(taskList, tzId, project)
+					  break;
+					  
+			    default :
+					 render (view :'tasksReport', model:[taskList : taskList, tzId:tzId]) 
+					 break;
 			}
-		}	
-		render (view :'tasksReport', model:[taskList : taskList, tzId:tzId]) 
+		} else{
+			flash.message = "Please select move event to get the task report."
+			redirect( action:"getBundleListForReportDialog", params:[reportId:"Task Report"])
+		}
+		
 	}
 	
+	/**
+	 * 
+	 * Export task report in XLS format
+	 * @param taskList : list of tasks 
+	 * @param tzId : timezone
+	 * @param project : project instance
+	 * @return : will generate a XLS file having task task list
+	 */
+	def exportTaskReportExcel(taskList, tzId, project){
+		def book = WorkbookObject.getWritableWorkbook(response, "${project.name}-TaskReport", "/templates/TaskReport.xls" );
+		def tasksSheet = book.getSheet("tasks")
+		def preMoveColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment','assignedTo', 'role', 'status',
+					'estStart','','', 'notes', 'duration', 'estStart','estFinish','actStart', 'actFinish', 'workflow',
+					'dateCreated', 'createdBy', 'moveEvent']
+		moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId, 7)
+		
+		book.write()
+		book.close()
+	}
 	
-	/*def taskListAsPdf ={
+	/**
+	 * Export task report in pdf format
+	 * @param taskList : list of tasks 
+	 * @param tzId : timezone
+	 * @param project : project instance
+	 * @return : will generate a pdf file having task task list
+	 */
+	def exportTaskReportPdf(taskList, tzId, project){
 		def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
-		DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		def reportFields = []
 		taskList.each{task ->
-			reportFields <<['taskNumber':task.taskNumber.toString() , 'taskDependencies':task.taskDependencies.assetComment.comment.toString() ,
-				"assetEntity":task.assetEntity?.assetName,
-				"comment":task.comment, "assignedTo":task.assignedTo.toString(), "status":task.status,
-				"datePlanned":GormUtil.convertInToUserTZ(task.estStart, tzId),"outStanding":'',"dateRequired":GormUtil.convertInToUserTZ(task.estStart, tzId ),
-				"clientName":project?.client?.name,
-				'projectName':project?.name,'notes':task.notes.toString(),
-				'duration':task.duration.toString(), 'estStart':GormUtil.convertInToUserTZ(task.estStart, tzId ),
-				'estFinish':task.estFinish,
-				'actStart':GormUtil.convertInToUserTZ(task.actStart, tzId ),
-				'actFinish':GormUtil.convertInToUserTZ(task.actFinish, tzId ), 'workflow':'',
-			'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
+			reportFields <<[
+				'taskNumber':task.taskNumber?.toString() , 
+				'taskDependencies': WebUtil.listAsMultiValueString(task.taskDependencies?.assetComment?.comment) ,
+				"assetEntity":task.assetEntity?.assetName,"comment":task.comment,
+				"assignedTo":task.assignedTo? task.assignedTo.toString():"", "status":task.status,
+				"datePlanned":"","outStanding":"","dateRequired":"", 'workflow':"",
+				"clientName":project?.client?.name,"team":task.role? task.role.toString():"",
+				'projectName':project?.name,'notes':task.notes? WebUtil.listAsMultiValueString(task.notes):"",
+				'duration':task.duration ? task.duration.toString():"", 
+				'estStart':task.estStart? formatter.format(GormUtil.convertInToUserTZ(task.estStart, tzId )).toString():"",
+				'estFinish':task.estFinish? formatter.format(GormUtil.convertInToUserTZ(task.estFinish, tzId )).toString(): "",
+				'actStart':task.actStart? formatter.format(GormUtil.convertInToUserTZ(task.actStart, tzId )).toString():"",
+				'actFinish':task.actFinish? formatter.format(GormUtil.convertInToUserTZ(task.actFinish, tzId )).toString():"",
+				"createdOn":task.dateCreated? formatter.format(GormUtil.convertInToUserTZ(task.dateCreated, tzId )).toString():"",
+				"createdBy":task.createdBy.toString() ,"moveEvent":task.moveEvent? task.moveEvent.toString():"",
+				'timezone':tzId ? tzId : "EDT","rptTime":String.valueOf(formatter.format( currDate ) )]
 		}
 		if(reportFields.size() <= 0) {
 			flash.message = " No Assets Were found for  selected values  "
 			redirect( action:'getBundleListForReportDialog', params:[reportId: 'Task Report'] )
 		}else {
-			def filename = 	"Task-${project?.name}_Report"
+			def filename = 	"${project.name}-TaskReport"
 			chain(controller:'jasper',action:'index',model:[data:reportFields],
 					params:["_format":"PDF","_name":"${filename}","_file":"taskReport"])
 		}
-	} */
+	} 
 }
  

@@ -41,7 +41,7 @@
 			<tr>
 				<td></td>
 				<td style="width:auto;">
-					<input type="checkbox" name="wUnresolved" checked="checked" />Include UnResolved Items in report
+					<input type="checkbox" name="wUnresolved" checked="checked" />Include only remaining tasks in report
 				</td>
 			</tr>
 			<tr>
