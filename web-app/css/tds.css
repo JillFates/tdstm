@@ -827,10 +827,19 @@ td .label_sm {
 	background: LightGreen; 
 }
 .dep-Unknown {
-	background: LightYellow; 
+	background: #F9FF90; 
 }
 .dep-Questioned {
 	background: LightPink; 
+}
+.dep-Not {
+	background: WhiteSmoke; 
+}
+.dep-Archive {
+	background: WhiteSmoke; 
+}
+.dep-Future {
+	background: WhiteSmoke; 
 }
 .rooms {
 	display: none;  left:0px  !important;    position: absolute  !important; top: 20px; 

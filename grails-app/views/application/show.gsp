@@ -161,34 +161,34 @@
 					<tbody>
 						<g:each in="${supportAssets}" var="support" status="i">
 							<tr onclick="getEntityDetails('${redirectTo}','${support?.asset?.assetType}', ${support?.asset?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
-								<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
+								<td class="dep-${support.status}">
 									${support?.dataFlowFreq}
 								</td>
-								<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
+								<td class="dep-${support.status}">
 									${support?.asset?.assetType == 'Files' ? 'Storage' : support?.asset?.assetType}
 								</td>
-								<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
+								<td class="dep-${support.status}">
 									${support?.asset?.assetName}
 								</td>
 								<g:if test="${support?.asset?.moveBundle!=applicationInstance.moveBundle && support.status == 'Validated' }" >
-									<td style="background-color: red">
-										${support?.asset?.moveBundle}
+									<td style="background-color: lightpink">
+										${support?.asset?.moveBundle} !
 									</td>
 								 </g:if>
 								 <g:elseif test="${support?.asset?.moveBundle!=applicationInstance.moveBundle }" >
-									<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
-										<b>${support?.asset?.moveBundle}</b>
+									<td class="dep-${support.status}">
+										<b>${support?.asset?.moveBundle} !</b>
 									</td>
 								 </g:elseif>
 								 <g:else>
-								    <td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
+									<td class="dep-${support.status}">
 										${support?.asset?.moveBundle}
 								    </td>
 								 </g:else>
-								<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
+								<td class="dep-${support.status}">
 									${support.type}
 								</td>
-								<td class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }">
+								<td class="dep-${support.status}">
 									${support.status}
 								</td>
 							</tr>
@@ -214,34 +214,34 @@
 					<tbody>
 						<g:each in="${dependentAssets}" var="dependent" status="i">
 							<tr onclick="getEntityDetails('${redirectTo}','${dependent.dependent?.assetType}', ${dependent.dependent?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
-								<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
+								<td class="dep-${dependent.status}">
 									${dependent.dataFlowFreq}
 								</td>
-								<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
+								<td class="dep-${dependent.status}">
 									${dependent.dependent?.assetType == 'Files' ? 'Storage' : dependent.dependent?.assetType}
 								</td>
-								<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
+								<td class="dep-${dependent.status}">
 									${dependent.dependent?.assetName}
 								</td>
 								<g:if test="${dependent.dependent?.moveBundle!=applicationInstance.moveBundle && dependent.status == 'Validated' }" >
-									<td style="background-color: red">
-										     ${dependent.dependent?.moveBundle}
+									<td style="background-color: lightpink">
+										${dependent.dependent?.moveBundle} !
 									</td>
 								</g:if>
 								<g:elseif test="${dependent.dependent?.moveBundle!=applicationInstance.moveBundle }" >
-									<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
-										    <b>${dependent.dependent?.moveBundle}</b>
+									<td class="dep-${dependent.status}">
+										<b>${dependent.dependent?.moveBundle} !</b>
 									</td>
 								</g:elseif>
 								<g:else>
-								    <td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
-										   ${dependent.dependent?.moveBundle}
+									<td class="dep-${dependent.status}">
+										${dependent.dependent?.moveBundle}
 									</td>
 								</g:else>
-								<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
+								<td class="dep-${dependent.status}">
 									${dependent.type}
 								</td>
-								<td class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }">
+								<td class="dep-${dependent.status}">
 									${dependent.status}
 								</td>
 							</tr>
