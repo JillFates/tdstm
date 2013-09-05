@@ -193,7 +193,7 @@
 						$("#todoCountProjectId").html(resp.count)
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
-						console.log("Unable to lookup task count - " + textStatus)
+						console.log("Unable to lookup task count - " + errorThrown)
 					}
 				});
 			}
