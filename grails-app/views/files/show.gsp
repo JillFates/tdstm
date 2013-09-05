@@ -12,7 +12,7 @@
 							<td class="label ${config.description}" nowrap="nowrap"><label for="description">Description</label></td>
 							<td class="value ${config.description}" colspan="2">${filesInstance.description}</td>
 							<td></td>
-							<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
+							<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle / Dep. Group</label></td>
 							<td class="valueNW ${config.moveBundle}">${filesInstance?.moveBundle} / ${dependencyBundleNumber}</td>
 						</tr>
 						<tr class="prop">

@@ -175,7 +175,7 @@ function updateAssetsList(name, assetType, assetId ) {
 }
 function updateAssetTitle( type ){
 	$("#createEntityView").dialog( "option", "title", 'Create '+type );
-	$("#showEntityView").dialog( "option", "title", 'Show '+type );
+	$("#showEntityView").dialog( "option", "title", type+' Detail' );
 	$("#editEntityView").dialog( "option", "title", 'Edit '+type );
 }
 function selectManufacturer(value, forWhom){

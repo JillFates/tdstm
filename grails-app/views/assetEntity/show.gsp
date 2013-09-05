@@ -52,7 +52,7 @@ $(document).ready(function() {
 								<td class="label ${config.environment}" nowrap="nowrap"><label for="assetName">Environment</label></td>
 								<td class="valueNW ${config.environment}">${assetEntity.environment}</td>
 								<td>&nbsp;</td>
-								<td class="label_sm">Source</td>
+								<td class="label_sm">Current</td>
 								<td class="label_sm">Target</td>
 							</tr>
 							<tr class="prop">
@@ -112,7 +112,7 @@ $(document).ready(function() {
 								<td class="valueNW ${config.retireDate}"><tds:convertDate date="${assetEntity?.retireDate}"
 							  		timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 								</td>
-								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
+								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle / Dep. Group</label></td>
 								<td class="valueNW ${config.moveBundle}" colspan="2">${assetEntity.moveBundle}${dependencyBundleNumber?' / ' : ''}${dependencyBundleNumber}</td>
 							</tr>
 							<tr class="prop">

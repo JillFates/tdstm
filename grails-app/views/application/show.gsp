@@ -48,7 +48,7 @@
 							<td class="valueNW ${config.appTech}">${applicationInstance.appTech}</td>
 							<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
 							<td class="valueNW ${config.owner}">${applicationInstance.appOwner?.lastNameFirst}</td>
-							<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
+							<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle / Dep. Group</label></td>
 							<td class="valueNW ${config.moveBundle}">${applicationInstance.moveBundle} / ${dependencyBundleNumber}</td>
 							<td class="label ${config.drRpoDesc}" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label></td>
 							<td class="valueNW ${config.drRpoDesc}">${applicationInstance.drRpoDesc}</td>
@@ -91,6 +91,7 @@
 						<tr>
 							<td class="label ${config.url}" nowrap="nowrap"><label for="license">URL</label></td>
 							<td class="valueNW ${config.url}" ><a href="${applicationInstance.url}" style="color:#00E">${applicationInstance.url}</a></td>
+
 							<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
 							<td class="${config.externalRefId}">${applicationInstance.externalRefId}</td>
 							<td class="label ${config.shutdownBy}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
