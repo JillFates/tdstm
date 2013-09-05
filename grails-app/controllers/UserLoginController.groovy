@@ -80,7 +80,8 @@ class UserLoginController {
 			WHERE u.active = '${active}'""")
 		if(active=='Y')
 			query.append(" AND u.expiry_date > '${presentDate}' ")
-				
+		else
+			query.append(" OR u.expiry_date < '${presentDate}' ")
 		if( RolePermissions.hasPermission("ShowAllUsers") ){
 			if(params.id && params.id != "All" ){
 				// If companyId is requested
