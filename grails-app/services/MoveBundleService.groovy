@@ -18,6 +18,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
+import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 
 
 class MoveBundleService {
@@ -480,7 +481,8 @@ class MoveBundleService {
 			adb.dependency_bundle as dependencyBundle, 
 			count(distinct adb.asset_id) as assetCnt, 
 			CONVERT( group_concat(distinct a.move_bundle_id) USING 'utf8') as moveBundles,
-			sum(if(a.plan_status='Assigned',1,0)) as statusAssigned,
+			sum(if(a.plan_status='${AssetEntityPlanStatus.ASSIGNED}',1,0)) as statusAssigned,
+			sum(if(a.plan_status='${AssetEntityPlanStatus.MOVED}',1,0)) as statusMoved,
 			sum(if(a.validation<>'BundleReady',1,0)) as notBundleReady,
 			sum(if(a.asset_type in ( ${AssetType.getPhysicalServerTypesAsString()} ), 1, 0)) as serverCount,
 			sum(if(a.asset_type in ( ${AssetType.getVirtualServerTypesAsString()} ), 1, 0)) as vmCount,
@@ -512,15 +514,16 @@ class MoveBundleService {
  		// log.info "dependencyConsoleMap() : stats=$stats}"
 
 		dependList.each { group ->
+	 		def depGroupsDone = group.statusAssigned + group.statusMoved
 			def statusClass = ''
 			if ( group.moveBundles?.contains(',') || group.needsReview > 0 ) {
 				// Assets in multiple bundles or dependency status unknown or questioned
 				statusClass = 'depGroupConflict'
-			} else if ( group.notBundleReady == 0  && group.statusAssigned != group.assetCnt) {
+			} else if ( group.notBundleReady == 0  && depGroupsDone != group.assetCnt) {
 				// If all assets are BundleReady and not fully assigned
 				statusClass = 'depGroupReady'
-			} else if ( group.statusAssigned == group.assetCnt ) {
-				// Assets have been fully assigned no conflicts
+			} else if ( depGroupsDone == group.assetCnt ) {
+				// Assets assigned + moved total the number of assets in the group so the group is done
 				statusClass = 'depGroupDone'
 			}
 

@@ -14,7 +14,7 @@
 					Move Bundle: <g:select id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}"
 					 				optionKey="id" value="${moveBundleId}" onchange="this.form.submit()"/>&nbsp;&nbsp;
 					 <input type="checkbox" id="assinedGroupCB" ${isAssigned == '1' ? 'checked="checked"': ''} onclick="assignedCheckbox( this )" />
-					 <label>Assigned Groups</label>
+					 <label>Show ONLY Work In Progress</label>
 				</g:form>
 			</div>
 			&nbsp;Dependency Analysis last run on &nbsp;${date} and ${dependencyBundleCount} dependency group(s) were discovered
