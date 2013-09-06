@@ -172,12 +172,12 @@ $(document).ready(function() {
 								</td>
 								<g:if test="${support?.asset?.moveBundle!=assetEntity.moveBundle && support.status == 'Validated' }" >
 									<td style="background-color: lightpink">
-										${support?.asset?.moveBundle}
+										${support?.asset?.moveBundle}&nbsp;?
 									</td>
 								</g:if>
 								<g:elseif test="${support?.asset?.moveBundle!=assetEntity.moveBundle }" >
 									<td class="dep-${support.status}">
-										<b>${support?.asset?.moveBundle}</b>
+										<b>${support?.asset?.moveBundle}&nbsp;?</b>
 									</td>
 								</g:elseif>
 								<g:else>
@@ -225,12 +225,12 @@ $(document).ready(function() {
 								</td>
 								<g:if test="${dependent.dependent?.moveBundle!=assetEntity.moveBundle && dependent.status == 'Validated' }" >
 									<td style="background-color: lightpink">
-										${dependent.dependent?.moveBundle} !
+										${dependent.dependent?.moveBundle}&nbsp;?
 									</td>
 								</g:if>
 								<g:elseif test="${dependent.dependent?.moveBundle!=assetEntity.moveBundle }" >
 									<td class="dep-${dependent.status}">
-										<b>${dependent.dependent?.moveBundle} !</b>
+										<b>${dependent.dependent?.moveBundle}&nbsp;?</b>
 									</td>
 								 </g:elseif>
 								 <g:else>
