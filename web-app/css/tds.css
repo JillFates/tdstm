@@ -833,13 +833,13 @@ td .label_sm {
 	background: LightPink; 
 }
 .dep-Not {
-	background: WhiteSmoke; 
+	background: #EEE; 
 }
-.dep-Archive {
-	background: WhiteSmoke; 
+.dep-Archived {
+	background: #EEE; 
 }
 .dep-Future {
-	background: WhiteSmoke; 
+	background: #EEE; 
 }
 .rooms {
 	display: none;  left:0px  !important;    position: absolute  !important; top: 20px; 
