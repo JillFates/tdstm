@@ -986,12 +986,15 @@ dl dd {
 
 .asset_details_block{
 	font-size:15px;
-	font-weight: bold;
+	padding-top: 10px;
+	padding-bottom: 10px;
 }
 .asset_details_block_task{
 	font-size:15px;
 	font-weight: bold;
 	width: 500px;
+	padding-top: 10px;
+	padding-bottom: 10px;
 }
 
 .asset_ready{

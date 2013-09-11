@@ -38,7 +38,6 @@ table {
 }
 
 th {
-	background-color: #000000;
 	color: #ffffff;
 	font-weight:bold;
 }
@@ -84,7 +83,7 @@ a.mobselect {
 	border-left-color: #444; 
 	border-right-color: #507028;
 	border-bottom-width: 6px;
-	background:#444;
+	background:#507028;
 	padding:auto 0px;
 }
 
