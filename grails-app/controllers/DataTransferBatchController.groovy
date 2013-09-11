@@ -1,23 +1,26 @@
 import grails.converters.JSON
 
+import java.text.SimpleDateFormat
+
 import org.apache.shiro.SecurityUtils
 
+import com.tds.asset.Application
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
-import com.tds.asset.Application
-import com.tds.asset.Files
 import com.tds.asset.Database
+import com.tds.asset.Files
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeSet
-import com.tdssrc.eav.EavEntityType
-import java.text.SimpleDateFormat
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.WebUtil
+
 class DataTransferBatchController {
     def sessionFactory
     def assetEntityAttributeLoaderService
     def jdbcTemplate
 	def securityService
+	def personService
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
 	protected static bundleTeamRoles = ['sourceTeamMt':'MOVE_TECH','targetTeamMt':'MOVE_TECH',
 										'sourceTeamLog':'CLEANER','targetTeamLog':'CLEANER',
@@ -384,6 +387,7 @@ class DataTransferBatchController {
 			def modelAssetsList = new ArrayList()
     		def existingAssetsList = new ArrayList()
 			def application
+			def warnings = []
     		try{
     			dataTransferBatch = DataTransferBatch.get(params.batchId)
     				batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = $dataTransferBatch.id ")[0]
@@ -471,43 +475,38 @@ class DataTransferBatchController {
 													application."$attribName" = it.importValue
 												}
 												break;
-										case "sme":
-												if(it.importValue){
-													def person = assetEntityAttributeLoaderService.findOrCreatePerson(it.importValue, true)
-													application."$attribName" = person
-												} 
-												break;
-										case "sme2":
-												if(it.importValue){
-													def person = assetEntityAttributeLoaderService.findOrCreatePerson(it.importValue, true)
-													application."$attribName" = person
-												} 
-												break;
-										case "appOwner":
-												if(it.importValue){
-													def person = assetEntityAttributeLoaderService.findOrCreatePerson(it.importValue, true)
-													application."$attribName" = person
-												} 
-												break;
-										case "shutdownBy":
-										case "startupBy":
-										case "testingBy":
-												if(it.importValue){
-													def person = assetEntityAttributeLoaderService.findOrCreatePerson(it.importValue, false)
-													if(person)
-														application."$attribName" = person.id
-													else {
-														application."$attribName" = it.importValue
-													}
+										case ~/sme|sme2|appOwner/:
+												def resultMap = personService.findOrCreatePerson(it.importValue, project)
+												application."$attribName" = it.importValue ? resultMap?.person : null
+												if(it.importValue && resultMap?.isAmbiguous){
+													def warnMsg = "Ambiguity in ${attribName} (${it.importValue}) for ${application.assetName}"
+													log.warn warnMsg
+													warnings << warnMsg
 												}
-												break;
-										case "shutdownFixed":
-										case "startupFixed":
-										case "testingFixed":
+													
+											 break;
+										case ~/shutdownBy|startupBy|testingBy/:
+												if(it.importValue){
+													if(it.importValue[0] in ['@', '#']){
+														application."$attribName" = it.importValue
+													} else {
+														def resultMap = personService.findOrCreatePerson(it.importValue, project)
+														application."$attribName" = resultMap?.person?.id
+														if(it.importValue && resultMap?.isAmbiguous){
+															def warnMsg = "Ambiguity in ${attribName} (${it.importValue}) for ${application.assetName}"
+															log.warn warnMsg
+															warnings << warnMsg
+														}
+													}
+												}else{
+													application."$attribName" = null
+												}
+											break;
+										case ~/shutdownFixed|startupFixed|testingFixed/:
 												if(it.importValue){
 													application."$attribName" = it.importValue.equalsIgnoreCase("yes") ? 1 : 0
 												}
-												break;
+											break;
 										default:
 										if( it.eavAttribute.backendType == "int"){
 		    								def correctedPos
@@ -523,7 +522,8 @@ class DataTransferBatchController {
 													application."$attribName" = correctedPos 
 		    	        						}
 		    								} catch ( Exception ex ) {
-												log.error "appProcess - unexpected exception 1 - " + ex.toString()
+											
+												log.error "appProcess - unexpected exception 1 - " + ex.printStackTrace()
 		    									errorConflictCount++
 		    									it.hasError = 1
 		    									it.errorText = "format error"
@@ -610,12 +610,14 @@ class DataTransferBatchController {
     		def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
     		flash.message = " Process Results:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
     							"<li>Records Updated: ${updateCount}</li><li>Asset Errors: ${errorCount} </li> "+
-    							"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> " 
+    							"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> "+
+								"<b>Warning:</b> <ul> ${WebUtil.getListAsli(warnings)}</ul>"
     	}
 		session.setAttribute("IMPORT_ASSETS", assetsList)
 		redirect ( action:list, params:[projectId:project.id, message:flash.message ] )
 		
 	}
+	
 	
 	def fileProcess ={
 		sessionFactory.getCurrentSession().flush();

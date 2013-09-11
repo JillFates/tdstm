@@ -1194,7 +1194,7 @@ class AssetEntityController {
 										colVal = assetDepBundleList.find {it.asset.id == app.id }?.dependencyBundle?.toString() ?: ''
 										break
 									case ~/ShutdownBy|StartupBy|TestingBy/:
-										colVal = app[assetColName] ? assetEntityService.resolveByName(app[assetColName], false) : ''
+										colVal = app[assetColName] ? assetEntityService.resolveByName(app[assetColName], false)?.toString() : ''
 										break
 									case ~/ShutdownFixed|StartupFixed|TestingFixed/:
 										colVal = app[assetColName] ? 'Yes' : 'No'
@@ -1208,9 +1208,8 @@ class AssetEntityController {
 
 								if ( colVal != null) {
 
-									// TODO : Remove the First Last once full name parsing on import is resolved
 									if (colVal?.class.name == 'Person') {
-										colVal = (colVal.lastName ? "${colVal.lastName}, " : '') + colVal.firstName
+										colVal = colVal.toString() 
 									}
 
 									def cell 

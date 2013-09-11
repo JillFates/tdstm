@@ -3,8 +3,8 @@ class Person extends Party {
 	def partyRelationshipService
 
 	String firstName
-	String middleName
-	String lastName
+	String middleName = ""
+	String lastName = ""
 	String nickName
 	String active = "Y"
 	String title
@@ -31,9 +31,9 @@ class Person extends Party {
 	 * Fields Validations
 	 */
 	 static constraints = {
-		 firstName( blank:false, nullable:false, maxLength:34 )
-		 middleName( blank:true, nullable:true, maxLength:20 )
-		 lastName( blank:true, nullable:true, maxLength:34 )
+		 firstName( blank:false, maxLength:34 )
+		 middleName( blank:true, maxLength:20 )
+		 lastName( blank:true, maxLength:34 )
 		 title( blank:true, nullable:true, maxLength:34 )
 		 nickName( blank:true, nullable:true, maxLength:34 )
 		 active( blank:false, nullable:false, inList:['Y','N'] )

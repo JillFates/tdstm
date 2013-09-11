@@ -46,9 +46,9 @@ class PersonService {
 	 * @param Project the project/client that the person is associated with
 	 * @return Person an instance of person or null if unable to lookup
 	 */
-	Person findPerson(String name , Project project) {
+	Person findPerson(String name, Project project) {
 		def nameMap = parseName(name)
-		return nameMap ? findPerson(nameMap, project) : null
+		return nameMap ? findPerson(nameMap, project)?.person : null
 	}
 
 	/**
@@ -57,18 +57,63 @@ class PersonService {
 	 * @param Project the project/client that the person is associated with
 	 * @return Person an instance of person or null if unable to lookup
 	 */
-	Person findPerson(Map nameMap , Project project) {
+	Map findPerson(Map nameMap , Project project) {
 		def person=null
-log.info "findPersion() nameMap=$nameMap"
+		def isAmbiguous = false
+		def resultMap = [:]
+		
+		log.info "findPersion() nameMap=$nameMap"
 		// Make sure we have a person
 		if (! nameMap || ! nameMap.containsKey('first'))
 			return person 
 
-		// Find all people with the same name
+		/* 
+		 * findingAll with blanks in the where clause. 
+		 * Case: A) zero results - create the new person,
+		 * Case: B) one result - use the person,
+		 * Case: C) more than one result - use first person but raise warning.
+		 */
 		def personList = Person.findAll("from Person as p where p.firstName=? and p.middleName=? and p.lastName=?",
 			[ nameMap.first, nameMap.middle, lastNameWithSuffix(nameMap) ] )
-
-log.info "findPerson() found ${personList.size()} that matched"
+		
+		person = personList ? personList[0] : null
+		if( personList.size() > 1 )
+			isAmbiguous = true
+			
+		/*
+		 * Performing the search twice if person found in first lookup
+		 * findingAll excluding blank fields from the results 
+		 * Case: A) one result and it match person found in #1 - do nothing; 
+		 * Case: B) one or more and not A - provide warning.
+		 */
+		if( person ){
+			def queryForAllPersons = "from Person as p where p.firstName=? " 
+			def args = [nameMap.first]
+			if( nameMap.middle ){
+				queryForAllPersons += " and p.middleName=? "
+				args << nameMap.middle
+			} 
+			
+			if( lastNameWithSuffix(nameMap) ){
+				queryForAllPersons +=" and p.lastName=? "
+				args << lastNameWithSuffix(nameMap)
+			} 
+			
+			def personNullExcd = Person.findAll( queryForAllPersons, args )
+			
+			//TODO:Not sure what exact warning should be here. 
+			if(personNullExcd.size() > 1 &&  personNullExcd.id.contains(person.id)){
+				isAmbiguous = true
+			}else if(personNullExcd.size() > 1 &&  !personNullExcd.id.contains(person.id)){ // one or more and not A - provide warning.
+				isAmbiguous = true
+				person = personNullExcd[0]
+			}else if(personNullExcd.size() == 1 && personNullExcd.id.contains(person.id)){ //one result and it match person found in #1 - do nothing; 
+				isAmbiguous = false
+			}
+				
+		}
+		
+		/*log.info "findPerson() found ${personList.size()} that matched"
 
 		// If we found them, then match against the company's staff
 		if (personList?.size() > 0) {
@@ -79,9 +124,10 @@ log.info "findPerson() found ${personList.size()} that matched"
 				person = staffList.find { it.id == personList[i].id }
 				if (person) break 
 			}
-		}
-
-		return person
+		}*/
+		resultMap.put("person", person)
+		resultMap.put("isAmbiguous", isAmbiguous)
+		return resultMap
 	}
 
 	/**
@@ -90,10 +136,10 @@ log.info "findPerson() found ${personList.size()} that matched"
 	 * @param Project the project/client that the person is associated with
 	 * @return instance of person or null if unable to lookup
 	 */
-	Person findOrCreatePerson(String name , Project project) {
+	Map findOrCreatePerson(String name , Project project) {
 		def nameMap = parseName(name)
 		if (nameMap == null) {
-			log.warn "findOrCreatePersonByName() unable to parse name ($name)"
+			log.error "findOrCreatePersonByName() unable to parse name ($name)"
 			return null
 		}
 		return findOrCreatePerson( nameMap, project)
@@ -106,13 +152,14 @@ log.info "findPerson() found ${personList.size()} that matched"
 	 * @param Project the project/client that the person is associated with
 	 * @return instance of person or null if unable to lookup
 	 */
-	Person findOrCreatePerson(Map nameMap , Project project) {
-
-		def person = findPerson(nameMap, project)
+	Map findOrCreatePerson(Map nameMap , Project project) {
+		
+		def resultMap = findPerson(nameMap, project)
+		def person = resultMap.person
 
 		if ( !person && nameMap.first ) {
-			log.debug "Person $firstName $lastName does not found in selected company"
-			person = new Person('firstName':firstName, 'lastName':lastName, 'staffType':'Salary')
+			//log.debug "Person $firstName $lastName does not found in selected company"
+			person = new Person('firstName':nameMap.first, 'lastName':nameMap.last, 'middleName': nameMap.middle, staffType:'Salary')
 			if (!person.save(insert:true, flush:true)) {
 				def etext = "findOrCreatePerson Unable to create Person"+GormUtil.allErrorsString( person )
 				log.error( etext )
@@ -124,9 +171,11 @@ log.info "findPerson() found ${personList.size()} that matched"
 			def partyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType,
 				partyIdFrom :project.client, roleTypeCodeFrom:roleTypeFrom, partyIdTo:person,
 				roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true, flush:true )
+			
+			resultMap.person = person
 		}
 
-		return person
+		return resultMap
 	}
 
 	/**
