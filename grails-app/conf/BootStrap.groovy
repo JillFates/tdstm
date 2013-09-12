@@ -4,7 +4,6 @@ import com.tds.asset.AssetEntity
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
 
-
 import groovy.sql.Sql
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
@@ -16,6 +15,9 @@ class BootStrap {
 	def workflowService
 	def stateEngineService
 	def init = { servletContext ->
+
+		// Initialize various custom metaclass methods used by the application
+		com.tdsops.metaclass.CustomMethods.initialize
 	
 		// Load all of the Workflow definitions into the StateEngine service
 		def workflowList = Workflow.list()

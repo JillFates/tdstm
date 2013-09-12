@@ -62,7 +62,9 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		// use groovy metaClass to put the log into your class
 		RunbookService.class.metaClass.getLog << {-> log }
 
-		loadConfig()
+		//loadConfig()
+		// Initialize various custom methods used by our application
+		com.tdsops.metaclass.CustomMethods.initialize
 
 	}
 
