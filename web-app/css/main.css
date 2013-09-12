@@ -678,3 +678,7 @@ margin: -8px !important;
 	color : blue;
 	cursor: pointer;
 }
+.ui-dialog th {
+	background: #CCCCCC !important;
+    color: #000 !important;
+}

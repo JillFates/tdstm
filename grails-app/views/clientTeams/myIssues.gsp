@@ -105,7 +105,7 @@
 			<tr class="prop">
 			   <td valign="top" class="name"><label for="comment"><b>Task:</b></label></td>
 				<td valign="top" class="value" colspan="3">
-				<span id="commentTdId"></span>
+				<span id="commentTdId_myTasks"></span>
 				</td>
 			</tr>
 			<tr class="prop" id="predecessorShowTr">
@@ -265,7 +265,7 @@
 				$('#dueDateId').html(ac.dueDate)
 				ac = ac.assetComment;
 				$('#statusShowId').attr("class","task_"+ac.status.toLowerCase())
-				$('#commentTdId').html(ac.taskNumber+":"+ac.comment)
+				$('#commentTdId_myTasks').html(ac.taskNumber+":"+ac.comment)
 				$('#commentTdId1').html(ac.comment)
 				$('#statusShowId').html(ac.status)
 				$('#roleTdId').html(ac.role)
@@ -362,6 +362,7 @@ function setTab(tab){
 	$("#teamMenuId a").css('background-color','#003366')
 	$(document).ready(function() {
 		$("#showEntityView").dialog({ autoOpen: false })
+		$("#createEntityView").dialog({ autoOpen: false })
 		$("#editEntityView").dialog({ autoOpen: false })
 		$("#manufacturerShowDialog").dialog({ autoOpen: false })
 		$("#modelShowDialog").dialog({ autoOpen: false })

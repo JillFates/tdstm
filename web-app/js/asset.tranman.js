@@ -664,6 +664,7 @@ function showAssetDialog( e , action ) {
 				 // $('#predCount').val(params.maxVal)
 				 $('#updateCommentId').val(ac.id)
 		      	 $('#commentTdId').val(ac.comment) 
+		      	 $('#commentTdId_myTasks').html(ac.taskNumber+":"+ac.comment)
 		      	 $('#commentTypeTdId').html(ac.commentType)
 		      	 $('#mustVerifyShowId').val(ac.mustVerify)
 		      	 $('#isResolvedId').val(ac.isResolved)
