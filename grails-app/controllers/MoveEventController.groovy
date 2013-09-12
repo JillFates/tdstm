@@ -1,4 +1,5 @@
 import grails.converters.JSON
+import grails.converters.*
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -30,6 +31,7 @@ class MoveEventController {
 	def stepSnapshotService
 	def stateEngineService
 	def reportsService
+	def runbookService
 	def taskService
 	def securityService
 	def projectService
@@ -895,5 +897,47 @@ class MoveEventController {
 				returnList <<  value
 		}
 		return returnList
+	}
+
+
+	/**
+	 * Simply a test page for the runbook optimization
+	 */
+	def testRBO = {
+
+		def meId = params.containsKey('eventId') ? params.eventId : 280
+		if (! meId.isNumber()) {
+			render "Invalid event id was provided"
+			return
+		}
+
+		def me = MoveEvent.get(meId)
+		if (! me) {
+			render "Unable to find event $meId"
+			return
+		}
+
+		def tasks = runbookService.getEventTasks(me)
+		def deps = runbookService.getTaskDependencies(tasks)
+
+		def dfsMap = runbookService.processDFS( tasks, deps )
+
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
+		StringBuilder results = new StringBuilder("Found ${tasks.size()} tasks and ${deps.size()} dependencies<br/>")
+
+		results.append("Start Vertices: " + (dfsMap.starts.size() > 0 ? dfsMap.starts : 'none') + '<br/>')
+		results.append("Sink Vertices: " + (dfsMap.sinks.size() > 0 ? dfsMap.sinks : 'none') + '<br/>')
+		results.append("Cyclical Maps: " + (dfsMap.cyclicals?.size() ? dfsMap.cyclicals : 'none') + '<br/>')
+		results.append("Pass 1 Elapsed Time: ${dfsMap.elapsed}<br/>")
+		results.append("Pass 2 Elapsed Time: ${durMap.elapsed}<br/>")
+		results.append("Edges data:<br/><table><tr><th>Id</th><th>Predecessor Task</th><th>Successor Task</th><th>DS Task Count</th><th>Path Duration</th></tr>")
+
+		deps.each { dep ->
+			results.append("<tr><td>${dep.id}</td><td>${dep.predecessor}</td><td>${dep.successor}</td><td>${dep.downstreamTaskCount}</td><td>${dep.pathDuration}</td></tr>")
+		}
+		results.append('</table>')
+
+		render results.toString()
+
 	}
 }

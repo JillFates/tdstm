@@ -38,6 +38,6 @@ class TaskDependency {
 	AssetComment getSuccessor() { this.assetComment }
 
 	String toString() {
-		"${assetComment.id}(${type})~${id}"
+		"$id: ${predecessor?.taskNumber ?: predecessor.id} to ${successor?.taskNumber ?: successor.id}"
 	}
 }
