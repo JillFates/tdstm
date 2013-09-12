@@ -877,7 +877,7 @@ class MoveEventController {
 				message = taskService.generateRunbook( securityService.getUserLoginPerson() , moveEvent ) 
 			}
 		}
-		render message
+		render (template:"resMessage",model :[message: message])
 	}
 	
 	/**

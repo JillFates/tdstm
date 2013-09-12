@@ -196,6 +196,17 @@
     		});
          }
    	}
+   	function toogleGenDetails(){
+		if($('#rightTriangle').is(':visible')){
+			$("#rightTriangle").hide();
+			$("#downTriangle").show();
+			$("#generateDetailsSpan").show();
+		}else {
+			$("#rightTriangle").show();
+			$("#downTriangle").hide();
+			$("#generateDetailsSpan").hide();
+		}
+   	}
 </script>
     </body>
 </html>

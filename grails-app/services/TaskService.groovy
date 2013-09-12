@@ -2276,9 +2276,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		
 		log.info "A total of ${taskList.size()} Tasks and $depCount Dependencies created in $elapsed"
 		if (failure) failure = "Generation FAILED: $failure<br/>"
-		return "<h2>Status:</h2>${failure}${taskList.size()} Tasks and $depCount Dependencies created in $elapsed<h2>Exceptions:</h2>" + 
-	
-		exceptions.toString() + "<h2>Log:</h2>" + out.toString()
+					
+		return ["status":"${failure}${taskList.size()} Tasks and $depCount Dependencies created in $elapsed",
+				"exceptions":exceptions.toString(), "Log":out.toString()]
 		
 	}
 	
