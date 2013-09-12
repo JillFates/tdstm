@@ -359,7 +359,7 @@ class DataTransferBatchController {
 				"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> " 
     	}
 		session.setAttribute("IMPORT_ASSETS", assetsList)
-		redirect ( action:list, params:[projectId:project.id, message:flash.message ] )
+		redirect ( action:list, params:[projectId:project.id ] )
      }
 	
 	def appProcess ={
@@ -566,9 +566,14 @@ class DataTransferBatchController {
     							errorCount++
     							application.discard()
     						}
-    						if(dataTransferValueRow % 50 == 0) {
+    						if(dataTransferValueRow % 50 == 49) {
     							sessionFactory.getCurrentSession().flush();
     							sessionFactory.getCurrentSession().clear();
+								/* 
+								 * Merging back the project to current session, 
+								 * As it is being detach after flushing and clearing hibernate session 
+								 */
+								project = project.merge()
     						}
     						session.setAttribute("TOTAL_PROCESSES_ASSETS",dataTransferValueRow)
     					}
@@ -614,7 +619,7 @@ class DataTransferBatchController {
 								"<b>Warning:</b> <ul> ${WebUtil.getListAsli(warnings)}</ul>"
     	}
 		session.setAttribute("IMPORT_ASSETS", assetsList)
-		redirect ( action:list, params:[projectId:project.id, message:flash.message ] )
+		redirect ( action:list, params:[projectId:project.id] )
 		
 	}
 	
@@ -837,7 +842,7 @@ class DataTransferBatchController {
 								"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> "
 		}
 		session.setAttribute("IMPORT_ASSETS", assetsList)
-		redirect ( action:list, params:[ projectId:project.id, message:flash.message ] )
+		redirect ( action:list, params:[ projectId:project.id ] )
 		
 	}
 	
@@ -1060,7 +1065,7 @@ class DataTransferBatchController {
 				"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> "
 		}
 		session.setAttribute("IMPORT_ASSETS", assetsList)
-		redirect ( action:list, params:[projectId:project.id, message:flash.message ] )
+		redirect ( action:list, params:[projectId:project.id] )
 		
 	}
 	
