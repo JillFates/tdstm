@@ -127,6 +127,34 @@
 			}
 		});
 	}
+	//Assigning task to me 
+	function assignTask(id, user, status, from){
+		if(B1 != ''){ B1.Pause(); }
+		$('#assigntome_button_'+id).removeAttr('onclick')
+		$('#assigntome_text_'+id).attr('class', 'task_button_disabled')
+
+		jQuery.ajax({
+			url: '../task/assignToMe',
+			data: {'id':id, 'user':user, 'status':status},
+			type:'POST',
+			success: function(data) {
+					if (data.errorMsg) {
+					alert(data.errorMsg);
+				} else {
+					$('#assignedToNameSpan_'+id).html(data.assignedTo)
+					if(B1 != '' && taskManagerTimePref != 0){
+						B1.Restart(taskManagerTimePref);
+					}else {
+						B1.Pause(0);
+					}
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert("An unexpected error occurred. Please close and reload form to see if the problem persists")
+			}
+		});
+	}
+
 	function cancelButton(id){
 		B1.Start(60);
 		//$('#myIssueList').css('display','block')
