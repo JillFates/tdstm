@@ -62,7 +62,7 @@
 								<tds:elapsedAgo start="${item?.lastUpdated}" end="${now}"/>
 							</g:else>
 						</td>
-						<td id="estFinish_${item?.id}" class="asset_details_block ${ item?.dueDate < TimeUtil.nowGMT() ? 'task_overdue' : ''}">
+						<td id="estFinish_${item?.id}" class="asset_details_block ${item?.dueDate && item?.dueDate < TimeUtil.nowGMT() ? 'task_overdue' : ''}">
 								<tds:convertDate date="${item?.estFinish}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
 									format="MM/dd kk:mm" />
 						</td>
@@ -96,6 +96,16 @@
 							<g:if test="${ personId != issue.item.assignedTo && issue.item.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]}">
 							<tds:actionButton label="Assign To Me" icon="ui-icon-person" id="${item?.id}"  
 								onclick="assignTask('${item?.id}','${issue.item.assignedTo}', '${issue.item.status}','myTask')"/>
+							</g:if>
+							<g:if test="${issue.item.status == AssetCommentStatus.READY}">
+								<g:if test="${!item.successors && !(item.category in AssetComment.moveDayCategories)}">
+									<tds:actionButton label="Do Tomorrow" icon="ui-icon-seek-next" id="${item?.id}"  
+										onclick="changeEstTime(1,'${item?.id}', this.id)"/>
+									<tds:actionButton label="Do in 2 days" icon="ui-icon-seek-next" id="${item?.id}"  
+										onclick="changeEstTime(2,'${item?.id}', this.id)"/>
+									<tds:actionButton label="Do in a week" icon="ui-icon-seek-next" id="${item?.id}"  
+										onclick="changeEstTime(7,'${item?.id}', this.id)"/>
+								</g:if>
 							</g:if>
 						</td>
 					</tr>

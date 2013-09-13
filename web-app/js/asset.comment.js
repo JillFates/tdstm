@@ -315,6 +315,24 @@ function zxcOpacity(obj,opc){
 	obj.style.filter='alpha(opacity='+opc+')';
 	obj.style.opacity=obj.style.MozOpacity=obj.style.WebkitOpacity=obj.style.KhtmlOpacity=opc/100-.001;
 }
+function changeEstTime(day,commentId,id){
+	console.log(id)
+	var reqId=id.split("_")
+	jQuery.ajax({
+		url: contextPath+'/task/changeEstTime',
+		data: {'commentId':commentId,'day':day},
+		type:'POST',
+		success: function(resp) {
+			if(resp.etext !=""){
+				alert(resp.etext)
+			}else {
+					$("#"+id).removeAttr('onclick')
+					$("#"+reqId[0]+"_text_"+reqId[2]).removeAttr('class')
+					$("#"+reqId[0]+"_text_"+reqId[2]).attr('class', 'task_button_disabled')
+			}
+		}
+	});
+}
 
 function toogleGenDetails(id){
 	if($("#rightTriangle_"+id).is(":visible")){

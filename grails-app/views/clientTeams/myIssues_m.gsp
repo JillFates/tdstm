@@ -154,7 +154,24 @@
 			}
 		});
 	}
-
+	function changeEstTime(day,commentId,id){
+		console.log(id)
+		var reqId=id.split("_")
+		jQuery.ajax({
+			url: '../task/changeEstTime',
+			data: {'commentId':commentId,'day':day},
+			type:'POST',
+			success: function(resp) {
+				if(resp.etext !=""){
+					alert(resp.etext)
+				}else {
+						$("#"+id).removeAttr('onclick')
+						$("#"+reqId[0]+"_text_"+reqId[2]).removeAttr('class')
+						$("#"+reqId[0]+"_text_"+reqId[2]).attr('class', 'task_button_disabled')
+				}
+			}
+		});
+	}
 	function cancelButton(id){
 		B1.Start(60);
 		//$('#myIssueList').css('display','block')

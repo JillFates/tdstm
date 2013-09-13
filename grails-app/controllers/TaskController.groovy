@@ -5,6 +5,8 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.GormUtil
 import org.apache.commons.lang.StringEscapeUtils
+import com.tdssrc.grails.TimeUtil
+import com.tds.asset.TaskDependency
 
 class TaskController {
 	
@@ -148,7 +150,18 @@ class TaskController {
 					HtmlUtil.actionButton('Assign To Me', 'ui-icon-person', comment.id,
 						"assignTask('${comment.id}','${comment.assignedTo}', '${comment.status}', 'taskManager')")))
 			}
-		} else {
+			if(comment.status ==  AssetCommentStatus.READY ){
+				def hasSucc = TaskDependency.countByPredecessor( comment )
+				if(!hasSucc && !(comment.category in AssetComment.moveDayCategories)){
+					actionBar.append( _actionButtonTd(	"1dEst_${comment.id}",
+						HtmlUtil.actionButton('Do Tomorrow', 'ui-icon-seek-next', comment.id,"changeEstTime('1','${comment.id}',this.id)")))
+					actionBar.append( _actionButtonTd(	"2dEst_${comment.id}",
+						HtmlUtil.actionButton('Do in 2 days', 'ui-icon-seek-next', comment.id,"changeEstTime('2','${comment.id}',this.id)")))
+					actionBar.append( _actionButtonTd(	"7dEst_${comment.id}",
+						HtmlUtil.actionButton('Do in a week', 'ui-icon-seek-next', comment.id,"changeEstTime('7','${comment.id}',this.id)")))
+				}
+			} 
+		}else {
 			log.warn "genActionBarHTML - invalid comment id (${params.id}) from user ${userLogin}"
 			actionBar.append('<td>An unexpected error occurred</td>')
 		}
@@ -456,5 +469,27 @@ digraph runbook {
 			}
 		}
 		render resultMap as JSON
+	}
+	
+	/**
+	 * Used in Task Manager action bar to change estTime.
+	 * @param : day : 1,2 or 7days.
+	 * @param : commentId.
+	 * @return : retMap. 
+	 */
+	def changeEstTime ={
+		def comment = AssetComment.findById(params.commentId)
+		def etext = ""
+		if(comment){
+			comment.estStart=TimeUtil.nowGMT().plus(Integer.parseInt(params.day))
+			if(!comment.hasErrors() && !comment.save(flush:true)){
+				etext = "unable to update estTime"+GormUtil.allErrorsString( comment )
+				log.error etext 
+			}
+		} else {
+			etext = "Requested comment id does not exist. "
+		}
+		def retMap=[etext:etext, estStart : comment?.estStart]
+		render retMap as JSON
 	}
 }

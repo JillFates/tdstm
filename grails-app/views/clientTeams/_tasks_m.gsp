@@ -1,4 +1,4 @@
-<%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus" %>
+<%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus;com.tds.asset.AssetComment" %>
 <%@page import="com.tdssrc.grails.GormUtil"%>
 <%--
 /*
@@ -98,7 +98,7 @@
 					</tr>
 					<g:if test="${tab && tab == 'todo'}">
 					 <tr id="showStatusId_${issue?.item?.id}" ${(todoSize!=1||search==''||search==null) ? 'style="display: none"' :''}>
-						<td nowrap="nowrap" colspan="3" class="statusButtonBar">
+						<td nowrap="nowrap" colspan="4" class="statusButtonBar">
 							<g:if test="${issue.item.status == AssetCommentStatus.READY}"> 
 							<tds:actionButton label="Start" icon="ui-icon-play" id="${issue?.item?.id}"  
 								onclick="changeStatus('${issue?.item?.id}','${AssetCommentStatus.STARTED}', '${issue?.item?.status}', 'taskManager')"/>
@@ -112,6 +112,16 @@
 							<g:if test="${ personId != issue.item.assignedTo && issue.item.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]}">
 							<tds:actionButton label="Assign To Me" icon="ui-icon-person" id="${issue?.item?.id}"  
 								onclick="assignTask('${issue?.item?.id}','${issue.item.assignedTo}', '${issue.item.status}','myTask')"/>
+							</g:if>
+							<g:if test="${issue.item.status == AssetCommentStatus.READY}">
+								<g:if test="${!issue?.item?.successors && !(issue?.item?.category in AssetComment.moveDayCategories)}">
+									<tds:actionButton label="Do Tomorrow" icon="ui-icon-seek-next" id="${issue?.item?.id}"  
+										onclick="changeEstTime(1,'${issue?.item?.id}', this.id)"/>
+									<tds:actionButton label="Do in 2 days" icon="ui-icon-seek-next" id="${issue?.item?.id}"  
+										onclick="changeEstTime(2,'${issue?.item?.id}', this.id)"/>
+									<tds:actionButton label="Do in a week" icon="ui-icon-seek-next" id="${issue?.item?.id}"  
+										onclick="changeEstTime(7,'${issue?.item?.id}', this.id)"/>
+								</g:if>
 							</g:if>
 						</td>
 					</tr>
