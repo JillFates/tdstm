@@ -42,7 +42,7 @@
 				<tr>
 					<td valign="middle" class="name"><label>Dependencies:</label></td>
 					<td valign="top" class="name">
-					<div id="predsTable_${assetComment.id}" class='assetImage' ${predCount < 5 && sucCount < 5 ? 'style="display:none;"' : '' }>
+					<div id="predsTable_${assetComment.id}" class='assetImage' ${predCount <= 5 && sucCount <= 5 ? 'style="display:none;"' : '' }>
 						<h4 onclick="javascript:toogleGenDetails('${assetComment.id}')">Dependency details 
 						<img id="rightTriangle_${assetComment.id}" src="${resource(dir:'images',file:'triangle_right.png')}" /> 
 						<img id="downTriangle_${assetComment.id}" style="display: none;" src="${resource(dir:'images',file:'triangle_down.png')}" />
