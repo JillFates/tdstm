@@ -41,7 +41,8 @@
 				<td colspan="2">
 					<input type="text" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" value="${assetComment.comment}" style="width:95%" />
 				</td>
-			</tr>	
+			</tr>
+			<g:if test="${assetComment.taskDependencies?.size() > 0 }">		
 			<tr>
 				<td valign="top" class="name"><label>Predecessors:</label></td>
 				<td><span style="width: 50%">
@@ -53,6 +54,8 @@
 					</span>
 				</td>
 			</tr>
+			</g:if>
+			<g:if test="${successor.size() > 0}">	
 			<tr>
 				<td valign="top" class="name"><label>Successors:</label></td>
 				<td>	
@@ -65,6 +68,7 @@
 					</span>
 				</td>
 			</tr>
+			</g:if>
 			<tr class="prop" id="teamId"  >
 				<td valign="top" class="name"><label for="team">Team:</label></td>
 				<td valign="top" class="value" id="team_${assetComment.id}" nowrap="nowrap">${assetComment.role}</td>
@@ -206,7 +210,7 @@
 	 		<div style="float: left;width:100%">
 				<table style=" margin-bottom: 30px;">
 				<tr>
-					<td class="heading"><a href="#detail">Details</a></td>
+					<td class="heading"><a href="#detail">Asset Highlights</a></td>
 					<td><span style="float:right;"><a href="#top">Top</a></span></td>
 			</tr>
 			<tr class="prop"><td colspan=2>

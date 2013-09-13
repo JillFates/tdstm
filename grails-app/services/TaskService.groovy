@@ -182,6 +182,8 @@ class TaskService {
 		
 		// Add Successor Count
 		sql.append(', (SELECT count(*) FROM task_dependency td WHERE predecessor_id=t.asset_comment_id) AS successors ')
+		// Add Predecessor Count
+		sql.append(', (SELECT count(*) FROM task_dependency td WHERE asset_comment_id=t.asset_comment_id) AS predecessors ')
 		
 		// The WHERE clause is going to find tasks that are assigned to the user (hard or soft) OR tasks that are assigned to the role(s) that
 		// the user has unless the task is hard assigned to someone else in one of the groups.
@@ -242,8 +244,8 @@ class TaskService {
 		//log.info "getUserTasks: SQL params: " + sqlParams
 		
 		// Get all tasks from the database and then filter out the TODOs based on a filtering
-		
 		def allTasks = namedParameterJdbcTemplate.queryForList( sql.toString(), sqlParams )
+		
 		// def allTasks = jdbcTemplate.queryForList( sql.toString(), sqlParams )
 		def format = "yyyy/MM/dd hh:mm:ss"
 		def minAgoFormat = minAgo.format(format)

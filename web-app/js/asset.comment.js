@@ -315,3 +315,15 @@ function zxcOpacity(obj,opc){
 	obj.style.filter='alpha(opacity='+opc+')';
 	obj.style.opacity=obj.style.MozOpacity=obj.style.WebkitOpacity=obj.style.KhtmlOpacity=opc/100-.001;
 }
+
+function toogleGenDetails(id){
+	if($("#rightTriangle_"+id).is(":visible")){
+		$("#rightTriangle_"+id).hide();
+		$("#downTriangle_"+id).show();
+		$("#predDivId_"+id).show();
+	}else {
+		$("#rightTriangle_"+id).show();
+		$("#downTriangle_"+id).hide();
+		$("#predDivId_"+id).hide();
+	}
+}

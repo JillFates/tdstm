@@ -49,10 +49,10 @@
 						<td id="comment_${item?.id}"
 							class="asset_details_block_task">
 							${item?.taskNumber?item?.taskNumber+' - ' : ''}
-							${com.tdssrc.grails.StringUtil.ellipsis(item?.comment,50)}
+							${item?.comment} 
 						</td>
 						<td id="asset_${item?.id}" class="asset_details_block">
-							${item?.assetName}
+							${item?.assetName} 
 						</td>
 						<td id="lastUpdated_${item?.id}" class="asset_details_block">
 							<g:if test="${AssetComment.moveDayCategories.contains(item.category)}">
@@ -62,7 +62,7 @@
 								<tds:elapsedAgo start="${item?.lastUpdated}" end="${now}"/>
 							</g:else>
 						</td>
-						<td id="estFinish_${item?.id}" class="asset_details_block">
+						<td id="estFinish_${item?.id}" class="asset_details_block ${ item?.dueDate < TimeUtil.nowGMT() ? 'task_overdue' : ''}">
 								<tds:convertDate date="${item?.estFinish}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
 									format="MM/dd kk:mm" />
 						</td>
@@ -88,10 +88,11 @@
 							<tds:actionButton label="Details..." icon="ui-icon-zoomin" id="${item?.id}"  
 								onclick="issueDetails(${item?.id},'${item?.status}')"/>
 
-							<tds:actionButton label="View Graph" icon="ui-icon-zoomin" id="${item?.id}"  
-								onclick="window.open('${ HtmlUtil.createLink([controller:'task',action:'neighborhoodGraph', id: item?.id]) }','_blank');"  
-							/>
-
+							<g:if test="${item.successors > 0 || item.predecessors > 0}">
+								<tds:actionButton label="View Graph" icon="ui-icon-zoomin" id="${item?.id}"  
+									onclick="window.open('${ HtmlUtil.createLink([controller:'task',action:'neighborhoodGraph', id: item?.id]) }','_blank');"  
+								/>
+							</g:if>
 							<g:if test="${ personId != issue.item.assignedTo && issue.item.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]}">
 							<tds:actionButton label="Assign To Me" icon="ui-icon-person" id="${item?.id}"  
 								onclick="assignTask('${item?.id}','${issue.item.assignedTo}', '${issue.item.status}','myTask')"/>

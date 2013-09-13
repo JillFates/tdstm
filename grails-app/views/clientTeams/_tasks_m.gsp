@@ -63,8 +63,9 @@
 			<thead>
 				<tr>
 					<g:sortableColumn class="sort_column" style="width:45%;"  action="listTasks" property="number_comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:35%;" action="listTasks" property="assetName" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:20%;" action="listTasks" property="status" title="Status" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:25%;" action="listTasks" property="assetName" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:15%;" action="listTasks" property="status" title="Status" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
+					<g:sortableColumn class="sort_column" style="width:15%;" action="listTasks" property="assigned" title="Assigned To" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
 				</tr>
 			</thead>
 			<tbody>
@@ -82,7 +83,7 @@
 					<td id="comment_${issue?.item?.id}"
 						class="asset_details_block_task">
 						${issue?.item?.taskNumber?issue?.item?.taskNumber+' - ' : ''}
-						${com.tdssrc.grails.StringUtil.ellipsis(issue?.item?.comment,25)}
+						${issue?.item?.comment}
 					</td>
 					<td id="asset_${issue?.item?.id}" class="asset_details_block">
 						${issue?.item?.assetName}
@@ -90,6 +91,9 @@
 					
 					<td id="statusTd_${issue?.item?.id}"id="statusTd_${issue?.item?.id}" class="asset_details_block">
 						${issue?.item?.status}
+					</td>
+					<td id="assignedToName_${issue?.item?.id}" class="asset_details_block">
+						${(issue?.item?.hardAssigned?'* ':'')} <span id="assignedToNameSpan_${issue?.item?.id}">${(issue?.item?.firstName?:'')+' '+((issue?.item?.lastName != null)? issue?.item?.lastName :'')}</span>
 					</td>
 					</tr>
 					<g:if test="${tab && tab == 'todo'}">
@@ -113,7 +117,7 @@
 					</tr>
 				</g:if>
 				<tr id="detailTdId_${issue?.item?.id}" style="display: none">
-				<td colspan="3">
+				<td colspan="4">
 				   <div id="detailId_${issue?.item?.id}"  > </div>
 				</td>
 				</tr>

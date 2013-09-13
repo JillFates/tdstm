@@ -22,6 +22,8 @@
 		<a name="comments"></a>
 		<input id="issueId" name="id" type="hidden" value="${assetComment.id}" />
 		<input id="redirectTo" name="redirectTo" type="hidden" value="taskList" />
+		<g:set var="predCount" value="${assetComment.taskDependencies?.size()}" />
+		<g:set var="sucCount" value="${successor.size()}" />
 		<table style="margin-left: -2px;">
 			<tr>
 				<td class="heading" colspan="2"><a class="heading" href="#comments">Task details:</a></td>
@@ -35,34 +37,44 @@
 				<td>
 					<input type="text" title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" value="${assetComment.comment}" style="width: 100%" />
 				</td>
-			</tr>	
-			<tr>
-				<td valign="middle" class="name"><label>Dependencies:</label></td>
-				<td valign="top" class="name">
-				<div style="width:400px; float:left">
-					<fieldset>
-					<legend>Predecessors</legend>
-					<g:each in="${assetComment.taskDependencies}" var="task">
-						<span class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}" onclick="showAssetCommentMyTasks(${task.predecessor.id})">
-						${task.predecessor.taskNumber}:${task.predecessor.comment} (${task.predecessor.category})
-						</span>
-						<br/>
-					</g:each>
-					</fieldset>
-				</div>
-				<div style="width:400px; float:left; margin-left:30px;">
-					<fieldset>
-					<legend>Successors</legend>
-					<g:each in="${successor}" var="task">
-						<span class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}" onclick="showAssetCommentMyTasks(${task.assetComment.id})">
-						${task.assetComment.taskNumber}:${task.assetComment.comment} (${task.assetComment.category})
-						</span>
-						<br/>
-					</g:each>
-					</fieldset>
-				</div>
-				</td>
 			</tr>
+			<g:if test="${predCount > 0 || sucCount > 0}">	
+				<tr>
+					<td valign="middle" class="name"><label>Dependencies:</label></td>
+					<td valign="top" class="name">
+					<div id="predsTable_${assetComment.id}" class='assetImage' ${predCount < 5 && sucCount < 5 ? 'style="display:none;"' : '' }>
+						<h4 onclick="javascript:toogleGenDetails('${assetComment.id}')">Dependency details 
+						<img id="rightTriangle_${assetComment.id}" src="${resource(dir:'images',file:'triangle_right.png')}" /> 
+						<img id="downTriangle_${assetComment.id}" style="display: none;" src="${resource(dir:'images',file:'triangle_down.png')}" />
+						</h4>
+					</div>
+					<div id="predDivId_${assetComment.id}" ${predCount > 5 || sucCount > 5 ? 'style="display:none;"' : ''}>
+					<div style="width:400px; float:left">
+						<fieldset>
+						<legend>Predecessors</legend>
+						<g:each in="${assetComment.taskDependencies}" var="task">
+							<span class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}" onclick="showAssetCommentMyTasks(${task.predecessor.id})">
+							${task.predecessor.taskNumber}:${task.predecessor.comment} (${task.predecessor.category})
+							</span>
+							<br/>
+						</g:each>
+						</fieldset>
+					</div>
+					<div style="width:400px; float:left; margin-left:30px;">
+						<fieldset>
+						<legend>Successors</legend>
+						<g:each in="${successor}" var="task">
+							<span class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}" onclick="showAssetCommentMyTasks(${task.assetComment.id})">
+							${task.assetComment.taskNumber}:${task.assetComment.comment} (${task.assetComment.category})
+							</span>
+							<br/>
+						</g:each>
+						</fieldset>
+					</div>
+					</div>
+					</td>
+				</tr>
+			</g:if>
 			<tr class="prop" id="teamId"  >
 				<td valign="top" class="name"><label for="team">Team:</label></td>
 				<td valign="top" class="value" id="team_${assetComment.id}" nowrap="nowrap">${assetComment.role}</td>
@@ -203,7 +215,7 @@
 			<div style="float: left;width:100%">
 				<table style="float: left;margin-left: -2px;">
 				<tr>
-					<td class="heading"><a href="#detail">${assetComment?.assetEntity?.assetType == 'Files' ? 'Storage' : assetComment?.assetEntity?.assetType} Details</a></td>
+					<td class="heading"><a href="#detail">${assetComment?.assetEntity?.assetType == 'Files' ? 'Storage' : assetComment?.assetEntity?.assetType} Highlights</a></td>
 					<td><span style="float:right;"><a href="#top">Top</a></span></td>
 				</tr>
 				<tr class="prop"><td colspan=2>
