@@ -482,6 +482,10 @@ digraph runbook {
 		def etext = ""
 		if(comment){
 			comment.estStart=TimeUtil.nowGMT().plus(Integer.parseInt(params.day))
+			
+			if(!comment.estFinish || comment.estStart > comment.estFinish )
+				comment.estFinish = comment.estStart.plus(1)
+				
 			if(!comment.hasErrors() && !comment.save(flush:true)){
 				etext = "unable to update estTime"+GormUtil.allErrorsString( comment )
 				log.error etext 

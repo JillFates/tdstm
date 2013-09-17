@@ -79,11 +79,21 @@
 					${assignToSelect}
 				</td>
 			</tr> 
-			<tr class="prop issue" id="estFinishShowId"  >
-				<td valign="top" class="name"><label for="estFinish">Est. Finish:</label></td>
-				<td valign="top" class="value" id="estFinishShowId_${assetComment.id}"  nowrap="nowrap" >
-				<tds:convertDate date="${assetComment.estFinish}" format="M/d kk:mm" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-				</td>
+			<g:if test="${assetComment.estStart}">	
+				<tr class="prop issue" id="estStartShowId"  >
+					<td valign="top" class="name"><label for="estStart">Est. Start:</label></td>
+					<td valign="top" class="value" id="estStartShowId_${assetComment.id}" nowrap="nowrap">
+					<tds:convertDate date="${assetComment.estStart}" format="M/d kk:mm" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+				</tr>
+			</g:if>
+			<g:if test="${assetComment.estFinish}">	
+				<tr class="prop issue" id="estFinishShowId"  >
+					<td valign="top" class="name"><label for="estFinish">Est. Finish:</label></td>
+					<td valign="top" class="value" id="estFinishShowId_${assetComment.id}"  nowrap="nowrap" >
+					<tds:convertDate date="${assetComment.estFinish}" format="M/d kk:mm" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+					</td>
+				</tr>
+			</g:if>
 			<tr class="prop">
 				<td valign="top" class="name"><label for="category">Category:</label></td>
 				<td valign="top" class="value"><g:select id="categoryEditId_${assetComment.id}" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="${assetComment.category}"></g:select>
