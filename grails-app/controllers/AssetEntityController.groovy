@@ -2206,7 +2206,7 @@ class AssetEntityController {
 			forward(controller:"clientTeams", action:"listComment", params:[view:params.view, tab:params.tab])
 		} else if( params.open != "view" ){
 			def assetEntity = AssetComment.findById(params.id)?.assetEntity
-			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
+			def assetCommentList = assetEntity ? AssetComment.findAllByAssetEntity(assetEntity) : []
 			render(template:"commentList",model:[assetCommentList:assetCommentList])
 		} else {
 			render map as JSON
