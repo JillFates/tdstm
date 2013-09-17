@@ -3609,10 +3609,15 @@ class AssetEntityController {
 			}
 			if (assigned )
 				'in'('assignedTo' , assigned)
-				
-			def sid = sortIndex  =='assetName' || sortIndex  =='assetType' ? "ae.${sortIndex}" : sortIndex
+			
 			if(sortIndex && sortOrder){
-				order(sid, sortOrder).ignoreCase()
+				if(sortIndex  =='assetName' || sortIndex  =='assetType'){
+					assetEntity {
+						order(sortIndex, sortOrder).ignoreCase()
+					}
+				}else{
+					order(sortIndex, sortOrder).ignoreCase()
+				}
 			} else {
 				and{
 					order('score','desc')
