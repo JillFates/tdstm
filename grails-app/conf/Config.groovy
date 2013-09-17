@@ -138,3 +138,6 @@ log4j = {
 	additivity.grails=false
 	additivity.StackTrace=false
  }
+
+//Maintenance file path
+tdsops.maintModeFile = "/tmp/tdstm-maint.txt"

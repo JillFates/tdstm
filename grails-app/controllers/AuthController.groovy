@@ -188,4 +188,8 @@ class AuthController {
 		
 		render( view:'home', model:[ recentUsers:recentUsers, moveEventsList:moveEventsList, moveBundlesList:upcomingBundles ] )
 	}
+	
+	def maintMode = {
+		//Do nothing
+	}
 }

@@ -3,9 +3,29 @@ import org.apache.shiro.SecurityUtils
 class SecurityFilters {
 	
 	def securityService
+	def maintService
 	def filters = {
 
-
+		maintModeCheck(controller:'*', action:'*'){
+			before = {
+				def hasBackdoorAccess = maintService.hasBackdoorAccess(session)
+				if( controllerName == "auth" && actionName == "maintMode" ){
+					if(!hasBackdoorAccess ){
+						maintService.toggleUsersBackdoor( session )
+						hasBackdoorAccess = maintService.hasBackdoorAccess( session )
+						redirect(controller:'auth', action:'login');
+						return
+					} else if( MaintService.isInMaintMode()){
+						render(status: 503, text: '503 Service Unavailable')
+						return
+					}
+				}
+				
+				if( MaintService.isInMaintMode() && !hasBackdoorAccess ){
+					render(status: 503, text: '503 Service Unavailable')
+				}
+			}
+		}
 		// Creating, modifying, or deleting a Party,person, project,partyGroup requires the ADMIN role.
 		partyCrud(controller: "(party|person|partyGroup)", action: "(create|edit|save|update|delete)") {
 			before = {

