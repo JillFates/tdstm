@@ -36,7 +36,10 @@ table {
 .task_done{
 	background-color: green;
 }
-
+.task_overdue {
+	color: yellow;
+	font-weight:bold;
+}
 th {
 	color: #ffffff;
 	font-weight:bold;

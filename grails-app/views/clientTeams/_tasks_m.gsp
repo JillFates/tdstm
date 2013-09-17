@@ -48,18 +48,25 @@
  **************************
  */
 --%>
-<div style="width: 100%;" id="myIssueList" class="mobbodyweb">
+<% java.text.DecimalFormat formatter = new java.text.DecimalFormat("0.0000") %>
+
+<div id="myIssueList" class="mobbodyweb" style="width: 100%">
 	<input id="issueId" name="issueId" type="hidden" value="" />
 	<input name="tab" id="tab_m" type="hidden" value="${tab}" />
 	<div id="mydiv" onclick="this.style.display = 'none';setFocus();">
 		<g:if test="${flash.message}">
 			<br />
-			<div class="message"><ul>${flash.message}</ul></div>
+			<div class="message">
+				<ul>
+					${flash.message}
+				</ul>
+			</div>
 		</g:if> 
 	</div>		
 	<div id="taskId" style="float: left; width:100%; margin: 1px;"></div>
 	<div id="assetIssueDiv" style="float: left; width: 100%;">
-		<table id="issueTable" cellspacing="0px" style="width:100%;">
+		<table id="issueTable" cellspacing="0px"
+			style="width: 100%; margin-left: -1px;">
 			<thead>
 				<tr>
 					<g:sortableColumn class="sort_column" style="width:45%;"  action="listTasks" property="number_comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
@@ -89,7 +96,7 @@
 						${issue?.item?.assetName}
 					</td>
 					
-					<td id="statusTd_${issue?.item?.id}"id="statusTd_${issue?.item?.id}" class="asset_details_block">
+					<td id="statusTd_${issue?.item?.id}" class="asset_details_block">
 						${issue?.item?.status}
 					</td>
 					<td id="assignedToName_${issue?.item?.id}" class="asset_details_block">
@@ -128,7 +135,7 @@
 				</g:if>
 				<tr id="detailTdId_${issue?.item?.id}" style="display: none">
 				<td colspan="4">
-				   <div id="detailId_${issue?.item?.id}"  > </div>
+						<div id="detailId_${issue?.item?.id}"  ></div>
 				</td>
 				</tr>
 			</g:each>

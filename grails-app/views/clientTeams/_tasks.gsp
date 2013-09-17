@@ -49,7 +49,7 @@
 						<td id="comment_${item?.id}"
 							class="asset_details_block_task">
 							${item?.taskNumber?item?.taskNumber+' - ' : ''}
-							${item?.comment} 
+							${item?.comment}
 						</td>
 						<td id="asset_${item?.id}" class="asset_details_block">
 							${item?.assetName} 
@@ -112,8 +112,7 @@
 
 					<tr id="detailTdId_${item?.id}" style="display: none">
 						<td colspan="6">
-							<div id="detailId_${item?.id}" style="width: 100%">
-							</div>
+							<div id="detailId_${item?.id}" style="width: 100%"></div>
 						</td>
 					</tr>
 				</g:each>
