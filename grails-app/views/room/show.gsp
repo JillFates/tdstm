@@ -62,8 +62,8 @@
 							</tr>
 							<tr>
 								<td>
-									<label for="Used" ><input type="radio" name="capacityType" id="Used" value="Used" onclick="capacityView()"/>&nbsp;Used&nbsp;</label>
-									<label for="Remaining" ><input type="radio" name="capacityType" id="Remaining" checked="checked" value="Remaining" onclick="capacityView()"/>&nbsp;Remaining<br/></label>
+									<label for="Used" ><input type="radio" name="capacityType" id="Used" value="Used" ${capacityType=='Used' ? 'checked="checked"' : ''} onclick="capacityView()"/>&nbsp;Used&nbsp;</label>
+									<label for="Remaining" ><input type="radio" name="capacityType" id="Remaining" ${capacityType=='Remaining' ? 'checked="checked"' : ''} value="Remaining" onclick="capacityView()"/>&nbsp;Remaining<br/></label>
 									<label for="otherBundle" >
 										<g:if test="${moveBundleList.id?.contains('all')}">
 											<input type="checkbox" name="otherBundle" id="otherBundle" disabled="disabled"  checked="checked" onclick="getRackLayout( $('#selectedRackId').val() )"/>
@@ -186,6 +186,7 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
+	$("#capacityViewId").val('${capacityView}')
 	$("#createEntityView").dialog({autoOpen: false})
 	$("#showEntityView").dialog({autoOpen: false})
     $("#editEntityView").dialog({autoOpen: false})
@@ -294,12 +295,14 @@ function capacityView(){
 	$("#listDialog").dialog("close")
 }
 function getRackDetails(browser){
+	var capacityView = $("#capacityViewId").val()
+	var capacityType = $('input[name=capacityType]:checked').val()
 	var bundles = new Array()
 	$("#bundleId option:selected").each(function () {
 		bundles.push($(this).val())
    	});
    	var otherBundle = $("#otherBundle").val()
-	${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()+\'&moveBundleId=\'+bundles+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')+\'&otherBundle=\'+otherBundle', onComplete:'openRoomView(e,browser)')}
+	${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()+\'&moveBundleId=\'+bundles+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')+\'&otherBundle=\'+otherBundle+\'&capView=\'+capacityView+\'&capType=\'+capacityType', onComplete:'openRoomView(e,browser)')}
 }
 
 function createAssetPage(type,source,rack,roomName,location,position){

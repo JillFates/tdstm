@@ -126,7 +126,7 @@ class RoomController {
 			}
 			
             [roomInstance: roomInstance, roomInstanceList:roomInstanceList, moveBundleList:moveBundleList, project:project,
-			 racksList: racksList, source:params.source, target:params.target, projectId : projectId,
+			 racksList: racksList, source:params.source, target:params.target, projectId : projectId, capacityView:params.capView, capacityType:params.capType?:'Remaining',
 			 auditPref:auditView, browserTestiPad:browserTestiPad, statusList:statusList, bundleList:bundleLists, moveBundleId:moveBundleId]
         }
     }
