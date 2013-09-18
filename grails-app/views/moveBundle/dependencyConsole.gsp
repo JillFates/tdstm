@@ -178,6 +178,7 @@
 					case "graph" :
 						var labelsList = "Application"
 						var blackBackground = null
+						var bundle = $("#planningBundleSelectId").val()
 						var showControls = 'hide'
 						if ($('#controlPanel').css('display') == 'block')
 							showControls = 'controls'
@@ -188,7 +189,7 @@
 						else if ($('#blackBackgroundId').is(':not(:checked)'))
 							blackBackground = false
 						compressList()
-						${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&force=\'+ force+\'&distance=\'+ distance + compressList() + \'&showControls=\'+ showControls + \'&blackBackground=\'+ blackBackground', onComplete:'listUpdate(e)') }
+						${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&force=\'+ force+\'&distance=\'+ distance + compressList() + \'&showControls=\'+ showControls + \'&blackBackground=\'+ blackBackground+\'&bundle=\'+ bundle', onComplete:'listUpdate(e)') }
 						break
 				}
 			}
