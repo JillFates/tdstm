@@ -64,6 +64,9 @@ class TaskService {
 	static final List runbookCategories = [AssetCommentCategory.MOVEDAY, AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP]
 	static final List categoryList = AssetCommentCategory.getList()
 	static final List statusList = AssetCommentStatus.getList()
+	
+	// This list will contain all of the common asset properties that filtering can be applied to
+	static final List commonFilterProperties 
 
 	// Color scheme for status key:[font, background]
 	static final Map taskStatusColorMap = [
@@ -1203,7 +1206,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// list.each() { log.info "dep match: ${it.assetComment.id} : ${it.predecessor.id}"}
 		return list
 	}
-	
+
 	/**
 	 * Used to generate the runbook tasks for a specified project's Event
 	 * @param Person whom - the individual that is generating the tasks
@@ -2565,7 +2568,17 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		
 		return count
 	}
-	
+
+	/**
+	 * used to initialize the commonFilterProperties array variable once, that which is used by the filtering logic of runbook generation
+	 */
+	private synchronized void initCommonFilterProps() { 
+		if (commonFilterProperties == null) {
+			def commonFilterProperties = ['assetName','assetTag','assetType', 'priority', 'planStatus', 'department', 'costCenter', 'environment']
+			(1..24).each() { commonFilterProperties.add("custom$it".toString()) }	// Add custom1..custom24
+		}
+	}
+		
 	/**
 	 * This special method is used to find all assets of a moveEvent that match the criteria as defined in the filter map
 	 * @param MoveEvent moveEvent object
@@ -2577,6 +2590,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	def findAllAssetsWithFilter(moveEvent, filter, loadedGroups, exceptions) {
 		def assets = []
 		
+		// Define the list of properties that are common for filtering
+		if (commonFilterProperties == null)
+			initCommonFilterProps()
+
 		if ( filter?.containsKey('group') ) {
 			//
 			// HANDLE filter.group
@@ -2702,11 +2719,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 		
 			// Add WHERE clauses based on the following properties being present in the filter.asset (Common across all Asset Classes)
-			// TODO : Some of these properties are device specific and should be moved down into the device section (e.g. truck, cart, shelf)
-			def validProperties = ['assetName','assetTag','assetType', 'priority', 'truck', 'cart', 'shelf', 'sourceLocation', 'targetLocation', 'planStatus']
-			(1..24).each() { validProperties.add("custom$it".toString()) }	// Add custom1..custom24
-			// log.info("findAllAssetsWithFilter: validProperties=$validProperties")
-			addWhereConditions( validProperties )
+			addWhereConditions( commonFilterProperties )
 		
 			//
 			// Param 'exclude'
@@ -2744,6 +2757,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							where = SqlUtil.appendToWhere(where, "a.assetType not IN ('application', 'database', 'files')")
 						}
 					
+						// Add any devices specific attribute filters
+						addWhereConditions( ['truck', 'cart', 'shelf', 'sourceLocation', 'targetLocation', 'os', 'serialNumber', 'assetTag', 'usize', 'ipAddress' ] )
+
 						sql = "from AssetEntity a where a.moveBundle.id in (:bIds)" + ( where ? " and $where" : '')
 						log.info "findAllAssetsWithFilter: DEVICE sql=$sql, map=$map"
 						assets = AssetEntity.findAll(sql, map)
@@ -2773,8 +2789,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						log.info "findAllAssetsWithFilter: FILES sql=$sql, map=$map"
 						assets = Files.findAll(sql, map)
 						break;
-						
-						
+												
 					default: 
 						log.error "Invalid class '$queryOn' specified in filter ($filter)<br/>"
 						throw new RuntimeException("Invalid class '$queryOn' specified in filter ($filter)")
