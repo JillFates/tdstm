@@ -56,5 +56,6 @@ databaseChangeLog = {
 	include file: '20130905-update-asset-orphan-records-with-no-racks-rooms.groovy'
 	include file: '20130904-update-blades-room-and-location.groovy'
 	include file: '20130910-update-person-fields.groovy'
+	include file: '20130918-add-last-modified-column-userlogin.groovy'
     
 }

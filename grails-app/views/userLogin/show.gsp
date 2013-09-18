@@ -80,7 +80,14 @@
                             <td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.createdDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
                             
                         </tr>
-                    
+                        
+                     	<tr class="prop">
+                            <td valign="top" class="name">Last Modified:</td>
+                            
+                            <td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.lastModified}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+                            
+                        </tr>
+                        
                         <tr class="prop">
                             <td valign="top" class="name">Last Login:</td>
                             

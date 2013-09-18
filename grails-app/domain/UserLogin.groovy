@@ -10,6 +10,7 @@ class UserLogin {
 	Date lastPage
 	Date expiryDate
 	Date passwordChangedDate = TimeUtil.nowGMT()
+	Date lastModified = TimeUtil.nowGMT()
 	String forcePasswordChange = 'N'
     
 	static belongsTo = [ person:Person ]
@@ -29,6 +30,7 @@ class UserLogin {
 		lastPage( nullable: true )
 		expiryDate( nullable: false )
 		passwordChangedDate( nullable: false)
+		lastModified( nullable: false )
 		//forcePasswordChange( nullable: false)
 	}
 
@@ -42,6 +44,7 @@ class UserLogin {
 		active sqlType:'varchar(20)'
 		forcePasswordChange sqltype: 'char(1)'
 		passwordChangedDate sqltype: 'DateTime'
+		lastModified sqltype: 'DateTime'
 		//person ignoreNotFound: true
 		//passwordChangedDate ignoreNotFound: true
 	}
@@ -61,5 +64,9 @@ class UserLogin {
 	// Check if the user has not expired and is flagged as active
 	def userActive() {
 		return (TimeUtil.nowGMT() < expiryDate) && (active == 'Y') && (person.active == 'Y')
+	}
+	
+	def beforeUpdate = {
+		lastModified = TimeUtil.nowGMT()
 	}
 }
