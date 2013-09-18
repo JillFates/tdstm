@@ -2767,7 +2767,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					
 					case 'application':
 						// Add additional WHERE clauses based on the following properties being present in the filter (Application domain specific)
-						addWhereConditions( ['appVendor','sme','sme2','businessUnit','criticality'] )
+						addWhereConditions( ['appVendor','sme','sme2','businessUnit','criticality', 'shutdownBy', 'startupBy', 'testingBy'] )
 						
 						sql = "from Application a where a.moveBundle.id in (:bIds)" + ( where ? " and $where" : '')
 						log.info "findAllAssetsWithFilter: APPLICATION sql=$sql, map=$map"
