@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# 
+# Usage
+#
+# ./runapp.sh test-app -unit RunbookService
+# 
+
 if [ "$1" == "" ]; then
    CMD="run-app"
 else
