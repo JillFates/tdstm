@@ -655,7 +655,7 @@ class AssetEntityController {
 				//
 				//  Process Storage (aka files)
 				//
-				if (params.files=='files') {
+				if (params.storage=='storage') {
 					flagToManageBatches = true
 					session.setAttribute("TOTAL_ASSETS",filesCount)
 					def eavEntityType = EavEntityType.findByDomainName('Files')
@@ -3214,7 +3214,7 @@ class AssetEntityController {
 		def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)
 		
 		//fieldImportance Styling for default validation.
-		def validationType = assetEntityInstance.validation
+		def validationType = assetEntityInstance.validation ?: ValidationType.DIS
 		def configMap = assetEntityService.getConfig('AssetEntity',validationType)
 		
 		def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntityInstance])
