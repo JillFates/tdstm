@@ -13,6 +13,7 @@ import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.apache.shiro.SecurityUtils
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
+import org.apache.commons.lang.math.NumberUtils
 
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetEntity
@@ -453,10 +454,10 @@ class ModelController {
             } else {
             	rearImage = modelInstance.rearImage
             }
-			modelInstance.height = params.modelHeight != "" ? Integer.parseInt(params.modelHeight):0 
-			modelInstance.weight = params.modelWeight != "" ? Integer.parseInt(params.modelWeight):0 
-			modelInstance.depth  = params.modelDepth  != "" ? Integer.parseInt(params.modelDepth):0 
-			modelInstance.width  = params.modelWidth  != "" ? Integer.parseInt(params.modelWidth):0
+			modelInstance.height = params.modelHeight != "" ? NumberUtils.toDouble(params.modelHeight,0).round():0 
+			modelInstance.weight = params.modelWeight != "" ? NumberUtils.toDouble(params.modelWeight,0).round():0 
+			modelInstance.depth  = params.modelDepth  != "" ? NumberUtils.toDouble(params.modelDepth,0).round():0 
+			modelInstance.width  = params.modelWidth  != "" ? NumberUtils.toDouble(params.modelWidth,0).round():0
             if( params?.modelStatus == 'valid' && modelStatus == 'full'){
 			   modelInstance.validatedBy = user?.person
 			   modelInstance.updatedBy =  modelInstance.updatedBy
@@ -475,7 +476,7 @@ class ModelController {
 				def deletedAka = params.deletedAka
 				def akaToSave = params.list('aka')
 				if(deletedAka){
-					ModelAlias.executeUpdate("delete from ModelAlias mo where mo.id in (:ids)",[ids:deletedAka.split(",").collect{return Long.parseLong(it)}])
+					ModelAlias.executeUpdate("delete from ModelAlias mo where mo.id in (:ids)",[ids:deletedAka.split(",").collect{return NumberUtils.toDouble(it,0).round()}])
 				}
 				def modelAliasList = ModelAlias.findAllByModel( modelInstance )
 				modelAliasList.each{ modelAlias->
@@ -490,7 +491,7 @@ class ModelController {
 				
 				def connectorCount = 0
 				if(params.connectorCount){
-            	    connectorCount = Integer.parseInt(params.connectorCount)
+            	    connectorCount = NumberUtils.toDouble(params.connectorCount,0).round()
 				}
 				if(connectorCount > 0){
 		        	for(int i=1; i<=connectorCount; i++){
@@ -506,8 +507,8 @@ class ModelController {
 								modelConnector.label = params["label"+i]
 								modelConnector.type = params["type"+i]
 								modelConnector.labelPosition = params["labelPosition"+i]
-								modelConnector.connectorPosX = Integer.parseInt(params["connectorPosX"+i])
-								modelConnector.connectorPosY = Integer.parseInt(params["connectorPosY"+i])
+								modelConnector.connectorPosX = NumberUtils.toDouble(params["connectorPosX"+i],0).round()
+								modelConnector.connectorPosY = NumberUtils.toDouble(params["connectorPosY"+i],0).round()
 								modelConnector.status = params["status"+i]
 								
 							} else if(connector){
@@ -517,8 +518,8 @@ class ModelController {
 									label: params["label"+i],
 									type: params["type"+i],
 									labelPosition: params["labelPosition"+i],
-									connectorPosX: Integer.parseInt(params["connectorPosX"+i]),
-									connectorPosY: Integer.parseInt(params["connectorPosY"+i]),
+									connectorPosX: NumberUtils.toDouble(params["connectorPosX"+i],0).round(),
+									connectorPosY: NumberUtils.toDouble(params["connectorPosY"+i],0).round(),
 									status: params["status"+i] )
 
 							}
