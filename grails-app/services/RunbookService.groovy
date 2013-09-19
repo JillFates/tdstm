@@ -214,6 +214,7 @@ class RunbookService {
 		tasks.each { 
 			it.metaClass.setProperty('maxPathDuration', 0)		// temporary
 			it.metaClass.setProperty('downstreamTasks', [:]) 	// temporary
+			it.metaClass.setProperty('mapDepth', 0)				// temporary
 			// Todo - check for the existence of beenExplored and only add if not there before
 			it.beenExplored = false
 		}
@@ -240,6 +241,9 @@ class RunbookService {
 		while ( s < sinkSize ) {
 			def sink = taskMap[sinks[s].id.toString()]
 
+			// Track the depth into the task
+			sink.mapDepth = 1
+
 			// Preload the duration along the current path
 			// sink.maxPathDuration = sink.duration ?: 0
 			// This will be used to track the tasks that we walked over for this particular sink vertex
@@ -263,6 +267,8 @@ class RunbookService {
 				// Pull the first task off the front of the queue
 				def taskId = queue.poll()
 				def task = taskMap[taskId.toString()]
+
+				def mapDepth = task.mapDepth + 1
 
 				// Safety valve so we don't get in an infinite loop
 				if (--ticks == 0) {
@@ -296,6 +302,11 @@ class RunbookService {
 							if (edge.pathDuration > edge.predecessor.maxPathDuration) {
 								edge.predecessor.maxPathDuration = edge.pathDuration
 							}
+
+							// Set the predecessor's mapDepth one higher than the successor. If there were multiple paths
+							// to a task, we'll use the shortest path
+							if (edge.predecessor.mapDepth == 0 || edge.predecessor.mapDepth > mapDepth)
+								edge.predecessor.mapDepth = mapDepth
 
 							// Merge the downstream tasks from the current task plus add the current task to the upstream task
 							if (task.downstreamTasks) {

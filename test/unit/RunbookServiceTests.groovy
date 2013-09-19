@@ -24,7 +24,7 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		[id:6, name:'Tony', color:'green'],
 	]
 	
-	// This represents the edge id, downstreamTaskCount, and pathDuration for the map defined below
+	// This represents the [ edge id, downstreamTaskCount, pathDuration ] for the map defined below
 	def dataMatrix = [
 		['100', 7, 71],
 		['101', 6, 73],
@@ -193,6 +193,13 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 			assertEquals "downstreamTaskCount for edge $i", c, durMap.edges[i].downstreamTaskCount
 			assertEquals "pathDuration for edge $i", d, durMap.edges[i].pathDuration
 		}
+
+		assertEquals 'Finish mapDepth', 1, durMap.tasks[9].mapDepth 
+		assertEquals 'Task 1005 mapDepth', 2, durMap.tasks[5].mapDepth 
+		assertEquals 'Task 1003 mapDepth', 3, durMap.tasks[3].mapDepth 
+		assertEquals 'Task 1002 mapDepth', 4, durMap.tasks[2].mapDepth 
+		assertEquals 'Task 1001 mapDepth', 5, durMap.tasks[1].mapDepth 
+		assertEquals 'Task 1000 mapDepth', 6, durMap.tasks[0].mapDepth 
 
 	}
 	

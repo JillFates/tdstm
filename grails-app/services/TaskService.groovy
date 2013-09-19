@@ -2541,7 +2541,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			log.error "createTaskDependency: attempted to create dependency with single task $predecessor"
 		}
 
-		def dependency = new TaskDependency( predecessor:predecessor, successor:successor )
+		def dependency = new TaskDependency( predecessor:predecessor, assetComment:successor )
 		if (! ( dependency.validate() && dependency.save(flush:true) ) ) {
 			throw new RuntimeException("Error while trying to create dependency between predecessor=$predecessor, successor=$successor<br/>Error=${GormUtil.allErrorsString(dependency)}, ")
 		}
