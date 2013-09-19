@@ -1944,7 +1944,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 						if (tnp.assetEntity) {
 							// Attempt to resolve any missed dependencies that may have occurred during an earlier step in the process.
-							// This can for instance when there are multiple Application shutdown taskSpec and there were references in  
+							// This can occur for instance when there are multiple Application shutdown taskSpec and there were references in  
 							// an earlier task spec that references an application created in subsquent steps. We track this in the 
 							// missedDepList. Missed dependencies are ONLY matched if they both occur in the same category (e.g. Shutdown)
 							def missedDepKey = "${tnp.assetEntity.id}_${tnp.category}"
@@ -2541,7 +2541,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			log.error "createTaskDependency: attempted to create dependency with single task $predecessor"
 		}
 
-		def dependency = new TaskDependency(assetComment:successor, predecessor:predecessor)
+		def dependency = new TaskDependency( predecessor:predecessor, successor:successor )
 		if (! ( dependency.validate() && dependency.save(flush:true) ) ) {
 			throw new RuntimeException("Error while trying to create dependency between predecessor=$predecessor, successor=$successor<br/>Error=${GormUtil.allErrorsString(dependency)}, ")
 		}
@@ -2563,7 +2563,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// Here is the recursive loop if the predecessor has a peer
 		if (predecessor.metaClass?.hasProperty(predecessor, 'chainPeerTask')) {
 			log.info "createTaskDependency() Invoking recursively due to predecessor having chainPeerTask (${predecessor.chainPeerTask})"
-			count = createTaskDependency( predecessor.chainPeerTask, successor, taskList, isRequired, out, count)
+			count += createTaskDependency( predecessor.chainPeerTask, successor, taskList, isRequired, out, count)
 		}
 		
 		return count
@@ -2701,10 +2701,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			 * @param String[] - list of the properties to examine
 			 */
 			def addWhereConditions = { list ->
-				// log.info "findAllAssetsWithFilter: Building WHERE - list:$list, filter=${filter}"
+				log.info "addWhereConditions: Building WHERE - list:$list, filter=${filter}"
 				list.each() { code ->
 					if (filter?.asset?.containsKey(code)) {
-						// log.info("addWhereConditions: code $code matched")						
+						log.info("addWhereConditions: code $code matched")						
 						def sm = SqlUtil.whereExpression("a.$code", filter.asset[code], code)
 						if (sm) {
 							where = SqlUtil.appendToWhere(where, sm.sql)
@@ -2758,7 +2758,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						}
 					
 						// Add any devices specific attribute filters
-						addWhereConditions( ['truck', 'cart', 'shelf', 'sourceLocation', 'targetLocation', 'os', 'serialNumber', 'assetTag', 'usize', 'ipAddress' ] )
+						addWhereConditions(['truck', 'cart', 'shelf', 'sourceLocation', 'targetLocation', 'os', 'serialNumber', 'assetTag', 'usize', 'ipAddress' ] )
 
 						sql = "from AssetEntity a where a.moveBundle.id in (:bIds)" + ( where ? " and $where" : '')
 						log.info "findAllAssetsWithFilter: DEVICE sql=$sql, map=$map"
