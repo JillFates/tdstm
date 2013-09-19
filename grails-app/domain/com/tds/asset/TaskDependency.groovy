@@ -11,6 +11,10 @@ class TaskDependency {
 	AssetComment assetComment	// aka successor
 	AssetComment predecessor
 
+	Integer downstreamTaskCount	= 0	// The number of tasks that are downstream from the predecessor task
+	Integer pathDepth = 0			// The depth from the furthest sink task in the map
+	Integer pathDuration = 0		// The total duration forward to the furthest sink task on the path in the map
+
 	// AssetComment successor
 	String type = TaskDependencyType.FS
 	// Integer delayTime		// # of minutes to delay either lead or lag 
@@ -21,7 +25,7 @@ class TaskDependency {
 	static constraints = {
 		assetComment(nullable:false)
 		predecessor(nullable:false)
-		type( inList:TaskDependencyType.getList() )
+		type( inList:TaskDependencyType.getKeys() )
 	}
 	
 	static mapping = {
