@@ -12,6 +12,7 @@
 		 *	function to show the Progress bar
 		 * ------------------------------- */
 		var handle=0;
+		var requestCount=0;
 		function showProcessBar(e){
 			var progress = eval('(' + e.responseText + ')');
 			if(progress){
@@ -33,25 +34,31 @@
 	        		handle=setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}",500);
 		        } else {
 			        // Increased interval by 5 sec as server was hanging over chrome with quick server request. 
-					handle=setInterval(getProgress, 5000);
+					handle=setInterval(getProgress, 500);
 		        }
 	        });
 		});
 
-
 		//This code is used to display progress bar at chrome as Chrome browser cancel all ajax request while uploading .
 		function getProgress(){	
-			 $("#iFrame").attr('src', contextPath+'/assetEntity/getProgress');
+			var hiddenVal=$("#requestCount").val()
+			if(hiddenVal != requestCount){
+				requestCount = hiddenVal
+			 	$("#iFrame").attr('src', contextPath+'/assetEntity/getProgress');
+			}
 		}
+		
 		function onIFrameLoad() {
 		   var serverResponse = $("#iFrame").contents().find("pre").html();
 		   var jsonProgress
-		   if(serverResponse)
-		     jsonProgress = JSON.parse( serverResponse )
+		   if(serverResponse){
+			   $("#requestCount").val(parseInt(requestCount)+1)
+		     	jsonProgress = JSON.parse( serverResponse )
+		   }
 		   if(jsonProgress){
 			   $("#progressbar").reportprogress(jsonProgress[0].imported,jsonProgress[0].total);
 		       if(jsonProgress[0].imported==jsonProgress[0].total){
-	  	         clearInterval(handle);addMessage
+	  	         clearInterval(handle);
 		       }
 		   }
 		 }
@@ -68,6 +75,7 @@
 			<div class="message">${flash.message}</div>
 		</g:if>
     	<h1>Asset Import</h1>
+    	<g:hiddenField name="requestCount" id="requestCount" value="1"/>
         <g:form action="upload" method="post" name="importForm" enctype="multipart/form-data" >
           <div class="dialog">
             <table>
