@@ -2,6 +2,7 @@ import grails.converters.JSON
 
 import java.text.SimpleDateFormat
 
+import org.apache.commons.lang.math.NumberUtils
 import org.apache.shiro.SecurityUtils
 
 import com.tds.asset.Application
@@ -21,6 +22,7 @@ class DataTransferBatchController {
     def jdbcTemplate
 	def securityService
 	def personService
+	def assetEntityService
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
 	protected static bundleTeamRoles = ['sourceTeamMt':'MOVE_TECH','targetTeamMt':'MOVE_TECH',
 										'sourceTeamLog':'CLEANER','targetTeamLog':'CLEANER',
@@ -71,7 +73,8 @@ class DataTransferBatchController {
 		def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
-
+		def blankAndNullFalseFields = assetEntityService.getFieldsByConstraints( AssetEntity, AssetEntity.class )
+		
 		DataTransferBatch.withTransaction { status ->
 			project = securityService.getUserCurrentProject()
     		def dataTransferBatch
@@ -131,7 +134,8 @@ class DataTransferBatchController {
 		    				isNewValidate = "true"
 							log.info "serverProcess - creating new asset for rowId $rowId"
 		    			}
-		    		
+						def cloneEntity = retainNotNullVal(assetEntity, blankAndNullFalseFields, isNewValidate)
+						
     					if( assetEntity && flag == 0 ) {
     						assetEntity.project = project
     						assetEntity.owner = project.client
@@ -199,19 +203,11 @@ class DataTransferBatchController {
 											assetEntity."$attribName" = it.importValue
 										}
 										break;
-									case "retireDate":
-										if(it.importValue){
-											def retireDate = it.importValue
-												isModified = "true"
-												assetEntity."$attribName" = GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
+									case ~/retireDate|maintExpDate/:
+										if(it.importValue && it.importValue.trim() != "NULL"){
+											isModified = "true"
+											assetEntity."$attribName" = GormUtil.convertInToGMT(formatter.parse( it.importValue ), tzId)
 										}
-										break;
-									case "maintExpDate":
-										if(it.importValue){
-											def maintExpDate = it.importValue
-												isModified = "true"
-												assetEntity."$attribName" = GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
-											 }
 										break;
 									case "usize":
 										// Skip the insertion
@@ -222,9 +218,9 @@ class DataTransferBatchController {
 		    								def correctedPos
 		    								try {
 		    									if( it.correctedValue ) {
-		    										correctedPos = Integer.parseInt(it.correctedValue.trim())
+		    										correctedPos = NumberUtils.toDouble(it.correctedValue.trim(), 0).round()
 		    									} else if( it.importValue ) {
-		    										correctedPos = Integer.parseInt(it.importValue.trim())
+		    										correctedPos = NumberUtils.toDouble(it.importValue.trim(), 0).round()
 		    									}
 		    									//correctedPos = it.correctedValue
 												if( assetEntity."$attribName" != correctedPos || isNewValidate == "true" ) {
@@ -274,6 +270,11 @@ class DataTransferBatchController {
 		    							}
 										break
 								}
+								//If imported "NULL" and field allows blank and null updating value to null
+								if(it.importValue == "NULL" && !blankAndNullFalseFields.contains(attribName)) 
+									assetEntity."$attribName" = null
+								else if (it.importValue == "NULL")
+									assetEntity."$attribName" = cloneEntity."$attribName"
     						}
     						if ( isFormatError != 1 ) {
     							if( isModified == "true" ) {
@@ -373,6 +374,7 @@ class DataTransferBatchController {
     	def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
+		def blankAndNullFalseFields = assetEntityService.getFieldsByConstraints( Application, Application.class )
 		
 		DataTransferBatch.withTransaction { status ->
 			project = securityService.getUserCurrentProject()			
@@ -435,6 +437,7 @@ class DataTransferBatchController {
 		    			}
 		    		
     					if( application && flag == 0 ) {
+							def cloneEntity = retainNotNullVal(application, blankAndNullFalseFields, isNewValidate)
     						application.project = project
     						dtvList.each {
     							def attribName = it.eavAttribute.attributeCode
@@ -444,19 +447,11 @@ class DataTransferBatchController {
 												isModified = "true"
 												application."$attribName" = moveBundleInstance
 											break;
-										case "retireDate":
-										if(it.importValue){
-											def retireDate = it.importValue
+										case ~/retireDate|maintExpDate/:
+											if(it.importValue && it.importValue.trim() != "NULL"){
 												isModified = "true"
-												application."$attribName" = GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
-										}
-											break;
-										case "maintExpDate":
-										if(it.importValue){
-											def maintExpDate = it.importValue
-												isModified = "true"
-												application."$attribName" = GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
-										     }
+												application."$attribName" = GormUtil.convertInToGMT(formatter.parse( it.importValue ), tzId)
+											}
 											break;
 										case "owner":
 											   application."$attribName" = application.owner
@@ -476,6 +471,7 @@ class DataTransferBatchController {
 												}
 												break;
 										case ~/sme|sme2|appOwner/:
+											if(it.importValue && it.importValue.trim() != "NULL"){
 												def resultMap = personService.findOrCreatePerson(it.importValue, project)
 												application."$attribName" = it.importValue ? resultMap?.person : null
 												if(it.importValue && resultMap?.isAmbiguous){
@@ -483,38 +479,37 @@ class DataTransferBatchController {
 													log.warn warnMsg
 													warnings << warnMsg
 												}
+											}
 													
 											 break;
 										case ~/shutdownBy|startupBy|testingBy/:
-												if(it.importValue){
-													if(it.importValue[0] in ['@', '#']){
-														application."$attribName" = it.importValue
-													} else {
-														def resultMap = personService.findOrCreatePerson(it.importValue, project)
-														application."$attribName" = resultMap?.person?.id
-														if(it.importValue && resultMap?.isAmbiguous){
-															def warnMsg = "Ambiguity in ${attribName} (${it.importValue}) for ${application.assetName}"
-															log.warn warnMsg
-															warnings << warnMsg
-														}
+											if(it.importValue && it.importValue != "NULL"){
+												if(it.importValue[0] in ['@', '#']){
+													application."$attribName" = it.importValue
+												} else {
+													def resultMap = personService.findOrCreatePerson(it.importValue, project)
+													application."$attribName" = resultMap?.person?.id
+													if(it.importValue && resultMap?.isAmbiguous){
+														def warnMsg = "Ambiguity in ${attribName} (${it.importValue}) for ${application.assetName}"
+														log.warn warnMsg
+														warnings << warnMsg
 													}
-												}else{
-													application."$attribName" = null
 												}
+											}
 											break;
 										case ~/shutdownFixed|startupFixed|testingFixed/:
-												if(it.importValue){
-													application."$attribName" = it.importValue.equalsIgnoreCase("yes") ? 1 : 0
-												}
+											if(it.importValue){
+												application."$attribName" = it.importValue.equalsIgnoreCase("yes") ? 1 : 0
+											}
 											break;
 										default:
-										if( it.eavAttribute.backendType == "int"){
+										if( it.eavAttribute.backendType == "int" ){
 		    								def correctedPos
 		    								try {
 		    									if( it.correctedValue ) {
-		    										correctedPos = Integer.parseInt(it.correctedValue.trim())
+		    										correctedPos = NumberUtils.toDouble(it.correctedValue.trim(), 0).round()
 		    									} else if( it.importValue ) {
-		    										correctedPos = Integer.parseInt(it.importValue.trim())
+		    										correctedPos = NumberUtils.toDouble(it.importValue.trim(), 0).round()
 		    									}
 		    									//correctedPos = it.correctedValue
 												if( application."$attribName" != correctedPos || isNewValidate == "true" ) {
@@ -544,7 +539,13 @@ class DataTransferBatchController {
 		    								}
 		    							}
 								}
+								//If imported "NULL" and field allows blank and null updating value to null
+								if(it.importValue.trim() == "NULL" && !blankAndNullFalseFields.contains(attribName)) 
+									application."$attribName" = null
+								else if (it.importValue == "NULL")
+									application."$attribName" = cloneEntity."$attribName"
     						}
+								
     						}
     						if ( isFormatError != 1 ) {
     							if( isModified == "true" ) {
@@ -635,6 +636,7 @@ class DataTransferBatchController {
 		def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
+		def blankAndNullFalseFields = assetEntityService.getFieldsByConstraints( Files, Files.class )
 		
 		DataTransferBatch.withTransaction { status ->
 			project = securityService.getUserCurrentProject()			
@@ -695,6 +697,7 @@ class DataTransferBatchController {
 						}
 					
 						if( files && flag == 0 ) {
+							def cloneEntity = retainNotNullVal(files, blankAndNullFalseFields, isNewValidate)
 							files.project = project
 							files.sizeUnit = "GB"
 							dtvList.each {
@@ -705,25 +708,18 @@ class DataTransferBatchController {
 												isModified = "true"
 												files."$attribName" = moveBundleInstance
 											break;
-										case "retireDate":
-										if(it.importValue){
-											def retireDate = it.importValue
+										case ~/retireDate|maintExpDate/:
+											if(it.importValue && it.importValue != "NULL"){
 												isModified = "true"
-												files."$attribName" = GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
-										}
+												files."$attribName" = GormUtil.convertInToGMT(formatter.parse( it.importValue ), tzId)
+											}
 											break;
-										case "maintExpDate":
-										if(it.importValue){
-											def maintExpDate = it.importValue
-												isModified = "true"
-												files."$attribName" = GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
-											 }
 											break;
 										case "owner":
 												files."$attribName" = application.owner
 											break;
 										case "fileSize":
-											files."$attribName" = it.importValue ? Integer.parseInt(it.importValue) : 0
+											files."$attribName" = it.importValue ? NumberUtils.toDouble(it.importValue, 0).round() : 0
 										    break;
 										case "validation":
 											if(!it.importValue){
@@ -774,6 +770,12 @@ class DataTransferBatchController {
 											}
 										}
 									}
+									
+									//If imported "NULL" and field allows blank and null updating value to null
+									if(it.importValue == "NULL" && !blankAndNullFalseFields.contains(attribName)) 
+										files."$attribName" = null
+									else if (it.importValue == "NULL")
+										files."$attribName" = cloneEntity."$attribName"
 								}
 							}
 							if ( isFormatError != 1 ) {
@@ -857,6 +859,7 @@ class DataTransferBatchController {
 		def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
+		def blankAndNullFalseFields = assetEntityService.getFieldsByConstraints( Database, Database.class )
 
 		DataTransferBatch.withTransaction { status ->
 			project = securityService.getUserCurrentProject()			
@@ -920,8 +923,8 @@ class DataTransferBatchController {
 					}
 				
 					if( dbInstance && flag == 0 ) {
+						def cloneEntity = retainNotNullVal(dbInstance, blankAndNullFalseFields, isNewValidate)
 						dbInstance.project = project
-						//application.owner = project.client
 						dtvList.each {
 							def attribName = it.eavAttribute.attributeCode
 								switch(attribName){
@@ -932,22 +935,14 @@ class DataTransferBatchController {
 										dbInstance."$attribName" = moveBundleInstance
 									}
 										break;
-									case "retireDate":
-										if(it.importValue){
-											    def retireDate = it.importValue
-												isModified = "true"
-												dbInstance."$attribName" = GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
+									case ~/retireDate|maintExpDate/:
+										if(it.importValue && it.importValue != "NULL"){
+											isModified = "true"
+											dbInstance."$attribName" = GormUtil.convertInToGMT(formatter.parse( it.importValue ), tzId)
 										}
 										break;
-									case "maintExpDate":
-										if(it.importValue){
-											def maintExpDate = it.importValue
-											isModified = "true"
-											dbInstance."$attribName" = GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
-										 }
-										break;
 									case "dbSize":
-										    dbInstance."$attribName" = it.importValue ? Integer.parseInt(it.importValue) : 0
+										    dbInstance."$attribName" = it.importValue ? NumberUtils.toDouble(it.importValue, 0).round()  : 0
 									    break;
 									case "validation":
 										if(!it.importValue){
@@ -999,7 +994,13 @@ class DataTransferBatchController {
 										}
 									}
 								}
+								//If imported "NULL" and field allows blank and null updating value to null
+								if(it.importValue.trim() == "NULL" && !blankAndNullFalseFields.contains(attribName))
+									dbInstance."$attribName" = null
+								else if (it.importValue == "NULL")
+									dbInstance."$attribName" = cloneEntity."$attribName"
 							}
+							
 						}
 						if ( isFormatError != 1 ) {
 							if( isModified == "true" ) {
@@ -1007,6 +1008,8 @@ class DataTransferBatchController {
 									dbInstance.assetType ='Database'
 									if( dbInstance.save(flush:true) ) {
 										insertCount++
+									}else{
+										dbInstance.errors.allErrors.each{ println it }
 									}
 								} else {
 									if( dbInstance.save() ) {
@@ -1251,6 +1254,23 @@ class DataTransferBatchController {
 		    errorMsg = "No match found for $importedManu / $importedModel <br/>"
 			
 		return errorMsg
+	}
+	
+	/**
+	 * Instead of using clone (of Cloneable interface (Mark up)) using this method to keep object current copy.
+	 * This method is used to retain older values as we need to keep it safe in order to look back and fetch 
+	 * values while removing values
+	 * @param entity :  entity instance
+	 * @param fields : all not null fields for whom we need to store data
+	 * @param isNew : a flag that will determine whether instance is new one
+	 * @return : a map having not null field as key and value as value
+	 */
+	def retainNotNullVal(entity, fields, isNew){
+		def retMap = [:]
+		fields.each { field->
+			retMap << [(field) :  !isNew ? entity."${field}" : null ]
+		}
+		return retMap
 	}
 }
 

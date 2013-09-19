@@ -1,5 +1,6 @@
 import org.apache.commons.lang.math.NumberUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 
 import com.tds.asset.Application
 import com.tds.asset.ApplicationAssetMap
@@ -471,5 +472,31 @@ class AssetEntityService {
 			}
 		}
 	}
+	
+	 /**
+	  * This method is introduced to get a list of fields that allows null or does not allow null as per request for a Domain.
+	  * using blankAndNullPropsOnly flag if it is true list will contain fields that property is blank: true, nullable:true
+	  * @param domain : Domain name .
+	  * @param blankAndNullPropsOnly : Boolean flag to determine returning list . 
+	  * @return : list of prop name as per request .
+	  */
+	 def getFieldsByConstraints(def domain, def clazz, def blankAndNullPropsOnly = true ){
+		 
+		 def fields = []
+		 def grailsDomain = new DefaultGrailsDomainClass( clazz )
+		 grailsDomain.properties.each {
+			 def blankAlw = domain.constraints."${it.name}"?.getAppliedConstraint( 'blank' )?.blank
+			 def nullAlw = domain.constraints."${it.name}"?.getAppliedConstraint( 'nullable' )?.nullable
+			 
+			 /* If blankAndNullPropsOnly is true and blankAlw and nullAlw is true list will collect props 
+			    having blank:true , nullable:true  vice versa .*/
+			 
+			 if(!blankAndNullPropsOnly && blankAlw && nullAlw)
+				 fields << it.name
+			 else if( !blankAlw && !nullAlw && blankAndNullPropsOnly)
+				 fields << it.name
+		 }
+		 return fields
+	 }
 	
 }

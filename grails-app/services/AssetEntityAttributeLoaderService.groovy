@@ -406,12 +406,12 @@ class AssetEntityAttributeLoaderService {
 	 */
 	 def getdtvMoveBundle(def dtv, def projectInstance ) {
 		def moveBundleInstance
-		 if( dtv.correctedValue ) {
+		 if( dtv.correctedValue && dtv.importValue.trim() != "NULL" ) {
 				moveBundleInstance = MoveBundle.findByNameAndProject( dtv.correctedValue, projectInstance )
 				if( !moveBundleInstance ) {
 					moveBundleInstance = new MoveBundle( name:dtv.correctedValue, project:projectInstance, operationalOrder:1, workflowCode: projectInstance.workflowCode ).save()
 				}
-			} else if( dtv.importValue ) {
+			} else if( dtv.importValue && dtv.importValue.trim() != "NULL" ) {
 				moveBundleInstance = MoveBundle.findByNameAndProject( dtv.importValue, projectInstance )
 				if( !moveBundleInstance ) {
 					moveBundleInstance = new MoveBundle( name:dtv.importValue, project:projectInstance, operationalOrder:1, workflowCode: projectInstance.workflowCode ).save()
