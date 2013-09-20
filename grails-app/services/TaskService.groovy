@@ -1207,6 +1207,18 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		return list
 	}
 
+
+
+
+
+
+	// ===================================================================================================================================================================================
+	// RUN BOOK
+	// ===================================================================================================================================================================================
+	
+
+
+
 	/**
 	 * Used to generate the runbook tasks for a specified project's Event
 	 * @param Person whom - the individual that is generating the tasks
@@ -1259,18 +1271,19 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		
 		// Define a number of vars that will hold cached data about the tasks being generated for easier lookup, dependencies, etc
 		def lastTaskNum = getLastTaskNumber(project)		
-		def taskList = [:]			// an array that will contain list of all tasks that are inserted as they are created
+		def taskList = [:]				// an Map list (key task id) that will contain list of all tasks that are inserted as they are created
 		def collectionTaskSpecIds = []	// An array of the task spec ids that are determined to be collections (sets, trucks, cart, rack, gateway, milestones, etc) 
-		def lastMilestone = null	// Will track the most recent milestone task
-		def assetsLatestTask = [:]	// This map array will contain reference of the assets' last assigned task
-		def taskSpecList = [:]		// Used to track the ID #s of all of the taskSpecs in the recipe and holds last task created for some special cases
-		def missedDepList = [:].withDefault {[]}		// Will contain the list of 
-		def groups = [:]			// Used to hold groups of assets as defined in the groups section of the recipe that can then be reference in taskSpec filters
-		def terminalTasks = []		// Maintains the list of general tasks indicated that are terminal so that milestones don't connect to them as successors
+		def lastMilestone = null		// Will reference the most recent milestone task
+		def assetsLatestTask = [:]		// This map array will contain reference of the assets' last assigned task
+		def taskSpecList = [:]			// Used to track the ID #s of all of the taskSpecs in the recipe and holds last task created for some special cases
+		def groups = [:]				// Used to hold groups of assets as defined in the groups section of the recipe that can then be reference in taskSpec filters
+		def terminalTasks = []			// Maintains the list of general tasks indicated that are terminal so that milestones don't connect to them as successors
+		def missedDepList = [:].withDefault {[]}	// Used to track missing dependencies for an asset. The key will be the (asset.id_asset.category). The map that will 
+													// by default contain ArrayList that will be populated with a map including the task and several related objects.
 		
-		def wfList = null			// get list of workflows for each bundle
+		def wfList = null				// Will be populated with a List of workflows for each bundle
 		
-		def isMilestone=false		// Will flag if the current taskSpec is a milestone
+		def isMilestone=false			// Will flag if the current taskSpec is a milestone
 		def isGateway = false
 		def isAsset = false
 		def isGeneral = false
@@ -1433,11 +1446,15 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					if ( groups[g.name].size() == 0 ) {
 						exceptions.append("Found zero (0) assets for group ${g.name}<br/>")
 					} else {
-						log.info "Group ${g.name} contains: ${groups[g.name].size()} elements"
+						log.info "Group ${g.name} contains: ${groups[g.name].size()} assets"
 					}
-					out.append("Group ${g.name} has ${groups[g.name].size()} asset(s)<br/>")
 				}
 			}
+			out.append('Assets in Groups:<ul>')
+			groups.each { n, l ->
+				out.append("<li>$n (contains ${l.size()} assets): ${l*.assetName}")
+			}
+			out.append('</ul>')
 
 			// Now iterate over each of the task specs
 			recipeTasks.each { taskSpec ->
@@ -1562,7 +1579,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					}
 				}
 				
-				out.append("=======<br/>Processing taskSpec ${taskSpec.id}-${taskSpec.description} ($stepType):<br/>")
+				out.append("======<br/>Processing taskSpec ${taskSpec.id}-${taskSpec.description} ($stepType):<br/>")
 
 				switch (stepType) {
 					
@@ -1582,10 +1599,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						
 						log.info "milestone isRequired = $isRequired"
 						
-						// Adjust the SQL query to exclude any terminal tasks 
-						//def noSuccessorsSqlFinal = (terminalTasks.size() == 0) ? noSuccessorsSql : 
-						//	"$noSuccessorsSql AND t.asset_comment_id NOT IN (${GormUtil.asCommaDelimitedString(terminalTasks)})"
-						
 						// Now find all tasks that don't have have successor (excluding the current milestone task) and
 						// create dependency where the milestone is the successor
 						def tasksNoSuccessors = []
@@ -1595,7 +1608,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							}
 						}
 
-						//def tasksNoSuccessors = jdbcTemplate.queryForList(noSuccessorsSqlFinal)
 						//log.info "SQL for noSuccessorsSql: $noSuccessorsSqlFinal"
 						log.info "generateRunbook: Found ${tasksNoSuccessors.count()} tasks with no successors for milestone ${taskSpec.id}, $moveEvent"
 					
@@ -1723,8 +1735,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						}
 					
 						def assetsForTask = findAllAssetsWithFilter(moveEvent, taskSpec.filter, groups, exceptions)
-						log.info "Found (${assetsForTask?.size()}) assets for taskSpec ${taskSpec.id}-${taskSpec.description}"
-						if ( !assetsForTask || assetsForTask.size()==0) return // aka continue
+						log.info "Found ${assetsForTask?.size()} assets for taskSpec ${taskSpec.id}-${taskSpec.description}"
+						if ( !assetsForTask || assetsForTask.size()==0) 
+							return // aka continue
 					
 						//
 						// Create a task for each asset based on the filtering of the taskSpec
@@ -1733,7 +1746,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							workflow = getWorkflowStep(taskWorkflowCode, asset.moveBundle.id)
 							newTask = createTaskFromSpec(recipeId, whom, taskList, ++lastTaskNum, moveEvent, taskSpec, projectStaff, exceptions, workflow, asset)
 							tasksNeedingPredecessors << newTask
-							out.append("Created task $newTask<br/>")
+							out.append("Created asset based task $newTask<br/>")
 						} 
 						
 						// If we have predecessor.mode (s|r) then we'll doing linkage via Asset Dependency otherwise we'll link asset to asset directly
@@ -1814,7 +1827,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				//   ASSET_MODE: Map dependencies based on asset relationships.
 				//        i. TaskSpec contains predecessor.mode - then wire tasksNeedingPredecessors to their assets' previous step or prior milestone if none was found 
 				//       ii. This can support group and other predecessor filter parameters
-				//      iii. If group is presented then the tasksNeedingPredecessors will be wired to those found in the group and exceptions reported for those not found
+				//      iii. If group is presented then the tasksNeedingPredecessors will be wired to those found in the group and exceptions are reported for those not found
 				//   TASK_MODE: Map dependencies based on predecessor.taskSpec
 				//        i. tasksNeedingPredecessors and referenced taskSpec both have assets then they will be wired one-to-one
 				//       ii. Either tasksNeedingPredecessors or referenced taskSpec DON'T have assets, all tasksNeedingPredecessors will be wired to all tasks from taskSpec
@@ -1941,12 +1954,13 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					tasksNeedingPredecessors.each() { tnp ->
 						log.info("### tasksNeedingPredecessors.each(): Processing $mapMode for task $tnp")
 
-
 						if (tnp.assetEntity) {
 							// Attempt to resolve any missed dependencies that may have occurred during an earlier step in the process.
-							// This can occur for instance when there are multiple Application shutdown taskSpec and there were references in  
-							// an earlier task spec that references an application created in subsquent steps. We track this in the 
-							// missedDepList. Missed dependencies are ONLY matched if they both occur in the same category (e.g. Shutdown)
+							// For example, this can occur when there are multiple Application shutdown taskSpecs for various groups of application where there are 
+							// dependencies between two or more applications. If the interdependent application shutdown tasks are created in separate task specs we 
+							// need away to bind them together when the subsequent taskspec is processed.
+							// These missed dependencies are tracked in the missedDepList map. Missed dependencies are ONLY matched if they both occur in the same 
+							// category (e.g. Shutdown).
 							def missedDepKey = "${tnp.assetEntity.id}_${tnp.category}"
 							log.info "missedDepList lookup for: $missedDepKey"
 							if (missedDepList[missedDepKey]) {
@@ -1957,7 +1971,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 									def prevTask = AssetComment.get(it.taskId)
 									if (prevTask) {
 										log.info "Resolved missed dependency between $prevTask and $tnp"
-										// The missed relationship earlier was that this asset was a predecessor however it hadn't been created yet
+										// The missed relationship earlier was that where this asset 
 
 										// Lets see if we have an inverse relationship (e.g. Auto App Shutdown) so that we can switch the sequence
 										// that the tasks are to be completed.
@@ -2073,9 +2087,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 								
 									log.info "Processing from hasTaskSpec"
 								
-									// Use the predecessorTasks array that was initialized earlier and if those tasks and the current task have assets then wire up
-									// the predecessor one-to-one for each asset otherwise wire the current task to all tasks in the predecessorTasks. If both have assets and 
-									// we are unable to find a predecessor task for the same asset, the current task will be wired to the most recent milestone if it exists.
+									// Use the predecessorTasks array that was initialized earlier. If any of those tasks and the current task are associated with the
+									// same asset then wire up the predecessor tasks one-to-one for each asset otherwise wire the current task to all tasks in the 
+									// predecessorTasks. If both have assets and we are unable to find a predecessor task for the same asset, the current task will 
+									// be wired to the most recent milestone if it exists.
 									if (predecessorTasks.size() > 0) {
 									
 										// See if we're linking task to task by asset 
@@ -2096,7 +2111,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 												// Push the task onto the missing pred stack to be wired later if possible
 												// TODO - Need to validate that this is necessary as it might wire things wrong
-												saveMissingDep(missedDepList, "${tnp.assetEntity.id}_${tnp.category}", taskSpec, tnp, isRequired, lastMilestone)
+												saveMissingDep(missedDepList, "${tnp.assetEntity.id}_${tnp.category ?: 'BLANK'}", taskSpec, tnp, isRequired, lastMilestone)
 
 												//log.info(msg)
 												//exceptions.append("${msg}<br/>")
@@ -2320,11 +2335,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def sql = baseSql
 
 		def map = ['assetId':asset.id]
+		def sqlMap
 
 		// Add additional WHERE expresions to the SQL
 		supportedPredFilterProps.each() { prop ->
 			if (taskSpec.predecessor?.containsKey(prop)) {
-				def sqlMap = SqlUtil.whereExpression("ad.$prop", taskSpec.predecessor[prop], prop)
+				sqlMap = SqlUtil.whereExpression("ad.$prop", taskSpec.predecessor[prop], prop)
 				if (sqlMap) {
 					sql = SqlUtil.appendToWhere(sql, sqlMap.sql)
 					if (sqlMap.param) {
@@ -2337,6 +2353,14 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 			
 		}
+
+		// Add filter on the classification (asset.type presently) if it was declared (this is filtering on the apposing asset.assetType property)
+		if (taskSpec.predecessor?.containsKey('classification') && taskSpec.predecessor.classification) {
+			sqlMap = SqlUtil.whereExpression("ad.${assocAssetPropName}.assetType", taskSpec.predecessor.classification, 'classification')
+			sql = SqlUtil.appendToWhere(sql, sqlMap.sql)
+			map['classification'] = sqlMap.param
+			log.info "getAssetDependencies: Added classification filter ${sqlMap.sql}, ${sqlMap.param}"
+		}
 		
 		log.info "getAssetDependencies: depMode=$depMode, SQL=$sql, PARAMS=$map"
 		list = AssetDependency.findAll(sql, map)
@@ -2345,8 +2369,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// Now need to find the nested logic associations (e.g. APP > DB > SRV or APP > Storage > SAN) and 
 		// add the dependency of the logic asset to the current asset's dependencies.
 		list.each() { dep ->
-
-			// finalList.add(dep)
 
 			// Call the recursive routine that will find any nested dependencies (e.g. App > DB > DB App or App > LUN > Storage App)
 			def nestedDep = traverseDependencies(asset, dep, currAssetPropName, assocAssetPropName, baseSql)
@@ -2371,7 +2393,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 	/**
 	 * This is a recursive helper method used by getAssetDependencies to traverse the dependencies of an asset to find other correlating 
-	 * assets that should be linked from a dependency standpoint. It will examine the assets in the dependency and if the related to asset
+	 * assets that should be linked from a dependency standpoint. It will examine the assets in the dependency and if the associated asset
 	 * is a logical then it will traverse logical's dependencies to find a real asset. If the origin asset is an application and it finds
 	 * a device dependency, it will attempt to traverse to find any dependency application, primarilly looking for database clusters, 
 	 * VM Clusters or Storage Apps (e.g. App > Server > logical DB > DB App; or App > logical DB > DB App).
