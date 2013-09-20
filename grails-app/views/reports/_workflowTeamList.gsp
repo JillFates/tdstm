@@ -15,16 +15,16 @@
 				</tr>
 			</thead>
 			<tbody>
-				<g:each in="${bundle.teamList}" var="teamList" status="i">
+				<g:each in="${bundle.teamList}" var="teams" status="i">
 					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-						<td> ${teamList.name[0]} </td>
-						<td> ${teamList.role[0]} </td>
+						<td> ${teams.name} </td>
+						<td> ${teams.role} </td>
 						<td>
 							<table style="border: 0px;">
 								<tr>
-									<td><g:each in="${teamList.teamList[0]}" var="teamListtaff">
+									<td><g:each in="${teams.teamList}" var="teamListStaff">
 										<tr>
-											<td> ${teamListtaff.company[0]}:${teamListtaff.name}</td>
+											<td> ${teamListStaff.company[0]}:${teamListStaff.name}</td>
 										</tr>
 										</g:each>
 									 </td>
@@ -32,7 +32,7 @@
 							</table>
 						</td>
 						<td>
-							${teamList.assetSize[0]}
+							${teams.assetSize}
 						</td>
 					</tr>
 				</g:each>
