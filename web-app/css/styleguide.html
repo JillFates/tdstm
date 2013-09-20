@@ -1,0 +1,610 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW" />
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+    <title>TDS Style Example</title>
+    <link type="text/css" rel="stylesheet" href="/tdstm/css/tdsexample.css" />
+    <link rel="stylesheet" href="/tdstm/css/main.css" type="text/css"/>
+    <link rel="stylesheet" href="/tdstm/css/tds.css" type="text/css"/>
+    <link rel="shortcut icon" href="/tdstm/images/tds.ico" type="image/x-icon" />
+    <link type="text/css" rel="stylesheet" href="/tdstm/css/ui.core.css" />
+    <link type="text/css" rel="stylesheet" href="/tdstm/css/ui.dialog.css" />
+    <link type="text/css" rel="stylesheet" href="/tdstm/css/ui.theme.css" />
+    <link rel="stylesheet" href="/tdstm/css/ui.datetimepicker.css" type="text/css"/>
+   	<link type="text/css" rel="stylesheet" href="/tdstm/css/jquery-ui-smoothness.css" />
+	<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css"
+		href="/tdstm/plugins/jquery-ui-1.8.15/jquery-ui/themes/ui-lightness/jquery-ui-1.8.15.custom.css"/>
+	<link type="text/css" rel="stylesheet" href="/tdstm/css/combox.css" />
+	<link type="text/css" rel="stylesheet" href="/tdstm/css/select2.css" />
+	<link type="text/css" rel="stylesheet" href="/tdstm/css/combox.css" />
+    <script type="text/javascript" src="/tdstm/js/prototype/prototype.js"></script>
+    <script type="text/javascript" src="/tdstm/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="/tdstm/js/jquery-1.9.1-ui.js"></script>
+	<script type="text/javascript" src="/tdstm/js/datetimepicker.js"></script>
+	<script type="text/javascript" src="/tdstm/js/jquery-migrate-1.0.0.js"></script>
+    <script type="text/javascript" src="/tdstm/js/crawler.js"></script>
+	<script type="text/javascript" src="/tdstm/js/select2.js"></script>
+	<script type="text/javascript" src="/tdstm/js/jquery.combox.js"></script>
+<meta name="layout" content="projectHeader"/>
+    <link type="text/css" rel="stylesheet" href="/tdstm/css/dropDown.css" />
+   <script type="text/javascript">
+   		$(document).ready(function() {
+      		$("#personDialog").dialog({ autoOpen: false })
+      		$("#userPrefDivId").dialog({ autoOpen: false })
+      		var currentURL = window.location.pathname
+      		new Ajax.Request('/tdstm/userLogin/updateLastPageLoad',{asynchronous:true,evalScripts:true,parameters:'url=' + currentURL });
+      		// Due to some issue with textarea overriding the value at intial load
+      		$('textarea').each(function(){
+      			$(this).val($(this).text())
+      		});
+     	})
+     	var emailRegExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/
+     	var dateRegExpForExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
+     	var currentMenuId = "";
+     	var B1 = []
+     	var B2 = []
+     	var taskManagerTimePref = "60"
+		var contextPath = "/tdstm"
+		var isIE7OrLesser  = jQuery.browser.msie && parseInt(jQuery.browser.version) < 8 ? true : false
+   </script>
+  </head>
+  <body>
+    <div class="main_body">
+      <input id="contextPath" type="hidden" value="/tdstm"/>
+		<div class="tds_header">
+      	<div class="header_left">
+			<a href="http://www.transitionaldata.com/" target="new"><img src="/tdstm/images/tds3.png" style="float: left;border: 0px;height: 30px;"/></a>      	    
+		</div>
+      <div class="title">&nbsp;TransitionManager&trade;- Style Example</div>
+        <div class="header_right" id="userMenuId"><br />
+          <div style="font-weight: bold;">
+			<strong>
+			<div style="float: left;">
+			<a href="/tdstm/person/getPersonDetails/59" onclick="new Ajax.Request('/tdstm/person/getPersonDetails/59',{asynchronous:true,evalScripts:true,onComplete:function(e){updatePersonDetails(e)}});return false;" onmouseover="waitForMenu('#userMegaMenu')" onmouseout="waitForMenu('', 'false')" style="float:left;display:inline">
+			&nbsp;<span id="loginUserId">Craig
+				<a id="userAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#userMegaMenu')" href="javascript:showMegaMenu('#userMegaMenu')" style="float:left;display:inline"></a> </span>
+			</a>
+			</div>
+			<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">EDT</span>
+				time<ul>
+				<li><a href="#">GMT</a></li>
+				<li><a href="#PS">PST</a></li>
+				<li><a href="#PD">PDT</a></li>
+				<li><a href="#MS">MST</a></li>
+				<li><a href="#MD">MDT</a></li>
+				<li><a href="#CS">CST</a></li>
+				<li><a href="#CD">CDT</a></li>
+				<li><a href="#ES">EST</a></li>
+				<li><a href="#ED">EDT</a></li>
+				</ul>
+			</div>
+			</strong>
+              &nbsp;&nbsp;<a href="#"></a>
+          </div>
+        </div>
+      </div>
+	      <div class="menu2">
+	      <ul>
+			<li id="adminMenuId"><a href="#" class="home menuhideright" onmouseover="waitForMenu('#adminMegaMenu', 'false')" onmouseout="waitForMenu('', 'false')">Admin
+				<a id="adminAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#adminMegaMenu')" onmouseout="waitForMenu('', 'false')" href="javascript:showMegaMenu('#adminMegaMenu')" style="display: inline"></a></a>
+    		    <div class="megamenu admin" id="adminMegaMenu" onmouseover="showMegaMenu('#adminMegaMenu')" onmouseout="waitForMenu('', 'false')" style="display: none;">
+					<table class="mmtable room_rack"><tr>
+					<td style="vertical-align:top" nowrap="nowrap"><span class="megamenuSection">Administration</span><br />
+					</td>
+					<td style="vertical-align:top"><span class="megamenuSection">Manage Clients</span><br />
+						<ul >
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('adminMegaMenu')">List Companies</a></li>
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('adminMegaMenu')">List Staff</a></li>
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('adminMegaMenu')">List Users</a></li>
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('adminMegaMenu')">Import Accounts</a></li>
+							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMCreatePerson?cover=print','help');" onclick="hideMegaMenu('adminMegaMenu')">help</a></li>
+						</ul>
+					</td>
+					<td style="vertical-align:top"><span class="megamenuSection">Manage Workflows</span><br />
+						<ul >
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('adminMegaMenu')">List Workflows </a> </li>
+							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMManageWorkflows?cover=print','help');" onclick="hideMegaMenu('adminMegaMenu')">help</a></li>
+						</ul>
+					</td>
+					<td style="vertical-align:top"><span class="megamenuSection">Manage Model Library</span><br />
+						<ul >
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('adminMegaMenu')">List Manufacturers</a></li>
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('adminMegaMenu')">List Models</a></li>
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('adminMegaMenu')">Sync Libraries</a></li>
+							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMModelLibrary?cover=print','help');" onclick="hideMegaMenu('adminMegaMenu')">help</a></li>
+						</ul>
+					</td>
+					</tr></table>
+				</div>
+			</li>
+			<li id="projectMenuId" style="position:relative; float: left;" ><a href="#" class="home" onmouseover="waitForMenu('#projectMegaMenu','false')" onmouseout="waitForMenu('', 'false')">Client/Project
+				<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#projectMegaMenu')" onmouseout="waitForMenu('', 'false')" href="javascript:showMegaMenu('#projectMegaMenu')" style="display: inline"></a></a>
+				<div class="megamenu client" id="projectMegaMenu" onmouseover="showMegaMenu('#projectMegaMenu')" onmouseout="waitForMenu('', 'false')" style="display: none;">
+					<table class="mmtable"><tr>
+						<td style="vertical-align:top">
+							<ul>
+								<li><a href="#" class="mmlink" onclick="hideMegaMenu('projectMegaMenu')">List Projects</a></li>
+							</ul>
+						<span class="megamenuSection">For <strong>ProjectName</strong></span><br />
+							<ul >
+								<li><a href="#" class="mmlink" onclick="hideMegaMenu('projectMegaMenu')">ProjectName Settings</a></li>
+								<li><a href="#" class="mmlink" onclick="hideMegaMenu('projectMegaMenu')">Project Staff</a></li>
+								<li><a href="#" class="mmlink" onclick="hideMegaMenu('adminMegaMenu')">Field Importance</a> </li>
+							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMProjectStaff?cover=print','help');"  onclick="hideMegaMenu('projectMegaMenu')">help</a></li>
+						</ul>
+					</td>
+					</tr></table>
+				</div>
+			</li>
+			<li id="roomMenuId" style="position:relative; float: left;"><a href="#" class="home" onmouseover="waitForMenu('#racksMegaMenu', 'false')" onmouseout="waitForMenu('', 'false')">Rooms</a>
+				<div class="megamenu rooms" id="racksMegaMenu" onmouseover="showMegaMenu('#racksMegaMenu')" onmouseout="waitForMenu('', 'false')" style="display: none;">
+					<table class="mmtable room_rack" ><tr>
+					<td style="vertical-align:top"><span class="megamenuSection">Rooms</span><br />
+						<ul >
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('racksMegaMenu')">List Rooms</a></li>
+							<li><a class="mmlink" href="#">help</a></li>
+						</ul>
+					</td>
+					<td style="vertical-align:top"><span class="megamenuSection">Racks</span><br />
+						<ul >
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('racksMegaMenu')">Racks</a></li>
+							<li><a class="mmlink" href="#" onclick="hideMegaMenu('racksMegaMenu')">help</a></li>
+						</ul>
+					</td>
+					</tr></table>
+				</div>
+			</li>
+			<li id="rackMenuId" ><a href="#" class="home" onmouseover="waitForMenu('#racksMegaMenu', 'false')" onmouseout="waitForMenu('', 'false')">Racks
+				<a id="rackAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#racksMegaMenu')" onmouseout="waitForMenu('', 'false')" href="javascript:showMegaMenu('#racksMegaMenu')" style="float: left"></a></a>
+				</li>
+			<li id="assetMenuId" style="position:relative; float:left;"><a href="#" class="home" onmouseover="waitForMenu('#assetMegaMenu', 'false')" onmouseout="waitForMenu('', 'false')">Assets
+				<a id="assetAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#assetMegaMenu')" onmouseout="waitForMenu('', 'false')" href="javascript:showMegaMenu('#assetMegaMenu')" style="display: inline"></a></a>
+				<div class="megamenu rooms" id="assetMegaMenu" onmouseover="showMegaMenu('#assetMegaMenu')" onmouseout="waitForMenu('', 'false')" style="display: none;">
+					<table class="mmtable room_rack"><tr>
+					<td style="vertical-align:top"><span class="megamenuSection">Assets</span><br />
+						<ul>
+							<li><a href="#" class="mmlink">Summary</a></li>
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('assetMegaMenu')">List Apps</a></li>
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('assetMegaMenu')">List Servers</a></li>
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('assetMegaMenu')">List DBs</a></li>
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('assetMegaMenu')">List Storage</a></li>
+							  <li><a href="#" class="mmlink" onclick="hideMegaMenu('assetMegaMenu')">List Dependencies</a></li>
+							  <li><a href="#" class="mmlink" onclick="hideMegaMenu('assetMegaMenu')">Dependency Console</a></li>
+							<li><a class="mmlink" href="#" onclick="hideMegaMenu('assetMegaMenu')">help</a></li>
+						</ul>
+					</td>
+					<td style="vertical-align:top"><span class="megamenuSection">Manage Data</span><br />
+						<ul>
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('assetMegaMenu')">Import</a></li>
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('assetMegaMenu')">Manage Batches</a></li>
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('assetMegaMenu')">Export</a></li>
+							<li><a href="#" class="mmlink" onclick="hideMegaMenu('assetMegaMenu')">Asset Comments</a></li>
+							<li><a class="mmlink" href="#" onclick="hideMegaMenu('assetMegaMenu')">help</a></li>
+						</ul>
+					</td>
+					</tr></table>
+				</div>
+			</li>
+			<li id="eventMenuId" style="position:relative; float: left;"><a href="#" class="home" onmouseover="waitForMenu('#bundleMegaMenu', 'false')" onmouseout="waitForMenu('', 'false')">Events </a>
+				<div class="megamenu rooms" id="bundleMegaMenu" onmouseover="showMegaMenu('#bundleMegaMenu')" onmouseout="waitForMenu('', 'false')" style="display: none;">
+					<table class="mmtable " ><tr>
+					<td style="vertical-align:top"><span class="megamenuSection">Events</span><br />
+					</td>
+					<td style="vertical-align:top"><span class="megamenuSection">Bundles</span><br />
+					</td>
+					</tr></table>
+				</div>
+			</li>
+			<li id="bundleMenuId" style="position:relative; float:left;"><a href="#" class="home" onmouseover="waitForMenu('#bundleMegaMenu', 'false')" onmouseout="waitForMenu('', 'false')">Bundles
+				<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#bundleMegaMenu')" onmouseout="waitForMenu('', 'false')" href="javascript:showMegaMenu('#bundleMegaMenu')" style="display: inline"></a></a>
+			</li>
+			<li id="teamMenuId" style="position:relative; float:left;"><a class="home" onmouseover="waitForMenu('#teamMegaMenu','false')" onmouseout="waitForMenu('', 'false')" href="#" >Tasks</a>
+				<a id="teamMenuAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#teamMegaMenu')" onmouseout="waitForMenu('', 'false')" href="javascript:showMegaMenu('#teamMegaMenu')" style="display: inline"></a>
+				<div class="megamenu rooms" id="teamMegaMenu" onmouseover="showMegaMenu('#teamMegaMenu')" onmouseout="waitForMenu('', 'false')" style="display: none;">
+					<table class="mmtable"><tr>
+					<td style="vertical-align:top"><span class="megamenuSection">Tasks</span><br />
+					</td>
+					</tr></table>
+				</div>
+			</li>
+			<li id="consoleMenuId" style="position:relative; float:left;"><a href="#" class="home" onmouseover="waitForMenu('#consoleMegaMenu', 'false')" onmouseout="waitForMenu('', 'false')">Console
+				<a id="consoleAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#consoleMegaMenu')" onmouseout="waitForMenu('', 'false')" href="javascript:showMegaMenu('#consoleMegaMenu')" style="display: inline"></a></a>
+			    <div class="megamenu rooms" id="consoleMegaMenu" onmouseover="showMegaMenu('#consoleMegaMenu')" onmouseout="waitForMenu('', 'false')" style="display: none;">
+					<table class="mmtable room_rack"><tr>
+					<td style="vertical-align:top"  ><span class="megamenuSection">Supervisor Console</span><br />
+					</td>
+					<td style="vertical-align:top"><span class="megamenuSection">News</span><br />
+						<ul>
+						</ul>
+					</td>
+					<td style="vertical-align:top"><span class="megamenuSection">Cart Tracker</span><br />
+						<ul>
+						</ul>
+					</td>
+					</tr></table>
+				</div>
+			</li>
+			<li id="dashboardMenuId" style="position:relative; float:left;"><a href="#" class="home" onmouseover="waitForMenu('#dashboardMegaMenu', 'false')" onmouseout="waitForMenu('', 'false')">Dashboards</a>
+				<a id="dashboardAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#dashboardMegaMenu')" onmouseout="waitForMenu('', 'false')" href="javascript:showMegaMenu('#dashboardMegaMenu')" style="display: inline"></a>
+				<div class="megamenu rooms" id="dashboardMegaMenu" onmouseover="showMegaMenu('#dashboardMegaMenu')" onmouseout="waitForMenu('', 'false')" style="display: none;">
+					<table class="mmtable"><tr>
+					<td style="vertical-align:top"><span class="megamenuSection">Live Dashboards</span><br />
+					</td>
+					</tr></table>
+				</div>
+			</li>
+			<li id="reportsMenuId" style="position:relative; float: left;"><a href="#" class="home" onmouseover="waitForMenu('#reportsMegaMenu', 'false')" onmouseout="waitForMenu('', 'false')">Reports
+				<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s" onmouseover="waitForMenu('#reportsMegaMenu')" onmouseout="waitForMenu('', 'false')" href="javascript:('#reportsMegaMenu')" style="display: inline"></a></a>
+				<div class="megamenu reports" id="reportsMegaMenu" onmouseover="showMegaMenu('#reportsMegaMenu')" onmouseout="waitForMenu('', 'false')" style="display: none;">
+					<table class="mmtable "><tr>
+					</tr></table>
+				</div>
+	        </li>
+	      </ul>
+	    </div>
+		<div class="megamenu" id="userMegaMenu" onmouseover="showMegaMenu('#userMegaMenu')" onmouseout="waitForMenu('', 'false')" style="display: none; width:255px">
+			<table class="mmtable"><tr>
+			<td style="vertical-align:top"><span class="megamenuSection">Craig</span><br />
+				<ul>
+					<li><a href="/tdstm/person/getPersonDetails/59" onclick="new Ajax.Request('/tdstm/person/getPersonDetails/59',{asynchronous:true,evalScripts:true,onComplete:function(e){updatePersonDetails(e)}});return false;">Account settings...</a></li>
+					<li><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="craig" onclick="editPreference()">Edit preferences</a></li>
+					<li><a href="#" class="home mmlink">Use Mobile Site</a></li>
+					<li><a href="#">Model Score: 19101</a></li>
+				</ul>
+			</td>
+			<td style="vertical-align:top">
+				<ul>
+					<li><a href="#" class="mmlink">Sign out</a></li>
+				</ul>
+			</td>
+			</tr></table>
+		</div>
+	<div class="main_bottom"><div id="messageDiv" class="message" style="display:none"></div>
+  <div class="body" style="width: 900px">
+  <div>
+  <h1>Page Title</h1>
+  </div>
+  <table style="width:700px;">
+     <thead>
+      <tr>
+	     <th>table header</th>
+	     <th style="text-align:center;"><a href="#">Applications</a> </th>
+	     <th style="text-align:center;"><a href="#">Assets</a></th>
+	     <th style="text-align:center;"><a href="#">Database</a></th>
+	     <th style="text-align:center;"><a href="#">Storage</a></th>
+	   </tr>
+    </thead>
+   <tbody>
+         <tr class="odd">
+	          <td>M1</td>
+	            <td  style="text-align:right;"><a href="#">5</a></td>
+	            <td  style="text-align:right;"><a href="#">33</a></td>
+	            <td  style="text-align:right;"><a href="#">59</a></td>
+	           <td  style="text-align:right;"></td>
+         </tr>
+         <tr class="even">
+	          <td>M2</td>
+	            <td  style="text-align:right;"><a href="#">8</a></td>
+	            <td  style="text-align:right;"><a href="#">9</a></td>
+	            <td  style="text-align:right;"><a href="#">1</a></td>
+	           <td  style="text-align:right;"></td>
+         </tr>
+         <tr class="odd">
+	          <td>M3</td>
+	            <td  style="text-align:right;"><a href="#">69</a></td>
+	            <td  style="text-align:right;"><a href="#">142</a></td>
+	            <td  style="text-align:right;"><a href="#">32</a></td>
+	            <td  style="text-align:right;"><a href="#">1</a></td>
+         </tr>
+         <tr class="even">
+	          <td>M4</td>
+	           <td  style="text-align:right;"></td>
+	           <td  style="text-align:right;"></td>
+	           <td  style="text-align:right;"></td>
+	           <td  style="text-align:right;"></td>
+         </tr>
+        <tr class='odd'>
+	          <td  style="text-align:right;"><b>Total</b></td>
+	          <td  style="text-align:right;"><b><a href="#">568</a></b></td>
+	          <td  style="text-align:right;"><b><a href="#">945</a></b></td>
+	          <td  style="text-align:right;"><b><a href="#">315</a></b></td>
+	          <td  style="text-align:right;"><b><a href="#">470</a></b></td>
+         </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+	</div>
+    <div id="personDialog" title="Edit Person" style="display:none;">
+      <div class="dialog">
+          <div class="dialog">
+            <table>
+              <tbody>
+				<tr>
+					<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+				</tr>
+				<tr class="prop">
+					<td valign="top" class="name">
+						<label for="firstName"><b>First Name:&nbsp;<span style="color: red">*</span></b></label>
+					</td>
+					<td valign="top" class="value">
+						<input type="text" maxlength="64" id="firstNameId" name="firstName"/>
+					</td>
+				</tr>
+				<tr class="prop" style="display:none;">
+					<td valign="top" class="name">
+						<label for="username"><b>User Name:&nbsp;<span style="color: red">*</span></b></label>
+					</td>
+					<td valign="top" class="value">
+						<input type="text" maxlength="64" id="prefUsernameId" name="username" value="craig"/>
+					</td>
+				</tr>
+				<tr class="prop">
+				  <td valign="top" class="name">
+					<label for="middleName">Middle Name:</label>
+				  </td>
+				  <td valign="top" class="value">
+					<input type="text" maxlength="64" id="middleNameId" name="middleName"/>
+	              </td>
+                </tr>
+                <tr class="prop">
+                  <td valign="top" class="name">
+                    <label for="lastName">Last Name:</label>
+                  </td>
+                  <td valign="top" class="value">
+                    <input type="text" maxlength="64" id="lastNameId" name="lastName"/>
+                  </td>
+                </tr>
+                <tr class="prop">
+                  <td valign="top" class="name">
+                    <label for="nickName">Nick Name:</label>
+                  </td>
+                  <td valign="top" class="value">
+                    <input type="text" maxlength="64" id="nickNameId" name="nickName"/>
+                  </td>
+                </tr>
+                <tr class="prop">
+                  <td valign="top" class="name">
+                    <label for="title">Title:</label>
+                  </td>
+                  <td valign="top" class="value">
+                    <input type="text" maxlength="34" id="titleId" name="title"/>
+                  </td>
+                </tr>
+                <tr class="prop">
+                  <td valign="top" class="name">
+                    <label for="nickName">Email:</label>
+                  </td>
+                  <td valign="top" class="value">
+                    <input type="text" maxlength="64" id="emailId" name="email"/>
+                  </td>
+                </tr>
+	                <tr class="prop">
+						<td valign="top" class="name">
+							<label for="nickName"><b>Expiry Date:<span style="color: red">*</span></label>
+						</td>
+						<td valign="top" class="value">
+						<script type="text/javascript">
+							$(document).ready(function(){
+					        	$("#expiryDateId").datetimepicker();
+					        });
+						</script>
+	        	        <input type="text" maxlength="64" id="expiryDateId" name="expiryDate"/>
+						<input type="text" maxlength="64" id="expiryDateId" name="expiryDate" readonly="readonly" style="background: none;border: 0"/>
+						</td>
+					</tr>
+                <tr class="prop">
+					<td valign="top" class="name">
+						<label for="title">Time Zone:</label>
+					</td>
+					<td valign="top" class="value">
+						<select name="timeZone" id="timeZoneId" >
+<option value="GMT" >GMT</option>
+<option value="PST" >PST</option>
+<option value="PDT" >PDT</option>
+<option value="MST" >MST</option>
+<option value="MDT" >MDT</option>
+<option value="CST" >CST</option>
+<option value="CDT" >CDT</option>
+<option value="EST" >EST</option>
+<option value="EDT" selected="selected" >EDT</option>
+</select>
+					</td>
+				</tr>
+					<tr class="prop">
+						<td valign="top" class="name">
+							<label for="startPage">Start Page:</label>
+						</td>
+						<td valign="top" class="value">
+							<select name="startPage" id="startPage" >
+<option value="Project Settings" >Project Settings</option>
+<option value="Current Dashboard" >Current Dashboard</option>
+<option value="Admin Portal" >Admin Portal</option>
+</select>
+						</td>
+					</tr>
+				<tr class="prop">
+					<td valign="top" class="name">
+                       <label for="title">Power In:</label>
+					</td>
+					<td valign="top" class="value">
+						<select name="powerType" id="powerTypeId" >
+<option value="Watts" selected="selected" >Watts</option>
+<option value="Amps" >Amps</option>
+</select>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td valign="top" class="name">
+                       <label for="title">Model Score:</label>
+					</td>
+					<td valign="top" class="value">
+                       <input type="text" name ="modelScore" id ="modelScoreId" readonly="readonly" value="19101"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Hide password:
+					</td>
+					<td>
+						<input type="checkbox" onchange="togglePasswordVisibility(this)" id="showPasswordId"/>
+					</td>
+				</tr>
+              	<tr class="prop">
+                	<td valign="top" class="name">
+                    	<label for="password">Old Password:&nbsp;</label>
+					</td>
+                    <td valign="top" class="value">
+                    	<input type="hidden" id="personId" name="personId" value=""/>
+						<input type="text" maxlength="25" name="oldPassword" id="oldPasswordId" value=""/>
+					</td>
+				</tr>
+              	<tr class="prop">
+                	<td valign="top" class="name">
+                    	<label for="password">New Password:&nbsp;</label>
+					</td>
+                    <td valign="top" class="value">
+						<input type="text" maxlength="25" name="newPassword" onkeyup="checkPassword(this)" id="newPasswordId" value=""/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Requirements:
+					</td>
+					<td>
+						<em id="usernameRequirementId">Password must not contain the username</em><br/>
+						<em id="lengthRequirementId">Password must be at least 8 characters long</em><br/>
+						<b id="passwordRequirementsId">Password must contain at least 3 of these requirements: </b><br/>
+						<ul>
+							<li><em id="uppercaseRequirementId">Uppercase characters</em></li>
+							<li><em id="lowercaseRequirementId">Lowercase characters</em></li>
+							<li><em id="numericRequirementId">Numeric characters</em></li>
+							<li><em id="symbolRequirementId">Nonalphanumeric characters</em></li>
+						</ul>
+					</td>
+				</tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="buttons">
+            <span class="button"><input type="button" class="edit" value="Update" onclick="changePersonDetails()"/></span>
+            <span class="button"><input type="button" class="delete" onclick="jQuery('#personDialog').dialog('close')" value="Cancel" /></span>
+          </div>
+          <html>
+	<head>
+		<title>Insert title here</title>
+		<script type="text/javascript">
+			$(document).ready(function() {
+    			$("#createNewsDialog").dialog({ autoOpen: false })
+			})
+		</script>
+	</head>
+	<body>
+  		<div class="body">
+  		<div id="createNewsDialog" title="Create News Comment"  style="display: none;">
+			<input name="projectId" value="2079" type="hidden"/>
+			<input name="moveBundle" value="" type="hidden"/>
+			<input name="moveEvent.id" value="336" type="hidden" id="moveEventId"/>
+			<div class="dialog" style="border: 1px solid #5F9FCF">
+				<table id="createCommentTable" style="border: 0px">
+					<tr>
+						<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+					</tr>
+					<tr>
+						<td valign="top" class="name"><label>Comment Type:</label></td>
+						<td valign="top" class="value" >
+							<select disabled="disabled">
+								<option>News</option>
+							</select>
+						</td>
+					</tr>
+					<tr class="prop">
+						<td valign="top" class="name"><label for="messageId"><b>Comment:&nbsp;<span style="color: red">*</span></b></label></td>
+						<td valign="top" class="value"><textarea cols="80" rows="5" id="messageId" name="message" onkeyup="textCounter(this.id,255)" onkeydown="textCounter(this.id,255)"></textarea></td>
+					</tr>
+					<tr class="prop">
+						<td valign="top" class="name" nowrap="nowrap"><label for="isArchiveId" >Resolved / Archived:</label></td>
+						<td valign="top" class="value" id="archivedTdId">
+							<input type="checkbox" id="isArchivedId" value="0" onclick="updateHidden('isArchivedId','isArchivedHiddenId')"/>
+							<input type="hidden" name="isArchived" value="0" id="isArchivedHiddenId"/>
+						</td>
+					</tr>
+					<tr class="prop">
+						<td valign="top" class="name"><label for="resolutionNewsId">Resolution:</label></td>
+						<td valign="top" class="value" ><textarea cols="80" rows="5" id="resolutionNewsId" name="resolution"  onkeyup="textCounter(this.id,255)" onkeydown="textCounter(this.id,255)"></textarea> </td>
+					</tr>
+				</table>
+			</div>
+			<div class="buttons"><span class="button">
+				<input class="save" type="submit" value="Save" onclick="return validateCreateNewsForm()"/></span>
+					<span class="button">
+					<input class="delete" type="button" value="Cancel" onclick="this.form.reset();$('#createNewsDialog').dialog('close');"/>
+				</span>
+			</div>
+		</div>
+  	</div>
+	</body>
+</html>
+<script type="text/javascript">
+function openCreateNewsDialog(){
+	$("#createNewsDialog").dialog('option', 'width', 'auto');
+	$("#createNewsDialog").dialog('option', 'position', ['center','top']);
+	$('#createNewsDialog').dialog('open');
+}
+function updateHidden(checkBoxId,hiddenId){
+	var resolve = $("#"+checkBoxId).is(':checked');
+	if(resolve){
+		$("#"+hiddenId).val(1);
+	} else {
+		$("#"+hiddenId).val(0);
+	}
+}
+function validateCreateNewsForm(){
+	var moveEvent = $("#moveEventId").val();
+	var resolveBoo = $("#isArchivedId").is(':checked');
+	var resolveVal = $("#resolutionNewsId").val();
+	var comments = $("#messageId").val();
+	var validate = false;
+	if(moveEvent){
+		if(resolveBoo && resolveVal == ""){
+			alert('Please enter Resolution');
+		} else if( !comments ){
+			alert('Please enter Comment');
+		} else {
+			validate = true;
+		}
+	} else{
+		alert("Please Assign MoveEvent to Current Bundle")
+		return false;
+	}
+	if(validate){
+		//timedUpdate( $("#updateTimeId").val() );
+		new Ajax.Request('/tdstm/newsEditor/saveNews',{asynchronous:true,evalScripts:true,onComplete:function(e){closeDiv()},parameters:'moveEvent.id=' + moveEvent +'&message='+ comments +'&isArchived='+$('#isArchivedHiddenId').val()+'&resolution='+$('#resolutionNewsId').val()});
+	}
+}
+function closeDiv(){
+	$("#createNewsDialog").dialog("close");
+	$("#messageId").val("");
+	$("#resolutionNewsId").val("");
+	$('#isArchivedId').attr("checked",false)
+	//$('#isResolvedId').attr("checked",false)
+	//$("#showEditCommentDialog").dialog("close");
+}
+function textCounter(fieldId, maxlimit) {
+	var value = $("#"+fieldId).val()
+    if (value.length > maxlimit) { // if too long...trim it!
+    	$("#"+fieldId).val(value.substring(0, maxlimit));
+    	return false;
+    } else {
+    	return true;
+    }
+}
+</script>
+      </div>
+    </div>
+    <script type="text/javascript" src="/tdstm/js/tdsmenu.js"></script>
+    <div id="userPrefDivId" style="display: none" title="Craig Preferences">
+    </div>
+  </body>
+</html>
