@@ -14,7 +14,7 @@ html * {
 body {
     background: #fff;
     color: #333;
-    font: 11px verdana, arial, helvetica, sans-serif;
+    font: 11px helvetica neue, arial, sans-serif;
 }
 
 a:link, a:visited, a:hover {
@@ -51,7 +51,7 @@ ul {
 input, select, textarea {
     background-color: #fcfcfc;
     border: 1px solid #ccc;
-    font: 11px verdana, arial, helvetica, sans-serif;
+    font: 11px helvetica neue, arial, sans-serif;
     margin: 2px 0;
     padding: 2px 4px;
 }
@@ -148,7 +148,7 @@ tr {
 	padding: 0px 6px;
 }
 td, th { 
-    font: 11px verdana, arial, helvetica, sans-serif;
+    font: 11px helvetica neue, arial, sans-serif;
     line-height: 11px;
     padding: 5px 6px;
     text-align: left;

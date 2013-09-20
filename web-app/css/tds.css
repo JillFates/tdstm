@@ -46,8 +46,7 @@
 	border:1px solid #328714;
 	background-image:url(../images/button_highlight.png);
 	background-repeat:repeat-x; 
-	font-family:"bold Arial",Helvetica,sans-serif;
-	font-size:12px;
+	font: 12px helvetica neue, arial, sans-serif;
 	padding: 2px 8px;
 	font-weight:bold;
 	margin:2px;
@@ -60,8 +59,7 @@
 	border:1px solid #328714;
 	background-image:url(../images/button_highlight.png);
 	background-repeat:repeat-x; 
-	font-family:"bold Arial",Helvetica,sans-serif;
-	font-size:12px;
+	font: 12px; helvetica neue, arial, sans-serif;
 	padding: 2px 8px;
 	font-weight:bold;
 	margin:2px;
@@ -75,8 +73,7 @@
 	border:1px solid #328714;
 	background-image:url(../images/button_highlight.png);
 	background-repeat:repeat-x; 
-	font-family:"bold Arial",Helvetica,sans-serif;
-	font-size:12px;
+	font: 12px helvetica neue, arial, sans-serif;
 	padding: 2px 8px;
 	font-weight:bold;
 	margin:2px;
@@ -101,7 +98,7 @@
 	margin-top:0px;
 }
 .title {
-	font: bold 16px Arial;
+	font: bold 16px helvetica neue, arial, sans-serif;
 	color:#ffffff;
 	width:auto;
     float:left;
@@ -130,7 +127,7 @@
 	height:15px;
 	text-decoration: none;
 	text-align:center;
-	font:bold 11px Tahoma, Arial, san-serif;
+	font:bold 11px Tahoma, helvetica neue, arial, sans-serif;
 	color:#ffffff;
 	padding:2px 6px;
 	border-right:1px solid #CCCCCC;
@@ -176,7 +173,7 @@
 	height:16px;
 	text-decoration: none;
 	text-align:center;
-	font:bold 12px Tahoma, Arial, san-serif;
+	font:bold 12px Tahoma, helvetica neue, arial, sans-serif;
 	color:#9acaee;
 	padding:2px 6px;
 	border-right:1px solid #1376C0;
@@ -187,7 +184,7 @@
 	height:16px;
 	text-decoration: none;
 	text-align:center;
-	font: bold 12px Tahoma, Arial, san-serif;
+	font: bold 12px Tahoma, helvetica neue, arial, sans-serif;
 	color:#F0F0F0;
 	padding:2px 6px;
 	border-right:1px solid #1376C0;
@@ -281,7 +278,7 @@
 	height:16px;
 	text-decoration: none;
 	text-align:left;
-	font: bold 12px Arial, san-serif;
+	font: bold 12px helvetica neue, arial, sans-serif;
 	color:#354E81;
 	padding:0px 6px;
 }
@@ -290,7 +287,7 @@
 	height:14px;
 	text-decoration: none;
 	text-align:center;
-	font: normal 12px Arial, san-serif;
+	font: normal 12px helvetica neue, arial, sans-serif;
 	color:black;
 	padding:2px 6px;
 }
@@ -383,7 +380,7 @@
 	width:auto;
 	height:auto;
 	float:right;
-	font:11px Arial;
+	font:11px helvetica neue, arial, sans-serif;
 	color:#FFFFFF;
 	padding-right: 5px;
 }
@@ -643,7 +640,7 @@
 	.verticaltext {
 	writing-mode: tb-rl;
 	filter: flipv fliph;
-	font-family: verdana,arial,helvetica,sans-serif;
+	font-family: helvetica neue, arial, sans-serif;
 	font-size: 12px; 
 	line-height: 8px;
 	color: #333333;
@@ -673,7 +670,7 @@ div.tableContainer thead th a {
 	border:1px solid #328714;
 	background-image:url(../images/button_highlight.png);
 	background-repeat:repeat-x; 
-	font-family:"bold Arial",Helvetica,sans-serif;
+	font-family: helvetica neue, arial, sans-serif;
 	font-size:12px;
 	padding: 2px 8px;
 	font-weight:bold;
@@ -946,7 +943,7 @@ td .label_sm {
 .mainbody {
 	background: white;
 	color: black;
-	font: 11px Helvetica,Arial,Verdana,sans-serif;
+	font: 11px helvetica neue, arial, sans-serif;
 }
 
 .menu4 {
@@ -1110,7 +1107,7 @@ dl dd {
     height:21px;
     text-decoration: none;
     text-align:center;
-    font:bold 12px Tahoma, Arial, san-serif;
+    font:bold 12px Tahoma, helvetica neue, arial, sans-serif;
     color: white;
     padding:2px 8px;
     border-right:1px solid #666;
@@ -1121,7 +1118,7 @@ dl dd {
     height:21px;
     text-decoration: none;
     text-align:center;
-    font: bold 12px Arial;
+    font: bold 12px helvetica neue, arial, sans-serif;
     color: white;
     padding:2px 8px;
     border-right:1px solid #666;
@@ -1302,7 +1299,7 @@ a.tab_deselect {
     margin-left: 5px;
 }
 .personShow{
-	font: 11px/19px verdana,arial,helvetica,sans-serif;
+	font: 11px/19px helvetica neue, arial, sans-serif;
     padding: 5px 6px;
     text-align: left;
 }

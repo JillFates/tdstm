@@ -1,7 +1,7 @@
 body {
 	background: white;
 	color: black;
-	font: 14px Helvetica,Arial,Verdana,sans-serif;
+	font: 14px helvetica neue, arial, sans-serif;
 }
 
 .mobbody{
@@ -45,7 +45,7 @@ th {
 	font-weight:bold;
 }
 td {
-	font: 14px Helvetica,Arial,Verdana,sans-serif;
+	font: 14px helvetica neue, arial, sans-serif;
 }
 
 a:link, a:visited, a:hover {
@@ -72,7 +72,7 @@ font-weight: bold;
 	margin:auto 0px;
 	color: white; 
 	font-weight: normal;
-font: bold 12px Tahoma, Arial, san-serif;
+font: bold 12px Tahoma, helvetica neue, arial, sans-serif;
 text-align: center;
 	border:1px solid #444; 
 	margin:0px;
@@ -98,7 +98,7 @@ a.mobselect {
 	width:100%; 
 	text-decoration: none;
 	text-align:center;
-	font: bold 11px Arial;
+	font: bold 11px helvetica neue, arial, sans-serif;
 	color: #FFFFFF !important;
 	background:black;
 	position: fixed;

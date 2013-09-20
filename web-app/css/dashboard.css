@@ -737,7 +737,7 @@ list-style-type:none;
 input, select, textarea {
 	background-color:#FCFCFC;
 	border:1px solid #CCCCCC;
-	font:11px verdana,arial,helvetica,sans-serif;
+	font:11px arial,helvetica,sans-serif;
 	margin:2px 0;
 	padding:2px 4px;
 }
