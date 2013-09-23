@@ -237,8 +237,14 @@ function submitRemoteForm(){
 			data: $('#editAssetsFormId').serialize(),
 			type:'POST',
 			success: function(data) {
+				var assetName = $("#assetName").val()
 				$('#editEntityView').dialog('close')
 				$('#items1').html(data);
+				$("#messageId").html( "Entity "+assetName+" Updated." )
+				$("#messageId").show()
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert("An unexpected error occurred while updating asset.")
 			}
 		});
  		return false;
