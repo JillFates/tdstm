@@ -100,7 +100,7 @@
      </g:each>
    </table>
     <div class="buttons">
-    	<input type="button"  class="save" value="Cancel" id="processData" onclick="jQuery('#showOrMergeId').dialog('close')"/>
+    	<input type="button"  class="delete" value="Cancel" id="processData" onclick="jQuery('#showOrMergeId').dialog('close')"/>
 		<input type="button" id="mergeModelId" class="save" value="Merge" onclick="mergeModel()"/> 
 	 </div>
   </div>
