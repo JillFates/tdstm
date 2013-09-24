@@ -16,6 +16,7 @@ class Project extends PartyGroup {
 	Integer lastAssetId
 	Integer runbookOn=0		// Flag that indicates that the project should use the runbook mode for various screens
     Integer customFieldsShown = 8
+	String depConsoleCriteria 
     
 	// Custom field labels
     	String custom1
@@ -85,6 +86,7 @@ class Project extends PartyGroup {
 		customFieldsShown( nullable:false, inList:[0, 4 ,8, 12, 16 ,20, 24] )
 		lastAssetId( nullable:true )
 		runbookOn(nullable:true)
+		depConsoleCriteria( blank:true, nullable:true )
 	}
 
 	static mapping  = {
@@ -95,6 +97,7 @@ class Project extends PartyGroup {
 			trackChanges sqlType: 'char(1)'
 			projectCode sqlType: 'varchar(20)', index: 'project_projectcode_idx', unique: true
 			runbookOn sqlType: 'tinyint'
+			depConsoleCriteria sqlType : 'TEXT'
 		}
 	}
 	

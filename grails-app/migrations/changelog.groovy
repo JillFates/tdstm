@@ -58,5 +58,6 @@ databaseChangeLog = {
 	include file: '20130910-update-person-fields.groovy'
 	include file: '20130912-add-columns-for-runbook-optimization.groovy'
 	include file: '20130918-add-last-modified-column-userlogin.groovy'
+	include file: '20130924-add-column-dep_console_grouping_criteria-project.groovy'
     
 }

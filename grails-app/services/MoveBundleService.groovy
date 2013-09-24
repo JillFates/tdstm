@@ -19,6 +19,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
+import grails.converters.JSON
 
 
 class MoveBundleService {
@@ -29,6 +30,7 @@ class MoveBundleService {
 	def sessionFactory
 	def assetEntityService
     def partyRelationshipService
+	def securityService
 	
 	/*----------------------------------------------
 	 * @author : Lokanada Reddy
@@ -329,7 +331,11 @@ class MoveBundleService {
 		// Get array of the valid status and connection types to check against in the inner loop
 		def statusList = statusTypes.replaceAll(', ',',').replaceAll("'",'').tokenize(',')
 		def connectionList = connectionTypes.replaceAll(', ',',').replaceAll("'",'').tokenize(',')
+		def depCriteriaMap = ["statusTypes": statusList, "connectionTypes":connectionList, "modifiedBy":securityService.getUserLoginPerson().toString()]
 
+		projectInstance.depConsoleCriteria = depCriteriaMap as JSON
+		projectInstance.save()
+		
 		// Find all move bundles that are flagged for Planning in the project and then get all assets in those bundles
 		String moveBundleText = MoveBundle.findAllByUseOfPlanningAndProject(true,projectInstance).id
 		moveBundleText = GormUtil.asCommaDelimitedString(moveBundleText)
@@ -586,7 +592,9 @@ class MoveBundleService {
 		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
  		
  		log.info "dependencyConsoleMap() : stats=$stats}"
-
+		 
+		def depGrpCrt = projectInstance.depConsoleCriteria ? JSON.parse( projectInstance.depConsoleCriteria ) : [:]
+		
 		def map = [ 
 			company:projectInstance.client,
 			asset:'apps',
@@ -615,7 +623,8 @@ class MoveBundleService {
 			availabaleRoles:availabaleRoles,
 			moveBundleId : moveBundleId,
 			isAssigned:isAssigned,
-			moveBundleList:allMoveBundles
+			moveBundleList:allMoveBundles,
+			depGrpCrt:depGrpCrt
 		]
 		log.info "dependencyConsoleMap() : OVERALL took ${TimeUtil.elapsed(startAll)}"
 

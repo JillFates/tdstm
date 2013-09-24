@@ -15,7 +15,7 @@
 					 <label>Show ONLY Work In Progress</label>
 				</g:form>
 			</div>
-			&nbsp;Dependency Analysis last run on &nbsp;${date} and ${dependencyBundleCount} dependency group(s) were discovered
+			&nbsp;Dependency Analysis last run by ${ depGrpCrt?.modifiedBy } on &nbsp;${date} and ${dependencyBundleCount} dependency group(s) were discovered
 		</div>
 		<div id="processDiv" style="display: none;">
 			<img src="../images/processing.gif" />
