@@ -52,4 +52,30 @@ public class GormUtil {
 		return sb.toString()
 	}
 	
+	/**
+	 * This method is used to get a list of fields that allows or disallow null properties of a given Domain.
+	 * using blankAndNullPropsOnly flag if it is true list will contain fields that property is blank: true, nullable:true
+	 * @param domain : Domain class 
+	 * @param blankAndNullPropsOnly : Boolean flag to determine returning list . 
+	 * @return List<String> containing the property name(s) in the domain with/without blank/null constraint
+	 */
+	public static List<String> getDomainPropertiesNullAndBlank(def domain, def blankAndNullPropsOnly = true ) {
+		 
+		def fields = []
+		def grailsDomain = new DefaultGrailsDomainClass( domain.class )
+		grailsDomain.properties.each {
+			def blankAlw = domain.constraints."${it.name}"?.getAppliedConstraint( 'blank' )?.blank
+			def nullAlw = domain.constraints."${it.name}"?.getAppliedConstraint( 'nullable' )?.nullable
+			 
+			// If blankAndNullPropsOnly is true and blankAlw and nullAlw is true list will collect props 
+			// having blank:true , nullable:true  vice versa
+			 
+			if(!blankAndNullPropsOnly && blankAlw && nullAlw)
+				fields << it.name
+			else if( !blankAlw && !nullAlw && blankAndNullPropsOnly)
+				fields << it.name
+		}
+		return fields
+	}
+
 }

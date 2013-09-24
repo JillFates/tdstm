@@ -17,19 +17,25 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
 
 class DataTransferBatchController {
+	// Objects to be injected
     def sessionFactory
     def assetEntityAttributeLoaderService
     def jdbcTemplate
 	def securityService
 	def personService
-	def assetEntityService
+
+	// Data used within some of the controller methods
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
 	protected static bundleTeamRoles = ['sourceTeamMt':'MOVE_TECH','targetTeamMt':'MOVE_TECH',
-										'sourceTeamLog':'CLEANER','targetTeamLog':'CLEANER',
-										'sourceTeamSa':'SYS_ADMIN','targetTeamSa':'SYS_ADMIN',
-										'sourceTeamDba':'DB_ADMIN','targetTeamDba':'DB_ADMIN'
-										]
-    def index = { redirect(action:list,params:params) }
+		'sourceTeamLog':'CLEANER','targetTeamLog':'CLEANER',
+		'sourceTeamSa':'SYS_ADMIN','targetTeamSa':'SYS_ADMIN',
+		'sourceTeamDba':'DB_ADMIN','targetTeamDba':'DB_ADMIN'
+	]
+
+	/**
+	 * The default index page loads the list page
+	 */
+    def index = { redirect(action:list, params:params) }
 
     // the delete, save and update actions only accept POST requests
     def allowedMethods = [save:'POST', update:'POST']
@@ -73,7 +79,7 @@ class DataTransferBatchController {
 		def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
-		def blankAndNullFalseFields = assetEntityService.getFieldsByConstraints( AssetEntity, AssetEntity.class )
+		def blankAndNullFalseFields = GormUtil.getDomainPropertiesNullAndBlank( AssetEntity )
 		
 		DataTransferBatch.withTransaction { status ->
 			project = securityService.getUserCurrentProject()
@@ -374,7 +380,7 @@ class DataTransferBatchController {
     	def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
-		def blankAndNullFalseFields = assetEntityService.getFieldsByConstraints( Application, Application.class )
+		def blankAndNullFalseFields = GormUtil.getDomainPropertiesNullAndBlank( Application )
 		
 		DataTransferBatch.withTransaction { status ->
 			project = securityService.getUserCurrentProject()			
@@ -636,7 +642,7 @@ class DataTransferBatchController {
 		def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
-		def blankAndNullFalseFields = assetEntityService.getFieldsByConstraints( Files, Files.class )
+		def blankAndNullFalseFields = GormUtil.getDomainPropertiesNullAndBlank( Files )
 		
 		DataTransferBatch.withTransaction { status ->
 			project = securityService.getUserCurrentProject()			
@@ -859,7 +865,7 @@ class DataTransferBatchController {
 		def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
-		def blankAndNullFalseFields = assetEntityService.getFieldsByConstraints( Database, Database.class )
+		def blankAndNullFalseFields = GormUtil.getDomainPropertiesNullAndBlank( Database )
 
 		DataTransferBatch.withTransaction { status ->
 			project = securityService.getUserCurrentProject()			
