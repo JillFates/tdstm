@@ -1,6 +1,5 @@
 import org.apache.commons.lang.math.NumberUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 
 import com.tds.asset.Application
 import com.tds.asset.ApplicationAssetMap
