@@ -18,19 +18,19 @@
 				<thead>
 					<tr class="header">
 						<th nowrap="nowrap"><input id="selectId" type="checkbox" onclick="selectAll()" title="Select All" />&nbsp;Actions</th>
-						<th>Asset Name</th>
-						<th>Model</th>
-						<th>Source Location</th>
-						<th>Source Rack</th>
-						<th>Target Location</th>
-						<th>Target rack</th>
-						<th>Asset Type</th>
-						<th>Asset Tag</th>
-						<th>Validation</th>
-						<th>Bundle</th>
-						<th>Plan Status</th>
-						<th>TBD</th>
-						<th>Conflict</th>
+						<th class="Arrowcursor ${sortBy == 'assetName' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','assetName')">Asset Name</th>
+						<th class="Arrowcursor ${sortBy == 'model' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','model')">Model</th>
+						<th class="Arrowcursor ${sortBy == 'sourceLocation' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','sourceLocation')">Source Location</th>
+						<th class="Arrowcursor ${sortBy == 'sourceRack' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','sourceRack')">Source Rack</th>
+						<th class="Arrowcursor ${sortBy == 'targetLocation' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','targetLocation')">Target Location</th>
+						<th class="Arrowcursor ${sortBy == 'targetRack' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','targetRack')">Target rack</th>
+						<th class="Arrowcursor ${sortBy == 'assetType' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','assetType')">Asset Type</th>
+						<th class="Arrowcursor ${sortBy == 'assetTag' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','assetTag')">Asset Tag</th>
+						<th class="Arrowcursor ${sortBy == 'validation' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','validation')">Validation</th>
+						<th class="Arrowcursor ${sortBy == 'moveBundle' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','moveBundle')">Bundle</th>
+						<th class="Arrowcursor ${sortBy == 'planStatus' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','planStatus')">Plan Status</th>
+						<th class="Arrowcursor ${sortBy == 'tbdCount' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','tbdCount')">TBD</th>
+						<th class="Arrowcursor ${sortBy == 'conflictCount' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','conflictCount')">Conflict</th>
 					</tr>
 
 				</thead>
@@ -95,7 +95,7 @@
 								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.planStatus}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${(asset.depUp + asset.depDown)?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${(asset.tbdCount)?:''}</span>
 							</td>
 							<td><span
 								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.conflictCount[0]?:''}</span>
@@ -105,6 +105,8 @@
 				</tbody>
 
 			</table>
+			<input type="hidden" id="orderBy" value="${orderBy?:'asc'}">
+			<input type="hidden" id="sortBy" value="${sortBy?:'asc'}">
 		</div>
 	</div>
 	<script type="text/javascript">

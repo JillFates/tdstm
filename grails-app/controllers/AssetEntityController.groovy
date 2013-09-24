@@ -3943,8 +3943,12 @@ class AssetEntityController {
 		
 		def model = [entity: (params.entity ?: 'apps'), stats:stats]
 		
+		def sortOn = params.sort?:"assetName"
+		def orderBy = params.orderBy?:"asc"
 		model.dependencyBundle = params.dependencyBundle
 		model.asset = params.entity
+		model.orderBy = orderBy
+		model.sortBy = sortOn
 		
 		def serverTypes = AssetType.getAllServerTypes()
 		
@@ -3957,7 +3961,7 @@ class AssetEntityController {
 				applicationList.each {
 					appList << Application.read(it.assetId)
 				}
-				
+				appList = sortAssetByColumn(appList,sortOn,orderBy)
 				model.appList = appList
 				model.applicationListSize = applicationList.size()
 
@@ -3971,7 +3975,7 @@ class AssetEntityController {
 				assetEntityList.each {
 					assetList << AssetEntity.read(it.assetId)
 				}
-				
+				assetList = sortAssetByColumn(assetList,sortOn,orderBy)
 				model.assetList = assetList
 				model.assetEntityListSize = assetEntityList.size()
 				render( template:"assetList", model:model)
@@ -3984,6 +3988,7 @@ class AssetEntityController {
 				databaseList.each {
 					dbList << Database.read(it.assetId)
 				}
+				dbList = sortAssetByColumn(dbList,sortOn,orderBy)
 				model.databaseList = dbList
 				model.dbDependentListSize = databaseList.size()
 				render(template:'dbList', model:model)
@@ -3996,6 +4001,7 @@ class AssetEntityController {
 				filesList.each {
 					fileList << Files.read(it.assetId)
 				}
+				fileList = sortAssetByColumn(fileList,sortOn,orderBy)
 				model.filesList = fileList
 				model.filesDependentListSize = filesList.size()
 				render(template:"filesList", model:model)
@@ -4679,5 +4685,22 @@ class AssetEntityController {
 		params.targetRack = sourceBladeChassis?.targetRack
 		params.roomTarget = sourceBladeChassis?.roomTarget
 		params.rackTarget = sourceBladeChassis?.rackTarget
+	}
+	/**
+	 * This method is used to sort AssetList in dependencyConsole
+	 * @param Assetlist
+	 * @param sortParam
+	 * @param orderParam
+	 * @return list
+	 */
+	def sortAssetByColumn(assetlist, sortOn, orderBy){
+		assetlist.sort{ a,b->
+			if(orderBy == 'asc'){
+				(a?."${sortOn}".toString() <=> b."${sortOn}".toString())
+			} else {
+				(b."${sortOn}".toString() <=> a?."${sortOn}".toString())
+			}
+		}
+		return assetlist
 	}
 }

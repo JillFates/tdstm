@@ -19,14 +19,14 @@
 				<thead>
 					<tr class="header">
 						<th nowrap="nowrap"><input id="selectId" type="checkbox"  onclick="selectAll()" title="Select All" />&nbsp;Actions</th>
-						<th>Name</th>
-						<th>App Sme</th>
-						<th>Sme2</th>
-						<th>Validation</th>
-						<th>Bundle</th>
-						<th>Plan Status</th>
-						<th>TBD</th>
-						<th>Conflict</th>
+						<th class="Arrowcursor ${sortBy == 'assetName' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','assetName')">Name</th>
+						<th class="Arrowcursor ${sortBy == 'sme' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','sme')">App Sme</th>
+						<th class="Arrowcursor ${sortBy == 'sme2' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','sme2')">Sme2</th>
+						<th class="Arrowcursor ${sortBy == 'validation' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','validation')">Validation</th>
+						<th class="Arrowcursor ${sortBy == 'moveBundle' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','moveBundle')">Bundle</th>
+						<th class="Arrowcursor ${sortBy == 'planStatus' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','planStatus')">Plan Status</th>
+						<th class="Arrowcursor ${sortBy == 'tbdCount' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','tbdCount')">TBD</th>
+						<th class="Arrowcursor ${sortBy == 'conflictCount' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','conflictCount')">Conflict</th>
 					</tr>
 
 				</thead>
@@ -75,7 +75,7 @@
 								<span onclick="getEntityDetails('dependencyConsole','Application', ${app?.id} )">${app?.planStatus}</span>
 							</td>
 							<td>
-								<span onclick="getEntityDetails('dependencyConsole','Application', ${app?.id} )">${(app?.depUp + app?.depDown)?:''}</span>
+								<span onclick="getEntityDetails('dependencyConsole','Application', ${app?.id} )">${(app?.tbdCount)?:''}</span>
 							</td>
 							<td>
 								<span onclick="getEntityDetails('dependencyConsole','Application', ${app?.id} )">${(app?.conflictCount)?(app.conflictCount[0]?:''):('')}</span>
@@ -84,6 +84,8 @@
 					</g:each>
 				</tbody>
 			</table>
+			<input type="hidden" id="orderBy" value="${orderBy?:'asc'}">
+			<input type="hidden" id="sortBy" value="${sortBy?:'asc'}">
 		</div>
 	</div>
 	<script type="text/javascript">

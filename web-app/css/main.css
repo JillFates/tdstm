@@ -682,3 +682,13 @@ margin: -8px !important;
 	background: #CCCCCC !important;
     color: #000 !important;
 }
+th.asc{
+	background-image: url(../images/skin/sorted_asc.gif);
+	background-position: right;
+    background-repeat: no-repeat;
+}
+th.desc{
+    background-image: url(../images/skin/sorted_desc.gif);
+    background-position: right;
+    background-repeat: no-repeat;
+}

@@ -18,13 +18,13 @@
 				<thead>
 					<tr class="header">
 						<th nowrap="nowrap"><input id="selectId" type="checkbox"   onclick="selectAll()" title="Select All" />&nbsp;Actions</th>
-						<th>Name</th>
-						<th>Storage Format</th>
-						<th>Validation</th>
-						<th>Bundle</th>
-						<th>Plan Status</th>
-						<th>TBD</th>
-						<th>Conflict</th>
+						<th class="Arrowcursor ${sortBy == 'assetName' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','assetName')">Name</th>
+						<th class="Arrowcursor ${sortBy == 'fileFormat' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','fileFormat')">Storage Format</th>
+						<th class="Arrowcursor ${sortBy == 'validation' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','validation')">Validation</th>
+						<th class="Arrowcursor ${sortBy == 'moveBundle' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','moveBundle')">Bundle</th>
+						<th class="Arrowcursor ${sortBy == 'planStatus' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','planStatus')">Plan Status</th>
+						<th class="Arrowcursor ${sortBy == 'tbdCount' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','tbdCount')">TBD</th>
+						<th class="Arrowcursor ${sortBy == 'conflictCount' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','conflictCount')">Conflict</th>
 					</tr>
 
 				</thead>
@@ -70,7 +70,7 @@
 
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Files', ${files.id} )">${(files.depUp + files.depDown)?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Files', ${files.id} )">${(files.tbdCount)?:''}</span>
 							</td>
 							<td><span
 								onclick="getEntityDetails('dependencyConsole','Files', ${files.id} )">${files.conflictCount[0]?:''}</span>
@@ -79,6 +79,8 @@
 					</g:each>
 				</tbody>
 			</table>
+			<input type="hidden" id="orderBy" value="${orderBy?:'asc'}">
+			<input type="hidden" id="sortBy" value="${sortBy?:'asc'}">
 		</div>
 	</div>
 	<script type="text/javascript">

@@ -362,6 +362,13 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	}
 	
 	/**
+	 * this method is used to get sum of depUp and depDown.
+	 * @return dependencyUp Count + dependencyDown Count
+	 */
+	def getTbdCount(){
+		return (this.depUp+this.depDown)
+	}
+	/**
 	 * this method is used to count of dependencies to assets and the status is not Validated.
 	 * @return dependencyDown Count
 	 */

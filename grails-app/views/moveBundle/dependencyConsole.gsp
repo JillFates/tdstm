@@ -225,6 +225,14 @@
 				$('#assinedGroup').val(chkbox.checked ? '1' : '0')
 				chkbox.form.submit()
 			}
+			function getListBySort(value,dependencyBundle,sort){
+				console.log(sort)
+				var bundle = $("#planningBundleSelectId").val()
+				var sortBy = $("#sortBy").val()
+				var orderBy = $("#orderBy").val() != 'asc' ? 'asc' : 'desc'
+				orderBy = (sortBy == sort) ? orderBy : 'asc'
+				${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&bundle=\'+ bundle+\'&sort=\'+ sort+\'&orderBy=\'+ orderBy', onComplete:'listUpdate(e)') }
+			}
 		</script>
 	</body>
 </html>
