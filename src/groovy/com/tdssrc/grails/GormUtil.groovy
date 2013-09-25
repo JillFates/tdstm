@@ -1,7 +1,8 @@
 package com.tdssrc.grails;
 
 import org.apache.shiro.SecurityUtils
-import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
+// import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
 
 public class GormUtil {
 	def public static allErrorsString = { domain, separator=" : " ->
@@ -54,27 +55,37 @@ public class GormUtil {
 	}
 	
 	/**
-	 * This method is used to get a list of fields that allows or disallow null properties of a given Domain.
-	 * using blankAndNullPropsOnly flag if it is true list will contain fields that property is blank: true, nullable:true
-	 * @param domain : Domain class 
-	 * @param blankAndNullPropsOnly : Boolean flag to determine returning list . 
+	 * This method is used to generate a list of the domain property names that the have the specified constraint. If at value is passed then 
+	 * only those properties having the constraint value as such will be returned.
+	 * @param domain - the Domain class to find properties within
+	 * @param constraintName - String that defines the constraint name (presently supports nullable and blank)
+	 * @param value - if passed then it will check the constraint value against that to further filter the list
 	 * @return List<String> containing the property name(s) in the domain with/without blank/null constraint
+	 * @usage getDomainPropertiesWithConstraint(Model, 'nullable', true) - returns all properties that are nullable 
 	 */
-	public static List<String> getDomainPropertiesNullAndBlank(def domain, def blankAndNullPropsOnly = true ) {
+	public static List<String> getDomainPropertiesWithConstraint(def domain, def constraintName, def value=null ) {
 		 
 		def fields = []
-		def grailsDomain = new DefaultGrailsDomainClass( domain.class )
-		grailsDomain.properties.each {
-			def blankAlw = domain.constraints."${it.name}"?.getAppliedConstraint( 'blank' )?.blank
-			def nullAlw = domain.constraints."${it.name}"?.getAppliedConstraint( 'nullable' )?.nullable
-			 
-			// If blankAndNullPropsOnly is true and blankAlw and nullAlw is true list will collect props 
-			// having blank:true , nullable:true  vice versa
-			 
-			if(!blankAndNullPropsOnly && blankAlw && nullAlw)
-				fields << it.name
-			else if( !blankAlw && !nullAlw && blankAndNullPropsOnly)
-				fields << it.name
+		domain.constraints.each() { propName, props ->
+			def constraint = props.getAppliedConstraint( constraintName )?.getAt(constraintName)
+			switch (constraintName) {
+				case 'blank':
+					def type = GrailsClassUtils.getPropertyType(domain, propName)?.getName()
+					if (type == 'java.lang.String' && constraint == null) 
+						constraint = true
+					break
+
+				case ['nullable', 'range']:	
+					// println "propName=$propName, constraintName=$constraintName, constraint=$constraint, value=$value"
+					break
+
+				default:
+					log.error "Called getDomainPropertiesWithConstraint() with unsupported constraint $constraintName"
+			}
+
+			if ( (value == null && constraint != null) || (value != null && constraint == value) )
+				fields <<  propName
+
 		}
 		return fields
 	}

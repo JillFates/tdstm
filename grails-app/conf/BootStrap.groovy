@@ -28,13 +28,7 @@ class BootStrap {
 		if ( grails.util.GrailsUtil.environment.equals("production") ) return
 
 		// createInitialData()
-		
-		def john = UserLogin.read(11)
-		john.password = new Sha256Hash("xyzzy").toHex()
-		if (! john.save()) {
-			log.error "had an issue with setting John's password"
-		}
-		
+				
 	}
 		
 	def destroy = {

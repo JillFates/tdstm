@@ -79,7 +79,8 @@ class DataTransferBatchController {
 		def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
-		def blankAndNullFalseFields = GormUtil.getDomainPropertiesNullAndBlank( AssetEntity )
+		def nullableProperties = GormUtil.getDomainPropertiesWithConstraint( AssetEntity, 'nullable', true )
+		def blankProperties = GormUtil.getDomainPropertiesWithConstraint( AssetEntity, 'blank', true )
 		
 		DataTransferBatch.withTransaction { status ->
 			project = securityService.getUserCurrentProject()
@@ -140,7 +141,7 @@ class DataTransferBatchController {
 		    				isNewValidate = "true"
 							log.info "serverProcess - creating new asset for rowId $rowId"
 		    			}
-						def cloneEntity = retainNotNullVal(assetEntity, blankAndNullFalseFields, isNewValidate)
+						def cloneEntity = retainNotNullVal(assetEntity, nullableProperties, isNewValidate)
 						
     					if( assetEntity && flag == 0 ) {
     						assetEntity.project = project
@@ -277,7 +278,7 @@ class DataTransferBatchController {
 										break
 								}
 								//If imported "NULL" and field allows blank and null updating value to null
-								if(it.importValue == "NULL" && !blankAndNullFalseFields.contains(attribName)) 
+								if(it.importValue == "NULL" && !nullableProperties.contains(attribName)) 
 									assetEntity."$attribName" = null
 								else if (it.importValue == "NULL")
 									assetEntity."$attribName" = cloneEntity."$attribName"
@@ -380,7 +381,8 @@ class DataTransferBatchController {
     	def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
-		def blankAndNullFalseFields = GormUtil.getDomainPropertiesNullAndBlank( Application )
+		def nullableProperties = GormUtil.getDomainPropertiesWithConstraint( Application, 'nullable', true )
+		def blankProperties = GormUtil.getDomainPropertiesWithConstraint( Application, 'blank', true )
 		
 		DataTransferBatch.withTransaction { status ->
 			project = securityService.getUserCurrentProject()			
@@ -443,7 +445,7 @@ class DataTransferBatchController {
 		    			}
 		    		
     					if( application && flag == 0 ) {
-							def cloneEntity = retainNotNullVal(application, blankAndNullFalseFields, isNewValidate)
+							def cloneEntity = retainNotNullVal(application, nullableProperties, isNewValidate)
     						application.project = project
     						dtvList.each {
     							def attribName = it.eavAttribute.attributeCode
@@ -546,7 +548,7 @@ class DataTransferBatchController {
 		    							}
 								}
 								//If imported "NULL" and field allows blank and null updating value to null
-								if(it.importValue.trim() == "NULL" && !blankAndNullFalseFields.contains(attribName)) 
+								if(it.importValue.trim() == "NULL" && !nullableProperties.contains(attribName)) 
 									application."$attribName" = null
 								else if (it.importValue == "NULL")
 									application."$attribName" = cloneEntity."$attribName"
@@ -642,7 +644,8 @@ class DataTransferBatchController {
 		def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
-		def blankAndNullFalseFields = GormUtil.getDomainPropertiesNullAndBlank( Files )
+		def nullableProperties = GormUtil.getDomainPropertiesWithConstraint( Files, 'nullable', true )
+		def blankProperties = GormUtil.getDomainPropertiesWithConstraint( Files, 'blank', true )
 		
 		DataTransferBatch.withTransaction { status ->
 			project = securityService.getUserCurrentProject()			
@@ -703,7 +706,7 @@ class DataTransferBatchController {
 						}
 					
 						if( files && flag == 0 ) {
-							def cloneEntity = retainNotNullVal(files, blankAndNullFalseFields, isNewValidate)
+							def cloneEntity = retainNotNullVal(files, nullableProperties, isNewValidate)
 							files.project = project
 							files.sizeUnit = "GB"
 							dtvList.each {
@@ -778,7 +781,7 @@ class DataTransferBatchController {
 									}
 									
 									//If imported "NULL" and field allows blank and null updating value to null
-									if(it.importValue == "NULL" && !blankAndNullFalseFields.contains(attribName)) 
+									if(it.importValue == "NULL" && !nullableProperties.contains(attribName)) 
 										files."$attribName" = null
 									else if (it.importValue == "NULL")
 										files."$attribName" = cloneEntity."$attribName"
@@ -865,7 +868,8 @@ class DataTransferBatchController {
 		def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
-		def blankAndNullFalseFields = GormUtil.getDomainPropertiesNullAndBlank( Database )
+		def nullableProperties = GormUtil.getDomainPropertiesWithConstraint( Database, 'nullable', true )
+		def blankProperties = GormUtil.getDomainPropertiesWithConstraint( Database, 'blank', true )
 
 		DataTransferBatch.withTransaction { status ->
 			project = securityService.getUserCurrentProject()			
@@ -929,7 +933,7 @@ class DataTransferBatchController {
 					}
 				
 					if( dbInstance && flag == 0 ) {
-						def cloneEntity = retainNotNullVal(dbInstance, blankAndNullFalseFields, isNewValidate)
+						def cloneEntity = retainNotNullVal(dbInstance, nullableProperties, isNewValidate)
 						dbInstance.project = project
 						dtvList.each {
 							def attribName = it.eavAttribute.attributeCode
@@ -1001,7 +1005,7 @@ class DataTransferBatchController {
 									}
 								}
 								//If imported "NULL" and field allows blank and null updating value to null
-								if(it.importValue.trim() == "NULL" && !blankAndNullFalseFields.contains(attribName))
+								if(it.importValue.trim() == "NULL" && !nullableProperties.contains(attribName))
 									dbInstance."$attribName" = null
 								else if (it.importValue == "NULL")
 									dbInstance."$attribName" = cloneEntity."$attribName"
