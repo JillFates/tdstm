@@ -190,16 +190,16 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
 
 		dataMatrix.each { i, c, d -> 
-			assertEquals "downstreamTaskCount for edge $i", c, durMap.edges[i].downstreamTaskCount
-			assertEquals "pathDuration for edge $i", d, durMap.edges[i].pathDuration
+			assertEquals "downstreamTaskCount for edge $i", c, durMap.edges[i].tmpDownstreamTaskCount
+			assertEquals "pathDuration for edge $i", d, durMap.edges[i].tmpPathDuration
 		}
 
-		assertEquals 'Finish mapDepth', 1, durMap.tasks[9].mapDepth 
-		assertEquals 'Task 1005 mapDepth', 2, durMap.tasks[5].mapDepth 
-		assertEquals 'Task 1003 mapDepth', 3, durMap.tasks[3].mapDepth 
-		assertEquals 'Task 1002 mapDepth', 4, durMap.tasks[2].mapDepth 
-		assertEquals 'Task 1001 mapDepth', 5, durMap.tasks[1].mapDepth 
-		assertEquals 'Task 1000 mapDepth', 6, durMap.tasks[0].mapDepth 
+		assertEquals 'Finish tmpMapDepth', 1, durMap.tasks[9].tmpMapDepth 
+		assertEquals 'Task 1005 tmpMapDepth', 2, durMap.tasks[5].tmpMapDepth 
+		assertEquals 'Task 1003 tmpMapDepth', 3, durMap.tasks[3].tmpMapDepth 
+		assertEquals 'Task 1002 tmpMapDepth', 4, durMap.tasks[2].tmpMapDepth 
+		assertEquals 'Task 1001 tmpMapDepth', 4, durMap.tasks[1].tmpMapDepth 
+		assertEquals 'Task 1000 tmpMapDepth', 5, durMap.tasks[0].tmpMapDepth 
 
 	}
 	
@@ -222,18 +222,80 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 
 		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
 
-		println "What tasks does edge 105 have? ${durMap.edges['105'].successor.downstreamTasks}"
+		println "What tasks does edge 105 have? ${durMap.edges['105'].successor.tmpDownstreamTasks}"
 		// Run the same process as before and we shouldn't see any differences
 		def m = [
 			['103', 2, 21],	// We added the earlier reference
 			['109', 1, 45] 	// Shouldn't of changed
 		]
 		m.each { i, c, d -> 
-			assertEquals "downstreamTaskCount for edge $i", c, durMap.edges[i].downstreamTaskCount
-			assertEquals "pathDuration for edge $i", d, durMap.edges[i].pathDuration
+			assertEquals "downstreamTaskCount for edge $i", c, durMap.edges[i].tmpDownstreamTaskCount
+			assertEquals "pathDuration for edge $i", d, durMap.edges[i].tmpPathDuration
 		}
 
 	}
-	
+
+	// @Test
+	// Test that the determineUniqueGraphs method properly matches up the start vertices with the sink vertices
+	void testDetermineUniqueGraphs() {
+
+		def tasks
+		def deps
+		(tasks, deps) = initTestData()
+
+		def dfsMap = runbookService.processDFS( tasks, deps )
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
+
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
+
+		// {starts=[0, 6], sinks=[7, 8, 9], maxPathDuration=73, maxDownstreamTaskCount=8}
+
+		assertEquals 'Returns a list with one group', 1, graphs.size()
+		assertEquals 'Starts', [0,6], graphs[0].starts
+		assertEquals 'Sinks', [7,8,9], graphs[0].sinks
+		assertEquals 'maxPathDuration', 82, graphs[0].maxPathDuration
+		assertEquals 'maxDownstreamTaskCount', 8, graphs[0].maxDownstreamTaskCount
+	}
+
+	// @Test
+	// Test that the determineUniqueGraphs method properly matches up the start vertices with the sink vertices when there are multiple graphs in the vertices
+	void testDetermineUniqueGraphsMultiple() {
+
+		def tasks
+		def deps
+		(tasks, deps) = initTestData()
+
+		// Add a second separate set of tasks
+		def ltid = tasks.size() - 1
+		tasks << new AssetComment(id:ltid+1, taskNumber: 1050, duration:90, comment:'Separate map Start task') // start vertex
+		tasks << new AssetComment(id:ltid+2, taskNumber: 1051, duration:7, comment:'Separate map Middle task')
+		tasks << new AssetComment(id:ltid+3, taskNumber: 1052, duration:12, comment:'Separate map Sink task') // start vertex
+		deps << new TaskDependency(id:200, predecessor:tasks[ltid+1], assetComment:tasks[ltid+2], type:'x') 
+		deps << new TaskDependency(id:201, predecessor:tasks[ltid+2], assetComment:tasks[ltid+3], type:'x') 
+
+		// Add an additional starting vector that is shorter so we can see the counts
+		tasks << new AssetComment(id:ltid+4, taskNumber: 1060, duration:120, comment:'Change tire on truck')
+		deps << new TaskDependency(id:210, predecessor:tasks[ltid+4], assetComment:tasks[5], type:'x') 
+
+		def dfsMap = runbookService.processDFS( tasks, deps )
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
+
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
+
+		// {starts=[0, 6], sinks=[7, 8, 9], maxPathDuration=73, maxDownstreamTaskCount=8}
+
+		assertEquals 'Returns a list with one group', 2, graphs.size()
+		assertEquals '1st Starts', [0, 6, ltid+4], graphs[0].starts
+		assertEquals '1st Sinks', [7,8,9], graphs[0].sinks
+		assertEquals '1st maxPathDuration', 180, graphs[0].maxPathDuration
+		assertEquals '1st maxDownstreamTaskCount', 8, graphs[0].maxDownstreamTaskCount
+
+		assertEquals '2nd Starts', [ltid+1], graphs[1].starts
+		assertEquals '2nd Sinks', [ltid+3], graphs[1].sinks
+		assertEquals '2nd maxPathDuration', 109, graphs[1].maxPathDuration
+		assertEquals '2nd maxDownstreamTaskCount', 2, graphs[1].maxDownstreamTaskCount
+
+
+	}
 	
 }
