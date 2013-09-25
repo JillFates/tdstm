@@ -2,9 +2,10 @@
 
 # 
 # Usage
-#
+# ./runapp.sh
 # ./runapp.sh test-app -unit RunbookService
-# 
+# ./runapp.sh test-app -integration GormUtil
+#
 
 if [ "$1" == "" ]; then
    CMD="run-app"
