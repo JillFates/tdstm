@@ -362,8 +362,8 @@ class DataTransferBatchController {
  			// END OF TRY
 
    			def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
-    		flash.message = " Process Results:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
-				"<li>Records Updated: ${updateCount}</li><li>Asset Errors: ${errorCount} </li> "+
+    		flash.message = "  Processed batch:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
+				"<li>Records Updated: ${updateCount}</li></ul> Processed batch error(s): <ul><li>Asset Errors: ${errorCount} </li> "+
 				"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> " 
     	}
 		session.setAttribute("IMPORT_ASSETS", assetsList)
@@ -622,8 +622,8 @@ class DataTransferBatchController {
 				flash.message = "Import Batch process failed"
     		}
     		def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
-    		flash.message = " Process Results:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
-    							"<li>Records Updated: ${updateCount}</li><li>Asset Errors: ${errorCount} </li> "+
+    		flash.message = " Processed batch:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
+    							"<li>Records Updated: ${updateCount}</li></ul> Processed batch error(s):<ul><li>Asset Errors: ${errorCount} </li> "+
     							"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> "+
 								"<b>Warning:</b> <ul> ${WebUtil.getListAsli(warnings)}</ul>"
     	}
@@ -848,8 +848,8 @@ class DataTransferBatchController {
 				flash.message = "Import Batch process failed"
 			}
 			def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
-			flash.message = " Process Results:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
-								"<li>Records Updated: ${updateCount}</li><li>Asset Errors: ${errorCount} </li> "+
+			flash.message = " Processed batch:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
+								"<li>Records Updated: ${updateCount}</li></ul> Processed batch error(s):<ul><li>Asset Errors: ${errorCount} </li> "+
 								"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> "
 		}
 		session.setAttribute("IMPORT_ASSETS", assetsList)
@@ -1073,8 +1073,8 @@ class DataTransferBatchController {
 				flash.message = "Import Batch process failed"
 			}
 			def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
-			flash.message = " Process Results:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
-				"<li>Records Updated: ${updateCount}</li><li>Asset Errors: ${errorCount} </li> "+
+			flash.message = " Processed batch:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
+				"<li>Records Updated: ${updateCount}</li></ul>Processed batch error(s):<ul><li>Asset Errors: ${errorCount} </li> "+
 				"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> "
 		}
 		session.setAttribute("IMPORT_ASSETS", assetsList)

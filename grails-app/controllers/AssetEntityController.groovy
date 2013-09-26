@@ -769,9 +769,9 @@ class AssetEntityController {
 
 					}
 					warnMsg += """
-						<li>$dependencyUpdated dependencies updated
-						<li>$skippedAdded new dependencies skipped 
-						<li>$skippedUpdated existing dependencies skipped</ul>"""
+						<li>dependencies updated : $dependencyUpdated 
+						<li>new dependencies skipped: $skippedAdded
+						<li>existing dependencies skipped: $skippedUpdated</ul>"""
 				}
 				for( int i=0;  i < sheetNamesLength; i++ ) {
 					if(sheetNames[i] == "Comments"){
@@ -802,14 +802,14 @@ class AssetEntityController {
 			workbook.close()
 			added = serverAdded + appAdded + dbAdded + filesAdded + dependencyAdded
 			
-			flash.message = "<b>Spreadsheet import was successful</b>" +
+			flash.message = "<b>Spreadsheet Initial import was successful</b>" +
 				( flagToManageBatches ? '<p>Please click the Manage Batches to review and post these changes</p>' : '' ) +
 				'<p>Results: <ul>' +
-				"<li>${serverAdded} Servers added" + 
-				"<li>$appAdded Applications added" + 
-				"<li>$dbAdded Databases added" +
-				"<li>$filesAdded Storage added" + 
-				"<li>$dependencyAdded Dependency added" + 
+				"<li>Initial Servers imported: ${serverAdded}" + 
+				"<li>Initial Applications imported: $appAdded" + 
+				"<li>Initial Databases imported: $dbAdded" +
+				"<li>Initial Storage imported: $filesAdded" + 
+				"<li>Dependency added: $dependencyAdded" + 
 				warnMsg +
 				( skipped.size() ? "${skipped.size()} spreadsheet rows were skipped: <ul><li>${skipped.join('<li>')}</ul>" : '' ) +
 				'</ul></p>'

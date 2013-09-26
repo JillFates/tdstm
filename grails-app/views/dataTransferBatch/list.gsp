@@ -235,7 +235,7 @@
 						else
 							$("#"+forWhom+"ReviewId_"+dataTransferBatchId).html($("#"+forWhom+"DisabledProcessId_"+dataTransferBatchId).html())
 							
-						data.errorMsg ? $("#messageId").html(data.errorMsg) : $("#messageId").html(" Reviewed , there were no errors in the review.")
+						data.errorMsg ? $("#messageId").html("<b>Reviewed batch error(s):</b><br>"+data.errorMsg) : $("#messageId").html(" Reviewed batch, there were no errors in the review.")
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
 						alert("An Unexpected error while populating dependent asset.")
