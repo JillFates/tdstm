@@ -1,3 +1,5 @@
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
+
 import grails.converters.JSON
 import grails.converters.*
 
@@ -900,6 +902,67 @@ class MoveEventController {
 	}
 
 
+	def test = {
+/*
+		def grailsDomain = new DefaultGrailsDomainClass( clazz )
+		grailsDomain.properties.each {
+			def blankAlw = domain.constraints."${it.name}"?.getAppliedConstraint( 'blank' )?.blank
+			def nullAlw = domain.constraints."${it.name}"?.getAppliedConstraint( 'nullable' )?.nullable
+
+		def d = Model
+		def n = 'blank'
+		def value = true
+		def fname = 'sourceURL'
+		def o = new Model(sourceURL:'http')
+		//def f = o.getProperty(fname)
+		//def f = x['sourceURL']
+		def f = GrailsClassUtils.getPropertyType(d.class, 'sourceURL')
+		log.info "sourceURL is ${f}"
+		//log.info "sourceURL is ${f.getClass().name}"
+		def x = Model.getProperties()
+		//log.info "properties === ${x['sourceURL']}"
+		x.each() { k, v ->
+			log.info "KEY $k"
+		}
+
+*/
+		def sb = new StringBuilder()
+
+		def list = []
+
+		list = GormUtil.getDomainPropertiesWithConstraint(MoveEvent, 'nullable', true)
+		sb.append("<h2>MoveEvent nullable:true properties<h2><ul>")
+		list.each { sb.append("<li>$it")}
+		sb.append("</ul>")
+
+		list = GormUtil.getDomainPropertiesWithConstraint(MoveEvent, 'nullable', false)
+		sb.append("<h2>MoveEvent nullable:false properties<h2><ul>")
+		list.each { sb.append("<li>$it")}
+		sb.append("</ul>")
+
+		list = GormUtil.getDomainPropertiesWithConstraint(MoveEvent, 'nullable')
+		sb.append("<h2>MoveEvent nullable:ANY properties<h2><ul>")
+		list.each { sb.append("<li>$it")}
+		sb.append("</ul>")
+
+		list = GormUtil.getDomainPropertiesWithConstraint(MoveEvent, 'blank', true)
+		sb.append("<h2>MoveEvent blank:true properties<h2><ul>")
+		list.each { sb.append("<li>$it")}
+		sb.append("</ul>")
+
+		list = GormUtil.getDomainPropertiesWithConstraint(MoveEvent, 'blank', false)
+		sb.append("<h2>MoveEvent blank:false properties<h2><ul>")
+		list.each { sb.append("<li>$it")}
+		sb.append("</ul>")
+
+		list = GormUtil.getDomainPropertiesWithConstraint(MoveEvent, 'blank')
+		sb.append("<h2>MoveEvent blank:ANY properties<h2><ul>")
+		list.each { sb.append("<li>$it")}
+		sb.append("</ul>")
+
+		render sb.toString()
+	}
+
 	/**
 	 * Simply a test page for the runbook optimization
 	 */
@@ -919,10 +982,13 @@ class MoveEventController {
 
 		def tasks = runbookService.getEventTasks(me)
 		def deps = runbookService.getTaskDependencies(tasks)
+		def startTime = 0
 
 		def dfsMap = runbookService.processDFS( tasks, deps )
-
 		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
+		def estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs)
+
 		StringBuilder results = new StringBuilder("Found ${tasks.size()} tasks and ${deps.size()} dependencies<br/>")
 
 		results.append("Start Vertices: " + (dfsMap.starts.size() > 0 ? dfsMap.starts : 'none') + '<br/>')
@@ -930,14 +996,25 @@ class MoveEventController {
 		results.append("Cyclical Maps: " + (dfsMap.cyclicals?.size() ? dfsMap.cyclicals : 'none') + '<br/>')
 		results.append("Pass 1 Elapsed Time: ${dfsMap.elapsed}<br/>")
 		results.append("Pass 2 Elapsed Time: ${durMap.elapsed}<br/>")
-		results.append("Edges data:<br/><table><tr><th>Id</th><th>Predecessor Task</th><th>Successor Task</th><th>DS Task Count</th><th>Path Duration</th></tr>")
 
+		results.append("<b>Estimated Runbook Duration: ${estFinish}</b><br/>")
+
+		results.append("<h1>Edges data</h1><table><tr><th>Id</th><th>Predecessor Task</th><th>Successor Task</th><th>DS Task Count</th><th>Path Duration</th></tr>")
 		deps.each { dep ->
 			results.append("<tr><td>${dep.id}</td><td>${dep.predecessor}</td><td>${dep.successor}</td><td>${dep.downstreamTaskCount}</td><td>${dep.pathDuration}</td></tr>")
 		}
 		results.append('</table>')
 
+
+		results.append("<h1>Tasks Details</h1><table><tr><th>Id</th><th>Task</th><th>Duration</th><th>Earliest Start</th><th>Latest Start</th><th>Critical Path</td></tr>")
+		tasks.each { t ->
+			results.append("<tr><td>${t.id}</td><td>${t.taskNumber} ${t.comment}</td><td>${t.duration}</td><td>${t.tmpEarliestStart}</td><td>${t.tmpLatestStart}</td><td>${t.tmpCriticalPath ? 'Yes' : 'No'}</td></tr>")
+		}
+		results.append('</table>')
+
+
 		render results.toString()
 
 	}
+
 }

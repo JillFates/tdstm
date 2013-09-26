@@ -44,4 +44,11 @@ databaseChangeLog = {
 		}
 
 	}
+	changeSet(author: "John", id: "20130912 TM-2274-3") {
+		comment("Change AssetComment.duration and durationScale to not null with default values ")
+		sql("UPDATE asset_comment SET duration=0 WHERE duration IS NULL")
+		sql("UPDATE asset_comment SET duration_scale='m' WHERE duration_scale IS NULL")
+		sql("ALTER TABLE asset_comment MODIFY duration INT(11) NOT NULL DEFAULT 0, MODIFY duration_scale CHAR(1) NOT NULL DEFAULT 'd' AFTER duration")
+	}
+
 }

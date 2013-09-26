@@ -36,7 +36,7 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		['107', 7, 71],
 		['108', 6, 73],
 		['109', 1, 45],
-		['110', 1,  0],
+		['110', 1,  2],
 		['111', 1,  1]
 	]
 
@@ -81,7 +81,7 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		tasks << new AssetComment(id:5, taskNumber: 1005, duration:15, comment:'Unrack Srv xyzzy')
 		tasks << new AssetComment(id:6, taskNumber: 1006, duration:9, comment:'Disable monitoring')	// Start vertex
 		tasks << new AssetComment(id:7, taskNumber: 1007, duration:45, comment:'Post Move Testing') // Sink vertex
-		tasks << new AssetComment(id:8, taskNumber: 1008, duration:null, comment:'Make Coffee') // Sink vertex
+		tasks << new AssetComment(id:8, taskNumber: 1008, duration:2, comment:'Make Coffee') // Sink vertex
 		tasks << new AssetComment(id:9, taskNumber: 1009, duration:1, comment:'Done Move') // Sink vertex
 
 		deps << new TaskDependency(id:100, predecessor:tasks[0], assetComment:tasks[1], type:'x') 
@@ -222,7 +222,7 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 
 		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
 
-		println "What tasks does edge 105 have? ${durMap.edges['105'].successor.tmpDownstreamTasks}"
+		// println "What tasks does edge 105 have? ${durMap.edges['105'].successor.tmpDownstreamTasks}"
 		// Run the same process as before and we shouldn't see any differences
 		def m = [
 			['103', 2, 21],	// We added the earlier reference
@@ -245,7 +245,6 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 
 		def dfsMap = runbookService.processDFS( tasks, deps )
 		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
-
 		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
 
 		// {starts=[0, 6], sinks=[7, 8, 9], maxPathDuration=73, maxDownstreamTaskCount=8}
@@ -295,6 +294,89 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		assertEquals '2nd maxPathDuration', 109, graphs[1].maxPathDuration
 		assertEquals '2nd maxDownstreamTaskCount', 2, graphs[1].maxDownstreamTaskCount
 
+
+	}
+
+	// @Test
+	// Test that the findCriticalStartTask method properly determines the critical task to start with from the graph list of tasks
+	void testFindCriticalStartTask() {
+
+		def tasks
+		def deps
+		(tasks, deps) = initTestData()
+
+		def dfsMap = runbookService.processDFS( tasks, deps )
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
+
+		def tasksMap = tasks.asMap('id')
+
+		def task = runbookService.findCriticalStartTask(tasksMap, graphs[0])
+
+		assertEquals "Critical start task should be", 6, task.id
+	}
+
+	// @Test
+	// Test that the findCriticalPath method properly determines the critical path edge based on the longest duration
+	void testFindCriticalPath() {
+
+		def tasks
+		def deps
+		(tasks, deps) = initTestData()
+
+		def dfsMap = runbookService.processDFS( tasks, deps )
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
+
+		def edgesByPred = deps.asGroup { it.predecessor.id }
+		def edge = runbookService.findCriticalPath(tasks[6], edgesByPred)
+
+		assertTrue 'Edge should not be null', edge != null
+		assertEquals "Critical edge should be", 108, edge.id
+	}
+
+	// @Test
+	// Test that the computeStartTimes method properly calculates the various estStart, earliest and latest starts for each task in the graph(s)
+	void testComputeStartTimes() {
+
+		def tasks
+		def deps
+		(tasks, deps) = initTestData()
+
+		def dfsMap = runbookService.processDFS( tasks, deps )
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
+
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
+
+		def startTime = 0
+		def estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs)
+
+
+		tasks.each { t -> println "Task ${t.taskNumber}/${t.id} duration=${t.duration}, estStart=${t.tmpEstimatedStart}, earliest=${t.tmpEarliestStart}, latest=${t.tmpLatestStart}, CP=${t.tmpCriticalPath}"}
+
+		// id, estStart, earliest, latest, is Critical Path
+		def startTimes = [
+			[0,  0,  0,  4, false],
+			[1,  0,  9, 11, false],
+			[2,  9,  9 , 9, true],
+			[3, 19, 19, 19, true],
+			[4,  0, 17, 61, false],
+			[5, 22, 22, 22, true],
+			[6,  0,  0,  0, true],	// Start of CP
+			[7, 37, 37, 37, true],
+			[8,  0, 37, 80, false],
+			[9,  0, 37, 81, false],
+		]
+
+		assertEquals 'estFinish should be zero', 82, estFinish
+
+		// Check the times and critical path of all tasks
+		startTimes.each { id, estStart, earliest, latest, criticalPath -> 
+			assertEquals "Estimated Start ($id)", estStart, tasks[id].tmpEstimatedStart
+			assertEquals "Earliest Start ($id)", earliest, tasks[id].tmpEarliestStart
+			assertEquals "Estimated Start ($id)", latest, tasks[id].tmpLatestStart
+			assertEquals "Critical Path ($id)", criticalPath, tasks[id].tmpCriticalPath
+		}
 
 	}
 	

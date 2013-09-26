@@ -1,8 +1,9 @@
 package com.tds.asset
 
-import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentCategory
+import com.tdsops.tm.enums.domain.TimeConstraintType
 
 class AssetComment {
 
@@ -35,13 +36,15 @@ class AssetComment {
 	String status
 	Date dueDate
 	
-	Integer duration				// # of minutes to perform task
+	Integer duration = 0			// # of minutes to perform task
 	String durationScale = 'm'		// Scale that duration represents m)inute, h)our, d)ay, w)eek
 	Integer priority=3				// An additional option to score the order that like tasks should be processed where 1=highest and 5=lowest
 	
 	Date estStart
 	Date estFinish	
 	Date actStart
+	Date constraintTime				// Used for tasks that have a constraint on the time that it can start or finish (typically used for start event or start testing)
+	TimeConstraintType constraintType	// The type of constraint for time (e.g. MSO-Must Start On, )
 	// Date actFinish		// Alias of dateResolved
 	
 	Integer slack					// Indicated the original or recalculated slack time that this task has based on other predecessors of successors of this task
@@ -98,8 +101,8 @@ class AssetComment {
 		status( blank:true, nullable:true, inList : AssetCommentStatus.getList() )
 			// validator:{ if (commentType=='issue' && ! status) return ['issue.blank'] } )
 		// TODO: change duration to default to zero and min:1, need to coordinate with db update for existing data
-		duration(nullable:true)
-		durationScale(nullable:true, blank:true, inList:['m','h','d','w'])
+		duration( )
+		durationScale(blank:false, inList:['m','h','d','w'])
 		// TODO : add constraint to priority
 		// priority(range:1..5)
 		priority( nullable:true )
@@ -108,6 +111,8 @@ class AssetComment {
 		estFinish( nullable:true  )
 		slack( nullable:true )
 		workflowTransition( nullable:true  )
+		constraintTime( nullable: true )
+		constraintType( nullable: true )
 		// TODO : add range to workflowOverride constraint
 		workflowOverride( nullable:true)
 		hardAssigned(nullable:true)
@@ -231,6 +236,17 @@ class AssetComment {
 			return null
 		}
 	}
+
+	/*
+	 * Returns the remaining duration until the tasks will be completed. This tasks into account the start time
+	 * if the task is in progress otherwise returns the total duration
+	 * @return Integer duration in minutes
+	 */
+	def durationRemaining() {
+		// TODO : implement durationRemaining
+		return duration
+	}
+
 	// Returns the duration of the task in minutes
 	def durationInMinutes() {
 		def d = duration
@@ -244,12 +260,12 @@ class AssetComment {
 	}
 	
 	def beforeInsert = {
-		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
+		dateCreated = TimeUtil.nowGMT()
 		lastUpdated = dateCreated
 	}
 	
 	def beforeUpdate = {
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+		lastUpdated = TimeUtil.nowGMT()
 	}
 
 	String toString() {

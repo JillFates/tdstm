@@ -10,7 +10,6 @@ import com.tds.asset.TaskDependency
 
 import com.tdssrc.grails.TimeUtil
 
-
 class RunbookService {
 	
 	/** 
@@ -188,11 +187,12 @@ class RunbookService {
 
 		def elapsed = TimeUtil.elapsed(e)
 
+/*
 		log.debug "processDFS() processed moveEvent ${tasks[0].moveEvent} - ${tasks.size()} tasks and ${dependencies.size()} dependencies; \n" + 
 			"startVertices=$startVertices \n" +
 			"sinkVertices=$sinkVertices \n looped $loops times; recursed $tick times; took ${elapsed} to process"
 
-
+*/
 		return [ 'sinks': sinkVertices, 'starts': startVertices, 'cyclicals': cyclicalMaps, 'elapsed': elapsed ]
 	}
 
@@ -234,7 +234,7 @@ class RunbookService {
 		def edgesBySucc = dependencies.asGroup { it.successor.id }
 
 
-		// Let's walk backwards through the graph to set the durations based on a completely optimal graph with no
+		// Let's walk backwards using BFS through the graph to set the durations based on a completely optimal graph with no
 		// resource constraints. We'll loop through each of the sink vectors and update the durations appropriately.
 		def sinkSize = sinks.size()
 		def s=0
@@ -243,11 +243,6 @@ class RunbookService {
 
 			// Track the depth into the task
 			sink.tmpMapDepth = 1
-
-			// Preload the duration along the current path
-			// sink.tmpMaxPathDuration = sink.duration ?: 0
-			// This will be used to track the tasks that we walked over for this particular sink vertex
-			def walked = []
 
 			// Create a queue that we'll use to push and pull from using FIFO
 			java.util.LinkedList queue = new java.util.LinkedList()
@@ -332,7 +327,7 @@ class RunbookService {
 		edges.each { k,v -> v.tmpDownstreamTaskCount = v.successor.tmpDownstreamTasks.size() + 1 }
 
 		def elapsed = TimeUtil.elapsed(e)
-		log.debug "processDurations() took $elapsed"
+		//log.debug "processDurations() took $elapsed"
 
 		return [tasks: tasks, 'edges': edges, elapsed: elapsed]
 
@@ -342,8 +337,8 @@ class RunbookService {
 	 * Used to determine the unique graphs (separate directed graphs) where groups of start vertices share intersecting sink vertices.
 	 * For example if start A references sink X,Y, B references Y,Z and C references Z then they are all in  the same group or map.
 	 * If D references sink R,Q it would be a separate group/map   
-	 * @param List start vertices
-	 * @param List sink vertices
+	 * @param List<AssetComment> start vertices
+	 * @param List<AssetComment> sink vertices
 	 * @return An array of maps containing grouping of starts and their shared sink vertices along with some other metrics include
 	 *    starts - the ids of the start vertices
 	 *    sinks - the ids of the sink vertices in the group
@@ -354,9 +349,9 @@ class RunbookService {
 		def sinkIds = sinks*.id 	// List of the sink vertex ids
 		def startSinks = [:]		// This will contain the list of sink vertices that are downstream for each start vertex
 
-		// log.debug "findVennSinkVertices() sinkIds has ${sinks.size()} tasks, IDS: $sinkIds"
+		// log.debug "determineUniqueGraphs() sinkIds has ${sinks.size()} tasks, IDS: $sinkIds"
 		starts.each { start ->
-			// log.debug "findVennSinkVertices() start $start contains ${start.tmpDownstreamTasks.size()} downstream tasks"
+			// log.debug "determineUniqueGraphs() start $start contains ${start.tmpDownstreamTasks.size()} downstream tasks"
 			def idsFound = []
 			start.tmpDownstreamTasks.each { k,t -> 
 				// log.debug "checking $k for $t id ${t.id} in sinkIds"
@@ -366,21 +361,21 @@ class RunbookService {
 			startSinks.putAt(start.id, idsFound?.sort() )
 		}
 
-		// Now create graps that contain the unions of each start vectors' sink vertices where at least one sink vertex is shared
+		// Now create graphs that contain the unions of each start vectors' sink vertices where at least one sink vertex is shared
 		// between each of the starts. This will basically create a grap for each separate map if there are more than one. We don't 
 		// expect there to be more than one but you never know...
-		def graps = []
+		def graphs = []
 		def processed = []
 		def maxDur
 		def maxDST
-		def grapSinks
-		def grapStarts = []
+		def graphSinks
+		def graphStarts = []
 
 		def x=0
 		def s=starts.size()
 		while (x < s) {
 
-			log.debug "findVennSinkVertices() Starting outer loop x=$x"
+			log.debug "determineUniqueGraphs() Starting outer loop x=$x"
 			def startId = starts[x].id
 
 			// Skip over any starts that have already been processed
@@ -389,14 +384,14 @@ class RunbookService {
 				continue
 			}
 
-			maxDur = starts[x].tmpMaxPathDuration + starts[x].duration
+			maxDur = starts[x].tmpMaxPathDuration + starts[x].durationRemaining()
 			maxDST = starts[x].tmpDownstreamTasks.size()
-			log.debug "findVennSinkVertices() Initial maxDur=$maxDur, maxDST=$maxDST" 
+			log.debug "determineUniqueGraphs() Initial maxDur=$maxDur, maxDST=$maxDST" 
 			// Initialize this set of sink ids that will be in this grap
-			grapSinks = startSinks[startId]	
+			graphSinks = startSinks[startId]	
 
 			// Initials this set of start ids that will be in this grap
-			grapStarts << startId
+			graphStarts << startId
 
 			def y=x+1
 			while (y < s) {
@@ -407,21 +402,21 @@ class RunbookService {
 					y++
 					continue
 				}
-				log.debug "findVennSinkVertices() Starting inner loop y=$y"
+				log.debug "determineUniqueGraphs() Starting inner loop y=$y"
 
 				// Lets see if any of this start's sink vertices intersect with the sinks already in this grap
-				if (org.apache.commons.collections.CollectionUtils.intersection(grapSinks, startSinks[nextId]).size() > 0) {
+				if (org.apache.commons.collections.CollectionUtils.intersection(graphSinks, startSinks[nextId]).size() > 0) {
 					// Add the start and it's sink vertices ids to the two arrays
-					grapStarts << nextId
-					grapSinks = org.apache.commons.collections.CollectionUtils.union(grapSinks, startSinks[nextId])
+					graphStarts << nextId
+					graphSinks = org.apache.commons.collections.CollectionUtils.union(graphSinks, startSinks[nextId])
 
 					// track that we've processed this start vertex
 					processed << nextId
 		
-					log.debug "findVennSinkVertices() task:${starts[y].taskNumber} maxDur=${starts[y].tmpMaxPathDuration}, maxDST=${starts[y].tmpDownstreamTasks.size()}" 
+					log.debug "determineUniqueGraphs() task:${starts[y].taskNumber} maxDur=${starts[y].tmpMaxPathDuration}, maxDST=${starts[y].tmpDownstreamTasks.size()}" 
 
 					// Track the max values for path duration and # of tasks downstream
-					def yDur = starts[y].tmpMaxPathDuration + starts[y].duration
+					def yDur = starts[y].tmpMaxPathDuration + starts[y].durationRemaining()
 					if (maxDur < yDur)
 						maxDur = yDur
 					if (maxDST < starts[y].tmpDownstreamTasks.size())
@@ -433,17 +428,277 @@ class RunbookService {
 				}
 				y++
 			}
-			graps << [starts:grapStarts, sinks:grapSinks, maxPathDuration:maxDur, maxDownstreamTaskCount:maxDST]
-			grapStarts = []
+			graphs << [starts:graphStarts, sinks:graphSinks, maxPathDuration:maxDur, maxDownstreamTaskCount:maxDST]
+			graphStarts = []
 			x++
 		}
 
 		// Catch the last grap if there was one no added to the grap
-		if (grapStarts.size() > 0)
-			graps << [starts:grapStarts, sinks:grapSinks, maxPathDuration:maxDur, maxDownstreamTaskCount:maxDST]
+		if (graphStarts.size() > 0)
+			graphs << [starts:graphStarts, sinks:graphSinks, maxPathDuration:maxDur, maxDownstreamTaskCount:maxDST]
 
-		log.debug "findVennSinkVertices() graps= $graps"
-		return graps
+		log.debug "determineUniqueGraphs() graphs= $graphs"
+		return graphs
+	}
+
+	/**
+	 * Used to determine the the critical start vertex task to process the critical path calculation
+	 * @param Map<AssetComment.id : AssetComment> the list of tasks mapped by their id
+	 * @param Map - The resulting graphs data from determineUniqueGraphs() method
+	 * @return The optimal task to start with 
+	 */
+	private AssetComment findCriticalStartTask(tasksMap, graph) {
+		def taskId
+		if ( graph.starts.size()==1 ) {
+			// Only one so we're good
+			taskId = graph.starts[0].toString()
+			log.debug "findCriticalStartTask() using first task (taskId=$taskId)"
+		} else {
+			// iterate over the various start vertices in the graph to find the longest duration or most downstream tasks
+			def maxDur = 0
+			def maxTaskCount = 0
+			graph.starts.each { id ->
+				id = id.toString()
+				def taskDur = tasksMap[id].duration
+				def taskCount = tasksMap[id].tmpDownstreamTasks.size()
+				log.debug "findCriticalStartTask() Comparing starts taskId=$id, taskDur=$taskDur, taskCount=$taskCount, maxDur=$maxDur, maxTaskCount=$maxTaskCount"
+				if (taskDur > maxDur) {
+					taskId = id
+					maxDur = taskDur
+					maxTaskCount = taskCount
+				} else {
+					if (taskDur == maxDur) {
+						if (taskCount > maxTaskCount) {
+							taskId = id
+							maxDur = taskDur
+							maxTaskCount = taskCount
+						}
+					}
+				}
+			}
+		}
+		return taskId ? tasksMap[taskId] : null
+	}
+
+	/**
+	 * Used to determine the the critical path for a particular task
+	 * @param AssetComment task to find edge for
+	 * @param Map - The resulting graphs data from determineUniqueGraphs() method
+	 * @return The edge(aka TaskDependency) that would be the critical path for the task
+	 */
+	private TaskDependency findCriticalPath(task, edges) {
+		def edge
+		def id = task.id.toString()
+
+		if (edges.containsKey(id)) {
+			def maxDur=0
+			def maxTasks=0
+			edges[id].each { e ->
+				if (e.tmpPathDuration > maxDur) {
+					edge = e
+					maxDur = e.tmpPathDuration
+					maxTasks = e.successor.tmpDownstreamTasks.size()
+				} else if ( e.tmpPathDuration > maxDur ) {
+					def taskCount = maxTasks = e.successor.tmpDownstreamTasks.size()
+					if (taskCount > maxTasks) {
+						edge = e
+						maxDur = e.tmpPathDuration
+						maxTasks = taskCount
+					} 
+				}
+			} 
+		}
+		return edge
+	}
+
+	/**
+	 * Used to compute the earliest and latest starts of a set of tasks in a directed graph
+	 * @param Integer the start time as an integer
+	 * @param List<AssetComment> a list of tasks
+	 * @param List<TaskDependency> a list of task dependencies associated with the task list
+ 	 * @param List<AssetComment> start vertices
+	 * @param List<AssetComment> sink vertices
+	 * @param List<Map> The resulting graphs data from determineUniqueGraphs() method
+	 * @return ?
+	 */
+	def computeStartTimes(startTime, tasks, dependencies, starts, sinks, graphs) {	
+
+		// 
+		// Initialization
+		// 
+
+		def time = startTime
+		// TODO - we need to convert to some time offset? TimeUtil.nowGMT()
+
+		// Sort on the # of tasks and then max durations so we work on the most important graph(s) first
+		if (graphs.size() > 1)
+			graphs = graphs.sort{ [it.maxDownstreamTaskCount, it.maxPathDuration ] }
+
+		// Add the temporary starts variables and reset the beenExplored 
+		tasks.each { 
+			it.metaClass.setProperty('tmpEarliestStart', 0)
+			it.metaClass.setProperty('tmpEstimatedStart', 0)
+			it.metaClass.setProperty('tmpLatestStart', 0)
+			it.metaClass.setProperty('tmpCriticalPath', false)
+			it.tmpBeenExplored = false
+		}
+
+		// Convert the task list into map by their ids
+		def tasksMap = tasks.asMap('id')
+
+		// Get map by dependencies by their predecessor and by their successors
+		def edgesByPred = dependencies.asGroup { it.predecessor.id }
+		def edgesBySucc = dependencies.asGroup { it.successor.id }
+
+		def estFinish
+
+		// 
+		// Main Loop
+		// 
+
+		// Need to iterate over the list of graphs and choose the first graph to work on
+		for (int g=0; g < graphs.size(); g++) {
+
+			// Find the start vertex that we should traverse based on the longest duration and tasks downstream
+			def task = findCriticalStartTask(tasksMap, graphs[g])
+
+			if (task==null) {
+				log.error "computeStartTimes() - No Critical Start Task found for graph: ${graphs[g]}"
+				continue
+			}
+
+			//
+			// Determine Critical Path
+			// Perform a DFS process through the graph to determine the earliest starts on the initial critical path
+			//
+			def safety = 100
+			while (true) {
+				if (--safety == 0) {
+					throw new RuntimeException('computeStartTimes() caught in infinite loop - Critical Path')
+				}
+				task.tmpEstimatedStart = time
+				task.tmpEarliestStart = time
+				task.tmpLatestStart = time
+				task.tmpCriticalPath = true
+				time += task.durationRemaining()
+				log.debug "computeStartTimes() DFS/CP task id=${task.id}, dur=${task.duration}. time=$time"
+
+				def edge = findCriticalPath(task, edgesByPred)
+				if (edge == null) {
+					// We presently on the sink vertex
+					break
+				} else {
+					task = edge.successor
+				}
+			}
+
+			estFinish = time
+
+			//
+			// Calculate Latest Starts for all tasks 
+			// Do a reverse BFS walk through the graph to update the tmpLatestStart values for all tasks that we haven't walked
+			// using each of the sink vertices in the graph
+			//
+
+			// Create a queue that we'll use to push and pull from using FIFO
+			java.util.LinkedList queue = new java.util.LinkedList()
+
+			// initialize the queue with all of the sink tasks
+			graphs[g].sinks.each { id ->
+				id = id.toString()
+
+				queue.add(id) 
+
+				tasksMap[id].tmpBeenExplored = true
+
+				// Update the non-critical path sink tasks with the latest start
+				if (id != task.id.toString())
+					tasksMap[id].tmpLatestStart = estFinish - tasksMap[id].duration
+			}
+
+			// We'll iterate until the queue is empty
+			safety = tasks.size() * 3
+			while( queue.size() > 0 ) {
+
+				// Bail out of infinite loop
+				if ( --safety == 0 ) {
+					throw new RuntimeException('computeStartTimes() caught in infinite loop - Latest Start')					
+				}
+
+				// Get task id out of the queue
+				def taskId = queue.poll()
+				log.debug "computeStartTimes() RBFS task=$taskId"
+
+				if (edgesBySucc.containsKey(taskId)) {
+					// Get the latest start of the successor task 
+					def succLatestStart = tasksMap[taskId].tmpLatestStart
+
+					// Iterate over the edges back to the predecessor tasks
+					edgesBySucc[taskId].each() { edge ->
+						def calcLatestStart = succLatestStart - edge.predecessor.duration 
+						if ( ! tasksMap[edge.predecessor.id.toString()].tmpBeenExplored ) {
+							// Add the task to the queue
+							queue.push(edge.predecessor.id.toString())
+							edge.predecessor.tmpLatestStart = calcLatestStart
+							edge.predecessor.tmpBeenExplored = true
+						} else {
+							// Been here before so we need to compare the latest starts to set to the ealiest start of the two
+							if ( calcLatestStart < edge.predecessor.tmpLatestStart ) 
+								edge.predecessor.tmpLatestStart = calcLatestStart
+						}
+					}
+				} else {
+					log.debug "computeStartTimes() Hit a start vertices task=$taskId"
+				}
+
+			}
+
+			//
+			// Calculate Earliest Starts
+			// Do a forward BFS walk through the graph to update the tmpEarliestStart that have yet to be updated (non-critical path)
+			//
+
+			// load queue with the start vertices
+			graphs[g].starts.each { id -> queue.push( id.toString() ) }
+
+			tasks.each { 
+				it.tmpBeenExplored = false
+			}
+
+			// log.debug "computeStartTimes() edgesByPred Keys: ${edgesByPred.keySet()}"
+
+			safety = tasks.size() * 3
+			while( queue.size() ) {
+
+				// Bail out of infinite loop
+				if ( --safety == 0 ) {
+					throw new RuntimeException('computeStartTimes() caught in infinite loop - Earliest Start')					
+				}
+
+				def taskId = queue.poll()
+				log.debug "computeStartTimes() Earliest task=$taskId, queue.size=${queue.size()}"
+				if (edgesByPred.containsKey(taskId)) {
+					edgesByPred[taskId].each() { edge ->
+						// Only need to calculate the earliest start of non-critical path tasks
+						if ( !edge.successor.tmpCriticalPath ) {
+							def earliest = edge.predecessor.tmpEarliestStart + edge.predecessor.duration
+							if (earliest > edge.successor.tmpEarliestStart)
+								edge.successor.tmpEarliestStart = earliest
+						}
+						if ( ! edge.successor.tmpBeenExplored ) {
+							queue.push( edge.successor.id.toString() )
+							edge.successor.tmpBeenExplored = true
+						}
+					}
+				} else {
+					log.debug "computeStartTimes() hit sink vertex $taskId"
+				}
+			}
+
+		} // for (int g=0; g < graphs.size(); g++)
+
+
+		return estFinish
 	}
 
 }

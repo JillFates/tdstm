@@ -1,5 +1,5 @@
 package com.tds.asset
-import com.tdssrc.grails.GormUtil;
+import com.tdssrc.grails.TimeUtil;
 
 class AssetDependency {
 
@@ -12,8 +12,7 @@ class AssetDependency {
 	String comment
 	Person createdBy
 	Person updatedBy
-	
-	
+		
 	Date dateCreated
 	Date lastUpdated
 
@@ -22,19 +21,19 @@ class AssetDependency {
 		dependent( nullable:true)
 		type( blank:false, nullable:false )
 		dataFlowFreq(blank:true, nullable:true, inList:[
-													"Unknown",
-													"constant",
-													"hourly",
-													"daily",
-													"weekly",
-													"monthly"
-												])
+			"Unknown",
+			"constant",
+			"hourly",
+			"daily",
+			"weekly",
+			"monthly"
+		])
 		dataFlowDirection(blank:false, nullable:false , inList:[
-													"Unknown",
-													"bi-directional",
-													"incoming",
-													"outgoing"
-												])
+			"Unknown",
+			"bi-directional",
+			"incoming",
+			"outgoing"
+		])
 		status(blank:false, nullable:false )
 		comment(blank:true, nullable:true)
 		updatedBy( nullable:false )
@@ -54,10 +53,10 @@ class AssetDependency {
 	 * Date to insert in GMT
 	 */
 	def beforeInsert = {
-		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+		dateCreated = TimeUtil.nowGMT()
+		lastUpdated = TimeUtil.nowGMT()
 	}
 	def beforeUpdate = {
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+		lastUpdated = TimeUtil.nowGMT()
 	}
 }
