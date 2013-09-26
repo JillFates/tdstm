@@ -399,5 +399,28 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 				[asset:this, bundle:this.moveBundle,
 				 status:[AssetDependencyStatus.VALIDATED, AssetDependencyStatus.UNKNOWN, AssetDependencyStatus.QUESTIONED]]).size()
 	}
-
+	
+	/**
+	 * This method is used to set source Room and location or target Room and Location when we get request from select box
+	 * @param roomId : id of the room that we need to set
+	 * @param source : a Boolean flag to determine whether request is for source or target
+	 * @return : void
+	 */
+	def setRoomAndLoc(def roomId, Boolean source){
+		def room = null
+		if(roomId && roomId !='0')
+			room = Room.read( roomId )
+		
+		//If flag is source then setting all source to requested value and vice versa .
+		if( source ){
+			roomSource = room
+			sourceRoom = room ? room.roomName : null
+			sourceLocation = room ? room?.location : null
+		}
+		if( !source ){
+			roomTarget = room
+			targetRoom = room ? room.roomName : null
+			targetLocation = room ? room?.location : null
+		}
+	}
 }

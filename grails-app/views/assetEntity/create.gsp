@@ -26,6 +26,13 @@
 			$(".rackLabel").show()
 			$(".vmLabel").hide()
 		}
+		
+		$(".newRoomS").hide();
+		$(".newRoomT").hide();
+		var myOption = "<option value='-1'>Add Room...</option>"
+		$(".roomSelectEditS option:first").after(myOption);
+		$(".roomSelectEditT option:first").after(myOption);
+		
 		if(!isIE7OrLesser)
 			$("select.assetSelect").select2();
 		
@@ -67,11 +74,35 @@
 								</td>
 								<td ><g:select id="priority" class="${config.priority}" name ="priority" from="${priorityOption}" value= "${assetEntityInstance.priority}" noSelection="${['':' Please Select']}" tabindex="21" />
 								</td>
-								<td class="label ${config.sourceLocation}" nowrap="nowrap"><label for="sourceLocationId">Location</label></td>
-								<td><input type="text" id="sourceLocationId" class="${config.sourceLocation}"
-									name="sourceLocation" value="${assetEntityInstance.sourceLocation}" size=10 tabindex="31" /></td>
-									<td><input type="text" id="targetLocationId" class="${config.targetLocation}"
-									name="targetLocation" value="${assetEntityInstance.targetLocation}" size=10 tabindex="41" /></td>
+								<td class="label ${config.sourceLocation}" nowrap="nowrap"><label for="sourceLocationId">Room</label></td>
+								<td>
+									<span class="useRoomS">
+									    <g:select from="${rooms}" name="roomSourceId" class="${config.sourceLocation} assetSelect roomSelectEditS"  optionKey="id" optionValue="${{it.location+' / '+it.roomName}}"
+									    	noSelection="${[0:' Please Select...']}" tabindex="31" onchange="toogleRoom(this.value, 'S')"/>
+									</span>
+									<span class="newRoomS">
+										<input type="text" id="sourceLocationId" class="${config.sourceLocation}"
+											name="sourceLocation" value="${assetEntityInstance.sourceLocation}" size=10 tabindex="31" />
+									</span>
+									<span class="newRoomS">
+										<input type="text" id="sourceRoomId" class="${config.sourceRoom}"
+											name="sourceRoom" value="${assetEntityInstance.sourceRoom}" size=10 tabindex="32" />
+									</span>
+								</td>
+								<td>
+									<span class="useRoomT">
+									    <g:select from="${rooms}" name="roomTargetId" class="${config.targetLocation} assetSelect roomSelectEditT"  optionKey="id" optionValue="${{it.location+' / '+it.roomName}}"
+									    	noSelection="${[0:' Please Select...']}"  tabindex="31" onchange="toogleRoom(this.value, 'T')"/>
+									</span>
+									<span class="newRoomT">
+										<input type="text" id="targetLocationId" class="${config.targetLocation}"
+											name="targetLocation" value="${assetEntityInstance.targetLocation}" size=10 tabindex="41" />
+									</span>
+									<span class="newRoomT">
+										<input type="text" id="targetRoomId" class="${config.targetRoom}"
+											name="targetRoom" value="${assetEntityInstance.targetRoom}" size=10 tabindex="42" />
+									</span>
+								</td>
 							</tr>
 							<tr>
 								<td class="label ${config.manufacturer}" nowrap="nowrap"><label for="manufacturer">Manufacturer</label></td>
@@ -84,21 +115,6 @@
 								<td ><input type="text" id="ipAddress" name="ipAddress" class="${config.ipAddress}"
 									value="${assetEntityInstance.ipAddress}" tabindex="22" />
 								</td>
-								<td class="label ${config.sourceRoom}" nowrap="nowrap"><label for="sourceRoomId">Room</label></td>
-								<td><input type="text" id="sourceRoomId" class="${config.sourceRoom}"
-									name="sourceRoom" value="${assetEntityInstance.sourceRoom}" size=10 tabindex="32" /></td>
-									<td><input type="text" id="targetRoomId" class="${config.targetRoom}"
-									name="targetRoom" value="${assetEntityInstance.targetRoom}" size=10 tabindex="42" /></td>
-							</tr>
-							<tr>
-								<td class="label ${config.model}" nowrap="nowrap"><label for="model">Model</label></td>
-								<td>
-								<div id="modelCreateId">
-								  		<g:render template="modelView"  model="[clazz:config.model, models:models, assetEntity:assetEntityInstance, forWhom:'Create']" />
-								 </div>
-								</td>
-								<td class="label ${config.os}" nowrap="nowrap"><label for="os">OS</label></td>
-								<td ><input type="text" id="os" name="os" class="${config.os}" value="${assetEntityInstance.os}"  tabindex="24" /></td>
 								<td class="label ${config.sourceRack} rackLabel"  nowrap="nowrap" id="rackId"><label for="sourceRackId">Rack/Cab</label></td>
 								<td class="label bladeLabel" nowrap="nowrap" id="bladeId" style="display: none"><label for="sourceBladeChassisId">Blade</label></td>
 								<td class="label vmLabel" style="display: none" class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label>
@@ -112,18 +128,16 @@
 									name="targetBladeChassis" value="${assetEntityInstance.targetBladeChassis}" size=10 tabindex="45" /></td>
 								<td class="vmLabel" style="display: none"><input type="text" id="virtualHost" class="${config.virtualHost}" name="virtualHost" value="${assetEntityInstance.virtualHost}" size=10 tabindex="37" /></td>
 								<td class="vmLabel" style="display: none">&nbsp;</td>
-								
 							</tr>
 							<tr>
-								<td class="label ${config.shortName}" nowrap="nowrap"><label for="shortName">Alt Name</label></td>
-								<td ><input type="text" id="shortName" class="${config.shortName}"
-									name="shortName" value="${assetEntityInstance.shortName}" tabindex="15" />
+								<td class="label ${config.model}" nowrap="nowrap"><label for="model">Model</label></td>
+								<td>
+								<div id="modelCreateId">
+								  		<g:render template="modelView"  model="[clazz:config.model, models:models, assetEntity:assetEntityInstance, forWhom:'Create']" />
+								 </div>
 								</td>
-								<td class="label ${config.supportType}" nowrap="nowrap"><label for="supportType">Support Type</label></td>
-								<td ><input type="text" id="supportType" class="${config.supportType}" name="supportType"
-									value="${assetEntityInstance.supportType}" tabindex="26" />
-								</td>
-								
+								<td class="label ${config.os}" nowrap="nowrap"><label for="os">OS</label></td>
+								<td ><input type="text" id="os" name="os" class="${config.os}" value="${assetEntityInstance.os}"  tabindex="24" /></td>
 								<td class="label ${config.sourceRackPosition}" nowrap="nowrap"><label for="sourceRackPositionId">Position</label>
 								<td class="rackLabel"><input type="text" id="sourceRackPositionId" class="${config.sourceRackPosition}"
 									name="sourceRackPosition" value="${assetEntityInstance.sourceRackPosition}" size=10 tabindex="34" /></td>
@@ -135,6 +149,21 @@
 									name="targetBladePosition" value="${assetEntityInstance.targetBladePosition}" size=10 tabindex="46" /></td>	
 								<td class="vmLabel">&nbsp;</td>
 								<td class="vmLabel">&nbsp;</td>	
+								
+							</tr>
+							<tr>
+								<td class="label ${config.shortName}" nowrap="nowrap"><label for="shortName">Alt Name</label></td>
+								<td ><input type="text" id="shortName" class="${config.shortName}"
+									name="shortName" value="${assetEntityInstance.shortName}" tabindex="15" />
+								</td>
+								<td class="label ${config.supportType}" nowrap="nowrap"><label for="supportType">Support Type</label></td>
+								<td ><input type="text" id="supportType" class="${config.supportType}" name="supportType"
+									value="${assetEntityInstance.supportType}" tabindex="26" />
+								</td>
+								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
+								<td colspan="2"><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${assetEntityInstance.moveBundle}" optionKey="id" optionValue="name" tabindex="38" noSelection="${['':' Please Select']}" />
+								</td>
+								
 							</tr>
 							<tr>
 								<td class="label ${config.serialNumber}" nowrap="nowrap"><label for="serialNumber">Serial #</label></td>
@@ -148,9 +177,8 @@
 				        				</script> <input type="text" class="dateRange ${config.retireDate}" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate" tabindex="27"
 									value="<tds:convertDate date="${assetEntityInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" tabindex="27" />" > 
 								</td>
-								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-								<td colspan="2"><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${assetEntityInstance.moveBundle}" optionKey="id" optionValue="name" tabindex="38" noSelection="${['':' Please Select']}" />
-								</td>
+								<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
+								<td colspan="2"><g:select id="planStatus" class="${config.planStatus}" name ="planStatus" from="${planStatusOptions}" value= "Unassigned"  noSelection="${['':' Please Select']}" tabindex="39" /></td>
 							</tr>
 							<tr>
 								<td class="label ${config.assetTag}" nowrap="nowrap"><label for="assetTag">Tag</label></td>
@@ -162,8 +190,10 @@
 					                    </script> <input type="text" class="dateRange ${config.maintExpDate}" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate" tabindex="28"
 									value="<tds:convertDate date="${assetEntityInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />" > 
 								</td>
-								<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
-								<td colspan="2"><g:select id="planStatus" class="${config.planStatus}" name ="planStatus" from="${planStatusOptions}" value= "Unassigned"  noSelection="${['':' Please Select']}" tabindex="39" /></td>
+								<td class="label ${config.validation}"><label for="validation">Validation</label></td>
+								<td colspan="2">
+									<g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" class="${config.validation}" name="validation" onChange="assetFieldImportance(this.value,'AssetEntity');" value="Discovery"/>
+								</td>
 							</tr>
 							<tr>
 								<td class="label ${config.railType}" nowrap="nowrap"><label for="railType">Rail Type</label></td>
@@ -172,12 +202,6 @@
 								<td ><input type="text" id="truck" class="${config.truck}" name="truck" value="${assetEntityInstance.truck}" size=3 tabindex="61" />
 								<input type="text" id="cart" class="${config.cart}" name="cart" value="${assetEntityInstance.cart}" size=3 tabindex="62" />
 								<input type="text" id="shelf" class="${config.shelf}" name="shelf" value="${assetEntityInstance.shelf}" size=2 tabindex="63" /></td>
-								<td class="label ${config.validation}"><label for="validation">Validation</label></td>
-								<td colspan="2">
-									<g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" class="${config.validation}" name="validation" onChange="assetFieldImportance(this.value,'AssetEntity');" value="Discovery"/>
-								</td>
-							</tr>
-							<tr>
 								<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
 								<td><input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" value="${assetEntityInstance.externalRefId}" tabindex="11" /></td>
 							</tr>

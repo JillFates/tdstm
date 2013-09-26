@@ -1752,6 +1752,10 @@ class AssetEntityController {
 		def assetEntity = new AssetEntity(params)	
 		assetEntity.project = projectInstance
 		assetEntity.owner = projectInstance.client
+		
+		params.roomSourceId == "-1" ?: assetEntity.setRoomAndLoc( params.roomSourceId, true ) 
+		params.roomTargetId == "-1" ?: assetEntity.setRoomAndLoc( params.roomTargetId, false )
+		
 		if(!params.assetTag){
 			def lastAssetId = projectInstance.lastAssetId
 			if(!lastAssetId){
@@ -1768,7 +1772,9 @@ class AssetEntityController {
 			}
 		}
 			if(!assetEntity.hasErrors() && assetEntity.save()) {
-				assetEntity.updateRacks()
+				if( params.roomSourceId == "-1" || params.roomTargetId == "-1" )
+					assetEntity.updateRacks()
+					
 				def loginUser = securityService.getUserLogin()
 				if(assetEntity.model){
 					assetEntityAttributeLoaderService.createModelConnectors( assetEntity )
@@ -3094,11 +3100,14 @@ class AssetEntityController {
 			
 			//fieldImportance for Discovery by default
 			def configMap = assetEntityService.getConfig('AssetEntity','Discovery')
+			
+			def rooms = Room.findAll("FROM Room WHERE project =:project order by location, roomName", [project:project])
 				
 			def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 								planStatusOptions:planStatusOptions?.value, projectId:project.id ,railTypeOption:railTypeOption?.value,
 								priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers,redirectTo:params?.redirectTo,
-								models:models, assetType:assetType, manufacuterer:manufacuterer, config:configMap.config ,customs:configMap.customs]
+								models:models, assetType:assetType, manufacuterer:manufacuterer, config:configMap.config ,customs:configMap.customs,
+								rooms:rooms]
 			 
 			 if(params.redirectTo == "assetAudit") {
 				 paramsMap << ['source':params.source, 'assetType':params.assetType]
@@ -3242,16 +3251,18 @@ class AssetEntityController {
 		def nonNetworkTypes = [AssetType.SERVER.toString(),AssetType.APPLICATION.toString(),AssetType.VM.toString(),
 			AssetType.FILES.toString(),AssetType.DATABASE.toString(),AssetType.BLADE.toString()]
 		
+		def rooms = Room.findAll("FROM Room WHERE project =:project order by location, roomName", [project:project])
+		
 		def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 							planStatusOptions:planStatusOptions?.value, projectId:projectId, project: project, railTypeOption:railTypeOption?.value,
 							priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets,
 							manufacturers:manufacturers, models:models,redirectTo:params?.redirectTo, dependencyType:dependencyType,
 							dependencyStatus:dependencyStatus,servers:servers, sourceChassisSelect:sourceChassisSelect, 
-							targetChassisSelect:targetChassisSelect, nonNetworkTypes:nonNetworkTypes, config:configMap.config, customs:configMap.customs]
+							targetChassisSelect:targetChassisSelect, nonNetworkTypes:nonNetworkTypes, config:configMap.config, customs:configMap.customs,
+							rooms:rooms]
 		
 		if(params.redirectTo == "roomAudit") {
-			def rooms = Room.findAllByProject(project)
-					paramsMap << ['rooms':rooms, 'source':params.source,'assetType':params.assetType]
+			paramsMap << ['rooms':rooms, 'source':params.source,'assetType':params.assetType]
 			render(template:"auditEdit",model:paramsMap)
 		}
 		
@@ -3318,8 +3329,14 @@ class AssetEntityController {
 		
 		def assetEntityInstance = AssetEntity.get(params.id)
 		assetEntityInstance.properties = params
+		
+		params.roomSourceId == "-1" ?: assetEntityInstance.setRoomAndLoc( params.roomSourceId, true ) 
+		params.roomTargetId == "-1" ?: assetEntityInstance.setRoomAndLoc( params.roomTargetId, false )
+		
 		if(!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {
-			assetEntityInstance.updateRacks()
+			if( params.roomSourceId == "-1" || params.roomTargetId == "-1" )
+				assetEntityInstance.updateRacks()
+				
 			def loginUser = securityService.getUserLogin()
 			flash.message = "Asset ${assetEntityInstance.assetName} Updated <br/>"
 			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance, loginUser, project)

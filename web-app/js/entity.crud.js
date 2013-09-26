@@ -910,14 +910,22 @@ function changeMoveBundleColor(depId,assetId,assetBundleId, status){
 			bundleObj.addClass('dep-'+status)
 	}
 }
+
 $(document).ready(function() {
-	  $(window).keydown(function(event){
-	    if(event.keyCode == 13) {
-	      event.preventDefault();
-	      if($("#updateCloseId").length > 0)
-	    	  $("#updateCloseId").click();
-	      if($("#updatedId").length > 0)
-	    	  $("#updatedId").click();
-	    }
-	  });
+	$(window).keydown(function(event){
+		if(event.keyCode == 13) {
+			event.preventDefault();
+		if($("#updateCloseId").length > 0)
+			$("#updateCloseId").click();
+		if($("#updatedId").length > 0)
+			$("#updatedId").click();
+		}
 	});
+});
+
+function toogleRoom(value, source){
+	if( value == '-1' )
+		$(".newRoom"+source).show()
+	else
+		$(".newRoom"+source).hide()
+}
