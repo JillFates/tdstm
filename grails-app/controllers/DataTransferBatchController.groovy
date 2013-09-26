@@ -15,6 +15,7 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
 
 class DataTransferBatchController {
 	// Objects to be injected
@@ -79,8 +80,9 @@ class DataTransferBatchController {
 		def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
-		def nullableProperties = GormUtil.getDomainPropertiesWithConstraint( AssetEntity, 'nullable', true )
-		def blankProperties = GormUtil.getDomainPropertiesWithConstraint( AssetEntity, 'blank', true )
+		def nullFProps = GormUtil.getDomainPropertiesWithConstraint( AssetEntity, 'nullable', false )
+		def blankFProps = GormUtil.getDomainPropertiesWithConstraint( AssetEntity, 'blank', false )
+		def nullAndBlankFProps = nullFProps.intersect( blankFProps )// list of props having both constraints (nullable, blank)false
 		
 		DataTransferBatch.withTransaction { status ->
 			project = securityService.getUserCurrentProject()
@@ -141,7 +143,7 @@ class DataTransferBatchController {
 		    				isNewValidate = "true"
 							log.info "serverProcess - creating new asset for rowId $rowId"
 		    			}
-						def cloneEntity = retainNotNullVal(assetEntity, nullableProperties, isNewValidate)
+						def cloneEntity = retainNotNullVal(assetEntity, nullFProps, isNewValidate)
 						
     					if( assetEntity && flag == 0 ) {
     						assetEntity.project = project
@@ -277,11 +279,22 @@ class DataTransferBatchController {
 		    							}
 										break
 								}
-								//If imported "NULL" and field allows blank and null updating value to null
-								if(it.importValue == "NULL" && !nullableProperties.contains(attribName)) 
-									assetEntity."$attribName" = null
-								else if (it.importValue == "NULL")
-									assetEntity."$attribName" = cloneEntity."$attribName"
+								//If imported "NULL" and field allows blank and null updating value to null 
+								if(it.importValue == "NULL"){
+									def type = GrailsClassUtils.getPropertyType(Database, attribName)?.getName()
+									if( !nullFProps.contains( attribName ) ) {
+										assetEntity."$attribName" = null
+									} else {
+										if( !blankFProps.contains( attribName ) )
+											assetEntity."$attribName" = ""
+										if ( nullAndBlankFProps.contains( attribName ) && type=="java.lang.String" ){
+											assetEntity."$attribName" =  "NULL"
+										} else {
+											assetEntity."$attribName" =  cloneEntity."$attribName"
+											log.info "Imported invalid value 'NULL' which is not allowed for $attribName property."
+										}
+									}
+								}
     						}
     						if ( isFormatError != 1 ) {
     							if( isModified == "true" ) {
@@ -381,8 +394,9 @@ class DataTransferBatchController {
     	def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
-		def nullableProperties = GormUtil.getDomainPropertiesWithConstraint( Application, 'nullable', true )
-		def blankProperties = GormUtil.getDomainPropertiesWithConstraint( Application, 'blank', true )
+		def nullFProps = GormUtil.getDomainPropertiesWithConstraint( Application, 'nullable', false )
+		def blankFProps = GormUtil.getDomainPropertiesWithConstraint( Application, 'blank', false )
+		def nullAndBlankFProps  = nullFProps.intersect( blankFProps ) // list of props having both constraints (nullable, blank)false
 		
 		DataTransferBatch.withTransaction { status ->
 			project = securityService.getUserCurrentProject()			
@@ -445,7 +459,7 @@ class DataTransferBatchController {
 		    			}
 		    		
     					if( application && flag == 0 ) {
-							def cloneEntity = retainNotNullVal(application, nullableProperties, isNewValidate)
+							def cloneEntity = retainNotNullVal(application, nullFProps, isNewValidate)
     						application.project = project
     						dtvList.each {
     							def attribName = it.eavAttribute.attributeCode
@@ -548,10 +562,21 @@ class DataTransferBatchController {
 		    							}
 								}
 								//If imported "NULL" and field allows blank and null updating value to null
-								if(it.importValue.trim() == "NULL" && !nullableProperties.contains(attribName)) 
-									application."$attribName" = null
-								else if (it.importValue == "NULL")
-									application."$attribName" = cloneEntity."$attribName"
+								if(it.importValue == "NULL"){
+									def type = GrailsClassUtils.getPropertyType(Database, attribName)?.getName()
+									if( !nullFProps.contains( attribName ) ) {
+										application."$attribName" = null
+									} else {
+										if( !blankFProps.contains( attribName ) )
+											application."$attribName" = ""
+										if (nullAndBlankFProps.contains( attribName ) && type=="java.lang.String"){
+											application."$attribName" =  "NULL"
+										} else {
+											application."$attribName" =  cloneEntity."$attribName"
+											log.error "Imported invalid value 'NULL' which is not allowed for $attribName property."
+										}
+									}
+								}
     						}
 								
     						}
@@ -644,8 +669,9 @@ class DataTransferBatchController {
 		def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
-		def nullableProperties = GormUtil.getDomainPropertiesWithConstraint( Files, 'nullable', true )
-		def blankProperties = GormUtil.getDomainPropertiesWithConstraint( Files, 'blank', true )
+		def nullFProps = GormUtil.getDomainPropertiesWithConstraint( Files, 'nullable', false )
+		def blankFProps = GormUtil.getDomainPropertiesWithConstraint( Files, 'blank', false )
+		def nullAndBlankFProps  = nullFProps.intersect( blankFProps )// list of props having both constraints (nullable, blank)false
 		
 		DataTransferBatch.withTransaction { status ->
 			project = securityService.getUserCurrentProject()			
@@ -706,7 +732,7 @@ class DataTransferBatchController {
 						}
 					
 						if( files && flag == 0 ) {
-							def cloneEntity = retainNotNullVal(files, nullableProperties, isNewValidate)
+							def cloneEntity = retainNotNullVal(files, nullFProps, isNewValidate)
 							files.project = project
 							files.sizeUnit = "GB"
 							dtvList.each {
@@ -780,11 +806,22 @@ class DataTransferBatchController {
 										}
 									}
 									
-									//If imported "NULL" and field allows blank and null updating value to null
-									if(it.importValue == "NULL" && !nullableProperties.contains(attribName)) 
-										files."$attribName" = null
-									else if (it.importValue == "NULL")
-										files."$attribName" = cloneEntity."$attribName"
+									if(it.importValue == "NULL"){
+										def type = GrailsClassUtils.getPropertyType(Database, attribName)?.getName()
+										if( !nullFProps.contains( attribName ) ) {
+											files."$attribName" = null
+										} else {
+											if( !blankFProps.contains( attribName ) )
+												files."$attribName" = ""
+											if (nullAndBlankFProps.contains( attribName ) && type=="java.lang.String"){
+												files."$attribName" =  "NULL"
+											} else {
+												files."$attribName" =  cloneEntity."$attribName"
+												log.error "Imported invalid value 'NULL' which is not allowed for $attribName property."
+											}
+										}
+									}
+									
 								}
 							}
 							if ( isFormatError != 1 ) {
@@ -868,9 +905,10 @@ class DataTransferBatchController {
 		def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
-		def nullableProperties = GormUtil.getDomainPropertiesWithConstraint( Database, 'nullable', true )
-		def blankProperties = GormUtil.getDomainPropertiesWithConstraint( Database, 'blank', true )
-
+		def nullFProps = GormUtil.getDomainPropertiesWithConstraint( Database, 'nullable', false )
+		def blankFProps = GormUtil.getDomainPropertiesWithConstraint( Database, 'blank', false )
+		def nullAndBlankFProps  = nullFProps.intersect( blankFProps )// list of props having both constraints (nullable, blank)false
+		
 		DataTransferBatch.withTransaction { status ->
 			project = securityService.getUserCurrentProject()			
 			log.info('Starting batch process for project: ' + project)
@@ -933,7 +971,7 @@ class DataTransferBatchController {
 					}
 				
 					if( dbInstance && flag == 0 ) {
-						def cloneEntity = retainNotNullVal(dbInstance, nullableProperties, isNewValidate)
+						def cloneEntity = retainNotNullVal(dbInstance, nullAndBlankFProps, isNewValidate)
 						dbInstance.project = project
 						dtvList.each {
 							def attribName = it.eavAttribute.attributeCode
@@ -1005,10 +1043,21 @@ class DataTransferBatchController {
 									}
 								}
 								//If imported "NULL" and field allows blank and null updating value to null
-								if(it.importValue.trim() == "NULL" && !nullableProperties.contains(attribName))
-									dbInstance."$attribName" = null
-								else if (it.importValue == "NULL")
-									dbInstance."$attribName" = cloneEntity."$attribName"
+								def type = GrailsClassUtils.getPropertyType(Database, attribName)?.getName()
+								if(it.importValue.trim() == "NULL"){
+									if( !nullFProps.contains( attribName ) ) {
+										dbInstance."$attribName" = null
+									} else {
+										if( !blankFProps.contains( attribName ) ){
+											dbInstance."$attribName" = ""
+										} else if (nullAndBlankFProps.contains( attribName ) && type=="java.lang.String"){
+											dbInstance."$attribName" =  "NULL"  
+										} else {
+											dbInstance."$attribName" =  cloneEntity."$attribName"
+											log.error "Imported invalid value 'NULL' which is not allowed for $attribName property."
+										}
+									}
+								}
 							}
 							
 						}

@@ -34,10 +34,10 @@ class GormUtilTests extends GrailsUnitTestCase {
 		assertEquals 'Test "blank" for true', ['color', 'label', 'note'], list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'blank', false).sort()
-		assertEquals 'Test "blank" for false', ['name'], list
+		assertEquals 'Test "blank" for false', ['age', 'name', 'score'], list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'blank').sort()
-		assertEquals 'Test "blank" for null', ['color', 'label', 'name', 'note'], list
+		assertEquals 'Test "blank" for null', ['age', 'color', 'label', 'name', 'note', 'score'], list
 
 		list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'range', (1..5) ).sort()
 		assertEquals 'Test "range" matching', ['score'], list

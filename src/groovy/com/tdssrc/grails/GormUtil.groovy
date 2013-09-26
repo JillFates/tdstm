@@ -70,9 +70,13 @@ public class GormUtil {
 			def constraint = props.getAppliedConstraint( constraintName )?.getAt(constraintName)
 			switch (constraintName) {
 				case 'blank':
+					/* By default property blank is false except String prop so if false is requested as value 
+					 * and property is not string so considering as 'blank : false' */
 					def type = GrailsClassUtils.getPropertyType(domain, propName)?.getName()
-					if (type == 'java.lang.String' && constraint == null) 
+					if (type == 'java.lang.String' && constraint in [null , true]) 
 						constraint = true
+					else 
+						constraint = false
 					break
 
 				case ['nullable', 'range']:	
