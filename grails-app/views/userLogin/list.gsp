@@ -2,7 +2,8 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 		<meta name="layout" content="projectHeader" />
-		<title>UserLogin List</title>
+		<g:set var="isActive" value="${session.getAttribute('InActive')}" />
+		<title>UserLogin List - ${isActive =='N' ? 'Inactive' : 'Active'} Users</title>
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}"  />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}"  />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}"  />
@@ -24,7 +25,7 @@
 				<tds:hasPermission permission='CreateUserLogin'>\
 					<span class='capBtn'><input type='button' value='Create User Login' onClick=\"window.location.href=\'"+contextPath+"/userLogin/create\'\"/></span> \
 				</tds:hasPermission>\
-				<span class='capBtn'><input type='button' value=' Show ${(session.getAttribute('InActive') == 'N')?'Active':'Inactive'} Users' onClick=\"$(\'#showActiveId\').val(${(session.getAttribute('InActive') == 'N')?"\'Y\'":"\'N\'"});submitForm();\"/></span>"
+				<span class='capBtn'><input type='button' value=' Show ${isActive == 'N' ? 'Active' : 'Inactive'} Users' onClick=\"$(\'#showActiveId\').val(${(session.getAttribute('InActive') == 'N')?"\'Y\'":"\'N\'"});submitForm();\"/></span>"
 				$("#personGeneralViewId").dialog({ autoOpen: false })
 				$("#createStaffDialog").dialog({ autoOpen: false })
 				
@@ -65,7 +66,7 @@
 	</head>
 	<body>
 		<div class="body fluid" >
-			<h1>UserLogin List</h1>
+			<h1>UserLogin List - ${isActive == 'N' ? 'Inactive' : 'Active'} Users</h1>
 			<br/>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
