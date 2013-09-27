@@ -1,7 +1,7 @@
 body {
     background: #fff;
     color: #333;
-    font: 11px helvetica neue, arial, sans-serif;
+    font: 12px helvetica neue, arial, sans-serif;
 }
 br.page-break-after {
 	page-break-after: always;
@@ -547,7 +547,7 @@ table.rack_elevation th {
 table.rack_elevation input, select, textarea {
     background-color: #fcfcfc;
     border: 1px solid #ccc;
-    font: 11px  helvetica neue, arial, sans-serif;
+    font: 12px  helvetica neue, arial, sans-serif;
     margin: 2px 0;
     padding: 2px 4px;
 }
@@ -624,30 +624,30 @@ table.rack_elevation table.bladeTable td.errorBlade {
 }
 .inputbdr {
 	border:1px solid #333333;
-	font-size:11px;
+	font-size:12px;
 }
 .inputs_div input{
 	border:1px solid #333333;
-	font-size:11px;
+	font-size:12px;
 }
 .unknown {
 	border:1px solid #333333;
-	font-size:11px;.
+	font-size:12px;.
 	background-color: #FFFFFF;
 }
 .empty_cable {
 	border:1px solid #333333;
-	font-size:11px;
+	font-size:12px;
 	background-color: #CCCCCC;
 }
 .cabled {
 	border:1px solid #333333;
-	font-size:11px;
+	font-size:12px;
 	background-color: #3300FF;
 }
 .cabled_details {
 	border:1px solid #333333;
-	font-size:11px;
+	font-size:12px;
 	background-color: green;
 }
 

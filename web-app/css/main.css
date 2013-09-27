@@ -14,7 +14,7 @@ html * {
 body {
     background: #fff;
     color: #333;
-    font: 11px helvetica neue, arial, sans-serif;
+    font: 12px helvetica neue, arial, sans-serif;
 }
 
 a:link, a:visited, a:hover {
@@ -51,7 +51,7 @@ ul {
 input, select, textarea {
     background-color: #fcfcfc;
     border: 1px solid #ccc;
-    font: 11px helvetica neue, arial, sans-serif;
+    font: 12px helvetica neue, arial, sans-serif;
     margin: 2px 0;
     padding: 2px 4px;
 }
@@ -148,15 +148,15 @@ tr {
 	padding: 0px 6px;
 }
 td, th { 
-    font: 11px helvetica neue, arial, sans-serif;
-    line-height: 11px;
+    font: 12px helvetica neue, arial, sans-serif;
+    line-height: 12px;
     padding: 5px 6px;
     text-align: left;
 }
 th {
     background: #CCCCCC;
     color: #000;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: bold;
     line-height: 16px;
     padding: 2px 6px;
@@ -422,7 +422,7 @@ span.cellWithoutBackground
 .headClass{
 	background: none repeat scroll 0 0 #CCCCCC;
     color: #000000;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: bold;
     line-height: 16px;
     padding: 2px 6px;

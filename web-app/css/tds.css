@@ -1,7 +1,7 @@
 .div_head {
 	background:#CCCCCC none repeat scroll 0 0;
 	color:#000000;
-	font-size:11px;
+	font-size:12px;
 	font-weight:bold;
 	line-height:17px;
 }
@@ -380,7 +380,7 @@
 	width:auto;
 	height:auto;
 	float:right;
-	font:11px helvetica neue, arial, sans-serif;
+	font:12px helvetica neue, arial, sans-serif;
 	color:#FFFFFF;
 	padding-right: 5px;
 }
@@ -745,7 +745,7 @@ text-decoration: line-through;
 .statusbar_good{
 	text-align:center;
 	background-color: #669900;
-	font-size:11px;
+	font-size:12px;
 	font-weight:bold;
 	color:#FFFFFF;
 	}
@@ -753,14 +753,14 @@ text-decoration: line-through;
 .statusbar_bad{
 	text-align:center;
 	background-color: #CD3333;
-	font-size:11px;
+	font-size:12px;
 	font-weight:bold;
 	color:#FFFFFF;
 }
 .statusbar_yellow{
 	text-align:center;
 	background-color: #FFCC33;
-	font-size:11px;
+	font-size:12px;
 	font-weight:bold;
 	color:#000;
 }
@@ -943,7 +943,7 @@ td .label_sm {
 .mainbody {
 	background: white;
 	color: black;
-	font: 11px helvetica neue, arial, sans-serif;
+	font: 12px helvetica neue, arial, sans-serif;
 }
 
 .menu4 {
@@ -1254,7 +1254,7 @@ a.tab_deselect {
 .cabling_div th {
     background: none repeat scroll 0 0 #CCCCCC;
     color: #000000;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: bold;
     line-height: 17px;
     padding: 2px 6px;
@@ -1299,7 +1299,7 @@ a.tab_deselect {
     margin-left: 5px;
 }
 .personShow{
-	font: 11px/19px helvetica neue, arial, sans-serif;
+	font: 12px/19px helvetica neue, arial, sans-serif;
     padding: 5px 6px;
     text-align: left;
 }
