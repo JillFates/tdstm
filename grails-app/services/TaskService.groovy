@@ -127,6 +127,8 @@ class TaskService {
 			t.asset_entity_id AS assetEntity, 
 			t.status, t.assigned_to_id AS assignedTo, 
 			IFNULL(a.asset_name,'') AS assetName, 
+			a.asset_entity_id AS assetId,
+			a.asset_type AS assetType,
 			p.first_name AS firstName, p.last_name AS lastName,
 			t.hard_assigned AS hardAssigned, 
 			t.category""")

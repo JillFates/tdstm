@@ -42,19 +42,18 @@
 			<tbody>
 				<g:each status="i" in="${taskList}" var="issue">
 					<g:set var="item" value="${issue?.item}"/>
-					<tr id="issueTrId_${item?.id}" class="actionBar ${issue.css}"
-					    data-itemId="${item?.id}" data-status="${item?.status}"
-						style="cursor: pointer;"
-						>
-						<td id="comment_${item?.id}"
-							class="asset_details_block_task">
+					<tr id="issueTrId_${item?.id}" class="${issue.css}" style="cursor: pointer;">
+						<td id="comment_${item?.id}" class="actionBar asset_details_block_task"
+							data-itemId="${item?.id}" data-status="${item?.status}">
 							${item?.taskNumber?item?.taskNumber+' - ' : ''}
 							${item?.comment}
 						</td>
-						<td id="asset_${item?.id}" class="asset_details_block">
+						<td id="asset_${item?.id}" class="asset_details_block"
+						${item?.assetName ? 'onclick="getEntityDetails(\'myIssues\',\''+item?.assetType+'\',\''+item?.assetId+'\')"' : ''}>
 							${item?.assetName} 
 						</td>
-						<td id="lastUpdated_${item?.id}" class="asset_details_block">
+						<td id="lastUpdated_${item?.id}" class="actionBar asset_details_block"
+							data-itemId="${item?.id}" data-status="${item?.status}">
 							<g:if test="${AssetComment.moveDayCategories.contains(item.category)}">
 								<tds:elapsedAgo start="${item?.statusUpdated}" end="${now}"/>
 							</g:if>
@@ -62,15 +61,18 @@
 								<tds:elapsedAgo start="${item?.lastUpdated}" end="${now}"/>
 							</g:else>
 						</td>
-						<td id="estFinish_${item?.id}" class="asset_details_block ${item?.dueDate && item?.dueDate < TimeUtil.nowGMT() ? 'task_overdue' : ''}">
+						<td id="estFinish_${item?.id}" data-itemId="${item?.id}" data-status="${item?.status}"
+							class="actionBar asset_details_block ${item?.dueDate && item?.dueDate < TimeUtil.nowGMT() ? 'task_overdue' : ''}">
 								<tds:convertDate date="${item?.estFinish}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
 									format="MM/dd kk:mm" />
 						</td>
 						
-						<td id="statusTd_${item?.id}" class="asset_details_block">
+						<td id="statusTd_${item?.id}" class="actionBar asset_details_block"
+							data-itemId="${item?.id}" data-status="${item?.status}">
 							${item?.status}<% // (${formatter.format(item?.score?: 0)}) %>
 						</td>
-						<td id="assignedToName_${item?.id}" class="asset_details_block">
+						<td id="assignedToName_${item?.id}" class="actionBar asset_details_block"
+							data-itemId="${item?.id}" data-status="${item?.status}">
 							${(item?.hardAssigned?'* ':'')} <span id="assignedToNameSpan_${item?.id}">${(item?.firstName?:'')+' '+((item?.lastName != null)? item?.lastName :'')}</span>
 						</td>
 					</tr>

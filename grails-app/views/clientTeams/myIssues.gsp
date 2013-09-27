@@ -204,10 +204,10 @@
 			$('#image_'+id).hide();
 		}
 		if(!$(this).data('state')){
-			showStatusTr.show();
+			showStatusTr.toggle();
 			$(this).data('state',true);
 		} else{
-			showStatusTr.hide();
+			showStatusTr.toggle();
 			$(this).data('state',false);
 			$('#detailTdId_'+id).hide();
 			if(taskManagerTimePref !=0){
