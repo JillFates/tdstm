@@ -94,7 +94,7 @@ $(document).ready(function() {
 								</td>
 							</g:if>
 							<g:else>
-								</td><td></td>
+								</td><td><img src="${resource(dir:'images',file:'checked-icon.png')}" /></td>
 							</g:else>
 						</tr>
 						<tr>
@@ -111,7 +111,7 @@ $(document).ready(function() {
 								</td>
 							</g:if>
 							<g:else>
-								</td><td></td>
+								</td><td><img src="${resource(dir:'images',file:'checked-icon.png')}" /> </td>
 							</g:else>
 						</tr>
 						<tr>
@@ -128,7 +128,7 @@ $(document).ready(function() {
 								</td>
 							</g:if>
 							<g:else>
-								</td><td></td>
+								</td><td><img src="${resource(dir:'images',file:'checked-icon.png')}" /> </td>
 							</g:else>
 						</tr>
 						<tr>
@@ -145,7 +145,7 @@ $(document).ready(function() {
 								</td>
 							</g:if>
 							<g:else>
-								</td><td></td>
+								</td><td><img src="${resource(dir:'images',file:'checked-icon.png')}" /> </td>
 							</g:else>
 						</tr>
 						<tr>
@@ -162,7 +162,7 @@ $(document).ready(function() {
 								</td>
 							</g:if>
 							<g:else>
-								</td><td></td>
+								</td><td><img src="${resource(dir:'images',file:'checked-icon.png')}" /> </td>
 							</g:else>
 						</tr>
 						<tr>
@@ -179,7 +179,7 @@ $(document).ready(function() {
 								</td>
 							</g:if>
 							<g:else>
-								</td><td></td>
+								</td><td><img src="${resource(dir:'images',file:'checked-icon.png')}" /> </td>
 							</g:else>
 						</tr>
 					</table>
