@@ -7,6 +7,7 @@ import com.tdssrc.grails.GormUtil
 import org.apache.commons.lang.StringEscapeUtils
 import com.tdssrc.grails.TimeUtil
 import com.tds.asset.TaskDependency
+import org.apache.commons.lang.math.NumberUtils
 
 class TaskController {
 	
@@ -478,20 +479,29 @@ digraph runbook {
 	 * @return : retMap. 
 	 */
 	def changeEstTime ={
-		def comment = AssetComment.findById(params.commentId)
 		def etext = ""
-		if(comment){
-			comment.estStart=TimeUtil.nowGMT().plus(Integer.parseInt(params.day))
-			
-			if(!comment.estFinish || comment.estStart > comment.estFinish )
-				comment.estFinish = comment.estStart.plus(1)
+		def comment
+		def commentId = NumberUtils.toInt(params.commentId)
+		if(commentId >0){
+			def day=NumberUtils.toInt(params.day)
+			def project = securityService.getUserCurrentProject()
+			comment = AssetComment.findByIdAndProject(commentId,project)
+			def estDay =[1,2,7].contains(day) ? day : 0
+			if(comment){
+				comment.estStart=TimeUtil.nowGMT().plus(estDay)
 				
-			if(!comment.hasErrors() && !comment.save(flush:true)){
-				etext = "unable to update estTime"+GormUtil.allErrorsString( comment )
-				log.error etext 
+				if(!comment.estFinish || comment.estStart > comment.estFinish )
+					comment.estFinish = comment.estStart.plus(1)
+					
+				if(!comment.hasErrors() && !comment.save(flush:true)){
+					etext = "unable to update estTime"+GormUtil.allErrorsString( comment )
+					log.error etext 
+				}
+			}else {
+				etext = "Requested comment does not exist. "
 			}
-		} else {
-			etext = "Requested comment id does not exist. "
+		}else {
+				etext = "Requested comment does not exist. "
 		}
 		def retMap=[etext:etext, estStart : comment?.estStart]
 		render retMap as JSON
