@@ -72,6 +72,20 @@ function changeDocTitle( newTitle ){
 	$(".ui-dialog .ui-dialog-titlebar-close").click(function(){
 		$(document).attr('title', title);
 	});
+	$( "#deps" ).tooltip({
+		 position: {
+			my: "center bottom-20",
+			at: "center top",
+			using: function( position, feedback ) {
+				$( this ).css( position );
+				$( "<div>" )
+				.addClass( "arrow" )
+				.addClass( feedback.vertical )
+				.addClass( feedback.horizontal )
+					 .appendTo( this );
+			}
+		 }
+	});
 }
 
 function editEntity(redirectTo,type, value, source,rack,roomName,location,position){
@@ -114,6 +128,7 @@ function isValidDate( date ){
   	return returnVal;
 }
 function addAssetDependency( type,forWhom ){
+	
 	var rowNo = $("#"+forWhom+"_"+type+"AddedId").val()
 	var rowData = $("#assetDependencyRow tr").html()
 		.replace(/dataFlowFreq/g,"dataFlowFreq_"+type+"_"+rowNo)
@@ -122,7 +137,13 @@ function addAssetDependency( type,forWhom ){
 		.replace(/dtype/g,"dtype_"+type+"_"+rowNo)
 		.replace(/status/g,"status_"+type+"_"+rowNo)
 		.replace(/bundles/g,"moveBundle_"+type+"_"+rowNo)
-		.replace(/entity/g,"entity_"+type+"_"+rowNo);
+		.replace(/entity/g,"entity_"+type+"_"+rowNo)
+		.replace(/aDepComment/g,"comment_"+type+"_"+rowNo)
+		.replace(/dep_comment/g,"dep_comment_"+type+"_"+rowNo)
+		.replace(/depComment/g,"depComment_"+type+"_"+rowNo)
+		.replace(/commLink/g,"commLink_"+type+"_"+rowNo);
+	$("#comment_"+type+"_"+rowNo).val('')
+	$("#dep_comment_"+type+"_"+rowNo).val('')
 	if(type!="support"){
 		$("#"+forWhom+"DependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"', 'edit_dependentAddedId')\"><span class='clear_filter'>X</span></a></td></tr>")
 	} else {
@@ -133,6 +154,8 @@ function addAssetDependency( type,forWhom ){
 	
 	if(!isIE7OrLesser)
 		$("select.assetSelect").select2();
+	
+	$("#depComment_"+type+"_"+rowNo).dialog({ autoOpen: false})
 }
 
 function deleteRow( rowId, forWhomId ){
@@ -928,4 +951,30 @@ function toogleRoom(value, source){
 		$(".newRoom"+source).show()
 	else
 		$(".newRoom"+source).hide()
+}
+
+
+function openCommentDialog(id){
+	 var type = id.split("_")[1]
+	 var rowNo = id.split("_")[2]
+	 $("#"+id).dialog('option', 'width', 'auto')
+	 $("#"+id).dialog('option', 'position', 'absolute');
+	 $("#"+id).dialog('option', 'title', type+" Comment");
+	 $("#"+id).dialog('open');
+	 if(!$("#comment_"+type+"_"+rowNo).val()){
+		 $("#comment_"+type+"_"+rowNo).val('')
+		 $("#dep_comment_"+type+"_"+rowNo).val('')
+	 } else {
+		 $("#dep_comment_"+type+"_"+rowNo).val($("#comment_"+type+"_"+rowNo).val())
+	 }
+}
+
+function saveDepComment(textId, hiddenId, dialogId, commLink){
+	$("#"+hiddenId).val($("#"+textId).val())
+	$("#"+dialogId).dialog("close")
+	if($("#"+hiddenId).val()){
+		$("#"+commLink).html('<img border="0px" src="'+contextPath+'/i/db_table_bold.png">')
+	}else {
+		$("#"+commLink).html('<img border="0px" src="'+contextPath+'/i/db_table_light.png">')
+	}
 }

@@ -14,7 +14,7 @@ html * {
 body {
     background: #fff;
     color: #333;
-    font: 12px helvetica neue, arial, sans-serif;
+    font: 11px helvetica neue, arial, sans-serif;
 }
 
 a:link, a:visited, a:hover {
@@ -51,7 +51,7 @@ ul {
 input, select, textarea {
     background-color: #fcfcfc;
     border: 1px solid #ccc;
-    font: 12px helvetica neue, arial, sans-serif;
+    font: 11px helvetica neue, arial, sans-serif;
     margin: 2px 0;
     padding: 2px 4px;
 }
@@ -148,15 +148,15 @@ tr {
 	padding: 0px 6px;
 }
 td, th { 
-    font: 12px helvetica neue, arial, sans-serif;
-    line-height: 12px;
+    font: 11px helvetica neue, arial, sans-serif;
+    line-height: 11px;
     padding: 5px 6px;
     text-align: left;
 }
 th {
     background: #CCCCCC;
     color: #000;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
     line-height: 16px;
     padding: 2px 6px;
@@ -422,7 +422,7 @@ span.cellWithoutBackground
 .headClass{
 	background: none repeat scroll 0 0 #CCCCCC;
     color: #000000;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
     line-height: 16px;
     padding: 2px 6px;
@@ -692,3 +692,54 @@ th.desc{
     background-position: right;
     background-repeat: no-repeat;
 }
+
+// For tooltip -- Start
+.ui-tooltip, .arrow:after {
+	background-color:  #F3F4F6 !important;
+}
+.ui-tooltip {
+	padding: 10px 20px;
+	color: white;
+	border-radius: 20px !important;
+	font: bold 14px "Helvetica Neue", Sans-Serif;
+	text-transform: uppercase;
+	box-shadow: 0 0 7px black;
+}
+.arrow {
+	width: 70px;
+	height: 16px;
+	overflow: hidden;
+	position: absolute;
+	left: 50%;
+	margin-left: -35px;
+	bottom: -16px;
+}
+.arrow.top {
+	top: -16px;
+	bottom: auto;
+}
+.arrow.left {
+	left: 20%;
+}
+.arrow:after {
+	content: "";
+	position: absolute;
+	left: 20px;
+	top: -20px;
+	width: 25px;
+	height: 25px;
+	box-shadow: 6px 5px 9px -9px black;
+	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	-o-transform: rotate(45deg);
+	tranform: rotate(45deg);
+}
+.arrow.top:after {
+	bottom: -20px;
+	top: auto;
+}
+.depBundle {
+	width: 70px
+}
+// --- Tooltip end

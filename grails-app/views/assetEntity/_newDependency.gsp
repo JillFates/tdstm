@@ -13,9 +13,20 @@
 					noSelection="${['null':'Please select']}" class="depSelect" onchange="changeMovebundle(this.value,this.id,jQuery('#moveBundle').val())"></g:select>
 				</span>
 			</td>
-			<td><g:select name="bundles" from="${moveBundleList}"  optionKey="id" optionValue="name" 
+			<td><g:select name="bundles" from="${moveBundleList}" class="depBundle" optionKey="id" optionValue="name" 
 				noSelection="${['':' Please Select']}" onchange="changeMoveBundleColor(this.name,this.value, jQuery('#moveBundle').val(),'')"></g:select></td>
-			<td><g:select name="dtype" from="${dependencyType?.value}"  optionValue="value"></g:select></td>
+			<td nowrap="nowrap"><g:select name="dtype" from="${dependencyType?.value}"  optionValue="value"></g:select>
+				<input type="hidden" name="aDepComment" id="aDepComment" value="">
+				<div id="depComment"  style="display:none" >
+					<textarea rows="5" cols="50" name="dep_comment" id="dep_comment"></textarea>
+					<div class="buttons">
+						<span class="button"><input type="button" class="save" value="Save" onclick="saveDepComment('dep_comment', 'aDepComment', 'depComment', 'commLink')"/> </span>
+					</div>
+				</div>
+			    <a id="commLink" href="javascript:openCommentDialog('depComment')">
+				   <img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" />
+				</a>
+			</td>
 			<td><g:select name="status" from="${dependencyStatus?.value}" optionValue="value"
 				onchange="changeMoveBundleColor(this.name,'', jQuery('#moveBundle').val(),this.value)"></g:select></td>
 		</tr>

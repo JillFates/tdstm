@@ -1,3 +1,8 @@
+<script type="text/javascript">
+$(document).ready(function() {
+	$(".depComDiv").dialog({ autoOpen: false})
+})
+</script>
 <td valign="top" >
 	<div style="width: auto;" >
 		<span style="float: left;"><h1>Supports:</h1></span>
@@ -35,21 +40,23 @@
 							<g:set var="supportBundle" value="${support?.asset?.moveBundle}"></g:set>
 						<%--Used to show bundle colors based on bundleConflicts--%>
 							<g:if test="${supportBundle!=assetEntity.moveBundle && support.status == 'Validated' }" >
-								<g:select from="${moveBundleList}" name="moveBundle_support_${support.id}" value="${supportBundle?.id}" 
+								<g:select from="${moveBundleList}" class="depBundle" name="moveBundle_support_${support.id}" value="${supportBundle?.id}" 
 										optionKey="id" optionValue="name" style="background-color: red" onchange="changeMoveBundleColor(this.name,this.value,'${assetEntity?.moveBundle?.id}','')"/>
 							</g:if>
 							<g:elseif test="${supportBundle!=assetEntity.moveBundle }" >
 								<g:select from="${moveBundleList}" name="moveBundle_support_${support.id}" value="${supportBundle?.id}" 
 									optionKey="id" optionValue="name" onchange="changeMoveBundleColor(this.name,this.value,'${assetEntity?.moveBundle?.id}','')" 
-									class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }"/>
+									class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status } depBundle"/>
 							</g:elseif>
 							<g:else>
-								<g:select from="${moveBundleList}" name="moveBundle_support_${support.id}" value="${supportBundle?.id}" 
+								<g:select from="${moveBundleList}" class="depBundle" name="moveBundle_support_${support.id}" value="${supportBundle?.id}" 
 									optionKey="id" optionValue="name" onchange="changeMoveBundleColor(this.name,this.value,'${assetEntity?.moveBundle?.id}','')"
-									class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status }"/>
+									class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status } depBundle"/>
 							</g:else>
 						</td>
-						<td><g:select name="dtype_support_${support.id}" value="${support.type}" from="${dependencyType.value}" optionValue="value" /></td>
+						<td nowrap="nowrap"><g:select name="dtype_support_${support.id}" value="${support.type}" from="${dependencyType.value}" optionValue="value" />
+						  <g:render template="dependencyComment" model= "[dependency:support,type:'support',forWhom:'edit']"></g:render>
+						</td>
 						<td><g:select name="status_support_${support.id}" value="${support.status}" from="${dependencyStatus.value}" 
 							optionValue="value" onchange="changeMoveBundleColor(this.name,'','${assetEntity.moveBundle?.id}',this.value)"/></td>
 						<td><a href="javascript:deleteRow('row_s_${i}_${support.id}', '${whom}_supportAddedId')"><span class='clear_filter'>X</span></a></td>
@@ -96,23 +103,27 @@
 						<g:set var="depBundle" value="${dependent?.dependent?.moveBundle}"></g:set>
 						<%--Used to show bundle colors based on bundleConflicts--%>
 						<g:if test="${depBundle!=assetEntity.moveBundle && dependent.status == 'Validated' }" >
-							<g:select from="${moveBundleList}" name="moveBundle_dependent_${dependent.id}" value="${depBundle?.id}" optionKey="id" 
+							<g:select from="${moveBundleList}" class="depBundle" name="moveBundle_dependent_${dependent.id}" value="${depBundle?.id}" optionKey="id" 
 							optionValue="name" style="background-color: red" onchange="changeMoveBundleColor(this.name,this.value,'${assetEntity.moveBundle?.id}','')"/>
 						</g:if>
 						<g:elseif test="${depBundle!=assetEntity.moveBundle }" >
 							<g:select from="${moveBundleList}" name="moveBundle_dependent_${dependent.id}" value="${depBundle?.id}" 
-							optionKey="id" optionValue="name" class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }"
+							optionKey="id" optionValue="name" class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status } depBundle"
 							onchange="changeMoveBundleColor(this.name,this.value,'${assetEntity.moveBundle?.id}','')"/>
 						</g:elseif>
 						<g:else>
-							<g:select from="${moveBundleList}" name="moveBundle_dependent_${dependent.id}" value="${depBundle?.id}" 
-							optionKey="id" optionValue="name" class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status }"
+							<g:select from="${moveBundleList}" class="depBundle" name="moveBundle_dependent_${dependent.id}" value="${depBundle?.id}" 
+							optionKey="id" optionValue="name" class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status } depBundle"
 							onchange="changeMoveBundleColor(this.name,this.value,'${assetEntity.moveBundle?.id}','')"/>
 						</g:else>
 					</td>
-					<td><g:select name="dtype_dependent_${dependent.id}" value="${dependent.type}" from="${dependencyType.value}" optionValue="value"/></td>
+					<td>
+						<g:select name="dtype_dependent_${dependent.id}" value="${dependent.type}" from="${dependencyType.value}" optionValue="value"/>
+						<g:render template="dependencyComment" model= "[dependency:dependent,type:'dependent',forWhom:'edit']"></g:render>
+					</td>
 					<td><g:select name="status_dependent_${dependent.id}" value="${dependent.status}" from="${dependencyStatus.value}" 
-						optionValue="value" onchange="changeMoveBundleColor(this.name,'','${assetEntity.moveBundle?.id}',this.value)"/></td>
+						optionValue="value" onchange="changeMoveBundleColor(this.name,'','${assetEntity.moveBundle?.id}',this.value)"/>
+						</td>
 					<td><a href="javascript:deleteRow('row_d_${i}_${dependent.id}', '${whom}_dependentAddedId')"><span class='clear_filter'>X</span></a></td>
 				</tr>
 			</g:each>

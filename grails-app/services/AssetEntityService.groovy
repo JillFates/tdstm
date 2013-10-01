@@ -138,6 +138,7 @@ class AssetEntityService {
 				type.asset = depType=="dependent" ? assetEntity : depEntity
 				type.dependent = depType=="dependent" ? depEntity : assetEntity
 				type.updatedBy = loginUser?.person
+				type.comment = params["comment_${depType}_"+idSuf]
 				if(createNew){
 					type.createdBy = loginUser?.person
 				}
