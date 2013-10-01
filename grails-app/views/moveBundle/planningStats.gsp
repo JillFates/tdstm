@@ -81,106 +81,22 @@ $(document).ready(function() {
 					</h4>
 					<table style="float:left; border: 0px; margin-left: 10px; margin-bottom: 10px;">
 						<tr>
-							<td style="width: 10px;text-align: right;">${applicationCount}</td>
-							<td style="padding-right:0px;"><g:link controller="application" action="list" params="[filter:'applicationCount']" class="links">Applications</g:link><br />
-							<g:if test="${ appToValidate > 0 }">
-								(<g:link controller="application" action="list" params="[filter:'applicationCount', validation:'Discovery']" class="links">${appToValidate} to validate</g:link>)
-								</td>
-								<td style="width:100px;padding-left:0px;">
-									<div class="dashboard_bar_base_small" >
-	
-									<div class="dashboard_bar_graph_small" id="applicationbar" style="width:0%;" ></div>
-									</div>
-								</td>
-							</g:if>
-							<g:else>
-								</td><td><img src="${resource(dir:'images',file:'checked-icon.png')}" /></td>
-							</g:else>
+							<g:render template="discoveryGraph" model="[assetCount:applicationCount,filter:'applicationCount',assetType:'application',title:'Applications',validate:appToValidate,barId:'applicationbar']" ></g:render>
 						</tr>
 						<tr>
-							<td style="width: 10px;text-align: right;">${physicalCount}</td>
-							<td style="padding-right:0px;"><g:link controller="assetEntity" action="list" params="[filter:'physical']" class="links">Physical Servers</g:link><br />
-							<g:if test="${ psToValidate > 0 }">
-							     (<g:link controller="assetEntity" action="list" params="[filter:'physical', type:'toValidate']" class="links">${psToValidate} to validate</g:link>)
-								</td>
-								<td style="width:100px;padding-left:0px;">
-									<div class="dashboard_bar_base_small" >
-	
-									<div class="dashboard_bar_graph_small" id="physicalbar" style="width:0%;" ></div>
-									</div>
-								</td>
-							</g:if>
-							<g:else>
-								</td><td><img src="${resource(dir:'images',file:'checked-icon.png')}" /> </td>
-							</g:else>
+							<g:render template="discoveryGraph" model="[assetCount:physicalCount,filter:'physical',assetType:'assetEntity',title:'Physical Servers',validate:psToValidate,barId:'physicalbar']" ></g:render>
 						</tr>
 						<tr>
-							<td style="width: 10px;text-align: right;">${virtualCount}</td>
-							<td style="padding-right:0px;"><g:link controller="assetEntity" action="list" params="[filter:'virtual']" class="links">Virtual Servers</g:link><br />
-							<g:if test="${ vsToValidate > 0 }">
-							     (<g:link controller="assetEntity" action="list" params="[filter:'virtual', type:'toValidate']" class="links">${vsToValidate} to validate</g:link>)
-								</td>
-								<td style="width:100px;padding-left:0px;">
-									<div class="dashboard_bar_base_small" >
-	
-									<div class="dashboard_bar_graph_small" id="virtualbar" style="width:0%;" ></div>
-									</div>
-								</td>
-							</g:if>
-							<g:else>
-								</td><td><img src="${resource(dir:'images',file:'checked-icon.png')}" /> </td>
-							</g:else>
+							<g:render template="discoveryGraph" model="[assetCount:virtualCount,filter:'virtual',assetType:'assetEntity',title:'Virtual Servers',validate:vsToValidate,barId:'virtualbar']" ></g:render>
 						</tr>
 						<tr>
-							<td style="width: 10px;text-align: right;">${dbCount}</td>
-							<td style="padding-right:0px;"><g:link controller="database" action="list" params="[filter:'db']" class="links">Databases</g:link><br />
-							<g:if test="${ dbToValidate > 0 }">
-							     (<g:link controller="database" action="list" params="[filter:'db', validation:'Discovery']" class="links">${dbToValidate} to validate</g:link>)
-								</td>
-								<td style="width:100px;padding-left:0px;">
-									<div class="dashboard_bar_base_small" >
-	
-									<div class="dashboard_bar_graph_small" id="dbbar" style="width:0%;" ></div>
-									</div>
-								</td>
-							</g:if>
-							<g:else>
-								</td><td><img src="${resource(dir:'images',file:'checked-icon.png')}" /> </td>
-							</g:else>
+							<g:render template="discoveryGraph" model="[assetCount:dbCount,filter:'db',assetType:'database',title:'Databases',validate:dbToValidate,barId:'dbbar']" ></g:render>
 						</tr>
 						<tr>
-							<td style="width: 10px;text-align: right;">${fileCount}</td>
-							<td style="padding-right:0px;"><g:link controller="files" action="list" params="[filter:'storage']" class="links">Storage</g:link><br />
-							<g:if test="${ fileToValidate > 0 }">
-							     (<g:link controller="files" action="list" params="[filter:'storage', validation:'Discovery']" class="links">${fileToValidate} to validate</g:link>)
-								</td>
-								<td style="width:100px;padding-left:0px;">
-									<div class="dashboard_bar_base_small" >
-	
-									<div class="dashboard_bar_graph_small" id="filebar" style="width: 0%;" ></div>
-									</div>
-								</td>
-							</g:if>
-							<g:else>
-								</td><td><img src="${resource(dir:'images',file:'checked-icon.png')}" /> </td>
-							</g:else>
+							<g:render template="discoveryGraph" model="[assetCount:fileCount,filter:'storage',assetType:'files',title:'Storage',validate:fileToValidate,barId:'filebar']" ></g:render>
 						</tr>
 						<tr>
-							<td style="width: 10px;text-align: right;">${otherAssetCount}</td>
-							<td style="padding-right:0px;"><g:link controller="assetEntity" action="list" params="[filter:'other']" class="links">Other Assets</g:link><br />
-							<g:if test="${ otherToValidate > 0 }">
-							     (<g:link controller="assetEntity" action="list" params="[filter:'other', type:'toValidate']" class="links">${otherToValidate} to validate</g:link>)
-								</td>
-								<td style="width:100px;padding-left:0px;">
-									<div class="dashboard_bar_base_small" >
-	
-									<div class="dashboard_bar_graph_small" id="assetbar" style="width: 0%;" ></div>
-									</div>
-								</td>
-							</g:if>
-							<g:else>
-								</td><td><img src="${resource(dir:'images',file:'checked-icon.png')}" /> </td>
-							</g:else>
+							<g:render template="discoveryGraph" model="[assetCount:otherAssetCount,filter:'other',assetType:'assetEntity',title:'Other Assets',validate:otherToValidate,barId:'assetbar']" ></g:render>
 						</tr>
 					</table>
 					<br />
