@@ -55,7 +55,7 @@ $(document).ready(function() {
 							</g:else>
 						</td>
 						<td nowrap="nowrap"><g:select name="dtype_support_${support.id}" value="${support.type}" from="${dependencyType.value}" optionValue="value" />
-						  <g:render template="dependencyComment" model= "[dependency:support,type:'support',forWhom:'edit']"></g:render>
+						  <g:render template="../assetEntity/dependencyComment" model= "[dependency:support,type:'support',forWhom:'edit']"></g:render>
 						</td>
 						<td><g:select name="status_support_${support.id}" value="${support.status}" from="${dependencyStatus.value}" 
 							optionValue="value" onchange="changeMoveBundleColor(this.name,'','${assetEntity.moveBundle?.id}',this.value)"/></td>
@@ -119,7 +119,7 @@ $(document).ready(function() {
 					</td>
 					<td>
 						<g:select name="dtype_dependent_${dependent.id}" value="${dependent.type}" from="${dependencyType.value}" optionValue="value"/>
-						<g:render template="dependencyComment" model= "[dependency:dependent,type:'dependent',forWhom:'edit']"></g:render>
+						<g:render template="../assetEntity/dependencyComment" model= "[dependency:dependent,type:'dependent',forWhom:'edit']"></g:render>
 					</td>
 					<td><g:select name="status_dependent_${dependent.id}" value="${dependent.status}" from="${dependencyStatus.value}" 
 						optionValue="value" onchange="changeMoveBundleColor(this.name,'','${assetEntity.moveBundle?.id}',this.value)"/>
