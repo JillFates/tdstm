@@ -5,6 +5,7 @@ import jxl.write.*
 import jxl.read.biff.*
 
 import com.tdssrc.grails.GormUtil
+import com.tds.asset.AssetComment
 
 class PartyRelationshipService {
 
@@ -752,5 +753,20 @@ class PartyRelationshipService {
 		""")
 		return personId in tdsEmployees.personId
 	}
-}
 
+	/**
+	 * Returns a list of the roles/teams that staff can be assigned to. Note that the description has the "Staff : " stripped off.
+	 * @param boolean indicating if the Automatic role should be included in the list (default true)
+	 * @return A list containing maps of all roles with the description cleaned up. Map format of [id, description]
+	 */
+	List<Map> getStaffingRoles(includeAuto = true) {
+		def roles = RoleType.findAllByDescriptionIlike("Staff%", [sort:'description'])
+		def list = []
+		roles.each { r -> 
+			if ( ! includeAuto && r.id == AssetComment.AUTOMATIC_ROLE) 
+				return
+			list << [ id: r.id, description: r.description.replaceFirst('Staff : ', '') ]
+		} 
+		return list
+	}
+}
