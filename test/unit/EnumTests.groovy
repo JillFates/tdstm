@@ -41,6 +41,14 @@ class EnumTests extends GrailsUnitTestCase {
 		enumTest AssetEntityType, AssetEntityType.STORAGE, 'STORAGE', 'S', 'APPLICATION', 'A'
 	}
 
+	void testSizeScale() {
+		enumTest SizeScale, SizeScale.GB, 'GB', 'Gigabyte', 'KB', 'Kilobyte'
+	}
+
+	void testSpeedScale() {
+		enumTest SpeedScale, SpeedScale.MBps, 'MBps', 'MegaByte/sec', 'Kbps', 'Kilobit/sec'
+	}
+
 	void testTaskDependencyType() {
 		enumTest TaskDependencyType, TaskDependencyType.FS, 'FS', 'Finish-Start', 'FF', 'Finish-Finish'
 	}
