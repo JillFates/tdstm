@@ -45,8 +45,8 @@ function modifyParameter(action, id ){
 	var minValue = parameterRanges[type][0]
 	var maxValue = parameterRanges[type][1]
 	value = Math.min(Math.max(value, minValue), maxValue)
-	if (value != val )
-		alert(type + " must be between " + minValue + " and " + maxValue)
+	if (value != val && type != 'force') // let's not show the alert for force
+		alert((type.charAt(0).toUpperCase() + type.slice(1)) + " must be between " + minValue + " and " + maxValue)
 	
 	$("#"+id).val( value )
 	rebuildMap($("#forceId").val(), $("#linkSizeId").val(), $("#frictionId").val(), $("#thetaId").val(), $("#widthId").val(), $("#heightId").val())
