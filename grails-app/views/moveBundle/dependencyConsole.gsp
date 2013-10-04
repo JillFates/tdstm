@@ -77,7 +77,7 @@
 							</div>
 							<div class="buttonR">
 								<input type="button" class="submit"
-									style="margin-top: 40px; margin-left: -27px;" value="Generate" onclick="submitCheckBox()" />
+									style="margin-top: 40px; margin-left: 10px;" value="Generate" onclick="submitCheckBox()" />
 							</div>
 							
 						</g:form>
