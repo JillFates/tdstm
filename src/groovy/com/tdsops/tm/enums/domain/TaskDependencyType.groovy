@@ -1,13 +1,14 @@
 /**
  * The TaskDependencyType represents the various types of dependency types. The different types consist of:
  * 
- * 		FS - Finish-to-Start which is the most common that TM will mark the successor as READY once the predecessor has completed
+ *		FR - The most common Finish-to-Ready that TM will use to update the successor to READY once the predecessor has completed
+ * 		FS - Finish-to-Start is typically used with Resource type tasks that automatically START when the Predecessor completes
  * 		SS - Start-to-Start which in TM will automatically start a successor when the predecessor starts
- * 			(e.g. TBD)
+ * 			(e.g. TBD)	
  * 		FF - Finish-to-Finish which in TM will automatically complete a successor task when its predecessor completes 
  * 			( e.g. Predecessor:Validation of VM copy successful (SYS_ADMIN), Successor:VM Copy time (SYS_RESOURCE) )
  * 		SF - Start-to-Finish the least common method that is not going to be implemented in TM at this time.
- * 
+ *      MM - Matched is a special case where the predecessor and successor tasks statuses are matched. When one is updated so is the other.
  * For more information visit http://office.microsoft.com/en-us/project-help/choose-the-right-type-of-task-dependency-HA001220848.aspx
  */
 
@@ -15,9 +16,16 @@ package com.tdsops.tm.enums.domain
 
 enum TaskDependencyType {
 	
-	FF ('Finish-Finish'),
+	FR ('Finish-Ready'),
 	FS ('Finish-Start'), 
-	SS ('Start-Start')
+	FF ('Finish-Finish'),
+	SS ('Start-Start'),
+	MM ('Matched-Matched')
+
+	// Returns the application default to use for the enum
+	static TaskDependencyType getDefault() {
+		return FR
+	}
 
 	//
 	// Boiler Plate from here down - Just swap out the enum class name
@@ -52,7 +60,8 @@ enum TaskDependencyType {
 	// Construct the static keys 
 	private static synchronized void buildKeys() { 
 		if (keys == null) {
-			keys = TaskDependencyType.values()*.name()
+//			keys = TaskDependencyType.values()*.name()
+			keys = TaskDependencyType.values()
 		}
 	} 
 

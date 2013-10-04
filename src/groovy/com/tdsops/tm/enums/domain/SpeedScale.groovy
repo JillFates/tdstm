@@ -52,7 +52,7 @@ enum SpeedScale {
 	// Construct the static keys 
 	private static synchronized void buildKeys() { 
 		if (keys == null) {
-			keys = SpeedScale.values()*.name()
+			keys = SpeedScale.values()
 		}
 	} 
 
