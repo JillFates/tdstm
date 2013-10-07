@@ -321,7 +321,7 @@ class MoveBundleService {
 	 * find all assets assigned to bundles that which are set to be used for planning, sorting the assets so that those with the most dependency
 	 * relationships are processed first.
 	 */
-	def generateDependencyGroups = { projectId, connectionTypes, statusTypes ->
+	def generateDependencyGroups = { projectId, connectionTypes, statusTypes, isChecked ->
 		def date = new Date()
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
 		String time = formatter.format(date);
@@ -331,10 +331,15 @@ class MoveBundleService {
 		// Get array of the valid status and connection types to check against in the inner loop
 		def statusList = statusTypes.replaceAll(', ',',').replaceAll("'",'').tokenize(',')
 		def connectionList = connectionTypes.replaceAll(', ',',').replaceAll("'",'').tokenize(',')
-		def depCriteriaMap = ["statusTypes": statusList, "connectionTypes":connectionList, "modifiedBy":securityService.getUserLoginPerson().toString()]
-
+		
+		// User previous setting if exists else set to empty
+		def depCriteriaMap = projectInstance.depConsoleCriteria ? JSON.parse(projectInstance.depConsoleCriteria) : [:]
+		if(isChecked == "1"){
+			depCriteriaMap = ["statusTypes": statusList, "connectionTypes":connectionList]
+		}
+		depCriteriaMap << ["modifiedBy":securityService.getUserLoginPerson().toString(), "modifiedDate":TimeUtil.nowGMT().getTime()]
 		projectInstance.depConsoleCriteria = depCriteriaMap as JSON
-		projectInstance.save()
+		projectInstance.save(flush:true)
 		
 		// Find all move bundles that are flagged for Planning in the project and then get all assets in those bundles
 		String moveBundleText = MoveBundle.findAllByUseOfPlanningAndProject(true,projectInstance).id
@@ -571,19 +576,11 @@ class MoveBundleService {
 
 		def entities = assetEntityService.entityInfo( projectInstance )
  
-		// Get the time that the bundles were processed by searching the AssetDependencyBundle entries
-		String time
-		def date = AssetDependencyBundle.findByProject(projectInstance,[sort:'lastUpdated', order:'desc', max:1])?.lastUpdated
-		if (date){
-			def formatter = new SimpleDateFormat('MMM dd,yyyy hh:mm a');
-			time = formatter.format(date)
-		}
-
 		// Used by the Assignment Dialog
 		def planningMoveBundles = MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance,true,[sort:'name'])
 		def allMoveBundles = MoveBundle.findAllByProject(projectInstance,[sort:'name'])
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
-		// def assetDependentlist = AssetDependencyBundle.findAllByProject(projectInstance)?.sort{it.dependencyBundle}
+		def assetDependencyList = AssetDependencyBundle.findAllByProject(projectInstance)?.sort{it.dependencyBundle}
 				
 		
 		// JPM - don't think that this is required
@@ -594,11 +591,13 @@ class MoveBundleService {
  		log.info "dependencyConsoleMap() : stats=$stats}"
 		 
 		def depGrpCrt = projectInstance.depConsoleCriteria ? JSON.parse( projectInstance.depConsoleCriteria ) : [:]
-		
+		def tzId = userPreferenceService.getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def formatter = new SimpleDateFormat('MM/dd/yyyy hh:mm a');
+		def generatedDate = depGrpCrt.modifiedDate ? formatter.format(TimeUtil.convertInToUserTZ(new Date(depGrpCrt.modifiedDate), tzId)):''
 		def map = [ 
 			company:projectInstance.client,
 			asset:'apps',
-			date:time,
+			date: generatedDate,
 
 			dependencyType: 		entities.dependencyType, 
 			dependencyConsoleList: 	dependencyConsoleList,
@@ -611,7 +610,7 @@ class MoveBundleService {
 			gridStats:stats,
 
 			//assetDependencyList: 	assetDependencyList, 
-			//dependencyBundleCount: 	assetDependencyList.size(),
+			dependencyBundleCount: 	assetDependencyList.size(),
 			servers: entities.servers, 
 			applications: entities.applications, 
 			dbs: entities.dbs, 

@@ -57,7 +57,7 @@
 								  <legend>Connection Type:</legend>
 									<g:each in="${dependencyType}" var="dependency">
 										<input type="checkbox" id="${dependency.value}"
-											name="connection" value="${dependency.value}" ${depGrpCrt ? (depGrpCrt.connectionTypes.contains(dependency.value) ? 'checked' : '') : ([ 'Batch' ].contains(dependency.value) ? "" : "checked")}/>&nbsp;&nbsp;
+											name="connection" value="${dependency.value}" ${depGrpCrt.connectionTypes ? (depGrpCrt.connectionTypes.contains(dependency.value) ? 'checked' : '') : ([ 'Batch' ].contains(dependency.value) ? "" : "checked")}/>&nbsp;&nbsp;
 											<span id="dependecy_${dependency.id}"> ${dependency.value}</span>
 										<br />
 									</g:each>
@@ -69,11 +69,13 @@
 									<legend>Connection Status:</legend>
 									<g:each in="${dependencyStatus}" var="dependencyStatus">
 										<input type="checkbox" id="${dependencyStatus.value}"
-											name="status" value="${dependencyStatus.value}" ${depGrpCrt ? (depGrpCrt.statusTypes.contains(dependencyStatus.value) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatus.value) ? '' : 'checked')}/>&nbsp;&nbsp;
+											name="status" value="${dependencyStatus.value}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatus.value) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatus.value) ? '' : 'checked')}/>&nbsp;&nbsp;
 											<span id="dependecy_${dependencyStatus.id}"> ${dependencyStatus.value} </span>
 										<br />
 									</g:each>
 								</fieldset>
+								<input type="checkbox" id="saveDefault" name="saveDefault" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
+										&nbsp;&nbsp; <span>Save as defaults</span>
 							</div>
 							<div class="buttonR">
 								<input type="button" class="submit"

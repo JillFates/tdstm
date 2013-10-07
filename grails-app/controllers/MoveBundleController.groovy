@@ -886,8 +886,9 @@ class MoveBundleController {
 		String connectionTypes = WebUtil.checkboxParamAsString( request.getParameterValues( "connection" ) )
 		String statusTypes = WebUtil.checkboxParamAsString( request.getParameterValues( "status" ) )
 		
+		def isChecked = params.saveDefault
 		// Generate the Dependency Groups
-		flash.message = moveBundleService.generateDependencyGroups(projectId, connectionTypes, statusTypes)
+		flash.message = moveBundleService.generateDependencyGroups(projectId, connectionTypes, statusTypes, isChecked)
 
 		// Now get the model and display results
 		def isAssigned = userPreferenceService.getPreference( "AssignedGroup" )?: "1"
