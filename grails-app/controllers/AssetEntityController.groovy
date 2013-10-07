@@ -3352,10 +3352,9 @@ class AssetEntityController {
 		}
 		else {
 			flash.message = "Asset not Updated"
-			assetEntityInstance.errors.a"</br>"+errorsrs.each{ flash.message += it }
+            assetEntityInstance.errors.allErrors.each{ flash.message += it }
 			session.AE?.JQ_FILTERS = params
-			redirect( action:list)
-
+            render flash.message
 		}
 
 
