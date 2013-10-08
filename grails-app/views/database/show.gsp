@@ -33,7 +33,7 @@
 						</tr>
 						<tr class="prop">
 							<td class="label ${config.size}" nowrap="nowrap"><label for="size">Size/Scale</label></td>
-							<td class="valueNW ${config.size}">${databaseInstance?.size} &nbsp;&nbsp; ${databaseInstance.scale?.value() ?: SizeScale.default.value()}</td>
+							<td class="valueNW ${config.size}">${databaseInstance?.size} &nbsp;&nbsp; ${databaseInstance.scale?.value()}</td>
 							<td class="label ${config.maintExpDate}" nowrap="nowrap">Maint Exp.</td>
 							<td class="valueNW ${config.maintExpDate}"><tds:convertDate date="${databaseInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
 							<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>

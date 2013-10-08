@@ -117,7 +117,7 @@ $(document).ready(function() {
 								<td class="valueNW ${config.moveBundle}">${assetEntity.moveBundle}${dependencyBundleNumber?' / ' : ''}${dependencyBundleNumber}</td>
 								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Size/Scale </label></td>
                                 <td nowrap="nowrap" class="sizeScale">
-                                    ${assetEntity.size} ${assetEntity.scale?.value() ?: SizeScale.default.value()}
+                                    ${assetEntity.size} ${assetEntity.scale?.value()}
                                 </td>
 							</tr>
 							<tr class="prop">

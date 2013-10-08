@@ -37,7 +37,7 @@
 						</tr>
 						<tr>
 							<td class="label ${config.size}" nowrap="nowrap"><label for="size">Size/Scale</label></td>
-							<td class="valueNW ${config.size}">${filesInstance.size}&nbsp;&nbsp;${filesInstance.scale?.value() ?: SizeScale.default.value()}</td>
+							<td class="valueNW ${config.size}">${filesInstance.size}&nbsp;&nbsp;${filesInstance.scale?.value()}</td>
 							<td class="label" nowrap="nowrap"><label>Rate of Change (%)</label></td>
 							<td class="valueNW ${config?.rateOfChange}">${filesInstance?.rateOfChange}</td>
 						</tr>

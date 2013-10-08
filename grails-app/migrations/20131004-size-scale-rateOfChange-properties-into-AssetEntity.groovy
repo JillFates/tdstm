@@ -149,4 +149,10 @@ databaseChangeLog = {
 			}
 		}
 	}
+    
+    // Update eav_attribute.frontend_label with fileSize to size and bdSize to Size
+    changeSet(author: "lokanada", id: "20131004 TM-2301-6") {
+        comment("Update eav_attribute frontend_label to Size")
+        sql("UPDATE eav_attribute set frontend_label = 'Size' where frontend_label in ('DBSize', 'FileSize');")
+    }
 }
