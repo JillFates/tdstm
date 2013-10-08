@@ -1,3 +1,4 @@
+<%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
 <table style="border: 0">
 	<tr>
 		<td colspan="2"><div class="dialog" <tds:hasPermission permission='EditAndDelete'> ondblclick="editEntity('${redirectTo}','Storage', ${filesInstance?.id})"</tds:hasPermission>>
@@ -10,8 +11,7 @@
 							<td class="label ${config.assetName}" nowrap="nowrap"><label for="assetName">Name</label></td>
 							<td style="font-weight:bold;" class="${config.assetName}">${filesInstance.assetName}</td>
 							<td class="label ${config.description}" nowrap="nowrap"><label for="description">Description</label></td>
-							<td class="value ${config.description}" colspan="2">${filesInstance.description}</td>
-							<td></td>
+							<td class="value ${config.description}">${filesInstance.description}</td>
 							<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle / Dep. Group</label></td>
 							<td class="valueNW ${config.moveBundle}">${filesInstance?.moveBundle} / ${dependencyBundleNumber}</td>
 						</tr>
@@ -30,16 +30,16 @@
 							<td class="valueNW ${config.fileFormat}">${filesInstance.fileFormat}</td>
 							<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment</label></td>
 							<td class="valueNW ${config.environment}">${filesInstance.environment}</td>
-							<td class="label ${config.fileSize}" nowrap="nowrap"><label for="fileSize">Size</label></td>
-							<td class="valueNW ${config.fileSize}">${filesInstance.fileSize}&nbsp;${filesInstance.sizeUnit}</td>
+							<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
+							<td class="${config.externalRefId}">${filesInstance.externalRefId}</td>
 							<td class="label ${config.validation}">Validation</td>
 							<td class="valueNW ${config.validation}">${filesInstance.validation}</td>
 						</tr>
 						<tr>
-						<tr>
-							<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
-							<td class="${config.externalRefId}">${filesInstance.externalRefId}</td>
-						</tr>
+							<td class="label ${config.size}" nowrap="nowrap"><label for="size">Size/Scale</label></td>
+							<td class="valueNW ${config.size}">${filesInstance.size}&nbsp;&nbsp;${filesInstance.scale?.value() ?: SizeScale.default.value()}</td>
+							<td class="label" nowrap="nowrap"><label>Rate of Change (%)</label></td>
+							<td class="valueNW ${config?.rateOfChange}">${filesInstance?.rateOfChange}</td>
 						</tr>
 						<g:render template="../assetEntity/customShow" model="[assetEntity:filesInstance]"></g:render>
 					</tbody>

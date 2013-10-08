@@ -1,7 +1,7 @@
 <script type="text/javascript">
 	$("#file_assetName").val($('#gs_assetName').val())
 	$("#file_fileFormat").val($('#gs_fileFormat').val())
-	$("#file_fileSize").val($('#gs_fileSize').val())
+	$("#file_size").val($('#gs_size').val())
 	$("#file_planStatus").val($('#gs_planStatus').val())
 	$("#file_moveBundle").val($('#gs_moveBundle').val())
 	
@@ -16,7 +16,7 @@
 <g:form method="post" action="update" name="editAssetsFormId">
 	<input type="hidden" id="file_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="file_fileFormat" name="fileFormatFilter" value="" />
-	<input type="hidden" id="file_fileSize" name="fileSizeFilter" value="" />
+	<input type="hidden" id="file_size" name="sizeFilter" value="" />
 	<input type="hidden" id="file_planStatus" name="planStatusFilter" value="" />
 	<input type="hidden" id="file_moveBundle" name="moveBundleFilter" value="" />
 	<input type="hidden" name="id" value="${fileInstance?.id}" />
@@ -71,17 +71,20 @@
 								</td>
 								<td><g:select id="environment" class="${config.environment}" name="environment" from="${com.tds.asset.AssetEntity.constraints.environment.inList}" value="${fileInstance.environment}" />
 								</td>
-								<td class="label ${config.fileSize}" nowrap="nowrap"><label for="fileSize">Size<span style="color: red;">*</span></label>
-								</td>
-								<td><input type="text" id="fileSize" name="fileSize" class="${config.fileSize}" value="${fileInstance.fileSize}" size="10"/>&nbsp;
-								<g:select from="${com.tds.asset.Files.constraints.sizeUnit.inList}" name="sizeUnit" id="sizeUnit" value="${fileInstance.sizeUnit}"/>
-								</td>
+								<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
+								<td><input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" value="${fileInstance.externalRefId}" tabindex="11" /></td>
 								<td class="label ${config.validation}"><label for="validation">Validation</label></td>
 							<td><g:select from="${fileInstance.constraints.validation.inList}" id="validation" class="${config.validation}" name="validation" onChange="assetFieldImportance(this.value,'Files')" value="${fileInstance.validation}"/>	
 							</tr>
 							<tr>
-								<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
-								<td><input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" value="${fileInstance.externalRefId}" tabindex="11" /></td>
+								<td class="label ${config.size}" nowrap="nowrap"><label for="size">Size<span style="color: red;">*</span></label>
+								</td>
+								<td nowrap="nowrap" class="sizeScale">
+									<input type="text" id="size" name="size" class="${config.size}" value="${fileInstance.size}" size="10"/>&nbsp;
+									<g:select from="${fileInstance.constraints.scale.inList}" class="${config.scale}" name="scale" id="scale" value="${fileInstance.scale}" optionValue="value" noSelection="${['':' Please Select']}"/>
+								</td>
+								<td class="label" nowrap="nowrap"><label>Rate of Change (%)</label></td>
+								<td><input type="text" class="${config.rateOfChange}" size="3" name="rateOfChange" id="rateOfChange" value="${fileInstance.rateOfChange}"></td>
 							</tr>
 							<tbody class="customTemplate">
 							 	<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:fileInstance]"></g:render>

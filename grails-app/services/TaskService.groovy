@@ -2800,7 +2800,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					
 					case 'database':
 						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
-						addWhereConditions( ['dbFormat','dbSize'] )
+						addWhereConditions( ['dbFormat','size'] )
 						sql = "from Database a where a.moveBundle.id in (:bIds)" + ( where ? " and $where" : '')
 						log.info "findAllAssetsWithFilter: DATABASE sql=$sql, map=$map"
 						assets = Database.findAll(sql, map)
@@ -2808,7 +2808,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 					case ~/files|file|storage/:
 						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
-						addWhereConditions( ['fileFormat','fileSize', 'sizeUnit', 'LUN'] )
+						addWhereConditions( ['fileFormat','size', 'scale', 'LUN'] )
 						sql = "from Files a where a.moveBundle.id in (:bIds)" + ( where ? " and $where" : '')
 						log.info "findAllAssetsWithFilter: FILES sql=$sql, map=$map"
 						assets = Files.findAll(sql, map)

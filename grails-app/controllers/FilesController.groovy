@@ -13,6 +13,7 @@ import com.tds.asset.AssetTransition
 import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
+import com.tdsops.tm.enums.domain.SizeScale;
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.ApplicationConstants
@@ -45,7 +46,7 @@ class FilesController {
 			files : entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
 			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,
 			staffRoles:taskService.getRolesForStaff(), moveBundleId:params.moveBundleId, fileName:filters?.assetNameFilter ?:'', 
-			fileFormat:filters?.fileFormatFilter, fileSize:filters?.fileSizeFilter,
+			fileFormat:filters?.fileFormatFilter, size:filters?.sizeFilter,
 			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref, moveBundleList:moveBundleList]
 		
 	}
@@ -73,9 +74,9 @@ class FilesController {
 		
 		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
 		
-		def filesSize = params.fileSize ? Files.findAll("from Files where fileSize like '%${params.fileSize}%' and project =:project",[project:project])?.fileSize : []
+		def filesSize = params.size ? Files.findAll("from Files where size like '%${params.size}%' and project =:project",[project:project])?.size : []
 		
-		def files = AssetEntity.createCriteria().list(max: maxRows, offset: rowOffset) {
+		def files = Files.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", project)
 			if (params.assetName)
 				ilike('assetName', "%${params.assetName}%")
@@ -87,7 +88,7 @@ class FilesController {
 			if (bundleList)
 				'in'('moveBundle', bundleList)
 			if(filesSize){
-			  'in'('fileSize',filesSize)	
+			  'in'('size',filesSize)	
 			}
 			
 			eq("assetType",  AssetType.FILES.toString() )
@@ -124,7 +125,7 @@ class FilesController {
 		def totalRows = files.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
 
-		def results = files?.collect { [ cell: ['',it.assetName, it.fileFormat, it.fileSize, it.planStatus,
+		def results = files?.collect { [ cell: ['',it.assetName, it.fileFormat, (it.size ? it.size +' '+ (it.scale ? it.scale?.value() : SizeScale.default.value()) : ''), it.planStatus,
 					it.moveBundle?.name, AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
 					(it.depToResolve ?it.depToResolve:''),(it.depToConflict ?it.depToConflict:''),
 					AssetComment.find("from AssetComment ac where ac.assetEntity=:entity and commentType=:type and status!=:status",

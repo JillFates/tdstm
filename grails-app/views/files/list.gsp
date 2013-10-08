@@ -37,7 +37,7 @@
 				var planStatus = '${planStatus}'
 				var moveBundle = '${moveBundle}'
 				var fileFormat = '${fileFormat}'
-				var fileSize = '${fileSize}'
+				var size = '${size}'
 				var sizePref = '${sizePref}'
 				var listCaption ='Storages: <tds:hasPermission permission="EditAndDelete"><span class="capBtn"><input type="button" value="Create Storage" onclick="createAssetDetails(\'Files\')"/></span></tds:hasPermission>\
 					<tds:hasPermission permission="AssetDelete">\
@@ -51,7 +51,7 @@
 					colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'80'},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
 						{name:'fileFormat'},
-						{name:'fileSize'},
+						{name:'size'},
 						{name:'planStatus'}, 
 						{name:'moveBundle'},
 						{name:'depNumber',sortable:false,search:false},
@@ -67,7 +67,7 @@
 					gridComplete="function(){bindResize('storageId')}"
 					onSelectRow="validateMergeCount"
 					postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId, assetName:fileName, 
-						planStatus:planStatus, moveBundle:moveBundle, fileFormat:fileFormat, fileSize:fileSize}"
+						planStatus:planStatus, moveBundle:moveBundle, fileFormat:fileFormat, size:size}"
 					showPager="true">
 					<jqgrid:filterToolbar id="storageId" searchOnEnter="false" />
 					<jqgrid:navigation id="storageId" add="false" edit="false" del="false" search="false" refresh="false"/>
@@ -104,7 +104,7 @@
 				function populateFilter(){
 					$("#gs_assetName").val('${fileName}')
 					$("#gs_fileFormat").val('${fileFormat}')
-					$("#gs_fileSize").val('${fileSize}')
+					$("#gs_size").val('${size}')
 					$("#gs_planStatus").val('${planStatus}')
 					$("#gs_moveBundle").val('${moveBundle}')
 				}

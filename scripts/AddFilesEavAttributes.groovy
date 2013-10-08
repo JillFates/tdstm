@@ -154,16 +154,16 @@ if(!formatDataTransferMapWalkThru){
    DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Format',sheetName='Files' where eavAttribute = ?",[formatAttribute])
 }
 /**
-*  Create FileSize
+*  Create Size
 */
-def fileSizeAttribute = EavAttribute.findByAttributeCodeAndEntityType('fileSize',filesEntityType)
-if(fileSizeAttribute){
-   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'fileSize', frontendLabel='FileSize' where id = ?",[fileSizeAttribute.id])
+def sizeAttribute = EavAttribute.findByAttributeCodeAndEntityType('size',filesEntityType)
+if(sizeAttribute){
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'size', frontendLabel='Size' where id = ?",[sizeAttribute.id])
 } else {
-   fileSizeAttribute = new EavAttribute( attributeCode : "fileSize",
+   sizeAttribute = new EavAttribute( attributeCode : "size",
 		   backendType : 'String',
 		   frontendInput : 'text',
-		   frontendLabel : 'FileSize',
+		   frontendLabel : 'Size',
 		   note : 'this field is used for just import',
 		   sortOrder : 30,
 		   entityType:filesEntityType,
@@ -172,55 +172,55 @@ if(fileSizeAttribute){
 		   defaultValue:"1",
 		   validation:'No validation'
 		   )
-   if ( !fileSizeAttribute.validate() || !fileSizeAttribute.save(flush:true) ) {
-	   println"Unable to create fileSizeAttribute : "
-	   fileSizeAttribute.errors.allErrors.each() {println"\n"+it }
+   if ( !sizeAttribute.validate() || !sizeAttribute.save(flush:true) ) {
+	   println"Unable to create sizeAttribute : "
+	   sizeAttribute.errors.allErrors.each() {println"\n"+it }
    }
 }
 
-def fileSizeEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(fileSizeAttribute,filesAttributeSet)
-if(fileSizeEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 30, attributeCode = 'fileSize' where attributeCode = 'fileSize'")
+def sizeEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(sizeAttribute,filesAttributeSet)
+if(sizeEavEntityAttribute){
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 30, attributeCode = 'size' where attributeCode = 'size'")
 } else {
-   fileSizeEavEntityAttribute = new EavEntityAttribute(sortOrder:30,attribute:fileSizeAttribute,eavAttributeSet:filesAttributeSet)
-   if ( !fileSizeEavEntityAttribute.validate() || !fileSizeEavEntityAttribute.save(flush:true) ) {
-	   println"Unable to create fileSizeEavEntityAttribute : " +
-			   fileSizeEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
+   sizeEavEntityAttribute = new EavEntityAttribute(sortOrder:30,attribute:sizeAttribute,eavAttributeSet:filesAttributeSet)
+   if ( !sizeEavEntityAttribute.validate() || !sizeEavEntityAttribute.save(flush:true) ) {
+	   println"Unable to create sizeEavEntityAttribute : " +
+			   sizeEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
    }
 }
 
-def fileSizeDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,fileSizeAttribute)
-if( !fileSizeDataTransferMapMaster ){
-   fileSizeDataTransferMapMaster = new DataTransferAttributeMap(columnName:"FileSize",
+def sizeDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,sizeAttribute)
+if( !sizeDataTransferMapMaster ){
+   sizeDataTransferMapMaster = new DataTransferAttributeMap(columnName:"Size",
 		   sheetName:"Files",
 		   dataTransferSet : masterDataTransferSet,
-		   eavAttribute:fileSizeAttribute,
+		   eavAttribute:sizeAttribute,
 		   validation:"NO Validation",
 		   isRequired:0
 		   )
-   if ( !fileSizeDataTransferMapMaster.validate() || !fileSizeDataTransferMapMaster.save(flush:true) ) {
-	   println"Unable to create fileSizeDataTransferMapMaster : " +
-			   fileSizeDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
+   if ( !sizeDataTransferMapMaster.validate() || !sizeDataTransferMapMaster.save(flush:true) ) {
+	   println"Unable to create sizeDataTransferMapMaster : " +
+			   sizeDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'FileSize',sheetName='Files' where eavAttribute = ?",[fileSizeAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Size',sheetName='Files' where eavAttribute = ?",[sizeAttribute])
 }
 
-def fileSizeDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,fileSizeAttribute)
-if(!fileSizeDataTransferMapWalkThru){
-   fileSizeDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"FileSize",
+def sizeDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,sizeAttribute)
+if(!sizeDataTransferMapWalkThru){
+   sizeDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Size",
 		   sheetName:"Files",
 		   dataTransferSet : walkThruDataTransferSet,
-		   eavAttribute:fileSizeAttribute,
+		   eavAttribute:sizeAttribute,
 		   validation:"NO Validation",
 		   isRequired:0
 		   )
-   if ( !fileSizeDataTransferMapWalkThru.validate() || !fileSizeDataTransferMapWalkThru.save(flush:true) ) {
-	   println"Unable to create fileSizeDataTransferMapWalkThru : " +
-			   fileSizeDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
+   if ( !sizeDataTransferMapWalkThru.validate() || !sizeDataTransferMapWalkThru.save(flush:true) ) {
+	   println"Unable to create sizeDataTransferMapWalkThru : " +
+			   sizeDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'FileSize',sheetName='Files' where eavAttribute = ?",[fileSizeAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Size',sheetName='Files' where eavAttribute = ?",[sizeAttribute])
 }
 /**
 *  Create Description

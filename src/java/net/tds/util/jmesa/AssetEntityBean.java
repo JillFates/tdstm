@@ -25,10 +25,9 @@ public class AssetEntityBean implements Serializable {
 	private String planStatus;
 
 	private String dbFormat;
-	private Integer dbSize;
 
 	private String fileFormat;
-	private Integer fileSize;
+	private Integer size;
 
 	private Integer depUp; 		// dependencies support count
 	private Integer depDown; 	// dependencies down count
@@ -300,14 +299,6 @@ public class AssetEntityBean implements Serializable {
 		this.dbFormat = dbFormat;
 	}
 
-	public Integer getDbSize() {
-		return dbSize;
-	}
-
-	public void setDbSize(Integer dbSize) {
-		this.dbSize = dbSize;
-	}
-
 	public String getFileFormat() {
 		return fileFormat;
 	}
@@ -316,12 +307,12 @@ public class AssetEntityBean implements Serializable {
 		this.fileFormat = fileFormat;
 	}
 
-	public Integer getFileSize() {
-		return fileSize;
+	public Integer getSize() {
+		return size;
 	}
 
-	public void setFileSize(Integer fileSize) {
-		this.fileSize = fileSize;
+	public void setSize(Integer size) {
+		this.size = size;
 	}
 
 	public Integer getDepUp() {

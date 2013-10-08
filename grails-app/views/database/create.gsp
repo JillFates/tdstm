@@ -44,8 +44,11 @@
 							<td colspan="3"><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${databaseInstance?.moveBundle}" optionKey="id" optionValue="name" tabindex="34" /></td>
 						</tr>
 						<tr>
-							<td class="label ${config.dbSize}" nowrap="nowrap"><label for="dbSize">Size<span style="color: red;">*</span></label></td>
-							<td><input type="text" id="dbSize" class="${config.dbSize}" name="dbSize" value="${databaseInstance.dbSize}" tabindex="14" /></td>
+							<td class="label ${config.size}" nowrap="nowrap"><label for="size">Size/Scale<span style="color: red;">*</span></label></td>
+							<td nowrap="nowrap" class="sizeScale">
+								<input type="text" id="size" size="3" class="${config.size}" name="size" value="${databaseInstance.size}" tabindex="14" />
+								<g:select from="${databaseInstance.constraints.scale.inList}" class="${config.scale}" id="scale" name="scale" value="${databaseInstance.scale}" optionValue="value" tabindex="40" noSelection="${['':' Please Select']}"/>
+							</td>
 							<td class="label ${config.maintExpDate}"><label for="maintExpDate">Maint Exp.</label></td>
 							<td valign="top" class="value ${hasErrors(bean:databaseInstance,field:'maintExpDate','errors')}">
 							    <script type="text/javascript" charset="utf-8">
@@ -58,14 +61,12 @@
 							<td colspan="3"><g:select from="${planStatusOptions}" id="planStatus" class="${config.planStatus}" name="planStatus" value="${databaseInstance.planStatus}" tabindex="35" /></td>
 						</tr>
 						<tr>
-							<td class="label" nowrap="nowrap"><label>Version</label></td><td></td>
-							<td class="label" nowrap="nowrap"><label>SME1</label></td><td></td>
-							<td class="label ${config.validation}"><label for="validation">Validation</label></td>
-							<td colspan="3"><g:select from="${databaseInstance.constraints.validation.inList}" id="validation" class="${config.validation}" onChange="assetFieldImportance(this.value,'Database');" name="validation" value="Discovery"/></td>
-						</tr>
-						<tr>
+							<td class="label" nowrap="nowrap"><label>Rate of Change (%)</label></td>
+							<td><input type="text" class="${config.rateOfChange}" size="3" name="rateOfChange" id="rateOfChange" value="${databaseInstance.rateOfChange}"></td>
 							<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
 							<td><input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" value="${databaseInstance.externalRefId}" tabindex="11" /></td>
+							<td class="label ${config.validation}"><label for="validation">Validation</label></td>
+							<td colspan="3"><g:select from="${databaseInstance.constraints.validation.inList}" id="validation" class="${config.validation}" onChange="assetFieldImportance(this.value,'Database');" name="validation" value="Discovery"/></td>
 						</tr>
 						<tbody class="customTemplate">
 							<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:databaseInstance]"></g:render>

@@ -4,15 +4,11 @@ import com.tdssrc.grails.GormUtil
 
 class Files extends AssetEntity{
 	String fileFormat
-	Integer fileSize
 	String LUN
-	String sizeUnit = "GB"
 	
     static constraints = {
 		fileFormat( blank:false, nullable:false )
-		fileSize( nullable:false )
 		LUN( blank:true, nullable:true )
-		sizeUnit( blank:false, nullable:false, inList:['TB','GB','MB'])
     }
 	static mapping  = {
 		version true

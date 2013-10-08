@@ -16,6 +16,7 @@ import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
+import com.tdsops.tm.enums.domain.SizeScale
 
 class DataTransferBatchController {
 	// Objects to be injected
@@ -221,7 +222,12 @@ class DataTransferBatchController {
 									case "usize":
 										// Skip the insertion
 										break;
-									
+									case ~/size|rateOfChange/:
+										assetEntity."$attribName" = it.importValue ? NumberUtils.toDouble(it.importValue, 0).round()  : 0
+										break;
+									case "scale":
+										assetEntity."$attribName" = SizeScale.asEnum( it.importValue )
+										break;
 									default:
 										if( it.eavAttribute.backendType == "int"){
 		    								def correctedPos
@@ -734,7 +740,7 @@ class DataTransferBatchController {
 						if( files && flag == 0 ) {
 							def cloneEntity = retainNotNullVal(files, nullFProps, isNewValidate)
 							files.project = project
-							files.sizeUnit = "GB"
+							files.scale = "GB"
 							dtvList.each {
 								def attribName = it.eavAttribute.attributeCode
 									switch(attribName){
@@ -753,9 +759,12 @@ class DataTransferBatchController {
 										case "owner":
 												files."$attribName" = application.owner
 											break;
-										case "fileSize":
+										case ~/size|rateOfChange/:
 											files."$attribName" = it.importValue ? NumberUtils.toDouble(it.importValue, 0).round() : 0
-										    break;
+											break;
+										case "scale":
+											files."$attribName" = SizeScale.asEnum( it.importValue )
+											break;
 										case "validation":
 											if(!it.importValue){
 												files."$attribName" = "Discovery"
@@ -989,9 +998,12 @@ class DataTransferBatchController {
 											dbInstance."$attribName" = GormUtil.convertInToGMT(formatter.parse( it.importValue ), tzId)
 										}
 										break;
-									case "dbSize":
-										    dbInstance."$attribName" = it.importValue ? NumberUtils.toDouble(it.importValue, 0).round()  : 0
-									    break;
+									case ~/size|rateOfChange/:
+										dbInstance."$attribName" = it.importValue ? NumberUtils.toDouble(it.importValue, 0).round()  : 0
+										break;
+									case "scale":
+										dbInstance."$attribName" = SizeScale.asEnum( it.importValue )
+										break;
 									case "validation":
 										if(!it.importValue){
 											dbInstance."$attribName" = "Discovery"

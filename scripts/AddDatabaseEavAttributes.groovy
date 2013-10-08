@@ -155,16 +155,16 @@ if(!dbFormatDataTransferMapWalkThru){
 	DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Format',sheetName='Databases' where eavAttribute = ?",[dbFormatAttribute])
 }
 /**
-*  Create DBSize
+*  Create Size
 */
-def dbSizeAttribute = EavAttribute.findByAttributeCodeAndEntityType('dbSize',dbEntityType)
-if(dbSizeAttribute){
-   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'dbSize', frontendLabel='DBSize' where id = ?",[dbSizeAttribute.id])
+def sizeAttribute = EavAttribute.findByAttributeCodeAndEntityType('size',dbEntityType)
+if(sizeAttribute){
+   EavAttribute.executeUpdate("UPDATE EavAttribute SET attributeCode = 'size', frontendLabel='Size' where id = ?",[sizeAttribute.id])
 } else {
-   dbSizeAttribute = new EavAttribute( attributeCode : "dbSize",
+   sizeAttribute = new EavAttribute( attributeCode : "size",
 		   backendType : 'String',
 		   frontendInput : 'text',
-		   frontendLabel : 'DBSize',
+		   frontendLabel : 'Size',
 		   note : 'this field is used for just import',
 		   sortOrder : 30,
 		   entityType:dbEntityType,
@@ -173,55 +173,55 @@ if(dbSizeAttribute){
 		   defaultValue:"1",
 		   validation:'No validation'
 		   )
-   if ( !dbSizeAttribute.validate() || !dbSizeAttribute.save(flush:true) ) {
-	   println"Unable to create dbSizeAttribute : "
-	   dbSizeAttribute.errors.allErrors.each() {println"\n"+it }
+   if ( !sizeAttribute.validate() || !sizeAttribute.save(flush:true) ) {
+	   println"Unable to create sizeAttribute : "
+	   sizeAttribute.errors.allErrors.each() {println"\n"+it }
    }
 }
 
-def dbSizeEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(dbSizeAttribute,dbAttributeSet)
-if(dbSizeEavEntityAttribute){
-   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 30, attributeCode = 'dbSize' where attributeCode = 'dbSize'")
+def sizeEavEntityAttribute = EavEntityAttribute.findByAttributeAndEavAttributeSet(sizeAttribute,dbAttributeSet)
+if(sizeEavEntityAttribute){
+   EavAttribute.executeUpdate("UPDATE from EavAttribute set sortOrder= 30, attributeCode = 'size' where attributeCode = 'size'")
 } else {
-   dbSizeEavEntityAttribute = new EavEntityAttribute(sortOrder:30,attribute:dbSizeAttribute,eavAttributeSet:dbAttributeSet)
-   if ( !dbSizeEavEntityAttribute.validate() || !dbSizeEavEntityAttribute.save(flush:true) ) {
-	   println"Unable to create dbSizeEavEntityAttribute : " +
-			   dbSizeEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
+   sizeEavEntityAttribute = new EavEntityAttribute(sortOrder:30,attribute:sizeAttribute,eavAttributeSet:dbAttributeSet)
+   if ( !sizeEavEntityAttribute.validate() || !sizeEavEntityAttribute.save(flush:true) ) {
+	   println"Unable to create sizeEavEntityAttribute : " +
+			   sizeEavEntityAttribute.errors.allErrors.each() {println"\n"+it }
    }
 }
 
-def dbSizeDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,dbSizeAttribute)
-if( !dbSizeDataTransferMapMaster ){
-   dbSizeDataTransferMapMaster = new DataTransferAttributeMap(columnName:"DBSize",
+def sizeDataTransferMapMaster = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(masterDataTransferSet,sizeAttribute)
+if( !sizeDataTransferMapMaster ){
+   sizeDataTransferMapMaster = new DataTransferAttributeMap(columnName:"Size",
 		   sheetName:"Databases",
 		   dataTransferSet : masterDataTransferSet,
-		   eavAttribute:dbSizeAttribute,
+		   eavAttribute:sizeAttribute,
 		   validation:"NO Validation",
 		   isRequired:0
 		   )
-   if ( !dbSizeDataTransferMapMaster.validate() || !dbSizeDataTransferMapMaster.save(flush:true) ) {
-	   println"Unable to create dbSizeDataTransferMapMaster : " +
-			   dbSizeDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
+   if ( !sizeDataTransferMapMaster.validate() || !sizeDataTransferMapMaster.save(flush:true) ) {
+	   println"Unable to create sizeDataTransferMapMaster : " +
+			   sizeDataTransferMapMaster.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'DBSize',sheetName='Databases' where eavAttribute = ?",[dbSizeAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Size',sheetName='Databases' where eavAttribute = ?",[sizeAttribute])
 }
 
-def dbSizeDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,dbSizeAttribute)
-if(!dbSizeDataTransferMapWalkThru){
-   dbSizeDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"DBSize",
+def sizeDataTransferMapWalkThru = DataTransferAttributeMap.findByDataTransferSetAndEavAttribute(walkThruDataTransferSet,sizeAttribute)
+if(!sizeDataTransferMapWalkThru){
+   sizeDataTransferMapWalkThru = new DataTransferAttributeMap(columnName:"Size",
 		   sheetName:"Databases",
 		   dataTransferSet : walkThruDataTransferSet,
-		   eavAttribute:dbSizeAttribute,
+		   eavAttribute:sizeAttribute,
 		   validation:"NO Validation",
 		   isRequired:0
 		   )
-   if ( !dbSizeDataTransferMapWalkThru.validate() || !dbSizeDataTransferMapWalkThru.save(flush:true) ) {
-	   println"Unable to create dbSizeDataTransferMapWalkThru : " +
-			   dbSizeDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
+   if ( !sizeDataTransferMapWalkThru.validate() || !sizeDataTransferMapWalkThru.save(flush:true) ) {
+	   println"Unable to create sizeDataTransferMapWalkThru : " +
+			   sizeDataTransferMapWalkThru.errors.allErrors.each() {println"\n"+it }
    }
 } else {
-   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'DBSize',sheetName='Databases' where eavAttribute = ?",[dbSizeAttribute])
+   DataTransferAttributeMap.executeUpdate("UPDATE DataTransferAttributeMap SET columnName = 'Size',sheetName='Databases' where eavAttribute = ?",[sizeAttribute])
 }
 /**
 *  Create Description

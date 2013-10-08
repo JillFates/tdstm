@@ -1,4 +1,5 @@
-	<table style="border: 0">
+	<%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
+<table style="border: 0">
 	<tr>
 		<td colspan="2">
 		
@@ -31,24 +32,20 @@
 							<td class="valueNW ${config.moveBundle}" colspan="3">${databaseInstance?.moveBundle} / ${dependencyBundleNumber}</td>
 						</tr>
 						<tr class="prop">
-							<td class="label ${config.dbSize}" nowrap="nowrap"><label for="dbSize">Size</label></td>
-							<td class="valueNW ${config.dbSize}">${databaseInstance?.dbSize}</td>
+							<td class="label ${config.size}" nowrap="nowrap"><label for="size">Size/Scale</label></td>
+							<td class="valueNW ${config.size}">${databaseInstance?.size} &nbsp;&nbsp; ${databaseInstance.scale?.value() ?: SizeScale.default.value()}</td>
 							<td class="label ${config.maintExpDate}" nowrap="nowrap">Maint Exp.</td>
 							<td class="valueNW ${config.maintExpDate}"><tds:convertDate date="${databaseInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
 							<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
 							<td class="valueNW ${config.planStatus}" colspan="3">${databaseInstance?.planStatus}</td>
 						</tr>
 						<tr>
-							<td class="label" nowrap="nowrap"><label>Version</label></td>
-							<td></td>
-							<td class="label" nowrap="nowrap"><label>SME1</label></td>
-							<td></td>
-							<td class="label ${config.validation}">Validation</td>
-							<td class="valueNW ${config.validation}" colspan="3">${databaseInstance.validation}</td>
-						</tr>
-						<tr>
+							<td class="label" nowrap="nowrap"><label>Rate of Change (%)</label></td>
+							<td class="valueNW ${config?.rateOfChange}">${databaseInstance?.rateOfChange}</td>
 							<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
 							<td class="${config.externalRefId}">${databaseInstance.externalRefId}</td>
+							<td class="label ${config.validation}">Validation</td>
+							<td class="valueNW ${config.validation}" colspan="3">${databaseInstance.validation}</td>
 						</tr>
 						<g:render template="../assetEntity/customShow" model="[assetEntity:databaseInstance, 'project':project]"></g:render>
 					</tbody>

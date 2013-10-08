@@ -1,3 +1,4 @@
+<%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
 <script type="text/javascript">
 	$("#asset_assetName").val($('#gs_assetName').val())
 	$("#asset_assetType").val($('#gs_assetType').val())
@@ -178,8 +179,12 @@
 								</td>
 								
 								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-								<td colspan="2"><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${assetEntityInstance.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="38" noSelection="${['null':' Please Select']}"/></td>
-								
+								<td><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${assetEntityInstance.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="38" noSelection="${['null':' Please Select']}"/></td>
+								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Size/Scale </label></td>
+                                <td nowrap="nowrap" class="sizeScale">
+                                    <input type="text" id="size" name="size" class="${config.size}" value="${assetEntityInstance.size}" tabindex="39"/>
+                                    <g:select from="${assetEntityInstance.constraints.scale.inList}" id="scale" name="scale" value="${assetEntityInstance.scale}" optionValue="value" tabindex="40" noSelection="${['':' Please Select']}"/>
+                                  </td>  
 							</tr>
 							<tr>
 								<td class="label ${config.serialNumber}" nowrap="nowrap"><label for="serialNumber">Serial #</label></td>
@@ -194,7 +199,9 @@
 									value="<tds:convertDate date="${assetEntityInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" tabindex="27" />" > 
 								</td>
 								<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
-								<td colspan="2"><g:select id="planStatus" class="${config.planStatus}" name ="planStatus" from="${planStatusOptions}" value= "${assetEntityInstance.planStatus}" noSelection="${['':' Please Select']}" tabindex="39"/></td>
+								<td><g:select id="planStatus" class="${config.planStatus}" name ="planStatus" from="${planStatusOptions}" value= "${assetEntityInstance.planStatus}" noSelection="${['':' Please Select']}" tabindex="39"/></td>
+								<td class="label ${config.rateOfChange}" nowrap="nowrap"><label for="rateOfChange">Rate of Change (%)</label></td>
+                                <td><input type="text" class="${config.rateOfChange}" size="3" name="rateOfChange" id="rateOfChange" value="${assetEntityInstance.rateOfChange}"></td>
 							</tr>
 							<tr>
 								<td class="label ${config.assetTag}" nowrap="nowrap"><label for="assetTag">Tag</label></td>

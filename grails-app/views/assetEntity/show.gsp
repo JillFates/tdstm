@@ -1,3 +1,4 @@
+<%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
 <g:if test="${flash.message}">
 <script type="text/javascript">
 alert("${flash.message}")
@@ -113,7 +114,11 @@ $(document).ready(function() {
 							  		timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 								</td>
 								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle / Dep. Group</label></td>
-								<td class="valueNW ${config.moveBundle}" colspan="2">${assetEntity.moveBundle}${dependencyBundleNumber?' / ' : ''}${dependencyBundleNumber}</td>
+								<td class="valueNW ${config.moveBundle}">${assetEntity.moveBundle}${dependencyBundleNumber?' / ' : ''}${dependencyBundleNumber}</td>
+								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Size/Scale </label></td>
+                                <td nowrap="nowrap" class="sizeScale">
+                                    ${assetEntity.size} ${assetEntity.scale?.value() ?: SizeScale.default.value()}
+                                </td>
 							</tr>
 							<tr class="prop">
 								<td class="label ${config.assetTag}" nowrap="nowrap"><label for="assetTag">Tag</label></td>
@@ -123,7 +128,9 @@ $(document).ready(function() {
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							        </td>
 								<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
-								<td class="valueNW ${config.planStatus}" colspan="2">${assetEntity.planStatus}</td>
+								<td class="valueNW ${config.planStatus}">${assetEntity.planStatus}</td>
+								<td class="label ${config.rateOfChange}" nowrap="nowrap"><label for="rateOfChange">Rate of Change (%)</label></td>
+                                <td class="valueNW ${config.rateOfChange}">${assetEntity.rateOfChange}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label ${config.railType}" nowrap="nowrap"><label for="railType">Rail Type</label></td>

@@ -244,8 +244,8 @@ function showComment(id , action){
 }
 function validateFileFormat(){
 	var fileFlag = false;
-    var fileSize = $('#fileSize').val();
-    if( fileSize=='' || isNaN(fileSize)){
+    var size = $('#size').val();
+    if( size=='' || isNaN(size)){
    	  alert("Please enter numeric value for Storage Size");
     }else if($('#fileFormat').val()==''){
    	  alert("Please enter value for Storage Format");

@@ -1352,3 +1352,10 @@ span.task_button_disabled { float: left; height: 16px; line-height: 16px;  paddi
 #successorShowTd {
 	vertical-align: top !important;
 }
+
+.sizeScale select{
+	width:80px;
+}
+.sizeScale input{
+    width: 40px
+}

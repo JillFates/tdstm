@@ -1,9 +1,11 @@
 package com.tds.asset
 
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
+import com.tdsops.tm.enums.domain.SizeScale;
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil;
 
 
 class AssetEntity extends com.tdssrc.eav.EavEntity {
@@ -105,7 +107,10 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String externalRefId
 	
 	Integer dependencyBundle = 0
-	
+    Integer size
+    SizeScale scale
+    Integer rateOfChange
+    
 	static hasMany = [
 		assetEntityVarchars : AssetEntityVarchar,
 		comments : AssetComment
@@ -208,6 +213,10 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		currentStatus( nullable:true )
 		dependencyBundle( nullable:true )
 		externalRefId( blank:true, nullable:true )
+        
+        size( nullable:true )
+        scale( blank:true, nullable:true, inList:SizeScale.getKeys() )
+        rateOfChange( nullable:true )
 	}
 	
 	static mapping  = {	

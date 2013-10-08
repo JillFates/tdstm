@@ -4,11 +4,9 @@ import com.tdssrc.grails.GormUtil
 
 class Database extends AssetEntity{
 	String dbFormat
-	Integer dbSize
 	
     static constraints = {
 		dbFormat( blank:false, nullable:false )
-		dbSize( nullable:false )
     }
 	static mapping  = {
 		table "data_base"

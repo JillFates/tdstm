@@ -732,12 +732,12 @@ class MoveEventController {
 			
 			def impactedAppColumnList =['id' ,'assetName' ,'' ,'startupProc' ,'description' ,'sme' ,'' ,'' ,'' ,'' ,'' ,'' ]
 			
-			def dbColumnList = ['id', 'assetName', 'dbFormat', 'dbSize', 'description', 'supportType','retireDate', 'maintExpDate',
+			def dbColumnList = ['id', 'assetName', 'dbFormat', 'size', 'description', 'supportType','retireDate', 'maintExpDate',
 								'environment','ipAddress', 'planStatus','custom1','custom2','custom3','custom4','custom5',
 								'custom6','custom7','custom8'
 								]
 			
-			def filesColumnList = ['id', 'assetName', 'fileFormat', 'fileSize', 'description', 'supportType','retireDate', 'maintExpDate',
+			def filesColumnList = ['id', 'assetName', 'fileFormat', 'size', 'description', 'supportType','retireDate', 'maintExpDate',
 								   'environment','ipAddress', 'planStatus','custom1','custom2','custom3','custom4','custom5',
 								   'custom6','custom7','custom8'
 								  ]
