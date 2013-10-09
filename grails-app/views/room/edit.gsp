@@ -337,6 +337,7 @@ function showRoomObjectsDiv(rackId){
 				$("#rackDetailDiv_"+id).css("top",(parseInt(y)+50)+"px")
 				$("#rackDetailDiv_"+id).show("fold", {horizFirst: true }, 1000);	
 				$("#rackDetailDivv_"+id).show("fold", {horizFirst: true }, 1000);
+				updateXYPositions(rackId)
 			}
 		});
 	}
