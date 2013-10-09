@@ -101,11 +101,12 @@
 							</g:if>
 							<g:if test="${issue.item.status == AssetCommentStatus.READY}">
 								<g:if test="${!item.successors && !(item.category in AssetComment.moveDayCategories)}">
-									<tds:actionButton label="Do Tomorrow" icon="ui-icon-seek-next" id="${item?.id}"  
+									<td style="width:8%"><span>Delay for: </span></td>
+									<tds:actionButton label="1 day" icon="ui-icon-seek-next" id="${item?.id}"  
 										onclick="changeEstTime(1,'${item?.id}', this.id)"/>
-									<tds:actionButton label="Do in 2 days" icon="ui-icon-seek-next" id="${item?.id}"  
+									<tds:actionButton label="2 days" icon="ui-icon-seek-next" id="${item?.id}"  
 										onclick="changeEstTime(2,'${item?.id}', this.id)"/>
-									<tds:actionButton label="Do in a week" icon="ui-icon-seek-next" id="${item?.id}"  
+									<tds:actionButton label="7 days" icon="ui-icon-seek-next" id="${item?.id}"  
 										onclick="changeEstTime(7,'${item?.id}', this.id)"/>
 								</g:if>
 							</g:if>
