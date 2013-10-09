@@ -154,7 +154,7 @@ class TaskController {
 			if(comment.status ==  AssetCommentStatus.READY ){
 				def hasSucc = TaskDependency.countByPredecessor( comment )
 				if(!hasSucc && !(comment.category in AssetComment.moveDayCategories)){
-					actionBar.append('<td><span>Delay for:</span></td>')
+					actionBar.append('<td width=8%><span>Delay for:</span></td>')
 					actionBar.append( _actionButtonTd(	"1dEst_${comment.id}",
 						HtmlUtil.actionButton('1 day', 'ui-icon-seek-next', comment.id,"changeEstTime('1','${comment.id}',this.id)")))
 					actionBar.append( _actionButtonTd(	"2dEst_${comment.id}",
