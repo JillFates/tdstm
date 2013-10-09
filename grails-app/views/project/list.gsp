@@ -2,7 +2,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="projectHeader" />
-		<title>Project List</title>
+		<title>Project List - ${active=='active' ? 'Active' : 'Completed'} Projects</title>
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 		<script src="${resource(dir:'js',file:'jquery.form.js')}"></script>
 		<jqgrid:resources />
@@ -48,7 +48,7 @@
 	</head>
 	<body>
 		<div class="body fluid">
-			<h1>Project List</h1>
+			<h1>Project List - ${active=='active' ? 'Active' : 'Completed'} Projects</h1>
 			<g:if test="${flash.message}">
 				<div id="messageDivId" class="message">
 					${flash.message}
