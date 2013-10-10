@@ -155,4 +155,23 @@ databaseChangeLog = {
         comment("Update eav_attribute frontend_label to Size")
         sql("UPDATE eav_attribute set frontend_label = 'Size' where frontend_label in ('DBSize', 'FileSize');")
     }
+	
+	//TODO :@John, enable below changeSets after ensuring the data transferred to new columns.
+	/*// This set of Database change to drop dbSize column from database table.
+	changeSet(author: "lokanada", id: "20131010 TM-2301-7") {
+		comment('Drop "dbSize" column from the data_base table')
+		preConditions(onFail:'MARK_RAN') {
+			columnExists(schemaName:'tdstm', tableName:'data_base', columnName:'db_size' )
+		}
+		dropColumn(tableName:'data_base', columnName:'db_size')
+	}
+	
+	// This set of Database change to drop fileSize column from files table.
+	changeSet(author: "lokanada", id: "20131010 TM-2301-8") {
+		comment('Drop "fileSize" column from the files table')
+		preConditions(onFail:'MARK_RAN') {
+			columnExists(schemaName:'tdstm', tableName:'files', columnName:'file_size' )
+		}
+		dropColumn(tableName:'files', columnName:'file_size')
+	}*/
 }
