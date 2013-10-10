@@ -1359,3 +1359,12 @@ span.task_button_disabled { float: left; height: 16px; line-height: 16px;  paddi
 .sizeScale input{
     width: 40px
 }
+.addDepButton{
+	margin-top: 12px;
+}
+.commentEllip{
+	white-space:nowrap;
+	width:7em;
+	overflow:hidden;
+	text-overflow:ellipsis;
+}

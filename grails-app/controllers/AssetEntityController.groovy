@@ -4613,13 +4613,13 @@ class AssetEntityController {
 		def project = securityService.getUserCurrentProject()
 		def sid
 		 
-		def filterParams = ['assetName':params.assetName, 'assetType':params.assetType, 'assetBundle':params.assetBundle, 'type':params.type,'dependentName':params.dependentName, 'dependentType':params.dependentType,'dependentBundle':params.dependentBundle,'status':params.status,'frequency':params.frequency]
+		def filterParams = ['assetName':params.assetName, 'assetType':params.assetType, 'assetBundle':params.assetBundle, 'type':params.type,'dependentName':params.dependentName, 'dependentType':params.dependentType,'dependentBundle':params.dependentBundle,'status':params.status,'frequency':params.frequency, 'comment':params.comment]
 		 
 		StringBuffer query = new StringBuffer(""" 
 			SELECT * FROM ( 
 				SELECT asset_dependency_id AS id, ae.asset_name AS assetName, ae.asset_type AS assetType, mb.name AS assetBundle, ad.type AS type, 
 					aed.asset_name AS dependentName, aed.asset_type AS dependentType, mbd.name AS dependentBundle, 
-					ad.status AS status, ad.data_flow_freq AS frequency, ae.asset_entity_id AS assetId,  aed.asset_entity_id AS dependentId 
+					ad.status AS status,ad.comment AS comment, ad.data_flow_freq AS frequency, ae.asset_entity_id AS assetId,  aed.asset_entity_id AS dependentId 
 				FROM tdstm.asset_dependency ad 
 				LEFT OUTER JOIN asset_entity ae ON ae.asset_entity_id = asset_id 
 				LEFT OUTER JOIN asset_entity aed ON aed.asset_entity_id = dependent_id 
@@ -4658,7 +4658,9 @@ class AssetEntityController {
 				[
 				it.assetName, it.assetType, it.assetBundle, it.type,
 				it.dependentName, it.dependentType, it.dependentBundle,
-				it.frequency, it.status, it.assetId, it.dependentId
+				it.frequency, it.status, 
+				it.comment ? "<div class='commentEllip'>${it.comment}</div>" : '', 
+				it.assetId, it.dependentId
 				], id: it.id
 			]}
 		

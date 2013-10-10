@@ -19,7 +19,7 @@
 					</tds:hasPermission>"
 				<jqgrid:grid id="dependencyGridId" url="'${createLink(action: 'listDepJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
-					colNames="'Asset','AssetClass', 'Bundle','Type', 'Depends On', 'Dep Class', 'Dep Bundle', 'Frequency', 'Status'"
+					colNames="'Asset','AssetClass', 'Bundle','Type', 'Depends On', 'Dep Class', 'Dep Bundle', 'Frequency', 'Status', 'Comment'"
 					colModel="{name:'assetName', index: 'assetName', width:'200',formatter: myLinkFormatter},
 								  {name:'assetType', editable: true},
 								  {name:'assetBundle', editable: true},
@@ -28,11 +28,14 @@
 								  {name:'dependentType', editable: true},
 								  {name:'dependentBundle', editable: true},
 								  {name:'frequency', editable: true,width:'90'},
-								  {name:'status', editable: true, width:'80'}"
+								  {name:'status', editable: true, width:'80'},
+								  {name:'comment',editable:true, width:'100'}"
 					sortname="'assetName'"
 					caption="listCaption"
 					multiselect="true"
+					loadComplete="initCheck"
 					gridComplete="function(){bindResize('dependencyGridId')}"
+					onSelectRow="validateMergeCount"
 					showPager="true">
 					<jqgrid:filterToolbar id="dependencyGridId" searchOnEnter="false" />
 					<jqgrid:navigation id="dependencyGridId" add="false" edit="false" del="false" search="false" refresh="false" />
@@ -42,11 +45,11 @@
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
 					var value = cellvalue ? cellvalue : ''
-						return '<a href="javascript:getEntityDetails(\'dependencies\',\''+rowObjcet[1]+'\',\''+rowObjcet[9]+'\')">'+value+'</a>'
+						return '<a href="javascript:getEntityDetails(\'dependencies\',\''+rowObjcet[1]+'\',\''+rowObjcet[10]+'\')">'+value+'</a>'
 				}
 				function dependentFormatter(cellvalue, options, rowObjcet){
 					var value = cellvalue ? cellvalue : ''
-						return '<a href="javascript:getEntityDetails(\'dependencies\',\''+rowObjcet[5]+'\',\''+rowObjcet[10]+'\')">'+value+'</a>'
+						return '<a href="javascript:getEntityDetails(\'dependencies\',\''+rowObjcet[5]+'\',\''+rowObjcet[11]+'\')">'+value+'</a>'
 				}
 				
 			})

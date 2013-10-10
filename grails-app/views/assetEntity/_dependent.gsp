@@ -5,8 +5,8 @@ $(document).ready(function() {
 </script>
 <td valign="top" >
 	<div style="width: auto;" >
-		<span style="float: left;"><h1>Supports:</h1></span>
-		<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('support','${whom}')"></span>
+		<span style="float: left;"><h1>Supports:&nbsp;&nbsp;</h1></span>
+		<span><input type='button'  class="addDepButton" value='Add' onclick="addAssetDependency('support','${whom}')"></span>
 		<br/>
 		<table style="width: 100%;">
 			<thead>
@@ -68,8 +68,8 @@ $(document).ready(function() {
 </td>
 <td valign="top">
 	<div style="width: auto;">
-		<span style="float: left;"><h1>Is dependent on:</h1></span>
-		<span style="float: right;"><input type='button' value='Add' onclick="addAssetDependency('dependent', '${whom}')"></span>
+		<span style="float: left;"><h1>Is dependent on:&nbsp;&nbsp;</h1></span>
+		<span><input type='button' class="addDepButton" value='Add' onclick="addAssetDependency('dependent', '${whom}')"></span>
 		<br/>
 		<table style="width: 100%;">
 			<thead>
