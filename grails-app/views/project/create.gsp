@@ -435,7 +435,7 @@
 					value="${projectInstance?.workflowCode}" noSelection="['':'Please Select']"></g:select> &nbsp;&nbsp;
 					<span class="name"><label for="runbookOn">Runbook Driven:&nbsp;</label></span>
 					<span class="value ${hasErrors(bean:projectInstance,field:'runbookOn','errors')}">&nbsp;
-					<input type="checkbox" name="runbookOn" id="runbookOn" >
+					<input type="checkbox" name="runbookOn" id="runbookOn" ${projectInstance.runbookOn ? 'checked="checked"' : ''}>
 						<g:hasErrors bean="${projectInstance}" field="runbookOn">
 						<div class="errors"><g:renderErrors bean="${projectInstance}"
 							as="list" field="runbookOn" /></div>

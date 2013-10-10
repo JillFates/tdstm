@@ -14,7 +14,7 @@ class Project extends PartyGroup {
     String workflowCode
     String projectType = "Standard"
 	Integer lastAssetId
-	Integer runbookOn=0		// Flag that indicates that the project should use the runbook mode for various screens
+	Integer runbookOn=1		// Flag that indicates that the project should use the runbook mode for various screens
     Integer customFieldsShown = 8
 	String depConsoleCriteria 
     
