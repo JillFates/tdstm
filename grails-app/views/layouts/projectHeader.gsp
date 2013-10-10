@@ -57,7 +57,7 @@
 
    </script>
   </head>
-	<% def currProj = session.getAttribute("CURR_PROJ") ?: '';
+	<% def currProj = session.getAttribute("CURR_PROJ");
 	   def setImage = session.getAttribute("setImage");
     def projectId = currProj?.CURR_PROJ ;
     def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
