@@ -122,7 +122,7 @@
 							</g:if>
 							<g:if test="${issue.item.status == AssetCommentStatus.READY}">
 								<g:if test="${!issue?.item?.successors && !(issue?.item?.category in AssetComment.moveDayCategories)}">
-									<span>Delay for:</span>
+									<span class="delay_myTasks">Delay for:</span>
 									<tds:actionButton label="1 day" icon="ui-icon-seek-next" id="${issue?.item?.id}"  
 										onclick="changeEstTime(1,'${issue?.item?.id}', this.id)"/>
 									<tds:actionButton label="2 days" icon="ui-icon-seek-next" id="${issue?.item?.id}"  
