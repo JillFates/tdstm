@@ -395,6 +395,7 @@ function updateToShow($me, forWhom){
 	if(forWhom=='app'){
 		flag = validateFields('Edit','editAssetsFormId')
 	}
+	flag = validateDependencies('editAssetsFormId')
 	if(flag){
 		jQuery.ajax({
 			url: $('#editAssetsFormId').attr('action'),
@@ -823,6 +824,7 @@ function saveToShow($me, forWhom){
 	if(forWhom=='Files'){
 		flag = validateFileFormat()
 	}
+	flag = validateDependencies('createAssetsFormId')
 	if(flag){
 		jQuery.ajax({
 			url: $('#createAssetsFormId').attr('action'),
@@ -869,14 +871,7 @@ function validateFields(forWhom,formName){
 		flag = false
 		alert("Please enter numeric value for Shutdown Duration, Startup Duration, Testing Duration ")
 		return flag
-	} else {
-		$('#'+formName+' select[name*="asset_"]').each( function() {
-			if( $(this).val() == 'null' )
-				flag = false
-		})
-		if( ! flag )
-			alert("Please select a valid asset for all dependencies ")
-	}
+	} 
 	return flag
 }
 
@@ -977,4 +972,15 @@ function saveDepComment(textId, hiddenId, dialogId, commLink){
 	}else {
 		$("#"+commLink).html('<img border="0px" src="'+contextPath+'/i/db_table_light.png">')
 	}
+}
+function validateDependencies(formName){
+	var flag = true
+	$('#'+formName+' select[name*="asset_"]').each( function() {
+		if( $(this).val() == 'null' )
+			flag = false
+			return flag
+	})
+	if(flag==false)
+		alert("Please select a valid asset for all dependencies ")
+	return flag
 }
