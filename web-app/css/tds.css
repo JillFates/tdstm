@@ -1368,3 +1368,12 @@ span.task_button_disabled { float: left; height: 16px; line-height: 16px;  paddi
 	overflow:hidden;
 	text-overflow:ellipsis;
 }
+.delay_myTasks{
+	float: left;
+	margin: 0 0 0 30px;
+	position: relative;
+}
+.delay_taskManager{
+	text-align:right;
+	width:8%;
+}
