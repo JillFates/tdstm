@@ -115,8 +115,8 @@ $(document).ready(function() {
 								</td>
 								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle / Dep. Group</label></td>
 								<td class="valueNW ${config.moveBundle}">${assetEntity.moveBundle}${dependencyBundleNumber?' / ' : ''}${dependencyBundleNumber}</td>
-								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Size/Scale </label></td>
-                                <td nowrap="nowrap" class="sizeScale">
+								<td class="label ${config.size}" nowrap="nowrap"><label for="size">Size/Scale </label></td>
+                                <td nowrap="nowrap" class="sizeScale ${config.size}">
                                     ${assetEntity.size} ${assetEntity.scale?.value()}
                                 </td>
 							</tr>

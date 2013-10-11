@@ -40,7 +40,7 @@
 							<td class="valueNW ${config.planStatus}" colspan="3">${databaseInstance?.planStatus}</td>
 						</tr>
 						<tr>
-							<td class="label" nowrap="nowrap"><label>Rate of Change (%)</label></td>
+							<td class="label ${config.rateOfChange}" nowrap="nowrap"><label for="rateOfChange">Rate of Change (%)</label></td>
 							<td class="valueNW ${config?.rateOfChange}">${databaseInstance?.rateOfChange}</td>
 							<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
 							<td class="${config.externalRefId}">${databaseInstance.externalRefId}</td>

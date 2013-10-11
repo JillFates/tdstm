@@ -83,7 +83,7 @@
 									<input type="text" id="size" name="size" class="${config.size}" value="${fileInstance.size}" size="10"/>&nbsp;
 									<g:select from="${fileInstance.constraints.scale.inList}" class="${config.scale}" name="scale" id="scale" value="${fileInstance.scale}" optionValue="value" noSelection="${['':' Please Select']}"/>
 								</td>
-								<td class="label" nowrap="nowrap"><label>Rate of Change (%)</label></td>
+								<td class="label ${config.rateOfChange}" nowrap="nowrap"><label for="rateOfChange">Rate of Change (%)</label></td>
 								<td><input type="text" class="${config.rateOfChange}" size="3" name="rateOfChange" id="rateOfChange" value="${fileInstance.rateOfChange}"></td>
 							</tr>
 							<tbody class="customTemplate">

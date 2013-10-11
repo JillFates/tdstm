@@ -38,7 +38,7 @@
 						<tr>
 							<td class="label ${config.size}" nowrap="nowrap"><label for="size">Size/Scale</label></td>
 							<td class="valueNW ${config.size}">${filesInstance.size}&nbsp;&nbsp;${filesInstance.scale?.value()}</td>
-							<td class="label" nowrap="nowrap"><label>Rate of Change (%)</label></td>
+							<td class="label ${config.rateOfChange}" nowrap="nowrap"><label for="rateOfChange">Rate of Change (%)</label></td>
 							<td class="valueNW ${config?.rateOfChange}">${filesInstance?.rateOfChange}</td>
 						</tr>
 						<g:render template="../assetEntity/customShow" model="[assetEntity:filesInstance]"></g:render>

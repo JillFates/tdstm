@@ -70,7 +70,7 @@
 							<td colspan="3"><g:select from="${planStatusOptions}" id="planStatus" class="${config.planStatus}" name="planStatus" value="${databaseInstance.planStatus}" tabindex="35" /></td>
 						</tr>
 						<tr>
-							<td class="label" nowrap="nowrap"><label>Rate of Change (%)</label></td>
+							<td class="label ${config.rateOfChange}" nowrap="nowrap"><label for="rateOfChange">Rate of Change (%)</label></td>
 							<td><input type="text" id="rateOfChange" size="3" class="${config?.rateOfChange}" name="rateOfChange" value="${databaseInstance.rateOfChange}" tabindex="11" /></td>
 							<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
 							<td><input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" value="${databaseInstance.externalRefId}" tabindex="11" /></td>

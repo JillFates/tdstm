@@ -180,10 +180,10 @@
 								
 								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
 								<td><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${assetEntityInstance.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="38" noSelection="${['null':' Please Select']}"/></td>
-								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Size/Scale </label></td>
+								<td class="label ${config.size}" nowrap="nowrap"><label for="size">Size/Scale </label></td>
                                 <td nowrap="nowrap" class="sizeScale">
                                     <input type="text" id="size" name="size" class="${config.size}" value="${assetEntityInstance.size}" tabindex="39"/>
-                                    <g:select from="${assetEntityInstance.constraints.scale.inList}" id="scale" name="scale" value="${assetEntityInstance.scale}" optionValue="value" tabindex="40" noSelection="${['':' Please Select']}"/>
+                                    <g:select from="${assetEntityInstance.constraints.scale.inList}" class="${config.scale}" id="scale" name="scale" value="${assetEntityInstance.scale}" optionValue="value" tabindex="40" noSelection="${['':' Please Select']}"/>
                                   </td>  
 							</tr>
 							<tr>
