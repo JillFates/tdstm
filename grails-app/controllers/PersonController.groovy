@@ -28,47 +28,6 @@ class PersonController {
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
-
-	def test = {
-		def person
-		def project = Project.read(457)
-
-		// Known person not on the project
-		person = personService.findPerson("John Martin", project)
-		log.info "person = $person"
-		assert person == null
-
-		// Know person for the project
-		person = personService.findPerson("Robin Banks", project)
-		log.info "person = $person"
-		assert person != null
-		assert 6 == person.id
-
-		// Fake person
-		person = personService.findPerson("Robert E. Lee", project)
-		log.info "person = $person"
-		assert person == null
-
-		// Know person for the project
-		person = personService.findPerson([first:'Robin', middle:'', last:'Banks'], project)
-		log.info "person = $person"
-		assert person != null
-		assert 6 == person.id
-
-		// Known person not on the project
-		person = personService.findPerson([first:'John', last:'Martin'], project)
-		log.info "person = $person"
-		assert person == null
-
-		// Fake person
-		person = personService.findPerson([first:'Robert', middle:'E.', last:'Lee'], project)
-		assert person == null
-
-		render "Tests were successful"
-
-	}
-
-
 	/**
 	 * Generates a list view of persons related to company
 	 * @param id - company id
