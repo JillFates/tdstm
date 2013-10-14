@@ -290,7 +290,9 @@ $(document).ready(function() {
 						<tr>
 							<td class="dashboard_stat_icon_td">&nbsp;</td>
 							<td class="dashboard_stat_exec_td">&nbsp;</td>
-							<td class="dashboard_stat_exec_td"><g:link controller="application" action="list" params="[filter:'applicationCount', plannedStatus:'Unassigned']">To be</g:link></td>
+							<td class="dashboard_stat_exec_td">
+								<g:link controller="application" action="list" params="[filter:'applicationCount', plannedStatus:'Unassigned']">To be</g:link>
+							</td>
 							<g:each in="${moveEventList}" var="event">
 								<td class="dashboard_stat_exec_tdmc" style="font-size: 10px"><b>${eventStartDate[event.id]}</b></td>
 							</g:each>
@@ -299,7 +301,9 @@ $(document).ready(function() {
 						<tr>
 							<td class="dashboard_stat_icon_td">&nbsp;</td>
 							<td class="dashboard_stat_exec_td">&nbsp;</td>
-							<td class="dashboard_stat_exec_td"><g:link controller="application" action="list" params="[filter:'applicationCount', plannedStatus:'Unassigned']">Assigned</g:link></td>
+							<td class="dashboard_stat_exec_td">
+								<g:link controller="application" action="list" params="[filter:'applicationCount', plannedStatus:'Unassigned']">Assigned</g:link>
+							</td>
 							<g:each in="${moveEventList}" var="event">
 								<td class="dashboard_stat_exec_tdmc" style="font-size: 10px"><b> ${event.runbookStatus ?: ''}</b></td>
 							</g:each>
@@ -372,7 +376,7 @@ $(document).ready(function() {
 						<tr>
 							<td class="dashboard_stat_icon_td">&nbsp;</td>
 							<td>
-								<g:link controller="assetEntity" params="[filter:'physical']"action="list" class="links">Physical</g:link>
+								<g:link controller="assetEntity" params="[filter:'physical']" action="list" class="links">Physical</g:link>
 							</td>
 							<td>
 							<g:set var="percentageUnassignedPhysicalAssetCount" value="${physicalCount ? (unassignedPhysialAssetCount/physicalCount)*100 : 0}" />
