@@ -1,10 +1,9 @@
 package com.tds.asset
 
-
 import Person
-import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 
-class Application extends AssetEntity{
+class Application extends AssetEntity {
 	String appVendor
 	String appVersion
 	Person sme
@@ -43,7 +42,6 @@ class Application extends AssetEntity{
     static constraints = {
 		appVendor( blank:true, nullable:true )
 		appVersion( blank:true, nullable:true )
-		appOwner( nullable:true )
 		sme( nullable:true )
 		sme2( nullable:true )
 		url( blank:true, nullable:true )
@@ -94,11 +92,11 @@ class Application extends AssetEntity{
 	 * Date to insert in GMT
 	 */
 	def beforeInsert = {
-		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+		dateCreated = TimeUtil.nowGMT()
+		lastUpdated = TimeUtil.nowGMT()
 	}
 	def beforeUpdate = {
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+		lastUpdated = TimeUtil.nowGMT()
 	}
 	String toString(){
 		"id:$id name:$assetName tag:$appVendor"
