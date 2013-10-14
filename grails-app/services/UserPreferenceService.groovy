@@ -12,6 +12,8 @@ import com.tds.asset.AssetTransition
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
+import com.tds.asset.AssetDependencyBundle
+import com.tds.asset.FieldImportance
 
 class UserPreferenceService  {
 
@@ -349,6 +351,17 @@ class UserPreferenceService  {
 			ProjectLogo.executeUpdate("delete from ProjectLogo pl where pl.project = ${projectInstance.id}")
 			// remove party relationship
 			PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom  = ${projectInstance.id} or pr.partyIdTo = ${projectInstance.id}")
+			
+			// remove associated references e.g. Room, Rack FI, AssetDepBundles, KeyValue .
+			Room.executeUpdate("delete from Room r where r.project  = ${projectInstance.id}")
+			Rack.executeUpdate("delete from Rack ra where ra.project  = ${projectInstance.id}")
+			AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle adb where adb.project = ${projectInstance.id}")
+			FieldImportance.executeUpdate("delete from FieldImportance fi where fi.project  = ${projectInstance.id}")
+			KeyValue.executeUpdate("delete from KeyValue kv where kv.project  = ${projectInstance.id}")
+			
+			Model.executeUpdate("update Model mo set mo.modelScope = null where mo.modelScope  = ${projectInstance.id}")
+			ModelSync.executeUpdate("update ModelSync ms set ms.modelScope = null where ms.modelScope  = ${projectInstance.id}")
+			
 		} catch(Exception ex){
 			message = "Unable to remove the $projectInstance.name project Error:"+ex
 		}	

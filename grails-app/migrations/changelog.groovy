@@ -61,5 +61,6 @@ databaseChangeLog = {
 	include file: '20130924-add-column-dep_console_grouping_criteria-project.groovy'
 	include file: '20130924-add-table-test-domain.groovy'
     include file: '20131004-size-scale-rateOfChange-properties-into-AssetEntity.groovy'
+	include file: '20131014-delete-orphan-records-room-rack.groovy'
     
 }
