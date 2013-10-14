@@ -315,6 +315,9 @@
 	float:left;
 	background:#CCCCCC;
 }
+
+/* PLANNING DASHBOARD */
+
 .dashboard_head{
 	color:#63A242;
 	font-size: 16px;
@@ -327,6 +330,11 @@
 	height: 450px;
 	background-image: url(../images/news_bg.jpg);
 	background-size: contain;
+}
+.dashboard_div_subdiv{
+	margin-top: 10px;
+	margin-left: 0px;
+	float: left;
 }
 .dashboard_bar_base{
 	padding: 0px; 
@@ -365,6 +373,40 @@
 	border-color: lightgray;
 	border-right-style: inset;
 }
+.dash_stat_table{
+	float:left;
+	border: 0px; 
+	margin-left: 0px;
+	margin-bottom: 10px;
+}
+.dash_stat_td{
+	width: 30px;
+	text-align: right;
+}
+.dash_stat_desc_td{
+	width: 120px;
+}
+.dash_stat_icon_td{
+	width: 14px;
+	padding-left: 2px;
+	padding-right: 2px;
+}
+.dash_stat_graph_td{
+	padding-left: 2px;
+	padding-right: 2px;
+}
+.dash_stat_exec_td{
+	width: 80px;
+}
+.dash_stat_exec_tdmx{
+	width: 42px;
+	text-align: right;
+}
+.dash_stat_exec_tdmc{
+	width: 42px;
+	text-align: center;
+}
+
 .tds_header {
 	width:100%;
 	height:30px;
