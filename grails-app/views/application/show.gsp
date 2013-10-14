@@ -101,7 +101,7 @@
 									<label for="shutdownFixedId" >Fixed</label>
 							</g:if>
 							</td>
-							<td class="label ${config.shutdownDuration}" nowrap="nowrap"><label for="shutdownDuration">Shutdown Dur.</label></td>
+							<td class="label ${config.shutdownDuration}" nowrap="nowrap"><label for="shutdownDuration">Shutdown Duration</label></td>
 							<td class="valueNW ${config.shutdownDuration}" nowrap="nowrap">${applicationInstance.shutdownDuration ? applicationInstance.shutdownDuration+'m' : ''}</td>
 						</tr>
 						<tr>
@@ -113,16 +113,16 @@
 									<label for="startupFixedId" >Fixed</label>
 							</g:if>
 							</td>
-							<td class="label ${config.shutdownDuration}" nowrap="nowrap"><label for="shutdownDuration">Startup Dur.</label></td>
+							<td class="label ${config.shutdownDuration}" nowrap="nowrap"><label for="shutdownDuration">Startup Duration</label></td>
 							<td class="valueNW ${config.shutdownDuration}" nowrap="nowrap">${applicationInstance.startupDuration ? applicationInstance.startupDuration+'m' :''} </td>
-							<td class="label ${config.testingBy}" nowrap="nowrap"><label for="testingBy">testing By</label></td>
+							<td class="label ${config.testingBy}" nowrap="nowrap"><label for="testingBy">Testing By</label></td>
 							<td class="valueNW ${config.testingBy}" nowrap="nowrap">${testingBy}
 							  <g:if test="${applicationInstance.testingFixed ==1 }">
 								<input type="checkbox" id="testingFixedShowId" disabled="disabled" name="testingFixed" checked="checked" />
 									<label for="testingFixedId" >Fixed</label>
 							  </g:if>
 							</td>
-							<td class="label ${config.testingDuration}" nowrap="nowrap"><label for="testingDuration">Testing Dur.</label></td>
+							<td class="label ${config.testingDuration}" nowrap="nowrap"><label for="testingDuration">Testing Duration</label></td>
 							<td class="valueNW ${config.testingDuration}" nowrap="nowrap">${applicationInstance.testingDuration ? applicationInstance.testingDuration+'m' :''}</td>
 						</tr>
 						<g:render template="../assetEntity/customShow" model="['assetEntity':applicationInstance]"></g:render>
