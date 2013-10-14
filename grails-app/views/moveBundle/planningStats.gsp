@@ -167,7 +167,7 @@ $(document).ready(function() {
 					</h4>
 					<table class="dashboard_stat_table">
 						<tr>
-							<td class="dashboard_stat_td">>${pendingAppDependenciesCount}</td>
+							<td class="dashboard_stat_td">${pendingAppDependenciesCount}</td>
 							<td>App Dependencies to validate<br />
 								<g:if test="${appDependenciesCount > 0 }">
 								(${appDependenciesCount ? Math.round((pendingAppDependenciesCount/appDependenciesCount)*100) : 0}% of the
@@ -277,35 +277,41 @@ $(document).ready(function() {
 				<table class="dashboard_stat_table">
 					<thead>
 						<tr>
-							<th class="dash_stat_exec_td">&nbsp;</th>
-							<th class="dash_stat_exec_td">&nbsp;</th>
+							<th class="dashboard_stat_icon_td">&nbsp;</th>
+							<th class="dashboard_stat_exec_td">&nbsp;</th>
+							<th class="dashboard_stat_exec_td">&nbsp;</th>
 							<g:each in="${moveEventList}" var="event">
-								<th class="dash_stat_exec_tdmc">
+								<th class="dashboard_stat_exec_tdmc">
 									<g:link controller="application" action="list" params="[moveEvent:event.id]">${event}</g:link>
 								</th>
 							</g:each>
-							<th></th>
+							<th class="dashboard_stat_exec_td"></th>
 						</tr>
 						<tr>
-							<td class="dash_stat_exec_td">&nbsp;</td>
-							<td class="dash_stat_exec_td"><g:link controller="application" action="list" params="[moveEvent:'unAssigned']">To be</g:link></td>
+							<td class="dashboard_stat_icon_td">&nbsp;</td>
+							<td class="dashboard_stat_exec_td">&nbsp;</td>
+							<td class="dashboard_stat_exec_td"><g:link controller="application" action="list" params="[filter:'applicationCount', plannedStatus:'Unassigned']">To be</g:link></td>
 							<g:each in="${moveEventList}" var="event">
-								<td class="dash_stat_exec_tdmc" style="font-size: 10px"><b>${eventStartDate[event.id]}</b></td>
+								<td class="dashboard_stat_exec_tdmc" style="font-size: 10px"><b>${eventStartDate[event.id]}</b></td>
 							</g:each>
 							<td>&nbsp;</td>
 						</tr>
 						<tr>
-							<td class="dash_stat_exec_td">&nbsp;</td>
-							<td class="dash_stat_exec_td"><g:link controller="application" action="list" params="[moveEvent:'unAssigned']">Assigned</g:link></td>
-							<g:each in="${moveBundle}" var="bundle">
-								<td class="dash_stat_exec_tdmc" style="font-size: 10px"><b> ${bundle.runbookStatus ?: ''}</b></td>
+							<td class="dashboard_stat_icon_td">&nbsp;</td>
+							<td class="dashboard_stat_exec_td">&nbsp;</td>
+							<td class="dashboard_stat_exec_td"><g:link controller="application" action="list" params="[filter:'applicationCount', plannedStatus:'Unassigned']">Assigned</g:link></td>
+							<g:each in="${moveEventList}" var="event">
+								<td class="dashboard_stat_exec_tdmc" style="font-size: 10px"><b> ${event.runbookStatus ?: ''}</b></td>
 							</g:each>
 							<td>Done</td>
 						</tr>
 					</thead>
 					<tbody>
 						<tr>
-							<td><b>Applications</b></td>
+							<td class="dashboard_stat_icon_td"><img src="${resource(dir:'images',file:'iconApp.png')}" height="14" /></td>
+							<td>
+								<g:link controller="application" action="list" class="links">Applications</g:link>
+							</td>
 							<td>
 							<g:if test="${unassignedAppCount == 0 }">
 								0
@@ -318,36 +324,41 @@ $(document).ready(function() {
 							</g:else>
 							</td>
 							<g:each in="${appList}" var="appCount">
-								<td class="dash_stat_exec_tdmx">
+								<td class="dashboard_stat_exec_tdmx">
 									<g:link controller="application" action="list" params="[filter:'applicationCount',moveEvent:appCount.moveEvent]" class="links">${appCount.count}</g:link>
 								</td>
 							</g:each>
-							<td class="dash_stat_exec_tdmx">
+							<td class="dashboard_stat_exec_tdmx">
 								<g:link controller="application" action="list" params="[filter:'applicationCount', plannedStatus:'Moved']" class="links">${percAppDoneCount}%</g:link>
 							</td>
 						</tr>
 						<tr>
+							<td class="dashboard_stat_icon_td">&nbsp;</td>
 							<td style="color: grey">Optional</td>
 							<td>&nbsp;</td>
 							<g:each in="${assetList}" var="appCount">
-								<td class="dash_stat_exec_tdmx" style="color: grey;">
+								<td class="dashboard_stat_exec_tdmx" style="color: grey;">
 									${appCount.optional}
 								</td>
 							</g:each>
 							<td>&nbsp;</td>
 						</tr>
 						<tr>
+							<td class="dashboard_stat_icon_td">&nbsp;</td>
 							<td style="color: grey">Unknown</td>
 							<td>&nbsp;</td>
 							<g:each in="${assetList}" var="appCount">
-								<td class="dash_stat_exec_tdmx" style="color: grey;">
+								<td class="dashboard_stat_exec_tdmx" style="color: grey;">
 									${appCount.potential}
 								</td>
 							</g:each>
 							<td>&nbsp;</td>
 						</tr>
 						<tr>
-							<td><b>Servers</b></td>
+							<td class="dashboard_stat_icon_td"><img src="${resource(dir:'images',file:'iconServer.png')}" height="14" /></td>
+							<td>
+								<g:link controller="assetEntity" params="[filter:'All']"action="list" class="links">Servers</g:link>
+							</td>
 							<td>
 								<g:link controller="assetEntity" action="list" params="[filter:'All', plannedStatus:'Unassigned']" class="links">${unassignedAssetCount}</g:link>
 							</td>
@@ -359,7 +370,10 @@ $(document).ready(function() {
 							<td>&nbsp;</td>
 						</tr>
 						<tr>
-							<td>Physical</td>
+							<td class="dashboard_stat_icon_td">&nbsp;</td>
+							<td>
+								<g:link controller="assetEntity" params="[filter:'physical']"action="list" class="links">Physical</g:link>
+							</td>
 							<td>
 							<g:set var="percentageUnassignedPhysicalAssetCount" value="${physicalCount ? (unassignedPhysialAssetCount/physicalCount)*100 : 0}" />
 							<g:if test="${unassignedPhysialAssetCount == 0 }">
@@ -381,7 +395,10 @@ $(document).ready(function() {
 							</td>
 						</tr>
 						<tr>
-							<td>Virtual</td>
+							<td class="dashboard_stat_icon_td">&nbsp;</td>
+							<td>
+								<g:link controller="assetEntity" params="[filter:'virtual']" action="list" class="links">Virtual</g:link>
+							</td>
 							<td>
 							<g:set var="percentageUnassignedVirtualCount" value="${virtualCount ? (unassignedVirtualAssetCount/virtualCount)*100 : 0}" />
 							<g:if test="${unassignedVirtualAssetCount == 0 }">
@@ -403,7 +420,10 @@ $(document).ready(function() {
 							</td>
 						</tr>
 						<tr>
-							<td><b>Databases</b></td>
+							<td class="dashboard_stat_icon_td"><img src="${resource(dir:'images',file:'iconDB.png')}" height="14" /></td>
+							<td>
+								<g:link controller="database" action="list" class="links">Databases</g:link>
+							</td>
 							<td>
 							<g:set var="percentageUnassignedDbCount" value="${dbCount ? (unassignedDbCount/dbCount)*100 : 0}" />
 							<g:if test="${unassignedDbCount == 0 }">
@@ -425,7 +445,10 @@ $(document).ready(function() {
 							</td>
 						</tr>
 						<tr>
-							<td ><b>Storage</b></td>
+							<td class="dashboard_stat_icon_td"><img src="${resource(dir:'images',file:'iconStorage.png')}" height="14" /></td>
+							<td>
+								<g:link controller="files" action="list" class="links">Storage</g:link>
+							</td>
 							<td>
 							<g:set var="percentageUnassignedFilesCount" value="${fileCount ? (unassignedFilesCount/fileCount)*100 : 0}" />
 							<g:if test="${unassignedFilesCount == 0 }">
@@ -447,6 +470,7 @@ $(document).ready(function() {
 							</td>
                         </tr>
                         <tr>
+							<td class="dashboard_stat_icon_td"><img src="${resource(dir:'images',file:'iconNetwork.png')}" height="14" /></td>
                             <td><b>Other</b></td>
                             <td>
                             <g:set var="percentageUnassignedOtherCount" value="${otherAssetCount ? (unassignedOtherCount/otherAssetCount)*100 : 0}" />
@@ -469,6 +493,7 @@ $(document).ready(function() {
 							</td>
 						</tr>
 						<tr>
+							<td class="dashboard_stat_icon_td">&nbsp;</td>
                             <td ><b>Open Tasks</b></td>
                             <td></td>
 							<g:each in="${openTasks}" var="tasks">
