@@ -357,7 +357,7 @@ $(document).ready(function() {
 						<tr>
 							<td class="dashboard_stat_icon_td"><img src="${resource(dir:'images',file:'iconServer.png')}" height="14" /></td>
 							<td>
-								<g:link controller="assetEntity" params="[filter:'All']"action="list" class="links">Servers</g:link>
+								<g:link controller="assetEntity" params="[filter:'All']" action="list" class="links">Servers</g:link>
 							</td>
 							<td>
 								<g:link controller="assetEntity" action="list" params="[filter:'All', plannedStatus:'Unassigned']" class="links">${unassignedAssetCount}</g:link>
