@@ -2683,6 +2683,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def assets = []
 		def msg
 		def addFilters = true
+		def where = ''
+		def project = moveEvent.project
+		def map = [:]
 
 		if ( filter?.containsKey('group') ) {
 			//
@@ -2719,6 +2722,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 			// Indicate if we should append filters if we have a group and asset elements in the taskSpec but only if the group has assets
 			addFilters = ( filter.containsKey('asset') && filter.asset instanceof Map && assets.size() > 0 )
+			if (addFilters) {
+				// Update the WHERE clause to only include the assets in the group
+				where = SqlUtil.appendToWhere(where, 'a.id in (:groupAssets)')
+				map.put('groupAssets', assets*.id)
+			}
 			
 		} else if (filter?.containsKey('taskSpec')) {
 			//
@@ -2766,9 +2774,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			// HANDLE performing an actual filter to find assets
 			//
 
-			def where = ''
-			def project = moveEvent.project
-			def map = [:]
 			def sql
 			def sm
 		
