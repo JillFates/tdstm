@@ -2682,7 +2682,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	def findAllAssetsWithFilter(moveEvent, filter, loadedGroups, exceptions) {
 		def assets = []
 		def msg
-		def addFilters = true
+		def addFilters = false
 
 		if ( filter?.containsKey('group') ) {
 			//
@@ -2716,6 +2716,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				log.info("findAllAssetsWithFilter: 'filter.taskSpec' group filter found no assets.")
 				// throw new RuntimeException("''filter.taskSpec' group filter ($groups) contains no assets.")
 			}
+
+			// Indicate if we should append filters if we have a group and asset elements in the taskSpec
+			addFilters = ( filter.containsKey('asset') && filter.asset instanceof Map )
 			
 		} else if (filter?.containsKey('taskSpec')) {
 			//
