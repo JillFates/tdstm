@@ -1069,10 +1069,13 @@ class AdminController {
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute , [sort:"value"]).value
 		def returnMap = []
+		assetTypeOptions.remove("Blade") // TODO : temp fix to resolve the below issue
 		assetTypeOptions.each{type->
-			def assetCount = AssetEntity.countByAssetType(type) 
-			def modelCount = Model.countByAssetType(type)
-			returnMap << [type, assetCount, modelCount]
+			def modelCount = Model.findAllByAssetType(type)
+			def assets = AssetEntity.findAllByAssetType(type) // TODO : getting Exception when type=Blade. assuming data issue. 
+			Set projects = assets?.project
+			returnMap << [type, assets.size(), modelCount.size(), 
+						assets[0]? assets[0]?.project.name : '', projects.size() > 1 ? projects.size()-1 : '']
 		}
 		render (template:'getAssetTypes', model:['returnMap':returnMap])
 	}
