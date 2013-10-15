@@ -379,17 +379,18 @@
 	margin-left: 0px;
 	margin-bottom: 10px;
 }
-.dashboard_stat_td{
-	width: 30px;
-	text-align: right;
-}
-.dashboard_stat_desc_td{
-	width: 95px;
-}
 .dashboard_stat_icon_td{
 	width: 14px;
 	padding-left: 2px;
 	padding-right: 2px;
+	background-color: white;
+}
+.dashboard_stat_desc_td{
+	width: 90px;
+}
+.dashboard_stat_td{
+	width: 30px;
+	text-align: right;
 }
 .dashboard_stat_graph_td{
 	padding-left: 2px;

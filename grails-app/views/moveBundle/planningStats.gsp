@@ -285,7 +285,7 @@ $(document).ready(function() {
 									<g:link controller="application" action="list" params="[moveEvent:event.id]">${event}</g:link>
 								</th>
 							</g:each>
-							<th class="dashboard_stat_exec_td"></th>
+							<th class="dashboard_stat_exec_tdmc" style="background-color:white;"></th>
 						</tr>
 						<tr>
 							<td class="dashboard_stat_icon_td">&nbsp;</td>
