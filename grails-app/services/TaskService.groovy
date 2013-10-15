@@ -2682,7 +2682,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	def findAllAssetsWithFilter(moveEvent, filter, loadedGroups, exceptions) {
 		def assets = []
 		def msg
-		def addFilters = false
+		def addFilters = true
 
 		if ( filter?.containsKey('group') ) {
 			//
@@ -3329,7 +3329,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					def map = personService.findPerson(whom, task.project, projectStaff)
 					if (! map.person ) {
 						msg = "Staff referenced by name ($whom) not found"
-					} else if (! map.isAmbiguous ) {
+					} else if ( map.isAmbiguous ) {
 						msg = "Staff referenced by name ($whom) was ambiguous"
 					} else {
 						person = map.person
