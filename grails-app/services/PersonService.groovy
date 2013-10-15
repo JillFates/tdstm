@@ -41,93 +41,108 @@ class PersonService {
 	}
 
 	/**
-	 * Used to find a person using a string of their name
-	 * @param Map containing person name elements
+	 * Used to find a person associated with a given project using a string representation of their name.
+	 * This method overloads the other findPerson as a convinence so one can just pass the string vs parsing the name and calling the alternate method.
+	 * @param A string representing a person's name (e.g. John Doe; Doe, John; John T. Doe)
 	 * @param Project the project/client that the person is associated with
-	 * @return Person an instance of person or null if unable to lookup
+	 * @param The staff for the project. This is optional but recommended if the function is used repeatedly (use partyRelationshipService.getCompanyStaff(project?.client.id) to get list). 
+	 * @param Flag used to indicate if the search should only look at staff of the client or all persons associated to the project
+	 * @return Null if name unable to be parsed or a Map[person:Person,isAmbiguous:boolean] where the person object will be null if no match is 
+	 * found. If more than one match is found then isAmbiguous will be set to true.
 	 */
-	Person findPerson(String name, Project project) {
-		def nameMap = parseName(name)
-		return nameMap ? findPerson(nameMap, project)?.person : null
+	Map findPerson(String name, Project project, def staffList = null, def clientStaffOnly=true) {
+		def map = parseName(name)
+		if (map)
+			map = findPerson( map, project, staffList, clientStaffOnly )
+		log.debug "findPerson(String) results=$map"
+		return map
 	}
 
 	/**
-	 * This method is used to find a person using a name map
+	 * Used to find a person associated with a given project using a parsed name map
 	 * @param Map containing person name elements
 	 * @param Project the project/client that the person is associated with
-	 * @return Person an instance of person or null if unable to lookup
+	 * @param The staff for the project. This is optional but recommended if the function is used repeatedly 
+	 *        Use partyRelationshipService.getAvailableProjectStaffPersons(project) in order to get list or 
+	 *        partyRelationshipService.getCompanyStaff(companyId)
+	 * @param Flag used to indicate if the search should only look at staff of the client or all persons associated to the project
+	 * @return A Map[person:Person,isAmbiguous:boolean] where the person object will be null if no match is found. If more than one match is 
+	 * found then isAmbiguous will be set to true.
 	 */
-	Map findPerson(Map nameMap , Project project) {
-		def person=null
-		def isAmbiguous = false
-		def resultMap = [:]
+	Map findPerson(Map nameMap , Project project, def staffList = null, def clientStaffOnly=true) {
+		def results = [person:null, isAmbiguous:false]
 		
-		log.info "findPersion() nameMap=$nameMap"
+		log.debug "findPersion() attempting to find nameMap=$nameMap in project $project"
+
 		// Make sure we have a person
-		if (! nameMap || ! nameMap.containsKey('first'))
-			return person 
-
-		/* 
-		 * findingAll with blanks in the where clause. 
-		 * Case: A) zero results - create the new person,
-		 * Case: B) one result - use the person,
-		 * Case: C) more than one result - use first person but raise warning.
-		 */
-		def personList = Person.findAll("from Person as p where p.firstName=? and p.middleName=? and p.lastName=?",
-			[ nameMap.first, nameMap.middle, lastNameWithSuffix(nameMap) ] )
-		
-		person = personList ? personList[0] : null
-		if( personList.size() > 1 )
-			isAmbiguous = true
-			
-		/*
-		 * Performing the search twice if person found in first lookup
-		 * findingAll excluding blank fields from the results 
-		 * Case: A) one result and it match person found in #1 - do nothing; 
-		 * Case: B) one or more and not A - provide warning.
-		 */
-		if( person ){
-			def queryForAllPersons = "from Person as p where p.firstName=? " 
-			def args = [nameMap.first]
-			if( nameMap.middle ){
-				queryForAllPersons += " and p.middleName=? "
-				args << nameMap.middle
-			} 
-			
-			if( lastNameWithSuffix(nameMap) ){
-				queryForAllPersons +=" and p.lastName=? "
-				args << lastNameWithSuffix(nameMap)
-			} 
-			
-			def personNullExcd = Person.findAll( queryForAllPersons, args )
-			
-			//TODO:Not sure what exact warning should be here. 
-			if(personNullExcd.size() > 1 &&  personNullExcd.id.contains(person.id)){
-				isAmbiguous = true
-			}else if(personNullExcd.size() > 1 &&  !personNullExcd.id.contains(person.id)){ // one or more and not A - provide warning.
-				isAmbiguous = true
-				person = personNullExcd[0]
-			}else if(personNullExcd.size() == 1 && personNullExcd.id.contains(person.id)){ //one result and it match person found in #1 - do nothing; 
-				isAmbiguous = false
-			}
-				
+		if (! nameMap || ! nameMap.containsKey('first')) {
+			results.isAmbiguous = true
+			return results
 		}
-		
-		/*log.info "findPerson() found ${personList.size()} that matched"
 
-		// If we found them, then match against the company's staff
-		if (personList?.size() > 0) {
-			// Try finding the person within the Project's Staff by their ID
-			def staffList = partyRelationshipService.getCompanyStaff(project?.client.id)
-			for (int i=0; i < personList?.size(); i++) {
-				log.info "Looking at ${personList[i]}"
-				person = staffList.find { it.id == personList[i].id }
-				if (person) break 
+		// Get the staffList if not passed into us
+		if (! staffList) {
+			staffList = partyRelationshipService.getAvailableProjectStaffPersons( project, null, clientStaffOnly )
+		}
+	
+		// log.debug "staffList looks like: \n$staffList"
+
+		/*
+		* Here are the steps that we'll go through to find the person
+		*
+		*    1. First step is to try and find the persons based on an exact match on first, middle and last names
+		*    2. Match person to the staffList and save first match as the person. If multiple matches found then set ambiguous true and we're done
+		*    3. If no person found or ambiguous is still false and any of the name values are blank, then perform a looser search. This may find additional matches 
+		*       (e.g. "George W. Bush" would be found in the case where "George Bush" was passed). 
+		*    4. If any persons are found compare to the staff list and previously found person accordingly.
+		*
+		* Note that the staffList could have multiple entries for staff based on their multiple roles
+		*/
+
+		// An inline closure that will validate if the person is in the staff
+		def findPersonInStaff = { personList ->
+			if (personList?.size()) {
+				for (int i=0; i < personList?.size(); i++) {
+					log.debug "findPerson() Looking at ${personList[i]} (${personList[i].id})"
+					def staffRef = staffList.find { it.id == personList[i].id }
+					if (staffRef) {
+						log.debug "findPerson() Found person in staff list: ${results.person}, $staffRef"
+						if (! results.person) {
+							// Found our person!
+							results.person = personList[i]
+						} else if ( staffRef.id != results.person.id ) {
+							// Shoot, we found a second person so we are done since we know that there is ambiguity
+							results.isAmbiguous = true
+							break
+						}
+					}
+				}
 			}
-		}*/
-		resultMap.put("person", person)
-		resultMap.put("isAmbiguous", isAmbiguous)
-		return resultMap
+		}
+	
+		def lastName = lastNameWithSuffix(nameMap)
+		def persons = Person.findAll("from Person as p where p.firstName=? and p.middleName=? and p.lastName=?", [ nameMap.first, nameMap.middle, lastName ] )
+		findPersonInStaff(persons)
+
+		if (! results.isAmbiguous && ( nameMap.middle == '' || lastNameWithSuffix(nameMap) == '' ) ) {
+			// Only need to check 
+			def query = "from Person as p where p.firstName=? " 
+			def args = [nameMap.first]
+			if ( nameMap.middle != '' ) {
+				query += " and p.middleName=? "
+				args << nameMap.middle
+			} 		
+			if ( lastName != '' ) {
+				query +=" and p.lastName=? "
+				args << lastName
+			}
+
+			findPersonInStaff( Person.findAll( query, args ) )
+		}
+
+		log.debug "findPerson() found $results"
+
+		return results
 	}
 
 	/**
@@ -181,7 +196,7 @@ class PersonService {
 	/**
 	 * Parses a name into it's various components and returns them in a map
 	 * @param String The full name of the person
-	 * @return Map - the map of the parsed name that includes first, last, middle, suffix
+	 * @return Map - the map of the parsed name that includes first, last, middle, suffix or null if it couldn't be parsed for some odd reason
 	 */
 	Map parseName(String name) {
 		Map map = [first:'', last:'', middle:'', suffix:'']
@@ -212,9 +227,8 @@ class PersonService {
 				}
 
 			} else {
-				def msg = "parseName('$name') encountered multiple commas that is not handled"
-				log.error msg
-				throw new RuntimeException(msg)
+				log.error "parseName('$name') encountered multiple commas that is not handled"
+				return null
 			}
 
 		} else {

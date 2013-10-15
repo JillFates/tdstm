@@ -317,48 +317,77 @@ class PartyRelationshipService {
 		}
 		return team
 	}
-	/*
-	 *  Return the Project Available Staff
+
+	/**
+	 * Return a list of persons associated to a project as part of the staff including the client's staff and optionally the partner's and primary's staff
+	 * @param The project that the staff is associated to
+	 * @param List of persons to exclude from the list (optional)
+	 * @param Flag indicating if the list should only contain the client's Staff only
+	 * @return A list containing the map with the following properties [company, staff, name, role]
 	 */
-	def getAvailableProjectStaff( def projectId, def teamMembers ){
+	List<Map> getAvailableProjectStaff( Project project, def excludeStaff=null, def clientStaffOnly=false ) {
 		def list = []
-		def query
-		if(teamMembers){
-			def team = createString( teamMembers )
-			query = "from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' and p.partyIdTo not in ( $team ) "
-		} else {
-			query = "from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' "
+		def projectStaff
+		def query = "from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = ? and p.roleTypeCodeFrom = 'PROJECT'"
+		def args = [ project ]
+
+		// Filter out staff if specified
+		if ( excludeStaff && excludeStaff.size()  ) {
+			query += ' and p.partyIdTo not in ( ? )'
+			args << excludeStaff
 		}
-		def projectStaff = PartyRelationship.findAll( query )
-		projectStaff.each{staff ->
+		projectStaff = PartyRelationship.findAll( query, args )
+
+		// Query to lookup a Company/Staff relationship
+		// query = "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo.id = ? and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'"
+		
+		projectStaff.each { staff ->
 			def map = new HashMap()
-			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-			map.put("company", company.partyIdFrom)
-			map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
-			map.put("role", staff.roleTypeCodeTo)
-			map.put("staff", staff.partyIdTo)
-			list<<map
+			def company = PartyRelationship.find(query, [staff.partyIdTo] )
+			if (! clientStaffOnly || ( clientStaffOnly && company?.partyIdFrom.id == project.client.id ) ) 
+				list << [company: company?.partyIdFrom, name: staff.partyIdTo.toString(), staff: staff.partyIdTo, role: staff.roleTypeCodeTo ]
 		}
 		return list
 	}
+
+	/**
+	 * Similar to the getAvailableStaff exept that this just returns the distinct list of persons returned instead of the map of staff and their one or more roles
+	 * @param The project that the staff is associated to
+	 * @param List of persons to exclude from the list (optional)
+	 * @param Flag indicating if the list should only contain the client's Staff only
+	 * @return A list containing the distinct persons
+	 */
+	List<Person> getAvailableProjectStaffPersons( def project, def excludeStaff=null, def clientStaffOnly=false ) {
+		def staff = getAvailableProjectStaff( project, excludeStaff, clientStaffOnly)
+		def persons = []
+
+		// Iterate over the list of staff and only add staff that we haven't see yet
+		staff.each { s -> 
+			if ( ! persons.find { p -> p.id == s.staff.id } )
+				persons << s.staff
+		}
+		
+		return persons
+	}
+
 	/*
 	 *  Return the Project Team Staff
 	 */
-	def getProjectTeamStaff( def projectId, def teamMembers ){
+	def getProjectTeamStaff( def project, def teamMembers ){
 		def list = []
 		def query
-		if(teamMembers){
+		if (teamMembers) {
 			def team = createString( teamMembers )
-			query = "from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' and p.partyIdTo in ( $team ) "
+			query = "from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $project and p.roleTypeCodeFrom = 'PROJECT' and p.partyIdTo in ( $team ) "
 			def projectStaff = PartyRelationship.findAll( query )
 			projectStaff.each{staff ->
 				def map = new HashMap()
 				def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
 				map.put("company", company.partyIdFrom)
-				map.put("name", staff.partyIdTo.firstName+" "+ staff.partyIdTo.lastName)
+				map.put("name", staff.toString() )
 				map.put("role", staff.roleTypeCodeTo)
 				map.put("staff", staff.partyIdTo)
-				list<<map
+				list << map
 			}
 		}
 		return list
@@ -759,7 +788,7 @@ class PartyRelationshipService {
 	 * @param boolean indicating if the Automatic role should be included in the list (default true)
 	 * @return A list containing maps of all roles with the description cleaned up. Map format of [id, description]
 	 */
-	List<Map> getStaffingRoles(includeAuto = true) {
+	static List<Map> getStaffingRoles(includeAuto = true) {
 		def roles = RoleType.findAllByDescriptionIlike("Staff%", [sort:'description'])
 		def list = []
 		roles.each { r -> 

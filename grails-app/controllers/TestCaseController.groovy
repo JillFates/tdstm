@@ -2,13 +2,19 @@
  * This controller just allows us to do some testing of things until we can move them into an integrated testcase
  */
 
+import com.tds.asset.Application
+import com.tds.asset.AssetEntity
+import com.tds.asset.Database
+import com.tds.asset.Files
+
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
+
 class TestCaseController {
 
 	// IoC
 	def partyRelationshipService
 	def personService
-	
-
+	def taskService	
 
 	def testGormUtilGetDPWC = {
 		def sb = new StringBuilder()
@@ -187,6 +193,27 @@ class TestCaseController {
 
 
 		render results.toString()
+
+	}
+
+
+	def indirectTest = {
+
+		def p = new Person(firstName:'Robin', lastName:'Banks', id:123)
+
+		def property = 'testingBy'
+		def asset = new Application(id:1, name:'test app', shutdownBy:'Martin, John', testingBy:'#sme', sme:p)
+		def asset2 = new AssetEntity()
+
+
+		//def type = GrailsClassUtils.getPropertyType(Application, property)?.getName()
+		//def type = GrailsClassUtils.getPropertyType(asset.getClass(), property)?.getName()
+
+		//render "type=$type, ${asset.testingBy}, asset2=${asset2.getClass().getName()}"
+
+		def obj = taskService.getIndirectPropertyRef(asset, property)
+
+		render obj.toString()
 
 	}
 

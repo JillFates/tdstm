@@ -103,8 +103,8 @@ class ProjectTeamController {
             }
             else {
             	projectTeamInstance.discard()
-            	def availableStaff = partyRelationshipService.getAvailableProjectStaff( bundleInstance.project.id, teamMembers )
-            	def projectTeamStaff = partyRelationshipService.getProjectTeamStaff( bundleInstance.project.id, teamMembers )
+            	def availableStaff = partyRelationshipService.getAvailableProjectStaff( bundleInstance.project, teamMembers )
+            	def projectTeamStaff = partyRelationshipService.getProjectTeamStaff( bundleInstance.project, teamMembers )
                 render( view:'edit', model:[projectTeamInstance:projectTeamInstance, bundleInstance:bundleInstance, availableStaff:availableStaff, teamMembers:projectTeamStaff  ] )
             }
         }
@@ -140,8 +140,8 @@ class ProjectTeamController {
             redirect( action:show, id:projectTeamInstance.id, params:[bundleId:bundleId])
         }
         else {
-        	def availableStaff = partyRelationshipService.getAvailableProjectStaff( bundleInstance.project.id, teamMembers )
-        	def projectTeamStaff = partyRelationshipService.getProjectTeamStaff( bundleInstance.project.id, teamMembers )
+        	def availableStaff = partyRelationshipService.getAvailableProjectStaff( bundleInstance.project, teamMembers )
+        	def projectTeamStaff = partyRelationshipService.getProjectTeamStaff( bundleInstance.project, teamMembers )
             render( view:'create',model:[ projectTeamInstance:projectTeamInstance, bundleInstance:bundleInstance, availableStaff:availableStaff, teamMembers:projectTeamStaff ] )
         }
     }

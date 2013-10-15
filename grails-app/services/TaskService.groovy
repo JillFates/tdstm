@@ -43,9 +43,12 @@ import grails.util.GrailsNameUtils
 
 import org.hibernate.SessionFactory;
 import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.apache.commons.lang.StringUtils as SU
 
-class TaskService {
+import org.springframework.beans.factory.InitializingBean
+
+class TaskService implements InitializingBean {
 
 	static transactional = true
 
@@ -53,6 +56,7 @@ class TaskService {
 	def jdbcTemplate
 	// def namedParameterJdbcTemplate
 	def partyRelationshipService
+	def personService
 	def securityService
 	def quartzScheduler
 	def workflowService
@@ -64,9 +68,12 @@ class TaskService {
 	static final List runbookCategories = [AssetCommentCategory.MOVEDAY, AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP]
 	static final List categoryList = AssetCommentCategory.getList()
 	static final List statusList = AssetCommentStatus.getList()
+
+	// The list of RoleTypes for Staff that will be initialized in the afterPropertiesSet method
+	static List staffingRoles = []
 	
 	// This list will contain all of the common asset properties that filtering can be applied to
-	static final List commonFilterProperties 
+	static List commonFilterProperties 
 
 	// Color scheme for status key:[font, background]
 	static final Map taskStatusColorMap = [
@@ -80,6 +87,21 @@ class TaskService {
 		'AUTO_TASK':['#848484','#848484'],	// [font, edge]
 		'ERROR': ['red', 'white'],		// Use if the status doesn't match
 	]
+
+	/**
+	 * This is a post initialization method to allow late configuration settings to occur
+	 */
+	public void afterPropertiesSet() throws Exception {
+
+		// NOTE - This method is only called on startup therefore if code is modified then you will need to restart Grails to see changes
+
+		// Initialize some class level variables used repeatedly by the application
+		staffingRoles = partyRelationshipService.getStaffingRoles()*.id
+
+		commonFilterProperties = ['assetName','assetTag','assetType', 'priority', 'planStatus', 'department', 'costCenter', 'environment']
+		(1..24).each() { commonFilterProperties.add("custom$it".toString()) }	// Add custom1..custom24
+
+	}
 
 	/**
 	 * The getUserTasks method is used to retreive the user's TODO and ALL tasks lists or the count results of the lists. The list results are based 
@@ -876,6 +898,7 @@ class TaskService {
 	 * @param blank
 	 * @return list of roles that is only starts with 'staff'
 	 */
+	// TODO : This method usage should be replaced with the PartyRelationship.getStaffingRoles method
 	def getRolesForStaff( ) {
 		def rolesForStaff = RoleType.findAllByDescriptionIlikeAndIdNotEqual('staff%', AssetComment.AUTOMATIC_ROLE, [sort:'description'])
 		return rolesForStaff
@@ -1229,7 +1252,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 */
 	def generateRunbook( whom, moveEvent ) {
 		def startedAt = new Date()
-		
+
 		// List of all bundles associated with the event
 		def bundleList = moveEvent.moveBundles
 		log.info "bundleList=[$bundleList] for moveEvent ${moveEvent.id}"		
@@ -1424,9 +1447,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def resolvedWhoms = [:]
 		def whomLastTaskSpec
 		// Preload all the staff for the project
-		def projectStaff = partyRelationshipService.getProjectStaff( project.id )
+		def projectStaff = partyRelationshipService.getAvailableProjectStaffPersons( project )
 
-		
+		log.debug "**************** generateRunbook() by $whom for MoveEvent $moveEvent"
+
+		// projectStaff.each { log.debug "${it.id} ${it.toString()}" }
+
 		def maxPreviousEstFinish = null		// Holds the max Est Finish from the previous taskSpec
 		def workflow
 		try {
@@ -2516,8 +2542,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			throw new RuntimeException("Error while trying to create task. error=${GormUtil.allErrorsString(task)}, asset=$asset, TaskSpec=$taskSpec")
 		}
 
-		// Perform the AssignedTo logic
-		assignWhomToTask(task, taskSpec, workflow, projectStaff, exceptions)
+		// Perform the assignment logic
+		def errMsg = assignWhomAndTeamToTask(task, taskSpec, workflow, projectStaff)
+		if (errMsg) 
+			exceptions.append("${errMsg}<br/>")
 
 		taskList[task.id] = task
 		
@@ -2594,16 +2622,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	}
 
 	/**
-	 * used to initialize the commonFilterProperties array variable once, that which is used by the filtering logic of runbook generation
-	 */
-	private synchronized void initCommonFilterProps() { 
-		if (commonFilterProperties == null) {
-			def commonFilterProperties = ['assetName','assetTag','assetType', 'priority', 'planStatus', 'department', 'costCenter', 'environment']
-			(1..24).each() { commonFilterProperties.add("custom$it".toString()) }	// Add custom1..custom24
-		}
-	}
-		
-	/**
 	 * This special method is used to find all assets of a moveEvent that match the criteria as defined in the filter map
 	 * @param MoveEvent moveEvent object
 	 * @param Map filter - contains various attributes that define the filtering
@@ -2613,10 +2631,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 */
 	def findAllAssetsWithFilter(moveEvent, filter, loadedGroups, exceptions) {
 		def assets = []
-		
-		// Define the list of properties that are common for filtering
-		if (commonFilterProperties == null)
-			initCommonFilterProps()
+		def msg
+		def addFilters = true
 
 		if ( filter?.containsKey('group') ) {
 			//
@@ -2647,7 +2663,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				}
 			}
 			if (assets.size() == 0) {
-				log.info("findAllAssetsWithFilter: 'filter.taskSpec' group filter found no assets .")
+				log.info("findAllAssetsWithFilter: 'filter.taskSpec' group filter found no assets.")
 				// throw new RuntimeException("''filter.taskSpec' group filter ($groups) contains no assets.")
 			}
 			
@@ -2688,11 +2704,71 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				log.info("findAllAssetsWithFilter: 'filter.taskSpec' taskSpecs filter found no assets .")
 				// throw new RuntimeException("''filter.taskSpec' taskSpecs filter ($taskSpecs) contains no assets.")
 			}
+			addFilters = false
 			
-		} else {
+		}
+
+		if (addFilters) {
 			// 
 			// HANDLE performing an actual filter to find assets
 			//
+
+			def where = ''
+			def project = moveEvent.project
+			def map = [:]
+			def sql
+			def sm
+		
+			//
+			// HANDLE filter.include - This can be use in conjustion with other filter properties handled below
+			//
+			if ( filter?.containsKey('include') ) {
+
+				// If the task spec references groups with an Include then we don't need the 'class' specification since it is inherent from the group
+				// TODO : extract the class from the groups
+				// TODO : Verify that if there are multiple includes, that they are from the same class
+
+				// Put the include property into an array if not already an array
+				def includes = ( filter.include instanceof java.util.ArrayList ) ? filter.include : [filter.include]
+				def incIds = []
+
+				// Iterate over the list of groups	
+				includes.each() { incGroup -> 
+					if (incGroup.size() == 0) {
+						msg = "filter.include specified without any group codes ${filter.include}"
+						log.warn("findAllAssetsWithFilter() $msg")
+						throw new RuntimeException(msg)
+					}
+					
+					// Find all of the assets of the specified GROUP and add their IDs to the list
+					if (loadedGroups.containsKey(incGroup)) {
+						incIds << loadedGroups[incGroup]*.id
+						log.debug("findAllAssetsWithFilter: added ${loadedGroups[incGroup].size()} asset(s) for group $incGroup")
+					} else {
+						msg = "filter.include references undefined group ($incGroup)"
+						log.warn("findAllAssetsWithFilter: $msg")
+						throw new RuntimeException(msg)
+					}
+				}
+				if (incIds.size() == 0) {
+					log.info("findAllAssetsWithFilter: 'filter.include' found no assets")
+					// Just return an empty list of assets
+					return assets
+				} 
+
+				sm = SqlUtil.whereExpression("a.id", incIds, 'assetIds')
+				if (sm) {
+					where = SqlUtil.appendToWhere(where, sm.sql)
+					if (sm.param) {
+						map[code] = sm.param
+					}								
+				} else {
+					msg = "Unable to create SQL for filter.include (${filter.include})"
+					log.error "SqlUtil.whereExpression error - $msg - $incIds"
+					throw new RuntimeException(msg)
+				}
+			}			
+
 			def queryOn = filter?.containsKey('class') ? filter['class'].toLowerCase() : 'device'
 			if (! ['device','application', 'database', 'files'].contains(queryOn) ) {
 				throw new RuntimeException("An invalid 'class' was specified for the filter (valid options are 'device','application', 'database', 'files') for filter: $filter")
@@ -2711,11 +2787,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				}
 			}
 
-			def where = ''
-			def project = moveEvent.project
-			def map = [:]
-			def sql
-		
 			map.bIds = bundleIds
 			// log.info "bundleIds=[$bundleIds]"
 			
@@ -2729,7 +2800,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				list.each() { code ->
 					if (filter?.asset?.containsKey(code)) {
 						log.info("addWhereConditions: code $code matched")						
-						def sm = SqlUtil.whereExpression("a.$code", filter.asset[code], code)
+						sm = SqlUtil.whereExpression("a.$code", filter.asset[code], code)
 						if (sm) {
 							where = SqlUtil.appendToWhere(where, sm.sql)
 							if (sm.param) {
@@ -2820,7 +2891,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						break;
 				} 
 			} catch (e) {
-				def msg = "An unexpected error occurred while trying to locate assets for filter $filter" + e.toString()
+				msg = "An unexpected error occurred while trying to locate assets for filter $filter" + e.toString()
 				log.error "$msg\n"
 				throw new RuntimeException("$msg<br/>${e.getMessage()}")
 			}
@@ -3030,7 +3101,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				task.metaClass.setProperty('associatedAssets', assocAssets)
 
 				// Perform the AssignedTo logic
-				assignWhomToTask(task, taskSpec, workflow, projectStaff, exceptions)
+				msg = assignWhomAndTeamToTask(task, taskSpec, workflow, projectStaff)
+				if (msg) 
+					exceptions.append("$msg<br/>")
 
 				taskList << task
 			}
@@ -3106,84 +3179,132 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	
 
 	/**
-	 * Helper closure used to manage the assignment of whom will perform the task
-	 * This will look for the team, whom and whomFixed parameters from the taskSpec and do the assignment accordingly.
-	 * The whom property has several methodologies to indicate whom based on the prefix which are:
+	 * Used to apply the assignment of the team, person and fixed assignment from the task specification
+	 *
+	 * 1. This logic will look for the team, whom and whomFixed parameters from the taskSpec and do the assignment accordingly.
+	 * 2. The taskSpec.whom property can have several different formats that represent different types of references which are:
 	 *    #propertyName - will look up the in person in the asset property accordingly (e.g. #sme2 will look to the sme2 field for the person)
-	 *    	@team - if used in a referenced property it will set the team instead of the person
-	 *    emailAddress - will lookup the person associated to the project by their email address
-	 *    firstName lastName - will lookup the person by first name and last name for people associated to the project
-	 * Note that when using the #propertyName, that it too can use the hash(#) or at(@) symbols to resolve the person.
-	 * In the event that it can't resolve the person it will log an exception.
-	 * The team property will be set if available, which will override the workflow team if workflow is also provided.
+	 *    contains @ - the value will be used to lookup the person associated to the project by their email address (case insensitive)
+	 *    Otherwise - will lookup the person by their name whom are associated to the project
+	 * 3. References to #propertyName can cause double indirection if the property contains a second #propertyNam
+	 * 4. The team property will be set if present in the task spec, which will override the workflow team if workflow is also provided.
+	 * 5. In the event that the whom or team are provided and are not found then an error message will be returned
+	 *
+	 * @param The task that an individual and/or a team will be assigned to based on the task spec
+	 * @param The recipe task specification
+	 * @param The workflow object associated with the taskSpec
+	 * @param The list of staff associated with the project
+	 * @return Return null if successfor or a String error message indicating the cause of the failure
 	 */
-	private def assignWhomToTask = { task, taskSpec, workflow, projectStaff, exceptions ->
+	private String assignWhomAndTeamToTask(AssetComment task, Map taskSpec, workflow, List projectStaff ) {
+		def msg
+		def person
 
-		// Set the Team independently of the direct person assignment
-		if (taskSpec.containsKey('team')) {
-			task.role = taskSpec.team
-		} else if (workflow && workflow.role_id) {
-			task.role = workflow.role_id
-		}
-
-		if (taskSpec.containsKey('whom') && taskSpec.whom.size() > 1 ) {
-			def whom = taskSpec.whom
-
-			log.info "assignWhomToTask() 'whom=$whom, task $task"
-
-			// See if we have an indirect reference and if so, we will lookup the reference value that will result in either a person's name or @TEAM
-			if (whom[0] == '#') {
-				if ( ! task.assetEntity ) {
-					throw new RuntimeException("Illegally used whom property reference ($whom) on non-asset taskSpec (${taskSpec.id})")
+		while (true) {
+			// Set the Team independently of the direct person assignment
+			if (taskSpec.containsKey('team')) {
+				// Validate that the string is correct
+				if (staffingRoles.contains(taskSpec.team)) {
+					task.role = taskSpec.team
+				} else {
+					msg = "Invalid team specified (${taskSpec.team})"
+					break
 				}
-
-				try {
-					whom = getIndirectPropertyRef(task.assetEntity, whom)
-				} catch (e) {
-					exceptions.append("${e.getMessage()}, taskSpec (${taskSpec.id}), task $task<br/>")
-					log.info "doAssignment() Unable to resolve indirect reference (${taskSpec.whom}) for TaskSpec (${taskSpec.id}) - ${e.getMessage()}<br/>"
-					return
-				}
+			} else if (workflow && workflow.role_id) {
+				task.role = workflow.role_id
 			}
 
-			// def whomLC = whom.toLowerCase()
-			def person
+			if (taskSpec.containsKey('whom') && taskSpec.whom.size() > 1 ) {
+				def whom = taskSpec.whom
 
-			// See if we already resolved this one - good for non-referenced lookups (e.g #sme1)
-		//	//if ( resolvedWhoms.containsKey(whomLC) ) {
-		//		if ( resolvedWhoms[whomLC] ) {
-		//			// Cool - we already had this one so we don't have to look it up again
-		//			task.assignedTo = resolvedWhoms[whomLC]
-		//		}
-		//	} else {
+				log.debug "assignWhomToTask() whom=$whom, task $task"
+
+				// whom can have one of the three following values
+				//    Persons' name (e.g. Banks, Robin J. )
+				//    Persons' email (e.g. robin.banks@example.com )
+				//    Indirect reference to other asset property (e.g. #testingBy)
+
+				// See if we have an indirect reference and if so, we will lookup the reference value that will result in either a person's name or @TEAM
+				if (whom[0] == '#') {
+					// log.debug "assignWhomToTask()  performing indirect lookup whom=$whom, task $task"
+					if ( ! task.assetEntity ) {
+						msg = "Illegally used whom property reference ($whom) on non-asset"
+						break
+					}
+
+					try {
+						whom = getIndirectPropertyRef(task.assetEntity, whom)
+						if (whom instanceof Person) {
+							// The indirect lookup returned a person so we don't need to go any further!
+							person = whom
+							break
+						} else if ( whom.isNumber() ) {
+							person = projectStaff.find { it.id == whom.toInteger() }
+							if ( ! person ) 
+								msg = "Indirect references an invalid person id ($whom) for ${taskSpec.whom}"
+							break
+						} else if (! whom.size() > 1 ) {
+							msg = "Unable to resolve indirect whom reference (${taskSpec.whom})"
+							break
+						}
+
+						// If we got here, then the indirect either referenced a @team or a 'name', which will be resolved below
+
+					} catch (e) {
+						msg = "${e.getMessage()}, whom (${taskSpec.whom})"
+						break
+					}
+				}
+
 				if (whom[0] == '@') {
 					// team reference
 					def teamAssign = whom[1..-1]
-					// TODO - Add team name validation
-					task.team = teamAssign
-				} else {
-					// Assignment by name or email
-					person = lookupPerson(whom, projectStaff)
-					if (person) {
-						// We had a static person reference in the taskSpec so we can cache for subsequent lookups 
-						//resolvedWhoms[whomLC] = person
-						task.assignedTo = person
+					if (staffingRoles.contains(teamAssign)) {
+						task.role = teamAssign
 					} else {
-						exceptions.append("Person assignment failed for TaskSpec (${taskSpec.id}) where whom ($whom) not found<br/>")
+						msg = "Unknown team (${taskSpec.team}) indirectly referenced"
+					}
+				} else if (whom.contains('@') ) {
+
+					// See if we can locate the person by email address
+					person = projectStaff.find { it.email?.toLowerCase() == whom.toLowerCase() }
+					if (! person)
+						msg = "Staff referenced by email ($whom) not associated with project"
+				} else {
+
+					// Assignment by name
+					def map = personService.findPerson(whom, task.project, projectStaff)
+					if (! map.person ) {
+						msg = "Staff referenced by name ($whom) not found"
+					} else if (! map.isAmbiguous ) {
+						msg = "Staff referenced by name ($whom) was ambiguous"
+					} else {
+						person = map.person
 					}
 				}
-		//	}
-
+			}
+			break
 		}
 
-		// Do the fixed/hard assignment appropriately if a person was assigned
-		if (task.assignedTo && taskSpec.containsKey('whomFixed') && taskSpec.whomFixed == true) {
-			task.hardAssigned = 1
+		// See if the above code ran into any errors
+		if (msg != null) {
+			msg += " for task #${task.taskNumber} ${task.comment}, taskSpec (${taskSpec.id})"
+			log.warn "assignWhomToTask() $msg, project ${task.project.id}"
+		} else {
+			if (person) {
+				task.assignedTo = person
+				// Set the fixed/hard assignment appropriately if a person was assigned
+				if (taskSpec.containsKey('whomFixed') && taskSpec.whomFixed == true)
+					task.hardAssigned = 1
+			}
 		}
+
+		return msg
 	}
 
+
 	/**
-	 * Helper closure to recursive lookup indirect property references (only single nesting)
+	 * Helper method lookup indirect property references that will recurse once if necessary
 	 * This supports two situations:
 	 *    1) taskSpec whom:'#prop' and asset.prop contains name/email
 	 *    2) taskSpec whom:'#prop' and asset.prop contains #prop2 reference (indirect reference)
@@ -3192,88 +3313,58 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @return String - the string (name or email) from the referenced or indirect referenced property
 	 * @throws RuntimeException if a reference is made to an invalid fieldname
 	 */
-	private def getIndirectPropertyRef = { asset, propertyRef, depth=0 ->
-		log.info "getIndirectPropertyRef() property=$propertyRef, depth=$depth"
+	private Object getIndirectPropertyRef( asset, propertyRef, depth=0) {
+		log.debug "getIndirectPropertyRef() property=$propertyRef, depth=$depth"
+
 		def value
 		def property = propertyRef	// Want to hold onto the original value for the exception message
-
 		if (property[0] == '#') {
 			// strip off the #
 			property = property[1..-1]
 		}	
 
 		// Deal with propery name inconsistency
-		if (property == 'sme1') property = 'sme'
+		def crossRef = [ sme1:'sme', sme2:'sme2', owner:'appOwner' ]
+
+		if ( crossRef.containsKey( property.toLowerCase() ) ) {
+			property = crossRef.getAt( property.toLowerCase() )
+		}
 
 		// Check to make sure that the asset has the field referenced
-		if (! asset.metaClass.hasProperty(asset, property) ) {
+		if (! asset.metaClass.hasProperty( asset.getClass(), property) ) {
 			throw new RuntimeException("Invalid property name ($propertyRef) used in name lookup in asset $asset")
 		}
 
-		if ( asset[property][0] == '#' ) {
-			if (depth == 0)  {
-				value = getIndirectPropertyRef( asset, asset[property], 1)
+		// TODO : Need to see if we can eliminate the multiple if statements by determining the asset type upfront
+		def type 
+		switch (asset.getClass().getName() ) {
+			case 'com.tds.asset.AssetEntity':
+				
+			break
+		}
+		type = GrailsClassUtils.getPropertyType(asset.getClass(), property)?.getName()
+
+		if (type == 'java.lang.String') {			
+			// Check to see if we're referencing a person object vs a string
+			if ( asset[property][0] == '#' ) {
+				if (++depth < 3)  {
+					value = getIndirectPropertyRef( asset, asset[property], depth)
+				} else {
+					throw new RuntimeException("Multiple nested indirection unsupported (${property}..${asset[property][0]}) of asset ($asset), depth=$depth")
+				}
 			} else {
-				throw new RuntimeException("Multiple nested indirection is not supported name lookup in property $propertyRef for asset $asset")
+				value = asset[property]
 			}
 		} else {
-			value = asset[property]
+			log.info "getIndirectPropertyRef() indirect referrences property $property of type $type"
+			if (type == 'Person') {
+				value = asset[property]
+			} else {
+				throw new RuntimeException("Indirect property ($property) references invalid type of asset ($asset)")			
+			}
 		}
 
 		return value
-	}
-
-	/**
-	 * Helper closure to find the person by name or email address
-	 * @param String whom - either an email or firstName lastName and it will figure out what to do
-	 * @param List of project staff
-	 * @return Person - if a person was located otherwise null
-	 * @throws RuntimeException if the person is not found
-	 */
-	private def lookupPerson = { whom, projectStaff ->
-		log.info "lookupPerson() for ($whom) in staff (${projectStaff.size()})"
-		
-		def person, names, lname, fname
-		def tryToFind = true
-
-		if (whom.size() == 0) {
-			return null
-		}
-
-		if (whom.contains('@')) {
-			// Email lookup
-			person = projectStaff.find() { it.email.toLowerCase() == whom.toLowerCase() }
-		} else {
-			// Lastname, Firstname 
-			if (whom.contains(',')) {
-				names = whom.split(',')
-				fname = names[1].trim()
-				lname = names[0].trim()
-			} else {
-				names = whom.split()
-				if (names.size() == 1) {
-					// Nickname lookup
-					person = projectStaff.find() { SU.equalsIgnoreCase(it.staff.nickName, names[0]) }
-					tryToFind = false
-				} else if (names.size() == 2) {
-					// Firstname Lastname
-					fname = names[0].trim()
-					lname = names[1].trim()
-				} else {
-					// Multi-part lastname (e.g. Gabriel Van Helsing)
-					fname = names[0].trim()
-					lname = names[1..-1].join(' ').trim()
-				}
-			}
-			if (tryToFind) {
-				person = projectStaff.find() { SU.equalsIgnoreCase(it.staff.firstName, fname)  &&  SU.equalsIgnoreCase(it.staff.lastName, lname) }
-				if (!person) {
-					log.info "lookupPerson() unable to find person [${fname}] [${lname}]" // : $projectStaff"
-				}
-			}
-		}
-
-		return person?.staff
 	}
 
 	/**
