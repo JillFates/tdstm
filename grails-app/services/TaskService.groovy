@@ -2717,8 +2717,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				// throw new RuntimeException("''filter.taskSpec' group filter ($groups) contains no assets.")
 			}
 
-			// Indicate if we should append filters if we have a group and asset elements in the taskSpec
-			addFilters = ( filter.containsKey('asset') && filter.asset instanceof Map )
+			// Indicate if we should append filters if we have a group and asset elements in the taskSpec but only if the group has assets
+			addFilters = ( filter.containsKey('asset') && filter.asset instanceof Map && assets.size() > 0 )
 			
 		} else if (filter?.containsKey('taskSpec')) {
 			//
