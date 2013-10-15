@@ -45,6 +45,7 @@ import org.hibernate.SessionFactory;
 import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.apache.commons.lang.StringUtils as SU
+import org.apache.commons.lang.math.NumberUtils
 
 import org.springframework.beans.factory.InitializingBean
 
@@ -2502,10 +2503,59 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			recipe: recipeId,
 			taskSpec: taskSpec.id )
 			
-		// Handle the various settings from the taskSpec
+		def msg 
+
+		// Handle setting the task duration which can have an indirect reference to another property as well as a default value 
+		// or a numeric value
 		task.priority = taskSpec.containsKey('priority') ? taskSpec.priority : 3
-		if (taskSpec.containsKey('duration')) task.duration = taskSpec.duration
-		if (taskSpec.containsKey('category')) task.category = taskSpec.category
+		if (taskSpec.containsKey('duration')) {
+			if ( taskSpec.duration instanceof String && taskSpec.duration.size() ) {
+				if (taskSpec.duration[0] == '#') {
+					// Deal with the indirection which allows for #PropertyName, Default value
+					def durParams = taskSpec.duration.split(',')
+					def defDur = 0
+					if (durParams.size() == 2) {
+						if (durParams[1].trim().isNumber()) {
+							defDur = NumberUtils.toInt(durParams[1].trim(), 0)
+						} else {
+							msg = "Duration default value is an invalid integer (${taskSpec.duration}) , taskSpec=$taskSpec.id"
+							log.error msg
+							exceptions.append("$msg<br/>")
+						}
+					}
+
+					// Try and do the lookup and if that fails, use the default
+					try {
+						def indDur = getIndirectPropertyRef( asset, durParams[0].trim() )
+						if (indDur instanceof Integer) {
+							task.duration = indDur ?: defDur
+						} else if (indDur instanceof String) {
+							task.duration = NumberUtils.toInt(indDur, defDur)
+						} else {
+							task.duration = defDur
+							if (indDur != null) {
+								msg = "Indirect duration reference (${taskSpec.duration}) referenced invalid data type, asset=$asset, taskSpec=$taskSpec.id"
+								log.error msg
+								exceptions.append("$msg<br/>")
+							}
+						}
+					} catch (e) {
+						msg = "Exception with indirect duration reference (${taskSpec.duration}) - ${e.getMessage()}, asset=$asset, taskSpec=$taskSpec.id"
+						log.error msg
+						exceptions.append("$msg<br/>")
+						task.duration=defDur
+					}
+
+				} else if ( taskSpec.duration.isNumber() ) {
+					task.duration = NumberUtils.toInt(taskSpec.duration, 0)
+				}
+			} else {
+				task.duration = taskSpec.duration	
+			}
+		}
+
+		if (taskSpec.containsKey('category') && taskSpec.category ) 
+			task.category = taskSpec.category
 		
 		def defCat = task.category
 		task.category = null
@@ -2770,8 +2820,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}			
 
 			def queryOn = filter?.containsKey('class') ? filter['class'].toLowerCase() : 'device'
-			if (! ['device','application', 'database', 'files'].contains(queryOn) ) {
-				throw new RuntimeException("An invalid 'class' was specified for the filter (valid options are 'device','application', 'database', 'files') for filter: $filter")
+			if (! ['device','application', 'database', 'files', 'storage'].contains(queryOn) ) {
+				throw new RuntimeException("An invalid 'class' was specified for the filter (valid options are 'device','application', 'database', 'files|storage') for filter: $filter")
 			}
 		
 			def bundleList = moveEvent.moveBundles
@@ -3314,7 +3364,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @throws RuntimeException if a reference is made to an invalid fieldname
 	 */
 	private Object getIndirectPropertyRef( asset, propertyRef, depth=0) {
-		log.debug "getIndirectPropertyRef() property=$propertyRef, depth=$depth"
+		log.info "getIndirectPropertyRef() property=$propertyRef, depth=$depth"
 
 		def value
 		def property = propertyRef	// Want to hold onto the original value for the exception message
@@ -3336,14 +3386,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		// TODO : Need to see if we can eliminate the multiple if statements by determining the asset type upfront
-		def type 
-		switch (asset.getClass().getName() ) {
-			case 'com.tds.asset.AssetEntity':
-				
-			break
-		}
-		type = GrailsClassUtils.getPropertyType(asset.getClass(), property)?.getName()
-
+		def type = GrailsClassUtils.getPropertyType(asset.getClass(), property)?.getName()
 		if (type == 'java.lang.String') {			
 			// Check to see if we're referencing a person object vs a string
 			if ( asset[property][0] == '#' ) {
@@ -3357,11 +3400,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 		} else {
 			log.info "getIndirectPropertyRef() indirect referrences property $property of type $type"
-			if (type == 'Person') {
-				value = asset[property]
-			} else {
-				throw new RuntimeException("Indirect property ($property) references invalid type of asset ($asset)")			
-			}
+			value = asset[property]
 		}
 
 		return value
