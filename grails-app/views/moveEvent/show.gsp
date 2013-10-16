@@ -6,12 +6,9 @@
     </head>
     <body>
         <div class="body">
-            <h1>Show Event</h1>
+            <h1>Event Details</h1>
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 		      <span class="menuButton"><g:link class="list" action="list">Events List</g:link></span>
-		     <tds:hasPermission permission='MoveEventShowView '>
-		        <span class="menuButton"><g:link class="create" action="create">Create Event</g:link></span>
-		     </tds:hasPermission>
 				<span class="menuButton"><g:link class="create" controller="task" action="moveEventTaskGraph"
 					params="[moveEventId: moveEventInstance.id]">View Task Graph</g:link></span>
 		    </div>
@@ -24,34 +21,34 @@
                 <table>
                     <tbody>
                     	<tr class="prop">
-                            <td valign="top" class="name">Project:</td>
+                            <td class="name">Project:</td>
                             
-                            <td valign="top" class="value"><g:link controller="project" action="show" id="${moveEventInstance?.project?.id}">${moveEventInstance?.project?.encodeAsHTML()}</g:link></td>
+                            <td class="valueNW"><g:link controller="project" action="show" id="${moveEventInstance?.project?.id}">${moveEventInstance?.project?.encodeAsHTML()}</g:link></td>
                             
                         </tr>
                         
                         <tr class="prop">
-                            <td valign="top" class="name">Name:</td>
+                            <td class="name">Name:</td>
                             
-                            <td valign="top" class="value">${fieldValue(bean:moveEventInstance, field:'name')}</td>
+                            <td class="valueNW"><b>${fieldValue(bean:moveEventInstance, field:'name')}</b></td>
 							<td rowspan="10" width="40%">
 								<label for="runbookRecipe">Runbook Recipe:</label><br/>
-								<textarea name="runbookRecipe" id="runbookRecipe" cols="80" rows="30" readonly="yes" wrap="hard">${moveEventInstance.runbookRecipe}</textarea>
+								<textarea name="runbookRecipe" class="fontMonospaced" id="runbookRecipe" cols="75" rows="30" readonly="yes" wrap="hard">${moveEventInstance.runbookRecipe}</textarea>
 							</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Description:</td>
+                            <td class="name">Description:</td>
                             
-                            <td valign="top" class="value">${fieldValue(bean:moveEventInstance, field:'description')}</td>
+                            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'description')}</td>
                             
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name">Bundles:</td>
+                            <td class="name">Bundles:</td>
                             
-                            <td  valign="top" style="text-align:left;" class="value">
+                            <td style="text-align:left;" class="valueNW">
                                 <ul>
                                 <g:each var="m" in="${moveEventInstance.moveBundles}">
                                     <li><g:link controller="moveBundle" action="show" id="${m.id}">${m?.encodeAsHTML()}</g:link></li>
@@ -60,38 +57,38 @@
                             </td>
                         </tr>
                         <tr class="prop">
-				            <td valign="top" class="name">Calculated Type:</td>
+				            <td class="name">Calculated Type:</td>
 				
-				            <td valign="top" class="value">
+				            <td class="valueNW">
 				            	<g:if test="${moveEventInstance.calcMethod != 'L'}">Manual</g:if>
 								<g:else>Linear</g:else>
 							</td>
 						</tr>
                         <tr class="prop">
-				            <td valign="top" class="name">Runbook Status:</td>
+				            <td class="name">Runbook Status:</td>
 				
-				            <td valign="top" class="value">${fieldValue(bean:moveEventInstance, field:'runbookStatus')}</td>
+				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'runbookStatus')}</td>
 						</tr><tr class="prop">
-				            <td valign="top" class="name">Runbook Version:</td>
+				            <td class="name">Runbook Version:</td>
 				
-				            <td valign="top" class="value">${fieldValue(bean:moveEventInstance, field:'runbookVersion')}</td>
+				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'runbookVersion')}</td>
 						</tr><tr class="prop">
-				            <td valign="top" class="name">Runbook bridge1 :</td>
+				            <td class="name">Runbook bridge1 :</td>
 				
-				            <td valign="top" class="value">${fieldValue(bean:moveEventInstance, field:'runbookBridge1')}</td>
+				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'runbookBridge1')}</td>
 						</tr><tr class="prop">
-				            <td valign="top" class="name">Runbook bridge2 :</td>
+				            <td class="name">Runbook bridge2 :</td>
 				
-				            <td valign="top" class="value">${fieldValue(bean:moveEventInstance, field:'runbookBridge2')}</td>
+				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'runbookBridge2')}</td>
 						</tr><tr class="prop">
-				            <td valign="top" class="name">Video Link::</td>
+				            <td class="name">Video Link::</td>
 				
-				            <td valign="top" class="value">${fieldValue(bean:moveEventInstance, field:'videolink')}</td>
+				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'videolink')}</td>
 						</tr>
                         <tr class="prop">
-				            <td valign="top" class="name">Status:</td>
+				            <td  class="name">Status:</td>
 				
-				            <td valign="top" class="value"><g:message code="event.inProgress.${moveEventInstance?.inProgress}" /></td>
+				            <td class="valueNW"><g:message code="event.inProgress.${moveEventInstance?.inProgress}" /></td>
 						</tr>
                     </tbody>
                 </table>

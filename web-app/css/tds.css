@@ -1421,3 +1421,6 @@ span.task_button_disabled { float: left; height: 16px; line-height: 16px;  paddi
 	text-align:right;
 	width:8%;
 }
+.fontMonospaced {
+	font-family: Courier New, Courier, monospace;
+}
