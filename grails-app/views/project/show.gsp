@@ -21,60 +21,57 @@
 		<div class="body">
 			<h1>Project</h1>
 					
-			<tds:hasPermission permission='CreateProject'>
 				<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-					<span class="menuButton"><g:link class="create" action="create">Create Project</g:link></span>
 					<tds:hasPermission permission='MoveBundleEditView'>
 						<span class="menuButton"><g:link class="create" controller="moveBundle" action="planningStats">Planning Dashboard</g:link></span>
 					</tds:hasPermission>
 				</div>
-			</tds:hasPermission>
 			<br/>
 			
 			<div class="dialog" id="updateShow">
 				<table style="border-style:solid solid none solid;">
 					<tbody>
 						<tr class="prop">
-							<td valign="top" class="name">Associated Client:</td>
-							<td valign="top" class="valueNW">${projectInstance?.client}</td>
-							<td valign="top" class="name">Project Code:</td>
-							<td valign="top" class="valueNW">${fieldValue(bean:projectInstance, field:'projectCode')}</td>
+							<td class="name">Client:</td>
+							<td class="valueNW">${projectInstance?.client}</td>
+							<td class="name">Project Code:</td>
+							<td class="valueNW">${fieldValue(bean:projectInstance, field:'projectCode')}</td>
 						</tr>
 						<tr class="prop">
-							<td valign="top" class="name">Project Name:</td>
-							<td valign="top" class="valueNW">${fieldValue(bean:projectInstance, field:'name')}</td>
-							<td valign="top" class="name">Project Type:</td>
-							<td valign="top" class="valueNW">${fieldValue(bean:projectInstance, field:'projectType')}</td>
+							<td class="name">Project Name:</td>
+							<td class="valueNW"><b>${fieldValue(bean:projectInstance, field:'name')}</b></td>
+							<td class="name">Project Type:</td>
+							<td class="valueNW">${fieldValue(bean:projectInstance, field:'projectType')}</td>
 						</tr>
 						<tr class="prop">
-							<td valign="top" class="name">Description:</td>
-							<td valign="top" class="valueNW"><textarea cols="40"	rows="3" readOnly="true" >${fieldValue(bean:projectInstance, field:'description')}</textarea></td>
-							<td valign="top" class="name">Comment:</td>
-							<td valign="top" class="valueNW"><textarea cols="40"	rows="3" readOnly="true" >${fieldValue(bean:projectInstance, field:'comment')}</textarea></td>
+							<td class="name">Description:</td>
+							<td class="valueNW"><textarea cols="40"	rows="3" readOnly="true" >${fieldValue(bean:projectInstance, field:'description')}</textarea></td>
+							<td class="name">Comment:</td>
+							<td class="valueNW"><textarea cols="40"	rows="3" readOnly="true" >${fieldValue(bean:projectInstance, field:'comment')}</textarea></td>
 						</tr>
 						<tr class="prop">
-							<td valign="top" class="name">Start Date:</td>
-							<td valign="top" class="valueNW"><tds:convertDate date="${projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-							<td valign="top" class="name">Completion Date:</td>
-							<td valign="top" class="valueNW"><tds:convertDate date="${projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+							<td class="name">Start Date:</td>
+							<td class="valueNW"><tds:convertDate date="${projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+							<td class="name">Completion Date:</td>
+							<td class="valueNW"><tds:convertDate date="${projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 						</tr>
 						<tr class="prop">
-										<td valign="top" class="name">Associated Partner:</td>
-							<td valign="top" class="valueNW">${projectPartner?.partyIdTo}</td>
-							<td valign="top" class="name">Partner Image:</td>
-							<td valign="top" class="valueNW">
+										<td class="name">Associated Partner:</td>
+							<td class="valueNW">${projectPartner?.partyIdTo}</td>
+							<td class="name">Partner Image:</td>
+							<td class="valueNW">
 								<g:if test="${projectLogoForProject}"><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;"/></g:if>
 							</td>
 						</tr>
 						<tr class="prop">
-							<td valign="top" class="name">Project Manager:</td>
-							<td valign="top" class="valueNW">${projectManager?.partyIdTo?.lastNameFirstAndTitle}</td>
-							<td valign="top" class="name">Event Manager:</td>
-							<td valign="top" class="valueNW">${moveManager?.partyIdTo?.lastNameFirstAndTitle}</td>
+							<td class="name">Project Manager:</td>
+							<td class="valueNW">${projectManager?.partyIdTo?.lastNameFirstAndTitle}</td>
+							<td class="name">Event Manager:</td>
+							<td class="valueNW">${moveManager?.partyIdTo?.lastNameFirstAndTitle}</td>
 						</tr>
 						<tr class="prop">
-							<td valign="top" class="name"><g:message code="project.customFieldsShown.label" default="Custom Fields Shown" />:</td>
-							<td valign="top" class="valueNW" colspan="3">${fieldValue(bean: projectInstance, field: "customFieldsShown")}</td>
+							<td class="name"><g:message code="project.customFieldsShown.label" default="Custom Fields Shown" />:</td>
+							<td class="valueNW" colspan="3">${fieldValue(bean: projectInstance, field: "customFieldsShown")}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -84,30 +81,32 @@
 							<g:if test="${i % 4 == 1}">
 								<tr class="prop custom_table" id="custom_count_${i}">
 							</g:if>
-								<td valign="top" class="name" nowrap="nowrap"><g:message code="project.(custom${i}).label" default="Custom${i} Label" />:</td>
-								<td valign="top" class="valueNW" nowrap="nowrap">${projectInstance.('custom'+i)}</td>
+								<td class="name" nowrap="nowrap"><g:message code="project.(custom${i}).label" default="Custom${i} Label" />:</td>
+								<td class="valueNW" nowrap="nowrap">${projectInstance.('custom'+i)}</td>
 							<g:if test="${i % 4 == 0}">
 								</tr>
 							</g:if>
 						  </g:each>
 						<tr class="prop">
-							<td valign="top" class="name" colspan="2">Workflow Code:</td>
-							<td valign="top" class="value" colspan="2" nowrap="nowrap">${fieldValue(bean:projectInstance, field:'workflowCode')} &nbsp;&nbsp;
-								<span class="name">Runbook Driven: </span>&nbsp;
-								<span class="valueNW"><input type="checkbox" name="runbookOn" id="runbookOn" ${ (projectInstance.runbookOn==1 ? 'checked="checked"':'') } disabled="disabled" /></span>
+							<td class="name">Workflow Code:</td>
+							<td class="valueNW" nowrap="nowrap">${fieldValue(bean:projectInstance, field:'workflowCode')} &nbsp;&nbsp;
 							</td>
-							<td valign="top" class="name" colspan="2">Display Transitions in Status bar:</td>
-							<td valign="top" class="value" colspan="2"><g:message code="project.trackChanges.${bean:projectInstance?.trackChanges}" /></td>
+							<td>
+							<span class="name">Runbook Driven: </span>&nbsp;</td>
+							<td><span class="valueNW"><input type="checkbox" name="runbookOn" id="runbookOn" ${ (projectInstance.runbookOn==1 ? 'checked="checked"':'') } disabled="disabled" /></span>
+							</td>
+							<td class="name">Display Transitions in Status bar:</td>
+							<td class="valueNW" colspan="3"><g:message code="project.trackChanges.${bean:projectInstance?.trackChanges}" /></td>
 						</tr>
 						<tr class="prop">
-							<td valign="top" class="name" colspan="2">
+							<td class="name">
 								<label for="dateCreated">Date Created:</label>
 							</td>
-							<td valign="top" class="value" colspan="2"><tds:convertDateTime date="${projectInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
-							<td valign="top" class="name" colspan="2">
+							<td class="valueNW"><tds:convertDateTime date="${projectInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
+							<td class="name">
 								<label for="lastUpdated">Last Updated:</label>
 							</td>
-							<td valign="top" class="value" colspan="2"><tds:convertDateTime date="${projectInstance?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
+							<td class="valueNW" colspan="5"><tds:convertDateTime date="${projectInstance?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
 						</tr>
 					</tbody>
 				</table>

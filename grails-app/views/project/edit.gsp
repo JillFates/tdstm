@@ -32,18 +32,18 @@
                             <tr class="prop">
 					            <td valign="top" class="name">Associated Client:</td>
 					
-					            <td valign="top" class="value">${projectInstance?.client}</td>
+					            <td valign="top" class="valueNW">${projectInstance?.client}</td>
 					
 					            <td valign="top" class="name">Project Code:</td>
 					
-					            <td valign="top" class="value">${fieldValue(bean:projectInstance, field:'projectCode')}</td>
+					            <td valign="top" class="valueNW">${fieldValue(bean:projectInstance, field:'projectCode')}</td>
 					
 					        </tr>           
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="name"><b>Project Name:&nbsp;<span style="color: red">*</span></b>:</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'name','errors')}">
+                                <td valign="top" class="valueNW ${hasErrors(bean:projectInstance,field:'name','errors')}">
                                     <input type="text" id="name" name="name" value="${fieldValue(bean:projectInstance,field:'name')}"/>
                                 <g:hasErrors bean="${projectInstance}" field="name">
 					            <div class="errors">
@@ -52,7 +52,7 @@
 					            </g:hasErrors>
                                 </td>
 								<td valign="top" class="name"><label for="projectType"><b>Project Type:&nbsp;<span style="color: red">*</span></b></label></td>
-								<td valign="top" class="value ${hasErrors(bean:projectInstance,field:'projectType','errors')}">
+								<td valign="top" class="valueNW ${hasErrors(bean:projectInstance,field:'projectType','errors')}">
 									<g:select id="projectType" name="projectType" from="${projectInstance.constraints.projectType.inList}" value="${projectInstance.projectType}"></g:select>
 									<g:hasErrors bean="${projectInstance}" field="projectType">
 										<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="projectType" /></div>
@@ -63,7 +63,7 @@
                                 <td valign="top" class="name">
                                     <label for="description">Description:</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'description','errors')}">
+                                <td valign="top" class="valueNW ${hasErrors(bean:projectInstance,field:'description','errors')}">
                                     <textarea cols="40"  rows="3" id="description" name="description" onkeydown="textCounter(document.editProjectForm.description,200);" onkeyup="textCounter(document.editProjectForm.description,200);">${fieldValue(bean:projectInstance,field:'description')}</textarea>
                                 <g:hasErrors bean="${projectInstance}" field="description">
 					            <div class="errors">
@@ -74,7 +74,7 @@
                                 <td valign="top" class="name">
                                     <label for="comment">Comment:</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'comment','errors')}">
+                                <td valign="top" class="valueNW ${hasErrors(bean:projectInstance,field:'comment','errors')}">
                                     <textarea cols="40"  rows="3" name="comment" onkeydown="textCounter(document.editProjectForm.comment,200);" onkeyup="textCounter(document.editProjectForm.comment,200);">${fieldValue(bean:projectInstance,field:'comment')}</textarea>
                                 <g:hasErrors bean="${projectInstance}" field="comment">
 					            <div class="errors">
@@ -85,7 +85,7 @@
                             </tr> 
                         <tr class="prop">
 			                <td valign="top" class="name"><label for="startDate">Start Date:</label></td>
-			                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'startDate','errors')}">
+			                <td valign="top" class="valueNW ${hasErrors(bean:projectInstance,field:'startDate','errors')}">
 			                  <script type="text/javascript" charset="utf-8">
 			                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 			                  </script>
@@ -96,7 +96,7 @@
 			                </g:hasErrors>
 			                </td>
 			                <td valign="top" class="name"><label for="completionDate"><b>Completion Date:&nbsp;<span style="color: red">*</span></b></label></td>
-			                <td valign="top" class="value ${hasErrors(bean:projectInstance,field:'completionDate','errors')}">
+			                <td valign="top" class="valueNW ${hasErrors(bean:projectInstance,field:'completionDate','errors')}">
 			                  <script type="text/javascript" charset="utf-8">
 			                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 			                  </script>
@@ -111,7 +111,7 @@
 			              <tr class="prop">
 			                <td valign="top" class="name"><label for="projectPartner">Partner:</label>
 			                </td>
-			                <td valign="top" class="value"><select id="projectPartnerId" name="projectPartner"
+			                <td valign="top" class="valueNW"><select id="projectPartnerId" name="projectPartner"
 			                                 onchange="${remoteFunction(action:'getPartnerStaffList', params:'\'partner=\' + this.value', onComplete:'appendPartnerStaff(e)' )}">
 			                    <option value="" selected="selected">None</option>
 			                    <g:each status="i" in="${companyPartners}" var="companyPartners">
@@ -122,10 +122,10 @@
 							<td valign="top" class="name"><label for="client">Partner Image:</label>
 							</td>
 							<g:if test="${projectLogoForProject}">
-							<td valign="top" class="value"><g:link  action="deleteImage" params='["id":projectInstance?.id]'><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;border:0px;"/><img src="${resource(dir:'images',file:'delete.png' )}" style="border:0px;padding:6px;"/></g:link></td>
+							<td valign="top" class="valueNW"><g:link  action="deleteImage" params='["id":projectInstance?.id]'><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;border:0px;"/><img src="${resource(dir:'images',file:'delete.png' )}" style="border:0px;padding:6px;"/></g:link></td>
 							</g:if>
 							<g:else>				
-							<td valign="top" class="value">
+							<td valign="top" class="valueNW">
 							<input type="file" name="partnerImage" id="partnerImage"/>
 							</td>				
 							</g:else>
@@ -133,7 +133,7 @@
                            <tr class="prop">
 			                <td valign="top" class="name"><label for="projectManager">Project
 			                Manager:</label></td>
-			                <td valign="top" class="value"><select id="projectManagerId"
+			                <td valign="top" class="valueNW"><select id="projectManagerId"
 			                                 name="projectManager">
 			                    <option value="" selected="selected">Please Select </option>
 			                    <optgroup label="TDS" >
@@ -154,7 +154,7 @@
 			                </select></td>
 			                <td valign="top" class="name"><label for="moveManager">Move
 			                Manager:</label></td>
-			                <td valign="top" class="value"><select id="moveManagerId"
+			                <td valign="top" class="valueNW"><select id="moveManagerId"
 			                                 name="moveManager">
 			                    <option value="" selected="selected">Please Select</option>
 			                    <optgroup label="TDS">
@@ -179,7 +179,7 @@
 						<tr>
 							<td valign="top" class="name"><label for="customFieldCount">
 									Custom Fields Shown: </label></td>
-							<td valign="top" class="value"><g:select id="customcount" name="customFieldsShown" from="${projectInstance.constraints.customFieldsShown.inList}"
+							<td valign="top" class="valueNW"><g:select id="customcount" name="customFieldsShown" from="${projectInstance.constraints.customFieldsShown.inList}"
 									 value="${projectInstance.customFieldsShown}" onchange="showCustomFields(this.value, 2);" /></td>
 						</tr>
 						<g:each in="${ (1..24) }" var="i">
@@ -189,7 +189,7 @@
 								<td valign="top" class="name" nowrap="nowrap">
 									<label for="custom$i"><g:message code="project.(custom${i}).label" default="Custom${i} Label" /></label>:
 								</td>
-								<td valign="top" class="value ${hasErrors(bean: projectInstance, field: 'custom'+i, 'errors')}">
+								<td valign="top" class="valueNW ${hasErrors(bean: projectInstance, field: 'custom'+i, 'errors')}">
 									<g:textField name="custom${i}" value="${projectInstance?.('custom'+i)}" />
 								</td>
 							<g:if test="${i % 2 == 0}">
@@ -201,7 +201,7 @@
 							<td valign="top" class="name">Workflow Code:</td>
 
 							<td valign="top"
-								class="value ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
+								class="valueNW ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
 								<g:select id="workflowCode" name="workflowCode"
 									from="${workflowCodes}"
 									value="${projectInstance?.workflowCode}"
@@ -209,7 +209,7 @@
 								&nbsp;&nbsp; <span class="name"> <label for="runbookOn">Runbook
 										Driven:</label>
 							</span>&nbsp; <span
-								class="value ${hasErrors(bean: projectInstance, field: 'runbookOn', 'errors')}">
+								class="valueNW ${hasErrors(bean: projectInstance, field: 'runbookOn', 'errors')}">
 									<input type="checkbox" name="runbookOn" id="runbookOn"
 									${ (projectInstance.runbookOn == 1 ? 'checked="checked"':'') } />
 							</span> <g:hasErrors bean="${projectInstance}" field="workflowCode">
@@ -236,13 +236,13 @@
 						<tr class="prop">
 							<td valign="top" class="name"><label for="dateCreated">Date
 									Created:</label></td>
-							<td valign="top" class="value"><tds:convertDateTime
+							<td valign="top" class="valueNW"><tds:convertDateTime
 									date="${projectInstance?.dateCreated}"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
 							<td valign="top" class="name"><label for="lastUpdated">Last
 									Updated:</label></td>
-							<td valign="top" class="value"><tds:convertDateTime
+							<td valign="top" class="valueNW"><tds:convertDateTime
 									date="${projectInstance?.lastUpdated}"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
