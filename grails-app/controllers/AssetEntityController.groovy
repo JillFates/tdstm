@@ -891,7 +891,7 @@ class AssetEntityController {
 
 			//set MIME TYPE as Excel
 			def exportType = filenametoSet.split("/")[2]
-			exportType = exportType.substring(0,exportType.indexOf("_template.xls"))
+			exportType = exportType.substring(0,exportType.indexOf("Master_template.xls"))
 			SimpleDateFormat fileFormat = new SimpleDateFormat("yyyy-MM-dd");
 			SimpleDateFormat exportFileFormat = new SimpleDateFormat("yyyyMMdd");
 			def exportDate = exportFileFormat.format(TimeUtil.nowGMT())
