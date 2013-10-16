@@ -53,7 +53,7 @@ $(document).ready(function() {
 		    <g:set var="percentageBundleReady" value="${applicationCount ? Math.round((bundleReady/applicationCount)*100) : 0}" />
 			<g:set var="percentageUnassignedAppCount" value="${applicationCount ? Math.round((unassignedAppCount/applicationCount)*100) :100}" />
 			<h1>Planning Dashboard</h1>
-			<div class="dashboard dashboard_div" style="float:left; width:250px;">
+			<div class="dashboard_div" style="float:left; width:250px;">
 					<span class="dashboard_head">Discovery Phase</span>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
@@ -105,8 +105,12 @@ $(document).ready(function() {
 					</h4>
 					<table class="dashboard_stat_table">
 						<tr>
-							<td class="dashboard_stat_td">${openIssue}</td>
-							<td><g:link controller="assetEntity" action="listTasks" params="[filter:'openIssue', moveEvent:'0', justRemaining:1]" class="links">Open Tasks</g:link></td>
+							<td class="dashboard_stat_td">
+								<g:link controller="assetEntity" action="listTasks" params="[filter:'openIssue', moveEvent:'0', justRemaining:1]" class="links">${openIssue}</g:link>
+							</td>
+							<td>
+								<g:link controller="assetEntity" action="listTasks" params="[filter:'openIssue', moveEvent:'0', justRemaining:1]" class="links">Open Tasks</g:link>
+							</td>
 						</tr>
 						<g:if test="${dueOpenIssue>0}">
 						<tr>
@@ -116,8 +120,7 @@ $(document).ready(function() {
 						</g:if>
 					</table>
 			</div>
-
-			<div class="dashboard dashboard_div" style="float:left; width:250px;">
+			<div class="dashboard_div" style="float:left; width:250px;">
 					<span class="dashboard_head">Analysis Phase</span>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
@@ -145,20 +148,36 @@ $(document).ready(function() {
 					</h4>
 					<table class="dashboard_stat_table">
 						<tr>
-							<td class="dashboard_stat_td">${validated}</td>
-							<td><g:link controller="application" action="list" params="[filter:'applicationCount', validation:'Validated']" class="links">Validated</g:link></td>
+							<td class="dashboard_stat_td">
+								<g:link controller="application" action="list" params="[filter:'applicationCount', validation:'Validated']" class="links">${validated}</g:link>
+							</td>
+							<td>
+								<g:link controller="application" action="list" params="[filter:'applicationCount', validation:'Validated']" class="links">Validated</g:link>
+							</td>
 						</tr>
 						<tr>
-                            <td class="dashboard_stat_td">${dependencyScan}</td>
-                            <td><g:link controller="application" action="list" params="[filter:'applicationCount', validation:'DependencyScan']" class="links">DependencyScan</g:link></td>
+                            <td class="dashboard_stat_td">
+                            	<g:link controller="application" action="list" params="[filter:'applicationCount', validation:'DependencyScan']" class="links">${dependencyScan}</g:link>
+                            </td>
+                            <td>
+                            	<g:link controller="application" action="list" params="[filter:'applicationCount', validation:'DependencyScan']" class="links">Dependency Scan</g:link>
+                            </td>
                         </tr>
 						<tr>
-							<td class="dashboard_stat_td">${dependencyReview}</td>
-							<td><g:link controller="application" action="list" params="[filter:'applicationCount', validation:'DependencyReview']" class="links">Dependency Review</g:link></td>
+							<td class="dashboard_stat_td">
+								<g:link controller="application" action="list" params="[filter:'applicationCount', validation:'DependencyReview']" class="links">${dependencyReview}</g:link>
+							</td>
+							<td>
+								<g:link controller="application" action="list" params="[filter:'applicationCount', validation:'DependencyReview']" class="links">Dependency Review</g:link>
+							</td>
 						</tr>
 						<tr>
-							<td class="dashboard_stat_td">${bundleReady}</td>
-							<td><g:link controller="application" action="list" params="[filter:'applicationCount', validation:'BundleReady']" class="links">Ready</g:link></td>
+							<td class="dashboard_stat_td">
+								<g:link controller="application" action="list" params="[filter:'applicationCount', validation:'BundleReady']" class="links">${bundleReady}</g:link>
+							</td>
+							<td>
+								<g:link controller="application" action="list" params="[filter:'applicationCount', validation:'BundleReady']" class="links">Ready</g:link>
+							</td>
 						</tr>
 					</table>
 					<br />
@@ -172,7 +191,8 @@ $(document).ready(function() {
 								<g:if test="${appDependenciesCount > 0 }">
 								(${appDependenciesCount ? Math.round((pendingAppDependenciesCount/appDependenciesCount)*100) : 0}% of the
 								${appDependenciesCount} total)
-								</g:if></td>
+								</g:if>
+							</td>
 						</tr>
 						<tr>
 							<td class="dashboard_stat_td">${pendingServerDependenciesCount}</td>
@@ -180,22 +200,29 @@ $(document).ready(function() {
 								<g:if test="${serverDependenciesCount > 0 }">
 								(${serverDependenciesCount ? Math.round((pendingServerDependenciesCount/serverDependenciesCount)*100) : 0}% of the
 								 ${serverDependenciesCount} total)
-								</g:if></td>
+								</g:if>
+							</td>
 						</tr>
 						<tr>
-							<td class="dashboard_stat_td">${issuesCount}</td>
-							<td style="width: 150px;"><g:link controller="assetEntity" action="listTasks" params="[filter:'analysisIssue', justRemaining:0, moveEvent:0]" class="links">Open Tasks</g:link></td>
+							<td class="dashboard_stat_td">
+								<g:link controller="assetEntity" action="listTasks" params="[filter:'analysisIssue', justRemaining:0, moveEvent:0]" class="links">${issuesCount}</g:link>
+							</td>
+							<td>
+								<g:link controller="assetEntity" action="listTasks" params="[filter:'analysisIssue', justRemaining:0, moveEvent:0]" class="links">Open Tasks</g:link>
+							</td>
 						</tr>
 						<g:if test="${generalOverDue>0}">
 						<tr>
 						    <td class="dashboard_stat_td" style="color: red;"><b>${generalOverDue}</b></td>
-							<td><g:link controller="assetEntity" action="listTasks" params="[filter:'generalOverDue', justRemaining:1, moveEvent:0]" class="links">Overdue</g:link></td>
+							<td>
+								<g:link controller="assetEntity" action="listTasks" params="[filter:'generalOverDue', justRemaining:1, moveEvent:0]" class="links">Overdue</g:link>
+							</td>
 						</tr>
 						</g:if>
 					</table>
 					<br />
 					<h4>
-						<b>App Latency Evaluations</b>
+						<b>Application Latency Evaluations</b>
 					</h4>
 					<table class="dashboard_stat_table">
 						<tr>
@@ -212,7 +239,7 @@ $(document).ready(function() {
 						</tr>
 					</table>
 			</div>
-			<div class="dashboard dashboard_div" style="float:left;">
+			<div class="dashboard_div" style="float:left;">
 					<span class="dashboard_head">Execution Phase</span>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>

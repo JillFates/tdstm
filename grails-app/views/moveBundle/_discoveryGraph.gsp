@@ -8,7 +8,7 @@
 		${title}
 	</g:link>
 </td>
-<td class="dashboard_stat_td">
+<td class="dashboard_stat_td_L">
 	<g:link controller="${assetType}" action="list" params="[filter:filter]" class="links">
 		${assetCount}
 	</g:link>

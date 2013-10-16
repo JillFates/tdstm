@@ -46,7 +46,7 @@
 	border:1px solid #328714;
 	background-image:url(../images/button_highlight.png);
 	background-repeat:repeat-x; 
-	font: 12px helvetica neue, arial, sans-serif;
+	font: 12px helvetica, arial, sans-serif;
 	padding: 2px 8px;
 	font-weight:bold;
 	margin:2px;
@@ -59,7 +59,7 @@
 	border:1px solid #328714;
 	background-image:url(../images/button_highlight.png);
 	background-repeat:repeat-x; 
-	font: 12px; helvetica neue, arial, sans-serif;
+	font: 12px helvetica, arial, sans-serif;
 	padding: 2px 8px;
 	font-weight:bold;
 	margin:2px;
@@ -73,7 +73,7 @@
 	border:1px solid #328714;
 	background-image:url(../images/button_highlight.png);
 	background-repeat:repeat-x; 
-	font: 12px helvetica neue, arial, sans-serif;
+	font: 12px helvetica, arial, sans-serif;
 	padding: 2px 8px;
 	font-weight:bold;
 	margin:2px;
@@ -98,7 +98,7 @@
 	margin-top:0px;
 }
 .title {
-	font: bold 16px helvetica neue, arial, sans-serif;
+	font: bold 16px helvetica, arial, sans-serif;
 	color:#ffffff;
 	width:auto;
     float:left;
@@ -127,7 +127,7 @@
 	height:15px;
 	text-decoration: none;
 	text-align:center;
-	font:bold 11px Tahoma, helvetica neue, arial, sans-serif;
+	font:bold 11px Tahoma, helvetica, arial, sans-serif;
 	color:#ffffff;
 	padding:2px 6px;
 	border-right:1px solid #CCCCCC;
@@ -173,7 +173,7 @@
 	height:16px;
 	text-decoration: none;
 	text-align:center;
-	font:bold 12px Tahoma, helvetica neue, arial, sans-serif;
+	font:bold 12px Tahoma, helvetica, arial, sans-serif;
 	color:#9acaee;
 	padding:2px 6px;
 	border-right:1px solid #1376C0;
@@ -184,7 +184,7 @@
 	height:16px;
 	text-decoration: none;
 	text-align:center;
-	font: bold 12px Tahoma, helvetica neue, arial, sans-serif;
+	font: bold 12px Tahoma, helvetica, arial, sans-serif;
 	color:#F0F0F0;
 	padding:2px 6px;
 	border-right:1px solid #1376C0;
@@ -278,7 +278,7 @@
 	height:16px;
 	text-decoration: none;
 	text-align:left;
-	font: bold 12px helvetica neue, arial, sans-serif;
+	font: bold 12px helvetica, arial, sans-serif;
 	color:#354E81;
 	padding:0px 6px;
 }
@@ -287,7 +287,7 @@
 	height:14px;
 	text-decoration: none;
 	text-align:center;
-	font: normal 12px helvetica neue, arial, sans-serif;
+	font: normal 12px helvetica, arial, sans-serif;
 	color:black;
 	padding:2px 6px;
 }
@@ -327,7 +327,7 @@
 .dashboard_div {
 	margin-top: 10px;
 	margin-left: 5px;
-	height: 450px;
+	height: 480px;
 	background-image: url(../images/news_bg.jpg);
 	background-size: contain;
 }
@@ -345,7 +345,7 @@
 .dashboard_bar_base_small{
 	padding: 0px;
 	padding-right: 5px;
-	width: 80%;
+	width: 85%;
 	height: 5px; 
 	background-color: lightyellow;
 	box-shadow: 0px 0px 0px;
@@ -383,13 +383,18 @@
 	width: 14px;
 	padding-left: 2px;
 	padding-right: 2px;
-	background-color: white;
+	background-color: transparent;
 }
 .dashboard_stat_desc_td{
 	width: 90px;
+	padding-right: 2px;
+}
+.dashboard_stat_td_L{
+	width: 20px;
+	text-align: left;
 }
 .dashboard_stat_td{
-	width: 30px;
+	width: 20px;
 	text-align: right;
 }
 .dashboard_stat_graph_td{
@@ -398,15 +403,17 @@
 }
 .dashboard_stat_exec_td{
 	width: 80px;
-	background-color: white;
+	background-color: transparent;
 }
 .dashboard_stat_exec_tdmx{
 	width: 42px;
 	text-align: right;
+	background-color: transparent;
 }
 .dashboard_stat_exec_tdmc{
-	width: 42px;
+	width: 48px;
 	text-align: center;
+	background-color: transparent;
 }
 
 .tds_header {
@@ -424,7 +431,7 @@
 	width:auto;
 	height:auto;
 	float:right;
-	font:12px helvetica neue, arial, sans-serif;
+	font:12px helvetica, arial, sans-serif;
 	color:#FFFFFF;
 	padding-right: 5px;
 }
@@ -684,7 +691,7 @@
 	.verticaltext {
 	writing-mode: tb-rl;
 	filter: flipv fliph;
-	font-family: helvetica neue, arial, sans-serif;
+	font-family: helvetica, arial, sans-serif;
 	font-size: 12px; 
 	line-height: 8px;
 	color: #333333;
@@ -714,7 +721,7 @@ div.tableContainer thead th a {
 	border:1px solid #328714;
 	background-image:url(../images/button_highlight.png);
 	background-repeat:repeat-x; 
-	font-family: helvetica neue, arial, sans-serif;
+	font-family: helvetica, arial, sans-serif;
 	font-size:12px;
 	padding: 2px 8px;
 	font-weight:bold;
@@ -987,7 +994,7 @@ td .label_sm {
 .mainbody {
 	background: white;
 	color: black;
-	font: 12px helvetica neue, arial, sans-serif;
+	font: 12px/100% helvetica, arial, sans-serif;
 }
 
 .menu4 {
@@ -1151,7 +1158,7 @@ dl dd {
     height:21px;
     text-decoration: none;
     text-align:center;
-    font:bold 12px Tahoma, helvetica neue, arial, sans-serif;
+    font:bold 12px Tahoma, helvetica, arial, sans-serif;
     color: white;
     padding:2px 8px;
     border-right:1px solid #666;
@@ -1162,7 +1169,7 @@ dl dd {
     height:21px;
     text-decoration: none;
     text-align:center;
-    font: bold 12px helvetica neue, arial, sans-serif;
+    font: bold 12px helvetica, arial, sans-serif;
     color: white;
     padding:2px 8px;
     border-right:1px solid #666;
@@ -1270,7 +1277,7 @@ a.tab_deselect {
 #cablingPanel div {
 	position: absolute; 
 	left: 0; 
-	top: 0
+	top: 0;
 	color:black;
 }
 .connector_Bottom{
@@ -1343,7 +1350,7 @@ a.tab_deselect {
     margin-left: 5px;
 }
 .personShow{
-	font: 12px/19px helvetica neue, arial, sans-serif;
+	font: 12px/19px helvetica, arial, sans-serif;
     padding: 5px 6px;
     text-align: left;
 }

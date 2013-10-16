@@ -14,7 +14,7 @@ html * {
 body {
     background: #fff;
     color: #333;
-    font: 11px helvetica neue, arial, sans-serif;
+    font: 12px helvetica, arial, sans-serif;
 }
 
 a:link, a:visited, a:hover {
@@ -51,7 +51,7 @@ ul {
 input, select, textarea {
     background-color: #fcfcfc;
     border: 1px solid #ccc;
-    font: 11px helvetica neue, arial, sans-serif;
+    font: 13px helvetica, arial, sans-serif;
     margin: 2px 0;
     padding: 2px 4px;
 }
@@ -75,7 +75,7 @@ select {
 }
 
 .menuButton {
-    font-size: 10px;
+    font-size: 13px;
     padding: 0 5px;
 }
 .menuButton a {
@@ -136,7 +136,7 @@ td.errors input {
 table {
     border: 1px solid #63a242;
     width: 100%;
-    //float:left
+    /*float:left */
 }
 tr {
     border: 0;
@@ -148,15 +148,15 @@ tr {
 	padding: 0px 6px;
 }
 td, th { 
-    font: 11px helvetica neue, arial, sans-serif;
-    line-height: 11px;
+    font: 12px helvetica, arial, sans-serif;
+    line-height: 12x;
     padding: 5px 6px;
     text-align: left;
 }
 th {
     background: #CCCCCC;
     color: #000;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: bold;
     line-height: 16px;
     padding: 2px 6px;
@@ -164,7 +164,7 @@ th {
 th a:link, th a:visited, th a:hover {
     color: #333;
     display: block;
-    font-size: 10px;
+    font-size: 12px;
     text-decoration: none;
     width: 100%;
 }
@@ -227,7 +227,7 @@ table.inner {
     border: 1px solid #ccc;
     border-top: 0;
     color: #666;
-    font-size: 10px;
+    font-size: 12px;
     overflow: hidden;
     padding: 10px 3px;
 }
@@ -245,7 +245,7 @@ table.inner {
 /* for PMO*/
 .pmo_paginateButtons {
     color: #666;
-    font-size: 10px;
+    font-size: 12px;
     overflow: hidden;
     padding: 10px 3px;
 }
@@ -301,11 +301,11 @@ table.inner {
     background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
     border: 1px solid #ccc;
     color: #666;
-    font-size: 10px;
+    font-size: 12px;
     margin-top: 5px;
     overflow: hidden;
     padding: 0;
-    //float: left;
+    /*float:left */
 }
 
 .buttons input {
@@ -313,7 +313,7 @@ table.inner {
     border: 0;
     color: #333;
     cursor: pointer;
-    font-size: 10px;
+    font-size: 13px;
     font-weight: bold;
     margin-left: 3px;
     overflow: visible;
@@ -422,7 +422,7 @@ span.cellWithoutBackground
 .headClass{
 	background: none repeat scroll 0 0 #CCCCCC;
     color: #000000;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: bold;
     line-height: 16px;
     padding: 2px 6px;
@@ -693,7 +693,7 @@ th.desc{
     background-repeat: no-repeat;
 }
 
-// For tooltip -- Start
+    /* For tooltip -- Start */
 .ui-tooltip, .arrow:after {
 	background-color:  #F3F4F6 !important;
 }
@@ -701,7 +701,7 @@ th.desc{
 	padding: 10px 20px;
 	color: white;
 	border-radius: 20px !important;
-	font: bold 14px "Helvetica Neue", Sans-Serif;
+	font: bold 14px Helvetica, Sans-Serif;
 	text-transform: uppercase;
 	box-shadow: 0 0 7px black;
 }
@@ -733,7 +733,7 @@ th.desc{
 	-moz-transform: rotate(45deg);
 	-ms-transform: rotate(45deg);
 	-o-transform: rotate(45deg);
-	tranform: rotate(45deg);
+	transform: rotate(45deg);
 }
 .arrow.top:after {
 	bottom: -20px;
