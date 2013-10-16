@@ -1,7 +1,7 @@
 body {
     background: #fff;
     color: #333;
-    font: 12px helvetica neue, arial, sans-serif;
+    font: 12px helvetica, arial, sans-serif;
 }
 br.page-break-after {
 	page-break-after: always;
@@ -55,7 +55,7 @@ br.page-break-after {
   overflow-x: visible !important;
 }
 .racktop_label {
-	postition: relative;
+	position: relative;
 	top: 30%;
 	color: black;
 	text-align: center ;
@@ -505,7 +505,7 @@ table.rack_elevation {
 	border: 8px solid #000000;
 	empty-cells: show;
 	-webkit-border-vertical-spacing: 0px;
-	font-family: helvetica neue, arial, sans-serif !important;
+	font-family: helvetica, arial, sans-serif !important;
 	font-size: 10px !important;
 }
 
@@ -525,7 +525,7 @@ table.rack_elevation.back {
 
 table.rack_elevation td {
 	text-align: left;
-	font: 8px helvetica neue, arial, sans-serif;
+	font: 8px helvetica, arial, sans-serif;
 	border: 1px solid #999999;
 	padding:0px 2px 0px 2px;
   vertical-align: top;
@@ -533,7 +533,7 @@ table.rack_elevation td {
 }
 
 table.rack_elevation th {
-	font: 10px helvetica neue, arial, sans-serif;
+	font: 10px helvetica, arial, sans-serif;
 	font-weight: bold;
 	text-decoration: underline;
 	padding:0px 2px 0px 2px;
@@ -547,7 +547,7 @@ table.rack_elevation th {
 table.rack_elevation input, select, textarea {
     background-color: #fcfcfc;
     border: 1px solid #ccc;
-    font: 12px  helvetica neue, arial, sans-serif;
+    font: 12px  helvetica, arial, sans-serif;
     margin: 2px 0;
     padding: 2px 4px;
 }
@@ -632,7 +632,7 @@ table.rack_elevation table.bladeTable td.errorBlade {
 }
 .unknown {
 	border:1px solid #333333;
-	font-size:12px;.
+	font-size:12px;
 	background-color: #FFFFFF;
 }
 .empty_cable {
@@ -862,7 +862,7 @@ table.rack_elevation table.bladeTable td.errorBlade {
 }
 .cap_tab{
 	padding:1px 5px;
-	font:10px  helvetica neue, arial, sans-serif;
+	font:10px  helvetica, arial, sans-serif;
 }
 .rack_cap20{
 	background-color: #66FE66 !important;
