@@ -36,8 +36,13 @@
 					
 					            <td class="name">Project Code:</td>
 					
-					            <td class="valueNW">${fieldValue(bean:projectInstance, field:'projectCode')}</td>
-					
+					            <td class="valueNW ${hasErrors(bean:projectInstance, field:'projectCode','errors')}">
+					            <input type="text" id="projectCode" name="projectCode" value="${fieldValue(bean:projectInstance, field:'projectCode')}" />
+									<g:hasErrors bean="${projectInstance}" field="projectCode">
+										<div class="errors"><g:renderErrors bean="${projectInstance}"
+											as="list" field="projectCode" /></div>
+									</g:hasErrors>
+								</td>
 					        </tr>           
                             <tr class="prop">
                                 <td class="name">
@@ -221,7 +226,7 @@
 							</td>
 							<td class="name"><label for="inProgress">Display
 									Transitions in Status bar:</label></td>
-							<td><g:select id="trackChanges"
+							<td class="valueNW"><g:select id="trackChanges"
 									name="trackChanges"
 									from="${projectInstance.constraints.trackChanges.inList}"
 									value="${projectInstance.trackChanges}"
