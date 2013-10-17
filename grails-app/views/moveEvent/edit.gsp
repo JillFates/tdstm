@@ -24,26 +24,25 @@
                 <div class="dialog">
                     <table>
                         <tbody>
-                        <tr>
-							<td colspan="3"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+	                        <tr>
+								<td colspan="3"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 							</tr>
                         	<tr class="prop">
 	                            <td class="name">Project:</td>
 	                            
-	                            <td class="valueNW" colspan="2"><g:link controller="project" action="show" id="${moveEventInstance?.project?.id}">${moveEventInstance?.project?.encodeAsHTML()}</g:link></td>
-                            
+	                            <td class="valueNW"><g:link controller="project" action="show" id="${moveEventInstance?.project?.id}">${moveEventInstance?.project?.encodeAsHTML()}</g:link></td>
+								<td rowspan="11">
+									<label for="runbookRecipe">Runbook Recipe:</label><br/>
+									<textarea name="runbookRecipe" class="fontMonospaced" id="runbookRecipe" cols="80" rows="30" wrap="soft">${moveEventInstance.runbookRecipe}</textarea>
+								</td>
                         	</tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="name"><b>Name:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
                                 <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'name','errors')}">
-                                    <input type="text" id="name" name="name" value="${fieldValue(bean:moveEventInstance,field:'name')}"/>
+                                    <input type="text" id="name" name="name" value="${fieldValue(bean:moveEventInstance,field:'name')}" />
                                 </td>
-								<td rowspan="10">
-									<label for="runbookRecipe">Runbook Recipe:</label><br/>
-									<textarea name="runbookRecipe" class="fontMonospaced" id="runbookRecipe" cols="80" rows="30" wrap="soft">${moveEventInstance.runbookRecipe}</textarea>
-								</td>
                             </tr> 
                         
                             <tr class="prop">

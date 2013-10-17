@@ -22,32 +22,22 @@
                     <tbody>
                     	<tr class="prop">
                             <td class="name">Project:</td>
-                            
-                            <td class="valueNW" colspan="2"><g:link controller="project" action="show" id="${moveEventInstance?.project?.id}">${moveEventInstance?.project?.encodeAsHTML()}</g:link></td>
-                            
-                        </tr>
-                        
-                        <tr class="prop">
-                            <td class="name">Name:</td>
-                            
-                            <td class="valueNW"><b>${fieldValue(bean:moveEventInstance, field:'name')}</b></td>
-							<td rowspan="10">
+                            <td class="valueNW"><g:link controller="project" action="show" id="${moveEventInstance?.project?.id}">${moveEventInstance?.project?.encodeAsHTML()}</g:link></td>
+							<td rowspan="11">
 								<label for="runbookRecipe">Runbook Recipe:</label><br/>
 								<textarea name="runbookRecipe" class="fontMonospaced" id="runbookRecipe" cols="80" rows="30" readonly="yes" wrap="hard">${moveEventInstance.runbookRecipe}</textarea>
 							</td>
-                            
                         </tr>
-                    
+                        <tr class="prop">
+                            <td class="name">Name:</td>
+                            <td class="valueNW"><b>${fieldValue(bean:moveEventInstance, field:'name')}</b></td>
+                        </tr>
                         <tr class="prop">
                             <td class="name">Description:</td>
-                            
                             <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'description')}</td>
-                            
                         </tr>
-                    
                         <tr class="prop">
                             <td class="name">Bundles:</td>
-                            
                             <td style="text-align:left;" class="valueNW">
                                 <ul>
                                 <g:each var="m" in="${moveEventInstance.moveBundles}">
@@ -66,28 +56,22 @@
 						</tr>
                         <tr class="prop">
 				            <td class="name">Runbook Status:</td>
-				
 				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'runbookStatus')}</td>
 						</tr><tr class="prop">
 				            <td class="name">Runbook Version:</td>
-				
 				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'runbookVersion')}</td>
 						</tr><tr class="prop">
 				            <td class="name">Runbook bridge1 :</td>
-				
 				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'runbookBridge1')}</td>
 						</tr><tr class="prop">
 				            <td class="name">Runbook bridge2 :</td>
-				
 				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'runbookBridge2')}</td>
 						</tr><tr class="prop">
 				            <td class="name">Video Link::</td>
-				
 				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'videolink')}</td>
 						</tr>
                         <tr class="prop">
 				            <td  class="name">Status:</td>
-				
 				            <td class="valueNW"><g:message code="event.inProgress.${moveEventInstance?.inProgress}" /></td>
 						</tr>
                     </tbody>
