@@ -1,7 +1,7 @@
 body {
 	background: white;
 	color: black;
-	font: 14px helvetica neue, arial, sans-serif;
+	font: 14px helvetica, arial, sans-serif;
 }
 
 .mobbody{
@@ -45,7 +45,7 @@ th {
 	font-weight:bold;
 }
 td {
-	font: 14px helvetica neue, arial, sans-serif;
+	font: 14px helvetica, arial, sans-serif;
 }
 
 a:link, a:visited, a:hover {
@@ -56,23 +56,21 @@ font-weight: bold;
 	width: 320px;
 	text-align: center;
 	float: left; 
-	margin:auto 0px;
 	color: white; 
 	font-weight: bold;
 	font-size: 125%;
 	border:1px solid #5F9FCF; 
 	background-color: #5F9FCF;
 	margin:0px;
-	padding:auto 0px;
+	padding: 0px;
 }
 .mobmenu {
 	height: 21px; 
 	width: auto; 
 	float: left; 
-	margin:auto 0px;
 	color: white; 
 	font-weight: normal;
-font: bold 12px Tahoma, helvetica neue, arial, sans-serif;
+font: bold 12px Tahoma, helvetica, arial, sans-serif;
 text-align: center;
 	border:1px solid #444; 
 	margin:0px;
@@ -87,7 +85,7 @@ a.mobselect {
 	border-right-color: #507028;
 	border-bottom-width: 6px;
 	background:#507028;
-	padding:auto 0px;
+	padding: 0px;
 }
 
 .mobfooter {
@@ -98,7 +96,7 @@ a.mobselect {
 	width:100%; 
 	text-decoration: none;
 	text-align:center;
-	font: bold 12px helvetica neue, arial, sans-serif;
+	font: bold 12px helvetica, arial, sans-serif;
 	color: #FFFFFF !important;
 	background:black;
 	position: fixed;

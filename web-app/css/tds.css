@@ -19,7 +19,6 @@
 
 .right_bcornerlog{background-position:bottom right;}
 
-
 .left_corner{background-position:top left;}
 
 .right_corner{background-position:top right;}
@@ -190,7 +189,7 @@
 	border-right:1px solid #1376C0;
 }
 .menu2 ul li a:hover, .menu2 ul li.current a {
-	color:#darkblue;
+	color:darkblue;
 }
 .menu2 ul li a:hover   {
 	color:#036;
@@ -685,7 +684,6 @@
 .headerwidth20 {
 	width: 200px;
 }
-
 
 /* dashboards label display for IE only */
 	.verticaltext {
@@ -1382,7 +1380,7 @@ a.tab_deselect {
 }
 a.task_action{float: left; position: relative; margin: 0 0 0 30px;cursor: pointer;}
 a#viewtaskgraph_button_graph{ margin: 5px 0 0 30px;}
-a.task_action span.task_icon{position: absolute; top: 8; left: 0;}
+a.task_action span.task_icon{position: absolute; top: 8px; left: 0;}
 a.task_action span.task_button { float: left; height: 16px; line-height: 16px;  padding: 0 5px 0 15px; color:#2C61AA;}
 span.task_button_disabled { float: left; height: 16px; line-height: 16px;  padding: 0 5px 0 15px; color:grey;}
 

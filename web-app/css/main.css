@@ -149,7 +149,7 @@ tr {
 }
 td, th { 
     font: 12px helvetica, arial, sans-serif;
-    line-height: 12x;
+    line-height: 12px;
     padding: 5px 6px;
     text-align: left;
 }
@@ -271,14 +271,19 @@ table.inner {
 }
 .prop .name {
     text-align: left;
+    white-space: nowrap;
+	vertical-align: top;
     width: 15%;
+}
+.prop .nameNW {
+    text-align: left;
     white-space: nowrap;
 	vertical-align: top;
 }
 .prop .value {
     text-align: left;
-    width: 85%;
 	vertical-align: top;
+    width: 85%;
 }
 .prop .valueNW {
     text-align: left;
@@ -352,13 +357,9 @@ table.inner {
 }
 
 .clear_filter {
-
 	font-size: 14px;
-
 	color: #B80000;
-
 	vertical-align: baseline;
-	
 }
 
 .menuButton a.save {
