@@ -22,19 +22,19 @@
 							<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 							</tr>
                         	<tr class="prop">
-                                <td valign="top" class="name">
+                                <td class="name">
                                     <label for="project"><b>Project:&nbsp;<span style="color: red">*</span></b></label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'project','errors')}">
+                                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'project','errors')}">
                                     <g:select optionKey="id" from="${Project.list()}" name="project.id" id="projectId"  
                                     value="${moveEventInstance?.project?.id}" onchange="loadMoveBundles();"></g:select>
                                 </td>
                             </tr> 
                             <tr class="prop">
-                                <td valign="top" class="name">
+                                <td class="name">
                                     <label for="name"><b>Name:&nbsp;<span style="color: red">*</span></b> </label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'name','errors')}">
+                                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'name','errors')}">
                                     <input type="text" id="name" name="name" value="${fieldValue(bean:moveEventInstance,field:'name')}"/>
                                     <g:hasErrors bean="${moveEventInstance}" field="name">
 						            <div class="errors">
@@ -45,68 +45,68 @@
                             </tr> 
                         
                             <tr class="prop">
-                                <td valign="top" class="name">
+                                <td class="name">
                                     <label for="description">Description:</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'description','errors')}">
+                                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'description','errors')}">
                                     <input type="text" id="description" name="description" value="${fieldValue(bean:moveEventInstance,field:'description')}"/>
                                 </td>
                             </tr> 
                         
                             <tr class="prop">
-                                <td valign="top" class="name">
+                                <td class="name">
                                     <label for="moveBundle">Bundle:</label>
                                 </td>
-                                <td  valign="top" style="text-align:left;" class="value">
+                                <td  style="text-align:left;" class="valueNW">
 	                                <ul id="moveBundleList">
 	                                </ul>
                             	</td>
                             </tr> 
                             <tr class="prop">
-                                <td valign="top" class="name">
+                                <td class="name">
                                     <label for="runbookStatus">Runbook Status:</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'runbookStatus','errors')}">
+                                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'runbookStatus','errors')}">
                                     <g:select id="runbookStatus" name="runbookStatus" from="${moveEventInstance.constraints.runbookStatus.inList}" value="${moveEventInstance.runbookStatus}" ></g:select>
                                 </td>
                             </tr> 
                             <tr class="prop">
-                                <td valign="top" class="name">
+                                <td class="name">
                                     <label for="description">Runbook version:</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'runbookVersion','errors')}">
+                                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'runbookVersion','errors')}">
                                     <input type="text" id="runbookVersion" name="runbookVersion" value="${fieldValue(bean:moveEventInstance,field:'runbookVersion')}"/>
                                 </td>
                             </tr> 
                             <tr class="prop">
-                                <td valign="top" class="name">
+                                <td class="name">
                                     <label for="description">Runbook bridge1 :</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'runbookBridge1','errors')}">
+                                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'runbookBridge1','errors')}">
                                     <input type="text" id="runbookBridge1" name="runbookBridge1" value="${fieldValue(bean:moveEventInstance,field:'runbookBridge1')}"/>
                                 </td>
                             </tr> 
                             <tr class="prop">
-                                <td valign="top" class="name">
+                                <td class="name">
                                     <label for="description">Runbook bridge1 :</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'runbookBridge2','errors')}">
+                                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'runbookBridge2','errors')}">
                                     <input type="text" id="runbookBridge2" name="runbookBridge2" value="${fieldValue(bean:moveEventInstance,field:'runbookBridge1')}"/>
                                 </td>
                             </tr> 
                             <tr class="prop">
-                                <td valign="top" class="name">
+                                <td class="name">
                                     <label for="description">Video Link:</label>
                                 </td>
-                                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'videolink','errors')}">
+                                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'videolink','errors')}">
                                     <input type="text" id="videolink" name="videolink" value="${fieldValue(bean:moveEventInstance,field:'videolink')}"/>
                                 </td>
                             </tr> 
                         <tr class="prop">
-				                <td valign="top" class="name">
+				                <td class="name">
 				                  <label for="inProgress"><b>Status:&nbsp;<span style="color: red">*</span></b></label>
 				                </td>
-				                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'inProgress','errors')}">
+				                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'inProgress','errors')}">
 				                  <g:select id="inProgress" name="inProgress" from="${moveEventInstance.constraints.inProgress.inList}" value="${moveEventInstance.inProgress}" valueMessagePrefix="event.inProgress"></g:select>
 				                  <g:hasErrors bean="${moveEventInstance}" field="inProgress">
 				                    <div class="errors">

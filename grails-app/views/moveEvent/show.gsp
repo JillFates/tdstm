@@ -23,7 +23,7 @@
                     	<tr class="prop">
                             <td class="name">Project:</td>
                             
-                            <td class="valueNW"><g:link controller="project" action="show" id="${moveEventInstance?.project?.id}">${moveEventInstance?.project?.encodeAsHTML()}</g:link></td>
+                            <td class="valueNW" colspan="2"><g:link controller="project" action="show" id="${moveEventInstance?.project?.id}">${moveEventInstance?.project?.encodeAsHTML()}</g:link></td>
                             
                         </tr>
                         
@@ -31,9 +31,9 @@
                             <td class="name">Name:</td>
                             
                             <td class="valueNW"><b>${fieldValue(bean:moveEventInstance, field:'name')}</b></td>
-							<td rowspan="10" width="40%">
+							<td rowspan="10">
 								<label for="runbookRecipe">Runbook Recipe:</label><br/>
-								<textarea name="runbookRecipe" class="fontMonospaced" id="runbookRecipe" cols="75" rows="30" readonly="yes" wrap="hard">${moveEventInstance.runbookRecipe}</textarea>
+								<textarea name="runbookRecipe" class="fontMonospaced" id="runbookRecipe" cols="80" rows="30" readonly="yes" wrap="hard">${moveEventInstance.runbookRecipe}</textarea>
 							</td>
                             
                         </tr>
