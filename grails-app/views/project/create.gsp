@@ -274,16 +274,16 @@
 			<td colspan="4"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 			</tr>
 			<tr class="prop">
-				<td valign="top" class="name"><label for="client"><b>Client:&nbsp;<span style="color: red">*</span></b></label>
+				<td class="name"><label for="client"><b>Client:&nbsp;<span style="color: red">*</span></b></label>
 				</td>
-				<td valign="top" class="valueNW"><select id="clientId" name="client.id" onchange="${remoteFunction(action:'getPartnerStaffList', params:'\'client=\'+ this.value +\'&partner=\'+document.getElementById(\'projectPartnerId\').value', onComplete:'updateMastersList(e)' )}">
+				<td class="valueNW"><select id="clientId" name="client.id" onchange="${remoteFunction(action:'getPartnerStaffList', params:'\'client=\'+ this.value +\'&partner=\'+document.getElementById(\'projectPartnerId\').value', onComplete:'updateMastersList(e)' )}">
 					<g:each status="i" in="${clients}" var="clients">
 						<option value="${clients.partyIdTo.id}">${clients.partyIdTo}</option>
 					</g:each>
 				</select>
 				</td>
-				<td valign="top" class="name"><label for="projectCode"><b>Project Code:&nbsp;<span style="color: red">*</span></b></label></td>
-				<td valign="top"
+				<td class="name"><label for="projectCode"><b>Project Code:&nbsp;<span style="color: red">*</span></b></label></td>
+				<td
 					class="valueNW ${hasErrors(bean:projectInstance,field:'projectCode','errors')}">
 				<input type="text" id="projectCode" name="projectCode" maxlength="20" value="${fieldValue(bean:projectInstance,field:'projectCode')}" />
 				<g:hasErrors bean="${projectInstance}" field="projectCode">
@@ -292,8 +292,8 @@
 				</g:hasErrors></td>
 			</tr>
 			<tr class="prop">
-				<td valign="top" class="name"><label for="name"><b>Project Name:&nbsp;<span style="color: red">*</span></b></label></td>
-				<td valign="top"
+				<td class="name"><label for="name"><b>Project Name:&nbsp;<span style="color: red">*</span></b></label></td>
+				<td
 					class="valueNW ${hasErrors(bean:projectInstance,field:'name','errors')}">
 				<input type="text" id="name" name="name" maxlength="64" value="${fieldValue(bean:projectInstance,field:'name')}" />
 					<g:hasErrors
@@ -302,8 +302,8 @@
 						as="list" field="name" /></div>
 				</g:hasErrors>
 				</td>
-				<td valign="top" class="name"><label for="projectType"><b>Project Type:&nbsp;<span style="color: red">*</span></b></label></td>
-				<td valign="top" class="valueNW ${hasErrors(bean:projectInstance,field:'projectType','errors')}">
+				<td class="name"><label for="projectType"><b>Project Type:&nbsp;<span style="color: red">*</span></b></label></td>
+				<td class="valueNW ${hasErrors(bean:projectInstance,field:'projectType','errors')}">
 					<g:select id="projectType" name="projectType" from="${projectInstance.constraints.projectType.inList}" value="${projectInstance.projectType}"></g:select>
 					<g:hasErrors bean="${projectInstance}" field="projectType">
 						<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="projectType" /></div>
@@ -311,9 +311,9 @@
 				</td>
 			</tr>
 			<tr class="prop">
-				<td valign="top" class="name"><label for="description">Description:</label>
+				<td class="name"><label for="description">Description:</label>
 				</td>
-				<td valign="top"
+				<td
 					class="valueNW ${hasErrors(bean:projectInstance,field:'description','errors')}">
 				<textarea rows="3" cols="40" id="description" name="description" 
 				onkeydown="textCounter(document.createProjectForm.description,200);" 
@@ -322,9 +322,9 @@
 					<div class="errors"><g:renderErrors bean="${projectInstance}"
 						as="list" field="description" /></div>
 				</g:hasErrors></td>
-				<td valign="top" class="name"><label for="comment">Comment:</label>
+				<td class="name"><label for="comment">Comment:</label>
 				</td>
-				<td valign="top"
+				<td
 					class="valueNW ${hasErrors(bean:projectInstance,field:'comment','errors')}">
 				<textarea  rows="3" cols="40" name="comment"
 					onkeydown="textCounter(document.createProjectForm.comment,200);"
@@ -336,9 +336,9 @@
 			</tr>
 
 			<tr class="prop">
-				<td valign="top" class="name"><label for="startDate">Start
+				<td class="name"><label for="startDate">Start
 				Date:</label></td>
-				<td valign="top"
+				<td
 					class="valueNW ${hasErrors(bean:projectInstance,field:'startDate','errors')}">
 				<script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
@@ -350,9 +350,9 @@
 					</div>
 				</g:hasErrors>
 				</td>
-				<td valign="top" class="name"><label for="completionDate"><b>Completion
+				<td class="name"><label for="completionDate"><b>Completion
 				Date:&nbsp;<span style="color: red">*</span></b></label></td>
-				<td valign="top"
+				<td
 					class="valueNW ${hasErrors(bean:projectInstance,field:'completionDate','errors')}">
 				<script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
@@ -365,9 +365,9 @@
 			</tr>
 
 			<tr class="prop">
-				<td valign="top" class="name"><label for="projectPartner">Partner:</label>
+				<td class="name"><label for="projectPartner">Partner:</label>
 				</td>
-				<td valign="top" class="valueNW"><select id="projectPartnerId"
+				<td class="valueNW"><select id="projectPartnerId"
 					name="projectPartner"
 					onchange="${remoteFunction(action:'getPartnerStaffList', params:'\'client=\'+ document.getElementById(\'clientId\').value +\'&partner=\'+this.value', onComplete:'updateMastersList(e)' )}">
 					<option value="" selected="selected">None</option>
@@ -375,17 +375,17 @@
 						<option value="${partners.partyIdTo.id}">${partners.partyIdTo}</option>
 					</g:each>
 				</select></td>
-				<td valign="top" class="name"><label for="client">Partner Image:</label>
+				<td class="name"><label for="client">Partner Image:</label>
 				</td>
-				<td valign="top" class="valueNW">
+				<td class="valueNW">
 				<input type="file" name="partnerImage" id="partnerImage" />
 				</td>
 			</tr>
 
 			<tr class="prop">
-				<td valign="top" class="name" colspan="1"><label for="projectManager">Project
+				<td class="name" colspan="1"><label for="projectManager">Project
 				Manager:</label></td>
-				<td valign="top" class="valueNW"><select id="projectManagerId"
+				<td class="valueNW"><select id="projectManagerId"
 					name="projectManager">
 					<option value="" selected="selected">Please Select</option>
 					<optgroup label="TDS" id="compPmGroup">
@@ -394,9 +394,9 @@
 						</g:each>
 					</optgroup>
 				</select></td>
-				<td valign="top" class="name" colspan="1"><label for="moveManager">Move
+				<td class="name" colspan="1"><label for="moveManager">Move
 				Manager:</label></td>
-				<td valign="top" class="valueNW"><select id="moveManagerId"
+				<td class="valueNW"><select id="moveManagerId"
 					name="moveManager">
 					<option value="" selected="selected">Please Select</option>
 					<optgroup label="TDS" id="compMmGroup">
@@ -407,19 +407,19 @@
 				</select> <input type="hidden" id="companyManagersId" value="${managers.size()}"/></td>
 			</tr>
 			<tr>
-			<td valign="top" class="name"><label for="customFieldCount" > Custom Fields Shown: </label>
+			<td class="name"><label for="customFieldCount" > Custom Fields Shown: </label>
 				</td>
-				<td valign="top" class="valueNW"><g:select id="customcount" name="customFieldsShown" from="${projectInstance.constraints.customFieldsShown.inList}" 
+				<td class="valueNW"><g:select id="customcount" name="customFieldsShown" from="${projectInstance.constraints.customFieldsShown.inList}" 
                          onchange="showCustomFields(this.value, 2);" /></td>
 			</tr>
 			<g:each in="${ (1..24) }" var="i">
 				<g:if test="${i % 2 == 1}">
 					<tr class="prop custom_table" id="custom_count_${i}" style="display: none;">
 				</g:if>
-					<td valign="top" class="name" nowrap="nowrap">
+					<td class="name" nowrap="nowrap">
 						<label for="custom$i"><g:message code="project.(custom${i}).label" default="Custom${i} Label" /></label>:
 					</td>
-					<td valign="top" class="valueNW ${hasErrors(bean: projectInstance, field: 'custom'+i, 'errors')}">
+					<td class="valueNW ${hasErrors(bean: projectInstance, field: 'custom'+i, 'errors')}">
 						<g:textField name="custom${i}" value="${projectInstance?.('custom'+i)}" />
 					</td>
 				<g:if test="${i % 2 == 0}">
@@ -427,8 +427,8 @@
 				</g:if>
 		    </g:each>
 			<tr class="prop">
-				<td valign="top" class="name"><label for="workflowCode">Workflow Code:</label></td>
-				<td valign="top"
+				<td class="name"><label for="workflowCode">Workflow Code:</label></td>
+				<td
 					class="valueNW ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
 				<g:select id="workflowCode" name="workflowCode"
 					from="${workflowCodes}"
@@ -445,10 +445,10 @@
 						as="list" field="workflowCode" /></div>
 				</g:hasErrors> 
 				</td>
-				<td valign="top" class="name">
+				<td class="name">
 					<label for="trackChanges">Display Transitions in Status bar:</label>
 				</td>
-				<td valign="top">
+				<td>
 					<g:select id="trackChanges" name="trackChanges"	from="${projectInstance.constraints.trackChanges.inList}" 
 					value="${projectInstance.trackChanges}" valueMessagePrefix="project.trackChanges"></g:select>
 				</td>
