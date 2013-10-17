@@ -212,7 +212,7 @@
 					</thead>
 					<tbody>
 						<g:each in="${roomInstanceList}" status="i" var="roomInstance">
-							<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" id="mergeRow_${roomInstance.id}" onclick="submitMergeForm(this.id)">
+							<tr class="${(i % 2) == 0 ? 'odd' : 'even'} pointer" id="mergeRow_${roomInstance.id}" onclick="submitMergeForm(this.id)">
 								
 								<td>${fieldValue(bean: roomInstance, field: "location")}</td>
 						
@@ -348,7 +348,7 @@
 			var checkBoxId = inputCheckBox.attr('id')
 			var sRoomId = inputCheckBox.attr('name').substring(inputCheckBox.attr('name').indexOf("_")+1,checkBoxId.length)
 
-			$("#mergeRoomDialog table tr").each(function() {
+			$("#mergeRoomDialog tbody tr").each(function() {
 				var rowId = $(this).attr('id')
 				if(rowId.substring(9,rowId.length) == sRoomId){
 					$(this).hide()
