@@ -892,8 +892,10 @@ class AssetEntityController {
 			//set MIME TYPE as Excel
 			def exportType = filenametoSet.split("/")[2]
 			exportType = exportType.substring(0,exportType.indexOf("Master_template.xls"))
-			SimpleDateFormat fileFormat = new SimpleDateFormat("yyyy-MM-dd");
-			SimpleDateFormat exportFileFormat = new SimpleDateFormat("yyyyMMdd");
+
+			SimpleDateFormat exportFileFormat = new SimpleDateFormat("yyyyMMdd")
+			SimpleDateFormat stdDateFormat = new SimpleDateFormat("MM-dd-yyyy")
+
 			def exportDate = exportFileFormat.format(TimeUtil.nowGMT())
 			def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString()
 			response.setContentType( "application/vnd.ms-excel" )			
@@ -1117,7 +1119,7 @@ class AssetEntityController {
 									addContentToSheet = new jxl.write.Number(serverMap[colName], r, (Double)pos )
 								} else if(attribute == "retireDate" || attribute == "maintExpDate"){
 									addContentToSheet = new Label(serverMap[colName], r, 
-										(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll]) ? fileFormat.format(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll])) :''))
+										(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll]) ? stdDateFormat.format(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll])) :''))
 								} else if ( asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll]) == null ) {
 									// Skip populating the cell if it is null
 									continue
@@ -1202,7 +1204,7 @@ class AssetEntityController {
 										//log.info "export() : field class type=$app[assetColName].className()}"
 										break
 									case ~/maintExpDate|retireDate/:
-										colVal = app[assetColName] ? fileFormat.format(app[assetColName]) : ''
+										colVal = app[assetColName] ? stdDateFormat.format(app[assetColName]) : ''
 										break
 									default:
 										colVal = app[assetColName]
