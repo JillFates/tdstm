@@ -16,6 +16,7 @@ class TestCaseController {
 	// IoC
 	def partyRelationshipService
 	def personService
+	def runbookService
 	def taskService	
 
 	// def messageSource
@@ -180,18 +181,22 @@ class TestCaseController {
 		results.append("Pass 1 Elapsed Time: ${dfsMap.elapsed}<br/>")
 		results.append("Pass 2 Elapsed Time: ${durMap.elapsed}<br/>")
 
-		results.append("<b>Estimated Runbook Duration: ${estFinish}</b><br/>")
+		results.append("<b>Estimated Runbook Duration: ${estFinish} for Move Event: $me</b><br/>")
 
+/*
 		results.append("<h1>Edges data</h1><table><tr><th>Id</th><th>Predecessor Task</th><th>Successor Task</th><th>DS Task Count</th><th>Path Duration</th></tr>")
 		deps.each { dep ->
 			results.append("<tr><td>${dep.id}</td><td>${dep.predecessor}</td><td>${dep.successor}</td><td>${dep.downstreamTaskCount}</td><td>${dep.pathDuration}</td></tr>")
 		}
 		results.append('</table>')
 
-
-		results.append("<h1>Tasks Details</h1><table><tr><th>Id</th><th>Task</th><th>Duration</th><th>Earliest Start</th><th>Latest Start</th><th>Critical Path</td></tr>")
+*/
+		results.append("<h1>Tasks Details</h1><table><tr><th>Id</th><th>Task</th><th>Duration</th><th>Earliest Start</th><th>Latest Start</th><th>Critical Path</td>" + 
+			"<th>Team</th><th>Individual</th></tr>")
 		tasks.each { t ->
-			results.append("<tr><td>${t.id}</td><td>${t.taskNumber} ${t.comment}</td><td>${t.duration}</td><td>${t.tmpEarliestStart}</td><td>${t.tmpLatestStart}</td><td>${t.tmpCriticalPath ? 'Yes' : 'No'}</td></tr>")
+			def person = t.assignedTo ?: '&nbsp;'
+			results.append("<tr><td>${t.id}</td><td>${t.taskNumber} ${t.comment}</td><td>${t.duration}</td><td>${t.tmpEarliestStart}</td><td>${t.tmpLatestStart}</td>" + 
+				"<td>${t.tmpCriticalPath ? 'Yes' : 'No'}</td><td>${t.role}</td><td>$person</td></tr>")
 		}
 		results.append('</table>')
 
