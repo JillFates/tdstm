@@ -549,7 +549,7 @@ class PersonController {
 				params.staffType = 'Hourly'
 			
 			personInstance.properties = params
-			
+			personInstance.tempForUpdate = Math.random().toString()
 			def personId
 			if ( !personInstance.hasErrors() && personInstance.save(flush:true) ) {
 				personId = personInstance.id
