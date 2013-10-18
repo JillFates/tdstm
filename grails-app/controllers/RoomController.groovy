@@ -347,6 +347,7 @@ class RoomController {
 		   updateRackToMergeRooms(sourceRoom,targetRoom)
 		   sourceRoom.delete(flush:true)
 		   redirect(action: "list", params:[viewType : "list"])
+		   flash.message = "Room:${sourceRoom} is merged to Room: ${targetRoom} successfully."
 	   } else {
 	   	   redirect(action: "list", params:[viewType : "list"])
 	   }

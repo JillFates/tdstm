@@ -50,6 +50,9 @@
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
+		<div id="processDiv" style="display: none;">
+			<img src="../images/processing.gif" /> Merging In Progress...
+		</div>
 		<div id="roomListView" style="width:500px;">
 		<g:if test="${roomId && viewType != 'list'}">
 		<script type="text/javascript">      
@@ -364,6 +367,9 @@
 			var tRoomId = selectedRoom.substring(9,selectedRoom.length)
 			if(tRoomId){
 				$("#tRoomId").val(tRoomId)
+				$('.message').hide();
+				$('#mergeRoomDialog').dialog('close');
+				$("#processDiv").show();
 				$("form#mergeRoomForm").submit()
 			}
 		}
