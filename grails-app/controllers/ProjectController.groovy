@@ -206,24 +206,28 @@ class ProjectController {
      * Update the Project details
      */
     def update = {
+
+    	// TODO : Security : Need fix update() to check user's permissions
+
         def projectInstance = Project.get( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
-        //projectInstance.lastUpdated = new Date()
         
         if( projectInstance ) {
-            def startDate = params.startDate
-            def completionDate = params.completionDate
             //  When the Start date is initially selected and Completion Date is blank, set completion date to the Start date
             def formatter = new SimpleDateFormat("MM/dd/yyyy");
             def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-            if(startDate){
+
+            def startDate = params.startDate
+            def completionDate = params.completionDate
+            if (startDate) {
             	params.startDate =  GormUtil.convertInToGMT(formatter.parse(startDate), tzId)
             }
-            if(completionDate){
+            if (completionDate){
             	params.completionDate =  GormUtil.convertInToGMT(formatter.parse(completionDate), tzId)
             }
+
 			params.runbookOn =  params.runbookOn ? 1 : 0
             projectInstance.properties = params
-			projectInstance.tempForUpdate = Math.random().toString()
+
            //Get the Partner Image file from the multi-part request
             def file = request.getFile('partnerImage')
             def image            

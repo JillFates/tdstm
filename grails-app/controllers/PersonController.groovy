@@ -219,22 +219,24 @@ class PersonController {
 	 */
 	def update = {
 			
-		def personInstance = Person.get( params.id )
+		def person = Person.get( params.id )
 			
 		def companyId = params.company
-		if(personInstance) {
-			personInstance.properties = params
-			personInstance.tempForUpdate = Math.random().toString()
-			if ( !personInstance.hasErrors() && personInstance.save() ) {
-				if(companyId != null ){
+
+		// TODO : Security - Need to harden this
+
+		if(person) {
+			person.properties = params
+			if ( person.validate() && person.save() ) {
+				if (companyId != null ){
 					def companyParty = Party.findById(companyId)
-					partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', personInstance, "STAFF")
+					partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', person, "STAFF")
 				}
-				flash.message = "Person ${params.firstName} ${params.lastName} updated"
+				flash.message = "Person '$person' was updated"
 				redirect( action:list, params:[ id:companyId ])
 			}
 			else {
-				flash.message = "Person ${params.firstName} ${params.lastName} not updated "
+				flash.message = "Person '$person' not updated due to: " + GormUtil.errorsToUL(person)
 				redirect( action:list, params:[ id:companyId ])
 			}
 		}
@@ -541,74 +543,79 @@ class PersonController {
 	 * @return : person firstname
 	 *----------------------------------------------------------*/
 	def updatePerson = {
-			def personInstance = Person.get(params.id)
-			def ret = []
-			params.travelOK == "1" ? params : (params.travelOK = 0)
-			
-			if(!personInstance.staffType && !params.staffType)
-				params.staffType = 'Hourly'
-			
-			personInstance.properties = params
-			personInstance.tempForUpdate = Math.random().toString()
-			def personId
-			if ( !personInstance.hasErrors() && personInstance.save(flush:true) ) {
-				personId = personInstance.id
-				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-				def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-				//getSession().setAttribute( "LOGIN_PERSON", ['name':personInstance.firstName, "id":personInstance.id ])
-				def userLogin = UserLogin.findByPerson( personInstance )
-					if(userLogin){
-					if(params.newPassword){
-						def password = params.newPassword
-						
-						if(password != null)
-							userLogin.password = new Sha1Hash(params.newPassword).toHex()
-					}
-						
-					if(params.expiryDate && params.expiryDate != "null"){
-						def expiryDate = params.expiryDate
-						userLogin.expiryDate =  GormUtil.convertInToGMT(formatter.parse( expiryDate ), tzId)
-					}
-					if(!userLogin.save()){
-						userLogin.errors.allErrors.each{println it}
-					}
+		def personInstance = Person.get(params.id)
+		def ret = []
+		params.travelOK == "1" ? params : (params.travelOK = 0)
+		
+		if(!personInstance.staffType && !params.staffType)
+			params.staffType = 'Hourly'
+		
+		personInstance.properties = params
+		def personId
+		if ( personInstance.validate() && personInstance.save(flush:true) ) {
+			personId = personInstance.id
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+			//getSession().setAttribute( "LOGIN_PERSON", ['name':personInstance.firstName, "id":personInstance.id ])
+			def userLogin = UserLogin.findByPerson( personInstance )
+				if(userLogin){
+				if(params.newPassword){
+					def password = params.newPassword
+					
+					if(password != null)
+						userLogin.password = new Sha1Hash(params.newPassword).toHex()
 				}
-				def functions = params.list("function")
-				if(params.manageFuncs != '0' || functions){
-					def staffCompany = partyRelationshipService.getStaffCompany(personInstance)
-					def companyProject = Project.findByClient(staffCompany)
-					partyRelationshipService.updateStaffFunctions(staffCompany, personInstance, functions, 'STAFF')
-					if(companyProject)
-						partyRelationshipService.updateStaffFunctions(companyProject, personInstance,functions, "PROJ_STAFF")
+					
+				if(params.expiryDate && params.expiryDate != "null"){
+					def expiryDate = params.expiryDate
+					userLogin.expiryDate =  GormUtil.convertInToGMT(formatter.parse( expiryDate ), tzId)
 				}
-				def personExpDates =params.list("availability")
-				if(personExpDates){
-					def expFormatter = new SimpleDateFormat("MM/dd/yyyy")
-					ExceptionDates.executeUpdate("delete from ExceptionDates where person = '$personInstance.id' ")
-					personExpDates.each{
-						def expDates = new ExceptionDates()
-						expDates.exceptionDay = GormUtil.convertInToGMT(expFormatter.parse(it), tzId)
-						expDates.person = personInstance
-						
-						expDates.save(flush:true)
-					}
+				if(!userLogin.save()){
+					userLogin.errors.allErrors.each{println it}
 				}
-				
-				userPreferenceService.setPreference( "CURR_TZ", params.timeZone )
-				userPreferenceService.setPreference( "CURR_POWER_TYPE", params.powerType )
-				userPreferenceService.loadPreferences("CURR_TZ")
-				userPreferenceService.setPreference("START_PAGE", params.startPage )
-				userPreferenceService.loadPreferences("START_PAGE")
-				
-			}else{
-				personInstance.errors.allErrors.each{println it}
 			}
-			if(params.tab){
-				forward( action:'loadGeneral', params:[tab: params.tab, personId:personId])
-			}else{
-				ret << [name:personInstance.firstName, tz:getSession().getAttribute( "CURR_TZ" )?.CURR_TZ]
-				render  ret as JSON
+			def functions = params.list("function")
+			if(params.manageFuncs != '0' || functions){
+				def staffCompany = partyRelationshipService.getStaffCompany(personInstance)
+				def companyProject = Project.findByClient(staffCompany)
+				partyRelationshipService.updateStaffFunctions(staffCompany, personInstance, functions, 'STAFF')
+				if(companyProject)
+					partyRelationshipService.updateStaffFunctions(companyProject, personInstance,functions, "PROJ_STAFF")
 			}
+
+			def personExpDates =params.list("availability")
+			if(personExpDates){
+				// TODO : JPM : TM-2330 Logic needs to be changed - should NEVER delete all records and then re-add - 
+				// I NEVER want to see this pattern implemented again!
+				def expFormatter = new SimpleDateFormat("MM/dd/yyyy")
+				ExceptionDates.executeUpdate("delete from ExceptionDates where person = '$personInstance.id' ")
+				personExpDates.each{
+					def expDates = new ExceptionDates()
+					expDates.exceptionDay = GormUtil.convertInToGMT(expFormatter.parse(it), tzId)
+					expDates.person = personInstance
+					
+					expDates.save(flush:true)
+				}
+			}
+			
+			userPreferenceService.setPreference( "CURR_TZ", params.timeZone )
+			userPreferenceService.setPreference( "CURR_POWER_TYPE", params.powerType )
+			userPreferenceService.loadPreferences("CURR_TZ")
+			userPreferenceService.setPreference("START_PAGE", params.startPage )
+			userPreferenceService.loadPreferences("START_PAGE")
+			
+		} else {
+
+			// TODO : Error handling - this doesn't report to the user that there was any error
+			log.warn "updatePerson() unable to save $personInstance due to: " + GormUtil.allErrorsString(personInstance)
+
+		}
+		if (params.tab) {
+			forward( action:'loadGeneral', params:[tab: params.tab, personId:personId])
+		} else { 
+			ret << [ name:personInstance.firstName, tz:getSession().getAttribute( "CURR_TZ" )?.CURR_TZ ]
+			render  ret as JSON
+		}
 	}
 	
 	def resetPreferences ={

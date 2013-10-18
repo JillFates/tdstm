@@ -87,14 +87,18 @@ class ProjectTeamController {
 	 *  Update the Project Team Details
 	 */
     def update = {
+
+        // TODO : Security : Need to check to see if the person is associated to the project and has permissions.
+        
         def projectTeamInstance = ProjectTeam.get( params.id )
         //projectTeamInstance.lastUpdated = new Date()
         def bundleId = params.bundleId
         def bundleInstance = MoveBundle.findById( bundleId )
         def teamMembers = request.getParameterValues("teamMembers")
+
         if(projectTeamInstance) {
             projectTeamInstance.properties = params
-			projectTeamInstance.tempForUpdate = Math.random().toString()
+
             if(!projectTeamInstance.hasErrors() && projectTeamInstance.save(flush:true)) {
             	PartyRelationship.executeUpdate("delete from PartyRelationship p where p.partyRelationshipType = 'PROJ_TEAM' and p.partyIdFrom = $projectTeamInstance.id and p.roleTypeCodeFrom = 'TEAM' ")
             	partyRelationshipService.createBundleTeamMembers( projectTeamInstance, teamMembers )

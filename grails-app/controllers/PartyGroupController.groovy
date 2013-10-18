@@ -1,4 +1,5 @@
 import grails.converters.JSON
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 
 class PartyGroupController {
@@ -115,12 +116,12 @@ class PartyGroupController {
         //partyGroupInstance.lastUpdated = new Date()
         if(partyGroupInstance) {
             partyGroupInstance.properties = params
-			partyGroupInstance.tempForUpdate = Math.random().toString()
-            if(!partyGroupInstance.hasErrors() && partyGroupInstance.save()) {
+			
+            if( !partyGroupInstance.hasErrors() && partyGroupInstance.save()) {
                 flash.message = "PartyGroup ${partyGroupInstance} updated"
                 redirect(action:show,id:partyGroupInstance.id)
-            }
-            else {
+            }   else {
+            	flash.message = "Unable to update due to: " + GormUtil.errorsToUL(partyGroupInstance)
                 render(view:'edit',model:[partyGroupInstance:partyGroupInstance])
             }
         }

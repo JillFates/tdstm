@@ -224,6 +224,9 @@ class MoveBundleController {
 	}
 
 	def update = {
+
+		// TODO : Security : Get User's project and attempt to find the project before blindly updating it
+
 		def moveBundleInstance = MoveBundle.get( params.id )
 		def projectManagerId = params.projectManager
 		def moveManagerId = params.moveManager
@@ -250,11 +253,10 @@ class MoveBundleController {
 			moveBundleInstance.startTime = startTime? GormUtil.convertInToGMT(formatter.parse( startTime ), tzId) : null
 			
 			moveBundleInstance.completionTime =  completionTime ? GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId) : null
-			
-			moveBundleInstance.tempForUpdate = Math.random().toString()
-			
+
+			// TODO : SECURITY : Should be confirming that the rooms belong to the moveBundle.project instead of blindly assigning plus should be
+			// validating that the rooms even exist.			
 			moveBundleInstance.sourceRoom = params.sourceRoom ? Room.read( params.sourceRoom ) : null
-			
 			moveBundleInstance.targetRoom = params.targetRoom ? Room.read( params.targetRoom ) : null
 			
 			if(moveBundleInstance.validate(true) && moveBundleInstance.save() ) {
@@ -373,39 +375,7 @@ class MoveBundleController {
 	 * @return Returns 200 okay or appropriate error message
 	 */
 	def createManualStep = {
-		/*
-		 // render( "HELLO WORLD!" )
-		 // return
-		 MoveBundleStep.withTransaction { status ->
-		 try {
-		 def moveBundleId = Integer.parseInt(params.moveBundleId)
-		 def moveBundleSteps = request.getParameterValues( "moveBundleStepId" )
-		 moveBundleSteps.each{ moveStep->
-		 def tasksCompleted = Integer.parseInt( request.getParameter("tasksCompleted_"+moveStep) )
-		 if (  tasksCompleted < 0 || tasksCompleted > 100 ) {
-		 response.sendError( 400, "Bad Request P")
-		 // render("400 Bad Request")
-		 status.setRollbackOnly()
-		 return false
-		 }
-		 def moveBundleStepId = Integer.parseInt(moveStep)
-		 def result = stepSnapshotService.createManualSnapshot( moveBundleId, moveBundleStepId, tasksCompleted )
-		 if (result == 200){
-		 render ("Record created")
-		 flash.result = "Record created"
-		 } else {
-		 response.sendError( result , "Error ${result}" )
-		 flash.result = "Error ${result}"
-		 status.setRollbackOnly()
-		 }
-		 }
-		 redirect(action:show,params:[id:moveBundleId, projectId:session.CURR_PROJ.CURR_PROJ ])
-		 } catch(NumberFormatException nfe) {
-		 response.sendError( 400, "Bad Request NFE")
-		 status.setRollbackOnly()
-		 }
-		 }
-		 */
+
 		try {
 			def moveBundleId = Integer.parseInt(params.moveBundleId)
 			def moveBundleStepId = Integer.parseInt(params.moveBundleStepId)
