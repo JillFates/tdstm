@@ -1203,7 +1203,7 @@ class AssetEntityController {
 										colVal = app[assetColName] ? 'Yes' : 'No'
 										//log.info "export() : field class type=$app[assetColName].className()}"
 										break
-									case ~/maintExpDate|retireDate/:
+									case ~/Retire|MaintExp/:
 										colVal = app[assetColName] ? stdDateFormat.format(app[assetColName]) : ''
 										break
 									default:
@@ -1253,6 +1253,8 @@ class AssetEntityController {
 								if(colName == "DepGroup"){
 									def depGroup = assetDepBundleList.find{it.asset.id==database[r-1].id}?.dependencyBundle?.toString()
 									addContentToSheet = new Label(dbMap[colName], r, depGroup ?:"" )
+								} else if(attribute == "retireDate" || attribute == "maintExpDate"){
+									addContentToSheet = new Label(dbMap[colName], r, (database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]) ? stdDateFormat.format(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll])) :''))
 								} else if ( database[r-1][attribute] == null ) {
 									addContentToSheet = new Label(  dbMap[colName], r, "" )
 								}else {
@@ -1288,6 +1290,8 @@ class AssetEntityController {
 								if(colName == "DepGroup"){
 									def depGroup = assetDepBundleList.find{it.asset.id==files[r-1].id}?.dependencyBundle?.toString()
 									addContentToSheet = new Label(fileMap[colName], r, depGroup ?:"" )
+								} else if(attribute == "retireDate" || attribute == "maintExpDate"){
+									addContentToSheet = new Label(fileMap[colName], r, (files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll]) ? stdDateFormat.format(files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll])) :''))
 								} else if ( files[r-1][attribute] == null ) {
 									addContentToSheet = new Label( fileMap[colName], r, "" )
 								} else {
