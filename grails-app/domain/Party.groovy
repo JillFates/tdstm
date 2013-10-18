@@ -1,4 +1,5 @@
-import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
+
 class Party {
 	Date dateCreated
 	Date lastUpdated
@@ -24,14 +25,7 @@ class Party {
 		tablePerHierarchy false
 		id column:'party_id'
 	}
-	
-/*	
-	static id = {
-		idMapping(name:'partyId', column:'party_id', unsavedValue:0)
-		generator(class:'assigned')
-	}
-*/
-	
+		
 	String toString(){
 		"$id : $dateCreated"
 	}
@@ -39,10 +33,10 @@ class Party {
 	 * Date to insert in GMT
 	 */
 	def beforeInsert = {
-		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+		dateCreated = TimeUtil.nowGMT()
+		lastUpdated = TimeUtil.nowGMT()
 	}
 	def beforeUpdate = {
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+		lastUpdated = TimeUtil.nowGMT()
 	}
 }
