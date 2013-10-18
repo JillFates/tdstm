@@ -112,13 +112,13 @@
                         
                    	        <th>Batch Id</th>
                         
-                   	       	<th>Date</th>
+                   	       	<th>Imported At</th>
                         
-                   	        <th>Created By</th>
+                   	        <th>Imported By</th>
                         
-                   	        <th>Set</th>
+                   	        <th>Attribute Set</th>
                    	        
-                   	        <th>Asset Type</th>
+                   	        <th>Class</th>
                    	        
                    	        <th>Assets</th>
                         
@@ -156,11 +156,11 @@
 	                      </span>
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                          
-                            <td>${fieldValue(bean:dataTransferBatch, field:'id')}</td>
+                            <td>${dataTransferBatch.id}</td>
                         
-                            <td><tds:convertDate date="${dataTransferBatch?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+                            <td><tds:convertDateTime date="${dataTransferBatch?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
                         
-                            <td>${dataTransferBatch?.userLogin?.person?.lastNameFirst}</td>
+                            <td>${dataTransferBatch?.userLogin?.person}</td>
                         
                             <td>${dataTransferBatch?.dataTransferSet?.title}</td>
                             
@@ -193,7 +193,8 @@
 	                                 </g:if>                     
 	                            </g:if>
 	                             <g:else>
-	                            	<g:if test="${dataTransferBatch?.hasErrors == 1}">|<a href="errorsListView?id=${dataTransferBatch?.id}">View Errors</a></g:if>
+	                            	<g:if test="${dataTransferBatch?.hasErrors == 1}"><a href="errorsListView?id=${dataTransferBatch?.id}">View Errors</a> | </g:if>
+	                             	<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                            </g:else>
                             </td>
                         
