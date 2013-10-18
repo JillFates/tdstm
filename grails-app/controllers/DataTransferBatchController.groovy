@@ -122,7 +122,10 @@ def messageSource
 			def existingAssetsList = new ArrayList()
 
 			try {
-				dataTransferBatch = DataTransferBatch.get(params.batchId)
+				dataTransferBatch = DataTransferBatch.findByIdAndProject(params.batchId, project)
+				if (! dataTransferBatch) 
+					throw new RuntimeException('Unable to find the batch number for your current project')
+
 				if (dataTransferBatch.eavEntityType?.domainName == "AssetEntity") {
 					batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = $dataTransferBatch.id ")[0]
 					def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = "+
@@ -217,44 +220,15 @@ def messageSource
 						}
 
 						// Save the asset if it was changed or is new
-						(insertCount, updateCount) = assetEntityAttributeLoaderService.saveAssetChanges(
-							assetEntity, assetsList, insertCount, rowNum, updateCount, warnings)
+						(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
+							assetEntity, assetsList, insertCount, rowNum, updateCount, errorCount, warnings)
 
 						// Update status and clear hibernate session
 						assetEntityAttributeLoaderService.updateStatusAndClear(project, dataTransferValueRow, sessionFactory, session)
 
 					} // for loop
-  
-					def dataTransferCommentRowList = DataTransferComment.findAll(" From DataTransferComment dtc where dtc.dataTransferBatch = " +
-						"$dataTransferBatch.id and dtc.dataTransferBatch.statusCode = 'PENDING'")
-					if (dataTransferCommentRowList){
-						dataTransferCommentRowList.each{
-							def assetComment
-							def assetEntity = AssetEntity.get(it.assetId)
-							if(assetEntity){
-								def principal = SecurityUtils.subject.principal
-								def loginUser = UserLogin.findByUsername(principal)
-								if(it.commentId){
-									assetComment = AssetComment.findById(it.commentId)
-								} 
-								if(!assetComment){
-									assetComment = new AssetComment()
-									assetComment.mustVerify = 0
-								}
-								assetComment.comment = it.comment
-								assetComment.commentType = it.commentType
-								assetComment.createdBy = loginUser.person
-								assetComment.assetEntity = assetEntity
-								assetComment.save()
-							}
-						}
-					}
-					
-					sessionFactory.getCurrentSession().flush();
-					sessionFactory.getCurrentSession().clear();
-					project = project.merge()
-					
-					if (!project.save(flush:true)) {
+  					
+					if ( ! project.save(flush:true)) {
 						GormUtil.allErrorsString(project)
 						throw new RuntimeException("Unable to update project.lastAssetId")
 					}
@@ -281,7 +255,7 @@ def messageSource
 
 			def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
 
-			def sb = new StringBuilder("<b>Process Results:</b><ul>" + 
+			def sb = new StringBuilder("<b>Process Results for Batch ${params.batchId}:</b><ul>" + 
 				"<li>Assets in Batch: ${batchRecords}</li>" + 
 				"<li>Records Inserted: ${insertCount}</li>"+
 				"<li>Records Updated: ${updateCount}</li>" + 
@@ -341,114 +315,121 @@ def messageSource
 			def existingAssetsList = new ArrayList()
 			def application
 		
+			def fubar = new StringBuilder("Staff List\n")
+			staffList.each { fubar.append( "   $it.id $it\n") }
+			log.debug fubar.toString()
+
 			try {
-				dataTransferBatch = DataTransferBatch.get(params.batchId)
-					batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = ${dataTransferBatch.id}")[0]
-					def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = "+
-						"$dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
-					def assetsSize = dataTransferValueRowList.size()
-					session.setAttribute("TOTAL_BATCH_ASSETS",assetsSize)
-					def dataTransferValues = DataTransferValue.findAllByDataTransferBatch( dataTransferBatch )
-					def eavAttributeSet = EavAttributeSet.findById(2)
-					
-					for ( int dataTransferValueRow=0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
-						def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
-						def rowNum = rowId+1
-						def dtvList = dataTransferValues.findAll{ it.rowId == rowId } 
-						def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-						def flag = 0
-						def isNewValidate = true
-						def isFormatError = 0
+				dataTransferBatch = DataTransferBatch.findByIdAndProject(params.batchId, project)
+				if (! dataTransferBatch) 
+					throw new RuntimeException('Unable to find the batch number for your current project')
 
-						application = assetEntityAttributeLoaderService.findAndValidateAsset(Application, assetEntityId, project, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets)
+				batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = ${dataTransferBatch.id}")[0]
+				def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = "+
+					"$dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
+				def assetsSize = dataTransferValueRowList.size()
+				session.setAttribute("TOTAL_BATCH_ASSETS",assetsSize)
+				def dataTransferValues = DataTransferValue.findAllByDataTransferBatch( dataTransferBatch )
+				def eavAttributeSet = EavAttributeSet.findById(2)
+				
+				for ( int dataTransferValueRow=0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
+					def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
+					def rowNum = rowId+1
+					def dtvList = dataTransferValues.findAll{ it.rowId == rowId } 
+					def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
+					def flag = 0
+					def isNewValidate = true
+					def isFormatError = 0
 
-						if (application == null)
-							continue
+					application = assetEntityAttributeLoaderService.findAndValidateAsset(Application, assetEntityId, project, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets)
 
-						if ( ! application.id ) {
-							// Initialize extra properties for new asset
+					if (application == null)
+						continue
+
+					if ( ! application.id ) {
+						// Initialize extra properties for new asset
+					}
+
+					// Iterate over the properties and set them on the asset
+					dtvList.each {
+						def attribName = it.eavAttribute.attributeCode
+						it.importValue = it.importValue.trim()
+
+						// If trying to set to NULL - call the closure to update the property and move on
+						if (it.importValue == "NULL") {
+							// Set the property to NULL appropriately
+							assetEntityAttributeLoaderService.setToNullOrBlank(application, it.importValue, nullProps, blankProps)
+							return
 						}
 
-						// Iterate over the properties and set them on the asset
-						dtvList.each {
-							def attribName = it.eavAttribute.attributeCode
-							it.importValue = it.importValue.trim()
+						switch (attribName) {
+							case ~/sme|sme2|appOwner|owner/:
+								if( it.importValue ) {
+									// Substitute owner for appOwner
+									def propName = attribName == 'owner' ? 'appOwner' : attribName
+									def results = personService.findOrCreatePerson(it.importValue, project, staffList)
+									def warnMsg = ''
+									if (results?.person) {
+										application[propName] = results.person
 
-							// If trying to set to NULL - call the closure to update the property and move on
-							if (it.importValue == "NULL") {
-								// Set the property to NULL appropriately
-								assetEntityAttributeLoaderService.setToNullOrBlank(application, it.importValue, nullProps, blankProps)
-								return
-							}
-
-							switch (attribName) {
-								case ~/sme|sme2|appOwner|owner/:
-									if( it.importValue ) {
-										// Substitute owner for appOwner
-										def propName = attribName == 'owner' ? 'appOwner' : attribName
-										def results = personService.findOrCreatePerson(it.importValue, project, staffList)
-										def warnMsg = ''
-										if (results?.person) {
-											application[propName] = results.person
-
-											// Now check for warnings
-											if (results.isAmbiguous) {
-												warnMsg = " $attribName (${it.importValue}) was ambiguous for App ${application.assetName} on row $rowNum. Name set to ${results.person}"
-												warnings << warnMsg
-												log.warn warnMsg
-												errorConflictCount++
-											}
-
-											if (results.isNew) 
-												personsAdded++
-
-										} else if ( results?.error ) {
-											warnMsg = "$attribName (${it.importValue}) had an error '${results.error}'' for App ${application.assetName} on row $rowNum"
+										// Now check for warnings
+										if (results.isAmbiguous) {
+											warnMsg = " $attribName (${it.importValue}) was ambiguous for App ${application.assetName} on row $rowNum. Name set to ${results.person}"
 											warnings << warnMsg
-											log.info warnMsg
+											log.warn warnMsg
 											errorConflictCount++
 										}
+
+										if (results.isNew) 
+											personsAdded++
+
+									} else if ( results?.error ) {
+										warnMsg = "$attribName (${it.importValue}) had an error '${results.error}'' for App ${application.assetName} on row $rowNum"
+										warnings << warnMsg
+										log.info warnMsg
+										errorConflictCount++
 									}
-									break
-								case ~/shutdownBy|startupBy|testingBy/:
-									if (it.importValue.size()) {
-										if(it.importValue[0] in ['@', '#']){
-											application[attribName] = it.importValue
-										} else {
-											def resultMap = personService.findOrCreatePerson(it.importValue, project, staffList)
-											application[attribName] = resultMap?.person?.id
-											if(it.importValue && resultMap?.isAmbiguous){
-												def warnMsg = "Ambiguity in ${attribName} (${it.importValue}) for ${application.assetName}"
-												log.warn warnMsg
-												warnings << warnMsg
-											}
+								}
+								break
+							case ~/shutdownBy|startupBy|testingBy/:
+								if (it.importValue.size()) {
+									if(it.importValue[0] in ['@', '#']){
+										application[attribName] = it.importValue
+									} else {
+										def resultMap = personService.findOrCreatePerson(it.importValue, project, staffList)
+										application[attribName] = resultMap?.person?.id
+										if(it.importValue && resultMap?.isAmbiguous){
+											def warnMsg = "Ambiguity in ${attribName} (${it.importValue}) for ${application.assetName}"
+											log.warn warnMsg
+											warnings << warnMsg
 										}
 									}
-									break
-								case ~/shutdownFixed|startupFixed|testingFixed/:
-									if (it.importValue) {
-										application[attribName] = it.importValue.equalsIgnoreCase("yes") ? 1 : 0
-									}
-									break
-								default:
-									// Try processing all common properties
-									assetEntityAttributeLoaderService.setCommonProperties(project, application, it, rowNum, warnings, errorConflictCount)
+								}
+								break
+							case ~/shutdownFixed|startupFixed|testingFixed/:
+								if (it.importValue) {
+									application[attribName] = it.importValue.equalsIgnoreCase("yes") ? 1 : 0
+								}
+								break
+							default:
+								// Try processing all common properties
+								assetEntityAttributeLoaderService.setCommonProperties(project, application, it, rowNum, warnings, errorConflictCount)
 
-							} // switch(attribName)
+						} // switch(attribName)
 
-						}	// dtvList.each						
+					}	// dtvList.each						
 
-						// Save the asset if it was changed or is new
-						(insertCount, updateCount) = assetEntityAttributeLoaderService.saveAssetChanges(
-							application, assetsList, rowNum, insertCount, updateCount, warnings)
+					// Save the asset if it was changed or is new
+					(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
+						application, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
 
-						// Update status and clear hibernate session
-						assetEntityAttributeLoaderService.updateStatusAndClear(project, dataTransferValueRow, sessionFactory, session)
+					// Update status and clear hibernate session
+					assetEntityAttributeLoaderService.updateStatusAndClear(project, dataTransferValueRow, sessionFactory, session)
 
-					} // for
-					
-					dataTransferBatch.statusCode = 'COMPLETED'
-					dataTransferBatch.save(flush:true)
+				} // for
+				
+				dataTransferBatch.statusCode = 'COMPLETED'
+				dataTransferBatch.save(flush:true)
 					
 			} catch (Exception e) {
 				status.setRollbackOnly()
@@ -462,7 +443,7 @@ def messageSource
 			def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
 
 			def sb = new StringBuilder(
-				"Process Results:<ul><li>Assets in Batch: ${batchRecords}</li>" + 
+				"Process Results for Batch ${params.batchId}:<ul><li>Assets in Batch: ${batchRecords}</li>" + 
 				"<li>Records Inserted: ${insertCount}</li>"+
 				"<li>Records Updated: ${updateCount}</li>" + 
 				"<li>Asset Errors: ${errorCount}</li> "+
@@ -520,7 +501,10 @@ def messageSource
 			def files
 
 			try {
-				dataTransferBatch = DataTransferBatch.get(params.batchId)
+				dataTransferBatch = DataTransferBatch.findByIdAndProject(params.batchId, project)
+				if (! dataTransferBatch) 
+					throw new RuntimeException('Unable to find the batch number for your current project')
+
 				batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = $dataTransferBatch.id ")[0]
 				def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = "+
 					"$dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
@@ -571,8 +555,8 @@ def messageSource
 					} // dtvList.each
 
 					// Save the asset if it was changed or is new
-					(insertCount, updateCount) = assetEntityAttributeLoaderService.saveAssetChanges(
-						files, assetsList, rowNum, insertCount, updateCount, warnings)
+					(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
+						files, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
 
 					// Update status and clear hibernate session
 					assetEntityAttributeLoaderService.updateStatusAndClear(project, dataTransferValueRow, sessionFactory, session)
@@ -593,7 +577,7 @@ def messageSource
 		
 			def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
 
-			def sb = new StringBuilder("Process Results:<ul><li>Assets in Batch: ${batchRecords}</li>" + 
+			def sb = new StringBuilder("Process Results for Batch ${params.batchId}:<ul><li>Assets in Batch: ${batchRecords}</li>" + 
 				"<li>Records Inserted: ${insertCount}</li>"+
 				"<li>Records Updated: ${updateCount}</li>" + 
 				"<li>Asset Errors: ${errorCount} </li> "+
@@ -655,7 +639,10 @@ def messageSource
 			def database
 
 			try {
-				dataTransferBatch = DataTransferBatch.get(params.batchId)
+				dataTransferBatch = DataTransferBatch.findByIdAndProject(params.batchId, project)
+				if (! dataTransferBatch) 
+					throw new RuntimeException('Unable to find the batch number for your current project')
+
 				batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = $dataTransferBatch.id ")[0]
 				def dataTransferValueRowList = DataTransferValue.findAll("From DataTransferValue d where d.dataTransferBatch = "+
 					"$dataTransferBatch.id and d.dataTransferBatch.statusCode='PENDING' group by rowId")
@@ -705,8 +692,8 @@ def messageSource
 					} // dtvList.each
 
 					// Save the asset if it was changed or is new
-					(insertCount, updateCount) = assetEntityAttributeLoaderService.saveAssetChanges(
-						database, assetsList, rowNum, insertCount, updateCount, warnings)
+					(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
+						database, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
 
 					// Update status and clear hibernate session
 					assetEntityAttributeLoaderService.updateStatusAndClear(project, dataTransferValueRow, sessionFactory, session)
@@ -727,7 +714,7 @@ def messageSource
 
 			def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
 
-			def sb = new StringBuilder(" Process Results:<ul><li>Assets in Batch: ${batchRecords}" + 
+			def sb = new StringBuilder(" Process Results for Batch ${params.batchId}:<ul><li>Assets in Batch: ${batchRecords}" + 
 				"<li>Records Inserted: ${insertCount}</li>" +
 				"<li>Records Updated: ${updateCount}</li>" + 
 				"<li>Asset Errors: ${errorCount}</li>"+

@@ -179,6 +179,7 @@ class PersonService {
 			staffList = partyRelationshipService.getAllCompaniesStaffPersons()
 
 		def results = findPerson(nameMap, project, staffList)
+		results.isNew = null
 
 		if ( ! results.person && nameMap.first ) {
 			log.debug "findOrCreatePerson() creating new person and associate to Company as staff ($nameMap)"
@@ -186,7 +187,6 @@ class PersonService {
 			if ( ! person.save(insert:true, flush:true)) {
 				log.error "findOrCreatePerson Unable to create Person"+GormUtil.allErrorsString( person )
 				results.error = "Unable to create person $nameMap"
-				results.isNew = null
 			} else {
 				if (! partyRelationshipService.addCompanyStaff(project.client, person) ) {
 					results.error = "Unable to assign person $results.person.toString() as staff"

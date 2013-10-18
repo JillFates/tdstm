@@ -3,13 +3,37 @@ package com.tdssrc.grails;
 import org.apache.shiro.SecurityUtils
 // import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 public class GormUtil {
-	def public static allErrorsString = { domain, separator=" : " ->
-		def text = ""
-		domain?.errors.allErrors.each() { text += separator + it }
-		text
+
+	/**
+	 * Used to output GORM Domain constraints and update errors in human readable format
+	 * @param Domain the domain instance that has errors
+	 * @param String the separator to used between listings (default ' : ')
+	 * @param String locale (optional)
+	 * @return String the errors formatted in human readable format
+	 */
+	def static String allErrorsString(domain, separator=" : ", locale=null) {
+		def messageSource = ApplicationHolder.application.mainContext.messageSource
+		StringBuilder text = new StringBuilder()
+		domain?.errors.allErrors.each() { text.append("$separator ${messageSource.getMessage(it, locale)}") }
+		text.toString()
 	}
+
+	/**
+	 * Used to output GORM Domain constraints and update errors in human readable HTML Unordered List
+	 * @param Domain the domain instance that has errors
+	 * @param String locale (optional)
+	 * @return String the errors formatted in human readable format
+	 */
+	def static String errorsAsUL(domain, locale=null) {
+		StringBuilder text = new StringBuilder('<ul>')
+		text.append(allErrorsString(domain, '<li>', locale))
+		text.append('</ul>')
+		return text.toString()
+	}
+
 	/**
 	 * Converts date into GMT
 	 * @param date

@@ -778,7 +778,7 @@ class AssetEntityAttributeLoaderService {
 	 * @param
 	 * @return
 	 */
-	def saveAssetChanges(asset, assetList, rowNum, insertCount, updateCount, warnings) {
+	def saveAssetChanges(asset, assetList, rowNum, insertCount, updateCount, errorCount, warnings) {
 		def saved = false
 		if ( asset.id ) {
 			if ( asset.dirtyPropertyNames.size() ) {
@@ -796,18 +796,18 @@ class AssetEntityAttributeLoaderService {
 			// Handle a new asset 
 			saved = asset.validate() && asset.save(flush:true)
 			if (saved) {
-				log.debug "saveAssetChanges() saved new asset id:$asset.id"
 				insertCount++
+				log.debug "saveAssetChanges() saved new asset id:$asset.id, insertCount:$insertCount"
 			}
 		}
 		if (! saved) {
-			errorCount++
 			log.warn "appProcess() Performing discard for rowNum $rowNum. " + GormUtil.allErrorsString(asset)
-			warnings << "Asset ${asset.assetName}, row $rowNum had an error and was not updated. " 
+			warnings << "Asset ${asset.assetName}, row $rowNum had an error and was not updated. " + GormUtil.errorsAsUL(asset)
 			asset.discard()
+			errorCount++
 		}
 
-		return [insertCount, updateCount]
+		return [insertCount, updateCount, errorCount]
 	}
 
 	/** 
