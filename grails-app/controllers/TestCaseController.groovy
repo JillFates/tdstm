@@ -7,6 +7,8 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
 
+import com.tdssrc.grails.GormUtil
+
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 
 class TestCaseController {
@@ -15,6 +17,8 @@ class TestCaseController {
 	def partyRelationshipService
 	def personService
 	def taskService	
+
+	// def messageSource
 
 	def testGormUtilGetDPWC = {
 		def sb = new StringBuilder()
@@ -196,7 +200,6 @@ class TestCaseController {
 
 	}
 
-
 	def indirectTest = {
 
 		def p = new Person(firstName:'Robin', lastName:'Banks', id:123)
@@ -217,5 +220,19 @@ class TestCaseController {
 
 	}
 
+	/**
+	 * Testing the GORM error handler to see if we can get human readable messages
+	 */
+	def gormErrorsTest = {
+
+		def app = new AssetEntity(assetName:'Test app', validation:'Foo', )
+		if (app.validate())
+			render "No errors with validation"
+		else {
+			def s = "We got errors<br/>${GormUtil.errorsAsUL(app)}"
+			render s
+		}
+
+	}
 
 }

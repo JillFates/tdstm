@@ -358,7 +358,12 @@ def messageSource
 						// If trying to set to NULL - call the closure to update the property and move on
 						if (it.importValue == "NULL") {
 							// Set the property to NULL appropriately
-							assetEntityAttributeLoaderService.setToNullOrBlank(application, it.importValue, nullProps, blankProps)
+							assetEntityAttributeLoaderService.setToNullOrBlank(application, attribName, it.importValue, nullProps, blankProps)
+							if (newVal) {
+								// Error messages are returned otherwise it updated
+								warnings << "$newVal for row $rowNum, asset $assetEntity"
+								errorConflictCount++
+							}
 							return
 						}
 
@@ -538,8 +543,12 @@ def messageSource
 						// If trying to set to NULL - call the closure to update the property and move on
 						if (it.importValue == "NULL") {
 							// Set the property to NULL appropriately
-							assetEntityAttributeLoaderService.setToNullOrBlank(files, it.importValue, nullProps, blankProps)
-
+							assetEntityAttributeLoaderService.setToNullOrBlank(files, attribName, it.importValue, nullProps, blankProps)
+							if (newVal) {
+								// Error messages are returned otherwise it updated
+								warnings << "$newVal for row $rowNum, asset $assetEntity"
+								errorConflictCount++
+							}
 							return
 						}
 
@@ -675,7 +684,7 @@ def messageSource
 						// If trying to set to NULL - call the closure to update the property and move on
 						if (it.importValue == "NULL") {
 							// Set the property to NULL appropriately
-							assetEntityAttributeLoaderService.setToNullOrBlank(database, it.importValue, nullProps, blankProps)
+							assetEntityAttributeLoaderService.attribNameOrBlank(database, attribName, it.importValue, nullProps, blankProps)
 
 							return
 						}
