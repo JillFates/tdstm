@@ -219,7 +219,7 @@ class AssetEntityController {
 			projectInstance = Project.findById( projectId )
 			moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
 		}
-		dataTransferSetExport = DataTransferSet.findAll(" from DataTransferSet dts where dts.transferMode IN ('B','E') ")
+		dataTransferSetExport = DataTransferSet.findAll("from DataTransferSet dts where dts.transferMode IN ('B','E') ")
 		if( projectId == null ) {
 			//get project id from session
 			def currProj = getSession().getAttribute( "CURR_PROJ" )
@@ -237,14 +237,14 @@ class AssetEntityController {
 		def	dataTransferBatchs = DataTransferBatch.findAllByProject(project).size()
 		
 		def prefMap = [:]
-		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency','ImportRoom','ImportRack'].each{t->
+		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency','ImportRoom','ImportRack'].each {t->
 		   prefMap << [(t) : userPreferenceService.getPreference(t)]
 		}
 		
-		render (view:"exportAssets",model : [projectId: projectId,
-						dataTransferBatchs:dataTransferBatchs, prefMap:prefMap,
-					moveBundleInstanceList: moveBundleInstanceList,
-					dataTransferSetExport: dataTransferSetExport])
+		render (view:"exportAssets", model : [projectId: projectId,
+			dataTransferBatchs:dataTransferBatchs, prefMap:prefMap,
+			moveBundleInstanceList: moveBundleInstanceList,
+			dataTransferSetExport: dataTransferSetExport])
 	}
 	/* ---------------------------------------------------
 	 * To upload the Data from the ExcelSheet
@@ -803,13 +803,13 @@ class AssetEntityController {
 			added = serverAdded + appAdded + dbAdded + filesAdded + dependencyAdded
 			
 			flash.message = "<b>Spreadsheet import was successful</b>" +
-				( flagToManageBatches ? '<p>Please click the Manage Batches to review and post these changes</p>' : '' ) +
+				( flagToManageBatches ? '<p>Please click the Manage Batches below to review and post these changes</p>' : '' ) +
 				'<p>Results: <ul>' +
-				"<li>${serverAdded} Servers added" + 
-				"<li>$appAdded Applications added" + 
-				"<li>$dbAdded Databases added" +
-				"<li>$filesAdded Storage added" + 
-				"<li>$dependencyAdded Dependency added" + 
+				"<li>${serverAdded} Servers loaded" + 
+				"<li>$appAdded Applications loaded" + 
+				"<li>$dbAdded Databases loaded" +
+				"<li>$filesAdded Storage loaded" + 
+				"<li>$dependencyAdded Dependency loaded" + 
 				warnMsg +
 				( skipped.size() ? "${skipped.size()} spreadsheet rows were skipped: <ul><li>${skipped.join('<li>')}</ul>" : '' ) +
 				'</ul></p>'
@@ -1116,7 +1116,8 @@ class AssetEntityController {
 									if (pos == 0) continue
 									addContentToSheet = new jxl.write.Number(serverMap[colName], r, (Double)pos )
 								} else if(attribute == "retireDate" || attribute == "maintExpDate"){
-									addContentToSheet = new Label(serverMap[colName], r, (asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll]) ? fileFormat.format(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll])) :''))
+									addContentToSheet = new Label(serverMap[colName], r, 
+										(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll]) ? fileFormat.format(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll])) :''))
 								} else if ( asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll]) == null ) {
 									// Skip populating the cell if it is null
 									continue
@@ -1199,6 +1200,9 @@ class AssetEntityController {
 									case ~/ShutdownFixed|StartupFixed|TestingFixed/:
 										colVal = app[assetColName] ? 'Yes' : 'No'
 										//log.info "export() : field class type=$app[assetColName].className()}"
+										break
+									case ~/maintExpDate|retireDate/:
+										colVal = app[assetColName] ? fileFormat.format(app[assetColName]) : ''
 										break
 									default:
 										colVal = app[assetColName]

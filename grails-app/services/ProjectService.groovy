@@ -10,6 +10,7 @@ class ProjectService {
     static transactional = true
 	def securityService
 	def partyRelationshipService
+	def jdbcTemplate
 	
 	/*
 	 * Returns list of completed Project means projects whose completion time is less than today's date
@@ -223,4 +224,25 @@ class ProjectService {
 		def attributes = EavAttribute.findAllByEntityType( eavEntityType )
 		return attributes
 	}
+
+	/**
+	 * Used to get the next asset tag for the project
+	 * @param Project - the project the project that the asset tag is for
+	 * @param AssetEntity - the asset that the tag will be generated for
+	 * @return String the actual asset tag
+	 */
+	def getNewAssetTag( project, asset ) {
+		def tag = ''
+		if (asset.id) {
+			tag = "TDS-${asset.id}"
+		} else {
+			def lastAssetId = project.lastAssetId
+			if (! lastAssetId) {
+				lastAssetId = jdbcTemplate.queryForInt("select max(asset_entity_id) FROM asset_entity") + 1
+			}
+			tag = "TDS-${lastAssetId}"
+			project.lastAssetId = ++lastAssetId
+		}
+		return tag
+	} 
 }

@@ -141,12 +141,13 @@ class PartyRelationshipService {
 	}
 
 	/* 
-	 * Used to assign a person to a compnay
+	 * Used to assign a person to a company as a Staff member
 	 * @param Party company
 	 * @param Person person to assign
+	 * @return The PartyRelationship record or null if it failed
 	 */
 	def addCompanyStaff( company, person ) {
-		updatePartyRelationshipPartyIdFrom("STAFF", company, 'COMPANY', person, "STAFF")
+		return updatePartyRelationshipPartyIdFrom('STAFF', company, 'COMPANY', person, 'STAFF')
 	}
 
 	/*
@@ -207,22 +208,37 @@ class PartyRelationshipService {
 		}
 	}
 	/*
-	 *  Method to update PartyIdFrom
+	 * Used to find or create a PartyRelationship m
+	 * @param String - the relationship type
+	 * @param Party - the from party in the relationship
+	 * @param String - the from party type in the relationship
+	 * @param Party - the to party in the relationship
+	 * @param String - the to party type in the relationship
+	 * @return PartyRelationship	 
 	 */
-	def updatePartyRelationshipPartyIdFrom( def relationshipType, def partyIdFrom, def roleTypeIdFrom, def partyIdTo, def roleTypeIdTo ){
-		def partyRelationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = '$relationshipType' and p.partyIdTo = $partyIdTo.id and p.roleTypeCodeFrom = '$roleTypeIdFrom' and p.roleTypeCodeTo = '$roleTypeIdTo' ")
-		def newPartyRelationship
-		def partyRelationshipType = PartyRelationshipType.findById( relationshipType )
-		def roleTypeFrom = RoleType.findById( roleTypeIdFrom )
-		def roleTypeTo = RoleType.findById( roleTypeIdTo )
-		if(partyRelationship == null){
-			newPartyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyIdFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyIdTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true )
-		}else{
-			partyRelationship.delete(flush:true)
-			newPartyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyIdFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyIdTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true )
-			
+	PartyRelationship updatePartyRelationshipPartyIdFrom( String relationshipType, Party partyIdFrom, String roleTypeIdFrom, Party partyIdTo, String roleTypeIdTo ){
+		def partyRelationship = PartyRelationship.find(
+			'from PartyRelationship p where p.partyRelationshipType.id = ? and p.partyIdFrom = ? and p.roleTypeCodeFrom.id = ? and p.partyIdTo = ?  and p.roleTypeCodeTo.id = ? ',
+			[relationshipType, partyIdFrom, roleTypeIdFrom, partyIdTo, roleTypeIdTo] )
+
+		if (! partyRelationship ) {
+			def partyRelationshipType = PartyRelationshipType.findById( relationshipType )
+			def roleTypeFrom = RoleType.findById( roleTypeIdFrom )
+			def roleTypeTo = RoleType.findById( roleTypeIdTo )
+			partyRelationship = new PartyRelationship( 
+				partyRelationshipType:partyRelationshipType, 
+				partyIdFrom:partyIdFrom, 
+				roleTypeCodeFrom:roleTypeFrom, 
+				partyIdTo:partyIdTo, 
+				roleTypeCodeTo:roleTypeTo, 
+				statusCode:"ENABLED" )
+			if ( ! partyRelationship.validate() || ! partyRelationship.save( insert:true, flush:true ) ) {
+				log.error "updatePartyRelationshipPartyIdFrom() failed to create relationship " + GormUtil.allErrorsString(PartyRelationship)				
+				partyRelationship = null
+			}
 		}
-		
+
+		return partyRelationship
 	}
 	
 	/*
@@ -271,13 +287,17 @@ class PartyRelationshipService {
 		}
 		return list
 	}
+
 	/**
-	 *  Returns a list of staff for a specified Company or list of Companies
-	 * @param Project
+	 * Returns a list of staff for a specified Company or list of Companies
+	 * @param A single Party (company) or list of companies
 	 * @return Map[] - array of maps contain each Staff relationship to a project
 	 */
-	def getAllCompaniesStaff( def companies ) {
+	def getAllCompaniesStaff( companies ) {
 		def list = []
+
+		if (! companies instanceof List) 
+			companies = [companies]
 
 		def relations = PartyRelationship.findAll("FROM PartyRelationship p WHERE p.partyRelationshipType='STAFF' AND " +
 			"p.partyIdFrom IN (:companies) AND p.roleTypeCodeFrom='COMPANY'", [companies:companies])
@@ -298,6 +318,25 @@ class PartyRelationshipService {
 			list<<map
 		}
 		return list
+	}
+
+	/**
+	 * Returns a unique list of staff (Person) objects for a specified Company or list of Companies sorted by lastname, first middle
+	 * @param A single Party (company) or list of companies
+	 * @return List of unique persons that are staff of the company or companies
+	 */
+	def getAllCompaniesStaffPersons( companies ) {
+
+		if (! companies instanceof List) 
+			companies = [companies]
+
+		def staffing = PartyRelationship.findAll("FROM PartyRelationship p WHERE p.partyRelationshipType='STAFF' AND " +
+			"p.partyIdFrom IN (:companies) AND p.roleTypeCodeFrom='COMPANY'", [companies:companies])
+
+		def persons = staffing*.partyIdTo
+		persons.sort  { a, b -> a.lastNameFirst.compareToIgnoreCase b.lastNameFirst }
+
+		return persons
 	}
 
 	/*

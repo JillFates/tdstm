@@ -15,16 +15,19 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import com.tdsops.tm.enums.domain.SizeScale
 
 class DataTransferBatchController {
 	// Objects to be injected
-    def sessionFactory
-    def assetEntityAttributeLoaderService
-    def jdbcTemplate
+	def sessionFactory
+	def assetEntityService
+	def assetEntityAttributeLoaderService
+	def jdbcTemplate
 	def securityService
+	def partyRelationshipService
 	def personService
+
+def messageSource
 
 	// Data used within some of the controller methods
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
@@ -34,653 +37,79 @@ class DataTransferBatchController {
 		'sourceTeamDba':'DB_ADMIN','targetTeamDba':'DB_ADMIN'
 	]
 
+	protected static formatter = new SimpleDateFormat("M-d-yyyy")
+
 	/**
 	 * The default index page loads the list page
 	 */
-    def index = { redirect(action:list, params:params) }
+	def index = { redirect(action:list, params:params) }
 
-    // the delete, save and update actions only accept POST requests
-    def allowedMethods = [save:'POST', update:'POST']
-    /* --------------------------------------------------------------------------
-     * Return list of dataTransferBatchs for associated Project and Mode = Import
-     * @param projectId
-     * @author Lokanath
-     * @return dataTransferBatchList
-     * -------------------------------------------------------------------------- */
-    def list = {
-    	if(params.message){
-    		flash.message = params.message
-    	}
-    	def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+	// the delete, save and update actions only accept POST requests
+	def allowedMethods = [save:'POST', update:'POST']
+
+
+	/**
+	 * Return list of dataTransferBatchs for associated Project and Mode = Import
+	 * @param projectId
+	 * @return dataTransferBatchList
+	 */
+	def list = {
+		if(params.message){
+			flash.message = params.message
+		}
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		
 		def project = Project.findById( projectId )
 		if( !params.max ) params.max = 10
 		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( project, "I", 
-				[sort:"dateCreated", order:"desc",max:params.max,offset:params.offset ? params.offset : 0] )
+			[sort:"dateCreated", order:"desc", max:params.max,offset:params.offset ? params.offset : 0] )
 		
 		def isMSIE = false
 		def userAgent = request.getHeader("User-Agent")
 		if (userAgent.contains("MSIE") || userAgent.contains("Firefox"))
 			isMSIE = true
 		return [ dataTransferBatchList:dataTransferBatchList, projectId:projectId, isMSIE:isMSIE ]
-    }
-
-    /* -----------------------------------------------------------------------
-     * Process DataTransfervalues Corresponding to DataTransferBatch
-     * @param dataTransferBach
-     * @author Lokanath
-     * @return process the dataTransferBatch and return to datatransferBatchList
-     * -------------------------------------------------------------------------    */
-    def serverProcess = {
-    	sessionFactory.getCurrentSession().flush();
-    	sessionFactory.getCurrentSession().clear();
-    	session.setAttribute("TOTAL_BATCH_ASSETS",0)
-    	session.setAttribute("TOTAL_PROCESSES_ASSETS",0)
-		def formatter = new SimpleDateFormat("yyyy-MM-dd")
-		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
-		def assetEntityErrorList = []
-		def assetsList = new ArrayList()
-		def project
-		def nullFProps = GormUtil.getDomainPropertiesWithConstraint( AssetEntity, 'nullable', false )
-		def blankFProps = GormUtil.getDomainPropertiesWithConstraint( AssetEntity, 'blank', false )
-		def nullAndBlankFProps = nullFProps.intersect( blankFProps )// list of props having both constraints (nullable, blank)false
-		
-		DataTransferBatch.withTransaction { status ->
-			project = securityService.getUserCurrentProject()
-    		def dataTransferBatch
-    		def insertCount = 0
-    		def errorConflictCount = 0
-    		def updateCount = 0
-    		def errorCount = 0
-    		def batchRecords = 0
-			def unknowAssetIds = 0
-			def unknowAssets = ""
-			def modelAssetsList = new ArrayList()
-    		def existingAssetsList = new ArrayList()
-    		try {
-    			dataTransferBatch = DataTransferBatch.get(params.batchId)
-				if (dataTransferBatch.eavEntityType?.domainName == "AssetEntity") {
-    				batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = $dataTransferBatch.id ")[0]
-    				def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = "+
-    					"$dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
-    				def assetsSize = dataTransferValueRowList.size()
-    				session.setAttribute("TOTAL_BATCH_ASSETS",assetsSize)
-					def dataTransferValues = DataTransferValue.findAllByDataTransferBatch( dataTransferBatch )
-					def eavAttributeSet = EavAttributeSet.findById(1)
-					
-    				for( int dataTransferValueRow =0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
-    					def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
-    					def dtvList = dataTransferValues.findAll{ it.rowId== rowId } //DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
-    					def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-    					def flag = 0
-    					def isModified = "false"
-    					def isNewValidate
-    					def isFormatError = 0
-		    			def assetEntity
-		    			if( assetEntityId ) {
-		    				assetEntity = AssetEntity.get(assetEntityId)
-							if(assetEntity && assetEntity.project?.id == project.id ){
-								existingAssetsList.add( assetEntity )
-			    				if ( dataTransferBatch.dataTransferSet.id == 1 ) {
-			    					def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, assetEntity, dtvList, project )
-			    					flag = validateResultList[0]?.flag
-			    					errorConflictCount += validateResultList[0]?.errorConflictCount 
-			    					if( flag == 0 ) {
-			    						isNewValidate = "false"
-			    					}else {
-			    						errorCount++
-			    					}
-			    				} else {
-			    					flag = 0;
-			    				}
-							} else if(assetEntity && assetEntity.project?.id != project.id){
-								assetEntity = new AssetEntity()
-								assetEntity.attributeSet = eavAttributeSet
-								isNewValidate = "true"
-						    } 
-		    			} else if(!assetEntityId) {
-		    				assetEntity = new AssetEntity()
-		    				assetEntity.attributeSet = eavAttributeSet
-		    				isNewValidate = "true"
-							log.info "serverProcess - creating new asset for rowId $rowId"
-		    			}
-						def cloneEntity = retainNotNullVal(assetEntity, nullFProps, isNewValidate)
-						
-    					if( assetEntity && flag == 0 ) {
-    						assetEntity.project = project
-    						assetEntity.owner = project.client
-    						dtvList.each {
-    							def attribName = it.eavAttribute.attributeCode
-								switch(attribName){
-									case "sourceTeamMt":
-									case "targetTeamMt":
-									case "sourceTeamLog":
-									case "targetTeamLog":
-									case "sourceTeamSa":
-									case "targetTeamSa":
-									case "sourceTeamDba":
-									case "targetTeamDba":
-										def bundleInstance = assetEntity.moveBundle 
-	    								def teamInstance = assetEntityAttributeLoaderService.getdtvTeam(it, bundleInstance, bundleTeamRoles.get(attribName) ) 
-	    								if( assetEntity."$attribName" != teamInstance || isNewValidate == "true" ) {
-	    									isModified = "true"
-	    									assetEntity."$attribName" = teamInstance
-	    								}
-										break;
-									case "moveBundle":
-	    								def moveBundleInstance = assetEntityAttributeLoaderService.getdtvMoveBundle(it, project ) 
-					    				if( assetEntity."$attribName" != moveBundleInstance || isNewValidate == "true" ) {
-	    									isModified = "true"
-	    									assetEntity."$attribName" = moveBundleInstance 
-	    								}
-										break;
-									case "manufacturer":
-										def manufacturerName = it.correctedValue ? it.correctedValue : it.importValue
-	 									def manufacturerInstance = assetEntityAttributeLoaderService.getdtvManufacturer( manufacturerName ) 
-					    				if( assetEntity."$attribName" != manufacturerInstance || isNewValidate == "true" ) {
-	    									isModified = "true"
-	    									assetEntity."$attribName" = manufacturerInstance 
-	    								}
-										break;
-									case "model":
-										def modelInstance = assetEntityAttributeLoaderService.getdtvModel(it, dtvList, assetEntity) 
-					    				if( assetEntity."$attribName" != modelInstance || isNewValidate == "true" ) {
-	    									isModified = "true"
-	    									assetEntity."$attribName" = modelInstance 
-											modelAssetsList.add(assetEntity)
-	    								}
-										break;
-									case "assetType":
-										if(assetEntity.model){ //if model already exist considering model's asset type and ignoring imported asset type.
-											assetEntity."$attribName" = assetEntity.model.assetType
-										} else {
-	    									assetEntity."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
-	    								}
-										//Storing imported asset type in EavAttributeOptions table if not exist
-										assetEntityAttributeLoaderService.findOrCreateAssetType(it.importValue, true)
-										break;
-									case "validation":
-										if(!it.importValue){
-											assetEntity."$attribName" = 'Discovery'
-										} else {
-											assetEntity."$attribName" = it.importValue
-										}
-										break;
-									case "planStatus":
-										if(!it.importValue){
-											assetEntity."$attribName" = 'Unassigned'
-										} else {
-											assetEntity."$attribName" = it.importValue
-										}
-										break;
-									case ~/retireDate|maintExpDate/:
-										if(it.importValue && it.importValue.trim() != "NULL"){
-											isModified = "true"
-											assetEntity."$attribName" = GormUtil.convertInToGMT(formatter.parse( it.importValue ), tzId)
-										}
-										break;
-									case "usize":
-										// Skip the insertion
-										break;
-									case ~/size|rateOfChange/:
-										assetEntity."$attribName" = it.importValue ? NumberUtils.toDouble(it.importValue, 0).round()  : 0
-										break;
-									case "scale":
-										assetEntity."$attribName" = SizeScale.asEnum( it.importValue )
-										break;
-									default:
-										if( it.eavAttribute.backendType == "int"){
-		    								def correctedPos
-		    								try {
-		    									if( it.correctedValue ) {
-		    										correctedPos = NumberUtils.toDouble(it.correctedValue.trim(), 0).round()
-		    									} else if( it.importValue ) {
-		    										correctedPos = NumberUtils.toDouble(it.importValue.trim(), 0).round()
-		    									}
-		    									//correctedPos = it.correctedValue
-												if( assetEntity."$attribName" != correctedPos || isNewValidate == "true" ) {
-													isModified = "true"
-													assetEntity."$attribName" = correctedPos 
-		    	        						}
-		    								} catch ( Exception ex ) {
-												log.error "serverProcess - unexpected exception 1 - " + ex.toString()
-		    									errorConflictCount++
-		    									it.hasError = 1
-		    									it.errorText = "format error"
-		    									it.save()
-		    									dataTransferBatch.hasErrors = 1
-		    									isFormatError = 1
-		    								}
-		    							} else {
-		    								try{
-			    								if( ( ( it.correctedValue == null || assetEntity."$attribName" != it.correctedValue ) && assetEntity."$attribName" != it.importValue) || isNewValidate == "true"  ) {
-			    									isModified = "true"
-													if(("$attribName" == "assetTag" || "$attribName" == "assetName" ) && !it.importValue){
-														if(assetEntity?.id){
-															assetEntity."$attribName" = "TDS-${assetEntity?.id}"
-														} else {
-															def lastAssetId = project.lastAssetId
-															if(!lastAssetId){
-																lastAssetId = jdbcTemplate.queryForInt("select max(asset_entity_id) FROM asset_entity WHERE project_id = ${project.id}")
-															}
-															while(AssetEntity.findByAssetTagAndProject("TDS-${lastAssetId}",project)){
-																lastAssetId++
-															}
-															assetEntity."$attribName" = "TDS-${lastAssetId}"
-															project.lastAssetId = lastAssetId + 1
-														}
-													} else {
-														assetEntity."$attribName" = it.correctedValue ?: it.importValue
-													}
-			    								}
-		    								} catch ( Exception ex ) {
-												log.error "serverProcess - unexpected exception 2 - " + ex.toString()
-		    									errorConflictCount++
-		    									it.hasError = 1
-		    									it.errorText = "Asset Tag should not be blank"
-		    									it.save()
-		    									dataTransferBatch.hasErrors = 1
-		    									isFormatError = 1
-		    								}
-		    							}
-										break
-								}
-								//If imported "NULL" and field allows blank and null updating value to null 
-								if(it.importValue == "NULL"){
-									def type = GrailsClassUtils.getPropertyType(Database, attribName)?.getName()
-									if( !nullFProps.contains( attribName ) ) {
-										assetEntity."$attribName" = null
-									} else {
-										if( !blankFProps.contains( attribName ) )
-											assetEntity."$attribName" = ""
-										if ( nullAndBlankFProps.contains( attribName ) && type=="java.lang.String" ){
-											assetEntity."$attribName" =  "NULL"
-										} else {
-											assetEntity."$attribName" =  cloneEntity."$attribName"
-											log.info "Imported invalid value 'NULL' which is not allowed for $attribName property."
-										}
-									}
-								}
-    						}
-    						if ( isFormatError != 1 ) {
-    							if( isModified == "true" ) {
-        							if ( isNewValidate == "true" ) {
-        								if( assetEntity.save(flush:true) ) {
-        									insertCount++
-        								}
-        							} else {
-        								if( assetEntity.save(flush:true) ) {
-        									updateCount++
-        								}
-        							}
-									if(assetEntity?.id)
-										assetsList.add(assetEntity?.id)
-    							}
-    						} else {
-    							errorCount++
-								log.warn "serverProcess - performing discard for rowId $rowId"
-    							assetEntity.discard()
-    						}
-    						if(dataTransferValueRow % 50 == 0) {
-    							sessionFactory.getCurrentSession().flush();
-    							sessionFactory.getCurrentSession().clear();
-    						}
-    						session.setAttribute("TOTAL_PROCESSES_ASSETS",dataTransferValueRow)
-    					}
-    				} // for loop
-  
-    				def dataTransferCommentRowList = DataTransferComment.findAll(" From DataTransferComment dtc where dtc.dataTransferBatch = "+
-    																	"$dataTransferBatch.id and dtc.dataTransferBatch.statusCode = 'PENDING'")
-    				if (dataTransferCommentRowList){
-    					dataTransferCommentRowList.each{
-    						def assetComment
-    						def assetEntity = AssetEntity.get(it.assetId)
-    						if(assetEntity){
-    							def principal = SecurityUtils.subject.principal
-    							def loginUser = UserLogin.findByUsername(principal)
-    							if(it.commentId){
-    								assetComment = AssetComment.findById(it.commentId)
-    							} 
-    							if(!assetComment){
-    								assetComment = new AssetComment()
-    								assetComment.mustVerify = 0
-    							}
-    							assetComment.comment = it.comment
-    							assetComment.commentType = it.commentType
-    							assetComment.createdBy = loginUser.person
-    							assetComment.assetEntity = assetEntity
-    							assetComment.save()
-    						}
-    					}
-    				}
-					
-					sessionFactory.getCurrentSession().flush();
-					sessionFactory.getCurrentSession().clear();
-					project = project.merge()
-					
-					if(!project.save(flush:true)){
-						println"Error while updating project.lastAssetId : ${project}"
-						project.errors.each { println it }
-					}
-					
-    				dataTransferBatch.statusCode = 'COMPLETED'
-					if(!dataTransferBatch.save(flush:true)){
-						dataTransferBatch.errors.allErrors.each { println it}
-					}
-					
-					/* update assets racks, cabling data once process done */
-					updateAssetsCabling( modelAssetsList, existingAssetsList )
-    			}
-			} catch (Exception e) {
-				log.error "serverProcess - Unexpected error, rolling back - " + e.printStackTrace()
-				insertCount = 0
-				updateCount = 0
-    			status.setRollbackOnly()
-				flash.message = "Import Batch process failed"
-    		}
- 			// END OF TRY
-
-   			def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
-    		flash.message = " Process Results:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
-				"<li>Records Updated: ${updateCount}</li><li>Asset Errors: ${errorCount} </li> "+
-				"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> " 
-    	}
-		session.setAttribute("IMPORT_ASSETS", assetsList)
-		redirect ( action:list, params:[projectId:project.id ] )
-     }
-	
-	def appProcess ={
-    	sessionFactory.getCurrentSession().flush();
-    	sessionFactory.getCurrentSession().clear();
-    	session.setAttribute("TOTAL_BATCH_ASSETS",0)
-    	session.setAttribute("TOTAL_PROCESSES_ASSETS",0)
-		session.getAttribute(null)
-		def formatter = new SimpleDateFormat("yyyy-dd-MM hh:mm:ss")
-		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
-    	def assetEntityErrorList = []
-		def assetsList = new ArrayList()
-		def project
-		def nullFProps = GormUtil.getDomainPropertiesWithConstraint( Application, 'nullable', false )
-		def blankFProps = GormUtil.getDomainPropertiesWithConstraint( Application, 'blank', false )
-		def nullAndBlankFProps  = nullFProps.intersect( blankFProps ) // list of props having both constraints (nullable, blank)false
-		
-		DataTransferBatch.withTransaction { status ->
-			project = securityService.getUserCurrentProject()			
-    		def dataTransferBatch
-    		def insertCount = 0
-    		def errorConflictCount = 0
-    		def updateCount = 0
-    		def errorCount = 0
-    		def batchRecords = 0
-			def unknowAssetIds = 0
-			def unknowAssets = ""
-			def modelAssetsList = new ArrayList()
-    		def existingAssetsList = new ArrayList()
-			def application
-			def warnings = []
-    		try{
-    			dataTransferBatch = DataTransferBatch.get(params.batchId)
-    				batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = $dataTransferBatch.id ")[0]
-    				def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = "+
-    															"$dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
-    				def assetsSize = dataTransferValueRowList.size()
-    				session.setAttribute("TOTAL_BATCH_ASSETS",assetsSize)
-					def dataTransferValues = DataTransferValue.findAllByDataTransferBatch( dataTransferBatch )
-					def eavAttributeSet = EavAttributeSet.findById(2)
-					
-    				for( int dataTransferValueRow =0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
-    					def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
-    					def dtvList = dataTransferValues.findAll{ it.rowId== rowId }//DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
-    					def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-    					def flag = 0
-    					def isModified = "false"
-    					def isNewValidate
-    					def isFormatError = 0
-		    			def assetEntity
-		    			if( assetEntityId ) {
-		    				application = Application.get(assetEntityId)
-							if(application && application.project?.id == project.id ){
-								existingAssetsList.add( application )
-			    				if ( dataTransferBatch?.dataTransferSet.id == 1 ) {
-			    					def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, application, dtvList, project )
-			    					flag = validateResultList[0]?.flag
-			    					errorConflictCount = errorConflictCount+validateResultList[0]?.errorConflictCount 
-			    					if( flag == 0 ) {
-			    						isNewValidate = "false"
-			    					}else {
-			    						errorCount++
-			    					}
-			    				} else {
-			    					flag = 0;
-			    				}
-							} else if(application && application.project?.id != project.id){
-								application = new Application()
-			    				application.attributeSet = eavAttributeSet
-			    				isNewValidate = "true"
-							}
-		    			} else if(!assetEntityId){
-		    				application = new Application()
-		    				application.attributeSet = eavAttributeSet
-		    				isNewValidate = "true"
-		    			}
-		    		
-    					if( application && flag == 0 ) {
-							def cloneEntity = retainNotNullVal(application, nullFProps, isNewValidate)
-    						application.project = project
-    						dtvList.each {
-    							def attribName = it.eavAttribute.attributeCode
-									switch(attribName){
-										case "moveBundle":
-											def moveBundleInstance = assetEntityAttributeLoaderService.getdtvMoveBundle(it, project )
-												isModified = "true"
-												application."$attribName" = moveBundleInstance
-											break;
-										case ~/retireDate|maintExpDate/:
-											if(it.importValue && it.importValue.trim() != "NULL"){
-												isModified = "true"
-												application."$attribName" = GormUtil.convertInToGMT(formatter.parse( it.importValue ), tzId)
-											}
-											break;
-										case "owner":
-											   application."$attribName" = application.owner
-											break;
-										case "validation":
-												if(!it.importValue){
-													application."$attribName" = "Discovery"
-												}else{
-											        application."$attribName" = it.importValue
-												}
-												break;
-										case "planStatus":
-												if(!it.importValue){
-													application."$attribName" = 'Unassigned'
-												} else {
-													application."$attribName" = it.importValue
-												}
-												break;
-										case ~/sme|sme2|appOwner/:
-											if(it.importValue && it.importValue.trim() != "NULL"){
-												def resultMap = personService.findOrCreatePerson(it.importValue, project)
-												application."$attribName" = it.importValue ? resultMap?.person : null
-												if(it.importValue && resultMap?.isAmbiguous){
-													def warnMsg = "Ambiguity in ${attribName} (${it.importValue}) for ${application.assetName}"
-													log.warn warnMsg
-													warnings << warnMsg
-												}
-											}
-													
-											 break;
-										case ~/shutdownBy|startupBy|testingBy/:
-											if(it.importValue && it.importValue != "NULL"){
-												if(it.importValue[0] in ['@', '#']){
-													application."$attribName" = it.importValue
-												} else {
-													def resultMap = personService.findOrCreatePerson(it.importValue, project)
-													application."$attribName" = resultMap?.person?.id
-													if(it.importValue && resultMap?.isAmbiguous){
-														def warnMsg = "Ambiguity in ${attribName} (${it.importValue}) for ${application.assetName}"
-														log.warn warnMsg
-														warnings << warnMsg
-													}
-												}
-											}
-											break;
-										case ~/shutdownFixed|startupFixed|testingFixed/:
-											if(it.importValue){
-												application."$attribName" = it.importValue.equalsIgnoreCase("yes") ? 1 : 0
-											}
-											break;
-										default:
-										if( it.eavAttribute.backendType == "int" ){
-		    								def correctedPos
-		    								try {
-		    									if( it.correctedValue ) {
-		    										correctedPos = NumberUtils.toDouble(it.correctedValue.trim(), 0).round()
-		    									} else if( it.importValue ) {
-		    										correctedPos = NumberUtils.toDouble(it.importValue.trim(), 0).round()
-		    									}
-		    									//correctedPos = it.correctedValue
-												if( application."$attribName" != correctedPos || isNewValidate == "true" ) {
-													isModified = "true"
-													application."$attribName" = correctedPos 
-		    	        						}
-		    								} catch ( Exception ex ) {
-											
-												log.error "appProcess - unexpected exception 1 - " + ex.printStackTrace()
-		    									errorConflictCount++
-		    									it.hasError = 1
-		    									it.errorText = "format error"
-		    									it.save()
-		    									dataTransferBatch.hasErrors = 1
-		    									isFormatError = 1
-		    								}
-		    							} else {
-		    								try{
-												application."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
-		    								} catch ( Exception ex ) {
-												log.error "appProcess - unexpected exception 2 - " + ex.toString()
-		    									errorConflictCount++
-		    									it.hasError = 1
-		    									it.save()
-		    									dataTransferBatch.hasErrors = 1
-		    									isFormatError = 1
-		    								}
-		    							}
-								}
-								//If imported "NULL" and field allows blank and null updating value to null
-								if(it.importValue == "NULL"){
-									def type = GrailsClassUtils.getPropertyType(Database, attribName)?.getName()
-									if( !nullFProps.contains( attribName ) ) {
-										application."$attribName" = null
-									} else {
-										if( !blankFProps.contains( attribName ) )
-											application."$attribName" = ""
-										if (nullAndBlankFProps.contains( attribName ) && type=="java.lang.String"){
-											application."$attribName" =  "NULL"
-										} else {
-											application."$attribName" =  cloneEntity."$attribName"
-											log.error "Imported invalid value 'NULL' which is not allowed for $attribName property."
-										}
-									}
-								}
-    						}
-								
-    						}
-    						if ( isFormatError != 1 ) {
-    							if( isModified == "true" ) {
-									application.assetType='Application'
-        							if ( isNewValidate == "true" ) {
-        								if( application.save() ) {
-                                   											
-        									insertCount++
-        								}
-        							} else {
-        								if( application.save() ) {
-        									updateCount++
-        								}
-        							}
-									if(application?.id)
-										assetsList.add(assetEntity?.id)
-    							}
-    						} else {
-    							errorCount++
-    							application.discard()
-    						}
-    						if(dataTransferValueRow % 50 == 49) {
-    							sessionFactory.getCurrentSession().flush();
-    							sessionFactory.getCurrentSession().clear();
-								/* 
-								 * Merging back the project to current session, 
-								 * As it is being detach after flushing and clearing hibernate session 
-								 */
-								project = project.merge()
-    						}
-    						session.setAttribute("TOTAL_PROCESSES_ASSETS",dataTransferValueRow)
-    					}
-    				def dataTransferCommentRowList = DataTransferComment.findAll(" From DataTransferComment dtc where dtc.dataTransferBatch = "+
-    																	"$dataTransferBatch.id and dtc.dataTransferBatch.statusCode = 'PENDING'")
-    				if(dataTransferCommentRowList){
-    					dataTransferCommentRowList.each{
-    						def assetComment
-    						def assetEntity = AssetEntity.get(it.assetId)
-    						if(assetEntity){
-    							def principal = SecurityUtils.subject.principal
-    							def loginUser = UserLogin.findByUsername(principal)
-    							if(it.commentId){
-    								assetComment = AssetComment.findById(it.commentId)
-    							} 
-    							if(!assetComment){
-    								assetComment = new AssetComment()
-    								assetComment.mustVerify = 0
-    							}
-    							assetComment.comment = it.comment
-    							assetComment.commentType = it.commentType
-    							assetComment.createdBy = loginUser.person
-    							assetComment.assetEntity = assetEntity
-    							assetComment.save()
-    						}
-    					}
-    				
-						}
-					
-    				dataTransferBatch.statusCode = 'COMPLETED'
-    				dataTransferBatch.save(flush:true)
-					
-    		}catch (Exception e) {
-				log.error "appProcess - Unexpected error, rolling back - " + e.printStackTrace()
-				status.setRollbackOnly()
-				e.printStackTrace()
-				flash.message = "Import Batch process failed"
-    		}
-    		def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
-    		flash.message = " Process Results:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
-    							"<li>Records Updated: ${updateCount}</li><li>Asset Errors: ${errorCount} </li> "+
-    							"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> "+
-								"<b>Warning:</b> <ul> ${WebUtil.getListAsli(warnings)}</ul>"
-    	}
-		session.setAttribute("IMPORT_ASSETS", assetsList)
-		redirect ( action:list, params:[projectId:project.id] )
-		
 	}
-	
-	
-	def fileProcess ={
-		sessionFactory.getCurrentSession().flush();
-		sessionFactory.getCurrentSession().clear();
+
+// TODO : JPM : 10/2013 - remove this function after done testing
+// Working on an improved version of the GormUtil function to get human readable error messages
+	def public static allErrorsString = { domain, separator= " : " ->
+		def text = new StringBuilder()
+		def first = true
+		domain.errors.allErrors.each { 
+			println message(error: it)
+//			text.append( (first ? '' : separator) + messageSource.getMessage(it, null) ) 
+			text.append( (first ? '' : separator) + message(error:it) ) 
+		}
+		
+		text.toString()
+	}
+
+	/**
+	 * Process DataTransfervalues corresponding to a DataTransferBatch for Servers
+	 * @param dataTransferBach
+	 * @return process the dataTransferBatch and return to datatransferBatchList
+	 */
+	def serverProcess = {
 		session.setAttribute("TOTAL_BATCH_ASSETS",0)
 		session.setAttribute("TOTAL_PROCESSES_ASSETS",0)
-		session.getAttribute(null)
-		def formatter = new SimpleDateFormat("yyyy-dd-MM hh:mm:ss")
+
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
-		def nullFProps = GormUtil.getDomainPropertiesWithConstraint( Files, 'nullable', false )
-		def blankFProps = GormUtil.getDomainPropertiesWithConstraint( Files, 'blank', false )
-		def nullAndBlankFProps  = nullFProps.intersect( blankFProps )// list of props having both constraints (nullable, blank)false
-		
+		def nullProps = GormUtil.getDomainPropertiesWithConstraint( AssetEntity, 'nullable', true )
+		def blankProps = GormUtil.getDomainPropertiesWithConstraint( AssetEntity, 'blank', true )
+		def newVal
+		def warnings = []
+		def ignoredAssets = []
+
+		log.debug "serverProcess() nullProps = $nullProps"
+		log.debug "serverProcess() blankProps = $blankProps"
+
 		DataTransferBatch.withTransaction { status ->
-			project = securityService.getUserCurrentProject()			
+			project = securityService.getUserCurrentProject()
+			def staffList = partyRelationshipService.getAllCompaniesStaffPersons(project.client)
 			def dataTransferBatch
 			def insertCount = 0
 			def errorConflictCount = 0
@@ -691,177 +120,114 @@ class DataTransferBatchController {
 			def unknowAssets = ""
 			def modelAssetsList = new ArrayList()
 			def existingAssetsList = new ArrayList()
-			def files
+
 			try {
 				dataTransferBatch = DataTransferBatch.get(params.batchId)
+				if (dataTransferBatch.eavEntityType?.domainName == "AssetEntity") {
 					batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = $dataTransferBatch.id ")[0]
 					def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = "+
-																"$dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
+						"$dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
 					def assetsSize = dataTransferValueRowList.size()
 					session.setAttribute("TOTAL_BATCH_ASSETS",assetsSize)
 					def dataTransferValues = DataTransferValue.findAllByDataTransferBatch( dataTransferBatch )
-					def eavAttributeSet = EavAttributeSet.findById(4)
+					def eavAttributeSet = EavAttributeSet.findById(1)
 					
 					for( int dataTransferValueRow =0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
 						def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
-						def dtvList = dataTransferValues.findAll{ it.rowId== rowId }//DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
+						def rowNum = rowId+1
+						def dtvList = dataTransferValues.findAll{ it.rowId== rowId } //DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
 						def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-						def flag = 0
-						def isModified = "false"
-						def isNewValidate
+						def isNewValidate = false
 						def isFormatError = 0
-						def assetEntity
-						if( assetEntityId ) {
-							files = Files.get(assetEntityId)
-							if(files && files.project?.id == project.id ){
-								existingAssetsList.add( files )
-								if ( dataTransferBatch?.dataTransferSet.id == 1 ) {
-									def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, files, dtvList, project )
-									flag = validateResultList[0]?.flag
-									errorConflictCount = errorConflictCount+validateResultList[0]?.errorConflictCount
-									if( flag == 0 ) {
-									}else {
-										errorCount++
-									}
-								} else {
-									flag = 0;
-								}
-							} else if(files && files.project?.id != project.id){
-								files = new Files()
-								files.attributeSet = eavAttributeSet
-								isNewValidate = "true"
-							}
-						} else if(!assetEntityId){
-							files = new Files()
-							files.attributeSet = eavAttributeSet
-							isNewValidate = "true"
+
+						def assetEntity = assetEntityAttributeLoaderService.findAndValidateAsset( AssetEntity, assetEntityId, project, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets)
+						if (assetEntity == null)
+							continue
+
+						if ( ! assetEntity.id ) {
+							isNewValidate = true
+							// Initialize extra properties for new asset
+						} else {
+							existingAssetsList << assetEntity
 						}
-					
-						if( files && flag == 0 ) {
-							def cloneEntity = retainNotNullVal(files, nullFProps, isNewValidate)
-							files.project = project
-							files.scale = "GB"
-							dtvList.each {
-								def attribName = it.eavAttribute.attributeCode
-									switch(attribName){
-										case "moveBundle":
-											def moveBundleInstance = assetEntityAttributeLoaderService.getdtvMoveBundle(it, project )
-												isModified = "true"
-												files."$attribName" = moveBundleInstance
-											break;
-										case ~/retireDate|maintExpDate/:
-											if(it.importValue && it.importValue != "NULL"){
-												isModified = "true"
-												files."$attribName" = GormUtil.convertInToGMT(formatter.parse( it.importValue ), tzId)
-											}
-											break;
-											break;
-										case "owner":
-												files."$attribName" = application.owner
-											break;
-										case ~/size|rateOfChange/:
-											files."$attribName" = it.importValue ? NumberUtils.toDouble(it.importValue, 0).round() : 0
-											break;
-										case "scale":
-											files."$attribName" = SizeScale.asEnum( it.importValue )
-											break;
-										case "validation":
-											if(!it.importValue){
-												files."$attribName" = "Discovery"
-											}else{
-												files."$attribName" = it.importValue
-											}
-											break;
-										case "planStatus":
-											if(!it.importValue){
-												files."$attribName" = 'Unassigned'
-											} else {
-												files."$attribName" = it.importValue
-											}
-											break;
-										default:
-										if( it.eavAttribute.backendType == "int"){
-											def correctedPos
-											try {
-												if( it.correctedValue ) {
-													correctedPos = Integer.parseInt(it.correctedValue.trim())
-												} else if( it.importValue ) {
-													correctedPos = Integer.parseInt(it.importValue.trim())
-												}
-												if( files."$attribName" != correctedPos || isNewValidate == "true" ) {
-													isModified = "true"
-													files."$attribName" = correctedPos
-												}
-											} catch ( Exception ex ) {
-												log.error "fileProcess - unexpected exception 1 - " + ex.toString()
-												errorConflictCount++
-												it.hasError = 1
-												it.errorText = "format error"
-												it.save()
-												dataTransferBatch.hasErrors = 1
-												isFormatError = 1
-											}
-										} else {
-											try{
-												files."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
-											} catch ( Exception ex ) {
-												log.error "fileProcess - unexpected exception 2 - " + ex.toString()
-												errorConflictCount++
-												it.hasError = 1
-												it.save()
-												dataTransferBatch.hasErrors = 1
-												isFormatError = 1
-											}
-										}
-									}
-									
-									if(it.importValue == "NULL"){
-										def type = GrailsClassUtils.getPropertyType(Database, attribName)?.getName()
-										if( !nullFProps.contains( attribName ) ) {
-											files."$attribName" = null
-										} else {
-											if( !blankFProps.contains( attribName ) )
-												files."$attribName" = ""
-											if (nullAndBlankFProps.contains( attribName ) && type=="java.lang.String"){
-												files."$attribName" =  "NULL"
-											} else {
-												files."$attribName" =  cloneEntity."$attribName"
-												log.error "Imported invalid value 'NULL' which is not allowed for $attribName property."
-											}
-										}
-									}
-									
+
+						// Iterate over the attributes to update the asset with
+						dtvList.each {
+							def attribName = it.eavAttribute.attributeCode
+
+							// If trying to set to NULL - call the closure to update the property and move on
+							if (it.importValue == "NULL") {
+								// Set the property to NULL appropriately
+								newVal = assetEntityAttributeLoaderService.setToNullOrBlank(assetEntity, attribName, it.importValue, nullProps, blankProps)
+								if (newVal) {
+									// Error messages are returned otherwise it updated
+									warnings << "$newVal for row $rowNum, asset $assetEntity"
+									errorConflictCount++
 								}
+								return
 							}
-							if ( isFormatError != 1 ) {
-								if( isModified == "true" ) {
-									files.assetType = 'Files'
-									if ( isNewValidate == "true" ) {
-										if( files.save() ) {
-											
-											insertCount++
-										}
+
+							switch (attribName) {
+								case "sourceTeamMt":
+								case "targetTeamMt":
+								case "sourceTeamLog":
+								case "targetTeamLog":
+								case "sourceTeamSa":
+								case "targetTeamSa":
+								case "sourceTeamDba":
+								case "targetTeamDba":
+									def bundleInstance = assetEntity.moveBundle 
+									def teamInstance = assetEntityAttributeLoaderService.getdtvTeam(it, bundleInstance, bundleTeamRoles.get(attribName) ) 
+									if( assetEntity[attribName] != teamInstance || isNewValidate ) {
+										assetEntity[attribName] = teamInstance
+									}
+									break
+								case "manufacturer":
+									def manufacturerName = it.correctedValue ? it.correctedValue : it.importValue
+									def manufacturerInstance = assetEntityAttributeLoaderService.getdtvManufacturer( manufacturerName ) 
+									if( assetEntity[attribName] != manufacturerInstance || isNewValidate ) {
+										assetEntity[attribName] = manufacturerInstance 
+									}
+									break
+								case "model":
+									def modelInstance = assetEntityAttributeLoaderService.getdtvModel(it, dtvList, assetEntity) 
+									if( assetEntity[attribName] != modelInstance || isNewValidate ) {
+										assetEntity[attribName] = modelInstance 
+										modelAssetsList.add(assetEntity)
+									}
+									break
+								case "assetType":
+									if(assetEntity.model){ 
+										//if model already exist considering model's asset type and ignoring imported asset type.
+										assetEntity[attribName] = assetEntity.model.assetType
 									} else {
-										if( files.save() ) {
-											updateCount++
-										}
+										assetEntity[attribName] = it.correctedValue ?: it.importValue
 									}
-									if(files?.id)
-										assetsList.add(assetEntity?.id)
-								}
-							} else {
-								errorCount++
-								files.discard()
+									//Storing imported asset type in EavAttributeOptions table if not exist
+									assetEntityAttributeLoaderService.findOrCreateAssetType(it.importValue, true)
+									break
+								case "usize":
+									// Skip the insertion
+									break
+								default: 
+									// Try processing all common properties
+									assetEntityAttributeLoaderService.setCommonProperties(project, assetEntity, it, rowNum, warnings, errorConflictCount)
 							}
-							if(dataTransferValueRow % 50 == 0) {
-								sessionFactory.getCurrentSession().flush();
-								sessionFactory.getCurrentSession().clear();
-							}
-							session.setAttribute("TOTAL_PROCESSES_ASSETS",dataTransferValueRow)
+
 						}
-					def dataTransferCommentRowList = DataTransferComment.findAll(" From DataTransferComment dtc where dtc.dataTransferBatch = "+
-																		"$dataTransferBatch.id and dtc.dataTransferBatch.statusCode = 'PENDING'")
-					if(dataTransferCommentRowList){
+
+						// Save the asset if it was changed or is new
+						(insertCount, updateCount) = assetEntityAttributeLoaderService.saveAssetChanges(
+							assetEntity, assetsList, insertCount, rowNum, updateCount, warnings)
+
+						// Update status and clear hibernate session
+						assetEntityAttributeLoaderService.updateStatusAndClear(project, dataTransferValueRow, sessionFactory, session)
+
+					} // for loop
+  
+					def dataTransferCommentRowList = DataTransferComment.findAll(" From DataTransferComment dtc where dtc.dataTransferBatch = " +
+						"$dataTransferBatch.id and dtc.dataTransferBatch.statusCode = 'PENDING'")
+					if (dataTransferCommentRowList){
 						dataTransferCommentRowList.each{
 							def assetComment
 							def assetEntity = AssetEntity.get(it.assetId)
@@ -870,7 +236,7 @@ class DataTransferBatchController {
 								def loginUser = UserLogin.findByUsername(principal)
 								if(it.commentId){
 									assetComment = AssetComment.findById(it.commentId)
-								}
+								} 
 								if(!assetComment){
 									assetComment = new AssetComment()
 									assetComment.mustVerify = 0
@@ -882,45 +248,399 @@ class DataTransferBatchController {
 								assetComment.save()
 							}
 						}
+					}
 					
+					sessionFactory.getCurrentSession().flush();
+					sessionFactory.getCurrentSession().clear();
+					project = project.merge()
+					
+					if (!project.save(flush:true)) {
+						GormUtil.allErrorsString(project)
+						throw new RuntimeException("Unable to update project.lastAssetId")
 					}
 					
 					dataTransferBatch.statusCode = 'COMPLETED'
-					dataTransferBatch.save(flush:true)
-			}catch (Exception e) {
-				log.error "fileProcess - Unexpected error, rolling back - " + e.printStackTrace()
+					if (!dataTransferBatch.save(flush:true)) {
+						GormUtil.allErrorsString(dataTransferBatch)
+						throw new RuntimeException("Unable to update the transfer batch status to COMPLETED")
+					}
+					
+					// update assets racks, cabling data once process done
+					assetEntityService.updateAssetsCabling( modelAssetsList, existingAssetsList )
+				}
+			} catch (Exception e) {
 				status.setRollbackOnly()
+				insertCount = 0
+				updateCount = 0
+				log.error "serverProcess() Unexpected error - rolling back : " + e.getMessage()
 				e.printStackTrace()
-				flash.message = "Import Batch process failed"
+				warnings << "Encounted unexpected error: ${e.getMessage()}"
+				warnings << "<b>The Import was NOT processed</b>"
 			}
+			// END OF TRY
+
 			def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
-			flash.message = " Process Results:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
-								"<li>Records Updated: ${updateCount}</li><li>Asset Errors: ${errorCount} </li> "+
-								"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> "
+
+			def sb = new StringBuilder("<b>Process Results:</b><ul>" + 
+				"<li>Assets in Batch: ${batchRecords}</li>" + 
+				"<li>Records Inserted: ${insertCount}</li>"+
+				"<li>Records Updated: ${updateCount}</li>" + 
+				"<li>Asset Errors: ${errorCount} </li> "+
+				"<li>Attribute Errors: ${errorConflictCount}</li>" +
+				"<li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li>" + 
+				"</ul><b>Warnings:</b><ul>" + 
+				WebUtil.getListAsli(warnings)
+			)
+
+			appendIgnoredAssets(sb, ignoredAssets)
+			sb.append('</ul>')
+			sb = sb.toString()
+
+			log.info sb
+			flash.message = sb
 		}
+
 		session.setAttribute("IMPORT_ASSETS", assetsList)
-		redirect ( action:list, params:[ projectId:project.id ] )
-		
+		redirect ( action:list, params:[projectId:project.id ] )
 	}
 	
-	def dbProcess={
-		sessionFactory.getCurrentSession().flush();
-		sessionFactory.getCurrentSession().clear();
+	/**
+	 * Process DataTransfervalues corresponding to a DataTransferBatch for Applications
+	 * @param dataTransferBach
+	 * @return process the dataTransferBatch and return to datatransferBatchList
+	 */
+	def appProcess = {
 		session.setAttribute("TOTAL_BATCH_ASSETS",0)
 		session.setAttribute("TOTAL_PROCESSES_ASSETS",0)
-		session.getAttribute(null)
-		def formatter = new SimpleDateFormat("yyyy-dd-MM hh:mm:ss")
+		// session.getAttribute(null)
+
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def assetEntityErrorList = []
 		def assetsList = new ArrayList()
 		def project
-		def nullFProps = GormUtil.getDomainPropertiesWithConstraint( Database, 'nullable', false )
-		def blankFProps = GormUtil.getDomainPropertiesWithConstraint( Database, 'blank', false )
-		def nullAndBlankFProps  = nullFProps.intersect( blankFProps )// list of props having both constraints (nullable, blank)false
+		def nullProps = GormUtil.getDomainPropertiesWithConstraint( Application, 'nullable', true )
+		def blankProps = GormUtil.getDomainPropertiesWithConstraint( Application, 'blank', true )
+		def newVal
+		def warnings = []
+		def ignoredAssets = []
+		def personMap = []
 		
 		DataTransferBatch.withTransaction { status ->
 			project = securityService.getUserCurrentProject()			
-			log.info('Starting batch process for project: ' + project)
+			def staffList = partyRelationshipService.getAllCompaniesStaffPersons(project.client)
+			def dataTransferBatch
+			def insertCount = 0
+			def personsAdded = 0
+			def errorConflictCount = 0
+			def updateCount = 0
+			def errorCount = 0
+			def batchRecords = 0
+			def unknowAssetIds = 0
+			def unknowAssets = ""
+			def modelAssetsList = new ArrayList()
+			def existingAssetsList = new ArrayList()
+			def application
+		
+			try {
+				dataTransferBatch = DataTransferBatch.get(params.batchId)
+					batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = ${dataTransferBatch.id}")[0]
+					def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = "+
+						"$dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
+					def assetsSize = dataTransferValueRowList.size()
+					session.setAttribute("TOTAL_BATCH_ASSETS",assetsSize)
+					def dataTransferValues = DataTransferValue.findAllByDataTransferBatch( dataTransferBatch )
+					def eavAttributeSet = EavAttributeSet.findById(2)
+					
+					for ( int dataTransferValueRow=0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
+						def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
+						def rowNum = rowId+1
+						def dtvList = dataTransferValues.findAll{ it.rowId == rowId } 
+						def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
+						def flag = 0
+						def isNewValidate = true
+						def isFormatError = 0
+
+						application = assetEntityAttributeLoaderService.findAndValidateAsset(Application, assetEntityId, project, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets)
+
+						if (application == null)
+							continue
+
+						if ( ! application.id ) {
+							// Initialize extra properties for new asset
+						}
+
+						// Iterate over the properties and set them on the asset
+						dtvList.each {
+							def attribName = it.eavAttribute.attributeCode
+							it.importValue = it.importValue.trim()
+
+							// If trying to set to NULL - call the closure to update the property and move on
+							if (it.importValue == "NULL") {
+								// Set the property to NULL appropriately
+								assetEntityAttributeLoaderService.setToNullOrBlank(application, it.importValue, nullProps, blankProps)
+								return
+							}
+
+							switch (attribName) {
+								case ~/sme|sme2|appOwner|owner/:
+									if( it.importValue ) {
+										// Substitute owner for appOwner
+										def propName = attribName == 'owner' ? 'appOwner' : attribName
+										def results = personService.findOrCreatePerson(it.importValue, project, staffList)
+										def warnMsg = ''
+										if (results?.person) {
+											application[propName] = results.person
+
+											// Now check for warnings
+											if (results.isAmbiguous) {
+												warnMsg = " $attribName (${it.importValue}) was ambiguous for App ${application.assetName} on row $rowNum. Name set to ${results.person}"
+												warnings << warnMsg
+												log.warn warnMsg
+												errorConflictCount++
+											}
+
+											if (results.isNew) 
+												personsAdded++
+
+										} else if ( results?.error ) {
+											warnMsg = "$attribName (${it.importValue}) had an error '${results.error}'' for App ${application.assetName} on row $rowNum"
+											warnings << warnMsg
+											log.info warnMsg
+											errorConflictCount++
+										}
+									}
+									break
+								case ~/shutdownBy|startupBy|testingBy/:
+									if (it.importValue.size()) {
+										if(it.importValue[0] in ['@', '#']){
+											application[attribName] = it.importValue
+										} else {
+											def resultMap = personService.findOrCreatePerson(it.importValue, project, staffList)
+											application[attribName] = resultMap?.person?.id
+											if(it.importValue && resultMap?.isAmbiguous){
+												def warnMsg = "Ambiguity in ${attribName} (${it.importValue}) for ${application.assetName}"
+												log.warn warnMsg
+												warnings << warnMsg
+											}
+										}
+									}
+									break
+								case ~/shutdownFixed|startupFixed|testingFixed/:
+									if (it.importValue) {
+										application[attribName] = it.importValue.equalsIgnoreCase("yes") ? 1 : 0
+									}
+									break
+								default:
+									// Try processing all common properties
+									assetEntityAttributeLoaderService.setCommonProperties(project, application, it, rowNum, warnings, errorConflictCount)
+
+							} // switch(attribName)
+
+						}	// dtvList.each						
+
+						// Save the asset if it was changed or is new
+						(insertCount, updateCount) = assetEntityAttributeLoaderService.saveAssetChanges(
+							application, assetsList, rowNum, insertCount, updateCount, warnings)
+
+						// Update status and clear hibernate session
+						assetEntityAttributeLoaderService.updateStatusAndClear(project, dataTransferValueRow, sessionFactory, session)
+
+					} // for
+					
+					dataTransferBatch.statusCode = 'COMPLETED'
+					dataTransferBatch.save(flush:true)
+					
+			} catch (Exception e) {
+				status.setRollbackOnly()
+				insertCount = 0
+				updateCount = 0
+				log.error "appProcess() Unexpected error - rolling back : " + e.getMessage()
+				e.printStackTrace()
+				warnings << "Encounted unexpected error: ${e.getMessage()}"
+				warnings << "<b>The Import was NOT processed</b>"			}
+
+			def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
+
+			def sb = new StringBuilder(
+				"Process Results:<ul><li>Assets in Batch: ${batchRecords}</li>" + 
+				"<li>Records Inserted: ${insertCount}</li>"+
+				"<li>Records Updated: ${updateCount}</li>" + 
+				"<li>Asset Errors: ${errorCount}</li> "+
+				"<li>Persons Added: $personsAdded</li>" +
+				"<li>Attribute Errors: ${errorConflictCount}</li>" +
+				"<li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> " +
+				"<b>Warning:</b><ul>" + 
+				WebUtil.getListAsli(warnings)
+			)
+
+			appendIgnoredAssets(sb, ignoredAssets)
+			sb.append('</ul>')
+			sb = sb.toString() 
+
+			log.info sb
+			flash.message = sb
+		}
+
+		session.setAttribute("IMPORT_ASSETS", assetsList)
+		redirect ( action:list, params:[projectId:project.id] )	
+	
+	}
+
+	/**
+	 * Process DataTransfervalues corresponding to a DataTransferBatch for Files (aka Storage)
+	 * @param dataTransferBach
+	 * @return process the dataTransferBatch and return to datatransferBatchList
+	 */
+	def fileProcess ={
+		session.setAttribute("TOTAL_BATCH_ASSETS",0)
+		session.setAttribute("TOTAL_PROCESSES_ASSETS",0)
+		// session.getAttribute(null)
+
+		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
+		def assetEntityErrorList = []
+		def assetsList = new ArrayList()
+		def project
+		def nullProps = GormUtil.getDomainPropertiesWithConstraint( Files, 'nullable', true )
+		def blankProps = GormUtil.getDomainPropertiesWithConstraint( Files, 'blank', true )
+		def newVal
+		def warnings = []
+		def ignoredAssets = []
+		
+		DataTransferBatch.withTransaction { status ->
+			project = securityService.getUserCurrentProject()			
+			def dataTransferBatch
+			def insertCount = 0
+			def errorConflictCount = 0
+			def updateCount = 0
+			def errorCount = 0
+			def batchRecords = 0
+			def unknowAssetIds = 0
+			def unknowAssets = ""
+			def existingAssetsList = []
+			def files
+
+			try {
+				dataTransferBatch = DataTransferBatch.get(params.batchId)
+				batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = $dataTransferBatch.id ")[0]
+				def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = "+
+					"$dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
+				def assetsSize = dataTransferValueRowList.size()
+				session.setAttribute("TOTAL_BATCH_ASSETS",assetsSize)
+				def dataTransferValues = DataTransferValue.findAllByDataTransferBatch( dataTransferBatch )
+				def eavAttributeSet = EavAttributeSet.findById(4)
+				
+				for( int dataTransferValueRow=0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
+					def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
+					def rowNum = rowId+1
+					def dtvList = dataTransferValues.findAll{ it.rowId== rowId }//DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
+					def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
+					def flag = 0
+					def isNewValidate
+					def isFormatError
+
+					files = assetEntityAttributeLoaderService.findAndValidateAsset(Files, assetEntityId, project, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets)
+
+					if (files == null)
+						continue
+
+					if ( ! files.id ) {
+						// Initialize extra properties for new asset
+						files.scale = SizeScale.GB
+					}
+
+					dtvList.each {
+						def attribName = it.eavAttribute.attributeCode
+
+						// If trying to set to NULL - call the closure to update the property and move on
+						if (it.importValue == "NULL") {
+							// Set the property to NULL appropriately
+							assetEntityAttributeLoaderService.setToNullOrBlank(files, it.importValue, nullProps, blankProps)
+
+							return
+						}
+
+						switch (attribName) {
+							// case ?:
+
+							default:
+								// Try processing all common properties
+								assetEntityAttributeLoaderService.setCommonProperties(project, files, it, rowNum, warnings, errorConflictCount)
+
+						}
+
+					} // dtvList.each
+
+					// Save the asset if it was changed or is new
+					(insertCount, updateCount) = assetEntityAttributeLoaderService.saveAssetChanges(
+						files, assetsList, rowNum, insertCount, updateCount, warnings)
+
+					// Update status and clear hibernate session
+					assetEntityAttributeLoaderService.updateStatusAndClear(project, dataTransferValueRow, sessionFactory, session)
+
+				} // for
+
+				dataTransferBatch.statusCode = 'COMPLETED'
+				dataTransferBatch.save(flush:true)
+
+			} catch (Exception e) {
+				status.setRollbackOnly()
+				insertCount = 0
+				updateCount = 0
+				log.error "filesProcess() Unexpected error - rolling back : " + e.getMessage()
+				e.printStackTrace()
+				warnings << "Encounted unexpected error: ${e.getMessage()}"
+				warnings << "<b>The Import was NOT processed</b>"			}
+		
+			def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
+
+			def sb = new StringBuilder("Process Results:<ul><li>Assets in Batch: ${batchRecords}</li>" + 
+				"<li>Records Inserted: ${insertCount}</li>"+
+				"<li>Records Updated: ${updateCount}</li>" + 
+				"<li>Asset Errors: ${errorCount} </li> "+
+				"<li>Attribute Errors: ${errorConflictCount}</li>" + 
+				"<li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li>" + 
+				"</ul><b>Warnings:</b><ul>" + 
+				WebUtil.getListAsli(warnings)
+			)
+
+			appendIgnoredAssets(sb, ignoredAssets)
+
+			sb.append('</ul>')
+			sb = sb.toString() 
+
+			log.info sb
+			flash.message = sb
+		}
+
+		session.setAttribute("IMPORT_ASSETS", assetsList)
+		redirect ( action:list, params:[ projectId:project.id ] )
+		
+	}
+
+	/**
+	 * Process DataTransfervalues corresponding to a DataTransferBatch for Databases
+	 * @param dataTransferBach
+	 * @return process the dataTransferBatch and return to datatransferBatchList
+	 */	
+	def dbProcess = {
+		session.setAttribute("TOTAL_BATCH_ASSETS",0)
+		session.setAttribute("TOTAL_PROCESSES_ASSETS",0)
+		// session.getAttribute(null)
+
+		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
+		def assetEntityErrorList = []
+		def assetsList = new ArrayList()
+		def project
+		def nullProps = GormUtil.getDomainPropertiesWithConstraint( Database, 'nullable', true )
+		def blankProps = GormUtil.getDomainPropertiesWithConstraint( Database, 'blank', true )
+		def newVal
+		def warnings = []
+		def ignoredAssets = []
+		
+		DataTransferBatch.withTransaction { status ->
+			project = securityService.getUserCurrentProject()			
+			log.info('Starting batch process for of Databases for project: ' + project)
+			def staffList = partyRelationshipService.getAllCompaniesStaffPersons(project.client)
 			
 			def dataTransferBatch
 			def insertCount = 0
@@ -932,7 +652,8 @@ class DataTransferBatchController {
 			def unknowAssets = ""
 			def modelAssetsList = new ArrayList()
 			def existingAssetsList = new ArrayList()
-			def dbInstance
+			def database
+
 			try {
 				dataTransferBatch = DataTransferBatch.get(params.batchId)
 				batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = $dataTransferBatch.id ")[0]
@@ -943,251 +664,136 @@ class DataTransferBatchController {
 				def dataTransferValues = DataTransferValue.findAllByDataTransferBatch( dataTransferBatch )
 				def eavAttributeSet = EavAttributeSet.findById(3)
 				log.info("Process batch ${dataTransferBatch}, assets count: ${assetsSize}")
-				for( int dataTransferValueRow =0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
+
+				for ( int dataTransferValueRow=0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
 					def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
+					def rowNum = rowId+1
 					def dtvList = dataTransferValues.findAll{ it.rowId== rowId }//DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
 					def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
 					def flag = 0
-					def isModified = "false"
-					def isNewValidate
 					def isFormatError = 0
-					def assetEntity
-					log.info("Processing rowId=${rowId}, assetId=${assetEntityId}")
-					if( assetEntityId ) {
-						dbInstance = Database.get(assetEntityId)
-						if(dbInstance && dbInstance.project.id == project.id ){
-							existingAssetsList.add( dbInstance )
-							if ( dataTransferBatch?.dataTransferSet.id == 1 ) {
-								def validateResultList = assetEntityAttributeLoaderService.importValidation( dataTransferBatch, dbInstance, dtvList, project )
-								flag = validateResultList[0]?.flag
-								errorConflictCount = errorConflictCount+validateResultList[0]?.errorConflictCount
-								if( flag == 0 ) {
-								}else {
-									errorCount++
-								}
-							} else {
-								flag = 0;
-							}
-						} else if(dbInstance && dbInstance.project?.id != project.id){
-							dbInstance = new Database()
-							dbInstance.attributeSet = eavAttributeSet
-							isNewValidate = "true"
-						}
-					} else if(!assetEntityId || AssetEntity.get(assetEntityId).project.id != project.id){
-						dbInstance = new Database()
-						dbInstance.attributeSet = eavAttributeSet
-						isNewValidate = "true"
-					}
-				
-					if( dbInstance && flag == 0 ) {
-						def cloneEntity = retainNotNullVal(dbInstance, nullAndBlankFProps, isNewValidate)
-						dbInstance.project = project
-						dtvList.each {
-							def attribName = it.eavAttribute.attributeCode
-								switch(attribName){
-									case "moveBundle":
-									if(it.importValue){
-										def moveBundleInstance = assetEntityAttributeLoaderService.getdtvMoveBundle(it, project)
-										isModified = "true"
-										dbInstance."$attribName" = moveBundleInstance
-									}
-										break;
-									case ~/retireDate|maintExpDate/:
-										if(it.importValue && it.importValue != "NULL"){
-											isModified = "true"
-											dbInstance."$attribName" = GormUtil.convertInToGMT(formatter.parse( it.importValue ), tzId)
-										}
-										break;
-									case ~/size|rateOfChange/:
-										dbInstance."$attribName" = it.importValue ? NumberUtils.toDouble(it.importValue, 0).round()  : 0
-										break;
-									case "scale":
-										dbInstance."$attribName" = SizeScale.asEnum( it.importValue )
-										break;
-									case "validation":
-										if(!it.importValue){
-											dbInstance."$attribName" = "Discovery"
-										}else{
-											dbInstance."$attribName" = it.importValue
-										}
-										break;
-									case "planStatus":
-										if(!it.importValue){
-											dbInstance."$attribName" = 'Unassigned'
-										} else {
-											dbInstance."$attribName" = it.importValue
-										}
-										break;
-									default:
-									if( it.eavAttribute.backendType == "int"){
-										def correctedPos
-										try {
-											if( it.correctedValue ) {
-												correctedPos = Integer.parseInt(it.correctedValue.trim())
-											} else if( it.importValue ) {
-												correctedPos = Integer.parseInt(it.importValue.trim())
-											}
-											//correctedPos = it.correctedValue
-											if( dbInstance."$attribName" != correctedPos || isNewValidate == "true" ) {
-												isModified = "true"
-												dbInstance."$attribName" = correctedPos
-											}
-										} catch ( Exception ex ) {
-											log.error "dbProcess - unexpected exception 1 - " + ex.toString()
-											errorConflictCount++
-											it.hasError = 1
-											it.errorText = "format error"
-											it.save()
-											dataTransferBatch.hasErrors = 1
-											isFormatError = 1
-										}
-									} else {
-										try{
-											dbInstance."$attribName" = it.correctedValue ? it.correctedValue : it.importValue
-										} catch ( Exception ex ) {
-											log.error "dbProcess - unexpected exception 2 - " + ex.toString()
-											errorConflictCount++
-											it.hasError = 1
-											it.save()
-											dataTransferBatch.hasErrors = 1
-											isFormatError = 1
-										}
-									}
-								}
-								//If imported "NULL" and field allows blank and null updating value to null
-								def type = GrailsClassUtils.getPropertyType(Database, attribName)?.getName()
-								if(it.importValue.trim() == "NULL"){
-									if( !nullFProps.contains( attribName ) ) {
-										dbInstance."$attribName" = null
-									} else {
-										if( !blankFProps.contains( attribName ) ){
-											dbInstance."$attribName" = ""
-										} else if (nullAndBlankFProps.contains( attribName ) && type=="java.lang.String"){
-											dbInstance."$attribName" =  "NULL"  
-										} else {
-											dbInstance."$attribName" =  cloneEntity."$attribName"
-											log.error "Imported invalid value 'NULL' which is not allowed for $attribName property."
-										}
-									}
-								}
-							}
-							
-						}
-						if ( isFormatError != 1 ) {
-							if( isModified == "true" ) {
-								if ( isNewValidate == "true" ) {
-									dbInstance.assetType ='Database'
-									if( dbInstance.save(flush:true) ) {
-										insertCount++
-									}else{
-										dbInstance.errors.allErrors.each{ println it }
-									}
-								} else {
-									if( dbInstance.save() ) {
-										updateCount++
-									}
-								}
-								if(dbInstance?.id)
-									assetsList.add(assetEntity?.id)
-							}
-						} else {
-							errorCount++
-							dbInstance.discard()
-						}
-						if(dataTransferValueRow % 50 == 0) {
-							sessionFactory.getCurrentSession().flush();
-							sessionFactory.getCurrentSession().clear();
-						}
-						session.setAttribute("TOTAL_PROCESSES_ASSETS",dataTransferValueRow)
+
+					database = assetEntityAttributeLoaderService.findAndValidateAsset(Database, assetEntityId, project, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets)
+
+					if (database == null)
+						continue
+
+					if ( ! database.id ) {
+						// Initialize extra properties for new asset
 					}
 
-					def dataTransferCommentRowList = DataTransferComment.findAll(" From DataTransferComment dtc where dtc.dataTransferBatch = "+
-																	"$dataTransferBatch.id and dtc.dataTransferBatch.statusCode = 'PENDING'")
-				if(dataTransferCommentRowList){
-					dataTransferCommentRowList.each{
-						def assetComment
-						def assetEntity = AssetEntity.get(it.assetId)
-						if(assetEntity){
-							def principal = SecurityUtils.subject.principal
-							def loginUser = UserLogin.findByUsername(principal)
-							if(it.commentId){
-								assetComment = AssetComment.findById(it.commentId)
-							}
-							if(!assetComment){
-								assetComment = new AssetComment()
-								assetComment.mustVerify = 0
-							}
-							assetComment.comment = it.comment
-							assetComment.commentType = it.commentType
-							assetComment.createdBy = loginUser.person
-							assetComment.assetEntity = assetEntity
-							assetComment.save()
+					dtvList.each {
+						def attribName = it.eavAttribute.attributeCode
+
+						// If trying to set to NULL - call the closure to update the property and move on
+						if (it.importValue == "NULL") {
+							// Set the property to NULL appropriately
+							assetEntityAttributeLoaderService.setToNullOrBlank(database, it.importValue, nullProps, blankProps)
+
+							return
 						}
-					}
-				}
-				
+
+						switch (attribName) {
+							// case ?:
+
+							default:
+								// Try processing all common properties
+								assetEntityAttributeLoaderService.setCommonProperties(project, database, it, rowNum, warnings, errorConflictCount)
+
+						} // switch
+
+					} // dtvList.each
+
+					// Save the asset if it was changed or is new
+					(insertCount, updateCount) = assetEntityAttributeLoaderService.saveAssetChanges(
+						database, assetsList, rowNum, insertCount, updateCount, warnings)
+
+					// Update status and clear hibernate session
+					assetEntityAttributeLoaderService.updateStatusAndClear(project, dataTransferValueRow, sessionFactory, session)
+
+				} // for
+
 				dataTransferBatch.statusCode = 'COMPLETED'
 				dataTransferBatch.save(flush:true)
+
 			} catch (Exception e) {
-				log.error("dbProcess - Unexpected error, rolling back - ", e)
 				status.setRollbackOnly()
-				flash.message = "Import Batch process failed"
-			}
+				insertCount = 0
+				updateCount = 0
+				log.error "dbProcess() Unexpected error - rolling back : " + e.getMessage()
+				e.printStackTrace()
+				warnings << "Encounted unexpected error: ${e.getMessage()}"
+				warnings << "<b>The Import was NOT processed</b>"			}
+
 			def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
-			flash.message = " Process Results:<ul><li>	Assets in Batch: ${batchRecords} <li>Records Inserted: ${insertCount}</li>"+
-				"<li>Records Updated: ${updateCount}</li><li>Asset Errors: ${errorCount} </li> "+
-				"<li>Attribute Errors: ${errorConflictCount}</li><li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> "
+
+			def sb = new StringBuilder(" Process Results:<ul><li>Assets in Batch: ${batchRecords}" + 
+				"<li>Records Inserted: ${insertCount}</li>" +
+				"<li>Records Updated: ${updateCount}</li>" + 
+				"<li>Asset Errors: ${errorCount}</li>"+
+				"<li>Attribute Errors: ${errorConflictCount}</li>" + 
+				"<li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li>" +
+				"</ul><b>Warnings:</b><ul>" + 
+				WebUtil.getListAsli(warnings)
+			)
+
+			appendIgnoredAssets(sb, ignoredAssets)
+			sb.append('</ul>')
+			sb = sb.toString() 
+			
+			log.info sb
+			flash.message = sb
+		
 		}
 		session.setAttribute("IMPORT_ASSETS", assetsList)
 		redirect ( action:list, params:[projectId:project.id] )
 		
 	}
 	
-    /* --------------------------------------
-     * 	@author : Lokanada Reddy
-     * 	@param  : processed and total assts from session 
-     *	@return : processed data for Batch progress bar
-     * -------------------------------------- */
-    def getProgress = {
-    	def progressData = []
-        def total = session.getAttribute("TOTAL_BATCH_ASSETS") 
-        def processed = session.getAttribute("TOTAL_PROCESSES_ASSETS")
-    	progressData << [processed:processed,total:total]
-        render progressData as JSON
-     }
-    
-    /* --------------------------------------
-     * 	@author : Mallikarjun
-     *	@return : data transfer batch error list
-     * -------------------------------------- */
-    
-    def errorsListView = {
-        def dataTransferBatchInstance = DataTransferBatch.get( params.id )
-        def query = new StringBuffer(" select d.asset_entity_id,d.import_value,d.row_id,a.attribute_code,d.error_text FROM data_transfer_value d ")
-        query.append(" left join eav_attribute a on (d.eav_attribute_id = a.attribute_id) where d.data_transfer_batch_id = ${dataTransferBatchInstance.id} ")
-        query.append(" and has_error = 1 ")
-        def dataTransferErrorList = jdbcTemplate.queryForList( query.toString() )
-        def completeDataTransferErrorList = []
-        def currentValues
-        dataTransferErrorList.each {
-        	def assetNameId = EavAttribute.findByAttributeCode("assetName")?.id
-        	def assetTagId = EavAttribute.findByAttributeCode("assetTag")?.id
-        	def assetName = DataTransferValue.find("from DataTransferValue where rowId=$it.row_id and eavAttribute=$assetNameId "+
-        										    "and dataTransferBatch=$dataTransferBatchInstance.id")?.importValue
-        	def assetTag = DataTransferValue.find("from DataTransferValue where rowId=$it.row_id and eavAttribute=$assetTagId "+
-                									"and dataTransferBatch=$dataTransferBatchInstance.id")?.importValue
-        	def assetEntity = AssetEntity.find("from AssetEntity where id=${it.asset_entity_id}")
-        	if( bundleMoveAndClientTeams.contains(it.attribute_code) ) {
-        		currentValues = assetEntity?.(it.attribute_code).name
-        	} else {
-        		currentValues = assetEntity?.(it.attribute_code)
-        	}
-        	completeDataTransferErrorList << ["assetName":assetName, "assetTag":assetTag, "attribute":it.attribute_code, "error":it.error_text,  
-        	                                  "currentValue":currentValues, "importValue":it.import_value]
-        }
-        completeDataTransferErrorList.sort{it.assetTag + it.attribute}
-        return [ completeDataTransferErrorList : completeDataTransferErrorList ]
-     }
+	/**
+	 * Called by the Asset Post page via Ajax in order to show progress of how many assets have been posted
+	 * 	@param  : processed and total assts from session 
+	 *	@return : processed data for Batch progress bar
+	 */
+	def getProgress = {
+		def progressData = []
+		def total = session.getAttribute("TOTAL_BATCH_ASSETS") 
+		def processed = session.getAttribute("TOTAL_PROCESSES_ASSETS")
+		progressData << [processed:processed, total:total]
+		render progressData as JSON
+	 }
+	
+	/* --------------------------------------
+	 * 	@author : Mallikarjun
+	 *	@return : data transfer batch error list
+	 * -------------------------------------- */
+	def errorsListView = {
+		def dataTransferBatchInstance = DataTransferBatch.get( params.id )
+		def query = new StringBuffer(" select d.asset_entity_id,d.import_value,d.row_id,a.attribute_code,d.error_text FROM data_transfer_value d ")
+		query.append(" left join eav_attribute a on (d.eav_attribute_id = a.attribute_id) where d.data_transfer_batch_id = ${dataTransferBatchInstance.id} ")
+		query.append(" and has_error = 1 ")
+		def dataTransferErrorList = jdbcTemplate.queryForList( query.toString() )
+		def completeDataTransferErrorList = []
+		def currentValues
+		dataTransferErrorList.each {
+			def assetNameId = EavAttribute.findByAttributeCode("assetName")?.id
+			def assetTagId = EavAttribute.findByAttributeCode("assetTag")?.id
+			def assetName = DataTransferValue.find("from DataTransferValue where rowId=$it.row_id and eavAttribute=$assetNameId "+
+													"and dataTransferBatch=$dataTransferBatchInstance.id")?.importValue
+			def assetTag = DataTransferValue.find("from DataTransferValue where rowId=$it.row_id and eavAttribute=$assetTagId "+
+													"and dataTransferBatch=$dataTransferBatchInstance.id")?.importValue
+			def assetEntity = AssetEntity.find("from AssetEntity where id=${it.asset_entity_id}")
+			if( bundleMoveAndClientTeams.contains(it.attribute_code) ) {
+				currentValues = assetEntity?.(it.attribute_code).name
+			} else {
+				currentValues = assetEntity?.(it.attribute_code)
+			}
+			completeDataTransferErrorList << ["assetName":assetName, "assetTag":assetTag, "attribute":it.attribute_code, "error":it.error_text,  
+											  "currentValue":currentValues, "importValue":it.import_value]
+		}
+		completeDataTransferErrorList.sort{it.assetTag + it.attribute}
+		return [ completeDataTransferErrorList : completeDataTransferErrorList ]
+	 }
 
 	/*=========================================================
 	 * Update Asset Racks once import batch process done.
@@ -1199,42 +805,24 @@ class DataTransferBatchController {
 		}
 		session.setAttribute("IMPORT_ASSETS",null)
 		render ""
-    }
-    /*
-     *  Update assets cabling data for selected list of assets 
-     */
-    def updateAssetsCabling( modelAssetsList, existingAssetsList ){
-    	modelAssetsList.each{ assetEntity->
-    		AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-								toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-								where toAsset = ? """,[assetEntity])
-			
-			AssetCableMap.executeUpdate("delete from AssetCableMap where fromAsset = ?",[assetEntity])
-			assetEntityAttributeLoaderService.createModelConnectors( assetEntity )
-    	}
-		existingAssetsList.each{ assetEntity->
-			AssetCableMap.executeUpdate("""Update AssetCableMap set toAssetRack='${assetEntity.targetRack}',
-					toAssetUposition=${assetEntity.targetRackPosition} where toAsset = ? """,[assetEntity])
-		}
-    }
-    
+	}
+
 	/**
-     *     Delete the Data Transfer Batch Instance
+	 *     Delete the Data Transfer Batch Instance
 	 */
-	
 	def delete = {
 		try{
 			def dataTransferBatchInstance = DataTransferBatch.get(params.batchId)
-	        if(dataTransferBatchInstance) {
-			    dataTransferBatchInstance.delete(flush:true,failOnError:true)
+			if(dataTransferBatchInstance) {
+				dataTransferBatchInstance.delete(flush:true,failOnError:true)
 				flash.message = "DataTransferBatch ${params.batchId} deleted"
 				redirect(action:list)
-	        }else {
-	            flash.message = "DataTransferBatch not found with id ${params.batchId}"
-	            redirect(action:list)
-	       }
+			}else {
+				flash.message = "DataTransferBatch not found with id ${params.batchId}"
+				redirect(action:list)
+		   }
 		}catch(Exception e){
-		       e.printStackTrace()
+			   e.printStackTrace()
 		}
 	}
 	
@@ -1307,7 +895,7 @@ class DataTransferBatchController {
 	 * @param importedManu   : Imported Manufacturer from excel
 	 * @return : if pair not found return error message
 	 */
-	def verifyModelAndManuPair(importedModel, importedManu){
+	def verifyModelAndManuPair(importedModel, importedManu) {
 		 
 		def errorMsg = ''
 		def manu = Manufacturer.findByName(importedManu)
@@ -1320,29 +908,25 @@ class DataTransferBatchController {
 			if(!modelName)
 				modelName = importedModel
 		}
-	    def pairExist = Model.findByModelNameAndManufacturer(modelName, manu)
-		if(!pairExist && importedManu && importedModel)
-		    errorMsg = "No match found for $importedManu / $importedModel <br/>"
+		def pairExist = Model.findByModelNameAndManufacturer(modelName, manu)
+		if (!pairExist && importedManu && importedModel)
+			errorMsg = "No match found for $importedManu / $importedModel <br/>"
 			
 		return errorMsg
 	}
 	
 	/**
-	 * Instead of using clone (of Cloneable interface (Mark up)) using this method to keep object current copy.
-	 * This method is used to retain older values as we need to keep it safe in order to look back and fetch 
-	 * values while removing values
-	 * @param entity :  entity instance
-	 * @param fields : all not null fields for whom we need to store data
-	 * @param isNew : a flag that will determine whether instance is new one
-	 * @return : a map having not null field as key and value as value
+	 * Used to append a list of ignored assets if any to a StringBuilder buffer
+	 * @param StringBuilder the message buffer
+	 * @param List<Asset> list of ignored assets
 	 */
-	def retainNotNullVal(entity, fields, isNew){
-		def retMap = [:]
-		fields.each { field->
-			retMap << [(field) :  !isNew ? entity."${field}" : null ]
+	private void appendIgnoredAssets(StringBuilder sb, List assets ) {
+		if (assets.size()) {
+			sb.append("<li>${assets.size()} assets where skipped due to being updated since export<ul>")
+			sb.each { assets.append("<li>${it.id} ${it.assetName}</li>") }
+			sb.append('</ul></li>')
 		}
-		return retMap
-	}
-}
+		sb.append('</ul></li>')
+	}	
 
-	
+}

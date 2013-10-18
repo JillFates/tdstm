@@ -140,6 +140,10 @@ class PersonService {
 			findPersonInStaff( Person.findAll( query, args ) )
 		}
 
+		// If the lookup found a fullname by just a first name, then we want to set the isAmbiguous flag as a warning
+		if (! results.isAmbiguous && lastName == '' && results.person?.lastName )
+			results.isAmbiguous = true
+
 		log.debug "findPerson() found $results"
 
 		return results
@@ -149,15 +153,16 @@ class PersonService {
 	 * Used to find a person object from their full name and if not found create it
 	 * @param String the person's full name
 	 * @param Project the project/client that the person is associated with
-	 * @return instance of person or null if unable to lookup
+	 * @param List of staff Person objects (optional). If not passed then the the partyRelationshipService.getAllCompaniesStaffPersons() will be used
+	 * @return Map containing person, status or null if unable to parse the name
 	 */
-	Map findOrCreatePerson(String name , Project project) {
+	Map findOrCreatePerson(String name , Project project, staffList=null) {
 		def nameMap = parseName(name)
 		if (nameMap == null) {
 			log.error "findOrCreatePersonByName() unable to parse name ($name)"
 			return null
 		}
-		return findOrCreatePerson( nameMap, project)
+		return findOrCreatePerson( nameMap, project, staffList)
 	}
 
 	/**
@@ -165,32 +170,36 @@ class PersonService {
 	 * Used to find a person object from their full name and if not found create it
 	 * @param Map the person's full name in map
 	 * @param Project the project/client that the person is associated with
-	 * @return instance of person or null if unable to lookup
+	 * @param List of staff Person objects (optional). If not passed then the the partyRelationshipService.getAllCompaniesStaffPersons() will be used
+	 * @return Map containing person, status or null if unable to parse the name
 	 */
-	Map findOrCreatePerson(Map nameMap , Project project) {
+	Map findOrCreatePerson(Map nameMap , Project project, staffList=null) {
 		
-		def resultMap = findPerson(nameMap, project)
-		def person = resultMap.person
+		if ( ! staffList )
+			staffList = partyRelationshipService.getAllCompaniesStaffPersons()
 
-		if ( !person && nameMap.first ) {
-			//log.debug "Person $firstName $lastName does not found in selected company"
-			person = new Person('firstName':nameMap.first, 'lastName':nameMap.last, 'middleName': nameMap.middle, staffType:'Salary')
-			if (!person.save(insert:true, flush:true)) {
-				def etext = "findOrCreatePerson Unable to create Person"+GormUtil.allErrorsString( person )
-				log.error( etext )
+		def results = findPerson(nameMap, project, staffList)
+
+		if ( ! results.person && nameMap.first ) {
+			log.debug "findOrCreatePerson() creating new person and associate to Company as staff ($nameMap)"
+			def person = new Person('firstName':nameMap.first, 'lastName':nameMap.last, 'middleName': nameMap.middle, staffType:'Salary')
+			if ( ! person.save(insert:true, flush:true)) {
+				log.error "findOrCreatePerson Unable to create Person"+GormUtil.allErrorsString( person )
+				results.error = "Unable to create person $nameMap"
+				results.isNew = null
+			} else {
+				if (! partyRelationshipService.addCompanyStaff(project.client, person) ) {
+					results.error = "Unable to assign person $results.person.toString() as staff"
+					// TODO - JPM (10/13) do we really want to proceed if we can't assign the person as staff otherwise they'll be in limbo.
+				}
+				results.person = person
+				results.isNew = true
 			}
-			def partyRelationshipType = PartyRelationshipType.findById( "STAFF" )
-			def roleTypeFrom = RoleType.findById( "COMPANY" )
-			def roleTypeTo = RoleType.findById( "STAFF" )
-
-			def partyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType,
-				partyIdFrom :project.client, roleTypeCodeFrom:roleTypeFrom, partyIdTo:person,
-				roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true, flush:true )
-			
-			resultMap.person = person
+		} else {
+			results.isNew = false
 		}
 
-		return resultMap
+		return results
 	}
 
 	/**

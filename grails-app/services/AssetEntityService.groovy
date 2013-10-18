@@ -20,9 +20,10 @@ import com.tdssrc.grails.WebUtil
 
 class AssetEntityService {
 
-    static transactional = true
+	static transactional = true
 	def jdbcTemplate
 	def projectService
+	def assetEntityAttributeLoaderService
 	def securityService
 	
 	/**
@@ -194,87 +195,87 @@ class AssetEntityService {
 	 */
 	def getSpecialExportData( project ){
 		String queryForSpecialExport = """ ( SELECT
-											   server.asset_entity_id AS server_id,
-											   app.asset_entity_id AS app_id,
-											   server.asset_name AS server_name,
-											   server.asset_type AS server_type,
-											   IFNULL(app.asset_name,'') AS app_name,
-											   IFNULL(sme,'') AS tru, IFNULL(sme2,'') AS tru2,
-											   IFNULL(mb.name,'') AS move_bundle,
-											   IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
-											   adb.dependency_bundle AS group_id,
-											   IFNULL(server.plan_status,'') AS status,
-											   IFNULL(server.environment, '') AS environment,
-											   IFNULL(application.criticality, '') AS criticality
-											FROM asset_entity server
-											JOIN asset_dependency srvappdep ON server.asset_entity_id = srvappdep.dependent_id
-											JOIN asset_entity app ON app.asset_entity_id = srvappdep.asset_id AND app.asset_type = 'Application'
-											LEFT OUTER JOIN application ON application.app_id = app.asset_entity_id
-											LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=server.move_bundle_id
-											LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id = server.asset_entity_id
-											WHERE
-											   server.project_id=${project.id}
-											   AND server.asset_type IN ('Server','VM', 'Load Balancer','Network', 'Storage', 'Blade')
-											   ORDER BY app_name, server_name
-											)
-											UNION DISTINCT
-											
-											 ( SELECT
-											   dbsrv.asset_entity_id AS server_id,
-											   app.asset_entity_id AS app_id,
-											   dbsrv.asset_name AS server_name,
-											   dbsrv.asset_type server_type,
-											   IFNULL(app.asset_name,'') AS app_name,
-											   IFNULL(sme,'') AS tru, IFNULL(sme2,'') AS tru2,
-											   IFNULL(mb.name,'') AS move_bundle,
-											   IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
-											   adb.dependency_bundle AS group_id,
-											   IFNULL(dbsrv.plan_status,'') AS status,
-										   	   IFNULL(app.environment, '') AS environment,
-											   IFNULL(applic.criticality, '') AS criticality
-											FROM asset_entity app
-											JOIN application applic ON applic.app_id=app.asset_entity_id
-											JOIN asset_dependency appdbdep ON appdbdep.asset_id = app.asset_entity_id #AND appdbdep.type='DB'
-											JOIN asset_entity db ON db.asset_entity_id = appdbdep.dependent_id AND db.asset_type = 'Database'
-											JOIN asset_dependency dbsrvdep ON dbsrvdep.asset_id = db.asset_entity_id
-											JOIN asset_entity dbsrv ON dbsrv.asset_entity_id = dbsrvdep.dependent_id AND dbsrv.asset_type IN ('Server','VM')
-											LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=dbsrv.move_bundle_id
-											LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id = dbsrv.asset_entity_id
-											WHERE
-											   app.project_id=${project.id}
-											   AND app.asset_type = 'Application'
-											)
-											UNION DISTINCT
-											( SELECT
-											   clustersrv.asset_entity_id AS server_id,
-											   app.asset_entity_id AS app_id,
-											   clustersrv.asset_name AS server_name,
-											   clustersrv.asset_type server_type,
-											   IFNULL(app.asset_name,'') AS app_name,
-											   IFNULL(sme,'') AS tru, IFNULL(sme2,'') AS tru2,
-											   IFNULL(mb.name,'') AS move_bundle,
-											   IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
-											   adb.dependency_bundle AS group_id,
-											   IFNULL(clustersrv.plan_status,'') AS status,
-											   IFNULL(app.environment, '') AS environment,
-											   IFNULL(applic.criticality, '') AS criticality
-											 FROM asset_entity app
-											JOIN application applic ON applic.app_id=app.asset_entity_id
-											JOIN asset_dependency appdbdep ON appdbdep.asset_id = app.asset_entity_id # AND appdbdep.type='DB'
-											JOIN asset_entity db ON db.asset_entity_id = appdbdep.dependent_id AND db.asset_type = 'Database'
-											JOIN asset_dependency dbclusterdep ON dbclusterdep.asset_id = db.asset_entity_id
-											JOIN asset_entity dbcluster ON dbcluster.asset_entity_id = dbclusterdep.dependent_id AND dbcluster.asset_type = 'Database'
-											JOIN asset_dependency clustersrvdep ON clustersrvdep.asset_id = dbcluster.asset_entity_id
-											JOIN asset_entity clustersrv ON clustersrv.asset_entity_id = clustersrvdep.dependent_id AND clustersrv.asset_type in ('Server','VM')
-											LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=clustersrv.move_bundle_id
-											LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id = clustersrv.asset_entity_id
-											WHERE
-											   app.project_id=${project.id}
-											   AND app.asset_type = 'Application' )"""
-		 
+				server.asset_entity_id AS server_id,
+				app.asset_entity_id AS app_id,
+				server.asset_name AS server_name,
+				server.asset_type AS server_type,
+				IFNULL(app.asset_name,'') AS app_name,
+				IFNULL(sme,'') AS tru, IFNULL(sme2,'') AS tru2,
+				IFNULL(mb.name,'') AS move_bundle,
+				IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
+				adb.dependency_bundle AS group_id,
+				IFNULL(server.plan_status,'') AS status,
+				IFNULL(server.environment, '') AS environment,
+				IFNULL(application.criticality, '') AS criticality
+			FROM asset_entity server
+			JOIN asset_dependency srvappdep ON server.asset_entity_id = srvappdep.dependent_id
+			JOIN asset_entity app ON app.asset_entity_id = srvappdep.asset_id AND app.asset_type = 'Application'
+			LEFT OUTER JOIN application ON application.app_id = app.asset_entity_id
+			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=server.move_bundle_id
+			LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id = server.asset_entity_id
+			WHERE
+				server.project_id=${project.id}
+				AND server.asset_type IN ('Server','VM', 'Load Balancer','Network', 'Storage', 'Blade')
+				ORDER BY app_name, server_name
+			)
+			UNION DISTINCT
+			
+			 ( SELECT
+				dbsrv.asset_entity_id AS server_id,
+				app.asset_entity_id AS app_id,
+				dbsrv.asset_name AS server_name,
+				dbsrv.asset_type server_type,
+				IFNULL(app.asset_name,'') AS app_name,
+				IFNULL(sme,'') AS tru, IFNULL(sme2,'') AS tru2,
+				IFNULL(mb.name,'') AS move_bundle,
+				IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
+				adb.dependency_bundle AS group_id,
+				IFNULL(dbsrv.plan_status,'') AS status,
+				IFNULL(app.environment, '') AS environment,
+				IFNULL(applic.criticality, '') AS criticality
+			FROM asset_entity app
+			JOIN application applic ON applic.app_id=app.asset_entity_id
+			JOIN asset_dependency appdbdep ON appdbdep.asset_id = app.asset_entity_id #AND appdbdep.type='DB'
+			JOIN asset_entity db ON db.asset_entity_id = appdbdep.dependent_id AND db.asset_type = 'Database'
+			JOIN asset_dependency dbsrvdep ON dbsrvdep.asset_id = db.asset_entity_id
+			JOIN asset_entity dbsrv ON dbsrv.asset_entity_id = dbsrvdep.dependent_id AND dbsrv.asset_type IN ('Server','VM')
+			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=dbsrv.move_bundle_id
+			LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id = dbsrv.asset_entity_id
+			WHERE
+				app.project_id=${project.id}
+				AND app.asset_type = 'Application'
+			)
+			UNION DISTINCT
+			( SELECT
+				clustersrv.asset_entity_id AS server_id,
+				app.asset_entity_id AS app_id,
+				clustersrv.asset_name AS server_name,
+				clustersrv.asset_type server_type,
+				IFNULL(app.asset_name,'') AS app_name,
+				IFNULL(sme,'') AS tru, IFNULL(sme2,'') AS tru2,
+				IFNULL(mb.name,'') AS move_bundle,
+				IF(mb.name='mx','',IFNULL(date_format(mb.start_time,'%m/%d'),'')) AS move_date,
+				adb.dependency_bundle AS group_id,
+				IFNULL(clustersrv.plan_status,'') AS status,
+				IFNULL(app.environment, '') AS environment,
+				IFNULL(applic.criticality, '') AS criticality
+			 FROM asset_entity app
+			JOIN application applic ON applic.app_id=app.asset_entity_id
+			JOIN asset_dependency appdbdep ON appdbdep.asset_id = app.asset_entity_id # AND appdbdep.type='DB'
+			JOIN asset_entity db ON db.asset_entity_id = appdbdep.dependent_id AND db.asset_type = 'Database'
+			JOIN asset_dependency dbclusterdep ON dbclusterdep.asset_id = db.asset_entity_id
+			JOIN asset_entity dbcluster ON dbcluster.asset_entity_id = dbclusterdep.dependent_id AND dbcluster.asset_type = 'Database'
+			JOIN asset_dependency clustersrvdep ON clustersrvdep.asset_id = dbcluster.asset_entity_id
+			JOIN asset_entity clustersrv ON clustersrv.asset_entity_id = clustersrvdep.dependent_id AND clustersrv.asset_type in ('Server','VM')
+			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=clustersrv.move_bundle_id
+			LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id = clustersrv.asset_entity_id
+			WHERE
+				app.project_id=${project.id}
+				AND app.asset_type = 'Application' )"""
+
 	  def splList =   jdbcTemplate.queryForList( queryForSpecialExport )
 											
-      return splList
+	  return splList
 	}
 	
 	/**
@@ -420,7 +421,7 @@ class AssetEntityService {
 			}
 		}
 		*/
-	  	return entities
+		return entities
 	}
 	/**
 	 * This method is used to delete assets by asset type
@@ -473,4 +474,24 @@ class AssetEntityService {
 		}
 	}
 		
+	/*
+	 * Update assets cabling data for selected list of assets 
+	 * @param list
+	 * @param list 
+	 */
+	def updateAssetsCabling( modelAssetsList, existingAssetsList ){
+		modelAssetsList.each{ assetEntity->
+			AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
+				toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
+				where toAsset = ? """,[assetEntity])
+			
+			AssetCableMap.executeUpdate("delete from AssetCableMap where fromAsset = ?",[assetEntity])
+			assetEntityAttributeLoaderService.createModelConnectors( assetEntity )
+		}
+		existingAssetsList.each{ assetEntity->
+			AssetCableMap.executeUpdate("""Update AssetCableMap set toAssetRack='${assetEntity.targetRack}',
+					toAssetUposition=${assetEntity.targetRackPosition} where toAsset = ? """,[assetEntity])
+		}
+	}
+
 }
