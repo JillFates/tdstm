@@ -31,7 +31,7 @@
 	                            <td class="name">Project:</td>
 	                            
 	                            <td class="valueNW"><g:link controller="project" action="show" id="${moveEventInstance?.project?.id}">${moveEventInstance?.project?.encodeAsHTML()}</g:link></td>
-								<td rowspan="11">
+								<td class="valueNW" rowspan="11">
 									<label for="runbookRecipe">Runbook Recipe:</label><br/>
 									<textarea name="runbookRecipe" class="fontMonospaced" id="runbookRecipe" cols="80" rows="30" wrap="soft">${moveEventInstance.runbookRecipe}</textarea>
 								</td>
