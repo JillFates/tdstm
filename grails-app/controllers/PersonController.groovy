@@ -584,18 +584,23 @@ class PersonController {
 			}
 
 			def personExpDates =params.list("availability")
+			def expFormatter = new SimpleDateFormat("MM/dd/yyyy")
+			personExpDates = personExpDates.collect{GormUtil.convertInToGMT(expFormatter.parse(it), tzId)}
+			def existingExp = ExceptionDates.findAllByPerson(personInstance)
+			
 			if(personExpDates){
-				// TODO : JPM : TM-2330 Logic needs to be changed - should NEVER delete all records and then re-add - 
-				// I NEVER want to see this pattern implemented again!
-				def expFormatter = new SimpleDateFormat("MM/dd/yyyy")
-				ExceptionDates.executeUpdate("delete from ExceptionDates where person = '$personInstance.id' ")
-				personExpDates.each{
-					def expDates = new ExceptionDates()
-					expDates.exceptionDay = GormUtil.convertInToGMT(expFormatter.parse(it), tzId)
-					expDates.person = personInstance
-					
-					expDates.save(flush:true)
+				ExceptionDates.executeUpdate("delete from ExceptionDates where person = :person and exceptionDay not in (:dates) ",[person:personInstance, dates:personExpDates])
+				personExpDates.each { presentExpDate->
+					def exp = ExceptionDates.findByExceptionDayAndPerson(presentExpDate, personInstance)
+					if(!exp){
+						def expDates = new ExceptionDates()
+						expDates.exceptionDay = presentExpDate
+						expDates.person = personInstance
+						expDates.save(flush:true)
+					}
 				}
+			} else {
+				ExceptionDates.executeUpdate("delete from ExceptionDates where person = :person",[person:personInstance])
 			}
 			
 			userPreferenceService.setPreference( "CURR_TZ", params.timeZone )
