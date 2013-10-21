@@ -170,7 +170,7 @@
 							<td align="center"><input type="text" class="dateRange"
 								size="15" style="width: 112px; height: 14px;"
 								name="availability" id="availabilityId_${i}"
-								value="<tds:convertDate date='${blackOutDay.exceptionDay}' timeZone='${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}'/>" />
+								value='<tds:convertDate date="${blackOutDay.exceptionDay}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>' />
 								<a href="javascript:deleteFuncsRow('dateTrId_${i}')">&nbsp;&nbsp;<span
 									class='clear_filter'>X</span></a></td>
 						</tr>

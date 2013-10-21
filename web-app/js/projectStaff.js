@@ -159,7 +159,7 @@ function changeManageFuncs(){
 function addBlackOutDay(){
 	var id = $("#availableId").val()
 	var inputHtml = $("#dateDivId").html().replace("availId","availId_"+id).replace("available","availability")
-	$("#blackOutDay").append("<tr id='roleTrId_"+id+"'><td>"+inputHtml +"<a href=\"javascript:deleteFuncsRow(\'dateTrId_"+id+"')\">&nbsp;&nbsp;"+"<span class=\'clear_filter\'>X</span></a> </td></tr><br/>")
+	$("#blackOutDay").append("<tr id='roleTrId_"+id+"'><td>"+inputHtml +"<a href=\"javascript:deleteFuncsRow(\'roleTrId_"+id+"')\">&nbsp;&nbsp;"+"<span class=\'clear_filter\'>X</span></a> </td></tr><br/>")
 	showCalender("#availId_"+id)//$("#availabilityId_"+id).datepicker();
 	$("#availableId").val(parseInt($("#availableId").val())+1)
 
