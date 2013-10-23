@@ -428,6 +428,7 @@
 	var eventType = "load"
 	var hasTimedOut = false;
 	var modWidth
+	var tz = '${session.getAttribute('CURR_TZ')?.CURR_TZ}'
 	$(document).ready(function() {
 		$("#showEditCommentDialog").dialog({autoOpen: false});
 		$("#createNews").dialog({autoOpen: false});
@@ -455,11 +456,12 @@
 	})
 	
 	
-	if("${session.getAttribute('CURR_TZ')?.CURR_TZ}"){
-		$("#timezone").find("option[text='${session.getAttribute('CURR_TZ')?.CURR_TZ}']").attr("selected","selected");
+	if(tz){
+		$("#timezone option:contains("+tz+")").attr("selected","selected");
 	} else {
-		$("#timezone").find("option[text='EDT']").attr("selected","selected");
+		$("#timezone option:contains(EDT)").attr("selected","selected");
 	}
+	console.log($("#timezone").val())
 	if('${timeToUpdate}'){
 		$("#updateTimeId").val("${timeToUpdate}")
 	}
