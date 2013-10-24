@@ -571,10 +571,10 @@ class RunbookService {
 			// Determine Critical Path
 			// Perform a DFS process through the graph to determine the earliest starts on the initial critical path
 			//
-			def safety = 100
+			def safety = 500
 			while (true) {
 				if (--safety == 0) {
-					throw new RuntimeException('computeStartTimes() caught in infinite loop - Critical Path')
+					throw new RuntimeException("computeStartTimes() caught in infinite loop for Critical Path (task ${task.taskNumber})")
 				}
 				task.tmpEstimatedStart = time
 				task.tmpEarliestStart = time
@@ -589,6 +589,10 @@ class RunbookService {
 					break
 				} else {
 					task = edge.successor
+					if (task.tmpBeenExplored) {
+						throw new RuntimeException("computeStartTimes() caught in infinite loop for Critical Path (task: ${task.taskNumber}, edge: $edge)")
+					}
+					task.tmpBeenExplored = true
 				}
 			}
 
