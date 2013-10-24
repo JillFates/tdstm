@@ -4084,7 +4084,7 @@ class AssetEntityController {
 					if (assetType == AssetType.APPLICATION.toString() ) {
 						type = AssetType.APPLICATION.toString()
 						shape = 'circle'
-						size = criticalitySizes[it.criticality]
+						size = it.criticality ? criticalitySizes[it.criticality] : 200
 					} else if (serverTypes.contains(assetType)) {
 						type = AssetType.SERVER.toString()
 						shape = 'square'
