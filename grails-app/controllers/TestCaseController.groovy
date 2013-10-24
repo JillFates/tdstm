@@ -207,7 +207,7 @@ class TestCaseController {
 				constraintTime = formatter.format(TimeUtil.convertInToUserTZ(t.constraintTime, tzId))
 			}
  
- 			def criticalPath = (t.duration > 0 && t.tmpEarliestStart == tmpLatestStart ? 'YES' : 'no')
+ 			def criticalPath = (t.duration > 0 && t.tmpEarliestStart == t.tmpLatestStart ? 'YES' : 'no')
  			// (t.tmpCriticalPath ? 'Yes' : 'No'
 			results.append( "<tr><td>${t.id}</td><td>${t.taskNumber} ${t.comment}</td><td>${t.duration}</td><td>${t.tmpEarliestStart}</td>" + 
 				"<td>${t.tmpLatestStart}</td><td>$constraintTime ${t.constraintType}</td>" + 
