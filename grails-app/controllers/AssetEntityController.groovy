@@ -178,9 +178,6 @@ class AssetEntityController {
 		  flash.message = params.message
 		}
 		
-		if( params.error)
-			flash.error = params.error 
-			
 		def prefMap = [:]
 		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency'].each{t->
 		   prefMap << [(t) : userPreferenceService.getPreference(t)]
@@ -331,14 +328,12 @@ class AssetEntityController {
 				try {
 					exportTime = format.parse( (titleSheet.getCell( 1,5 ).contents).toString() )
 				}catch ( Exception e) {
-					flash.error = 'The Export date time was not found on the Title sheet.'
-					forward action:forwardAction, params: [error: flash.error]
+					forward action:forwardAction, params: [message: 'The Export date time was not found on the Title sheet.']
 					return
 				}
 
 			} else {
-				flash.error = 'The required Title tab was not found in the spreadsheet.'
-				forward action:forwardAction, params: [error: flash.error]
+				forward action:forwardAction, params: [message: 'The required Title tab was not found in the spreadsheet.']
 				return
 			}
 
@@ -375,23 +370,19 @@ class AssetEntityController {
 			// Statement to check Headers if header are not found it will return Error message
 			if ( !checkHeader( serverColumnslist, serverColumnNames ) ) {
 				def missingHeader = missingHeader.replaceFirst(",","")
-				flash.error = " Server Column Headers : ${missingHeader} not found, Please check it."
-				forward action:forwardAction, params: [error: flash.error]
+				forward action:forwardAction, params: [message: " Server Column Headers : ${missingHeader} not found, Please check it."]
 				return
 			} else if ( !checkHeader( appColumnslist, appColumnNames ) ) {
 				def missingHeader = missingHeader.replaceFirst(",","")
-				flash.error = " Applciations Column Headers : ${missingHeader} not found, Please check it."
-				forward action:forwardAction, params: [error: flash.error]
+				forward action:forwardAction, params: [message: " Applciations Column Headers : ${missingHeader} not found, Please check it."]
 				return
 			} else if ( !checkHeader( databaseColumnslist, databaseColumnNames ) ) {
 				def missingHeader = missingHeader.replaceFirst(",","")
-				flash.error = " Databases Column Headers : ${missingHeader} not found, Please check it."
-				forward action:forwardAction, params: [error: flash.error]
+				forward action:forwardAction, params: [message: " Databases Column Headers : ${missingHeader} not found, Please check it."]
 				return
 			} else if ( !checkHeader( filesColumnslist, filesColumnNames ) ) {
 				def missingHeader = missingHeader.replaceFirst(",","")
-				flash.error = " Storage Column Headers : ${missingHeader} not found, Please check it."
-				forward action:forwardAction, params: [error: flash.error]
+				forward action:forwardAction, params: [message: " Storage Column Headers : ${missingHeader} not found, Please check it."]
 				return
 			} else {
 				//get user name.
@@ -505,8 +496,7 @@ class AssetEntityController {
 										try{
 											assetId = Integer.parseInt(serverSheet.getCell( 0, r ).contents)
 										} catch( NumberFormatException ex ) {
-											flash.error = "AssetId must be an Integer on the Server tab at row ${r+1}"
-											forward action:forwardAction, params: [error: flash.error]
+											forward action:forwardAction, params: [message: "AssetId must be an Integer on the Server tab at row ${r+1}"]
 											return
 										}
 									}
@@ -568,8 +558,7 @@ class AssetEntityController {
 										try{
 											assetId = Integer.parseInt(appSheet.getCell( 0, r ).contents)
 										} catch( NumberFormatException ex ) {
-											flash.error = "AppId must be an Integer on the Application tab at row ${r+1}"
-											forward action:'assetImport', params: [error: flash.error]
+											forward action:'assetImport', params: [message: "AppId must be an Integer on the Application tab at row ${r+1}"]
 											return
 										}
 									}
@@ -632,8 +621,7 @@ class AssetEntityController {
 										try{
 											assetId = Integer.parseInt(databaseSheet.getCell( 0, r ).contents)
 										} catch( NumberFormatException ex ) {
-											flash.error = "DBId must be an Integer on the Database tab at row ${r+1}"
-											forward action:forwardAction, params: [error: flash.error]
+											forward action:forwardAction, params: [message: "DBId must be an Integer on the Database tab at row ${r+1}"]
 										}
 									}
 									def dataTransferValues = "("+assetId+",'"+databaseSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+dbDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
@@ -692,8 +680,7 @@ class AssetEntityController {
 										try{
 											assetId = Integer.parseInt(filesSheet.getCell( 0, r ).contents)
 										} catch( NumberFormatException ex ) {
-											flash.error = "StorageId must be an Integer on the Storage tab at row ${r+1}"
-											forward action:forwardAction, params: [error: flash.error]
+											forward action:forwardAction, params: [message: "StorageId must be an Integer on the Storage tab at row ${r+1}"]
 											return
 										}
 									}
@@ -820,13 +807,11 @@ class AssetEntityController {
 			forward action:forwardAction
 
 		} catch( NumberFormatException nfe ) {
-			ex.printStackTrace()
-			flash.error = nfe
-			forward action:forwardAction, params: [error: flash.error]
+			nfe.printStackTrace()
+			forward action:forwardAction, params: [message: nfe]
 		} catch( Exception ex ) {
 			ex.printStackTrace()
-			flash.error = ex
-			forward action:forwardAction, params: [error: flash.error]
+			forward action:forwardAction, params: [message: ex]
 		}
 	}
 	/*------------------------------------------------------------
