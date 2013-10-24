@@ -14,7 +14,9 @@ enum TimeConstraintType {
 
 	ALAP ('As Late As Possible'),
 	ASAP ('As Soon As Possible'),
-	MSO ('Must Start On')
+	FNLT ('Finish No Later Than'),
+	MSO ('Must Start On'),
+	SNLT ('Start No Later Than')
 
 	//
 	// Boiler Plate from here down - Just swap out the enum class name

@@ -185,7 +185,7 @@ class TimeUtil {
 			try {
 				ret = new Date(date.getTime() + tz.getRawOffset());				
 			} catch (e) { 
-				log.error "convertInToUserTZ(${date}, ${tzId}) had exception: e.toString()" 
+				// log.error "convertInToUserTZ(${date}, ${tzId}) had exception: e.toString()" 
 			}
 			
 			// println "convertInToUserTZ() date=${date}, tzId=${tzId}, newDate=${ret}"
@@ -202,6 +202,24 @@ class TimeUtil {
 			}*/
 		}
 		return ret;
+	}
+
+	/**
+	 * Used to convert a string into a date that includes the Timezone
+	 * @param the datetime as a string
+	 * @return The date or null if it failed to parse it
+	 **/
+	def public static Date parseDateTime( String text) {
+		def format = new SimpleDateFormat("MM/dd/yyyy hh:mma z")
+
+		def dt
+
+		try {
+			dt = format.parse(text)
+		} catch (java.text.ParseException e) {
+			// println "parseDateTime() invalid formated string $text"
+		}
+		return dt
 	}
 
 	/**

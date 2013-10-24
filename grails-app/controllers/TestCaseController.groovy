@@ -191,12 +191,24 @@ class TestCaseController {
 		results.append('</table>')
 
 */
-		results.append("<h1>Tasks Details</h1><table><tr><th>Id</th><th>Task</th><th>Duration</th><th>Earliest Start</th><th>Latest Start</th><th>Critical Path</td>" + 
-			"<th>Team</th><th>Individual</th></tr>")
+		results.append("<h1>Tasks Details</h1><table><tr><th>Id</th><th>Task</th><th>Duration</th><th>Earliest Start</th><th>Latest Start</th>" +
+			"<th>Constraint Time</th><th>Critical Path</td>" + 
+			"<th>Team</th><th>Individual</th><th>Category</th></tr>")
 		tasks.each { t ->
+
 			def person = t.assignedTo ?: '&nbsp;'
-			results.append("<tr><td>${t.id}</td><td>${t.taskNumber} ${t.comment}</td><td>${t.duration}</td><td>${t.tmpEarliestStart}</td><td>${t.tmpLatestStart}</td>" + 
-				"<td>${t.tmpCriticalPath ? 'Yes' : 'No'}</td><td>${t.role}</td><td>$person</td></tr>")
+			def constraintTime = '&nbsp;'
+			if (t.constraintTime) {
+				def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+				constraintTime = formatter.format(TimeUtil.convertInToUserTZ(t.constraintTime, tzId))
+			}
+ 
+ 			def criticalPath = (t.duration > 0 && t.tmpEarliestStart == tmpLatestStart ? 'YES' : 'no')
+ 			// (t.tmpCriticalPath ? 'Yes' : 'No'
+			results.append( "<tr><td>${t.id}</td><td>${t.taskNumber} ${t.comment}</td><td>${t.duration}</td><td>${t.tmpEarliestStart}</td>" + 
+				"<td>${t.tmpLatestStart}</td><td>$constraintTime ${t.constraintType}</td>" + 
+				"<td>$criticalPath</td><td>${t.role}</td><td>$person</td><td>${t.category}</tr>")
 		}
 		results.append('</table>')
 

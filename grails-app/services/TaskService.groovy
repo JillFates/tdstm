@@ -6,8 +6,7 @@
  *
  */
 
-import org.apache.shiro.SecurityUtils
-
+// Domains
 import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.Database
@@ -16,37 +15,36 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.CommentNote
 import com.tds.asset.TaskDependency
+// Enums
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.AssetDependencyType
 import com.tdsops.tm.enums.domain.RoleTypeGroup
+import com.tdsops.tm.enums.domain.TimeConstraintType
+// Utilities
 import com.tdsops.common.lang.GStringEval
 import com.tdsops.common.sql.SqlUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
-
+// 3rd party
+import org.apache.shiro.SecurityUtils
 import org.quartz.SimpleTrigger
 import org.quartz.Trigger
-
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.SqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-
 import groovy.time.TimeDuration
 import groovy.time.TimeCategory
 import groovy.text.GStringTemplateEngine as Engine
-
 import grails.util.GrailsNameUtils
-
 import org.hibernate.SessionFactory;
 import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.apache.commons.lang.StringUtils as SU
 import org.apache.commons.lang.math.NumberUtils
-
 import org.springframework.beans.factory.InitializingBean
 
 class TaskService implements InitializingBean {
@@ -2563,10 +2561,15 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// TODO : Should be able to parse the duration for a character
 		task.durationScale = 'm'
 		
-		if (asset) {
-			task.comment = new GStringEval().toString(taskSpec.title, asset)
-		} else {
-			task.comment = new GStringEval().toString(taskSpec.title, moveEvent)
+		try {
+			if (asset) {
+				task.comment = new GStringEval().toString(taskSpec.title, asset)
+			} else {
+				task.comment = new GStringEval().toString(taskSpec.title, moveEvent)
+			}
+		catch (Exception ex) {
+			exeptions.append("Unable to parse title (${taskSpec.title}) for taskSpec ${taskSpec.id}<br/>")
+			task.comment = "** Error computing title **"
 		}
 			
 		// Set various values if there is a workflow associated to this taskSpec and Asset
@@ -2601,6 +2604,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		
 		log.info "Saved task ${task.id} - ${task}"
 		
+		// Set any scheduling constraints on the task
+		setTaskConstraints(task, taskSpec, workflow, projectStaff, exceptions) 
+
 		return task
 	}
 	
@@ -3163,6 +3169,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				if (msg) 
 					exceptions.append("$msg<br/>")
 
+				// Set any scheduling constraints on the task
+				setTaskConstraints(task, taskSpec, workflow, projectStaff, exceptions) 
+
 				taskList << task
 			}
 		}
@@ -3397,7 +3406,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def type = GrailsClassUtils.getPropertyType(asset.getClass(), property)?.getName()
 		if (type == 'java.lang.String') {			
 			// Check to see if we're referencing a person object vs a string
-			if ( asset[property][0] == '#' ) {
+			log.debug "getIndirectPropertyRef() $property of type $type has value (${asset[property]})"
+			if ( asset[property]?.size() && asset[property][0] == '#' ) {
 				if (++depth < 3)  {
 					value = getIndirectPropertyRef( asset, asset[property], depth)
 				} else {
@@ -3407,7 +3417,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				value = asset[property]
 			}
 		} else {
-			log.info "getIndirectPropertyRef() indirect referrences property $property of type $type"
+			log.debug "getIndirectPropertyRef() indirect references property $property of type $type"
 			value = asset[property]
 		}
 
@@ -3429,4 +3439,59 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		log.info "saveMissingDep() Added missing predecessor to stack ($key) for task $task. Now have ${missedDepList[key].size()} missed predecessors"
 	}
 
+	/** 
+	 * Helper method to set any scheduling constraints on a task
+	 * @param task
+	 * @param taskSpec
+	 * @param 
+	 * @return ? 
+	 */
+	private void setTaskConstraints(AssetComment task, Map taskSpec, workflow, List projectStaff, StringBuffer exceptions) {
+		def ctype 
+		def cdt
+		def dateTime 
+
+		// Check to see if we have a type
+		if (taskSpec.containsKey('constraintType')) {
+			ctype = TimeConstraintType.asEnum(taskSpec.constraintType)
+			if (! ctype) {
+				exceptions.append("TaskSpec ${taskSpec.id} constraintType contains invalid value, must be one of ${TimeConstraintType.getKeys()}<br/>")
+				return
+			}
+		}
+
+		// Check for an actual time and parse it if so
+		if (taskSpec.containsKey('constraintTime')) {
+			cdt = taskSpec.constraintTime
+			if (cdt?.size()) {
+				if (cdt[0] == '#') {
+					if (task.assetEntity) {
+						// Get indirect reference to where the DateTime value is stored in the asset
+						cdt = getIndirectPropertyRef(task.assetEntity, cdt)						
+					} else {
+						exceptions.append("TaskSpec ${taskSpec.id} can not use indirect reference ($cdt) for constraintTime of non-asset type task spec<br/>")
+						return
+					}
+				} 
+
+				// Let's try to convert the text into a date time
+				if (cdt?.size()) {
+					dateTime = TimeUtil.parseDateTime(cdt)
+					if (! dateTime) {
+						exceptions.append("TaskSpec ${taskSpec.id} for task ($task.taskNumber) has unparsable date ($cdt)<br/>")
+						return
+					}
+				}
+			}
+		}
+
+		task.constraintType = ctype
+		switch (ctype) {
+			case TimeConstraintType.FNLT:
+			case TimeConstraintType.MSO:
+			case TimeConstraintType.SNLT:
+				task.constraintTime = dateTime
+		}
+
+	}
 }
