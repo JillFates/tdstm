@@ -2567,7 +2567,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			} else {
 				task.comment = new GStringEval().toString(taskSpec.title, moveEvent)
 			}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			exeptions.append("Unable to parse title (${taskSpec.title}) for taskSpec ${taskSpec.id}<br/>")
 			task.comment = "** Error computing title **"
 		}
