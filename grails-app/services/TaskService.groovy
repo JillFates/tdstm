@@ -45,6 +45,8 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.apache.commons.lang.StringUtils as SU
 import org.apache.commons.lang.math.NumberUtils
+import java.text.SimpleDateFormat
+
 import org.springframework.beans.factory.InitializingBean
 
 class TaskService implements InitializingBean {
