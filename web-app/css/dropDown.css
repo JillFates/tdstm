@@ -102,9 +102,6 @@
       background-color: #354E81;
     }
     
-    div.tzmenu:hover ul {
-      display: block;     
-    }
     /**************************** Rack Menu***************************/
     .rack_menu {
       width: auto;

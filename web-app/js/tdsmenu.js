@@ -184,29 +184,6 @@
 				tipTimer = null;
 			}
 		}
-		function waitForMenu(e, isMobile){
-			if(e=='#teamMegaMenu'){
-				jQuery.ajax({
-					url: contextPath+'/clientTeams/getToDoCount',
-					type:'POST',
-					success: function(resp) {
-						$("#todoCountProjectId").html(resp.count)
-					},
-					error: function(jqXHR, textStatus, errorThrown) {
-						console.log("Unable to lookup task count - " + errorThrown)
-					}
-				});
-			}
-			if(isMobile=='true'){
-				showMegaMenu(e)
-			}else{
-				clearTipTimer();
-				tipTimer = setTimeout(function() {
-					tipTimer = null;
-					showMegaMenu(e);
-				}, 400);
-			}
-		}
 		
 		function showMegaMenu(e){
 			$('#adminMegaMenu').hide();
@@ -262,6 +239,16 @@
 					$("#bundleAnchor").css("display","inline")
 				}
 				if(e == "#teamMegaMenu"){
+					jQuery.ajax({
+						url: contextPath+'/clientTeams/getToDoCount',
+						type:'POST',
+						success: function(resp) {
+							$("#todoCountProjectId").html(resp.count)
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							console.log("Unable to lookup task count - " + errorThrown)
+						}
+					});
 					$("#teamMenuId a").css('background-color','lightblue');
 					$("#teamMenuId a").css('border-right-color','lightblue');
 					$("#teamMenuId a").css('color','#354E81');
@@ -426,3 +413,8 @@
 		var timeout = 500;
 		var megamenuitem = 0;
 		document.onclick = closeMegaMenu;// close mega when click-out
+		$(document).click(function(e){
+	        if (!$(e.target).is('.tzmenu,#tzId')) {
+	        	$(".tzmenu ul").hide();
+	        }
+		});
