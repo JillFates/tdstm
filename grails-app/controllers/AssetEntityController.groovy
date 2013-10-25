@@ -174,9 +174,6 @@ class AssetEntityController {
 		def	dataTransferBatchs = DataTransferBatch.findAllByProject(project).size()
 		session.setAttribute("BATCH_ID",0)
 		session.setAttribute("TOTAL_ASSETS",0)
-		if( params.message ) {
-		  flash.message = params.message
-		}
 		
 		def prefMap = [:]
 		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency'].each{t->
@@ -193,7 +190,7 @@ class AssetEntityController {
 					moveBundleInstanceList: moveBundleInstanceList,
 					dataTransferSetImport: dataTransferSetImport,
 					dataTransferSetExport: dataTransferSetExport, prefMap:prefMap,
-					dataTransferBatchs: dataTransferBatchs, args:params.list("args"), isMSIE:isMSIE, warnMsg:params.warnMsg] )
+					dataTransferBatchs: dataTransferBatchs, args:params.list("args"), isMSIE:isMSIE, message:params.message, error:params.error] )
 	}
 	/* -----------------------------------------------------
 	 * To Export the assets
@@ -328,12 +325,12 @@ class AssetEntityController {
 				try {
 					exportTime = format.parse( (titleSheet.getCell( 1,5 ).contents).toString() )
 				}catch ( Exception e) {
-					forward action:forwardAction, params: [message: 'The Export date time was not found on the Title sheet.']
+					forward action:forwardAction, params: [error: 'The Export date time was not found on the Title sheet.']
 					return
 				}
 
 			} else {
-				forward action:forwardAction, params: [message: 'The required Title tab was not found in the spreadsheet.']
+				forward action:forwardAction, params: [error: 'The required Title tab was not found in the spreadsheet.']
 				return
 			}
 
@@ -370,19 +367,19 @@ class AssetEntityController {
 			// Statement to check Headers if header are not found it will return Error message
 			if ( !checkHeader( serverColumnslist, serverColumnNames ) ) {
 				def missingHeader = missingHeader.replaceFirst(",","")
-				forward action:forwardAction, params: [message: " Server Column Headers : ${missingHeader} not found, Please check it."]
+				forward action:forwardAction, params: [error: " Server Column Headers : ${missingHeader} not found, Please check it."]
 				return
 			} else if ( !checkHeader( appColumnslist, appColumnNames ) ) {
 				def missingHeader = missingHeader.replaceFirst(",","")
-				forward action:forwardAction, params: [message: " Applciations Column Headers : ${missingHeader} not found, Please check it."]
+				forward action:forwardAction, params: [error: " Applciations Column Headers : ${missingHeader} not found, Please check it."]
 				return
 			} else if ( !checkHeader( databaseColumnslist, databaseColumnNames ) ) {
 				def missingHeader = missingHeader.replaceFirst(",","")
-				forward action:forwardAction, params: [message: " Databases Column Headers : ${missingHeader} not found, Please check it."]
+				forward action:forwardAction, params: [error: " Databases Column Headers : ${missingHeader} not found, Please check it."]
 				return
 			} else if ( !checkHeader( filesColumnslist, filesColumnNames ) ) {
 				def missingHeader = missingHeader.replaceFirst(",","")
-				forward action:forwardAction, params: [message: " Storage Column Headers : ${missingHeader} not found, Please check it."]
+				forward action:forwardAction, params: [error: " Storage Column Headers : ${missingHeader} not found, Please check it."]
 				return
 			} else {
 				//get user name.
@@ -496,7 +493,7 @@ class AssetEntityController {
 										try{
 											assetId = Integer.parseInt(serverSheet.getCell( 0, r ).contents)
 										} catch( NumberFormatException ex ) {
-											forward action:forwardAction, params: [message: "AssetId must be an Integer on the Server tab at row ${r+1}"]
+											forward action:forwardAction, params: [error: "AssetId must be an Integer on the Server tab at row ${r+1}"]
 											return
 										}
 									}
@@ -558,7 +555,7 @@ class AssetEntityController {
 										try{
 											assetId = Integer.parseInt(appSheet.getCell( 0, r ).contents)
 										} catch( NumberFormatException ex ) {
-											forward action:'assetImport', params: [message: "AppId must be an Integer on the Application tab at row ${r+1}"]
+											forward action:'assetImport', params: [error: "AppId must be an Integer on the Application tab at row ${r+1}"]
 											return
 										}
 									}
@@ -621,7 +618,7 @@ class AssetEntityController {
 										try{
 											assetId = Integer.parseInt(databaseSheet.getCell( 0, r ).contents)
 										} catch( NumberFormatException ex ) {
-											forward action:forwardAction, params: [message: "DBId must be an Integer on the Database tab at row ${r+1}"]
+											forward action:forwardAction, params: [error: "DBId must be an Integer on the Database tab at row ${r+1}"]
 										}
 									}
 									def dataTransferValues = "("+assetId+",'"+databaseSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+dbDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
@@ -680,7 +677,7 @@ class AssetEntityController {
 										try{
 											assetId = Integer.parseInt(filesSheet.getCell( 0, r ).contents)
 										} catch( NumberFormatException ex ) {
-											forward action:forwardAction, params: [message: "StorageId must be an Integer on the Storage tab at row ${r+1}"]
+											forward action:forwardAction, params: [error: "StorageId must be an Integer on the Storage tab at row ${r+1}"]
 											return
 										}
 									}
@@ -792,7 +789,7 @@ class AssetEntityController {
 			workbook.close()
 			added = serverAdded + appAdded + dbAdded + filesAdded + dependencyAdded
 			
-			flash.message = "<b>Spreadsheet import was successful</b>" +
+			def message = "<b>Spreadsheet import was successful</b>" +
 				( flagToManageBatches ? '<p>Please click the Manage Batches below to review and post these changes</p>' : '' ) +
 				'<p>Results: <ul>' +
 				"<li>${serverAdded} Servers loaded" + 
@@ -804,14 +801,14 @@ class AssetEntityController {
 				( skipped.size() ? "${skipped.size()} spreadsheet rows were skipped: <ul><li>${skipped.join('<li>')}</ul>" : '' ) +
 				'</ul></p>'
 			
-			forward action:forwardAction
+			forward action:forwardAction, params: [message: message]
 
 		} catch( NumberFormatException nfe ) {
 			nfe.printStackTrace()
-			forward action:forwardAction, params: [message: nfe]
+			forward action:forwardAction, params: [error: nfe]
 		} catch( Exception ex ) {
 			ex.printStackTrace()
-			forward action:forwardAction, params: [message: ex]
+			forward action:forwardAction, params: [error: ex]
 		}
 	}
 	/*------------------------------------------------------------

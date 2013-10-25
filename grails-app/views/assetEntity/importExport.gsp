@@ -74,6 +74,12 @@
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
+		<g:if test="${error}">
+            <div class="message">${error}</div>
+        </g:if>
+        <g:if test="${message}">
+            <div class="message">${message}</div>
+        </g:if>
     	<h1>Asset Import</h1>
     	<g:hiddenField name="requestCount" id="requestCount" value="1"/>
         <g:form action="upload" method="post" name="importForm" enctype="multipart/form-data" >
