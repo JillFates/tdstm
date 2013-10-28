@@ -1371,22 +1371,21 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def linkTaskToLastAssetOrMilestone = { taskToLink ->
 			// See if there is an asset and that there are previous tasks for the asset
 			log.info "linkTaskToLastAssetOrMilestone: assetsLatestTask=${assetsLatestTask.size()}"
-			if ( taskToLink.assetEntity 
-				 && assetsLatestTask.containsKey(taskToLink.assetEntity.id) 
-				 && assetsLatestTask[taskToLink.assetEntity.id].taskNumber != taskToLink.taskNumber 
-			) {
-				log.info "linkTaskToLastAssetOrMilestone - $taskToLink"
-				depCount += createTaskDependency( assetsLatestTask[taskToLink.assetEntity.id], taskToLink, taskList, isRequired, out)
+			if ( taskToLink.assetEntity ) {
+				if (assetsLatestTask.containsKey(taskToLink.assetEntity.id) && assetsLatestTask[taskToLink.assetEntity.id].taskNumber != taskToLink.taskNumber ) {
+					log.info "linkTaskToLastAssetOrMilestone - $taskToLink"
+					depCount += createTaskDependency( assetsLatestTask[taskToLink.assetEntity.id], taskToLink, taskList, isRequired, out)
+					out.append("Created dependency between ${assetsLatestTask[taskToLink.assetEntity.id]} and $taskToLink<br/>")
+				} else {
+					linkTaskToMilestone( taskToLink )
+				}
 
+				// We want to track that the asset was bound to this tasks regardless if there was a previous task for the asset
 				if ( (isMilestone || isRequired) ) {
 					assetsLatestTask[taskToLink.assetEntity.id] = taskToLink
-					log.info "linkTaskToLastAssetOrMilestone: Added latest task $taskToLink to asset ${taskToLink.assetEntity} - 2"
-					
+					log.info "linkTaskToLastAssetOrMilestone: Added latest task $taskToLink to asset ${taskToLink.assetEntity} - 2"					
 				}
-				out.append("Created dependency between ${assetsLatestTask[taskToLink.assetEntity.id]} and $taskToLink<br/>")
-				// Now we can associate this new task as the latest task for the asset									
-				// assetsLatestTask.put(taskToLink.assetEntity.id, taskToLink)
-				
+					
 			} else {
 				log.info "linkTaskToLastAssetOrMilestone: isRequired=$isRequired, task.asset=${taskToLink.assetEntity}"
 				linkTaskToMilestone( taskToLink )
@@ -2277,12 +2276,26 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 									throw new RuntimeException(msg)
 								}
 								
-								// Iterate over the associated assets, setting it to the task and creating the predecessor
+								// This logic is used for the various grouping actions (e.g. cart, truck, set)
+								// Iterate over the associated assets that were stuffed into the task.associatedAssets list
+								def foundPred=false
 								tnp.associatedAssets.each() { assocAsset ->
-									tnp.assetEntity = assocAsset
-									linkTaskToLastAssetOrMilestone(tnp)
+									// Let's stuff the asset into the task and then wire up the predecessors 
+									if (assetsLatestTask.containsKey(assocAsset.id)) {
+										tnp.assetEntity = assocAsset
+										linkTaskToLastAssetOrMilestone(tnp)
+										foundPred = true
+									} else {
+										assetsLatestTask[assocAsset.id] = tnp
+									}
 								}
 								tnp.assetEntity = null
+
+								if (! foundPred) {
+									// If we didn't wire-up the tnp to previous tasks then we need to wire up the tnp the last gateway
+									linkTaskToLastAssetOrMilestone(tnp)
+								}
+
 								wasWired = true
 
 								break
@@ -3093,7 +3106,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		log.info("Found ${tasksToCreate.size()} $action for createAssetActionTasks and assetsForAction=${assetsForAction.size()}")
 
 		def template = new Engine().createTemplate(taskSpec.title)
-		
+
 		tasksToCreate.each() { ttc ->
 
 			if ( validateForTask(ttc) ) {
@@ -3133,8 +3146,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						map.location = ttc["${loc}Location"] ?: ''
 						break
 				}
-
-				task.comment = template.make(map).toString()
+				try {
+					task.comment = template.make(map).toString()
+				} catch (Exception ex) {
+					exceptions.append("Unable to evaluate title ($taskSpec.title) of TaskSpec ${taskSpec.id} with map=$map<br/>")
+					task.comment = '** Unable to evaluate title **'
+				}
 				log.info "Creating $action task - $task"
 
 				// Handle the various settings from the taskSpec
@@ -3156,7 +3173,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					// If we're not ignorning the predecessor
 					assocAssets = findAssets(ttc)			
 					if (assocAssets.size() == 0) {
-						msg = "Unable to find expected assets for $action in TaskSpec(${taskSpec.id})"
+						exceptions.append("Unable to find expected assets for $action in TaskSpec(${taskSpec.id})<br/>")
 						log.error "$msg on event $moveEvent"
 						throw new RuntimeException(msg)
 					}
