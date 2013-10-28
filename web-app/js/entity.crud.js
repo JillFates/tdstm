@@ -387,6 +387,7 @@ function submitMoveForm(){
 }
 function updateToShow($me, forWhom){
 	var act = $me.data('action')
+	var redirect = $me.data('redirect')
 	if(act=='close')
 		$('#updateView').val('closeView')
 	else
@@ -413,6 +414,8 @@ function updateToShow($me, forWhom){
 							$('.ui-icon-refresh').click();
 					}else{
 						$('#editEntityView').dialog('close')
+						if(redirect == 'room')
+							getRackLayout( $('#selectedRackId').val() )
 						$('#showEntityView').html(data)
 						$("#showEntityView").dialog('option', 'width', 'auto')
 						$("#showEntityView").dialog('option', 'position', ['center','top']);
