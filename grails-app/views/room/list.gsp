@@ -398,7 +398,10 @@
 					onSuccess:function(e){updateRackPower( rackId )},
 					onComplete:function(e){
 							jQuery('#rackLayout').html(e.responseText);
-							$("#auditDetailViewId").hide()
+							if(forWhom=='room')
+								$("#auditDetailViewId").show()
+							else
+								$("#auditDetailViewId").hide()
 							getAssignedDetails('room', rackId)
 						},parameters:moveBundleId+'rackId='+rackId+'&backView=off&showCabling=off&otherBundle='+otherBundle+'&bundleName=on&hideIcons=on&forWhom='+forWhom});return false;
 			}

@@ -542,6 +542,7 @@ function updateAudit(){
 			if(data.errMsg){
 				alert(data.errMsg)
 			}else{
+				getRackLayout( $('#selectedRackId').val() )
 				$("#auditDetailViewId").html(data)
 			}
 		}
@@ -815,6 +816,7 @@ function getHelpTextAsToolTip(type){
 
 function saveToShow($me, forWhom){
 	var act = $me.data('action')
+	var redirect = $me.data('redirect').split("_")[0]
 	if(act=='close'){
 		$('#showView').val('closeView')
 	}else{
@@ -847,6 +849,8 @@ function saveToShow($me, forWhom){
 						$('#createEntityView').dialog('close')
 						if($('.ui-icon-refresh').length)
 							$('.ui-icon-refresh').click();
+						if(redirect=='room')
+							getRackLayout( $('#selectedRackId').val() )
 						$('#showEntityView').html(data)
 						$("#showEntityView").dialog('option', 'width', 'auto')
 						$("#showEntityView").dialog('option', 'position', ['center','top']);
