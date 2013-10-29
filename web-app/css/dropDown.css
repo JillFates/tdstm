@@ -101,6 +101,12 @@
       color: #ffffff;
       background-color: #354E81;
     }
+    .active {
+    	display: block;
+	}
+	.inActive{
+		display: none;
+	}
     
     /**************************** Rack Menu***************************/
     .rack_menu {

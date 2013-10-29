@@ -184,96 +184,112 @@
 				tipTimer = null;
 			}
 		}
-		
 		function showMegaMenu(e){
-			$('#adminMegaMenu').hide();
-			$('#projectMegaMenu').hide();
-			$('#racksMegaMenu').hide();
-			$('#assetMegaMenu').hide();
-			$('#bundleMegaMenu').hide();
-			$('#teamMegaMenu').hide();
-			$('#consoleMegaMenu').hide();
-			$('#dashboardMegaMenu').hide();
-			$('#reportsMegaMenu').hide();
-			$('#userMegaMenu').hide();
+			if(megamenuitem!=e)
+				$(".active").removeClass('active').addClass('inActive')
+			if($(e).hasClass('inActive'))
+				$(e).addClass('active').removeClass('inActive')
+			else
+				$(e).addClass('inActive').removeClass('active')
+			
 			resetmenu2();
 			if(e!=""){
-				$(e).show();
 				clearTipTimer()
 				megamenuitem = e;
-				if(e == "#adminMegaMenu"){
-					$("#adminMenuId a").css('background-color','lightblue');
-					$("#adminMenuId a").css('border-right-color','lightblue');
-					$("#adminMenuId a").css('color','#354E81');
-					$("#adminAnchor").css("display","inline")
-				}
-				if(e == "#projectMegaMenu"){
-					$("#projectMenuId a").css('background-color','lightblue');
-					$("#projectMenuId a").css('border-right-color','lightblue');
-					$("#projectMenuId a").css('color','#354E81');
-					$("#projectAnchor").css("display","inline")
-				}
-				if(e == "#racksMegaMenu"){
-					$("#roomMenuId a").css('background-color','lightblue');
-					$("#roomMenuId a").css('border-right-color','lightblue');
-					$("#roomMenuId a").css('color','#354E81');
-					$("#rackMenuId a").css('background-color','lightblue');
-					$("#rackMenuId a").css('border-right-color','lightblue');
-					$("#rackMenuId a").css('color','#354E81');
-					$("#rackAnchor").css("display","inline")
-				}
-				if(e == "#assetMegaMenu"){
-					$("#assetMenuId a").css('background-color','lightblue');
-					$("#assetMenuId a").css('border-right-color','lightblue');
-					$("#assetMenuId a").css('color','#354E81');
-					$("#assetAnchor").css("display","inline")
-					
-				}
-				if(e == "#bundleMegaMenu"){
-					$("#eventMenuId a").css('background-color','lightblue');
-					$("#eventMenuId a").css('border-right-color','lightblue');
-					$("#eventMenuId a").css('color','#354E81');
-					$("#bundleMenuId a").css('background-color','lightblue');
-					$("#bundleMenuId a").css('border-right-color','lightblue');
-					$("#bundleMenuId a").css('color','#354E81');
-					$("#bundleAnchor").css("display","inline")
-				}
-				if(e == "#teamMegaMenu"){
-					jQuery.ajax({
-						url: contextPath+'/clientTeams/getToDoCount',
-						type:'POST',
-						success: function(resp) {
-							$("#todoCountProjectId").html(resp.count)
-						},
-						error: function(jqXHR, textStatus, errorThrown) {
-							console.log("Unable to lookup task count - " + errorThrown)
-						}
-					});
-					$("#teamMenuId a").css('background-color','lightblue');
-					$("#teamMenuId a").css('border-right-color','lightblue');
-					$("#teamMenuId a").css('color','#354E81');
-					$("#teamAnchor").css("display","inline")
-				}
-				if(e == "#consoleMegaMenu"){
-					$("#consoleMenuId a").css('background-color','lightblue');
-					$("#consoleMenuId a").css('border-right-color','lightblue');
-					$("#consoleMenuId a").css('color','#354E81');
-					$("#consoleAnchor").css("display","inline")
-				}
-				if(e == "#dashboardMegaMenu"){
-					$("#dashboardMenuId a").css('background-color','lightblue');
-					$("#dashboardMenuId a").css('border-right-color','lightblue');
-					$("#dashboardMenuId a").css('color','#354E81');
-					$("#dashboardAnchor").css("display","inline")
-				}
-				if(e == "#reportsMegaMenu"){
-					$("#reportsMenuId a").css('background-color','lightblue');
-					$("#reportsMenuId a").css('border-right-color','lightblue');
-					$("#reportsMenuId a").css('color','#354E81');
-					$("#reportAnchor").css("display","inline")
-				}
-				if(e == "#userMegaMenu"){
-					$("#userMenuId div").css('background-color','lightblue');
+				switch(e){
+				case "#adminMegaMenu":
+					if($("#adminMegaMenu:visible").length){
+						$("#adminMenuId a").css('background-color','lightblue');
+						$("#adminMenuId a").css('border-right-color','lightblue');
+						$("#adminMenuId a").css('color','#354E81');
+						$("#adminAnchor").css("display","inline")
+					}
+					break;
+				case "#projectMegaMenu":
+					if($("#projectMegaMenu:visible").length){
+						$("#projectMenuId a").css('background-color','lightblue');
+						$("#projectMenuId a").css('border-right-color','lightblue');
+						$("#projectMenuId a").css('color','#354E81');
+						$("#projectAnchor").css("display","inline")
+					}
+					break;
+				case "#racksMegaMenu":
+					if($("#racksMegaMenu:visible").length){
+						$("#roomMenuId a").css('background-color','lightblue');
+						$("#roomMenuId a").css('border-right-color','lightblue');
+						$("#roomMenuId a").css('color','#354E81');
+						$("#rackMenuId a").css('background-color','lightblue');
+						$("#rackMenuId a").css('border-right-color','lightblue');
+						$("#rackMenuId a").css('color','#354E81');
+						$("#rackAnchor").css("display","inline")
+					}
+					break;
+				case "#assetMegaMenu":
+					if($("#assetMegaMenu:visible").length){
+						$("#assetMenuId a").css('background-color','lightblue');
+						$("#assetMenuId a").css('border-right-color','lightblue');
+						$("#assetMenuId a").css('color','#354E81');
+						$("#assetAnchor").css("display","inline")
+					}
+					break;
+				case "#bundleMegaMenu":
+					if($("#bundleMegaMenu:visible").length){
+						$("#eventMenuId a").css('background-color','lightblue');
+						$("#eventMenuId a").css('border-right-color','lightblue');
+						$("#eventMenuId a").css('color','#354E81');
+						$("#bundleMenuId a").css('background-color','lightblue');
+						$("#bundleMenuId a").css('border-right-color','lightblue');
+						$("#bundleMenuId a").css('color','#354E81');
+						$("#bundleAnchor").css("display","inline")
+					}
+					break;
+				case "#teamMegaMenu":
+					if($("#teamMegaMenu:visible").length){
+						jQuery.ajax({
+							url: contextPath+'/clientTeams/getToDoCount',
+							type:'POST',
+							success: function(resp) {
+								$("#todoCountProjectId").html(resp.count)
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+								console.log("Unable to lookup task count - " + errorThrown)
+							}
+						});
+						$("#teamMenuId a").css('background-color','lightblue');
+						$("#teamMenuId a").css('border-right-color','lightblue');
+						$("#teamMenuId a").css('color','#354E81');
+						$("#teamAnchor").css("display","inline")
+					}
+					break;
+				case "#consoleMegaMenu":
+					if($("#consoleMegaMenu:visible").length){
+						$("#consoleMenuId a").css('background-color','lightblue');
+						$("#consoleMenuId a").css('border-right-color','lightblue');
+						$("#consoleMenuId a").css('color','#354E81');
+						$("#consoleAnchor").css("display","inline")
+					}
+					break;
+				case "#dashboardMegaMenu":
+					if($("#dashboardMegaMenu:visible").length){
+						$("#dashboardMenuId a").css('background-color','lightblue');
+						$("#dashboardMenuId a").css('border-right-color','lightblue');
+						$("#dashboardMenuId a").css('color','#354E81');
+						$("#dashboardAnchor").css("display","inline")
+					}
+					break;
+				case "#reportsMegaMenu":
+					if($("#reportsMegaMenu:visible").length){
+						$("#reportsMenuId a").css('background-color','lightblue');
+						$("#reportsMenuId a").css('border-right-color','lightblue');
+						$("#reportsMenuId a").css('color','#354E81');
+						$("#reportAnchor").css("display","inline")
+					}
+					break;
+				case "#userMegaMenu":
+					if($("#userMegaMenu:visible").length){
+						$("#userMenuId div").css('background-color','lightblue');
+					}
+					break;
 				}
 			}
 		}
@@ -281,7 +297,7 @@
 			$("#"+id).hide()
 		}
 		function closeMegaMenu() {
-			if(megamenuitem) $(megamenuitem).hide();
+			if(megamenuitem) $(megamenuitem).removeClass('active').addClass('inActive');
 			resetmenu2();
 		}
 		function resetmenu2 () {
@@ -412,9 +428,11 @@
 
 		var timeout = 500;
 		var megamenuitem = 0;
-		document.onclick = closeMegaMenu;// close mega when click-out
 		$(document).click(function(e){
 	        if (!$(e.target).is('.tzmenu,#tzId')) {
 	        	$(".tzmenu ul").hide();
+	        }
+	        if (!$(e.target).is('.headerClass')) {
+	        	closeMegaMenu();
 	        }
 		});
