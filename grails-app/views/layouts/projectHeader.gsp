@@ -205,7 +205,7 @@
 					<g:if test="${currProjObj}">
 						<span class="megamenuSection">For <strong><g:if test="${currProjObj.name.size()>25}">${currProjObj.name.substring(0,25)+'...'}</g:if><g:else>${currProjObj.name}</g:else></strong></span><br />
 							<ul >
-								<li><g:link class="mmlink" controller="projectUtil" onclick="hideMegaMenu('projectMegaMenu')"><g:if test="${currProjObj.name.size()>20}">${currProjObj.name.substring(0,20)+'...'}</g:if><g:else>${currProjObj.name}</g:else> Settings</g:link></li>
+								<li><g:link class="mmlink" controller="projectUtil" onclick="hideMegaMenu('projectMegaMenu')"><g:if test="${currProjObj.name.size()>20}">${currProjObj.name.substring(0,20)+'...'}</g:if><g:else>${currProjObj.name}</g:else> Details</g:link></li>
 								<li><g:link class="mmlink" controller="person" action="manageProjectStaff"  onclick="hideMegaMenu('projectMegaMenu')">Project Staff</g:link></li>
 								<li><g:link class="mmlink" controller="project" action="fieldImportance" onclick="hideMegaMenu('adminMegaMenu')">Field Importance</g:link> </li>
 					</g:if>
@@ -229,9 +229,9 @@
 					<td style="vertical-align:top"><span class="megamenuSection">Rooms</span><br />
 						<ul >
 							<li><g:link class="mmlink" params="[viewType:'list']" controller="room"  onclick="hideMegaMenu('racksMegaMenu')">List Rooms</g:link></li>
-							<g:if test="${roomId}">
+							<%-- <g:if test="${roomId}">
 								<li><g:link class="mmlink" params="[viewType:'',roomId:roomId]" controller="room" onclick="hideMegaMenu('racksMegaMenu')">Room ${room?.location}/${room?.roomName}</g:link></li>
-							</g:if>
+							</g:if> --%>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 							</tds:hasPermission>
@@ -310,9 +310,9 @@
 					<td style="vertical-align:top"><span class="megamenuSection">Events</span><br />
 						<ul>
 							<li><g:link class="mmlink" controller="moveEvent" action="list" onclick="hideMegaMenu('bundleMegaMenu')" >List Events</g:link> </li>
-							<g:if test="${currProjObj}">
-							<g:if test="${moveEvent}"><span class="megamenuSection">For <strong>${moveEventName}</strong>:</span><br /></g:if>
-							<li style="white-space:nowrap;"><g:link class="mmlink" controller="moveEvent" action="show" id="${moveEventId}" onclick="hideMegaMenu('bundleMegaMenu')">Event Settings</g:link></li>
+							<g:if test="${currProjObj && moveEvent}">
+								<span class="megamenuSection">For <strong>${moveEventName}</strong>:</span><br />
+								<li style="white-space:nowrap;"><g:link class="mmlink" controller="moveEvent" action="show" id="${moveEventId}" onclick="hideMegaMenu('bundleMegaMenu')">Event Details</g:link></li>
 							</g:if>
 							<tds:hasPermission permission="ShowMovePrep">
 							<li style="white-space:nowrap;"><g:link class="mmlink" controller="reports" action="preMoveCheckList" onclick="hideMegaMenu('bundleMegaMenu')">Pre-event Checklist</g:link></li>
@@ -326,9 +326,9 @@
 					<td style="vertical-align:top"><span class="megamenuSection">Bundles</span><br />
 						<ul>
 							<li><g:link class="mmlink" controller="moveBundle" action="list">List Bundles</g:link> </li>
-					<g:if test="${currProjObj}">
-							<g:if test="${moveBundleId}"><span class="megamenuSection">For <strong>${moveBundleName}</strong>:</span><br /></g:if>
-							<li><g:link class="mmlink" controller="moveBundle" action="show"  onclick="hideMegaMenu('bundleMegaMenu')">Bundle Settings</g:link></li>
+					<g:if test="${currProjObj && moveBundleId}">
+							<span class="megamenuSection">For <strong>${moveBundleName}</strong>:</span><br />
+							<li><g:link class="mmlink" controller="moveBundle" action="show"  onclick="hideMegaMenu('bundleMegaMenu')">Bundle Details</g:link></li>
 							<li><g:link class="mmlink" controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]" onclick="hideMegaMenu('bundleMegaMenu')">Bundled Assets</g:link> </li>
 					</g:if>
 							<tds:hasPermission permission='HelpMenuView'>
@@ -501,7 +501,7 @@
 			<table class="mmtable"><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">${session.getAttribute("LOGIN_PERSON").name }</span><br />
 				<ul>
-					<li><g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">Account settings...</g:remoteLink></li>
+					<li><g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">Account Details...</g:remoteLink></li>
 					<li><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${user}" onclick="editPreference()">Edit preferences</a></li>
 					<li><g:link class="home mmlink" controller="clientTeams" action="listTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li>
 					<g:if test="${person?.modelScore}">
