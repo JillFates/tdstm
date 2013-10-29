@@ -55,9 +55,7 @@
 		</div>
 		<div id="roomListView" style="width:500px;">
 		<g:if test="${roomId && viewType != 'list'}">
-		<script type="text/javascript">      
-		${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomView(e)')}   
-		</script>
+		<!-- do nothing -->
 		</g:if>
 		<g:else>
 		<fieldset><legend><b>Room List</b></legend>
@@ -307,8 +305,8 @@
 		function openRoomView(e,browser){
 			
 			var resp = e.responseText
-			$("#roomShowView").html(resp)
 			$("#roomShowView").show()
+			$("#roomShowView").html(resp)
 			$("#roomListView").hide()
 			if(browser){
 				$("#bundleId").removeAttr("multiple")
