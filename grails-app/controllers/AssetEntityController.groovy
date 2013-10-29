@@ -1748,8 +1748,10 @@ class AssetEntityController {
 		assetEntity.project = projectInstance
 		assetEntity.owner = projectInstance.client
 		
-		params.roomSourceId == "-1" ?: assetEntity.setRoomAndLoc( params.roomSourceId, true ) 
-		params.roomTargetId == "-1" ?: assetEntity.setRoomAndLoc( params.roomTargetId, false )
+		if(params.roomSourceId && params.roomSourceId != '-1')
+			assetEntity.setRoomAndLoc( params.roomSourceId, true )
+		if(params.roomTargetId && params.roomTargetId != '-1')
+			assetEntity.setRoomAndLoc( params.roomTargetId, false )
 		
 		if(!params.assetTag){
 			def lastAssetId = projectInstance.lastAssetId
@@ -1767,7 +1769,7 @@ class AssetEntityController {
 			}
 		}
 			if(!assetEntity.hasErrors() && assetEntity.save()) {
-				if( params.roomSourceId == "-1" || params.roomTargetId == "-1" )
+				if( params.sourceRoom || params.targetRoom)
 					assetEntity.updateRacks()
 					
 				def loginUser = securityService.getUserLogin()
@@ -3325,11 +3327,13 @@ class AssetEntityController {
 		def assetEntityInstance = AssetEntity.get(params.id)
 		assetEntityInstance.properties = params
 		
-		params.roomSourceId == "-1" ?: assetEntityInstance.setRoomAndLoc( params.roomSourceId, true ) 
-		params.roomTargetId == "-1" ?: assetEntityInstance.setRoomAndLoc( params.roomTargetId, false )
-		
+		if(params.roomSourceId && params.roomSourceId != '-1')
+			assetEntityInstance.setRoomAndLoc( params.roomSourceId, true ) 
+		if(params.roomTargetId && params.roomTargetId != '-1')
+			assetEntityInstance.setRoomAndLoc( params.roomTargetId, false )
+			
 		if(!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {
-			if( params.roomSourceId == "-1" || params.roomTargetId == "-1" )
+			if( params.sourceRoom || params.targetRoom)
 				assetEntityInstance.updateRacks()
 				
 			def loginUser = securityService.getUserLogin()
