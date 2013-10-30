@@ -64,13 +64,13 @@
 			<td>Power (max/design/avg) :</td>
 			<td>
 			    <g:set var="powerType" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE ?: 'Watts'}"/>
-				<span id="namePlatePowerSpanId">${powerType !='Watts' ? modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerNameplate}</span>
+				<span id="namePlatePowerSpanId">${powerType !='Watts' ? modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 120)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerNameplate}</span>
 				<input type="hidden" id="powerNameplateId" value="${modelInstance?.powerNameplate}" >&nbsp;
 
-				<span id="PowerDesignSpanId">${powerType !='Watts' ? modelInstance?.powerDesign ? (modelInstance?.powerDesign / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerDesign}</span>
+				<span id="PowerDesignSpanId">${powerType !='Watts' ? modelInstance?.powerDesign ? (modelInstance?.powerDesign / 120)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerDesign}</span>
 				<input type="hidden" id="powerDesignId" value="${modelInstance?.powerDesign}" >&nbsp;
 
-				<span id="powerSpanId">${powerType !='Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 110)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}</span>
+				<span id="powerSpanId">${powerType !='Watts' ? modelInstance?.powerUse ? (modelInstance?.powerUse / 120)?.toFloat()?.round(1) : 0.0 : modelInstance?.powerUse}</span>
 				<input type="hidden" id="powerUseId" value="${modelInstance?.powerUse}" >&nbsp;
 				<g:select id="powertype" name='powerType' value="${powerType}" from="${['Watts','Amps']}" onchange="updatePowerType( this.value , this.name)"> </g:select>
             </td>
@@ -276,13 +276,13 @@ function updatePowerType(value,name){
 		$("#PowerDesignSpanId").html($('#powerDesignId').val());
 	}
 	else if(value=="Amps" && name == "powerType"){
-		var preference= $('#powerUseId').val()/110;
+		var preference= $('#powerUseId').val()/120;
 		$("#powerSpanId").html(preference.toFixed(1));
 
-		preference= $('#powerNameplateId').val()/110;
+		preference= $('#powerNameplateId').val()/120;
 		$("#namePlatePowerSpanId").html(preference.toFixed(1));
 
-		preference= $('#powerDesignId').val()/110;
+		preference= $('#powerDesignId').val()/120;
 		$("#PowerDesignSpanId").html(preference.toFixed(1));
 	}
 	${remoteFunction(controller:'project', action:'setPower', params:'\'p=\' + value ')}

@@ -193,9 +193,9 @@ class RoomController {
 						rack.powerB = params["powerB_"+rack.id] ? NumberUtils.toDouble(params["powerB_"+rack.id],0).round() : 0
 						rack.powerC = params["powerC_"+rack.id] ? NumberUtils.toDouble(params["powerC_"+rack.id],0).round() : 0
 						if(powerType != "Watts"){
-							rack.powerA = Math.round(rack.powerA * 110)
-							rack.powerB = Math.round(rack.powerB * 110)
-							rack.powerC = Math.round(rack.powerC * 110)
+							rack.powerA = Math.round(rack.powerA * 120)
+							rack.powerB = Math.round(rack.powerB * 120)
+							rack.powerC = Math.round(rack.powerC * 120)
 						}
 						rack.rackType = params["rackType_"+rack.id]
 						rack.front = params["front_"+rack.id]
@@ -225,9 +225,9 @@ class RoomController {
                                 newRack.manufacturer = model?.manufacturer
                                 newRack.model = model
 								if(powerType != "Watts"){
-									newRack.powerA = Math.round(newRack.powerA * 110)
-									newRack.powerB = Math.round(newRack.powerB * 110)
-									newRack.powerC = Math.round(newRack.powerC * 110)
+									newRack.powerA = Math.round(newRack.powerA * 120)
+									newRack.powerB = Math.round(newRack.powerB * 120)
+									newRack.powerC = Math.round(newRack.powerC * 120)
 								}
 								newRack.rackType = params["rackType_"+id]
 								newRack.front = params["front_"+id]
@@ -412,8 +412,8 @@ class RoomController {
 		   spaceUsed = totalSpace - spaceUsed
 		   powerUsed = totalPower - powerUsed
 	   }
-	   powerUsed = powerType != "Watts" ?  powerUsed ? (powerUsed / 110).toFloat().round(1) : 0.0 : powerUsed ? Math.round(powerUsed):0
-	   totalPower = powerType != "Watts" ?  totalPower ? (totalPower / 110).toFloat().round(1) : 0.0 : totalPower ? Math.round(totalPower):0
+	   powerUsed = powerType != "Watts" ?  powerUsed ? (powerUsed / 120).toFloat().round(1) : 0.0 : powerUsed ? Math.round(powerUsed):0
+	   totalPower = powerType != "Watts" ?  totalPower ? (totalPower / 120).toFloat().round(1) : 0.0 : totalPower ? Math.round(totalPower):0
 	   def powerA = 0
 	   def powerB = 0
 	   def powerC = 0
@@ -484,14 +484,14 @@ class RoomController {
 			   		powerX = unassignedPowerInRack
 			  
 		   }
-		   powerA = powerType != "Watts" ?  powerA ? (powerA / 110).toFloat().round(1) : 0.0 : powerA ? Math.round(powerA):0
-		   powerB = powerType != "Watts" ?  powerB ? (powerB / 110).toFloat().round(1) : 0.0 : powerB ? Math.round(powerB):0
-		   powerC = powerType != "Watts" ?  powerC ? (powerC / 110).toFloat().round(1) : 0.0 : powerC ? Math.round(powerC):0
-		   powerX = powerType != "Watts" ?  powerX ? (powerX / 110).toFloat().round(1) : 0.0 : powerX ? Math.round(powerX):0
+		   powerA = powerType != "Watts" ?  powerA ? (powerA / 120).toFloat().round(1) : 0.0 : powerA ? Math.round(powerA):0
+		   powerB = powerType != "Watts" ?  powerB ? (powerB / 120).toFloat().round(1) : 0.0 : powerB ? Math.round(powerB):0
+		   powerC = powerType != "Watts" ?  powerC ? (powerC / 120).toFloat().round(1) : 0.0 : powerC ? Math.round(powerC):0
+		   powerX = powerType != "Watts" ?  powerX ? (powerX / 120).toFloat().round(1) : 0.0 : powerX ? Math.round(powerX):0
 		   
-		   rackPowerA = powerType != "Watts" ? rack.powerA ? (rack.powerA / 110).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA) : 0
-		   rackPowerB = powerType != "Watts" ? rack.powerB ? (rack.powerB / 110).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB) : 0
-		   rackPowerC = powerType != "Watts" ? rack.powerC ? (rack.powerC / 110).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC) : 0
+		   rackPowerA = powerType != "Watts" ? rack.powerA ? (rack.powerA / 120).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA) : 0
+		   rackPowerB = powerType != "Watts" ? rack.powerB ? (rack.powerB / 120).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB) : 0
+		   rackPowerC = powerType != "Watts" ? rack.powerC ? (rack.powerC / 120).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC) : 0
 			
 	   }
 	  
@@ -743,7 +743,7 @@ class RoomController {
 		
 		def powerType = session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
 		powerType = powerType ?: "Watts"
-		maxPower = powerType != "Watts" ? Math.round(maxPower / 110) : maxPower
+		maxPower = powerType != "Watts" ? Math.round(maxPower / 120) : maxPower
 		// Added switch to use if we use other capacityViews 
 		switch(capacityView){
 			case "Space":

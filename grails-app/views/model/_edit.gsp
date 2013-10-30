@@ -118,13 +118,13 @@
 			<td>
 			    <g:set var="powerType" value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE ?: 'Watts'}"/>
 				<input type="text" size="4" name="powerNameplate" id="powerNameplateEditId"
-				 	value="${powerType != 'Watts' ? ( modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 110 ).toFloat().round(1) : '' ): modelInstance?.powerNameplate}" 
+				 	value="${powerType != 'Watts' ? ( modelInstance?.powerNameplate ? (modelInstance?.powerNameplate / 120 ).toFloat().round(1) : '' ): modelInstance?.powerNameplate}" 
 					onblur="changePowerValue('Edit')" ><a id ="namePlateId"  title="Make standard values from nameplate" style="cursor: pointer;" 
 					onclick="setStanderdPower('Edit')"> >> </a>
 				<input type="hidden" id="powerNameplateIdH" value="${modelInstance?.powerNameplate}">
-				<input type="text" size="4" name="powerDesign" id="powerDesignEditId" value="${powerType != 'Watts' ? ( modelInstance?.powerDesign ?  (modelInstance?.powerDesign / 110 ).toFloat().round(1) : '' ) : modelInstance?.powerDesign}" >&nbsp;
+				<input type="text" size="4" name="powerDesign" id="powerDesignEditId" value="${powerType != 'Watts' ? ( modelInstance?.powerDesign ?  (modelInstance?.powerDesign / 120 ).toFloat().round(1) : '' ) : modelInstance?.powerDesign}" >&nbsp;
 				<input type="hidden" id="powerDesignIdH" value="${modelInstance?.powerDesign}" >
-                <input type="text" size="4" name="powerUse" id="powerUseEditId" value="${powerType != 'Watts' ?  ( modelInstance?.powerUse ? (modelInstance?.powerUse / 110 ).toFloat().round(1) : '') : modelInstance?.powerUse}" >&nbsp;
+                <input type="text" size="4" name="powerUse" id="powerUseEditId" value="${powerType != 'Watts' ?  ( modelInstance?.powerUse ? (modelInstance?.powerUse / 120 ).toFloat().round(1) : '') : modelInstance?.powerUse}" >&nbsp;
                 <input type="hidden" id="powerUseIdH" value="${modelInstance?.powerUse}" >
 				<g:select id="ptype" name='powerType' value="${powerType}" from="${['Watts','Amps']}" onchange="updatePowerType(this.value,'Edit')"></g:select>
 			</td>

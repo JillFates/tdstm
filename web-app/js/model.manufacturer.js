@@ -82,18 +82,18 @@ function avoidDuplicate(spanId){
  */
 function convertPowerType(value, whom){
 	if(value=="Watts"){
-		var powerUsed = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0')? $('#powerUseIdH').val() : ($('#powerUse'+whom+'Id').val()*110)
-	    var powerNameplate =  ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0')  ? $('#powerNameplateIdH').val() : ($('#powerNameplate'+whom+'Id').val()*110)
-	    var powerDesign =  ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() !='0') ? $('#powerDesignIdH').val() : ($('#powerDesign'+whom+'Id').val()*110)
+		var powerUsed = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0')? $('#powerUseIdH').val() : ($('#powerUse'+whom+'Id').val()*120)
+	    var powerNameplate =  ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0')  ? $('#powerNameplateIdH').val() : ($('#powerNameplate'+whom+'Id').val()*120)
+	    var powerDesign =  ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() !='0') ? $('#powerDesignIdH').val() : ($('#powerDesign'+whom+'Id').val()*120)
 		$('#powerUse'+whom+'Id').val(powerUsed);
 		$('#powerNameplate'+whom+'Id').val(powerNameplate);
 		$('#powerDesign'+whom+'Id').val(powerDesign);
 	} else if(value=="Amps"){
-		var powerUseA = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0') ? $('#powerUseIdH').val()/110 : ($('#powerUse'+whom+'Id').val()/110);
+		var powerUseA = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0') ? $('#powerUseIdH').val()/120 : ($('#powerUse'+whom+'Id').val()/120);
 		$('#powerUse'+whom+'Id').val(powerUseA.toFixed(1));
-		var powerNameplateA = ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() !='0') ? $('#powerNameplateIdH').val()/110 : ($('#powerNameplate'+whom+'Id').val()/110);
+		var powerNameplateA = ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() !='0') ? $('#powerNameplateIdH').val()/120 : ($('#powerNameplate'+whom+'Id').val()/120);
 		$('#powerNameplate'+whom+'Id').val(powerNameplateA.toFixed(1));
-		var powerDesignA = ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() !='0') ? $('#powerDesignIdH').val()/110 : ($('#powerDesign'+whom+'Id').val()/110);
+		var powerDesignA = ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() !='0') ? $('#powerDesignIdH').val()/120 : ($('#powerDesign'+whom+'Id').val()/120);
 		$('#powerDesign'+whom+'Id').val(powerDesignA.toFixed(1));
 	}
 }

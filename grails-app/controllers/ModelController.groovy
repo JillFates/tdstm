@@ -206,9 +206,9 @@ class ModelController {
 			params.endOfLifeDate =  GormUtil.convertInToGMT(formatter.parse(endOfLifeDate), tzId)
 		}
 		if( powerType == "Amps"){
-			powerNameplate =  powerNameplate * 110
-			powerDesign = powerDesign * 110
-			powerUsed = powerUsed * 110
+			powerNameplate =  powerNameplate * 120
+			powerDesign = powerDesign * 120
+			powerUsed = powerUsed * 120
         }
 	    def modelTemplate 
 		if(modelId)
@@ -411,9 +411,9 @@ class ModelController {
 			def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
 			def powerType = params.powerType
 			if( powerType == "Amps"){
-				powerNameplate = powerNameplate * 110
-				powerDesign = powerDesign * 110
-				powerUsed = powerUsed * 110
+				powerNameplate = powerNameplate * 120
+				powerDesign = powerDesign * 120
+				powerUsed = powerUsed * 120
 			}
         	params.useImage = params.useImage == 'on' ? 1 : 0
         	params.sourceTDS = params.sourceTDS == 'on' ? 1 : 0
@@ -1235,11 +1235,11 @@ class ModelController {
 		def powerDesign = model.powerDesign
 		def powerUsed = model.powerUse
 		if( session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE !='Watts'){
-			powerNameplate = powerNameplate ? powerNameplate / 110 : ''
+			powerNameplate = powerNameplate ? powerNameplate / 120 : ''
 			powerNameplate = powerNameplate ? powerNameplate.toDouble().round(1) : ''
-			powerDesign = powerDesign ? powerDesign / 110 : ''
+			powerDesign = powerDesign ? powerDesign / 120 : ''
 			powerDesign = powerDesign ? powerDesign.toDouble().round(1) : ''
-			powerUsed = powerUsed ? powerUsed / 110 : ''
+			powerUsed = powerUsed ? powerUsed / 120 : ''
 			powerUsed = powerUsed ? powerUsed.toDouble().round(1) : ''
 		}
 		def modelMap = [id:model.id,

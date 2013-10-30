@@ -1251,11 +1251,11 @@ class ReportsController {
 						powerTBD += powerDesign
 					}
 				}
-				powerA = powerType != "Watts" ?  powerA ? (powerA / 110).toFloat().round(1) : 0.0 : powerA ? Math.round(powerA):0 
-	            powerB = powerType != "Watts" ?  powerB ? (powerB / 110).toFloat().round(1) : 0.0 : powerB ? Math.round(powerB):0
-	            powerC = powerType != "Watts" ?  powerC ? (powerC / 110).toFloat().round(1) : 0.0 : powerC ? Math.round(powerC):0
-				powerTBD = powerType != "Watts" ?  powerTBD ? (powerTBD / 110).toFloat().round(1) : 0.0 : powerTBD ? Math.round(powerTBD):0
-				totalPower = powerType != "Watts" ?  totalPower ? (totalPower / 110).toFloat().round(1) : 0.0 : totalPower ? Math.round(totalPower):0
+				powerA = powerType != "Watts" ?  powerA ? (powerA / 120).toFloat().round(1) : 0.0 : powerA ? Math.round(powerA):0 
+	            powerB = powerType != "Watts" ?  powerB ? (powerB / 120).toFloat().round(1) : 0.0 : powerB ? Math.round(powerB):0
+	            powerC = powerType != "Watts" ?  powerC ? (powerC / 120).toFloat().round(1) : 0.0 : powerC ? Math.round(powerC):0
+				powerTBD = powerType != "Watts" ?  powerTBD ? (powerTBD / 120).toFloat().round(1) : 0.0 : powerTBD ? Math.round(powerTBD):0
+				totalPower = powerType != "Watts" ?  totalPower ? (totalPower / 120).toFloat().round(1) : 0.0 : totalPower ? Math.round(totalPower):0
 				
 				reportDetails << [location:rack.location, room:rack.room, rack:rack.tag, devices:assets.size(),
 								  powerA:powerA,powerB:powerB,powerC:powerC,powerTBD:powerTBD,totalPower:totalPower]

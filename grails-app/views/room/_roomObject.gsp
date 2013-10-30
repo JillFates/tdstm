@@ -13,9 +13,9 @@
 	</tr>
 	<tr>
 		<td>Power A/B/C:(${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE!="Watts"?"Amps":"W"})<span id="unitsId"></span></td>
-		<td><input id="powerAId" size="2"  value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerA ? (rack.powerA / 110).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA):0}" onchange="changeRackDetails(${rack_id},this.value,'powerA')"/>
-			<input id="powerBId" size="2"  value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerB ? (rack.powerB / 110).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB):0}" onchange="changeRackDetails(${rack_id},this.value,'powerB')"/> 
-			<input id="powerCId" size="2"  value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerC ? (rack.powerC / 110).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC):0}" onchange="changeRackDetails(${rack_id},this.value,'powerC')"/>
+		<td><input id="powerAId" size="2"  value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerA ? (rack.powerA / 120).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA):0}" onchange="changeRackDetails(${rack_id},this.value,'powerA')"/>
+			<input id="powerBId" size="2"  value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerB ? (rack.powerB / 120).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB):0}" onchange="changeRackDetails(${rack_id},this.value,'powerB')"/> 
+			<input id="powerCId" size="2"  value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerC ? (rack.powerC / 120).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC):0}" onchange="changeRackDetails(${rack_id},this.value,'powerC')"/>
 		</td>
 	</tr>
 	<tr>

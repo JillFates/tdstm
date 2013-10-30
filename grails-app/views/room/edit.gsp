@@ -181,15 +181,15 @@
 								style="width:40px;"></g:select></td>
 						<td><input type="text" class="focusShadow"
 							id="powerA_${rack.id}" name="powerA_${rack.id}"
-							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerA ? (rack.powerA / 110).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA):0}"
+							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerA ? (rack.powerA / 120).toFloat().round(1) : 0.0 : rack.powerA ? Math.round(rack.powerA):0}"
 							size="3" /></td>
 						<td><input type="text" class="focusShadow"
 							id="powerB_${rack.id}" name="powerB_${rack.id}"
-							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerB ? (rack.powerB / 110).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB):0}"
+							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerB ? (rack.powerB / 120).toFloat().round(1) : 0.0 : rack.powerB ? Math.round(rack.powerB):0}"
 							size="3" /></td>
 						<td><input type="text" class="focusShadow"
 							id="powerC_${rack.id}" name="powerC_${rack.id}"
-							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerC ? (rack.powerC / 110).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC):0}"
+							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? rack.powerC ? (rack.powerC / 120).toFloat().round(1) : 0.0 : rack.powerC ? Math.round(rack.powerC):0}"
 							size="3" /></td>
 						<td><g:select id="rackTypeId_${rack.id}"
 								name="rackType_${rack.id}"
@@ -231,15 +231,15 @@
 								style="width:40px;"></g:select></td>
 						<td><input type="text" class="focusShadow"
 							id="newPowerA_${rack}" name="powerA_${rack}"
-							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerA/ 110 ).toFloat().round(1) : new Rack().powerA}"
+							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerA/ 120 ).toFloat().round(1) : new Rack().powerA}"
 							size="3" /></td>
 						<td><input type="text" class="focusShadow"
 							id="newPowerB_${rack}" name="powerB_${rack}"
-							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerB/ 110 ).toFloat().round(1) : new Rack().powerB}"
+							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerB/ 120 ).toFloat().round(1) : new Rack().powerB}"
 							size="3" /></td>
 						<td><input type="text" class="focusShadow"
 							id="newPowerC_${rack}" name="powerC_${rack}"
-							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerC/ 110 ).toFloat().round(1) : new Rack().powerC}"
+							value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE != 'Watts' ? (new Rack().powerC/ 120 ).toFloat().round(1) : new Rack().powerC}"
 							size="3" /></td>
 						<td><g:select id="rackTypeId_${rack}" name="rackType_${rack}"
 								from="${Rack.constraints.rackType.inList}" value="Rack"
