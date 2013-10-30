@@ -324,6 +324,15 @@ table.inner {
     overflow: visible;
     padding: 2px 6px;
 }
+td.buttonR .powerIcon {
+	background: url(../images/power-off.png) 5px 50%,
+        url(../images/button_highlight.png) !important;
+  	background-repeat: no-repeat, repeat-x !important;
+	 font: 12px helvetica, arial, sans-serif !important;
+	 background-color:#5F9FCF !important;
+	 font-weight:bold !important;
+	 padding-left: 22px !important;
+}
 .buttons input.delete {
     background: transparent url(../images/skin/database_delete.png) 5px 50% no-repeat;
     padding-left: 28px;

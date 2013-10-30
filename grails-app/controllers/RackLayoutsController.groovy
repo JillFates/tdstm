@@ -858,7 +858,25 @@ class RackLayoutsController {
 	 *  @return -  flash message
 	*/
 	def assignPowers = {
-		def rack = Rack.read(params.rackId)
+		def rack
+		if (params.roomId){
+			def roomInstance = Room.read(params.roomId)
+			def rackInstanceList = Rack.findAllByRoom(roomInstance , [sort:"tag"])
+			rackInstanceList.each{ r ->
+				rack = assignPowerForRack(r.id)
+			}
+		}else {
+			rack = assignPowerForRack(params.rackId)
+		}
+		render "Rack ${rack.tag} wired"
+	}
+	/**
+	 *This method is used  give power connection to a selected rack.
+	 *  @param rackId - id of requested rack.
+	 *  @return -  rack
+	*/
+	def assignPowerForRack(rackId){
+		def rack = Rack.read(rackId)
 		def rackAssets = rack.assets
 		def toPowers = ["A","B","C"]
 		rackAssets.each { asset->
@@ -880,7 +898,7 @@ class RackLayoutsController {
 				}
 			}
 		}
-		render "Rack ${rack.tag} wired"
+		return rack
 	}
 	
 	/**

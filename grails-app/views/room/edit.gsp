@@ -5,7 +5,7 @@
 
 	<div class="body">
 		<div id="roomListView">
-			<span class="span"> <b>Data Center Room Edit View ${prefVal}</b>
+			<span class="span"> <b>Data Center Room Edit View </b>
 			</span>
 			<g:form action="update" onsubmit="return submitForm(this)">
 				<div class="dialog" style="border: 1px solid black;">
@@ -51,7 +51,7 @@
 									onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
 									<input type="submit" class="submit" value="Update" /></td>
 								<td class="buttonR"
-									style="padding-left: 180px; vertical-align: top;" colspan="6"
+									style="padding-left: 115px; vertical-align: top;" colspan="6"
 									nowrap="nowrap"><span> <label for="addTargetRoom"><b>Target
 												room:</b></label> <input type="checkbox" id="addTargetRoom"
 										name="addTargetRoom" />&nbsp;
@@ -64,6 +64,7 @@
 										name="showRoomObjects"
 										${draggableRack == 'on'? 'checked' :'checked' }
 										onclick="enableDraggableRack()" />&nbsp;
+										<input type="button" class="powerIcon" value="Power Connect" onclick="assignPowersForRoom(${roomInstance.id})"/>
 								</span> <span> <b>Add to Room:</b>&nbsp; <input type="button"
 										class="submit" value="Rack" onclick="createRack(this.value)" />
 										<input type="button" class="submit" value="UPS"

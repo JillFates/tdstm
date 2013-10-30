@@ -50,6 +50,7 @@
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
+		<div id="messageDivId" class="message" style="display: none;"></div>
 		<div id="processDiv" style="display: none;">
 			<img src="../images/processing.gif" /> Merging In Progress...
 		</div>

@@ -447,6 +447,23 @@ function assignPowers(id){
 			 }})
 	}
 }
+function assignPowersForRoom(roomId){
+	if(confirm("Connect devices to power?")){
+		$("#messageDivId").show();
+		$("#messageDivId").html("Starting to set default power connections.")
+		jQuery.ajax({
+			url: contextPath+"/rackLayouts/assignPowers",
+			data: {'roomId':roomId},
+			type:'POST',
+			success: function(data) {
+				$("#messageDivId").html("Default power connections set.")
+			},
+			error: function(jqXHR, textStatus, errorThrown){
+				alert("An unexpected error occurred while powering racks.")
+			}
+		});
+	}
+}
 function getAssignedDetails(forWhom, rackId){
 	var selectedBundles  = new Array()
 	var selectedSourceRoom =  new Array()
