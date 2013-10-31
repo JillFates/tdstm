@@ -132,7 +132,7 @@ a:hover {
 				</tr>
 				<tr class="odd">
 					<td><a style="color:black" href="#" onclick="openShowTypeDiv()"> Show/Clean Types </a></td>
-					<td></td>
+					<td><a style="color:black" href="/tdstm/reports/getBundleListForReportDialog?reportId=Project+Report">Projects Summary Report</a></td>
 				</tr>
 			</tbody>
 		</table>

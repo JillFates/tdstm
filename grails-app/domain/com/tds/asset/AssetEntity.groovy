@@ -432,4 +432,23 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 			targetLocation = room ? room?.location : null
 		}
 	}
+	
+	
+	
+	/**
+	 * used to get AssetEntity Count for selected project.
+	 * @return count.
+	 */
+	def getAssetEntityCountByProjectAndUseOfPlannig(def project,def type) {
+		def assetList
+		if(type == "Server") {
+			assetList = AssetEntity.executeQuery("select Count(*) FROM AssetEntity a where a.moveBundle.useOfPlanning = true \
+											And a.project.id = ${project.id} And a.assetType not in(:type)",
+										[type:['Application','Database','Files']])
+		} else {
+		 	assetList = AssetEntity.executeQuery("select Count(*) FROM AssetEntity a where a.moveBundle.useOfPlanning = true \
+				 							And a.project.id = ${project.id} And a.assetType='${type}'")
+		 }
+		return assetList
+	}
 }

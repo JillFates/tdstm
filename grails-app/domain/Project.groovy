@@ -1,10 +1,16 @@
 import com.tdssrc.grails.GormUtil
 import org.apache.shiro.SecurityUtils
+import com.tds.asset.AssetEntity
+import com.tds.asset.Application
+import com.tds.asset.Database
+import com.tds.asset.Files
 
 class Project extends PartyGroup {
 
 	def static final DEFAULT_PROJECT_ID = 2
-
+	def partyRelationshipService
+	def projectService
+	
 	String projectCode
 	String description
 	String trackChanges = 'Y'
@@ -129,5 +135,27 @@ class Project extends PartyGroup {
 	 */
 	Boolean isDefaultProject() {
 		id == DEFAULT_PROJECT_ID
+	}
+	/**
+	 * used to get staff tied to the client company.
+	 * @return list.
+	 */
+	def getProjectCompanyStaff() {
+		return partyRelationshipService.getCompanyStaff(this.client.id)
+	}
+	/**
+	 * used to get patner for selected project.
+	 * @return projectPartner.
+	 */
+	def getPatner(){
+		def projectPartner = projectService.getProjectPatner(this)
+	return projectPartner
+	}
+	/**
+	 * used to get MoveEvent Count for selected project.
+	 * @return count.
+	 */
+	def getMoveEventCount(){
+		return MoveEvent.countByProject(this)
 	}
 }

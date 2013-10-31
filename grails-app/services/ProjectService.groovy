@@ -244,5 +244,16 @@ class ProjectService {
 			project.lastAssetId = ++lastAssetId
 		}
 		return tag
+	}
+	/**
+	 * This method is used to get project patner  for requested project.
+	 * @param projectId
+	 * @return projectPartner
+	 */
+	//TODO : use this method where ever we are getting project patner.
+	def getProjectPatner( project ) {
+		def projectPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' \
+									and p.partyIdFrom = ${project.id} and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
+		return projectPartner
 	} 
 }
