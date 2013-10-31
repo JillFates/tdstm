@@ -84,9 +84,9 @@
                     <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this Event will remove any news and any related step data?');" value="Delete" /></span>
                     <span class="button"><input type="button" class="delete" value="Clear Dashboard History" onclick="clearHistoricData( $('#moveEventId').val())"/></span>
-                 	<span class="button"><input type="button" class="delete" value="Delete Generated Tasks" onclick="clearTaskData( $('#moveEventId').val(), 'delete')"/></span>
                     <span class="button"><input type="button" class="delete" value="Reset Tasks" onclick="clearTaskData( $('#moveEventId').val(), 'reset')"/></span>
                     <span class="button"><input type="button" class="edit" value="Generate Tasks" onclick="generateTasks( $('#moveEventId').val())"/></span>
+                    <span class="button"><input type="button" class="delete" value="Delete Generated Tasks" onclick="clearTaskData( $('#moveEventId').val(), 'delete')"/></span>
                     <span class="button"><input type="button" class="edit" value="Mark Assets Moved" onclick="markAssetsMoved( $('#moveEventId').val())"/></span>
                  </tds:hasPermission>
                 </g:form>

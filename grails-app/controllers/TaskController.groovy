@@ -198,7 +198,7 @@ class TaskController {
 			return
 		}
 
-		def depList = taskService.getNeighborhood(taskId)
+		def depList = taskService.getNeighborhood(taskId, 2, 20)
 		if (depList.size() == 0) {
 			render "The task has no interdependencies with other tasks so a map wasn't generated."
 			return
@@ -241,7 +241,7 @@ digraph runbook {
 			    def tooltip  = "${task.taskNumber}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
 				def colorKey = taskService.taskStatusColorMap.containsKey(task.status) ? task.status : 'ERROR'
 				def fillcolor = taskService.taskStatusColorMap[colorKey][1]
-				def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:task.id, absolute:true])
+				def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:task.id, absolute:false])
 
 				// TODO - JPM - outputTaskNode() the following boolean statement doesn't work any other way which is really screwy
 				if ( "${task.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes' ) {
@@ -414,7 +414,7 @@ digraph runbook {
 			// style = mode == 's' ? "fillcolor=\"${taskService.taskStatusColorMap[colorKey][1]}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\", style=filled" : ''
 			attribs = "color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
 
-			def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:"${it.id}", absolute:true])
+			def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:"${it.id}", absolute:false])
 
 		    task = (task.size() > 35) ? task[0..34] : task 
 			dotText << "\t${it.task_number} [label=\"${task}\"  URL=\"$url\", style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
