@@ -4,6 +4,8 @@ import com.tds.asset.FieldImportance
 import com.tdsops.tm.enums.domain.ValidationType;
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavEntityType
+import com.tdssrc.grails.TimeUtil
+import com.tds.asset.AssetEntity
 
 class ProjectService {
 
@@ -256,4 +258,57 @@ class ProjectService {
 									and p.partyIdFrom = ${project.id} and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
 		return projectPartner
 	} 
+	/**
+	 * This method is used to get project summary for requested project.
+	 * @param params
+	 * @return map
+	 */
+	def getProjectReportSummary( params ){
+		def projects = []
+		def summaryMap =[:]
+		def now = TimeUtil.nowGMT()
+		if(params.inactive){
+			projects += Project.findAllByCompletionDateLessThan(now, [sort:"projectCode"])
+		}
+		if(params.active){
+			projects += Project.findAllByCompletionDateGreaterThanEquals(now, [sort:"projectCode"])
+		}
+		projects.each {p->
+			summaryMap << [(p.id) : getProjectSummaryMap(p)]
+		}
+		return [summaryMap:summaryMap ,projects:projects ]
+	}
+	/**
+	 * This method is used to get event,asset,application,db and files count for requested project.
+	 * @param projectInstance
+	 * @return summaryMap
+	 */
+	def getProjectSummaryMap(project){
+		def summaryMap =[
+						'patner':getProjectPatner(project),
+						'staffCount': partyRelationshipService.getCompanyStaff(project.client.id),
+						'eventCount': MoveEvent.countByProject(project),
+						'assetCount': getAssetEntityCountByProjectAndUseOfPlannig(project,'Server')[0],
+						'appCount': getAssetEntityCountByProjectAndUseOfPlannig(project,'Application')[0],
+						'dbCount': getAssetEntityCountByProjectAndUseOfPlannig(project,'Database')[0],
+						'fileCount': getAssetEntityCountByProjectAndUseOfPlannig(project,'Files')[0]]
+		
+		return summaryMap
+	}
+	/**
+	 * used to get AssetEntity Count for selected project.
+	 * @return count.
+	 */
+	def getAssetEntityCountByProjectAndUseOfPlannig(def project,def type) {
+		def assetList
+		if(type == "Server") {
+			assetList = AssetEntity.executeQuery("select Count(*) FROM AssetEntity a where a.moveBundle.useOfPlanning = true \
+											And a.project.id = ${project.id} And a.assetType not in(:type)",
+										[type:['Application','Database','Files']])
+		} else {
+			 assetList = AssetEntity.executeQuery("select Count(*) FROM AssetEntity a where a.moveBundle.useOfPlanning = true \
+											 And a.project.id = ${project.id} And a.assetType='${type}'")
+		 }
+		return assetList
+	}
 }

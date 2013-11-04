@@ -10,6 +10,7 @@ import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 
 class AdminController {
 	def jdbcTemplate
@@ -17,7 +18,7 @@ class AdminController {
 	def securityService
 	def partyRelationshipService 
 	def userPreferenceService   
-
+	def projectService
 
     def index = { }
 
@@ -1306,5 +1307,21 @@ class AdminController {
 
 		return map
 
+	}
+	/**
+	 * A action to show project Summary report filters.
+	 */
+	def projectReport ={
+		return
+	}
+	
+	/**
+	 * To Generate project Summary Web report
+	 */
+	def projectSummaryReport ={
+		def person  = securityService.getUserLoginPerson().toString()
+		def now = TimeUtil.nowGMT()
+		def results = projectService.getProjectReportSummary( params )
+		render (template :'projectSummaryReport', model:[results:results, person:person, time:now])
 	}
 }

@@ -36,6 +36,7 @@ class ReportsController {
 	def securityService
 	def moveEventService
 	def moveBundleService
+	def projectService
 	def index = { 
 		render(view:'home')
 	}
@@ -75,9 +76,6 @@ class ReportsController {
 					def moveEventInstanceList  = MoveEvent.findAllByProject(projectInstance,[sort:'name'])
 					render( view:'taskReport',
 						model:[moveEventInstanceList: moveEventInstanceList, projectInstance:projectInstance])
-						break;
-	case "Project Report":
-					render( view:'projectReport')
 						break;
 	case "Transportation Asset List":  
 					render( view:'transportationAssetReport',
@@ -1492,23 +1490,5 @@ class ReportsController {
 					params:["_format":"PDF","_name":"${filename}","_file":"taskReport"])
 		}
 	}
-	/**
-	 * To Generate project Summary Web report
-	 */
-	def projectReport ={
-		def projects
-		def person  = securityService.getUserLoginPerson().toString()
-		def now = TimeUtil.nowGMT()
-		def inActiveProjects = Project.findAllByCompletionDateLessThan(now, [sort:"projectCode"])
-		def activeProjects = Project.findAllByCompletionDateGreaterThanEquals(now, [sort:"projectCode"])
-		projects = activeProjects
-		if(params.inactive){
-			projects = inActiveProjects
-		}
-		if(params.active && params.inactive){
-			projects = activeProjects+inActiveProjects  
-		}
-		render (view :'projectsReport', model:[projects : projects, person:person, time:now, assetEntity : new AssetEntity()])
-	} 
 }
  
