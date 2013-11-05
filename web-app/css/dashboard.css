@@ -750,14 +750,16 @@ input, select, textarea {
 }
 .task_bar_label {
  width: 30px;
- padding:0px;
+ font-weight: bold;
+ padding: 5px;
 }
 .task_bar_base {
  width: 240px;
  height: 24px;
  background-color: white;
- box-shadow: 2px 3px 3px lightgray inset;
- padding:0px;
+ box-shadow: 2px 3px 3px lightgray inset !important;
+ font-weight: bold;
+ font-size: 11px;
 }
 .task_bar_graph {
  z-index:-1;
