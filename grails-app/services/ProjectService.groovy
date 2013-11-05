@@ -248,14 +248,15 @@ class ProjectService {
 		return tag
 	}
 	/**
-	 * This method is used to get project patner  for requested project.
+	 * NOTE : use this method where ever we are getting project partner.
+	 * This method is used to get project partner  for requested project.
 	 * @param projectId
 	 * @return projectPartner
 	 */
-	//TODO : use this method where ever we are getting project patner.
-	def getProjectPatner( project ) {
+	def getProjectPartner( project ) {
 		def projectPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' \
-									and p.partyIdFrom = ${project.id} and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
+									and p.partyIdFrom = :project and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ",
+                                    [project:project])
 		return projectPartner
 	} 
 	/**
@@ -285,13 +286,13 @@ class ProjectService {
 	 */
 	def getProjectSummaryMap(project){
 		def summaryMap =[
-						'patner':getProjectPatner(project),
+						'patner':getProjectPartner(project),
 						'staffCount': partyRelationshipService.getCompanyStaff(project.client.id),
 						'eventCount': MoveEvent.countByProject(project),
-						'assetCount': getAssetEntityCountByProjectAndUseOfPlannig(project,'Server')[0],
-						'appCount': getAssetEntityCountByProjectAndUseOfPlannig(project,'Application')[0],
-						'dbCount': getAssetEntityCountByProjectAndUseOfPlannig(project,'Database')[0],
-						'fileCount': getAssetEntityCountByProjectAndUseOfPlannig(project,'Files')[0]]
+						'assetCount': getAssetEntityCountByProjectAndAssetType(project,'Server')[0],
+						'appCount': getAssetEntityCountByProjectAndAssetType(project,'Application')[0],
+						'dbCount': getAssetEntityCountByProjectAndAssetType(project,'Database')[0],
+						'fileCount': getAssetEntityCountByProjectAndAssetType(project,'Files')[0]]
 		
 		return summaryMap
 	}
@@ -299,16 +300,13 @@ class ProjectService {
 	 * used to get AssetEntity Count for selected project.
 	 * @return count.
 	 */
-	def getAssetEntityCountByProjectAndUseOfPlannig(def project,def type) {
-		def assetList
-		if(type == "Server") {
-			assetList = AssetEntity.executeQuery("select Count(*) FROM AssetEntity a where a.moveBundle.useOfPlanning = true \
-											And a.project.id = ${project.id} And a.assetType not in(:type)",
-										[type:['Application','Database','Files']])
-		} else {
-			 assetList = AssetEntity.executeQuery("select Count(*) FROM AssetEntity a where a.moveBundle.useOfPlanning = true \
-											 And a.project.id = ${project.id} And a.assetType='${type}'")
-		 }
+	def getAssetEntityCountByProjectAndAssetType(def project,def type) {
+        def args = [project:project,type:[type]]
+        def query = """select count(*) from AssetEntity a where a.moveBundle.useOfPlanning = true
+                        and a.project = :project and  a.assetType ${type == 'Server' ? 'not':''} in (:type)"""
+		if(type == "Server")
+            args.type = ['Application','Database','Files']
+        def assetList = AssetEntity.executeQuery(query,args)
 		return assetList
 	}
 }
