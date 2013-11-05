@@ -744,3 +744,48 @@ input, select, textarea {
 .Arrowcursor{
 	cursor:pointer;
 }
+.task_bar_table {
+ width:280px;
+ border-width:0px;
+}
+.task_bar_label {
+ width: 30px;
+ padding:0px;
+}
+.task_bar_base {
+ width: 240px;
+ height: 24px;
+ background-color: white;
+ box-shadow: 2px 3px 3px lightgray inset;
+ padding:0px;
+}
+.task_bar_graph {
+ z-index:-1;
+ height:24px;
+ float:left;
+}
+.task_bar_graph_edge {
+ height:24px;
+ border-right-width: 3px;
+ border-color: lightgray;
+ border-right-style:inset;
+}
+.prog_bar_text {
+ position:absolute;;
+ color: white;
+ margin: 5px;
+}
+.taskDetailsDiv {
+	width: 135px;
+	font-size: 11px;
+	text-align: left;
+	margin: 4px 34px 0px;
+}
+.taskSummaryDiv {
+	margin-top:-24px;
+	font-size:20px;
+}
+.taskCountSpan{
+	font-size:40px;
+	border:1px solid black;
+}

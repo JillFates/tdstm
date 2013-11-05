@@ -1,6 +1,7 @@
 import org.apache.shiro.SecurityUtils
 
 import com.tds.asset.AssetComment
+import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdssrc.grails.GormUtil
 
 class DashboardController {
@@ -43,9 +44,24 @@ class DashboardController {
         	userPreferenceService.setPreference("MOVE_EVENT","${moveEvent.id}")
 			moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = ${moveEvent.id} ORDER BY mb.startTime ")				
 		}
+		//code for task Summary and task progress bars
+		def taskCountByEvent = AssetComment.countByMoveEvent(moveEvent)
+		def taskStatusMap =[:]
+		def totalDuration=0
+		def durationScale = [d:1440,m:1,w:10080,h:60] // minutes per day,week,hour
+		AssetCommentStatus.topStatusList.each{ status->
+			def duration = AssetComment.findAllByMoveEventAndStatus(moveEvent,status)
+			def timeInMin=duration.sum{d->
+				d.duration*durationScale[d.durationScale]
+			}
+			taskStatusMap <<[(status): [taskCount :AssetComment.countByStatusAndMoveEvent(status,moveEvent), timeInMin:timeInMin]]
+			totalDuration +=timeInMin
+		}
+		
 		return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, projectLogo : projectLogo, 
 				 moveBundleList : moveBundleList, timeToUpdate : timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : "never",
-				 manualOverrideViewPermission:RolePermissions.hasPermission("ManualOverride")	]
+				 manualOverrideViewPermission:RolePermissions.hasPermission("ManualOverride"),
+				 taskCountByEvent:taskCountByEvent, taskStatusMap:taskStatusMap, totalDuration:totalDuration]
     }
 	
 	/*---------------------------------------------------------

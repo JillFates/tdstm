@@ -10,6 +10,34 @@
 <link rel="shortcut icon"
 	href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <g:javascript src="yahoo.ui.dashboard.js" />
+
+<script type="text/javascript">
+$(document).ready(function() {
+	var percentageTaskDone=${taskStatusMap['Completed'].taskCount ? Math.round((taskStatusMap['Completed'].taskCount/taskCountByEvent)*100) :0};
+	$("#tasksDoneBar").css('width','0%');
+	$("#tasksDoneBar").animate({width: percentageTaskDone+"%" }, 1000);
+	
+	var percentageTaskStarted=${taskStatusMap['Started'].taskCount ? Math.round((taskStatusMap['Started'].taskCount/taskCountByEvent)*100) :0};
+	$("#tasksStartBar").css('width', percentageTaskDone+'%');
+	$("#tasksStartBar").animate({width: percentageTaskStarted+"%" }, 1000);
+	
+	var percentageTaskReady=${taskStatusMap['Ready'].taskCount ? Math.round((taskStatusMap['Ready'].taskCount/taskCountByEvent)*100) :0};
+	$("#tasksReadyBar").css('width', percentageTaskStarted+'%');
+	$("#tasksReadyBar").animate({width: percentageTaskReady+"%" }, 1000);
+	
+	var percentageDurationCompleted=${taskStatusMap['Completed'].timeInMin ? Math.round((taskStatusMap['Completed'].timeInMin/totalDuration)*100) :0};
+	$("#effortDoneBar").css('width','0%');
+	$("#effortDoneBar").animate({width: percentageDurationCompleted+"%" }, 1000);
+	
+	var percentageDurationStarted=${taskStatusMap['Started'].timeInMin ? Math.round((taskStatusMap['Started'].timeInMin/totalDuration)*100) :0};
+	$("#effortStartBar").css('width', percentageDurationCompleted+'%');
+	$("#effortStartBar").animate({width: percentageDurationStarted+"%" }, 1000);
+	
+	var percentageDurationReady=${taskStatusMap['Ready'].timeInMin ? Math.round((taskStatusMap['Ready'].timeInMin/totalDuration)*100) :0};
+	$("#effortReadyBar").css('width', percentageDurationStarted+'%');
+	$("#effortReadyBar").animate({width: percentageDurationReady+"%" }, 1000);
+});
+</script>
 </head>
 <body>
 <div class="body_bg">
@@ -18,6 +46,12 @@
 
 		<!-- Body Starts here-->
 		<div id="bodycontent">
+		<g:set var="percentageTaskDone" value="${taskStatusMap['Completed'].taskCount ? Math.round((taskStatusMap['Completed'].taskCount/taskCountByEvent)*100) :0}" />
+		<g:set var="percentageTaskStarted" value="${taskStatusMap['Started'].taskCount ? Math.round((taskStatusMap['Started'].taskCount/taskCountByEvent)*100) :0}" />
+		<g:set var="percentageTaskReady" value="${taskStatusMap['Ready'].taskCount ? Math.round((taskStatusMap['Ready'].taskCount/taskCountByEvent)*100) :0}" />
+		<g:set var="percentageDurationDone" value="${taskStatusMap['Completed'].timeInMin ? Math.round((taskStatusMap['Completed'].timeInMin/totalDuration)*100) :0}" />
+		<g:set var="percentageDurationStarted" value="${taskStatusMap['Started'].timeInMin ? Math.round((taskStatusMap['Started'].timeInMin/totalDuration)*100) :0}" />
+		<g:set var="percentageDurationReady" value="${taskStatusMap['Ready'].timeInMin ? Math.round((taskStatusMap['Ready'].timeInMin/totalDuration)*100) :0}" />
 			<!--Header Starts here-->
 			<div id="header">
 				<div style="float: left; padding-top: 2px;">
@@ -116,6 +150,47 @@
 							<br /> <span id="spanRevised"></span>
 						</span>
 					</div>
+					<div class="toprightcontent">
+					<div class="taskSummaryDiv">
+						<h3>Task Summary </h3><br>
+						<span class="taskCountSpan">${taskCountByEvent}</span>
+					</div>
+					</div>
+					<div class="toprightcontent">
+					<div class="taskDetailsDiv">
+							<div class="task_done" style="border:1px solid #24488A;"><b>Done:${taskStatusMap['Completed'].taskCount} (${taskStatusMap['Completed'].timeInMin}m)</b></div>
+							<div class="task_started" style="border:1px solid #00CED1;"><b>Started:${taskStatusMap['Started'].taskCount} (${taskStatusMap['Started'].timeInMin}m)</b></div>
+							<div class="task_ready" style="border:1px solid #008000;"><b>Ready:${taskStatusMap['Ready'].taskCount} (${taskStatusMap['Ready'].timeInMin}m)</b></div>
+							<div style="border:1px solid black;"><b>Pending:${taskStatusMap['Pending'].taskCount} (${taskStatusMap['Pending'].timeInMin}m)</b></div>
+					</div>
+					</div>
+					<div class="toprightcontent">
+						<table class="task_bar_table">
+							 <tr>
+							  <td class="task_bar_label">
+							   Tasks
+							  </td>
+							  <td class="task_bar_base">
+							   <div class="task_done task_bar_graph" id="tasksDoneBar" ></div>
+							   <div class="task_started task_bar_graph" id="tasksStartBar"></div>
+							   <div class="task_ready task_bar_graph" id="tasksReadyBar"></div>
+							   <div class="prog_bar_text" id="taskDoneText">${percentageTaskDone}% ${percentageTaskStarted}% ${percentageTaskReady}%</div>
+							  </td>
+							 </tr>
+							 <tr>
+							  <td class="task_bar_label">
+							   Effort
+							  </td>
+							  <td class="task_bar_base">
+							   <div class="task_done task_bar_graph" id="effortDoneBar"></div>
+							   <div class="task_started task_bar_graph" id="effortStartBar"></div>
+							   <div class="task_ready task_bar_graph" id="effortReadyBar"></div>
+							   <div class="prog_bar_text" id="effortDoneText">${percentageDurationDone}% ${percentageDurationStarted}% ${percentageDurationReady}%</div>
+							  </td>
+							 </tr>
+						</table>
+					</div>
+				
 				</div>
 			</div>
 			<!-- News section starts here-->
@@ -461,7 +536,6 @@
 	} else {
 		$("#timezone option:contains(EDT)").attr("selected","selected");
 	}
-	console.log($("#timezone").val())
 	if('${timeToUpdate}'){
 		$("#updateTimeId").val("${timeToUpdate}")
 	}
@@ -659,7 +733,7 @@
 	 * functions to convert Date & Time into respective timezones
 	 *-----------------------------------------------------------*/
 
-	function convertTime(offset, source) {
+	function convertTime(offset, source, format) {
 		try{
 			//12/11: 12:30 PM: (0m)     
 		    if (source ==  ""){
@@ -691,7 +765,9 @@
 		        		deltaTemp = deltaTemp * -1
 		        		sign = "-"
 		        	}
-		        	if((parseInt( deltaTemp / 60 ))<10){
+		        	if(format=='m'){
+		        		tsource2 = "("+sign + deltaTemp+"m)"
+		        	} else if((parseInt( deltaTemp / 60 ))<10){
 		        		tsource2 = "("+sign + parseInt( deltaTemp / 60 ) +"h "+ deltaTemp % 60 +"m)"
 		        	} else {
 		        	    tsource2 = "("+sign + parseInt( deltaTemp / 60 ) +"h"+"+)"
@@ -857,7 +933,7 @@
 						$("#li_start_"+moveBundleId+"_"+steps[i].tid).addClass("actstart_red");
 					}
 				}
-				$("#act_start_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].actStart+": ("+ startDelta +"m)"));
+				$("#act_start_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].actStart+": ("+ startDelta +"m)", 'm'));
 				if( steps[i].actStart && !steps[i].actComp && steps[i].calcMethod != "M" && ${runbookOn} != 1) {
 					$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html("<span id='databox'>Total Devices "+steps[i].tskTot+" Completed "+steps[i].tskComp+"</span>")
 				} else {
@@ -866,7 +942,7 @@
 						$("#li_finish_"+moveBundleId+"_"+steps[i].tid).removeClass("actfinish");
 						$("#li_finish_"+moveBundleId+"_"+steps[i].tid).addClass("actfinish_red");
 					}
-					$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].actComp+": ("+actDelta+"m)"));
+					$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].actComp+": ("+actDelta+"m)", 'm'));
 				}
 				var percentage = $("#percentage_"+moveBundleId+"_"+steps[i].tid).html()
 				if(percentage != "100%" && percentage != "0%"){

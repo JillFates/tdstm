@@ -20,4 +20,7 @@ class AssetCommentStatus {
 	static final getList() {
 		return list as List
 	}
+	static final getTopStatusList() {
+		return [PENDING, READY, STARTED, DONE] as List
+	}
 }	
