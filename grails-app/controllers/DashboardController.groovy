@@ -55,7 +55,8 @@ class DashboardController {
 				d.duration*durationScale[d.durationScale]
 			}
 			taskStatusMap <<[(status): [taskCount :AssetComment.countByStatusAndMoveEvent(status,moveEvent), timeInMin:timeInMin]]
-			totalDuration +=timeInMin
+			if(timeInMin) 
+				totalDuration +=timeInMin
 		}
 		
 		return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, projectLogo : projectLogo, 
