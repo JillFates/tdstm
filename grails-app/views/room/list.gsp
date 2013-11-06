@@ -13,35 +13,6 @@
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>	
 
-		<script type="text/javascript">
-		var roomId = "${roomId}"
-		var viewType = "${viewType}"
-		if (roomId && viewType != 'list') {
-			var rackId = "${filterRackId}"
-			if (rackId) {
-				${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'getTimeOut(rackId)')}
-			} else {
-				${remoteFunction(action:'show', params:'\'id=\'+roomId', onComplete:'openRoomView(e)')}
-			}
-		}
-		$(document).ready(function() {
-			$("#editDialog").dialog({ autoOpen: false })
-			$("#createRoomDialog").dialog({ autoOpen: false })
-			$("#mergeRoomDialog").dialog({ autoOpen: false })
-			$("#listDialog").dialog({ autoOpen: false })
-			$("#cablingDialogId").dialog({ autoOpen: false })
-			$("#manufacturerShowDialog").dialog({ autoOpen: false })
-			$("#modelShowDialog").dialog({ autoOpen: false })
-			$("#createEntityView").dialog({autoOpen: false})
-			$("#showEntityView").dialog({autoOpen: false})
-			$("#editEntityView").dialog({autoOpen: false})
-			$("#commentsListDialog").dialog({ autoOpen: false })
-			$("#createCommentDialog").dialog({ autoOpen: false })
-			$("#showCommentDialog").dialog({ autoOpen: false })
-			$("#editCommentDialog").dialog({ autoOpen: false })
-			$("#editManufacturerView").dialog({ autoOpen: false})
-		})
-		</script>
 	</head>
 	<body>
 
@@ -302,15 +273,37 @@
 		<input type="hidden" id="role" value="role"/>
 
 		<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
-		<script type="text/javascript">    
+	<script type="text/javascript">   
+		
+		var roomId = "${roomId}"
+		var viewType = "${viewType}"
+		if (roomId && viewType != 'list') {
+			var rackId = "${filterRackId}"
+			$.ajax({
+				url: contextPath+"/room/show",
+				data: {'id':roomId},
+				type:'POST',
+				success: function(data) {
+					$("#roomListView").hide()
+					$("#roomShowView").html(data)
+					$("#roomShowView").show()
+					if(rackId)
+						getTimeOut(rackId)
+				}
+			});
+		}
+		$(document).ready(function() {
+			$("#editDialog,#createRoomDialog,#mergeRoomDialog,#listDialog,#cablingDialogId").dialog({ autoOpen: false })
+			$("#manufacturerShowDialog,#modelShowDialog,#createEntityView,#showEntityView").dialog({autoOpen: false})
+			$("#editEntityView,#commentsListDialog,#createCommentDialog,#showCommentDialog").dialog({ autoOpen: false })
+			$("#editCommentDialog,#editManufacturerView").dialog({ autoOpen: false})
+		})
 		function openRoomView(e,browser){
 			
 			var resp = e.responseText
-			setTimeout(function() {
-				$("#roomListView").hide()
-				$("#roomShowView").html(resp)
-				$("#roomShowView").show()
-			}, 500 );
+			$("#roomListView").hide()
+			$("#roomShowView").html(resp)
+			$("#roomShowView").show()
 			if(browser){
 				$("#bundleId").removeAttr("multiple")
 			}
@@ -383,7 +376,9 @@
 			}
 		}
 		function getTimeOut(rackId){
-			setTimeout("getRackLayout( rackId )",600);
+			setTimeout(function(){
+					getRackLayout( rackId )
+			},600);
 		}
 		function getRackLayout( rackId ){
 			if(rackId){
@@ -409,8 +404,8 @@
 						},parameters:moveBundleId+'rackId='+rackId+'&backView=off&showCabling=off&otherBundle='+otherBundle+'&bundleName=on&hideIcons=on&forWhom='+forWhom});return false;
 			}
 		}
-			currentMenuId = "#roomsMenu";
-			$("#roomMenuId a").css('background-color','#003366')
+		currentMenuId = "#roomsMenu";
+		$("#roomMenuId a").css('background-color','#003366')
 		</script>
 	</body>
 </html>
