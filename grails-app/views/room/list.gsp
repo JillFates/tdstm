@@ -306,9 +306,11 @@
 		function openRoomView(e,browser){
 			
 			var resp = e.responseText
-			$("#roomShowView").show()
-			$("#roomShowView").html(resp)
-			$("#roomListView").hide()
+			setTimeout(function() {
+				$("#roomListView").hide()
+				$("#roomShowView").html(resp)
+				$("#roomShowView").show()
+			}, 500 );
 			if(browser){
 				$("#bundleId").removeAttr("multiple")
 			}
