@@ -229,9 +229,9 @@
 					<td style="vertical-align:top"><span class="megamenuSection">Rooms</span><br />
 						<ul >
 							<li><g:link class="mmlink" params="[viewType:'list']" controller="room"  onclick="hideMegaMenu('racksMegaMenu')">List Rooms</g:link></li>
-							<%-- <g:if test="${roomId}">
-								<li><g:link class="mmlink" params="[viewType:'',roomId:roomId]" controller="room" onclick="hideMegaMenu('racksMegaMenu')">Room ${room?.location}/${room?.roomName}</g:link></li>
-							</g:if> --%>
+							<g:if test="${roomId}">
+								<li><g:link class="mmlink" params="[roomId:roomId]" controller="room" onclick="hideMegaMenu('racksMegaMenu')">Room ${room?.location}/${room?.roomName}</g:link></li>
+							</g:if>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
 							</tds:hasPermission>
