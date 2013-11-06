@@ -198,7 +198,7 @@ class TaskController {
 			return
 		}
 
-		def depList = taskService.getNeighborhood(taskId, 2, 8)
+		def depList = taskService.getNeighborhood(taskId, 2, 5)
 		if (depList.size() == 0) {
 			render "The task has no interdependencies with other tasks so a map wasn't generated."
 			return
