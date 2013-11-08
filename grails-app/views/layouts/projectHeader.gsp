@@ -367,7 +367,7 @@
 							<li><a class="mmlink" id="MyTasksMenuId" href="/tdstm/clientTeams/listTasks" onclick="hideMegaMenu('teamMegaMenu')">My Tasks 
 							(<span id="todoCountProjectId">&nbsp;</span>)</a></li>
 							<tds:hasPermission permission='ShowMoveTechsAndAdmins'>
-							<li><g:link class="mmlink" controller="assetEntity" action="listTasks"  params="[initSession:true]" onclick="hideMegaMenu('assetMegaMenu')">Task Manager</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" action="listTasks"  params="[initSession:true]" onclick="hideMegaMenu('teamMegaMenu')">Task Manager</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('consoleMegaMenu')">help</a></li>
