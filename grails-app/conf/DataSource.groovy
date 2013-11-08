@@ -26,8 +26,8 @@ environments {
 			// url = "jdbc:mysql://localhost/tdstm_dev"
 			url = "jdbc:mysql://localhost/tdstm?autoReconnect=true"
 			driverClassName = "com.mysql.jdbc.Driver"
-			username = "root"
-			password = "root"
+			username = "tdstm"
+			password = "tdstm"
 			
 	        //logSql = true 
 		}
