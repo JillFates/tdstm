@@ -153,10 +153,10 @@ $(document).ready(function() {
 					</div>
 					<div class="toprightcontent">
 					<div class="taskDetailsDiv">
-							<div class="task_done"><b>Done:${taskStatusMap['Completed'].taskCount} (${taskStatusMap['Completed'].timeInMin}m)</b></div>
-							<div class="task_started"><b>Started:${taskStatusMap['Started'].taskCount} (${taskStatusMap['Started'].timeInMin}m)</b></div>
-							<div class="task_ready"><b>Ready:${taskStatusMap['Ready'].taskCount} (${taskStatusMap['Ready'].timeInMin}m)</b></div>
-							<div style="border:1px solid black;"><b>Pending:${taskStatusMap['Pending'].taskCount} (${taskStatusMap['Pending'].timeInMin}m)</b></div>
+							<div class="task_done taskSummaryCounts"><b>Done: ${taskStatusMap['Completed'].taskCount} (${taskStatusMap['Completed'].timeInMin}m)</b></div>
+							<div class="task_started taskSummaryCounts"><b>Started: ${taskStatusMap['Started'].taskCount} (${taskStatusMap['Started'].timeInMin}m)</b></div>
+							<div class="task_ready taskSummaryCounts"><b>Ready: ${taskStatusMap['Ready'].taskCount} (${taskStatusMap['Ready'].timeInMin}m)</b></div>
+							<div class="taskSummaryCounts" style="border:1px solid black;"><b>Pending: ${taskStatusMap['Pending'].taskCount} (${taskStatusMap['Pending'].timeInMin}m)</b></div>
 					</div>
 					</div>
 					<div class="toprightcontent">

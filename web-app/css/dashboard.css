@@ -758,6 +758,7 @@ input, select, textarea {
  height: 24px;
  background-color: white;
  box-shadow: 2px 3px 3px lightgray inset !important;
+ padding: 0px;
  font-weight: bold;
  font-size: 11px;
 }
@@ -790,4 +791,10 @@ input, select, textarea {
 .taskCountSpan{
 	font-size:40px;
 	border:1px solid black;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+.taskSummaryCounts{
+	padding-left: 5px;
+	width: 120px;
 }
