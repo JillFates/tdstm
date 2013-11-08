@@ -48,6 +48,17 @@
       		$('.tzmenu').click(function(){
       			 $(".tzmenu ul").toggle();
       		});
+      		$(".headerClass").mouseover(function(){
+      			$(this).parent().find('a').addClass('mouseover');
+      			$(this).parent().find('a').removeClass('mouseout');
+      		})
+      		$(".headerClass").mouseout(function(){
+      			if(!$(this).parent().find(".megamenu").is(":visible")){
+      				$(this).parent().find('a').removeClass('mouseover');
+      			} else {
+      				$('.headerClass').removeClass('mouseover');
+      			}
+      		})
      	})
      	var emailRegExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/
      	var dateRegExpForExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
@@ -113,8 +124,8 @@
 			<g:if test="${isIE6 || isIE7}">
 				<span><img title="Note: MS IE6 and MS IE7 has limited capability so functions have been reduced." src="${resource(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
 			</g:if>
-			<a href="javascript:showMegaMenu('#userMegaMenu')" style="float:left;display:inline">
-			&nbsp;<span id="loginUserId" class="headerClass">${session.getAttribute("LOGIN_PERSON").name }</span></a>
+			<a class="headerClass" href="javascript:showMegaMenu('#userMegaMenu')" style="float:left;text-decoration:none;display:inline">
+			&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name }</span></a>
 				<a id="userAnchor" class="ui-icon ui-icon-triangle-1-s headerClass" href="javascript:showMegaMenu('#userMegaMenu')" style="float:left;display:inline"></a>
 			</div>
 			<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>

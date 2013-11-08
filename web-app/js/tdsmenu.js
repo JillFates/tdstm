@@ -294,7 +294,7 @@
 			}
 		}
 		function hideMegaMenu( id ){
-			$("#"+id).hide()
+			$("#"+id).removeClass('inActive').addClass('active')
 		}
 		function closeMegaMenu() {
 			if(megamenuitem) $(megamenuitem).removeClass('active').addClass('inActive');

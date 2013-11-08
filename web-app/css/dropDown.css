@@ -1,252 +1,262 @@
 #menubar {
-      border-top: 2px solid #354E81;
-      border-right: 2px solid #354E81;
-      border-bottom: 2px solid #354E81;
-      border-left: 2px solid #354E81;
-      background-color: #354E81;
-      color: #9ACAEE;
-      height: 1.4em;
-      line-height: 1.2em;
-	  width:130px;
-	  font:12px Tahoma;
-	  font-weight:bold;
-	  float:left;
-	  width:150px;
-	  height:auto;
-	}
-    
-    .menu_new {
-      width: auto;
-      height:auto;
-      float: left;
-      padding: 0.1em 3em 0.1em 0.5em;
-      cursor: default;
-    }
-    
-    .menu_new ul {
-      display: none;
-      position: absolute;
-      background-color: #354E81;
-      color: black;
-      list-style: none;
-      margin: 0.1em 0 0 -8px;
-      padding: 0;
-      width:200px;
-      height:auto;
-      float:left;
-      z-index: 100;
-    }
-       
-    .menu_new ul li {
-      display: block;
-      padding: 0.2em;
-    }
-    
-    .menu_new ul li a {
-      background-color: #354E81;
-      width:180px;
-      color: #9ACAEE;
-      font:11px Tahoma;
-	  font-weight:bold;
-	  border:0px;	
-	  text-align:left;
-	  padding-top:5px;  
-    }
-    
-    .menu_new ul li a:hover {
-      color: #ffffff;
-    }
-    
-    div.menu_new:hover ul {
-      display: block;     
-    }
-	.tzmenu {
-      width: auto;
-      float: left;
-      cursor: default;
-    }
-    
-    .tzmenu ul {
-      display: none;
-      border : 0px solid #CCC;
-      color: black;
-      list-style: none;
-      margin: 0 0 0 10px;
-      padding: 0px;
-      position: relative;
-      width:80px;
-      height:auto;
-      z-index: 100;
-    }
-       
-    .tzmenu ul li {
-      display: block;
-      margin-top:-2px;
-      position: relative;
-    }
-    
-    .tzmenu ul li a {
-      background-color: #efefef;
-      width:80px;
-      color: #354E81;
-      font:11px Tahoma;
-	  font-weight:bold;
-	  border:1px solid #354E81;	
-	  text-align:left;
-	  padding:3px;
-	  display: block;  
-    }
-    
-    .tzmenu ul li a:hover {
-      color: #ffffff;
-      background-color: #354E81;
-    }
-    .active {
-    	display: block;
-	}
-	.inActive{
-		display: none;
-	}
-    
-    /**************************** Rack Menu***************************/
-    .rack_menu {
-      width: auto;
-      float: left;
-      cursor: default;
-    }
-    
-    .rack_menu ul {
-      display: none;
-      border : 0px solid #CCC;
-      color: black;
-      list-style: none;
-      margin: 0 0 0 10px;
-      padding: 0px;
-      position: absolute;
-      width:80px;
-      height:auto;
-      z-index: 100;
-      margin-top: -4px;
-    }
-       
-    .rack_menu ul li {
-      display: block;
-      margin-top:-2px;
-      position: relative;
-    }
-    
-    .rack_menu ul li a {
-      background-color: #efefef;
-      width:80px;
-      color: #354E81;
-      font:11px Tahoma;
-	  font-weight:bold;
-	  border:1px solid #354E81;	
-	  text-align:left;
-	  padding:3px;
-	  display: block;  
-	  text-decoration: none;
-    }
-    
-    .rack_menu ul li a:hover {
-      color: #ffffff;
-      background-color: #354E81;
-    }
-    
-    div.rack_menu:hover ul {
-      display: block;     
-    }
-/*Asset menu*/
-    .menu_new_asset {
-      width: auto;
-      height:auto;
-      float: left;
-      padding: 0.1em 3em 0.1em 0.5em;
-      cursor: default;
-    }
-    
-    .menu_new_asset ul {
-      display: none;
-      position: absolute;
-      background-color: #354E81;
-      color: black;
-      list-style: none;
-      margin: 0.1em 0 0 -8px;
-      padding: 0;
-      width:165px;
-      height:auto;
-      float:left;
-      z-index:100;
-    }
-       
-    .menu_new_asset ul li {
-      display: block;
-      padding: 0.2em;
-    }
-    
-    .menu_new_asset ul li a {
-      background-color: #354E81;
-      width:150px;
-      color: #9ACAEE;
-      font:11px Tahoma;
-	  font-weight:bold;
-	  border:0px;	
-	  text-align:left;
-	  padding-top:5px;  
-    }
-    
-    .menu_new_asset ul li a:hover {
-      color: #ffffff;
-    }
-    
-    div.menu_new_asset:hover ul {
-      display: block;      
-    }
-    /*Normal User Report Menu */
-    
-     .menu_normal {
-      width: auto;
-      height:auto;
-      float: left;
-      padding: 0.1em 3em 0.1em 0.5em;
-      cursor: default;
-    }
-    
-    .menu_normal ul {
-      display: none;
-      position: absolute;
-      background-color: #354E81;
-      color: black;
-      list-style: none;
-      margin: 0.1em 0 0 -8px;
-      padding: 0;
-      width:200px;
-      height:auto;
-      float:left;
-    }
-       
-    .menu_normal ul li {
-      display: block;
-      padding: 0.2em;
-    }
-    
-    .menu_normal ul li a {
-      background-color: #354E81;
-      width:180px;
-      color: #9ACAEE;
-      font:11px Tahoma;
-	  font-weight:bold;
-	  border:0px;	
-	  text-align:left;
-	  padding-top:5px;  
-    }
-    
-    .menu_normal ul li a:hover {
-      color: #ffffff;
-    }
-    
-    div.menu_normal:hover ul {
-      display: block;      
-    }
+	border-top: 2px solid #354E81;
+	border-right: 2px solid #354E81;
+	border-bottom: 2px solid #354E81;
+	border-left: 2px solid #354E81;
+	background-color: #354E81;
+	color: #9ACAEE;
+	height: 1.4em;
+	line-height: 1.2em;
+	width: 130px;
+	font: 12px Tahoma;
+	font-weight: bold;
+	float: left;
+	width: 150px;
+	height: auto;
+}
 
-    
+.menu_new {
+	width: auto;
+	height: auto;
+	float: left;
+	padding: 0.1em 3em 0.1em 0.5em;
+	cursor: default;
+}
+
+.menu_new ul {
+	display: none;
+	position: absolute;
+	background-color: #354E81;
+	color: black;
+	list-style: none;
+	margin: 0.1em 0 0 -8px;
+	padding: 0;
+	width: 200px;
+	height: auto;
+	float: left;
+	z-index: 100;
+}
+
+.menu_new ul li {
+	display: block;
+	padding: 0.2em;
+}
+
+.menu_new ul li a {
+	background-color: #354E81;
+	width: 180px;
+	color: #9ACAEE;
+	font: 11px Tahoma;
+	font-weight: bold;
+	border: 0px;
+	text-align: left;
+	padding-top: 5px;
+}
+
+.menu_new ul li a:hover {
+	color: #ffffff;
+}
+
+div.menu_new:hover ul {
+	display: block;
+}
+
+.tzmenu {
+	width: auto;
+	float: left;
+	cursor: default;
+}
+
+.tzmenu ul {
+	display: none;
+	border: 0px solid #CCC;
+	color: black;
+	list-style: none;
+	margin: 0 0 0 10px;
+	padding: 0px;
+	position: relative;
+	width: 80px;
+	height: auto;
+	z-index: 100;
+}
+
+.tzmenu ul li {
+	display: block;
+	margin-top: -2px;
+	position: relative;
+}
+
+.tzmenu ul li a {
+	background-color: #efefef;
+	width: 80px;
+	color: #354E81;
+	font: 11px Tahoma;
+	font-weight: bold;
+	border: 1px solid #354E81;
+	text-align: left;
+	padding: 3px;
+	display: block;
+}
+
+.tzmenu ul li a:hover {
+	color: #ffffff;
+	background-color: #354E81;
+}
+
+.active {
+	display: block;
+}
+
+.inActive {
+	display: none;
+}
+/**************************** Rack Menu***************************/
+.rack_menu {
+	width: auto;
+	float: left;
+	cursor: default;
+}
+
+.rack_menu ul {
+	display: none;
+	border: 0px solid #CCC;
+	color: black;
+	list-style: none;
+	margin: 0 0 0 10px;
+	padding: 0px;
+	position: absolute;
+	width: 80px;
+	height: auto;
+	z-index: 100;
+	margin-top: -4px;
+}
+
+.rack_menu ul li {
+	display: block;
+	margin-top: -2px;
+	position: relative;
+}
+
+.rack_menu ul li a {
+	background-color: #efefef;
+	width: 80px;
+	color: #354E81;
+	font: 11px Tahoma;
+	font-weight: bold;
+	border: 1px solid #354E81;
+	text-align: left;
+	padding: 3px;
+	display: block;
+	text-decoration: none;
+}
+
+.rack_menu ul li a:hover {
+	color: #ffffff;
+	background-color: #354E81;
+}
+
+div.rack_menu:hover ul {
+	display: block;
+}
+/*Asset menu*/
+.menu_new_asset {
+	width: auto;
+	height: auto;
+	float: left;
+	padding: 0.1em 3em 0.1em 0.5em;
+	cursor: default;
+}
+
+.menu_new_asset ul {
+	display: none;
+	position: absolute;
+	background-color: #354E81;
+	color: black;
+	list-style: none;
+	margin: 0.1em 0 0 -8px;
+	padding: 0;
+	width: 165px;
+	height: auto;
+	float: left;
+	z-index: 100;
+}
+
+.menu_new_asset ul li {
+	display: block;
+	padding: 0.2em;
+}
+
+.menu_new_asset ul li a {
+	background-color: #354E81;
+	width: 150px;
+	color: #9ACAEE;
+	font: 11px Tahoma;
+	font-weight: bold;
+	border: 0px;
+	text-align: left;
+	padding-top: 5px;
+}
+
+.menu_new_asset ul li a:hover {
+	color: #ffffff;
+}
+
+div.menu_new_asset:hover ul {
+	display: block;
+}
+/*Normal User Report Menu */
+.menu_normal {
+	width: auto;
+	height: auto;
+	float: left;
+	padding: 0.1em 3em 0.1em 0.5em;
+	cursor: default;
+}
+
+.menu_normal ul {
+	display: none;
+	position: absolute;
+	background-color: #354E81;
+	color: black;
+	list-style: none;
+	margin: 0.1em 0 0 -8px;
+	padding: 0;
+	width: 200px;
+	height: auto;
+	float: left;
+}
+
+.menu_normal ul li {
+	display: block;
+	padding: 0.2em;
+}
+
+.menu_normal ul li a {
+	background-color: #354E81;
+	width: 180px;
+	color: #9ACAEE;
+	font: 11px Tahoma;
+	font-weight: bold;
+	border: 0px;
+	text-align: left;
+	padding-top: 5px;
+}
+
+.menu_normal ul li a:hover {
+	color: #ffffff;
+}
+
+div.menu_normal:hover ul {
+	display: block;
+}
+
+a.mouseover{
+	background-color:#ADD8E6 !important;
+	border-right-color:#ADD8E6 !important;
+    color:#354E81 !important;
+}
+a.mouseout{
+	background-color:#354E81 !important;
+	border-right-color:#354E81 !important;
+    color:#9ACAEE !important;
+}
