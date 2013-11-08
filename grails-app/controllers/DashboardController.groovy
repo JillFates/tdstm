@@ -7,19 +7,14 @@ import com.tdssrc.grails.GormUtil
 class DashboardController {
 	
 	def userPreferenceService
+    def taskService
     
-	def index = { 
+	def index = {
 		
 		def projectId = session.CURR_PROJ.CURR_PROJ
-		def project
-		def moveEventsList
-		def projectLogo
 		def moveEvent
-		def moveBundleList
 		
-		project = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
-		moveEventsList = MoveEvent.findAllByProject(project)
-		projectLogo = ProjectLogo.findByProject(project)
+		def project = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		def moveEventId = params.moveEvent
 		
 		if(moveEventId){
@@ -37,32 +32,25 @@ class DashboardController {
             	moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
             }
         }
-		userPreferenceService.loadPreferences("DASHBOARD_REFRESH")
-        def timeToUpdate = getSession().getAttribute("DASHBOARD_REFRESH")
-		def subject = SecurityUtils.subject
-        if( moveEvent ){
+        if(!moveEvent){
+            flash.message = "Please select move event to view Event Dashboard"
+            redirect(controller:"moveEvent",action:"list")
+        } else {
+            def moveEventsList = MoveEvent.findAllByProject(project,[sort:'name',order:'asc'])
+            def projectLogo = ProjectLogo.findByProject(project)
+    		userPreferenceService.loadPreferences("DASHBOARD_REFRESH")
+            def timeToUpdate = getSession().getAttribute("DASHBOARD_REFRESH")
+    		def subject = SecurityUtils.subject
+            //code for task Summary and task progress bars
         	userPreferenceService.setPreference("MOVE_EVENT","${moveEvent.id}")
-			moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = ${moveEvent.id} ORDER BY mb.startTime ")				
-		}
-		//code for task Summary and task progress bars
-		def taskCountByEvent = AssetComment.countByMoveEvent(moveEvent)
-		def taskStatusMap =[:]
-		def totalDuration=0
-		def durationScale = [d:1440,m:1,w:10080,h:60] // minutes per day,week,hour
-		AssetCommentStatus.topStatusList.each{ status->
-			def duration = AssetComment.findAllByMoveEventAndStatus(moveEvent,status)
-			def timeInMin=duration.sum{d->
-				d.duration*durationScale[d.durationScale]
-			}
-			taskStatusMap <<[(status): [taskCount :AssetComment.countByStatusAndMoveEvent(status,moveEvent), timeInMin:timeInMin]]
-			if(timeInMin) 
-				totalDuration +=timeInMin
-		}
-		
-		return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, projectLogo : projectLogo, 
-				 moveBundleList : moveBundleList, timeToUpdate : timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : "never",
-				 manualOverrideViewPermission:RolePermissions.hasPermission("ManualOverride"),
-				 taskCountByEvent:taskCountByEvent, taskStatusMap:taskStatusMap, totalDuration:totalDuration]
+			def moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = ${moveEvent.id} ORDER BY mb.startTime ")			
+            def results = taskService.getMoveEventTaskSummary(moveEvent)
+            
+    		return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, projectLogo : projectLogo, 
+    				 moveBundleList : moveBundleList, timeToUpdate : timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : "never",
+    				 manualOverrideViewPermission:RolePermissions.hasPermission("ManualOverride"),
+    				 taskCountByEvent:results.taskCountByEvent, taskStatusMap:results.taskStatusMap, totalDuration:results.totalDuration]
+        }
     }
 	
 	/*---------------------------------------------------------
@@ -143,4 +131,17 @@ class DashboardController {
 		redirect(action:index)
 	}
 	
+    /**
+     * ajax call to find the given event task summary ( taskCounts, tatalDuratin, tasks by status)
+     * @param id moveEventId
+     * @param Render taskSummary template
+     */
+    def taskSummary = {
+        
+        def moveEvent = MoveEvent.read(params.id)
+        def results = taskService.getMoveEventTaskSummary(moveEvent)
+        
+        render(template:'taskSummary',model:[taskCountByEvent:results.taskCountByEvent, taskStatusMap:results.taskStatusMap, totalDuration:results.totalDuration])
+        
+    }
 }

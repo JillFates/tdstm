@@ -3663,4 +3663,32 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 	}
+    
+    /**
+     * This special method is used to find given event task summary ( taskCounts, tatalDuratin, tasks by status)
+     * @param MoveEvent moveEvent object
+     * @param loadedGroups Map<List> - A mapped list of the taskCounts, tatalDuratin, tasks by status
+     */
+    def getMoveEventTaskSummary(def moveEvent){
+        
+        def taskStatusMap =[:]
+        def totalDuration=0
+        def taskCountByEvent = 0
+        
+        if(moveEvent){
+            taskCountByEvent = AssetComment.countByMoveEvent(moveEvent)
+            def durationScale = [d:1440,m:1,w:10080,h:60] // minutes per day,week,hour
+            AssetCommentStatus.topStatusList.each{ status->
+                def duration = AssetComment.findAllByMoveEventAndStatus(moveEvent,status)
+                def timeInMin=duration.sum{d->
+                    d.duration*durationScale[d.durationScale]
+                }
+                taskStatusMap <<[(status): [taskCount :AssetComment.countByStatusAndMoveEvent(status,moveEvent), timeInMin:timeInMin]]
+                if(timeInMin)
+                    totalDuration +=timeInMin
+            }
+        }
+        
+        return [taskCountByEvent:taskCountByEvent, taskStatusMap:taskStatusMap, totalDuration:totalDuration]
+    }
 }

@@ -10,42 +10,13 @@
 <link rel="shortcut icon"
 	href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 <g:javascript src="yahoo.ui.dashboard.js" />
-
-<script type="text/javascript">
-$(document).ready(function() {
-	var percentageTaskDone=${taskStatusMap['Completed'].taskCount ? Math.round((taskStatusMap['Completed'].taskCount/taskCountByEvent)*100) :0};
-	$("#tasksDoneBar").animate({width: percentageTaskDone+"%" }, 1000);
-	
-	var percentageTaskStarted=${taskStatusMap['Started'].taskCount ? Math.round((taskStatusMap['Started'].taskCount/taskCountByEvent)*100) :0};
-	$("#tasksStartBar").animate({width: percentageTaskStarted+"%" }, 1000);
-	
-	var percentageTaskReady=${taskStatusMap['Ready'].taskCount ? Math.round((taskStatusMap['Ready'].taskCount/taskCountByEvent)*100) :0};
-	$("#tasksReadyBar").animate({width: percentageTaskReady+"%" }, 1000);
-	
-	var percentageDurationCompleted=${taskStatusMap['Completed'].timeInMin ? Math.round((taskStatusMap['Completed'].timeInMin/totalDuration)*100) :0};
-	$("#effortDoneBar").animate({width: percentageDurationCompleted+"%" }, 1000);
-	
-	var percentageDurationStarted=${taskStatusMap['Started'].timeInMin ? Math.round((taskStatusMap['Started'].timeInMin/totalDuration)*100) :0};
-	$("#effortStartBar").animate({width: percentageDurationStarted+"%" }, 1000);
-	
-	var percentageDurationReady=${taskStatusMap['Ready'].timeInMin ? Math.round((taskStatusMap['Ready'].timeInMin/totalDuration)*100) :0};
-	$("#effortReadyBar").animate({width: percentageDurationReady+"%" }, 1000);
-});
-</script>
 </head>
 <body>
 <div class="body_bg">
 	<a name="page_up"></a>
 	<div id="doc">
-
 		<!-- Body Starts here-->
 		<div id="bodycontent">
-		<g:set var="percentageTaskDone" value="${taskStatusMap['Completed'].taskCount ? Math.round((taskStatusMap['Completed'].taskCount/taskCountByEvent)*100) :0}" />
-		<g:set var="percentageTaskStarted" value="${taskStatusMap['Started'].taskCount ? Math.round((taskStatusMap['Started'].taskCount/taskCountByEvent)*100) :0}" />
-		<g:set var="percentageTaskReady" value="${taskStatusMap['Ready'].taskCount ? Math.round((taskStatusMap['Ready'].taskCount/taskCountByEvent)*100) :0}" />
-		<g:set var="percentageDurationDone" value="${taskStatusMap['Completed'].timeInMin ? Math.round((taskStatusMap['Completed'].timeInMin/totalDuration)*100) :0}" />
-		<g:set var="percentageDurationStarted" value="${taskStatusMap['Started'].timeInMin ? Math.round((taskStatusMap['Started'].timeInMin/totalDuration)*100) :0}" />
-		<g:set var="percentageDurationReady" value="${taskStatusMap['Ready'].timeInMin ? Math.round((taskStatusMap['Ready'].timeInMin/totalDuration)*100) :0}" />
 			<!--Header Starts here-->
 			<div id="header">
 				<div style="float: left; padding-top: 2px;">
@@ -144,48 +115,9 @@ $(document).ready(function() {
 							<br /> <span id="spanRevised"></span>
 						</span>
 					</div>
-					<div class="toprightcontent">
-					<div class="taskSummaryDiv">
-						<h3>Task Summary </h3><br>
-						<span class="taskCountSpan">${taskCountByEvent-taskStatusMap['Completed'].taskCount}</span><br><br>
-						<h5>Remaining</h5>
-					</div>
-					</div>
-					<div class="toprightcontent">
-					<div class="taskDetailsDiv">
-							<div class="task_done taskSummaryCounts"><b>Done: ${taskStatusMap['Completed'].taskCount} (${taskStatusMap['Completed'].timeInMin}m)</b></div>
-							<div class="task_started taskSummaryCounts"><b>Started: ${taskStatusMap['Started'].taskCount} (${taskStatusMap['Started'].timeInMin}m)</b></div>
-							<div class="task_ready taskSummaryCounts"><b>Ready: ${taskStatusMap['Ready'].taskCount} (${taskStatusMap['Ready'].timeInMin}m)</b></div>
-							<div class="taskSummaryCounts" style="border:1px solid black;"><b>Pending: ${taskStatusMap['Pending'].taskCount} (${taskStatusMap['Pending'].timeInMin}m)</b></div>
-					</div>
-					</div>
-					<div class="toprightcontent">
-						<table class="task_bar_table">
-							 <tr>
-							  <td class="task_bar_label">
-							   Tasks
-							  </td>
-							  <td class="task_bar_base">
-							   <div class="task_done task_bar_graph" id="tasksDoneBar" style="width:0%;"></div>
-							   <div class="task_started task_bar_graph" id="tasksStartBar" style="width:0%;"></div>
-							   <div class="task_ready task_bar_graph" id="tasksReadyBar" style="width:0%;"></div>
-							   <div class="prog_bar_text" id="taskDoneText">${(percentageTaskDone<10)? '' : percentageTaskDone+'%'}</div>
-							  </td>
-							 </tr>
-							 <tr>
-							  <td class="task_bar_label">
-							   Effort
-							  </td>
-							  <td class="task_bar_base">
-							   <div class="task_done task_bar_graph" id="effortDoneBar" style="width:0%;"></div>
-							   <div class="task_started task_bar_graph" id="effortStartBar" style="width:0%;"></div>
-							   <div class="task_ready task_bar_graph" id="effortReadyBar" style="width:0%;"></div>
-							   <div class="prog_bar_text" id="effortDoneText">${(percentageDurationDone<10)? '' : percentageDurationDone+'%'}</div>
-							  </td>
-							 </tr>
-						</table>
-					</div>
-				
+				</div>
+				<div id="taskSummary">
+				    <g:render template="taskSummary" model="[taskCountByEvent:taskCountByEvent, taskStatusMap:taskStatusMap, totalDuration:totalDuration]"></g:render>
 				</div>
 			</div>
 			<!-- News section starts here-->
@@ -617,7 +549,7 @@ $(document).ready(function() {
 	var handler = 0
 	function timedUpdate( updateTime ) {
 		if(updateTime != 'never'){
-			handler = setInterval("getMoveEventNewsDetails($('#moveEvent').val())",updateTime);
+			handler = setInterval("getMoveEventNewsDetails($('#moveEvent').val());updateTaskSummary();",updateTime);
 			$("#updateTimeId").val(updateTime)
 		} else {
 			clearInterval(handler)
@@ -688,6 +620,29 @@ $(document).ready(function() {
 		$("#news_archived").html(archived);
 		$("#head_mycrawlerId").html(scrollText)
 		
+	}
+	updateTaskSummary()
+	function updateTaskSummary(){
+		jQuery.ajax({
+            type:"GET",
+            async : true,
+            cache: false,
+            url:"../dashboard/taskSummary/"+moveEvent,
+            success:function (data){
+                $("#taskSummary").html(data)
+            },
+            error:function (xhr, ajaxOptions, thrownError){
+                if( doUpdate && errorCode ==  xhr.status ){
+                    clearInterval(handler);
+                    $("#update").css("color","red")
+                    if( xhr.status == "403"){
+                        alert("403 Forbidden occurred, user don't have permission to load the current project data.");
+                    }   
+                } else {
+                    errorCode =  xhr.status ; 
+                }
+            }    
+        });
 	}
 	function setUserPrefTimeZone(){
 		var timeZone = $("#timezone :selected").text()
