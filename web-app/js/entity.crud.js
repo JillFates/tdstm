@@ -816,7 +816,8 @@ function getHelpTextAsToolTip(type){
 
 function saveToShow($me, forWhom){
 	var act = $me.data('action')
-	var redirect = $me.data('redirect').split("_")[0]
+	if($me.data('redirect'))
+		var redirect = $me.data('redirect').split("_")[0]
 	if(act=='close'){
 		$('#showView').val('closeView')
 	}else{
