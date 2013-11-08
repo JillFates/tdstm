@@ -277,11 +277,11 @@
         	<td valign="top" class="name"><label for="duration ">Duration:</label></td>
         	<td valign="top" class="value" colspan="3">
         	  <input type="text" id="duration" name="duration" value="" size="3">
-            	<g:select id="durationScale" name="durationScale " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>
+            	<g:select id="durationScale" class="ynselect" name="durationScale " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>
             	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               	<span id="priorityCreateSpanId" style="display: none">
 	        		<label for="priority">Priority:</label>
-	            	<g:select id="priority" name="priority" from="${1..5}" value="3"></g:select>
+	            	<g:select id="priority" class="ynselect" name="priority" from="${1..5}" value="3"></g:select>
             	</span>
             	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               	<span id="dueDateCreateSpanId" >
@@ -472,10 +472,10 @@
         	<td valign="top" class="name"><label for="durationEdit ">Duration:</label></td>
         	<td valign="top" class="value" colspan="4">
 				<input type="text" id="durationEdit" name="durationEdit" value="" size="3"/>
-				<g:select id="durationScaleEdit" name="durationScaleEdit " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>&nbsp;&nbsp;
+				<g:select id="durationScaleEdit" class="ynselect" name="durationScaleEdit " from="${com.tds.asset.AssetComment.constraints.durationScale.inList}" value="m"/>&nbsp;&nbsp;
 				<span id="priorityEditSpanId">
 		        	    <label for="priority">Priority:</label>
-		            	<g:select id="priorityEdit" name="priorityEdit" from="${1..5}" value=""></g:select>
+		            	<g:select id="priorityEdit" class="ynselect" name="priorityEdit" from="${1..5}" value=""></g:select>
 	            </span> &nbsp;&nbsp;&nbsp;
 	            <span id="dueDateEditSpanId">
 		        	    <label for="dueDateEditId">Due Date:</label>
