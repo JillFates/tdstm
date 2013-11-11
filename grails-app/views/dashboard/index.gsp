@@ -100,22 +100,7 @@
 						<span id="spanPlanned"></span>
 					</div>
 				</div>
-				<div id="revised_summary">
-					<div id="topindright" style="display: none;">
-						<div id="revised_gauge_div" align="center">
-							<img id="revised_gauge" alt="Event Revised Summary"
-								src="${resource(dir:'i/dials',file:'dial-50.png')}">
-						</div>
-						Status vs. Revised Plan
-					</div>
-					<div class="toprightcontent" id="revised_gauge_content"
-						style="display: none;">
-						Confidence in Revised Plan<br> <span class="high">High</span><br>
-						<span class="redfont">Planned Completion:&#13; <!--12/12: 07:00 AM EST&#13;-->
-							<br /> <span id="spanRevised"></span>
-						</span>
-					</div>
-				</div>
+				<!-- Removed revised_summary section -->
 				<div id="taskSummary">
 				    <g:render template="taskSummary" model="[taskCountByEvent:taskCountByEvent, taskStatusMap:taskStatusMap, totalDuration:totalDuration]"></g:render>
 				</div>
