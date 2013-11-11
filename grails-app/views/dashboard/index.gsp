@@ -853,15 +853,6 @@
 			$("#manualSummaryStatusId").val( sumDialInd );
 			$("#spanPlanned").html(convertTime(offset, planSum.compTime))
 			
-			if(revSum.dialInd == "-1") {
-				$("#topindright").hide();
-				$("#revised_gauge_content").hide();
-			} else if(snapshot.revisedComp) {
-				$("#topindright").show();
-				updateSummaryGauge("revised_gauge",revSum.dialInd)
-				$("#spanRevised").html(convertTime(offset, revSum.compTime))
-				$("#revised_gauge_content").show();
-			}
 			for( i = 0; i < steps.length; i++ ) {
 				$("#percentage_"+moveBundleId+"_"+steps[i].tid).html(isNaN(steps[i].tskComp / steps[i].tskTot) ? 0+ "%" : parseInt( (steps[i].tskComp / steps[i].tskTot ) * 100 ) +"%");
 				$("#percentage_"+moveBundleId+"_"+steps[i].tid).attr("class",steps[i].percentageStyle)
