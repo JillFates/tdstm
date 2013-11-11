@@ -3009,7 +3009,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			if (filter?.asset?.containsKey('bundle')) {
 				def moveBundle = MoveBundle.findByProjectAndName(moveEvent.project, filter.asset.bundle)
 				if (moveBundle) {
-					bundleIds = moveBundle.id
+					bundleIds = [ moveBundle.id ]
 				} else {
 					throw new RuntimeException("Bundle name ($filter.moveBundle) was not found for filter: $filter")
 				}
