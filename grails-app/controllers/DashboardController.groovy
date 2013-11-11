@@ -141,7 +141,12 @@ class DashboardController {
         def moveEvent = MoveEvent.read(params.id)
         def results = taskService.getMoveEventTaskSummary(moveEvent)
         
-        render(template:'taskSummary',model:[taskCountByEvent:results.taskCountByEvent, taskStatusMap:results.taskStatusMap, totalDuration:results.totalDuration])
+        render(template:'taskSummary',
+					model:[taskCountByEvent:results.taskCountByEvent, taskStatusMap:results.taskStatusMap, 
+					   	   totalDuration:results.totalDuration, 'taskStartedwidth':params.taskStartedwidth,
+					       'taskReadywidth':params.taskReadywidth,'taskDonewidth':params.taskDonewidth, 
+					       'effortStartedwidth':params.effortStartedwidth, 'effortReadywidth':params.effortReadywidth,
+					       'effortDonewidth':params.effortDonewidth])
         
     }
 }

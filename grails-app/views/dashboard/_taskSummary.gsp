@@ -41,6 +41,12 @@ $(document).ready(function() {
         <div class="taskSummaryCounts" style="border:1px solid black;"><b>Pending: ${taskStatusMap['Pending'].taskCount} (${taskStatusMap['Pending'].timeInMin}m)</b></div>
 </div>
 </div>
+	<input type="hidden" id="task_done_width" value="${percentageTaskDone}"/>
+	<input type="hidden" id="task_started_width" value="${percentageTaskStarted}"/>
+	<input type="hidden" id="task_ready_width" value="${percentageTaskReady}"/>
+	<input type="hidden" id="effort_done_width" value="${percentageDurationDone}"/>
+	<input type="hidden" id="effort_started_width" value="${percentageDurationStarted}"/>
+	<input type="hidden" id="effort_ready_width" value="${percentageDurationReady}"/>
 <div class="toprightcontent">
     <table class="task_bar_table">
          <tr>
@@ -48,9 +54,9 @@ $(document).ready(function() {
            Tasks
           </td>
           <td class="task_bar_base">
-           <div class="task_done task_bar_graph" id="tasksDoneBar" style="width:0%;"></div>
-           <div class="task_started task_bar_graph" id="tasksStartBar" style="width:0%;"></div>
-           <div class="task_ready task_bar_graph" id="tasksReadyBar" style="width:0%;"></div>
+           <div class="task_done task_bar_graph" id="tasksDoneBar" style="width:${taskDonewidth?:'0'}%;"></div>
+           <div class="task_started task_bar_graph" id="tasksStartBar" style="width: ${taskStartedwidth?:'0'}%;"></div>
+           <div class="task_ready task_bar_graph" id="tasksReadyBar" style="width:${taskReadywidth?:'0'}%;"></div>
            <div class="prog_bar_text" id="taskDoneText">${(percentageTaskDone<10)? '' : percentageTaskDone+'%'}</div>
           </td>
          </tr>
@@ -59,9 +65,9 @@ $(document).ready(function() {
            Effort
           </td>
           <td class="task_bar_base">
-           <div class="task_done task_bar_graph" id="effortDoneBar" style="width:0%;"></div>
-           <div class="task_started task_bar_graph" id="effortStartBar" style="width:0%;"></div>
-           <div class="task_ready task_bar_graph" id="effortReadyBar" style="width:0%;"></div>
+           <div class="task_done task_bar_graph" id="effortDoneBar" style="width:${effortDonewidth?:'0'}%;"></div>
+           <div class="task_started task_bar_graph" id="effortStartBar" style="width:${effortStartedwidth?:'0'}%;"></div>
+           <div class="task_ready task_bar_graph" id="effortReadyBar" style="width:${effortReadywidth?:'0'}%;"></div>
            <div class="prog_bar_text" id="effortDoneText">${(percentageDurationDone<10)? '' : percentageDurationDone+'%'}</div>
           </td>
          </tr>

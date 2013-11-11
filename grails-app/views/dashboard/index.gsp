@@ -623,9 +623,18 @@
 	}
 	
 	function updateTaskSummary(){
+		var taskDonewidth =$("#task_done_width").val();
+		var taskStartedwidth =$("#task_started_width").val();
+		var taskReadywidth =$("#task_ready_width").val();
+		var effortDonewidth =$("#effort_done_width").val();
+		var effortStartedwidth =$("#effort_started_width").val();
+		var effortReadywidth =$("#effort_ready_width").val();
+		
 		jQuery.ajax({
-            type:"GET",
+            type:"POST",
             async : true,
+            data: {'taskReadywidth':taskReadywidth,'taskDonewidth':taskDonewidth,'taskStartedwidth':taskStartedwidth,
+            		'effortReadywidth':effortReadywidth,'effortDonewidth':effortDonewidth,'effortStartedwidth':effortStartedwidth},
             cache: false,
             url:"../dashboard/taskSummary/"+moveEvent,
             success:function (data){
