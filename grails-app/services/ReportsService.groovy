@@ -571,10 +571,15 @@ class ReportsService {
 		def dotFile = new File(dotFN);
 		dotFile << dotText
 
+		def sout = new StringBuffer()
+		def serr = new StringBuffer()		
 		def cmd = "${dotExec} -T${graphType} -v -o ${targetDir}${imgFilename} ${dotFile}"
-		log.info "generateDotGraph() about to execute command: $cmd"
+		log.info "generateDotGraph: about to execute command: $cmd"
 		def proc = cmd.execute()
-	 	proc.waitFor()
+		proc.consumeProcessOutput(sout, serr)
+	 	proc.waitForOrKill(2000)
+	 	log.info "generateDotGraph: process stdout=$sout"
+	 	log.info "generateDotGraph: process stderr=$serr"
 	
 		if (proc.exitValue() == 0) {
 			// Delete the dot file because we don't need it and configured to delete it automatically
@@ -582,9 +587,9 @@ class ReportsService {
 			return "${targetURI}${imgFilename}"
 		} else {
 			def errFile = new File("${targetDir}${filename}.err")
-			errFile << "exit code:\n\n${ proc.exitValue()}\n\nstderr:\n${proc.err.text}\n\nstdout:\n${proc.in.text}"
+			errFile << "exit code:\n\n${ proc.exitValue()}\n\nstderr:\n${serr}\n\nstdout:\n${sout}"
 
-			throw new RuntimeException("exit code: ${ proc.exitValue()}\n stderr: ${proc.err.text}\n stdout: ${proc.in.text}")
+			throw new RuntimeException("Exit code: ${ proc.exitValue()}\n stderr: ${serr}\n stdout: ${sout}")
 		}
 	}
 
