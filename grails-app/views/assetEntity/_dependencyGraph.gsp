@@ -83,6 +83,13 @@ function listCheck(){
 	});
 	return labelsList
 }
+function depConsoleLabelUserpref($me,forWhom){
+	var isChecked = $me.is(":checked")
+    jQuery.ajax({
+        url:contextPath+'/assetEntity/setImportPerferences',
+        data:{'selected':isChecked, 'prefFor':forWhom}
+    });
+}
 
   $('#forceId').val($('#force').val())
   $('#linksSizeId').val($('#distance').val())

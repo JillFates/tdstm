@@ -4037,7 +4037,11 @@ class AssetEntityController {
 				   colorDiff = (232/moveEventList.size()).intValue()
 				}
 				
-				def labelMap = ['Application':(params.Application)?:('true'), 'Server':params.Server, 'Database':params.Database, 'Files':params.Files, 'Network':params.Network]
+				def labelMap = ['Application':userPreferenceService.getPreference('dependencyConsoleApplicationLabel')?:'true',
+							    'Server':userPreferenceService.getPreference('dependencyConsoleServerLabel')?:'', 
+								'Database':userPreferenceService.getPreference('dependencyConsoleDatabaseLabel')?:'', 
+								'Files':userPreferenceService.getPreference('dependencyConsoleFilesLabel')?:'', 
+								'Network':userPreferenceService.getPreference('dependencyConsoleNetworkLabel')?:'']
 				def labelList = params.labelsList
 				labelList = labelList?.replace(" ","")
 				List labels = labelList ?  labelList.split(",") : []

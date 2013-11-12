@@ -752,4 +752,11 @@ th.desc{
 .depBundle {
 	width: 70px
 }
-// --- Tooltip end
+/* --- Tooltip end---*/
+.controlPanelprop{
+	width: 32px;
+	margin-left: -4px;
+	border: 0px;
+	background-color: #FFF;
+	text-align: center;
+}
