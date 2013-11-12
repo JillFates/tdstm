@@ -184,6 +184,17 @@
 				tipTimer = null;
 			}
 		}
+		function hoverMegaMenu(e){
+			if($(".megamenu:visible").is(":visible")){
+				if(megamenuitem!=e){
+					clearTipTimer();
+			        tipTimer = setTimeout(function() {
+			            tipTimer = null;
+			            showMegaMenu(e);
+			        }, 500);
+				}
+			}
+		}
 		function showMegaMenu(e){
 			if(megamenuitem!=e)
 				$(".active").removeClass('active').addClass('inActive')

@@ -124,9 +124,9 @@
 			<g:if test="${isIE6 || isIE7}">
 				<span><img title="Note: MS IE6 and MS IE7 has limited capability so functions have been reduced." src="${resource(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
 			</g:if>
-			<a class="headerClass" href="javascript:showMegaMenu('#userMegaMenu')" style="float:left;text-decoration:none;display:inline">
+			<a class="headerClass" onmouseover="hoverMegaMenu('#userMegaMenu')" href="javascript:showMegaMenu('#userMegaMenu')" style="float:left;text-decoration:none;display:inline">
 			&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name }</span></a>
-				<a id="userAnchor" class="ui-icon ui-icon-triangle-1-s headerClass" href="javascript:showMegaMenu('#userMegaMenu')" style="float:left;display:inline"></a>
+				<a id="userAnchor" class="ui-icon ui-icon-triangle-1-s headerClass" onmouseover="hoverMegaMenu('#userMegaMenu')" href="javascript:showMegaMenu('#userMegaMenu')" style="float:left;display:inline"></a>
 			</div>
 			<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>
 				time<ul>
@@ -152,8 +152,8 @@
 	      <div class="menu2">
 	      <ul>
 			<tds:hasPermission permission='AdminMenuView'>
-			<li id="adminMenuId"><a class="home menuhideright headerClass" href="javascript:showMegaMenu('#adminMegaMenu')">Admin</a>
-				<a id="adminAnchor" class="ui-icon ui-icon-triangle-1-s headerClass" href="javascript:showMegaMenu('#adminMegaMenu')" style="display: inline"></a>
+			<li id="adminMenuId"><a class="home menuhideright headerClass" onmouseover="hoverMegaMenu('#adminMegaMenu')" href="javascript:showMegaMenu('#adminMegaMenu')">Admin</a>
+				<a id="adminAnchor" class="ui-icon ui-icon-triangle-1-s headerClass" onmouseover="hoverMegaMenu('#adminMegaMenu')" href="javascript:showMegaMenu('#adminMegaMenu')" style="display: inline"></a>
     		    <div class="megamenu admin inActive" id="adminMegaMenu">
 					<table class="mmtable room_rack"><tr>
 					<td style="vertical-align:top" nowrap="nowrap"><span class="megamenuSection">Administration</span><br />
@@ -205,8 +205,8 @@
 			</li>
 			</tds:hasPermission>
 
-			<li id="projectMenuId" style="position:relative; float: left;" ><a class="home headerClass" href="javascript:showMegaMenu('#projectMegaMenu')">Client/Project</a>
-				<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s headerClass" href="javascript:showMegaMenu('#projectMegaMenu')" style="display: inline"></a>
+			<li id="projectMenuId" style="position:relative; float: left;" ><a class="home headerClass" onmouseover="hoverMegaMenu('#projectMegaMenu')" href="javascript:showMegaMenu('#projectMegaMenu')">Client/Project</a>
+				<a id="projectAnchor" class="ui-icon ui-icon-triangle-1-s headerClass" onmouseover="hoverMegaMenu('#projectMegaMenu')" href="javascript:showMegaMenu('#projectMegaMenu')" style="display: inline"></a>
 				<div class="megamenu client inActive" id="projectMegaMenu">
 					<table class="mmtable"><tr>
 						<td style="vertical-align:top">
@@ -234,7 +234,7 @@
 				
 			</li>
 
-			<li id="roomMenuId" style="position:relative; float: left;"><a class="home headerClass" href="javascript:showMegaMenu('#racksMegaMenu')">Rooms</a>
+			<li id="roomMenuId" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#racksMegaMenu')" href="javascript:showMegaMenu('#racksMegaMenu')">Rooms</a>
 				<div class="megamenu rooms inActive" id="racksMegaMenu">
 					<table class="mmtable room_rack" ><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Rooms</span><br />
@@ -260,13 +260,13 @@
 				</div>
 			</li>
 			<tds:hasPermission permission='RackMenuView'>
-			<li id="rackMenuId" ><a class="home headerClass" href="javascript:showMegaMenu('#racksMegaMenu')">Racks</a>
-				<a id="rackAnchor" class="ui-icon ui-icon-triangle-1-s headerClass"  href="javascript:showMegaMenu('#racksMegaMenu')" style="float: left"></a>
+			<li id="rackMenuId" ><a class="home headerClass" onmouseover="hoverMegaMenu('#racksMegaMenu')" href="javascript:showMegaMenu('#racksMegaMenu')">Racks</a>
+				<a id="rackAnchor" class="ui-icon ui-icon-triangle-1-s headerClass"  onmouseover="hoverMegaMenu('#racksMegaMenu')" href="javascript:showMegaMenu('#racksMegaMenu')" style="float: left"></a>
 				</li>
             </tds:hasPermission>
 	        <tds:hasPermission permission='AssetMenuView'>
-			<li id="assetMenuId" style="position:relative; float:left;"><a class="home headerClass" href="javascript:showMegaMenu('#assetMegaMenu')" >Assets</a>
-				<a id="assetAnchor" class="ui-icon ui-icon-triangle-1-s headerClass" href="javascript:showMegaMenu('#assetMegaMenu')" style="display: inline"></a>
+			<li id="assetMenuId" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#assetMegaMenu')" href="javascript:showMegaMenu('#assetMegaMenu')" >Assets</a>
+				<a id="assetAnchor" class="ui-icon ui-icon-triangle-1-s headerClass" onmouseover="hoverMegaMenu('#assetMegaMenu')" href="javascript:showMegaMenu('#assetMegaMenu')" style="display: inline"></a>
 				<div class="megamenu rooms inActive" id="assetMegaMenu" >
 					<table class="mmtable room_rack"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Assets</span><br />
@@ -314,7 +314,7 @@
 			</li>
 			</tds:hasPermission>
 			<tds:hasPermission permission='EventMenuView'>
-			<li id="eventMenuId" style="position:relative; float: left;"><a class="home headerClass" href="javascript:showMegaMenu('#bundleMegaMenu')">Events </a>
+			<li id="eventMenuId" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#bundleMegaMenu')" href="javascript:showMegaMenu('#bundleMegaMenu')">Events </a>
 			
 				<div class="megamenu rooms inActive" id="bundleMegaMenu">
 					<table class="mmtable " ><tr>
@@ -354,12 +354,12 @@
 			</li>
 			</tds:hasPermission>
 			<tds:hasPermission permission='BundleMenuView'>
-			<li id="bundleMenuId" style="position:relative; float:left;"><a class="home headerClass" href="javascript:showMegaMenu('#bundleMegaMenu')">Bundles</a>
-				<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s headerClass" href="javascript:showMegaMenu('#bundleMegaMenu')" style="display: inline"></a>
+			<li id="bundleMenuId" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#bundleMegaMenu')" href="javascript:showMegaMenu('#bundleMegaMenu')">Bundles</a>
+				<a id="bundleAnchor" class="ui-icon ui-icon-triangle-1-s headerClass" onmouseover="hoverMegaMenu('#bundleMegaMenu')" href="javascript:showMegaMenu('#bundleMegaMenu')" style="display: inline"></a>
 			</li>
 
-			<li id="teamMenuId" style="position:relative; float:left;"><a class="home headerClass" href="javascript:showMegaMenu('#teamMegaMenu')">Tasks</a>
-				<a id="teamMenuAnchor" class="ui-icon ui-icon-triangle-1-s headerClass"  href="javascript:showMegaMenu('#teamMegaMenu')" style="display: inline"></a>
+			<li id="teamMenuId" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#teamMegaMenu')" href="javascript:showMegaMenu('#teamMegaMenu')">Tasks</a>
+				<a id="teamMenuAnchor" class="ui-icon ui-icon-triangle-1-s headerClass" onmouseover="hoverMegaMenu('#teamMegaMenu')" href="javascript:showMegaMenu('#teamMegaMenu')" style="display: inline"></a>
 				<div class="megamenu rooms inActive" id="teamMegaMenu" >
 					<table class="mmtable"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Tasks</span><br />
@@ -379,8 +379,8 @@
 			</li>
             </tds:hasPermission>
 	        <tds:hasPermission permission='ConsoleMenuView'>
-			<li id="consoleMenuId" style="position:relative; float:left;"><a class="home headerClass" href="javascript:showMegaMenu('#consoleMegaMenu')">Console</a>
-				<a id="consoleAnchor" class="ui-icon ui-icon-triangle-1-s headerClass" href="javascript:showMegaMenu('#consoleMegaMenu')" style="display: inline"></a>
+			<li id="consoleMenuId" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#consoleMegaMenu')" href="javascript:showMegaMenu('#consoleMegaMenu')">Console</a>
+				<a id="consoleAnchor" class="ui-icon ui-icon-triangle-1-s headerClass" onmouseover="hoverMegaMenu('#consoleMegaMenu')" href="javascript:showMegaMenu('#consoleMegaMenu')" style="display: inline"></a>
 			    <div class="megamenu rooms inActive" id="consoleMegaMenu">
 					<table class="mmtable room_rack"><tr>
 					<td style="vertical-align:top"  ><span class="megamenuSection">Supervisor Console</span><br />
@@ -424,8 +424,8 @@
 			</li>
 	        </tds:hasPermission>
 			<tds:hasPermission permission='DashBoardMenuView'> 
-			<li id="dashboardMenuId" style="position:relative; float:left;"><a class="home headerClass" href="javascript:showMegaMenu('#dashboardMegaMenu')">Dashboards</a>
-				<a id="dashboardAnchor" class="ui-icon ui-icon-triangle-1-s headerClass"  href="javascript:showMegaMenu('#dashboardMegaMenu')" style="display: inline"></a>
+			<li id="dashboardMenuId" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#dashboardMegaMenu')" href="javascript:showMegaMenu('#dashboardMegaMenu')">Dashboards</a>
+				<a id="dashboardAnchor" class="ui-icon ui-icon-triangle-1-s headerClass"  onmouseover="hoverMegaMenu('#dashboardMegaMenu')" href="javascript:showMegaMenu('#dashboardMegaMenu')" style="display: inline"></a>
 				<div class="megamenu rooms inActive" id="dashboardMegaMenu">
 					<table class="mmtable"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Live Dashboards</span><br />
@@ -447,8 +447,8 @@
 			</li>
 			</tds:hasPermission>
 			<tds:hasPermission permission='ReportMenuView'>
-			<li id="reportsMenuId" style="position:relative; float: left;"><a class="home headerClass" href="javascript:showMegaMenu('#reportsMegaMenu')">Reports</a>
-				<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s headerClass" href="javascript:showMegaMenu('#reportsMegaMenu')" style="display: inline"></a>
+			<li id="reportsMenuId" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#reportsMegaMenu')" href="javascript:showMegaMenu('#reportsMegaMenu')">Reports</a>
+				<a id="reportAnchor" class="ui-icon ui-icon-triangle-1-s headerClass" onmouseover="hoverMegaMenu('#reportsMegaMenu')" href="javascript:showMegaMenu('#reportsMegaMenu')" style="display: inline"></a>
 				<div class="megamenu reports inActive" id="reportsMegaMenu">
 					<table class="mmtable "><tr>
 					<tds:hasPermission permission='ShowDiscovery'>
