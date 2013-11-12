@@ -107,7 +107,8 @@
 						</tr>
 						<tr>
 							<td>
-								<span style="color:#EFEFEF "><b>Bundle</b></span> &nbsp;&nbsp;<g:select name="moveBundle" id="plannedMoveBundleList" from="${moveBundle}" optionKey="id"  noSelection="${['':'Please Select']}"></g:select><br></br>
+								<span style="color:#EFEFEF "><b>Bundle</b></span> &nbsp;&nbsp;
+								<g:select name="moveBundle" id="plannedMoveBundleList" from="${moveBundle}" optionKey="id" onchange="changeBundleSelect()" noSelection="${['':'Please Select']}"></g:select><br></br>
 							</td>
 						</tr>
 						<tr>
@@ -209,9 +210,11 @@
 				if (id=="allBundles") {
 					$("#plannedMoveBundleList").html($("#moveBundleList_all").html())
 					$("#plannedMoveBundleList").val(bundle);
+					changeBundleSelect();
 				} else {
 					$("#plannedMoveBundleList").html($("#moveBundleList_planning").html())
 					$("#plannedMoveBundleList").val(bundle);
+					changeBundleSelect();
 				}
 			}
 			function compressList() {

@@ -351,6 +351,9 @@ function selectAll(){
 	}
 }
 function changeMoveBundle(assetType,totalAsset,assignBundle){
+	if(!assignBundle){
+		$("#saveBundleId").attr("disabled", "disabled");
+	}
 	var assetArr = new Array();
 	var j=0;
 	for(i=0; i< totalAsset.size() ; i++){
@@ -991,4 +994,11 @@ function validateDependencies(formName){
 	if(flag==false)
 		alert("Please select a valid asset for all dependencies ")
 	return flag
+}
+function changeBundleSelect(){
+	if($("#plannedMoveBundleList").val()){
+		$("#saveBundleId").removeAttr("disabled");
+	}else {
+		$("#saveBundleId").attr("disabled", "disabled");
+	}
 }
