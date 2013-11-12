@@ -577,7 +577,7 @@ class ReportsService {
 		log.info "generateDotGraph: about to execute command: $cmd"
 		def proc = cmd.execute()
 		proc.consumeProcessOutput(sout, serr)
-	 	proc.waitForOrKill(5000)
+	 	proc.waitForOrKill(150000)
 	 	log.info "generateDotGraph: process stdout=$sout"
 	 	log.info "generateDotGraph: process stderr=$serr"
 	
