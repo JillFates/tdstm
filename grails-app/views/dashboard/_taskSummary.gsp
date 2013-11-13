@@ -1,30 +1,30 @@
 <script type="text/javascript">
 $(document).ready(function() {
-    var percentageTaskDone=${taskStatusMap['Completed'].taskCount ? Math.round((taskStatusMap['Completed'].taskCount/taskCountByEvent)*100) :0};
+    var percentageTaskDone=${taskStatusMap['Completed'].taskCount ? ((taskStatusMap['Completed'].taskCount/taskCountByEvent)*100).intValue() :0};
     $("#tasksDoneBar").animate({width: percentageTaskDone+"%" }, 1000);
     
-    var percentageTaskStarted=${taskStatusMap['Started'].taskCount ? Math.round((taskStatusMap['Started'].taskCount/taskCountByEvent)*100) :0};
+    var percentageTaskStarted=${taskStatusMap['Started'].taskCount ? ((taskStatusMap['Started'].taskCount/taskCountByEvent)*100).intValue() :0};
     $("#tasksStartBar").animate({width: percentageTaskStarted+"%" }, 1000);
     
-    var percentageTaskReady=${taskStatusMap['Ready'].taskCount ? Math.round((taskStatusMap['Ready'].taskCount/taskCountByEvent)*100) :0};
+    var percentageTaskReady=${taskStatusMap['Ready'].taskCount ? ((taskStatusMap['Ready'].taskCount/taskCountByEvent)*100).intValue() :0};
     $("#tasksReadyBar").animate({width: percentageTaskReady+"%" }, 1000);
     
-    var percentageDurationCompleted=${taskStatusMap['Completed'].timeInMin ? Math.round((taskStatusMap['Completed'].timeInMin/totalDuration)*100) :0};
+    var percentageDurationCompleted=${taskStatusMap['Completed'].timeInMin ? ((taskStatusMap['Completed'].timeInMin/totalDuration)*100).intValue() :0};
     $("#effortDoneBar").animate({width: percentageDurationCompleted+"%" }, 1000);
     
-    var percentageDurationStarted=${taskStatusMap['Started'].timeInMin ? Math.round((taskStatusMap['Started'].timeInMin/totalDuration)*100) :0};
+    var percentageDurationStarted=${taskStatusMap['Started'].timeInMin ? ((taskStatusMap['Started'].timeInMin/totalDuration)*100).intValue() :0};
     $("#effortStartBar").animate({width: percentageDurationStarted+"%" }, 1000);
     
-    var percentageDurationReady=${taskStatusMap['Ready'].timeInMin ? Math.round((taskStatusMap['Ready'].timeInMin/totalDuration)*100) :0};
+    var percentageDurationReady=${taskStatusMap['Ready'].timeInMin ? ((taskStatusMap['Ready'].timeInMin/totalDuration)*100).intValue() :0};
     $("#effortReadyBar").animate({width: percentageDurationReady+"%" }, 1000);
 });
 </script>
-<g:set var="percentageTaskDone" value="${taskStatusMap['Completed'].taskCount ? Math.round((taskStatusMap['Completed'].taskCount/taskCountByEvent)*100) :0}" />
-<g:set var="percentageTaskStarted" value="${taskStatusMap['Started'].taskCount ? Math.round((taskStatusMap['Started'].taskCount/taskCountByEvent)*100) :0}" />
-<g:set var="percentageTaskReady" value="${taskStatusMap['Ready'].taskCount ? Math.round((taskStatusMap['Ready'].taskCount/taskCountByEvent)*100) :0}" />
-<g:set var="percentageDurationDone" value="${taskStatusMap['Completed'].timeInMin ? Math.round((taskStatusMap['Completed'].timeInMin/totalDuration)*100) :0}" />
-<g:set var="percentageDurationStarted" value="${taskStatusMap['Started'].timeInMin ? Math.round((taskStatusMap['Started'].timeInMin/totalDuration)*100) :0}" />
-<g:set var="percentageDurationReady" value="${taskStatusMap['Ready'].timeInMin ? Math.round((taskStatusMap['Ready'].timeInMin/totalDuration)*100) :0}" />
+<g:set var="percentageTaskDone" value="${taskStatusMap['Completed'].taskCount ? ((taskStatusMap['Completed'].taskCount/taskCountByEvent)*100).intValue() :0}" />
+<g:set var="percentageTaskStarted" value="${taskStatusMap['Started'].taskCount ? ((taskStatusMap['Started'].taskCount/taskCountByEvent)*100).intValue() :0}" />
+<g:set var="percentageTaskReady" value="${taskStatusMap['Ready'].taskCount ? ((taskStatusMap['Ready'].taskCount/taskCountByEvent)*100).intValue() :0}" />
+<g:set var="percentageDurationDone" value="${taskStatusMap['Completed'].timeInMin ? ((taskStatusMap['Completed'].timeInMin/totalDuration)*100).intValue() :0}" />
+<g:set var="percentageDurationStarted" value="${taskStatusMap['Started'].timeInMin ? ((taskStatusMap['Started'].timeInMin/totalDuration)*100).intValue() :0}" />
+<g:set var="percentageDurationReady" value="${taskStatusMap['Ready'].timeInMin ? ((taskStatusMap['Ready'].timeInMin/totalDuration)*100).intValue() :0}" />
 
 <div class="toprightcontent">
 <div class="taskSummaryDiv">
