@@ -1838,7 +1838,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 								} else {
 									exceptions.append("$action action did not create any tasks for taskSpec(${taskSpec.id})<br/>")
 								}
-								out.append("${createAssetActionTasks.size()} $action tasks were created for taskSpec(${taskSpec.id})<br/>")
+								out.append("${actionTasks.size()} $action tasks were created for taskSpec(${taskSpec.id})<br/>")
 								break								
 							
 							default:
@@ -3059,7 +3059,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				// Only update previous task to hasSuccessorTaskFlag if we're not updating a peer task pointing back at the same asset
 				// which will happen on a gather and there are multiple tasks for the same asset that were deferred
 				if (assetsLatestTask[asset.id].id != task.id ) {
-					log.debug "assignLatestTask: Updated previous task (${assetsLatestTask[asset.id]})with hasSuccessorTaskFlag"
+					log.debug "assignLatestTask: Updated previous task (${assetsLatestTask[asset.id]}) 	with hasSuccessorTaskFlag"
 					// Mark the previous task as having a successor
 					if ( ! assetsLatestTask[asset.id].metaClass.hasProperty(assetsLatestTask[asset.id], 'hasSuccessorTaskFlag') )
 						assetsLatestTask[asset.id].metaClass.setProperty('hasSuccessorTaskFlag', true)
