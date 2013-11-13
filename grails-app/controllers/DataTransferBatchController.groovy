@@ -228,11 +228,6 @@ def messageSource
 
 					} // for loop
   					
-					if ( ! project.save(flush:true)) {
-						GormUtil.allErrorsString(project)
-						throw new RuntimeException("Unable to update project.lastAssetId")
-					}
-					
 					dataTransferBatch.statusCode = 'COMPLETED'
 					if (!dataTransferBatch.save(flush:true)) {
 						GormUtil.allErrorsString(dataTransferBatch)
