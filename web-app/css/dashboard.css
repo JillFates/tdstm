@@ -797,4 +797,5 @@ input, select, textarea {
 .taskSummaryCounts{
 	padding-left: 5px;
 	width: 120px;
+	border: 1px solid gray;
 }

@@ -28,17 +28,17 @@ $(document).ready(function() {
 
 <div class="toprightcontent">
 <div class="taskSummaryDiv">
-    <h3>Task Summary </h3><br>
+    <h4>Task Summary </h4><br>
     <span class="taskCountSpan">${taskCountByEvent-taskStatusMap['Completed'].taskCount}</span><br><br>
     <h5>Remaining</h5>
 </div>
 </div>
 <div class="toprightcontent">
 <div class="taskDetailsDiv">
-        <div class="task_done taskSummaryCounts"><b>Done: ${taskStatusMap['Completed'].taskCount} (${taskStatusMap['Completed'].timeInMin}m)</b></div>
-        <div class="task_started taskSummaryCounts"><b>Started: ${taskStatusMap['Started'].taskCount} (${taskStatusMap['Started'].timeInMin}m)</b></div>
-        <div class="task_ready taskSummaryCounts"><b>Ready: ${taskStatusMap['Ready'].taskCount} (${taskStatusMap['Ready'].timeInMin}m)</b></div>
-        <div class="taskSummaryCounts" style="border:1px solid black;"><b>Pending: ${taskStatusMap['Pending'].taskCount} (${taskStatusMap['Pending'].timeInMin}m)</b></div>
+        <div class="task_done taskSummaryCounts"><b>Done: ${taskStatusMap['Completed'].taskCount} ${taskStatusMap['Completed'].taskCount ? (taskStatusMap['Completed'].timeInMin+'m'):''}</b></div>
+        <div class="task_started taskSummaryCounts"><b>Started: ${taskStatusMap['Started'].taskCount} ${taskStatusMap['Started'].taskCount ? (taskStatusMap['Started'].timeInMin+'m'):''}</b></div>
+        <div class="task_ready taskSummaryCounts"><b>Ready: ${taskStatusMap['Ready'].taskCount} ${taskStatusMap['Ready'].taskCount ? (taskStatusMap['Ready'].timeInMin+'m'):''}</b></div>
+        <div class="taskSummaryCounts"><b>Pending: ${taskStatusMap['Pending'].taskCount} ${taskStatusMap['Pending'].taskCount ? (taskStatusMap['Pending'].timeInMin+'m'):''}</b></div>
 </div>
 </div>
 	<input type="hidden" id="task_done_width" value="${percentageTaskDone}"/>

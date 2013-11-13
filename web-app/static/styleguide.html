@@ -4,31 +4,32 @@
 	<meta name="robots" content="noindex, nofollow" />
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
     <title>TDS Style Guide</title>
-    <link type="text/css" rel="stylesheet" href="/tdstm/css/tdsexample.css" />
-    <link rel="stylesheet" href="/tdstm/css/main.css" type="text/css" />
-    <link rel="stylesheet" href="/tdstm/css/tds.css" type="text/css" />
-    <link rel="shortcut icon" href="/tdstm/images/tds.ico" type="image/x-icon" />
-    <link type="text/css" rel="stylesheet" href="/tdstm/css/ui.core.css" />
-    <link type="text/css" rel="stylesheet" href="/tdstm/css/ui.dialog.css" />
-    <link type="text/css" rel="stylesheet" href="/tdstm/css/ui.theme.css" />
-    <link rel="stylesheet" href="/tdstm/css/ui.datetimepicker.css" type="text/css" />
-   	<link type="text/css" rel="stylesheet" href="/tdstm/css/jquery-ui-smoothness.css" />
+    <link type="text/css" rel="stylesheet" href="../css/tdsexample.css" />
+    <link rel="stylesheet" href="../css/main.css" type="text/css" />
+    <link rel="stylesheet" href="../css/tds.css" type="text/css" />
+    <link rel="shortcut icon" href="../images/tds.ico" type="image/x-icon" />
+    <link type="text/css" rel="stylesheet" href="../css/ui.core.css" />
+    <link type="text/css" rel="stylesheet" href="../css/ui.dialog.css" />
+    <link type="text/css" rel="stylesheet" href="../css/ui.theme.css" />
+    <link rel="stylesheet" href="../css/ui.datetimepicker.css" type="text/css" />
+   	<link type="text/css" rel="stylesheet" href="../css/jquery-ui-smoothness.css" />
 	<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css"
-		href="/tdstm/plugins/jquery-ui-1.8.15/jquery-ui/themes/ui-lightness/jquery-ui-1.8.15.custom.css" />
-	<link type="text/css" rel="stylesheet" href="/tdstm/css/combox.css" />
-	<link type="text/css" rel="stylesheet" href="/tdstm/css/select2.css" />
-	<link type="text/css" rel="stylesheet" href="/tdstm/css/combox.css" />
-	<link type="text/css" rel="stylesheet" href="/tdstm/css/rackLayout.css" />
-    <script type="text/javascript" src="/tdstm/js/prototype/prototype.js"></script>
-    <script type="text/javascript" src="/tdstm/js/jquery-1.9.1.js"></script>
-	<script type="text/javascript" src="/tdstm/js/jquery-1.9.1-ui.js"></script>
-	<script type="text/javascript" src="/tdstm/js/datetimepicker.js"></script>
-	<script type="text/javascript" src="/tdstm/js/jquery-migrate-1.0.0.js"></script>
-    <script type="text/javascript" src="/tdstm/js/crawler.js"></script>
-	<script type="text/javascript" src="/tdstm/js/select2.js"></script>
-	<script type="text/javascript" src="/tdstm/js/jquery.combox.js"></script>
+		href="../plugins/jquery-ui-1.8.15/jquery-ui/themes/ui-lightness/jquery-ui-1.8.15.custom.css" />
+	<link type="text/css" rel="stylesheet" href="../css/combox.css" />
+	<link type="text/css" rel="stylesheet" href="../css/select2.css" />
+	<link type="text/css" rel="stylesheet" href="../css/combox.css" />
+	<link type="text/css" rel="stylesheet" href="../css/rackLayout.css" />
+	<link type="text/css" rel="stylesheet" href="../css/rackLayout.css" />
+    <script type="text/javascript" src="../js/prototype/prototype.js"></script>
+    <script type="text/javascript" src="../js/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="../js/jquery-1.9.1-ui.js"></script>
+	<script type="text/javascript" src="../js/datetimepicker.js"></script>
+	<script type="text/javascript" src="../js/jquery-migrate-1.0.0.js"></script>
+    <script type="text/javascript" src="../js/crawler.js"></script>
+	<script type="text/javascript" src="../js/select2.js"></script>
+	<script type="text/javascript" src="../js/jquery.combox.js"></script>
 
-    <link type="text/css" rel="stylesheet" href="/tdstm/css/dropDown.css" />
+    <link type="text/css" rel="stylesheet" href="../css/dropDown.css" />
    <script type="text/javascript">
    		$(document).ready(function() {
       		$("#personDialog").dialog({ autoOpen: false })
@@ -306,6 +307,125 @@
  <li><a href="/tdstm/css/qvga.css" >/tdstm/css/qvga.css</a></li>
 </ul>
 
+<style type="text/css">
+.task_bar_table {
+	width:280px;
+	border-width:0px;
+}
+.task_bar_label {
+	width: 30px;
+	padding:0px;
+}
+.task_bar_base {
+	width: 240px;
+	height: 24px;
+	background-color: white;
+	box-shadow: 2px 3px 3px lightgray inset;
+	padding:0px;
+}
+.task_bar_graph {
+	z-index:-1;
+	height:24px;
+	float:left;
+}
+.task_bar_graph_edge {
+	height:24px;
+	border-right-width: 3px;
+	border-color: lightgray;
+	border-right-style:inset;
+}
+.prog_bar_text {
+	position: fixed;
+	color: white;
+	margin: 5px;
+}
+</style>
+<table class="task_bar_table">
+	<tr>
+		<td class="task_bar_label">
+			Tasks
+		</td>
+		<td class="task_bar_base">
+			<div class="task_done task_bar_graph" id="tasksDoneBar" style="width:25%;"></div>
+			<div class="task_started task_bar_graph" id="tasksStartBar" style="width:8%;"></div>
+			<div class="task_ready task_bar_graph" id="tasksReadyBar" style="width:15%;"></div>
+			<div class="prog_bar_text" id="taskDoneText">25%</div>
+		</td>
+	</tr>
+	<tr>
+		<td class="task_bar_label">
+			Effort
+		</td>
+		<td class="task_bar_base">
+			<div class="task_done task_bar_graph" id="effortDoneBar" style="width:20%;"></div>
+			<div class="task_started task_bar_graph" id="effortStartBar" style="width:5%;"></div>
+			<div class="task_ready task_bar_graph" id="effortReadyBar" style="width:10%;"></div>
+			<div class="prog_bar_text" id="effortDoneText">20%</div>
+		</td>
+	</tr>
+</table>
+
+<link type="text/css" rel="stylesheet" href="../css/dashboard2.css" />
+
+<div class="container">
+    <ul class="flip taskCounterPlay">
+        <li><a href="#">
+                <div class="up"><div class="shadow"></div><div class="inn">1,234</div></div>
+                <div class="down"><div class="shadow"></div><div class="inn">1,234</div></div>
+            </a>
+        </li>
+        <li><a href="#">
+                <div class="up"><div class="shadow"></div><div class="inn">2,345</div></div>
+                <div class="down"><div class="shadow"></div><div class="inn">2,345</div></div>
+            </a>
+        </li>
+        <li><a href="#">
+                <div class="up"><div class="shadow"></div><div class="inn">3,456</div></div>
+                <div class="down"><div class="shadow"></div><div class="inn">3,456</div></div>
+            </a>
+        </li>
+    </ul>
+
+</div>
+<script >
+setInterval(function () {
+	taskCounterPlay()
+}, 4000);
+
+function taskCounterPlay() {
+    $("body").removeClass("play");
+    var aa = $("ul.taskCounterPlay li.active");
+
+    if (aa.html() == undefined) {
+        aa = $("ul.taskCounterPlay li").eq(0);
+        aa.addClass("before")
+            .removeClass("active")
+            .next("li")
+            .addClass("active")
+            .closest("body")
+            .addClass("play");
+    }
+    else if (aa.is(":last-child")) {
+        $("ul.taskCounterPlay li").removeClass("before");
+        aa.addClass("before").removeClass("active");
+        aa = $("ul.taskCounterPlay li").eq(0);
+        aa.addClass("active")
+            .closest("body")
+            .addClass("play");
+    }
+    else {
+        $("ul.taskCounterPlay li").removeClass("before");
+        aa.addClass("before")
+            .removeClass("active")
+            .next("li")
+            .addClass("active")
+            .closest("body")
+            .addClass("play");
+    }
+}
+</script>
+
+
 </div>
 
 	</div>
@@ -445,8 +565,8 @@
 				<tr><td class='empty' nowrap>32</td><td rowspan='1' class=empty>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
 				<tr><td class='empty' nowrap>31</td><td rowspan='1' class=empty>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
 				<tr><td class='rack_current'>30</td><td rowspan='3' class='rack_current'><a href="javascript:getEntityDetails('rack','Network',113890)" >TDS-24 - F5-1</a>&nbsp;</td><td rowspan='3' class='rack_current'>Master Bundle<br/></td><td rowspan='3' class='rack_current'><a href='#' onclick='openCablingDiv(113890)'>cable </a></td></tr>
-				<tr><td class='rack_current'>29</td><td rowspan='1' class=empty>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-				<tr><td class='rack_current'>28</td><td rowspan='1' class=empty>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+				<tr><td class='rack_current'>29</td></tr>
+				<tr><td class='rack_current'>28</td></tr>
 				<tr><td class='empty' nowrap>27</td><td rowspan='1' class=empty>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
 				<tr><td class='empty' nowrap>26</td><td rowspan='1' class=empty>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
 				<tr><td class='empty' nowrap>25</td><td rowspan='1' class=empty>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
