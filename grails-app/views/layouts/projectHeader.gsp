@@ -214,7 +214,7 @@
 								<li><g:link class="mmlink" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link></li>
 							</ul>
 					<g:if test="${currProjObj}">
-						<span class="megamenuSection">For <strong><g:if test="${currProjObj.name.size()>25}">${currProjObj.name.substring(0,25)+'...'}</g:if><g:else>${currProjObj.name}</g:else></strong></span><br />
+						<span class="megamenuSection"> </span><br />
 							<ul >
 								<li><g:link class="mmlink" controller="projectUtil" onclick="hideMegaMenu('projectMegaMenu')"><g:if test="${currProjObj.name.size()>20}">${currProjObj.name.substring(0,20)+'...'}</g:if><g:else>${currProjObj.name}</g:else> Details</g:link></li>
 								<li><g:link class="mmlink" controller="person" action="manageProjectStaff"  onclick="hideMegaMenu('projectMegaMenu')">Project Staff</g:link></li>
@@ -322,8 +322,8 @@
 						<ul>
 							<li><g:link class="mmlink" controller="moveEvent" action="list" onclick="hideMegaMenu('bundleMegaMenu')" >List Events</g:link> </li>
 							<g:if test="${currProjObj && moveEvent}">
-								<span class="megamenuSection">For <strong>${moveEventName}</strong>:</span><br />
-								<li style="white-space:nowrap;"><g:link class="mmlink" controller="moveEvent" action="show" id="${moveEventId}" onclick="hideMegaMenu('bundleMegaMenu')">Event Details</g:link></li>
+								<span class="megamenuSection"> </span><br />
+								<li style="white-space:nowrap;"><g:link class="mmlink" controller="moveEvent" action="show" id="${moveEventId}" onclick="hideMegaMenu('bundleMegaMenu')">${moveEventName} Event Details</g:link></li>
 							</g:if>
 							<tds:hasPermission permission="ShowMovePrep">
 							<li style="white-space:nowrap;"><g:link class="mmlink" controller="reports" action="preMoveCheckList" onclick="hideMegaMenu('bundleMegaMenu')">Pre-event Checklist</g:link></li>
@@ -338,8 +338,8 @@
 						<ul>
 							<li><g:link class="mmlink" controller="moveBundle" action="list">List Bundles</g:link> </li>
 					<g:if test="${currProjObj && moveBundleId}">
-							<span class="megamenuSection">For <strong>${moveBundleName}</strong>:</span><br />
-							<li><g:link class="mmlink" controller="moveBundle" action="show"  onclick="hideMegaMenu('bundleMegaMenu')">Bundle Details</g:link></li>
+							<span class="megamenuSection"> </span><br />
+							<li><g:link class="mmlink" controller="moveBundle" action="show"  onclick="hideMegaMenu('bundleMegaMenu')">${moveBundleName} Bundle Details</g:link></li>
 							<li><g:link class="mmlink" controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]" onclick="hideMegaMenu('bundleMegaMenu')">Bundled Assets</g:link> </li>
 					</g:if>
 							<tds:hasPermission permission='HelpMenuView'>

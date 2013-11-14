@@ -2,7 +2,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="projectHeader" />
-    <title>Show Bundle</title>
+    <title>Bundle Details</title>
     <script type="text/javascript">
     	
    /*
@@ -76,7 +76,7 @@
 		</div>
     <div class="body" style="width: 330px;">
     	<div class="steps_table" style="float: none;">
-      	<span class="span"><b> Show Bundle </b></span>
+      	<span class="span"><b> Bundle Details </b></span>
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
