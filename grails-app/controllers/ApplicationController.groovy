@@ -39,7 +39,7 @@ class ApplicationController {
 		
 		
 		def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
-		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
+		def availabaleRoles = partyRelationshipService.getStaffingRoles()
 		def company = project.client
 		
 		def moveEvent = null
@@ -153,14 +153,13 @@ class ApplicationController {
 		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 	
 		def personList = partyRelationshipService.getCompanyStaff( project.client?.id )
-		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
 		
 		//fieldImportance for Discovery by default
 		def configMap = assetEntityService.getConfig('Application','Discovery')
 		
 		[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 			planStatusOptions:planStatusOptions?.value, projectId:project.id, project:project,moveEventList:moveEventList,
-			config:configMap.config, customs:configMap.customs, personList:personList, company:project.client, availabaleRoles:availabaleRoles]
+			config:configMap.config, customs:configMap.customs, personList:personList, company:project.client]
 	}
 	def save = {
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
@@ -286,8 +285,6 @@ class ApplicationController {
 			}
 			def personList = partyRelationshipService.getCompanyStaff( project.client?.id )
 			
-			def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
-			
 			//fieldImportance Styling for default validation.
 			def validationType = applicationInstance.validation
 			def configMap = assetEntityService.getConfig('Application',validationType)
@@ -295,8 +292,7 @@ class ApplicationController {
 			[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
 						planStatusOptions:planStatusOptions?.value, projectId:project.id, supportAssets: supportAssets,
 						dependentAssets:dependentAssets, redirectTo : params.redirectTo,dependencyType:dependencyType, dependencyStatus:dependencyStatus,
-						moveEvent:moveEvent,servers:servers, personList:personList, config:configMap.config, customs:configMap.customs,
-						availabaleRoles:availabaleRoles]
+						moveEvent:moveEvent,servers:servers, personList:personList, config:configMap.config, customs:configMap.customs]
 		}
 
 	}

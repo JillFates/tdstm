@@ -143,7 +143,7 @@ class ReportsService {
 				bundleMap << ["name":moveBundle?.name, "size":team.size(),"teamList":teamList]
 			}
 		} else {
-			def functions = RoleType.findAllByDescriptionIlike("Staff%")
+			def functions = RoleType.findAllByDescriptionIlike("Staff%") // This can not be replaced with  partyRelationshipService.getStaffingRoles()
 			functions.each { func->
 				bundleMap << ["name":func.description, "code":func.id, 
 								"assignedStaff":partyRelationshipService.getProjectStaffByFunction(func, project), 

@@ -161,7 +161,7 @@
           </div>
           <div id="availableFuncsCreateId" style="display: none">
 				<g:select from="${availabaleRoles}" id="functionId" name="funcToAdd"
-					optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"
+					optionValue="${{it.description}}"
 					value="" optionKey="id" />
 			</div>
 			<input type="hidden" id="maxSize" value="0">

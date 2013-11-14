@@ -7,7 +7,7 @@
 	</optgroup>
 	<optgroup label="Team" id="teamGroup">
 		<g:each status="i" in="${availabaleRoles}" var="role">
-			<option value="@${role.id}">${role.description.substring(role.description.lastIndexOf(':') +1).trim()}</option>
+			<option value="@${role.id}">${role.description}</option>
 		</g:each>
 	</optgroup>
 	<optgroup label="Named Staff" id="staffGroup">

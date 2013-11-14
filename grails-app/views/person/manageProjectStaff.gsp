@@ -19,7 +19,7 @@
 					<td>
 						<span><b>Team</b></span><br/>
 						<label for="role">
-							<g:select id="role" name="role" from="${roleTypes}" optionKey="id" optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"  value="${currRole}" onChange="loadFilteredStaff('lastName','staff')"
+							<g:select id="role" name="role" from="${roleTypes}" optionKey="id" optionValue="${{it.description}}"  value="${currRole}" onChange="loadFilteredStaff('lastName','staff')"
 									noSelection="${['0':'All']}"></g:select>
 						</label>
 					</td>

@@ -122,7 +122,7 @@
 										<tr id="funcTrId_${i}">
 											<td><g:select from="${availabaleFunctions}" id="functionId"
 													name="function" value="${function.id}" optionKey="id"
-													optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"
+													optionValue="${{it.description}}"
 													onChange="changeManageFuncs()" /> &nbsp;&nbsp; <a
 												href="javascript:deleteFuncsRow('funcTrId_${i}')"><span
 													class="clear_filter">X</span></a><br /></td>
@@ -143,7 +143,7 @@
 
 			<div id="availableFuncsId" style="display: none">
 				<g:select from="${availabaleFunctions}" id="functionId" name="funcToAdd"
-					optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"
+					optionValue="${{it.description}}"
 					value="" optionKey="id" />
 			</div>
 		</div>

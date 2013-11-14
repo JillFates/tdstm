@@ -246,7 +246,7 @@
 				</td>
 				<td nowrap="nowrap">
 				<g:select from="${roles}" id="role_${transitions.transition.id}" name="role_${transitions.transition.id}"
-					optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"
+					optionValue="${{it.description}}"
 					value="${transitions.transition?.role?.id ? transitions.transition?.role?.id : 'PROJ_MGR'  }" optionKey="id" />
 				</td>
 				<td nowrap="nowrap">
@@ -314,7 +314,7 @@
                 noSelection="['':'please select']"/>
     </div>
     <div style="display: none;" >
-    		 <g:select id="addRole" name="addRole" from="${roles}"  optionValue="${{it.description.substring(it.description.lastIndexOf(':') +1).trim()}}"
+    		 <g:select id="addRole" name="addRole" from="${roles}"  optionValue="${{it.description}}"
 					value="PROJ_MGR" optionKey="id" />
     </div>
 </div>

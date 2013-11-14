@@ -898,9 +898,8 @@ class TaskService implements InitializingBean {
 	 * @param blank
 	 * @return list of roles that is only starts with 'staff'
 	 */
-	// TODO : This method usage should be replaced with the PartyRelationship.getStaffingRoles method
 	def getRolesForStaff( ) {
-		def rolesForStaff = RoleType.findAllByDescriptionIlikeAndIdNotEqual('staff%', AssetComment.AUTOMATIC_ROLE, [sort:'description'])
+		def rolesForStaff = partyRelationshipService.getStaffingRoles(false)
 		return rolesForStaff
 	}
 
@@ -909,7 +908,7 @@ class TaskService implements InitializingBean {
 	 * Automated.
 	 */
 	def getTeamRolesForTasks() {
-		def rolesForStaff = RoleType.findAllByDescriptionIlike('staff%', [sort:'description'])
+		def rolesForStaff = partyRelationshipService.getStaffingRoles()
 		return rolesForStaff
 	}
 	

@@ -31,7 +31,7 @@ class MoveBundleService {
 	def assetEntityService
     def partyRelationshipService
 	def securityService
-	
+	def taskService
 	/*----------------------------------------------
 	 * @author : Lokanada Reddy
      * @param  : moveBundleId
@@ -587,8 +587,7 @@ class MoveBundleService {
 		// def personList = partyRelationshipService.getCompanyStaff( projectInstance.client?.id )
 		def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
 
-		// TODO : Correct the spelling of this variable and replace this call with PartyRelationshipService.getStaffingRoles (method name to be confirmed) plus update the view that uses this data since 'Staff : ' was removed
-		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
+		def availabaleRoles = partyRelationshipService.getStaffingRoles()
  		
  		log.info "dependencyConsoleMap() : stats=$stats}"
 		 
@@ -621,6 +620,7 @@ class MoveBundleService {
 
 			partyGroupList:companiesList,
 			// personList:personList, 
+            staffRoles:taskService.getRolesForStaff(),
 			availabaleRoles:availabaleRoles,
 			moveBundleId : moveBundleId,
 			isAssigned:isAssigned,

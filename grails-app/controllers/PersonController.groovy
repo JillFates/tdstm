@@ -57,7 +57,7 @@ class PersonController {
 
 		def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
 		//used to show roles in addTeam select
-		def availabaleRoles = RoleType.findAllByDescriptionIlike("Staff%")
+		def availabaleRoles = partyRelationshipService.getStaffingRoles()
 		return [companyId:companyId, company:company, partyGroupList:partyGroupList, 
 					listJsonUrl:listJsonUrl, availabaleRoles:availabaleRoles]
 	}
@@ -648,7 +648,7 @@ class PersonController {
 		def projects = projectService.getActiveProject( now, hasShowAllProjectsPerm, 'name', 'asc' )
 		
 		def project = securityService.getUserCurrentProject()
-		def roleTypes = RoleType.findAllByDescriptionIlike("Staff%")
+		def roleTypes = partyRelationshipService.getStaffingRoles()
 		def role = params.role ? params.role : "MOVE_TECH"
 		def moveEventList = []
 		
@@ -922,7 +922,7 @@ class PersonController {
 			def roleType =RoleType.findById(role)
 			sqlArgs << [roleArgs : [roleType]]
 		} else {
-			def roleTypes = RoleType.findAllByDescriptionIlike("Staff%")
+			def roleTypes = partyRelationshipService.getStaffingRoles()
 			sqlArgs << [roleArgs : roleTypes]
 		}
 		queryForStaff.append(" WHERE p.roleType IN (:roleArgs) ")
@@ -1024,7 +1024,7 @@ class PersonController {
 		def personFunctions = []
 		personFunctions = partyRelationshipService.getCompanyStaffFunctions(company.id, person.id)
 			
-		def availabaleFunctions = RoleType.findAllByDescriptionIlike("Staff%")
+		def availabaleFunctions = partyRelationshipService.getStaffingRoles()
 		
 		def isProjMgr = false
 		if( subject.hasRole("PROJ_MGR")){

@@ -16,6 +16,7 @@ class WorkflowController {
 	def stateEngineService
 	def jdbcTemplate
 	def userPreferenceService
+    def partyRelationshipService
 	/*-----------------------------------------------
 	 * Index method for default action
 	 *---------------------------------------------*/
@@ -63,7 +64,7 @@ class WorkflowController {
 				
 			workflowTransitionsList << [transition : workflowTransition, isExist : isExist, donotDelete : donotDelete ]
 		}
-		def roles = RoleType.findAllByDescriptionIlike("Staff%",[sort:'description'])
+		def roles = partyRelationshipService.getStaffingRoles()
 		return [workflowTransitionsList : workflowTransitionsList, workflow : workflow, roles:roles ]
 	}
 	/*-----------------------------------------------
@@ -250,7 +251,7 @@ class WorkflowController {
 			}
 			//load transitions details into application memory.
 			stateEngineService.loadWorkflowTransitionsIntoMap(workflow.process, 'workflow')
-			roles = RoleType.findAllByDescriptionIlike("Staff%",[sort:'description'])
+			roles = partyRelationshipService.getStaffingRoles()
 		} else {
 			redirect(action:home)
 		}
