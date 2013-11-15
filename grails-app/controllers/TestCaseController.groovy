@@ -223,7 +223,7 @@ class TestCaseController {
 
 			results.append( "<tr><td>${t.id}</td><td>${t.taskNumber}</td><td>${t.comment}</td><td>${t.duration}</td><td>${t.tmpEarliestStart}</td>" + 
 				"<td>${t.tmpLatestStart}</td><td>$constraintTime</td><td>$actFinish</td><td>${t.priority}</td>" + 
-				"<td>$criticalPath</td><td>${Team}</td><td>$person</td><td>${t.category}</tr>")
+				"<td>$criticalPath</td><td>${team}</td><td>$person</td><td>${t.category}</tr>")
 		}
 		results.append('</table>')
 
