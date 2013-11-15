@@ -202,17 +202,19 @@ class TestCaseController {
 
 			def person = t.assignedTo ?: '&nbsp;'
 			def constraintTime = '&nbsp;'
+			def team = t.role ?: '&nbsp;'
+
 			if (t.constraintTime) {
 				def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-				constraintTime = formatter.format(TimeUtil.convertInToUserTZ(t.constraintTime, tzId))
+				constraintTime = formatter.format(TimeUtil.convertInToUserTZ(t.constraintTime, tzId)) ?: '&nbsp;'
 			}
  
  			def criticalPath = (t.duration > 0 && t.tmpEarliestStart == t.tmpLatestStart ? 'YES' : 'no')
  			// (t.tmpCriticalPath ? 'Yes' : 'No'
 			results.append( "<tr><td>${t.id}</td><td>${t.taskNumber} ${t.comment}</td><td>${t.duration}</td><td>${t.tmpEarliestStart}</td>" + 
 				"<td>${t.tmpLatestStart}</td><td>$constraintTime ${t.constraintType}</td>" + 
-				"<td>$criticalPath</td><td>${t.role}</td><td>$person</td><td>${t.category}</tr>")
+				"<td>$criticalPath</td><td>${team}</td><td>$person</td><td>${t.category}</tr>")
 		}
 		results.append('</table>')
 
