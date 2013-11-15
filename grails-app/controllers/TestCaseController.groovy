@@ -177,6 +177,9 @@ class TestCaseController {
 		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
 		def estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs)
 
+		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+
 		StringBuilder results = new StringBuilder("Found ${tasks.size()} tasks and ${deps.size()} dependencies<br/>")
 
 		results.append("Start Vertices: " + (dfsMap.starts.size() > 0 ? dfsMap.starts : 'none') + '<br/>')
@@ -195,26 +198,32 @@ class TestCaseController {
 		results.append('</table>')
 
 */
-		results.append("<h1>Tasks Details</h1><table><tr><th>Id</th><th>Task</th><th>Duration</th><th>Earliest Start</th><th>Latest Start</th>" +
-			"<th>Constraint Time</th><th>Critical Path</td>" + 
+		results.append("<h1>Tasks Details</h1><table><tr><th>Id</th><th>Task #</th><th>Action</th>" + 
+			"<th>Duration</th><th>Earliest Start</th><th>Latest Start</th>" +
+			"<th>Constraint Time</th><th>Act Finish</th><th>Priority</th><th>Critical Path</td>" + 
 			"<th>Team</th><th>Individual</th><th>Category</th></tr>")
+
 		tasks.each { t ->
 
 			def person = t.assignedTo ?: '&nbsp;'
-			def constraintTime = '&nbsp;'
 			def team = t.role ?: '&nbsp;'
+			def constraintTime = '&nbsp;'
+			def actFinish = '&nbsp;'
 
 			if (t.constraintTime) {
-				def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-				constraintTime = formatter.format(TimeUtil.convertInToUserTZ(t.constraintTime, tzId)) ?: '&nbsp;'
+				constraintTime = formatter.format(TimeUtil.convertInToUserTZ(t.constraintTime, tzId)) + " ${t.constraintType}"
 			}
+			if (t.actFinish) {
+				actFinish = formatter.format(TimeUtil.convertInToUserTZ(t.actFinish, tzId))
+			}
+
+			// TODO : add in computation for time differences if both constraint time est and/or actual
  
- 			def criticalPath = (t.duration > 0 && t.tmpEarliestStart == t.tmpLatestStart ? 'YES' : 'no')
- 			// (t.tmpCriticalPath ? 'Yes' : 'No'
-			results.append( "<tr><td>${t.id}</td><td>${t.taskNumber} ${t.comment}</td><td>${t.duration}</td><td>${t.tmpEarliestStart}</td>" + 
-				"<td>${t.tmpLatestStart}</td><td>$constraintTime ${t.constraintType}</td>" + 
-				"<td>$criticalPath</td><td>${team}</td><td>$person</td><td>${t.category}</tr>")
+ 			def criticalPath = (t.duration > 0 && t.tmpEarliestStart == t.tmpLatestStart ? 'Yes' : '&nbsp;')
+
+			results.append( "<tr><td>${t.id}</td><td>${t.taskNumber}</td><td>${t.comment}</td><td>${t.duration}</td><td>${t.tmpEarliestStart}</td>" + 
+				"<td>${t.tmpLatestStart}</td><td>$constraintTime</td><td>$actFinish</td><td>${t.priority}</td>" + 
+				"<td>$criticalPath</td><td>${Team}</td><td>$person</td><td>${t.category}</tr>")
 		}
 		results.append('</table>')
 
