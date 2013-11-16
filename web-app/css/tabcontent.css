@@ -13,7 +13,7 @@ display: inline;
 text-align:center;
 margin: 0;
 width:127px;
-height:28px;
+height:22px;
 }
 
 .shadetabs li a{
@@ -23,7 +23,7 @@ position: relative;
 z-index: 1;
 padding-left: 4px;
 margin-right: 3px;
-line-height:28px;
+line-height:22px;
 color: #2d2b2b;
 width:123px;
 top:1px;

@@ -100,18 +100,11 @@
 						<span id="spanPlanned"></span>
 					</div>
 				</div>
-				<!-- Removed revised_summary section -->
-				<div id="taskSummary">
-				    <g:render template="taskSummary" model="[taskCountByEvent:taskCountByEvent, taskStatusMap:taskStatusMap, totalDuration:totalDuration]"></g:render>
-				</div>
-			</div>
-			<!-- News section starts here-->
-			<div id="newssection">
 				<div id="newstop">
-					<div id="newsheading">Event News</div>
+					<div id="newsheading"></div>
 					<div id="newsmenu">
 						<ul id="newstabs" class="shadetabs">
-							<li><a href="#" rel="news_live_div" class="selected">Live</a>
+							<li><a href="#" rel="news_live_div" class="selected">Event News</a>
 							</li>
 							<li><a href="#" rel="news_archived_div"
 								onmouseup="javascript:setCrossobjTop()">Archive</a>
@@ -154,6 +147,13 @@
 							</a>
 						</div>
 					</div>
+				</div>
+				<!-- Removed revised_summary section -->
+			</div>
+			<!-- News section starts here-->
+			<div id="newssection">
+				<div id="taskSummary">
+				    <g:render template="taskSummary" model="[taskCountByEvent:taskCountByEvent, taskStatusMap:taskStatusMap, totalDuration:totalDuration]"></g:render>
 				</div>
 			</div>
 			<!-- News section ends here-->
