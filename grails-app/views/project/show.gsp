@@ -3,7 +3,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 		<meta name="layout" content="projectHeader" />
 		<g:javascript src="project.js"></g:javascript>
-		<title>Show Project</title>
+		<title>Project Details</title>
 
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
@@ -19,7 +19,7 @@
 		</g:if>
 		 
 		<div class="body">
-			<h1>Project</h1>
+			<h1>Project Details</h1>
 					
 				<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 					<tds:hasPermission permission='MoveBundleEditView'>
