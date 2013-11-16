@@ -914,7 +914,7 @@ def messageSource
 	private void appendIgnoredAssets(StringBuilder sb, List assets ) {
 		if (assets.size()) {
 			sb.append("<li>${assets.size()} assets where skipped due to being updated since export<ul>")
-			sb.each { assets.append("<li>${it.id} ${it.assetName}</li>") }
+			assets.each { sb.append("<li>${it.id} ${it.assetName}</li>") }
 			sb.append('</ul></li>')
 		}
 		sb.append('</ul></li>')
