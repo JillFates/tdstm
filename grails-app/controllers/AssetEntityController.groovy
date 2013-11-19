@@ -881,7 +881,9 @@ class AssetEntityController {
 			SimpleDateFormat exportFileFormat = new SimpleDateFormat("yyyyMMdd")
 			SimpleDateFormat stdDateFormat = new SimpleDateFormat("MM-dd-yyyy")
 
-			def exportDate = exportFileFormat.format(TimeUtil.nowGMT())
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def currDate = TimeUtil.convertInToUserTZ(TimeUtil.nowGMT(),tzId)
+			def exportDate = exportFileFormat.format(currDate)
 			def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString()
 			response.setContentType( "application/vnd.ms-excel" )			
 			log.info "export() - Loading appDepBundle took ${TimeUtil.elapsed(started)}"
@@ -1039,8 +1041,6 @@ class AssetEntityController {
 					//Add Title Information to master SpreadSheet
 					titleSheet = book.getSheet("Title")
 					SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss a");
-					def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-					def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
 					if(titleSheet != null) {
 						def titleInfoMap = new ArrayList();
 						titleInfoMap.add (project.client )
