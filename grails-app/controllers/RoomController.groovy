@@ -170,6 +170,7 @@ class RoomController {
 		def powerType = session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
 		List rackIds = request.getParameterValues("rackId")
 		userPreferenceService.setPreference("roomTableShowAll", params.showAll=='1' ? 'TRUE' : 'FALSE')
+		def source = params.addTargetRoom == "on" ? 0 : 1
         if (roomInstance) {
     		roomInstance.roomName = params.roomName
 			roomInstance.location = params.location
@@ -180,6 +181,7 @@ class RoomController {
 			roomInstance.stateProv = params.stateProv
 			roomInstance.postalCode = params.postalCode
 			roomInstance.country = params.country
+			roomInstance.source = source
 			
             if (!roomInstance.hasErrors() && roomInstance.save(flush: true)) {
 				
@@ -213,7 +215,6 @@ class RoomController {
 					if(id < params.rackCount ){
 						def rack = Rack.get( id )
 						if( !rack ){
-                            def source = params.addTargetRoom == "on" ? 0 : 1
 							def newRack = Rack.findOrCreateWhere(source:source, 'project.id':roomInstance.project.id, location:roomInstance.location, 'room.id':roomInstance?.id, tag:params["tag_"+id])
 							if(newRack){
 								newRack.roomX = params["roomX_"+id] ? NumberUtils.toDouble(params["roomX_"+id],0).round() :0

@@ -54,7 +54,7 @@
 									style="padding-left: 115px; vertical-align: top;" colspan="6"
 									nowrap="nowrap"><span> <label for="addTargetRoom"><b>Target
 												room:</b></label> <input type="checkbox" id="addTargetRoom"
-										name="addTargetRoom" />&nbsp;
+										name="addTargetRoom" ${roomInstance?.source== 0 ? 'checked="checked"' : ''}/>&nbsp;
 								</span> <span> <label for="showAll"><b>Show All:</b></label> <input
 										type="checkbox" id="showAll" name="showAll"
 										${prefVal && prefVal == 'TRUE' ?  'value="1" checked="checked"' :  ' value="0"' }
