@@ -27,7 +27,7 @@
 				</g:link></li>
 		</g:if>
 		<li>
-    	  	<g:form method="post" name="issueAssetForm" action="showIssue">
+    	  	<g:form method="post" name="issueAssetForm" action="listTasks">
 			<input type="text" size="08" value="${search}" id="search" 
 				name="search" autocorrect="off" autocapitalize="off" 
 				onfocus="changeAction()" onblur="retainAction()" />

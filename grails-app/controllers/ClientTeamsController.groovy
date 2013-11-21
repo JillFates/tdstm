@@ -975,6 +975,7 @@ class ClientTeamsController {
 	 *		tab - all or todo 
 	 */
 	def listTasks = {
+
 		def project = securityService.getUserCurrentProject()
 		//log.error "PROJECT: ${project}"
 		def person = securityService.getUserLoginPerson()
@@ -989,6 +990,8 @@ class ClientTeamsController {
 			log.info "listTasks - sunk for ${person} on project ${project.id}"
 		}
 		
+		log.debug "listTasks: params=$params, project=$project, person=$person, entities=${entities.size()}"
+
 		def allTasks = false
 
 		// Parameters 		
@@ -1059,7 +1062,8 @@ class ClientTeamsController {
 			model.isOnIE= true
 		}
 		
-		// log.info "======= View is $view =========="
+
+		log.debug "listTasks: View is $view"
 		
 		// Send the user on his merry way
 		render (view:view, model:model)
@@ -1085,9 +1089,28 @@ class ClientTeamsController {
 	 * @return HTML that is used by an AJax call
 	 */
 	def showIssue ={
+
 		def project = securityService.getUserCurrentProject()
-		def assetComment = AssetComment.findByIdAndProject(params.issueId, project)
+
+		// This is such a hack at the moment but if this errors, the mobile scanner doesn't have any way to get back to the previous screen 
+		// so it is a painful experience to close the app, kill the app, restart, login and then get back to the original screen.
+		def backButton = 'Please press the Back button to return to the previous screen.<p/><button onclick="goBack()">Back</button>'
+		def backScript = """
+<script>
+function goBack() { window.history.back() }
+</script>
+"""
 		
+		log.debug "showIssue: params=$params, project=$project"
+
+		def assetComment = AssetComment.findByIdAndProject(params.issueId, project)
+
+		if (! assetComment) {
+			render "${backScript}Unable to locate a task for asset [${params.search}/${params.issueId}]. $backButton"
+			return
+		}
+		
+
 		def cartQty = '	'
 		def moveEvent = assetComment.moveEvent
 		
@@ -1110,7 +1133,7 @@ class ClientTeamsController {
 		// Bounce back to the user if we didn't get a legit id, associated with the project
 		if (! assetComment ) {
 			log.error "${person} attempted an invalide access a task/comment with id ${params.issueId} on project $project"
-			render "Unable to find specified record"
+			render "${backScript}Unable to find specified record. ${backButton}"
 			return
 		}
 		
