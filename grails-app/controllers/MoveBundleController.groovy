@@ -496,12 +496,17 @@ class MoveBundleController {
 		def appliance = AssetType.APPLIANCE.toString()
 		
 		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
-	    Set uniqueMoveEventList = moveBundleList.moveEvent
-		uniqueMoveEventList.remove(null)
-		
-		List moveEventList = []
-		moveEventList =  uniqueMoveEventList.toList()
-		moveEventList.sort{it?.name}
+		def bundleSortedList = moveBundleList.sort{it.startTime}
+		def totalEventList = bundleSortedList.moveEvent
+		def moveEventList = []
+		//To add the moveEvents whose bundles has startTime.
+		bundleSortedList.each{me->
+			if(me.startTime)
+				moveEventList.add(me.moveEvent)
+		}
+		moveEventList = moveEventList+(totalEventList-moveEventList)
+		moveEventList.removeAll( [null] )
+		moveEventList.unique()
 		
 		// Forming query for multi-uses
 		def countQuery = "SELECT count(ae) FROM AssetEntity ae WHERE ae.assetType IN (:type) AND (ae.moveBundle IN \
@@ -808,7 +813,6 @@ class MoveBundleController {
 			moveBundleList:moveBundleList, 
 			dependencyConsoleList:dependencyConsoleList, 
 			dependencyBundleCount:dependencyBundleCount, 
-			uniqueMoveEventList:uniqueMoveEventList, 
 			planningDashboard:'planningDashboard', 
 			eventStartDate:eventStartDate, 
 			date:time, 
