@@ -193,7 +193,7 @@ body{
 }
 #bodytop{
 	height:165px;
-	margin-left: 100px;
+	margin-left: 8%;
 }
 
 #bodytopl{
@@ -290,17 +290,16 @@ body{
 
 #newsmenu{
 	float:left;
-	margin-left:15px;
 }
 #newsblock{
 	text-align:left;
-	padding-left:25px;
+	margin-left:395px;
 	height:150px;
+	margin-top:-95px;
 	}
 #newsbox{
 	float:left;
 	line-height:25px;
-	padding-top:10px;
 }
 
 #newsarrows{
@@ -311,7 +310,7 @@ body{
 }
 
 #toparrow{
-	height:140px;
+	height:100%;
 	}
 
 .newstime{
