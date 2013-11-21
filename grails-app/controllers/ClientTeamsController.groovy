@@ -1008,6 +1008,7 @@ class ClientTeamsController {
 		// log.info "listComment() sort=${params.sort}, order=${params.order}"
 
 		def isCleaner = partyRelationshipService.staffHasFunction(project.id, person.id, 'CLEANER')
+		def isMoveTech = partyRelationshipService.staffHasFunction(project.id, person.id, 'MOVE_TECH')
 
 		// Use the taskService.getUserTasks service to get all of the tasks [all,todo]
 		def tasks = taskService.getUserTasks(person, project, false, 7, params.sort, params.order, search )
@@ -1037,7 +1038,7 @@ class ClientTeamsController {
 		// Determine the model and view
 		def model = [taskList:issueList, tab:tab, todoSize:todoSize, allSize:allSize, 
 			search:search, sort:params.sort, order:params.order,
-	 		personId:person.id, isCleaner:isCleaner,
+	 		personId:person.id, isCleaner:isCleaner, isMoveTech:isMoveTech,
 			timeToUpdate:timeToRefresh ?: 60, 
 			isOnIE:false, person:person,servers : entities.servers, 
 			applications : entities.applications, dbs : entities.dbs, 

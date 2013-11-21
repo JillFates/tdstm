@@ -1,5 +1,6 @@
 <%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus;com.tds.asset.AssetComment" %>
 <%@page import="com.tdssrc.grails.GormUtil"%>
+<g:set var="colSpan" value="${isCleaner ? 1 : 4}" />
 <%--
 /*
  **************************
@@ -70,10 +71,13 @@
 			<thead>
 				<tr>
 					<g:sortableColumn class="sort_column" style="width:45%;"  action="listTasks" property="number_comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:25%;" action="listTasks" property="assetName" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:15%;" action="listTasks" property="status" title="Status" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
-					<g:sortableColumn class="sort_column" style="width:15%;" action="listTasks" property="assigned" title="Assigned To" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
+					<g:if test="${ ! isMoveTech}">
+						<g:sortableColumn class="sort_column" style="width:25%;" action="listTasks" property="assetName" title="Related" params="['tab':tab,'search':search]"></g:sortableColumn>
+						<g:sortableColumn class="sort_column" style="width:15%;" action="listTasks" property="status" title="Status" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
+						<g:sortableColumn class="sort_column" style="width:15%;" action="listTasks" property="assigned" title="Assigned To" params="['tab':tab,'search':search]" defaultOrder="desc"></g:sortableColumn>
+					</g:if>
 				</tr>
+
 			</thead>
 			<tbody>
 				<g:each status="i" in="${taskList}" var="issue">
@@ -92,20 +96,21 @@
 						${issue?.item?.taskNumber?issue?.item?.taskNumber+' - ' : ''}
 						${issue?.item?.comment}
 					</td>
-					<td id="asset_${issue?.item?.id}" class="asset_details_block">
-						${issue?.item?.assetName}
-					</td>
-					
-					<td id="statusTd_${issue?.item?.id}" class="asset_details_block">
-						${issue?.item?.status}
-					</td>
-					<td id="assignedToName_${issue?.item?.id}" class="asset_details_block">
-						${(issue?.item?.hardAssigned?'* ':'')} <span id="assignedToNameSpan_${issue?.item?.id}">${(issue?.item?.firstName?:'')+' '+((issue?.item?.lastName != null)? issue?.item?.lastName :'')}</span>
-					</td>
+					<g:if test="${ ! isMoveTech}">
+						<td id="asset_${issue?.item?.id}" class="asset_details_block">
+							${issue?.item?.assetName}
+						</td>					
+						<td id="statusTd_${issue?.item?.id}" class="asset_details_block">
+							${issue?.item?.status}
+						</td>
+						<td id="assignedToName_${issue?.item?.id}" class="asset_details_block">
+							${(issue?.item?.hardAssigned?'* ':'')} <span id="assignedToNameSpan_${issue?.item?.id}">${(issue?.item?.firstName?:'')+' '+((issue?.item?.lastName != null)? issue?.item?.lastName :'')}</span>
+						</td>
+					</g:if>
 					</tr>
 					<g:if test="${tab && tab == 'todo'}">
 					 <tr id="showStatusId_${issue?.item?.id}" ${(todoSize!=1||search==''||search==null) ? 'style="display: none"' :''}>
-						<td nowrap="nowrap" colspan="4" class="statusButtonBar">
+						<td nowrap="nowrap" colspan="${colSpan}" class="statusButtonBar">
 							<g:if test="${issue.item.status == AssetCommentStatus.READY}"> 
 							<tds:actionButton label="Start" icon="ui-icon-play" id="${issue?.item?.id}"  
 								onclick="changeStatus('${issue?.item?.id}','${AssetCommentStatus.STARTED}', '${issue?.item?.status}', 'taskManager')"/>
