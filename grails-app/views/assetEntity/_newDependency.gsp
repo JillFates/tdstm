@@ -3,7 +3,7 @@
 		<tr>
 			<td><g:select name="dataFlowFreq" from="${com.tds.asset.AssetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
 			<td>
-					<g:select name="entity" from="['Application','Server','Database','Storage','Network']" 
+					<g:select name="entity" from="['Application','Server','Database','Storage','Other']" 
 							onchange='updateAssetsList(this.name, this.value)' 
 							value="${forWhom== 'Application' ? 'Application' : 'Server'}"></g:select>
 			</td>
@@ -41,6 +41,6 @@
 			noSelection="${['null':'Please select']}" class="depSelect"></g:select></span>
 	<span id="Storage"><g:select name="asset" from="${files}" optionKey="${-2}" optionValue="${1}" 
 			noSelection="${['null':'Please select']}" class="depSelect"></g:select></span>
-	<span id="Network"><g:select name="asset" from="${networks}" optionKey="${-2}" optionValue="${1}" 
+	<span id="Other"><g:select name="asset" from="${networks}" optionKey="${-2}" optionValue="${1}" 
 			noSelection="${['null':'Please select']}" class="depSelect"></g:select></span>
 </div>

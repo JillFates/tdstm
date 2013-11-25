@@ -26,9 +26,9 @@ $(document).ready(function() {
 					<tr id='row_s_${i}_${support.id}'>
 						<td><g:select name="dataFlowFreq_support_${support.id}" value="${support.dataFlowFreq}" from="${support.constraints.dataFlowFreq.inList}" /></td>
 						<td>
-							<g:select name="entity_support_${support.id}" id="entity_support_${support.id}" from="['Server','Application','Database','Storage','Network']" 
+							<g:select name="entity_support_${support.id}" id="entity_support_${support.id}" from="['Server','Application','Database','Storage','Other']" 
 								onChange="updateAssetsList(this.name)" 
-								value="${type== 'Files' ? 'Storage' : (nonNetworkTypes.contains(type) ? type : 'Network')}" />
+								value="${type== 'Files' ? 'Storage' : (nonNetworkTypes.contains(type) ? type : 'Other')}" />
 						</td>
 						<td id="assetListSupportTdId_${i}"  class='combo-td'>
 							<select name="asset_support_${support.id}" class="assetSelect" onmousedown="updateAssetsList(this.name, '${type}', '${support?.asset?.id}')" 
@@ -89,8 +89,8 @@ $(document).ready(function() {
 				<tr id='row_d_${i}_${dependent.id}'>
 					<td><g:select name="dataFlowFreq_dependent_${dependent.id}" value="${dependent.dataFlowFreq}" from="${dependent.constraints.dataFlowFreq.inList}" /></td>
 					<td>
-						<g:select name="entity_dependent_${dependent.id}" id="entity_dependent_${i}" from="['Server','Application','Database','Storage','Network']"
-							value="${type== 'Files' ? 'Storage' : (nonNetworkTypes.contains(type) ? type : 'Network')}"  
+						<g:select name="entity_dependent_${dependent.id}" id="entity_dependent_${i}" from="['Server','Application','Database','Storage','Other']"
+							value="${type== 'Files' ? 'Storage' : (nonNetworkTypes.contains(type) ? type : 'Other')}"  
 							onchange="updateAssetsList(this.name)" />
 					</td>
 					<td id="assetListDependentTdId_${i}"  class='combo-td'>

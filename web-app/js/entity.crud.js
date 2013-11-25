@@ -184,9 +184,9 @@ function updateAssetsList(name, assetType, assetId ) {
 	if ( 
 	  (claz == 'Application' && assetType == claz) ||
 	  (claz == 'Database' && assetType == claz) ||
-	  (claz == 'Network' && assetType == claz) ||
+	  (claz == 'Other' && assetType == claz) ||
 	  (claz == 'Storage' && ( assetType == claz || assetType == 'Files')) || 
-	  (claz == 'Server' && assetType!='Application' && assetType!='Database' && assetType!='Network' && assetType!='Storage' && assetType!='Files') 
+	  (claz == 'Server' && assetType!='Application' && assetType!='Database' && assetType!='Other' && assetType!='Storage' && assetType!='Files') 
 	) {
 		// relookup the SELECT
 	    // $("select[name='asset_"+idValues[1]+"_"+idValues[2]+"'] option=[value='"+assetId+"']").attr('selected','selected')
