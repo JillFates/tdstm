@@ -45,11 +45,13 @@ class DashboardController {
         	userPreferenceService.setPreference("MOVE_EVENT","${moveEvent.id}")
 			def moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = ${moveEvent.id} ORDER BY mb.startTime ")			
             def results = taskService.getMoveEventTaskSummary(moveEvent)
+            def teamTaskResults = taskService.getMoveEventTeamTaskSummary(moveEvent)
             
     		return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, projectLogo : projectLogo, 
     				 moveBundleList : moveBundleList, timeToUpdate : timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : "never",
     				 manualOverrideViewPermission:RolePermissions.hasPermission("ManualOverride"),
-    				 taskCountByEvent:results.taskCountByEvent, taskStatusMap:results.taskStatusMap, totalDuration:results.totalDuration]
+    				 taskCountByEvent:results.taskCountByEvent, taskStatusMap:results.taskStatusMap, totalDuration:results.totalDuration,
+					 teamTaskMap:teamTaskResults, roles:teamTaskResults.values().role]
         }
     }
 	
@@ -140,13 +142,19 @@ class DashboardController {
         
         def moveEvent = MoveEvent.read(params.id)
         def results = taskService.getMoveEventTaskSummary(moveEvent)
-        
-        render(template:'taskSummary',
+		def teamTaskResults = taskService.getMoveEventTeamTaskSummary(moveEvent)
+        def taskRoles = teamTaskResults.values().role
+		def rolesPercentageMap = [:]
+		taskRoles.each{t->
+			rolesPercentageMap << [(t.id): params.(t.id)]
+		}
+		render(template:'taskSummary',
 					model:[taskCountByEvent:results.taskCountByEvent, taskStatusMap:results.taskStatusMap, 
-					   	   totalDuration:results.totalDuration, 'taskStartedwidth':params.taskStartedwidth,
-					       'taskReadywidth':params.taskReadywidth,'taskDonewidth':params.taskDonewidth, 
-					       'effortStartedwidth':params.effortStartedwidth, 'effortReadywidth':params.effortReadywidth,
-					       'effortDonewidth':params.effortDonewidth])
+					   	   totalDuration:results.totalDuration,teamTaskMap:teamTaskResults,
+						   roles:taskRoles, 'taskStartedwidth':params.taskStartedWidthId,
+					       'taskReadywidth':params.taskReadyWidthId,'taskDonewidth':params.taskDoneWidthId, 
+					       'effortStartedwidth':params.effortStartedWidthId, 'effortReadywidth':params.effortReadyWidthId,
+					       'effortDonewidth':params.effortDoneWidthId, rolesPercentageMap:rolesPercentageMap])
         
     }
 }

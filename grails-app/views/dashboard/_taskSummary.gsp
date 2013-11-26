@@ -17,6 +17,13 @@ $(document).ready(function() {
     
     var percentageDurationReady=${taskStatusMap['Ready'].timeInMin ? ((taskStatusMap['Ready'].timeInMin/totalDuration)*100).intValue() :0};
     $("#effortReadyBar").animate({width: percentageDurationReady+"%" }, 1000);
+    
+    <g:each in="${roles['id']}" var="role"> 
+     <g:set var="role" value="'${role}'" />
+     	var roleId='${role}'
+    	 var percentage = "${teamTaskMap[role].teamTaskCount ? Math.round((teamTaskMap[role].teamDoneCount/teamTaskMap[role].teamTaskCount)*100) :0}";
+    	 $("#team_"+roleId).animate({width: percentage+"%" }, 1000);
+    </g:each>
 });
 </script>
 <g:set var="percentageTaskDone" value="${taskStatusMap['Completed'].taskCount ? ((taskStatusMap['Completed'].taskCount/taskCountByEvent)*100).intValue() :0}" />
@@ -41,12 +48,13 @@ $(document).ready(function() {
         <div class="taskSummaryCounts"><b>Pending: ${taskStatusMap['Pending'].taskCount} ${taskStatusMap['Pending'].taskCount ? ('('+taskStatusMap['Pending'].timeInMin+'m)'):''}</b></div>
 </div>
 </div>
-	<input type="hidden" id="task_done_width" value="${percentageTaskDone}"/>
-	<input type="hidden" id="task_started_width" value="${percentageTaskStarted}"/>
-	<input type="hidden" id="task_ready_width" value="${percentageTaskReady}"/>
-	<input type="hidden" id="effort_done_width" value="${percentageDurationDone}"/>
-	<input type="hidden" id="effort_started_width" value="${percentageDurationStarted}"/>
-	<input type="hidden" id="effort_ready_width" value="${percentageDurationReady}"/>
+<g:form  method="post" name="teamTaskPercentageFormId" >
+	<input type="hidden" id="taskDoneWidthId"  name="taskDoneWidthId" value="${percentageTaskDone}"/>
+	<input type="hidden" id="taskStartedWidthId" name="taskStartedWidthId" value="${percentageTaskStarted}"/>
+	<input type="hidden" id="taskReadyWidthId" name="taskReadyWidthId" value="${percentageTaskReady}"/>
+	<input type="hidden" id="effortDoneWidthId" name="effortDoneWidthId" value="${percentageDurationDone}"/>
+	<input type="hidden" id="effortStartedWidthId" name="effortStartedWidthId" value="${percentageDurationStarted}"/>
+	<input type="hidden" id="effortReadyWidthId" name="effortReadyWidthId" value="${percentageDurationReady}"/>
 <div class="toprightcontent">
     <table class="task_bar_table">
          <tr>
@@ -72,4 +80,32 @@ $(document).ready(function() {
           </td>
          </tr>
     </table>
+ </div>
+ <div style="margin-left:52%;position:absolute;margin-top: 20px;">
+  	<table style="border:none;">
+	   	<g:each in="${roles}" var="role" status="i">
+	   		<input type="hidden" name="${role.id}" id="${role.id}" value="${teamTaskMap[role.id].teamTaskCount ? Math.round((teamTaskMap[role.id].teamDoneCount/teamTaskMap[role.id].teamTaskCount)*100) :0}"/>	
+	   		<g:if test="${i==0 || i%2==0 }">
+	    		<tr>
+	    	</g:if>
+	    		<td><b>${role.description}</b></td>
+	    		<td><b>${teamTaskMap[role.id].teamTaskCount}</b></td>
+	    		<td>
+	    			<g:set var="remainingTeamTask" value="${teamTaskMap[role.id].teamTaskCount-teamTaskMap[role.id].teamDoneCount}" />
+		    		<g:if test="${remainingTeamTask>0 }" >
+		    		<div class="team_bar_base_small">
+						<div class="team_bar_graph_small" id="team_${role.id}" style="width: ${rolesPercentageMap? rolesPercentageMap[role.id]:'0'}%;"></div>
+					</div>
+					<b>${remainingTeamTask} to go</b>
+					</g:if>
+					<g:else>
+						<img src="${resource(dir:'images',file:'checked-icon.png')}" />
+					</g:else>
+				</td>
+			<g:if test="${i!=0 && i%2==1 }">
+	    		</tr>
+	    	</g:if>
+	   	</g:each>
+    </table>
 </div>
+</g:form>

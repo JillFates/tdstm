@@ -4043,5 +4043,25 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 		
 		return [ taskCountByEvent:taskCountByEvent, taskStatusMap:taskStatusMap, totalDuration:totalDuration]
-	}	
+	}
+	/**
+	 * This special method is used to find given event task summary ( teamTaskCounts, teamTaskDoneCount)
+	 * @param MoveEvent moveEvent object
+	 * @return loadedGroups Map<List> - A mapped list of the taskCounts, teamTaskDoneCount.
+	 */
+	def getMoveEventTeamTaskSummary(def moveEvent){
+		def teamTaskMap =[:]
+		if (moveEvent) {
+			def roles= getTeamRolesForTasks()
+			roles.each { role ->
+				def teamTask = AssetComment.findAllByMoveEventAndRole(moveEvent, role.id)
+				def teamDoneTask = teamTask.findAll { it.status == 'Completed' }
+				if(teamTask){
+					teamTaskMap << [(role.id): [teamTaskCount:teamTask.size(), teamDoneCount:teamDoneTask.size(), role:role ]]
+				}
+			}
+		}
+		return teamTaskMap
+	}
 }
+

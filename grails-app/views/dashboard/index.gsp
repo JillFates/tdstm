@@ -153,7 +153,7 @@
 			<!-- News section starts here-->
 			<div id="newssection">
 				<div id="taskSummary">
-				    <g:render template="taskSummary" model="[taskCountByEvent:taskCountByEvent, taskStatusMap:taskStatusMap, totalDuration:totalDuration]"></g:render>
+				    <g:render template="taskSummary" model="[taskCountByEvent:taskCountByEvent, taskStatusMap:taskStatusMap, totalDuration:totalDuration, teamTaskMap:teamTaskMap, roles:roles]"></g:render>
 				</div>
 			</div>
 			<!-- News section ends here-->
@@ -608,19 +608,10 @@
 	}
 	
 	function updateTaskSummary(){
-		var taskDonewidth =$("#task_done_width").val();
-		var taskStartedwidth =$("#task_started_width").val();
-		var taskReadywidth =$("#task_ready_width").val();
-		var effortDonewidth =$("#effort_done_width").val();
-		var effortStartedwidth =$("#effort_started_width").val();
-		var effortReadywidth =$("#effort_ready_width").val();
-		
 		jQuery.ajax({
             type:"POST",
             async : true,
-            data: {'taskReadywidth':taskReadywidth,'taskDonewidth':taskDonewidth,'taskStartedwidth':taskStartedwidth,
-            		'effortReadywidth':effortReadywidth,'effortDonewidth':effortDonewidth,'effortStartedwidth':effortStartedwidth},
-            cache: false,
+            data: $('#teamTaskPercentageFormId').serialize(),
             url:"../dashboard/taskSummary/"+moveEvent,
             success:function (data){
                 $("#taskSummary").html(data)
