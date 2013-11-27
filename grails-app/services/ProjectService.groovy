@@ -292,7 +292,8 @@ class ProjectService {
 						'assetCount': getAssetEntityCountByProjectAndAssetType(project,'Server')[0],
 						'appCount': getAssetEntityCountByProjectAndAssetType(project,'Application')[0],
 						'dbCount': getAssetEntityCountByProjectAndAssetType(project,'Database')[0],
-						'fileCount': getAssetEntityCountByProjectAndAssetType(project,'Files')[0]]
+						'fileCount': getAssetEntityCountByProjectAndAssetType(project,'Files')[0],
+						'totalAssetCount': AssetEntity.countByProject(project) ]
 		
 		return summaryMap
 	}

@@ -14,6 +14,8 @@
 					<th>Applications</th>
 					<th>Databases</th>
 					<th>Storage</th>
+					<th nowrap>Total Assets Count</th>
+					<th>Project Description</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -44,6 +46,8 @@
 						<td>${summaryMap[project.id].appCount?:''}</td>
 						<td>${summaryMap[project.id].dbCount?:''}</td>
 						<td>${summaryMap[project.id].fileCount?:''}</td>
+						<td>${summaryMap[project.id].totalAssetCount?:''}</td>
+						<td>${project.description}</td>
 					</tr>
 				</g:each>
 			</tbody>
