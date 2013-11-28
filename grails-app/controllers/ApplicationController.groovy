@@ -90,7 +90,7 @@ class ApplicationController {
 		def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
 		def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
 		
-		def query = new StringBuffer("""SELECT * FROM ( SELECT a.app_id AS appId, ae.asset_name AS assetName, 
+		def query = new StringBuffer("""SELECT * FROM ( SELECT a.app_id AS appId, ae.asset_name AS assetName, a.latency As latency,
 			CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS sme, ae.validation AS validation, 
 			ae.plan_status AS planStatus, mb.name AS moveBundle, adb.dependency_bundle AS depNumber, me.move_event_id AS event, 
 			COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, 
@@ -122,7 +122,12 @@ class ApplicationController {
 					query.append(" AND apps.${it.getKey()} LIKE '%${it.getValue()}%'")
 				}
 		}
-		
+		if(params.latency){
+			if(params.latency!='unknown')
+				query.append(" WHERE apps.latency = '${params.latency}' ")
+			else
+				query.append(" WHERE (apps.latency NOT IN ('Y','N') OR apps.latency IS NULL) ")	
+		}
 		def appsList = jdbcTemplate.queryForList(query.toString())
 		
 		// Cut the list of selected applications down to only the rows that will be shown in the grid
