@@ -256,7 +256,7 @@ $(document).ready(function() {
 
 								<div class="dashboard_bar_graph" id="assignmentbar" style="width:0%;"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${assignedAppCount}%</b>
-									<g:link controller="application" action="list" params="[filter:'applicationCount',plannedStatus:'Unassigned']">Applications Assigned</g:link>
+									<g:link controller="application" action="list" params="[filter:'applicationCount',plannedStatus:'Assigned']">Applications Assigned</g:link>
 								</div>
 							</g:else>
 							</td>
@@ -275,7 +275,7 @@ $(document).ready(function() {
 
 								<div class="dashboard_bar_graph" id="confirmedbar" style="width:0%;"></div>
 								<div style="position:relative; top:-18px;height:0px;margin-left:5px;"><b>${confirmedAppCount}%</b>
-									<g:link controller="application" action="list" params="[filter:'applicationCount',plannedStatus:'Unassigned']">Applications Confirmed</g:link>
+									<g:link controller="application" action="list" params="[filter:'applicationCount',plannedStatus:'Confirmed']">Applications Confirmed</g:link>
 								</div>
 							</g:else>
 							</td>
