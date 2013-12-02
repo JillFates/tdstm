@@ -23,8 +23,8 @@
 						<th class="Arrowcursor ${sortBy == 'validation' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','validation')">Validation</th>
 						<th class="Arrowcursor ${sortBy == 'moveBundle' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','moveBundle')">Bundle</th>
 						<th class="Arrowcursor ${sortBy == 'planStatus' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','planStatus')">Plan Status</th>
-						<th class="Arrowcursor ${sortBy == 'tbdCount' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','tbdCount')">TBD</th>
-						<th class="Arrowcursor ${sortBy == 'conflictCount' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','conflictCount')">Conflict</th>
+						<th class="Arrowcursor ${sortBy == 'depToResolve' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','depToResolve')">TBD</th>
+						<th class="Arrowcursor ${sortBy == 'depToConflict' ? orderBy :''}" onclick="javascript:getListBySort('files','${dependencyBundle}','depToConflict')">Conflict</th>
 					</tr>
 
 				</thead>
@@ -70,10 +70,10 @@
 
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Files', ${files.id} )">${(files.tbdCount)?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Files', ${files.id} )">${files?.depToResolve?:''}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Files', ${files.id} )">${files.conflictCount[0]?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Files', ${files.id} )">${files?.depToConflict?:''}</span>
 							</td>
 						</tr>
 					</g:each>

@@ -29,8 +29,8 @@
 						<th class="Arrowcursor ${sortBy == 'validation' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','validation')">Validation</th>
 						<th class="Arrowcursor ${sortBy == 'moveBundle' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','moveBundle')">Bundle</th>
 						<th class="Arrowcursor ${sortBy == 'planStatus' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','planStatus')">Plan Status</th>
-						<th class="Arrowcursor ${sortBy == 'tbdCount' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','tbdCount')">TBD</th>
-						<th class="Arrowcursor ${sortBy == 'conflictCount' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','conflictCount')">Conflict</th>
+						<th class="Arrowcursor ${sortBy == 'depToResolve' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','depToResolve')">TBD</th>
+						<th class="Arrowcursor ${sortBy == 'depToConflict' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','depToConflict')">Conflict</th>
 					</tr>
 
 				</thead>
@@ -95,10 +95,10 @@
 								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.planStatus}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${(asset.tbdCount)?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset?.depToResolve?:''}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.conflictCount[0]?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset?.depToConflict?:''}</span>
 							</td>
 						</tr>
 					</g:each>

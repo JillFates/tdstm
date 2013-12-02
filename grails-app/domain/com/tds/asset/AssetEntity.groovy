@@ -244,7 +244,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	}
 
 	// Need to indicate the getters that would otherwise be mistaken as db properties
-	static transients = ['modelName', 'moveBundleName', 'conflictCount', 'depUp', 'depDown', 'depToResolve', 'depToConflict']
+	static transients = ['modelName', 'moveBundleName', 'depUp', 'depDown', 'depToResolve', 'depToConflict']
 
 	/*
 	 * Date to insert in GMT
@@ -345,22 +345,6 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		}
 	} 
 	*/
-	
-	/**
-	 *this method is used to count of dependencies to assets with bundles not the same as this asset and the status is not Archived or Not Applicable
-	 * @return conflictedCount
-	 */
-	def transient getConflictCount(){
-		return moveBundle ? AssetDependency.executeQuery(
-			"SELECT COUNT(ad) FROM AssetDependency ad WHERE (ad.asset =:asset OR ad.dependent =:asset) \
-			AND (ad.asset.moveBundle !=:bundle OR ad.dependent.moveBundle != :bundle) \
-			and status not in (:status)",
-			[	asset:this, 
-				bundle:moveBundle, 
-			  	status:[AssetDependencyStatus.ARCHIVED.toString(), AssetDependencyStatus.NA.toString()]
-			]
-		) : [0]
-	}
 
 	/**
 	 * this method is used to count of dependencies to dependent and status is not Validated.
@@ -370,13 +354,6 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		return AssetDependency.countByDependentAndStatusNotEqual(this, 'Validated')
 	}
 	
-	/**
-	 * this method is used to get sum of depUp and depDown.
-	 * @return dependencyUp Count + dependencyDown Count
-	 */
-	def getTbdCount(){
-		return (this.depUp+this.depDown)
-	}
 	/**
 	 * this method is used to count of dependencies to assets and the status is not Validated.
 	 * @return dependencyDown Count

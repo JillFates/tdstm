@@ -25,8 +25,8 @@
 						<th class="Arrowcursor ${sortBy == 'validation' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','validation')">Validation</th>
 						<th class="Arrowcursor ${sortBy == 'moveBundle' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','moveBundle')">Bundle</th>
 						<th class="Arrowcursor ${sortBy == 'planStatus' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','planStatus')">Plan Status</th>
-						<th class="Arrowcursor ${sortBy == 'tbdCount' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','tbdCount')">TBD</th>
-						<th class="Arrowcursor ${sortBy == 'conflictCount' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','conflictCount')">Conflict</th>
+						<th class="Arrowcursor ${sortBy == 'depToResolve' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','depToResolve')">TBD</th>
+						<th class="Arrowcursor ${sortBy == 'depToConflict' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','depToConflict')">Conflict</th>
 					</tr>
 
 				</thead>
@@ -75,10 +75,10 @@
 								<span onclick="getEntityDetails('dependencyConsole','Application', ${app?.id} )">${app?.planStatus}</span>
 							</td>
 							<td>
-								<span onclick="getEntityDetails('dependencyConsole','Application', ${app?.id} )">${(app?.tbdCount)?:''}</span>
+								<span onclick="getEntityDetails('dependencyConsole','Application', ${app?.id} )">${app?.depToResolve?:''}</span>
 							</td>
 							<td>
-								<span onclick="getEntityDetails('dependencyConsole','Application', ${app?.id} )">${(app?.conflictCount)?(app.conflictCount[0]?:''):('')}</span>
+								<span onclick="getEntityDetails('dependencyConsole','Application', ${app?.id} )">${app?.depToConflict?:''}</span>
 							</td>
 						</tr>
 					</g:each>
