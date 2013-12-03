@@ -1598,15 +1598,17 @@ class AssetEntityController {
 		
 		def totalRows = assetEntities.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
+		def assetComments = AssetComment.findAllByAssetEntityInList(assetEntities)
+		def depsBundle = AssetDependencyBundle.findAllByAssetInList(assetEntities)
 		
-		def results = assetEntities?.collect { 
-			[ cell: ['',it.assetName, it.assetType,it.model?.modelName, it.sourceLocation,
-					it.sourceRack, it.targetLocation, it.targetRack, it.assetTag, it.serialNumber,it.planStatus,it.moveBundle?.name,
-					AssetDependencyBundle.findByAsset(it)?.dependencyBundle, (it.depToResolve ?it.depToResolve:''),
-					(it.depToConflict ?it.depToConflict:''),
-					AssetComment.find("from AssetComment ac where ac.assetEntity=:entity and commentType=:type and status!=:status",
-					[entity:it, type:'issue', status:'completed']) ? 'issue' :
-					(AssetComment.find("from AssetComment ac where ac.assetEntity=:entity",[entity:it]) ? 'comment' : 'blank')], id: it.id,
+		def results = assetEntities?.collect { entity->
+			[ cell: ['',entity.assetName, entity.assetType,entity.model?.modelName, entity.sourceLocation,
+					entity.sourceRack, entity.targetLocation, entity.targetRack, entity.assetTag, 
+					entity.serialNumber,entity.planStatus,entity.moveBundle?.name,
+					depsBundle.find{it.asset == entity}?.dependencyBundle,
+					(entity.depToResolve ?entity.depToResolve:''),(entity.depToConflict ?entity.depToConflict:''),
+					assetComments.find{ it.assetEntity == entity && it.commentType == 'issue' && it.status == 'completed'} ? 'issue' :
+					assetComments.find{ it.assetEntity == entity} ? 'comment' : 'blank'], id: entity.id,
 			]}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
