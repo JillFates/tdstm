@@ -376,15 +376,13 @@ class PartyRelationshipService {
 			args << excludeStaff
 		}
 		projectStaff = PartyRelationship.findAll( query, args )
-
-		// Query to lookup a Company/Staff relationship
-		// query = "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo.id = ? and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'"
 		
+		def company
 		projectStaff.each { staff ->
 			def map = new HashMap()
-			def company = PartyRelationship.find(query, [staff.partyIdTo] )
-			if (! clientStaffOnly || ( clientStaffOnly && company?.partyIdFrom.id == project.client.id ) ) 
-				list << [company: company?.partyIdFrom, name: staff.partyIdTo.toString(), staff: staff.partyIdTo, role: staff.roleTypeCodeTo ]
+			company = clientStaffOnly ? getStaffCompany(staff.partyIdTo) : null
+			if (! clientStaffOnly || ( clientStaffOnly && company?.id == project.client.id ) ) 
+				list << [company:company, name:staff.partyIdTo.toString(), staff:staff.partyIdTo, role:staff.roleTypeCodeTo ]
 		}
 		return list
 	}
