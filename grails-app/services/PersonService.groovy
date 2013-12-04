@@ -184,6 +184,7 @@ class PersonService {
 		if ( ! results.person && nameMap.first ) {
 			log.debug "findOrCreatePerson() creating new person and associate to Company as staff ($nameMap)"
 			def person = new Person('firstName':nameMap.first, 'lastName':nameMap.last, 'middleName': nameMap.middle, staffType:'Salary')
+			staffList.add(person)
 			if ( ! person.save(insert:true, flush:true)) {
 				log.error "findOrCreatePerson Unable to create Person"+GormUtil.allErrorsString( person )
 				results.error = "Unable to create person $nameMap"
