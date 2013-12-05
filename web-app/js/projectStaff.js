@@ -82,7 +82,6 @@ function loadPersonDiv(personId,renderPage,redirectTo){
 			$("#personGeneralViewId").html(data)
 			$("#personGeneralViewId").dialog('option', 'width', '420px')
 			$("#personGeneralViewId").dialog('option', 'position', ['center','top']);
-			$(".person").hide()
 			$("#"+currentTabShow).show()
 			$(".mobmenu").removeClass("mobselect")
 			$("#"+currentHeaderShow).addClass("mobselect")
