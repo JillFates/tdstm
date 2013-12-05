@@ -158,30 +158,14 @@ $(document).ready(function() {
 	</tr>
 		<tr>
 			<td colspan="2">
-			<tds:hasPermission permission='EditAndDelete'>
 				<div class="buttons">
 					<input name="attributeSet.id" type="hidden" value="1">
 					<input name="project.id" type="hidden" value="${projectId}">
 					<input type="hidden" name="id" id="assetsId" value="${assetEntity?.id}" />
-					<span class="button">
-					<input type="button" class="edit" value="Edit" onclick="editEntity('${redirectTo}','Server', ${assetEntity?.id})" /> </span>
 					<input type ="hidden" id = "dstPath" name = "dstPath" value ="${redirectTo}"/>
-					<g:if test="${redirectTo!='dependencyConsole'}">
-					   <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>
-					</g:if>
-					<g:else>
-					   <span class="button"><input id="deleteId" name="deleteId" class="delete" value="Delete" onclick=" deleteAsset($('#assetsId').val(),'server')" /> </span>
-					</g:else>
-					<tds:hasPermission permission="CommentCrudView">	
-						<a href="javascript:createIssue('${assetEntity.assetName}','comment', ${assetEntity.id},'update');">
-							<img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Comment
-						</a>
-						<a href="javascript:createIssue('${assetEntity.assetName}','',${assetEntity.id},'update');">
-							<img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Task
-						</a>
-					</tds:hasPermission>
+					<g:render template="showButtons" 
+						model="[assetEntity:assetEntity, redirectTo:redirectTo,type:'Server', forWhom:'server']" />
 				</div>
-			</tds:hasPermission>
 			</td>
 		</tr>
 	</table>
