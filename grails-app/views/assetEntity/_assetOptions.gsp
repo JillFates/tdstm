@@ -58,20 +58,22 @@
     }
 
     function submitForm(option){
-        var option = option
-        if(option=='planStatus'){
 	        var planStatus = $("#newplanStatus").val();
-	        ${remoteFunction(action:'saveAssetoptions', params:'\'planStatus=\'+ planStatus+\'&assetOptionType=\'+"planStatus" ', onSuccess:'addAssetOption(e,planStatus,option)')};
-        }else if(option=='Priority'){
-        	var priorityOption = $("#priorityOption").val();
-        	${remoteFunction(action:'saveAssetoptions', params:'\'priorityOption=\'+ priorityOption +\'&assetOptionType=\'+"Priority"', onSuccess:'addAssetOption(e,priorityOption,option)')};
-        } else if(option=='dependency'){
-        	var dependencyType = $("#dependencyType").val();
-        	${remoteFunction(action:'saveAssetoptions', params:'\'dependencyType=\'+ dependencyType +\'&assetOptionType=\'+"dependency" ', onSuccess:'addAssetOption(e,dependencyType,option)')};
-        }else if(option=='dependencyStatus'){
-        	var dependencyStatus = $("#dependencyStatus").val();
-        	${remoteFunction(action:'saveAssetoptions', params:'\'dependencyStatus=\'+ dependencyStatus +\'&assetOptionType=\'+"dependencyStatus"', onSuccess:'addAssetOption(e,dependencyStatus,option)')};
-        }
+	        var priorityOption = $("#priorityOption").val();
+	        var dependencyType = $("#dependencyType").val();
+	        var dependencyStatus = $("#dependencyStatus").val();
+	        
+	        if(option=='planStatus' && planStatus){
+		        ${remoteFunction(action:'saveAssetoptions', params:'\'planStatus=\'+ planStatus+\'&assetOptionType=\'+"planStatus" ', onSuccess:'addAssetOption(e,planStatus,option)')};
+	        }else if(option=='Priority' && priorityOption){
+	        	${remoteFunction(action:'saveAssetoptions', params:'\'priorityOption=\'+ priorityOption +\'&assetOptionType=\'+"Priority"', onSuccess:'addAssetOption(e,priorityOption,option)')};
+	        } else if(option=='dependency' && dependencyType){
+	        	${remoteFunction(action:'saveAssetoptions', params:'\'dependencyType=\'+ dependencyType +\'&assetOptionType=\'+"dependency" ', onSuccess:'addAssetOption(e,dependencyType,option)')};
+	        }else if(option=='dependencyStatus' && dependencyStatus){
+	        	${remoteFunction(action:'saveAssetoptions', params:'\'dependencyStatus=\'+ dependencyStatus +\'&assetOptionType=\'+"dependencyStatus"', onSuccess:'addAssetOption(e,dependencyStatus,option)')};
+	        }else{
+    			alert(option+" can't be blank.")
+    		}
     }
     
     function addAssetOption(e,value,option){
