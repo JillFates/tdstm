@@ -5,17 +5,11 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="projectHeader" />
 	<title>My Tasks</title>
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
 	<link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="entity.crud.js" />
 	<g:javascript src="model.manufacturer.js"/>
-<style>
-.ui-icon{
-	margin-top: 0px !important;
-}
-</style>
 </head>
 <body>
 		<div class="menu4">
