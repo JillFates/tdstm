@@ -38,7 +38,7 @@
 
      	} else {
 
-     	 ${remoteFunction(action:'getTeamsForBundles', params:'\'bundleId=\' + val +\'&projectId=\'+projectId', onComplete:'assignTeams(e)')}
+     	 ${remoteFunction(controller:'moveBundleAsset', action:'getTeamsForBundles', params:'\'bundleId=\' + val +\'&projectId=\'+projectId', onComplete:'assignTeams(e)')}
 
      	}     	
      }
