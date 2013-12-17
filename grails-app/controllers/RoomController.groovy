@@ -398,7 +398,7 @@ class RoomController {
 		   	 AssetEntity.findAllByRackTarget(obj, [sort:'targetRackPosition'])
 		   assetsInRack.findAll{ it.assetType != 'Blade' }.each{ assetEntity ->
 			   spaceUsed += assetEntity?.model?.usize ? assetEntity?.model?.usize : 1
-			   def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? ",["Power",assetEntity])
+			   def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.assetFromPort.type = ? AND cap.assetFrom = ? ",["Power",assetEntity])
 			   def powerConnectorsAssigned = powerConnectors.size()
 			   def rackPower = assetEntity.model?.powerDesign ? assetEntity.model?.powerDesign : 0
 			   if(powerConnectorsAssigned){
@@ -456,7 +456,7 @@ class RoomController {
 		   }
 		   spaceString = params.capacityType != "Used" ? (thisRackTotalSpace-thisRackUsedSpace)+" remaining of "+thisRackTotalSpace+" RU" : thisRackUsedSpace+" used of "+thisRackTotalSpace+" RU"
 		   assets.each{ asset->
-			   def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? ",["Power",asset])
+			   def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.assetFromPort.type = ? AND cap.assetFrom = ? ",["Power",asset])
 			   def powerConnectors = assetPowerCabling.size()
 			   def powerConnectorsAssigned = assetPowerCabling.findAll{it.toPower != null && it.toPower != '' }.size()
 			   
@@ -645,7 +645,7 @@ class RoomController {
             def posResult = getRackPosDetails(assetEntity, assetPos, prevUsize, location, rack)
 			    usedRacks += posResult.assetUsize
 				
-				def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.toPower is not null AND cap.fromConnectorNumber.type = ? AND cap.fromAsset = ? ",["Power",assetEntity])
+				def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.toPower is not null AND cap.assetFromPort.type = ? AND cap.assetFrom = ? ",["Power",assetEntity])
 				def powerConnectorsAssigned = powerConnectors.size()
 				def totalPower = assetEntity.model?.powerDesign ? assetEntity.model?.powerDesign : 0
 				if(powerConnectorsAssigned){

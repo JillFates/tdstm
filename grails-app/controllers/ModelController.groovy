@@ -16,6 +16,7 @@ import org.springframework.web.multipart.commons.*
 import org.apache.commons.lang.math.NumberUtils
 
 import com.tds.asset.AssetCableMap
+import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
@@ -536,7 +537,7 @@ class ModelController {
 						labelPosition: "Right",
 						connectorPosX: 0,
 						connectorPosY: 0,
-						status: "missing"
+						status: "${AssetCableStatus.UNKNOWN}"
 					)
 					
 					if (!powerConnector.save(flush: true)){
@@ -551,23 +552,22 @@ class ModelController {
 				assetEntitysByModel.each{ assetEntity ->
             		assetConnectors.each{connector->
             			
-    					def assetCableMap = AssetCableMap.findByFromAssetAndFromConnectorNumber( assetEntity, connector )
-						
+    					def assetCableMap = AssetCableMap.findByAssetFromAndAssetFromPort( assetEntity, connector )
 						if( !assetCableMap ){
 	    					assetCableMap = new AssetCableMap(
 								cable : "Cable"+connector.connector,
-								fromAsset: assetEntity,
-								fromConnectorNumber : connector,
-								status : connector.status
+								assetFrom: assetEntity,
+								assetFromPort : connector,
+								cableStatus : connector.status,
+								cableComment : "Cable"+connector.connector
 							)
 						}
 						if(assetEntity?.rackTarget && connector.type == "Power" && 
 							connector.label?.toLowerCase() == 'pwr1' && !assetCableMap.toPower){
-							assetCableMap.toAsset = assetEntity
-							assetCableMap.toAssetRack = assetEntity?.rackTarget?.tag
-							assetCableMap.toAssetUposition = 0
-							assetCableMap.toConnectorNumber = null
+							assetCableMap.assetToPort = null
 							assetCableMap.toPower = "A"
+							assetCableMap.cableStatus= connector.status
+							assetCableMap.cableComment= "Cable"
 						}
 						if ( !assetCableMap.validate() || !assetCableMap.save() ) {
 							def etext = "Unable to create assetCableMap for assetEntity ${assetEntity}" +
@@ -576,13 +576,12 @@ class ModelController {
 							log.error( etext )
 						}
     				}
-					def assetCableMaps = AssetCableMap.findAllByFromAsset( assetEntity )
+					def assetCableMaps = AssetCableMap.findAllByAssetFrom( assetEntity )
 					assetCableMaps.each{assetCableMap->
-						if(!assetConnectors.id?.contains(assetCableMap.fromConnectorNumber?.id)){
-							AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-								toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-								where toConnectorNumber = ${assetCableMap.fromConnectorNumber?.id}""")
-							AssetCableMap.executeUpdate("delete AssetCableMap where fromConnectorNumber = ${assetCableMap.fromConnectorNumber?.id}")
+						if(!assetConnectors.id?.contains(assetCableMap.assetFromPort?.id)){
+							AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
+								assetToPort=null where assetToPort = ${assetCableMap.assetFromPort?.id}""")
+							AssetCableMap.executeUpdate("delete AssetCableMap where assetFromPort = ${assetCableMap.assetFromPort?.id}")
 						}
 					}
             	}
@@ -737,7 +736,7 @@ class ModelController {
 		if(modelInstance){
 			def connector = params.connector
 			def modelConnector = ModelConnector.findByConnectorAndModel( connector, modelInstance )
-			assetCableMap = AssetCableMap.findAll("from AssetCableMap where status in ('empty','cabled','cabledDetails') and (fromConnectorNumber = ? or toConnectorNumber = ? )",[modelConnector,modelConnector])
+			assetCableMap = AssetCableMap.findAll("from AssetCableMap where cableStatus in ('${AssetCableStatus.EMPTY}','${AssetCableStatus.CABLED}','${AssetCableStatus.ASSIGNED}') and (assetFromPort = ? or assetToPort = ? )",[modelConnector,modelConnector])
 		}
     	render assetCableMap as JSON
     }

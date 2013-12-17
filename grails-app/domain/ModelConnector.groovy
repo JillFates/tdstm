@@ -1,5 +1,6 @@
 import com.tds.asset.AssetCableMap
 import com.tdssrc.grails.TimeUtil
+import com.tdsops.tm.enums.domain.AssetCableStatus
 
 
 class ModelConnector {
@@ -52,14 +53,13 @@ class ModelConnector {
     def beforeDelete = {
         AssetCableMap.withNewSession { fromConnectorCableMaps*.delete() }
         AssetCableMap.withNewSession{
-            AssetCableMap.executeUpdate("Update AssetCableMap set status='missing', toAsset=null, \
-                                                        toConnectorNumber=null,toAssetRack=null,toAssetUposition = null \
-                                                        where toConnectorNumber = :connector",[connector:this])
+            AssetCableMap.executeUpdate("Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}', assetTo=null, \
+                                                        assetToPort=null where assetToPort = :connector",[connector:this])
         }
     }
     
     def getFromConnectorCableMaps(){
-        AssetCableMap.findAllByFromConnectorNumber(this)
+        AssetCableMap.findAllByAssetFromPort(this)
     }
 	
 	String toString(){

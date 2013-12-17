@@ -1,6 +1,7 @@
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enums.domain.AssetCableStatus
 
 
 def modelInstancesList = Model.list([sort:'modelName',order:'asc'])
@@ -28,21 +29,18 @@ modelInstancesList.each { modelInstance ->
 				 println etext
         }
 		assetEntityList.each{ assetEntity ->
-			AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-							toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-							where toAsset = ${assetEntity.id}""")
-			AssetCableMap.executeUpdate("delete AssetCableMap where fromAsset = ${assetEntity.id}")
+			AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
+							assetToPort=null where assetTo = ${assetEntity.id}""")
+			AssetCableMap.executeUpdate("delete AssetCableMap where assetFrom = ${assetEntity.id}")
 			def assetCableMap = new AssetCableMap(
 													cable : "Cable"+powerConnector.connector,
-													fromAsset: assetEntity,
-													fromConnectorNumber : powerConnector,
-													status : powerConnector.status
+													assetFrom: assetEntity,
+													assetFromPort : powerConnector,
+													cableStatus : powerConnector.status
 													)
 			if(assetEntity?.rackTarget ){
-				assetCableMap.toAsset = assetEntity
-				assetCableMap.toAssetRack = assetEntity?.rackTarget?.tag
-				assetCableMap.toAssetUposition = 0
-				assetCableMap.toConnectorNumber = null
+				assetCableMap.assetTo = assetEntity
+				assetCableMap.assetToPort = null
 				assetCableMap.toPower = "A"
 			}
 			if ( !assetCableMap.validate() || !assetCableMap.save(flush: true) ) {
@@ -62,20 +60,18 @@ modelInstancesList.each { modelInstance ->
 		assetEntityList.each { assetEntity ->
 			def modelConnectors = ModelConnector.findAllByModel( modelInstance )
 			modelConnectors.each{connector->
-				def assetCableMap = AssetCableMap.findByFromAssetAndFromConnectorNumber( assetEntity, connector )
+				def assetCableMap = AssetCableMap.findByAssetFromAndAssetFromPort( assetEntity, connector )
 				if( !assetCableMap ){
 					assetCableMap = new AssetCableMap(
 														cable : "Cable"+connector.connector,
-														fromAsset: assetEntity,
-														fromConnectorNumber : connector,
-														status : connector.status
+														assetFrom: assetEntity,
+														assetFromPort : connector,
+														cableStatus : connector.status
 														)
 				}
 				if(assetEntity?.rackTarget && connector.type == "Power" && connector.label?.toLowerCase() == 'pwr1' && !assetCableMap.toPower){
-					assetCableMap.toAsset = assetEntity
-					assetCableMap.toAssetRack = assetEntity?.rackTarget?.tag
-					assetCableMap.toAssetUposition = 0
-					assetCableMap.toConnectorNumber = null
+					assetCableMap.assetTo = assetEntity
+					assetCableMap.assetToPort = null
 					assetCableMap.toPower = "A"
 				}
 				if ( !assetCableMap.validate() || !assetCableMap.save(flush: true) ) {
@@ -86,11 +82,10 @@ modelInstancesList.each { modelInstance ->
 			}
 			def assetCableMaps = AssetCableMap.findAllByFromAsset( assetEntity )
 			assetCableMaps.each{assetCableMap->
-				if(!modelConnectors.id?.contains(assetCableMap.fromConnectorNumber?.id)){
-					AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-												toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-												where toConnectorNumber = ${assetCableMap.fromConnectorNumber?.id}""")
-					AssetCableMap.executeUpdate("delete AssetCableMap where fromConnectorNumber = ${assetCableMap.fromConnectorNumber?.id}")
+				if(!modelConnectors.id?.contains(assetCableMap.assetFromPort?.id)){
+					AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
+												assetToPort=null where assetToPort = ${assetCableMap.assetFromPort?.id}""")
+					AssetCableMap.executeUpdate("delete AssetCableMap where assetFromPort = ${assetCableMap.assetFromPort?.id}")
 				}
 			}
 		}

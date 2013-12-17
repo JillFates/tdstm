@@ -218,7 +218,7 @@
 				<div id="actionDiv" style="margin-top: 5px;float: right;display: none;">
 					<input type="button" value="Ok" onclick="submitAction($('form[name=cablingDetailsForm]'))"/>
 					<input type="button" value="Cancel"  onclick="cancelAction()"/>
-					<g:select id="colorId" name="color" from="${AssetCableMap.constraints.color.inList}" noSelection="${['':'']}" onchange="updateCell(this.value)"></g:select>
+					<g:select id="colorId" name="color" from="${AssetCableMap.constraints.cableColor.inList}" noSelection="${['':'']}" onchange="updateCell(this.value)"></g:select>
 					<input type="reset" id="formReset" style="display: none;"/>
 				</div>
 				<div style="clear: both;"></div>
@@ -253,7 +253,7 @@
 							<th>Label</th>
 							<th>Status</th>
 							<th>Color</th>
-							<th>Rack/Upos/Conn</th>
+							<th>assetTo/Conn</th>
 						</tr>
 					</thead>
 					<tbody id="cablingTableBody">

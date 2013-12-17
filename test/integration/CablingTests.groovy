@@ -42,10 +42,10 @@ class CablingTests extends GrailsUnitTestCase {
      **********************************/
     void testAssetCableMapCreate() {
     	def assetCableMapInstance = new AssetCableMap( cable : "PowerEdge wire", 
-						    			fromAsset : AssetEntity.findById(10), 
-						    			toAsset : AssetEntity.findById(11),
-						    			fromConnectorNumber : 52,
-						    			toConnectorNumber : 25,
+						    			assetFrom : AssetEntity.findById(10), 
+						    			assetTo : AssetEntity.findById(11),
+						    			assetFromPort : 52,
+						    			assetToPort : 25,
 										state : 1 
 										)
     	if ( !assetCableMapInstance.validate() || !assetCableMapInstance.save() ) {

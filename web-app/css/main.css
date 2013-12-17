@@ -446,6 +446,9 @@ span.cellWithoutBackground
 .assetSelect{
 	width:135px;
 }
+.assetConnectSelect{
+	width:100px;
+}
 #viewGraphSpanId{
 	position:relative;
 	float: right !important;

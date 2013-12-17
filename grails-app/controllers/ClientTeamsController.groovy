@@ -10,6 +10,7 @@ import com.tds.asset.TaskDependency
 import com.tds.asset.AssetDependency
 import com.tdssrc.grails.GormUtil
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.TimeUtil
 
@@ -494,20 +495,28 @@ class ClientTeamsController {
 					   if(assetItem.model)
 						   modelConnectors = ModelConnector.findAllByModel( assetItem.model )
 						   
-					   def assetCableMapList = AssetCableMap.findAllByFromAsset( assetItem )
+					   def assetCableMapList = AssetCableMap.findAllByAssetFrom( assetItem )
+					   def currRoomRackAssets = []
+					   if(assetItem.roomSource){
+						   currRoomRackAssets = AssetEntity.findAllByRoomSourceAndSourceRack(assetItem.roomSource,assetItem.sourceRack)
+					   }else{
+						   currRoomRackAssets = AssetEntity.findAllByRoomTargetAndTargetRack(assetItem.roomTarget,assetItem.targetRack)
+					   }
+					   def dependencyStatus = AssetCableStatus.list
 					   def assetCablingDetails = []
 					   assetCableMapList.each {
 						   
-						   def rackUposition = it.toConnectorNumber ? it.toAssetRack+"/"+it.toAssetUposition+"/"+it.toConnectorNumber.label : ""
-						   if(it.fromConnectorNumber.type == "Power"){
-							   rackUposition = it.toPower ? it.toAssetRack+"/"+it.toAssetUposition+"/"+it.toPower : ""
+						   def connectorLabel = it.assetToPort ? it.assetToPort.label : ""
+						   if(it.assetFromPort.type == "Power"){
+							   connectorLabel = it.toPower ? it.toPower : ""
 						   }
-						   assetCablingDetails << [connector : it.fromConnectorNumber.connector, type:it.fromConnectorNumber.type,
-												   labelPosition:it.fromConnectorNumber.labelPosition, label:it.fromConnectorNumber.label,
-												   status:it.status,displayStatus:statusDetails[it.status], color:it.color ? it.color : "",
-												   connectorPosX:it.fromConnectorNumber.connectorPosX, connectorPosY:it.fromConnectorNumber.connectorPosY,
+						   assetCablingDetails << [connector : it.assetFromPort.connector, type:it.assetFromPort.type,
+												   labelPosition:it.assetFromPort.labelPosition, label:it.assetFromPort.label,
+												   status:it.cableStatus,displayStatus:it.cableStatus, color:it.cableColor ? it.cableColor : "",
+												   connectorPosX:it.assetFromPort.connectorPosX, connectorPosY:it.assetFromPort.connectorPosY,
 												   hasImageExist:assetItem.model.rearImage && assetItem.model?.useImage ? true : false,
-												   rackUposition : rackUposition ]
+												   rackUposition : connectorLabel, currRoomRackAssets:currRoomRackAssets-assetItem,
+												   dependencyStatus:dependencyStatus,fromAssetId :(it.assetTo? it.assetTo?.assetName+"/"+connectorLabel:'') ]
 					   }
 					   if (viewMode!='web'){
 					       render ( view:'assetSearch_m',model:[ projMap:projMap, assetComment:assetComment?assetComment :"", stateVal:stateVal, bundleId:bundleId,

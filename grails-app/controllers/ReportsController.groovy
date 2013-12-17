@@ -20,6 +20,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
@@ -984,32 +985,32 @@ class ReportsController {
             def moveBundleInstance = MoveBundle.findById(params.moveBundle)
             def reportFields = []
             def bundleName = "All Bundles"
-			def cablesQuery = new StringBuffer("from AssetCableMap acm where acm.fromAsset.project.id = $projectInstance.id ")
+			def cablesQuery = new StringBuffer("from AssetCableMap acm where acm.assetFrom.project.id = $projectInstance.id ")
             //if moveBundleinstance is selected (single moveBundle)
             if( moveBundleInstance ) {
                 bundleName = moveBundleInstance?.name
-                cablesQuery.append(" and acm.fromAsset.moveBundle = $moveBundleInstance.id ")
+                cablesQuery.append(" and acm.assetFrom.moveBundle = $moveBundleInstance.id ")
             }
             //All Bundles Selected
             else {
-            	cablesQuery.append(" and acm.fromAsset.moveBundle != null ")
+            	cablesQuery.append(" and acm.assetFrom.moveBundle != null ")
        		}
             if(cableType){
-            	cablesQuery.append(" and acm.fromConnectorNumber.type = '${cableType}' ")
+            	cablesQuery.append(" and acm.assetFromPort.type = '${cableType}' ")
             }
             
             
 			List assetCablesList = new ArrayList()
 			if(reportName == "cablingQA"){
-				cablesQuery.append(" order By acm.fromAsset ")
+				cablesQuery.append(" order By acm.assetFrom ")
 				assetCablesList = AssetCableMap.findAll( cablesQuery.toString() )
 			} else {
-				def conflictQuery = " and acm.toConnectorNumber is not null group by acm.toConnectorNumber having count(acm.toConnectorNumber) > 1"
+				def conflictQuery = " and acm.assetToPort is not null group by acm.assetToPort having count(acm.assetToPort) > 1"
 				def conflictList =  AssetCableMap.findAll( cablesQuery.toString() + conflictQuery )
 
-				def unknownList = AssetCableMap.findAll( cablesQuery.toString() + " and acm.status ='missing' " )
+				def unknownList = AssetCableMap.findAll( cablesQuery.toString() + " and acm.cableStatus ='${AssetCableStatus.UNKNOWN}' " )
 
-				def orphanedQuery = " and acm.toConnectorNumber is not null and acm.toConnectorNumber not in( select mc.id from ModelConnector mc )"
+				def orphanedQuery = " and acm.assetToPort is not null and acm.assetToPort not in( select mc.id from ModelConnector mc )"
 				def orphanedList = AssetCableMap.findAll( cablesQuery.toString() + orphanedQuery )
 
 				if(conflictList.size() > 0) assetCablesList.addAll(conflictList)
@@ -1024,23 +1025,23 @@ class ReportsController {
        		if( assetCablesList != null) {
        			assetCablesList.each { cable ->
        				def bundleInstance
-       				if(cable.fromAsset.moveBundle != null) {
-       					bundleInstance = MoveBundle.findById(cable.fromAsset.moveBundle.id)
+       				if(cable.assetFrom.moveBundle != null) {
+       					bundleInstance = MoveBundle.findById(cable.assetFrom.moveBundle.id)
        				}
        				
-       				reportFields <<['from_asset_name':cable.fromAsset.assetName,
-       								'from_asset_tag':cable.fromAsset.assetTag,
-									'cable_type': cable.fromConnectorNumber.type,
-									'from_rack':cable.fromAsset?.rackTarget?.tag,
-									'to_rack':cable.toAsset ? cable.toAsset?.rackTarget?.tag : "",
-									'from_upos':cable.fromAsset?.targetRackPosition,
-									'color':cable.color ? cable.color : "",
-									'to_upos':cable.toAssetUposition ? cable.toAssetUposition  : "" ,
-									'from_connector_label':cable.fromConnectorNumber.label,
-									'to_connector_label':cable.toConnectorNumber ? cable.toConnectorNumber.label : "",
-									'to_asset_tag': cable.toAsset ? cable.toAsset?.assetTag :"",
-									'to_asset_name':cable.toAsset ? cable.toAsset?.assetName :"",
-       				                "asset_id":cable.fromAsset?.id,
+       				reportFields <<['from_asset_name':cable.assetFrom.assetName,
+       								'from_asset_tag':cable.assetFrom.assetTag,
+									'cable_type': cable.assetFromPort.type,
+									'from_rack':cable.assetFrom?.rackTarget?.tag,
+									'to_rack':cable.assetTo ? cable.assetTo?.rackTarget?.tag : "",
+									'from_upos':cable.assetFrom?.targetRackPosition,
+									'color':cable.cableColor ? cable.cableColor : "",
+									'to_upos': "" ,
+									'from_connector_label':cable.assetFromPort.label,
+									'to_connector_label':cable.assetToPort ? cable.assetToPort.label : "",
+									'to_asset_tag': cable.assetTo ? cable.assetTo?.assetTag :"",
+									'to_asset_name':cable.assetTo ? cable.assetTo?.assetName :"",
+       				                "asset_id":cable.assetFrom?.id,
        				                'project_name':projectInstance?.name,
        				                'bundle_name':bundleInstance?.name,
        				                'report_type': reportName == 'cablingQA' ? "Cabling QA Report" : "Cabling Conflict Report",
@@ -1077,20 +1078,20 @@ class ReportsController {
         	def moveBundleInstance = MoveBundle.findById(params.moveBundle)
             def reportFields = []
             def bundleName = "All Bundles"
-			def cablesQuery = new StringBuffer("from AssetCableMap acm where acm.fromAsset.project.id = $projectInstance.id ")
+			def cablesQuery = new StringBuffer("from AssetCableMap acm where acm.assetFrom.project.id = $projectInstance.id ")
             //if moveBundleinstance is selected (single moveBundle)
             if( moveBundleInstance ) {
                 bundleName = moveBundleInstance?.name
-                cablesQuery.append(" and acm.fromAsset.moveBundle = $moveBundleInstance.id ")
+                cablesQuery.append(" and acm.assetFrom.moveBundle = $moveBundleInstance.id ")
             }
             //All Bundles Selected
             else {
-            	cablesQuery.append(" and acm.fromAsset.moveBundle != null ")
+            	cablesQuery.append(" and acm.assetFrom.moveBundle != null ")
        		}
             if(cableType){
-            	cablesQuery.append(" and acm.fromConnectorNumber.type = '${cableType}' ")
+            	cablesQuery.append(" and acm.assetFromPort.type = '${cableType}' ")
             }
-            cablesQuery.append(" order By acm.fromAsset ")
+            cablesQuery.append(" order By acm.assetFrom ")
 			def assetCablesList = AssetCableMap.findAll( cablesQuery.toString() )
 			try {
 				File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Cabling_Details.xls" ).getFile()
@@ -1110,18 +1111,17 @@ class ReportsController {
 				DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 				
 				for ( int r = 2; r <= assetCablesList.size(); r++ ) {
-					sheet.addCell( new Label( 0, r, String.valueOf(assetCablesList[r-2].fromConnectorNumber.type )) )
-					sheet.addCell( new Label( 1, r, String.valueOf(assetCablesList[r-2].fromAsset.assetName )) )
-					sheet.addCell( new Label( 2, r, String.valueOf(assetCablesList[r-2].fromAsset.assetTag )) )
-					sheet.addCell( new Label( 3, r, String.valueOf(assetCablesList[r-1].fromConnectorNumber.label )) )
-					sheet.addCell( new Label( 4, r, String.valueOf(assetCablesList[r-1].fromAsset?.rackTarget?.tag )) )
-					sheet.addCell( new Label( 5, r, String.valueOf(assetCablesList[r-1].fromAsset?.targetRackPosition )) )
-					sheet.addCell( new Label( 7, r, String.valueOf(assetCablesList[r-1].color ? assetCablesList[r-1].color : "" )) )
-					sheet.addCell( new Label( 8, r, String.valueOf(assetCablesList[r-1].toAsset ? assetCablesList[r-1].toAsset?.assetName :"" )) )
-					sheet.addCell( new Label( 9, r, String.valueOf(assetCablesList[r-1].toAsset ? assetCablesList[r-1].toAsset?.assetTag :"" )) )
-					sheet.addCell( new Label( 10, r, String.valueOf(assetCablesList[r-1].toConnectorNumber ? assetCablesList[r-1].toConnectorNumber?.label :"" )) )
-					sheet.addCell( new Label( 11, r, String.valueOf(assetCablesList[r-1].toAsset ? assetCablesList[r-1].toAsset?.rackTarget?.tag :"" )) )
-					sheet.addCell( new Label( 12, r, String.valueOf(assetCablesList[r-1].toAssetUposition ? assetCablesList[r-1].toAssetUposition :"" )) )
+					sheet.addCell( new Label( 0, r, String.valueOf(assetCablesList[r-2].assetFromPort.type )) )
+					sheet.addCell( new Label( 1, r, String.valueOf(assetCablesList[r-2].assetFrom.assetName )) )
+					sheet.addCell( new Label( 2, r, String.valueOf(assetCablesList[r-2].assetFrom.assetTag )) )
+					sheet.addCell( new Label( 3, r, String.valueOf(assetCablesList[r-1].assetFromPort.label )) )
+					sheet.addCell( new Label( 4, r, String.valueOf(assetCablesList[r-1].assetFrom?.rackTarget?.tag )) )
+					sheet.addCell( new Label( 5, r, String.valueOf(assetCablesList[r-1].assetFrom?.targetRackPosition )) )
+					sheet.addCell( new Label( 7, r, String.valueOf(assetCablesList[r-1].cableColor ? assetCablesList[r-1].cableColor : "" )) )
+					sheet.addCell( new Label( 8, r, String.valueOf(assetCablesList[r-1].assetTo ? assetCablesList[r-1].assetTo?.assetName :"" )) )
+					sheet.addCell( new Label( 9, r, String.valueOf(assetCablesList[r-1].assetTo ? assetCablesList[r-1].assetTo?.assetTag :"" )) )
+					sheet.addCell( new Label( 10, r, String.valueOf(assetCablesList[r-1].assetToPort ? assetCablesList[r-1].assetToPort?.label :"" )) )
+					sheet.addCell( new Label( 11, r, String.valueOf(assetCablesList[r-1].assetTo ? assetCablesList[r-1].assetTo?.rackTarget?.tag :"" )) )
 				}
 				
 				book.write()
@@ -1231,7 +1231,7 @@ class ReportsController {
 				def powerTBD = 0
 				def totalPower = 0
 				assets.each{ asset->
-					def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.fromConnectorNumber.type = ? AND cap.fromAsset = ?",["Power",asset])
+					def assetPowerCabling = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.assetFromPort.type = ? AND cap.assetFrom = ?",["Power",asset])
 					def powerConnectors = assetPowerCabling.findAll{it.toPower != null && it.toPower != '' }.size()
 					def powerDesign = asset.model?.powerDesign ? asset.model?.powerDesign : 0
 					totalPower += powerDesign

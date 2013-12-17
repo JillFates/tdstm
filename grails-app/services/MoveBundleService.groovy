@@ -19,6 +19,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
+import com.tdsops.tm.enums.domain.AssetCableStatus
 import grails.converters.JSON
 
 
@@ -273,10 +274,9 @@ class MoveBundleService {
 			AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar av where av.assetEntity in ($assetsQuery)")
 			AssetTransition.executeUpdate("delete from AssetTransition at where at.assetEntity in ($assetsQuery)")
 			ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset in ($assetsQuery)")
-			AssetCableMap.executeUpdate("delete AssetCableMap where fromAsset in ($assetsQuery)")
-			AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null, 
-				toConnectorNumber=null,toAssetRack=null,toAssetUposition=null 
-				where toAsset in ($assetsQuery)""")
+			AssetCableMap.executeUpdate("delete AssetCableMap where assetFrom in ($assetsQuery)")
+			AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null, 
+											assetToPort=null where assetTo in ($assetsQuery)""")
 			ProjectTeam.executeUpdate("Update ProjectTeam pt SET pt.latestAsset = null where pt.latestAsset in ($assetsQuery)")
 			
 			AssetEntity.executeUpdate("delete from AssetEntity ae where a.moveBundle = ${moveBundleInstance.id}")

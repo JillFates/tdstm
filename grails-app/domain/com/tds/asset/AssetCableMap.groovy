@@ -1,26 +1,26 @@
 package com.tds.asset
 class AssetCableMap {
 	String cable
-	AssetEntity fromAsset
-	AssetEntity toAsset
-	ModelConnector fromConnectorNumber
-	ModelConnector toConnectorNumber
-	String toAssetRack
-	Integer toAssetUposition
-	String status
-	String color
+	String cableComment
+	AssetEntity assetFrom
+	AssetEntity assetTo
+	ModelConnector assetFromPort
+	ModelConnector assetToPort
+	String cableStatus
+	String cableColor
+	Integer cableLength
 	String toPower
 	
 	static constraints = {
 		cable( nullable:false, blank:false )
-		fromAsset( nullable:false )
-		toAsset( nullable:true )
-		fromConnectorNumber( nullable:false )
-		toConnectorNumber( nullable:true )
-		toAssetRack( nullable:true, blank:true )
-		toAssetUposition( nullable:true )
-		status( nullable:false, blank:false, inList: ['missing','empty','cabled','cabledDetails'] )
-		color( nullable:true, blank:true, inList: ['White', 'Grey', 'Green', 'Yellow', 'Orange', 'Red', 'Blue', 'Purple', 'Black'] )
+		cableComment( nullable:true, blank:true )
+		assetFrom( nullable:false )
+		assetTo( nullable:true )
+		assetFromPort( nullable:false )
+		assetToPort( nullable:true )
+		cableStatus( nullable:false, blank:false)
+		cableColor( nullable:true, blank:true, inList: ['White', 'Grey', 'Green', 'Yellow', 'Orange', 'Red', 'Blue', 'Purple', 'Black'] )
+		cableLength( nullable:true )
 		toPower( nullable:true, blank:true)
 	}
 	
@@ -31,6 +31,6 @@ class AssetCableMap {
 	}
 
 	String toString() {
-		"${cable} : from ${fromAsset} to ${toAsset}"
+		"${cable} : from ${assetFrom} to ${assetTo}"
 	}
 }

@@ -119,55 +119,29 @@ function updateBladeEditForm(source,blade,position, bundleId){
  *******************************************************************************************************/
 var click = 1
 function openCablingDiv( assetId ){
-	$("#assetEntityId").val(assetId)
-	new Ajax.Request(contextPath+'/rackLayouts/getCablingDetails?assetId='+assetId,{asynchronous:true,evalScripts:true,onComplete:function(e){showCablingDetails(e);}})
+	new Ajax.Request(contextPath+'/rackLayouts/getCablingDetails?assetId='+assetId,{asynchronous:true,evalScripts:true,onComplete:function(e){showCablingDetails(e,assetId);}})
+}
+function showCablingDetails( e, assetId ){
+	$("#cablingDialogId").html(e.responseText);
 	$("#cablingDialogId").dialog( "option", "width", 400 )
 	$("#cablingDialogId").dialog("open")
+	$("#assetEntityId").val(assetId)
 }
-function showCablingDetails( e ){
-	$("#cablingPanel img").hide()
-	$("#cablingPanel div").hide()
-	$("#actionButtonsDiv").hide()
-	$("#assignFieldDiv").hide()
-	$("#actionDiv").hide()
-	var assetCablingDetails = eval('(' + e.responseText + ')');
-	var model = assetCablingDetails[0].model
-	var hasImageExist = assetCablingDetails[0].hasImageExist
-	if(!hasImageExist){
-		$("#cablingPanel").css("height",assetCablingDetails[0].usize*30+2)
-		$("#cablingPanel").css("background-color","LightGreen")
-	} else {
-		$("#rearImage"+model).show()
-		$("#cablingPanel").css("background-color","#FFF")
-	}
-	var details = ""
-	var tbodyDetails = ""
-	$("#cablingDialogId").dialog( "option", "title", assetCablingDetails[0].title );
-	for(i=0;i<assetCablingDetails.length;i++){
-		var assetCabling = assetCablingDetails[i]
-		var cssClass = "connector_"+assetCabling.labelPosition
-		details += "<div id='connector"+assetCabling.id+"' style='top: "+(assetCabling.connectorPosY / 2)+"px; left: "+assetCabling.connectorPosX+"px;'><a href='#'><div><img id='"+assetCabling.status+"' src='../i/cabling/"+assetCabling.status+".png' onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.id, '"+assetCabling.type+"')\"></div></a><div class='"+cssClass+"'><span>"+assetCabling.label+"</span></div></div>"
-		
-		tbodyDetails += "<tr id='connectorTr"+assetCabling.id+"'><td title="+assetCabling.status+" onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\">"+assetCabling.type+"</td><td title="+assetCabling.status+" onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\">"+assetCabling.label+"</td><td title="+assetCabling.status+" onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\">"+assetCabling.displayStatus+"</td>"
-
-		if(assetCabling.color != "" ){
-			tbodyDetails += "<td id='color_"+assetCabling.id+"' title="+assetCabling.status+" class='"+assetCabling.color+"' onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\">&nbsp;</td>"
-		} else {
-			tbodyDetails += "<td id='color_"+assetCabling.id+"' title="+assetCabling.status+" onclick=\"openActionButtonsDiv( "+assetCabling.id+", this.title, '"+assetCabling.type+"' )\">&nbsp;</td>"
-		}
-		if(assetCabling.toAssetId != null){
-				tbodyDetails += "<td id='connectorTd"+assetCabling.id+"'><a title='"+assetCabling.title+"' style='text-decoration: underline;color:blue;' href='javascript:openCablingDiv("+assetCabling.toAssetId+")'>"+assetCabling.rackUposition+"</a></td></tr>"
-		} else {
-			tbodyDetails += "<td id='connectorTd"+assetCabling.id+"'>"+assetCabling.rackUposition+"</td></tr>"
-		}
-	}
-	$("#cablingPanel").append(details)
-	if( tbodyDetails ){
-		$("#cablingTableBody").html( tbodyDetails )
-		$('div.connector_Left').each(function(index) {
-			$(this).attr("style","margin-left:-"+$(this).children().width()+"px");
+function assetModelConnectors(value){
+	if(value!='null'){
+		jQuery.ajax({
+			url:contextPath+'/rackLayouts/getAssetModelConnectors',
+			data: {'value':value,'type':$("#connectorTypeId").val()},
+			type:'POST',
+			success: function(data) {
+				$("#modelConnectorList").html(data)
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert("An unexpected error occurred while updating asset.")
+			}
 		});
-		
+	}else{
+		alert("Please Select an asset?")
 	}
 }
 function openActionButtonsDiv( cabledId, status, type ){
@@ -246,17 +220,15 @@ function submitAction(form){
 		
 		if($("#connectorTypeId").val() != 'Power'){
 
-			var rack = $("#rackId").val()
-			var uposition = $("#upositionId").val()
-			var connector = $("#connectorId").val()
-			
-			if( !rack || !uposition || !connector){
+			var assetFrom = $("#assetFromId").val()
+			var modelConnectorId = $("#modelConnectorId").val()
+			if( assetFrom=='null' || modelConnectorId=='null' ){
 				isValid = false
 				alert("Please enter the target connector details")
 			} else {
-				if($(".field_error").length){
+				if($("#cableComment").val()==''){
 					isValid = false
-					alert("Error with target connector details")
+					alert("Please enter the cable Comment details")
 				}
 			}
 		} else {

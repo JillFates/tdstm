@@ -15,6 +15,7 @@ import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.ValidationType
+import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
 
@@ -290,10 +291,9 @@ class AssetEntityService {
 		ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset = :asset",[asset:assetEntity])
 		AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = :asset",[asset:assetEntity])
 		ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = :asset",[asset:assetEntity])
-		AssetCableMap.executeUpdate("delete AssetCableMap where fromAsset = :asset",[asset:assetEntity])
-		AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-											toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-											where toAsset = :asset""",[asset:assetEntity])
+		AssetCableMap.executeUpdate("delete AssetCableMap where assetFrom = :asset",[asset:assetEntity])
+		AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
+											assetToPort=null where assetTo = :asset""",[asset:assetEntity])
 		AssetDependency.executeUpdate("delete AssetDependency where asset = :asset or dependent = :dependent ",[asset:assetEntity, dependent:assetEntity])
 		AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = :asset",[asset:assetEntity])
 	}
@@ -481,17 +481,16 @@ class AssetEntityService {
 	 */
 	def updateAssetsCabling( modelAssetsList, existingAssetsList ){
 		modelAssetsList.each{ assetEntity->
-			AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-				toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-				where toAsset = ? """,[assetEntity])
+			AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
+				assetToPort=null where assetTo = ? """,[assetEntity])
 			
-			AssetCableMap.executeUpdate("delete from AssetCableMap where fromAsset = ?",[assetEntity])
+			AssetCableMap.executeUpdate("delete from AssetCableMap where assetFrom = ?",[assetEntity])
 			assetEntityAttributeLoaderService.createModelConnectors( assetEntity )
 		}
-		existingAssetsList.each{ assetEntity->
+		/*existingAssetsList.each{ assetEntity->
 			AssetCableMap.executeUpdate("""Update AssetCableMap set toAssetRack='${assetEntity.targetRack}',
-					toAssetUposition=${assetEntity.targetRackPosition} where toAsset = ? """,[assetEntity])
-		}
+					toAssetUposition=${assetEntity.targetRackPosition} where assetTo = ? """,[assetEntity])
+		}*/
 	}
 
 }

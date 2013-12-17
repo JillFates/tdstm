@@ -3,6 +3,7 @@ import grails.converters.JSON
 import org.apache.shiro.SecurityUtils
 
 import com.tds.asset.AssetCableMap
+import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
@@ -443,11 +444,10 @@ class WalkThroughController {
 			assetEntity.properties = params
 			if(!assetEntity.hasErrors() && assetEntity.save() ) {
 				if(existingModelId != assetEntity.model?.id){
-            		AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-													toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-													where toAsset = ? """,[assetEntity])
+            		AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
+													assetToPort=null where assetTo = ? """,[assetEntity])
 
-            		AssetCableMap.executeUpdate("delete from AssetCableMap where fromAsset = ?",[assetEntity])
+            		AssetCableMap.executeUpdate("delete from AssetCableMap where assetFrom = ?",[assetEntity])
             		assetEntityAttributeLoaderService.createModelConnectors( assetEntity )
             	}
 				

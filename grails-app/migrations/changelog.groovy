@@ -63,5 +63,6 @@ databaseChangeLog = {
     include file: '20131004-size-scale-rateOfChange-properties-into-AssetEntity.groovy'
 	include file: '20131014-delete-orphan-records-room-rack.groovy'
 	include file: '20131018-fix-party-version-tempForUpdate.groovy'
+	include file: '20131211-asset-cable-map-rebuild.groovy'
     
 }

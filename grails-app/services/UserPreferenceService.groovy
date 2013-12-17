@@ -13,6 +13,7 @@ import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tds.asset.AssetDependencyBundle
+import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tds.asset.FieldImportance
 
 class UserPreferenceService  {
@@ -307,10 +308,9 @@ class UserPreferenceService  {
 			AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar av where av.assetEntity in ($assetsQuery)")
 			AssetTransition.executeUpdate("delete from AssetTransition at where at.assetEntity in ($assetsQuery)")
 			ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.project = ${projectInstance.id}")
-			AssetCableMap.executeUpdate("delete AssetCableMap where fromAsset in ($assetsQuery)")
-			AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-											toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-											where toAsset in ($assetsQuery)""")
+			AssetCableMap.executeUpdate("delete AssetCableMap where assetFrom in ($assetsQuery)")
+			AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
+											assetToPort=null where assetTo in ($assetsQuery)""")
 			ProjectTeam.executeUpdate("Update ProjectTeam pt SET pt.latestAsset = null where pt.latestAsset in ($assetsQuery)")
 			
 			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.project = ${projectInstance.id}")

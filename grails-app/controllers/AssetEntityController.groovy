@@ -35,6 +35,7 @@ import com.tds.asset.FieldImportance
 import com.tds.asset.Files
 import com.tds.asset.TaskDependency
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.EntityType
 import com.tdsops.tm.enums.domain.ValidationType
@@ -1955,18 +1956,18 @@ class AssetEntityController {
 						}
 					}
 					if(existingModelId != assetEntityInstance.model?.id){
-						AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-														toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-														where toAsset = ? """,[assetEntityInstance])
+						AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
+														assetToPort=null where assetTo = ? """,[assetEntityInstance])
 
-						AssetCableMap.executeUpdate("delete from AssetCableMap where fromAsset = ?",[assetEntityInstance])
+						AssetCableMap.executeUpdate("delete from AssetCableMap where assetFrom = ?",[assetEntityInstance])
 						assetEntityAttributeLoaderService.createModelConnectors( assetEntityInstance )
 					}
-					if(existingTargetRack != assetEntityInstance.targetRack || existingUposition != assetEntityInstance.targetRackPosition){
+					//we are no more using toAssetRack and toAssetUposition in assetCableMap
+					/*if(existingTargetRack != assetEntityInstance.targetRack || existingUposition != assetEntityInstance.targetRackPosition){
 
 						AssetCableMap.executeUpdate("""Update AssetCableMap set toAssetRack='${assetEntityInstance.targetRack}',
-	            				toAssetUposition=${assetEntityInstance.targetRackPosition} where toAsset = ? """,[assetEntityInstance])
-					}
+	            				toAssetUposition=${assetEntityInstance.targetRackPosition} where assetTo = ? """,[assetEntityInstance])
+					}*/
 				} else {
 					def etext = "Unable to Update Asset" +
 							GormUtil.allErrorsString( assetEntityInstance )

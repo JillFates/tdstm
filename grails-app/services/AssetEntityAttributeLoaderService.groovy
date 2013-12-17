@@ -14,6 +14,7 @@ import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.eav.EavEntityAttribute
 import com.tdssrc.eav.EavEntityType
 import com.tdsops.tm.enums.domain.SizeScale
+import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.DateUtil
 import com.tdssrc.grails.GormUtil
 
@@ -553,15 +554,13 @@ class AssetEntityAttributeLoaderService {
 			assetConnectors.each{
 				def assetCableMap = new AssetCableMap(
 					cable : "Cable"+it.connector,
-					fromAsset: assetEntity,
-					fromConnectorNumber : it,
-					status : it.status
+					assetFrom: assetEntity,
+					assetFromPort : it,
+					cableStatus : it.status
 				)
 				if(assetEntity?.rackTarget && it.type == "Power" && it.label?.toLowerCase() == 'pwr1'){
-					assetCableMap.toAsset = assetEntity
-					assetCableMap.toAssetRack = assetEntity?.rackTarget?.tag
-					assetCableMap.toAssetUposition = 0
-					assetCableMap.toConnectorNumber = null
+					assetCableMap.assetTo = assetEntity
+					assetCableMap.assetToPort = null
 					assetCableMap.toPower = "A"
 				}
 				if ( !assetCableMap.validate() || !assetCableMap.save() ) {
@@ -581,25 +580,22 @@ class AssetEntityAttributeLoaderService {
 	 def updateModelConnectors( assetEntity ){
 		if(assetEntity.model){
 			// Set to connectors to blank if associated 
-			AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-				toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-				where toAsset = ? """,[assetEntity])
+			AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
+				assetToPort=null where assetTo = ? """,[assetEntity])
 			// Delete AssetCableMap for this asset
-			AssetCableMap.executeUpdate("delete from AssetCableMap where fromAsset = ?",[assetEntity])
+			AssetCableMap.executeUpdate("delete from AssetCableMap where assetFrom = ?",[assetEntity])
 			// Create new connectors 
 			def assetConnectors = ModelConnector.findAllByModel( assetEntity.model )
 			assetConnectors.each{
 				def assetCableMap = new AssetCableMap(
 					cable : "Cable"+it.connector,
-					fromAsset: assetEntity,
-					fromConnectorNumber : it,
-					status : it.status
+					assetFrom: assetEntity,
+					assetFromPort : it,
+					cableStatus : it.status
 				)
 				if(assetEntity?.rackTarget && it.type == "Power" && it.label?.toLowerCase() == 'pwr1'){
-					assetCableMap.toAsset = assetEntity
-					assetCableMap.toAssetRack = assetEntity?.rackTarget?.tag
-					assetCableMap.toAssetUposition = 0
-					assetCableMap.toConnectorNumber = null
+					assetCableMap.assetTo = assetEntity
+					assetCableMap.assetToPort = null
 					assetCableMap.toPower = "A"
 				}
 				if ( !assetCableMap.validate() || !assetCableMap.save() ) {

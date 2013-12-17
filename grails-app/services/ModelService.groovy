@@ -2,6 +2,7 @@ import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 
 import com.tds.asset.AssetCableMap
+import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tds.asset.AssetEntity
 import com.tdsops.common.sql.SqlUtil
 
@@ -39,10 +40,9 @@ class ModelService {
 		}
 		
 		// Delete model associated record
-		AssetCableMap.executeUpdate("delete AssetCableMap where fromConnectorNumber in (from ModelConnector where model = ${fromModel.id})")
-		AssetCableMap.executeUpdate("""Update AssetCableMap set status='missing',toAsset=null,
-												toConnectorNumber=null,toAssetRack=null,toAssetUposition=null
-												where toConnectorNumber in (from ModelConnector where model = ${fromModel.id})""")
+		AssetCableMap.executeUpdate("delete AssetCableMap where assetFromPort in (from ModelConnector where model = ${fromModel.id})")
+		AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
+												assetToPort=null where assetToPort in (from ModelConnector where model = ${fromModel.id})""")
 		ModelConnector.executeUpdate("delete ModelConnector where model = ?",[fromModel])
 		
 		
