@@ -42,7 +42,7 @@ $(document).ready(function() {
 </head>
 <body>
 	<div class="body">
-		<div style="width: 1330px !important;">
+		<div>
 		    <g:set var="percentageAppToValidate" value="${applicationCount ? Math.round((appToValidate/applicationCount)*100) :100}" />
 		    <g:set var="percentagePSToValidate" value="${physicalCount ? Math.round((psToValidate/physicalCount)*100) :100}" />
 		    <g:set var="percentageVMToValidate" value="${virtualCount ? Math.round((vsToValidate/virtualCount)*100) :100}" />
