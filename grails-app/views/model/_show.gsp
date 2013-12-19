@@ -163,7 +163,7 @@
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 				<div id="connector${i}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">
 					<div>
-					<img src="../../i/cabling/${modelConnector.status}.png"/>
+					<img src="${resource(dir:'i/cabling',file:modelConnector.status+'.png')}"/>
 					</div>
 					<div class="connector_${modelConnector.labelPosition}">
 					<span>${modelConnector.label}</span>
