@@ -11,7 +11,8 @@
 	$('div.connector_Left').each(function(index) {
 		$(this).attr("style","margin-left:-"+$(this).children().width()+"px");
 	}); 
-	$("select.assetConnectSelect").select2();
+	if(!isIE7OrLesser)
+		$("select.assetConnectSelect").select2();
 </script>
 	<div id="cablingPanel" style="height: auto; ">
 	<g:if test="${assetCablingDetails}">
@@ -91,10 +92,16 @@
 			</g:if>
 			<g:else>
 				<g:each in="${assetCablingDetails}" var="assetCabling">
-					<tr id='connectorTr"+assetCabling.id+"'>
-					<td title="${assetCabling.status}" onclick="openActionButtonsDiv( '${assetCabling.id}', this.title, '${assetCabling.type}' )">${assetCabling.type}</td>
-					<td title="${assetCabling.status}" onclick="openActionButtonsDiv( '${assetCabling.id}', this.title, '${assetCabling.type}' )">${assetCabling.label}</td>
-					<td title="${assetCabling.status}" onclick="openActionButtonsDiv( '${assetCabling.id}', this.title, '${assetCabling.type}' )">${assetCabling.displayStatus}</td>
+					<tr id='connectorTr${assetCabling.id}'>
+					<td title="${assetCabling.status}" onclick="openActionButtonsDiv( '${assetCabling.id}', this.title, '${assetCabling.type}' , '${assetCabling.toAssetId}')">
+						${assetCabling.type}
+						<input type="hidden" id="comment_${assetCabling.id}" value="${assetCabling.comment}"/>
+						<input type="hidden" id="status_${assetCabling.id}" value="${assetCabling.status}"/>
+						<input type="hidden" id="asset_${assetCabling.id}" value="${assetCabling.toAssetId}"/>
+						<input type="hidden" id="toport_${assetCabling.id}" value="${assetCabling.toAssetPortId}"/>
+					</td>
+					<td title="${assetCabling.status}" onclick="openActionButtonsDiv( '${assetCabling.id}', this.title, '${assetCabling.type}' , '${assetCabling.toAssetId}')">${assetCabling.label}</td>
+					<td title="${assetCabling.status}" onclick="openActionButtonsDiv( '${assetCabling.id}', this.title, '${assetCabling.type}' , '${assetCabling.toAssetId}')">${assetCabling.displayStatus}</td>
 		
 					<g:if test="${assetCabling.color != ''}">
 						<td id='color_${assetCabling.id}' title="${assetCabling.status}" class="${assetCabling.color}" onclick="openActionButtonsDiv( '${assetCabling.id}', this.title, '${assetCabling.type}' )">&nbsp;</td>
@@ -108,7 +115,10 @@
 						</tr>
 					</g:if> 
 					<g:else>
-						<td id='connectorTd${assetCabling.id}'>${assetCabling.fromAssetId}</td>
+						<td id='connectorTd${assetCabling.id}'>
+						<input type="hidden" id="power_${assetCabling.id}" value="${assetCabling.rackUposition}"/>
+							${assetCabling.fromAssetId}
+						</td>
 						</tr>
 					</g:else>
 				</g:each>

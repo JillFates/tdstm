@@ -652,7 +652,7 @@ class RackLayoutsController {
 		def title =  ""
 		if( assetEntity ){
 			assetCableMapList = AssetCableMap.findAllByAssetFrom( assetEntity )
-			title = assetEntity.assetName+" ( "+assetEntity.model.manufacturer+" / "+assetEntity.model+" )"
+			title = assetEntity.assetName+" ( "+assetEntity?.model?.manufacturer+" / "+assetEntity.model+" )"
 		}
 		def currRoomRackAssets = []
 		if(assetEntity.roomSource){
@@ -670,14 +670,15 @@ class RackLayoutsController {
 				connectorLabel = it.toPower ? it.toPower : ""
 			} else if(it.assetTo){
 				toAssetId = it.assetTo.id
-				toTitle = it.assetTo.assetName+" ( "+it.assetTo.model.manufacturer+" / "+it.assetTo.model+" )"
+				toTitle = it.assetTo.assetName+" ( "+it.assetTo.model?.manufacturer+" / "+it.assetTo.model+" )"
 			}
-			assetCablingDetails << [model:assetEntity.model.id, id:it.id, connector : it.assetFromPort.connector, 
+			assetCablingDetails << [model:assetEntity.model?.id, id:it.id, connector : it.assetFromPort.connector, 
 									type:it.assetFromPort.type, connectorPosX:it.assetFromPort.connectorPosX,
 									labelPosition:it.assetFromPort.labelPosition, color : it.cableColor ? it.cableColor : "",
-									connectorPosY:it.assetFromPort.connectorPosY, status:it.cableStatus,displayStatus:it.cableStatus, 
-									label:it.assetFromPort.label, hasImageExist:assetEntity.model.rearImage && assetEntity.model?.useImage ? true : false,
-									usize:assetEntity?.model?.usize, rackUposition : connectorLabel, toAssetId : toAssetId, fromAssetId :(it.assetTo? it.assetTo?.assetName+"/"+connectorLabel:''), toTitle:toTitle, title:title]
+									connectorPosY:it.assetFromPort.connectorPosY, status:it.cableStatus,displayStatus:it.cableStatus, comment:it.cableComment?:'',
+									label:it.assetFromPort.label, hasImageExist:assetEntity.model?.rearImage && assetEntity.model?.useImage ? true : false,
+									usize:assetEntity?.model?.usize, rackUposition : connectorLabel, toAssetId : toAssetId, toAssetPortId: it.assetToPort?.id,
+									fromAssetId :(it.assetTo? it.assetTo?.assetName+"/"+connectorLabel:''), toTitle:toTitle, title:title]
 		}
 		render(template:"cabling", model:[assetCablingDetails:assetCablingDetails, currentBundle:currentBundle, 
 										  models:models, currRoomRackAssets:currRoomRackAssets-assetEntity, 
@@ -706,7 +707,7 @@ class RackLayoutsController {
 			def projectId = currProj.CURR_PROJ
 			def project = Project.get( projectId )
 			def actionType = params.actionType
-			def status = params.status?: "UnKnown"
+			def status = params.status?: AssetCableStatus.UNKNOWN
 			def toConnector
 			def assetTo
 			def toPower
@@ -721,8 +722,8 @@ class RackLayoutsController {
 			}
 			}
 			switch(actionType){
-				case "emptyId" : status = "empty" ; break;
-				case "cabledId" : status = "cabled"; break;
+				case "emptyId" : status = AssetCableStatus.EMPTY ; break;
+				case "cabledId" : status = AssetCableStatus.CABLED ; break;
 				case "assignId" : 
 					if(connectorType != "Power"){
 						/*def rack = Rack.findWhere(tag:toAssetRack,source:0,project:project)
@@ -745,7 +746,7 @@ class RackLayoutsController {
 			}
 			sessionFactory.getCurrentSession().flush();
 	    	sessionFactory.getCurrentSession().clear();
-			assetCableMap.cableStatus = params.status
+			assetCableMap.cableStatus = status
 			assetCableMap.assetTo = assetTo
 			assetCableMap.assetToPort = toConnector
 			assetCableMap.toPower = toPower
@@ -754,7 +755,7 @@ class RackLayoutsController {
 			if(assetCableMap.save(flush:true)){
 				if(assetTo && connectorType != "Power"){
 					def toAssetCableMap = AssetCableMap.findByAssetFromAndAssetFromPort( assetTo, toConnector )
-					toAssetCableMap.cableStatus = params.status
+					toAssetCableMap.cableStatus = status
 					toAssetCableMap.assetTo = assetCableMap.assetFrom
 					toAssetCableMap.assetToPort = assetCableMap.assetFromPort
 					toAssetCableMap.cableColor = params.color

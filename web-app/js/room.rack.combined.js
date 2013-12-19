@@ -144,7 +144,12 @@ function assetModelConnectors(value){
 		alert("Please Select an asset?")
 	}
 }
-function openActionButtonsDiv( cabledId, status, type ){
+function openActionButtonsDiv( cabledId, status, type , toAssetId){
+	if(toAssetId){
+		$('#assetFromId option[value="'+toAssetId+'"]').attr('selected','selected');
+		if(!isIE7OrLesser)
+			$("select.assetConnectSelect").select2()
+	}
 	$('#formReset').click()
 	$("#cabledTypeId").val(cabledId)
 	$("#connectorTypeId").val(type)
@@ -153,10 +158,10 @@ function openActionButtonsDiv( cabledId, status, type ){
 	$("#assignFieldDiv").hide()
 	$("#actionDiv").hide()
 	switch(status){
-		case "missing":
+		case "Unknown":
 			$("#unknownId").css("background-color", "#5F9FCF")
 			break;
-		case "cabledDetails":
+		case "Assigned":
 			$("#assignId").css("background-color", "#5F9FCF")
 			var cabledDetails = $("#connectorTd"+cabledId).html()
 			if($("#connectorTypeId").val() !='Power'){
@@ -170,10 +175,10 @@ function openActionButtonsDiv( cabledId, status, type ){
 			$("#staticConnector_"+presetValue).attr("checked",true)
 			openActionDiv( 'assignId' )
 			break;
-		case "cabled":
+		case "Cabled":
 			$("#cabledId").css("background-color", "#5F9FCF")
 			break;
-		case "empty":
+		case "Empty":
 			$("#emptyId").css("background-color", "#5F9FCF")
 			break;
 	}
@@ -187,14 +192,24 @@ function openActionDiv( id ){
 	$("#cabledId").css("background-color","")
 	$("#assignId").css("background-color","")
 	$("#"+id).css("background-color","#5F9FCF");
+	var connectId=$("#cabledTypeId").val();
 	if(id == "assignId"){
 		$("#assignFieldDiv").show()
 		if($("#connectorTypeId").val()=='Power'){
 			$("#inputDiv").hide()
-			$("#powerDiv").show()
+			$("#powerDiv").show();
+			$("#staticConnector_"+$('#power_'+connectId).val()).attr('checked', true);
 		} else {
-			$("#inputDiv").show()
-			$("#powerDiv").hide()
+			$("#inputDiv").show();
+			$('#status option[value="'+$('#status_'+connectId).val()+'"]').attr('selected','selected');
+			$("#cableComment").val($('#comment_'+connectId).val());
+			if($('#asset_'+connectId).val())
+				assetModelConnectors($('#asset_'+connectId).val());
+			
+			setTimeout(function(){
+				$('#modelConnectorId').val($('#toport_'+connectId).val());
+			},500);
+			$("#powerDiv").hide();
 		}			
 	} else {
 		$("#assignFieldDiv").hide()
@@ -225,12 +240,7 @@ function submitAction(form){
 			if( assetFrom=='null' || modelConnectorId=='null' ){
 				isValid = false
 				alert("Please enter the target connector details")
-			} else {
-				if($("#cableComment").val()==''){
-					isValid = false
-					alert("Please enter the cable Comment details")
-				}
-			}
+			} 
 		} else {
 			var staticConn = $("input:radio[name=staticConnector]:checked").val()
 			if( !staticConn ){
