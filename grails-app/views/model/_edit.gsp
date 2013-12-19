@@ -3,6 +3,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Model - Edit</title>
     <g:javascript src="model.manufacturer.js" />
+    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
 <g:javascript src="drag_drop.js" />
 <script src="${resource(dir:'js',file:'jquery.form.js')}"></script>
   </head>
@@ -241,7 +242,7 @@
 			<g:else>
 				<script type="text/javascript">
 					var usize = "${modelInstance.usize}"
-					$("#cablingPanelEdit").css("height",usize*30)
+					$("#cablingPanelEdit").css("height",usize*30+'px')
 				</script>
 			</g:else>
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">

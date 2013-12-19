@@ -4,7 +4,6 @@
 		<meta name="layout" content="projectHeader" />
 		<title>Model List</title>
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 			
 		<g:javascript src="model.manufacturer.js" />
