@@ -128,6 +128,7 @@ function showCablingDetails( e, assetId ){
 	$("#assetEntityId").val(assetId)
 }
 function assetModelConnectors(value){
+	var connectId=$("#cabledTypeId").val();
 	if(value!='null'){
 		jQuery.ajax({
 			url:contextPath+'/rackLayouts/getAssetModelConnectors',
@@ -135,6 +136,9 @@ function assetModelConnectors(value){
 			type:'POST',
 			success: function(data) {
 				$("#modelConnectorList").html(data)
+				if($('#toport_'+connectId).val()){
+					$('#modelConnectorId option[value="'+$('#toport_'+connectId).val()+'"]').attr('selected','selected');
+				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				alert("An unexpected error occurred while updating asset.")
@@ -206,9 +210,6 @@ function openActionDiv( id ){
 			if($('#asset_'+connectId).val())
 				assetModelConnectors($('#asset_'+connectId).val());
 			
-			setTimeout(function(){
-				$('#modelConnectorId').val($('#toport_'+connectId).val());
-			},500);
 			$("#powerDiv").hide();
 		}			
 	} else {
