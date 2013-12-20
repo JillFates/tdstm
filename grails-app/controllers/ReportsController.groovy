@@ -1112,16 +1112,26 @@ class ReportsController {
 				
 				for ( int r = 2; r <= assetCablesList.size(); r++ ) {
 					sheet.addCell( new Label( 0, r, String.valueOf(assetCablesList[r-2].assetFromPort.type )) )
-					sheet.addCell( new Label( 1, r, String.valueOf(assetCablesList[r-2].assetFrom.assetName )) )
-					sheet.addCell( new Label( 2, r, String.valueOf(assetCablesList[r-2].assetFrom.assetTag )) )
-					sheet.addCell( new Label( 3, r, String.valueOf(assetCablesList[r-1].assetFromPort.label )) )
-					sheet.addCell( new Label( 4, r, String.valueOf(assetCablesList[r-1].assetFrom?.rackTarget?.tag )) )
-					sheet.addCell( new Label( 5, r, String.valueOf(assetCablesList[r-1].assetFrom?.targetRackPosition )) )
-					sheet.addCell( new Label( 7, r, String.valueOf(assetCablesList[r-1].cableColor ? assetCablesList[r-1].cableColor : "" )) )
-					sheet.addCell( new Label( 8, r, String.valueOf(assetCablesList[r-1].assetTo ? assetCablesList[r-1].assetTo?.assetName :"" )) )
-					sheet.addCell( new Label( 9, r, String.valueOf(assetCablesList[r-1].assetTo ? assetCablesList[r-1].assetTo?.assetTag :"" )) )
-					sheet.addCell( new Label( 10, r, String.valueOf(assetCablesList[r-1].assetToPort ? assetCablesList[r-1].assetToPort?.label :"" )) )
-					sheet.addCell( new Label( 11, r, String.valueOf(assetCablesList[r-1].assetTo ? assetCablesList[r-1].assetTo?.rackTarget?.tag :"" )) )
+					sheet.addCell( new Label( 1, r, String.valueOf(assetCablesList[r-2].assetFrom ? assetCablesList[r-2].assetFrom?.id : "" )) )
+					sheet.addCell( new Label( 2, r, String.valueOf(assetCablesList[r-2].assetFrom ? assetCablesList[r-2].assetFrom.assetName : "" )) )
+					sheet.addCell( new Label( 3, r, String.valueOf(assetCablesList[r-2].assetFromPort.label )) )
+					sheet.addCell( new Label( 4, r, String.valueOf(assetCablesList[r-2].assetTo ? assetCablesList[r-2].assetTo?.id : "" )) )
+					sheet.addCell( new Label( 5, r, String.valueOf(assetCablesList[r-2].assetTo ? assetCablesList[r-2].assetTo?.assetName :"" )) )
+					if(assetCablesList[r-2].assetFromPort.type !='Power'){
+						sheet.addCell( new Label( 6, r, String.valueOf(assetCablesList[r-2].assetToPort ? assetCablesList[r-2].assetToPort?.label :"" )) )
+					}else{
+						sheet.addCell( new Label( 6, r, String.valueOf(assetCablesList[r-2].toPower?:"" )) )
+					}
+					sheet.addCell( new Label( 7, r, String.valueOf(assetCablesList[r-2].cableComment?:"" )) )
+					sheet.addCell( new Label( 8, r, String.valueOf(assetCablesList[r-2].cableColor?:"" )) )
+					if(assetCablesList[r-2].assetFrom.sourceRoom){
+						sheet.addCell( new Label( 9, r, String.valueOf(assetCablesList[r-2].assetFrom?.sourceLocation+"/"+assetCablesList[r-2].assetFrom?.sourceRoom+"/"+assetCablesList[r-2].assetFrom?.sourceRack )) )
+					}else if(assetCablesList[r-2].assetFrom.targetRoom){
+						sheet.addCell( new Label( 9, r, String.valueOf(assetCablesList[r-2].assetFrom?.targetLocation+"/"+assetCablesList[r-2].assetFrom?.targetRoom+"/"+assetCablesList[r-2].assetFrom?.targetRack )) )
+					}else{
+						sheet.addCell( new Label( 9, r, '') )
+					}
+					sheet.addCell( new Label( 10, r, String.valueOf(assetCablesList[r-2].cableStatus?:"" )) )
 				}
 				
 				book.write()
