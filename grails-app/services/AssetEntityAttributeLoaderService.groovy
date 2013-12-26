@@ -793,6 +793,7 @@ class AssetEntityAttributeLoaderService {
 			saved = asset.validate() && asset.save(flush:true)
 			if (saved) {
 				insertCount++
+				assetList << asset.id // Once asset saved to DB it will provide ID for that.
 				log.debug "saveAssetChanges() saved new asset id:$asset.id, insertCount:$insertCount"
 			}
 		}
