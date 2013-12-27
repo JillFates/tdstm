@@ -123,9 +123,14 @@ function openCablingDiv( assetId ){
 }
 function showCablingDetails( e, assetId ){
 	$("#cablingDialogId").html(e.responseText);
-	$("#cablingDialogId").dialog( "option", "width", 400 )
+	$("#cablingDialogId").dialog( "option", "width", "auto" )
 	$("#cablingDialogId").dialog("open")
 	$("#assetEntityId").val(assetId)
+	setTimeout(function(){
+		$.getScript( "../js/angular.min.js" )
+		$.getScript( "../js/xeditable.js" )
+		$("#cableTable").show();
+	},100);
 }
 function assetModelConnectors(value){
 	var connectId=$("#cabledTypeId").val();

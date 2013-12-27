@@ -662,6 +662,7 @@ class RackLayoutsController {
 		}
 		def dependencyStatus = AssetCableStatus.list
 		def assetCablingDetails = []
+		def assetCablingMap =[:]
 		assetCableMapList.each {
 			def connectorLabel = it.assetToPort ? it.assetToPort.label : ""
 			def toAssetId
@@ -679,8 +680,11 @@ class RackLayoutsController {
 									label:it.assetFromPort.label, hasImageExist:assetEntity.model?.rearImage && assetEntity.model?.useImage ? true : false,
 									usize:assetEntity?.model?.usize, rackUposition : connectorLabel, toAssetId : toAssetId, toAssetPortId: it.assetToPort?.id,
 									fromAssetId :(it.assetTo? it.assetTo?.assetName+"/"+connectorLabel:''), toTitle:toTitle, title:title]
-		}
-		render(template:"cabling", model:[assetCablingDetails:assetCablingDetails, currentBundle:currentBundle, 
+			
+			assetCablingMap <<[(it.id):[label : it.assetFromPort.label, color : it.cableColor ?: "", type:it.assetFromPort.type, length:it.cableLength?:'',
+									status:it.cableStatus,comment:it.cableComment?:'', fromAssetId :(it.assetTo? it.assetTo?.assetName+"/"+connectorLabel:''), toTitle:toTitle, title:title]]
+			}
+		render(template:"cabling", model:[assetCablingDetails:assetCablingDetails, currentBundle:currentBundle, assetCablingMap:(assetCablingMap as JSON) ,
 										  models:models, currRoomRackAssets:currRoomRackAssets-assetEntity, 
 										  dependencyStatus: dependencyStatus ])
 	}
@@ -1015,5 +1019,10 @@ class RackLayoutsController {
 		def data = ['rackIds':racks.id,'data':resultMap]
 		render  data as JSON
 	}
+	def demo ={
 		
+	}
+	def demo11 = {
+		
+	}
 }
