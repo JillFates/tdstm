@@ -9,6 +9,7 @@ import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.GormUtil
+import org.apache.commons.lang.math.NumberUtils
 
 class RackLayoutsController {
 	def userPreferenceService
@@ -663,6 +664,8 @@ class RackLayoutsController {
 		def dependencyStatus = AssetCableStatus.list
 		def assetCablingDetails = []
 		def assetCablingMap =[:]
+		def modelConnectorMap =[:]
+		def assetRows =[:]
 		assetCableMapList.each {
 			def connectorLabel = it.assetToPort ? it.assetToPort.label : ""
 			def toAssetId
@@ -681,29 +684,42 @@ class RackLayoutsController {
 									usize:assetEntity?.model?.usize, rackUposition : connectorLabel, toAssetId : toAssetId, toAssetPortId: it.assetToPort?.id,
 									fromAssetId :(it.assetTo? it.assetTo?.assetName+"/"+connectorLabel:''), toTitle:toTitle, title:title]
 			
-			assetCablingMap <<[(it.id):[label : it.assetFromPort.label, color : it.cableColor ?: "", type:it.assetFromPort.type, length:it.cableLength?:'',
-									status:it.cableStatus,comment:it.cableComment?:'', fromAssetId :(it.assetTo? it.assetTo?.assetName+"/"+connectorLabel:''), toTitle:toTitle, title:title]]
+			assetCablingMap <<[(it.id):[label : it.assetFromPort.label, color :it.cableColor, type:it.assetFromPort.type, length:it.cableLength?:'',
+									status:it.cableStatus,comment:it.cableComment?:'', fromAssetId :it.assetTo? it.assetTo?.id :'',
+									fromAsset:(it.assetTo? it.assetTo?.assetName+"/"+connectorLabel:'') ,toTitle:toTitle, title:title, rackUposition : connectorLabel , 
+									connectorId: it.assetToPort ? it.assetToPort.id : "",type:it.assetFromPort.type, cableId:it.id]]
+			
+			assetRows << [(it.id):'h']
+		}
+		currRoomRackAssets.each{asset ->
+			def modelConnectors =[:]
+			ModelConnector.constraints.type.inList.each{
+				modelConnectors << [(it):getAssetModelConnectors(asset.id, it)]
 			}
+			modelConnectorMap << [(asset.id):modelConnectors]
+		}
 		render(template:"cabling", model:[assetCablingDetails:assetCablingDetails, currentBundle:currentBundle, assetCablingMap:(assetCablingMap as JSON) ,
-										  models:models, currRoomRackAssets:currRoomRackAssets-assetEntity, 
-										  dependencyStatus: dependencyStatus ])
+										  models:models, currRoomRackAssets:(currRoomRackAssets-assetEntity as JSON), modelConnectorJson:(modelConnectorMap as JSON),
+										  dependencyStatus: dependencyStatus , assetRows:(assetRows as JSON)])
 	}
 	/*
 	 * Return modelConnectorList to display at connectors dropdown in  cabling screen
 	 */
-	def getAssetModelConnectors = {
-		def assetId = params.value
+	def getAssetModelConnectors(assetId,type) {
 		def assetEntity = assetId ? AssetEntity.get(assetId) : null
-		def modelConnectList = AssetCableMap.findAllByAssetFrom(assetEntity)?.findAll{it.assetFromPort.type==params.type}
-		
-		render (template:"modelConnectorList", model:[modelConnectList:modelConnectList?.assetFromPort])
+		def modelConnectList = AssetCableMap.findAllByAssetFrom(assetEntity)?.findAll{it.assetFromPort.type==type}?.assetFromPort
+		def modelConnectMapList=[]
+		modelConnectList.each{
+			modelConnectMapList << ['value':it.id, 'text': it.label]
+		}
+		return modelConnectMapList
 	}
 	/*
 	 * Update the AssetCablingMap with the date send from RackLayout cabling screen
 	 */
 	def updateCablingDetails = {
 		
-		def assetId = params.assetEntityId
+		def assetId = NumberUtils.toDouble(params.assetId,0).round() 
 		def assetCableId = params.assetCable
 		
 		if(assetCableId){
@@ -730,8 +746,6 @@ class RackLayoutsController {
 				case "cabledId" : status = AssetCableStatus.CABLED ; break;
 				case "assignId" : 
 					if(connectorType != "Power"){
-						/*def rack = Rack.findWhere(tag:toAssetRack,source:0,project:project)
-						def assetEntity = rack?.targetAssets?.find{it.targetRackPosition == Integer.parseInt(params.uposition)}*/
 						def assetEntity = AssetEntity.findById(params.assetFromId)
 						def modelConnectors
 						if(assetEntity?.model){
@@ -755,6 +769,7 @@ class RackLayoutsController {
 			assetCableMap.assetToPort = toConnector
 			assetCableMap.toPower = toPower
 			assetCableMap.cableColor = params.color
+			assetCableMap.cableLength = NumberUtils.toDouble(params.cableLength,0).round() 
 			assetCableMap.cableComment = params.cableComment
 			if(assetCableMap.save(flush:true)){
 				if(assetTo && connectorType != "Power"){
@@ -763,6 +778,7 @@ class RackLayoutsController {
 					toAssetCableMap.assetTo = assetCableMap.assetFrom
 					toAssetCableMap.assetToPort = assetCableMap.assetFromPort
 					toAssetCableMap.cableColor = params.color
+					toAssetCableMap.cableLength = NumberUtils.toDouble(params.cableLength,0).round() 
 					toAssetCableMap.cableComment = params.cableComment
 					if(!toAssetCableMap.save(flush:true)){
 						def etext = "Unable to create toAssetCableMap" +
@@ -1018,11 +1034,5 @@ class RackLayoutsController {
 		}
 		def data = ['rackIds':racks.id,'data':resultMap]
 		render  data as JSON
-	}
-	def demo ={
-		
-	}
-	def demo11 = {
-		
 	}
 }

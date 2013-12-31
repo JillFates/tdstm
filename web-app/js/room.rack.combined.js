@@ -126,9 +126,8 @@ function showCablingDetails( e, assetId ){
 	$("#cablingDialogId").dialog( "option", "width", "auto" )
 	$("#cablingDialogId").dialog("open")
 	$("#assetEntityId").val(assetId)
+	$.getScript( "../js/angular.min.js" )
 	setTimeout(function(){
-		$.getScript( "../js/angular.min.js" )
-		$.getScript( "../js/xeditable.js" )
 		$("#cableTable").show();
 	},100);
 }
@@ -234,16 +233,16 @@ function openActionDiv( id ){
 	$("#actionDiv").show()
 	
 }
-function submitAction(form){
+function submitAction(form, cableId){
 	var actionId = $("#actionTypeId").val()
 	var isValid = true
 	if(actionId == "assignId"){
 		
-		if($("#connectorTypeId").val() != 'Power'){
+		if($("#connectType_"+cableId).val() != 'Power'){
 
-			var assetFrom = $("#assetFromId").val()
-			var modelConnectorId = $("#modelConnectorId").val()
-			if( assetFrom=='null' || modelConnectorId=='null' ){
+			var assetFrom = $("#assetFromId_"+cableId).val()
+			var modelConnectorId = $("#modelConnectorId_"+cableId).val()
+			if( assetFrom=='' || modelConnectorId=='' ){
 				isValid = false
 				alert("Please enter the target connector details")
 			} 
@@ -257,8 +256,11 @@ function submitAction(form){
 	}
 	if(isValid){
 		jQuery.ajax({
-			url: $(form).attr('action'),
-			data: $(form).serialize(),
+			url:contextPath+'/rackLayouts/updateCablingDetails',
+			data: {'assetCable':cableId ,'assetId':$("#assetEntityId").val(), 'status':$("#status_"+cableId).val(),'actionType':'assignId',
+				          'color':$("#color_"+cableId).val(), 'connectorType':$("#connectType_"+cableId).val(),'assetFromId':$("#assetFromId_"+cableId).val(),
+				          'modelConnectorId':$("#modelConnectorId_"+cableId).val(),'staticConnector':$("input:radio[name=staticConnector]:checked").val(),
+				          'cableComment':$("#cableComment_"+cableId).val(), 'cableLength':$("#cableLength_"+cableId).val()},
 			type:'POST',
 			success: function(data) {
 				openCablingDiv( data.assetId )

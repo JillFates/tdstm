@@ -1,35 +1,66 @@
 <%@page import="com.tds.asset.AssetCableMap"%>
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'xeditable.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrapXedit.css')}" />
 <script type="text/javascript">
-var app = angular.module("app", ["xeditable"]);
-
-app.run(function(editableOptions) {
-  editableOptions.theme = 'bs3';
-});
+var app = angular.module("app", []);
 
 app.controller('Ctrl', function($scope, $filter, $http) {
- $scope.users = ${assetCablingMap}; 
+	 $scope.statues = [
+	                   {value: 1, text:'Unknown'},
+	   				   {value: 2, text:'Cabled'},
+	   				   {value: 3, text:'Assigned'},
+	   				   {value: 4, text:'Empty'}
+	   				  ];
 
- $scope.colors = [
-                  {value: 1, text:'White'},
-   				  {value: 2, text:'Grey'},
-   				  {value: 3, text:'Green'},
-   				  {value: 4, text:'Yellow'},
-   				  {value: 5, text:'Orange'},
-   				  {value: 6, text:'Red'},
-   				  {value: 7, text:'Blue'},
-   				  {value: 8, text:'Purple'},
-   				  {value: 9, text:'Black'}
-   				  ];
+	 $scope.colors = [
+	                  {value: 1, text:'White'},
+	   				  {value: 2, text:'Grey'},
+	   				  {value: 3, text:'Green'},
+	   				  {value: 4, text:'Yellow'},
+	   				  {value: 5, text:'Orange'},
+	   				  {value: 6, text:'Red'},
+	   				  {value: 7, text:'Blue'},
+	   				  {value: 8, text:'Purple'},
+	   				  {value: 9, text:'Black'}
+   				  	];
 
- $scope.statues = [
-                   {value: 1, text:'Unknown'},
-   				  {value: 2, text:'Cabled'},
-   				  {value: 3, text:'Assigned'},
-   				  {value: 4, text:'Empty'}
-   				  ];
+	 $scope.cables = ${assetCablingMap};
+	 $scope.assets = ${currRoomRackAssets};  
+	 $scope.connectors = ${modelConnectorJson};
+	 $scope.row = ${assetRows};
+  	  
+  	$scope.params = {};
+  	$scope.modelConnectors = {};
+  	$scope.demoChange = function(value,type){
+  	  	if(value)
+        	$scope.modelConnectors = $scope.connectors[value][type];
+    }
+	
+	$scope.showRow = function(id) {
+		return $scope.row[id] == 's';
+	}
+	
+    $scope.showEditRow = function(id){
+    	var asset = $("#fromAsset_"+id).val();
+    	var type = $("#connectType_"+id).val();
+    	if($('.btn:visible').length== 0){
+    		$scope.row[id] = $scope.row[id] == 'h' ? 's' : 'h';
+    		if(asset)
+    			$scope.modelConnectors = $scope.connectors[asset][type];
 
+			//TODO: Used jquery syntax for now,should be replaced with angular.
+    		if(type=='Power'){
+				$(".powerDiv").show();
+				$(".nonPowerDiv").hide();
+				$("#staticConnector_"+$('#power_'+id).val()+"_"+id).attr('checked', true);
+        	}else{
+        		$(".powerDiv").hide();
+				$(".nonPowerDiv").show();
+            }
+    	}
+    };
+
+    $scope.cancelRow = function(id){
+    	return $scope.row[id] = 'h';
+    };
 });
 
 </script>
@@ -67,7 +98,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 	</g:if>
 	</div>
 <div ng-app="app" ng-controller="Ctrl">
-   <table id="cableTable" class="table table-bordered table-hover table-condensed" style="width:auto;display:none:">
+   <table id="cableTable" class="table table-bordered table-hover table-condensed" style="width:auto;display:none;">
     <tr style="font-weight: bold">
       <th>Type</th>
       <th>Label</th>
@@ -77,54 +108,72 @@ app.controller('Ctrl', function($scope, $filter, $http) {
       <th>Comment</th>
       <th>Assigned To</th>
     </tr>
-    <tr ng-repeat="user in users">
-      <td ng-click="rowform.$show()">
-        <span editable-text="user.type" e-name="type" e-form="rowform" e-required>
-          {{ user.type }}
-        </span>
+    <tr ng-repeat="cable in cables" >
+      <td ng-click="showEditRow(cable.cableId)"><span>{{ cable.type }}</span></td>
+      <td ng-click="showEditRow(cable.cableId)"><span>{{ cable.label }}</span></td>
+      <td ng-click="showEditRow(cable.cableId)">
+      	 <span ng-hide="showRow(cable.cableId)">{{cable.status}}</span>
+      	 <span ng-show="showRow(cable.cableId)">
+      	 <select id="status_{{cable.cableId}}" name="status_{{cable.cableId}}" style="width:75px;">
+	        <option value="">Please Select</option>
+	        <option ng-repeat="s in statues" value="{{s.text}}" title="{{s.text}}" ng-selected="s.text == cable.status">{{s.text}}</option>
+	     </select>
+      	 </span>
       </td>
-      <td ng-click="rowform.$show()">
-        <span editable-text="user.label" e-name="status" e-form="rowform">
-          {{ user.label }}
-        </span>
+      <td ng-click="showEditRow(cable.cableId)" class='{{cable.color}}' ng-hide="showRow(cable.cableId)" >
+      	 <span></span>
       </td>
-      <td ng-click="rowform.$show()">
-        <span editable-select="user.status" e-name="status" e-form="rowform" e-ng-options="s.value as s.text for s in statues">
-          {{ user.status }}
-        </span>
+      <td ng-click="showEditRow(cable.cableId)" ng-show="showRow(cable.cableId)">
+      	 <span>
+	      	 <select id="color_{{cable.cableId}}" name="color_{{cable.cableId}}" style="width:75px;">
+			        <option value="">Please Select</option>
+			        <option ng-repeat="c in colors" value="{{c.text}}" title="{{c.text}}" ng-selected="c.text == cable.color">{{c.text}}</option>
+		     </select>
+      	 </span>
       </td>
-      <td ng-click="rowform.$show()" class="{{user.color}}">
-        <span editable-select="user.color" e-name="color" e-form="rowform" e-ng-options="c.value as c.text for c in colors" >
-        </span>
+      <td ng-click="showEditRow(cable.cableId)">
+      	 <span ng-hide="showRow(cable.cableId)">{{ cable.length }}</span>
+      	 <span ng-show="showRow(cable.cableId)">
+      	 	<input type="text" id="cableLength_{{cable.cableId}}" name="cableLength_{{cable.cableId}}" value="{{ cable.length }}" size="2"/>
+      	 </span>
       </td>
-      <td ng-click="rowform.$show()">
-        <span editable-text="user.length" e-name="length" e-form="rowform">
-          {{ user.length }}
-        </span>
-      </td>
-      <td ng-click="rowform.$show()">
-        <span editable-text="user.comment" e-name="comment" e-form="rowform">
-          {{ user.comment }}
-        </span>
+      <td ng-click="showEditRow(cable.cableId)" >
+      	 <div ng-hide="showRow(cable.cableId)" class='commentEllip'>{{ cable.comment }}</div>
+      	 <span ng-show="showRow(cable.cableId)">
+      	 	<input type="text" name="cableComment_{{cable.cableId}}" id="cableComment_{{cable.cableId}}" value="{{ cable.comment }}" size="8"/>
+      	 </span>
       </td>
       <td>
-        <span e-name="fromAssetId" e-form="rowform">
-          {{ user.fromAssetId }}
-        </span>
+	      	<span ng-hide="showRow(cable.cableId)" onclick="javascript:openCablingDiv({{cable.fromAssetId}})" style="text-decoration: underline;color:blue;" class="pointer">
+	      		{{ cable.fromAsset }}
+	      	</span>
+	      	<span ng-show="showRow(cable.cableId)">
+			      	<span class="powerDiv" style="display:none;">
+						<input type="radio" name="staticConnector" id="staticConnector_A_{{cable.cableId}}" value="A">A</input>&nbsp;
+						<input type="radio" name="staticConnector" id="staticConnector_B_{{cable.cableId}}" value="B">B</input>&nbsp;
+						<input type="radio" name="staticConnector" id="staticConnector_C_{{cable.cableId}}" value="C">C</input>
+						<input type="hidden" name="power_{{cable.cableId}}" id="power_{{cable.cableId}}" value="{{cable.rackUposition}}"/>
+					</span>
+					<span class="nonPowerDiv" style="display:none;">
+					     <select ng-model="params.value" ng-change="demoChange(params.value, cable.type)" id="assetFromId_{{cable.cableId}}" style="width:75px;">
+				        	<option value="">Please Select</option>
+					        <option ng-repeat="v in assets" value="{{v.id}}" title="{{v.assetName}}" ng-selected="v.id == cable.fromAssetId">{{v.assetName}}</option>
+					     </select>
+					     <select id="modelConnectorId_{{cable.cableId}}" style="width:75px;">
+					        <option value="">Please Select</option>
+					        <option ng-repeat="c in modelConnectors" value="{{c.value}}" title="{{c.text}}" ng-selected="c.value == cable.connectorId">{{c.text}}</option>
+					     </select>
+				    </span>
+				    <input type="hidden" name="fromAsset_{{cable.cableId}}" id="fromAsset_{{cable.cableId}}" value="{{cable.fromAssetId}}"/>
+				    <input type="hidden" name="connectType_{{cable.cableId}}" id="connectType_{{cable.cableId}}" value="{{cable.type}}"/>
+		     </span>
       </td>
-      <td style="white-space: nowrap" ng-show="rowform.$visible">
-        <!-- form -->
-        <form editable-form name="rowform" onbeforesave="saveUser($data, user.id)" ng-show="rowform.$visible" class="form-buttons form-inline" shown="inserted == user">
-          <button type="submit" ng-disabled="rowform.$waiting" class="btn btn-primary">
-            save
-          </button>
-          <button type="button" ng-disabled="rowform.$waiting" ng-click="rowform.$cancel()" class="btn btn-default">
-            cancel
-          </button>
-        </form>  
+      <td ng-show="showRow(cable.cableId)">
+			<img src="${resource(dir:'images',file:'check12.png')}" class="pointer btn" onclick="submitAction($('form[name=cablingDetailsForm]'),{{cable.cableId}})" style="width:18px;"/>
+			<img src="${resource(dir:'images',file:'delete.png')}" class="pointer btn" ng-click="cancelRow(cable.cableId)" style="width:18px;"/>
       </td>
-      
     </tr>
   </table>
-
+  <input type="hidden" name="assetEntityId" id="assetEntityId"/>
+  <input type="hidden" name="actionType" id="actionTypeId" value='assignId'/>
 </div>
