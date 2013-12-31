@@ -126,8 +126,10 @@ function showCablingDetails( e, assetId ){
 	$("#cablingDialogId").dialog( "option", "width", "auto" )
 	$("#cablingDialogId").dialog("open")
 	$("#assetEntityId").val(assetId)
-	$.getScript( "../js/angular.min.js" )
-	$("#cableTable").show();
+	$.getScript( "../js/angular.js" )
+	setTimeout(function(){
+		$("#cableTable").show();
+	},400);
 }
 function assetModelConnectors(value){
 	var connectId=$("#cabledTypeId").val();
