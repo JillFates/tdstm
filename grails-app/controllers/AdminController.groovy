@@ -16,14 +16,14 @@ class AdminController {
 	def jdbcTemplate
 	def sessionFactory
 	def securityService
-	def partyRelationshipService 
-	def userPreferenceService   
+	def partyRelationshipService
+	def userPreferenceService
 	def projectService
 
-    def index = { }
+	def index = { }
 
 
-    def orphanSummary = {
+	def orphanSummary = {
 		def summaryRecords = []
 		def orphanParty = """SELECT party_id as party_id FROM party p where p.party_id not in
 								(select distinct pr.party_id from (select party_group_id as party_id from party_group
@@ -38,7 +38,7 @@ class AdminController {
 								union
 								select app_id as party_id from application ) pr)"""
 								
-    	def AssetsummaryQuery = """
+	def AssetsummaryQuery = """
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR APPLICATION_ASSET_MAP---------------------------------*/
 			SELECT * FROM (SELECT 'application_asset_map' as mainTable,'application_id' as refId,'Orphan' as type,count(*) as totalCount FROM application_asset_map asm where asm.application_id not in (select app.app_id from application app )
 				UNION
@@ -397,12 +397,12 @@ class AdminController {
 			summaryRecords << jdbcTemplate.queryForList( partySummaryQuery )
 
 			return[summaryRecords : summaryRecords];	
-    }
+	}
 	/*
 	 * 
 	 */
 	def orphanDetails = {
-		def orphanDeatils 
+		def orphanDeatils
 		def table = params.table
 		def column = params.column
 		def type = params.type
@@ -848,12 +848,12 @@ class AdminController {
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "" :
-	        			query = "SELECT * FROM party p where p.party_type_id not in (select pt.party_type_code from party_type pt)"
-	        			orphanDeatils = jdbcTemplate.queryForList(query)
+					query = "SELECT * FROM party p where p.party_type_id not in (select pt.party_type_code from party_type pt)"
+					orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 				}
-        	break;
-        	
+		break;
+		
 			case "party_relationship" :
 				switch (column){
 					case "party_id_from_id" :
@@ -1018,9 +1018,9 @@ class AdminController {
 		StringBuffer queryForData = new StringBuffer("FROM data_transfer_value")
 		StringBuffer queryForBatch = new StringBuffer("FROM data_transfer_batch")
 		switch(deleteHistory){
-	   		case "anyProcessed" :
-			   queryForBatch.append(" WHERE status_code = 'completed'")
-			   queryForData.append(" WHERE data_transfer_batch_id  IN (SELECT batch_id $queryForBatch) ")
+			case "anyProcessed" :
+				queryForBatch.append(" WHERE status_code = 'completed'")
+				queryForData.append(" WHERE data_transfer_batch_id  IN (SELECT batch_id $queryForBatch) ")
 			break;
 			case "overTwoMonths" :
 				queryForBatch.append(" WHERE date_created <= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 60 DAY)")
@@ -1084,7 +1084,7 @@ class AdminController {
 	/**
 	 * This method is used to clean the UnUsed Asset types
 	 */
-	def cleanAssetTypes ={
+	def cleanAssetTypes = {
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute , [sort:"value"]).value
 		def deletedTypes = []
@@ -1106,7 +1106,7 @@ class AdminController {
 	/**
 	 * Just a sample of the Twitter Bootstrap implementation
 	 */
-	def bootstrap ={
+	def bootstrap = {
 		def contextPath = request.contextPath
 		return [contextPath:contextPath]
 	}
@@ -1248,40 +1248,40 @@ class AdminController {
 					
 						if (person.validate() && person.save(flush:true)) {
 							log.info "importAccounts() : created person $person"
-		 					partyRelationshipService.addCompanyStaff(project.client, person)
+							partyRelationshipService.addCompanyStaff(project.client, person)
 
-		 					if (createUserLogin && p.username) {
-		 						def u = new UserLogin(
-		 							username: p.username,
-		 							password: password,
-		 							active: (activateLogin ? 'Y' : 'N'),
-		 							expiryDate: expiryDate,
-		 							person: person
-		 							)
+							if (createUserLogin && p.username) {
+								def u = new UserLogin(
+									username: p.username,
+									password: password,
+									active: (activateLogin ? 'Y' : 'N'),
+									expiryDate: expiryDate,
+									person: person
+									)
 
-		 						if (! u.validate() || !u.save(flush:true)) {
-		 							p.error = GormUtil.allErrorsString(u)
-		 							failedPeople << p
-		 							failed = true
-		 						} else {
-		 							if (role) {
-		 								log.info "importAccounts() : creating Role $role for $person"
-			 							userPreferenceService.setUserRoles([role], person.id)
+								if (! u.validate() || !u.save(flush:true)) {
+									p.error = GormUtil.allErrorsString(u)
+									failedPeople << p
+									failed = true
+								} else {
+									if (role) {
+										log.info "importAccounts() : creating Role $role for $person"
+										userPreferenceService.setUserRoles([role], person.id)
 									}
 
-		 							log.info "importAccounts() : created UserLogin $u"
-		 							def up = new UserPreference(
-		 								userLogin: u,
-		 								preferenceCode: 'CURR_PROJ',
-		 								value: project.id.toString()
-		 							)
-		 							if (! up.validate() || ! up.save()) {
-		 								log.error "importAccounts() : failed creating User Preference for $person : " + GormUtil.allErrorsString(up)
-		 								p.error = "Setting Default Project Errored"
-		 								failedPeople << p
-		 							}
-		 						}
-		 					}
+									log.info "importAccounts() : created UserLogin $u"
+									def up = new UserPreference(
+										userLogin: u,
+										preferenceCode: 'CURR_PROJ',
+										value: project.id.toString()
+									)
+									if (! up.validate() || ! up.save()) {
+										log.error "importAccounts() : failed creating User Preference for $person : " + GormUtil.allErrorsString(up)
+										p.error = "Setting Default Project Errored"
+										failedPeople << p
+									}
+								}
+							}
 						} else {
 							p.error = GormUtil.allErrorsString(person)
 							failedPeople << p
@@ -1311,14 +1311,14 @@ class AdminController {
 	/**
 	 * A action to show project Summary report filters.
 	 */
-	def projectReport ={
+	def projectReport = {
 		return
 	}
 	
 	/**
 	 * To Generate project Summary Web report
 	 */
-	def projectSummaryReport ={
+	def projectSummaryReport = {
 		def person  = securityService.getUserLoginPerson().toString()
 		def now = TimeUtil.nowGMT()
 		def results = projectService.getProjectReportSummary( params )

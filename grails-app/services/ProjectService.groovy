@@ -1,5 +1,6 @@
 import org.apache.shiro.SecurityUtils
 import grails.converters.JSON
+import com.tds.asset.AssetType
 import com.tds.asset.FieldImportance
 import com.tdsops.tm.enums.domain.ValidationType;
 import com.tdssrc.eav.EavAttribute
@@ -9,7 +10,7 @@ import com.tds.asset.AssetEntity
 
 class ProjectService {
 
-    static transactional = true
+	static transactional = true
 	def securityService
 	def partyRelationshipService
 	def jdbcTemplate
@@ -17,7 +18,7 @@ class ProjectService {
 	/*
 	 * Returns list of completed Project means projects whose completion time is less than today's date
 	 */
-    def getCompletedProject( timeNow, projectHasPermission, String sortOn='name',String orderBy='desc', def params = [:]) {
+	def getCompletedProject( timeNow, projectHasPermission, String sortOn='name',String orderBy='desc', def params = [:]) {
 		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
 		def projects
 		def parties
@@ -32,7 +33,7 @@ class ProjectService {
 		}
 		
 		projects = projectFilter( parties, projectHasPermission, companyId, timeNow, params, "completed")
-		return  projects
+		return projects
 	}
 
 	
@@ -255,59 +256,59 @@ class ProjectService {
 	 */
 	def getProjectPartner( project ) {
 		def projectPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' \
-									and p.partyIdFrom = :project and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ",
-                                    [project:project])
+			and p.partyIdFrom = :project and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ",
+			[project:project])
 		return projectPartner
-	} 
+	}
 	/**
-	 * This method is used to get project summary for requested project.
+	 * This method gets the data used to populate the project summary report
 	 * @param params
 	 * @return map
 	 */
-	def getProjectReportSummary( params ){
-		def projects = []
-		def summaryMap =[:]
-		def now = TimeUtil.nowGMT()
-		if(params.inactive){
-			projects += Project.findAllByCompletionDateLessThan(now, [sort:"projectCode"])
-		}
-		if(params.active){
-			projects += Project.findAllByCompletionDateGreaterThanEquals(now, [sort:"projectCode"])
-		}
-		projects.each {p->
-			summaryMap << [(p.id) : getProjectSummaryMap(p)]
-		}
-		return [summaryMap:summaryMap ,projects:projects ]
-	}
-	/**
-	 * This method is used to get event,asset,application,db and files count for requested project.
-	 * @param projectInstance
-	 * @return summaryMap
-	 */
-	def getProjectSummaryMap(project){
-		def summaryMap =[
-						'patner':getProjectPartner(project),
-						'staffCount': partyRelationshipService.getCompanyStaff(project.client.id),
-						'eventCount': MoveEvent.countByProject(project),
-						'assetCount': getAssetEntityCountByProjectAndAssetType(project,'Server')[0],
-						'appCount': getAssetEntityCountByProjectAndAssetType(project,'Application')[0],
-						'dbCount': getAssetEntityCountByProjectAndAssetType(project,'Database')[0],
-						'fileCount': getAssetEntityCountByProjectAndAssetType(project,'Files')[0],
-						'totalAssetCount': AssetEntity.countByProject(project) ]
+	def getProjectReportSummary( params ) {
 		
-		return summaryMap
-	}
-	/**
-	 * used to get AssetEntity Count for selected project.
-	 * @return count.
-	 */
-	def getAssetEntityCountByProjectAndAssetType(def project,def type) {
-        def args = [project:project,type:[type]]
-        def query = """select count(*) from AssetEntity a where a.moveBundle.useOfPlanning = true
-                        and a.project = :project and  a.assetType ${type == 'Server' ? 'not':''} in (:type)"""
-		if(type == "Server")
-            args.type = ['Application','Database','Files']
-        def assetList = AssetEntity.executeQuery(query,args)
-		return assetList
+		def projects = []
+		
+		// check if either of the active/inactive checkboxes are checked
+		if( params.active || params.inactive ) {
+			def query = new StringBuffer(""" SELECT *, totalAssetCount-filesCount-dbCount-appCount AS assetCount FROM
+				(SELECT p.project_id AS projId, p.project_code AS projName, p.client_id AS clientId,
+					(SELECT COUNT(*) FROM move_event me WHERE me.project_id = p.project_id) AS eventCount,
+					COUNT(IF(ae.asset_type = "${AssetType.FILES}",1,NULL)) AS filesCount, 
+					COUNT(IF(ae.asset_type = "${AssetType.DATABASE}",1,NULL)) AS dbCount, 
+					COUNT(IF(ae.asset_type = "${AssetType.APPLICATION}",1,NULL)) AS appCount,
+					COUNT(*) AS totalAssetCount,
+					DATE(p.start_date) AS startDate,
+					DATE(p.completion_date) AS completionDate,
+					pg.name AS clientName,
+					pg2.name AS partnerName,
+					p.description AS description
+					FROM asset_entity ae
+					LEFT JOIN move_bundle mb ON (mb.move_bundle_id = ae.move_bundle_id) 
+						AND ((ae.move_bundle_id = NULL) OR (mb.use_of_planning = true))
+					LEFT JOIN project p ON (p.project_id = ae.project_id)
+					LEFT JOIN party_group pg ON (pg.party_group_id = p.client_id)
+					LEFT JOIN party_relationship pr ON (pr.party_relationship_type_id = 'PROJ_PARTNER' AND pr.party_id_from_id = p.project_id 
+						AND pr.role_type_code_from_id = 'PROJECT' AND pr.role_type_code_to_id = 'PARTNER')
+					LEFT JOIN party_group pg2 ON (pg2.party_group_id = pr.party_id_to_id) """)
+			
+			// handle active/inactive project specification
+			if ( params.inactive && ! params.active )
+				query.append(" WHERE CURDATE() > p.completion_date ")
+			if ( params.active && ! params.inactive )
+				query.append(" WHERE CURDATE() < p.completion_date ")
+			
+			query.append(""" GROUP BY ae.project_id
+					) inside
+				ORDER BY inside.projName """)
+			projects = jdbcTemplate.queryForList(query.toString())
+			
+			// add the staff count to each project
+			projects.each {
+				it["staffCount"] = partyRelationshipService.getCompanyStaff(it["clientId"]).size()
+			}
+		}
+		
+		return projects
 	}
 }
