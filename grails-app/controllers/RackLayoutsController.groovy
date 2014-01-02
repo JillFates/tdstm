@@ -666,6 +666,7 @@ class RackLayoutsController {
 		def assetCablingMap =[:]
 		def modelConnectorMap =[:]
 		def assetRows =[:]
+		def powerHouse = [:]
 		assetCableMapList.each {
 			def connectorLabel = it.assetToPort ? it.assetToPort.label : ""
 			def toAssetId
@@ -690,6 +691,8 @@ class RackLayoutsController {
 									connectorId: it.assetToPort ? it.assetToPort.id : "",type:it.assetFromPort.type, cableId:it.id]]
 			
 			assetRows << [(it.id):'h']
+			//Used to show and hide power links using angular.
+			powerHouse << [(it.id):(it.assetFromPort.type=='Power'? 'h': 's')]
 		}
 		currRoomRackAssets.each{asset ->
 			def modelConnectors =[:]
@@ -700,7 +703,7 @@ class RackLayoutsController {
 		}
 		render(template:"cabling", model:[assetCablingDetails:assetCablingDetails, currentBundle:currentBundle, assetCablingMap:(assetCablingMap as JSON) ,
 										  models:models, currRoomRackAssets:(currRoomRackAssets-assetEntity as JSON), modelConnectorJson:(modelConnectorMap as JSON),
-										  dependencyStatus: dependencyStatus , assetRows:(assetRows as JSON)])
+										  dependencyStatus: dependencyStatus , assetRows:(assetRows as JSON),cableTypes:(powerHouse as JSON)])
 	}
 	/*
 	 * Return modelConnectorList to display at connectors dropdown in  cabling screen

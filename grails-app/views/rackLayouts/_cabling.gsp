@@ -5,8 +5,8 @@ var app = angular.module("app", []);
 app.controller('Ctrl', function($scope, $filter, $http) {
 	 $scope.statues = [
 	                   {value: 1, text:'Unknown'},
-	   				   {value: 2, text:'Cabled'},
-	   				   {value: 3, text:'Assigned'},
+	   				   {value: 2, text:'Assigned'},
+	   				   {value: 3, text:'Cabled'},
 	   				   {value: 4, text:'Empty'}
 	   				  ];
 
@@ -26,6 +26,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 	 $scope.assets = ${currRoomRackAssets};  
 	 $scope.connectors = ${modelConnectorJson};
 	 $scope.row = ${assetRows};
+  	 $scope.power = ${cableTypes};
   	  
   	$scope.params = {};
   	$scope.modelConnectors = {};
@@ -144,9 +145,12 @@ app.controller('Ctrl', function($scope, $filter, $http) {
       	 </span>
       </td>
       <td>
-	      	<span ng-hide="showRow(cable.cableId)" onclick="javascript:openCablingDiv({{cable.fromAssetId}})" style="text-decoration: underline;color:blue;" class="pointer">
-	      		{{ cable.fromAsset }}
-	      	</span>
+      	<span ng-hide="showRow(cable.cableId);" class="power_{{power[cable.cableId]}}" style="display:none;" onclick="javascript:openCablingDiv({{cable.fromAssetId}})">
+      		{{ cable.fromAsset }}
+      	</span>
+      	<span ng-hide="showRow(cable.cableId);" style="display:none;" class="type_{{power[cable.cableId]}}">
+      		{{ cable.fromAsset }}
+      	</span>
 	      	<span ng-show="showRow(cable.cableId)">
 			      	<span class="powerDiv" style="display:none;">
 						<input type="radio" name="staticConnector" id="staticConnector_A_{{cable.cableId}}" value="A">A</input>&nbsp;

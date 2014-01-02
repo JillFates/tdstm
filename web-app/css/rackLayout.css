@@ -947,3 +947,18 @@ table.rack_elevation table.bladeTable td.errorBlade {
 	display: block; 
 	margin: -8px !important; 
 }
+.power_s{
+	text-decoration: underline;
+	color:blue;
+	cursor: pointer;
+	display: block;
+}
+.power_h{
+	display: none;
+}
+.type_s{
+	display: none;
+}
+.type_h{
+	display: block;
+}
