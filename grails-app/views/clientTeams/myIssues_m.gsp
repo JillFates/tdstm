@@ -43,7 +43,7 @@
 <body onorientationchange="updateOrientation();">
 	<div class="mainbody" style="width: 100%;">
 	   <div style="width: 100%;" id="mobtitle">TransitionManager&trade; - Mobile 
-		   <span id="userSpanId"  onclick="loadUserPref(${person.id})">${person.firstName}&nbsp;<a id="userAnchor" class="ui-icon ui-icon-triangle-1-s" href="#"></a></span>
+		   <span id="userSpanId"  onclick="loadUserPref(${person.id})">${person.firstName}&nbsp;</span>
 	   </div>
 	   <div id="mobilePrefDialog" class="megamenu" style="display: none;" >
 	</div>
