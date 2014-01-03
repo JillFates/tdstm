@@ -32,12 +32,15 @@ br.page-break-after {
 	box-shadow: #888 5px 5px 10px;
 }
 #rackLayout {
-  position: inherit;
-  height: auto; width: auto !important;
-  top: 70px; right: 5px; bottom: 25px;
+  position: fixed;
+  height: auto; 
+  width: auto !important;
+  top: 190px; 
+  right: 5px; 
+  bottom: 25px;
   margin: 0;
   padding-right: 18px;
-  float: left !important;
+  float: right !important;
   overflow-y: auto !important;
   background-color: white;
 }
@@ -48,7 +51,6 @@ br.page-break-after {
 	padding: 1px;
 }
 #room_layout {
-  padding-right: 320px !important;
 }
 #roomLayout_body {
  width: auto !important;

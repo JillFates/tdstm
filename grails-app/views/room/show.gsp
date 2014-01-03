@@ -93,7 +93,7 @@
 		</tbody>
 	</table>
 </div>
-<div id="roomLayout_body" style="width: 1283px !important; border: 2px solid black">
+<div id="roomLayout_body" style="border: 2px solid black">
 	<g:set var="numrows" value="${1}" />
 	<g:set var="tilerows" value="${roomInstance.roomDepth / 2}" />
 	<g:set var="numcols" value="${1}" />
@@ -132,7 +132,7 @@
 			</g:each>
 		<span>Floor ${roomInstance.roomWidth}ft x ${roomInstance.roomDepth}ft = ${roomInstance.roomWidth * roomInstance.roomDepth} sqft</span>
 	</div>
-	<div style="float:left ; margin-left: 20px;" id="rackLayout">
+	<div style="position:fixed;z-index:10; margin-left: 20px;" id="rackLayout">
 	<table style="display:none" cellpadding=2 class="rack_elevation back">
 	<tr><th>U</th><th>Device</th><th>Bundle</th></tr>
 	<tr><td class='rack_upos'>42</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
