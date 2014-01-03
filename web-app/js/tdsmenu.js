@@ -196,6 +196,7 @@
 			}
 		}
 		function showMegaMenu(e){
+			$(".headerClass").removeClass("ui-icon");
 			if(megamenuitem!=e)
 				$(".active").removeClass('active').addClass('inActive')
 			if($(e).hasClass('inActive'))

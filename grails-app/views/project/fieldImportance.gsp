@@ -42,6 +42,8 @@
 </div>
 </div>
 <script type="text/javascript">
+currentMenuId = "#projectMenu";
+$("#projectMenuId a").css('background-color','#003366')
 $(".legend").css('margin-left',$(window).width()-375+"px")
 </script>
 </body>

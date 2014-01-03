@@ -344,8 +344,8 @@
 			<!-- <tr align="right"><td colspan="2" ><input type="button" value="Done"> </td> </tr> -->
 <script type="text/javascript">
 initialize()
-	currentMenuId = "#bundleMenu";
-	$("#bundleMenuId a").css('background-color','#003366')
+	currentMenuId = "#eventMenu";
+	$("#eventMenuId a").css('background-color','#003366')
 </script>
 </body>
 </html>

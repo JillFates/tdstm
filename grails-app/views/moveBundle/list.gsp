@@ -53,5 +53,9 @@
 				</tr>
 			</table>
 		</div>
+		<script>
+			currentMenuId = "#eventMenu";
+			$("#eventMenuId a").css('background-color','#003366')
+		</script>
 	</body>
 </html>

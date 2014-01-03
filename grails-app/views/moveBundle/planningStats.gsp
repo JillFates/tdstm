@@ -7,8 +7,8 @@
 <title>Transition Planning Dashboard</title>
 <script type="text/javascript">
 $(document).ready(function() { 
-	currentMenuId = "#bundleMenu";
-	$("#bundleMenuId a").css('background-color','#003366')
+	currentMenuId = "#dashboardMenu";
+	$("#dashboardMenuId a").css('background-color','#003366')
 	
 	var percentageAppToValidate=100-"${applicationCount ? Math.round((appToValidate/applicationCount)*100) :100}";
 	$("#discoverybar").animate({width: percentageAppToValidate+"%" }, 1000);

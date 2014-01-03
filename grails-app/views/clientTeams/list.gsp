@@ -83,8 +83,8 @@
 			}
 		</script>
 		<script>
-			currentMenuId = "#teamMenuId";
-			$("#teamMenuId a").css('background-color','#003366')
+			currentMenuId = "#consoleMenu";
+			$("#consoleMenuId a").css('background-color','#003366')
 		</script>
 	</body>
 </html>

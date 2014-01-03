@@ -62,5 +62,9 @@
 				<jqgrid:wrapper id="projectGridId" />
 			</div>
 		</div>
+		<script>
+			currentMenuId = "#projectMenu";
+			$("#projectMenuId a").css('background-color','#003366')
+		</script>
 	</body>
 </html>
