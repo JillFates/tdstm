@@ -29,24 +29,28 @@ class SecurityFilters {
 		// Creating, modifying, or deleting a Party,person, project,partyGroup requires the ADMIN role.
 		partyCrud(controller: "(party|person|partyGroup)", action: "(create|edit|save|update|delete)") {
 			before = {
-				 accessControl {
-					  role("ADMIN")
-				 }
+				accessControl {
+					role("ADMIN")
+				}
 			}
-		}		// Creating, modifying, or deleting a Party,person, project,partyGroup requires the ADMIN role.
-		projectCrud(controller: "project", action: "(create|edit|save|update|delete)") {
+		}
+		// Editing a project requires the ProjectEditView permission
+		projectCrud(controller: "project", action: "(edit|update)") {
 			before = {
-				 accessControl {
-					  role("ADMIN") || role("SUPERVISOR")
-				 }
+				def perm = RolePermissions.hasPermission("ProjectEditView")
+				if ( ! perm ) {
+					flash.message = "You do not have permission to edit projects."
+					redirect(controller:'project', action:'show')
+				}
+				return perm
 			}
 		}
 		// for modify and delete a userLogin require ADMIN role 
 		userCrud(controller: "userLogin", action: "(edit|update|delete)") {
 			before = {
-				 accessControl {
-					  role("ADMIN")
-				 }
+				accessControl {
+					role("ADMIN")
+				}
 			}
 		}
 		// for delete require ADMIN role 
