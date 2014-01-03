@@ -99,7 +99,7 @@
 	<g:set var="numcols" value="${1}" />
 	<g:set var="tilecols" value="${roomInstance.roomWidth / 2}" />
 
-	<div id="room_layout" style="position:relative; width:300px; height:800px; overflow:auto; border:0px; float:left;margin-right:10px">
+	<div id="room_layout" style="position:relative; height:800px; overflow:auto; border:0px; float:left;margin-right:10px">
 		<table id="room_layout_table" cellpadding="0" cellspacing="0" style="width:${tilecols *42}px; height:${tilerows *42}px; border:0px;">
 			<g:while test="${numrows <= tilerows }">
 				<tr>
