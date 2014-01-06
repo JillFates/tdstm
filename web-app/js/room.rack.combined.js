@@ -242,22 +242,30 @@ function submitAction(form, cableId){
 
 			var assetFrom = $("#assetFromId_"+cableId).val()
 			var modelConnectorId = $("#modelConnectorId_"+cableId).val()
-			if( assetFrom=='' || modelConnectorId=='' ){
-				isValid = false
-				alert("Please enter the target connector details")
-			} 
+			if($("#status_"+cableId).val() == 'Assigned'){
+				if( assetFrom=='null' || modelConnectorId=='null' ){
+					isValid = false
+					alert("Please enter the target connector details")
+				} 
+			}
 		} else {
 			var staticConn = $("input:radio[name=staticConnector]:checked").val()
-			if( !staticConn ){
+			if( $("#status_"+cableId).val() == 'Assigned' && !staticConn ){
 				isValid = false
 				alert("Please select the target connector")
 			}
 		}
 	}
+	var actionType=''
+	switch($("#status_"+cableId).val()){
+		case "Assigned" : actionType = 'assignId' ; break;
+		case "Cabled" : actionType = 'cabledId' ; break;
+		case "Empty" : actionType = 'emptyId' ; break;
+	}
 	if(isValid){
 		jQuery.ajax({
 			url:contextPath+'/rackLayouts/updateCablingDetails',
-			data: {'assetCable':cableId ,'assetId':$("#assetEntityId").val(), 'status':$("#status_"+cableId).val(),'actionType':'assignId',
+			data: {'assetCable':cableId ,'assetId':$("#assetEntityId").val(), 'status':$("#status_"+cableId).val(),'actionType':actionType,
 				          'color':$("#color_"+cableId).val(), 'connectorType':$("#connectType_"+cableId).val(),'assetFromId':$("#assetFromId_"+cableId).val(),
 				          'modelConnectorId':$("#modelConnectorId_"+cableId).val(),'staticConnector':$("input:radio[name=staticConnector]:checked").val(),
 				          'cableComment':$("#cableComment_"+cableId).val(), 'cableLength':$("#cableLength_"+cableId).val()},

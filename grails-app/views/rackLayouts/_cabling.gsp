@@ -1,6 +1,6 @@
 <%@page import="com.tds.asset.AssetCableMap"%>
 <script type="text/javascript">
-var app = angular.module("app", []);
+var app = angular.module("app", ['ui']);
 
 app.controller('Ctrl', function($scope, $filter, $http) {
 	 $scope.statues = [
@@ -27,7 +27,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 	 $scope.connectors = ${modelConnectorJson};
 	 $scope.row = ${assetRows};
   	 $scope.power = ${cableTypes};
-  	  
+  	 $scope.connectors['null']={};
   	$scope.params = {};
   	$scope.modelConnectors = {};
   	$scope.demoChange = function(value,type){
@@ -38,25 +38,35 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 	$scope.showRow = function(id) {
 		return $scope.row[id] == 's';
 	}
-	
+	var tempId=''
     $scope.showEditRow = function(id){
-    	var asset = $("#fromAsset_"+id).val();
-    	var type = $("#connectType_"+id).val();
-    	if($('.btn:visible').length== 0){
-    		$scope.row[id] = $scope.row[id] == 'h' ? 's' : 'h';
-    		if(asset)
-    			$scope.modelConnectors = $scope.connectors[asset][type];
-
-			//TODO: Used jquery syntax for now,should be replaced with angular.
-    		if(type=='Power'){
-				$(".powerDiv").show();
-				$(".nonPowerDiv").hide();
-				$("#staticConnector_"+$('#power_'+id).val()+"_"+id).attr('checked', true);
-        	}else{
-        		$(".powerDiv").hide();
-				$(".nonPowerDiv").show();
-            }
-    	}
+		var asset = $("#fromAsset_"+id).val();
+		var type = $("#connectType_"+id).val();
+	    if(tempId!='' && id!=tempId){
+    		$scope.cancelRow(tempId);
+		    $scope.row[id] = $scope.row[id] == 'h' ? 's' : 'h';
+	    } else {
+	    	if($('.btn:visible').length== 0){
+	    		$scope.row[id] = $scope.row[id] == 'h' ? 's' : 'h';
+	    		if(asset)
+	    			$scope.modelConnectors = $scope.connectors[asset][type];
+	         }
+	    }
+	    if(asset){
+		    $("#assetFromId_"+id).val(asset);
+		    if(!isIE7OrLesser)
+		    	$("#assetFromId_"+id).select2();
+	    }
+	  //TODO: Used jquery syntax for now,should be replaced with angular.
+		if(type=='Power'){
+			$(".powerDiv").show();
+			$(".nonPowerDiv").hide();
+			$("#staticConnector_"+$('#power_'+id).val()+"_"+id).attr('checked', true);
+    	}else{
+    		$(".powerDiv").hide();
+			$(".nonPowerDiv").show();
+        }
+	    tempId=id
     };
 
     $scope.cancelRow = function(id){
@@ -77,8 +87,6 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 	$('div.connector_Left').each(function(index) {
 		$(this).attr("style","margin-left:-"+$(this).children().width()+"px");
 	}); 
-	if(!isIE7OrLesser)
-		$("select.assetConnectSelect").select2();
 
 </script>
 <div id="cablingPanel" style="height: auto; ">
@@ -102,10 +110,10 @@ app.controller('Ctrl', function($scope, $filter, $http) {
    <table id="cableTable" class="table table-bordered table-hover table-condensed" style="width:auto;display:none;">
     <tr style="font-weight: bold">
       <th>Type</th>
-      <th>Label</th>
+      <th>Connector</th>
       <th>Status</th>
       <th>Color</th>
-      <th>Feet</th>
+      <th>Length</th>
       <th>Comment</th>
       <th>Assigned To</th>
     </tr>
@@ -149,7 +157,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
       		{{ cable.fromAsset }}
       	</span>
       	<span ng-hide="showRow(cable.cableId);" style="display:none;" class="type_{{power[cable.cableId]}}">
-      		{{ cable.fromAsset }}
+      		{{ cable.rackUposition }}
       	</span>
 	      	<span ng-show="showRow(cable.cableId)">
 			      	<span class="powerDiv" style="display:none;">
@@ -159,12 +167,12 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 						<input type="hidden" name="power_{{cable.cableId}}" id="power_{{cable.cableId}}" value="{{cable.rackUposition}}"/>
 					</span>
 					<span class="nonPowerDiv" style="display:none;">
-					     <select ng-model="params.value" ng-change="demoChange(params.value, cable.type)" id="assetFromId_{{cable.cableId}}" style="width:75px;">
-				        	<option value="">Please Select</option>
-					        <option ng-repeat="v in assets" value="{{v.id}}" title="{{v.assetName}}" ng-selected="v.id == cable.fromAssetId">{{v.assetName}}</option>
+					     <select ui-select2 ng-model="params.value" ng-change="demoChange(params.value, cable.type)" id="assetFromId_{{cable.cableId}}" style="width:100px;">
+				        	<option value="null">Please Select</option>
+					        <option ng-repeat="v in assets" value="{{v.id}}" title="{{v.assetName}}">{{v.assetName}}</option>
 					     </select>
 					     <select id="modelConnectorId_{{cable.cableId}}" style="width:75px;">
-					        <option value="">Please Select</option>
+					        <option value="null">Please Select</option>
 					        <option ng-repeat="c in modelConnectors" value="{{c.value}}" title="{{c.text}}" ng-selected="c.value == cable.connectorId">{{c.text}}</option>
 					     </select>
 				    </span>
