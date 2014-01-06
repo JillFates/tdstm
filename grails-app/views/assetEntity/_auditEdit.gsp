@@ -63,8 +63,8 @@ $(document).ready(function() {
 		 </div>
 		</td>
 	</tr>
-	<tr class="prop trAnchor" >
-		<td class="label"><b>Model</b></td>
+	<tr class="prop" >
+		<td class="label">Model</td>
 		<td class="label">
 		<div id="modelEditId">
 			<g:render template="modelView"  model="[clazz:config.model, models:models, assetEntity:assetEntityInstance, forWhom:'Edit']" />

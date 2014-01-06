@@ -34,10 +34,10 @@
 			${assetEntity.manufacturer}
 		</td>
 	</tr>
-	<tr class="prop trAnchor" onclick="showModelAudit(${assetEntity.model?.id})">
-		<td class="label"><a><b>Model</b></a></td>
+	<tr class="prop">
+		<td class="label">Model</td>
 		<td class="label">
-			<a>${assetEntity.model}</a>
+			${assetEntity.model}
 		</td>
 	</tr>
 	<tr class="prop">
