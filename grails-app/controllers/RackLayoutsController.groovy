@@ -749,14 +749,16 @@ class RackLayoutsController {
 				case "cabledId" : status = AssetCableStatus.CABLED ; break;
 				case "assignId" : 
 					if(connectorType != "Power"){
-						def assetEntity = AssetEntity.findById(params.assetFromId)
-						def modelConnectors
-						if(assetEntity?.model){
-							assetTo = assetEntity 
-							toConnector = ModelConnector.findById( params.modelConnectorId )
-							AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus=?,assetTo=null,
-															assetToPort=null, cableColor=null
-															where assetTo = ? and assetToPort = ? """,[status, assetTo, toConnector])
+						if(params.assetFromId !='null'){
+							def assetEntity = AssetEntity.findById(params.assetFromId)
+							def modelConnectors
+							if(assetEntity?.model){
+								assetTo = assetEntity 
+								toConnector = ModelConnector.findById( params.modelConnectorId )
+								AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus=?,assetTo=null,
+																assetToPort=null, cableColor=null
+																where assetTo = ? and assetToPort = ? """,[status, assetTo, toConnector])
+							}
 						}
 					} else {
 						assetTo = assetCableMap.assetFrom

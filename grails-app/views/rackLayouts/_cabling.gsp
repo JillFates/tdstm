@@ -5,9 +5,8 @@ var app = angular.module("app", ['ui']);
 app.controller('Ctrl', function($scope, $filter, $http) {
 	 $scope.statues = [
 	                   {value: 1, text:'Unknown'},
-	   				   {value: 2, text:'Assigned'},
-	   				   {value: 3, text:'Cabled'},
-	   				   {value: 4, text:'Empty'}
+	   				   {value: 2, text:'Cabled'},
+	   				   {value: 3, text:'Empty'}
 	   				  ];
 
 	 $scope.colors = [

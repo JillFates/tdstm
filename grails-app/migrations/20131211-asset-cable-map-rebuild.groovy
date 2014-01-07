@@ -46,4 +46,10 @@ databaseChangeLog = {
 		}
 		dropColumn(tableName:'asset_cable_map', columnName:'to_asset_uposition')
 	}*/
+	
+	//This set of database change to update cable_status from Assigned to Cabled.
+	changeSet(author: "lokanada", id: "20140107 TM-2381-4") {
+		comment("updates the status to Cabled for Assigned")
+		sql("UPDATE tdstm.asset_cable_map SET cable_status = 'Cabled' WHERE cable_status= 'Assigned'")
+	}
 }
