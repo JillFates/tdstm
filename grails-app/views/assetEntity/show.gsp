@@ -77,7 +77,7 @@ $(document).ready(function() {
 							<tr class="prop">
 								<td class="label ${config.model}" nowrap="nowrap"><label for="model">Model</label></td>
 								<td class="valueNW ${config.model}"><a href='javascript:showModel(${assetEntity.model?.id})' style='color:#00E'>${assetEntity.model}</a>
-								  <g:if test="${assetEntity.model?.modelStatus=='new'}"> <span style="color: red;"><b>?</b></span></g:if>
+								  <g:if test="${assetEntity.model?.modelStatus!='valid'}"> <span style="color: red;"><b>?</b></span></g:if>
 								</td>
 								<td class="label ${config.os}" nowrap="nowrap"><label for="os">OS</label></td>
 								<td class="valueNW ${config.os}">${assetEntity.os}</td>

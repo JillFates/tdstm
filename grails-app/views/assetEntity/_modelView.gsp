@@ -19,7 +19,7 @@
 			<g:each in="${models.Unvalidated}" var="m">
 				<option value="${m.id}"
 					${m.id == assetEntity?.model?.id ? 'selected="selected"' : ''}>
-					${m.modelName+(m.modelStatus!='full' ? ' ?' : '')}
+					${m.modelName+'?'}
 				</option>
 			</g:each>
 		</optgroup>
