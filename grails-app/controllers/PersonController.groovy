@@ -330,7 +330,7 @@ class PersonController {
 		} else {
 			if (errMsg) 
 				flash.message = errMsg
-			redirect( action:list )
+			redirect( action:list, params:[ companyId:companyId ] )
 		}
 
 	}
