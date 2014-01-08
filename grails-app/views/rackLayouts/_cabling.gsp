@@ -180,8 +180,8 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 		     </span>
       </td>
       <td ng-show="showRow(cable.cableId)">
-			<img src="${resource(dir:'images',file:'check12.png')}" class="pointer btn" onclick="submitAction($('form[name=cablingDetailsForm]'),{{cable.cableId}})" style="width:18px;"/>
-			<img src="${resource(dir:'images',file:'delete.png')}" class="pointer btn" ng-click="cancelRow(cable.cableId)" style="width:18px;"/>
+     	<img src="${resource(dir:'images',file:'delete.png')}" class="pointer btn" ng-click="cancelRow(cable.cableId)" style="width:18px;"/>
+		<img src="${resource(dir:'images',file:'check12.png')}" class="pointer btn" onclick="submitAction($('form[name=cablingDetailsForm]'),{{cable.cableId}})" style="width:18px;"/>
       </td>
     </tr>
   </table>

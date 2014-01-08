@@ -656,11 +656,15 @@ class RackLayoutsController {
 			title = assetEntity.assetName+" ( "+assetEntity?.model?.manufacturer+" / "+assetEntity.model+" )"
 		}
 		def currRoomRackAssets = []
-		if(assetEntity.roomSource){
-			currRoomRackAssets = AssetEntity.findAllByRoomSourceAndSourceRack(assetEntity.roomSource,assetEntity.sourceRack)
-		}else{
-			currRoomRackAssets = AssetEntity.findAllByRoomTargetAndTargetRack(assetEntity.roomTarget,assetEntity.targetRack)
+		
+		if( assetEntity.roomSource && !assetEntity.roomTarget ){
+			currRoomRackAssets = AssetEntity.findAllByRoomSource(assetEntity.roomSource)
+		} else if ( assetEntity.roomTarget && !assetEntity.roomSource ){
+			currRoomRackAssets = AssetEntity.findAllByRoomTarget(assetEntity.roomTarget)
+		} else {
+			currRoomRackAssets = AssetEntity.findAllByRoomSourceOrRoomTarget(assetEntity.roomSource,assetEntity.roomTarget)
 		}
+		
 		def dependencyStatus = AssetCableStatus.list
 		def assetCablingDetails = []
 		def assetCablingMap =[:]
@@ -676,6 +680,12 @@ class RackLayoutsController {
 			} else if(it.assetTo){
 				toAssetId = it.assetTo.id
 				toTitle = it.assetTo.assetName+" ( "+it.assetTo.model?.manufacturer+" / "+it.assetTo.model+" )"
+			}
+			if(it.assetLoc == 'S'){
+				def sourceRack =it.assetFrom?.sourceRack
+				title += sourceRack ? " ( "+sourceRack+" / "+it.assetFrom?.sourceRackPosition+" )" : ""
+			}else{
+				title += " ( "+it.assetFrom?.targetRack+" / "+it.assetFrom?.targetRackPosition+" )"
 			}
 			assetCablingDetails << [model:assetEntity.model?.id, id:it.id, connector : it.assetFromPort.connector, 
 									type:it.assetFromPort.type, connectorPosX:it.assetFromPort.connectorPosX,

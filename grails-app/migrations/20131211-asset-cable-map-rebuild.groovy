@@ -29,6 +29,24 @@ databaseChangeLog = {
 		sql("UPDATE tdstm.asset_cable_map SET cable_status = 'Empty' WHERE cable_status= 'empty'")
 		sql("UPDATE tdstm.asset_cable_map SET cable_status = 'Cabled' WHERE cable_status= 'cabled'")
 	}
+	
+	//This set of database change to update cable_status from Assigned to Cabled.
+	changeSet(author: "lokanada", id: "20140107 TM-2381-4") {
+		comment("updates the status to Cabled for Assigned")
+		sql("UPDATE tdstm.asset_cable_map SET cable_status = 'Cabled' WHERE cable_status= 'Assigned'")
+	}
+	
+	//This set of database change to Add column asset_loc in asset_cable_map table.
+	changeSet(author: "lokanada", id: "20140107 TM-2381-5") {
+		comment("Added asset_loc column in asset_cable_map table")
+		preConditions(onFail:'MARK_RAN') {
+			not {
+				columnExists(schemaName:'tdstm', tableName:'asset_cable_map', columnName:'asset_loc' )
+			}
+		}
+		sql("ALTER TABLE tdstm.asset_cable_map ADD COLUMN asset_loc VARCHAR(10) DEFAULT 'S'")
+	}
+	
 	//TODO :@John, enable below changeSets after ensuring the data transferred to new columns.
 	/*// This set of Database change to drop to_asset_rack column from asset_cable_map table.
 	changeSet(author: "lokanada", id: "20131211 TM-2381-1") {
@@ -46,10 +64,4 @@ databaseChangeLog = {
 		}
 		dropColumn(tableName:'asset_cable_map', columnName:'to_asset_uposition')
 	}*/
-	
-	//This set of database change to update cable_status from Assigned to Cabled.
-	changeSet(author: "lokanada", id: "20140107 TM-2381-4") {
-		comment("updates the status to Cabled for Assigned")
-		sql("UPDATE tdstm.asset_cable_map SET cable_status = 'Cabled' WHERE cable_status= 'Assigned'")
-	}
 }

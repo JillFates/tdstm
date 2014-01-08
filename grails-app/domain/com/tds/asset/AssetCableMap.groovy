@@ -10,6 +10,7 @@ class AssetCableMap {
 	String cableColor
 	Integer cableLength
 	String toPower
+	String assetLoc = 'S'
 	
 	static constraints = {
 		cable( nullable:false, blank:false )
@@ -22,6 +23,7 @@ class AssetCableMap {
 		cableColor( nullable:true, blank:true, inList: ['White', 'Grey', 'Green', 'Yellow', 'Orange', 'Red', 'Blue', 'Purple', 'Black'] )
 		cableLength( nullable:true )
 		toPower( nullable:true, blank:true)
+		assetLoc( nullable: true )
 	}
 	
 	static mapping = {
