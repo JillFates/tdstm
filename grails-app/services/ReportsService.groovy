@@ -63,7 +63,7 @@ class ReportsService {
 			   'blankAssets':assetsInfo.blankAssets ,'questioned':assetsInfo.questioned,'questionedDependency':assetsInfo.questionedDependency,
 			   'specialInstruction':assetsInfo.specialInstruction,'importantInstruction':assetsInfo.importantInstruction,'eventErrorString':eventErrorString,
 			   'dashBoardOk':eventBundleInfo.dashBoardOk,'allErrors':allErrors,'nullAssetTag':assetsInfo.nullAssetTag,'blankAssetTag':assetsInfo.blankAssetTag,'modelList':modelInfo.modelList,'modelError':modelInfo.modelError,
-			   'eventIssues':assetsInfo.eventIssues,'nonAssetIssue':assetsInfo.nonAssetIssue]
+			   'eventIssues':assetsInfo.eventIssues,'nonAssetIssue':assetsInfo.nonAssetIssue, 'dependenciesNotValid':assetsInfo.dependenciesNotValid]
 
 	}
 	
@@ -236,7 +236,7 @@ class ReportsService {
 			blankAssets += """<span style="color: red;"><b>Blank Naming Check: <br></br></span>"""
 			eventErrorList << 'Assets'
 		}else{
-		    blankAssets += """<span style="color: green;"><b>Blank Naming Check: OK: No error: "Blank names: 0"<br></br></span>"""
+		    blankAssets += """<span style="color: green;"><b>Blank Naming Check: OK<br></br></span>"""
 		}
 		
 		def duplicatesAssetTagNames = jdbcTemplate.queryForList("""SELECT asset_tag as tag , count(*) as counts from asset_entity 
@@ -260,7 +260,7 @@ class ReportsService {
 			blankAssetTag += """<span style="color: red;"><b>Blank Tag Check: ${nullAssetTag.size()} assets with no asset tags <br></br></span>"""
 			eventErrorList << 'Assets'
 		}else{
-			blankAssetTag += """<span style="color: green;"><b>Blank Tag Check: OK: No error: "Blank tag: 0"<br></br></span>"""
+			blankAssetTag += """<span style="color: green;"><b>Blank Naming Tag: OK<br></br></span>"""
 		}
 		
 		def missingRacks = AssetEntity.findAll("from AssetEntity asset where  asset.project.id=${currProj} and asset.assetType not in (:type) \
@@ -283,18 +283,28 @@ class ReportsService {
 		}else{
 		    dependencies=[]
 		}
+		def assetId = assetEntityList.id
 		dependencies.sort()
+		String dependenciesNotValid = ""
+		def depsStatusNotValid = assetId ? AssetDependency.findAll("from AssetDependency dependency where (dependency.asset.id in (:assetIds) or \
+            									dependency.dependent.id in (:assetIds)) and dependency.status =:status  order by dependency.asset.assetName ",
+												[assetIds : assetId, status:'Validated']) : []
+		Set assetsWithDep = depsStatusNotValid.asset + depsStatusNotValid.dependent
+		def assetsWithOutDep = assetEntityList - assetsWithDep.toList()
+		if(assetsWithOutDep.size()>0){
+			dependenciesNotValid +="""<span style="color: red;"><b>Assets without dependency: ${assetsWithOutDep.size()} Assets:<br></br></b></span>
+									<div style="margin-left:50px;"> ${assetsWithOutDep.assetName.toString().replace('[','').replace(']','')}</div>"""
+		}else{
+			dependenciesNotValid +="""<span style="color: red;"><b>Assets without dependency: 0 Assets</b><br></br></span>"""
+		}
 		String dependenciesOk = ""
 		if(dependencies.size()>0){
-			dependenciesOk +="""<span style="color: red;"><b>Dependency found: ${dependencies.size} Dependency Found:<br></br></b></span> 
-                                    <div style="margin-left:50px;"> ${dependencies.toString().replace('[','').replace(']','')}</div>
-                                """
+			dependenciesOk +="""<span style="color: green;"><b>Dependency found: ${dependencies.size} Dependency Found:<br></br></b></span>"""
 			eventErrorList << 'Assets'
 		}else{
-			dependenciesOk +="""<span style="color: green;"><b>Dependency: OK-No Dependencies: </b><br></br></span>"""
+			dependenciesOk +="""<span style="color: red;"><b>Dependency: OK-No Dependencies: </b><br></br></span>"""
 		}
 		
-		def assetId = assetEntityList.id
 		
 		def categories = ['shutdown','moveday','startup','physical','physical-source','physical-target']
 		def issues = assetId ? AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in (:assetIds) and commentType ='issue' \
@@ -302,10 +312,10 @@ class ReportsService {
             [assetIds:assetId, categories:categories]) : []
 		def issue = ""
 		if(issues.size()>0){
-			issue +="""<span style="color: red;"><b>Asset Issues: Unresolved Issues  </b><br></br></span>"""
+			issue +="""<span style="color: red;"><b>Asset Tasks: Unresolved Tasks  </b><br></br></span>"""
 			eventErrorList << 'Assets'
 		}else{
-			issue +="""<span style="color: green;"><b>Asset Issues: OK  </b><br></br></span>"""
+			issue +="""<span style="color: green;"><b>Asset Tasks: OK  </b><br></br></span>"""
 		}
 		
 		def specialInstruction = assetId ? AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in (:assetIds)  and  mustVerify = 1 order by comment.assetEntity.assetName ",
@@ -331,13 +341,13 @@ class ReportsService {
 		}else{
 		    questioned +="""<span style="color: green;"><b>Dependencies Questioned: OK  </b><br></br></span>"""
 		}
-		def nonAssetIssue = AssetComment.findAll("from AssetComment a where a.moveEvent = :event and a.category not in(:categories) ",
-                                                [event: moveEventInstance, categories:categories])
+		def nonAssetIssue = AssetComment.findAll("from AssetComment a where a.moveEvent = :event and a.category in(:categories) and a.isResolved = :resolved",
+                                                [event: moveEventInstance, categories:['general','discovery','planning','walkthru'], resolved:0])
 		def eventIssues = ''
 		if(nonAssetIssue.size()>0){
-			eventIssues +="""<span style="color: red;"><b>Event Issues: </b><br></br></span>"""
+			eventIssues +="""<span style="color: red;"><b>Event Tasks: </b><br></br></span>"""
 		}else{
-			eventIssues +="""<span style="color: green;"><b>Event Issues: OK  </b><br></br></span>"""
+			eventIssues +="""<span style="color: green;"><b>Event Tasks: OK  </b><br></br></span>"""
 		}
 		
 		
@@ -345,7 +355,8 @@ class ReportsService {
 			   missedRacks:missedRacks,duplicatesTag:duplicatesTag,duplicatesAssetTagNames:duplicatesAssetTagNames,duplicates:duplicates,
 			   duplicatesAssetNames:duplicatesAssetNames,nullAssetname:nullAssetname,blankAssets:blankAssets,questioned:questioned,
 			   questionedDependency:questionedDependency,specialInstruction:specialInstruction,importantInstruction:importantInstruction,
-			   eventErrorList:eventErrorList,nullAssetTag:nullAssetTag,blankAssetTag:blankAssetTag,eventIssues:eventIssues,nonAssetIssue:nonAssetIssue]
+			   eventErrorList:eventErrorList,nullAssetTag:nullAssetTag,blankAssetTag:blankAssetTag,eventIssues:eventIssues,nonAssetIssue:nonAssetIssue,
+			   dependenciesNotValid:dependenciesNotValid]
 
 	}
 	

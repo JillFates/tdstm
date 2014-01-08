@@ -234,11 +234,18 @@
 			<tr>
 				<td>&nbsp;</td>
 				<td>
+					${dependenciesNotValid}
+				</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>
 					${issue}<br />
 					<table style="width: auto; margin-left: 100px;">
 						<tr>
 							<th>AssetName</th>
 							<th>Comment</th>
+							<th>Assigned To</th>
 						</tr>
 						<tbody>
 							<g:if test="${issueMap.size()>0}">
@@ -250,6 +257,9 @@
 										<td>
 											${issue.comment}
 										</td>
+										<td>
+											${issue.assignedTo}
+										</td>
 									</tr>
 								</g:each>
 							</g:if>
@@ -260,37 +270,6 @@
 							</g:else>
 						</tbody>
 
-					</table>
-				</td>
-			</tr>
-			<tr>
-				<td>&nbsp;</td>
-				<td>
-					${importantInstruction}<br />
-					<table style="width: auto; margin-left: 100px;">
-						<tr>
-							<th>AssetName</th>
-							<th>Special Comment</th>
-						</tr>
-						<tbody>
-							<g:if test="${specialInstruction.size()>0}">
-								<g:each in="${specialInstruction}" var="instruction" status="i">
-									<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-										<td>
-											${instruction.assetEntity.assetName}
-										</td>
-										<td>
-											${instruction.comment}
-										</td>
-									</tr>
-								</g:each>
-							</g:if>
-							<g:else>
-								<tr>
-									<td colspan="2">No Special Instruction</td>
-								</tr>
-							</g:else>
-						</tbody>
 					</table>
 				</td>
 			</tr>
