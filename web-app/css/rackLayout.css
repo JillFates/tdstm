@@ -32,22 +32,41 @@ br.page-break-after {
 	box-shadow: #888 5px 5px 10px;
 }
 #rackLayout {
-  position: fixed;
-  height: auto; 
+  position: absolute !important;
+  display:table;  
   width: auto !important;
-  top: 190px; 
+  top: 194px; 
   right: 5px; 
-  bottom: 25px;
-  margin: 0;
-  padding-right: 18px;
-  float: right !important;
-  overflow-y: auto !important;
-  background-color: white;
+  background-color: white !important;
+}
+.audit{
+	margin-right: 25% !important;
+}
+.nonAdudit{
+	float:right !important;
 }
 #rackLayout .body {
   height: 100%;
 }
 #rackLayout td {
+	padding: 1px;
+}
+
+/*CSS for RackLayout in Rack view for changed Id 'racksLayout'*/
+#racksLayout {
+  position: inherit;
+  height: auto; width: auto !important;
+  top: 70px; right: 5px; bottom: 25px;
+  margin: 0;
+  padding-right: 18px;
+  float: left !important;
+  overflow-y: auto !important;
+  background-color: white;
+}
+#racksLayout .body {
+  height: 100%;
+}
+#racksLayout td {
 	padding: 1px;
 }
 #room_layout {
@@ -933,8 +952,11 @@ table.rack_elevation table.bladeTable td.errorBlade {
 	position:absolute;
 }
 #auditDetailViewId{
-	float: left;
-	width: 275px
+	position: absolute !important;
+	margin-left:72.3%;
+	margin-top: 10px;
+	width: 295px !important;
+	background-color: white !important;
 }
 .capCount {
 	font-size: 10px;

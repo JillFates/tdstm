@@ -94,7 +94,7 @@
      		return false;
      	} else if($('#commit').val() == 'Generate') {
 			$("#cablingDialogId").dialog("close")
-			$('#rackLayout').html('Loading...');
+			$('#racksLayout').html('Loading...');
 		if(reqLoadRack) reqLoadRack.abort();
 		reqLoadRack = jQuery.ajax({
 				url: $(form).attr('action'),
@@ -102,7 +102,7 @@
 				type:'POST',
 				success: function(data) {
 					getAssignedDetails('rack','');
-					$('#rackLayout').html(data);					
+					$('#racksLayout').html(data);					
 				}
 			});
 	 		return false;
@@ -201,7 +201,7 @@
 	</g:form>
 </div>
 <div style="display: none;" id="cablingDialogId"></div>
-<div id="rackLayout" style="width:100%; overflow-x:auto; border: 1px solid black">
+<div id="racksLayout" style="width:100%; overflow-x:auto; border: 1px solid black">
 
 </div>
 <div id="listDialog" title="Asset List" style="display: none;">

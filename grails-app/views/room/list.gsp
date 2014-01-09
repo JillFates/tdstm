@@ -399,10 +399,15 @@
 					onSuccess:function(e){updateRackPower( rackId )},
 					onComplete:function(e){
 							jQuery('#rackLayout').html(e.responseText);
-							if(forWhom=='room')
-								$("#auditDetailViewId").show()
-							else
-								$("#auditDetailViewId").hide()
+							if(forWhom=='room'){
+								$("#auditDetailViewId").show();
+								$('#rackLayout').addClass('audit');
+								$('#rackLayout').removeClass('notAudit'); 
+							}else{
+								$("#auditDetailViewId").hide();
+								$('#rackLayout').addClass('notAudit');
+								$('#rackLayout').removeClass('audit');
+							}
 							getAssignedDetails('room', rackId)
 						},parameters:moveBundleId+'rackId='+rackId+'&backView=off&showCabling=off&otherBundle='+otherBundle+'&bundleName=on&hideIcons=on&forWhom='+forWhom});return false;
 			}
