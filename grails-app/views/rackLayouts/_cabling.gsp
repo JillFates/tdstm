@@ -49,8 +49,6 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 	    		$scope.row[id] = $scope.row[id] == 'h' ? 's' : 'h';
 	         }
 	    }
-	    console.log($scope.assets.length);
-		//$scope.showAsset(id, asset, type);
 	  //TODO: Used jquery syntax for now,should be replaced with angular.
 		if(type=='Power'){
 			$(".powerDiv").show();
@@ -68,18 +66,19 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 	    		}).success (function(resp) {
 	    			$scope.assets = resp['assets'];
 	    			$scope.connectors = resp['connectors'];
+	    			$scope.showAsset(id, asset, type);
 	    			if(asset)
 	    				$scope.modelConnectors = $scope.connectors[asset][type];
 	    		}).error(function(resp, status, headers, config) {
 	    			alert("An Unexpected error while showing the asset fields.")
 	    		});
 			} else {
+				$scope.showAsset(id, asset, type);
 				if(!asset)
 					$scope.modelConnectors = {};
 				else
 					$scope.modelConnectors = $scope.connectors[asset][type];
 			}
-			$scope.showAsset(id, asset, type);
         }
 	    tempId=id
     };
