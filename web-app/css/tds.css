@@ -216,7 +216,7 @@
 	width:200px;
 }
 #racksMegaMenu {
-	width:250px;
+	width:auto !important;
 }
 #assetMegaMenu {
 	width:285px;
