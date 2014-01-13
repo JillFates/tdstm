@@ -242,7 +242,7 @@ function submitAction(form, cableId){
 
 			var assetFrom = $("#assetFromId_"+cableId).val()
 			var modelConnectorId = $("#modelConnectorId_"+cableId).val()
-			if($("#status_"+cableId).val() == 'Cabled'){
+			if($("#status_"+cableId).val() == 'Cabled' || $("#status_"+cableId).val() == 'Empty'){
 				if( assetFrom!='null' && modelConnectorId=='null' ){
 					isValid = false
 					alert("Please enter the target connector details")
@@ -253,7 +253,7 @@ function submitAction(form, cableId){
 	var actionType=''
 	switch($("#status_"+cableId).val()){
 		case "Cabled" : actionType = 'assignId' ; break;
-		case "Empty" : actionType = 'emptyId' ; break;
+		case "Empty" : actionType = 'assignId' ; break;
 	}
 	if(isValid){
 		jQuery.ajax({

@@ -22,8 +22,8 @@ app.controller('Ctrl', function($scope, $filter, $http) {
    				  	];
 
 	 $scope.cables = ${assetCablingMap};
-	 $scope.assets = ${currRoomRackAssets};  
-	 $scope.connectors = ${modelConnectorJson};
+	 $scope.assets = {}; 
+	 $scope.connectors = {};
 	 $scope.row = ${assetRows};
   	 $scope.power = ${cableTypes};
   	 $scope.connectors['null']={};
@@ -47,27 +47,50 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 	    } else {
 	    	if($('.btn:visible').length== 0){
 	    		$scope.row[id] = $scope.row[id] == 'h' ? 's' : 'h';
-	    		if(asset)
-	    			$scope.modelConnectors = $scope.connectors[asset][type];
 	         }
 	    }
-	    if(asset){
-		    $("#assetFromId_"+id).val(asset);
-		    if(!isIE7OrLesser)
-		    	$("#assetFromId_"+id).select2();
-	    }
+	    console.log($scope.assets.length);
+		//$scope.showAsset(id, asset, type);
 	  //TODO: Used jquery syntax for now,should be replaced with angular.
 		if(type=='Power'){
 			$(".powerDiv").show();
 			$(".nonPowerDiv").hide();
 			$("#staticConnector_"+$('#power_'+id).val()+"_"+id).attr('checked', true);
     	}else{
-    		$(".powerDiv").hide();
 			$(".nonPowerDiv").show();
+			$(".powerDiv").hide();
+			if( $scope.assets.length == undefined){
+	    		$http({
+	    			url : "../rackLayouts/getAssetModelConnectors",
+	    			method: "POST",
+	    			async: false,
+	    			data:{'asset': $("#assetEntityId").val(), 'type':type}
+	    		}).success (function(resp) {
+	    			$scope.assets = resp['assets'];
+	    			$scope.connectors = resp['connectors'];
+	    			if(asset)
+	    				$scope.modelConnectors = $scope.connectors[asset][type];
+	    		}).error(function(resp, status, headers, config) {
+	    			alert("An Unexpected error while showing the asset fields.")
+	    		});
+			} else {
+				if(!asset)
+					$scope.modelConnectors = {};
+				else
+					$scope.modelConnectors = $scope.connectors[asset][type];
+			}
+			$scope.showAsset(id, asset, type);
         }
 	    tempId=id
     };
-
+	$scope.showAsset = function(id, asset, type){
+		setTimeout(function(){
+			$("#assetFromId_"+id).html($("#assetHiddenId").html());
+		    $("#assetFromId_"+id).val(asset);
+		    if(!isIE7OrLesser)
+		    	$("#assetFromId_"+id).select2();
+		},600);
+	}
     $scope.cancelRow = function(id){
     	return $scope.row[id] = 'h';
     };
@@ -167,8 +190,11 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 					</span>
 					<span class="nonPowerDiv" style="display:none;">
 					     <select ui-select2 ng-model="params.value" ng-change="demoChange(params.value, cable.type)" id="assetFromId_{{cable.cableId}}" style="width:100px;">
-				        	<option value="null">Please Select</option>
-					        <option ng-repeat="v in assets" value="{{v.id}}" title="{{v.assetName}}">{{v.assetName}}</option>
+				        	<option value="{{cable.fromAssetId}}">{{ cable.asset }}</option>
+					     </select>
+					     <select id="assetHiddenId" style="display:none;width:75px;">
+					        <option value="null">Please Select</option>
+					        <option ng-repeat="v in assets" value="{{v.id}}" title="{{v.assetName}}" >{{v.assetName}}</option>
 					     </select>
 					     <select id="modelConnectorId_{{cable.cableId}}" style="width:75px;">
 					        <option value="null">Please Select</option>

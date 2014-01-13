@@ -655,15 +655,6 @@ class RackLayoutsController {
 			assetCableMapList = AssetCableMap.findAllByAssetFrom( assetEntity )
 			title = assetEntity.assetName+" ( "+assetEntity?.model?.manufacturer+" / "+assetEntity.model+" )"
 		}
-		def currRoomRackAssets = []
-		
-		if( assetEntity.roomSource && !assetEntity.roomTarget ){
-			currRoomRackAssets = AssetEntity.findAllByRoomSource(assetEntity.roomSource)
-		} else if ( assetEntity.roomTarget && !assetEntity.roomSource ){
-			currRoomRackAssets = AssetEntity.findAllByRoomTarget(assetEntity.roomTarget)
-		} else {
-			currRoomRackAssets = AssetEntity.findAllByRoomSourceOrRoomTarget(assetEntity.roomSource,assetEntity.roomTarget)
-		}
 		
 		def dependencyStatus = AssetCableStatus.list
 		def assetCablingDetails = []
@@ -696,7 +687,7 @@ class RackLayoutsController {
 									fromAssetId :(it.assetTo? it.assetTo?.assetName+"/"+connectorLabel:''), toTitle:toTitle, title:title]
 			
 			assetCablingMap <<[(it.id):[label : it.assetFromPort.label, color :it.cableColor, type:it.assetFromPort.type, length:it.cableLength?:'',
-									status:it.cableStatus,comment:it.cableComment?:'', fromAssetId :it.assetTo? it.assetTo?.id :'',
+									status:it.cableStatus,comment:it.cableComment?:'', fromAssetId :it.assetTo? it.assetTo?.id :'',asset :it.assetTo? it.assetTo?.assetName :'',
 									fromAsset:(it.assetTo? it.assetTo?.assetName+"/"+connectorLabel:'') ,toTitle:toTitle, title:title, rackUposition : connectorLabel , 
 									connectorId: it.assetToPort ? it.assetToPort.id : "",type:it.assetFromPort.type, cableId:it.id]]
 			
@@ -704,28 +695,40 @@ class RackLayoutsController {
 			//Used to show and hide power links using angular.
 			powerHouse << [(it.id):(it.assetFromPort.type=='Power'? 'h': 's')]
 		}
-		currRoomRackAssets.each{asset ->
-			def modelConnectors =[:]
-			ModelConnector.constraints.type.inList.each{
-				modelConnectors << [(it):getAssetModelConnectors(asset.id, it)]
-			}
-			modelConnectorMap << [(asset.id):modelConnectors]
-		}
-		render(template:"cabling", model:[assetCablingDetails:assetCablingDetails, currentBundle:currentBundle, assetCablingMap:(assetCablingMap as JSON) ,
-										  models:models, currRoomRackAssets:(currRoomRackAssets-assetEntity as JSON), modelConnectorJson:(modelConnectorMap as JSON),
-										  dependencyStatus: dependencyStatus , assetRows:(assetRows as JSON),cableTypes:(powerHouse as JSON)])
+		render(template:"cabling", model:[assetCablingDetails:assetCablingDetails, currentBundle:currentBundle, assetCablingMap:(assetCablingMap as JSON),
+										  models:models,assetRows:(assetRows as JSON),cableTypes:(powerHouse as JSON)])
 	}
 	/*
 	 * Return modelConnectorList to display at connectors dropdown in  cabling screen
 	 */
-	def getAssetModelConnectors(assetId,type) {
+	def getAssetModelConnectors = {
+		def Json = request.JSON
+		def assetId =Json.asset
 		def assetEntity = assetId ? AssetEntity.get(assetId) : null
-		def modelConnectList = AssetCableMap.findAllByAssetFrom(assetEntity)?.findAll{it.assetFromPort.type==type}?.assetFromPort
-		def modelConnectMapList=[]
-		modelConnectList.each{
-			modelConnectMapList << ['value':it.id, 'text': it.label]
+		def currRoomRackAssets = []
+		if( assetEntity.roomSource && !assetEntity.roomTarget ){
+			currRoomRackAssets = AssetEntity.findAllByRoomSource(assetEntity.roomSource)
+		} else if ( assetEntity.roomTarget && !assetEntity.roomSource ){
+			currRoomRackAssets = AssetEntity.findAllByRoomTarget(assetEntity.roomTarget)
+		} else {
+			currRoomRackAssets = AssetEntity.findAllByRoomSourceOrRoomTarget(assetEntity.roomSource,assetEntity.roomTarget)
 		}
-		return modelConnectMapList
+		def modelConnectorMap =[:]
+		currRoomRackAssets.each{asset ->
+			def modelConnectList = AssetCableMap.findAllByAssetFrom(asset)//?.findAll{it.assetFromPort.type==Json.type}?.assetFromPort
+			
+			def modelConnectors =[:]
+			ModelConnector.constraints.type.inList.each{ type->
+				def modelConnectMapList=[]
+				modelConnectList.findAll{it.assetFromPort.type == type }.assetFromPort.each{
+					modelConnectMapList << ['value': it.id, 'text': it.label]
+				}
+				modelConnectors << [(type):modelConnectMapList]
+			}
+			modelConnectorMap << [(asset.id):modelConnectors?:[:]]
+		}
+		def output = ['connectors': modelConnectorMap, 'assets' : currRoomRackAssets]
+		render output as JSON
 	}
 	/*
 	 * Update the AssetCablingMap with the date send from RackLayout cabling screen
