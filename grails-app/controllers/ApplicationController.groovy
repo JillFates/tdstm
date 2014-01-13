@@ -128,6 +128,10 @@ class ApplicationController {
 			else
 				query.append(" WHERE (apps.latency NOT IN ('Y','N') OR apps.latency IS NULL) ")	
 		}
+		if(params.moveBundleId){
+			def bundleName = MoveBundle.get(params.moveBundleId)?.name
+			query.append(" WHERE apps.moveBundle  = '${bundleName}' ")
+		}
 		def appsList = jdbcTemplate.queryForList(query.toString())
 		
 		// Cut the list of selected applications down to only the rows that will be shown in the grid
