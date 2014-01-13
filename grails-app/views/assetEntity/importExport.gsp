@@ -109,10 +109,6 @@
                   <td >&nbsp;</td>
                   <td ><div id="progressbar" style="display: none;" ></div></td>
                 </tr>
-                <tr>
-                	<td valign="top" class="buttonR"><g:link controller="dataTransferBatch" >Manage Batches: ${dataTransferBatchs}</g:link></td>
-                	<td valign="top" class="name">&nbsp;</td>
-                </tr>
                 <tr><td colspan="2">
 	                <span><input type="checkbox" id="applicationId" name="application" value="application" 
 	                		onclick="importExportPreference($(this),'ImportApplication')" 
@@ -140,6 +136,10 @@
                 <tds:hasPermission permission="Import">
                   <td class="buttonR"><input class="button" id="run" type="submit" value="Import Batch" /></td>
                  </tds:hasPermission>
+                </tr>
+                <tr>
+                	<td valign="top" class="buttonR"><g:link controller="dataTransferBatch" >Manage Batches: ${dataTransferBatchs}</g:link></td>
+                	<td valign="top" class="name">&nbsp;</td>
                 </tr>
               </tbody>
             </table>
