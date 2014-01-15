@@ -702,30 +702,25 @@ class RackLayoutsController {
 	 * Return modelConnectorList to display at connectors dropdown in  cabling screen
 	 */
 	def getAssetModelConnectors = {
-		def Json = request.JSON
-		def assetId =Json.asset
+		def jsonInput = request.JSON
+		def assetId =jsonInput.asset
 		def assetEntity = assetId ? AssetEntity.get(assetId) : null
 		def currRoomRackAssets = []
 		if( assetEntity.roomSource && !assetEntity.roomTarget ){
-			currRoomRackAssets = AssetEntity.findAllByRoomSource(assetEntity.roomSource)
+			currRoomRackAssets = AssetEntity.findAllByRoomSource(assetEntity.roomSource)?.findAll{it.model?.modelConnectors?.type?.contains(jsonInput.type)}
 		} else if ( assetEntity.roomTarget && !assetEntity.roomSource ){
-			currRoomRackAssets = AssetEntity.findAllByRoomTarget(assetEntity.roomTarget)
+			currRoomRackAssets = AssetEntity.findAllByRoomTarget(assetEntity.roomTarget)?.findAll{it.model?.modelConnectors?.type?.contains(jsonInput.type)}
 		} else {
-			currRoomRackAssets = AssetEntity.findAllByRoomSourceOrRoomTarget(assetEntity.roomSource,assetEntity.roomTarget)
+			currRoomRackAssets = AssetEntity.findAllByRoomSourceOrRoomTarget(assetEntity.roomSource,assetEntity.roomTarget)?.findAll{it.model?.modelConnectors?.type?.contains(jsonInput.type)}
 		}
 		def modelConnectorMap =[:]
 		currRoomRackAssets.each{asset ->
-			def modelConnectList = AssetCableMap.findAllByAssetFrom(asset)//?.findAll{it.assetFromPort.type==Json.type}?.assetFromPort
-			
-			def modelConnectors =[:]
-			ModelConnector.constraints.type.inList.each{ type->
-				def modelConnectMapList=[]
-				modelConnectList.findAll{it.assetFromPort.type == type }.assetFromPort.each{
-					modelConnectMapList << ['value': it.id, 'text': it.label]
-				}
-				modelConnectors << [(type):modelConnectMapList]
+			def modelConnectMapList=[]
+			def modelConnectList = AssetCableMap.findAllByAssetFrom(asset)?.findAll{it.assetFromPort.type == jsonInput.type }
+			modelConnectList.each{
+				modelConnectMapList << ['value': it.assetFromPort.id, 'text': it.assetFromPort.label]
 			}
-			modelConnectorMap << [(asset.id):modelConnectors?:[:]]
+			modelConnectorMap << [(asset.id):modelConnectMapList]
 		}
 		def output = ['connectors': modelConnectorMap, 'assets' : currRoomRackAssets]
 		render output as JSON
@@ -734,21 +729,22 @@ class RackLayoutsController {
 	 * Update the AssetCablingMap with the date send from RackLayout cabling screen
 	 */
 	def updateCablingDetails = {
-		
-		def assetId = NumberUtils.toDouble(params.assetId,0).round() 
-		def assetCableId = params.assetCable
-		
+		def jsonInput = request.JSON
+		def assetId = NumberUtils.toDouble(jsonInput.assetId,0).round() 
+		def assetCableId = jsonInput.assetCable
+		def assetCableMap
+		def toCableId
 		if(assetCableId){
 			def currProj = getSession().getAttribute( "CURR_PROJ" )
 			def projectId = currProj.CURR_PROJ
 			def project = Project.get( projectId )
-			def actionType = params.actionType
-			def status = params.status?: AssetCableStatus.UNKNOWN
+			def actionType = jsonInput.actionType
+			def status = jsonInput.status?: AssetCableStatus.UNKNOWN
 			def toConnector
 			def assetTo
 			def toPower
-			def connectorType = params.connectorType
-			def assetCableMap = AssetCableMap.findById( assetCableId )
+			def connectorType = jsonInput.connectorType
+			assetCableMap = AssetCableMap.findById( assetCableId )
 		
 			if(connectorType != "Power"){
 				def fromAssetCableMap = AssetCableMap.findByAssetToAndAssetToPort( assetCableMap.assetFrom, assetCableMap.assetFromPort )
@@ -762,12 +758,13 @@ class RackLayoutsController {
 				case "cabledId" : status = AssetCableStatus.CABLED ; break;
 				case "assignId" : 
 					if(connectorType != "Power"){
-						if(params.assetFromId !='null'){
-							def assetEntity = AssetEntity.findById(params.assetFromId)
+						if(jsonInput.assetFromId !='null'){
+							def assetEntity = AssetEntity.findById(jsonInput.assetFromId)
 							def modelConnectors
 							if(assetEntity?.model){
 								assetTo = assetEntity 
-								toConnector = ModelConnector.findById( params.modelConnectorId )
+								toConnector = ModelConnector.findById( jsonInput.modelConnectorId )
+								toCableId = AssetCableMap.findByAssetToPortAndAssetTo(toConnector, assetTo)
 								AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus=?,assetTo=null,
 																assetToPort=null, cableColor=null
 																where assetTo = ? and assetToPort = ? """,[status, assetTo, toConnector])
@@ -776,7 +773,7 @@ class RackLayoutsController {
 					} else {
 						assetTo = assetCableMap.assetFrom
 						toConnector = null
-						toPower = params.staticConnector
+						toPower = jsonInput.staticConnector
 					}
 					break;
 			}
@@ -786,18 +783,18 @@ class RackLayoutsController {
 			assetCableMap.assetTo = assetTo
 			assetCableMap.assetToPort = toConnector
 			assetCableMap.toPower = toPower
-			assetCableMap.cableColor = params.color
-			assetCableMap.cableLength = NumberUtils.toDouble(params.cableLength,0).round() 
-			assetCableMap.cableComment = params.cableComment
+			assetCableMap.cableColor = jsonInput.color
+			assetCableMap.cableLength = NumberUtils.toDouble(jsonInput.cableLength,0).round() 
+			assetCableMap.cableComment = jsonInput.cableComment
 			if(assetCableMap.save(flush:true)){
 				if(assetTo && connectorType != "Power"){
 					def toAssetCableMap = AssetCableMap.findByAssetFromAndAssetFromPort( assetTo, toConnector )
 					toAssetCableMap.cableStatus = status
 					toAssetCableMap.assetTo = assetCableMap.assetFrom
 					toAssetCableMap.assetToPort = assetCableMap.assetFromPort
-					toAssetCableMap.cableColor = params.color
-					toAssetCableMap.cableLength = NumberUtils.toDouble(params.cableLength,0).round() 
-					toAssetCableMap.cableComment = params.cableComment
+					toAssetCableMap.cableColor = jsonInput.color
+					toAssetCableMap.cableLength = NumberUtils.toDouble(jsonInput.cableLength,0).round() 
+					toAssetCableMap.cableComment = jsonInput.cableComment
 					if(!toAssetCableMap.save(flush:true)){
 						def etext = "Unable to create toAssetCableMap" +
 		                GormUtil.allErrorsString( toAssetCableMap )
@@ -810,7 +807,14 @@ class RackLayoutsController {
 				println etext
 			}
 		}
-		def assetCable = [assetId : assetId, assetTag : AssetEntity.get(assetId)?.assetTag ]
+		def connectorLabel = assetCableMap.assetToPort ? assetCableMap.assetToPort.label : ""
+		if(assetCableMap.assetFromPort.type == "Power"){
+			connectorLabel = assetCableMap.toPower ? assetCableMap.toPower : ""
+		}
+		def assetCable = [ color :assetCableMap.cableColor, length:assetCableMap.cableLength?:'', asset :assetCableMap.assetTo? assetCableMap.assetTo?.assetName :'',
+									status:assetCableMap.cableStatus,comment:assetCableMap.cableComment?:'', fromAssetId :assetCableMap.assetTo? assetCableMap.assetTo?.id :'',
+									fromAsset:(assetCableMap.assetTo? assetCableMap.assetTo?.assetName+"/"+connectorLabel:'') , rackUposition : connectorLabel , 
+									connectorId: assetCableMap.assetToPort ? assetCableMap.assetToPort.id : "" , toCableId:toCableId?.id]
 		render assetCable as JSON
 	}
 	/*
