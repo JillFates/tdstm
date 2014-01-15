@@ -23,6 +23,11 @@ $(document).ready(function() {
 	}else{
 	  $('#filesLabel').attr('checked',false)
 	}
+	
+	$('#item1').css('height', $(window).height() - 380);
+	$('#height').val($('#item1').innerHeight());
+	$('#width').val($('#item1').innerWidth());
+	
 	if( ! document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") )
 		$('.tabInner').html('Your browser does not support SVG, see <a href="http://caniuse.com/svg">http://caniuse.com/svg</a> for more details.')
 })
@@ -116,7 +121,7 @@ function depConsoleLabelUserpref($me,forWhom){
 		<input type="hidden" id="filesChecked" value="${filesChecked}" />
 		<input type="hidden" id="listCheckId" value="?" />
 		
-		<div id="item1" style="float: left;z-index: 10000;">
+		<div id="item1" style="float: left;z-index: 10000; width: 97%; top: 0px; top: 0px;">
 			<g:render template="map" model="${pageScope.variables}"/>
 		</div>
 	</div>

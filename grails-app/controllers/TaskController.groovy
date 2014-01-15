@@ -8,10 +8,12 @@ import org.apache.commons.lang.StringEscapeUtils
 import com.tdssrc.grails.TimeUtil
 import com.tds.asset.TaskDependency
 import org.apache.commons.lang.math.NumberUtils
+import java.text.SimpleDateFormat
 
 class TaskController {
 	
 	def securityService
+	def runbookService
 	def commentService
 	def taskService
 	def userPreferenceService
@@ -306,7 +308,6 @@ digraph runbook {
 			render "<pre>${e.getMessage()}</pre>"
 		}				
 	}
-	
 
 	/**
 	 * Generates a graph of the Event Tasks
@@ -322,7 +323,7 @@ digraph runbook {
 			render "Invalid move event id supplied"
 			return
 		}
-
+		
 		def moveEvent = MoveEvent.findByIdAndProject(moveEventId, project)
 		if (! moveEvent) {
 			render "Move event not found"
@@ -336,9 +337,8 @@ digraph runbook {
 		}
 		
 		def projectId = project.id
-
+		
 		def categories = GormUtil.asQuoteCommaDelimitedString(AssetComment.moveDayCategories)
-
 		
 		def query = """
 			SELECT 
@@ -434,10 +434,14 @@ digraph runbook {
 		
 		try {
 			def uri = reportsService.generateDotGraph("runbook-$moveEventId", dotText.toString() )
+			
+			// convert the URI into a web-safe format
+			uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
+			
 			redirect(uri:uri)
-		} catch(e) {
-			render "<h1>Graph Generation Failed</h1>The error was:<p/><pre>${e.getMessage()}</pre>"
-		}				
+		} catch (e) {
+			render(text:"<h1>Graph Generation Failed</h1>The error was:<p/><pre>${e.getMessage()}</pre>", status:"503")
+		}
 	}
 	
 	/**
@@ -445,7 +449,7 @@ digraph runbook {
 	 * @param prefFor - Key 
 	 * @param selected : value
 	 */
-	def setLabelQuantityPref ={
+	def setLabelQuantityPref = {
 		def key = params.prefFor
 		def selected=params.list('selected[]')[0] ?:params.selected
 		if(selected){
@@ -479,32 +483,134 @@ digraph runbook {
 	 * @param : commentId.
 	 * @return : retMap. 
 	 */
-	def changeEstTime ={
+	def changeEstTime = {
 		def etext = ""
 		def comment
 		def commentId = NumberUtils.toInt(params.commentId)
-		if(commentId >0){
-			def day=NumberUtils.toInt(params.day)
+		if (commentId >0) {
+			def day = NumberUtils.toInt(params.day)
 			def project = securityService.getUserCurrentProject()
 			comment = AssetComment.findByIdAndProject(commentId,project)
-			def estDay =[1,2,7].contains(day) ? day : 0
-			if(comment){
-				comment.estStart=TimeUtil.nowGMT().plus(estDay)
+			def estDay = [1,2,7].contains(day) ? day : 0
+			if (comment) {
+				comment.estStart = TimeUtil.nowGMT().plus(estDay)
 				
-				if(!comment.estFinish || comment.estStart > comment.estFinish )
+				if (!comment.estFinish || comment.estStart > comment.estFinish )
 					comment.estFinish = comment.estStart.plus(1)
 					
-				if(!comment.hasErrors() && !comment.save(flush:true)){
+				if (!comment.hasErrors() && !comment.save(flush:true)) {
 					etext = "unable to update estTime"+GormUtil.allErrorsString( comment )
 					log.error etext 
 				}
-			}else {
+			} else {
 				etext = "Requested comment does not exist. "
 			}
-		}else {
+		} else {
 				etext = "Requested comment does not exist. "
 		}
 		def retMap=[etext:etext, estStart : comment?.estStart]
 		render retMap as JSON
+	}
+	
+	def taskGraphViewer = {
+		if ( RolePermissions.hasPermission("AdminMenuView") ) {
+			// handle project
+			long projectId = securityService.getUserCurrentProject().id
+			if ( ! projectId ) {
+				flash.message = "You must select a project before using the task graph."
+				redirect(controller:"project", action:"list")
+				return
+			}
+
+			// if user used the event selector on the page, update their preferences with the new event
+			if (params.moveEventId && params.moveEventId.isLong())
+				userPreferenceService.setPreference("MOVE_EVENT", params.moveEventId)
+
+			// handle move events
+			def moveEvents = MoveEvent.findAllByProject(Project.get(projectId))
+			def eventPref = userPreferenceService.getPreference("MOVE_EVENT") ?: '0'
+			long selectedEventId = eventPref.isLong() ? eventPref.toLong() : 0
+			
+			return [moveEvents:moveEvents, selectedEventId:selectedEventId]
+		} else {
+			flash.message = "You do not have permission to view the task graph."
+			redirect(controller:"project", action:"show")
+			return
+		}
+	}
+	
+	// gets the JSON object used to populate the task graph timeline
+	def taskGraph = {
+		
+		// handle project
+		long projectId = securityService.getUserCurrentProject().id
+		if ( ! projectId ) {
+			flash.message = "You must select a project before using the task graph."
+			redirect(controller:"project", action:"list")
+			return
+		}
+
+		// if user used the event selector on the page, update their preferences with the new event
+		if (params.moveEventId && params.moveEventId.isLong())
+			userPreferenceService.setPreference("MOVE_EVENT", params.moveEventId)
+
+		// handle move events
+		def moveEvents = MoveEvent.findAllByProject(Project.get(projectId))
+		def eventPref = userPreferenceService.getPreference("MOVE_EVENT") ?: '0'
+		long selectedEventId = eventPref.isLong() ? eventPref.toLong() : 0
+		if (selectedEventId == 0)
+			return [data:{}, moveEvents:moveEvents, selectedEventId:selectedEventId];
+		
+		// get basic task and dependency data
+		def me = MoveEvent.get(selectedEventId)
+		if (! me) {
+			render "Unable to find event $meId"
+			return
+		}
+		def tasks = runbookService.getEventTasks(me)
+		def deps = runbookService.getTaskDependencies(tasks)
+		def startTime = 0
+		
+		// generate optimized schedule based on this data
+		def dfsMap = runbookService.processDFS( tasks, deps )
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
+		def estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs)
+
+//		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def startDate = TimeUtil.convertInToUserTZ(dfsMap.starts[0].estStart, tzId) ?: TimeUtil.nowGMT()
+		
+		// generate the JSON data used by d3
+		def items = []
+		def roles = []
+		tasks.each { t ->
+			def predecessorIds = []
+			t.taskDependencies.each { dep ->
+				predecessorIds.push(dep.predecessor.id)
+			}
+			def role = t.role ?: 'NONE'
+			if ( ! (role in roles) )
+				roles.push(role)
+			items.push([ id:t.id, name:t.comment, startInitial:t.tmpEarliestStart, endInitial:t.tmpEarliestStart+t.duration,
+			predecessorIds:predecessorIds, criticalPath:t.tmpCriticalPath, assignedTo:t.assignedTo.toString(), status:t.status,
+			role:role])
+		}
+		def sinks = []
+		dfsMap.sinks.each { s ->
+			sinks.push(s.id)
+		}
+		def data = [items:items, sinks:sinks, roles:roles, startDate:startDate] as JSON
+		
+		// clear out the metaclass objects to prevent a memory leak
+		tasks.each { t ->
+			t.metaClass = null
+		}
+		deps.each { d ->
+			d.metaClass = null
+		}
+		
+		def returnMap = [data:data, moveEvents:moveEvents, selectedEventId:selectedEventId] as JSON
+		render data
 	}
 }

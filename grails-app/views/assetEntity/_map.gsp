@@ -166,5 +166,5 @@
 <g:render template="../d3/force/force" model="${pageScope.variables}"/>
 
 <script type="text/javascript">
-	buildMap()
+	buildMap(null, null, null, null, $('#item1').innerWidth(), $('#item1').innerHeight()-50);
 </script>

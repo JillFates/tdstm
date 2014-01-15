@@ -6,6 +6,11 @@ circle.node {
 line.link {
   stroke: #999;
   stroke-opacity: .6;
+  marker-end: url(#arrowhead);
+}
+line.link.selected {
+  stroke: #00dd00;
+  marker-end: url(#arrowheadSelected);
 }
 
 text {

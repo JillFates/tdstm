@@ -1,5 +1,15 @@
 
 <div id="scriptDivId">
+<style>
+/* 	these styles must be included here due to a bug in firefox
+	where marker styles don't work when used in external stylesheets. */
+line.link {
+	marker-end: url(#arrowhead);
+}
+line.link.selected {
+	marker-end: url(#arrowheadSelected);
+}
+</style>
 <script type="text/javascript">
 // If there is already an instance of force running in memory, it should be stopped before creating this one
 if(force != null) {
@@ -12,22 +22,43 @@ var canvas = d3.select("div#item1")
 	.append("div")
 	.attr('id','svgContainerId')
 	.append("svg:svg");
+
+// define the arrowhead markers used for marking dependencies
+canvas.append("defs")
+	.append("marker")
+	.attr("id", "arrowhead")
+	.attr("viewBox", "0 -5 10 10")
+	.attr("refX", 20)
+	.attr("refY", 0)
+	.attr("markerUnits", "userSpaceOnUse")
+	.attr("markerWidth", 10)
+	.attr("markerHeight", 10)
+	.attr("orient", "auto")
+	.append("path")
+	.attr("d", "M0,-4L10,0L0,4");
+d3.select("defs")
+	.append("marker")
+	.attr("id", "arrowheadSelected")
+	.attr("viewBox", "0 -5 10 10")
+	.attr("refX", 20)
+	.attr("refY", 0)
+	.attr("markerUnits", "userSpaceOnUse")
+	.attr("markerWidth", 10)
+	.attr("markerHeight", 10)
+	.attr("orient", "auto")
+	.append("path")
+	.attr("d", "M0,-5L10,0L0,5")
+	.attr("fill", "#00dd00");
+
 $('#svgContainerId')
 	.resizable({
 		minHeight: 300,
 		minWidth: 300,
 		helper: "ui-resizable-helper",
-		start: function(e, ui) {
-			console.log("start e="+e)
-		},
-		resize: function(e, ui) {
-			console.log("resize e="+e)
-		},
-		stop: function(e, ui) {
-			//alert('resizing stopped');
-			console.log("stop e="+e)
-			
-			rebuildMap($("#forceId").val(), $("#linkSizeId").val(), $("#frictionId").val(), $("#thetaId").val(), $(this).width(), $(this).height())
+		stop: function(e, ui) {	
+			$('#heightId').val($(this).height());
+			$('#widthId').val($(this).width());
+			rebuildMap($("#forceId").val(), $("#linkSizeId").val(), $("#frictionId").val(), $("#thetaId").val(), $(this).width(), $(this).height());
 		}
 	});
 var zoomBehavior;
@@ -50,6 +81,8 @@ var selectedParentColor = '#00ff00'
 var selectedChildColor = '#00cc99'
 var selectedLinkColor = '#00dd00'
 var backgroundColor = defaults.blackBackground ? '#000000' : '#ffffff'
+if (defaults.blackBackground)
+	$('marker#arrowhead').attr('fill', '#ffffff');
 
 var widthCurrent
 var heightCurrent
@@ -60,21 +93,35 @@ var floatMode = false;
 			
 // Build the layout model
 function buildMap (charge, linkSize, friction, theta, width, height) {
-	console.log("BUILDING MAP")
+	$('#item1').css('height', '');
 
 	// Use the new parameters, or the defaults if not specified
-	var charge 	 =	( charge	? charge 	: defaults['force'] 	)
-	var linkSize =	( linkSize	? linkSize 	: defaults['linkSize'] 	)
-	var friction =	( friction	? friction 	: defaults['friction'] 	)
-	var theta 	 =	( theta		? theta 	: defaults['theta'] 	)
-	var width 	 = 	( width 	? width 	: defaults['width'] 	)
-	var height 	 = 	( height 	? height 	: defaults['height'] 	)
+	var charge 	 =	( charge	? charge 	: defaults['force'] 	);
+	var linkSize =	( linkSize	? linkSize 	: defaults['linkSize'] 	);
+	var friction =	( friction	? friction 	: defaults['friction'] 	);
+	var theta 	 =	( theta	? theta 	: defaults['theta'] 	);
+	var width 	 = 	( width 	? width 	: defaults['width'] 	);
+	var height 	 = 	( height 	? height 	: defaults['height'] 	);
 	
-	widthCurrent = width
-	heightCurrent = height
+	widthCurrent = width;
+	heightCurrent = height;
 	
-	var zoom = d3.behavior.zoom().on("zoom",rescale)
-	canvas.call(zoom);
+	var zoom = d3.behavior.zoom()
+		.on("zoom", zooming)
+		.on("zoomend", zoomEnd);
+	
+	// Sets the panning behavior
+	var panBehavior = d3.behavior.drag()
+		.on("dragstart", panStart)
+		.on("drag", panMove)
+		.on("dragend", panEnd);
+	
+	canvas.call(zoom)
+		.on("mousedown.zoom", null)
+		.on("touchstart.zoom", null)
+		.on("touchmove.zoom", null)
+		.on("touchend.zoom", null)
+		.call(panBehavior);
 	
 	vis = canvas
 		.append('svg:g')
@@ -82,29 +129,34 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			.style('width', '100%')
 			.style('height', '100%')
 		.append('svg:g')
-			.on("mousedown", mousedown)
+	
 	
 	background = vis
 		.append('svg:rect')
 			.attr('width', width)
 			.attr('height', height)
-			.attr('fill', backgroundColor)
-			.on("click", function(){ toggleNodeSelection(nodeSelected) });
+			.attr('fill', backgroundColor);
+	
 	
 	// Sets the custom node dragging behavior
-	var node_drag = d3.behavior.drag()
-        .on("dragstart", dragstart)
-        .on("drag", dragmove)
-        .on("dragend", dragend);
+	var dragBehavior = d3.behavior.drag()
+		.on("dragstart", dragstart)
+		.on("drag", dragmove)
+		.on("dragend", dragend);
 	
 	var startAlpha = 0
+	var dragging = false;
+	var clicked = false;
 	
-	function dragstart(d, i) {
-		startAlpha = force.alpha()
+	function dragstart (d, i) {
+		startAlpha = force.alpha();
+		dragging = true;		
+		clicked = true;
+		d3.event.sourceEvent.stopPropagation();
 	}
 
-	function dragmove(d, i) {
-		startAlpha = Math.min(startAlpha+0.005, 0.1)
+	function dragmove (d, i) {
+		startAlpha = Math.min(startAlpha+0.005, 0.1);
 		d.x += d3.event.dx;
 		d.y += d3.event.dy;
 		d.px = d.x;
@@ -114,28 +166,86 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		
 		d.fix = true;
 		d.fixed = true;
+		clicked = false;
 		force.alpha(startAlpha);
+		d3.event.sourceEvent.stopPropagation();
 	}
 
-	function dragend(d, i) {
+	function dragend (d, i) {
 		d.fix = false;
 		d.fixed = false;
+		dragging = false;
+		if (clicked)
+			toggleNodeSelection(d.index);
+		d3.event.sourceEvent.stopPropagation();
+	}
+	
+	
+	var translateX = 0;
+	var translateY = 0;
+	var scale = 1;
+	var panning = true;
+	function panStart (d, i) {
+		var target = d3.event.sourceEvent.target.nodeName;
+		if (target == 'g' || target == 'rect' || target == 'svg')
+			panning = true;		
+		clicked = true;
+	}
+
+	function panMove (d, i) {
+		if (panning) {
+			translateX += d3.event.dx;
+			translateY += d3.event.dy;
+			vis.attr('transform',
+				'translate(' + (translateX + zoomOffsetX) + ',' + (translateY + zoomOffsetY) + ')'
+				+ ' scale(' + scale + ')');
+		}
+		clicked = false;
+	}
+
+	function panEnd (d, i) {
+		panning = false;
+		if (clicked)
+			toggleNodeSelection(nodeSelected);
 	}
 	
 	// Rescales the contents of the svg. Called when the user scrolls.
-	function rescale() {		
-		var translate = d3.event.translate;
-		var scale = d3.event.scale;
-
-		vis.attr("transform",
-			"translate(" + translate + ")"
-			+ " scale(" + scale + ")");
+	var panXInitial = 0;
+	var panYInitial = 0;
+	var zoomOffsetX = 0;
+	var zoomOffsetY = 0;
+	
+	// Rescales the contents of the svg. Called when the user scrolls.
+	function zooming () {
+		if (!dragging) {
+			var target = d3.event.sourceEvent.target.nodeName;
+			if (target == 'g' || target == 'rect' || target == 'svg') {
+				zoomOffsetX = d3.event.translate[0];
+				zoomOffsetY = d3.event.translate[1];
+				scale = d3.event.scale;
+				vis.attr('transform',
+					'translate(' + (translateX + zoomOffsetX) + ',' + (translateY + zoomOffsetY) + ')'
+					+ ' scale(' + scale + ')');
+			}
+		}
+	}
+	function zoomEnd () {
+		if (!dragging)
+			if ( ! d3.event.sourceEvent )
+				vis.attr('transform',
+					'translate(' + (translateX + zoomOffsetX) + ',' + (translateY + zoomOffsetY) + ')'
+					+ ' scale(' + scale + ')');
 	}
 	
 	// Resets the scale and position of the map. Called when the user double clicks on the background
 	function resetView() {
 		zoom.scale(1);
 		zoom.translate([0,0]);
+		scale = 1;
+		translateX = 0;
+		translateY = 0;
+		zoomOffsetX = 0;
+		zoomOffsetY = 0;
 		vis.attr("transform",
 		  "translate(0)"
 		  + " scale(1)");
@@ -160,6 +270,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.attr("height", height)
 		.attr("style", graphstyle)
 		.style('background-color', backgroundColor)
+		.style('cursor', 'default !important')
 		.on("dblclick", resetView)
 		.on("dblclick.zoom", null);
 	
@@ -214,17 +325,15 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	node = node
 		.append("svg:path")
 			.attr("class", "node")
-			.call(node_drag)
+			.call(dragBehavior)
 			.on("dblclick", function(d) { return getEntityDetails('planningConsole', d.type, d.id); })
-			.on("click", function(d) { toggleNodeSelection(d.index) })
 			.on("mousedown", mousedown)
 			.attr("d", d3.svg.symbol().size(function(d) { return d.size; }).type(function(d) { return d.shape; }))
 			.attr("fix", false)
 			.attr("id", function(d) { return 'node-'+d.index })
 			.style("fill", function(d) { return fill(d.group); })
+			.style('cursor', 'default !important')
 			.attr("fillColor", function(d) {
-				console.log("node fill(d.group)="+fill(d.group))
-				console.log("node d.group="+d.group)
 				return fill(d.group) 
 			})
 			.style("stroke", function(d) {
@@ -377,6 +486,8 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			.attr("cy", function(d) {return d.y })
 			.attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";});
 	}
+	
+	vis.append(background.remove());
 }
 
 
@@ -387,13 +498,13 @@ function rebuildMap (charge, linkSize, friction, theta, width, height, labels) {
 	var charge 	 =	( charge	? charge 	: defaults['force'] 	)
 	var linkSize =	( linkSize	? linkSize 	: defaults['linkSize'] 	)
 	var friction =	( friction	? friction 	: defaults['friction'] 	)
-	var theta 	 =	( theta		? theta 	: defaults['theta'] 	)
+	var theta 	 =	( theta	? theta 	: defaults['theta'] 	)
 	
 	widthCurrent 	= ( widthCurrent  ? widthCurrent  : defaults['width']  )
 	heightCurrent 	= ( heightCurrent ? heightCurrent : defaults['height'] )
 	
-	var width	= ( width	? width  :	( widthCurrent	? widthCurrent	: defaults['width']	 ) )
-	var height	= ( height 	? height :	( heightCurrent ? heightCurrent : defaults['height'] ) )
+	var width	= ( width	? width  :	( widthCurrent	? widthCurrent	: defaults['width']	) )
+	var height	= ( height 	? height :	( heightCurrent 	? heightCurrent	: defaults['height']	) )
 	
 	widthCurrent = width
 	heightCurrent = height
@@ -434,10 +545,13 @@ function rebuildMap (charge, linkSize, friction, theta, width, height, labels) {
 			return (nameList[d.type+''])?(d.name):('');
 		});
 		
-		if (backgroundColor == '#ffffff')
+		if (backgroundColor == '#ffffff') {
+			$('marker#arrowhead').attr('fill', '#000000');
 			graph.attr("class", "node nodeLabel blackText")
-		else
+		} else {
+			$('marker#arrowhead').attr('fill', '#ffffff');
 			graph.attr("class", "node nodeLabel")
+		}
 }
 
 // Used by the defaults button to reset all control values to their default state

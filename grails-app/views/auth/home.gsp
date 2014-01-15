@@ -134,6 +134,9 @@ a:hover {
 					<td><a style="color:black" href="#" onclick="openShowTypeDiv()"> Show/Clean Types </a></td>
 					<td><g:link controller="admin" action="projectReport" style="color:black">Projects Summary Report</g:link></td>
 				</tr>
+				<tr class="even">
+					<td><g:link controller="task" action="taskGraphViewer" style="color:black">View Task Graph Timeline</g:link></td>
+				</tr>
 			</tbody>
 		</table>
 			</div>

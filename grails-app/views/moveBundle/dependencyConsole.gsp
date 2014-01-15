@@ -8,7 +8,7 @@
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
 		<g:javascript src="projectStaff.js" />
-		<script type="text/javascript" src="${resource(dir:'d3',file:'d3.v2.js')} "></script>
+		<script type="text/javascript" src="${resource(dir:'d3',file:'d3.js')} "></script>
 		<link rel="stylesheet" href="${resource(dir:'d3/force',file:'force.css')}" type="text/css"/>
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 		

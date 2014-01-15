@@ -1446,6 +1446,20 @@ span.task_button_disabled { float: left; height: 16px; line-height: 16px;  paddi
 .fontMonospaced {
 	font-family: Courier New, Courier, monospace;
 }
+
+/* Task graph */
+#svgViewerId {
+	width: 1800px !important;
+	height: 1800px !important;
+	position: relative;
+}
+/*#svgRootId {*/
+#viewport {
+	width: 1600px !important;
+	height: 1600px !important;
+	position: relative;
+}
+
 .headerClass {
 	margin-right: 7px;
 }

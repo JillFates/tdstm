@@ -1,23 +1,24 @@
-var self = this,
-    globals = ["document", "window", "navigator", "CSSStyleDeclaration", "d3", "Sizzle"],
-    globalValues = {};
+var document = require("jsdom").jsdom("<html><head></head><body></body></html>"),
+    window = document.createWindow(),
+    globals = {};
 
-globals.forEach(function(global) {
-  if (global in self) globalValues[global] = self[global];
-});
+// stash globals
+if ("window" in global) globals.window = global.window;
+global.window = window;
+if ("document" in global) globals.document = global.document;
+global.document = document;
 
-document = require("jsdom").jsdom("<html><head></head><body></body></html>");
-window = document.createWindow();
-navigator = window.navigator;
-CSSStyleDeclaration = window.CSSStyleDeclaration;
+// https://github.com/chad3814/CSSStyleDeclaration/issues/3
+var CSSStyleDeclaration_prototype = window.CSSStyleDeclaration.prototype,
+    CSSStyleDeclaration_setProperty = CSSStyleDeclaration_prototype.setProperty;
+CSSStyleDeclaration_prototype.setProperty = function(name, value, priority) {
+  return CSSStyleDeclaration_setProperty.call(this, name + "", value == null ? null : value + "", priority == null ? null : priority + "");
+};
 
-Sizzle = require("sizzle");
+module.exports = require("./d3");
 
-require("./d3.v2");
-
-module.exports = d3;
-
-globals.forEach(function(global) {
-  if (global in globalValues) self[global] = globalValues[global];
-  else delete self[global];
-});
+// restore globals
+if ("window" in globals) global.window = globals.window;
+else delete global.window;
+if ("document" in globals) global.document = globals.document;
+else delete global.document;

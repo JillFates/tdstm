@@ -184,8 +184,6 @@
 				<div class="message">${flash.message}</div>
 			</g:if>
 			<div id="taskMessageDiv" class="message" style="display: none;"></div>
-			<div>
-			<div>
 			<input type="hidden" id="manageTaskId" value="manageTask"/>
 			<g:render template="commentCrud"/> 
 			<form name="commentForm" id="commentForm" method="post" action="listTasks">
@@ -224,79 +222,77 @@
 		<div id="createEntityView" style="display: none;"></div>
 		<div id="editManufacturerView" style="display: none;"></div>
 		<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
-  </div>
-  
- </div>
- </div>
+	</div>
  <script type="text/javascript">
-function toggleCheckbox(chkbox, field) {
+function toggleCheckbox (chkbox, field) {
 	$('input[name='+field+']').val(chkbox.checked ? '1' : '0')
 	submitForm()
 }
- function submitForm(){
-     $('#commentForm').submit()
- }
- 
- function loadGrid(){
-	 $(".ui-icon-refresh").click()
-	 var timePref = $("#selectTimedBarId").val()
-	 if(timePref != 0){
-		 B2.Start(timePref);
-	 } else{
-		 B2.Pause(0);
-	 }
- }
- 
- function pageRefresh(){
-   window.location.reload()
- }
+function submitForm () {
+	$('#commentForm').submit()
+}
 
- function Bar(o){
-	var obj=document.getElementById(o.ID);
-		this.oop=new zxcAnimate('width',obj,0);
-		this.max=$('#issueTimebar').width();
-		this.to=null;
+function loadGrid () {
+	$(".ui-icon-refresh").click()
+	var timePref = $("#selectTimedBarId").val()
+	if(timePref != 0){
+		B2.Start(timePref);
+	} else{
+		B2.Pause(0);
 	}
-	Bar.prototype={
-		Start:function(sec){
-			clearTimeout(this.to);
-			this.oop.animate(0,$('#issueTimebar').width(),sec*1000);
-			this.srt=new Date();
-			this.sec=sec;
-			this.Time();
-		},
-		Time:function(sec){
-			var oop=this,sec=this.sec-Math.floor((new Date()-this.srt)/1000);
-			//this.oop.obj.innerHTML=sec+' sec';
-			$('#timeBarValueId').val(sec)
-			if (sec>0){
-				this.to=setTimeout(function(){ oop.Time(); },1000);
-			}else{
-				loadGrid();
-			}
-		},
-		Pause:function(sec){
-			clearTimeout(this.to);
-			if(sec==0){
-				this.oop.animate(sec,'',sec*1000);
-			}else{
-				this.oop.animate($('#issueTimebarId').width(),$('#issueTimebarId').width(),sec*1000);
-			}
-		},
-		Restart:function(sec){
-			clearTimeout(this.to);
-			var second = $('#timeBarValueId').val()
-			this.oop.animate($('#issueTimebarId').width(),$('#issueTimebar').width(),second*1000);
-			this.srt=new Date();
-			this.sec=second;
-			this.Time();
+}
+
+function pageRefresh () {
+	window.location.reload()
+}
+
+function Bar (o) {
+	var obj = document.getElementById(o.ID);
+	this.oop = new zxcAnimate('width',obj,0);
+	this.max = $('#issueTimebar').width();
+	this.to = null;
+}
+Bar.prototype = {
+	Start:function (sec) {
+		clearTimeout(this.to);
+		this.oop.animate(0,$('#issueTimebar').width(),sec*1000);
+		this.srt = new Date();
+		this.sec = sec;
+		this.Time();
+	},
+	Time:function (sec) {
+		var oop = this
+			,sec=this.sec-Math.floor((new Date()-this.srt)/1000);
+		//this.oop.obj.innerHTML=sec+' sec';
+		$('#timeBarValueId').val(sec)
+		if (sec > 0) {
+			this.to = setTimeout(function(){ oop.Time(); },1000);
+		} else {
+			loadGrid();
 		}
+	},
+	Pause:function (sec) {
+		clearTimeout(this.to);
+		if (sec == 0) {
+			this.oop.animate(sec,'',sec*1000);
+		} else {
+			this.oop.animate($('#issueTimebarId').width(),$('#issueTimebarId').width(),sec*1000);
+		}
+	},
+	Restart:function (sec) {
+		clearTimeout(this.to);
+		var second = $('#timeBarValueId').val()
+		this.oop.animate($('#issueTimebarId').width(),$('#issueTimebar').width(),second*1000);
+		this.srt = new Date();
+		this.sec = second;
+		this.Time();
 	}
+}
 
-	B2=new Bar({
-		ID:'issueTimebarId'
-	});
+B2 = new Bar({
+	ID:'issueTimebarId'
+});
 </script>
 </body>
- 
+
 </html>
