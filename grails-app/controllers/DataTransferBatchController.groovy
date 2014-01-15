@@ -221,7 +221,7 @@ def messageSource
 
 						// Save the asset if it was changed or is new
 						(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
-							assetEntity, assetsList, insertCount, rowNum, updateCount, errorCount, warnings)
+							assetEntity, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
 
 						// Update status and clear hibernate session
 						assetEntityAttributeLoaderService.updateStatusAndClear(project, dataTransferValueRow, sessionFactory, session)
