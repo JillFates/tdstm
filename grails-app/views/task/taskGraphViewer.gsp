@@ -75,44 +75,44 @@ THE SOFTWARE.
 		
 		
 		
-		rect.mainItem {
+		polygon.mainItem {
 			stroke-width: 2;
 			fill: #FFFF00;
 			stroke: #FFFF00;
 			fill-opacity: 1;
 		}
-		rect.mainItem.selected {
+		polygon.mainItem.selected {
 			stroke: blue !important;
 			fill: lightblue !important;
 		}
 		
-		rect.mainItem.Completed {
+		polygon.mainItem.Completed {
 			fill: #5478BA;
 		}
-		rect.mainItem.Started {
+		polygon.mainItem.Started {
 			fill: darkturquoise;
 		}
-		rect.mainItem.Ready {
+		polygon.mainItem.Ready {
 			fill: lightgreen;
 		}
-		rect.mainItem.Pending {
+		polygon.mainItem.Pending {
 			fill: lightgrey;
 		}
 		
-		rect.mainItem.overdue {
+		polygon.mainItem.overdue {
 			stroke: red;
 		}
-		rect.mainItem.ontime {
+		polygon.mainItem.ontime {
 			stroke: black;
 		}
-		rect.mainItem.ahead {
+		polygon.mainItem.ahead {
 			stroke: green;
 		}
 		
-		rect.mainItem.critical {
+		polygon.mainItem.critical {
 			stroke-width: 4;
 		}
-		rect.mainItem.milestone {
+		polygon.mainItem.milestone {
 			fill-opacity: 0.75;
 		}
 
@@ -172,6 +172,10 @@ THE SOFTWARE.
 			fill: #AA33AA;
 			font-weight: bold !important;	
 		}
+		
+		div.body {
+			width: 100%;
+		}
 		</style>
 		<script type="text/javascript">
 		
@@ -208,7 +212,7 @@ THE SOFTWARE.
 			var mainRectHeight = 30;
 			var initialExtent = 1000000;
 			var anchorOffset = 10;
-			var margin = {top: 20, right: 5, bottom: 15, left: 5};
+			var margin = {top: 20, right: 0, bottom: 15, left: 0};
 			var items = data.items;
 			var dependencies = [];
 			sanitizeData(items, dependencies);
@@ -239,7 +243,7 @@ THE SOFTWARE.
 
 			var x = d3.time.scale()
 				.domain([items[0].start, items[items.length-1].end])
-				.range([0, 2500 - margin.left - margin.right]);
+				.range([0, $('div.body').innerWidth() - 20 - $('div.body').offset().left]);
 			var domainOffset = (x.domain()[1] - x.domain()[0]) * 0.1;
 			x.domain([new Date(x.domain()[0].getTime() - domainOffset),  new Date(x.domain()[1].getTime() + domainOffset)]);
 			
@@ -487,8 +491,8 @@ THE SOFTWARE.
 				.attr('y2', miniHeight)
 				.attr('class', 'todayLine');
 
-			// construct the container for the task rects
-			var itemRects = main.append('g')
+			// construct the container for the task polygons
+			var itemPolys = main.append('g')
 				.attr('clip-path', 'url(#clip)');
 				
 			// construct the container for the task labels
@@ -546,7 +550,7 @@ THE SOFTWARE.
 			// updates the svg
 			function display () {
 				
-				var rects, labels, lines;
+				var polys, labels, lines;
 				var minExtent = brush.extent()[0];
 				var maxExtent = brush.extent()[1];
 				var visItems = items.filter(function (d) { return d.start < maxExtent && d.end > minExtent});
@@ -560,20 +564,19 @@ THE SOFTWARE.
 				main.select('.main.axis.minute').call(x1MinuteAxis);
 				main.select('.main.axis.hour').call(x1HourAxis)
 
-				// update any existing item rects
-				rects = itemRects.selectAll('rect')
+				// update any existing item polys
+				polys = itemPolys.selectAll('polygon')
 					.data(visItems, function (d) { return d.id; })
-					.attr('x', function(d) { return x1(d.start); })
-					.attr('y', function(d) { return d.stack * mainRectHeight + 0.4 * mainRectHeight + 0.5; })
-					.attr('width', function(d) { return x1(d.end) - x1(d.start); })
+					.attr('points', function(d) { return getPoints(d); })
 					.attr('class', function(d) { return getClasses(d); });
-				
-				// add any task rects in the new domain extents
-				rects.enter().append('rect')
-					.attr('x', function(d) { return x1(d.start); })
+/*					.attr('x', function(d) { return x1(d.start); })
 					.attr('y', function(d) { return d.stack * mainRectHeight + 0.4 * mainRectHeight + 0.5; })
-					.attr('width', function(d) { return x1(d.end) - x1(d.start); })
-					.attr('height', function(d) { return 0.8 * mainRectHeight; })
+					.attr('width', function(d) { return x1(d.end) - x1(d.start); })*/
+				
+				// add any task polys in the new domain extents
+				polys.enter()
+					.append('polygon')
+					.attr('points', function(d) { return getPoints(d); })
 					.attr('class', function(d) { return getClasses(d); })
 					.attr('id', function(d) { return 'task-' + d.id; })
 					.on("click", function(d) {
@@ -586,7 +589,7 @@ THE SOFTWARE.
 					.append('title')
 					.html(function(d) { return d.name + ' - ' + d.assignedTo + ' - ' + d.status; });
 					
-				rects.exit().remove();
+				polys.exit().remove();
 				
 				// update any existing dependency lines
 				lines = itemArrows.selectAll('line')
@@ -699,6 +702,22 @@ THE SOFTWARE.
 				if ($('#rolesSelectId').val() != 'ALL' && $('#rolesSelectId').val() != d.role)
 					classString += ' unfocussed '
 				return classString;
+			}
+			
+			// gets the points string for task polygons
+			function getPoints (d) {
+				var x = x1(d.start);
+				var y = d.stack * mainRectHeight + 0.4 * mainRectHeight + 0.5;
+				var w = x1(d.end) - x1(d.start);
+				var h = 0.8 * mainRectHeight;
+				var x2 = x + w - 10;
+				var y2 = y + (h/2);
+				return x + ',' + y + ' '
+					 + x2 + ',' + y + ' '
+					 + (x+w) + ',' + y2 + ' '
+					 + x2 + ',' + (y+h) + ' '
+					 + x + ',' + (y+h) + ' ';
+				
 			}
 			
 			// used to get the offset used for dependency arrows' links to the task rects
@@ -973,14 +992,11 @@ THE SOFTWARE.
 	<body>
 		<div class="body">
 			<h1>Task Graph</h1>
-			<br/>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-			<form name="eventForm" id="eventFormId" method="post" action="taskGraph">
-				Event: <g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Select a move event']}" value="${selectedEventId}" onchange="submitForm()" />
-			</form>
-			Role: <select name="roleSelect" id="rolesSelectId"></select>
+			Event: <g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Select a move event']}" value="${selectedEventId}" onchange="submitForm()" />
+			&nbsp; Role: <select name="roleSelect" id="rolesSelectId"></select>
 			<g:render template="../assetEntity/commentCrud"/>
 		</div>
 	</body>

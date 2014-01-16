@@ -35,7 +35,9 @@ canvas.append("defs")
 	.attr("markerHeight", 10)
 	.attr("orient", "auto")
 	.append("path")
-	.attr("d", "M0,-4L10,0L0,4");
+	.attr("d", "M0,-4L10,0L0,4")
+	.attr('fill', '#808080');
+	
 d3.select("defs")
 	.append("marker")
 	.attr("id", "arrowheadSelected")
@@ -546,10 +548,8 @@ function rebuildMap (charge, linkSize, friction, theta, width, height, labels) {
 		});
 		
 		if (backgroundColor == '#ffffff') {
-			$('marker#arrowhead').attr('fill', '#000000');
 			graph.attr("class", "node nodeLabel blackText")
 		} else {
-			$('marker#arrowhead').attr('fill', '#ffffff');
 			graph.attr("class", "node nodeLabel")
 		}
 }
