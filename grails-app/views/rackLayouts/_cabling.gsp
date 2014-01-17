@@ -164,7 +164,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 <div id="cablingPanel" style="height: auto; ">
 	<g:if test="${assetCablingDetails}">
 		<g:each in="${assetCablingDetails}" var="assetCabling">
-			<div id='connector${assetCabling.id}' style='top: "${(assetCabling.connectorPosY / 2)}+"px; left: "${assetCabling.connectorPosX}+"px;'>
+			<div id='connector${assetCabling.id}' style='top: ${(assetCabling.connectorPosY / 2)}px; left: ${assetCabling.connectorPosX}px;'>
 				<a href='#'><div><img id='${assetCabling.status}' src='../i/cabling/${assetCabling.status.toLowerCase()}.png' onclick="openActionButtonsDiv( '${assetCabling.id}', this.id, '${assetCabling.type}')"></div></a>
 				<div class='connector_${assetCabling.labelPosition}'><span>${assetCabling.label}</span></div>
 			</div>
