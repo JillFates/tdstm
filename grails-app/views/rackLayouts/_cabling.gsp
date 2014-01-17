@@ -26,10 +26,8 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 	 $scope.connectors = {};
 	 $scope.row = ${assetRows};
   	 $scope.power = ${cableTypes};
-  	 $scope.connectors['null']={};
-  	$scope.params = {};
-  	$scope.modelConnectors = {};
-  	$scope.demoChange = function(value,type){
+   	 $scope.modelConnectors = {};
+  	 $scope.demoChange = function(value,type){
   	  	if(value)
         	$scope.modelConnectors = $scope.connectors[value];
     }
@@ -75,6 +73,8 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 				$scope.showAsset(id, asset, type);
 				if(asset)
 					$scope.modelConnectors = $scope.connectors[asset];
+				else
+					$scope.modelConnectors = {};
 			}).error(function(resp, status, headers, config) {
 				alert("An Unexpected error while showing the asset fields.")
 			});
@@ -178,7 +178,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 		</g:each>
 	</g:if>
 	</div>
-<div ng-app="app" ng-controller="Ctrl">
+<div id="app" ng-app="app" ng-controller="Ctrl">
    <table id="cableTable" class="table table-bordered table-hover table-condensed" style="width:auto;display:none;">
     <tr style="font-weight: bold">
       <th>Type</th>
@@ -195,7 +195,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
       <td ng-click="showEditRow(cable.cableId)">
       	 <span ng-hide="showRow(cable.cableId)">{{cable.status}}</span>
       	 <span ng-show="showRow(cable.cableId)">
-      	 <select id="status_{{cable.cableId}}" name="status_{{cable.cableId}}" style="width:75px;">
+      	 <select id="status_{{cable.cableId}}" name="status_{{cable.cableId}}" style="width:75px;" onchange="changeCableDetails(this.value,{{cable.cableId}})">
 	        <option ng-repeat="s in statues" value="{{s.text}}" title="{{s.text}}" ng-selected="s.text == cable.status">{{s.text}}</option>
 	     </select>
       	 </span>
@@ -205,7 +205,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
       </td>
       <td ng-click="showEditRow(cable.cableId)" ng-show="showRow(cable.cableId)">
       	 <span>
-	      	 <select id="color_{{cable.cableId}}" name="color_{{cable.cableId}}" style="width:75px;">
+	      	 <select id="color_{{cable.cableId}}" name="color_{{cable.cableId}}" style="width:75px;" onchange="changeStatus({{cable.cableId}})">
 	      	 		<option value="">Please Select</option>
 			        <option ng-repeat="c in colors" value="{{c.text}}" title="{{c.text}}" ng-selected="c.text == cable.color">{{c.text}}</option>
 		     </select>
@@ -214,13 +214,13 @@ app.controller('Ctrl', function($scope, $filter, $http) {
       <td ng-click="showEditRow(cable.cableId)">
       	 <span ng-hide="showRow(cable.cableId)">{{ cable.length }}</span>
       	 <span ng-show="showRow(cable.cableId)">
-      	 	<input type="text" id="cableLength_{{cable.cableId}}" name="cableLength_{{cable.cableId}}" value="{{ cable.length }}" size="2"/>
+      	 	<input type="text" id="cableLength_{{cable.cableId}}" name="cableLength_{{cable.cableId}}" value="{{ cable.length }}" size="2" onkeypress="changeStatus({{cable.cableId}})"/>
       	 </span>
       </td>
       <td ng-click="showEditRow(cable.cableId)" >
       	 <div ng-hide="showRow(cable.cableId)" class='commentEllip'>{{ cable.comment }}</div>
       	 <span ng-show="showRow(cable.cableId)">
-      	 	<input type="text" name="cableComment_{{cable.cableId}}" id="cableComment_{{cable.cableId}}" value="{{ cable.comment }}" size="8"/>
+      	 	<input type="text" name="cableComment_{{cable.cableId}}" id="cableComment_{{cable.cableId}}" value="{{ cable.comment }}" size="8" onkeypress="changeStatus({{cable.cableId}})"/>
       	 </span>
       </td>
       <td>
@@ -231,27 +231,29 @@ app.controller('Ctrl', function($scope, $filter, $http) {
       		{{ cable.rackUposition }}
       	</span>
 	      	<span ng-show="showRow(cable.cableId)">
-			      	<span class="powerDiv" style="display:none;">
-						<input type="radio" name="staticConnector" id="staticConnector_A_{{cable.cableId}}" value="A">A</input>&nbsp;
-						<input type="radio" name="staticConnector" id="staticConnector_B_{{cable.cableId}}" value="B">B</input>&nbsp;
-						<input type="radio" name="staticConnector" id="staticConnector_C_{{cable.cableId}}" value="C">C</input>
-						<input type="hidden" name="power_{{cable.cableId}}" id="power_{{cable.cableId}}" value="{{cable.rackUposition}}"/>
-					</span>
-					<span class="nonPowerDiv" style="display:none;">
-					     <select ui-select2 ng-model="params.value" ng-change="demoChange(params.value, cable.type)" id="assetFromId_{{cable.cableId}}" style="width:100px;">
-				        	<option value="{{cable.fromAssetId}}">{{ cable.asset }}</option>
-					     </select>
-					     <select id="assetHiddenId" style="display:none;width:75px;">
-					        <option value="null">Please Select</option>
-					        <option ng-repeat="v in assets" value="{{v.id}}" title="{{v.assetName}}" >{{v.assetName}}</option>
-					     </select>
-					     <select id="modelConnectorId_{{cable.cableId}}" style="width:75px;">
-					        <option value="null">Please Select</option>
-					        <option ng-repeat="c in modelConnectors" value="{{c.value}}" title="{{c.text}}" ng-selected="c.value == cable.connectorId">{{c.text}}</option>
-					     </select>
-				    </span>
-				    <input type="hidden" name="fromAsset_{{cable.cableId}}" id="fromAsset_{{cable.cableId}}" value="{{cable.fromAssetId}}"/>
-				    <input type="hidden" name="connectType_{{cable.cableId}}" id="connectType_{{cable.cableId}}" value="{{cable.type}}"/>
+		      	<span class="powerDiv" style="display:none;">
+					<input type="radio" name="staticConnector" id="staticConnector_A_{{cable.cableId}}" value="A">A</input>&nbsp;
+					<input type="radio" name="staticConnector" id="staticConnector_B_{{cable.cableId}}" value="B">B</input>&nbsp;
+					<input type="radio" name="staticConnector" id="staticConnector_C_{{cable.cableId}}" value="C">C</input>
+					<input type="hidden" name="power_{{cable.cableId}}" id="power_{{cable.cableId}}" value="{{cable.rackUposition}}"/>
+				</span>
+				<%--TODO: Used onchange and onkeypress since ng-model usage in selects adding an empty option which is a drawback 
+				     you can look over here  https://github.com/angular/angular.js/issues/1019 --%>
+				<span class="nonPowerDiv" style="display:none;">
+				     <select ui-select2 ng-model="params.value" ng-change="demoChange(params.value, cable.type)" id="assetFromId_{{cable.cableId}}" style="width:100px;" onchange="changeStatus({{cable.cableId}})">
+			        	<option value="{{cable.fromAssetId}}">{{ cable.asset }}</option>
+				     </select>
+				     <select id="assetHiddenId" style="display:none;width:75px;">
+				        <option value="null">Please Select</option>
+				        <option ng-repeat="v in assets" value="{{v.id}}" title="{{v.assetName}}" >{{v.assetName}}</option>
+				     </select>
+				     <select id="modelConnectorId_{{cable.cableId}}" style="width:75px;" onchange="changeStatus({{cable.cableId}})">
+				        <option value="null">Please Select</option>
+				        <option ng-repeat="c in modelConnectors" value="{{c.value}}" title="{{c.text}}" ng-selected="c.value == cable.connectorId">{{c.text}}</option>
+				     </select>
+			    </span>
+			    <input type="hidden" name="fromAsset_{{cable.cableId}}" id="fromAsset_{{cable.cableId}}" value="{{cable.fromAssetId}}"/>
+			    <input type="hidden" name="connectType_{{cable.cableId}}" id="connectType_{{cable.cableId}}" value="{{cable.type}}"/>
 		     </span>
       </td>
       <td ng-show="showRow(cable.cableId)">

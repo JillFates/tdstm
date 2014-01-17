@@ -689,7 +689,7 @@ class RackLayoutsController {
 			assetCablingMap <<[(it.id):[label : it.assetFromPort.label, color :it.cableColor, type:it.assetFromPort.type, length:it.cableLength?:'',
 									status:it.cableStatus,comment:it.cableComment?:'', fromAssetId :it.assetTo? it.assetTo?.id :'',asset :it.assetTo? it.assetTo?.assetName :'',
 									fromAsset:(it.assetTo? it.assetTo?.assetName+"/"+connectorLabel:'') ,toTitle:toTitle, title:title, rackUposition : connectorLabel , 
-									connectorId: it.assetToPort ? it.assetToPort.id : "",type:it.assetFromPort.type, cableId:it.id]]
+									connectorId: it.assetToPort ? it.assetToPort?.id : "",type:it.assetFromPort.type, cableId:it.id]]
 			
 			assetRows << [(it.id):'h']
 			//Used to show and hide power links using angular.
@@ -713,6 +713,9 @@ class RackLayoutsController {
 		} else {
 			currRoomRackAssets = AssetEntity.findAllByRoomSourceOrRoomTarget(assetEntity.roomSource,assetEntity.roomTarget)?.findAll{it.model?.modelConnectors?.type?.contains(jsonInput.type)}
 		}
+		def currRackAssets = currRoomRackAssets.findAll{it.rackSource?.id == assetEntity.rackSource?.id || it.rackTarget?.id == assetEntity.rackTarget?.id}
+		def sortedAssets = currRackAssets.sort{ it.assetName } + (currRoomRackAssets-currRackAssets).sort{ it.assetName }
+		
 		def modelConnectorMap =[:]
 		currRoomRackAssets.each{asset ->
 			def modelConnectMapList=[]
@@ -722,7 +725,7 @@ class RackLayoutsController {
 			}
 			modelConnectorMap << [(asset.id):modelConnectMapList]
 		}
-		def output = ['connectors': modelConnectorMap, 'assets' : currRoomRackAssets]
+		def output = ['connectors': modelConnectorMap, 'assets' : sortedAssets]
 		render output as JSON
 	}
 	/*
