@@ -75,9 +75,9 @@
 						{name:'serialNumber'},
 						{name:'planStatus'},
 						{name:'moveBundle'},
-						{name:'depNumber',sortable:false,search:false,width:'90', fixed:true},
-						{name:'depToResolve',sortable:false,search:false ,width:'100', fixed:true},
-						{name:'depToConflict',sortable:false,search:false ,width:'100', fixed:true},
+						{name:'depNumber', width:'90', fixed:true},
+						{name:'depToResolve', width:'100', fixed:true},
+						{name:'depConflicts', width:'100', fixed:true},
 						{name:'id', hidden: true},
 						{name:'commentType', hidden: true} "
 					sortname="'assetName'"

@@ -46,6 +46,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 import org.apache.commons.lang.math.NumberUtils
+import com.tdsops.tm.enums.domain.AssetDependencyStatus
 
 import RolePermissions
 
@@ -1512,9 +1513,11 @@ class AssetEntityController {
 	 * This method is used by JQgrid to load assetList
 	 */
 	def listJson = {
-		def sortIndex = params.sidx ?: 'assetName'
-		def sortOrder  = params.sord ?: 'asc'
-		def maxRows =  Integer.valueOf(params.rows) 
+		def filterParams = ['assetName':params.assetName, 'assetType':params.assetType, 'model':params.model, 'sourceLocation':params.sourceLocation, 'sourceRack':params.sourceRack, 'targetLocation':params.targetLocation, 'targetRack':params.targetRack, 'assetTag':params.assetTag, 'serialNumber':params.serialNumber, 'planStatus':params.planStatus, 'moveBundle':params.moveBundle, 'depNumber':params.depNumber, 'depToResolve':params.depToResolve,'depConflicts':params.depConflicts, 'event':params.event]
+		def sortIndex = (params.sidx in filterParams.keySet()) ? (params.sidx) : ('assetName')
+		def validSords = ['asc', 'desc']
+		def sortOrder = (validSords.indexOf(params.sord) != -1) ? (params.sord) : ('asc')
+		def maxRows = Integer.valueOf(params.rows) 
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 
@@ -1524,96 +1527,76 @@ class AssetEntityController {
 		session.AE = [:]
 		userPreferenceService.setPreference("assetListSize", "${maxRows}")
 		
-		if(params.event && params.event.isNumber()){
+		if (params.event && params.event.isNumber()) {
 			def moveEvent = MoveEvent.read( params.event )
 			moveBundleList = moveEvent?.moveBundles?.findAll {it.useOfPlanning == true}
 		} else {
 			moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
 		}
 		
-		def assetType = params.filter  ? ApplicationConstants.assetFilters[ params.filter ] : []
+		def assetType = params.filter ? ApplicationConstants.assetFilters[ params.filter ] : []
 
 		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
-		def models = params.model ? Model.findAllByModelNameIlike("%${params.model}%") : []
 		
-		def assetEntities = AssetEntity.createCriteria().list(max: maxRows, offset: rowOffset) {
-			eq("project", project)
-			if (params.assetName) 
-				ilike('assetName', "%${params.assetName.trim()}%")
-			if (params.assetType) 
-				ilike('assetType', "%${params.assetType}%")
-			if (models)
-				'in'('model', models)
-			if (params.sourceLocation)
-				ilike('sourceLocation', "%${params.sourceLocation}%")
-			if (params.sourceRack) 
-				ilike('sourceRack', "%${params.sourceRack}%")
-			if (params.targetLocation) 
-				ilike('targetLocation', "%${params.targetLocation}%")
-			if (params.targetRack) 
-				ilike('targetRack', "%${params.targetRack}%")
-			if (params.assetTag)
-				ilike('assetTag', "%${params.assetTag}%")
-			if (params.serialNumber)
-				ilike('serialNumber', "%${params.serialNumber}%")
-			if (params.planStatus)  
-				ilike('planStatus', "%${params.planStatus}%")
-			if (bundleList) 
-				'in'('moveBundle', bundleList)
-			if(params.plannedStatus) 
-				eq("planStatus", params.plannedStatus)
-				
-			if(params.moveBundleId){
-				if(params.moveBundleId =='unAssigned'){
-					isNull('moveBundle')
+		def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
+		def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
+		
+		def query = new StringBuffer(""" 
+			SELECT * FROM ( 
+				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName, ae.asset_type AS assetType, m.name AS model, 
+					ae.source_location AS sourceLocation, ae.source_rack AS sourceRack,
+					ae.target_location AS targetLocation, ae.target_rack AS targetRack,
+					ae.asset_tag AS assetTag, ae.serial_number AS serialNumber,
+					ae.plan_status AS planStatus, mb.name AS moveBundle, adb.dependency_bundle AS depNumber, me.move_event_id AS event,
+					COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depToResolve,
+					COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts
+				FROM asset_entity ae
+				LEFT OUTER JOIN model m ON m.model_id=ae.model_id
+				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
+				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
+				LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
+				LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 
+				LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN (${unknownQuestioned}) 
+				LEFT OUTER JOIN asset_dependency adc ON ae.asset_entity_id = adc.asset_id AND adc.status IN (${validUnkownQuestioned}) 
+					AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.dependent_id) != mb.move_bundle_id 
+				LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN (${validUnkownQuestioned}) 
+					AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id 
+				WHERE ae.project_id = ${project.id} 
+				GROUP BY assetId ORDER BY ${sortIndex} ${sortOrder}
+			) AS assets
+		""")
+		
+		// Handle the filtering by each column's text field
+		def firstWhere = true
+		filterParams.each {
+			if( it.getValue() )
+				if (firstWhere) {
+					// single quotes are stripped from the filter to prevent SQL injection
+					query.append(" WHERE assets.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
+					firstWhere = false
 				} else {
-					eq('moveBundle', MoveBundle.read(params.moveBundleId))
+					query.append(" AND assets.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
 				}
-			}
-			
-			// if filter have some value then this one is getting requested from planning dashboard to filter the asset list. else it will be 1146.
-			if ( params.filter ) {
-				if (params.filter !='other')  // filter is not other means filter is in (Server, VM , Blade) and others is excepts (Server, VM , Blade).
-					'in'('assetType', assetType)
-				else 
-					not {'in'("assetType",  assetType)}
-					
-				or{
-					and {
-						'in'('moveBundle', moveBundleList) 
-					} 
-					and {
-						isNull('moveBundle')
-					}
-				}
-				if( params.type=='toValidate') 
-					eq ('validation','Discovery')
-				
-			} else {
-				not {'in'("assetType",  ["Application","Database","Files"])}
-			}
-			
-			order(sortIndex, sortOrder).ignoreCase()
 		}
+		log.info "query = ${query}"
+		def assetList = jdbcTemplate.queryForList(query.toString())
 		
-		
-		def totalRows = assetEntities.totalCount
+		// Cut the list of selected applications down to only the rows that will be shown in the grid
+		def totalRows = assetList.size()
 		def numberOfPages = Math.ceil(totalRows / maxRows)
-		def assetComments = AssetComment.findAllByAssetEntityInList(assetEntities)
-		def depsBundle = AssetDependencyBundle.findAllByAssetInList(assetEntities)
+		if (totalRows > 0)
+			assetList = assetList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
+		else
+			assetList = []
 		
-		def results = assetEntities?.collect { entity->
-			[ cell: ['',entity.assetName, entity.assetType,entity.model?.modelName, entity.sourceLocation,
-					entity.sourceRack, entity.targetLocation, entity.targetRack, entity.assetTag, 
-					entity.serialNumber,entity.planStatus,entity.moveBundle?.name,
-					depsBundle.find{it.asset == entity}?.dependencyBundle,
-					(entity.depToResolve ?entity.depToResolve:''),(entity.depToConflict ?entity.depToConflict:''),
-					assetComments.find{ it.assetEntity == entity && it.commentType == 'issue' && it.status == 'completed'} ? 'issue' :
-					assetComments.find{ it.assetEntity == entity} ? 'comment' : 'blank'], id: entity.id,
-			]}
+		def results = assetList?.collect { [ cell: [ '',it.assetName, (it.assetType ?: ''), it.model, 
+			it.sourceLocation, it.sourceRack, it.targetLocation, it.targetRack, it.assetTag, it.serialNumber, it.planStatus, it.moveBundle, 
+			it.depNumber, (it.depToResolve==0)?(''):(it.depToResolve), (it.depConflicts==0)?(''):(it.depConflicts),
+			(it.commentStatus!='completed' && it.commentType=='issue')?('issue'):(it.commentType?:'blank'),	it.assetType, it.event
+		], id: it.assetId]}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
-
+		
 		render jsonData as JSON
 	}
 	/* ----------------------------------------

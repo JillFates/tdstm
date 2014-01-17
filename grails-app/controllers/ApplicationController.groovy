@@ -108,23 +108,24 @@ class ApplicationController {
 			LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN (${validUnkownQuestioned}) 
 				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id 
 			WHERE ae.project_id = ${project.id} 
-			GROUP BY app_id ORDER BY """ + sortIndex + " " + sortOrder + """
+			GROUP BY app_id ORDER BY ${sortIndex} ${sortOrder}
 			) AS apps""")
 		
 		// Handle the filtering by each column's text field
 		def firstWhere = true
 		filterParams.each {
-			if(it.getValue())
-				if(firstWhere){
-					query.append(" WHERE apps.${it.getKey()} LIKE '%${it.getValue()}%'")
+			if( it.getValue() )
+				if (firstWhere) {
+					// single quotes are stripped from the filter to prevent SQL injection
+					query.append(" WHERE apps.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
 					firstWhere = false
 				} else {
-					query.append(" AND apps.${it.getKey()} LIKE '%${it.getValue()}%'")
+					query.append(" AND apps.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
 				}
 		}
 		if(params.latency){
 			if(params.latency!='unknown')
-				query.append(" WHERE apps.latency = '${params.latency}' ")
+				query.append(" WHERE apps.latency = '${params.latency.replaceAll("'", "")}' ")
 			else
 				query.append(" WHERE (apps.latency NOT IN ('Y','N') OR apps.latency IS NULL) ")	
 		}
@@ -132,6 +133,7 @@ class ApplicationController {
 			def bundleName = MoveBundle.get(params.moveBundleId)?.name
 			query.append(" WHERE apps.moveBundle  = '${bundleName}' ")
 		}
+		log.info "query = ${query}"
 		def appsList = jdbcTemplate.queryForList(query.toString())
 		
 		// Cut the list of selected applications down to only the rows that will be shown in the grid
