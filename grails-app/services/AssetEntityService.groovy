@@ -1,3 +1,6 @@
+import jxl.*
+import jxl.read.biff.*
+import jxl.write.*
 import org.apache.commons.lang.math.NumberUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 
@@ -491,6 +494,36 @@ class AssetEntityService {
 			AssetCableMap.executeUpdate("""Update AssetCableMap set toAssetRack='${assetEntity.targetRack}',
 					toAssetUposition=${assetEntity.targetRackPosition} where assetTo = ? """,[assetEntity])
 		}*/
+	}
+	/*
+	 * export cabling data.
+	 * @param assetCablesList
+	 * @param cablingSheet
+	 */
+	def cablingReportData( assetCablesList, cablingSheet ){
+			for ( int r = 2; r <= assetCablesList.size(); r++ ) {
+				cablingSheet.addCell( new Label( 0, r, String.valueOf(assetCablesList[r-2].assetFromPort.type )) )
+				cablingSheet.addCell( new Label( 1, r, String.valueOf(assetCablesList[r-2].assetFrom ? assetCablesList[r-2].assetFrom?.id : "" )) )
+				cablingSheet.addCell( new Label( 2, r, String.valueOf(assetCablesList[r-2].assetFrom ? assetCablesList[r-2].assetFrom.assetName : "" )) )
+				cablingSheet.addCell( new Label( 3, r, String.valueOf(assetCablesList[r-2].assetFromPort.label )) )
+				cablingSheet.addCell( new Label( 4, r, String.valueOf(assetCablesList[r-2].assetTo ? assetCablesList[r-2].assetTo?.id : "" )) )
+				cablingSheet.addCell( new Label( 5, r, String.valueOf(assetCablesList[r-2].assetTo ? assetCablesList[r-2].assetTo?.assetName :"" )) )
+				if(assetCablesList[r-2].assetFromPort.type !='Power'){
+					cablingSheet.addCell( new Label( 6, r, String.valueOf(assetCablesList[r-2].assetToPort ? assetCablesList[r-2].assetToPort?.label :"" )) )
+				}else{
+					cablingSheet.addCell( new Label( 6, r, String.valueOf(assetCablesList[r-2].toPower?:"" )) )
+				}
+				cablingSheet.addCell( new Label( 7, r, String.valueOf(assetCablesList[r-2].cableComment?:"" )) )
+				cablingSheet.addCell( new Label( 8, r, String.valueOf(assetCablesList[r-2].cableColor?:"" )) )
+				if(assetCablesList[r-2].assetFrom.sourceRoom){
+					cablingSheet.addCell( new Label( 9, r, String.valueOf(assetCablesList[r-2].assetFrom?.sourceLocation+"/"+assetCablesList[r-2].assetFrom?.sourceRoom+"/"+assetCablesList[r-2].assetFrom?.sourceRack )) )
+				}else if(assetCablesList[r-2].assetFrom.targetRoom){
+					cablingSheet.addCell( new Label( 9, r, String.valueOf(assetCablesList[r-2].assetFrom?.targetLocation+"/"+assetCablesList[r-2].assetFrom?.targetRoom+"/"+assetCablesList[r-2].assetFrom?.targetRack )) )
+				}else{
+					cablingSheet.addCell( new Label( 9, r, '') )
+				}
+				cablingSheet.addCell( new Label( 10, r, String.valueOf(assetCablesList[r-2].cableStatus?:"" )) )
+			}
 	}
 
 }

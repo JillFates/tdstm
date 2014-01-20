@@ -236,7 +236,7 @@ class AssetEntityController {
 		def	dataTransferBatchs = DataTransferBatch.findAllByProject(project).size()
 		
 		def prefMap = [:]
-		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency','ImportRoom','ImportRack'].each {t->
+		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency','ImportRoom','ImportRack', 'ImportCabling'].each {t->
 		   prefMap << [(t) : userPreferenceService.getPreference(t)]
 		}
 		
@@ -907,6 +907,7 @@ class AssetEntityController {
 			def dependencySheet
 			def roomSheet
 			def rackSheet
+			def cablingSheet
 			def exportedEntity = ""
 
 			def serverMap = [:]
@@ -983,6 +984,7 @@ class AssetEntityController {
 			dependencySheet = book.getSheet( sheetNames[5] )
 			roomSheet = book.getSheet( sheetNames[6] )
 			rackSheet = book.getSheet( sheetNames[7] )
+			cablingSheet = book.getSheet( sheetNames[8] )
 
 			if( flag == 0 ) {
 				flash.message = "Sheet not found, Please check it."
@@ -1405,6 +1407,13 @@ class AssetEntityController {
 					  }
 					  log.info "export() - processing racks took ${TimeUtil.elapsed(started)}"
 					  started = new Date()
+					}
+					
+					if(params.cabling=='cable'){
+						exportedEntity +="C"
+						def projectInstance = securityService.getUserCurrentProject()
+						def assetCablesList = AssetCableMap.findAll( " from AssetCableMap acm where acm.assetFrom.project.id = $projectInstance.id " )
+						assetEntityService.cablingReportData(assetCablesList, cablingSheet)
 					}
 				}
 				//update data from Asset Comment table to EXCEL
