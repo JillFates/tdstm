@@ -525,5 +525,14 @@ class AssetEntityService {
 				cablingSheet.addCell( new Label( 10, r, String.valueOf(assetCablesList[r-2].cableStatus?:"" )) )
 			}
 	}
+	/**
+	 * used to get the frontEndLabel of particular attribute
+	 * @param attribute
+	 * @return frontEndLabel
+	 */
+	def getAttributeFrontendLabel(attributeCode, frontendLabel){
+		def project = securityService.getUserCurrentProject()
+		return (attributeCode.contains('custom') && project[attributeCode])? project[attributeCode]:frontendLabel
+	}
 
 }

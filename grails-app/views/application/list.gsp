@@ -56,13 +56,13 @@
 					<g:if test="${moveEvent != null}"><g:link class="mmlink" controller="application" action="list"><span class="capBtn"><input type="button" value="Clear Filters" /></span></g:link></g:if>'
 				<jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
-					colNames="'Actions','Name', 'App Sme','Validation', 'Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType', 'Event'"
+					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType', 'Event'"
 					colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'50', fixed:true},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
-						{name:'sme'},
-						{name:'validation', width:'200'},
-						{name:'planStatus'}, 
-						{name:'moveBundle'},
+						{name:'${appPref['1']}',width:'120'},
+						{name:'${appPref['2']}', width:'120'},
+						{name:'${appPref['3']}', width:'120'}, 
+						{name:'${appPref['4']}', width:'120'},
 						{name:'depNumber'},
 						{name:'depResolve'},
 						{name:'depConflicts'},
@@ -93,7 +93,10 @@
 						{afterSubmit:deleteMessage}
 					);
 				});
-
+				<g:each var="key" in="['1','2','3','4']">
+					var appPref= '${appPref[key]}';
+					$("#applicationIdGrid_"+appPref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:absolute;margin-left: 42px;margin-top: -15px;" onclick="showSelect(\''+appPref+'\',\'application\',\''+${key}+'\')">');
+				</g:each>
 				$.jgrid.formatter.integer.thousandsSeparator='';
 			function myLinkFormatter (cellvalue, options, rowObject) {
 				var value = cellvalue ? cellvalue : ''
@@ -160,6 +163,18 @@
 			<div>
 				<div id="messageId" class="message" style="display:none"></div>
 			</div>
+			<g:each var="key" in="['1','2','3','4']">
+				<div id="columnCustomDiv_${appPref[key]}" style="display:none;">
+					<div class="columnDiv_${key}" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width: 120px;z-index: 2147483647; overflow-y: scroll;text-align: left;">
+						<g:set var="list" value="${[['attributeCode':appPref[key],'frontendLabel':modelPref[key]]]}"></g:set>
+						<g:set var="temp" value="${list.addAll(attributesList)}"></g:set>
+						<g:each var="attribute" in="${list}">
+							<input type="radio" name="coloumnSelector_${appPref[key]}" id="coloumnSelector_${appPref[key]}" value="${attribute.attributeCode}" 
+								${appPref[key]==attribute.attributeCode?'checked':'' } style="margin-left:11px;" onchange="setColumnAssetPref(this.value,'${key}')"/>${attribute.frontendLabel}<br>
+						</g:each>
+					</div>
+				</div>
+			</g:each>
 			<jqgrid:wrapper id="applicationId" />
 			<g:render template="../assetEntity/commentCrud"/>
 			<g:render template="../assetEntity/modelDialog"/>

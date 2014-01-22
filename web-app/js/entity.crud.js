@@ -1013,3 +1013,33 @@ function changeBundleSelect(){
 		$("#saveBundleId").attr("disabled", "disabled");
 	}
 }
+function setColumnAssetPref(value,key){
+	jQuery.ajax({
+		url: contextPath+'/application/columnAssetPref',
+		data: {'columnValue':value,'from':key},
+		type:'POST',
+		success: function(resp) {
+			console.log('success');
+			if(resp)
+				window.location.reload()
+		}
+	});
+}
+var columnPref=''
+function showSelect(column, type, key){
+	if(column!=columnPref){
+		$("#applicationIdGrid_"+column).append($("#columnCustomDiv_"+column).html());
+	}
+	$(".columnDiv_"+key).show();
+	columnPref=column
+}
+
+$(document).click(function(e){
+	for(var i=1;i<5;i++){
+		if($(".columnDiv_"+i+":visible").length){
+		    if (!$(e.target).is(".editSelectimage_"+i)) {
+		    	$(".columnDiv_"+i).hide();
+		    }
+		}
+	}
+});
