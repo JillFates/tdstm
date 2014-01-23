@@ -21,6 +21,7 @@ import com.tdsops.tm.enums.domain.ValidationType
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
+import grails.converters.JSON
 
 class AssetEntityService {
 
@@ -28,6 +29,7 @@ class AssetEntityService {
 	def jdbcTemplate
 	def projectService
 	def assetEntityAttributeLoaderService
+	def userPreferenceService
 	def securityService
 	
 	/**
@@ -534,5 +536,60 @@ class AssetEntityService {
 		def project = securityService.getUserCurrentProject()
 		return (attributeCode.contains('custom') && project[attributeCode])? project[attributeCode]:frontendLabel
 	}
-
+	/**
+	 * Used to get the customised query based on the application preference
+	 * @param appPref(List of key value column preferences)
+	 * @return query,joinQuery
+	 */
+	def getAppCustomQuery(appPref){
+		def query = ""
+		def joinQuery = ""
+		appPref.each{key,value->
+			switch(value){
+				case 'sme':
+						query +="CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS sme,"
+						joinQuery +="\n LEFT OUTER JOIN person p ON p.person_id=a.sme_id \n"
+						break;
+				case 'sme2':
+						query +="CONCAT(CONCAT(p1.first_name, ' '), IFNULL(p1.last_name,'')) AS sme2,"
+						joinQuery +="\n LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id \n"
+						break;
+				case 'moveBundle':
+						query +="mb.name AS moveBundle,"
+						break;
+				case 'event':
+						query +="me.move_event_id AS event,"
+						joinQuery +="\n LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id \n"
+						break;
+				case 'owner':
+						query +="pg.name AS owner,"
+						joinQuery +="\n LEFT OUTER JOIN party_group pg ON pg.party_group_id = ae.owner_id \n"
+						break;
+				case ~/appVersion|appVendor|appTech|latency|appAccess|appSource|license|businessUnit|appFunction|criticality|userCount|userLocations|useFrequency|drRpoDesc|drRtoDesc|shutdownFixed|moveDowntimeTolerance|testProc|startupProc|url|shutdownBy|shutdownDuration|startupBy|startupFixed|startupDuration|testingBy|testingFixed|testingDuration/:
+						query +="a.${WebUtil.splitCamelCase(value)} AS ${value},"
+						break;
+				case ~/custom1|custom2|custom3|custom4|custom5|custom6|custom7|custom8|custom9|custom10|custom11|custom12|custom13|custom14|custom15|custom16|custom17|custom18|custom19|custom20|custom21|custom22|custom23|custom24/:
+						query +="ae.${value} AS ${value},"
+						break;
+				default:
+						query +="ae.${WebUtil.splitCamelCase(value)} AS ${value},"
+			}
+		}
+		return [ query:query, joinQuery:joinQuery ]
+	}
+	/**
+	 * Used to get the existing preference for customized columns
+	 * @forWhom 'App_columns' for now
+	 * @return appPref
+	 */
+	def getExistingPref(forWhom){
+		def existingPref = userPreferenceService.getPreference(forWhom)
+		def appPref
+		if(!existingPref){
+			appPref = ['1':'sme','2':'validation','3':'planStatus','4':'moveBundle']
+		}else{
+			appPref = JSON.parse(existingPref)
+		}
+		return appPref
+	}
 }

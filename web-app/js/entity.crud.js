@@ -1016,7 +1016,7 @@ function changeBundleSelect(){
 function setColumnAssetPref(value,key){
 	jQuery.ajax({
 		url: contextPath+'/application/columnAssetPref',
-		data: {'columnValue':value,'from':key},
+		data: {'columnValue':value,'from':key,'previousValue':$("#previousValue_"+key).val()},
 		type:'POST',
 		success: function(resp) {
 			console.log('success');

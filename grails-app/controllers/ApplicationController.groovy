@@ -48,29 +48,23 @@ class ApplicationController {
 			moveEvent = MoveEvent.findByProjectAndId( project, params.moveEvent )
 		}
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:"name"])
-		def existingPref = userPreferenceService.getPreference('App_Columns')
-		def appPref
-		if(!existingPref){
-			appPref = ['1':'sme','2':'validation','3':'planStatus','4':'moveBundle']
-		}else{
-			appPref = JSON.parse(existingPref)
-		}
-		
-		def appList=["assetName",appPref['1'],appPref['2'],appPref['3'],appPref['4']]
-		
-		def modelPref = [:]
+		def appPref= assetEntityService.getExistingPref('App_Columns')
 		def attributes = projectService.getAttributes('Application')
+		def customList = (1..project.customFieldsShown).collect{"custom"+it}
+		
+		// Remove the non project specific attributes and sort them by attributeCode
+		def appAttributes = attributes.findAll{!it.attributeCode.contains('custom') || it.attributeCode=='assetName'}?.sort{it.frontendLabel}
+		def customAttributes = attributes.findAll{it.attributeCode in customList}.sort{it.frontendLabel}
+		// Used to display column names in jqgrid dynamically
+		def modelPref = [:]
 		appPref.each{key,value->
-			modelPref << [ (key): assetEntityService.getAttributeFrontendLabel(value,attributes.find{it.attributeCode==value}?.frontendLabel)]
+			modelPref << [(key): assetEntityService.getAttributeFrontendLabel(value,attributes.find{it.attributeCode==value}?.frontendLabel)]
 		}
 		/* Asset Entity attributes for Filters*/
-		def attributesList=[]
-		
-		attributes.each{ attribute ->
-			if(!appList.contains(attribute.attributeCode)){
-				attributesList << [attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
-			}
+		def attributesList= (appAttributes+customAttributes).collect{ attribute ->
+			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
 		}
+		
 		return [projectId: project.id, assetDependency: new AssetDependency(),
 			servers: entities.servers, 
 			applications: entities.applications, 
@@ -96,11 +90,14 @@ class ApplicationController {
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		def project = securityService.getUserCurrentProject()
 		
-		def filterParams = ['depNumber':params.depNumber,'depResolve':params.depResolve,'depConflicts':params.depConflicts,'event':params.event]
+		def filterParams = ['assetName':params.assetName,'depNumber':params.depNumber,'depResolve':params.depResolve,'depConflicts':params.depConflicts,'event':params.event]
 		def attributes = projectService.getAttributes('Application')
 		
+		def appPref= assetEntityService.getExistingPref('App_Columns')
+		def appPrefVal = appPref.collect{it.value}
 		attributes.each{ attribute ->
-			filterParams << [ (attribute.attributeCode): params[(attribute.attributeCode)]]
+			if(attribute.attributeCode in appPrefVal)
+				filterParams << [ (attribute.attributeCode): params[(attribute.attributeCode)]]
 		}
 		def initialFilter = params.initialFilter in [true,false] ? params.initialFilter : false
 		
@@ -118,39 +115,31 @@ class ApplicationController {
 		
 		def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
 		def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
+		def customizeQuery = assetEntityService.getAppCustomQuery(appPref)
+		def query = new StringBuffer("""SELECT * FROM ( SELECT a.app_id AS appId, ae.asset_name AS assetName, adb.dependency_bundle AS depNumber,""")
+		if(customizeQuery.query){
+			query.append(customizeQuery.query)
+		}	
 		
-		// FIXME : added all columns in the select for now for Craig review, I will replace with dynamic columns based on preference
-		def query = new StringBuffer("""SELECT * FROM ( SELECT a.app_id AS appId, ae.asset_name AS assetName, a.latency As latency,
-			CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS sme, ae.validation AS validation,  ae.environment AS environment,
-			a.sme2 AS sme2, a.app_version AS appVersion, a.app_vendor AS appVendor,a.app_tech AS appTech,a.app_access AS appAccess, 
-			a.app_source AS appSource,a.license AS license,ae.description AS description,ae.support_type AS supportType,a.business_unit AS businessUnit,
-			pg.name AS owner, ae.retire_date AS retireDate,ae.maint_exp_date AS maintExpDate,a.app_function AS appFunction,a.criticality AS criticality, 
-			a.user_count AS userCount,a.user_locations AS userLocations,a.use_frequency AS useFrequency,a.dr_rpo_desc AS drRpoDesc, a.dr_rto_desc AS drRtoDesc,
-			a.move_downtime_tolerance AS moveDowntimeTolerance,a.test_proc AS testProc,a.startup_proc AS startupProc,a.url AS url,a.shutdown_by shutdownBy,
-			a.shutdown_fixed shutdownFixed, a.shutdown_duration shutdownDuration, a.startup_by startupBy, a.startup_fixed startupFixed,a.startup_duration startupDuration,
-			a.testing_by testingBy, a.testing_fixed testingFixed, a.testing_duration testingDuration,ae.custom1 AS custom1,ae.custom2 AS custom2,ae.custom3 AS custom3,
-			ae.custom4 AS custom4,ae.custom5 AS custom5,ae.custom6 AS custom6,ae.custom7 AS custom7,ae.custom8 AS custom8,ae.custom10 AS custom10,ae.custom9 AS custom9,
-			ae.custom11 AS custom11, ae.custom12 AS custom12, ae.custom13 AS custom13, ae.custom14 AS custom14, ae.custom15 AS custom15,ae.custom16 AS custom16,ae.custom17 AS custom17,
-			ae.custom18 AS custom18,ae.custom19 AS custom19,ae.custom20 AS custom20,ae.custom21 AS custom21,ae.custom22 AS custom22,ae.custom23 AS custom23,ae.custom24 AS custom24,
-			ae.plan_status AS planStatus, mb.name AS moveBundle, adb.dependency_bundle AS depNumber, me.move_event_id AS event, 
-			COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, 
-			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts 
-			FROM application a 
-			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id 
-			LEFT OUTER JOIN person p ON p.person_id=a.sme_id
-			LEFT OUTER JOIN party_group pg ON pg.party_group_id = ae.owner_id
-			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
-			LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
-			LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
-			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 
-			LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN (${unknownQuestioned}) 
-			LEFT OUTER JOIN asset_dependency adc ON ae.asset_entity_id = adc.asset_id AND adc.status IN (${validUnkownQuestioned}) 
-				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.dependent_id) != mb.move_bundle_id 
-			LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN (${validUnkownQuestioned}) 
-				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id 
-			WHERE ae.project_id = ${project.id} 
-			GROUP BY app_id ORDER BY ${sortIndex} ${sortOrder}
-			) AS apps""")
+		query.append("""COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, 
+		COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts 
+		FROM application a 
+		LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id""")
+		if(customizeQuery.joinQuery){
+			query.append(customizeQuery.joinQuery)
+		}
+		
+		query.append("""\n LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
+		LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
+		LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 
+		LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN (${unknownQuestioned}) 
+		LEFT OUTER JOIN asset_dependency adc ON ae.asset_entity_id = adc.asset_id AND adc.status IN (${validUnkownQuestioned}) 
+			AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.dependent_id) != mb.move_bundle_id 
+		LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN (${validUnkownQuestioned}) 
+			AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id 
+		WHERE ae.project_id = ${project.id} 
+		GROUP BY app_id ORDER BY ${sortIndex} ${sortOrder}
+		) AS apps""")
 		
 		// Handle the filtering by each column's text field
 		def firstWhere = true
@@ -185,13 +174,6 @@ class ApplicationController {
 		else
 			appsList = []
 			
-		def existingPref = userPreferenceService.getPreference('App_Columns')
-		def appPref
-		if(!existingPref){
-			appPref = ['1':'sme','2':'validation','3':'planStatus','4':'moveBundle']
-		}else{
-			appPref = JSON.parse(existingPref)
-		}
 		def results = appsList?.collect { [ cell: [
 			'',it.assetName, (it[appPref["1"]] ?: ''), it[appPref["2"]], it[appPref["3"]], it[appPref["4"]], 
 			it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,
@@ -210,15 +192,12 @@ class ApplicationController {
 	def columnAssetPref={
 		def column= params.columnValue
 		def fromKey= params.from
-		
-		def existingCols = userPreferenceService.getPreference('App_Columns')
-		def existingColsMap = [:]
-		if(!existingCols){
-			existingColsMap = ['1':'sme','2':'validation','3':'planStatus','4':'moveBundle']
-		} else {
-			existingColsMap = JSON.parse(existingCols)
-		}
-		existingColsMap["${fromKey}"] = params.columnValue
+		def existingColsMap = assetEntityService.getExistingPref('App_Columns')
+		def key = existingColsMap.find{it.value==column}?.key
+		if(key)
+			existingColsMap["${key}"] = params.previousValue
+
+		existingColsMap["${fromKey}"] = column
 		userPreferenceService.setPreference( 'App_Columns', (existingColsMap as JSON).toString() )
 		render true
 	}
