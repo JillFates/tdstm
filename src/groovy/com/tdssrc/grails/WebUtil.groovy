@@ -47,6 +47,20 @@ class WebUtil {
 		}
 		return liString
 	}
-
+	/** 
+	 * this utility method is used to split a camel Case String with "_"
+	 * @param string
+	 * @return
+	 */
+	static String splitCamelCase(String s) {
+		return s.replaceAll(
+		   String.format("%s|%s|%s",
+			  "(?<=[A-Z])(?=[A-Z][a-z])",
+			  "(?<=[^A-Z])(?=[A-Z])",
+			  "(?<=[A-Za-z])(?=[^A-Za-z])"
+		   ),
+		   "_"
+		).toLowerCase();
+	 }
 
 }
