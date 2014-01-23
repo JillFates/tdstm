@@ -53,7 +53,7 @@ class ApplicationController {
 		def customList = (1..project.customFieldsShown).collect{"custom"+it}
 		
 		// Remove the non project specific attributes and sort them by attributeCode
-		def appAttributes = attributes.findAll{!it.attributeCode.contains('custom') || it.attributeCode=='assetName'}?.sort{it.frontendLabel}
+		def appAttributes = attributes.findAll{!it.attributeCode.contains('custom') && it.attributeCode!="assetName"}?.sort{it.frontendLabel}
 		def customAttributes = attributes.findAll{it.attributeCode in customList}.sort{it.frontendLabel}
 		// Used to display column names in jqgrid dynamically
 		def modelPref = [:]
