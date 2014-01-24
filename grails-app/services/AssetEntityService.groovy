@@ -586,7 +586,17 @@ class AssetEntityService {
 		def existingPref = userPreferenceService.getPreference(forWhom)
 		def appPref
 		if(!existingPref){
-			appPref = ['1':'sme','2':'validation','3':'planStatus','4':'moveBundle']
+			switch(forWhom){
+				case 'App_Columns':
+					appPref = ['1':'sme','2':'validation','3':'planStatus','4':'moveBundle']
+				break;
+				case 'Asset_Columns':
+					appPref = ['1':'targetLocation','2':'targetRack','3':'assetTag','4':'serialNumber']
+				break;
+				case 'Database_Columns':
+					appPref = ['1':'dbFormat','2':'size','3':'planStatus','4':'moveBundle']
+				break;
+			}
 		}else{
 			appPref = JSON.parse(existingPref)
 		}

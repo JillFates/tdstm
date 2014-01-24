@@ -61,23 +61,23 @@
 					<g:if test="${moveEvent != null}"><g:link class="mmlink" controller="assetEntity" action="list"><span class="capBtn"><input type="button" value="Clear Filters" /></span></g:link></g:if>'
 				<jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
-					colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','Target Location','Target Rack','Tag','Serial#','Plan Status','Bundle',
+					colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','Plan Status','Bundle',
 						'Dep Group','Dep to resolve', 'Dep Conflicts', 'id', 'commentType'"
-					colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false,width:'60', fixed:true},
-						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
+					colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false,width:'40', fixed:true},
+						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'250'},
 						{name:'assetType'},
 						{name:'model'}, 
 						{name:'sourceLocation'},
 						{name:'sourceRack'},
-						{name:'targetLocation', width:'110', fixed:true},
-						{name:'targetRack', width:'100', fixed:true},
-						{name:'assetTag'},
-						{name:'serialNumber'},
+						{name:'${assetPref['1']}',width:'130'},
+						{name:'${assetPref['2']}', width:'130'},
+						{name:'${assetPref['3']}', width:'130'}, 
+						{name:'${assetPref['4']}', width:'130'},
 						{name:'planStatus'},
 						{name:'moveBundle'},
-						{name:'depNumber', width:'90', fixed:true},
-						{name:'depToResolve', width:'100', fixed:true},
-						{name:'depConflicts', width:'100', fixed:true},
+						{name:'depNumber', width:'50', fixed:true},
+						{name:'depToResolve', width:'50', fixed:true},
+						{name:'depConflicts', width:'50', fixed:true},
 						{name:'id', hidden: true},
 						{name:'commentType', hidden: true} "
 					sortname="'assetName'"
@@ -101,7 +101,12 @@
 					$("#assetListId").jqGrid("editGridRow","new",
 						{afterSubmit:deleteMessage});
 				});
-				
+
+				<g:each var="key" in="['1','2','3','4']">
+					var assetPref= '${assetPref[key]}';
+					$("#assetListIdGrid_"+assetPref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:absolute;margin-left: 24px;margin-top: -15px;" onclick="showSelect(\''+assetPref+'\',\'assetList\',\''+${key}+'\')">');
+				</g:each>
+			
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
 					var value = cellvalue ? cellvalue : ''
@@ -168,6 +173,18 @@
 			<div>
 				<div id="messageId" class="message" style="display:none"></div>
 			</div>
+			<g:each var="key" in="['1','2','3','4']">
+				<div id="columnCustomDiv_${assetPref[key]}" style="display:none;">
+					<div class="columnDiv_${key}" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width: 100px;z-index: 2147483647; overflow-y: scroll;text-align: left;">
+						<input type="hidden" id="previousValue_${key}" value="${assetPref[key]}" />
+						<g:each var="attribute" in="${attributesList}">
+							<label><input type="radio" name="coloumnSelector_${assetPref[key]}" id="coloumnSelector_${assetPref[key]}" value="${attribute.attributeCode}" 
+								${assetPref[key]==attribute.attributeCode?'checked':'' } style="margin-left:2px;" 
+								onchange="setColumnAssetPref(this.value,'${key}','Asset_Columns')"/> ${attribute.frontendLabel}</label><br>
+						</g:each>
+					</div>
+				</div>
+			</g:each>
 			<div>
 				  <jqgrid:wrapper id="assetListId" /> 
 			</div>

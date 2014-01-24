@@ -47,7 +47,7 @@ import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 import org.apache.commons.lang.math.NumberUtils
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
-
+import com.tdssrc.grails.WebUtil
 import RolePermissions
 
 class AssetEntityController {
@@ -70,6 +70,7 @@ class AssetEntityController {
 	def commentService
 	def securityService
 	def taskService
+	def projectService
 	
 	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8','Custom9','Custom10',
 		'Custom11','Custom12','Custom13','Custom14','Custom15','Custom16','Custom17','Custom18','Custom19','Custom20','Custom21','Custom22','Custom23','Custom24']
@@ -1508,7 +1509,22 @@ class AssetEntityController {
 			log.info "it's good - ${params.moveEvent}"
 			moveEvent = MoveEvent.findByProjectAndId( project, params.moveEvent )
 		}
-		
+		def assetPref= assetEntityService.getExistingPref('Asset_Columns')
+		def attributes = projectService.getAttributes('AssetEntity')
+		def customList = (1..project.customFieldsShown).collect{"custom"+it}
+		def assets = ['assetName', 'assetType', 'model', 'sourceLocation', 'sourceRack', 'planStatus', 'moveBundle']
+		// Remove the non project specific attributes and sort them by attributeCode
+		def assetAttributes = attributes.findAll{!it.attributeCode.contains('custom') && !(it.attributeCode in assets)}?.sort{it.frontendLabel}
+		def customAttributes = attributes.findAll{it.attributeCode in customList}.sort{it.frontendLabel}
+		// Used to display column names in jqgrid dynamically
+		def modelPref = [:]
+		assetPref.each{key,value->
+			modelPref << [(key): assetEntityService.getAttributeFrontendLabel(value,attributes.find{it.attributeCode==value}?.frontendLabel)]
+		}
+		/* Asset Entity attributes for Filters*/
+		def attributesList= (assetAttributes+customAttributes).collect{ attribute ->
+			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
+		}
 		render(view:'list', model:[assetDependency : new AssetDependency(), dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
 			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, type:params.type, plannedStatus:params.plannedStatus,  servers : entities.servers, 
 			applications : entities.applications, dbs : entities.dbs, files : entities.files,  networks :entities.networks, assetName:filters?.assetNameFilter ?:'', 
@@ -1516,13 +1532,14 @@ class AssetEntityController {
 			moveBundle:filters?.moveBundleFilter ?:'', model:filters?.modelFilter ?:'', sourceLocation:filters?.sourceLocationFilter ?:'', 
 			targetLocation:filters?.targetLocationFilter ?:'', targetRack:filters?.targetRackFilter ?:'', assetTag:filters?.assetTagFilter ?:'', 
 			serialNumber:filters?.serialNumberFilter ?:'', sortIndex:filters?.sortIndex, sortOrder:filters?.sortOrder, moveBundleId:params.moveBundleId,
-			staffRoles:taskService.getRolesForStaff(), sizePref:userPreferenceService.getPreference("assetListSize")?: '25' , moveBundleList:moveBundleList ]) 
+			staffRoles:taskService.getRolesForStaff(), sizePref:userPreferenceService.getPreference("assetListSize")?: '25' , moveBundleList:moveBundleList,
+			 attributesList:attributesList, assetPref:assetPref, modelPref:modelPref]) 
 	}
 	/**
 	 * This method is used by JQgrid to load assetList
 	 */
 	def listJson = {
-		def filterParams = ['assetName':params.assetName, 'assetType':params.assetType, 'model':params.model, 'sourceLocation':params.sourceLocation, 'sourceRack':params.sourceRack, 'targetLocation':params.targetLocation, 'targetRack':params.targetRack, 'assetTag':params.assetTag, 'serialNumber':params.serialNumber, 'planStatus':params.planStatus, 'moveBundle':params.moveBundle, 'depNumber':params.depNumber, 'depToResolve':params.depToResolve,'depConflicts':params.depConflicts, 'event':params.event]
+		def filterParams = ['assetName':params.assetName, 'assetType':params.assetType, 'model':params.model, 'sourceLocation':params.sourceLocation, 'sourceRack':params.sourceRack, 'planStatus':params.planStatus, 'moveBundle':params.moveBundle, 'depNumber':params.depNumber, 'depToResolve':params.depToResolve,'depConflicts':params.depConflicts, 'event':params.event]
 		def sortIndex = (params.sidx in filterParams.keySet()) ? (params.sidx) : ('assetName')
 		def validSords = ['asc', 'desc']
 		def sortOrder = (validSords.indexOf(params.sord) != -1) ? (params.sord) : ('asc')
@@ -1532,6 +1549,14 @@ class AssetEntityController {
 
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList
+		
+		def attributes = projectService.getAttributes('AssetEntity')
+		def assetPref= assetEntityService.getExistingPref('Asset_Columns')
+		def assetPrefVal = assetPref.collect{it.value}
+		attributes.each{ attribute ->
+			if(attribute.attributeCode in assetPrefVal)
+				filterParams << [ (attribute.attributeCode): params[(attribute.attributeCode)]]
+		}
 		
 		session.AE = [:]
 		userPreferenceService.setPreference("assetListSize", "${maxRows}")
@@ -1549,19 +1574,74 @@ class AssetEntityController {
 		
 		def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
 		def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
+		//TODO:need to move the code to AssetEntityService.
+		def temp= ""
+		def joinQuery= ""
+		assetPref.each{key,value->
+			switch(value){
+				case 'appOwner':
+					temp +="CONCAT(CONCAT(p1.first_name, ' '), IFNULL(p1.last_name,'')) AS appOwner,"
+					joinQuery +="\n LEFT OUTER JOIN person p1 ON p1.person_id=ae.app_owner_id \n"
+					break;
+				case 'os':
+					temp +="ae.hinfo AS os,"
+					break;
+				case 'sourceTeamMt':
+					temp +="pt.team_code AS sourceTeamMt,"
+					joinQuery +="\n LEFT OUTER JOIN project_team pt ON pt.project_team_id=ae.source_team_id \n"
+					break;
+				case 'targetTeamMt':
+					temp +="pt1.team_code AS targetTeamMt,"
+					joinQuery +="\n LEFT OUTER JOIN project_team pt1 ON pt1.project_team_id=ae.target_team_id \n"
+					break;
+				case 'sourceTeamLog':
+					temp +="pt2.team_code AS sourceTeamLog,"
+					joinQuery +="\n LEFT OUTER JOIN project_team pt2 ON pt2.project_team_id=ae.source_team_log_id \n"
+					break;
+				case 'targetTeamLog':
+					temp +="pt3.team_code AS targetTeamLog,"
+					joinQuery +="\n LEFT OUTER JOIN project_team pt3 ON pt3.project_team_id=ae.target_team_log_id \n"
+					break;
+				case 'sourceTeamSa':
+					temp +="pt4.team_code AS sourceTeamSa,"
+					joinQuery +="\n LEFT OUTER JOIN project_team pt4 ON pt4.project_team_id=ae.source_team_sa_id \n"
+					break;
+				case 'targetTeamSa':
+					temp +="pt5.team_code AS targetTeamSa,"
+					joinQuery +="\n LEFT OUTER JOIN project_team pt5 ON pt5.project_team_id=ae.target_team_sa_id \n"
+					break;
+				case 'sourceTeamDba':
+					temp +="pt6.team_code AS sourceTeamDba,"
+					joinQuery +="\n LEFT OUTER JOIN project_team pt6 ON pt6.project_team_id=ae.source_team_dba_id \n"
+					break;
+				case 'targetTeamDba':
+					temp +="pt7.team_code AS targetTeamDba,"
+					joinQuery +="\n LEFT OUTER JOIN project_team pt7 ON pt7.project_team_id=ae.target_team_dba_id \n"
+					break;
+				case ~/custom1|custom2|custom3|custom4|custom5|custom6|custom7|custom8|custom9|custom10|custom11|custom12|custom13|custom14|custom15|custom16|custom17|custom18|custom19|custom20|custom21|custom22|custom23|custom24/:
+					temp +="ae.${value} AS ${value},"
+					break;
+				default:
+					temp +="ae.${WebUtil.splitCamelCase(value)} AS ${value},"
+			}
+		}
 		
 		def query = new StringBuffer(""" 
 			SELECT * FROM ( 
 				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName, ae.asset_type AS assetType, m.name AS model, 
-					ae.source_location AS sourceLocation, ae.source_rack AS sourceRack,
-					ae.target_location AS targetLocation, ae.target_rack AS targetRack,
-					ae.asset_tag AS assetTag, ae.serial_number AS serialNumber,
-					ae.plan_status AS planStatus, mb.name AS moveBundle, adb.dependency_bundle AS depNumber, me.move_event_id AS event,
+					ae.source_location AS sourceLocation, ae.source_rack AS sourceRack,""")
+		if(temp)
+			query.append(temp)	
+					
+		query.append("""ae.plan_status AS planStatus, mb.name AS moveBundle, adb.dependency_bundle AS depNumber, me.move_event_id AS event,
 					COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depToResolve,
 					COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts
 				FROM asset_entity ae
-				LEFT OUTER JOIN model m ON m.model_id=ae.model_id
-				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
+				LEFT OUTER JOIN model m ON m.model_id=ae.model_id""")
+		if(joinQuery)
+			query.append(joinQuery)
+		
+		query.append(""" \n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
 				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
 				LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
 				LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 
@@ -1599,7 +1679,7 @@ class AssetEntityController {
 			assetList = []
 		
 		def results = assetList?.collect { [ cell: [ '',it.assetName, (it.assetType ?: ''), it.model, 
-			it.sourceLocation, it.sourceRack, it.targetLocation, it.targetRack, it.assetTag, it.serialNumber, it.planStatus, it.moveBundle, 
+			it.sourceLocation, it.sourceRack, (it[assetPref["1"]] ?: ''), it[assetPref["2"]], it[assetPref["3"]], it[assetPref["4"]], it.planStatus, it.moveBundle, 
 			it.depNumber, (it.depToResolve==0)?(''):(it.depToResolve), (it.depConflicts==0)?(''):(it.depConflicts),
 			(it.commentStatus!='completed' && it.commentType=='issue')?('issue'):(it.commentType?:'blank'),	it.assetType, it.event
 		], id: it.assetId]}

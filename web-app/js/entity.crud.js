@@ -1013,10 +1013,10 @@ function changeBundleSelect(){
 		$("#saveBundleId").attr("disabled", "disabled");
 	}
 }
-function setColumnAssetPref(value,key){
+function setColumnAssetPref(value,key, type){
 	jQuery.ajax({
 		url: contextPath+'/application/columnAssetPref',
-		data: {'columnValue':value,'from':key,'previousValue':$("#previousValue_"+key).val()},
+		data: {'columnValue':value,'from':key,'previousValue':$("#previousValue_"+key).val(),'type':type},
 		type:'POST',
 		success: function(resp) {
 			console.log('success');
@@ -1028,7 +1028,7 @@ function setColumnAssetPref(value,key){
 var columnPref=''
 function showSelect(column, type, key){
 	if(column!=columnPref){
-		$("#applicationIdGrid_"+column).append($("#columnCustomDiv_"+column).html());
+		$("#"+type+"IdGrid_"+column).append($("#columnCustomDiv_"+column).html());
 	}
 	$(".columnDiv_"+key).show();
 	columnPref=column

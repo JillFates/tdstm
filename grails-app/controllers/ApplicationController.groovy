@@ -192,13 +192,13 @@ class ApplicationController {
 	def columnAssetPref={
 		def column= params.columnValue
 		def fromKey= params.from
-		def existingColsMap = assetEntityService.getExistingPref('App_Columns')
+		def existingColsMap = assetEntityService.getExistingPref(params.type)
 		def key = existingColsMap.find{it.value==column}?.key
 		if(key)
 			existingColsMap["${key}"] = params.previousValue
 
 		existingColsMap["${fromKey}"] = column
-		userPreferenceService.setPreference( 'App_Columns', (existingColsMap as JSON).toString() )
+		userPreferenceService.setPreference( params.type, (existingColsMap as JSON).toString() )
 		render true
 	}
 	def create = {
