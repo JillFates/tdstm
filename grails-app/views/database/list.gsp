@@ -49,12 +49,13 @@
 					<g:if test="${moveEvent != null}"><g:link class="mmlink" controller="database" action="list"><span class="capBtn"><input type="button" value="Clear Filters" /></span></g:link></g:if>'		
 				<jqgrid:grid id="databaseId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
-					colNames="'Actions','Name', 'DB Format','Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType'"
+					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType'"
 					colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'50', fixed:false},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
-						{name:'dbFormat'},
-						{name:'planStatus'}, 
-						{name:'moveBundle'},
+						{name:'${dbPref['1']}',width:'120'},
+						{name:'${dbPref['2']}', width:'120'},
+						{name:'${dbPref['3']}', width:'120'}, 
+						{name:'${dbPref['4']}', width:'120'},
 						{name:'depNumber',sortable:false,search:false},
 						{name:'depResolve',sortable:false,search:false },
 						{name:'depConflicts',sortable:false,search:false},
@@ -75,12 +76,17 @@
 					<jqgrid:resize id="databaseId" resizeOffset="-2" />
 					<jqgrid:refreshButton id="databaseId" />
 				</jqgrid:grid>
+				jQuery("#databaseId").jqGrid('navButtonAdd','#pcolch',{ caption: "Columns", title: "Reorder Columns", onClickButton : function (){ jQuery("#colch").jqGrid('columnChooser'); } });
 				populateFilter();
 				$("#del_databaseIdGrid").click(function(){
 				$("#databaseId").jqGrid("editGridRow","new",
 					{afterSubmit:deleteMessage});
 			 });
-			
+			<g:each var="key" in="['1','2','3','4']">
+				var dbPref= '${dbPref[key]}';
+				$("#databaseIdGrid_"+dbPref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:absolute;margin-left: 42px;margin-top: -15px;" onclick="showSelect(\''+dbPref+'\',\'database\',\''+${key}+'\')">');
+			</g:each>
+				
 			$.jgrid.formatter.integer.thousandsSeparator='';
 			function myLinkFormatter (cellvalue, options, rowObjcet) {
 				var value = cellvalue ? cellvalue : ''
@@ -133,6 +139,18 @@
 			<div >
 				<div id="messageId" class="message" style="display:none"></div>
 			</div>
+			<g:each var="key" in="['1','2','3','4']">
+				<div id="columnCustomDiv_${dbPref[key]}" style="display:none;">
+					<div class="columnDiv_${key}" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width: 150px;z-index: 2147483647; overflow-y: scroll;text-align: left;">
+						<input type="hidden" id="previousValue_${key}" value="${dbPref[key]}" />
+						<g:each var="attribute" in="${attributesList}">
+							<label><input type="radio" name="coloumnSelector_${dbPref[key]}" id="coloumnSelector_${dbPref[key]}" value="${attribute.attributeCode}" 
+								${dbPref[key]==attribute.attributeCode?'checked':'' } style="margin-left:11px;" 
+								onchange="setColumnAssetPref(this.value,'${key}','Database_Columns')"/> ${attribute.frontendLabel}</label><br>
+						</g:each>
+					</div>
+				</div>
+			</g:each>
 			<jqgrid:wrapper id="databaseId" /> 
 			<div id="createEntityView" style="display: none;" ></div>
 			<div id="showEntityView" style="display: none;"></div>

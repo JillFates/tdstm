@@ -19,6 +19,7 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 
 
 class DatabaseController {
@@ -28,6 +29,7 @@ class DatabaseController {
 	def taskService 
 	def securityService
 	def userPreferenceService
+	def projectService
     def index = {
 		redirect(action: "list", params: params)
     }
@@ -45,12 +47,29 @@ class DatabaseController {
 			moveEvent = MoveEvent.findByProjectAndId( project, params.moveEvent )
 		}
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:"name"])
+		
+		def dbPref= assetEntityService.getExistingPref('Database_Columns')
+		def attributes = projectService.getAttributes('Database')
+		def customList = (1..project.customFieldsShown).collect{"custom"+it}
+		// Remove the non project specific attributes and sort them by attributeCode
+		def dbAttributes = attributes.findAll{!it.attributeCode.contains('custom') && it.attributeCode !='assetName'}?.sort{it.frontendLabel}
+		def customAttributes = attributes.findAll{it.attributeCode in customList}.sort{it.frontendLabel}
+		// Used to display column names in jqgrid dynamically
+		def modelPref = [:]
+		dbPref.each{key,value->
+			modelPref << [(key): assetEntityService.getAttributeFrontendLabel(value,attributes.find{it.attributeCode==value}?.frontendLabel)]
+		}
+		/* Asset Entity attributes for Filters*/
+		def attributesList= (dbAttributes+customAttributes).collect{ attribute ->
+			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
+		}
 		return [assetDependency: new AssetDependency(),
 			servers : entities.servers, applications : entities.applications, dbs : entities.dbs, files : entities.files,networks : entities.networks, 
 			dependencyStatus:entities.dependencyStatus,staffRoles:taskService.getRolesForStaff(),dependencyType:entities.dependencyType,
 			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,
 			moveBundleId:params.moveBundleId, dbName:filters?.assetNameFilter ?:'', dbFormat:filters?.dbFormatFilter?:'',
-			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref, moveBundleList:moveBundleList]
+			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref, moveBundleList:moveBundleList,
+			dbPref:dbPref , modelPref:modelPref, attributesList:attributesList]
 	}
 	
 	/**
@@ -77,16 +96,30 @@ class DatabaseController {
 		}
 		
 		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
+		def retireDates = params.retireDate ? AssetEntity.findAll("from AssetEntity where project=:project and retireDate like '%${params.retireDate}%'",[project:project])?.retireDate : []
+		def maintExpDates = params.maintExpDate ? AssetEntity.findAll("from AssetEntity where project=:project and maintExpDate like '%${params.maintExpDate}%'",[project:project])?.maintExpDate : []
+		def dbScale = params.scale ? AssetEntity.findAll("from AssetEntity where project=:project and scale like '%${params.scale}%'",[project:project])?.scale : ''
 		
-		
+		def dbPref= assetEntityService.getExistingPref('Database_Columns')
+		def attributes = projectService.getAttributes('Database')
 		def dbs = Database.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", project)
-			if (params.assetName)
-				ilike('assetName', "%${params.assetName}%")
-			if (params.dbFormat)
-				ilike('dbFormat', "%${params.dbFormat}%")
-			if (params.planStatus)
-				ilike('planStatus', "%${params.planStatus}%")
+			attributes.each{ attribute ->
+				if(params[(attribute.attributeCode)] && !(attribute.attributeCode in ['moveBundle','scale','size','retireDate','maintExpDate']))
+					ilike(attribute.attributeCode, "%${params[(attribute.attributeCode)]}%")
+			}
+			if(params.size)
+				'in'('size', Integer.parseInt(params.size))
+			
+			if(retireDates)
+				'in'('retireDate',retireDates)
+			
+			if(maintExpDates)
+				'in'('maintExpDate',maintExpDates)
+				
+			if(dbScale)
+				'in'('scale', dbScale)
+			
 			if (bundleList)
 				'in'('moveBundle', bundleList)
 				
@@ -124,8 +157,8 @@ class DatabaseController {
 		def totalRows = dbs.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
 
-		def results = dbs?.collect { [ cell: ['',it.assetName, it.dbFormat, it.planStatus,
-					it.moveBundle?.name, AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
+		def results = dbs?.collect { [ cell: ['',it.assetName, databaseValue(dbPref["1"],it), databaseValue(dbPref["2"],it), databaseValue(dbPref["3"],it), 
+						databaseValue(dbPref["4"],it), AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
 					(it.depToResolve ?it.depToResolve:''),(it.depToConflict ?it.depToConflict:''),
 					AssetComment.find("from AssetComment ac where ac.assetEntity=:entity and commentType=:type and status!=:status",
 					[entity:it, type:'issue', status:'completed']) ? 'issue' :
@@ -137,7 +170,27 @@ class DatabaseController {
 
 		render jsonData as JSON
 	}
-	
+	/**
+	 * This method is used by JQgrid to load values for dynamic columns based on preferences
+	 */
+	def databaseValue(pref, value){
+		def res
+		switch(pref){
+			case 'moveBundle':
+				res = value.moveBundle?.name
+			break;
+			case ~/retireDate|maintExpDate/:
+				def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
+				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+				res = value[pref]? dateFormatter.format(TimeUtil.convertInToUserTZ(value[pref], tzId)): ''
+				break;
+			case 'scale':
+				res = value[pref]?.name()
+				break;
+			default:
+				res = value[pref]
+		}
+	} 
 	def show ={
 		def id = params.id
 		def databaseInstance = Database.get( id )
