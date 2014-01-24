@@ -10,98 +10,154 @@
 *
 **/
 
-//
-// Database Properties
-//
-dataSource {
-	// TDS Transitional Manager
-	url = "jdbc:mysql://localhost/tdstm"
-	username = "tdstm"
-	password = "tdstm"
-}
+// Set the DEFAULT URL to use for the site
+grails.serverURL = "https://tmlocal.tdsops.com/tdstm"
 
-//
-// Mail Properties
-//
-grails {
-	mail {
-		host = "smtp.transitionaldata.com"
-		port = 587
-		username = 'tm-prod'
-		password = "7UJuhepR"
-		props = [
-			"mail.smtp.auth":"true",
-			"mail.smtp.socketFactory.port":"587",
-			"mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
-			"mail.smtp.socketFactory.fallback":"false"
-			]
+// Database Properties
+environments {
+	development {
+		dataSource {
+			// TDS Transitional Manager
+			//	url = "jdbc:mysql://dev02.tdsops.net/tdstm"
+			driverClassName = "com.mysql.jdbc.Driver"
+			url = "jdbc:mysql://localhost/tdstm?autoReconnect=true"
+			username = "tdstm"
+			password = "tdstm"
+			dbCreate = ""
+			//dbCreate = "create"
+			//logSql = true
+		}
+	}
+	production {
+		dataSource {
+			// TDS Transitional Manager
+			//	url = "jdbc:mysql://dev02.tdsops.net/tdstm"
+			driverClassName = "com.mysql.jdbc.Driver"
+			url = "jdbc:mysql://dev02.tdsops.net/tdstm?autoReconnect=true"
+			username = ""
+			password = ""
+			dbCreate = ""
+		}
+	}
+
+	// DB Configuation to be used with the LiquiBase tool but not fully implemented yet
+	dbdiff {
+		dataSource {
+			driverClassName = "com.mysql.jdbc.Driver"
+			url = "jdbc:mysql://localhost/dbdiff?autoReconnect=true"
+			username = "tdstm"
+			password = "tdstm"
+			dbCreate = "create-drop"
+		}
 	}
 }
-grails.mail.default.from = "TDS TransitionManager <tm-prod@transitionaldata.com>"
 
-log4j = {
-   // Configure classes to log at the various logging levels (defaulting to error)
-   error 'org.codehaus.groovy.grails.web.servlet',  //  controllers
-         'org.codehaus.groovy.grails.web.pages', //  GSP
-         'org.codehaus.groovy.grails.web.sitemesh', //  layouts
-         'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-         'org.codehaus.groovy.grails.web.mapping', // URL mapping
-         'org.codehaus.groovy.grails.commons', // core / classloading
-         'org.codehaus.groovy.grails.plugins', // plugins
-         'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-         'org.springframework',
-         'net.sf.ehcache.hibernate',
-         'util.GrailsUtil'
-
-   // trace 'org.hibernate'
-   // debug 'org.hibernate'
-   debug 'service.PmoAssetTrackingService'
-   // info 'org.codehaus.groovy.grails.web.mapping' // URL mapping
-   // off 'org.hibernate'
-
-   // Set level for all application artifacts
-   // info "grails.app"
-   // Set for a specific controller
-   // debug "grails.app.controller.YourController"
-   // Set for a specific domain class
-   // debug "grails.app.domain.Book"
-   // Set for all taglibs
-   // info "grails.app.tagLib"
-
-   appenders {
-      def commonPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n"
-      def appName = appName ?: "tdstm"
-      def logDirectory = 'target'
-      if (System.properties.getProperty('catalina.base')) {
-           logDirectory = "${System.properties.getProperty('catalina.base')}/logs"
-      }
-
-      // Use this if we want to modify the default appender called 'stdout'.
-      console name:'stdout', layout:pattern(conversionPattern: '[%t] %-5p %c{2} %x - %m%n')
-
-      // Application log file
-      rollingFile name:'applicationLog',
-              file:"${logDirectory}/${appName}.log",
-              maxFileSize:'500MB',
-              maxBackupIndex:7
-              layout:pattern(conversionPattern: commonPattern)
-
-      // Stacktrace log file
-      // Use the 'null' line only, if we want to prevent creation of a stacktrace.log file.
-      // 'null' name:'stacktrace'
-      rollingFile name:'stacktraceLog',
-              file:"$logDirectory/${appName}-stacktrace.log",
-              maxFileSize:'500MB',
-              maxBackupIndex:7
-              layout:pattern(conversionPattern: commonPattern)
-   }
-
-   root {
-      // Set the logging level for the various appenders
-      info 'stdout', 'applicationLog'
-      // additivity = false
-   }
-   additivity.StackTrace=false
+// Graph Properties
+graph {
+	 graphviz {
+			dotCmd = '/usr/local/bin/dot'
+			graphType = 'svg'
+	 }
+	 deleteDotFile = false
+	 tmpDir = '/data/tmp/'
+	 targetDir = '/private/var/www/tdstm/images/tmp/'
+	 targetURI = '/../images/tmp/'
 }
 
+// Mail Properties
+grails {
+	mail {
+		host = '127.0.0.1'
+		port = 25
+		username = ''
+		password = ''
+		props = [
+			'mail.transport.protocol': 'smtp'
+			,'mail.debug': false
+			,'mail.debug.auth': false
+			,'mail.smtp.auth': false
+			,'mail.smtp.port': 25
+			,'mail.smtp.starttls.enable': false
+			,'mail.smtp.ssl.enable': false
+			,'mail.smtp.socketFactory.fallback': true
+		]
+
+	}
+	/*
+	 mail {
+			host = "smtp.gmail.com"
+			port = 465
+			username = "tds.transition.manager@gmail.com"
+			password = "urbzjbkftjzeybaq"
+		props = [
+			"mail.smtp.auth":"true",
+			"mail.smtp.socketFactory.port":"465",
+			"mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+			"mail.smtp.socketFactory.fallback":"false"
+			] 
+
+	 }
+	*/
+}
+grails.mail.default.from = "TDS Transition Manager <tds.transition.manager@gmail.com>"
+grails.mail.overrideAddress="TM DEBUG EMAILS<jmartin@transitionaldata.com>"
+
+log4j = {
+	 // Configure classes to log at the various logging levels (defaulting to error) 
+	 error 'org.codehaus.groovy.grails.web.servlet',  //  controllers
+		'org.codehaus.groovy.grails.web.pages', //  GSP
+		'org.codehaus.groovy.grails.web.sitemesh', //  layouts
+		// 'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+		'org.codehaus.groovy.grails.web.mapping', // URL mapping
+		'org.codehaus.groovy.grails.web.binding', // URL mapping
+		'org.codehaus.groovy.grails.commons', // core / classloading
+		'org.codehaus.groovy.grails.plugins', // plugins
+		'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+		'org.springframework',
+		'net.sf.ehcache.hibernate',
+		'util.GrailsUtil'
+
+	 // trace 'org.hibernate'
+	 // debug 'org.hibernate'
+	 debug 'service.PmoAssetTrackingService'
+	 // info 'org.codehaus.groovy.grails.web.mapping' // URL mapping
+	 // off 'org.hibernate'
+
+	 appenders {
+			def commonPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n"
+			def appName = appName ?: "tdstm"
+			def logDirectory = 'target'
+			if (System.properties.getProperty('catalina.base')) {
+				logDirectory = "${System.properties.getProperty('catalina.base')}/logs"
+			}
+
+			// Use this if we want to modify the default appender called 'stdout'.
+			console name:'stdout', layout:pattern(conversionPattern: '[%t] %-5p %c{2} %x - %m%n')
+
+			// Application log file
+			rollingFile name:'applicationLog',
+				file:"${logDirectory}/${appName}.log",
+				maxFileSize:'500MB',
+				maxBackupIndex:7
+				layout:pattern(conversionPattern: commonPattern)
+
+			// Stacktrace log file
+			// Use the 'null' line only, if we want to prevent creation of a stacktrace.log file.
+			// 'null' name:'stacktrace'
+			rollingFile name:'stacktraceLog',
+				file:"$logDirectory/${appName}-stacktrace.log",
+				maxFileSize:'500MB',
+				maxBackupIndex:7
+				layout:pattern(conversionPattern: commonPattern)
+	 }
+
+	 root {
+			// Set the logging level for the various appenders
+			debug 'stdout', 'applicationLog'
+			// additivity = false
+	 }
+
+	 additivity.StackTrace=false
+	 additivity.grails="false"
+}
 
