@@ -1682,7 +1682,7 @@ class AssetEntityController {
 		def results = assetList?.collect { [ cell: [ '',it.assetName, (it.assetType ?: ''), it.model, 
 			it.sourceLocation, it.sourceRack, (it[assetPref["1"]] ?: ''), it[assetPref["2"]], it[assetPref["3"]], it[assetPref["4"]], it.planStatus, it.moveBundle, 
 			it.depNumber, (it.depToResolve==0)?(''):(it.depToResolve), (it.depConflicts==0)?(''):(it.depConflicts),
-			(it.commentStatus!='completed' && it.commentType=='issue')?('issue'):(it.commentType?:'blank'),	it.assetType, it.event
+			(it.commentStatus!='Completed' && it.commentType=='issue')?('issue'):(it.commentType?:'blank'),	it.assetType, it.event
 		], id: it.assetId]}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
