@@ -26,10 +26,12 @@ class Recipe {
 
 	Date dateCreated
 	Date lastUpdated
+	
+	Boolean archived
 
 	static constraints = {	
-		name(blank:false, nullable:false)
-		description(blank:true, nullable:true)
+		name(blank:false, nullable:false, maxLength:40)
+		description(blank:true, nullable:true, maxLength:255)
 		context(blank:false, nullable:false, inList: ['Event', 'Bundle', 'Application'] )	// TODO : Switch to ENUM RecipeContext
 		project(nullable:false)
 		createdBy(nullable:false)

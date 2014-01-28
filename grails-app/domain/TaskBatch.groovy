@@ -61,9 +61,8 @@ class TaskBatch {
 		autoTimestamp false
 		id column: 'task_batch_id'
 		columns {
-			changelog sqltype: 'text'
-			sourceCode sqltype: 'text'
-			versionNumber sqltype: 'smallint'
+			infoLog sqltype: 'text'
+			exceptionLog sqltype: 'text'
 			taskCount sqltype: 'smallint'
 		}
 	}
