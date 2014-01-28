@@ -1,0 +1,7 @@
+
+
+class CookbookController {
+
+    def index = { 
+	}
+}
