@@ -116,7 +116,8 @@ class ApplicationController {
 		def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
 		def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
 		def customizeQuery = assetEntityService.getAppCustomQuery(appPref)
-		def query = new StringBuffer("""SELECT * FROM ( SELECT a.app_id AS appId, ae.asset_name AS assetName, adb.dependency_bundle AS depNumber,""")
+		def query = new StringBuffer("""SELECT * FROM ( SELECT a.app_id AS appId, ae.asset_name AS assetName, adb.dependency_bundle AS depNumber,
+										ac.status AS commentStatus, ac.comment_type AS commentType,me.move_event_id AS event,ae.asset_type AS assetType,""")
 		if(customizeQuery.query){
 			query.append(customizeQuery.query)
 		}	
@@ -124,13 +125,15 @@ class ApplicationController {
 		query.append("""COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, 
 		COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts 
 		FROM application a 
-		LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id""")
+		LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
+		LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id""")
 		if(customizeQuery.joinQuery){
 			query.append(customizeQuery.joinQuery)
 		}
 		
 		query.append("""\n LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
 		LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
+		LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
 		LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 
 		LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN (${unknownQuestioned}) 
 		LEFT OUTER JOIN asset_dependency adc ON ae.asset_entity_id = adc.asset_id AND adc.status IN (${validUnkownQuestioned}) 

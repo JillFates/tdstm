@@ -1628,16 +1628,17 @@ class AssetEntityController {
 		
 		def query = new StringBuffer(""" 
 			SELECT * FROM ( 
-				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName, ae.asset_type AS assetType, m.name AS model, 
-					ae.source_location AS sourceLocation, ae.source_rack AS sourceRack,""")
+				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName, ae.asset_type AS assetType, m.name AS model, ae.source_location AS sourceLocation, 
+				ae.source_rack AS sourceRack,ac.status AS commentStatus, ac.comment_type AS commentType,me.move_event_id AS event,""")
 		if(temp)
 			query.append(temp)	
 					
-		query.append("""ae.plan_status AS planStatus, mb.name AS moveBundle, adb.dependency_bundle AS depNumber, me.move_event_id AS event,
+		query.append("""ae.plan_status AS planStatus, mb.name AS moveBundle, adb.dependency_bundle AS depNumber,
 					COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depToResolve,
 					COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts
 				FROM asset_entity ae
-				LEFT OUTER JOIN model m ON m.model_id=ae.model_id""")
+				LEFT OUTER JOIN model m ON m.model_id=ae.model_id
+				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id""")
 		if(joinQuery)
 			query.append(joinQuery)
 		

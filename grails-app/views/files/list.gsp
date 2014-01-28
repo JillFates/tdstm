@@ -47,13 +47,13 @@
 				// JqGrid implementations 
 				<jqgrid:grid id="storageId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
-					colNames="'Actions','Name', 'Storage Format', 'Storage Size', 'Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType'"
+					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType'"
 					colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'80'},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
-						{name:'fileFormat'},
-						{name:'size'},
-						{name:'planStatus'}, 
-						{name:'moveBundle'},
+						{name:'${filesPref['1']}',width:'120'},
+						{name:'${filesPref['2']}', width:'120'},
+						{name:'${filesPref['3']}', width:'120'}, 
+						{name:'${filesPref['4']}', width:'120'},
 						{name:'depNumber',sortable:false,search:false},
 						{name:'depResolve',sortable:false,search:false },
 						{name:'depConflicts',sortable:false,search:false},
@@ -74,6 +74,11 @@
 					<jqgrid:refreshButton id="storageId" />
 				</jqgrid:grid>
 				populateFilter();
+
+				<g:each var="key" in="['1','2','3','4']">
+					var filePref= '${filesPref[key]}';
+					$("#storageIdGrid_"+filePref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:absolute;margin-left: 42px;margin-top: -15px;" onclick="showSelect(\''+filePref+'\',\'storage\',\''+${key}+'\')">');
+				</g:each>
 				
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
@@ -122,7 +127,18 @@
 				<div id="messageId" class="message" style="display:none"></div>
 			</div>
 			<jqgrid:wrapper id="storageId" />
-			
+			<g:each var="key" in="['1','2','3','4']">
+				<div id="columnCustomDiv_${filesPref[key]}" style="display:none;">
+					<div class="columnDiv_${key}" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width: 116px;z-index: 2147483647; overflow-y: scroll;text-align: left;">
+						<input type="hidden" id="previousValue_${key}" value="${filesPref[key]}" />
+						<g:each var="attribute" in="${attributesList}">
+							<label><input type="radio" name="coloumnSelector_${filesPref[key]}" id="coloumnSelector_${filesPref[key]}" value="${attribute.attributeCode}" 
+								${filesPref[key]==attribute.attributeCode?'checked':'' } style="margin-left:11px;" 
+								onchange="setColumnAssetPref(this.value,'${key}','Storage_Columns')"/> ${attribute.frontendLabel}</label><br>
+						</g:each>
+					</div>
+				</div>
+			</g:each>
 			<div id="createEntityView" style="display: none;"></div>
 			<div id="showEntityView" style="display: none;"></div>
 			<div id="editEntityView" style="display: none;"></div>	

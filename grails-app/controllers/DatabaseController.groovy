@@ -20,6 +20,8 @@ import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WebUtil
+import com.tdsops.tm.enums.domain.AssetDependencyStatus
 
 
 class DatabaseController {
@@ -28,6 +30,7 @@ class DatabaseController {
     def assetEntityService  
 	def taskService 
 	def securityService
+	def jdbcTemplate
 	def userPreferenceService
 	def projectService
     def index = {
@@ -78,7 +81,7 @@ class DatabaseController {
 	def listJson = {
 		def sortIndex = params.sidx ?: 'assetName'
 		def sortOrder  = params.sord ?: 'asc'
-		def maxRows = Integer.valueOf(params.rows)
+		def maxRows = Integer.valueOf(params.rows?:'25')?:25
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 
@@ -94,103 +97,92 @@ class DatabaseController {
 		} else {
 			moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
 		}
+		def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
+		def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
 		
-		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
-		def retireDates = params.retireDate ? AssetEntity.findAll("from AssetEntity where project=:project and retireDate like '%${params.retireDate}%'",[project:project])?.retireDate : []
-		def maintExpDates = params.maintExpDate ? AssetEntity.findAll("from AssetEntity where project=:project and maintExpDate like '%${params.maintExpDate}%'",[project:project])?.maintExpDate : []
-		def dbScale = params.scale ? AssetEntity.findAll("from AssetEntity where project=:project and scale like '%${params.scale}%'",[project:project])?.scale : ''
-		
+		def filterParams = ['assetName':params.assetName,'depNumber':params.depNumber,'depResolve':params.depResolve,'depConflicts':params.depConflicts,'event':params.event]
 		def dbPref= assetEntityService.getExistingPref('Database_Columns')
 		def attributes = projectService.getAttributes('Database')
-		def dbs = Database.createCriteria().list(max: maxRows, offset: rowOffset) {
-			eq("project", project)
-			attributes.each{ attribute ->
-				if(params[(attribute.attributeCode)] && !(attribute.attributeCode in ['moveBundle','scale','size','retireDate','maintExpDate']))
-					ilike(attribute.attributeCode, "%${params[(attribute.attributeCode)]}%")
-			}
-			if(params.size)
-				'in'('size', Integer.parseInt(params.size))
-			
-			if(retireDates)
-				'in'('retireDate',retireDates)
-			
-			if(maintExpDates)
-				'in'('maintExpDate',maintExpDates)
-				
-			if(dbScale)
-				'in'('scale', dbScale)
-			
-			if (bundleList)
-				'in'('moveBundle', bundleList)
-				
-			eq("assetType",  AssetType.DATABASE.toString() )
-			
-			if(params.moveBundleId){
-				if(params.moveBundleId =='unAssigned'){
-					isNull('moveBundle')
-				} else {
-					eq('moveBundle', MoveBundle.read(params.moveBundleId))
-				}
-			}
-			
-			if(params.filter){
-				or{
-					and {
-						'in'('moveBundle', moveBundleList)
-					}
-					and {
-						isNull('moveBundle')
-					}
-				}
-				
-				if( params.validation)
-					eq ('validation', params.validation)
-				
-				if(params.plannedStatus)
-					eq("planStatus", params.plannedStatus)
-				
-			}
-
-			order(sortIndex, sortOrder).ignoreCase()
+		def dbPrefVal = dbPref.collect{it.value}
+		attributes.each{ attribute ->
+			if(attribute.attributeCode in dbPrefVal)
+				filterParams << [ (attribute.attributeCode): params[(attribute.attributeCode)]]
 		}
-
-		def totalRows = dbs.totalCount
+		def initialFilter = params.initialFilter in [true,false] ? params.initialFilter : false
+		
+		//TODO:need to move the code to AssetEntityService 
+		def temp=""
+		dbPref.each{key,value->
+			switch(value){
+			case 'moveBundle':
+				temp +="mb.name AS moveBundle,"
+			break;
+			case ~/custom1|custom2|custom3|custom4|custom5|custom6|custom7|custom8|custom9|custom10|custom11|custom12|custom13|custom14|custom15|custom16|custom17|custom18|custom19|custom20|custom21|custom22|custom23|custom24/:
+				temp +="ae.${value} AS ${value},"
+			break;
+			case 'dbFormat':
+				temp+="d.db_format AS dbFormat,"
+			break;
+			default:
+				temp +="ae.${WebUtil.splitCamelCase(value)} AS ${value},"
+			}
+		}
+		def query = new StringBuffer("""SELECT * FROM ( SELECT d.db_id AS dbId, ae.asset_name AS assetName,ae.asset_type AS assetType,
+										adb.dependency_bundle AS depNumber, me.move_event_id AS event,ac.status AS commentStatus, ac.comment_type AS commentType, """)
+		
+		if(temp){
+			query.append(temp)
+		}
+		
+		query.append("""COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, 
+			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts 
+			FROM data_base d 
+			LEFT OUTER JOIN asset_entity ae ON d.db_id=ae.asset_entity_id
+			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
+			LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
+			LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id
+			LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
+			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 
+			LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN (${unknownQuestioned}) 
+			LEFT OUTER JOIN asset_dependency adc ON ae.asset_entity_id = adc.asset_id AND adc.status IN (${validUnkownQuestioned}) 
+				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.dependent_id) != mb.move_bundle_id 
+			LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN (${validUnkownQuestioned}) 
+				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id 
+			WHERE ae.project_id = ${project.id} 
+			GROUP BY db_id ORDER BY ${sortIndex} ${sortOrder}
+			) AS dbs""")
+		def firstWhere = true
+		filterParams.each {
+			if( it.getValue() )
+				if (firstWhere) {
+					// single quotes are stripped from the filter to prevent SQL injection
+					query.append(" WHERE dbs.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
+					firstWhere = false
+				} else {
+					query.append(" AND dbs.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
+				}
+		}
+		def dbsList = jdbcTemplate.queryForList(query.toString())
+		
+		def totalRows = dbsList.size()
 		def numberOfPages = Math.ceil(totalRows / maxRows)
+		if (totalRows > 0)
+			dbsList = dbsList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
+		else
+			dbsList = []
 
-		def results = dbs?.collect { [ cell: ['',it.assetName, databaseValue(dbPref["1"],it), databaseValue(dbPref["2"],it), databaseValue(dbPref["3"],it), 
-						databaseValue(dbPref["4"],it), AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
-					(it.depToResolve ?it.depToResolve:''),(it.depToConflict ?it.depToConflict:''),
-					AssetComment.find("from AssetComment ac where ac.assetEntity=:entity and commentType=:type and status!=:status",
-					[entity:it, type:'issue', status:'completed']) ? 'issue' :
-					(AssetComment.find("from AssetComment ac where ac.assetEntity=:entity",[entity:it]) ? 'comment' : 'blank'),
-					it.assetType], id: it.id,
+		def results = dbsList?.collect { 
+			[ cell: ['',it.assetName, (it[dbPref["1"]] ?: ''), it[dbPref["2"]], it[dbPref["3"]], it[dbPref["4"]], 
+					it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,
+					(it.commentStatus!='Completed' && it.commentType=='issue')?('issue'):(it.commentType?:'blank'),
+					it.assetType], id: it.dbId,
 			]}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 
 		render jsonData as JSON
 	}
-	/**
-	 * This method is used by JQgrid to load values for dynamic columns based on preferences
-	 */
-	def databaseValue(pref, value){
-		def res
-		switch(pref){
-			case 'moveBundle':
-				res = value.moveBundle?.name
-			break;
-			case ~/retireDate|maintExpDate/:
-				def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
-				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-				res = value[pref]? dateFormatter.format(TimeUtil.convertInToUserTZ(value[pref], tzId)): ''
-				break;
-			case 'scale':
-				res = value[pref]?.name()
-				break;
-			default:
-				res = value[pref]
-		}
-	} 
+	
 	def show ={
 		def id = params.id
 		def databaseInstance = Database.get( id )

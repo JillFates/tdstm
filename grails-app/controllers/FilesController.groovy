@@ -17,6 +17,8 @@ import com.tdsops.tm.enums.domain.SizeScale;
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.ApplicationConstants
+import com.tdssrc.grails.WebUtil
+import com.tdsops.tm.enums.domain.AssetDependencyStatus
 
 class FilesController {
 	
@@ -25,6 +27,8 @@ class FilesController {
 	def taskService
 	def securityService
 	def userPreferenceService
+	def projectService
+	def jdbcTemplate
 	def index ={
 	     redirect(action : list)
 		 	
@@ -41,13 +45,30 @@ class FilesController {
 			log.info "it's good - ${params.moveEvent}"
 			moveEvent = MoveEvent.findByProjectAndId( project, params.moveEvent )
 		}
+		
+		def filesPref= assetEntityService.getExistingPref('Storage_Columns')
+		def attributes = projectService.getAttributes('Files')
+		def customList = (1..project.customFieldsShown).collect{"custom"+it}
+		// Remove the non project specific attributes and sort them by attributeCode
+		def filesAttributes = attributes.findAll{!it.attributeCode.contains('custom') && it.attributeCode !='assetName'}?.sort{it.frontendLabel}
+		def customAttributes = attributes.findAll{it.attributeCode in customList}.sort{it.frontendLabel}
+		// Used to display column names in jqgrid dynamically
+		def modelPref = [:]
+		filesPref.each{key,value->
+			modelPref << [(key): assetEntityService.getAttributeFrontendLabel(value,attributes.find{it.attributeCode==value}?.frontendLabel)]
+		}
+		/* Asset Entity attributes for Filters*/
+		def attributesList= (filesAttributes+customAttributes).collect{ attribute ->
+			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
+		}
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:"name"])
 		return [assetDependency: new AssetDependency(), servers : entities.servers, applications : entities.applications, dbs : entities.dbs, networks : entities.networks ,
 			files : entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
 			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,
 			staffRoles:taskService.getRolesForStaff(), moveBundleId:params.moveBundleId, fileName:filters?.assetNameFilter ?:'', 
 			fileFormat:filters?.fileFormatFilter, size:filters?.sizeFilter,
-			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref, moveBundleList:moveBundleList]
+			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref, moveBundleList:moveBundleList,
+			attributesList:attributesList, filesPref:filesPref, modelPref:modelPref]
 		
 	}
 	/**
@@ -72,66 +93,85 @@ class FilesController {
 			moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
 		}
 		
-		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
+		def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
+		def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
 		
-		def filesSize = params.size ? Files.findAll("from Files where size like '%${params.size}%' and project =:project",[project:project])?.size : []
-		
-		def files = Files.createCriteria().list(max: maxRows, offset: rowOffset) {
-			eq("project", project)
-			if (params.assetName)
-				ilike('assetName', "%${params.assetName}%")
-			if (params.fileFormat)
-				ilike('fileFormat', "%${params.fileFormat}%")
-				
-			if (params.planStatus)
-				ilike('planStatus', "%${params.planStatus}%")
-			if (bundleList)
-				'in'('moveBundle', bundleList)
-			if(filesSize){
-			  'in'('size',filesSize)	
-			}
-			
-			eq("assetType",  AssetType.FILES.toString() )
-			
-			if(params.moveBundleId){
-				if(params.moveBundleId =='unAssigned'){
-					isNull('moveBundle')
-				} else {
-					eq('moveBundle', MoveBundle.read(params.moveBundleId))
-				}
-			}
-			
-			if(params.filter){
-				or{
-					and {
-						'in'('moveBundle', moveBundleList)
-					}
-					and {
-						isNull('moveBundle')
-					}
-				}
-				
-				if( params.validation)
-					eq ('validation', params.validation)
-				
-				if(params.plannedStatus)
-					eq("planStatus", params.plannedStatus)
-				
-			}
-
-			order(sortIndex, sortOrder).ignoreCase()
+		def filterParams = ['assetName':params.assetName,'depNumber':params.depNumber,'depResolve':params.depResolve,'depConflicts':params.depConflicts,'event':params.event]
+		def filePref= assetEntityService.getExistingPref('Storage_Columns')
+		def attributes = projectService.getAttributes('Files')
+		def filePrefVal = filePref.collect{it.value}
+		attributes.each{ attribute ->
+			if(attribute.attributeCode in filePrefVal)
+				filterParams << [ (attribute.attributeCode): params[(attribute.attributeCode)]]
 		}
-
-		def totalRows = files.totalCount
+		def initialFilter = params.initialFilter in [true,false] ? params.initialFilter : false
+		
+		//TODO:need to move the code to AssetEntityService 
+		def temp=""
+		filePref.each{key,value->
+			switch(value){
+			case 'moveBundle':
+				temp +="mb.name AS moveBundle,"
+			break;
+			case ~/custom1|custom2|custom3|custom4|custom5|custom6|custom7|custom8|custom9|custom10|custom11|custom12|custom13|custom14|custom15|custom16|custom17|custom18|custom19|custom20|custom21|custom22|custom23|custom24/:
+				temp +="ae.${value} AS ${value},"
+			break;
+			case 'fileFormat':
+				temp+="f.file_format AS fileFormat,"
+			break;
+			default:
+				temp +="ae.${WebUtil.splitCamelCase(value)} AS ${value},"
+			}
+		}
+		def query = new StringBuffer("""SELECT * FROM ( SELECT f.files_id AS fileId, ae.asset_name AS assetName,ae.asset_type AS assetType,
+										adb.dependency_bundle AS depNumber, me.move_event_id AS event,ac.status AS commentStatus, ac.comment_type AS commentType, """)
+		
+		if(temp){
+			query.append(temp)
+		}
+		
+		query.append("""COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, 
+			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts 
+			FROM files f 
+			LEFT OUTER JOIN asset_entity ae ON f.files_id=ae.asset_entity_id
+			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
+			LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
+			LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
+			LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id
+			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 
+			LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN (${unknownQuestioned}) 
+			LEFT OUTER JOIN asset_dependency adc ON ae.asset_entity_id = adc.asset_id AND adc.status IN (${validUnkownQuestioned}) 
+				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.dependent_id) != mb.move_bundle_id 
+			LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN (${validUnkownQuestioned}) 
+				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id 
+			WHERE ae.project_id = ${project.id} 
+			GROUP BY files_id ORDER BY ${sortIndex} ${sortOrder}
+			) AS files""")
+		def firstWhere = true
+		filterParams.each {
+			if( it.getValue() )
+				if (firstWhere) {
+					// single quotes are stripped from the filter to prevent SQL injection
+					query.append(" WHERE files.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
+					firstWhere = false
+				} else {
+					query.append(" AND files.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
+				}
+		}
+		def filesList = jdbcTemplate.queryForList(query.toString())
+		
+		def totalRows = filesList.size()
 		def numberOfPages = Math.ceil(totalRows / maxRows)
+		if (totalRows > 0)
+			filesList = filesList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
+		else
+			filesList = []
 
-		def results = files?.collect { [ cell: ['',it.assetName, it.fileFormat, (it.size ? it.size +' '+ (it.scale ? it.scale?.value() : SizeScale.default.value()) : ''), it.planStatus,
-					it.moveBundle?.name, AssetDependencyBundle.findByAsset(it)?.dependencyBundle,
-					(it.depToResolve ?it.depToResolve:''),(it.depToConflict ?it.depToConflict:''),
-					AssetComment.find("from AssetComment ac where ac.assetEntity=:entity and commentType=:type and status!=:status",
-					[entity:it, type:'issue', status:'completed']) ? 'issue' :
-					(AssetComment.find("from AssetComment ac where ac.assetEntity=:entity",[entity:it]) ? 'comment' : 'blank'),
-					it.assetType], id: it.id,
+		def results = filesList?.collect { 
+			[ cell: ['',it.assetName, (it[filePref["1"]] ?: ''), it[filePref["2"]], it[filePref["3"]], it[filePref["4"]], 
+					it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,
+					(it.commentStatus!='Completed' && it.commentType=='issue')?('issue'):(it.commentType?:'blank'),
+					it.assetType], id: it.fileId,
 			]}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
