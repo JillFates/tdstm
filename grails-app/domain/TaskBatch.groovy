@@ -1,8 +1,6 @@
 
 import com.tdssrc.grails.TimeUtil
 import com.tds.asset.AssetEntity
-import com.tds.asset.MoveEvent
-import com.tds.asset.MoveBundle
 
 /**
  * TaskBatch Domain Object
