@@ -2,6 +2,12 @@
 
 class CookbookController {
 
-    def index = { 
+	def index = { 
+		def map = [ 
+			name: 'Emiliano',
+			gender: 'male'
+		]
+
+		return map
 	}
 }
