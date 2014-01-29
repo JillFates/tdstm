@@ -242,17 +242,29 @@ function showComment(id , action){
 		   new Ajax.Request(contextPath+'/assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog(e, 'show');commentChangeShow();}})
 	   }
 }
-function validateFileFormat(){
+function validateFileFormat(form){
 	var fileFlag = false;
-    var size = $('#size').val();
+    var size = $('#'+form+' #size').val();
     if( size=='' || isNaN(size)){
    	  alert("Please enter numeric value for Storage Size");
-    }else if($('#fileFormat').val()==''){
+    }else if($('#'+form+' #fileFormat').val()==''){
    	  alert("Please enter value for Storage Format");
     }else{
    	  fileFlag = true;
     }
   return fileFlag
+}
+function validateDbFormat(form){
+	var dbFlag = false;
+    var size = $('#'+form+' #size').val();
+    if( size=='' || isNaN(size)){
+   	  alert("Please enter numeric value for DB Size");
+    }else if($('#'+form+' #dbFormat').val()==''){
+   	  alert("Please enter value for DB Format");
+    }else{
+    	dbFlag = true;
+    }
+  return dbFlag
 }
 function submitRemoteForm(){
 		jQuery.ajax({
@@ -399,7 +411,14 @@ function updateToShow($me, forWhom){
 	if(forWhom=='app'){
 		flag = validateFields('Edit','editAssetsFormId')
 	}
-	flag = validateDependencies('editAssetsFormId')
+	if(forWhom=='files'){
+		flag = validateFileFormat('editAssetsFormId')
+	}
+	if(forWhom=='database'){
+		flag = validateDbFormat('editAssetsFormId')
+	}
+	if(flag!=false)
+		flag = validateDependencies('editAssetsFormId')
 	if(flag){
 		jQuery.ajax({
 			url: $('#editAssetsFormId').attr('action'),
@@ -831,9 +850,14 @@ function saveToShow($me, forWhom){
 		flag = validateFields('','createAssetsFormId')
 	}
 	if(forWhom=='Files'){
-		flag = validateFileFormat()
+		flag = validateFileFormat('createAssetsFormId')
 	}
-	flag = validateDependencies('createAssetsFormId')
+	if(forWhom=='Database'){
+		flag = validateDbFormat('createAssetsFormId')
+	}
+	if(flag!=false)
+		flag = validateDependencies('createAssetsFormId')
+		
 	if(flag){
 		jQuery.ajax({
 			url: $('#createAssetsFormId').attr('action'),
