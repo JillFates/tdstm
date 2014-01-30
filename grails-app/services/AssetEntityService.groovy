@@ -605,4 +605,94 @@ class AssetEntityService {
 		}
 		return appPref
 	}
+	/**
+	 * Used to save cabling data to database while importing.
+	 * 
+	 */
+	def saveImportCables(cablingSheet){
+		def warnMsg=""
+		def cablingSkipped = 0
+		def cablingUpdated = 0
+		def project = securityService.getUserCurrentProject()
+		for ( int r = 2; r < cablingSheet.rows; r++ ) {
+			int cols = 0 ;
+			def isNew = false
+			def cableType=cablingSheet.getCell( cols, r ).contents.replace("'","\\'")
+			def fromAsset = AssetEntity.get(NumberUtils.toDouble(cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'"), 0).round())
+			def fromAssetName=cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
+			def fromConnectorLabel =cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
+			//if assetId is not there then get asset from assetname and fromConnector
+			if(!fromAsset && fromAssetName){
+				fromAsset = AssetEntity.findByAssetNameAndProject( fromAssetName, project)?.find{it.model.modelConnectors?.label.contains(fromConnectorLabel)}
+			}
+			def toAsset = AssetEntity.get(NumberUtils.toDouble(cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'"), 0).round())
+			def toAssetName=cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
+			def toConnectorLabel=cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
+			def toConnectorTemp
+			if(cableType=='Power')
+				toConnectorTemp = fromConnectorLabel
+			else
+				toConnectorTemp = toConnectorLabel
+			//if toAssetId is not there then get asset from assetname and toConnectorLabel
+			if(!toAsset && toAssetName){
+				if(cableType!='Power')
+					toAsset = AssetEntity.findByAssetNameAndProject( toAssetName, project)?.find{it.model.modelConnectors?.label.contains(toConnectorLabel)}
+				else
+					toAsset = fromAsset
+			}
+			def cableComment = cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
+			def cableColor = cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
+			def room = cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
+			def cableStatus = cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
+			if(fromAsset){
+				def fromAssetConnectorsLabels= fromAsset.model?.modelConnectors?.label
+				if(fromAssetConnectorsLabels && fromAssetConnectorsLabels?.contains(fromConnectorLabel)){
+					def fromConnector = fromAsset.model?.modelConnectors.find{it.label == fromConnectorLabel}
+					def assetCable = AssetCableMap.findByAssetFromAndAssetFromPort(fromAsset,fromConnector)
+					if(toAsset){
+						def toAssetconnectorLabels= toAsset.model?.modelConnectors?.label
+						if(toAssetconnectorLabels.contains(toConnectorTemp)){
+							if(cableType=='Power'){
+								assetCable.toPower = toConnectorLabel
+							}else{
+								def toConnector = toAsset.model?.modelConnectors.find{it.label == toConnectorTemp}
+								def previousCable = AssetCableMap.findByAssetToAndAssetToPort(toAsset,toConnector)
+								if(previousCable !=assetCable){
+									// Release the connection from other port to connect with FromPorts
+									AssetCableMap.executeUpdate("""Update AssetCableMap set assetTo=null,assetToPort=null, cableColor=null
+																			where assetTo = ? and assetToPort = ? """,[toAsset, toConnector])
+								}
+								assetCable.assetToPort = toConnector
+							}
+						}
+						assetCable.assetTo = toAsset
+					}else {
+						assetCable.assetTo = null
+						assetCable.assetToPort = null
+						assetCable.toPower = ''
+					}
+					
+					if(AssetCableMap.constraints.cableColor.inList.contains(cableColor))
+						assetCable.cableColor = cableColor
+						
+					assetCable.cableComment = cableComment
+					assetCable.cableStatus = cableStatus
+					
+					if(assetCable.dirtyPropertyNames.size()){
+						assetCable.save(flush:true)
+						cablingUpdated+=1
+					}
+					
+				}else{
+					warnMsg += "<li>connector $fromConnectorLabel with Asset Name $fromAssetName does not exist.</li>"
+					cablingSkipped+=1
+				}
+				
+			}else{
+				warnMsg += "<li>cable with AssetName $fromAssetName does not exist.</li>"
+				cablingSkipped+=1
+			}
+		}
+		return [warnMsg:warnMsg, cablingSkipped:cablingSkipped, cablingUpdated:cablingUpdated]
+	}
 }

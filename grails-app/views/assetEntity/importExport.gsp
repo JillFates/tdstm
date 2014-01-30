@@ -130,6 +130,10 @@
 	                		onclick="importExportPreference($(this),'ImportDependency')"
 	                		${prefMap['ImportDependency'] =='true' ? 'checked="checked"' :''}/>&nbsp;
 	                <label for="dependencyId">Dependency</label></span>&nbsp;
+	                <span><input type="checkbox" id="cablingId" name="cabling" value="cable" 
+		               		onclick="importExportPreference($(this),'ImportCabling')"
+		               		${prefMap['ImportCabling']=='true' ? 'checked="checked"' :''}/>&nbsp;
+		               		<label for="cablingId">Cabling</label></span>&nbsp;
 	                </td>
                 </tr>
                 <tr>

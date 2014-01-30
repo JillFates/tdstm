@@ -179,7 +179,7 @@ class AssetEntityController {
 		session.setAttribute("TOTAL_ASSETS",0)
 		
 		def prefMap = [:]
-		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency'].each{t->
+		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency','ImportCabling'].each{t->
 		   prefMap << [(t) : userPreferenceService.getPreference(t)]
 		}
 		
@@ -285,7 +285,7 @@ class AssetEntityController {
 		// create workbook
 		def workbook
 		def titleSheet
-		def sheetNameMap = ['Title','Applications','Servers','Databases','Storage','Dependencies']
+		def sheetNameMap = ['Title','Applications','Servers','Databases','Storage','Dependencies','Cabling']
 		def appNameMap = [:]
 		def databaseNameMap = [:]
 		def filesNameMap = [:]
@@ -297,7 +297,9 @@ class AssetEntityController {
 		int dbAdded  = 0
 		int filesAdded = 0
 		int dependencyAdded = 0
+		int cablingAdded = 0
 		int dependencyUpdated = 0
+		int cablingUpdated = 0
 		def appColumnslist = []
 		def databaseColumnslist = []
 		def filesColumnslist = []
@@ -342,6 +344,7 @@ class AssetEntityController {
 			def databaseSheet = workbook.getSheet( "Databases" )
 			def filesSheet = workbook.getSheet( "Storage" )
 			def dependencySheet = workbook.getSheet( "Dependencies" )
+			def cablingSheet = workbook.getSheet( "Cabling" )
 			def serverColumnNames = [:]
 			def appColumnNames = [:]
 			def databaseColumnNames = [:]
@@ -394,6 +397,7 @@ class AssetEntityController {
 				int databaseCount = 0
 				int filesCount = 0
 				int dependencyCount = 0
+				int cablingCount = 0
 				//Add Data to dataTransferBatch.
 				def serverColNo = 0
 				for (int index = 0; index < serverCol; index++) {
@@ -454,6 +458,16 @@ class AssetEntityController {
 						def name = dependencySheet.getCell( appColNo, row ).contents
 						if(name){
 							dependencyCount = row
+						}
+					}
+				}
+				def cablingSheetRow = cablingSheet.rows
+				if(params.cabling=='cable'){
+					cablingCount
+					for (int row = 1; row < cablingSheetRow; row++) {
+						def name = cablingSheet.getCell( appColNo, row ).contents
+						if(name){
+							cablingCount = row
 						}
 					}
 				}
@@ -763,6 +777,20 @@ class AssetEntityController {
 						<li>$skippedAdded new dependencies skipped 
 						<li>$skippedUpdated existing dependencies skipped</ul>"""
 				}
+				
+				/**
+				 * imports Cabling data
+				 */
+				if(params.cabling=='cable'){
+					session.setAttribute("TOTAL_ASSETS",cablingCount)
+					cablingAdded = cablingCount-1
+					warnMsg += '<ul>'
+					def resultMap = assetEntityService.saveImportCables(cablingSheet)
+					warnMsg += resultMap.warnMsg+"""
+						<li>$resultMap.cablingUpdated cables updated
+						<li>$resultMap.cablingSkipped new cables skipped</ul>"""
+				}
+				
 				for( int i=0;  i < sheetNamesLength; i++ ) {
 					if(sheetNames[i] == "Comments"){
 						def commentSheet = workbook.getSheet(sheetNames[i])
@@ -799,7 +827,8 @@ class AssetEntityController {
 				"<li>$appAdded Applications loaded" + 
 				"<li>$dbAdded Databases loaded" +
 				"<li>$filesAdded Storage loaded" + 
-				"<li>$dependencyAdded Dependency loaded" + 
+				"<li>$dependencyAdded Dependency loaded" +
+				"<li>$cablingAdded cables loaded" +
 				warnMsg +
 				( skipped.size() ? "${skipped.size()} spreadsheet rows were skipped: <ul><li>${skipped.join('<li>')}</ul>" : '' ) +
 				'</ul></p>'
