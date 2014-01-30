@@ -1,12 +1,16 @@
-<html>
+<html ng-app="cookbookRecipes">
 	<head>
 		<title>Cookbook</title>
     	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
-    	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'newStyles.css')}" />
+    	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
+    	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ng-grid.css')}" />
     	<g:javascript src="jquery-1.9.1.js" />
     	<g:javascript src="bootstrap.js" />
+    	<g:javascript src="angular.js" />
+    	<g:javascript src="ng-grid-2.0.7.min.js" />
+    	<g:javascript src="controllers/cookbook.js" />
 	</head>
-	<body>
+	<body ng-app ng-controller="CookbookRecipeEditor">
 		<div class="container">
 			<div class="row-fluid clearfix" style="margin-top:10px;"> %{-- This last style attr should be removed --}%
 				<div class="col-md-6 col-xs-6">
@@ -30,6 +34,11 @@
 						</label>
 					</div>
 				</div>
+			</div>
+			<div class="row-fluid clearfix">
+				<div class="col-md-12">
+					<div class="gridStyle" ng-grid="gridOptions"></div>
+				</div>				
 			</div>
 			<div class="row-fluid clearfix">
 				<div class="col-md-12">
@@ -330,11 +339,7 @@
 								<div class="tabContainer hidden">
 									<form action="#" class="form-inline groups clearfix">
 										<div class="form-group">
-											<label for="testWith" class="sr-only">Test With</label>
-											<input type="text" name="testWith" id="testWith" value="Test with Bundle:" width="100px">
-										</div>
-										<div class="form-group">
-											<label for="testOptions" class="sr-only">Test With</label>
+											<label for="testWith">Test With: </label>
 											<select name="testOptions" id="testOptions">
 												<option value="wave1">Wave 1</option>
 												<option value="wave2">Wave 2</option>
@@ -426,6 +431,7 @@
 						</p>
 					</g:each>
 				</div>
+				This is ${name} and I am a ${gender}
 			</div> --}%
 		</div>
 		<script>
@@ -438,9 +444,6 @@
 				if(!$(this).hasClass('active')){
 					var ind = $(this).parent().index(),
 						ulElement = $(this).parent().parent();
-					console.log(ind);
-					console.log(ulElement);
-					console.log(ulElement.parent().children('.tabContainer:eq(' + ind + ')'));
 					ulElement.find('li').removeClass('active');
 					$(this).parent().addClass('active');
 					ulElement.parent().children('.tabContainer').addClass('hidden');
@@ -448,6 +451,5 @@
 				}
 			});
 		</script>
-		This is ${name} and I am a ${gender}
 	</body>
 </html>
