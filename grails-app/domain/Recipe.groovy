@@ -21,8 +21,6 @@ class Recipe {
 	/** The current version of the recipe that has been released, which is the version that people should use 
 		to generate tasks */
 	RecipeVersion releasedVersion
-	/** Whom created the recipe */
-	Person createdBy
 
 	Date dateCreated
 	Date lastUpdated

@@ -16,6 +16,12 @@ class UrlMappings {
     		controller = "wsDashboard"
 			action = [GET:"bundleData"]
     	}
+		
+		"/ws/cookbook/recipe/list" {
+			controller = "wsCookbook"
+			action = [GET:"recipeList"]
+		}
+		
 		"/maint/backd00r" {
 			controller = "auth"
 			action = [GET:"maintMode"]
