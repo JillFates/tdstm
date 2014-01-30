@@ -1,0 +1,88 @@
+/* Specific Styles for all the new pages */
+
+/* Cookbook */
+.recipesTable{
+	border:1px solid #ddd;
+	margin-bottom: 0;
+}
+
+.recipesTable tr th, .recipesTable tr td{
+	border-rigth:1px solid #ddd;
+	border-left:1px solid #ddd;
+}
+
+.recipesTable tr th:nth-child(6), .recipesTable tr td:nth-child(6){
+	text-align: right;
+}
+
+.recipesTable tr th:nth-child(7), .recipesTable tr td:nth-child(7), .recipesTable tr th:nth-child(8), .recipesTable tr td:nth-child(8), .recipesTable tr th:nth-child(9), .recipesTable tr td:nth-child(9){
+	text-align: center;
+}
+
+.tabContainer{
+    padding: 15px;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+.innerTabWrapper{
+	margin: 15px 0 0 0;
+}
+
+.historyMainTable table tr > th:nth-child(2), .historyMainTable table tr > td:nth-child(2), .historyMainTable table tr > th:nth-child(5), .historyMainTable table tr > td:nth-child(5){
+	text-align: right;
+}
+
+.historyMainTable table tr > th:nth-child(6), .historyMainTable table tr > td:nth-child(6), .historyMainTable table tr > th:nth-child(7), .historyMainTable table tr > td:nth-child(7){
+	text-align: center;
+}
+
+.actionsText{
+	margin: 15px 0;
+}
+
+#logsArea, #recipeCode{
+	display: block;
+	width: 100%;
+}
+
+#recipeCode{
+	height: 200px;
+}
+
+.btns{
+	margin:15px 0 0 0;
+}
+
+table{
+	font-size: 1em;
+}
+
+ul.logs{
+	height:164px;
+	border: 1px solid #ddd;
+	margin:0;
+	overflow-y: auto;
+}
+
+form.groups .form-group{
+	margin-right:15px;
+}
+
+#testOptions{
+	width: 200px;
+}
+
+.groupsTable, .groupsTable2{
+	height:150px;
+	overflow-y: auto;
+}
+
+.groupsTable2{
+	margin:15px 0 0 0;
+}
+
+.groupsTable table tr > th:nth-child(3), .groupsTable table tr > td:nth-child(3){
+	text-align: right;
+}
