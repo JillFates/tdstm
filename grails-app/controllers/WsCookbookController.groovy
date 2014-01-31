@@ -7,6 +7,28 @@ class WsCookbookController {
 
 	def cookbookService
 	
+	
+	def createRecipe = {
+		def renderMap = [:]
+		renderMap.status = "success"
+		renderMap.data = "create"
+		render(renderMap as JSON)
+	}
+	
+	def saveRecipeVersion = {
+		def renderMap = [:]
+		renderMap.status = "success"
+		renderMap.data = "save version"
+		render(renderMap as JSON)
+	}
+	
+	def updateRecipeVersion = {
+		def renderMap = [:]
+		renderMap.status = "success"
+		renderMap.data = "update version"
+		render(renderMap as JSON)
+	}
+	
 	def recipe = {
 		if (!SecurityUtils.subject.authenticated) {
 			response.sendError(401, 'Unauthorized error')
