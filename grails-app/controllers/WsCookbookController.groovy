@@ -1,34 +1,45 @@
 import grails.converters.JSON
 
 import org.apache.shiro.SecurityUtils
+import org.springframework.stereotype.Controller;
 
-
+/**
+ * {@link Controller} for handling WS calls of the {@link CookbookService}
+ * 
+ * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
+ */
 class WsCookbookController {
 
 	def cookbookService
 	
-	
+	/**
+	 * Creates a recipe
+	 * Check {@link UrlMappings} for the right call
+	 */
 	def createRecipe = {
-		def renderMap = [:]
-		renderMap.status = "success"
-		renderMap.data = "create"
-		render(renderMap as JSON)
+		render(ServiceResults.success([message : 'create']) as JSON)
 	}
 	
+	/**
+	 * Saves a version of the recipe
+	 * Check {@link UrlMappings} for the right call
+	 */
 	def saveRecipeVersion = {
-		def renderMap = [:]
-		renderMap.status = "success"
-		renderMap.data = "save version"
-		render(renderMap as JSON)
+		render(ServiceResults.success([message : 'save version']) as JSON)
 	}
 	
+	/**
+	 * Updates a version of the recipe
+	 * Check {@link UrlMappings} for the right call
+	 */
 	def updateRecipeVersion = {
-		def renderMap = [:]
-		renderMap.status = "success"
-		renderMap.data = "update version"
-		render(renderMap as JSON)
+		render(ServiceResults.success([message : 'update version']) as JSON)
 	}
 	
+	/**
+	 * Obtains the information about a recipe
+	 * Check {@link UrlMappings} for the right call
+	 */
 	def recipe = {
 		if (!SecurityUtils.subject.authenticated) {
 			response.sendError(401, 'Unauthorized error')
@@ -52,20 +63,21 @@ class WsCookbookController {
 			dataMap.hasWIP = result.wip != null
 			dataMap.sourceCode = result.recipeVersion.sourceCode
 			dataMap.changelog = result.recipeVersion.changelog
-			dataMap.clonedFrom = (result.recipeVersion.clonedFrom == null) ? "" : result.recipeVersion.clonedFrom.toString()
+			dataMap.clonedFrom = (result.recipeVersion.clonedFrom == null) ? '' : result.recipeVersion.clonedFrom.toString()
 			
-			def renderMap = [:]
-			renderMap.status = "success"
-			renderMap.data = dataMap
-
-			render(renderMap as JSON)
+			render(ServiceResults.success(dataMap) as JSON)
 		} catch (UnauthorizedException e) {
 			response.sendError(403, 'Forbidden')
 		} catch (EmptyResultException e) {
 			response.sendError(424, 'Method Failure')
 		}
 	}
-	
+
+		
+	/**
+	 * Lists the recipes of the current user
+	 * Check {@link UrlMappings} for the right call
+	 */
 	def recipeList = {
 		if (!SecurityUtils.subject.authenticated) {
 			response.sendError(401, 'Unauthorized error')
@@ -78,19 +90,17 @@ class WsCookbookController {
 		def projectType = params.project
 
 		try {
-			def results = this.cookbookService.findRecipes(isArchived, catalogContext, searchText, projectType)
+			def results = cookbookService.findRecipes(isArchived, catalogContext, searchText, projectType)
 
 			def dataMap = [:]
 			dataMap.list = results
 
-			def renderMap = [:]
-			renderMap.status = "success"
-			renderMap.data = dataMap
-
-			render(renderMap as JSON)
+			render(ServiceResults.success(dataMap) as JSON)
 		} catch (UnauthorizedException e) {
 			response.sendError(403, 'Forbidden')
 		} catch (EmptyResultException e) {
+			response.sendError(424, 'Method Failure')
+		} catch (IllegalArgumentException e) {
 			response.sendError(424, 'Method Failure')
 		}
 	}
