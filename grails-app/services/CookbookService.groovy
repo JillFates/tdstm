@@ -13,15 +13,56 @@ class CookbookService {
 	def jdbcTemplate
 	def projectService
 	def partyRelationshipService
+	def securityService
+	
+	def getRecipe(recipeId, versionNumber) {
+		if (versionNumber == null) {
+			def recipe = Recipe.get(recipeId)
+			versionNumber = recipe.releasedVersion == null ? 0 : recipe.releasedVersion.versionNumber
+		}
+
+		def recipeVersion = RecipeVersion.findByIdAndVersionNumber(recipeId, versionNumber)
+		def wip = RecipeVersion.findByIdAndVersionNumber(recipeId, 0)
+		
+		if (recipeVersion == null) {
+			throw new EmptyResultException("Invalid recipe")
+		}
+		
+		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
+		def peopleInProject = partyRelationshipService.getAvailableProjectStaffPersons(recipeVersion.recipe.project)
+		if (recipeVersion.recipe.project.id != Project.DEFAULT_PROJECT_ID
+				&& !peopleInProject.contains(loginUser.person)) {
+			throw new UnauthorizedException("The current user doesn't have access to the project")
+		}
+		
+		def recipe = recipeVersion.recipe
+		def person = recipeVersion.createdBy
+		
+		
+		def result = [:]
+		result.recipe = recipe
+		result.recipeVersion = recipeVersion
+		result.person = person
+		result.wip = wip
+		
+		return result
+	}
 	
     def findRecipes(isArchived, catalogContext, searchText, projectType) {
 		def projectIds = []
 		
 		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
-
-		if (projectType.equals("master")) {
+		if (projectType == null) {
+			def currentProject = securityService.getUserCurrentProject()
+			if (currentProject == null) {
+				throw new EmptyResultException()
+			} else {
+				projectIds.add(currentProject.id)
+			}
+		} else if (projectType.equals("master")) {
 			projectIds.add(Project.DEFAULT_PROJECT_ID)
 		} else if (projectType.equals("active")) {
+		
 			def projects = projectService.getActiveProject(new Date(), true, loginUser.person)
 			projects.each { project ->
 				projectIds.add(project.id)
@@ -38,10 +79,10 @@ class CookbookService {
 				if (peopleInProject.contains(loginUser.person)) {
 					projectIds.add(projectType.toInteger())
 				} else {
-					throw new IllegalArgumentException("The current user doesn't have access to the project")
+					throw new UnauthorizedException("The current user doesn't have access to the project")
 				}
 			} else {
-				throw new IllegalArgumentException("The current user doesn't have access to the project")
+				throw new UnauthorizedException("The current user doesn't have access to the project")
 			}
 		}
 

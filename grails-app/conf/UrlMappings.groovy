@@ -22,6 +22,11 @@ class UrlMappings {
 			action = [GET:"recipeList"]
 		}
 		
+		"/ws/cookbook/recipe/$id/$version" {
+			controller = "wsCookbook"
+			action = [GET:"recipe"]
+		}
+		
 		"/maint/backd00r" {
 			controller = "auth"
 			action = [GET:"maintMode"]
