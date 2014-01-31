@@ -684,12 +684,12 @@ class AssetEntityService {
 					}
 					
 				}else{
-					warnMsg += "<li>connector $fromConnectorLabel with Asset Name $fromAssetName does not exist.</li>"
+					warnMsg += "<li>row "+(r+1)+" with connector $fromConnectorLabel and Asset Name $fromAssetName does not exist & skipped.</li>"
 					cablingSkipped+=1
 				}
 				
 			}else{
-				warnMsg += "<li>cable with AssetName $fromAssetName does not exist.</li>"
+				warnMsg += "<li>row "+(r+1)+" with connector $fromConnectorLabel and Asset Name $fromAssetName does not exist & skipped.</li>"
 				cablingSkipped+=1
 			}
 		}

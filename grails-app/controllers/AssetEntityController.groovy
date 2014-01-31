@@ -786,9 +786,10 @@ class AssetEntityController {
 					cablingAdded = cablingCount-1
 					warnMsg += '<ul>'
 					def resultMap = assetEntityService.saveImportCables(cablingSheet)
-					warnMsg += resultMap.warnMsg+"""
+					warnMsg += """
 						<li>$resultMap.cablingUpdated cables updated
-						<li>$resultMap.cablingSkipped new cables skipped</ul>"""
+						<li>$resultMap.cablingSkipped new cables skipped
+						$resultMap.warnMsg</ul>"""
 				}
 				
 				for( int i=0;  i < sheetNamesLength; i++ ) {
