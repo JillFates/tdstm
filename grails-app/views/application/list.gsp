@@ -7,6 +7,9 @@
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="projectStaff.js" />
+		<g:javascript src="angular.js" />
+		<g:javascript src="angular-ui.js"/>	
+		<g:javascript src="room.rack.combined.js"/>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
@@ -22,6 +25,7 @@
 				$("#createEntityView").dialog({ autoOpen: false })
 				$("#showEntityView").dialog({ autoOpen: false })
 				$("#editEntityView").dialog({ autoOpen: false })
+				$("#cablingDialogId").dialog({ autoOpen:false })
 				$("#commentsListDialog").dialog({ autoOpen: false })
 				$("#createCommentDialog").dialog({ autoOpen: false })
 				$("#showCommentDialog").dialog({ autoOpen: false })
@@ -182,6 +186,7 @@
 			<div id="showEntityView" style="display: none;"></div>
 			<div id="editEntityView" style="display: none;"></div>
 			<div id="createStaffDialog" style="display:none;">
+			<div id="cablingDialogId" style="display: none;"></div>
 				<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
 			</div>
 			<g:render template="../assetEntity/newDependency" model="['forWhom':'Application', entities:applications]"></g:render>

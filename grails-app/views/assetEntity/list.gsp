@@ -7,6 +7,9 @@
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
+		<g:javascript src="angular.js" />
+		<g:javascript src="angular-ui.js"/>	
+		<g:javascript src="room.rack.combined.js"/>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
@@ -32,6 +35,7 @@
 				$("#manufacturerShowDialog").dialog({ autoOpen: false })
 				$("#modelShowDialog").dialog({ autoOpen: false })
 				$("#editManufacturerView").dialog({ autoOpen: false})
+				$("#cablingDialogId").dialog({ autoOpen:false })
 				$("#filterPane").draggable()
 				var filter = '${filter}'
 				var type = '${type}'
@@ -195,6 +199,7 @@
 		<div id="showEntityView" style="display: none;"></div>
 		<div id="editEntityView" style="display: none;"></div>
 		<div id="editManufacturerView" style="display: none;"></div>
+		<div id="cablingDialogId" style="display: none;"></div>
 		<g:render template="newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
 		<script>
 			currentMenuId = "#assetMenu";

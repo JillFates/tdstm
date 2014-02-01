@@ -5,6 +5,9 @@
 		<meta name="layout" content="projectHeader" />
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
+		<g:javascript src="angular.js" />
+		<g:javascript src="angular-ui.js"/>	
+		<g:javascript src="room.rack.combined.js"/>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
 
@@ -29,6 +32,7 @@
 				$("#editCommentDialog").dialog({ autoOpen: false })
 				$("#manufacturerShowDialog").dialog({ autoOpen: false })
 				$("#modelShowDialog").dialog({ autoOpen: false })
+				$("#cablingDialogId").dialog({ autoOpen:false })
 
 
 				// JqGrid implementations 
@@ -155,6 +159,7 @@
 			<div id="createEntityView" style="display: none;" ></div>
 			<div id="showEntityView" style="display: none;"></div>
 			<div id="editEntityView" style="display: none;"></div>
+			<div id="cablingDialogId" style="display: none;"></div>
 			<g:render template="../assetEntity/newDependency" model="['forWhom':'Database', entities:dbs]"></g:render>
 		</div>
 		<g:render template="../assetEntity/commentCrud"/>

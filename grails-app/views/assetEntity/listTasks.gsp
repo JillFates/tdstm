@@ -12,6 +12,9 @@
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="entity.crud.js" />
 	<g:javascript src="model.manufacturer.js"/>
+	<g:javascript src="angular.js" />
+	<g:javascript src="angular-ui.js"/>	
+	<g:javascript src="room.rack.combined.js"/>
 	<jqgrid:resources />
 	<g:javascript src="jqgrid-support.js" />
 	<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
@@ -32,6 +35,7 @@
 			$("#editManufacturerView").dialog({ autoOpen: false})
 			$("#manufacturerShowDialog").dialog({ autoOpen: false })
 			$("#modelShowDialog").dialog({ autoOpen: false })
+			$("#cablingDialogId").dialog({ autoOpen:false })
 			currentMenuId = "#assetMenu";
 			$("#teamMenuId a").css('background-color','#003366')
 			$("#viewGraphSpanId").css('margin-left',$(window).width()*3.3/100+'%')
@@ -221,6 +225,7 @@
 		<div id="editEntityView" style="display: none;"></div>
 		<div id="createEntityView" style="display: none;"></div>
 		<div id="editManufacturerView" style="display: none;"></div>
+		<div id="cablingDialogId" style="display: none;"></div>
 		<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
 	</div>
  <script type="text/javascript">

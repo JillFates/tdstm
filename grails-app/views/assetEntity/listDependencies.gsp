@@ -7,6 +7,9 @@
 		<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="asset.tranman.js" />
+		<g:javascript src="angular.js" />
+		<g:javascript src="angular-ui.js"/>	
+		<g:javascript src="room.rack.combined.js"/>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
 		
@@ -18,6 +21,7 @@
 				$("#createCommentDialog").dialog({ autoOpen: false })
 				$("#showCommentDialog").dialog({ autoOpen: false })
 				$("#editCommentDialog").dialog({ autoOpen: false })
+				$("#cablingDialogId").dialog({ autoOpen:false })
 				var listCaption ="Dependencies: \
 					<tds:hasPermission permission='AssetDelete'>\
 					<span class='capBtn'><input type='button' id='deleteAssetId' value='Bulk Delete' onclick='deleteAssets(\"dependencies\")' disabled='disabled'/></span>\
@@ -71,6 +75,7 @@
 			</div>
 			<div id="showEntityView" style="display: none;"></div>
 			<div id="editEntityView" style="display: none;"></div>
+			<div id="cablingDialogId" style="display: none;"></div>
 			<jqgrid:wrapper id="dependencyGridId" />
 			<g:render template="commentCrud"/> 
 			<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>

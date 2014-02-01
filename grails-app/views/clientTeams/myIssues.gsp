@@ -9,6 +9,9 @@
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="entity.crud.js" />
+	<g:javascript src="angular.js" />
+	<g:javascript src="angular-ui.js"/>	
+	<g:javascript src="room.rack.combined.js"/>
 	<g:javascript src="model.manufacturer.js"/>
 </head>
 <body>
@@ -83,6 +86,7 @@
 				<div id="editEntityView" style="display: none;"></div>
 				<div id="editManufacturerView" style="display: none;"></div>
 				<div id="createEntityView" style="display: none;"></div>
+				<div id="cablingDialogId" style="display: none;"></div>
 				<g:render template="../assetEntity/commentCrud"/>
 				<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
 	    <br />
@@ -365,6 +369,7 @@ function setTab(tab){
 		$("#editCommentDialog").dialog({ autoOpen: false })
 		$("#editManufacturerView").dialog({ autoOpen: false})
 		$("#createCommentDialog").dialog({ autoOpen: false })
+		$("#cablingDialogId").dialog({ autoOpen:false })
 	});
  </script>
 </body>

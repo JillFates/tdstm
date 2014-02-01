@@ -1,3 +1,4 @@
+<%@page import="com.tds.asset.AssetType;"%>
 <g:if test="${redirectTo!='dependencyConsole'}">
 	 <g:if test="${redirectTo=='listTask'}">
 	 	<span class="button"><input id="updateCloseId" type="button" class="save updateDep" value="Update/Close" onclick="updateToRefresh()" /></span>
@@ -19,3 +20,6 @@
 	 <span class="button"><input type="button" id="deleteId" name="deleteId"  class="save" value="Delete" onclick=" deleteAsset('${value}','${whom}')" /> </span>
 	 <span class="button"><input type="button" class="delete" value="Cancel" onclick="$('#editEntityView').dialog('close');"/> </span>
 </g:else>
+<g:if test="${assetEntity && assetEntity?.assetType in AssetType.getPhysicalServerTypes() && assetEntity?.model && assetEntity.isCableExist()}">
+ 	<span class="button"><input type="button" id="cableId" name="cableId" class="edit" value="Cable" onclick="openCablingDiv('${value}');closeAssetDivs();" /> </span>
+</g:if>

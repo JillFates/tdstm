@@ -763,3 +763,19 @@ th.desc{
 	background-color: #FFF;
 	text-align: center;
 }
+
+.power_s{
+	text-decoration: underline;
+	color:blue;
+	cursor: pointer;
+	display: block;
+}
+.power_h{
+	display: none !important;
+}
+.type_s{
+	display: none;
+}
+.type_h{
+	display: block;
+}

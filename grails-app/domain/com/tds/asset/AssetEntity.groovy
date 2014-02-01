@@ -409,5 +409,10 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 			targetLocation = room ? room?.location : null
 		}
 	}
-	
+	/**
+	 * This method is used to know whether a particular asset having cables or not.
+	 */
+	def isCableExist(){
+		return AssetCableMap.findByAssetFrom(this)
+	}
 }

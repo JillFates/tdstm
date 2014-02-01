@@ -8,6 +8,9 @@
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
 		<g:javascript src="projectStaff.js" />
+		<g:javascript src="angular.js" />
+		<g:javascript src="angular-ui.js"/>	
+		<g:javascript src="room.rack.combined.js"/>
 		<script type="text/javascript" src="${resource(dir:'d3',file:'d3.js')} "></script>
 		<link rel="stylesheet" href="${resource(dir:'d3/force',file:'force.css')}" type="text/css"/>
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
@@ -33,6 +36,7 @@
 				$("#moveBundleSelectId").dialog({ autoOpen: false })
 				$("#editManufacturerView").dialog({ autoOpen: false})
 				$("#createStaffDialog").dialog({ autoOpen: false })
+				$("#cablingDialogId").dialog({ autoOpen:false })
 				currentMenuId = "#assetMenu";
 				$("#assetMenuId a").css('background-color','#003366')	
 				$("#dependencyDivId").css('max-width', ($(window).width()-185)+'px');
@@ -139,7 +143,8 @@
 			<div id="showEntityView" style="display: none;"></div>
 			<div id="editEntityView" style="display: none;"></div>
 			<div id="editManufacturerView" style="display: none;"></div>
-			<div id="createStaffDialog" style="display:none;">
+			<div id="createStaffDialog" style="display:none;">'
+			<div id="cablingDialogId" style="display: none;"></div>
 				<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
 			</div>
 			<div style="display: none;">

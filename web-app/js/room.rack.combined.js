@@ -134,7 +134,10 @@ function showCablingDetails( e, assetId ){
 function changeStatus(cableId){
 	$('#status_'+cableId+' option[value="Cabled"]').attr('selected','selected');
 }
-
+function closeAssetDivs(){
+	$("#showEntityView").dialog("close");
+	$("#editEntityView").dialog("close");
+}
 function changeCableDetails(value, cableId){
 	var scope = angular.element($('#app')).scope();
 	if(value=='Empty'){
