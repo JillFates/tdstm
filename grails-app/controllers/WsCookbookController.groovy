@@ -52,6 +52,11 @@ class WsCookbookController {
 	 * Check {@link UrlMappings} for the right call
 	 */
 	def saveRecipeVersion = {
+		if (!SecurityUtils.subject.authenticated) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
 		render(ServiceResults.success([message : 'save version']) as JSON)
 	}
 	
@@ -60,6 +65,11 @@ class WsCookbookController {
 	 * Check {@link UrlMappings} for the right call
 	 */
 	def updateRecipeVersion = {
+		if (!SecurityUtils.subject.authenticated) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
 		render(ServiceResults.success([message : 'update version']) as JSON)
 	}
 	
