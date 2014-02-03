@@ -1,6 +1,8 @@
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.tdssrc.grails.GormUtil;
 
 import org.springframework.jdbc.core.RowMapper;
@@ -87,15 +89,57 @@ class CookbookService {
 	/**
 	 * Saves a specific recipe reference
 	 * 
-	 * @param recipeId
-	 * @param recipeVersionId
-	 * @param name
-	 * @param description
-	 * @param sourceCode
-	 * @param changelog
-	 * @return
+	 * @param recipeId the recipe id
+	 * @param recipeVersionId the id of the recipe version
+	 * @param name the name of the recipe
+	 * @param description the description of the recipe
+	 * @param sourceCode the source code of the recipe
+	 * @param changelog the change log of the recipe
+	 * @param loginUser the current user
+	 * @param currentProject the current project
 	 */
-	def save(recipeId, recipeVersionId, name, description, sourceCode, changelog) {
+	def saveOrUpdateWIPRecipe(recipeId, recipeVersionId, name, description, sourceCode, changelog, loginUser, currentProject) {
+		if (!RolePermissions.hasPermission('CatalogRecipeSave')) {
+			throw new UnauthorizedException('User doesn\'t have a CatalogRecipeSave permission')
+		}
+
+		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
+			throw new EmptyResultException();
+		}
+		
+		def recipe = Recipe.get(recipeId)
+		if (recipe == null) {
+			throw new EmptyResultException();
+		}
+		
+		def recipeVersion = RecipeVersion.get(recipeVersionId)
+		
+		if (!recipe.project.equals(currentProject)) {
+			throw new UnauthorizedException('The current user can only edit recipes of the current project')
+		}
+		
+		def wip = RecipeVersion.findByRecipeAndVersionNumber(recipe, 0)
+		if (wip == null) {
+			wip = new RecipeVersion()
+			wip.versionNumber = 0
+			wip.createdBy = loginUser.person
+			wip.recipe = recipe
+			if (recipeVersion != null) {
+				wip.clonedFrom = recipeVersion
+			}
+		}
+		
+		if (!StringUtils.isEmpty(name)) {
+			recipe.name = name
+		}
+		if (!StringUtils.isEmpty(description)) {
+			recipe.description = description
+		}
+		
+		wip.sourceCode = sourceCode
+		wip.changelog = changelog
+		
+		wip.save(failOnError: true)
 	}
 
 	/**
@@ -229,7 +273,7 @@ class CookbookService {
 		
 		
 		def catalogCondition = ''
-		if (catalogContext != null) {
+		if (catalogContext != null && allowedCatalogs.contains(catalogContext)) {
 			catalogCondition = 'AND recipe.context = :catalogContext'
 			arguments.catalogContext = catalogContext
 		}
