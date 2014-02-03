@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 class WsCookbookController {
 
 	def cookbookService
+	def securityService
 	
 	/**
 	 * Creates a recipe
@@ -42,7 +43,7 @@ class WsCookbookController {
 	 */
 	def recipe = {
 		if (!SecurityUtils.subject.authenticated) {
-			response.sendError(401, 'Unauthorized error')
+			ServiceResults.unauthorized(response)
 			return
 		}
 		
@@ -50,7 +51,8 @@ class WsCookbookController {
 		def recipeVersion = params.version
 		
 		try {
-			def result = cookbookService.getRecipe(recipeId, recipeVersion)
+			def loginUser = securityService.getUserLogin()
+			def result = cookbookService.getRecipe(recipeId, recipeVersion, loginUser)
 
 			def dataMap = [:]
 			dataMap.recipeId = result.recipe.id
@@ -67,9 +69,9 @@ class WsCookbookController {
 			
 			render(ServiceResults.success(dataMap) as JSON)
 		} catch (UnauthorizedException e) {
-			response.sendError(403, 'Forbidden')
+			ServiceResults.forbidden(response)
 		} catch (EmptyResultException e) {
-			response.sendError(424, 'Method Failure')
+			ServiceResults.methodFailure(response)
 		}
 	}
 
@@ -80,7 +82,7 @@ class WsCookbookController {
 	 */
 	def recipeList = {
 		if (!SecurityUtils.subject.authenticated) {
-			response.sendError(401, 'Unauthorized error')
+			ServiceResults.unauthorized(response)
 			return
 		}
 
@@ -90,18 +92,21 @@ class WsCookbookController {
 		def projectType = params.project
 
 		try {
-			def results = cookbookService.findRecipes(isArchived, catalogContext, searchText, projectType)
+			def loginUser = securityService.getUserLogin()
+			def currentProject = securityService.getUserCurrentProject()
+			
+			def results = cookbookService.findRecipes(isArchived, catalogContext, searchText, projectType, loginUser, currentProject)
 
 			def dataMap = [:]
 			dataMap.list = results
 
 			render(ServiceResults.success(dataMap) as JSON)
 		} catch (UnauthorizedException e) {
-			response.sendError(403, 'Forbidden')
+			ServiceResults.forbidden(response)
 		} catch (EmptyResultException e) {
-			response.sendError(424, 'Method Failure')
+			ServiceResults.methodFailure(response)
 		} catch (IllegalArgumentException e) {
-			response.sendError(424, 'Method Failure')
+			ServiceResults.methodFailure(response)
 		}
 	}
 }

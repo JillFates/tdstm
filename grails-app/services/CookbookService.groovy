@@ -28,7 +28,11 @@ class CookbookService {
 	 * @param versionNumber the version of the Recipe
 	 * @return a Map with information about the Recipe and the RecipeVersion
 	 */
-	def getRecipe(recipeId, versionNumber) {
+	def getRecipe(recipeId, versionNumber, loginUser) {
+		if (recipeId == null || !recipeId.isNumber()) {
+			throw new EmptyResultException();
+		}
+		
 		if (versionNumber == null) {
 			def recipe = Recipe.get(recipeId)
 			versionNumber = recipe.releasedVersion == null ? 0 : recipe.releasedVersion.versionNumber
@@ -41,22 +45,21 @@ class CookbookService {
 			throw new EmptyResultException('Invalid recipe')
 		}
 		
-		def loginUser = securityService.getUserLogin() 
 		def peopleInProject = partyRelationshipService.getAvailableProjectStaffPersons(recipeVersion.recipe.project)
 		if (recipeVersion.recipe.project.id != Project.DEFAULT_PROJECT_ID
 				&& !peopleInProject.contains(loginUser.person)) {
 			throw new UnauthorizedException('The current user doesn\'t have access to the project')
 		}
 		
-		def recipe = recipeVersion.recipe
+		def recipeOfVersion = recipeVersion.recipe
 		def person = recipeVersion.createdBy
 		
-		
-		def result = [:]
-		result.recipe = recipe
-		result.recipeVersion = recipeVersion
-		result.person = person
-		result.wip = wip
+		def result = [
+			'recipe' : recipeOfVersion,
+			'recipeVersion' : recipeVersion,
+			'person' : person,
+			'wip' : wip
+		]
 		
 		return result
 	}
@@ -72,15 +75,15 @@ class CookbookService {
 	 * When set to active, it will search all active projects the user has access to
 	 * When set to completed, it will search all completed projects that the user has access to
 	 * When set to a numeric value, it will search the specific project by id (as long as the user is associated to the project)
+	 * @param loginUser the current user
+	 * @param currentProject the current project
 	 * 
 	 * @return a list of Maps with information about the recipes. See {@link RecipeMapper}
 	 */
-    def findRecipes(isArchived, catalogContext, searchText, projectType) {
+    def findRecipes(isArchived, catalogContext, searchText, projectType, loginUser, currentProject) {
 		def projectIds = []
 		
-		def loginUser = securityService.getUserLogin() 
 		if (projectType == null) {
-			def currentProject = securityService.getUserCurrentProject()
 			if (currentProject == null) {
 				throw new EmptyResultException()
 			} else {

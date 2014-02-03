@@ -20,4 +20,28 @@ class ServiceResults {
 		
 		return renderMap
 	}  
+	
+	/**
+	 * Sends an unauthorized error
+	 * @param response the response object
+	 */
+	static def unauthorized(response) {
+		response.sendError(401, 'Unauthorized error')
+	}
+	
+	/**
+	 * Sends a method failure error
+	 * @param response the response object
+	 */
+	static def methodFailure(response) {
+		response.sendError(424, 'Method Failure')
+	}
+	
+	/**
+	 * Sends a forbidden error
+	 * @param response the response object
+	 */
+	static def forbidden(response) {
+		response.sendError(403, 'Forbidden')
+	}
 }
