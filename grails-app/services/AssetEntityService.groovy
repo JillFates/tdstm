@@ -525,6 +525,7 @@ class AssetEntityService {
 					cablingSheet.addCell( new Label( 9, r, '') )
 				}
 				cablingSheet.addCell( new Label( 10, r, String.valueOf(assetCablesList[r-2].cableStatus?:"" )) )
+				cablingSheet.addCell( new Label( 11, r, String.valueOf(assetCablesList[r-2].assetLoc?: "" )) )
 			}
 	}
 	/**
@@ -644,6 +645,7 @@ class AssetEntityService {
 			def cableColor = cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
 			def room = cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
 			def cableStatus = cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
+			def roomType = cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
 			if(fromAsset){
 				def fromAssetConnectorsLabels= fromAsset.model?.modelConnectors?.label
 				if(fromAssetConnectorsLabels && fromAssetConnectorsLabels?.contains(fromConnectorLabel)){
@@ -678,6 +680,9 @@ class AssetEntityService {
 					assetCable.cableComment = cableComment
 					assetCable.cableStatus = cableStatus
 					
+					if(AssetCableMap.constraints.assetLoc.inList.contains(roomType))
+						assetCable.assetLoc= roomType
+						
 					if(assetCable.dirtyPropertyNames.size()){
 						assetCable.save(flush:true)
 						cablingUpdated+=1

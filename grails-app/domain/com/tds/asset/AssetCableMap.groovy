@@ -23,7 +23,7 @@ class AssetCableMap {
 		cableColor( nullable:true, blank:true, inList: ['White', 'Grey', 'Green', 'Yellow', 'Orange', 'Red', 'Blue', 'Purple', 'Black'] )
 		cableLength( nullable:true )
 		toPower( nullable:true, blank:true)
-		assetLoc( nullable: true )
+		assetLoc( nullable: true , inList:['S', 'T'])
 	}
 	
 	static mapping = {

@@ -131,6 +131,14 @@ function showCablingDetails( e, assetId ){
 		$("#cableTable").show();
 	},500);
 }
+
+function showSourceTargetAssets(value,cableId){
+	var asset = $("#fromAsset_"+cableId).val();
+	var type = $("#connectType_"+cableId).val();
+	var scope = angular.element($('#app')).scope();
+	if(type!='Power')
+		scope.getAsset(cableId, asset, type, value)
+}
 function changeStatus(cableId){
 	$('#status_'+cableId+' option[value="Cabled"]').attr('selected','selected');
 }

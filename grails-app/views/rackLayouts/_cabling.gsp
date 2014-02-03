@@ -39,6 +39,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
     $scope.showEditRow = function(id){
 		var asset = $("#fromAsset_"+id).val();
 		var type = $("#connectType_"+id).val();
+		var roomType = $("#roomType_"+id).val();
 	    if(tempId!='' && id!=tempId){
     		$scope.cancelRow(tempId);
 		    $scope.row[id] = $scope.row[id] == 'h' ? 's' : 'h';
@@ -55,18 +56,20 @@ app.controller('Ctrl', function($scope, $filter, $http) {
     	}else{
 			$(".nonPowerDiv").show();
 			$(".powerDiv").hide();
-			$scope.getAsset(id, asset, type)
+			$scope.getAsset(id, asset, type, roomType)
         }
+		$("#cableRoomType_"+roomType+"_"+id).attr('checked',true)
 	    tempId=id
     };
 	var assetTemp = ''
-    $scope.getAsset = function(id, asset, type){
-	    if(id != assetTemp){
+	var roomTemp = ''
+    $scope.getAsset = function(id, asset, type, room){
+	    if(id != assetTemp || room!=roomTemp){
 	    	$http({
 				url : "../rackLayouts/getAssetModelConnectors",
 				method: "POST",
 				async: false,
-				data:{'asset': $("#assetEntityId").val(), 'type':type}
+				data:{'asset': $("#assetEntityId").val(), 'type':type,'roomType':room}
 			}).success (function(resp) {
 				$scope.assets = resp['assets'];
 				$scope.connectors = resp['connectors'];
@@ -80,6 +83,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 			});
 	    }
 	    assetTemp=id
+	    roomTemp=room
      }
 	$scope.showAsset = function(id, asset, type){
 		setTimeout(function(){
@@ -121,7 +125,8 @@ app.controller('Ctrl', function($scope, $filter, $http) {
     			data: {'assetCable':cableId ,'assetId':$("#assetEntityId").val(), 'status':$("#status_"+cableId).val(),'actionType':actionType,
     				          'color':$("#color_"+cableId).val(), 'connectorType':$("#connectType_"+cableId).val(),'assetFromId':$("#assetFromId_"+cableId).val(),
     				          'modelConnectorId':$("#modelConnectorId_"+cableId).val(),'staticConnector':$("input:radio[name=staticConnector]:checked").val(),
-    				          'cableComment':$("#cableComment_"+cableId).val(), 'cableLength':$("#cableLength_"+cableId).val()},
+    				          'cableComment':$("#cableComment_"+cableId).val(), 'cableLength':$("#cableLength_"+cableId).val(),
+    				          'roomType':$("input:radio[name=cableRoomType_"+cableId+"]:checked").val()},
     			method: "POST"
     		}).success (function(resp) {
         		$scope.cancelRow(cableId)
@@ -134,7 +139,8 @@ app.controller('Ctrl', function($scope, $filter, $http) {
         		$scope.cables[cableId]['rackUposition']= resp.rackUposition
         		$scope.cables[cableId]['connectorId']= resp.connectorId
         		$scope.cables[cableId]['asset']= resp.asset
-        		if(resp.toCableId){
+        		$scope.cables[cableId]['locRoom'] = resp.locRoom
+        		if(resp.toCableId && resp.toCableId!=cableId){
         			$scope.cables[resp.toCableId]['fromAssetId']= ''
             		$scope.cables[resp.toCableId]['fromAsset']= ''
             		$scope.cables[resp.toCableId]['connectorId']= ''
@@ -143,7 +149,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
     		});
     	}
     }
-    
+   
 });
 
 </script>
@@ -188,6 +194,9 @@ app.controller('Ctrl', function($scope, $filter, $http) {
       <th>Length</th>
       <th>Comment</th>
       <th>Assigned To</th>
+      <g:if test="${isTargetRoom}">
+      	<th>Location/Room</th>
+      </g:if>
     </tr>
     <tr ng-repeat="cable in cables" >
       <td ng-click="showEditRow(cable.cableId)"><span>{{ cable.type }}</span></td>
@@ -256,6 +265,16 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 			    <input type="hidden" name="connectType_{{cable.cableId}}" id="connectType_{{cable.cableId}}" value="{{cable.type}}"/>
 		     </span>
       </td>
+      <g:if test="${isTargetRoom}">
+	      <td>
+	      	<span ng-hide="showRow(cable.cableId)">{{cable.locRoom}}</span>
+	      	<span ng-show="showRow(cable.cableId)">
+		      	<input type="radio" name="cableRoomType_{{cable.cableId}}" id="cableRoomType_S_{{cable.cableId}}" value="S" onclick="showSourceTargetAssets(this.value,{{cable.cableId}})">Current</input>&nbsp;
+				<input type="radio" name="cableRoomType_{{cable.cableId}}" id="cableRoomType_T_{{cable.cableId}}" value="T" onclick="showSourceTargetAssets(this.value,{{cable.cableId}})">Target</input>&nbsp;
+				<input type="hidden" name="roomType_{{cable.cableId}}" id="roomType_{{cable.cableId}}" value="{{cable.roomType}}"/>
+			</span>
+	      </td>
+      </g:if>
       <td ng-show="showRow(cable.cableId)">
      	<img src="${resource(dir:'images',file:'delete.png')}" class="pointer btn" ng-click="cancelRow(cable.cableId)" style="width:18px;"/>
 		<img src="${resource(dir:'images',file:'check12.png')}" class="pointer btn" ng-click="submitAction(cable.cableId)" style="width:18px;"/>
