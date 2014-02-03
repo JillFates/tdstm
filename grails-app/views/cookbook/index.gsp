@@ -1,36 +1,41 @@
 <html ng-app="cookbookRecipes">
 	<head>
 		<title>Cookbook</title>
-    	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
+    	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		%{-- <meta name="layout" content="projectHeader" />	 --}%
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
     	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
     	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ng-grid.css')}" />
     	<g:javascript src="jquery-1.9.1.js" />
     	<g:javascript src="bootstrap.js" />
     	<g:javascript src="angular.js" />
+    	<g:javascript src="angular-resource.js" />
+    	<g:javascript src="ui-bootstrap-tpls-0.10.0.js" />
     	<g:javascript src="ng-grid-2.0.7.min.js" />
     	<g:javascript src="controllers/cookbook.js" />
 	</head>
-	<body ng-app ng-controller="CookbookRecipeEditor">
+	<body ng-controller="CookbookRecipeEditor">
+		%{-- <div>{{recipes}}</div> --}%
 		<div class="container">
 			<div class="row-fluid clearfix" style="margin-top:10px;"> %{-- This last style attr should be removed --}%
 				<div class="col-md-6 col-xs-6">
 					<g:form id="switchContext" action="#">
-						<div class="btn-group">
-						  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-						    Action <span class="caret"></span>
-						  </button>
-						  <ul class="dropdown-menu" role="menu">
-						    <li><a href="#">All</a></li>
-						    <li><a href="#">First</a></li>
-						    <li><a href="#">Last</a></li>
-						  </ul>
-						</div>
+						%{-- <div class="btn-group">
+							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+								Context <span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu" role="menu">
+								<li ng-repeat="c in contexts" ng-click="change()" ><a href="#">{{c}}</a></li>
+							</ul>
+						</div> --}%
+						<select name="contextSelector" id="contextSelector" ng-model="context" ng-options="c for c in contexts" ng-change="change()">
+						</select>
 					</g:form>
 				</div>
 				<div class="col-md-6 col-xs-6">
 					<div class="checkbox">
 						<label class="pull-right">
-							<input type="checkbox" name="viewArchived" id="viewArchived"> View Archived Recipes
+							<input type="checkbox" name="viewArchived" id="viewArchived" value="n" ng-model="archived" ng-true-value="y" ng-false-value="n" ng-change="change()"> View Archived Recipes
 						</label>
 					</div>
 				</div>
@@ -41,116 +46,8 @@
 				</div>				
 			</div>
 			<div class="row-fluid clearfix">
-				<div class="col-md-12">
-					<div class="table-responsive">
-						<table class="table table-hover table-striped recipesTable">
-							<thead>
-								<tr>
-									<th>Recipe</th>
-									<th>Description</th>
-									<th>Context</th>
-									<th>Editor</th>
-									<th>Last</th>
-									<th>Version</th>
-									<th>WIP</th>
-									<th>Edit</th>
-									<th>Del</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>T-180-45</td>
-									<td>Tasks for initial phase (45 days)</td>
-									<td>Bundle</td>
-									<td>John</td>
-									<td>1/5/14 12:51pm</td>
-									<td>6</td>
-									<td></td>
-									<td>
-										<a href="#" class="actions edit"><span class="glyphicon glyphicon-edit"></span></a>
-									</td>
-									<td>
-										<a href="#" class="actions delete"><span class="glyphicon glyphicon-remove"></span></a>
-									</td>
-								</tr>
-								<tr>
-									<td>T-135-45</td>
-									<td>Tasks for initial phase (45 days)</td>
-									<td>Bundle</td>
-									<td>Craig</td>
-									<td>1/10/14 5:22am</td>
-									<td>3</td>
-									<td></td>
-									<td>
-										<a href="#" class="actions edit"><span class="glyphicon glyphicon-edit"></span></a>
-									</td>
-									<td>
-										<a href="#" class="actions delete"><span class="glyphicon glyphicon-remove"></span></a>
-									</td>
-								</tr>
-								<tr>
-									<td>T-090-60</td>
-									<td>Tasks for initial phase (45 days)</td>
-									<td>Bundle</td>
-									<td>Wim</td>
-									<td>1/9/14 4:17pm</td>
-									<td>2</td>
-									<td>Yes</td>
-									<td>
-										<a href="#" class="actions edit"><span class="glyphicon glyphicon-edit"></span></a>
-									</td>
-									<td>
-										<a href="#" class="actions delete"><span class="glyphicon glyphicon-remove"></span></a>
-									</td>
-								</tr>
-								<tr>
-									<td>T-030-30</td>
-									<td>Tasks for initial phase (45 days)</td>
-									<td>Bundle</td>
-									<td>Craig</td>
-									<td>1/12/14 3:12am</td>
-									<td>1</td>
-									<td></td>
-									<td>
-										<a href="#" class="actions edit"><span class="glyphicon glyphicon-edit"></span></a>
-									</td>
-									<td>
-										<a href="#" class="actions delete"><span class="glyphicon glyphicon-remove"></span></a>
-									</td>
-								</tr>
-								<tr>
-									<td>T-0-Wave001</td>
-									<td>Wave 001 Runbook</td>
-									<td>Event</td>
-									<td>John</td>
-									<td>1/13/14 10:44pm,12</td>
-									<td>1</td>
-									<td>Yes</td>
-									<td>
-										<a href="#" class="actions edit"><span class="glyphicon glyphicon-edit"></span></a>
-									</td>
-									<td>
-										<a href="#" class="actions delete"><span class="glyphicon glyphicon-remove"></span></a>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>				
-			</div>
-			<div class="row-fluid clearfix">
-				<div class="col-md-4 col-md-offset-4">
-					<ul class="pagination pagination-centered">
-						<li><a href="#">&laquo;</a></li>
-						<li><a href="#">&lt;</a></li>
-						<li><a href="#">1</a></li>
-						<li><a href="#">2</a></li>
-						<li><a href="#">3</a></li>
-						<li><a href="#">4</a></li>
-						<li><a href="#">5</a></li>
-						<li><a href="#">&gt;</a></li>
-						<li><a href="#">&raquo;</a></li>
-					</ul>
+				<div class="col-md-4 col-md-offset-4 paginationWrapper">
+					<pagination boundary-links="true" total-items="totalItems" page="currentPage" class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
 				</div>
 			</div>
 			<div class="row-fluid clearfix">
@@ -435,6 +332,14 @@
 			</div> --}%
 		</div>
 		<script>
+			$('#viewArchived').on('click', function(e){
+				if($(this).val() == 'n'){
+					$(this).val('y');
+				}else{
+					$(this).val('n')
+				}
+			})
+
 			$('ul.nav-tabs > li.active').each(function(){
 				var ind = $(this).index();
 				$(this).parent().parent().find('.tabContainer:eq(' + ind + ')').removeClass('hidden');

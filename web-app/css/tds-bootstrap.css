@@ -1,6 +1,11 @@
 /* Specific Styles for all the new pages */
 
 /* Cookbook */
+
+.paginationWrapper{
+	text-align: center;
+}
+
 .recipesTable{
 	border:1px solid #ddd;
 	margin-bottom: 0;
@@ -94,3 +99,18 @@ form.groups .form-group{
     overflow-y: auto;
     margin: 0 0 10px 0;
 }
+
+.gridIcon{
+	display: table;
+	height: 100%;
+	width: 100%;
+}
+
+.actions{
+	display: table-cell;
+	vertical-align: middle;
+}
+
+/*.ngHeaderText{
+	font-weight: normal;
+}*/
