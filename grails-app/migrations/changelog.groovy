@@ -67,5 +67,6 @@ databaseChangeLog = {
 	include file: '20140128-add-cookbook.groovy'
 	include file: '20140130-remove-createdBy-recipe.groovy'
 	include file: '20140131-add-missing-version.groovy'
+	include file: '20140203-add-missing-autoincrement.groovy'
 	
 }

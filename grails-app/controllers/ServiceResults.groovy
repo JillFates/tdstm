@@ -13,13 +13,26 @@ class ServiceResults {
 	 * @param map the Map data to be added to the response object
 	 * @return the response map
 	 */
-	static def success(map) {
+	static def success(map = [:]) {
 		def renderMap = [:]
 		renderMap.status = 'success'
 		renderMap.data = map
 		
 		return renderMap
 	}  
+	
+	/**
+	 * Returns a fail response to be serialized as json
+	 * @param map the Map data to be added to the response object
+	 * @return the response map
+	 */
+	static def fail(map = [:]) {
+		def renderMap = [:]
+		renderMap.status = 'fail'
+		renderMap.data = map
+		
+		return renderMap
+	}
 	
 	/**
 	 * Sends an unauthorized error

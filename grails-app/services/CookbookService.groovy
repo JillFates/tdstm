@@ -1,9 +1,9 @@
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import com.tdssrc.grails.GormUtil;
 
 import org.springframework.jdbc.core.RowMapper;
-
 import org.apache.shiro.SecurityUtils
 
 /**
@@ -13,13 +13,73 @@ import org.apache.shiro.SecurityUtils
  */
 class CookbookService {
 
-    static transactional = true
-	static allowedCatalogs = ['All', 'Event', 'Bundle', 'Application']
+    boolean transactional = true
+	static allowedCatalogs = ['Event', 'Bundle', 'Application']
+	static searchAllowedCatalogs = ['All', 'Event', 'Bundle', 'Application']
 
 	def namedParameterJdbcTemplate
 	def projectService
 	def partyRelationshipService
 	def securityService
+	
+	/**
+	 * Creates a Recipe using the information passed
+	 * 
+	 * @param name the name of the recipe
+	 * @param description the description of the recipe
+	 * @param context the context
+	 * @param cloneFrom the id of the recipe to be cloned from
+	 * @param loginUser the user that is creating this recipe
+	 * @param currentProject the project owning this recipe
+	 */
+	def createRecipe(recipeName, description, recipeContext, cloneFrom, loginUser, currentProject) {
+		//TODO check this checkAccess(loginUser.person, currentProject)
+		
+		if (currentProject == null) {
+			log.info('Current project is null')
+			throw new EmptyResultException()
+		}
+		
+		if (recipeName == null || recipeContext == null || !allowedCatalogs.contains(recipeContext)) {
+			throw new IllegalArgumentException('Please check allowed arguments')
+		}
+		
+		def clonedVersion = null
+		
+		if (cloneFrom != null) {
+			if (clonedFrom.isNumber()) {
+				clonedVersion = RecipeVersion.get(clonedFrom)
+				checkAccess(loginUser.person, clonedVersion.recipe.project)
+			} else {
+				log.info('Cloned from is not a number')
+				throw new EmptyResultException()
+			}
+		}
+		
+		def recipe = new Recipe()
+		def recipeVersion = new RecipeVersion()
+		
+		recipe.name = recipeName
+		recipe.description = description
+		recipe.context = recipeContext
+		recipe.project = currentProject
+		recipe.archived = false
+
+		recipe.save(flush:true)
+		
+		recipeVersion.versionNumber = 0
+		recipeVersion.createdBy = loginUser.person
+		recipeVersion.recipe = recipe
+		
+		if (clonedVersion != null) {
+			recipeVersion.cloneFrom = clonedVersion
+			recipeVersion.sourceCode = clonedVersion.sourceCode
+			recipeVersion.changelog = clonedVersion.changelog
+		}
+		
+		recipeVersion.save()
+	}
+
 	
 	/**
 	 * Returns the information about a specific version of the Recipe
@@ -45,11 +105,7 @@ class CookbookService {
 			throw new EmptyResultException('Invalid recipe')
 		}
 		
-		def peopleInProject = partyRelationshipService.getAvailableProjectStaffPersons(recipeVersion.recipe.project)
-		if (recipeVersion.recipe.project.id != Project.DEFAULT_PROJECT_ID
-				&& !peopleInProject.contains(loginUser.person)) {
-			throw new UnauthorizedException('The current user doesn\'t have access to the project')
-		}
+		checkAccess(loginUser.person, recipeVersion.recipe.project)
 		
 		def recipeOfVersion = recipeVersion.recipe
 		def person = recipeVersion.createdBy
@@ -132,7 +188,7 @@ class CookbookService {
 
 		def projectIdsAsString = projectIds.isEmpty() ? '-1' : GormUtil.asCommaDelimitedString(projectIds)
 		isArchived = (isArchived.equals('y') ? '1' : 0)
-		catalogContext = (allowedCatalogs.contains(catalogContext)) ? catalogContext : 'All'
+		catalogContext = (searchAllowedCatalogs.contains(catalogContext)) ? catalogContext : 'All'
 		
 		def arguments = [
 			"isArchived" : isArchived,
@@ -170,6 +226,24 @@ class CookbookService {
 		
 		return recipes
     }
+	
+	/**
+	 * Checks if person can access project. If it can't then it throws an {@link UnauthorizedException}
+	 * @param person the person interested in the project
+	 * @param project the project
+	 */
+	private void checkAccess(person, project) {
+		if (person == null || project == null) {
+			return
+		}
+		
+		def peopleInProject = partyRelationshipService.getAvailableProjectStaffPersons(project)
+		if (project.id != Project.DEFAULT_PROJECT_ID
+				&& !peopleInProject.contains(person)) {
+				log.warn('Person doesn\'t have access to the project')
+			throw new UnauthorizedException('The current user doesn\'t have access to the project')
+		}
+	}
 }
 
 class RecipeMapper implements RowMapper {

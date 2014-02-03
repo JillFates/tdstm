@@ -32,9 +32,9 @@ class Recipe {
 		description(blank:true, nullable:true, maxLength:255)
 		context(blank:false, nullable:false, inList: ['Event', 'Bundle', 'Application'] )	// TODO : Switch to ENUM RecipeContext
 		project(nullable:false)
-		createdBy(nullable:false)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
+		releasedVersion(nullable:true)
 	}
 
 	static mapping  = {	

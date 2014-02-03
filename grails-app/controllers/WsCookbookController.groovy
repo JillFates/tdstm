@@ -18,8 +18,34 @@ class WsCookbookController {
 	 * Check {@link UrlMappings} for the right call
 	 */
 	def createRecipe = {
-		render(ServiceResults.success([message : 'create']) as JSON)
+		if (!SecurityUtils.subject.authenticated) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		
+		def name = params.name
+		def description = params.description
+		def context = params.context
+		def cloneFrom = params.cloneFrom
+		def loginUser = securityService.getUserLogin()
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			cookbookService.createRecipe(name, description, context, cloneFrom, loginUser, currentProject)
+
+			render(ServiceResults.success() as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (IllegalArgumentException e) {
+			render(ServiceResults.fail([
+				'name' : 'Name is required', 
+				'context' : 'Context is not a valid value'
+			]) as JSON)
+		}
 	}
+		
 	
 	/**
 	 * Saves a version of the recipe
