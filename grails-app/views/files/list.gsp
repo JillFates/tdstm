@@ -51,16 +51,13 @@
 				// JqGrid implementations 
 				<jqgrid:grid id="storageId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
-					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType'"
-					colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'80'},
+					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','id', 'commentType'"
+					colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'50'},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
 						{name:'${filesPref['1']}',width:'120'},
 						{name:'${filesPref['2']}', width:'120'},
 						{name:'${filesPref['3']}', width:'120'}, 
 						{name:'${filesPref['4']}', width:'120'},
-						{name:'depNumber',sortable:false,search:false},
-						{name:'depResolve',sortable:false,search:false },
-						{name:'depConflicts',sortable:false,search:false},
 						{name:'id', hidden: true},
 						{name:'commentType', hidden: true} "
 					sortname="'assetName'"
@@ -81,7 +78,7 @@
 
 				<g:each var="key" in="['1','2','3','4']">
 					var filePref= '${filesPref[key]}';
-					$("#storageIdGrid_"+filePref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:absolute;margin-left: 42px;margin-top: -15px;" onclick="showSelect(\''+filePref+'\',\'storage\',\''+${key}+'\')">');
+					$("#storageIdGrid_"+filePref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:absolute;margin-left: 74px;margin-top: -15px;" onclick="showSelect(\''+filePref+'\',\'storage\',\''+${key}+'\')">');
 				</g:each>
 				
 				$.jgrid.formatter.integer.thousandsSeparator='';
@@ -93,12 +90,12 @@
 				function myCustomFormatter (cellVal,options,rowObject) {
 					var editButton = '<a href="javascript:editEntity(\'files\',\''+rowObject[10]+'\','+options.rowId+')">'+
 							"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
-					if(rowObject[9]=='issue'){
+					if(rowObject[6]=='issue'){
 						var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
 							+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
 						editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
 							+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_red.png')}' border='0px'/>"+"</a></span>"
-					} else if (rowObject[9]=='comment') {
+					} else if (rowObject[6]=='comment') {
 						var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
 							+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
 						editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
@@ -133,7 +130,7 @@
 			<jqgrid:wrapper id="storageId" />
 			<g:each var="key" in="['1','2','3','4']">
 				<div id="columnCustomDiv_${filesPref[key]}" style="display:none;">
-					<div class="columnDiv_${key}" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width: 116px;z-index: 2147483647; overflow-y: scroll;text-align: left;">
+					<div class="columnDiv_${key}" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width: 185px;z-index: 2147483647; overflow-y: scroll;text-align: left;">
 						<input type="hidden" id="previousValue_${key}" value="${filesPref[key]}" />
 						<g:each var="attribute" in="${attributesList}">
 							<label><input type="radio" name="coloumnSelector_${filesPref[key]}" id="coloumnSelector_${filesPref[key]}" value="${attribute.attributeCode}" 

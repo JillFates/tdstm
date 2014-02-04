@@ -66,7 +66,7 @@
 				<jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
 					colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','Plan Status','Bundle',
-						'Dep Group','Dep to resolve', 'Dep Conflicts', 'id', 'commentType'"
+						 'id', 'commentType'"
 					colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false,width:'40', fixed:true},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'250'},
 						{name:'assetType'},
@@ -79,9 +79,6 @@
 						{name:'${assetPref['4']}', width:'130'},
 						{name:'planStatus'},
 						{name:'moveBundle'},
-						{name:'depNumber', width:'50', fixed:true},
-						{name:'depToResolve', width:'50', fixed:true},
-						{name:'depConflicts', width:'50', fixed:true},
 						{name:'id', hidden: true},
 						{name:'commentType', hidden: true} "
 					sortname="'assetName'"
@@ -108,7 +105,7 @@
 
 				<g:each var="key" in="['1','2','3','4']">
 					var assetPref= '${assetPref[key]}';
-					$("#assetListIdGrid_"+assetPref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:absolute;margin-left: 24px;margin-top: -15px;" onclick="showSelect(\''+assetPref+'\',\'assetList\',\''+${key}+'\')">');
+					$("#assetListIdGrid_"+assetPref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:absolute;margin-left: 31px;margin-top: -15px;" onclick="showSelect(\''+assetPref+'\',\'assetList\',\''+${key}+'\')">');
 				</g:each>
 			
 				$.jgrid.formatter.integer.thousandsSeparator='';
@@ -120,12 +117,12 @@
 				function myCustomFormatter (cellVal,options,rowObject) {
 					var editButton = '<a href="javascript:editEntity(\'assetEntity\',\''+rowObject[1]+'\','+options.rowId+')">'+
 							"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
-					if(rowObject[15]=='issue'){
+					if(rowObject[12]=='issue'){
 						var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
 							+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
 						editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
 							+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_red.png')}' border='0px'/>"+"</a></span>"
-					} else if (rowObject[15]=='comment') {
+					} else if (rowObject[12]=='comment') {
 						var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
 							+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
 						editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'

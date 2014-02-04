@@ -113,36 +113,40 @@ class ApplicationController {
 		
 		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
 		
-		def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
-		def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
+		//def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
+		//def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
+		
 		def customizeQuery = assetEntityService.getAppCustomQuery(appPref)
-		def query = new StringBuffer("""SELECT * FROM ( SELECT a.app_id AS appId, ae.asset_name AS assetName, adb.dependency_bundle AS depNumber,
-										ac.status AS commentStatus, ac.comment_type AS commentType,me.move_event_id AS event,ae.asset_type AS assetType,""")
+		def query = new StringBuffer("""SELECT * FROM ( SELECT a.app_id AS appId, ae.asset_name AS assetName,
+										ac.status AS commentStatus, ac.comment_type AS commentType,me.move_event_id AS event,""")
 		if(customizeQuery.query){
 			query.append(customizeQuery.query)
 		}	
 		
-		query.append("""COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, 
-		COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts 
-		FROM application a 
-		LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
-		LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id""")
+		query.append(""" ae.asset_type AS assetType 
+			FROM application a 
+			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
+			LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id""")
 		if(customizeQuery.joinQuery){
 			query.append(customizeQuery.joinQuery)
 		}
+		//commented as per craig comments for performance issue
+		/*COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve,  adb.dependency_bundle AS depNumber,
+		COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts */
 		
-		query.append("""\n LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
-		LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
+		query.append("""\n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
 		LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
-		LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 
-		LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN (${unknownQuestioned}) 
-		LEFT OUTER JOIN asset_dependency adc ON ae.asset_entity_id = adc.asset_id AND adc.status IN (${validUnkownQuestioned}) 
-			AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.dependent_id) != mb.move_bundle_id 
-		LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN (${validUnkownQuestioned}) 
-			AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id 
 		WHERE ae.project_id = ${project.id} 
 		GROUP BY app_id ORDER BY ${sortIndex} ${sortOrder}
 		) AS apps""")
+		
+		/*LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
+		LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned})
+		LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN (${unknownQuestioned})
+		LEFT OUTER JOIN asset_dependency adc ON ae.asset_entity_id = adc.asset_id AND adc.status IN (${validUnkownQuestioned})
+			AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.dependent_id) != mb.move_bundle_id
+		LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN (${validUnkownQuestioned})
+			AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id*/
 		
 		// Handle the filtering by each column's text field
 		def firstWhere = true
@@ -179,7 +183,7 @@ class ApplicationController {
 			
 		def results = appsList?.collect { [ cell: [
 			'',it.assetName, (it[appPref["1"]] ?: ''), it[appPref["2"]], it[appPref["3"]], it[appPref["4"]], 
-			it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,
+			/*it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,*/
 			(it.commentStatus!='Completed' && it.commentType=='issue')?('issue'):(it.commentType?:'blank'),	it.assetType, it.event
 		], id: it.appId]}
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]

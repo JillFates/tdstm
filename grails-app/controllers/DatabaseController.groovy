@@ -97,8 +97,8 @@ class DatabaseController {
 		} else {
 			moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
 		}
-		def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
-		def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
+		//def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
+		//def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
 		
 		def filterParams = ['assetName':params.assetName,'depNumber':params.depNumber,'depResolve':params.depResolve,'depConflicts':params.depConflicts,'event':params.event]
 		def dbPref= assetEntityService.getExistingPref('Database_Columns')
@@ -128,29 +128,33 @@ class DatabaseController {
 			}
 		}
 		def query = new StringBuffer("""SELECT * FROM ( SELECT d.db_id AS dbId, ae.asset_name AS assetName,ae.asset_type AS assetType,
-										adb.dependency_bundle AS depNumber, me.move_event_id AS event,ac.status AS commentStatus, ac.comment_type AS commentType, """)
+										 me.move_event_id AS event,ac.status AS commentStatus, """)
 		
 		if(temp){
 			query.append(temp)
 		}
 		
-		query.append("""COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, 
-			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts 
+		/*COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, adb.dependency_bundle AS depNumber,
+			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts */
+		
+		query.append("""  ac.comment_type AS commentType
 			FROM data_base d 
 			LEFT OUTER JOIN asset_entity ae ON d.db_id=ae.asset_entity_id
 			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
 			LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
 			LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id
-			LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
+			WHERE ae.project_id = ${project.id} 
+			GROUP BY db_id ORDER BY ${sortIndex} ${sortOrder}
+			) AS dbs""")
+		
+		/* LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
 			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 
 			LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN (${unknownQuestioned}) 
 			LEFT OUTER JOIN asset_dependency adc ON ae.asset_entity_id = adc.asset_id AND adc.status IN (${validUnkownQuestioned}) 
 				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.dependent_id) != mb.move_bundle_id 
 			LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN (${validUnkownQuestioned}) 
-				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id 
-			WHERE ae.project_id = ${project.id} 
-			GROUP BY db_id ORDER BY ${sortIndex} ${sortOrder}
-			) AS dbs""")
+				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id */
+		
 		def firstWhere = true
 		filterParams.each {
 			if( it.getValue() )
@@ -173,7 +177,7 @@ class DatabaseController {
 
 		def results = dbsList?.collect { 
 			[ cell: ['',it.assetName, (it[dbPref["1"]] ?: ''), it[dbPref["2"]], it[dbPref["3"]], it[dbPref["4"]], 
-					it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,
+					/*it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,*/
 					(it.commentStatus!='Completed' && it.commentType=='issue')?('issue'):(it.commentType?:'blank'),
 					it.assetType], id: it.dbId,
 			]}

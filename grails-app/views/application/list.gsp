@@ -60,16 +60,13 @@
 					<g:if test="${moveEvent != null}"><g:link class="mmlink" controller="application" action="list"><span class="capBtn"><input type="button" value="Clear Filters" /></span></g:link></g:if>'
 				<jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
-					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType', 'Event'"
+					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','id', 'commentType', 'Event'"
 					colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'50', fixed:true},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
 						{name:'${appPref['1']}',width:'120'},
 						{name:'${appPref['2']}', width:'120'},
 						{name:'${appPref['3']}', width:'120'}, 
 						{name:'${appPref['4']}', width:'120'},
-						{name:'depNumber'},
-						{name:'depResolve'},
-						{name:'depConflicts'},
 						{name:'id', hidden: true},
 						{name:'commentType', hidden: true},
 						{name:'event', hidden: true} "
@@ -99,7 +96,7 @@
 				});
 				<g:each var="key" in="['1','2','3','4']">
 					var appPref= '${appPref[key]}';
-					$("#applicationIdGrid_"+appPref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:absolute;margin-left: 42px;margin-top: -15px;" onclick="showSelect(\''+appPref+'\',\'application\',\''+${key}+'\')">');
+					$("#applicationIdGrid_"+appPref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:absolute;margin-left: 77px;margin-top: -15px;" onclick="showSelect(\''+appPref+'\',\'application\',\''+${key}+'\')">');
 				</g:each>
 				$.jgrid.formatter.integer.thousandsSeparator='';
 			function myLinkFormatter (cellvalue, options, rowObject) {
@@ -110,12 +107,12 @@
 			function myCustomFormatter (cellVal,options,rowObject) {
 				var editButton = '<a href="javascript:editEntity(\'application\',\'Application\','+options.rowId+')">'+
 						"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
-				if (rowObject[9]=='issue') {
+				if (rowObject[6]=='issue') {
 					var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
 						+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
 					editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
 						+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_red.png')}' border='0px'/>"+"</a></span>"
-				} else if (rowObject[9]=='comment') {
+				} else if (rowObject[6]=='comment') {
 					var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
 						+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
 					editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
@@ -169,7 +166,7 @@
 			</div>
 			<g:each var="key" in="['1','2','3','4']">
 				<div id="columnCustomDiv_${appPref[key]}" style="display:none;">
-					<div class="columnDiv_${key}" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width: 120px;z-index: 2147483647; overflow-y: scroll;text-align: left;">
+					<div class="columnDiv_${key}" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width: 188px;z-index: 2147483647; overflow-y: scroll;text-align: left;">
 						<input type="hidden" id="previousValue_${key}" value="${appPref[key]}" />
 						<g:each var="attribute" in="${attributesList}">
 							<label><input type="radio" name="coloumnSelector_${appPref[key]}" id="coloumnSelector_${appPref[key]}" value="${attribute.attributeCode}" 

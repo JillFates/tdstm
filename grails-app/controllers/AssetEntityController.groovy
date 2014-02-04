@@ -1602,8 +1602,8 @@ class AssetEntityController {
 
 		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
 		
-		def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
-		def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
+		//def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
+		//def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
 		//TODO:need to move the code to AssetEntityService.
 		def temp= ""
 		def joinQuery= ""
@@ -1663,9 +1663,10 @@ class AssetEntityController {
 		if(temp)
 			query.append(temp)	
 					
-		query.append("""ae.plan_status AS planStatus, mb.name AS moveBundle, adb.dependency_bundle AS depNumber,
+		/*adb.dependency_bundle AS depNumber,
 					COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depToResolve,
-					COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts
+					COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts*/
+		query.append("""ae.plan_status AS planStatus, mb.name AS moveBundle
 				FROM asset_entity ae
 				LEFT OUTER JOIN model m ON m.model_id=ae.model_id
 				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id""")
@@ -1674,17 +1675,18 @@ class AssetEntityController {
 		
 		query.append(""" \n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
 				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
-				LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
+				WHERE ae.project_id = ${project.id} 
+				GROUP BY assetId ORDER BY ${sortIndex} ${sortOrder}
+			) AS assets
+		""")
+		
+		/*LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
 				LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 
 				LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN (${unknownQuestioned}) 
 				LEFT OUTER JOIN asset_dependency adc ON ae.asset_entity_id = adc.asset_id AND adc.status IN (${validUnkownQuestioned}) 
 					AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.dependent_id) != mb.move_bundle_id 
 				LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN (${validUnkownQuestioned}) 
-					AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id 
-				WHERE ae.project_id = ${project.id} 
-				GROUP BY assetId ORDER BY ${sortIndex} ${sortOrder}
-			) AS assets
-		""")
+					AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id */
 		
 		// Handle the filtering by each column's text field
 		def firstWhere = true
@@ -1711,7 +1713,7 @@ class AssetEntityController {
 		
 		def results = assetList?.collect { [ cell: [ '',it.assetName, (it.assetType ?: ''), it.model, 
 			it.sourceLocation, it.sourceRack, (it[assetPref["1"]] ?: ''), it[assetPref["2"]], it[assetPref["3"]], it[assetPref["4"]], it.planStatus, it.moveBundle, 
-			it.depNumber, (it.depToResolve==0)?(''):(it.depToResolve), (it.depConflicts==0)?(''):(it.depConflicts),
+			/*it.depNumber, (it.depToResolve==0)?(''):(it.depToResolve), (it.depConflicts==0)?(''):(it.depConflicts),*/
 			(it.commentStatus!='Completed' && it.commentType=='issue')?('issue'):(it.commentType?:'blank'),	it.assetType, it.event
 		], id: it.assetId]}
 
