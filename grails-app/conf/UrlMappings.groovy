@@ -26,7 +26,12 @@ class UrlMappings {
 			controller = "wsCookbook"
 			action = [GET:"recipe", POST:"saveRecipeVersion"]
 		}
-		
+
+		"/ws/cookbook/recipe/version/$recipeVersionId" {
+			controller = "wsCookbook"
+			action = [POST:"releaseRecipe"]
+		}
+
 		"/ws/cookbook/recipe/" {
 			controller = "wsCookbook"
 			action = [POST:"createRecipe"]

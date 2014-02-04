@@ -78,6 +78,30 @@ class WsCookbookController {
 	}
 	
 	/**
+	 * Releases a recipe that is WIP
+	 */
+	def releaseRecipe = {
+		if (!SecurityUtils.subject.authenticated) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
+		def recipeVersionId = params.recipeVersionId
+		def loginUser = securityService.getUserLogin()
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			cookbookService.releaseRecipe(recipeVersionId, loginUser, currentProject)
+
+			render(ServiceResults.success() as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		}
+	}
+	
+	/**
 	 * Obtains the information about a recipe
 	 * Check {@link UrlMappings} for the right call
 	 */
@@ -111,6 +135,8 @@ class WsCookbookController {
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
 		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (IllegalArgumentException e) {
 			ServiceResults.methodFailure(response)
 		}
 	}

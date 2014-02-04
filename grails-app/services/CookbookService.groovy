@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import com.tdssrc.grails.GormUtil;
 
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.apache.shiro.SecurityUtils
 
 /**
@@ -142,11 +143,49 @@ class CookbookService {
 		wip.save(failOnError: true)
 	}
 
+	
+	/**
+	 * Releases a WIP recipe version using the recipeVersionId
+	 * @param recipeVersionId the version id
+	 * @param loginUser the current user
+	 * @param currentProject the current project
+	 */
+	def releaseRecipe(recipeVersionId, loginUser, currentProject) {
+//		if (!RolePermissions.hasPermission('ReleaseRecipe')) {
+//			throw new UnauthorizedException('User doesn\'t have a ReleaseRecipe permission')
+//		}
+		
+		if (recipeVersionId == null || !recipeVersionId.isNumber() || currentProject == null) {
+			throw new EmptyResultException(); 
+		}
+		
+		//TODO check this checkAccess(loginUser.person, currentProject)
+		def wip = RecipeVersion.get(recipeVersionId)
+		
+		if (wip == null || wip.versionNumber != 0) {
+			throw new IllegalArgumentException('Not a WIP')
+		}
+		
+		def max = 0
+		
+		try {
+			max = namedParameterJdbcTemplate.queryForInt('SELECT MAX(version_number) FROM recipe_version WHERE recipe_id = :recipeId', ['recipeId' : wip.recipe.id])
+		} catch (IncorrectResultSizeDataAccessException e) {
+			log.warn('No results when looking for a version number')
+		}
+		
+		wip.versionNumber = max + 1
+		wip.recipe.releasedVersion = wip
+		
+		wip.save(failOnError: true)
+	}
+	
 	/**
 	 * Returns the information about a specific version of the Recipe
 	 * 
 	 * @param recipeId the id of the Recipe
 	 * @param versionNumber the version of the Recipe
+	 * @param loginUser the current user
 	 * @return a Map with information about the Recipe and the RecipeVersion
 	 */
 	def getRecipe(recipeId, versionNumber, loginUser) {
