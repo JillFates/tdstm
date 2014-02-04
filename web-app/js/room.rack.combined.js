@@ -81,11 +81,26 @@ function openSelectedRackLayout(){
 }
 function updateAssetBladeInfo(source,blade,position,manufacturer,moveBundle){
 	var target = source != '1' ? 'target' : 'source'
-	$("#assetTypeCreateId").val("Blade")	
+	$("#assetTypeCreateId").val("Blade")
 	$("#"+target+"BladeChassisId").val(blade)
 	$("#"+target+"BladePositionId").val(position)
 	$("#manufacturer").val(manufacturer)
 	$("#moveBundle").val(moveBundle)
+	$("#assetTypeCreateId,#manufacturer").select2();
+	
+	if($("#assetTypeCreateId").val()=='Blade'){
+		$(".bladeLabel").show()
+		$(".rackLabel").hide()
+		$(".vmLabel").hide()
+	} else if($("#assetTypeCreateId").val()=='VM') {
+		$(".bladeLabel").hide()
+		$(".rackLabel").hide()
+		$(".vmLabel").show()
+	} else {
+		$(".bladeLabel").hide()
+		$(".rackLabel").show()
+		$(".vmLabel").hide()
+	}
 }
 function listBladeDialog(source,blade,position, assign){
 	jQuery.ajax({

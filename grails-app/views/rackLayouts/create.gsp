@@ -259,7 +259,7 @@
 			        	var resp = eval('(' + e.responseText + ')');
 			       	 	alert(resp.errMsg)
 			        }else{
-		           	 	createEntityView(e,Server);updateAssetBladeInfo(source,blade,position,manufacturer,moveBundleId);
+		           	 	createEntityView(e,'Server');updateAssetBladeInfo(source,blade,position,manufacturer,moveBundleId);
 		            }
 		        },
 				onFailure:function(jqXHR, textStatus, errorThrown){
