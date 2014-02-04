@@ -11,7 +11,9 @@ databaseChangeLog = {
 			columnExists(schemaName:'tdstm', tableName:'recipe', columnName:'recipe_id')
 		}
 		sql("""
+				SET FOREIGN_KEY_CHECKS=0;
 				ALTER TABLE `tdstm`.`recipe` CHANGE COLUMN `recipe_id` `recipe_id` BIGINT(20) NOT NULL AUTO_INCREMENT  ;
+				SET FOREIGN_KEY_CHECKS=1;
 			""")
 	}
 	
@@ -22,7 +24,9 @@ databaseChangeLog = {
 			columnExists(schemaName:'tdstm', tableName:'recipe_version', columnName:'recipe_version_id')
 		}
 		sql("""
+				SET FOREIGN_KEY_CHECKS=0;
 				ALTER TABLE `tdstm`.`recipe_version` CHANGE COLUMN `recipe_version_id` `recipe_version_id` BIGINT(20) NOT NULL AUTO_INCREMENT  ;
+				SET FOREIGN_KEY_CHECKS=1;
 			""")
 	}
 }
