@@ -18,7 +18,8 @@ public enum PermissionGroup {
 	ROOMLAYOUT('room'),
 	REPORTS('Reports'),
 	USER('User'),
-	PARTY('Party')
+	PARTY('Party'),
+	COOKBOOK('Cookbook')
 	
 	String name
 	
@@ -32,7 +33,7 @@ public enum PermissionGroup {
 	
 	static list() {
 		 [NAVIGATION,ASSETENTITY,PROJECT,CONSOLE,ASSETTRACKER,CLIENTTEAMS,DASHBOARD,MOVEBUNDLE,
-			 MOVEEVENT,MODEL,PERSON,RACKLAYOUT,ROLETYPE,ROOMLAYOUT,REPORTS,USER,PARTY]
+			 MOVEEVENT,MODEL,PERSON,RACKLAYOUT,ROLETYPE,ROOMLAYOUT,REPORTS,USER,PARTY,COOKBOOK]
 		}
 	String toString() {
 		return name
