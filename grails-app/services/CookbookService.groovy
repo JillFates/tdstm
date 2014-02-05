@@ -207,6 +207,37 @@ class CookbookService {
 	}
 	
 	/**
+	 * Reverts the recipe to the previous released version
+	 * @param recipeId the id of the recipe
+	 * @param loginUser the current user
+	 * @param currentProject the current project
+	 */
+	def revertRecipe(recipeId, loginUser, currentProject) {
+//		if (!RolePermissions.hasPermission('RevertRecipe')) {
+//			throw new UnauthorizedException('User doesn\'t have a RevertRecipe permission')
+//		}
+		
+		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
+			throw new EmptyResultException();
+		}
+
+		//TODO check this checkAccess(loginUser.person, currentProject)
+		def recipe = Recipe.get(recipeId)
+		
+		if (recipe.releasedVersion == null) {
+			throw new EmptyResultException();
+		}
+		
+		def wip = RecipeVersion.findByRecipeAndVersionNumber(recipe, 0)
+		
+		if (wip != null) {
+			wip.delete(failOnError: true)
+		} else {
+			throw new EmptyResultException();
+		}
+	}
+	
+	/**
 	 * Returns the information about a specific version of the Recipe
 	 * 
 	 * @param recipeId the id of the Recipe
@@ -219,13 +250,14 @@ class CookbookService {
 			throw new EmptyResultException();
 		}
 		
+		def recipe = Recipe.get(recipeId)
+
 		if (versionNumber == null) {
-			def recipe = Recipe.get(recipeId)
 			versionNumber = recipe.releasedVersion == null ? 0 : recipe.releasedVersion.versionNumber
 		}
 
-		def recipeVersion = RecipeVersion.findByIdAndVersionNumber(recipeId, versionNumber)
-		def wip = RecipeVersion.findByIdAndVersionNumber(recipeId, 0)
+		def recipeVersion = RecipeVersion.findByRecipeAndVersionNumber(recipe, versionNumber)
+		def wip = RecipeVersion.findByRecipeAndVersionNumber(recipe, 0)
 		
 		if (recipeVersion == null) {
 			throw new EmptyResultException('Invalid recipe')
@@ -233,11 +265,10 @@ class CookbookService {
 		
 		checkAccess(loginUser.person, recipeVersion.recipe.project)
 		
-		def recipeOfVersion = recipeVersion.recipe
 		def person = recipeVersion.createdBy
 		
 		def result = [
-			'recipe' : recipeOfVersion,
+			'recipe' : recipe,
 			'recipeVersion' : recipeVersion,
 			'person' : person,
 			'wip' : wip

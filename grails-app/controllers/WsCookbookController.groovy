@@ -102,6 +102,30 @@ class WsCookbookController {
 	}
 	
 	/**
+	 * Reverts a recipe to the previous release version
+	 */
+	def revert = {
+		if (!SecurityUtils.subject.authenticated) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
+		def recipeId = params.id
+		def loginUser = securityService.getUserLogin()
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			cookbookService.revertRecipe(recipeId, loginUser, currentProject)
+
+			render(ServiceResults.success() as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		}
+	}
+	
+	/**
 	 * Obtains the information about a recipe
 	 * Check {@link UrlMappings} for the right call
 	 */

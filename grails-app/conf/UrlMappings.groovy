@@ -22,7 +22,12 @@ class UrlMappings {
 			action = [GET:"recipeList"]
 		}
 		
-		"/ws/cookbook/recipe/$id/$version" {
+		"/ws/cookbook/recipe/revert/$id" {
+			controller = "wsCookbook"
+			action = [POST:"revert"]
+		}
+		
+		"/ws/cookbook/recipe/$id/$version?" {
 			controller = "wsCookbook"
 			action = [GET:"recipe", POST:"saveRecipeVersion"]
 		}
