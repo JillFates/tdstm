@@ -1642,7 +1642,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						}	
 						
 						// Make sure we have one of the these methods to find predecessors
-						if (! (depMode || hasPredGroup || hasTaskSpec || ignorePred || findParent || deferSucc || gatherSucc ) ) {
+						if (! (depMode || hasPredGroup || hasTaskSpec || ignorePred || findParent || deferPred || gatherPred ) ) {
 							msg = "Task Spec (${taskSpec.id}) contains 'predecessor' section that requires one of the properties [mode | group | ignore | parent | taskSpec | defer | gather]"
 							log.info(msg)
 							throw new RuntimeException(msg)							
@@ -2799,6 +2799,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					def durParams = taskSpec.duration.split(',')
 					def defDur = 0
 					if (durParams.size() == 2) {
+						log.debug "createTaskFromSpec: found indirect duration (${taskSpec.duration}) with a default for task spec (${taskSpec.id})"
 						if (durParams[1]?.trim().isNumber()) {
 							defDur = NumberUtils.toInt(durParams[1].trim(), 0)
 						} else {
@@ -2836,6 +2837,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			} else {
 				task.duration = taskSpec.duration	
 			}
+			log.debug "createTaskFromSpec: Set duration to ${task.duration}"
 		}
 
 		if (taskSpec.containsKey('category') && taskSpec.category ) 
@@ -2854,7 +2856,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				task.comment = new GStringEval().toString(taskSpec.title, moveEvent)
 			}
 		} catch (Exception ex) {
-			exeptions.append("Unable to parse title (${taskSpec.title}) for taskSpec ${taskSpec.id}<br/>")
+			exceptions.append("Unable to parse title (${taskSpec.title}) for taskSpec ${taskSpec.id}<br/>")
 			task.comment = "** Error computing title **"
 		}
 			
