@@ -1,12 +1,20 @@
+<<<<<<< .mine
+// import org.codehaus.groovy.grails.commons.GrailsClassUtils
+=======
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.tdssrc.grails.GormUtil;
+>>>>>>> .r3977
 
-import org.springframework.jdbc.core.RowMapper;
+import java.sql.ResultSet
+import java.sql.SQLException
+import com.tdssrc.grails.GormUtil
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.jdbc.core.RowMapper
+
 import org.apache.shiro.SecurityUtils
 
 /**
@@ -24,6 +32,24 @@ class CookbookService {
 	def projectService
 	def partyRelationshipService
 	def securityService
+
+	/**
+	 * Checks if person can access project. If it can't then it throws an {@link UnauthorizedException}
+	 * @param person the person interested in the project
+	 * @param project the project
+	 */
+	private void checkAccess(person, project) {
+		if (person == null || project == null) {
+			return
+		}
+		
+		def peopleInProject = partyRelationshipService.getAvailableProjectStaffPersons(project)
+		if (project.id != Project.DEFAULT_PROJECT_ID
+				&& !peopleInProject.contains(person)) {
+				log.warn('Person doesn\'t have access to the project')
+			throw new UnauthorizedException('The current user doesn\'t have access to the project')
+		}
+	}
 	
 	/**
 	 * Creates a Recipe using the information passed
@@ -332,24 +358,118 @@ class CookbookService {
 		
 		return recipes
     }
-	
+
 	/**
-	 * Checks if person can access project. If it can't then it throws an {@link UnauthorizedException}
-	 * @param person the person interested in the project
-	 * @param project the project
-	 */
-	private void checkAccess(person, project) {
-		if (person == null || project == null) {
-			return
+	* Used to validate the syntax of a recipe 
+	* 
+	* @param sourceCode - the source code to validate
+	* @return a list of errors if any otherwise null where the list map matches that used by web service errors
+	* The map will consist of:
+	*    error:Integer - 
+	*    reason:String - General cause
+	*    detail:String - The specific issue, typically what the user is most interested in
+	* 1) Invalid syntax
+	* 2) Missing section
+	* 3) Missing property
+	* 4) Invalid group reference
+	* 5) Duplicate reference
+	*/
+	List<Map> validateSyntax( sourceCode ) {
+		def errorList = []
+		def recipe
+
+		try {
+			recipe = Eval.me("[${sourceCode}]")
+		} catch (e) {
+			errorList << [ error: 1, reason: 'Invalid syntax', detail: e.getMessage().replaceAll(/[\r]/, '<br/>') ]
 		}
-		
-		def peopleInProject = partyRelationshipService.getAvailableProjectStaffPersons(project)
-		if (project.id != Project.DEFAULT_PROJECT_ID
-				&& !peopleInProject.contains(person)) {
-				log.warn('Person doesn\'t have access to the project')
-			throw new UnauthorizedException('The current user doesn\'t have access to the project')
+
+		if (! errorList) {
+			// If the syntax compiled then we can start examining different sections of the recipe for common mistakes
+
+			def index = 0
+
+			// Note that Groups are optional
+			def hasGroups = recipe.containsKey('groups')
+			def groupKeys = [:]
+			def classNames = ['application','device','database','storage']
+			if ( hasGroups ) {
+				// Check to see if groups has expected elements
+				recipe.groups.each { group ->
+					index++
+					if (group.containsKey('name')) {
+						// Check for spaces
+						if (group.name.contains(' ')) {
+							errorList << [ error: 1, reason: 'Invalid syntax',
+								detail: "Group name '${group.name}' in element ${index} contains unsupported space character(s)" ]
+						}
+						if (group.name.trim() == '') {
+							errorList << [ error: 1, reason: 'Invalid syntax',
+								detail: "Group name '${group.name}' in element ${index} is blank" ]
+						}
+						if (groupKeys.containsKey(group.name)) {
+							errorList << [ error: 5, reason: 'Duplicate group', 
+								detail: "Group name '${group.name}' duplicated in group ${groupKeys[group.name]} and ${index}" ]
+						}
+						groupKeys.put(group.name, index)
+					}
+					if ( group.containsKey('filter') ) {
+						if (group.filter instanceof Map) {
+							if ( group.filter.containsKey('class') ) {
+								// Make sure that the filter has a class and proper value
+								if (! classNames.contains( group.filter.class.toLowerCase() ) ) {
+									errorList << [ error: 1, reason: 'Invalid syntax', 
+										detail: "Group '${group.name}' in element ${index} has invalid filter.class value. Allowed values [${classNames.join(',')}]" ]
+								}
+							} else {
+								errorList << [ error: 3, reason: 'Missing property', 
+									detail: "Group '${group.name}' in element ${index} is missing required 'filter.class' property" ]
+							}
+							if ( group.filter.containsKey('taskSpec') ) {
+								errorList << [ error: 1, reason: 'Invalid syntax', 
+									detail: "Group '${group.name}' in element ${index} references a taskSpec which is not supported in groups" ]
+							}
+						} else {
+							errorList << [ error: 1, reason: 'Invalid syntax', 
+								detail: "Group '${group.name}' in element ${index} 'filter' element not properly defined as a map" ]
+						}
+					} else {
+						errorList << [ error: 3, reason: 'Missing property', 
+							detail: "Group ${group.name} in element ${index} is missing require section 'filter'" ]
+					}
+				}
+
+				// Check to see that any include/exclude references match defined groups
+				index = 0
+				recipe.groups.each { group -> 
+					index++
+					if (group.containsKey('filter') && group.filter instanceof Map ) {
+						['exclude','include'].each { ei -> 
+							if (group.filter.containsKey(ei)) {
+								def eiList = group.filter[ei] instanceof java.util.ArrayList ? group.filter[ei] : [ group.filter[ei] ]
+								eiList.each { gName -> 
+									if (! groupKeys.containsKey(gName) ) {
+										errorList << [ error: 4, reason: 'Invalid group reference', 
+											detail: "Group ${group.name} in element ${index} 'filter.${ei}' references undefined group ${gName}" ]
+
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if ( ! recipe.containsKey('tasks')) {
+				errorList << [ error: 2, reason: 'Missing section', detail: 'Recipe is missing required \'tasks\' section' ]
+			} else {
+				// Check for Task Names
+			}
 		}
-	}
+
+		return (errorList ?: null)
+    }
+
 }
 
 class RecipeMapper implements RowMapper {
