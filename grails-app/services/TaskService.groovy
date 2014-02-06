@@ -54,7 +54,7 @@ class TaskService implements InitializingBean {
 
 	def dataSource
 	def jdbcTemplate
-	// def namedParameterJdbcTemplate
+	def namedParameterJdbcTemplate
 	def partyRelationshipService
 	def personService
 	def securityService
@@ -4064,6 +4064,71 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 		}
 		return teamTaskMap
+	}
+
+	/**
+	 * Publishes the asset comment for a specific task
+	 * 
+	 * @param taskId the task id
+	 * @param loginUser the current user
+	 * @param currentProject the current project
+	 * @return the number of affected tasks
+	 */
+	def publish(taskId, loginUser, currentProject) {
+		return this.basicPublish(taskId, loginUser, currentProject, true, "PublishTasks")
+	}
+
+	/**
+	 * Unpublishes the asset comment for a specific task
+	 * 
+	 * @param taskId the task id
+	 * @param loginUser the current user
+	 * @param currentProject the current project
+	 * @return the number of affected tasks
+	 */
+	def unpublish(taskId, loginUser, currentProject) {
+		return this.basicPublish(taskId, loginUser, currentProject, false, "UnpublishTasks")
+	}
+
+	/**
+	 * Publishes/Unpublishes the asset comment for a specific task
+	 * 
+	 * @param taskId the task id
+	 * @param loginUser the current user
+	 * @param currentProject the current project
+	 * @param shouldPublish if it should publish or unpublish
+	 * @param permission the requested permission
+	 * @return the number of affected tasks
+	 */
+	private def basicPublish(taskId, loginUser, currentProject, shouldPublish, permission) {
+		if (!RolePermissions.hasPermission(permission)) {
+			throw new UnauthorizedException("User doesn't have a " + permission + " permission")
+		}
+		
+		log.info('ENTRO')
+		if (taskId == null || !taskId.isNumber() || currentProject == null) {
+			throw new EmptyResultException();
+		}
+		
+		def task = TaskBatch.get(taskId)
+
+		if (task == null) {
+			throw new EmptyResultException();
+		}
+		
+		//TODO check access task, currentProject
+		log.info((task.isPublished == shouldPublish))
+		if (task.isPublished == shouldPublish) {
+			throw new IllegalArgumentException('The task is already in that state')
+		}
+		
+		
+		def affectedComments = namedParameterJdbcTemplate.update('UPDATE asset_comment SET is_published = :shouldPublish WHERE task_batch_id = :taskId', ['taskId': taskId, 'shouldPublish' : shouldPublish])
+		
+		task.isPublished = shouldPublish
+		task.save()
+		
+		return affectedComments
 	}
 }
 

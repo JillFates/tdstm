@@ -51,7 +51,6 @@ class TaskBatch {
 		infoLog(blank:true, nullable:false)
 
 		createdBy(nullable:false)
-		lastEditedBy(nullable:true)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
 	}

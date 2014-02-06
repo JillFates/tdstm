@@ -41,7 +41,17 @@ class UrlMappings {
 			controller = "wsCookbook"
 			action = [POST:"createRecipe"]
 		}
-		
+
+		"/ws/task/$id/publish" {
+			controller = "wsTask"
+			action = [POST:"publish"]
+		}
+
+		"/ws/task/$id/unpublish" {
+			controller = "wsTask"
+			action = [POST:"unpublish"]
+		}
+
 		"/maint/backd00r" {
 			controller = "auth"
 			action = [GET:"maintMode"]
