@@ -18,6 +18,9 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tds.asset.Application
+import com.tds.asset.AssetDependency
+import com.tds.asset.AssetDependencyBundle
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCableStatus
@@ -1329,6 +1332,122 @@ class ReportsController {
 		def moveBundleList = MoveBundle.findAllByProject(projectInstance)
 		def moveBundleId = securityService.getUserCurrentMoveBundleId()
 		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId]
+	}
+	/**
+	 * Used to display application selection criteria page.
+	 */
+	def applicationProfiles ={
+		def project = securityService.getUserCurrentProject()
+		def moveBundleList = MoveBundle.findAllByProject(project)
+		def moveBundleId = securityService.getUserCurrentMoveBundleId()
+		def smeList = []
+		def smeListByBundle = []
+		if(moveBundleId){
+			def currentBundle = MoveBundle.get(moveBundleId)
+			smeList = Application.findAllByMoveBundleAndProject(currentBundle,project)
+		}else{
+			smeList = Application.findAllByProject(project)
+		}
+		smeList.each{
+			if(it.sme)
+				smeListByBundle << (it.sme)
+		}
+		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId, smeList:smeListByBundle.unique()]
+	}
+	/**
+	 * Used to populate sme select based on the bundle Selected
+	 * @param bundle
+	 * @render template
+	 */
+	def generateSmeByBundle = {
+		def project = securityService.getUserCurrentProject()
+		def moveBundleId=params.bundle
+		def smeList = []
+		def smeListByBundle = []
+		if(moveBundleId == 'useForPlanning'){
+			smeList  = Application.findAllByProject(project)?.sme
+		}else{
+			def currentBundle = MoveBundle.get(moveBundleId)
+			smeList = Application.findAllByMoveBundleAndProject(currentBundle,project)?.sme
+		}
+		smeListByBundle = smeList.each{
+			if(it.sme)
+				smeListByBundle << (it.sme)
+		}
+		render(template:"smeSelectByBundle", model:[smeList:smeListByBundle.unique()])
+	}
+	/**
+	 * Used to generate Application Profiles
+	 * @param bundle
+	 * @param sme
+	 * @return list of applications
+	 */
+	def generateApplicationProfiles = {
+		def project = securityService.getUserCurrentProject()
+		def currentSme 
+		def applicationList = []
+		def currentBundle
+		def smeListByBundle =[]
+		//Used to get all the application of a project which has sme.
+		def smeList = Application.findAllByProject(project)
+		//Used to list out all the sme of a project
+		smeList.each{
+			if(it.sme)
+			smeListByBundle << (it.sme)
+		}
+		smeListByBundle.unique()
+		
+		//checking various condition
+		if(params.moveBundle == 'useForPlanning'){		 //if user haven't selected any bundle
+			if(params.smeByModel!='null'){             	 //if user haven't selected any sme
+				currentSme = Person.get(params.smeByModel)
+				applicationList = Application.findAllByProjectAndSme(project,currentSme)
+			}else {										 //if user selects any sme
+				applicationList = Application.findAllByProjectAndSmeInList(project,smeListByBundle)
+			}
+		}else{ 											 //if user selects any bundle
+			currentBundle = MoveBundle.get(params.moveBundle)
+			if(params.smeByModel!='null'){               //if user haven't selected any sme
+				currentSme = Person.get(params.smeByModel)
+				applicationList = Application.findAllByMoveBundleAndProject(currentBundle,project)?.findAll{it.sme==currentSme}
+			}else if(smeListByBundle){									    //if user selects any sme
+				applicationList = Application.findAll("from Application where project = :project and moveBundle = :bundle and sme in (:smes)",[project:project,bundle:currentBundle,smes:smeListByBundle])
+			}
+		}
+		ArrayList appList = new ArrayList()
+		//TODO:need to write a service method since the code used below is almost similar to application show.
+		applicationList.each{
+			def assetEntity = AssetEntity.get(it.id)
+			def applicationInstance = Application.get( it.id )
+			def assetComment 
+			def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
+			def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
+			if(AssetComment.find("from AssetComment where assetEntity = ${applicationInstance?.id} and commentType = ? and isResolved = ?",['issue',0])){
+				assetComment = "issue"
+			} else if(AssetComment.find('from AssetComment where assetEntity = '+ applicationInstance?.id)){
+				assetComment = "comment"
+			} else {
+				assetComment = "blank"
+			}
+			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
+			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)	
+			def appMoveEvent = AppMoveEvent.findAllByApplication(applicationInstance)
+		    def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
+			def appMoveEventlist = AppMoveEvent.findAllByApplication(applicationInstance).value
+			
+			def shutdownBy = assetEntity.shutdownBy  ? assetEntityService.resolveByName(assetEntity.shutdownBy) : ''
+			def startupBy = assetEntity.startupBy  ? assetEntityService.resolveByName(assetEntity.startupBy) : ''
+			def testingBy = assetEntity.testingBy  ? assetEntityService.resolveByName(assetEntity.testingBy) : ''
+			
+			appList.add([ app : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, 
+			  redirectTo : params.redirectTo, assetComment:assetComment, assetCommentList:assetCommentList,
+			  appMoveEvent:appMoveEvent, moveEventList:moveEventList, appMoveEvent:appMoveEventlist, project:project,
+			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle ,prefValue:prefValue, 
+			  shutdownBy:shutdownBy, startupBy:startupBy, testingBy:testingBy,
+			  errors:params.errors])
+		}
+		
+		return [applicationList:appList, moveBundle:currentBundle , sme:currentSme?:'All' , project:project]
 	}
 	def generateApplicationConflicts = {
 		def project = securityService.getUserCurrentProject()

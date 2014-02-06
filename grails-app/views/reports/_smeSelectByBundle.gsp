@@ -1,0 +1,1 @@
+<g:select from="${smeList}" id="smeByModel" name="smeByModel" style="width:178px;" optionKey="id" optionValue="${{it.lastNameFirst}}" noSelection="${['null':'All']}"/>
