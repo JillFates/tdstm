@@ -11,6 +11,7 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource) {
     $scope.recipes = Recipes.get({archived: 'n', context: 'All', project: 'master'}, function(){
         $scope.totalItems = $scope.recipes.data.list.length;
         $scope.gridData = ($scope.totalItems) ? $scope.recipes.data.list : [{'message': 'No results found'}];
+        $scope.switchGridIfNecessary();
     });
 
     // This should be called whenever we need to update the recipes Grid
@@ -77,7 +78,7 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource) {
     $scope.gridOptions = {
         data: 'gridData',
         multiSelect: false,
-        selectedItems: $scope.mySelections,
+        //selectedItems: $scope.mySelections,
         columnDefs: 'colDefinition'
         //afterSelectionChange: function(){
         //    $scope.change1();

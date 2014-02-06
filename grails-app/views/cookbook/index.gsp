@@ -41,7 +41,6 @@
 					</div>
 				</div>
 			</div>
-			<div>{{requestedRecipe}}</div>
 			<div class="row-fluid clearfix">
 				<div class="col-md-12">
 					<div class="gridStyle" ng-grid="gridOptions"></div>
