@@ -1365,12 +1365,12 @@ class ReportsController {
 		def smeList = []
 		def smeListByBundle = []
 		if(moveBundleId == 'useForPlanning'){
-			smeList  = Application.findAllByProject(project)?.sme
+			smeList = Application.findAllByProject(project)
 		}else{
 			def currentBundle = MoveBundle.get(moveBundleId)
-			smeList = Application.findAllByMoveBundleAndProject(currentBundle,project)?.sme
+			smeList = Application.findAllByMoveBundleAndProject(currentBundle,project)
 		}
-		smeListByBundle = smeList.each{
+		smeList.each{
 			if(it.sme)
 				smeListByBundle << (it.sme)
 		}
