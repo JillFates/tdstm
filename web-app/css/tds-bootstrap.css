@@ -2,6 +2,30 @@
 
 /* Cookbook */
 
+.body{
+	float:none;
+	margin:0;
+}
+
+#contextSelector{
+	margin:5px 0 0 0;
+}
+
+.nav{
+	background: transparent;
+	border: none;
+	margin-top: 0;
+	padding: 0;
+	border-bottom: 1px solid #ddd;
+	padding-left: 0;
+	margin-bottom: 0;
+	list-style: none;
+}
+
+ul{
+	padding-left: 25px;
+}
+
 .paginationWrapper{
 	text-align: center;
 }
@@ -24,7 +48,7 @@
 	text-align: center;
 }
 
-.tabContainer{
+.tab-content{
     padding: 15px;
     border-left: 1px solid #ddd;
     border-right: 1px solid #ddd;
@@ -65,14 +89,19 @@ table{
 }
 
 ul.logs{
-	height:164px;
+	height:161px;
 	border: 1px solid #ddd;
+	padding:10px 0 10px 30px;
 	margin:0;
 	overflow-y: auto;
 }
 
 form.groups .form-group{
 	margin-right:15px;
+}
+
+form.groups{
+	margin-bottom: 1em;
 }
 
 #testOptions{
@@ -104,6 +133,10 @@ form.groups .form-group{
 	display: table;
 	height: 100%;
 	width: 100%;
+}
+
+.ngCell > div{
+	height: 100%;
 }
 
 .actions{
