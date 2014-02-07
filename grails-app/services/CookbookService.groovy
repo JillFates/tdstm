@@ -234,6 +234,27 @@ class CookbookService {
 	}
 	
 	/**
+	 * Validates the syntax for sourceCode for the current loginUser and currentProject
+	 * 
+	 * @param sourceCode the source code to be validated
+	 * @param loginUser the current user
+	 * @param currentProject the current project
+	 * @return the list of errors found or empty list if everything looks fine
+	 */
+	def validateSyntaxForUser(sourceCode, loginUser, currentProject) {
+		if (!RolePermissions.hasPermission('EditRecipe')) {
+			throw new UnauthorizedException('User doesn\'t have a EditRecipe permission')
+		}
+				
+		if (currentProject == null) {
+			throw new EmptyResultException();
+		}
+		
+		def validationResult = this.validateSyntax(sourceCode);
+		return validationResult
+	}
+	
+	/**
 	 * Returns the information about a specific version of the Recipe
 	 * 
 	 * @param recipeId the id of the Recipe

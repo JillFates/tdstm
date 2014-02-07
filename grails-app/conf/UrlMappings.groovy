@@ -42,6 +42,11 @@ class UrlMappings {
 			action = [POST:"createRecipe"]
 		}
 
+		"/ws/cookbook/recipe/validateSyntax" {
+			controller = "wsCookbook"
+			action = [POST:"validateSyntax"]
+		}
+
 		"/ws/task/$id/publish" {
 			controller = "wsTask"
 			action = [POST:"publish"]

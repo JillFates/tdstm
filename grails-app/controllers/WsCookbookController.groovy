@@ -199,4 +199,37 @@ class WsCookbookController {
 			ServiceResults.methodFailure(response)
 		}
 	}
+	
+	/**
+	 * Validates the syntax of the source code of a recipe
+	 * Check {@link UrlMappings} for the right call
+	 */
+	def validateSyntax = {
+		if (!SecurityUtils.subject.authenticated) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
+		def sourceCode = params.sourceCode
+		def loginUser = securityService.getUserLogin()
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			
+			def results = cookbookService.validateSyntaxForUser(sourceCode, loginUser, currentProject)
+
+			if (results.isEmpty()) {
+				render(ServiceResults.success() as JSON)
+			} else {
+				render(ServiceResults.errors(results) as JSON)
+			}
+
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (IllegalArgumentException e) {
+			ServiceResults.methodFailure(response)
+		}
+	}
 }

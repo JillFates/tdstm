@@ -35,6 +35,19 @@ class ServiceResults {
 	}
 	
 	/**
+	 * Returns a error response to be serialized as json
+	 * @param object an array or map to be set as errors
+	 * @return the response map
+	 */
+	static def errors(object) {
+		def renderMap = [:]
+		renderMap.status = 'error'
+		renderMap.errors = object ?: []
+		
+		return renderMap
+	}
+	
+	/**
 	 * Sends an unauthorized error
 	 * @param response the response object
 	 */
