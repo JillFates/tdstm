@@ -779,3 +779,6 @@ th.desc{
 .type_h{
 	display: block;
 }
+br.page-break-after {
+	page-break-after: always;
+}

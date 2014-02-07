@@ -1340,19 +1340,16 @@ class ReportsController {
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		def moveBundleId = securityService.getUserCurrentMoveBundleId()
-		def smeList = []
-		def smeListByBundle = []
+		def smeList ;
 		if(moveBundleId){
 			def currentBundle = MoveBundle.get(moveBundleId)
-			smeList = Application.findAllByMoveBundleAndProject(currentBundle,project)
+			smeList = Application.findAllByMoveBundleAndProject(currentBundle,project, [sort:"sme.lastName"])?.sme 
 		}else{
-			smeList = Application.findAllByProject(project)
+			smeList = Application.findAllByProject(project, [sort:"sme.lastName"])?.sme 
 		}
-		smeList.each{
-			if(it.sme)
-				smeListByBundle << (it.sme)
-		}
-		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId, smeList:smeListByBundle.unique()]
+		smeList.removeAll([null])
+		//smeList.sort { sme1, sme2 -> sme1.lastName <=> sme2.lastName ?: sme1.firstName <=> sme2.firstName }
+		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId, smeList:smeList.unique()]
 	}
 	/**
 	 * Used to populate sme select based on the bundle Selected
@@ -1435,6 +1432,9 @@ class ReportsController {
 		    def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 			def appMoveEventlist = AppMoveEvent.findAllByApplication(applicationInstance).value
 			
+			//field importance styling for respective validation.
+			def validationType = assetEntity.validation
+			def configMap = assetEntityService.getConfig('Application',validationType)
 			def shutdownBy = assetEntity.shutdownBy  ? assetEntityService.resolveByName(assetEntity.shutdownBy) : ''
 			def startupBy = assetEntity.startupBy  ? assetEntityService.resolveByName(assetEntity.startupBy) : ''
 			def testingBy = assetEntity.testingBy  ? assetEntityService.resolveByName(assetEntity.testingBy) : ''
@@ -1443,7 +1443,7 @@ class ReportsController {
 			  redirectTo : params.redirectTo, assetComment:assetComment, assetCommentList:assetCommentList,
 			  appMoveEvent:appMoveEvent, moveEventList:moveEventList, appMoveEvent:appMoveEventlist, project:project,
 			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle ,prefValue:prefValue, 
-			  shutdownBy:shutdownBy, startupBy:startupBy, testingBy:testingBy,
+			  config:configMap.config, customs:configMap.customs,shutdownBy:shutdownBy, startupBy:startupBy, testingBy:testingBy,
 			  errors:params.errors])
 		}
 		
