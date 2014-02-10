@@ -46,7 +46,11 @@ databaseChangeLog = {
 		}
 		sql("ALTER TABLE tdstm.asset_cable_map ADD COLUMN asset_loc VARCHAR(10) DEFAULT 'S'")
 	}
-	
+	//This set of database change to update asset_los filed with default 'S'.
+	changeSet(author: "lokanada", id: "20140210 TM-2410-10") {
+		comment("updates the status to Cabled for Assigned")
+		sql("UPDATE tdstm.asset_cable_map SET asset_loc = 'S'")
+	}
 	//TODO :@John, enable below changeSets after ensuring the data transferred to new columns.
 	/*// This set of Database change to drop to_asset_rack column from asset_cable_map table.
 	changeSet(author: "lokanada", id: "20131211 TM-2381-1") {

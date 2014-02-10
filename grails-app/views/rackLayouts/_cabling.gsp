@@ -39,7 +39,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
     $scope.showEditRow = function(id){
 		var asset = $("#fromAsset_"+id).val();
 		var type = $("#connectType_"+id).val();
-		var roomType = $("#roomType_"+id).val();
+		var roomType = $("#roomType").val();
 	    if(tempId!='' && id!=tempId){
     		$scope.cancelRow(tempId);
 		    $scope.row[id] = $scope.row[id] == 'h' ? 's' : 'h';
@@ -58,7 +58,6 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 			$(".powerDiv").hide();
 			$scope.getAsset(id, asset, type, roomType)
         }
-		$("#cableRoomType_"+roomType+"_"+id).attr('checked',true)
 	    tempId=id
     };
 	var assetTemp = ''
@@ -126,7 +125,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
     				          'color':$("#color_"+cableId).val(), 'connectorType':$("#connectType_"+cableId).val(),'assetFromId':$("#assetFromId_"+cableId).val(),
     				          'modelConnectorId':$("#modelConnectorId_"+cableId).val(),'staticConnector':$("input:radio[name=staticConnector]:checked").val(),
     				          'cableComment':$("#cableComment_"+cableId).val(), 'cableLength':$("#cableLength_"+cableId).val(),
-    				          'roomType':$("input:radio[name=cableRoomType_"+cableId+"]:checked").val()},
+    				          'roomType':$("#roomType").val()},
     			method: "POST"
     		}).success (function(resp) {
         		$scope.cancelRow(cableId)
@@ -156,6 +155,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 <script type="text/javascript">
 	if(!${assetCablingDetails[0]?.hasImageExist}){
 		$("#cablingPanel").css("height",${assetCablingDetails[0].usize? assetCablingDetails[0].usize*30+2 : 0}+'px')
+		$("#roomTypeDiv").css("margin-top",${assetCablingDetails[0].usize? assetCablingDetails[0].usize*10 : 0}+'px')
 		$("#cablingPanel").css("background-color","LightGreen")
 	} else {
 		$("#rearImage_${assetCablingDetails[0]?.model}").show()
@@ -167,6 +167,11 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 	}); 
 
 </script>
+<div id="roomTypeDiv" style="position: relative;float:right;margin-top: 20px;">
+      	<label><input type="radio" name="cableRoomType" id="cableRoomType_S" value="S" ${isTargetRoom? '':'disabled="disabled"' } ${roomType=='S'? 'checked="checked"' :'' } onclick="openCablingDiv('${assetId}',this.value)"/>Current</label><br>
+		<label><input type="radio" name="cableRoomType" id="cableRoomType_T" value="T" ${isTargetRoom? '':'disabled="disabled"' } ${roomType=='T'? 'checked="checked"' :'' } onclick="openCablingDiv('${assetId}',this.value)"/>Target</label>
+		<input type="hidden" id="roomType" name="roomType"  value="${roomType}"/>
+</div>
 <div id="cablingPanel" style="height: auto; ">
 	<g:if test="${assetCablingDetails}">
 		<g:each in="${assetCablingDetails}" var="assetCabling">
@@ -183,7 +188,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 			</g:if>
 		</g:each>
 	</g:if>
-	</div>
+</div>
 <div id="app" ng-app="app" ng-controller="Ctrl">
    <table id="cableTable" class="table table-bordered table-hover table-condensed" style="width:auto;display:none;">
     <tr style="font-weight: bold">
@@ -194,9 +199,6 @@ app.controller('Ctrl', function($scope, $filter, $http) {
       <th>Length</th>
       <th>Comment</th>
       <th>Assigned To</th>
-      <g:if test="${isTargetRoom}">
-      	<th>Location/Room</th>
-      </g:if>
     </tr>
     <tr ng-repeat="cable in cables" >
       <td ng-click="showEditRow(cable.cableId)"><span>{{ cable.type }}</span></td>
@@ -233,7 +235,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
       	 </span>
       </td>
       <td>
-      	<span ng-hide="showRow(cable.cableId);" class="power_{{power[cable.cableId]}}" style="display:none;" onclick="javascript:openCablingDiv({{cable.fromAssetId}})">
+      	<span ng-hide="showRow(cable.cableId);" class="power_{{power[cable.cableId]}}" style="display:none;" onclick="javascript:openCablingDiv({{cable.fromAssetId}},'S')">
       		{{ cable.fromAsset }}
       	</span>
       	<span ng-hide="showRow(cable.cableId);" style="display:none;" class="type_{{power[cable.cableId]}}">
@@ -265,18 +267,8 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 			    <input type="hidden" name="connectType_{{cable.cableId}}" id="connectType_{{cable.cableId}}" value="{{cable.type}}"/>
 		     </span>
       </td>
-      <g:if test="${isTargetRoom}">
-	      <td>
-	      	<span ng-hide="showRow(cable.cableId)">{{cable.locRoom}}</span>
-	      	<span ng-show="showRow(cable.cableId)">
-		      	<input type="radio" name="cableRoomType_{{cable.cableId}}" id="cableRoomType_S_{{cable.cableId}}" value="S" onclick="showSourceTargetAssets(this.value,{{cable.cableId}})">Current</input>&nbsp;
-				<input type="radio" name="cableRoomType_{{cable.cableId}}" id="cableRoomType_T_{{cable.cableId}}" value="T" onclick="showSourceTargetAssets(this.value,{{cable.cableId}})">Target</input>&nbsp;
-				<input type="hidden" name="roomType_{{cable.cableId}}" id="roomType_{{cable.cableId}}" value="{{cable.roomType}}"/>
-			</span>
-	      </td>
-      </g:if>
       <td ng-show="showRow(cable.cableId)">
-     	<img src="${resource(dir:'images',file:'delete.png')}" class="pointer btn" ng-click="cancelRow(cable.cableId)" style="width:18px;"/>
+     	<img src="${resource(dir:'images',file:'delete.png')}" id="cancelButton_{{cable.cableId}}" class="pointer btn" ng-click="cancelRow(cable.cableId)" style="width:18px;"/>
 		<img src="${resource(dir:'images',file:'check12.png')}" class="pointer btn" ng-click="submitAction(cable.cableId)" style="width:18px;"/>
       </td>
     </tr>

@@ -646,13 +646,19 @@ class RackLayoutsController {
 				currentBundle = moveBundleList[0]?.id?.toString()
 				isCurrentBundle = false
 			}
+			def roomType = params.roomType 
 			
 		def assetId = params.assetId
 		def assetEntity = assetId ? AssetEntity.get(assetId) : null
 		def assetCableMapList
 		def title =  ""
 		if( assetEntity ){
-			assetCableMapList = AssetCableMap.findAllByAssetFrom( assetEntity )
+			if(roomType =='T'){
+				assetCableMapList = assetEntityService.createOrFetchTargetAssetCables(assetEntity)
+			}else {
+				assetCableMapList = AssetCableMap.findAllByAssetFromAndAssetLoc( assetEntity , 'S')
+			}
+			
 			title = assetEntity.assetName+" ( "+assetEntity?.model?.manufacturer+" / "+assetEntity.model+" )"
 		}
 		def isTargetRoom = assetEntity.roomTarget ? true :false
@@ -697,7 +703,8 @@ class RackLayoutsController {
 			powerHouse << [(it.id):(it.assetFromPort.type=='Power'? 'h': 's')]
 		}
 		render(template:"cabling", model:[assetCablingDetails:assetCablingDetails, currentBundle:currentBundle, assetCablingMap:(assetCablingMap as JSON),
-										  models:models,assetRows:(assetRows as JSON),cableTypes:(powerHouse as JSON),isTargetRoom:isTargetRoom])
+										  models:models,assetRows:(assetRows as JSON),cableTypes:(powerHouse as JSON),isTargetRoom:isTargetRoom, 
+										  assetId:assetId, roomType:roomType])
 	}
 	/*
 	 * Return modelConnectorList to display at connectors dropdown in  cabling screen
@@ -720,7 +727,7 @@ class RackLayoutsController {
 		def modelConnectorMap =[:]
 		currRoomRackAssets.each{asset ->
 			def modelConnectMapList=[]
-			def modelConnectList = AssetCableMap.findAllByAssetFrom(asset)?.findAll{it.assetFromPort.type == jsonInput.type }
+			def modelConnectList = AssetCableMap.findAllByAssetFromAndAssetLoc(asset,roomType)?.findAll{it.assetFromPort.type == jsonInput.type }
 			modelConnectList.each{
 				modelConnectMapList << ['value': it.assetFromPort.id, 'text': it.assetFromPort.label]
 			}
@@ -751,10 +758,11 @@ class RackLayoutsController {
 			assetCableMap = AssetCableMap.findById( assetCableId )
 		
 			if(connectorType != "Power"){
-				def fromAssetCableMap = AssetCableMap.findByAssetToAndAssetToPort( assetCableMap.assetFrom, assetCableMap.assetFromPort )
+				def fromAssetCableMap = AssetCableMap.find("from AssetCableMap where assetTo=? and assetToPort=? and assetLoc=?",
+													[assetCableMap.assetFrom,assetCableMap.assetFromPort,jsonInput.roomType])
 				if(fromAssetCableMap){
 					AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus=?, assetTo=null,assetToPort=null, cableColor=null
-												where assetTo = ? and assetToPort = ?""",[status, assetCableMap.assetFrom, assetCableMap.assetFromPort])
+												where assetTo = ? and assetToPort = ? and assetLoc=?""",[status, assetCableMap.assetFrom, assetCableMap.assetFromPort, jsonInput.roomType])
 			}
 			}
 			switch(actionType){
@@ -768,10 +776,11 @@ class RackLayoutsController {
 							if(assetEntity?.model){
 								assetTo = assetEntity 
 								toConnector = ModelConnector.findById( jsonInput.modelConnectorId )
-								toCableId = AssetCableMap.findByAssetToPortAndAssetTo(toConnector, assetTo)
+								toCableId = AssetCableMap.find("from AssetCableMap where assetTo=? and assetToPort=? and assetLoc=?",
+													[assetTo,toConnector,jsonInput.roomType])
 								AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus=?,assetTo=null,
 																assetToPort=null, cableColor=null
-																where assetTo = ? and assetToPort = ? """,[status, assetTo, toConnector])
+																where assetTo = ? and assetToPort = ? and assetLoc=?""",[status, assetTo, toConnector,jsonInput.roomType])
 							}
 						}
 					} else {
@@ -793,7 +802,8 @@ class RackLayoutsController {
 			assetCableMap.assetLoc= jsonInput.roomType
 			if(assetCableMap.save(flush:true)){
 				if(assetTo && connectorType != "Power"){
-					def toAssetCableMap = AssetCableMap.findByAssetFromAndAssetFromPort( assetTo, toConnector )
+					def toAssetCableMap = AssetCableMap.find("from AssetCableMap where assetFrom=? and assetFromPort=? and assetLoc=?",
+													[assetTo,toConnector,jsonInput.roomType])
 					toAssetCableMap.cableStatus = status
 					toAssetCableMap.assetTo = assetCableMap.assetFrom
 					toAssetCableMap.assetToPort = assetCableMap.assetFromPort

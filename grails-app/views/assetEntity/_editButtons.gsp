@@ -21,5 +21,5 @@
 	 <span class="button"><input type="button" class="delete" value="Cancel" onclick="$('#editEntityView').dialog('close');"/> </span>
 </g:else>
 <g:if test="${assetEntity && assetEntity?.assetType in AssetType.getPhysicalServerTypes() && assetEntity?.model && assetEntity.isCableExist()}">
- 	<span class="button"><input type="button" id="cableId" name="cableId" class="edit" value="Cable" onclick="openCablingDiv('${value}')" /> </span>
+ 	<span class="button"><input type="button" id="cableId" name="cableId" class="edit" value="Cable" onclick="openCablingDiv('${value}','S')" /> </span>
 </g:if>

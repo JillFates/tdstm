@@ -700,4 +700,29 @@ class AssetEntityService {
 		}
 		return [warnMsg:warnMsg, cablingSkipped:cablingSkipped, cablingUpdated:cablingUpdated]
 	}
+	/**
+	 * Used to create or fetch target asset cables.
+	 *
+	 */
+	def createOrFetchTargetAssetCables(assetEntity){
+		def cableExist = AssetCableMap.findAllByAssetFromAndAssetLoc(assetEntity,'T')?:[]
+		if(!cableExist){
+			def sourceCables=AssetCableMap.findAllByAssetFromAndAssetLoc(assetEntity,'S')
+			sourceCables.each{
+				def targetCable = new AssetCableMap()
+				targetCable.cable = it.cable
+				targetCable.cableStatus = AssetCableStatus.EMPTY
+				targetCable.assetFrom = it.assetFrom
+				targetCable.assetFromPort = it.assetFromPort
+				targetCable.assetLoc= 'T'
+				if(!targetCable.save(flush:true)){
+					def etext = "Unable to create AssetCableMap" +
+	                GormUtil.allErrorsString( targetCable )
+					println etext
+				}
+				cableExist << targetCable
+			}
+		}
+		return cableExist
+	}
 }

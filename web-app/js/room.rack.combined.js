@@ -133,8 +133,11 @@ function updateBladeEditForm(source,blade,position, bundleId){
  * Cabling script
  *******************************************************************************************************/
 var click = 1
-function openCablingDiv( assetId ){
-	new Ajax.Request(contextPath+'/rackLayouts/getCablingDetails?assetId='+assetId,{asynchronous:true,evalScripts:true,onComplete:function(e){showCablingDetails(e,assetId);}})
+function openCablingDiv( assetId , type){
+	if(!type)
+		type='S'
+			
+	new Ajax.Request(contextPath+'/rackLayouts/getCablingDetails?assetId='+assetId+'&roomType='+type,{asynchronous:true,evalScripts:true,onComplete:function(e){showCablingDetails(e,assetId);}})
 }
 function showCablingDetails( e, assetId ){
 	$("#cablingDialogId").html(e.responseText);
@@ -147,13 +150,6 @@ function showCablingDetails( e, assetId ){
 	},500);
 }
 
-function showSourceTargetAssets(value,cableId){
-	var asset = $("#fromAsset_"+cableId).val();
-	var type = $("#connectType_"+cableId).val();
-	var scope = angular.element($('#app')).scope();
-	if(type!='Power')
-		scope.getAsset(cableId, asset, type, value)
-}
 function changeStatus(cableId){
 	$('#status_'+cableId+' option[value="Cabled"]').attr('selected','selected');
 }
