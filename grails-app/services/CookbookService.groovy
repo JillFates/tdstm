@@ -74,6 +74,8 @@ class CookbookService {
 		}
 		
 		def clonedVersion = null
+		def defaultSourceCode = ''
+		def defaultChangelog = ''
 		
 		if (cloneFrom != null) {
 			if (clonedFrom.isNumber()) {
@@ -82,6 +84,12 @@ class CookbookService {
 			} else {
 				log.info('Cloned from is not a number')
 				throw new EmptyResultException()
+			}
+		} else {
+			def defaultRecipe = Recipe.findByNameAndProject('Default', Project.getDefaultProject())
+			if (defaultRecipe != null && defaultRecipe.releasedVersion != null) {
+				defaultSourceCode = defaultRecipe.releasedVersion.sourceCode
+				defaultChangelog = defaultRecipe.releasedVersion.changelog
 			}
 		}
 		
@@ -104,6 +112,9 @@ class CookbookService {
 			recipeVersion.cloneFrom = clonedVersion
 			recipeVersion.sourceCode = clonedVersion.sourceCode
 			recipeVersion.changelog = clonedVersion.changelog
+		} else {
+			recipeVersion.sourceCode = defaultSourceCode
+			recipeVersion.changelog = defaultChangelog
 		}
 		
 		recipeVersion.save()
