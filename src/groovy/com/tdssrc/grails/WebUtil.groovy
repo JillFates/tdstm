@@ -62,5 +62,16 @@ class WebUtil {
 		   "_"
 		).toLowerCase();
 	 }
+	
+	/**
+	 * Returns multi-value Quoted String of a List
+	 */
+	def public static listAsMultiValueQuotedString = { param ->
+		
+		String list = param.collect{ id -> "'"+id.trim()+"'"}.toString()
+		list = list.replace("[","").replace("]","")
+		
+		return list
+	}
 
 }

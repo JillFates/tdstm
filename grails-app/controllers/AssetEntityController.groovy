@@ -1675,7 +1675,7 @@ class AssetEntityController {
 		
 		query.append(""" \n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
 				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
-				WHERE ae.project_id = ${project.id} 
+				WHERE ae.project_id = ${project.id} AND ae.asset_type NOT IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getNonServerTypes())})
 				GROUP BY assetId ORDER BY ${sortIndex} ${sortOrder}
 			) AS assets
 		""")
@@ -1700,7 +1700,7 @@ class AssetEntityController {
 					query.append(" AND assets.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
 				}
 		}
-		log.info "query = ${query}"
+		log.info  "query = ${query}"
 		def assetList = jdbcTemplate.queryForList(query.toString())
 		
 		// Cut the list of selected applications down to only the rows that will be shown in the grid
