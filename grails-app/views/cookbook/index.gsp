@@ -196,10 +196,10 @@
 							<div class="row clearfix">
 								<div class="col-xs-6">
 									<h5 class="headingTitle">Recipe</h5>
-									<textarea name="recipeCode" id="recipeCode" rows="10"></textarea>
+									<textarea name="recipeCode" id="recipeCode" rows="10" ng-model="selectedRecipe.sourceCode" value="{{selectedRecipe.sourceCode}}"></textarea>
 									<div class="clearfix btns">
 										<div class="btn-group pull-left">
-											<button type="button" class="btn btn-default">Save WIP</button>
+											<button type="button" class="btn btn-default" ng-click="saveWIP()">Save WIP</button>
 											<button type="button" class="btn btn-default">Release</button>
 											<button type="button" class="btn btn-default">Revert</button>
 										</div>
@@ -211,20 +211,8 @@
 										
 										%{-- Change Logs Content --}%
 										<tab heading="Change Logs">
-											<ul class="logs">
-												<li>Added Win2008 group</li>
-												<li>Added step to re-ip Linux VMs before shutting them down</li>
-												<li>Changed duration on Window 2003 reboots to 15 minutes</li>
-												<li>Added Win2008 group</li>
-												<li>Added step to re-ip Linux VMs before shutting them down</li>
-												<li>Changed duration on Window 2003 reboots to 15 minutes</li>
-												<li>Added Win2008 group</li>
-												<li>Added step to re-ip Linux VMs before shutting them down</li>
-												<li>Changed duration on Window 2003 reboots to 15 minutes</li>
-												<li>Added Win2008 group</li>
-												<li>Added step to re-ip Linux VMs before shutting them down</li>
-												<li>Changed duration on Window 2003 reboots to 15 minutes</li>
-											</ul>
+											<label for="logs" class="sr-only">Logs </label>
+											<textarea name="logs" id="logs" rows="6" ng-model="selectedRecipe.changelog" value="{{selectedRecipe.changelog}}"></textarea>
 										</tab>
 
 										%{-- Groups Content --}%
@@ -311,21 +299,23 @@
 					</tabset>
 				</div>
 			</div>
-			%{-- <div class="row-fluid">
-				<div class="span6">Hi team I'm ${name}</div>
-				<div class="span6">${role}</div>
-			</div>
-			<div class="row-fluid">
-				<div class="span12">
-					<g:each in="${books}" var="book">
-						<p>
-							<span>Name: ${book.name} - </span>
-							<span>Author: ${book.author} - </span>
-							<span>Description: ${book.description}</span>
-						</p>
-					</g:each>
+
+			%{-- <div class="modal fade" id="unsavedChangesModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="myModalLabel">Unsaved Changes</h4>
+						</div>
+						<div class="modal-body">
+							<p>Recipe {{currentSelectedRow.entity.name}} has unsaved changes. Press Okay to continue and loose those changes otherwise press Cancel</p>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default cancel" data-dismiss="modal">Cancel</button>
+							<button type="button" class="btn btn-primary okey">Okey</button>
+						</div>
+					</div>
 				</div>
-				This is ${name} and I am a ${gender}
 			</div> --}%
 		</div>
 	</div>

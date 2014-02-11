@@ -88,12 +88,9 @@ table{
 	font-size: 1em;
 }
 
-ul.logs{
+textarea#logs{
 	height:161px;
-	border: 1px solid #ddd;
-	padding:10px 0 10px 30px;
-	margin:0;
-	overflow-y: auto;
+	width:100%;
 }
 
 form.groups .form-group{
