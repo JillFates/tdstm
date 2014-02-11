@@ -1,0 +1,52 @@
+#!/bin/sh
+
+BACKUP_DB=1
+SOURCE=/mnt/nas01/puppetmaster/fileserver/tranman/releases
+USAGE="Usage: $0 [--skipdb|--list] #### (war build number)"
+TOMCAT=/opt/tomcat/latest
+
+if [ "$1" == "" ]; then 
+   echo $USAGE
+else
+
+   if [ "$1" == "--skipdb" ]; then 
+      BACKUP_DB=0
+      shift
+   fi
+
+   if [ "$1" == "--list" ]; then 
+      echo "Deployments to choose from:"
+      ls -l $SOURCE/tdstm-*.war
+      exit
+   fi
+
+   BUILD=$1
+   WAR=$SOURCE/tdstm-$BUILD.war
+
+   if [ ! -f $WAR ]; then
+      echo "Unable to find build #$BUILD. Expected to find it at $WAR. Run tmrelease on dev01 first."
+      echo $USAGE
+   else 
+      /etc/init.d/tomcat stop
+
+      if [ $BACKUP_DB -eq 1 ]; then
+         #DUMP_FILE=/root/database_backup/tdstm-move-fulldb-`date +%F-%H%M%S`.sql
+         #mysqldump -utdstmapp -ptdstmpswd -hdev01.tdsops.net -e -r$DUMP_FILE tdstm
+         # Invoke backup on DB server
+         echo "Invoking database backup"
+         ssh dev02.tdsops.net /root/bin/tranman_backup
+         RC=$?
+         if [ $RC -ne 0 ]; then
+            echo "Database backup failed with exit code $RC"
+            exit 1
+         fi
+      else 
+         echo "Database backup was skipped"
+      fi
+
+      rm -rf $TOMCAT/temp/* $TOMCAT/work/* $TOMCAT/webapps/tdstm
+      cp -p $WAR webapps/tdstm.war
+      /etc/init.d/tomcat start
+      tail -f /var/log/tomcat/tdstm.log
+   fi
+fi

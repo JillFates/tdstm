@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# This script is used to create mysql dump of the tranman database and compress it.
+#
+DUMP_FILE=/root/backups/tdstm_move.full_dump.`date +%Y%m%d-%H%M%S`.sql
+echo "Creating DB dump `hostname`:$DUMP_FILE"
+
+/usr/bin/mysqldump -utdstm -ptdstm -hlocalhost -e -r $DUMP_FILE tdstm
+RC=$?
+if [[ $RC != 0 ]]; then
+   echo The mysqldump failed with error code $RC
+   exit $RC 
+else
+   ls -l $DUMP_FILE
+   echo Compressing dump file
+   gzip $DUMP_FILE
+fi
+

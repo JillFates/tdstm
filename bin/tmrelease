@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# This script is used to release a copy of Transition Manager out to the Puppet environment
+#
+TARGET=/mnt/nas01/puppetmaster/fileserver/tranman/releases
+TOMCAT=/opt/tomcat/latest/webapps
+BUILD=$( cat $TOMCAT/tdstm/build.txt | awk '{split($0,array," ")} END{print array[2]}' )
+
+WAR=tdstm-$BUILD.war
+
+cp $TOMCAT/tdstm.war $TARGET/$WAR
+echo "Released build $BUILD to $TARGET/$WAR"
