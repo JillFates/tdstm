@@ -106,7 +106,7 @@ public enum AssetType {
 	 * @return
 	 */
 	static List getNonServerTypes() {
-		return ['Application','Files', 'Storage','Database']
+		return ['Application','Files','Database']
 	}
 
 
