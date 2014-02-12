@@ -9,7 +9,7 @@
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="angular.js" />
 		<g:javascript src="angular-ui.js"/>	
-		<g:javascript src="room.rack.combined.js"/>
+		<g:javascript src="cabling.js"/>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
 		

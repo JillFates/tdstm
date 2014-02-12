@@ -6,6 +6,9 @@
 		<title>Asset Comment</title>
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
+		<g:javascript src="angular.js" />
+		<g:javascript src="angular-ui.js"/>	
+		<g:javascript src="cabling.js"/>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
@@ -30,6 +33,7 @@
 				$("#showEntityView").dialog({ autoOpen: false })
 				$("#editEntityView").dialog({ autoOpen: false })
 				$("#createEntityView").dialog({ autoOpen: false })
+				$("#cablingDialogId").dialog({ autoOpen:false })
 				currentMenuId = "#assetMenu";
 				$("#assetMenuId a").css('background-color','#003366')
 				$(".span_ready").parent().addClass("task_ready")
@@ -85,6 +89,7 @@
 				<div id="showEntityView" style="display: none;"></div>
 				<div id="editEntityView" style="display: none;"></div>
 				<div id="createEntityView" style="display: none;"></div>
+				<div id="cablingDialogId" style="display: none;"></div>
 				<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
 			</div>
 			

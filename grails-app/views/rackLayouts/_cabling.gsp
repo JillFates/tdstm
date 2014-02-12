@@ -176,7 +176,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 	<g:if test="${assetCablingDetails}">
 		<g:each in="${assetCablingDetails}" var="assetCabling">
 			<div id='connector${assetCabling.id}' style='top: ${(assetCabling.connectorPosY / 2)}px; left: ${assetCabling.connectorPosX}px;'>
-				<a href='#'><div><img id='${assetCabling.status}' src='../i/cabling/${assetCabling.status.toLowerCase()}.png' onclick="openActionButtonsDiv( '${assetCabling.id}', this.id, '${assetCabling.type}')"></div></a>
+				<a href='#'><div><img id='${assetCabling.status}' src='../i/cabling/${assetCabling.status.toLowerCase()}.png'></div></a>
 				<div class='connector_${assetCabling.labelPosition}'><span>${assetCabling.label}</span></div>
 			</div>
 		</g:each>
@@ -216,7 +216,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
       </td>
       <td ng-click="showEditRow(cable.cableId)" ng-show="showRow(cable.cableId)">
       	 <span>
-	      	 <select id="color_{{cable.cableId}}" name="color_{{cable.cableId}}" style="width:75px;" onchange="changeStatus({{cable.cableId}})">
+	      	 <select id="color_{{cable.cableId}}" name="color_{{cable.cableId}}" style="width:75px;" onchange="changeCableStatus({{cable.cableId}})">
 	      	 		<option value="">Please Select</option>
 			        <option ng-repeat="c in colors" value="{{c.text}}" title="{{c.text}}" ng-selected="c.text == cable.color">{{c.text}}</option>
 		     </select>
@@ -225,13 +225,13 @@ app.controller('Ctrl', function($scope, $filter, $http) {
       <td ng-click="showEditRow(cable.cableId)">
       	 <span ng-hide="showRow(cable.cableId)">{{ cable.length }}</span>
       	 <span ng-show="showRow(cable.cableId)">
-      	 	<input type="text" id="cableLength_{{cable.cableId}}" name="cableLength_{{cable.cableId}}" value="{{ cable.length }}" size="2" onkeypress="changeStatus({{cable.cableId}})"/>
+      	 	<input type="text" id="cableLength_{{cable.cableId}}" name="cableLength_{{cable.cableId}}" value="{{ cable.length }}" size="2" onkeypress="changeCableStatus({{cable.cableId}})"/>
       	 </span>
       </td>
       <td ng-click="showEditRow(cable.cableId)" >
       	 <div ng-hide="showRow(cable.cableId)" class='commentEllip'>{{ cable.comment }}</div>
       	 <span ng-show="showRow(cable.cableId)">
-      	 	<input type="text" name="cableComment_{{cable.cableId}}" id="cableComment_{{cable.cableId}}" value="{{ cable.comment }}" size="8" onkeypress="changeStatus({{cable.cableId}})"/>
+      	 	<input type="text" name="cableComment_{{cable.cableId}}" id="cableComment_{{cable.cableId}}" value="{{ cable.comment }}" size="8" onkeypress="changeCableStatus({{cable.cableId}})"/>
       	 </span>
       </td>
       <td>
@@ -251,14 +251,14 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 				<%--TODO: Used onchange and onkeypress since ng-model usage in selects adding an empty option which is a drawback 
 				     you can look over here  https://github.com/angular/angular.js/issues/1019 --%>
 				<span class="nonPowerDiv" style="display:none;">
-				     <select ui-select2 ng-model="params.value" ng-change="demoChange(params.value, cable.type)" id="assetFromId_{{cable.cableId}}" style="width:100px;" onchange="changeStatus({{cable.cableId}})">
+				     <select ui-select2 ng-model="params.value" ng-change="demoChange(params.value, cable.type)" id="assetFromId_{{cable.cableId}}" style="width:100px;" onchange="changeCableStatus({{cable.cableId}})">
 			        	<option value="{{cable.fromAssetId}}">{{ cable.asset }}</option>
 				     </select>
 				     <select id="assetHiddenId" style="display:none;width:75px;">
 				        <option value="null">Please Select</option>
 				        <option ng-repeat="v in assets" value="{{v.id}}" title="{{v.assetName}}" >{{v.assetName}}</option>
 				     </select>
-				     <select id="modelConnectorId_{{cable.cableId}}" style="width:75px;" onchange="changeStatus({{cable.cableId}})">
+				     <select id="modelConnectorId_{{cable.cableId}}" style="width:75px;" onchange="changeCableStatus({{cable.cableId}})">
 				        <option value="null">Please Select</option>
 				        <option ng-repeat="c in modelConnectors" value="{{c.value}}" title="{{c.text}}" ng-selected="c.value == cable.connectorId">{{c.text}}</option>
 				     </select>

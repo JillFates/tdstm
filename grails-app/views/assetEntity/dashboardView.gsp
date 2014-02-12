@@ -13,6 +13,9 @@
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
 <g:javascript src="scrollfollow.js" />
+<g:javascript src="angular.js" />
+<g:javascript src="angular-ui.js"/>	
+<g:javascript src="cabling.js"/>
 <style type="text/css">
 td .odd {
 	background: #DDDDDD;
@@ -39,6 +42,7 @@ function onInvokeAction(id) {
 	    $('#filterDialog').dialog({ autoOpen: false })
 	    $("#manufacturerShowDialog").dialog({ autoOpen: false })
 	    $("#modelShowDialog").dialog({ autoOpen: false })
+	    $("#cablingDialogId").dialog({ autoOpen:false })
 	    jQuery( '#floatMenu' ).scrollFollow({
 		    speed: 50
 		});
@@ -979,6 +983,7 @@ function onInvokeAction(id) {
 </div>
 <div id ="showEntityView" style="display: none" title="Show Asset"></div>
 <div id ="editEntityView" style="display: none" title="Edit Asset"></div>
+<div id="cablingDialogId" style="display: none;"></div>
 <g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
 <script type="text/javascript">
 bundleChange();
