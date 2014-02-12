@@ -46,6 +46,37 @@ class WsCookbookController {
 		}
 	}
 		
+	/**
+	 * Updates the name and description of an existing Recipe
+	 * Check {@link UrlMappings} for the right call
+	 */
+	def updateRecipe = {
+		if (!SecurityUtils.subject.authenticated) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		
+		def recipeId = params.id
+		def json = request.JSON
+		def name = json.name
+		def description = json.description
+		def loginUser = securityService.getUserLogin()
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			cookbookService.updateRecipe(recipeId, name, description, loginUser, currentProject)
+
+			render(ServiceResults.success() as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (IllegalArgumentException e) {
+			render(ServiceResults.fail([
+				'name' : 'Name is required'
+			]) as JSON)
+		}
+	}
 	
 	/**
 	 * Saves a version of the recipe

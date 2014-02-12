@@ -120,6 +120,30 @@ class CookbookService {
 		recipeVersion.save()
 	}
 
+	
+	def updateRecipe(recipeId, recipeName, description, loginUser, currentProject) {
+		//TODO check this checkAccess(loginUser.person, currentProject)
+		
+		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
+			throw new EmptyResultException();
+		}
+		
+		if (recipeName == null) {
+			throw new IllegalArgumentException('Please check allowed arguments')
+		}
+		
+		def recipe = Recipe.get(recipeId)
+		
+		if (recipe == null) {
+			throw new EmptyResultException();
+		}
+
+		recipe.name = recipeName
+		recipe.description = description
+
+		recipe.save(flush:true)
+	}
+	
 	/**
 	 * Saves a specific recipe reference
 	 * 
