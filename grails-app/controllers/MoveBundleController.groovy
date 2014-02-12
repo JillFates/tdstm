@@ -589,7 +589,7 @@ class MoveBundleController {
 			otherTypeList << ['moveEvent':moveEvent.id , 'count':otherCount]
 			
 			def openIssues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status in (:status) \
-				and a.moveEvent = :event" ,[project:project, type:AssetCommentType.TASK, 
+				and a.moveEvent = :event AND a.isPublished = true" ,[project:project, type:AssetCommentType.TASK, 
 				status: [AssetCommentStatus.READY,AssetCommentStatus.STARTED], event:moveEvent])
 			
 			openTasks << ['moveEvent':moveEvent.id , 'count':openIssues.size()]
@@ -726,13 +726,13 @@ class MoveBundleController {
 		time = date ? formatter.format(date) : ''
 		
 		def today = new Date()
-		def issueQuery = "from AssetComment a  where a.project =:project and a.category in (:category) and a.status != :status and a.commentType =:type"
+		def issueQuery = "from AssetComment a  where a.project =:project and a.category in (:category) and a.status != :status and a.commentType =:type AND a.isPublished = true"
 		def issueArgs = [project:project, status:AssetCommentStatus.COMPLETED, type:AssetCommentType.TASK.toString()]
 		
 		def openIssue =  AssetComment.findAll(issueQuery,issueArgs << [category : ['discovery']]).size()
 		def dueOpenIssue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs<< [category : ['discovery'], dueDate:today]).size()
 		def issues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status =:status  \
-			and a.category in (:category)",[project:project, type:AssetCommentType.TASK, status: AssetCommentStatus.READY , category:['general','planning']])
+			and a.category in (:category) AND a.isPublished = true",[project:project, type:AssetCommentType.TASK, status: AssetCommentStatus.READY , category:['general','planning']])
 		def generalOverDue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs<< [category : ['general','planning'], dueDate:today]).size()
 
 		def dependencyConsoleList = []
