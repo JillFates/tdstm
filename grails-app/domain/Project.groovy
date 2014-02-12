@@ -8,6 +8,7 @@ import com.tds.asset.Files
 class Project extends PartyGroup {
 
 	def static final DEFAULT_PROJECT_ID = 2
+	def static final CUSTOM_FIELD_COUNT = 48
 	
 	String projectCode
 	String description
@@ -47,6 +48,30 @@ class Project extends PartyGroup {
 		String custom22
 		String custom23
 		String custom24
+		String custom25
+		String custom26
+		String custom27
+		String custom28
+		String custom29
+		String custom30
+		String custom31
+		String custom32
+		String custom33
+		String custom34
+		String custom35
+		String custom36
+		String custom37
+		String custom38
+		String custom39
+		String custom40
+		String custom41
+		String custom42
+		String custom43
+		String custom44
+		String custom45
+		String custom46
+		String custom47
+		String custom48
 		
 	static hasMany = [ dataTransferBatch : DataTransferBatch ]
 	
@@ -87,7 +112,31 @@ class Project extends PartyGroup {
 		custom22( blank:true, nullable:true )
 		custom23( blank:true, nullable:true )
 		custom24( blank:true, nullable:true )
-		customFieldsShown( nullable:false, inList:[0, 4 ,8, 12, 16 ,20, 24] )
+		custom25( blank:true, nullable:true )
+		custom26( blank:true, nullable:true )
+		custom27( blank:true, nullable:true )
+		custom28( blank:true, nullable:true )
+		custom29( blank:true, nullable:true )
+		custom30( blank:true, nullable:true )
+		custom31( blank:true, nullable:true )
+		custom32( blank:true, nullable:true )
+		custom33( blank:true, nullable:true )
+		custom34( blank:true, nullable:true )
+		custom35( blank:true, nullable:true )
+		custom36( blank:true, nullable:true )
+		custom37( blank:true, nullable:true )
+		custom38( blank:true, nullable:true )
+		custom39( blank:true, nullable:true )
+		custom40( blank:true, nullable:true )
+		custom41( blank:true, nullable:true )
+		custom42( blank:true, nullable:true )
+		custom43( blank:true, nullable:true )
+		custom44( blank:true, nullable:true )
+		custom45( blank:true, nullable:true )
+		custom46( blank:true, nullable:true )
+		custom47( blank:true, nullable:true )
+		custom48( blank:true, nullable:true )
+		customFieldsShown( nullable:false, inList:[0,4,8,12,16,20,24,28,32,36,40,44,48] )
 		lastAssetId( nullable:true )
 		runbookOn(nullable:true)
 		depConsoleCriteria( blank:true, nullable:true )

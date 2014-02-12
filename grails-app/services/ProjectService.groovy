@@ -224,7 +224,12 @@ class ProjectService {
 	 */
 	def getAttributes(entityType){
 		def eavEntityType = EavEntityType.findByDomainName(entityType)
-		def attributes = EavAttribute.findAllByEntityType( eavEntityType )
+		def attributes = EavAttribute.findAllByEntityType( eavEntityType ,[sort:'frontendLabel'])
+		(1..48).each {i->
+		    def attribute = attributes.find{it.frontendLabel == "Custom"+i}
+			attributes.remove(attribute)
+			attributes.add(attribute)
+		}
 		return attributes
 	}
 

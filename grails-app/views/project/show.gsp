@@ -76,7 +76,7 @@
 				</table>
 				<table style="border-style:none solid none solid;">
 					<tbody>
-						<g:each in="${ (1..24) }" var="i">
+						<g:each in="${ (1..Project.CUSTOM_FIELD_COUNT) }" var="i">
 							<g:if test="${i % 4 == 1}">
 								<tr class="prop custom_table" id="custom_count_${i}">
 							</g:if>

@@ -69,4 +69,5 @@ databaseChangeLog = {
 	include file: '20140131-add-missing-version.groovy'
 	include file: '20140203-add-missing-autoincrement.groovy'
 	include file: '20140205-add-new-permissions.groovy'
+	include file: '20140211-add-25-to-48-custom-fields.groovy'
 }

@@ -1,6 +1,6 @@
 <g:set var="tabOffset" value="50"/>
 
-<g:if test="${project.customFieldsShown != 0 && project.customFieldsShown < 25}">
+<g:if test="${project.customFieldsShown != 0 && project.customFieldsShown <= Project.CUSTOM_FIELD_COUNT}">
 	<g:each in="${customs}" var="i" status="j">
 		<g:if test="${j % 4 == 0}">
 			<tr class="prop">
