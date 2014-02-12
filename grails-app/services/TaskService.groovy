@@ -217,7 +217,7 @@ class TaskService implements InitializingBean {
 		sql.append("""FROM asset_comment t 
 			LEFT OUTER JOIN asset_entity a ON a.asset_entity_id = t.asset_entity_id 
 			LEFT OUTER JOIN person p ON p.person_id = t.assigned_to_id 
-			WHERE t.project_id=:projectId AND t.comment_type=:type """)
+			WHERE t.project_id=:projectId AND t.comment_type=:type AND t.is_published = true """)
 
 			sql.append("AND( t.assigned_to_id=:assignedToId OR \
 				(${roles ? 't.role IN (:roles) AND ' : ''}	t.status IN (:statuses) \
