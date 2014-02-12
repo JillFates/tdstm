@@ -60,6 +60,7 @@
 			var event = ${filterEvent}
 			var justRemaining = ${justRemaining}
 			var justMyTasks = ${justMyTasks}
+			var viewUnpublished = ${viewUnpublished}
 			var filter = '${filter}'
 			var comment = '${comment}'
 			var taskNumber = '${taskNumber}'
@@ -78,7 +79,7 @@
 					
 			<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
 				colNames="'Action', 'Task', 'Description', 'Asset', 'AssetType', 'Updated', 'Due', 'Status',
-					'Assigned To', 'Team', 'Category', 'Suc.', 'Score', 'id', 'statusCss'"
+					'Assigned To', 'Team', 'Category', 'Suc.', 'Score', 'id', 'statusCss', 'Is published?'"
 				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
 					{name:'taskNumber', formatter:taskFormatter, width:80},
 					{name:'comment', width:680, formatter:taskFormatter},
@@ -93,13 +94,14 @@
 					{name:'suc', formatter:taskFormatter,sortable:false,search:false, width:50},
 					{name:'score', formatter:taskFormatter, search:false, width:70},
 					{name:'id', hidden: true},
-					{name:'statusCss', hidden: true}"
+					{name:'statusCss', hidden: true},
+					{name:'isPublished', formatter: isPublishedFormatter, search:false}"
 				caption="listCaption"
 				rowNum="sizePref"
 				scrollOffset="0"
 				gridComplete="function(){bindResize('taskListId')}"
 				postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
-					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category}"
+					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category, viewUnpublished : viewUnpublished}"
 				showPager="true">
 				<jqgrid:filterToolbar id="taskListId" searchOnEnter="false" />
 				<jqgrid:navigation id="taskListId" add="false" edit="false" 
@@ -127,6 +129,9 @@
 			var editButton = '<a href="javascript:showAssetComment(\''+options.rowId+'\',\'edit\')">'+
 				"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 			return editButton
+		}
+		function isPublishedFormatter(cellVal,options,rowObject) {
+			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" >' + (rowObject[17] ? rowObject[17] : "false") + '</span>';
 		}
 		function taskFormatter(cellVal,options,rowObject) {
 			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal ? cellVal :"") + '</span>';
@@ -193,6 +198,7 @@
 			<form name="commentForm" id="commentForm" method="post" action="listTasks">
 			<input type="hidden" name="justRemaining" id="justRemaining" value="${justRemaining}" />
 			<input type="hidden" name="justMyTasks"   id="justMyTasks"   value="${justMyTasks}"/>
+			<input type="hidden" name="viewUnpublished"   id="viewUnpublished"   value="${viewUnpublished}"/>
 			<input type="hidden" id="myPage" value="taskManager" />
 			<span>
 				<b>Event </b>
@@ -202,6 +208,11 @@
 				<b> <label for="justRemainingCB" >Just Remaining</label></b>
 				<input type="checkbox" id="justMyTasksCB" ${ (justMyTasks=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'justMyTasks');"/>
 				<b><label for="justMyTasksCB" > Just Mine</label></b>&nbsp;&nbsp;
+				<tds:hasPermission permission="PublishTasks">
+					<input type="checkbox" id="viewUnpublishedCB" ${ (viewUnpublished=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'viewUnpublished');"/>
+					<b><label for="viewUnpublishedCB" > View unpublished</label></b>&nbsp;&nbsp;
+				</tds:hasPermission>
+
 					<span id="viewGraphSpanId">
 					${HtmlUtil.actionButton('View Task Graph', 'ui-icon-zoomin', 'graph', '','../task/moveEventTaskGraph?moveEventId='+filterEvent+'&mode=s')}&nbsp;
 				

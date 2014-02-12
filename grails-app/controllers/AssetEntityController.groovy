@@ -3563,6 +3563,7 @@ class AssetEntityController {
 		def justRemaining = userPreferenceService.getPreference("JUST_REMAINING") ?: "1"
 		// Set the Checkbox values to that which were submitted or default if we're coming into the list for the first time
 		def justMyTasks = params.containsKey('justMyTasks') ? params.justMyTasks : "0"
+		def viewUnpublished = params.containsKey('viewUnpublished') ? params.viewUnpublished : "0"
 		def timeToRefresh = userPreferenceService.getPreference("TASKMGR_REFRESH")
 		def entities = assetEntityService.entityInfo( project )
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
@@ -3571,7 +3572,7 @@ class AssetEntityController {
 				moveEvents:moveEvents, filterEvent:filterEvent , justRemaining:justRemaining, justMyTasks:justMyTasks, filter:params.filter,
 				comment:filters?.comment ?:'', taskNumber:filters?.taskNumber ?:'', assetName:filters?.assetEntity ?:'', assetType:filters?.assetType ?:'',
 				dueDate : filters?.dueDate ?:'', status : filters?.status ?:'', assignedTo : filters?.assignedTo ?:'', role: filters?.role ?:'',
-				category: filters?.category ?:'', moveEvent:moveEvent, moveBundleList : moveBundleList,
+				category: filters?.category ?:'', moveEvent:moveEvent, moveBundleList : moveBundleList, viewUnpublished : viewUnpublished,
 				staffRoles:taskService.getTeamRolesForTasks(), 
 //				staffRoles:taskService.getRolesForStaff(), 
 				sizePref:userPreferenceService.getPreference("assetListSize")?: '25']
@@ -3702,10 +3703,11 @@ class AssetEntityController {
 
 		def assigned = params.assignedTo ? Person.findAllByFirstNameIlikeOrLastNameIlike("%${params.assignedTo}%","%${params.assignedTo}%" ) : []
 
-		
 		def tasks = AssetComment.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", project)
-			eq("commentType", AssetCommentType.TASK)
+			eq("commentType", AssetCommentType.TASK) 
+			if (params.viewUnpublished.equals("0"))
+				eq("isPublished", true)
 			assetEntity {
 				if (params.assetType)
 					ilike('assetType', "%${params.assetType}%")
@@ -3750,7 +3752,7 @@ class AssetEntityController {
 				}
 			}
 			if(moveEvent)
-				eq('moveEvent', moveEvent)
+				eq("moveEvent", moveEvent)
 				
 			if (params.justRemaining == "1") {
 				ne("status", AssetCommentStatus.COMPLETED)
@@ -3840,9 +3842,10 @@ class AssetEntityController {
 				nGraphUrl, 
 				it.score ?: 0,
 				it.status ? "task_${it.status.toLowerCase()}" : 'task_na',
-				updatedClass, dueClass, it.assetEntity?.id
+				updatedClass, dueClass, it.assetEntity?.id,
+				it.isPublished
 				], 
-				id:it.id,
+				id:it.id
 			]}
 		
 		// If sessions variables exists, set them with params and sort

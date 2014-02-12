@@ -134,6 +134,7 @@ class AssetComment {
 		version true
 		autoTimestamp false
 		id column: 'asset_comment_id'
+		isPublished column: 'is_published'
 		resolvedBy column: 'resolved_by'
 		createdBy column: 'created_by'
 		columns {
