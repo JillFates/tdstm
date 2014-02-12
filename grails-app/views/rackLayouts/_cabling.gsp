@@ -153,6 +153,9 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 
 </script>
 <script type="text/javascript">
+	if($("#fromRoomOrRack").val() == 'room' && $("#roomTypeForCabling").val()== 0){
+		$(".cableRoomType").attr("disabled","disabled")
+	}
 	if(!${assetCablingDetails[0]?.hasImageExist}){
 		$("#cablingPanel").css("height",${assetCablingDetails[0].usize? assetCablingDetails[0].usize*30+2 : 0}+'px')
 		$("#roomTypeDiv").css("margin-top",${assetCablingDetails[0].usize? assetCablingDetails[0].usize*10 : 0}+'px')
@@ -168,8 +171,8 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 
 </script>
 <div id="roomTypeDiv" style="position: relative;float:right;margin-top: 20px;">
-      	<label><input type="radio" name="cableRoomType" id="cableRoomType_S" value="S" ${isTargetRoom? '':'disabled="disabled"' } ${roomType=='S'? 'checked="checked"' :'' } onclick="openCablingDiv('${assetId}',this.value)"/>Current</label><br>
-		<label><input type="radio" name="cableRoomType" id="cableRoomType_T" value="T" ${isTargetRoom? '':'disabled="disabled"' } ${roomType=='T'? 'checked="checked"' :'' } onclick="openCablingDiv('${assetId}',this.value)"/>Target</label>
+      	<label><input type="radio" class="cableRoomType" name="cableRoomType" id="cableRoomType_S" value="S" ${roomType=='S'? 'checked="checked"' :'' } onclick="openCablingDiv('${assetId}',this.value)"/>Current</label><br>
+		<label><input type="radio" class="cableRoomType" name="cableRoomType" id="cableRoomType_T" value="T" ${roomType=='T'? 'checked="checked"' :'' } onclick="openCablingDiv('${assetId}',this.value)"/>Target</label>
 		<input type="hidden" id="roomType" name="roomType"  value="${roomType}"/>
 </div>
 <div id="cablingPanel" style="height: auto; ">

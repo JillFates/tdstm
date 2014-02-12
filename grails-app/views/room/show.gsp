@@ -3,6 +3,7 @@
 <div class="body" style="width:98%;">
 <div id="roomListView"></div>
 <input type="hidden" id="redirectTo" value="room"/>
+<input type="hidden" id="fromRoomOrRack" value="room"/>
 <div class="dialog" style="border: 1px solid black;width: 1051px;overflow-x: auto;">
 	<table style="width: 100%; border: none;border-spacing:0px;">
 		<tbody>
@@ -10,6 +11,7 @@
 				<td class="buttonR" style="vertical-align:top;width:220px;">
 					<div>
 					<h1 style="margin: 0px;">Data Center Room View</h1><br />
+					<input type="hidden" id="roomTypeForCabling" value="${roomInstance.source}"/>
 					<g:select id="roomId" name="id" from="${roomInstanceList}" value="${roomInstance.id}" optionKey="id" optionValue="${{it.location +' / '+it.roomName}}" onchange="getRackDetails()"/>
 					<input type="hidden" id="selectedRackId" value="">
 					<br />
