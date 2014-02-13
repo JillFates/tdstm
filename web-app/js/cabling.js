@@ -3,9 +3,14 @@
  *******************************************************************************************************/
 var click = 1
 function openCablingDiv( assetId , type){
-	if(!type)
+	var defRoomType = $("#roomTypeForCabling").val();
+	if(!type && defRoomType=='0'){
+		type = 'T'
+	}
+	
+	if(!type){
 		type='S'
-			
+	}
 	new Ajax.Request(contextPath+'/rackLayouts/getCablingDetails?assetId='+assetId+'&roomType='+type,{asynchronous:true,evalScripts:true,onComplete:function(e){showCablingDetails(e,assetId);}})
 }
 function showCablingDetails( e, assetId ){
