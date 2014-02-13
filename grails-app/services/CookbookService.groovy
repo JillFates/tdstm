@@ -69,10 +69,6 @@ class CookbookService {
 			throw new EmptyResultException()
 		}
 		
-		if (recipeName == null || recipeContext == null || !allowedCatalogs.contains(recipeContext)) {
-			throw new IllegalArgumentException('Please check allowed arguments')
-		}
-		
 		def clonedVersion = null
 		def defaultSourceCode = ''
 		def defaultChangelog = ''
@@ -80,9 +76,13 @@ class CookbookService {
 		if (cloneFrom != null) {
 			if (clonedFrom.isNumber()) {
 				clonedVersion = RecipeVersion.get(clonedFrom)
+				if (clonedVersion == null) {
+					log.warn('Empty cloned version')
+					throw new EmptyResultException()
+				}
 				checkAccess(loginUser.person, clonedVersion.recipe.project)
 			} else {
-				log.info('Cloned from is not a number')
+				log.info("Cloned from is not a number. Found: ${cloneFrom}")
 				throw new EmptyResultException()
 			}
 		} else {
@@ -102,7 +102,7 @@ class CookbookService {
 		recipe.project = currentProject
 		recipe.archived = false
 
-		recipe.save(flush:true)
+		recipe.save(flush:true, failOnError: true)
 		
 		recipeVersion.versionNumber = 0
 		recipeVersion.createdBy = loginUser.person
@@ -117,7 +117,9 @@ class CookbookService {
 			recipeVersion.changelog = defaultChangelog
 		}
 		
-		recipeVersion.save()
+		recipeVersion.save(failOnError: true)
+		
+		return recipe
 	}
 
 	
@@ -126,10 +128,6 @@ class CookbookService {
 		
 		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
 			throw new EmptyResultException();
-		}
-		
-		if (recipeName == null) {
-			throw new IllegalArgumentException('Please check allowed arguments')
 		}
 		
 		def recipe = Recipe.get(recipeId)
@@ -141,7 +139,7 @@ class CookbookService {
 		recipe.name = recipeName
 		recipe.description = description
 
-		recipe.save(flush:true)
+		recipe.save(flush:true, failOnError: true)
 	}
 	
 	/**
@@ -187,10 +185,10 @@ class CookbookService {
 			}
 		}
 		
-		if (!StringUtils.isEmpty(name)) {
+		if (!name) {
 			recipe.name = name
 		}
-		if (!StringUtils.isEmpty(description)) {
+		if (description != null) {
 			recipe.description = description
 		}
 		
@@ -198,6 +196,8 @@ class CookbookService {
 		wip.changelog = changelog
 		
 		wip.save(failOnError: true)
+		
+		return wip
 	}
 
 	
@@ -248,15 +248,21 @@ class CookbookService {
 //			throw new UnauthorizedException('User doesn\'t have a RevertRecipe permission')
 //		}
 		
-		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
-			throw new EmptyResultException();
+		if (recipeId == null) {
+			throw new EmptyResultException('Recipe id is empty');
+		}
+		if (!recipeId.isNumber()) {
+			throw new EmptyResultException('Recipe id is not a number');
+		}
+		if (currentProject == null) {
+			throw new EmptyResultException('Project is empty');
 		}
 
 		//TODO check this checkAccess(loginUser.person, currentProject)
 		def recipe = Recipe.get(recipeId)
 		
 		if (recipe.releasedVersion == null) {
-			throw new EmptyResultException();
+			throw new EmptyResultException('Release version is empty');
 		}
 		
 		def wip = RecipeVersion.findByRecipeAndVersionNumber(recipe, 0)
@@ -304,6 +310,10 @@ class CookbookService {
 		
 		def recipe = Recipe.get(recipeId)
 
+		if (recipe == null) {
+			throw new EmptyResultException('Recipe does not exists');
+		}
+
 		if (versionNumber == null) {
 			versionNumber = recipe.releasedVersion == null ? 0 : recipe.releasedVersion.versionNumber
 		}
@@ -315,7 +325,7 @@ class CookbookService {
 			throw new EmptyResultException('Invalid recipe')
 		}
 		
-		checkAccess(loginUser.person, recipeVersion.recipe.project)
+		checkAccess(loginUser.person, recipe.project)
 		
 		def person = recipeVersion.createdBy
 		

@@ -2,6 +2,8 @@ import grails.converters.JSON
 
 import org.apache.shiro.SecurityUtils
 import org.springframework.stereotype.Controller;
+import grails.validation.ValidationException;
+
 
 /**
  * {@link Controller} for handling WS calls of the {@link CookbookService}
@@ -18,7 +20,8 @@ class WsCookbookController {
 	 * Check {@link UrlMappings} for the right call
 	 */
 	def createRecipe = {
-		if (!SecurityUtils.subject.authenticated) {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser != null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
@@ -27,7 +30,6 @@ class WsCookbookController {
 		def description = params.description
 		def context = params.context
 		def cloneFrom = params.cloneFrom
-		def loginUser = securityService.getUserLogin()
 		def currentProject = securityService.getUserCurrentProject()
 
 		try {
@@ -38,11 +40,10 @@ class WsCookbookController {
 			ServiceResults.forbidden(response)
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
-		} catch (IllegalArgumentException e) {
-			render(ServiceResults.fail([
-				'name' : 'Name is required', 
-				'context' : 'Context is not a valid value'
-			]) as JSON)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()))
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
 		}
 	}
 		
@@ -51,7 +52,8 @@ class WsCookbookController {
 	 * Check {@link UrlMappings} for the right call
 	 */
 	def updateRecipe = {
-		if (!SecurityUtils.subject.authenticated) {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser != null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
@@ -60,7 +62,6 @@ class WsCookbookController {
 		def json = request.JSON
 		def name = json.name
 		def description = json.description
-		def loginUser = securityService.getUserLogin()
 		def currentProject = securityService.getUserCurrentProject()
 
 		try {
@@ -71,10 +72,10 @@ class WsCookbookController {
 			ServiceResults.forbidden(response)
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
-		} catch (IllegalArgumentException e) {
-			render(ServiceResults.fail([
-				'name' : 'Name is required'
-			]) as JSON)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()))
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
 		}
 	}
 	
@@ -83,7 +84,8 @@ class WsCookbookController {
 	 * Check {@link UrlMappings} for the right call
 	 */
 	def saveRecipeVersion = {
-		if (!SecurityUtils.subject.authenticated) {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser != null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
@@ -94,7 +96,6 @@ class WsCookbookController {
 		def description = params.description
 		def sourceCode = params.sourceCode
 		def changelog = params.changelog
-		def loginUser = securityService.getUserLogin()
 		def currentProject = securityService.getUserCurrentProject()
 
 		try {
@@ -103,8 +104,12 @@ class WsCookbookController {
 			render(ServiceResults.success() as JSON)
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()))
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
 		}
 	}
 	
@@ -112,13 +117,13 @@ class WsCookbookController {
 	 * Releases a recipe that is WIP
 	 */
 	def releaseRecipe = {
-		if (!SecurityUtils.subject.authenticated) {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser != null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
 
 		def recipeVersionId = params.recipeVersionId
-		def loginUser = securityService.getUserLogin()
 		def currentProject = securityService.getUserCurrentProject()
 
 		try {
@@ -127,8 +132,12 @@ class WsCookbookController {
 			render(ServiceResults.success() as JSON)
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()))
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
 		}
 	}
 	
@@ -136,13 +145,13 @@ class WsCookbookController {
 	 * Reverts a recipe to the previous release version
 	 */
 	def revert = {
-		if (!SecurityUtils.subject.authenticated) {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser != null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
 
 		def recipeId = params.id
-		def loginUser = securityService.getUserLogin()
 		def currentProject = securityService.getUserCurrentProject()
 
 		try {
@@ -151,8 +160,12 @@ class WsCookbookController {
 			render(ServiceResults.success() as JSON)
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()))
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
 		}
 	}
 	
@@ -161,7 +174,8 @@ class WsCookbookController {
 	 * Check {@link UrlMappings} for the right call
 	 */
 	def recipe = {
-		if (!SecurityUtils.subject.authenticated) {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser != null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
@@ -170,7 +184,6 @@ class WsCookbookController {
 		def recipeVersion = params.version
 		
 		try {
-			def loginUser = securityService.getUserLogin()
 			def result = cookbookService.getRecipe(recipeId, recipeVersion, loginUser)
 
 			def dataMap = [:]
@@ -191,8 +204,10 @@ class WsCookbookController {
 			ServiceResults.forbidden(response)
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()))
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
 		}
 	}
 
@@ -202,7 +217,8 @@ class WsCookbookController {
 	 * Check {@link UrlMappings} for the right call
 	 */
 	def recipeList = {
-		if (!SecurityUtils.subject.authenticated) {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser != null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
@@ -213,7 +229,6 @@ class WsCookbookController {
 		def projectType = params.project
 
 		try {
-			def loginUser = securityService.getUserLogin()
 			def currentProject = securityService.getUserCurrentProject()
 			
 			def results = cookbookService.findRecipes(isArchived, catalogContext, searchText, projectType, loginUser, currentProject)
@@ -226,8 +241,12 @@ class WsCookbookController {
 			ServiceResults.forbidden(response)
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()))
 		} catch (IllegalArgumentException e) {
 			ServiceResults.methodFailure(response)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
 		}
 	}
 	
@@ -236,13 +255,13 @@ class WsCookbookController {
 	 * Check {@link UrlMappings} for the right call
 	 */
 	def validateSyntax = {
-		if (!SecurityUtils.subject.authenticated) {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser != null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
 
 		def sourceCode = params.sourceCode
-		def loginUser = securityService.getUserLogin()
 		def currentProject = securityService.getUserCurrentProject()
 
 		try {
@@ -259,8 +278,10 @@ class WsCookbookController {
 			ServiceResults.forbidden(response)
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()))
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
 		}
 	}
 }

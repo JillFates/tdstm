@@ -1,4 +1,5 @@
 import java.beans.StaticFieldsPersistenceDelegate;
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 
 /**
@@ -61,6 +62,25 @@ class ServiceResults {
 	 */
 	static def methodFailure(response) {
 		response.sendError(424, 'Method Failure')
+	}
+	
+	/**
+	 * Internal error
+	 * @param response the response object
+	 */
+	static def internalError(response, log, Exception e) {
+		log.error(e.getMessage())
+		response.sendError(500, 'Internal server error')
+	}
+	
+	/**
+	 * Sends a method failure error with the validation errors
+	 * @param response the response object
+	 */
+	static def errorsInValidation(errs) {
+		def messageSource = ApplicationHolder.application.mainContext.messageSource
+		def allErrorsAsArray = errs.allErrors.collect { it -> "${messageSource.getMessage(it, locale)}" }
+		return errors(allErrorsAsArray)
 	}
 	
 	/**

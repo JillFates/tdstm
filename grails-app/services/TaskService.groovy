@@ -4110,7 +4110,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			throw new UnauthorizedException("User doesn't have a " + permission + " permission")
 		}
 		
-		log.info('ENTRO')
 		if (taskId == null || !taskId.isNumber() || currentProject == null) {
 			throw new EmptyResultException();
 		}
@@ -4131,7 +4130,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def affectedComments = namedParameterJdbcTemplate.update('UPDATE asset_comment SET is_published = :shouldPublish WHERE task_batch_id = :taskId', ['taskId': taskId, 'shouldPublish' : shouldPublish])
 		
 		task.isPublished = shouldPublish
-		task.save()
+		task.save(failOnError: true)
 		
 		return affectedComments
 	}

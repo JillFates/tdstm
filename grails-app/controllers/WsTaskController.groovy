@@ -2,6 +2,7 @@ import grails.converters.JSON
 
 import org.apache.shiro.SecurityUtils
 import org.springframework.stereotype.Controller;
+import grails.validation.ValidationException;
 
 /**
  * {@link Controller} for handling WS calls of the {@link TaskService}
@@ -17,13 +18,13 @@ class WsTaskController {
 	 * Publishes a {@link TaskBatch} that has been generated before
 	 */
 	def publish = {
-		if (!SecurityUtils.subject.authenticated) {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser != null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
 		
 		def id = params.id
-		def loginUser = securityService.getUserLogin()
 		def currentProject = securityService.getUserCurrentProject()
 
 		try {
@@ -34,8 +35,12 @@ class WsTaskController {
 			ServiceResults.forbidden(response)
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()))
 		} catch (IllegalArgumentException e) {
 			ServiceResults.forbidden(response)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
 		}
 	}
 
@@ -43,13 +48,13 @@ class WsTaskController {
 	 * Unpublishes a {@link TaskBatch} that has been generated before
 	 */
 	def unpublish = {
-		if (!SecurityUtils.subject.authenticated) {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser != null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
 		
 		def id = params.id
-		def loginUser = securityService.getUserLogin()
 		def currentProject = securityService.getUserCurrentProject()
 
 		try {
@@ -62,6 +67,8 @@ class WsTaskController {
 			ServiceResults.methodFailure(response)
 		} catch (IllegalArgumentException e) {
 			ServiceResults.forbidden(response)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
 		}
 	}
 }
