@@ -4031,14 +4031,18 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def taskCountByEvent = 0
 		
 		if (moveEvent) {
-			taskCountByEvent = AssetComment.countByMoveEvent(moveEvent)
+			taskCountByEvent = AssetComment.countByMoveEventAndIsPublished(moveEvent, true)
 			def durationScale = [d:1440, m:1, w:10080, h:60] // minutes per day,week,hour
 			AssetCommentStatus.topStatusList.each{ status->
 				def duration = AssetComment.findAllByMoveEventAndStatus(moveEvent, status)
 				def timeInMin=duration.sum{d->
-					d.duration*durationScale[d.durationScale]
+					d.isPublished ? d.duration*durationScale[d.durationScale] : 0
 				}
-				taskStatusMap << [ (status): [taskCount: AssetComment.countByStatusAndMoveEvent(status,moveEvent), timeInMin: timeInMin] ]  
+				def countTasks = duration.sum { d ->
+					d.isPublished ? 1 : 0
+				}
+				countTasks = countTasks ?: 0
+				taskStatusMap << [ (status): [taskCount: countTasks, timeInMin: timeInMin] ]  
 				if(timeInMin)
 					totalDuration +=timeInMin
 			}
@@ -4057,6 +4061,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			def roles= getTeamRolesForTasks()
 			roles.each { role ->
 				def teamTask = AssetComment.findAllByMoveEventAndRole(moveEvent, role.id)
+				teamTask = teamTask.findAll{ t -> t.isPublished }
 				def teamDoneTask = teamTask.findAll { it.status == 'Completed' }
 				if(teamTask){
 					teamTaskMap << [(role.id): [teamTaskCount:teamTask.size(), teamDoneCount:teamDoneTask.size(), role:role ]]
