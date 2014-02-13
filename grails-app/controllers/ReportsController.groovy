@@ -1370,6 +1370,9 @@ class ReportsController {
 		smeList.each{
 			if(it.sme)
 				smeListByBundle << (it.sme)
+				
+			if(it.sme2)
+				smeListByBundle << (it.sme2)
 		}
 		render(template:"smeSelectByBundle", model:[smeList:smeListByBundle.unique()])
 	}
@@ -1390,7 +1393,10 @@ class ReportsController {
 		//Used to list out all the sme of a project
 		smeList.each{
 			if(it.sme)
-			smeListByBundle << (it.sme)
+				smeListByBundle << (it.sme)
+			
+			if(it.sme2)
+				smeListByBundle << (it.sme2)
 		}
 		smeListByBundle.unique()
 		
@@ -1398,17 +1404,17 @@ class ReportsController {
 		if(params.moveBundle == 'useForPlanning'){		 //if user haven't selected any bundle
 			if(params.smeByModel!='null'){             	 //if user haven't selected any sme
 				currentSme = Person.get(params.smeByModel)
-				applicationList = Application.findAllByProjectAndSme(project,currentSme)
+				applicationList = Application.findAll("from Application where project = :project and (sme=:smes or sme2=:smes)",[project:project,smes:currentSme]) 
 			}else {										 //if user selects any sme
-				applicationList = Application.findAllByProjectAndSmeInList(project,smeListByBundle)
+				applicationList = Application.findAll("from Application where project = :project and (sme in (:smes) or sme2 in (:smes))",[project:project,smes:smeListByBundle]) 
 			}
 		}else{ 											 //if user selects any bundle
 			currentBundle = MoveBundle.get(params.moveBundle)
 			if(params.smeByModel!='null'){               //if user haven't selected any sme
 				currentSme = Person.get(params.smeByModel)
-				applicationList = Application.findAllByMoveBundleAndProject(currentBundle,project)?.findAll{it.sme==currentSme}
+				applicationList = Application.findAll("from Application where project = :project and moveBundle = :bundle and (sme=:smes or sme2=:smes)",[project:project,bundle:currentBundle,smes:currentSme])
 			}else if(smeListByBundle){									    //if user selects any sme
-				applicationList = Application.findAll("from Application where project = :project and moveBundle = :bundle and sme in (:smes)",[project:project,bundle:currentBundle,smes:smeListByBundle])
+				applicationList = Application.findAll("from Application where project = :project and moveBundle = :bundle and (sme in (:smes) or sme2 in (:smes))",[project:project,bundle:currentBundle,smes:smeListByBundle])
 			}
 		}
 		ArrayList appList = new ArrayList()

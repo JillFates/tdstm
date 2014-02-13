@@ -36,7 +36,7 @@
 				</td>
 				</tr>
 				<tr id="deps">
-					<g:render template="../assetEntity/dependentShow" model="[assetEntity:application,supportAssets:application.supportAssets,dependentAssets:application.dependentAssets]" ></g:render>
+					<g:render template="../assetEntity/dependentShow" model="[assetEntity:application.app,supportAssets:application.supportAssets,dependentAssets:application.dependentAssets]" ></g:render>
 				</tr>
 			</tbody>
 		</table>"<br class="page-break-after">
