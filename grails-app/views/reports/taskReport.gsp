@@ -41,9 +41,19 @@
 			<tr>
 				<td></td>
 				<td style="width:auto;">
-					<input type="checkbox" name="wUnresolved" checked="checked" />Include only remaining tasks in report
+					<input type="checkbox" name="wUnresolved" checked="checked" />
+					Include only remaining tasks in report
 				</td>
 			</tr>
+			<tds:hasPermission permission="PublishTasks">
+			<tr>
+				<td></td>
+				<td style="width:auto;">
+					<input type="checkbox" name="viewUnpublished" />
+					Include Unpublished Tasks
+				</td>
+			</tr>
+			</tds:hasPermission>
 			<tr>
 			<td colspan="2" class="buttonR">
 				<g:actionSubmit type="submit"  value="Generate Web" action="tasksReport" />

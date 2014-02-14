@@ -1487,7 +1487,12 @@ class ReportsController {
 				taskListHql += "AND status != :status"
 				argMap << ["status":AssetCommentStatus.COMPLETED]
 			}
-			
+
+			if( params.viewUnpublished ){
+				taskListHql += " AND isPublished = :isPublished "
+				argMap << ["isPublished": true]
+			}
+
 			taskList = AssetComment.findAll(taskListHql, argMap)
 			taskList.addAll( params.wComment ? AssetComment.findAllByCommentTypeAndProject(AssetCommentType.COMMENT, project): [])
 			
