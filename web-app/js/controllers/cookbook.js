@@ -1,5 +1,5 @@
-var app = angular.module('cookbookRecipes', ['ngGrid', 'ngResource', 'ui.bootstrap']);
-app.controller('CookbookRecipeEditor', function($scope, $http, $resource) {
+var app = angular.module('cookbookRecipes', ['ngGrid', 'ngResource', 'ui.bootstrap', 'modNgBlur']);
+app.controller('CookbookRecipeEditor', function($scope, $http, $resource, $timeout) {
     
     $scope.contexts = ['All', 'Event', 'Bundle', 'Application'];
     
@@ -13,36 +13,23 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource) {
     // Initial call to the $resource method
     $scope.recipes = Recipes.get({archived: 'n', context: 'All', project: 'master'}, function(){
         seeChanges();
+        console.log($scope.recipes);
     });
+    console.log($scope.recipes);
+
+    $scope.singleRecipe = {
+        name: null,
+        description: null
+    };
 
     // This should be called whenever we need to update the recipes Grid
     $scope.change = function(){
         $scope.recipes = Recipes.get({archived: $scope.archived || 'n', context: $scope.context || 'All', project: 'master'}, function(){
-            if($scope.workInProgress){
-                var confitmation=confirm("Recipe " + currentSelectedRow.entity.name + " has unsaved changes. Press Okay to continue and loose those changes otherwise press Cancel");
-                if (confitmation==true){
-                    seeChanges();
-                    contextLastSelected = $('#contextSelector').val();
-                    archivedSelected = $('#viewArchived').val()
-                }else{
-                    var s = setTimeout(function(){
-                        $('#contextSelector').val(contextLastSelected)
-                        $scope.context = $('#contextSelector option:eq('+contextLastSelected+')').text();
-                        $('#viewArchived').val(archivedSelected)
-                        document.getElementById("viewArchived").checked = archivedSelected;
-                        console.log($scope.context);
-                    }, 300)
-                }
-            }else{
-                seeChanges();
-                contextLastSelected = document.getElementById("contextSelector").selectedIndex;
-                archivedSelected = document.getElementById("viewArchived").checked;
-            }
+            seeChanges();
         });
     }
 
     var seeChanges = function(){
-        //console.log($scope.recipes.data.list);
         $scope.totalItems = $scope.recipes.data.list.length;
         $scope.gridData = ($scope.totalItems) ? $scope.recipes.data.list : [{'message': 'No results found', 'context': 'none'}]; 
         $scope.colDefinition = ($scope.totalItems) ? $scope.colDef : $scope.colDefNoData;
@@ -61,21 +48,19 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource) {
     $scope.bigCurrentPage = 1;
     //----------------------------
 
-    
+    var col = {index: 0}
     // ng-grid stuff
-    var editBtnTemplate = '<div class="gridIcon"><a href="#" class="actions edit"><span class="glyphicon glyphicon-edit"></span></a></div>'
-    var deleteBtnTemplate = '<div class="gridIcon"><a href="#" class="actions delete"><span class="glyphicon glyphicon-remove"></span></a></div>'
-
+    var actionsTemplate = '<div class="gridIcon"><a href="#" class="actions edit" title="Edit" ng-click="actionsEdit()"><span class="glyphicon glyphicon-pencil"></span> <a href="#" class="actions edit" title="Revert" ng-click="actionRevert()"><span class="glyphicon glyphicon-arrow-left"></span> <a href="#" class="actions edit" title="Archive" ng-click="actionArchive()"><span class="glyphicon glyphicon-folder-close"></span> <a href="#" class="actions edit" title="Remove" ng-click="actionDelete()"><span class="glyphicon glyphicon-trash"></span></a></div>'
+    $scope.edittableField = '<input ng-class="colt' + col.index + '" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-blur="updateEntity(row)" />'; //value="{{row.getProperty(col.field)}}" ng-blur="saveRecipeChanges()"
     $scope.colDef = [
-        {field:'name', displayName:'Recipe', enableCellEdit: true, width: '***'},
-        {field:'description', displayName:'Description', enableCellEdit: true, width: '******'},
+        {field:'name', displayName:'Recipe', enableCellEdit: true, enableCellEditOnFocus: false, width: '***', editableCellTemplate: $scope.edittableField},
+        {field:'description', displayName:'Description', enableCellEdit: true, enableCellEditOnFocus: false, width: '******', editableCellTemplate: $scope.edittableField},
         {field:'context', displayName:'Context', enableCellEdit: false, width: '**'},
         {field:'createdBy', displayName:'Editor', enableCellEdit: false, width: '***'},
         {field:'lastUpdated', displayName:'Last', enableCellEdit: false, width: '****'},
         {field:'versionNumber', displayName:'Version', cellClass: 'text-right', enableCellEdit: false, width: '**'},
         {field:'hasWIP', displayName:'WIP', cellClass: 'text-center', enableCellEdit: false, width: '*'},
-        {field:'edit', displayName:'Edit', cellClass: 'text-center', enableCellEdit: false, width: '*', sortable: false, cellTemplate: editBtnTemplate},
-        {field:'delete', displayName:'Delete', cellClass: 'text-center', enableCellEdit: false, width: '*', sortable: false, cellTemplate: deleteBtnTemplate}
+        {field:'', displayName:'Actions', cellClass: 'text-center', enableCellEdit: false, width: '**', sortable: false, cellTemplate: actionsTemplate}
     ];
 
     $scope.colDefNoData = [{field:'message', displayName:'Message', enableCellEdit: false, width: '100%'}];
@@ -95,40 +80,45 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource) {
         multiSelect: false,
         selectedItems: $scope.mySelection,
         columnDefs: 'colDefinition',
+        enableCellEditOnFocus: false,
+        enableCellEdit: true,
         beforeSelectionChange: function(rowItem){
-            console.log('$scope.workInProgress: '+$scope.workInProgress);
-                if($scope.workInProgress){
-                    
-                    /*$('#unsavedChangesModal').modal('show');
-                    $('#unsavedChangesModal .btn.okey').on('click', function(e){
-                        e.preventDefault();
-                        $('#unsavedChangesModal').modal('hide');
-                        console.log('cancel');
-                        return true;
-                    })
-                    $('#unsavedChangesModal .btn.cancel, #unsavedChangesModal .close').on('click', function(e){
-                        e.preventDefault();
-                        $('#unsavedChangesModal').modal('hide');
-                        console.log('no, please');
-                        return false;
-                    })*/
-                    
-                    var confitmation=confirm("Recipe " + currentSelectedRow.entity.name + " has unsaved changes. Press Okay to continue and loose those changes otherwise press Cancel");
-                    if (confitmation==true){
-                        console.log('cancel');
-                        return true;
-                    }else{
-                        console.log('no, please');
-                        return false;
-                    }
-                }else{
+            if($scope.workInProgress){
+                
+                /*$('#unsavedChangesModal').modal('show');
+                $('#unsavedChangesModal .btn.okey').on('click', function(e){
+                    e.preventDefault();
+                    $('#unsavedChangesModal').modal('hide');
+                    console.log('cancel');
                     return true;
+                })
+                $('#unsavedChangesModal .btn.cancel, #unsavedChangesModal .close').on('click', function(e){
+                    e.preventDefault();
+                    $('#unsavedChangesModal').modal('hide');
+                    console.log('no, please');
+                    return false;
+                })*/
+                
+                var confirmation=confirm("Recipe " + currentSelectedRow.entity.name + " has unsaved changes. Press Okay to continue and loose those changes otherwise press Cancel");
+                if (confirmation==true){
+                    console.log('cancel');
+                    return true;
+                }else{
+                    console.log('no, please');
+                    return false;
                 }
+            }else{
+                return true;
+            }
         },
         afterSelectionChange: function(rowItem){
             if(rowItem != currentSelectedRow){
                 currentSelectedRow = rowItem;
                 $scope.changeRecipe();
+                $scope.currentSelectedRecipe = {
+                    name: rowItem.entity.name,
+                    description: rowItem.entity.description
+                }
             }
         }
     };
@@ -149,6 +139,7 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource) {
             });
             if($scope.selectedRecipe){
                 $scope.selectedRecipe.name = currentSelectedRow.entity.name;
+                console.log($scope.selectedRecipe);
             }
         }else{
             $scope.selectedRecipe = {
@@ -177,38 +168,26 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource) {
     $scope.saveWIP = function(){
         var rid = $scope.selectedRecipe.recipeId;
         var vid = $scope.selectedRecipe.versionNumber;
-        /*console.log(rid);
-        console.log($scope.selectedRecipe);*/
+
         $http.post('/tdstm/ws/cookbook/recipe/'+rid+'/'+vid, $scope.selectedRecipe).
-        success(function(data, status) {
-            console.log('success');
-            console.log(status);
-            console.log(data);
-        }).
-        error(function(data, status) {
-            console.log('error');
-            console.log(status);
-            console.log(data);
-        });
+            success(function(data, status) {
+                console.log('success');
+                $scope.workInProgress = false;
+            }).
+            error(function(data, status) {
+                console.log('error');
+            });
     }
 
     $scope.$watch('selectedRecipe', function(newValue, oldValue) {
-        console.log('d');
         if (newValue === oldValue || !oldValue || (newValue.recipeId != oldValue.recipeId)) {
             $scope.workInProgress = false;
+            disableElements();
             return;
         }
-        console.log('Work in progress');
         $scope.workInProgress = true;
+        enableDisabledElements();
     }, true);
-
-    $scope.$watch('workInProgress', function(newValue, oldValue){
-        if (!newValue){
-            disableElements();
-        }else{
-            enableDisabledElements();
-        }
-    })
 
     // Initially we should disable the buttons:
     disableElements()
@@ -220,8 +199,60 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource) {
     }
 
     function disableElements(){
-        console.log($('.btns .btn-group > button'));
         $('.btns .btn-group > button').prop('disabled', true);
         $('.btns button:submit').prop('disabled', true);
     }
+
+    $scope.actionsEdit = function(){
+        //console.log(this.row.entity);
+    }
+
+    // Update recipe. After editing. 
+    $scope.updateEntity = function(row) {
+        
+        var recipeToUpdate = {
+                name : $scope.gridData[row.rowIndex].name,
+                description: $scope.gridData[row.rowIndex].description
+            },
+            rid = $scope.gridData[row.rowIndex].recipeId;
+
+        console.log(recipeToUpdate.name + ' - ' + $scope.currentSelectedRecipe.name + ' ... ' + recipeToUpdate.description  + ' - ' +  $scope.currentSelectedRecipe.description);
+        console.log(row);
+        if(!$scope.save) {
+            $scope.save = { promise: null, pending: false, row: null };
+        }
+        
+        $scope.save.row = row.rowIndex;
+        if(!$scope.save.pending && (recipeToUpdate.name != $scope.currentSelectedRecipe.name || recipeToUpdate.description != $scope.currentSelectedRecipe.description)) {
+            $scope.save.pending = true;
+            $scope.save.promise = $timeout(function(){
+                $http.put('/tdstm/ws/cookbook/recipe/'+rid, recipeToUpdate).success(function(){
+                    
+                    console.log("Here you'd save your record to the server, we're updating row: " 
+                        + $scope.save.row + " to be: " 
+                        + recipeToUpdate.name + "," 
+                        + recipeToUpdate.description);
+
+                    $scope.save.pending = false;
+
+                    $scope.currentSelectedRecipe.name = recipeToUpdate.name;
+                    $scope.currentSelectedRecipe.description = recipeToUpdate.description;
+
+                    $('.alert.saved').fadeIn(200).delay(500).fadeOut();
+                }).error(function(){
+                    console.log('error when trying to update the recipe');
+                });
+            }, 500);
+        }  
+    };
+
+});
+
+angular.module('modNgBlur', [])
+.directive('ngBlur', function () {
+    return function (scope, elem, attrs) {
+        elem.bind('blur', function () {
+            scope.$apply(attrs.ngBlur);
+        });
+    };
 });

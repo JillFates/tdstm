@@ -7,9 +7,7 @@
 	margin:0;
 }
 
-#contextSelector{
-	margin:5px 0 0 0;
-}
+
 
 .nav{
 	background: transparent;
@@ -26,26 +24,46 @@ ul{
 	padding-left: 25px;
 }
 
+table{
+	font-size: 1em;
+}
+
+#contextSelector{
+	margin:5px 0 0 0;
+}
+
 .paginationWrapper{
 	text-align: center;
 }
 
-.recipesTable{
+.ngGridTable{
 	border:1px solid #ddd;
 	margin-bottom: 0;
 }
 
-.recipesTable tr th, .recipesTable tr td{
+.ngGridTable tr th, .ngGridTable tr td{
 	border-rigth:1px solid #ddd;
 	border-left:1px solid #ddd;
 }
 
-.recipesTable tr th:nth-child(6), .recipesTable tr td:nth-child(6){
+.ngGridTable tr th:nth-child(6), .ngGridTable tr td:nth-child(6){
 	text-align: right;
 }
 
-.recipesTable tr th:nth-child(7), .recipesTable tr td:nth-child(7), .recipesTable tr th:nth-child(8), .recipesTable tr td:nth-child(8), .recipesTable tr th:nth-child(9), .recipesTable tr td:nth-child(9){
+.ngGridTable tr th:nth-child(7), .ngGridTable tr td:nth-child(7), .ngGridTable tr th:nth-child(8), .ngGridTable tr td:nth-child(8), .ngGridTable tr th:nth-child(9), .ngGridTable tr td:nth-child(9){
 	text-align: center;
+}
+
+.alert{
+	position: fixed;
+	width:300px;
+	left:50%;
+	margin-left:-15%;
+	top:5%;
+	z-index:50;
+	padding:5px 15px;
+	text-align:center;
+	display: none;
 }
 
 .tab-content{
@@ -53,6 +71,10 @@ ul{
     border-left: 1px solid #ddd;
     border-right: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
+}
+
+.ngCell > div{
+	height: 100%;
 }
 
 .innerTabWrapper{
@@ -82,10 +104,6 @@ ul{
 
 .btns{
 	margin:15px 0 0 0;
-}
-
-table{
-	font-size: 1em;
 }
 
 textarea#logs{
@@ -121,7 +139,7 @@ form.groups{
 .gridStyle {
     border: 1px solid rgb(212,212,212);
     width: 100%;
-    height: 150px;
+    height: 154px;
     overflow-y: auto;
     margin: 0 0 10px 0;
 }
@@ -130,17 +148,19 @@ form.groups{
 	display: table;
 	height: 100%;
 	width: 100%;
+	padding: 0 10px;
 }
 
-.ngCell > div{
-	height: 100%;
+.createRecipe{
+	margin: 17px 0;
 }
 
 .actions{
 	display: table-cell;
 	vertical-align: middle;
+	margin-right:5px;
 }
 
-/*.ngHeaderText{
-	font-weight: normal;
-}*/
+.actions:last-child{
+	margin-right:0;
+}

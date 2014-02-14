@@ -47,7 +47,10 @@
 				</div>				
 			</div>
 			<div class="row-fluid clearfix">
-				<div class="col-md-4 col-md-offset-4 paginationWrapper">
+				<div class="col-md-4">
+					<button class="btn btn-default createRecipe">Create Recipe</button>
+				</div>
+				<div class="col-md-4 paginationWrapper">
 					<pagination boundary-links="true" total-items="totalItems" page="currentPage" class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
 				</div>
 			</div>
@@ -62,7 +65,7 @@
 						%{-- History --}%
 						<tab heading="History">
 							<div class="table-responsive historyMainTable">
-								<table class="table table-hover table-striped recipesTable">
+								<table class="table table-hover table-striped ngGridTable">
 									<thead>
 										<tr>
 											<th>Target</th>
@@ -124,7 +127,7 @@
 									%{-- Tasks Content --}%
 									<tab heading="Task Content">
 										<div class="table-responsive">
-											<table class="table table-hover table-striped recipesTable">
+											<table class="table table-hover table-striped ngGridTable">
 												<thead>
 													<tr>
 														<th>Task #</th>
@@ -193,10 +196,10 @@
 
 						%{-- Editor Content --}%
 						<tab heading="Editor">
-							<div class="row clearfix">
+							<div class="row clearfix edition">
 								<div class="col-xs-6">
 									<h5 class="headingTitle">Recipe</h5>
-									<textarea name="recipeCode" id="recipeCode" rows="10" ng-model="selectedRecipe.sourceCode" value="{{selectedRecipe.sourceCode}}"></textarea>
+									<textarea name="recipeCode" ng-blur="alertIt()" id="recipeCode" rows="10" ng-model="selectedRecipe.sourceCode" value="{{selectedRecipe.sourceCode}}"></textarea>
 									<div class="clearfix btns">
 										<div class="btn-group pull-left">
 											<button type="button" class="btn btn-default" ng-click="saveWIP()">Save WIP</button>
@@ -228,7 +231,7 @@
 												<button type="submit" class="btn btn-default pull-right">Refresh</button>
 											</form>
 											<div class="table-responsive groupsTable">
-												<table class="table table-hover table-striped recipesTable">
+												<table class="table table-hover table-striped ngGridTable">
 													<thead>
 														<tr>
 															<th>Class</th>
@@ -266,7 +269,7 @@
 												</table>
 											</div>
 											<div class="table-responsive groupsTable2">
-												<table class="table table-hover table-striped recipesTable">
+												<table class="table table-hover table-striped ngGridTable">
 													<thead>
 														<tr>
 															<th>Asset Name</th>
@@ -292,12 +295,21 @@
 									</tabset>
 								</div>
 							</div>
+							%{-- <div class="row clearfix creation">
+								<div class="col-xs-6">
+									
+								</div>
+							</div> --}%
 						</tab>
 
 						%{-- Versions --}%
 						<tab heading="Versions">Versions Content</tab>
 					</tabset>
 				</div>
+			</div>
+
+			<div class="saved alert alert-warning fade in">
+				Saved!
 			</div>
 
 			%{-- <div class="modal fade" id="unsavedChangesModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -317,6 +329,7 @@
 					</div>
 				</div>
 			</div> --}%
+
 		</div>
 	</div>
 	<script>
@@ -327,6 +340,10 @@
 				$(this).val('n')
 			}
 		})
+
+		$('.alert .close').on("click", function(e) {
+		    $(this).parent().fadeOut();
+		});
 	</script>
 	</body>
 </html>
