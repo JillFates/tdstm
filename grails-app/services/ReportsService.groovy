@@ -10,6 +10,7 @@ class ReportsService {
 	def partyRelationshipService
 	def jdbcTemplate
     def grailsApplication
+	def securityService
 
 	static transactional = true
 
@@ -602,6 +603,27 @@ class ReportsService {
 
 			throw new RuntimeException("Exit code: ${ proc.exitValue()}\n stderr: ${serr}\n stdout: ${sout}")
 		}
+	}
+	/**
+	 * Used to get the smeList from moveBundle & Project
+	 * @param moveBundleId
+	 * @return smeList
+	 */
+	HashSet getSmeList(moveBundleId){
+		def apps = []
+		Set smeListByBundle = []
+		def project = securityService.getUserCurrentProject()
+		if(moveBundleId && moveBundleId !='useForPlanning'){
+			def currentBundle = MoveBundle.read(moveBundleId)
+			apps = Application.findAllByMoveBundleAndProject(currentBundle, project)
+		}else{
+			apps = Application.findAllByProject(project)
+		}
+		smeListByBundle =  apps.collect{it.sme} + apps.collect{it.sme2}
+		smeListByBundle.remove(null)
+		smeListByBundle.sort{it.lastName}
+		
+		return smeListByBundle
 	}
 
 }

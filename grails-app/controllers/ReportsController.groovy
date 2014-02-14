@@ -1340,17 +1340,10 @@ class ReportsController {
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		def moveBundleId = securityService.getUserCurrentMoveBundleId()
-		def smeList ;
-		if(moveBundleId){
-			def currentBundle = MoveBundle.get(moveBundleId)
-			smeList = Application.findAllByMoveBundleAndProject(currentBundle,project, [sort:"sme.lastName"])?.sme 
-		}else{
-			smeList = Application.findAllByProject(project, [sort:"sme.lastName"])?.sme 
-		}
-		smeList.removeAll([null])
-		//smeList.sort { sme1, sme2 -> sme1.lastName <=> sme2.lastName ?: sme1.firstName <=> sme2.firstName }
-		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId, smeList:smeList.unique()]
+		def smeList = reportsService.getSmeList(moveBundleId)
+		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId, smeList:smeList]
 	}
+	
 	/**
 	 * Used to populate sme select based on the bundle Selected
 	 * @param bundle
@@ -1359,22 +1352,8 @@ class ReportsController {
 	def generateSmeByBundle = {
 		def project = securityService.getUserCurrentProject()
 		def moveBundleId=params.bundle
-		def smeList = []
-		def smeListByBundle = []
-		if(moveBundleId == 'useForPlanning'){
-			smeList = Application.findAllByProject(project)
-		}else{
-			def currentBundle = MoveBundle.get(moveBundleId)
-			smeList = Application.findAllByMoveBundleAndProject(currentBundle,project)
-		}
-		smeList.each{
-			if(it.sme)
-				smeListByBundle << (it.sme)
-				
-			if(it.sme2)
-				smeListByBundle << (it.sme2)
-		}
-		render(template:"smeSelectByBundle", model:[smeList:smeListByBundle.unique()])
+		def smeList = reportsService.getSmeList(moveBundleId)
+		render(template:"smeSelectByBundle", model:[smeList:smeList])
 	}
 	/**
 	 * Used to generate Application Profiles
@@ -1387,18 +1366,7 @@ class ReportsController {
 		def currentSme 
 		def applicationList = []
 		def currentBundle
-		def smeListByBundle =[]
-		//Used to get all the application of a project which has sme.
-		def smeList = Application.findAllByProject(project)
-		//Used to list out all the sme of a project
-		smeList.each{
-			if(it.sme)
-				smeListByBundle << (it.sme)
-			
-			if(it.sme2)
-				smeListByBundle << (it.sme2)
-		}
-		smeListByBundle.unique()
+		def smeListByBundle = new ArrayList(reportsService.getSmeList(''))
 		
 		//checking various condition
 		if(params.moveBundle == 'useForPlanning'){		 //if user haven't selected any bundle
