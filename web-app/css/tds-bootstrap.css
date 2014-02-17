@@ -66,6 +66,18 @@ table{
 	display: none;
 }
 
+.modal-dialog{
+	width:800px;
+}
+
+.modal-dialog h3{
+	margin:0;
+}
+
+.modal-dialog .selectLabel{
+	padding-top:2px;
+}
+
 .tab-content{
     padding: 15px;
     border-left: 1px solid #ddd;
@@ -163,4 +175,8 @@ form.groups{
 
 .actions:last-child{
 	margin-right:0;
+}
+
+form .error-msg{
+	margin:0.5em 0 0 0;
 }

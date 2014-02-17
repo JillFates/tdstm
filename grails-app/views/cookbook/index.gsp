@@ -29,14 +29,14 @@
 								<li ng-repeat="c in contexts" ng-click="change()" ><a href="#">{{c}}</a></li>
 							</ul>
 						</div> --}%
-						<select name="contextSelector" id="contextSelector" ng-model="context" ng-options="c for c in contexts" ng-change="change()">
+						<select name="contextSelector" id="contextSelector" ng-model="context" ng-options="c for c in ['All', 'Event', 'Bundle', 'Application']" ng-disabled="editingRecipe" ng-change="changeRecipeList()">
 						</select>
 					</g:form>
 				</div>
 				<div class="col-md-6 col-xs-6">
 					<div class="checkbox">
 						<label class="pull-right">
-							<input type="checkbox" name="viewArchived" id="viewArchived" value="n" ng-model="archived" ng-true-value="y" ng-false-value="n" ng-change="change()"> View Archived Recipes
+							<input type="checkbox" name="viewArchived" id="viewArchived" value="n" ng-model="archived" ng-true-value="y" ng-false-value="n" ng-disabled="editingRecipe" ng-change="changeRecipeList()"> View Archived Recipes
 						</label>
 					</div>
 				</div>
@@ -48,7 +48,7 @@
 			</div>
 			<div class="row-fluid clearfix">
 				<div class="col-md-4">
-					<button class="btn btn-default createRecipe">Create Recipe</button>
+					<button class="btn btn-default createRecipe" ng-click="openCreateModal()">Create Recipe</button>
 				</div>
 				<div class="col-md-4 paginationWrapper">
 					<pagination boundary-links="true" total-items="totalItems" page="currentPage" class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
@@ -201,12 +201,15 @@
 									<h5 class="headingTitle">Recipe</h5>
 									<textarea name="recipeCode" ng-blur="alertIt()" id="recipeCode" rows="10" ng-model="selectedRecipe.sourceCode" value="{{selectedRecipe.sourceCode}}"></textarea>
 									<div class="clearfix btns">
-										<div class="btn-group pull-left">
-											<button type="button" class="btn btn-default" ng-click="saveWIP()">Save WIP</button>
-											<button type="button" class="btn btn-default">Release</button>
-											<button type="button" class="btn btn-default">Revert</button>
+										<div class="btn-group pull-left" style="margin-right:15px;">
+											<button type="button" class="btn btn-default" ng-click="saveWIP()" ng-disabled="!editingRecipe">Save WIP</button>
+											<button type="button" class="btn btn-default" ng-disabled="!editingRecipe">Release</button>
 										</div>
-										<button type="submit" class="btn btn-default pull-right">Validate Syntax</button>
+										<div class="btn-group pull-left">
+											<button type="button" class="btn btn-default" ng-disabled="!editingRecipe" ng-click="cancelChanges()">Cancel</button>
+											<button type="button" class="btn btn-default" ng-disabled="!editingRecipe">Discard WIP</button>
+										</div>
+										<button type="submit" class="btn btn-default pull-right" ng-disabled="!editingRecipe">Validate Syntax</button>
 									</div>
 								</div>
 								<div class="col-xs-6">
@@ -295,11 +298,6 @@
 									</tabset>
 								</div>
 							</div>
-							%{-- <div class="row clearfix creation">
-								<div class="col-xs-6">
-									
-								</div>
-							</div> --}%
 						</tab>
 
 						%{-- Versions --}%
@@ -311,6 +309,52 @@
 			<div class="saved alert alert-warning fade in">
 				Saved!
 			</div>
+
+			<script type="text/ng-template" id="createRecipeModal">
+				<form class="form-horizontal" name="form" role="form" novalidate >
+		        <div class="modal-header">
+		            <h3>Create a recipe</h3>
+		        </div>
+		        <div class="modal-body">
+		            <tabset>
+		            	%{-- New Recipe Tab --}%
+						<tab heading="Brand New Recipe">
+							<div class="form-group">
+								<label for="inputName" class="col-sm-2 control-label">Name</label>
+								<div class="col-sm-10">
+									<input type="text" class="form-control" id="inputName" placeholder="" name="inputName" ng-model="newRecipe.name" required>
+									<div ng-show="form.inputName.$dirty && form.inputName.$invalid">
+										<pre class="error-msg" ng-show="form.inputName.$error.required">Recipe Name is required.</pre>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="textareaDescription" class="col-sm-2 control-label">Description</label>
+								<div class="col-sm-10">
+									<textarea class="form-control" rows="3" id="textareaDescription" placeholder="" ng-model="newRecipe.description"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="contextSelector2" class="col-sm-2 control-label selectLabel">Context</label>
+								<div class="col-sm-10">
+									<select name="contextSelector2" id="contextSelector2" ng-model="newRecipe.context" ng-options="d for d in ['Event', 'Bundle', 'Application']">
+									</select>
+								</div>
+							</div>							
+						</tab>
+
+						%{-- Clone tab --}%
+						<tab heading="Clone An Existing Recipe">
+							Clone Recipe Stuff
+						</tab>
+					</tabset>
+		        </div>
+		        <div class="modal-footer">
+		            <button class="btn btn-primary" ng-disabled="form.$invalid || isUnchanged(newRecipe)" ng-click="modalBtns.save()">Save</button>
+		            <button class="btn btn-warning" ng-click="modalBtns.cancel()">Cancel</button>
+		        </div>
+		        </form>
+		    </script>
 
 			%{-- <div class="modal fade" id="unsavedChangesModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 				<div class="modal-dialog">
