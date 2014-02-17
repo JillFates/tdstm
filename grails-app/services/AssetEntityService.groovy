@@ -600,6 +600,9 @@ class AssetEntityService {
 				case 'Storage_Columns':
 					appPref = ['1':'fileFormat','2':'size','3':'planStatus','4':'moveBundle']
 				break;
+				case 'Task_Columns':
+					appPref = ['1':'assetName','2':'assetType','3':'assignedTo','4':'role', '5':'category']
+				break;
 			}
 		}else{
 			appPref = JSON.parse(existingPref)

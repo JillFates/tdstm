@@ -78,24 +78,23 @@
 				<span class='capBtn'><input type='button' id='bulkEditId' class='bulkEdit' value='Bulk Edit' data-method='bulkEditTasks' /></span>"
 					
 			<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
-				colNames="'Action', 'Task', 'Description', 'Asset', 'AssetType', 'Updated', 'Due', 'Status',
-					'Assigned To', 'Team', 'Category', 'Suc.', 'Score', 'id', 'statusCss', 'Is published?'"
+				colNames="'Action', 'Task', 'Description', '${modelPref['1']}', '${modelPref['2']}', 'Updated', 'Due', 'Status',
+					'${modelPref['3']}', '${modelPref['4']}', '${modelPref['5']}', 'Suc.', 'Score', 'id', 'statusCss'"
 				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
 					{name:'taskNumber', formatter:taskFormatter, width:80},
 					{name:'comment', width:680, formatter:taskFormatter},
-					{name:'assetName', formatter:assetFormatter, width:200},
-					{name:'assetType', formatter:taskFormatter},
+					{name:'${taskPref['1']}', formatter:assetFormatter, width:200},
+					{name:'${taskPref['2']}', formatter:taskFormatter, width:200},
 					{name:'updated', formatter: updatedFormatter,sortable:false,search:false},
 					{name:'dueDate', formatter: dueFormatter},
 					{name:'status', formatter: statusFormatter},
-					{name:'assignedTo', formatter:assignedFormatter, width:200},
-					{name:'role', formatter:taskFormatter},
-					{name:'category', formatter:taskFormatter},
+					{name:'${taskPref['3']}', formatter:assignedFormatter, width:200},
+					{name:'${taskPref['4']}', formatter:taskFormatter, width:200},
+					{name:'${taskPref['5']}', formatter:taskFormatter, width:200},
 					{name:'suc', formatter:taskFormatter,sortable:false,search:false, width:50},
 					{name:'score', formatter:taskFormatter, search:false, width:70},
 					{name:'id', hidden: true},
-					{name:'statusCss', hidden: true},
-					{name:'isPublished', formatter: isPublishedFormatter, search:false}"
+					{name:'statusCss', hidden: true}"
 				caption="listCaption"
 				rowNum="sizePref"
 				scrollOffset="0"
@@ -109,6 +108,11 @@
 				<jqgrid:refreshButton id="taskListId" />
 			</jqgrid:grid>
 			populateFilter();
+
+			<g:each var="key" in="['1','2','3','4','5']">
+				var taskPref= '${taskPref[key]}';
+				$("#taskListIdGrid_"+taskPref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:absolute;margin-left: 36px;margin-top: -15px;" onclick="showSelect(\''+taskPref+'\',\'taskList\',\''+${key}+'\')">');
+			</g:each>
 			
 			$('.bulkEdit').on('click',function(){
 				var method = $(this).data('method');
@@ -231,6 +235,20 @@
 			<br/></br>
 			<jqgrid:wrapper id="taskListId" />
 		</div>
+		<input type="hidden" id="customizeFieldCount" value="6" />
+		<g:each var="key" in="['1','2','3','4','5']">
+			<div id="columnCustomDiv_${taskPref[key]}" style="display:none;">
+				<div class="columnDiv_${key}" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 198px;width: 104px;z-index: 2147483647; overflow-y: scroll;text-align: left;">
+					<input type="hidden" id="previousValue_${key}" value="${taskPref[key]}" />
+					<g:each var="attribute" in="${attributesList}">
+						<label><input type="radio" name="coloumnSelector_${taskPref[key]}" id="coloumnSelector_${taskPref[key]}" value="${attribute}" 
+							${taskPref[key]==attribute?'checked':'' } 
+							onchange="setColumnAssetPref(this.value,'${key}','Task_Columns')"/> ${attribute}</label><br>
+					</g:each>
+				</div>
+			</div>
+		</g:each>
+			
 		<g:render template="../assetEntity/modelDialog" />
 		<div id="showEntityView" style="display: none;"></div>
 		<div id="editEntityView" style="display: none;"></div>
