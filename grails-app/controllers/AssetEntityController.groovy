@@ -1543,16 +1543,17 @@ class AssetEntityController {
 		def attributes = projectService.getAttributes('AssetEntity')
 		def customList = (1..project.customFieldsShown).collect{"custom"+it}
 		def assets = ['assetName', 'assetType', 'model', 'sourceLocation', 'sourceRack', 'planStatus', 'moveBundle']
+		
 		// Remove the non project specific attributes and sort them by attributeCode
-		def assetAttributes = attributes.findAll{!it.attributeCode.contains('custom') && !(it.attributeCode in assets)}?.sort{it.frontendLabel}
-		def customAttributes = attributes.findAll{it.attributeCode in customList}.sort{it.frontendLabel}
+		def assetAttributes = attributes.findAll{!(it.attributeCode in assets)}
+		
 		// Used to display column names in jqgrid dynamically
 		def modelPref = [:]
 		assetPref.each{key,value->
 			modelPref << [(key): assetEntityService.getAttributeFrontendLabel(value,attributes.find{it.attributeCode==value}?.frontendLabel)]
 		}
 		/* Asset Entity attributes for Filters*/
-		def attributesList= (assetAttributes+customAttributes).collect{ attribute ->
+		def attributesList= (assetAttributes).collect{ attribute ->
 			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
 		}
 		render(view:'list', model:[assetDependency : new AssetDependency(), dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
@@ -1570,7 +1571,6 @@ class AssetEntityController {
 	 */
 	def listJson = {
 		def filterParams = ['assetName':params.assetName, 'assetType':params.assetType, 'model':params.model, 'sourceLocation':params.sourceLocation, 'sourceRack':params.sourceRack, 'planStatus':params.planStatus, 'moveBundle':params.moveBundle, 'depNumber':params.depNumber, 'depToResolve':params.depToResolve,'depConflicts':params.depConflicts, 'event':params.event]
-		def sortIndex = (params.sidx in filterParams.keySet()) ? (params.sidx) : ('assetName')
 		def validSords = ['asc', 'desc']
 		def sortOrder = (validSords.indexOf(params.sord) != -1) ? (params.sord) : ('asc')
 		def maxRows = Integer.valueOf(params.rows) 
@@ -1587,6 +1587,7 @@ class AssetEntityController {
 			if(attribute.attributeCode in assetPrefVal)
 				filterParams << [ (attribute.attributeCode): params[(attribute.attributeCode)]]
 		}
+		def sortIndex = (params.sidx in filterParams.keySet()) ? (params.sidx) : ('assetName')
 		
 		session.AE = [:]
 		userPreferenceService.setPreference("assetListSize", "${maxRows}")

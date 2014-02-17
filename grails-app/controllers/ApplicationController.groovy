@@ -53,15 +53,15 @@ class ApplicationController {
 		def customList = (1..project.customFieldsShown).collect{"custom"+it}
 		
 		// Remove the non project specific attributes and sort them by attributeCode
-		def appAttributes = attributes.findAll{!it.attributeCode.contains('custom') && it.attributeCode!="assetName"}?.sort{it.frontendLabel}
-		def customAttributes = attributes.findAll{it.attributeCode in customList}.sort{it.frontendLabel}
+		def appAttributes = attributes.findAll{it.attributeCode!="assetName"}
+
 		// Used to display column names in jqgrid dynamically
 		def modelPref = [:]
 		appPref.each{key,value->
 			modelPref << [(key): assetEntityService.getAttributeFrontendLabel(value,attributes.find{it.attributeCode==value}?.frontendLabel)]
 		}
 		/* Asset Entity attributes for Filters*/
-		def attributesList= (appAttributes+customAttributes).collect{ attribute ->
+		def attributesList= (appAttributes).collect{ attribute ->
 			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
 		}
 		
@@ -96,7 +96,7 @@ class ApplicationController {
 		def appPref= assetEntityService.getExistingPref('App_Columns')
 		def appPrefVal = appPref.collect{it.value}
 		attributes.each{ attribute ->
-			if(attribute.attributeCode in appPrefVal)
+			if(attribute.attributeCode in appPrefVal && attribute.attributeCode!='latency')
 				filterParams << [ (attribute.attributeCode): params[(attribute.attributeCode)]]
 		}
 		def initialFilter = params.initialFilter in [true,false] ? params.initialFilter : false

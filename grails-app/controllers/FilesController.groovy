@@ -50,15 +50,15 @@ class FilesController {
 		def attributes = projectService.getAttributes('Files')
 		def customList = (1..project.customFieldsShown).collect{"custom"+it}
 		// Remove the non project specific attributes and sort them by attributeCode
-		def filesAttributes = attributes.findAll{!it.attributeCode.contains('custom') && it.attributeCode !='assetName'}?.sort{it.frontendLabel}
-		def customAttributes = attributes.findAll{it.attributeCode in customList}.sort{it.frontendLabel}
+		def filesAttributes = attributes.findAll{it.attributeCode !='assetName'}
+		
 		// Used to display column names in jqgrid dynamically
 		def modelPref = [:]
 		filesPref.each{key,value->
 			modelPref << [(key): assetEntityService.getAttributeFrontendLabel(value,attributes.find{it.attributeCode==value}?.frontendLabel)]
 		}
 		/* Asset Entity attributes for Filters*/
-		def attributesList= (filesAttributes+customAttributes).collect{ attribute ->
+		def attributesList= (filesAttributes).collect{ attribute ->
 			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
 		}
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:"name"])

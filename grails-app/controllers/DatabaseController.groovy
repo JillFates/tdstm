@@ -55,15 +55,15 @@ class DatabaseController {
 		def attributes = projectService.getAttributes('Database')
 		def customList = (1..project.customFieldsShown).collect{"custom"+it}
 		// Remove the non project specific attributes and sort them by attributeCode
-		def dbAttributes = attributes.findAll{!it.attributeCode.contains('custom') && it.attributeCode !='assetName'}?.sort{it.frontendLabel}
-		def customAttributes = attributes.findAll{it.attributeCode in customList}.sort{it.frontendLabel}
+		def dbAttributes = attributes.findAll{it.attributeCode !='assetName'}
+
 		// Used to display column names in jqgrid dynamically
 		def modelPref = [:]
 		dbPref.each{key,value->
 			modelPref << [(key): assetEntityService.getAttributeFrontendLabel(value,attributes.find{it.attributeCode==value}?.frontendLabel)]
 		}
 		/* Asset Entity attributes for Filters*/
-		def attributesList= (dbAttributes+customAttributes).collect{ attribute ->
+		def attributesList= (dbAttributes).collect{ attribute ->
 			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
 		}
 		return [assetDependency: new AssetDependency(),
