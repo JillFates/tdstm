@@ -3281,7 +3281,7 @@ class AssetEntityController {
 			def validationType = assetEntity.validation
 			def configMap = assetEntityService.getConfig('AssetEntity',validationType)
 			
-			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
+			def assetCommentList = AssetComment.findAllByAssetEntityAndIsPublished(assetEntity, true)
 			def paramsMap = [label:frontEndLabel, assetEntity:assetEntity,
 				supportAssets:supportAssets, dependentAssets:dependentAssets, 
 				redirectTo:params.redirectTo, project:project,
