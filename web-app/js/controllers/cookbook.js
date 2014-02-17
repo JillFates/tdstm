@@ -24,6 +24,7 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource, $timeo
             $scope.colDefinition = ($scope.totalItems) ? $scope.colDef : $scope.colDefNoData;
         }, function(){
             $log.warn('Error on getting Recipes');
+            $scope.alerts.addAlert({type: 'danger', msg: 'Error: Could not get the list of Recipes'});
         });
     }
 
@@ -158,6 +159,7 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource, $timeo
 
             }, function(){
                 $log.warn('Error on getting selected recipe');
+                $scope.alerts.addAlert({type: 'danger', msg: 'Error: Could not get the selected recipe data'});
             });
             
         }else{
@@ -218,9 +220,12 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource, $timeo
                     $scope.currentSelectedRecipe.name = recipeToUpdate.name;
                     $scope.currentSelectedRecipe.description = recipeToUpdate.description;
 
-                    $('.alert.saved').fadeIn(200).delay(500).fadeOut();
+                    $scope.alerts.addAlert({type: 'success', msg: 'Saved', closeIn: 1500});
+                    //$scope.alerts.removeAlertAfter(1500);
+
                 }).error(function(){
                     $log.warn('Recipe updating error');
+                    $scope.alerts.addAlert({type: 'danger', msg: 'Error: Could not save the recipe'});
                 });
             }, 500);
         }  
@@ -287,6 +292,35 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource, $timeo
     $scope.cancelChanges = function(){
         $scope.selectedRecipe = angular.copy($scope.originalDataRecipe);
     }
+
+    // Alerts Stuff
+    $scope.alerts = {};
+    
+    $scope.alerts.list = [];
+    
+    $scope.alerts.addAlert = function(obj) {
+        if(obj.closeIn){
+            $scope.alerts.removeAlertAfter(obj.closeIn);
+        }
+
+        $scope.alerts.list.push({type: obj.type, msg: obj.msg, hidden: false});
+    };
+    
+    $scope.alerts.closeAlert = function(index) {
+        index = (index) ? index : $scope.alerts.list.length-1;
+        $scope.alerts.list[index].hidden = true;
+        $timeout(function(){
+            $scope.alerts.list.splice(index, 1);
+        }, 500);
+    };
+
+    $scope.alerts.removeAlertAfter = function(time) {
+        time = (time) ? time : 1000;
+        $timeout(function(){
+            $scope.alerts.closeAlert();
+        }, time);
+    }
+    //--------------
 
 });
 

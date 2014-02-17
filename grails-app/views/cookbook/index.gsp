@@ -306,8 +306,19 @@
 				</div>
 			</div>
 
-			<div class="saved alert alert-warning fade in">
+			%{-- <div class="saved alert alert-warning fade in">
 				Saved!
+			</div>
+
+			<div class="error alert alert-error fade in">
+				Error: {{responseMsg.error}}
+			</div> --}%
+
+			%{-- <alert ng-repeat="alert in alerts.list" type="alert.type" close="alerts.closeAlert($index)" class="animate-hide" ng-class="{lalala: alert.hidden}">{{alert.msg}}</alert> --}%
+
+			<div class="alert alert-{{alert.type}}" ng-repeat="alert in alerts.list" ng-class="{animateShow: !alert.hidden}">
+				<button type="button" class="close" aria-hidden="true" ng-click="alerts.closeAlert($index)">&times;</button>
+				{{alert.msg}}
 			</div>
 
 			<script type="text/ng-template" id="createRecipeModal">
@@ -384,10 +395,6 @@
 				$(this).val('n')
 			}
 		})
-
-		$('.alert .close').on("click", function(e) {
-		    $(this).parent().fadeOut();
-		});
 	</script>
 	</body>
 </html>
