@@ -1044,8 +1044,12 @@ function setColumnAssetPref(value,key, type){
 		type:'POST',
 		success: function(resp) {
 			console.log('success');
-			if(resp)
-				window.location.reload()
+			if(resp){
+				if( type!='Task_Columns')
+					window.location.reload()
+				else
+					submitForm()
+			}
 		}
 	});
 }

@@ -3712,6 +3712,7 @@ class AssetEntityController {
 
 	    def dates = params.dueDate ? AssetComment.findAll("from AssetComment where project =:project and dueDate like '%${params.dueDate}%' ",[project:project])?.dueDate : []
 		def estStartdates = params.estStart ? AssetComment.findAll("from AssetComment where project =:project and estStart like '%${params.estStart}%' ",[project:project])?.estStart : []
+		def actStartdates = params.actStart ? AssetComment.findAll("from AssetComment where project =:project and actStart like '%${params.actStart}%' ",[project:project])?.actStart : []
 		def dateCreateddates = params.dateCreated ? AssetComment.findAll("from AssetComment where project =:project and dateCreated like '%${params.dateCreated}%' ",[project:project])?.dateCreated : []
 		def dateResolveddates = params.dateResolved ? AssetComment.findAll("from AssetComment where project =:project and dateResolved like '%${params.dateResolved}%' ",[project:project])?.dateResolved : []
 		def estFinishdates = params.estFinish ? AssetComment.findAll("from AssetComment where project =:project and estFinish like '%${params.estFinish}%' ",[project:project])?.estFinish : []
@@ -3720,6 +3721,8 @@ class AssetEntityController {
 		def createdBy = params.createdBy ? Person.findAllByFirstNameIlikeOrLastNameIlike("%${params.createdBy}%","%${params.createdBy}%" ) : [] 
 		def resolvedBy = params.resolvedBy ? Person.findAllByFirstNameIlikeOrLastNameIlike("%${params.resolvedBy}%","%${params.resolvedBy}%" ) : []
 
+		def isPublishedList = (params.isPublished=='true') ? AssetComment.findAllByProjectAndIsPublished(project, params.isPublished )?.isPublished :[]
+		def isResolvedList = params.isResolved ? AssetComment.findAllByProjectAndIsResolved(project, params.isResolved )?.isResolved :[]
 		def tasks = AssetComment.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", project)
 			eq("commentType", AssetCommentType.TASK) 
@@ -3754,6 +3757,10 @@ class AssetEntityController {
 			if (taskNumbers)
 				'in'('taskNumber' , taskNumbers)
 				
+			if(isPublishedList)
+				'in'('isPublished',isPublishedList)
+			if(isResolvedList)
+				'in'('isResolved',isResolvedList)
 			if(hardAssigneds)
 				'in'('hardAssigned',hardAssigneds)
 			if (dates) {
@@ -3766,6 +3773,8 @@ class AssetEntityController {
 			}
 			if(estStartdates)
 				'in'('estStart',estStartdates)
+			if(actStartdates)
+				'in'('actStart',actStartdates)
 			if(estFinishdates)
 				'in'('estFinish',estFinishdates)
 			if(dateCreateddates)
@@ -3925,9 +3934,6 @@ class AssetEntityController {
 			break;
 			case 'createdBy':
 				result = task.createdBy ? task.createdBy.toString(): ''
-			break;
-			case 'moveEvent':
-				result = task.moveEvent?.name
 			break;
 			case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart/:
 				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
