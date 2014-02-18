@@ -41,7 +41,7 @@ class WsCookbookController {
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
 		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()))
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
 		} catch (Exception e) {
 			ServiceResults.internalError(response, log, e)
 		}
@@ -70,7 +70,7 @@ class WsCookbookController {
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
 		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()))
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
 		} catch (Exception e) {
 			ServiceResults.internalError(response, log, e)
 		}
@@ -102,7 +102,7 @@ class WsCookbookController {
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
 		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()))
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
 		} catch (Exception e) {
 			ServiceResults.internalError(response, log, e)
 		}
@@ -134,7 +134,7 @@ class WsCookbookController {
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
 		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()))
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
 		} catch (Exception e) {
@@ -162,7 +162,7 @@ class WsCookbookController {
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
 		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()))
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
 		} catch (Exception e) {
@@ -190,7 +190,7 @@ class WsCookbookController {
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
 		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()))
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
 		} catch (Exception e) {
@@ -234,7 +234,7 @@ class WsCookbookController {
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
 		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()))
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
 		} catch (Exception e) {
 			ServiceResults.internalError(response, log, e)
 		}
@@ -271,7 +271,7 @@ class WsCookbookController {
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
 		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()))
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
 		} catch (IllegalArgumentException e) {
 			ServiceResults.methodFailure(response)
 		} catch (Exception e) {
@@ -308,7 +308,7 @@ class WsCookbookController {
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
 		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()))
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
 		} catch (Exception e) {
 			ServiceResults.internalError(response, log, e)
 		}
