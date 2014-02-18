@@ -152,8 +152,10 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource, $timeo
                 $scope.saveWIP = function(){
                     rec.$save(rec.data, function(){
                         $log.info('Success on Saving WIP');
+                        $scope.alerts.addAlert({type: 'success', msg: 'Saved', closeIn: 1500});
                     }, function(){
                         $log.warn('Error on Saving WIP');
+                        $scope.alerts.addAlert({type: 'danger', msg: 'Error: Could not save recipe version'});
                     });
                 }
 
