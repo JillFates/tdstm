@@ -48,10 +48,10 @@ class WsCookbookController {
 	}
 	
 	/**
-	 * Deletes a recipe
+	 * Deletes a recipe or a recipe version id version is passed
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def deleteRecipe = {
+	def deleteRecipeOrVersion = {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -59,10 +59,15 @@ class WsCookbookController {
 		}
 		
 		def id = params.id
+		def version = params.version
 		def currentProject = securityService.getUserCurrentProject()
 
 		try {
-			cookbookService.deleteRecipe(id, loginUser, currentProject)
+			if (version == null) {
+				cookbookService.deleteRecipe(id, loginUser, currentProject)
+			} else {
+				cookbookService.deleteRecipeVersion(id, version, loginUser, currentProject)
+			}
 
 			render(ServiceResults.success() as JSON)
 		} catch (UnauthorizedException e) {
@@ -144,6 +149,7 @@ class WsCookbookController {
 	
 	/**
 	 * Releases a recipe that is WIP
+	 * Check {@link UrlMappings} for the right call
 	 */
 	def releaseRecipe = {
 		def loginUser = securityService.getUserLogin()
@@ -172,6 +178,7 @@ class WsCookbookController {
 	
 	/**
 	 * Reverts a recipe to the previous release version
+	 * Check {@link UrlMappings} for the right call
 	 */
 	def revert = {
 		def loginUser = securityService.getUserLogin()
@@ -255,11 +262,10 @@ class WsCookbookController {
 		def isArchived = params.archived
 		def catalogContext = params.context
 		def searchText = params.search
-		def projectType = params.project
+		def currentProject = securityService.getUserCurrentProject()
+		def projectType = currentProject.id
 
 		try {
-			def currentProject = securityService.getUserCurrentProject()
-			
 			def results = cookbookService.findRecipes(isArchived, catalogContext, searchText, projectType, loginUser, currentProject)
 
 			def dataMap = [:]

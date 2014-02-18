@@ -160,6 +160,56 @@ class CookbookService {
 		return recipe
 	}
 	
+	
+	/**
+	 * Deletes a Recipe version using the information passed
+	 *
+	 * @param recipeId the id of the recipe
+	 * @param recipeVersion the version of the recipeVersion
+	 * @param loginUser the user that is creating this recipe
+	 * @param currentProject the project owning this recipe
+	 */
+	def deleteRecipeVersion(recipeId, recipeVersion, loginUser, currentProject) {
+		if (!RolePermissions.hasPermission('DeleteRecipe')) {
+			throw new UnauthorizedException('User doesn\'t have a DeleteRecipe permission')
+		}
+		
+		if (recipeId == null || !recipeId.isNumber() || currentProject == null || recipeVersion == null || !recipeVersion.isNumber()) {
+			throw new EmptyResultException();
+		}
+		
+		def recipe = Recipe.get(recipeId)
+		if (recipe == null) {
+			throw new EmptyResultException();
+		}
+
+		def rv = RecipeVersion.findByRecipeAndVersionNumber(recipe, recipeVersion)
+		if (rv == null) {
+			throw new EmptyResultException();
+		}
+
+		if (!recipe.project.equals(currentProject)) {
+			log.warn('User is trying to delete recipe whose project that is not the current ' + recipeId + ' currentProject ' + currentProject.id)
+			throw new UnauthorizedException('User is trying to delete recipe whose project that is not the current ' + recipeId + ' currentProject ' + currentProject.id)
+		}
+		
+		if (!rv.recipe.equals(recipe)) {
+			log.warn('Recipe and version does not have a common recipe')
+			throw new UnauthorizedException('Recipe and version does not have a common recipe')
+		}
+
+		if (recipe.releasedVersion.equals(rv)) {
+			log.warn('Can not delete the currently published version')
+			throw new UnauthorizedException('Can not delete the currently published version')
+		}
+
+		namedParameterJdbcTemplate.update('UPDATE task_batch SET recipe_version_used_id = NULL WHERE recipe_version_used_id = :recipeVersionId', ['recipeVersionId' : rv.id])
+		
+		rv.delete(failOnError: true)
+		
+		return rv
+	}
+	
 	def updateRecipe(recipeId, recipeName, description, loginUser, currentProject) {
 		//TODO check this checkAccess(loginUser.person, currentProject)
 		
