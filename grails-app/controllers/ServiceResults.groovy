@@ -79,6 +79,7 @@ class ServiceResults {
 	 */
 	static def errorsInValidation(errs) {
 		def messageSource = ApplicationHolder.application.mainContext.messageSource
+		def locale = null
 		def allErrorsAsArray = errs.allErrors.collect { it -> "${messageSource.getMessage(it, locale)}" }
 		return errors(allErrorsAsArray)
 	}
