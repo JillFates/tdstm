@@ -453,7 +453,7 @@ class CookbookService {
 			}
 		} else {
 
-			projectType = projectType.toLowerCase()
+			projectType = (projectType.class == String) ? projectType.toLowerCase() : projectType
 			
 			switch (projectType) {
 				case 'master':
@@ -474,20 +474,21 @@ class CookbookService {
 					}
 					break
 					
-				case Integer:
-					def project = Project.get(projectType.toInteger())
+				case Long:
+					def project = Project.get(projectType)
 					if (project != null) {
-						def peopleInProject = partyRelationshipService.getAvailableProjectStaffPersons(project)
-						if (peopleInProject.contains(loginUser.person)) {
+//						def peopleInProject = partyRelationshipService.getAvailableProjectStaffPersons(project)
+//						if (peopleInProject.contains(loginUser.person)) {
 							projectIds.add(projectType.toInteger())
-						} else {
-							throw new UnauthorizedException('The current user doesn\'t have access to the project')
-						}
+//						} else {
+//							throw new UnauthorizedException('The current user doesn\'t have access to the project')
+//						}
 					} else {
 						throw new UnauthorizedException('The current user doesn\'t have access to the project')
 					}
 					break
 				default :
+					log.info('Reach Default value. Rare case')
 					return []
 			}
 		}
@@ -528,8 +529,8 @@ class CookbookService {
 				SELECT DISTINCT recipe.recipe_id as recipeId, recipe.name, recipe.description, recipe.context, recipe.last_updated, CONCAT(person.first_name, ' ', person.last_name)  as createdBy, recipe.last_updated as lastUpdated, recipe_version.version_number as versionNumber, IF(ISNULL(rv2.version_number), false, true) as hasWIP 
 				FROM recipe
 				LEFT OUTER JOIN recipe_version ON recipe.released_version_id = recipe_version.recipe_version_id
-				LEFT OUTER JOIN recipe_version as rv2 ON recipe.released_version_id = recipe_version.recipe_version_id AND recipe_version.version_number = 0
-				INNER JOIN person ON person.person_id = recipe_version.created_by_id
+				LEFT OUTER JOIN recipe_version as rv2 ON recipe.released_version_id = rv2.recipe_version_id AND rv2.version_number = 0
+				LEFT OUTER JOIN person ON person.person_id = recipe_version.created_by_id
 				WHERE recipe.archived = :isArchived
 				AND recipe.project_id IN (:projectIdsAsString)
 				${searchCondition}
