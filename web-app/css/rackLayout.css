@@ -971,3 +971,184 @@ table.rack_elevation table.bladeTable td.errorBlade {
 	display: block; 
 	margin: -8px !important; 
 }
+/* Alternative rack sizes */
+.rackwide1_L{
+	width:80px;
+	height:53px;
+	border-style: solid;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 2px;
+	border-top-color: black;
+	border-right-color: red;
+	border-bottom-color: black;
+	border-left-color: blue;
+	background-color: #FFF;
+	position:absolute;
+}
+.rackwide1_R{
+	width:80px;
+	height:53px;
+	border-style: solid;
+	border-top-width: 1px;
+	border-right-width: 2px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-color: black;
+	border-right-color: blue;
+	border-bottom-color: black;
+	border-left-color: red;
+	background-color: #FFF;
+	position:absolute;
+}
+.rackwide1_T{
+	width:53px;
+	height:80px;
+	border-style: solid;
+	border-top-width: 2px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-color: blue;
+	border-right-color: black;
+	border-bottom-color: red;
+	border-left-color: black;
+	background-color: #FFF;
+	position:absolute;
+}
+.rackwide1_B{
+	width:53px;
+	height:80px;
+	border-style: solid;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 2px;
+	border-left-width: 1px;
+	border-top-color: red;
+	border-right-color: black;
+	border-bottom-color: blue;
+	border-left-color: black;
+	background-color: #FFF;
+	position:absolute;
+}
+.rackwide2_L{
+	width:87px;
+	height:54px;
+	border-style: solid;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 2px;
+	border-top-color: black;
+	border-right-color: red;
+	border-bottom-color: black;
+	border-left-color: blue;
+	background-color: #FFF;
+	position:absolute;
+}
+.rackwide2_R{
+	width:87px;
+	height:54px;
+	border-style: solid;
+	border-top-width: 1px;
+	border-right-width: 2px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-color: black;
+	border-right-color: blue;
+	border-bottom-color: black;
+	border-left-color: red;
+	background-color: #FFF;
+	position:absolute;
+}
+.rackwide2_T{
+	width:54px;
+	height:87px;
+	border-style: solid;
+	border-top-width: 2px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-color: blue;
+	border-right-color: black;
+	border-bottom-color: red;
+	border-left-color: black;
+	background-color: #FFF;
+	position:absolute;
+}
+.rackwide2_B{
+	width:54px;
+	height:87px;
+	border-style: solid;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 2px;
+	border-left-width: 1px;
+	border-top-color: red;
+	border-right-color: black;
+	border-bottom-color: blue;
+	border-left-color: black;
+	background-color: #FFF;
+	position:absolute;
+}
+.rackdeep1_L{
+	width:87px;
+	height:40px;
+	border-style: solid;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 2px;
+	border-top-color: black;
+	border-right-color: red;
+	border-bottom-color: black;
+	border-left-color: blue;
+	background-color: #FFF;
+	position:absolute;
+}
+.rackdeep1_R{
+	width:87px;
+	height:40px;
+	border-style: solid;
+	border-top-width: 1px;
+	border-right-width: 2px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-color: black;
+	border-right-color: blue;
+	border-bottom-color: black;
+	border-left-color: red;
+	background-color: #FFF;
+	position:absolute;
+}
+.rackdeep1_T{
+	width:40px;
+	height:87px;
+	border-style: solid;
+	border-top-width: 2px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-color: blue;
+	border-right-color: black;
+	border-bottom-color: red;
+	border-left-color: black;
+	background-color: #FFF;
+	position:absolute;
+}
+.rackdeep1_B{
+	width:40px;
+	height:87px;
+	border-style: solid;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 2px;
+	border-left-width: 1px;
+	border-top-color: red;
+	border-right-color: black;
+	border-bottom-color: blue;
+	border-left-color: black;
+	background-color: #FFF;
+	position:absolute;
+}

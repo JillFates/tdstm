@@ -111,7 +111,7 @@
 									<div align="center" id="rack_${rack.id}"
 										style="top:${rack.roomY}px; left:${rack.roomX}px;"
 										onmouseout="updateXYPositions(this.id)"
-										class="${rack.model?.layoutStyle} dragRack draggable">
+										class="${rack.model?.layoutStyle}_${rack.front} dragRack draggable">
 								</g:else>
 								<span id="rackLabel_${rack.id}"><br> ${rack.tag}</br></span>
 					</div>
