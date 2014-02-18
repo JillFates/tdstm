@@ -488,7 +488,7 @@ class CookbookService {
 					}
 					break
 				default :
-					throw new IllegalArgumentException('Invalid project type')
+					return []
 			}
 		}
 
