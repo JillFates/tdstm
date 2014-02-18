@@ -74,9 +74,9 @@ class AssetComment {
 	// TODO : Add custom validator for role that checks that the role is legit for "Staff : *" of RoleType
 	
 	// Grouping of the various categories
-	def static final preMoveCategories = ['general', 'discovery', 'planning','walkthru','premove']
-	def static final moveDayCategories = ['moveday','shutdown',	'physical','physical-source','physical-target',	'startup']
-	def static final postMoveCategories = ['postmove']
+	def static final preMoveCategories = ['general','discovery','verify','analysis','planning','design','buildout','walkthru','premove']
+	def static final moveDayCategories = ['moveday','shutdown','physical','physical-source','physical-target','startup']
+	def static final postMoveCategories = ['postmove','closeout']
 	def static final AUTOMATIC_ROLE = 'AUTO'
 
 	static constraints = {	
