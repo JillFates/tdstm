@@ -29,7 +29,7 @@ class UrlMappings {
 		
 		"/ws/cookbook/recipe/$id/$version?" {
 			controller = "wsCookbook"
-			action = [GET:"recipe", POST:"saveRecipeVersion", PUT:"updateRecipe"]
+			action = [GET:"recipe", POST:"saveRecipeVersion", PUT:"updateRecipe", DELETE:"deleteRecipe"]
 		}
 
 		"/ws/cookbook/recipe/version/$recipeVersionId" {

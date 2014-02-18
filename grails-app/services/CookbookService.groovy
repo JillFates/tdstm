@@ -123,6 +123,43 @@ class CookbookService {
 	}
 
 	
+	/**
+	 * Deletes a Recipe using the information passed
+	 *
+	 * @param recipeId the id of the recipe
+	 * @param loginUser the user that is creating this recipe
+	 * @param currentProject the project owning this recipe
+	 */
+	def deleteRecipe(recipeId, loginUser, currentProject) {
+		if (!RolePermissions.hasPermission('DeleteRecipe')) {
+			throw new UnauthorizedException('User doesn\'t have a DeleteRecipe permission')
+		}
+		
+		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
+			throw new EmptyResultException();
+		}
+		
+		def recipe = Recipe.get(recipeId)
+		
+		if (recipe == null) {
+			throw new EmptyResultException();
+		}
+		
+		if (!recipe.project.equals(currentProject)) {
+			throw new UnauthorizedException('User is trying to delete recipe whose project that is not the current ' + recipeId + ' currentProject ' + currentProject.id)
+		}
+		
+		recipe.releasedVersion = null;
+		recipe.save(flush:true, failOnError: true)
+		
+		namedParameterJdbcTemplate.update('UPDATE task_batch SET recipe_version_used_id = NULL WHERE recipe_version_used_id IN (SELECT recipe_version_id FROM recipe_version WHERE recipe_id = :recipeId)', ['recipeId' : recipeId])
+		namedParameterJdbcTemplate.update('DELETE FROM recipe_version WHERE recipe_id = :recipeId', ['recipeId' : recipeId])
+		
+		recipe.delete(failOnError: true)
+		
+		return recipe
+	}
+	
 	def updateRecipe(recipeId, recipeName, description, loginUser, currentProject) {
 		//TODO check this checkAccess(loginUser.person, currentProject)
 		

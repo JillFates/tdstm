@@ -21,7 +21,7 @@ class WsCookbookController {
 	 */
 	def createRecipe = {
 		def loginUser = securityService.getUserLogin()
-		if (loginUser != null) {
+		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
@@ -46,6 +46,35 @@ class WsCookbookController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
+	
+	/**
+	 * Deletes a recipe
+	 * Check {@link UrlMappings} for the right call
+	 */
+	def deleteRecipe = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		
+		def id = params.id
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			cookbookService.deleteRecipe(id, loginUser, currentProject)
+
+			render(ServiceResults.success() as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()))
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
+	}
 		
 	/**
 	 * Updates the name and description of an existing Recipe
@@ -53,7 +82,7 @@ class WsCookbookController {
 	 */
 	def updateRecipe = {
 		def loginUser = securityService.getUserLogin()
-		if (loginUser != null) {
+		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
@@ -85,7 +114,7 @@ class WsCookbookController {
 	 */
 	def saveRecipeVersion = {
 		def loginUser = securityService.getUserLogin()
-		if (loginUser != null) {
+		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
@@ -118,7 +147,7 @@ class WsCookbookController {
 	 */
 	def releaseRecipe = {
 		def loginUser = securityService.getUserLogin()
-		if (loginUser != null) {
+		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
@@ -146,7 +175,7 @@ class WsCookbookController {
 	 */
 	def revert = {
 		def loginUser = securityService.getUserLogin()
-		if (loginUser != null) {
+		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
@@ -175,7 +204,7 @@ class WsCookbookController {
 	 */
 	def recipe = {
 		def loginUser = securityService.getUserLogin()
-		if (loginUser != null) {
+		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
@@ -218,7 +247,7 @@ class WsCookbookController {
 	 */
 	def recipeList = {
 		def loginUser = securityService.getUserLogin()
-		if (loginUser != null) {
+		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
@@ -256,7 +285,7 @@ class WsCookbookController {
 	 */
 	def validateSyntax = {
 		def loginUser = securityService.getUserLogin()
-		if (loginUser != null) {
+		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
