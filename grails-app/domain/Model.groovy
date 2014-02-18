@@ -266,5 +266,15 @@ class Model {
 			}
 		}
 	}
+	//this method return all fields with their labels which are used in model List jqgrid.
+	static getModelFieldsAndlabels(){
+		return [ 'description':'Description', 'assetType':'Asset Type','layoutStyle':'Layout Style', 'bladeRows':'Blade Rows','modelScope':'Model Scope',
+			     'bladeCount':'Blade Count', 'bladeLabelCount':'Blade Label Count', 'bladeHeight':'Blade Height', 'usize':'USize','useImage':'Use Image',
+			     'height':'Height','weight':'Weight','depth':'Depth','width':'Width','powerUse':'Power','powerNameplate':'Power Name Plate',
+			     'powerDesign':'Power Design','productLine':'Product Line','modelFamily':'Model Family','endOfLifeDate':'End Of Life Date',
+			     'endOfLifeStatus':'endOfLifeStatus','modelConnectors':'No Of Connectors','roomObject':'roomObject','createdBy':'Created By','updatedBy':'Updated By',
+			     'validatedBy':'Validated By','dateCreated':'Date Created','lastModified':'Last Modified','sourceURL':'Source URL'
+			  ]
+	}
 	
 }

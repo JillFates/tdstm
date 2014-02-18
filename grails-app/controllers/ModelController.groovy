@@ -19,8 +19,8 @@ import com.tds.asset.AssetCableMap
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.WebUtil
-
+import com.tdssrc.grails.WebUtil 
+import com.tdssrc.grails.TimeUtil
 class ModelController {
 	
 	// Services and objects to be injected by IoC
@@ -30,6 +30,7 @@ class ModelController {
 	def securityService
 	def userPreferenceService
 	def modelService
+	def assetEntityService
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -38,7 +39,13 @@ class ModelController {
     }
 
     def list = {
-		return 
+		def modelPref= assetEntityService.getExistingPref('Model_Columns')
+		def attributes = Model.getModelFieldsAndlabels()
+		def columnLabelpref=[:]
+		modelPref.each{key,value->
+			columnLabelpref << [ (key):attributes[value] ]
+		}
+		return [modelPref:modelPref, attributesList:attributes.keySet().sort{it}, columnLabelpref:columnLabelpref]
     }
     
 	/**
@@ -57,7 +64,13 @@ class ModelController {
 			'assetType':params.assetType,'powerUse':params.powerUse, 'noOfConnectors':params.modelConnectors, 
 			'assetsCount':params.assetsCount, 'sourceTDSVersion':params.sourceTDSVersion, 'sourceTDS':params.sourceTDS, 
 			'modelStatus':params.modelStatus]
-
+		def attributes = Model.getModelFieldsAndlabels()
+		def modelPref= assetEntityService.getExistingPref('Model_Columns')
+		def modelPrefVal = modelPref.collect{it.value}
+		attributes.keySet().each{ attribute ->
+			if(attribute in modelPrefVal && attribute!='modelConnectors')
+				filterParams << [ (attribute): params[(attribute)]]
+		}
 		// Cut the list of fields to filter by down to only the fields the user has entered text into
 		def usedFilters = filterParams.findAll { key, val -> val != null }
 				
@@ -77,7 +90,8 @@ class ModelController {
 			[ 
 				id: it.modelId,
 				cell: [ 
-					it.modelName, it.manufacturer, it.description, it.assetType, it.powerUse, it.noOfConnectors, 
+					it.modelName, it.manufacturer, displayModelValues(modelPref["1"],it), displayModelValues(modelPref["2"],it), 
+					displayModelValues(modelPref["3"],it), displayModelValues(modelPref["4"],it), 
 					it.assetsCount, it.sourceTDSVersion, it.sourceTDS, it.modelStatus
 				]
 			]
@@ -87,6 +101,23 @@ class ModelController {
 
 		render jsonData as JSON
 
+    }
+	
+	def displayModelValues(value, model){
+		def result
+		switch(value){
+			case ~/dateCreated|lastModified|endOfLifeDate/:
+				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+				def dueFormatter = new SimpleDateFormat("MM/dd/yyyy")
+				result = model[value] ? dueFormatter.format(TimeUtil.convertInToUserTZ(model[value], tzId)) : ''
+			break;
+			case 'modelConnectors':
+				result= model.noOfConnectors
+			break;
+			default:
+				result = model[value]
+			break;
+		}
     }
 		/*
 		// If the user is sorting by a valid column, order by that one instead of the default

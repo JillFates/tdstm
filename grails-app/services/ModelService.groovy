@@ -5,6 +5,7 @@ import com.tds.asset.AssetCableMap
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tds.asset.AssetEntity
 import com.tdsops.common.sql.SqlUtil
+import com.tdssrc.grails.WebUtil
 
 //import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 //import org.springframework.jdbc.core.namedparam.SqlParameterSource
@@ -19,6 +20,7 @@ class ModelService {
 	def assetEntityAttributeLoaderService
 	def dataSource
     def jdbcTemplate
+	def assetEntityService
 
    /**
 	 * @param fromModel : instance of the model that is being merged
@@ -113,11 +115,26 @@ class ModelService {
 
 		// These values are mapped to real columns in the database, so they can be used in the WHERE clause
 		def aliasValuesBase = [ 
-			'modelName':'m.name', 'manufacturer':'man.name', 'description':'m.description', 'assetType':'m.asset_type',
-			'powerUse':'m.power_use', 'sourceTDSVersion':'m.sourcetdsversion', 'sourceTDS':'m.sourcetds', 'modelStatus':'m.model_status', 
-			'modelId':'m.model_id'
+			'modelName':'m.name', 'manufacturer':'man.name','sourceTDSVersion':'m.sourcetdsversion', 'sourceTDS':'m.sourcetds', 'modelStatus':'m.model_status','modelId':'m.model_id'
 		]
+		def modelPref= assetEntityService.getExistingPref('Model_Columns')
+		def modelPrefVal = modelPref.collect{it.value}
 		
+		modelPrefVal.each{
+			def dbValue = WebUtil.splitCamelCase(it)
+			if(!(it in [ 'modelConnectors' , 'createdBy', 'updatedBy', 'validatedBy','modelScope','sourceURL']))
+				aliasValuesBase << [(it): ('m.'+dbValue)]
+			if(it=='createdBy')
+				aliasValuesBase << [(it): ('CONCAT(CONCAT(p.first_name, " "), IFNULL(p.last_name,""))')]
+			if(it=='updatedBy')
+				aliasValuesBase << [(it): ('CONCAT(CONCAT(p1.first_name, " "), IFNULL(p1.last_name,""))')]
+			if(it=='validatedBy')
+				aliasValuesBase << [(it): ('CONCAT(CONCAT(p2.first_name, " "), IFNULL(p2.last_name,""))')]
+			if(it=='modelScope')
+				aliasValuesBase << [(it): ('pr.project_code')]
+			if(it=='sourceURL')
+				aliasValuesBase << [(it): ('m.sourceurl')]
+		}
 		// These values are mapped to derived columns, so they will be used in the HAVING clause if included in the filter
 		def aliasValuesAggregate = [ 'noOfConnectors':'COUNT(DISTINCT mc.model_connectors_id)', 'assetsCount':'COUNT(DISTINCT ae.asset_entity_id)' ]
 		
@@ -138,7 +155,11 @@ class ModelService {
 			LEFT OUTER JOIN model_connector mc on mc.model_id = m.model_id 
 			LEFT OUTER JOIN model_sync ms on ms.model_id = m.model_id 
 			LEFT OUTER JOIN manufacturer man on man.manufacturer_id = m.manufacturer_id 
-			LEFT OUTER JOIN asset_entity ae ON ae.model_id = m.model_id """ )
+			LEFT OUTER JOIN asset_entity ae ON ae.model_id = m.model_id 
+			LEFT OUTER JOIN person p ON p.person_id = m.created_by
+			LEFT OUTER JOIN person p1 ON p1.person_id = m.updated_by
+			LEFT OUTER JOIN person p2 ON p2.person_id = m.validated_by
+			LEFT OUTER JOIN project pr ON pr.project_id = m.model_scope_id""" )
 				
 		// Handle the filtering by each column's text field for base columns
 		def firstWhere = true

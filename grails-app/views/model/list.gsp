@@ -7,6 +7,7 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 			
 		<g:javascript src="model.manufacturer.js" />
+		<g:javascript src="entity.crud.js" />
 		<g:javascript src="drag_drop.js" />
 		<script src="${resource(dir:'js',file:'jquery.form.js')}"></script>
 		<jqgrid:resources />
@@ -21,13 +22,13 @@
 					<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='compareOrMerge()' disabled='disabled'/></span>\
 					<span class='capBtn'><input type='button' id='deleteModelId' value='Bulk Delete' onclick='deleteModels()' disabled='disabled'/></span>"
 				<jqgrid:grid id="modelId" url="'${createLink(action: 'listJson')}'"
-					colNames="'Model Name','Manufacturer', 'Description','Asset Type', 'Power','No Of Connectors','Assets ','Version','Source TDS','Model Status'"
+					colNames="'Model Name','Manufacturer', '${columnLabelpref['1']}','${columnLabelpref['2']}', '${columnLabelpref['3']}','${columnLabelpref['4']}','Assets ','Version','Source TDS','Model Status'"
 					colModel="{name:'modelName', index: 'modelName', width:'150',formatter: myLinkFormatter},
 						{name:'manufacturer', width:'100'},
-						{name:'description',width:'100'},
-						{name:'assetType', width:'100'},
-						{name:'powerUse',width:'50'},
-						{name:'modelConnectors',width:'80'},
+						{name:'${modelPref['1']}',width:'100'},
+						{name:'${modelPref['2']}', width:'100'},
+						{name:'${modelPref['3']}',width:'100'},
+						{name:'${modelPref['4']}',width:'100'},
 						{name:'assetsCount',width:'50'},
 						{name:'sourceTDSVersion',width:'50'},
 						{name:'sourceTDS',width:'60'},
@@ -43,6 +44,12 @@
 					<jqgrid:navigation id="modelId" add="false" edit="false" del="false" search="false"/>
 					<jqgrid:refreshButton id="modelId" />
 				</jqgrid:grid>
+				
+				<g:each var="key" in="['1','2','3','4']">
+					var modelPref= '${modelPref[key]}';
+					$("#modelIdGrid_"+modelPref).append('<img src=\'${resource(dir:'images',file:'select2Arrow.png')}\' class="selectImage editSelectimage_'+${key}+'" style="position:absolute;margin-left: 55px;margin-top: -15px;" onclick="showSelect(\''+modelPref+'\',\'model\',\''+${key}+'\')">');
+				</g:each>
+				
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
 					var value = cellvalue ? cellvalue : ''
@@ -79,6 +86,19 @@
 			</div>
 			
 			<jqgrid:wrapper id="modelId" />
+			
+			<g:each var="key" in="['1','2','3','4']">
+				<div id="columnCustomDiv_${modelPref[key]}" style="display:none;">
+					<div class="columnDiv_${key}" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width: 144px;z-index: 2147483647; overflow-y: scroll;text-align: left;">
+						<input type="hidden" id="previousValue_${key}" value="${modelPref[key]}" />
+						<g:each var="attribute" in="${attributesList}">
+							<label><input type="radio" name="coloumnSelector_${modelPref[key]}" id="coloumnSelector_${modelPref[key]}" value="${attribute}" 
+								${modelPref[key]== attribute? 'checked' :'' } style="margin-left:11px;" 
+								onchange="setColumnAssetPref(this.value,'${key}','Model_Columns')"/> ${attribute}</label><br>
+						</g:each>
+					</div>
+				</div>
+			</g:each>
 			<span id="spinnerId" style="display: none">Merging ...<img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 			<div id="createModelView" style="display: none;" ></div>
 			<div id="showModelView" style="display: none;"></div>
