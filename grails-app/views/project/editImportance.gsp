@@ -24,7 +24,7 @@
 			<td ng-repeat="phase in phases" class="{{importance[type.name][field.label]['phase'][phase.id]}}">
 			<div class="pickbox" ng-repeat='datum in data' ng-click="assignData(type.name,datum,field.label,phase.id);">{{datum}}</div>
 			</td>
-			<td><input type="text" value="{{help[type.name][field.label]}}" ng-model="help[type.name][field.label]"/></td>
+			<td><input type="text" value="{{help[type.name][field.label]}}" id="help_{{type.name}}_{{field.label}}"/></td>
 		</tr>
 	</table>
 </div>

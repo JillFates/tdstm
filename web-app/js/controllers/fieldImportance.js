@@ -157,6 +157,11 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 		});
 	}
 	$scope.updateHelp = function (type) {
+		//Need to find a solution for the sluggish behaviour of ng-model,for now done using javascript.
+		for(i=0;i<$scope.fields[type].length; i++){
+			var fieldLabel= $scope.fields[type][i].label
+			$scope.help[type][fieldLabel] =$("#help_"+type+"_"+fieldLabel).val()
+		}
 		$http({
 			url : contextPath+"/common/tooltipsUpdate",
 			method: "POST",
