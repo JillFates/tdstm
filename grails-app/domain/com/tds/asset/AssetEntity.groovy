@@ -357,7 +357,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		// return entityType == AssetEntityType.DEVICE		
 	}
 	def isaApplication() {
-		return assetType.toLowerCase() == 'application'
+		return assetType?.toLowerCase() == 'application'
 		// return entityType == AssetEntityType.APPLICATION
 	}
 	def isaNetwork() {
@@ -367,7 +367,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		// return entityType == AssetEntityType.NETWORK
 	}
 	def isaStorage() {
-		return ['files','storage'].contains(assetType.toLowerCase())
+		return ['files','storage'].contains(assetType?.toLowerCase())
 		// return entityType == AssetEntityType.STORAGE
 	}
 	/**

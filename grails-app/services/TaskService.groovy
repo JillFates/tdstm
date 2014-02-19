@@ -2727,6 +2727,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @return Array<AssetDependency> - the list of dependencies accumlated by the recursive function
 	 */
 	def traverseDependencies(origAsset, dependency, currAssetPropName, assocAssetPropName, sql) {
+		log.debug "traverseDependencies() origAsset=$origAsset, dependency=$dependency, currAssetPropName=$currAssetPropName, assocAssetPropName=$assocAssetPropName"
 		def depList = []
 		def assocAsset = dependency[assocAssetPropName]
 		def origIsApp = origAsset.isaApplication()
