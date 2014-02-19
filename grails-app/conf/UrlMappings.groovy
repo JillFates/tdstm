@@ -47,6 +47,11 @@ class UrlMappings {
 			action = [POST:"validateSyntax"]
 		}
 
+		"/ws/task/$id" {
+			controller = "wsTask"
+			action = [DELETE:"deleteBatch"]
+		}
+
 		"/ws/task/$id/publish" {
 			controller = "wsTask"
 			action = [POST:"publish"]

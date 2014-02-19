@@ -4134,5 +4134,35 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		
 		return affectedComments
 	}
+	
+	/**
+	 * Deletes the batch whose id is taskId
+	 *
+	 * @param taskId the task id
+	 * @param loginUser the current user
+	 * @param currentProject the current project
+	 */
+	def deleteBatch(taskId, loginUser, currentProject) {
+		if (!RolePermissions.hasPermission('DeleteTaskBatch')) {
+			throw new UnauthorizedException('User does not have a DeleteTaskBatch permission')
+		}
+		
+		if (taskId == null || !taskId.isNumber() || currentProject == null) {
+			throw new EmptyResultException();
+		}
+		
+		def task = TaskBatch.get(taskId)
+
+		if (task == null) {
+			throw new EmptyResultException();
+		}
+		
+		if (task.recipeVersionUsed != null && !task.recipeVersionUsed.recipe.project.equals(currentProject)) {
+			throw new UnauthorizedException('User is trying to delete a batch whose project that is not the current ' + task.recipeVersionUsed.recipe.project.id + ' currentProject ' + currentProject.id)
+		}
+		
+		namedParameterJdbcTemplate.update('DELETE FROM tdstm.asset_comment WHERE task_batch_id = :taskId', ['taskId' : taskId])
+		task.delete(failOnError: true)
+	}
 }
 

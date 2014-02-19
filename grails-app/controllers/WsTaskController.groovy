@@ -16,10 +16,11 @@ class WsTaskController {
 
 	/**
 	 * Publishes a {@link TaskBatch} that has been generated before
+	 * Check {@link UrlMappings} for the right call
 	 */
 	def publish = {
 		def loginUser = securityService.getUserLogin()
-		if (loginUser != null) {
+		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
@@ -36,7 +37,7 @@ class WsTaskController {
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
 		} catch (ValidationException e) {
-			render(ServiceResults.errorsInValidation(e.getErrors()))
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
 		} catch (IllegalArgumentException e) {
 			ServiceResults.forbidden(response)
 		} catch (Exception e) {
@@ -46,10 +47,11 @@ class WsTaskController {
 
 	/**
 	 * Unpublishes a {@link TaskBatch} that has been generated before
+	 * Check {@link UrlMappings} for the right call
 	 */
 	def unpublish = {
 		def loginUser = securityService.getUserLogin()
-		if (loginUser != null) {
+		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
@@ -67,6 +69,39 @@ class WsTaskController {
 			ServiceResults.methodFailure(response)
 		} catch (IllegalArgumentException e) {
 			ServiceResults.forbidden(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
+	}
+	
+	/**
+	 * Deletes a {@link TaskBatch}
+	 * Check {@link UrlMappings} for the right call
+	 */
+	def deleteBatch = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		
+		def id = params.id
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			taskService.deleteBatch(id, loginUser, currentProject)
+
+			render(ServiceResults.success() as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (IllegalArgumentException e) {
+			ServiceResults.forbidden(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
 		} catch (Exception e) {
 			ServiceResults.internalError(response, log, e)
 		}

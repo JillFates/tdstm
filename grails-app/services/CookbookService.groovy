@@ -412,7 +412,7 @@ class CookbookService {
 			throw new EmptyResultException('Invalid recipe')
 		}
 		
-		checkAccess(loginUser.person, recipe.project)
+		//checkAccess(loginUser.person, recipe.project)
 		
 		def person = recipeVersion.createdBy
 		
