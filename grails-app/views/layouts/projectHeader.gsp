@@ -215,7 +215,7 @@
 							<ul >
 								<li><g:link class="mmlink" controller="projectUtil" onclick="hideMegaMenu('projectMegaMenu')"><g:if test="${currProjObj.name.size()>20}">${currProjObj.name.substring(0,20)+'...'}</g:if><g:else>${currProjObj.name}</g:else> Details</g:link></li>
 								<li><g:link class="mmlink" controller="person" action="manageProjectStaff"  onclick="hideMegaMenu('projectMegaMenu')">Project Staff</g:link></li>
-								<li><g:link class="mmlink" controller="project" action="fieldImportance" onclick="hideMegaMenu('adminMegaMenu')">Field Importance</g:link> </li>
+								<li><g:link class="mmlink" controller="project" action="fieldImportance" onclick="hideMegaMenu('projectMegaMenu')">Field Importance</g:link> </li>
 					</g:if>
 					<g:else>
 						<span class="megamenuSection">No Project Selected</strong></span><br />
