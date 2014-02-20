@@ -78,7 +78,7 @@ class CommonController {
 			def attributes = projectService.getAttributes(entityType)?.attributeCode
 			attributes.each{ k ->
 				def keyMap = KeyValue.findAllByCategoryAndKey(category, k).find{it.project==project}
-				returnMap << [(k): keyMap.value]
+				returnMap << [(k): keyMap?.value]
 			}
 		}catch(Exception ex){
 			log.error "An error occurred : ${ex}"
