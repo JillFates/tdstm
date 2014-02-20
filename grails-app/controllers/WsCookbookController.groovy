@@ -319,4 +319,60 @@ class WsCookbookController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
+	
+	/**
+	 * Archive recipes
+	 * Check {@link UrlMappings} for the right call
+	 */
+	def archiveRecipe = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
+		def id = params.id
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			cookbookService.archivedUnarchived(id, true, loginUser, currentProject)
+			render(ServiceResults.success() as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
+	}
+	
+	/**
+	 * Unarchive recipes
+	 * Check {@link UrlMappings} for the right call
+	 */
+	def unarchiveRecipe = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
+		def id = params.id
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			cookbookService.archivedUnarchived(id, false, loginUser, currentProject)
+			render(ServiceResults.success() as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
+	}
 }

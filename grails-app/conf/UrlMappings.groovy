@@ -27,6 +27,16 @@ class UrlMappings {
 			action = [POST:"revert"]
 		}
 		
+		"/ws/cookbook/recipe/archive/$id" {
+			controller = "wsCookbook"
+			action = [POST:"archiveRecipe"]
+		}
+
+		"/ws/cookbook/recipe/unarchive/$id" {
+			controller = "wsCookbook"
+			action = [POST:"unarchiveRecipe"]
+		}
+
 		"/ws/cookbook/recipe/$id/$version?" {
 			controller = "wsCookbook"
 			action = [GET:"recipe", POST:"saveRecipeVersion", PUT:"updateRecipe", DELETE:"deleteRecipeOrVersion"]

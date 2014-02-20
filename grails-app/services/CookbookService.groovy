@@ -539,6 +539,39 @@ class CookbookService {
 		
 		return recipes
     }
+	
+	/**
+	 * Archives the recipe with recipeId depending on the archived parameter
+	 * 
+	 * @param recipeId the id of the recipe
+	 * @param archived true to archive, false to unarchived
+	 * @param loginUser the current user
+	 * @param currentProject the current project
+	 */
+	def archivedUnarchived(recipeId, archived, loginUser, currentProject) {
+		if (!RolePermissions.hasPermission('EditRecipe')) {
+			throw new UnauthorizedException('User doesn\'t have a EditRecipe permission')
+		}
+		
+		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
+			throw new EmptyResultException();
+		}
+		
+		def recipe = Recipe.get(recipeId)
+		
+		if (recipe == null) {
+			throw new EmptyResultException();
+		}
+		
+		if (!recipe.project.equals(currentProject)) {
+			throw new UnauthorizedException('User is trying to archive/unarchived recipe whose project that is not the current ' + recipeId + ' currentProject ' + currentProject.id)
+		}
+		
+		recipe.archived = archived
+		recipe.save(flush:true, failOnError: true)
+		
+		return recipe
+	}
 
     /**
      * Used to convert the Recipe source code from syntax into a Map
