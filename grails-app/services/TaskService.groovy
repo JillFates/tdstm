@@ -52,6 +52,7 @@ class TaskService implements InitializingBean {
 
 	static transactional = true
 
+	def cookbookService
 	def dataSource
 	def jdbcTemplate
 	def namedParameterJdbcTemplate
@@ -1336,28 +1337,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		def newTask
 		def msg
-		
-		def recipe = getMoveEventRunbookRecipe( moveEvent )
-		def recipeId = recipe?.id
-		def recipeGroups = recipe?.groups
-		def recipeTasks = recipe?.tasks		
-		if (! recipeTasks || recipeTasks.size() == 0) {
-			return "There appears to be no runbook recipe or there is an error in its format"
-		}
-		// log.info "Runbook recipe: $recipe"
 
-		// Load the taskSpecList array used for validation, etc
-		def taskSpecIdList = recipeTasks*.id
-		log.info "taskSpecIdList=$taskSpecIdList"
-				
-		def noSuccessorsSql = "select t.asset_comment_id as id \
-			from asset_comment t \
-			left outer join task_dependency d ON d.predecessor_id=t.asset_comment_id \
-			where t.move_event_id=${moveEvent.id} AND d.asset_comment_id is null \
-			AND t.auto_generated=true \
-			AND t.category IN (${categories}) "
-		// log.info("noSuccessorsSql: $noSuccessorsSql")
-		
 		def depCount = 0
 		def specCount = 0
 		
@@ -1464,8 +1444,42 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		def maxPreviousEstFinish = null		// Holds the max Est Finish from the previous taskSpec
 		def workflow
-		try {
+		def recipe 			// The recipe Map
+		def recipeId 		// The id of the recipe
+		def recipeTasks 	// The list of Tasks within the recipe
+		def taskSpecIdList 	// The list of the task spec id #s
+				
+		def noSuccessorsSql = "select t.asset_comment_id as id \
+			from asset_comment t \
+			left outer join task_dependency d ON d.predecessor_id=t.asset_comment_id \
+			where t.move_event_id=${moveEvent.id} AND d.asset_comment_id is null \
+			AND t.auto_generated=true \
+			AND t.category IN (${categories}) "
+		// log.info("noSuccessorsSql: $noSuccessorsSql")
 
+		try {
+			// Validate the syntax of the recipe before going any further
+			def recipeErrors = cookbookService.validateSyntax(moveEvent.runbookRecipe)
+			if (recipeErrors) {
+				def errMsg = 'The recipe has the following error(s):<ul>'
+				recipeErrors.each { e -> errMsg += "<li>${e.reason}: ${e.detail}</li>"}
+				errMsg += '</ul>'
+				log.debug "Recipe had syntax errors : $errMsg"
+				throw new RuntimeException(errMsg)
+			}
+			recipe = cookbookService.parseRecipeSyntax(moveEvent.runbookRecipe)
+			recipeId = recipe?.id
+			recipeTasks = recipe?.tasks
+
+			if (! recipeTasks || recipeTasks.size() == 0) {
+				throw new RuntimeException('There appears to be no runbook recipe or there is an error in its format')
+			}
+
+			// Load the taskSpecList array used for validation, etc
+			taskSpecIdList = recipeTasks*.id
+			log.info "taskSpecIdList=$taskSpecIdList"
+
+			/*
 			// First load up the 'groups' if any are defined 
 			if ( recipeGroups ) {
 				def gCount = 0
@@ -1487,9 +1501,17 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					}
 				}
 			}
+			*/
+
+			// Load the groups with the corresponding assets from the recipe group/filters
+			groups = fetchGroups( recipe, moveEvent, exceptions )
+
 			out.append('Assets in Groups:<ul>')
 			groups.each { n, l ->
-				out.append("<li>$n (contains ${l.size()} assets): ${l*.assetName}")
+				if (l.size() == 0)
+					exceptions.append("Found zero (0) assets for group ${n}<br/>")
+
+				out.append("<li><b>$n</b> (contains ${l.size()} assets): ${l*.assetName}")
 			}
 			out.append('</ul>')
 
@@ -3188,19 +3210,70 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	}
 
 	/**
+	 * This is used to process the 'groups' section of a recipe and load the assets according to the context that the recipe is to be applied
+	 *
+	 * @param recipe - the recipe map that contains the groups section
+	 * @param contextObject - the context for which the groups will be filtered (MoveEvent, MoveBundle) 
+	 * @param cid - the id of the context
+	 * @return A map of each group name where each value is a List<AssetEntity, Application, Database, File> based on the filter
+	 */
+	Map<String,List> fetchGroups(recipe, contextObject, exceptions) {
+		def groups = [:]
+
+		if ( ! recipe instanceof java.util.LinkedHashMap) {
+			throw new InvalidParamException('The receipe must be of the LinkedHashMap type')
+		} 
+
+		// First load up the 'groups' if any are defined 
+		if ( recipe.containsKey('groups') ) {
+			if (! recipe instanceof java.util.ArrayList) {
+				throw new InvalidParamException('The receipe.groups element must the List type')
+			}
+
+			def gCount = 0
+			recipe.groups.each { g -> 
+				gCount++
+				if (! g.name || g.name.size() == 0) {
+					msg = "Group specification #${gCount} missing required 'name' property"
+					throw new InvalidParamException(msg)					
+				}
+
+				if ( contextObject instanceof Application ) {
+					// If it is an application then we just stuff it into the list - screw the filtering for now...
+					groups[g.name] = [ contextObject ]
+				} else {
+					if ( g.filter?.containsKey('taskSpec') ) {
+						msg = "Group specification (${g.name}) references a taskSpec which is not supported"
+						throw new InvalidParamException(msg)
+					}
+
+					groups[g.name] = findAllAssetsWithFilter(contextObject, g, groups, exceptions)
+					if ( groups[g.name].size() == 0 ) {
+						// exceptions.append("Found zero (0) assets for group ${g.name}<br/>")
+					} else {
+						log.info "Group ${g.name} contains: ${groups[g.name].size()} assets"
+					}
+				}
+			}
+		}
+
+		return groups
+	}
+
+	/**
 	 * This special method is used to find all assets of a moveEvent that match the criteria as defined in the filter map
-	 * @param MoveEvent moveEvent object
+	 * @param contextObject - the object that the filter is applied to (either MoveEvent or MoveBundle) 
 	 * @param Map filter - contains various attributes that define the filtering
 	 * @param loadedGroups Map<List> - A mapped list of the groups and associated assets that have already been loaded
 	 * @return List<AssetEntity, Application, Database, File> based on the filter
 	 * @throws RuntimeException if query fails or there is invalid specifications in the filter criteria
 	 */
-	def findAllAssetsWithFilter(moveEvent, groupOrTaskSpec, loadedGroups, exceptions) {
+	def findAllAssetsWithFilter(contextObject, groupOrTaskSpec, loadedGroups, exceptions) {
 		def assets = []
 		def msg
 		def addFilters = true
 		def where = ''
-		def project = moveEvent.project
+		//def project = moveEvent.project
 		def map = [:]
 		def filter 
 
@@ -3354,24 +3427,29 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}			
 
 			def queryOn = filter?.containsKey('class') ? filter['class'].toLowerCase() : 'device'
-			if (! ['device','application', 'database', 'files', 'storage'].contains(queryOn) ) {
-				throw new RuntimeException("An invalid 'class' was specified for the filter (valid options are 'device','application', 'database', 'files|storage') for filter: $filter")
-			}
 		
-			def bundleList = moveEvent.moveBundles
-			def bundleIds = bundleList*.id
+			// Now find the bundles if the contextObject is a MoveEvent otherwise we can just use the existing bundle id
+			if (contextObject instanceof MoveEvent) {
+				def bundleList = contextObject.moveBundles
+				def bundleIds = bundleList*.id
 
-			// See if they are trying to filter on the Bundle Name
-			if (filter?.asset?.containsKey('bundle')) {
-				def moveBundle = MoveBundle.findByProjectAndName(moveEvent.project, filter.asset.bundle)
-				if (moveBundle) {
-					bundleIds = [ moveBundle.id ]
-				} else {
-					throw new RuntimeException("Bundle name ($filter.moveBundle) was not found for filter: $filter")
+				// See if they are trying to filter on the Bundle Name
+				if (filter?.asset?.containsKey('bundle')) {
+					def moveBundle = MoveBundle.findByProjectAndName(contextObject.project, filter.asset.bundle)
+					if (moveBundle) {
+						bundleIds = [ moveBundle.id ]
+					} else {
+						throw new RuntimeException("Bundle name ($filter.moveBundle) was not found for filter: $filter")
+					}
 				}
-			}
 
-			map.bIds = bundleIds
+				map.bIds = bundleIds
+			} else if (contextObject instanceof MoveBundle) {
+				// Pretty simple, we're just searching the current bundle
+				map.bIds = contextObject.id
+			} else {
+				throw new InvalidParamException("The context for findAllAssetsWithFilter must be a MoveBundle or MoveEvent ${contextObject.getClass().getName()}")
+			}
 			// log.info "bundleIds=[$bundleIds]"
 			
 			/** 
@@ -3479,6 +3557,76 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				log.error "$msg\n"
 				throw new RuntimeException("$msg<br/>${e.getMessage()}")
 			}
+
+			//
+			// Handle filter.dependency if specified and there were assets found
+			//
+			// This will instead of returning the assets found above, it will return the assets found through dependencies and some
+			// limited filtering
+			//
+			if (filter?.containsKey('dependency') && assets.size() ) {
+				// Now we need to find assets that are associated via the AssetDependency domain
+				def depMode = filter.dependency.mode[0].toLowerCase()
+				def daProp='asset'
+				if (depMode == 'r') {
+					sql = 'from AssetDependency ad where ad.dependent.id in (:assetIds)'
+				} else {
+					sql = 'from AssetDependency ad where ad.asset.id in (:assetIds)'
+					daProp = 'dependent'					
+				}
+				def depAssets = AssetDependency.findAll(sql, [assetIds:assets*.id])
+				def daList = []
+				queryOn = filter.dependency.containsKey('class') ? filter.dependency['class'].toLowerCase() : 'device'
+
+				def chkVirtual=false
+				def chkPhysical=false
+				if (filter.dependency.containsKey('asset')) {
+					chkVirtual = filter.dependency.asset.containsKey('virtual')
+					chkPhysical = filter.dependency.asset.containsKey('physical')
+				}
+
+				depAssets.each { da -> 
+					def asset = da[daProp]
+					// Verify that the asset is in the move bundle id list
+					if ( map.bIds.contains( asset.moveBundle.id ) ) {
+						// Now verify based on 
+						// Attempt to get the asset by it's class
+						switch (queryOn) {
+							case 'application':
+								asset = Application.get(asset.id)
+								break
+							case 'database':
+								asset = Databae.get(asset.id)
+								break
+							case ~/files|file|storage/:
+								asset = Files.get(asset.id)
+								break
+							case 'device':
+								// Make sure that the assets that were found are of the right type
+								if (chkVirtual) {
+									if ( ! ['virtual', 'vm'].contains(asset.assetType.toLowerCase() )) 
+										asset = null
+								} else if (chkPhysical) {
+									if ( ['application', 'database', 'files', 'virtual', 'vm'].contains(asset.assetType.toLowerCase() ))
+										asset = null
+								} else {
+									if ( ['application', 'database', 'files'].contains(asset.assetType.toLowerCase() ))
+										asset = null
+								}
+
+								break
+							default:
+								log.error "findAllAssetsWithFilter() Unhandled switch/case for filter.dependency.class='$queryOn'"
+								throw new RuntimeException("Unsupported filter.dependency.class '$queryOn' specified in filter ($filter)")
+								break
+						}
+
+						if (asset)
+							daList << asset
+					}
+				}
+				assets = daList
+			}			
 		}
 	
 		return assets

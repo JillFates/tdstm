@@ -34,6 +34,7 @@ class MoveEventController {
 	def stateEngineService
 	def reportsService
 	def runbookService
+	def cookbookService
 	def taskService
 	def securityService
 	def projectService
@@ -173,19 +174,20 @@ class MoveEventController {
         if(moveEventInstance) {
 	
 			// Validate that the runbook recipe syntax is okay
-			if (params.runbookRecipe?.size() > 0) {
-				def error
-				try {
-					Eval.me("[${params.runbookRecipe}]")
-				} catch (e) {
-					error = e.getMessage()
-					error = error.replaceAll(/[\r]/, '<br/>')
-				}
-				if (error) {
-					flash.message = "There was an error with the runtime recipe<br/>$error"
-					render(view:'edit',model:[moveEventInstance:moveEventInstance, moveBundles:MoveBundle.findAllByProject( moveEventInstance.project )])
-					return
-				}
+			def recipeErrors = cookbookService.validateSyntax( params.runbookRecipe )
+			if (recipeErrors) {
+				def errMsg = 'The recipe has the following error(s):<ul>'
+				log.debug "recipeErrors = $recipeErrors"
+				recipeErrors.each { e -> errMsg += "<li>${e.reason}: ${e.detail}</li>"}
+				errMsg += '</ul>'
+				log.debug "Recipe had syntax errors : $errMsg"
+
+				flash.message = errMsg
+
+				// Populate the parameters back into the MoveEvent so that the user doesn't loose what they were working on
+				moveEventInstance.properties = params
+				render(view:'edit',model:[moveEventInstance:moveEventInstance, moveBundles:MoveBundle.findAllByProject( moveEventInstance.project )])
+				return
 			}
 	
             moveEventInstance.properties = params
@@ -881,7 +883,7 @@ class MoveEventController {
 				message = taskService.generateRunbook( securityService.getUserLoginPerson() , moveEvent ) 
 			}
 		}
-		render (template:"resMessage",model :[message: message])
+		render (template:"resMessage", model:[message: message])
 	}
 	
 	/**

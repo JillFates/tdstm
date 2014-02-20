@@ -540,6 +540,29 @@ class CookbookService {
 		return recipes
     }
 
+    /**
+     * Used to convert the Recipe source code from syntax into a Map
+     * @param sourceCode the source code that represents the recipe (presently represents a Groovy Map)
+     * @return The recipe in a Groovy Map containing the various elements of the recipe
+     * @throws InvalidSyntaxException if the sourcecode is invalid
+     */
+    Map parseRecipeSyntax( sourceCode ) {
+    	def recipe
+		if (! sourceCode ) {
+//			throw new InvalidSyntaxException('Recipe contains no source code')
+			throw new RuntimeException('Recipe contains no source code')
+		} else {
+			//log.debug "About to parse the recipe:\n$sourceCode"
+			try {
+				recipe = Eval.me("[${sourceCode}]")
+			} catch (e) {
+				//throw new InvalidSyntaxException( e.getMessage().replaceAll(/[\r]/, '<br/>') )
+				throw new RuntimeException( e.getMessage().replaceAll(/[\r]/, '<br/>') )
+			}
+		}
+		return recipe
+    }
+
 	/**
 	* Used to validate the syntax of a recipe 
 	* 
@@ -560,7 +583,7 @@ class CookbookService {
 		def recipe
 
 		try {
-			recipe = Eval.me("[${sourceCode}]")
+			recipe = parseRecipeSyntax(sourceCode)
 		} catch (e) {
 			errorList << [ error: 1, reason: 'Invalid syntax', detail: e.getMessage().replaceAll(/[\r]/, '<br/>') ]
 		}
@@ -603,13 +626,49 @@ class CookbookService {
 										detail: "Group '${group.name}' in element ${index} has invalid filter.class value. Allowed values [${classNames.join(',')}]" ]
 								}
 							} else {
-								errorList << [ error: 3, reason: 'Missing property', 
-									detail: "Group '${group.name}' in element ${index} is missing required 'filter.class' property" ]
+								// We default class=device so no error if not found
+								//errorList << [ error: 3, reason: 'Missing property', 
+								//	detail: "Group '${group.name}' in element ${index} is missing required 'filter.class' property" ]
 							}
 							if ( group.filter.containsKey('taskSpec') ) {
 								errorList << [ error: 1, reason: 'Invalid syntax', 
 									detail: "Group '${group.name}' in element ${index} references a taskSpec which is not supported in groups" ]
 							}
+
+							// Validate the filter.dependency map settings
+							if (group.filter.containsKey('dependency')) {
+								if (group.filter.dependency instanceof Map ) {
+									if (group.filter.dependency.containsKey('mode')) {
+										// Now we need to find assets that are associated via the AssetDependency domain
+										def depMode = group.filter.dependency.mode.toLowerCase()
+										if ( ! depMode || ! ['s','r'].contains(depMode[0]) ) {
+											errorList << [ error: 1, reason: 'Invalid syntax', 
+												detail: "Group '${group.name}' in element ${index} 'filter.dependency.mode' must be [supports|requires]" ]
+										}
+										if (group.filter.dependency.containsKey('asset')) {
+											if (group.filter.dependency.asset instanceof Map ) {
+												def suppAttribs = ['virtual','physical']
+												group.filter.dependency.asset.each { n, v -> 
+													if (! suppAttribs.contains(n)) 
+														errorList << [ error: 1, reason: 'Invalid syntax', 
+															detail: "Group '${group.name}' in element ${index} 'filter.dependency.asset' contains unsupport property '$n'" ]													
+												}
+												//
+											} else {
+												errorList << [ error: 1, reason: 'Invalid syntax', 
+													detail: "Group '${group.name}' in element ${index} 'filter.dependency.asset' element not properly defined as a map" ]													
+											}
+										}
+									} else {
+										errorList << [ error: 3, reason: 'Missing property', 
+											detail: "Group '${group.name}' in element ${index} is missing required 'filter.dependency.mode' property" ]
+									}
+								} else {
+									errorList << [ error: 1, reason: 'Invalid syntax', 
+										detail: "Group '${group.name}' in element ${index} 'filter.dependency' element not properly defined as a map" ]	
+								}
+							}
+
 						} else {
 							errorList << [ error: 1, reason: 'Invalid syntax', 
 								detail: "Group '${group.name}' in element ${index} 'filter' element not properly defined as a map" ]
