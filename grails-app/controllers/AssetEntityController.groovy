@@ -3706,10 +3706,6 @@ class AssetEntityController {
 		def durations = params.duration ? AssetComment.findAll("from AssetComment where project =:project \
 			and duration like '%${params.duration}%'",[project:project])?.duration : []
 
-		// TODO : Replace this with eq()
-		def hardAssigneds = params.hardAssigned ? AssetComment.findAll("from AssetComment where project =:project \
-			and hardAssigned like '%${params.hardAssigned}%'",[project:project])?.hardAssigned : []
-
 	    def dates = params.dueDate ? AssetComment.findAll("from AssetComment where project =:project and dueDate like '%${params.dueDate}%' ",[project:project])?.dueDate : []
 		def estStartdates = params.estStart ? AssetComment.findAll("from AssetComment where project =:project and estStart like '%${params.estStart}%' ",[project:project])?.estStart : []
 		def actStartdates = params.actStart ? AssetComment.findAll("from AssetComment where project =:project and actStart like '%${params.actStart}%' ",[project:project])?.actStart : []
@@ -3720,9 +3716,6 @@ class AssetEntityController {
 		def assigned = params.assignedTo ? Person.findAllByFirstNameIlikeOrLastNameIlike("%${params.assignedTo}%","%${params.assignedTo}%" ) : []
 		def createdBy = params.createdBy ? Person.findAllByFirstNameIlikeOrLastNameIlike("%${params.createdBy}%","%${params.createdBy}%" ) : [] 
 		def resolvedBy = params.resolvedBy ? Person.findAllByFirstNameIlikeOrLastNameIlike("%${params.resolvedBy}%","%${params.resolvedBy}%" ) : []
-
-		// TODO : Replace this with eq()
-		def isResolvedList = params.isResolved ? AssetComment.findAllByProjectAndIsResolved(project, params.isResolved )?.isResolved :[]
 
 		def tasks = AssetComment.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", project)
@@ -3758,12 +3751,12 @@ class AssetEntityController {
 			if (taskNumbers)
 				'in'('taskNumber' , taskNumbers)
 				
-			// TODO : Replace this with eq()
-			if(isResolvedList)
-				'in'('isResolved',isResolvedList)
-			// TODO : Replace this with eq()
-			if(hardAssigneds)
-				'in'('hardAssigned',hardAssigneds)
+			if((params.isResolved || params.isResolved == '0') && params.isResolved?.isNumber())
+				eq('isResolved', new Integer(params.isResolved))
+				
+			if((params.hardAssigned || params.hardAssigned == '0') && params.hardAssigned?.isNumber())
+				eq('hardAssigned', new Integer(params.hardAssigned))
+				
 			if (dates) {
 				and {
 					or {

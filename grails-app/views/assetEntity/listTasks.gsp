@@ -138,10 +138,10 @@
 			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" >' + (rowObject[17] ? rowObject[17] : "false") + '</span>';
 		}
 		function taskFormatter(cellVal,options,rowObject) {
-			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal ? cellVal :"") + '</span>';
+			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal || cellVal == 0 ? cellVal :"") + '</span>';
 		}
 		function assignedFormatter(cellVal,options,rowObject) {
-		  return '<span class="cellWithoutBackground pointer" id="assignedToName_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal ? cellVal :"") + '</span>';
+		  return '<span class="cellWithoutBackground pointer" id="assignedToName_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal || cellVal == 0 ? cellVal :"") + '</span>';
 		}
 		function statusFormatter(cellVal,options,rowObject){
 			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
@@ -154,8 +154,8 @@
 			return '<span id="span_'+options.rowId+'" class=" '+rowObject[15] +'" onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
 		}
 		function assetFormatter(cellVal,options,rowObject){
-			return cellVal ? '<span class="cellWithoutBackground pointer" onclick= "getEntityDetails(\'listTask\', \''+rowObject[4]+'\', '+rowObject[16]+')\" >' + (cellVal) + '</span>' :
-				"<span class='cellWithoutBackground pointer'></span>"
+			return options.colModel.name == "assetName" && cellVal ? '<span class="cellWithoutBackground pointer" onclick= "getEntityDetails(\'listTask\', \''+rowObject[4]+'\', '+rowObject[16]+')\" >' + (cellVal) + '</span>' :
+				(cellVal || cellVal == 0 ? cellVal : "<span class='cellWithoutBackground pointer'></span>")
 		}
 		
 		function populateFilter(){
