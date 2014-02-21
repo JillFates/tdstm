@@ -1,23 +1,86 @@
-var app = angular.module('cookbookRecipes', ['ngGrid', 'ngResource', 'ui.bootstrap', 'modNgBlur']);
+var app = angular.module('cookbookRecipes', ['ngGrid', 'ngResource', 'ui.bootstrap', 'modNgBlur', 'ui.codemirror']);
 
 app.config(['$logProvider', function($logProvider) {  
    //$logProvider.debugEnabled(false);  
 }]);
 
-app.controller('CookbookRecipeEditor', function($scope, $http, $resource, $timeout, $modal, $log) {
+app.controller('CookbookRecipeEditor', function($scope, $http, $resource, $timeout, $modal, $log, $location, $anchorScroll) {
     
     // Resource Calls
-    var Recipes = $resource('/tdstm/ws/cookbook/recipe/list?:archived&:context&:project', {archived:'@archived', context: '@context', project: '@project'}),
+    var Recipes = $resource('/tdstm/ws/cookbook/recipe/list:archived&:context', {archived:'@archived', context: '@context'}),
         Recipe = $resource('/tdstm/ws/cookbook/recipe/:recipeId/:versionId', {recipeId:'@recipeId', versionId:'@versionId'});
+
+    var restCalls = $resource(
+        '/tdstm/ws/cookbook/:section/:details/:moreDetail',
+        {
+            section: "@section",
+            details: "@details",
+            moreDetail: "@moreDetail"
+        },
+        {
+            getListOfRecipes: {
+                method: "GET",
+                params: {
+                    section: "recipe",
+                    details: "list",
+                    moreDetail: ""
+                }
+            },
+            getARecipeVersion: {
+                method: "GET",
+                params: {
+                    section: "recipe"
+                }
+            },
+            saveWIP: {
+                method: "POST",
+                params: {
+                    section: "save"
+                }
+            },
+            release: {
+                method: "GET",
+                params: {
+                    section: "release"
+                }
+            },
+            revert: {
+                method: "GET",
+                params: {
+                    section: "revert"
+                }
+            },
+            validate: {
+                method: "GET",
+                params: {
+                    section: "validate"
+                }
+            }
+        }
+    );
+
+    var aRecipe = restCalls.getARecipeVersion({details: 9, moreDetail: ""}, function(){
+        console.log(aRecipe);
+    })
+
+    //  BASE:           /tdstm/ws/cookbook/
+    
+    //  getList:        recipe/list+params
+    //  getRecipe:      recipe/params
+    //  Save WIP:       save
+    //  Release:        release
+    //  Revert:         revert
+    //  Validate:       validate Syntax
+
+    //  
 
     // Default data to get recipes
     $scope.context = 'All';
     $scope.archived = 'n';
-    $scope.project = 'master';
 
     // Method to Get the list of Recipes.
     var listRecipes = function(){
-        $scope.recipes = Recipes.get({archived: 'archived=' + $scope.archived, context: 'context=' + $scope.context, project: 'project=' + $scope.project}, function(){
+        $scope.recipes = restCalls.getListOfRecipes({archived: $scope.archived, context: $scope.context}, function(){
             $log.info('Success on getting Recipes');
             $scope.totalItems = $scope.recipes.data.list.length;
             $scope.gridData = ($scope.totalItems) ? $scope.recipes.data.list : [{'message': 'No results found', 'context': 'none'}]; 
@@ -36,6 +99,15 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource, $timeo
     // Initial call to get the list of Recipes
     listRecipes();
 
+
+    // Main tabset actives
+    $scope.activeTabs = {
+        taskGeneration : true,
+        history : false,
+        editor : false,
+        versions : false
+    };
+
     // Pagination Stuff
     $scope.totalItems = 4;
     $scope.currentPage = 1;
@@ -51,7 +123,7 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource, $timeo
 
     // ng-grid stuff
     var col = {index: 0}
-    var actionsTemplate = '<div class="gridIcon"><a href="#" class="actions edit" title="Edit" ng-click="actionsEdit()"><span class="glyphicon glyphicon-pencil"></span> <a href="#" class="actions edit" title="Revert" ng-click="actionRevert()"><span class="glyphicon glyphicon-arrow-left"></span> <a href="#" class="actions edit" title="Archive" ng-click="actionArchive()"><span class="glyphicon glyphicon-folder-close"></span> <a href="#" class="actions edit" title="Remove" ng-click="actionDelete()"><span class="glyphicon glyphicon-trash"></span></a></div>'
+    var actionsTemplate = '<div class="gridIcon"><a href="" class="actions edit" title="Edit" ng-click="gridActions(row, 0)"><span class="glyphicon glyphicon-pencil"></span> <a href="" class="actions revert" title="Revert" ng-click="gridActions(row, 1)"><span class="glyphicon glyphicon-arrow-left"></span> <a href="" class="actions archive" title="Archive" ng-click="gridActions(row, 2)"><span class="glyphicon glyphicon-folder-close"></span> <a href="" class="actions remove" title="Remove" ng-click="gridActions(row, 3)"><span class="glyphicon glyphicon-trash"></span></a></div>'
     $scope.edittableField = '<input ng-class="colt' + col.index + '" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-blur="updateEntity(row)" />'; //value="{{row.getProperty(col.field)}}" ng-blur="saveRecipeChanges()"
     $scope.colDef = [
         {field:'name', displayName:'Recipe', enableCellEdit: true, enableCellEditOnFocus: false, width: '***', editableCellTemplate: $scope.edittableField},
@@ -148,14 +220,29 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource, $timeo
                 $scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
 
                 $log.info('Success on getting selected recipe');
+                $log.info(rec.data);
                 
+                // Save WIP Functionality
                 $scope.saveWIP = function(){
                     rec.$save(rec.data, function(){
                         $log.info('Success on Saving WIP');
-                        $scope.alerts.addAlert({type: 'success', msg: 'Saved', closeIn: 1500});
+                        $scope.alerts.addAlert({type: 'success', msg: 'WIP Saved', closeIn: 1500});
+                        listRecipes();
                     }, function(){
                         $log.warn('Error on Saving WIP');
-                        $scope.alerts.addAlert({type: 'danger', msg: 'Error: Could not save recipe version'});
+                        $scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to save recipe version'});
+                    });
+                }
+
+                // Release Version Functionality
+                $scope.releaseVersion = function(){
+                    rec.$save(rec.data, function(){
+                        $log.info('Success on Releasing');
+                        $scope.alerts.addAlert({type: 'success', msg: 'Version Released', closeIn: 1500});
+                        listRecipes();
+                    }, function(){
+                        $log.warn('Error on Saving WIP');
+                        $scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to release version'});
                     });
                 }
 
@@ -183,15 +270,42 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource, $timeo
     // Watch changes at the selected Recipe.
     $scope.$watch('selectedRecipe', function(newValue, oldValue) {
         oldValue = angular.copy($scope.originalDataRecipe);
-        if (JSON.stringify(newValue) === JSON.stringify(oldValue) || !oldValue) {
+        if (JSON.stringify(newValue) === JSON.stringify(oldValue) || !oldValue || newValue.name == "") {
             $scope.editingRecipe = false;
+            $log.log('not editable')
             return;
         }
         $scope.editingRecipe = true;
+        $log.log('editable')
     }, true);
 
-    $scope.actionsEdit = function(){
-        //$log.log(this.row.entity);
+    // Actions for the main Grid
+    $scope.gridActions = function(row, ind){
+        $log.warn(row);
+        $log.warn(ind);
+        var action = ['edit', 'revert', 'archive', 'delete'],
+            actions = {
+                edit : function(){
+                    $scope.activeTabs.editor = true;
+                    $timeout(function(){
+                        $location.hash('mainTabset');
+                        $anchorScroll();
+                    }, 100)
+                },
+                revert : function(){
+                    $log.info('Revert code');
+                },
+
+                archive : function(){
+                    $log.info('Archive code');
+                },
+
+                delete : function(){
+                    $log.info('Delete code');
+                }
+            };
+
+        actions[action[ind]]();
     }
 
     // Update recipe. After editing. 
@@ -245,13 +359,12 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource, $timeo
     var ModalInstanceCtrl = function ($scope, $modalInstance) {
         $scope.modalBtns = {};
 
-        $scope.modalContextSelector = "Event";
+        $scope.modalContextSelector = "";
 
         $scope.newRecipe = {
             name: '',
             description: '',
-            context: $scope.modalContextSelector,
-            projectType: 'Master'
+            context: $scope.modalContextSelector
         }
 
         $log.log($scope.modalContextSelector);
@@ -267,13 +380,23 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource, $timeo
         };
 
         var save = function(){
-            $http.post('/tdstm/ws/cookbook/recipe', $scope.newRecipe).
-                success(function(){
-                    $log.info('Recipe created');
-                }).
-                error(function(){
-                    $log.warn('Error when creating recipe');
-                })
+            var url = '/tdstm/ws/cookbook/recipe',
+                dataToSend = $.param($scope.newRecipe);
+
+            $http({
+                method: 'POST',
+                url: url,
+                data: dataToSend,
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+            }).
+            success(function(){
+                $log.info('Recipe created');
+                $scope.alerts.addAlert({type: 'success', msg: 'Recipe Created', closeIn: 1500});
+            }).
+            error(function(){
+                $log.warn('Error when creating recipe');
+                $scope.alerts.addAlert({type: 'danger', msg: 'Saved'});
+            })
         }
     };
     //-----------------------------------------------------
@@ -292,7 +415,15 @@ app.controller('CookbookRecipeEditor', function($scope, $http, $resource, $timeo
 
     // Cancel changes
     $scope.cancelChanges = function(){
-        $scope.selectedRecipe = angular.copy($scope.originalDataRecipe);
+        var confirmation=confirm("You are about to cancel the changes for recipe: " + currentSelectedRow.entity.name + ". You want to proceed?");
+        if (confirmation==true){
+            $log.log('Yes, cancel');
+            $scope.selectedRecipe = angular.copy($scope.originalDataRecipe);
+            return true;
+        }else{
+            $log.log('No, please');
+            return false;
+        }
     }
 
     // Alerts Stuff
