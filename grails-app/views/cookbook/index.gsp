@@ -19,7 +19,7 @@
     	<g:javascript src="controllers/cookbook.js" />
 	</head>
 	<body>
-		<div class="body" ng-app="cookbookRecipes" ng-controller="CookbookRecipeEditor">
+		<div class="body" id="cookbookRecipesEditor" ng-app="cookbookRecipes" ng-controller="CookbookRecipeEditor">
 			<div class="container">
 				<div class="row-fluid clearfix" style="margin-top:10px;"> %{-- This last style attr should be removed --}%
 					<div class="col-md-6 col-xs-6">
