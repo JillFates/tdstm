@@ -3657,7 +3657,6 @@ class AssetEntityController {
 	 * @return : list of tasks as JSON
 	 */
 	def listTaskJSON = {
-		
 		def sortIndex =  params.sidx ? params.sidx : session.TASK?.JQ_FILTERS?.sidx
 		def sortOrder =  params.sidx ? params.sord : session.TASK?.JQ_FILTERS?.sord
 		
@@ -3707,6 +3706,7 @@ class AssetEntityController {
 		def durations = params.duration ? AssetComment.findAll("from AssetComment where project =:project \
 			and duration like '%${params.duration}%'",[project:project])?.duration : []
 
+		// TODO : Replace this with eq()
 		def hardAssigneds = params.hardAssigned ? AssetComment.findAll("from AssetComment where project =:project \
 			and hardAssigned like '%${params.hardAssigned}%'",[project:project])?.hardAssigned : []
 
@@ -3721,8 +3721,9 @@ class AssetEntityController {
 		def createdBy = params.createdBy ? Person.findAllByFirstNameIlikeOrLastNameIlike("%${params.createdBy}%","%${params.createdBy}%" ) : [] 
 		def resolvedBy = params.resolvedBy ? Person.findAllByFirstNameIlikeOrLastNameIlike("%${params.resolvedBy}%","%${params.resolvedBy}%" ) : []
 
-		def isPublishedList = (params.isPublished=='true') ? AssetComment.findAllByProjectAndIsPublished(project, params.isPublished )?.isPublished :[]
+		// TODO : Replace this with eq()
 		def isResolvedList = params.isResolved ? AssetComment.findAllByProjectAndIsResolved(project, params.isResolved )?.isResolved :[]
+
 		def tasks = AssetComment.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", project)
 			eq("commentType", AssetCommentType.TASK) 
@@ -3757,10 +3758,10 @@ class AssetEntityController {
 			if (taskNumbers)
 				'in'('taskNumber' , taskNumbers)
 				
-			if(isPublishedList)
-				'in'('isPublished',isPublishedList)
+			// TODO : Replace this with eq()
 			if(isResolvedList)
 				'in'('isResolved',isResolvedList)
+			// TODO : Replace this with eq()
 			if(hardAssigneds)
 				'in'('hardAssigned',hardAssigneds)
 			if (dates) {
@@ -3833,14 +3834,19 @@ class AssetEntityController {
 			}
 		}
 
+	def createJsonTime = new Date()
+
 		def totalRows = tasks.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
 		def updatedTime
 		def updatedClass
 		def dueClass
 		def nowGMT = TimeUtil.nowGMT()
+		def taskPref=assetEntityService.getExistingPref('Task_Columns')
+
 		def results = tasks?.collect { 
-			updatedTime =  it.isRunbookTask() ? it.statusUpdated : it.lastUpdated
+			def isRunbookTask = it.isRunbookTask()
+			updatedTime =  isRunbookTask ? it.statusUpdated : it.lastUpdated
 			
 			def elapsed = TimeUtil.elapsed(it.statusUpdated, nowGMT)
 			def elapsedSec = elapsed.toMilliseconds() / 1000
@@ -3872,12 +3878,11 @@ class AssetEntityController {
 			}
 			
 			def dueDate='' 
-			if (it.isRunbookTask()) {
+			if (isRunbookTask) {
 				dueDate = it.estFinish ? runBookFormatter.format(TimeUtil.convertInToUserTZ(it.estFinish, tzId)) : ''
 			} else {
 				dueDate = it.dueDate ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.dueDate, tzId)) : ''
 			}
-			def taskPref= assetEntityService.getExistingPref('Task_Columns')
 			
 			def depCount = TaskDependency.countByPredecessor( it )
 			// Have the dependency count be a link to the Task Neighborhood graph if there are dependencies
@@ -3902,7 +3907,8 @@ class AssetEntityController {
 				updatedClass, dueClass, it.assetEntity?.id
 				], 
 				id:it.id
-			]}
+			]
+		}
 		
 		// If sessions variables exists, set them with params and sort
 		session.TASK?.JQ_FILTERS = params
