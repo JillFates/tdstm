@@ -242,8 +242,8 @@ class CookbookService {
 	 * @param currentProject the current project
 	 */
 	def saveOrUpdateWIPRecipe(recipeId, recipeVersionId, name, description, sourceCode, changelog, loginUser, currentProject) {
-		if (!RolePermissions.hasPermission('CatalogRecipeSave')) {
-			throw new UnauthorizedException('User doesn\'t have a CatalogRecipeSave permission')
+		if (!RolePermissions.hasPermission('EditRecipe')) {
+			throw new UnauthorizedException('User doesn\'t have a EditRecipe permission')
 		}
 
 		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
