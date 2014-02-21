@@ -158,11 +158,11 @@ class WsCookbookController {
 			return
 		}
 
-		def recipeVersionId = params.recipeVersionId
+		def recipeId = params.recipeId
 		def currentProject = securityService.getUserCurrentProject()
 
 		try {
-			cookbookService.releaseRecipe(recipeVersionId, loginUser, currentProject)
+			cookbookService.releaseRecipe(recipeId, loginUser, currentProject)
 
 			render(ServiceResults.success() as JSON)
 		} catch (UnauthorizedException e) {
@@ -230,7 +230,7 @@ class WsCookbookController {
 			dataMap.createdBy = result.person.firstName + " " + result.person.lastName
 			dataMap.lastUpdated = result.recipeVersion.lastUpdated
 			dataMap.versionNumber = (result.recipe.releasedVersion == null) ? -1 : result.recipe.releasedVersion.versionNumber
-			dataMap.hasWIP = result.wip
+			dataMap.hasWIP = result.wip != null
 			dataMap.sourceCode = result.recipeVersion.sourceCode
 			dataMap.changelog = result.recipeVersion.changelog
 			dataMap.clonedFrom = (result.recipeVersion.clonedFrom == null) ? '' : result.recipeVersion.clonedFrom.toString()

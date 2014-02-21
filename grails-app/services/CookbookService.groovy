@@ -289,22 +289,27 @@ class CookbookService {
 
 	
 	/**
-	 * Releases a WIP recipe version using the recipeVersionId
-	 * @param recipeVersionId the version id
+	 * Releases a WIP recipe version using the recipeId
+	 * @param recipeId the id
 	 * @param loginUser the current user
 	 * @param currentProject the current project
 	 */
-	def releaseRecipe(recipeVersionId, loginUser, currentProject) {
+	def releaseRecipe(recipeId, loginUser, currentProject) {
 //		if (!RolePermissions.hasPermission('ReleaseRecipe')) {
 //			throw new UnauthorizedException('User doesn\'t have a ReleaseRecipe permission')
 //		}
 		
-		if (recipeVersionId == null || !recipeVersionId.isNumber() || currentProject == null) {
+		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
 			throw new EmptyResultException(); 
 		}
 		
+		def recipe = Recipe.get(recipeId)
+		if (recipe == null) {
+			throw new EmptyResultException();
+		}
+		
 		//TODO check this checkAccess(loginUser.person, currentProject)
-		def wip = RecipeVersion.get(recipeVersionId)
+		def wip = RecipeVersion.findByRecipeAndVersionNumber(recipe, 0)
 		
 		if (wip == null || wip.versionNumber != 0) {
 			throw new IllegalArgumentException('Not a WIP')

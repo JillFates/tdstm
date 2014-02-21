@@ -42,7 +42,7 @@ class UrlMappings {
 			action = [GET:"recipe", POST:"saveRecipeVersion", PUT:"updateRecipe", DELETE:"deleteRecipeOrVersion"]
 		}
 
-		"/ws/cookbook/recipe/version/$recipeVersionId" {
+		"/ws/cookbook/recipe/release/$recipeId" {
 			controller = "wsCookbook"
 			action = [POST:"releaseRecipe"]
 		}
