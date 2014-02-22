@@ -176,9 +176,10 @@ class DatabaseController {
 			dbsList = []
 
 		def results = dbsList?.collect { 
+			def commentType = it.commentType
 			[ cell: ['',it.assetName, (it[dbPref["1"]] ?: ''), it[dbPref["2"]], it[dbPref["3"]], it[dbPref["4"]], 
 					/*it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,*/
-					(it.commentStatus!='Completed' && it.commentType=='issue')?('issue'):(it.commentType?:'blank'),
+					(it.commentStatus!='Completed' && commentType=='issue')?('issue'):(commentType?:'blank'),
 					it.assetType], id: it.dbId,
 			]}
 

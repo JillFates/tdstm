@@ -168,10 +168,11 @@ class FilesController {
 		else
 			filesList = []
 
-		def results = filesList?.collect { 
+		def results = filesList?.collect {
+			def commentType = it.commentType
 			[ cell: ['',it.assetName, (it[filePref["1"]] ?: ''), it[filePref["2"]], it[filePref["3"]], it[filePref["4"]], 
 					/*it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,*/
-					(it.commentStatus!='Completed' && it.commentType=='issue')?('issue'):(it.commentType?:'blank'),
+					(it.commentStatus!='Completed' && commentType=='issue')?('issue'):(commentType?:'blank'),
 					it.assetType], id: it.fileId,
 			]}
 

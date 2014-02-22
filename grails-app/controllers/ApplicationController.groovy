@@ -181,10 +181,12 @@ class ApplicationController {
 		else
 			appsList = []
 			
-		def results = appsList?.collect { [ cell: [
+		def results = appsList?.collect { 
+			def commentType = it.commentType
+			[ cell: [
 			'',it.assetName, (it[appPref["1"]] ?: ''), it[appPref["2"]], it[appPref["3"]], it[appPref["4"]], 
 			/*it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,*/
-			(it.commentStatus!='Completed' && it.commentType=='issue')?('issue'):(it.commentType?:'blank'),	it.assetType, it.event
+			(it.commentStatus!='Completed' && commentType=='issue')?('issue'):(commentType?:'blank'),	it.assetType, it.event
 		], id: it.appId]}
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 		

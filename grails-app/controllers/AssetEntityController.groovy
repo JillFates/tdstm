@@ -1712,10 +1712,12 @@ class AssetEntityController {
 		else
 			assetList = []
 		
-		def results = assetList?.collect { [ cell: [ '',it.assetName, (it.assetType ?: ''), it.model, 
+		def results = assetList?.collect { 
+			def commentType = it.commentType
+			[ cell: [ '',it.assetName, (it.assetType ?: ''), it.model, 
 			it.sourceLocation, it.sourceRack, (it[assetPref["1"]] ?: ''), it[assetPref["2"]], it[assetPref["3"]], it[assetPref["4"]], it.planStatus, it.moveBundle, 
 			/*it.depNumber, (it.depToResolve==0)?(''):(it.depToResolve), (it.depConflicts==0)?(''):(it.depConflicts),*/
-			(it.commentStatus!='Completed' && it.commentType=='issue')?('issue'):(it.commentType?:'blank'),	it.assetType, it.event
+			(it.commentStatus!='Completed' && commentType=='issue')?('issue'):(commentType?:'blank'),	it.assetType, it.event
 		], id: it.assetId]}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
@@ -3882,6 +3884,8 @@ class AssetEntityController {
 			def nGraphUrl = depCount == 0 ? depCount : '<a href="' + HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:it.id]) +
 				'" target="_blank",>' + depCount + '</a>'
 
+			def status = it.status
+			
 			[ cell: [
 				'',
 				it.taskNumber, 
@@ -3890,13 +3894,13 @@ class AssetEntityController {
 				taskManagerValues(taskPref["2"],it),
 				updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '',
 				dueDate,
-				it.status ?: '', 
+				status ?: '', 
 				taskManagerValues(taskPref["3"],it),
 				taskManagerValues(taskPref["4"],it), 
 				taskManagerValues(taskPref["5"],it), 
 				nGraphUrl, 
 				it.score ?: 0,
-				it.status ? "task_${it.status.toLowerCase()}" : 'task_na',
+				status ? "task_${it.status.toLowerCase()}" : 'task_na',
 				updatedClass, dueClass, it.assetEntity?.id
 				], 
 				id:it.id
