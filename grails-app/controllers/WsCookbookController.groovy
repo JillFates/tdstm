@@ -229,7 +229,8 @@ class WsCookbookController {
 			dataMap.context = result.recipe.context
 			dataMap.createdBy = result.person.firstName + " " + result.person.lastName
 			dataMap.lastUpdated = result.recipeVersion.lastUpdated
-			dataMap.versionNumber = (result.recipe.releasedVersion == null) ? -1 : result.recipe.releasedVersion.versionNumber
+			dataMap.versionNumber = result.recipeVersion.versionNumber
+			dataMap.releasedVersionNumber = (result.recipe.releasedVersion == null) ? -1 : result.recipe.releasedVersion.versionNumber
 			dataMap.hasWIP = result.wip != null
 			dataMap.sourceCode = result.recipeVersion.sourceCode
 			dataMap.changelog = result.recipeVersion.changelog
@@ -267,7 +268,6 @@ class WsCookbookController {
 
 		try {
 			def results = cookbookService.findRecipes(isArchived, catalogContext, searchText, projectType, loginUser, currentProject)
-
 			def dataMap = [:]
 			dataMap.list = results
 

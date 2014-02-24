@@ -21,29 +21,18 @@
 	<body>
 		<div class="body" id="cookbookRecipesEditor" ng-app="cookbookRecipes" ng-controller="CookbookRecipeEditor">
 			<div class="container">
-				<div class="row-fluid clearfix" style="margin-top:10px;"> %{-- This last style attr should be removed --}%
-					<div class="col-md-6 col-xs-6">
-						<g:form id="switchContext" action="#">
-							%{-- <div class="btn-group">
-								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-									Context <span class="caret"></span>
-								</button>
-								<ul class="dropdown-menu" role="menu">
-									<li ng-repeat="c in contexts" ng-click="change()" ><a href="#">{{c}}</a></li>
-								</ul>
-							</div> --}%
-							<select name="contextSelector" id="contextSelector" ng-model="context" ng-options="c for c in ['All', 'Event', 'Bundle', 'Application']" ng-disabled="editingRecipe" ng-change="changeRecipeList()">
-							</select>
-						</g:form>
+				<form id="gridControls" class="row-fluid clearfix form-inline groups">
+					<div class="col-md-2 col-xs-2 form-group">
+						<select class="form-control" name="contextSelector" id="contextSelector" ng-model="context" ng-options="c for c in ['All', 'Event', 'Bundle', 'Application']" ng-disabled="editingRecipe" ng-change="changeRecipeList()"></select>
 					</div>
-					<div class="col-md-6 col-xs-6">
-						<div class="checkbox">
+					<div class="col-md-6 col-xs-6 form-group pull-right archiveCheckWrapper">
+						<div class="checkbox pull-right">
 							<label class="pull-right">
 								<input type="checkbox" name="viewArchived" id="viewArchived" value="n" ng-model="archived" ng-true-value="y" ng-false-value="n" ng-disabled="editingRecipe" ng-change="changeRecipeList()"> View Archived Recipes
 							</label>
 						</div>
 					</div>
-				</div>
+				</form>
 				<div class="row-fluid clearfix">
 					<div class="col-md-12">
 						<div class="gridStyle" ng-grid="gridOptions"></div>
@@ -53,9 +42,9 @@
 					<div class="col-md-4">
 						<button class="btn btn-default createRecipe" ng-click="openCreateModal()">Create Recipe</button>
 					</div>
-					<div class="col-md-4 paginationWrapper">
+					%{-- <div class="col-md-4 paginationWrapper">
 						<pagination boundary-links="true" total-items="totalItems" page="currentPage" class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
-					</div>
+					</div> --}%
 				</div>
 				<div class="row-fluid clearfix">
 					<div class="col-md-12">
@@ -203,18 +192,18 @@
 									<div class="col-xs-6">
 										<h5 class="headingTitle">Recipe</h5>
 										<section class="codeMirrorWrapper"> 
-											<textarea name="recipeCode" id="recipeCode" rows="10" ng-model="selectedRecipe.sourceCode" value="{{selectedRecipe.sourceCode}}"></textarea>
+											<textarea name="recipeCode" id="recipeCode" rows="10" ng-model="selectedRecipe.sourceCode" ng-disabled="!currentSelectedRecipe" value="{{selectedRecipe.sourceCode}}"></textarea>
 										</section>
 										<div class="clearfix btns">
 											<div class="btn-group pull-left" style="margin-right:15px;">
-												<button type="button" class="btn btn-default" ng-click="saveWIP()" ng-disabled="!editingRecipe">Save WIP</button>
-												<button type="button" class="btn btn-default" ng-disabled="!editingRecipe" ng-click="releaseVersion()">Release</button>
+												<button type="button" class="btn btn-default" ng-disabled="!currentSelectedRecipe" ng-click="editorActions.saveWIP()">Save WIP</button>
+												<button type="button" ng-disabled="!selectedRecipe.hasWIP || !currentSelectedRecipe" class="btn btn-default" ng-click="editorActions.releaseVersion()">Release</button>
 											</div>
 											<div class="btn-group pull-left">
-												<button type="button" class="btn btn-default" ng-disabled="!editingRecipe" ng-click="cancelChanges()">Cancel</button>
-												<button type="button" class="btn btn-default" ng-disabled="!editingRecipe">Discard WIP</button>
+												<button type="button" class="btn btn-default" ng-disabled="!editingRecipe || !currentSelectedRecipe" ng-click="editorActions.cancelChanges()">Cancel</button>
+												<button type="button" class="btn btn-default" ng-disabled="!selectedRecipe.hasWIP || !currentSelectedRecipe" ng-click="editorActions.discardWIP()">Discard WIP</button>
 											</div>
-											<button type="submit" class="btn btn-default pull-right" ng-disabled="!editingRecipe">Validate Syntax</button>
+											<button type="submit" class="btn btn-default pull-right" ng-disabled="selectedRecipe.sourceCode == '' || !currentSelectedRecipe" ng-click="editorActions.validateSyntax()">Validate Syntax</button>
 										</div>
 									</div>
 									<div class="col-xs-6">
@@ -223,20 +212,22 @@
 											%{-- Change Logs Content --}%
 											<tab heading="Change Logs">
 												<label for="logs" class="sr-only">Logs </label>
-												<textarea name="logs" id="logs" rows="6" ng-model="selectedRecipe.changelog" value="{{selectedRecipe.changelog}}"></textarea>
+												<textarea name="logs" id="logs" rows="6" ng-model="selectedRecipe.changelog" ng-disabled="!currentSelectedRecipe" value="{{selectedRecipe.changelog}}"></textarea>
 											</tab>
 
 											%{-- Groups Content --}%
 											<tab heading="Groups">
 												<form action="#" class="form-inline groups clearfix">
-													<div class="form-group">
+													<div class="form-group col-xs-7">
 														<label for="testWith">Test With: </label>
-														<select name="testOptions" id="testOptions">
+														<select name="testOptions" class="form-control" id="testOptions" ng-disabled="!currentSelectedRecipe" >
 															<option value="wave1">Wave 1</option>
 															<option value="wave2">Wave 2</option>
 														</select>
 													</div>
-													<button type="submit" class="btn btn-default pull-right">Refresh</button>
+													<div class="form-group col-xs-5">
+														<button type="submit" ng-disabled="!currentSelectedRecipe"  class="btn btn-default pull-right">Refresh</button>
+													</div>
 												</form>
 												<div class="table-responsive groupsTable">
 													<table class="table table-hover table-striped ngGridTable">

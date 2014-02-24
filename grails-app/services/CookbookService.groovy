@@ -759,7 +759,7 @@ class RecipeMapper implements RowMapper {
 		rowMap.description = rs.getString('description')
 		rowMap.createdBy = rs.getString('createdBy')
 		rowMap.versionNumber = rs.getInt('versionNumber')
-		rowMap.hasWIP = rs.getBoolean('hasWIP')
+		rowMap.hasWIP = rs.getString('hasWIP').equals('1')
 		rowMap.context = rs.getString('context')
 		rowMap.lastUpdated = rs.getTimestamp('last_updated')
 		return rowMap

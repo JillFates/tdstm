@@ -28,10 +28,6 @@ table{
 	font-size: 1em;
 }
 
-#contextSelector{
-	margin:5px 0 0 0;
-}
-
 .paginationWrapper{
 	text-align: center;
 }
@@ -78,6 +74,8 @@ table{
 	padding-top:2px;
 }
 
+#gridControls{margin-top:15px;}
+
 .tab-content{
     padding: 15px;
     border-left: 1px solid #ddd;
@@ -123,16 +121,8 @@ textarea#logs{
 	width:100%;
 }
 
-form.groups .form-group{
-	margin-right:15px;
-}
-
 form.groups{
 	margin-bottom: 1em;
-}
-
-#testOptions{
-	width: 200px;
 }
 
 .groupsTable, .groupsTable2{
@@ -180,6 +170,8 @@ form.groups{
 form .error-msg{
 	margin:0.5em 0 0 0;
 }
+
+.archiveCheckWrapper{margin:5px 0 0 0;}
 
 /*animations*/
 .alert{
