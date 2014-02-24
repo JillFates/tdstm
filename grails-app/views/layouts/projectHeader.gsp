@@ -151,7 +151,7 @@
 	      <div class="menu2">
 	      <ul>
 			<tds:hasPermission permission='AdminMenuView'>
-			<li id="adminMenuId"><a class="home menuhideright headerClass" onmouseover="hoverMegaMenu('#adminMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#adminMegaMenu')">Admin</a>
+			<li id="adminMenuId" class="menuLiIndex"><a class="home menuhideright headerClass" onmouseover="hoverMegaMenu('#adminMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#adminMegaMenu')">Admin</a>
     		    <div class="megamenu admin inActive" id="adminMegaMenu">
 					<table class="mmtable room_rack"><tr>
 					<td style="vertical-align:top" nowrap="nowrap"><span class="megamenuSection">Administration</span><br />
@@ -203,7 +203,7 @@
 			</li>
 			</tds:hasPermission>
 
-			<li id="projectMenuId" style="position:relative; float: left;" ><a class="home headerClass" onmouseover="hoverMegaMenu('#projectMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#projectMegaMenu')">Client/Project</a>
+			<li id="projectMenuId" class="menuLiIndex" style="position:relative; float: left;" ><a class="home headerClass" onmouseover="hoverMegaMenu('#projectMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#projectMegaMenu')">Client/Project</a>
 				<div class="megamenu client inActive" id="projectMegaMenu">
 					<table class="mmtable"><tr>
 						<td style="vertical-align:top">
@@ -231,7 +231,7 @@
 				
 			</li>
 
-			<li id="roomMenuId" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#racksMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#racksMegaMenu')">Rooms/Racks</a>
+			<li id="roomMenuId" class="menuLiIndex" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#racksMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#racksMegaMenu')">Rooms/Racks</a>
 				<div class="megamenu rooms inActive" id="racksMegaMenu">
 					<table class="mmtable room_rack" ><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Rooms</span><br />
@@ -257,7 +257,7 @@
 				</div>
 			</li>
 	        <tds:hasPermission permission='AssetMenuView'>
-			<li id="assetMenuId" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#assetMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#assetMegaMenu')" >Assets</a>
+			<li id="assetMenuId" class="menuLiIndex" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#assetMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#assetMegaMenu')" >Assets</a>
 				<div class="megamenu rooms inActive" id="assetMegaMenu" >
 					<table class="mmtable room_rack"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Assets</span><br />
@@ -305,7 +305,7 @@
 			</li>
 			</tds:hasPermission>
 			<tds:hasPermission permission='EventMenuView'>
-			<li id="eventMenuId" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#bundleMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#bundleMegaMenu')">Events/Bundles </a>
+			<li id="eventMenuId" class="menuLiIndex" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#bundleMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#bundleMegaMenu')">Events/Bundles </a>
 				<div class="megamenu rooms inActive" id="bundleMegaMenu">
 					<table class="mmtable " ><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Events</span><br />
@@ -344,7 +344,7 @@
 			</li>
 			</tds:hasPermission>
 			<tds:hasPermission permission='BundleMenuView'>
-			<li id="teamMenuId" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#teamMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#teamMegaMenu')">Tasks</a>
+			<li id="teamMenuId" class="menuLiIndex" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#teamMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#teamMegaMenu')">Tasks</a>
 				<div class="megamenu rooms inActive" id="teamMegaMenu" >
 					<table class="mmtable"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Tasks</span><br />
@@ -364,7 +364,7 @@
 			</li>
             </tds:hasPermission>
 	        <tds:hasPermission permission='ConsoleMenuView'>
-			<li id="consoleMenuId" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#consoleMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#consoleMegaMenu')">Console</a>
+			<li id="consoleMenuId" class="menuLiIndex" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#consoleMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#consoleMegaMenu')">Console</a>
 			    <div class="megamenu rooms inActive" id="consoleMegaMenu">
 					<table class="mmtable room_rack"><tr>
 					<td style="vertical-align:top"  ><span class="megamenuSection">Supervisor Console</span><br />
@@ -408,7 +408,7 @@
 			</li>
 	        </tds:hasPermission>
 			<tds:hasPermission permission='DashBoardMenuView'> 
-			<li id="dashboardMenuId" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#dashboardMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#dashboardMegaMenu')">Dashboards</a>
+			<li id="dashboardMenuId" class="menuLiIndex" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#dashboardMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#dashboardMegaMenu')">Dashboards</a>
 				<div class="megamenu rooms inActive" id="dashboardMegaMenu">
 					<table class="mmtable"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Live Dashboards</span><br />
@@ -430,7 +430,7 @@
 			</li>
 			</tds:hasPermission>
 			<tds:hasPermission permission='ReportMenuView'>
-			<li id="reportsMenuId" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#reportsMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#reportsMegaMenu')">Reports</a>
+			<li id="reportsMenuId" class="menuLiIndex" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#reportsMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#reportsMegaMenu')">Reports</a>
 				<div class="megamenu reports inActive" id="reportsMegaMenu">
 					<table class="mmtable "><tr>
 					<tds:hasPermission permission='ShowDiscovery'>
