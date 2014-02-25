@@ -243,23 +243,36 @@ class CookbookService {
 	 */
 	def saveOrUpdateWIPRecipe(recipeId, recipeVersionId, name, description, sourceCode, changelog, loginUser, currentProject) {
 		if (!RolePermissions.hasPermission('EditRecipe')) {
-			throw new UnauthorizedException('User doesn\'t have a EditRecipe permission')
+			log.warn "SECURITY: User $loginUser attempted to update a recipe without permission, recipe id: $recipeId"
+			throw new UnauthorizedException('Sorry but you do not have the permission to update a recipe')
 		}
 
-		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
-			throw new EmptyResultException();
+		if ( currentProject == null) {
+			log.warn "SECURITY: User $loginUser attempting to update a recipe without a valid project, recipe id: $recipeId"
+			throw new InvalidParamException('You must select a project before being able to edit recipes');
+		}
+
+		if (recipeId == null || !recipeId.isNumber() || !recipeId.isInteger() ) {
+			log.warn "SECURITY: User $loginUser attempted to update a recipe without invalid recipe id, recipe id: $recipeId"
+			throw new InvalidParamException('Sorry but the recipe reference was invalid. Please contact support.');
 		}
 		
 		def recipe = Recipe.get(recipeId)
 		if (recipe == null) {
-			throw new EmptyResultException();
+			log.warn "User attempted to update recipe but recipe was not found, user: $loginUser, project: $currentProject, recipe id: $recipeId"
+			throw new EmptyResultException('Unable to find the recipe that you were attempting to update. Please contact support.');
 		}
-		
-		def recipeVersion = RecipeVersion.get(recipeVersionId)
 		
 		if (!recipe.project.equals(currentProject)) {
-			throw new UnauthorizedException('The current user can only edit recipes of the current project')
+			log.warn "SECURITY: User $loginUser illegally attempted to update a recipe of different project, recipe id: $recipeId, current project: $currentProject"
+			throw new UnauthorizedException('Sorry but you can only update a recipe within the current project')
 		}
+
+		// Validate that the syntax is correct before submitting
+		// TODO - Add logic to validate syntax
+
+		// TODO - why two lookups? 		
+		def recipeVersion = RecipeVersion.get(recipeVersionId)
 		
 		def wip = RecipeVersion.findByRecipeAndVersionNumber(recipe, 0)
 		if (wip == null) {
@@ -286,7 +299,6 @@ class CookbookService {
 		
 		return wip
 	}
-
 	
 	/**
 	 * Releases a WIP recipe version using the recipeId
@@ -620,6 +632,62 @@ class CookbookService {
 		def errorList = []
 		def recipe
 
+		// Helper closure that compares the properties of a spec to a defined map
+		def validateAgainstMap = { type, spec, map ->
+			def i=0
+			def label = ( type=='task' ? "Task id ${spec.id ?: 'UNDEF'}" : "Group ${spec.name ?: 'UNDEF'}" )
+			spec.each { n, v -> 
+				i++
+				if (map.containsKey(n)) {
+					// can do more here to check the nested definitions later on.
+				}
+				else {
+					errorList << [ error: 1, reason: 'Invalid syntax', 
+						detail: "$label in element $i contains unknown property '$n'" ]
+				}
+			}
+		}
+
+		// Definition of the properties supported by group
+		def groupProps = [
+			name:'',
+			description:'',
+			filter: [
+				group:0,
+				include:0,
+				exclude:0,
+				taskSpec:0,
+				class:['device','database','application','storage'],
+				asset:0,
+			]
+		]
+
+		// Definition of the properties supported by group
+		def taskProps = [
+			id:0,
+			name:0,
+			description:0,
+			filter:[],
+			type:['milestone','gateway','general','rollcall','location','room','rack','truck','set'],
+			disposition:0,
+			setOn:0,
+			workflow:0,
+			duration:0,
+			team:0,
+			category:0,
+			estStart:0,
+			estFinish:0,
+			priority:0,
+			effort:0,
+			chain:0,
+			terminal:0,
+			whom:0,
+			whomFixed:0,
+			predecessor: ['mode','group','defer','gather','parent','ignore','require','typeSpec', 'inverse', 'classification'],
+			constraintTime:0,
+			constraintType:0
+		]
+
 		try {
 			recipe = parseRecipeSyntax(sourceCode)
 		} catch (e) {
@@ -673,6 +741,9 @@ class CookbookService {
 									detail: "Group '${group.name}' in element ${index} references a taskSpec which is not supported in groups" ]
 							}
 
+							// Check for any unsupported properties (misspellings, etc)
+							validateAgainstMap( 'group', group, groupProps )
+
 							// Validate the filter.dependency map settings
 							if (group.filter.containsKey('dependency')) {
 								if (group.filter.dependency instanceof Map ) {
@@ -705,6 +776,7 @@ class CookbookService {
 									errorList << [ error: 1, reason: 'Invalid syntax', 
 										detail: "Group '${group.name}' in element ${index} 'filter.dependency' element not properly defined as a map" ]	
 								}
+
 							}
 
 						} else {
@@ -742,6 +814,43 @@ class CookbookService {
 				errorList << [ error: 2, reason: 'Missing section', detail: 'Recipe is missing required \'tasks\' section' ]
 			} else {
 				// Check for Task Names
+
+				def taskIds = []
+				index=0
+				def lastId=0
+
+				recipe.tasks.each { task -> 
+					index++
+
+					// Test that the 'id' exists, that it isn't duplicated and that it is a positive whole number
+					if (task.containsKey('id')) {
+						if (task.id instanceof Integer) {
+							if ( task.id > 0 ) {
+								if (taskIds.contains(task.id)) {
+									errorList << [ error: 1, reason: 'Invalid syntax', 
+										detail: "Task id ${task.id} in element $index is a duplicate of an earlier task spec" ]													
+								} else {
+									taskIds << task.id
+								}
+							} else {
+								errorList << [ error: 1, reason: 'Invalid syntax', 
+									detail: "Task id ${task.id} in element $index must be a positive whole number > 0" ]
+							}
+						} else {
+							errorList << [ error: 1, reason: 'Invalid syntax', 
+								detail: "Task id ${task.id} in element $index must be a positive whole number > 0" ]
+						}
+					} else {
+						errorList << [ error: 3, reason: 'Missing property', 
+							detail: "Task in element ${index} is missing require property 'id' which must be a unique number" ]
+					}
+
+					// Check for any unsupported properties (misspellings, etc)
+					validateAgainstMap( 'task', task, taskProps )
+
+				}
+
+
 			}
 		}
 
