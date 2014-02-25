@@ -409,19 +409,16 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
         }  
     };
 
-    // Create Recipe Modal - Open Modal
+    /*// Create Recipe Modal - Open Modal
     $scope.openCreateModal = function () {
         $log.info('01 - Open Create modal');
         var modalInstance = $modal.open({
-            templateUrl: 'createRecipeModal',
-            controller: ModalInstanceCtrl
+            templateUrl: 'createRecipeModal'
         });
     };
     // Create Recipe Modal - Once Opened
-    ModalInstanceCtrl = function ($scope, $modalInstance) {
+    
         $log.info('02 - Modal Instance');
-
-        var outsideScope = angular.element(document.getElementById('cookbookRecipesEditor')).scope();
 
         var save = function(){
             $log.info('04 - Save function');
@@ -456,8 +453,70 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
             $modalInstance.dismiss('cancel');
             $log.log('cancel create recipe');
         };
+    
+    //-----------------------------------------------------*/
+
+    
+    // Modal stuff ------------------------------
+    
+    $scope.modalBtns = {};
+
+    //Hide or show the modal
+    $scope.showModal = function (visible, elem) {
+        if (!elem)
+            elem = element;
+
+        if (visible)
+            elem.modal("show");                     
+        else
+            elem.modal("hide");
+    }
+
+    // Watch the bolean variable
+    $scope.$watch('showDialog', function (newValue, oldValue) {
+        $scope.showModal(newValue, $('#createRecipeModal'));
+    });
+
+    var clearFields = function(){
+        $scope.modalContextSelector = "";
+
+        $scope.newRecipe = {
+            name: '',
+            description: '',
+            context: $scope.modalContextSelector
+        }
+    }
+
+    var save = function(){
+        $log.info('04 - Save function');
+        var dataToSend = $.param($scope.newRecipe);
+        restCalls.createRecipe(dataToSend, function(){
+            $log.info('05 - Recipe created');
+            $scope.alerts.addAlert({type: 'success', msg: 'Recipe Created', closeIn: 1500});
+            listRecipes();
+        }, function(){
+            $log.warn('Error when creating recipe');
+            $scope.alerts.addAlert({type: 'danger', msg: 'Saved'});
+        });
+
+        clearFields();
+    }
+
+    $scope.modalBtns.save = function () {
+        $scope.showDialog = false;
+        $log.info('03 - Pressed Save btn');
+        save();
     };
-    //-----------------------------------------------------
+
+    $scope.modalBtns.cancel = function () {
+        $scope.showDialog = false;
+        clearFields();
+        $log.log('cancel create recipe');
+    };
+
+    $scope.showDialog = false;
+    clearFields();
+    //----------------------------------------------------
 
     // New recipe Validation
     $scope.tmpRecipe = {};

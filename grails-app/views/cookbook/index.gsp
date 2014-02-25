@@ -40,7 +40,7 @@
 				</div>
 				<div class="row-fluid clearfix">
 					<div class="col-md-4">
-						<button class="btn btn-default createRecipe" ng-click="openCreateModal()">Create Recipe</button>
+						<button class="btn btn-default createRecipe" ng-click="showDialog = true">Create Recipe</button>
 					</div>
 					%{-- <div class="col-md-4 paginationWrapper">
 						<pagination boundary-links="true" total-items="totalItems" page="currentPage" class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
@@ -317,52 +317,54 @@
 					{{alert.msg}}
 				</div>
 
-				<script type="text/ng-template" id="createRecipeModal">
-					<form class="form-horizontal" name="form" role="form" novalidate >
-			        <div class="modal-header">
-			            <h3>Create a recipe</h3>
-			        </div>
-			        <div class="modal-body">
-			            <tabset>
-			            	%{-- New Recipe Tab --}%
-							<tab heading="Brand New Recipe" >
-								<div class="form-group">
-									<label for="inputName" class="col-sm-2 control-label">Name</label>
-									<div class="col-sm-10">
-										<input type="text" class="form-control" id="inputName" placeholder="" name="inputName" ng-model="newRecipe.name" required>
-										<div ng-show="form.inputName.$dirty && form.inputName.$invalid">
-											<pre class="error-msg" ng-show="form.inputName.$error.required">Recipe Name is required.</pre>
+				<div modal-show="showDialog" class="modal fade" id="createRecipeModal">
+					<div class="modal-dialog modal-lg">
+						<form class="form-horizontal modal-content" name="form" role="form" novalidate >
+					        <div class="modal-header">
+					            <h3>Create a recipe</h3>
+					        </div>
+					        <div class="modal-body">
+					            <tabset>
+					            	%{-- New Recipe Tab --}%
+									<tab heading="Brand New Recipe" >
+										<div class="form-group">
+											<label for="inputName" class="col-sm-2 control-label">Name</label>
+											<div class="col-sm-10">
+												<input type="text" class="form-control" id="inputName" placeholder="" name="inputName" ng-model="newRecipe.name" required>
+												<div ng-show="form.inputName.$dirty && form.inputName.$invalid">
+													<pre class="error-msg" ng-show="form.inputName.$error.required">Recipe Name is required.</pre>
+												</div>
+											</div>
 										</div>
-									</div>
-								</div>
-								<div class="form-group">
-									<label for="textareaDescription" class="col-sm-2 control-label">Description</label>
-									<div class="col-sm-10">
-										<textarea class="form-control" rows="3" id="textareaDescription" placeholder="" ng-model="newRecipe.description"></textarea>
-									</div>
-								</div>
-								<div class="form-group">
-									<label for="contextSelector2" class="col-sm-2 control-label selectLabel">Context</label>
-									<div class="col-sm-10">
-										<select name="contextSelector2" id="contextSelector2" ng-model="newRecipe.context" ng-options="d for d in ['Event', 'Bundle', 'Application']" required>
-											<option value="">Select context</option>
-										</select>
-									</div>
-								</div>							
-							</tab>
+										<div class="form-group">
+											<label for="textareaDescription" class="col-sm-2 control-label">Description</label>
+											<div class="col-sm-10">
+												<textarea class="form-control" rows="3" id="textareaDescription" placeholder="" ng-model="newRecipe.description"></textarea>
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="contextSelector2" class="col-sm-2 control-label selectLabel">Context</label>
+											<div class="col-sm-10">
+												<select name="contextSelector2" id="contextSelector2" ng-model="newRecipe.context" ng-options="d for d in ['Event', 'Bundle', 'Application']" required>
+													<option value="">Select context</option>
+												</select>
+											</div>
+										</div>							
+									</tab>
 
-							%{-- Clone tab --}%
-							<tab heading="Clone An Existing Recipe">
-								Clone Recipe Stuff
-							</tab>
-						</tabset>
-			        </div>
-			        <div class="modal-footer">
-			            <button class="btn btn-primary" ng-disabled="form.$invalid || isUnchanged(newRecipe)" ng-click="modalBtns.save()">Save</button>
-			            <button class="btn btn-warning" ng-click="modalBtns.cancel()">Cancel</button>
-			        </div>
-			        </form>
-			    </script>
+									%{-- Clone tab --}%
+									<tab heading="Clone An Existing Recipe">
+										Clone Recipe Stuff
+									</tab>
+								</tabset>
+					        </div>
+					        <div class="modal-footer">
+					            <button class="btn btn-primary" ng-disabled="form.$invalid || isUnchanged(newRecipe)" ng-click="modalBtns.save()">Save</button>
+					            <button class="btn btn-warning" ng-click="modalBtns.cancel()">Cancel</button>
+					        </div>
+				        </form>
+			    	</div>
+			    </div>
 			</div>
 		</div>
 	</body>
