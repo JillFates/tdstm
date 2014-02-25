@@ -6,6 +6,7 @@
 		<title>Cookbook</title>
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
     	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
+    	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'cookbook.css')}" />
     	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ng-grid.css')}" />
     	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/codemirror.css')}" />
     	<g:javascript src="angular.js" />

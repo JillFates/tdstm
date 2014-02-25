@@ -87,12 +87,17 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
     // Method to Get the list of Recipes.
     listRecipes = function(){
-        $scope.recipes = restCalls.getListOfRecipes({archived: $scope.archived, context: $scope.context}, function(){
+        $scope.recipes = restCalls.getListOfRecipes({archived: $scope.archived, context: $scope.context}, function(data){
             $log.info('Success on getting Recipes');
-            $scope.totalItems = $scope.recipes.data.list.length;
-            $scope.gridData = ($scope.totalItems) ? $scope.recipes.data.list : [{'message': 'No results found', 'context': 'none'}]; 
-            $scope.colDefinition = ($scope.totalItems) ? $scope.colDef : $scope.colDefNoData;
-        }, function(){
+            if(data.data){
+                $scope.totalItems = data.data.list.length;
+                $scope.gridData = ($scope.totalItems) ? data.data.list : [{'message': 'No results found', 'context': 'none'}]; 
+                $scope.colDefinition = ($scope.totalItems) ? $scope.colDef : $scope.colDefNoData;
+            }else{
+                $log.warn('Moved Temporarily');
+                location.reload();
+            }
+        }, function(data){
             $log.warn('Error on getting Recipes');
             $scope.alerts.addAlert({type: 'danger', msg: 'Error: Could not get the list of Recipes'});
         });
@@ -392,17 +397,19 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
         if(!$scope.save.pending && (recipeToUpdate.name != $scope.currentSelectedRecipe.name || recipeToUpdate.description != $scope.currentSelectedRecipe.description)) {
             $scope.save.pending = true;
             $scope.save.promise = $timeout(function(){
-                restCalls.putInRecipe({details:rid}, recipeToUpdate, function(){
-                    $log.info("Recipe updated: " 
-                        + recipeToUpdate.name + "," 
-                        + recipeToUpdate.description);
+                restCalls.putInRecipe({details:rid}, recipeToUpdate, function(data, status, headers, config){
+                    if(data.data){
+                        $log.info('Racipe Updated');
+                        $scope.save.pending = false;
 
-                    $scope.save.pending = false;
+                        $scope.currentSelectedRecipe.name = recipeToUpdate.name;
+                        $scope.currentSelectedRecipe.description = recipeToUpdate.description;
 
-                    $scope.currentSelectedRecipe.name = recipeToUpdate.name;
-                    $scope.currentSelectedRecipe.description = recipeToUpdate.description;
-
-                    $scope.alerts.addAlert({type: 'success', msg: 'Saved', closeIn: 1500});
+                        $scope.alerts.addAlert({type: 'success', msg: 'Saved', closeIn: 1500});
+                    }else{
+                        $log.warn('Moved Temporarily');
+                        location.reload();
+                    }
                 }, function(){
                     $log.warn('Recipe updating error');
                     $scope.alerts.addAlert({type: 'danger', msg: 'Error: Could not save the recipe'});                    
