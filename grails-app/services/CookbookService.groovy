@@ -633,19 +633,32 @@ class CookbookService {
 		def recipe
 
 		// Helper closure that compares the properties of a spec to a defined map
-		def validateAgainstMap = { type, spec, map ->
+		def validateAgainstMap
+		validateAgainstMap = { type, spec, map ->
 			def i=0
 			def label = ( type=='task' ? "Task id ${spec.id ?: 'UNDEF'}" : "Group ${spec.name ?: 'UNDEF'}" )
 			spec.each { n, v -> 
 				i++
 				if (map.containsKey(n)) {
 					// can do more here to check the nested definitions later on.
+
+					if ( map[n] instanceof java.util.LinkedHashMap) {
+						// Check the sub section of the spec against a sub section of the map
+						// errorList.addAll( validateAgainstMap(type, spec[n], map[n]) )
+					} else if ( map[n] instanceof List ) {
+						// Check if the value of a property exists in the map defined list
+						if ( ! map[n].contains( v ) ) {
+							errorList << [ error: 1, reason: 'Invalid syntax', 
+								detail: "$label in element $i property '$n' contains invalid value '$n'" ]
+						}
+					}
 				}
 				else {
 					errorList << [ error: 1, reason: 'Invalid syntax', 
 						detail: "$label in element $i contains unknown property '$n'" ]
 				}
 			}
+			return errorList
 		}
 
 		// Definition of the properties supported by group
@@ -665,12 +678,13 @@ class CookbookService {
 		// Definition of the properties supported by group
 		def taskProps = [
 			id:0,
-			name:0,
+			title:0,
 			description:0,
-			filter:[],
+			filter:0,
 			type:['milestone','gateway','general','rollcall','location','room','rack','truck','set'],
 			disposition:0,
 			setOn:0,
+			action:0,
 			workflow:0,
 			duration:0,
 			team:0,
@@ -683,7 +697,18 @@ class CookbookService {
 			terminal:0,
 			whom:0,
 			whomFixed:0,
-			predecessor: ['mode','group','defer','gather','parent','ignore','require','typeSpec', 'inverse', 'classification'],
+			predecessor: [
+				mode: ['supports','requires'],
+				group:'',
+				defer:'',
+				gather:'',
+				parent:0,
+				ignore:true,
+				require:true,
+				typeSpec:0,
+				inverse:true,
+				classification: ['device','database','application','storage']
+			],
 			constraintTime:0,
 			constraintType:0
 		]
