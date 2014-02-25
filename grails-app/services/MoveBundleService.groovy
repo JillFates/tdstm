@@ -675,7 +675,7 @@ class MoveBundleService {
 				def attribName = columnList[c]
 				switch(attribName){
 					case "taskDependencies":
-						cellValue = WebUtil.listAsPipeSepratedString(exportList[r-startRow]."${columnList[c]}"?.predecessor?.taskNumber)
+						cellValue = WebUtil.listAsPipeSepratedString(exportList[r-startRow]."${columnList[c]}".collect({ e -> e.predecessor == null ? '' : e.predecessor.taskNumber + ' ' + e.predecessor.comment?.toString()}))
 						break;
 					case "assetEntity":
 						cellValue = exportList[r-startRow]."${columnList[c]}"?.assetType == "Application" ?  String.valueOf(exportList[r-startRow]."${columnList[c]}"?.assetName) : ''

@@ -1529,7 +1529,7 @@ class ReportsController {
 	def exportTaskReportExcel(taskList, tzId, project){
 		def book = WorkbookObject.getWritableWorkbook(response, "${project.name}-TaskReport", "/templates/TaskReport.xls" );
 		def tasksSheet = book.getSheet("tasks")
-		def preMoveColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment','assignedTo', 'role', 'status',
+		def preMoveColumnList = ['taskNumber', 'comment', 'assetEntity', 'taskDependencies', 'assignedTo', 'role', 'status',
 					'estStart','','', 'notes', 'duration', 'estStart','estFinish','actStart', 'actFinish', 'workflow',
 					'dateCreated', 'createdBy', 'moveEvent']
 		moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId, 7)
