@@ -338,8 +338,6 @@ digraph runbook {
 		
 		def projectId = project.id
 		
-		def categories = GormUtil.asQuoteCommaDelimitedString(AssetComment.moveDayCategories)
-		
 		def query = """
 			SELECT 
 			  t.asset_comment_id AS id,
@@ -356,8 +354,7 @@ digraph runbook {
 			LEFT OUTER JOIN asset_comment s ON s.asset_comment_id=d.asset_comment_id
 			LEFT OUTER JOIN asset_entity a ON t.asset_entity_id=a.asset_entity_id
 			LEFT OUTER JOIN person ON t.owner_id=person.person_id
-			WHERE t.project_id=${projectId} AND t.move_event_id=${moveEventId} AND
-			  t.category IN ( ${categories} )
+			WHERE t.project_id=${projectId} AND t.move_event_id=${moveEventId}
 			GROUP BY t.task_number
 			"""
 
