@@ -1,13 +1,9 @@
-/* Specific Styles for all the new pages */
-
-/* Cookbook */
+/* Bootstrap Styles Overwirtes */
 
 .body{
 	float:none;
 	margin:0;
 }
-
-
 
 .nav{
 	background: transparent;
@@ -20,166 +16,12 @@
 	list-style: none;
 }
 
-ul{
-	padding-left: 25px;
-}
 
 table{
 	font-size: 1em;
 }
 
-.paginationWrapper{
-	text-align: center;
-}
-
-.ngGridTable{
-	border:1px solid #ddd;
-	margin-bottom: 0;
-}
-
-.ngGridTable tr th, .ngGridTable tr td{
-	border-rigth:1px solid #ddd;
-	border-left:1px solid #ddd;
-}
-
-.ngGridTable tr th:nth-child(6), .ngGridTable tr td:nth-child(6){
-	text-align: right;
-}
-
-.ngGridTable tr th:nth-child(7), .ngGridTable tr td:nth-child(7), .ngGridTable tr th:nth-child(8), .ngGridTable tr td:nth-child(8), .ngGridTable tr th:nth-child(9), .ngGridTable tr td:nth-child(9){
-	text-align: center;
-}
-
-.alert{
-	position: fixed;
-	width:300px;
-	left:50%;
-	margin-left:-15%;
-	top:5%;
-	z-index:100;
-	padding:5px 15px;
-	text-align:center;
-	/*display: none;*/
-}
-
-.modal-dialog{
-	width:800px;
-}
-
-.modal-dialog h3{
-	margin:0;
-}
-
-.modal-dialog .selectLabel{
-	padding-top:2px;
-}
-
-#gridControls{margin-top:15px;}
-
-.tab-content{
-    padding: 15px;
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-}
-
-.ngCell > div{
-	height: 100%;
-}
-
-.innerTabWrapper{
-	margin: 15px 0 0 0;
-}
-
-.historyMainTable table tr > th:nth-child(2), .historyMainTable table tr > td:nth-child(2), .historyMainTable table tr > th:nth-child(5), .historyMainTable table tr > td:nth-child(5){
-	text-align: right;
-}
-
-.historyMainTable table tr > th:nth-child(6), .historyMainTable table tr > td:nth-child(6), .historyMainTable table tr > th:nth-child(7), .historyMainTable table tr > td:nth-child(7){
-	text-align: center;
-}
-
-.actionsText{
-	margin: 15px 0;
-}
-
-#logsArea, #recipeCode{
-	display: block;
-	width: 100%;
-}
-
-#recipeCode{
-	height: 200px;
-}
-
-.btns{
-	margin:15px 0 0 0;
-}
-
-textarea#logs{
-	height:161px;
-	width:100%;
-}
-
-form.groups{
-	margin-bottom: 1em;
-}
-
-.groupsTable, .groupsTable2{
-	height:150px;
-	overflow-y: auto;
-}
-
-.groupsTable2{
-	margin:15px 0 0 0;
-}
-
-.groupsTable table tr > th:nth-child(3), .groupsTable table tr > td:nth-child(3){
-	text-align: right;
-}
-
-.gridStyle {
-    border: 1px solid rgb(212,212,212);
-    width: 100%;
-    height: 154px;
-    overflow-y: auto;
-    margin: 0 0 10px 0;
-}
-
-.gridIcon{
-	display: table;
-	height: 100%;
-	width: 100%;
-	padding: 0 10px;
-}
-
-.createRecipe{
-	margin: 17px 0;
-}
-
-.actions{
-	display: table-cell;
-	vertical-align: middle;
-	margin-right:5px;
-}
-
-.actions:last-child{
-	margin-right:0;
-}
-
-form .error-msg{
-	margin:0.5em 0 0 0;
-}
-
-.archiveCheckWrapper{margin:5px 0 0 0;}
-
-/*animations*/
-.alert{
-	-webkit-transition:all ease 0.5s;
-	transition:all ease 0.5s;
-	top:-200px;
-}
-
-.alert.animateShow {
-	top:35px;
+.btn[disabled], .btn.btn-primary[disabled]{
+	background-color: RGBA(80, 80, 80, 0.3);
+	border-color: RGBA(190, 190, 190, 0.5);
 }
