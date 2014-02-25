@@ -240,7 +240,6 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
                     $scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
 
                     $log.info('Success on getting selected recipe');
-                    $log.info($scope.selectedRecipe);
 
                 }, function(){
                     $log.info('No records found for selected Recipe');
@@ -412,6 +411,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
     // Create Recipe Modal - Open Modal
     $scope.openCreateModal = function () {
+        $log.info('01 - Open Create modal');
         var modalInstance = $modal.open({
             templateUrl: 'createRecipeModal',
             controller: ModalInstanceCtrl
@@ -419,7 +419,22 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
     };
     // Create Recipe Modal - Once Opened
     ModalInstanceCtrl = function ($scope, $modalInstance) {
+        $log.info('02 - Modal Instance');
+
         var outsideScope = angular.element(document.getElementById('cookbookRecipesEditor')).scope();
+
+        var save = function(){
+            $log.info('04 - Save function');
+            var dataToSend = $.param($scope.newRecipe);
+            restCalls.createRecipe(dataToSend, function(){
+                $log.info('05 - Recipe created');
+                outsideScope.alerts.addAlert({type: 'success', msg: 'Recipe Created', closeIn: 1500});
+                listRecipes();
+            }, function(){
+                $log.warn('Error when creating recipe');
+                outsideScope.alerts.addAlert({type: 'danger', msg: 'Saved'});
+            });
+        }
 
         $scope.modalBtns = {};
 
@@ -432,26 +447,15 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
         }
 
         $scope.modalBtns.save = function () {
-            $modalInstance.close(save());
-            $log.log('creating recipe');
+            $log.info('03 - Pressed Save btn');
+            $modalInstance.close();
+            save();
         };
 
         $scope.modalBtns.cancel = function () {
             $modalInstance.dismiss('cancel');
             $log.log('cancel create recipe');
         };
-
-        var save = function(){
-            var dataToSend = $.param($scope.newRecipe);
-            restCalls.createRecipe(dataToSend, function(){
-                $log.info('Recipe created');
-                outsideScope.alerts.addAlert({type: 'success', msg: 'Recipe Created', closeIn: 1500});
-                listRecipes();
-            }, function(){
-                $log.warn('Error when creating recipe');
-                outsideScope.alerts.addAlert({type: 'danger', msg: 'Saved'});
-            });
-        }
     };
     //-----------------------------------------------------
 
