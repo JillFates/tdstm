@@ -23,9 +23,9 @@
 			<thead>
 				<tr>
 					<th>Task #</th>
-					<th>Pred</th>
-					<th>Related to</th>
 					<th>Task Description</th>
+					<th>Related to</th>
+					<th>Pred</th>
 					<th>Responsible Resource</th>
 					<th>Team</th>
 					<th>Status</th>
@@ -49,16 +49,16 @@
 						<td>
 							${task.taskNumber}
 						</td>
-						<td><g:each in="${task.taskDependencies}" var="dep">
-								${dep.assetComment.comment.toString()}
-								<br />
-							</g:each></td>
-						<td>
-							${task.assetEntity?.assetName}
-						</td>
 						<td>
 							${task.comment}
 						</td>
+						<td>
+							${task.assetEntity?.assetName}
+						</td>
+						<td><g:each in="${task.taskDependencies}" var="dep">
+								${dep.predecessor == null ? '' : dep.predecessor.id + ' ' + dep.predecessor.comment.toString()}
+								<br />
+							</g:each></td>
 						<td>
 							${task.assignedTo}
 						</td>
