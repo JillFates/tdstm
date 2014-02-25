@@ -84,11 +84,11 @@
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
 					var value = cellvalue ? cellvalue : ''
-					return '<a href="javascript:getEntityDetails(\'files\',\''+rowObjcet[10]+'\','+options.rowId+')">'+value+'</a>'
+					return '<a href="javascript:getEntityDetails(\'files\',\''+rowObjcet[7]+'\','+options.rowId+')">'+value+'</a>'
 				}
 				
 				function myCustomFormatter (cellVal,options,rowObject) {
-					var editButton = '<a href="javascript:editEntity(\'files\',\''+rowObject[10]+'\','+options.rowId+')">'+
+					var editButton = '<a href="javascript:editEntity(\'files\',\''+rowObject[7]+'\','+options.rowId+')">'+
 							"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 					if(rowObject[6]=='issue'){
 						var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
