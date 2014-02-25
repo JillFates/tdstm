@@ -260,6 +260,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
                 }
                 $scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
             }
+            if(!$scope.activeTabs.editor)
+                        $scope.activeTabs.editor  = true;
         }else{
             $log.warn('no results found for the selected recipe');
         }
