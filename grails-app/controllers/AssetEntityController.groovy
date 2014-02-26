@@ -1539,7 +1539,10 @@ class AssetEntityController {
 			log.info "it's good - ${params.moveEvent}"
 			moveEvent = MoveEvent.findByProjectAndId( project, params.moveEvent )
 		}
-		def assetPref= assetEntityService.getExistingPref('Asset_Columns')
+		
+		def listType = params.listType
+		def prefType = (listType=='server') ? 'Asset_Columns' : 'Physical_Columns'
+		def assetPref= assetEntityService.getExistingPref(prefType)
 		def attributes = projectService.getAttributes('AssetEntity')
 		def projectCustoms = project.customFieldsShown+1
 		def nonCustomList = (projectCustoms..48).collect{"custom"+it}
@@ -1565,7 +1568,7 @@ class AssetEntityController {
 			targetLocation:filters?.targetLocationFilter ?:'', targetRack:filters?.targetRackFilter ?:'', assetTag:filters?.assetTagFilter ?:'', 
 			serialNumber:filters?.serialNumberFilter ?:'', sortIndex:filters?.sortIndex, sortOrder:filters?.sortOrder, moveBundleId:params.moveBundleId,
 			staffRoles:taskService.getRolesForStaff(), sizePref:userPreferenceService.getPreference("assetListSize")?: '25' , moveBundleList:moveBundleList,
-			 attributesList:attributesList, assetPref:assetPref, modelPref:modelPref]) 
+			 attributesList:attributesList, assetPref:assetPref, modelPref:modelPref, listType:listType, prefType :prefType]) 
 	}
 	/**
 	 * This method is used by JQgrid to load assetList
@@ -1582,7 +1585,11 @@ class AssetEntityController {
 		def moveBundleList
 		
 		def attributes = projectService.getAttributes('AssetEntity')
-		def assetPref= assetEntityService.getExistingPref('Asset_Columns')
+		
+		def listType = params.listType
+		def prefType = (listType=='server') ? 'Asset_Columns' : 'Physical_Columns'
+		def assetPref= assetEntityService.getExistingPref(prefType)
+		
 		def assetPrefVal = assetPref.collect{it.value}
 		attributes.each{ attribute ->
 			if(attribute.attributeCode in assetPrefVal)
@@ -1663,8 +1670,12 @@ class AssetEntityController {
 				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName, ae.asset_type AS assetType, m.name AS model, ae.source_location AS sourceLocation, 
 				ae.source_rack AS sourceRack,ac.status AS commentStatus, ac.comment_type AS commentType,me.move_event_id AS event,""")
 		if(temp)
-			query.append(temp)	
-					
+			query.append(temp)
+			
+		def nonServerTypes = AssetType.getNonServerTypes()	
+		if(listType!='server')
+			nonServerTypes.add(AssetType.VM.toString()) // If we are requesting for Physical
+			
 		/*adb.dependency_bundle AS depNumber,
 					COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depToResolve,
 					COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts*/
@@ -1674,11 +1685,19 @@ class AssetEntityController {
 				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id""")
 		if(joinQuery)
 			query.append(joinQuery)
-		
+			
 		query.append(""" \n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
 				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
-				WHERE ae.project_id = ${project.id} AND ae.asset_type NOT IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getNonServerTypes())})
-				GROUP BY assetId ORDER BY ${sortIndex} ${sortOrder}
+				WHERE ae.project_id = ${project.id} """)
+		
+		//which will limit the query based on physical or server Assets.
+		if(listType=='server')
+			query.append(" AND ae.asset_Type IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getServerTypes())}) ")
+		else
+			query.append(" AND ae.asset_type NOT IN (${WebUtil.listAsMultiValueQuotedString(nonServerTypes)}) ")
+		
+			
+		query.append(""" GROUP BY assetId ORDER BY ${sortIndex} ${sortOrder}
 			) AS assets
 		""")
 		
@@ -1712,7 +1731,7 @@ class AssetEntityController {
 			assetList = assetList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
 		else
 			assetList = []
-		
+			
 		def results = assetList?.collect { 
 			def commentType = it.commentType
 			[ cell: [ '',it.assetName, (it.assetType ?: ''), it.model, 

@@ -3,7 +3,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="projectHeader" />
-		<title>Asset List</title>
+		<title>${listType=='server'? 'Server' : 'Physical'} List</title>
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
@@ -41,6 +41,7 @@
 				var type = '${type}'
 				var event = '${event}'
 				var plannedStatus = '${plannedStatus}' 
+				var listType = '${listType}'
 
 				var assetName = '${assetName}'
 				var planStatus = '${planStatus}'
@@ -92,7 +93,7 @@
 					showPager="true"
 					postData="{filter: filter, event:event, type:type, plannedStatus:plannedStatus, assetName:assetName, planStatus:planStatus, moveBundle:moveBundle,
 						moveBundle : moveBundle, assetType:assetType , model :model , sourceLocation: sourceLocation , sourceRack:sourceRack,
-						targetLocation:targetLocation, targetRack :targetRack,assetTag :assetTag,serialNumber:serialNumber, moveBundleId:moveBundleId}">
+						targetLocation:targetLocation, targetRack :targetRack,assetTag :assetTag,serialNumber:serialNumber, moveBundleId:moveBundleId,listType:listType}">
 					<jqgrid:filterToolbar id="assetListId" searchOnEnter="false" />
 					<jqgrid:navigation id="assetListId" add="false" edit="false" del="false" search="false" refresh="false" />
 					<jqgrid:refreshButton id="assetListId" />
@@ -105,7 +106,7 @@
 
 				<g:each var="key" in="['1','2','3','4']">
 					var assetPref= '${assetPref[key]}';
-					$("#assetListIdGrid_"+assetPref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:absolute;margin-left: 31px;margin-top: -15px;" onclick="showSelect(\''+assetPref+'\',\'assetList\',\''+${key}+'\')">');
+					$("#assetListIdGrid_"+assetPref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:relative;float:right;margin-top: -15px;" onclick="showSelect(\''+assetPref+'\',\'assetList\',\''+${key}+'\')">');
 				</g:each>
 			
 				$.jgrid.formatter.integer.thousandsSeparator='';
@@ -167,7 +168,7 @@
 	</head>
 	<body>
 		<div class="body fluid">
-			<h1>Asset List${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
+			<h1>${listType=='server'? 'Server' : 'Physical'  } List${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
 			<g:if test="${flash.message}">
 				<div id="messageDivId" class="message">${flash.message}</div>
 			</g:if>
@@ -176,12 +177,12 @@
 			</div>
 			<g:each var="key" in="['1','2','3','4']">
 				<div id="columnCustomDiv_${assetPref[key]}" style="display:none;">
-					<div class="columnDiv_${key}" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width: 100px;z-index: 2147483647; overflow-y: scroll;text-align: left;">
+					<div class="columnDiv_${key} customScroll" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width: auto;z-index: 2147483647; overflow-y: scroll;text-align: left;">
 						<input type="hidden" id="previousValue_${key}" value="${assetPref[key]}" />
 						<g:each var="attribute" in="${attributesList}">
 							<label><input type="radio" name="coloumnSelector_${assetPref[key]}" id="coloumnSelector_${assetPref[key]}" value="${attribute.attributeCode}" 
 								${assetPref[key]==attribute.attributeCode?'checked':'' } style="margin-left:2px;" 
-								onchange="setColumnAssetPref(this.value,'${key}','Asset_Columns')"/> ${attribute.frontendLabel}</label><br>
+								onchange="setColumnAssetPref(this.value,'${key}','${prefType}')"/> ${attribute.frontendLabel}</label><br>
 						</g:each>
 					</div>
 				</div>

@@ -594,6 +594,9 @@ class AssetEntityService {
 				case 'Asset_Columns':
 					appPref = ['1':'targetLocation','2':'targetRack','3':'assetTag','4':'serialNumber']
 				break;
+				case 'Physical_Columns':
+					appPref = ['1':'targetLocation','2':'targetRack','3':'assetTag','4':'serialNumber']
+				break;
 				case 'Database_Columns':
 					appPref = ['1':'dbFormat','2':'size','3':'planStatus','4':'moveBundle']
 				break;

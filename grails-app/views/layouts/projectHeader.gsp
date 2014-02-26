@@ -264,7 +264,8 @@
 						<ul>
 							<li><g:link class="mmlink" controller="assetEntity" action="assetSummary">Summary</g:link></li>	
 							<li><g:link class="mmlink" controller="application" action="list"  onclick="hideMegaMenu('assetMegaMenu')">List Apps</g:link></li>
-							<li><g:link class="mmlink" controller="assetEntity"  onclick="hideMegaMenu('assetMegaMenu')">List Servers</g:link></li>
+							<li><g:link class="mmlink" params="[listType:'server']" controller="assetEntity"  onclick="hideMegaMenu('assetMegaMenu')">List Servers</g:link></li>
+							<li><g:link class="mmlink" params="[listType:'physical']" controller="assetEntity"  onclick="hideMegaMenu('assetMegaMenu')">List Physical</g:link></li>
 							<li><g:link class="mmlink" controller="database"  onclick="hideMegaMenu('assetMegaMenu')">List DBs</g:link></li>
 							<li><g:link class="mmlink" controller="files"  onclick="hideMegaMenu('assetMegaMenu')">List Storage</g:link></li>
 							<tds:hasPermission permission='EditAndDelete'>
