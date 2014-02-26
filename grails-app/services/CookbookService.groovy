@@ -649,7 +649,7 @@ class CookbookService {
 						// Check if the value of a property exists in the map defined list
 						if ( ! map[n].contains( v ) ) {
 							errorList << [ error: 1, reason: 'Invalid syntax', 
-								detail: "$label in element $i property '$n' contains invalid value '$n'" ]
+								detail: "$label in element $i property '$n' contains invalid value '$v'" ]
 						}
 					}
 				}
@@ -681,7 +681,7 @@ class CookbookService {
 			title:0,
 			description:0,
 			filter:0,
-			type:['milestone','gateway','general','rollcall','location','room','rack','truck','set'],
+			type:['action','milestone','gateway','general','rollcall','location','room','rack','truck','set'],
 			disposition:0,
 			setOn:0,
 			action:0,
