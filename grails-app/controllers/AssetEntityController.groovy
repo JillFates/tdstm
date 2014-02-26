@@ -1541,11 +1541,12 @@ class AssetEntityController {
 		}
 		def assetPref= assetEntityService.getExistingPref('Asset_Columns')
 		def attributes = projectService.getAttributes('AssetEntity')
-		def customList = (1..project.customFieldsShown).collect{"custom"+it}
+		def projectCustoms = project.customFieldsShown+1
+		def nonCustomList = (projectCustoms..48).collect{"custom"+it}
 		def assets = ['assetName', 'assetType', 'model', 'sourceLocation', 'sourceRack', 'planStatus', 'moveBundle']
-		
+		def removableAttributes = assets+nonCustomList
 		// Remove the non project specific attributes and sort them by attributeCode
-		def assetAttributes = attributes.findAll{!(it.attributeCode in assets)}
+		def assetAttributes = attributes.findAll{!(it.attributeCode in removableAttributes)}
 		
 		// Used to display column names in jqgrid dynamically
 		def modelPref = [:]

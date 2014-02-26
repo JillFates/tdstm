@@ -50,10 +50,11 @@ class ApplicationController {
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:"name"])
 		def appPref= assetEntityService.getExistingPref('App_Columns')
 		def attributes = projectService.getAttributes('Application')
-		def customList = (1..project.customFieldsShown).collect{"custom"+it}
+		def projectCustoms = project.customFieldsShown+1
+		def nonCustomList = (projectCustoms..48).collect{"custom"+it}
 		
 		// Remove the non project specific attributes and sort them by attributeCode
-		def appAttributes = attributes.findAll{it.attributeCode!="assetName"}
+		def appAttributes = attributes.findAll{it.attributeCode!="assetName" && !(it.attributeCode in nonCustomList)}
 
 		// Used to display column names in jqgrid dynamically
 		def modelPref = [:]
