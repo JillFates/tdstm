@@ -78,7 +78,7 @@
 
 				<g:each var="key" in="['1','2','3','4']">
 					var filePref= '${filesPref[key]}';
-					$("#storageIdGrid_"+filePref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:absolute;margin-left: 74px;margin-top: -15px;" onclick="showSelect(\''+filePref+'\',\'storage\',\''+${key}+'\')">');
+					$("#storageIdGrid_"+filePref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:relative;float:right;margin-top: -15px;" onclick="showSelect(\''+filePref+'\',\'storage\',\''+${key}+'\')">');
 				</g:each>
 				
 				$.jgrid.formatter.integer.thousandsSeparator='';
@@ -130,7 +130,7 @@
 			<jqgrid:wrapper id="storageId" />
 			<g:each var="key" in="['1','2','3','4']">
 				<div id="columnCustomDiv_${filesPref[key]}" style="display:none;">
-					<div class="columnDiv_${key}" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width: 185px;z-index: 2147483647; overflow-y: scroll;text-align: left;">
+					<div class="columnDiv_${key} customScroll" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width: 13.3%;z-index: 2147483647; overflow-y: scroll;text-align: left;">
 						<input type="hidden" id="previousValue_${key}" value="${filesPref[key]}" />
 						<g:each var="attribute" in="${attributesList}">
 							<label><input type="radio" name="coloumnSelector_${filesPref[key]}" id="coloumnSelector_${filesPref[key]}" value="${attribute.attributeCode}" 

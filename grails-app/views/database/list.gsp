@@ -85,7 +85,7 @@
 			 });
 			<g:each var="key" in="['1','2','3','4']">
 				var dbPref= '${dbPref[key]}';
-				$("#databaseIdGrid_"+dbPref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:absolute;margin-left: 74px;margin-top: -15px;" onclick="showSelect(\''+dbPref+'\',\'database\',\''+${key}+'\')">');
+				$("#databaseIdGrid_"+dbPref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:relative;float:right;margin-top: -15px;" onclick="showSelect(\''+dbPref+'\',\'database\',\''+${key}+'\')">');
 			</g:each>
 				
 			$.jgrid.formatter.integer.thousandsSeparator='';
@@ -142,7 +142,7 @@
 			</div>
 			<g:each var="key" in="['1','2','3','4']">
 				<div id="columnCustomDiv_${dbPref[key]}" style="display:none;">
-					<div class="columnDiv_${key}" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width: 185px;z-index: 2147483647; overflow-y: scroll;text-align: left;">
+					<div class="columnDiv_${key} customScroll" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width: 13.3%;z-index: 2147483647; overflow-y: scroll;text-align: left;">
 						<input type="hidden" id="previousValue_${key}" value="${dbPref[key]}" />
 						<g:each var="attribute" in="${attributesList}">
 							<label><input type="radio" name="coloumnSelector_${dbPref[key]}" id="coloumnSelector_${dbPref[key]}" value="${attribute.attributeCode}" 
