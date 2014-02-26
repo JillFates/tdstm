@@ -230,7 +230,7 @@
 				</td>
 				
 				<td nowrap="nowrap">
-					<g:select id="category_${transitions.transition.id}" name="category_${transitions.transition.id}" from="${com.tdsops.tm.enums.domain.AssetCommentCategory.list}" value="${transitions.transition.category}"  noSelection="['':'please select']" ></g:select>
+					<g:select id="category_${transitions.transition.id}" name="category_${transitions.transition.id}" from="${com.tds.asset.AssetComment.constraints.category.inList}" value="${transitions.transition.category}"  noSelection="['':'please select']" ></g:select>
 				</td>
 
 				<td nowrap="nowrap">
