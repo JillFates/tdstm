@@ -174,22 +174,24 @@ class MoveEventController {
         if(moveEventInstance) {
 	
 			// Validate that the runbook recipe syntax is okay
-			def recipeErrors = cookbookService.validateSyntax( params.runbookRecipe )
-			if (recipeErrors) {
-				def errMsg = 'The recipe has the following error(s):<ul>'
-				log.debug "recipeErrors = $recipeErrors"
-				recipeErrors.each { e -> errMsg += "<li>${e.reason}: ${e.detail}</li>"}
-				errMsg += '</ul>'
-				log.debug "Recipe had syntax errors : $errMsg"
+			if (params.runbookRecipe && params.runbookRecipe.size() > 0) {
+				def recipeErrors = cookbookService.validateSyntax( params.runbookRecipe )
+				if (recipeErrors) {
+					def errMsg = 'The recipe has the following error(s):<ul>'
+					log.debug "recipeErrors = $recipeErrors"
+					recipeErrors.each { e -> errMsg += "<li>${e.reason}: ${e.detail}</li>"}
+					errMsg += '</ul>'
+					log.debug "Recipe had syntax errors : $errMsg"
 
-				flash.message = errMsg
+					flash.message = errMsg
 
-				// Populate the parameters back into the MoveEvent so that the user doesn't loose what they were working on
-				moveEventInstance.properties = params
-				render(view:'edit',model:[moveEventInstance:moveEventInstance, moveBundles:MoveBundle.findAllByProject( moveEventInstance.project )])
-				return
+					// Populate the parameters back into the MoveEvent so that the user doesn't loose what they were working on
+					moveEventInstance.properties = params
+					render(view:'edit',model:[moveEventInstance:moveEventInstance, moveBundles:MoveBundle.findAllByProject( moveEventInstance.project )])
+					return
+				}
 			}
-	
+				
             moveEventInstance.properties = params
             def moveBundles = request.getParameterValues("moveBundle")
 			

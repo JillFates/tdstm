@@ -625,7 +625,7 @@ class CookbookService {
 	* 1) Invalid syntax
 	* 2) Missing section
 	* 3) Missing property
-	* 4) Invalid group reference
+	* 4) Invalid reference
 	* 5) Duplicate reference
 	*/
 	List<Map> validateSyntax( sourceCode ) {
@@ -835,10 +835,13 @@ class CookbookService {
 				}
 			}
 
+			//
+			// Validate the Tasks section
+			//
+
 			if ( ! recipe.containsKey('tasks')) {
 				errorList << [ error: 2, reason: 'Missing section', detail: 'Recipe is missing required \'tasks\' section' ]
 			} else {
-				// Check for Task Names
 
 				def taskIds = []
 				index=0
@@ -846,20 +849,23 @@ class CookbookService {
 
 				recipe.tasks.each { task -> 
 					index++
+					def taskId = null
+
+					if (! task instanceof Map) {
+						errorList << [ error: 1, reason: 'Invalid syntax', 
+							detail: "Task element $index is not a valid map definition" ]
+						return	
+					}
 
 					// Test that the 'id' exists, that it isn't duplicated and that it is a positive whole number
 					if (task.containsKey('id')) {
-						if (task.id instanceof Integer) {
-							if ( task.id > 0 ) {
-								if (taskIds.contains(task.id)) {
-									errorList << [ error: 1, reason: 'Invalid syntax', 
-										detail: "Task id ${task.id} in element $index is a duplicate of an earlier task spec" ]													
-								} else {
-									taskIds << task.id
-								}
-							} else {
+						if (task.id instanceof Integer && task.id > 0) {
+							taskId = task.id
+							if (taskIds.contains(task.id)) {
 								errorList << [ error: 1, reason: 'Invalid syntax', 
-									detail: "Task id ${task.id} in element $index must be a positive whole number > 0" ]
+									detail: "Task id ${task.id} in element $index is a duplicate of an earlier task spec" ]													
+							} else {
+								taskIds << task.id
 							}
 						} else {
 							errorList << [ error: 1, reason: 'Invalid syntax', 
@@ -872,6 +878,34 @@ class CookbookService {
 
 					// Check for any unsupported properties (misspellings, etc)
 					validateAgainstMap( 'task', task, taskProps )
+
+
+					// Validate the predecessor specifications
+					if (task.containsKey('predecessor')) {
+
+						// Validate if taskSpec was used, to make sure that it references a previously defined spec
+						if (task.predecessor.containsKey('taskSpec')) {
+							def ts = task.predecessor.taskSpec instanceof java.util.ArrayList ? task.predecessor.taskSpec : [task.predecessor.taskSpec]
+							ts.each { tsid ->
+								if ( tsid instanceof Integer && tsid > 0 ) {
+									log.debug "Checking reference of $tsid in $taskIds, current task is $taskId"
+									if ( taskIds.contains(tsid) ) {
+										if (taskId && tsid == taskId) {
+											errorList << [ error: 4, reason: 'Invalid Reference', 
+												detail: "Task id ${task.id} predecessor.taskSpec contains reference ($tsid) to itself." ]
+										}
+									} else {
+										errorList << [ error: 4, reason: 'Invalid Reference', 
+											detail: "Task id ${task.id} predecessor.taskSpec contains invalid id reference ($tsid). TaskSpec ids must reference a previously defined TaskSpec." ]
+ 									}
+								} else {
+									errorList << [ error: 1, reason: 'Invalid syntax', 
+										detail: "Task id ${task.id} predecessor.taskSpec contains invalid id ($tsid). Ids must be a positive whole number > 0" ]
+								}
+								
+							} 
+						}
+					}
 
 				}
 
