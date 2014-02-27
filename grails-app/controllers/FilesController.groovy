@@ -160,6 +160,16 @@ class FilesController {
 					query.append(" AND files.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
 				}
 		}
+		
+		if(params.moveBundleId){
+			if(params.moveBundleId!='unAssigned'){
+				def bundleName = MoveBundle.get(params.moveBundleId)?.name
+				query.append(" WHERE files.moveBundle  = '${bundleName}' ")
+			}else{
+				query.append(" WHERE files.moveBundle IS NULL ")
+			}
+		}
+		
 		def filesList = jdbcTemplate.queryForList(query.toString())
 		
 		def totalRows = filesList.size()

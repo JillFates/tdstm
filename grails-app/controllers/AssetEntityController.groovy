@@ -1672,10 +1672,6 @@ class AssetEntityController {
 		if(temp)
 			query.append(temp)
 			
-		def nonServerTypes = AssetType.getNonServerTypes()	
-		if(listType!='server')
-			nonServerTypes.add(AssetType.VM.toString()) // If we are requesting for Physical
-			
 		/*adb.dependency_bundle AS depNumber,
 					COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depToResolve,
 					COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts*/
@@ -1694,7 +1690,7 @@ class AssetEntityController {
 		if(listType=='server')
 			query.append(" AND ae.asset_Type IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getServerTypes())}) ")
 		else
-			query.append(" AND ae.asset_type NOT IN (${WebUtil.listAsMultiValueQuotedString(nonServerTypes)}) ")
+			query.append(" AND ae.asset_type NOT IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getNonPhysicalTypes())}) ")
 		
 			
 		query.append(""" GROUP BY assetId ORDER BY ${sortIndex} ${sortOrder}
@@ -1721,6 +1717,16 @@ class AssetEntityController {
 					query.append(" AND assets.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
 				}
 		}
+		
+		if(params.moveBundleId){
+			if(params.moveBundleId!='unAssigned'){
+				def bundleName = MoveBundle.get(params.moveBundleId)?.name
+				query.append(" WHERE assets.moveBundle  = '${bundleName}' ")
+			}else{
+				query.append(" WHERE assets.moveBundle IS NULL ")
+			}
+		}
+		
 		log.info  "query = ${query}"
 		def assetList = jdbcTemplate.queryForList(query.toString())
 		
@@ -4068,38 +4074,45 @@ class AssetEntityController {
 		List moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		List assetSummaryList = []
 		int totalAsset = 0;
+		int totalPhysical = 0;
 		int totalApplication =0;
 		int totalDatabase = 0;
 		int totalFiles = 0;
 
 		moveBundleList.each{ moveBundle->
-			def assetCount = AssetEntity.countByMoveBundleAndAssetTypeNotInList( moveBundle,["Application","Database","Files"], params )
+			def physicalCount = AssetEntity.countByMoveBundleAndAssetTypeNotInList( moveBundle,AssetType.getNonPhysicalTypes(), params )
+			def assetCount = AssetEntity.countByMoveBundleAndAssetTypeInList( moveBundle,AssetType.getServerTypes(), params )
 			def applicationCount = Application.countByMoveBundle(moveBundle)
 			def databaseCount = Database.countByMoveBundle(moveBundle)
 			def filesCount = Files.countByMoveBundle(moveBundle)
-			assetSummaryList << ["name":moveBundle, "assetCount":assetCount, "applicationCount":applicationCount, 
+			assetSummaryList << ["name":moveBundle, "assetCount":assetCount, "applicationCount":applicationCount, "physicalCount":physicalCount,
 				"databaseCount":databaseCount, "filesCount":filesCount, id:moveBundle.id]
 		}
 		
+		def unassignedPhysicalCount = AssetEntity.executeQuery("SELECT COUNT(*) FROM AssetEntity WHERE moveBundle = null \
+						AND project = $projectId AND assetType NOT IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getNonPhysicalTypes())})")[0]
 		def unassignedAssetCount = AssetEntity.executeQuery("SELECT COUNT(*) FROM AssetEntity WHERE moveBundle = null \
-						AND project = $projectId AND assetType NOT IN ('Application','Database','Files')")[0]
+						AND project = $projectId AND assetType IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getServerTypes())})")[0]
+
 		def unassignedAppCount = Application.executeQuery("SELECT COUNT(*) FROM Application WHERE moveBundle = null AND project = $projectId ")[0]
 		def unassignedDBCount = Database.executeQuery("SELECT COUNT(*) FROM Database WHERE moveBundle = null AND project = $projectId ")[0]
 		def unassignedFilesCount = Files.executeQuery("SELECT COUNT(*) FROM Files WHERE moveBundle = null AND project = $projectId ")[0]
 
 		assetSummaryList.each{asset->
 			totalAsset=totalAsset + asset.assetCount
+			totalPhysical=totalPhysical+ asset.physicalCount
 			totalApplication = totalApplication + asset.applicationCount
 			totalDatabase = totalDatabase + asset.databaseCount
 			totalFiles = totalFiles + asset.filesCount
 		}
 		totalAsset = totalAsset + unassignedAssetCount ;
+		totalPhysical = totalPhysical + unassignedPhysicalCount;
 		totalApplication = totalApplication + unassignedAppCount;
 		totalDatabase = totalDatabase + unassignedDBCount;
 		totalFiles =totalFiles + unassignedFilesCount;
 
-		return [assetSummaryList:assetSummaryList, totalAsset:totalAsset, totalApplication:totalApplication, totalDatabase:totalDatabase,
-			totalFiles:totalFiles,unassignedAssetCount:unassignedAssetCount, unassignedAppCount:unassignedAppCount, unassignedDBCount:unassignedDBCount,
+		return [assetSummaryList:assetSummaryList, totalAsset:totalAsset, totalApplication:totalApplication, totalDatabase:totalDatabase,totalPhysical:totalPhysical,
+			totalFiles:totalFiles,unassignedAssetCount:unassignedAssetCount, unassignedAppCount:unassignedAppCount, unassignedDBCount:unassignedDBCount,unassignedPhysicalCount:unassignedPhysicalCount,
 			unassignedFilesCount:unassignedFilesCount]
 
 	}

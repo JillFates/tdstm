@@ -168,8 +168,12 @@ class ApplicationController {
 				query.append(" WHERE (apps.latency NOT IN ('Y','N') OR apps.latency IS NULL) ")	
 		}
 		if(params.moveBundleId){
-			def bundleName = MoveBundle.get(params.moveBundleId)?.name
-			query.append(" WHERE apps.moveBundle  = '${bundleName}' ")
+			if(params.moveBundleId!='unAssigned'){
+				def bundleName = MoveBundle.get(params.moveBundleId)?.name
+				query.append(" WHERE apps.moveBundle  = '${bundleName}' ")
+			}else{
+				query.append(" WHERE apps.moveBundle IS NULL ")
+			}
 		}
 		log.info "query = ${query}"
 		def appsList = jdbcTemplate.queryForList(query.toString())

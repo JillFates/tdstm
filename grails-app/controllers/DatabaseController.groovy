@@ -167,6 +167,15 @@ class DatabaseController {
 					query.append(" AND dbs.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
 				}
 		}
+		if(params.moveBundleId){
+			if(params.moveBundleId!='unAssigned'){
+				def bundleName = MoveBundle.get(params.moveBundleId)?.name
+				query.append(" WHERE dbs.moveBundle  = '${bundleName}' ")
+			}else{
+				query.append(" WHERE dbs.moveBundle IS NULL ")
+			}
+		}
+		
 		def dbsList = jdbcTemplate.queryForList(query.toString())
 		
 		def totalRows = dbsList.size()

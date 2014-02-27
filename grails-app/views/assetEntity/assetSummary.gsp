@@ -15,7 +15,8 @@
       <tr>
 	     <th>Bundle</th>
 	     <th style="text-align:center;"><g:link controller="application" action="list">Applications</g:link> </th>
-	     <th style="text-align:center;"><g:link controller="assetEntity" action="list">Assets</g:link></th>
+	     <th style="text-align:center;"><g:link controller="assetEntity" action="list" params="[listType:'server']">Servers</g:link></th>
+	     <th style="text-align:center;"><g:link controller="assetEntity" action="list" params="[listType:'physical']">Physical Assets</g:link></th>
 	     <th style="text-align:center;"><g:link controller="database" action="list">Database</g:link></th>
 	     <th style="text-align:center;"><g:link controller="files" action="list">Storage</g:link></th>
 	   </tr>
@@ -32,7 +33,13 @@
 	           <td  style="text-align:right;"></td>
 	          </g:else>
 	          <g:if test="${assetSummary.assetCount>0}">
-	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[moveBundleId:"${assetSummary.id}"]' >${assetSummary.assetCount}</g:link></td>
+	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[moveBundleId:"${assetSummary.id}",listType:"server"]' >${assetSummary.assetCount}</g:link></td>
+	          </g:if>
+	          <g:else>
+	           <td  style="text-align:right;"></td>
+	          </g:else>
+	          <g:if test="${assetSummary.physicalCount>0}">
+	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[moveBundleId:"${assetSummary.id}",listType:"physical"]' >${assetSummary.physicalCount}</g:link></td>
 	          </g:if>
 	          <g:else>
 	           <td  style="text-align:right;"></td>
@@ -60,7 +67,13 @@
 	              <td  style="text-align:right;"></td>
 	          </g:else>
 	          <g:if test="${unassignedAssetCount>0}">
-	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[moveBundleId:"unAssigned"]' >${unassignedAssetCount}</g:link></td>
+	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[moveBundleId:"unAssigned",listType:"server"]' >${unassignedAssetCount}</g:link></td>
+	          </g:if>
+	          <g:else>
+	              <td  style="text-align:right;"></td>
+	          </g:else>
+	          <g:if test="${unassignedPhysicalCount>0}">
+	            <td  style="text-align:right;"><g:link controller="assetEntity" action="list" params='[moveBundleId:"unAssigned",listType:"physical"]' >${unassignedPhysicalCount}</g:link></td>
 	          </g:if>
 	          <g:else>
 	              <td  style="text-align:right;"></td>
@@ -81,7 +94,8 @@
         <tr class='odd'>
 	          <td  style="text-align:right;"><b>Total</b></td>
 	          <td  style="text-align:right;"><b><g:link controller="application" action="list">${totalApplication}</g:link></b></td>
-	          <td  style="text-align:right;"><b><g:link controller="assetEntity" action="list">${totalAsset}</g:link></b></td>
+	          <td  style="text-align:right;"><b><g:link controller="assetEntity" action="list" params="[listType:'server']">${totalAsset}</g:link></b></td>
+	          <td  style="text-align:right;"><b><g:link controller="assetEntity" action="list" params="[listType:'physical']">${totalPhysical}</g:link></b></td>
 	          <td  style="text-align:right;"><b><g:link controller="database" action="list">${totalDatabase}</g:link></b></td>
 	          <td  style="text-align:right;"><b><g:link controller="files" action="list">${totalFiles}</g:link></b></td>
          </tr> 

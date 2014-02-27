@@ -105,8 +105,8 @@ public enum AssetType {
 	 * The list of types represent all non Server Types.
 	 * @return
 	 */
-	static List getNonServerTypes() {
-		return ['Application','Files','Database']
+	static List getNonPhysicalTypes() {
+		return ['Application','Files','Database','VM']
 	}
 	/**
 	 * The list of types represent all Server Types which differs the physical list and ServerList.
