@@ -1660,6 +1660,8 @@ class AssetEntityController {
 				case ~/custom1|custom2|custom3|custom4|custom5|custom6|custom7|custom8|custom9|custom10|custom11|custom12|custom13|custom14|custom15|custom16|custom17|custom18|custom19|custom20|custom21|custom22|custom23|custom24|custom25|custom26|custom27|custom28|custom29|custom30|custom31|custom32|custom33|custom34|custom35|custom36|custom37|custom38|custom39|custom40|custom41|custom42|custom43|custom44|custom45|custom46|custom47|custom48/:
 					temp +="ae.${value} AS ${value},"
 					break;
+				case 'validation':
+					break;
 				default:
 					temp +="ae.${WebUtil.splitCamelCase(value)} AS ${value},"
 			}
@@ -1675,7 +1677,7 @@ class AssetEntityController {
 		/*adb.dependency_bundle AS depNumber,
 					COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depToResolve,
 					COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts*/
-		query.append("""ae.plan_status AS planStatus, mb.name AS moveBundle
+		query.append("""ae.plan_status AS planStatus, mb.name AS moveBundle,ae.validation AS validation
 				FROM asset_entity ae
 				LEFT OUTER JOIN model m ON m.model_id=ae.model_id
 				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id""")
@@ -1725,6 +1727,27 @@ class AssetEntityController {
 			}else{
 				query.append(" WHERE assets.moveBundle IS NULL ")
 			}
+		}
+		
+		if ( params.filter ) {
+			if (params.filter !='other'){  // filter is not other means filter is in (Server, VM , Blade) and others is excepts (Server, VM , Blade).
+				if(!params.event)
+					query.append("WHERE assets.assetType  IN (${WebUtil.listAsMultiValueQuotedString(assetType)}) ")
+				else
+					query.append("AND assets.assetType  IN (${WebUtil.listAsMultiValueQuotedString(assetType)}) ")
+			}else{
+				if(!params.event)
+					query.append("WHERE assets.assetType NOT IN (${WebUtil.listAsMultiValueQuotedString(assetType)}) ")
+				else
+					query.append("AND assets.assetType NOT IN (${WebUtil.listAsMultiValueQuotedString(assetType)}) ")
+			}	
+				
+			if( params.type=='toValidate'){
+				query.append(" AND assets.validation='Discovery' ")//eq ('validation','Discovery')
+			}
+		}
+		if(params.plannedStatus){
+			query.append(" AND assets.planStatus='${params.plannedStatus}'")
 		}
 		
 		log.info  "query = ${query}"

@@ -37,7 +37,7 @@
 
 				// JqGrid implementations 
 				var filter = '${filter}'
-				var latency = '${latency}'
+				var latencys = '${latencys}'
 				var event = '${event}'
 				var moveEvent = '${moveEvent}'
 				var plannedStatus = '${plannedStatus}' 
@@ -48,6 +48,8 @@
 				var moveBundle = '${moveBundle}'
 				var validationFilter = '${validationFilter}'
 				var appSme = '${appSme}'
+				var toValidate = '${toValidate}'
+				var runbook = '${runbook}'
 				
 				var sizePref = '${sizePref}'
 				var listCaption ='Applications: \
@@ -81,8 +83,8 @@
 					loadComplete=function(){
 						resizeGrid()
 					}
-					postData="{filter: filter, event:event, latency:latency, plannedStatus:plannedStatus, validationFilter:validation, moveBundleId:moveBundleId,
-						assetName:appName, planStatus:planStatus, moveBundle:moveBundle, validation:validationFilter, sme:appSme}">
+					postData="{filter: filter, event:event, latencys:latencys, plannedStatus:plannedStatus, validationFilter:validation, moveBundleId:moveBundleId,
+						assetName:appName, planStatus:planStatus, moveBundle:moveBundle, validation:validationFilter, sme:appSme, toValidate:toValidate,runbook:runbook}">
 					<jqgrid:filterToolbar id="applicationId" searchOnEnter="false" />
 					<jqgrid:navigation id="applicationId" add="false" edit="false" del="false" search="false" refresh="false" />
 					<jqgrid:refreshButton id="applicationId" />

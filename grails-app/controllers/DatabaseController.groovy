@@ -70,7 +70,7 @@ class DatabaseController {
 		return [assetDependency: new AssetDependency(),
 			servers : entities.servers, applications : entities.applications, dbs : entities.dbs, files : entities.files,networks : entities.networks, 
 			dependencyStatus:entities.dependencyStatus,staffRoles:taskService.getRolesForStaff(),dependencyType:entities.dependencyType,
-			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,
+			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,toValidate:params.toValidate,
 			moveBundleId:params.moveBundleId, dbName:filters?.assetNameFilter ?:'', dbFormat:filters?.dbFormatFilter?:'',
 			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref, moveBundleList:moveBundleList,
 			dbPref:dbPref , modelPref:modelPref, attributesList:attributesList]
@@ -124,6 +124,8 @@ class DatabaseController {
 			case 'dbFormat':
 				temp+="d.db_format AS dbFormat,"
 			break;
+			case 'validation':
+			break;
 			default:
 				temp +="ae.${WebUtil.splitCamelCase(value)} AS ${value},"
 			}
@@ -138,7 +140,7 @@ class DatabaseController {
 		/*COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, adb.dependency_bundle AS depNumber,
 			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts */
 		
-		query.append("""  ac.comment_type AS commentType
+		query.append("""  ac.comment_type AS commentType,ae.validation AS validation
 			FROM data_base d 
 			LEFT OUTER JOIN asset_entity ae ON d.db_id=ae.asset_entity_id
 			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
@@ -175,7 +177,9 @@ class DatabaseController {
 				query.append(" WHERE dbs.moveBundle IS NULL ")
 			}
 		}
-		
+		if( params.toValidate){
+			query.append(" WHERE dbs.validation='Discovery'")
+		}
 		def dbsList = jdbcTemplate.queryForList(query.toString())
 		
 		def totalRows = dbsList.size()

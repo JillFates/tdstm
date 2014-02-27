@@ -73,9 +73,9 @@ class ApplicationController {
 			files: entities.files, 
 			networks: entities.networks, 
 			dependencyType:entities.dependencyType, 
-			dependencyStatus:entities.dependencyStatus, event:params.moveEvent, filter:params.filter, latency:params.latency,
-		    staffRoles:taskService.getRolesForStaff(), plannedStatus:params.plannedStatus, appSme : filters?.appSmeFilter ?:'',
-			validation:params.validation, moveBundleId:params.moveBundleId, appName:filters?.assetNameFilter ?:'', sizePref:sizePref, 
+			dependencyStatus:entities.dependencyStatus, event:params.moveEvent, filter:params.filter, latencys:params.latencys,
+		    staffRoles:taskService.getRolesForStaff(), plannedStatus:params.plannedStatus, appSme : filters?.appSmeFilter ?:'',runbook:params.runbook,
+			validation:params.validation, moveBundleId:params.moveBundleId, appName:filters?.assetNameFilter ?:'', sizePref:sizePref,toValidate:params.toValidate, 
 			validationFilter:filters?.appValidationFilter ?:'', moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'',
 			partyGroupList:companiesList, availabaleRoles:availabaleRoles, company:company, moveEvent:moveEvent, moveBundleList:moveBundleList,
 			attributesList:attributesList, appPref:appPref, modelPref:modelPref]
@@ -97,7 +97,7 @@ class ApplicationController {
 		def appPref= assetEntityService.getExistingPref('App_Columns')
 		def appPrefVal = appPref.collect{it.value}
 		attributes.each{ attribute ->
-			if(attribute.attributeCode in appPrefVal && attribute.attributeCode!='latency')
+			if(attribute.attributeCode in appPrefVal)
 				filterParams << [ (attribute.attributeCode): params[(attribute.attributeCode)]]
 		}
 		def initialFilter = params.initialFilter in [true,false] ? params.initialFilter : false
@@ -118,13 +118,13 @@ class ApplicationController {
 		//def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
 		
 		def customizeQuery = assetEntityService.getAppCustomQuery(appPref)
-		def query = new StringBuffer("""SELECT * FROM ( SELECT a.app_id AS appId, ae.asset_name AS assetName,
+		def query = new StringBuffer("""SELECT * FROM ( SELECT a.app_id AS appId, ae.asset_name AS assetName,a.latency AS latency,
 										ac.status AS commentStatus, ac.comment_type AS commentType,me.move_event_id AS event,""")
 		if(customizeQuery.query){
 			query.append(customizeQuery.query)
 		}	
 		
-		query.append(""" ae.asset_type AS assetType 
+		query.append(""" ae.asset_type AS assetType,ae.validation AS validation,ae.plan_status AS planStatus,me.runbook_status AS runbookStatus
 			FROM application a 
 			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
 			LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id""")
@@ -161,9 +161,9 @@ class ApplicationController {
 					query.append(" AND apps.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
 				}
 		}
-		if(params.latency){
-			if(params.latency!='unknown')
-				query.append(" WHERE apps.latency = '${params.latency.replaceAll("'", "")}' ")
+		if(params.latencys){
+			if(params.latencys!='unknown')
+				query.append(" WHERE apps.latency = '${params.latencys.replaceAll("'", "")}' ")
 			else
 				query.append(" WHERE (apps.latency NOT IN ('Y','N') OR apps.latency IS NULL) ")	
 		}
@@ -174,6 +174,15 @@ class ApplicationController {
 			}else{
 				query.append(" WHERE apps.moveBundle IS NULL ")
 			}
+		}
+		if( params.toValidate){
+			query.append(" WHERE apps.validation='${params.toValidate}'")
+		}
+		if(params.plannedStatus){
+			query.append(" WHERE apps.planStatus='${params.plannedStatus}'")
+		}
+		if(params.runbook){
+			query.append( " Where apps.runbookStatus='Done' " )
 		}
 		log.info "query = ${query}"
 		def appsList = jdbcTemplate.queryForList(query.toString())

@@ -43,6 +43,8 @@
 				var fileFormat = '${fileFormat}'
 				var size = '${size}'
 				var sizePref = '${sizePref}'
+				var toValidate = '${toValidate}'
+				
 				var listCaption ='Storages: <tds:hasPermission permission="EditAndDelete"><span class="capBtn"><input type="button" value="Create Storage" onclick="createAssetDetails(\'Files\')"/></span></tds:hasPermission>\
 					<tds:hasPermission permission="AssetDelete">\
 						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'Files\')" disabled="disabled"/></span>\
@@ -68,7 +70,7 @@
 					gridComplete="function(){bindResize('storageId')}"
 					onSelectRow="validateMergeCount"
 					postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId, assetName:fileName, 
-						planStatus:planStatus, moveBundle:moveBundle, fileFormat:fileFormat, size:size}"
+						planStatus:planStatus, moveBundle:moveBundle, fileFormat:fileFormat, size:size,toValidate:toValidate}"
 					showPager="true">
 					<jqgrid:filterToolbar id="storageId" searchOnEnter="false" />
 					<jqgrid:navigation id="storageId" add="false" edit="false" del="false" search="false" refresh="false"/>

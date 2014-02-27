@@ -46,6 +46,8 @@
 				var moveBundle = '${moveBundle}'
 				var dbFormat = '${validationFilter}'
 				var sizePref = '${sizePref}'
+				var toValidate = '${toValidate}'
+					
 				var listCaption ='DataBases: <tds:hasPermission permission="EditAndDelete"><span class="capBtn"><input type="button" value="Create DB" onclick="createAssetDetails(\'Database\')"/></span></tds:hasPermission>\
 					<tds:hasPermission permission="AssetDelete">\
 						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'Database\')" disabled="disabled"/></span>\
@@ -70,7 +72,7 @@
 					gridComplete="function(){bindResize('databaseId')}"
 					onSelectRow="validateMergeCount"
 					postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId,
-						assetName:dbName, planStatus:planStatus, moveBundle:moveBundle, dbFormat:dbFormat}"
+						assetName:dbName, planStatus:planStatus, moveBundle:moveBundle, dbFormat:dbFormat, toValidate:toValidate}"
 					showPager="true">
 					<jqgrid:filterToolbar id="databaseId" searchOnEnter="false" />
 					<jqgrid:navigation id="databaseId" add="false" edit="false" del="false" search="false" refresh="false" afterSubmit="deleteMessage"/>

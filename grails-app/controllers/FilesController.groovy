@@ -67,7 +67,7 @@ class FilesController {
 			files : entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
 			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,
 			staffRoles:taskService.getRolesForStaff(), moveBundleId:params.moveBundleId, fileName:filters?.assetNameFilter ?:'', 
-			fileFormat:filters?.fileFormatFilter, size:filters?.sizeFilter,
+			fileFormat:filters?.fileFormatFilter, size:filters?.sizeFilter,toValidate:params.toValidate,
 			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref, moveBundleList:moveBundleList,
 			attributesList:attributesList, filesPref:filesPref, modelPref:modelPref]
 		
@@ -120,6 +120,8 @@ class FilesController {
 			case 'fileFormat':
 				temp+="f.file_format AS fileFormat,"
 			break;
+			case 'validation':
+			break;
 			default:
 				temp +="ae.${WebUtil.splitCamelCase(value)} AS ${value},"
 			}
@@ -132,7 +134,7 @@ class FilesController {
 		}
 		/*COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, adb.dependency_bundle AS depNumber,
 			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts */
-		query.append("""  ac.comment_type AS commentType
+		query.append("""  ac.comment_type AS commentType,ae.validation AS validation
 			FROM files f 
 			LEFT OUTER JOIN asset_entity ae ON f.files_id=ae.asset_entity_id
 			LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id
@@ -169,7 +171,9 @@ class FilesController {
 				query.append(" WHERE files.moveBundle IS NULL ")
 			}
 		}
-		
+		if( params.toValidate){
+			query.append(" WHERE files.validation='Discovery'")
+		}
 		def filesList = jdbcTemplate.queryForList(query.toString())
 		
 		def totalRows = filesList.size()

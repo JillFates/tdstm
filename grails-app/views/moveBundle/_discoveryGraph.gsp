@@ -4,27 +4,46 @@
 	</g:link>
 </td>
 <td class="dashboard_stat_desc_td">
-	<g:link controller="${assetType}" action="list" params="[filter:filter]" class="links">
-		${title}
-	</g:link>
+	<g:if test="${filter in ['physical','virtual']}" >
+		<g:link controller="${assetType}" action="list" params="[listType:'server',filter:filter]" class="links">
+				${title}
+		</g:link>
+	</g:if>
+	<g:else>
+		<g:link controller="${assetType}" action="list" params="[filter:filter]" class="links">
+			${title}
+		</g:link>
+	</g:else>
 </td>
 <td class="dashboard_stat_td_L">
-	<g:link controller="${assetType}" action="list" params="[filter:filter]" class="links">
-		${assetCount}
-	</g:link>
+	<g:if test="${filter in ['physical','virtual']}" >
+		<g:link controller="${assetType}" action="list" params="[listType:'server',filter:filter]" class="links">
+			${assetCount}
+		</g:link>
+	</g:if>
+	<g:else>
+		<g:link controller="${assetType}" action="list" params="[filter:filter]" class="links">
+			${assetCount}
+		</g:link>
+	</g:else>
 </td>
 <g:if test="${ validate > 0 }">
 	<td class="dashboard_stat_graph_td">
 		<div class="dashboard_bar_base_small">
 			<div class="dashboard_bar_graph_small" id="${barId}" style="width: 0%;"></div>
 		</div>
-		<g:if test="${ filter in ['physical','virtual','other'] }">
-			<g:link controller="${assetType}" action="list" params="[filter:filter, type:'toValidate']" class="links">
+		<g:if test="${ filter in ['physical','virtual'] }">
+			<g:link controller="${assetType}" action="list" params="[listType:'server',filter:filter, type:'toValidate']" class="links">
 				${validate} to validate
 			</g:link>
 		</g:if>
+		<g:elseif test="${ filter=='other' }">
+			<g:link controller="${assetType}" action="list" params="[filter:filter, type:'toValidate']" class="links">
+				${validate} to validate
+			</g:link>
+		</g:elseif>
 		<g:else>
-			<g:link controller="${assetType}" action="list" params="[filter:filter, validation:'Discovery']" class="links">
+			<g:link controller="${assetType}" action="list" params="[filter:filter,toValidate:'Discovery']" class="links">
 				${validate} to validate
 			</g:link>
 		</g:else>
