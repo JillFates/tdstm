@@ -3,6 +3,7 @@ import java.sql.SQLException;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdssrc.grails.GormUtil;
 
 import java.sql.ResultSet
@@ -642,10 +643,10 @@ class CookbookService {
 				if (map.containsKey(n)) {
 					// can do more here to check the nested definitions later on.
 
-					if ( map[n] instanceof java.util.LinkedHashMap) {
+					if ( CU.isaMap(map[n])) {
 						// Check the sub section of the spec against a sub section of the map
 						// errorList.addAll( validateAgainstMap(type, spec[n], map[n]) )
-					} else if ( map[n] instanceof List ) {
+					} else if ( CU.isaList(map[n]) ) {
 						// Check if the value of a property exists in the map defined list
 						if ( ! map[n].contains( v ) ) {
 							errorList << [ error: 1, reason: 'Invalid syntax', 
@@ -681,7 +682,8 @@ class CookbookService {
 			title:0,
 			description:0,
 			filter:0,
-			type:['action','milestone','gateway','general','rollcall','location','room','rack','truck','set'],
+			type:['asset','action','milestone','gateway','general'],
+			action: ['rollcall','location','room','rack','truck','set'],
 			disposition:0,
 			setOn:0,
 			action:0,
@@ -749,7 +751,7 @@ class CookbookService {
 						groupKeys.put(group.name, index)
 					}
 					if ( group.containsKey('filter') ) {
-						if (group.filter instanceof Map) {
+						if ( CU.isaMap(group.filter)) {
 							if ( group.filter.containsKey('class') ) {
 								// Make sure that the filter has a class and proper value
 								if (! classNames.contains( group.filter.class.toLowerCase() ) ) {
@@ -771,7 +773,7 @@ class CookbookService {
 
 							// Validate the filter.dependency map settings
 							if (group.filter.containsKey('dependency')) {
-								if (group.filter.dependency instanceof Map ) {
+								if (CU.isaMap(group.filter.dependency) ) {
 									if (group.filter.dependency.containsKey('mode')) {
 										// Now we need to find assets that are associated via the AssetDependency domain
 										def depMode = group.filter.dependency.mode.toLowerCase()
@@ -780,7 +782,7 @@ class CookbookService {
 												detail: "Group '${group.name}' in element ${index} 'filter.dependency.mode' must be [supports|requires]" ]
 										}
 										if (group.filter.dependency.containsKey('asset')) {
-											if (group.filter.dependency.asset instanceof Map ) {
+											if (CU.isaMap(group.filter.dependency.asset)) {
 												def suppAttribs = ['virtual','physical']
 												group.filter.dependency.asset.each { n, v -> 
 													if (! suppAttribs.contains(n)) 
@@ -818,10 +820,10 @@ class CookbookService {
 				index = 0
 				recipe.groups.each { group -> 
 					index++
-					if (group.containsKey('filter') && group.filter instanceof Map ) {
+					if (group.containsKey('filter') && CU.isaMap(group.filter)) {
 						['exclude','include'].each { ei -> 
 							if (group.filter.containsKey(ei)) {
-								def eiList = group.filter[ei] instanceof java.util.ArrayList ? group.filter[ei] : [ group.filter[ei] ]
+								def eiList = CU.asList(group.filter[ei])
 								eiList.each { gName -> 
 									if (! groupKeys.containsKey(gName) ) {
 										errorList << [ error: 4, reason: 'Invalid group reference', 
@@ -850,61 +852,126 @@ class CookbookService {
 				recipe.tasks.each { task -> 
 					index++
 					def taskId = null
+					def taskRef = "Task in element $index"
+					def hasFilter = false
+					def type = task.type ?: ''
 
-					if (! task instanceof Map) {
+					if (! CU.isaMap(task) ) {
 						errorList << [ error: 1, reason: 'Invalid syntax', 
-							detail: "Task element $index is not a valid map definition" ]
+							detail: "$taskRef is not a valid map definition" ]
 						return	
 					}
 
 					// Test that the 'id' exists, that it isn't duplicated and that it is a positive whole number
 					if (task.containsKey('id')) {
-						if (task.id instanceof Integer && task.id > 0) {
+						if ( (task.id instanceof Integer) && task.id > 0) {
 							taskId = task.id
+							taskRef = "Task id $taskId"
 							if (taskIds.contains(task.id)) {
 								errorList << [ error: 1, reason: 'Invalid syntax', 
-									detail: "Task id ${task.id} in element $index is a duplicate of an earlier task spec" ]													
+									detail: "$taskRef is a duplicate of an earlier task spec" ]													
 							} else {
 								taskIds << task.id
 							}
 						} else {
 							errorList << [ error: 1, reason: 'Invalid syntax', 
-								detail: "Task id ${task.id} in element $index must be a positive whole number > 0" ]
+								detail: "$taskRef 'id' must be a positive whole number > 0" ]
 						}
 					} else {
 						errorList << [ error: 3, reason: 'Missing property', 
-							detail: "Task in element ${index} is missing require property 'id' which must be a unique number" ]
+							detail: "$taskRef is missing require property 'id' which must be a unique number" ]
 					}
 
 					// Check for any unsupported properties (misspellings, etc)
 					validateAgainstMap( 'task', task, taskProps )
 
-
 					// Validate the predecessor specifications
 					if (task.containsKey('predecessor')) {
+						def predecessor = task.predecessor
 
-						// Validate if taskSpec was used, to make sure that it references a previously defined spec
-						if (task.predecessor.containsKey('taskSpec')) {
-							def ts = task.predecessor.taskSpec instanceof java.util.ArrayList ? task.predecessor.taskSpec : [task.predecessor.taskSpec]
-							ts.each { tsid ->
-								if ( tsid instanceof Integer && tsid > 0 ) {
-									log.debug "Checking reference of $tsid in $taskIds, current task is $taskId"
-									if ( taskIds.contains(tsid) ) {
-										if (taskId && tsid == taskId) {
+						if (! CU.isaMap(predecessor)) {
+							errorList << [ error: 1, reason: 'Invalid syntax', 
+								detail: "$taskRef 'predecessor' attribute is not a valid map definition" ]
+						} else {
+
+							// Validate if taskSpec was used, to make sure that it references a previously defined spec
+							if (predecessor.containsKey('taskSpec')) {
+								def ts = CU.asList(predecessor.taskSpec)
+								ts.each { tsid ->
+									if ( tsid instanceof Integer && tsid > 0 ) {
+										if ( taskIds.contains(tsid) ) {
+											if (taskId && tsid == taskId) {
+												errorList << [ error: 4, reason: 'Invalid Reference', 
+													detail: "$taskRef 'predecessor.taskSpec' contains reference ($tsid) to itself." ]
+											}
+										} else {
 											errorList << [ error: 4, reason: 'Invalid Reference', 
-												detail: "Task id ${task.id} predecessor.taskSpec contains reference ($tsid) to itself." ]
-										}
+												detail: "$taskRef 'predecessor.taskSpec' contains invalid id reference ($tsid). TaskSpec ids must reference a previously defined TaskSpec." ]
+	 									}
 									} else {
-										errorList << [ error: 4, reason: 'Invalid Reference', 
-											detail: "Task id ${task.id} predecessor.taskSpec contains invalid id reference ($tsid). TaskSpec ids must reference a previously defined TaskSpec." ]
- 									}
+										errorList << [ error: 1, reason: 'Invalid syntax', 
+											detail: "$taskRef 'predecessor.taskSpec' contains invalid id ($tsid). Ids must be a positive whole number > 0" ]
+									}
+									
+								} 
+							}
+
+							// Validate the filter section
+							if (predecessor.containsKey('filter')) {
+								def filter = predecessor.filter
+								if (CU.isaMap(filter)) {
+									hasFilter=true
 								} else {
 									errorList << [ error: 1, reason: 'Invalid syntax', 
-										detail: "Task id ${task.id} predecessor.taskSpec contains invalid id ($tsid). Ids must be a positive whole number > 0" ]
+										detail: "$taskRef 'predecessor.filter' attribute is not a valid map definition" ]
 								}
-								
+							}
+
+							// Check for Mode/TaskSpec/Group requirement
+							def hasMode = predecessor.containsKey('mode')
+							def hasTaskSpec = predecessor.containsKey('taskSpec')
+							def hasGroup = predecessor.containsKey('group')
+							def hasDefer = predecessor.containsKey('defer')
+							def hasGather = predecessor.containsKey('gather')
+
+							if ( ! (hasMode || hasTaskSpec || hasGroup || hasGather) ) {
+								errorList << [ error: 3, reason: 'Missing property', 
+									detail: "$taskRef 'predecessor' section requires [mode | taskSpec | group | gather] property" ]
+							} else if ( hasMode && hasGroup ) {
+								errorList << [ error: 1, reason: 'Invalid syntax', 
+									detail: "$taskRef 'predecessor' section contains 'mode' and 'group' properties which are mutually exclusive" ]
+							} else if ( hasTaskSpec && hasGroup) {
+								errorList << [ error: 1, reason: 'Invalid syntax', 
+									detail: "$taskRef 'predecessor' section contains 'taskSpec' and 'group' properties which are mutually exclusive" ]
 							} 
+
+							if (hasMode && predecessor.mode == 'both' && hasDefer) {
+								errorList << [ error: 1, reason: 'Invalid syntax', 
+									detail: "$taskRef 'predecessor' section contains 'defer' and mode with 'both' value which is not supported" ]
+							}
+							if (hasTaskSpec && hasDefer) {
+								errorList << [ error: 1, reason: 'Invalid syntax', 
+									detail: "$taskRef 'predecessor' section contains 'taskSpec' and 'defer' properties which are mutually exclusive" ]
+							}
+							def modeValues = ['supports','requires', 'both']
+							if (hasMode &&  ! modeValues.contains(predecessor.mode)) {
+								errorList << [ error: 1, reason: 'Invalid syntax', 
+									detail: "$taskRef 'predecessor.mode' has invalid value '${predecessor.mode}'. Value options are [supports | requires | both]" ]
+							}
+
+							if (type == 'milestone') {
+								errorList << [ error: 1, reason: 'Invalid syntax', 
+									detail: "$taskRef of type 'milestone' does not support 'predecessor'" ]
+							}
 						}
+					} // predecessor validation
+
+					if (task.containsKey('successor')) {
+						def successor = task.successor
+						if (! isaMap(successor)) {
+							errorList << [ error: 1, reason: 'Invalid syntax', 
+								detail: "$taskRef 'successor' attribute is not a valid map definition" ]
+						} 
 					}
 
 				}
