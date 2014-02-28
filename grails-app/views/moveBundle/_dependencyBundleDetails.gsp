@@ -1,5 +1,5 @@
 <div style="margin-top: 10px; float: left;">
-	<div>
+	<div class="compactClass">
 		<input type="hidden" id="tabTypeId" name="tabType" value="${asset}" />
 		<div style="margin-left: 20px; margin-bottom: 10px;">
         	<div class="message" id="messageId" style="display:none">${flash.message}</div>
@@ -36,13 +36,13 @@
 							<tr class="odd">
 								<td><b>Phys Servers</b></td>
 							</tr>
-							<tr class="even">
+							<tr class="even compactClass">
 								<td><b>Virt. Servers</b></td>
 							</tr>
-							<tr class="odd">
+							<tr class="odd compactClass">
 								<td><b>DB</b></td>
 							</tr>
-							<tr class="even">
+							<tr class="even compactClass">
 								<td><b>Storage</b></td>
 							</tr>
 						</table>
@@ -85,7 +85,7 @@
 									</td>
 								</g:each>
 							</tr>
-							<tr class="even">
+							<tr class="even compactClass">
 								<td id="vm_all" class="vm_count">
 									<span id="allVirtualCount">${gridStats.vm[0] ?: '&nbsp;' }</span>
 								</td>
@@ -96,7 +96,7 @@
 									</td>
 								</g:each>
 							</tr>
-							<tr class="odd">
+							<tr class="odd compactClass">
 								<td id="db_all" class="db_count">
 									<span id="allDatabaseCount">${gridStats.db[0] ?: '&nbsp;' }</span>
 								</td>
@@ -107,7 +107,7 @@
 									</td>
 								</g:each>
 							</tr>
-							<tr class="even">
+							<tr class="even compactClass">
 								<td id="file_all"  class="file_count">
 									<span id="allFileCount">${gridStats.storage[0] ?: '&nbsp;' }</span>
 								</td>

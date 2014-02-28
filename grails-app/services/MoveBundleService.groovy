@@ -625,7 +625,8 @@ class MoveBundleService {
 			moveBundleId : moveBundleId,
 			isAssigned:isAssigned,
 			moveBundleList:allMoveBundles,
-			depGrpCrt:depGrpCrt
+			depGrpCrt:depGrpCrt,
+			compactPref:userPreferenceService.getPreference('depConsoleCompact')
 		]
 		log.info "dependencyConsoleMap() : OVERALL took ${TimeUtil.elapsed(startAll)}"
 

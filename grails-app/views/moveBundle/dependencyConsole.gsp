@@ -21,6 +21,8 @@
 			var force
 			
 			$(document).ready(function() {
+				var compactPref= '${compactPref}'
+				compactDivToggle(compactPref);
 				
 				// ${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + "apps" +\'&dependencyBundle=\'+ null', onComplete:'listUpdate(e)') }
 				$("#checkBoxDiv").dialog({ autoOpen: false, resizable: false })
@@ -51,6 +53,10 @@
 		<div class="body">
 			<div id="dependencyTitle" style="float: left;">
 				<h1>Dependency Console</h1>
+				<div style="position:absolute;margin: -25px 176px 0;">
+					<input type="checkbox" id="compactControl" name="compactControl" ${compactPref == 'true' ? 'checked="checked"' :''} onclick="compactControlPref( $(this) )"/>
+					&nbsp;<span> Compact Control </span>
+				</div>
 			</div>
 			<tds:hasPermission permission='MoveBundleEditView'>
 				<div id="checkBoxDiv"  title="Dependency Grouping Control" style="display: none">
@@ -242,6 +248,23 @@
 				var orderBy = $("#orderBy").val() != 'asc' ? 'asc' : 'desc'
 				orderBy = (sortBy == sort) ? orderBy : 'asc'
 				${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&bundle=\'+ bundle+\'&sort=\'+ sort+\'&orderBy=\'+ orderBy', onComplete:'listUpdate(e)') }
+			}
+			function compactControlPref($me){
+				var isChecked= $me.is(":checked")
+				jQuery.ajax({
+			        url:contextPath+'/moveBundle/setCompactControlPref',
+			        data:{'selected':isChecked, 'prefFor':'depConsoleCompact'},
+			        type:'POST',
+					success: function(data) {
+						compactDivToggle(data);
+					}
+			    });
+			}
+			function compactDivToggle(data){
+				if(data=='true')
+					$(".compactClass").hide();
+				else
+					$(".compactClass").show();
 			}
 		</script>
 	</body>

@@ -1044,5 +1044,21 @@ class MoveBundleController {
 	def countAppPercentage(def totalAppCount, def filteredAppCount){
 		return totalAppCount ? Math.round((filteredAppCount/totalAppCount)*100) : 0
 	}
+	
+	/**
+	 * This method is used to set compactControl preference
+	 * @param prefFor
+	 * @param selected
+	 * @return selected
+	 */
+	def setCompactControlPref ={
+		def key = params.prefFor
+		def selected=params.selected
+		if(selected){
+			userPreferenceService.setPreference( key, selected )
+			session.setAttribute(key,selected)
+		}
+		render selected
+	}
 }
 
