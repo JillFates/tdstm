@@ -3854,7 +3854,7 @@ class AssetEntityController {
 				eq("moveEvent", moveEvent)
 				
 			if (params.justRemaining == "1") {
-				ne("status", AssetCommentStatus.COMPLETED)
+				'in'("status", AssetCommentStatus.READY,AssetCommentStatus.STARTED)
 			}
 			if (params.justMyTasks == "1") {
 				eq("assignedTo",person)

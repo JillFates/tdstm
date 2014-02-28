@@ -120,7 +120,7 @@ class FilesController {
 			case 'fileFormat':
 				temp+="f.file_format AS fileFormat,"
 			break;
-			case 'validation':
+			case ~/validation|planStatus/:
 			break;
 			default:
 				temp +="ae.${WebUtil.splitCamelCase(value)} AS ${value},"
@@ -134,7 +134,7 @@ class FilesController {
 		}
 		/*COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, adb.dependency_bundle AS depNumber,
 			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts */
-		query.append("""  ac.comment_type AS commentType,ae.validation AS validation
+		query.append("""  ac.comment_type AS commentType,ae.validation AS validation,ae.plan_status AS planStatus
 			FROM files f 
 			LEFT OUTER JOIN asset_entity ae ON f.files_id=ae.asset_entity_id
 			LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id
@@ -173,6 +173,9 @@ class FilesController {
 		}
 		if( params.toValidate){
 			query.append(" WHERE files.validation='Discovery'")
+		}
+		if(params.plannedStatus){
+			query.append(" WHERE files.planStatus='${params.plannedStatus}'")
 		}
 		def filesList = jdbcTemplate.queryForList(query.toString())
 		

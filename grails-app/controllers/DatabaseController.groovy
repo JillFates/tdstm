@@ -124,7 +124,7 @@ class DatabaseController {
 			case 'dbFormat':
 				temp+="d.db_format AS dbFormat,"
 			break;
-			case 'validation':
+			case ~/validation|planStatus/:
 			break;
 			default:
 				temp +="ae.${WebUtil.splitCamelCase(value)} AS ${value},"
@@ -140,7 +140,7 @@ class DatabaseController {
 		/*COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, adb.dependency_bundle AS depNumber,
 			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts */
 		
-		query.append("""  ac.comment_type AS commentType,ae.validation AS validation
+		query.append("""  ac.comment_type AS commentType,ae.validation AS validation,ae.plan_status AS planStatus
 			FROM data_base d 
 			LEFT OUTER JOIN asset_entity ae ON d.db_id=ae.asset_entity_id
 			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
@@ -180,6 +180,10 @@ class DatabaseController {
 		if( params.toValidate){
 			query.append(" WHERE dbs.validation='Discovery'")
 		}
+		if(params.plannedStatus){
+			query.append(" WHERE dbs.planStatus='${params.plannedStatus}'")
+		}
+		
 		def dbsList = jdbcTemplate.queryForList(query.toString())
 		
 		def totalRows = dbsList.size()
