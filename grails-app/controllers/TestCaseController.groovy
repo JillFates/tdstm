@@ -168,65 +168,96 @@ class TestCaseController {
 			return
 		}
 
-		def tasks = runbookService.getEventTasks(me)
-		def deps = runbookService.getTaskDependencies(tasks)
+		StringBuilder results = new StringBuilder()
+
 		def startTime = 0
+		def tasks, deps, dfsMap, durMap, graphs,estFinish
 
-		def dfsMap = runbookService.processDFS( tasks, deps )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
-		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
-		def estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs)
+		try {
+			tasks = runbookService.getEventTasks(me)
+			deps = runbookService.getTaskDependencies(tasks)
 
-		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			dfsMap = runbookService.processDFS( tasks, deps )
+			durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
+			graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
+			estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs)
 
-		StringBuilder results = new StringBuilder("Found ${tasks.size()} tasks and ${deps.size()} dependencies<br/>")
+			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 
-		results.append("Start Vertices: " + (dfsMap.starts.size() > 0 ? dfsMap.starts : 'none') + '<br/>')
-		results.append("Sink Vertices: " + (dfsMap.sinks.size() > 0 ? dfsMap.sinks : 'none') + '<br/>')
-		results.append("Cyclical Maps: " + (dfsMap.cyclicals?.size() ? dfsMap.cyclicals : 'none') + '<br/>')
-		results.append("Pass 1 Elapsed Time: ${dfsMap.elapsed}<br/>")
-		results.append("Pass 2 Elapsed Time: ${durMap.elapsed}<br/>")
-
-		results.append("<b>Estimated Runbook Duration: ${estFinish} for Move Event: $me</b><br/>")
-
-/*
-		results.append("<h1>Edges data</h1><table><tr><th>Id</th><th>Predecessor Task</th><th>Successor Task</th><th>DS Task Count</th><th>Path Duration</th></tr>")
-		deps.each { dep ->
-			results.append("<tr><td>${dep.id}</td><td>${dep.predecessor}</td><td>${dep.successor}</td><td>${dep.downstreamTaskCount}</td><td>${dep.pathDuration}</td></tr>")
-		}
-		results.append('</table>')
-
-*/
-		results.append("<h1>Tasks Details</h1><table><tr><th>Id</th><th>Task #</th><th>Action</th>" + 
-			"<th>Duration</th><th>Earliest Start</th><th>Latest Start</th>" +
-			"<th>Constraint Time</th><th>Act Finish</th><th>Priority</th><th>Critical Path</td>" + 
-			"<th>Team</th><th>Individual</th><th>Category</th></tr>")
-
-		tasks.each { t ->
-
-			def person = t.assignedTo ?: '&nbsp;'
-			def team = t.role ?: '&nbsp;'
-			def constraintTime = '&nbsp;'
-			def actFinish = '&nbsp;'
-
-			if (t.constraintTime) {
-				constraintTime = formatter.format(TimeUtil.convertInToUserTZ(t.constraintTime, tzId)) + " ${t.constraintType}"
+			results.append("Found ${tasks.size()} tasks and ${deps.size()} dependencies<br/>")
+			results.append("Start Vertices: " + (dfsMap.starts.size() > 0 ? dfsMap.starts : 'none') + '<br/>')
+			results.append("Sink Vertices: " + (dfsMap.sinks.size() > 0 ? dfsMap.sinks : 'none') + '<br/>')
+			results.append("Cyclical Maps: ")
+			// results.append(dfsMap.cyclicals)
+			if (dfsMap.cyclicals?.size()) {
+				results.append('<ul>')
+				dfsMap.cyclicals.each { root, list ->
+					def marker = ''
+					results.append('<li>')
+					list.each { cycTaskId ->
+						def cycTaskNum = tasks.find { it.id == cycTaskId }?.taskNumber
+						results.append("$marker$cycTaskNum")
+						marker = ' &gt; '
+					}  
+				}
+				results.append('</ul>')
+			} else {
+				results.append('none')
 			}
-			if (t.actFinish) {
-				actFinish = formatter.format(TimeUtil.convertInToUserTZ(t.actFinish, tzId))
+			results.append('<br/>')
+			results.append("Pass 1 Elapsed Time: ${dfsMap.elapsed}<br/>")
+			results.append("Pass 2 Elapsed Time: ${durMap.elapsed}<br/>")
+
+			results.append("<b>Estimated Runbook Duration: ${estFinish} for Move Event: $me</b><br/>")
+
+	/*
+			results.append("<h1>Edges data</h1><table><tr><th>Id</th><th>Predecessor Task</th><th>Successor Task</th><th>DS Task Count</th><th>Path Duration</th></tr>")
+			deps.each { dep ->
+				results.append("<tr><td>${dep.id}</td><td>${dep.predecessor}</td><td>${dep.successor}</td><td>${dep.downstreamTaskCount}</td><td>${dep.pathDuration}</td></tr>")
 			}
+			results.append('</table>')
 
-			// TODO : add in computation for time differences if both constraint time est and/or actual
- 
- 			def criticalPath = (t.duration > 0 && t.tmpEarliestStart == t.tmpLatestStart ? 'Yes' : '&nbsp;')
+	*/
+			results.append("<h1>Tasks Details</h1><table><tr><th>Id</th><th>Task #</th><th>Action</th>" + 
+				"<th>Duration</th><th>Earliest Start</th><th>Latest Start</th>" +
+				"<th>Constraint Time</th><th>Act Finish</th><th>Priority</th><th>Critical Path</td>" + 
+				"<th>Team</th><th>Individual</th><th>Category</th></tr>")
 
-			results.append( "<tr><td>${t.id}</td><td>${t.taskNumber}</td><td>${t.comment}</td><td>${t.duration}</td><td>${t.tmpEarliestStart}</td>" + 
-				"<td>${t.tmpLatestStart}</td><td>$constraintTime</td><td>$actFinish</td><td>${t.priority}</td>" + 
-				"<td>$criticalPath</td><td>${team}</td><td>$person</td><td>${t.category}</tr>")
+			tasks.each { t ->
+
+				def person = t.assignedTo ?: '&nbsp;'
+				def team = t.role ?: '&nbsp;'
+				def constraintTime = '&nbsp;'
+				def actFinish = '&nbsp;'
+
+				if (t.constraintTime) {
+					constraintTime = formatter.format(TimeUtil.convertInToUserTZ(t.constraintTime, tzId)) + " ${t.constraintType}"
+				}
+				if (t.actFinish) {
+					actFinish = formatter.format(TimeUtil.convertInToUserTZ(t.actFinish, tzId))
+				}
+
+				// TODO : add in computation for time differences if both constraint time est and/or actual
+	 
+	 			def criticalPath = (t.duration > 0 && t.tmpEarliestStart == t.tmpLatestStart ? 'Yes' : '&nbsp;')
+
+				results.append( "<tr><td>${t.id}</td><td>${t.taskNumber}</td><td>${t.comment}</td><td>${t.duration}</td><td>${t.tmpEarliestStart}</td>" + 
+					"<td>${t.tmpLatestStart}</td><td>$constraintTime</td><td>$actFinish</td><td>${t.priority}</td>" + 
+					"<td>$criticalPath</td><td>${team}</td><td>$person</td><td>${t.category}</tr>")
+			}
+			results.append('</table>')
+		} catch (e) {
+			results.append("<h1>Unable to complete computation</h1>${e.getMessage()}")
 		}
-		results.append('</table>')
 
+		// Cleanup work to free up memory which is otherwise a memory leak
+		tasks?.each { x -> x.metaClass = null }
+		deps?.each { x -> x.metaClass = null }
+		tasks?.each { x -> x.metaClass = null }
+		dfsMap?.each { x -> x.metaClass = null }
+		durMap?.each { x -> x.metaClass = null }
+		graphs?.each { x -> x.metaClass = null }
 
 		render results.toString()
 
