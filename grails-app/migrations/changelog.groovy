@@ -71,4 +71,5 @@ databaseChangeLog = {
 	include file: '20140205-add-new-permissions.groovy'
 	include file: '20140211-add-25-to-48-custom-fields.groovy'
 	include file: '20140219-add-default-values-is-published.groovy'
+	include file: '20140227-add-time-move-event.groovy'
 }

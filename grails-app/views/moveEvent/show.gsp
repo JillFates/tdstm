@@ -74,6 +74,10 @@
 				            <td  class="name">Status:</td>
 				            <td class="valueNW"><g:message code="event.inProgress.${moveEventInstance?.inProgress}" /></td>
 						</tr>
+                        <tr class="prop">
+				            <td  class="name">Estimated Start:</td>
+				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'estStartTime')}</td>
+						</tr>
                     </tbody>
                 </table>
             </div>

@@ -27,6 +27,8 @@ class MoveEvent {
 	// Not sure if this is going to be stored or not....
     Date actualStartTime
     Date actualCompletionTime
+	Date estStartTime
+	Date estCompletionTime
 
     static constraints = {        
 		name( blank:false, nullable:false )
@@ -43,6 +45,8 @@ class MoveEvent {
 		runbookBridge2( blank:true, nullable:true )
 		videolink( blank:true, nullable:true )
 		runbookRecipe( blank:true, nullable:true )
+		estStartTime( nullable:true )
+		estCompletionTime( nullable:true )
 	}
 
 	static hasMany = [
@@ -57,6 +61,8 @@ class MoveEvent {
         columns {
 	 		revisedCompletionTime sqlType: 'DateTime'
 			runbookRecipe sqlType: 'Text'
+	 		estStartTime sqlType: 'DateTime'
+	 		estCompletionTime sqlType: 'DateTime'
 		}        
 	}
 

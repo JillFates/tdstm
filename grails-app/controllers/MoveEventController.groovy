@@ -171,8 +171,15 @@ class MoveEventController {
 	 */
     def update = {
         def moveEventInstance = MoveEvent.get( params.id )
-        if(moveEventInstance) {
-	
+        
+		if(moveEventInstance) {
+			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def estStartTime = params.estStartTime
+			if(estStartTime){
+				params.estStartTime =  GormUtil.convertInToGMT(formatter.parse( estStartTime ), tzId)
+			}
+			
 			// Validate that the runbook recipe syntax is okay
 			if (params.runbookRecipe && params.runbookRecipe.size() > 0) {
 				def recipeErrors = cookbookService.validateSyntax( params.runbookRecipe )
@@ -193,6 +200,7 @@ class MoveEventController {
 			}
 				
             moveEventInstance.properties = params
+			
             def moveBundles = request.getParameterValues("moveBundle")
 			
             if(!moveEventInstance.hasErrors() && moveEventInstance.save()) {
@@ -224,6 +232,13 @@ class MoveEventController {
 	 * @return : redirect to the show method
 	 */
     def save = {
+		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def estStartTime = params.estStartTime
+		if(estStartTime){
+			params.estStartTime =  GormUtil.convertInToGMT(formatter.parse( estStartTime ), tzId)
+		}
+		
         def moveEventInstance = new MoveEvent(params)
         def moveBundles = request.getParameterValues("moveBundle")
         if(moveEventInstance.project.runbookOn ==1){

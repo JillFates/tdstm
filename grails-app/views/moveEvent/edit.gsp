@@ -3,7 +3,34 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="projectHeader" />
         <title>Edit Event</title>
-    </head>
+    <script type="text/javascript">
+      function initialize(){
+
+      // This is called when the page loads to initialize Managers
+      $('#moveManagerId').val('${moveManager}')
+      $('#projectManagerId').val('${projectManager}')
+
+      }
+      function isValidDate( date ){
+        var returnVal = true;
+      	var objRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
+      	if( date && !objRegExp.test(date) ){
+          	alert("Date should be in 'mm/dd/yyyy HH:MM AM/PM' format");
+          	returnVal  =  false;
+      	} 
+      	return returnVal;
+      }
+      function validateDates(){
+          var returnval = false
+          var startTime = $("#startTime").val();
+          var completionTime = $("#completionTime").val();
+          if(isValidDate(startTime) && isValidDate(completionTime)){
+        	  returnval = true;
+          } 
+          return returnval;
+      }
+    </script>
+        </head>
     <body>
         <div class="body">
             <h1>Edit Event</h1>
@@ -138,6 +165,25 @@
 				                  </g:hasErrors>
 				                </td>
 			              </tr>
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="description">Estimated Start:</label>
+                                </td>
+				                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'estStartTime','errors')}">
+				                  <script type="text/javascript">
+				                    $(document).ready(function(){
+				                      $("#estStartTime").datetimepicker();
+				                    });
+				                  </script> <input type="text" class="dateRange" size="15" style="width: 132px; height: 14px;" id="estStartTime" name="estStartTime"
+				                                   value="<tds:convertDateTime date="${moveEventInstance?.estStartTime}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
+				                                   onchange="isValidDate(this.value)"/>
+				                                   <g:hasErrors bean="${moveEventInstance}" field="estStartTime">
+				                    <div class="errors">
+				                      <g:renderErrors bean="${moveEventInstance}" as="list" field="estStartTime"/>
+				                    </div>
+				                  </g:hasErrors>
+				                </td>
+                            </tr> 
                         </tbody>
                     </table>
                 </div>
