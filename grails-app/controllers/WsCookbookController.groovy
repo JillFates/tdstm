@@ -33,9 +33,9 @@ class WsCookbookController {
 		def currentProject = securityService.getUserCurrentProject()
 
 		try {
-			cookbookService.createRecipe(name, description, context, cloneFrom, loginUser, currentProject)
+			def recipe = cookbookService.createRecipe(name, description, context, cloneFrom, loginUser, currentProject)
 
-			render(ServiceResults.success() as JSON)
+			render(ServiceResults.success('recipeId' : recipe.id) as JSON)
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
 		} catch (EmptyResultException e) {
