@@ -51,6 +51,7 @@
 	<body>
 		<input type="hidden" id="redirectTo" name="redirectTo" value="dependencyConsole" />
 		<div class="body">
+		<div style="min-width: 1000px;">
 			<div id="dependencyTitle" style="float: left;">
 				<h1>Dependency Console</h1>
 				<div style="position:absolute;margin: -25px 176px 0;">
@@ -140,6 +141,8 @@
 					</table>
 				</g:form>
 			</div>
+			</div>
+			<div style="float:left;">
 			<tds:hasPermission permission='MoveBundleEditView'>
 				<div id="items1" style="display: none"></div>
 			</tds:hasPermission>
@@ -159,7 +162,7 @@
 			</div>
 			<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
 		</div>
-		
+		</div>
 		<script type="text/javascript">
 			function getList(value,dependencyBundle, force, distance, labels){
 				$('#moveBundleSelectId').dialog("close")
