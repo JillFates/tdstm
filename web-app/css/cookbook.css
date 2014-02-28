@@ -143,6 +143,12 @@ form.groups{
 	margin-right:0;
 }
 
+.actions.disabled{
+	opacity: 0.3;
+	color: #333;
+	cursor: default;
+}
+
 form .error-msg{
 	margin:0.5em 0 0 0;
 }

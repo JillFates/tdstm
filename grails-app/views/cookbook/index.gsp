@@ -329,7 +329,7 @@
 					            	%{-- New Recipe Tab --}%
 									<tab heading="Brand New Recipe" >
 										<div class="form-group">
-											<label for="inputName" class="col-sm-2 control-label">Name</label>
+											<label for="inputName" class="col-sm-2 control-label">Name*</label>
 											<div class="col-sm-10">
 												<input type="text" class="form-control" id="inputName" placeholder="" name="inputName" ng-model="newRecipe.name" required>
 												<div ng-show="form.inputName.$dirty && form.inputName.$invalid">
@@ -344,7 +344,7 @@
 											</div>
 										</div>
 										<div class="form-group">
-											<label for="contextSelector2" class="col-sm-2 control-label selectLabel">Context</label>
+											<label for="contextSelector2" class="col-sm-2 control-label selectLabel">Context*</label>
 											<div class="col-sm-10">
 												<select name="contextSelector2" id="contextSelector2" ng-model="newRecipe.context" ng-options="d for d in ['Event', 'Bundle', 'Application']" required>
 													<option value="">Select context</option>
