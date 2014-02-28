@@ -191,17 +191,23 @@ class TestCaseController {
 			results.append("Cyclical Maps: ")
 			// results.append(dfsMap.cyclicals)
 			if (dfsMap.cyclicals?.size()) {
-				results.append('<ul>')
+				results.append('<ol>')
 				dfsMap.cyclicals.each { root, list ->
-					def marker = ''
-					results.append('<li>')
+					def task = tasks.find { it.id == root }
+					results.append("<li> Circular Reference Stack: <ul>")
+					// def marker = ''
 					list.each { cycTaskId ->
-						def cycTaskNum = tasks.find { it.id == cycTaskId }?.taskNumber
-						results.append("$marker$cycTaskNum")
-						marker = ' &gt; '
+						// results.append('<li>')
+						// def looper = cycTaskId == root
+						//def cycTaskNum = tasks.find { it.id == cycTaskId }?.taskNumber
+						task = tasks.find { it.id == cycTaskId }
+						results.append("<li>$task.taskNumber $task.comment")
+						// results.append("<li>${looper?'<b>':''}$task.taskNumber $task.comment ${looper?'</b>':''}")
+						// if (!marker) marker = ' &gt; '
 					}  
+					results.append('</ul>')
 				}
-				results.append('</ul>')
+				results.append('</ol>')
 			} else {
 				results.append('none')
 			}
