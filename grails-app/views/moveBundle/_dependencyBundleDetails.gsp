@@ -33,7 +33,7 @@
 							<tr class="even">
 								<td><b>Applications</b></td>
 							</tr>
-							<tr class="odd">
+							<tr class="odd compactClass">
 								<td><b>Phys Servers</b></td>
 							</tr>
 							<tr class="even compactClass">
@@ -75,7 +75,7 @@
 									</td>
 								</g:each>
 							</tr>
-							<tr class="odd">
+							<tr class="odd compactClass">
 								<td id="server_all" class="server_count">
 									<span id="allServerCount">${gridStats.server[0] ?: '&nbsp;' }</span></td>
 								<td id="server_onePlus">${gridStats.server[1] ?: '&nbsp;' }</td>
