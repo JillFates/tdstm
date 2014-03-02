@@ -259,9 +259,10 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
     };
 
     $scope.$on('ngGridEventData', function(){
-        if(rowToShow){
+        if(typeof(rowToShow) == 'number'){
             $scope.gridOptions.selectRow(rowToShow, true);
-        }else if(currentSelectedRow.rowIndex){
+            rowToShow = null;
+        }else if(typeof(currentSelectedRow.rowIndex) == 'number'){
             $scope.gridOptions.selectRow(currentSelectedRow.rowIndex, true);
         }else{
             $scope.gridOptions.selectRow(0, true);
@@ -402,6 +403,9 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
                             $scope.alerts.addAlert({type: 'success', msg: 'Recipe Removed', closeIn: 1500});
                             listRecipes();
                             $scope.preventSelection = false;
+                            if(row.rowIndex == currentSelectedRow.rowIndex){
+                                rowToShow = 0;
+                            }
                         }, function(){
                             $log.warn('Error on removing Recipe');
                             $scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to Remove Recipe'});
