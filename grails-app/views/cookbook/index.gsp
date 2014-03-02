@@ -9,14 +9,14 @@
     	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'cookbook.css')}" />
     	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ng-grid.css')}" />
     	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/codemirror.css')}" />
-    	<g:javascript src="angular.js" />
+    	<g:javascript src="angularNewVersion/angular.js" />
     	<g:javascript src="codemirror/codemirror.js" />
     	<g:javascript src="codemirror/ui-codemirror.js" />
 		<g:javascript src="codemirror/javascript.js" />
     	<g:javascript src="bootstrap.js" />
     	<g:javascript src="angular-resource.js" />
     	<g:javascript src="ui-bootstrap-tpls-0.10.0.js" />
-    	<g:javascript src="ng-grid-2.0.7.min.js" />
+    	<g:javascript src="ng-grid-2.0.7.debug.js" />
     	<g:javascript src="controllers/cookbook.js" />
 	</head>
 	<body>

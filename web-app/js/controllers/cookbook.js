@@ -8,7 +8,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
     
     // All Vars used
     var restCalls, restCalls, listRecipes, columnSel, actionsTemplate, updateBtns, 
-    currentSelectedRow, lastLoop, confirmation, confirmation, ModalInstanceCtrl;
+    currentSelectedRow, lastLoop, confirmation, confirmation, rowToShow, ModalInstanceCtrl;
 
     $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
     // Resource Calls
@@ -105,14 +105,19 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
     $scope.context = 'All';
     $scope.archived = 'n';
 
+    rowToShow = null;
+
     // Method to Get the list of Recipes.
-    listRecipes = function(){
+    listRecipes = function(ind){
         $scope.recipes = restCalls.getListOfRecipes({archived: $scope.archived, context: $scope.context}, function(data){
             $log.info('Success on getting Recipes');
             if(data.data){
                 $scope.totalItems = data.data.list.length;
                 $scope.gridData = ($scope.totalItems) ? data.data.list : [{'message': 'No results found', 'context': 'none'}]; 
                 $scope.colDefinition = ($scope.totalItems) ? $scope.colDef : $scope.colDefNoData;
+                if(ind){
+                    rowToShow = ind;
+                }
             }else{
                 $log.warn('Moved Temporarily');
                 location.reload();
@@ -157,6 +162,10 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
     // ng-grid stuff
 
+    $scope.preventSelection = false;
+
+    $scope.executeUpdate = true;
+
     columnSel = {index: 0},
     actionsTemplate =   '<div class="gridIcon">'+
                             '<a href="" class="actions edit" title="Edit" ng-click="gridActions(row, 0)">'+
@@ -175,7 +184,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
                                 '<span class="glyphicon glyphicon-trash"></span>'+
                             '</a>'+
                         '</div>';
-    $scope.edittableField = '<input ng-class="colt' + columnSel.index + '" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-blur="updateEntity(row)" />';
+    $scope.edittableField = '<input ng-class="colt' + columnSel.index + '" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-keydown="keyPressed($event, row, col)" ng-blur="updateEntity(row, updateEntity.execute)"/>';
     $scope.colDef = [
         {field:'name', displayName:'Recipe', enableCellEdit: true, enableCellEditOnFocus: false, width: '***', editableCellTemplate: $scope.edittableField},
         {field:'description', displayName:'Description', enableCellEdit: true, enableCellEditOnFocus: false, width: '******', editableCellTemplate: $scope.edittableField},
@@ -203,22 +212,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
         enableCellEditOnFocus: false,
         enableCellEdit: true,
         beforeSelectionChange: function(rowItem){
-            if($scope.editingRecipe){
-                
-                /*$('#unsavedChangesModal').modal('show');
-                $('#unsavedChangesModal .btn.okey').on('click', function(e){
-                    e.preventDefault();
-                    $('#unsavedChangesModal').modal('hide');
-                    $log.log('cancel');
-                    return true;
-                })
-                $('#unsavedChangesModal .btn.cancel, #unsavedChangesModal .close').on('click', function(e){
-                    e.preventDefault();
-                    $('#unsavedChangesModal').modal('hide');
-                    $log.log('no, please');
-                    return false;
-                })*/
-                
+            if($scope.editingRecipe){                
                 confirmation=confirm("Recipe " + currentSelectedRow.entity.name + " has unsaved changes. Press Okay to continue and loose those changes otherwise press Cancel");
                 if (confirmation==true){
                     return true;
@@ -226,7 +220,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
                     return false;
                 }
             }else{
-                if(!$scope.gridActions.executing){
+                if(!$scope.preventSelection){
                     return true;
                 }else{
                     return false;
@@ -265,12 +259,26 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
     };
 
     $scope.$on('ngGridEventData', function(){
-        if(currentSelectedRow.rowIndex){
+        if(rowToShow){
+            $scope.gridOptions.selectRow(rowToShow, true);
+        }else if(currentSelectedRow.rowIndex){
             $scope.gridOptions.selectRow(currentSelectedRow.rowIndex, true);
         }else{
             $scope.gridOptions.selectRow(0, true);
         }
     });
+
+    $scope.keyPressed = function(ev, row, col) {
+        var charCode = ev.which || ev.keyCode
+        if (charCode==13){
+            //$scope.executeUpdate = true;
+            //$('.gridStyle input:visible').blur();
+        }else if(charCode==27){
+            //$scope.executeUpdate = false;
+            //$('.gridStyle input:not(:visible)').focus();
+        }
+    }
+
     //------------------------------------------
 
     // Updates all the content below the Recipes list with data from a selected recipe.
@@ -308,7 +316,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
                 }
                 $scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
             }
-            if(!$scope.activeTabs.editor)
+            if(!$scope.activeTabs.history)
                         $scope.activeTabs.editor  = true;
         }else{
             $log.warn('no results found for the selected recipe');
@@ -327,11 +335,9 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
     // Actions for the main Grid
     $scope.gridActions = function(row, ind){
-        
-        console.log(row);
 
         if(ind != 0){
-            $scope.gridActions.executing = true;
+            $scope.preventSelection = true;
         }
         
         if(ind == 1 && $scope.gridData[row.rowIndex].versionNumber < 1){
@@ -342,23 +348,19 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
             actions = {
                 edit : function(){
                     $timeout(function(){
+                        $scope.preventSelection = false;
+                        $scope.activeTabs.editor = true;
                         $location.hash('mainTabset');
                         $anchorScroll();
                     }, 100)
                 },
                 revert : function(){
-                    /*$log.info('Reverting code code');
-                    var selectedId = row.entity.recipeId;
-                    restCalls.revert({moreDetails:selectedId}, function(){
-                        $log.info('Success on reverting Recipe');
-                        $scope.alerts.addAlert({type: 'success', msg: 'Recipe Reverted', closeIn: 1500});
-                        listRecipes();
-                        $scope.gridActions.executing = false;
-                    }, function(){
-                        $log.warn('Error on reverting Recipe');
-                        $scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to Revert Recipe'});
-                        $scope.gridActions.executing = false;
-                    });*/
+                    $scope.preventSelection = false;
+                    $scope.activeTabs.history = true;
+                    $timeout(function(){
+                        $location.hash('mainTabset');
+                        $anchorScroll();
+                    }, 100);
                 },
 
                 archive : function(){
@@ -368,11 +370,11 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
                         $log.info('Success on archiving Recipe');
                         $scope.alerts.addAlert({type: 'success', msg: 'Recipe Archived', closeIn: 1500});
                         listRecipes();
-                        $scope.gridActions.executing = false;
+                        $scope.preventSelection = false;
                     }, function(){
                         $log.warn('Error on archiving Recipe');
                         $scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to Archive Recipe'});
-                        $scope.gridActions.executing = false;
+                        $scope.preventSelection = false;
                     });
                 },
 
@@ -383,11 +385,11 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
                         $log.info('Success on unarchiving Recipe');
                         $scope.alerts.addAlert({type: 'success', msg: 'Recipe UnArchived', closeIn: 1500});
                         listRecipes();
-                        $scope.gridActions.executing = false;
+                        $scope.preventSelection = false;
                     }, function(){
                         $log.warn('Error on unarchiving Recipe');
                         $scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to UnArchive Recipe'});
-                        $scope.gridActions.executing = false;
+                        $scope.preventSelection = false;
                     });
                 },
 
@@ -399,11 +401,11 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
                             $log.info('Success on removing Recipe');
                             $scope.alerts.addAlert({type: 'success', msg: 'Recipe Removed', closeIn: 1500});
                             listRecipes();
-                            $scope.gridActions.executing = false;
+                            $scope.preventSelection = false;
                         }, function(){
                             $log.warn('Error on removing Recipe');
                             $scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to Remove Recipe'});
-                            $scope.gridActions.executing = false;
+                            $scope.preventSelection = false;
                         });
                     }
                 }
@@ -414,7 +416,6 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
     // This boolean is for to differentiate when the click at the grid was in an action or not. 
     // If it was in an action it shouldn't select that row, specially for delete action. Otherwise the grid tries to select a non existing row.
-    $scope.gridActions.executing = false;
     
     // Editor Actions -----------
     $scope.editorActions = {
@@ -488,22 +489,28 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
     // Update recipe. After editing. 
     $scope.updateEntity = function(row) {
-        
+
         var recipeToUpdate = {
                 name : $scope.gridData[row.rowIndex].name,
                 description: $scope.gridData[row.rowIndex].description
             },
+            dataToSend = $.param(recipeToUpdate),
             rid = $scope.gridData[row.rowIndex].recipeId;
+
 
         if(!$scope.save) {
             $scope.save = { promise: null, pending: false, row: null };
         }
+
+        if(!$scope.executeUpdate){
+            return false;
+        };
         
         $scope.save.row = row.rowIndex;
         if(!$scope.save.pending && (recipeToUpdate.name != $scope.currentSelectedRecipe.name || recipeToUpdate.description != $scope.currentSelectedRecipe.description)) {
             $scope.save.pending = true;
             $scope.save.promise = $timeout(function(){
-                restCalls.putInRecipe({details:rid}, recipeToUpdate, function(data, status, headers, config){
+                restCalls.putInRecipe({details:rid}, recipeToUpdate, function(data){
                     if(data.data){
                         $log.info('Racipe Updated');
                         $scope.save.pending = false;
@@ -511,7 +518,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
                         $scope.currentSelectedRecipe.name = recipeToUpdate.name;
                         $scope.currentSelectedRecipe.description = recipeToUpdate.description;
 
-                        $scope.alerts.addAlert({type: 'success', msg: 'Saved', closeIn: 1500});
+                        $scope.alerts.addAlert({type: 'success', msg: 'Saved', closeIn: 1000});
                     }else{
                         $log.warn('Moved Temporarily');
                         location.reload();
@@ -558,10 +565,10 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
     var save = function(){
         $log.info('04 - Save function');
         var dataToSend = $.param($scope.newRecipe);
-        restCalls.createRecipe(dataToSend, function(){
+        restCalls.createRecipe(dataToSend, function(data){
             $log.info('05 - Recipe created');
             $scope.alerts.addAlert({type: 'success', msg: 'Recipe Created', closeIn: 1500});
-            listRecipes();
+            listRecipes($scope.gridData.length);
         }, function(){
             $log.warn('Error when creating recipe');
             $scope.alerts.addAlert({type: 'danger', msg: 'Saved'});
