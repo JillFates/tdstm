@@ -404,19 +404,10 @@ class ProjectController {
 	def create = {
 		def projectInstance = new Project()
 		projectInstance.properties = params
+		def projectDetails = projectService.getProjectPatnerAndManagerDetails()
 
-		def tdsParty = PartyGroup.findByName( 'TDS' )
-
-		def clients = partyRelationshipService.getCompanyClients(tdsParty)
-
-		def partners = partyRelationshipService.getCompanyPartners(tdsParty)
-
-		def managers = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = ${tdsParty.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
-		managers?.sort{it.partyIdTo?.lastName}
-		
-		def workflowCodes = stateEngineService.getWorkflowCode()
-
-		return [ projectInstance:projectInstance, clients:clients , partners:partners , managers:managers, workflowCodes: workflowCodes ]
+		return [ projectInstance:projectInstance, clients:projectDetails.clients , partners:projectDetails.partners , 
+					managers:projectDetails.managers, workflowCodes: projectDetails.workflowCodes ]
 	}
 
 	/*
@@ -446,11 +437,15 @@ class ProjectController {
 		if( file && file.getContentType() && file.getContentType() != "application/octet-stream" ){
 			if(params.projectPartner == ""){
 		   		flash.message = " Please select Associated Partner to upload Image. "
-				redirect(action:'create' )
+				def projectDetails = projectService.getProjectPatnerAndManagerDetails()
+				render( view:'create', model:[ projectInstance:projectInstance, clients:projectDetails.clients, partners:projectDetails.partners,
+											 managers:projectDetails.managers, workflowCodes: projectDetails.workflowCodes ,prevParam:params] )
 				return;
 			} else if (! okcontents.contains(file.getContentType())) {
 				flash.message = "Image must be one of: ${okcontents}"
-				redirect(action:'create')
+				def projectDetails = projectService.getProjectPatnerAndManagerDetails()
+				render( view:'create', model:[ projectInstance:projectInstance, clients:projectDetails.clients, partners:projectDetails.partners,
+											 managers:projectDetails.managers, workflowCodes: projectDetails.workflowCodes ,prevParam:params] )
 				return;
 			}		
 		}
@@ -466,7 +461,9 @@ class ProjectController {
 		def imageSize = image.getSize()
 		if( imageSize > 50000 ) {
 			flash.message = " Image size is too large. Please select proper Image"
-			redirect(action:'create')
+			def projectDetails = projectService.getProjectPatnerAndManagerDetails()
+			render( view:'create', model:[ projectInstance:projectInstance, clients:projectDetails.clients, partners:projectDetails.partners,
+											 managers:projectDetails.managers, workflowCodes: projectDetails.workflowCodes ,prevParam:params] )
 			return;
 		}
 		
@@ -532,20 +529,9 @@ class ProjectController {
 			flash.message = "Project ${projectInstance} created"
 			redirect( action:show,  imageId:image.id )
 		} else {
-			def tdsParty = PartyGroup.findByName( 'TDS' ).id
-			 
-			//	Populate a SELECT listbox with a list of all CLIENTS relationship to COMPANY (TDS)
-			def clients = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'CLIENTS' and p.partyIdFrom = $tdsParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'CLIENT' order by p.partyIdTo" )
-			 
-			//	Populate a SELECT listbox with a list of all PARTNERS relationship to COMPANY (TDS)
-			def partners = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = $tdsParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER' order by p.partyIdTo" )
-			
-			//	Populate a SELECT listbox with a list of all STAFF relationship to COMPANY (TDS)
-			def managers = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $tdsParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
-			
-			workflowCodes = stateEngineService.getWorkflowCode()
-			  
-			render( view:'create', model:[ projectInstance:projectInstance, clients:clients, partners:partners, managers:managers, workflowCodes: workflowCodes ] )
+			def projectDetails = projectService.getProjectPatnerAndManagerDetails()
+			render( view:'create', model:[ projectInstance:projectInstance, clients:projectDetails.clients, partners:projectDetails.partners,
+											 managers:projectDetails.managers, workflowCodes: projectDetails.workflowCodes ,prevParam:params] )
 		}
 	}
 	

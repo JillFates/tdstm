@@ -14,6 +14,7 @@ class ProjectService {
 	def securityService
 	def partyRelationshipService
 	def jdbcTemplate
+	def stateEngineService
 	
 	/*
 	 * Returns list of completed Project means projects whose completion time is less than today's date
@@ -315,5 +316,22 @@ class ProjectService {
 		}
 		
 		return projects
+	}
+	/**
+	 * This method used to get all clients,patners,managers and workflowcodes.
+	 */
+	def getProjectPatnerAndManagerDetails(){
+		def tdsParty = PartyGroup.findByName( 'TDS' )
+		
+		def clients = partyRelationshipService.getCompanyClients(tdsParty)//	Populate a SELECT listbox with default list as earlier.
+		def partners = partyRelationshipService.getCompanyPartners(tdsParty)
+		
+		//	Populate a SELECT listbox with a list of all STAFF relationship to COMPANY (TDS)
+		def managers = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = ${tdsParty.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
+		managers?.sort{it.partyIdTo?.lastName}
+		
+		def workflowCodes = stateEngineService.getWorkflowCode()
+		
+		return [ clients:clients, partners:partners, managers:managers, workflowCodes: workflowCodes ]
 	}
 }

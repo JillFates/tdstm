@@ -10,11 +10,33 @@
 
       $(document).ready(function() {
           var now = new Date();
-          formatDate(now,'startDate');
-          now.setDate(now.getDate() + 90) ;
-          formatDate(now,'completionDate')
+          if(!'${prevParam?.startDate}'){
+	          formatDate(now,'startDate');
+	          now.setDate(now.getDate() + 90) ;
+	          formatDate(now,'completionDate');
+          }
+          //appending the previous values.
+			if('${prevParam?.client?.id}'){
+				$("#clientId").val('${prevParam?.client?.id}');
+			}
 
+			if('${prevParam?.projectPartner}'){
+				$("#projectPartnerId").val('${prevParam?.projectPartner}');
+			}
+
+			showCustomFields('${prevParam?.customFieldsShown ?: '0'}', 2);
       })
+      
+      function updateManagers(){
+    	  if('${prevParam?.projectManager}'){
+				$("#projectManagerId").val('${prevParam?.projectManager}');
+		   	}
+		  if('${prevParam?.moveManager}'){
+				$("#moveManagerId").val('${prevParam?.moveManager}');
+			}
+       }
+
+      
       function formatDate(dateValue,value)
 	  {
     	    var M = "" + (dateValue.getMonth()+1);
@@ -204,6 +226,7 @@
 			      }
 		      }
 	      }
+	      updateManagers();
       }
       function initialize(){
 	      // This is called when the page loads to initialize Managers
@@ -343,7 +366,7 @@
 				<script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="startDate" id="startDateId"
-					value="<tds:convertDate date="${projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="setCompletionDate(this.value);isValidDate(this.value);"/> 
+					value="<tds:convertDate date="${prevParam?.startDate?: projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="setCompletionDate(this.value);isValidDate(this.value);"/> 
        			<g:hasErrors bean="${projectInstance}" field="startDate">
 					<div class="errors">
 						<g:renderErrors bean="${projectInstance}" as="list" field="startDate" />
@@ -357,7 +380,7 @@
 				<script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                   </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" id="completionDateId"	name="completionDate"
-					value="<tds:convertDate date="${projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="isValidDate(this.value);"/>
+					value="<tds:convertDate date="${prevParam?.completionDate?: projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="isValidDate(this.value);"/>
 				<g:hasErrors bean="${projectInstance}" field="completionDate">
 					<div class="errors"><g:renderErrors bean="${projectInstance}"
 						as="list" field="completionDate" /></div>
@@ -410,9 +433,9 @@
 			<td class="name"><label for="customFieldCount" > Custom Fields Shown: </label>
 				</td>
 				<td class="valueNW"><g:select id="customcount" name="customFieldsShown" from="${projectInstance.constraints.customFieldsShown.inList}" 
-                         onchange="showCustomFields(this.value, 2);" /></td>
+                         value="${prevParam?.customFieldsShown?:'0'}" onchange="showCustomFields(this.value, 2);" /></td>
 			</tr>
-			<g:each in="${ (1..24) }" var="i">
+			<g:each in="${ (1..Project.CUSTOM_FIELD_COUNT) }" var="i">
 				<g:if test="${i % 2 == 1}">
 					<tr class="prop custom_table" id="custom_count_${i}" style="display: none;">
 				</g:if>
