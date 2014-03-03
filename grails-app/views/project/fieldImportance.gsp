@@ -40,6 +40,7 @@
 		</tr>
 	</table>	
 </div>
+<input type="hidden" id="customfieldShown" name="customfieldShown" value="${Project.CUSTOM_FIELD_COUNT}" />
 </div>
 <script type="text/javascript">
 currentMenuId = "#projectMenu";

@@ -85,7 +85,8 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 	}
 	//Constant consists of all customs as list
 	var FIELD_LIST = [];
-	for(i=1;i<25;i++){
+	var customCount = $("#customfieldShown").val();
+	for(i=1;i<=customCount;i++){
 		FIELD_LIST.push("custom"+i);
 	}
 	$scope.assignData = function(type,value,field,phase) {
