@@ -65,19 +65,19 @@
 							<tr>
 								<td class="label ${config.assetName}" nowrap="nowrap"><label for="assetName">Name</label></td>
 								<td><input type="text" id="assetName" name="assetName" class="${config.assetName}" title="gagdjgajgdjgs" value="${assetEntityInstance.assetName}" tabindex="11" /></td>
-								<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment</label></td>
-								<td><g:select id="environment" name="environment" class="${config.environment}" from="${assetEntityInstance.constraints.environment.inList}" value="${assetEntityInstance.environment}"  tabindex="32"></g:select></td>
-								<td>&nbsp</td>
+								<td class="label ${config.description}" nowrap="nowrap">Description</td>
+								<td colspan="2">
+									<input type="text" id="description" class="${config.description}" name="description" 
+										value="${assetEntityInstance.description}" size="35" />
+								</td>
 								<td class="label_sm">Source</td>
 								<td class="label_sm">Target</td>
 							</tr>
 							<tr>
 								<td class="label ${config.assetType}" nowrap="nowrap"><label for="assetType">Type</label></td>
 								<td ><g:select from="${assetTypeOptions}"  class="${config.assetType} assetSelect" id="assetTypeEditId" name="assetType"  value="${assetEntityInstance.assetType}" onChange="selectManufacturer(this.value, 'Edit')" tabindex="12"/></td>
-								<td class="label ${config.priority}" nowrap="nowrap"><label for="priority">Priority</label>
-								</td>
-								<td ><g:select id="priority" name ="priority" class="${config.priority}" from="${priorityOption}" value= "${assetEntityInstance.priority}" noSelection="${['':' Please Select']}" tabindex="21"/>
-								</td>
+								<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment</label></td>
+								<td><g:select id="environment" name="environment" class="${config.environment}" from="${assetEntityInstance.constraints.environment.inList}" value="${assetEntityInstance.environment}" tabindex="32"></g:select></td>
 								<td class="label ${config.sourceLocation}" nowrap="nowrap"><label for="sourceLocationId">Room</label></td>
 									<td >
 										<span class="useRoomS">
@@ -121,9 +121,9 @@
 								   <g:select id="manufacturer" name="manufacturer.id" class="${config.manufacturer} assetSelect" from="${manufacturers}" value="${assetEntityInstance.manufacturer?.id}" onChange="selectModel(this.value,'Edit')" optionKey="id" optionValue="name" noSelection="${[null:'Unassigned']}" tabindex="13"/>
 								 </div>
 								</td>
-								<td class="label ${config.ipAddress}" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
-								<td ><input type="text" id="ipAddress" name="ipAddress" class="${config.ipAddress}"
-									value="${assetEntityInstance.ipAddress}" tabindex="22"/>
+								<td class="label ${config.priority}" nowrap="nowrap"><label for="priority">Priority</label>
+								</td>
+								<td ><g:select id="priority" name ="priority" class="${config.priority}" from="${priorityOption}" value= "${assetEntityInstance.priority}" noSelection="${['':' Please Select']}" tabindex="21"/>
 								</td>
 								<td class="label rackLabel ${config.sourceRack}"  nowrap="nowrap" id="rackId"><label for="sourceRackId">Rack/Cab</label></td>
 								<td class="label bladeLabel ${config.sourceBladeChassis}" nowrap="nowrap" id="bladeId" style="display: none"><label for="sourceBladeChassisId">Blade</label></td>
@@ -153,8 +153,10 @@
 									<g:render template="modelView"  model="[clazz:config.model, models:models, assetEntity:assetEntityInstance, forWhom:'Edit']" />
 								 </div>
 								</td>
-								<td class="label ${config.os}" nowrap="nowrap"><label for="os">OS</label></td>
-								<td ><input type="text" id="os" name="os" class="${config.os}" value="${assetEntityInstance.os}"  tabindex="24"/></td>
+								<td class="label ${config.ipAddress}" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
+								<td ><input type="text" id="ipAddress" name="ipAddress" class="${config.ipAddress}"
+									value="${assetEntityInstance.ipAddress}" tabindex="22"/>
+								</td>
 								<td class="label ${config.sourceRackPosition}" nowrap="nowrap"><label for="sourceRackPositionId">Position</label>
 								<td class="rackLabel"><input type="text" id="sourceRackPositionId" class="${config.sourceRackPosition}"
 									name="sourceRackPosition" value="${assetEntityInstance.sourceRackPosition}" size=10 tabindex="34" /></td>
@@ -173,11 +175,8 @@
 								<td ><input type="text" id="shortName" class="${config.shortName}"
 									name="shortName" value="${assetEntityInstance.shortName}" tabindex="15"/>
 								</td>
-								<td class="label ${config.supportType}" nowrap="nowrap"><label for="supportType">Support Type</label></td>
-								<td ><input type="text" id="supportType" name="supportType" class="${config.supportType}"
-									value="${assetEntityInstance.supportType}" tabindex="26"/>
-								</td>
-								
+								<td class="label ${config.os}" nowrap="nowrap"><label for="os">OS</label></td>
+								<td ><input type="text" id="os" name="os" class="${config.os}" value="${assetEntityInstance.os}"  tabindex="24"/></td>
 								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
 								<td><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${assetEntityInstance.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="38" noSelection="${['null':' Please Select']}"/></td>
 								<td class="label ${config.size}" nowrap="nowrap"><label for="size">Size/Scale </label></td>
@@ -191,12 +190,9 @@
 								<td ><input type="text" id="serialNumber" class="${config.serialNumber}"
 									name="serialNumber" value="${assetEntityInstance.serialNumber}" tabindex="16"/>
 								</td>
-								<td class="label ${config.retireDate}"><label for="retireDate">Retire Date:</label></td>
-								<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'retireDate','errors')}">
-								    <script type="text/javascript" charset="utf-8">
-				                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-				                    </script> <input type="text" class="dateRange ${config.retireDate}" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate" tabindex="27"
-									value="<tds:convertDate date="${assetEntityInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" tabindex="27" />" > 
+								<td class="label ${config.supportType}" nowrap="nowrap"><label for="supportType">Support Type</label></td>
+								<td ><input type="text" id="supportType" name="supportType" class="${config.supportType}"
+									value="${assetEntityInstance.supportType}" tabindex="26"/>
 								</td>
 								<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
 								<td><g:select id="planStatus" class="${config.planStatus}" name ="planStatus" from="${planStatusOptions}" value= "${assetEntityInstance.planStatus}" noSelection="${['':' Please Select']}" tabindex="39"/></td>
@@ -206,12 +202,12 @@
 							<tr>
 								<td class="label ${config.assetTag}" nowrap="nowrap"><label for="assetTag">Tag</label></td>
 								<td ><input type="text" id="assetTag" class="${config.assetTag}" name="assetTag" value="${assetEntityInstance.assetTag}" tabindex="17"/></td>
-								<td  class="label ${config.maintExpDate}"><label for="maintExpDate">Maint Exp.</label></td>
-								<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'maintExpDate','errors')}">
-									<script type="text/javascript" charset="utf-8">
-					                	    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
-					                	    </script> <input type="text" class="dateRange ${config.maintExpDate}" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate" tabindex="28"
-									value="<tds:convertDate date="${assetEntityInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" > 
+								<td class="label ${config.retireDate}"><label for="retireDate">Retire Date:</label></td>
+								<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'retireDate','errors')}">
+								    <script type="text/javascript" charset="utf-8">
+				                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+				                    </script> <input type="text" class="dateRange ${config.retireDate}" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate" tabindex="27"
+									value="<tds:convertDate date="${assetEntityInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" tabindex="27" />" > 
 								</td>
 								<td class="label ${config.validation}"><label for="validation">Validation</label></td>
 								<td  colspan="2"><g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" class="${config.validation}" name="validation" onChange="assetFieldImportance(this.value,'AssetEntity');" value="${assetEntityInstance.validation}"/>	
@@ -220,13 +216,22 @@
 							<tr>
 								<td class="label ${config.railType}" nowrap="nowrap"><label for="railType">Rail Type</label></td>
 								 <td ><g:select id="railType" class="${config.railType}" name ="railType" from="${railTypeOption}" value= "${assetEntityInstance.railType}" noSelection="${['':' Please Select']}" tabindex="64"/></td>
-								<td class="label ${config.truck}" nowrap="nowrap"><label for="truck">Truck/Cart/Shelf</label></td>
+								<td  class="label ${config.maintExpDate}"><label for="maintExpDate">Maint Exp.</label></td>
+								<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'maintExpDate','errors')}">
+									<script type="text/javascript" charset="utf-8">
+					                	    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+					                	    </script> <input type="text" class="dateRange ${config.maintExpDate}" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate" tabindex="28"
+									value="<tds:convertDate date="${assetEntityInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" > 
+								</td>
+								
+							</tr>
+							<tr>
+							<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
+							<td><input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" value="${assetEntityInstance.externalRefId}" tabindex="11" /></td>
+							<td class="label ${config.truck}" nowrap="nowrap"><label for="truck">Truck/Cart/Shelf</label></td>
 								<td ><input type="text" id="truck" class="${config.truck}" name="truck" value="${assetEntityInstance.truck}" size=3 tabindex="61" />
 								<input type="text" id="cart" class="${config.cart}" name="cart" value="${assetEntityInstance.cart}" size=3 tabindex="62" />
 								<input type="text" id="shelf" class="${config.shelf}" name="shelf" value="${assetEntityInstance.shelf}" size=2 tabindex="63" /></td>
-								<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
-								<td><input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" value="${assetEntityInstance.externalRefId}" tabindex="11" /></td>
-								
 							</tr>
 							<tbody class="customTemplate">
 							<g:render template="customEdit" ></g:render>
