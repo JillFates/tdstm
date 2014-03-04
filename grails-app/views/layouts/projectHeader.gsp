@@ -451,6 +451,7 @@
 						<ul>
 							<li><a href="/tdstm/reports/applicationProfiles" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Application Profiles</a> </li>
 							<li><a href="/tdstm/reports/applicationConflicts" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Application Conflicts</a> </li>
+							<li><a href="/tdstm/reports/serverConflicts" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Server Conflicts</a> </li>
 							<tds:hasPermission permission='ShowPlanning'>
 								<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Task+Report"  class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Task Report</a> </li>
 							</tds:hasPermission>

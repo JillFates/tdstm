@@ -1576,5 +1576,47 @@ class ReportsController {
 					params:["_format":"PDF","_name":"${filename}","_file":"taskReport"])
 		}
 	}
+	
+	/**
+	 * used to render to server Conflicts selection criteria.
+	 */
+	def serverConflicts = {
+		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectInstance = Project.findById( currProj )
+		def moveBundleList = MoveBundle.findAllByProject(projectInstance)
+		def moveBundleId = securityService.getUserCurrentMoveBundleId()
+		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId]
+	}
+	
+	/**
+	 * Used to generate server Conflicts.
+	 */
+	def generateServerConflicts = {
+		def project = securityService.getUserCurrentProject()
+		def moveBundleId = params.moveBundle
+		def moveBundleInstance
+		def errorMsg = "Please select a MoveBundle"
+		def bundleConflicts = params.bundleConflicts == 'on'
+		def unresolvedDependencies = params.unresolvedDep == 'on'
+		def noRunsOn = params.noRuns == 'on'
+		def vmWithNoSupport = params.vmWithNoSupport == 'on'
+		if( params.moveBundle == 'useForPlanning' ){
+			return reportsService.genServerConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noRunsOn, vmWithNoSupport, true)
+		}
+		if( moveBundleId && moveBundleId.isNumber() ){
+			def isProjMoveBundle  = MoveBundle.findByIdAndProject( moveBundleId, project )
+			if ( !isProjMoveBundle ) {
+				errorMsg = " User tried to access moveBundle ${moveBundleId} that was not found in project : ${project} "
+				log.warn "generateCheckList: User tried to access moveBundle ${moveBundleId} that was not found in project : ${project}"
+			} else {
+				errorMsg = ""
+				userPreferenceService.setPreference( "MOVE_BUNDLE", "${moveBundleId}" )
+				moveBundleInstance = MoveBundle.get(moveBundleId)
+				return reportsService.genServerConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noRunsOn, vmWithNoSupport, false)
+			}
+		}
+		flash.message = errorMsg
+		redirect( action:"serverConflicts")
+	}
 }
  

@@ -626,4 +626,75 @@ class ReportsService {
 		return smeListByBundle
 	}
 
+	/**
+	 *  Used to generate server conflicts Report.
+	 */
+	def genServerConflicts(def moveBundleId, def bundleConflicts, def unresolvedDep, def runsOn, def vmSupport, def planning){
+		def project = securityService.getUserCurrentProject()
+		ArrayList assetList = new ArrayList()
+		def assetsInBundle
+		log.info "****bundle:${moveBundleId} bundleConflicts:${bundleConflicts} unresolvedDep:${unresolvedDep} RunsOn:${runsOn}  vmSupport:${vmSupport} planning:${planning} "
+		
+		if(planning) {
+			assetsInBundle = AssetEntity.findAllByMoveBundleInList(MoveBundle.findAllByProjectAndUseOfPlanning(project, true).toList())
+		} else {
+			assetsInBundle = AssetEntity.findAllByMoveBundle(MoveBundle.findById(moveBundleId))
+		}
+		log.info "${assetsInBundle}"
+		
+		assetsInBundle.each{asset->
+			def showAsset = false
+			def dependsOnList = AssetDependency.findAllByAsset(asset)
+			def supportsList = AssetDependency.findAllByDependent(asset)
+			def title=''
+			// skipt the asset if there is no deps and support
+			if(!dependsOnList && !supportsList)
+				return
+			
+			if( !bundleConflicts && !unresolvedDep && !runsOn && !vmSupport){
+				showAsset = true
+			} else {
+				// Check for vm No support if showAsset is true
+				if(asset.assetType=='VM' && !supportsList && vmSupport){
+					title = 'No VM support?'
+					showAsset = true
+				}
+				// Check for bundleConflicts if showAsset is false
+				if(!showAsset && bundleConflicts){
+					def conflictIssue = dependsOnList.find{(it.asset.moveBundle?.id != it.dependent.moveBundle?.id) && ( it.status in ['Validated','Questioned','Unknown'] )}
+					if(!conflictIssue){
+						conflictIssue = supportsList.find{(it.asset.moveBundle?.id != it.dependent.moveBundle?.id) && ( it.status in ['Validated','Questioned','Unknown'] )}
+					}
+					if(conflictIssue){
+						showAsset = true
+					}
+				}
+				// Check for unResolved Dependencies if showAsset is false
+				if(!showAsset && unresolvedDep){
+					def statusIssue = dependsOnList.find{it.status in ['Questioned','Unknown']}
+					if(!statusIssue){
+						statusIssue = supportsList.find{it.status in ['Questioned','Unknown']}
+					}
+					if(statusIssue){
+						showAsset = true
+					}
+				}
+				
+				// Check for Run On if showAsset is false
+				if(!showAsset && runsOn){
+					def isRunOn = dependsOnList.find{it.type == 'Runs On'}
+					if(!isRunOn){
+						isRunOn = supportsList.find{it.type == 'Runs On'}
+					}
+					if(!isRunOn){
+						showAsset = true
+						title='No applications?'
+					}
+				}
+			}
+			if(showAsset)
+				assetList.add([ 'app':asset, 'dependsOnList':dependsOnList, 'supportsList':supportsList, 'dependsOnIssueCount':dependsOnList.size, 'supportsIssueCount':supportsList.size, title:title ])
+		}
+		return['project':project, 'appList':assetList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : (moveBundleId), 'columns':9]
+	}
 }
