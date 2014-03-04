@@ -82,7 +82,7 @@
 								</td>
 								<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment</label>
 								</td>
-								<td ><g:select id="environment" class="${config.environment}" name="environment" from="${applicationInstance.constraints.environment.inList}" value="${applicationInstance.environment}"  tabindex="32"></g:select>
+								<td ><g:select id="environment" class="${config.environment}" name="environment" from="${applicationInstance.constraints.environment.inList}" value="${applicationInstance.environment}"  noSelection="${['':' Please Select']}" tabindex="32"></g:select>
 								</td>
 								<td class="label ${config.userLocations}" nowrap="nowrap"><label for="userLocations">User Location</label>
 								</td>

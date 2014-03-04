@@ -79,7 +79,7 @@
 									<g:select id="environment" class="${config.environment}" name="environment" 
 										from="${applicationInstance.constraints.environment.inList}" 
 										value="${applicationInstance.environment}" 
-										tabindex="32">
+										noSelection="${['':' Please Select']}" tabindex="32">
 									</g:select>
 								</td>
 								<td class="label ${config.userLocations}" nowrap="nowrap"><label for="userLocations">User Location</label>
