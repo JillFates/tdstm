@@ -231,6 +231,9 @@
       function initialize(){
 	      // This is called when the page loads to initialize Managers
 	      var partnerVal = document.getElementById('projectPartnerId').value
+	      if('${prevParam?.projectPartner}'){
+	    	  partnerVal = '${prevParam?.projectPartner}'
+		   }
 	      var clientObj = document.getElementById('clientId').value
 	      ${remoteFunction(action:'getPartnerStaffList', params:'\'client=\'+ clientObj +\'&partner=\'+partnerVal', onComplete:'updateMastersList(e)')}
       }

@@ -139,66 +139,18 @@ class ProjectController {
 
 	def edit = {
 		def projectInstance = Project.get( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
-
+		def projectDetails
 		if (!projectInstance) {
 			flash.message = "Project not found with id ${params.id}"
 			redirect(action:list)
 		}
 		else {
-			def currProj = session.getAttribute("CURR_PROJ");
-			def currProjectInstance = Project.get( currProj.CURR_PROJ )
-			def loginPerson = securityService.getUserLoginPerson()
-			def userCompany = partyRelationshipService.getStaffCompany( loginPerson )
-
-			userPreferenceService.setPreference( "PARTYGROUP", "${userCompany?.id}" )
-			
-			def projectLogo
-			if (currProjectInstance) {
-				projectLogo = ProjectLogo.findByProject(currProjectInstance)
-			}
-			def imageId
-			if (projectLogo) {
-				imageId = projectLogo.id
-			}
-			session.setAttribute("setImage",imageId) 
-			def projectLogoForProject = ProjectLogo.findByProject(projectInstance)
-			def partnerStaff
-			def projectCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_COMPANY' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'COMPANY' ")
-			//def projectClient = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_CLIENT' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'CLIENT' ")
-			def projectPartner = projectService.getProjectPartner( projectInstance )
-			def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
-			def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-			def companyStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
-			companyStaff.each {
-				if ( it.partyIdTo.lastName == null ) {
-					it.partyIdTo.lastName = ""
-				}
-			}
-			companyStaff.sort{it.partyIdTo.lastName}
-			def clientStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectInstance.client.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
-				clientStaff.each {
-				if ( it.partyIdTo.lastName == null ) {
-					it.partyIdTo.lastName = ""
-				}
-			}
-			clientStaff.sort{it.partyIdTo.lastName}
-			def companyPartners = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER' order by p.partyIdTo" )
-			companyPartners.sort{it.partyIdTo.name}
-			if (projectPartner != null) {
-				partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectPartner.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
-				partnerStaff.each {
-					if ( it.partyIdTo.lastName == null ) {
-						it.partyIdTo.lastName = ""
-					}
-				}
-				partnerStaff.sort{it.partyIdTo.lastName}
-			}
-			clientStaff.each{staff->
-			}
-			def workflowCodes = stateEngineService.getWorkflowCode()
-			return [ projectInstance : projectInstance, projectPartner:projectPartner, projectManager:projectManager, moveManager:moveManager, companyStaff:companyStaff, clientStaff:clientStaff, partnerStaff:partnerStaff, companyPartners:companyPartners,projectLogoForProject:projectLogoForProject,
-					 workflowCodes:workflowCodes ]
+			projectDetails = projectService.getprojectEditDetails(projectInstance,[:])
 		}
+		return [ projectInstance : projectInstance, projectPartner: projectDetails.projectPartner, projectManager: projectDetails.projectManager, 
+				 moveManager: projectDetails.moveManager, companyStaff: projectDetails.companyStaff, clientStaff: projectDetails.clientStaff, 
+				 partnerStaff: projectDetails.partnerStaff, companyPartners: projectDetails.companyPartners,
+				 projectLogoForProject: projectDetails.projectLogoForProject, workflowCodes: projectDetails.workflowCodes ]
 	}
 
 	/*
@@ -235,12 +187,20 @@ class ProjectController {
 				def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
 				if( file.getContentType() && file.getContentType() != "application/octet-stream"){
 					if(params.projectPartner == ""){
+						def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
 						flash.message = " Please select Associated Partner to upload Image. "
-						redirect(action:'edit')
+						render( view:'edit', model:[ projectInstance : projectInstance, projectPartner: projectDetails.projectPartner, projectManager: projectDetails.projectManager, 
+													 moveManager: projectDetails.moveManager, companyStaff: projectDetails.companyStaff, clientStaff: projectDetails.clientStaff, 
+													 partnerStaff: projectDetails.partnerStaff, companyPartners: projectDetails.companyPartners, workflowCodes: projectDetails.workflowCodes,
+													 projectLogoForProject: projectDetails.projectLogoForProject, prevParam:params] )
 						return;
 					} else if (! okcontents.contains(file.getContentType())) {
+						def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
 						flash.message = "Image must be one of: ${okcontents}"
-						redirect(action:'edit' )
+						render( view:'edit', model:[ projectInstance : projectInstance, projectPartner: projectDetails.projectPartner, projectManager: projectDetails.projectManager, 
+													 moveManager: projectDetails.moveManager, companyStaff: projectDetails.companyStaff, clientStaff: projectDetails.clientStaff, 
+													 partnerStaff: projectDetails.partnerStaff, companyPartners: projectDetails.companyPartners, workflowCodes: projectDetails.workflowCodes,
+													 projectLogoForProject: projectDetails.projectLogoForProject, prevParam:params] )
 						return;
 					}
 				}
@@ -263,16 +223,24 @@ class ProjectController {
 				
 				def imageSize = image.getSize()
 				if( imageSize > 50000 ) {
+					def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
 					flash.message = " Image size is too large. Please select proper Image"
-					redirect(action:'edit')
+					render( view:'edit', model:[ projectInstance : projectInstance, projectPartner: projectDetails.projectPartner, projectManager: projectDetails.projectManager, 
+													 moveManager: projectDetails.moveManager, companyStaff: projectDetails.companyStaff, clientStaff: projectDetails.clientStaff, 
+													 partnerStaff: projectDetails.partnerStaff, companyPartners: projectDetails.companyPartners, workflowCodes: projectDetails.workflowCodes,
+													 projectLogoForProject: projectDetails.projectLogoForProject, prevParam:params] )
 					return;
 				}
 				if(file.getContentType() == "application/octet-stream"){
 					//Nonthing to perform.
 				} else if(params.projectPartner){
 					if(!image.save()){
+						def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
 						flash.message = " Image Upload Error."
-						redirect(action:'edit' )
+						render( view:'edit', model:[ projectInstance : projectInstance, projectPartner: projectDetails.projectPartner, projectManager: projectDetails.projectManager, 
+													 moveManager: projectDetails.moveManager, companyStaff: projectDetails.companyStaff, clientStaff: projectDetails.clientStaff, 
+													 partnerStaff: projectDetails.partnerStaff, companyPartners: projectDetails.companyPartners, workflowCodes: projectDetails.workflowCodes,
+													 projectLogoForProject: projectDetails.projectLogoForProject, prevParam:params] )
 						return;
 					}
 				}
@@ -390,7 +358,12 @@ class ProjectController {
 			}
 			else {
 				flash.message = "Project ${projectInstance} not updated"
-				redirect( action:edit, id:params.id )
+				def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
+				projectInstance.discard()
+				render( view:'edit', model:[ projectInstance : projectInstance, projectPartner: projectDetails.projectPartner, projectManager: projectDetails.projectManager, 
+											 moveManager: projectDetails.moveManager, companyStaff: projectDetails.companyStaff, clientStaff: projectDetails.clientStaff, 
+											 partnerStaff: projectDetails.partnerStaff, companyPartners: projectDetails.companyPartners, workflowCodes: projectDetails.workflowCodes,
+											 projectLogoForProject: projectDetails.projectLogoForProject, prevParam:params] )
 			}
 		} else {
 			flash.message = "Project not found with id ${params.id}"
