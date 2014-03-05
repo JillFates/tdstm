@@ -1568,7 +1568,7 @@ class AssetEntityController {
 			targetLocation:filters?.targetLocationFilter ?:'', targetRack:filters?.targetRackFilter ?:'', assetTag:filters?.assetTagFilter ?:'', 
 			serialNumber:filters?.serialNumberFilter ?:'', sortIndex:filters?.sortIndex, sortOrder:filters?.sortOrder, moveBundleId:params.moveBundleId,
 			staffRoles:taskService.getRolesForStaff(), sizePref:userPreferenceService.getPreference("assetListSize")?: '25' , moveBundleList:moveBundleList,
-			 attributesList:attributesList, assetPref:assetPref, modelPref:modelPref, listType:listType, prefType :prefType]) 
+			 attributesList:attributesList, assetPref:assetPref, modelPref:modelPref, listType:listType, prefType :prefType, justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true']) 
 	}
 	/**
 	 * This method is used by JQgrid to load assetList
@@ -1666,7 +1666,7 @@ class AssetEntityController {
 					temp +="ae.${WebUtil.splitCamelCase(value)} AS ${value},"
 			}
 		}
-		
+		def justPlanning = userPreferenceService.getPreference("assetJustPlanning")?:'true'
 		def query = new StringBuffer(""" 
 			SELECT * FROM ( 
 				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName, ae.asset_type AS assetType, m.name AS model, ae.source_location AS sourceLocation, 
@@ -1686,7 +1686,7 @@ class AssetEntityController {
 			
 		query.append(""" \n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
 				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
-				WHERE ae.project_id = ${project.id} """)
+				WHERE ae.project_id = ${project.id} AND mb.use_of_planning=${justPlanning}""")
 		
 		//which will limit the query based on physical or server Assets.
 		if(listType=='server')

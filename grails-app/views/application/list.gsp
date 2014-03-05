@@ -58,6 +58,7 @@
 					</tds:hasPermission>\
 					<tds:hasPermission permission="AssetDelete">\
 						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'Application\')" disabled="disabled"/></span>\
+						<span><input type="checkbox" id="justPlanning" ${ (justPlanning == 'true' ? 'checked="checked"': '') } onclick="toggleJustPlanning($(this))"/> Just Planning</span>\
 					</tds:hasPermission>\
 					<g:if test="${moveEvent != null}"><g:link class="mmlink" controller="application" action="list"><span class="capBtn"><input type="button" value="Clear Filters" /></span></g:link></g:if>'
 				<jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"

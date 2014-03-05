@@ -69,7 +69,7 @@ class FilesController {
 			staffRoles:taskService.getRolesForStaff(), moveBundleId:params.moveBundleId, fileName:filters?.assetNameFilter ?:'', 
 			fileFormat:filters?.fileFormatFilter, size:filters?.sizeFilter,toValidate:params.toValidate,
 			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref, moveBundleList:moveBundleList,
-			attributesList:attributesList, filesPref:filesPref, modelPref:modelPref]
+			attributesList:attributesList, filesPref:filesPref, modelPref:modelPref, justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true']
 		
 	}
 	/**
@@ -106,7 +106,7 @@ class FilesController {
 				filterParams << [ (attribute.attributeCode): params[(attribute.attributeCode)]]
 		}
 		def initialFilter = params.initialFilter in [true,false] ? params.initialFilter : false
-		
+		def justPlanning = userPreferenceService.getPreference("assetJustPlanning")?:'true'
 		//TODO:need to move the code to AssetEntityService 
 		def temp=""
 		filePref.each{key,value->
@@ -140,7 +140,7 @@ class FilesController {
 			LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id
 			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
 			LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
-			WHERE ae.project_id = ${project.id} 
+			WHERE ae.project_id = ${project.id} AND mb.use_of_planning=${justPlanning}
 			GROUP BY files_id ORDER BY ${sortIndex} ${sortOrder}
 			) AS files""")
 		

@@ -62,6 +62,7 @@
 				var listCaption ='Assets: <tds:hasPermission permission="EditAndDelete"><span class=\'button\'><input type=\'button\' value=\'Create Asset\' class=\'create\' onclick="createAssetDetails(\'assetEntity\')"/></span></tds:hasPermission>\
 					<tds:hasPermission permission="AssetDelete">\
 						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'AssetEntity\')" disabled="disabled"/></span>\
+						<span><input type="checkbox" id="justPlanning" ${ (justPlanning == 'true' ? 'checked="checked"': '') } onclick="toggleJustPlanning($(this))"/> Just Planning</span>\
 					</tds:hasPermission>\
 					<g:if test="${moveEvent != null}"><g:link class="mmlink" controller="assetEntity" action="list"><span class="capBtn"><input type="button" value="Clear Filters" /></span></g:link></g:if>'
 				<jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"

@@ -1092,3 +1092,15 @@ $(window).scroll(function(event){
     //Updates scroll position
     lastScroll = st;
 });
+
+function toggleJustPlanning($me){
+	var isChecked= $me.is(":checked")
+	jQuery.ajax({
+        url:contextPath+'/assetEntity/setImportPerferences',
+        data:{'selected':isChecked, 'prefFor':'assetJustPlanning'},
+        type:'POST',
+		success: function(data) {
+			window.location.reload()
+		}
+    });
+}

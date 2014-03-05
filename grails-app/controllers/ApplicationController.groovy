@@ -78,7 +78,7 @@ class ApplicationController {
 			validation:params.validation, moveBundleId:params.moveBundleId, appName:filters?.assetNameFilter ?:'', sizePref:sizePref,toValidate:params.toValidate, 
 			validationFilter:filters?.appValidationFilter ?:'', moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'',
 			partyGroupList:companiesList, availabaleRoles:availabaleRoles, company:company, moveEvent:moveEvent, moveBundleList:moveBundleList,
-			attributesList:attributesList, appPref:appPref, modelPref:modelPref]
+			attributesList:attributesList, appPref:appPref, modelPref:modelPref, justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true']
 	}
 	/**
 	 * This method is used by JQgrid to load appList 
@@ -116,7 +116,7 @@ class ApplicationController {
 		
 		//def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
 		//def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
-		
+		def justPlanning = userPreferenceService.getPreference("assetJustPlanning")?:'true'
 		def customizeQuery = assetEntityService.getAppCustomQuery(appPref)
 		def query = new StringBuffer("""SELECT * FROM ( SELECT a.app_id AS appId, ae.asset_name AS assetName,a.latency AS latency,
 										ac.status AS commentStatus, ac.comment_type AS commentType,me.move_event_id AS event,""")
@@ -137,7 +137,7 @@ class ApplicationController {
 		
 		query.append("""\n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
 		LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
-		WHERE ae.project_id = ${project.id} 
+		WHERE ae.project_id = ${project.id} AND mb.use_of_planning=${justPlanning}
 		GROUP BY app_id ORDER BY ${sortIndex} ${sortOrder}
 		) AS apps""")
 		
