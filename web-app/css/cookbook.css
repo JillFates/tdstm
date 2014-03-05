@@ -155,6 +155,14 @@ form .error-msg{
 
 .archiveCheckWrapper{margin:5px 0 0 0;}
 
+.versionLinks{
+	margin: 4px 0;
+}
+
+.versionLinks label{
+	font-weight: normal;
+}
+
 /*animations*/
 .alert{
 	-webkit-transition:all ease 0.5s;

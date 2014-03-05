@@ -353,29 +353,37 @@ class CookbookService {
 //			throw new UnauthorizedException('User doesn\'t have a RevertRecipe permission')
 //		}
 		
+		println(recipeId);
+		println(loginUser);
+		println(currentProject);
+
 		if (recipeId == null) {
+			println('001');
 			throw new EmptyResultException('Recipe id is empty');
 		}
 		if (!recipeId.isNumber()) {
+			println('002');
 			throw new EmptyResultException('Recipe id is not a number');
 		}
 		if (currentProject == null) {
+			println('003');
 			throw new EmptyResultException('Project is empty');
 		}
-
 		//TODO check this checkAccess(loginUser.person, currentProject)
 		def recipe = Recipe.get(recipeId)
 		
 		if (recipe.releasedVersion == null) {
+			println('004');
 			throw new EmptyResultException('Release version is empty');
 		}
 		
 		def wip = RecipeVersion.findByRecipeAndVersionNumber(recipe, 0)
-		
+		println(wip);
+
 		if (wip != null) {
 			wip.delete(failOnError: true)
 		} else {
-			throw new EmptyResultException();
+			throw new EmptyResultException('wip is null');
 		}
 	}
 	
@@ -994,7 +1002,7 @@ class RecipeMapper implements RowMapper {
 		rowMap.description = rs.getString('description')
 		rowMap.createdBy = rs.getString('createdBy')
 		rowMap.versionNumber = rs.getInt('versionNumber')
-		rowMap.hasWIP = rs.getString('hasWIP').equals('1')
+		rowMap.hasWIP = (rs.getString('hasWIP').equals('1')) ? 'yes' : ''
 		rowMap.context = rs.getString('context')
 		rowMap.lastUpdated = rs.getTimestamp('last_updated')
 		return rowMap

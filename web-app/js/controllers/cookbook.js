@@ -279,16 +279,23 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
             //$('.gridStyle input:not(:visible)').focus();
         }
     }
-
     //------------------------------------------
 
+    $scope.checkOpts;
+
     // Updates all the content below the Recipes list with data from a selected recipe.
-    // Added the Save WIP method here.
-    $scope.changeRecipe = function(){
-        var item = $scope.gridOptions.selectedItems[0];
+    $scope.changeRecipe = function(getWIP){
+        var item = $scope.gridOptions.selectedItems[0],
+            // recipeVersion will be 0 to get WIP or '' to get the latest version.
+            recipeVersion = (getWIP) ? 0 : '';
+        if(getWIP && !item.hasWIP){
+            $scope.editorActions.saveWIP();
+            return false;
+        }
+        
         if(item && $scope.totalItems){
             if(item.hasWIP || item.versionNumber > 0){
-                rec = restCalls.getARecipeVersion({details:item.recipeId, moreDetails:''}, function(){
+                rec = restCalls.getARecipeVersion({details:item.recipeId, moreDetails:recipeVersion}, function(){
                     
                     // This is the selected recipe data.
                     $scope.selectedRecipe = (rec.data) ? rec.data : null;
@@ -297,6 +304,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
                     $scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
 
                     $log.info('Success on getting selected recipe');
+
+                    $scope.checkOpts = ($scope.selectedRecipe.versionNumber > 0) ? 'release' : 'wip';
 
                 }, function(){
                     $log.info('No records found for selected Recipe');

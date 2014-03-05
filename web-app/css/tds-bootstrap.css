@@ -25,3 +25,7 @@ table{
 	background-color: RGBA(80, 80, 80, 0.3);
 	border-color: RGBA(190, 190, 190, 0.5);
 }
+
+.nav-tabs > li > a{
+	font-weight: normal;
+}

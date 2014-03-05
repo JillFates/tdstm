@@ -191,18 +191,28 @@
 							<tab heading="Editor" select="executeCodeMirror(this)" active="activeTabs.editor">
 								<div class="row clearfix edition">
 									<div class="col-xs-6">
-										<h5 class="headingTitle">Recipe</h5>
+										<div class="titleWrapper row">
+											<h5 class="headingTitle col-xs-6">Recipe</h5>
+											<div class="versionLinks col-xs-6" style="text-align: right;">
+												<label for="releasedVersionRadio" ng-show="gridOptions.selectedItems[0].versionNumber > 0">
+													<input type="radio" ng-checked="selectedRecipe.versionNumber > 0" ng-model="checkOpts" value="release" ng-click="changeRecipe(false)" name="releasedWipVersion" id="releasedVersionRadio"> Version {{gridOptions.selectedItems[0].versionNumber}}
+												</label>
+												<label for="wipVersionRadio" style="margin-left: 15px;">
+													<input type="radio" ng-checked="selectedRecipe.versionNumber < 1" ng-model="checkOpts" value="wip" ng-click="changeRecipe(true)" name="releasedWipVersion" id="wipVersionRadio"> WIP
+												</label>
+											</div>
+										</div>
 										<section class="codeMirrorWrapper"> 
 											<textarea name="recipeCode" id="recipeCode" rows="10" ng-model="selectedRecipe.sourceCode" ng-disabled="!currentSelectedRecipe" value="{{selectedRecipe.sourceCode}}"></textarea>
 										</section>
 										<div class="clearfix btns">
 											<div class="btn-group pull-left" style="margin-right:15px;">
 												<button type="button" class="btn btn-default" ng-disabled="!currentSelectedRecipe" ng-click="editorActions.saveWIP()">Save WIP</button>
-												<button type="button" ng-disabled="!selectedRecipe.hasWIP || !currentSelectedRecipe" class="btn btn-default" ng-click="editorActions.releaseVersion()">Release</button>
+												<button type="button" ng-disabled="!selectedRecipe.hasWIP || !currentSelectedRecipe || selectedRecipe.versionNumber > 0" class="btn btn-default" ng-click="editorActions.releaseVersion()">Release</button>
 											</div>
 											<div class="btn-group pull-left">
 												<button type="button" class="btn btn-default" ng-disabled="!editingRecipe || !currentSelectedRecipe" ng-click="editorActions.cancelChanges()">Cancel</button>
-												<button type="button" class="btn btn-default" ng-disabled="!selectedRecipe.hasWIP || !currentSelectedRecipe" ng-click="editorActions.discardWIP()">Discard WIP</button>
+												<button type="button" class="btn btn-default" ng-disabled="!selectedRecipe.hasWIP || !currentSelectedRecipe || selectedRecipe.versionNumber > 0" ng-click="editorActions.discardWIP()">Discard WIP</button>
 											</div>
 											<button type="submit" class="btn btn-default pull-right" ng-disabled="selectedRecipe.sourceCode == '' || !currentSelectedRecipe" ng-click="editorActions.validateSyntax()">Validate Syntax</button>
 										</div>
