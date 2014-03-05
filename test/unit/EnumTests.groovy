@@ -32,6 +32,7 @@ class EnumTests extends GrailsUnitTestCase {
 		assertTrue	'$label getLabels() is a List', (labels instanceof List)
 		assertEquals "$label getKeys()[0]", firstKey, keys[0]
 		assertEquals "$label getLabels()[0]", firstLabel, labels[0]
+
 		assertTrue "$label asEnum() positive", (e.asEnum(firstKey) != null)
 		assertTrue "$label asEnum() negative", (e.asEnum('XYZZy123') == null)
 
@@ -50,12 +51,19 @@ class EnumTests extends GrailsUnitTestCase {
 	}
 
 	void testTaskDependencyType() {
-		enumTest TaskDependencyType, TaskDependencyType.FS, 'FS', 'Finish-Start', 'FF', 'Finish-Finish'
+		enumTest TaskDependencyType, TaskDependencyType.FS, 'FS', 'Finish-Start', 'FR', 'Finish-Ready'
 	}
 
 	void testTimeConstraintType() {
 		enumTest TimeConstraintType, TimeConstraintType.ASAP, 'ASAP', 'As Soon As Possible', 'ALAP', 'As Late As Possible'
 	}
 
+	void testDurationScale() {
+		enumTest DurationScale, DurationScale.W, 'W', 'Weeks', 'M', 'Minutes'
+	}
+
+	void testSecurityRole() {
+		enumTest SecurityRole, SecurityRole.ADMIN, 'ADMIN', 'Administrator', 'USER', 'User'
+	}
 
 }

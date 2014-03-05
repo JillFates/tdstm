@@ -1,32 +1,25 @@
 /**
- * The SpeedScale represents the speed scale or unit of measure used to represent the speed of a resource
+ * The SecurityRole represents the various Security roles that users can be assigned to
  */
 
 package com.tdsops.tm.enums.domain
 
-enum SpeedScale {
+enum SecurityRole {
 
-	Kbps ('Kilobit/sec'),
-	KBps ('KiloByte/sec'),
-	Mbps ('Megabit/sec'),
-	MBps ('MegaByte/sec'),
-	Gbps ('Gigabit/sec'),
-	GBps ('GigaByte/sec')
-
-	// Used to access the application's default value to use
-	static SpeedScale getDefault() {
-		return SpeedScale.MBps
-	}
+	USER ('User'),	// Limited access
+	EDITOR ('Editor'),	// Client user with moderate access'),
+	SUPERVISOR ('Supervisor'), 
+	ADMIN ('Administrator') // All rights
 
 	//
-	// Boiler Plate from here down ('Just swap out the enum class name
+	// Boiler Plate from here down - Just swap out the enum class name
 	//
 
 	String value
 	private static List keys
 	private static List labels
 
-	SpeedScale(String value) {
+	SecurityRole(String value) {
 		this.value = value
 	}	
 
@@ -34,10 +27,10 @@ enum SpeedScale {
 	String value() { value }
 
 	// Used to convert a string to the enum or null if string doesn't match any of the constants
-	static SpeedScale asEnum(key) {
+	static SecurityRole asEnum(key) {
 		def obj
 		try {
-			obj = key as SpeedScale
+			obj = key as SecurityRole
 		} catch (e) { }
 		return obj
 	}
@@ -52,7 +45,7 @@ enum SpeedScale {
 	// Construct the static keys 
 	private static synchronized void buildKeys() { 
 		if (keys == null) {
-			keys = SpeedScale.values()*.name()
+			keys = SecurityRole.values()*.name()
 		}
 	} 
 
@@ -66,7 +59,7 @@ enum SpeedScale {
 	// Construct the static labels 
 	private static synchronized void buildLabels() { 
 		if (labels == null) {
-			labels = SpeedScale.values()*.value
+			labels = SecurityRole.values()*.value
 		}
 	} 
 

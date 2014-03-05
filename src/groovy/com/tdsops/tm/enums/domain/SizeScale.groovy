@@ -51,7 +51,7 @@ enum SizeScale {
 	// Construct the static keys 
 	private static synchronized void buildKeys() { 
 		if (keys == null) {
-			keys = SizeScale.values()
+			keys = SizeScale.values()*.name()
 		}
 	} 
 
