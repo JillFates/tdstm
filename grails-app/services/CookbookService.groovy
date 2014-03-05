@@ -544,7 +544,7 @@ class CookbookService {
 		
 		
 		def recipes = namedParameterJdbcTemplate.query("""
-				SELECT DISTINCT recipe.recipe_id as recipeId, recipe.name, recipe.description, recipe.context, recipe.last_updated, CONCAT(person.first_name, ' ', person.last_name)  as createdBy, recipe.last_updated as lastUpdated, recipe_version.version_number as versionNumber, IF(ISNULL(rv2.version_number), false, true) as hasWIP 
+				SELECT DISTINCT recipe.recipe_id as recipeId, recipe.name, recipe.description, recipe.context, IF(ISNULL(recipe_version.last_updated), rv2.last_updated, recipe_version.last_updated) as last_updated, CONCAT(person.first_name, ' ', person.last_name)  as createdBy, recipe.last_updated as lastUpdated, recipe_version.version_number as versionNumber, IF(ISNULL(rv2.version_number), false, true) as hasWIP 
 				FROM recipe
 				LEFT OUTER JOIN recipe_version ON recipe.released_version_id = recipe_version.recipe_version_id
 				LEFT OUTER JOIN recipe_version as rv2 ON recipe.recipe_id = rv2.recipe_id AND rv2.version_number = 0
