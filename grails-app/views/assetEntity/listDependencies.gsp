@@ -28,7 +28,7 @@
 					</tds:hasPermission>"
 				<jqgrid:grid id="dependencyGridId" url="'${createLink(action: 'listDepJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
-					colNames="'Asset','AssetClass', 'Bundle','Type', 'Depends On', 'Dep Class', 'Dep Bundle', 'Frequency', 'Status', 'Comment'"
+					colNames="'Asset','AssetClass', 'Bundle','Type', 'Depends On', 'Dep Class', 'Dep Bundle', '${columnLabelpref['1']}', '${columnLabelpref['2']}', 'Status'"
 					colModel="{name:'assetName', index: 'assetName', width:'200',formatter: myLinkFormatter},
 								  {name:'assetType', editable: true},
 								  {name:'assetBundle', editable: true},
@@ -36,9 +36,9 @@
 								  {name:'dependentName', editable: true,formatter: dependentFormatter,width:'200'},
 								  {name:'dependentType', editable: true},
 								  {name:'dependentBundle', editable: true},
-								  {name:'frequency', editable: true,width:'90'},
-								  {name:'status', editable: true, width:'80'},
-								  {name:'comment',editable:true, width:'100'}"
+								  {name:'${depPref['1']}', editable: true,width:'100'},
+								  {name:'${depPref['2']}',editable:true, width:'100'},
+								  {name:'status', editable: true, width:'80'}"
 					sortname="'assetName'"
 					caption="listCaption"
 					multiselect="true"
@@ -50,7 +50,10 @@
 					<jqgrid:navigation id="dependencyGridId" add="false" edit="false" del="false" search="false" refresh="false" />
 					<jqgrid:refreshButton id="dependencyGridId" />
 				</jqgrid:grid>
-				
+				<g:each var="key" in="['1','2']">
+					var depPref= '${depPref[key]}';
+					$("#dependencyGridIdGrid_"+depPref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:relative;float:right;margin-top: -15px;" onclick="showSelect(\''+depPref+'\',\'dependencyGrid\',\''+${key}+'\')">');
+				</g:each>
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
 					var value = cellvalue ? cellvalue : ''
@@ -77,6 +80,18 @@
 			<div id="editEntityView" style="display: none;"></div>
 			<div id="cablingDialogId" style="display: none;"></div>
 			<jqgrid:wrapper id="dependencyGridId" />
+			<g:each var="key" in="['1','2']">
+				<div id="columnCustomDiv_${depPref[key]}" style="display:none;">
+					<div class="columnDiv_${key} customScroll" style="background-color: #F8F8F8 ;height: 133px;position: fixed; top: 148px;width:8%;;z-index: 2147483647; overflow-y: scroll;text-align: left;">
+						<input type="hidden" id="previousValue_${key}" value="${depPref[key]}" />
+						<g:each var="attribute" in="${attributesList}">
+							<label><input type="radio" name="coloumnSelector_${depPref[key]}" id="coloumnSelector_${depPref[key]}" value="${attribute}" 
+								${depPref[key]==attribute?'checked':'' } style="margin-left:11px;" 
+								onchange="setColumnAssetPref(this.value,'${key}','Dep_Columns')"/> ${attribute}</label><br>
+						</g:each>
+					</div>
+				</div>
+			</g:each>
 			<g:render template="commentCrud"/> 
 			<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
 		</div>

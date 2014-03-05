@@ -16,6 +16,10 @@ class AssetDependency {
 	Date dateCreated
 	Date lastUpdated
 
+	String c1
+	String c2
+	String c3
+	String c4
 	static constraints = {
 		asset( nullable:false, unique:['dependent', 'type'] )
 		dependent( nullable:true)
@@ -37,6 +41,10 @@ class AssetDependency {
 		status(blank:false, nullable:false )
 		comment(blank:true, nullable:true)
 		updatedBy( nullable:false )
+		c1( blank:true, nullable:true )
+		c2( blank:true, nullable:true )
+		c3( blank:true, nullable:true )
+		c4( blank:true, nullable:true )
 	}
 
 	static mapping={	

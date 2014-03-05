@@ -755,6 +755,10 @@ class AssetEntityController {
 							assetDep.dataFlowDirection = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
 							assetDep.status = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
 							assetDep.comment = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+							assetDep.c1 = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+							assetDep.c2 = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+							assetDep.c3 = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+							assetDep.c4 = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
 							assetDep.updatedBy = userLogins.person
 							if(isNew)
 								assetDep.createdBy = userLogin.person
@@ -1335,9 +1339,9 @@ class AssetEntityController {
 					if(params.dependency=='dependency'){
 						exportedEntity +="X"
 						def assetDependent = AssetDependency.findAll("from AssetDependency where asset.project = ? ",[project])
-						def dependencyMap = ['AssetId':1,'DependentId':2, 'Type':3, 'DataFlowFreq':4, 'DataFlowDirection':5, 'status':6, 'comment':7]
-						def dependencyColumnNameList = ['AssetId','DependentId', 'Type', 'DataFlowFreq', 'DataFlowDirection', 'status', 'comment']
-						def DTAMap = [0:'asset',1:'dependent', 2:'type', 3:'dataFlowFreq', 4:'dataFlowDirection', 5:'status', 6:'comment']
+						def dependencyMap = ['AssetId':1,'DependentId':2, 'Type':3, 'DataFlowFreq':4, 'DataFlowDirection':5, 'status':6, 'comment':7, 'c1':8, 'c2':9, 'c3':10, 'c4':11]
+						def dependencyColumnNameList = ['AssetId','DependentId', 'Type', 'DataFlowFreq', 'DataFlowDirection', 'status', 'comment', 'c1', 'c2', 'c3', 'c4']
+						def DTAMap = [0:'asset',1:'dependent', 2:'type', 3:'dataFlowFreq', 4:'dataFlowDirection', 5:'status', 6:'comment', 7:'c1', 8:'c2', 9:'c3', 10:'c4']
 						def dependentSize = assetDependent.size()
 						for ( int r = 1; r <= dependentSize; r++ ) {
 							//Add assetId for walkthrough template only.
@@ -1345,7 +1349,7 @@ class AssetEntityController {
 							def addAssetDependentId = new Number(0, r, (assetDependent[r-1].id))
 							dependencySheet.addCell( addAssetDependentId )
 
-							for ( int coll = 0; coll < 7; coll++ ) {
+							for ( int coll = 0; coll < 11; coll++ ) {
 								def addContentToSheet
 								if ( assetDependent[r-1].(DTAMap[coll]) == null ) {
 									addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, "" )
@@ -4853,6 +4857,13 @@ class AssetEntityController {
 		 def project = securityService.getUserCurrentProject()
 		 def entities = assetEntityService.entityInfo( project )
 		 def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
+		 def depPref= assetEntityService.getExistingPref('Dep_Columns')
+		 def attributes =[ 'c1':'C1','c2':'C2','c3':'C3','c4':'C4','frequency':'Frequency','comment':'Comment','direction':'Direction']
+		 def columnLabelpref = [:]
+		 depPref.each{key,value->
+			 columnLabelpref << [ (key):attributes[value] ]
+		 }
+		 
 		 if(!hasPerm){
 		 	redirect (controller:"project", action:"list")
 			flash.message = "${message(code:'user.access.denied')}"
@@ -4860,7 +4871,8 @@ class AssetEntityController {
 		 	return [projectId: project.id, assetDependency: new AssetDependency(),
 				 	servers: entities.servers,applications: entities.applications,dbs: entities.dbs, 
 					files: entities.files, networks: entities.networks, 
-					dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, moveBundleList:moveBundleList]
+					dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
+				    moveBundleList:moveBundleList, depPref:depPref,attributesList:attributes.keySet().sort{it}, columnLabelpref:columnLabelpref]
 		 }
 	 }
 	/**
@@ -4875,13 +4887,17 @@ class AssetEntityController {
 		def project = securityService.getUserCurrentProject()
 		def sid
 		 
-		def filterParams = ['assetName':params.assetName, 'assetType':params.assetType, 'assetBundle':params.assetBundle, 'type':params.type,'dependentName':params.dependentName, 'dependentType':params.dependentType,'dependentBundle':params.dependentBundle,'status':params.status,'frequency':params.frequency, 'comment':params.comment]
-		 
+		def filterParams = ['assetName':params.assetName, 'assetType':params.assetType, 'assetBundle':params.assetBundle, 'type':params.type,
+							'dependentName':params.dependentName, 'dependentType':params.dependentType,'dependentBundle':params.dependentBundle,
+							'status':params.status,'frequency':params.frequency, 'comment':params.comment,'c1':params.c1,'c2':params.c2,'c3':params.c3,
+							'c4':params.c4, 'direction':params.direction]
+		def depPref= assetEntityService.getExistingPref('Dep_Columns')
 		StringBuffer query = new StringBuffer(""" 
 			SELECT * FROM ( 
 				SELECT asset_dependency_id AS id, ae.asset_name AS assetName, ae.asset_type AS assetType, mb.name AS assetBundle, ad.type AS type, 
 					aed.asset_name AS dependentName, aed.asset_type AS dependentType, mbd.name AS dependentBundle, 
-					ad.status AS status,ad.comment AS comment, ad.data_flow_freq AS frequency, ae.asset_entity_id AS assetId,  aed.asset_entity_id AS dependentId 
+					ad.status AS status,ad.comment AS comment, ad.data_flow_freq AS frequency, ae.asset_entity_id AS assetId,  
+					aed.asset_entity_id AS dependentId, ad.c1 AS c1, ad.c2 AS c2, ad.c3 AS c3,ad.c4 AS c4,ad.data_flow_direction AS direction
 				FROM tdstm.asset_dependency ad 
 				LEFT OUTER JOIN asset_entity ae ON ae.asset_entity_id = asset_id 
 				LEFT OUTER JOIN asset_entity aed ON aed.asset_entity_id = dependent_id 
@@ -4920,8 +4936,9 @@ class AssetEntityController {
 				[
 				it.assetName, it.assetType, it.assetBundle, it.type,
 				it.dependentName, it.dependentType, it.dependentBundle,
-				it.frequency, it.status, 
-				it.comment ? "<div class='commentEllip'>${it.comment}</div>" : '', 
+				(depPref['1']!='comment') ? it[depPref['1']] : (it[depPref['1']]? "<div class='commentEllip'>${it.comment}</div>" : ''), 
+				(depPref['2']!='comment') ? it[depPref['2']] : (it[depPref['2']]? "<div class='commentEllip'>${it.comment}</div>" : ''),
+				it.status,
 				it.assetId, it.dependentId
 				], id: it.id
 			]}
