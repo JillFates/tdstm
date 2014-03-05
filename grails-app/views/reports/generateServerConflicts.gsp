@@ -18,7 +18,7 @@
 <body>
 	<div class="body" style="width:1000px;">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
-			<b>Server Conflicts - ${project.name} : ${moveBundle}</b><br/>
+			<b>Server Conflicts - ${project.name} : ${moveBundle} - Includes servers matching: ${title?:'' }</b><br/>
 			This analysis was performed on <tds:convertDateTime date="${new Date()}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> for ${session.getAttribute("LOGIN_PERSON").name }.
 		</div> 
 		<div style="color: black; font-size: 15px;text-align: center;">
@@ -38,7 +38,9 @@
 									<tr>
 										<th colspan="${columns}">
 											<a href="javascript:getEntityDetails('Server','server',${assetEntity.app.id})" class="inlineLink">${assetEntity.app.assetName}</a>
-											<g:if test="${assetEntity.app.moveBundle.useOfPlanning}"> (${assetEntity.app.moveBundle})</g:if> - Supports ${assetEntity.supportsList.size()} , Depends on ${assetEntity.dependsOnList.size()} ${assetEntity.title?' - '+assetEntity.title:''}
+											<g:if test="${assetEntity.app.moveBundle.useOfPlanning}"> (${assetEntity.app.moveBundle})</g:if> 
+												- Supports ${assetEntity.supportsList.size()} , Depends on ${assetEntity.dependsOnList.size()} 
+												<span style="color: red;">${assetEntity.header?' - '+assetEntity.header:''}</span>
 										</th>
 									</tr>
 								</thead>

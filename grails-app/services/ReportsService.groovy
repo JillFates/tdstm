@@ -1,3 +1,4 @@
+import org.apache.commons.lang3.StringUtils
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import com.tds.asset.AssetEntity
@@ -641,12 +642,28 @@ class ReportsService {
 			assetsInBundle = AssetEntity.findAllByMoveBundle(MoveBundle.findById(moveBundleId))
 		}
 		log.info "${assetsInBundle}"
+		def titleString = new StringBuffer("");
 		
+		if(bundleConflicts){
+			titleString.append('Bundle Conflicts')
+		}
+		if(unresolvedDep){
+			titleString.append(', UnResolved Dependencies')
+		}
+		if(runsOn){
+			titleString.append(', No Runs On')
+		}
+		if(vmSupport){
+			titleString.append(', VM With NO support')
+		}
+		if( !bundleConflicts && !unresolvedDep && !runsOn && !vmSupport){
+			titleString.append('All')
+		}
 		assetsInBundle.each{asset->
 			def showAsset = false
 			def dependsOnList = AssetDependency.findAllByAsset(asset)
 			def supportsList = AssetDependency.findAllByDependent(asset)
-			def title=''
+			def header=''
 			// skipt the asset if there is no deps and support
 			if(!dependsOnList && !supportsList)
 				return
@@ -656,7 +673,7 @@ class ReportsService {
 			} else {
 				// Check for vm No support if showAsset is true
 				if(asset.assetType=='VM' && !supportsList && vmSupport){
-					title = 'No VM support?'
+					header = 'No VM support?'
 					showAsset = true
 				}
 				// Check for bundleConflicts if showAsset is false
@@ -682,19 +699,18 @@ class ReportsService {
 				
 				// Check for Run On if showAsset is false
 				if(!showAsset && runsOn){
-					def isRunOn = dependsOnList.find{it.type == 'Runs On'}
-					if(!isRunOn){
-						isRunOn = supportsList.find{it.type == 'Runs On'}
-					}
+					def isRunOn = supportsList.find{it.type == 'Runs On'}
 					if(!isRunOn){
 						showAsset = true
-						title='No applications?'
+						header='No applications?'
 					}
 				}
 			}
 			if(showAsset)
-				assetList.add([ 'app':asset, 'dependsOnList':dependsOnList, 'supportsList':supportsList, 'dependsOnIssueCount':dependsOnList.size, 'supportsIssueCount':supportsList.size, title:title ])
+				assetList.add([ 'app':asset, 'dependsOnList':dependsOnList, 'supportsList':supportsList, 'dependsOnIssueCount':dependsOnList.size, 'supportsIssueCount':supportsList.size, header:header ])
 		}
-		return['project':project, 'appList':assetList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : (moveBundleId), 'columns':9]
+		return['project':project, 'appList':assetList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : (moveBundleId), 
+				'columns':9, title:StringUtils.stripStart(titleString.toString(), ",")
+				]
 	}
 }
