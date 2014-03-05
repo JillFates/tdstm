@@ -287,7 +287,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
     $scope.changeRecipe = function(){
         var item = $scope.gridOptions.selectedItems[0];
         if(item && $scope.totalItems){
-            if(item.hasWIP){
+            if(item.hasWIP || item.versionNumber > 0){
                 rec = restCalls.getARecipeVersion({details:item.recipeId, moreDetails:''}, function(){
                     
                     // This is the selected recipe data.
