@@ -45,7 +45,7 @@ enum SecurityRole {
 	// Construct the static keys 
 	private static synchronized void buildKeys() { 
 		if (keys == null) {
-			keys = SecurityRole.values()*.name()
+			keys = SecurityRole.values()
 		}
 	} 
 

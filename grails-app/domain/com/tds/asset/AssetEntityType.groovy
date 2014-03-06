@@ -1,21 +1,11 @@
-/**
- * The SizeScale represents the size scale or unit of measure
- */
+package com.tds.asset
 
-package com.tdsops.tm.enums.domain
-
-enum SizeScale {
-
-	KB ('Kilobyte'),
-	MB ('Megabyte'),
-	GB ('Gigabyte'),
-	TB ('Terabyte'),
-	PB ('Petabyte')
-
-	// Used to access the application's default value to use
-	static SizeScale getDefault() {
-		return MB
-	} 
+public enum AssetEntityType {
+	APPLICATION('A'),
+	DATABASE('B'),
+	DEVICE('D'),
+	NETWORK('N'),
+	STORAGE('S')
 
 	//
 	// Boiler Plate from here down - Just swap out the enum class name
@@ -25,18 +15,18 @@ enum SizeScale {
 	private static List keys
 	private static List labels
 
-	SizeScale(String value) {
+	AssetEntityType(String value) {
 		this.value = value
 	}	
 
 	String toString() { name() }
-	String value() { value }
+	String value() { return value }
 
 	// Used to convert a string to the enum or null if string doesn't match any of the constants
-	static SizeScale asEnum(key) {
+	static AssetEntityType asEnum(key) {
 		def obj
 		try {
-			obj = key as SizeScale
+			obj = key as AssetEntityType
 		} catch (e) { }
 		return obj
 	}
@@ -45,14 +35,14 @@ enum SizeScale {
 	static List getKeys() { 
 		if (keys == null) 
 			buildKeys()
+
 		return keys
 	}
 
 	// Construct the static keys 
 	private static synchronized void buildKeys() { 
-		if (keys == null) {
-			keys = SizeScale.values()
-		}
+		if (keys == null)
+			keys = AssetEntityType.values()
 	} 
 
 	// Returns the labels of the enum labels
@@ -65,7 +55,7 @@ enum SizeScale {
 	// Construct the static labels 
 	private static synchronized void buildLabels() { 
 		if (labels == null) {
-			labels = SizeScale.values()*.value
+			labels = AssetEntityType.values()*.value
 		}
 	} 
 

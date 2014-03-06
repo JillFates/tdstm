@@ -52,7 +52,7 @@ enum TimeConstraintType {
 	// Construct the static keys 
 	private static synchronized void buildKeys() { 
 		if (keys == null) {
-			keys = TimeConstraintType.values()*.name()
+			keys = TimeConstraintType.values()
 		}
 	} 
 
