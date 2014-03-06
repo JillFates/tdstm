@@ -348,28 +348,53 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		return this.moveBundle?.name
 	}
 
-	//
-	// A few methods to distinquish what type of asset that we are dealing with
-	//
+	/**
+	 * Use to determine if the asset is a Server / VM
+	 * @return boolean
+	 */
 	def isaDevice() {
-		return ( ! isaApplication() && ! isaNetwork() && ! isaStorage() )
-		// return ['server','vm','blade','chassis'].contains(assetType.toLowerCase())
-		// return entityType == AssetEntityType.DEVICE		
+		return ( ! isaApplication() && ! isaNetwork() && ! isaStorage() && ! isaDatabase() ) 
 	}
+
+	/**
+	 * Use to determine if the asset is a Database
+	 * @return boolean
+	 */
+
+	def isaDatabase() {
+		return assetType?.toLowerCase() == 'database'		
+	}
+
+	/**
+	 * Use to determine if the asset is an Application
+	 * @return boolean
+	 */
+
 	def isaApplication() {
 		return assetType?.toLowerCase() == 'application'
 		// return entityType == AssetEntityType.APPLICATION
 	}
+
+	/**
+	 * Use to determine if the asset is a Network (presently stubbed out to return FALSE)
+	 * @return boolean
+	 */
 	def isaNetwork() {
 		return false
 		// TODO - Fix isNetwork when domain is implemented
 		// return assetType.toLowerCase() == 'network'		
 		// return entityType == AssetEntityType.NETWORK
 	}
+
+	/**
+	 * Use to determine if the asset is a Storage
+	 * @return boolean
+	 */
 	def isaStorage() {
 		return ['files','storage'].contains(assetType?.toLowerCase())
 		// return entityType == AssetEntityType.STORAGE
 	}
+
 	/**
 	 * Used to determine if the asset is considered a logic type of object (e.g. Network, Database, Storage)
 	 * @return Boolean true if asset is logical
