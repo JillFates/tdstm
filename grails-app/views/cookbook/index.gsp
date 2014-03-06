@@ -195,10 +195,10 @@
 											<h5 class="headingTitle col-xs-6">Recipe</h5>
 											<div class="versionLinks col-xs-6" style="text-align: right;">
 												<label for="releasedVersionRadio" ng-show="gridOptions.selectedItems[0].versionNumber > 0">
-													<input type="radio" ng-checked="selectedRecipe.versionNumber > 0" ng-model="checkOpts" value="release" ng-click="changeRecipe(false)" name="releasedWipVersion" id="releasedVersionRadio"> Version {{gridOptions.selectedItems[0].versionNumber}}
+													<input type="radio" ng-checked="wipConfig[gridData[currentSelectedRow.rowIndex].recipeId] == 'release'" ng-model="wipConfig[gridData[currentSelectedRow.rowIndex].recipeId]" value="release" ng-click="changeRecipe('release')" name="releasedWipVersion" id="releasedVersionRadio"> Version {{gridOptions.selectedItems[0].versionNumber}}
 												</label>
 												<label for="wipVersionRadio" style="margin-left: 15px;">
-													<input type="radio" ng-checked="selectedRecipe.versionNumber < 1" ng-model="checkOpts" value="wip" ng-click="changeRecipe(true)" name="releasedWipVersion" id="wipVersionRadio"> WIP
+													<input type="radio" ng-checked="wipConfig[gridData[currentSelectedRow.rowIndex].recipeId] == 'wip'" ng-model="wipConfig[gridData[currentSelectedRow.rowIndex].recipeId]" value="wip" ng-click="changeRecipe('wip')" name="releasedWipVersion" id="wipVersionRadio"> WIP
 												</label>
 											</div>
 										</div>

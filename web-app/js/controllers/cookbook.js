@@ -7,8 +7,7 @@ app.config(['$logProvider', function($logProvider) {
 app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $resource, $timeout, $modal, $log, $location, $anchorScroll) {
     
     // All Vars used
-    var restCalls, restCalls, listRecipes, columnSel, actionsTemplate, updateBtns, 
-    currentSelectedRow, lastLoop, confirmation, confirmation, rowToShow, ModalInstanceCtrl;
+    var restCalls, restCalls, listRecipes, columnSel, actionsTemplate, updateBtns, lastLoop, confirmation, confirmation, rowToShow, ModalInstanceCtrl;
 
     $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
     // Resource Calls
@@ -201,7 +200,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 
     $scope.mySelection = [];
-    currentSelectedRow = {};
+    $scope.currentSelectedRow = {};
     
     $scope.editingRecipe = false;
     $scope.gridOptions = {
@@ -213,7 +212,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
         enableCellEdit: true,
         beforeSelectionChange: function(rowItem){
             if($scope.editingRecipe){                
-                confirmation=confirm("Recipe " + currentSelectedRow.entity.name + " has unsaved changes. Press Okay to continue and loose those changes otherwise press Cancel");
+                confirmation=confirm("Recipe " + $scope.currentSelectedRow.entity.name + " has unsaved changes. Press Okay to continue and loose those changes otherwise press Cancel");
                 if (confirmation==true){
                     return true;
                 }else{
@@ -228,8 +227,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
             }
         },
         afterSelectionChange: function(rowItem){
-            if(rowItem != currentSelectedRow){
-                currentSelectedRow = rowItem;
+            if(rowItem != $scope.currentSelectedRow){
+                $scope.currentSelectedRow = rowItem;
 
                 // This hack is to avoid changeRecipe() to be executed many times. This is a common issue on the ng-grid for the afterSelectionChange event.
                 $timeout.cancel(lastLoop);
@@ -262,8 +261,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
         if(typeof(rowToShow) == 'number'){
             $scope.gridOptions.selectRow(rowToShow, true);
             rowToShow = null;
-        }else if(typeof(currentSelectedRow.rowIndex) == 'number'){
-            $scope.gridOptions.selectRow(currentSelectedRow.rowIndex, true);
+        }else if(typeof($scope.currentSelectedRow.rowIndex) == 'number'){
+            $scope.gridOptions.selectRow($scope.currentSelectedRow.rowIndex, true);
         }else{
             $scope.gridOptions.selectRow(0, true);
         }
@@ -281,20 +280,46 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
     }
     //------------------------------------------
 
-    $scope.checkOpts;
+    var fillDefault = function(){
+        $scope.selectedRecipe = {
+            "recipeId": $scope.currentSelectedRecipe.recipeId,
+            "name": $scope.currentSelectedRecipe.name,
+            "description": $scope.currentSelectedRecipe.description,
+            "createdBy": null,
+            "lastUpdated": "",
+            "versionNumber": $scope.currentSelectedRecipe.versionNumber,
+            "hasWIP": $scope.currentSelectedRecipe.hasWIP,
+            "sourceCode": "",
+            "changelog": "",
+            "clonedFrom": ""
+        }
+    }
+
+    $scope.wipConfig = [];
 
     // Updates all the content below the Recipes list with data from a selected recipe.
-    $scope.changeRecipe = function(getWIP){
-        var item = $scope.gridOptions.selectedItems[0],
-            // recipeVersion will be 0 to get WIP or '' to get the latest version.
-            recipeVersion = (getWIP) ? 0 : '';
-        if(getWIP && !item.hasWIP){
-            $scope.editorActions.saveWIP();
-            return false;
-        }
+    $scope.changeRecipe = function(releaseWip){
+        var item = $scope.gridOptions.selectedItems[0];
         
+        $log.info(item);
+        $log.info($scope.wipConfig);
+
+
+        if(!$scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId]){
+            $scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId] = (item.versionNumber > 0) ? 'release' : 'wip';   
+        }else if(releaseWip){
+            $scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId] = releaseWip
+        }
+
+        //$scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId] = $scope.gridData[$scope.currentSelectedRow.rowIndex].releaseWipRadio
+
+        $log.info($scope.wipConfig);
+
+        // recipeVersion will be 0 to get WIP or '' to get the latest version.
+        var recipeVersion = ($scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId] && $scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId] == 'wip') ? 0 : '';
+
         if(item && $scope.totalItems){
-            if(item.hasWIP || item.versionNumber > 0){
+            if((item.hasWIP || item.versionNumber > 0) && (releaseWip != 'wip')){
                 rec = restCalls.getARecipeVersion({details:item.recipeId, moreDetails:recipeVersion}, function(){
                     
                     // This is the selected recipe data.
@@ -305,25 +330,18 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
                     $log.info('Success on getting selected recipe');
 
-                    $scope.checkOpts = ($scope.selectedRecipe.versionNumber > 0) ? 'release' : 'wip';
-
+                    $log.info($scope.gridData);
                 }, function(){
                     $log.info('No records found for selected Recipe');
                 });
-            }else{
-                $log.info('The selected recipe has no version yet. Creating empty recipe..');
-                $scope.selectedRecipe = {
-                    "recipeId": $scope.currentSelectedRecipe.recipeId,
-                    "name": $scope.currentSelectedRecipe.name,
-                    "description": $scope.currentSelectedRecipe.description,
-                    "createdBy": null,
-                    "lastUpdated":"",
-                    "versionNumber": $scope.currentSelectedRecipe.versionNumber,
-                    "hasWIP": $scope.currentSelectedRecipe.hasWIP,
-                    "sourceCode":"",
-                    "changelog":"",
-                    "clonedFrom":""
+            }else if(releaseWip == 'wip'){
+                if($scope.originalDataRecipe){
+                    $scope.originalDataRecipe.changelog = "";
+                    $scope.selectedRecipe = angular.copy($scope.originalDataRecipe);
                 }
+            }else{
+                $log.info('The selected recipe has no version yet or has no WIP yet. Creating empty recipe..');
+                fillDefault();
                 $scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
             }
             if(!$scope.activeTabs.history)
@@ -412,7 +430,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
                             $scope.alerts.addAlert({type: 'success', msg: 'Recipe Removed', closeIn: 1500});
                             listRecipes();
                             $scope.preventSelection = false;
-                            if(row.rowIndex == currentSelectedRow.rowIndex){
+                            if(row.rowIndex == $scope.currentSelectedRow.rowIndex){
                                 rowToShow = 0;
                             }
                         }, function(){
@@ -434,9 +452,11 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
     $scope.editorActions = {
         // Save WIP
         saveWIP : function(){
-            var dataToSend = $.param($scope.selectedRecipe),
+            var tmpObj = $scope.selectedRecipe,
                 selectedId = $scope.selectedRecipe.recipeId,
                 selectedVersion = $scope.selectedRecipe.versionNumber;
+            tmpObj.changelog = '';
+            dataToSend = $.param(tmpObj)
             restCalls.saveWIP({details:selectedId, moreDetails:selectedVersion}, dataToSend, function(){
                 $log.info('Success on Saving WIP');
                 $scope.alerts.addAlert({type: 'success', msg: 'WIP Saved', closeIn: 1500});
@@ -469,7 +489,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
         },
         // Cancel
         cancelChanges : function(){
-            var confirmation=confirm("You are about to cancel the changes for recipe: " + currentSelectedRow.entity.name + ". You want to proceed?");
+            var confirmation=confirm("You are about to cancel the changes for recipe: " + $scope.currentSelectedRow.entity.name + ". You want to proceed?");
             if (confirmation==true){
                 $scope.selectedRecipe = angular.copy($scope.originalDataRecipe);
                 return true;
