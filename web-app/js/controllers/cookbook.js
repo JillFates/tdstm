@@ -301,25 +301,17 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
     $scope.changeRecipe = function(releaseWip){
         var item = $scope.gridOptions.selectedItems[0];
         
-        $log.info(item);
-        $log.info($scope.wipConfig);
-
-
         if(!$scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId]){
             $scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId] = (item.versionNumber > 0) ? 'release' : 'wip';   
         }else if(releaseWip){
             $scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId] = releaseWip
         }
 
-        //$scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId] = $scope.gridData[$scope.currentSelectedRow.rowIndex].releaseWipRadio
-
-        $log.info($scope.wipConfig);
-
         // recipeVersion will be 0 to get WIP or '' to get the latest version.
         var recipeVersion = ($scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId] && $scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId] == 'wip') ? 0 : '';
 
         if(item && $scope.totalItems){
-            if((item.hasWIP || item.versionNumber > 0) && (releaseWip != 'wip')){
+            if((item.hasWIP || item.versionNumber > 0) && !($scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId] == 'wip' && !item.hasWIP)){
                 rec = restCalls.getARecipeVersion({details:item.recipeId, moreDetails:recipeVersion}, function(){
                     
                     // This is the selected recipe data.
@@ -334,7 +326,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
                 }, function(){
                     $log.info('No records found for selected Recipe');
                 });
-            }else if(releaseWip == 'wip'){
+            }else if($scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId] == 'wip' && !item.hasWIP){
                 if($scope.originalDataRecipe){
                     $scope.originalDataRecipe.changelog = "";
                     $scope.selectedRecipe = angular.copy($scope.originalDataRecipe);
