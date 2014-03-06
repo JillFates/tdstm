@@ -781,3 +781,6 @@ th.desc{
 br.page-break-after {
 	page-break-after: always;
 }
+.colorGrey{
+	color: grey;
+}
