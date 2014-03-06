@@ -321,8 +321,6 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
                     $scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
 
                     $log.info('Success on getting selected recipe');
-
-                    $log.info($scope.gridData);
                 }, function(){
                     $log.info('No records found for selected Recipe');
                 });
@@ -556,9 +554,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
         }  
     };
 
-    
-    // Modal stuff ------------------------------
-    
+    // Modal general stuff ------------------------------
     $scope.modalBtns = {};
 
     //Hide or show the modal
@@ -571,6 +567,38 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
         else
             elem.modal("hide");
     }
+
+    // Syntax Modal Stuff
+    // Watch the showSyntax variable
+
+    $scope.codeEditorOptions = {
+        lineNumbers: true,
+        indentWithTabs: true
+    };
+
+    $scope.syntaxModal = {
+        sourceCode : '',
+        showModal : false,
+        btns : {
+            save : function(){
+                console.log('saving edition');
+                $scope.selectedRecipe.sourceCode = angular.copy($scope.syntaxModal.sourceCode);
+                $scope.syntaxModal.showModal = false;
+            },
+            cancel : function(){
+                console.log('cancel edition');
+                $scope.syntaxModal.showModal = false;
+            }
+        }
+    };
+
+    $scope.$watch('syntaxModal.showModal', function (newValue, oldValue) {
+        if($scope.selectedRecipe){
+            $scope.syntaxModal.sourceCode = angular.copy($scope.selectedRecipe.sourceCode);
+            $scope.showModal(newValue, $('#editSyntax'));
+        }
+    });
+    //-------------------------------------------
 
     // Watch the showDialog variable
     $scope.$watch('showDialog', function (newValue, oldValue) {

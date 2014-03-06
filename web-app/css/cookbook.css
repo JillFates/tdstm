@@ -174,3 +174,16 @@ form .error-msg{
 	top:35px;
 }
 
+.CodeMirror-lines pre{
+	display: block;
+	padding: 0;
+	margin: 0;
+	font-size: 1em;
+	line-height: 1em;
+	color: #333333;
+	word-break: normal;
+	word-wrap: normal;
+	background-color: transparent;
+	border: none;
+	border-radius: 0;
+}

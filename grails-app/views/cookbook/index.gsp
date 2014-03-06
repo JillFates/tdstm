@@ -203,7 +203,7 @@
 											</div>
 										</div>
 										<section class="codeMirrorWrapper"> 
-											<textarea name="recipeCode" id="recipeCode" rows="10" ng-model="selectedRecipe.sourceCode" ng-disabled="!currentSelectedRecipe" value="{{selectedRecipe.sourceCode}}"></textarea>
+											<textarea name="recipeCode" id="recipeCode" rows="10" ng-model="selectedRecipe.sourceCode" ng-click="syntaxModal.showModal = true" ng-disabled="!currentSelectedRecipe" value="{{selectedRecipe.sourceCode}}"></textarea>
 										</section>
 										<div class="clearfix btns">
 											<div class="btn-group pull-left" style="margin-right:15px;">
@@ -328,6 +328,8 @@
 					{{alert.msg}}
 				</div>
 
+				%{-- <div ng-model="selectedRecipe.sourceCode" ui-codemirror="codeEditorOptions" class="codeMirrorWrapper"></div> --}%
+
 				<div modal-show="showDialog" class="modal fade" id="createRecipeModal">
 					<div class="modal-dialog modal-lg">
 						<form class="form-horizontal modal-content" name="form" role="form" novalidate >
@@ -376,7 +378,30 @@
 				        </form>
 			    	</div>
 			    </div>
+
+			    <div modal-show="syntaxModal" class="modal fade" id="editSyntax">
+					<div class="modal-dialog modal-lg">
+						<form class="form-horizontal modal-content" name="form" role="form" novalidate >
+					        <div class="modal-body">
+					            <div ng-model="syntaxModal.sourceCode" ui-codemirror="codeEditorOptions"></div>
+					        </div>
+					        <div class="modal-footer">
+					            <button class="btn btn-primary" ng-click="syntaxModal.btns.save()">Save</button>
+					            <button class="btn btn-warning" ng-click="syntaxModal.btns.cancel()">Cancel</button>
+					        </div>
+				        </form>
+			    	</div>
+			    </div>
 			</div>
 		</div>
+		<script type="text/javascript">
+			$('#editSyntax').on('shown.bs.modal', function (e) {
+        		$('.CodeMirror').each(function(i, el){
+	            	setTimeout(function(){
+		                el.CodeMirror.refresh();
+		            }, 10)
+		        });
+    		})
+		</script>
 	</body>
 </html>
