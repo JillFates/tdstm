@@ -360,10 +360,10 @@ class ProjectService {
 		//def projectClient = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_CLIENT' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'CLIENT' ")
 		def projectPartner = getProjectPartner( projectInstance )
 		def projectPartnerId
-		if(prevParam.projectPartner){
+		if (prevParam.projectPartner){
 			projectPartnerId = prevParam.projectPartner
-		}else{
-			projectPartnerId = projectPartner.partyIdTo.id
+		} else {
+			projectPartnerId = projectPartner?.partyIdTo?.id
 		}
 		def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
 		def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
