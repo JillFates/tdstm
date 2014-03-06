@@ -31,7 +31,15 @@
    				});
 
 			   }
-
+			   
+				function togglePasswordFields($me){
+					var isChecked = $me.is(":checked")
+					if(!isChecked){
+						$(".passwordsFields").hide();
+					}else{
+						$(".passwordsFields").show();
+					}
+				}
 			  </script>          
     </head>
     <body>
@@ -98,7 +106,24 @@
 					            </g:hasErrors>
                                 </td>
                             </tr> 
-                        	<tr>
+                            <tr>
+                            	<td valign="top" class="name">
+									<label for="isLocal">Local account:</label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'isLocal','errors')}">
+                                    <input type="checkbox" id="isLocal" name="isLocal" value="true" ${(userLoginInstance.isLocal)?'checked="checked"':''}  
+                                    onchange="togglePasswordFields( $(this) )" onclick='if(this.checked){this.value = true} else {this.value = false }'/>
+                                </td>
+                            </tr>
+                            <tr class="prop passwordsFields">
+								<td valign="top" class="name">
+									<label for="forcePasswordChange">Force password change:</label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'forcePasswordChange','errors')}">
+									<input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="Y" />
+								</td>
+							</tr>
+                        	<tr class='passwordsFields'>
 								<td>
 									Hide password:
 								</td>
@@ -106,7 +131,7 @@
 									<input type="checkbox" onchange="togglePasswordVisibility(this)" id="showPasswordEditId"/>
 								</td>
 							</tr>
-                            <tr class="prop">
+                            <tr class="prop passwordsFields">
                                 <td valign="top" class="name">
                                     <label for="password">Password:&nbsp;</label>
                                 </td>
@@ -119,7 +144,7 @@
 					            </g:hasErrors>
                                 </td>
                             </tr>
-                            <tr>
+                            <tr class='passwordsFields'>
 								<td>
 									Requirements:
 								</td>
@@ -180,14 +205,6 @@
 
                             </tr> 
 							
-							<tr class="prop">
-								<td valign="top" class="name">
-									<label for="forcePasswordChange">Force password change:</label>
-								</td>
-								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'forcePasswordChange','errors')}">
-									<input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="Y" />
-								</td>
-							</tr>
                            	<tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="active">Project:</label>

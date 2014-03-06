@@ -6,6 +6,13 @@
 			 <script type="text/javascript"> 
 			 	   var flag 
 				   $().ready(function() {  
+					var isLocal = ${userLoginInstance.isLocal}
+					if(isLocal){
+						$(".passwordsEditFields").show();
+					}else{
+						$(".passwordsEditFields").hide();
+					}
+					   
 				    $('#add').click(function() {
 				     updateRole( 'add',$('#availableRoleId').val() );
 				     flag = !$('#availableRoleId option:selected').remove().appendTo('#assignedRoleId');
@@ -23,6 +30,14 @@
 				     	${remoteFunction(controller:'userLogin', action:'addRoles', params:'\'assignedRoleId=\' + values +\'&person=\'+personId +\'&actionType=\'+action')}
 				     }
 				   }
+				   function togglePasswordEditFields($me){
+						var isChecked = $me.is(":checked")
+						if(!isChecked){
+							$(".passwordsEditFields").hide();
+						}else{
+							$(".passwordsEditFields").show();
+						}
+					}
 			  </script> 
     </head>
     <body>
@@ -71,8 +86,24 @@
 					            </g:hasErrors>
                                 </td>
                             </tr>
-							
-                        	<tr>
+                            <tr>
+                            	<td valign="top" class="name">
+                                    <label for="isLocal">Local account:</label>
+                                </td>
+								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'isLocal','errors')}">
+                                    <input type="checkbox" id="isLocal" name="isLocal" value="${userLoginInstance.isLocal}" ${(userLoginInstance.isLocal)?'checked="checked"':''}  
+                                    onchange="togglePasswordEditFields( $(this) )" onclick='if(this.checked){this.value = true} else {this.value = false }'/>
+                                </td>
+                            </tr>
+							<tr class="prop passwordsEditFields">
+                                <td valign="top" class="name">
+                                    <label for="forcePasswordChange">Force password change:</label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'forcePasswordChange','errors')}">
+                                    <input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="${userLoginInstance.forcePasswordChange}" ${(userLoginInstance.forcePasswordChange=='Y')?'checked="checked"':''}/>
+                                </td>
+                            </tr> 
+                        	<tr class='passwordsEditFields'>
 								<td>
 									Hide password:
 								</td>
@@ -80,7 +111,7 @@
 									<input type="checkbox" onchange="togglePasswordVisibility(this)" id="showPasswordEditId"/>
 								</td>
 							</tr>
-                            <tr class="prop">
+                            <tr class="prop passwordsEditFields">
                                 <td valign="top" class="name">
                                     <label for="password">Password:&nbsp;</label>
                                 </td>
@@ -94,7 +125,7 @@
 					            </g:hasErrors>
                                 </td>
                             </tr> 
-                            <tr>
+                            <tr class="passwordsEditFields">
 								<td>
 									Requirements:
 								</td>
@@ -142,14 +173,6 @@
 					            </g:hasErrors>
                                 </td>
                             </tr>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="forcePasswordChange">Force password change:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'forcePasswordChange','errors')}">
-                                    <input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="${userLoginInstance.forcePasswordChange}" ${(userLoginInstance.forcePasswordChange=='Y')?'checked="checked"':''}/>
-                                </td>
-                            </tr> 
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="active">Project:</label>

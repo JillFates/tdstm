@@ -29,30 +29,41 @@
                 <table>
                     <tbody>
 
-                    
-						<tr class="prop">
-
-                            <td valign="top" class="name">Username:</td>
-
-                            
-
-                            <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'username')}</td>
-
-                            
-
-                        </tr>                    
-                        <tr class="prop">
+                         <tr class="prop">
                             <td valign="top" class="name">Person:</td>
                             
                             <td nowrap="nowrap" valign="top" class="value"><g:link controller="person" action="show" id="${userLoginInstance?.person?.id}">${userLoginInstance?.person?.encodeAsHTML()}</g:link></td>
                             
                         </tr>
-                    	<tr class="prop">
-                            <td valign="top" class="name"><g:message code="userLogin.expiryDate.label" default="Expiry Date" />:</td>
-                            
-                            <td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.expiryDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-                            
+                    
+						<tr class="prop">
+
+                            <td valign="top" class="name">Username:</td>
+
+                            <td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'username')}</td>
+
+                        </tr> 
+                                           
+                        <tr class="prop">
+
+                            <td valign="top" class="name">Local account:</td>
+
+                            <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'isLocal','errors')}">
+								<input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="${userLoginInstance.isLocal}" disabled="disabled" ${(userLoginInstance.isLocal)?'checked="checked"':''}/>
+							</td>
+
                         </tr>
+                        
+                        <tr class="prop">
+							<td valign="top" class="name">
+								<label for="forcePasswordChange">Force password change:</label>
+							</td>
+							
+							<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'forcePasswordChange','errors')}">
+								<input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="${userLoginInstance.forcePasswordChange}" disabled="disabled" ${(userLoginInstance.forcePasswordChange=='Y')?'checked="checked"':''}/>
+							</td>
+						</tr>
+						
                     	<tr class="prop">
 
                             <td valign="top" class="name">Active:</td>
@@ -61,19 +72,14 @@
 
                             <td nowrap="nowrap" valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'active')}</td>
 
-                            
-
                         </tr>
 
 						<tr class="prop">
-							<td valign="top" class="name">
-								<label for="forcePasswordChange">Force password change:</label>
-							</td>
-							<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'forcePasswordChange','errors')}">
-								<input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="${userLoginInstance.forcePasswordChange}" disabled="disabled" ${(userLoginInstance.forcePasswordChange=='Y')?'checked="checked"':''}/>
-							</td>
-						</tr>
-                        
+                            <td valign="top" class="name"><g:message code="userLogin.expiryDate.label" default="Expiry Date" />:</td>
+                            
+                            <td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.expiryDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+                            
+                        </tr>
                         <tr class="prop">
                             <td valign="top" class="name">Created Date:</td>
                             

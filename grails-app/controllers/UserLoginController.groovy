@@ -132,7 +132,7 @@ class UserLoginController {
 		
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = userLoginInstanceList?.collect {
-			[ cell: [ '<a href="'+HtmlUtil.createLink([controller:'userLogin', action:'edit', id:"${it.userLoginId}"])+'">'+it.username+'</a>',
+			[ cell: [ '<a href="'+HtmlUtil.createLink([controller:'userLogin', action:'show', id:"${it.userLoginId}"])+'">'+it.username+'</a>',
 			'<a href="javascript:loadPersonDiv('+it.personId+',\'generalInfoShow\')">'+it.fullname+'</a>', 
 			it.roles, it.company, it.lastLogin, it.dateCreated, it.expiryDate ], id: it.userLoginId ]}
 			
@@ -212,10 +212,15 @@ class UserLoginController {
 					redirect( action:edit, id:userLoginInstance.id, params:[ companyId:companyId ] )
 				} else{
 					userLoginInstance.properties = params
-					if(params.forcePasswordChange)
-						userLoginInstance.forcePasswordChange = 'Y'
-					else
+					if(params.isLocal){
+						if(params.forcePasswordChange)
+							userLoginInstance.forcePasswordChange = 'Y'
+						else
+							userLoginInstance.forcePasswordChange = 'N'
+					}else{
+						userLoginInstance.isLocal = false
 						userLoginInstance.forcePasswordChange = 'N'
+					}
 					if(password != ""){
 						//	convert password onto Hash code
 						userLoginInstance.password = new Sha1Hash(params['password']).toHex()
@@ -307,8 +312,21 @@ class UserLoginController {
 		def companyId = params.companyId
 		//convert password onto Hash code
 		def success = false
-		if(securityService.validPassword(params['username'], params['password'])) {
+		def token = true
+		if(params.isLocal)
+			token = securityService.validPassword(params['username'], params['password'])
+		
+		if(token) {
 			userLoginInstance.password = new Sha1Hash(params['password']).toHex()
+			if(params.isLocal){
+				if(params.forcePasswordChange)
+					userLoginInstance.forcePasswordChange = 'Y'
+				else
+					userLoginInstance.forcePasswordChange = 'N'
+			}else{
+				userLoginInstance.isLocal = false
+				userLoginInstance.forcePasswordChange = 'N'
+			}
 			if(!userLoginInstance.hasErrors() && userLoginInstance.save()) {
 				def assignedRoles = request.getParameterValues("assignedRole");
 				def person = params.person.id

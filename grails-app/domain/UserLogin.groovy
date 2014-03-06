@@ -12,6 +12,7 @@ class UserLogin {
 	Date passwordChangedDate = TimeUtil.nowGMT()
 	Date lastModified = TimeUtil.nowGMT()
 	String forcePasswordChange = 'N'
+	Boolean isLocal = true
     
 	static belongsTo = [ person:Person ]
 	static hasMany = [
@@ -31,6 +32,7 @@ class UserLogin {
 		expiryDate( nullable: false )
 		passwordChangedDate( nullable: false)
 		lastModified( nullable: false )
+		isLocal( nullable:false )
 		//forcePasswordChange( nullable: false)
 	}
 
