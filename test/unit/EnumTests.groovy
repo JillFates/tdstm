@@ -30,7 +30,7 @@ class EnumTests extends GrailsUnitTestCase {
 		assertEquals "$label value()", value, obj.value()
 		assertTrue	'$label getKeys() is a List', (keys instanceof List)
 		assertTrue	'$label getLabels() is a List', (labels instanceof List)
-		assertEquals "$label getKeys()[0]", firstKey, keys[0]
+		assertEquals "$label getKeys()[0]", obj.asEnum(firstKey), keys[0]
 		assertEquals "$label getLabels()[0]", firstLabel, labels[0]
 
 		assertTrue "$label asEnum() positive", (e.asEnum(firstKey) != null)
@@ -58,8 +58,8 @@ class EnumTests extends GrailsUnitTestCase {
 		enumTest TimeConstraintType, TimeConstraintType.ASAP, 'ASAP', 'As Soon As Possible', 'ALAP', 'As Late As Possible'
 	}
 
-	void testDurationScale() {
-		enumTest DurationScale, DurationScale.W, 'W', 'Weeks', 'M', 'Minutes'
+	void testTimeScale() {
+		enumTest TimeScale, TimeScale.W, 'W', 'Weeks', 'M', 'Minutes'
 	}
 
 	void testSecurityRole() {
