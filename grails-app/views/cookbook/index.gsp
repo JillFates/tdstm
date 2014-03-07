@@ -1,23 +1,23 @@
 <!doctype html>
 <html xmlns:ng="http://angularjs.org">
 	<head>
-    	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="projectHeader" />
 		<title>Cookbook</title>
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
-    	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
-    	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'cookbook.css')}" />
-    	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ng-grid.css')}" />
-    	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/codemirror.css')}" />
-    	<g:javascript src="angularNewVersion/angular.js" />
-    	<g:javascript src="codemirror/codemirror.js" />
-    	<g:javascript src="codemirror/ui-codemirror.js" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ng-grid.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/codemirror.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'cookbook.css')}" />
+		<g:javascript src="angularNewVersion/angular.js" />
+		<g:javascript src="codemirror/codemirror.js" />
+		<g:javascript src="codemirror/ui-codemirror.js" />
 		<g:javascript src="codemirror/javascript.js" />
-    	<g:javascript src="bootstrap.js" />
-    	<g:javascript src="angular-resource.js" />
-    	<g:javascript src="ui-bootstrap-tpls-0.10.0.js" />
-    	<g:javascript src="ng-grid-2.0.7.debug.js" />
-    	<g:javascript src="controllers/cookbook.js" />
+		<g:javascript src="bootstrap.js" />
+		<g:javascript src="angular-resource.js" />
+		<g:javascript src="ui-bootstrap-tpls-0.10.0.js" />
+		<g:javascript src="ng-grid-2.0.7.debug.js" />
+		<g:javascript src="controllers/cookbook.js" />
 	</head>
 	<body>
 		<div class="body" id="cookbookRecipesEditor" ng-app="cookbookRecipes" ng-controller="CookbookRecipeEditor">
@@ -203,7 +203,7 @@
 											</div>
 										</div>
 										<section class="codeMirrorWrapper"> 
-											<textarea name="recipeCode" id="recipeCode" rows="10" ng-model="selectedRecipe.sourceCode" ng-click="syntaxModal.showModal = true" ng-disabled="!currentSelectedRecipe" value="{{selectedRecipe.sourceCode}}"></textarea>
+											<textarea readonly name="recipeCode" title="Double click to edit" id="recipeCode" rows="10" ng-model="selectedRecipe.sourceCode" ng-dblclick="syntaxModal.showModal = true" ng-disabled="!currentSelectedRecipe" value="{{selectedRecipe.sourceCode}}"></textarea>
 										</section>
 										<div class="clearfix btns">
 											<div class="btn-group pull-left" style="margin-right:15px;">
@@ -333,12 +333,12 @@
 				<div modal-show="showDialog" class="modal fade" id="createRecipeModal">
 					<div class="modal-dialog modal-lg">
 						<form class="form-horizontal modal-content" name="form" role="form" novalidate >
-					        <div class="modal-header">
-					            <h3>Create a recipe</h3>
-					        </div>
-					        <div class="modal-body">
-					            <tabset>
-					            	%{-- New Recipe Tab --}%
+							<div class="modal-header">
+								<h3>Create a recipe</h3>
+							</div>
+							<div class="modal-body">
+								<tabset>
+									%{-- New Recipe Tab --}%
 									<tab heading="Brand New Recipe" >
 										<div class="form-group">
 											<label for="inputName" class="col-sm-2 control-label">Name*</label>
@@ -370,38 +370,38 @@
 										Clone Recipe Stuff
 									</tab>
 								</tabset>
-					        </div>
-					        <div class="modal-footer">
-					            <button class="btn btn-primary" ng-disabled="form.$invalid || isUnchanged(newRecipe)" ng-click="modalBtns.save()">Save</button>
-					            <button class="btn btn-warning" ng-click="modalBtns.cancel()">Cancel</button>
-					        </div>
-				        </form>
-			    	</div>
-			    </div>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-primary" ng-disabled="form.$invalid || isUnchanged(newRecipe)" ng-click="modalBtns.save()">Save</button>
+								<button class="btn btn-warning" ng-click="modalBtns.cancel()">Cancel</button>
+							</div>
+						</form>
+					</div>
+				</div>
 
-			    <div modal-show="syntaxModal" class="modal fade" id="editSyntax">
+				<div modal-show="syntaxModal" class="modal fade" id="editSyntax" data-backdrop="static" data-keyboard="false">
 					<div class="modal-dialog modal-lg">
 						<form class="form-horizontal modal-content" name="form" role="form" novalidate >
-					        <div class="modal-body">
-					            <div ng-model="syntaxModal.sourceCode" ui-codemirror="codeEditorOptions"></div>
-					        </div>
-					        <div class="modal-footer">
-					            <button class="btn btn-primary" ng-click="syntaxModal.btns.save()">Save</button>
-					            <button class="btn btn-warning" ng-click="syntaxModal.btns.cancel()">Cancel</button>
-					        </div>
-				        </form>
-			    	</div>
-			    </div>
+							<div class="modal-body">
+								<div ng-model="syntaxModal.sourceCode" ui-codemirror="codeEditorOptions"></div>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-primary" ng-click="syntaxModal.btns.save()">Close</button>
+								<button class="btn btn-warning" ng-click="syntaxModal.btns.cancel()">Cancel</button>
+							</div>
+						</form>
+					</div>
+				</div>
 			</div>
 		</div>
 		<script type="text/javascript">
 			$('#editSyntax').on('shown.bs.modal', function (e) {
-        		$('.CodeMirror').each(function(i, el){
-	            	setTimeout(function(){
-		                el.CodeMirror.refresh();
-		            }, 10)
-		        });
-    		})
+				$('.CodeMirror').each(function(i, el){
+					setTimeout(function(){
+						el.CodeMirror.refresh();
+					}, 10)
+				});
+			})
 		</script>
 	</body>
 </html>
