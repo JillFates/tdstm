@@ -407,6 +407,7 @@
 			$('.CodeMirror').each(function(i, el){
 				setTimeout(function(){
 					el.CodeMirror.refresh();
+					el.CodeMirror.focus();
 				}, 10)
 			});
 		})
