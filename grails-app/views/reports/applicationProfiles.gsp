@@ -17,16 +17,18 @@
 			<table>
 				<tbody>
 					<tr>
+						<td>Bundle : </td>
 						<td><g:select from="${moveBundles}" id="moveBundleId" name="moveBundle" onChange="changeSmeSelect(this.value)"
 								optionKey="id" optionValue="name" value="${moveBundleId}" noSelection="['useForPlanning':'Use For Planning']"/></td>
 					</tr>
 					<tr>
+						<td>SME : </td>
 						<td>
 							<g:render template="smeSelectByBundle"  model="[smeList:smeList]" />
 						</td>
 					</tr>
 					<tr>
-						<td>
+						<td colspan="2">
 							<div style="width: 150px; float: left;">
 								<label><strong>Output:</strong></label>&nbsp;<br />
 								<label for="web"><input type="radio" name="output" id="web" checked="checked" value="web" />&nbsp;Web</label><br />
@@ -36,7 +38,7 @@
 					</tr>
 					<tr class="buttonR">
 					<tds:hasPermission permission="ShowMovePrep">
-						<td><input type="submit" class="submit" value="Generate"/></td>
+						<td colspan="2"><input type="submit" class="submit" value="Generate"/></td>
 					</tds:hasPermission>
 					</tr>
 				</tbody>

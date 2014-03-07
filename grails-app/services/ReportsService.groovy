@@ -617,6 +617,9 @@ class ReportsService {
 		if(moveBundleId && moveBundleId !='useForPlanning'){
 			def currentBundle = MoveBundle.read(moveBundleId)
 			apps = Application.findAllByMoveBundleAndProject(currentBundle, project)
+		}else if(moveBundleId && moveBundleId =='useForPlanning'){
+			apps = Application.findAllByProjectAndMoveBundleInList(project, 
+				MoveBundle.getUseOfPlanningBundlesByProject(project))
 		}else{
 			apps = Application.findAllByProject(project)
 		}

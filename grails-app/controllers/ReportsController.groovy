@@ -1365,24 +1365,25 @@ class ReportsController {
 		def project = securityService.getUserCurrentProject()
 		def currentSme 
 		def applicationList = []
-		def currentBundle
-		def smeListByBundle = new ArrayList(reportsService.getSmeList(''))
+		def currentBundle 
 		
 		//checking various condition
 		if(params.moveBundle == 'useForPlanning'){		 //if user haven't selected any bundle
 			if(params.smeByModel!='null'){             	 //if user haven't selected any sme
 				currentSme = Person.get(params.smeByModel)
-				applicationList = Application.findAll("from Application where project = :project and (sme=:smes or sme2=:smes)",[project:project,smes:currentSme]) 
-			}else {										 //if user selects any sme
-				applicationList = Application.findAll("from Application where project = :project and (sme in (:smes) or sme2 in (:smes))",[project:project,smes:smeListByBundle]) 
+				applicationList = Application.findAll("from Application where project = :project and (sme=:smes or sme2=:smes)",
+					[project:project,smes:currentSme]) 
+			}else {		
+				applicationList = Application.findAllByMoveBundleInList(MoveBundle.getUseOfPlanningBundlesByProject(project))
 			}
-		}else{ 											 //if user selects any bundle
+		}else{ //if user selects any bundle
 			currentBundle = MoveBundle.get(params.moveBundle)
-			if(params.smeByModel!='null'){               //if user haven't selected any sme
+			if(params.smeByModel!='null'){//if user haven't selected any sme
 				currentSme = Person.get(params.smeByModel)
-				applicationList = Application.findAll("from Application where project = :project and moveBundle = :bundle and (sme=:smes or sme2=:smes)",[project:project,bundle:currentBundle,smes:currentSme])
-			}else if(smeListByBundle){									    //if user selects any sme
-				applicationList = Application.findAll("from Application where project = :project and moveBundle = :bundle and (sme in (:smes) or sme2 in (:smes))",[project:project,bundle:currentBundle,smes:smeListByBundle])
+				applicationList = Application.findAll("from Application where project = :project and moveBundle = :bundle \
+					and (sme=:smes or sme2=:smes)",[project:project,bundle:currentBundle,smes:currentSme])
+			}else { //if user selects any sme
+				applicationList = Application.findAllByMoveBundle(currentBundle)
 			}
 		}
 		ArrayList appList = new ArrayList()
