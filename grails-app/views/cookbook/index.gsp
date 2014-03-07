@@ -1,48 +1,56 @@
 <!doctype html>
 <html xmlns:ng="http://angularjs.org">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<meta name="layout" content="projectHeader" />
-		<title>Cookbook</title>
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ng-grid.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/codemirror.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'cookbook.css')}" />
-		<g:javascript src="angularNewVersion/angular.js" />
-		<g:javascript src="codemirror/codemirror.js" />
-		<g:javascript src="codemirror/ui-codemirror.js" />
-		<g:javascript src="codemirror/javascript.js" />
-		<g:javascript src="bootstrap.js" />
-		<g:javascript src="angular-resource.js" />
-		<g:javascript src="ui-bootstrap-tpls-0.10.0.js" />
-		<g:javascript src="ng-grid-2.0.7.debug.js" />
-		<g:javascript src="controllers/cookbook.js" />
-	</head>
-	<body>
-		<div class="body" id="cookbookRecipesEditor" ng-app="cookbookRecipes" ng-controller="CookbookRecipeEditor">
-			<div class="container">
-				<form id="gridControls" class="row-fluid clearfix form-inline groups">
-					<div class="col-md-2 col-xs-2 form-group">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="layout" content="projectHeader" />
+	<title>Cookbook</title>
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ng-grid.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/codemirror.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/addon/dialog.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/addon/show-hint.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'cookbook.css')}" />
+	<g:javascript src="angularNewVersion/angular.js" />
+	<g:javascript src="codemirror/codemirror.js" />
+	<g:javascript src="codemirror/ui-codemirror.js" />
+	<g:javascript src="codemirror/addon/dialog.js" />
+	<g:javascript src="codemirror/addon/search.js" />
+	<g:javascript src="codemirror/addon/show-hint.js" />
+	<g:javascript src="codemirror/addon/javascript-hint.js" />
+	<g:javascript src="codemirror/javascript.js" />
+	<g:javascript src="bootstrap.js" />
+	<g:javascript src="angular-resource.js" />
+	<g:javascript src="ui-bootstrap-tpls-0.10.0.js" />
+	<g:javascript src="ng-grid-2.0.7.debug.js" />
+	<g:javascript src="controllers/cookbook.js" />
+</head>
+<body>
+	<div class="body" id="cookbookRecipesEditor" ng-app="cookbookRecipes" ng-controller="CookbookRecipeEditor">
+		<div class="container">
+			<form id="gridControls" class="row-fluid clearfix form-inline groups">
+				<div class="col-md-4 col-xs-4 form-group">
+					<label for="contextSelector">Context: 
 						<select class="form-control" name="contextSelector" id="contextSelector" ng-model="context" ng-options="c for c in ['All', 'Event', 'Bundle', 'Application']" ng-disabled="editingRecipe" ng-change="changeRecipeList()"></select>
-					</div>
-					<div class="col-md-6 col-xs-6 form-group pull-right archiveCheckWrapper">
-						<div class="checkbox pull-right">
-							<label class="pull-right">
-								<input type="checkbox" name="viewArchived" id="viewArchived" value="n" ng-model="archived" ng-true-value="y" ng-false-value="n" ng-disabled="editingRecipe" ng-change="changeRecipeList()"> View Archived Recipes
-							</label>
-						</div>
-					</div>
-				</form>
-				<div class="row-fluid clearfix">
-					<div class="col-md-12">
-						<div class="gridStyle" ng-grid="gridOptions"></div>
-					</div>				
+					</label>
 				</div>
-				<div class="row-fluid clearfix">
-					<div class="col-md-4">
-						<button class="btn btn-default createRecipe" ng-click="showDialog = true">Create Recipe</button>
+				<div class="col-md-6 col-xs-6 form-group pull-right archiveCheckWrapper">
+					<div class="checkbox pull-right">
+						<label class="pull-right">
+							<input type="checkbox" name="viewArchived" id="viewArchived" value="n" ng-model="archived" ng-true-value="y" ng-false-value="n" ng-disabled="editingRecipe" ng-change="changeRecipeList()"> View Archived Recipes
+						</label>
 					</div>
+				</div>
+			</form>
+			<div class="row-fluid clearfix">
+				<div class="col-md-12">
+					<div class="gridStyle" ng-grid="gridOptions"></div>
+				</div>				
+			</div>
+			<div class="row-fluid clearfix">
+				<div class="col-md-4">
+					<button class="btn btn-default createRecipe" ng-click="showDialog = true">Create Recipe</button>
+				</div>
 					%{-- <div class="col-md-4 paginationWrapper">
 						<pagination boundary-links="true" total-items="totalItems" page="currentPage" class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
 					</div> --}%
@@ -116,7 +124,7 @@
 
 											<input type="button" value="Confirm">
 										</tab>
-									
+										
 										%{-- Tasks Content --}%
 										<tab heading="Task Content">
 											<div class="table-responsive">
@@ -395,13 +403,13 @@
 			</div>
 		</div>
 		<script type="text/javascript">
-			$('#editSyntax').on('shown.bs.modal', function (e) {
-				$('.CodeMirror').each(function(i, el){
-					setTimeout(function(){
-						el.CodeMirror.refresh();
-					}, 10)
-				});
-			})
+		$('#editSyntax').on('shown.bs.modal', function (e) {
+			$('.CodeMirror').each(function(i, el){
+				setTimeout(function(){
+					el.CodeMirror.refresh();
+				}, 10)
+			});
+		})
 		</script>
 	</body>
-</html>
+	</html>

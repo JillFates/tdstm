@@ -29,3 +29,7 @@ table{
 .nav-tabs > li > a{
 	font-weight: normal;
 }
+
+form label{
+	font-weight: normal;
+}

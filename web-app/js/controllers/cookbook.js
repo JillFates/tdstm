@@ -98,7 +98,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				}
 			}
 		}
-	);
+		);
 
 	// Default data to get recipes
 	$scope.context = 'All';
@@ -167,32 +167,32 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 	columnSel = {index: 0},
 	actionsTemplate =   '<div class="gridIcon">'+
-							'<a href="" class="actions edit" title="Edit" ng-click="gridActions(row, 0)">'+
-								'<span class="glyphicon glyphicon-pencil"></span>'+
-							'</a>'+
-							'<a href="" class="actions revert" ng-class="{ disabled: gridData[row.rowIndex].versionNumber < 1 }" title="Revert" ng-click="gridActions(row, 1)">'+
-								'<span class="glyphicon glyphicon-arrow-left"></span>'+
-							'</a>'+
-							'<a href="" class="actions archive" title="Archive" ng-click="gridActions(row, 2)" ng-hide="archived == \'y\'">'+
-								'<span class="glyphicon glyphicon-folder-close"></span>'+
-							'</a>'+
-							'<a href="" class="actions unarchive" title="UnArchive" ng-click="gridActions(row, 4)" ng-hide="archived == \'n\'">'+
-								'<span class="glyphicon glyphicon-folder-open"></span>'+
-							'</a>'+
-							'<a href="" class="actions remove" title="Remove" ng-click="gridActions(row, 3)">'+
-								'<span class="glyphicon glyphicon-trash"></span>'+
-							'</a>'+
-						'</div>';
+	'<a href="" class="actions edit" title="Edit" ng-click="gridActions(row, 0)">'+
+	'<span class="glyphicon glyphicon-pencil"></span>'+
+	'</a>'+
+	'<a href="" class="actions revert" ng-class="{ disabled: gridData[row.rowIndex].versionNumber < 1 }" title="Revert" ng-click="gridActions(row, 1)">'+
+	'<span class="glyphicon glyphicon-arrow-left"></span>'+
+	'</a>'+
+	'<a href="" class="actions archive" title="Archive" ng-click="gridActions(row, 2)" ng-hide="archived == \'y\'">'+
+	'<span class="glyphicon glyphicon-folder-close"></span>'+
+	'</a>'+
+	'<a href="" class="actions unarchive" title="UnArchive" ng-click="gridActions(row, 4)" ng-hide="archived == \'n\'">'+
+	'<span class="glyphicon glyphicon-folder-open"></span>'+
+	'</a>'+
+	'<a href="" class="actions remove" title="Remove" ng-click="gridActions(row, 3)">'+
+	'<span class="glyphicon glyphicon-trash"></span>'+
+	'</a>'+
+	'</div>';
 	$scope.edittableField = '<input ng-class="colt' + columnSel.index + '" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-keydown="keyPressed($event, row, col)" ng-blur="updateEntity(row, updateEntity.execute)"/>';
 	$scope.colDef = [
-		{field:'name', displayName:'Recipe', enableCellEdit: true, enableCellEditOnFocus: false, width: '***', editableCellTemplate: $scope.edittableField},
-		{field:'description', displayName:'Description', enableCellEdit: true, enableCellEditOnFocus: false, width: '******', editableCellTemplate: $scope.edittableField},
-		{field:'context', displayName:'Context', enableCellEdit: false, width: '**'},
-		{field:'createdBy', displayName:'Editor', enableCellEdit: false, width: '***'},
-		{field:'lastUpdated', displayName:'Last', enableCellEdit: false, width: '****'},
-		{field:'versionNumber', displayName:'Version', cellClass: 'text-right', enableCellEdit: false, width: '**'},
-		{field:'hasWIP', displayName:'WIP', cellClass: 'text-center', enableCellEdit: false, width: '*'},
-		{field:'', displayName:'Actions', cellClass: 'text-center', enableCellEdit: false, width: '**', sortable: false, cellTemplate: actionsTemplate}
+	{field:'name', displayName:'Recipe', enableCellEdit: true, enableCellEditOnFocus: false, width: '***', editableCellTemplate: $scope.edittableField},
+	{field:'description', displayName:'Description', enableCellEdit: true, enableCellEditOnFocus: false, width: '******', editableCellTemplate: $scope.edittableField},
+	{field:'context', displayName:'Context', enableCellEdit: false, width: '**'},
+	{field:'createdBy', displayName:'Editor', enableCellEdit: false, width: '***'},
+	{field:'lastUpdated', displayName:'Last Updated', enableCellEdit: false, width: '****'},
+	{field:'versionNumber', displayName:'Version', cellClass: 'text-right', enableCellEdit: false, width: '**'},
+	{field:'hasWIP', displayName:'WIP', cellClass: 'text-center', enableCellEdit: false, width: '*'},
+	{field:'', displayName:'Actions', cellClass: 'text-center', enableCellEdit: false, width: '**', sortable: false, cellTemplate: actionsTemplate}
 	];
 
 	$scope.colDefNoData = [{field:'message', displayName:'Message', enableCellEdit: false, width: '100%'}];
@@ -300,7 +300,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	// Updates all the content below the Recipes list with data from a selected recipe.
 	$scope.changeRecipe = function(releaseWip){
 		var item = $scope.gridOptions.selectedItems[0];
-		
+		$log.info(item);
 		if(!$scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId]){
 			$scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId] = (item.versionNumber > 0) ? 'release' : 'wip';   
 		}else if(releaseWip){
@@ -335,7 +335,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				$scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
 			}
 			if(!$scope.activeTabs.history)
-						$scope.activeTabs.editor  = true;
+				$scope.activeTabs.editor  = true;
 		}else{
 			$log.warn('no results found for the selected recipe');
 		}
@@ -363,74 +363,74 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		}
 
 		var action = ['edit', 'revert', 'archive', 'delete', 'unarchive'],
-			actions = {
-				edit : function(){
-					$timeout(function(){
-						$scope.preventSelection = false;
-						$scope.activeTabs.editor = true;
-						$location.hash('mainTabset');
-						$anchorScroll();
-					}, 100)
-				},
-				revert : function(){
+		actions = {
+			edit : function(){
+				$timeout(function(){
 					$scope.preventSelection = false;
-					$scope.activeTabs.history = true;
-					$timeout(function(){
-						$location.hash('mainTabset');
-						$anchorScroll();
-					}, 100);
-				},
+					$scope.activeTabs.editor = true;
+					$location.hash('mainTabset');
+					$anchorScroll();
+				}, 100)
+			},
+			revert : function(){
+				$scope.preventSelection = false;
+				$scope.activeTabs.history = true;
+				$timeout(function(){
+					$location.hash('mainTabset');
+					$anchorScroll();
+				}, 100);
+			},
 
-				archive : function(){
-					$log.info('Archive code');
+			archive : function(){
+				$log.info('Archive code');
+				var selectedId = row.entity.recipeId;
+				restCalls.archive({moreDetails:selectedId}, function(){
+					$log.info('Success on archiving Recipe');
+					$scope.alerts.addAlert({type: 'success', msg: 'Recipe Archived', closeIn: 1500});
+					listRecipes();
+					$scope.preventSelection = false;
+				}, function(){
+					$log.warn('Error on archiving Recipe');
+					$scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to Archive Recipe'});
+					$scope.preventSelection = false;
+				});
+			},
+
+			unarchive : function(){
+				$log.info('Archive code');
+				var selectedId = row.entity.recipeId;
+				restCalls.unarchive({moreDetails:selectedId}, function(){
+					$log.info('Success on unarchiving Recipe');
+					$scope.alerts.addAlert({type: 'success', msg: 'Recipe UnArchived', closeIn: 1500});
+					listRecipes();
+					$scope.preventSelection = false;
+				}, function(){
+					$log.warn('Error on unarchiving Recipe');
+					$scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to UnArchive Recipe'});
+					$scope.preventSelection = false;
+				});
+			},
+
+			delete : function(){
+				confirmation=confirm("Delete Recipe \""+row.entity.name+"\"?");
+				if (confirmation==true){
 					var selectedId = row.entity.recipeId;
-					restCalls.archive({moreDetails:selectedId}, function(){
-						$log.info('Success on archiving Recipe');
-						$scope.alerts.addAlert({type: 'success', msg: 'Recipe Archived', closeIn: 1500});
+					restCalls.discardWIP({details:selectedId}, function(){
+						$log.info('Success on removing Recipe');
+						$scope.alerts.addAlert({type: 'success', msg: 'Recipe Removed', closeIn: 1500});
 						listRecipes();
 						$scope.preventSelection = false;
+						if(row.rowIndex == $scope.currentSelectedRow.rowIndex){
+							rowToShow = 0;
+						}
 					}, function(){
-						$log.warn('Error on archiving Recipe');
-						$scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to Archive Recipe'});
+						$log.warn('Error on removing Recipe');
+						$scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to Remove Recipe'});
 						$scope.preventSelection = false;
 					});
-				},
-
-				unarchive : function(){
-					$log.info('Archive code');
-					var selectedId = row.entity.recipeId;
-					restCalls.unarchive({moreDetails:selectedId}, function(){
-						$log.info('Success on unarchiving Recipe');
-						$scope.alerts.addAlert({type: 'success', msg: 'Recipe UnArchived', closeIn: 1500});
-						listRecipes();
-						$scope.preventSelection = false;
-					}, function(){
-						$log.warn('Error on unarchiving Recipe');
-						$scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to UnArchive Recipe'});
-						$scope.preventSelection = false;
-					});
-				},
-
-				delete : function(){
-					confirmation=confirm("Delete Recipe \""+row.entity.name+"\"?");
-					if (confirmation==true){
-						var selectedId = row.entity.recipeId;
-						restCalls.discardWIP({details:selectedId}, function(){
-							$log.info('Success on removing Recipe');
-							$scope.alerts.addAlert({type: 'success', msg: 'Recipe Removed', closeIn: 1500});
-							listRecipes();
-							$scope.preventSelection = false;
-							if(row.rowIndex == $scope.currentSelectedRow.rowIndex){
-								rowToShow = 0;
-							}
-						}, function(){
-							$log.warn('Error on removing Recipe');
-							$scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to Remove Recipe'});
-							$scope.preventSelection = false;
-						});
-					}
 				}
-			};
+			}
+		};
 
 		actions[action[ind]]();
 	}
@@ -443,8 +443,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		// Save WIP
 		saveWIP : function(){
 			var tmpObj = $scope.selectedRecipe,
-				selectedId = $scope.selectedRecipe.recipeId,
-				selectedVersion = $scope.selectedRecipe.versionNumber;
+			selectedId = $scope.selectedRecipe.recipeId,
+			selectedVersion = $scope.selectedRecipe.versionNumber;
 			tmpObj.changelog = '';
 			dataToSend = $.param(tmpObj)
 			restCalls.saveWIP({details:selectedId, moreDetails:selectedVersion}, dataToSend, function(){
@@ -460,8 +460,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		// Release
 		releaseVersion : function(){
 			var dataToSend = $.param($scope.selectedRecipe),
-				selectedId = $scope.selectedRecipe.recipeId,
-				confirmation=confirm("Only publish recipes if it is ready for use by all users. Press Okay to publish otherwise press cancel");
+			selectedId = $scope.selectedRecipe.recipeId,
+			confirmation=confirm("Only publish recipes if it is ready for use by all users. Press Okay to publish otherwise press cancel");
 			if (confirmation==true){
 				restCalls.release({moreDetails:selectedId}, dataToSend, function(){
 					$log.info('Success on Releasing');
@@ -492,8 +492,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		// Discard WIP
 		discardWIP : function(){
 			var dataToSend = $.param($scope.selectedRecipe),
-				selectedId = $scope.selectedRecipe.recipeId,
-				selectedVersion = $scope.selectedRecipe.versionNumber;
+			selectedId = $scope.selectedRecipe.recipeId,
+			selectedVersion = $scope.selectedRecipe.versionNumber;
 			restCalls.discardWIP({details:selectedId, moreDetails:selectedVersion}, dataToSend, function(){
 				$log.info('Success on Discarding WIP');
 				$scope.alerts.addAlert({type: 'success', msg: 'WIP Discarded', closeIn: 1500});
@@ -516,11 +516,11 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	$scope.updateEntity = function(row) {
 
 		var recipeToUpdate = {
-				name : $scope.gridData[row.rowIndex].name,
-				description: $scope.gridData[row.rowIndex].description
-			},
-			dataToSend = $.param(recipeToUpdate),
-			rid = $scope.gridData[row.rowIndex].recipeId;
+			name : $scope.gridData[row.rowIndex].name,
+			description: $scope.gridData[row.rowIndex].description
+		},
+		dataToSend = $.param(recipeToUpdate),
+		rid = $scope.gridData[row.rowIndex].recipeId;
 
 
 		if(!$scope.save) {
@@ -575,7 +575,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 	$scope.codeEditorOptions = {
 		lineNumbers: true,
-		indentWithTabs: true
+		indentWithTabs: true,
+		extraKeys: {"Ctrl-Space": "autocomplete"}
 	};
 
 	$scope.syntaxModal = {
