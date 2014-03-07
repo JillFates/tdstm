@@ -450,6 +450,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			restCalls.saveWIP({details:selectedId, moreDetails:selectedVersion}, dataToSend, function(){
 				$log.info('Success on Saving WIP');
 				$scope.alerts.addAlert({type: 'success', msg: 'WIP Saved', closeIn: 1500});
+				$scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId] = 'wip'
 				listRecipes();
 			}, function(){
 				$log.warn('Error on Saving WIP');
@@ -465,6 +466,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				restCalls.release({moreDetails:selectedId}, dataToSend, function(){
 					$log.info('Success on Releasing');
 					$scope.alerts.addAlert({type: 'success', msg: 'Version Released', closeIn: 1500});
+					$scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId] = 'release'
 					listRecipes();
 				}, function(){
 					$log.warn('Error on Saving WIP');
