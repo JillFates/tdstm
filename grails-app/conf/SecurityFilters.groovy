@@ -8,6 +8,8 @@ class SecurityFilters {
 
 		maintModeCheck(controller:'*', action:'*'){
 			before = {
+				if( controllerName == "wsSequence") return
+				
 				def hasBackdoorAccess = maintService.hasBackdoorAccess(session)
 				if( controllerName == "auth" && actionName == "maintMode" ){
 					if(!hasBackdoorAccess ){
@@ -70,7 +72,7 @@ class SecurityFilters {
 				}
 			}
 		}
-
+		
 		// Check to see if the userLogin has forcePasswordChange set and only allow him to access appropriate actions
 		checkForcePasswordChange(controller:'*', action:'*'){
 			before = {
@@ -104,6 +106,8 @@ class SecurityFilters {
 				def subject = SecurityUtils.subject
 				def principal = subject.principal
 				if (controllerName == 'moveTech' && principal == null) {
+					return true
+				} else if (controllerName == "wsSequence") {
 					return true
 				} else if( controllerName != 'auth' && principal == null ) {
 					flash.message = "Your login session has expired.  Please login again."

@@ -52,6 +52,11 @@ class UrlMappings {
 			action = [POST:"createRecipe"]
 		}
 
+		"/ws/public/sequence/$contextId/$name" {
+			controller = "wsSequence"
+			action = [GET:"get"]
+		}
+
 		"/ws/cookbook/recipe/validateSyntax" {
 			controller = "wsCookbook"
 			action = [POST:"validateSyntax"]

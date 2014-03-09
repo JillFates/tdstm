@@ -74,4 +74,5 @@ databaseChangeLog = {
 	include file: '20140227-add-time-move-event.groovy'
 	include file: '20140305-add-custom-fields-to-dependencies.groovy'
 	include file: '20140306-add-is-local-column-to-user-login-table.groovy'
+	include file: '20140307-sequence-logic.groovy'
 }
