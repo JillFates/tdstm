@@ -102,7 +102,7 @@
 		</tr>
     	<tr class="prop">
 			<td valign="top" class="name"><label for="status">Status:</label></td>
-			<td valign="top" class="value" id="statusShowId" colspan="1" style="width: 20%"></td>
+			<td valign="top" class="value" id="statusShowId" colspan="1" style="width: 20%">&nbsp;</td>
 		</tr>
 
 
@@ -206,6 +206,7 @@
 					<input class="delete" type="button" value="Delete" onclick="deleteComment('#commentId','#assetEntityIdShow','refresh')" />
 				</span>
 			</span>
+			<span id='actionBarId' class="slide"></span>
 		</div>
 	</tds:hasPermission>
 </div>

@@ -661,6 +661,16 @@ function showAssetDialog( e , action ) {
 					ac.resolution = "";
 				}
 				 $('#commentId').val(ac.id)
+				 if(action=='show'){
+						$.ajax({
+							url: contextPath+'/task/genActionBarForShowView',
+							data: {'id':ac.id},
+							type:'POST',
+							success: function(data) {
+								$("#actionBarId").html(data);
+							}
+						});
+					}
 				 // $('#predCount').val(params.maxVal)
 				 $('#updateCommentId').val(ac.id)
 		      	 $('#commentTdId').val(ac.comment) 
@@ -845,6 +855,11 @@ function showAssetDialog( e , action ) {
 		      	 $('#statusShowId').html(ac.status);
 		         $("#statusShowId").removeAttr('class')
 		      	 $('#statusShowId').addClass(params.cssForCommentStatus);
+		         
+		         $('#showCommentTable #statusShowId').html(ac.status);
+		         $("#showCommentTable #statusShowId").removeAttr('class')
+		      	 $('#showCommentTable #statusShowId').addClass(params.cssForCommentStatus); 
+		         
 		      	 $('#isResolvedEditId').val(ac.isResolved);
 		      	
 		      	 $('#dateResolvedId').html(params.dtResolved)

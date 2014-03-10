@@ -176,6 +176,60 @@ class TaskController {
 		return actionBar
 	}
 	/**
+	 * Used to generate action Bar for task details view 
+	 * @param asset comment id.
+	 * @render : Action Bar HTML code.
+	 */
+	def genActionBarForShowView = {
+		def comment = AssetComment.get(params.id)
+		StringBuffer actionBar = new StringBuffer("""<span class="slide" style=" margin-top: 4px;">""")
+		def cols=12
+		def userLogin = securityService.getUserLogin()
+		
+		if (comment) {
+			if(comment.status ==  AssetCommentStatus.READY){
+				cols--
+				actionBar.append( "<span id='startTdId_${comment.id}' width='8%' nowrap='nowrap'>"+
+					HtmlUtil.actionButton('Start', 'ui-icon-play', comment.id, "changeStatus('${comment.id}','${AssetCommentStatus.STARTED}','${comment.status}', 'taskManager')")+
+					"</span>")
+			}
+			
+			if (comment.status in[ AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
+				cols--
+				actionBar.append("<span id='doneTdId_${comment.id}' width='8%' nowrap='nowrap'>"+
+					HtmlUtil.actionButton('Done', 'ui-icon-check', comment.id,
+						"changeStatus('${comment.id}','${AssetCommentStatus.DONE}', '${comment.status}', 'taskManager')")+
+					"</span>")
+			}
+		
+			if (userLogin.person.id != comment.assignedTo?.id && comment.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
+				cols--
+				actionBar.append( "<span id='assignToMeId_${comment.id}' width='8%' nowrap='nowrap'>"+
+					HtmlUtil.actionButton('Assign To Me', 'ui-icon-person', comment.id,
+						"assignTask('${comment.id}','${comment.assignedTo}', '${comment.status}', 'taskManager')")+
+					"</span>")
+			}
+			if(comment.status ==  AssetCommentStatus.READY ){
+				def hasSucc = TaskDependency.countByPredecessor( comment )
+				if(!hasSucc && !(comment.category in AssetComment.moveDayCategories)){
+					actionBar.append( "<span id='1dEst_${comment.id}' width='8%' nowrap='nowrap'>"+
+						HtmlUtil.actionButton('1 day', 'ui-icon-seek-next', comment.id,"changeEstTime('1','${comment.id}',this.id)")+"</span>")
+					actionBar.append( "<span id='2dEst_${comment.id}' width='8%' nowrap='nowrap'>"+
+						HtmlUtil.actionButton('2 days', 'ui-icon-seek-next', comment.id,"changeEstTime('2','${comment.id}',this.id)")+"</span>")
+					actionBar.append("<span id='7dEst_${comment.id}' width='8%' nowrap='nowrap'>"+
+						HtmlUtil.actionButton('7 days', 'ui-icon-seek-next', comment.id,"changeEstTime('7','${comment.id}',this.id)")+"</span>")
+				}
+			}
+			
+		}else {
+			log.warn "genActionBarHTML - invalid comment id (${params.id}) from user ${userLogin}"
+			actionBar.append('<span> An unexpected error occurred</span> ')
+		}
+
+		actionBar.append(""" </span> """)
+		render actionBar.toString()
+	}
+	/**
 	* Used by the getActionBarHTML to wrap the button HTML into <td>...</td>
 	*/
 	def _actionButtonTd(tdId, button) {
@@ -484,6 +538,8 @@ digraph runbook {
 		def etext = ""
 		def comment
 		def commentId = NumberUtils.toInt(params.commentId)
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 		if (commentId >0) {
 			def day = NumberUtils.toInt(params.day)
 			def project = securityService.getUserCurrentProject()
@@ -505,7 +561,8 @@ digraph runbook {
 		} else {
 				etext = "Requested comment does not exist. "
 		}
-		def retMap=[etext:etext, estStart : comment?.estStart]
+		def retMap=[etext:etext, estStart : comment?.estStart ? estformatter.format(TimeUtil.convertInToUserTZ(comment?.estStart, tzId)) : '' ,
+					 estFinish: comment?.estFinish ? estformatter.format(TimeUtil.convertInToUserTZ(comment?.estFinish, tzId)) : '' ]
 		render retMap as JSON
 	}
 	

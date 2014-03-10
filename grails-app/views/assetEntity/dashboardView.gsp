@@ -16,6 +16,7 @@
 <g:javascript src="angular.js" />
 <g:javascript src="angular-ui.js"/>	
 <g:javascript src="cabling.js"/>
+<g:javascript src="asset.comment.js" />
 <style type="text/css">
 td .odd {
 	background: #DDDDDD;

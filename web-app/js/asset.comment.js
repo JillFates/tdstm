@@ -8,12 +8,17 @@
  */
 function changeStatus(id, status, currentStatus, from){
 	var params = {'id':id,'status':status,'currentStatus':currentStatus,redirectTo:'taskManager'}
-
+	
 	// Disable status change buttons to prevent double-clicking
 	$('#start_button_'+id).removeAttr('onclick')
 	$('#done_button_'+id).removeAttr('onclick')
  	$('#start_text_'+id).attr('class', 'task_button_disabled')
 	$('#done_text_'+id).attr('class', 'task_button_disabled')
+	
+	$('#showCommentDialog #start_button_'+id).removeAttr('onclick')
+	$('#showCommentDialog #done_button_'+id).removeAttr('onclick')
+	$('#showCommentDialog #start_text_'+id).attr('class', 'task_button_disabled')
+	$('#showCommentDialog #done_text_'+id).attr('class', 'task_button_disabled')
 
 	if(from == "myTask"){ params = {'id':id,'status':status,'currentStatus':currentStatus,redirectTo:'taskManager','view':'myTask','tab':$('#tabId').val() }}
 	jQuery.ajax({
@@ -43,6 +48,8 @@ function changeStatus(id, status, currentStatus, from){
 					 	$('#started_'+id).hide()
 					 }
 				}
+				$("#showCommentTable #statusShowId").html(data.assetComment.status)
+				$("#showCommentTable #statusShowId").removeAttr('class').addClass(data.statusCss)
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
@@ -63,6 +70,9 @@ function assignTask(id, user, status, from){
 	if(B1 != ''){ B1.Pause(); }
 	$('#assigntome_button_'+id).removeAttr('onclick')
 	$('#assigntome_text_'+id).attr('class', 'task_button_disabled')
+	
+	$('#showCommentDialog #assigntome_button_'+id).removeAttr('onclick')
+	$('#showCommentDialog #assigntome_text_'+id).attr('class', 'task_button_disabled')
  	
 	jQuery.ajax({
 		url: contextPath+'/task/assignToMe',
@@ -84,6 +94,7 @@ function assignTask(id, user, status, from){
 					  	B1.Pause(0);
 					 }
 				}
+				$("#showCommentDialog #assignedToTdId").html(data.assignedTo)
 			}
 			
 		},
@@ -329,6 +340,12 @@ function changeEstTime(day,commentId,id){
 					$("#"+id).removeAttr('onclick')
 					$("#"+reqId[0]+"_text_"+reqId[2]).removeAttr('class')
 					$("#"+reqId[0]+"_text_"+reqId[2]).attr('class', 'task_button_disabled')
+					
+					$('#estStartShowId').html(resp.estStart)
+					$('#estFinishShowId').html(resp.estFinish)
+					$('#showCommentDialog #'+id).removeAttr('onclick')
+					$('#showCommentDialog #'+reqId[0]+"_text_"+reqId[2]).removeAttr('class')
+					$('#showCommentDialog #'+reqId[0]+"_text_"+reqId[2]).attr('class', 'task_button_disabled')
 			}
 		}
 	});

@@ -9,6 +9,7 @@
 		<g:javascript src="projectStaff.js" />
 		<g:javascript src="angular.js" />
 		<g:javascript src="angular-ui.js"/>	
+		<g:javascript src="asset.comment.js" />
 		<g:javascript src="cabling.js"/>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />

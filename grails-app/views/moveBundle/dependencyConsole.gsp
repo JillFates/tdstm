@@ -9,7 +9,8 @@
 		<g:javascript src="model.manufacturer.js"/>
 		<g:javascript src="projectStaff.js" />
 		<g:javascript src="angular.js" />
-		<g:javascript src="angular-ui.js"/>	
+		<g:javascript src="angular-ui.js"/>
+		<g:javascript src="asset.comment.js" />
 		<g:javascript src="cabling.js"/>
 		<script type="text/javascript" src="${resource(dir:'d3',file:'d3.js')} "></script>
 		<link rel="stylesheet" href="${resource(dir:'d3/force',file:'force.css')}" type="text/css"/>
