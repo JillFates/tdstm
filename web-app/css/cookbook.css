@@ -191,3 +191,7 @@ form .error-msg{
 	border: none;
 	border-radius: 0;
 }
+
+.syntaxErrors > li p:first-child{
+	margin: 0;
+}

@@ -4,7 +4,7 @@ app.config(['$logProvider', function($logProvider) {
    //$logProvider.debugEnabled(false);  
 }]);
 
-app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $resource, $timeout, $modal, $log, $location, $anchorScroll) {
+app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $resource, $timeout, $modal, $log, $location, $anchorScroll, $sce) {
 	
 	// All Vars used
 	var restCalls, restCalls, listRecipes, columnSel, actionsTemplate, updateBtns, lastLoop, confirmation, confirmation, rowToShow, ModalInstanceCtrl;
@@ -82,7 +82,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			validate: {
 				method: "POST",
 				params: {
-					section: "validate"
+					section: "recipe",
+					details: "validateSyntax"
 				}
 			},
 			putInRecipe: {
@@ -143,6 +144,19 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		editor : false,
 		versions : false
 	};
+
+	$scope.activeSubTabs = {
+		history: {
+			actions: true,
+			tasks: false,
+			logs: false
+		},
+		editor: {
+			logs: true,
+			groups: false,
+			syntaxErrors: false
+		}
+	}
 
 	// Pagination Stuff
 	$scope.totalItems = 4;
@@ -319,6 +333,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 					// A deep copy of the selected Recipe data. It won't change when editing.
 					$scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
+					$scope.originalDataRecipe.syntaxValidation = [];
 
 					$log.info('Success on getting selected recipe');
 				}, function(){
@@ -505,11 +520,22 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		},
 		// Validate Syntax
 		validateSyntax : function(){
-			
+			var dataToSend = $.param({'sourceCode': $scope.selectedRecipe.sourceCode});
+			restCalls.validate({}, dataToSend, function(data){
+				$scope.originalDataRecipe.syntaxValidation = data.errors;
+				$scope.activeSubTabs.editor.syntaxErrors = true;
+			}, function(data){
+				$log.warn('Error on validation');
+				$scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to validate Syntax'});
+			});
 		}
 
 	}
 	//----------------------
+
+	$scope.secureHTML = function(param){
+		return $sce.trustAsHtml(param);
+	}
 	
 
 	// Update recipe. After editing. 
@@ -576,6 +602,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	$scope.codeEditorOptions = {
 		lineNumbers: true,
 		indentWithTabs: true,
+		lineWrapping : true,
 		extraKeys: {"Ctrl-Space": "autocomplete"}
 	};
 

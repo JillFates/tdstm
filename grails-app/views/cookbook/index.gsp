@@ -113,7 +113,7 @@
 									
 									<tabset>
 										%{-- Actions Content --}%
-										<tab heading="Task Generation">
+										<tab heading="Task Generation" active="activeSubTabs.history.actions">
 											<div class="btn-group">
 												<button type="button" class="btn btn-default">Publish</button>
 												<button type="button" class="btn btn-default">Refresh</button>
@@ -126,7 +126,7 @@
 										</tab>
 										
 										%{-- Tasks Content --}%
-										<tab heading="Task Content">
+										<tab heading="Task Content" active="activeSubTabs.history.tasks">
 											<div class="table-responsive">
 												<table class="table table-hover table-striped ngGridTable">
 													<thead>
@@ -174,7 +174,7 @@
 										</tab>
 
 										%{-- Generation Log Content --}%
-										<tab heading="Generation Log">
+										<tab heading="Generation Log" active="activeSubTabs.history.logs">
 											<form action="#">
 												<div class="radio-inline">
 													<label>
@@ -196,7 +196,7 @@
 							</tab>
 
 							%{-- Editor Content --}%
-							<tab heading="Editor" select="executeCodeMirror(this)" active="activeTabs.editor">
+							<tab heading="Editor" active="activeTabs.editor">
 								<div class="row clearfix edition">
 									<div class="col-xs-6">
 										<div class="titleWrapper row">
@@ -229,13 +229,13 @@
 										<tabset>
 											
 											%{-- Change Logs Content --}%
-											<tab heading="Change Logs">
+											<tab heading="Change Logs" active="activeSubTabs.editor.logs">
 												<label for="logs" class="sr-only">Logs </label>
 												<textarea name="logs" id="logs" rows="6" ng-model="selectedRecipe.changelog" ng-disabled="!currentSelectedRecipe" value="{{selectedRecipe.changelog}}"></textarea>
 											</tab>
 
 											%{-- Groups Content --}%
-											<tab heading="Groups">
+											<tab heading="Groups" active="activeSubTabs.editor.groups">
 												<form action="#" class="form-inline groups clearfix">
 													<div class="form-group col-xs-7">
 														<label for="testWith">Test With: </label>
@@ -309,6 +309,15 @@
 														</tbody>
 													</table>
 												</div>
+											</tab>
+											%{-- Syntax Errors Content --}%
+											<tab heading="Syntax Errors" active="activeSubTabs.editor.syntaxErrors">
+												<ul class="syntaxErrors">
+													<li ng-repeat="error in originalDataRecipe.syntaxValidation">
+														<p style="font-weight: bold" ng-bind="error.reason"></p>
+														<p ng-bind-html="secureHTML(error.detail)"></p>
+													</li>
+												</ul>
 											</tab>
 										</tabset>
 									</div>
