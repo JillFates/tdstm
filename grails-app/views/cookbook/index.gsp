@@ -313,7 +313,7 @@
 											%{-- Syntax Errors Content --}%
 											<tab heading="Syntax Errors" active="activeSubTabs.editor.syntaxErrors">
 												<ul class="syntaxErrors">
-													<li ng-repeat="error in originalDataRecipe.syntaxValidation">
+													<li ng-repeat="error in currentSyntaxValidation">
 														<p style="font-weight: bold" ng-bind="error.reason"></p>
 														<p ng-bind-html="secureHTML(error.detail)"></p>
 													</li>

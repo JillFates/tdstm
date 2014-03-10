@@ -333,7 +333,6 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 					// A deep copy of the selected Recipe data. It won't change when editing.
 					$scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
-					$scope.originalDataRecipe.syntaxValidation = [];
 
 					$log.info('Success on getting selected recipe');
 				}, function(){
@@ -522,7 +521,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		validateSyntax : function(){
 			var dataToSend = $.param({'sourceCode': $scope.selectedRecipe.sourceCode});
 			restCalls.validate({}, dataToSend, function(data){
-				$scope.originalDataRecipe.syntaxValidation = data.errors;
+				$scope.currentSyntaxValidation = data.errors;
 				$scope.activeSubTabs.editor.syntaxErrors = true;
 			}, function(data){
 				$log.warn('Error on validation');
