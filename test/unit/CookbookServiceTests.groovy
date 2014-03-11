@@ -20,6 +20,21 @@ class CookbookServiceTests extends GrailsUnitTestCase {
 			]
 		]"""
 
+	def predTask = """[
+			id: 1106,
+			description: 'Make NAT changes for various CSG services',
+			title: [
+				'Make NAT change for STL-PROD-ws.suddenlink.cequel3.com',
+				'Make NAT change for STL-PROD-wsp.suddenlink.com-internal',
+			],
+			team: 'NETWORK_ADMIN',
+			duration: 5,
+			category: 'shutdown',
+			type: 'general',
+			terminal: true,
+			chain: false,
+		]"""
+		
 	def goodGeneralTask = """[
 			id: 1110,
 			description: 'Make NAT changes for various CSG services',
@@ -70,7 +85,7 @@ class CookbookServiceTests extends GrailsUnitTestCase {
 	// Series of tests for the validateSyntax method as there are numerous issues that could arise
 	//
 	void testValidateSyntaxGroupIsProperlyFormatted() {
-		def recipe = "groups: [$goodGroup], tasks:[$goodGeneralTask]"
+		def recipe = "groups: [$goodGroup], tasks:[$predTask, $goodGeneralTask]"
 		def errors = cookbookService.validateSyntax( recipe )
 		assertNull errors
 	}
@@ -79,7 +94,7 @@ class CookbookServiceTests extends GrailsUnitTestCase {
 	void testValidateSyntaxGroupMissingName() {
 		def recipe = """
 			groups: [ [name:'', filter: [class:'application'] ] ], 
-			tasks:[$goodGeneralTask]"""
+			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
 		assertNotNull 'Should have errors', errors
 		assertEquals 'Should have one error', 1, errors.size()
@@ -89,7 +104,7 @@ class CookbookServiceTests extends GrailsUnitTestCase {
 	void testValidateSyntaxGroupNameHasSpace() {
 		def recipe = """
 			groups: [ [name:'a b c', filter: [class:'application'] ] ], 
-			tasks:[$goodGeneralTask]"""
+			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
 		assertNotNull 'Should have errors', errors
 		assertEquals 'Should have one error', 1, errors.size()
@@ -99,7 +114,7 @@ class CookbookServiceTests extends GrailsUnitTestCase {
 	void testValidateSyntaxGroupHasDuplicateNameDefined() {
 		def recipe = """
 			groups: [ $goodGroup, $goodGroup ], 
-			tasks:[$goodGeneralTask]"""
+			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
 		assertNotNull 'Should have errors', errors
 		assertEquals 'Should have one error', 1, errors.size()
@@ -109,7 +124,7 @@ class CookbookServiceTests extends GrailsUnitTestCase {
 	void testValidateSyntaxGroupHasInvalidClassName() {
 		def recipe = """
 			groups: [ [name:'APPS', filter: [class:'invalidClassName'] ] ],
-			tasks:[$goodGeneralTask]"""
+			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
 		log.info errors
 		assertNotNull 'Should have errors', errors
@@ -120,7 +135,7 @@ class CookbookServiceTests extends GrailsUnitTestCase {
 	void testValidateSyntaxGroupIsMissingFilterDefinition() {
 		def recipe = """
 			groups: [ [name:'APPS'] ],
-			tasks:[$goodGeneralTask]"""
+			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
 		log.info errors
 		assertNotNull 'Should have errors', errors
@@ -131,7 +146,7 @@ class CookbookServiceTests extends GrailsUnitTestCase {
 	void testValidateSyntaxGroupFilterIsNotMap() {
 		def recipe = """
 			groups: [ [ name:'APPS', filter: 'Should be a Map but it is not' ] ],
-			tasks:[$goodGeneralTask]"""
+			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
 		log.info errors
 		assertNotNull 'Should have errors', errors
@@ -149,7 +164,7 @@ class CookbookServiceTests extends GrailsUnitTestCase {
 					]
 				]
 			],
-			tasks:[$goodGeneralTask]"""
+			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
 		log.info errors
 		assertNotNull 'Should have errors', errors
@@ -167,7 +182,7 @@ class CookbookServiceTests extends GrailsUnitTestCase {
 					]
 				]
 			],
-			tasks:[$goodGeneralTask]"""
+			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
 		log.info errors
 		assertNotNull 'Should have errors', errors
