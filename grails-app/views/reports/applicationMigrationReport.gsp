@@ -1,0 +1,78 @@
+<%@page import="com.tds.asset.AssetComment"%>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="layout" content="projectHeader" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
+<title>Application Migration Results</title>
+</head>
+<body>
+	<div class="body">
+		<h1>Application Migration Results</h1>
+		
+		<g:if test="${flash.message}">
+			<div class="message">${flash.message}</div>
+		</g:if>
+		
+		<g:form action="generateApplicationMigration" name="applicationProfiles" method="post">
+			<table>
+				<tbody>
+					<tr>
+						<td><label for="moveBundle">Bundle:</label></td>
+						<td><g:select from="${moveBundles}" id="moveBundleId" name="moveBundle" onChange="changeSmeSelect(this.value)"
+								optionKey="id" optionValue="name" value="${moveBundleId}" noSelection="['useForPlanning':'Use For Planning']"/></td>
+					</tr>
+					<tr>
+						<td><label for="moveBundle">SME:</label></td>
+						<td>
+							<g:render template="smeSelectByBundle"  model="[smeList:smeList]" />
+						</td>
+					</tr>
+					<tr>
+						<td><label for="startCateory">start of with:</label></td>
+						<td><g:select from="${AssetComment.constraints.category.inList}" id="startCateory" name="startCateory" value='shutdown'/></td>
+					</tr>
+					<tr>
+						<td><label for="workflowTransId">Testing:</label></td>
+						<td>
+							<g:select id="workflowTransId.id" name="workflowTransId" from="${workflowTransitions}" optionKey="id" optionValue="name"
+								noSelection="['':'Please Select']"></g:select>
+						</td>
+					</tr>
+					<tr>
+						<td><label for="stopCateory">end with:</label></td>
+						<td><g:select from="${AssetComment.constraints.category.inList}" id="stopCateory" name="stopCateory" value='shutdown'/></td>
+					</tr>
+					<tr>
+						<td><label for="outageWindow">Outage window:</label></td>
+						<td><g:select from="${appAttributes}" id="outageWindow" name="outageWindow" optionKey="attributeCode" optionValue="frontendLabel" 
+							value="drRtoDesc" noSelection="['':'Please Select']"/></td>
+					</tr>
+					<tr class="buttonR">
+					<tds:hasPermission permission="ShowMovePrep">
+						<td><input type="submit" class="submit" value="Generate"/></td>
+					</tds:hasPermission>
+					</tr>
+				</tbody>
+			</table>
+		</g:form>
+	</div>
+	<script type="text/javascript">
+		currentMenuId = "#reportsMenu"
+		$("#reportsMenuId a").css('background-color','#003366')
+		
+		function changeSmeSelect(bundle){
+			jQuery.ajax({
+				url: contextPath+'/reports/generateSmeByBundle',
+				data: {'bundle':bundle},
+				type:'POST',
+				success: function(data) {
+					console.log("success");
+					$("#smeByModel").html(data)
+				}
+			});
+		}
+
+	</script>
+</body>
+</html>

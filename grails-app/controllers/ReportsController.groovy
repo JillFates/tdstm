@@ -1,4 +1,5 @@
 import grails.converters.JSON
+import groovy.time.TimeCategory
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -14,6 +15,7 @@ import jxl.write.*
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.apache.commons.lang.math.NumberUtils
 
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
@@ -1618,6 +1620,83 @@ class ReportsController {
 		}
 		flash.message = errorMsg
 		redirect( action:"serverConflicts")
+	}
+	/**
+	 * used to render to application Migration Report selection criteria.
+	 */
+	def applicationMigrationReport = {
+		def project = securityService.getUserCurrentProject()
+		def moveBundleList = MoveBundle.findAllByProject(project)
+		def moveBundleId = securityService.getUserCurrentMoveBundleId()
+		def smeList = reportsService.getSmeList(moveBundleId)
+		def workflow = Workflow.findByProcess(project.workflowCode)
+		def workflowTransitions = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? order by w.transId", [workflow] )
+		def attributes = projectService.getAttributes('Application')
+		def projectCustoms = project.customFieldsShown+1
+		def nonCustomList = (projectCustoms..48).collect{"custom"+it}
+		def appAttributes = attributes.findAll{!(it.attributeCode in nonCustomList)}
+		return ['moveBundles':moveBundleList, moveBundleId:moveBundleId, smeList:smeList,workflowTransitions:workflowTransitions, appAttributes:appAttributes]
+	}
+	/**
+	 * Used to generate Application Migration Report.
+	 */
+	def generateApplicationMigration = {
+		def project = securityService.getUserCurrentProject()
+		def applicationList
+		def currentSme
+		def currentBundle
+		def appList = []
+		if(params.moveBundle == 'useForPlanning'){		 
+			if(params.smeByModel!='null'){          
+				currentSme = Person.get(params.smeByModel)
+				applicationList = Application.findAll("from Application where project = :project and (sme=:smes or sme2=:smes)",
+					[project:project,smes:currentSme])
+			}else {
+				applicationList = Application.findAllByMoveBundleInList(MoveBundle.getUseOfPlanningBundlesByProject(project))
+			}
+		}else{ 
+			currentBundle = MoveBundle.get(params.moveBundle)
+			if(params.smeByModel!='null'){
+				currentSme = Person.get(params.smeByModel)
+				applicationList = Application.findAll("from Application where project = :project and moveBundle = :bundle \
+					and (sme=:smes or sme2=:smes)",[project:project,bundle:currentBundle,smes:currentSme])
+			}else {
+				applicationList = Application.findAllByMoveBundle(currentBundle)
+			}
+		}
+		
+		applicationList.each{
+			def applicationInstance = Application.get( it.id )
+			def startCommentList = applicationInstance.comments.findAll{it.category == params.startCateory}.sort{it.actStart}
+			def finishCommentList = applicationInstance.comments.findAll{it.category == params.stopCateory}.sort{it.actStart}.reverse()
+			def finishTime = finishCommentList[0]?.actStart
+			def startTime = startCommentList[0]?.actStart
+			def duration
+			def customParam
+			def windowColor
+			def workflow
+			
+			if(finishTime && startTime){
+				def dayTime = TimeCategory.minus(finishTime, startTime)
+				duration = (dayTime.days*24)+dayTime.hours
+			}
+			if(params.outageWindow == 'drRtoDesc'){
+				customParam = applicationInstance.drRtoDesc? NumberUtils.toInt((applicationInstance.drRtoDesc).split(" ")[0]) : ''
+				if(duration && customParam)
+					windowColor = (customParam < duration) ? 'red' : ''
+			}else{
+				customParam = it[params.outageWindow]
+			}
+			if(params.workflowTransId){
+				def workflowTransaction = WorkflowTransition.get(params.workflowTransId)
+				workflow = applicationInstance.comments.findAll{it?.workflowTransition == workflowTransaction}.sort{it.actStart}
+			}
+			appList.add([ app : applicationInstance,startTime:startTime,finishTime:finishTime, duration: duration? duration+' hours' : '',
+				 customParam: customParam ? customParam + (params.outageWindow == 'drRtoDesc' ? ' hours': ''): '', windowColor:windowColor, 
+				 workflow: workflow? workflow[0].duration+" "+workflow[0].durationScale : ''])
+		}
+	  
+	  return [appList:appList, moveBundle:currentBundle , sme:currentSme?:'All' , project:project]
 	}
 }
  
