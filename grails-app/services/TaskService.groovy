@@ -1248,6 +1248,101 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	// ===================================================================================================================================================================================
 
 	/**
+	 * Used to create a task batch
+	 * TODO: Esteban - fill in doc and implementation
+	 */
+	TaskBatch createTaskBatch(Person whom, Object context, RecipeVersion recipe) {
+		// In retrospect, looking at the TaskBatch class, it may make more sense to have a contextType ENUM (e.g. Event, Bundle, App) 
+		// along with Integer contextId instead of the three fields (moveEvent, moveBundle, Application).
+
+		// Create and return the TaskBatch - throw exception if validation / save fails
+	}
+
+	/**
+	 * Used to initiate an async task creation process 
+	 * This is the service method called by the controller to initiate task generation
+	 * TODO: Esteban - fill in doc and implementation
+	 * @param publish - used to indicate if the tasks should be published at the time that they are generate, default=false
+	 */
+	TaskBatch initiateCreateTasksWithRecipe(UserLogin user, Object context, RecipeVersion recipe, Boolean publish=false) {
+
+		// Validate that the user has permission GenerateTasks
+		// If publish then validate that user has PublishTasks permission
+
+		def assets = getAssocAssets( context )
+
+		if (assets.size()) {
+			// call createTaskBatch
+			// create one-time quartz job that will need to pass the taskBatch id and publish flag
+		} else {
+			// Throw exception that there were no assets found
+		}
+
+	}
+
+	/**
+	 * Used to find assets associated with a given context type and id
+	 * TODO: Esteban - fill in doc and implementation, contextType (enum)
+	 * 
+	 */
+	Object getContextObject(contextType, Integer contextId) {
+		def asset
+		switch (contextType):
+			// For each type lookup the asset
+		}
+		return asset
+	}
+
+	/**
+	 * Used to find assets associated with a given context type and id
+	 * TODO: Esteban - fill in doc and implementation, contextType (enum)
+	 * 
+	 */
+	List getAssocAssets(contextType, Integer contextId) {
+		def asset = getContextObject( contextType, contextId)
+
+		return getAssocAsset( asset )
+	}
+
+	/**
+	 * Used to find assets associated with a given context
+	 * TODO: Esteban - fill in doc and implementation
+	 * 
+	 */
+	List getAssocAssets(Object context) {
+		def assets = []
+
+		// Load Asset list based on the context
+		switch (context) {
+			case instanceof MoveEvent:
+				// See the code below in generateRunbook:
+				// get bundle ids
+				// get assets in the bundle, could just fall into MoveBundle case
+			case instanceof MoveBundle:
+				// Similar to MoveEvent
+				// get assets in bundle
+				break
+			case instanceOf Application:
+				// Get assets that it depends on and supports from AssetDependency along with the application
+				break
+			default:
+				// log error for unhandled case with the context.class
+		}
+
+		return assets
+	}
+
+	/**
+	 * This is going to replace the generateRunbook method below
+	 * TODO: John to implement
+	 */
+	void generateTasks(TaskBatch taskBatch) {
+		// 
+		// def context = getContextObject(taskBatch.contextType, taskBatch.contextId)
+		// def assets = getAssocAssets(context)
+	}
+	
+	/**
 	 * Used to generate the runbook tasks for a specified project's Event
 	 * @param Person whom - the individual that is generating the tasks
 	 * @param MoveEvent moveEvent - the event to process
