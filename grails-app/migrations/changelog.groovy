@@ -75,4 +75,5 @@ databaseChangeLog = {
 	include file: '20140305-add-custom-fields-to-dependencies.groovy'
 	include file: '20140306-add-is-local-column-to-user-login-table.groovy'
 	include file: '20140307-sequence-logic.groovy'
+	include file: '20140312-update-person-active-field-with-user-login-active.groovy'
 }

@@ -228,6 +228,8 @@ class PersonController {
 		if(person) {
 			person.properties = params
 			if ( person.validate() && person.save() ) {
+				def userLogin = UserLogin.findByPerson(person)
+				userLogin.active = person.active
 				if (companyId != null ){
 					def companyParty = Party.findById(companyId)
 					partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', person, "STAFF")
@@ -570,6 +572,7 @@ class PersonController {
 					def expiryDate = params.expiryDate
 					userLogin.expiryDate =  GormUtil.convertInToGMT(formatter.parse( expiryDate ), tzId)
 				}
+				userLogin.active = personInstance.active
 				if(!userLogin.save()){
 					userLogin.errors.allErrors.each{println it}
 				}

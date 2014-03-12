@@ -232,6 +232,7 @@ class UserLoginController {
 						def assignedRoles = request.getParameterValues("assignedRole");
 						def person = params.person.id
 						def personInstance = Person.get(person)
+						personInstance.active = userLoginInstance.active
 						partyRelationshipService.updatePartyRoleByType('system', personInstance, assignedRoles)
 						userPreferenceService.setUserRoles(assignedRoles, person)
 						userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "CURR_PROJ", params.project)
@@ -330,6 +331,8 @@ class UserLoginController {
 			if(!userLoginInstance.hasErrors() && userLoginInstance.save()) {
 				def assignedRoles = request.getParameterValues("assignedRole");
 				def person = params.person.id
+				def personInstance = Person.findById( person )
+				personInstance.active = userLoginInstance.active
 				userPreferenceService.setUserRoles(assignedRoles, person)
 				userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "START_PAGE", "Current Dashboard")
 				userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "CURR_PROJ", params.project)
