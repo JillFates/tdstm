@@ -92,8 +92,8 @@ ul{
 	margin:15px 0 0 0;
 }
 
-textarea#logs{
-	height:161px;
+textarea#logs, .syntaxErrors{
+	height:167px;
 	width:100%;
 }
 
@@ -156,7 +156,7 @@ form .error-msg{
 .archiveCheckWrapper{margin:5px 0 0 0;}
 
 .versionLinks{
-	margin: 4px 0;
+	margin: 7px 0;
 }
 
 .versionLinks label{
@@ -190,6 +190,12 @@ form .error-msg{
 	background-color: transparent;
 	border: none;
 	border-radius: 0;
+}
+
+.syntaxErrors{
+	overflow: auto;
+	border: 1px solid #ddd;
+	margin: 0;
 }
 
 .syntaxErrors > li p:first-child{

@@ -203,10 +203,10 @@
 											<h5 class="headingTitle col-xs-6">Recipe</h5>
 											<div class="versionLinks col-xs-6" style="text-align: right;">
 												<label for="releasedVersionRadio" ng-show="gridOptions.selectedItems[0].versionNumber > 0">
-													<input type="radio" ng-checked="wipConfig[gridData[currentSelectedRow.rowIndex].recipeId] == 'release'" ng-model="wipConfig[gridData[currentSelectedRow.rowIndex].recipeId]" value="release" ng-click="changeRecipe('release')" name="releasedWipVersion" id="releasedVersionRadio"> Version {{gridOptions.selectedItems[0].versionNumber}}
+													<input type="radio" ng-model="wipConfig[gridData[currentSelectedRow.rowIndex].recipeId]" value="release" ng-change="switchWipRelease('release')" name="releasedWipVersion" id="releasedVersionRadio"> Version {{gridOptions.selectedItems[0].versionNumber}}
 												</label>
 												<label for="wipVersionRadio" style="margin-left: 15px;">
-													<input type="radio" ng-checked="wipConfig[gridData[currentSelectedRow.rowIndex].recipeId] == 'wip'" ng-model="wipConfig[gridData[currentSelectedRow.rowIndex].recipeId]" value="wip" ng-click="changeRecipe('wip')" name="releasedWipVersion" id="wipVersionRadio"> WIP
+													<input type="radio" ng-model="wipConfig[gridData[currentSelectedRow.rowIndex].recipeId]" value="wip" ng-change="switchWipRelease('wip')" name="releasedWipVersion" id="wipVersionRadio"> WIP
 												</label>
 											</div>
 										</div>
@@ -215,7 +215,7 @@
 										</section>
 										<div class="clearfix btns">
 											<div class="btn-group pull-left" style="margin-right:15px;">
-												<button type="button" class="btn btn-default" ng-disabled="!currentSelectedRecipe" ng-click="editorActions.saveWIP()">Save WIP</button>
+												<button type="button" class="btn btn-default" ng-disabled="!currentSelectedRecipe || !editingRecipe" ng-click="editorActions.saveWIP()">Save WIP</button>
 												<button type="button" ng-disabled="!selectedRecipe.hasWIP || !currentSelectedRecipe || selectedRecipe.versionNumber > 0" class="btn btn-default" ng-click="editorActions.releaseVersion()">Release</button>
 											</div>
 											<div class="btn-group pull-left">
@@ -231,7 +231,7 @@
 											%{-- Change Logs Content --}%
 											<tab heading="Change Logs" active="activeSubTabs.editor.logs">
 												<label for="logs" class="sr-only">Logs </label>
-												<textarea name="logs" id="logs" rows="6" ng-model="selectedRecipe.changelog" ng-disabled="!currentSelectedRecipe" value="{{selectedRecipe.changelog}}"></textarea>
+												<textarea name="logs" id="logs" rows="6" ng-model="selectedRecipe.changelog" ng-disabled="!currentSelectedRecipe || wipConfig[gridData[currentSelectedRow.rowIndex].recipeId] == 'release'" value="{{selectedRecipe.changelog}}"></textarea>
 											</tab>
 
 											%{-- Groups Content --}%
@@ -311,7 +311,7 @@
 												</div>
 											</tab>
 											%{-- Syntax Errors Content --}%
-											<tab heading="Syntax Errors" active="activeSubTabs.editor.syntaxErrors">
+											<tab heading="Syntax Errors" class="no-padding" active="activeSubTabs.editor.syntaxErrors">
 												<ul class="syntaxErrors">
 													<li ng-repeat="error in currentSyntaxValidation">
 														<p style="font-weight: bold" ng-bind="error.reason"></p>
