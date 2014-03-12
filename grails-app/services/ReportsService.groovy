@@ -77,11 +77,11 @@ class ReportsService {
 	 * @param boolean unresolved - If true, apps with dependencies with status 'Questioned' or 'Unknown' will be shown
 	 * @return Map - The parameters used by the view to generate the report
 	 */
-	def genApplicationConflicts(def currProj , def moveBundleId, def conflicts, def unresolved, def planning) {
+	def genApplicationConflicts(def currProj , def moveBundleId, def conflicts, def unresolved, def missing, def planning) {
 		def projectInstance = Project.findById( currProj )
 		ArrayList appList = new ArrayList()
 		def appsInBundle
-		log.info "****bundle:${moveBundleId} conflicts:${conflicts} unresolved:${unresolved} planning:${planning} "//type:${MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance, true).class} list:${MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance, true).toList()}"
+		log.info "****bundle:${moveBundleId} conflicts:${conflicts} unresolved:${unresolved} planning:${planning} missing: ${missing}"
 		
 		if(planning) {
 			appsInBundle = Application.findAllByMoveBundleInList(MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance, true).toList())
@@ -93,31 +93,40 @@ class ReportsService {
 			def showApp = false
 			def dependsOnList = AssetDependency.findAllByAsset(it)
 			def supportsList = AssetDependency.findAllByDependent(it)
-			def dependsOnIssueCount = 0
-			def supportsIssueCount = 0
 			
-			dependsOnList.each {
-				def conflictIssue = (it.asset.moveBundle?.id != it.dependent.moveBundle?.id) && ( it.status in ['Validated','Questioned','Unknown'] )
-				def statusIssue = it.status in ['Questioned','Unknown']
-				showApp = showApp || ( conflicts && conflictIssue ) || ( unresolved && statusIssue )
-				
-				if(conflictIssue || statusIssue)
-					dependsOnIssueCount++
+			if( !conflicts && !unresolved && !missing ){
+				showApp = true
+			} else {
+				// Check for missing dependencies if showApp is false
+				if(missing){
+					if(!dependsOnList & !supportsList)
+						showApp = true
+				}
+				// Check for bundleConflicts if showApp is false
+				if(!showApp && conflicts){
+					def conflictIssue = dependsOnList.find{(it.asset.moveBundle?.id != it.dependent.moveBundle?.id) && ( it.status in ['Validated','Questioned','Unknown'] )}
+					if(!conflictIssue){
+						conflictIssue = supportsList.find{(it.asset.moveBundle?.id != it.dependent.moveBundle?.id) && ( it.status in ['Validated','Questioned','Unknown'] )}
+					}
+					if(conflictIssue){
+						showApp = true
+					}
+				}
+				// Check for unResolved Dependencies if showApp is false
+				if(!showApp && unresolved){
+					def statusIssue = dependsOnList.find{it.status in ['Questioned','Unknown']}
+					if(!statusIssue){
+						statusIssue = supportsList.find{it.status in ['Questioned','Unknown']}
+					}
+					if(statusIssue){
+						showApp = true
+					}
+				}
 			}
 			
-			supportsList.each {
-				def conflictIssue = (it.asset.moveBundle?.id != it.dependent.moveBundle?.id) && ( it.status in ['Validated','Questioned','Unknown'] )
-				def statusIssue = it.status in ['Questioned','Unknown']
-				showApp = showApp || ( conflicts && conflictIssue ) || ( unresolved && statusIssue )
-				
-				if(conflictIssue || statusIssue)
-					supportsIssueCount++
-			}
-			
-			if(showApp || ( ! conflicts && ! unresolved ) )
-				appList.add([ 'app':it, 'dependsOnList':dependsOnList, 'supportsList':supportsList, 'dependsOnIssueCount':dependsOnIssueCount, 'supportsIssueCount':supportsIssueCount ])
+			if(showApp)
+				appList.add([ 'app':it, 'dependsOnList':dependsOnList, 'supportsList':supportsList, 'dependsOnIssueCount':dependsOnList.size(), 'supportsIssueCount':supportsList.size() ])
 		}
-		
 		return['project':projectInstance, 'appList':appList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : (moveBundleId), 'columns':9]
 	}
 	

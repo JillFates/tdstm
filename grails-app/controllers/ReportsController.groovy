@@ -1433,8 +1433,9 @@ class ReportsController {
 		def errorMsg = "Please select a MoveBundle"
 		def conflicts = params.conflicts == 'on'
 		def unresolved = params.unresolved == 'on'
+		def missing = params."missing" == 'on'
 		if( params.moveBundle == 'useForPlanning' )
-			return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved, true)
+			return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved, missing, true)
 		
 		if( moveBundleId && moveBundleId.isNumber() ){
 			def isProjMoveBundle  = MoveBundle.findByIdAndProject( moveBundleId, project )
@@ -1446,7 +1447,7 @@ class ReportsController {
 				userPreferenceService.setPreference( "MOVE_BUNDLE", "${moveBundleId}" )
 				moveBundleInstance = MoveBundle.get(moveBundleId)
 				//def eventsProjectInfo = getEventsProjectInfo(moveEventInstance,projectInstance,currProj,moveBundles,eventErrorList)
-				return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved, false)//.add(['time':])
+				return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved, missing, false)//.add(['time':])
 			}
 		}
 		flash.message = errorMsg

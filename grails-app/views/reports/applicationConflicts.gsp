@@ -23,6 +23,11 @@
 					</tr>
 					<tr>
 						<td>
+							<input type="checkbox" name="missing" id="missing" checked="checked" />&nbsp;Missing
+						</td>
+					</tr>
+					<tr>
+						<td>
 							<input type="checkbox" name="unresolved" id="unresolved" checked="checked" />&nbsp;Unresolved
 						</td>
 					</tr>
