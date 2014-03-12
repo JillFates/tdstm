@@ -84,22 +84,22 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		tasks << new AssetComment(id:8, taskNumber: 1008, duration:2, comment:'Make Coffee') // Sink vertex
 		tasks << new AssetComment(id:9, taskNumber: 1009, duration:1, comment:'Done Move') // Sink vertex
 
-		deps << new TaskDependency(id:100, predecessor:tasks[0], assetComment:tasks[1], type:'x') 
+		deps << new TaskDependency(id:100, predecessor:tasks[0], assetComment:tasks[1], type:'SS') 
 		// 1 > [3,4], 3 > 5, 5 > [7,8,9], 4 > 9
 		// 8    3,20  3  15, 15  45,2,1   20  1
 		// 1 > 3 > 5 > [7,8,9] (72)
 		// 1 > 4 > 9 (29)
-		deps << new TaskDependency(id:101, predecessor:tasks[0], assetComment:tasks[2], type:'x')
-		deps << new TaskDependency(id:102, predecessor:tasks[1], assetComment:tasks[3], type:'x')
-		deps << new TaskDependency(id:103, predecessor:tasks[1], assetComment:tasks[4], type:'x')
-		deps << new TaskDependency(id:104, predecessor:tasks[2], assetComment:tasks[3], type:'x')
-		deps << new TaskDependency(id:105, predecessor:tasks[3], assetComment:tasks[5], type:'x') // 4 downstream tasks
-		deps << new TaskDependency(id:106, predecessor:tasks[4], assetComment:tasks[9], type:'x')
-		deps << new TaskDependency(id:107, predecessor:tasks[6], assetComment:tasks[1], type:'x')
-		deps << new TaskDependency(id:108, predecessor:tasks[6], assetComment:tasks[2], type:'x')
-		deps << new TaskDependency(id:109, predecessor:tasks[5], assetComment:tasks[7], type:'x')
-		deps << new TaskDependency(id:110, predecessor:tasks[5], assetComment:tasks[8], type:'x')
-		deps << new TaskDependency(id:111, predecessor:tasks[5], assetComment:tasks[9], type:'x')
+		deps << new TaskDependency(id:101, predecessor:tasks[0], assetComment:tasks[2], type:'SS')
+		deps << new TaskDependency(id:102, predecessor:tasks[1], assetComment:tasks[3], type:'SS')
+		deps << new TaskDependency(id:103, predecessor:tasks[1], assetComment:tasks[4], type:'SS')
+		deps << new TaskDependency(id:104, predecessor:tasks[2], assetComment:tasks[3], type:'SS')
+		deps << new TaskDependency(id:105, predecessor:tasks[3], assetComment:tasks[5], type:'SS') // 4 downstream tasks
+		deps << new TaskDependency(id:106, predecessor:tasks[4], assetComment:tasks[9], type:'SS')
+		deps << new TaskDependency(id:107, predecessor:tasks[6], assetComment:tasks[1], type:'SS')
+		deps << new TaskDependency(id:108, predecessor:tasks[6], assetComment:tasks[2], type:'SS')
+		deps << new TaskDependency(id:109, predecessor:tasks[5], assetComment:tasks[7], type:'SS')
+		deps << new TaskDependency(id:110, predecessor:tasks[5], assetComment:tasks[8], type:'SS')
+		deps << new TaskDependency(id:111, predecessor:tasks[5], assetComment:tasks[9], type:'SS')
 
 		return [tasks, deps]
 
@@ -212,7 +212,7 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		(tasks, deps) = initTestData()
 
 		// Add a cyclical reference
-		deps << new TaskDependency(id:666, predecessor:tasks[5], assetComment:tasks[2], type:'x')
+		deps << new TaskDependency(id:666, predecessor:tasks[5], assetComment:tasks[2], type:'SS')
 
 		def dfsMap = runbookService.processDFS( tasks, deps )
 
@@ -269,12 +269,12 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		tasks << new AssetComment(id:ltid+1, taskNumber: 1050, duration:90, comment:'Separate map Start task') // start vertex
 		tasks << new AssetComment(id:ltid+2, taskNumber: 1051, duration:7, comment:'Separate map Middle task')
 		tasks << new AssetComment(id:ltid+3, taskNumber: 1052, duration:12, comment:'Separate map Sink task') // start vertex
-		deps << new TaskDependency(id:200, predecessor:tasks[ltid+1], assetComment:tasks[ltid+2], type:'x') 
-		deps << new TaskDependency(id:201, predecessor:tasks[ltid+2], assetComment:tasks[ltid+3], type:'x') 
+		deps << new TaskDependency(id:200, predecessor:tasks[ltid+1], assetComment:tasks[ltid+2], type:'SS') 
+		deps << new TaskDependency(id:201, predecessor:tasks[ltid+2], assetComment:tasks[ltid+3], type:'SS') 
 
 		// Add an additional starting vector that is shorter so we can see the counts
 		tasks << new AssetComment(id:ltid+4, taskNumber: 1060, duration:120, comment:'Change tire on truck')
-		deps << new TaskDependency(id:210, predecessor:tasks[ltid+4], assetComment:tasks[5], type:'x') 
+		deps << new TaskDependency(id:210, predecessor:tasks[ltid+4], assetComment:tasks[5], type:'SS') 
 
 		def dfsMap = runbookService.processDFS( tasks, deps )
 		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
@@ -356,13 +356,13 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 
 		// id, estStart, earliest, latest, is Critical Path
 		def startTimes = [
-			[0,  0,  0,  4, false],
-			[1,  0,  9, 11, false],
+			[0,  0,  0, 48, false],
+			[1,  0,  9, 53, false],
 			[2,  9,  9 , 9, true],
 			[3, 19, 19, 19, true],
 			[4,  0, 17, 61, false],
 			[5, 22, 22, 22, true],
-			[6,  0,  0,  0, true],	// Start of CP
+			[6,  0,  0, 44, true],	// Start of CP
 			[7, 37, 37, 37, true],
 			[8,  0, 37, 80, false],
 			[9,  0, 37, 81, false],
@@ -371,7 +371,8 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		assertEquals 'estFinish should be zero', 82, estFinish
 
 		// Check the times and critical path of all tasks
-		startTimes.each { id, estStart, earliest, latest, criticalPath -> 
+		startTimes.each { id, estStart, earliest, latest, criticalPath ->
+			def task = tasks[id] 
 			assertEquals "Estimated Start ($id)", estStart, tasks[id].tmpEstimatedStart
 			assertEquals "Earliest Start ($id)", earliest, tasks[id].tmpEarliestStart
 			assertEquals "Estimated Start ($id)", latest, tasks[id].tmpLatestStart
