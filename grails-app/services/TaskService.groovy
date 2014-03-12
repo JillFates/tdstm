@@ -1287,7 +1287,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 */
 	Object getContextObject(contextType, Integer contextId) {
 		def asset
-		switch (contextType):
+		switch (contextType) {
+			default:
+			break;
 			// For each type lookup the asset
 		}
 		return asset
@@ -1314,19 +1316,20 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		// Load Asset list based on the context
 		switch (context) {
-			case instanceof MoveEvent:
+			case MoveEvent:
 				// See the code below in generateRunbook:
 				// get bundle ids
 				// get assets in the bundle, could just fall into MoveBundle case
-			case instanceof MoveBundle:
+			case MoveBundle:
 				// Similar to MoveEvent
 				// get assets in bundle
 				break
-			case instanceOf Application:
+			case Application:
 				// Get assets that it depends on and supports from AssetDependency along with the application
 				break
 			default:
 				// log error for unhandled case with the context.class
+				break
 		}
 
 		return assets
