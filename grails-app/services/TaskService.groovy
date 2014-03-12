@@ -1336,6 +1336,23 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	}
 
 	/**
+	 * Generates a set of tasks based on the parameters
+	 * 
+	 * @param eventId
+	 * @param bundleId
+	 * @param applicationId
+	 * @param recipeVersion
+	 * @param publishTasks
+	 * @param loginUser
+	 * @return the process id
+	 */
+	def generateTasks(eventId, bundleId, applicationId, recipeVersion, publishTasks, loginUser) {
+		//TODO complete Esteban
+		return '1';
+	}
+
+	
+	/**
 	 * This is going to replace the generateRunbook method below
 	 * TODO: John to implement
 	 */

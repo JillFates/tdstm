@@ -106,4 +106,37 @@ class WsTaskController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
+	
+	/**
+	 * Generates a set of tasks based on a recipe
+	 */
+	def generateTasks = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		
+		def eventId = params.eventId
+		def bundleId = params.bundleId
+		def applicationId = params.applicationId
+		def recipeVersion = params.recipeVersion
+		def publishTasks = params.publishTasks
+
+		try {
+			def processId = taskService.generateTasks(eventId, bundleId, applicationId, recipeVersion, publishTasks, loginUser)
+
+			render(ServiceResults.success('processId' : processId) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (IllegalArgumentException e) {
+			ServiceResults.forbidden(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
+	}
 }

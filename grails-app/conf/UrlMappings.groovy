@@ -52,16 +52,16 @@ class UrlMappings {
 			action = [POST:"createRecipe"]
 		}
 
-		"/ws/public/sequence/$contextId/$name" {
-			controller = "wsSequence"
-			action = [GET:"get"]
-		}
-
 		"/ws/cookbook/recipe/validateSyntax" {
 			controller = "wsCookbook"
 			action = [POST:"validateSyntax"]
 		}
 
+		"/ws/task/generateTasks" {
+			controller = "wsTask"
+			action = [POST:"generateTasks"]
+		}
+		
 		"/ws/task/$id" {
 			controller = "wsTask"
 			action = [DELETE:"deleteBatch"]
@@ -75,6 +75,16 @@ class UrlMappings {
 		"/ws/task/$id/unpublish" {
 			controller = "wsTask"
 			action = [POST:"unpublish"]
+		}
+		
+		"/ws/progress/$id" {
+			controller = "wsProgress"
+			action = [GET:"get"]
+		}
+		
+		"/ws/public/sequence/$contextId/$name" {
+			controller = "wsSequence"
+			action = [GET:"get"]
 		}
 
 		"/maint/backd00r" {
