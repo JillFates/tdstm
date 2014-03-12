@@ -173,7 +173,9 @@ form .error-msg{
 .alert.animateShow {
 	top:35px;
 }
+/****/
 
+/* Code Mirror Stuff */
 .CodeMirror{
 	height: 400px;
 }
@@ -191,7 +193,9 @@ form .error-msg{
 	border: none;
 	border-radius: 0;
 }
+/******/
 
+/* Validate Syntax Stuff */
 .syntaxErrors{
 	overflow: auto;
 	border: 1px solid #ddd;
@@ -200,4 +204,22 @@ form .error-msg{
 
 .syntaxErrors > li p:first-child{
 	margin: 0;
+}
+/*****/
+
+
+form.taskGeneration{
+	padding: 10px 0 0 0;
+}
+
+form.taskGeneration label{
+	margin: 0 5% 0 0;
+}
+
+form.taskGeneration label[for="autoPublishTasks"]{
+	margin: 20px 0 0 0;
+}
+
+.completionWrapper{
+	margin: 20px 0 0 0;
 }

@@ -60,7 +60,46 @@
 						<tabset id="mainTabset">
 							%{-- Task Generation --}%
 							<tab heading="Task Generation" active="activeTabs.taskGeneration">
-								<p>Task Generation Content</p>
+								<p>Select propert context to generate tasks using the T-090-60 recipe:</p>
+								<form action="#" class="form-inline taskGeneration clearfix">
+									<label ng-show="context == 'Event' || context == 'Bundle' || context == 'Application' || context == 'All'" for="eventSelect">Event:
+										<select name="eventSelect" id="eventSelect">
+											<option value="">Wave 001</option>
+										</select>
+									</label>
+									<label ng-show="context == 'Bundle' || context == 'Application' || context == 'All'" for="eventSelect">Bundle:
+										<select name="bundleSelect" id="bundleSelect">
+											<option value="">Wave 001 - Tony</option>
+										</select>
+									</label>
+									<label ng-show="context == 'Application' || context == 'All'" for="eventSelect">Application:
+										<select name="applicationSelect" id="applicationSelect">
+											<option value="">Payroll (Prod)</option>
+										</select>
+									</label>
+
+									<br />
+									
+									<label for="autoPublishTasks">
+										<input type="checkbox" name="autoPublishTasks" id="autoPublishTasks">
+										Automatically publish tasks
+									</label>
+								</form>
+								<div class="completionWrapper">
+									<tabset id="taskGenerationTabs">
+										<tab heading="Summary" active="activeSubTabs.tasks.summary">
+											
+											<ul class="summaryList">
+												<li>Status: Completed | Canceled</li>
+												<li>Tasks Created: 1462</li>
+												<li>Number of Exceptions: 25</li>
+											</ul>
+
+										</tab>
+										<tab heading="Exceptions" active="activeSubTabs.tasks.exceptions"></tab>
+										<tab heading="Info" active="activeSubTabs.tasks.info"></tab>
+									</tabset>
+								</div>
 							</tab>
 
 							%{-- History --}%
@@ -203,10 +242,10 @@
 											<h5 class="headingTitle col-xs-6">Recipe</h5>
 											<div class="versionLinks col-xs-6" style="text-align: right;">
 												<label for="releasedVersionRadio" ng-show="gridOptions.selectedItems[0].versionNumber > 0">
-													<input type="radio" ng-model="wipConfig[gridData[currentSelectedRow.rowIndex].recipeId]" value="release" ng-change="switchWipRelease('release')" name="releasedWipVersion" id="releasedVersionRadio"> Version {{gridOptions.selectedItems[0].versionNumber}}
+													<input type="radio" ng-model="wipConfig[gridData[currentSelectedRow.rowIndex].recipeId].opt" value="release" ng-change="switchWipRelease('release')" name="releasedWipVersion" id="releasedVersionRadio"> Version {{gridOptions.selectedItems[0].versionNumber}}
 												</label>
 												<label for="wipVersionRadio" style="margin-left: 15px;">
-													<input type="radio" ng-model="wipConfig[gridData[currentSelectedRow.rowIndex].recipeId]" value="wip" ng-change="switchWipRelease('wip')" name="releasedWipVersion" id="wipVersionRadio"> WIP
+													<input type="radio" ng-model="wipConfig[gridData[currentSelectedRow.rowIndex].recipeId].opt" value="wip" ng-change="switchWipRelease('wip')" name="releasedWipVersion" id="wipVersionRadio"> WIP
 												</label>
 											</div>
 										</div>
@@ -231,7 +270,7 @@
 											%{-- Change Logs Content --}%
 											<tab heading="Change Logs" active="activeSubTabs.editor.logs">
 												<label for="logs" class="sr-only">Logs </label>
-												<textarea name="logs" id="logs" rows="6" ng-model="selectedRecipe.changelog" ng-disabled="!currentSelectedRecipe || wipConfig[gridData[currentSelectedRow.rowIndex].recipeId] == 'release'" value="{{selectedRecipe.changelog}}"></textarea>
+												<textarea name="logs" id="logs" rows="6" ng-model="selectedRecipe.changelog" ng-disabled="!currentSelectedRecipe || wipConfig[gridData[currentSelectedRow.rowIndex].recipeId].opt == 'release'" value="{{selectedRecipe.changelog}}"></textarea>
 											</tab>
 
 											%{-- Groups Content --}%
