@@ -170,7 +170,7 @@
 			</div>
 			<g:each var="key" in="['1','2','3','4']">
 				<div id="columnCustomDiv_${appPref[key]}" style="display:none;">
-					<div class="columnDiv_${key} customScroll" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width:13.7%;z-index: 2147483647; overflow-y: scroll;text-align: left;">
+					<div class="columnDiv_${key} customScroll" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width:13.7%;z-index: 100; overflow-y: scroll;text-align: left;">
 						<input type="hidden" id="previousValue_${key}" value="${appPref[key]}" />
 						<g:each var="attribute" in="${attributesList}">
 							<label><input type="radio" name="coloumnSelector_${appPref[key]}" id="coloumnSelector_${appPref[key]}" value="${attribute.attributeCode}" 
