@@ -6,7 +6,7 @@ import grails.validation.ValidationException;
 
 
 /**
- * {@link Controller} for handling WS calls of the {@link EventService}
+ * {@link Controller} for handling WS calls of the {@link ApplicationService}
  * 
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
