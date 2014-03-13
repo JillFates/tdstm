@@ -1,7 +1,13 @@
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetTransition
+import com.tdsops.tm.enums.domain.ContextType;
 
 class MoveBundle extends Party {	
+	
+	static ContextType getContextType() {
+		return ContextType.B
+	}
+	
     Project project
     String name
     String description

@@ -1,9 +1,16 @@
 package com.tds.asset
 
 import Person
+
+import com.tdsops.tm.enums.domain.ContextType;
 import com.tdssrc.grails.TimeUtil
 
 class Application extends AssetEntity {
+	
+	static ContextType getContextType() {
+		return ContextType.A
+	}
+	
 	String appVendor
 	String appVersion
 	Person sme

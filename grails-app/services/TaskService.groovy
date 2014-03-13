@@ -21,6 +21,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.AssetDependencyType
+import com.tdsops.tm.enums.domain.ContextType
 import com.tdsops.tm.enums.domain.RoleTypeGroup
 import com.tdsops.tm.enums.domain.TimeConstraintType
 // Utilities
@@ -1249,35 +1250,39 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 	/**
 	 * Used to create a task batch
-	 * TODO: Esteban - fill in doc and implementation
 	 */
-	TaskBatch createTaskBatch(Person whom, Object context, RecipeVersion recipe) {
-		// In retrospect, looking at the TaskBatch class, it may make more sense to have a contextType ENUM (e.g. Event, Bundle, App) 
-		// along with Integer contextId instead of the three fields (moveEvent, moveBundle, Application).
-
-		// Create and return the TaskBatch - throw exception if validation / save fails
+	TaskBatch createTaskBatch(Person whom, ContextType contextType, Integer contextId, RecipeVersion recipe) {
+		TaskBatch tb = new TaskBatch()
+		tb.createdBy = whom
+		tb.recipeVersionUsed = recipe
+		tb.contextType = contextType
+		tb.contextId = contextId
+		tb.save(failOnError: true)
 	}
 
 	/**
 	 * Used to initiate an async task creation process 
 	 * This is the service method called by the controller to initiate task generation
-	 * TODO: Esteban - fill in doc and implementation
 	 * @param publish - used to indicate if the tasks should be published at the time that they are generate, default=false
 	 */
-	TaskBatch initiateCreateTasksWithRecipe(UserLogin user, Object context, RecipeVersion recipe, Boolean publish=false) {
-
-		// Validate that the user has permission GenerateTasks
-		// If publish then validate that user has PublishTasks permission
-
-		def assets = getAssocAssets( context )
+	Map initiateCreateTasksWithRecipe(UserLogin user, ContextType contextType, Integer contextId, RecipeVersion recipe, Boolean publish=false) {
+		if (!RolePermissions.hasPermission('GenerateTasks')) {
+			throw new UnauthorizedException('User doesn\'t have a GenerateTasks permission')
+		}
+		
+		if (publish && !RolePermissions.hasPermission('PublishTasks')) {
+			throw new UnauthorizedException('User doesn\'t have a PublishTasks permission')
+		}
+		
+		def assets = this.getAssocAssets(contextType)
 
 		if (assets.size()) {
-			// call createTaskBatch
-			// create one-time quartz job that will need to pass the taskBatch id and publish flag
+			TaskBatch tb = this.createTaskBatch(user.person, contextType, contextId, recipe);
+			this.generateTasks(tb)
+			return ['taskBatch' : tb]
 		} else {
-			// Throw exception that there were no assets found
+			throw new IllegalArgumentException('No assets were found')
 		}
-
 	}
 
 	/**
@@ -1311,20 +1316,20 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * TODO: Esteban - fill in doc and implementation
 	 * 
 	 */
-	List getAssocAssets(Object context) {
+	List getAssocAssets(ContextType context) {
 		def assets = []
 
 		// Load Asset list based on the context
 		switch (context) {
-			case MoveEvent:
+			case E:
 				// See the code below in generateRunbook:
 				// get bundle ids
 				// get assets in the bundle, could just fall into MoveBundle case
-			case MoveBundle:
+			case B:
 				// Similar to MoveEvent
 				// get assets in bundle
 				break
-			case Application:
+			case A:
 				// Get assets that it depends on and supports from AssetDependency along with the application
 				break
 			default:
@@ -1335,23 +1340,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		return assets
 	}
 
-	/**
-	 * Generates a set of tasks based on the parameters
-	 * 
-	 * @param eventId
-	 * @param bundleId
-	 * @param applicationId
-	 * @param recipeVersion
-	 * @param publishTasks
-	 * @param loginUser
-	 * @return the process id
-	 */
-	def generateTasks(eventId, bundleId, applicationId, recipeVersion, publishTasks, loginUser) {
-		//TODO complete Esteban
-		return '1';
-	}
-
-	
 	/**
 	 * This is going to replace the generateRunbook method below
 	 * TODO: John to implement

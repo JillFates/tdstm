@@ -1,15 +1,21 @@
+import com.tdsops.tm.enums.domain.ContextType
+
 /**
  * The MoveEvent domain represents the concept of an event where one or move bundles that will occur at one logical 
  * period of time.
  */
 class MoveEvent {
 		
+	static ContextType getContextType() {
+		return ContextType.E
+	}
+	
 	static transients = [ "jdbcTemplate" ]
 	def jdbcTemplate
 	
 	static final String METHOD_LINEAR="L"
 	static final String METHOD_MANUAL="M"
-		
+	
     Project project
     String name
     String description

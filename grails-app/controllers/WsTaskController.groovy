@@ -1,7 +1,10 @@
+import java.util.Map;
+
 import grails.converters.JSON
 
 import org.apache.shiro.SecurityUtils
 import org.springframework.stereotype.Controller;
+
 import grails.validation.ValidationException;
 
 /**
@@ -117,16 +120,15 @@ class WsTaskController {
 			return
 		}
 		
-		def eventId = params.eventId
-		def bundleId = params.bundleId
-		def applicationId = params.applicationId
+		def contextType = params.contextType
+		def contextId = params.contextId
 		def recipeVersion = params.recipeVersion
 		def publishTasks = params.publishTasks
 
 		try {
-			def processId = taskService.generateTasks(eventId, bundleId, applicationId, recipeVersion, publishTasks, loginUser)
+			def result = taskService.initiateCreateTasksWithRecipe(loginUser, contextType, contextId, recipeVersion, publishTasks);
 
-			render(ServiceResults.success('processId' : processId) as JSON)
+			render(ServiceResults.success('processId' : contextId) as JSON)
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
 		} catch (EmptyResultException e) {

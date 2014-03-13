@@ -66,4 +66,8 @@ class EnumTests extends GrailsUnitTestCase {
 		enumTest SecurityRole, SecurityRole.ADMIN, 'ADMIN', 'Administrator', 'USER', 'User'
 	}
 
+	void testContextType() {
+		enumTest ContextType, ContextType.A, 'A', 'Application', 'E', 'Event'
+	}
+
 }
