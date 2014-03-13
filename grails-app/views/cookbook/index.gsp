@@ -85,6 +85,11 @@
 										Automatically publish tasks
 									</label>
 								</form>
+								<div class="generateWrapper">
+									<label for="generateTasks">
+										<button class="btn btn-default" id="generateTasks">Generate</button>
+									</label>
+								</div>
 								<div class="completionWrapper">
 									<tabset id="taskGenerationTabs">
 										<tab heading="Summary" active="activeSubTabs.tasks.summary">
@@ -99,6 +104,20 @@
 										<tab heading="Exceptions" active="activeSubTabs.tasks.exceptions"></tab>
 										<tab heading="Info" active="activeSubTabs.tasks.info"></tab>
 									</tabset>
+								</div>
+								<div class="progressWrapper row">
+									<div class="col-md-3 col-xs-3">
+										<p class="text-right">Creating Tasks: </p>
+									</div>
+									<div class="col-md-6 col-xs-6">
+										<div class="progress">
+											<div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+												60%
+											</div>
+										</div>
+										<p class="text-center">Estimated to finish in 3 min 40 sec </p>
+										<div class="text-center"><button class="btn btn-default">Cancel Generation</button></div>
+									</div>
 								</div>
 							</tab>
 
