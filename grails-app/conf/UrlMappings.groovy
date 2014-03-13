@@ -63,14 +63,14 @@ class UrlMappings {
 			action = [POST:"validateSyntax"]
 		}
 
-		'/ws/event/listEventsAndBundles' {
-			controller = "wsEvent"
-			action = [GET:"listEventsAndBundles"]
-		}
-
-		'/ws/event/listBundles' {
+		"/ws/event/listBundles/$id" {
 			controller = "wsEvent"
 			action = [GET:"listBundles"]
+		}
+
+		"/ws/event/listEventsAndBundles" {
+			controller = "wsEvent"
+			action = [GET:"listEventsAndBundles"]
 		}
 
 		"/ws/task/generateTasks" {
