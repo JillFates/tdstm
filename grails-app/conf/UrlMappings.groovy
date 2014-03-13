@@ -7,6 +7,12 @@ class UrlMappings {
 	      	}
     	}
 
+		"/ws/application/listInBundle/$id" {
+			controller = "wsApplication"
+			action = [GET:"listInBundle"]
+		}
+
+
     	"/ws/moveEventNews/$id?" {
     		controller = "moveEventNews"
 			action = [GET:"list", PUT:"update", DELETE:"delete", POST:"save"]
@@ -55,6 +61,16 @@ class UrlMappings {
 		"/ws/cookbook/recipe/validateSyntax" {
 			controller = "wsCookbook"
 			action = [POST:"validateSyntax"]
+		}
+
+		'/ws/event/listEventsAndBundles' {
+			controller = "wsEvent"
+			action = [GET:"listEventsAndBundles"]
+		}
+
+		'/ws/event/listBundles' {
+			controller = "wsEvent"
+			action = [GET:"listBundles"]
 		}
 
 		"/ws/task/generateTasks" {
