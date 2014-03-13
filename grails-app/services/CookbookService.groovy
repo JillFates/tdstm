@@ -4,7 +4,10 @@ import java.sql.SQLException;
 import org.apache.commons.lang.StringUtils;
 
 import com.tdsops.common.lang.CollectionUtils as CU
-import com.tdssrc.grails.GormUtil;
+import com.tdsops.tm.enums.domain.TimeConstraintType
+import com.tdsops.tm.enums.domain.TimeScale
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 
 import java.sql.ResultSet
 import java.sql.SQLException
@@ -624,7 +627,7 @@ class CookbookService {
     }
 
 	/**
-	* Used to validate the syntax of a recipe 
+	* Used to validate the syntax of a recipe and will return a list of syntax violations 
 	* 
 	* @param sourceCode - the source code to validate
 	* @return a list of errors if any otherwise null where the list map matches that used by web service errors
@@ -857,6 +860,7 @@ class CookbookService {
 				def taskIds = []
 				index=0
 				def lastId=0
+				def match
 
 				recipe.tasks.each { task -> 
 					index++
@@ -882,6 +886,15 @@ class CookbookService {
 							} else {
 								taskIds << task.id
 							}
+							// Make sure that the id #s are assending					
+							if (lastId) {
+								if (task.id < lastId) {
+									errorList << [ error: 1, reason: 'Invalid syntax', 
+										detail: "$taskRef task id is smaller than previous task spec. The ids must have ascending values." ]													
+								}
+							}
+							lastId = task.id
+
 						} else {
 							errorList << [ error: 1, reason: 'Invalid syntax', 
 								detail: "$taskRef 'id' must be a positive whole number > 0" ]
@@ -983,10 +996,130 @@ class CookbookService {
 						} 
 					}
 
+					// TODO - Add logic to validate that the Team / Role is valid
+
+					// Validate time constraints if specified and parse the definition so that the logic can use it
+					if ( task.containsKey('constraintType')) {
+						if (! TimeConstraintType.asEnum(task.constraintType)) {
+							errorList << [ error: 1, reason: 'Invalid syntax', 
+								detail: "$taskRef 'constraintType' attribute has invalid value (${task.constraintType}). " +
+									"Possible values include ( ${TimeConstraintType.getKeys().join(' | ')} )" ]
+						}
+					} else {
+						// Set the default to MSO
+						task.constraintType = TimeConstraintType.MSO.toString()
+					}
+
+					// Validate and parse the constraintTime property if defined
+					def valid
+					if ( task.containsKey('constraintTime')) {
+						// This can have:
+						//   date (mm/dd/yyyy)
+						//   datatime (mm/dd/yyyy hh:mmAP TZ)
+						//   indirect (#FieldName - date or datetime)
+						//   Event reference + date math (e.g. ES-5d or EC+4h)
+						//   TaskSpec + date math (e.g. 2000-6d)
+						def ct = task.constraintTime
+						def t
+						if (ct ==~ /\d{1,2}\/\d{1,2}\/\d{4}/ ) {
+							t = TimeUtil.parseDate(ct)
+						} else if (ct ==~ /\d{1,2}\/\d{1,2}\/\d{4}.*/ ) {
+							t = TimeUtil.parseDateTime(ct)
+						} else if ( ct ==~ /^#.*/ ) {
+							t = ct
+						} else if ( ct ==~ /^(?i)(\d{1,}|es|ec).*/ ) {
+							// ES or EC reference with optional date math
+							if ( ct ==~ /(?i)(\d{1,}|es|ec)/ ) {
+								t = ct.toLowerCase()
+							} else {
+								match = ( ct =~ /(?i)(\d{1,}|es|ec)(\+|-)(\d{1,})(?i)(m|h|d|w)/ )
+								if (match.matches()) {
+									// validate if referencing a TaskSpec, that the id exists
+									log.debug "match[0][1] = ${match[0][1]}"
+									if ( match[0][1].isInteger() ) {
+										if (! taskIds.contains( match[0][1].toInteger() )) {
+											errorList << [ error: 1, reason: 'Invalid syntax', 
+												detail: "$taskRef 'constraintTime' (${task.constraintTime}) references undefined task spec (${match[0][1]})" ]
+										}
+									}
+									t = match[0]
+								}
+							}
+						}
+						if (t) {
+							// Stuff the parsed constraintTime into new property
+							task.constraintTimeParsed=t
+						} else {
+							errorList << [ error: 1, reason: 'Invalid syntax', 
+								detail: "$taskRef 'constraintTime' has invalid value (${task.constraintTime})" ]
+						}
+
+						log.debug "$taskRef task.constraintTimeParsed=${task.constraintTimeParsed} "
+					} // ConstraintTime tests
+
+					// Validate duration if specified, which supports:
+					//    Integer - defaults to minutes (e.g. duration:15)
+					//    String time - requires scale (e.g. duration:'60m')
+					//    Indirect reference (e.g. duration:'#shutdownTime')
+					//    Indirect reference with default value (e.g. duration:'#shutdownTime,15m')
+					if (task.containsKey('duration')) {
+						def d = task.duration
+						task.durationIndirect = null
+						if (d instanceof Integer) {
+							task.durationValue = d
+							task.durationUom = TimeScale.M
+						} else {
+							if (d ==~ /^#\b.*/) {
+								// Handle indirect references
+								match = d =~ /#(\w{1,})/
+								if ( match.matches() ) {
+									task.durationIndirect = match[0][1]
+									task.durationValue = null
+									task.durationUom = TimeScale.M
+								} else {
+									match = d =~ /#(\w{1,}),\s?(\d{1,})(?i)(m|h|d|w)/
+									if ( match.matches() ) {
+										task.durationIndirect = match[0][1]
+										task.durationValue = match[0][2]
+										task.durationUom = TimeScale.asEnum(match[0][3].toUpperCase())
+									} else {
+										errorList << [ error: 1, reason: 'Invalid syntax', 
+											detail: "$taskRef 'duration' has invalid reference (${task.duration})" ]
+									}
+								}
+
+							} else {
+								// Handle string time
+								match = ( d =~ /(\d{1,})(?i)(m|h|d|w)/ )
+								if (match.matches()) {
+									task.durationValue = match[0][1]
+									task.durationUom = TimeScale.asEnum(match[0][2].toUpperCase())
+								} else {
+									errorList << [ error: 1, reason: 'Invalid syntax', 
+										detail: "$taskRef 'duration' has invalid value (${d})" ]
+								}
+							}
+						}
+						log.debug "$taskRef - duration=${d}, value=${task.durationValue}, uom=${task.durationUom}, indirect=${task.durationIndirect}"
+					} // Duration tests
+
 				}
 
-
-			}
+				// TODO - Add test to validate the title expression is valid 
+				/*
+					// Need to determine the asset type from the class property
+					try {
+						if (asset) {
+							task.comment = new GStringEval().toString(taskSpec.title, asset)
+						} else {
+							task.comment = new GStringEval().toString(taskSpec.title, moveEvent)
+						}
+					} catch (Exception ex) {
+						exceptions.append("Unable to parse title (${taskSpec.title}) for taskSpec ${taskSpec.id}<br/>")
+						task.comment = "** Error computing title **"
+					}
+				*/
+			} // Tasks section Tests
 		}
 
 		return (errorList ?: null)
