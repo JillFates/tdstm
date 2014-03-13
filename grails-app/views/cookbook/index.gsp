@@ -407,7 +407,7 @@
 
 				<div modal-show="showDialog" class="modal fade" id="createRecipeModal">
 					<div class="modal-dialog modal-lg">
-						<form class="form-horizontal modal-content" name="form" role="form" novalidate >
+						<form class="form-horizontal modal-content" id="createRecipeForm" name="createRecipeForm" role="form" novalidate >
 							<div class="modal-header">
 								<h3>Create a recipe</h3>
 							</div>
@@ -419,8 +419,8 @@
 											<label for="inputName" class="col-sm-2 control-label">Name*</label>
 											<div class="col-sm-10">
 												<input type="text" class="form-control" id="inputName" placeholder="" name="inputName" ng-model="newRecipe.name" required>
-												<div ng-show="form.inputName.$dirty && form.inputName.$invalid">
-													<pre class="error-msg" ng-show="form.inputName.$error.required">Recipe Name is required.</pre>
+												<div ng-show="createRecipeForm.inputName.$dirty && createRecipeForm.inputName.$invalid">
+													<pre class="error-msg" ng-show="createRecipeForm.inputName.$error.required">Recipe Name is required.</pre>
 												</div>
 											</div>
 										</div>
@@ -447,7 +447,7 @@
 								</tabset>
 							</div>
 							<div class="modal-footer">
-								<button class="btn btn-primary" ng-disabled="form.$invalid || isUnchanged(newRecipe)" ng-click="modalBtns.save()">Save</button>
+								<button class="btn btn-primary" ng-disabled="createRecipeForm.$invalid || isUnchanged(newRecipe)" ng-click="modalBtns.save()">Save</button>
 								<button class="btn btn-warning" ng-click="modalBtns.cancel()">Cancel</button>
 							</div>
 						</form>
