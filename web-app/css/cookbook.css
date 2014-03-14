@@ -216,19 +216,7 @@ form.taskGeneration label{
 	margin: 0 5% 0 0;
 }
 
-form.taskGeneration label[for="autoPublishTasks"]{
-	margin: 20px 0 0 0;
-}
-
-.completionWrapper{
-	margin: 20px 0 0 0;
-}
-
-.generateWrapper{
-	margin-top: 20px;
-}
-
-.progressWrapper{
+form.taskGeneration label[for="autoPublishTasks"], .completionWrapper, .generateWrapper, .progressWrapper, .completionButtons{
 	margin-top: 20px;
 }
 

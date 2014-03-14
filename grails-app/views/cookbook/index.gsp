@@ -61,36 +61,48 @@
 							%{-- Task Generation --}%
 							<tab heading="Task Generation" active="activeTabs.taskGeneration">
 								<p>Select propert context to generate tasks using the T-090-60 recipe:</p>
-								<form action="#" class="form-inline taskGeneration clearfix">
+								<form action="#" class="form-inline taskGeneration clearfix" ng-show="tasks.show.generate">
 									<label ng-show="context == 'Event' || context == 'Bundle' || context == 'Application' || context == 'All'" for="eventSelect">Event:
-										<select name="eventSelect" id="eventSelect">
-											<option value="">Wave 001</option>
+										<select name="eventSelect" id="eventSelect" ng-model="tasks.selectedEvent" ng-change="tasks.eventSelected()" ng-options="item.id as item.name for item in tasks.eventsArray">
+											<option value="">Please select</option>
 										</select>
 									</label>
 									<label ng-show="context == 'Bundle' || context == 'Application' || context == 'All'" for="eventSelect">Bundle:
-										<select name="bundleSelect" id="bundleSelect">
-											<option value="">Wave 001 - Tony</option>
+										<select name="bundleSelect" id="bundleSelect" ng-model="tasks.selectedBundle" ng-change="tasks.bundleSelected()" ng-options="item.id as item.name for item in tasks.bundlesArray">
+											<option value="">Please select</option>
 										</select>
 									</label>
 									<label ng-show="context == 'Application' || context == 'All'" for="eventSelect">Application:
-										<select name="applicationSelect" id="applicationSelect">
-											<option value="">Payroll (Prod)</option>
+										<select name="applicationSelect" id="applicationSelect" ng-model="tasks.selectedApplication" ng-change="tasks.generateBtnStatus = tasks.getGenerateBtnStatus()" ng-options="item.id as item.name for item in tasks.applicationsArray">
+											<option value="">Please select</option>
 										</select>
 									</label>
 
-									<br />
-									
-									<label for="autoPublishTasks">
-										<input type="checkbox" name="autoPublishTasks" id="autoPublishTasks">
-										Automatically publish tasks
-									</label>
+									<div>
+										<label for="autoPublishTasks">
+											<input type="checkbox" name="autoPublishTasks" id="autoPublishTasks">
+											Automatically publish tasks
+										</label>
+									</div>	
+									<div ng-show="currentSelectedRecipe.hasWIP">	
+										<label for="generateUsingWIP">
+											<input type="checkbox" name="generateUsingWIP" id="generateUsingWIP">
+											Generate using WIP recipe
+										</label>
+									</div>	
+									<div>	
+										<label for="deletePreviouslyGenerated">
+											<input type="checkbox" name="deletePreviouslyGenerated" id="deletePreviouslyGenerated">
+											Delete previously generated tasks that were created using this context & recipe
+										</label>
+									</div>
+									<div class="generateWrapper">
+										<label for="generateTasks">
+											<button class="btn btn-default" id="generateTasks" ng-disabled="!tasks.generateBtnStatus">Generate</button>
+										</label>
+									</div>
 								</form>
-								<div class="generateWrapper">
-									<label for="generateTasks">
-										<button class="btn btn-default" id="generateTasks">Generate</button>
-									</label>
-								</div>
-								<div class="completionWrapper">
+								<div class="completionWrapper" ng-show="tasks.show.generating">
 									<tabset id="taskGenerationTabs">
 										<tab heading="Summary" active="activeSubTabs.tasks.summary">
 											
@@ -104,8 +116,14 @@
 										<tab heading="Exceptions" active="activeSubTabs.tasks.exceptions"></tab>
 										<tab heading="Info" active="activeSubTabs.tasks.info"></tab>
 									</tabset>
+
+									<div class="completionButtons">
+										<a class="btn btn-default" href="#"><span class="glyphicon glyphicon-tasks"></span> View Results</a>
+										<a class="btn btn-default" href="#"><span class="glyphicon glyphicon-stats"></span> View Task Graph</a>
+										<a class="btn btn-default" href="#"><span class="glyphicon glyphicon-arrow-left"></span> Start Over</a>
+									</div>
 								</div>
-								<div class="progressWrapper row">
+								<div class="progressWrapper row" ng-show="tasks.show.completion">
 									<div class="col-md-3 col-xs-3">
 										<p class="text-right">Creating Tasks: </p>
 									</div>

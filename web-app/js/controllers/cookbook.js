@@ -14,9 +14,12 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	$http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
 	// Resource Calls
 
+	var startingFolder = 'tdstm'
+
 	restCalls = $resource(
-		'/tdstm/ws/cookbook/:section/:details/:moreDetails',
+		'/'+startingFolder+'/ws/:domain/:section/:details/:moreDetails',
 		{
+			domain: "@domain",
 			section: "@section",
 			details: "@details",
 			moreDetails: "@moreDetails"
@@ -25,6 +28,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			archive: {
 				method: "POST",
 				params: {
+					domain: "cookbook",
 					section: "recipe",
 					details: "archive"
 				}
@@ -32,6 +36,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			unarchive: {
 				method: "POST",
 				params: {
+					domain: "cookbook",
 					section: "recipe",
 					details: "unarchive"
 				}
@@ -39,6 +44,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			getListOfRecipes: {
 				method: "GET",
 				params: {
+					domain: "cookbook",
 					section: "recipe",
 					details: "list"
 				}
@@ -46,18 +52,21 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			getARecipeVersion: {
 				method: "GET",
 				params: {
+					domain: "cookbook",
 					section: "recipe"
 				}
 			},
 			createRecipe: {
 				method: "POST",
 				params: {
+					domain: "cookbook",
 					section: "recipe"
 				}
 			},
 			saveWIP: {
 				method: "POST",
 				params: {
+					domain: "cookbook",
 					section: "recipe"
 				}
 			},
@@ -70,6 +79,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			release: {
 				method: "POST",
 				params: {
+					domain: "cookbook",
 					section: "recipe",
 					details: "release"
 				}
@@ -77,6 +87,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			revert: {
 				method: "POST",
 				params: {
+					domain: "cookbook",
 					section: "recipe",
 					details: "revert"
 				}
@@ -84,6 +95,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			validate: {
 				method: "POST",
 				params: {
+					domain: "cookbook",
 					section: "recipe",
 					details: "validateSyntax"
 				}
@@ -91,17 +103,40 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			putInRecipe: {
 				method: "PUT",
 				params: {
+					domain: "cookbook",
 					section: "recipe"
 				}
 			},
-			getTasks: {
+			getEventsAndBundles: {
 				method: "GET",
 				params: {
-					section: "recipe"
+					section: "event",
+					details: "listEventsAndBundles"
+				}
+			},
+			getListBundles: {
+				method: "GET",
+				params: {
+					domain: "event",
+					section: "listBundles"
+				}
+			},
+			getListInBundle: {
+				method: "GET",
+				params: {
+					domain: "application",
+					section: "listInBundle"
+				}
+			},
+			getUsrPreferences: {
+				method: "GET",
+				params: {
+					domain: "user",
+					section: "preferences"
 				}
 			}
 		}
-		);
+	);
 
 	// Default data to get recipes
 	$scope.context = 'All';
@@ -350,6 +385,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				$scope.selectedRVersion = null;
 				$scope.selectedRWip = null;
 
+				// This sets the new 2 variables for wip and release
 				var fillTheVars = function(){
 					
 					if(!item.hasWIP && item.versionNumber > 0){
@@ -365,6 +401,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 					if(!$scope.selectedRWip){
 						$scope.selectedRWip = ($scope.selectedRVersion) ? $scope.selectedRVersion : fillDefault();
 					}
+
 				}
 
 				// Only call getWipRecipe if there is the recipe has WIP
@@ -409,6 +446,9 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			}
 			if(!$scope.activeTabs.history)
 				$scope.activeTabs.editor  = true;
+
+			//Reset the selects in task generation part.
+			$scope.tasks.resetSelects();
 
 			$scope.currentSyntaxValidation = '';
 		}else{
@@ -805,6 +845,106 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		}, time);
 	}
 	//--------------
+
+	// TASKS STUFF ///////////////////////////////////
+
+	$scope.tasks = {};
+	$scope.tasks.eventsArray = [];
+	$scope.tasks.boundlesArray = [];
+	$scope.tasks.applicationsArray = [];
+	$scope.tasks.selectedEvent = null;
+	$scope.tasks.selectedBundle = null;
+	$scope.tasks.selectedApplication = null;
+	$scope.tasks.generateBtnStatus = false;
+	$scope.tasks.getGenerateBtnStatus = function(){
+		if($scope.currentSelectedRecipe.context){
+			var context = $scope.currentSelectedRecipe.context;
+			if((context == 'Event' && $scope.tasks.selectedEvent) || (context == 'Bundle' && $scope.tasks.selectedBundle) ||
+				(context == 'Application' && $scope.tasks.selectedApplication)){
+				$log.log('matches event, or bundle, or application');
+				return true;
+			}else{
+				$log.log('not Matching');
+				return false;
+			}
+		}
+	}
+	$scope.tasks.show = {
+		generate: true,
+		generating: false,
+		completion: false
+	}
+	$scope.tasks.eventSelected = function(){
+		$log.warn('changed event!!');
+		$log.warn($scope.tasks.selectedEvent);
+		if($scope.tasks.selectedEvent){
+			$scope.tasks.getListBundles($scope.tasks.selectedEvent);
+			$scope.tasks.generateBtnStatus = $scope.tasks.getGenerateBtnStatus();
+		}
+	};
+	$scope.tasks.bundleSelected = function(){
+		$log.warn('changed bundles!!');
+		$log.warn($scope.tasks.selectedBundle);
+		if($scope.tasks.selectedBundle){
+			$scope.tasks.getListInBundle($scope.tasks.selectedBundle);
+			$scope.tasks.generateBtnStatus = $scope.tasks.getGenerateBtnStatus();
+		}
+	};
+	$scope.tasks.resetSelects = function(){
+		$scope.tasks.selectedEvent = null;
+		$scope.tasks.selectedBundle = null;
+		$scope.tasks.selectedApplication = null;
+	}
+	
+	// Get Events and Bundles
+	$scope.tasks.getEventsAndBundles = function(){
+		restCalls.getEventsAndBundles({}, function(data){
+			$log.info('Success on getting Events and Bundles');
+			$log.info(data.data.list);
+			$scope.tasks.eventsArray = data.data.list
+
+			$scope.tasks.getUsrPreferences();
+		}, function(){
+			$log.info('Error on getting Events and Bundles');
+		});
+	}
+
+	// Get List of Bundles for a given Event
+	$scope.tasks.getListBundles = function(idEvent){
+		restCalls.getListBundles({details: idEvent}, function(data){
+			$log.info('Success on getting Bundles');
+			$log.info(data.data.list);
+			$scope.tasks.bundlesArray = data.data.list;
+		}, function(){
+			$log.info('Error on getting Bundles');
+		});
+	}
+
+	// Get Applications in for a given Bundle
+	$scope.tasks.getListInBundle = function(idBundle){
+		restCalls.getListInBundle({details: idBundle}, function(data){
+			$log.info('Success on getting Applications');
+			$log.info(data.data.list);
+			$scope.tasks.applicationsArray = data.data.list;
+		}, function(){
+			$log.info('Error on getting Applications');
+		});
+	}
+
+	// Get User Preference
+	$scope.tasks.getUsrPreferences = function(){
+		restCalls.getUsrPreferences({details: 'MOVE_EVENT,CURR_BUNDLE'}, function(data){
+			$log.info('Success on getting User Preferences');
+			$log.info(data.data.preferences);
+			$scope.tasks.selectedEvent = data.data.preferences.MOVE_EVENT;
+			$scope.tasks.selectedBundle = data.data.preferences.CURR_BUNDLE;
+		}, function(){
+			$log.info('Error on getting User Preferences');
+		});
+	}
+
+	$scope.tasks.getEventsAndBundles();
+	///////////////////////////////////////////////////////
 
 });
 
