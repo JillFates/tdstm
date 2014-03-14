@@ -994,7 +994,28 @@ function toogleRoom(value, source){
 		$(".newRoom"+source).hide()
 }
 
+function getRacksPerRoom(value, type, assetId, forWhom){
+	jQuery.ajax({
+		url: contextPath+'/assetEntity/getRacksPerRoom',
+		data: {'roomId':value,'sourceType':type ,'assetId':assetId,'forWhom':forWhom},
+		type:'POST',
+		success: function(resp) {
+			console.log('success');
+			$("#rack"+type+"Id"+forWhom).html(resp);
+			var myOption = "<option value='-1'>Add Rack...</option>"
+			$("#rack"+type+"Id"+forWhom+" option:first").after(myOption);
+			if(!isIE7OrLesser)
+				$("select.assetSelect").select2();
+		}
+	});
+}
 
+function toogleRack(value, source){
+	if( value == '-1' )
+		$(".newRack"+source).show()
+	else
+		$(".newRack"+source).hide()
+}
 function openCommentDialog(id){
 	 var type = id.split("_")[1]
 	 var rowNo = id.split("_")[2]

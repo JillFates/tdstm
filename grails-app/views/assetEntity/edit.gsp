@@ -29,9 +29,19 @@
 
 		$(".newRoomS").hide();
 		$(".newRoomT").hide();
+		$(".newRackS").hide();
+		$(".newRackT").hide();
+		
 		var myOption = "<option value='-1'>Add Room...</option>"
-		$(".roomSelectS option:first").after(myOption);
-		$(".roomSelectT option:first").after(myOption);
+		$("#roomSelectS option:first").after(myOption);
+		$("#roomSelectT option:first").after(myOption);
+
+		var myOption = "<option value='-1'>Add Rack...</option>"
+		if('${assetEntityInstance.roomTarget}')
+			$("#rackTId option:first").after(myOption);
+		
+		if('${assetEntityInstance.roomSource}')
+			$("#rackSId option:first").after(myOption);
 
 		// Ajax to populate dependency selects in edit pages
 		var assetId = '${assetEntityInstance.id}'
@@ -81,27 +91,29 @@
 								<td class="label ${config.sourceLocation}" nowrap="nowrap"><label for="sourceLocationId">Room</label></td>
 									<td >
 										<span class="useRoomS">
-										    <g:select from="${rooms}" name="roomSourceId" class="${config.sourceLocation} assetSelect roomSelectS"  optionKey="id" optionValue="${{it.location+' / '+it.roomName}}"
-										    	noSelection="${[0:' Please Select...']}" value="${assetEntityInstance.roomSource?.id}" tabindex="31" onchange="toogleRoom(this.value, 'S')"/>
+										    <g:select id="roomSelectS" from="${rooms.findAll{it.source==1}}" name="roomSourceId" class="${config.sourceLocation} assetSelect roomSelectS"  optionKey="id" optionValue="${{it.location+' / '+it.roomName}}"
+										    	noSelection="${[0:' Please Select...']}" value="${assetEntityInstance.roomSource?.id}" tabindex="31" 
+										    	onchange="toogleRoom(this.value, 'S');getRacksPerRoom(this.value, 'S', '${assetEntityInstance.id}','edit');"/>
 										</span>
 										<span class="newRoomS">
 											<input type="text" id="sourceLocationId"
-												name="sourceLocation" class="${config.sourceLocation}" value="${assetEntityInstance.sourceLocation}" size=10 tabindex="31"/>
+												name="sourceLocation" class="${config.sourceLocation}" value="" size=10 tabindex="31"/>
 										</span>
 										<span class="newRoomS"><input type="text" id="sourceRoomId" class="${config.sourceRoom}"
-											name="sourceRoom" value="${assetEntityInstance.roomSource?.roomName}" size=10 tabindex="32"/>
+											name="sourceRoom" value="" size=10 tabindex="32"/>
 										</span>
 									</td>
 									<td >
 										<span class="useRoomT">
-										    <g:select from="${rooms}" name="roomTargetId" class="${config.targetLocation} assetSelect roomSelectT"  optionKey="id" optionValue="${{it.location+' / '+it.roomName}}"
-										    	noSelection="${[0:' Please Select...']}" value="${assetEntityInstance.roomTarget?.id}" tabindex="31" onchange="toogleRoom(this.value, 'T')"/>
+										    <g:select id="roomSelectT" from="${rooms.findAll{it.source==0}}" name="roomTargetId" class="${config.targetLocation} assetSelect roomSelectT"  optionKey="id" optionValue="${{it.location+' / '+it.roomName}}"
+										    	noSelection="${[0:' Please Select...']}" value="${assetEntityInstance.roomTarget?.id}" tabindex="31" 
+										    	onchange="toogleRoom(this.value, 'T');getRacksPerRoom(this.value, 'T', '${assetEntityInstance.id}','edit');"/>
 										</span>
 										<span class="newRoomT"><input type="text" id="targetLocationId"
-											name="targetLocation" class="${config.targetLocation}" value="${assetEntityInstance.targetLocation}" size=10 tabindex="41"/>
+											name="targetLocation" class="${config.targetLocation}" value="" size=10 tabindex="41"/>
 										</span>
 										<span class="newRoomT"><input type="text" id="targetRoomId" class="${config.targetRoom}"
-											name="targetRoom" value="${assetEntityInstance.roomTarget?.roomName}" size=10 tabindex="42" />
+											name="targetRoom" value="" size=10 tabindex="42" />
 										</span>
 									</td>
 									
@@ -128,10 +140,26 @@
 								<td class="label rackLabel ${config.sourceRack}"  nowrap="nowrap" id="rackId"><label for="sourceRackId">Rack/Cab</label></td>
 								<td class="label bladeLabel ${config.sourceBladeChassis}" nowrap="nowrap" id="bladeId" style="display: none"><label for="sourceBladeChassisId">Blade</label></td>
 								<td class="label vmLabel ${config.virtualHost}" style="display: none" class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label>
-								<td class="rackLabel"><input type="text" id="sourceRackId" class="${config.sourceRack}"
-									name="sourceRack" value="${assetEntityInstance.sourceRack}" size=10 tabindex="33" /></td>
-								<td class="rackLabel"><input type="text" id="targetRackId" class="${config.targetRack}"
-									name="targetRack" value="${assetEntityInstance.targetRack}" size=10 tabindex="44" /></td>
+								
+								<td class="rackLabel">
+									<span class="useRackS">
+										<g:render template="rackView"  model="[clazz:config.sourceRack, racks:sourceRacks,rackId:'rackSId', rackName:'rackSourceId', roomType:'S', assetEntity:assetEntityInstance,forWhom:'edit']" />
+									</span>
+									<span class="newRackS">
+										<input type="text" id="sourceRackId" class="${config.sourceRack}"
+											name="sourceRack" value="" size=10 tabindex="33" />
+									</span>
+								</td>
+								<td class="rackLabel">
+									<span class="useRackT">
+										<g:render template="rackView"  model="[clazz:config.targetRack, racks:targetRacks,rackId:'rackTId', rackName:'rackTargetId', roomType:'T', assetEntity:assetEntityInstance,forWhom:'edit']" />
+									</span>
+									<span class="newRackT">
+										<input type="text" id="targetRackId" class="${config.targetRack}"
+									name="targetRack" value="" size=10 tabindex="44" />
+									</span>
+								</td>
+								
 								<td class="bladeLabel" style="display: none"><g:select id='sourceBladeChassis' class="${config.sourceBladeChassis}" from='${sourceChassisSelect}' optionKey='${-2}' optionValue='${1}'
 									  name="sourceBladeChassis" value="${assetEntityInstance.sourceBladeChassis}" noSelection="${['':' Please Select']}"/></td>
 								<td class="bladeLabel" style="display: none"><g:select id='targetBladeChassis' class="${config.targetBladeChassis}" from='${targetChassisSelect}' optionKey='${-2}' optionValue='${1}'

@@ -30,10 +30,12 @@
 		
 		$(".newRoomS").hide();
 		$(".newRoomT").hide();
+		$(".newRackS").hide();
+		$(".newRackT").hide();
 		var myOption = "<option value='-1'>Add Room...</option>"
 		$(".roomSelectEditS option:first").after(myOption);
 		$(".roomSelectEditT option:first").after(myOption);
-		
+
 		if(!isIE7OrLesser)
 			$("select.assetSelect").select2();
 		
@@ -78,8 +80,8 @@
 								<td class="label ${config.sourceLocation}" nowrap="nowrap"><label for="sourceLocationId">Room</label></td>
 								<td>
 									<span class="useRoomS">
-									    <g:select from="${rooms}" name="roomSourceId" class="${config.sourceLocation} assetSelect roomSelectEditS"  optionKey="id" optionValue="${{it.location+' / '+it.roomName}}"
-									    	noSelection="${[0:' Please Select...']}" tabindex="31" onchange="toogleRoom(this.value, 'S')"/>
+									    <g:select from="${rooms.findAll{it.source==1}}" name="roomSourceId" class="${config.sourceLocation} assetSelect roomSelectEditS"  optionKey="id" optionValue="${{it.location+' / '+it.roomName}}"
+									    	noSelection="${[0:' Please Select...']}" tabindex="31" onchange="toogleRoom(this.value, 'S');getRacksPerRoom(this.value, 'S', '${assetEntityInstance.id}', 'create');"/>
 									</span>
 									<span class="newRoomS">
 										<input type="text" id="sourceLocationId" class="${config.sourceLocation}"
@@ -92,8 +94,8 @@
 								</td>
 								<td>
 									<span class="useRoomT">
-									    <g:select from="${rooms}" name="roomTargetId" class="${config.targetLocation} assetSelect roomSelectEditT"  optionKey="id" optionValue="${{it.location+' / '+it.roomName}}"
-									    	noSelection="${[0:' Please Select...']}"  tabindex="31" onchange="toogleRoom(this.value, 'T')"/>
+									    <g:select from="${rooms.findAll{it.source==0}}" name="roomTargetId" class="${config.targetLocation} assetSelect roomSelectEditT"  optionKey="id" optionValue="${{it.location+' / '+it.roomName}}"
+									    	noSelection="${[0:' Please Select...']}"  tabindex="31" onchange="toogleRoom(this.value, 'T');getRacksPerRoom(this.value, 'T', '${assetEntityInstance.id}', 'create');"/>
 									</span>
 									<span class="newRoomT">
 										<input type="text" id="targetLocationId" class="${config.targetLocation}"
@@ -119,10 +121,26 @@
 								<td class="label ${config.sourceRack} rackLabel"  nowrap="nowrap" id="rackId"><label for="sourceRackId">Rack/Cab</label></td>
 								<td class="label bladeLabel" nowrap="nowrap" id="bladeId" style="display: none"><label for="sourceBladeChassisId">Blade</label></td>
 								<td class="label vmLabel" style="display: none" class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label>
-								<td class="rackLabel"><input type="text" id="sourceRackId" class="${config.sourceRack}"
-									name="sourceRack" value="${assetEntityInstance.sourceRack}" size=10 tabindex="33" /></td>
-								<td class="rackLabel"><input type="text" id="targetRackId" class="${config.targetRack}"
-									name="targetRack" value="${assetEntityInstance.targetRack}" size=10 tabindex="44" /></td>
+								
+								<td class="rackLabel">
+									<span class="useRackS">
+										<g:render template="rackView"  model="[clazz:config.sourceRack, racks:'',rackId:'rackSId', rackName:'rackSourceId', roomType:'S', assetEntity:assetEntityInstance,forWhom:'create']" />
+									</span>
+									<span class="newRackS">
+										<input type="text" id="sourceRackId" class="${config.sourceRack}"
+											name="sourceRack" value="${assetEntityInstance.sourceRack}" size=10 tabindex="33" />
+									</span>
+								</td>
+								<td class="rackLabel">
+									<span class="useRackT">
+										<g:render template="rackView"  model="[clazz:config.targetRack, racks:'',rackId:'rackTId', rackName:'rackTargetId', roomType:'T', assetEntity:assetEntityInstance,forWhom:'create']" />
+									</span>
+									<span class="newRackT">
+										<input type="text" id="targetRackId" class="${config.targetRack}"
+									name="targetRack" value="${assetEntityInstance.targetRack}" size=10 tabindex="44" />
+									</span>
+								</td>
+								
 								<td class="bladeLabel" style="display: none"><input type="text" id="sourceBladeChassisId" class="${config.sourceBladeChassis}"
 									name="sourceBladeChassis" value="${assetEntityInstance.sourceBladeChassis}" size=10 tabindex="35"/></td>
 								<td class="bladeLabel" style="display: none"><input type="text" id="targetBladeChassisId" class="${config.targetBladeChassis}"

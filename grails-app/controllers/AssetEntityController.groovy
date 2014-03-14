@@ -1917,6 +1917,12 @@ class AssetEntityController {
 		if(params.roomTargetId && params.roomTargetId != '-1')
 			assetEntity.setRoomAndLoc( params.roomTargetId, false )
 		
+		if(params.rackSourceId && params.rackSourceId != '-1')
+			assetEntity.setRack( params.rackSourceId, true )
+			
+		if(params.rackTargetId && params.rackTargetId != '-1')
+			assetEntity.setRack( params.rackTargetId, false )
+		
 		if(!params.assetTag){
 			def lastAssetId = projectInstance.lastAssetId
 			if(!lastAssetId){
@@ -3413,14 +3419,21 @@ class AssetEntityController {
 			AssetType.FILES.toString(),AssetType.DATABASE.toString(),AssetType.BLADE.toString()]
 		
 		def rooms = Room.findAll("FROM Room WHERE project =:project order by location, roomName", [project:project])
-		
+		def targetRacks
+		def sourceRacks
+		if(assetEntityInstance.roomTarget)
+			targetRacks = Rack.findAllByRoom(Room.get(assetEntityInstance.roomTarget.id))
+			
+		if(assetEntityInstance.roomSource)
+			sourceRacks = Rack.findAllByRoom(Room.get(assetEntityInstance.roomSource.id))
+			
 		def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 							planStatusOptions:planStatusOptions?.value, projectId:projectId, project: project, railTypeOption:railTypeOption?.value,
 							priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets,
 							manufacturers:manufacturers, models:models,redirectTo:params?.redirectTo, dependencyType:dependencyType,
 							dependencyStatus:dependencyStatus,servers:servers, sourceChassisSelect:sourceChassisSelect, 
 							targetChassisSelect:targetChassisSelect, nonNetworkTypes:nonNetworkTypes, config:configMap.config, customs:configMap.customs,
-							rooms:rooms]
+							rooms:rooms, targetRacks:targetRacks, sourceRacks:sourceRacks]
 		
 		if(params.redirectTo == "roomAudit") {
 			paramsMap << ['rooms':rooms, 'source':params.source,'assetType':params.assetType]
@@ -3495,6 +3508,11 @@ class AssetEntityController {
 			assetEntityInstance.setRoomAndLoc( params.roomSourceId, true ) 
 		if(params.roomTargetId && params.roomTargetId != '-1')
 			assetEntityInstance.setRoomAndLoc( params.roomTargetId, false )
+		
+		if(params.rackSourceId && params.rackSourceId != '-1')
+			assetEntityInstance.setRack( params.rackSourceId, true )
+		if(params.rackTargetId && params.rackTargetId != '-1')
+			assetEntityInstance.setRack( params.rackTargetId, false )
 			
 		if(!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {
 			if( params.sourceRoom || params.targetRoom)
@@ -4999,5 +5017,29 @@ class AssetEntityController {
 			}
 		}
 		return assetlist
+	}
+	def getRacksPerRoom = {
+		def roomInstance = Room.get(NumberUtils.toInt(params.roomId))
+		def roomType= params.sourceType
+		def assetEntityInstance = AssetEntity.get(NumberUtils.toInt(params.assetId))
+		def racks = []
+		
+		if(roomInstance)
+			racks = Rack.findAllByRoom(roomInstance)
+			
+		def rackId
+		def rackName
+		def clazz
+		
+		if( roomType== 'S' ){
+			rackId = 'rackSId'
+			rackName = 'rackSourceId'
+			clazz = 'config.sourceRack'
+		}else{
+			rackId = 'rackTId'
+			rackName = 'rackTargetId'
+			clazz = 'config.targetRack'
+		}
+		render(template:'rackView',	model:[racks:racks, rackId:rackId, rackName:rackName, roomType:roomType, clazz:clazz, assetEntity:assetEntityInstance,forWhom:params.forWhom])
 	}
 }

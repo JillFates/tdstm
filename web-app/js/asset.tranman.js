@@ -1789,3 +1789,6 @@ function toggleDependencies(forWhom,view){
 		$(".rightArrow"+view).show()
 	}
 }
+function redirectToListTasks(){
+	window.location.href= contextPath+'/assetEntity/listTasks'
+ }

@@ -483,6 +483,27 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		}
 	}
 	/**
+	 * This method is used to set source Rack  or target Rack when we get request from select box
+	 * @param rackId : id of the room that we need to set
+	 * @param source : a Boolean flag to determine whether request is for source or target
+	 * @return : void
+	 */
+	def setRack(def rackId, Boolean source){
+		def rack = null
+		if(rackId && rackId !='0')
+			rack = Rack.read( rackId )
+		
+		//If flag is source then setting all source to requested value and vice versa .
+		if( source ){
+			rackSource = rack
+			sourceRack = rack ? rack.tag : null
+		}
+		if( !source ){
+			rackTarget = rack
+			targetRack = rack ? rack.tag : null
+		}
+	}
+	/**
 	 * This method is used to know whether a particular asset having cables or not.
 	 */
 	def isCableExist(){
