@@ -140,15 +140,27 @@ class DatabaseController {
 		/*COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, adb.dependency_bundle AS depNumber,
 			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts */
 		
-		query.append("""  ac.comment_type AS commentType,ae.validation AS validation,ae.plan_status AS planStatus
-			FROM data_base d 
-			LEFT OUTER JOIN asset_entity ae ON d.db_id=ae.asset_entity_id
-			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
-			LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
-			LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id
-			WHERE ae.project_id = ${project.id} AND mb.use_of_planning=${justPlanning}
-			GROUP BY db_id ORDER BY ${sortIndex} ${sortOrder}
-			) AS dbs""")
+		if(justPlanning=='true'){
+			query.append("""  ac.comment_type AS commentType,ae.validation AS validation,ae.plan_status AS planStatus
+				FROM data_base d 
+				LEFT OUTER JOIN asset_entity ae ON d.db_id=ae.asset_entity_id
+				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
+				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
+				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id
+				WHERE ae.project_id = ${project.id} AND mb.use_of_planning=${justPlanning}
+				GROUP BY db_id ORDER BY ${sortIndex} ${sortOrder}
+				) AS dbs""")
+		} else {
+			query.append("""  ac.comment_type AS commentType,ae.validation AS validation,ae.plan_status AS planStatus
+				FROM data_base d 
+				LEFT OUTER JOIN asset_entity ae ON d.db_id=ae.asset_entity_id
+				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
+				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
+				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id
+				WHERE ae.project_id = ${project.id}
+				GROUP BY db_id ORDER BY ${sortIndex} ${sortOrder}
+				) AS dbs""")
+		}
 		
 		/* LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
 			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 

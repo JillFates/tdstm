@@ -1688,9 +1688,15 @@ class AssetEntityController {
 		if(joinQuery)
 			query.append(joinQuery)
 			
-		query.append(""" \n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
+		if(justPlanning=='true'){
+			query.append(""" \n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
 				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
 				WHERE ae.project_id = ${project.id} AND mb.use_of_planning=${justPlanning}""")
+		} else {
+			query.append(""" \n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
+				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
+				WHERE ae.project_id = ${project.id} """)
+		}
 		
 		//which will limit the query based on physical or server Assets.
 		if(listType=='server')
