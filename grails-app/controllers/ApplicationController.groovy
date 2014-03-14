@@ -531,4 +531,5 @@ class ApplicationController {
 		def existingCol= "'Actions','Name', 'App Sme','Validation', 'Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType', 'Event'"
 		render existingCol as JSON
 	}
+
 }
