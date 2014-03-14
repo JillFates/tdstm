@@ -137,7 +137,7 @@ class ApplicationController {
 		
 		query.append("""\n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
 			LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
-			WHERE ae.project_id = ${project.id}""")
+			WHERE ae.project_id = ${project.id} """)
 
 		if (justPlanning=='true')
 			query.append(" AND mb.use_of_planning=${justPlanning} ")
