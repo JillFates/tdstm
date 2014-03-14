@@ -34,6 +34,7 @@ class CommentService {
 	def quartzScheduler
 	def securityService
 	def taskService
+	def userPreferenceService
 
 	// TODO : This should use an array defined in AssetCommentCategory instead as that is where people will add new statuses
 	private final List<String> statusToSendEmailFor = [
@@ -526,5 +527,104 @@ class CommentService {
         }
         return errorMsg
     }
+	
+	def showOrEditTask(params){
+		def commentList = []
+		def personResolvedObj
+		def personCreateObj
+		def dtCreated
+		def dtResolved
+		
+		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+		def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
+		def tzId = userPreferenceService.getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def assetComment = AssetComment.get(params.id)
+		if(assetComment){
+			if(assetComment.createdBy){
+				personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")?.toString()
+				dtCreated = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
+			}
+			if(assetComment.dateResolved){
+				personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")?.toString()
+				dtResolved = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
+			}
+			
+			def etStart =  assetComment.estStart ? estformatter.format(TimeUtil.convertInToUserTZ(assetComment.estStart, tzId)) : ''
+			
+			def etFinish = assetComment.estFinish ? estformatter.format(TimeUtil.convertInToUserTZ(assetComment.estFinish, tzId)) : ''
+			
+			def atStart = assetComment.actStart ? estformatter.format(TimeUtil.convertInToUserTZ(assetComment.actStart, tzId)) : ''
+			
+			def dueDate = assetComment.dueDate ? dateFormatter.format(TimeUtil.convertInToUserTZ(assetComment.dueDate, tzId)): ''
+	
+			def workflowTransition = assetComment?.workflowTransition
+			def workflow = workflowTransition?.name
+			
+			def noteList = assetComment.notes.sort{it.dateCreated}
+			def notes = []
+			noteList.each {
+				def dateCreated = it.dateCreated ? TimeUtil.convertInToUserTZ(it.dateCreated, tzId).format("E, d MMM 'at ' HH:mma") : ''
+				notes << [ dateCreated , it.createdBy.toString() ,it.note]
+			}
+			
+			// Get the name of the User Role by Name to display
+			def roles = securityService.getRoleName(assetComment.role)
+			
+			// TODO : Runbook : the use of maxVal is incorrect.  I believe that this is for the max assetComment.taskNumber but is getting taskDependency.id. This fails
+			// when there are no taskDependencies as Null gets incremented down in the map return.  Plus the property should be completely calculated here instead of incrementing
+			// while assigning in the map.  Logic should test for null.
+			def maxVal = TaskDependency.list([sort:'id',order:'desc',max:1])?.id[0]
+			if (maxVal) {
+				maxVal++
+			} else {
+				maxVal = 1
+			}
+			
+			def predecessorTable = ""
+			def taskDependencies = assetComment.taskDependencies
+			if (taskDependencies.size() > 0) {
+				taskDependencies = taskDependencies.sort{ it.predecessor.taskNumber }
+				predecessorTable = new StringBuffer('<table cellspacing="0" style="border:0px;"><tbody>')
+				taskDependencies.each() { taskDep ->
+					def task = taskDep.predecessor
+					def css = taskService.getCssClassForStatus(task.status)
+					def taskDesc = task.comment?.length()>50 ? task.comment.substring(0,50): task.comment
+					predecessorTable.append("""<tr class="${css}" style="cursor:pointer;" onClick="showAssetComment(${task.id}, 'show')"><td>${task.category}</td><td>${task.taskNumber ? task.taskNumber+':' :''}${taskDesc}</td></tr>""")
+			    }
+				predecessorTable.append('</tbody></table>')
+			}
+			def taskSuccessors = TaskDependency.findAllByPredecessor( assetComment )
+			def successorsCount= taskSuccessors.size()
+			def predecessorsCount = taskDependencies.size()
+			def successorTable = ""
+			if (taskSuccessors.size() > 0) {
+				taskSuccessors = taskSuccessors.sort{ it.assetComment.taskNumber }
+				successorTable = new StringBuffer('<table  cellspacing="0" style="border:0px;" ><tbody>')
+				taskSuccessors.each() { successor ->
+					def task = successor.assetComment
+					def css = taskService.getCssClassForStatus(task.status)
+					successorTable.append("""<tr class="${css}" style="cursor:pointer;" onClick="showAssetComment(${task.id}, 'show')"><td>${task.category}</td><td>${task}</td>""")
+				}
+				successorTable.append("""</tbody></table>""")
+			
+			}
+			def cssForCommentStatus = taskService.getCssClassForStatus(assetComment.status)
+		 
+		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
+			commentList = [ 
+				assetComment:assetComment, personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
+				dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo?.toString() ?:'', assetName:assetComment.assetEntity?.assetName ?: "",
+				eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate, etStart:etStart, etFinish:etFinish,atStart:atStart,notes:notes,
+				workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,maxVal:maxVal,
+				cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, 
+				successorsCount:successorsCount, predecessorsCount:predecessorsCount, assetId:assetComment.assetEntity?.id ?: "" ,
+				assetType:assetComment.assetEntity?.assetType ,staffRoles:taskService.getRolesForStaff()]
+		}else{
+		 def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - ${params.id} "
+		 log.error "showComment: show comment view - "+errorMsg
+		 commentList = [error:errorMsg]
+		}
+		return commentList
+	}
 	
 }

@@ -13,6 +13,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WebUtil
 
 
 class ClientTeamsController {
@@ -27,6 +28,7 @@ class ClientTeamsController {
 	def workflowService
 	def projectService
 	def assetEntityService
+	def commentService
 
 	def static final statusDetails = ["missing":"Unknown", "cabledDetails":"Cabled with Details","empty":"Empty","cabled":"Cabled"]
 	protected static targetTeamColumns = ['MOVE_TECH':'target_team_id', 'CLEANER':'target_team_log_id','SYS_ADMIN':'target_team_sa_id',"DB_ADMIN":'target_team_dba_id']
@@ -1246,5 +1248,50 @@ function goBack() { window.history.back() }
 		} else {
 		  	render "Person id ${params.personId} is not existed. "
 		}
+	}
+	def showTaskforEmail = {
+		def userLogin = securityService.getUserLogin()
+		def project = securityService.getUserCurrentProject()
+		def isValidUser= false
+		def task= AssetComment.get(params.id)
+		if(task?.assignedTo.id == userLogin.person.id){
+			def isPersonAssignedToProject = partyRelationshipService.isPersonAssignedToProject()
+			if(isPersonAssignedToProject)
+				isValidUser = true
+		}
+		
+		if(isValidUser){
+			// if we are here good to go
+			return commentService.showOrEditTask(params)
+		} else {
+			redirect(controller:"clientTeams", action:"listTasks", params:[message:"you dont have permissions to access this task ${task.taskNumber}"])
+		}
+	}
+	def editTaskForEmail = {
+		return commentService.showOrEditTask(params)
+	}
+	def updateEmailComment = {
+		def pred = params.taskDependency
+		def succ = params.taskSuccessor
+		
+		params.status=params.statusEditId
+		params.category=params.categoryEditId
+		params.assignedTo =params.assignedToEdit
+		params.hardAssigned = params.hardAssignedEdit?:'0'
+		params.workflowTransition = params.workFlow
+		params.override = params.override?:'0'
+		params.manageDependency=1
+		
+		List<String> preds = Arrays.asList(pred.split(","));
+		List<String> succs = Arrays.asList(succ.split(","));
+		
+		if(params.taskDependency)
+			params.'taskDependency[]' = preds
+			
+		if(params.taskSuccessor)
+			params.'taskSuccessor[]' = succs
+		
+		def map = commentService.saveUpdateCommentAndNotes(session, params, false, flash)
+		forward(controller:"clientTeams", action:"showTaskforEmail", params:[id:params.id])
 	}
 }

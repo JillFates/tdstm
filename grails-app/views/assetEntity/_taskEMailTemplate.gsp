@@ -5,7 +5,8 @@
 	<table style="border: 1px solid green;font-family:courier;">
 		<tr style="margin-top: 10px">
 			<td valign="top" class="name" ><label for="TaskNumber" style=""><b>Task #:</b></label></td>
-			<td valign="top" class="value" id="dateCreatedId"  >${assetComment.taskNumber}</td>
+			<td valign="top" class="value" id="dateCreatedId"  >
+			<a href="${createLink(controller:'clientTeams',  action:'showTaskforEmail', params:['id': assetComment.id],  absolute:"true")}">${assetComment.taskNumber}</a></td>
 		</tr>
 		<tr class="prop" style="margin-top: 10px">
 			<td valign="top" class="name" ><label for="comment"><b>Task:</b></label></td>
