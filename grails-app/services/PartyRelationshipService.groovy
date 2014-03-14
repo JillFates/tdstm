@@ -11,6 +11,7 @@ class PartyRelationshipService {
 
 	boolean transactional = true
 	def jdbcTemplate
+	def securityService
 	/*
 	 * method to save party Relationship
 	 */
@@ -834,5 +835,15 @@ class PartyRelationshipService {
 			list << [ id: r.id, description: r.description.replaceFirst('Staff : ', '') ]
 		} 
 		return list
+	}
+	/**
+	 * Returns whether a person assigned to project or not.
+	 */
+	
+	def isPersonAssignedToProject(){
+		def userLogin = securityService.getUserLogin()
+		def project = securityService.getUserCurrentProject()
+		
+		return PartyRelationship.find("from PartyRelationship where roleTypeCodeFrom='PROJECT' and partyIdFrom=${project.id} and partyIdTo=${userLogin.person.id}")
 	}
 }
