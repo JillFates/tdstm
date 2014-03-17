@@ -303,7 +303,7 @@ class WsCookbookController {
 			
 			def results = cookbookService.validateSyntaxForUser(sourceCode, loginUser, currentProject)
 
-			if (results.isEmpty()) {
+			if (results == null) {
 				render(ServiceResults.success() as JSON)
 			} else {
 				render(ServiceResults.errors(results) as JSON)
