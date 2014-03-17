@@ -134,6 +134,13 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 					domain: "user",
 					section: "preferences"
 				}
+			},
+			generateTask: {
+				method: "POST",
+				params: {
+					domain: "task",
+					section: "generateTasks"
+				}
 			}
 		}
 	);
@@ -729,6 +736,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	$scope.codeEditorOptions = {
 		lineNumbers: true,
 		indentWithTabs: true,
+		indentUnit: 4,
 		lineWrapping : true,
 		extraKeys: {"Ctrl-Space": "autocomplete"}
 	};
@@ -856,6 +864,21 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	$scope.tasks.selectedBundle = null;
 	$scope.tasks.selectedApplication = null;
 	$scope.tasks.generateBtnStatus = false;
+	$scope.tasks.generateOpts = {
+		contextId: null,// - the select value from the select that represents the context
+		recipeId: null,// - the id of the Recipe record to use to generate the tasks
+		recipeVersionId: null,// - the id of the RecipeVersion record to use to generate the tasks
+		useWIP: false,
+		autoPublish: false,
+		deletePrevious: false
+	};
+	$scope.tasks.show = {
+		generate: true,
+		generating: false,
+		completion: false
+	}
+
+	// Returns true if the 'generate task' button should be enabled. Otherwise returns false
 	$scope.tasks.getGenerateBtnStatus = function(){
 		if($scope.currentSelectedRecipe.context){
 			var context = $scope.currentSelectedRecipe.context;
@@ -869,31 +892,83 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			}
 		}
 	}
-	$scope.tasks.show = {
-		generate: true,
-		generating: false,
-		completion: false
-	}
+
+	// Put select elements in blank. 
+	$scope.tasks.blankBundles = function(){
+		$scope.tasks.boundlesArray = [];
+		$scope.tasks.applicationsArray = [];
+		$scope.tasks.selectedBundle = null;
+		$scope.tasks.selectedApplication = null;
+	};
+	$scope.tasks.blankApplications = function(){
+		$scope.tasks.applicationsArray = [];
+		$scope.tasks.selectedApplication = null;
+	};
+	/////////////////////////////
+
+	// Events for select elements.
 	$scope.tasks.eventSelected = function(){
 		$log.warn('changed event!!');
 		$log.warn($scope.tasks.selectedEvent);
+		$scope.tasks.selectedBundle = null;
+		$scope.tasks.selectedApplication = null;
 		if($scope.tasks.selectedEvent){
 			$scope.tasks.getListBundles($scope.tasks.selectedEvent);
-			$scope.tasks.generateBtnStatus = $scope.tasks.getGenerateBtnStatus();
+		}else{
+			$scope.tasks.blankBundles();
 		}
+		$scope.tasks.generateBtnStatus = $scope.tasks.getGenerateBtnStatus();
 	};
 	$scope.tasks.bundleSelected = function(){
 		$log.warn('changed bundles!!');
 		$log.warn($scope.tasks.selectedBundle);
+		$scope.tasks.selectedApplication = null;
 		if($scope.tasks.selectedBundle){
 			$scope.tasks.getListInBundle($scope.tasks.selectedBundle);
-			$scope.tasks.generateBtnStatus = $scope.tasks.getGenerateBtnStatus();
+		}else{
+			$scope.tasks.blankApplications();
 		}
+		$scope.tasks.generateBtnStatus = $scope.tasks.getGenerateBtnStatus();
 	};
+	////////////////////////////////
+
+	// Reset selects
 	$scope.tasks.resetSelects = function(){
 		$scope.tasks.selectedEvent = null;
 		$scope.tasks.selectedBundle = null;
 		$scope.tasks.selectedApplication = null;
+	};
+
+	// Generate btn click.
+	$scope.tasks.generateTask = function(e){
+		var idSelected = null,
+			dataToSend;
+		switch($scope.currentSelectedRecipe.context){
+		case 'Event':
+			idSelected = $scope.tasks.selectedEvent;
+			break;
+		case 'Bundle':
+			idSelected = $scope.tasks.selectedBundle;
+			break;
+		case 'Application':
+			idSelected = $scope.tasks.selectedApplication;
+			break;
+		default:
+			idSelected = null
+		}
+
+		$scope.tasks.generateOpts.contextId = idSelected;
+		$scope.tasks.generateOpts.recipeId = $scope.selectedRecipe.recipeId;
+		$scope.tasks.generateOpts.recipeVersionId = '';
+
+		dataToSend = $.param($scope.tasks.generateOpts);
+
+		restCalls.generateTask({}, dataToSend, function(data){
+			$log.info('Success on generating task');
+			$log.info(data);
+		}, function(){
+			$log.info('Error on generating task');
+		});
 	}
 	
 	// Get Events and Bundles

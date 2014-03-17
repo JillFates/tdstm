@@ -80,25 +80,27 @@
 
 									<div>
 										<label for="autoPublishTasks">
-											<input type="checkbox" name="autoPublishTasks" id="autoPublishTasks">
+											<input type="checkbox" name="autoPublishTasks" id="autoPublishTasks" ng-model="tasks.generateOpts.autoPublish">
 											Automatically publish tasks
 										</label>
 									</div>	
 									<div ng-show="currentSelectedRecipe.hasWIP">	
 										<label for="generateUsingWIP">
-											<input type="checkbox" name="generateUsingWIP" id="generateUsingWIP">
+											<input type="checkbox" name="generateUsingWIP" id="generateUsingWIP" ng-model="tasks.generateOpts.useWIP">
 											Generate using WIP recipe
 										</label>
 									</div>	
 									<div>	
 										<label for="deletePreviouslyGenerated">
-											<input type="checkbox" name="deletePreviouslyGenerated" id="deletePreviouslyGenerated">
+											<input type="checkbox" name="deletePreviouslyGenerated" id="deletePreviouslyGenerated" ng-model="tasks.generateOpts.deletePrevious">
 											Delete previously generated tasks that were created using this context & recipe
 										</label>
 									</div>
 									<div class="generateWrapper">
-										<label for="generateTasks">
-											<button class="btn btn-default" id="generateTasks" ng-disabled="!tasks.generateBtnStatus">Generate</button>
+										<label for="generateTask">
+											<a class="btn btn-default has-spinner" id="generateTask" ng-disabled="!tasks.generateBtnStatus" ng-click="tasks.generateTask(this)">
+												<span class="spinner"><i class="icon-spin icon-refresh"></i></span>Generate
+											</a>
 										</label>
 									</div>
 								</form>
