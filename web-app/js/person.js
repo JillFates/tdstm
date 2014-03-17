@@ -20,7 +20,7 @@ function mergePerson(){
     var returnStatus =  confirm('This will merge the selected Person');
 	if(returnStatus ){
 		var targetModelId 
-		var modelToMerge
+		var modelToMerge = new Array()
 		$('input[name=mergeRadio]:radio:checked').each(function(){
 			targetModelId = this.id.split("_")[1]
 		})
@@ -29,7 +29,7 @@ function mergePerson(){
 			return
 		}
 		$('input[name=mergeRadio]:radio:not(:checked)').each(function(){
-			modelToMerge = this.id.split("_")[1]
+			modelToMerge.push(this.id.split("_")[1])
 		})
 		var params = {};
 		$(".input_"+targetModelId).each(function(){
@@ -50,7 +50,7 @@ function mergePerson(){
 			success: function(data) {
 				$("#spinnerId").hide()
 				$("#messageId").html(data)
-				window.location.reload();
+				$(".ui-icon-refresh").click()
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				$("#spinnerId").hide()

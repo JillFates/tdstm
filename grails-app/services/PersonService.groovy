@@ -1,9 +1,14 @@
+import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
+import com.tdssrc.grails.GormUtil
+
 /**
  * The PersonService class provides a number of functions to help in the management and access of Person objects
  */
 class PersonService {
 
 	def partyRelationshipService
+	def jdbcTemplate
+	def sessionFactory
 	
 	static List SUFFIXES = [
 		"jr.", "jr", "junior", "ii", "iii", "iv", "senior", "sr.", "sr", //family
@@ -311,5 +316,151 @@ class PersonService {
 
 		return map
 	}
+	
+	/**
+	 * 
+	 * @param fromPerson
+	 * @param toPerson
+	 * @return
+	 */
+	def mergePerson(Person fromPerson, Person toPerson){
+		def toUserLogin = UserLogin.findByPerson( toPerson )
+		def fromUserLogin = UserLogin.findByPerson( fromPerson )
+		
+		def personDomain = new DefaultGrailsDomainClass( Person.class )
+		def notToUpdate = ['beforeDelete','beforeInsert', 'beforeUpdate','id', 'firstName','blackOutDates']
+		personDomain.properties.each{
+			def prop = it.name
+			if(it.isPersistent() && !toPerson."${prop}" && !notToUpdate.contains(prop)){
+				toPerson."${prop}" = fromPerson."${prop}"
+			}
+		}
+		
+		if(!toPerson.save(flush:true)){
+			toPerson.errors.allErrors.each{println it}
+		}
+		
+		//Calling method to merge roles
+		mergeUserLogin(toUserLogin, fromUserLogin, toPerson)
+		//Updating person reference from 'fromPerson' to 'toPerson'
+		updatePersonReference(fromPerson, toPerson)
+		//Updating ProjectRelationship relation from 'fromPerson' to 'toPerson'
+		updateProjectRelationship(fromPerson, toPerson)
+		
+		sessionFactory.getCurrentSession().flush();
+		sessionFactory.getCurrentSession().clear();
+		fromPerson.delete()
+		
+		return fromPerson
+	}
 
+	/**
+	 * This action is used to merge Person's UserLogin according to criteria
+	 * 1. If neither account has a UserLogin - nothing to do
+	 * 2. If Person being merged into the master has a UserLogin but master doesn't, assign the UserLogin to the master Person record.
+	 * 3. If both Persons have a UserLogin,select the UserLogin that has the most recent login activity. If neither have login activity,
+	 *	  choose the oldest login account.
+	 * @param fromUserLogin : instance of fromUserLogin
+	 * @param toUserLogin : instance of toUserLogin
+	 * @param toPerson: instance of toPerson
+	 * @return
+	 */
+	def mergeUserLogin(toUserLogin, fromUserLogin, toPerson){
+		if(fromUserLogin && !toUserLogin){
+			fromUserLogin.person = toPerson
+			fromUserLogin.save(flush:true)
+		} else if(fromUserLogin && toUserLogin){
+			if(fromUserLogin.lastLogin && toUserLogin.lastLogin){
+				if (fromUserLogin.lastLogin > toUserLogin.lastLogin){
+					fromUserLogin.person = toPerson
+					toUserLogin.delete()
+				} else {
+					fromUserLogin.delete()
+				}
+			} else{
+				if(fromUserLogin.createdDate > toUserLogin.createdDate){
+					fromUserLogin.person = toPerson
+					toUserLogin.delete()
+				} else{
+					fromUserLogin.delete()
+				}
+			}
+		}
+		if(fromUserLogin && toUserLogin)
+			updateUserLoginRefrence(fromUserLogin, toUserLogin);
+	}
+	
+	/**
+	 * This method is used to update Person reference from 'fromPerson' to  'toPerson'
+	 * @param fromPerson : instance of fromPerson
+	 * @param toPerson : instance of toPerson
+	 * @return
+	 */
+	def updatePersonReference(fromPerson, toPerson){
+		def domainRelatMap = ['application':['sme_id', 'sme2_id', 'shutdown_by', 'startup_by', 'testing_by'],
+			'asset_comment':['resolved_by', 'created_by', 'assigned_to_id'], 'comment_note':['created_by_id'],
+			'asset_dependency':['created_by','updated_by'], 'asset_entity':['app_owner_id'],
+			'exception_dates':['person_id'], 'model':['created_by', 'updated_by', 'validated_by'],
+			'model_sync':['created_by_id', 'updated_by_id', 'validated_by_id'], 'move_event_news':['archived_by', 'created_by'],
+			'move_event_staff':['person_id'], 'workflow':['updated_by']]
+		
+		domainRelatMap.each{key, value->
+			value.each{prop->
+				jdbcTemplate.update("UPDATE ${key} SET ${prop} = '${toPerson.id}' where ${prop}= '${fromPerson.id}'")
+			}
+		}
+	}
+	
+	
+	
+	/**
+	 * This method is used to update userlogin reference from 'fromUserLogin' to  'toUserLogin'
+	 * @param fromUserLogin : instance of fromUserLogin
+	 * @param toUserLogin : instance of toUserLogin
+	 * @return
+	 */
+	def updateUserLoginRefrence(fromUserLogin, toUserLogin){
+		def domainRelatMap = ['asset_transition':['user_login_id'], 'data_transfer_batch':['user_login_id'],'model_sync':['created_by_id']]
+		domainRelatMap.each{key, value->
+			value.each{prop->
+				jdbcTemplate.update("UPDATE ${key} SET ${prop} = ${toUserLogin.id} where ${prop}=${fromUserLogin.id}")
+			}
+		}
+	}
+	
+	/**
+	 * This method is used to update person reference in PartyRelationship table.
+	 * @param toPerson : instance of Person
+	 * @param fromPerson : instance of Person
+	 * @return void
+	 */
+	def updateProjectRelationship(Party fromPerson, Party toPerson){
+		try{
+			//Written all sql as GORM blowing up this block of code.
+			def allRelations = jdbcTemplate.queryForList("SELECT p.party_relationship_type_id AS prType, p.party_id_from_id AS pIdFrom, \
+						p.party_id_to_id AS pIdTo, p.role_type_code_from_id AS rTypeCodeFrom, p.role_type_code_to_id AS rTypeCodeTo \
+						FROM party_relationship p WHERE p.party_id_to_id = ${fromPerson.id}")
+
+			allRelations.each{ relation->
+				def res = jdbcTemplate.queryForList("SELECT 1 FROM party_relationship p WHERE \
+							p.party_relationship_type_id='${relation.prType}' AND p.party_id_from_id =${relation.pIdFrom} \
+							AND p.party_id_to_id =${toPerson.id} AND p.role_type_code_from_id='${relation.rTypeCodeFrom}'\
+							AND p.role_type_code_to_id ='${relation.rTypeCodeTo}'")
+				
+				if(res){
+					jdbcTemplate.update("DELETE FROM party_relationship   \
+					   WHERE party_relationship_type_id = '${relation.prType}'\
+					   AND role_type_code_from_id = '${relation.rTypeCodeFrom}' AND role_type_code_to_id='${relation.rTypeCodeTo}' \
+					   AND party_id_to_id = ${fromPerson.id} AND party_id_from_id = ${relation.pIdFrom}")
+				} else {
+				   jdbcTemplate.update("UPDATE party_relationship SET party_id_to_id = ${toPerson.id} \
+					   WHERE party_relationship_type_id = '${relation.prType}'\
+					   AND role_type_code_from_id = '${relation.rTypeCodeFrom}' AND role_type_code_to_id='${relation.rTypeCodeTo}' \
+					   AND party_id_to_id = ${fromPerson.id} AND party_id_from_id = ${relation.pIdFrom}")
+				}
+			}
+		} catch(Exception ex){
+			ex.printStackTrace()
+		}
+	}
 }

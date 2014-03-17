@@ -784,3 +784,6 @@ br.page-break-after {
 .colorGrey{
 	color: grey;
 }
+.nodisplay{
+	display: none;
+}

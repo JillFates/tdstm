@@ -96,7 +96,8 @@
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
-		<span id="spinnerId" style="display: none">Merging ...<img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
+		<div id="messageId" class="message nodisplay"></div>
+		<span id="spinnerId" class="nodisplay">Merging ...<img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 		<div>
 			<g:form name="personForm" id="formId" url="[action:'list', controller:'person', params:'[companyId:${companyId}]']">
 				<g:select id="filterSelect" name="companyId" from="${partyGroupList}" value="${companyId}"  optionKey="id" optionValue="name" noSelection="['All':'All']" />
