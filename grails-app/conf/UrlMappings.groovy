@@ -103,6 +103,11 @@ class UrlMappings {
 			action = [GET:"preferences"]
 		}
 		
+		"/ws/progress" {
+			controller = "wsProgress"
+			action = [GET:"list"]
+		}
+		
 		"/ws/public/sequence/$contextId/$name" {
 			controller = "wsSequence"
 			action = [GET:"get"]

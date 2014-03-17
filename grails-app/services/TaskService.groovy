@@ -7,15 +7,33 @@
  */
 
 // Domains
+import groovy.text.GStringTemplateEngine as Engine
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
+
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
+import org.apache.commons.lang.StringUtils as SU
+import org.apache.commons.lang.math.NumberUtils
+import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
+import org.quartz.SimpleTrigger
+import org.quartz.Trigger
+import org.springframework.beans.factory.InitializingBean
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+
 import com.tds.asset.Application
-import com.tds.asset.AssetDependency
-import com.tds.asset.Database
-import com.tds.asset.Files
 import com.tds.asset.AssetComment
+import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.CommentNote
+import com.tds.asset.Database
+import com.tds.asset.Files
 import com.tds.asset.TaskDependency
-// Enums
+import com.tdsops.common.lang.CollectionUtils as CU
+import com.tdsops.common.lang.GStringEval
+import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
@@ -24,31 +42,9 @@ import com.tdsops.tm.enums.domain.AssetDependencyType
 import com.tdsops.tm.enums.domain.ContextType
 import com.tdsops.tm.enums.domain.RoleTypeGroup
 import com.tdsops.tm.enums.domain.TimeConstraintType
-// Utilities
-import com.tdsops.common.lang.CollectionUtils as CU
-import com.tdsops.common.lang.GStringEval
-import com.tdsops.common.sql.SqlUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
-// 3rd party
-import org.apache.shiro.SecurityUtils
-import org.quartz.SimpleTrigger
-import org.quartz.Trigger
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
-import org.springframework.jdbc.core.namedparam.SqlParameterSource
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import groovy.time.TimeDuration
-import groovy.time.TimeCategory
-import groovy.text.GStringTemplateEngine as Engine
-import grails.util.GrailsNameUtils
-import org.hibernate.SessionFactory;
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
-import org.apache.commons.lang.StringUtils as SU
-import org.apache.commons.lang.math.NumberUtils
-
-import org.springframework.beans.factory.InitializingBean
 
 class TaskService implements InitializingBean {
 
@@ -64,6 +60,8 @@ class TaskService implements InitializingBean {
 	def quartzScheduler
 	def workflowService
 	def grailsApplication
+	ProgressService progressService
+	ExecutorService executors
 
 	def ctx = AH.application.mainContext
 	def sessionFactory = ctx.sessionFactory
@@ -91,6 +89,10 @@ class TaskService implements InitializingBean {
 		'ERROR': ['red', 'white'],		// Use if the status doesn't match
 	]
 
+	public TaskService() {
+		this.executors = Executors.newFixedThreadPool(20)
+	}
+	
 	/**
 	 * This is a post initialization method to allow late configuration settings to occur
 	 */
@@ -1277,9 +1279,20 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def assets = this.getAssocAssets(contextType)
 
 		if (assets.size()) {
-			TaskBatch tb = this.createTaskBatch(user.person, contextType, contextId, recipe);
-			this.generateTasks(tb)
-			return ['taskBatch' : tb]
+			final TaskBatch tb = this.createTaskBatch(user.person, contextType, contextId, recipe);
+			
+			def key = "TaskBatch-${tb.id}"
+			this.progressService.create(key, 'Pending')
+			
+			this.executors.submit(new Runnable() {
+				void run() {
+					TaskBatch.withTransaction({ status ->
+						TaskService.this.generateTasks(tb)
+					});
+				}
+			});
+		
+			return ['jobId' : key, 'taskBatch' : tb]
 		} else {
 			throw new IllegalArgumentException('No assets were found')
 		}

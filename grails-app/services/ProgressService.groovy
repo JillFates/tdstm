@@ -1,5 +1,10 @@
 import groovy.time.TimeDuration
-import java.util.concurrent.ConcurrentHashMap
+
+import java.util.concurrent.TimeUnit
+
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
+import com.tdssrc.grails.TimeUtil
 
 
 /**
@@ -9,49 +14,89 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class ProgressService {
 
-	Map<String, ProgressInfo> progressInfo
+	Cache<String, ProgressInfo> progressInfo 
 	
 	public ProgressService() {
-		this.progressInfo = new ConcurrentHashMap<String, ProgressInfo>();
+		this.progressInfo = CacheBuilder.newBuilder()
+			.expireAfterWrite(2, TimeUnit.HOURS)
+			.build();
 	}
 	
-	void create(String key, String status='', Integer ttl=50) {
+	/**
+	 * Creates a new progress info under the key and with initial status
+	 * @param key the key of the progress
+	 * @param status the initial status
+	 */
+	void create(String key, String status='') {
 		ProgressInfo info = new ProgressInfo(key, status)
 		this.progressInfo.put(key, info)
 	}
 	
+	/**
+	 * Updates a progress info with the specific information
+	 * If the info doesn't exists it simply ignores it
+	 * 
+	 * @param key the key of the progress
+	 * @param percentComp the percentage completed
+	 * @param status the initial status
+	 */
 	void update(String key, Integer percentComp, String status, TimeDuration remainingTime=null) {
-		ProgressInfo info = this.progressInfo.get(key)
+		ProgressInfo info = this.progressInfo.getIfPresent(key)
 		if (info != null) {
+			log.debug("Key FOUND ${key}")
 			synchronized (info) {
 				info.percentComp = percentComp
 				info.status = status
 				info.remainingTime = remainingTime
+				info.lastUpdated = new Date().getTime()
 			}
+		} else {
+			log.debug("Key not found ${key}")
 		}
 	}
 	
+	/**
+	 * Manually removes a progress info under a specific key
+	 * @param key the key of the progress
+	 */
 	void remove(String key) {
-		this.progressInfo.remove(key)
+		this.progressInfo.invalidate(key)
 	}
 	
+	/**
+	 * Lists the existing progress infos in this service
+	 * @return a list of maps each containing the info of the get method
+	 */
 	List<Map> list() {
 		def results = []
 		
-		for (def entry : this.progressInfo.entrySet()) {
-			results.add(this.get(entry.getKey()))
+		for (def entry : this.progressInfo.asMap().entrySet()) {
+			def info = this.get(entry.getKey())
+			results.add(info)
 		}
 		
 		return results
 	}
 	
-	def get(id) {
-		//TODO esteban
-		return [
-			'percentComp' : 20,
-			'status' : 'In progress',
-			'remainingTime' : '2 min 12 sec',
-			'lastUpdated' : new Date().getTime()
-		];
+	/**
+	 * Returns the information about a specific key if exists and if not empty map
+	 * @param key the key of the progress
+	 * @return the information about a specific key if exists and if not empty map
+	 */
+	def get(key) {
+		ProgressInfo info = this.progressInfo.getIfPresent(key);
+		
+		if (info == null) {
+			log.debug("Key not found ${key}")
+			return [:]
+		} else {
+			log.debug("Key FOUND ${key}")
+			return [
+				'percentComp' : info.percentComp,
+				'status' : info.status,
+				'remainingTime' : info.remainingTime == null ? 'Unknown' : TimeUtil.ago(info.remainingTime),
+				'lastUpdated' : info.lastUpdated
+			];
+		}
 	}
 }
