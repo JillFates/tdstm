@@ -21,10 +21,17 @@ function createDialog(source,rack,roomName,location,position){
   }
 function updateAssetInfo(source,rack,roomName,location,position){
 	var target = source != '1' ? 'target' : 'source'
-	$("#"+target+"RackId").val(rack)
+	var type = source != '1' ? 'T' : 'S'
+	var roomType = source != '1' ? 'Target' : 'Source'
+		
 	$("#"+target+"LocationId").val(location)
-	$("#"+target+"RoomId").val(roomName)
+	$("#room"+roomType+"Id").val(roomName)
 	$("#"+target+"RackPositionId").val(position)
+	
+	getRacksPerRoom(roomName, type, '','create',rack)
+	
+	if(!isIE7OrLesser)
+		$("select.assetSelect").select2();
     
 }
 function validateAssetEntity(formname) {

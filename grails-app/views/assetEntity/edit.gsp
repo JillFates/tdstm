@@ -38,10 +38,10 @@
 
 		var myOption = "<option value='-1'>Add Rack...</option>"
 		if('${assetEntityInstance.roomTarget}')
-			$("#rackTId option:first").after(myOption);
+			$("#rackTIdedit option:first").after(myOption);
 		
 		if('${assetEntityInstance.roomSource}')
-			$("#rackSId option:first").after(myOption);
+			$("#rackSIdedit option:first").after(myOption);
 
 		// Ajax to populate dependency selects in edit pages
 		var assetId = '${assetEntityInstance.id}'

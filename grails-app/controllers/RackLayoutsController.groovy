@@ -512,9 +512,11 @@ class RackLayoutsController {
 				rackStyle = it.rackStyle
 				row.append("<td class='empty' nowrap>${it.rack}</td><td rowspan=1 class=${it.cssClass}>")
 				if (commit!="Print View") {
+				def roomParameter = forWhom ? it.rackDetails.room?.roomName : it.rackDetails.room?.id
+				def rackParameter = forWhom ? it.rackDetails?.tag : it.rackDetails.id
 				row.append("""<div ${showIconPref ? '' : 'style="display:none"'}  class="rack_menu create_${rackId}"><img src="../i/rack_add2.png">
 							<ul>
-								<li><a href="javascript:${forWhom ? "createAuditPage" : "createAssetPage"}('Server','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
+								<li><a href="javascript:${forWhom ? "createAuditPage" : "createAssetPage"}('Server','${it.source}','${rackParameter}','${roomParameter}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
 								<li><a href="javascript:listDialog('','','asc','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Assign asset </a></li>
 								<li><a href="javascript:listDialog('all','','asc','${it.source}','${it.rackDetails.tag}','${it.rackDetails.room?.roomName}','${it.rackDetails.location}','${it.rack}')">Reassign asset </a></li>
 							</ul></img></div>&nbsp;""")

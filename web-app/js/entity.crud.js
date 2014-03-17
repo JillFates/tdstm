@@ -994,7 +994,7 @@ function toogleRoom(value, source){
 		$(".newRoom"+source).hide()
 }
 
-function getRacksPerRoom(value, type, assetId, forWhom){
+function getRacksPerRoom(value, type, assetId, forWhom,rack){
 	jQuery.ajax({
 		url: contextPath+'/assetEntity/getRacksPerRoom',
 		data: {'roomId':value,'sourceType':type ,'assetId':assetId,'forWhom':forWhom},
@@ -1004,6 +1004,10 @@ function getRacksPerRoom(value, type, assetId, forWhom){
 			$("#rack"+type+"Id"+forWhom).html(resp);
 			var myOption = "<option value='-1'>Add Rack...</option>"
 			$("#rack"+type+"Id"+forWhom+" option:first").after(myOption);
+			
+			if(rack){
+				$("#rack"+type+"Idcreate").val(rack);
+			}
 			if(!isIE7OrLesser)
 				$("select.assetSelect").select2();
 		}
