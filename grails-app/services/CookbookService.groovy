@@ -33,6 +33,7 @@ class CookbookService {
 	def projectService
 	def partyRelationshipService
 	def securityService
+	def progressService
 
 	/**
 	 * Checks if person can access project. If it can't then it throws an {@link UnauthorizedException}
@@ -626,6 +627,16 @@ class CookbookService {
 		return recipe
     }
 
+	List<Map> validateSyntax( sourceCode ) {
+		try {
+			return this.basicValidateSyntax(sourceCode)	
+		} catch (e) {
+			def errorList = []
+			errorList << [ error: 1, reason: 'Invalid syntax', detail: e.getMessage().replaceAll(/[\r]/, '<br/>') ]
+			return errorList
+		}
+	}
+		
 	/**
 	* Used to validate the syntax of a recipe and will return a list of syntax violations 
 	* 
@@ -641,7 +652,7 @@ class CookbookService {
 	* 4) Invalid reference
 	* 5) Duplicate reference
 	*/
-	List<Map> validateSyntax( sourceCode ) {
+	List<Map> basicValidateSyntax( sourceCode ) {
 		def errorList = []
 		def recipe
 

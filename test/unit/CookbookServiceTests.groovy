@@ -89,6 +89,12 @@ class CookbookServiceTests extends GrailsUnitTestCase {
 		def errors = cookbookService.validateSyntax( recipe )
 		assertNull errors
 	}
+	
+	void testSimple() {
+		def recipe = "tasks: {}"
+		def errors = cookbookService.validateSyntax( recipe )
+		assertNotNull errors
+	}
 
 	// Testing the Groups Section
 	void testValidateSyntaxGroupMissingName() {
