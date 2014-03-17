@@ -1945,8 +1945,9 @@ class AssetEntityController {
 			}
 		}
 			if(!assetEntity.hasErrors() && assetEntity.save()) {
-				if( params.sourceRoom || params.targetRoom)
+				if( assetEntity.sourceRoom || assetEntity.targetRoom){
 					assetEntity.updateRacks()
+				}
 					
 				def loginUser = securityService.getUserLogin()
 				if(assetEntity.model){
@@ -3521,9 +3522,9 @@ class AssetEntityController {
 			assetEntityInstance.setRack( params.rackTargetId, false )
 			
 		if(!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {
-			if( params.sourceRoom || params.targetRoom)
+			if( assetEntityInstance.sourceRoom || assetEntityInstance.targetRoom){
 				assetEntityInstance.updateRacks()
-				
+			}
 			def loginUser = securityService.getUserLogin()
 			flash.message = "Asset ${assetEntityInstance.assetName} Updated <br/>"
 			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance, loginUser, project)
