@@ -13,6 +13,7 @@ import grails.validation.ValidationException;
 class WsEventController {
 
 	def securityService
+	def eventService
 	
 	/**
 	 * Provides a list all events and associate bundles for the user's current project
@@ -25,22 +26,20 @@ class WsEventController {
 			return
 		}
 
-		// Create some stub data which will be replaced later with EventService calls
-		def bundles = { eId ->
-			def b = []
-			for (def j=1; j < 6; j++) {
-				b << [ id: (eId*10 + j), name: "Bundle ${eId}-${j}"]
-			}
-			return b
+		def currentProject = securityService.getUserCurrentProject()
+		
+		try {
+			def results = eventService.listEventsAndBundles(loginUser, currentProject)
+			render(ServiceResults.success(['list' : results]) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
 		}
-
-		def data = []
-		def e = ['Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo']
-		for (def i=0; i < e.size(); i++) {
-			data << [ id: (i+1), name: "Event ${e[i]}", bundles: bundles(i) ]
-		}
-
-		render(ServiceResults.success('list' : data) as JSON)
 	}
 
 	
