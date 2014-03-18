@@ -1073,7 +1073,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			$log.info('Success on getting User Preferences');
 			$log.info(data.data.preferences);
 			if(data.data.preferences.MOVE_EVENT){
-				$scope.tasks.selectedEvent = '';
+				$scope.tasks.selectedEvent = {};
+				$scope.tasks.selectedBundle = {};
 				$scope.tasks.selectedEvent.id = data.data.preferences.MOVE_EVENT;
 				$scope.tasks.selectedBundle.id = data.data.preferences.CURR_BUNDLE;
 			}
