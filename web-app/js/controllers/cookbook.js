@@ -854,15 +854,21 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	}
 	//--------------
 
+
 	// TASKS STUFF ///////////////////////////////////
+
 
 	$scope.tasks = {};
 	$scope.tasks.eventsArray = [];
 	$scope.tasks.boundlesArray = [];
+	$scope.tasks.bundlesArrayUnassigned = []
+	$scope.tasks.bundlesArrayAssigned = []
 	$scope.tasks.applicationsArray = [];
-	$scope.tasks.selectedEvent = null;
-	$scope.tasks.selectedBundle = null;
-	$scope.tasks.selectedApplication = null;
+	$scope.tasks.applicationsArrayUnassigned = [];
+	$scope.tasks.applicationsArrayAssigned = [];
+	$scope.tasks.selectedEvent = '';
+	$scope.tasks.selectedBundle = '';
+	$scope.tasks.selectedApplication = '';
 	$scope.tasks.generateBtnStatus = false;
 	$scope.tasks.generateOpts = {
 		contextId: null,// - the select value from the select that represents the context
@@ -895,23 +901,24 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 	// Put select elements in blank. 
 	$scope.tasks.blankBundles = function(){
-		$scope.tasks.boundlesArray = [];
-		$scope.tasks.applicationsArray = [];
-		$scope.tasks.selectedBundle = null;
-		$scope.tasks.selectedApplication = null;
+		$scope.tasks.selectedBundle = '';
+		$scope.tasks.selectedApplication = '';
+		$scope.tasks.bundlesArrayAssigned = [];
+		$scope.tasks.bundlesArray = $scope.tasks.bundlesArrayUnassigned;
+		$scope.tasks.applicationsArrayAssigned = [];
+		$scope.tasks.applicationsArray = $scope.tasks.applicationsArrayUnassigned;
 	};
 	$scope.tasks.blankApplications = function(){
-		$scope.tasks.applicationsArray = [];
-		$scope.tasks.selectedApplication = null;
+		$scope.tasks.selectedApplication = '';
+		$scope.tasks.applicationsArrayAssigned = [];
+		$scope.tasks.applicationsArray = $scope.tasks.applicationsArrayUnassigned;
 	};
 	/////////////////////////////
 
 	// Events for select elements.
 	$scope.tasks.eventSelected = function(){
-		$log.warn('changed event!!');
-		$log.warn($scope.tasks.selectedEvent);
-		$scope.tasks.selectedBundle = null;
-		$scope.tasks.selectedApplication = null;
+		$scope.tasks.selectedBundle = '';
+		$scope.tasks.selectedApplication = '';
 		if($scope.tasks.selectedEvent){
 			$scope.tasks.getListBundles($scope.tasks.selectedEvent);
 		}else{
@@ -920,9 +927,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		$scope.tasks.generateBtnStatus = $scope.tasks.getGenerateBtnStatus();
 	};
 	$scope.tasks.bundleSelected = function(){
-		$log.warn('changed bundles!!');
-		$log.warn($scope.tasks.selectedBundle);
-		$scope.tasks.selectedApplication = null;
+		$scope.tasks.selectedApplication = '';
 		if($scope.tasks.selectedBundle){
 			$scope.tasks.getListInBundle($scope.tasks.selectedBundle);
 		}else{
@@ -934,10 +939,28 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 	// Reset selects
 	$scope.tasks.resetSelects = function(){
-		$scope.tasks.selectedEvent = null;
-		$scope.tasks.selectedBundle = null;
-		$scope.tasks.selectedApplication = null;
+		$scope.tasks.selectedEvent = '';
+		$scope.tasks.selectedBundle = '';
+		$scope.tasks.selectedApplication = '';
 	};
+
+	//generate an array to show the select element correctly
+	// Expect opts with the following data: isUnassigned (boolean), unassignedArray (array with unassigned info)
+	// assignedArray (array with assigned info), and groupName which would be the group name if isUnassigned is false.
+	$scope.tasks.generateOptions = function(opts){
+		var newArray = (opts.isUnassigned) ? opts.unassignedArray : opts.assignedArray;
+		if(opts.isUnassigned){
+			angular.forEach(newArray, function(value, key){
+				value.group = 'unassigned';
+			})
+			$scope.tasks.bundlesArrayUnassigned = newArray;
+		}else{
+			angular.forEach(newArray, function(value, key){
+				value.group = opts.groupName;
+			})
+		}
+		return newArray
+	}
 
 	// Generate btn click.
 	$scope.tasks.generateTask = function(e){
@@ -945,13 +968,13 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			dataToSend;
 		switch($scope.currentSelectedRecipe.context){
 		case 'Event':
-			idSelected = $scope.tasks.selectedEvent;
+			idSelected = $scope.tasks.selectedEvent.id;
 			break;
 		case 'Bundle':
-			idSelected = $scope.tasks.selectedBundle;
+			idSelected = $scope.tasks.selectedBundle.id;
 			break;
 		case 'Application':
-			idSelected = $scope.tasks.selectedApplication;
+			idSelected = $scope.tasks.selectedApplication.id;
 			break;
 		default:
 			idSelected = null
@@ -985,25 +1008,63 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	}
 
 	// Get List of Bundles for a given Event
-	$scope.tasks.getListBundles = function(idEvent){
-		restCalls.getListBundles({details: idEvent}, function(data){
+	$scope.tasks.getListBundles = function(event){
+		var event = (event == 0) ? {id: 0} : event;
+		restCalls.getListBundles({details: event.id}, function(data){
 			$log.info('Success on getting Bundles');
 			$log.info(data.data.list);
-			$scope.tasks.bundlesArray = data.data.list;
+			if(event.id == 0){
+				//generate an array to show the select element correctly
+				$scope.tasks.bundlesArrayUnassigned = $scope.tasks.generateOptions({
+					isUnassigned: true, 
+					unassignedArray: data.data.list, 
+					assignedArray: []
+				});
+			}else{
+				//generate an array to show the select element correctly
+				$scope.tasks.bundlesArrayAssigned = $scope.tasks.generateOptions({
+					isUnassigned: false, 
+					unassignedArray: angular.copy($scope.tasks.bundlesArrayUnassigned), 
+					assignedArray: data.data.list, 
+					groupName: event.name
+				});
+			}
+			$scope.tasks.bundlesArray = angular.copy($scope.tasks.bundlesArrayAssigned).concat(angular.copy($scope.tasks.bundlesArrayUnassigned));
 		}, function(){
 			$log.info('Error on getting Bundles');
 		});
 	}
 
 	// Get Applications in for a given Bundle
-	$scope.tasks.getListInBundle = function(idBundle){
-		restCalls.getListInBundle({details: idBundle}, function(data){
-			$log.info('Success on getting Applications');
-			$log.info(data.data.list);
-			$scope.tasks.applicationsArray = data.data.list;
-		}, function(){
-			$log.info('Error on getting Applications');
-		});
+	$scope.tasks.getListInBundle = function(bundle){
+		var bundle = (bundle == 0) ? {id: 0} : bundle;
+		if(bundle.group != 'unassigned'){
+			restCalls.getListInBundle({details: bundle.id}, function(data){
+				$log.info('Success on getting Applications');
+				$log.info(data.data.list);
+				if(bundle.id == 0){
+					//generate an array to show the select element correctly
+					$scope.tasks.applicationsArrayUnassigned =  $scope.tasks.generateOptions({
+						isUnassigned: true, 
+						unassignedArray: data.data.list, 
+						assignedArray: []
+					});
+				}else{
+					//generate an array to show the select element correctly
+					$scope.tasks.applicationsArrayAssigned = $scope.tasks.generateOptions({
+						isUnassigned: false, 
+						unassignedArray: angular.copy($scope.tasks.applicationsArrayUnassigned), 
+						assignedArray: data.data.list, 
+						groupName: bundle.name
+					});
+				}
+				$scope.tasks.applicationsArray = angular.copy($scope.tasks.applicationsArrayAssigned).concat(angular.copy($scope.tasks.applicationsArrayUnassigned));
+			}, function(){
+				$log.info('Error on getting Applications');
+			});
+		}else{
+			$scope.tasks.applicationsArray = angular.copy($scope.tasks.applicationsArrayUnassigned)
+		}
 	}
 
 	// Get User Preference
@@ -1011,14 +1072,19 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		restCalls.getUsrPreferences({details: 'MOVE_EVENT,CURR_BUNDLE'}, function(data){
 			$log.info('Success on getting User Preferences');
 			$log.info(data.data.preferences);
-			$scope.tasks.selectedEvent = data.data.preferences.MOVE_EVENT;
-			$scope.tasks.selectedBundle = data.data.preferences.CURR_BUNDLE;
+			if(data.data.preferences.MOVE_EVENT){
+				$scope.tasks.selectedEvent = '';
+				$scope.tasks.selectedEvent.id = data.data.preferences.MOVE_EVENT;
+				$scope.tasks.selectedBundle.id = data.data.preferences.CURR_BUNDLE;
+			}
 		}, function(){
 			$log.info('Error on getting User Preferences');
 		});
 	}
 
 	$scope.tasks.getEventsAndBundles();
+	$scope.tasks.getListBundles(0);
+	$scope.tasks.getListInBundle(0);
 	///////////////////////////////////////////////////////
 
 });

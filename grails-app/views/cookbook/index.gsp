@@ -63,17 +63,17 @@
 								<p>Select propert context to generate tasks using the T-090-60 recipe:</p>
 								<form action="#" class="form-inline taskGeneration clearfix" ng-show="tasks.show.generate">
 									<label ng-show="context == 'Event' || context == 'Bundle' || context == 'Application' || context == 'All'" for="eventSelect">Event:
-										<select name="eventSelect" id="eventSelect" ng-model="tasks.selectedEvent" ng-change="tasks.eventSelected()" ng-options="item.id as item.name for item in tasks.eventsArray">
+										<select name="eventSelect" id="eventSelect" ng-model="tasks.selectedEvent" ng-change="tasks.eventSelected()" ng-options="item as item.name for item in tasks.eventsArray" ng-change="tasks.generateBtnStatus = tasks.getGenerateBtnStatus()">
 											<option value="">Please select</option>
 										</select>
 									</label>
 									<label ng-show="context == 'Bundle' || context == 'Application' || context == 'All'" for="eventSelect">Bundle:
-										<select name="bundleSelect" id="bundleSelect" ng-model="tasks.selectedBundle" ng-change="tasks.bundleSelected()" ng-options="item.id as item.name for item in tasks.bundlesArray">
+										<select name="bundleSelect" id="bundleSelect" ng-model="tasks.selectedBundle" ng-change="tasks.bundleSelected()" ng-options="item as item.name group by item.group for item in tasks.bundlesArray">
 											<option value="">Please select</option>
 										</select>
 									</label>
 									<label ng-show="context == 'Application' || context == 'All'" for="eventSelect">Application:
-										<select name="applicationSelect" id="applicationSelect" ng-model="tasks.selectedApplication" ng-change="tasks.generateBtnStatus = tasks.getGenerateBtnStatus()" ng-options="item.id as item.name for item in tasks.applicationsArray">
+										<select name="applicationSelect" id="applicationSelect" ng-model="tasks.selectedApplication" ng-change="tasks.generateBtnStatus = tasks.getGenerateBtnStatus()" ng-options="item as item.name group by item.group for item in tasks.applicationsArray">
 											<option value="">Please select</option>
 										</select>
 									</label>
