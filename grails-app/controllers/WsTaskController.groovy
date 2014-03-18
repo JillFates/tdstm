@@ -141,4 +141,32 @@ class WsTaskController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
+
+	/**
+	 * Used to lookup a TaskBatch by the Context and Recipe regardless of the recipe version
+	 * @param contextId - the record id number of the context that the TaskBatch was generated for
+	 * @param recipeId - the record id of the recipe used to generate the TaskBatch
+	 * @return A taskBatch object if found or null
+	 */
+	def findTaskBatchByRecipeAndContext = {
+		def now = new Date()
+		def event = [
+			id: 70,
+			"id":55,
+			"contextType": "E",
+			"contextId": 42,
+			"recipeVersionUsed": 27,
+			"status": "Done",
+			"taskCount": 30,
+			"exceptionCount": 12,
+			"createdBy": "Jim Laucher",
+			"dateCreated": now,
+			"lastUpdated": now
+		]
+
+		if ( params.contextId.toInteger() % 2 == 0 )
+			render(ServiceResults.success('taskBatch' : event) as JSON)
+		else
+			render(ServiceResults.success('taskBatch' : null ) as JSON)
+	}
 }
