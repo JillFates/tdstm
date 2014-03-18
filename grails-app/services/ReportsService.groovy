@@ -5,6 +5,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetComment
 import com.tds.asset.Application
+import com.tds.asset.AssetType
 
 class ReportsService {
 
@@ -647,12 +648,15 @@ class ReportsService {
 		ArrayList assetList = new ArrayList()
 		def assetsInBundle
 		log.info "****bundle:${moveBundleId} bundleConflicts:${bundleConflicts} unresolvedDep:${unresolvedDep} RunsOn:${runsOn}  vmSupport:${vmSupport} planning:${planning} "
-		
+		def bundles = []
 		if(planning) {
-			assetsInBundle = AssetEntity.findAllByMoveBundleInList(MoveBundle.findAllByProjectAndUseOfPlanning(project, true).toList())
+			bundles = MoveBundle.findAllByProjectAndUseOfPlanning(project, true)
+			
 		} else {
-			assetsInBundle = AssetEntity.findAllByMoveBundle(MoveBundle.findById(moveBundleId))
+			bundles = [MoveBundle.findById(moveBundleId)]
 		}
+		assetsInBundle = AssetEntity.findAll(" FROM AssetEntity WHERE moveBundle IN (:bundles) AND assetType IN (:types)",[bundles:bundles, types:AssetType.getServerTypes()])
+		
 		log.info "${assetsInBundle}"
 		def titleString = new StringBuffer("");
 		
