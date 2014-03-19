@@ -218,13 +218,14 @@
  **************************
  */
 --%>
-<div id="createCommentDialog" title="Create Asset Comment" style="display: none;z-index: 10000;">
+<div id="createCommentDialog" title="Create Asset Comment" style="display: none;">
 	<input type="hidden" name="assetEntity.id" id="createAssetCommentId" value="" />
 	<g:form action="saveComment" method="post" name="createCommentForm">
 		<input type="hidden" name="category" value="general" />
 		<input type="hidden" id="predCount"  value="-1" />
 		<input type="hidden" id="deletePredId" name="deletePredId" />
 		<input type="hidden" id="commentFromId" name="commentFromId" />
+		<input type="hidden" name="prevAssetId" id="prevAssetId" value="" />
   <div class="dialog" style="border: 1px solid #5F9FCF">
 	<div>
 		<table id="createCommentTable" style="border: 0px;">
@@ -268,10 +269,13 @@
 			 <label for="override" >Overridden</label>
 			</td>
 		</tr>
-		<tr class="prop" id="assetEntityTrId">
+		<tr id="assetEntityTrId">
         	<td valign="top" class="name"><label for="category">Asset Name:</label></td>
-        	<td valign="top" class="value" colspan="3">
-            	<span id="assetEntityInputId"></span>
+        	<td valign="top" nowrap="nowrap">
+            	<g:select id="assetSelectCreateType" name="asset" from="['Application','Server','Database','Storage','Other']" 
+							onchange="getAssetsList(this.value,'Create')"></g:select>
+            	<g:select name="assetEntity" id="assetSelectCreateId" from="${servers}" optionKey="${-2}" optionValue="${1}" 
+					noSelection="${['null':'Please select']}" class="assetSelect" onchange="setAssetId(this.value)"></g:select>
         	</td>
 		</tr>
 		<tr id="durationTrId" class="prop" style="display: none">
@@ -378,7 +382,20 @@
 	</tds:hasPermission>
 </g:form>
 </div>
-
+<%--
+/*
+ **************************
+ * assets select section
+ **************************
+ */
+--%>
+<div style="display: none;">
+	<g:select id="Server" from="${servers}" optionKey="${-2}" optionValue="${1}" noSelection="${['null':'Please select']}"></g:select>
+	<g:select id="Application" from="${applications}" optionKey="${-2}" optionValue="${1}" noSelection="${['null':'Please select']}"></g:select>
+	<g:select id="Database"  from="${dbs}" optionKey="${-2}" optionValue="${1}" noSelection="${['null':'Please select']}"></g:select>
+	<g:select id="Storage" from="${files}" optionKey="${-2}" optionValue="${1}" noSelection="${['null':'Please select']}"></g:select>
+	<g:select id="Other" from="${networks}" optionKey="${-2}" optionValue="${1}" noSelection="${['null':'Please select']}"></g:select>
+</div>
 <%--
 /*
  **************************
@@ -391,6 +408,7 @@
  <div class="dialog" style="border: 1px solid #5F9FCF">
 	<input type="hidden" name="id" id="updateCommentId" value="" />
 	<input type="hidden" name="assetName" id="assetValueId" value="" />
+	<input type="hidden" name="prevAssetEdit" id="prevAssetEditId" value="" />
 	<input type="hidden" id="statuWarnId" value="" />
 	<input type="hidden" id="commentcloseId" name="commentcloseId" />
   <div>
@@ -465,9 +483,14 @@
 				 <label for="overrideEdit">Overridden</label>
 			</td>
 		</tr>
-		<tr class="prop" id="assetTrId">
+		<tr id="assetTrId">
 			<td valign="top" class="name" id="assetEditTd"><label for="asset">Asset:</label></td>
-			<td valign="top" class="value"  id="assetTrShowId" colspan="3"></td>
+			<td valign="top">
+            	<g:select id="assetSelectEditType" name="asset" from="['Application','Server','Database','Storage','Other']" 
+							onchange="getAssetsList(this.value,'Edit')"></g:select>
+				<g:select name="assetEntity" id="assetSelectEditId" from="${entities}" optionKey="${-2}" optionValue="${1}" 
+					noSelection="${['null':'Please select']}" class="assetSelect" onchange="setAssetEditId(this.value)"></g:select>
+        	</td>
 		</tr>
 		<tr class="prop" id="durationEditId" style="display: none">
         	<td valign="top" class="name"><label for="durationEdit ">Duration:</label></td>

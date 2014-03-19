@@ -313,7 +313,9 @@ function showAssetDialog( e , action ) {
  function setAssetId(assetId){
 	$("#createAssetCommentId").val(assetId)
  }
- 
+ function setAssetEditId(assetId){
+	 $("#assetValueId").val(assetId)
+ }
  function updateWorkflowTransitions(assetId, category, transitionID, predecessorID,id){
 	new Ajax.Request(contextPath+'/assetEntity/getWorkflowTransition?assetId='+assetId+'&category='+category+'&assetCommentId='+id,{asynchronous:true,evalScripts:true,
 		onComplete:function(e){
@@ -510,7 +512,7 @@ function showAssetDialog( e , action ) {
 		    listTbody.id = 'listCommentsTbodyId'
 			var length = assetComments.length
 		    $('#assetEntityInputId').html(assetComments[0].assetName)
-		    $('#newCommentId').attr('onClick','createComments('+assetComments[0].assetEntityId+',"'+assetComments[0].assetName+'")')
+		    $('#newCommentId').attr('onClick','createComments('+assetComments[0].assetEntityId+',"'+assetComments[0].assetName+'","'+assetComments[0].assetType+'")')
 		      
 		      	for (var i=0; i < length; i++) {
 		      	//generate dynamic rows	
@@ -682,6 +684,14 @@ function showAssetDialog( e , action ) {
 		      	 $('#commentCodeTdId').html(ac.commentCode)
 		      	 $('#assetShowValueId').html('<a href=\"javascript:getEntityDetails(\'listTask\',\''+params.assetType+'\', \''+params.assetId+'\')\">'+params.assetName+'</a>')
 			     $('#assetTrShowId').html(params.assetName)
+			     if(params.assetType){
+			    	 assignAssetType(params.assetType,'Edit');
+					$('#assetSelectEditId').val(params.assetId)
+					
+				 }else{
+						$('#assetSelectEditType').val('Server')
+						$('#assetSelectEditId').val('')
+				}
 			     $('#eventShowValueId').html(params.eventName)
 			     $('#commentButtonEditId').removeAttr('onclick')
 				 $('#commentButtonEditId').unbind("click").bind("click", function(){
@@ -811,11 +821,10 @@ function showAssetDialog( e , action ) {
 	      		     $('#moveEventEditTrId').css('display','table-row')
 				     if(ac.assetEntity==null){
 				    	$('#assetShowId').css('display','none')
-				    	$('#assetTrId').css('display','none')
 				     }else{
 				    	$('#assetShowId').css('display','table-row')
-				    	$('#assetTrId').css('display','table-row')
 				    	$('#assetValueId').val(ac.assetEntity ? ac.assetEntity.id : '')
+				    	$("#prevAssetEditId").val(ac.assetEntity ? ac.assetEntity.id : '')
 				    	$('#assetEntityIdShow').val(ac.assetEntity ? ac.assetEntity.id : '')
 				     }
 	      		   $("#showCommentDialog").dialog("option", "title", "Task Detail");
@@ -913,6 +922,8 @@ function showAssetDialog( e , action ) {
 		      	 }
 			}
 		}
+		if(!isIE7OrLesser)
+			$("select.assetSelect").select2();
 	}
 	function addCommentsToList( e ){
 		var status = $('#statusId').val();
@@ -1079,8 +1090,9 @@ function showAssetDialog( e , action ) {
 		return trunc;
 	}
 
-function createIssue(asset, type, id, forWhom){
-	$("#createAssetCommentId").val(id)
+function createIssue(asset, type, id, forWhom, assetType){
+	$("#createAssetCommentId").val(id);
+	$('#prevAssetId').val(id);
 	$("#commentFromId").val(forWhom)
 	$("#comment").val('')
 	if(type=="comment"){
@@ -1110,10 +1122,6 @@ function createIssue(asset, type, id, forWhom){
 		$('#priorityCreateSpanId').css('display','inline-table')
 		$('#statusCreateTrId').css('display','table-row')
 		//$('#assetEntityTrId').css('display','none')
-		if(asset){
-			$('#assetEntityTrId').css('display','table-row')
-			$('#assetEntityInputId').html(asset)
-		}
 		$('#moveEventTrId').css('display','table-row')
 		$('#createResolveDiv').css('display','table-row');
 		$('#createCommentDialog').dialog('option', 'width', 'auto');
@@ -1126,8 +1134,24 @@ function createIssue(asset, type, id, forWhom){
 		$('#predecessorHeadTrId').css('display','table-row')
 		$('#predecessorTrId').css('display','table-row')
 	}
-	$('#createCommentDialog').parent().css('z-index',10000);
+	//$('#createCommentDialog').parent().css('z-index',10000);
+	if(asset){
+		assignAssetType(assetType,'Create');
+		$('#assetSelectCreateId').val(id)
+	}else{
+		$('#assetSelectCreateType').val('Server')
+		$('#assetSelectCreateId').val('')
+	}
+	if(!isIE7OrLesser)
+		$("select.assetSelect").select2();
 }	
+
+function getAssetsList(value,type){
+	$("#assetSelect"+type+"Id").html($("#"+value).html());
+	$('#assetSelectCreateId').val('')
+	if(!isIE7OrLesser)
+		$("select.assetSelect").select2();
+}
 function commentChange(resolveDiv,formName) {
 	var type = 	document.forms[formName].commentType.value;
 	$("#commentTypeCreateTdId").css('display', 'table-row');
@@ -1333,7 +1357,7 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 			'duration':$('#duration').val(),'durationScale':$('#durationScale').val(),
 			'assetEntity':objId ,'override':$('#override').val(),'role':$('#roleType').val(),
 			'taskDependency' : predArr,'taskSuccessor' : succArr,
-			'manageDependency':1, 'forWhom':forWhom};
+			'manageDependency':1, 'forWhom':forWhom, 'prevAsset':$("#prevAssetId").val()};
 		var completeFunc = function(e) { addCommentsToList(e); }
 	} else {
 		$('#taskDependencyTdId').html("")
@@ -1362,7 +1386,8 @@ function resolveValidate(formName, idVal, redirectTo,open) {
 			'mustVerify':$('#mustVerifyEditId').val(), 'category':$('#categoryEditId').val(), 
 			'assignedTo':$('#assignedToEdit').val(), 'dueDate':$('#dueDateEditId').val(), 
 			'moveEvent':$('#moveEventEditId').val(), 'status':$('#statusEditId').val(),
-//			'note':$('#noteEditId').val(),'assetEntity.id':$('#assetValueId').val(),
+//			'note':$('#noteEditId').val(),
+			'assetEntity':$('#assetValueId').val(),'prevAsset':$("#prevAssetEditId").val(),
 			'estStart':$('#estStartEditId').val(), 'estFinish':$('#estFinishEditId').val(),
 			'actStart':$('#actStartEditId').val(), 'workflowTransition':$('#workFlowId').val(),
 			'hardAssigned':$('#hardAssignedEdit').val(),'priority':$('#priorityEdit').val(),
@@ -1504,7 +1529,7 @@ function showModel(id){
 		}
 	})
 }
-function createNewAssetComment(asset, assetName){
+function createNewAssetComment(asset, assetName, assetType){
 	setAssetId( asset )
 	updateWorkflowTransitions( asset, "general", "workFlowTransitionId", "predecessorId",'' );
 	updateAssignedToList('assignedToSave','assignedCreateSpan',0);
@@ -1526,9 +1551,32 @@ function createNewAssetComment(asset, assetName){
 	document.createCommentForm.mustVerify.value=0;
 	document.createCommentForm.reset();
 	commentChange('#createResolveDiv','createCommentForm');
-	
+	if(asset){
+		assignAssetType(assetType,'Create');
+		$("#assetSelectCreateId").val(asset);
+	}else{
+		$("#assetSelectCreateType").val('Server')
+		$("#assetSelectCreateId").val('')
+	}
+	if(!isIE7OrLesser)
+		$("select.assetSelect").select2();
 }
-function createComments(asset, assetName){
+
+function assignAssetType(type, forWhom){
+	var assetType
+ 	if(type =='Application' || type =='Database' || type =='Storage'){
+ 		assetType= type
+ 	}else if(type =='Server' ||type =='VM' || type =='Blade'){
+ 		assetType= 'Server'
+ 	}else{
+ 		assetType='Other'
+ 	}
+	$("#assetSelect"+forWhom+"Type").val(assetType)
+	$("#assetSelect"+forWhom+"Id").html($('#'+assetType).html())
+	if(!isIE7OrLesser)
+		$("select.assetSelect").select2();
+}
+function createComments(asset, assetName, assetType){
 	setAssetId( asset )
 	updateWorkflowTransitions( asset, "general", "workFlowTransitionId", "predecessorId", '');
 	updateAssignedToList('assignedToSave','assignedCreateSpan',0);
@@ -1547,7 +1595,15 @@ function createComments(asset, assetName){
 	document.createCommentForm.mustVerify.value=0;
 	document.createCommentForm.reset();
 	commentChange('#createResolveDiv','createCommentForm');
-	
+	if(asset){
+		assignAssetType(assetType,'Create');
+		$('#assetSelectCreateId').val(asset)
+	}else{
+		$('#assetSelectCreateType').val('Server')
+		$('#assetSelectCreateId').val('')
+	}
+	if(!isIE7OrLesser)
+		$("select.assetSelect").select2();
 }
 function showAssetComment(id ,type){
 	$("#commentcloseId").val('close')

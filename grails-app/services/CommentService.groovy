@@ -79,13 +79,13 @@ class CommentService {
 
 			// if assetEntity is passed, then validate that it valid and that the user has access to it (belongs to the current project)
 			if ( params.assetEntity ) {
-				if (! params.assetEntity.isNumber() ) {
+				if (! params.assetEntity.isNumber() && params.assetEntity!='null') {
 					log.warn "saveUpdateCommentAndNotes: Invalid asset id (${params.assetEntity}"
 					errorMsg = "An unexpected asset id was received"
 					break
 				}
 				// Now see if it exists and belongs to the project
-				assetEntity = AssetEntity.get(params.assetEntity)
+				assetEntity = params.assetEntity!='null' ? AssetEntity.get(params.assetEntity) : null
 				if (assetEntity) {
 					def assetProject = assetEntity.project
 					if (assetProject.id != project.id) {
@@ -93,11 +93,6 @@ class CommentService {
 						errorMsg = "It appears that you do not have permission to view the specified task"
 						break
 					}
-				} else {
-					// TODO : handle failure for missing Asset
-					log.error "saveUpdateCommentAndNotes: Specified asset [id:${params.assetEntity}] was not found while creating comment"
-					errorMsg = "An invalid asset id was specified"
-					break
 				}
 			}
 
@@ -151,7 +146,7 @@ class CommentService {
 				}
 			
 				commentProject = assetComment.project
-			
+				assetComment.assetEntity = assetEntity
 				// Make sure that the comment about to be updated is associated to the user's current project
 				if ( commentProject.id != project.id ) {
 					log.error "saveUpdateCommentAndNotes: The comment (${params.id}/${commentProject.id}) is not associated with user's current project [${project.id}]"

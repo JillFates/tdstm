@@ -2242,7 +2242,8 @@ class AssetEntityController {
 		def css //= 'white'
 		assetCommentsInstance.each {
 			css = it.dueDate < today ? 'Lightpink' : 'White'
-			assetCommentsList <<[ commentInstance : it, assetEntityId : it.assetEntity.id,cssClass:css,assetName: it.assetEntity.assetName]
+			assetCommentsList <<[ commentInstance : it, assetEntityId : it.assetEntity.id,cssClass:css, 
+									assetName: it.assetEntity.assetName,assetType:it.assetEntity.assetType]
 		}
 		render assetCommentsList as JSON
 	}
@@ -2359,7 +2360,7 @@ class AssetEntityController {
 	def saveComment = {
 		def map = commentService.saveUpdateCommentAndNotes(session, params, true, flash)
 		if( params.forWhom == "update" ){
-			def assetEntity = AssetEntity.get(params.assetEntity)
+			def assetEntity = AssetEntity.get(params.prevAsset)
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 			render(template:"commentList",model:[assetCommentList:assetCommentList])
 		} else {
@@ -2385,7 +2386,7 @@ class AssetEntityController {
 			}
 			forward(controller:"clientTeams", action:"listComment", params:[view:params.view, tab:params.tab])
 		} else if( params.open != "view" ){
-			def assetEntity = AssetComment.findById(params.id)?.assetEntity
+			def assetEntity = AssetEntity.get(params.prevAsset)
 			def assetCommentList = assetEntity ? AssetComment.findAllByAssetEntity(assetEntity) : []
 			render(template:"commentList",model:[assetCommentList:assetCommentList])
 		} else {
@@ -2732,6 +2733,7 @@ class AssetEntityController {
 				assetEntityBean.setId(it.asset.id)
 				assetEntityBean.setAssetTag(it.asset.assetTag)
 				assetEntityBean.setAssetName(it.asset.assetName)
+				assetEntityBean.setAssetType(it.asset.assetType)
 				if(AssetComment.find("from AssetComment where assetEntity = ${it?.asset?.id} and commentType = ? and isResolved = ?",['issue',0])){
 					assetEntityBean.setCommentType("issue")
 				} else if(AssetComment.find('from AssetComment where assetEntity = '+ it?.asset?.id)){

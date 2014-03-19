@@ -246,7 +246,7 @@
 					</g:if>
 					<g:else>
 					<g:if test="${clientConsoleCommentHasPermission}">
-						<img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${assetEntity.id},'${assetEntity.asset.assetName}');"/>
+						<img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${assetEntity.id},'${assetEntity.asset.assetName}','${assetEntity.asset.assetType}');"/>
 					</g:if>
 					</g:else>
 			</g:else>

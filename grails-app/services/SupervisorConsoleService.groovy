@@ -71,7 +71,7 @@ class SupervisorConsoleService {
 		
 		
         def queryForConsole = new StringBuffer("select max(at.date_created) as dateCreated, ae.asset_entity_id as id, ae.priority, "+
-						"ae.asset_tag as assetTag, ae.asset_name as assetName, ae.source_team_id as sourceTeamMt, ae.target_team_id as " + 
+						"ae.asset_tag as assetTag, ae.asset_name as assetName,ae.asset_type as assetType, ae.source_team_id as sourceTeamMt, ae.target_team_id as " + 
 						"targetTeamMt, pm.current_state_id as currentState, min(cast(at.state_to as UNSIGNED INTEGER)) as minstate FROM asset_entity ae " +
 						"LEFT JOIN asset_transition at ON ( at.asset_entity_id = ae.asset_entity_id and at.voided = 0 ) " + 
 						"LEFT JOIN project_asset_map pm ON (pm.asset_id = ae.asset_entity_id) " + 
