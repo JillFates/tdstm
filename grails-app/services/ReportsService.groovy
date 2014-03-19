@@ -725,7 +725,7 @@ class ReportsService {
 			if(showAsset)
 				assetList.add([ 'app':asset, 'dependsOnList':dependsOnList, 'supportsList':supportsList, 'dependsOnIssueCount':dependsOnList.size, 'supportsIssueCount':supportsList.size, header:header ])
 		}
-		return['project':project, 'appList':assetList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : (moveBundleId), 
+		return['project':project, 'appList':assetList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : "Planning Bundles", 
 				'columns':9, title:StringUtils.stripStart(titleString.toString(), ",")
 				]
 	}
