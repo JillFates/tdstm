@@ -878,10 +878,10 @@ class AssetEntityController {
 						
 						
 						def createdByImported = commentsSheet.getCell( ++cols, r ).contents
-						def results = personService.findPerson(createdByImported, project, staffList)
+						def person = createdByImported ? personService.findPerson(createdByImported, project, staffList)?.person : securityService.getUserLoginPerson()
 						
-						if(results.person){
-							assetComment.createdBy = results.person
+						if(person){
+							assetComment.createdBy = person
 						} else {
 							recordForAddition ? skippedAdded++ : skippedUpdated++
 							errorMsg.append("<li>Person $createdByImported not found.</li>")
