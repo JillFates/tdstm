@@ -11,7 +11,11 @@ class UserLogin {
 	Date expiryDate
 	Date passwordChangedDate = TimeUtil.nowGMT()
 	Date lastModified = TimeUtil.nowGMT()
+	/** Used to signal during the login process that the user needs to change their password */
 	String forcePasswordChange = 'N'
+	/** The GUID use to reference a user that is authenticated by an external authority (e.g. Active Directory or SSO) */
+	String externalGuid
+	/** Indicates that the user authentication is local (DB) vs external authority (e.g. Active Directory) */
 	Boolean isLocal = true
     
 	static belongsTo = [ person:Person ]
@@ -33,7 +37,8 @@ class UserLogin {
 		passwordChangedDate( nullable: false)
 		lastModified( nullable: false )
 		isLocal( nullable:false )
-		//forcePasswordChange( nullable: false)
+		externalGuid( nullable:true, blank:true)
+		forcePasswordChange( nullable: false, blank: false)
 	}
 
 	static mapping  = {
@@ -47,6 +52,7 @@ class UserLogin {
 		forcePasswordChange sqltype: 'char(1)'
 		passwordChangedDate sqltype: 'DateTime'
 		lastModified sqltype: 'DateTime'
+		externalGuid sqltype: 'varchar(64)'
 		//person ignoreNotFound: true
 		//passwordChangedDate ignoreNotFound: true
 	}
