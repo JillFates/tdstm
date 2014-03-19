@@ -49,6 +49,8 @@ import org.apache.commons.lang.math.NumberUtils
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdssrc.grails.WebUtil
 import RolePermissions
+import com.tdsops.tm.enums.domain.AssetCommentCategory
+import com.tdssrc.grails.DateUtil
 
 class AssetEntityController {
 
@@ -71,6 +73,7 @@ class AssetEntityController {
 	def securityService
 	def taskService
 	def projectService
+	def personService
 	
 	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8','Custom9','Custom10',
 		'Custom11','Custom12','Custom13','Custom14','Custom15','Custom16','Custom17','Custom18','Custom19','Custom20','Custom21','Custom22','Custom23','Custom24']
@@ -179,7 +182,7 @@ class AssetEntityController {
 		session.setAttribute("TOTAL_ASSETS",0)
 		
 		def prefMap = [:]
-		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency','ImportCabling'].each{t->
+		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency','ImportCabling', 'ImportComment'].each{t->
 		   prefMap << [(t) : userPreferenceService.getPreference(t)]
 		}
 		
@@ -300,6 +303,9 @@ class AssetEntityController {
 		int cablingAdded = 0
 		int dependencyUpdated = 0
 		int cablingUpdated = 0
+		int commentAdded = 0;
+		int commentUpdated = 0;
+		int commentCount = 0
 		def appColumnslist = []
 		def databaseColumnslist = []
 		def filesColumnslist = []
@@ -345,6 +351,7 @@ class AssetEntityController {
 			def filesSheet = workbook.getSheet( "Storage" )
 			def dependencySheet = workbook.getSheet( "Dependencies" )
 			def cablingSheet = workbook.getSheet( "Cabling" )
+			def commentsSheet = workbook.getSheet( "Comments" )
 			def serverColumnNames = [:]
 			def appColumnNames = [:]
 			def databaseColumnNames = [:]
@@ -398,6 +405,7 @@ class AssetEntityController {
 				int filesCount = 0
 				int dependencyCount = 0
 				int cablingCount = 0
+				
 				//Add Data to dataTransferBatch.
 				def serverColNo = 0
 				for (int index = 0; index < serverCol; index++) {
@@ -471,7 +479,8 @@ class AssetEntityController {
 						}
 					}
 				}
-
+				
+				commentCount = commentsSheet.rows
 				//
 				// Assets
 				//
@@ -796,7 +805,115 @@ class AssetEntityController {
 						$resultMap.warnMsg</ul>"""
 				}
 				
-				for( int i=0;  i < sheetNamesLength; i++ ) {
+				/**
+				 * Importing coment
+				 */
+				if (params.comment=='comment') {
+					session.setAttribute("TOTAL_ASSETS",commentCount)
+					def errorMsg = new StringBuilder("<ul>");
+					def projectInstance = securityService.getUserCurrentProject()
+					def userLogins = securityService.getUserLogin()
+					def skippedUpdated =0
+					def skippedAdded=0
+					def staffList = partyRelationshipService.getAllCompaniesStaffPersons(project.client)
+					
+					for ( int r = 1; r < commentCount ; r++ ) {
+						def recordForAddition = false
+						int cols = 0 ;
+						def commentIdImported = commentsSheet.getCell( cols, r ).contents.replace("'","\\'")
+						def assetComment
+						if(commentIdImported){
+							def commentId = NumberUtils.toDouble(commentIdImported, 0).round()
+							assetComment = AssetComment.get( commentId )
+							if(!assetComment){
+								skippedUpdated++
+								errorMsg.append("<li>commentId $commentIdImported not found</li>")	
+							}
+						} else {
+							assetComment = new AssetComment();
+							recordForAddition = true
+						}
+						
+						assetComment.commentType = AssetCommentType.COMMENT
+						assetComment.project = project
+						
+						def assetId = commentsSheet.getCell( ++cols, r ).contents.replace("'","\\'")
+						if(assetId){
+							def formattedId = NumberUtils.toDouble(assetId, 0).round()
+							def assetEntity = AssetEntity.findByIdAndProject(formattedId, project)
+							if(assetEntity){
+								assetComment.assetEntity = assetEntity
+							}else{
+								recordForAddition ? skippedAdded++ : skippedUpdated++
+								errorMsg.append("<li>assetId $assetId not found</li>")
+								continue;
+							}
+						} else {
+							recordForAddition ? skippedAdded++ : skippedUpdated++
+							continue;
+						}
+						
+						
+						
+						def categoryInput = commentsSheet.getCell( ++cols, r ).contents?.replace("'","\\'")?.toLowerCase()?.trim()
+						
+						if(AssetCommentCategory.list.contains(categoryInput)){
+							assetComment.category =  categoryInput ?: AssetCommentCategory.GENERAL
+						} else{
+							recordForAddition ? skippedAdded++ : skippedUpdated++
+							errorMsg.append("<li>Category $categoryInput not standerd.</li>")
+							continue;
+						}
+						
+						
+						def createdDateInput = commentsSheet.getCell( ++cols, r ).contents?.replace("'","\\'")
+						def dateCreated = DateUtil.parseImportedCreatedDate(createdDateInput)
+						if(dateCreated instanceof Date){
+							assetComment.dateCreated = TimeUtil.convertInToGMT(dateCreated, tzId)
+						} else {
+							recordForAddition ? skippedAdded++ : skippedUpdated++
+							errorMsg.append("<li> $dateCreated .</li>")
+							continue;
+						}
+						
+						
+						def createdByImported = commentsSheet.getCell( ++cols, r ).contents
+						def results = personService.findPerson(createdByImported, project, staffList)
+						
+						if(results.person){
+							assetComment.createdBy = results.person
+						} else {
+							recordForAddition ? skippedAdded++ : skippedUpdated++
+							errorMsg.append("<li>Person $createdByImported not found.</li>")
+							continue;
+						}
+						
+						assetComment.comment = commentsSheet.getCell( ++cols, r ).contents
+						
+						if(!assetComment.save()){
+							log.info GormUtil.allErrorsString(assetComment)
+							recordForAddition ? skippedAdded++ : skippedUpdated++
+						} else {
+							recordForAddition ? commentAdded++ : commentUpdated++
+						}
+						
+						
+						if (r%50 == 0){
+							sessionFactory.getCurrentSession().flush();
+							sessionFactory.getCurrentSession().clear();
+						}
+
+					}
+					
+					errorMsg.append(commentAdded ? "<li>$commentAdded Comment added. </li>" : "");
+					errorMsg.append(commentUpdated ? "<li>$commentUpdated Comment updated. </li>" : "");
+					errorMsg.append(skippedAdded ? "<li>$skippedAdded Comment skipped while adding. </li>" : "");
+					errorMsg.append(skippedUpdated ? "<li>$commentUpdated Comment skipped while updations. </li>" : "");
+					
+					errorMsg.append("</ul>");
+					warnMsg += errorMsg.toString();
+				}
+				/*for( int i=0;  i < sheetNamesLength; i++ ) {
 					if(sheetNames[i] == "Comments"){
 						def commentSheet = workbook.getSheet(sheetNames[i])
 						for( int rowNo = 1; rowNo < commentSheet.rows; rowNo++ ) {
@@ -819,7 +936,7 @@ class AssetEntityController {
 							dataTransferComment.save()
 						}
 					}
-				}
+				}*/
 
 			} // generate error message
 			workbook.close()
@@ -834,6 +951,7 @@ class AssetEntityController {
 				"<li>$filesAdded Storage loaded" + 
 				"<li>$dependencyAdded Dependency loaded" +
 				"<li>$cablingAdded cables loaded" +
+				"<li>${commentCount-1} Comments loaded" +
 				warnMsg +
 				( skipped.size() ? "${skipped.size()} spreadsheet rows were skipped: <ul><li>${skipped.join('<li>')}</ul>" : '' ) +
 				'</ul></p>'
