@@ -185,10 +185,10 @@
 								<td ><input type="text" id="ipAddress" name="ipAddress" class="${config.ipAddress}"
 									value="${assetEntityInstance.ipAddress}" tabindex="22"/>
 								</td>
-								<td class="label ${config.sourceRackPosition}" nowrap="nowrap"><label for="sourceRackPositionId">Position</label>
-								<td class="rackLabel"><input type="text" id="sourceRackPositionId" class="${config.sourceRackPosition}"
+								<td class="label ${config.sourceRackPosition}" nowrap="nowrap"><label for="sourceRackPositionIdedit">Position</label>
+								<td class="rackLabel"><input type="text" id="sourceRackPositionIdedit" class="${config.sourceRackPosition}"
 									name="sourceRackPosition" value="${assetEntityInstance.sourceRackPosition}" size=10 tabindex="34" /></td>
-								<td class="rackLabel"> <input type="text" id="targetRackPositionId" class="${config.targetRackPosition}"
+								<td class="rackLabel"> <input type="text" id="targetRackPositionIdedit" class="${config.targetRackPosition}"
 									name="targetRackPosition" value="${assetEntityInstance.targetRackPosition}" size=10 tabindex="44" /></td>
 								<td class="bladeLabel ${config.sourceBladePosition}"><input type="text" id="sourceBladePositionId" class="${config.sourceBladePosition}"
 									name="sourceBladePosition" value="${assetEntityInstance.sourceBladePosition}" size=10 tabindex="36"/></td>

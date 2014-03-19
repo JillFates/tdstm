@@ -9,7 +9,7 @@ function createEntityView(e, type,source,rack,roomName,location,position){
 	 $("#editEntityView").dialog('close');
 	 $("#showEntityView").dialog('close');
 	 updateAssetTitle(type);
-	 updateAssetInfo(source,rack,roomName,location,position)
+	 updateAssetInfo(source,rack,roomName,location,position,'create')
 }
 
 function createAssetDetails(type){
@@ -117,6 +117,8 @@ function editEntityView(e, type,source,rack,roomName,location,position){
 	 if(!isIE7OrLesser)
 		 getHelpTextAsToolTip(type);
 	 updateAssetTitle(type)
+	 if(rack)
+		 updateAssetInfo(source,rack,roomName,location,position,'edit')
 }
 function isValidDate( date ){
     var returnVal = true;
@@ -1004,9 +1006,8 @@ function getRacksPerRoom(value, type, assetId, forWhom,rack){
 			$("#rack"+type+"Id"+forWhom).html(resp);
 			var myOption = "<option value='-1'>Add Rack...</option>"
 			$("#rack"+type+"Id"+forWhom+" option:first").after(myOption);
-			
 			if(rack){
-				$("#rack"+type+"Idcreate").val(rack);
+				$("#rack"+type+"Id"+forWhom).val(rack);
 			}
 			if(!isIE7OrLesser)
 				$("select.assetSelect").select2();

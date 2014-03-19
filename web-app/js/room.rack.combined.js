@@ -19,16 +19,20 @@ function createDialog(source,rack,roomName,location,position){
     var redirectTo = $('#redirectTo').val() == 'room' ? 'room' : 'rack'
     new Ajax.Request(contextPath+'/assetEntity/create?redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e);updateAssetInfo(source,rack,roomName,location,position);}})
   }
-function updateAssetInfo(source,rack,roomName,location,position){
+function updateAssetInfo(source,rack,roomName,location,position,forWhom){
 	var target = source != '1' ? 'target' : 'source'
 	var type = source != '1' ? 'T' : 'S'
 	var roomType = source != '1' ? 'Target' : 'Source'
 		
 	$("#"+target+"LocationId").val(location)
-	$("#room"+roomType+"Id").val(roomName)
-	$("#"+target+"RackPositionId").val(position)
+	if(forWhom=='create'){
+		$("#room"+roomType+"Id").val(roomName)
+	}else{
+		$("#roomSelect"+type).val(roomName)
+	}
+	$("#"+target+"RackPositionId"+forWhom).val(position)
 	
-	getRacksPerRoom(roomName, type, '','create',rack)
+	getRacksPerRoom(roomName, type, '',forWhom,rack)
 	
 	if(!isIE7OrLesser)
 		$("select.assetSelect").select2();
