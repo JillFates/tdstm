@@ -141,6 +141,13 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 					domain: "task",
 					section: "generateTasks"
 				}
+			},
+			getTaskBatchInfo: {
+				method: "GET",
+				params: {
+					domain: "task",
+					section: 'findTaskBatchByRecipeAndContext'
+				}
 			}
 		}
 	);
@@ -858,35 +865,38 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	// TASKS STUFF ///////////////////////////////////
 
 
-	$scope.tasks = {};
-	$scope.tasks.eventsArray = [];
-	$scope.tasks.boundlesArray = [];
-	$scope.tasks.bundlesArrayUnassigned = []
-	$scope.tasks.bundlesArrayAssigned = []
-	$scope.tasks.applicationsArray = [];
-	$scope.tasks.applicationsArrayUnassigned = [];
-	$scope.tasks.applicationsArrayAssigned = [];
-	$scope.tasks.selectedEvent = '';
-	$scope.tasks.selectedBundle = '';
-	$scope.tasks.selectedApplication = '';
-	$scope.tasks.generateBtnStatus = false;
-	$scope.tasks.generateOpts = {
-		contextId: null,// - the select value from the select that represents the context
-		recipeId: null,// - the id of the Recipe record to use to generate the tasks
-		recipeVersionId: null,// - the id of the RecipeVersion record to use to generate the tasks
-		useWIP: false,
-		autoPublish: false,
-		deletePrevious: false
-	};
-	$scope.tasks.show = {
-		generate: true,
-		generating: false,
-		completion: false
+	$scope.tasks = {
+		eventsArray : [],
+		boundlesArray : [],
+		bundlesArrayUnassigned : [],
+		bundlesArrayAssigned : [],
+		applicationsArray : [],
+		applicationsArrayUnassigned : [],
+		applicationsArrayAssigned : [],
+		selectedEvent : '',
+		selectedBundle : '',
+		selectedApplication : '',
+		validCurrentSelection : false,
+		showDeletePreviouslyGenerated : false,
+		taskBatch : {},
+		generateOpts : {
+			contextId: null,// - the select value from the select that represents the context
+			recipeId: null,// - the id of the Recipe record to use to generate the tasks
+			recipeVersionId: null,// - the id of the RecipeVersion record to use to generate the tasks
+			useWIP: false,
+			autoPublish: false,
+			deletePrevious: false
+		},
+		show : {
+			generate: true,
+			generating: false,
+			completion: false
+		}
 	}
 
 	// Returns true if the 'generate task' button should be enabled. Otherwise returns false
-	$scope.tasks.getGenerateBtnStatus = function(){
-		if($scope.currentSelectedRecipe.context){
+	$scope.tasks.validateCurrentSelection = function(){
+		if($scope.currentSelectedRecipe && $scope.currentSelectedRecipe.context){
 			var context = $scope.currentSelectedRecipe.context;
 			if((context == 'Event' && $scope.tasks.selectedEvent) || (context == 'Bundle' && $scope.tasks.selectedBundle) ||
 				(context == 'Application' && $scope.tasks.selectedApplication)){
@@ -896,6 +906,31 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				$log.log('not Matching');
 				return false;
 			}
+			return false;
+		}
+	}
+
+	$scope.tasks.checkValidSelection = function(){
+		var context = $scope.currentSelectedRecipe.context,
+			contextId,
+			recipeId = $scope.currentSelectedRecipe.recipeId;
+
+		switch(context){
+			case 'Application':
+			 	contextId = $scope.tasks.selectedApplication.id
+				break;
+			case 'Event':
+				contextId = $scope.tasks.selectedEvent.id
+				break;
+			case 'Bundle':
+				contextId = $scope.tasks.selectedBundle.id
+				break;
+			default:
+				contextId = 0
+		}
+		$scope.tasks.validCurrentSelection = $scope.tasks.validateCurrentSelection();
+		if($scope.tasks.validCurrentSelection){
+			$scope.tasks.getTaskBatchInfo({recipeId: recipeId, contextId: contextId, logs: false});
 		}
 	}
 
@@ -919,21 +954,21 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	$scope.tasks.eventSelected = function(){
 		$scope.tasks.selectedBundle = '';
 		$scope.tasks.selectedApplication = '';
-		if($scope.tasks.selectedEvent){
+		if($scope.tasks.selectedEvent && $scope.currentSelectedRecipe.context != 'Event'){
 			$scope.tasks.getListBundles($scope.tasks.selectedEvent);
 		}else{
 			$scope.tasks.blankBundles();
 		}
-		$scope.tasks.generateBtnStatus = $scope.tasks.getGenerateBtnStatus();
+		$scope.tasks.checkValidSelection();
 	};
 	$scope.tasks.bundleSelected = function(){
 		$scope.tasks.selectedApplication = '';
-		if($scope.tasks.selectedBundle){
+		if($scope.tasks.selectedBundle && $scope.currentSelectedRecipe.context != 'Bundle'){
 			$scope.tasks.getListInBundle($scope.tasks.selectedBundle);
 		}else{
 			$scope.tasks.blankApplications();
 		}
-		$scope.tasks.generateBtnStatus = $scope.tasks.getGenerateBtnStatus();
+		$scope.tasks.checkValidSelection();
 	};
 	////////////////////////////////
 
@@ -1080,6 +1115,20 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			}
 		}, function(){
 			$log.info('Error on getting User Preferences');
+		});
+	}
+
+	// Get Task Batch Info
+	$scope.tasks.getTaskBatchInfo = function(params){
+		restCalls.getTaskBatchInfo(params, function(data){
+			var results = null;
+			$log.info('Success on getting Task Batch Info');
+			$log.info(data);
+			if(results){
+				$scope.tasks.showDeletePreviouslyGenerated = true;
+			}
+		}, function(){
+			$log.info('Error on getting Task Batch Info');
 		});
 	}
 

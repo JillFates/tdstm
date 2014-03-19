@@ -60,10 +60,10 @@
 						<tabset id="mainTabset">
 							%{-- Task Generation --}%
 							<tab heading="Task Generation" active="activeTabs.taskGeneration">
-								<p>Select propert context to generate tasks using the T-090-60 recipe:</p>
+								<p>Select appropriate context to generate tasks using the {{selectedRecipe.name}} recipe:</p>
 								<form action="#" class="form-inline taskGeneration clearfix" ng-show="tasks.show.generate">
 									<label ng-show="context == 'Event' || context == 'Bundle' || context == 'Application' || context == 'All'" for="eventSelect">Event:
-										<select name="eventSelect" id="eventSelect" ng-model="tasks.selectedEvent" ng-change="tasks.eventSelected()" ng-options="item as item.name for item in tasks.eventsArray" ng-change="tasks.generateBtnStatus = tasks.getGenerateBtnStatus()">
+										<select name="eventSelect" id="eventSelect" ng-model="tasks.selectedEvent" ng-change="tasks.eventSelected()" ng-options="item as item.name for item in tasks.eventsArray" ng-change="tasks.validCurrentSelection = tasks.getGenerateBtnStatus()">
 											<option value="">Please select</option>
 										</select>
 									</label>
@@ -73,7 +73,7 @@
 										</select>
 									</label>
 									<label ng-show="context == 'Application' || context == 'All'" for="eventSelect">Application:
-										<select name="applicationSelect" id="applicationSelect" ng-model="tasks.selectedApplication" ng-change="tasks.generateBtnStatus = tasks.getGenerateBtnStatus()" ng-options="item as item.name group by item.group for item in tasks.applicationsArray">
+										<select name="applicationSelect" id="applicationSelect" ng-model="tasks.selectedApplication" ng-change="tasks.checkValidSelection()" ng-options="item as item.name group by item.group for item in tasks.applicationsArray">
 											<option value="">Please select</option>
 										</select>
 									</label>
@@ -98,7 +98,7 @@
 									</div>
 									<div class="generateWrapper">
 										<label for="generateTask">
-											<a class="btn btn-default has-spinner" id="generateTask" ng-disabled="!tasks.generateBtnStatus" ng-click="tasks.generateTask(this)">
+											<a class="btn btn-default has-spinner" id="generateTask" ng-disabled="!tasks.validCurrentSelection" ng-click="tasks.generateTask(this)">
 												<span class="spinner"><i class="icon-spin icon-refresh"></i></span>Generate
 											</a>
 										</label>
