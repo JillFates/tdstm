@@ -19,6 +19,11 @@ databaseChangeLog = {
 				) ENGINE=InnoDB;
 			""")
 	}
+	/*
+
+	// This caused an error when deploying to production (see TM-2548)
+	// We need to move this migration to a new migration script once we update production and resolve this issue
+	// We also need to do a DROP function first for systems that did get the function
 	
 	changeSet(author: "eluna", id: "20140307 TM-2511-2") {
 		comment('Add function')
@@ -39,4 +44,5 @@ databaseChangeLog = {
 				END;
 			"""
 	}
+	*/
 }
