@@ -1564,8 +1564,10 @@ function createNewAssetComment(asset, assetName, assetType){
 
 function assignAssetType(type, forWhom){
 	var assetType
- 	if(type =='Application' || type =='Database' || type =='Storage'){
+ 	if(type =='Application' || type =='Database' ){
  		assetType= type
+ 	}else if( type=='Files' || type =='Storage'){
+ 		assetType= 'Storage'
  	}else if(type =='Server' ||type =='VM' || type =='Blade'){
  		assetType= 'Server'
  	}else{
