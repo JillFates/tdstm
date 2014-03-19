@@ -49,4 +49,69 @@ class EventService {
 		
 		return result
 	}
+	
+	/**
+	 * Provides a list all bundles associated to a specified move event or if id=0 then unassigned bundles
+	 * for the user's current project
+	 * 
+	 * @param eventId the id of the event
+	 * @param userForPlanning a boolean to filter by the useOfPlanning property of the move event
+	 * @param user the current user
+	 * @param currentProject the current project
+	 * @return the list of bundles associated with the event
+	 */
+	def listBundles(eventId, useForPlanning, loginUser, currentProject) {
+		if (currentProject == null) {
+			log.info('Current project is null')
+			throw new EmptyResultException()
+		}
+		
+		if (eventId != null && !eventId.isNumber()) {
+			throw new IllegalArgumentException('Not a eventId number')
+		}
+		
+		eventId = eventId.toInteger()
+		def moveEvent = null
+		
+		if (eventId > 0) {
+			moveEvent = MoveEvent.get(eventId)
+			if (moveEvent != null) {
+				if (!moveEvent.project.equals(currentProject)) {
+					throw new IllegalArgumentException('The current project and the Move event project doesn\'t match')
+				}
+			} else {
+				log.info('Move event is null')
+				throw new EmptyResultException()
+			}
+		}
+		
+		def result = []
+		def moveBundles = []
+		
+		if (moveEvent != null) {
+			if (useForPlanning != null) {
+				moveBundles = MoveBundle.findAllByMoveEventAndUseOfPlanning(moveEvent, useForPlanning.toBoolean())
+			} else {
+				moveBundles = MoveBundle.findAllByMoveEvent(moveEvent)
+			}
+		} else {
+			if (useForPlanning != null) {
+				moveBundles = MoveBundle.findAllByMoveEventIsNullAndUseOfPlanning(useForPlanning.toBoolean())
+			} else {
+				moveBundles = MoveBundle.findAllByMoveEventIsNull()
+			}
+		}
+		
+		for (moveBundle in moveBundles) {
+			def moveBundleMap = [
+				'id' : moveBundle.id,
+				'name' : moveBundle.name
+			];
+		
+			result.add(moveBundleMap)
+		}
+		
+		return result
+	}
+
 }

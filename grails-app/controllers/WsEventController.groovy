@@ -56,15 +56,20 @@ class WsEventController {
 		}
 
 		def currentProject = securityService.getUserCurrentProject()
-		def id = (params.id && params.id.toInteger() > 0 ? params.id : 'UNASSIGNED' )
-
-		def data = [
-			[ id: 1, name: "Bundle ${id}-1"],
-			[ id: 2, name: "Bundle ${id}-2"],
-			[ id: 3, name: "Bundle ${id}-3"],
-			[ id: 4, name: "Bundle ${id}-4"],
-		]
-
-		render(ServiceResults.success('list' : data) as JSON)
+		def id = params.id
+		def useForPlanning = params.useForPlanning
+		
+		try {
+			def results = eventService.listBundles(id, useForPlanning, loginUser, currentProject)
+			render(ServiceResults.success(['list' : results]) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
 	}
 }
