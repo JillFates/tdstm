@@ -5,6 +5,7 @@
 	<title>Task Detail</title>
 	<g:javascript src="asset.tranman.js"/>
 	<g:javascript src="entity.crud.js" />
+	<g:javascript src="cabling.js"/>
 </head>
 <body>
 <div id="showTaskForEmailId" title="Comment/Issue detail">
