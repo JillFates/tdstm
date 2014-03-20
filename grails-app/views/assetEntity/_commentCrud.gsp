@@ -488,7 +488,7 @@
 			<td valign="top">
             	<g:select id="assetSelectEditType" name="asset" from="['Application','Server','Database','Storage','Other']" 
 							onchange="getAssetsList(this.value,'Edit')"></g:select>
-				<g:select name="assetEntity" id="assetSelectEditId" from="${entities}" optionKey="${-2}" optionValue="${1}" 
+				<g:select name="assetEntity" id="assetSelectEditId" from="${servers}" optionKey="${-2}" optionValue="${1}" 
 					noSelection="${['null':'Please select']}" class="assetSelect" onchange="setAssetEditId(this.value)"></g:select>
         	</td>
 		</tr>

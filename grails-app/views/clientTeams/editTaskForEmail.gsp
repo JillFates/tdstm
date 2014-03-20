@@ -98,9 +98,14 @@
 					 <label for="overrideEdit">Overridden</label>
 				</td>
 			</tr>
-		<tr class="prop" id="assetTrId">
+		<tr id="assetTrId">
 			<td valign="top" class="name" id="assetEditTd"><label for="asset">Asset:</label></td>
-			<td valign="top" class="value"  id="assetTrShowId" colspan="3">${assetName}</td>
+			<td valign="top">
+            	<g:select id="assetSelectEditType" name="asset" from="['Application','Server','Database','Storage','Other']" 
+							onchange="getAssetsList(this.value,'Edit')"></g:select>
+				<g:select name="assetEntity" id="assetSelectEditId" from="${servers}" optionKey="${-2}" optionValue="${1}" 
+					noSelection="${['null':'Please select']}" class="assetSelect" onchange="setAssetEditId(this.value)"></g:select>
+        	</td>
 		</tr>
 		<g:if test="${assetComment.commentType=='issue' }">
 		<tr class="prop" id="durationEditId">
@@ -241,6 +246,13 @@
 <input type="hidden" id="deletedPredsId" name="deletedPreds" value=""/>
 </g:form>
 </div>
+<div style="display: none;">
+	<g:select id="Server" from="${servers}" optionKey="${-2}" optionValue="${1}" noSelection="${['null':'Please select']}"></g:select>
+	<g:select id="Application" from="${applications}" optionKey="${-2}" optionValue="${1}" noSelection="${['null':'Please select']}"></g:select>
+	<g:select id="Database"  from="${dbs}" optionKey="${-2}" optionValue="${1}" noSelection="${['null':'Please select']}"></g:select>
+	<g:select id="Storage" from="${files}" optionKey="${-2}" optionValue="${1}" noSelection="${['null':'Please select']}"></g:select>
+	<g:select id="Other" from="${networks}" optionKey="${-2}" optionValue="${1}" noSelection="${['null':'Please select']}"></g:select>
+</div>
 <script type="text/javascript">
 $(document).ready(function() {
 	if(${assetComment.commentType=='issue'}){
@@ -256,6 +268,17 @@ $(document).ready(function() {
 		loadEditPredecessor('${assetComment.id}');
 		loadEditSucccessor('${assetComment.id}');
 	}
+
+	if('${assetComment.assetEntity}'){
+   	 	assignAssetType('${assetType}',"Edit");
+		$('#assetSelectEditId').val('${assetComment.assetEntity?.id}')
+		
+	 }else{
+		$('#assetSelectEditType').val('Server')
+		$('#assetSelectEditId').val('')
+	}
+	if(!isIE7OrLesser)
+		$("select.assetSelect").select2();
 });
 function validatePredSucc(){
 	var objId = ''

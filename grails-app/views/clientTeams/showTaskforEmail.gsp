@@ -4,6 +4,7 @@
 	<meta name="layout" content="projectHeader" />
 	<title>Task Detail</title>
 	<g:javascript src="asset.tranman.js"/>
+	<g:javascript src="entity.crud.js" />
 </head>
 <body>
 <div id="showTaskForEmailId" title="Comment/Issue detail">
@@ -54,7 +55,7 @@
 		</g:if>
 		<tr id="assetShowId" class="prop">
 			<td valign="top" class="name" id="assetTdId"><label for="asset">Asset:</label></td>
-			<td valign="top" class="value" id="assetShowValueId" colspan="3"><a href="javascript:getEntityDetails('listTask','params.assetType', 'params.assetId')">${assetName}</a></td>
+			<td valign="top" class="value" id="assetShowValueId" colspan="3"><a href="javascript:getEntityDetails('listTask','${assetType}', '${assetId}')">${assetName}</a></td>
 		</tr>
 		<g:if test = "${workflow}">
 			<tr class="issue" id="workFlowShow">
@@ -177,9 +178,30 @@
 	</tds:hasPermission>
 </div>
 </div>
+<g:render template="../assetEntity/commentCrud"/>
+<g:render template="../assetEntity/modelDialog"/>
+<div id="createEntityView" style="display: none;"></div>
+<div id="showEntityView" style="display: none;"></div>
+<div id="editEntityView" style="display: none;"></div>
+<div id="editManufacturerView" style="display: none;"></div>
+<div id="cablingDialogId" style="display: none;"></div>
+<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
 <script>
 	currentMenuId = "#teamMenuId";
 	$("#teamMenuId a").css('background-color','#003366')
+	$(document).ready(function() {
+		$("#createEntityView").dialog({ autoOpen: false })
+		$("#showEntityView").dialog({ autoOpen: false })
+		$("#editEntityView").dialog({ autoOpen: false })
+		$("#commentsListDialog").dialog({ autoOpen: false })
+		$("#createCommentDialog").dialog({ autoOpen: false })
+		$("#showCommentDialog").dialog({ autoOpen: false })
+		$("#editCommentDialog").dialog({ autoOpen: false })
+		$("#manufacturerShowDialog").dialog({ autoOpen: false })
+		$("#modelShowDialog").dialog({ autoOpen: false })
+		$("#editManufacturerView").dialog({ autoOpen: false})
+		$("#cablingDialogId").dialog({ autoOpen:false })
+	});
 </script>
 </body>
 </html>

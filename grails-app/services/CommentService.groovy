@@ -35,6 +35,7 @@ class CommentService {
 	def securityService
 	def taskService
 	def userPreferenceService
+	def assetEntityService
 
 	// TODO : This should use an array defined in AssetCommentCategory instead as that is where people will add new statuses
 	private final List<String> statusToSendEmailFor = [
@@ -146,7 +147,8 @@ class CommentService {
 				}
 			
 				commentProject = assetComment.project
-				assetComment.assetEntity = assetEntity
+				if(params.view!='myTask')
+					assetComment.assetEntity = assetEntity
 				// Make sure that the comment about to be updated is associated to the user's current project
 				if ( commentProject.id != project.id ) {
 					log.error "saveUpdateCommentAndNotes: The comment (${params.id}/${commentProject.id}) is not associated with user's current project [${project.id}]"
@@ -529,7 +531,7 @@ class CommentService {
 		def personCreateObj
 		def dtCreated
 		def dtResolved
-		
+		def project = securityService.getUserCurrentProject()
 		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 		def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
 		def tzId = userPreferenceService.getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
@@ -584,7 +586,7 @@ class CommentService {
 					def task = taskDep.predecessor
 					def css = taskService.getCssClassForStatus(task.status)
 					def taskDesc = task.comment?.length()>50 ? task.comment.substring(0,50): task.comment
-					predecessorTable.append("""<tr class="${css}" style="cursor:pointer;" onClick="showAssetComment(${task.id}, 'show')"><td>${task.category}</td><td>${task.taskNumber ? task.taskNumber+':' :''}${taskDesc}</td></tr>""")
+					predecessorTable.append("""<tr class="${css}"><td>${task.category}</td><td>${task.taskNumber ? task.taskNumber+':' :''}${taskDesc}</td></tr>""")
 			    }
 				predecessorTable.append('</tbody></table>')
 			}
@@ -598,13 +600,14 @@ class CommentService {
 				taskSuccessors.each() { successor ->
 					def task = successor.assetComment
 					def css = taskService.getCssClassForStatus(task.status)
-					successorTable.append("""<tr class="${css}" style="cursor:pointer;" onClick="showAssetComment(${task.id}, 'show')"><td>${task.category}</td><td>${task}</td>""")
+					successorTable.append("""<tr class="${css}" ><td>${task.category}</td><td>${task}</td>""")
 				}
 				successorTable.append("""</tbody></table>""")
 			
 			}
 			def cssForCommentStatus = taskService.getCssClassForStatus(assetComment.status)
-		 
+			def entities = assetEntityService.entityInfo( project )
+			def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
 			commentList = [ 
 				assetComment:assetComment, personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
@@ -613,7 +616,9 @@ class CommentService {
 				workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,maxVal:maxVal,
 				cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, 
 				successorsCount:successorsCount, predecessorsCount:predecessorsCount, assetId:assetComment.assetEntity?.id ?: "" ,
-				assetType:assetComment.assetEntity?.assetType ,staffRoles:taskService.getRolesForStaff()]
+				assetType:assetComment.assetEntity?.assetType ,staffRoles:taskService.getRolesForStaff(), servers : entities.servers, 
+				applications : entities.applications, dbs : entities.dbs, files : entities.files,  networks :entities.networks,moveBundleList:moveBundleList,
+				assetDependency : new AssetDependency(), dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus]
 		}else{
 		 def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - ${params.id} "
 		 log.error "showComment: show comment view - "+errorMsg

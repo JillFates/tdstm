@@ -1292,6 +1292,6 @@ function goBack() { window.history.back() }
 			params.'taskSuccessor[]' = succs
 		
 		def map = commentService.saveUpdateCommentAndNotes(session, params, false, flash)
-		forward(controller:"clientTeams", action:"showTaskforEmail", params:[id:params.id])
+		redirect(controller:"clientTeams", action:"showTaskforEmail", params:[id:params.id])
 	}
 }
