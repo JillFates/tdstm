@@ -37,7 +37,8 @@ class PersonController {
 	def list = {
 		def listJsonUrl
 		def company
-		def companyId = params.companyId ?: 'All'
+		def currentCompany = securityService.getUserCurrentProject()?.client
+		def companyId = params.companyId ?: currentCompany.id
 		if(companyId && companyId != 'All'){
 			def map = [controller:'person', action:'listJson', id:"${companyId}"]
 			listJsonUrl = HtmlUtil.createLink(map)
@@ -49,17 +50,17 @@ class PersonController {
 		def partyGroupList = PartyGroup.findAllByPartyType( PartyType.read("COMPANY")).sort{it.name}
 		
 		// Used to set the default value of company select in the create staff dialog
-		if(companyId && companyId.isNumber())
+		if(companyId && companyId != 'All')
 			company = PartyGroup.find( "from PartyGroup as p where partyType = 'COMPANY' AND p.id = ?", [companyId.toLong()] )
 		else
-			company = securityService.getUserCurrentProject()?.client
+			company = currentCompany
 		
 		userPreferenceService.setPreference( "PARTYGROUP", companyId.toString() )
 
 		def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
 		//used to show roles in addTeam select
 		def availabaleRoles = partyRelationshipService.getStaffingRoles()
-		return [companyId:companyId, company:company, partyGroupList:partyGroupList, 
+		return [companyId:companyId?:'All', company:company, partyGroupList:partyGroupList, 
 					listJsonUrl:listJsonUrl, availabaleRoles:availabaleRoles]
 	}
 	
@@ -1178,7 +1179,7 @@ class PersonController {
 					break;
 				
 				case "PARTYGROUP" :
-					prefMap.put((pref.preferenceCode), "Company / "+PartyGroup.get(pref.value).name)
+					prefMap.put((pref.preferenceCode), "Company / "+ (!pref.value.equalsIgnoreCase("All")  ? PartyGroup.get(pref.value).name : 'All'))
 					break;
 				
 				case "CURR_ROOM" :
