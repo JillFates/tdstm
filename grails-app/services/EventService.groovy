@@ -55,7 +55,7 @@ class EventService {
 	 * for the user's current project
 	 * 
 	 * @param eventId the id of the event
-	 * @param userForPlanning a boolean to filter by the useOfPlanning property of the move event
+	 * @param useForPlanning - a boolean to filter by the useForPlanning property of the move event
 	 * @param user the current user
 	 * @param currentProject the current project
 	 * @return the list of bundles associated with the event
@@ -90,13 +90,13 @@ class EventService {
 		
 		if (moveEvent != null) {
 			if (useForPlanning != null) {
-				moveBundles = MoveBundle.findAllByMoveEventAndUseOfPlanning(moveEvent, useForPlanning.toBoolean())
+				moveBundles = MoveBundle.findAllByMoveEventAndUseForPlanning(moveEvent, useForPlanning.toBoolean())
 			} else {
 				moveBundles = MoveBundle.findAllByMoveEvent(moveEvent)
 			}
 		} else {
 			if (useForPlanning != null) {
-				moveBundles = MoveBundle.findAllByMoveEventIsNullAndUseOfPlanning(useForPlanning.toBoolean())
+				moveBundles = MoveBundle.findAllByMoveEventIsNullAndUseForPlanning(useForPlanning.toBoolean())
 			} else {
 				moveBundles = MoveBundle.findAllByMoveEventIsNull()
 			}

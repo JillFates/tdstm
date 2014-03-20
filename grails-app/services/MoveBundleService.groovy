@@ -342,7 +342,7 @@ class MoveBundleService {
 		projectInstance.save(flush:true)
 		
 		// Find all move bundles that are flagged for Planning in the project and then get all assets in those bundles
-		String moveBundleText = MoveBundle.findAllByUseOfPlanningAndProject(true,projectInstance).id
+		String moveBundleText = MoveBundle.findAllByUseForPlanningAndProject(true,projectInstance).id
 		moveBundleText = GormUtil.asCommaDelimitedString(moveBundleText)
 
 		// Get array of moveBundle ids
@@ -577,7 +577,7 @@ class MoveBundleService {
 		def entities = assetEntityService.entityInfo( projectInstance )
  
 		// Used by the Assignment Dialog
-		def planningMoveBundles = MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance,true,[sort:'name'])
+		def planningMoveBundles = MoveBundle.findAllByProjectAndUseForPlanning(projectInstance,true,[sort:'name'])
 		def allMoveBundles = MoveBundle.findAllByProject(projectInstance,[sort:'name'])
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def assetDependencyList = AssetDependencyBundle.findAllByProject(projectInstance)?.sort{it.dependencyBundle}
