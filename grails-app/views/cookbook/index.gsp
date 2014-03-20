@@ -62,17 +62,17 @@
 							<tab heading="Task Generation" active="activeTabs.taskGeneration">
 								<p>Select appropriate context to generate tasks using the {{selectedRecipe.name}} recipe:</p>
 								<form action="#" class="form-inline taskGeneration clearfix" ng-show="tasks.show.generate">
-									<label ng-show="context == 'Event' || context == 'Bundle' || context == 'Application' || context == 'All'" for="eventSelect">Event:
+									<label class="inline" for="eventSelect">Event:
 										<select name="eventSelect" id="eventSelect" ng-model="tasks.selectedEvent" ng-change="tasks.eventSelected()" ng-options="item as item.name for item in tasks.eventsArray" ng-change="tasks.validCurrentSelection = tasks.getGenerateBtnStatus()">
 											<option value="">Please select</option>
 										</select>
 									</label>
-									<label ng-show="context == 'Bundle' || context == 'Application' || context == 'All'" for="eventSelect">Bundle:
+									<label class="inline" ng-show="currentSelectedRecipe.context == 'Bundle' || currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'" for="eventSelect">Bundle:
 										<select name="bundleSelect" id="bundleSelect" ng-model="tasks.selectedBundle" ng-change="tasks.bundleSelected()" ng-options="item as item.name group by item.group for item in tasks.bundlesArray">
 											<option value="">Please select</option>
 										</select>
 									</label>
-									<label ng-show="context == 'Application' || context == 'All'" for="eventSelect">Application:
+									<label class="inline" ng-show="currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'" for="eventSelect">Application:
 										<select name="applicationSelect" id="applicationSelect" ng-model="tasks.selectedApplication" ng-change="tasks.checkValidSelection()" ng-options="item as item.name group by item.group for item in tasks.applicationsArray">
 											<option value="">Please select</option>
 										</select>
@@ -91,7 +91,7 @@
 										</label>
 									</div>	
 									<div>	
-										<label for="deletePreviouslyGenerated">
+										<label for="deletePreviouslyGenerated" ng-show="">
 											<input type="checkbox" name="deletePreviouslyGenerated" id="deletePreviouslyGenerated" ng-model="tasks.generateOpts.deletePrevious">
 											Delete previously generated tasks that were created using this context & recipe
 										</label>

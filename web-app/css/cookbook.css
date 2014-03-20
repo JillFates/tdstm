@@ -212,8 +212,13 @@ form.taskGeneration{
 	padding: 10px 0 0 0;
 }
 
-form.taskGeneration label{
+form.taskGeneration label.inline{
 	margin: 0 5% 0 0;
+	display: inline;
+}
+
+form.taskGeneration label.inline select{
+	max-width: 20%;
 }
 
 form.taskGeneration label[for="autoPublishTasks"], .completionWrapper, .generateWrapper, .progressWrapper, .completionButtons{
