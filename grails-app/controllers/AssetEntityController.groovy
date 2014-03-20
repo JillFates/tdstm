@@ -1570,7 +1570,8 @@ class AssetEntityController {
 					}
 				}
 				//update data from Asset Comment table to EXCEL
-				for( int sl=0;  sl < sheetNamesLength; sl++ ) {
+				//commented as per craig comments on skype,as default asset comments are exporting.
+				/*for( int sl=0;  sl < sheetNamesLength; sl++ ) {
 					def commentIt = new ArrayList()
 					if(sheetNames[sl] == "Comments"){
 						def commentSheet = book.getSheet("Comments")
@@ -1605,7 +1606,7 @@ class AssetEntityController {
 							commentSheet.addCell(comment)
 						}
 					}
-				}
+				}*/
 				filename += "-"+exportedEntity+"-"+exportDate
 				response.setHeader( "Content-Disposition", "attachment; filename=\""+exportType+'-'+filename+".xls\"" )
 				book.write()
