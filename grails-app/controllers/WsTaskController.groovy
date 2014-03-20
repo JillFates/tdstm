@@ -173,7 +173,39 @@ class WsTaskController {
 		} catch (ValidationException e) {
 			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
 		} catch (Exception e) {
-		e.printStackTrace();
+			ServiceResults.internalError(response, log, e)
+		}
+	}
+	
+	
+	/**
+	 * List the {@link TaskBatch} using the parameters passed in the request
+	 * Check {@link UrlMappings} for the right call
+	 */
+	def listTaskBatches = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		
+		def recipeId = params.recipeId
+		def limitDays = params.limitDays
+		def currentProject = securityService.getUserCurrentProject()
+		
+		try {
+			def result = taskService.listTaskBatches(recipeId, limitDays, loginUser, currentProject);
+
+			render(ServiceResults.success('list' : result) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (IllegalArgumentException e) {
+			ServiceResults.forbidden(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (Exception e) {
 			ServiceResults.internalError(response, log, e)
 		}
 	}

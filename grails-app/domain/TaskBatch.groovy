@@ -1,7 +1,7 @@
 
+import com.tds.asset.Application
 import com.tdsops.tm.enums.domain.ContextType
 import com.tdssrc.grails.TimeUtil
-import com.tds.asset.AssetEntity
 
 /**
  * TaskBatch Domain Object
@@ -76,8 +76,27 @@ class TaskBatch {
 	/** 
 	 * Used to get the name of the object for which the context references
 	 */
-	def contextName = {
-		return contextType.toString()
+	def contextName() {
+		if (contextType == null) {
+			return "";
+		}
+		switch (contextType) {
+			case ContextType.A:
+				Application o = Application.get(this.contextId)
+				return o == null ? "" : o.assetName
+				break;
+			case ContextType.B:
+				MoveBundle o = MoveBundle.get(this.contextId)
+				return o == null ? "" : o.name
+				break;
+			case ContextType.E:
+				MoveEvent o = MoveEvent.get(this.contextId)
+				return o == null ? "" : o.name
+				break;
+			default:
+				return ""
+				break;
+		}
 	}
 
 	/**

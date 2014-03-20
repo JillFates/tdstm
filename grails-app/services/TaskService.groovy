@@ -4419,8 +4419,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param contextId - the record id number of the context that the TaskBatch was generated for
 	 * @param recipeId - the record id of the recipe used to generate the TaskBatch
 	 * @param includeLogs - whether to include the logs information or not
-	 * @param loginUser - the user that is creating this recipe
-	 * @param currentProject - the project owning this recipe
+	 * @param loginUser - the current user
+	 * @param currentProject - the current project
 	 * @return A taskBatch map if found or null
 	 */
 	def findTaskBatchByRecipeAndContext(recipeId, contextId, includeLogs, loginUser, currentProject) {
@@ -4463,7 +4463,65 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			return result
 		} catch (IncorrectResultSizeDataAccessException e) {
 			return null
-		} 
+		}
+	}
+	
+	/**
+	 * List the TaskBatchs for a specific recipeId
+	 *
+	 * @param recipeId - the record id of the recipe
+	 * @param limitDays - the number of days to limit the search
+	 * @param loginUser - the current user
+	 * @param currentProject - the current project
+	 * @return the list of Task batches
+	 */
+	def listTaskBatches(recipeId, limitDays, loginUser, currentProject) {
+		if (currentProject == null) {
+			throw new EmptyResultException('No project selected');
+		}
+		
+		if (recipeId == null || !recipeId.isNumber()) {
+			throw new EmptyResultException('Invalid recipeId');
+		}
+		def recipe = Recipe.get(recipeId.toInteger())
+		if (recipe == null) {
+			throw new EmptyResultException('Recipe doesn\'t exists');
+		}
+		if (!recipe.project.equals(currentProject)) {
+			throw new IllegalArgumentException('The current project and the Move event project doesn\'t match')
+		}
+		
+		if (limitDays == null || !limitDays.isNumber()) {
+			throw new IllegalArgumentException('Not a valid limitDays')
+		}
+		
+		def startCreationDate = new Date()
+		startCreationDate = startCreationDate - limitDays.toInteger()
+		log.info("Start date" + startCreationDate)
+		
+		def c = TaskBatch.createCriteria()
+		def queryResults = c.list {
+			createAlias('recipeVersionUsed', 'rv')
+			
+			ge("dateCreated", startCreationDate)
+			eq("rv.recipe", recipe)
+		}
+		
+		def result = []
+		for (TaskBatch taskBatch in queryResults) {
+			result.add([
+			'id': taskBatch.id,
+			'contextName' : taskBatch.contextName(),
+			'taskCount': taskBatch.taskCount,
+			'exceptionCount': taskBatch.exceptionCount,
+			'createdBy': taskBatch.createdBy?.firstName + " " + taskBatch.createdBy?.lastName,
+			'dateCreated': taskBatch.dateCreated,
+			'status': taskBatch.status,
+			'versionNumber' : taskBatch.recipeVersionUsed.versionNumber,
+			'isPublished' : taskBatch.isPublished])
+		}
+
+ 		return result
 	}
 }
 

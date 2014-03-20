@@ -82,6 +82,11 @@ class UrlMappings {
 			controller = "wsTask"
 			action = [GET:"findTaskBatchByRecipeAndContext"]
 		}
+		
+		"/ws/task/listTaskBatches" {
+			controller = "wsTask"
+			action = [GET:"listTaskBatches"]
+		}
 
 		"/ws/task/$id" {
 			controller = "wsTask"
