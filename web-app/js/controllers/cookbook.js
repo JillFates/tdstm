@@ -1064,6 +1064,13 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 					groupName: event.name
 				});
 			}
+			$log.log('--------------------');
+			$log.log('$scope.tasks.bundlesArrayAssigned');
+			$log.log($scope.tasks.bundlesArrayAssigned);
+			$log.log('--------------------');
+			$log.log('$scope.tasks.bundlesArrayUnassigned');
+			$log.log($scope.tasks.bundlesArrayUnassigned);
+			$log.log('--------------------');
 			$scope.tasks.bundlesArray = angular.copy($scope.tasks.bundlesArrayAssigned).concat(angular.copy($scope.tasks.bundlesArrayUnassigned));
 		}, function(){
 			$log.info('Error on getting Bundles');
