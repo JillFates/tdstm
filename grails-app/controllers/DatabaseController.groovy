@@ -94,9 +94,9 @@ class DatabaseController {
 		
 		if(params.event && params.event.isNumber()){
 			def moveEvent = MoveEvent.read( params.event )
-			moveBundleList = moveEvent?.moveBundles?.findAll {it.useOfPlanning == true}
+			moveBundleList = moveEvent?.moveBundles?.findAll {it.useForPlanning == true}
 		} else {
-			moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+			moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project,true)
 		}
 		//def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
 		//def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
@@ -147,7 +147,7 @@ class DatabaseController {
 				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
 				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
 				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id
-				WHERE ae.project_id = ${project.id} AND mb.use_of_planning=${justPlanning}
+				WHERE ae.project_id = ${project.id} AND mb.use_for_planning=${justPlanning}
 				GROUP BY db_id ORDER BY ${sortIndex} ${sortOrder}
 				) AS dbs""")
 		} else {

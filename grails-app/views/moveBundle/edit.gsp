@@ -225,12 +225,12 @@
                 <td valign="top" class="name">
                   <label for="description">Use For Planning:</label>
                 </td>
-                <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'useOfPlanning','errors')}">
-                <g:if test="${moveBundleInstance.useOfPlanning == true}">
-                    <input type="checkbox" id="useOfPlanning" name="useOfPlanning" checked="checked"/>
+                <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'useForPlanning','errors')}">
+                <g:if test="${moveBundleInstance.useForPlanning == true}">
+                    <input type="checkbox" id="useForPlanning" name="useForPlanning" checked="checked"/>
                  </g:if>
                  <g:else>
-                    <input type="checkbox" id="useOfPlanning" name="useOfPlanning" />
+                    <input type="checkbox" id="useForPlanning" name="useForPlanning" />
                  </g:else>
                   
                 </td>

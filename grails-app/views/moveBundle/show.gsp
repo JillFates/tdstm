@@ -175,11 +175,11 @@
               <td valign="top" class="name">Use For Planning:</td>
 
               <td valign="top" class="value"> 
-              <g:if test="${moveBundleInstance.useOfPlanning == true}">
-                <input type="checkbox" id="useOfPlanning" name="useOfPlanning" checked="checked" disabled="disabled"/>
+              <g:if test="${moveBundleInstance.useForPlanning == true}">
+                <input type="checkbox" id="useForPlanning" name="useForPlanning" checked="checked" disabled="disabled"/>
               </g:if>
               <g:else>
-                 <input type="checkbox" id="useOfPlanning" name="useOfPlanning" disabled="disabled" />
+                 <input type="checkbox" id="useForPlanning" name="useForPlanning" disabled="disabled" />
               </g:else></td>
 
             </tr>

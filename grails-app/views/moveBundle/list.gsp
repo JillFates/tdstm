@@ -16,7 +16,7 @@
 				colNames="'Name', 'Description','Planning', 'Asset Qty', 'Start', 'Completion'"
 				colModel="{name:'name', index: 'name', width:'150',formatter: myLinkFormatter},
 					{name:'description', width:'150'},
-					{name:'useOfPlanning',width:'150'},
+					{name:'useForPlanning',width:'150'},
 					{name:'assetQty',width:'100', search:false},
 					{name:'startTime', width:'150'},
 					{name:'completionTime',width:'100'}"

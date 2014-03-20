@@ -1376,7 +1376,7 @@ class ReportsController {
 				applicationList = Application.findAll("from Application where project = :project and (sme=:smes or sme2=:smes)",
 					[project:project,smes:currentSme]) 
 			}else {		
-				applicationList = Application.findAllByMoveBundleInList(MoveBundle.getUseOfPlanningBundlesByProject(project))
+				applicationList = Application.findAllByMoveBundleInList(MoveBundle.getUseForPlanningBundlesByProject(project))
 			}
 		}else{ //if user selects any bundle
 			currentBundle = MoveBundle.get(params.moveBundle)
@@ -1653,7 +1653,7 @@ class ReportsController {
 				applicationList = Application.findAll("from Application where project = :project and (sme=:smes or sme2=:smes)",
 					[project:project,smes:currentSme])
 			}else {
-				applicationList = Application.findAllByMoveBundleInList(MoveBundle.getUseOfPlanningBundlesByProject(project))
+				applicationList = Application.findAllByMoveBundleInList(MoveBundle.getUseForPlanningBundlesByProject(project))
 			}
 		}else{ 
 			currentBundle = MoveBundle.get(params.moveBundle)

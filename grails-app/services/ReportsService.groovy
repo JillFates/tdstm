@@ -85,7 +85,7 @@ class ReportsService {
 		log.info "****bundle:${moveBundleId} conflicts:${conflicts} unresolved:${unresolved} planning:${planning} missing: ${missing}"
 		
 		if(planning) {
-			appsInBundle = Application.findAllByMoveBundleInList(MoveBundle.findAllByProjectAndUseOfPlanning(projectInstance, true).toList())
+			appsInBundle = Application.findAllByMoveBundleInList(MoveBundle.findAllByProjectAndUseForPlanning(projectInstance, true).toList())
 		} else {
 			appsInBundle = Application.findAllByMoveBundle(MoveBundle.findById(moveBundleId))
 		}
@@ -629,7 +629,7 @@ class ReportsService {
 			apps = Application.findAllByMoveBundleAndProject(currentBundle, project)
 		}else if(moveBundleId && moveBundleId =='useForPlanning'){
 			apps = Application.findAllByProjectAndMoveBundleInList(project, 
-				MoveBundle.getUseOfPlanningBundlesByProject(project))
+				MoveBundle.getUseForPlanningBundlesByProject(project))
 		}else{
 			apps = Application.findAllByProject(project)
 		}
@@ -650,7 +650,7 @@ class ReportsService {
 		log.info "****bundle:${moveBundleId} bundleConflicts:${bundleConflicts} unresolvedDep:${unresolvedDep} RunsOn:${runsOn}  vmSupport:${vmSupport} planning:${planning} "
 		def bundles = []
 		if(planning) {
-			bundles = MoveBundle.findAllByProjectAndUseOfPlanning(project, true)
+			bundles = MoveBundle.findAllByProjectAndUseForPlanning(project, true)
 			
 		} else {
 			bundles = [MoveBundle.findById(moveBundleId)]

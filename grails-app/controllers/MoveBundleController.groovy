@@ -63,8 +63,8 @@ class MoveBundleController {
 					ilike('name', "%${params.name}%")
 				if (params.description)
 					ilike('description', "%${params.description}%")
-				if (params.useOfPlanning)
-					eq('useOfPlanning', (params.useOfPlanning.equalsIgnoreCase('Y') ? true : false))
+				if (params.useForPlanning)
+					eq('useForPlanning', (params.useForPlanning.equalsIgnoreCase('Y') ? true : false))
 				if (startDates) 
 					'in'('startTime' , startDates)
 				if (completionDates)
@@ -81,7 +81,7 @@ class MoveBundleController {
 			bundleList.sort{(sortOrder=='desc' ? -it.assetQty : it.assetQty)}
 		
 		def results = bundleList?.collect {
-			[ cell: [it.name, it.description, (it.useOfPlanning ? 'Y' : 'N'), it.assetQty, 
+			[ cell: [it.name, it.description, (it.useForPlanning ? 'Y' : 'N'), it.assetQty, 
 				(it.startTime ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.startTime, tzId)):''),
 				(it.completionTime ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.completionTime, tzId)):'')],
 				 id: it.id]
@@ -234,10 +234,10 @@ class MoveBundleController {
 			moveBundleInstance.name = params.name
 			moveBundleInstance.description = params.description
 			moveBundleInstance.workflowCode = params.workflowCode
-			if(params.useOfPlanning){
-				moveBundleInstance.useOfPlanning = true
+			if(params.useForPlanning){
+				moveBundleInstance.useForPlanning = true
 			}else{
-				moveBundleInstance.useOfPlanning = false
+				moveBundleInstance.useForPlanning = false
 			}
 			if(params.moveEvent.id){
 				moveBundleInstance.moveEvent = MoveEvent.get(params.moveEvent.id)
@@ -342,10 +342,10 @@ class MoveBundleController {
 		def projectManager = params.projectManager
 		def moveManager = params.moveManager
 		def managers = partyRelationshipService.getProjectStaff( project.id )
-		if(params.useOfPlanning){
-			moveBundleInstance.useOfPlanning = true
+		if(params.useForPlanning){
+			moveBundleInstance.useForPlanning = true
 		}else{
-			moveBundleInstance.useOfPlanning = false
+			moveBundleInstance.useForPlanning = false
 		}
 		if(!moveBundleInstance.hasErrors() && moveBundleInstance.save()) {
 			if( projectManager != null && projectManager != ""){
@@ -495,7 +495,7 @@ class MoveBundleController {
 		def blade = AssetType.BLADE.toString()
 		def appliance = AssetType.APPLIANCE.toString()
 		
-		def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+		def moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project,true)
 		def bundleSortedList = moveBundleList.sort{it.startTime}
 		def totalEventList = bundleSortedList.moveEvent
 		def moveEventList = []
@@ -541,8 +541,8 @@ class MoveBundleController {
 		def openTasks = []
 		
 		moveEventList.each{ moveEvent->
-			// fetching bundles for current moveEvent which was set 'true' for useOfPlanning 
-			def moveBundles = moveEvent?.moveBundles?.findAll {it.useOfPlanning == true}
+			// fetching bundles for current moveEvent which was set 'true' for useForPlanning 
+			def moveBundles = moveEvent?.moveBundles?.findAll {it.useForPlanning == true}
 			def eventWiseArgs = [project:project, moveBundles:moveBundles]
 			
 			// fetching application count that are assigned to current move-event .
@@ -564,12 +564,12 @@ class MoveBundleController {
 			def otherMoveBundles = moveEventList.moveBundles.findAll{!(it.id in moveBundles.id)}
 			
 			if(otherMoveBundles.size()>0){
-				def potentialQuery = "from AppMoveEvent am right join am.application a where a.moveBundle.useOfPlanning =:useOfPlanning \
+				def potentialQuery = "from AppMoveEvent am right join am.application a where a.moveBundle.useForPlanning =:useForPlanning \
 						and a.project=:project and (a.moveBundle.moveEvent != :moveEvent or a.moveBundle.moveEvent is null) \
 						and (am.moveEvent = :moveEvent or am.moveEvent is null)\
 						and (a.planStatus is null or a.planStatus in ('$unassignedPlan',''))"
 				
-				def queryArgs = [useOfPlanning:true, project:project, moveEvent:moveEvent]
+				def queryArgs = [useForPlanning:true, project:project, moveEvent:moveEvent]
 				
 				potential = Application.findAll(potentialQuery+" and (am.value = '?' or am.value is null or am.value = '') ",queryArgs).size()
 				optional = Application.findAll(potentialQuery+" and am.value = 'Y' ",queryArgs).size()

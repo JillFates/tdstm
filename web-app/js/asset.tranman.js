@@ -819,14 +819,6 @@ function showAssetDialog( e , action ) {
 	      		     $('#moveEventEditId').val(ac.moveEvent ? ac.moveEvent.id : '')
 	      		     $('#moveShowId').css('display','table-row')
 	      		     $('#moveEventEditTrId').css('display','table-row')
-				     if(ac.assetEntity==null){
-				    	$('#assetShowId').css('display','none')
-				     }else{
-				    	$('#assetShowId').css('display','table-row')
-				    	$('#assetValueId').val(ac.assetEntity ? ac.assetEntity.id : '')
-				    	$("#prevAssetEditId").val(ac.assetEntity ? ac.assetEntity.id : '')
-				    	$('#assetEntityIdShow').val(ac.assetEntity ? ac.assetEntity.id : '')
-				     }
 	      		   $("#showCommentDialog").dialog("option", "title", "Task Detail");
 	      		   $("#editCommentDialog").dialog("option", "title", "Task Detail");
 		      	 } else {
@@ -846,6 +838,14 @@ function showAssetDialog( e , action ) {
 		      		$('#saveAndCloseBId').removeAttr('disabled')
 			    	$('#saveAndViewBId').removeAttr('disabled')
 		      	 }
+		      	 	if(ac.assetEntity==null){
+				    	$('#assetShowId').css('display','none')
+				     }else{
+				    	$('#assetShowId').css('display','table-row')
+				    	$('#assetValueId').val(ac.assetEntity ? ac.assetEntity.id : '')
+				    	$("#prevAssetEditId").val(ac.assetEntity ? ac.assetEntity.id : '')
+				    	$('#assetEntityIdShow').val(ac.assetEntity ? ac.assetEntity.id : '')
+				     }
 				 if(ac.commentType=='instruction'){
 					 $('#mustVerifyId').css('display','table-row')
 					 $('#mustVerifyEditTr').css('display','table-row')

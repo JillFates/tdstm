@@ -27,7 +27,7 @@
 			<tbody>
 				<tr>
 				<th><a href="javascript:getEntityDetails('Application','Application',${application.app.id})" class="inlineLink">${application.app.assetName}</a>
-						<g:if test="${application.app.moveBundle?.useOfPlanning}"> (${application.app.moveBundle})</g:if> - Supports ${application.supportAssets.size()} , Depends on ${application.dependentAssets.size()}</th>
+						<g:if test="${application.app.moveBundle?.useForPlanning}"> (${application.app.moveBundle})</g:if> - Supports ${application.supportAssets.size()} , Depends on ${application.dependentAssets.size()}</th>
 				<td></td>
 				</tr>
 				<tr>

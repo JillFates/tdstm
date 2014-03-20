@@ -1724,9 +1724,9 @@ class AssetEntityController {
 		
 		if (params.event && params.event.isNumber()) {
 			def moveEvent = MoveEvent.read( params.event )
-			moveBundleList = moveEvent?.moveBundles?.findAll {it.useOfPlanning == true}
+			moveBundleList = moveEvent?.moveBundles?.findAll {it.useForPlanning == true}
 		} else {
-			moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+			moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project,true)
 		}
 		
 		def assetType = params.filter ? ApplicationConstants.assetFilters[ params.filter ] : []
@@ -1809,7 +1809,7 @@ class AssetEntityController {
 		if(justPlanning=='true'){
 			query.append(""" \n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
 				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
-				WHERE ae.project_id = ${project.id} AND mb.use_of_planning=${justPlanning}""")
+				WHERE ae.project_id = ${project.id} AND mb.use_for_planning=${justPlanning}""")
 		} else {
 			query.append(""" \n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
 				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
@@ -4431,7 +4431,7 @@ class AssetEntityController {
 				break
 
 			case "graph" :
-				def moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+				def moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project,true)
 				Set uniqueMoveEventList = moveBundleList.moveEvent
 			    uniqueMoveEventList.remove(null)
 			    List moveEventList = []

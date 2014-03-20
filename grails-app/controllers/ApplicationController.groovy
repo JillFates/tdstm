@@ -107,9 +107,9 @@ class ApplicationController {
 		userPreferenceService.setPreference("assetListSize", "${maxRows}")
 		if(params.event && params.event.isNumber()){
 			def moveEvent = MoveEvent.read( params.event )
-			moveBundleList = moveEvent?.moveBundles?.findAll {it.useOfPlanning == true}
+			moveBundleList = moveEvent?.moveBundles?.findAll {it.useForPlanning == true}
 		} else {
-			moveBundleList = MoveBundle.findAllByProjectAndUseOfPlanning(project,true)
+			moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project,true)
 		}
 		
 		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
@@ -140,7 +140,7 @@ class ApplicationController {
 			WHERE ae.project_id = ${project.id} """)
 
 		if (justPlanning=='true')
-			query.append(" AND mb.use_of_planning=${justPlanning} ")
+			query.append(" AND mb.use_for_planning=${justPlanning} ")
 
 		query.append("GROUP BY app_id ORDER BY ${sortIndex} ${sortOrder} ) AS apps")
 		

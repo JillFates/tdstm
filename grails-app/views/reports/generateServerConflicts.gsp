@@ -38,7 +38,7 @@
 									<tr>
 										<th colspan="${columns}">
 											<a href="javascript:getEntityDetails('Server','server',${assetEntity.app.id})" class="inlineLink">${assetEntity.app.assetName}</a>
-											<g:if test="${assetEntity.app.moveBundle.useOfPlanning}"> (${assetEntity.app.moveBundle})</g:if> 
+											<g:if test="${assetEntity.app.moveBundle.useForPlanning}"> (${assetEntity.app.moveBundle})</g:if> 
 												- Supports ${assetEntity.supportsList.size()} , Depends on ${assetEntity.dependsOnList.size()} 
 												<span style="color: red;">${assetEntity.header?' - '+assetEntity.header:''}</span>
 										</th>

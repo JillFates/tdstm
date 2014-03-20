@@ -79,4 +79,5 @@ databaseChangeLog = {
 	include file: '20140312-update-person-active-field-with-user-login-active.groovy'
 	include file: '20140313-task-batch-context-type.groovy'
 	include file: '20140318-add-guid-to-userlogin.groovy'
+	include file: '20140320-change-use-of-planning-field-to-use-for-planning.groovy'
 }

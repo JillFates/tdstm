@@ -16,7 +16,7 @@ class MoveBundle extends Party {
     Integer operationalOrder = 1  		// Order that the bundles are performed in (NOT BEING USED)
     MoveEvent moveEvent
 	String workflowCode
-	Boolean useOfPlanning = true
+	Boolean useForPlanning = true
 	Room sourceRoom
 	Room targetRoom
 	Boolean tasksCreated = false
@@ -82,9 +82,9 @@ class MoveBundle extends Party {
 	
 	/**
 	 * @param : project Instance of project
-	 * @return : all moveBundles list that is set true for UseOfPlanning
+	 * @return : all moveBundles list that is set true for UseForPlanning
 	 */
-	static def getUseOfPlanningBundlesByProject( def project){
-		return project ? MoveBundle.findAllByProjectAndUseOfPlanning(project, true) : []
+	static def getUseForPlanningBundlesByProject( def project){
+		return project ? MoveBundle.findAllByProjectAndUseForPlanning(project, true) : []
 	}
 }

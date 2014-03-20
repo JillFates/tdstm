@@ -291,7 +291,7 @@ class ProjectService {
 					p.description AS description
 					FROM asset_entity ae
 					LEFT JOIN move_bundle mb ON (mb.move_bundle_id = ae.move_bundle_id) 
-						AND ((ae.move_bundle_id = NULL) OR (mb.use_of_planning = true))
+						AND ((ae.move_bundle_id = NULL) OR (mb.use_for_planning = true))
 					LEFT JOIN project p ON (p.project_id = ae.project_id)
 					LEFT JOIN party_group pg ON (pg.party_group_id = p.client_id)
 					LEFT JOIN party_relationship pr ON (pr.party_relationship_type_id = 'PROJ_PARTNER' AND pr.party_id_from_id = p.project_id 
