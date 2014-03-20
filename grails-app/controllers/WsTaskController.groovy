@@ -209,4 +209,35 @@ class WsTaskController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
+	
+	/**
+	 * Gets a {@link TaskBatch} based on a id
+	 * Check {@link UrlMappings} for the right call
+	 */
+	def getTaskBatch = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		
+		def id = params.id
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			def taskBatch = taskService.getTaskBatch(id, loginUser, currentProject)
+
+			render(ServiceResults.success(['taskBatch' : taskBatch]) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (IllegalArgumentException e) {
+			ServiceResults.forbidden(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
+	}
 }

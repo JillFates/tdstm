@@ -90,7 +90,7 @@ class UrlMappings {
 
 		"/ws/task/$id" {
 			controller = "wsTask"
-			action = [DELETE:"deleteBatch"]
+			action = [GET: "getTaskBatch", DELETE:"deleteBatch"]
 		}
 
 		"/ws/task/$id/publish" {

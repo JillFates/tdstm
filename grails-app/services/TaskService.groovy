@@ -4523,5 +4523,45 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
  		return result
 	}
+	
+	
+	/**
+	 * Returns the task batch using the taskBatchId
+	 *
+	 * @param taskBatchId - the id of the task batch
+	 * @param loginUser - the current user
+	 * @param currentProject - the current project
+	 * @return the task batch
+	 */
+	def getTaskBatch(taskBatchId, loginUser, currentProject) {
+		if (currentProject == null) {
+			throw new EmptyResultException('No project selected');
+		}
+		
+		if (taskBatchId == null || !taskBatchId.isNumber()) {
+			throw new EmptyResultException('Invalid recipeId');
+		}
+		TaskBatch taskBatch = TaskBatch.get(taskBatchId.toInteger())
+		if (taskBatch == null) {
+			throw new EmptyResultException('TaskBatch doesn\'t exists');
+		}
+		if (!taskBatch.recipeVersionUsed.recipe.project.equals(currentProject)) {
+			throw new IllegalArgumentException('The current project and the Task batch project doesn\'t match')
+		}
+		
+		return [
+			'id': taskBatch.id,
+			'contextName' : taskBatch.contextName(),
+			'taskCount': taskBatch.taskCount,
+			'exceptionCount': taskBatch.exceptionCount,
+			'createdBy': taskBatch.createdBy?.firstName + " " + taskBatch.createdBy?.lastName,
+			'dateCreated': taskBatch.dateCreated,
+			'status': taskBatch.status,
+			'versionNumber' : taskBatch.recipeVersionUsed.versionNumber,
+			'isPublished' : taskBatch.isPublished,
+			'exceptionLog' : taskBatch.exceptionLog,
+			'infoLog' : taskBatch.infoLog,
+			];
+	}
 }
 
