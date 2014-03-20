@@ -149,24 +149,32 @@ class WsTaskController {
 	 * @return A taskBatch object if found or null
 	 */
 	def findTaskBatchByRecipeAndContext = {
-		def now = new Date()
-		def event = [
-			id: 70,
-			"id":55,
-			"contextType": "E",
-			"contextId": 42,
-			"recipeVersionUsed": 27,
-			"status": "Done",
-			"taskCount": 30,
-			"exceptionCount": 12,
-			"createdBy": "Jim Laucher",
-			"dateCreated": now,
-			"lastUpdated": now
-		]
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		
+		def recipeId = params.recipeId
+		def contextId = params.contextId
+		def logs = params.logs
+		def currentProject = securityService.getUserCurrentProject()
+		
+		try {
+			def result = taskService.findTaskBatchByRecipeAndContext(recipeId, contextId, logs, loginUser, currentProject);
 
-		if ( params.contextId.toInteger() % 2 == 0 )
-			render(ServiceResults.success('taskBatch' : event) as JSON)
-		else
-			render(ServiceResults.success('taskBatch' : null ) as JSON)
+			render(ServiceResults.success('taskBatch' : result) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (IllegalArgumentException e) {
+			ServiceResults.forbidden(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (Exception e) {
+		e.printStackTrace();
+			ServiceResults.internalError(response, log, e)
+		}
 	}
 }

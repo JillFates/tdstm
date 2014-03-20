@@ -55,6 +55,8 @@ class TaskBatch {
 		version false
 		autoTimestamp false
 		id column: 'task_batch_id'
+		contextId column: 'context_id'
+		contextType column: 'context_type'
 		columns {
 			infoLog sqltype: 'text'
 			exceptionLog sqltype: 'text'

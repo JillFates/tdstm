@@ -21,6 +21,7 @@ import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.quartz.SimpleTrigger
 import org.quartz.Trigger
 import org.springframework.beans.factory.InitializingBean
+import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 import com.tds.asset.Application
@@ -4409,6 +4410,60 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		
 		namedParameterJdbcTemplate.update('DELETE FROM tdstm.asset_comment WHERE task_batch_id = :taskId', ['taskId' : taskId])
 		task.delete(failOnError: true)
+	}
+	
+	
+	/**
+	 * Used to lookup a TaskBatch by the Context and Recipe regardless of the recipe version
+	 * 
+	 * @param contextId - the record id number of the context that the TaskBatch was generated for
+	 * @param recipeId - the record id of the recipe used to generate the TaskBatch
+	 * @param includeLogs - whether to include the logs information or not
+	 * @param loginUser - the user that is creating this recipe
+	 * @param currentProject - the project owning this recipe
+	 * @return A taskBatch map if found or null
+	 */
+	def findTaskBatchByRecipeAndContext(recipeId, contextId, includeLogs, loginUser, currentProject) {
+		if (currentProject == null) {
+			throw new EmptyResultException('No project selected');
+		}
+		
+		if (recipeId == null || !recipeId.isNumber()) {
+			throw new EmptyResultException('Invalid recipeId');
+		}
+		def recipe = Recipe.get(recipeId.toInteger())
+		if (recipe == null) {
+			throw new EmptyResultException('Recipe doesn\'t exists');
+		}
+		if (!recipe.project.equals(currentProject)) {
+			throw new IllegalArgumentException('The current project and the Move event project doesn\'t match')
+		}
+		
+		includeLogs = includeLogs == null ? false : includeLogs.toBoolean()
+		
+		try {
+			def taskBatch = namedParameterJdbcTemplate.queryForMap("select * from task_batch inner join recipe_version on task_batch.recipe_version_used_id = recipe_version.recipe_version_id inner join person on task_batch.created_by_id = person.person_id where recipe_version.recipe_id = :recipeId AND task_batch.context_id = :contextId", ['recipeId' : Long.valueOf(recipeId), 'contextId' : contextId.toInteger()])
+			def result = [
+				'id': taskBatch.task_batch_id,
+				'contextType': taskBatch.context_type,
+				'contextId': taskBatch.context_id,
+				'recipeVersionUsed': taskBatch.recipe_version_id,
+				'status': taskBatch.status,
+				'taskCount': taskBatch.task_count,
+				'exceptionCount': taskBatch.exception_count,
+				'createdBy': taskBatch.first_name + " " + taskBatch.last_name,
+				'dateCreated': taskBatch.date_created,
+				'lastUpdated': taskBatch.last_updated]
+			
+			if (includeLogs) {
+				result['exceptionLog'] = taskBatch.exceptionLog
+				result['infoLog'] = taskBatch.infoLog
+			}
+			
+			return result
+		} catch (IncorrectResultSizeDataAccessException e) {
+			return null
+		} 
 	}
 }
 

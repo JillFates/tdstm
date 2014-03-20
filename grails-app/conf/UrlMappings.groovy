@@ -77,7 +77,12 @@ class UrlMappings {
 			controller = "wsTask"
 			action = [POST:"generateTasks"]
 		}
-		
+
+		"/ws/task/findTaskBatchByRecipeAndContext" {
+			controller = "wsTask"
+			action = [GET:"findTaskBatchByRecipeAndContext"]
+		}
+
 		"/ws/task/$id" {
 			controller = "wsTask"
 			action = [DELETE:"deleteBatch"]
