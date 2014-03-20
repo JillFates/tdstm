@@ -50,7 +50,7 @@ class ApplicationService {
 		if (mb != null) {
 			applications = Application.findAllByMoveBundle(mb)	
 		} else {
-			applications = Application.findAllByMoveBundleIsNullAndOwner(mb.project.client)
+			applications = Application.findAllByMoveBundleIsNullAndOwner(currentProject.client)
 		}
 		
 		for (application in applications) {
