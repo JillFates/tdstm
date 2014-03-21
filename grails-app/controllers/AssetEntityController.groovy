@@ -4011,18 +4011,18 @@ class AssetEntityController {
 			}
 			switch(params.filter){
 				case "openIssue" :
-					eq('category',"discovery" )
+					'in'('category', AssetComment.discoveryCategories )
 					break;
 				case "dueOpenIssue":
-					eq('category',"discovery" )
+					'in'('category', AssetComment.discoveryCategories )
 					lt('dueDate',today)
 					break;
 				case "analysisIssue" :
 					eq("status", AssetCommentStatus.READY)
-					'in'('category', ['general','planning'])
+					'in'('category', AssetComment.planningCategories)
 					break;
 				case "generalOverDue" :
-					'in'('category', ['general','planning'])
+					'in'('category', AssetComment.planningCategories)
 					 lt('dueDate',today)
 					 break;
 			}

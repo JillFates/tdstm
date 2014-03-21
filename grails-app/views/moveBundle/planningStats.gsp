@@ -109,7 +109,7 @@ $(document).ready(function() {
 								<g:link controller="assetEntity" action="listTasks" params="[filter:'openIssue', moveEvent:'0', justRemaining:1]" class="links">${openIssue}</g:link>
 							</td>
 							<td>
-								<g:link controller="assetEntity" action="listTasks" params="[filter:'openIssue', moveEvent:'0', justRemaining:1]" class="links">Open Tasks</g:link>
+								<g:link controller="assetEntity" action="listTasks" params="[filter:'openIssue', moveEvent:'0', justRemaining:1]" class="links">Active Tasks</g:link>
 							</td>
 						</tr>
 						<g:if test="${dueOpenIssue>0}">
@@ -208,7 +208,7 @@ $(document).ready(function() {
 								<g:link controller="assetEntity" action="listTasks" params="[filter:'analysisIssue', justRemaining:0, moveEvent:0]" class="links">${issuesCount}</g:link>
 							</td>
 							<td>
-								<g:link controller="assetEntity" action="listTasks" params="[filter:'analysisIssue', justRemaining:0, moveEvent:0]" class="links">Open Tasks</g:link>
+								<g:link controller="assetEntity" action="listTasks" params="[filter:'analysisIssue', justRemaining:0, moveEvent:0]" class="links">Active Tasks</g:link>
 							</td>
 						</tr>
 						<g:if test="${generalOverDue>0}">
