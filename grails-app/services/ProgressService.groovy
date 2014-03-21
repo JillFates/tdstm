@@ -1,5 +1,7 @@
 import groovy.time.TimeDuration
 
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 import com.google.common.cache.Cache
@@ -15,11 +17,16 @@ import com.tdssrc.grails.TimeUtil
 class ProgressService {
 
 	Cache<String, ProgressInfo> progressInfo 
+	//REMOVE THIS. ONLY FOR DEMO
+	ExecutorService service
 	
 	public ProgressService() {
 		this.progressInfo = CacheBuilder.newBuilder()
 			.expireAfterWrite(2, TimeUnit.HOURS)
 			.build();
+			
+		//REMOVE THIS. ONLY FOR DEMO
+		this.service = Executors.newFixedThreadPool(10)
 	}
 	
 	/**
@@ -30,6 +37,18 @@ class ProgressService {
 	void create(String key, String status='') {
 		ProgressInfo info = new ProgressInfo(key, status)
 		this.progressInfo.put(key, info)
+		//REMOVE THIS. ONLY FOR DEMO
+		this.service.execute(new Runnable() {
+			void run() {
+				int p = 2
+				while (p < 100) {
+					ProgressService.this.update(key, p, 'In progress', null)
+					p = p + 2
+					Thread.sleep(1000)
+				}
+				ProgressService.this.update(key, 100, 'Completed', null)
+			}
+		});
 	}
 	
 	/**

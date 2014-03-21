@@ -1260,6 +1260,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		tb.recipeVersionUsed = recipe
 		tb.contextType = contextType
 		tb.contextId = contextId
+		tb.status = "Pending"
 		tb.save(failOnError: true)
 	}
 
@@ -1268,7 +1269,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * This is the service method called by the controller to initiate task generation
 	 * @param publish - used to indicate if the tasks should be published at the time that they are generate, default=false
 	 */
-	Map initiateCreateTasksWithRecipe(UserLogin user, ContextType contextType, Integer contextId, RecipeVersion recipe, Boolean publish=false) {
+	Map initiateCreateTasksWithRecipe(UserLogin user, contextType, contextId, recipe, publish=false) {
 		if (!RolePermissions.hasPermission('GenerateTasks')) {
 			throw new UnauthorizedException('User doesn\'t have a GenerateTasks permission')
 		}
@@ -1277,14 +1278,34 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			throw new UnauthorizedException('User doesn\'t have a PublishTasks permission')
 		}
 		
+		try {
+			contextType = ContextType.valueOf(contextType)
+		} catch (e) {
+			throw new IllegalArgumentException('Invalid context type', e)
+		}
+		
+		if (contextId == null || !contextId.isNumber()) {
+			throw new IllegalArgumentException('Invalid context id', e)
+		}
+		contextId = contextId.toInteger()
+		
+		if (recipe == null || !recipe.isNumber()) {
+			throw new IllegalArgumentException('Invalid recipe id', e)
+		}
+		recipe = RecipeVersion.get(recipe.toInteger())
+		if (recipe == null) {
+			new EmptyResultException('Recipe doesn\'t exists');
+		}
+
+		publish = publish == null ? false : publish.toBoolean()
+		
 		def assets = this.getAssocAssets(contextType)
 
 		if (assets.size()) {
 			final TaskBatch tb = this.createTaskBatch(user.person, contextType, contextId, recipe);
-			
 			def key = "TaskBatch-${tb.id}"
 			this.progressService.create(key, 'Pending')
-			
+
 			this.executors.submit(new Runnable() {
 				void run() {
 					TaskBatch.withTransaction({ status ->
@@ -1335,15 +1356,15 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		// Load Asset list based on the context
 		switch (context) {
-			case E:
+			case ContextType.E:
 				// See the code below in generateRunbook:
 				// get bundle ids
 				// get assets in the bundle, could just fall into MoveBundle case
-			case B:
+			case ContextType.B:
 				// Similar to MoveEvent
 				// get assets in bundle
 				break
-			case A:
+			case ContextType.A:
 				// Get assets that it depends on and supports from AssetDependency along with the application
 				break
 			default:
