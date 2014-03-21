@@ -96,9 +96,10 @@ class EventService {
 			}
 		} else {
 			if (useForPlanning != null) {
-				moveBundles = MoveBundle.findAllByMoveEventIsNullAndUseForPlanning(useForPlanning.toBoolean())
+				def up = useForPlanning.toBoolean()
+				moveBundles = MoveBundle.findAll('from MoveBundle where moveEvent = null AND project.client = :client and useForPlanning = :useForPlanning', ['useForPlanning' : up, 'client' : currentProject.client])
 			} else {
-				moveBundles = MoveBundle.findAllByMoveEventIsNull()
+				moveBundles = MoveBundle.findAll('from MoveBundle where moveEvent = null AND project.client = :client', ['client' : currentProject.client])
 			}
 		}
 		
