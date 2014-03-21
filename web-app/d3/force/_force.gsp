@@ -54,8 +54,8 @@ d3.select("defs")
 
 $('#svgContainerId')
 	.resizable({
-		minHeight: 300,
-		minWidth: 300,
+		minHeight: 400,
+		minWidth: 1000,
 		helper: "ui-resizable-helper",
 		stop: function(e, ui) {	
 			$('#heightId').val($(this).height());
