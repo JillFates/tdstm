@@ -22,8 +22,8 @@
 	<g:javascript src="bootstrap.js" />
 	<g:javascript src="angular-resource.js" />
 	<g:javascript src="ui-bootstrap-tpls-0.10.0.js" />
-	<g:javascript src="ng-grid-2.0.7.debug.js" />
 	<g:javascript src="controllers/cookbook.js" />
+	<g:javascript src="ng-grid-2.0.7.debug.js" />
 </head>
 <body>
 	<div class="body" id="cookbookRecipesEditor" ng-app="cookbookRecipes" ng-controller="CookbookRecipeEditor">
@@ -142,113 +142,24 @@
 							</tab>
 
 							%{-- History --}%
-							<tab heading="History" active="activeTabs.history">
-								<div class="table-responsive historyMainTable">
-									<table class="table table-hover table-striped ngGridTable">
-										<thead>
-											<tr>
-												<th>Target</th>
-												<th># of Tasks</th>
-												<th>User</th>
-												<th>Generated At</th>
-												<th>Version</th>
-												<th>Published</th>
-												<th>Del</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td>Wave-001-HR</td>
-												<td>20</td>
-												<td>Jim Lauchure</td>
-												<td>1/12/14 4:38pm</td>
-												<td>3</td>
-												<td>
-													<input type="checkbox" name="pulished" id="pulished">
-												</td>
-												<td>
-													<a href="#" class="actions delete"><span class="glyphicon glyphicon-remove"></span></a>
-												</td>
-											</tr>
-											<tr>
-												<td>Wave-001-Payroll</td>
-												<td>65</td>
-												<td>Robin Banks</td>
-												<td>1/8/14 08:12am</td>
-												<td>6</td>
-												<td>
-													<input type="checkbox" name="pulished" id="pulished" checked>
-												</td>
-												<td>
-													<a href="#" class="actions delete"><span class="glyphicon glyphicon-remove"></span></a>
-												</td>
-											</tr>
-										</tbody>
-									</table>
-								</div>
-
+							<tab heading="History" active="activeTabs.history" ng-click="tasks.tasksGrid.selectRow(0, true)">
+								
+								<div class="gridStyleTasks" ng-grid="tasks.tasksGrid"></div>
+								
 								<div class="innerTabWrapper">
-									
 									<tabset>
 										%{-- Actions Content --}%
 										<tab heading="Task Generation" active="activeSubTabs.history.actions">
 											<div class="btn-group">
-												<button type="button" class="btn btn-default">Publish</button>
-												<button type="button" class="btn btn-default">Refresh</button>
-												<button type="button" class="btn btn-default">Delete</button>
+												<button type="button" class="btn btn-default" ng-disabled="tasks.selectedTaskBatch == null" ng-bind="tasks.selectedTaskBatch.isPublished && 'Publish' || 'Unpublish'" ng-click="tasks.publishUnpublishTaskBatch(tasks.selectedTaskBatch)">Publish</button>
+												<button type="button" class="btn btn-default" ng-disabled="tasks.selectedTaskBatch == null">Refresh</button>
+												<button type="button" class="btn btn-default" ng-disabled="tasks.selectedTaskBatch == null" ng-click="tasks.deleteTaskBatch(tasks.selectedTaskBatch.id)">Delete</button>
 											</div>
-
-											<p class="actionsText">The selected tasks presently are unpublished. Press the _*Confirm*_ button in order to publish the tasks to the users.</p>
-
-											<input type="button" value="Confirm">
 										</tab>
 										
 										%{-- Tasks Content --}%
 										<tab heading="Task Content" active="activeSubTabs.history.tasks">
-											<div class="table-responsive">
-												<table class="table table-hover table-striped ngGridTable">
-													<thead>
-														<tr>
-															<th>Task #</th>
-															<th>Description</th>
-															<th>Asset</th>
-															<th>Team</th>
-															<th>Person</th>
-															<th>Due Date</th>
-															<th>Status</th>
-														</tr>
-													</thead>
-													<tbody> 
-														<tr>
-															<td>8132</td>
-															<td>Application current state assessment</td>
-															<td>HR</td>
-															<td>App Owner</td>
-															<td>Fran Tick</td>
-															<td>1/18/14</td>
-															<td>Done</td>
-														</tr>
-														<tr>
-															<td>8132</td>
-															<td>Application current state assessment</td>
-															<td>HR</td>
-															<td>App Owner</td>
-															<td>Fran Tick</td>
-															<td>1/18/14</td>
-															<td>Done</td>
-														</tr>
-														<tr>
-															<td>8134</td>
-															<td>Stack holder assessment</td>
-															<td>HR</td>
-															<td>Proj Mgr</td>
-															<td>Jim Lauchure</td>
-															<td>2/13/14</td>
-															<td>Done</td>
-														</tr>
-													</tbody>
-												</table>
-											</div>
+											
 										</tab>
 
 										%{-- Generation Log Content --}%
