@@ -151,7 +151,7 @@
 										%{-- Actions Content --}%
 										<tab heading="Task Generation" active="activeSubTabs.history.actions">
 											<div class="btn-group">
-												<button type="button" class="btn btn-default" ng-disabled="tasks.selectedTaskBatch == null" ng-bind="tasks.selectedTaskBatch.isPublished && 'Publish' || 'Unpublish'" ng-click="tasks.publishUnpublishTaskBatch(tasks.selectedTaskBatch)">Publish</button>
+												<button type="button" class="btn btn-default" ng-disabled="tasks.selectedTaskBatch == null" ng-bind="tasks.selectedTaskBatch.isPublished && 'Unpublish' || 'Publish'" ng-click="tasks.publishUnpublishTaskBatch(tasks.selectedTaskBatch)">Publish</button>
 												<button type="button" class="btn btn-default" ng-disabled="tasks.selectedTaskBatch == null">Refresh</button>
 												<button type="button" class="btn btn-default" ng-disabled="tasks.selectedTaskBatch == null" ng-click="tasks.deleteTaskBatch(tasks.selectedTaskBatch.id)">Delete</button>
 											</div>
