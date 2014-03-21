@@ -419,20 +419,34 @@ class AssetEntityAttributeLoaderService {
 	 * @param dataTransferValue, projectInstance
 	 * @author srinivas
 	 */
-	 def getdtvMoveBundle(def dtv, def projectInstance ) {
-		def moveBundleInstance
-		 if( dtv.correctedValue && dtv.importValue.trim() != "NULL" ) {
-				moveBundleInstance = MoveBundle.findByNameAndProject( dtv.correctedValue, projectInstance )
-				if( !moveBundleInstance ) {
-					moveBundleInstance = new MoveBundle( name:dtv.correctedValue, project:projectInstance, operationalOrder:1, workflowCode: projectInstance.workflowCode ).save()
-				}
-			} else if( dtv.importValue && dtv.importValue.trim() != "NULL" ) {
-				moveBundleInstance = MoveBundle.findByNameAndProject( dtv.importValue, projectInstance )
-				if( !moveBundleInstance ) {
-					moveBundleInstance = new MoveBundle( name:dtv.importValue, project:projectInstance, operationalOrder:1, workflowCode: projectInstance.workflowCode ).save()
-				}
-			}
+	 def getdtvMoveBundle(def dtv, def projectInstance) {
+		def moveBundleInstance = null
+		if( dtv.correctedValue && dtv.importValue.toUpperCase().trim() != "NULL" ) {
+			moveBundleInstance = createBundleIfNotExist(dtv.correctedValue, projectInstance)
+		} else if(!dtv.importValue.isEmpty() && dtv.importValue.toUpperCase().trim() !="NULL") {
+			moveBundleInstance = createBundleIfNotExist(dtv.importValue, projectInstance)
+		} else if(dtv.importValue.isEmpty()) {
+			moveBundleInstance = createBundleIfNotExist("TBD", projectInstance)
+		}
 		return moveBundleInstance
+	}
+	 
+	/**
+	 * 
+	 * @param bundleName
+	 * @param project
+	 * @return
+	 */
+	def createBundleIfNotExist(String bundleName, Project project){
+		def moveBundle = MoveBundle.findByNameAndProject( bundleName, project );
+		if(!moveBundle){
+			moveBundle = new MoveBundle( name:bundleName, project:project, operationalOrder:1, workflowCode: project.workflowCode )
+			if(!moveBundle.save()){
+				def etext = "Unable to create movebundle" + GormUtil.allErrorsString( moveBundle )
+				log.error(etext)
+			}
+		}
+		return moveBundle
 	}
 	
 	/* To get DataTransferValue Asset Manufacturer
@@ -740,8 +754,8 @@ class AssetEntityAttributeLoaderService {
 							errorCount++
 							errorConflictCount += validateResultList.errorConflictCount
 							ignoredAssets << asset
-							asset = false
 							log.warn "findAndValidateAsset() Field validation error for $clazzName (id:${asset.id}, assetName:${asset.assetName})"
+							asset = false
 						}
 					}
 				} else {
@@ -878,8 +892,10 @@ class AssetEntityAttributeLoaderService {
 					asset[property] = newVal
 				break
 			case "moveBundle":
-				def moveBundle = getdtvMoveBundle(dtv, project)
-					asset[property] = moveBundle
+				if(!asset.id || dtv.importValue){
+					def moveBundle = getdtvMoveBundle(dtv, project)
+						asset[property] = moveBundle
+				}
 				break
 			case ~/maintExpDate|retireDate/:
 				if (value) {
