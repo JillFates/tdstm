@@ -12,6 +12,7 @@ class PartyRelationshipService {
 	boolean transactional = true
 	def jdbcTemplate
 	def securityService
+	
 	/*
 	 * method to save party Relationship
 	 */
@@ -149,6 +150,16 @@ class PartyRelationshipService {
 	 */
 	def addCompanyStaff( company, person ) {
 		return updatePartyRelationshipPartyIdFrom('STAFF', company, 'COMPANY', person, 'STAFF')
+	}
+
+	/* 
+	 * Used to assign a person to a project as a Staff member
+	 * @param Party Project
+	 * @param Person person to assign
+	 * @return The PartyRelationship record or null if it failed
+	 */
+	def addProjectStaff( project, person ) {
+		return updatePartyRelationshipPartyIdFrom('STAFF', project, 'PROJECT', person, 'STAFF')
 	}
 
 	/*

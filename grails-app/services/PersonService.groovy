@@ -6,9 +6,10 @@ import com.tdssrc.grails.GormUtil
  */
 class PersonService {
 
-	def partyRelationshipService
 	def jdbcTemplate
+	def namedParameterJdbcTemplate
 	def sessionFactory
+	def partyRelationshipService
 	
 	static List SUFFIXES = [
 		"jr.", "jr", "junior", "ii", "iii", "iv", "senior", "sr.", "sr", //family
@@ -44,6 +45,62 @@ class PersonService {
 
 		return last
 	}
+
+	/** 
+	 * Used to find a person by their name for a specified client
+	 * @param client - The client that the person would be associated as Staff
+	 * @param nameMap - a map of the person's name (map [first, last, middle])
+	 * @return A list of the person(s) found that match the name or null if none found
+	 */
+
+	List findByClientAndName(PartyGroup client, Map nameMap) {
+		def map = [client:client.id]
+		StringBuffer query = new StringBuffer('SELECT party_id_to_id as id FROM party_relationship pr JOIN person p ON p.person_id=pr.party_id_to_id')
+		query.append(' WHERE pr.party_id_from_id=:client')
+		query.append(' AND pr.role_type_code_from_id="COMPANY"')
+		query.append(' AND pr.role_type_code_to_id="STAFF"')
+		// query.append(' ')
+		if (nameMap.first) {
+			map.first = nameMap.first
+			query.append(' AND p.first_name=:first' )
+		}
+		if (nameMap.last) {
+			map.last = nameMap.last
+			query.append(' AND p.last_name=:last' )
+		}
+
+		def persons
+		def pIds = namedParameterJdbcTemplate.queryForList(query.toString(), map)
+		if (pIds) {
+			persons = Person.findAll('from Person p where p.id in (:ids)', [ids:pIds*.id])
+		}
+
+		return persons
+	}  
+
+	/** 
+	 * Used to find a person by their name for a specified client
+	 * @param client - The client that the person would be associated as Staff
+	 * @param nameMap - a map of the person's name (map [first, last, middle])
+	 * @return A list of the person(s) found that match the name or null if none found
+	 */
+
+	List findByClientAndEmail(PartyGroup client, String email) {
+		def map = [client:client.id, email:email]
+		StringBuffer query = new StringBuffer('SELECT party_id_to_id as id FROM party_relationship pr JOIN person p ON p.person_id=pr.party_id_to_id')
+		query.append(' WHERE pr.party_id_from_id=:client')
+		query.append(' AND pr.role_type_code_from_id="COMPANY"')
+		query.append(' AND pr.role_type_code_to_id="STAFF"')
+		query.append(' AND p.email=:email')
+
+		def persons
+		def pIds = namedParameterJdbcTemplate.queryForList(query.toString(), map)
+		if (pIds) {
+			persons = Person.findAll('from Person p where p.id in (:ids)', [ids:pIds*.id])
+		}
+
+		return persons
+	}  
 
 	/**
 	 * Used to find a person associated with a given project using a string representation of their name.

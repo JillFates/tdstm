@@ -22,11 +22,10 @@ class ShiroDbRealm {
             throw new AccountException('Blank usernames are not allowed by this realm.')
         }
 
-        // Get the user with the given username. If the user is not
-        // found, then they don't have an account and we throw an
-        // exception.
+        // Get the user with the given username. If the user is not found or if it is not a local
+        // account (meaning using AD or SSO realm) then they don't have an account and we throw an exception.
         def user = UserLogin.findByUsername(username)
-        if (!user) {
+        if (!user || !user.isLocal) {
             throw new UnknownAccountException("No account found for user [${username}]")
         }
 

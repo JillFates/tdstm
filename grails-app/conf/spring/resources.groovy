@@ -4,6 +4,8 @@ import org.apache.commons.dbcp.BasicDataSource
 // import org.apache.shiro.authc.credential.Sha512CredentialsMatcher
 import org.apache.shiro.authc.credential.Sha1CredentialsMatcher
 
+import com.tdsops.common.grails.ApplicationContextHolder
+ 
 beans = {
 	// uses the grails dataSource from DataSource.groovy
 	jdbcTemplate(JdbcTemplate) {
@@ -12,7 +14,13 @@ beans = {
 	
 	namedParameterJdbcTemplate(NamedParameterJdbcTemplate, ref("dataSource")){
 	}
+
+	// A custom context holder to allow us to gain access to the application context and other components of the runtime environment
+	applicationContextHolder(ApplicationContextHolder) { bean ->
+		bean.factoryMethod = 'getInstance'
+	}
 	
+	/*
 	// use a different datasource
 	otherDataSource(BasicDataSource) {
 	   driverClassName = "com.mysql.jdbc.Driver"
@@ -25,6 +33,7 @@ beans = {
 	otherJdbcTemplate(JdbcTemplate) {
 	   dataSource = otherDataSource
 	}
+	*/
 	
 	// Shiro Password Encryption configuration
 	credentialMatcher(Sha1CredentialsMatcher) {
@@ -46,7 +55,7 @@ beans = {
 	/**
 	dataSource(BasicDataSource) {
 		driverClassName='com.mysql.jdbc.Driver'
-	    url = 'jdbc:mysql://localhost:3306/tdstm'
+		url = 'jdbc:mysql://localhost:3306/tdstm'
 		username = 'tdstm'
 		password = 'tdstm'
 	

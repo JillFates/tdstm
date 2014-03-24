@@ -10,11 +10,55 @@ import org.apache.shiro.SecurityUtils
 import org.apache.shiro.crypto.hash.Sha1Hash
 import com.tdsops.tm.enums.domain.RoleTypeGroup
  
- class SecurityService {
+import org.springframework.beans.factory.InitializingBean
+import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdsops.common.exceptions.ConfigurationException
+
+class SecurityService implements InitializingBean {
 	
 	static transactional = true
 	
-    def jdbcTemplate
+	// IoC
+	def grailsApplication
+	def jdbcTemplate
+
+	def activeDirectoryConfigMap = [:]
+
+	/**
+	 * This is a post initialization method to allow late configuration settings to occur
+	 */
+	public void afterPropertiesSet() throws Exception {
+
+		// Initialize the ActiveDirectory Configuration Map 
+		def conf = grailsApplication.config?.tdstm?.security?.ad
+		if (conf) {
+			activeDirectoryConfigMap.with {
+				// A way to enable/disable the account quickly
+				enabled = conf.containsKey('enabled') ? conf.enabled : false
+				// Flag to indicate the connector type that these settings are used with (ActiveDirectory)
+				connector = 'AD'	
+				url = conf.url ?: []
+				domain = conf.domain ?: ''
+				searchBase = conf.searchBase ?: ''
+				groupBase = conf.groupBase ?: ''
+				roleMap = conf.roleMap ?: []
+				username = conf.username ?: ''
+				password = conf.password ?: ''
+				company = conf.company ?: ''
+				autoProvision = conf.containsKey('autoProvision') ? conf.autoProvision : false
+				updateUser = conf.containsKey('updateUser') ? conf.updateUser : false
+				updateRoles = conf.containsKey('updateRoles') ? conf.updateRoles : false 
+				defaultRole = conf.defaultRole ?: ''
+				defaultTimezone = conf.defaultTimezone ?: 'EST'
+				defaultProject = conf.defaultProject ?: ''
+				debug = conf.containsKey('debug') ? conf.debug : false
+			}
+		} else {
+			// log has not yet been injected into the object so we need to use println...
+			println 'ERROR - SecurityService: unable to locate Active Directory configuration settings tdstm.ad.*'
+		}
+
+	}
 
 	/**
 	 * Used to determine if the current user has a specified role
@@ -122,10 +166,10 @@ import com.tdsops.tm.enums.domain.RoleTypeGroup
 		def subject = SecurityUtils.subject
 		def principal = subject.principal
 		def userLogin
-		if (principal) {
+		if (principal)
 			userLogin = UserLogin.findByUsername( principal )
-		}
-		// log.error "getUserLogin: principal=${principal} userLogin=${userLogin}"
+		if (log.isDebugEnabled())
+			log.debug "getUserLogin: principal=${principal} userLogin=${userLogin}"
 		return userLogin
 	}
 
@@ -186,8 +230,18 @@ import com.tdsops.tm.enums.domain.RoleTypeGroup
 	 */
 
 	 String encrypt(String text) {
-	 	def etext = new Sha1Hash(text).toHex()
-	 	return etext.toString()
+		def etext = new Sha1Hash(text).toHex()
+		return etext.toString()
 	 }
+
+	/**
+	 * Used to retrieve the Active Directory integration configuration settings
+	 * @return A map consisting of all of the settings defined in the configuration or various defaults
+	 */
+	Map getActiveDirectoryConfig() {
+		// log.debug "Calling AfterPropertiesSet()"
+		// afterPropertiesSet()
+		return activeDirectoryConfigMap
+	}
 	
 }

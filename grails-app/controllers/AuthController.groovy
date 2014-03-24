@@ -54,8 +54,12 @@ class AuthController {
 				// Perform the actual login. An AuthenticationException
 				// will be thrown if the username is unrecognised or the
 				// password is incorrect.
+				if (log.isDebugEnabled())
+					log.debug "signIn: About to call SecurityUtils.subject.login(authToken) : $authToken"
 				SecurityUtils.subject.login(authToken)
 				
+				if (log.isDebugEnabled())
+					log.debug "signIn: About to call securityService.getUserLogin()"
 				def userLogin = securityService.getUserLogin()
 				if (! userLogin) {
 					log.error "signIn() : unable to locate UserLogin for ${params.username}"
