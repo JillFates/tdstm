@@ -375,7 +375,7 @@ class CommentService {
      *  @return : create Trigger
      */
     def dispatchTaskEmail(Map params) {
-		Trigger trigger = new SimpleTrigger("tm-sendEmail-${params.taskId}" + System.currentTimeMillis(), null, new Date() )
+		Trigger trigger = new SimpleTrigger("tm-sendEmail-${params.taskId}" + System.currentTimeMillis(), null, new Date(System.currentTimeMillis() + 5000) )
         trigger.jobDataMap.putAll( [ 'taskId':params.taskId, 'tzId':params.tzId, 'isNew':params.isNew])
 		trigger.setJobName('SendTaskEmailJob')
 		trigger.setJobGroup('tdstm')
