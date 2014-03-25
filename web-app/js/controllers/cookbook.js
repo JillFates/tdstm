@@ -500,8 +500,6 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				$scope.selectedRecipe = fillDefault();
 				$scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
 			}
-			/*if(!$scope.activeTabs.history)*/
-				$scope.activeTabs.editor  = true;
 
 			//Reset the selects in task generation part.
 			$scope.tasks.resetSelects();
@@ -840,6 +838,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		restCalls.createRecipe(dataToSend, function(data){
 			$scope.alerts.addAlert({type: 'success', msg: 'Recipe Created', closeIn: 1500});
 			listRecipes($scope.gridData.length);
+			$scope.activeTabs.editor  = true;
 		}, function(){
 			$log.warn('Error when creating recipe');
 			$scope.alerts.addAlert({type: 'danger', msg: 'Saved'});

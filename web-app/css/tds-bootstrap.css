@@ -26,6 +26,10 @@ table{
 	border-color: RGBA(190, 190, 190, 0.5);
 }
 
+.btn[disabled], .btn, .btn:hover{
+	font-weight: normal;
+}
+
 .nav-tabs > li > a{
 	font-weight: normal;
 }

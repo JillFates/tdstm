@@ -31,7 +31,7 @@
 			<form id="gridControls" class="row-fluid clearfix form-inline groups">
 				<div class="col-md-4 col-xs-4 form-group">
 					<label for="contextSelector">Context: 
-						<select class="form-control" name="contextSelector" id="contextSelector" ng-model="context" ng-options="c for c in ['All', 'Event', 'Bundle', 'Application']" ng-disabled="editingRecipe" ng-change="changeRecipeList()"></select>
+						<select name="contextSelector" id="contextSelector" ng-model="context" ng-options="c for c in ['All', 'Event', 'Bundle', 'Application']" ng-disabled="editingRecipe" ng-change="changeRecipeList()"></select>
 					</label>
 				</div>
 				<div class="col-md-6 col-xs-6 form-group pull-right archiveCheckWrapper">
@@ -378,8 +378,8 @@
 								</tabset>
 							</div>
 							<div class="modal-footer">
-								<button class="btn btn-primary" ng-disabled="createRecipeForm.$invalid || isUnchanged(newRecipe)" ng-click="modalBtns.save()">Save</button>
-								<button class="btn btn-warning" ng-click="modalBtns.cancel()">Cancel</button>
+								<button class="btn btn-default" ng-disabled="createRecipeForm.$invalid || isUnchanged(newRecipe)" ng-click="modalBtns.save()">Save</button>
+								<button class="btn btn-default" ng-click="modalBtns.cancel()">Cancel</button>
 							</div>
 						</form>
 					</div>
