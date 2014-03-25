@@ -646,7 +646,7 @@ class ReportsService {
 	def genServerConflicts(def moveBundleId, def bundleConflicts, def unresolvedDep, def runsOn, def vmSupport, def planning){
 		def project = securityService.getUserCurrentProject()
 		ArrayList assetList = new ArrayList()
-		def assetsInBundle
+		def assetsInBundle = []
 		log.info "****bundle:${moveBundleId} bundleConflicts:${bundleConflicts} unresolvedDep:${unresolvedDep} RunsOn:${runsOn}  vmSupport:${vmSupport} planning:${planning} "
 		def bundles = []
 		if(planning) {
@@ -655,7 +655,8 @@ class ReportsService {
 		} else {
 			bundles = [MoveBundle.findById(moveBundleId)]
 		}
-		assetsInBundle = AssetEntity.findAll(" FROM AssetEntity WHERE moveBundle IN (:bundles) AND assetType IN (:types)",[bundles:bundles, types:AssetType.getServerTypes()])
+		if(bundles)
+			assetsInBundle = AssetEntity.findAll(" FROM AssetEntity WHERE moveBundle IN (:bundles) AND assetType IN (:types)",[bundles:bundles, types:AssetType.getServerTypes()])
 		
 		log.info "${assetsInBundle}"
 		def titleString = new StringBuffer("");

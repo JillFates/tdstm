@@ -19,7 +19,7 @@
 				<tbody>
 					<tr>
 						<td><g:select from="${moveBundles}" id="moveBundleId" name="moveBundle"
-								optionKey="id" optionValue="name" value="${moveBundleId}" noSelection="['useForPlanning':'Planning Bundles']"/></td>
+								optionKey="id" optionValue="name" value="${moveBundleId}"/></td>
 					</tr>
 					<tr>
 						<td>
@@ -64,6 +64,9 @@
 	currentMenuId = "#reportsMenu"
 	$("#reportsMenuId a").css('background-color','#003366')
 	
+	$(document).ready(function() {
+		$("#moveBundleId").append("<option value='useForPlanning'>Planning Bundles</option>");
+	});
 	</script>
 </body>
 </html>

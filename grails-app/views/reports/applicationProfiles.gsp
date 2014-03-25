@@ -19,7 +19,7 @@
 					<tr>
 						<td>Bundle : </td>
 						<td><g:select from="${moveBundles}" id="moveBundleId" name="moveBundle" onChange="changeSmeSelect(this.value)"
-								optionKey="id" optionValue="name" value="${moveBundleId}" noSelection="['useForPlanning':'Use For Planning']"/></td>
+								optionKey="id" optionValue="name" value="${moveBundleId}"/></td>
 					</tr>
 					<tr>
 						<td>SME : </td>
@@ -48,6 +48,9 @@
 	<script type="text/javascript">
 		currentMenuId = "#reportsMenu"
 		$("#reportsMenuId a").css('background-color','#003366')
+		$(document).ready(function() {
+			$("#moveBundleId").append("<option value='useForPlanning'>Planning Bundles</option>");
+		});
 		
 		function changeSmeSelect(bundle){
 			jQuery.ajax({

@@ -1341,7 +1341,7 @@ class ReportsController {
 	def applicationProfiles ={
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList = MoveBundle.findAllByProject(project)
-		def moveBundleId = securityService.getUserCurrentMoveBundleId()
+		def moveBundleId = securityService.getUserCurrentMoveBundleId()?: moveBundleList[0]?.id
 		def smeList = reportsService.getSmeList(moveBundleId)
 		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId, smeList:smeList]
 	}
