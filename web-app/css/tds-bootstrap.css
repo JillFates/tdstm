@@ -26,7 +26,7 @@ table{
 	border-color: RGBA(190, 190, 190, 0.5);
 }
 
-.btn[disabled], .btn, .btn:hover{
+.btn[disabled], .btn, .btn.btn-default, .btn.btn-default:hover, .btn:hover{
 	font-weight: normal;
 }
 

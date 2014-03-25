@@ -104,7 +104,7 @@
 										</label>
 									</div>
 								</form>
-								<div class="completionWrapper" ng-show="tasks.show.generating">
+								<div class="completionWrapper ng-hide" ng-show="tasks.show.generating">
 									<tabset id="taskGenerationTabs">
 										<tab heading="Summary" active="activeSubTabs.tasks.summary">
 											
@@ -125,7 +125,7 @@
 										<a class="btn btn-default" href="#"><span class="glyphicon glyphicon-arrow-left"></span> Start Over</a>
 									</div>
 								</div>
-								<div class="progressWrapper row" ng-show="tasks.show.completion">
+								<div class="progressWrapper row ng-hide" ng-show="tasks.show.completion">
 									<div class="col-md-3 col-xs-3">
 										<p class="text-right">Creating Tasks: </p>
 									</div>
