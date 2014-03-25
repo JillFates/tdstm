@@ -7,6 +7,7 @@
 import com.tdsops.tm.enums.domain.RoleTypeGroup
 import com.tdssrc.grails.GormUtil
 import com.tdsops.common.exceptions.ConfigurationException
+import org.apache.shiro.authc.AccountException
 
 class UserService {
 	
@@ -128,6 +129,14 @@ class UserService {
 			}
 		}
 
+		if (! userLogin && !userInfo.roles && !config.defaultRole) {
+			throw new AccountException('No roles defined for the user')
+		}
+
+		if (! userLogin && ! person && ! config.autoProvision) {
+			throw new AccountException('UserLogin or Person not found and autoProvision is disabled')
+		}
+
 		if (userLogin)
 			person = userLogin.person
 
@@ -151,7 +160,7 @@ class UserService {
 				mobilePhone: userInfo.mobile
 			)
 			if (! person.save(flush:true)) {
-				log.error "findOrProvisionUser: Creating user ($personIdentifier) failed due to ${GormUtil.allErrorsString(userLogin)}"
+				log.error "findOrProvisionUser: Creating user ($personIdentifier) failed due to ${GormUtil.allErrorsString(person)}"
 				throw new RuntimeException('Unexpected error while creating Person object')
 			}
 			// Create Staff relationship with the Company

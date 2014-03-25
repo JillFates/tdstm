@@ -100,8 +100,8 @@ class ShiroActiveDirectoryRealm {
 		}
 
 		if (log.isDebugEnabled() || config.debug)
-			log.debug "ShiroActiveDirectoryRealm: Found user '${userInfo.username}' in AD"
-	
+			log.debug "ShiroActiveDirectoryRealm: Found user '${userInfo.username}' in Active Directory"
+
 		// Now attempt to lookup the user or provision accordingly
 		// Note that the findOrProvisionUser method can throw errors that Shiro will catch
 		def userLogin
