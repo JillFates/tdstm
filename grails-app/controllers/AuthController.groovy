@@ -94,6 +94,8 @@ class AuthController {
 					def browserTestiPad = request.getHeader("User-Agent").toLowerCase().contains("ipad")
 					def browserTest = request.getHeader("User-Agent").toLowerCase().contains("mobile")
 					
+					Person.loggedInPerson = securityService.getUserLoginPerson();
+					
 					if(browserTest) {
 						if(browserTestiPad) {
 							redirect(controller:'projectUtil')

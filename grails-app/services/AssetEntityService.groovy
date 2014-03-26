@@ -555,6 +555,14 @@ class AssetEntityService {
 						query +="CONCAT(CONCAT(p1.first_name, ' '), IFNULL(p1.last_name,'')) AS sme2,"
 						joinQuery +="\n LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id \n"
 						break;
+				case 'modifiedBy':
+						query +="CONCAT(CONCAT(p2.first_name, ' '), IFNULL(p2.last_name,'')) AS modifiedBy,"
+						joinQuery +="\n LEFT OUTER JOIN person p2 ON p2.person_id=ae.modified_by \n"
+						break;
+				case 'lastUpdated':
+						query +="ee.last_updated AS ${value},"
+						joinQuery +="\n LEFT OUTER JOIN eav_entity ee ON ee.entity_id=ae.asset_entity_id \n"
+						break;
 				case 'moveBundle':
 						query +="mb.name AS moveBundle,"
 						break;

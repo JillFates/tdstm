@@ -81,4 +81,5 @@ databaseChangeLog = {
 	include file: '20140318-add-guid-to-userlogin.groovy'
 	include file: '20140320-change-use-of-planning-field-to-use-for-planning.groovy'
 	include file: '20140320-update-date-created-when-null.groovy'
+	include file: '20140324-add-modified-by-column-in-asset-entity.groovy'
 }

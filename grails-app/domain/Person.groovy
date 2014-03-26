@@ -23,6 +23,8 @@ class Person extends Party {
 	String tdsLink
 	String staffType
 	Integer travelOK = 1
+	
+	static Person loggedInPerson
 
 	static hasMany =[
 		blackOutDates : ExceptionDates
@@ -102,5 +104,6 @@ class Person extends Party {
 	String toString(){
 		firstName + ( middleName ? " $middleName" : '' ) + ( lastName ? " $lastName" : '' )
 	}
+	
 	
 }

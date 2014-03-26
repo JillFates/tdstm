@@ -370,7 +370,7 @@ class AssetEntityAttributeLoaderService {
 						updateChangeConflicts( dataTransferBatch, dtValue )
 						errorConflictCount++
 					}
-				} else if( attribName == "usize"){
+				} else if( attribName in ["usize", "modifiedBy", "lastUpdated"]){
 					// skip the validation
 				} else if( dtValue.eavAttribute.backendType == "int" ){
 					def correctedPos
@@ -794,7 +794,7 @@ class AssetEntityAttributeLoaderService {
 			if ( asset.dirtyPropertyNames.size() ) {
 				// Check to see if dirty
 				log.info "saveAssetChanges() Updated asset ${asset.id} ${asset.assetName} - Dirty properties: ${asset.dirtyPropertyNames}"
-				saved = asset.validate() && asset.save(flush:true)
+				saved = asset.validate() && asset.save()
 				if (saved) {
 					updateCount++
 					assetList << asset.id
@@ -804,7 +804,7 @@ class AssetEntityAttributeLoaderService {
 			}
 		} else {
 			// Handle a new asset 
-			saved = asset.validate() && asset.save(flush:true)
+			saved = asset.validate() && asset.save()
 			if (saved) {
 				insertCount++
 				assetList << asset.id // Once asset saved to DB it will provide ID for that.
@@ -935,6 +935,8 @@ class AssetEntityAttributeLoaderService {
 				break
 			case "validation":
 				setValueOrDefault(asset, property, value, 'Discovery')
+				break
+			case ~/modifiedBy|lastUpdated/: 
 				break
 			default:
 				if (value.size() ) {

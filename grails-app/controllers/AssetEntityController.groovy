@@ -1259,7 +1259,7 @@ class AssetEntityController {
 									// Don't bother populating position if it is a zero
 									if (pos == 0) continue
 									addContentToSheet = new jxl.write.Number(serverMap[colName], r, (Double)pos )
-								} else if(attribute == "retireDate" || attribute == "maintExpDate"){
+								} else if(attribute in ["retireDate", "maintExpDate", "lastUpdated"]){
 									addContentToSheet = new Label(serverMap[colName], r, 
 										(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll]) ? stdDateFormat.format(asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll])) :''))
 								} else if ( asset[r-1].(serverDTAMap.eavAttribute.attributeCode[coll]) == null ) {
@@ -1345,7 +1345,7 @@ class AssetEntityController {
 										colVal = app[assetColName] ? 'Yes' : 'No'
 										//log.info "export() : field class type=$app[assetColName].className()}"
 										break
-									case ~/Retire|MaintExp/:
+									case ~/Retire|MaintExp|Modified Date/:
 										colVal = app[assetColName] ? stdDateFormat.format(app[assetColName]) : ''
 										break
 									default:
@@ -1395,7 +1395,7 @@ class AssetEntityController {
 								if(colName == "DepGroup"){
 									def depGroup = assetDepBundleList.find{it.asset.id==database[r-1].id}?.dependencyBundle?.toString()
 									addContentToSheet = new Label(dbMap[colName], r, depGroup ?:"" )
-								} else if(attribute == "retireDate" || attribute == "maintExpDate"){
+								} else if(attribute in ["retireDate", "maintExpDate", "lastUpdated"]){
 									addContentToSheet = new Label(dbMap[colName], r, (database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]) ? stdDateFormat.format(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll])) :''))
 								} else if ( database[r-1][attribute] == null ) {
 									addContentToSheet = new Label(  dbMap[colName], r, "" )
@@ -1432,7 +1432,7 @@ class AssetEntityController {
 								if(colName == "DepGroup"){
 									def depGroup = assetDepBundleList.find{it.asset.id==files[r-1].id}?.dependencyBundle?.toString()
 									addContentToSheet = new Label(fileMap[colName], r, depGroup ?:"" )
-								} else if(attribute == "retireDate" || attribute == "maintExpDate"){
+								} else if(attribute == "retireDate" || attribute == "maintExpDate" || attribute == "lastUpdated"){
 									addContentToSheet = new Label(fileMap[colName], r, (files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll]) ? stdDateFormat.format(files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll])) :''))
 								} else if ( files[r-1][attribute] == null ) {
 									addContentToSheet = new Label( fileMap[colName], r, "" )
@@ -1782,6 +1782,14 @@ class AssetEntityController {
 					break;
 				case ~/custom1|custom2|custom3|custom4|custom5|custom6|custom7|custom8|custom9|custom10|custom11|custom12|custom13|custom14|custom15|custom16|custom17|custom18|custom19|custom20|custom21|custom22|custom23|custom24|custom25|custom26|custom27|custom28|custom29|custom30|custom31|custom32|custom33|custom34|custom35|custom36|custom37|custom38|custom39|custom40|custom41|custom42|custom43|custom44|custom45|custom46|custom47|custom48/:
 					temp +="ae.${value} AS ${value},"
+					break;
+				case 'lastUpdated':
+					temp +="ee.last_updated AS ${value},"
+					joinQuery +="\n LEFT OUTER JOIN eav_entity ee ON ee.entity_id=ae.asset_entity_id \n"
+					break;
+				case 'modifiedBy':
+					temp +="CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS modifiedBy,"
+					joinQuery +="\n LEFT OUTER JOIN person p ON p.person_id=ae.modified_by \n"
 					break;
 				case 'validation':
 					break;

@@ -109,6 +109,7 @@ class FilesController {
 		def justPlanning = userPreferenceService.getPreference("assetJustPlanning")?:'true'
 		//TODO:need to move the code to AssetEntityService 
 		def temp=""
+		def joinQuery=""
 		filePref.each{key,value->
 			switch(value){
 			case 'moveBundle':
@@ -119,6 +120,14 @@ class FilesController {
 			break;
 			case 'fileFormat':
 				temp+="f.file_format AS fileFormat,"
+			break;
+			case 'lastUpdated':
+				temp +="ee.last_updated AS ${value},"
+				joinQuery +="\n LEFT OUTER JOIN eav_entity ee ON ee.entity_id=ae.asset_entity_id \n"
+			break;
+			case 'modifiedBy':
+				temp +="CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS modifiedBy,"
+				joinQuery +="\n LEFT OUTER JOIN person p ON p.person_id=ae.modified_by \n"
 			break;
 			case ~/validation|planStatus/:
 			break;
@@ -134,28 +143,21 @@ class FilesController {
 		}
 		/*COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, adb.dependency_bundle AS depNumber,
 			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts */
-
-		if(justPlanning=='true'){
-			query.append("""  ac.comment_type AS commentType,ae.validation AS validation,ae.plan_status AS planStatus
+		query.append("""  ac.comment_type AS commentType,ae.validation AS validation,ae.plan_status AS planStatus
 				FROM files f 
 				LEFT OUTER JOIN asset_entity ae ON f.files_id=ae.asset_entity_id
 				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id
-				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
-				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
-				WHERE ae.project_id = ${project.id} AND mb.use_for_planning=${justPlanning}
-				GROUP BY files_id ORDER BY ${sortIndex} ${sortOrder}
-				) AS files""")
-		} else {
-			query.append("""  ac.comment_type AS commentType,ae.validation AS validation,ae.plan_status AS planStatus
-				FROM files f 
-				LEFT OUTER JOIN asset_entity ae ON f.files_id=ae.asset_entity_id
-				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id
-				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
-				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
-				WHERE ae.project_id = ${project.id}
-				GROUP BY files_id ORDER BY ${sortIndex} ${sortOrder}
-				) AS files""")
-		}
+				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id """)
+		if(joinQuery)
+			query.append(joinQuery)
+		
+		query.append("""\n LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
+				WHERE ae.project_id = ${project.id} """)
+		
+		if(justPlanning=='true')
+			query.append(" AND mb.use_for_planning=${justPlanning} ")
+			
+		query.append(" GROUP BY files_id ORDER BY ${sortIndex} ${sortOrder}) AS files ")
 		
 		/*LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
 			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 

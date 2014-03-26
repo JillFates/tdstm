@@ -134,6 +134,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
     Integer size
     SizeScale scale
     Integer rateOfChange
+	Person modifiedBy
     
 	static hasMany = [
 		assetEntityVarchars : AssetEntityVarchar,
@@ -265,6 +266,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
         size( nullable:true )
         scale( blank:true, nullable:true, inList:SizeScale.getKeys() )
         rateOfChange( nullable:true )
+		modifiedBy( nullable:true )
 	}
 	
 	static mapping  = {	
@@ -289,6 +291,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		columns {
 			hasRemoteMgmt sqltype: 'tinyint(1)'
 		}
+		modifiedBy column:'modified_by'
 	}
 
 	// Need to indicate the getters that would otherwise be mistaken as db properties
@@ -300,10 +303,14 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	def beforeInsert = {
 		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
 		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+		modifiedBy = Person.loggedInPerson
+
 	}
 	def beforeUpdate = {
 		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+		modifiedBy = Person.loggedInPerson
 	}
+	
 	/*def afterInsert = {
 		updateRacks()
 	}

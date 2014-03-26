@@ -113,10 +113,19 @@ class DatabaseController {
 		def justPlanning = userPreferenceService.getPreference("assetJustPlanning")?:'true'
 		//TODO:need to move the code to AssetEntityService 
 		def temp=""
+		def joinQuery =""
 		dbPref.each{key,value->
 			switch(value){
 			case 'moveBundle':
 				temp +="mb.name AS moveBundle,"
+			break;
+			case 'lastUpdated':
+				temp +="ee.last_updated AS ${value},"
+				joinQuery +="\n LEFT OUTER JOIN eav_entity ee ON ee.entity_id=ae.asset_entity_id \n"
+			break;
+			case 'modifiedBy':
+				temp +="CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS modifiedBy,"
+				joinQuery +="\n LEFT OUTER JOIN person p ON p.person_id=ae.modified_by \n"
 			break;
 			case ~/custom1|custom2|custom3|custom4|custom5|custom6|custom7|custom8|custom9|custom10|custom11|custom12|custom13|custom14|custom15|custom16|custom17|custom18|custom19|custom20|custom21|custom22|custom23|custom24|custom25|custom26|custom27|custom28|custom29|custom30|custom31|custom32|custom33|custom34|custom35|custom36|custom37|custom38|custom39|custom40|custom41|custom42|custom43|custom44|custom45|custom46|custom47|custom48/:
 				temp +="ae.${value} AS ${value},"
@@ -140,28 +149,21 @@ class DatabaseController {
 		/*COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, adb.dependency_bundle AS depNumber,
 			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts */
 		
-		if(justPlanning=='true'){
-			query.append("""  ac.comment_type AS commentType,ae.validation AS validation,ae.plan_status AS planStatus
-				FROM data_base d 
-				LEFT OUTER JOIN asset_entity ae ON d.db_id=ae.asset_entity_id
-				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
-				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
-				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id
-				WHERE ae.project_id = ${project.id} AND mb.use_for_planning=${justPlanning}
-				GROUP BY db_id ORDER BY ${sortIndex} ${sortOrder}
-				) AS dbs""")
-		} else {
-			query.append("""  ac.comment_type AS commentType,ae.validation AS validation,ae.plan_status AS planStatus
-				FROM data_base d 
-				LEFT OUTER JOIN asset_entity ae ON d.db_id=ae.asset_entity_id
-				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id 
-				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id 
-				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id
-				WHERE ae.project_id = ${project.id}
-				GROUP BY db_id ORDER BY ${sortIndex} ${sortOrder}
-				) AS dbs""")
-		}
-		
+		query.append("""  ac.comment_type AS commentType,ae.validation AS validation,ae.plan_status AS planStatus
+			FROM data_base d 
+			LEFT OUTER JOIN asset_entity ae ON d.db_id=ae.asset_entity_id
+			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id """)
+		if(joinQuery)
+			query.append(joinQuery)
+			
+		query.append(""" \n LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
+			LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id
+			WHERE ae.project_id = ${project.id} """)
+
+		if (justPlanning=='true')
+			query.append(" AND mb.use_for_planning=${justPlanning} ")
+
+		query.append(" GROUP BY db_id ORDER BY ${sortIndex} ${sortOrder}) AS dbs ")
 		/* LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
 			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 
 			LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN (${unknownQuestioned}) 

@@ -101,9 +101,11 @@ class Application extends AssetEntity {
 	def beforeInsert = {
 		dateCreated = TimeUtil.nowGMT()
 		lastUpdated = TimeUtil.nowGMT()
+		modifiedBy = Person.loggedInPerson
 	}
 	def beforeUpdate = {
 		lastUpdated = TimeUtil.nowGMT()
+		modifiedBy = Person.loggedInPerson
 	}
 	String toString(){
 		"id:$id name:$assetName tag:$appVendor"
