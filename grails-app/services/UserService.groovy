@@ -86,6 +86,14 @@ class UserService {
 			throw new ConfigurationException("Project (${config.defaultProject}) not associated with client $client")
 		}
 
+		// Parse the person's name
+		def nameMap = [first:'', middle:'', last:userInfo.lastName]
+		def names = userInfo.firstName.split(' ')
+		if (names.size()) 
+			nameMap.first = names[0]
+		if (names.size() > 1)
+			nameMap.middle = names[1..-1].join(' ')
+
 		// Make the GUID unique to the companyId + the GUID from their authority system
 		def guid = "${userInfo.company}-${userInfo.guid}"	
 		userLogin = UserLogin.findByExternalGuid(guid)
@@ -108,7 +116,6 @@ class UserService {
 			if (! persons) {
 				if (log.isDebugEnabled() || config.debug)
 					log.debug "findOrProvisionUser: Looking up person by name"
-				def nameMap = [first:userInfo.firstName, last:userInfo.lastName]
 				persons = personService.findByClientAndName(client, nameMap)
 			} 
 
@@ -151,8 +158,9 @@ class UserService {
 				log.debug "findOrProvisionUser: Creating new person"
 
 			person = new Person( 
-				firstName:userInfo.firstName,
-				lastName:userInfo.lastName,
+				firstName:nameMap.first,
+				lastName:nameMap.last,
+				middleName: nameMap.middle,
 				email: userInfo.email,
 				staffType:'Salary',
 				active:'Y',
