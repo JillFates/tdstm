@@ -182,10 +182,12 @@ class UserService {
 		} else {
 			// Update the person information if the configuration is set for it
 			if (config.updateUser) {
-				if (person.firstName != userInfo.firstName)
-					person.firstName = userInfo.firstName
-				if (person.lastName != userInfo.lastName)
-					person.lastName = userInfo.lastName
+				if (person.firstName != nameMap.first)
+					person.firstName = nameMap.first
+				if (person.middleName != nameMap.middle)
+					person.middleName = nameMap.middle
+				if (person.lastName != nameMap.last)
+					person.lastName = nameMap.last
 				if (person.email != userInfo.email)
 					person.email = userInfo.email
 				if (person.active != 'Y')
