@@ -71,6 +71,14 @@ class PersonService {
 
 		def persons
 		def pIds = namedParameterJdbcTemplate.queryForList(query.toString(), map)
+
+		if (nameMap.middle) {
+			// Try to lookup the person with their middle name as well
+			map.middle = nameMap.last
+			query.append(' AND p.middle_name=:middle' )
+			pIds.addAll( namedParameterJdbcTemplate.queryForList(query.toString(), map) )
+		}
+
 		if (pIds) {
 			persons = Person.findAll('from Person p where p.id in (:ids)', [ids:pIds*.id])
 		}

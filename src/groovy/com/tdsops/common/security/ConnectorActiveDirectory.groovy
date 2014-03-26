@@ -69,6 +69,7 @@ class ConnectorActiveDirectory {
 			assert config.url
 			assert config.domain
 			assert config.searchBase
+			assert config.baseDN
 
 			// Get the user's username, stripping of the @domain if present
 			def smauser = username
@@ -95,106 +96,64 @@ class ConnectorActiveDirectory {
 			def results
 			def i
 			for (i=0; i<config.searchBase.size(); i++) {
-				results = ldap.search(queryUser, config.searchBase[i], SearchScope.SUB )
-				if (results.size()) {
-					if (config.debug)
-						log.info "Found user in ${config.searchBase[i]}"
-					break
+				try {
+					results = ldap.search(queryUser, config.searchBase[i], SearchScope.SUB )
+					if (results.size()) {
+						if (config.debug)
+							log.info "Found user ${results[0].dn} in ${config.searchBase[i]}"
+						break
+					}
+				} catch (javax.naming.NameNotFoundException userSearchEx) {
+					// Don't need to do anything
 				}
 			}
 
-			def u
-			def nestedGroups = []
-
-			if (results.size()) {
-
-				u = results[0]
-
-				// Grab the user's nested group memberships by iterating over one or more searchBase values
-				def queryNestedGroups = "(member:1.2.840.113556.1.4.1941:=${u.distinguishedname})"
-				config.searchBase.each { sb ->
-					def g = ldap.search(queryNestedGroups, sb, SearchScope.SUB)
-					if (config.debug) 
-						log.info "Found ${( g ? g.size() : '0')} groups in $sb"
-					if (g)
-						nestedGroups.addAll(g*.dn)
-				}
-
-				// Weed out any duplicates that they may have
-				if (nestedGroups)
-					nestedGroups = nestedGroups.unique()
-
-				if (config.debug)
-					log.info "Unique groups found: $nestedGroups"
-
-/*
-				// Grab the user's nested group memberships
-				def queryNestedGroups = "(member:1.2.840.113556.1.4.1941:=${u.distinguishedname})"
-				nestedGroups = ldap.search(queryNestedGroups, config.searchBase, SearchScope.SUB)
-				if (nestedGroups)
-					nestedGroups = nestedGroups*.dn
-				if (config.debug)
-					log.info "Found nested groups: ${nestedGroups}"
-*/
-
-				// Now attempt a connect using the user's own DN/password and then try to compare the samaccountname to 
-				// validate that the user has given us the correct credentials
-				if (config.debug)
-					log.info 'Initiating LDAP connection with user credentials'
-				ldap = LDAP.newInstance(config.url[0], u.dn, password)
-				if (config.debug)
-					log.info 'Confirming user credentials'
-				assert ldap.compare(u.dn, [samaccountname: smauser] )
-
-				// Map all of the user information into TM userInfo map
-				userInfo.company = config.company	// Copy over the company id
-				userInfo.username = username
-				userInfo.firstName = u.givenname ?: ''
-				userInfo.lastName = u.sn ?: ''
-				userInfo.fullName = u.cn ?: ''
-				userInfo.email = u.mail ?: ''
-				userInfo.telephone = u.telephonenumber ?: ''
-				userInfo.mobile = u.mobile ?: ''
-				userInfo.guid = (u.objectguid ? guidToString( u.objectguid ) : u.dn)
-				userInfo.roles = []
-
-			} else {
+			if (! results.size()) {
 				if (config.debug)
 					log.info "Unable to locate username $username"
-				throw new RuntimeException('Unable to locate username')
+				throw new javax.naming.NameNotFoundException('Unable to locate username')
+			} 
+			
+			def u = results[0]
+			def nestedGroups = []
+			def roles = []
+
+			// Grab the user's nested group memberships by iterating over one or more searchBase values
+			def queryNestedGroups = "(member:1.2.840.113556.1.4.1941:=${u.distinguishedname})"
+			if (config.debug)
+				log.info "About to search for nested groups with query $queryNestedGroups"
+			def g = ldap.search(queryNestedGroups, config.baseDN, SearchScope.SUB)
+			if (g)
+				nestedGroups.addAll(g*.dn)
+
+			config.roleMap.each { role, filter ->
+				def groupDN="$filter,${config.baseDN}".toLowerCase()
+				if (config.debug)
+					log.info "Trying to find role $role for DN $groupDN"
+				if (nestedGroups.find { it.toLowerCase() == groupDN })
+					roles << role
 			}
 
-			// Try to find the user groups the user is associated to any
-			if (config.roleMap && nestedGroups) {
+			// Now attempt a connect using the user's own DN/password and then try to compare the samaccountname to 
+			// validate that the user has given us the correct credentials
+			if (config.debug)
+				log.info 'Initiating LDAP connection with user credentials'
+			ldap = LDAP.newInstance(config.url[0], u.dn, password)
+			if (config.debug)
+				log.info 'Confirming user credentials'
+			assert ldap.compare(u.dn, [samaccountname: smauser] )
 
-				// Need to convert the roleMap into the Regx pattern by merging the config.groupBase array with
-				// each of the regx patterns
-				def patterns = [] 
-				i=0
-				config.groupBase.each { gb ->
-					config.roleMap.each { k, v ->
-						def p = "^${v},$gb"
-						if (config.debug)
-							log.info "Role ${++i} search pattern for $k, regex: $p"
-						patterns << [ role:k, pattern: Pattern.compile( p ) ]
-					}
-				}
-
-				def rmSize = config.roleMap.size()
-				nestedGroups.each { group ->
-					if (config.debug)
-						log.info "Checking for role match of group $group"
-					for (i=0; i < rmSize; i++) {					
-						def match = patterns[i].pattern.matcher( group )
-						if (match.matches()) {
-							userInfo.roles << patterns[i].role
-							if (config.debug)
-								log.info "Matched ${patterns[i].role} on role ${++i}"
-							break
-						}
-					}
-				}
-			}
+			// Map all of the user information into TM userInfo map
+			userInfo.company = config.company	// Copy over the company id
+			userInfo.username = username
+			userInfo.firstName = u.givenname ?: ''
+			userInfo.lastName = u.sn ?: ''
+			userInfo.fullName = u.cn ?: ''
+			userInfo.email = u.mail ?: ''
+			userInfo.telephone = u.telephonenumber ?: ''
+			userInfo.mobile = u.mobile ?: ''
+			userInfo.guid = (u.objectguid ? guidToString( u.objectguid ) : u.dn)
+			userInfo.roles = roles
 
 			if (config.debug) {
 				def ui = new StringBuffer("User information:\n")
@@ -214,15 +173,13 @@ class ConnectorActiveDirectory {
 			emsg = 'User DN was invalid'
 			if (config.debug)
 				log.info "$emsg : ${ine.getMessage()}"
-		} catch (java.lang.NullPointerException npe) {
-			emsg = 'Possibly invalid system user credentials or URL'
+		} catch (java.lang.NullPointerException npe) {				
+			emsg = 'Possibly invalid service user credentials or LDAP URL'
 			if (config.debug)
-				log.info emsg
-
+				log.info "$emsg : ${npe.getMessage()}"
 		} catch (Exception e) {
 			emsg = 'Unexpected error'
-			if (config.debug)
-				log.info "$emsg : ${e.class} ${e.getMessage()}"			
+			log.error "$emsg : ${e.class} ${e.getMessage()}"			
 		}
 
 		if (emsg)

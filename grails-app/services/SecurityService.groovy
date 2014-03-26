@@ -40,7 +40,8 @@ class SecurityService implements InitializingBean {
 				url = conf.url ?: []
 				domain = conf.domain ?: ''
 				searchBase = conf.searchBase ?: ''
-				groupBase = conf.groupBase ?: ''
+				// groupBase = conf.groupBase ?: ''
+				baseDN = conf.baseDN
 				roleMap = conf.roleMap ?: []
 				username = conf.username ?: ''
 				password = conf.password ?: ''
