@@ -1,4 +1,5 @@
 import org.quartz.JobExecutionContext;
+import org.quartz.Trigger;
 import org.quartz.JobExecutionException;
 
 /**
@@ -26,7 +27,33 @@ class SendTaskEmailJob {
         def taskId = dataMap.getLongValue('taskId');
         def tzId = dataMap.get('tzId').toString();
         def isNew = dataMap.getBooleanValue('isNew')
-		// log.info "execute: taskId=$taskId, tzId=$tzId, isNew=$isNew"
-        commentService.sendTaskEMail(taskId, tzId, isNew)
+		long tries = dataMap.getLongValue('tries') + 1
+		//log.info "execute: taskId=$taskId, tzId=$tzId, isNew=$isNew"
+		
+		def result = commentService.sendTaskEMail(taskId, tzId, isNew)
+		
+		if(result=='reschedule'){
+			if(tries<3){
+				// Reschedule the job for 10s
+				long nextFiring = System.currentTimeMillis() + 10000   // in 10s
+				Date nextFiringDate = new Date(nextFiring)
+				Trigger trigger = context.getTrigger()
+				trigger.setStartTime(nextFiringDate)
+	
+				// Update the retries count
+				def map = context.getJobDetail().getJobDataMap()
+				map.put("tries", tries)
+				trigger.jobDataMap.putAll(map)
+				log.info "JobDataMap = $map"
+	
+				// reschedule the job
+				String triggerName = trigger.getName()
+				context.getScheduler().rescheduleJob(triggerName, trigger.getGroup(), trigger)
+				log.info("Rescheduled job ${triggerName} for ${nextFiringDate}")
+			} else {
+				log.error "Gave up on waiting for task $taskId to create"
+				return
+			}
+		}
     }
 }

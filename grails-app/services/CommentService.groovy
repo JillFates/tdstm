@@ -376,7 +376,7 @@ class CommentService {
      */
     def dispatchTaskEmail(Map params) {
 		Trigger trigger = new SimpleTrigger("tm-sendEmail-${params.taskId}" + System.currentTimeMillis(), null, new Date(System.currentTimeMillis() + 5000) )
-        trigger.jobDataMap.putAll( [ 'taskId':params.taskId, 'tzId':params.tzId, 'isNew':params.isNew])
+        trigger.jobDataMap.putAll( [ 'taskId':params.taskId, 'tzId':params.tzId, 'isNew':params.isNew,'tries':0L])
 		trigger.setJobName('SendTaskEmailJob')
 		trigger.setJobGroup('tdstm')
   
@@ -399,9 +399,9 @@ class CommentService {
 		// https://github.com/grails/grails-core/commit/9a8e765e4a139f67bb150b6dd9f7e67b16ecb21e
 		// AssetComment.withNewSession { session ->
 		def assetComment = AssetComment.read(taskId)
-		if (! assetComment) {
+		if (!assetComment) {
 			log.error "sendTaskEMail: Invalid AssetComment ID [${taskId}] referenced in call"
-			return
+			return "reschedule"
 		}
 		
 		// log.info "sendTaskEMail: commentType: ${assetComment.commentType}, category: ${assetComment.category}"
