@@ -226,15 +226,6 @@ class ProjectService {
 	def getAttributes(entityType){
 		def eavEntityType = EavEntityType.findByDomainName(entityType)
 		def attributes = EavAttribute.findAllByEntityType( eavEntityType ,[sort:'frontendLabel'])
-		// TODO : Remove below condition and statements once appOwner added to eav
-		if(entityType == "Application"){
-			attributes = attributes.collect{ 
-							if(it.attributeCode=='owner')
-								it.frontendLabel = 'App Owner'
-							return it
-						}
-			attributes.sort{it.frontendLabel}
-		}
 		(1..48).each {i->
 		    def attribute = attributes.find{it.frontendLabel == "Custom"+i}
 			attributes.remove(attribute)

@@ -1331,7 +1331,7 @@ class AssetEntityController {
 									case 'AppId':
 										colVal = app.id
 										break
-									case 'Owner':
+									case 'AppOwner':
 										colVal = app.appOwner
 										break
 									case 'DepGroup':

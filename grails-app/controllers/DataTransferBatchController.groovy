@@ -363,10 +363,10 @@ def messageSource
 						}
 
 						switch (attribName) {
-							case ~/sme|sme2|appOwner|owner/:
+							case ~/sme|sme2|appOwner/:
 								if( it.importValue ) {
 									// Substitute owner for appOwner
-									def propName = attribName == 'owner' ? 'appOwner' : attribName
+									def propName = attribName 
 									def results = personService.findOrCreatePerson(it.importValue, project, staffList)
 									def warnMsg = ''
 									if (results?.person) {
