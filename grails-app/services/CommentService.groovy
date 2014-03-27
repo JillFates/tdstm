@@ -86,7 +86,10 @@ class CommentService {
 					break
 				}
 				// Now see if it exists and belongs to the project
-				assetEntity = params.assetEntity!='null' ? AssetEntity.get(params.assetEntity) : null
+				if(params.containsKey("assetEntity")){
+					assetEntity = params.assetEntity !='null' ? AssetEntity.read(params.assetEntity) : null
+				}
+				
 				if (assetEntity) {
 					def assetProject = assetEntity.project
 					if (assetProject.id != project.id) {
@@ -147,8 +150,9 @@ class CommentService {
 				}
 			
 				commentProject = assetComment.project
-				if(params.view!='myTask')
+				if(params.containsKey("assetEntity")){
 					assetComment.assetEntity = assetEntity
+				}
 				// Make sure that the comment about to be updated is associated to the user's current project
 				if ( commentProject.id != project.id ) {
 					log.error "saveUpdateCommentAndNotes: The comment (${params.id}/${commentProject.id}) is not associated with user's current project [${project.id}]"
