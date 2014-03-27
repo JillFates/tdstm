@@ -375,4 +375,35 @@ class WsCookbookController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
+	
+	/**
+	 * List the groups
+	 * Check {@link UrlMappings} for the right call
+	 */
+	def groups = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
+		def recipeVersionId = params.recipeVersionId
+		def contextId = params.contextId
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			def groups = cookbookService.getGroups(recipeVersionId, contextId, loginUser, currentProject)
+			render(ServiceResults.success('groups' : groups) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			e.printStackTrace();
+			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (Exception e) {
+			e.printStackTrace();
+			ServiceResults.internalError(response, log, e)
+		}
+	}
 }

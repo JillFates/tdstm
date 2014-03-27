@@ -1,21 +1,20 @@
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.lang.StringUtils;
+import java.sql.ResultSet
+import java.sql.SQLException
 
+import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
+import org.springframework.dao.IncorrectResultSizeDataAccessException
+import org.springframework.jdbc.core.RowMapper
+
+import com.tds.asset.Application
 import com.tdsops.common.lang.CollectionUtils as CU
+import com.tdsops.tm.enums.domain.ContextType
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
-
-import java.sql.ResultSet
-import java.sql.SQLException
-import com.tdssrc.grails.GormUtil
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
-import org.springframework.jdbc.core.RowMapper
-
-import org.apache.shiro.SecurityUtils
 
 
 /**
@@ -358,27 +357,19 @@ class CookbookService {
 //			throw new UnauthorizedException('User doesn\'t have a RevertRecipe permission')
 //		}
 		
-		println(recipeId);
-		println(loginUser);
-		println(currentProject);
-
 		if (recipeId == null) {
-			println('001');
 			throw new EmptyResultException('Recipe id is empty');
 		}
 		if (!recipeId.isNumber()) {
-			println('002');
 			throw new EmptyResultException('Recipe id is not a number');
 		}
 		if (currentProject == null) {
-			println('003');
 			throw new EmptyResultException('Project is empty');
 		}
 		//TODO check this checkAccess(loginUser.person, currentProject)
 		def recipe = Recipe.get(recipeId)
 		
 		if (recipe.releasedVersion == null) {
-			println('004');
 			throw new EmptyResultException('Release version is empty');
 		}
 		
@@ -412,6 +403,81 @@ class CookbookService {
 		def validationResult = this.validateSyntax(sourceCode);
 		return validationResult
 	}
+	
+	/**
+	 * Returns a list of groups based on the recipeVersionId and the contextId
+	 * 
+	 * @param recipeVersionId the id of the RecipeVersion
+	 * @param contextId the id of the context
+	 * @param loginUser the current user
+	 * @param currentProject the current project
+	 * @return the list of groups
+	 */
+	def getGroups(recipeVersionId, contextId, loginUser, currentProject) {
+		if (recipeVersionId == null || !recipeVersionId.isNumber()) {
+			throw new EmptyResultException('Invalid recipeVersionId');
+		}
+		
+		RecipeVersion recipeVersion = RecipeVersion.get(recipeVersionId.toInteger())
+		
+		if (recipeVersion == null) {
+			throw new EmptyResultException('Recipe version does not exists');
+		}
+		
+		if (!recipeVersion.recipe.project.equals(currentProject)) {
+			log.warn "SECURITY: User $loginUser illegally attempted to update a recipe of different project, recipe id: $recipeId, current project: $currentProject"
+			throw new UnauthorizedException('Sorry but you can only update a recipe within the current project')
+		}
+		
+		if (contextId == null || !contextId.isNumber()) {
+			throw new EmptyResultException('Invalid contextId');
+		}
+		
+		contextId = contextId.toInteger()
+		def recipe = recipeVersion.recipe
+		def contextType = null
+		switch (recipe.context) {
+			case 'Application' :
+				contextType = ContextType.A
+				break;
+			case 'Bundle' :
+				contextType = ContextType.B
+				break;
+			case 'Event' :
+				contextType = ContextType.E
+				break;
+			default :
+				throw new IllegalArgumentException('Invalid context')
+				break;
+		}
+		
+		def context = contextType.getObject(contextId);
+
+		if (!context.belongsToClient(recipe.project.client)) {
+			throw new UnauthorizedException('The client doesn\'t own this context')
+		}
+		
+		def taskService = AH.application.mainContext.getBean('taskService')
+		def recipeMap = this.parseRecipeSyntax(recipeVersion.sourceCode)
+		def exceptions = new StringBuilder()
+		def fetchedGroups = this.taskService.fetchGroups(recipe, context, exceptions)
+		
+		return fetchedGroups.collect({ k, v ->
+			def assets = v.collect({ asset ->
+				return [
+					'id' : asset.id,
+					'name' : asset.assetName,
+					'assetType' : asset.assetType
+				]
+			})
+			
+			return [
+				'name' : k,
+				'assets' : assets
+			]
+		})
+	}
+
 	
 	/**
 	 * Returns the information about a specific version of the Recipe
@@ -1135,7 +1201,6 @@ class CookbookService {
 
 		return (errorList ?: null)
     }
-
 }
 
 class RecipeMapper implements RowMapper {

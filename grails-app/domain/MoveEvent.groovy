@@ -101,4 +101,7 @@ class MoveEvent {
 		name
 	}
 
+	boolean belongsToClient(aClient) {
+		return this.project.client.equals(aClient)
+	}
 }

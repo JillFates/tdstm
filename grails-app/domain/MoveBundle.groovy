@@ -87,4 +87,8 @@ class MoveBundle extends Party {
 	static def getUseForPlanningBundlesByProject( def project){
 		return project ? MoveBundle.findAllByProjectAndUseForPlanning(project, true) : []
 	}
+	
+	boolean belongsToClient(aClient) {
+		return this.project.client.equals(aClient)
+	}
 }

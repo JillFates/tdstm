@@ -1,8 +1,9 @@
 package com.tds.asset
 
 import Person
+import Project
 
-import com.tdsops.tm.enums.domain.ContextType;
+import com.tdsops.tm.enums.domain.ContextType
 import com.tdssrc.grails.TimeUtil
 
 class Application extends AssetEntity {
@@ -111,4 +112,7 @@ class Application extends AssetEntity {
 		"id:$id name:$assetName tag:$appVendor"
 	}
 
+	boolean belongsToClient(aClient) {
+		return this.owner.equals(aClient)
+	}
 }
