@@ -86,13 +86,16 @@ class UserService {
 			throw new ConfigurationException("Project (${config.defaultProject}) not associated with client $client")
 		}
 
-		// Parse the person's name
+		// Parse the person's name and populate a name map
 		def nameMap = [first:'', middle:'', last:userInfo.lastName]
 		def names = userInfo.firstName.split(' ')
-		if (names.size()) 
+		if (names.size()) { 
 			nameMap.first = names[0]
-		if (names.size() > 1)
-			nameMap.middle = names[1..-1].join(' ')
+			if (names.size() > 1)
+				nameMap.middle = names[1..-1].join(' ')
+		}
+		if (log.isDebugEnabled())
+			log.debug "findOrProvisionUser: parsed [${userInfo.firstName} : ${userInfo.lastName}] into $nameMap"
 
 		// Make the GUID unique to the companyId + the GUID from their authority system
 		def guid = "${userInfo.company}-${userInfo.guid}"	
