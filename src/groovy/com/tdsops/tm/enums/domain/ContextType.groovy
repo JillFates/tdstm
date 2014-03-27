@@ -1,15 +1,15 @@
 package com.tdsops.tm.enums.domain
 
-import java.util.List;
+import MoveBundle
+import MoveEvent
 
-import com.tdsops.tm.enums.domain.ContextType;
-
+import com.tds.asset.Application
 
 enum ContextType {
 
     E('Event'),
     B('Bundle'),
-    A('Application')
+    A('Application');
 
 	// Used to access the application's default value to use
 	static ContextType getDefault() {
@@ -27,6 +27,24 @@ enum ContextType {
 	ContextType(String value) {
 		this.value = value
 	}	
+	
+	public Object getObject(contextId) {
+		//abstract methods are not supported
+		switch (this) {
+			case ContextType.A:
+				return Application.get(contextId)
+				break;
+			case ContextType.B:
+				return MoveBundle.get(contextId)
+				break;
+			case ContextType.E:
+				return MoveEvent.get(contextId)
+				break;
+			default:
+				throw new IllegalArgumentException('')
+				break;
+		}
+	}
 
 	String toString() { name() }
 	String value() { value }

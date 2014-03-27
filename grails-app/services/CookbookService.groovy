@@ -425,7 +425,7 @@ class CookbookService {
 		}
 		
 		if (!recipeVersion.recipe.project.equals(currentProject)) {
-			log.warn "SECURITY: User $loginUser illegally attempted to update a recipe of different project, recipe id: $recipeId, current project: $currentProject"
+			log.warn "SECURITY: User $loginUser illegally attempted to update a recipe of different project, recipe id: $recipeVersionId, current project: $currentProject"
 			throw new UnauthorizedException('Sorry but you can only update a recipe within the current project')
 		}
 		
@@ -451,16 +451,19 @@ class CookbookService {
 				break;
 		}
 		
+		log.debug('Context type ' + contextType)
+		log.debug('Context id ' + contextId)
+
 		def context = contextType.getObject(contextId);
 
-		if (!context.belongsToClient(recipe.project.client)) {
+		if (context == null || !context.belongsToClient(recipe.project.client)) {
 			throw new UnauthorizedException('The client doesn\'t own this context')
 		}
 		
 		def taskService = AH.application.mainContext.getBean('taskService')
 		def recipeMap = this.parseRecipeSyntax(recipeVersion.sourceCode)
 		def exceptions = new StringBuilder()
-		def fetchedGroups = this.taskService.fetchGroups(recipe, context, exceptions)
+		def fetchedGroups = taskService.fetchGroups(recipeMap, context, exceptions)
 		
 		return fetchedGroups.collect({ k, v ->
 			def assets = v.collect({ asset ->
