@@ -47,6 +47,7 @@
 			var personDetails = eval("(" + e.responseText + ")");
 			$("#personId").val(personDetails.person.id)
 			$("#firstNameId").val(personDetails.person.firstName);
+			$("#middleNameId").val(personDetails.person.middleName);
 			$("#lastNameId").val(personDetails.person.lastName);
 			$("#nickNameId").val(personDetails.person.nickName);
 			$("#emailId").val(personDetails.person.email);
@@ -91,7 +92,7 @@
 	        }
 	        if(returnVal){
 				new Ajax.Request('/tdstm/person/checkPassword',{asynchronous:true,evalScripts:true,onComplete:function(e){updateWelcome(e)},parameters:'id=' + $('#personId').val() 
-											+'&firstName='+$('#firstNameId').val() +'&lastName='+$('#lastNameId').val()
+											+'&firstName='+$('#firstNameId').val() +'&lastName='+$('#lastNameId').val() +'&middleName='+$('#middleNameId').val()
 											+'&nickName='+$('#nickNameId').val()+'&title='+$('#titleId').val()+'&oldPassword='+$('#oldPasswordId').val()
 											+'&newPassword='+$('#newPasswordId').val()
 											+'&timeZone='+$('#timeZoneId').val()+'&email='+$('#emailId').val()+'&expiryDate='+expiryDate
