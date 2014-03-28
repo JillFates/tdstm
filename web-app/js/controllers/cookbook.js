@@ -73,6 +73,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			discardWIP: {
 				method: "DELETE",
 				params: {
+					domain: "cookbook",
 					section: "recipe"
 				}
 			},
