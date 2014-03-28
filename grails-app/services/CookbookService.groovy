@@ -1070,7 +1070,7 @@ class CookbookService {
 
 					if (task.containsKey('successor')) {
 						def successor = task.successor
-						if (! isaMap(successor)) {
+						if (! CU.isaMap(successor)) {
 							errorList << [ error: 1, reason: 'Invalid syntax', 
 								detail: "$taskRef 'successor' attribute is not a valid map definition" ]
 						} 

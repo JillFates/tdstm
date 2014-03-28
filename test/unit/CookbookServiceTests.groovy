@@ -53,6 +53,90 @@ class CookbookServiceTests extends GrailsUnitTestCase {
 			]
 		]"""
 
+		
+		def problemRecipe1 = """
+/**
+			 * Recipe to create branching and gather tasks
+			 */
+tasks: [
+	[
+		id: 1000,
+		title: 'MS: Prep for Move Event',
+		type: 'milestone',
+		category: 'moveday',
+		team: 'PROJ_MGR'
+	],	
+	[
+		id: 1100,
+		description: 'Validate ALL applications',
+		title: 'Validate app \${it.assetName}',
+		whom: '#shutdownBy',
+		category: 'shutdown',
+		duration: 10,
+		filter : [
+			class: 'application',
+		],
+		successor: [
+			defer: 'App Tasks'
+		]
+	],
+
+	[
+		id: 1110,
+		description: 'Schedule review of ALL applications',
+		title: 'Schedule review of app \${it.assetName}',
+		whom: '#shutdownBy',
+		category: 'shutdown',
+		duration: 10,
+		filter : [
+			class: 'application',
+		],
+		successor: [
+			defer: 'App Tasks'
+		]
+	],	
+	[
+		id: 1120,
+		description: 'Document ALL applications',
+		title: 'Document app \${it.assetName}',
+		whom: '#shutdownBy',
+		category: 'shutdown',
+		duration: 10,
+		filter : [
+			class: 'application',
+		],
+		predecessor: [
+			taskSpec:1100,	// This will allow 1110 and this (1120) to execute in parallel
+ 		]
+	],	
+
+		[
+		id: 1130,
+		description: 'Wrap-up ALL applications',
+		title: 'Wrap up app \${it.assetName}',
+		whom: '#shutdownBy',
+		category: 'shutdown',
+		duration: 10,
+		filter : [
+			class: 'application',
+		],
+		predecessor: [
+			gather: 'App Tasks',
+		]
+	],	
+
+	[
+		id: 1200,
+		title: 'MS: Prep for Move Event',
+		type: 'milestone',
+		category: 'moveday',
+		team: 'PROJ_MGR'
+	],	
+]
+
+	"""
+		
+		
 	/**
 	 * This is used to load the grails-app/conf/Config.groovy which contains both configurations as well as 
 	 * dynamic method injections for various object classes to be used by the application
@@ -88,6 +172,12 @@ class CookbookServiceTests extends GrailsUnitTestCase {
 		def recipe = "groups: [$goodGroup], tasks:[$predTask, $goodGeneralTask]"
 		def errors = cookbookService.validateSyntax( recipe )
 		assertNull errors
+	}
+	
+	void testValidateProblem1() {
+		def errors = cookbookService.validateSyntax( problemRecipe1 )
+		assertNotNull errors
+		assertFalse 'Failed for another reason and not isaMap', errors[0].detail.contains('isaMap')
 	}
 	
 	void testSimple() {
