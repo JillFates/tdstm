@@ -123,7 +123,7 @@ form.groups{
 	margin: 0 0 10px 0;
 }
 
-.gridStyleTasks {
+.gridStyleTasks, .gridStyleGroups{
 	border: 1px solid rgb(212,212,212);
 	height: 154px;
 	margin: 0 0 10px 0;
@@ -221,7 +221,7 @@ form.taskGeneration{
 	padding: 10px 0 0 0;
 }
 
-form.taskGeneration label.inline{
+form.taskGeneration label.inline, .groups label.inline{
 	margin: 0 5% 0 0;
 	display: inline;
 }

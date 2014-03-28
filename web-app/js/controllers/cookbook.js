@@ -4,12 +4,19 @@ app.config(['$logProvider', function($logProvider) {
    //$logProvider.debugEnabled(false);  
 }]);
 
+app.config(['$httpProvider', function($httpProvider) {
+    $httpProvider.interceptors.push('servicesInterceptor');
+}]);
+
 app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $resource, $timeout, $modal, 
 	$log, $location, $anchorScroll, $sce) {
 	
 	// All Vars used
 	var restCalls, restCalls, listRecipes, columnSel, actionsTemplate, updateBtns, lastLoop, confirmation, 
-	confirmation, rowToShow, ModalInstanceCtrl;
+	confirmation, rowToShow, ModalInstanceCtrl, checkLoginStatus;
+
+	var layoutPluginGroups = new ngGridLayoutPlugin();
+	var layoutPluginTasks = new ngGridLayoutPlugin();
 
 	$http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
 	// Resource Calls
@@ -462,7 +469,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 				// Only call getWipRecipe if there is the recipe has WIP
 				var callGetWipService = function(){
-					restCalls.getARecipeVersion({details:item.recipeId, moreDetails: 0}, function(data){
+					restCalls.getARecipeVersion({details:item.recipeId, moreDetails: 0}, function(data, xhr){
 						// This is the selected recipe data.
 						$scope.selectedRWip = (data.data) ? data.data : null;
 						fillTheVars();
@@ -474,8 +481,10 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 					});
 				}
 
-				restCalls.getARecipeVersion({details:item.recipeId}, function(data){
+				restCalls.getARecipeVersion({details:item.recipeId}, function(data, xhr){
 					// This is the selected recipe data.
+					//checkLoginStatus(xhr('x-login-url'));
+
 					$scope.selectedRVersion = (data.data) ? data.data : null;
 					if($scope.selectedRVersion.hasWIP){
 						// Only call getWipRecipe if there is the recipe has WIP
@@ -704,7 +713,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		validateSyntax : function(){
 			var dataToSend = $.param({'sourceCode': $scope.selectedRecipe.sourceCode});
 			restCalls.validate({}, dataToSend, function(data){
-				$scope.currentSyntaxValidation = data.errors;
+				$scope.currentSyntaxValidation = data.errors || [{"error":0,"reason":"No errors found"}];
 				$scope.activeSubTabs.editor.syntaxErrors = true;
 			}, function(data){
 				$log.warn('Error on validation');
@@ -1224,10 +1233,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			if(data.data.list.length == 0){
 				$scope.tasks.selectedTaskBatch = null;
 			}
-
-			$log.warn($scope.tasks.tasksGrid);
-			$scope.tasks.tasksGrid.selectRow(0, true);
-
+			
 			$timeout(function(){
 				$scope.enabledGridSelection = true;
 			}, 200)
@@ -1255,76 +1261,170 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 	//Tasks Grid///////////////
 	
-		$scope.tasks.gridData = [{'message': 'No results found', 'context': 'none'}];
+	$scope.tasks.gridData = [{'message': 'No results found', 'context': 'none'}];
 
-		$scope.tasks.colDef = [{field:'message', displayName:'Message', enableCellEdit: false, width: '100%'}];
-		
-		var lastLoop;
-		$scope.tasks.tasksGrid = {
-			data: 'tasks.gridData',
-			multiSelect: false,
-			columnDefs: 'tasks.colDef',
-			enableCellEditOnFocus: false,
-			afterSelectionChange: function(rowItem){
-				if(rowItem != $scope.tasks.currentSelectedTaskRow){
-					$scope.tasks.currentSelectedTaskRow = rowItem;
-					// This hack is to avoid changeRecipe() to be executed many times. 
-					// This is a known issue on the ng-grid for the afterSelectionChange event.
-					$timeout.cancel(lastLoop);
-					lastLoop = $timeout(function(){
-						if(rowItem.entity.id){
-							$log.info('Row changed');
-							$scope.tasks.selectedTaskBatch = rowItem.entity;
-						}
-					}, 50)
-					
-				}
+	$scope.tasks.colDef = [{field:'message', displayName:'Message', enableCellEdit: false, width: '100%'}];
+	
+	var lastLoop;
+	$scope.tasks.tasksGrid = {
+		data: 'tasks.gridData',
+		multiSelect: false,
+		columnDefs: 'tasks.colDef',
+		selectedItems: [],
+		plugins: [layoutPluginTasks],
+		enableCellEditOnFocus: false,
+		afterSelectionChange: function(rowItem){
+			if(rowItem != $scope.tasks.currentSelectedTaskRow){
+				$scope.tasks.currentSelectedTaskRow = rowItem;
+				// This hack is to avoid changeRecipe() to be executed many times. 
+				// This is a known issue on the ng-grid for the afterSelectionChange event.
+				$timeout.cancel(lastLoop);
+				lastLoop = $timeout(function(){
+					if(rowItem.entity.id){
+						$log.info('Row changed');
+						$scope.tasks.selectedTaskBatch = rowItem.entity;
+					}
+				}, 50)
+				
 			}
-		}; 
+		}
+	}; 
 
-		// Tasks Grid Actions
-		$scope.tasks.tasksGridActions = function(item, action){
-			$log.info(action);
-			if(action == 'refresh'){
-				// TODO // There is no service for this yet.
-			}else if(action == 'remove'){
-				$scope.tasks.deleteTaskBatch(item.entity.id);
-			}else if(action == 'publishUnpublish'){
-				item.entity.isPublished = (item.entity.isPublished) ? false : true;
-				$scope.tasks.publishUnpublishTaskBatch(item.entity);
-			}
-		};
+	// Tasks Grid Actions
+	$scope.tasks.tasksGridActions = function(item, action){
+		$log.info(action);
+		if(action == 'refresh'){
+			// TODO // There is no service for this yet.
+		}else if(action == 'remove'){
+			$scope.tasks.deleteTaskBatch(item.entity.id);
+		}else if(action == 'publishUnpublish'){
+			item.entity.isPublished = (item.entity.isPublished) ? false : true;
+			$scope.tasks.publishUnpublishTaskBatch(item.entity);
+		}
+	};
 
-		// Delete tasks batch function
-		$scope.tasks.deleteTaskBatch = function(id){
-			restCalls.deleteTaskBatch({section: id}, function(data){
-				$log.info('Success on deleting task');
+	// Delete tasks batch function
+	$scope.tasks.deleteTaskBatch = function(id){
+		restCalls.deleteTaskBatch({section: id}, function(data){
+			$log.info('Success on deleting task');
+			$log.info(data);
+		}, function(){
+			$log.info('Error on deleting task');
+		});
+	}
+
+	// Publish && Unpublish tasks batch functions
+	$scope.tasks.publishUnpublishTaskBatch = function(obj){
+		if(obj.isPublished){
+			restCalls.publishTaskBatch({section: obj.id}, function(data){
+				$log.info('Success on publishing task');
 				$log.info(data);
 			}, function(){
-				$log.info('Error on deleting task');
+				$log.info('Error on publishing task');
+			});
+		}else{
+			restCalls.unpublishTaskBatch({section: obj.id}, function(data){
+				$log.info('Success on unpublishing task');
+				$log.info(data);
+			}, function(){
+				$log.info('Error on unpublishing task');
 			});
 		}
+	}
 
-		// Publish && Unpublish tasks batch functions
-		$scope.tasks.publishUnpublishTaskBatch = function(obj){
-			if(obj.isPublished){
-				restCalls.publishTaskBatch({section: obj.id}, function(data){
-					$log.info('Success on publishing task');
-					$log.info(data);
-				}, function(){
-					$log.info('Error on publishing task');
-				});
-			}else{
-				restCalls.unpublishTaskBatch({section: obj.id}, function(data){
-					$log.info('Success on unpublishing task');
-					$log.info(data);
-				}, function(){
-					$log.info('Error on unpublishing task');
-				});
-			}
-		}
+	$scope.tasks.updateGrid = function(){
+		$log.log($scope.tasks.tasksGrid);
+		if($scope.tasks.tasksGrid.selectedItems.length == 0){
+    		layoutPluginTasks.updateGridLayout();
+    		$scope.tasks.tasksGrid.selectRow(0, true)
+    	}
+    };
 
 	///////////////////////////
+
+	//GROUPS///////////////////
+
+	$scope.groups = {
+		groupsArray : [],
+		assetsArray : [],
+		selectedGroup : '',
+		selectedAsset : '',
+		selectedGroup : '',
+		selectedGroupRow : ''
+	}
+
+	$scope.groups.gridData = [];
+
+	$scope.groups.colDef = [
+		{field:'class', displayName:'Class', enableCellEdit: false},
+		{field:'name', displayName:'Name', enableCellEdit: false},
+		{field:'count', displayName:'Count', enableCellEdit: false}
+	];
+
+	//$scope.groups.colDef = [{field:'message', displayName:'Message', enableCellEdit: false, width: '100%'}];
+	var lastLoop;
+	$scope.groups.groupsGrid = {
+		data: 'groups.groupsArray',
+		multiSelect: false,
+		columnDefs: 'groups.colDef',
+		enableCellEditOnFocus: false,
+		selectedItems: [],
+		plugins: [layoutPluginGroups],
+		afterSelectionChange: function(rowItem){
+			if(rowItem != $scope.groups.selectedGroup){
+				$scope.groups.selectedGroupRow = rowItem;
+				// This hack is to avoid changeRecipe() to be executed many times. 
+				// This is a known issue on the ng-grid for the afterSelectionChange event.
+				$timeout.cancel(lastLoop);
+				lastLoop = $timeout(function(){
+					if(rowItem.entity.id){
+						$log.info('Group changed');
+						$scope.groups.selectedGroup = rowItem.entity;
+						$log.info($scope.groups.selectedGroup);
+					}
+				}, 50)
+				
+			}
+		}
+	};
+
+	$scope.groups.getGroupsArray = function(){
+		$scope.groups.groupsArray = [
+			{'id': '01', 'class': 'Application', 'name': 'APP_ALL', 'count': 5},
+			{'id': '02', 'class': 'Application', 'name': 'APP_CRIT', 'count': 15}
+		]
+	}
+
+	$scope.groups.getListGroups = function(){
+		$scope.enabledGridSelection = false;
+
+		$scope.groups.colDef = [
+			{field:'class', displayName:'Class', enableCellEdit: false},
+			{field:'name', displayName:'Name', enableCellEdit: false},
+			{field:'count', displayName:'Count', enableCellEdit: false}
+		];
+
+		$scope.groups.getGroupsArray();
+
+		$scope.groups.assetsArray = [
+			{name: 'Payroll'},
+			{name: 'HR'}
+		]
+
+		$timeout(function(){
+			$scope.enabledGridSelection = true;
+		}, 200)
+	}
+
+	$scope.groups.getListGroups();
+
+	$scope.groups.updateGrid = function(){
+    	$log.log($scope.groups.groupsGrid);
+    	if($scope.groups.groupsArray.length > 0 && $scope.groups.groupsGrid == 0){
+    		layoutPluginGroups.updateGridLayout();
+			$scope.groups.groupsGrid.selectRow(0, true);
+    	}
+    };
 
 });
 
@@ -1336,3 +1436,19 @@ angular.module('modNgBlur', [])
 		});
 	};
 });
+
+app.factory('servicesInterceptor', [function() {
+    var servicesInterceptor = {
+        response: function(response) {
+        	var loginRedirect = response.headers('x-login-url');
+            if(!loginRedirect){
+            	return response;
+            }else{
+            	alert("Your session has expired and need to login again.");
+            	location.reload();
+            	//window.location.href = loginRedirect;
+            }
+        }
+    };
+    return servicesInterceptor;
+}]);

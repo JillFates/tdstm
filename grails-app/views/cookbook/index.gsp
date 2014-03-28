@@ -23,7 +23,8 @@
 	<g:javascript src="angular-resource.js" />
 	<g:javascript src="ui-bootstrap-tpls-0.10.0.js" />
 	<g:javascript src="controllers/cookbook.js" />
-	<g:javascript src="ng-grid-2.0.7.debug.js" />
+	<g:javascript src="ngGrid/ng-grid-2.0.7.debug.js" />
+	<g:javascript src="ngGrid/ng-grid-layout.js" />
 </head>
 <body>
 	<div class="body" id="cookbookRecipesEditor" ng-app="cookbookRecipes" ng-controller="CookbookRecipeEditor">
@@ -142,7 +143,7 @@
 							</tab>
 
 							%{-- History --}%
-							<tab heading="History" active="activeTabs.history" ng-click="tasks.tasksGrid.selectRow(0, true)">
+							<tab heading="History" active="activeTabs.history" ng-click="tasks.updateGrid()">
 								
 								<div class="gridStyleTasks" ng-grid="tasks.tasksGrid"></div>
 								
@@ -224,80 +225,44 @@
 											</tab>
 
 											%{-- Groups Content --}%
-											<tab heading="Groups" active="activeSubTabs.editor.groups">
-												<form action="#" class="form-inline groups clearfix">
-													<div class="form-group col-xs-7">
-														<label for="testWith">Test With: </label>
-														<select name="testOptions" class="form-control" id="testOptions" ng-disabled="!currentSelectedRecipe" >
-															<option value="wave1">Wave 1</option>
-															<option value="wave2">Wave 2</option>
-														</select>
+											<tab heading="Groups" active="activeSubTabs.editor.groups" ng-click="groups.updateGrid()">
+												<div class="groups">
+													<div class="form-group">
+														<label class="inline text-right" for="eventSelect">Event:</label>
+															<select name="eventSelect" id="eventSelect" ng-model="tasks.selectedEvent" ng-change="tasks.eventSelected()" ng-options="item as item.name for item in tasks.eventsArray" ng-change="tasks.validCurrentSelection = tasks.getGenerateBtnStatus()">
+																<option value="">Please select</option>
+															</select>
+														
+													</div>	
+													
+													<div class="form-group">
+														<label class="inline text-right" ng-show="currentSelectedRecipe.context == 'Bundle' || currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'" for="eventSelect">Bundle:</label>
+															<select name="bundleSelect" id="bundleSelect" ng-model="tasks.selectedBundle" ng-change="tasks.bundleSelected()" ng-options="item as item.name group by item.group for item in tasks.bundlesArray">
+																<option value="">Please select</option>
+															</select>
+														
 													</div>
-													<div class="form-group col-xs-5">
-														<button type="submit" ng-disabled="!currentSelectedRecipe"  class="btn btn-default pull-right">Refresh</button>
+
+													<div class="form-group">
+														<label class="inline text-right" ng-show="currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'" for="eventSelect">Application:</label>
+															<select name="applicationSelect" id="applicationSelect" ng-model="tasks.selectedApplication" ng-change="tasks.checkValidSelection()" ng-options="item as item.name group by item.group for item in tasks.applicationsArray">
+																<option value="">Please select</option>
+															</select>
+														
 													</div>
-												</form>
-												<div class="table-responsive groupsTable">
-													<table class="table table-hover table-striped ngGridTable">
-														<thead>
-															<tr>
-																<th>Class</th>
-																<th>Name</th>
-																<th>Count</th>
-															</tr>
-														</thead>
-														<tbody> 
-															<tr>
-																<td>Application</td>
-																<td>APP_ALL</td>
-																<td>15</td>
-															</tr>
-															<tr>
-																<td>Application</td>
-																<td>APP_CRIT</td>
-																<td>5</td>
-															</tr>
-															<tr>
-																<td>Application</td>
-																<td>APP_NONCRIT</td>
-																<td>10</td>
-															</tr>
-															<tr>
-																<td>Server</td>
-																<td>SRV_ALL</td>
-																<td>38</td>
-															</tr>
-															<tr>
-																<td>Server</td>
-																<td>SRV_VM</td>
-																<td>12</td>
-															</tr>
-														</tbody>
-													</table>
+
+													<div class="refreshWrapper">
+														<label for="refreshGroups">
+															<a class="btn btn-default" id="refreshGroups">
+																Fetch
+															</a>
+														</label>
+													</div>
+													
+													<div class="gridStyleGroups" style="margin-top:15px;" ng-grid="groups.groupsGrid"></div>
+
 												</div>
-												<div class="table-responsive groupsTable2">
-													<table class="table table-hover table-striped ngGridTable">
-														<thead>
-															<tr>
-																<th>Asset Name</th>
-															</tr>
-														</thead>
-														<tbody> 
-															<tr>
-																<td>Payroll</td>
-															</tr>
-															<tr>
-																<td>HR</td>
-															</tr>
-															<tr>
-																<td>SAP</td>
-															</tr>
-															<tr>
-																<td>Exchange</td>
-															</tr>
-														</tbody>
-													</table>
-												</div>
+										
 											</tab>
 											%{-- Syntax Errors Content --}%
 											<tab heading="Syntax Errors" class="no-padding" active="activeSubTabs.editor.syntaxErrors">
