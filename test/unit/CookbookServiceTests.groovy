@@ -176,8 +176,7 @@ tasks: [
 	
 	void testValidateProblem1() {
 		def errors = cookbookService.validateSyntax( problemRecipe1 )
-		assertNotNull errors
-		assertFalse 'Failed for another reason and not isaMap', errors[0].detail.contains('isaMap')
+		assertNull errors
 	}
 	
 	void testSimple() {

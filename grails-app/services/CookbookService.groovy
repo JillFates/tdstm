@@ -803,6 +803,10 @@ class CookbookService {
 				inverse:true,
 				classification: ['device','database','application','storage']
 			],
+			successor: [
+				defer: [],
+				gather: []
+			],
 			constraintTime:0,
 			constraintType:0
 		]
