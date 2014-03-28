@@ -643,10 +643,13 @@ class ReportsService {
 	/**
 	 *  Used to generate server conflicts Report.
 	 */
-	def genServerConflicts(def moveBundleId, def bundleConflicts, def unresolvedDep, def runsOn, def vmSupport, def planning){
+	def genServerConflicts(def moveBundleId, def bundleConflicts, def unresolvedDep, def runsOn, def vmSupport, def planning, params){
 		def project = securityService.getUserCurrentProject()
 		ArrayList assetList = new ArrayList()
 		def assetsInBundle = []
+		def maxR = params.rows ? Integer.valueOf(params.rows) : 50
+		def ofst = params.offset ? Integer.valueOf(params.offset) : 0
+		def appCount = params.appCount ?:0
 		log.info "****bundle:${moveBundleId} bundleConflicts:${bundleConflicts} unresolvedDep:${unresolvedDep} RunsOn:${runsOn}  vmSupport:${vmSupport} planning:${planning} "
 		def bundles = []
 		if(planning) {
@@ -655,12 +658,15 @@ class ReportsService {
 		} else {
 			bundles = [MoveBundle.findById(moveBundleId)]
 		}
-		if(bundles)
-			assetsInBundle = AssetEntity.findAll(" FROM AssetEntity WHERE moveBundle IN (:bundles) AND assetType IN (:types)",[bundles:bundles, types:AssetType.getServerTypes()])
-		
+		if(bundles){
+			assetsInBundle = AssetEntity.findAll(" FROM AssetEntity WHERE moveBundle IN (:bundles) AND assetType IN (:types) ORDER BY assetName",
+									[bundles:bundles, types:AssetType.getServerTypes()],[max: maxR, offset: ofst])
+			if(appCount==0)
+				appCount = AssetEntity.findAll(" FROM AssetEntity WHERE moveBundle IN (:bundles) AND assetType IN (:types)",
+									[bundles:bundles, types:AssetType.getServerTypes()]).size()
+		}
 		log.info "${assetsInBundle}"
 		def titleString = new StringBuffer("");
-		
 		if(bundleConflicts){
 			titleString.append('Bundle Conflicts')
 		}
@@ -727,7 +733,8 @@ class ReportsService {
 				assetList.add([ 'app':asset, 'dependsOnList':dependsOnList, 'supportsList':supportsList, 'dependsOnIssueCount':dependsOnList.size, 'supportsIssueCount':supportsList.size, header:header ])
 		}
 		return['project':project, 'appList':assetList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : "Planning Bundles", 
-				'columns':9, title:StringUtils.stripStart(titleString.toString(), ",")
+				'columns':9, title:StringUtils.stripStart(titleString.toString(), ","), maxR:maxR, ofst:ofst+maxR, bundleConflicts:bundleConflicts, unresolvedDependencies:params.unresolvedDep,
+					noRunsOn:params.noRuns, vmWithNoSupport:params.vmWithNoSupport, moveBundleId:params.moveBundle, appCount:appCount
 				]
 	}
 }

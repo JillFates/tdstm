@@ -1604,8 +1604,10 @@ class ReportsController {
 		def unresolvedDependencies = params.unresolvedDep == 'on'
 		def noRunsOn = params.noRuns == 'on'
 		def vmWithNoSupport = params.vmWithNoSupport == 'on'
+		def view = params.rows ? "_serverConflicts" : "generateServerConflicts"
+		
 		if( params.moveBundle == 'useForPlanning' ){
-			return reportsService.genServerConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noRunsOn, vmWithNoSupport, true)
+				render (view : view , model : reportsService.genServerConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noRunsOn, vmWithNoSupport, true, params))
 		}
 		if( moveBundleId && moveBundleId.isNumber() ){
 			def isProjMoveBundle  = MoveBundle.findByIdAndProject( moveBundleId, project )
@@ -1616,11 +1618,10 @@ class ReportsController {
 				errorMsg = ""
 				userPreferenceService.setPreference( "MOVE_BUNDLE", "${moveBundleId}" )
 				moveBundleInstance = MoveBundle.get(moveBundleId)
-				return reportsService.genServerConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noRunsOn, vmWithNoSupport, false)
+				render (view : view , model : reportsService.genServerConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noRunsOn, vmWithNoSupport, false, params))
+				
 			}
 		}
-		flash.message = errorMsg
-		redirect( action:"serverConflicts")
 	}
 	/**
 	 * used to render to application Migration Report selection criteria.

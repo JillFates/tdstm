@@ -7,12 +7,49 @@
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
 <script>
+	var maxR
+	var ofst
+	var bundleConflicts 
+	var unresolvedDependencies
+	var noRunsOn
+	var vmWithNoSupport
+	var moveBundleId
+	var appCount
+	
 	$(document).ready(function() {
 		$("#showEntityView").dialog({ autoOpen: false })
 		$("#editEntityView").dialog({ autoOpen: false })
 		currentMenuId = "#reportsMenu";
 		$("#reportsMenuId a").css('background-color','#003366')
+
+		maxR = ${maxR}
+		ofst = ${ofst}
+		bundleConflicts = '${bundleConflicts}'
+		unresolvedDependencies = '${unresolvedDependencies}'
+		noRunsOn = '${noRunsOn}'
+		vmWithNoSupport = '${vmWithNoSupport}'
+		moveBundleId = '${moveBundleId}'
+		appCount = ${appCount}
+		if(appCount>50)
+			generateServers()
 	});
+	function generateServers(){
+		jQuery.ajax({
+			url: contextPath+"/reports/generateServerConflicts",
+			data: {'rows':maxR, 'appCount':appCount,'offset':ofst, 'bundleConflicts':bundleConflicts, 'unresolvedDep':unresolvedDependencies, 'vmWithNoSupport':vmWithNoSupport, 'moveBundle':moveBundleId, 'noRuns':noRunsOn},
+			type:'POST',
+			success: function(data) {
+				$("#serverConflictTbody").append(data)
+				if(ofst<appCount){
+					ofst = ofst+maxR;
+					generateServers()
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert("An unexpected error occurred while updating asset.")
+			}
+		});
+	}
 </script>
 </head>
 <body>
@@ -25,120 +62,13 @@
 			${time}
 		</div>
 		${eventErrorString}
-
 		<table>
-			<tbody>
-				<tr>
-					<td >
-					</td>
-					<td>
-						<g:each var="appList" in="${appList}" var="assetEntity" status="i">
-							<table class="conflictApp">
-								<thead>
-									<tr>
-										<th colspan="${columns}">
-											<a href="javascript:getEntityDetails('Server','server',${assetEntity.app.id})" class="inlineLink">${assetEntity.app.assetName}</a>
-											<g:if test="${assetEntity.app.moveBundle.useForPlanning}"> (${assetEntity.app.moveBundle})</g:if> 
-												- Supports ${assetEntity.supportsList.size()} , Depends on ${assetEntity.dependsOnList.size()} 
-												<span style="color: red;">${assetEntity.header?' - '+assetEntity.header:''}</span>
-										</th>
-									</tr>
-								</thead>
-								<tbody class="conflictAppBody">
-								
-									<g:if test="${assetEntity.supportsList.size() > 0}">
-										<tr>
-											<td class="leftCells"></td>
-											<td colspan="${columns-1}">Supports (${assetEntity.supportsIssueCount} Issues)</td>
-										</tr>
-										<tr class="headRow">
-											<td class="leftCells"></td>
-											<td class="leftCells"></td>
-											<td>Type</td>
-											<td>Class</td>
-											<td>Name</td>
-											<td>Frequency</td>
-											<td>Bundle</td>
-											<td>Status</td>
-										</tr>
-										<g:each in="${assetEntity.supportsList}" var="supports" status="j">
-											<tr class="${(j % 2) == 0 ? 'odd' : 'even'}">
-												<td class="leftCells"></td>
-												<td class="leftCells"></td>
-												<td>
-													${supports.type}
-												</td>
-												<td>
-													${supports.asset.assetType}
-												</td>
-												<td>
-													${supports.asset.assetName}
-												</td>
-												<td>
-													${supports.dataFlowFreq}
-												</td>
-												<td>
-													<g:if test="${supports.asset.moveBundle != assetEntity.app.moveBundle}"><b style="color:red;">${supports.asset.moveBundle}</b></g:if>
-													<g:else>${supports.asset.moveBundle}</g:else>
-												</td>
-												<td>
-													<g:if test="${supports.status in ['Questioned','Unknown']}"><b style="color:red;">${supports.status}</b></g:if>
-													<g:else>${supports.status}</g:else>
-												</td>
-											</tr>
-										</g:each>
-									</g:if>
-									
-									<g:if test="${assetEntity.dependsOnList.size() > 0}">
-										<tr>
-											<td class="leftCells"></td>
-											<td colspan="${columns-1}">Dependencies (${assetEntity.dependsOnIssueCount} Issues)</td>
-										</tr>
-										<tr class="headRow">
-											<td class="leftCells"></td>
-											<td class="leftCells"></td>
-											<td>Type</td>
-											<td>Class</td>
-											<td>Name</td>
-											<td>Frequency</td>
-											<td>Bundle</td>
-											<td>Status</td>
-										</tr>
-										<g:each in="${assetEntity.dependsOnList}" var="depOn" status="j">
-											<tr class="${(j % 2) == 0 ? 'odd' : 'even'}">
-												<td class="leftCells"></td>
-												<td class="leftCells"></td>
-												<td>
-													${depOn.type}
-												</td>
-												<td>
-													${depOn.dependent.assetType}
-												</td>
-												<td>
-													${depOn.dependent.assetName}
-												</td>
-												<td>
-													${depOn.dataFlowFreq}
-												</td>
-												<td>
-													<g:if test="${depOn.dependent.moveBundle != assetEntity.app.moveBundle}"><b style="color:red;">${depOn.dependent.moveBundle}</b></g:if>
-													<g:else>${depOn.dependent.moveBundle}</g:else>
-												</td>
-												<td>
-													<g:if test="${depOn.status in ['Questioned','Unknown']}"><b style="color:red;">${depOn.status}</b></g:if>
-													<g:else>${depOn.status}</g:else>
-												</td>
-											</tr>
-										</g:each>
-									</g:if>
-									
-								</tbody>
-							</table>
-						</g:each>
-					</td>
-				</tr>
+			<tbody id="serverConflictTbody">
+			<g:render template="serverConflicts"></g:render>
 			</tbody>
 		</table>
+
+		
 	<div id="showEntityView" style="display: none;"></div>
 	<div id="editEntityView" style="display: none;"></div>
 
