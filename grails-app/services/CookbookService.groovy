@@ -639,7 +639,48 @@ class CookbookService {
 		
 		return recipes
     }
-	
+
+	/**
+	 * Finds the recipes versions for a given recipe id.
+	 *
+	 * @param recipeId recipe id to search
+	 *
+	 * @return a list of Maps with information about the recipes. See {@link RecipeMapper}
+	 */
+	def findRecipeVersions(recipeId, currentProject) {
+
+		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
+			throw new EmptyResultException();
+		}
+
+		def recipe = Recipe.get(recipeId)
+
+		if (recipe == null) {
+			throw new EmptyResultException();
+		}
+
+		if (!recipe.project.equals(currentProject)) {
+			throw new UnauthorizedException('User is trying to archive/unarchived recipe whose project that is not the current ' + recipeId + ' currentProject ' + currentProject.id)
+		}
+
+		def arguments = [
+			"recipeId" : recipeId
+		]
+
+		def recipeVersions = namedParameterJdbcTemplate.query("""
+			SELECT DISTINCT recipe.recipe_id as recipeId, recipe_version.recipe_version_id as recipeVersionId,
+							recipe_version.version_number as versionNumber, recipe_version.last_updated as lastUpdated,
+							CONCAT(person.first_name, ' ', person.last_name) as createdBy, if ((recipe.released_version_id = recipe_version.recipe_version_id), true, false) as isCurrentVersion
+			FROM recipe
+			INNER JOIN recipe_version ON recipe.recipe_id = recipe_version.recipe_id 
+			INNER JOIN person ON person.person_id = recipe_version.created_by_id
+			WHERE recipe.recipe_id = :recipeId
+			ORDER BY version_number DESC
+			""", arguments, new RecipeVersionMapper())
+
+		return recipeVersions
+	}
+
 	/**
 	 * Archives the recipe with recipeId depending on the archived parameter
 	 * 
@@ -1225,3 +1266,17 @@ class RecipeMapper implements RowMapper {
 		return rowMap
 	}
 }
+
+class RecipeVersionMapper implements RowMapper {
+	@Override
+	public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+		def rowMap = [:]
+		rowMap.id = rs.getInt('recipeVersionId')
+		rowMap.versionNumber = (rs.getInt('versionNumber').equals(0)) ? '' : rs.getInt('versionNumber')
+		rowMap.lastUpdated = rs.getTimestamp('lastUpdated')
+		rowMap.createdBy = rs.getString('createdBy')
+		rowMap.isCurrentVersion = (rs.getInt('isCurrentVersion').equals(1)) ? true : false
+		return rowMap
+	}
+}
+

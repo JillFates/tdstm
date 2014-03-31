@@ -284,7 +284,41 @@ class WsCookbookController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
+	/**
+	 * List of RecipeVersion objects for a given recipe id.
+	 * 
+	 * Check {@link UrlMappings} for the right call
+	 */
+	def recipeVersionList = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		def currentProject = securityService.getUserCurrentProject()
+
+		def recipeId = params.id
+
+		try {
+			def results = cookbookService.findRecipeVersions(recipeId, currentProject)
+			def dataMap = [:]
+			dataMap.recipeVersions = results
+
+			render(ServiceResults.success(dataMap) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.methodFailure(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (IllegalArgumentException e) {
+			ServiceResults.methodFailure(response)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
+	}
+
 	/**
 	 * Validates the syntax of the source code of a recipe
 	 * Check {@link UrlMappings} for the right call
