@@ -206,7 +206,7 @@
 								<td class="label ${config.os}" nowrap="nowrap"><label for="os">OS</label></td>
 								<td ><input type="text" id="os" name="os" class="${config.os}" value="${assetEntityInstance.os}"  tabindex="24"/></td>
 								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-								<td><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${assetEntityInstance.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="38" noSelection="${['null':' Please Select']}"/></td>
+								<td><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${assetEntityInstance.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="38"/></td>
 								<td class="label ${config.size}" nowrap="nowrap"><label for="size">Size/Scale </label></td>
                                 <td nowrap="nowrap" class="sizeScale">
                                     <input type="text" id="size" name="size" class="${config.size}" value="${assetEntityInstance.size}" tabindex="39"/>
