@@ -4310,7 +4310,8 @@ class AssetEntityController {
 
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
-
+		def depGroups = JSON.parse(session.getAttribute('Dep_Groups'))
+		
 		def depSql = """SELECT  
 		   sum(if(a.asset_type in ( ${AssetType.getPhysicalServerTypesAsString()} ), 1, 0)) as serverCount,
 		   sum(if(a.asset_type in ( ${AssetType.getVirtualServerTypesAsString()} ), 1, 0)) as vmCount,
@@ -4321,9 +4322,6 @@ class AssetEntityController {
 		join asset_entity a ON a.asset_entity_id=adb.asset_id
 		where adb.project_id=${projectId}
 		"""
-		if(params.bundle)
-			depSql+=" and a.move_bundle_id = ${params.bundle} "
-		
 
 		def assetDependentlist
 		def selectionQuery = ''
@@ -4338,12 +4336,15 @@ class AssetEntityController {
 		} else if (params.dependencyBundle == 'onePlus') {
 			// Get all the groups other than zero - these are the groups that have interdependencies
 			multiple = true;
-			selectionQuery = " and adb.dependency_bundle > 0"
-			mapQuery = " AND deps.bundle > 0"
-			nodesQuery = " AND dependency_bundle > 0 "
+			selectionQuery = " and adb.dependency_bundle in (${WebUtil.listAsMultiValueString(depGroups-[0])})"
+			mapQuery = " AND deps.bundle in (${WebUtil.listAsMultiValueString(depGroups-[0])})"
+			nodesQuery = " AND dependency_bundle in (${WebUtil.listAsMultiValueString(depGroups-[0])})"
 		} else {
 			// Get 'all' assets that were bundled
 			multiple = true;
+			selectionQuery = " and adb.dependency_bundle in (${WebUtil.listAsMultiValueString(depGroups)})"
+			mapQuery = " AND deps.bundle in (${WebUtil.listAsMultiValueString(depGroups)})"
+			nodesQuery = " AND dependency_bundle in (${WebUtil.listAsMultiValueString(depGroups)})"
 		}
 		def queryFordepsList = """
 			SELECT deps.asset_id AS assetId, ae.asset_name AS assetName, deps.dependency_bundle AS bundle, 
@@ -4358,8 +4359,6 @@ class AssetEntityController {
 			LEFT OUTER JOIN move_event me ON me.move_event_id = mb.move_event_id 
 			LEFT OUTER JOIN application app ON app.app_id = ae.asset_entity_id
 			"""
-		if(params.bundle)
-			queryFordepsList +=" WHERE ae.move_bundle_id = ${params.bundle} "
 			
 		assetDependentlist = jdbcTemplate.queryForList(queryFordepsList)
 		depSql += selectionQuery

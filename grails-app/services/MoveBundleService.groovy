@@ -514,8 +514,6 @@ class MoveBundleService {
 			JOIN asset_entity a ON a.asset_entity_id=adb.asset_id
 			WHERE adb.project_id=${projectId}""")
 
-		    if( moveBundleId )
-				depSql.append(" AND a.move_bundle_id = ${moveBundleId}")
 			
 			depSql.append(" GROUP BY adb.dependency_bundle ORDER BY adb.dependency_bundle ")
 
@@ -524,6 +522,13 @@ class MoveBundleService {
 		// log.info "dependencyConsoleMap() : dependList[0]"
  		// log.info "dependencyConsoleMap() : stats=$stats}"
 
+		if( moveBundleId )
+		 	dependList = dependList.collect{ if( it.moveBundles.contains(moveBundleId)){ it } }
+	 
+		dependList.removeAll([null])
+		def groups = dependList.dependencyBundle
+		userPreferenceService.getSession().setAttribute( 'Dep_Groups', (groups as JSON).toString() )
+	
 		dependList.each { group ->
 	 		def depGroupsDone = group.statusAssigned + group.statusMoved
 			def statusClass = ''
