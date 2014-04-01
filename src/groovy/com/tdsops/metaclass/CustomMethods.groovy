@@ -7,8 +7,14 @@ package com.tdsops.metaclass
 class CustomMethods {
 
  	// Setup a Singleton pattern so we only initialize the methods once
-	private static final INSTANCE = new CustomMethods()
-    static getInitialize() { return INSTANCE }
+	private static INSTANCE 
+    
+	static getInitialize() {
+		if (INSTANCE == null) {
+			INSTANCE = new CustomMethods()
+		} 
+		return INSTANCE 
+	}
 
     /**
      * private constructor that will inject the new functions onto the various classes
@@ -20,10 +26,10 @@ class CustomMethods {
 		 * @param String or Closure - as a String, it would be the property name or as a Closure a method that computes the key referencing the object
 		 * @return Map
 		 */
-		List.metaClass.asMap = { arg ->
+		ArrayList.metaClass.asMap = { arg ->
 			def result = [:]
 			def isClosure = (arg instanceof Closure)
-			delegate.each { 
+			delegate.each {
 				def key = isClosure ? arg(it) : it[arg]
 				result.putAt(key.toString(), it)
 			}
@@ -35,7 +41,7 @@ class CustomMethods {
 		 * @param String or Closure - as a String, it would be the property name or as a Closure a method that computes the key referencing the object
 		 * @return Map
 		 */
-		List.metaClass.asGroup = { arg ->
+		ArrayList.metaClass.asGroup = { arg ->
 			def result = [:]
 			def isClosure = (arg instanceof Closure)
 			delegate.each { 

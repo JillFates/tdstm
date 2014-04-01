@@ -1,12 +1,16 @@
-import org.springframework.jdbc.core.JdbcTemplate
 
-class MoveBundleServiceTests extends DatasourceTests {
+
+import org.springframework.jdbc.core.JdbcTemplate
+import org.junit.Ignore
+
+class MoveBundleServiceTests {
 	
 	def moveBundleService = new MoveBundleService()
 	
 	def jdbcTemplate = new JdbcTemplate( getDatasource() )
 	
 	//test case for moveBundleService.assetCount( def moveBundleId )
+	@Ignore
     void testassetCount() {
     	moveBundleService.jdbcTemplate = jdbcTemplate
 		
@@ -14,6 +18,7 @@ class MoveBundleServiceTests extends DatasourceTests {
     }
 	
 	// test case for moveBundleService.assetCompletionCount( def moveBundleId, def transitionId )
+	@Ignore
 	void testassetCompletionCount() {
 		moveBundleService.jdbcTemplate = jdbcTemplate
 		
@@ -23,12 +28,14 @@ class MoveBundleServiceTests extends DatasourceTests {
     }
 	
 	// test case for moveBundleService.getActualTimes( def moveBundleId, def transitionId )
+	@Ignore
 	void testgetActualTimes() {
 		moveBundleService.jdbcTemplate = jdbcTemplate
 		assertEquals false, ! moveBundleService.getActualTimes("27","60").started
     }
 	
 	// test case for moveBundleService.getAllDashboardSteps( def moveBundleId )
+	@Ignore
 	void testgetAllDashboardSteps() {
 		moveBundleService.jdbcTemplate = jdbcTemplate
 		
@@ -42,6 +49,7 @@ class MoveBundleServiceTests extends DatasourceTests {
     }
 	
 	// method to test the MoveEvent Transition Times summary report details
+	@Ignore
 	void testgetMoveEventSummaryResults() {
 		moveBundleService.jdbcTemplate = jdbcTemplate
 		def summaryResults = moveBundleService.getMoveEventSummaryResults( 1 )
@@ -49,6 +57,7 @@ class MoveBundleServiceTests extends DatasourceTests {
 	}
 	
 	// method to test the MoveEvent Transition Times detailed report details
+	@Ignore
 	void testgetMoveEventDetailedResults() {
 		moveBundleService.jdbcTemplate = jdbcTemplate
 		def detailedResults = moveBundleService.getMoveEventDetailedResults( 1 )

@@ -107,17 +107,17 @@ class TaskServiceTests extends GrailsUnitTestCase {
 		def me = new MoveEvent(runbookRecipe:text)
 		MoveEvent.metaClass.static.read = { id -> return id == 1 ? me : null }
 		
-		def recipe = taskService.getMoveEventRunbookRecipe(1)
+		def recipe = taskService.getMoveEventRunbookRecipe(me)
 		assertTrue recipe.size() > 0
 		
-		def task = recipe.tasks[0]
+		def task = recipe[0].tasks[0]
 		assertEquals 1000, task.id
 		assertEquals 'Start', task.description
 		
 		println recipe
 		
 		// See that it handles not getting an event as well
-		assertNull taskService.getMoveEventRunbookRecipe(2)
+		assertNull taskService.getMoveEventRunbookRecipe(null)
 		
 	}
 	

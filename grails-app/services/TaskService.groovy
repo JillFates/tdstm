@@ -64,9 +64,6 @@ class TaskService implements InitializingBean {
 	ProgressService progressService
 	ExecutorService executors
 
-	def ctx = AH.application.mainContext
-	def sessionFactory = ctx.sessionFactory
-	
 	static final List runbookCategories = [AssetCommentCategory.MOVEDAY, AssetCommentCategory.SHUTDOWN, AssetCommentCategory.PHYSICAL, AssetCommentCategory.STARTUP]
 	static final List categoryList = AssetCommentCategory.getList()
 	static final List statusList = AssetCommentStatus.getList()
