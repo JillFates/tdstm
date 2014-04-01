@@ -234,7 +234,7 @@
 	width:200px;
 }
 #reportsMegaMenu {
-	width:626px;
+	width:auto !important;
 }
 #userMegaMenu {
 	right: 107px;
