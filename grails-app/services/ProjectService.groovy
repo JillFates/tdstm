@@ -16,6 +16,38 @@ class ProjectService {
 	def jdbcTemplate
 	def stateEngineService
 	def userPreferenceService
+
+
+	/** 
+	 * Returns a list of projects that the user has access to. If showAllProjPerm is true then the user has access to all 
+	 * projects and the list will be filtered by the projectState and possibly the pagination params. If showAllProjPerm
+	 * is false then the list will be restricted to those that the user has been assigned to via a relation in the 
+	 * PartyRelationship table.
+	 *
+	 * @param userLogin - the user to lookup projects for
+	 * @param showAllProjPerm - flag if the user has the ShowAllProject permission (default false)
+	 * @param projectState - the state of the project, options [any | active | completed] (default any)
+	 * @param params - parameters to manage the resultset/pagination [maxRows, currentPage, sortOn, orderBy]
+	 * @return list of projects
+	 */
+	List<Project> getUserProjects(UserLogin userLogin, Boolean showAllProjPerm=false, String projectState='any', Map params=null) {
+		def projects = []
+		def projectIds = []
+		def timeNow = new Date() 
+
+		// If ! showAllProjPerm, then need to find distinct project ids where the PartyRelationship.partyIdTo.id = userLogin.person.id
+		// and PartyRelationshipType=PROJ_STAFF and RoleTypeCodeFrom=PROJECT
+
+		// See implementation criteria below in projectFilter() for the following
+
+		// if ! showAllProjPerm then filter in('id', userProjectIds)
+		// If projectState = active, filter ge("completionDate", timeNow)
+		// If projectState = completed then filter lt('completionDate', timeNow)
+		// if params has pagination params, then add to the filtering
+
+		projects
+	}
+
 	/*
 	 * Returns list of completed Project means projects whose completion time is less than today's date
 	 */
@@ -70,7 +102,7 @@ class ProjectService {
 			parties = PartyRelationship.executeQuery("SELECT pr.partyIdFrom FROM PartyRelationship pr WHERE \
 							pr.partyIdTo = ${company?.id} AND pr.roleTypeCodeFrom = 'PROJECT' ")
 		}
-		
+// TODO : we shouldn't be looking up parties. It should only be looking up the projects that the person is related to.		
 		projects = projectFilter( parties, viewAllPerm, company, timeNow, params, "active")
 		
 		return projects
