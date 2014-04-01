@@ -117,7 +117,7 @@ class TaskServiceTests extends GrailsUnitTestCase {
 		println recipe
 		
 		// See that it handles not getting an event as well
-		assertNotNull taskService.getMoveEventRunbookRecipe(null)
+		assertNull taskService.getMoveEventRunbookRecipe(null)
 		
 	}
 	
