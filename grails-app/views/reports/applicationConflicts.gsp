@@ -4,6 +4,7 @@
 <meta name="layout" content="projectHeader" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
 <title>Application Conflicts</title>
+<g:javascript src="report.js"/>
 </head>
 <body>
 	<div class="body">
@@ -14,7 +15,7 @@
 			<div class="message">${flash.message}</div>
 		</g:if>
 		
-		<g:form action="generateApplicationConflicts" name="applicationConflicts" method="post">
+		<g:form action="generateApplicationConflicts" name="applicationConflicts" method="post" onsubmit="return disableGenerateButton(this.name)">
 			<table>
 				<tbody>
 					<tr>
@@ -47,7 +48,7 @@
 					</tr>
 					<tr class="buttonR">
 					<tds:hasPermission permission="ShowMovePrep">
-						<td><input type="submit" class="submit" value="Generate" onclick="return verifyBundle();"/></td>
+						<td><input type="submit" class="submit" value="Generate" id="applicationConflictsButton" onclick="return verifyBundle();"/></td>
 					</tds:hasPermission>
 					</tr>
 				</tbody>
@@ -61,6 +62,7 @@
 	
 	$(document).ready(function() {
 		$("#moveBundleId").append("<option value='useForPlanning'>Planning Bundles</option>");
+		$("#applicationConflictsButton").removeAttr('disabled');
 	});
 	function submitForm(form){
 		if($("form input:radio:checked").val() == "web"){

@@ -5,6 +5,7 @@
 <meta name="layout" content="projectHeader" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
 <title>Application Migration Results</title>
+<g:javascript src="report.js"/>
 </head>
 <body>
 	<div class="body">
@@ -14,13 +15,13 @@
 			<div class="message">${flash.message}</div>
 		</g:if>
 		
-		<g:form action="generateApplicationMigration" name="applicationProfiles" method="post">
+		<g:form action="generateApplicationMigration" name="applicationMigration" method="post" onsubmit="return disableGenerateButton(this.name)">
 			<table>
 				<tbody>
 					<tr>
 						<td><label for="moveBundle">Bundle:</label></td>
 						<td><g:select from="${moveBundles}" id="moveBundleId" name="moveBundle" onChange="changeSmeSelect(this.value)"
-								optionKey="id" optionValue="name" value="${moveBundleId}" noSelection="['useForPlanning':'Use For Planning']"/></td>
+								optionKey="id" optionValue="name" value="${moveBundleId}"/></td>
 					</tr>
 					<tr>
 						<td><label for="moveBundle">SME:</label></td>
@@ -50,7 +51,7 @@
 					</tr>
 					<tr class="buttonR">
 					<tds:hasPermission permission="ShowMovePrep">
-						<td><input type="submit" class="submit" value="Generate"/></td>
+						<td><input type="submit" class="submit" value="Generate" id="applicationMigrationButton"/></td>
 					</tds:hasPermission>
 					</tr>
 				</tbody>
@@ -60,6 +61,11 @@
 	<script type="text/javascript">
 		currentMenuId = "#reportsMenu"
 		$("#reportsMenuId a").css('background-color','#003366')
+		
+		$(document).ready(function() {
+			$("#moveBundleId").append("<option value='useForPlanning'>Planning Bundles</option>");
+			$("#applicationMigrationButton").removeAttr('disabled');
+		});
 		
 		function changeSmeSelect(bundle){
 			jQuery.ajax({

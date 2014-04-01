@@ -4,6 +4,7 @@
 <meta name="layout" content="projectHeader" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
 <title>Application Profiles</title>
+<g:javascript src="report.js"/>
 </head>
 <body>
 	<div class="body">
@@ -13,7 +14,7 @@
 			<div class="message">${flash.message}</div>
 		</g:if>
 		
-		<g:form action="generateApplicationProfiles" name="applicationProfiles" method="post">
+		<g:form action="generateApplicationProfiles" name="applicationProfiles" method="post" onsubmit="return disableGenerateButton(this.name)">
 			<table>
 				<tbody>
 					<tr>
@@ -38,7 +39,7 @@
 					</tr>
 					<tr class="buttonR">
 					<tds:hasPermission permission="ShowMovePrep">
-						<td colspan="2"><input type="submit" class="submit" value="Generate"/></td>
+						<td colspan="2"><input type="submit" class="submit" value="Generate" id="applicationProfilesButton"/></td>
 					</tds:hasPermission>
 					</tr>
 				</tbody>
@@ -50,6 +51,7 @@
 		$("#reportsMenuId a").css('background-color','#003366')
 		$(document).ready(function() {
 			$("#moveBundleId").append("<option value='useForPlanning'>Planning Bundles</option>");
+			$("#applicationProfilesButton").removeAttr('disabled');
 		});
 		
 		function changeSmeSelect(bundle){
