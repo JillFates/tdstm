@@ -54,7 +54,7 @@
 				
 				var sizePref = '${sizePref}'
 				var listCaption ='Applications: \
-					<tds:hasPermission permission="EditAndDelete">\
+					<tds:hasPermission permission="AssetEdit">\
 						<span class="capBtn"><input type="button" value="Create App"  onclick="createAssetDetails(\'Application\')"/></span>\
 					</tds:hasPermission>\
 					<tds:hasPermission permission="AssetDelete">\

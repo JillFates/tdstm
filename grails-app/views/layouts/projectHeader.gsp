@@ -268,7 +268,7 @@
 							<li><g:link class="mmlink" params="[listType:'physical']" controller="assetEntity"  onclick="hideMegaMenu('assetMegaMenu')">List Physical</g:link></li>
 							<li><g:link class="mmlink" controller="database"  onclick="hideMegaMenu('assetMegaMenu')">List DBs</g:link></li>
 							<li><g:link class="mmlink" controller="files"  onclick="hideMegaMenu('assetMegaMenu')">List Storage</g:link></li>
-							<tds:hasPermission permission='EditAndDelete'>
+							<tds:hasPermission permission='AssetEdit'>
 							  <li><g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')">List Dependencies</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='MoveBundleEditView'>
@@ -279,14 +279,14 @@
 							</tds:hasPermission>
 						</ul>
 					</td>
-					<tds:hasPermission permission='EditAndDelete'>
+					<tds:hasPermission permission='AssetEdit'>
 					<td style="vertical-align:top"><span class="megamenuSection">Manage Data</span><br />
 					
 						<ul>
 							<tds:hasPermission permission='Import'>
 							<li><g:link class="mmlink" controller="assetEntity" action="assetImport"  onclick="hideMegaMenu('assetMegaMenu')">Import</g:link></li>
 							</tds:hasPermission>
-							<tds:hasPermission permission='EditAndDelete'>
+							<tds:hasPermission permission='AssetEdit'>
 							<li><g:link class="mmlink" controller="dataTransferBatch" action="index" onclick="hideMegaMenu('assetMegaMenu')">Manage Batches</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='Export'>

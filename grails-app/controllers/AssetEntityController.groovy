@@ -5006,7 +5006,7 @@ class AssetEntityController {
 	  * Action to return on list Dependency
 	  */
 	 def listDependencies ={
-		 def hasPerm = RolePermissions.hasPermission("EditAndDelete")
+		 def hasPerm = RolePermissions.hasPermission("AssetEdit")
 		 def project = securityService.getUserCurrentProject()
 		 def entities = assetEntityService.entityInfo( project )
 		 def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])

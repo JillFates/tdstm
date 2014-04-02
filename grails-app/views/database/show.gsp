@@ -3,7 +3,7 @@
 	<tr>
 		<td colspan="2">
 		
-			<div class="dialog" <tds:hasPermission permission='EditAndDelete'> ondblclick="editEntity('${redirectTo}','Database',${databaseInstance?.id})" </tds:hasPermission>>
+			<div class="dialog" <tds:hasPermission permission='AssetEdit'> ondblclick="editEntity('${redirectTo}','Database',${databaseInstance?.id})" </tds:hasPermission>>
 				<g:if test="${errors}">
 					<div id="messageDivId" class="message">${errors}</div>
 			    </g:if>

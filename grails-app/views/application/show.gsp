@@ -1,7 +1,7 @@
 <table style="border: 0">
 	<tr>
 	
-		<td colspan="2"><div class="dialog" <tds:hasPermission permission='EditAndDelete'> ondblclick="editEntity('${redirectTo}', 'Application', ${applicationInstance?.id})"</tds:hasPermission>>
+		<td colspan="2"><div class="dialog" <tds:hasPermission permission='AssetEdit'> ondblclick="editEntity('${redirectTo}', 'Application', ${applicationInstance?.id})"</tds:hasPermission>>
 				<g:if test="${errors}">
 					<div id="messageDivId" class="message">${errors}</div>
 				</g:if>

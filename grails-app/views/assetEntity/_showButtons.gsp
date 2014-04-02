@@ -1,6 +1,8 @@
 <%@page import="com.tds.asset.AssetType;"%>
-<tds:hasPermission permission='EditAndDelete'>
+<tds:hasPermission permission='AssetEdit'>
 	<span class="button"><input type="button" class="edit" value="Edit" onclick="editEntity('${redirectTo}','${type}',${assetEntity?.id})" /> </span>
+</tds:hasPermission>
+<tds:hasPermission permission='AssetDelete'>
 	<g:if test="${redirectTo!='dependencyConsole'}">
 	   <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>
 	</g:if>

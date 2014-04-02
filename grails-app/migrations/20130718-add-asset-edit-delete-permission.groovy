@@ -20,5 +20,13 @@ databaseChangeLog = {
 				((select id from permissions where permission_group = 'ASSETENTITY' and permission_item= 'AssetDelete'), '${role}')""")
 			}
 	}
+	changeSet(author: "lokanada", id: "20140402 TM-2581-1") {
+		comment('updated "EditAndDelete" with "AssetEdit" permission in permission table')
+		preConditions(onFail:'MARK_RAN') {
+			sqlCheck(expectedResult:'1', 'select count(*) from permissions where permission_group="ASSETENTITY" and permission_item = "EditAndDelete"')
+		}
+
+			sql("UPDATE permissions SET permission_item = 'AssetEdit' WHERE permission_group='ASSETENTITY' AND permission_item = 'EditAndDelete'")
+	}
 	
 }

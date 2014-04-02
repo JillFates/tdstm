@@ -39,7 +39,7 @@ $(document).ready(function() {
  	<table style="border:0;width:1000px;">
 		<tr>
 			<td colspan="2">
-			<tds:hasPermission permission='EditAndDelete'>
+			<tds:hasPermission permission='AssetEdit'>
 				<div class="dialog" ondblclick="editEntity('${redirectTo}','Server', ${assetEntity?.id})"></div>
 			</tds:hasPermission>
 			<g:if test="${errors}">

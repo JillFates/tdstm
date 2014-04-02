@@ -60,7 +60,7 @@
 				var moveBundleId = '${moveBundleId}'
 				var windowWidth = $(window).width() - $(window).width()*5/100 ;
 				var sizePref = '${sizePref}'
-				var listCaption ='Assets: <tds:hasPermission permission="EditAndDelete"><span class=\'button\'><input type=\'button\' value=\'Create Asset\' class=\'create\' onclick="createAssetDetails(\'assetEntity\')"/></span></tds:hasPermission>\
+				var listCaption ='Assets: <tds:hasPermission permission="AssetEdit"><span class=\'button\'><input type=\'button\' value=\'Create Asset\' class=\'create\' onclick="createAssetDetails(\'assetEntity\')"/></span></tds:hasPermission>\
 					<tds:hasPermission permission="AssetDelete">\
 						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'AssetEntity\')" disabled="disabled"/></span>\
 						<span><input type="checkbox" id="justPlanning" ${ (justPlanning == 'true' ? 'checked="checked"': '') } onclick="toggleJustPlanning($(this))"/> Just Planning</span>\
