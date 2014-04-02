@@ -154,7 +154,7 @@
 			return '<span id="span_'+options.rowId+'" class=" '+rowObject[15] +'" onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
 		}
 		function assetFormatter(cellVal,options,rowObject){
-			return options.colModel.name == "assetName" && cellVal ? '<span class="cellWithoutBackground pointer" onclick= "getEntityDetails(\'listTask\', \''+rowObject[4]+'\', '+rowObject[16]+')\" >' + (cellVal) + '</span>' :
+			return options.colModel.name == "assetName" && cellVal ? '<span class="cellWithoutBackground pointer" onclick= "getEntityDetails(\'listTask\', \''+rowObject[17]+'\', '+rowObject[16]+')\" >' + (cellVal) + '</span>' :
 				(cellVal || cellVal == 0 ? cellVal : "<span class='cellWithoutBackground pointer'></span>")
 		}
 		

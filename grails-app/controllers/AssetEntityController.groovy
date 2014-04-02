@@ -4108,7 +4108,7 @@ class AssetEntityController {
 				nGraphUrl, 
 				it.score ?: 0,
 				status ? "task_${it.status.toLowerCase()}" : 'task_na',
-				updatedClass, dueClass, it.assetEntity?.id
+				updatedClass, dueClass, it.assetEntity?.id, it.assetEntity?.assetType
 				], 
 				id:it.id
 			]

@@ -25,59 +25,37 @@
 			${time}
 		</div>
 		${eventErrorString}
-
-		<table>
-			<tbody>
+		<br/>
+		<table style="margin-left:5%;">
+			<thead>
 				<tr>
-					<td >
-					</td>
+					<th>Name</th>
+					<th>SME</th>
+					<th>Start</th>
+					<th>Test</th>
+					<th>Finish</th>
+					<th>Duration (hh:mm)</th>
+					<th>Window</th>
+				</tr>
+			</thead>
+			<tbody>
+			<g:each var="appList" in="${appList}" var="application" status="i">
+				<tr>
 					<td>
-						<g:each var="appList" in="${appList}" var="application" status="i">
-							<table class="conflictApp">
-									<thead>
-										<tr>
-											<th colspan="3">
-												<a href="javascript:getEntityDetails('Application','Application',${application.app.id})" class="inlineLink">${application.app.assetName}</a>
-												<g:if test="${application.app.moveBundle.useForPlanning}"> (${application.app.moveBundle})</g:if>
-											</th>
-										</tr>
-									</thead>
-								<tbody class="conflictAppBody">
-									<tr>
-										<td>Application Name:</td>
-										<td>${application.app.assetName}</td>
-									</tr>
-									<tr>
-										<td>Application SME:</td>
-										<td>${sme}</td>
-									</tr>
-									<tr>
-										<td>Start:</td>
-										<td>${application.startTime}</td>
-									</tr>
-									<tr>
-										<td>Test:</td>
-										<td>${application.workflow }</td>
-									</tr>
-									<tr>
-										<td>Finish:</td>
-										<td>${application.finishTime}</td>
-									</tr>
-									<tr>
-										<td>Duration:</td>
-										<td>${application.duration}</td>
-									</tr>
-									<g:if test="${application.customParam}">
-										<tr>
-											<td>Window:</td>
-											<td><span style="color:${application.windowColor};" > ${application.customParam}</span></td>
-										</tr>
-									</g:if>
-								</tbody>
-							</table>
-						</g:each>
+						<a href="javascript:getEntityDetails('Application','Application',${application.app.id})" class="inlineLink">${application.app.assetName}</a>
+					</td>
+					<td>${application.app.sme}</td>
+					<td>${application.startTime}</td>
+					<td>${application.workflow }</td>
+					<td>${application.finishTime}</td>
+					<td>${application.duration}</td>
+					<td>
+						<g:if test="${application.customParam}">
+							<span style="color:${application.windowColor};" > ${application.customParam}</span>
+						</g:if>
 					</td>
 				</tr>
+			</g:each>
 			</tbody>
 		</table>
 	<div id="showEntityView" style="display: none;"></div>

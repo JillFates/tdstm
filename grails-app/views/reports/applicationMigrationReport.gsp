@@ -42,7 +42,7 @@
 					</tr>
 					<tr>
 						<td><label for="stopCateory">end with:</label></td>
-						<td><g:select from="${AssetComment.constraints.category.inList}" id="stopCateory" name="stopCateory" value='shutdown'/></td>
+						<td><g:select from="${AssetComment.constraints.category.inList}" id="stopCateory" name="stopCateory" value='startup'/></td>
 					</tr>
 					<tr>
 						<td><label for="outageWindow">Outage window:</label></td>

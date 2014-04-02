@@ -1673,19 +1673,26 @@ class ReportsController {
 			def finishCommentList = applicationInstance.comments.findAll{it.category == params.stopCateory}.sort{it.actStart}.reverse()
 			def finishTime = finishCommentList[0]?.actStart
 			def startTime = startCommentList[0]?.actStart
-			def duration
+			def duration = new StringBuffer("");
 			def customParam
 			def windowColor
 			def workflow
+			def durationHours
 			
 			if(finishTime && startTime){
 				def dayTime = TimeCategory.minus(finishTime, startTime)
-				duration = (dayTime.days*24)+dayTime.hours
+				durationHours = (dayTime.days*24)+dayTime.hours
+				if(durationHours){
+					duration.append(durationHours)
+				}
+				if(dayTime.minutes){
+					duration.append((durationHours?':':'0:')+dayTime.minutes)
+				}
 			}
 			if(params.outageWindow == 'drRtoDesc'){
 				customParam = applicationInstance.drRtoDesc? NumberUtils.toInt((applicationInstance.drRtoDesc).split(" ")[0]) : ''
 				if(duration && customParam)
-					windowColor = (customParam < duration) ? 'red' : ''
+					windowColor = (customParam < durationHours) ? 'red' : ''
 			}else{
 				customParam = it[params.outageWindow]
 			}
@@ -1693,8 +1700,8 @@ class ReportsController {
 				def workflowTransaction = WorkflowTransition.get(params.workflowTransId)
 				workflow = applicationInstance.comments.findAll{it?.workflowTransition == workflowTransaction}.sort{it.actStart}
 			}
-			appList.add([ app : applicationInstance,startTime:startTime,finishTime:finishTime, duration: duration? duration+' hours' : '',
-				 customParam: customParam ? customParam + (params.outageWindow == 'drRtoDesc' ? ' hours': ''): '', windowColor:windowColor, 
+			appList.add([ app : applicationInstance,startTime:startTime,finishTime:finishTime, duration: duration? duration : '',
+				 customParam: customParam ? customParam + (params.outageWindow == 'drRtoDesc' ? 'h': ''): '', windowColor:windowColor, 
 				 workflow: workflow? workflow[0].duration+" "+workflow[0].durationScale : ''])
 		}
 	  
