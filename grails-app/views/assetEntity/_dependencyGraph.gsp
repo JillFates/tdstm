@@ -1,7 +1,7 @@
 <script type="text/javascript">
 
 var parameterPrecision = {'force':${multiple?10:100}, 'linkSize':10, 'friction':0.1, 'theta':0.1, 'width':100, 'height':100}
-var parameterRanges = {'force':[${multiple?-100:-1000}, 0], 'linkSize':[0,1000], 'friction':[0,1], 'theta':[0,1], 'width':[100,100000], 'height':[100,100000]}
+var parameterRanges = {'force':[${multiple?-100:-1000}, 0], 'linkSize':[0,1000], 'friction':[0,1], 'theta':[0,1], 'width':[600,100000], 'height':[500,100000]}
 
 $(document).ready(function() {
 	$('#appLabel').attr('checked',true)
@@ -121,7 +121,7 @@ function depConsoleLabelUserpref($me,forWhom){
 		<input type="hidden" id="filesChecked" value="${filesChecked}" />
 		<input type="hidden" id="listCheckId" value="?" />
 		
-		<div id="item1" style="float: left;z-index: 10000; width: 97%; top: 0px; top: 0px;">
+		<div id="item1" style="float: left;z-index: 10000; width: 1200px; top: 0px; top: 0px;">
 			<g:render template="map" model="${pageScope.variables}"/>
 		</div>
 	</div>
