@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Application Conflicts</title>
+<title>Application Migration Results</title>
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
 <script>
@@ -18,7 +18,7 @@
 <body>
 	<div class="body" style="width:1000px;">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
-			<b>Application Conflicts - ${project.name} : ${moveBundle}</b><br/>
+			<b>Application Migration Results - ${project.name} : ${moveBundle}</b><br/>
 			This analysis was performed on <tds:convertDateTime date="${new Date()}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> for ${session.getAttribute("LOGIN_PERSON").name }.
 		</div> 
 		<div style="color: black; font-size: 15px;text-align: center;">
@@ -40,7 +40,7 @@
 			</thead>
 			<tbody>
 			<g:each var="appList" in="${appList}" var="application" status="i">
-				<tr>
+				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" align="center">
 					<td>
 						<a href="javascript:getEntityDetails('Application','Application',${application.app.id})" class="inlineLink">${application.app.assetName}</a>
 					</td>
