@@ -3,7 +3,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 		<meta name="layout" content="projectHeader" />
-		<title>Dependency Console</title>
+		<title>Dependency Analyzer</title>
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
@@ -54,7 +54,7 @@
 		<div class="body">
 		<div style="min-width: 1000px;">
 			<div id="dependencyTitle" style="float: left;">
-				<h1>Dependency Console</h1>
+				<h1>Dependency Analyzer</h1>
 				<div style="position:absolute;margin: -25px 176px 0;">
 					<input type="checkbox" id="compactControl" name="compactControl" ${compactPref == 'true' ? 'checked="checked"' :''} onclick="compactControlPref( $(this) )"/>
 					&nbsp;<span> Compact Control </span>

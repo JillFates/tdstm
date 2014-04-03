@@ -125,7 +125,7 @@
 						</span>
 					</tds:hasPermission>
 					<span class="button">
-						<g:actionSubmit class="show" value="Field Importance" action="fieldImportance" />
+						<g:actionSubmit class="show" value="Field Settings" action="fieldImportance" />
 					</span>
 				</g:form>
 			</div>

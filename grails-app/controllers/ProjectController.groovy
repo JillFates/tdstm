@@ -624,7 +624,7 @@ class ProjectController {
 	}
 	
 	/**
-	 * Action to render the Field Importance Show/Edit maintenance form for field importance and field tooltips
+	 * Action to render the Field Settings (aka Importance) Show/Edit maintenance form for field importance and field tooltips
 	 */
 	def fieldImportance = {
 		return []

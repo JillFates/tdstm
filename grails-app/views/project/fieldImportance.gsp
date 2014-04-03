@@ -4,12 +4,12 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
-<title>Asset Fields</title>
+<title>Project Field Settings</title>
 <g:javascript src="angular.js" />
 <g:javascript src="controllers/fieldImportance.js" />
 </head>
 <body>
-	<h1 class="assetFieldHeader1">Project Field Importance</h1>
+	<h1 class="assetFieldHeader1">Project Field Settings</h1>
 	<div ng-app="MyApp" id="ng-app" ng-controller="assetFieldImportanceCtrl">
 		<div class="legend" >
 				<h1 class="assetImage" ng-click="toggleLegend()">Legend

@@ -827,7 +827,7 @@ class MoveBundleController {
 	}
 	
 	/**
-	 * Control function to render the Dependency Console 
+	 * Control function to render the Dependency Analyzer (was Dependency Console)
 	 */
 	def dependencyConsole = {
 	
