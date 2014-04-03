@@ -840,6 +840,7 @@ class PersonController {
 				WHERE pr.role_type_code_from_id in ('COMPANY') 
 					AND pr.party_relationship_type_id in ('STAFF') 
 					AND pr.party_id_from_id IN (${companies}) 
+					AND p.active = 'Y'
 				GROUP BY role, personId 
 				ORDER BY fullName ASC 
 			) AS companyStaff 
