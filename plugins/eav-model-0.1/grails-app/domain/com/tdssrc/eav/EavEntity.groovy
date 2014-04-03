@@ -21,7 +21,7 @@ class EavEntity {
 		lastUpdated( nullable:true )
 	}
 	static mapping = {
-		version false
+		version true
 		autoTimestamp false
 		tablePerHierarchy false
 		columns {
