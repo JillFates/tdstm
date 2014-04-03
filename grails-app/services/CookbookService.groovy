@@ -347,40 +347,46 @@ class CookbookService {
 	}
 	
 	/**
-	 * Reverts the recipe to the previous released version
-	 * @param recipeId the id of the recipe
+	 * Reverts the recipe to the recipeVersionId version
+	 * @param recipeVersionId the id of the recipeVersion
 	 * @param loginUser the current user
 	 * @param currentProject the current project
 	 */
-	def revertRecipe(recipeId, loginUser, currentProject) {
+	def revertRecipe(recipeVersionId, loginUser, currentProject) {
 //		if (!RolePermissions.hasPermission('RevertRecipe')) {
 //			throw new UnauthorizedException('User doesn\'t have a RevertRecipe permission')
 //		}
 		
-		if (recipeId == null) {
-			throw new EmptyResultException('Recipe id is empty');
+		if (recipeVersionId == null) {
+			log.debug('Recipe version is null')
+			throw new EmptyResultException('Recipe version id is empty');
 		}
-		if (!recipeId.isNumber()) {
-			throw new EmptyResultException('Recipe id is not a number');
+		if (!recipeVersionId.isNumber()) {
+			log.debug('Recipe version is not a number')
+			throw new EmptyResultException('Recipe version id is not a number');
 		}
 		if (currentProject == null) {
+			log.debug('Current project is null')
 			throw new EmptyResultException('Project is empty');
 		}
-		//TODO check this checkAccess(loginUser.person, currentProject)
-		def recipe = Recipe.get(recipeId)
-		
-		if (recipe.releasedVersion == null) {
-			throw new EmptyResultException('Release version is empty');
-		}
-		
-		def wip = RecipeVersion.findByRecipeAndVersionNumber(recipe, 0)
-		println(wip);
 
-		if (wip != null) {
-			wip.delete(failOnError: true)
-		} else {
-			throw new EmptyResultException('wip is null');
+		def recipeVersion = RecipeVersion.get(recipeVersionId)
+		if (recipeVersion == null) {
+			throw new EmptyResultException('Recipe version is empty');
 		}
+		if (recipeVersion.versionNumber == 0) {
+			throw new IllegalArgumentException('Trying to revert a WIP');
+		}
+
+		def recipe = recipeVersion.recipe
+		
+		if (!recipe.project.equals(currentProject)) {
+			log.warn('Person doesn\'t have access to the project')
+			throw new UnauthorizedException('The current user doesn\'t have access to the project')
+		}
+		
+		recipe.releasedVersion = recipeVersion 
+		recipe.save(failOnError: true)
 	}
 	
 	/**

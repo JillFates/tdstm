@@ -187,11 +187,11 @@ class WsCookbookController {
 			return
 		}
 
-		def recipeId = params.id
+		def recipeVersionId = params.id
 		def currentProject = securityService.getUserCurrentProject()
 
 		try {
-			cookbookService.revertRecipe(recipeId, loginUser, currentProject)
+			cookbookService.revertRecipe(recipeVersionId, loginUser, currentProject)
 
 			render(ServiceResults.success() as JSON)
 		} catch (UnauthorizedException e) {
