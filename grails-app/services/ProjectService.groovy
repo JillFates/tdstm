@@ -1,12 +1,15 @@
-import org.apache.shiro.SecurityUtils
 import grails.converters.JSON
+
+import org.apache.shiro.SecurityUtils
+
 import com.tds.asset.AssetType
 import com.tds.asset.FieldImportance
-import com.tdsops.tm.enums.domain.ValidationType;
+import com.tdsops.tm.enums.domain.ProjectSortProperty
+import com.tdsops.tm.enums.domain.ProjectStatus
+import com.tdsops.tm.enums.domain.SortOrder
+import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavEntityType
-import com.tdssrc.grails.TimeUtil
-import com.tds.asset.AssetEntity
 
 class ProjectService {
 
@@ -30,22 +33,43 @@ class ProjectService {
 	 * @param params - parameters to manage the resultset/pagination [maxRows, currentPage, sortOn, orderBy]
 	 * @return list of projects
 	 */
-	List<Project> getUserProjects(UserLogin userLogin, Boolean showAllProjPerm=false, String projectState='any', Map params=null) {
+	List<Project> getUserProjects(UserLogin userLogin, Boolean showAllProjPerm=false, ProjectStatus projectStatus=ProjectStatus.ANY, Map searchParams=null) {
 		def projects = []
 		def projectIds = []
 		def timeNow = new Date() 
+		
+		def maxRows = searchParams.maxRows ? Integer.valueOf(searchParams.maxRows) : 25
+		def currentPage = searchParams.currentPage ? Integer.valueOf(searchParams.currentPage) : 1
+		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		def sortOn = searchParams.sortOn?:ProjectSortProperty.PROJECT_CODE
+		def sortOrder = searchParams.sortOrder?:SortOrder.ASC
 
-		// If ! showAllProjPerm, then need to find distinct project ids where the PartyRelationship.partyIdTo.id = userLogin.person.id
+		// If !showAllProjPerm, then need to find distinct project ids where the PartyRelationship.partyIdTo.id = userLogin.person.id
 		// and PartyRelationshipType=PROJ_STAFF and RoleTypeCodeFrom=PROJECT
+		if (!showAllProjPerm) {
+			projectIds = PartyRelationship.executeQuery("SELECT pr.partyIdFrom.id FROM PartyRelationship pr WHERE \
+				pr.partyIdTo = ${userLogin.person.id} AND pr.roleTypeCodeFrom = 'PROJECT' AND pr.partyRelationshipType = 'PROJ_STAFF' ")
+			if (!projectIds) return projects;
+		}
 
-		// See implementation criteria below in projectFilter() for the following
-
-		// if ! showAllProjPerm then filter in('id', userProjectIds)
+		// if !showAllProjPerm then filter in('id', userProjectIds)
 		// If projectState = active, filter ge("completionDate", timeNow)
 		// If projectState = completed then filter lt('completionDate', timeNow)
 		// if params has pagination params, then add to the filtering
-
-		projects
+		projects = Project.createCriteria().list(max: maxRows, offset: rowOffset) {
+			if (projectIds){
+				'in'("id", projectIds)
+			}
+			if (projectStatus != ProjectStatus.ANY) { 
+				if(projectStatus == ProjectStatus.ACTIVE){
+					ge("completionDate", timeNow)
+				}else{
+					lt('completionDate', timeNow)
+				}
+			}
+			order(sortOn.toString(), sortOrder.toString())
+		}
+		return projects
 	}
 
 	/*

@@ -133,6 +133,11 @@ class UrlMappings {
 			action = [GET:"get"]
 		}
 
+		"/ws/project/userProjects" {
+			controller = "wsProject"
+			action = [GET:"userProjects"]
+		}
+
 		"/maint/backd00r" {
 			controller = "auth"
 			action = [GET:"maintMode"]

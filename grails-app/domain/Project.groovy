@@ -154,7 +154,7 @@ class Project extends PartyGroup {
 		}
 	}
 	
-	static transients = [ 'isDefaultProject', 'getDefaultProject', 'readDefaultProject' ]
+	static transients = [ 'isDefaultProject', 'getDefaultProject', 'readDefaultProject', 'active', 'status' ]
 
 	String toString() {
 		"$projectCode : $name"
@@ -183,4 +183,22 @@ class Project extends PartyGroup {
 	Boolean isDefaultProject() {
 		id == DEFAULT_PROJECT_ID
 	}
+
+	/**
+	 * Can be used to determine if this is an active project
+	 * @return Boolean - true if the project is active
+	 */
+	Boolean isActive() {
+		//TODO: check time GMT
+		completionDate.compareTo(new Date()) > 0
+	}
+
+	/**
+	 * Can be used to determine project status, valid values are active or completed
+	 * @return String - could be active or completed
+	 */
+	String getStatus() {
+		isActive()?'active':'completed'
+	}
+
 }
