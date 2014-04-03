@@ -240,7 +240,7 @@ class AssetEntityController {
 		def	dataTransferBatchs = DataTransferBatch.findAllByProject(project).size()
 		
 		def prefMap = [:]
-		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency','ImportRoom','ImportRack', 'ImportCabling'].each {t->
+		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency','ImportRoom','ImportRack', 'ImportCabling','ImportComment'].each {t->
 		   prefMap << [(t) : userPreferenceService.getPreference(t)]
 		}
 		
@@ -1563,50 +1563,58 @@ class AssetEntityController {
 					}
 					
 					if(params.cabling=='cable'){
-						exportedEntity +="C"
+						exportedEntity +="c"
 						def projectInstance = securityService.getUserCurrentProject()
 						def assetCablesList = AssetCableMap.findAll( " from AssetCableMap acm where acm.assetFrom.project.id = $projectInstance.id " )
 						assetEntityService.cablingReportData(assetCablesList, cablingSheet)
 					}
 				}
 				//update data from Asset Comment table to EXCEL
-				//commented as per craig comments on skype,as default asset comments are exporting.
-				/*for( int sl=0;  sl < sheetNamesLength; sl++ ) {
-					def commentIt = new ArrayList()
-					if(sheetNames[sl] == "Comments"){
-						def commentSheet = book.getSheet("Comments")
-						asset.each{
-							commentIt.add(it.id)
-						}
-						def commentList = new StringBuffer()
-						def commentSize = commentIt.size()
-						for ( int k=0; k< commentSize ; k++ ) {
-							if( k != commentSize - 1) {
-								commentList.append( commentIt[k] + "," )
-							} else {
-								commentList.append( commentIt[k] )
+				if ( params.comment == 'comment' ) {
+					exportedEntity +="C"
+					for( int sl=0;  sl < sheetNamesLength; sl++ ) {
+						def commentIt = new ArrayList()
+						SimpleDateFormat createDateFormat = new SimpleDateFormat("MM/dd/yyyy")
+						if(sheetNames[sl] == "Comments"){
+							def commentSheet = book.getSheet("Comments")
+							asset.each{
+								commentIt.add(it.id)
+							}
+							def commentList = new StringBuffer()
+							def commentSize = commentIt.size()
+							for ( int k=0; k< commentSize ; k++ ) {
+								if( k != commentSize - 1) {
+									commentList.append( commentIt[k] + "," )
+								} else {
+									commentList.append( commentIt[k] )
+								}
+							}
+							if(commentList){
+								def assetcomment = AssetComment.findAll("from AssetComment cmt where cmt.assetEntity in ($commentList)")
+								def assetId
+								def createdDate
+								def createdBy
+								def commentId
+								def category
+								def comment
+								for(int cr=1 ; cr<=assetcomment.size() ; cr++){
+									commentId = new Label(0,cr,String.valueOf(assetcomment[cr-1].id))
+									commentSheet.addCell(commentId)
+									assetId = new Label(1,cr,String.valueOf(assetcomment[cr-1].assetEntity.id))
+									commentSheet.addCell(assetId)
+									category = new Label(2,cr,String.valueOf(assetcomment[cr-1].category))
+									commentSheet.addCell(category)
+									createdDate = new Label(3,cr,String.valueOf(assetcomment[cr-1].dateCreated? createDateFormat.format(assetcomment[cr-1].dateCreated) : ''))
+									commentSheet.addCell(createdDate)
+									createdBy = new Label(4,cr,String.valueOf(assetcomment[cr-1].createdBy))
+									commentSheet.addCell(createdBy)
+									comment = new Label(5,cr,String.valueOf(assetcomment[cr-1].comment))
+									commentSheet.addCell(comment)
+								}
 							}
 						}
-						def assetcomment = AssetComment.findAll("from AssetComment cmt where cmt.assetEntity in ($commentList)")
-						def assetId
-						def commentType
-						def comment
-						def commentId
-						def assetName
-						for(int cr=1 ; cr<=assetcomment.size() ; cr++){
-							assetId = new Label(0,cr,String.valueOf(assetcomment[cr-1].assetEntity.id))
-							commentSheet.addCell(assetId)
-							commentId = new Label(1,cr,String.valueOf(assetcomment[cr-1].id))
-							commentSheet.addCell(commentId)
-							assetName = new Label(2,cr,String.valueOf(assetcomment[cr-1].assetEntity.assetName))
-							commentSheet.addCell(assetName)
-							commentType = new Label(3,cr,String.valueOf(assetcomment[cr-1].commentType))
-							commentSheet.addCell(commentType)
-							comment = new Label(4,cr,String.valueOf(assetcomment[cr-1].comment))
-							commentSheet.addCell(comment)
-						}
 					}
-				}*/
+				}
 				filename += "-"+exportedEntity+"-"+exportDate
 				response.setHeader( "Content-Disposition", "attachment; filename=\""+exportType+'-'+filename+".xls\"" )
 				book.write()
