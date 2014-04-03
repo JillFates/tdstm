@@ -70,7 +70,7 @@
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
 					colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','Plan Status','Bundle',
 						 'id', 'commentType'"
-					colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false,width:'40', fixed:true},
+					colModel="{name:'act', index: 'act' , sortable: false, ${hasPerm? 'formatter:myCustomFormatter,' :''} search:false,width:'40', fixed:true},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'250'},
 						{name:'assetType'},
 						{name:'model'}, 

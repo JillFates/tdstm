@@ -56,7 +56,7 @@
 				<jqgrid:grid id="storageId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
 					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','id', 'commentType'"
-					colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:'50'},
+					colModel="{name:'act', index: 'act' , sortable: false, ${hasPerm? 'formatter:myCustomFormatter,' :''} search:false, width:'50'},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
 						{name:'${filesPref['1']}',width:'120'},
 						{name:'${filesPref['2']}', width:'120'},
