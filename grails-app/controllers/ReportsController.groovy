@@ -1669,10 +1669,15 @@ class ReportsController {
 		
 		applicationList.each{
 			def applicationInstance = Application.get( it.id )
-			def startCommentList = applicationInstance.comments.findAll{it.category == params.startCateory}.sort{it.actStart}
-			def finishCommentList = applicationInstance.comments.findAll{it.category == params.stopCateory}.sort{it.actStart}.reverse()
-			def finishTime = finishCommentList[0]?.actStart
-			def startTime = startCommentList[0]?.actStart
+			def appComments = applicationInstance.comments
+			def startTimeList = appComments.findAll{it.category == params.startCateory}.sort{it.actStart}?.actStart
+			def finishTimeList = appComments.findAll{it.category == params.stopCateory}.sort{it.actStart}?.actStart
+			
+			startTimeList.removeAll([null])
+			
+			def finishTime= finishTimeList ? finishTimeList[(finishTimeList.size()-1)] : null
+			def startTime = startTimeList ? startTimeList[0] : null
+			
 			def duration = new StringBuffer("");
 			def customParam
 			def windowColor
@@ -1698,7 +1703,8 @@ class ReportsController {
 			}
 			if(params.workflowTransId){
 				def workflowTransaction = WorkflowTransition.get(params.workflowTransId)
-				workflow = applicationInstance.comments.findAll{it?.workflowTransition == workflowTransaction}.sort{it.actStart}
+				workflow = appComments.findAll{it?.workflowTransition == workflowTransaction}.sort{it.actStart}
+				workflow.removeAll([null])
 			}
 			appList.add([ app : applicationInstance,startTime:startTime,finishTime:finishTime, duration: duration? duration : '',
 				 customParam: customParam ? customParam + (params.outageWindow == 'drRtoDesc' ? 'h': ''): '', windowColor:windowColor, 
