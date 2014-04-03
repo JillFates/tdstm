@@ -11,9 +11,9 @@ import com.tdssrc.grails.TimeUtil
 class RecipeVersion {
 
 	/** The source code of the recipe (presently Groovy array - may make a JSON object in the future) */
-	String sourceCode
+	String sourceCode = ""
 	/** The user entered details about changes to the recipe (TODO : change to wiki syntax) */
-	String changelog
+	String changelog = ""
 	/** The recipe version that the recipe was originally cloned from */
 	RecipeVersion clonedFrom
 	/** The version number of the recipe. A zero (0) indicates that the recipe is WIP. When published it will 

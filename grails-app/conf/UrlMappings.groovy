@@ -67,7 +67,12 @@ class UrlMappings {
 			controller = "wsCookbook"
 			action = [POST:"validateSyntax"]
 		}
-		
+
+		"/ws/cookbook/recipe/clone" {
+			controller = "wsCookbook"
+			action = [POST:"cloneRecipe"]
+		}
+
 		"/ws/cookbook/groups" {
 			controller = "wsCookbook"
 			action = [GET:"groups"]

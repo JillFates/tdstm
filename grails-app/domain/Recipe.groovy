@@ -25,7 +25,7 @@ class Recipe {
 	Date dateCreated
 	Date lastUpdated
 	
-	Boolean archived
+	Boolean archived = false
 
 	static constraints = {	
 		name(blank:false, nullable:false, maxLength:40)

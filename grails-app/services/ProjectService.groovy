@@ -33,11 +33,12 @@ class ProjectService {
 	 * @param params - parameters to manage the resultset/pagination [maxRows, currentPage, sortOn, orderBy]
 	 * @return list of projects
 	 */
-	List<Project> getUserProjects(UserLogin userLogin, Boolean showAllProjPerm=false, ProjectStatus projectStatus=ProjectStatus.ANY, Map searchParams=null) {
+	List<Project> getUserProjects(UserLogin userLogin, Boolean showAllProjPerm=false, ProjectStatus projectStatus=ProjectStatus.ANY, Map searchParams=[:]) {
 		def projects = []
 		def projectIds = []
 		def timeNow = new Date() 
 		
+		searchParams=searchParams?:[:]
 		def maxRows = searchParams.maxRows ? Integer.valueOf(searchParams.maxRows) : 25
 		def currentPage = searchParams.currentPage ? Integer.valueOf(searchParams.currentPage) : 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows

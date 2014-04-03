@@ -46,7 +46,42 @@ class WsCookbookController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
+	/**
+	 * Clone a recipe
+	 * Check {@link UrlMappings} for the right call
+	 */
+	def cloneRecipe = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		
+		def recipeVersionid = params.recipeVersionid
+		def name = params.name
+		def description = params.description
+		def currentProject = securityService.getUserCurrentProject()
+		
+		try {
+			def data = cookbookService.cloneRecipe(recipeVersionid, name, description, loginUser, currentProject)
+
+			def dataMap = [:]
+			dataMap.recipeId = data.recipe.id
+			dataMap.recipeVersionId = data.recipeVersion.id
+
+			render(ServiceResults.success(dataMap) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
+	}
+
 	/**
 	 * Deletes a recipe or a recipe version id version is passed
 	 * Check {@link UrlMappings} for the right call

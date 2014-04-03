@@ -97,37 +97,121 @@ class CookbookService {
 				defaultChangelog = defaultRecipe.releasedVersion.changelog
 			}
 		}
-		
-		def recipe = new Recipe()
-		def recipeVersion = new RecipeVersion()
-		
-		recipe.name = recipeName
-		recipe.description = description
-		recipe.context = recipeContext
-		recipe.project = currentProject
-		recipe.archived = false
 
-		recipe.save(flush:true, failOnError: true)
-		
-		recipeVersion.versionNumber = 0
-		recipeVersion.createdBy = loginUser.person
-		recipeVersion.recipe = recipe
-		
+		def result = null
+
 		if (clonedVersion != null) {
-			recipeVersion.cloneFrom = clonedVersion
-			recipeVersion.sourceCode = clonedVersion.sourceCode
-			recipeVersion.changelog = clonedVersion.changelog
+			result = createRecipeAndRecipeVersion(recipeName, description, recipeContext,
+				           currentProject, clonedVersion.sourceCode, clonedVersion.changelog, clonedVersion, loginUser.person)
 		} else {
-			recipeVersion.sourceCode = defaultSourceCode
-			recipeVersion.changelog = defaultChangelog
+		    result = createRecipeAndRecipeVersion(recipeName, description, recipeContext,
+			               currentProject, defaultSourceCode, defaultChangelog, null, loginUser.person)
 		}
-		
-		recipeVersion.save(failOnError: true)
-		
-		return recipe
+
+		return result.recipe
 	}
 
 	
+	/**
+	 * Clones a Recipe using the information passed
+	 *  
+	 * @param recipeVersionid The id of the RecipeVersion record to clone
+	 * @param name the name of the new recipe
+	 * @param description the description of the new recipe
+	 * @param loginUser the user that is cloning this recipe
+	 * @param currentProject the project owning this recipe
+	 * @return a map with the created recipe and recipeVersion
+	 */
+	def cloneRecipe(recipeVersionid, name, description, loginUser, currentProject) {
+		if (!RolePermissions.hasPermission('EditRecipe')) {
+			throw new UnauthorizedException('User doesn\'t have a EditRecipe permission')
+		}
+
+    	if (loginUser == null || recipeVersionid == null || !recipeVersionid.isNumber() || !name || currentProject == null) {
+			throw new EmptyResultException();
+		}
+		
+		def recipeVersion = RecipeVersion.get(recipeVersionid)
+		
+		if (recipeVersion == null) {
+			throw new EmptyResultException();
+		}
+		
+		def recipe = recipeVersion.recipe
+		def recipeProject = recipeVersion.recipe.project
+		
+		if (!validUserProject(recipeProject, loginUser, currentProject)) {
+			throw new EmptyResultException();
+		}
+		
+		return createRecipeAndRecipeVersion(name, description, recipe.context, 
+			currentProject, recipeVersion.sourceCode, "", recipeVersion, loginUser.person)
+		
+	}
+
+	/**
+	 * Unifies create recipe and reciveVersion 
+	 * 
+	 * @param name recipe name
+	 * @param description recipe description
+	 * @param context recipe context
+	 * @param project recipe project
+	 * @param sourceCode recipeVersion source code
+	 * @param changelog recipeVersion changelog
+	 * @param recipeVersion original recipeVersion
+	 * @param person recipeVersion person
+	 * @return
+	 */
+	def createRecipeAndRecipeVersion(name, description, context, project, sourceCode, changelog, recipeVersion, person) {	
+
+		def newRecipe = new Recipe()
+		def newRecipeVersion = new RecipeVersion()
+
+		newRecipe.name = name
+		newRecipe.description = description
+		newRecipe.context = context
+		newRecipe.project = project
+		newRecipe.archived = false
+
+		newRecipe.save(flush:true, failOnError: true)
+
+		newRecipeVersion.sourceCode = sourceCode
+		newRecipeVersion.changelog = changelog
+		newRecipeVersion.clonedFrom  = recipeVersion
+		newRecipeVersion.recipe = newRecipe
+    	newRecipeVersion.versionNumber = 0
+		newRecipeVersion.createdBy = person
+
+		newRecipeVersion.save(failOnError: true)
+
+		def result = [:]
+		result.recipe = newRecipe
+		result.recipeVersion = newRecipeVersion
+
+		return result;
+	}
+
+	/**
+	 * Checks if person can access a specific project
+	 * @param project the project to check
+	 * @param loginUser the user to validate
+	 * @param currentProject current project
+	 * 
+	 */
+	def validUserProject(project, loginUser, currentProject) {
+		def valid = false
+		if (project.id == Project.DEFAULT_PROJECT_ID) {
+			valid = true
+		} else if (project == currentProject) {
+			valid = true
+		} else {
+		    valid = projectService.getUserProjects(loginUser).find() {
+				return (project.id == it.id)
+			}
+		}
+		return valid
+	}
+
 	/**
 	 * Deletes a Recipe using the information passed
 	 *
@@ -487,10 +571,9 @@ class CookbookService {
 		})
 	}
 
-	
 	/**
 	 * Returns the information about a specific version of the Recipe
-	 * 
+	 *
 	 * @param recipeId the id of the Recipe
 	 * @param versionNumber the version of the Recipe
 	 * @param loginUser the current user
