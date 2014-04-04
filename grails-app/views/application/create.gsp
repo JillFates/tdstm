@@ -7,10 +7,11 @@
 	$("#createStaffDialog").dialog({ autoOpen: false })
 	
 	var myOption = "<option value='0'>Add Person...</option>"
-
-	$("#sme1 option:first").after(myOption);
-	$("#sme2 option:first").after(myOption);
-	$("#appOwner option:first").after(myOption);
+	<tds:hasPermission permission='PersonCreateView'>
+		$("#sme1 option:first").after(myOption);
+		$("#sme2 option:first").after(myOption);
+		$("#appOwner option:first").after(myOption);
+	</tds:hasPermission>
 	if(!isIE7OrLesser)
 		$("select.assetSelect").select2();
 	

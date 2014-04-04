@@ -29,7 +29,7 @@ class SecurityFilters {
 			}
 		}
 		// Creating, modifying, or deleting a Party,person, project,partyGroup requires the ADMIN role.
-		partyCrud(controller: "(party|person|partyGroup)", action: "(create|edit|save|update|delete)") {
+		partyCrud(controller: "(party|partyGroup)", action: "(create|edit|save|update|delete)") {
 			before = {
 				accessControl {
 					role("ADMIN")

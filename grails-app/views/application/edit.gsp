@@ -10,10 +10,11 @@
 		populateDependency(assetId, 'application','edit')
 
 		var myOption = "<option value='0'>Add Person...</option>"
-
-		$("#sme1Edit option:first").after(myOption);
-		$("#sme2Edit option:first").after(myOption);
-		$("#appOwnerEdit option:first").after(myOption);
+		<tds:hasPermission permission='PersonCreateView'>
+			$("#sme1Edit option:first").after(myOption);
+			$("#sme2Edit option:first").after(myOption);
+			$("#appOwnerEdit option:first").after(myOption);
+		</tds:hasPermission>
 		$("#shutdownByEditId").val('${applicationInstance.shutdownBy}')
 		$("#startupByEditId").val('${applicationInstance.startupBy}')
 		$("#testingByEditId").val('${applicationInstance.testingBy}')
