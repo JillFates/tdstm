@@ -19,7 +19,7 @@
 			<table>
 				<tbody>
 					<tr>
-						<td><g:select from="${moveBundles}" id="moveBundleId" name="moveBundle"
+						<td>Bundle: <g:select from="${moveBundles}" id="moveBundleId" name="moveBundle"
 								optionKey="id" optionValue="name" value="${moveBundleId}"/></td>
 					</tr>
 					<tr>
