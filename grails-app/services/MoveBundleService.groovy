@@ -585,8 +585,7 @@ class MoveBundleService {
 		def planningMoveBundles = MoveBundle.findAllByProjectAndUseForPlanning(projectInstance,true,[sort:'name'])
 		def allMoveBundles = MoveBundle.findAllByProject(projectInstance,[sort:'name'])
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
-		def assetDependencyList = AssetDependencyBundle.findAllByProject(projectInstance)?.sort{it.dependencyBundle}
-				
+		def assetDependencyList = AssetDependencyBundle.executeQuery("SELECT distinct(dependencyBundle) FROM AssetDependencyBundle WHERE project=$projectInstance.id") 
 		
 		// JPM - don't think that this is required
 		// def personList = partyRelationshipService.getCompanyStaff( projectInstance.client?.id )
