@@ -737,4 +737,92 @@ class ReportsService {
 					noRunsOn:params.noRuns, vmWithNoSupport:params.vmWithNoSupport, moveBundleId:params.moveBundle, appCount:appCount
 				]
 	}
+	
+	def genDatabaseConflicts(def moveBundleId, def bundleConflicts, def unresolvedDep, def noApps, def dbSupport, def planning){
+		def project = securityService.getUserCurrentProject()
+		ArrayList assetList = new ArrayList()
+		def assetsInBundle = []
+		log.info "****bundle:${moveBundleId} bundleConflicts:${bundleConflicts} unresolvedDep:${unresolvedDep} noApps:${noApps}  dbSupport:${dbSupport} planning:${planning} "
+		
+		def bundles = []
+		if(planning) {
+			bundles = MoveBundle.findAllByProjectAndUseForPlanning(project, true)
+		} else {
+			bundles = [MoveBundle.findById(moveBundleId)]
+		}
+		if(bundles){
+			assetsInBundle = AssetEntity.findAll("FROM AssetEntity WHERE moveBundle IN (:bundles) AND assetType IN (:type) ORDER BY assetName",
+								[bundles:bundles, type:[(AssetType.DATABASE).toString()]])
+		}
+		
+		log.info "${assetsInBundle}"
+		def titleString = new StringBuffer("");
+		if(bundleConflicts){
+			titleString.append('Bundle Conflicts')
+		}
+		if(unresolvedDep){
+			titleString.append(', UnResolved Dependencies')
+		}
+		if(noApps){
+			titleString.append(', No Applications')
+		}
+		if(dbSupport){
+			titleString.append(', DB With NO support')
+		}
+		if( !bundleConflicts && !unresolvedDep && !noApps && !dbSupport){
+			titleString.append('All')
+		}
+		assetsInBundle.each{asset->
+			def showDb = false
+			def dependsOnList = AssetDependency.findAllByAsset(asset)
+			def supportsList = AssetDependency.findAllByDependent(asset)
+			def header=''
+			// skip the asset if there is no deps and support
+			if(!dependsOnList && !supportsList)
+				return
+			
+			if( !bundleConflicts && !unresolvedDep && !noApps && !dbSupport){
+				showDb = true
+			} else {
+				// Check for vm No support if showDb is true
+				if(!supportsList && dbSupport){
+					header = 'No DB support?'
+					showDb = true
+				}
+				// Check for bundleConflicts if showDb is false
+				if(!showDb && bundleConflicts){
+					def conflictIssue = dependsOnList.find{(it.asset.moveBundle?.id != it.dependent.moveBundle?.id) && ( it.status in ['Validated','Questioned','Unknown'] )}
+					if(!conflictIssue){
+						conflictIssue = supportsList.find{(it.asset.moveBundle?.id != it.dependent.moveBundle?.id) && ( it.status in ['Validated','Questioned','Unknown'] )}
+					}
+					if(conflictIssue){
+						showDb = true
+					}
+				}
+				// Check for unResolved Dependencies if showDb is false
+				if(!showDb && unresolvedDep){
+					def statusIssue = dependsOnList.find{it.status in ['Questioned','Unknown']}
+					if(!statusIssue){
+						statusIssue = supportsList.find{it.status in ['Questioned','Unknown']}
+					}
+					if(statusIssue){
+						showDb = true
+					}
+				}
+				
+				// Check for Run On if showDb is false
+				if(!showDb && noApps){
+					def isRunOn = supportsList.find{it.type == 'Runs On'}
+					if(!isRunOn){
+						showDb = true
+						header='No applications?'
+					}
+				}
+			}
+			if(showDb)
+				assetList.add([ 'app':asset, 'dependsOnList':dependsOnList, 'supportsList':supportsList, 'dependsOnIssueCount':dependsOnList.size, 'supportsIssueCount':supportsList.size, header:header ])
+		}
+		return['project':project, 'appList':assetList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : "Planning Bundles",
+				'columns':9, title:StringUtils.stripStart(titleString.toString(), ",")]
+	}
 }

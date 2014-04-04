@@ -1713,5 +1713,45 @@ class ReportsController {
 	  
 	  return [appList:appList, moveBundle:currentBundle , sme:currentSme?:'All' , project:project]
 	}
+	/**
+	 * used to render to database Report selection criteria.
+	 */
+	def databaseConflicts = {
+		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectInstance = Project.findById( currProj )
+		def moveBundleList = MoveBundle.findAllByProject(projectInstance)
+		def moveBundleId = securityService.getUserCurrentMoveBundleId()
+		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId]
+	}
+	/**
+	 * Used to generate database conflicts Report.
+	 */
+	def generateDatabaseConflicts = {
+		def project = securityService.getUserCurrentProject()
+		def moveBundleId = params.moveBundle
+		def moveBundleInstance
+		def errorMsg = "Please select a MoveBundle"
+		def bundleConflicts = params.bundleConflicts == 'on'
+		def unresolvedDependencies = params.unresolvedDep == 'on'
+		def noApps = params.noApps == 'on'
+		def dbWithNoSupport = params.dbWithNoSupport == 'on'
+		
+		if( params.moveBundle == 'useForPlanning' ){
+				return reportsService.genDatabaseConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noApps, dbWithNoSupport, true)
+		}
+		if( moveBundleId && moveBundleId.isNumber() ){
+			def isProjMoveBundle  = MoveBundle.findByIdAndProject( moveBundleId, project )
+			if ( !isProjMoveBundle ) {
+				errorMsg = " User tried to access moveBundle ${moveBundleId} that was not found in project : ${project} "
+				log.warn "generateCheckList: User tried to access moveBundle ${moveBundleId} that was not found in project : ${project}"
+			} else {
+				errorMsg = ""
+				userPreferenceService.setPreference( "MOVE_BUNDLE", "${moveBundleId}" )
+				moveBundleInstance = MoveBundle.get(moveBundleId)
+				return reportsService.genDatabaseConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noApps, dbWithNoSupport, false)
+				
+			}
+		}
+	}
 }
  
