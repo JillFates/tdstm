@@ -455,12 +455,12 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 					$scope.selectedRecipe = ($scope.wipConfig[ind].opt == 'release') ?
 						angular.copy($scope.selectedRVersion) : angular.copy($scope.selectedRWip);
 
-					// A deep copy of the selected Recipe data. It won't change when editing.
-					$scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
-
 					if(!$scope.selectedRWip){
 						$scope.selectedRWip = ($scope.selectedRVersion) ? $scope.selectedRVersion : fillDefault();
 					}
+
+					// A deep copy of the selected Recipe data. It won't change when editing.
+					$scope.originalDataRecipe = angular.copy($scope.selectedRWip);
 
 					// This is a good moment to call the get list task batches service
 					$scope.tasks.getListTaskBatches({recipeId: $scope.selectedRecipe.recipeId, limitDays: 30})
@@ -502,12 +502,14 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 			}else if($scope.wipConfig[ind].opt == 'wip' && !item.hasWIP){
 				/*if($scope.originalDataRecipe){*/
-					$scope.selectedRecipe = fillDefault();
+				    $scope.selectedRecipe = fillDefault();
+				    $scope.selectedRWip = angular.copy($scope.selectedRecipe);
 					$scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
 				/*}*/
 			}else{
 				$log.info('The selected recipe has no version yet or has no WIP yet. Creating empty recipe..');
-				$scope.selectedRecipe = fillDefault();
+			    $scope.selectedRecipe = fillDefault();
+			    $scope.selectedRWip = angular.copy($scope.selectedRecipe);
 				$scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
 			}
 
@@ -528,21 +530,19 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		}
 
 		if(par == 'release'){
-			$scope.selectedRWip = angular.copy($scope.selectedRecipe)
+			//$scope.selectedRWip = angular.copy($scope.selectedRecipe)
 		}else if($scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId].justReleased){
 			$scope.selectedRWip.changelog = '';
 			$scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId].justReleased = false;
 		}
 
 		$scope.selectedRecipe = (par == 'release') ? angular.copy($scope.selectedRVersion) : angular.copy($scope.selectedRWip);
-		$scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
-		
 	}
 
 	// Watch changes at the selected Recipe.
-	$scope.$watch('selectedRecipe', function(newValue, oldValue) {
+	$scope.$watch('selectedRWip', function(newValue, oldValue) {
 		oldValue = angular.copy($scope.originalDataRecipe);
-		if (JSON.stringify(newValue) === JSON.stringify(oldValue) || !oldValue || newValue.name == "") {
+		if (JSON.stringify(newValue) === JSON.stringify(oldValue) || !oldValue || ((newValue != null) && newValue.name == "")) {
 			$scope.editingRecipe = false;
 			return;
 		}
@@ -641,15 +641,15 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	$scope.editorActions = {
 		// Save WIP
 		saveWIP : function(){
-			var tmpObj = $scope.selectedRecipe,
-			selectedId = $scope.selectedRecipe.recipeId,
-			selectedVersion = $scope.selectedRecipe.versionNumber;
+			var tmpObj = $scope.selectedRWip,
+			selectedId = $scope.selectedRWip.recipeId,
+			selectedVersion = $scope.selectedRWip.versionNumber;
 			dataToSend = $.param(tmpObj)
 			restCalls.saveWIP({details:selectedId, moreDetails:selectedVersion}, dataToSend, function(){
 				$log.info('Success on Saving WIP');
 				$scope.alerts.addAlert({type: 'success', msg: 'WIP Saved', closeIn: 1500});
-				$scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
-				$scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId].opt = 'wip'
+				$scope.originalDataRecipe = angular.copy($scope.selectedRWip);
+				$scope.switchWipRelease('wip');
 				listRecipes();
 			}, function(){
 				$log.warn('Error on Saving WIP');
@@ -685,6 +685,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			var confirmation=confirm("You are about to cancel the changes for recipe: " +
 				$scope.currentSelectedRow.entity.name + ". You want to proceed?");
 			if (confirmation==true){
+				$scope.selectedRWip = angular.copy($scope.originalDataRecipe);
 				$scope.selectedRecipe = angular.copy($scope.originalDataRecipe);
 				return true;
 			}else{
@@ -711,7 +712,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		},
 		// Validate Syntax
 		validateSyntax : function(){
-			var dataToSend = $.param({'sourceCode': $scope.selectedRecipe.sourceCode});
+			var dataToSend = $.param({'sourceCode': $scope.selectedRWip.sourceCode});
 			restCalls.validate({}, dataToSend, function(data){
 				$scope.currentSyntaxValidation = data.errors || [{"error":0,"reason":"No errors found"}];
 				$scope.activeSubTabs.editor.syntaxErrors = true;
@@ -802,8 +803,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		sourceCode : '',
 		showModal : false,
 		btns : {
-			save : function(){
-				$log.log('saving edition');
+			storeLocally : function(){
+				$log.log('storing locally edition');
 				$scope.selectedRWip.sourceCode = $scope.syntaxModal.sourceCode;
 				$scope.selectedRWip.changelog = $scope.selectedRecipe.changelog;
 				$scope.selectedRecipe = angular.copy($scope.selectedRWip);
@@ -868,6 +869,19 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	};
 
 	$scope.showDialog = false;
+	
+	$scope.showCreateRecipeDialog = function() {
+		if($scope.editingRecipe){                
+			confirmation=confirm("Recipe " + $scope.currentSelectedRow.entity.name + " has unsaved changes."+ 
+				"Press Okay to continue and loose those changes otherwise press Cancel");
+			if (confirmation==true){
+				$scope.showDialog = true;
+			}
+		} else {
+			$scope.showDialog = true;
+		}
+	};	
+	
 	clearFields();
 	//----------------------------------------------------
 
@@ -1426,6 +1440,12 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
     	}
     };
 
+    $(window).on('beforeunload', function(){
+ 	   if ($scope.editingRecipe){
+ 	      return 'Warning: Switching pages will cause you to loose unsaved changes to the recipe'
+ 	   }
+ 	});    
+
 });
 
 angular.module('modNgBlur', [])
@@ -1452,3 +1472,4 @@ app.factory('servicesInterceptor', [function() {
     };
     return servicesInterceptor;
 }]);
+

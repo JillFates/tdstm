@@ -50,7 +50,7 @@
 			</div>
 			<div class="row-fluid clearfix">
 				<div class="col-md-4">
-					<button class="btn btn-default createRecipe" ng-click="showDialog = true">Create Recipe</button>
+					<button class="btn btn-default createRecipe" ng-click="showCreateRecipeDialog()">Create Recipe</button>
 				</div>
 					%{-- <div class="col-md-4 paginationWrapper">
 						<pagination boundary-links="true" total-items="totalItems" page="currentPage" class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
@@ -357,7 +357,7 @@
 								<div ng-model="syntaxModal.sourceCode" ui-codemirror="codeEditorOptions"></div>
 							</div>
 							<div class="modal-footer">
-								<button class="btn btn-primary" ng-click="syntaxModal.btns.save()">Close</button>
+								<button class="btn btn-primary" ng-click="syntaxModal.btns.storeLocally()">Close</button>
 								<button class="btn btn-warning" ng-click="syntaxModal.btns.cancel()">Cancel</button>
 							</div>
 						</form>
