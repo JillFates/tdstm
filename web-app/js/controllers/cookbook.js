@@ -565,7 +565,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			angular.copy($scope.selectedRWip);
 	}
 
-	// Watch changes at the selected Recipe.
+	// Watch changes at the WIP RecipeVersion.
 	$scope.$watch('selectedRWip', function(newValue, oldValue) {
 		oldValue = angular.copy($scope.originalDataRecipe);
 		if (JSON.stringify(newValue) === JSON.stringify(oldValue) || !oldValue || ((newValue != null) && newValue.name == "")) {
@@ -575,6 +575,14 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		$scope.editingRecipe = true;
 	}, true);
 
+	// Watch changes on changelog
+	$scope.$watch('selectedRecipe', function(newValue, oldValue) {
+		if (($scope.gridData != null) &&
+			($scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId].opt == 'wip')) {
+			$scope.selectedRWip.changelog = $scope.selectedRecipe.changelog;
+		}
+	}, true);
+	
 	// Actions for the main Grid
 	$scope.gridActions = function(row, ind){
 
