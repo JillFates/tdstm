@@ -26,7 +26,7 @@
 		<tr>
 			<td><img src="${resource(dir:'images',file:'iconApp.png')}" height="14" /></td>
 			<td colspan="2" style="padding: 0px;">
-				<input type="checkbox" id="Application" name="labels" value="apps" ${( (! multiple) && labelMap.Application=='true' ) ? 'checked' : ''} class="pointer" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleApplicationLabel');">
+				<input type="checkbox" id="Application" name="labels" value="apps" ${( labelMap.Application=='true' ) ? 'checked' : ''} class="pointer" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleApplicationLabel');">
 				<label for="Application" style="vertical-align: text-top;">Apps &nbsp;&nbsp;&nbsp;</label>
 			</td>
 		</tr>
