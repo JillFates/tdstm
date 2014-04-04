@@ -1,4 +1,5 @@
-var app = angular.module('cookbookRecipes', ['ngGrid', 'ngResource', 'ui.bootstrap', 'modNgBlur', 'ui.codemirror']);
+var app = angular.module('cookbookRecipes', ['ngGrid', 'ngResource', 'ui.bootstrap', 'modNgBlur',
+	 'ui.codemirror']);
 
 app.config(['$logProvider', function($logProvider) {  
    //$logProvider.debugEnabled(false);  
@@ -12,11 +13,12 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	$log, $location, $anchorScroll, $sce) {
 	
 	// All Vars used
-	var restCalls, restCalls, listRecipes, columnSel, actionsTemplate, updateBtns, lastLoop, confirmation, 
+	var restCalls, listRecipes, columnSel, actionsTemplate, updateBtns, lastLoop, confirmation, 
 	confirmation, rowToShow, ModalInstanceCtrl, checkLoginStatus;
 
 	var layoutPluginGroups = new ngGridLayoutPlugin();
 	var layoutPluginTasks = new ngGridLayoutPlugin();
+	var layoutPluginVersions = new ngGridLayoutPlugin();
 
 	$http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
 	// Resource Calls
@@ -190,8 +192,22 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				params: {
 					domain: "task"
 				}
+			},
+			getGroups: {
+				method: "GET",
+				params: {
+					domain: "cookbook",
+					section: "groups"
+				}
+			},
+			getVersions: {
+				method: "GET",
+				params: {
+					domain: "cookbook",
+					section: "recipeVersion",
+					details: "list"
+				}
 			}
-
 		}
 	);
 
@@ -203,11 +219,13 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 	// Method to Get the list of Recipes.
 	listRecipes = function(ind){
-		$scope.recipes = restCalls.getListOfRecipes({archived: $scope.archived, context: $scope.context}, function(data){
+		$scope.recipes = restCalls.getListOfRecipes({archived: $scope.archived, context: $scope.context}, 
+			function(data){
 			$log.info('Success on getting Recipes');
 			if(data.data){
 				$scope.totalItems = data.data.list.length;
-				$scope.gridData = ($scope.totalItems) ? data.data.list : [{'message': 'No results found', 'context': 'none'}]; 
+				$scope.gridData = ($scope.totalItems) ? data.data.list : 
+					[{'message': 'No results found', 'context': 'none'}]; 
 				$scope.colDefinition = ($scope.totalItems) ? $scope.colDef : $scope.colDefNoData;
 				if(ind){
 					rowToShow = ind;
@@ -287,10 +305,12 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		'title="Revert" ng-click="gridActions(row, 1)">'+
 	'<span class="glyphicon glyphicon-arrow-left"></span>'+
 	'</a>'+
-	'<a href="" class="actions archive" title="Archive" ng-click="gridActions(row, 2)" ng-hide="archived == \'y\'">'+
+	'<a href="" class="actions archive" title="Archive" ng-click="gridActions(row, 2)"'+
+		'ng-hide="archived == \'y\'">'+
 	'<span class="glyphicon glyphicon-folder-close"></span>'+
 	'</a>'+
-	'<a href="" class="actions unarchive" title="UnArchive" ng-click="gridActions(row, 4)" ng-hide="archived == \'n\'">'+
+	'<a href="" class="actions unarchive" title="UnArchive" ng-click="gridActions(row, 4)"'+
+		'ng-hide="archived == \'n\'">'+
 	'<span class="glyphicon glyphicon-folder-open"></span>'+
 	'</a>'+
 	'<a href="" class="actions remove" title="Remove" ng-click="gridActions(row, 3)">'+
@@ -303,15 +323,16 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	$scope.colDef = [
 	{field:'name', displayName:'Recipe', enableCellEdit: true, enableCellEditOnFocus: false, width: '***', 
 		editableCellTemplate: $scope.edittableField},
-	{field:'description', displayName:'Description', enableCellEdit: true, enableCellEditOnFocus: false, width: '******', 
-		editableCellTemplate: $scope.edittableField},
+	{field:'description', displayName:'Description', enableCellEdit: true, enableCellEditOnFocus: false, 
+		width: '******', editableCellTemplate: $scope.edittableField},
 	{field:'context', displayName:'Context', enableCellEdit: false, width: '**'},
 	{field:'createdBy', displayName:'Editor', enableCellEdit: false, width: '***'},
 	{field:'lastUpdated', displayName:'Last Updated', enableCellEdit: false, width: '****'},
-	{field:'versionNumber', displayName:'Version', cellClass: 'text-right', enableCellEdit: false, width: '**'},
+	{field:'versionNumber', displayName:'Version', cellClass: 'text-right', enableCellEdit: false, 
+		width: '**'},
 	{field:'hasWIP', displayName:'WIP', cellClass: 'text-center', enableCellEdit: false, width: '*'},
-	{field:'', displayName:'Actions', cellClass: 'text-center', enableCellEdit: false, width: '**', sortable: false, 
-		cellTemplate: actionsTemplate}
+	{field:'', displayName:'Actions', cellClass: 'text-center', enableCellEdit: false, width: '**', 
+		sortable: false, cellTemplate: actionsTemplate}
 	];
 
 	$scope.colDefNoData = [{field:'message', displayName:'Message', enableCellEdit: false, width: '100%'}];
@@ -334,9 +355,10 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		enableCellEdit: true,
 		beforeSelectionChange: function(rowItem){
 			if($scope.editingRecipe){                
-				confirmation=confirm("Recipe " + $scope.currentSelectedRow.entity.name + " has unsaved changes."+ 
+				confirmation = confirm("Recipe " + $scope.currentSelectedRow.entity.name + 
+					" has unsaved changes."+ 
 					"Press Okay to continue and loose those changes otherwise press Cancel");
-				if (confirmation==true){
+				if (confirmation == true){
 					return true;
 				}else{
 					return false;
@@ -456,7 +478,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 						angular.copy($scope.selectedRVersion) : angular.copy($scope.selectedRWip);
 
 					if(!$scope.selectedRWip){
-						$scope.selectedRWip = ($scope.selectedRVersion) ? $scope.selectedRVersion : fillDefault();
+						$scope.selectedRWip = ($scope.selectedRVersion) ? $scope.selectedRVersion : 
+						fillDefault();
 					}
 
 					// A deep copy of the selected Recipe data. It won't change when editing.
@@ -464,12 +487,13 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 					// This is a good moment to call the get list task batches service
 					$scope.tasks.getListTaskBatches({recipeId: $scope.selectedRecipe.recipeId, limitDays: 30})
+					$scope.versions.getVersions({recipeId: $scope.selectedRecipe.recipeId});
 
 				}
 
 				// Only call getWipRecipe if there is the recipe has WIP
 				var callGetWipService = function(){
-					restCalls.getARecipeVersion({details:item.recipeId, moreDetails: 0}, function(data, xhr){
+					restCalls.getARecipeVersion({details:item.recipeId, moreDetails: 0}, function(data){
 						// This is the selected recipe data.
 						$scope.selectedRWip = (data.data) ? data.data : null;
 						fillTheVars();
@@ -481,10 +505,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 					});
 				}
 
-				restCalls.getARecipeVersion({details:item.recipeId}, function(data, xhr){
-					// This is the selected recipe data.
-					//checkLoginStatus(xhr('x-login-url'));
-
+				restCalls.getARecipeVersion({details:item.recipeId}, function(data){
 					$scope.selectedRVersion = (data.data) ? data.data : null;
 					if($scope.selectedRVersion.hasWIP){
 						// Only call getWipRecipe if there is the recipe has WIP
@@ -495,6 +516,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 					}
 					
 					$log.info('Success on getting selected released recipe');
+					$log.info(data.data);
 				}, function(){
 					$scope.selectedRVersion = fillDefault();
 					$log.info('No records found for selected released Recipe');
@@ -507,7 +529,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 					$scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
 				/*}*/
 			}else{
-				$log.info('The selected recipe has no version yet or has no WIP yet. Creating empty recipe..');
+				$log.info('The selected recipe has no version yet or has no WIP yet.'+
+					' Creating empty recipe..');
 			    $scope.selectedRecipe = fillDefault();
 			    $scope.selectedRWip = angular.copy($scope.selectedRecipe);
 				$scope.originalDataRecipe = angular.copy($scope.selectedRecipe);
@@ -531,12 +554,15 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 		if(par == 'release'){
 			//$scope.selectedRWip = angular.copy($scope.selectedRecipe)
-		}else if($scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId].justReleased){
+		}else if($scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId].
+			justReleased){
 			$scope.selectedRWip.changelog = '';
-			$scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId].justReleased = false;
+			$scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId].
+				justReleased = false;
 		}
 
-		$scope.selectedRecipe = (par == 'release') ? angular.copy($scope.selectedRVersion) : angular.copy($scope.selectedRWip);
+		$scope.selectedRecipe = (par == 'release') ? angular.copy($scope.selectedRVersion) : 
+			angular.copy($scope.selectedRWip);
 	}
 
 	// Watch changes at the selected Recipe.
@@ -610,8 +636,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			},
 
 			delete : function(){
-				confirmation=confirm("Delete Recipe \""+row.entity.name+"\"?");
-				if (confirmation==true){
+				confirmation = confirm("Delete Recipe \""+row.entity.name+"\"?");
+				if (confirmation == true){
 					var selectedId = row.entity.recipeId;
 					restCalls.discardWIP({details:selectedId}, function(){
 						$log.info('Success on removing Recipe');
@@ -660,21 +686,24 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		releaseVersion : function(){
 			var dataToSend = $.param($scope.selectedRecipe),
 			selectedId = $scope.selectedRecipe.recipeId,
-			confirmation=confirm("Only publish recipes if it is ready for use by all users."+
+			confirmation = confirm("Only publish recipes if it is ready for use by all users."+
 				"Press Okay to publish otherwise press cancel");
-			if (confirmation==true){
+			if (confirmation == true){
 				restCalls.release({moreDetails:selectedId}, dataToSend, function(){
 					$log.info('Success on Releasing');
 					$scope.alerts.addAlert({type: 'success', msg: 'Version Released', closeIn: 1500});
-					$scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId].opt = 'release';
-					$scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId].justReleased = true;
+					$scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId].opt = 
+						'release';
+					$scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId].
+						justReleased = true;
 					listRecipes();
 				}, function(){
 					$log.warn('Error on Saving WIP');
 					if($scope.selectedRecipe.hasWIP){
 						$scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to release version'});    
 					}else{
-						$scope.alerts.addAlert({type: 'danger', msg: 'Error: You can only release recipes saved as WIP'});
+						$scope.alerts.addAlert({type: 'danger', msg: 'Error: You can only release recipes'+
+							' saved as WIP'});
 					}
 					
 				});
@@ -682,9 +711,9 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		},
 		// Cancel
 		cancelChanges : function(){
-			var confirmation=confirm("You are about to cancel the changes for recipe: " +
+			var confirmation = confirm("You are about to cancel the changes for recipe: " +
 				$scope.currentSelectedRow.entity.name + ". You want to proceed?");
-			if (confirmation==true){
+			if (confirmation == true){
 				$scope.selectedRWip = angular.copy($scope.originalDataRecipe);
 				$scope.selectedRecipe = angular.copy($scope.originalDataRecipe);
 				return true;
@@ -694,13 +723,15 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		},
 		// Discard WIP
 		discardWIP : function(){
-			var confirmation=confirm("You are about to discard WIP: " + $scope.currentSelectedRow.entity.name + "."+
+			var confirmation = confirm("You are about to discard WIP: " + 
+				$scope.currentSelectedRow.entity.name + "."+
 				" Do you want to proceed?");
-			if (confirmation==true){
+			if (confirmation == true){
 				var dataToSend = $.param($scope.selectedRecipe),
 				selectedId = $scope.selectedRecipe.recipeId,
 				selectedVersion = $scope.selectedRecipe.versionNumber;
-				restCalls.discardWIP({details:selectedId, moreDetails:selectedVersion}, dataToSend, function(){
+				restCalls.discardWIP({details:selectedId, moreDetails:selectedVersion}, 
+					dataToSend, function(){
 					$log.info('Success on Discarding WIP');
 					$scope.alerts.addAlert({type: 'success', msg: 'WIP Discarded', closeIn: 1500});
 					listRecipes();
@@ -808,7 +839,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				$scope.selectedRWip.sourceCode = $scope.syntaxModal.sourceCode;
 				$scope.selectedRWip.changelog = $scope.selectedRecipe.changelog;
 				$scope.selectedRecipe = angular.copy($scope.selectedRWip);
-				if($scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId].opt != 'wip'){
+				if($scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId].opt
+					 != 'wip'){
 					$scope.switchWipRelease('wip');
 				}
 				$scope.syntaxModal.showModal = false;
@@ -963,8 +995,9 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	$scope.tasks.validateCurrentSelection = function(){
 		if($scope.currentSelectedRecipe && $scope.currentSelectedRecipe.context){
 			var context = $scope.currentSelectedRecipe.context;
-			if((context == 'Event' && $scope.tasks.selectedEvent) || (context == 'Bundle' && $scope.tasks.selectedBundle) ||
-				(context == 'Application' && $scope.tasks.selectedApplication)){
+			if((context == 'Event' && $scope.tasks.selectedEvent) || (context == 'Bundle' && 
+					$scope.tasks.selectedBundle) ||	(context == 'Application' && 
+					$scope.tasks.selectedApplication)){
 				$log.log('matches event, or bundle, or application');
 				return true;
 			}else{
@@ -1044,16 +1077,22 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		$scope.tasks.selectedApplication = '';
 	};
 
-	//generate an array to show the select element correctly
-	// Expect opts with the following data: isUnassigned (boolean), unassignedArray (array with unassigned info)
-	// assignedArray (array with assigned info), and groupName which would be the group name if isUnassigned is false.
+	// generate an array to show the select element correctly
+	// Expect opts with the following data: isUnassigned (boolean), unassignedArray 
+	// (array with unassigned info)
+	// assignedArray (array with assigned info), and groupName which would be the group name if 
+	// isUnassigned is false.
 	$scope.tasks.generateOptions = function(opts){
 		var newArray = (opts.isUnassigned) ? opts.unassignedArray : opts.assignedArray;
 		if(opts.isUnassigned){
 			angular.forEach(newArray, function(value, key){
 				value.group = 'unassigned';
 			})
-			$scope.tasks.bundlesArrayUnassigned = newArray;
+			if(opts.isGroup){
+				$scope.groups.bundlesArrayUnassigned = newArray;
+			}else{
+				$scope.tasks.bundlesArrayUnassigned = newArray;
+			}
 		}else{
 			angular.forEach(newArray, function(value, key){
 				value.group = opts.groupName;
@@ -1095,55 +1134,74 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	}
 	
 	// Get Events and Bundles
-	$scope.tasks.getEventsAndBundles = function(){
+	$scope.tasks.getEventsAndBundles = function(isGroup){
 		restCalls.getEventsAndBundles({}, function(data){
 			$log.info('Success on getting Events and Bundles');
 			$log.info(data.data.list);
-			$scope.tasks.eventsArray = data.data.list
-
-			$scope.tasks.getUsrPreferences();
+			if(isGroup){
+				$scope.groups.eventsArray = data.data.list;
+			}else{
+				$scope.tasks.eventsArray = data.data.list;
+			}
+			$scope.tasks.getUsrPreferences(isGroup);
 		}, function(){
 			$log.info('Error on getting Events and Bundles');
 		});
 	}
 
 	// Get List of Bundles for a given Event
-	$scope.tasks.getListBundles = function(event){
+	$scope.tasks.getListBundles = function(event, isGroup){
 		var event = (event == 0) ? {id: 0} : event;
 		restCalls.getListBundles({details: event.id}, function(data){
 			$log.info('Success on getting Bundles');
 			$log.info(data.data.list);
 			if(event.id == 0){
 				//generate an array to show the select element correctly
-				$scope.tasks.bundlesArrayUnassigned = $scope.tasks.generateOptions({
-					isUnassigned: true, 
-					unassignedArray: data.data.list, 
-					assignedArray: []
-				});
+				if(isGroup){
+					$scope.groups.bundlesArrayUnassigned = $scope.tasks.generateOptions({
+						isUnassigned: true, 
+						unassignedArray: data.data.list, 
+						assignedArray: []
+					});
+				}else{
+					$scope.tasks.bundlesArrayUnassigned = $scope.tasks.generateOptions({
+						isUnassigned: true, 
+						unassignedArray: data.data.list, 
+						assignedArray: []
+					});
+				}
 			}else{
 				//generate an array to show the select element correctly
-				$scope.tasks.bundlesArrayAssigned = $scope.tasks.generateOptions({
-					isUnassigned: false, 
-					unassignedArray: angular.copy($scope.tasks.bundlesArrayUnassigned), 
-					assignedArray: data.data.list, 
-					groupName: event.name
-				});
+				if(isGroup){
+					$scope.groups.bundlesArrayAssigned = $scope.tasks.generateOptions({
+						isUnassigned: false, 
+						unassignedArray: angular.copy($scope.groups.bundlesArrayUnassigned), 
+						assignedArray: data.data.list, 
+						groupName: event.name
+					});
+				}else{
+					$scope.groups.bundlesArrayAssigned = $scope.tasks.generateOptions({
+						isUnassigned: false, 
+						unassignedArray: angular.copy($scope.tasks.bundlesArrayUnassigned), 
+						assignedArray: data.data.list, 
+						groupName: event.name
+					});
+				}
 			}
-			$log.log('--------------------');
-			$log.log('$scope.tasks.bundlesArrayAssigned');
-			$log.log($scope.tasks.bundlesArrayAssigned);
-			$log.log('--------------------');
-			$log.log('$scope.tasks.bundlesArrayUnassigned');
-			$log.log($scope.tasks.bundlesArrayUnassigned);
-			$log.log('--------------------');
-			$scope.tasks.bundlesArray = angular.copy($scope.tasks.bundlesArrayAssigned).concat(angular.copy($scope.tasks.bundlesArrayUnassigned));
+			if(isGroup){
+				$scope.groups.bundlesArray = angular.copy($scope.groups.bundlesArrayAssigned)
+				.concat(angular.copy($scope.groups.bundlesArrayUnassigned));
+			}else{
+				$scope.tasks.bundlesArray = angular.copy($scope.tasks.bundlesArrayAssigned)
+				.concat(angular.copy($scope.tasks.bundlesArrayUnassigned));
+			}
 		}, function(){
 			$log.info('Error on getting Bundles');
 		});
 	}
 
 	// Get Applications in for a given Bundle
-	$scope.tasks.getListInBundle = function(bundle){
+	$scope.tasks.getListInBundle = function(bundle, isGroup){
 		var bundle = (bundle == 0) ? {id: 0} : bundle;
 		if(bundle.group != 'unassigned'){
 			restCalls.getListInBundle({details: bundle.id}, function(data){
@@ -1151,21 +1209,46 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				$log.info(data.data.list);
 				if(bundle.id == 0){
 					//generate an array to show the select element correctly
-					$scope.tasks.applicationsArrayUnassigned =  $scope.tasks.generateOptions({
-						isUnassigned: true, 
-						unassignedArray: data.data.list, 
-						assignedArray: []
-					});
+					if(isGroup){
+						$scope.groups.applicationsArrayUnassigned =  $scope.tasks.generateOptions({
+							isUnassigned: true, 
+							unassignedArray: data.data.list, 
+							assignedArray: []
+						});
+					}else{
+						$scope.tasks.applicationsArrayUnassigned =  $scope.tasks.generateOptions({
+							isUnassigned: true, 
+							unassignedArray: data.data.list, 
+							assignedArray: []
+						});
+					}
 				}else{
 					//generate an array to show the select element correctly
-					$scope.tasks.applicationsArrayAssigned = $scope.tasks.generateOptions({
-						isUnassigned: false, 
-						unassignedArray: angular.copy($scope.tasks.applicationsArrayUnassigned), 
-						assignedArray: data.data.list, 
-						groupName: bundle.name
-					});
+					if(isGroup){
+						$scope.groups.applicationsArrayAssigned = $scope.tasks.generateOptions({
+							isUnassigned: false, 
+							unassignedArray: angular.copy($scope.tasks.applicationsArrayUnassigned), 
+							assignedArray: data.data.list, 
+							groupName: bundle.name,
+							isGroup: true
+						});
+					}else{
+						$scope.tasks.applicationsArrayAssigned = $scope.tasks.generateOptions({
+							isUnassigned: false, 
+							unassignedArray: angular.copy($scope.tasks.applicationsArrayUnassigned), 
+							assignedArray: data.data.list, 
+							groupName: bundle.name,
+							isGroup: false
+						});
+					}
 				}
-				$scope.tasks.applicationsArray = angular.copy($scope.tasks.applicationsArrayAssigned).concat(angular.copy($scope.tasks.applicationsArrayUnassigned));
+				if(isGroup){
+					$scope.groups.applicationsArray = angular.copy($scope.tasks.applicationsArrayAssigned).
+					concat(angular.copy($scope.tasks.applicationsArrayUnassigned));
+				}else{
+					$scope.tasks.applicationsArray = angular.copy($scope.tasks.applicationsArrayAssigned).
+					concat(angular.copy($scope.tasks.applicationsArrayUnassigned));
+				}
 			}, function(){
 				$log.info('Error on getting Applications');
 			});
@@ -1175,15 +1258,22 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	}
 
 	// Get User Preference
-	$scope.tasks.getUsrPreferences = function(){
+	$scope.tasks.getUsrPreferences = function(isGroup){
 		restCalls.getUsrPreferences({details: 'MOVE_EVENT,CURR_BUNDLE'}, function(data){
 			$log.info('Success on getting User Preferences');
 			$log.info(data.data.preferences);
 			if(data.data.preferences.MOVE_EVENT){
-				$scope.tasks.selectedEvent = {};
-				$scope.tasks.selectedBundle = {};
-				$scope.tasks.selectedEvent.id = data.data.preferences.MOVE_EVENT;
-				$scope.tasks.selectedBundle.id = data.data.preferences.CURR_BUNDLE;
+				if(isGroup){
+					$scope.groups.selectedEvent = {};
+					$scope.groups.selectedBundle = {};
+					$scope.groups.selectedEvent.id = data.data.preferences.MOVE_EVENT;
+					$scope.groups.selectedBundle.id = data.data.preferences.CURR_BUNDLE;
+				}else{
+					$scope.tasks.selectedEvent = {};
+					$scope.tasks.selectedBundle = {};
+					$scope.tasks.selectedEvent.id = data.data.preferences.MOVE_EVENT;
+					$scope.tasks.selectedBundle.id = data.data.preferences.CURR_BUNDLE;
+				}
 			}
 		}, function(){
 			$log.info('Error on getting User Preferences');
@@ -1212,31 +1302,40 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			$log.info(data);
 
 			var	tasksActionsTemplate = '<div class="gridIcon">'+
-				'<a href="" class="actions edit" title="Edit" ng-click="tasks.tasksGridActions(row, \'refresh\')">'+
+				'<a href="" class="actions edit" title="Edit"'+
+					'ng-click="tasks.tasksGridActions(row, \'refresh\')">'+
 				'<span class="glyphicon glyphicon-refresh"></span>'+
 				'</a>'+
-				'<a href="" class="actions remove" title="Remove" ng-click="tasks.tasksGridActions(row, \'remove\')">'+
+				'<a href="" class="actions remove" title="Remove"'+
+					'ng-click="tasks.tasksGridActions(row, \'remove\')">'+
 				'<span class="glyphicon glyphicon-trash"></span>'+
 				'</a>'+
 				'</div>',
 				checkboxTemplate = '<div class="gridIcon">'+
 				'<span class="actions" style="text-align: center;">'+
-				'<input type="checkbox" name="isPublished" ng-checked="row.entity.isPublished" id="isPublished" ng-model="tasks.isPublished" ng-change="tasks.tasksGridActions(row, \'publishUnpublish\')"/>'+
+				'<input type="checkbox" name="isPublished" ng-checked="row.entity.isPublished"'+
+					'id="isPublished" ng-model="tasks.isPublished"'+
+					'ng-change="tasks.tasksGridActions(row, \'publishUnpublish\')"/>'+
 				'</span>'+
 				'</div>';
 			
-			$scope.tasks.gridData = (data.data.list.length > 0) ? data.data.list : [{'message': 'No results found', 'context': 'none'}];
+			$scope.tasks.gridData = (data.data.list.length > 0) ? 
+				data.data.list : [{'message': 'No results found', 'context': 'none'}];
 
 			$scope.tasks.colDef = (data.data.list.length > 0) ? [
 				{field:'id', displayName:'Target', enableCellEdit: false, width: '**'},
 				{field:'contextName', displayName:'Context', enableCellEdit: false, width: '**'},
-				{field:'taskCount', displayName:'# of', cellClass: 'text-center', enableCellEdit: false, width: '**'},
-				{field:'exceptionCount', displayName:'Exceptions', cellClass: 'text-center', enableCellEdit: false, width: '***'},
+				{field:'taskCount', displayName:'# of', cellClass: 'text-center', 
+					enableCellEdit: false, width: '**'},
+				{field:'exceptionCount', displayName:'Exceptions', cellClass: 'text-center', 
+					enableCellEdit: false, width: '***'},
 				{field:'createdBy', displayName:'Generated By', enableCellEdit: false, width: '****'},
 				{field:'dateCreated', displayName:'Generated At', enableCellEdit: false, width: '****'},
 				{field:'status', displayName:'Status', enableCellEdit: false, width: '**'},
-				{field:'versionNumber', displayName:'Version', cellClass: 'text-center', enableCellEdit: false, width: '**'},
-				{field:'isPublished', displayName:'Published', cellClass: 'text-center', enableCellEdit: false, width: '**',
+				{field:'versionNumber', displayName:'Version', cellClass: 'text-center', 
+					enableCellEdit: false, width: '**'},
+				{field:'isPublished', displayName:'Published', cellClass: 'text-center', 
+					enableCellEdit: false, width: '**',
 					cellTemplate: checkboxTemplate},
 				{field:'', displayName:'Actions', cellClass: 'text-center', enableCellEdit: false, 
 					width: '**', sortable: false, cellTemplate: tasksActionsTemplate}
@@ -1346,6 +1445,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		}
 	}
 
+	// This should to be fired whenever the usr click on "Task Generation" tab. 
+	// It selects the first row if there isn't any selected
 	$scope.tasks.updateGrid = function(){
 		$log.log($scope.tasks.tasksGrid);
 		if($scope.tasks.tasksGrid.selectedItems.length == 0){
@@ -1358,25 +1459,111 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 	//GROUPS///////////////////
 
+	var isGroup = true;
+
 	$scope.groups = {
-		groupsArray : [],
-		assetsArray : [],
-		selectedGroup : '',
-		selectedAsset : '',
-		selectedGroup : '',
-		selectedGroupRow : ''
+		eventsArray : [],
+		boundlesArray : [],
+		bundlesArrayUnassigned : [],
+		bundlesArrayAssigned : [],
+		applicationsArray : [],
+		applicationsArrayUnassigned : [],
+		applicationsArrayAssigned : [],
+		selectedEvent : '',
+		selectedBundle : '',
+		selectedApplication : '',
+		fetchBtnDisabled : true,
+		contextId: 0,
+		gridData: [],
+		colDef: [],
+		groupsArray: [],
+		assetsArray: [],
+		selectedGroup: ''
 	}
 
-	$scope.groups.gridData = [];
+	// Put select elements in blank. 
+	$scope.groups.blankBundles = function(){
+		$scope.groups.selectedBundle = '';
+		$scope.groups.selectedApplication = '';
+		$scope.groups.bundlesArrayAssigned = [];
+		$scope.groups.bundlesArray = $scope.groups.bundlesArrayUnassigned;
+		$scope.groups.applicationsArrayAssigned = [];
+		$scope.groups.applicationsArray = $scope.groups.applicationsArrayUnassigned;
+	};
+	$scope.groups.blankApplications = function(){
+		$scope.groups.selectedApplication = '';
+		$scope.groups.applicationsArrayAssigned = [];
+		$scope.groups.applicationsArray = $scope.groups.applicationsArrayUnassigned;
+	};
 
-	$scope.groups.colDef = [
-		{field:'class', displayName:'Class', enableCellEdit: false},
-		{field:'name', displayName:'Name', enableCellEdit: false},
-		{field:'count', displayName:'Count', enableCellEdit: false}
-	];
+	// Events for select elements.
+	$scope.groups.eventSelected = function(){
+		$scope.groups.selectedBundle = '';
+		$scope.groups.selectedApplication = '';
+		if($scope.groups.selectedEvent && $scope.currentSelectedRecipe.context != 'Event'){
+			$scope.tasks.getListBundles($scope.groups.selectedEvent, isGroup);
+		}else{
+			$scope.groups.blankBundles();
+		}
+		$scope.groups.getContextId();
+	};
+	$scope.groups.bundleSelected = function(){
+		$scope.groups.selectedApplication = '';
+		if($scope.groups.selectedBundle && $scope.currentSelectedRecipe.context != 'Bundle'){
+			$scope.tasks.getListInBundle($scope.groups.selectedBundle, isGroup);
+		}else{
+			$scope.groups.blankApplications();
+		}
+		$scope.groups.getContextId();
+	};
+	$scope.groups.applicationSelected = function(){
+		$scope.groups.getContextId();
+	};
 
-	//$scope.groups.colDef = [{field:'message', displayName:'Message', enableCellEdit: false, width: '100%'}];
-	var lastLoop;
+	$scope.groups.getContextId = function(){
+		var context = $scope.selectedRecipe.context;
+		$log.log(context);
+		switch(context){
+			case 'Application':
+			 	$scope.groups.contextId = ($scope.groups.selectedApplication) ? $scope.groups.selectedApplication.id : 0;
+				break;
+			case 'Event':
+				$scope.groups.contextId = ($scope.groups.selectedEvent) ? $scope.groups.selectedEvent.id : 0;
+				break;
+			case 'Bundle':
+				$scope.groups.contextId = ($scope.groups.selectedBundle) ? $scope.groups.selectedBundle.id : 0;
+				break;
+			default:
+				$scope.groups.contextId = 0;
+		}
+		$scope.groups.fetchBtnDisabled = ($scope.groups.contextId) ? false : true;
+	}
+
+	var countTemplate = '<div class="gridIcon">'+
+		'<span class="actions" style="text-align: center;">'+
+			'<span ng-bind="row.entity.assets.length"></span>'+
+		'</span>'+
+		'</div>';
+
+	$scope.groups.fetchGroups = function(recipeId, contextId){
+		$scope.enabledGridSelection = false;
+		restCalls.getGroups({recipeVersionId: $scope.selectedRecipe.recipeVersionId, contextId: $scope.groups.contextId}, function(data){
+			$log.info('Success on getting Groups');
+			$log.info(data.data.groups);
+			$scope.groups.groupsArray = data.data.groups
+			$timeout(function(){
+				$scope.enabledGridSelection = true;
+			}, 200)
+		}, function(){
+			$log.warn('Error on getting Groups');
+			$scope.groups.groupsArray = [{'message': 'No results found', 'context': 'none'}];
+			$scope.groups.colDef = [{field:'message', displayName:'Message', enableCellEdit: false, width: '100%'}];
+			$timeout(function(){
+				$scope.enabledGridSelection = true;
+			}, 200)
+		});
+	}
+
 	$scope.groups.groupsGrid = {
 		data: 'groups.groupsArray',
 		multiSelect: false,
@@ -1386,15 +1573,16 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		plugins: [layoutPluginGroups],
 		afterSelectionChange: function(rowItem){
 			if(rowItem != $scope.groups.selectedGroup){
-				$scope.groups.selectedGroupRow = rowItem;
 				// This hack is to avoid changeRecipe() to be executed many times. 
 				// This is a known issue on the ng-grid for the afterSelectionChange event.
 				$timeout.cancel(lastLoop);
 				lastLoop = $timeout(function(){
-					if(rowItem.entity.id){
+					if(rowItem.entity.name){
 						$log.info('Group changed');
 						$scope.groups.selectedGroup = rowItem.entity;
 						$log.info($scope.groups.selectedGroup);
+						$scope.enabledGridSelection = false;
+						loadAssets(rowItem.entity.assets);
 					}
 				}, 50)
 				
@@ -1402,49 +1590,237 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		}
 	};
 
-	$scope.groups.getGroupsArray = function(){
-		$scope.groups.groupsArray = [
-			{'id': '01', 'class': 'Application', 'name': 'APP_ALL', 'count': 5},
-			{'id': '02', 'class': 'Application', 'name': 'APP_CRIT', 'count': 15}
-		]
+	// This should to be fired whenever the usr click on "Groups" tab. 
+	// It selects the first row if there isn't any selected
+	$scope.groups.updateGrid = function(){
+    	$log.log($scope.groups.groupsGrid);
+    	$scope.groups.colDef = [
+			/*{field:'class', displayName:'Class', enableCellEdit: false},*/
+			{field:'name', displayName:'Name', enableCellEdit: false},
+			{field:'count', displayName:'Count', cellTemplate: countTemplate, enableCellEdit: false}
+		];
+    };
+
+    $scope.tasks.getEventsAndBundles(isGroup);
+	$scope.tasks.getListBundles(0, isGroup);
+	$scope.tasks.getListInBundle(0, isGroup);
+
+
+
+	// ASSETS //////////////
+	$scope.assets = {
+		colDef : [],
+		gridData : [],
+		showAssetsGrid: false,
+		selectedAsset: ''
 	}
 
-	$scope.groups.getListGroups = function(){
-		$scope.enabledGridSelection = false;
+	var lastLoop,
+		loadAssets; 
 
-		$scope.groups.colDef = [
-			{field:'class', displayName:'Class', enableCellEdit: false},
+	loadAssets = function(data){
+		$scope.groups.showAssetsGrid = true;
+		$scope.assets.gridData = data;
+		$scope.assets.colDef = [
 			{field:'name', displayName:'Name', enableCellEdit: false},
-			{field:'count', displayName:'Count', enableCellEdit: false}
+			{field:'assetType', displayName:'Asset Type', enableCellEdit: false}
 		];
-
-		$scope.groups.getGroupsArray();
-
-		$scope.groups.assetsArray = [
-			{name: 'Payroll'},
-			{name: 'HR'}
-		]
 
 		$timeout(function(){
 			$scope.enabledGridSelection = true;
 		}, 200)
-	}
+	};
 
-	$scope.groups.getListGroups();
+	$scope.assets.assetsGrid = {
+		data: 'assets.gridData',
+		multiSelect: false,
+		columnDefs: 'assets.colDef',
+		enableCellEditOnFocus: false,
+		selectedItems: [],
+		afterSelectionChange: function(rowItem){
+			if(rowItem != $scope.assets.selectedAsset){
+				// This hack is to avoid changeRecipe() to be executed many times. 
+				// This is a known issue on the ng-grid for the afterSelectionChange event.
+				$timeout.cancel(lastLoop);
+				lastLoop = $timeout(function(){
+					if(rowItem.entity.name){
+						$log.info('Asset changed');
+						$scope.assets.selectedAsset = rowItem.entity;
+						$log.info($scope.assets.selectedAsset);
+					}
+				}, 50)
+				
+			}
+		}
+	};
 
-	$scope.groups.updateGrid = function(){
-    	$log.log($scope.groups.groupsGrid);
-    	if($scope.groups.groupsArray.length > 0 && $scope.groups.groupsGrid == 0){
-    		layoutPluginGroups.updateGridLayout();
-			$scope.groups.groupsGrid.selectRow(0, true);
+
+    ///////////////////////
+
+    // VERSIONS
+
+    $scope.versions = {
+    	versionsArray : [],
+		selectedVersion : '',
+		selectedVersionRow : '',
+		currentSelectedTaskRow : ''
+    }
+
+    $scope.versions.gridData = [];
+
+    var	versionsActionsTemplate = '<div class="gridIcon">'+
+		'<a href="" ng-hide="row.entity.isCurrentVersion || !row.entity.versionNumber"'+
+			'class="actions edit" title="Edit"'+ 
+			'ng-click="versions.versionsGridActions(row, \'revert\')">'+
+			'<span class="glyphicon glyphicon-arrow-left"></span>'+
+		'</a>'+
+		'<a href="" class="actions remove" title="Remove"'+
+		'ng-click="versions.versionsGridActions(row, \'remove\')">'+
+			'<span class="glyphicon glyphicon-trash"></span>'+
+		'</a>'+
+		'</div>',
+		currentVersionTemplate = '<div class="gridIcon">'+
+		'<span class="actions" style="text-align: center;">'+
+			'<span ng-bind="row.entity.isCurrentVersion && \'*\' || \'\'"></span>'+
+		'</span>'+
+		'</div>';
+
+	$scope.versions.colDef = [
+		{field:'versionNumber', displayName:'Version', cellClass: 'text-right', enableCellEdit: false, 
+			width: '**'},
+		{field:'', displayName:'Current', enableCellEdit: false, sortable: false, 
+			cellTemplate: currentVersionTemplate, width: '**'},
+		{field:'lastUpdated', displayName:'Last Updated', enableCellEdit: false, width: '***'},
+		{field:'createdBy', displayName:'Created By', enableCellEdit: false, width: '***'},
+		{field:'', displayName:'Actions', cellClass: 'text-center', enableCellEdit: false, 
+			sortable: false, cellTemplate: versionsActionsTemplate, width: '**'}
+	];
+
+	// Versions Grid Actions
+	$scope.versions.versionsGridActions = function(item, action){
+		$log.info(action);
+		var version = (item.entity.versionNumber) ? 'version '+item.entity.versionNumber : 'WIP version';
+		if(action == 'revert'){
+			console.log(item.entity);
+			confirmation = confirm("Reverting \"" + $scope.currentSelectedRecipe.name + "\" to " +
+				version + "\n\nPress Okay to continue");
+			if (confirmation == true){
+				$log.info(item.entity);
+				restCalls.revert({moreDetails:item.entity.id}, function(){
+					$log.info('Success on Reverting');
+					$scope.alerts.addAlert({type: 'success', msg: 'Reverted to version '+
+						item.entity.versionNumber, closeIn: 1500});
+					listRecipes();
+					$scope.versions.getVersions({recipeId: $scope.selectedRecipe.recipeId})
+				}, function(){
+					$log.warn('Error on Reverting');
+					$scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to revert version'});
+				});
+			}
+		}else if(action == 'remove'){
+			console.log($scope.selectedRecipe);
+			confirmation = confirm("Deleting " + version + " for \"" + 
+				$scope.currentSelectedRecipe.name + "\" \n\nPress Okay to continue");
+			if (confirmation == true){
+				$log.info(item.entity);
+				restCalls.discardWIP({details:$scope.selectedRecipe.recipeId, 
+					moreDetails: item.entity.versionNumber}, function(){
+					$log.info('Success on removing Recipe Version');
+					$scope.alerts.addAlert({type: 'success', msg: 'Recipe Version Removed', closeIn: 1500});
+					listRecipes();
+					$scope.versions.getVersions({recipeId: $scope.selectedRecipe.recipeId});
+				}, function(){
+					$log.warn('Error on removing Recipe Version');
+					$scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to remove version'});
+				})
+			}
+		}
+	};
+
+	// This should to be fired whenever the usr click on "Versions" tab. 
+	// It selects the first row if there isn't any selected  
+	$scope.versions.updateGrid = function(){
+		$log.info('group grid select');
+		$log.info($scope.versions.versionsGrid);
+		if($scope.versions.versionsGrid.selectedItems.length == 0){
+    		layoutPluginTasks.updateGridLayout();
+    		$scope.versions.versionsGrid.selectRow(0, true)
     	}
     };
 
-    $(window).on('beforeunload', function(){
+    $scope.versions.getRecipeData = function(id){
+    	restCalls.getARecipeVersion({details:$scope.currentSelectedRecipe.recipeId, moreDetails: id},
+    	function(data){
+	    	$log.info('Success on getting version');
+			$log.info(data.data);
+			$scope.versions.selectedVersion = data.data;
+		}, function(){
+			$log.info('Error on getting version');
+		});
+    }
+
+	var lastLoop;
+	$scope.versions.versionsGrid = {
+		data: 'versions.versionsArray',
+		multiSelect: false,
+		columnDefs: 'versions.colDef',
+		enableCellEditOnFocus: false,
+		selectedItems: [],
+		plugins: [layoutPluginVersions],
+		afterSelectionChange: function(rowItem){
+			if(rowItem != $scope.versions.selectedVersionRow){
+				$scope.versions.selectedVersionRow = rowItem;
+				// This hack is to avoid the code to be executed many times. 
+				// This is a known issue on the ng-grid for the afterSelectionChange event.
+				$timeout.cancel(lastLoop);
+				lastLoop = $timeout(function(){
+					if(rowItem.entity.id){
+						$log.info('Version Row changed');
+						$log.info(rowItem.entity);
+						if(!rowItem.entity.isCurrentVersion){
+							var id = (rowItem.entity.versionNumber) ? rowItem.entity.versionNumber : 0;
+							$scope.versions.selectedVersion = rowItem.entity;
+							$scope.versions.getRecipeData(id);
+						}else{
+							$scope.versions.selectedVersion = angular.copy($scope.selectedRecipe);
+						}
+						$log.info($scope.versions.selectedVersionRow);
+					}
+				}, 50)
+				
+			}
+		}
+	};
+
+	$scope.versions.getVersionsArray = function(arr){
+		$scope.versions.versionsArray = []
+	}
+
+	$scope.versions.getVersionsArray();
+
+	$scope.versions.getVersions = function(obj){
+		$scope.versions.selectedVersionRow = {};
+		$scope.versions.versionsGrid.selectedItems = [];
+		restCalls.getVersions({moreDetails: obj.recipeId}, function(data){
+			$log.info('Success on getting versions');
+			$log.info(data.data.recipeVersions);
+			$scope.versions.versionsArray = data.data.recipeVersions
+			setTimeout(function(){
+				$scope.versions.versionsGrid.selectRow(0, true);
+			}, 100)
+		}, function(){
+			$log.info('Error on getting versions');
+		});
+	}
+
+
+	////////////////////////
+
+	$(window).on('beforeunload', function(){
  	   if ($scope.editingRecipe){
  	      return 'Warning: Switching pages will cause you to loose unsaved changes to the recipe'
  	   }
- 	});    
+ 	});
 
 });
 
@@ -1465,8 +1841,8 @@ app.factory('servicesInterceptor', [function() {
             	return response;
             }else{
             	alert("Your session has expired and need to login again.");
-            	location.reload();
-            	//window.location.href = loginRedirect;
+            	//location.reload();
+            	window.location.href = loginRedirect;
             }
         }
     };

@@ -227,39 +227,42 @@
 											%{-- Groups Content --}%
 											<tab heading="Groups" active="activeSubTabs.editor.groups" ng-click="groups.updateGrid()">
 												<div class="groups">
-													<div class="form-group">
-														<label class="inline text-right" for="eventSelect">Event:</label>
-															<select name="eventSelect" id="eventSelect" ng-model="tasks.selectedEvent" ng-change="tasks.eventSelected()" ng-options="item as item.name for item in tasks.eventsArray" ng-change="tasks.validCurrentSelection = tasks.getGenerateBtnStatus()">
-																<option value="">Please select</option>
-															</select>
+													<div class="selectors in">
+														<div class="form-group">
+															<label class="inline text-right" for="eventSelect">Event:</label>
+																<select name="eventSelect" id="eventSelect" ng-model="groups.selectedEvent" ng-change="groups.eventSelected()" ng-options="item as item.name for item in groups.eventsArray">
+																	<option value="">Please select</option>
+																</select>
+														</div>	
 														
-													</div>	
-													
-													<div class="form-group">
-														<label class="inline text-right" ng-show="currentSelectedRecipe.context == 'Bundle' || currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'" for="eventSelect">Bundle:</label>
-															<select name="bundleSelect" id="bundleSelect" ng-model="tasks.selectedBundle" ng-change="tasks.bundleSelected()" ng-options="item as item.name group by item.group for item in tasks.bundlesArray">
-																<option value="">Please select</option>
-															</select>
-														
+														<div class="form-group" ng-show="currentSelectedRecipe.context == 'Bundle' || currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'">
+															<label class="inline text-right" for="eventSelect">Bundle:</label>
+																<select name="bundleSelect" id="bundleSelect" ng-model="groups.selectedBundle" ng-change="groups.bundleSelected()" ng-options="item as item.name group by item.group for item in groups.bundlesArray">
+																	<option value="">Please select</option>
+																</select>
+														</div>
+
+														<div class="form-group" ng-show="currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'">
+															<label class="inline text-right" for="eventSelect">Application:</label>
+																<select name="applicationSelect" id="applicationSelect" ng-model="groups.selectedApplication" ng-change="groups.applicationSelected()" ng-options="item as item.name group by item.group for item in groups.applicationsArray">
+																	<option value="">Please select</option>
+																</select>
+														</div>
+
+														<div class="refreshWrapper">
+															<label for="refreshGroups">
+																<a class="btn btn-default" ng-disabled="groups.fetchBtnDisabled" id="refreshGroups" ng-click="groups.fetchGroups()">
+																	Fetch
+																</a>
+															</label>
+														</div>
 													</div>
 
-													<div class="form-group">
-														<label class="inline text-right" ng-show="currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'" for="eventSelect">Application:</label>
-															<select name="applicationSelect" id="applicationSelect" ng-model="tasks.selectedApplication" ng-change="tasks.checkValidSelection()" ng-options="item as item.name group by item.group for item in tasks.applicationsArray">
-																<option value="">Please select</option>
-															</select>
-														
-													</div>
-
-													<div class="refreshWrapper">
-														<label for="refreshGroups">
-															<a class="btn btn-default" id="refreshGroups">
-																Fetch
-															</a>
-														</label>
-													</div>
+													<a class="btn btn-navbar" data-toggle="collapse" data-target=".selectors">Collapse Selectors</a>
 													
 													<div class="gridStyleGroups" style="margin-top:15px;" ng-grid="groups.groupsGrid"></div>
+
+													<div class="gridStyleGroups" ng-show="groups.showAssetsGrid" style="margin-top:15px;" ng-grid="assets.assetsGrid"></div>
 
 												</div>
 										
@@ -279,7 +282,25 @@
 							</tab>
 
 							%{-- Versions --}%
-							<tab heading="Versions" active="activeTabs.versions">Versions Content</tab>
+							<tab heading="Versions" active="activeTabs.versions" ng-click="versions.updateGrid()">
+								<div class="row">
+									<div class="col-xs-7">
+										<div class="gridStyleGroups" ng-grid="versions.versionsGrid"></div>
+									</div>
+									<div class="col-xs-5">
+										<tabset>
+											<tab heading="Change Log" class="no-padding" active="activeSubTabs.versions.changeLog">
+												<textarea class="fullWidth" name="versions_changelog" id="versions_changelog" cols="30" rows="10" value="{{versions.selectedVersion.changelog}}" readonly></textarea>
+											</tab>
+											<tab heading="Source Code" class="no-padding" active="activeSubTabs.versions.sourceCode">
+												<textarea class="fullWidth" name="versions_sourcecode" id="versions_sourcecode" cols="30" rows="10" value="{{versions.selectedVersion.sourceCode}}" readonly></textarea>
+											</tab>
+											<tab heading="Diff" class="no-padding" active="activeSubTabs.versions.diff">
+											</tab>	
+										</tabset>
+									</div>
+								</div>
+							</tab>
 						</tabset>
 					</div>
 				</div>
