@@ -2129,7 +2129,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 						// Flip the predecessor tasks to a Map<List> of the tasks by the associated asset id
 						predecessorTasks.each { t -> 
-							predTasksByAssetId[t.assetEntity.id] << t
+							if (t.assetEntity)
+								predTasksByAssetId[t.assetEntity.id] << t
 						}
 
 						// log.debug "***%%%*** predTasksByAssetId: $predTasksByAssetId"
