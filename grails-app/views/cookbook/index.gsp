@@ -322,7 +322,7 @@
 
 				%{-- <div ng-model="selectedRecipe.sourceCode" ui-codemirror="codeEditorOptions" class="codeMirrorWrapper"></div> --}%
 
-				<div modal-show="showDialog" class="modal fade" id="createRecipeModal">
+				<div modal-show="showDialog" class="modal fade" id="createRecipeModal" data-backdrop="static" data-keyboard="false">
 					<div class="modal-dialog modal-lg">
 						<form class="form-horizontal modal-content" id="createRecipeForm" name="createRecipeForm" role="form" novalidate >
 							<div class="modal-header">
