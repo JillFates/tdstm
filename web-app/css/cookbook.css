@@ -22,6 +22,12 @@
 	text-align: center;
 }
 
+.ngGridCellEdit {
+    width: 98%;	
+    margin-top: 2px;
+    margin-left: 2px;
+}
+
 ul{
 	padding-left: 25px;
 }

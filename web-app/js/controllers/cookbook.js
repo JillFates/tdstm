@@ -317,9 +317,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	'<span class="glyphicon glyphicon-trash"></span>'+
 	'</a>'+
 	'</div>';
-	$scope.edittableField = '<input ng-class="colt' + columnSel.index + 
-		'" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-keydown="keyPressed($event, row, col)"'+ 
-		'ng-blur="updateEntity(row, updateEntity.execute)"/>';
+	$scope.edittableField = '<input class="ngGridCellEdit" ng-class="colt' + columnSel.index + 
+		'" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-keydown="keyPressed($event, row, col)" />';
 	$scope.colDef = [
 	{field:'name', displayName:'Recipe', enableCellEdit: true, enableCellEditOnFocus: false, width: '***', 
 		editableCellTemplate: $scope.edittableField},
@@ -354,6 +353,13 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		enableCellEditOnFocus: false,
 		enableCellEdit: true,
 		beforeSelectionChange: function(rowItem){
+			if (rowItem.rowIndex == $scope.currentSelectedRow.rowIndex) {
+				if(!$scope.preventSelection){
+					return true;
+				}else{
+					return false;
+				}
+			}
 			if($scope.editingRecipe){                
 				confirmation = confirm("Recipe " + $scope.currentSelectedRow.entity.name + 
 					" has unsaved changes."+ 
@@ -372,7 +378,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			}
 		},
 		afterSelectionChange: function(rowItem){
-			if(rowItem != $scope.currentSelectedRow && $scope.enabledGridSelection){
+			if(rowItem.rowIndex != $scope.currentSelectedRow.rowIndex && $scope.enabledGridSelection){
 				$scope.currentSelectedRow = rowItem;
 				// This hack is to avoid changeRecipe() to be executed many times. 
 				// This is a known issue on the ng-grid for the afterSelectionChange event.
@@ -414,9 +420,19 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		}
 	});
 
+	$scope.$on('ngGridEventEndCellEdit', function(evt){
+		var row=$scope.currentSelectedRow;
+		if (!row) {
+	        return true;
+	    }
+		$scope.updateEntity(row);
+	});
+	
 	$scope.keyPressed = function(ev, row, col) {
 		var charCode = ev.which || ev.keyCode
-		if (charCode==13){
+		if (charCode==13 || charCode==9){
+			ev.stopPropagation();
+			$scope.$broadcast('ngGridEventEndCellEdit');
 			//$scope.executeUpdate = true;
 			//$('.gridStyle input:visible').blur();
 		}else if(charCode==27){
@@ -568,7 +584,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	// Watch changes at the WIP RecipeVersion.
 	$scope.$watch('selectedRWip', function(newValue, oldValue) {
 		oldValue = angular.copy($scope.originalDataRecipe);
-		if (JSON.stringify(newValue) === JSON.stringify(oldValue) || !oldValue || ((newValue != null) && newValue.name == "")) {
+		if (JSON.stringify(newValue) === JSON.stringify(oldValue) || !oldValue || !newValue || ((newValue != null) && newValue.name == "")) {
 			$scope.editingRecipe = false;
 			return;
 		}
@@ -582,7 +598,22 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			$scope.selectedRWip.changelog = $scope.selectedRecipe.changelog;
 		}
 	}, true);
-	
+
+	// Watch changes on originalDataRecipe
+	$scope.$watch('originalDataRecipe', function(newValue, oldValue) {
+		$scope.editingRecipe = false;
+	}, true);
+
+	// Watch changes on originalDataRecipe
+	$scope.$watch('currentSelectedRecipe', function(newValue, oldValue) {
+		if (newValue && $scope.selectedRWip && $scope.selectedRVersion) {
+			$scope.selectedRWip.name = newValue.name;
+			$scope.selectedRWip.description = newValue.description;
+			$scope.selectedRVersion.name = newValue.name;
+			$scope.selectedRVersion.description = newValue.description;		
+		}
+	}, true);
+
 	// Actions for the main Grid
 	$scope.gridActions = function(row, ind){
 
@@ -675,7 +706,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	$scope.editorActions = {
 		// Save WIP
 		saveWIP : function(){
-			var tmpObj = $scope.selectedRWip,
+			var tmpObj = angular.copy($scope.selectedRWip),
 			selectedId = $scope.selectedRWip.recipeId,
 			selectedVersion = $scope.selectedRWip.versionNumber;
 			dataToSend = $.param(tmpObj)
@@ -771,7 +802,6 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 	// Update recipe. After editing. 
 	$scope.updateEntity = function(row) {
-
 		var recipeToUpdate = {
 			name : $scope.gridData[row.rowIndex].name,
 			description: $scope.gridData[row.rowIndex].description
