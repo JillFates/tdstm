@@ -25,15 +25,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 	var startingFolder = 'tdstm'
 
-	restCalls = $resource(
-		'/'+startingFolder+'/ws/:domain/:section/:details/:moreDetails',
-		{
-			domain: "@domain",
-			section: "@section",
-			details: "@details",
-			moreDetails: "@moreDetails"
-		},
-		{
+	var restMethodDefinitions = {
 			archive: {
 				method: "POST",
 				params: {
@@ -208,7 +200,17 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 					details: "list"
 				}
 			}
-		}
+	};
+	
+	restCalls = $resource(
+		'/'+startingFolder+'/ws/:domain/:section/:details/:moreDetails',
+		{
+			domain: "@domain",
+			section: "@section",
+			details: "@details",
+			moreDetails: "@moreDetails"
+		},
+		restMethodDefinitions
 	);
 
 	// Default data to get recipes
@@ -1875,8 +1877,24 @@ app.factory('servicesInterceptor', [function() {
     var servicesInterceptor = {
         response: function(response) {
         	var loginRedirect = response.headers('x-login-url');
-            if(!loginRedirect){
-            	return response;
+            if(!loginRedirect) {
+            	try {
+            		var json = angular.fromJson(response.data);
+                	if (json.errors && json.errors.length > 0) {
+						var errorDiv = angular.element(document.querySelector('#errorModalText'));
+						var errorsHTML = "<ul>";
+						for (var j = 0; j < json.errors.length; j++) {
+							errorsHTML = errorsHTML + "<li>" + json.errors[j] + "</li>";
+						}
+						errorsHTML = errorsHTML + "</ul>";
+						errorDiv.html(errorsHTML);
+						$('#errorModal').modal('show');
+                	} else {
+                		return response;
+                	}
+            	} catch (e) {
+                	return response;
+            	}
             }else{
             	alert("Your session has expired and need to login again.");
             	//location.reload();

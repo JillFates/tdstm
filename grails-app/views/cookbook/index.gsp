@@ -27,6 +27,9 @@
 	<g:javascript src="ngGrid/ng-grid-layout.js" />
 </head>
 <body>
+
+<g:include view="/layouts/_error.gsp" />
+
 	<div class="body" id="cookbookRecipesEditor" ng-app="cookbookRecipes" ng-controller="CookbookRecipeEditor">
 		<div class="container">
 			<form id="gridControls" class="row-fluid clearfix form-inline groups">
