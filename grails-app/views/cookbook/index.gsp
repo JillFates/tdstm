@@ -258,7 +258,7 @@
 														</div>
 													</div>
 
-													<a class="btn btn-navbar" data-toggle="collapse" data-target=".selectors">Collapse Selectors</a>
+													<a class="selectorsHideShow" data-toggle="collapse" data-target=".selectors">Show/Hide Selectors</a>
 													
 													<div class="gridStyleGroups" style="margin-top:15px;" ng-grid="groups.groupsGrid"></div>
 

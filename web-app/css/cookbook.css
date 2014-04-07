@@ -239,3 +239,14 @@ form.taskGeneration label[for="autoPublishTasks"], .completionWrapper, .generate
 .progressWrapper .progress{
 	margin-bottom: 0px;
 }
+
+.selectorsHideShow{
+	margin: 8px 0 0 0;
+	display: inline-block;
+}
+
+a:hover{
+	text-decoration: none;
+	font-weight: normal;
+	cursor: pointer;
+}

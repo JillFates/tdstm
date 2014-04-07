@@ -679,7 +679,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			selectedId = $scope.selectedRWip.recipeId,
 			selectedVersion = $scope.selectedRWip.versionNumber;
 			dataToSend = $.param(tmpObj)
-			restCalls.saveWIP({details:selectedId, moreDetails:selectedVersion}, dataToSend, function(){
+			restCalls.saveWIP({details:selectedId}, dataToSend, function(){
 				$log.info('Success on Saving WIP');
 				$scope.alerts.addAlert({type: 'success', msg: 'WIP Saved', closeIn: 1500});
 				$scope.originalDataRecipe = angular.copy($scope.selectedRWip);
