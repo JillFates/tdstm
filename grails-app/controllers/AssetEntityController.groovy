@@ -1575,9 +1575,16 @@ class AssetEntityController {
 					for( int sl=0;  sl < sheetNamesLength; sl++ ) {
 						def commentIt = new ArrayList()
 						SimpleDateFormat createDateFormat = new SimpleDateFormat("MM/dd/yyyy")
+						def allAssets
+						if(bundle[0] == "" ) {
+							allAssets = AssetEntity.findAllByProject( project, params )
+						}else{
+						    allAssets = AssetEntity.findAll( "from AssetEntity m where m.project = project and m.moveBundle in ( $bundleList ) " )
+						}
+						
 						if(sheetNames[sl] == "Comments"){
 							def commentSheet = book.getSheet("Comments")
-							asset.each{
+							allAssets.each{
 								commentIt.add(it.id)
 							}
 							def commentList = new StringBuffer()
@@ -1590,7 +1597,7 @@ class AssetEntityController {
 								}
 							}
 							if(commentList){
-								def assetcomment = AssetComment.findAll("from AssetComment cmt where cmt.assetEntity in ($commentList)")
+								def assetcomment = AssetComment.findAll("from AssetComment cmt where cmt.assetEntity in ($commentList) and cmt.commentType = 'comment'")
 								def assetId
 								def createdDate
 								def createdBy
