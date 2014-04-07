@@ -5016,7 +5016,6 @@ class AssetEntityController {
 	  * Action to return on list Dependency
 	  */
 	 def listDependencies ={
-		 def hasPerm = RolePermissions.hasPermission("AssetEdit")
 		 def project = securityService.getUserCurrentProject()
 		 def entities = assetEntityService.entityInfo( project )
 		 def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
@@ -5027,16 +5026,11 @@ class AssetEntityController {
 			 columnLabelpref << [ (key):attributes[value] ]
 		 }
 		 
-		 if(!hasPerm){
-		 	redirect (controller:"project", action:"list")
-			flash.message = "${message(code:'user.access.denied')}"
-		 }else{
-		 	return [projectId: project.id, assetDependency: new AssetDependency(),
-				 	servers: entities.servers,applications: entities.applications,dbs: entities.dbs, 
-					files: entities.files, networks: entities.networks, 
-					dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
-				    moveBundleList:moveBundleList, depPref:depPref,attributesList:attributes.keySet().sort{it}, columnLabelpref:columnLabelpref]
-		 }
+	 	 return [projectId: project.id, assetDependency: new AssetDependency(),
+			 	servers: entities.servers,applications: entities.applications,dbs: entities.dbs, 
+				files: entities.files, networks: entities.networks, 
+				dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
+			    moveBundleList:moveBundleList, depPref:depPref,attributesList:attributes.keySet().sort{it}, columnLabelpref:columnLabelpref]
 	 }
 	/**
 	* This method is to show list of dependencies using jqgrid.

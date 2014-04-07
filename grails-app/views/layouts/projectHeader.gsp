@@ -268,9 +268,7 @@
 							<li><g:link class="mmlink" params="[listType:'physical']" controller="assetEntity"  onclick="hideMegaMenu('assetMegaMenu')">List Physical</g:link></li>
 							<li><g:link class="mmlink" controller="database"  onclick="hideMegaMenu('assetMegaMenu')">List DBs</g:link></li>
 							<li><g:link class="mmlink" controller="files"  onclick="hideMegaMenu('assetMegaMenu')">List Storage</g:link></li>
-							<tds:hasPermission permission='AssetEdit'>
-							  <li><g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')">List Dependencies</g:link></li>
-							</tds:hasPermission>
+							<li><g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')">List Dependencies</g:link></li>
 							<tds:hasPermission permission='MoveBundleEditView'>
 							  <li><g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">Dependency Analyzer</g:link></li>
 							</tds:hasPermission>
