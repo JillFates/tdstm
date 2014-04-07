@@ -1,8 +1,7 @@
 import grails.converters.JSON
+import grails.validation.ValidationException
 
-import org.apache.shiro.SecurityUtils
-import org.springframework.stereotype.Controller;
-import grails.validation.ValidationException;
+import org.hibernate.exception.ConstraintViolationException
 
 
 /**
@@ -111,6 +110,8 @@ class WsCookbookController {
 			ServiceResults.methodFailure(response)
 		} catch (ValidationException e) {
 			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (ConstraintViolationException e) {
+			render(ServiceResults.errors(['Can\'t delete the recipe']) as JSON)
 		} catch (Exception e) {
 			ServiceResults.internalError(response, log, e)
 		}
@@ -466,12 +467,10 @@ class WsCookbookController {
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
 		} catch (EmptyResultException e) {
-			e.printStackTrace();
 			ServiceResults.methodFailure(response)
 		} catch (ValidationException e) {
 			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
 		} catch (Exception e) {
-			e.printStackTrace();
 			ServiceResults.internalError(response, log, e)
 		}
 	}
