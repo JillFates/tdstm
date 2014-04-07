@@ -650,7 +650,7 @@ class PersonController {
 		def hasShowAllProjectsPerm = RolePermissions.hasPermission("ShowAllProjects")
 		def hasEditTdsPerm = RolePermissions.hasPermission("EditTDSPerson")
 		def now = TimeUtil.nowGMT()
-		def projects = projectService.getActiveProject( now, hasShowAllProjectsPerm, 'name', 'asc' )
+		def projects = []
 		
 		def project = securityService.getUserCurrentProject()
 		def roleTypes = partyRelationshipService.getStaffingRoles()
@@ -658,16 +658,37 @@ class PersonController {
 		def moveEventList = []
 		
 		// set the defaults for the checkboxes
-		def assigned = '1'
-		def onlyClientStaff = '1'
+		def assigned = userPreferenceService.getPreference("ShowAssignedStaff") ?: '1'
+		def onlyClientStaff = userPreferenceService.getPreference("ShowClientStaff") ?: '1'
 		
 		def currRole = userPreferenceService.getPreference("StaffingRole")?:"MOVE_TECH"
 		def currLoc = userPreferenceService.getPreference("StaffingLocation")?:"All"
 		def currPhase = userPreferenceService.getPreference("StaffingPhases")?:"All"
 		def currScale = userPreferenceService.getPreference("StaffingScale")?:"6"
 		def moveEvents
-		def projectId = projects.find{it.id == project.id} ? project.id : 0
+		def projectId = Project.findById( project.id) ? project.id : 0
+		def loginPerson = securityService.getUserLoginPerson()
+		def reqProjects = projectService.getActiveProject( now, hasShowAllProjectsPerm, 'name', 'asc' )
 		
+		if (projectId == 0) {
+			projects = reqProjects
+		}else{
+			// Add only the indicated project if exists and based on user's associate to the project
+			project = Project.read( projectId )
+			if (project) {
+				if ( hasShowAllProjectsPerm ) {
+					projects << project
+				} else {
+					// Lets make sure that the user has access to it (is assoicated with the project)
+					def staffProjectRoles = partyRelationshipService.getProjectStaffFunctions(projectId, loginPerson.id)
+					if (staffProjectRoles.size() > 0) {
+						projects << project
+					}
+				}
+			} else {
+				log.error("Didn't find project $projectId")
+			}
+		}
 		if (projectId == 0) {
 			moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",[project:(projects?:project)])
 		} else {
@@ -675,10 +696,22 @@ class PersonController {
 			moveEvents = MoveEvent.findAll("from MoveEvent m where project =:project order by m.project.name , m.name asc",[project:project])
 		}
 		
+		def companies = new StringBuffer('0')
+		def projectList = new StringBuffer('0')
+		projects.each {
+			companies.append(",${it.client.id}")
+			projectList.append(",${it.id}")
+		}
 		// if the "only client staff" button is not checked, show TDS employees as well
 		if (onlyClientStaff == '0')
 			companies.append(",18")
 		
+		// if the user doesn't have permission to edit TDS employees, remove TDS from the companies list
+		if( ! hasEditTdsPerm ) {
+			def tdsIndex = companies.indexOf("18")
+			if(tdsIndex != -1)
+				companies.replace(tdsIndex, tdsIndex+1, "0")
+		}
 		def query = new StringBuffer("""
 			SELECT * FROM (
 				SELECT pr.party_id_to_id AS personId, CONCAT(IFNULL(p.first_name, ''), ' ', IFNULL(CONCAT(p.middle_name, ' '), ''), IFNULL(p.last_name, '')) AS fullName, CONCAT('[',pg.name,']') AS company, 
@@ -691,13 +724,14 @@ class PersonController {
 					LEFT OUTER JOIN role_type rt ON rt.role_type_code = pr.role_type_code_to_id 
 					LEFT OUTER JOIN party_relationship pr2 ON pr2.party_id_to_id = pr.party_id_to_id 
 						AND pr2.role_type_code_to_id = pr.role_type_code_to_id 
-						AND pr2.party_id_from_id IN (${projectId}) 
+						AND pr2.party_id_from_id IN (${projectList}) 
 						AND pr2.role_type_code_from_id = 'PROJECT'
 					LEFT OUTER JOIN move_event_staff mes ON mes.person_id = p.person_id 
 						AND mes.role_id = pr.role_type_code_to_id 
 				WHERE pr.role_type_code_from_id IN ('COMPANY') 
 					AND pr.party_relationship_type_id IN ('STAFF') 
-					AND pr.party_id_from_id = ${project.client.id} 
+					AND pr.party_id_from_id IN (${companies})
+                    AND p.active = 'Y' 
 				GROUP BY role, personId 
 				ORDER BY lastName ASC 
 			) AS companyStaff 
@@ -718,9 +752,10 @@ class PersonController {
 		def paramsMap = [sortOn : 'lastName', firstProp : 'staff', orderBy : 'asc']
 		
 		def editPermission  = RolePermissions.hasPermission('EditProjectStaff')
-		return [projects:projects, projectId:project.id, roleTypes:roleTypes, staffList:staffList,
+		return [projects:reqProjects, projectId:project.id, roleTypes:roleTypes, staffList:staffList,
 			moveEventList:getBundleHeader( moveEvents ), currRole:currRole, currLoc:currLoc,
-			currPhase:currPhase, currScale:currScale, project:project, editPermission:editPermission]
+			currPhase:currPhase, currScale:currScale, project:project, editPermission:editPermission,
+			assigned:assigned, onlyClientStaff:onlyClientStaff]
 		log.error "Loading staff list took ${TimeUtil.elapsed(start)}"
 	}
 	
@@ -745,6 +780,17 @@ class PersonController {
 		
 		def sortableProps = ['lastName', 'fullName', 'company', 'team']
 		def orders = ['asc', 'desc']
+		
+		//code which is used to resolve the bug in TM-2585: 
+		//alphasorting is reversed each time when the user checks or unchecks the two filtering checkboxes.
+		if(params.firstProp != 'staff'){
+			session.setAttribute("Staff_OrderBy",params.orderBy)
+			session.setAttribute("Staff_SortOn",params.sortOn)
+		}else{
+			params.orderBy = session.getAttribute("Staff_OrderBy")?:'asc'
+			params.sortOn = session.getAttribute("Staff_SortOn")?:'lastName'
+		}
+		
 		def paramsMap = [sortOn : params.sortOn in sortableProps ? params.sortOn : 'fullName',
 		firstProp : params.firstProp, 
 		orderBy : params.orderBy in orders ? params.orderBy : 'asc']
@@ -760,6 +806,9 @@ class PersonController {
 		userPreferenceService.setPreference("StaffingLocation",location)
 		userPreferenceService.setPreference("StaffingPhases",phase.toString().replace("[", "").replace("]", ""))
 		userPreferenceService.setPreference("StaffingScale",scale)
+		
+		userPreferenceService.setPreference("ShowClientStaff",onlyClientStaff)
+		userPreferenceService.setPreference("ShowAssignedStaff",assigned)
 
 		def now = TimeUtil.nowGMT()
 		def hasShowAllProjectPerm = RolePermissions.hasPermission("ShowAllProjects")

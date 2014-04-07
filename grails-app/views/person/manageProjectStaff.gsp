@@ -27,13 +27,13 @@
 						<td>
 							<span><b>Only Client Staff</b></span><br/>
 								<input type="checkbox" name="clientStaff" id="clientStaffId"  onChange="if(this.checked){this.value = 1} else {this.value = 0 };loadFilteredStaff('lastName','staff')"
-								value="1" checked="checked"/>
+								${onlyClientStaff=='1'? 'checked="checked" value="1"'  : 'value="0"'}/>
 						</td>
 					</tds:hasPermission>
 					<td>
 						<span><b>Only Assigned</b></span><br/>
 							<input type="checkbox" name="assigned" id="assignedId"  onChange="if(this.checked){this.value = 1} else {this.value = 0 };loadFilteredStaff('lastName','staff')"
-							value="1" checked="checked"/>
+							${assigned=='1'? 'checked="checked" value="1"' : 'value="0"'}/>
 					</td>
 					<%--<td>
 						<span><b>Location</b></span><br/>
