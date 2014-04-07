@@ -45,6 +45,7 @@ import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.StringUtil
 import org.apache.commons.lang.math.NumberUtils
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdssrc.grails.WebUtil
@@ -763,7 +764,13 @@ class AssetEntityController {
 							assetDep.dataFlowFreq = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
 							assetDep.dataFlowDirection = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
 							assetDep.status = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-							assetDep.comment = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+							def depComment = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+							def length = depComment.length()
+							if(length > 254){
+								depComment = StringUtil.ellipsis(depComment,254)
+								warnMsg += "<li> Comment With Dependency $dependent.assetName trimmed at 254"
+							}
+							assetDep.comment = depComment
 							assetDep.c1 = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
 							assetDep.c2 = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
 							assetDep.c3 = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
