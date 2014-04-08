@@ -126,7 +126,7 @@
 						<div id="container"
 							style="position: absolute; width: 50%; height: 120px; overflow: hidden; border: 0px solid grey">
 							<div id="content"
-								style="position: relative; width: 59%; left: 0px; top: -5px">
+								style="position: relative; width: 70%; left: 0px; top: -5px">
 								<div id="news_live_div" class="tabcontent">
 									<ul id="news_live" class="newscroll">
 									</ul>
