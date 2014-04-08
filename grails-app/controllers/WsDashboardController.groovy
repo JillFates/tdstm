@@ -1,5 +1,6 @@
 import grails.converters.JSON
 import java.text.SimpleDateFormat
+import groovy.time.TimeCategory
 
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
@@ -216,15 +217,27 @@ class WsDashboardController {
 		def moveEventPlannedSnapshot
 		def moveEventRevisedSnapshot
 		def revisedComp 
+		def dayTime
+		def eventString=""
 		if( moveEvent ){
 			
 			def resultMap = jdbcTemplate.queryForMap( """
-				SELECT DATE_FORMAT( max(mb.completion_time) ,'%Y/%m/%d %r' ) as compTime
+				SELECT DATE_FORMAT( max(mb.completion_time) ,'%Y/%m/%d %r' ) as compTime,
+				DATE_FORMAT( min(mb.start_time) ,'%Y/%m/%d %r' ) as startTime
 				FROM move_bundle mb WHERE mb.move_event_id = ${moveEvent.id}
 				""" )
 
 			planSumCompTime = resultMap?.compTime
-
+			if(resultMap?.startTime){
+				def eventStartTime = new Date( resultMap?.startTime ) 
+				if(eventStartTime>sysTime){
+					dayTime = TimeCategory.minus(eventStartTime, sysTime)
+					eventString = "<i>Time Remaining<i>"
+				}else{
+					dayTime = TimeCategory.minus(sysTime, eventStartTime)
+					eventString = "<i>Event Time<i>"
+				}
+			}
 			/*
 			* select the most recent MoveEventSnapshot records for the event for both the P)lanned and R)evised types.
 			*/
@@ -249,7 +262,9 @@ class WsDashboardController {
 				"systime": sdf.format(sysTime),
 				"planSum": [ 
 					"dialInd": moveEventPlannedSnapshot?.dialIndicator, "confText": "High", 
-					"confColor": "green", "compTime":planSumCompTime 
+					"confColor": "green", "compTime":planSumCompTime,
+					'dayTime':"<span><b>${dayTime?.days?(dayTime?.days>10? dayTime?.days:'0'+dayTime?.days):'0'}:${dayTime?.hours?(dayTime?.hours>10?dayTime?.hours:'0'+dayTime?.hours):'00'}:${dayTime?.minutes?(dayTime?.minutes>10?dayTime?.minutes:'0'+dayTime?.minutes):'00'}</b></span>",
+					'eventString':eventString,'eventRunbook':moveEvent?.runbookStatus
 				],
 				"revSum": [ 
 					"dialInd": moveEventRevisedSnapshot?.dialIndicator,
