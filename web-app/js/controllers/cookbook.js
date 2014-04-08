@@ -1,4 +1,4 @@
-var app = angular.module('cookbookRecipes', ['ngGrid', 'ngResource', 'ui.bootstrap', 'modNgBlur',
+var app = angular.module('cookbookRecipes', ['ngGrid', 'ngResource', 'ui.bootstrap', 'modNgBlur', 
 	 'ui.codemirror']);
 
 app.config(['$logProvider', function($logProvider) {  
@@ -792,9 +792,52 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				$log.warn('Error on validation');
 				$scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to validate Syntax'});
 			});
+		},
+		
+		diff : function() {
+			$scope.showCompareCodeDialog(
+			   $scope.selectedRVersion.sourceCode,
+			   $scope.selectedRWip.sourceCode,
+			   ("Version " + $scope.selectedRVersion.versionNumber),
+			   "WIP"
+			);
 		}
 
 	}
+
+    $scope.showCompareCodeDialog = function(leftSourceCode, rightSourceCode, leftLabel, rightLabel) {
+		$scope.toCompare = {
+			"leftSourceCode":leftSourceCode, 	
+			"rightSourceCode":rightSourceCode,
+			"leftLabel":leftLabel,
+			"rightLabel":rightLabel
+		};
+	    var dialogInstance = $modal.open({
+	        templateUrl: 'cookbook/sourceCodeDiffDialog.gsp',
+	        controller: SourceCodeDiffController,
+	        scope: $scope,
+	        resolve: {
+	        	leftSourceCode: function () {
+	               return $scope.toCompare.leftSourceCode;
+	            },
+	            rightSourceCode: function () {
+		           return $scope.toCompare.rightSourceCode;
+	            },
+	            leftLabel: function () {
+			       return $scope.toCompare.leftLabel;
+                },
+	            rightLabel: function () {
+			       return $scope.toCompare.rightLabel;
+	            }
+	          }
+	    });
+
+	    dialogInstance.opened.then(function (modalReady) {
+	    	    $scope.$broadcast("sourceCodeDiffModalLoaded");
+	        }
+	    );		    
+	}
+
 	//----------------------
 
 	$scope.secureHTML = function(param){
@@ -1703,7 +1746,9 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
     	versionsArray : [],
 		selectedVersion : '',
 		selectedVersionRow : '',
-		currentSelectedTaskRow : ''
+		currentSelectedTaskRow : '',
+		toCompareVersions : [],
+        toCompareVersion : null
     }
 
     $scope.versions.gridData = [];
@@ -1788,16 +1833,46 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
     	}
     };
 
-    $scope.versions.getRecipeData = function(id){
-    	restCalls.getARecipeVersion({details:$scope.currentSelectedRecipe.recipeId, moreDetails: id},
+    $scope.versions.getRecipeVersionData = function(versionNumber){
+    	restCalls.getARecipeVersion({details:$scope.currentSelectedRecipe.recipeId, moreDetails: versionNumber},
     	function(data){
 	    	$log.info('Success on getting version');
 			$log.info(data.data);
 			$scope.versions.selectedVersion = data.data;
+			$scope.versions.updateToCompareVersions();
 		}, function(){
 			$log.info('Error on getting version');
 		});
     }
+
+    $scope.versions.getRecipeVersionDataAndCompare = function(versionNumber){
+    	if ($scope.versions.selectedVersion) {
+	    	if (versionNumber == "WIP") {
+	    		$scope.versions.compareVersions($scope.versions.selectedVersion, $scope.selectedRWip);
+	    	} else {
+	        	restCalls.getARecipeVersion({details:$scope.currentSelectedRecipe.recipeId, moreDetails: versionNumber},
+	    	    	function(data){
+	    		        $scope.versions.compareVersions($scope.versions.selectedVersion, data.data);
+	    			}, function(){
+	    				$log.info('Error on getting version');
+	    			}
+	    	    );
+	    	}
+    	}
+    }
+
+    $scope.versions.compareVersions = function(recipeVersion1, recipeVersion2){
+		$scope.showCompareCodeDialog(
+			recipeVersion1.sourceCode,
+			recipeVersion2.sourceCode,
+	 	    (angular.isNumber(recipeVersion1.versionNumber) && (recipeVersion1.versionNumber > 0))?("Version " + recipeVersion1.versionNumber):"WIP",
+		    (angular.isNumber(recipeVersion2.versionNumber) && (recipeVersion2.versionNumber > 0))?("Version " + recipeVersion2.versionNumber):"WIP"
+		);
+    }
+
+	$scope.versions.onCompareVersions = function() {
+		$scope.versions.getRecipeVersionDataAndCompare($scope.versions.toCompareVersion);	
+    };
 
 	var lastLoop;
 	$scope.versions.versionsGrid = {
@@ -1817,13 +1892,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 					if(rowItem.entity.id){
 						$log.info('Version Row changed');
 						$log.info(rowItem.entity);
-						if(!rowItem.entity.isCurrentVersion){
-							var id = (rowItem.entity.versionNumber) ? rowItem.entity.versionNumber : 0;
-							$scope.versions.selectedVersion = rowItem.entity;
-							$scope.versions.getRecipeData(id);
-						}else{
-							$scope.versions.selectedVersion = angular.copy($scope.selectedRecipe);
-						}
+						var versionNumber = (rowItem.entity.versionNumber) ? rowItem.entity.versionNumber : 0;
+						$scope.versions.getRecipeVersionData(versionNumber);
 						$log.info($scope.versions.selectedVersionRow);
 					}
 				}, 50)
@@ -1833,7 +1903,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	};
 
 	$scope.versions.getVersionsArray = function(arr){
-		$scope.versions.versionsArray = []
+		$scope.versions.versionsArray = [];
 	}
 
 	$scope.versions.getVersionsArray();
@@ -1844,7 +1914,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		restCalls.getVersions({moreDetails: obj.recipeId}, function(data){
 			$log.info('Success on getting versions');
 			$log.info(data.data.recipeVersions);
-			$scope.versions.versionsArray = data.data.recipeVersions
+			$scope.versions.versionsArray = data.data.recipeVersions;
 			setTimeout(function(){
 				$scope.versions.versionsGrid.selectRow(0, true);
 			}, 100)
@@ -1853,6 +1923,29 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		});
 	}
 
+	$scope.versions.updateToCompareVersions = function() {
+		var toCompareVersions = [];
+		if ($scope.versions.versionsArray && $scope.versions.selectedVersion) {
+			var addWIP = false;
+			var selectedVersion = $scope.versions.selectedVersion;
+			angular.forEach($scope.versions.versionsArray,
+			    function(value, key){
+				    if (selectedVersion.versionNumber != value.versionNumber) {
+					    if (angular.isNumber(value.versionNumber)) {
+						    toCompareVersions.push(value.versionNumber);
+					    } else {
+					    	addWIP = true;
+					    }
+				    }
+				}
+			);
+			if (addWIP) {
+				toCompareVersions.splice(0, 0, "WIP");				
+			}
+		}
+		$scope.versions.toCompareVersions = toCompareVersions;
+		$scope.versions.toCompareVersion = null;
+	}
 
 	////////////////////////
 
@@ -1905,3 +1998,36 @@ app.factory('servicesInterceptor', [function() {
     return servicesInterceptor;
 }]);
 
+/**
+ * This controller implements the behaviour for the source code diff dialog
+ */
+var SourceCodeDiffController = function ($scope, $modalInstance, $timeout, leftSourceCode, rightSourceCode, leftLabel, rightLabel) {
+	$scope.leftSourceCode = leftSourceCode;
+	$scope.rightSourceCode = rightSourceCode;
+	$scope.leftLabel = leftLabel;
+	$scope.rightLabel = rightLabel;
+
+	$scope.removeSrcCodeLoaderListener = $scope.$on('sourceCodeDiffModalLoaded', function(evt) {
+		$timeout( function() {
+		    var compareView = angular.element('#compareViewport');
+		    compareView.mergely({
+			   viewport: true,
+			   editor_width: '47%',
+			   editor_height: '402px',
+			   change_timeout: 100,
+			   cmsettings: { mode: "", readOnly: true, lineNumbers: true, lineWrapping: false },
+			   lhs: function(setValue) {
+   				   setValue($scope.leftSourceCode);
+			   },
+			   rhs: function(setValue) {
+				   setValue($scope.rightSourceCode);
+			   }
+		    });
+		    $scope.removeSrcCodeLoaderListener();
+		}, 250);
+	});
+
+	$scope.close = function () {
+		$modalInstance.dismiss('close');
+	};
+};

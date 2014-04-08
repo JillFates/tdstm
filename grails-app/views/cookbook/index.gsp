@@ -10,6 +10,7 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/codemirror.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/addon/dialog.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/addon/show-hint.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'mergely/mergely.css')}" />	
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'cookbook.css')}" />
 	<g:javascript src="angularNewVersion/angular.js" />
 	<g:javascript src="codemirror/codemirror.js" />
@@ -19,6 +20,7 @@
 	<g:javascript src="codemirror/addon/show-hint.js" />
 	<g:javascript src="codemirror/addon/javascript-hint.js" />
 	<g:javascript src="codemirror/javascript.js" />
+	<g:javascript src="mergely/mergely.js" />	
 	<g:javascript src="bootstrap.js" />
 	<g:javascript src="angular-resource.js" />
 	<g:javascript src="ui-bootstrap-tpls-0.10.0.js" />
@@ -207,13 +209,16 @@
 											<textarea readonly name="recipeCode" title="Double click to edit" id="recipeCode" rows="10" ng-model="selectedRecipe.sourceCode" ng-dblclick="syntaxModal.showModal = true" ng-disabled="!currentSelectedRecipe" value="{{selectedRecipe.sourceCode}}"></textarea>
 										</section>
 										<div class="clearfix btns">
-											<div class="btn-group pull-left" style="margin-right:15px;">
+											<div class="btn-group pull-left" style="margin-right:6px;">
 												<button type="button" class="btn btn-default" ng-disabled="!currentSelectedRecipe || !editingRecipe" ng-click="editorActions.saveWIP()">Save WIP</button>
 												<button type="button" ng-disabled="!selectedRecipe.hasWIP || !currentSelectedRecipe || selectedRecipe.versionNumber > 0" class="btn btn-default" ng-click="editorActions.releaseVersion()">Release</button>
 											</div>
-											<div class="btn-group pull-left">
+											<div class="btn-group pull-left" style="margin-right:6px;">
 												<button type="button" class="btn btn-default" ng-disabled="!editingRecipe || !currentSelectedRecipe" ng-click="editorActions.cancelChanges()">Cancel</button>
 												<button type="button" class="btn btn-default" ng-disabled="!selectedRecipe.hasWIP || !currentSelectedRecipe || selectedRecipe.versionNumber > 0" ng-click="editorActions.discardWIP()">Discard WIP</button>
+											</div>
+											<div class="btn-group pull-left">
+												<button type="button" class="btn btn-default" ng-disabled="!((selectedRWip != null) && (selectedRVersion != null && (selectedRVersion.versionNumber > 0)))" ng-click="editorActions.diff()">Diff</button>
 											</div>
 											<button type="submit" class="btn btn-default pull-right" ng-disabled="selectedRecipe.sourceCode == '' || !currentSelectedRecipe" ng-click="editorActions.validateSyntax()">Validate Syntax</button>
 										</div>
@@ -299,6 +304,17 @@
 												<textarea class="fullWidth" name="versions_sourcecode" id="versions_sourcecode" cols="30" rows="10" value="{{versions.selectedVersion.sourceCode}}" readonly></textarea>
 											</tab>
 											<tab heading="Diff" class="no-padding" active="activeSubTabs.versions.diff">
+											     <p>Compare syntax differences with another version</p>
+											     <p>
+											       <label ng-show="versions.toCompareVersions.length > 1">Versions:</label>
+												   <select  ng-show="versions.toCompareVersions.length > 1" name="vertionToCompareSelector" id="vertionToCompareSelector" ng-model="versions.toCompareVersion" ng-options="version for version in versions.toCompareVersions" required>
+													 <option value="">Please select a version</option>
+												   </select>
+											     </p>
+											     <p>
+											        <button type="submit" ng-disabled="!versions.toCompareVersion" ng-show="versions.toCompareVersions.length > 1" ng-click="versions.onCompareVersions()">Compare</button>
+											     </p>
+                                                 <label ng-show="versions.toCompareVersions.length <= 1">No versions available to compare</label>											     
 											</tab>	
 										</tabset>
 									</div>

@@ -212,6 +212,23 @@ form .error-msg{
 }
 /******/
 
+/* Code Diff Stuff */
+
+.codeDiff {
+	height: 420px;
+}
+
+.codeDiffHeaderLeft {
+	margin-left: 5px;
+}
+
+.codeDiffHeaderRight {
+	float: right;
+	margin-right: 15px;
+}
+
+/******/
+
 /* Validate Syntax Stuff */
 .syntaxErrors{
 	overflow: auto;
