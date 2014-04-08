@@ -133,9 +133,137 @@ tasks: [
 		team: 'PROJ_MGR'
 	],	
 ]
-
 	"""
-		
+
+	def problemRecipe2 = """
+groups: [
+	[	name: 'PHY',
+		filter: [
+			class: 'device',
+			asset: [
+				physical: true,
+			],
+		]
+	]
+],
+tasks: [
+	[
+		id: 2120,
+		description: 'Task with just indirect',
+		title: 'Blah \${it.assetName}',
+		team: 'SYS_ADMIN',
+		duration: '#startupDuration',
+		category: 'startup',
+		class: 'device',
+	],
+	[
+		id: 2140,
+		description: 'Task with indirect duration and default value',
+		title: 'Blah \${it.assetName}',
+		team: 'SYS_ADMIN',
+		duration: '#startupDuration,10',
+		category: 'startup',
+		class: 'device',
+	],
+	[
+		id: 2142,
+		description: 'Task with indirect duration and default value with valid scale',
+		title: 'Blah \${it.assetName}',
+		team: 'SYS_ADMIN',
+		duration: '#startupDuration,10h',
+		category: 'startup',
+		class: 'device',
+	],
+	[
+		id: 2144,
+		description: 'Task with indirect duration and default value with invalid scale',
+		title: 'Blah \${it.assetName}',
+		team: 'SYS_ADMIN',
+		duration: '#startupDuration,10x',
+		category: 'startup',
+		class: 'device',
+	],
+	[
+		id: 2160,
+		description: 'Task with bogus duration string and unknown team',
+		title: 'Blah \${it.assetName}',
+		team: 'SWAT_TEAM',
+		duration: 'abc',
+		category: 'startup',
+		class: 'device',
+	],
+	[
+		id: 2200,
+		description: 'Task with valid filter group reference',
+		title: 'Blah \${it.assetName}',
+		category: 'startup',
+		class: 'device',
+		filter: [
+			group: 'PHY',
+		],
+	],
+	[
+		id: 2210,
+		description: 'Task with bogus filter group reference',
+		title: 'Blah \${it.assetName}',
+		category: 'startup',
+		class: 'device',
+		filter: [
+			group: 'BOGUS',
+		],
+	],
+	[
+		id: 2300,
+		description: 'Task with valid filter include reference',
+		title: 'Blah \${it.assetName}',
+		category: 'startup',
+		class: 'device',
+		filter: [
+			include: 'PHY',
+		],
+	],
+	[
+		id: 2301,
+		description: 'Task with valid filter include reference',
+		title: 'Blah \${it.assetName}',
+		category: 'startup',
+		class: 'device',
+		filter: [
+			include: 'BOGUS',
+		],
+	],
+	[
+		id: 2310,
+		description: 'Task with BOGUS filter include reference',
+		title: 'Blah \${it.assetName}',
+		category: 'startup',
+		class: 'device',
+		filter: [
+			exclude: ['PHY', 'BOGUS'],
+		],
+	],
+	[
+		id: 2320,
+		description: 'Task with valid predecessor reference',
+		title: 'Blah \${it.assetName}',
+		category: 'startup',
+		class: 'device',
+		predecessor: [
+			group: 'PHY',
+		],
+	],
+	[
+		id: 2330,
+		description: 'Task with bogus predecessor reference',
+		title: 'Blah \${it.assetName}',
+		category: 'startup',
+		class: 'device',
+		predecessor: [
+			group: ['PHY', 'BOGUS'],
+		],
+	],
+]
+	"""
 		
 	/**
 	 * This is used to load the grails-app/conf/Config.groovy which contains both configurations as well as 
@@ -177,6 +305,18 @@ tasks: [
 	void testValidateProblem1() {
 		def errors = cookbookService.validateSyntax( problemRecipe1 )
 		assertNull errors
+	}
+	
+	void testValidateProblem2() {
+		def errors = cookbookService.validateSyntax( problemRecipe2 )
+		assertNotNull errors
+		assertEquals 'Should have one error', 6, errors.size()
+		assertTrue 'Should have an error', errors[0].detail.contains("Task id 2144 'duration' has invalid reference (#startupDuration,10x)")
+		assertTrue 'Should have an error', errors[1].detail.contains("Task id 2160 'duration' has invalid value (abc)")
+		assertTrue 'Should have an error', errors[2].detail.contains("Task id 2210 'filter/group' references an invalid group BOGUS")
+		assertTrue 'Should have an error', errors[3].detail.contains("Task id 2301 'filter/include' references an invalid group BOGUS")
+		assertTrue 'Should have an error', errors[4].detail.contains("Task id 2310 'filter/exclude' references an invalid group BOGUS")
+		assertTrue 'Should have an error', errors[5].detail.contains("Task id 2330 'predecessor/group' references an invalid group BOGUS")
 	}
 	
 	void testSimple() {

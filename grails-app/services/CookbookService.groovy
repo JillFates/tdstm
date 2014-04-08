@@ -3,6 +3,7 @@ import java.sql.SQLException;
 
 import java.sql.ResultSet
 import java.sql.SQLException
+import java.util.concurrent.ConcurrentHashMap.Values;
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 import org.springframework.dao.IncorrectResultSizeDataAccessException
@@ -903,7 +904,11 @@ class CookbookService {
 			id:0,
 			title:0,
 			description:0,
-			filter:0,
+			filter: [
+				group: '',
+				include: [],
+				exclude: []
+			],
 			type:['asset','action','milestone','gateway','general'],
 			action: ['rollcall','location','room','rack','truck','set'],
 			disposition:0,
@@ -938,8 +943,14 @@ class CookbookService {
 				gather: []
 			],
 			constraintTime:0,
-			constraintType:0
+			constraintType:0,
+			class:['device','database','application','storage']
 		]
+		
+		def ids = []
+		if (partyRelationshipService) {
+			ids = partyRelationshipService.getStaffingRoles()*.id
+		}
 
 		try {
 			recipe = parseRecipeSyntax(sourceCode)
@@ -1121,6 +1132,20 @@ class CookbookService {
 					// Check for any unsupported properties (misspellings, etc)
 					validateAgainstMap( 'task', task, taskProps )
 
+					if (task.containsKey('filter')) {
+						def taskFilter = task.filter
+						
+						if (taskFilter.containsKey('group')) {
+							this.validateGroupReferences(task, 'filter/group', taskFilter.group, groupKeys, errorList)
+						}
+						if (taskFilter.containsKey('include')) {
+							this.validateGroupReferences(task, 'filter/include', taskFilter.include, groupKeys, errorList)
+						}
+						if (taskFilter.containsKey('exclude')) {
+							this.validateGroupReferences(task, 'filter/exclude', taskFilter.exclude, groupKeys, errorList)
+						}
+					}
+						
 					// Validate the predecessor specifications
 					if (task.containsKey('predecessor')) {
 						def predecessor = task.predecessor
@@ -1170,6 +1195,9 @@ class CookbookService {
 							def hasDefer = predecessor.containsKey('defer')
 							def hasGather = predecessor.containsKey('gather')
 
+							if (hasGroup) {
+								this.validateGroupReferences(task, 'predecessor/group', predecessor.group, groupKeys, errorList)
+							}
 							if ( ! (hasMode || hasTaskSpec || hasGroup || hasGather) ) {
 								errorList << [ error: 3, reason: 'Missing property', 
 									detail: "$taskRef 'predecessor' section requires [mode | taskSpec | group | gather] property" ]
@@ -1210,7 +1238,13 @@ class CookbookService {
 						} 
 					}
 
-					// TODO - Add logic to validate that the Team / Role is valid
+					if (task.containsKey('team')) {
+						if (!ids.isEmpty() && !ids.contains(task.team)) {
+							errorList << [ error: 1, reason: 'Invalid syntax',
+								detail: "$taskRef 'team' references a not valid staffing role ${task.team}" ]
+
+						}
+					}
 
 					// Validate time constraints if specified and parse the definition so that the logic can use it
 					if ( task.containsKey('constraintType')) {
@@ -1291,11 +1325,11 @@ class CookbookService {
 									task.durationValue = null
 									task.durationUom = TimeScale.M
 								} else {
-									match = d =~ /#(\w{1,}),\s?(\d{1,})(?i)(m|h|d|w)/
+									match = d =~ /#(\w{1,}),\s?(\d{1,})(?i)(m|h|d|w)?/
 									if ( match.matches() ) {
 										task.durationIndirect = match[0][1]
 										task.durationValue = match[0][2]
-										task.durationUom = TimeScale.asEnum(match[0][3].toUpperCase())
+										task.durationUom = match[0][3] != null ? TimeScale.asEnum(match[0][3].toUpperCase()) : TimeScale.M
 									} else {
 										errorList << [ error: 1, reason: 'Invalid syntax', 
 											detail: "$taskRef 'duration' has invalid reference (${task.duration})" ]
@@ -1308,6 +1342,11 @@ class CookbookService {
 								if (match.matches()) {
 									task.durationValue = match[0][1]
 									task.durationUom = TimeScale.asEnum(match[0][2].toUpperCase())
+									
+									if (task.durationUom == null) {
+										errorList << [ error: 1, reason: 'Invalid syntax',
+											detail: "$taskRef 'duration' has an invalid timescale ${match[0][2].toUpperCase()}" ]
+									}
 								} else {
 									errorList << [ error: 1, reason: 'Invalid syntax', 
 										detail: "$taskRef 'duration' has invalid value (${d})" ]
@@ -1338,6 +1377,25 @@ class CookbookService {
 
 		return (errorList ?: null)
     }
+	
+	void validateGroupReferences(taskRef, fieldName, field, existingGroups, errorList) {
+		if (field) {
+			def values = []
+
+			if (field instanceof String) {
+				values.add(field)
+			} else if (field instanceof List) {
+				values.addAll(field)
+			}
+			
+			values.each { groupRef ->
+				if (!existingGroups.containsKey(groupRef)) {
+					errorList << [ error: 1, reason: 'Invalid syntax',
+						detail: "Task id ${taskRef.id} '$fieldName' references an invalid group $groupRef" ]
+				}
+			}
+		}
+	}
 }
 
 class RecipeMapper implements RowMapper {
