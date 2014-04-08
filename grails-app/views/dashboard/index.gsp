@@ -98,11 +98,11 @@
 						<!--Planned Completion<br>
 						12/12: 07:00 AM EST&#13;
 						<span id="spanPlanned"></span><br>-->
-						<span id="eventDescription" style="text-align: center;font-size: 1.6em;"></span><br />
+						<span id="eventDescription" style="text-align: center;font-size: 1.5em;"></span><br />
 						<span id="eventStringId"></span><br />
 						<span id="plannedStart" style="text-align: center;font-size: 3em;"></span><br />
-						<i><span style=" margin-left: 2%;">days</span><span style=" margin-left: 7%;">hours</span><span style=" margin-left: 9%;">mins</span></i><br/>
-						 <br /><b>Runbook Status:</b><span id="eventRunbook"style="font-size: 1.4em;"></span>
+						<i><span style=" margin-left: 2%;">days</span><span style=" margin-left: 7%;">hours</span><span style=" margin-left: 9%;">mins</span></i><br />
+						 <br /><b>Runbook Status:</b>&nbsp;<span id="eventRunbook"></span>
 					</div>
 				</div>
 				<div id="newstop">
