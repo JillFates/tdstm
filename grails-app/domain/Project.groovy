@@ -10,6 +10,14 @@ class Project extends PartyGroup {
 	def static final DEFAULT_PROJECT_ID = 2
 	def static final CUSTOM_FIELD_COUNT = 48
 	
+	static isDefaultProject(aProjectRef) {
+		if (aProjectRef instanceof Project) {
+			return aProjectRef.id == DEFAULT_PROJECT_ID
+		} else {
+			return aProjectRef == DEFAULT_PROJECT_ID
+		}
+	}
+	
 	String projectCode
 	String description
 	String trackChanges = 'Y'

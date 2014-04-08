@@ -299,8 +299,8 @@ class WsCookbookController {
 		def isArchived = params.archived
 		def catalogContext = params.context
 		def searchText = params.search
+		def projectType = params.projectType
 		def currentProject = securityService.getUserCurrentProject()
-		def projectType = currentProject.id;
 
 		try {
 			def results = cookbookService.findRecipes(isArchived, catalogContext, searchText, projectType, loginUser, currentProject)

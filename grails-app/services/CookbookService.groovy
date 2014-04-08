@@ -644,6 +644,9 @@ class CookbookService {
 		} else {
 
 			projectType = (projectType.class == String) ? projectType.toLowerCase() : projectType
+			if (projectType.isNumber()) {
+				projectType = projectType.toLong()
+			}
 			
 			switch (projectType) {
 				case 'master':
@@ -666,13 +669,19 @@ class CookbookService {
 					
 				case Long:
 					def project = Project.get(projectType)
+					log.debug('PROJECT ' + project)
 					if (project != null) {
-//						def peopleInProject = partyRelationshipService.getAvailableProjectStaffPersons(project)
-//						if (peopleInProject.contains(loginUser.person)) {
+						def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
+						def now = TimeUtil.nowGMT()
+						def projects = projectService.getActiveProject( now, projectHasPermission)*.id
+
+						log.debug('PROJECTS of USER ' + projects)
+						
+						if (Project.isDefaultProject(project) || projects.contains(project.id)) {
 							projectIds.add(projectType.toInteger())
-//						} else {
-//							throw new UnauthorizedException('The current user doesn\'t have access to the project')
-//						}
+						} else {
+							throw new UnauthorizedException('The current user doesn\'t have access to the project')
+						}
 					} else {
 						throw new UnauthorizedException('The current user doesn\'t have access to the project')
 					}
