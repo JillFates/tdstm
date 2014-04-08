@@ -787,3 +787,7 @@ br.page-break-after {
 .nodisplay{
 	display: none;
 }
+.prefButton{
+	margin-left:15px;
+	cursor: pointer;
+}

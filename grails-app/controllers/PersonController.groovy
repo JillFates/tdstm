@@ -1258,7 +1258,7 @@ class PersonController {
 		}
 		
 		
-		render(template:"showPreference",model:[prefMap:prefMap])
+		render(template:"showPreference",model:[prefMap:prefMap.sort{it.value}])
 	}
 	
 	/**

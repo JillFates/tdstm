@@ -712,7 +712,7 @@
       </div>
     </div>
     <g:javascript src="tdsmenu.js" />
-    <div id="userPrefDivId" style="display: none" title="${session.getAttribute("LOGIN_PERSON").name } Preferences">
+    <div id="userPrefDivId" style="display: none;min-width:250px;" title="${session.getAttribute("LOGIN_PERSON").name } Preferences">
     </div>
   </body>
 </html>
