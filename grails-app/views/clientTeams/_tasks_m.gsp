@@ -125,8 +125,8 @@
 							<tds:actionButton label="Assign To Me" icon="ui-icon-person" id="${issue?.item?.id}"  
 								onclick="assignTask('${issue?.item?.id}','${issue.item.assignedTo}', '${issue.item.status}','myTask')"/>
 							</g:if>
-							<g:if test="${issue.item.status == AssetCommentStatus.READY}">
-								<g:if test="${!issue?.item?.successors && !(issue?.item?.category in AssetComment.moveDayCategories)}">
+							<tds:hasPermission permission='CommentCrudView'>
+								<g:if test="${issue.item.status == AssetCommentStatus.READY && !(issue?.item?.category in AssetComment.moveDayCategories)}">
 									<span class="delay_myTasks">Delay for:</span>
 									<tds:actionButton label="1 day" icon="ui-icon-seek-next" id="${issue?.item?.id}"  
 										onclick="changeEstTime(1,'${issue?.item?.id}', this.id)"/>
@@ -135,7 +135,7 @@
 									<tds:actionButton label="7 days" icon="ui-icon-seek-next" id="${issue?.item?.id}"  
 										onclick="changeEstTime(7,'${issue?.item?.id}', this.id)"/>
 								</g:if>
-							</g:if>
+							</tds:hasPermission>
 						</td>
 					</tr>
 				</g:if>

@@ -153,17 +153,15 @@ class TaskController {
 					HtmlUtil.actionButton('Assign To Me', 'ui-icon-person', comment.id,
 						"assignTask('${comment.id}','${comment.assignedTo}', '${comment.status}', 'taskManager')")))
 			}
-			if(comment.status ==  AssetCommentStatus.READY ){
-				def hasSucc = TaskDependency.countByPredecessor( comment )
-				if(!hasSucc && !(comment.category in AssetComment.moveDayCategories)){
-					actionBar.append('<td class="delay_taskManager"><span>Delay for:</span></td>')
-					actionBar.append( _actionButtonTd(	"1dEst_${comment.id}",
-						HtmlUtil.actionButton('1 day', 'ui-icon-seek-next', comment.id,"changeEstTime('1','${comment.id}',this.id)")))
-					actionBar.append( _actionButtonTd(	"2dEst_${comment.id}",
-						HtmlUtil.actionButton('2 days', 'ui-icon-seek-next', comment.id,"changeEstTime('2','${comment.id}',this.id)")))
-					actionBar.append( _actionButtonTd(	"7dEst_${comment.id}",
-						HtmlUtil.actionButton('7 days', 'ui-icon-seek-next', comment.id,"changeEstTime('7','${comment.id}',this.id)")))
-				}
+			def hasDelayPrem = RolePermissions.hasPermission("CommentCrudView")
+			if(hasDelayPrem && comment.status ==  AssetCommentStatus.READY && !(comment.category in AssetComment.moveDayCategories)){
+				actionBar.append('<td class="delay_taskManager"><span>Delay for:</span></td>')
+				actionBar.append( _actionButtonTd(	"1dEst_${comment.id}",
+					HtmlUtil.actionButton('1 day', 'ui-icon-seek-next', comment.id,"changeEstTime('1','${comment.id}',this.id)")))
+				actionBar.append( _actionButtonTd(	"2dEst_${comment.id}",
+					HtmlUtil.actionButton('2 days', 'ui-icon-seek-next', comment.id,"changeEstTime('2','${comment.id}',this.id)")))
+				actionBar.append( _actionButtonTd(	"7dEst_${comment.id}",
+					HtmlUtil.actionButton('7 days', 'ui-icon-seek-next', comment.id,"changeEstTime('7','${comment.id}',this.id)")))
 			} 
 		}else {
 			log.warn "genActionBarHTML - invalid comment id (${params.id}) from user ${userLogin}"

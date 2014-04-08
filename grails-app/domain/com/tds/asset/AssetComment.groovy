@@ -75,7 +75,7 @@ class AssetComment {
 	
 	// Grouping of the various categories
 	def static final preMoveCategories = ['general','discovery','verify','analysis','planning','design','buildout','walkthru','premove']
-	def static final moveDayCategories = ['walkthru','premove','moveday','shutdown','physical','transport', 'startup']
+	def static final moveDayCategories = ['moveday','shutdown','physical','transport', 'startup']
 	def static final postMoveCategories = ['postmove','closeout']
 	def static final discoveryCategories = ['discovery', 'verify']
 	def static final planningCategories = ['analysis','planning','design','buildout']
