@@ -264,7 +264,7 @@ class WsDashboardController {
 					"dialInd": moveEventPlannedSnapshot?.dialIndicator, "confText": "High", 
 					"confColor": "green", "compTime":planSumCompTime,
 					'dayTime':"<span><b>${dayTime?.days?(dayTime?.days>10? dayTime?.days:'0'+dayTime?.days):'0'}:${dayTime?.hours?(dayTime?.hours>10?dayTime?.hours:'0'+dayTime?.hours):'00'}:${dayTime?.minutes?(dayTime?.minutes>10?dayTime?.minutes:'0'+dayTime?.minutes):'00'}</b></span>",
-					'eventString':eventString,'eventRunbook':moveEvent?.runbookStatus
+					'eventDescription':moveEvent?.description,'eventString':eventString,'eventRunbook':moveEvent?.runbookStatus
 				],
 				"revSum": [ 
 					"dialInd": moveEventRevisedSnapshot?.dialIndicator,
