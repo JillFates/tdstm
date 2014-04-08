@@ -207,16 +207,14 @@ class TaskController {
 						"assignTask('${comment.id}','${comment.assignedTo}', '${comment.status}', 'taskManager')")+
 					"</span>")
 			}
-			if(comment.status ==  AssetCommentStatus.READY ){
-				def hasSucc = TaskDependency.countByPredecessor( comment )
-				if(!hasSucc && !(comment.category in AssetComment.moveDayCategories)){
-					actionBar.append( "<span id='1dEst_${comment.id}' width='8%' nowrap='nowrap'>"+
-						HtmlUtil.actionButton('1 day', 'ui-icon-seek-next', comment.id,"changeEstTime('1','${comment.id}',this.id)")+"</span>")
-					actionBar.append( "<span id='2dEst_${comment.id}' width='8%' nowrap='nowrap'>"+
-						HtmlUtil.actionButton('2 days', 'ui-icon-seek-next', comment.id,"changeEstTime('2','${comment.id}',this.id)")+"</span>")
-					actionBar.append("<span id='7dEst_${comment.id}' width='8%' nowrap='nowrap'>"+
-						HtmlUtil.actionButton('7 days', 'ui-icon-seek-next', comment.id,"changeEstTime('7','${comment.id}',this.id)")+"</span>")
-				}
+			def hasDelayPrem = RolePermissions.hasPermission("CommentCrudView")
+			if(hasDelayPrem && comment.status ==  AssetCommentStatus.READY && !(comment.category in AssetComment.moveDayCategories)){
+				actionBar.append( "<span id='1dEst_${comment.id}' width='8%' nowrap='nowrap'>"+
+					HtmlUtil.actionButton('1 day', 'ui-icon-seek-next', comment.id,"changeEstTime('1','${comment.id}',this.id)")+"</span>")
+				actionBar.append( "<span id='2dEst_${comment.id}' width='8%' nowrap='nowrap'>"+
+					HtmlUtil.actionButton('2 days', 'ui-icon-seek-next', comment.id,"changeEstTime('2','${comment.id}',this.id)")+"</span>")
+				actionBar.append("<span id='7dEst_${comment.id}' width='8%' nowrap='nowrap'>"+
+					HtmlUtil.actionButton('7 days', 'ui-icon-seek-next', comment.id,"changeEstTime('7','${comment.id}',this.id)")+"</span>")
 			}
 			
 		}else {
