@@ -37,3 +37,8 @@ table{
 form label, * label{
 	font-weight: normal;
 }
+
+.show{
+	display: block !important;
+	visibility: visible !important;
+}

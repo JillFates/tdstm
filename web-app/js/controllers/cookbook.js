@@ -959,8 +959,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		}
 	}
 
-	var save = function(){
-		var dataToSend = $.param($scope.newRecipe);
+	var save = function(args){
+		var dataToSend = $.param(args);
 		restCalls.createRecipe(dataToSend, function(data){
 			$scope.alerts.addAlert({type: 'success', msg: 'Recipe Created', closeIn: 1500});
 			listRecipes($scope.gridData.length);
@@ -975,7 +975,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 	$scope.modalBtns.save = function () {
 		$scope.showDialog = false;
-		save();
+		var recipeToSave = ($scope.clone.activeTabs.newRecipe) ? $scope.newRecipe : $scope.clone.newRecipe;
+		save(recipeToSave); 
 	};
 
 	$scope.modalBtns.cancel = function () {
@@ -1042,9 +1043,144 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	//--------------
 
 
+	// CLONE
+
+	$scope.clone = {
+		contextArray : [{name: 'all'}, {name: 'Event'}, {name: 'Bundle'}, {name: 'Application'}],
+		projectsArray : [],
+		projectsStateArray : [],
+		selectedContext : '',
+		selectedProject : '',
+		selectedProjectState : '',
+		activeTabs : {
+			createNew : true,
+			clone : false
+		},
+		newRecipe : {
+			name: '',
+			description: ''
+		},
+		currentSelectedRecipeRow : '',
+		selectedRecipe : '',
+		givenProjects : { 
+			"status": "success",
+			"data": {
+				"projects": [
+					{
+						"id": 123,
+						"name": "Foo",
+						"description":"Move from NYC to NJ",
+						"projectCode": "MOVE_1",
+						"status": "active",
+						"completionDate": "2014/12/15",
+						"clientId": 343,
+						"clientName": "Acme, Inc.",
+					},
+					{
+						"id": 124,
+						"name": "Foo2",
+						"description":"Move from NJ to OH",
+						"projectCode": "MOVE_2",
+						"status": "delayed",
+						"completionDate": "2014/12/17",
+						"clientId": 343,
+						"clientName": "Acme, Inc.",
+					},
+					{
+						"id": 125,
+						"name": "Foo3",
+						"description":"Move from UT to SF",
+						"projectCode": "MOVE_3",
+						"status": "active",
+						"completionDate": "2014/12/19",
+						"clientId": 343,
+						"clientName": "Acme, Inc.",
+					}
+				]
+			}
+		}
+	}
+
+		// Grid stuff
+	$scope.clone.colDef = [
+		{field:'recipe', displayName:'Recipe', enableCellEdit: false, width: '**'},
+		{field:'description', displayName:'Description', enableCellEdit: false, width: '**'},
+		{field:'editor', displayName:'Editor', enableCellEdit: false, width: '**'},
+		{field:'last', displayName:'Last', enableCellEdit: false, width: '**'},
+		{field:'version', displayName:'Version', enableCellEdit: false, width: '**'},
+	]
+		// grid 
+	$scope.clone.projectsGrid = {
+		data: 'clone.gridData',
+		multiSelect: false,
+		columnDefs: 'clone.colDef',
+		selectedItems: [],
+		enableCellEditOnFocus: false,
+		afterSelectionChange: function(rowItem){
+			if(rowItem != $scope.clone.currentSelectedRecipeRow){
+				$scope.clone.currentSelectedRecipeRow = rowItem;
+				// This hack is to avoid changeRecipe() to be executed many times. 
+				// This is a known issue on the ng-grid for the afterSelectionChange event.
+				$timeout.cancel(lastLoop);
+				lastLoop = $timeout(function(){
+					if(rowItem.entity.name){
+						$log.info('Row changed');
+						$scope.clone.selectedRecipe = rowItem.entity;
+						$scope.clone.newRecipe.context = $scope.clone.selectedRecipe.context;
+						$scope.clone.newRecipe.cloneFrom = $scope.clone.selectedRecipe.recipeId;
+					}
+				}, 50)
+				
+			}
+		}
+		//$scope.clone.newRecipe.context = 
+	}; 
+
+	$timeout(function() {
+		$scope.clone.projectsArray = $scope.clone.givenProjects.data.projects;
+		angular.forEach($scope.clone.projectsArray, function(value, key){		
+			if($scope.clone.projectsStateArray.indexOf(value.status) == -1){
+				$scope.clone.projectsStateArray[key] = {name: value.status};
+			}
+		})
+	}, 500);
+
+
+
+	$scope.clone.optionsSelected = function(arg){
+		if($scope.clone.selectedContext && $scope.clone.selectedProject && $scope.clone.selectedProjectState){
+			restCalls.getListOfRecipes(
+				{context: $scope.clone.selectedContext.name, projectId: $scope.clone.selectedProject.id}, 
+				function(data){
+					$log.info('Success on getting Recipes to Clone');
+					$log.info(data.data.list);
+					$scope.clone.gridData = data.data.list;
+					$timeout(function(){
+						$scope.clone.projectsGrid.selectRow(0, true)
+					}, 200)
+				}, function(data){
+					$log.warn('Error on getting Recipes to Clone');
+					$scope.alerts.addAlert({type: 'danger', msg: 'Error: Could not get the list of Recipes'});
+				}
+			);
+			//$scope.clone.gridData = angular.copy($scope.clone.projectsArray);
+		}else{
+			$scope.clone.gridData = [];
+			$scope.clone.projectsGrid.selectedItems[0] = '';
+		}
+	}
+
+	$scope.clone.refreshGrid = function(){
+		$scope.clone.colDef = [
+			{field:'name', displayName:'Recipe', enableCellEdit: false, width: '**'},
+			{field:'description', displayName:'Description', enableCellEdit: false, width: '**'},
+			{field:'createdBy', displayName:'Editor', enableCellEdit: false, width: '**'},
+			{field:'lastUpdated', displayName:'Last', enableCellEdit: false, width: '**'},
+			{field:'versionNumber', displayName:'Version', enableCellEdit: false, width: '**'},
+		]
+	}
+
 	// TASKS STUFF ///////////////////////////////////
-
-
 	$scope.tasks = {
 		eventsArray : [],
 		boundlesArray : [],
@@ -1768,11 +1904,15 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		'<span class="actions" style="text-align: center;">'+
 			'<span ng-bind="row.entity.isCurrentVersion && \'*\' || \'\'"></span>'+
 		'</span>'+
+		'</div>',
+		versionNumberTemplate = '<div class="ngCellText" ng-class="col.colIndex()">'+
+			'<span ng-cell-text ng-bind="row.entity.versionNumber && row.entity.versionNumber || \'WIP\'"></span>'+
 		'</div>';
+		
 
 	$scope.versions.colDef = [
 		{field:'versionNumber', displayName:'Version', cellClass: 'text-right', enableCellEdit: false, 
-			width: '**'},
+			cellTemplate: versionNumberTemplate, width: '**'},
 		{field:'', displayName:'Current', enableCellEdit: false, sortable: false, 
 			cellTemplate: currentVersionTemplate, width: '**'},
 		{field:'lastUpdated', displayName:'Last Updated', enableCellEdit: false, width: '***'},

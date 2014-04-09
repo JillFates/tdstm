@@ -63,7 +63,7 @@
 				</div>
 				<div class="row-fluid clearfix">
 					<div class="col-md-12">
-						<tabset id="mainTabset">
+						<tabset id="mainTabset" class="hidden" ng-class="{show : true}">
 							%{-- Task Generation --}%
 							<tab heading="Task Generation" active="activeTabs.taskGeneration">
 								<p>Select appropriate context to generate tasks using the {{selectedRecipe.name}} recipe:</p>
@@ -350,7 +350,7 @@
 							<div class="modal-body">
 								<tabset>
 									%{-- New Recipe Tab --}%
-									<tab heading="Brand New Recipe" >
+									<tab heading="Brand New Recipe" active="clone.activeTabs.newRecipe">
 										<div class="form-group">
 											<label for="inputName" class="col-sm-2 control-label">Name*</label>
 											<div class="col-sm-10">
@@ -377,13 +377,56 @@
 									</tab>
 
 									%{-- Clone tab --}%
-									<tab heading="Clone An Existing Recipe">
-										Clone Recipe Stuff
+									<tab heading="Clone An Existing Recipe" active="clone.activeTabs.clone" ng-click="clone.refreshGrid()">
+										<div class="cloneSelectors">
+											<div class="form-group">
+												<label class="col-sm-2 control-label" for="eventSelect">Context</label>
+												<div class="col-sm-10">
+													<select class="form-control" name="contextSelect" id="cloneContextSelect" ng-model="clone.selectedContext" ng-change="clone.optionsSelected('context')" ng-options="item as item.name for item in clone.contextArray">
+														<option value="">Please select</option>
+													</select>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-2 control-label" for="projectSelect">Project</label>
+												<div class="col-sm-10">
+													<select class="form-control" name="projectSelect" id="cloneprojectSelect" ng-model="clone.selectedProject" ng-change="clone.optionsSelected('project')" ng-options="item as item.name for item in clone.projectsArray">
+														<option value="">Please select</option>
+													</select>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-2 control-label" for="projectStateSelect">Project State</label>
+												<div class="col-sm-10">
+													<select class="form-control" name="projectStateSelect" id="projectStateSelect" ng-model="clone.selectedProjectState" ng-change="clone.optionsSelected('projectState')" ng-options="item as item.name for item in clone.projectsStateArray">
+														<option value="">Please select</option>
+													</select>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-2 control-label">Recipe to clone</label>
+												<div class="col-sm-10">
+													<div class="gridStyle form-control" ng-grid="clone.projectsGrid" style="padding:0"></div>
+												</div>
+											</div>
+											<div class="form-group">
+												<label for="recipeName" class="col-sm-2 control-label">Name</label>
+												<div class="col-sm-10">
+													<input type="text" name="recipeName" ng-model="clone.newRecipe.name" class="form-control">
+												</div>
+											</div>
+											<div class="form-group">
+												<label for="recipeDescription" class="col-sm-2 control-label">Description</label>
+												<div class="col-sm-10">
+													<input type="text" name="recipeDescription" ng-model="clone.newRecipe.description" class="form-control"> 
+												</div>
+											</div>
+										</div>
 									</tab>
 								</tabset>
 							</div>
 							<div class="modal-footer">
-								<button class="btn btn-default" ng-disabled="createRecipeForm.$invalid || isUnchanged(newRecipe)" ng-click="modalBtns.save()">Save</button>
+								<button class="btn btn-default" ng-disabled="(clone.activeTabs.newRecipe && (createRecipeForm.$invalid || isUnchanged(newRecipe))) || (!clone.activeTabs.newRecipe && (!clone.newRecipe.name || !clone.newRecipe.description || !clone.projectsGrid.selectedItems[0]))" ng-click="modalBtns.save()">Save</button>
 								<button class="btn btn-default" ng-click="modalBtns.cancel()">Cancel</button>
 							</div>
 						</form>
