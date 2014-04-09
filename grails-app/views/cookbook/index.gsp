@@ -304,17 +304,17 @@
 												<textarea class="fullWidth" name="versions_sourcecode" id="versions_sourcecode" cols="30" rows="10" value="{{versions.selectedVersion.sourceCode}}" readonly></textarea>
 											</tab>
 											<tab heading="Diff" class="no-padding" active="activeSubTabs.versions.diff">
-											     <p>Compare syntax differences with another version</p>
+											     <p><label ng-show="versions.toCompareVersions.length > 0">Compare syntax differences with another version</label></p>
 											     <p>
-											       <label ng-show="versions.toCompareVersions.length > 1">Versions:</label>
-												   <select  ng-show="versions.toCompareVersions.length > 1" name="vertionToCompareSelector" id="vertionToCompareSelector" ng-model="versions.toCompareVersion" ng-options="version for version in versions.toCompareVersions" required>
+											       <label ng-show="versions.toCompareVersions.length > 0">Versions:</label>
+												   <select  ng-show="versions.toCompareVersions.length > 0" name="vertionToCompareSelector" id="vertionToCompareSelector" ng-model="versions.toCompareVersion" ng-options="version for version in versions.toCompareVersions" required>
 													 <option value="">Please select a version</option>
 												   </select>
 											     </p>
 											     <p>
-											        <button type="submit" ng-disabled="!versions.toCompareVersion" ng-show="versions.toCompareVersions.length > 1" ng-click="versions.onCompareVersions()">Compare</button>
+											        <button type="submit" ng-disabled="!versions.toCompareVersion" ng-show="versions.toCompareVersions.length > 0" ng-click="versions.onCompareVersions()">Compare</button>
 											     </p>
-                                                 <label ng-show="versions.toCompareVersions.length <= 1">No versions available to compare</label>											     
+                                                 <label ng-show="versions.toCompareVersions.length < 1">No versions available to compare</label>											     
 											</tab>	
 										</tabset>
 									</div>

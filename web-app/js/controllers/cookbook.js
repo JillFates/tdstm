@@ -1933,13 +1933,11 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				    if (selectedVersion.versionNumber != value.versionNumber) {
 					    if (angular.isNumber(value.versionNumber)) {
 						    toCompareVersions.push(value.versionNumber);
-					    } else {
-					    	addWIP = true;
 					    }
 				    }
 				}
 			);
-			if (addWIP) {
+			if ($scope.editingRecipe || $scope.selectedRecipe.hasWIP) {
 				toCompareVersions.splice(0, 0, "WIP");				
 			}
 		}
