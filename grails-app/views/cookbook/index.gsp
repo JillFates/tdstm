@@ -195,7 +195,7 @@
 								<div class="row clearfix edition">
 									<div class="col-xs-6">
 										<div class="titleWrapper row">
-											<h5 class="headingTitle col-xs-6">Recipe</h5>
+											<h5 class="headingTitle col-xs-6">{{currentSelectedRecipe.name}}</h5>
 											<div class="versionLinks col-xs-6" style="text-align: right;">
 												<label for="releasedVersionRadio" ng-show="gridOptions.selectedItems[0].versionNumber > 0">
 													<input type="radio" ng-model="wipConfig[gridData[currentSelectedRow.rowIndex].recipeId].opt" value="release" ng-change="switchWipRelease('release')" name="releasedWipVersion" id="releasedVersionRadio"> Version {{gridOptions.selectedItems[0].versionNumber}}

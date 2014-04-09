@@ -595,7 +595,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 	// Watch changes on changelog
 	$scope.$watch('selectedRecipe', function(newValue, oldValue) {
-		if (($scope.gridData != null) &&
+		if (($scope.gridData != null) && ($scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId] != null) &&
 			($scope.wipConfig[$scope.gridData[$scope.currentSelectedRow.rowIndex].recipeId].opt == 'wip')) {
 			$scope.selectedRWip.changelog = $scope.selectedRecipe.changelog;
 		}
