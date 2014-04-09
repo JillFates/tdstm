@@ -619,7 +619,7 @@
 		</tr>
 		<tr class = "issue" id="actStartShow" style="display: none">
 			<td valign="top" class="name"><label for="actStartEditId">Actual Start:</label></td>
-			<td valign="top" class="value" id="actStartShowId"></td>
+			<td valign="top" class="value" id="actStartEditId"></td>
 			<td valign="top" class="name" nowrap="nowrap" width="10%"><label for="actFinishShowId">Actual Finish:</label></td>
 			<td valign="top" class="value" id="actFinishEditId" nowrap="nowrap"></td>
 		</tr >

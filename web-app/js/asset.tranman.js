@@ -775,7 +775,7 @@ function showAssetDialog( e , action ) {
    	      		     params.dueDate ? $('#dueDateEditId').val(params.dueDate) : $('#dueDateEditId').val('')
    	      		    		 
 	      		     $('#actStartShowId').html(params.atStart)
-	      		     $('#actStartEditId').val(params.atStart)
+	      		     $('#actStartEditId').html(params.atStart)
 	      		     $('#actFinishShowId').html(params.dtResolved)
 	      		     $('#actFinishEditId').html(params.dtResolved)
 	      		     if(params.workflow){

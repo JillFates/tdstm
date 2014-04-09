@@ -402,7 +402,11 @@ class TaskService implements InitializingBean {
 			}
 			// Clear the actual Start if we're moving back before STARTED
 			if ( compareStatus(AssetCommentStatus.STARTED, status) > 0) {
-				task.actStart = null				
+				if(previousStatus!= AssetCommentStatus.HOLD){
+					task.actStart = null	
+				}else if(!task.actStart){
+					task.actStart = now
+				}		
 			}
 			
 			if ( task.isRunbookTask() && previousStatus ) {
