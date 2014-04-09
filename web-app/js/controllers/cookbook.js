@@ -418,7 +418,9 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		}else if(typeof($scope.currentSelectedRow.rowIndex) == 'number'){
 			$scope.gridOptions.selectRow($scope.currentSelectedRow.rowIndex, true);
 		}else{
-			$scope.gridOptions.selectRow(0, true);
+			$timeout(function(){
+				$scope.gridOptions.selectRow(0, true);
+			}, 100)
 		}
 	});
 
