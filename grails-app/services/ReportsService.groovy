@@ -776,7 +776,17 @@ class ReportsService {
 			def showDb = false
 			def dependsOnList = AssetDependency.findAllByAsset(asset)
 			def supportsList = AssetDependency.findAllByDependent(asset)
+			def noAppSupport = !supportsList.asset.assetType.contains(AssetType.APPLICATION.toString())
+			
 			def header=''
+			
+			if(!supportsList){
+				header += ' No DB support?'
+			}
+			if(noAppSupport){
+				header +=' No applications?'
+			}
+			
 			// skip the asset if there is no deps and support
 			if(!dependsOnList && !supportsList)
 				return
@@ -786,7 +796,6 @@ class ReportsService {
 			} else {
 				// Check for vm No support if showDb is true
 				if(!supportsList && dbSupport){
-					header = 'No DB support?'
 					showDb = true
 				}
 				// Check for bundleConflicts if showDb is false
@@ -812,10 +821,9 @@ class ReportsService {
 				
 				// Check for Run On if showDb is false
 				if(!showDb && noApps){
-					def isRunOn = supportsList.find{it.type == 'Runs On'}
+					def isRunOn = supportsList.find{it.type == 'DB'}
 					if(!isRunOn){
 						showDb = true
-						header='No applications?'
 					}
 				}
 			}
