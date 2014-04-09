@@ -791,3 +791,18 @@ br.page-break-after {
 	margin-left:15px;
 	cursor: pointer;
 }
+.customizeSelect{
+	position:relative;
+	float:right;
+	margin-top: -15px;
+}
+.customizeDiv{
+	background-color: #F8F8F8 ;
+	height: 300px !important;
+	position: fixed !important; 
+	margin-top: 4px;
+	width:auto;
+	z-index: 100; 
+	overflow-y: scroll !important;
+	text-align: left;
+}

@@ -108,7 +108,7 @@
 
 				<g:each var="key" in="['1','2','3','4']">
 					var assetPref= '${assetPref[key]}';
-					$("#assetListIdGrid_"+assetPref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:relative;float:right;margin-top: -15px;" onclick="showSelect(\''+assetPref+'\',\'assetList\',\''+${key}+'\')">');
+					$("#assetListIdGrid_"+assetPref).append('<img src="../images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+assetPref+'\',\'assetList\',\''+${key}+'\')">');
 				</g:each>
 			
 				$.jgrid.formatter.integer.thousandsSeparator='';
@@ -179,7 +179,7 @@
 			</div>
 			<g:each var="key" in="['1','2','3','4']">
 				<div id="columnCustomDiv_${assetPref[key]}" style="display:none;">
-					<div class="columnDiv_${key} customScroll" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width: auto;z-index: 2147483647; overflow-y: scroll;text-align: left;">
+					<div class="columnDiv_${key} customScroll customizeDiv">
 						<input type="hidden" id="previousValue_${key}" value="${assetPref[key]}" />
 						<g:each var="attribute" in="${attributesList}">
 							<label><input type="radio" name="coloumnSelector_${assetPref[key]}" id="coloumnSelector_${assetPref[key]}" value="${attribute.attributeCode}" 

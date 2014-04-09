@@ -47,7 +47,7 @@
 				
 				<g:each var="key" in="['1','2','3','4']">
 					var modelPref= '${modelPref[key]}';
-					$("#modelIdGrid_"+modelPref).append('<img src=\'${resource(dir:'images',file:'select2Arrow.png')}\' class="selectImage editSelectimage_'+${key}+'" style="position:absolute;margin-left: 55px;margin-top: -15px;" onclick="showSelect(\''+modelPref+'\',\'model\',\''+${key}+'\')">');
+					$("#modelIdGrid_"+modelPref).append('<img src=\'${resource(dir:'images',file:'select2Arrow.png')}\' class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+modelPref+'\',\'model\',\''+${key}+'\')">');
 				</g:each>
 				
 				$.jgrid.formatter.integer.thousandsSeparator='';
@@ -89,7 +89,7 @@
 			
 			<g:each var="key" in="['1','2','3','4']">
 				<div id="columnCustomDiv_${modelPref[key]}" style="display:none;">
-					<div class="columnDiv_${key}" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 148px;width: 144px;z-index: 2147483647; overflow-y: scroll;text-align: left;">
+					<div class="columnDiv_${key} customScroll customizeDiv">
 						<input type="hidden" id="previousValue_${key}" value="${modelPref[key]}" />
 						<g:each var="attribute" in="${attributesList}">
 							<label><input type="radio" name="coloumnSelector_${modelPref[key]}" id="coloumnSelector_${modelPref[key]}" value="${attribute}" 

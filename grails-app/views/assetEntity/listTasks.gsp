@@ -111,7 +111,7 @@
 
 			<g:each var="key" in="['1','2','3','4','5']">
 				var taskPref= '${taskPref[key]}';
-				$("#taskListIdGrid_"+taskPref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:absolute;margin-left: 36px;margin-top: -15px;" onclick="showSelect(\''+taskPref+'\',\'taskList\',\''+${key}+'\')">');
+				$("#taskListIdGrid_"+taskPref).append('<img src="../images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+taskPref+'\',\'taskList\',\''+${key}+'\')">');
 			</g:each>
 			
 			$('.bulkEdit').on('click',function(){
@@ -238,7 +238,7 @@
 		<input type="hidden" id="customizeFieldCount" value="6" />
 		<g:each var="key" in="['1','2','3','4','5']">
 			<div id="columnCustomDiv_${taskPref[key]}" style="display:none;">
-				<div class="columnDiv_${key}" style="background-color: #F8F8F8 ;height: 300px;position: fixed; top: 198px;width: 104px;z-index: 2147483647; overflow-y: scroll;text-align: left;">
+				<div class="columnDiv_${key} customScroll customizeDiv">
 					<input type="hidden" id="previousValue_${key}" value="${taskPref[key]}" />
 					<g:each var="attribute" in="${attributesList}">
 						<label><input type="radio" name="coloumnSelector_${taskPref[key]}" id="coloumnSelector_${taskPref[key]}" value="${attribute}" 
