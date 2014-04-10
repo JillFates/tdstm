@@ -20,15 +20,12 @@
 				<tbody>
 					<tr>
 						<td><label for="moveBundle">Bundle:</label></td>
-						<td><g:select from="${moveBundles}" id="moveBundleId" name="moveBundle" onChange="changeSmeSelect(this.value)"
+						<td><g:select from="${moveBundles}" id="moveBundleId" name="moveBundle" onChange="changeSmeSelect(this.value,'migration')"
 								optionKey="id" optionValue="name" value="${moveBundleId}"/></td>
 					</tr>
-					<tr>
-						<td><label for="moveBundle">SME:</label></td>
-						<td>
-							<g:render template="smeSelectByBundle"  model="[smeList:smeList]" />
-						</td>
-					</tr>
+					<tbody id="smeAndAppOwnerTbody">
+						<g:render template="smeSelectByBundle"  model="[smeList:smeList, appOwnerList:'', forWhom:'migration']" />
+					</tbody>
 					<tr>
 						<td><label for="startCateory">start of with:</label></td>
 						<td><g:select from="${AssetComment.constraints.category.inList}" id="startCateory" name="startCateory" value='shutdown'/></td>
@@ -66,18 +63,6 @@
 			$("#moveBundleId").append("<option value='useForPlanning'>Planning Bundles</option>");
 			$("#applicationMigrationButton").removeAttr('disabled');
 		});
-		
-		function changeSmeSelect(bundle){
-			jQuery.ajax({
-				url: contextPath+'/reports/generateSmeByBundle',
-				data: {'bundle':bundle},
-				type:'POST',
-				success: function(data) {
-					console.log("success");
-					$("#smeByModel").html(data)
-				}
-			});
-		}
 
 	</script>
 </body>

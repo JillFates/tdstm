@@ -18,7 +18,7 @@
 <body>
 	<div class="body" style="width:1000px;">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
-			<b>Application Profiles - ${project.name} : ${moveBundle} and SME : ${sme}</b><br/>
+			<b>Application Profiles - ${project.name} : ${moveBundle}, SME : ${sme} and App Owner : ${appOwner}</b><br/>
 			This report generated on <tds:convertDateTime date="${new Date()}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> for ${session.getAttribute("LOGIN_PERSON").name }.
 		</div>
 
@@ -39,7 +39,7 @@
 					<g:render template="../assetEntity/dependentShow" model="[assetEntity:application.app,supportAssets:application.supportAssets,dependentAssets:application.dependentAssets]" ></g:render>
 				</tr>
 			</tbody>
-		</table>"<br class="page-break-after">
+		</table><br class="page-break-after">
 	</g:each>
 	<div id="showEntityView" style="display: none;"></div>
 	<div id="editEntityView" style="display: none;"></div>

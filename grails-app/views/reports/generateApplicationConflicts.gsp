@@ -18,7 +18,7 @@
 <body>
 	<div class="body" style="width:1000px;">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
-			<b>Application Conflicts - ${project.name} : ${moveBundle}</b><br/>
+			<b>Application Conflicts - ${project.name} : ${moveBundle} and App Owner:${currAppOwner}</b><br/>
 			This analysis was performed on <tds:convertDateTime date="${new Date()}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> for ${session.getAttribute("LOGIN_PERSON").name }.
 		</div> 
 		<div style="color: black; font-size: 15px;text-align: center;">

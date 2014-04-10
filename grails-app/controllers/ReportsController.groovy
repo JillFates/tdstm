@@ -1332,8 +1332,9 @@ class ReportsController {
 		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def projectInstance = Project.findById( currProj ) 
 		def moveBundleList = MoveBundle.findAllByProject(projectInstance)
-		def moveBundleId = securityService.getUserCurrentMoveBundleId()
-		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId]
+		def moveBundleId = securityService.getUserCurrentMoveBundleId()?: moveBundleList[0]?.id
+		def appOwnerList = reportsService.getSmeList(moveBundleId, 'owner')
+		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId,appOwnerList:appOwnerList]
 	}
 	/**
 	 * Used to display application selection criteria page.
@@ -1342,8 +1343,9 @@ class ReportsController {
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		def moveBundleId = securityService.getUserCurrentMoveBundleId()?: moveBundleList[0]?.id
-		def smeList = reportsService.getSmeList(moveBundleId)
-		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId, smeList:smeList]
+		def smeList = reportsService.getSmeList(moveBundleId, 'sme')
+		def appOwnerList = reportsService.getSmeList(moveBundleId, 'owner')
+		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId, smeList:smeList,appOwnerList:appOwnerList]
 	}
 	
 	/**
@@ -1354,8 +1356,15 @@ class ReportsController {
 	def generateSmeByBundle = {
 		def project = securityService.getUserCurrentProject()
 		def moveBundleId=params.bundle
-		def smeList = reportsService.getSmeList(moveBundleId)
-		render(template:"smeSelectByBundle", model:[smeList:smeList])
+		def smeList = []
+		def appOwnerList = []
+		if(params.forWhom!='conflict'){
+			smeList = reportsService.getSmeList(moveBundleId, 'sme')
+		}
+		if(params.forWhom!='migration'){
+			appOwnerList = reportsService.getSmeList(moveBundleId, 'owner')
+		}
+		render(template:"smeSelectByBundle", model:[smeList:smeList,appOwnerList:appOwnerList,forWhom:params.forWhom?:''])
 	}
 	/**
 	 * Used to generate Application Profiles
@@ -1365,34 +1374,44 @@ class ReportsController {
 	 */
 	def generateApplicationProfiles = {
 		def project = securityService.getUserCurrentProject()
-		def currentSme 
-		def applicationList = []
 		def currentBundle 
+		def currentSme
+		def applicationOwner
 		
-		//checking various condition
-		if(params.moveBundle == 'useForPlanning'){		 //if user haven't selected any bundle
-			if(params.smeByModel!='null'){             	 //if user haven't selected any sme
-				currentSme = Person.get(params.smeByModel)
-				applicationList = Application.findAll("from Application where project = :project and (sme=:smes or sme2=:smes)",
-					[project:project,smes:currentSme]) 
-			}else {		
-				applicationList = Application.findAllByMoveBundleInList(MoveBundle.getUseForPlanningBundlesByProject(project))
-			}
-		}else{ //if user selects any bundle
+		def query = new StringBuffer(""" SELECT a.app_id AS id
+					FROM application a 
+					LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
+					LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
+					LEFT OUTER JOIN person p ON p.person_id=a.sme_id
+					LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id
+					LEFT OUTER JOIN person p2 ON p2.person_id=ae.app_owner_id
+					WHERE ae.project_id = ${project.id} """)
+		
+		if(params.moveBundle == 'useForPlanning'){
+			def bundleIds = MoveBundle.getUseForPlanningBundlesByProject(project)?.id
+			query.append(" AND mb.move_bundle_id in (${WebUtil.listAsMultiValueString(bundleIds)}) ")
+		}else{
 			currentBundle = MoveBundle.get(params.moveBundle)
-			if(params.smeByModel!='null'){//if user haven't selected any sme
-				currentSme = Person.get(params.smeByModel)
-				applicationList = Application.findAll("from Application where project = :project and moveBundle = :bundle \
-					and (sme=:smes or sme2=:smes)",[project:project,bundle:currentBundle,smes:currentSme])
-			}else { //if user selects any sme
-				applicationList = Application.findAllByMoveBundle(currentBundle)
-			}
+			query.append(" AND mb.move_bundle_id=${params.moveBundle} ")
 		}
+		
+		if(params.smeByModel!='null'){
+			currentSme = Person.get(params.smeByModel)
+			query.append(" AND (p.person_id=${params.smeByModel} or p1.person_id=${params.smeByModel}) ")
+		}
+		
+		if(params.appOwner!='null'){
+			applicationOwner = Person.get(params.appOwner)
+			query.append(" AND p2.person_id=${params.appOwner} ")
+		}
+		log.info "query = ${query}"
+		def applicationList = jdbcTemplate.queryForList(query.toString())
+		
 		ArrayList appList = new ArrayList()
 		//TODO:need to write a service method since the code used below is almost similar to application show.
 		applicationList.each{
 			def assetEntity = AssetEntity.get(it.id)
-			def applicationInstance = Application.get( it.id )
+			def applicationInstance = Application.get(it.id)
 			def assetComment 
 			def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
 			def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
@@ -1424,7 +1443,7 @@ class ReportsController {
 			  errors:params.errors])
 		}
 		
-		return [applicationList:appList, moveBundle:currentBundle , sme:currentSme?:'All' , project:project]
+		return [applicationList:appList, moveBundle:currentBundle?:'Planning Bundles' , sme:currentSme?:'All' ,appOwner:applicationOwner?:'All', project:project]
 	}
 	def generateApplicationConflicts = {
 		def project = securityService.getUserCurrentProject()
@@ -1434,8 +1453,9 @@ class ReportsController {
 		def conflicts = params.conflicts == 'on'
 		def unresolved = params.unresolved == 'on'
 		def missing = params."missing" == 'on'
+		def appOwner = params.appOwner
 		if( params.moveBundle == 'useForPlanning' )
-			return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved, missing, true)
+			return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved, missing, true, appOwner)
 		
 		if( moveBundleId && moveBundleId.isNumber() ){
 			def isProjMoveBundle  = MoveBundle.findByIdAndProject( moveBundleId, project )
@@ -1447,7 +1467,7 @@ class ReportsController {
 				userPreferenceService.setPreference( "MOVE_BUNDLE", "${moveBundleId}" )
 				moveBundleInstance = MoveBundle.get(moveBundleId)
 				//def eventsProjectInfo = getEventsProjectInfo(moveEventInstance,projectInstance,currProj,moveBundles,eventErrorList)
-				return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved, missing, false)//.add(['time':])
+				return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved, missing, false, appOwner)//.add(['time':])
 			}
 		}
 		flash.message = errorMsg
@@ -1630,7 +1650,7 @@ class ReportsController {
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		def moveBundleId = securityService.getUserCurrentMoveBundleId()
-		def smeList = reportsService.getSmeList(moveBundleId)
+		def smeList = reportsService.getSmeList(moveBundleId, 'sme')
 		def workflow = Workflow.findByProcess(project.workflowCode)
 		def workflowTransitions = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? order by w.transId", [workflow] )
 		def attributes = projectService.getAttributes('Application')

@@ -20,8 +20,11 @@
 				<tbody>
 					<tr>
 						<td>Bundle: <g:select from="${moveBundles}" id="moveBundleId" name="moveBundle"
-								optionKey="id" optionValue="name" value="${moveBundleId}"/></td>
+								optionKey="id" optionValue="name" value="${moveBundleId}" onChange="changeSmeSelect(this.value,'conflict')"/></td>
 					</tr>
+					<tbody id="smeAndAppOwnerTbody">
+						<g:render template="smeSelectByBundle"  model="[smeList:'', appOwnerList:appOwnerList, forWhom:'conflict']" />
+					</tbody>
 					<tr>
 						<td>
 							<input type="checkbox" name="missing" id="missing" checked="checked" />&nbsp;Missing

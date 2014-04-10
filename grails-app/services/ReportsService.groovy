@@ -78,10 +78,11 @@ class ReportsService {
 	 * @param boolean unresolved - If true, apps with dependencies with status 'Questioned' or 'Unknown' will be shown
 	 * @return Map - The parameters used by the view to generate the report
 	 */
-	def genApplicationConflicts(def currProj , def moveBundleId, def conflicts, def unresolved, def missing, def planning) {
+	def genApplicationConflicts(def currProj , def moveBundleId, def conflicts, def unresolved, def missing, def planning, def owner) {
 		def projectInstance = Project.findById( currProj )
 		ArrayList appList = new ArrayList()
 		def appsInBundle
+		def currAppOwner
 		log.info "****bundle:${moveBundleId} conflicts:${conflicts} unresolved:${unresolved} planning:${planning} missing: ${missing}"
 		
 		if(planning) {
@@ -89,6 +90,12 @@ class ReportsService {
 		} else {
 			appsInBundle = Application.findAllByMoveBundle(MoveBundle.findById(moveBundleId))
 		}
+		
+		if(owner!='null'){
+			currAppOwner = Person.get(owner)
+			appsInBundle = appsInBundle.findAll{it.appOwner==currAppOwner}
+		}
+		
 		log.info "${appsInBundle}"
 		appsInBundle.each {
 			def showApp = false
@@ -128,7 +135,7 @@ class ReportsService {
 			if(showApp)
 				appList.add([ 'app':it, 'dependsOnList':dependsOnList, 'supportsList':supportsList, 'dependsOnIssueCount':dependsOnList.size(), 'supportsIssueCount':supportsList.size() ])
 		}
-		return['project':projectInstance, 'appList':appList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : (moveBundleId), 'columns':9]
+		return['project':projectInstance, 'appList':appList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : (moveBundleId), 'columns':9,'currAppOwner':currAppOwner?:'All']
 	}
 	
 	/**
@@ -620,7 +627,7 @@ class ReportsService {
 	 * @param moveBundleId
 	 * @return smeList
 	 */
-	HashSet getSmeList(moveBundleId){
+	HashSet getSmeList(moveBundleId, forWhom){
 		def apps = []
 		Set smeListByBundle = []
 		def project = securityService.getUserCurrentProject()
@@ -633,7 +640,11 @@ class ReportsService {
 		}else{
 			apps = Application.findAllByProject(project)
 		}
-		smeListByBundle =  apps.collect{it.sme} + apps.collect{it.sme2}
+		if(forWhom == 'sme'){
+			smeListByBundle =  apps.collect{it.sme} + apps.collect{it.sme2}
+		}else{
+			smeListByBundle =  apps.collect{it.appOwner}
+		}
 		smeListByBundle.remove(null)
 		smeListByBundle.sort{it.lastName}
 		

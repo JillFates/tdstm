@@ -22,12 +22,9 @@
 						<td><g:select from="${moveBundles}" id="moveBundleId" name="moveBundle" onChange="changeSmeSelect(this.value)"
 								optionKey="id" optionValue="name" value="${moveBundleId}"/></td>
 					</tr>
-					<tr>
-						<td>SME : </td>
-						<td>
-							<g:render template="smeSelectByBundle"  model="[smeList:smeList]" />
-						</td>
-					</tr>
+					<tbody id="smeAndAppOwnerTbody">
+						<g:render template="smeSelectByBundle"  model="[smeList:smeList, appOwnerList:appOwnerList]" />
+					</tbody>
 					<tr>
 						<td colspan="2">
 							<div style="width: 150px; float: left;">
@@ -54,18 +51,6 @@
 			$("#applicationProfilesButton").removeAttr('disabled');
 		});
 		
-		function changeSmeSelect(bundle){
-			jQuery.ajax({
-				url: contextPath+'/reports/generateSmeByBundle',
-				data: {'bundle':bundle},
-				type:'POST',
-				success: function(data) {
-					console.log("success");
-					$("#smeByModel").html(data)
-				}
-			});
-		}
-
 	</script>
 </body>
 </html>
