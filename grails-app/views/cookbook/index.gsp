@@ -12,7 +12,7 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/addon/show-hint.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'mergely/mergely.css')}" />	
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'cookbook.css')}" />
-	<g:javascript src="angular/angular.js" />
+	<g:javascript src="angular/angular.min.js" />
 	<g:javascript src="codemirror/codemirror.js" />
 	<g:javascript src="codemirror/ui-codemirror.js" />
 	<g:javascript src="codemirror/addon/dialog.js" />

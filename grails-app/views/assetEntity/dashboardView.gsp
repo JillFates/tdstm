@@ -13,7 +13,7 @@
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
 <g:javascript src="scrollfollow.js" />
-<g:javascript src="angular/angular.js" />
+<g:javascript src="angular/angular.min.js" />
 <g:javascript src="angular/plugins/angular-ui.js"/>	
 <g:javascript src="cabling.js"/>
 <g:javascript src="asset.comment.js" />

@@ -18,7 +18,7 @@ function showCablingDetails( e, assetId ){
 	$("#cablingDialogId").dialog( "option", "width", "auto" )
 	$("#cablingDialogId").dialog("open")
 	$("#assetEntityId").val(assetId)
-	$.getScript( "../js/angular.min.js" )
+	$.getScript( "../js/angular/angular.min.js" )
 	setTimeout(function(){
 		$("#cableTable").show();
 	},500);

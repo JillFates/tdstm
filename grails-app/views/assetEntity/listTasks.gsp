@@ -12,7 +12,7 @@
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="entity.crud.js" />
 	<g:javascript src="model.manufacturer.js"/>
-	<g:javascript src="angular/angular.js" />
+	<g:javascript src="angular/angular.min.js" />
 	<g:javascript src="angular/plugins/angular-ui.js"/>	
 	<g:javascript src="cabling.js"/>
 	<jqgrid:resources />
