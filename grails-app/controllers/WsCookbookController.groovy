@@ -267,6 +267,7 @@ class WsCookbookController {
 			dataMap.lastUpdated = result.recipeVersion.lastUpdated
 			dataMap.versionNumber = result.recipeVersion.versionNumber
 			dataMap.releasedVersionNumber = (result.recipe.releasedVersion == null) ? -1 : result.recipe.releasedVersion.versionNumber
+			dataMap.recipeVersionId = result.recipeVersion.id
 			dataMap.hasWIP = result.wip != null
 			dataMap.sourceCode = result.recipeVersion.sourceCode
 			dataMap.changelog = result.recipeVersion.changelog

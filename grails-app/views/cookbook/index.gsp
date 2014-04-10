@@ -12,7 +12,7 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/addon/show-hint.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'mergely/mergely.css')}" />	
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'cookbook.css')}" />
-	<g:javascript src="angularNewVersion/angular.js" />
+	<g:javascript src="angular/angular.js" />
 	<g:javascript src="codemirror/codemirror.js" />
 	<g:javascript src="codemirror/ui-codemirror.js" />
 	<g:javascript src="codemirror/addon/dialog.js" />
@@ -22,11 +22,11 @@
 	<g:javascript src="codemirror/javascript.js" />
 	<g:javascript src="mergely/mergely.js" />	
 	<g:javascript src="bootstrap.js" />
-	<g:javascript src="angular-resource.js" />
+	<g:javascript src="angular/plugins/angular-resource.js" />
 	<g:javascript src="ui-bootstrap-tpls-0.10.0.js" />
 	<g:javascript src="controllers/cookbook.js" />
-	<g:javascript src="ngGrid/ng-grid-2.0.7.debug.js" />
-	<g:javascript src="ngGrid/ng-grid-layout.js" />
+	<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.debug.js" />
+	<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 </head>
 <body>
 

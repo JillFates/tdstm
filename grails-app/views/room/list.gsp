@@ -13,9 +13,9 @@
 		<g:javascript src="cabling.js"/>
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>	
-		<g:javascript src="angular.js" />
+		<g:javascript src="angular/angular.js" />
 		<g:javascript src="select2.js" />
-		<g:javascript src="angular-ui.js"/>	
+		<g:javascript src="angular/plugins/angular-ui.js"/>	
 
 	</head>
 	<body>

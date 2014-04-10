@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <title>Project Field Settings</title>
-<g:javascript src="angular.js" />
+<g:javascript src="angular/angular.js" />
 <g:javascript src="controllers/fieldImportance.js" />
 </head>
 <body>

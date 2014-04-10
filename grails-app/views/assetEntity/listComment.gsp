@@ -6,8 +6,8 @@
 		<title>Asset Comment</title>
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
-		<g:javascript src="angular.js" />
-		<g:javascript src="angular-ui.js"/>	
+		<g:javascript src="angular/angular.js" />
+		<g:javascript src="angular/plugins/angular-ui.js"/>	
 		<g:javascript src="cabling.js"/>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
