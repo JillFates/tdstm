@@ -395,14 +395,15 @@
 													</select>
 												</div>
 											</div>
-											<div class="form-group">
+											%{-- <div class="form-group">
 												<label class="col-sm-2 control-label" for="projectStateSelect">Project State</label>
 												<div class="col-sm-10">
-													<select class="form-control" name="projectStateSelect" id="projectStateSelect" ng-model="clone.selectedProjectState" ng-change="clone.optionsSelected('projectState')" ng-options="item as item.name for item in clone.projectsStateArray">
+													<select class="form-control" name="projectStateSelect" id="projectStateSelect" ng-model="clone.selectedProjectState" ng-change="clone.optionsSelected('projectState')">
 														<option value="">Please select</option>
+														<option ng-repeat="ps in clone.projectsStateArray" value="{{ps}}">{{ps}}</option>
 													</select>
 												</div>
-											</div>
+											</div> --}%
 											<div class="form-group">
 												<label class="col-sm-2 control-label">Recipe to clone</label>
 												<div class="col-sm-10">

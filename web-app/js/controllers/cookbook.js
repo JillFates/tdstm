@@ -13,7 +13,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	$log, $location, $anchorScroll, $sce) {
 	
 	// All Vars used
-	var restCalls, listRecipes, columnSel, actionsTemplate, updateBtns, lastLoop, confirmation, 
+	var restCalls, listRecipes, columnSel, actionsTemplate, updateBtns, lastLoop, lastLoopData, confirmation, 
 	confirmation, rowToShow, ModalInstanceCtrl, checkLoginStatus;
 
 	var layoutPluginGroups = new ngGridLayoutPlugin();
@@ -198,6 +198,13 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 					domain: "cookbook",
 					section: "recipeVersion",
 					details: "list"
+				}
+			},
+			getUserProjects: {
+				method: "GET",
+				params: {
+					domain: "project",
+					section: "userProjects"
 				}
 			}
 	};
@@ -410,10 +417,9 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	};
 
 	$scope.$on('ngGridEventData', function(){
-		var lastLoopGrid,
-			row = 0;
-		lastLoopGrid = $timeout(function(){
-			$log.info('nggrid event data');
+		var row = 0;
+		$timeout.cancel(lastLoopData);
+		lastLoopData = $timeout(function(){
 			if(typeof(rowToShow) == 'number'){
 				row = ($scope.gridOptions.data.length == 1) ? 0 : rowToShow;
 				rowToShow = null;
@@ -892,6 +898,156 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		}  
 	};
 
+	// CLONE
+
+	$scope.clone = {
+		contextArray : [{name: 'all'}, {name: 'Event'}, {name: 'Bundle'}, {name: 'Application'}],
+		projectsArray : [],
+		projectsStateArray : [],
+		selectedContext : '',
+		selectedProject : '',
+		selectedProjectState : '',
+		activeTabs : {
+			createNew : true,
+			clone : false
+		},
+		newRecipe : {
+			name: '',
+			description: ''
+		},
+		currentSelectedRecipeRow : '',
+		selectedRecipe : '',
+		givenProjects : { 
+			"status": "success",
+			"data": {
+				"projects": [
+					{
+						"id": 123,
+						"name": "Foo",
+						"description":"Move from NYC to NJ",
+						"projectCode": "MOVE_1",
+						"status": "active",
+						"completionDate": "2014/12/15",
+						"clientId": 343,
+						"clientName": "Acme, Inc.",
+					},
+					{
+						"id": 124,
+						"name": "Foo2",
+						"description":"Move from NJ to OH",
+						"projectCode": "MOVE_2",
+						"status": "delayed",
+						"completionDate": "2014/12/17",
+						"clientId": 343,
+						"clientName": "Acme, Inc.",
+					},
+					{
+						"id": 125,
+						"name": "Foo3",
+						"description":"Move from UT to SF",
+						"projectCode": "MOVE_3",
+						"status": "active",
+						"completionDate": "2014/12/19",
+						"clientId": 343,
+						"clientName": "Acme, Inc.",
+					}
+				]
+			}
+		}
+	}
+
+		// Grid stuff
+	$scope.clone.colDef = [
+		{field:'recipe', displayName:'Recipe', enableCellEdit: false, width: '**'},
+		{field:'description', displayName:'Description', enableCellEdit: false, width: '**'},
+		{field:'editor', displayName:'Editor', enableCellEdit: false, width: '**'},
+		{field:'last', displayName:'Last', enableCellEdit: false, width: '**'},
+		{field:'version', displayName:'Version', enableCellEdit: false, width: '**'},
+	]
+		// grid 
+	$scope.clone.projectsGrid = {
+		data: 'clone.gridData',
+		multiSelect: false,
+		columnDefs: 'clone.colDef',
+		selectedItems: [],
+		enableCellEditOnFocus: false,
+		afterSelectionChange: function(rowItem){
+			if(rowItem != $scope.clone.currentSelectedRecipeRow){
+				$scope.clone.currentSelectedRecipeRow = rowItem;
+				// This hack is to avoid changeRecipe() to be executed many times. 
+				// This is a known issue on the ng-grid for the afterSelectionChange event.
+				$timeout.cancel(lastLoop);
+				lastLoop = $timeout(function(){
+					if(rowItem.entity.name){
+						$log.info('Row changed');
+						$scope.clone.selectedRecipe = rowItem.entity;
+						$scope.clone.newRecipe.context = $scope.clone.selectedRecipe.context;
+						$scope.clone.newRecipe.cloneFrom = $scope.clone.selectedRecipe.recipeId;
+					}
+				}, 50)
+				
+			}
+		}
+		//$scope.clone.newRecipe.context = 
+	}; 
+
+	getProjectsAndStatuses = function(){
+		$log.log('getProjectsAndStatuses');
+		restCalls.getUserProjects(
+			{currentPage: 0, maxRows: 1000}, 
+			function(data){
+				$log.info('Success on getting Project list');
+				$scope.clone.projectsArray = data.data.projects;
+				angular.forEach($scope.clone.projectsArray, function(value, key){
+					//$log.info($scope.clone.projectsStateArray);
+					if($scope.clone.projectsStateArray.indexOf(value.status) == -1){
+						$scope.clone.projectsStateArray.push(value.status);
+					}
+				})
+			}, function(data){
+				$log.warn('Error on getting Project list');
+				$scope.alerts.addAlert({type: 'danger', msg: 'Error: Could not get the list of Projects'});
+			}
+		);
+	}
+
+	$scope.clone.optionsSelected = function(arg){
+		if($scope.clone.selectedContext && $scope.clone.selectedProject/* && $scope.clone.selectedProjectState*/){
+			$log.info('fill the grid');
+			restCalls.getListOfRecipes(
+				{context: $scope.clone.selectedContext.name, projectId: $scope.clone.selectedProject.id}, 
+				function(data){
+					$log.info('Success on getting Recipes to Clone');
+					$log.info(data.data.list);
+					$scope.clone.gridData = data.data.list;
+					$timeout(function(){
+						$scope.clone.projectsGrid.selectRow(0, true)
+					}, 200)
+				}, function(data){
+					$log.warn('Error on getting Recipes to Clone');
+					$scope.alerts.addAlert({type: 'danger', msg: 'Error: Could not get the list of Recipes'});
+				}
+			);
+			//$scope.clone.gridData = angular.copy($scope.clone.projectsArray);
+		}else{
+			$log.info('blank the grid');
+			$scope.clone.gridData = [];
+			$scope.clone.projectsGrid.selectedItems[0] = '';
+		}
+	}
+
+	$scope.clone.refreshGrid = function(){
+		$scope.clone.colDef = [
+			{field:'name', displayName:'Recipe', enableCellEdit: false, width: '**'},
+			{field:'description', displayName:'Description', enableCellEdit: false, width: '**'},
+			{field:'createdBy', displayName:'Editor', enableCellEdit: false, width: '**'},
+			{field:'lastUpdated', displayName:'Last', enableCellEdit: false, width: '**'},
+			{field:'versionNumber', displayName:'Version', enableCellEdit: false, width: '**'},
+		]
+	}
+
+	/////////////////////////////////
+
 	// Modal general stuff ------------------------------
 	$scope.modalBtns = {};
 
@@ -900,10 +1056,12 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		if (!elem)
 			elem = element;
 
-		if (visible)
-			elem.modal("show");                     
-		else
+		if (visible){
+			elem.modal("show");
+			getProjectsAndStatuses();                     
+		}else{
 			elem.modal("hide");
+		}
 	}
 
 	// Syntax Modal Stuff
@@ -1045,143 +1203,6 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	}
 	//--------------
 
-
-	// CLONE
-
-	$scope.clone = {
-		contextArray : [{name: 'all'}, {name: 'Event'}, {name: 'Bundle'}, {name: 'Application'}],
-		projectsArray : [],
-		projectsStateArray : [],
-		selectedContext : '',
-		selectedProject : '',
-		selectedProjectState : '',
-		activeTabs : {
-			createNew : true,
-			clone : false
-		},
-		newRecipe : {
-			name: '',
-			description: ''
-		},
-		currentSelectedRecipeRow : '',
-		selectedRecipe : '',
-		givenProjects : { 
-			"status": "success",
-			"data": {
-				"projects": [
-					{
-						"id": 123,
-						"name": "Foo",
-						"description":"Move from NYC to NJ",
-						"projectCode": "MOVE_1",
-						"status": "active",
-						"completionDate": "2014/12/15",
-						"clientId": 343,
-						"clientName": "Acme, Inc.",
-					},
-					{
-						"id": 124,
-						"name": "Foo2",
-						"description":"Move from NJ to OH",
-						"projectCode": "MOVE_2",
-						"status": "delayed",
-						"completionDate": "2014/12/17",
-						"clientId": 343,
-						"clientName": "Acme, Inc.",
-					},
-					{
-						"id": 125,
-						"name": "Foo3",
-						"description":"Move from UT to SF",
-						"projectCode": "MOVE_3",
-						"status": "active",
-						"completionDate": "2014/12/19",
-						"clientId": 343,
-						"clientName": "Acme, Inc.",
-					}
-				]
-			}
-		}
-	}
-
-		// Grid stuff
-	$scope.clone.colDef = [
-		{field:'recipe', displayName:'Recipe', enableCellEdit: false, width: '**'},
-		{field:'description', displayName:'Description', enableCellEdit: false, width: '**'},
-		{field:'editor', displayName:'Editor', enableCellEdit: false, width: '**'},
-		{field:'last', displayName:'Last', enableCellEdit: false, width: '**'},
-		{field:'version', displayName:'Version', enableCellEdit: false, width: '**'},
-	]
-		// grid 
-	$scope.clone.projectsGrid = {
-		data: 'clone.gridData',
-		multiSelect: false,
-		columnDefs: 'clone.colDef',
-		selectedItems: [],
-		enableCellEditOnFocus: false,
-		afterSelectionChange: function(rowItem){
-			if(rowItem != $scope.clone.currentSelectedRecipeRow){
-				$scope.clone.currentSelectedRecipeRow = rowItem;
-				// This hack is to avoid changeRecipe() to be executed many times. 
-				// This is a known issue on the ng-grid for the afterSelectionChange event.
-				$timeout.cancel(lastLoop);
-				lastLoop = $timeout(function(){
-					if(rowItem.entity.name){
-						$log.info('Row changed');
-						$scope.clone.selectedRecipe = rowItem.entity;
-						$scope.clone.newRecipe.context = $scope.clone.selectedRecipe.context;
-						$scope.clone.newRecipe.cloneFrom = $scope.clone.selectedRecipe.recipeId;
-					}
-				}, 50)
-				
-			}
-		}
-		//$scope.clone.newRecipe.context = 
-	}; 
-
-	$timeout(function() {
-		$scope.clone.projectsArray = $scope.clone.givenProjects.data.projects;
-		angular.forEach($scope.clone.projectsArray, function(value, key){		
-			if($scope.clone.projectsStateArray.indexOf(value.status) == -1){
-				$scope.clone.projectsStateArray[key] = {name: value.status};
-			}
-		})
-	}, 500);
-
-
-
-	$scope.clone.optionsSelected = function(arg){
-		if($scope.clone.selectedContext && $scope.clone.selectedProject && $scope.clone.selectedProjectState){
-			restCalls.getListOfRecipes(
-				{context: $scope.clone.selectedContext.name, projectId: $scope.clone.selectedProject.id}, 
-				function(data){
-					$log.info('Success on getting Recipes to Clone');
-					$log.info(data.data.list);
-					$scope.clone.gridData = data.data.list;
-					$timeout(function(){
-						$scope.clone.projectsGrid.selectRow(0, true)
-					}, 200)
-				}, function(data){
-					$log.warn('Error on getting Recipes to Clone');
-					$scope.alerts.addAlert({type: 'danger', msg: 'Error: Could not get the list of Recipes'});
-				}
-			);
-			//$scope.clone.gridData = angular.copy($scope.clone.projectsArray);
-		}else{
-			$scope.clone.gridData = [];
-			$scope.clone.projectsGrid.selectedItems[0] = '';
-		}
-	}
-
-	$scope.clone.refreshGrid = function(){
-		$scope.clone.colDef = [
-			{field:'name', displayName:'Recipe', enableCellEdit: false, width: '**'},
-			{field:'description', displayName:'Description', enableCellEdit: false, width: '**'},
-			{field:'createdBy', displayName:'Editor', enableCellEdit: false, width: '**'},
-			{field:'lastUpdated', displayName:'Last', enableCellEdit: false, width: '**'},
-			{field:'versionNumber', displayName:'Version', enableCellEdit: false, width: '**'},
-		]
-	}
 
 	// TASKS STUFF ///////////////////////////////////
 	$scope.tasks = {
