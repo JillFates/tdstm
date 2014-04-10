@@ -1345,7 +1345,7 @@ class ReportsController {
 		def moveBundleId = securityService.getUserCurrentMoveBundleId()?: moveBundleList[0]?.id
 		def smeList = reportsService.getSmeList(moveBundleId, 'sme')
 		def appOwnerList = reportsService.getSmeList(moveBundleId, 'owner')
-		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId, smeList:smeList,appOwnerList:appOwnerList]
+		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId, smeList:smeList.sort{it.lastName},appOwnerList:appOwnerList.sort{it.lastName}]
 	}
 	
 	/**
@@ -1364,7 +1364,7 @@ class ReportsController {
 		if(params.forWhom!='migration'){
 			appOwnerList = reportsService.getSmeList(moveBundleId, 'owner')
 		}
-		render(template:"smeSelectByBundle", model:[smeList:smeList,appOwnerList:appOwnerList,forWhom:params.forWhom?:''])
+		render(template:"smeSelectByBundle", model:[smeList:smeList.sort{it.lastName},appOwnerList:appOwnerList.sort{it.lastName},forWhom:params.forWhom?:''])
 	}
 	/**
 	 * Used to generate Application Profiles
@@ -1657,7 +1657,7 @@ class ReportsController {
 		def projectCustoms = project.customFieldsShown+1
 		def nonCustomList = (projectCustoms..48).collect{"custom"+it}
 		def appAttributes = attributes.findAll{!(it.attributeCode in nonCustomList)}
-		return ['moveBundles':moveBundleList, moveBundleId:moveBundleId, smeList:smeList,workflowTransitions:workflowTransitions, appAttributes:appAttributes]
+		return ['moveBundles':moveBundleList, moveBundleId:moveBundleId, smeList:smeList.sort{it.lastName},workflowTransitions:workflowTransitions, appAttributes:appAttributes]
 	}
 	/**
 	 * Used to generate Application Migration Report.
